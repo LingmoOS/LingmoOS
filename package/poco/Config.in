@@ -1,0 +1,123 @@
+config LINGMO_PACKAGE_POCO_ARCH_SUPPORTS
+	bool
+	default y
+	depends on !LINGMO_arc
+	depends on !LINGMO_microblaze
+	depends on !LINGMO_mipsel
+	depends on !LINGMO_or1k
+	depends on !LINGMO_RISCV_32
+	depends on !LINGMO_xtensa
+
+config LINGMO_PACKAGE_POCO
+	bool "poco"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17
+	# pthread_condattr_setclock
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	depends on LINGMO_PACKAGE_POCO_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  The C++ Portable Components Libraries
+
+	  http://pocoproject.org
+
+if LINGMO_PACKAGE_POCO
+
+comment "poco components"
+
+config LINGMO_PACKAGE_POCO_ACTIVERECORD
+	bool "ActiveRecord"
+	select LINGMO_PACKAGE_POCO_XML
+
+config LINGMO_PACKAGE_POCO_CPP_PARSER
+	bool "CppParser"
+
+config LINGMO_PACKAGE_POCO_CRYPTO
+	bool "Crypto"
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_OPENSSL
+
+config LINGMO_PACKAGE_POCO_DATA
+	bool
+
+config LINGMO_PACKAGE_POCO_DATA_MYSQL
+	bool "Data/MySQL"
+	depends on LINGMO_USE_MMU # mysql
+	select LINGMO_PACKAGE_MARIADB
+	select LINGMO_PACKAGE_POCO_DATA
+
+config LINGMO_PACKAGE_POCO_DATA_PGSQL
+	bool "Data/PostgreSQL"
+	depends on LINGMO_USE_MMU # postgresql
+	depends on !LINGMO_OPTIMIZE_FAST # postgresql
+	select LINGMO_PACKAGE_POCO_DATA
+	select LINGMO_PACKAGE_POSTGRESQL
+
+comment "Data/PostgreSQL can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST
+
+config LINGMO_PACKAGE_POCO_DATA_SQLITE
+	bool "Data/SQLite"
+	select LINGMO_PACKAGE_POCO_DATA
+	select LINGMO_PACKAGE_SQLITE
+
+config LINGMO_PACKAGE_POCO_JSON
+	bool "JSON"
+
+config LINGMO_PACKAGE_POCO_JWT
+	bool "JWT"
+	select LINGMO_PACKAGE_POCO_CRYPTO
+	select LINGMO_PACKAGE_POCO_JSON
+
+config LINGMO_PACKAGE_POCO_MONGODB
+	bool "MongoDB"
+	select LINGMO_PACKAGE_POCO_NET
+
+config LINGMO_PACKAGE_POCO_NET
+	bool "Net"
+
+config LINGMO_PACKAGE_POCO_NETSSL_OPENSSL
+	bool "NetSSL_OpenSSL"
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_POCO_CRYPTO
+	select LINGMO_PACKAGE_POCO_NET
+	select LINGMO_PACKAGE_POCO_UTIL
+
+config LINGMO_PACKAGE_POCO_PDF
+	bool "PDF"
+	select LINGMO_PACKAGE_POCO_JSON
+	select LINGMO_PACKAGE_POCO_UTIL
+	select LINGMO_PACKAGE_POCO_XML
+
+config LINGMO_PACKAGE_POCO_PROMETHEUS
+	bool "Prometheus"
+	select LINGMO_PACKAGE_POCO_NET
+
+config LINGMO_PACKAGE_POCO_REDIS
+	bool "Redis"
+	select LINGMO_PACKAGE_POCO_NET
+
+config LINGMO_PACKAGE_POCO_UTIL
+	bool "Util"
+	select LINGMO_PACKAGE_POCO_XML
+
+config LINGMO_PACKAGE_POCO_XML
+	bool "XML"
+	select LINGMO_PACKAGE_EXPAT
+
+config LINGMO_PACKAGE_POCO_ZIP
+	bool "Zip"
+	select LINGMO_PACKAGE_POCO_NET
+	select LINGMO_PACKAGE_POCO_UTIL
+	select LINGMO_PACKAGE_POCO_XML
+
+endif # LINGMO_PACKAGE_POCO
+
+comment "poco needs a toolchain w/ wchar, NPTL, C++, dynamic library, gcc >= 8"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+	depends on LINGMO_PACKAGE_POCO_ARCH_SUPPORTS

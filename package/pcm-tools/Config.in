@@ -1,0 +1,33 @@
+comment "pcm-tools needs a toolchain w/ C++, NPTL"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+
+config LINGMO_PACKAGE_PCM_TOOLS
+	bool "pcm-tools"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	select LINGMO_PACKAGE_HWDATA
+	select LINGMO_PACKAGE_HWDATA_PCI_IDS
+	help
+	  Processor Counter Monitor (PCM) is an application programming
+	  interface (API) and a set of tools based on the API to monitor
+	  performance and energy metrics of Intel(R) Core(TM), Xeon(R),
+	  Atom(TM) and Xeon Phi(TM) processors.
+
+	  https://github.com/opcm/pcm
+
+if LINGMO_PACKAGE_PCM_TOOLS
+
+config LINGMO_PACKAGE_PCM_TOOLS_PMU_QUERY
+	bool "install the pmu-query script"
+	default y
+	depends on LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_CA_CERTIFICATES # https
+	select LINGMO_PACKAGE_PYTHON3_SSL # urllib2
+
+comment "pmu-query needs Python3"
+	depends on !LINGMO_PACKAGE_PYTHON3
+
+endif

@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64 || LINGMO_arm || LINGMO_i386 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_WEBRTC_AUDIO_PROCESSING
+	bool "webrtc-audio-processing"
+	depends on LINGMO_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # libabseil-cpp
+	# pthread_condattr_setclock
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !LINGMO_STATIC_LIBS # libabseil-cpp
+	select LINGMO_PACKAGE_LIBABSEIL_CPP
+	help
+	  AudioProcessing library based on Google's implementation of
+	  WebRTC.
+
+	  http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/
+
+comment "webrtc-audio-processing needs a toolchain w/ C++, NPTL, dynamic library, gcc >= 8"
+	depends on LINGMO_PACKAGE_WEBRTC_AUDIO_PROCESSING_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8

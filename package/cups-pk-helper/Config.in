@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_CUPS_PK_HELPER
+	bool "cups-pk-helper"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # polkit -> c++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2, polkit
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on !LINGMO_STATIC_LIBS # polkit -> duktape
+	depends on !LINGMO_OPTIMIZE_FAST # polkit -> duktape
+	depends on LINGMO_PACKAGE_CUPS
+	select LINGMO_PACKAGE_POLKIT
+	help
+	  cups-pk-helper is a PolicyKit helper to configure cups with
+	  fine-grained privileges.
+
+	  https://wiki.freedesktop.org/www/Software/cups-pk-helper/
+
+comment "cups-pk-helper support needs a toolchain with threads, wchar, dynamic library, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+comment "cups-pk-helper can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST

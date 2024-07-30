@@ -1,0 +1,44 @@
+comment "exiv2 needs a uClibc or glibc toolchain w/ C++, wchar, dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL
+
+config LINGMO_PACKAGE_EXIV2
+	bool "exiv2"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+	depends on LINGMO_USE_WCHAR
+	help
+	  Exiv2 is a C++ library and a command line utility to manage
+	  image metadata. It provides fast and easy read and write
+	  access to the Exif, IPTC and XMP metadata of images in
+	  various formats.
+
+	  http://www.exiv2.org/
+
+if LINGMO_PACKAGE_EXIV2
+
+config LINGMO_PACKAGE_EXIV2_PNG
+	bool "PNG image support"
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Build with PNG image support
+
+config LINGMO_PACKAGE_EXIV2_XMP
+	bool "XMP support"
+	select LINGMO_PACKAGE_EXPAT
+	help
+	  Build with XMP support
+
+config LINGMO_PACKAGE_EXIV2_LENSDATA
+	bool "Nikon lens name database"
+	help
+	  Integrate Nikon lens name database.
+
+	  This database comes from a thirdparty and is free to use in
+	  non-commercial, GPL or open source software only.
+	  For more informations src/nikonmn_int.cpp.
+
+endif

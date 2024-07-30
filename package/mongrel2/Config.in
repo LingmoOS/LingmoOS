@@ -1,0 +1,33 @@
+# mongrel2 uses {get,make,swap}context() functions, which are
+# available in glibc for all architectures and in uClibc only for a
+# subset of the architectures
+config LINGMO_PACKAGE_MONGREL2_LIBC_SUPPORTS
+	bool
+	default y if LINGMO_TOOLCHAIN_USES_GLIBC
+	default y if LINGMO_TOOLCHAIN_USES_UCLIBC && \
+		(LINGMO_arm || LINGMO_armeb || LINGMO_i386 || LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el || LINGMO_sparc || LINGMO_x86_64)
+
+comment "mongrel2 needs a uClibc or glibc toolchain w/ C++, threads, dynamic library"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_PACKAGE_MONGREL2_LIBC_SUPPORTS
+
+config LINGMO_PACKAGE_MONGREL2
+	bool "mongrel2"
+	depends on LINGMO_INSTALL_LIBSTDCPP # zeromq
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # zeromq
+	depends on !LINGMO_STATIC_LIBS # uses dlopen()
+	depends on LINGMO_PACKAGE_MONGREL2_LIBC_SUPPORTS
+	select LINGMO_PACKAGE_MBEDTLS
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_ZEROMQ
+	help
+	  Mongrel2 is an application, language, and network architecture
+	  agnostic web server that focuses on web applications using
+	  modern browser technologies.
+
+	  Mongrel2 supports 17 languages and platforms, HTTP, Flash
+	  sockets, WebSockets, Long Polling, and many ways to deploy
+	  and hack on it.
+
+	  http://www.mongrel2.org

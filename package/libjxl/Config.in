@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_LIBJXL
+	bool "libjxl"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # highway
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC # highway
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP # highway
+	# libjxl fail to link statically due to libatomic issue
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_81426
+	select LINGMO_HOST_CMAKE_AT_LEAST_3_19
+	select LINGMO_PACKAGE_BROTLI
+	select LINGMO_PACKAGE_HIGHWAY
+	select LINGMO_PACKAGE_LCMS2
+	help
+	  libjxl is the reference implementation of JPEG XL (encoder
+	  and decoder).
+
+	  https://github.com/libjxl/libjxl
+
+comment "libjxl needs a toolchain with C++, threads, gcc >= 7, dynamic library"
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_81426
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_MJPEGTOOLS
+	bool "mjpegtools"
+	depends on LINGMO_USE_MMU # fork
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_JPEG
+	help
+	  The mjpegtools programs are a set of tools
+	  that can do recording of videos and playback,
+	  simple cut-and-paste editing and the MPEG
+	  compression of audio and video under Linux.
+
+	  http://mjpeg.sourceforge.net
+
+config LINGMO_PACKAGE_MJPEGTOOLS_SIMD_SUPPORT
+	bool
+	default y if LINGMO_X86_CPU_HAS_MMX
+	default y if LINGMO_POWERPC_CPU_HAS_ALTIVEC
+
+comment "mjpegtools needs a toolchain w/ C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

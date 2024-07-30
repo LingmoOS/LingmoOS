@@ -1,0 +1,43 @@
+config LINGMO_PACKAGE_NETDATA
+	bool "netdata"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # libuv
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libuv
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libuv
+	select LINGMO_PACKAGE_LIBUV
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Netdata is distributed, real-time, performance and health
+	  monitoring for systems and applications. It is a highly
+	  optimized monitoring agent you install on all your systems and
+	  containers.
+
+	  https://github.com/netdata/netdata
+
+if LINGMO_PACKAGE_NETDATA
+
+config LINGMO_PACKAGE_NETDATA_PROMETHEUS
+	bool "prometheus remote write backend"
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP # protobuf, snappy
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # protobuf
+	select LINGMO_PACKAGE_PROTOBUF
+	select LINGMO_PACKAGE_SNAPPY
+	help
+	  Enable prometheus remote write backend
+
+comment "prometheus remote write backend needs a toolchain w/ C++, gcc >= 4.8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+
+endif
+
+comment "netdata needs a toolchain w/ NPTL, dynamic library, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4

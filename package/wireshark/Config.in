@@ -1,0 +1,52 @@
+config LINGMO_PACKAGE_WIRESHARK
+	bool "wireshark"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt -> libgpg-error
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # fork(), glib2
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_C_ARES
+	select LINGMO_PACKAGE_LIBPCAP
+	select LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_SPEEXDSP
+	help
+	  Network traffic sniffer and protocol decoder.
+
+	  https://www.wireshark.org
+
+if LINGMO_PACKAGE_WIRESHARK
+
+config LINGMO_PACKAGE_WIRESHARK_GUI
+	bool "Qt5 GUI"
+	default y
+	depends on LINGMO_INSTALL_LIBSTDCPP # qt5
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # qt5
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # qt5
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # qt5
+	depends on LINGMO_PACKAGE_HAS_UDEV # qt5 input
+	select LINGMO_PACKAGE_QT5
+	select LINGMO_PACKAGE_QT5BASE_FONTCONFIG # runtime
+	select LINGMO_PACKAGE_QT5BASE_PNG # runtime
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS
+	select LINGMO_PACKAGE_QT5MULTIMEDIA
+	select LINGMO_PACKAGE_QT5SVG
+	select LINGMO_PACKAGE_QT5TOOLS
+	select LINGMO_PACKAGE_QT5TOOLS_LINGUIST_TOOLS
+	help
+	  Enable Qt5 GUI
+
+comment "Qt5 GUI needs a udev /dev management and a toolchain w/ C++, NPTL, host gcc >= 5.0, gcc >= 5.0"
+	depends on !LINGMO_PACKAGE_HAS_UDEV || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || \
+		!LINGMO_HOST_GCC_AT_LEAST_5
+
+endif # LINGMO_PACKAGE_WIRESHARK
+
+comment "wireshark needs a toolchain w/ wchar, threads, dynamic library, C++"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP

@@ -1,0 +1,46 @@
+config LINGMO_PACKAGE_PYTHON_MATPLOTLIB
+	bool "python-matplotlib"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL # python-numpy
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 # python-numpy
+	depends on LINGMO_HOST_GCC_AT_LEAST_9 # host-python-numpy
+	select LINGMO_PACKAGE_FREETYPE # runtime
+	select LINGMO_PACKAGE_LIBPNG # runtime
+	select LINGMO_PACKAGE_PYTHON_CERTIFI # runtime
+	select LINGMO_PACKAGE_PYTHON_CONTOURPY # runtime
+	select LINGMO_PACKAGE_PYTHON_CYCLER
+	select LINGMO_PACKAGE_PYTHON_PYBIND
+	select LINGMO_PACKAGE_PYTHON_SETUPTOOLS # runtime
+	select LINGMO_PACKAGE_PYTHON_DATEUTIL # runtime
+	select LINGMO_PACKAGE_PYTHON_KIWISOLVER # runtime
+	select LINGMO_PACKAGE_PYTHON_NUMPY # runtime
+	select LINGMO_PACKAGE_PYTHON_PILLOW # runtime
+	select LINGMO_PACKAGE_PYTHON_PYPARSING # runtime
+	select LINGMO_PACKAGE_PYTHON3_ZLIB # runtime
+	select LINGMO_PACKAGE_QHULL
+	select LINGMO_PACKAGE_ZLIB # runtime
+	help
+	  Matplotlib strives to produce publication quality 2D
+	  graphics for interactive graphing, scientific publishing,
+	  user interface development and web application servers
+	  targeting multiple user interfaces and hardcopy output
+	  formats.
+
+	  https://matplotlib.org/
+
+if LINGMO_PACKAGE_PYTHON_MATPLOTLIB
+
+config LINGMO_PACKAGE_PYTHON_MATPLOTLIB_QT
+	bool "qt display"
+	depends on LINGMO_PACKAGE_QT5 # python-pyqt5
+	select LINGMO_PACKAGE_PYTHON_PYQT5
+	select LINGMO_PACKAGE_QT5BASE_FONTCONFIG
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS
+
+endif
+
+comment "python-matplotlib needs a glibc or musl toolchain w/ C++, gcc >= 9, host gcc >= 9"
+	depends on !(LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL) || \
+		!LINGMO_INSTALL_LIBSTDCPP || !LINGMO_HOST_GCC_AT_LEAST_9 || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_9

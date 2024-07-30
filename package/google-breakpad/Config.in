@@ -1,0 +1,54 @@
+config LINGMO_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_i386 || LINGMO_x86_64 || LINGMO_arm || LINGMO_aarch64 || \
+		LINGMO_mips || LINGMO_mipsel
+
+config LINGMO_PACKAGE_GOOGLE_BREAKPAD
+	bool "google-breakpad"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_LINUX_SYSCALL_SUPPORT
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Google-Breakpad is a library and tool suite that allows you
+	  to distribute an application to users with compiler-provided
+	  debugging information removed, record crashes in compact
+	  "minidump" files, send them back to your server, and produce
+	  C and C++ stack traces from these minidumps. Breakpad can
+	  also write minidumps on request for programs that have not
+	  crashed.
+
+	  You may want to set LINGMO_ENABLE_DEBUG, in order to get useful
+	  results.
+
+	  This target package installs a static library named
+	  libbreakpad_client.a which should be linked into programs
+	  willing to use Google Breakpad. A host variant of this
+	  package is also available, and provides the different tools
+	  needed to extract the debugging symbols from target
+	  binaries.
+
+	  https://chromium.googlesource.com/breakpad/breakpad
+
+if LINGMO_PACKAGE_GOOGLE_BREAKPAD
+
+config LINGMO_PACKAGE_GOOGLE_BREAKPAD_TOOLS
+	bool "Build target tools"
+	help
+	  Build processor and tools for target: dump_syms,
+	  minidump_stackwalk and microdump_stackwalk.
+
+endif
+
+comment "google-breakpad requires a glibc toolchain w/ wchar, threads, C++, gcc >= 7"
+	depends on LINGMO_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_USES_GLIBC || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

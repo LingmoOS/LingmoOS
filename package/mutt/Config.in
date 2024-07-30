@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_MUTT
+	bool "mutt"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Mutt is a sophisticated text-based Mail User Agent (MUA)
+
+	  http://www.mutt.org/
+
+if LINGMO_PACKAGE_MUTT
+
+config LINGMO_PACKAGE_MUTT_IMAP
+	bool "imap"
+	help
+	  IMAP support
+
+config LINGMO_PACKAGE_MUTT_POP3
+	bool "pop3"
+	help
+	  POP3 support
+
+endif # LINGMO_PACKAGE_MUTT
+
+comment "mutt needs a toolchain w/ wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR

@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_PROSODY
+	bool "prosody"
+	depends on LINGMO_USE_MMU # fork
+	depends on LINGMO_PACKAGE_HAS_LUAINTERPRETER
+	depends on !LINGMO_PACKAGE_LUA_5_4
+	depends on !LINGMO_STATIC_LIBS # luaexpat, luasec, luasocket, luafilesystem
+	select LINGMO_PACKAGE_LUABITOP if LINGMO_PACKAGE_LUA_5_1 # runtime
+	select LINGMO_PACKAGE_LUAEXPAT # runtime
+	select LINGMO_PACKAGE_LUASEC # runtime
+	select LINGMO_PACKAGE_LUASOCKET # runtime
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBIDN
+	select LINGMO_PACKAGE_LUAFILESYSTEM # runtime
+	help
+	  Prosody is a modern XMPP communication server. It aims to be
+	  easy to set up and configure, and efficient with system
+	  resources.
+
+	  https://prosody.im
+
+comment "prosody needs the lua interpreter, dynamic library"
+	depends on !LINGMO_PACKAGE_HAS_LUAINTERPRETER || LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+
+comment "prosody needs a Lua <= 5.3"
+	depends on LINGMO_PACKAGE_LUA_5_4

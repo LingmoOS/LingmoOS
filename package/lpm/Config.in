@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_LPM
+        bool "lpm (LingmoOS Package Manager)"
+        depends on !LINGMO_STATIC_LIBS # dlfcn.h
+        depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+        depends on LINGMO_PACKAGE_LUA && !LINGMO_PACKAGE_LUA_5_1
+        depends on LINGMO_TOOLCHAIN_HAS_THREADS
+        depends on LINGMO_USE_MMU # fork()
+        select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_LIBGCRYPT
+        select LINGMO_PACKAGE_FILE
+        select LINGMO_PACKAGE_POPT
+        select LINGMO_PACKAGE_ZLIB
+        help
+          The Pacman Package Manager.

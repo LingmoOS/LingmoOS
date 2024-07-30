@@ -1,0 +1,17 @@
+comment "signal-estimator needs a toochain w/ C++, threads, gcc >= 7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_SIGNAL_ESTIMATOR
+	bool "signal-estimator"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # alsa-lib
+	select LINGMO_PACKAGE_ALSA_LIB
+	help
+	  signal-estimator is a small command-line and GUI tool allowing
+	  to measure different characteristics of the signal looped back
+	  from audio output to audio input.
+
+	  https://github.com/gavv/signal-estimator

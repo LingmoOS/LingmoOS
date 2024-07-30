@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_DC3DD
+	bool "dc3dd"
+	depends on !LINGMO_RISCV_32
+	depends on !LINGMO_arc
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL
+	help
+	  dc3dd is a patch to the GNU dd program, this version has
+	  several features intended for forensic acquisition of data.
+	  Highlights include hashing on-the-fly, split output files,
+	  pattern writing, a progress meter, and file verification.
+
+	  https://sourceforge.net/projects/dc3dd/
+
+comment "dc3dd needs a glibc or uClibc toolchain w/ threads"
+	depends on !LINGMO_RISCV_32
+	depends on !LINGMO_arc
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_TOOLCHAIN_USES_MUSL

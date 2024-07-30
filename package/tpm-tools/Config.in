@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_TPM_TOOLS
+	bool "tpm-tools"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # trousers
+	depends on !LINGMO_STATIC_LIBS # trousers
+	select LINGMO_PACKAGE_TROUSERS
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  Tools to manage and diagnose a TPM
+
+	  http://trousers.sourceforge.net/
+
+comment "tpm-tools needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

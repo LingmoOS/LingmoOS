@@ -1,0 +1,108 @@
+menuconfig LINGMO_PACKAGE_LIBDRM
+	bool "libdrm"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libpthread-stubs
+	select LINGMO_PACKAGE_LIBPTHREAD_STUBS
+	help
+	  Direct Rendering Manager
+
+	  http://dri.freedesktop.org/libdrm/
+
+if LINGMO_PACKAGE_LIBDRM
+
+config LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	bool
+	default y if LINGMO_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS || \
+		LINGMO_TOOLCHAIN_HAS_SYNC_4
+
+config LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	bool
+	select LINGMO_PACKAGE_LIBATOMIC_OPS if !LINGMO_TOOLCHAIN_HAS_SYNC_4
+
+config LINGMO_PACKAGE_LIBDRM_INTEL
+	bool "intel"
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	select LINGMO_PACKAGE_LIBPCIACCESS
+	help
+	  Install intel graphics driver.
+
+config LINGMO_PACKAGE_LIBDRM_RADEON
+	bool "radeon"
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install AMD/ATI graphics driver.
+
+config LINGMO_PACKAGE_LIBDRM_AMDGPU
+	bool "amdgpu"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install AMD GPU driver.
+
+config LINGMO_PACKAGE_LIBDRM_NOUVEAU
+	bool "nouveau"
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install NVIDIA graphics driver.
+
+config LINGMO_PACKAGE_LIBDRM_VMWGFX
+	bool "vmwgfx"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	help
+	  Installs Vmware graphics driver.
+
+config LINGMO_PACKAGE_LIBDRM_OMAP
+	bool "omap (experimental)"
+	depends on LINGMO_arm
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install the TI OMAP driver using an experimental API.
+
+config LINGMO_PACKAGE_LIBDRM_ETNAVIV
+	bool "etnaviv (experimental)"
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install the Etnaviv/Vivante driver using an experimental API.
+
+config LINGMO_PACKAGE_LIBDRM_EXYNOS
+	bool "exynos (experimental)"
+	depends on LINGMO_arm
+	help
+	  Install Samsung Exynos driver using an experimental API.
+
+config LINGMO_PACKAGE_LIBDRM_FREEDRENO
+	bool "freedreno"
+	depends on LINGMO_arm || LINGMO_aarch64 || LINGMO_aarch64_be
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install Qualcomm Snapdragon driver.
+
+config LINGMO_PACKAGE_LIBDRM_TEGRA
+	bool "tegra (experimental)"
+	depends on LINGMO_arm
+	depends on LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBDRM_ENABLE_ATOMIC
+	help
+	  Install NVIDIA Tegra driver using an experimental API.
+
+config LINGMO_PACKAGE_LIBDRM_VC4
+	bool "vc4"
+	depends on LINGMO_aarch64 || LINGMO_arm
+	help
+	  Install vc4 (Raspberry Pi) driver.
+
+config LINGMO_PACKAGE_LIBDRM_INSTALL_TESTS
+	bool "Install test programs"
+	help
+	  This option allows to install the libdrm test programs.
+
+endif
+
+comment "libdrm needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

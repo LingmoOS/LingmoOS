@@ -1,0 +1,40 @@
+config LINGMO_PACKAGE_I2PD
+	bool "i2pd"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	# pthread_condattr_setclock
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-filesystem
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # boost
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_DATE_TIME
+	select LINGMO_PACKAGE_BOOST_FILESYSTEM
+	select LINGMO_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  i2pd (I2P Daemon) is a full-featured C++ implementation of I2P
+	  client.
+
+	  I2P (Invisible Internet Protocol) is a universal anonymous
+	  network layer.
+	  All communications over I2P are anonymous and end-to-end
+	  encrypted, participants don't reveal their real IP addresses.
+
+	  http://i2pd.website
+
+comment "i2pd needs a toolchain w/ C++, NPTL, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_USE_WCHAR
+
+comment "i2pd needs exception_ptr"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

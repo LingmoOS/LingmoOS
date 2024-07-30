@@ -1,0 +1,58 @@
+comment "samba4 needs a uClibc or glibc toolchain w/ wchar, dynamic library, NPTL"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || LINGMO_TOOLCHAIN_USES_MUSL \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_SAMBA4
+	bool "samba4"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR # python
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # python -> libffi
+	depends on !LINGMO_STATIC_LIBS # cmocka, python, gnutls
+	depends on !LINGMO_nios2 # binary too large, relocations don't fit
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL
+	select LINGMO_PACKAGE_CMOCKA
+	select LINGMO_PACKAGE_E2FSPROGS
+	select LINGMO_PACKAGE_GNUTLS
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBTIRPC if !LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	select LINGMO_PACKAGE_POPT
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Provides secure, stable and fast file and print services
+	  for all clients using the SMB/CIFS protocol, such as all
+	  versions of DOS, Windows, OS/2, Linux and many others.
+
+	  http://www.samba.org/
+
+if LINGMO_PACKAGE_SAMBA4
+
+config LINGMO_PACKAGE_SAMBA4_AD_DC
+	bool "AD DC"
+	depends on LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_JANSSON
+	select LINGMO_PACKAGE_PYTHON_DNSPYTHON
+	select LINGMO_PACKAGE_PYTHON_MARKDOWN
+	select LINGMO_PACKAGE_SAMBA4_ADS
+	help
+	  Enable Active Directory Domain Controller functionality.
+
+comment "AD DC depends on python3"
+	depends on !LINGMO_PACKAGE_PYTHON3
+
+config LINGMO_PACKAGE_SAMBA4_ADS
+	bool "ADS"
+	select LINGMO_PACKAGE_OPENLDAP
+	help
+	  Enable Active Directory member Server functionality.
+
+config LINGMO_PACKAGE_SAMBA4_SMBTORTURE
+	bool "smbtorture"
+	help
+	  Install the smbtorture test suite.
+	  It's normally used for validation and stress testing.
+	  Approximately +5 MB of stripped uncompressed target space.
+
+endif

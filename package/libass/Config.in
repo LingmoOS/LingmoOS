@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_LIBASS
+	bool "libass"
+	depends on LINGMO_INSTALL_LIBSTDCPP # harfbuzz
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # harfbuzz
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_HARFBUZZ
+	select LINGMO_PACKAGE_LIBFRIBIDI
+	help
+	  libass is a portable subtitle renderer for the ASS/SSA
+	  (Advanced Substation Alpha/Substation Alpha) subtitle format
+
+	  https://github.com/libass/libass
+
+comment "libass needs a toolchain w/ C++, gcc >= 4.9"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

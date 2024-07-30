@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_PYTHON_ML_DTYPES
+	bool "python-ml-dtypes"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP # python-numpy
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL # python-numpy
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 # python-numpy
+	depends on LINGMO_HOST_GCC_AT_LEAST_9 # host-python-numpy
+	select LINGMO_PACKAGE_PYTHON_NUMPY
+	help
+	  ml_dtypes is a stand-alone implementation of several NumPy
+	  dtype extensions used in machine learning libraries.
+
+	  https://github.com/jax-ml/ml_dtypes
+
+comment "python-ml-dtypes needs a glibc or musl toolchain w/ C++, gcc >= 9"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 || \
+		!(LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL)

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_AZURE_IOT_SDK_C
+	bool "azure-iot-sdk-c"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Microsoft Azure IoT Hub device SDK for C is used
+	  to connect devices running C code to Azure IoT Hub.
+
+	  https://github.com/Azure/azure-iot-sdk-c
+
+comment "azure-iot-sdk-c needs a toolchain w/ C++, NPTL and wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_USE_WCHAR

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_PYTHON_BLUEZERO
+	bool "python-bluezero"
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS # python-gobject -> gobject-introspection
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # python-gobject -> gobject-introspection
+	depends on LINGMO_HOST_GCC_AT_LEAST_8 # python-gobject -> gobject-introspection -> host-qemu
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # python-gobject -> gobject-introspection
+	select LINGMO_PACKAGE_DBUS # runtime
+	select LINGMO_PACKAGE_DBUS_PYTHON # runtime
+	select LINGMO_PACKAGE_PYTHON_GOBJECT # runtime
+	help
+	  Python library for Bluetooth Low Energy (BLE) on Linux.
+
+	  https://github.com/ukBaz/python-bluezero
+
+comment "python-bluezero needs a glibc toolchain, gcc >= 4.9, host gcc >= 8"
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_HOST_GCC_AT_LEAST_8

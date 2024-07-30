@@ -1,0 +1,107 @@
+menuconfig LINGMO_PACKAGE_JANUS_GATEWAY
+	bool "janus-gateway"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_WCHAR # libnice -> libglib2
+	depends on LINGMO_USE_MMU # libnice
+	depends on !LINGMO_STATIC_LIBS # dlopen
+	select LINGMO_PACKAGE_JANSSON
+	select LINGMO_PACKAGE_LIBCONFIG
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBNICE
+	select LINGMO_PACKAGE_LIBSRTP
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  Janus is an open source, general purpose, WebRTC gateway
+	  designed and developed by Meetecho.
+
+	  https://github.com/meetecho/janus-gateway
+
+if LINGMO_PACKAGE_JANUS_GATEWAY
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_DEMOS
+	bool "HTML demos"
+	help
+	  Install the demonstration website, as featured on
+	  https://janus.conf.meetecho.com/
+
+comment "plugins"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_AUDIO_BRIDGE
+	bool "audio bridge"
+	select LINGMO_PACKAGE_OPUS
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_DUKTAPE
+	bool "duktape"
+	depends on !LINGMO_OPTIMIZE_FAST # duktape
+	select LINGMO_PACKAGE_DUKTAPE
+
+comment "duktape plugin can't be built with optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_ECHO_TEST
+	bool "echo test"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_RECORDPLAY
+	bool "record and play"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_SIP_GATEWAY
+	bool "sip gateway"
+	select LINGMO_PACKAGE_SOFIA_SIP
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_STREAMING
+	bool "streaming"
+	# SO_REUSEPORT
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_9
+
+comment "streaming plugin needs a toolchain w/ headers >= 3.9"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_9
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_TEXT_ROOM
+	bool "text room"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_VIDEO_CALL
+	bool "video call"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_VIDEO_ROOM
+	bool "video room"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_VOICE_MAIL
+	bool "voice mail"
+	select LINGMO_PACKAGE_LIBOGG
+
+comment "transports"
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_MQTT
+	bool "MQTT"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_PAHO_MQTT_C
+
+comment "MQTT transport needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_RABBITMQ
+	bool "RabbitMQ"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_RABBITMQ_C
+
+comment "RabbitMQ transport needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_REST
+	bool "REST (HTTP/HTTPS)"
+	select LINGMO_PACKAGE_LIBMICROHTTPD
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_UNIX_SOCKETS
+	bool "Unix Sockets"
+	default y
+
+config LINGMO_PACKAGE_JANUS_GATEWAY_WEBSOCKETS
+	bool "WebSockets"
+	select LINGMO_PACKAGE_LIBWEBSOCKETS
+
+endif
+
+comment "janus-gateway needs a toolchain w/ dynamic library, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_LIBGUDEV
+	bool "libgudev"
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_USE_WCHAR # gettext
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  This library provides GObject bindings for libudev.  It was
+	  originally part of udev-extras, then udev, then systemd.
+	  It's now a project on its own. Required for building some
+	  programs that use udev, when using systemd.
+
+	  https://wiki.gnome.org/Projects/libgudev
+
+comment "libgudev needs udev /dev handling and a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_PACKAGE_HAS_UDEV

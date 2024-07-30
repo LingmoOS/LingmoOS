@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_GUPNP_AV
+	bool "gupnp-av"
+	depends on LINGMO_USE_WCHAR # glib2, gupnp
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2, gupnp
+	depends on LINGMO_USE_MMU # glib2, gupnp
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_GUPNP
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  GUPnP-AV is a collection of helpers for building AV
+	  (audio/video) applications using GUPnP.
+
+	  http://www.gupnp.org/
+
+comment "gupnp-av needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

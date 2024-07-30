@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_IPROUTE2
+	bool "iproute2"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 # __kernel_{u,}long_t
+	help
+	  Kernel routing and traffic control utilities. Provides things
+	  like ip and tc.
+
+	  http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
+
+comment "iproute2 needs a toolchain w/ headers >= 3.4"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4

@@ -1,0 +1,73 @@
+config LINGMO_PACKAGE_GLIBC_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_arm
+	default y if LINGMO_armeb
+	default y if LINGMO_aarch64
+	default y if LINGMO_aarch64_be
+	default y if LINGMO_i386
+	default y if LINGMO_m68k_m68k
+	default y if LINGMO_mips
+	default y if LINGMO_mipsel
+	default y if LINGMO_mips64
+	default y if LINGMO_mips64el
+	default y if LINGMO_or1k
+	default y if LINGMO_powerpc
+	default y if LINGMO_powerpc64
+	default y if LINGMO_powerpc64le
+	default y if LINGMO_riscv
+	default y if LINGMO_s390x
+	default y if LINGMO_sh
+	default y if LINGMO_sparc64
+	default y if LINGMO_x86_64
+	default y if LINGMO_microblaze
+	default y if LINGMO_nios2
+	default y if LINGMO_arc && LINGMO_ARC_ATOMIC_EXT
+	depends on !LINGMO_POWERPC_CPU_HAS_SPE
+	depends on LINGMO_RISCV_ISA_RVA || !LINGMO_riscv
+	depends on LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_GLIBC_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_GLIBC_ARCH_SUPPORTS
+	# Make sure to keep these dependencies in sync with the
+	# Config.in comments in
+	# toolchain/toolchain-buildroot/Config.in
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_2
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_10 || !LINGMO_powerpc64le
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_5 || !LINGMO_MIPS_NAN_2008
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_4 || !LINGMO_RISCV_32
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0 || !LINGMO_RISCV_64
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_1 || !LINGMO_arc
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_4 || !LINGMO_or1k
+
+if LINGMO_TOOLCHAIN_BUILDROOT_GLIBC
+
+comment "Glibc Options"
+
+config LINGMO_PACKAGE_GLIBC
+	bool
+	default y
+	select LINGMO_PACKAGE_LINUX_HEADERS
+	select LINGMO_TOOLCHAIN_HAS_SSP if LINGMO_PACKAGE_HOST_BINUTILS_SUPPORTS_CFI
+	help
+	  https://www.gnu.org/software/libc/
+
+config LINGMO_PACKAGE_GLIBC_KERNEL_COMPAT
+	bool "Enable compatibility shims to run on older kernels"
+	help
+	  Say 'y' here if you plan on running your system on a kernel
+	  older than the version used for the toolchain headers.
+
+	  Enabling those compatibility shims may generate a slightly
+	  bigger and slightly slower glibc library.
+
+	  The oldest supported kernel version depends on the
+	  architecture.
+
+config LINGMO_PACKAGE_GLIBC_UTILS
+	bool "Install glibc utilities"
+	help
+	  Enabling this option will compile and install the getconf,
+	  ldconfig, ldd and locale glibc utilities for the target.
+
+endif # LINGMO_TOOLCHAIN_BUILDROOT_GLIBC

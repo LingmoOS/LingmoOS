@@ -1,0 +1,63 @@
+config LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS
+	bool
+	# see src/syscfg/
+	default y if \
+		LINGMO_aarch64	|| LINGMO_aarch64_be	|| \
+		LINGMO_arm		|| LINGMO_armeb		|| \
+		LINGMO_i386	|| LINGMO_mips		|| \
+		LINGMO_mipsel	|| LINGMO_mips64		|| \
+		LINGMO_mips64el	|| LINGMO_m68k		|| \
+		LINGMO_nios2	|| LINGMO_or1k		|| \
+		LINGMO_powerpc	|| LINGMO_powerpc64 	|| \
+		LINGMO_powerpc64le	|| LINGMO_RISCV_64		|| \
+		LINGMO_RISCV_32	|| LINGMO_s390x		|| \
+		LINGMO_sh4		|| LINGMO_sh4eb		|| \
+		LINGMO_sh4a	|| LINGMO_sh4aeb		|| \
+		LINGMO_sparc	|| LINGMO_sparc64		|| \
+		LINGMO_x86_64
+
+config LINGMO_PACKAGE_LIBGPG_ERROR
+	bool "libgpg-error"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS
+	help
+	  Libgpg-error is a small library with error codes and
+	  descriptions shared by most GnuPG related software.
+
+	  https://www.gnupg.org/related_software/libgpg-error
+
+config LINGMO_PACKAGE_LIBGPG_ERROR_SYSCFG
+	string
+	default "aarch64-unknown-linux-gnu" \
+		if LINGMO_aarch64 || LINGMO_aarch64_be
+	default "arm-unknown-linux-gnueabi" \
+		if LINGMO_arm || LINGMO_armeb
+	default "i686-pc-linux-gnu" \
+		if LINGMO_i386
+	default "mips-unknown-linux-gnu" \
+		if LINGMO_mips || LINGMO_mipsel
+	default "mips64el-unknown-linux-gnuabi64" \
+		if LINGMO_mips64 || LINGMO_mips64el
+	default "m68k-unknown-linux-gnu" \
+		if LINGMO_m68k
+	default "nios2-unknown-linux-gnu" \
+		if LINGMO_nios2
+	default "or1k-unknown-linux-gnu" \
+		if LINGMO_or1k
+	default "powerpc-unknown-linux-gnu" \
+		if LINGMO_powerpc
+	default "powerpc64-unknown-linux-gnu" \
+		if LINGMO_powerpc64 || LINGMO_powerpc64le
+	default "riscv32-unknown-linux-gnu" \
+		if LINGMO_RISCV_32
+	default "riscv64-unknown-linux-gnu" \
+		if LINGMO_RISCV_64
+	default "s390x-unknown-linux-gnu" \
+		if LINGMO_s390x
+	default "sh4-unknown-linux-gnu" \
+		if LINGMO_sh4 || LINGMO_sh4eb || LINGMO_sh4a || LINGMO_sh4aeb
+	default "sparc-unknown-linux-gnu" \
+		if LINGMO_sparc
+	default "sparc64-unknown-linux-gnu" \
+		if LINGMO_sparc64
+	default "x86_64-unknown-linux-gnu" \
+		if LINGMO_x86_64

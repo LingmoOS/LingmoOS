@@ -1,0 +1,33 @@
+# archs officially supported by upstream
+config LINGMO_PACKAGE_XMRIG_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_ARM_CPU_ARMV7A
+	default y if LINGMO_aarch64
+	default y if LINGMO_x86_64
+	default y if LINGMO_i386
+
+config LINGMO_PACKAGE_XMRIG
+	bool "xmrig"
+	depends on LINGMO_PACKAGE_XMRIG_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU # libuv
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libuv
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # libuv
+	# xmrig needs fenv.h which is not provided by uclibc
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC
+	depends on !LINGMO_STATIC_LIBS # libuv
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libuv
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_LIBUV
+	help
+	  RandomX, CryptoNight, AstroBWT and Argon2 CPU/GPU miner.
+
+	  https://xmrig.com
+
+comment "xmrig needs a glibc or musl toolchain w/ NPTL, dynamic library, C++, gcc >= 4.9"
+	depends on LINGMO_PACKAGE_XMRIG_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		LINGMO_TOOLCHAIN_USES_UCLIBC || LINGMO_STATIC_LIBS || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

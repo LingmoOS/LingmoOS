@@ -1,0 +1,24 @@
+comment "cegui needs a toolchain w/ C++, threads, dynamic library, wchar, gcc >= 5"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP \
+			|| LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+			|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+
+config LINGMO_PACKAGE_CEGUI
+	bool "cegui"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # C++11 PR59987
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_GLM
+	select LINGMO_PACKAGE_LIBGLFW if LINGMO_PACKAGE_HAS_LIBGL # SampleBrowser dependency
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  Crazy Eddie's GUI System is a free library providing windowing
+	  and widgets for graphics APIs / engines where such
+	  functionality is not natively available, or severely lacking.
+	  The library is object orientated, written in C++, and targeted
+	  at games developers who should be spending their time creating
+	  great games, not building GUI sub-systems!
+
+	  http://www.cegui.org.uk/

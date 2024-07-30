@@ -1,0 +1,31 @@
+config LINGMO_PACKAGE_GITLAB_RUNNER
+	bool "gitlab-runner"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # git
+	depends on LINGMO_USE_WCHAR # tar
+	select LINGMO_PACKAGE_BASH # runtime, shells/bash.go probably want to support bashism.
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS # bash
+	select LINGMO_PACKAGE_CA_CERTIFICATES # runtime
+	select LINGMO_PACKAGE_GIT # runtime
+	select LINGMO_PACKAGE_LIBCURL # runtime
+	select LINGMO_PACKAGE_LIBCURL_CURL # runtime
+	select LINGMO_PACKAGE_LIBCURL_FORCE_TLS # runtime
+	select LINGMO_PACKAGE_OPENSSL # runtime
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL # runtime
+	select LINGMO_PACKAGE_LIBOPENSSL_BIN # runtime
+	select LINGMO_PACKAGE_TAR # runtime
+	help
+	  GitLab Runner is the open source project that is used to run
+	  your jobs and send the results back to GitLab. It is used in
+	  conjunction with GitLab CI/CD, the open-source continuous
+	  integration service included with GitLab that coordinates the
+	  jobs.
+
+	  https://docs.gitlab.com/runner/
+
+comment "gitlab-runner needs a toolchain w/ threads"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

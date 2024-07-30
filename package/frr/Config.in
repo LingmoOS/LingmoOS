@@ -1,0 +1,39 @@
+config LINGMO_PACKAGE_FRR
+	bool "frr"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS # libyang
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # json-c, libyang
+	select LINGMO_PACKAGE_BASH
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS # bash
+	select LINGMO_PACKAGE_LIBYANG
+	select LINGMO_PACKAGE_READLINE
+	select LINGMO_PACKAGE_JSON_C
+	help
+	  The FRRouting Protocol Suite.
+
+	  FRR is free software that implements and manages various
+	  IPv4 and IPv6 routing protocols.
+
+	  https://frrouting.org
+
+if LINGMO_PACKAGE_FRR
+
+config LINGMO_PACKAGE_FRR_BMP
+	bool "BMP protocol"
+	select LINGMO_PACKAGE_C_ARES
+	help
+	  Build BGP Monitoring Protocol daemon.
+
+config LINGMO_PACKAGE_FRR_NHRPD
+	bool "NHRPD protocol"
+	select LINGMO_PACKAGE_C_ARES
+	help
+	  Build Next Hop Routing Protocol daemon.
+
+endif
+
+comment "frr needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

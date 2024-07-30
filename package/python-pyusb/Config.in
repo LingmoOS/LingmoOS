@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_PYTHON_PYUSB
+	bool "python-pyusb"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libusb
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	select LINGMO_PACKAGE_LIBUSB
+	help
+	  The PyUSB module provides easy access to the Universal
+	  Serial Bus (USB) from Python.
+
+	  http://sourceforge.net/apps/trac/pyusb/
+
+comment "python-pyusb needs a toolchain w/ threads, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

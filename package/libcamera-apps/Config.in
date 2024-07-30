@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_LIBCAMERA_APPS
+	bool "libcamera-apps"
+	depends on LINGMO_PACKAGE_LIBCAMERA_ARCH_SUPPORTS # libcamera
+	depends on LINGMO_INSTALL_LIBSTDCPP # libcamera/boost
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libcamera/boost
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # libcamera
+	depends on !LINGMO_STATIC_LIBS # gnutls/libcamera
+	depends on LINGMO_USE_WCHAR # gnutls/libcamera/boost
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBCAMERA
+	select LINGMO_PACKAGE_LIBEXIF
+	select LINGMO_PACKAGE_LIBPNG
+	select LINGMO_PACKAGE_TIFF
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7 && (LINGMO_PACKAGE_HAS_LIBEGL || LINGMO_PACKAGE_HAS_LIBGL)
+	select LINGMO_PACKAGE_LIBDRM if LINGMO_PACKAGE_XORG7 && (LINGMO_PACKAGE_HAS_LIBEGL || LINGMO_PACKAGE_HAS_LIBGL)
+	select LINGMO_PACKAGE_LIBEPOXY if LINGMO_PACKAGE_XORG7 && (LINGMO_PACKAGE_HAS_LIBEGL || LINGMO_PACKAGE_HAS_LIBGL)
+	select LINGMO_PACKAGE_QT5BASE_GUI if LINGMO_PACKAGE_QT5
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS if LINGMO_PACKAGE_QT5
+	help
+	  This is a small suite of libcamera-based apps that aim to copy
+	  the functionality of the existing "raspicam" apps.
+
+	  https://github.com/raspberrypi/libcamera-apps
+
+comment "libcamera-apps needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8"
+	depends on LINGMO_PACKAGE_LIBCAMERA_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR

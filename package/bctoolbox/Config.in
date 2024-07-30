@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_BCTOOLBOX
+	bool "bctoolbox"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  Utilities library used by Belledonne Communications
+	  softwares like belle-sip, mediastreamer2 and linphone.
+
+	  Select LINGMO_PACKAGE_MBEDTLS for crypto support.
+
+	  https://github.com/BelledonneCommunications/bctoolbox
+
+comment "bctoolbox needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "bctoolbox needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

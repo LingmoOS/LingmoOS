@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_EBTABLES
+	bool "ebtables"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Ethernet bridge frame table administration
+
+	  http://ebtables.netfilter.org/
+
+if LINGMO_PACKAGE_EBTABLES
+
+config LINGMO_PACKAGE_EBTABLES_UTILS_SAVE
+	bool "ebtables save"
+	select LINGMO_PACKAGE_BASH # runtime
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS # bash
+	help
+	  Install the ebtables-legacy-save tool
+
+config LINGMO_PACKAGE_EBTABLES_UTILS_RESTORE
+	bool "ebtables restore"
+	help
+	  Install the ebtables-legacy-restore tool
+
+endif

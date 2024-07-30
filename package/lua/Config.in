@@ -1,0 +1,87 @@
+config LINGMO_PACKAGE_LUA
+	bool "lua"
+	select LINGMO_PACKAGE_HAS_LUAINTERPRETER
+	help
+	  Lua is a powerful, fast, light-weight, embeddable scripting
+	  language.
+
+	  http://www.lua.org/
+
+if LINGMO_PACKAGE_LUA
+
+config LINGMO_PACKAGE_PROVIDES_LUAINTERPRETER
+	default "lua"
+
+choice
+	prompt "Lua Version"
+	default LINGMO_PACKAGE_LUA_5_3 if LINGMO_PACKAGE_LUA_5_2 # legacy
+	default LINGMO_PACKAGE_LUA_5_4
+	help
+	  Select the version of Lua API/ABI you wish to use.
+
+config LINGMO_PACKAGE_LUA_5_1
+	bool "Lua 5.1.x"
+	select LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_1
+	select LINGMO_PACKAGE_LUA_CVT_N2S
+	select LINGMO_PACKAGE_LUA_CVT_S2N
+
+config LINGMO_PACKAGE_LUA_5_3
+	bool "Lua 5.3.x"
+	select LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_3
+
+config LINGMO_PACKAGE_LUA_5_4
+	bool "Lua 5.4.x"
+	select LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_4
+
+endchoice
+
+if LINGMO_PACKAGE_LUA_5_3 || LINGMO_PACKAGE_LUA_5_4
+config LINGMO_PACKAGE_LUA_32BITS
+	bool "Use 32 bit numbers"
+	default y if !LINGMO_ARCH_IS_64
+	help
+	  Use a 32 bit data type for numbers / integers instead of the
+	  default 64 bit type. This option is particularly attractive
+	  for small machines and embedded systems.
+
+endif
+
+config LINGMO_PACKAGE_LUA_CVT_N2S
+	bool "automatic coercion from number to string"
+	default y  # legacy
+	help
+	  If unsure, say y, this is the default behavior of the Lua
+	  interpreter. See LUA_NOCVTN2S in luaconf.h
+
+config LINGMO_PACKAGE_LUA_CVT_S2N
+	bool "automatic coercion from string to number"
+	default y  # legacy
+	help
+	  If unsure, say y, this is the default behavior of the Lua
+	  interpreter. See LUA_NOCVTN2S in luaconf.h
+
+choice
+	prompt "Lua command-line editing"
+	default LINGMO_PACKAGE_LUA_EDITING_NONE
+
+config LINGMO_PACKAGE_LUA_EDITING_NONE
+	bool "none"
+	help
+	  None.
+
+config LINGMO_PACKAGE_LUA_READLINE
+	bool "readline support"
+	select LINGMO_PACKAGE_READLINE
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Enables command-line editing in the Lua interpreter.
+
+config LINGMO_PACKAGE_LUA_LINENOISE
+	bool "linenoise support"
+	select LINGMO_PACKAGE_LINENOISE
+	help
+	  Enables command-line editing in the Lua interpreter.
+
+endchoice
+
+endif

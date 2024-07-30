@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_ORTP
+	bool "oRTP"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # bctoolbox
+	select LINGMO_PACKAGE_BCTOOLBOX
+	help
+	  oRTP, a Real-time Transport Protocol (RTP,RFC3550) library
+
+	  https://www.linphone.org/technical-corner/ortp
+
+comment "ortp needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "ortp needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

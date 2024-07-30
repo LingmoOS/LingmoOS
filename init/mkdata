@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+mkdir data_base
+ 
+function read_dir(){
+for file in `ls ../dl`
+	do
+		if [ -d $1"/"$file ]
+		then
+		read_dir $1"/"$file
+		else
+		# echo $1""$file
+		TMP_FILE=$1$file
+		cp -r -v db_rf/$TMP_FILE* data_base/
+
+		fi
+	done
+}
+ 
+read_dir $1

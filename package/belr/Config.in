@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_BELR
+	bool "belr"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # bctoolbox
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # bctoolbox
+	select LINGMO_PACKAGE_BCTOOLBOX
+	help
+	  Belr is Belledonne Communications' language recognition
+	  library, written in C++11. It parses text inputs formatted
+	  according to a language defined by an ABNF grammar, such as
+	  the protocols standardized at IETF.
+
+	  https://gitlab.linphone.org/BC/public/belr
+
+comment "belr needs a toolchain w/ threads, C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "belr needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

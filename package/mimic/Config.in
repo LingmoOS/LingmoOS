@@ -1,0 +1,41 @@
+comment "mimic needs a toolchain w/ wchar"
+	depends on !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_MIMIC
+	bool "mimic"
+	depends on LINGMO_USE_WCHAR
+	help
+	  Mimic is a fast, lightweight Text-to-speech engine developed
+	  by Mycroft A.I. and VocaliD, based on Carnegie Mellon
+	  University's Flite (Festival-Lite) software. Mimic takes in
+	  text and reads it out loud to create a high quality voice.
+
+	  https://github.com/MycroftAI/mimic
+
+if LINGMO_PACKAGE_MIMIC
+
+choice
+	prompt "audio backend"
+	default LINGMO_PACKAGE_MIMIC_AUDIO_BACKEND_NONE
+
+config LINGMO_PACKAGE_MIMIC_AUDIO_BACKEND_NONE
+	bool "none"
+	help
+	  With no backend, mimic will only be able to produce .wav
+	  files.
+
+config LINGMO_PACKAGE_MIMIC_AUDIO_BACKEND_ALSA
+	bool "alsa"
+	depends on LINGMO_PACKAGE_ALSA_LIB
+
+config LINGMO_PACKAGE_MIMIC_AUDIO_BACKEND_PORTAUDIO
+	bool "alsa via portaudio"
+	depends on LINGMO_PACKAGE_PORTAUDIO
+
+config LINGMO_PACKAGE_MIMIC_AUDIO_BACKEND_PULSEAUDIO
+	bool "pulseaudio"
+	depends on LINGMO_PACKAGE_PULSEAUDIO
+
+endchoice
+
+endif # LINGMO_PACKAGE_MIMIC

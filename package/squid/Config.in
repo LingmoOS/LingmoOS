@@ -1,0 +1,25 @@
+comment "squid needs a toolchain w/ C++, threads, gcc >= 8, host gcc >= 8"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || \
+		!LINGMO_HOST_GCC_AT_LEAST_8
+
+config LINGMO_PACKAGE_SQUID
+	bool "squid"
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17
+	depends on LINGMO_HOST_GCC_AT_LEAST_8 # C++17
+	# needs fork()
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_LIBCAP
+	select LINGMO_PACKAGE_LIBTOOL
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  Caching proxy for the Web supporting HTTP, HTTPS, FTP, and
+	  more.
+
+	  http://www.squid-cache.org/

@@ -1,0 +1,136 @@
+if LINGMO_PACKAGE_LIBOPENSSL
+
+# 4xx PowerPC cores seem to have trouble with openssl's ASM
+# optimizations
+config LINGMO_PACKAGE_LIBOPENSSL_TARGET_ARCH_LINUX_PPC
+	bool
+	default y if LINGMO_powerpc
+	depends on !LINGMO_powerpc_401
+	depends on !LINGMO_powerpc_403
+	depends on !LINGMO_powerpc_405
+	depends on !LINGMO_powerpc_405fp
+	depends on !LINGMO_powerpc_440
+	depends on !LINGMO_powerpc_440fp
+
+config LINGMO_PACKAGE_LIBOPENSSL_TARGET_ARCH
+	string
+	# Doesn't work for thumb-only (Cortex-M?)
+	default "linux-armv4"			if LINGMO_ARM_CPU_HAS_ARM
+	default "linux-aarch64"			if LINGMO_aarch64
+	default "linux-ppc"			if LINGMO_PACKAGE_LIBOPENSSL_TARGET_ARCH_LINUX_PPC
+	default "linux-ppc64"			if LINGMO_powerpc64
+	default "linux-ppc64le"			if LINGMO_powerpc64le
+	default "linux-x86"			if LINGMO_i386 && !LINGMO_TOOLCHAIN_HAS_LIBATOMIC
+	default "linux-x86-latomic"		if LINGMO_i386 && LINGMO_TOOLCHAIN_HAS_LIBATOMIC
+	default "linux-x86_64"			if LINGMO_x86_64
+	default "linux64-riscv64"               if LINGMO_riscv && LINGMO_ARCH_IS_64
+	default "linux32-riscv32"               if LINGMO_riscv && !LINGMO_ARCH_IS_64
+	default "linux64-s390x"                 if LINGMO_s390x
+	# no-asm is needed with generic architectures such as
+	# linux-generic{32,64}, see
+	# https://github.com/openssl/openssl/issues/9839
+	default "linux-generic64 no-asm"	if LINGMO_ARCH_IS_64 && !LINGMO_MIPS_NABI32
+	default "linux-latomic no-asm"		if LINGMO_TOOLCHAIN_HAS_LIBATOMIC
+	default "linux-generic32 no-asm"
+
+config LINGMO_PACKAGE_LIBOPENSSL_BIN
+	bool "openssl binary"
+	help
+	  Install the openssl binary and the associated helper scripts
+	  to the target file system. This is a command line tool for
+	  doing various cryptographic stuff.
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENGINES
+	bool "openssl additional engines"
+	help
+	  Install additional encryption engine libraries.
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_CHACHA
+	bool "enable CHACHA"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC2
+	bool "enable RC2"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC4
+	bool "enable RC4"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD2
+	bool "enable MD2"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD4
+	bool "enable MD4"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MDC2
+	bool "enable MDC2"
+	default y
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_BLAKE2
+	bool "enable BLAKE2"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_IDEA
+	bool "enable IDEA"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_SEED
+	bool "enable SEED"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES
+	bool "enable DES"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RMD160
+	bool "enable RMD160"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_WHIRLPOOL
+	bool "enable WHIRLPOOL"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_BLOWFISH
+	bool "enable BLOWFISH"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_SSL
+	bool "enable SSL"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_SSL3
+	bool "enable SSL3"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_WEAK_SSL
+	bool "enable WEAK_SSL"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_PSK
+	bool "enable mode PSK"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_CAST
+	bool "enable mode CAST"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_UNSECURE
+	bool "enable unit test, debug, backtrace"
+	default y
+	help
+	  Enable unit-test crypto-mdebug-backtrace
+	  crypto-mdebug autoerrinit mode.
+
+config LINGMO_PACKAGE_LIBOPENSSL_DYNAMIC_ENGINE
+	bool "enable dynamic engine"
+	default y
+
+config LINGMO_PACKAGE_LIBOPENSSL_ENABLE_COMP
+	bool "enable compression"
+	default y
+
+endif # LINGMO_PACKAGE_LIBOPENSSL

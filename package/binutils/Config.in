@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_BINUTILS
+	bool "binutils"
+	depends on !LINGMO_nios2
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Install binutils on the target
+
+if LINGMO_PACKAGE_BINUTILS
+
+config LINGMO_PACKAGE_BINUTILS_TARGET
+	bool "binutils binaries"
+	help
+	  The GNU Binutils are a collection of binary tools:
+
+	  ld - the GNU linker.
+	  as - the GNU assembler.
+	  and others...
+
+	  http://www.gnu.org/software/binutils/
+
+endif
+
+comment "binutils needs a toolchain w/ wchar"
+	depends on !LINGMO_nios2
+	depends on !LINGMO_USE_WCHAR

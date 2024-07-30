@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_POSTGIS
+	bool "postgis"
+	depends on LINGMO_PACKAGE_POSTGRESQL_FULL
+	depends on LINGMO_INSTALL_LIBSTDCPP # libgeos, proj
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libgeos
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # proj
+	depends on LINGMO_USE_WCHAR # libgeos, proj
+	depends on !LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_27597 # libgeos
+	select LINGMO_PACKAGE_LIBGEOS
+	select LINGMO_PACKAGE_PROJ
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  PostGIS is a spatial database extender for PostgreSQL
+	  object-relational database. It adds support for
+	  geographic objects allowing location queries
+	  to be run in SQL.
+
+	  https://postgis.net/
+
+comment "postgis needs a toolchain w/ C++, NPTL, wchar, gcc >= 4.9, not binutils bug 27597"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_USE_WCHAR || \
+		LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_27597

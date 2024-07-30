@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_GMRENDER_RESURRECT
+	bool "gmrender-resurrect"
+	depends on LINGMO_USE_WCHAR # gstreamer1 -> libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # gstreamer1
+	select LINGMO_PACKAGE_GSTREAMER1
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE # run-time only
+	select LINGMO_PACKAGE_LIBUPNP
+	help
+	  UPnP (DLNA) media renderer based on gstreamer
+
+	  https://github.com/hzeller/gmrender-resurrect
+
+comment "gmrender-resurrect needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

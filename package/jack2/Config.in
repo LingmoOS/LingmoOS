@@ -1,0 +1,51 @@
+config LINGMO_PACKAGE_JACK2
+	bool "jack2"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # alsa-lib
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_HWDEP
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+	select LINGMO_PACKAGE_ALSA_LIB_RAWMIDI
+	# Ensure we get at least one:
+	select LINGMO_PACKAGE_JACK2_LEGACY if !LINGMO_PACKAGE_JACK2_DBUS
+	help
+	  JACK Audio Connection Kit (server and example clients).
+
+	  JACK is a low-latency sound server, allowing multiple
+	  applications to connect to one audio device, and to share
+	  audio between themselves. This package contains the daemon
+	  jackd as well as some example clients.
+
+	  http://jackaudio.org/
+
+if LINGMO_PACKAGE_JACK2
+
+config LINGMO_PACKAGE_JACK2_LEGACY
+	bool "classic jack2"
+	help
+	  Build and use jackd.
+
+	  https://github.com/jackaudio/jackaudio.github.com/wiki/JACK-DBus-packaging
+
+config LINGMO_PACKAGE_JACK2_DBUS
+	bool "dbus jack2"
+	depends on LINGMO_USE_WCHAR # dbus-python, python
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_DBUS_PYTHON
+	select LINGMO_PACKAGE_PYTHON3 # runtime
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT # runtime
+	help
+	  Build and use jackdbus.
+
+	  https://github.com/jackaudio/jackaudio.github.com/wiki/JACK-DBus-packaging
+
+endif
+
+comment "jack2 needs a toolchain w/ threads, C++, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP || \
+		LINGMO_STATIC_LIBS

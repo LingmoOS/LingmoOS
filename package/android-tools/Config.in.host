@@ -1,0 +1,41 @@
+config LINGMO_PACKAGE_HOST_ANDROID_TOOLS
+	bool "host android-tools"
+	select LINGMO_PACKAGE_HOST_ANDROID_TOOLS_ADB if \
+		!LINGMO_PACKAGE_HOST_ANDROID_TOOLS_FASTBOOT
+	help
+	  This package contains the fastboot and adb utilities, that
+	  can be used to interact with target devices using of these
+	  protocols.
+
+if LINGMO_PACKAGE_HOST_ANDROID_TOOLS
+
+config LINGMO_PACKAGE_HOST_ANDROID_TOOLS_FASTBOOT
+	bool "fastboot"
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # host-libselinux -> host-libsepol
+	help
+	  This option will build and install the fastboot utility for
+	  the host, which can be used to reflash target devices
+	  implementing the fastboot protocol.
+
+comment "fastboot needs a toolchain w/ host gcc >= 5"
+	depends on !LINGMO_HOST_GCC_AT_LEAST_5
+
+config LINGMO_PACKAGE_HOST_ANDROID_TOOLS_ADB
+	bool "adb"
+	help
+	  This option will build and install the adb utility for the
+	  host, which can be used to interact with target devices
+	  implementing the ADB protocol.
+
+config LINGMO_PACKAGE_HOST_ANDROID_TOOLS_EXT4_UTILS
+	bool "ext4 utils"
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # host-libselinux -> host-libsepol
+	help
+	  This option will build and install the ext4 utils for the
+	  host, i.e. make_ext4fs, ext4fixup, ext2simg, img2simg,
+	  simg2img and simg2simg.
+
+comment "ext4 utils needs a toolchain w/ host gcc >= 5"
+	depends on !LINGMO_HOST_GCC_AT_LEAST_5
+
+endif

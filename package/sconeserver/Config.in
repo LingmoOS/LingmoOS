@@ -1,0 +1,95 @@
+menuconfig LINGMO_PACKAGE_SCONESERVER
+	bool "sconeserver"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	select LINGMO_PACKAGE_PCRE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Sconeserver is a modular, object-orientated and extremely
+	  versatile network server framework for GNU/Linux and
+	  UNIX-like platforms.
+
+	  http://www.sconemad.com/sconeserver/
+
+if LINGMO_PACKAGE_SCONESERVER
+
+comment "Sconeserver modules"
+
+config LINGMO_PACKAGE_SCONESERVER_BLUETOOTH
+	bool "bluetooth"
+	depends on LINGMO_USE_WCHAR # bluez5_utils -> libglib2
+	depends on LINGMO_USE_MMU # bluez5_utils -> dbus
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # bluez5_utils -> dbus, libglib2
+	depends on !LINGMO_STATIC_LIBS # bluez5_utils
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 # bluez5_utils
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # bluez5_utils
+	select LINGMO_PACKAGE_BLUEZ5_UTILS
+	help
+	  Bluetooth module for Sconeserver
+
+comment "bluetooth support needs a toolchain w/ wchar, threads, dynamic library, headers >= 3.4"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4
+
+config LINGMO_PACKAGE_SCONESERVER_EXAMPLES
+	bool "examples"
+	help
+	  Example modules for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_HTTP_SCONESITE
+	bool "http::sconesite"
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  http::sconesite module for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_LOCATION
+	bool "location"
+	depends on LINGMO_USE_MMU # gpsd
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # gpsd
+	depends on !LINGMO_STATIC_LIBS # gpsd
+	select LINGMO_PACKAGE_GPSD
+	help
+	  Location module for Sconeserver
+
+comment "location support needs a toolchain w/ theads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_SCONESERVER_MATHS
+	bool "maths"
+	select LINGMO_PACKAGE_MPFR
+	help
+	  Mathematics module for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_MYSQL
+	bool "mysql"
+	depends on LINGMO_USE_MMU # mysql
+	select LINGMO_PACKAGE_MARIADB
+	help
+	  MySQL module for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_RSS
+	bool "rss"
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  RSS module for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_SQLITE
+	bool "sqlite"
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  SQLite module for Sconeserver
+
+config LINGMO_PACKAGE_SCONESERVER_TESTBUILDER
+	bool "testbuilder"
+	help
+	  Testbuilder module for Sconeserver
+
+endif # LINGMO_PACKAGE_SCONESERVER
+
+comment "sconeserver needs a toolchain with dynamic library, C++, NPTL"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL \
+		|| LINGMO_STATIC_LIBS

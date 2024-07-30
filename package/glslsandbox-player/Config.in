@@ -1,0 +1,122 @@
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER
+	bool "glslsandbox-player"
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	depends on LINGMO_PACKAGE_HAS_LIBGLES
+	help
+	  GLSL Sandbox standalone player allow one to run and render
+	  (most of) nice shaders available online on the
+	  http://glslsandbox.com/ website, but without the need of an
+	  Internet connection, a web browser or any of its
+	  dependencies. Instead, the only requirement of
+	  glslsandbox-player is a working EGL and GLESv2 libraries.
+
+	  This package is useful for stressing and testing GLES shader
+	  compiler in GPU drivers.
+
+	  https://github.com/jolivain/glslsandbox-player
+
+if LINGMO_PACKAGE_GLSLSANDBOX_PLAYER
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_PNG
+	bool "Enable PNG support"
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  Enable PNG texture loading support
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_TESTING
+	bool "Enable testing"
+	help
+	  Generate and install test suite on target
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_SCRIPTS
+	bool "Install scripts"
+	depends on !LINGMO_STATIC_LIBS # python3
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # python3
+	depends on LINGMO_USE_MMU # bash, python3
+	depends on LINGMO_USE_WCHAR # python3
+	select LINGMO_PACKAGE_BASH # runtime
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS if LINGMO_PACKAGE_BUSYBOX # bash
+	select LINGMO_PACKAGE_COREUTILS # runtime (timeout)
+	select LINGMO_PACKAGE_LIBCURL_CURL # runtime
+	select LINGMO_PACKAGE_IMAGEMAGICK # runtime
+	select LINGMO_PACKAGE_JPEG # runtime
+	select LINGMO_PACKAGE_LIBCURL # runtime
+	select LINGMO_PACKAGE_LIBOPENSSL_BIN if LINGMO_PACKAGE_LIBOPENSSL # runtime
+	select LINGMO_PACKAGE_LIBRESSL_BIN if LINGMO_PACKAGE_LIBRESSL # runtime
+	select LINGMO_PACKAGE_MAKE # runtime
+	select LINGMO_PACKAGE_OPENSSL # runtime
+	select LINGMO_PACKAGE_PYTHON3 # runtime
+	help
+	  Install additional helper scripts
+
+choice
+	prompt "Native windowing system"
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_MALI  if LINGMO_PACKAGE_SUNXI_MALI_UTGARD
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_MALI_T76X if LINGMO_PACKAGE_MALI_T76X
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_RPI   if LINGMO_PACKAGE_RPI_USERLAND
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_SDL2  if LINGMO_PACKAGE_SDL2_OPENGLES
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_TISGX if LINGMO_PACKAGE_TI_SGX_UM
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_VIVFB if LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_FB
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_WL    if LINGMO_PACKAGE_WAYLAND
+	default LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_X11   if LINGMO_PACKAGE_XORG7
+	help
+	  Select the native windowing system you wish to use.
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_NULL
+	bool "NullWS"
+	help
+	  Enable Null Windowing System
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_KMS
+	bool "KMS/DRM/GBM"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm
+	depends on LINGMO_PACKAGE_HAS_LIBGBM
+	select LINGMO_PACKAGE_LIBDRM
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_MALI
+	bool "Allwinner ARM/Mali Frame Buffer"
+	depends on LINGMO_PACKAGE_SUNXI_MALI_UTGARD
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_MALI_T76X
+	bool "ARM/Mali T76x Frame Buffer"
+	depends on LINGMO_PACKAGE_MALI_T76X
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_RPI
+	bool "RaspberryPI Frame Buffer"
+	depends on LINGMO_PACKAGE_RPI_USERLAND
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_SDL2
+	bool "SDL2"
+	depends on LINGMO_PACKAGE_SDL2_OPENGLES
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_TISGX
+	bool "TI/SGX Frame Buffer"
+	depends on LINGMO_PACKAGE_TI_SGX_UM
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_VIVFB
+	bool "Vivante Frame Buffer"
+	depends on LINGMO_PACKAGE_IMX_GPU_VIV
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_WL
+	bool "Wayland"
+	depends on LINGMO_PACKAGE_WAYLAND
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_X11
+	bool "X11"
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+
+endchoice
+
+if LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_WL
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_WL_IVI
+	bool "Wayland IVI shell support"
+
+config LINGMO_PACKAGE_GLSLSANDBOX_PLAYER_WL_XDG
+	bool "Wayland XDG shell support"
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+endif
+endif
+
+comment "glslsandbox-player needs openGL ES and EGL driver"
+	depends on !LINGMO_PACKAGE_HAS_LIBEGL || !LINGMO_PACKAGE_HAS_LIBGLES

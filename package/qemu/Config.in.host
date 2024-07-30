@@ -1,0 +1,105 @@
+config LINGMO_PACKAGE_HOST_QEMU_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_arm
+	default y if LINGMO_armeb
+	default y if LINGMO_aarch64
+	default y if LINGMO_i386
+	default y if LINGMO_m68k
+	default y if LINGMO_microblazeel
+	default y if LINGMO_microblazebe
+	default y if LINGMO_mips
+	default y if LINGMO_mipsel
+	default y if LINGMO_nios2
+	default y if LINGMO_or1k
+	default y if LINGMO_powerpc
+	default y if LINGMO_powerpc64
+	default y if LINGMO_powerpc64le
+	default y if LINGMO_riscv
+	default y if LINGMO_s390x
+	default y if LINGMO_sh
+	default y if LINGMO_sparc
+	default y if LINGMO_sparc64
+	default y if LINGMO_xtensa
+	default y if LINGMO_x86_64
+	depends on !LINGMO_x86_steamroller && !LINGMO_x86_core_avx2
+	depends on !LINGMO_powerpc_620 && !LINGMO_powerpc_630
+
+config LINGMO_PACKAGE_HOST_QEMU_SYSTEM_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_HOST_QEMU_ARCH_SUPPORTS
+	default y if LINGMO_mips64
+	default y if LINGMO_mips64el
+
+config LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_HOST_QEMU_ARCH_SUPPORTS
+
+comment "host-qemu needs a host gcc >= 8"
+	depends on LINGMO_PACKAGE_HOST_QEMU_SYSTEM_ARCH_SUPPORTS || \
+		LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORT
+	depends on !LINGMO_HOST_GCC_AT_LEAST_8
+
+config LINGMO_PACKAGE_HOST_QEMU
+	bool "host qemu"
+	depends on LINGMO_PACKAGE_HOST_QEMU_SYSTEM_ARCH_SUPPORTS || LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS
+	depends on LINGMO_HOST_GCC_AT_LEAST_8
+	select LINGMO_PACKAGE_HOST_QEMU_LINUX_USER_MODE \
+		if !LINGMO_PACKAGE_HOST_QEMU_SYSTEM_MODE && LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_HOST_QEMU_SYSTEM_MODE \
+		if !LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS
+	help
+	  QEMU is a generic and open source machine emulator and
+	  virtualizer.
+
+	  This option builds an emulator for your selected architecture.
+
+	  http://www.qemu.org
+
+if LINGMO_PACKAGE_HOST_QEMU
+
+comment "Emulators selection"
+
+config LINGMO_PACKAGE_HOST_QEMU_SYSTEM_MODE
+	bool "Enable system emulation"
+	depends on LINGMO_PACKAGE_HOST_QEMU_SYSTEM_ARCH_SUPPORTS
+	help
+	  Enables the build of the system emulator, which allows to
+	  boot an entire system in Qemu.
+
+config LINGMO_PACKAGE_HOST_QEMU_LINUX_USER_MODE
+	bool "Enable Linux user-land emulation"
+	depends on LINGMO_PACKAGE_HOST_QEMU_USER_ARCH_SUPPORTS
+	help
+	  Enables the build of the user-land emulator, which allows to
+	  run user-space applications.
+
+	  Note that system calls made by the emulated user-land are
+	  serviced by the running host kernel. Therefore, if the
+	  kernel headers used by your target are more recent than
+	  the running host kernel, you may run into invalid system
+	  calls, which may yield surprising effects.
+
+config LINGMO_PACKAGE_HOST_QEMU_USER_MODE_ARGS
+	string
+	default "-cpu Nehalem,check=false" if LINGMO_x86_corei7
+
+config LINGMO_PACKAGE_HOST_QEMU_VDE2
+	bool "VDE2 support"
+	help
+	  Enables VDE2 support. VDE2 stands for Virtual Distributed
+	  Ethernet and can be used to create virtual switches to
+	  "plug" both physical and virtual machines in them.
+
+config LINGMO_PACKAGE_HOST_QEMU_VIRTFS
+	bool "Virtual filesystem support"
+	depends on LINGMO_PACKAGE_HOST_QEMU_SYSTEM_MODE
+	help
+	  Enables support for virtual filesystem in Qemu allowing
+	  shared filesystem between Qemu and its emulated target.
+
+config LINGMO_PACKAGE_HOST_QEMU_USB
+	bool "USB passthrough support"
+	help
+	  Enables USB passthrough support from guest to host.
+
+endif

@@ -1,0 +1,36 @@
+config LINGMO_PACKAGE_NTFS_3G
+	bool "ntfs-3g"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  The NTFS-3G driver is an open source, freely available
+	  read/write NTFS driver for Linux, FreeBSD, Mac OS X, NetBSD,
+	  and Haiku. It provides safe and fast handling of the Windows
+	  XP, Windows Server 2003, Windows 2000 and Windows Vista file
+	  systems. Most POSIX file system operations are supported, with
+	  the exception of full file ownership and access right support.
+
+	  http://www.ntfs-3g.org/
+
+if LINGMO_PACKAGE_NTFS_3G
+
+config LINGMO_PACKAGE_NTFS_3G_ENCRYPTED
+	bool "encrypted volumes"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt
+	select LINGMO_PACKAGE_GNUTLS
+	select LINGMO_PACKAGE_LIBGCRYPT
+	help
+	  Enable support for NTFS encrypted volumes.
+
+config LINGMO_PACKAGE_NTFS_3G_NTFSPROGS
+	bool "ntfsprogs"
+	help
+	  Install NTFS utilities.
+
+endif
+
+comment "ntfs-3g needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

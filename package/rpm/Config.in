@@ -1,0 +1,36 @@
+comment "rpm needs a toolchain w/ dynamic library, threads and lua >= 5.3"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS \
+		|| !LINGMO_PACKAGE_LUA || LINGMO_PACKAGE_LUA_5_1
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	depends on LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_RPM
+	bool "rpm"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	depends on LINGMO_PACKAGE_LUA && !LINGMO_PACKAGE_LUA_5_1
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_FILE
+	select LINGMO_PACKAGE_POPT
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  The RPM Package Manager (RPM).
+
+	  http://www.rpm.org/
+
+if LINGMO_PACKAGE_RPM
+
+comment "rpm2archive support needs a toolchain w/ wchar"
+	depends on !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_RPM_RPM2ARCHIVE
+	bool "rpm2archive command"
+	default y
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LIBARCHIVE
+	help
+	  Enable rpm2archive
+
+endif

@@ -1,0 +1,32 @@
+config LINGMO_PACKAGE_PANGO
+	bool "pango"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	depends on LINGMO_INSTALL_LIBSTDCPP # freetype support
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # harfbuzz
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBFRIBIDI
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_CAIRO
+	select LINGMO_PACKAGE_FONTCONFIG
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_HARFBUZZ
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7
+	help
+	  Pango is a library for laying out and rendering of text,
+	  with an emphasis on internationalization. Pango can be used
+	  anywhere that text layout is needed, though most of the work
+	  on Pango so far has been done in the context of the GTK+
+	  widget toolkit. Pango forms the core of text and font
+	  handling for GTK+-2.x.
+
+	  https://pango.gnome.org/
+
+comment "pango needs a toolchain w/ wchar, threads, C++, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_INSTALL_LIBSTDCPP

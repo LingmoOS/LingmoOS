@@ -1,0 +1,444 @@
+menuconfig LINGMO_PACKAGE_MPD
+	bool "mpd"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # boost
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17
+	depends on LINGMO_HOST_GCC_AT_LEAST_8 # C++17
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_FMT
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  MPD is a flexible, powerful, server-side application
+	  for playing music. Through plugins and libraries
+	  it can play a variety of sound files while being
+	  controlled by its network protocol.
+
+	  https://www.musicpd.org
+
+if LINGMO_PACKAGE_MPD
+
+comment "Archive plugins"
+
+config LINGMO_PACKAGE_MPD_BZIP2
+	bool "bzip2"
+	select LINGMO_PACKAGE_BZIP2
+	help
+	  Enable bzip2 archive support.
+
+config LINGMO_PACKAGE_MPD_SQLITE
+	bool "sqlite"
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  Enable sqlite database support.
+	  If you don't use sqlite it will use an ASCII database.
+
+config LINGMO_PACKAGE_MPD_ZZIP
+	bool "zzip"
+	select LINGMO_PACKAGE_ZZIPLIB
+	help
+	  Enable ZIP archive support.
+
+comment "Commercial services"
+
+config LINGMO_PACKAGE_MPD_QOBUZ
+	bool "qobuz"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_MPD_CURL
+	select LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_YAJL
+	help
+	  Play songs from the commercial streaming service Qobuz.
+
+config LINGMO_PACKAGE_MPD_SOUNDCLOUD
+	bool "soundcloud"
+	select LINGMO_PACKAGE_MPD_CURL
+	select LINGMO_PACKAGE_YAJL
+	help
+	  Enable soundcloud.com playlist support.
+
+comment "Converter plugins"
+
+config LINGMO_PACKAGE_MPD_LIBSAMPLERATE
+	bool "libsamplerate"
+	select LINGMO_PACKAGE_LIBSAMPLERATE
+	help
+	  Enable libsamplerate input support.
+	  Select this for software sample rate conversion.
+
+config LINGMO_PACKAGE_MPD_LIBSOXR
+	bool "libsoxr"
+	select LINGMO_PACKAGE_LIBSOXR
+	help
+	  Enable libsoxr resampler support.
+	  The SoX Resampler library performs software sample-rate
+	  conversion.
+
+comment "Decoder plugins"
+
+config LINGMO_PACKAGE_MPD_DSD
+	bool "dsd"
+	help
+	  Enable Digital Speech Decoder (DSD) support to play audio
+	  files encoded in a digital speech format.
+
+config LINGMO_PACKAGE_MPD_FAAD2
+	bool "faad2"
+	select LINGMO_PACKAGE_FAAD2
+	help
+	  Enable faad2 input support.
+	  Select this if you want to play back MP4/AAC files.
+
+config LINGMO_PACKAGE_MPD_FFMPEG
+	bool "ffmpeg"
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_FFMPEG
+	help
+	  Enable ffmpeg input support.
+	  Select this if you want to play back files supported by
+	  ffmpeg.
+
+config LINGMO_PACKAGE_MPD_FLAC
+	bool "flac"
+	select LINGMO_PACKAGE_FLAC
+	help
+	  Enable flac input/streaming support.
+	  Select this if you want to play back FLAC files.
+
+config LINGMO_PACKAGE_MPD_FLUIDSYNTH
+	bool "fluidsynth"
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_FLUIDSYNTH
+	help
+	  Enable fluidsynth MIDI decoder support.
+
+comment "fluidsynth support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_MPD_LIBSNDFILE
+	bool "libsndfile"
+	select LINGMO_PACKAGE_LIBSNDFILE
+	help
+	  Enable libsndfile input/streaming support.
+	  Select this if you want to play back WAV files.
+
+config LINGMO_PACKAGE_MPD_MAD
+	bool "mad"
+	default y
+	select LINGMO_PACKAGE_MPD_ID3TAG
+	select LINGMO_PACKAGE_LIBMAD
+	help
+	  Enable mad input support.
+	  Select this if you want to play back MP3 files.
+
+config LINGMO_PACKAGE_MPD_MODPLUG
+	bool "modplug"
+	select LINGMO_PACKAGE_LIBMODPLUG
+	help
+	  Enable Modplug decoder support.
+
+config LINGMO_PACKAGE_MPD_MPG123
+	bool "mpg123"
+	select LINGMO_PACKAGE_MPD_ID3TAG
+	select LINGMO_PACKAGE_MPG123
+	help
+	  Enable mpg123 input support.
+	  Select this if you want to play back MP3 files.
+
+config LINGMO_PACKAGE_MPD_MUSEPACK
+	bool "musepack"
+	select LINGMO_PACKAGE_LIBCUEFILE
+	select LINGMO_PACKAGE_LIBREPLAYGAIN
+	select LINGMO_PACKAGE_MUSEPACK
+	help
+	  Enable musepack input support.
+	  Select this if you want to play back MPC files.
+
+config LINGMO_PACKAGE_MPD_OPUS
+	bool "opus"
+	select LINGMO_PACKAGE_OPUS
+	select LINGMO_PACKAGE_LIBOGG
+	help
+	  Enable opus input support.
+	  Select this if you want to play back OPUS encoded files.
+
+config LINGMO_PACKAGE_MPD_SIDPLAY
+	bool "sidplay"
+	select LINGMO_PACKAGE_LIBSIDPLAY2
+	help
+	  Enable C64 SID support.
+
+config LINGMO_PACKAGE_MPD_TREMOR
+	bool "tremor"
+	depends on !LINGMO_PACKAGE_MPD_VORBIS
+	select LINGMO_PACKAGE_LIBOGG
+	select LINGMO_PACKAGE_TREMOR
+	help
+	  Enable vorbis input support.
+	  Select this if you want to play back OGG files on softfloat
+	  targets.
+
+config LINGMO_PACKAGE_MPD_VORBIS
+	bool "vorbis"
+	select LINGMO_PACKAGE_LIBOGG
+	select LINGMO_PACKAGE_LIBVORBIS
+	help
+	  Enable vorbis input/streaming support.
+	  Select this if you want to play back OGG files on hardfloat
+	  targets.
+
+config LINGMO_PACKAGE_MPD_WAVPACK
+	bool "wavpack"
+	select LINGMO_PACKAGE_WAVPACK
+	help
+	  Enable wavpack input support.
+	  Select this if you want to play back WV files.
+
+comment "Encoder plugins"
+
+config LINGMO_PACKAGE_MPD_LAME
+	bool "lame"
+	select LINGMO_PACKAGE_LAME
+	help
+	  Enable lame (mp3) encoding support.
+
+config LINGMO_PACKAGE_MPD_TWOLAME
+	bool "twolame"
+	select LINGMO_PACKAGE_TWOLAME
+	help
+	  Enable TwoLAME mp2 encoding.
+
+comment "Input plugins"
+
+config LINGMO_PACKAGE_MPD_CDIO_PARANOIA
+	bool "cdio-paranoia"
+	select LINGMO_PACKAGE_LIBCDIO_PARANOIA
+	help
+	  Enable cdio-paranoia support.
+
+config LINGMO_PACKAGE_MPD_CURL
+	bool "curl"
+	select LINGMO_PACKAGE_LIBCURL
+	help
+	  Enable curl streaming (http) support.
+
+config LINGMO_PACKAGE_MPD_LIBMMS
+	bool "mms"
+	select LINGMO_PACKAGE_LIBMMS
+	help
+	  Enable MMS support.
+
+config LINGMO_PACKAGE_MPD_LIBNFS
+	bool "nfs"
+	# libnfs -> libtirpc
+	depends on LINGMO_TOOLCHAIN_HAS_NATIVE_RPC || LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBNFS
+	help
+	  Enable Network File System (NFS) support.
+
+comment "nfs support needs a toolchain w/ threads support"
+	depends on !(LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_HAS_NATIVE_RPC)
+
+comment "samba support needs a glibc toolchain w/ dynamic library, RPC"
+	depends on !LINGMO_nios2
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+
+config LINGMO_PACKAGE_MPD_LIBSMBCLIENT
+	bool "samba"
+	depends on !LINGMO_nios2 # samba
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_SAMBA4
+	help
+	  Enable Samba support.
+
+comment "Output plugins"
+
+config LINGMO_PACKAGE_MPD_ALSA
+	bool "alsa"
+	default y
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_PCM
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+	help
+	  Enable alsa output support.
+
+config LINGMO_PACKAGE_MPD_AO
+	bool "ao"
+	select LINGMO_PACKAGE_LIBAO
+	help
+	  Enable libao output support.
+
+config LINGMO_PACKAGE_MPD_HTTPD_OUTPUT
+	bool "httpd output"
+	help
+	  Enable httpd output support.
+
+config LINGMO_PACKAGE_MPD_JACK2
+	bool "jack2"
+	depends on !LINGMO_STATIC_LIBS # jack2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_JACK2
+	help
+	  Enable jack output support.
+
+comment "jack support needs a toolchain w/ dynamic library"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_MPD_OPENAL
+	bool "openal"
+	depends on LINGMO_PACKAGE_OPENAL_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	select LINGMO_PACKAGE_OPENAL
+	help
+	  Enable OpenAL output support.
+
+comment "openal support needs a toolchain w/ NPTL"
+	depends on LINGMO_PACKAGE_OPENAL_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+
+config LINGMO_PACKAGE_MPD_OSS
+	bool "oss"
+	help
+	  Enable OSS (Open Sound System) output support.
+
+config LINGMO_PACKAGE_MPD_PULSEAUDIO
+	bool "pulseaudio"
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_PULSEAUDIO
+	help
+	  Enable pulseaudio output support.
+
+comment "pulseaudio support needs a toolchain w/ threads, wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_MPD_SHOUTCAST
+	bool "shoutcast"
+	select LINGMO_PACKAGE_LIBSHOUT
+	help
+	  Enable shoutcast streaming output support.
+
+comment "Miscellaneous plugins"
+
+config LINGMO_PACKAGE_MPD_AVAHI_SUPPORT
+	bool "avahi (zeroconf) support"
+	depends on !LINGMO_STATIC_LIBS # avahi
+	select LINGMO_PACKAGE_AVAHI
+	select LINGMO_PACKAGE_AVAHI_DAEMON
+	select LINGMO_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY
+	help
+	  Enable Avahi (zeroconf) support.
+	  Select this for multicast DNS/DNS-SD service discovery
+	  support. This allows MPD to publish service information on a
+	  local network.
+
+comment "avahi support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_MPD_IO_URING
+	bool "io_uring"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_1
+	select LINGMO_PACKAGE_LIBURING
+	help
+	  Asynchronous I/O using kernel io_uring subsystem
+
+comment "io_uring support needs a toolchain w/ headers >= 5.1"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_1
+
+config LINGMO_PACKAGE_MPD_LIBMPDCLIENT
+	bool "libmpdclient"
+	select LINGMO_PACKAGE_LIBMPDCLIENT
+	help
+	  Enable libmpdclient support.
+
+config LINGMO_PACKAGE_MPD_NEIGHBOR_DISCOVERY_SUPPORT
+	bool "neighbor discovery support"
+	depends on LINGMO_PACKAGE_MPD_LIBSMBCLIENT || !LINGMO_PACKAGE_MPD_UPNP_DISABLED
+	help
+	  Enable support for neighbor discovery.
+	  This option can be used in conjunction with the smbclient
+	  plugin to provide a list of SMB/CIFS servers or with the
+	  UPnP plugin to provide a list of UPnP servers on the local
+	  network. The neighbor plugin needs configuration in
+	  mpd.conf. For further information take a look at the MPD
+	  documentation.
+
+config LINGMO_PACKAGE_MPD_TCP
+	bool "tcp sockets"
+	default y
+	help
+	  Enable MPD to listen on tcp sockets.
+
+	  You want this on if MPD and the client(s) work
+	  on different machines (the usual scenario).
+
+choice
+	prompt "UPnP"
+	default LINGMO_PACKAGE_MPD_UPNP_PUPNP if LINGMO_PACKAGE_MPD_UPNP # legacy
+	default LINGMO_PACKAGE_MPD_UPNP_DISABLED
+	help
+	  Enable MPD to access a UPnP based media server.
+
+	  For further information, see
+	  https://www.lesbonscomptes.com/upmpdcli/pages/upmpdcli-or-mpdupnp.html
+
+config LINGMO_PACKAGE_MPD_UPNP_PUPNP
+	bool "pupnp"
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_LIBUPNP
+	select LINGMO_PACKAGE_MPD_CURL
+	help
+	  Provides UPnP database access through libupnp
+	  (the legacy Portable SDK for UPnP devices).
+
+	  Introduces least additional dependencies.
+
+config LINGMO_PACKAGE_MPD_UPNP_NPUPNP
+	bool "npupnp"
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_LIBNPUPNP
+	select LINGMO_PACKAGE_MPD_CURL
+	help
+	  Provides UPnP database access through libnpupnp
+	  (a C++ reimplementation of the Portable UPnP library).
+
+	  This implementation is more modern, but also brings
+	  additional features not needed in this context, thus
+	  consuming more space.
+
+config LINGMO_PACKAGE_MPD_UPNP_DISABLED
+	bool "disabled"
+	help
+	  No UPnP client functionality.
+
+endchoice
+
+comment "Tag plugins"
+
+config LINGMO_PACKAGE_MPD_ID3TAG
+	bool "id3tag"
+	select LINGMO_PACKAGE_LIBID3TAG
+	help
+	  Enable ID3 support.
+
+endif
+
+comment "mpd needs a toolchain w/ C++, threads, wchar, gcc >= 8, host gcc >= 8"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || \
+		!LINGMO_HOST_GCC_AT_LEAST_8

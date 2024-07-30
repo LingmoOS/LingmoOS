@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBPQXX
+	bool "libpqxx"
+	depends on LINGMO_PACKAGE_POSTGRESQL
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  libpqxx is the official C++ client API for PostgreSQL, the
+	  enterprise-strength open-source relational database.
+
+	  http://pqxx.org/development/libpqxx/
+
+comment "libpqxx needs toolchain w/ C++, gcc >= 7, threads"
+	depends on LINGMO_PACKAGE_POSTGRESQL
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS

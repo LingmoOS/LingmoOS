@@ -1,0 +1,29 @@
+comment "udpcast needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_UDPCAST
+	bool "udpcast"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UDPCAST_SENDER \
+		if !LINGMO_PACKAGE_UDPCAST_RECEIVER
+	help
+	  A multicast protocol implementation which happens to
+	  be very handy for imaging drives over the network.
+
+	  http://www.udpcast.linux.lu/
+
+if LINGMO_PACKAGE_UDPCAST
+
+config LINGMO_PACKAGE_UDPCAST_SENDER
+	bool "sender"
+	help
+	  The udpcast transmitter.
+
+config LINGMO_PACKAGE_UDPCAST_RECEIVER
+	bool "receiver"
+	help
+	  The udpcast receiver.
+
+endif

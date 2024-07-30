@@ -1,0 +1,44 @@
+comment "tesseract-ocr needs a toolchain w/ threads, C++, gcc >= 7, dynamic library, wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR
+
+menuconfig LINGMO_PACKAGE_TESSERACT_OCR
+	bool "tesseract-ocr"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LEPTONICA
+	help
+	  Tesseract is an OCR (Optical Character Recognition) engine,
+	  It can be used directly, or (for programmers) using an API.
+	  It supports a wide variety of languages.
+
+	  https://github.com/tesseract-ocr/tesseract
+
+if LINGMO_PACKAGE_TESSERACT_OCR
+
+comment "tesseract-ocr languages support"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_ENG
+	bool "English"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_FRA
+	bool "French"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_GER
+	bool "German"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_SPA
+	bool "Spanish"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_CHI_SIM
+	bool "Simplified Chinese"
+
+config LINGMO_PACKAGE_TESSERACT_OCR_LANG_CHI_TRA
+	bool "Traditional Chinese"
+
+endif

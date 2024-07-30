@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_BULLET
+	bool "bullet"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	help
+	  Bullet is a Collision Detection and Rigid Body Dynamics
+	  Library.
+
+	  http://bulletphysics.org
+
+comment "bullet needs a toolchain w/ C++, dynamic library, threads, wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR

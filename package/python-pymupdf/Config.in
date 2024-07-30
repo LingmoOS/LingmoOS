@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_PYTHON_PYMUPDF
+	bool "python-pymupdf"
+	depends on LINGMO_INSTALL_LIBSTDCPP # mupdf -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # mupdf -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # mupdf -> harfbuzz
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_HOST_SWIG
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_MUPDF
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Python bindings for the PDF rendering library MuPDF.
+
+	  https://github.com/pymupdf/PyMuPDF
+
+comment "python-pymupdf needs Xorg"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_PACKAGE_XORG7
+
+comment "python-pymupdf needs a toolchain w/ C++, gcc >= 4.9"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

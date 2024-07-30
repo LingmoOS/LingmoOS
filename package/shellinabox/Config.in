@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_SHELLINABOX
+	bool "shellinabox"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Shell In A Box implements a web server that can export
+	  arbitrary command line tools to a web based terminal
+	  emulator. This emulator is accessible to any JavaScript and
+	  CSS enabled web browser and does not require any additional
+	  browser plugins.
+
+	  https://github.com/shellinabox/shellinabox
+
+comment "shellinabox needs a toolchain w/ dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

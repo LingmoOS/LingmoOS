@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_LIBSS7
+	bool "libss7"
+	depends on LINGMO_USE_MMU # dahdi-tools <- perl
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_DAHDI_LINUX
+	select LINGMO_PACKAGE_DAHDI_TOOLS
+	help
+	  libss7 is an open source library that encapsulates the
+	  protocols used to communicate using Signaling System 7
+	  over ISDN (T1, E1).
+
+	  http://www.asterisk.org/downloads/libss7
+
+comment "libss7 needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+comment "libss7 needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

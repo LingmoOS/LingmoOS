@@ -1,0 +1,45 @@
+config LINGMO_PACKAGE_DOMOTICZ
+	bool "domoticz"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_6 # C++14
+	# pthread_condattr_setclock
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # mosquitto
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_PACKAGE_LUA_5_3
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-thread
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_ATOMIC
+	select LINGMO_PACKAGE_BOOST_DATE_TIME
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_BOOST_THREAD
+	select LINGMO_PACKAGE_CEREAL
+	select LINGMO_PACKAGE_JSONCPP
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_MINIZIP_ZLIB
+	select LINGMO_PACKAGE_MOSQUITTO
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Domoticz is a Home Automation System that lets you monitor
+	  and configure various devices like: Lights, Switches,
+	  various sensors/meters like Temperature, Rain, Wind, UV,
+	  Electra, Gas, Water and much more. Notifications/Alerts can
+	  be sent to any mobile device.
+
+	  http://domoticz.com
+
+comment "domoticz needs lua 5.3 and a toolchain w/ C++, gcc >= 6, NPTL, wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_6 || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS || \
+		!LINGMO_PACKAGE_LUA_5_3
+
+comment "domoticz needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

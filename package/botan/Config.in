@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_BOTAN_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_m68k
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	default y if LINGMO_riscv
+	default y if LINGMO_sparc || LINGMO_sparc64
+	default y if LINGMO_s390x
+	default y if LINGMO_sh
+
+config LINGMO_PACKAGE_BOTAN
+	bool "botan"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_10 # C++20
+	depends on LINGMO_PACKAGE_BOTAN_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_BOOST_FILESYSTEM if LINGMO_PACKAGE_BOOST && LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	select LINGMO_PACKAGE_BOOST_SYSTEM if LINGMO_PACKAGE_BOOST && LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	help
+	  Botan is a crypto library for C++
+
+	  http://botan.randombit.net
+
+comment "botan needs a toolchain w/ C++, gcc >= 10"
+	depends on !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_10
+	depends on LINGMO_PACKAGE_BOTAN_ARCH_SUPPORTS

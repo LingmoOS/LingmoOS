@@ -1,0 +1,92 @@
+config LINGMO_TARGET_MXS_BOOTLETS
+	bool "mxs-bootlets"
+	depends on LINGMO_arm
+	depends on LINGMO_TARGET_BAREBOX || LINGMO_LINUX_KERNEL || \
+		LINGMO_TARGET_UBOOT
+	help
+	  Stage1 bootloaders for Freescale iMX23/iMX28 SoCs
+
+if LINGMO_TARGET_MXS_BOOTLETS
+
+choice
+	prompt "Source"
+	default LINGMO_TARGET_MXS_BOOTLETS_FREESCALE
+	help
+	  Select the location of the bootlets you want to use
+
+config LINGMO_TARGET_MXS_BOOTLETS_FREESCALE
+	bool "Freescale 10.12.01 version"
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_TARBALL
+	bool "Custom tarball"
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_GIT
+	bool "Custom Git repository"
+
+endchoice
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_TARBALL_URL
+	string "URL of custom bootlets tarball"
+	depends on LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_TARBALL
+
+if LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_GIT
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_GIT_URL
+	string "URL of custom Git repository"
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_GIT_VERSION
+	string "Custom Git version"
+
+endif
+
+choice
+	prompt "Bootstream"
+	help
+	  Select which bootstream to generate
+
+config LINGMO_TARGET_MXS_BOOTLETS_BAREBOX
+	bool "Barebox Bootloader"
+	depends on LINGMO_TARGET_BAREBOX
+
+config LINGMO_TARGET_MXS_BOOTLETS_LINUX
+	bool "Linux Kernel"
+	depends on LINGMO_LINUX_KERNEL
+
+config LINGMO_TARGET_MXS_BOOTLETS_UBOOT
+	bool "U-boot bootloader"
+	depends on LINGMO_TARGET_UBOOT
+
+endchoice
+
+config LINGMO_TARGET_MXS_BOOTLETS_HAS_IVT
+	bool "HAB Support"
+	help
+	  Enable this option if you are building bootlets
+	  for the iMX28 platform that needs to include instructions
+	  for the secure boot mechanism present on these SoCs
+
+choice
+	prompt "Board"
+	help
+	  Select the board to build the bootlets for
+
+config LINGMO_TARGET_MXS_BOOTLETS_STMP37xx
+	bool "Sigmatel ST-MP3-7xx Board"
+
+config LINGMO_TARGET_MXS_BOOTLETS_STMP378x
+	bool "Sigmatel ST-MP3-78x Board"
+
+config LINGMO_TARGET_MXS_BOOTLETS_IMX28EVK
+	bool "Freescale iMX28 EVK Board"
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_BOARD
+	bool "Custom board"
+endchoice
+
+config LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_BOARD_NAME
+	string "Custom board name"
+	depends on LINGMO_TARGET_MXS_BOOTLETS_CUSTOM_BOARD
+	help
+	  Name of the board to build the bootlets for
+
+endif

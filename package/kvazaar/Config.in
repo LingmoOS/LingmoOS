@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_KVAZAAR
+	bool "kvazaar"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	# use deprecated altivec vec_lvsl()
+	depends on !LINGMO_powerpc && !LINGMO_powerpc64 && !LINGMO_powerpc64le
+	help
+	  An open-source HEVC encoder licensed under LGPLv2.1
+
+	  https://github.com/ultravideo/kvazaar
+
+comment "kvazaar needs a toolchain w/ C++, threads"
+	depends on !LINGMO_powerpc && !LINGMO_powerpc64 && !LINGMO_powerpc64le
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

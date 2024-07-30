@@ -1,0 +1,46 @@
+config LINGMO_PACKAGE_LIBSSH
+	bool "libssh"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_OPENSSL if !(LINGMO_PACKAGE_MBEDTLS || LINGMO_PACKAGE_LIBGCRYPT)
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  libssh is a multiplatform C library implementing the SSHv2
+	  and SSHv1 protocol on client and server side. With libssh,
+	  you can remotely execute programs, transfer files, use a
+	  secure and transparent tunnel for your remote applications.
+
+	  http://www.libssh.org/
+
+if LINGMO_PACKAGE_LIBSSH
+
+config LINGMO_PACKAGE_LIBSSH_SERVER
+	bool "server"
+	help
+	  Enable libssh server support
+
+choice
+	prompt "Crypto Backend"
+	help
+	  Select crypto library to be used in libssh.
+
+config LINGMO_PACKAGE_LIBSSH_MBEDTLS
+	bool "mbedtls"
+	depends on LINGMO_PACKAGE_MBEDTLS
+
+config LINGMO_PACKAGE_LIBSSH_LIBGCRYPT
+	bool "gcrypt"
+	depends on LINGMO_PACKAGE_LIBGCRYPT
+
+config LINGMO_PACKAGE_LIBSSH_OPENSSL
+	bool "openssl"
+	depends on LINGMO_PACKAGE_OPENSSL
+
+endchoice
+
+endif
+
+comment "libssh needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

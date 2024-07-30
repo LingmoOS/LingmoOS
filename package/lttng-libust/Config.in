@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_LTTNG_LIBUST
+	bool "lttng-libust"
+	depends on LINGMO_USE_WCHAR # uses wchar_t
+	# liburcu only works on some architectures and requires threads support"
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP # liburcu
+	select LINGMO_PACKAGE_LIBURCU
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Userspace tracing library for the LTTng 2.x tracing
+	  infrastructure. It allows userspace programs to create
+	  custom trace events that are integrated with all other
+	  events gathered by LTTng.
+
+	  http://lttng.org
+
+comment "lttng-libust needs a toolchain w/ dynamic library, wchar, threads, C++"
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP

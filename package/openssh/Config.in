@@ -1,0 +1,42 @@
+config LINGMO_PACKAGE_OPENSSH
+	bool "openssh"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  A free version of the SSH protocol suite of network
+	  connectivity tools. The standard 'ssh', 'sshd', 'scp', and
+	  friends.
+
+	  http://www.openssh.com/
+
+if LINGMO_PACKAGE_OPENSSH
+
+config LINGMO_PACKAGE_OPENSSH_CLIENT
+	bool "client"
+	default y
+	help
+	  Client programs: ssh, scp, sftp, ssh-agent, ssh-add,
+	  ssh-copy-id.
+
+config LINGMO_PACKAGE_OPENSSH_SERVER
+	bool "server"
+	default y
+	help
+	  Server programs: sshd, sftp-server
+
+config LINGMO_PACKAGE_OPENSSH_KEY_UTILS
+	bool "key utilities"
+	default y
+	help
+	  Key utilities: ssh-keygen, ssh-keyscan.
+
+config LINGMO_PACKAGE_OPENSSH_SANDBOX
+	bool "use sandboxing"
+	default y
+	help
+	  Use sandboxing for extra privilege protection of processes.
+
+	  This is normally preferable, but may cause seccomp problems
+	  for certain combinations of C libraries and kernel versions.
+endif

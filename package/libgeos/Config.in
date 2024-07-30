@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_LIBGEOS
+	bool "libgeos"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++14
+	depends on !LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_27597
+	help
+	  GEOS (Geometry Engine - Open Source) is a C++ port of the
+	  JTS Topology Suite (JTS). It aims to contain the complete
+	  functionality of JTS in C++. This includes all the OpenGIS
+	  Simple Features for SQL spatial predicate functions and
+	  spatial operators, as well as specific JTS enhanced functions.
+
+	  https://trac.osgeo.org/geos
+
+comment "libgeos needs a toolchain w/ C++, wchar, gcc >= 4.9, threads not binutils bug 27597"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		   !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		   !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		   LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_27597

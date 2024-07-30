@@ -1,0 +1,19 @@
+comment "zxing-cpp needs a toolchain w/ C++, wchar, dynamic library, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_ZXING_CPP
+	bool "zxing-cpp"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_STB
+	select LINGMO_PACKAGE_PYTHON_PYBIND if LINGMO_PACKAGE_PYTHON3
+	help
+	  ZXing-cpp (pronounced "zebra crossing") is an open-source,
+	  multi-format 1D/2D barcode image processing library
+	  implemented in Java, with ports to other languages. This
+	  compiles the C++ port.
+
+	  https://github.com/zxing-cpp/zxing-cpp

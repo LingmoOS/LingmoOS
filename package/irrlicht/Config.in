@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_IRRLICHT
+	bool "irrlicht"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_PACKAGE_HAS_LIBGL # use GLX
+	select LINGMO_PACKAGE_XLIB_LIBXXF86VM # libXxf86vm
+	help
+	  An open source high performance realtime 3D graphics engine.
+
+	  http://irrlicht.sourceforge.net/
+
+comment "irrlicht needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+comment "irrlicht needs X11 and an OpenGL provider"
+	depends on !LINGMO_PACKAGE_HAS_LIBGL || !LINGMO_PACKAGE_XORG7
+	depends on LINGMO_INSTALL_LIBSTDCPP

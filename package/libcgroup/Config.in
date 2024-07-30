@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_LIBCGROUP
+	bool "libcgroup"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_MUSL_FTS if !LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  libcgroup is a library that abstracts the control
+	  group file system in Linux.
+
+	  http://libcg.sourceforge.net/
+
+if LINGMO_PACKAGE_LIBCGROUP
+
+config LINGMO_PACKAGE_LIBCGROUP_TOOLS
+	bool "install tools"
+	help
+	  Include a set of command-line tools for managing cgroups.
+
+endif
+
+comment "libcgroup needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

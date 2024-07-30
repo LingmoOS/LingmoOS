@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBGLIB2
+	bool "libglib2"
+	depends on LINGMO_USE_WCHAR # gettext
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBFFI
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Low-level core library that forms the basis of GTK+ and GNOME.
+
+	  http://www.gtk.org/
+
+comment "libglib2 needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_IWD
+	bool "iwd"
+	depends on LINGMO_USE_MMU # dbus
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # ell
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12 # ell
+	depends on LINGMO_USE_WCHAR # ell
+	select LINGMO_PACKAGE_DBUS # runtime
+	select LINGMO_PACKAGE_ELL
+	select LINGMO_PACKAGE_OPENRESOLV if !LINGMO_PACKAGE_SYSTEMD_RESOLVED
+	help
+	  iNet Wireless daemon (iwd)
+
+	  https://iwd.wiki.kernel.org/
+
+comment "iwd needs a toolchain w/ threads, wchar, headers >= 4.12"
+	depends on LINGMO_USE_MMU # dbus
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # ell
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12

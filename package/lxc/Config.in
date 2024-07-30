@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_LXC
+	bool "lxc"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	# build system forcefully builds a shared library
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7 # C++11
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_0 # setns() system call
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # no fexecve
+	help
+	  Linux Containers (LXC), provides the ability to group and
+	  isolate of a set of processes in a jail by virtualizing and
+	  accounting the kernel resources. It is similar to
+	  Linux-Vserver or Openvz.
+
+	  https://linuxcontainers.org/
+
+comment "lxc needs a glibc or musl toolchain w/ threads, headers >= 3.0, dynamic library, gcc >= 4.7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7 \
+		|| !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_0 \
+		|| LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_UCLIBC

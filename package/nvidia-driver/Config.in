@@ -1,0 +1,93 @@
+comment "nvidia-driver needs a glibc toolchain"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER
+	bool "nvidia-driver"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  The binary-only driver blob for NVidia cards.
+	  This is the userland part only.
+
+	  http://www.nvidia.com/
+
+if LINGMO_PACKAGE_NVIDIA_DRIVER
+
+comment "nvidia-driver X.org drivers needs a modular Xorg server"
+	depends on !LINGMO_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_XORG
+	bool "X.org drivers"
+	default y
+	depends on LINGMO_PACKAGE_XSERVER_XORG_SERVER_MODULAR
+	select LINGMO_PACKAGE_MESA3D_HEADERS
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	select LINGMO_PACKAGE_HAS_LIBGL
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+	select LINGMO_PACKAGE_HAS_LIBGLES
+
+if LINGMO_PACKAGE_NVIDIA_DRIVER_XORG
+
+config LINGMO_PACKAGE_PROVIDES_LIBGL
+	default "nvidia-driver"
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "nvidia-driver"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "nvidia-driver"
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_PRIVATE_LIBS
+	bool "Install private libraries"
+	help
+	  Two libraries require special agreement with NVidia to
+	  develop code linking to those libraries: libnvidia-ifr.so
+	  and libnvidia-fbc.so (to grab and encode an OpenGL buffer or
+	  an X framebuffer.)
+
+	  Say 'y' here if you plan on running a program that uses
+	  those private libraries.
+
+endif # LINGMO_PACKAGE_NVIDIA_DRIVER_XORG
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_CUDA
+	bool "CUDA support"
+
+if LINGMO_PACKAGE_NVIDIA_DRIVER_CUDA
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_OPENCL
+	bool "OpenCL support"
+	select LINGMO_PACKAGE_MESA3D_HEADERS
+	select LINGMO_PACKAGE_HAS_LIBOPENCL
+
+config LINGMO_PACKAGE_PROVIDES_LIBOPENCL
+	default "nvidia-driver" if LINGMO_PACKAGE_NVIDIA_DRIVER_OPENCL
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_CUDA_PROGS
+	bool "CUDA MPS server and control"
+	help
+	  Say 'y' here if you need to run more than one program
+	  doing CUDA at the same time. The MPS server will be
+	  launched automatically when needed.
+
+endif # LINGMO_PACKAGE_NVIDIA_DRIVER_CUDA
+
+comment "nvidia kernel module needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_NVIDIA_DRIVER_MODULE
+	bool "nvidia kernel module"
+	depends on LINGMO_LINUX_KERNEL
+	select LINGMO_LINUX_NEEDS_MODULES # not using kernel-module infra
+	help
+	  Build the nvidia.ko kernel module.
+
+	  If CUDA support (above) is set, and the target is x86_64, then
+	  this will also build the nvidia-uvm.ko kernel module, which
+	  provides Unified Memory access to the GPU and CPU memories for
+	  CUDA programs.
+
+endif # LINGMO_PACKAGE_NVIDIA_DRIVER

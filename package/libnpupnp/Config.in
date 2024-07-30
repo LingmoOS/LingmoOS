@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_LIBNPUPNP
+	bool "libnpupnp"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++11
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBMICROHTTPD
+	help
+	  npupnp (new pupnp or not pupnp ?) is an UPnP library derived
+	  from the venerable pupnp (https://github.com/pupnp/pupnp),
+	  based on its 1.6.x branch (around 1.6.25).
+
+	  https://www.lesbonscomptes.com/upmpdcli/libnpupnp.html
+
+comment "libnpupnp needs a toolchain w/ C++, threads, gcc >= 4.9"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

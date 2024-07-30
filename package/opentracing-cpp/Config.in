@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_OPENTRACING_CPP
+	bool "opentracing-cpp"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	help
+	  OpenTracing API for C++
+
+	  http://opentracing.io
+
+comment "opentracing-cpp needs a toolchain w/ C++, threads, dynamic library, gcc >= 4.8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+
+comment "opentracing-cpp needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

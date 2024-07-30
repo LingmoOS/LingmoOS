@@ -1,0 +1,37 @@
+comment "libmediaart needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_LIBMEDIAART
+	bool "libmediaart"
+	depends on LINGMO_USE_MMU # glib2
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Library tasked with managing, extracting and handling media
+	  art caches
+
+	  https://github.com/GNOME/libmediaart
+
+if LINGMO_PACKAGE_LIBMEDIAART
+
+choice
+	prompt "media art backend"
+	default LINGMO_PACKAGE_LIBMEDIAART_BACKEND_GDK_PIXBUF
+
+config LINGMO_PACKAGE_LIBMEDIAART_BACKEND_GDK_PIXBUF
+	bool "gdk-pixbuf"
+	select LINGMO_PACKAGE_GDK_PIXBUF
+
+config LINGMO_PACKAGE_LIBMEDIAART_BACKEND_QT
+	bool "Qt"
+	depends on LINGMO_PACKAGE_QT5
+	select LINGMO_PACKAGE_QT5BASE_GUI
+
+comment "Qt backend depends on Qt5"
+	depends on !LINGMO_PACKAGE_QT5
+
+endchoice
+
+endif # LINGMO_PACKAGE_LIBMEDIAART

@@ -1,0 +1,62 @@
+config LINGMO_PACKAGE_UDISKS
+	bool "udisks"
+	depends on LINGMO_ENABLE_LOCALE # libblockdev, parted
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # polkit -> C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # polkit
+	depends on LINGMO_USE_WCHAR # dbus-glib -> glib2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libblockdev -> cryptsetup -> json-c
+	depends on !LINGMO_STATIC_LIBS # polkit -> duktape
+	depends on !LINGMO_OPTIMIZE_FAST # polkit -> duktape
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_DBUS_GLIB
+	select LINGMO_PACKAGE_LIBATASMART
+	select LINGMO_PACKAGE_LIBBLOCKDEV
+	select LINGMO_PACKAGE_LIBBLOCKDEV_CRYPTO
+	select LINGMO_PACKAGE_LIBBLOCKDEV_FS
+	select LINGMO_PACKAGE_LIBBLOCKDEV_LOOP
+	select LINGMO_PACKAGE_LIBBLOCKDEV_MDRAID
+	select LINGMO_PACKAGE_LIBBLOCKDEV_NVME
+	select LINGMO_PACKAGE_LIBBLOCKDEV_PART
+	select LINGMO_PACKAGE_LIBBLOCKDEV_SWAP
+	select LINGMO_PACKAGE_LIBGUDEV
+	select LINGMO_PACKAGE_PARTED
+	select LINGMO_PACKAGE_POLKIT
+	select LINGMO_PACKAGE_SG3_UTILS
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	help
+	  The udisks project provides
+
+	   o A storage daemon that implements well-defined D-Bus
+	     interfaces that can be used to query and manipulate
+	     storage devices.
+
+	   o a command-line tool, udisksctl(1), that can be used to
+	     query and use the daemon
+
+	  http://www.freedesktop.org/wiki/Software/udisks
+
+comment "udisks needs udev /dev management"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_PACKAGE_HAS_UDEV
+
+comment "udisks needs a toolchain with dynamic library, locale, wchar, threads, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_ENABLE_LOCALE || \
+		!LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+
+comment "udisks can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST
+
+if LINGMO_PACKAGE_UDISKS
+
+config LINGMO_PACKAGE_UDISKS_FHS_MEDIA
+	bool "Mount devices in /media instead of /run/media"
+	help
+	  Support mounting in /media for compatibility with the
+	  Filesystem Hierarchy Standard (FHS)
+
+endif

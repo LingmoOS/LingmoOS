@@ -1,0 +1,35 @@
+config LINGMO_PACKAGE_ICU
+	bool "icu"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9 # C++11 PR56019
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++11 PR56019
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	# icu does some funky things by generating by itself an ELF
+	# file, and it cannot easily be changed to generate FLAT
+	# format.
+	depends on !LINGMO_BINFMT_FLAT
+	help
+	  International Components for Unicode.
+
+	  https://icu.unicode.org/
+
+if LINGMO_PACKAGE_ICU
+
+config LINGMO_PACKAGE_ICU_CUSTOM_DATA_PATH
+	string "Path to custom data library file"
+	help
+	  This option allows to define the path to a custom data
+	  library generated with http://apps.icu-project.org/datacustom/
+	  Make sure you select the appropiate version to match the one
+	  provided by buildroot.
+	  Leave empty to not use this functionality.
+
+endif
+
+comment "icu needs a toolchain w/ C++, wchar, threads, gcc >= 4.9, host gcc >= 4.9"
+	depends on !LINGMO_BINFMT_FLAT
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_HOST_GCC_AT_LEAST_4_9

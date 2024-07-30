@@ -1,0 +1,22 @@
+comment "openmpi needs a toolchain w/ dynamic library, NPTL, wchar, C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_sparc
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL \
+		|| !LINGMO_USE_WCHAR || !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_OPENMPI
+	bool "openmpi"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	# from the configure script: "Sparc v8 target is not supported
+	# in this release of Open MPI"
+	depends on !LINGMO_sparc
+	help
+	  A High Performance Message Passing Library.
+
+	  https://www.open-mpi.org/

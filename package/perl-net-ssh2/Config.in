@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_PERL_NET_SSH2
+	bool "perl-net-ssh2"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_LIBSSH2_OPENSSL || LINGMO_PACKAGE_LIBSSH2_LIBGCRYPT
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Support for the SSH 2 protocol via libssh2.
+
+	  Note: only the OpenSSL and Libgcrypt backends of libssh2 are
+	  supported.
+
+	  https://metacpan.org/release/Net-SSH2
+
+comment "perl-net-ssh2 needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+comment "perl-net-ssh2 needs libssh2 with OpenSSL or Libgcrypt backend"
+	depends on !(LINGMO_PACKAGE_LIBSSH2_OPENSSL || LINGMO_PACKAGE_LIBSSH2_LIBGCRYPT)

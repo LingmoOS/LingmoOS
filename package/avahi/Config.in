@@ -1,0 +1,62 @@
+config LINGMO_PACKAGE_AVAHI
+	bool "avahi"
+	# libdaemon uses fork()
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Avahi is a system which facilitates service
+	  discovery on a local network.
+
+	  http://www.avahi.org/
+
+if LINGMO_PACKAGE_AVAHI
+
+config LINGMO_PACKAGE_AVAHI_AUTOIPD
+	bool "IPv4LL network address configuration daemon"
+	default y
+	select LINGMO_PACKAGE_LIBDAEMON
+	help
+	  Avahi-autoipd implements IPv4LL, "Dynamic Configuration of
+	  IPv4 Link-Local Addresses" (IETF RFC3927), a protocol for
+	  automatic IP address configuration from the link-local
+	  169.254.0.0/16 range without the need for a central server.
+	  It is primarily intended to be used in ad-hoc networks which
+	  lack a DHCP server.
+
+config LINGMO_PACKAGE_AVAHI_DAEMON
+	bool "mDNS/DNS-SD daemon"
+	select LINGMO_PACKAGE_LIBDAEMON
+	select LINGMO_PACKAGE_EXPAT
+	help
+	  The Avahi mDNS/DNS-SD daemon implementing Apple's ZeroConf
+	  architecture (also known as "Rendezvous" or "Bonjour").
+	  The daemon registers local IP addresses and services using
+	  mDNS/DNS-SD.
+
+# This hidden option allows packages that need the libavahi-client to
+# more easily determine if it's available or not.
+config LINGMO_PACKAGE_AVAHI_LIBAVAHI_CLIENT
+	bool
+	default y if LINGMO_PACKAGE_DBUS
+
+config LINGMO_PACKAGE_AVAHI_LIBDNSSD_COMPATIBILITY
+	bool "libdns_sd compatibility (Bonjour)"
+	depends on LINGMO_PACKAGE_AVAHI_DAEMON
+	select LINGMO_PACKAGE_DBUS
+	help
+	  Enable the libdns_sd (Bonjour) compatibility library support
+	  for legacy applications.
+
+config LINGMO_PACKAGE_AVAHI_DEFAULT_SERVICES
+	bool "install default service definitions"
+	depends on LINGMO_PACKAGE_AVAHI_DAEMON
+	help
+	  Install the SSH/SFTP service definitions included with the
+	  Avahi daemon by default.
+
+endif
+
+comment "avahi needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

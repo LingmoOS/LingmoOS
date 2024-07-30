@@ -1,0 +1,41 @@
+config LINGMO_PACKAGE_ZMQPP
+	bool "zmqpp"
+	# c++1x support
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # zeromq
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_ZEROMQ
+	help
+	  C++ binding for zeromq (ZeroMQ, 0MQ, zmq).
+
+	  This C++ binding is a 'high-level' library that hides most
+	  of the C-style interface core zeromq provides.
+
+	  http://github.com/benjamg/zmqpp
+
+comment "zmqpp needs a toolchain w/ C++, threads, gcc >= 4.7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7
+
+comment "zmqpp needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735
+
+if LINGMO_PACKAGE_ZMQPP
+
+config LINGMO_PACKAGE_ZMQPP_CLIENT
+	bool "zmqpp client"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # boost
+	depends on LINGMO_USE_WCHAR # boost
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_PROGRAM_OPTIONS
+	help
+	  Build and install the zmqpp client, a command line tool that
+	  can be used to listen or send to zeromq sockets.
+
+comment "zmqpp client needs a toolchain w/ dynamic library, threads, wchar"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR
+
+endif

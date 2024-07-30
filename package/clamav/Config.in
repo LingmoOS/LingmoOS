@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_CLAMAV
+	bool "clamav"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # dlopen
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_BZIP2
+	select LINGMO_PACKAGE_HOST_RUSTC
+	select LINGMO_PACKAGE_JSON_C
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBMSPACK
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_MUSL_FTS if !LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_ZLIB_FORCE_LIBZLIB
+	help
+	  ClamAV is an open source antivirus engine for detecting
+	  trojans, viruses, malware & other malicious threats.
+
+	  http://www.clamav.net
+
+comment "clamav needs a toolchain w/ C++, dynamic library, threads, wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU

@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_IMA_EVM_UTILS
+	bool "ima-evm-utils"
+	depends on LINGMO_USE_MMU # keyutils
+	depends on !LINGMO_STATIC_LIBS # keyutils, tpm2-tss
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_KEYUTILS
+	select LINGMO_PACKAGE_TPM2_TSS
+	help
+	  Linux Integrity Measurement Architecture (IMA)
+	  Extended Verification Module (EVM) tools.
+
+	  https://sourceforge.net/p/linux-ima/wiki/Home/
+
+comment "ima-evm-utils needs dynamic library support"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

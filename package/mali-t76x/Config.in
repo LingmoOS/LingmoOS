@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_MALI_T76X
+	bool "mali-t76x"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_ARM_EABIHF
+	depends on LINGMO_arm
+	select LINGMO_PACKAGE_MESA3D_HEADERS
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBGLES
+	help
+	  Install the binary user-space components for the ARM Mali
+	  Midgard T76X GPU. This package requires a kernel with the
+	  ARM Mali Midgard GPU Kernel Drivers enabled.
+
+	  http://malideveloper.arm.com/resources/drivers/
+
+if LINGMO_PACKAGE_MALI_T76X
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "mali-t76x"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "mali-t76x"
+
+endif
+
+comment "mali-t76x needs a glibc toolchain with armhf enabled"
+	depends on LINGMO_arm
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_ARM_EABIHF

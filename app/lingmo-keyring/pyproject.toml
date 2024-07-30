@@ -1,0 +1,58 @@
+[tool.black]
+line-length = 120
+exclude = '''
+/(
+  \.direnv|
+  |\.eggs
+  |\.git
+  |\.hg
+  |\.mypy_cache
+  |\.nox
+  |\.tox
+  |\.venv
+  |\.svn
+  |_build
+  |build
+  |dist
+)/
+'''
+
+[tool.coverage.paths]
+source = ["libkeyringctl"]
+
+[tool.coverage.report]
+include = ["libkeyringctl/*", "keyringctl"]
+precision = 2
+show_missing = true
+
+[tool.coverage.run]
+branch = true
+command_line = "-m pytest --junit-xml=build/junit-report.xml -vv tests/"
+omit = ["tests/*", ".tox/*"]
+relative_files = true
+
+[tool.coverage.xml]
+output = "build/coverage.xml"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+force_single_line = true
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "silent"
+follow_imports_for_stubs = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
+warn_unreachable = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_OPENSC
+	bool "opensc"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # pcsc-lite
+	select LINGMO_PACKAGE_PCSC_LITE
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RMD160 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  OpenSC provides a set of libraries and utilities to work
+	  with smart cards.
+
+	  https://github.com/OpenSC/OpenSC/wiki
+
+comment "opensc needs a toolchain with dynamic library, threads, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

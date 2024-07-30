@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_BELLE_SIP
+	bool "belle-sip"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # bctoolbox
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_BCTOOLBOX
+	# needs crypto support in bctoolbox
+	select LINGMO_PACKAGE_MBEDTLS
+	help
+	  Belle-sip is a modern library implementing SIP (RFC 3261)
+	  transport, transaction and dialog layers.
+
+	  http://www.linphone.org/technical-corner/belle-sip
+
+comment "belle-sip needs a toolchain w/ threads, C++, dynamic library, wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+
+comment "belle-sip needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

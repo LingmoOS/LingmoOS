@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_LIBSHDATA
+	bool "libshdata"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC # libfutils
+	depends on LINGMO_INSTALL_LIBSTDCPP # libfutils
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libfutils
+	select LINGMO_PACKAGE_LIBFUTILS
+	select LINGMO_PACKAGE_ULOG
+	help
+	  This library provides lock free shared-memory tools
+
+	  https://github.com/Parrot-Developers/libshdata
+
+if LINGMO_PACKAGE_LIBSHDATA
+
+config LINGMO_PACKAGE_LIBSHDATA_STRESS
+	bool "libshdata-stress binary"
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Install libshdata-stress binary as well
+
+comment "libshdata-stress needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+endif
+
+comment "libshdata needs a toolchain w/ C++, threads"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

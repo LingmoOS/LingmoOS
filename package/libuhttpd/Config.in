@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_LIBUHTTPD
+	bool "libuhttpd"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	select LINGMO_PACKAGE_LIBEV
+	select LINGMO_PACKAGE_WOLFSSL_ALL if LINGMO_PACKAGE_WOLFSSL && \
+		!LINGMO_STATIC_LIBS
+	help
+	  A lightweight and fully asynchronous HTTP server
+	  library based on libev
+
+	  https://github.com/zhaojh329/libuhttpd
+
+comment "libuhttpd needs a toolchain w/ gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

@@ -1,0 +1,43 @@
+config LINGMO_PACKAGE_XEN
+	bool "xen"
+	# needs "dmb" on ARM, so ARM >= v7
+	depends on LINGMO_ARM_CPU_ARMV7A || LINGMO_aarch64
+	select LINGMO_PACKAGE_XEN_HYPERVISOR if !LINGMO_PACKAGE_XEN_TOOLS
+	help
+	  This package builds the Xen hypervisor and toolstack.
+
+	  http://www.xenproject.org/
+
+if LINGMO_PACKAGE_XEN
+
+config LINGMO_PACKAGE_XEN_HYPERVISOR
+	bool "Xen hypervisor"
+	help
+	  The Xen binaries are avaliable in /usr/lib/xen/ See
+	  http://wiki.xenproject.org/wiki/Getting_Started for using
+	  the Xen hypervisor.
+
+config LINGMO_PACKAGE_XEN_TOOLS
+	bool "Xen tools"
+	depends on !LINGMO_STATIC_LIBS # dtc (libfdt)
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_WCHAR # libglib2
+	select LINGMO_PACKAGE_DTC
+	select LINGMO_PACKAGE_LIBAIO
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PIXMAN
+	select LINGMO_PACKAGE_SLIRP
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_YAJL
+	select LINGMO_PACKAGE_ARGP_STANDALONE if !LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  The Xen tools can be accessed by the xl command.
+
+comment "xen tools need a toolchain w/ wchar, threads, dynamic library"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS
+
+endif

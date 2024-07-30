@@ -1,0 +1,61 @@
+config LINGMO_TARGET_SYSLINUX
+	bool "syslinux"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	# Make sure at least one of the flavors is installed
+	select LINGMO_TARGET_SYSLINUX_ISOLINUX \
+		if !LINGMO_TARGET_SYSLINUX_PXELINUX && \
+		   !LINGMO_TARGET_SYSLINUX_MBR && \
+		   !LINGMO_TARGET_SYSLINUX_EFI
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  The syslinux bootloader for x86 systems.
+	  This includes: syslinux, pxelinux, extlinux.
+
+	  http://syslinux.org
+
+if LINGMO_TARGET_SYSLINUX
+
+config LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+	bool
+
+config LINGMO_TARGET_SYSLINUX_ISOLINUX
+	bool "install isolinux"
+	select LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+	help
+	  Install the legacy-BIOS 'isolinux' image, to boot off
+	  optical media (CDROM, DVD.)
+
+config LINGMO_TARGET_SYSLINUX_PXELINUX
+	bool "install pxelinux"
+	select LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+	help
+	  Install the legacy-BIOS 'pxelinux' image, to boot off
+	  the network using PXE.
+
+config LINGMO_TARGET_SYSLINUX_MBR
+	bool "install mbr"
+	select LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+	help
+	  Install the legacy-BIOS 'mbr' image, to boot off a
+	  local MBR-partition (e.g. prepared with 'extlinux'
+	  or 'syslinux').
+
+config LINGMO_TARGET_SYSLINUX_EFI
+	bool "install efi"
+	depends on LINGMO_PACKAGE_GNU_EFI_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_GNU_EFI
+	help
+	  Install the 'efi' image, to boot from an EFI environment.
+
+if LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+
+config LINGMO_TARGET_SYSLINUX_C32
+	string "modules to install"
+	help
+	  Enter a space-separated list of .c32 modules to install.
+	  Leave empty to install no module.
+
+endif # LINGMO_TARGET_SYSLINUX_LEGACY_BIOS
+
+endif # LINGMO_TARGET_SYSLINUX

@@ -1,0 +1,35 @@
+config LINGMO_PACKAGE_INTEL_MEDIADRIVER
+	bool "intel-mediadriver"
+	depends on LINGMO_x86_64
+	depends on !LINGMO_STATIC_LIBS # mesa3d, libva
+	depends on LINGMO_INSTALL_LIBSTDCPP # intel-gmmlib, mesa3d
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # mesa3d
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 # mesa3d
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # intel-gmmlib, libva
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # mesa3d
+	select LINGMO_PACKAGE_INTEL_GMMLIB
+	select LINGMO_PACKAGE_LIBPCIACCESS
+	select LINGMO_PACKAGE_LIBVA
+	select LINGMO_PACKAGE_MESA3D
+	help
+	  The Intel(R) Media Driver for VAAPI is a new VA-API (Video
+	  Acceleration API) user mode driver supporting hardware
+	  accelerated decoding, encoding, and video post processing for
+	  GEN based graphics hardware.
+
+	  https://github.com/intel/media-driver
+
+if LINGMO_PACKAGE_INTEL_MEDIADRIVER
+
+config LINGMO_PACKAGE_INTEL_MEDIADRIVER_GEN8
+	bool "Gen8 support"
+	default y
+	help
+	  Enable support for Gen8 GPUs (Coffee Lake)
+
+endif # LINGMO_PACKAGE_INTEL_MEDIADRIVER
+
+comment "intel-mediadriver needs a toolchain w/ dynamic library, gcc >= 8, C++, NPTL"
+	depends on LINGMO_x86_64 && LINGMO_TOOLCHAIN_HAS_SYNC_1
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8

@@ -1,0 +1,46 @@
+config LINGMO_ARCH
+	default "m68k"		if LINGMO_m68k
+
+config LINGMO_NORMALIZED_ARCH
+	default "m68k"
+
+config LINGMO_ENDIAN
+	default "BIG"
+
+# symbols used to distinguish between m68k and coldfire
+# for gcc multilib
+config LINGMO_m68k_m68k
+	bool
+
+config LINGMO_m68k_cf
+	bool
+
+# coldfire variants will be added later
+choice
+	prompt "Target CPU"
+	default LINGMO_m68k_68040
+	depends on LINGMO_m68k
+	help
+	  Specific CPU variant to use
+
+config LINGMO_m68k_68040
+	bool "68040"
+	select LINGMO_m68k_m68k
+	select LINGMO_USE_MMU
+
+config LINGMO_m68k_cf5208
+	bool "5208"
+	select LINGMO_m68k_cf
+	select LINGMO_SOFT_FLOAT
+
+endchoice
+
+config LINGMO_GCC_TARGET_CPU
+	default "68040"		if LINGMO_m68k_68040
+	default "5208"		if LINGMO_m68k_cf5208
+
+config LINGMO_READELF_ARCH_NAME
+	default "MC68000"
+
+# vim: ft=kconfig
+# -*- mode:kconfig; -*-

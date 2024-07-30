@@ -1,0 +1,135 @@
+config LINGMO_PACKAGE_FLUIDSYNTH
+	bool "fluidsynth"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	# the .pc file installed by fluidsynth does not mention its
+	# indirect dependencies in Libs.private.
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  FluidSynth is a real-time software synthesizer based on the
+	  SoundFont 2 specifications and has reached widespread
+	  distribution. FluidSynth itself does not have a graphical
+	  user interface, but due to its powerful API several
+	  applications utilize it and it has even found its way onto
+	  embedded systems and is used in some mobile apps.
+
+	  http://www.fluidsynth.org/
+
+if LINGMO_PACKAGE_FLUIDSYNTH
+
+comment "Output support"
+
+config LINGMO_PACKAGE_FLUIDSYNTH_ALSA_LIB
+	bool "alsa"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_RAWMIDI
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+	help
+	  Enable alsa support.
+
+comment "alsa support needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_FLUIDSYNTH_JACK2
+	bool "jack2"
+	# See: https://sourceware.org/bugzilla/show_bug.cgi?id=19908
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # jack2
+	depends on LINGMO_USE_MMU # jack2
+	depends on LINGMO_INSTALL_LIBSTDCPP # jack2
+	depends on !LINGMO_STATIC_LIBS # jack2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # jack2
+	select LINGMO_PACKAGE_JACK2
+	help
+	  Enable jack support.
+
+comment "jack support needs a toolchain w/ dynamic library, threads, C++"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_FLUIDSYNTH_LIBSNDFILE
+	bool "libsndfile"
+	select LINGMO_PACKAGE_LIBSNDFILE
+	help
+	  Enable libsndfile support, for writing output to WAV files.
+
+config LINGMO_PACKAGE_FLUIDSYNTH_PORTAUDIO
+	bool "portaudio"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_PORTAUDIO
+	help
+	  Enable portaudio support.
+
+comment "portaudio support needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_FLUIDSYNTH_PULSEAUDIO
+	bool "pulseaudio"
+	# See: https://sourceware.org/bugzilla/show_bug.cgi?id=19908
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC # pulseaudio
+	depends on LINGMO_USE_WCHAR # pulseaudio
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # pulseaudio
+	depends on !LINGMO_STATIC_LIBS # pulseaudio
+	depends on LINGMO_USE_MMU # pulseaudio
+	select LINGMO_PACKAGE_PULSEAUDIO
+	help
+	  Enable PulseAudio support.
+
+comment "pulseaudio support needs a toolchain w/ dynamic library, wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	depends on LINGMO_STATIC_LIBS || !LINGMO_USE_MMU || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_FLUIDSYNTH_SDL2
+	bool "sdl2"
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_SDL2
+	help
+	  Enable SDL2 audio support.
+
+comment "SDL2 audio support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+comment "Misc options"
+
+config LINGMO_PACKAGE_FLUIDSYNTH_DBUS
+	bool "dbus"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_DBUS
+	help
+	  Enable dbus support.
+
+comment "dbus support needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_FLUIDSYNTH_FLOATS
+	bool "32-bit single precision float"
+	help
+	  Enable 32-bit single precision float support, instead of
+	  64-bit double precision floats for DSP samples.
+
+config LINGMO_PACKAGE_FLUIDSYNTH_READLINE
+	bool "readline"
+	select LINGMO_PACKAGE_READLINE
+	help
+	  Enable readline support, for better line editing in FluidSynth
+	  shell.
+
+endif # LINGMO_PACKAGE_FLUIDSYNTH
+
+comment "fluidsynth needs a toolchain w/ threads, wchar, dynamic library, C++"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP

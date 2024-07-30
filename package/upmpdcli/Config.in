@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_UPMPDCLI
+	bool "upmpdcli"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++11, libupnpp
+	select LINGMO_PACKAGE_JSONCPP
+	select LINGMO_PACKAGE_LIBMICROHTTPD
+	select LINGMO_PACKAGE_LIBMPDCLIENT
+	select LINGMO_PACKAGE_LIBUPNPP
+	help
+	  upmpdcli is a UPnP Media Renderer front-end for MPD, the Music
+	  Player Daemon. It supports UPnP gapless track transitions and
+	  the OpenHome ohMedia services.
+
+	  http://www.lesbonscomptes.com/upmpdcli/
+
+comment "upmpdcli needs a toolchain w/ C++, NPTL, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

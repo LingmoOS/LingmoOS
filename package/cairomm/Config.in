@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_CAIROMM
+	bool "cairomm (latest)"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # libsigc
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_CAIRO
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBSIGC
+	help
+	  The cairomm package is a set of C++ bindings for Cairo.
+
+	  https://www.cairographics.org/cairomm/
+
+comment "cairomm needs a toolchain w/ C++, wchar, threads, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP

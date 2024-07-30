@@ -1,0 +1,100 @@
+comment "alsa-utils needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU # fork
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+menuconfig LINGMO_PACKAGE_ALSA_UTILS
+	bool "alsa-utils"
+	depends on LINGMO_USE_MMU # fork
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # alsa-lib
+	select LINGMO_PACKAGE_ALSA_LIB
+	help
+	  This package contains the command line utilities for the ALSA
+	  project.
+
+	  http://www.alsa-project.org/
+
+if LINGMO_PACKAGE_ALSA_UTILS
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSACONF
+	bool "alsaconf"
+
+config LINGMO_PACKAGE_ALSA_UTILS_ACONNECT
+	bool "aconnect"
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSACTL
+	bool "alsactl"
+	default y
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSALOOP
+	bool "alsaloop"
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSAMIXER
+	bool "alsamixer"
+	default y
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+
+comment "alsamixer needs a toolchain w/ wchar"
+	depends on !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSAUCM
+	bool "alsaucm"
+	select LINGMO_PACKAGE_ALSA_LIB_UCM
+
+config LINGMO_PACKAGE_ALSA_UTILS_ALSATPLG
+	bool "alsatplg"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	select LINGMO_PACKAGE_ALSA_LIB_TOPOLOGY
+
+comment "alsatplg needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_ALSA_UTILS_AMIDI
+	bool "amidi"
+	select LINGMO_PACKAGE_ALSA_LIB_RAWMIDI
+
+config LINGMO_PACKAGE_ALSA_UTILS_AMIXER
+	bool "amixer"
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+
+config LINGMO_PACKAGE_ALSA_UTILS_APLAY
+	bool "aplay/arecord"
+	select LINGMO_PACKAGE_ALSA_LIB_PCM
+
+config LINGMO_PACKAGE_ALSA_UTILS_APLAYMIDI
+	bool "aplaymidi"
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+
+config LINGMO_PACKAGE_ALSA_UTILS_ARECORDMIDI
+	bool "arecordmidi"
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+
+config LINGMO_PACKAGE_ALSA_UTILS_ASEQDUMP
+	bool "aseqdump"
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+
+config LINGMO_PACKAGE_ALSA_UTILS_ASEQNET
+	bool "aseqnet"
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+
+config LINGMO_PACKAGE_ALSA_UTILS_BAT
+	bool "bat"
+	help
+	  ALSABAT (ALSA Basic Audio Tester) is a simple command-line
+	  utility intended to help automate audio driver and sound
+	  server testing with little human interaction.
+
+	  Note that analysis support in alsabat requires fftw single
+	  precision.
+
+config LINGMO_PACKAGE_ALSA_UTILS_IECSET
+	bool "iecset"
+	select LINGMO_PACKAGE_ALSA_LIB_PCM
+
+config LINGMO_PACKAGE_ALSA_UTILS_SPEAKER_TEST
+	bool "speaker-test"
+	select LINGMO_PACKAGE_ALSA_LIB_PCM
+
+endif

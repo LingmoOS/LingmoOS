@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_SSHFS
+	bool "sshfs (FUSE)"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libfuse3, glib2
+	depends on LINGMO_USE_MMU # libfuse3, glib2
+	depends on !LINGMO_STATIC_LIBS # libfuse3
+	select LINGMO_PACKAGE_LIBFUSE3
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_OPENSSH
+	help
+	  FUSE filesystem client based on the SSH File Transfer
+	  Protocol.
+
+	  https://github.com/libfuse/sshfs
+
+comment "sshfs needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_IFUPDOWN
+	bool "ifupdown"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 # iproute2
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	# runtime for ip binary
+	select LINGMO_PACKAGE_IPROUTE2 if !LINGMO_PACKAGE_BUSYBOX
+	# runtime for run-parts
+	select LINGMO_PACKAGE_DEBIANUTILS if !LINGMO_PACKAGE_BUSYBOX
+	help
+	  High level tools to configure network interfaces.
+
+	  https://tracker.debian.org/pkg/ifupdown
+
+comment "ifupdown needs a toolchain w/ headers >= 3.4"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS

@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_HOST_MONO_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_HOSTARCH = "x86_64"
+	default y if LINGMO_HOSTARCH = "x86"
+
+config LINGMO_PACKAGE_MONO_ARCH_SUPPORTS
+	bool
+	default y if (LINGMO_aarch64 || LINGMO_arm || LINGMO_armeb || \
+		      LINGMO_i386 || LINGMO_powerpc || LINGMO_x86_64)
+	depends on LINGMO_PACKAGE_HOST_MONO_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_MONO
+	bool "mono"
+	depends on LINGMO_PACKAGE_MONO_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # pthread_getattr_np()
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBATOMIC_OPS
+	help
+	  An open source, cross-platform, implementation of C#
+	  and the CLR that is binary compatible with Microsoft.NET.
+
+	  http://download.mono-project.com/sources/mono/
+
+comment "mono needs a toolchain w/ C++, NPTL, dynamic library"
+	depends on LINGMO_PACKAGE_MONO_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS

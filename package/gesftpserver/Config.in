@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_GESFTPSERVER
+	bool "gesftpserver"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  Green End SFTP Server
+
+	  This is an SFTP server supporting up to protocol version 6.
+	  It is possible to use it as a drop-in replacement for the
+	  OpenSSH server, or to provide sftp support for Dropbear.
+
+	  http://www.greenend.org.uk/rjk/sftpserver/
+
+comment "gesftpserver needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

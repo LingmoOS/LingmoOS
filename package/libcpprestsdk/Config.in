@@ -1,0 +1,33 @@
+config LINGMO_PACKAGE_LIBCPPRESTSDK
+	bool "libcpprestsdk"
+	depends on LINGMO_ENABLE_LOCALE
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # boost
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-atomic, boost-filesystem
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_ATOMIC
+	select LINGMO_PACKAGE_BOOST_CHRONO
+	select LINGMO_PACKAGE_BOOST_DATE_TIME
+	select LINGMO_PACKAGE_BOOST_FILESYSTEM
+	select LINGMO_PACKAGE_BOOST_RANDOM
+	select LINGMO_PACKAGE_BOOST_REGEX
+	select LINGMO_PACKAGE_BOOST_THREAD
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  The C++ REST SDK is a Microsoft project for cloud-based
+	  client-server communication in native code using a modern
+	  asynchronous C++ API design. This project aims to help C++
+	  developers connect to and interact with services.
+
+	  https://github.com/Microsoft/cpprestsdk
+
+comment "libcpprestsdk needs a toolchain w/ NPTL, C++, wchar, locale"
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_USE_WCHAR || !LINGMO_ENABLE_LOCALE
+
+comment "libcpprestsdk needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

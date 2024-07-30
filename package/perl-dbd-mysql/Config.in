@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_PERL_DBD_MYSQL
+	bool "perl-dbd-mysql"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP # mysql
+	depends on LINGMO_USE_MMU # mysql
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # mysql
+	select LINGMO_PACKAGE_MARIADB
+	select LINGMO_PACKAGE_PERL_DBI # runtime
+	help
+	  A MySQL driver for the Perl5 Database Interface (DBI).
+
+	  http://dbi.perl.org/
+
+comment "perl-dbd-mysql needs a toolchain w/ dynamic library, C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS

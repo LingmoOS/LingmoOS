@@ -1,0 +1,11 @@
+config LINGMO_PACKAGE_XAPP_XINIT
+	bool "xinit"
+	depends on LINGMO_USE_MMU # fork()
+	# Runtime dependency: can't start an X server unless there is one
+	depends on LINGMO_PACKAGE_XSERVER_XORG_SERVER
+	# Runtime dependency; mcookie is also in util-linux
+	select LINGMO_PACKAGE_MCOOKIE if !LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_XAPP_XAUTH
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	help
+	  X Window System initializer

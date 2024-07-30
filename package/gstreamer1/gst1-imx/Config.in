@@ -1,0 +1,104 @@
+comment "gst1-imx needs a toolchain w/ dynamic library"
+	depends on LINGMO_arm
+	depends on LINGMO_STATIC_LIBS
+
+menuconfig LINGMO_PACKAGE_GST1_IMX
+	bool "gst1-imx"
+	depends on LINGMO_arm # Only relevant for i.MX
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	help
+	  This is a set of GStreamer 1.0 plugins for plugins for
+	  Freescale's i.MX platforms, which make use of the i.MX
+	  multimedia capabilities.
+
+	  https://github.com/Freescale/gstreamer-imx
+
+if LINGMO_PACKAGE_GST1_IMX
+
+config LINGMO_PACKAGE_GST1_IMX_EGLVISINK
+	bool "imxeglvivsink"
+	depends on LINGMO_PACKAGE_IMX_GPU_VIV
+	help
+	  Elements leveraging the 3D GPU
+
+comment "imxeglvivsink needs the Vivante 3D libraries"
+	depends on !LINGMO_PACKAGE_IMX_GPU_VIV
+
+config LINGMO_PACKAGE_GST1_IMX_G2D
+	bool "imxg2d"
+	depends on LINGMO_PACKAGE_IMX_GPU_G2D
+	help
+	  Elements leveraging the 2D GPU
+
+comment "imxg2d needs the G2D libraries"
+	depends on !LINGMO_PACKAGE_IMX_GPU_G2D
+
+config LINGMO_PACKAGE_GST1_IMX_IPU
+	bool "imxipu"
+	depends on LINGMO_LINUX_KERNEL
+	help
+	  Elements leveraging the IPU
+
+comment "imxipu needs an imx-specific Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_GST1_IMX_MP3ENCODER
+	bool "mp3encoder"
+	depends on LINGMO_PACKAGE_IMX_CODEC
+	help
+	  Elements for MP3 encoding
+
+comment "mp3encoder needs the i.MX codec binaries"
+	depends on !LINGMO_PACKAGE_IMX_CODEC
+
+config LINGMO_PACKAGE_GST1_IMX_PXP
+	bool "imxpxp"
+	depends on LINGMO_LINUX_KERNEL
+	help
+	  Elements leveraging the PXP
+
+comment "imxpxp needs an imx-specific Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_GST1_IMX_UNIAUDIODEC
+	bool "uniaudiodec"
+	depends on LINGMO_PACKAGE_IMX_CODEC
+	help
+	  Elements for audio decoding
+
+comment "uniaudiodec needs the i.MX codec binaries"
+	depends on !LINGMO_PACKAGE_IMX_CODEC
+
+config LINGMO_PACKAGE_GST1_IMX_VPU
+	bool "imxvpu"
+	depends on LINGMO_PACKAGE_LIBIMXVPUAPI
+	help
+	  Elements leveraging the VPU
+
+comment "imxvpu needs the VPU imxvpuapi library"
+	depends on !LINGMO_PACKAGE_LIBIMXVPUAPI
+
+config LINGMO_PACKAGE_GST1_IMX_V4L2VIDEOSRC
+	bool "imxv4l2videosrc"
+	depends on LINGMO_INSTALL_LIBSTDCPP # gst1-plugins-bad
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD
+	help
+	  Elements for V4L2 capture
+
+comment "imxv4l2videosrc needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_GST1_IMX_V4L2VIDEOSINK
+	bool "imxv4l2videosink"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_2 # V4L2_COLORSPACE_DEFAULT
+	depends on LINGMO_INSTALL_LIBSTDCPP # gst1-plugins-bad
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD
+	help
+	  Elements for V4L2 output
+
+comment "imxv4l2videosink needs a toolchain w/ headers >= 4.2, C++"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_2 || \
+		!LINGMO_INSTALL_LIBSTDCPP
+
+endif

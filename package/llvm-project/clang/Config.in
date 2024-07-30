@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_CLANG
+	bool "clang"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # std::wstring
+	depends on LINGMO_HOST_GCC_AT_LEAST_7
+	select LINGMO_PACKAGE_LLVM
+	help
+	  Clang is a C/C++, Objective C/C++ and OpenCL C front-end
+	  for the LLVM compiler.
+
+	  http://clang.llvm.org
+
+comment "clang needs a toolchain w/ wchar, threads, C++, gcc >= 7, dynamic library, host gcc >= 7"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 \
+		|| LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+		|| !LINGMO_HOST_GCC_AT_LEAST_7
+
+comment "clang needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

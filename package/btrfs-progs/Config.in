@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_BTRFS_PROGS
+	bool "btrfs-progs"
+	depends on LINGMO_USE_MMU # util-linux
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LZO
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Btrfs filesystem utilities
+
+	  https://btrfs.wiki.kernel.org/index.php/Main_Page
+
+comment "btrfs-progs needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LUALDAP
+	bool "lualdap"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # openldap
+	depends on LINGMO_USE_MMU # openldap
+	select LINGMO_PACKAGE_OPENLDAP
+	help
+	  LuaLDAP is a simple interface from Lua to an LDAP client,
+	  in fact it is a bind to OpenLDAP client.
+
+	  https://lualdap.github.io/lualdap/
+
+comment "lualdap needs a toolchain w/ wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS

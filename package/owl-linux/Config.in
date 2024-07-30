@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_OWL_LINUX
+	bool "owl-linux"
+	depends on LINGMO_LINUX_KERNEL
+	depends on (LINGMO_arm920t || LINGMO_arm922t || LINGMO_arm926t)
+	help
+	  Linux kernel driver for the H&D Wireless SPB104 SD-card WiFi
+	  SIP.
+
+	  owl-linux requires the hidden kernel option WIRELESS_EXT
+	  enabled.
+
+	  http://linux.hd-wireless.se/bin/view/Linux/GettingStarted
+
+comment "owl-linux needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+	depends on LINGMO_arm || LINGMO_armeb
+
+comment "owl-linux is only supported on ARM9 architecture"
+	depends on !(LINGMO_arm920t || LINGMO_arm922t || LINGMO_arm926t)
+	depends on LINGMO_arm || LINGMO_armeb

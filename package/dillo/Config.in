@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_DILLO
+	bool "dillo"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU # fltk fork()
+	select LINGMO_PACKAGE_FLTK
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Dillo is a multi-platform graphical web browser known
+	  for its speed and small footprint.
+
+	  Enable openssl package to gain https support.
+
+	  http://www.dillo.org
+
+comment "dillo needs a toolchain w/ C++"
+	depends on LINGMO_PACKAGE_XORG7 && LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP

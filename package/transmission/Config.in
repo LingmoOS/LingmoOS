@@ -1,0 +1,57 @@
+config LINGMO_PACKAGE_TRANSMISSION
+	bool "transmission"
+	depends on !LINGMO_BINFMT_FLAT # libnatpmp
+	depends on LINGMO_INSTALL_LIBSTDCPP # libutp
+	depends on !LINGMO_STATIC_LIBS # libnatpmp
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR # libpsl
+	select LINGMO_PACKAGE_DHT
+	select LINGMO_PACKAGE_LIBB64
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBDEFLATE
+	select LINGMO_PACKAGE_LIBEVENT
+	select LINGMO_PACKAGE_LIBMINIUPNPC
+	select LINGMO_PACKAGE_LIBNATPMP
+	select LINGMO_PACKAGE_LIBPSL
+	select LINGMO_PACKAGE_LIBUTP
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Transmission is a cross-platform BitTorrent client.
+
+	  http://www.transmissionbt.com/
+
+if LINGMO_PACKAGE_TRANSMISSION
+
+config LINGMO_PACKAGE_TRANSMISSION_CLI
+	bool "transmission-cli"
+	help
+	  Install transmission command line interface.
+
+config LINGMO_PACKAGE_TRANSMISSION_DAEMON
+	bool "transmission-daemon"
+	help
+	  Install transmission daemon.
+
+config LINGMO_PACKAGE_TRANSMISSION_GTK
+	bool "transmission-gtk"
+	depends on !LINGMO_nios2 # gtkmm3
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # pangomm, libgtk3 -> pango -> harfbuzz -> gtkmm3
+	depends on LINGMO_PACKAGE_LIBGTK3 && LINGMO_SYSTEM_ENABLE_NLS
+	select LINGMO_PACKAGE_GTKMM3
+	help
+	  Install transmission GTK-based GUI interface.
+
+comment "transmission-gtk needs libgtk3 and a toolchain with NLS enabled"
+	depends on !LINGMO_nios2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_LIBGTK3 && !LINGMO_SYSTEM_ENABLE_NLS
+endif
+
+comment "transmission needs a toolchain w/ dynamic library, threads, C++, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_BINFMT_FLAT
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || LINGMO_STATIC_LIBS

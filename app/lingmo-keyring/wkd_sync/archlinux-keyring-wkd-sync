@@ -1,0 +1,74 @@
+#!/usr/bin/bash
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Update all locally existing PGP keys in pacman's gnupg keyring, that are
+# relevant for Arch Linux packaging using the distribution's Web Key Directory
+# (WKD).
+# This ensures, that new signatures on already existing keys are fetched before
+# a new version of archlinux-keyring is installed. Fetching signatures early
+# prevents marginal trust issues with packages that are signed by keys which
+# only gain full trust when updating to a new version of archlinux-keyring in
+# that same system upgrade action.
+
+set -eu
+
+readonly main_key_domain_match="@master-key.archlinux.org$"
+readonly packager_domain_match="@archlinux.org$"
+readonly homedir="$(pacman-conf GPGDir)"
+# fingerprints of keys with SHA-1 self-signatures (no longer used)
+readonly invalid_fingerprints=(
+    0F334D8698881578F65D2AE55ED514A45BD5C938  # djgera@archlinux.org
+    F4DDD6DDCEC320B665F502AAE8F18BA1615137BC  # ibiru@archlinux.org
+    EA84EA00866F51FB10CD19AE426991CD8406FFF3  # ronald@archlinux.org
+)
+
+domain_match=""
+gpg_locate_external=(
+    # force update a key using WKD
+    gpg
+    --homedir
+    "$homedir"
+    --quiet
+    --no-permission-warning
+    --auto-key-locate
+    "clear,nodefault,wkd"
+    --locate-external-keys
+)
+# a list of <fingerprint> <mbox> tuples of all keys in the keyring
+# e.g.:
+# C7E7849466FE2358343588377258734B41C31549 dvzrv@archlinux.org
+# 8FC15A064950A99DD1BD14DD39E4B877E62EB915 svenstaro@gmail.com
+fingerprint_mboxes="$(
+    gpg --homedir "$homedir" --no-permission-warning --list-keys --list-options show-only-fpr-mbox
+)"
+
+# a list of <fingerprints> of all revoked keys and keys that have no valid main
+# key signatures
+old_fingerprints="$(
+    gpg --homedir "$homedir" --no-permission-warning --list-keys --with-colons |
+    awk -F: '$1 == "pub" && $2 ~ /-|q|r/ { getline; print $10 }'
+)"
+
+if (( EUID != 0 )); then
+     printf "This script must be run as root.\n" >&2
+     exit 1
+fi
+
+errors=()
+# first update the main signing keys, then the packager keys
+for domain_match in "$main_key_domain_match" "$packager_domain_match"; do
+    while read -ra fpr_email; do
+        if [[ ${fpr_email[1]} =~ $domain_match && ! "$old_fingerprints" =~ ${fpr_email[0]} && ! "${invalid_fingerprints[*]}" =~ ${fpr_email[0]} ]]; then
+            printf "Refreshing key %s with UID %s...\n" "${fpr_email[0]}" "${fpr_email[1]}"
+            if ! "${gpg_locate_external[@]}" "${fpr_email[1]}"; then
+                errors+=("Error refreshing key ${fpr_email[0]} with UID ${fpr_email[1]}.")
+            fi
+        else
+            printf "Skipping key %s with UID %s...\n" "${fpr_email[0]}" "${fpr_email[1]}"
+        fi
+    done <<< "$fingerprint_mboxes"
+done
+
+>&2 printf "%s\n" "${errors[@]}"
+exit ${#errors[@]}

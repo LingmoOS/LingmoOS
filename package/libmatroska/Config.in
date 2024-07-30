@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LIBMATROSKA
+	bool "libmatroska"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++14
+	select LINGMO_PACKAGE_LIBEBML
+	help
+	  Extensible open standard audio/video container format access
+	  library.
+
+	  http://matroska.org
+
+comment "libmatroska needs a toolchain w/ C++, wchar, gcc >= 4.9"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

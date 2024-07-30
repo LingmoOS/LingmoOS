@@ -1,0 +1,61 @@
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN
+	bool "python-autobahn"
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS # python-cryptography
+	select LINGMO_PACKAGE_PYTHON_CFFI # runtime
+	select LINGMO_PACKAGE_PYTHON_CRYPTOGRAPHY # runtime
+	select LINGMO_PACKAGE_PYTHON_HYPERLINK # runtime
+	select LINGMO_PACKAGE_PYTHON_TXAIO # runtime
+	help
+	  WebSocket client and server library, WAMP real-time
+	  framework.
+
+	  https://pypi.python.org/pypi/autobahn
+
+if LINGMO_PACKAGE_PYTHON_AUTOBAHN
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_ACCELERATE
+	bool "C-based WebSocket acceleration"
+	select LINGMO_PACKAGE_PYTHON_WSACCEL # runtime
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_COMPRESS
+	bool "Non-standard WebSocket compression support"
+	depends on LINGMO_INSTALL_LIBSTDCPP # python-snappy -> snappy
+	select LINGMO_PACKAGE_PYTHON_SNAPPY # runtime
+
+comment "Non-standard WebSocket compression needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_ENCRYPTION
+	bool "TLS and WAMP-cryptosign encryption/authentication support"
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS # python-pyopenssl -> python-cryptography
+	select LINGMO_PACKAGE_PYTHON_PYNACL # runtime
+	select LINGMO_PACKAGE_PYTHON_PYOPENSSL # runtime
+	select LINGMO_PACKAGE_PYTHON_QRCODE # runtime
+	select LINGMO_PACKAGE_PYTHON_QRCODE_SVG # runtime
+	select LINGMO_PACKAGE_PYTHON_PYTRIE # runtime
+	select LINGMO_PACKAGE_PYTHON_SERVICE_IDENTITY # runtime
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_SCRAM
+	bool "WAMP-SCRAM authentication support"
+	select LINGMO_PACKAGE_PYTHON_ARGON2_CFFI # runtime
+	select LINGMO_PACKAGE_PYTHON_PASSLIB # runtime
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_SERIALIZATION
+	bool "Accelerated JSON, MessagePack, CBOR, UBJSON, and FlatBuffers serialization support"
+	depends on LINGMO_INSTALL_LIBSTDCPP # python-ujson
+	select LINGMO_PACKAGE_PYTHON_CBOR2 # runtime
+	select LINGMO_PACKAGE_PYTHON_FLATBUFFERS # runtime
+	select LINGMO_PACKAGE_PYTHON_MSGPACK # runtime
+	select LINGMO_PACKAGE_PYTHON_UBJSON # runtime
+	select LINGMO_PACKAGE_PYTHON_UJSON # runtime
+
+comment "Accelerated JSON, MessagePack, CBOR, UBJSON, and FlatBuffers serialization needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_PYTHON_AUTOBAHN_TWISTED
+	bool "Twisted support"
+	select LINGMO_PACKAGE_PYTHON_ATTRS # runtime
+	select LINGMO_PACKAGE_PYTHON_TWISTED # runtime
+	select LINGMO_PACKAGE_PYTHON_ZOPE_INTERFACE # runtime
+
+endif

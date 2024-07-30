@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_UHTTPD
+	bool "uhttpd"
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # json-c
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBUBOX
+	select LINGMO_PACKAGE_JSON_C
+	help
+	  uHTTPd is a tiny single threaded HTTP server with TLS, CGI
+	  and Lua support. It is intended as a drop-in replacement for
+	  the Busybox HTTP daemon.
+
+	  https://wiki.openwrt.org/doc/howto/http.uhttpd
+
+comment "uhttpd needs a toolchain w/ dynamic library"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

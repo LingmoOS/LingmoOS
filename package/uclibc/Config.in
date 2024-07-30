@@ -1,0 +1,183 @@
+config LINGMO_PACKAGE_UCLIBC_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_aarch64_be
+	default y if LINGMO_arcle
+	default y if LINGMO_arceb
+	default y if LINGMO_arm
+	default y if LINGMO_armeb
+	default y if LINGMO_i386
+	default y if LINGMO_m68k
+	default y if LINGMO_microblaze
+	default y if LINGMO_mips
+	default y if LINGMO_mipsel
+	default y if LINGMO_mips64
+	default y if LINGMO_mips64el
+	default y if LINGMO_or1k
+	default y if LINGMO_powerpc
+	# see libc/sysdeps/linux/riscv64/sys/asm.h
+	default y if LINGMO_RISCV_64 && (LINGMO_RISCV_ABI_LP64 || LINGMO_RISCV_ABI_LP64D)
+	default y if LINGMO_sh4
+	default y if LINGMO_sh4eb
+	default y if LINGMO_sparc
+	default y if LINGMO_xtensa
+	default y if LINGMO_x86_64
+
+config LINGMO_PACKAGE_UCLIBC_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_UCLIBC_ARCH_SUPPORTS
+
+if LINGMO_TOOLCHAIN_BUILDROOT_UCLIBC
+
+comment "uClibc Options"
+
+config LINGMO_PACKAGE_UCLIBC
+	bool
+	default y
+	select LINGMO_PACKAGE_LINUX_HEADERS
+
+config LINGMO_UCLIBC_CONFIG
+	string "uClibc configuration file to use?"
+	default "package/uclibc/uClibc-ng.config"
+	help
+	  Some people may wish to use their own modified uClibc
+	  configuration file and will specify their config file
+	  location with this option.  See also docs/README in this
+	  package.  If unsure, use the default.
+
+config LINGMO_UCLIBC_CONFIG_FRAGMENT_FILES
+	string "Additional uClibc configuration fragment files"
+	help
+	  A space-separated list of configuration fragment files, that
+	  will be merged to the main uClibc configuration file.
+
+config LINGMO_TOOLCHAIN_BUILDROOT_WCHAR
+	bool "Enable WCHAR support"
+	select LINGMO_USE_WCHAR
+	help
+	  Enable this option if you want your toolchain to support
+	  wide characters (i.e characters longer than 8 bits, needed
+	  for locale support).
+
+config LINGMO_TOOLCHAIN_BUILDROOT_LOCALE
+	bool "Enable toolchain locale/i18n support"
+	select LINGMO_TOOLCHAIN_BUILDROOT_WCHAR
+	select LINGMO_ENABLE_LOCALE
+	select LINGMO_NEEDS_HOST_UTF8_LOCALE
+	help
+	  Enable this option if you want your toolchain to support
+	  localization and internationalization.
+
+choice
+	prompt "Thread library implementation"
+	help
+	  Use this option to select the thread library implementation
+	  that should be used in your toolchain.
+
+config LINGMO_PTHREADS_NATIVE
+	bool "Native POSIX Threading (NPTL)"
+	depends on LINGMO_USE_MMU
+	select LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+
+config LINGMO_PTHREADS
+	bool "linuxthreads"
+	depends on !LINGMO_aarch64 && !LINGMO_aarch64_be
+	depends on !LINGMO_RISCV_64
+	select LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PTHREADS_NONE
+	bool "none"
+
+endchoice
+
+config LINGMO_PTHREAD_DEBUG
+	bool "Thread library debugging"
+	depends on LINGMO_PTHREADS || LINGMO_PTHREADS_NATIVE
+	select LINGMO_TOOLCHAIN_HAS_THREADS_DEBUG
+	help
+	  Build the thread library with debugging enabled.
+
+config LINGMO_TOOLCHAIN_BUILDROOT_USE_SSP
+	bool "Enable stack protection support"
+	depends on LINGMO_PACKAGE_HOST_BINUTILS_SUPPORTS_CFI
+	select LINGMO_TOOLCHAIN_HAS_SSP
+	help
+	  Enable stack smashing protection support using GCCs
+	  -fstack-protector-all option in uClibc.
+
+	  See
+	  http://www.linuxfromscratch.org/hints/downloads/files/ssp.txt
+	  for details.
+
+config LINGMO_UCLIBC_INSTALL_UTILS
+	bool "Compile and install uClibc utilities"
+	default y
+	help
+	  Enabling this option will compile and install the getconf,
+	  ldconfig and ldd uClibc utilities for the target.
+
+	  You can save ~32 KiB in target space by disabling them since
+	  they're normally not needed.
+
+# Mapping from the Buildroot architecture configuration options to the
+# uClibc architecture names.
+config LINGMO_UCLIBC_TARGET_ARCH
+	string
+	default "aarch64"  if LINGMO_aarch64 || LINGMO_aarch64_be
+	default "arc"	   if LINGMO_arcle || LINGMO_arceb
+	default "arm"	   if LINGMO_arm	|| LINGMO_armeb
+	default "m68k"	   if LINGMO_m68k
+	default "microblaze"   if LINGMO_microblaze
+	default "mips"	   if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default "or1k"     if LINGMO_or1k
+	default "powerpc"  if LINGMO_powerpc
+	default "sh"	   if LINGMO_sh
+	default "sparc"	   if LINGMO_sparc
+	default "xtensa"   if LINGMO_xtensa
+	default "i386"	   if LINGMO_i386
+	default "x86_64"   if LINGMO_x86_64
+	default "riscv64"  if LINGMO_RISCV_64
+
+config LINGMO_UCLIBC_MIPS_ABI
+	string
+	default "O32" if LINGMO_MIPS_OABI32
+	default "N32" if LINGMO_MIPS_NABI32
+	default "N64" if LINGMO_MIPS_NABI64
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "mips"
+
+config LINGMO_UCLIBC_MIPS_NAN
+	string
+	default "LEGACY" if LINGMO_MIPS_NAN_LEGACY
+	default "2008" if LINGMO_MIPS_NAN_2008
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "mips"
+
+config LINGMO_UCLIBC_SH_TYPE
+	string
+	default "SH4"  if LINGMO_sh4 || LINGMO_sh4eb
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "sh"
+
+config LINGMO_UCLIBC_SPARC_TYPE
+	string
+	default "V8"	if LINGMO_sparc_v8
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "sparc"
+
+config LINGMO_UCLIBC_POWERPC_TYPE
+	string
+	default "CLASSIC" if !LINGMO_powerpc_8540 && !LINGMO_powerpc_8548
+	default "E500"    if LINGMO_powerpc_8540 || LINGMO_powerpc_8548
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "powerpc"
+
+config LINGMO_UCLIBC_X86_TYPE
+	string
+	default "486"        if LINGMO_x86_i486
+	default "586"        if LINGMO_x86_i586
+	default "586MMX"     if LINGMO_x86_pentium_mmx
+	default "686"	     if LINGMO_x86_i686 || LINGMO_x86_pentiumpro
+	default "PENTIUMII"  if LINGMO_x86_pentium2
+	default "PENTIUMIII" if LINGMO_x86_pentium3
+	default "PENTIUM4"   if LINGMO_x86_pentium4 || LINGMO_x86_pentium_m || \
+	                        LINGMO_x86_nocona || LINGMO_x86_core2 || LINGMO_x86_corei7
+	depends on LINGMO_UCLIBC_TARGET_ARCH = "i386"
+
+endif # LINGMO_TOOLCHAIN_BUILDROOT_UCLIBC

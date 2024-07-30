@@ -1,0 +1,40 @@
+config LINGMO_PACKAGE_LINUXCONSOLETOOLS
+	bool "linuxconsoletools"
+	select LINGMO_PACKAGE_LINUXCONSOLETOOLS_INPUTATTACH if \
+	       !LINGMO_PACKAGE_LINUXCONSOLETOOLS_JOYSTICK && \
+	       !LINGMO_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK
+	help
+	  Linuxconsoletools contains the inputattach utility
+	  to attach legacy serial devices to the Linux kernel
+	  input layer and joystick utilities to calibrate and
+	  test joysticks and joypads.
+
+	  http://sf.net/projects/linuxconsole/
+
+if LINGMO_PACKAGE_LINUXCONSOLETOOLS
+
+config LINGMO_PACKAGE_LINUXCONSOLETOOLS_INPUTATTACH
+	bool "inputattach"
+	default y
+	help
+	  The inputattach utility attaches legacy serial devices
+	  to the Linux kernel input layer.
+
+config LINGMO_PACKAGE_LINUXCONSOLETOOLS_JOYSTICK
+	bool "joystick utilities"
+	help
+	  Joystick utilities (jstest, jscal, jscal-store,
+	  jscal-restore, evdev-joystick).
+
+config LINGMO_PACKAGE_LINUXCONSOLETOOLS_FORCEFEEDBACK
+	bool "force-feedback utilities"
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_SDL2
+	help
+	  Build force-feedback driver utilities (fftest,
+	  ffmvforce, ffset, ffcfstress).
+
+comment "force-feedback utilities need a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+endif

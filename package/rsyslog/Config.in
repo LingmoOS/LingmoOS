@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_RSYSLOG
+	bool "rsyslog"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # modules
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # GLOB_BRACE
+	# Propagate the exact same dependency from libfastjson,
+	# even though rsyslog already depends on threads for itself:
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 || LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_APR_UTIL if LINGMO_PACKAGE_CIVETWEB_LIB
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LIBESTR
+	select LINGMO_PACKAGE_LIBLOGGING
+	select LINGMO_PACKAGE_LIBFASTJSON
+	help
+	  Rsyslog is a powerful and flexible syslog implementation
+
+	  http://www.rsyslog.com
+
+comment "rsyslog needs a uClibc or glibc toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS

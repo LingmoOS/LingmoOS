@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_LIBPRI
+	bool "libpri"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_DAHDI_LINUX
+	select LINGMO_PACKAGE_DAHDI_TOOLS
+	help
+	  libpri is an open source library that encapsulates the
+	  protocols used to communicate over ISDN Primary Rate
+	  Interfaces (T1, E1, J1).
+
+	  http://www.asterisk.org/downloads/libpri
+
+comment "libpri needs a Linux kernel to be built"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_LINUX_KERNEL
+
+comment "libpri needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

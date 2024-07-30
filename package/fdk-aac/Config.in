@@ -1,0 +1,24 @@
+# These are the architectures supported by FDK AAC
+config LINGMO_PACKAGE_FDK_AAC_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_powerpc
+	default y if LINGMO_sh
+
+config LINGMO_PACKAGE_FDK_AAC
+	bool "fdk-aac"
+	depends on LINGMO_PACKAGE_FDK_AAC_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  The Fraunhofer FDK AAC Codec Library for Android ("FDK AAC
+	  Codec") is software that implements the MPEG Advanced Audio
+	  Coding ("AAC") encoding and decoding scheme for digital audio
+
+	  http://sourceforge.net/projects/opencore-amr/files/fdk-aac/
+
+comment "fdk-aac needs a toolchain w/ C++"
+	depends on LINGMO_PACKAGE_FDK_AAC_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP

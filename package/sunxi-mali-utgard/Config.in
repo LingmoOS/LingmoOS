@@ -1,0 +1,74 @@
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD
+	bool "sunxi-mali-utgard"
+	depends on LINGMO_aarch64 || (LINGMO_ARM_EABIHF && LINGMO_arm)
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBGLES
+	help
+	  Install userspace Allwinner OpenGL libraries for Mali
+	  Utgard GPUs.
+
+	  https://github.com/bootlin/mali-blobs
+
+if LINGMO_PACKAGE_SUNXI_MALI_UTGARD
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "sunxi-mali-utgard"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "sunxi-mali-utgard"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGBM
+	default "sunxi-mali-utgard" if LINGMO_PACKAGE_SUNXI_MALI_UTGARD_WAYLAND
+
+choice
+	prompt "Version"
+	default LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2 if LINGMO_PACKAGE_SUNXI_MALI_MAINLINE_R6P2 # legacy
+	default LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R8P1 if LINGMO_PACKAGE_SUNXI_MALI_MAINLINE_R8P1 # legacy
+	default LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2
+	help
+	  Select the version of the userspace module.
+
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2
+	bool "r6p2"
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R8P1
+	bool "r8p1"
+
+endchoice
+
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_REVISION
+	string
+	default "r6p2"	if LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2
+	default "r8p1"	if LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R8P1
+
+choice
+	prompt "Platform"
+	default LINGMO_PACKAGE_SUNXI_MALI_UTGARD_FBDEV
+	help
+	  Select the target EGL platform.
+
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_FBDEV
+	bool "fbdev"
+
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_WAYLAND
+	bool "wayland"
+	depends on LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2
+	select LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+	select LINGMO_PACKAGE_HAS_LIBGBM
+	select LINGMO_PACKAGE_WAYLAND
+
+comment "wayland support requires version r6p2"
+	depends on !LINGMO_PACKAGE_SUNXI_MALI_UTGARD_R6P2
+
+endchoice
+
+config LINGMO_PACKAGE_SUNXI_MALI_UTGARD_PLATFORM
+	string
+	default "fbdev" if LINGMO_PACKAGE_SUNXI_MALI_UTGARD_FBDEV
+	default "wayland" if LINGMO_PACKAGE_SUNXI_MALI_UTGARD_WAYLAND
+
+endif
+
+comment "sunxi-mali-utgard needs an EABIhf glibc toolchain"
+	depends on LINGMO_arm
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_ARM_EABIHF

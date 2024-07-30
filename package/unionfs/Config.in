@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_UNIONFS
+	bool "unionfs (FUSE)"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libfuse
+	depends on LINGMO_USE_MMU # libfuse
+	depends on !LINGMO_STATIC_LIBS # libfuse
+	select LINGMO_PACKAGE_LIBFUSE
+	help
+	  A userspace unionfs implementation.
+
+	  https://github.com/rpodgorny/unionfs-fuse
+
+comment "unionfs needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

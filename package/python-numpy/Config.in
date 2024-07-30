@@ -1,0 +1,36 @@
+config LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	bool
+	# Numpy has some CPU specific code
+	default y if LINGMO_arc
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm
+	default y if LINGMO_armeb
+	default y if LINGMO_i386
+	default y if LINGMO_mips
+	default y if LINGMO_mipsel
+	default y if LINGMO_powerpc
+	default y if LINGMO_powerpc64
+	default y if LINGMO_sh
+	default y if LINGMO_x86_64
+
+config LINGMO_PACKAGE_PYTHON_NUMPY
+	bool "python-numpy"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	# python-numpy needs fenv.h which is not provided by uclibc
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9
+	help
+	  NumPy is the fundamental package for scientific computing
+	  with Python.
+
+	  Note that NumPy needs fenv.h fully supported by the
+	  C library.
+
+	  http://www.numpy.org/
+
+comment "python-numpy needs a glibc or musl toolchain w/ C++, gcc >= 9"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 || \
+		!(LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL)

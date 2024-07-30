@@ -1,0 +1,178 @@
+config LINGMO_TARGET_GRUB2_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	default y if LINGMO_arm
+	default y if LINGMO_aarch64
+	default y if LINGMO_RISCV_64
+	depends on LINGMO_USE_MMU
+
+config LINGMO_TARGET_GRUB2
+	bool "grub2"
+	depends on LINGMO_TARGET_GRUB2_ARCH_SUPPORTS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_TARGET_GRUB2_I386_PC if \
+		!LINGMO_TARGET_GRUB2_HAS_PTF && \
+		(LINGMO_i386 || LINGMO_x86_64)
+	select LINGMO_TARGET_GRUB2_ARM_UBOOT if \
+		!LINGMO_TARGET_GRUB2_HAS_PTF && \
+		LINGMO_arm
+	select LINGMO_TARGET_GRUB2_ARM64_EFI if LINGMO_aarch64
+	help
+	  GNU GRUB is a Multiboot boot loader. It was derived from
+	  GRUB, the GRand Unified Bootloader, which was originally
+	  designed and implemented by Erich Stefan Boleyn. GRUB 2 has
+	  replaced what was formerly known as GRUB (i.e. version
+	  0.9x), which has, in turn, become GRUB Legacy.
+
+	  Amongst others, GRUB2 offers EFI support, which GRUB Legacy
+	  doesn't provide.
+
+	  The file boot/grub2/grub.cfg is used by default as the Grub
+	  configuration file. It can be overridden using a rootfs
+	  overlay or post-build script.
+
+	  For additional notes on using Grub 2 with Buildroot, see
+	  boot/grub2/readme.txt
+
+	  http://www.gnu.org/software/grub/
+
+if LINGMO_TARGET_GRUB2
+
+config LINGMO_TARGET_GRUB2_HAS_LEGACY_BOOT
+	bool
+
+config LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	bool
+
+config LINGMO_TARGET_GRUB2_HAS_PTF
+	bool
+
+config LINGMO_TARGET_GRUB2_I386_PC
+	bool "i386-pc"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	select LINGMO_TARGET_GRUB2_HAS_LEGACY_BOOT
+	help
+	  Select this option if the platform you're targetting is a
+	  x86 or x86-64 legacy BIOS based platform.
+
+config LINGMO_TARGET_GRUB2_I386_EFI
+	bool "i386-efi"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	select LINGMO_TARGET_GRUB2_HAS_PTF
+	select LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	help
+	  Select this option if the platform you're targetting has a
+	  32 bits EFI BIOS. Note that some x86-64 platforms use a 32
+	  bits EFI BIOS, and this option should be used in this case.
+
+config LINGMO_TARGET_GRUB2_X86_64_EFI
+	bool "x86-64-efi"
+	depends on LINGMO_x86_64
+	select LINGMO_TARGET_GRUB2_HAS_PTF
+	select LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	help
+	  Select this option if the platform you're targetting has a
+	  64 bits EFI BIOS.
+
+config LINGMO_TARGET_GRUB2_ARM_UBOOT
+	bool "arm-uboot"
+	depends on LINGMO_arm
+	select LINGMO_TARGET_GRUB2_HAS_LEGACY_BOOT
+	help
+	  Select this option if the platform you're targetting is an
+	  ARM u-boot platform, and you want to boot Grub 2 as an u-boot
+	  compatible image.
+
+config LINGMO_TARGET_GRUB2_ARM_EFI
+	bool "arm-efi"
+	depends on LINGMO_arm
+	select LINGMO_TARGET_GRUB2_HAS_PTF
+	select LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	help
+	  Select this option if the platform you're targetting is an
+	  ARM platform and you want to boot Grub 2 as an EFI
+	  application.
+
+config LINGMO_TARGET_GRUB2_ARM64_EFI
+	bool "arm64-efi"
+	depends on LINGMO_aarch64
+	select LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	help
+	  Select this option if the platform you're targetting is an
+	  Aarch64 platform and you want to boot Grub 2 as an EFI
+	  application.
+
+config LINGMO_TARGET_GRUB2_RISCV64_EFI
+	bool "riscv64-efi"
+	depends on LINGMO_RISCV_64
+	select LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+	help
+	  Select this option if the platform you're targetting is a
+	  64bit RISC-V platform and you want to boot Grub 2 as an EFI
+	  application.
+
+if LINGMO_TARGET_GRUB2_HAS_LEGACY_BOOT
+
+comment "Options for the x86 legacy BIOS or ARM U-Boot support"
+
+config LINGMO_TARGET_GRUB2_BOOT_PARTITION
+	string "boot partition"
+	default "hd0,msdos1"
+	help
+	  Specify the partition where the /boot/grub/grub.cfg file is
+	  located. Use 'hd0,msdos1' for the first partition of the
+	  first disk if using a legacy partition table, or 'hd0,gpt1'
+	  if using GPT partition table.
+
+config LINGMO_TARGET_GRUB2_BUILTIN_MODULES_PC
+	string "builtin modules"
+	default LINGMO_TARGET_GRUB2_BUILTIN_MODULES if LINGMO_TARGET_GRUB2_BUILTIN_MODULES != "" # legacy
+	default "boot linux ext2 fat squash4 part_msdos part_gpt normal biosdisk" if LINGMO_TARGET_GRUB2_I386_PC
+	default "linux ext2 fat part_msdos normal" if LINGMO_TARGET_GRUB2_ARM_UBOOT
+
+config LINGMO_TARGET_GRUB2_BUILTIN_CONFIG_PC
+	string "builtin config"
+	default LINGMO_TARGET_GRUB2_BUILTIN_CONFIG if LINGMO_TARGET_GRUB2_BUILTIN_CONFIG != "" # legacy
+	help
+	  Path to a Grub 2 configuration file that will be embedded
+	  into the Grub image itself. This allows to set the root
+	  device and other configuration parameters, but however menu
+	  entries cannot be described in this embedded configuration.
+
+endif # LINGMO_TARGET_GRUB2_HAS_LEGACY_BOOT
+
+if LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+
+comment "Options for the EFI BIOS or ARM EFI support"
+
+config LINGMO_TARGET_GRUB2_BUILTIN_MODULES_EFI
+	string "builtin modules"
+	default LINGMO_TARGET_GRUB2_BUILTIN_MODULES if LINGMO_TARGET_GRUB2_BUILTIN_MODULES != "" # legacy
+	default "boot linux ext2 fat squash4 part_msdos part_gpt normal efi_gop"
+
+config LINGMO_TARGET_GRUB2_BUILTIN_CONFIG_EFI
+	string "builtin config"
+	default LINGMO_TARGET_GRUB2_BUILTIN_CONFIG if LINGMO_TARGET_GRUB2_BUILTIN_CONFIG != "" # legacy
+	help
+	  Path to a Grub 2 configuration file that will be embedded
+	  into the Grub image itself. This allows to set the root
+	  device and other configuration parameters, but however menu
+	  entries cannot be described in this embedded configuration.
+
+endif # LINGMO_TARGET_GRUB2_HAS_EFI_BOOT
+
+config LINGMO_TARGET_GRUB2_INSTALL_TOOLS
+	bool "install tools"
+	help
+	  Install support tools to interact with GNU GRUB Multiboot
+	  boot loader.
+
+	  This will also install the Grub 2 loadable modules to the
+	  target.
+
+endif # LINGMO_TARGET_GRUB2
+
+comment "grub2 needs a toolchain w/ wchar"
+	depends on LINGMO_TARGET_GRUB2_ARCH_SUPPORTS
+	depends on !LINGMO_USE_WCHAR

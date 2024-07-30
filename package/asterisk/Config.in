@@ -1,0 +1,32 @@
+config LINGMO_PACKAGE_ASTERISK
+	bool "asterisk"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL
+	depends on LINGMO_USE_MMU # libedit
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR # libedit
+	select LINGMO_PACKAGE_JANSSON
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBEDIT
+	select LINGMO_PACKAGE_LIBILBC
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Asterisk is an open source framework for building
+	  communications applications. Asterisk turns an ordinary
+	  computer into a communications server. Asterisk powers IP PBX
+	  systems, VoIP gateways, conference servers and other custom
+	  solutions. It is used by small businesses, large businesses,
+	  call centers, carriers and government agencies, worldwide.
+	  Asterisk is free and open source.
+
+	  http://www.asterisk.org/
+
+comment "asterisk needs a glibc or uClibc toolchain w/ C++, dynamic library, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_USES_MUSL || !LINGMO_INSTALL_LIBSTDCPP \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR

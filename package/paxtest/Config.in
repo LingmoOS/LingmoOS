@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_PAXTEST
+	bool "paxtest"
+	depends on !LINGMO_microblaze
+	# No UCLIBC or MUSL because __NO_A_OUT_SUPPORT
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  PaX regression test suite
+
+	  http://pax.grsecurity.net/docs
+
+comment "paxtest needs a glibc toolchain"
+	depends on !LINGMO_microblaze
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC

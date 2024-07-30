@@ -1,0 +1,51 @@
+# memory barrier function implemented only for some architectures
+config LINGMO_PACKAGE_OPROFILE_ARCH_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_arceb || LINGMO_arcle || LINGMO_arm || LINGMO_armeb || \
+		LINGMO_aarch64 || LINGMO_aarch64_be || LINGMO_i386 || LINGMO_mips || \
+		LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el || LINGMO_powerpc || \
+		LINGMO_powerpc64 || LINGMO_powerpc64le || LINGMO_s390x || LINGMO_sh || \
+		LINGMO_sparc || LINGMO_sparc64 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_OPROFILE_NEEDS_LIBPFM4
+	bool
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+
+config LINGMO_PACKAGE_OPROFILE
+	bool "oprofile"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # binutils
+	depends on LINGMO_PACKAGE_OPROFILE_ARCH_SUPPORTS
+	# libpfm4 is needed on PowerPC, and requires thread support
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_PACKAGE_OPROFILE_NEEDS_LIBPFM4
+	select LINGMO_PACKAGE_POPT
+	select LINGMO_PACKAGE_BINUTILS
+	select LINGMO_PACKAGE_LIBPFM4 if LINGMO_PACKAGE_OPROFILE_NEEDS_LIBPFM4
+	help
+	  OProfile is a system-wide profiler for Linux systems,
+	  capable of profiling all running code at low overhead.
+	  OProfile is released under the GNU GPL.
+
+	  It consists of a kernel driver and a daemon for collecting
+	  sample data, and several post-profiling tools for turning
+	  data into information.
+
+	  OProfile leverages the hardware performance counters of the
+	  CPU to enable profiling of a wide variety of interesting
+	  statistics, which can also be used for basic time-spent
+	  profiling. All code is profiled: hardware and software
+	  interrupt handlers, kernel modules, the kernel, shared
+	  libraries, and applications.
+
+	  https://sourceforge.net/projects/oprofile/
+
+comment "oprofile needs a toolchain w/ C++, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_OPROFILE_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR
+
+comment "oprofile needs a toolchain w/ NPTL on PowerPC(64)"
+	depends on LINGMO_USE_MMU && LINGMO_PACKAGE_OPROFILE_NEEDS_LIBPFM4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

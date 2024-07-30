@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_DAQ3
+	bool "daq3"
+	depends on !LINGMO_PACKAGE_DAQ
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  DAQ is a Data Acquisition library for packet I/O from the
+	  Snort project.
+
+	  https://www.snort.org
+
+comment "daq3 needs a toolchain w/ dynamic library, gcc >= 4.9, threads"
+	depends on !LINGMO_PACKAGE_DAQ
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS

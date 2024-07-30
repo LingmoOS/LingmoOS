@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_LIBVPL_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_ARCH_IS_64
+	default y if LINGMO_arm
+
+config LINGMO_PACKAGE_LIBVPL
+	bool "libvpl"
+	depends on LINGMO_PACKAGE_LIBVPL_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS if LINGMO_PACKAGE_WAYLAND
+	# libva support needs a libdrm with intel driver
+	select LINGMO_PACKAGE_LIBDRM_INTEL if LINGMO_PACKAGE_LIBVA && \
+		(LINGMO_i386 || LINGMO_x86_64) && \
+		LINGMO_PACKAGE_LIBDRM_HAS_ATOMIC
+	select LINGMO_PACKAGE_LIBXCB if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7
+	help
+	  oneAPI Video Processing Library (oneVPL) dispatcher,
+	  tools, and examples
+
+	  https://github.com/oneapi-src/oneVPL
+
+comment "libvpl needs a toolchain w/ dynamic library, gcc >= 7, C++, threads"
+	depends on LINGMO_PACKAGE_LIBVPL_ARCH_SUPPORTS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || \
+		!LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

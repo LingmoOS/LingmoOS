@@ -1,0 +1,34 @@
+config LINGMO_PACKAGE_LIBSOUP3
+	bool "libsoup3"
+	depends on LINGMO_USE_WCHAR # glib2, libpsl
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBPSL
+	select LINGMO_PACKAGE_NGHTTP2
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  libsoup3 is an HTTP client/server library. It uses GObject
+	  and the GLib main loop, to integrate well with GNOME
+	  applications.
+
+	  https://wiki.gnome.org/Projects/libsoup
+
+if LINGMO_PACKAGE_LIBSOUP3
+
+config LINGMO_PACKAGE_LIBSOUP3_SSL
+	bool "https support"
+	depends on !LINGMO_STATIC_LIBS # glib-networking, gnutls
+	select LINGMO_PACKAGE_GLIB_NETWORKING # runtime
+	select LINGMO_PACKAGE_GNUTLS # runtime
+	help
+	  Enable HTTPS (SSL) support.
+
+comment "libsoup3 https support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+endif
+
+comment "libsoup3 needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

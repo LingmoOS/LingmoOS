@@ -1,0 +1,32 @@
+choice
+	prompt "Target Architecture Variant"
+	help
+	  Specific CPU variant to use
+
+config LINGMO_s390x_z13
+	bool "z13"
+
+config LINGMO_s390x_z14
+	bool "z14"
+
+config LINGMO_s390x_z15
+	bool "z15"
+
+endchoice
+
+config LINGMO_ARCH
+	default "s390x"	if LINGMO_s390x
+
+config LINGMO_NORMALIZED_ARCH
+	default "s390"
+
+config LINGMO_ENDIAN
+	default "BIG"
+
+config LINGMO_GCC_TARGET_ARCH
+	default "arch11" if LINGMO_s390x_z13
+	default "arch12" if LINGMO_s390x_z14
+	default "arch13" if LINGMO_s390x_z15
+
+config LINGMO_READELF_ARCH_NAME
+	default "IBM S/390"	if LINGMO_s390x

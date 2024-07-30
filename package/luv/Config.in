@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_LUV
+	bool "luv"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # libuv
+	depends on LINGMO_USE_MMU # libuv
+	depends on !LINGMO_STATIC_LIBS # libuv
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libuv
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libuv
+	select LINGMO_PACKAGE_LIBUV
+	help
+	  libuv bindings for LuaJIT and Lua.
+
+	  https://github.com/luvit/luv
+
+comment "luv needs a toolchain w/ NPTL, dynamic library, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4

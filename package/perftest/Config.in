@@ -1,0 +1,42 @@
+config LINGMO_PACKAGE_PERFTEST_ARCH_SUPPORTS
+	bool
+	# Accurate cycle measurement in perftest is implemented for a
+	# limited set of architectures, see:
+	# https://github.com/linux-rdma/perftest/blob/v4.5-0.20/src/get_clock.h
+	# Note: the package has also a fallback to use "asm/timex.h"
+	# from the Kernel, in
+	# "$(LINUX_DIR)/arch/$(KERNEL_ARCH)/include". It is not
+	# reflected here as this path is not well tested.
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_arm && !LINGMO_ARM_CPU_ARMV4 && !LINGMO_ARM_CPU_ARMV5 && !LINGMO_ARM_CPU_ARMV6
+	default y if LINGMO_aarch64
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	default y if LINGMO_s390x
+	default y if LINGMO_sparc || LINGMO_sparc64
+	default y if LINGMO_riscv
+	depends on LINGMO_USE_MMU # rdma-core
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # rdma-core
+
+config LINGMO_PACKAGE_PERFTEST
+	bool "perftest"
+	depends on LINGMO_PACKAGE_PERFTEST_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 # rdma-core
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # rdma-core
+	depends on !LINGMO_STATIC_LIBS # rdma-core
+	# musl does not define sysconf(_SC_LEVEL1_DCACHE_LINESIZE)
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL
+	select LINGMO_PACKAGE_PCIUTILS
+	select LINGMO_PACKAGE_RDMA_CORE
+	help
+	  Open Fabrics Performance Tests.
+
+	  This is a collection of tests written over uverbs intended
+	  for use as a performance micro-benchmark. The tests may be
+	  used for HW or SW tuning as well as for functional testing.
+
+	  https://github.com/linux-rdma/perftest
+
+comment "perftest needs a glibc or uClibc toolchain w/ threads, dynamic library"
+	depends on LINGMO_PACKAGE_PERFTEST_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL

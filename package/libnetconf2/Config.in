@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBNETCONF2
+	bool "libnetconf2"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libyang
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_LIBYANG
+	help
+	  libnetconf2 is a NETCONF library in C intended for building
+	  NETCONF clients and servers.
+
+	  https://github.com/CESNET/libnetconf2
+
+comment "libnetconf2 needs a toolchain w/ threads, dynamic libraray"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

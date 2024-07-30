@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_WGET
+	bool "wget"
+	# fork()
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD4 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  Network utility to retrieve files from http, https and ftp.
+
+	  http://www.gnu.org/software/wget/
+
+comment "wget needs a toolchain w/ wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS

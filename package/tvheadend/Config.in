@@ -1,0 +1,74 @@
+comment "tvheadend needs a toolchain w/ NPTL, headers >= 3.2, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_2 || LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_8
+
+menuconfig LINGMO_PACKAGE_TVHEADEND
+	bool "tvheadend"
+	depends on !LINGMO_STATIC_LIBS # dladdr()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_8
+	select LINGMO_PACKAGE_DTV_SCAN_TABLES
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+
+	  Tvheadend is a TV streaming server for Linux supporting
+	  DVB-S, DVB-S2, DVB-C, DVB-T, ATSC, IPTV, and Analog video
+	  (V4L) as input sources.
+
+	  https://www.lonelycoder.com/redmine/projects/tvheadend/
+
+	  Note:
+	    - on first run, tvheadend will start in wizard mode; the
+	      webUI is available on port 9981.
+	    - if you want Avahi support, you'll need to enable:
+	          Avahi, D-Bus, libdaemon
+
+if LINGMO_PACKAGE_TVHEADEND
+
+config LINGMO_PACKAGE_TVHEADEND_DESCRAMBLER
+	bool "descrambler support"
+	default y
+	help
+	  Enable support for various descrambler modules.
+
+config LINGMO_PACKAGE_TVHEADEND_IPTV
+	bool "IPTV support"
+	default y
+	help
+	  Enable IPTV support.
+
+	  Note that some IPTV streams will need to be piped through
+	  ffmpeg (the commandline tool), so you may have to enable it
+	  with:
+	    LINGMO_PACKAGE_FFMPEG=y
+	    LINGMO_PACKAGE_FFMPEG_FFMPEG=y
+
+config LINGMO_PACKAGE_TVHEADEND_SATIP
+	bool "SAT>IP support"
+	default y
+	help
+	  Enable SAT>IP support.
+
+config LINGMO_PACKAGE_TVHEADEND_TIMESHIFT
+	bool "timeshift support"
+	default y
+	help
+	  Enable timeshift support.
+
+config LINGMO_PACKAGE_TVHEADEND_TRANSCODING
+	bool "transcoding support"
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_FFMPEG_GPL # needed for x264 support
+	select LINGMO_PACKAGE_FFMPEG_SWSCALE
+	# vp8 encoder needs c++
+	select LINGMO_PACKAGE_LIBVPX if LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_X264
+	help
+	  Enable transcoding support.
+
+endif

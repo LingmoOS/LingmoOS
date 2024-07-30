@@ -1,0 +1,69 @@
+config LINGMO_PACKAGE_XVISOR_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_cortex_a7 || LINGMO_cortex_a12 || LINGMO_cortex_a15 || LINGMO_cortex_a17
+	default y if LINGMO_riscv
+	default y if LINGMO_x86_64
+	depends on LINGMO_USE_MMU
+
+menuconfig LINGMO_PACKAGE_XVISOR
+	bool "xvisor"
+	depends on LINGMO_PACKAGE_XVISOR_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	help
+	  Xvisor is an open-source type-1 hypervisor, which aims at
+	  providing a monolithic, light-weight, portable, and flexible
+	  virtualization solution.
+
+	  http://www.xhypervisor.org/
+
+if LINGMO_PACKAGE_XVISOR
+
+choice
+	prompt "Xvisor configuration"
+	default LINGMO_PACKAGE_XVISOR_USE_DEFCONFIG
+
+config LINGMO_PACKAGE_XVISOR_USE_DEFCONFIG
+	bool "Using an in-tree defconfig file"
+
+config LINGMO_PACKAGE_XVISOR_USE_CUSTOM_CONFIG
+	bool "Using a custom (def)config file"
+
+endchoice
+
+config LINGMO_PACKAGE_XVISOR_DEFCONFIG
+	string "Defconfig name"
+	default "generic-v7-ve" if LINGMO_ARM_CPU_ARMV7A
+	default "generic-v8" if LINGMO_aarch64
+	default "generic-32b" if LINGMO_RISCV_32
+	default "generic-64b" if LINGMO_RISCV_64
+	default "x86_64_generic" if LINGMO_x86_64
+	depends on LINGMO_PACKAGE_XVISOR_USE_DEFCONFIG
+	help
+	  Name of the Xvisor defconfig file to use, without the
+	  trailing -defconfig. The defconfig is located in
+	  arch/<arch>/configs in the source tree.
+
+config LINGMO_PACKAGE_XVISOR_CUSTOM_CONFIG_FILE
+	string "Configuration file path"
+	depends on LINGMO_PACKAGE_XVISOR_USE_CUSTOM_CONFIG
+	help
+	  Path to the Xvisor configuration file
+
+config LINGMO_PACKAGE_XVISOR_CREATE_UBOOT_IMAGE
+	bool "Create U-Boot image of Xvisor"
+	depends on LINGMO_arm
+	select LINGMO_PACKAGE_HOST_UBOOT_TOOLS
+	help
+	  Create an image file of Xvisor loadable from Das U-Boot.
+
+config LINGMO_PACKAGE_XVISOR_BUILD_TEST_DTB
+	bool "Build test device-tree blobs"
+	help
+	  Build test device-tree blobs for popular boards.
+
+endif
+
+comment "xvisor needs a toolchain w/ gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_PACKAGE_XVISOR_ARCH_SUPPORTS

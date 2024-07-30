@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_CLPEAK
+	bool "clpeak"
+	depends on LINGMO_PACKAGE_HAS_LIBOPENCL
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	select LINGMO_PACKAGE_OPENCL_CLHPP
+	help
+	  clpeak is a tool that profiles OpenCL devices
+	  to find their peak capacities
+
+	  https://github.com/krrishnarraj/clpeak
+
+comment "clpeak needs an OpenCL provider, a toolchain w/ C++, gcc >= 4.8"
+	depends on !LINGMO_PACKAGE_HAS_LIBOPENCL \
+		|| !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8

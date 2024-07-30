@@ -1,0 +1,45 @@
+config LINGMO_PACKAGE_OGRE
+	bool "ogre"
+	depends on LINGMO_PACKAGE_HAS_LIBGL # libglu
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_USE_WCHAR # use wchar_t
+	depends on !LINGMO_arc # libfreeimage
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_LIBFREEIMAGE
+	select LINGMO_PACKAGE_PUGIXML
+	select LINGMO_PACKAGE_SDL2
+	select LINGMO_PACKAGE_SDL2_OPENGL
+	select LINGMO_PACKAGE_SDL2_X11 # use wmInfo.info.x11
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXAW
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	select LINGMO_PACKAGE_XLIB_LIBXRANDR
+	select LINGMO_PACKAGE_ZZIPLIB
+	help
+	  OGRE is a scene-oriented, flexible 3D engine written in C++
+	  designed to make it easier and more intuitive for developers
+	  to produce games and demos utilising 3D hardware. The class
+	  library abstracts all the details of using the underlying
+	  system libraries like Direct3D and OpenGL and provides an
+	  interface based on world objects and other intuitive classes.
+
+	  https://ogrecave.github.io/ogre
+
+comment "ogre needs X11 and an OpenGL provider"
+	depends on !LINGMO_PACKAGE_HAS_LIBGL || !LINGMO_PACKAGE_XORG7
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS && LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 \
+		&& LINGMO_INSTALL_LIBSTDCPP && !LINGMO_STATIC_LIBS && LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_arc
+
+comment "ogre needs a toolchain w/ C++, dynamic library, gcc >= 4.8, threads, wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_arc

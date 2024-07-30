@@ -1,0 +1,32 @@
+comment "libest needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_LIBEST
+	bool "libest"
+	depends on !LINGMO_STATIC_LIBS # libexecinfo or glibc
+	select LINGMO_PACKAGE_LIBEXECINFO if !LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	select LINGMO_PACKAGE_SAFECLIB
+	help
+	  libest is a C implementation of RFC 7030 (Enrollment over
+	  Secure Transport).
+
+	  It can be used to provision public key certificates from
+	  a certificate authority (CA) or registration authority (RA)
+	  to end-user devices and network infrastructure devices.
+
+	  https://github.com/cisco/libest
+
+if LINGMO_PACKAGE_LIBEST
+
+config LINGMO_PACKAGE_LIBEST_BRSKI
+	bool "BRSKI support"
+
+config LINGMO_PACKAGE_LIBEST_MODE_CLIENT_ONLY
+	bool "client-only mode"
+	# The client-only mode fails to build with OpenJDK/JNI
+	# bindings
+	depends on !LINGMO_PACKAGE_OPENJDK
+
+endif # LINGMO_PACKAGE_LIBEST

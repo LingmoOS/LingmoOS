@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_NETWORKD_DISPATCHER
+	bool "networkd-dispatcher"
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS # python-gobject -> gobject-introspection
+	depends on LINGMO_HOST_GCC_AT_LEAST_8 # python-gobject -> gobject-introspection -> host-qemu
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # python-gobject -> gobject-introspection
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # python-gobject -> gobject-introspection
+	depends on LINGMO_PACKAGE_SYSTEMD # runtime
+	select LINGMO_PACKAGE_DBUS # dbus-python
+	select LINGMO_PACKAGE_DBUS_PYTHON # runtime
+	select LINGMO_PACKAGE_PYTHON3 # python-gobject
+	select LINGMO_PACKAGE_PYTHON_GOBJECT # runtime
+	select LINGMO_PACKAGE_SYSTEMD_NETWORKD # runtime
+	help
+	  Networkd-dispatcher is a dispatcher daemon for
+	  systemd-networkd connection status changes.
+	  This daemon is similar to NetworkManager-dispatcher,
+	  but is much more limited in the types of events it
+	  supports due to the limited nature of systemd-networkd.
+
+	  https://gitlab.com/craftyguy/networkd-dispatcher
+
+comment "networkd-dispatcher needs a glibc toolchain, gcc >= 4.9, host gcc >= 8"
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_SYSTEMD
+	depends on !LINGMO_HOST_GCC_AT_LEAST_8 || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_TOOLCHAIN_USES_GLIBC

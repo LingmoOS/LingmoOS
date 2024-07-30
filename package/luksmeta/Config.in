@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LUKSMETA
+	bool "luksmeta"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # cryptsetup -> lvm2
+	depends on LINGMO_USE_MMU # cryptsetup -> lvm2
+	depends on !LINGMO_STATIC_LIBS # cryptsetup -> lvm2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # cryptsetup -> json-c
+	select LINGMO_PACKAGE_CRYPTSETUP
+	help
+	  LUKSMeta is a simple library and utility for storing
+	  metadata in the LUKSv1 header.
+
+	  https://github.com/latchset/luksmeta
+
+comment "luksmeta needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

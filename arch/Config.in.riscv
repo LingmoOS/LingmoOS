@@ -1,0 +1,128 @@
+# RISC-V CPU ISA extensions.
+
+choice
+	prompt "Target Architecture Variant"
+	default LINGMO_riscv_g
+
+config LINGMO_riscv_g
+	bool "General purpose (G)"
+	select LINGMO_RISCV_ISA_RVI
+	select LINGMO_RISCV_ISA_RVM
+	select LINGMO_RISCV_ISA_RVA
+	select LINGMO_RISCV_ISA_RVF
+	select LINGMO_RISCV_ISA_RVD
+	help
+	  General purpose (G) is equivalent to IMAFD.
+
+config LINGMO_riscv_custom
+	bool "Custom architecture"
+	select LINGMO_RISCV_ISA_RVI
+
+endchoice
+
+comment "Instruction Set Extensions"
+
+config LINGMO_RISCV_ISA_RVI
+	bool "Base Integer (I)"
+
+config LINGMO_RISCV_ISA_RVM
+	bool "Integer Multiplication and Division (M)"
+
+config LINGMO_RISCV_ISA_RVA
+	bool "Atomic Instructions (A)"
+
+config LINGMO_RISCV_ISA_RVF
+	bool "Single-precision Floating-point (F)"
+
+config LINGMO_RISCV_ISA_RVD
+	bool "Double-precision Floating-point (D)"
+	depends on LINGMO_RISCV_ISA_RVF
+
+config LINGMO_RISCV_ISA_RVC
+	bool "Compressed Instructions (C)"
+
+config LINGMO_RISCV_ISA_RVV
+	bool "Vector Instructions (V)"
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_12
+
+choice
+	prompt "Target Architecture Size"
+	default LINGMO_RISCV_64
+
+config LINGMO_RISCV_32
+	bool "32-bit"
+	select LINGMO_USE_MMU
+
+config LINGMO_RISCV_64
+	bool "64-bit"
+	select LINGMO_ARCH_IS_64
+
+endchoice
+
+config LINGMO_RISCV_USE_MMU
+	bool "MMU support"
+	default y
+	depends on LINGMO_RISCV_64
+	select LINGMO_USE_MMU
+	help
+	  Enable this option if your RISC-V core has a MMU (Memory
+	  Management Unit).
+
+choice
+	prompt "Target ABI"
+	default LINGMO_RISCV_ABI_ILP32D if !LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVD
+	default LINGMO_RISCV_ABI_ILP32F if !LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVF
+	default LINGMO_RISCV_ABI_ILP32  if !LINGMO_ARCH_IS_64
+	default LINGMO_RISCV_ABI_LP64D  if LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVD
+	default LINGMO_RISCV_ABI_LP64F  if LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVF
+	default LINGMO_RISCV_ABI_LP64   if LINGMO_ARCH_IS_64
+
+config LINGMO_RISCV_ABI_ILP32
+	bool "ilp32"
+	depends on !LINGMO_ARCH_IS_64
+
+config LINGMO_RISCV_ABI_ILP32F
+	bool "ilp32f"
+	depends on !LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVF
+
+config LINGMO_RISCV_ABI_ILP32D
+	bool "ilp32d"
+	depends on !LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVD
+
+config LINGMO_RISCV_ABI_LP64
+	bool "lp64"
+	depends on LINGMO_ARCH_IS_64
+
+config LINGMO_RISCV_ABI_LP64F
+	bool "lp64f"
+	depends on LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVF
+	depends on LINGMO_USE_MMU
+
+config LINGMO_RISCV_ABI_LP64D
+	bool "lp64d"
+	depends on LINGMO_ARCH_IS_64 && LINGMO_RISCV_ISA_RVD
+endchoice
+
+config LINGMO_ARCH
+	default "riscv32" if !LINGMO_ARCH_IS_64
+	default "riscv64" if LINGMO_ARCH_IS_64
+
+config LINGMO_NORMALIZED_ARCH
+	default "riscv"
+
+config LINGMO_ENDIAN
+	default "LITTLE"
+
+config LINGMO_GCC_TARGET_ABI
+	default "ilp32" if LINGMO_RISCV_ABI_ILP32
+	default "ilp32f" if LINGMO_RISCV_ABI_ILP32F
+	default "ilp32d" if LINGMO_RISCV_ABI_ILP32D
+	default "lp64" if LINGMO_RISCV_ABI_LP64
+	default "lp64f" if LINGMO_RISCV_ABI_LP64F
+	default "lp64d" if LINGMO_RISCV_ABI_LP64D
+
+config LINGMO_READELF_ARCH_NAME
+	default "RISC-V"
+
+# vim: ft=kconfig
+# -*- mode:kconfig; -*-

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_CHECKPOLICY
+	bool "checkpolicy"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libselinux
+	depends on !LINGMO_STATIC_LIBS # libselinux
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # libselinux -> libsepol
+	select LINGMO_PACKAGE_LIBSELINUX
+	select LINGMO_PACKAGE_FLEX
+	help
+	  checkpolicy is the SELinux policy compiler. It uses libsepol
+	  to generate the binary policy. checkpolicy uses the static
+	  libsepol since it deals with low level details of the policy
+	  that have not been encapsulated/abstracted by a proper
+	  shared library interface.
+
+	  http://selinuxproject.org/page/Main_Page
+
+comment "checkpolicy needs a toolchain w/ threads, dynamic library, gcc >= 5"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5

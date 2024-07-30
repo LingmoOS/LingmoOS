@@ -1,0 +1,35 @@
+comment "multipath-tools needs udev and a toolchain w/ threads, dynamic library, C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_PACKAGE_HAS_UDEV || !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_MULTIPATH_TOOLS
+	bool "multipath-tools"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_INSTALL_LIBSTDCPP # liburcu
+	select LINGMO_PACKAGE_JSON_C
+	select LINGMO_PACKAGE_LIBURCU
+	select LINGMO_PACKAGE_LIBAIO
+	select LINGMO_PACKAGE_LVM2
+	select LINGMO_PACKAGE_LVM2_STANDARD_INSTALL
+	select LINGMO_PACKAGE_READLINE
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBS
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	help
+	  This package provides the following binaries to drive
+	  the Device Mapper multipathing driver:
+	    * multipath - Device mapper target autoconfig.
+	    * multipathd - Multipath daemon.
+	    * mpathpersist - Manages SCSI persistent reservations on
+	      dm multipath devices.
+	    * kpartx - Create device maps from partition tables.
+
+	  https://github.com/openSUSE/multipath-tools

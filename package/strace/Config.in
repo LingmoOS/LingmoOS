@@ -1,0 +1,33 @@
+config LINGMO_PACKAGE_STRACE
+	bool "strace"
+	# needs at least kernel headers 4.0 on nios2
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_0 || !LINGMO_nios2
+	# needs at least kernel headers 5.0 on xtensa
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0 || !LINGMO_xtensa
+	# needs at least kernel headers 5.0 on musl aarch64
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0 || \
+		!(LINGMO_aarch64 || LINGMO_aarch64_be) || \
+		!LINGMO_TOOLCHAIN_USES_MUSL
+	depends on !LINGMO_RISCV_32
+	help
+	  A useful diagnostic, instructional, and debugging tool.
+	  Allows you to track what system calls a program makes
+	  while it is running.
+
+	  If you want 'strace -k' to work, make sure to enable the
+	  'libunwind' package.
+
+	  https://strace.io
+
+comment "strace needs a toolchain w/ headers >= 4.0 on nios2"
+	depends on LINGMO_nios2
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_0
+
+comment "strace needs a toolchain w/ headers >= 5.0 on xtensa"
+	depends on LINGMO_xtensa
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0
+
+comment "strace needs a musl toolchain w/ headers >= 5.0 on aarch64"
+	depends on LINGMO_aarch64 || LINGMO_aarch64_be
+	depends on LINGMO_TOOLCHAIN_USES_MUSL
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0

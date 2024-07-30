@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_SYSLOG_NG
+	bool "syslog-ng"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  syslog-ng is an enhanced log daemon, supporting a wide range
+	  of input and output methods: syslog, unstructured text,
+	  queueing, SQL & NoSQL
+
+	  https://www.syslog-ng.com/products/open-source-log-management/
+
+comment "syslog-ng needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS

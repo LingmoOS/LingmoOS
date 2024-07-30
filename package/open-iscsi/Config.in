@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_OPEN_ISCSI
+	bool "open-iscsi"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # pthread
+	depends on !LINGMO_STATIC_LIBS # kmod
+	select LINGMO_PACKAGE_KMOD
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPEN_ISNS
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	help
+	  iSCSI tools for Linux.
+
+	  https://www.open-iscsi.com
+
+comment "open-iscsi needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

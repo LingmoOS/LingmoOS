@@ -1,0 +1,12 @@
+config LINGMO_PACKAGE_MDADM
+	bool "mdadm"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Utility for managing Linux Software RAID arrays.
+
+	  https://raid.wiki.kernel.org/index.php/A_guide_to_mdadm
+
+comment "mdadm needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU

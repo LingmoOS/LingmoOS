@@ -1,0 +1,53 @@
+# criu only builds on certain architectures
+config LINGMO_PACKAGE_CRIU_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_ARM_CPU_ARMV6
+	default y if LINGMO_ARM_CPU_ARMV7A
+	default y if LINGMO_ARM_CPU_ARMV7M
+	default y if LINGMO_ARM_CPU_ARMV8A && !LINGMO_aarch64_be
+	default y if LINGMO_aarch64
+	default y if LINGMO_x86_64
+	default y if LINGMO_powerpc64le # Only support powerpc64 with LE
+	# CRIU has "some" support for s390 but it is not included due to
+	# BE/LE endian issues.
+	depends on LINGMO_USE_MMU # libcap
+	depends on LINGMO_PACKAGE_HOST_PROTOBUF_ARCH_SUPPORTS # protobuf-c
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_LIBBSD_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_CRIU
+	bool "criu"
+	depends on LINGMO_PACKAGE_CRIU_ARCH_SUPPORTS
+	depends on LINGMO_HOST_GCC_AT_LEAST_7 # protobuf-c
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # -march=armv7-a+fp
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_18 # rseq.h
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # no aio.h
+	depends on !LINGMO_STATIC_LIBS # protobuf, libbsd
+	depends on LINGMO_INSTALL_LIBSTDCPP # protobuf
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # protobuf, libnl
+	depends on LINGMO_USE_WCHAR # libbsd
+	select LINGMO_PACKAGE_HOST_PYTHON3
+	select LINGMO_PACKAGE_HOST_PYTHON3_SSL
+	select LINGMO_PACKAGE_PROTOBUF
+	select LINGMO_PACKAGE_PROTOBUF_C
+	select LINGMO_PACKAGE_LIBAIO
+	select LINGMO_PACKAGE_LIBBSD
+	select LINGMO_PACKAGE_LIBCAP
+	select LINGMO_PACKAGE_LIBNET
+	select LINGMO_PACKAGE_LIBNL
+	select LINGMO_PACKAGE_PYTHON3
+	help
+	  Checkpoint/Restore In Userspace (CRIU), is a software
+	  tool for the Linux operating system to make it possible
+	  to freeze a running application and checkpoint it to
+	  persistent storage as a collection of files.
+
+	  https://criu.org/Main_Page
+
+comment "criu needs a glibc or musl toolchain w/ threads, host gcc >= 7, gcc >= 8, headers >= 4.18, C++, dynamic library, wchar"
+	depends on LINGMO_PACKAGE_CRIU_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_18 \
+		|| LINGMO_TOOLCHAIN_USES_UCLIBC || !LINGMO_INSTALL_LIBSTDCPP \
+		|| LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+		|| LINGMO_HOST_GCC_AT_LEAST_7

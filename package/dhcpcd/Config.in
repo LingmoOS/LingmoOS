@@ -1,0 +1,28 @@
+comment "dhcpcd needs a toolchain w/ headers >= 3.1"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_1
+
+config LINGMO_PACKAGE_DHCPCD
+	bool "dhcpcd"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_1 # sa_family_t in linux/socket.h
+	help
+	  An RFC2131 compliant DHCP client
+
+	  http://roy.marples.name/projects/dhcpcd/
+
+if LINGMO_PACKAGE_DHCPCD
+
+config LINGMO_PACKAGE_DHCPCD_ENABLE_PRIVSEP
+	bool
+	default y
+	depends on LINGMO_USE_MMU
+	# Audit headers were only added in recent kernels for some arches
+	depends on !(LINGMO_arceb || LINGMO_arcle) || \
+		LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_2
+	depends on !(LINGMO_microblazeel || LINGMO_microblazebe) || \
+		LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+	depends on !LINGMO_nios2 || LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_2
+	depends on !LINGMO_or1k || LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_7
+	depends on !LINGMO_sh || LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_7
+	depends on !LINGMO_xtensa || LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_0
+
+endif

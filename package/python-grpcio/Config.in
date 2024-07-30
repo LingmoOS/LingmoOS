@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_PYTHON_GRPCIO_ARCH_SUPPORTS
+	bool
+	# see third_party/boringssl-with-bazel/src/include/openssl/target.h
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_riscv
+
+config LINGMO_PACKAGE_PYTHON_GRPCIO
+	bool "python-grpcio"
+	depends on LINGMO_PACKAGE_PYTHON_GRPCIO_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  HTTP/2-based RPC framework.
+
+	  https://grpc.io
+
+comment "python-grpcio needs a toolchain w/ C++"
+	depends on LINGMO_PACKAGE_PYTHON_GRPCIO_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP

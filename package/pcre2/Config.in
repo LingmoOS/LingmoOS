@@ -1,0 +1,44 @@
+config LINGMO_PACKAGE_PCRE2
+	bool "pcre2"
+	help
+	  Perl Compatible Regular Expressions. By default, only the
+	  8-bits libpcre2 is built. To get the 16-bits and/or 32-bits
+	  variants libpcre2-16/libpcre2-32, use the package
+	  sub-options.
+
+	  http://www.pcre.org/
+
+if LINGMO_PACKAGE_PCRE2
+
+config LINGMO_PACKAGE_PCRE2_16
+	bool "16-bit pcre2"
+	help
+	  This option builds the 16-bits pcre2 library, i.e
+	  'libpcre2-16'
+
+config LINGMO_PACKAGE_PCRE2_32
+	bool "32-bit pcre2"
+	help
+	  This option builds the 32-bits pcre2 library, i.e
+	  'libpcre2-32'
+
+config LINGMO_PACKAGE_PCRE2_JIT_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_powerpc
+
+config LINGMO_PACKAGE_PCRE2_JIT
+	bool "enable JIT support"
+	depends on LINGMO_PACKAGE_PCRE2_JIT_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  This option enables JIT support
+
+comment "JIT support needs a toolchain w/ threads"
+	depends on LINGMO_PACKAGE_PCRE2_JIT_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif

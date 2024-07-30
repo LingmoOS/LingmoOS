@@ -1,0 +1,41 @@
+config LINGMO_PACKAGE_GNUTLS
+	bool "gnutls"
+	# https://gitlab.com/gnutls/gnutls/issues/203
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LIBTASN1
+	select LINGMO_PACKAGE_LIBUNISTRING
+	select LINGMO_PACKAGE_NETTLE
+	help
+	  GnuTLS is a secure communications library implementing the SSL
+	  and TLS protocols and technologies around them.
+
+	  https://www.gnutls.org/
+
+if LINGMO_PACKAGE_GNUTLS
+
+config LINGMO_PACKAGE_GNUTLS_OPENSSL
+	bool "OpenSSL compatibility library"
+	help
+	  Install OpenSSL compatibility library.
+
+config LINGMO_PACKAGE_GNUTLS_TOOLS
+	bool "install tools"
+	help
+	  Install GnuTLS command line tools for various cryptographic
+	  tasks.
+
+config LINGMO_PACKAGE_GNUTLS_ENABLE_SSL2
+	bool "enable SSLv2"
+	help
+	  Enable SSLv2 protocol.
+
+config LINGMO_PACKAGE_GNUTLS_ENABLE_GOST
+	bool "enable GOST"
+	help
+	  Enable GOST cipher.
+
+endif
+
+comment "gnutls needs a toolchain w/ wchar, dynamic library"
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS

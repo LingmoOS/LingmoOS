@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBHTTPSERVER
+	bool "libhttpserver"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBMICROHTTPD
+	help
+	  libhttpserver is a C++ library for building high performance
+	  RESTfuls web servers. libhttpserver is built upon
+	  libmicrohttpd to provide a simple API for developers to
+	  create HTTP services in C++.
+
+	  https://github.com/etr/libhttpserver
+
+comment "libhttpserver needs a toolchain w/ C++, threads, gcc >= 7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

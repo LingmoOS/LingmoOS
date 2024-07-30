@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_DUMA
+	bool "duma"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	# By design, duma uses page mapping to isolate
+	# allocations. Non-MMU platforms cannot perform such
+	# things.
+	depends on LINGMO_USE_MMU
+	# duma works using LD_PRELOAD, so it always needs to build a
+	# shared library
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  D.U.M.A. - Detect Unintended Memory Access. A fork of the
+	  Electric Fence library. Detects buffer overflow and
+	  underflow, and also memory leaks.
+
+	  https://github.com/johnsonjh/duma
+
+if LINGMO_PACKAGE_DUMA
+
+config LINGMO_PACKAGE_DUMA_NO_LEAKDETECTION
+	bool "disable memory leak detection"
+
+endif # LINGMO_PACKAGE_DUMA
+
+comment "duma needs a toolchain w/ C++, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

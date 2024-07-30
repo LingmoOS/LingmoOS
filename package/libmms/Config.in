@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_LIBMMS
+	bool "libmms"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  LibMMS is a common library for parsing mms:// and mmsh://
+	  type network streams. These are commonly used to stream
+	  Windows Media Video content over the web. LibMMS itself is
+	  only for receiving MMS stream, it doesn't handle sending at
+	  all.
+
+	  http://launchpad.net/libmms
+
+comment "libmms needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

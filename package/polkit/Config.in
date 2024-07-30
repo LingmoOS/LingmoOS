@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_POLKIT
+	bool "polkit"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2, dbus
+	depends on LINGMO_USE_MMU # libglib2, dbus
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on !LINGMO_STATIC_LIBS # duktape
+	depends on !LINGMO_OPTIMIZE_FAST # duktape
+	select LINGMO_PACKAGE_DBUS # runtime
+	select LINGMO_PACKAGE_DUKTAPE
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  PolicyKit is a toolkit for defining and handling
+	  authorizations. It is used for allowing unprivileged
+	  processes to speak to privileged processes.
+
+	  http://www.freedesktop.org/wiki/Software/polkit
+
+comment "polkit needs a toolchain with dynamic library, wchar, threads, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "polkit can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST

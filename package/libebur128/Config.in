@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_LIBEBUR128
+	bool "libebur128"
+	# build system has no support to disable shared linking
+	# leading to a build error with a static-only toolchain
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  libebur128 is a library that implements the EBU R 128 standard
+	  for loudness normalization.
+
+	  https://github.com/jiixyj/libebur128
+
+comment "libebur128 needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS

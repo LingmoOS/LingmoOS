@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_RE2
+	bool "re2"
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++14
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS # libabseil-cpp
+	select LINGMO_PACKAGE_LIBABSEIL_CPP
+	help
+	  RE2 is a fast, safe, thread-friendly alternative
+	  to backtracking regular expression engines like
+	  those used in PCRE, Perl, and Python.
+	  It is a C++ library.
+
+	  https://github.com/google/re2
+
+comment "re2 needs a toolchain w/ C++, threads, dynamic library, gcc >= 8"
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8

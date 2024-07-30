@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_HAPROXY_ARCH_SUPPORTS
+	bool
+	default y
+	# src/proto_http.c:6330:1: internal compiler error: Segmentation fault
+	depends on !LINGMO_nios2
+	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60040
+	depends on !(LINGMO_sh4 && !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7)
+
+config LINGMO_PACKAGE_HAPROXY
+	bool "haproxy"
+	depends on LINGMO_PACKAGE_HAPROXY_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 && LINGMO_TOOLCHAIN_HAS_SYNC_4
+	help
+	  HAProxy is a free, very fast and reliable solution offering
+	  high availability, load balancing, and proxying for TCP and
+	  HTTP-based applications.
+
+	  http://www.haproxy.org

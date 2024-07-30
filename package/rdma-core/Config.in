@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_RDMA_CORE
+	bool "rdma-core"
+	depends on LINGMO_USE_MMU # fork() used in rstream example
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4  # iproute2
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	select LINGMO_PACKAGE_IPROUTE2  # runtime
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  This is the userspace components for the Linux Kernel's
+	  drivers/infiniband subsystem.
+
+	  https://github.com/linux-rdma/rdma-core
+
+comment "rdma-core needs a toolchain w/ headers >= 3.4, NPTL, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS

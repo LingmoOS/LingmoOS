@@ -1,0 +1,46 @@
+config LINGMO_PACKAGE_MODEM_MANAGER
+	bool "modem-manager"
+	depends on LINGMO_USE_WCHAR # libglib2 and gnutls
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus, libglib2
+	depends on LINGMO_USE_MMU # dbus
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBGUDEV if LINGMO_PACKAGE_HAS_UDEV
+	help
+	  ModemManager is a DBus-activated daemon which controls mobile
+	  broadband (2G/3G/4G) devices and connections.
+
+	  http://www.freedesktop.org/wiki/Software/ModemManager/
+
+if LINGMO_PACKAGE_MODEM_MANAGER
+
+config LINGMO_PACKAGE_MODEM_MANAGER_LIBMBIM
+	bool "MBIM support"
+	select LINGMO_PACKAGE_LIBMBIM
+	help
+	  This option enables support for MBIM protocol
+
+config LINGMO_PACKAGE_MODEM_MANAGER_LIBQMI
+	bool "QMI support"
+	select LINGMO_PACKAGE_LIBQMI
+	help
+	  This option enables support for QMI protocol
+
+config LINGMO_PACKAGE_MODEM_MANAGER_LIBQRTR
+	bool "QRTR support"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_15 # libqrtr-glib
+	select LINGMO_PACKAGE_LIBQRTR_GLIB
+	select LINGMO_PACKAGE_MODEM_MANAGER_LIBQMI
+	help
+	  This option enables support for QRTR protocol
+
+comment "QRTR support needs a toolchain w/ headers >= 4.15"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_15
+
+endif
+
+comment "modemmanager needs a toolchain w/ wchar, threads, dynamic library"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU

@@ -1,0 +1,43 @@
+config LINGMO_PACKAGE_NEON
+	bool "libneon"
+	help
+	  HTTP and WebDAV client library, with a C interface.
+
+	  https://notroj.github.io/neon/
+
+if LINGMO_PACKAGE_NEON
+
+config LINGMO_PACKAGE_NEON_ZLIB
+	bool "ZLIB support"
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  build with ZLIB support
+
+config LINGMO_PACKAGE_NEON_SSL
+	bool "SSL support"
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD4 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  build with SSL support
+
+# This is an hidden symbol other packages can select to ensure that
+# Neon has XML support, either provided by Expat or libxml2.
+config LINGMO_PACKAGE_NEON_XML
+	bool
+	select LINGMO_PACKAGE_NEON_EXPAT if !LINGMO_PACKAGE_NEON_LIBXML2
+
+config LINGMO_PACKAGE_NEON_EXPAT
+	bool "XML support with expat"
+	depends on !LINGMO_PACKAGE_NEON_LIBXML2
+	select LINGMO_PACKAGE_EXPAT
+	help
+	  Enable XML support in neon, using the Expat XML library.
+
+config LINGMO_PACKAGE_NEON_LIBXML2
+	bool "XML support with libxml2"
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  Enable XML support in neon, using the libxml2 XML library.
+
+endif

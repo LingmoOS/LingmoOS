@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_TBB
+	bool "tbb"
+	# tbb needs fenv.h which is not provided by uclibc
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	help
+	  Intel(R) Threading Building Blocks (Intel(R) TBB) lets you
+	  easily write parallel C++ programs that take full advantage
+	  of multicore performance, that are portable, composable and
+	  have future-proof scalability.
+
+	  https://www.threadingbuildingblocks.org/
+
+comment "tbb needs a glibc or musl toolchain w/ dynamic library, threads, C++"
+	depends on LINGMO_TOOLCHAIN_USES_UCLIBC || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP
+
+comment "tbb needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

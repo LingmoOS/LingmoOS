@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_NERDCTL
+	bool "nerdctl"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # containerd
+	depends on LINGMO_USE_MMU # util-linux
+	select LINGMO_PACKAGE_CONTAINERD # runtime
+	help
+	  Docker-compatible CLI for containerd, controlling runc.
+
+	  https://github.com/containerd/nerdctl
+
+comment "nerdctl needs a glibc or musl toolchain w/ threads"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_USES_UCLIBC

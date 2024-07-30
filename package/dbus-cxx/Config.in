@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_DBUS_CXX
+	bool "dbus-cxx"
+	depends on LINGMO_USE_MMU # dbus
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # libsigc
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_DBUS # runtime
+	select LINGMO_PACKAGE_LIBSIGC
+	help
+	  DBus-cxx is a C++ implementation for DBus. DBus is a
+	  Linux-specific RPC (remote procedure call) and
+	  IPC (inter-process communications) mechanism.
+	  DBus-cxx provides an object-oriented view of all programs
+	  on the DBus, and allows an object-oriented way of
+	  exporting methods onto the DBus.
+
+	  https://dbus-cxx.github.io/
+
+comment "dbus-cxx needs a toolchain w/ C++, threads, gcc >= 7 and dynamic library support"
+	depends on LINGMO_USE_MMU # dbus
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

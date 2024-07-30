@@ -1,0 +1,59 @@
+config LINGMO_PACKAGE_DOCKER_ENGINE
+	bool "docker-engine"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # containerd -> runc
+	depends on LINGMO_USE_MMU # containerd
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS # libseccomp
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17 # libseccomp
+	select LINGMO_PACKAGE_CGROUPFS_MOUNT if !LINGMO_PACKAGE_SYSTEMD # runtime dependency
+	select LINGMO_PACKAGE_CONTAINERD # runtime dependency
+	select LINGMO_PACKAGE_IPTABLES # runtime dependency
+	select LINGMO_PACKAGE_LIBSECCOMP
+	help
+	  Docker is a platform to build, ship,
+	  and run applications as lightweight containers.
+
+	  https://github.com/docker/docker
+
+if LINGMO_PACKAGE_DOCKER_ENGINE
+
+config LINGMO_PACKAGE_DOCKER_ENGINE_DRIVER_BTRFS
+	bool "btrfs filesystem driver"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12
+	help
+	  Build the btrfs filesystem driver for Docker.
+
+comment "brtfs filesystem driver needs headers >= 4.12"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12
+
+config LINGMO_PACKAGE_DOCKER_ENGINE_DRIVER_DEVICEMAPPER
+	bool "devicemapper filesystem driver"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # lvm2
+	depends on LINGMO_USE_MMU # lvm2
+	depends on !LINGMO_STATIC_LIBS # lvm2
+	select LINGMO_PACKAGE_LVM2
+	help
+	  Build the devicemapper filesystem driver for Docker.
+
+config LINGMO_PACKAGE_DOCKER_ENGINE_DRIVER_VFS
+	bool "vfs filesystem driver"
+	depends on LINGMO_USE_WCHAR # gvfs
+	depends on LINGMO_USE_MMU # gvfs
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # gvfs
+	depends on !LINGMO_STATIC_LIBS # gvfs
+	select LINGMO_PACKAGE_GVFS
+	help
+	  Build the vfs filesystem driver for Docker.
+
+endif
+
+comment "docker-engine needs a glibc or musl toolchain w/ threads, headers >= 3.17"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_TOOLCHAIN_USES_UCLIBC || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17
+	depends on LINGMO_USE_MMU

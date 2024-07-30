@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_GUILE
+	bool "guile"
+	depends on LINGMO_USE_MMU # bdwgc
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # no strtol_l
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS # bdwgc
+	depends on LINGMO_USE_WCHAR # libunistring
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBUNISTRING
+	select LINGMO_PACKAGE_LIBFFI
+	select LINGMO_PACKAGE_GMP
+	select LINGMO_PACKAGE_BDWGC
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  Guile is an interpreter and compiler for the Scheme
+	  programming language, a clean and elegant dialect of Lisp.
+
+	  http://www.gnu.org/software/guile
+
+comment "guile needs a uClibc or glibc toolchain w/ threads, wchar, dynamic library"
+	depends on LINGMO_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		LINGMO_STATIC_LIBS || LINGMO_TOOLCHAIN_USES_MUSL

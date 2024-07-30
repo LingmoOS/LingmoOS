@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_CCTZ
+	bool "cctz"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	select LINGMO_TARGET_TZ_INFO # runtime dependency
+	help
+	  CCTZ is a C++ library for translating between absolute
+	  and civil times using the rules of a time zone.
+
+	  https://github.com/google/cctz
+
+if LINGMO_PACKAGE_CCTZ
+
+config LINGMO_PACKAGE_CCTZ_INSTALL_TOOLS
+	bool "Install tools"
+	help
+	  This option allows installing CCTZ tools.
+
+config LINGMO_PACKAGE_CCTZ_INSTALL_EXAMPLES
+	bool "Install example programs"
+	help
+	  This option allows installing CCTZ example programs.
+
+endif
+
+comment "cctz needs a toolchain w/ C++, threads, gcc >= 4.8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8

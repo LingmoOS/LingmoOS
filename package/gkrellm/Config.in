@@ -1,0 +1,43 @@
+config LINGMO_PACKAGE_GKRELLM
+	bool "gkrellm"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_GKRELLM_SERVER if !LINGMO_PACKAGE_GKRELLM_CLIENT
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  GKrellM is a single process stack of system monitors which
+	  supports applying themes to match its appearance to your
+	  window manager, Gtk, or any other theme.
+
+	  http://gkrellm.srcbox.net/
+
+if LINGMO_PACKAGE_GKRELLM
+
+config LINGMO_PACKAGE_GKRELLM_SERVER
+	bool "server"
+	help
+	  Enable gkrellm server.
+
+config LINGMO_PACKAGE_GKRELLM_CLIENT
+	bool "client"
+	depends on LINGMO_PACKAGE_XORG7 # libgtk2
+	depends on LINGMO_INSTALL_LIBSTDCPP # libgtk2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libgtk2
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # libgtk2
+	select LINGMO_PACKAGE_LIBGTK2
+	select LINGMO_PACKAGE_XLIB_LIBSM
+	help
+	  Enable gkrellm client.
+
+comment "client needs a toolchain w/ C++, gcc >= 4.8"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_XORG7
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+
+endif # LINGMO_PACKAGE_GKRELLM
+
+comment "gkrellm needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

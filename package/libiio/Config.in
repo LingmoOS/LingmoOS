@@ -1,0 +1,98 @@
+config LINGMO_PACKAGE_LIBIIO
+	bool "libiio"
+	select LINGMO_PACKAGE_LIBIIO_LOCAL_BACKEND if !LINGMO_PACKAGE_LIBIIO_XML_BACKEND
+	help
+	  Libiio is a library to ease the development of software
+	  interfacing Linux Industrial I/O (IIO) devices.
+
+	  http://wiki.analog.com/resources/tools-software/linux-software/libiio
+
+if LINGMO_PACKAGE_LIBIIO
+
+config LINGMO_PACKAGE_LIBIIO_LOCAL_BACKEND
+	bool "Local backend"
+	default y
+	help
+	  Enable the local backend of the library.
+
+config LINGMO_PACKAGE_LIBIIO_XML_BACKEND
+	bool "XML backend"
+	default y
+	select LINGMO_PACKAGE_LIBXML2
+	help
+	  Enable the XML backend of the library.
+
+config LINGMO_PACKAGE_LIBIIO_NETWORK_BACKEND
+	bool "Network backend"
+	default y
+	select LINGMO_PACKAGE_LIBIIO_XML_BACKEND
+	help
+	  Enable the network backend of the library.
+
+config LINGMO_PACKAGE_LIBIIO_USB_BACKEND
+	bool "USB backend"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libusb
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	select LINGMO_PACKAGE_LIBIIO_XML_BACKEND
+	select LINGMO_PACKAGE_LIBUSB
+	help
+	  Enable the USB backend of the library.
+
+comment "The USB backend needs a toolchain w/ threads, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_LIBIIO_SERIAL_BACKEND
+	bool "Serial backend"
+	default y
+	select LINGMO_PACKAGE_LIBIIO_XML_BACKEND
+	select LINGMO_PACKAGE_LIBSERIALPORT
+	help
+	  Enable the serial backend of the library.
+
+config LINGMO_PACKAGE_LIBIIO_IIOD
+	bool "IIO Daemon"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBIIO_LOCAL_BACKEND
+	help
+	  Install the IIO Daemon.
+
+config LINGMO_PACKAGE_LIBIIO_IIOD_USBD
+	bool "USB support in the IIO Daemon (FunctionFS)"
+	depends on LINGMO_PACKAGE_LIBIIO_IIOD
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18 # usb_functionfs_descs_head_v2
+	select LINGMO_PACKAGE_LIBAIO
+	help
+	  Add support for USB through FunctionFS with IIOD.
+
+comment "USB support in the IIO Daemon requires headers >= 3.18"
+	depends on LINGMO_PACKAGE_LIBIIO_IIOD
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+comment "IIO Daemon needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_LIBIIO_TESTS
+	bool "Install test programs"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  Install the test programs (iio_info, iio_genxml, iio_readdev).
+
+comment "IIO test programs need a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_LIBIIO_BINDINGS_CSHARP
+	bool "Install C# bindings"
+	depends on LINGMO_PACKAGE_MONO
+	help
+	  Install the C# bindings.
+
+config LINGMO_PACKAGE_LIBIIO_BINDINGS_PYTHON
+	bool "Install Python bindings"
+	depends on LINGMO_PACKAGE_PYTHON3
+	help
+	  Install the Python bindings.
+
+endif

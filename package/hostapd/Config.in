@@ -1,0 +1,116 @@
+config LINGMO_PACKAGE_HOSTAPD
+	bool "hostapd"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD4 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  User space daemon for wireless access points.
+
+	  It implements IEEE 802.11 access point management,
+	  IEEE 802.1X/WPA/WPA2/EAP authenticators, RADIUS client,
+	  EAP server and RADIUS authentication server.
+
+	  http://w1.fi/hostapd/
+
+if LINGMO_PACKAGE_HOSTAPD
+
+config LINGMO_PACKAGE_HOSTAPD_DRIVER_HOSTAP
+	bool "Enable hostap driver"
+	default y
+	select LINGMO_PACKAGE_HOSTAPD_HAS_WIFI_DRIVERS
+	help
+	  Enable support for Host AP driver.
+
+config LINGMO_PACKAGE_HOSTAPD_DRIVER_NL80211
+	bool "Enable nl80211 driver"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnl
+	select LINGMO_PACKAGE_LIBNL
+	select LINGMO_PACKAGE_HOSTAPD_HAS_WIFI_DRIVERS
+	help
+	  Enable support for drivers using the nl80211 kernel interface.
+
+comment "nl80211 driver needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_HOSTAPD_DRIVER_WIRED
+	bool "Enable wired driver"
+	help
+	  Enable support for wired authenticator.
+
+config LINGMO_PACKAGE_HOSTAPD_DRIVER_NONE
+	bool
+	default y
+	depends on !LINGMO_PACKAGE_HOSTAPD_DRIVER_HOSTAP
+	depends on !LINGMO_PACKAGE_HOSTAPD_DRIVER_NL80211
+	depends on !LINGMO_PACKAGE_HOSTAPD_DRIVER_WIRED
+
+config LINGMO_PACKAGE_HOSTAPD_HAS_WIFI_DRIVERS
+	bool
+
+config LINGMO_PACKAGE_HOSTAPD_ACS
+	bool "Enable ACS"
+	default y
+	depends on LINGMO_PACKAGE_HOSTAPD_DRIVER_NL80211
+	help
+	  Enable support for standard ACS (Automatic Channel Selection).
+	  Some propietary drivers use a custom algorithm which requires
+	  channel to be set to '0' (which enables ACS in the config),
+	  causing hostapd to use the standard one which doesn't work
+	  for those cases.
+
+comment "ACS is currently only supported through the nl80211 driver"
+	depends on !LINGMO_PACKAGE_HOSTAPD_DRIVER_NL80211
+
+config LINGMO_PACKAGE_HOSTAPD_EAP
+	bool "Enable EAP"
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Enable support for EAP and RADIUS.
+
+comment "hostapd EAP needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_HOSTAPD_WPS
+	bool "Enable WPS"
+	help
+	  Enable support for Wi-Fi Protected Setup.
+
+config LINGMO_PACKAGE_HOSTAPD_WPA3
+	bool "Enable WPA3 support"
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	help
+	  Enable WPA3 support including OWE, SAE, DPP
+
+config LINGMO_PACKAGE_HOSTAPD_VLAN
+	bool "Enable VLAN support"
+	default y
+	help
+	  Enable support for VLANs.
+
+if LINGMO_PACKAGE_HOSTAPD_VLAN
+
+config LINGMO_PACKAGE_HOSTAPD_VLAN_DYNAMIC
+	bool "Enable dynamic VLAN support"
+	default y
+	help
+	  Enable support for fully dynamic VLANs.
+	  This enables hostapd to automatically create
+	  bridge and VLAN interfaces if necessary.
+
+config LINGMO_PACKAGE_HOSTAPD_VLAN_NETLINK
+	bool "Use netlink-based API for VLAN operations"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnl
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  Use netlink-based kernel API for VLAN operations
+	  instead of ioctl().
+
+comment "netlink-based VLAN support needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif # LINGMO_PACKAGE_HOSTAPD_VLAN
+
+endif

@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_UFTP
+	bool "uftp"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	help
+	  Encrypted UDP based FTP with multicast.
+
+	  http://uftp-multicast.sourceforge.net/
+
+comment "uftp needs a toolchain w/ threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR

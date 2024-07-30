@@ -1,0 +1,41 @@
+config LINGMO_PACKAGE_LINPHONE
+	bool "linphone"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # belle-sip, mediastreamer
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # belr, belle-sip, mediastreamer
+	# belr, belle-sip, mediastreamer
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735
+	depends on LINGMO_USE_WCHAR # belle-sip
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # mediastreamer
+	select LINGMO_PACKAGE_BELLE_SIP
+	select LINGMO_PACKAGE_BELR
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_MEDIASTREAMER
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  Linphone is an internet phone or Voice Over IP phone (VoIP).
+
+	  With linphone you can communicate freely with people over
+	  the internet, with voice, video, and text instant messaging.
+	  Linphone makes use of the SIP protocol, an open standard
+	  for internet telephony. You can use Linphone with any SIP
+	  VoIP operator, including our free SIP audio/video service.
+	  linphone is free-software (or open-source), you can download
+	  and redistribute it freely.
+	  Linphone is available for desktop computers: Linux, Windows,
+	  MacOSX, and for mobile phones: Android, iPhone, Blackberry.
+
+	  Linphone support in Buildroot is limited to the commandline
+	  client, linphonec, and video support is not enabled.
+
+	  http://www.linphone.org/
+
+comment "linphone needs a toolchain w/ threads, C++, dynamic library, wchar, gcc >= 5"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+
+comment "linphone needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

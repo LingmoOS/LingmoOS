@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_TPM2_ABRMD
+	bool "tpm2-abrmd"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on !LINGMO_STATIC_LIBS # tpm2-tss
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_TPM2_TSS
+	help
+	  A system daemon implementing the TPM2 access broker (TAB) &
+	  Resource Manager (RM) spec from the TCG. It should be started
+	  during the OS boot process. Communication between the daemon
+	  and clients using the TPM is done with a combination of DBus
+	  and Unix pipes.
+
+	  The package also provides a client library for interacting
+	  with the daemon via TPM Command Transmission Interface (TCTI).
+	  It is intended for use with the SAPI library (libtss2-sys)
+	  like any other TCTI.
+
+	  https://github.com/tpm2-software/tpm2-abrmd
+
+comment "tpm2-abrmd needs a toolchain w/ dynamic library, wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

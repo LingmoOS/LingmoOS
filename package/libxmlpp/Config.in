@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_LIBXMLPP
+	bool "libxml++"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # glibmm -> libsigc
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # glibmm -> libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glibmm -> libglib2
+	depends on LINGMO_USE_MMU # glibmm -> libglib2
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_GLIBMM
+	help
+	  libxml++ is a C++ wrapper for the libxml XML parser library.
+
+	  https://libxmlplusplus.github.io/libxmlplusplus/
+
+comment "libxml++ needs a toolchain w/ C++, wchar, threads, gcc >= 7"
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 || !LINGMO_USE_WCHAR \
+		||!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU

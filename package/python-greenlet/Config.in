@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_PYTHON_GREENLET_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_aarch64
+	default y if LINGMO_m68k
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	default y if LINGMO_riscv
+	default y if LINGMO_sparc || LINGMO_sparc64
+	default y if LINGMO_i386 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_PYTHON_GREENLET
+	bool "python-greenlet"
+	depends on LINGMO_PACKAGE_PYTHON_GREENLET_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  Lightweight in-process concurrent programming.
+
+	  https://github.com/python-greenlet/greenlet
+
+comment "python-greenlet needs a toolchain w/ C++"
+	depends on LINGMO_PACKAGE_PYTHON_GREENLET_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP

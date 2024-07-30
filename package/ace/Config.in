@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_ACE
+	bool "ace"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++14
+	help
+	  The ADAPTIVE Communication Environment (ACE(TM))
+	  An OO Network Programming Toolkit in C++.
+
+	  http://www.dre.vanderbilt.edu/~schmidt/ACE.html
+
+comment "ACE needs a glibc toolchain, dynamic library, C++, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_STATIC_LIBS || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

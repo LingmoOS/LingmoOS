@@ -1,0 +1,34 @@
+config LINGMO_PACKAGE_GERBERA
+	bool "gerbera"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17 filesystem
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # fmt
+	select LINGMO_PACKAGE_FMT
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBUPNP if !LINGMO_PACKAGE_LIBNPUPNP
+	select LINGMO_PACKAGE_PUGIXML
+	select LINGMO_PACKAGE_PUGIXML_XPATH_SUPPORT
+	select LINGMO_PACKAGE_SPDLOG
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  A free media server.
+	  Stream your media to devices on your home network.
+
+	  Select LINGMO_PACKAGE_DUKTAPE if you want to enable JavaScript
+	  for scripting.
+
+	  https://gerbera.io
+
+comment "gerbera needs a toolchain w/ C++, dynamic library, threads, wchar, gcc >= 8"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8

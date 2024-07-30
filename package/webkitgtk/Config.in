@@ -1,0 +1,142 @@
+config LINGMO_PACKAGE_WEBKITGTK_ARCH_SUPPORTS
+	bool
+	# ARM needs BLX, so v5t+, BE completely untested so disabled
+	default y if LINGMO_arm && !LINGMO_ARM_CPU_ARMV4
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_i386 || LINGMO_x86_64
+	# Disabled on MIPS big endian due to sigbus
+	default y if LINGMO_mipsel || LINGMO_mips64el
+	# Disabled on PowerPC pending runtime testing
+	# RISC-V needs the g/imafd ISA.
+	default y if LINGMO_riscv && LINGMO_RISCV_ISA_RVI \
+		&& LINGMO_RISCV_ISA_RVM && LINGMO_RISCV_ISA_RVA \
+		&& LINGMO_RISCV_ISA_RVF && LINGMO_RISCV_ISA_RVD
+	# Disabled on SuperH because of segfault
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt
+
+comment "webkitgtk needs libgtk3 and a toolchain w/ C++, wchar, threads, dynamic library, gcc >= 10, host gcc >= 4.9"
+	depends on LINGMO_PACKAGE_WEBKITGTK_ARCH_SUPPORTS
+	depends on !LINGMO_BINFMT_FLAT
+	depends on !LINGMO_PACKAGE_LIBGTK3 || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_10 || \
+		!LINGMO_HOST_GCC_AT_LEAST_4_9
+	depends on LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_WEBKITGTK
+	bool "webkitgtk"
+	depends on !LINGMO_STATIC_LIBS # wayland
+	depends on !LINGMO_BINFMT_FLAT # icu
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9 # icu, host-ruby
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # wayland, icu, libsoup3
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_10
+	depends on LINGMO_USE_WCHAR # icu, libsoup3
+	depends on LINGMO_PACKAGE_LIBGTK3
+	depends on LINGMO_PACKAGE_WEBKITGTK_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_CAIRO
+	select LINGMO_PACKAGE_CAIRO_PNG
+	select LINGMO_PACKAGE_ENCHANT
+	select LINGMO_PACKAGE_HARFBUZZ
+	select LINGMO_PACKAGE_ICU
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_LIBSECRET
+	select LINGMO_PACKAGE_LIBSOUP3
+	select LINGMO_PACKAGE_LIBTASN1
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_LIBXSLT
+	select LINGMO_PACKAGE_OPENJPEG
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_WEBP
+	select LINGMO_PACKAGE_WEBP_DEMUX
+	select LINGMO_PACKAGE_WOFF2
+	select LINGMO_PACKAGE_WPEBACKEND_FDO if LINGMO_PACKAGE_LIBGTK3_WAYLAND
+	select LINGMO_PACKAGE_XLIB_LIBXCOMPOSITE if LINGMO_PACKAGE_LIBGTK3_X11
+	select LINGMO_PACKAGE_XLIB_LIBXDAMAGE if LINGMO_PACKAGE_LIBGTK3_X11
+	select LINGMO_PACKAGE_XLIB_LIBXRENDER if LINGMO_PACKAGE_LIBGTK3_X11
+	select LINGMO_PACKAGE_XLIB_LIBXT if LINGMO_PACKAGE_LIBGTK3_X11
+	help
+	  WebKit is an open source, standards compliant web browser
+	  engine.
+
+	  http://www.webkitgtk.org/
+
+if LINGMO_PACKAGE_WEBKITGTK
+
+config LINGMO_PACKAGE_WEBKITGTK_SANDBOX
+	bool "sandboxing support"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS # libseccomp
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12 # libseccomp
+	select LINGMO_PACKAGE_BUBBLEWRAP # runtime
+	select LINGMO_PACKAGE_XDG_DBUS_PROXY # runtime
+	select LINGMO_PACKAGE_LIBSECCOMP
+	help
+	  Enable sandboxing of the processes used for network operation,
+	  disk access, and Web content rendering.
+
+comment "sandboxing support needs a toolchain w/ headers >= 3.12"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+
+config LINGMO_PACKAGE_WEBKITGTK_HTTPS
+	bool "HTTPS support"
+	depends on !LINGMO_STATIC_LIBS # libsoup3 -> glib-networking, gnutls
+	select LINGMO_PACKAGE_CA_CERTIFICATES # runtime
+	select LINGMO_PACKAGE_LIBSOUP3_SSL
+	help
+	  Enable HTTPS protocol support.
+
+comment "webkitgtk https support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_WEBKITGTK_MULTIMEDIA
+	bool "multimedia support"
+	select LINGMO_PACKAGE_GSTREAMER1
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DEBUGUTILS
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MPEGTSDEMUX
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SUBENC
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_ALSA
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_APP
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIOCONVERT
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIORESAMPLE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_PLAYBACK
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERTSCALE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VOLUME
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_AUDIOFX
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_AUTODETECT
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_ISOMP4
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_MATROSKA
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_RTSP
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_VPX
+	select LINGMO_PACKAGE_GST1_LIBAV
+	help
+	  This option pulls in all of the required dependencies
+	  to enable multimedia (video/audio) support.
+
+if LINGMO_PACKAGE_WEBKITGTK_MULTIMEDIA
+
+config LINGMO_PACKAGE_WEBKITGTK_USE_GSTREAMER_GL
+	bool "use gstreamer-gl"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+	help
+	  Use the GStreamer GL elements for handling video content.
+	  This is recommended as it improves performance of video
+	  playback. In some target configurations incorrect rendering
+	  might be produced, and disabling this option may help.
+
+endif
+
+config LINGMO_PACKAGE_WEBKITGTK_WEBDRIVER
+	bool "WebDriver support"
+	help
+	  Enable support for WebDriver. This will build and install the
+	  WebKitWebDriver program in the target.
+
+endif

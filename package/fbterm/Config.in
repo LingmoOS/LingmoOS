@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_FBTERM
+	bool "fbterm"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_ENABLE_LOCALE
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_FONTCONFIG
+	select LINGMO_PACKAGE_LIBERATION
+	help
+	  fbterm is a fast terminal emulator for Linux with frame buffer
+	  device or VESA video card.
+
+	  https://code.google.com/archive/p/fbterm/
+
+comment "fbterm needs a toolchain w/ C++, wchar, locale"
+	depends on LINGMO_USE_MMU
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR)

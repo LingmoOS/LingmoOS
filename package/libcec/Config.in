@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_LIBCEC
+	bool "libcec"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7 # C++11
+	select LINGMO_PACKAGE_LIBPLATFORM
+	help
+	  libcec allows you in combination with the right hardware to
+	  control your home theater devices with your TV remote
+	  control utilizing existing HDMI cabling.
+
+	  http://libcec.pulse-eight.com
+
+comment "libcec needs a toolchain w/ C++, wchar, threads, dynamic library, gcc >= 4.7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7 || \
+		LINGMO_STATIC_LIBS

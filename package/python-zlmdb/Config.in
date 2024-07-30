@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_PYTHON_ZLMDB
+	bool "python-zlmdb"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS # python-numpy
+	depends on LINGMO_INSTALL_LIBSTDCPP # python-numpy
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL # python-numpy
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 # python-numpy
+	select LINGMO_PACKAGE_PYTHON_CBOR2 # runtime
+	select LINGMO_PACKAGE_PYTHON_CFFI # runtime
+	select LINGMO_PACKAGE_PYTHON_CLICK # runtime
+	select LINGMO_PACKAGE_PYTHON_FLATBUFFERS # runtime
+	select LINGMO_PACKAGE_PYTHON_LMDB # runtime
+	select LINGMO_PACKAGE_PYTHON_NUMPY # runtime
+	select LINGMO_PACKAGE_PYTHON_PYNACL # runtime
+	select LINGMO_PACKAGE_PYTHON_PYYAML # runtime
+	select LINGMO_PACKAGE_PYTHON_TXAIO # runtime
+	help
+	  Object-relational zero-copy in-memory database layer for
+	  LMDB.
+
+	  https://github.com/crossbario/zlmdb
+
+comment "python-zlmdb needs a glibc or musl toolchain w/ C++, gcc >= 9"
+	depends on LINGMO_PACKAGE_PYTHON_NUMPY_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 || \
+		!(LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL)

@@ -1,0 +1,37 @@
+config LINGMO_PACKAGE_FOOT
+	bool "foot"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL # fcft
+	depends on !LINGMO_STATIC_LIBS # wayland
+	select LINGMO_PACKAGE_FCFT
+	select LINGMO_PACKAGE_FONTCONFIG
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+	select LINGMO_PACKAGE_PIXMAN
+	select LINGMO_PACKAGE_TLLIST
+	select LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+	help
+	  A fast, lightweight and minimalistic Wayland terminal
+	  emulator.
+	  NOTE: foot needs a working UTF-8 locale (LINGMO_GENERATE_LOCALE)
+
+	  https://codeberg.org/dnkl/foot
+
+if LINGMO_PACKAGE_FOOT
+
+config LINGMO_PACKAGE_FOOT_GRAPHEME_CLUSTERING
+	bool "grapheme-clustering"
+	select LINGMO_PACKAGE_UTF8PROC
+	help
+	  Enables grapheme clustering.
+
+config LINGMO_PACKAGE_FOOT_THEMES
+	bool "themes"
+	help
+	  Install themes (predefined color schemes)
+
+endif # LINGMO_PACKAGE_FOOT
+
+comment "foot needs a glibc or musl toolchain w/ dynamic library"
+	depends on !(LINGMO_TOOLCHAIN_USES_GLIBC || LINGMO_TOOLCHAIN_USES_MUSL) || \
+		LINGMO_STATIC_LIBS

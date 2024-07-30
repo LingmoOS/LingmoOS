@@ -1,0 +1,65 @@
+config LINGMO_PACKAGE_OPENVMTOOLS_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	default y if LINGMO_aarch64
+
+config LINGMO_PACKAGE_OPENVMTOOLS
+	bool "openvmtools"
+	depends on LINGMO_PACKAGE_OPENVMTOOLS_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_ENABLE_LOCALE
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBDNET
+	select LINGMO_PACKAGE_LIBTIRPC if !LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	help
+	  Open Virtual Machine Tools for VMware guest OS
+
+	  https://github.com/vmware/open-vm-tools
+
+	  ICU locales, Xerces, and X11 tools are currently not
+	  supported.
+
+	  NOTE: Support for vmblock-fuse will be enabled in
+	  openvmtools if the libfuse package is selected.
+
+if LINGMO_PACKAGE_OPENVMTOOLS
+
+config LINGMO_PACKAGE_OPENVMTOOLS_PAM
+	bool "PAM support"
+	# linux-pam needs locale, dynamic library and wchar, but we
+	# already have these dependencies on the main symbol, above.
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # linux-pam
+	select LINGMO_PACKAGE_LINUX_PAM
+	help
+	  Support for PAM in openvmtools
+
+comment "PAM support needs a toolchain w/ gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_OPENVMTOOLS_RESOLUTIONKMS
+	bool "resolutionkms support"
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm
+	depends on LINGMO_i386 || LINGMO_x86_64 # libdrm vmwgfx
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_LIBDRM_VMWGFX
+	help
+	  Enable support for resolutionkms
+
+comment "resolutionkms needs udev, a toolchain w/ threads"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on !LINGMO_PACKAGE_HAS_UDEV || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif
+
+comment "openvmtools needs a glibc or musl toolchain w/ wchar, threads, locale, dynamic library"
+	depends on LINGMO_PACKAGE_OPENVMTOOLS_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_ENABLE_LOCALE || LINGMO_STATIC_LIBS || \
+		LINGMO_TOOLCHAIN_USES_UCLIBC

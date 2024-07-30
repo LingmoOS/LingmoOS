@@ -1,0 +1,51 @@
+comment "Binutils Options"
+
+config LINGMO_PACKAGE_HOST_BINUTILS_SUPPORTS_CFI
+	bool
+	default y
+	depends on !LINGMO_microblaze
+
+config LINGMO_PACKAGE_BINUTILS_HAS_NO_LIBSFRAME
+	bool
+
+choice
+	prompt "Binutils Version"
+	default LINGMO_BINUTILS_VERSION_2_40_X if !LINGMO_arc
+	default LINGMO_BINUTILS_VERSION_ARC if LINGMO_arc
+	help
+	  Select the version of binutils you wish to use.
+
+config LINGMO_BINUTILS_VERSION_2_39_X
+	bool "binutils 2.39"
+	select LINGMO_PACKAGE_BINUTILS_HAS_NO_LIBSFRAME
+
+config LINGMO_BINUTILS_VERSION_2_40_X
+	bool "binutils 2.40"
+
+config LINGMO_BINUTILS_VERSION_2_41_X
+	bool "binutils 2.41"
+
+config LINGMO_BINUTILS_VERSION_ARC
+	bool "binutils arc (2.41)"
+	depends on LINGMO_arc
+
+endchoice
+
+config LINGMO_BINUTILS_VERSION
+	string
+	default "arc-2023.09-release"	if LINGMO_BINUTILS_VERSION_ARC
+	default "2.39"		if LINGMO_BINUTILS_VERSION_2_39_X
+	default "2.40"		if LINGMO_BINUTILS_VERSION_2_40_X
+	default "2.41"		if LINGMO_BINUTILS_VERSION_2_41_X
+
+config LINGMO_BINUTILS_GPROFNG
+	bool "gprofng support"
+	depends on !LINGMO_BINUTILS_VERSION_ARC
+	help
+	  This option enables support for gprofng, a new profiler.
+
+config LINGMO_BINUTILS_EXTRA_CONFIG_OPTIONS
+	string "Additional binutils options"
+	default ""
+	help
+	  Any additional binutils options you may want to include.

@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_OPENLDAP
+	bool "openldap"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # needs fork()
+	help
+	  OpenLDAP Software is an open source implementation of the
+	  Lightweight Directory Access Protocol.
+
+	  This only installs client-side support.
+
+	  https://www.openldap.org/
+
+if LINGMO_PACKAGE_OPENLDAP
+
+config LINGMO_PACKAGE_OPENLDAP_CLIENTS
+	bool "openldap client binaries"
+	default y
+	help
+	  Install the OpenLDAP client tools (ldapadd, ldapcompare,
+	  ldapdelete, ldapexop, ldapmodify, ldapmodrdn, ldappasswd,
+	  ldapsearch, ldapurl, ldapwhoami)
+
+endif
+
+comment "openldap needs a toolchain w/ wchar"
+	depends on LINGMO_USE_MMU # needs fork()
+	depends on !LINGMO_USE_WCHAR

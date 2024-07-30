@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_APR_UTIL
+	bool "apr-util"
+	# apr really needs shared library support
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # apr
+	select LINGMO_PACKAGE_APR
+	select LINGMO_PACKAGE_EXPAT
+	help
+	  The utility library for the apache runtime project
+
+	  https://apr.apache.org
+
+comment "apr-util needs a toolchain w/ dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_BALENA_ENGINE
+	bool "balena-engine"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # no fexecve
+	depends on LINGMO_USE_MMU # util-linux
+	select LINGMO_PACKAGE_CGROUPFS_MOUNT if !LINGMO_PACKAGE_SYSTEMD # runtime
+	select LINGMO_PACKAGE_IPTABLES # runtime
+	select LINGMO_PACKAGE_UTIL_LINUX # runtime
+	select LINGMO_PACKAGE_UTIL_LINUX_BINARIES # runtime
+	select LINGMO_PACKAGE_UTIL_LINUX_MOUNT # runtime
+	select LINGMO_PACKAGE_UTIL_LINUX_MOUNTPOINT # runtime
+	select LINGMO_PACKAGE_UTIL_LINUX_PIVOT_ROOT # runtime
+	help
+	  balenaEngine is a new container engine purpose-built for
+	  embedded and IoT use cases and compatible with Docker
+	  containers.
+
+	  https://github.com/balena-os/balena-engine
+
+comment "balena-engine needs a glibc or musl toolchain w/ threads"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_USES_UCLIBC
+	depends on LINGMO_USE_MMU
