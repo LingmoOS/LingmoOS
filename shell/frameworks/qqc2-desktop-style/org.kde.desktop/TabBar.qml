@@ -8,20 +8,20 @@
 
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import QtQuick.Templates as T
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.TabBar {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Window
+    LingmoUI.Theme.inherit: false
 
     //Some QStyles seem to not return sensible pixelmetrics here
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding,
-                            Kirigami.Units.gridUnit * 6)
+                            LingmoUI.Units.gridUnit * 6)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              contentHeight + topPadding + bottomPadding)
 

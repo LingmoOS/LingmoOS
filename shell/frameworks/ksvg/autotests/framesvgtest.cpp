@@ -28,10 +28,10 @@ void FrameSvgTest::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
 
-    m_themeDir = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) % '/' % "plasma");
+    m_themeDir = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) % '/' % "lingmo");
     m_themeDir.removeRecursively();
 
-    copyDirectory(QFINDTESTDATA("data/plasma"), m_themeDir.absolutePath());
+    copyDirectory(QFINDTESTDATA("data/lingmo"), m_themeDir.absolutePath());
 
     m_cacheDir = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
     m_cacheDir.removeRecursively();
@@ -86,20 +86,20 @@ void FrameSvgTest::setImageSet()
 
     KSvg::FrameSvg *frameSvg = new KSvg::FrameSvg;
     frameSvg->setImagePath("widgets/background");
-    frameSvg->setImageSet(new KSvg::ImageSet("breeze-light", {}, this));
+    frameSvg->setImageSet(new KSvg::ImageSet("ocean-light", {}, this));
     frameSvg->framePixmap();
-    frameSvg->setImageSet(new KSvg::ImageSet("breeze-dark", {}, this));
+    frameSvg->setImageSet(new KSvg::ImageSet("ocean-dark", {}, this));
     frameSvg->framePixmap();
     delete frameSvg;
 
     frameSvg = new KSvg::FrameSvg;
     frameSvg->setImagePath("widgets/background");
-    frameSvg->setImageSet(new KSvg::ImageSet("breeze-light", {}, this));
+    frameSvg->setImageSet(new KSvg::ImageSet("ocean-light", {}, this));
     frameSvg->framePixmap();
-    frameSvg->setImageSet(new KSvg::ImageSet("breeze-dark", {}, this));
+    frameSvg->setImageSet(new KSvg::ImageSet("ocean-dark", {}, this));
     frameSvg->framePixmap();
 
-    frameSvg->setImageSet(new KSvg::ImageSet("testtheme", "plasma/desktoptheme", this));
+    frameSvg->setImageSet(new KSvg::ImageSet("testtheme", "lingmo/desktoptheme", this));
     QCOMPARE(frameSvg->color(KSvg::Svg::Text), QColor(255, 54, 59));
 
     delete frameSvg;
@@ -118,7 +118,7 @@ void FrameSvgTest::resizeMask()
 void FrameSvgTest::loadQrc()
 {
     KSvg::FrameSvg *frameSvg = new KSvg::FrameSvg;
-    frameSvg->setImageSet(new KSvg::ImageSet("testtheme", "plasma/desktoptheme", this));
+    frameSvg->setImageSet(new KSvg::ImageSet("testtheme", "lingmo/desktoptheme", this));
     frameSvg->setImagePath(QStringLiteral("qrc:/data/background.svgz"));
     QVERIFY(frameSvg->isValid());
     // An external image is colored as well

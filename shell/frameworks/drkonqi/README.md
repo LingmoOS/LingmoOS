@@ -64,7 +64,7 @@ Add into `~/.config/drkonqirc`:
 IncludeAll=true
 ```
 
-This operation mode primarily targets Plasma Mobile. It effectively catches and reports **all** coredumpd tracked
+This operation mode primarily targets Lingmo Mobile. It effectively catches and reports **all** coredumpd tracked
 crashes. This is notably including non-KDE software for which drkonqi will only offer tracing facilities but no active
 bug reporting. The use is that for systems where we are completely in control we'll want to give our users the ability
 to differentiate a crash in middleware from one in the application space (or defects caused by the former in the latter).
@@ -79,7 +79,7 @@ in `~/.cache/drkonqi/application-not-responding/` followed by an ABRT signal to 
 The metadata file must be named `$exe.$bootId.$pid.$timestamp.json`. It is currently empty but may gain optional content
 in the future.
 
-In a regular Plasma session this metadata file is created by KWin when an application is being killed for unresponsiveness.
+In a regular Lingmo session this metadata file is created by KWin when an application is being killed for unresponsiveness.
 
 This feature is only supported with the coredumpd backend.
 Other backends record the ABRT as crash but will not be able to identify it as ANR.

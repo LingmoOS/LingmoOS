@@ -5,7 +5,7 @@ project(libksysguard)
 set(PROJECT_VERSION "6.1.80")
 set(PROJECT_VERSION_MAJOR 6)
 
-# check with non-Plasma consumers (e.g. KDevelop) before bumping these versions to make sure the KDE CI does not break
+# check with non-Lingmo consumers (e.g. KDevelop) before bumping these versions to make sure the KDE CI does not break
 set(QT_MIN_VERSION "6.6.0")
 set(KF6_MIN_VERSION "6.2.0")
 set(KDE_COMPILERSETTINGS_LEVEL "5.82")

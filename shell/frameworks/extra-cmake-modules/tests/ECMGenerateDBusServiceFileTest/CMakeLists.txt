@@ -17,7 +17,7 @@ ecm_generate_dbus_service_file(
 ecm_generate_dbus_service_file(
    NAME org.kde.kded5.withSystemD
    EXECUTABLE /usr/bin/kded5
-   SYSTEMD_SERVICE plasma-kded.service
+   SYSTEMD_SERVICE lingmo-kded.service
    DESTINATION ${CMAKE_INSTALL_PREFIX}/test
    RENAME org.kde.kded5.withSystemD.renamed.service
 )

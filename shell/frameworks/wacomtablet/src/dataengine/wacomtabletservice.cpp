@@ -18,12 +18,12 @@
 #include "wacomtabletservice.h"
 #include "dbustabletinterface.h"
 #include "screenrotation.h"
-#include <Plasma5Support/ServiceJob>
+#include <Lingmo5Support/ServiceJob>
 #include <QProcess>
 
 using namespace Wacom;
 
-class WacomTabletJob : public Plasma::ServiceJob
+class WacomTabletJob : public Lingmo::ServiceJob
 {
     Q_OBJECT
 public:
@@ -109,7 +109,7 @@ WacomTabletService::~WacomTabletService()
 {
 }
 
-Plasma::ServiceJob *WacomTabletService::createJob(const QString &operation, QMap<QString, QVariant> &parameters)
+Lingmo::ServiceJob *WacomTabletService::createJob(const QString &operation, QMap<QString, QVariant> &parameters)
 {
     return new WacomTabletJob(destination(), operation, parameters, this);
 }

@@ -25,11 +25,11 @@ setuptools.setup(
             "pico-wizard = PicoWizard.__main__:__main__",
         ]
     },
-    url="https://invent.kde.org/plasma/pico-wizard/pico-wizard",
+    url="https://invent.kde.org/lingmo/pico-wizard/pico-wizard",
     project_urls={
         "Bug Tracker": "https://bugs.kde.org/enter_bug.cgi?product=PicoWizard",
-        "Documentation": "https://invent.kde.org/plasma/pico-wizard/pico-wizard",
-        "Source Code": "https://invent.kde.org/plasma/pico-wizard/pico-wizard",
+        "Documentation": "https://invent.kde.org/lingmo/pico-wizard/pico-wizard",
+        "Source Code": "https://invent.kde.org/lingmo/pico-wizard/pico-wizard",
     },
     packages=setuptools.find_packages(),
     classifiers=[

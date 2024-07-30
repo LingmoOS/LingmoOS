@@ -14,7 +14,7 @@
 
 #include <qqmlregistration.h>
 
-namespace Kirigami
+namespace LingmoUI
 {
 namespace Platform
 {
@@ -127,7 +127,7 @@ class FrameSvgItem : public QQuickItem
     /**
      * This property holds the prefix for the SVG.
      * prefix for the 9-piece SVG, like "pushed" or "normal" for a button.
-     * see https://techbase.kde.org/Development/Tutorials/Plasma5/ThemeDetails
+     * see https://techbase.kde.org/Development/Tutorials/Lingmo5/ThemeDetails
      * for a list of paths and prefixes
      * It can also be an array of strings, specifying a fallback chain in case
      * the first element isn't found in the theme, eg ["toolbutton-normal", "normal"]
@@ -193,7 +193,7 @@ class FrameSvgItem : public QQuickItem
      * * Selected: text color becomes highlightedText and background color is
      * changed to highlightColor.
      *
-     * @see Kirigami::PlatformTheme
+     * @see LingmoUI::PlatformTheme
      * @see KSvg::Svg::status
      * @since 5.23
      * @property enum<KSvg::Svg::Status> status
@@ -309,7 +309,7 @@ private:
     void applyPrefixes();
 
     KSvg::FrameSvg *m_frameSvg;
-    Kirigami::Platform::PlatformTheme *m_kirigamiTheme;
+    LingmoUI::Platform::PlatformTheme *m_lingmouiTheme;
     FrameSvgItemMargins *m_margins;
     FrameSvgItemMargins *m_fixedMargins;
     FrameSvgItemMargins *m_insetMargins;

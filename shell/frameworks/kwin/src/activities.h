@@ -12,7 +12,7 @@
 #include <QStringList>
 #include <kwin_export.h>
 
-#include <PlasmaActivities/Controller>
+#include <LingmoActivities/Controller>
 
 namespace KActivities
 {

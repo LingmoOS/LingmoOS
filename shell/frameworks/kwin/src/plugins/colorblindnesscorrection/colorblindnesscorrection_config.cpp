@@ -25,7 +25,7 @@ ColorBlindnessCorrectionEffectConfig::ColorBlindnessCorrectionEffectConfig(QObje
     : KQuickManagedConfigModule(parent, metaData)
     , m_data(new ColorBlindnessCorrectionSettingsData(this))
 {
-    qmlRegisterUncreatableType<ColorBlindnessCorrectionSettings>("org.kde.plasma.kwin.colorblindnesscorrectioneffect.kcm",
+    qmlRegisterUncreatableType<ColorBlindnessCorrectionSettings>("org.kde.lingmo.kwin.colorblindnesscorrectioneffect.kcm",
                                                                  1,
                                                                  0,
                                                                  "ColorBlindnessCorrectionSettings",

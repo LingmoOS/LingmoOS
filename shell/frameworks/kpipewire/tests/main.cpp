@@ -4,7 +4,7 @@
     SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 */
 
-#include "PlasmaRecordMe.h"
+#include "LingmoRecordMe.h"
 #include <QCommandLineParser>
 #include <QGuiApplication>
 
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
         parser.addHelpOption();
         parser.process(app);
 
-        PlasmaRecordMe *me = new PlasmaRecordMe(cursorOptions[parser.value(cursor).toLower()], parser.positionalArguments(), parser.isSet(selection), &app);
+        LingmoRecordMe *me = new LingmoRecordMe(cursorOptions[parser.value(cursor).toLower()], parser.positionalArguments(), parser.isSet(selection), &app);
         if (parser.isSet(duration)) {
             me->setDuration(parser.value(duration).toInt() * 1000);
         }

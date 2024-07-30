@@ -4,8 +4,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.workspace.dialogs as PWD
 import org.kde.iconthemes as KIconThemes
 
 PWD.SystemDialog {
@@ -18,15 +18,15 @@ PWD.SystemDialog {
 
     readonly property Component displayComponent: Component {
         ColumnLayout {
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 id: icon
                 Layout.alignment: Qt.AlignHCenter
-                implicitWidth: Kirigami.Units.iconSizes.enormous
+                implicitWidth: LingmoUI.Units.iconSizes.enormous
                 implicitHeight: implicitWidth
                 source: dialog.icon
             }
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.fillWidth: true
                 level: 3
@@ -35,7 +35,7 @@ PWD.SystemDialog {
                 verticalAlignment: Qt.AlignTop
             }
 
-            Kirigami.LinkButton {
+            LingmoUI.LinkButton {
                 Layout.fillWidth: true
                 visible: text.length > 0
                 Layout.alignment: Qt.AlignHCenter
@@ -50,10 +50,10 @@ PWD.SystemDialog {
         ColumnLayout {
             QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
-                contentItem: Kirigami.Icon {
+                contentItem: LingmoUI.Icon {
                     id: icon
                     implicitHeight: implicitWidth
-                    implicitWidth: Kirigami.Units.iconSizes.enormous
+                    implicitWidth: LingmoUI.Units.iconSizes.enormous
                     source: dialog.icon
 
                     KIconThemes.IconDialog {
@@ -86,18 +86,18 @@ PWD.SystemDialog {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action edit launcher name/icon", "Edit Info…")
             icon.name: "document-edit"
             onCheckedChanged: root.edit = checked
             checkable: true
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action accept dialog and create launcher", "Accept")
             icon.name: "dialog-ok"
             onTriggered: accept()
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action", "Cancel")
             icon.name: "dialog-cancel"
             onTriggered: reject()

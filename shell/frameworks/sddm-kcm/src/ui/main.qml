@@ -13,24 +13,24 @@ import Qt5Compat.GraphicalEffects
 
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.14 as Kirigami
+import org.kde.lingmoui 2.14 as LingmoUI
 import org.kde.newstuff 1.81 as NewStuff
 import org.kde.private.kcms.sddm 1.0
 
 KCM.GridViewKCM {
     id: root
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button", "Behavior…")
             icon.name: "settings-configure"
             onTriggered: { kcm.push("Advanced.qml") }
         },
-        Kirigami.Action {
-            text: i18nc("@action:button", "Apply Plasma Settings…")
-            icon.name: "plasma"
+        LingmoUI.Action {
+            text: i18nc("@action:button", "Apply Lingmo Settings…")
+            icon.name: "lingmo"
             onTriggered: syncSheet.open()
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button", "Install From File…")
             icon.name: "document-import"
             onTriggered: themeDialog.open()
@@ -45,10 +45,10 @@ KCM.GridViewKCM {
     ]
 
     headerPaddingEnabled: false // Let the InlineMessage touch the edges
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: errorMessage
-        position: Kirigami.InlineMessage.Position.Header
-        type: Kirigami.MessageType.Error
+        position: LingmoUI.InlineMessage.Position.Header
+        type: LingmoUI.MessageType.Error
         showCloseButton: true
         Connections {
             target: kcm
@@ -87,7 +87,7 @@ KCM.GridViewKCM {
             smooth: true
         }
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "documentinfo"
                 tooltip: i18nc("@info:tooltip", "View details")
                 onTriggered: {
@@ -102,7 +102,7 @@ KCM.GridViewKCM {
                     detailsDialog.open()
                 }
             },
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "games-config-background"
                 tooltip: i18nc("@info:tooltip", "Change Background")
                 onTriggered: {
@@ -111,7 +111,7 @@ KCM.GridViewKCM {
                     backgroundSheet.open()
                 }
             },
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "edit-delete"
                 tooltip: i18nc("@info:tooltip", "Delete")
                 onTriggered: kcm.removeTheme(view.model.index(index, 0))
@@ -131,20 +131,20 @@ KCM.GridViewKCM {
     DetailsDialog {
         id: detailsDialog
     }
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: syncSheet
-        title: i18nc("@title:window", "Apply Plasma Settings")
-        Kirigami.InlineMessage {
-            implicitWidth: Math.max(footer.implicitWidth, Kirigami.Units.gridUnit * 22)
+        title: i18nc("@title:window", "Apply Lingmo Settings")
+        LingmoUI.InlineMessage {
+            implicitWidth: Math.max(footer.implicitWidth, LingmoUI.Units.gridUnit * 22)
             visible: true
-            type: Kirigami.MessageType.Information
-            font: Kirigami.Theme.smallFont
-            text: i18n("This will make the SDDM login screen reflect your customizations to the following Plasma settings:") +
-                xi18nc("@info", "<para><list><item>Color scheme,</item><item>Cursor theme,</item><item>Cursor size,</item><item>Font,</item><item>Font rendering,</item><item>NumLock preference,</item><item>Plasma theme,</item><item>Scaling DPI,</item><item>Screen configuration (Wayland only)</item></list></para>") +
+            type: LingmoUI.MessageType.Information
+            font: LingmoUI.Theme.smallFont
+            text: i18n("This will make the SDDM login screen reflect your customizations to the following Lingmo settings:") +
+                xi18nc("@info", "<para><list><item>Color scheme,</item><item>Cursor theme,</item><item>Cursor size,</item><item>Font,</item><item>Font rendering,</item><item>NumLock preference,</item><item>Lingmo theme,</item><item>Scaling DPI,</item><item>Screen configuration (Wayland only)</item></list></para>") +
                 i18n("Please note that theme files must be installed globally to be reflected on the SDDM login screen.")
         }
         footer: RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             Item {
                 Layout.fillWidth: true
@@ -161,7 +161,7 @@ KCM.GridViewKCM {
             }
         }
     }
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: backgroundSheet
         property var modelIndex
         property string imagePath
@@ -169,7 +169,7 @@ KCM.GridViewKCM {
         Item {
             implicitWidth: 0.75 * root.width
             implicitHeight: backgroundImage.hasImage ? backgroundImage.implicitHeight : placeHolder.implicitHeight
-            Kirigami.PlaceholderMessage  {
+            LingmoUI.PlaceholderMessage  {
                 id: placeHolder
                 anchors.fill: parent
                 visible: !backgroundImage.hasImage
@@ -195,7 +195,7 @@ KCM.GridViewKCM {
             }
         }
         footer: RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             Item {
                 Layout.fillWidth: true

@@ -38,18 +38,18 @@ inline KPluginMetaData parseMetaDataFromDesktopFile(const QString &fileName)
     QJsonObject root;
     root.insert(QLatin1String("KPlugin"), kplugin);
 
-    copyIfExists(grp, root, "X-Plasma-DBusRunner-Service");
-    copyIfExists(grp, root, "X-Plasma-DBusRunner-Path");
-    copyIfExists(grp, root, "X-Plasma-Runner-Unique-Results", false);
-    copyIfExists(grp, root, "X-Plasma-Runner-Weak-Results", false);
-    copyIfExists(grp, root, "X-Plasma-API");
-    copyIfExists(grp, root, "X-Plasma-Request-Actions-Once", false);
-    copyIfExists(grp, root, "X-Plasma-Runner-Min-Letter-Count", 0);
-    copyIfExists(grp, root, "X-Plasma-Runner-Match-Regex");
+    copyIfExists(grp, root, "X-Lingmo-DBusRunner-Service");
+    copyIfExists(grp, root, "X-Lingmo-DBusRunner-Path");
+    copyIfExists(grp, root, "X-Lingmo-Runner-Unique-Results", false);
+    copyIfExists(grp, root, "X-Lingmo-Runner-Weak-Results", false);
+    copyIfExists(grp, root, "X-Lingmo-API");
+    copyIfExists(grp, root, "X-Lingmo-Request-Actions-Once", false);
+    copyIfExists(grp, root, "X-Lingmo-Runner-Min-Letter-Count", 0);
+    copyIfExists(grp, root, "X-Lingmo-Runner-Match-Regex");
     copyIfExists(grp, root, "X-KDE-ConfigModule"); // DBus-Runners may also specify KCMs
-    root.insert(QLatin1String("X-Plasma-Runner-Syntaxes"), QJsonArray::fromStringList(grp.readEntry("X-Plasma-Runner-Syntaxes", QStringList())));
-    root.insert(QLatin1String("X-Plasma-Runner-Syntax-Descriptions"),
-                QJsonArray::fromStringList(grp.readEntry("X-Plasma-Runner-Syntax-Descriptions", QStringList())));
+    root.insert(QLatin1String("X-Lingmo-Runner-Syntaxes"), QJsonArray::fromStringList(grp.readEntry("X-Lingmo-Runner-Syntaxes", QStringList())));
+    root.insert(QLatin1String("X-Lingmo-Runner-Syntax-Descriptions"),
+                QJsonArray::fromStringList(grp.readEntry("X-Lingmo-Runner-Syntax-Descriptions", QStringList())));
     QJsonObject author;
     author.insert(QLatin1String("Name"), grp.readEntry("X-KDE-PluginInfo-Author"));
     author.insert(QLatin1String("Email"), grp.readEntry("X-KDE-PluginInfo-Email"));

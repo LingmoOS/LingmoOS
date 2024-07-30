@@ -18,7 +18,7 @@ namespace Client
 {
 class Compositor;
 class ConnectionThread;
-class PlasmaShell;
+class LingmoShell;
 class Registry;
 class ShadowManager;
 class ShmPool;
@@ -36,7 +36,7 @@ public:
     static WaylandIntegration *self();
 
     KWayland::Client::Registry *registry() const;
-    KWayland::Client::PlasmaShell *waylandPlasmaShell();
+    KWayland::Client::LingmoShell *waylandLingmoShell();
 
     WaylandXdgActivationV1 *activation();
 
@@ -44,7 +44,7 @@ private:
     QPointer<KWayland::Client::ConnectionThread> m_waylandConnection;
     QPointer<KWayland::Client::Compositor> m_waylandCompositor;
     QPointer<KWayland::Client::Registry> m_registry;
-    QPointer<KWayland::Client::PlasmaShell> m_waylandPlasmaShell;
+    QPointer<KWayland::Client::LingmoShell> m_waylandLingmoShell;
     std::unique_ptr<WaylandXdgActivationV1> m_activation;
     struct {
         quint32 name = 0;

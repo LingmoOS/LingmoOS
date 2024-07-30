@@ -110,7 +110,7 @@ void RunnerManagerHistoryTest::testRelevanceForOftenLaunched()
 {
     {
         KConfig cfg(stateConfigFile);
-        cfg.group("PlasmaRunnerManager").writeEntry("LaunchCounts", "5 foo");
+        cfg.group("LingmoRunnerManager").writeEntry("LaunchCounts", "5 foo");
         cfg.sync();
     }
     std::unique_ptr<RunnerManager> manager(new RunnerManager());
@@ -129,7 +129,7 @@ void RunnerManagerHistoryTest::testRelevanceForOftenLaunched()
     QVERIFY(matches.at(0).relevance() < 0.6); // 0.5 is the max we add as a bonus, 0.1 comes from the runner
     {
         KConfig cfg(stateConfigFile);
-        cfg.group("PlasmaRunnerManager").writeEntry("LaunchCounts", QStringList{"5 foo", "5 bar"});
+        cfg.group("LingmoRunnerManager").writeEntry("LaunchCounts", QStringList{"5 foo", "5 bar"});
         cfg.sync();
         KSharedConfig::openConfig(QStringLiteral("krunnerstaterc"), KConfig::NoGlobals, QStandardPaths::GenericDataLocation)->reparseConfiguration();
     }

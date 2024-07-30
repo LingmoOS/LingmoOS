@@ -11,18 +11,18 @@
 
 import QtQuick 2.1
 import QtQuick.Layouts 1.1
-import org.kde.kirigami 2.20 as Kirigami
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import org.kde.lingmoui 2.20 as LingmoUI
+import org.kde.lingmo.plasmoid 2.0
+import org.kde.lingmo.components 2.0 as LingmoComponents
 
 Item {
     Plasmoid.fullRepresentation: ColumnLayout {
         anchors.fill: parent
-        Kirigami.Icon {
+        LingmoUI.Icon {
             source: "kde"
         }
-        PlasmaComponents.Label {
-            text: "This is Plasma!"
+        LingmoComponents.Label {
+            text: "This is Lingmo!"
         }
     }
 }

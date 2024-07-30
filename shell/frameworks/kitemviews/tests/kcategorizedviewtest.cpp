@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 {
     icons << QStringLiteral("konqueror");
     icons << QStringLiteral("okular");
-    icons << QStringLiteral("plasma");
+    icons << QStringLiteral("lingmo");
     icons << QStringLiteral("system-file-manager");
 
     QApplication app(argc, argv);

@@ -10,19 +10,19 @@
 
 import QtQuick
 import QtQuick.Layouts 1.1
-import org.kde.plasma.core as PlasmaCore
+import org.kde.lingmo.core as LingmoCore
 import org.kde.ksvg 1.0 as KSvg
-import org.kde.plasma.components 3.0 as PlasmaComponents3
+import org.kde.lingmo.components 3.0 as LingmoComponents3
 import org.kde.kwin 3.0 as KWin
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 KWin.TabBoxSwitcher {
     id: tabBox
 
     Instantiator {
         active: tabBox.visible
-        delegate: PlasmaCore.Dialog {
-            location: PlasmaCore.Types.Floating
+        delegate: LingmoCore.Dialog {
+            location: LingmoCore.Types.Floating
             visible: true
             flags: Qt.X11BypassWindowManagerHint
             x: tabBox.screenGeometry.x + tabBox.screenGeometry.width * 0.5 - dialogMainItem.width * 0.5
@@ -101,10 +101,10 @@ KWin.TabBoxSwitcher {
                     model: tabBox.model
                     currentIndex: tabBox.currentIndex
 
-                    readonly property int iconSize: Kirigami.Units.iconSizes.huge
-                    readonly property int captionRowHeight: Kirigami.Units.gridUnit * 2
-                    readonly property int columnSpacing: Kirigami.Units.gridUnit
-                    readonly property int thumbnailWidth: Kirigami.Units.gridUnit * 16
+                    readonly property int iconSize: LingmoUI.Units.iconSizes.huge
+                    readonly property int captionRowHeight: LingmoUI.Units.gridUnit * 2
+                    readonly property int columnSpacing: LingmoUI.Units.gridUnit
+                    readonly property int thumbnailWidth: LingmoUI.Units.gridUnit * 16
                     readonly property int thumbnailHeight: thumbnailWidth * (1.0/dialogMainItem.screenFactor)
                     cellWidth: hoverItem.margins.left + thumbnailWidth + hoverItem.margins.right
                     cellHeight: hoverItem.margins.top + captionRowHeight + thumbnailHeight + hoverItem.margins.bottom
@@ -148,7 +148,7 @@ KWin.TabBoxSwitcher {
                                     wId: windowId
                                 }
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.verticalCenter: parent.bottom
                                     anchors.verticalCenterOffset: Math.round(-thumbnailGridView.iconSize / 4)
@@ -158,7 +158,7 @@ KWin.TabBoxSwitcher {
                                     source: model.icon
                                 }
 
-                                PlasmaComponents3.ToolButton {
+                                LingmoComponents3.ToolButton {
                                     id: closeButton
                                     anchors {
                                         right: parent.right
@@ -171,8 +171,8 @@ KWin.TabBoxSwitcher {
                                             (thumbnailGridItem.containsMouse
                                             || closeButton.hovered
                                             || thumbnailGridItem.focus
-                                            || Kirigami.Settings.tabletMode
-                                            || Kirigami.Settings.hasTransientTouchInput
+                                            || LingmoUI.Settings.tabletMode
+                                            || LingmoUI.Settings.hasTransientTouchInput
                                             )
                                     icon.name: 'window-close-symbolic'
                                     onClicked: {
@@ -181,7 +181,7 @@ KWin.TabBoxSwitcher {
                                 }
                             }
 
-                            PlasmaComponents3.Label {
+                            LingmoComponents3.Label {
                                 Layout.fillWidth: true
                                 text: model.caption
                                 font.weight: thumbnailGridItem.focus ? Font.Bold : Font.Normal
@@ -201,9 +201,9 @@ KWin.TabBoxSwitcher {
                     onCurrentIndexChanged: tabBox.currentIndex = thumbnailGridView.currentIndex;
                 } // GridView
 
-                Kirigami.PlaceholderMessage {
+                LingmoUI.PlaceholderMessage {
                     anchors.centerIn: parent
-                    width: parent.width - Kirigami.Units.largeSpacing * 2
+                    width: parent.width - LingmoUI.Units.largeSpacing * 2
                     icon.source: "edit-none"
                     text: i18ndc("kwin", "@info:placeholder no entries in the task switcher", "No open windows")
                     visible: thumbnailGridView.count === 0

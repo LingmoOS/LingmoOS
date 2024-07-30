@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.Page {
@@ -23,7 +23,7 @@ T.Page {
                              + (implicitFooterHeight > 0 ? implicitFooterHeight + spacing : 0))
 
     background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
     }
     readonly property Item __internal: StylePrivate.StyleItem {
         parent: controlRoot

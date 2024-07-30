@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -15,17 +15,17 @@ import org.kde.ksysguard.faces as Faces
 Faces.SensorFace {
     id: root
 
-    Layout.minimumWidth: root.formFactor == Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit : Kirigami.Units.gridUnit * 2
-    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? contentItem.implicitHeight : Kirigami.Units.gridUnit
+    Layout.minimumWidth: root.formFactor == Faces.SensorFace.Vertical ? LingmoUI.Units.gridUnit : LingmoUI.Units.gridUnit * 2
+    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? contentItem.implicitHeight : LingmoUI.Units.gridUnit
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Repeater {
             model: root.controller.highPrioritySensorIds
 
             SensorRect {
-                Layout.preferredHeight: Math.min(implicitHeight, Math.max(root.height / root.controller.highPrioritySensorIds.length - Kirigami.Units.smallSpacing * (root.controller.highPrioritySensorIds.length - 1), Kirigami.Units.smallSpacing))
+                Layout.preferredHeight: Math.min(implicitHeight, Math.max(root.height / root.controller.highPrioritySensorIds.length - LingmoUI.Units.smallSpacing * (root.controller.highPrioritySensorIds.length - 1), LingmoUI.Units.smallSpacing))
                 opacity: y + height <= root.height
                 sensor: sensor
                 text: sensor.formattedValue

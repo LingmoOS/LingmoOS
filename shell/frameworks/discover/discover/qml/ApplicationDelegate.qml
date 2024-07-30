@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 BasicAbstractCard {
     id: root
@@ -29,7 +29,7 @@ BasicAbstractCard {
         ListView.currentIndex = index
         Navigation.openApplication(application)
     }
-    padding: Kirigami.Units.largeSpacing * 2
+    padding: LingmoUI.Units.largeSpacing * 2
     highlighted: ListView.isCurrentItem
 
     Keys.onReturnPressed: trigger()
@@ -38,19 +38,19 @@ BasicAbstractCard {
     content: Item {
         implicitHeight: Math.max(columnLayout.implicitHeight, resourceIconFrame.implicitHeight)
 
-        Kirigami.Padding {
+        LingmoUI.Padding {
             id: resourceIconFrame
             anchors {
                 top: parent.top
                 left: parent.left
                 bottom: parent.bottom
             }
-            padding: Kirigami.Units.largeSpacing
-            contentItem: Kirigami.Icon {
+            padding: LingmoUI.Units.largeSpacing
+            contentItem: LingmoUI.Icon {
                 source: root.application.icon
                 animated: false
 
-                implicitHeight: root.compact ? Kirigami.Units.iconSizes.large : Kirigami.Units.iconSizes.huge
+                implicitHeight: root.compact ? LingmoUI.Units.iconSizes.large : LingmoUI.Units.iconSizes.huge
                 implicitWidth: implicitHeight
             }
         }
@@ -64,16 +64,16 @@ BasicAbstractCard {
                 right: parent.right
                 bottom: parent.bottom
                 left: resourceIconFrame.right
-                leftMargin: Kirigami.Units.gridUnit
+                leftMargin: LingmoUI.Units.gridUnit
             }
             spacing: 0
 
             // Container for app name and backend name labels
             RowLayout {
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 // App name label
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     id: head
                     Layout.fillWidth: true
                     // We want the heading visually top-aligned with the top margin, the icon background and that in general
@@ -82,7 +82,7 @@ BasicAbstractCard {
                     // painted area of the label, not including the leading
                     topPadding: headMetrics.boundingRect.y - headMetrics.tightBoundingRect.y
                     level: root.compact ? 2 : 1
-                    type: Kirigami.Heading.Type.Primary
+                    type: LingmoUI.Heading.Type.Primary
                     text: root.application.name
                     elide: Text.ElideRight
                     maximumLineCount: 1
@@ -98,16 +98,16 @@ BasicAbstractCard {
                 RowLayout {
                     Layout.alignment: Qt.AlignRight
                     visible: root.appIsFromNonDefaultBackend && !root.compact
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
 
-                    Kirigami.Icon {
+                    LingmoUI.Icon {
                         source: root.application.sourceIcon
-                        implicitWidth: Kirigami.Units.iconSizes.smallMedium
-                        implicitHeight: Kirigami.Units.iconSizes.smallMedium
+                        implicitWidth: LingmoUI.Units.iconSizes.smallMedium
+                        implicitHeight: LingmoUI.Units.iconSizes.smallMedium
                     }
                     QQC2.Label {
                         text: root.application.backend.displayName
-                        font: Kirigami.Theme.smallFont
+                        font: LingmoUI.Theme.smallFont
                     }
                 }
             }
@@ -132,7 +132,7 @@ BasicAbstractCard {
             // Container for rating, size, and install button
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 // Combined condition of both children items
                 visible: root.showRating || (!root.compact && root.showSize) || !root.compact
@@ -160,7 +160,7 @@ BasicAbstractCard {
                         Layout.alignment: Qt.AlignBottom
                         visible: root.showRating
                         opacity: 0.6
-                        spacing: Kirigami.Units.largeSpacing
+                        spacing: LingmoUI.Units.largeSpacing
 
                         Rating {
                             Layout.alignment: Qt.AlignVCenter
@@ -175,7 +175,7 @@ BasicAbstractCard {
                             topPadding: (ratingLabelMetrics.boundingRect.y - ratingLabelMetrics.tightBoundingRect.y)/2
                             visible: root.application.backend.reviewsBackend?.isResourceSupported(root.application) ?? false
                             text: root.application.rating.ratingCount > 0 ? i18np("%1 rating", "%1 ratings", root.application.rating.ratingCount) : i18n("No ratings yet")
-                            font: Kirigami.Theme.smallFont
+                            font: LingmoUI.Theme.smallFont
                             elide: Text.ElideRight
                             TextMetrics {
                                 id: ratingLabelMetrics
@@ -194,7 +194,7 @@ BasicAbstractCard {
                         text: visible ? root.application.sizeDescription : ""
                         horizontalAlignment: Text.AlignRight
                         opacity: 0.6;
-                        font: Kirigami.Theme.smallFont
+                        font: LingmoUI.Theme.smallFont
                         elide: Text.ElideRight
                         maximumLineCount: 1
                     }

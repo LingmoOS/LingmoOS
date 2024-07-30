@@ -208,7 +208,7 @@ void PowerManagementControl::updateInhibitions(const QList<InhibitionInfo> &inhi
 
     for (auto it = inhibitions.constBegin(); it != inhibitions.constEnd(); ++it) {
         const QString &name = (*it).first;
-        if (name == QStringLiteral("plasmashell") || name == QStringLiteral("org.kde.plasmashell")) {
+        if (name == QStringLiteral("lingmoshell") || name == QStringLiteral("org.kde.lingmoshell")) {
             continue;
         }
         QString prettyName;

@@ -1,0 +1,17 @@
+[Unit]
+Description=KDE Lingmo Workspace
+After=lingmo-ksmserver.service lingmo-kcminit.service
+PartOf=graphical-session.target
+StartLimitIntervalSec=60s
+StartLimitBurst=3
+
+[Service]
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/lingmoshell --no-respawn
+Restart=on-failure
+Type=dbus
+BusName=org.kde.lingmoshell
+Slice=session.slice
+TimeoutSec=40sec
+
+[Install]
+WantedBy=lingmo-core.target

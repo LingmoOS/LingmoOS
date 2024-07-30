@@ -249,7 +249,7 @@ void DeviceMonitor::updateDevicePlace(BluezQt::DevicePtr device)
             qCDebug(BLUEDEVIL_KDED_LOG) << "Adding place" << url;
             QString icon = device->icon();
             if (icon == QLatin1String("phone")) {
-                icon.prepend(QLatin1String("smart")); // Better breeze icon
+                icon.prepend(QLatin1String("smart")); // Better ocean icon
             }
             places()->addPlace(device->name(), url, icon);
         }

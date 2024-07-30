@@ -1833,7 +1833,7 @@ void TreeView::updateTreeView(bool showHidden)
 
 void TreeView::sendReloadMenu()
 {
-    QDBusMessage message = QDBusMessage::createSignal(QStringLiteral("/kickoff"), QStringLiteral("org.kde.plasma"), QStringLiteral("reloadMenu"));
+    QDBusMessage message = QDBusMessage::createSignal(QStringLiteral("/kickoff"), QStringLiteral("org.kde.lingmo"), QStringLiteral("reloadMenu"));
     QDBusConnection::sessionBus().send(message);
 }
 

@@ -28,7 +28,7 @@ private Q_SLOTS:
         cg.writeEntry("Theme", "themeinresource");
         cg.sync();
 
-        // ensure we don't use the breeze icon set from our lib for these tests but the fake we set up below
+        // ensure we don't use the ocean icon set from our lib for these tests but the fake we set up below
         KIconTheme::forceThemeForTests(QString());
 
         // Remove icon cache

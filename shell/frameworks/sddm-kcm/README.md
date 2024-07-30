@@ -1,12 +1,12 @@
 # sddm-kcm - Login Screen (SDDM) System Settings Module
 
-`sddm-kcm` is a KConfig Module (KCM) that integrates itself into KDE's System Settings and serves the purpose of configuring the Simple Desktop Display Manager (SDDM) - the recommended display manager for KDE Plasma.
+`sddm-kcm` is a KConfig Module (KCM) that integrates itself into KDE's System Settings and serves the purpose of configuring the Simple Desktop Display Manager (SDDM) - the recommended display manager for KDE Lingmo.
 
 The main features are the selection of an SDDM theme and setting/modifying its wallpaper. The KCM also supports KDE's Get Hot New Stuff (GHNS) feature, which  means it is possible to install (and remove) user-created SDDM themes hosted on [the KDE Store](https://store.kde.org/browse/cat/101/).
 
 The remainder of the options is geared towards affecting the login screen's behavior, such as enabling or disabling auto-login or setting the default session.
 
-Certain visual and behavioral discrepancies between the login screen and the desktop — which may present themselves due to the login screen's inability to access user files — can be alleviated with the use of the settings synchronization feature. The feature currently allows users to sync the Plasma color scheme, cursor theme, font, font rendering, NumLock preference, Plasma theme, and scaling DPI.
+Certain visual and behavioral discrepancies between the login screen and the desktop — which may present themselves due to the login screen's inability to access user files — can be alleviated with the use of the settings synchronization feature. The feature currently allows users to sync the Lingmo color scheme, cursor theme, font, font rendering, NumLock preference, Lingmo theme, and scaling DPI.
 
 # Installation
 
@@ -47,7 +47,7 @@ Developers are appreciative of potential contributions and will gladly help out 
 
 * https://community.kde.org/Get_Involved/development
 
-If there is something you would like to discuss, you can either use [the main KDE developer mailing list](plasma-devel@kde.org) or contact the community via instant messaging. The most appropriate groups would be #plasma or #kde-vdg.
+If there is something you would like to discuss, you can either use [the main KDE developer mailing list](lingmo-devel@kde.org) or contact the community via instant messaging. The most appropriate groups would be #lingmo or #kde-vdg.
 
 ## End user
 Some distributions use their own SDDM themes. If it's evident that a particular issue with the login screen stems from the theme please contact the support channels of your Linux distribution for user support.

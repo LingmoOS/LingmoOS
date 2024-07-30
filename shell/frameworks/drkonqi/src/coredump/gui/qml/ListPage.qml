@@ -4,18 +4,18 @@
 import QtQuick 2.15
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import org.kde.kitemmodels 1.0 as KItemModels
 
 import org.kde.drkonqi.coredump.gui 1.0 as DrKonqi
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
     title: i18nc("@title", "Crashes")
 
     actions: [
-        Kirigami.Action {
-            displayComponent: Kirigami.SearchField {
+        LingmoUI.Action {
+            displayComponent: LingmoUI.SearchField {
                 onAccepted: patientFilterModel.filterString = text
             }
         }
@@ -42,32 +42,32 @@ Kirigami.ScrollablePage {
             width: ListView.view.width
             onClicked: pageStack.push("qrc:/DetailsPage.qml", {patient: modelObject})
 
-            contentItem: Kirigami.IconTitleSubtitle {
+            contentItem: LingmoUI.IconTitleSubtitle {
                 title: delegate.text
                 subtitle: modelObject.dateTime
                 icon: icon.fromControlsIcon(delegate.icon)
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             visible: page.state === "loading"
             icon.name: "search"
             text: i18nc("@info place holder for empty listview", "Loading crash reports")
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             visible: page.state === "noData"
             icon.name: "emblem-checked"
             text: i18nc("@info place holder for empty listview", "No processes have crashed yet")
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             visible: page.state === "badSearch"
             icon.name: "search"
             text: i18nc("@info place holder for empty listview", "No crashes matching the search")

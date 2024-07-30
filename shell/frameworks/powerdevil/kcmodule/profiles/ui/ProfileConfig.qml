@@ -8,10 +8,10 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.powerdevil as PD
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     required property string profileId
@@ -29,8 +29,8 @@ Kirigami.FormLayout {
     // Suspend Session
 
     Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: i18nc("@title:group", "Suspend Session")
+        LingmoUI.FormData.isSection: true
+        LingmoUI.FormData.label: i18nc("@title:group", "Suspend Session")
         visible: (
             autoSuspendActionRow.visible
             || powerButtonActionCombo.visible
@@ -40,23 +40,23 @@ Kirigami.FormLayout {
         )
     }
 
-    Kirigami.InlineMessage {
-        Kirigami.FormData.isSection: true
+    LingmoUI.InlineMessage {
+        LingmoUI.FormData.isSection: true
         visible: autoSuspendActionCombo.visible && !autoSuspendActionCombo.isConfiguredValueSupported
         Layout.fillWidth: true
-        type: Kirigami.MessageType.Warning
+        type: LingmoUI.MessageType.Warning
         text: i18nc("@info:status", "The action you had previously configured for after a period of inactivity is now unsupported on your system. Please select a different one.")
     }
 
     RowLayout {
         id: autoSuspendActionRow
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:combobox Suspend action such as sleep/hibernate to perform when the system is idle",
             "A&fter a period of inactivity:"
         )
         visible: kcm.supportedActions["SuspendSession"] === true
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         ComboBoxWithIcon {
             id: autoSuspendActionCombo
@@ -86,7 +86,7 @@ Kirigami.FormLayout {
 
         TimeDurationComboBox {
             id: autoSuspendIdleTimeoutCombo
-            durationPromptLabel: autoSuspendActionRow.Kirigami.FormData.label
+            durationPromptLabel: autoSuspendActionRow.LingmoUI.FormData.label
             durationPromptAcceptsUnits: [DurationPromptDialog.Unit.Seconds, DurationPromptDialog.Unit.Minutes]
 
             function translateSeconds(n, formatUnit = DurationPromptDialog.Unit.Seconds) {
@@ -139,17 +139,17 @@ Kirigami.FormLayout {
         }
     }
 
-    Kirigami.InlineMessage {
-        Kirigami.FormData.isSection: true
+    LingmoUI.InlineMessage {
+        LingmoUI.FormData.isSection: true
         visible: powerButtonActionCombo.visible && !powerButtonActionCombo.isConfiguredValueSupported
         Layout.fillWidth: true
-        type: Kirigami.MessageType.Warning
+        type: LingmoUI.MessageType.Warning
         text: i18nc("@info:status", "The action you had previously configured for when the power button is pressed is now unsupported on your system. Please select a different one.")
     }
 
     ComboBoxWithIcon {
         id: powerButtonActionCombo
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:combobox Suspend action such as sleep/hibernate to perform when the power button is pressed",
             "When &power button pressed:"
         )
@@ -178,17 +178,17 @@ Kirigami.FormLayout {
         }
     }
 
-    Kirigami.InlineMessage {
-        Kirigami.FormData.isSection: true
+    LingmoUI.InlineMessage {
+        LingmoUI.FormData.isSection: true
         visible: lidActionCombo.visible && !lidActionCombo.isConfiguredValueSupported
         Layout.fillWidth: true
-        type: Kirigami.MessageType.Warning
+        type: LingmoUI.MessageType.Warning
         text: i18nc("@info:status", "The action you had previously configured for when the lid is closed is now unsupported on your system. Please select a different one.")
     }
 
     ComboBoxWithIcon {
         id: lidActionCombo
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:combobox Suspend action such as sleep/hibernate to perform when the power button is pressed",
             "When laptop &lid closed:"
         )
@@ -236,17 +236,17 @@ Kirigami.FormLayout {
         onToggled: { profileSettings.inhibitLidActionWhenExternalMonitorPresent = !checked; }
     }
 
-    Kirigami.InlineMessage {
-        Kirigami.FormData.isSection: true
+    LingmoUI.InlineMessage {
+        LingmoUI.FormData.isSection: true
         visible: sleepModeCombo.visible && sleepModeCombo.enabled && !sleepModeCombo.isConfiguredValueSupported
         Layout.fillWidth: true
-        type: Kirigami.MessageType.Warning
+        type: LingmoUI.MessageType.Warning
         text: i18nc("@info:status", "The sleep mode you had previously configured is now unsupported on your system. Please select a different one.")
     }
 
     QQC2.ComboBox {
         id: sleepModeCombo
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:combobox Sleep mode selection - suspend to memory, disk or both",
             "When sleeping, enter:"
         )
@@ -260,7 +260,7 @@ Kirigami.FormLayout {
         textRole: "name"
         valueRole: "value"
 
-        delegate: Kirigami.SubtitleDelegate {
+        delegate: LingmoUI.SubtitleDelegate {
             required property string index
 
             // model roles from roleNames(), expose these in your QAbstractItemModel if you haven't already
@@ -298,8 +298,8 @@ Kirigami.FormLayout {
     // Display and Brightness
 
     Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: i18nc("@title:group", "Display and Brightness")
+        LingmoUI.FormData.isSection: true
+        LingmoUI.FormData.label: i18nc("@title:group", "Display and Brightness")
         visible: (
             kcm.supportedActions["BrightnessControl"] === true
             || kcm.supportedActions["DimDisplay"] === true
@@ -309,11 +309,11 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nc("@label:slider Brightness level", "Change scr&een brightness:")
+        LingmoUI.FormData.label: i18nc("@label:slider Brightness level", "Change scr&een brightness:")
 
         visible: kcm.supportedActions["BrightnessControl"] === true
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.CheckBox {
             id: displayBrightnessCheck
@@ -355,7 +355,7 @@ Kirigami.FormLayout {
         id: dimDisplayIdleTimeoutCombo
         visible: kcm.supportedActions["DimDisplay"] === true
         Layout.fillWidth: true
-        Kirigami.FormData.label: i18nc("@label:combobox Dim screen after X minutes", "Di&m automatically:")
+        LingmoUI.FormData.label: i18nc("@label:combobox Dim screen after X minutes", "Di&m automatically:")
 
         durationPromptLabel: i18nc("@label:spinbox Dim screen after X minutes", "Di&m automatically after:")
         durationPromptAcceptsUnits: [DurationPromptDialog.Unit.Seconds, DurationPromptDialog.Unit.Minutes]
@@ -413,8 +413,8 @@ Kirigami.FormLayout {
         }
     }
 
-    Kirigami.InlineMessage {
-        Kirigami.FormData.isSection: true
+    LingmoUI.InlineMessage {
+        LingmoUI.FormData.isSection: true
         visible: (
             dimDisplayIdleTimeoutCombo.visible
             && profileSettings.dimDisplayWhenIdle && profileSettings.turnOffDisplayWhenIdle
@@ -422,18 +422,18 @@ Kirigami.FormLayout {
             && profileSettings.dimDisplayIdleTimeoutSec >= profileSettings.turnOffDisplayIdleTimeoutWhenLockedSec
         )
         Layout.fillWidth: true
-        type: Kirigami.MessageType.Warning
+        type: LingmoUI.MessageType.Warning
         text: i18nc("@info:status", "The screen will not be dimmed because it is configured to turn off sooner.")
     }
 
     RowLayout {
         id: turnOffDisplayRow
-        Kirigami.FormData.label: i18nc("@label:combobox After X minutes", "&Turn off screen:")
-        Kirigami.FormData.buddyFor: turnOffDisplayIdleTimeoutCombo
+        LingmoUI.FormData.label: i18nc("@label:combobox After X minutes", "&Turn off screen:")
+        LingmoUI.FormData.buddyFor: turnOffDisplayIdleTimeoutCombo
 
         visible: kcm.supportedActions["DPMSControl"] === true
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         TimeDurationComboBox {
             id: turnOffDisplayIdleTimeoutCombo
@@ -553,11 +553,11 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nc("@label:slider Brightness level", "Change key&board brightness:")
+        LingmoUI.FormData.label: i18nc("@label:slider Brightness level", "Change key&board brightness:")
 
         visible: kcm.supportedActions["KeyboardBrightnessControl"] === true
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.CheckBox {
             id: keyboardBrightnessCheck
@@ -599,14 +599,14 @@ Kirigami.FormLayout {
     // Advanced customization options
 
     Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: i18nc("@title:group", "Other Settings")
+        LingmoUI.FormData.isSection: true
+        LingmoUI.FormData.label: i18nc("@title:group", "Other Settings")
         visible: kcm.supportedActions["RunScript"] === true || powerProfileCombo.visible
     }
 
     QQC2.ComboBox {
         id: powerProfileCombo
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:combobox Power Save, Balanced or Performance profile - same options as in the Battery applet",
             "Switch to po&wer profile:"
         )
@@ -639,7 +639,7 @@ Kirigami.FormLayout {
 
     QQC2.Button {
         id: addScriptCommandButton
-        Kirigami.FormData.label: i18nc("@label:button", "Run custom script:")
+        LingmoUI.FormData.label: i18nc("@label:button", "Run custom script:")
 
         visible: (kcm.supportedActions["RunScript"] === true
             // If power states aren't switchable, only show the idleTimeoutCommand field
@@ -666,7 +666,7 @@ Kirigami.FormLayout {
             title: addScriptCommandButton.text
             y: addScriptCommandButton.height
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 id: profileLoadCommandEditAction
                 text: i18nc(
                     "@text:action:menu Script command to execute for power state (On AC Power, On Battery, ...)",
@@ -684,7 +684,7 @@ Kirigami.FormLayout {
                     }
                 }
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 id: profileUnloadCommandEditAction
                 text: i18nc(
                     "@text:action:menu Script command to execute for power state (On AC Power, On Battery, ...)",
@@ -702,7 +702,7 @@ Kirigami.FormLayout {
                     }
                 }
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 id: idleTimeoutCommandEditAction
                 text: i18nc(
                     "@text:action:menu Script command to execute",
@@ -727,7 +727,7 @@ Kirigami.FormLayout {
 
     RunScriptEdit {
         id: profileLoadCommandEdit
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:textfield Script command to execute for power state (On AC Power, On Battery, ...)",
             "When e&ntering \"%1\" state:", root.profileLabel
         )
@@ -762,7 +762,7 @@ Kirigami.FormLayout {
 
     RunScriptEdit {
         id: profileUnloadCommandEdit
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:textfield Script command to execute for power state (On AC Power, On Battery, ...)",
             "When e&xiting \"%1\" state:", root.profileLabel
         )
@@ -797,7 +797,7 @@ Kirigami.FormLayout {
 
     RunScriptEdit {
         id: idleTimeoutCommandEdit
-        Kirigami.FormData.label: i18nc(
+        LingmoUI.FormData.label: i18nc(
             "@label:textfield Script command to execute",
             "After a period of inacti&vity:"
         )

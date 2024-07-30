@@ -1,0 +1,46 @@
+Lingmo Applet Template
+----------------------
+
+-- Namespace adaption --
+
+Each Lingmo plugin has a unique identifier, which is also used to find related
+resources (like the translation catalogs).
+To avoid naming collisions, Lingmo plugins use a reverse domain name notation
+for that identifier:
+
+* org.kde.lingmo.* - plugins coming from Lingmo modules
+* org.kde.*        - plugins coming from other software from KDE
+* $(my.domain).*   - plugins of your 3rd-party
+
+The generated code uses the "org.kde.lingmo" namespace for the plugin identifier.
+As this namespace is reserved for use by plugins part of Lingmo modules, you will
+need to adapt this namespace if you are writing a plugin which is not intended to
+end up in the Lingmo modules.
+
+
+-- Build instructions --
+
+cd /where/your/applet/is/generated
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=MYPREFIX .. 
+make 
+make install
+
+(MYPREFIX is where you install your Lingmo setup, replace it accordingly)
+
+Restart lingmo to load the applet 
+(in a terminal type: 
+kquitapp lingmoshell 
+and then
+lingmoshell)
+
+or view it with 
+plasmoidviewer -a YourAppletName
+
+-- Tutorials and resources --
+The explanation of the QML part of the template
+https://techbase.kde.org/Development/Tutorials/Lingmo5/QML2/GettingStarted
+
+Lingmo QML API explained
+https://techbase.kde.org/Development/Tutorials/Lingmo2/QML2/API

@@ -16,7 +16,7 @@ install(
 install(CODE "
     include(${CMAKE_SOURCE_DIR}/cmake/SystemctlEnable.cmake)
     systemctl_enable(drkonqi-sentry-postman.path default.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
-    systemctl_enable(drkonqi-sentry-postman.path plasma-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
+    systemctl_enable(drkonqi-sentry-postman.path lingmo-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
     systemctl_enable(drkonqi-sentry-postman.timer timers.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
-    systemctl_enable(drkonqi-sentry-postman.timer plasma-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
+    systemctl_enable(drkonqi-sentry-postman.timer lingmo-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
 ")

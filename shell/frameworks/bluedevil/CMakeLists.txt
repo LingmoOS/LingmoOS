@@ -39,12 +39,12 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
     WindowSystem
 )
 
-find_package(Plasma ${PROJECT_DEP_VERSION} REQUIRED)
+find_package(Lingmo ${PROJECT_DEP_VERSION} REQUIRED)
 
 find_package(SharedMimeInfo REQUIRED)
 
-find_package(KF6Kirigami ${KF6_MIN_VERSION} CONFIG)
-set_package_properties(KF6Kirigami PROPERTIES
+find_package(KF6LingmoUI ${KF6_MIN_VERSION} CONFIG)
+set_package_properties(KF6LingmoUI PROPERTIES
     TYPE RUNTIME
 )
 

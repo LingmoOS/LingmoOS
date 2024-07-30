@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 T.ToolBar {
@@ -19,13 +19,13 @@ T.ToolBar {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              contentHeight + topPadding + bottomPadding)
 
-    padding: Kirigami.Units.smallSpacing
+    padding: LingmoUI.Units.smallSpacing
 
     // Note: relying on this heuristic might break your apps if used with other QQC2 styles.
     position: parent?.footer === controlRoot ? T.ToolBar.Footer : T.ToolBar.Header
 
-    Kirigami.Theme.colorSet: position === T.ToolBar.Footer ? Kirigami.Theme.Window : Kirigami.Theme.Header
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: position === T.ToolBar.Footer ? LingmoUI.Theme.Window : LingmoUI.Theme.Header
+    LingmoUI.Theme.inherit: false
 
     background: Private.DefaultToolBarBackground {
         control: controlRoot

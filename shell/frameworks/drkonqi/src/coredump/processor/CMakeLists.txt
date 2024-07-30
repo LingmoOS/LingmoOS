@@ -26,5 +26,5 @@ install(
 install(CODE "
     include(${CMAKE_SOURCE_DIR}/cmake/SystemctlEnable.cmake)
     systemctl_enable(drkonqi-coredump-processor@.service systemd-coredump@.service ${KDE_INSTALL_FULL_SYSTEMDUNITDIR}/system)
-    systemctl_enable(drkonqi-coredump-pickup.service plasma-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
+    systemctl_enable(drkonqi-coredump-pickup.service lingmo-core.target ${KDE_INSTALL_FULL_SYSTEMDUSERUNITDIR})
 ")

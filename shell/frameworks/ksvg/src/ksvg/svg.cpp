@@ -598,7 +598,7 @@ QPixmap SvgPrivate::findInCache(const QString &elementId, qreal ratio, const QSi
     QPixmap p;
     if (cacheRendering && lastModified == SvgRectsCache::instance()->lastModifiedTimeFromCache(path) && actualImageSet()->d->findInCache(id, p, lastModified)) {
         p.setDevicePixelRatio(ratio);
-        // qCDebug(LOG_PLASMA) << "found cached version of " << id << p.size();
+        // qCDebug(LOG_LINGMO) << "found cached version of " << id << p.size();
         return p;
     }
 

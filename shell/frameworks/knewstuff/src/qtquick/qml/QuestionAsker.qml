@@ -17,7 +17,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 import org.kde.newstuff.core as NewStuffCore
 
@@ -31,8 +31,8 @@ QQC2.Dialog {
     modal: true
     focus: true
 
-    margins: Kirigami.Units.largeSpacing
-    padding: Kirigami.Units.largeSpacing
+    margins: LingmoUI.Units.largeSpacing
+    padding: LingmoUI.Units.largeSpacing
 
     standardButtons: {
         switch (questionType) {
@@ -136,7 +136,7 @@ QQC2.Dialog {
         }
 
         anchors.fill: parent
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.Label {
             id: questionLabel
@@ -146,7 +146,7 @@ QQC2.Dialog {
 
         ListView {
             id: listView
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Layout.maximumWidth: layout.maxWidth
             Layout.fillWidth: true
 

@@ -96,7 +96,7 @@ The C++ implementation with its CMake and JSON files are recommended to be in th
 
 Package structures are instance of PackageStructure and are shipeed as plugins.
 
-PackageStructure::initPackage will be executed once when any package is created, and this initializes the Package instance on what are the allowed subfolders and named files for this type. The most important thing to do in initPackage is setting a packageRoot path, that will be a common prefix under which all packages will be installed, relative to the xdg data paths. For instance the packages of type "plasmoid" will be under "plasma/plasmoids" which means searching under ~/.local/share/plasma/plasmoids and /usr/share/plasma/plasmoids.
+PackageStructure::initPackage will be executed once when any package is created, and this initializes the Package instance on what are the allowed subfolders and named files for this type. The most important thing to do in initPackage is setting a packageRoot path, that will be a common prefix under which all packages will be installed, relative to the xdg data paths. For instance the packages of type "plasmoid" will be under "lingmo/plasmoids" which means searching under ~/.local/share/lingmo/plasmoids and /usr/share/lingmo/plasmoids.
 
 This is the only required function to be reimplemented for a given PackageStructure, the other ones being optional only when particular needs ensue.
 
@@ -108,11 +108,11 @@ The PackageLoader is used to list, find and load Package instances.
 
 The most important functions of this class are listPackages/findPackages to list and search packages of a certain type (package structure), for example listing all plasmoids or all plasmoids that have "clock" in their description PackageLoader::loadPackage loads a "blank" package of a certain type. The returned package will be a Package instance that has been initialized to that given structure, pointing to a particular package in the filesystem only if the optional parameter packagePath has been passed. If not, it will be an invalid package, still usable to install and uninstall packages of this type or it can always load a package on the filesystem with the setPath Package method, relative to the packageroot.
 
-Upon setPath, subdirectories of the packageroot will be searched both in the global system installation and in the user home, preferring the home, such as ~/.local/share/plasma/plasmoids and /usr/share/plasma/plasmoids. If one has to iterate through packages, creating a single Package instance then loading different ones with subsequent calls of setPath is preferable over creating multiple instances for performance reasons.
+Upon setPath, subdirectories of the packageroot will be searched both in the global system installation and in the user home, preferring the home, such as ~/.local/share/lingmo/plasmoids and /usr/share/lingmo/plasmoids. If one has to iterate through packages, creating a single Package instance then loading different ones with subsequent calls of setPath is preferable over creating multiple instances for performance reasons.
 Example of code loading a package:
 
 ```
-KPackage::Package p = KPackage::PackageLoader::self()->loadPackage("Plasma/Applet", "org.kde.plasma.analogclock");
+KPackage::Package p = KPackage::PackageLoader::self()->loadPackage("Lingmo/Applet", "org.kde.lingmo.analogclock");
 if (p.isValid()) {
     qDebug() << p.filePath("mainscript");
 }

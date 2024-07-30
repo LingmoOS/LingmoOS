@@ -67,7 +67,7 @@ public:
     /** When an application is run via kdeinit, the executable() method returns kdeinit4, but
      * we still need a way to know which is the application that was loaded by kdeinit. So,
      * this method returns the base name of the executable that would have been launched if
-     * the app had not been loaded by kdeinit (ex. "plasma-desktop"). If the application was
+     * the app had not been loaded by kdeinit (ex. "lingmo-desktop"). If the application was
      * not launched via kdeinit, this method returns executable().baseName();
      */
     QString fakeExecutableBaseName() const;

@@ -9,14 +9,14 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.15
 
-import org.kde.plasma.core as PlasmaCore
+import org.kde.lingmo.core as LingmoCore
 
 Item
 {
     width: 500
     height: 500
 
-    PlasmaCore.FrameSvgItem {
+    LingmoCore.FrameSvgItem {
         id: theItem
 
         imagePath: "widgets/background"
@@ -35,9 +35,9 @@ Item
             }
             onClicked: {
                 if (checked)
-                    theItem.enabledBorders |= PlasmaCore.FrameSvg.LeftBorder;
+                    theItem.enabledBorders |= LingmoCore.FrameSvg.LeftBorder;
                 else
-                    theItem.enabledBorders &=~PlasmaCore.FrameSvg.LeftBorder;
+                    theItem.enabledBorders &=~LingmoCore.FrameSvg.LeftBorder;
             }
         }
         Button {
@@ -51,9 +51,9 @@ Item
             }
             onClicked: {
                 if (checked)
-                    theItem.enabledBorders |= PlasmaCore.FrameSvg.RightBorder;
+                    theItem.enabledBorders |= LingmoCore.FrameSvg.RightBorder;
                 else
-                    theItem.enabledBorders &=~PlasmaCore.FrameSvg.RightBorder;
+                    theItem.enabledBorders &=~LingmoCore.FrameSvg.RightBorder;
             }
         }
         Button {
@@ -67,9 +67,9 @@ Item
             }
             onClicked: {
                 if (checked)
-                    theItem.enabledBorders |= PlasmaCore.FrameSvg.TopBorder;
+                    theItem.enabledBorders |= LingmoCore.FrameSvg.TopBorder;
                 else
-                    theItem.enabledBorders &=~PlasmaCore.FrameSvg.TopBorder;
+                    theItem.enabledBorders &=~LingmoCore.FrameSvg.TopBorder;
             }
         }
         Button {
@@ -83,9 +83,9 @@ Item
             }
             onClicked: {
                 if (checked)
-                    theItem.enabledBorders |= PlasmaCore.FrameSvg.BottomBorder;
+                    theItem.enabledBorders |= LingmoCore.FrameSvg.BottomBorder;
                 else
-                    theItem.enabledBorders &=~PlasmaCore.FrameSvg.BottomBorder;
+                    theItem.enabledBorders &=~LingmoCore.FrameSvg.BottomBorder;
             }
         }
     }

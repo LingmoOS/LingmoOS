@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.quickcharts as Charts
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -18,7 +18,7 @@ import org.kde.ksysguard.faces as Faces
 Faces.AbstractSensorFace {
     id: root
 
-    property list<Kirigami.Action> actions
+    property list<LingmoUI.Action> actions
 
     implicitWidth: contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight
@@ -39,7 +39,7 @@ Faces.AbstractSensorFace {
         map: root.controller.sensorColors
     }
     Charts.ColorGradientSource {
-        baseColor: Kirigami.Theme.highlightColor
+        baseColor: LingmoUI.Theme.highlightColor
         itemCount: root.controller.highPrioritySensorIds.length
 
         onItemCountChanged: generate()

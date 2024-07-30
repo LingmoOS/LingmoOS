@@ -1,8 +1,8 @@
 
 find_package(Qt6Widgets REQUIRED)
-set_package_properties(Qt6Widgets PROPERTIES TYPE REQUIRED PURPOSE "The charts example needs Qt Widgets so the Plasma desktop style works properly.")
-find_package(KF6Kirigami2 REQUIRED)
-set_package_properties(KF6Kirigami2 PROPERTIES TYPE REQUIRED PURPOSE "The charts example uses Kirigami for its UI.")
+set_package_properties(Qt6Widgets PROPERTIES TYPE REQUIRED PURPOSE "The charts example needs Qt Widgets so the Lingmo desktop style works properly.")
+find_package(KF6LingmoUI2 REQUIRED)
+set_package_properties(KF6LingmoUI2 PROPERTIES TYPE REQUIRED PURPOSE "The charts example uses LingmoUI for its UI.")
 find_package(KF6Declarative REQUIRED)
 set_package_properties(KF6Declarative PROPERTIES TYPE REQUIRED PURPOSE "The charts example uses items from KF6Declarative for its UI.")
 

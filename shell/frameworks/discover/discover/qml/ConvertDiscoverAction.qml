@@ -5,14 +5,14 @@
  */
 
 import QtQml
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
 /*
- * Converts a DiscoverAction into a Kirigami.Action so we can use DiscoverActions
+ * Converts a DiscoverAction into a LingmoUI.Action so we can use DiscoverActions
  * with QQC2 components
  */
-Kirigami.Action {
+LingmoUI.Action {
     required property Discover.DiscoverAction action
 
     icon.name: action.iconName

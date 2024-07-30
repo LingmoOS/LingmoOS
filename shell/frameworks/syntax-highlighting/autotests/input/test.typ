@@ -313,7 +313,7 @@ There now is your insular city of the Manhattoes, belted round by
 wharves as Indian isles by coral reefs - commerce surrounds it with
 her surf. Right and left, the streets take you waterward. Its extreme
 down-town is the battery, where that noble mole is washed by waves,
-and cooled by breezes, which a few hours previous were out of sight of
+and cooled by oceans, which a few hours previous were out of sight of
 land. Look at the crowds of water-gazers there.
 
 Anyone caught using formulas such as $sqrt(x+y)=sqrt(x)+sqrt(y)$

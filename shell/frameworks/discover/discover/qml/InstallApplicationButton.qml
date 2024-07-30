@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
 ConditionalLoader {
@@ -18,7 +18,7 @@ ConditionalLoader {
         id: listener
     }
 
-    readonly property Kirigami.Action action: Kirigami.Action {
+    readonly property LingmoUI.Action action: LingmoUI.Action {
         text: {
             if (!root.isStateAvailable) {
                 return i18nc("State being fetched", "Loading…")
@@ -34,15 +34,15 @@ ConditionalLoader {
         icon {
             name: root.application.isInstalled ? "edit-delete" : "download"
             color: !root.isActive && enabled
-                ? (root.application.isInstalled ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.positiveTextColor)
-                : Kirigami.Theme.backgroundColor
+                ? (root.application.isInstalled ? LingmoUI.Theme.negativeTextColor : LingmoUI.Theme.positiveTextColor)
+                : LingmoUI.Theme.backgroundColor
         }
         visible: !root.isActive && (!root.application.isInstalled || root.application.isRemovable)
         enabled: !root.isActive && root.isStateAvailable
         onTriggered: root.click()
     }
 
-    readonly property Kirigami.Action cancelAction: Kirigami.Action {
+    readonly property LingmoUI.Action cancelAction: LingmoUI.Action {
         text: i18n("Cancel")
         icon.name: "dialog-cancel"
         enabled: listener.isCancellable
@@ -77,7 +77,7 @@ ConditionalLoader {
 
             QQC2.ToolTip.text: text
             QQC2.ToolTip.visible: hovered
-            QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+            QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
         }
 
         LabelBackground {
@@ -98,7 +98,7 @@ ConditionalLoader {
 
         QQC2.ToolTip.text: text
         QQC2.ToolTip.visible: hovered
-        QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+        QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
         onClicked: root.click()
     }

@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -27,7 +27,7 @@ ChartControls.PieChartControl {
 
     property int updateRateLimit
 
-    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : Kirigami.Units.gridUnit
+    Layout.minimumHeight: root.formFactor == Faces.SensorFace.Vertical ? width : LingmoUI.Units.gridUnit
 
     leftPadding: 0
     rightPadding: 0
@@ -43,7 +43,7 @@ ChartControls.PieChartControl {
     chart.smoothEnds: root.controller.faceConfiguration.smoothEnds
     chart.fromAngle: root.controller.faceConfiguration.fromAngle
     chart.toAngle: root.controller.faceConfiguration.toAngle
-    chart.thickness: Kirigami.Units.largeSpacing
+    chart.thickness: LingmoUI.Units.largeSpacing
 
     range {
         from: chart.rangeFrom
@@ -51,7 +51,7 @@ ChartControls.PieChartControl {
         automatic: root.controller.faceConfiguration.rangeAuto
     }
 
-    chart.backgroundColor: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, 0.1)
+    chart.backgroundColor: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, 0.1)
 
     valueSources: Charts.ModelSource {
         model: Sensors.SensorDataModel {

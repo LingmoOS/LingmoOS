@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     QObject::connect(&app, &QGuiApplication::saveStateRequest, disableSessionManagement);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(i18n("Greeter for the KDE Plasma Workspaces Screen locker"));
+    parser.setApplicationDescription(i18n("Greeter for the KDE Lingmo Workspaces Screen locker"));
     parser.addHelpOption();
     parser.addVersionOption();
 

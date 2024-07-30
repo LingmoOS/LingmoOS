@@ -6,14 +6,14 @@
 
 import QtQuick
 import QtQuick.Window
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin as KWinComponents
 
 Window {
     id: root
 
-    readonly property int thumbnailWidth: Kirigami.Units.gridUnit * 10
-    readonly property int thumbnailHeight: Kirigami.Units.gridUnit * 10
+    readonly property int thumbnailWidth: LingmoUI.Units.gridUnit * 10
+    readonly property int thumbnailHeight: LingmoUI.Units.gridUnit * 10
     readonly property bool _q_showWithoutActivating: true
 
     color: "transparent"

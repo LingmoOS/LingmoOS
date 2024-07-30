@@ -9,8 +9,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.workspace.dialogs as PWD
 import org.kde.taskmanager 0.1 as TaskManager
 
 PWD.SystemDialog {
@@ -46,15 +46,15 @@ PWD.SystemDialog {
         QQC2.Frame {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 20
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 30
+            Layout.preferredHeight: LingmoUI.Units.gridUnit * 20
+            Layout.preferredWidth: LingmoUI.Units.gridUnit * 30
 
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.View
+            LingmoUI.Theme.inherit: false
+            LingmoUI.Theme.colorSet: LingmoUI.Theme.View
 
             background: Rectangle {
-                color: Kirigami.Theme.backgroundColor
-                border.color: Qt.alpha(Kirigami.Theme.textColor, 0.3)
+                color: LingmoUI.Theme.backgroundColor
+                border.color: Qt.alpha(LingmoUI.Theme.textColor, 0.3)
                 border.width: 1
             }
 
@@ -65,7 +65,7 @@ PWD.SystemDialog {
                 QQC2.ScrollView {
                     contentWidth: availableWidth
                     contentHeight: outputsLayout.height
-                    Kirigami.CardsLayout {
+                    LingmoUI.CardsLayout {
                         id: outputsLayout
                         anchors {
                             left: parent.left;
@@ -128,7 +128,7 @@ PWD.SystemDialog {
                 QQC2.ScrollView {
                     contentWidth: availableWidth
                     contentHeight: windowsLayout.height
-                    Kirigami.CardsLayout {
+                    LingmoUI.CardsLayout {
                         id: windowsLayout
                         anchors {
                             left: parent.left;

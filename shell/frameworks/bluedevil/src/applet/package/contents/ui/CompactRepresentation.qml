@@ -10,21 +10,21 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
 
 MouseArea {
     id: root
 
     required property PlasmoidItem plasmoidItem
-    required property PlasmaCore.Action toggleBluetoothAction
+    required property LingmoCore.Action toggleBluetoothAction
 
     readonly property bool inPanel: [
-        PlasmaCore.Types.TopEdge,
-        PlasmaCore.Types.RightEdge,
-        PlasmaCore.Types.BottomEdge,
-        PlasmaCore.Types.LeftEdge,
+        LingmoCore.Types.TopEdge,
+        LingmoCore.Types.RightEdge,
+        LingmoCore.Types.BottomEdge,
+        LingmoCore.Types.LeftEdge,
     ].includes(Plasmoid.location)
 
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
@@ -45,7 +45,7 @@ MouseArea {
 
     hoverEnabled: true
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         anchors.fill: parent
         source: Plasmoid.icon
         active: root.containsMouse

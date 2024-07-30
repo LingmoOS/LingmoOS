@@ -502,10 +502,10 @@ bool StorageAccess::requestPassphrase()
 
     QString appId = QCoreApplication::applicationName();
 
-    const auto plasmaVersionMajor = qEnvironmentVariable("KDE_SESSION_VERSION", "6");
+    const auto lingmoVersionMajor = qEnvironmentVariable("KDE_SESSION_VERSION", "6");
 
-    // TODO KF6: remove hard dep on Plasma here which provides the SolidUiServer kded plugin
-    QDBusInterface soliduiserver(QStringLiteral("org.kde.kded") + plasmaVersionMajor, "/modules/soliduiserver", "org.kde.SolidUiServer");
+    // TODO KF6: remove hard dep on Lingmo here which provides the SolidUiServer kded plugin
+    QDBusInterface soliduiserver(QStringLiteral("org.kde.kded") + lingmoVersionMajor, "/modules/soliduiserver", "org.kde.SolidUiServer");
     QDBusReply<void> reply = soliduiserver.call("showPassphraseDialog", udi, returnService, m_lastReturnObject, wId, appId);
     m_passphraseRequested = reply.isValid();
     if (!m_passphraseRequested) {

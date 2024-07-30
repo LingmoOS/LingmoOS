@@ -35,7 +35,7 @@ find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
 )
 
 find_package(KF6 ${KF6_MIN_VERSION} REQUIRED
-    Kirigami2
+    LingmoUI2
     I18n
 )
 
@@ -44,7 +44,7 @@ ecm_find_qmlmodule(QtQuick 2.15)
 ecm_find_qmlmodule(QtQuick.Window 2.15)
 ecm_find_qmlmodule(QtQuick.Controls 2.15)
 ecm_find_qmlmodule(QtQuick.Layouts 1.15)
-ecm_find_qmlmodule(org.kde.kirigami 2.19)
+ecm_find_qmlmodule(org.kde.lingmoui 2.19)
 ecm_find_qmlmodule(Qt.labs.folderlistmodel 2.15)
 ecm_find_qmlmodule(QtQuick.Templates 2.15)
 ecm_find_qmlmodule(QtMultimedia 2.15)

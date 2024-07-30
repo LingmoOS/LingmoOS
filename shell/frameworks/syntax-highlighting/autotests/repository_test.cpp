@@ -518,7 +518,7 @@ private Q_SLOTS:
         palette.setColor(QPalette::Base, QColor(27, 30, 32));
         palette.setColor(QPalette::Highlight, QColor(61, 174, 253));
         auto theme = m_repo.themeForPalette(palette);
-        QCOMPARE(theme.name(), QStringLiteral("Breeze Dark"));
+        QCOMPARE(theme.name(), QStringLiteral("Ocean Dark"));
     }
 };
 }

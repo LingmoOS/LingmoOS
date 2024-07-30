@@ -11,8 +11,8 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.kcmutils as KCMUtils
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
 ColumnLayout {
     id: root
@@ -21,12 +21,12 @@ ColumnLayout {
     Discover.Activatable.active: list.model.rowCount() > 0
     spacing: 0
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         Layout.fillWidth: true
-        Layout.bottomMargin: Kirigami.Units.largeSpacing
+        Layout.bottomMargin: LingmoUI.Units.largeSpacing
         text: i18ndc("libdiscover", "%1 is the name of the application", "Permissions for %1", root.resource.name)
         level: 2
-        type: Kirigami.Heading.Type.Primary
+        type: LingmoUI.Heading.Type.Primary
         wrapMode: Text.Wrap
     }
 
@@ -73,7 +73,7 @@ ColumnLayout {
     QQC2.Button {
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: parent.width
-        Layout.topMargin: Kirigami.Units.largeSpacing
+        Layout.topMargin: LingmoUI.Units.largeSpacing
         visible: root.resource.isInstalled
         text: i18nd("libdiscover", "Configure permissions…")
         icon.name: "configure"

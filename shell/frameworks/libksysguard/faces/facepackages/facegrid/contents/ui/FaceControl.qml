@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces

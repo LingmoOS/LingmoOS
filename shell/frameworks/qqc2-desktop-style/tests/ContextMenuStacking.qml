@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.ApplicationWindow {
     id: root
@@ -17,13 +17,13 @@ QQC2.ApplicationWindow {
     height: 400
     visible: true
 
-    Kirigami.SelectableLabel {
+    LingmoUI.SelectableLabel {
         anchors {
             top: parent.top
             left: parent.left
             right: parent.right
-            margins: Kirigami.Units.largeSpacing
-            topMargin: Kirigami.Units.gridUnit * 3
+            margins: LingmoUI.Units.largeSpacing
+            topMargin: LingmoUI.Units.gridUnit * 3
         }
         text: `<ol>
             <li>TextField is parented to an item in Popup A.</li>
@@ -38,15 +38,15 @@ QQC2.ApplicationWindow {
         id: textField
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: Kirigami.Units.largeSpacing
+        anchors.margins: LingmoUI.Units.largeSpacing
         placeholderText: "Right click me"
     }
 
     component ControlPanel: Column {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.margins: Kirigami.Units.largeSpacing
-        spacing: Kirigami.Units.smallSpacing
+        anchors.margins: LingmoUI.Units.largeSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.Button {
             text: "Move TextField to Popup A"
@@ -79,15 +79,15 @@ QQC2.ApplicationWindow {
     QQC2.Popup {
         id: popupA
 
-        Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.Dialog
-        z: Kirigami.OverlayZStacking.z
+        LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.Dialog
+        z: LingmoUI.OverlayZStacking.z
 
         parent: root.QQC2.Overlay.overlay
         x: 0
         y: 0
         width: 300
         height: 300
-        margins: Kirigami.Units.gridUnit
+        margins: LingmoUI.Units.gridUnit
         closePolicy: QQC2.Popup.NoAutoClose | QQC2.Popup.CloseOnPressOutside
         modal: false
 
@@ -101,14 +101,14 @@ QQC2.ApplicationWindow {
     QQC2.Popup {
         id: popupB
 
-        Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.Notification
-        z: Kirigami.OverlayZStacking.z
+        LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.Notification
+        z: LingmoUI.OverlayZStacking.z
 
         parent: root.QQC2.Overlay.overlay
         anchors.centerIn: parent
         width: 300
         height: 300
-        margins: Kirigami.Units.gridUnit
+        margins: LingmoUI.Units.gridUnit
         closePolicy: QQC2.Popup.NoAutoClose | QQC2.Popup.CloseOnPressOutside
         modal: false
 

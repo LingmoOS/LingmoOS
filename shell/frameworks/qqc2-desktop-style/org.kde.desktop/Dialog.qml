@@ -9,12 +9,12 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Dialog {
     id: control
 
-    z: Kirigami.OverlayZStacking.z
+    z: LingmoUI.OverlayZStacking.z
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding,
@@ -25,7 +25,7 @@ T.Dialog {
                              + (implicitHeaderHeight > 0 ? implicitHeaderHeight + spacing : 0)
                              + (implicitFooterHeight > 0 ? implicitFooterHeight + spacing : 0))
 
-    padding: Kirigami.Units.gridUnit
+    padding: LingmoUI.Units.gridUnit
 
     // black background, fades in and out
     QQC2.Overlay.modal: Rectangle {
@@ -33,9 +33,9 @@ T.Dialog {
 
         // the opacity of the item is changed internally by QQuickPopup on open/close
         Behavior on opacity {
-            enabled: Kirigami.Units.longDuration > 0
+            enabled: LingmoUI.Units.longDuration > 0
             OpacityAnimator {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
@@ -47,7 +47,7 @@ T.Dialog {
             from: 0
             to: 1
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
         }
     }
 
@@ -57,18 +57,18 @@ T.Dialog {
             from: 1
             to: 0
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
         }
     }
 
     contentItem: Item {}
 
-    background: Kirigami.ShadowedRectangle {
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: false
+    background: LingmoUI.ShadowedRectangle {
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: false
 
-        color: Kirigami.Theme.backgroundColor
-        radius: Kirigami.Units.cornerRadius
+        color: LingmoUI.Theme.backgroundColor
+        radius: LingmoUI.Units.cornerRadius
 
         shadow {
             size: radius * 2
@@ -78,16 +78,16 @@ T.Dialog {
 
         border {
             width: 1
-            color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast);
+            color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast);
         }
     }
 
-    header: Kirigami.Heading {
+    header: LingmoUI.Heading {
         text: control.title
         level: 2
         visible: control.title
         elide: Label.ElideRight
-        padding: Kirigami.Units.gridUnit
+        padding: LingmoUI.Units.gridUnit
         bottomPadding: 0
     }
 

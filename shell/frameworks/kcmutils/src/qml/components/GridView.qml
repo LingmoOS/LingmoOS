@@ -6,7 +6,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import "private" as Private
 
 /**
@@ -36,8 +36,8 @@ QQC2.ScrollView {
     property bool framedView: true
 
     activeFocusOnTab: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     Component.onCompleted: {
         if (background) {

@@ -11,8 +11,8 @@
 
 #include <KWayland/Client/compositor.h>
 #include <KWayland/Client/connection_thread.h>
-#include <KWayland/Client/plasmashell.h>
-#include <KWayland/Client/plasmawindowmanagement.h>
+#include <KWayland/Client/lingmoshell.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
 #include <KWayland/Client/region.h>
 #include <KWayland/Client/registry.h>
 #include <KWayland/Client/shadow.h>
@@ -69,18 +69,18 @@ KWayland::Client::Registry *WaylandIntegration::registry() const
     return m_registry;
 }
 
-KWayland::Client::PlasmaShell *WaylandIntegration::waylandPlasmaShell()
+KWayland::Client::LingmoShell *WaylandIntegration::waylandLingmoShell()
 {
-    if (!m_waylandPlasmaShell && m_registry) {
-        const KWayland::Client::Registry::AnnouncedInterface wmInterface = m_registry->interface(KWayland::Client::Registry::Interface::PlasmaShell);
+    if (!m_waylandLingmoShell && m_registry) {
+        const KWayland::Client::Registry::AnnouncedInterface wmInterface = m_registry->interface(KWayland::Client::Registry::Interface::LingmoShell);
 
         if (wmInterface.name == 0) {
             return nullptr;
         }
 
-        m_waylandPlasmaShell = m_registry->createPlasmaShell(wmInterface.name, wmInterface.version, qApp);
+        m_waylandLingmoShell = m_registry->createLingmoShell(wmInterface.name, wmInterface.version, qApp);
     }
-    return m_waylandPlasmaShell;
+    return m_waylandLingmoShell;
 }
 
 WaylandXdgActivationV1 *WaylandIntegration::activation()

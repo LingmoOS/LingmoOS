@@ -102,7 +102,7 @@ void KApplicationTraderTest::initTestCase()
                                                 {{QStringLiteral("MimeType"), QStringLiteral("text/plain;x-scheme-handler/someprotocol")}});
     m_fakeSchemeHandler = QFileInfo(m_fakeSchemeHandler).canonicalFilePath();
 
-    // fakegnomeapplication (do not show in Plasma). Should never be returned. To test the filtering code in queryByMimeType.
+    // fakegnomeapplication (do not show in Lingmo). Should never be returned. To test the filtering code in queryByMimeType.
     QMap<QString, QString> fields;
     fields.insert(QStringLiteral("OnlyShowIn"), QStringLiteral("Gnome"));
     m_fakeGnomeApplication = createFakeApplication(QStringLiteral("fakegnomeapplication.desktop"), QStringLiteral("FakeApplicationGnome"), fields);

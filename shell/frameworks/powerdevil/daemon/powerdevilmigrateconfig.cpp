@@ -40,7 +40,7 @@ namespace PowerDevil
 void migrateActivitiesConfig(KSharedConfig::Ptr profilesConfig)
 {
     KConfigGroup migrationGroup = profilesConfig->group(QStringLiteral("Migration"));
-    if (migrationGroup.hasKey("MigratedActivitiesToPlasma6")) {
+    if (migrationGroup.hasKey("MigratedActivitiesToLingmo6")) {
         return;
     }
 
@@ -64,7 +64,7 @@ void migrateActivitiesConfig(KSharedConfig::Ptr profilesConfig)
         newConfig.save();
     }
 
-    migrationGroup.writeEntry("MigratedActivitiesToPlasma6", "powerdevilrc");
+    migrationGroup.writeEntry("MigratedActivitiesToLingmo6", "powerdevilrc");
     profilesConfig->sync();
 }
 
@@ -82,7 +82,7 @@ void ensureLockScreenIdleTimeoutInKScreenLockerKCM(int seconds)
 void migrateProfilesConfig(KSharedConfig::Ptr profilesConfig, bool isMobile, bool isVM, bool canSuspend)
 {
     KConfigGroup migrationGroup = profilesConfig->group(QStringLiteral("Migration"));
-    if (migrationGroup.hasKey(QStringLiteral("MigratedProfilesToPlasma6"))) {
+    if (migrationGroup.hasKey(QStringLiteral("MigratedProfilesToLingmo6"))) {
         return;
     }
 
@@ -132,7 +132,7 @@ void migrateProfilesConfig(KSharedConfig::Ptr profilesConfig, bool isMobile, boo
         if (KConfigGroup group = oldProfileGroup.group(QStringLiteral("DPMSControl")); group.exists()) {
             profileSettings.setTurnOffDisplayWhenIdle(true);
             // The "DPMSControl" group used seconds for "idleTime". Unlike other groups which
-            // used milliseconds in Plasma 5, this one doesn't need division by 1000.
+            // used milliseconds in Lingmo 5, this one doesn't need division by 1000.
             migrateEntry(group, u"idleTime"_s, &ProfileSettings::setTurnOffDisplayIdleTimeoutSec);
             migrateEntry(group, u"idleTimeoutWhenLocked"_s, &ProfileSettings::setTurnOffDisplayIdleTimeoutWhenLockedSec);
             migrateEntry(group, u"lockBeforeTurnOff"_s, &ProfileSettings::setLockBeforeTurnOffDisplay);
@@ -236,14 +236,14 @@ void migrateProfilesConfig(KSharedConfig::Ptr profilesConfig, bool isMobile, boo
         profileSettings.save();
     }
 
-    migrationGroup.writeEntry("MigratedProfilesToPlasma6", "powerdevilrc");
+    migrationGroup.writeEntry("MigratedProfilesToLingmo6", "powerdevilrc");
     profilesConfig->sync();
 }
 
 void migrateConfig(bool isMobile, bool isVM, bool canSuspend)
 {
     KSharedConfig::Ptr profilesConfig = KSharedConfig::openConfig(QStringLiteral("powermanagementprofilesrc"));
-    // TODO KF7 (or perhaps earlier): Remove Plasma 5->6 migration code and delete powermanagementprofilesrc
+    // TODO KF7 (or perhaps earlier): Remove Lingmo 5->6 migration code and delete powermanagementprofilesrc
 
     migrateActivitiesConfig(profilesConfig);
     migrateProfilesConfig(profilesConfig, isMobile, isVM, canSuspend);

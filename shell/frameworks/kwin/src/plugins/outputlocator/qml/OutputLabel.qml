@@ -5,8 +5,8 @@
 */
 
 import QtQuick
-import org.kde.plasma.components 3.0 as PlasmaComponents3
-import org.kde.kirigami 2 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents3
+import org.kde.lingmoui 2 as LingmoUI
 
 Rectangle {
     id: root;
@@ -15,22 +15,22 @@ Rectangle {
     property size resolution;
     property double scale;
 
-    color: Kirigami.Theme.backgroundColor
+    color: LingmoUI.Theme.backgroundColor
 
     implicitWidth: childrenRect.width + 2 * childrenRect.x
     implicitHeight: childrenRect.height + 2 * childrenRect.y
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: displayName
-        x: Kirigami.Units.largeSpacing * 2
-        y: Kirigami.Units.largeSpacing
-        font.pointSize: Kirigami.Theme.defaultFont.pointSize * 3
+        x: LingmoUI.Units.largeSpacing * 2
+        y: LingmoUI.Units.largeSpacing
+        font.pointSize: LingmoUI.Theme.defaultFont.pointSize * 3
         text: root.outputName;
         wrapMode: Text.WordWrap;
         horizontalAlignment: Text.AlignHCenter;
     }
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: modeLabel;
         anchors {
             horizontalCenter: displayName.horizontalCenter

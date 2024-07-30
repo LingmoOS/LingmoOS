@@ -11,7 +11,7 @@ target_sources(kcm_powerdevilprofilesconfig PRIVATE
 target_link_libraries(kcm_powerdevilprofilesconfig
     KF6::AuthCore
     KF6::KCMUtils
-    KF6::Kirigami2
+    KF6::LingmoUI2
     KF6::I18n
     KF6::ItemModels
     powerdevilconfigcommonprivate

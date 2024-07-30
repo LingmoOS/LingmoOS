@@ -184,7 +184,7 @@ public:
     QString uniqueId() const;
 
     /**
-     * Sets the data category, e.g. "KWin Scripts" or "Plasma Theme".
+     * Sets the data category, e.g. "KWin Scripts" or "Lingmo Theme".
      */
     void setCategory(const QString &category);
 

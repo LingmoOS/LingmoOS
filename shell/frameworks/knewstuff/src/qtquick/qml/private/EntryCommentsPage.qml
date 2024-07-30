@@ -5,17 +5,17 @@
 */
 
 /**
- * @brief A Kirigami.Page component used for displaying a NewStuff entry's comments
+ * @brief A LingmoUI.Page component used for displaying a NewStuff entry's comments
  */
 
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.newstuff as NewStuff
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: component
 
     property string entryName
@@ -26,7 +26,7 @@ Kirigami.ScrollablePage {
 
     title: i18ndc("knewstuff6", "Title for the page containing a view of the comments for the entry", "Comments and Reviews for %1", component.entryName)
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Title for the item which is checked when all comments should be shown", "Show All Comments")
             checked: commentsModel.includedComments === NewStuff.CommentsModel.IncludeAllComments
             checkable: true
@@ -34,7 +34,7 @@ Kirigami.ScrollablePage {
                 commentsModel.includedComments = NewStuff.CommentsModel.IncludeAllComments;
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Title for the item which is checked when only comments which are reviews should be shown", "Show Reviews Only")
             checked: commentsModel.includedComments === NewStuff.CommentsModel.IncludeOnlyReviews
             checkable: true
@@ -42,7 +42,7 @@ Kirigami.ScrollablePage {
                 commentsModel.includedComments = NewStuff.CommentsModel.IncludeOnlyReviews;
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Title for the item which is checked when comments which are reviews, and their children should be shown", "Show Reviews and Replies")
             checked: commentsModel.includedComments === NewStuff.CommentsModel.IncludeReviewsAndReplies
             checkable: true
@@ -66,11 +66,11 @@ Kirigami.ScrollablePage {
                 left: parent.left
                 right: parent.right
             }
-            height: Kirigami.Units.largeSpacing
+            height: LingmoUI.Units.largeSpacing
         }
 
-        leftMargin: Kirigami.Units.largeSpacing
-        rightMargin: Kirigami.Units.largeSpacing
+        leftMargin: LingmoUI.Units.largeSpacing
+        rightMargin: LingmoUI.Units.largeSpacing
 
         delegate: EntryCommentDelegate {
             width: {

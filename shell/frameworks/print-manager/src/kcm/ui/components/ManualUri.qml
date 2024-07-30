@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /*
  * This component is a catch-all for manually selected printers.
@@ -40,7 +40,7 @@ BaseDevice {
 
     contentItem: ColumnLayout {
         width: uriItem.width
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Component.onCompleted: {
             uriItem.uriText = compLoader.selector !== "other"
@@ -65,7 +65,7 @@ BaseDevice {
         // Actions
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.Button {
                 text: i18nc("@action:button", "Select Printer…")
@@ -88,7 +88,7 @@ BaseDevice {
                 }
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: xi18nc("@info:whatsthis", "If the printer address is known, enter it and choose <interface>Continue</interface>.
                     If the printer is on a remote host, enter that address and choose <interface>Search</interface>.")
             }
@@ -125,7 +125,7 @@ BaseDevice {
                     event.accepted = false
                 }
 
-                delegate: Kirigami.SubtitleDelegate {
+                delegate: LingmoUI.SubtitleDelegate {
                     width: ListView.view.width
                     text: modelData["printer-info"]
                     subtitle: modelData["printer-name"]

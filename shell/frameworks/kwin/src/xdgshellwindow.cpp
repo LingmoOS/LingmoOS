@@ -26,7 +26,7 @@
 #include "virtualdesktops.h"
 #include "wayland/appmenu.h"
 #include "wayland/output.h"
-#include "wayland/plasmashell.h"
+#include "wayland/lingmoshell.h"
 #include "wayland/seat.h"
 #include "wayland/server_decoration.h"
 #include "wayland/server_decoration_palette.h"
@@ -280,8 +280,8 @@ QRectF XdgSurfaceWindow::frameRectToBufferRect(const QRectF &rect) const
 
 void XdgSurfaceWindow::handleRoleDestroyed()
 {
-    if (m_plasmaShellSurface) {
-        m_plasmaShellSurface->disconnect(this);
+    if (m_lingmoShellSurface) {
+        m_lingmoShellSurface->disconnect(this);
     }
     m_shellSurface->disconnect(this);
     m_shellSurface->surface()->disconnect(this);
@@ -312,14 +312,14 @@ void XdgSurfaceWindow::destroyWindow()
 }
 
 /**
- * \todo This whole plasma shell surface thing doesn't seem right. It turns xdg-toplevel into
- * something completely different! Perhaps plasmashell surfaces need to be implemented via a
+ * \todo This whole lingmo shell surface thing doesn't seem right. It turns xdg-toplevel into
+ * something completely different! Perhaps lingmoshell surfaces need to be implemented via a
  * proprietary protocol that doesn't piggyback on existing shell surface protocols. It'll lead
  * to cleaner code and will be technically correct, but I'm not sure whether this is do-able.
  */
-void XdgSurfaceWindow::installPlasmaShellSurface(PlasmaShellSurfaceInterface *shellSurface)
+void XdgSurfaceWindow::installLingmoShellSurface(LingmoShellSurfaceInterface *shellSurface)
 {
-    m_plasmaShellSurface = shellSurface;
+    m_lingmoShellSurface = shellSurface;
 
     auto updatePosition = [this, shellSurface] {
         if (!isInteractiveMoveResize()) {
@@ -339,28 +339,28 @@ void XdgSurfaceWindow::installPlasmaShellSurface(PlasmaShellSurfaceInterface *sh
     auto updateRole = [this, shellSurface] {
         WindowType type = WindowType::Unknown;
         switch (shellSurface->role()) {
-        case PlasmaShellSurfaceInterface::Role::Desktop:
+        case LingmoShellSurfaceInterface::Role::Desktop:
             type = WindowType::Desktop;
             break;
-        case PlasmaShellSurfaceInterface::Role::Panel:
+        case LingmoShellSurfaceInterface::Role::Panel:
             type = WindowType::Dock;
             break;
-        case PlasmaShellSurfaceInterface::Role::OnScreenDisplay:
+        case LingmoShellSurfaceInterface::Role::OnScreenDisplay:
             type = WindowType::OnScreenDisplay;
             break;
-        case PlasmaShellSurfaceInterface::Role::Notification:
+        case LingmoShellSurfaceInterface::Role::Notification:
             type = WindowType::Notification;
             break;
-        case PlasmaShellSurfaceInterface::Role::ToolTip:
+        case LingmoShellSurfaceInterface::Role::ToolTip:
             type = WindowType::Tooltip;
             break;
-        case PlasmaShellSurfaceInterface::Role::CriticalNotification:
+        case LingmoShellSurfaceInterface::Role::CriticalNotification:
             type = WindowType::CriticalNotification;
             break;
-        case PlasmaShellSurfaceInterface::Role::AppletPopup:
+        case LingmoShellSurfaceInterface::Role::AppletPopup:
             type = WindowType::AppletPopup;
             break;
-        case PlasmaShellSurfaceInterface::Role::Normal:
+        case LingmoShellSurfaceInterface::Role::Normal:
         default:
             type = WindowType::Normal;
             break;
@@ -386,11 +386,11 @@ void XdgSurfaceWindow::installPlasmaShellSurface(PlasmaShellSurfaceInterface *sh
             break;
         }
     };
-    connect(shellSurface, &PlasmaShellSurfaceInterface::positionChanged, this, updatePosition);
-    connect(shellSurface, &PlasmaShellSurfaceInterface::openUnderCursorRequested, this, showUnderCursor);
-    connect(shellSurface, &PlasmaShellSurfaceInterface::roleChanged, this, updateRole);
-    connect(shellSurface, &PlasmaShellSurfaceInterface::panelTakesFocusChanged, this, [this] {
-        if (m_plasmaShellSurface->panelTakesFocus()) {
+    connect(shellSurface, &LingmoShellSurfaceInterface::positionChanged, this, updatePosition);
+    connect(shellSurface, &LingmoShellSurfaceInterface::openUnderCursorRequested, this, showUnderCursor);
+    connect(shellSurface, &LingmoShellSurfaceInterface::roleChanged, this, updateRole);
+    connect(shellSurface, &LingmoShellSurfaceInterface::panelTakesFocusChanged, this, [this] {
+        if (m_lingmoShellSurface->panelTakesFocus()) {
             workspace()->activateWindow(this);
         }
     });
@@ -403,13 +403,13 @@ void XdgSurfaceWindow::installPlasmaShellSurface(PlasmaShellSurfaceInterface *sh
     updateRole();
 
     setSkipTaskbar(shellSurface->skipTaskbar());
-    connect(shellSurface, &PlasmaShellSurfaceInterface::skipTaskbarChanged, this, [this] {
-        setSkipTaskbar(m_plasmaShellSurface->skipTaskbar());
+    connect(shellSurface, &LingmoShellSurfaceInterface::skipTaskbarChanged, this, [this] {
+        setSkipTaskbar(m_lingmoShellSurface->skipTaskbar());
     });
 
     setSkipSwitcher(shellSurface->skipSwitcher());
-    connect(shellSurface, &PlasmaShellSurfaceInterface::skipSwitcherChanged, this, [this] {
-        setSkipSwitcher(m_plasmaShellSurface->skipSwitcher());
+    connect(shellSurface, &LingmoShellSurfaceInterface::skipSwitcherChanged, this, [this] {
+        setSkipSwitcher(m_lingmoShellSurface->skipSwitcher());
     });
 }
 
@@ -619,8 +619,8 @@ bool XdgToplevelWindow::isMinimizable() const
 
 bool XdgToplevelWindow::isPlaceable() const
 {
-    if (m_plasmaShellSurface) {
-        return !m_plasmaShellSurface->isPositionSet() && !m_plasmaShellSurface->wantsOpenUnderCursor();
+    if (m_lingmoShellSurface) {
+        return !m_lingmoShellSurface->isPositionSet() && !m_lingmoShellSurface->wantsOpenUnderCursor();
     }
     return true;
 }
@@ -927,9 +927,9 @@ bool XdgToplevelWindow::wantsInput() const
 
 bool XdgToplevelWindow::dockWantsInput() const
 {
-    if (m_plasmaShellSurface) {
-        if (m_plasmaShellSurface->role() == PlasmaShellSurfaceInterface::Role::Panel) {
-            return m_plasmaShellSurface->panelTakesFocus();
+    if (m_lingmoShellSurface) {
+        if (m_lingmoShellSurface->role() == LingmoShellSurfaceInterface::Role::Panel) {
+            return m_lingmoShellSurface->panelTakesFocus();
         }
     }
     return false;
@@ -937,14 +937,14 @@ bool XdgToplevelWindow::dockWantsInput() const
 
 bool XdgToplevelWindow::acceptsFocus() const
 {
-    if (m_plasmaShellSurface) {
-        if (m_plasmaShellSurface->role() == PlasmaShellSurfaceInterface::Role::OnScreenDisplay || m_plasmaShellSurface->role() == PlasmaShellSurfaceInterface::Role::ToolTip) {
+    if (m_lingmoShellSurface) {
+        if (m_lingmoShellSurface->role() == LingmoShellSurfaceInterface::Role::OnScreenDisplay || m_lingmoShellSurface->role() == LingmoShellSurfaceInterface::Role::ToolTip) {
             return false;
         }
-        switch (m_plasmaShellSurface->role()) {
-        case PlasmaShellSurfaceInterface::Role::Notification:
-        case PlasmaShellSurfaceInterface::Role::CriticalNotification:
-            return m_plasmaShellSurface->panelTakesFocus();
+        switch (m_lingmoShellSurface->role()) {
+        case LingmoShellSurfaceInterface::Role::Notification:
+        case LingmoShellSurfaceInterface::Role::CriticalNotification:
+            return m_lingmoShellSurface->panelTakesFocus();
         default:
             break;
         }
@@ -1695,8 +1695,8 @@ void XdgPopupWindow::updateRelativePlacement()
     const QRectF bounds = workspace()->clientArea(transientFor()->isFullScreen() ? FullScreenArea : PlacementArea, transientFor()).translated(-parentPosition);
     const XdgPositioner positioner = m_shellSurface->positioner();
 
-    if (m_plasmaShellSurface && m_plasmaShellSurface->isPositionSet()) {
-        m_relativePlacement = QRectF(m_plasmaShellSurface->position(), positioner.size()).translated(-parentPosition);
+    if (m_lingmoShellSurface && m_lingmoShellSurface->isPositionSet()) {
+        m_relativePlacement = QRectF(m_lingmoShellSurface->position(), positioner.size()).translated(-parentPosition);
     } else {
         m_relativePlacement = positioner.placement(bounds);
     }

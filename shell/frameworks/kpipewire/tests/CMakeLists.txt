@@ -16,11 +16,11 @@ qt_add_dbus_interface(
 )
 
 qt6_generate_wayland_protocol_client_sources(PipeWireScreencastingTest FILES
-    ${PLASMA_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml)
+    ${LINGMO_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml)
 
 target_link_libraries(PipeWireScreencastingTest PUBLIC Wayland::Client Qt::DBus Qt::GuiPrivate KPipeWire Qt::WaylandClient)
 
-add_executable(recordme main.cpp recordme.qrc PlasmaRecordMe.cpp)
+add_executable(recordme main.cpp recordme.qrc LingmoRecordMe.cpp)
 target_link_libraries(recordme PipeWireScreencastingTest Qt::Quick)
 
 add_executable(kpipewireheadlesstest HeadlessTest.cpp ${SRCS})

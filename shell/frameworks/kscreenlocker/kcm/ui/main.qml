@@ -11,17 +11,17 @@ import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.kquickcontrols 2.0 as KQuickControls
 
 KCM.SimpleKCM {
     id: root
 
-    implicitHeight: Kirigami.Units.gridUnit * 45
-    implicitWidth: Kirigami.Units.gridUnit * 45
+    implicitHeight: LingmoUI.Units.gridUnit * 45
+    implicitWidth: LingmoUI.Units.gridUnit * 45
 
     actions:  [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button", "Configure Appearance…")
             icon.name: "edit-image-symbolic"
             onTriggered: kcm.push("Appearance.qml")
@@ -30,11 +30,11 @@ KCM.SimpleKCM {
     ColumnLayout {
         spacing: 0
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             ComboBoxWithCustomValue {
                 id: timeoutComboBox
                 Layout.fillWidth: true
-                Kirigami.FormData.label: i18n("Lock screen automatically:")
+                LingmoUI.FormData.label: i18n("Lock screen automatically:")
                 textRole: "text"
                 valueRole: "value"
                 property var customOptions: []
@@ -75,7 +75,7 @@ KCM.SimpleKCM {
 
                     DurationPromptDialog {
                         title: i18nc("@title:window", "Custom Duration")
-                        label: timeoutComboBox.Kirigami.FormData.label
+                        label: timeoutComboBox.LingmoUI.FormData.label
                         parent: QQC2.Overlay.overlay
                         from: 1
 
@@ -110,13 +110,13 @@ KCM.SimpleKCM {
             }
 
             Item {
-                Kirigami.FormData.isSection: true
+                LingmoUI.FormData.isSection: true
             }
 
             ComboBoxWithCustomValue {
                 id: lockGraceComboBox
                 Layout.fillWidth: true
-                Kirigami.FormData.label: i18nc("First part of sentence \"Delay before password required: X minutes\"", "Delay before password required:")
+                LingmoUI.FormData.label: i18nc("First part of sentence \"Delay before password required: X minutes\"", "Delay before password required:")
                 textRole: "text"
                 valueRole: "seconds"
                 property var customOptions: []
@@ -178,7 +178,7 @@ KCM.SimpleKCM {
 
                     DurationPromptDialog {
                         title: i18nc("@title:window", "Custom Duration")
-                        label: lockGraceComboBox.Kirigami.FormData.label
+                        label: lockGraceComboBox.LingmoUI.FormData.label
                         parent: QQC2.Overlay.overlay
                         from: 1
 
@@ -207,12 +207,12 @@ KCM.SimpleKCM {
                 }
             }
 
-            Kirigami.Separator {
-                Kirigami.FormData.isSection: true
+            LingmoUI.Separator {
+                LingmoUI.FormData.isSection: true
             }
 
             KQuickControls.KeySequenceItem {
-                Kirigami.FormData.label: i18n("Keyboard shortcut:")
+                LingmoUI.FormData.label: i18n("Keyboard shortcut:")
                 keySequence: kcm.settings.shortcut
                 onCaptureFinished: kcm.settings.shortcut = keySequence
 

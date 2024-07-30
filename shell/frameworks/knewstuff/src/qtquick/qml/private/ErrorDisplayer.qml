@@ -6,14 +6,14 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
-Kirigami.PromptDialog {
+LingmoUI.PromptDialog {
     id: component
 
     title: i18ndc("knewstuff6", "Title for a dialog box which shows error messages", "An Error Occurred");
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
     property bool active: true
     property NewStuff.Engine engine
@@ -38,7 +38,7 @@ Kirigami.PromptDialog {
     }
     onVisibleChanged: displayThrottle.start()
     property QtObject displayThrottle: Timer {
-        interval: Kirigami.Units.shortDuration
+        interval: LingmoUI.Units.shortDuration
         onTriggered: showNextError()
     }
     function showNextError() {
@@ -51,10 +51,10 @@ Kirigami.PromptDialog {
     property var currentError: null
 
     RowLayout {
-        implicitWidth: Kirigami.Units.gridUnit * 10
-        spacing: Kirigami.Units.largeSpacing
+        implicitWidth: LingmoUI.Units.gridUnit * 10
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             Layout.alignment: Qt.AlignVCenter
             visible: source !== ""
             source: {
@@ -68,7 +68,7 @@ Kirigami.PromptDialog {
             }
         }
 
-        Kirigami.SelectableLabel {
+        LingmoUI.SelectableLabel {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
             wrapMode: Text.Wrap

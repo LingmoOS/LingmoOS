@@ -107,7 +107,7 @@ void processStream(ScreencastingStream *stream)
     });
 }
 
-void checkPlasmaScreens()
+void checkLingmoScreens()
 {
     auto screencasting = new Screencasting(qGuiApp);
     for (auto screen : qGuiApp->screens()) {
@@ -116,7 +116,7 @@ void checkPlasmaScreens()
     }
 }
 
-void checkPlasmaWorkspace()
+void checkLingmoWorkspace()
 {
     auto screencasting = new Screencasting(qGuiApp);
     QRegion region;
@@ -487,7 +487,7 @@ int main(int argc, char **argv)
         parser.addOption(useXdpRD);
         QCommandLineOption useXdpSC(QStringLiteral("xdp-screencast"), QStringLiteral("Uses the XDG Desktop Portal ScreenCast interface"));
         parser.addOption(useXdpSC);
-        QCommandLineOption useWorkspace(QStringLiteral("workspace"), QStringLiteral("Uses the Plasma screencasting workspace feed"));
+        QCommandLineOption useWorkspace(QStringLiteral("workspace"), QStringLiteral("Uses the Lingmo screencasting workspace feed"));
         parser.addOption(useWorkspace);
         QCommandLineOption encodedStream(QStringLiteral("encoded"), QStringLiteral("Reports encoded streams with PipeWireEncodedStream"));
         parser.addOption(encodedStream);
@@ -523,9 +523,9 @@ int main(int argc, char **argv)
         } else if (parser.isSet(useXdpSC)) {
             new XdpScreenCast(&app);
         } else if (parser.isSet(useWorkspace)) {
-            checkPlasmaWorkspace();
+            checkLingmoWorkspace();
         } else {
-            checkPlasmaScreens();
+            checkLingmoScreens();
         }
     }
 

@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCM
 import org.kde.kitemmodels
 import org.kde.kcms.kwinrules
@@ -32,7 +32,7 @@ KCM.ScrollViewKCM {
         }
         section {
             property: "section"
-            delegate: Kirigami.ListSectionHeader {
+            delegate: LingmoUI.ListSectionHeader {
                 width: ListView.view.width
                 label: section
             }
@@ -41,10 +41,10 @@ KCM.ScrollViewKCM {
         highlightRangeMode: ListView.ApplyRange
 
         add: Transition {
-            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Kirigami.Units.longDuration * 3 }
+            NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: LingmoUI.Units.longDuration * 3 }
         }
         removeDisplaced: Transition {
-            NumberAnimation { property: "y"; duration: Kirigami.Units.longDuration }
+            NumberAnimation { property: "y"; duration: LingmoUI.Units.longDuration }
         }
 
         // We need to center on the free space below contentItem, not the full
@@ -59,10 +59,10 @@ KCM.ScrollViewKCM {
             }
             visible: rulesView.count <= 4
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 id: hintArea
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 4)
                 text: i18n("No window properties changed")
                 explanation: xi18nc("@info", "Click the <interface>Add Property...</interface> button below to add some window properties that will be affected by the rule")
             }
@@ -75,7 +75,7 @@ KCM.ScrollViewKCM {
             id: warningList
             model: kcm.rulesModel.warningMessages
 
-            delegate: Kirigami.InlineMessage {
+            delegate: LingmoUI.InlineMessage {
                 text: modelData
                 visible: true
                 Layout.fillWidth: true
@@ -102,13 +102,13 @@ KCM.ScrollViewKCM {
             onClicked: {
                 overlayModel.onlySuggestions = true;
                 kcm.rulesModel.detectWindowProperties(Math.max(delaySpin.value * 1000,
-                                                               Kirigami.Units.shortDuration));
+                                                               LingmoUI.Units.shortDuration));
             }
         }
         QQC2.SpinBox {
             id: delaySpin
             enabled: detectButton.enabled
-            Layout.preferredWidth: Math.max(metricsInstant.advanceWidth, metricsAfter.advanceWidth) + Kirigami.Units.gridUnit * 4
+            Layout.preferredWidth: Math.max(metricsInstant.advanceWidth, metricsAfter.advanceWidth) + LingmoUI.Units.gridUnit * 4
             from: 0
             to: 30
             textFromValue: (value, locale) => {
@@ -146,34 +146,34 @@ KCM.ScrollViewKCM {
         }
     }
 
-    Kirigami.Dialog {
+    LingmoUI.Dialog {
         id: errorDialog
 
         property alias message: errorLabel.text
 
-        preferredWidth: rulesEditor.width - Kirigami.Units.gridUnit * 6
-        maximumWidth: Kirigami.Units.gridUnit * 35
+        preferredWidth: rulesEditor.width - LingmoUI.Units.gridUnit * 6
+        maximumWidth: LingmoUI.Units.gridUnit * 35
         footer: null  // Just use the close button on top
 
         ColumnLayout {
             // Wrap it in a Layout so we can apply margins to the text while keeping implicit sizes
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 id: errorLabel
                 level: 4
                 wrapMode: Text.WordWrap
 
                 Layout.fillWidth: true
-                Layout.margins: Kirigami.Units.largeSpacing
+                Layout.margins: LingmoUI.Units.largeSpacing
             }
         }
     }
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: propertySheet
 
         title: i18n("Add property to the rule")
 
-        footer: Kirigami.SearchField {
+        footer: LingmoUI.SearchField {
             id: searchField
             horizontalAlignment: Text.AlignLeft
         }
@@ -181,13 +181,13 @@ KCM.ScrollViewKCM {
         ListView {
             id: overlayView
             model: overlayModel
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 28
+            Layout.preferredWidth: LingmoUI.Units.gridUnit * 28
             clip: true
             reuseItems: true
 
             section {
                 property: "section"
-                delegate: Kirigami.ListSectionHeader {
+                delegate: LingmoUI.ListSectionHeader {
                     label: section
                     width: ListView.view.width
                     height: implicitHeight
@@ -200,10 +200,10 @@ KCM.ScrollViewKCM {
                 width: ListView.view.width
 
                 contentItem: RowLayout {
-                    Kirigami.Icon {
+                    LingmoUI.Icon {
                         source: model.icon
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                        Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
+                        Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
                         Layout.alignment: Qt.AlignVCenter
                     }
                     QQC2.Label {
@@ -220,7 +220,7 @@ KCM.ScrollViewKCM {
                         horizontalAlignment: Text.AlignRight
                         elide: Text.ElideRight
                         opacity: 0.7
-                        Layout.maximumWidth: propertyDelegate.width - itemNameLabel.implicitWidth - Kirigami.Units.gridUnit * 6
+                        Layout.maximumWidth: propertyDelegate.width - itemNameLabel.implicitWidth - LingmoUI.Units.gridUnit * 6
                         Layout.alignment: Qt.AlignVCenter
                         QQC2.ToolTip {
                             text: suggestedLabel.text
@@ -228,8 +228,8 @@ KCM.ScrollViewKCM {
                         }
                     }
 
-                    Kirigami.ContextualHelpButton {
-                        Layout.rightMargin: Kirigami.Units.largeSpacing
+                    LingmoUI.ContextualHelpButton {
+                        Layout.rightMargin: LingmoUI.Units.largeSpacing
                         visible: model.description.length > 0
                         toolTipText: model.description
                     }
@@ -238,8 +238,8 @@ KCM.ScrollViewKCM {
                         icon.name: (model.enabled) ? "dialog-ok-apply" : "list-add"
                         onClicked: addProperty();
                         Layout.preferredWidth: implicitWidth
-                        Layout.leftMargin: -Kirigami.Units.smallSpacing
-                        Layout.rightMargin: -Kirigami.Units.smallSpacing
+                        Layout.leftMargin: -LingmoUI.Units.smallSpacing
+                        Layout.rightMargin: -LingmoUI.Units.smallSpacing
                         Layout.alignment: Qt.AlignVCenter
                     }
                 }
@@ -258,9 +258,9 @@ KCM.ScrollViewKCM {
                 }
             }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 4)
                 visible: overlayModel.count === 0
                 text: {
                     if (searchField.text.length === 0) {

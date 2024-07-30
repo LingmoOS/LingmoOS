@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -26,13 +26,13 @@ Faces.SensorFace {
     readonly property bool showGridLines: root.controller.faceConfiguration.showGridLines
     readonly property bool showYAxisLabels: root.controller.faceConfiguration.showYAxisLabels
     // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+    Layout.minimumWidth: LingmoUI.Units.gridUnit * 8
     Layout.preferredWidth: Math.max(titleMetrics.width, legend.preferredWidth)
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: heading
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
@@ -48,13 +48,13 @@ Faces.SensorFace {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Layout.fillHeight: true
             Layout.topMargin: showYAxisLabels ? axisMetrics.height / 2 : 0
             Layout.bottomMargin: Layout.topMargin
 
-            Layout.minimumHeight: 3 * Kirigami.Units.gridUnit
-            Layout.preferredHeight: 5 * Kirigami.Units.gridUnit
+            Layout.minimumHeight: 3 * LingmoUI.Units.gridUnit
+            Layout.preferredHeight: 5 * LingmoUI.Units.gridUnit
 
             ChartsControls.AxisLabels {
                 id: axisLabels
@@ -64,10 +64,10 @@ Faces.SensorFace {
                 direction: ChartsControls.AxisLabels.VerticalBottomTop
                 delegate: QQC2.Label {
                     anchors.right: parent.right
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     text: Formatter.Formatter.formatValueShowNull(ChartsControls.AxisLabels.label,
                         compactRepresentation.sensorsModel.unit)
-                    color: Kirigami.Theme.disabledTextColor
+                    color: LingmoUI.Theme.disabledTextColor
                 }
                 source: Charts.ChartAxisSource {
                     chart: compactRepresentation
@@ -76,7 +76,7 @@ Faces.SensorFace {
                 }
                 TextMetrics {
                     id: axisMetrics
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     text: Formatter.Formatter.formatValueShowNull("0",
                         compactRepresentation.sensorsModel.unit)
                 }
@@ -100,8 +100,8 @@ Faces.SensorFace {
 
                     major.count: 3
                     major.lineWidth: 1
-                    // The same color as a Kirigami.Separator
-                    major.color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, 0.2)
+                    // The same color as a LingmoUI.Separator
+                    major.color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, 0.2)
                     minor.visible: false
 
                 }

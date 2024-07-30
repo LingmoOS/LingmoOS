@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -22,12 +22,12 @@ Faces.SensorFace {
     id: root
     readonly property bool showLegend: controller.faceConfiguration.showLegend
 
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+    Layout.minimumWidth: LingmoUI.Units.gridUnit * 8
     Layout.preferredWidth: Math.max(titleMetrics.width, legend.preferredWidth)
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.largeSpacing
-        Kirigami.Heading {
+        spacing: LingmoUI.Units.largeSpacing
+        LingmoUI.Heading {
             id: heading
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
@@ -46,11 +46,11 @@ Faces.SensorFace {
             id: compactRepresentation
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? Kirigami.Units.gridUnit * 4 : Kirigami.Units.gridUnit
+            Layout.minimumWidth: root.formFactor != Faces.SensorFace.Vertical ? LingmoUI.Units.gridUnit * 4 : LingmoUI.Units.gridUnit
             Layout.minimumHeight: root.formFactor === Faces.SensorFace.Constrained 
-                ? 3 * Kirigami.Units.gridUnit
-                : 5 * Kirigami.Units.gridUnit
-            Layout.preferredHeight: 8 * Kirigami.Units.gridUnit
+                ? 3 * LingmoUI.Units.gridUnit
+                : 5 * LingmoUI.Units.gridUnit
+            Layout.preferredHeight: 8 * LingmoUI.Units.gridUnit
             updateRateLimit: root.controller.updateRateLimit
             highlight: legend.highlightedIndex
         }

@@ -6,7 +6,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 import org.kde.private.kcm.kscreen 1.0 as KScreen
 
@@ -27,7 +27,7 @@ QQC2.ToolButton {
         text: tooltip
     }
 
-    contentItem: Kirigami.Icon {
+    contentItem: LingmoUI.Icon {
         source: "tv"
         rotation: root.value
     }
@@ -41,8 +41,8 @@ QQC2.ToolButton {
         screen.resetTotalSize();
     }
 
-    implicitWidth: contentItem.implicitWidth + 2 * Kirigami.Units.smallSpacing
-    implicitHeight: contentItem.implicitHeight + 2 * Kirigami.Units.smallSpacing
+    implicitWidth: contentItem.implicitWidth + 2 * LingmoUI.Units.smallSpacing
+    implicitHeight: contentItem.implicitHeight + 2 * LingmoUI.Units.smallSpacing
 
     Component.onCompleted: {
         switch (value) {

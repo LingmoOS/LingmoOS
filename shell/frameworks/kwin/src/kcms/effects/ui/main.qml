@@ -12,14 +12,14 @@ import QtQuick.Layouts
 
 import org.kde.kcmutils
 import org.kde.config
-import org.kde.kirigami 2 as Kirigami
+import org.kde.lingmoui 2 as LingmoUI
 import org.kde.newstuff as NewStuff
 
 import org.kde.private.kcms.kwin.effects as Private
 
 ScrollViewKCM {
-    implicitHeight: Kirigami.Units.gridUnit * 30
-    implicitWidth: Kirigami.Units.gridUnit * 40
+    implicitHeight: LingmoUI.Units.gridUnit * 30
+    implicitWidth: LingmoUI.Units.gridUnit * 40
 
     actions: NewStuff.Action {
         text: i18nc("@action:button get new KWin effects", "Get New…")
@@ -33,21 +33,21 @@ ScrollViewKCM {
     }
 
     header: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.Label {
             Layout.fillWidth: true
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: LingmoUI.Units.smallSpacing
+            Layout.rightMargin: LingmoUI.Units.smallSpacing
 
             wrapMode: Text.WordWrap
             text: i18n("Hint: To find out or configure how to activate an effect, look at the effect's settings.")
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
-            Kirigami.SearchField {
+            LingmoUI.SearchField {
                 id: searchField
 
                 Layout.fillWidth: true
@@ -103,7 +103,7 @@ ScrollViewKCM {
         }
 
         section.property: "CategoryRole"
-        section.delegate: Kirigami.ListSectionHeader {
+        section.delegate: LingmoUI.ListSectionHeader {
             width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
             text: section
         }

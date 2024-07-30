@@ -65,7 +65,7 @@ endif()
 if (KWINDOWSYSTEM_WAYLAND)
     find_package(Qt6WaylandClient ${REQUIRED_QT_VERSION} CONFIG REQUIRED)
     find_package(WaylandProtocols 1.21 REQUIRED)
-    find_package(PlasmaWaylandProtocols REQUIRED)
+    find_package(LingmoWaylandProtocols REQUIRED)
     check_cxx_source_compiles("
         #include <fcntl.h>
         #include <sys/mman.h>

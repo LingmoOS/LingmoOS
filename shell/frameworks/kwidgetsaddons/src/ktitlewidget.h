@@ -144,7 +144,7 @@ public:
     /**
      * @return The level of this title: it influences the font size following the guidelines in
      *         the <a href="https://develop.kde.org/hig/style/typography/">KDE HIG</a>.
-     *         It also corresponds to the level api of Kirigami Heading for QML applications
+     *         It also corresponds to the level api of LingmoUI Heading for QML applications
      * @since 5.53
      */
     int level();

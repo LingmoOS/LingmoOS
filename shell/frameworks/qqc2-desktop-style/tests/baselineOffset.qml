@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.Pane {
     id: root
@@ -16,7 +16,7 @@ QQC2.Pane {
     height: 100
     padding: 0
 
-    component Guide : Kirigami.Separator {
+    component Guide : LingmoUI.Separator {
         anchors.left: parent.left
         anchors.right: parent.right
         opacity: 0.7
@@ -26,8 +26,8 @@ QQC2.Pane {
     QQC2.ScrollView {
         anchors.fill: parent
 
-        Kirigami.Padding {
-            padding: Kirigami.Units.largeSpacing
+        LingmoUI.Padding {
+            padding: LingmoUI.Units.largeSpacing
 
             Guide {
                 anchors.top: layout.top
@@ -49,7 +49,7 @@ QQC2.Pane {
             contentItem: RowLayout {
                 id: layout
 
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.CheckBox {
                     id: checkBox

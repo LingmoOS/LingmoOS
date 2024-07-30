@@ -59,7 +59,7 @@ NightLightManager::NightLightManager()
             : i18nc("Night Light was reenabled from temporary suspension", "Night Light Resumed");
 
         QDBusMessage message = QDBusMessage::createMethodCall(
-            QStringLiteral("org.kde.plasmashell"),
+            QStringLiteral("org.kde.lingmoshell"),
             QStringLiteral("/org/kde/osdService"),
             QStringLiteral("org.kde.osdService"),
             QStringLiteral("showText"));
@@ -426,7 +426,7 @@ void NightLightManager::preview(uint previewTemp)
     m_previewTimer->start(15000);
 
     QDBusMessage message = QDBusMessage::createMethodCall(
-        QStringLiteral("org.kde.plasmashell"),
+        QStringLiteral("org.kde.lingmoshell"),
         QStringLiteral("/org/kde/osdService"),
         QStringLiteral("org.kde.osdService"),
         QStringLiteral("showText"));

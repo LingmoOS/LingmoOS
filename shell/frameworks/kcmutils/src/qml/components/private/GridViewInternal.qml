@@ -6,16 +6,16 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 GridView {
     id: view
 
-    property int implicitCellWidth: Kirigami.Units.gridUnit * 10
-    property int implicitCellHeight: Math.round(implicitCellWidth / 1.6) + Kirigami.Units.gridUnit*3
+    property int implicitCellWidth: LingmoUI.Units.gridUnit * 10
+    property int implicitCellHeight: Math.round(implicitCellWidth / 1.6) + LingmoUI.Units.gridUnit*3
 
     /**
-     * Allow to highlight the selected item with Kirigami.Theme.neutralTextColor
+     * Allow to highlight the selected item with LingmoUI.Theme.neutralTextColor
      */
     property bool neutralHighlight: false
 
@@ -37,8 +37,8 @@ GridView {
     Keys.onTabPressed: event => nextItemInFocusChain().forceActiveFocus(Qt.TabFocusReason)
     Keys.onBacktabPressed: event => nextItemInFocusChain(false).forceActiveFocus(Qt.TabFocusReason)
 
-    cellWidth: Math.floor(internal.availableWidth / Math.max(Math.floor(internal.availableWidth / (implicitCellWidth + Kirigami.Units.gridUnit)), (Kirigami.Settings.isMobile ? 1 : 2)))
-    cellHeight: Kirigami.Settings.isMobile ? cellWidth/1.6 + Kirigami.Units.gridUnit : implicitCellHeight
+    cellWidth: Math.floor(internal.availableWidth / Math.max(Math.floor(internal.availableWidth / (implicitCellWidth + LingmoUI.Units.gridUnit)), (LingmoUI.Settings.isMobile ? 1 : 2)))
+    cellHeight: LingmoUI.Settings.isMobile ? cellWidth/1.6 + LingmoUI.Units.gridUnit : implicitCellHeight
 
     keyNavigationEnabled: true
     keyNavigationWraps: true
@@ -46,32 +46,32 @@ GridView {
 
     remove: Transition {
         ParallelAnimation {
-            NumberAnimation { property: "scale"; to: 0.5; duration: Kirigami.Units.longDuration }
-            NumberAnimation { property: "opacity"; to: 0.0; duration: Kirigami.Units.longDuration }
+            NumberAnimation { property: "scale"; to: 0.5; duration: LingmoUI.Units.longDuration }
+            NumberAnimation { property: "opacity"; to: 0.0; duration: LingmoUI.Units.longDuration }
         }
     }
 
     removeDisplaced: Transition {
         SequentialAnimation {
             // wait for the "remove" animation to finish
-            PauseAnimation { duration: Kirigami.Units.longDuration }
-            NumberAnimation { properties: "x,y"; duration: Kirigami.Units.longDuration }
+            PauseAnimation { duration: LingmoUI.Units.longDuration }
+            NumberAnimation { properties: "x,y"; duration: LingmoUI.Units.longDuration }
         }
     }
 
     Loader {
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.gridUnit * 8)
+        width: parent.width - (LingmoUI.Units.gridUnit * 8)
         active: parent.count === 0 && !startupTimer.running
         opacity: active && status === Loader.Ready ? 1 : 0
         visible: opacity > 0
         Behavior on opacity {
             OpacityAnimator {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
-        sourceComponent: Kirigami.PlaceholderMessage {
+        sourceComponent: LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
             icon.name: "edit-none"
             text: i18nd("kcmutils6", "No items found")
@@ -84,7 +84,7 @@ GridView {
     // suppress it appearing for a moment after the KCM loads.
     Timer {
         id: startupTimer
-        interval: Kirigami.Units.humanMoment
+        interval: LingmoUI.Units.humanMoment
         running: false
     }
     Component.onCompleted: {

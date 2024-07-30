@@ -20,9 +20,9 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.plasma.plasmoid
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasma5support as P5Support
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.lingmo5support as P5Support
 import org.kde.ksvg as KSvg
 import org.kde.kcmutils as KCMUtils
 import org.kde.config as KConfig
@@ -36,7 +36,7 @@ PlasmoidItem {
         service.startOperationCall(operation);
     }
 
-    PlasmaCore.Action {
+    LingmoCore.Action {
         id: configureAction
         text: i18n("&Configure Graphics Tablet...")
         icon.name: "configure"
@@ -51,7 +51,7 @@ PlasmoidItem {
     property bool active: dataSource.data["wacomtablet"]["serviceAvailable"] && dataModel.count != 0
 
     toolTipMainText: i18n("Wacom Tablet")
-    Plasmoid.status: active ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+    Plasmoid.status: active ? LingmoCore.Types.ActiveStatus : LingmoCore.Types.PassiveStatus
     Plasmoid.icon: "input-tablet"
     KSvg.Svg {
         id: lineSvg

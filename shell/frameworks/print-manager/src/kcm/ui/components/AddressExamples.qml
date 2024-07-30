@@ -5,7 +5,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.ScrollView {
     id: root
@@ -24,7 +24,7 @@ QQC2.ScrollView {
         model: examples
 
         headerPositioning: ListView.OverlayHeader
-        header: Kirigami.InlineViewHeader {
+        header: LingmoUI.InlineViewHeader {
             text: i18nc("@info:usagetip", "Example Addresses")
             implicitWidth: ListView.view.width
         }

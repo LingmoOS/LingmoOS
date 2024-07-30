@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -48,8 +48,8 @@ ProgressBar {
 
     background: Rectangle {
         implicitWidth: 100
-        implicitHeight: Kirigami.Units.largeSpacing
-        color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, 0.1)
+        implicitHeight: LingmoUI.Units.largeSpacing
+        color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, 0.1)
         radius: height / 2
     }
 }

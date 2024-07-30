@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 MouseArea {
     // This needs to be a mousearea in orcer for the proper mouse events to be correctly filtered
@@ -94,7 +94,7 @@ MouseArea {
 
         SystemPalette {
             id: palette
-            colorGroup: Kirigami.Theme.Active
+            colorGroup: LingmoUI.Theme.Active
         }
     }
 
@@ -125,7 +125,7 @@ MouseArea {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -173,7 +173,7 @@ MouseArea {
         }
         Behavior on opacity {
             NumberAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -214,7 +214,7 @@ MouseArea {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutCubic
             }
         }

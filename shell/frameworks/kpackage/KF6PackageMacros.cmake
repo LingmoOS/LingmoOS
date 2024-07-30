@@ -17,7 +17,7 @@ set(KPACKAGE_RELATIVE_DATA_INSTALL_DIR "kpackage")
 #       default ${KPACKAGE_RELATIVE_DATA_INSTALL_DIR}
 #
 # Examples:
-# kpackage_install_package(mywidget org.kde.plasma.mywidget plasmoids) # installs an applet
+# kpackage_install_package(mywidget org.kde.lingmo.mywidget plasmoids) # installs an applet
 # kpackage_install_package(declarativetoolbox org.kde.toolbox packages) # installs a generic package
 # kpackage_install_package(declarativetoolbox org.kde.toolbox) # installs a generic package
 #

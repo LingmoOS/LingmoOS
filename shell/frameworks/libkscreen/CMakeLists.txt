@@ -33,8 +33,8 @@ find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED Core DBus Gui Test WaylandCli
 find_package(WaylandScanner)
 
 
-find_package(PlasmaWaylandProtocols 1.13 CONFIG)
-set_package_properties(PlasmaWaylandProtocols PROPERTIES TYPE REQUIRED)
+find_package(LingmoWaylandProtocols 1.13 CONFIG)
+set_package_properties(LingmoWaylandProtocols PROPERTIES TYPE REQUIRED)
 
 find_package(Wayland 1.15 COMPONENTS Client)
 set_package_properties(Wayland PROPERTIES

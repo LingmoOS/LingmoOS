@@ -9,7 +9,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import org.kde.bluezqt as BluezQt
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QtObject {
     id: root
@@ -26,7 +26,7 @@ QtObject {
     readonly property Component __dialogComponent: Component {
         id: dialogComponent
 
-        Kirigami.PromptDialog {
+        LingmoUI.PromptDialog {
             id: dialog
 
             required property BluezQt.Device device
@@ -41,16 +41,16 @@ QtObject {
             // the text and icon of a single standardbutton, and if we use just a
             // custom action for that one, then it's in the wrong visual position
             // relative to the StandardButton-provided Cancel button
-            standardButtons: Kirigami.Dialog.NoButton
+            standardButtons: LingmoUI.Dialog.NoButton
             customFooterActions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     text: i18nc("@action:button", "Forget Device")
                     icon.name: "edit-delete-remove-symbolic"
                     onTriggered: {
                         dialog.accept();
                     }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     text: i18nc("@action:button", "Cancel")
                     icon.name: "dialog-cancel-symbolic"
                     onTriggered: {

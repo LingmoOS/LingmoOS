@@ -9,7 +9,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrols
 
 import org.kde.quickcharts as Charts
@@ -35,7 +35,7 @@ ChartPage {
         }
     }
 
-    chart: Kirigami.AbstractCard {
+    chart: LingmoUI.AbstractCard {
         anchors.centerIn: parent
         width: parent.width
         height: 400

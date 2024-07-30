@@ -9,16 +9,16 @@ import QtQuick
 import QtQuick.Layouts
 
 import org.kde.config
-import org.kde.kirigami 2 as Kirigami
+import org.kde.lingmoui 2 as LingmoUI
 import org.kde.newstuff as NewStuff
 import org.kde.kcmutils as KCMUtils
 
 KCMUtils.ScrollViewKCM {
-    implicitWidth: Kirigami.Units.gridUnit * 22
-    implicitHeight: Kirigami.Units.gridUnit * 20
+    implicitWidth: LingmoUI.Units.gridUnit * 22
+    implicitHeight: LingmoUI.Units.gridUnit * 20
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "document-import"
             text: i18n("Install from File…")
             onTriggered: kcm.importScript()
@@ -36,16 +36,16 @@ KCMUtils.ScrollViewKCM {
     ]
 
     header: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             Layout.fillWidth: true
             visible: kcm.errorMessage || kcm.infoMessage
-            type: kcm.errorMessage ? Kirigami.MessageType.Error : Kirigami.MessageType.Information
+            type: kcm.errorMessage ? LingmoUI.MessageType.Error : LingmoUI.MessageType.Information
             text: kcm.errorMessage || kcm.infoMessage
         }
 
-        Kirigami.SearchField {
+        LingmoUI.SearchField {
             Layout.fillWidth: true
             id: searchField
         }
@@ -59,11 +59,11 @@ KCMUtils.ScrollViewKCM {
         delegate: KCMUtils.PluginDelegate {
             onConfigTriggered: kcm.configure(model.config)
             additionalActions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     enabled: kcm.canDeleteEntry(model.metaData)
                     icon.name: kcm.pendingDeletions.indexOf(model.metaData) === -1 ? "delete" : "edit-undo"
                     text: i18nc("@info:tooltip", "Delete…")
-                    displayHint: Kirigami.DisplayHint.IconOnly
+                    displayHint: LingmoUI.DisplayHint.IconOnly
 
                     onTriggered: kcm.togglePendingDeletion(model.metaData)
                 }

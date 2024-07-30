@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
 QQC2.ComboBox {
@@ -27,7 +27,7 @@ QQC2.ComboBox {
         background.properties = Qt.binding(function() {
             const modelIndex = model.index(currentIndex, 0);
             props.currentIcon = model.data(modelIndex, model.KItemModels.KRoleNames.role("iconName"));
-            props.iconColor = Kirigami.Theme.textColor;
+            props.iconColor = LingmoUI.Theme.textColor;
             return props;
         });
     }

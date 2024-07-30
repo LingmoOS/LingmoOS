@@ -3,15 +3,15 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: root
 
     title: i18nc("@title:window", "Overview")
-    minimumWidth: Kirigami.Settings.isMobile ? 0 : Kirigami.Units.gridUnit * 22
-    minimumHeight: Kirigami.Settings.isMobile ? 0 : Kirigami.Units.gridUnit * 22
+    minimumWidth: LingmoUI.Settings.isMobile ? 0 : LingmoUI.Units.gridUnit * 22
+    minimumHeight: LingmoUI.Settings.isMobile ? 0 : LingmoUI.Units.gridUnit * 22
 
     pageStack.initialPage: ListPage {}
     pageStack.defaultColumnWidth: root.width // show single page

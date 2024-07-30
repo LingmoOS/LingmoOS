@@ -530,7 +530,7 @@ bool PipeWireSourceStream::createStream(uint nodeid, int fd)
     connect(d->pwCore.data(), &PipeWireCore::pipewireFailed, this, &PipeWireSourceStream::coreFailed);
 
     if (objectName().isEmpty()) {
-        setObjectName(QStringLiteral("plasma-screencast-%1").arg(nodeid));
+        setObjectName(QStringLiteral("lingmo-screencast-%1").arg(nodeid));
     }
 
     const auto pwServerVersion = d->pwCore->serverVersion();

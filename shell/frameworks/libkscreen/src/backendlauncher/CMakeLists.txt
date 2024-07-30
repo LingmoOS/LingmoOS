@@ -35,9 +35,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.kde.kscreen.service
         DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR}
 )
 
-configure_file(plasma-kscreen.service.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/plasma-kscreen.service @ONLY
+configure_file(lingmo-kscreen.service.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/lingmo-kscreen.service @ONLY
 )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plasma-kscreen.service
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lingmo-kscreen.service
         DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR}
 )

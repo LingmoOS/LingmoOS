@@ -7,10 +7,10 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
-import org.kde.kirigamiaddons.components as KirigamiComponents
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmouiaddons.components as LingmoUIComponents
 
-KirigamiComponents.FloatingButton {
+LingmoUIComponents.FloatingButton {
     id: controlRoot
 
     /*
@@ -31,7 +31,7 @@ KirigamiComponents.FloatingButton {
      * Extra offset toward the button's primary direction to add on top of the
      * default padding.
      */
-    property real edgeMargin: Kirigami.Units.gridUnit
+    property real edgeMargin: LingmoUI.Units.gridUnit
 
     property int role: Qt.AlignLeading
 
@@ -65,19 +65,19 @@ KirigamiComponents.FloatingButton {
     Behavior on opacity {
         enabled: controlRoot.visible && controlRoot.animated
         NumberAnimation {
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
 
     transform: Translate {
         x: controlRoot.enabled ? 0
-            : Kirigami.Units.gridUnit * 2 * (controlRoot.effectiveRole === Qt.AlignLeading ? -1 : 1)
+            : LingmoUI.Units.gridUnit * 2 * (controlRoot.effectiveRole === Qt.AlignLeading ? -1 : 1)
 
         Behavior on x {
             enabled: controlRoot.visible && controlRoot.animated
             NumberAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutCubic
             }
         }

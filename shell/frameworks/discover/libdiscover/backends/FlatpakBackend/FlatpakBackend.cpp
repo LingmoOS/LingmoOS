@@ -310,7 +310,7 @@ FlatpakBackend::FlatpakBackend(QObject *parent)
     connect(m_checkForUpdatesTimer, &QTimer::timeout, this, &FlatpakBackend::checkForUpdates);
 
     /* Override the umask to 022 to make it possible to share files between
-     * the plasma-discover process and flatpak system helper process.
+     * the lingmo-discover process and flatpak system helper process.
      *
      * See https://github.com/flatpak/flatpak/pull/2856/
      */

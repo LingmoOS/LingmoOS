@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * Device setup for directly connected printer devices,
@@ -25,7 +25,7 @@ BaseDevice {
 
     contentItem: ColumnLayout {
         width: root.width
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         Component.onCompleted: {
             // Device connection discovery failed or system-config-printer is

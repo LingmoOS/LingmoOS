@@ -51,9 +51,9 @@
 #include "wayland/output_order_v1.h"
 #include "wayland/outputdevice_v2.h"
 #include "wayland/outputmanagement_v2.h"
-#include "wayland/plasmashell.h"
-#include "wayland/plasmavirtualdesktop.h"
-#include "wayland/plasmawindowmanagement.h"
+#include "wayland/lingmoshell.h"
+#include "wayland/lingmovirtualdesktop.h"
+#include "wayland/lingmowindowmanagement.h"
 #include "wayland/pointerconstraints_v1.h"
 #include "wayland/pointergestures_v1.h"
 #include "wayland/presentationtime.h"
@@ -123,11 +123,11 @@ public:
     }
 
     const QSet<QByteArray> interfacesBlackList = {
-        QByteArrayLiteral("org_kde_plasma_window_management"),
+        QByteArrayLiteral("org_kde_lingmo_window_management"),
         QByteArrayLiteral("org_kde_kwin_fake_input"),
         QByteArrayLiteral("org_kde_kwin_keystate"),
         QByteArrayLiteral("zkde_screencast_unstable_v1"),
-        QByteArrayLiteral("org_kde_plasma_activation_feedback"),
+        QByteArrayLiteral("org_kde_lingmo_activation_feedback"),
         QByteArrayLiteral("kde_lockscreen_overlay_v1"),
     };
 
@@ -244,8 +244,8 @@ void WaylandServer::registerXdgToplevelWindow(XdgToplevelWindow *window)
 
     registerWindow(window);
 
-    if (auto shellSurface = PlasmaShellSurfaceInterface::get(surface)) {
-        window->installPlasmaShellSurface(shellSurface);
+    if (auto shellSurface = LingmoShellSurfaceInterface::get(surface)) {
+        window->installLingmoShellSurface(shellSurface);
     }
     if (auto decoration = ServerSideDecorationInterface::get(surface)) {
         window->installServerDecoration(decoration);
@@ -276,8 +276,8 @@ void WaylandServer::registerXdgGenericWindow(Window *window)
     }
     if (auto popup = qobject_cast<XdgPopupWindow *>(window)) {
         registerWindow(popup);
-        if (auto shellSurface = PlasmaShellSurfaceInterface::get(popup->surface())) {
-            popup->installPlasmaShellSurface(shellSurface);
+        if (auto shellSurface = LingmoShellSurfaceInterface::get(popup->surface())) {
+            popup->installLingmoShellSurface(shellSurface);
         }
         return;
     }
@@ -414,10 +414,10 @@ bool WaylandServer::init()
     new IdleInhibition(m_idle);
     new IdleInhibitManagerV1Interface(m_display, m_display);
     new IdleNotifyV1Interface(m_display, m_display);
-    m_plasmaShell = new PlasmaShellInterface(m_display, m_display);
-    connect(m_plasmaShell, &PlasmaShellInterface::surfaceCreated, this, [this](PlasmaShellSurfaceInterface *surface) {
+    m_lingmoShell = new LingmoShellInterface(m_display, m_display);
+    connect(m_lingmoShell, &LingmoShellInterface::surfaceCreated, this, [this](LingmoShellSurfaceInterface *surface) {
         if (XdgSurfaceWindow *window = findXdgSurfaceWindow(surface->surface())) {
-            window->installPlasmaShellSurface(surface);
+            window->installLingmoShellSurface(surface);
         }
     });
     m_appMenuManager = new AppMenuManagerInterface(m_display, m_display);
@@ -433,18 +433,18 @@ bool WaylandServer::init()
         }
     });
 
-    m_windowManagement = new PlasmaWindowManagementInterface(m_display, m_display);
-    m_windowManagement->setShowingDesktopState(PlasmaWindowManagementInterface::ShowingDesktopState::Disabled);
-    connect(m_windowManagement, &PlasmaWindowManagementInterface::requestChangeShowingDesktop, this, [](PlasmaWindowManagementInterface::ShowingDesktopState state) {
+    m_windowManagement = new LingmoWindowManagementInterface(m_display, m_display);
+    m_windowManagement->setShowingDesktopState(LingmoWindowManagementInterface::ShowingDesktopState::Disabled);
+    connect(m_windowManagement, &LingmoWindowManagementInterface::requestChangeShowingDesktop, this, [](LingmoWindowManagementInterface::ShowingDesktopState state) {
         if (!workspace()) {
             return;
         }
         bool set = false;
         switch (state) {
-        case PlasmaWindowManagementInterface::ShowingDesktopState::Disabled:
+        case LingmoWindowManagementInterface::ShowingDesktopState::Disabled:
             set = false;
             break;
-        case PlasmaWindowManagementInterface::ShowingDesktopState::Enabled:
+        case LingmoWindowManagementInterface::ShowingDesktopState::Enabled:
             set = true;
             break;
         default:
@@ -457,10 +457,10 @@ bool WaylandServer::init()
         workspace()->setShowingDesktop(set);
     });
 
-    m_virtualDesktopManagement = new PlasmaVirtualDesktopManagementInterface(m_display, m_display);
-    m_windowManagement->setPlasmaVirtualDesktopManagementInterface(m_virtualDesktopManagement);
+    m_virtualDesktopManagement = new LingmoVirtualDesktopManagementInterface(m_display, m_display);
+    m_windowManagement->setLingmoVirtualDesktopManagementInterface(m_virtualDesktopManagement);
 
-    m_plasmaActivationFeedback = new PlasmaWindowActivationFeedbackInterface(m_display, m_display);
+    m_lingmoActivationFeedback = new LingmoWindowActivationFeedbackInterface(m_display, m_display);
 
     new ShadowManagerInterface(m_display, m_display);
     new DpmsManagerInterface(m_display, m_display);
@@ -581,7 +581,7 @@ void WaylandServer::initWorkspace()
 
     if (m_windowManagement) {
         connect(workspace(), &Workspace::showingDesktopChanged, this, [this](bool set) {
-            m_windowManagement->setShowingDesktopState(set ? PlasmaWindowManagementInterface::ShowingDesktopState::Enabled : PlasmaWindowManagementInterface::ShowingDesktopState::Disabled);
+            m_windowManagement->setShowingDesktopState(set ? LingmoWindowManagementInterface::ShowingDesktopState::Enabled : LingmoWindowManagementInterface::ShowingDesktopState::Disabled);
         });
 
         connect(workspace(), &Workspace::workspaceInitialized, this, [this] {

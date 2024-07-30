@@ -47,11 +47,11 @@ class SENSORFACES_EXPORT SensorFace : public QQuickItem
     /**
      * Primary actions that this face provides
      */
-    Q_PROPERTY(org::kde::kirigami::Action primaryActions)
+    Q_PROPERTY(org::kde::lingmoui::Action primaryActions)
     /**
      * Secondary actions this face provides
      */
-    Q_PROPERTY(org::kde::kirigami::Action secondaryActions)
+    Q_PROPERTY(org::kde::lingmoui::Action secondaryActions)
     /**
      * A color source that can be used  when using charts from KQuickCharts
      * @see SensorFaceController::sensorColors
@@ -66,7 +66,7 @@ public:
         Planar, ///< Default, the face can expand horizontally and vertically
         Vertical, ///< The face is constrained horizontally, but can expand vertically
         Horizontal, ///< The face is constrained vertically, but can expand horizontally
-        Constrained ///< The face is fully constrained, for example when in the edit mode of plasma-systemmonitor
+        Constrained ///< The face is fully constrained, for example when in the edit mode of lingmo-systemmonitor
     };
     Q_ENUM(FormFactor)
 

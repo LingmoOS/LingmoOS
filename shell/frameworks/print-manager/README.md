@@ -1,6 +1,6 @@
 # Print Manager
 
-Print Manager is a small, relatively self-contained set of components integrated with Plasma System Settings for managing CUPS printer configurations.
+Print Manager is a small, relatively self-contained set of components integrated with Lingmo System Settings for managing CUPS printer configurations.
 
 
 ## Components
@@ -36,7 +36,7 @@ Of note, if a printer is not discovered on the network or with a USB connection 
 
 ## General
 
-For Plasma6, the KCM will provide the primary means to add/configure printers and printer groups.  In addition, some of the basic CUPS print server options can be configured.  There are some limitations to KCM add-printer features that mirror the legacy apps:
+For Lingmo6, the KCM will provide the primary means to add/configure printers and printer groups.  In addition, some of the basic CUPS print server options can be configured.  There are some limitations to KCM add-printer features that mirror the legacy apps:
 
 * Limited support for Windows printers using samba
 * Limited support for auto print queue identification for older connection schemes (LPD/SOCKET)
@@ -62,7 +62,7 @@ When building print-manager manually, keep in mind that the Qt5 and Qt6 versions
 
 ## Contributing
 
-Like other projects in the KDE ecosystem, contributions are welcome from all. This repository is managed in [KDE Invent](https://invent.kde.org/plasma/print-manager), our GitLab instance.
+Like other projects in the KDE ecosystem, contributions are welcome from all. This repository is managed in [KDE Invent](https://invent.kde.org/lingmo/print-manager), our GitLab instance.
 
 * Want to contribute code? See the [GitLab wiki page](https://community.kde.org/Infrastructure/GitLab) for a tutorial on how to send a merge request.
 * Reporting a bug? Please submit it on the [KDE Bugtracking System](https://bugs.kde.org/enter_bug.cgi?format=guided&product=print-manager). Please do not use the Issues

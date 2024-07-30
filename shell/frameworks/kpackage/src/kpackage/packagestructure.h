@@ -27,7 +27,7 @@ namespace KPackage
  *
  * @code
  * package->addFileDefinition("mainscript", QStringLiteral("ui/main.qml"));
- * package->setDefaultPackageRoot(QStringLiteral("plasma/wallpapers/"));
+ * package->setDefaultPackageRoot(QStringLiteral("lingmo/wallpapers/"));
  * package->addDirectoryDefinition("images", QStringLiteral("images"));
  * package->addDirectoryDefinition("theme", QStringLiteral("theme"));
  * QStringList mimetypes{QStringLiteral("image/svg+xml"), QStringLiteral("image/png"), QStringLiteral("image/jpeg")};

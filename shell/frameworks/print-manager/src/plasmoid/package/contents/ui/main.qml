@@ -9,19 +9,19 @@
 
 import QtQuick
 import QtQuick.Layouts // fullRepresentation sizing
-import org.kde.plasma.plasmoid
-import org.kde.plasma.core as PlasmaCore
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmoui as LingmoUI
 import org.kde.config // KAuthorized
 import org.kde.kcmutils // KCMLauncher
-import org.kde.plasma.printmanager as PrintManager
+import org.kde.lingmo.printmanager as PrintManager
 
 PlasmoidItem {
 
-    readonly property bool inPanel: (Plasmoid.location === PlasmaCore.Types.TopEdge
-        || Plasmoid.location === PlasmaCore.Types.RightEdge
-        || Plasmoid.location === PlasmaCore.Types.BottomEdge
-        || Plasmoid.location === PlasmaCore.Types.LeftEdge)
+    readonly property bool inPanel: (Plasmoid.location === LingmoCore.Types.TopEdge
+        || Plasmoid.location === LingmoCore.Types.RightEdge
+        || Plasmoid.location === LingmoCore.Types.BottomEdge
+        || Plasmoid.location === LingmoCore.Types.LeftEdge)
 
     property alias serverUnavailable: printersModel.serverUnavailable
     property string printersModelError: ""
@@ -71,25 +71,25 @@ PlasmoidItem {
     fullRepresentation: FullRepresentation {
         focus: true
         // as a desktop widget, we need to start with a reasonable size
-        Layout.preferredWidth: inPanel ? -1 : Kirigami.Units.gridUnit * 24
-        Layout.preferredHeight: inPanel ? -1 : Kirigami.Units.gridUnit * 24
+        Layout.preferredWidth: inPanel ? -1 : LingmoUI.Units.gridUnit * 24
+        Layout.preferredHeight: inPanel ? -1 : LingmoUI.Units.gridUnit * 24
     }
 
-    switchWidth: Kirigami.Units.gridUnit * 10
-    switchHeight: Kirigami.Units.gridUnit * 10
+    switchWidth: LingmoUI.Units.gridUnit * 10
+    switchHeight: LingmoUI.Units.gridUnit * 10
 
     Plasmoid.status: {
         if (activeJobsFilterModel.activeCount > 0) {
-            return PlasmaCore.Types.ActiveStatus;
+            return LingmoCore.Types.ActiveStatus;
         } else if (printersModel.count > 0 || serverUnavailable) {
-            return PlasmaCore.Types.PassiveStatus;
+            return LingmoCore.Types.PassiveStatus;
         } else {
-            return PlasmaCore.Types.HiddenStatus;
+            return LingmoCore.Types.HiddenStatus;
         }
     }
 
     // Overwrite default configure menu item
-    PlasmaCore.Action {
+    LingmoCore.Action {
         id: configAction
         text: i18n("&Configure Printers…")
         icon.name: "configure"

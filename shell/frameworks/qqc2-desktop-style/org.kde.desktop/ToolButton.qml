@@ -9,14 +9,14 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.ToolButton {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: flat ? Kirigami.Theme.Window : Kirigami.Theme.Button
-    Kirigami.Theme.inherit: flat
+    LingmoUI.Theme.colorSet: flat ? LingmoUI.Theme.Window : LingmoUI.Theme.Button
+    LingmoUI.Theme.inherit: flat
 
     implicitWidth: Math.max((text && display !== T.AbstractButton.IconOnly ?
         implicitBackgroundWidth : implicitHeight) + leftInset + rightInset,
@@ -29,9 +29,9 @@ T.ToolButton {
     hoverEnabled: Qt.styleHints.useHoverEffects
 
     flat: true
-    Kirigami.MnemonicData.enabled: enabled && visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.SecondaryControl
-    Kirigami.MnemonicData.label: text
+    LingmoUI.MnemonicData.enabled: enabled && visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.SecondaryControl
+    LingmoUI.MnemonicData.label: text
 
     // KF6 TODO: investigate setting this by default
     // focusPolicy: Qt.TabFocus
@@ -39,7 +39,7 @@ T.ToolButton {
     Shortcut {
         //in case of explicit & the button manages it by itself
         enabled: !(RegExp(/\&[^\&]/).test(controlRoot.text))
-        sequence: controlRoot.Kirigami.MnemonicData.sequence
+        sequence: controlRoot.LingmoUI.MnemonicData.sequence
         onActivated: controlRoot.clicked()
     }
     background: StylePrivate.StyleItem {
@@ -49,7 +49,7 @@ T.ToolButton {
         sunken: controlRoot.down
         on: controlRoot.checkable && controlRoot.checked
         hover: controlRoot.hovered
-        text: controlRoot.Kirigami.MnemonicData.mnemonicLabel
+        text: controlRoot.LingmoUI.MnemonicData.mnemonicLabel
         hasFocus: controlRoot.visualFocus || (!controlRoot.flat && controlRoot.pressed) || controlRoot.highlighted
         flat: controlRoot.flat
         font: controlRoot.font
@@ -77,7 +77,7 @@ T.ToolButton {
 
         properties: {
             "icon": controlRoot.icon.name !== "" ? controlRoot.icon.name : controlRoot.icon.source,
-            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? Kirigami.Theme.textColor : controlRoot.icon.color,
+            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? LingmoUI.Theme.textColor : controlRoot.icon.color,
             "iconWidth": controlRoot.icon.width,
             "iconHeight": controlRoot.icon.height,
 

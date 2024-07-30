@@ -5,7 +5,7 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
 QtObject {
@@ -13,7 +13,7 @@ QtObject {
 
     signal currentIndexChanged(currentIndex: int)
 
-    readonly property bool fullScreenModeAvailable: !Kirigami.Settings.isMobile
+    readonly property bool fullScreenModeAvailable: !LingmoUI.Settings.isMobile
 
     enum Mode {
         FullScreen,

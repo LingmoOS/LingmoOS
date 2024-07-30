@@ -130,7 +130,7 @@ public Q_SLOTS:
     /**
      * Returns a list of all available profiles
      *
-     * This way around the plasma applet does not check the local KConfig file itself
+     * This way around the lingmo applet does not check the local KConfig file itself
      * and can be used as a remote applet.
      *
      * @param tabletId the ID of the Tablet to check

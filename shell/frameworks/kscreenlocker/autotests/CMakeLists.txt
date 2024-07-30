@@ -21,7 +21,7 @@ ecm_mark_as_test(logindTest)
 
 pkg_search_module(PamWrapper pam_wrapper)
 # We're turning it off on the CI until pam_wrapper 1.15 is available on our image (which adds sanitizer support.)
-# see https://invent.kde.org/plasma/kscreenlocker/-/issues/11 for more details
+# see https://invent.kde.org/lingmo/kscreenlocker/-/issues/11 for more details
 if (PamWrapper_FOUND AND NOT "$ENV{KDECI_BUILD}" STREQUAL "TRUE")
     pkg_get_variable(PamWrapperModuleDir pam_wrapper "modules")
     configure_file(data/test_service.in ./test_service)

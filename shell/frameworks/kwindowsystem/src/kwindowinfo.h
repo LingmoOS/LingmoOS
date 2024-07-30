@@ -362,7 +362,7 @@ public:
     /**
      * Returns the list of activity UUIDs this window belongs to.
      *
-     * The Plasma workspace allows the user to separate her work into
+     * The Lingmo workspace allows the user to separate her work into
      * different activities, by assigning windows, documents etc. to
      * the specific ones. An activity is an abstract concept whose meaning
      * can differ from one user to another. Typical examples of activities
@@ -382,7 +382,7 @@ public:
      *     info.desktop();
      * @endcode
      *
-     * @note Activities are only supported on Plasma Workspace on X11
+     * @note Activities are only supported on Lingmo Workspace on X11
      *
      * @since 5.0
      */

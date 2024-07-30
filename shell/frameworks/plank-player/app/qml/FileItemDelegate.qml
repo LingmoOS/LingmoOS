@@ -5,12 +5,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import Qt5Compat.GraphicalEffects
 
 ItemDelegate {
     id: delegate
-    property int borderSize: Kirigami.Units.smallSpacing
+    property int borderSize: LingmoUI.Units.smallSpacing
     property int baseRadius: 3
 
     readonly property Flickable gridView: {
@@ -28,15 +28,15 @@ ItemDelegate {
         gridView.currentIndex == index && activeFocus && !gridView.moving
     }
 
-    leftPadding: Kirigami.Units.largeSpacing * 2
-    topPadding: Kirigami.Units.largeSpacing * 2
-    rightPadding: Kirigami.Units.largeSpacing * 2
-    bottomPadding: Kirigami.Units.largeSpacing * 2
+    leftPadding: LingmoUI.Units.largeSpacing * 2
+    topPadding: LingmoUI.Units.largeSpacing * 2
+    rightPadding: LingmoUI.Units.largeSpacing * 2
+    bottomPadding: LingmoUI.Units.largeSpacing * 2
 
-    leftInset: Kirigami.Units.largeSpacing
-    topInset: Kirigami.Units.largeSpacing
-    rightInset: Kirigami.Units.largeSpacing
-    bottomInset: Kirigami.Units.largeSpacing
+    leftInset: LingmoUI.Units.largeSpacing
+    topInset: LingmoUI.Units.largeSpacing
+    rightInset: LingmoUI.Units.largeSpacing
+    bottomInset: LingmoUI.Units.largeSpacing
 
     implicitWidth: gridView.cellWidth
     height: gridView.cellHeight
@@ -53,12 +53,12 @@ ItemDelegate {
             color: "transparent"
             border {
                 width: delegate.borderSize
-                color: delegate.Kirigami.Theme.highlightColor
+                color: delegate.LingmoUI.Theme.highlightColor
             }
             opacity: delegate.isCurrent || delegate.highlighted
             Behavior on opacity {
                 OpacityAnimator {
-                    duration: Kirigami.Units.longDuration/2
+                    duration: LingmoUI.Units.longDuration/2
                     easing.type: Easing.InOutQuad
                 }
             }
@@ -70,7 +70,7 @@ ItemDelegate {
                 fill: parent
             }
             radius: delegate.baseRadius
-            color: delegate.Kirigami.Theme.backgroundColor
+            color: delegate.LingmoUI.Theme.backgroundColor
             layer.enabled: true
             layer.effect: DropShadow {
                 transparentBorder: false
@@ -107,14 +107,14 @@ ItemDelegate {
                     when: !delegate.isCurrent
                     PropertyChanges {
                         target: delegate
-                        leftInset: Kirigami.Units.largeSpacing
-                        rightInset: Kirigami.Units.largeSpacing
-                        topInset: Kirigami.Units.largeSpacing
-                        bottomInset: Kirigami.Units.largeSpacing
+                        leftInset: LingmoUI.Units.largeSpacing
+                        rightInset: LingmoUI.Units.largeSpacing
+                        topInset: LingmoUI.Units.largeSpacing
+                        bottomInset: LingmoUI.Units.largeSpacing
                     }
                     PropertyChanges {
                         target: background.highlight.anchors
-                        margins: Kirigami.Units.largeSpacing
+                        margins: LingmoUI.Units.largeSpacing
                     }
                     PropertyChanges {
                         target: frame
@@ -131,32 +131,32 @@ ItemDelegate {
                 ParallelAnimation {
                     NumberAnimation {
                         property: "leftInset"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                     NumberAnimation {
                         property: "rightInset"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                     NumberAnimation {
                         property: "topInset"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                     NumberAnimation {
                         property: "bottomInset"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                     NumberAnimation {
                         property: "radius"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                     NumberAnimation {
                         property: "margins"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                 }
@@ -165,7 +165,7 @@ ItemDelegate {
     }
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Item {
             id: imgRoot
@@ -193,7 +193,7 @@ ItemDelegate {
                 }
             }
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 id: img
                 source: "kdenlive-show-video"
                 anchors {
@@ -227,7 +227,7 @@ ItemDelegate {
                 }
                 NumberAnimation {
                     property: "extraBorder"
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
             }
@@ -239,9 +239,9 @@ ItemDelegate {
             // Compensate for blank space created from not rounding thumbnail bottom corners
             Layout.topMargin: -delegate.baseRadius
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 id: videoLabel
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -249,7 +249,7 @@ ItemDelegate {
                 level: 3
                 maximumLineCount: 1
                 elide: Text.ElideRight
-                color: Kirigami.Theme.textColor
+                color: LingmoUI.Theme.textColor
                 Component.onCompleted: {
                     text = fileName + (fileIsDir ? "/" : "")
                 }

@@ -9,33 +9,33 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQml.Models
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.12 as Kirigami
+import org.kde.lingmoui 2.12 as LingmoUI
 
 KCM.ScrollViewKCM {
     id: rulesListKCM
 
-    implicitWidth: Kirigami.Units.gridUnit * 35
-    implicitHeight: Kirigami.Units.gridUnit * 35
+    implicitWidth: LingmoUI.Units.gridUnit * 35
+    implicitHeight: LingmoUI.Units.gridUnit * 35
 
-    KCM.ConfigModule.columnWidth: Kirigami.Units.gridUnit * 23
+    KCM.ConfigModule.columnWidth: LingmoUI.Units.gridUnit * 23
     KCM.ConfigModule.buttons: KCM.ConfigModule.Help | KCM.ConfigModule.Apply
 
     property var selectedIndexes: []
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             enabled: !exportInfo.visible
             text: i18n("Add New…")
             icon.name: "list-add-symbolic"
             onTriggered: kcm.createRule();
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             enabled: !exportInfo.visible
             text: i18n("Import…")
             icon.name: "document-import-symbolic"
             onTriggered: importDialog.active = true;
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: checked ? i18n("Cancel Export") : i18n("Export…")
             icon.name: exportInfo.visible ? "dialog-cancel-symbolic" : "document-export-symbolic"
             checkable: true
@@ -70,32 +70,32 @@ KCM.ScrollViewKCM {
         delegate: RuleBookDelegate {}
         reuseItems: true
 
-        highlightMoveDuration: Kirigami.Units.longDuration
+        highlightMoveDuration: LingmoUI.Units.longDuration
 
         displaced: Transition {
             NumberAnimation {
                 properties: "y"
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             visible: ruleBookView.count === 0
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             icon.name: "preferences-system-windows-actions"
             text: i18n("No rules for specific windows are currently set");
             explanation: xi18nc("@info", "Click <interface>Add New…</interface> to add some")
         }
     }
 
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: exportInfo
         icon.source: "document-export"
         showCloseButton: true
         text: i18n("Select the rules to export")
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "dialog-ok-apply"
                 text: checked ? i18n("Unselect All") : i18n("Select All")
                 checkable: true
@@ -109,7 +109,7 @@ KCM.ScrollViewKCM {
                 }
             }
             ,
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "document-save"
                 text: i18n("Save Rules")
                 enabled: selectedIndexes.length > 0
@@ -129,7 +129,7 @@ KCM.ScrollViewKCM {
     }
 
     component RuleBookDelegate : Item {
-        // External item required to make Kirigami.ListItemDragHandle work
+        // External item required to make LingmoUI.ListItemDragHandle work
         width: ruleBookView.width
         implicitHeight: ruleBookItem.implicitHeight
 
@@ -147,7 +147,7 @@ KCM.ScrollViewKCM {
             down: false  // Disable press effect
 
             contentItem: RowLayout {
-                Kirigami.ListItemDragHandle {
+                LingmoUI.ListItemDragHandle {
                     visible: !exportInfo.visible
                     listItem: ruleBookItem
                     listView: ruleBookView
@@ -158,7 +158,7 @@ KCM.ScrollViewKCM {
 
                 QQC2.TextField {
                     id: descriptionField
-                    Layout.minimumWidth: Kirigami.Units.gridUnit * 2
+                    Layout.minimumWidth: LingmoUI.Units.gridUnit * 2
                     Layout.fillWidth: true
                     background: Item {}
                     horizontalAlignment: Text.AlignLeft

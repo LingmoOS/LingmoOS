@@ -4,16 +4,16 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.InlineMessage {
+LingmoUI.InlineMessage {
     id: banner
-    type: Kirigami.MessageType.Error
-    position: Kirigami.InlineMessage.Position.Header
+    type: LingmoUI.MessageType.Error
+    position: LingmoUI.InlineMessage.Position.Header
     showCloseButton: true
 
     property bool resetToDefault: true
-    property int defaultType: Kirigami.MessageType.Error
+    property int defaultType: LingmoUI.MessageType.Error
     property alias autoCloseInterval: timer.interval
 
     signal timeout()

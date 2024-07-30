@@ -17,7 +17,7 @@ namespace KWayland
 namespace Client
 {
 class Surface;
-class PlasmaShellSurface;
+class LingmoShellSurface;
 }
 }
 
@@ -58,7 +58,7 @@ private:
     NET::Properties m_properties;
     NET::Properties2 m_properties2;
     KWayland::Client::Surface *m_surface;
-    KWayland::Client::PlasmaShellSurface *m_plasmaShellSurface;
+    KWayland::Client::LingmoShellSurface *m_lingmoShellSurface;
 };
 
 #endif

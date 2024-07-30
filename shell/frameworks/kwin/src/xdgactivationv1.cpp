@@ -12,7 +12,7 @@
 #include "utils/common.h"
 #include "wayland/clientconnection.h"
 #include "wayland/display.h"
-#include "wayland/plasmawindowmanagement.h"
+#include "wayland/lingmowindowmanagement.h"
 #include "wayland/surface.h"
 #include "wayland/xdgactivation_v1.h"
 #include "wayland_server.h"
@@ -28,7 +28,7 @@ static bool isPrivilegedInWindowManagement(const ClientConnection *client)
 {
     Q_ASSERT(client);
     auto requestedInterfaces = client->property("requestedInterfaces").toStringList();
-    return requestedInterfaces.contains(QLatin1String("org_kde_plasma_window_management")) || requestedInterfaces.contains(QLatin1String("kde_lockscreen_overlay_v1"));
+    return requestedInterfaces.contains(QLatin1String("org_kde_lingmo_window_management")) || requestedInterfaces.contains(QLatin1String("kde_lockscreen_overlay_v1"));
 }
 
 static const QString windowDesktopFileName(Window *window)
@@ -103,9 +103,9 @@ QString XdgActivationV1Integration::requestToken(bool isPrivileged, SurfaceInter
         }
         icon = QIcon::fromTheme(df.readIcon(), icon);
     }
-    std::unique_ptr<PlasmaWindowActivationInterface> activation;
+    std::unique_ptr<LingmoWindowActivationInterface> activation;
     if (showNotify) {
-        activation = waylandServer()->plasmaActivationFeedback()->createActivation(appId);
+        activation = waylandServer()->lingmoActivationFeedback()->createActivation(appId);
     }
     m_currentActivationToken = std::make_unique<ActivationToken>(ActivationToken{newToken, isPrivileged, surface, serial, seat, appId, showNotify, std::move(activation)});
     if (showNotify) {

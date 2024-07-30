@@ -256,7 +256,7 @@ public:
     static QString defaultThemeName();
 
     /**
-     * Enforces the Breeze icon theme (including our KIconEngine for re-coloring).
+     * Enforces the Ocean icon theme (including our KIconEngine for re-coloring).
      *
      * If the user has configured a different icon set, that one will be taken.
      *

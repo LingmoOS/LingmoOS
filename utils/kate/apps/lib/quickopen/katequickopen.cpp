@@ -273,7 +273,7 @@ KateQuickOpen::KateQuickOpen(KateMainWindow *mainWindow)
     , m_mainWindow(mainWindow)
 {
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    setProperty("_breeze_force_frame", true);
+    setProperty("_ocean_force_frame", true);
 
     QGraphicsDropShadowEffect *e = new QGraphicsDropShadowEffect(this);
     e->setColor(palette().color(QPalette::Dark));
@@ -301,7 +301,7 @@ KateQuickOpen::KateQuickOpen(KateMainWindow *mainWindow)
 
     m_listView = new QTreeView(this);
     layout->addWidget(m_listView, 1);
-    m_listView->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags(Qt::TopEdge)));
+    m_listView->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags(Qt::TopEdge)));
     m_listView->setTextElideMode(Qt::ElideLeft);
     m_listView->setUniformRowHeights(true);
 

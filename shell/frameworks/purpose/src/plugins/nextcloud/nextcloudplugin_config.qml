@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMUtils
 import SSO.OnlineAccounts as OA
 
@@ -19,7 +19,7 @@ ColumnLayout {
     property var urls
     property var mimeType
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         Layout.fillWidth: true
         text: i18nd("purpose6_nextcloud", "Select an account:")
         visible: list.count !== 0
@@ -59,9 +59,9 @@ ColumnLayout {
                 root.accountId = serviceModel.get(list.currentIndex, "accountId")
             }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 4)
                 visible: list.count === 0
                 text: i18nd("purpose6_nextcloud", "No account configured")
             }

@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     KNotification *notification = new KNotification(QStringLiteral("notification"));
-    notification->setComponentName(QStringLiteral("plasma_workspace"));
+    notification->setComponentName(QStringLiteral("lingmo_workspace"));
     notification->setText(QStringLiteral("Hello!"));
     notification->setTitle(QStringLiteral("Yo"));
 

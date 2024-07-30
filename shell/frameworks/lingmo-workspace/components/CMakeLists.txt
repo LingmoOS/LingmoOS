@@ -1,0 +1,13 @@
+add_definitions(-DTRANSLATION_DOMAIN=\"lingmoshellprivateplugin\")
+
+install(DIRECTORY dialogs/ DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/lingmo/workspace/dialogs)
+add_subdirectory(containmentlayoutmanager)
+add_subdirectory(dbus)
+add_subdirectory(shellprivate)
+add_subdirectory(keyboardlayout)
+add_subdirectory(sessionsprivate)
+add_subdirectory(lookandfeelqml)
+add_subdirectory(calendar)
+add_subdirectory(trianglemousefilter)
+add_subdirectory(batterycontrol)
+add_subdirectory(workspace)

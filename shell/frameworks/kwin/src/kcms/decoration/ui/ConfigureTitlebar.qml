@@ -10,7 +10,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 KCM.AbstractKCM {
     title: i18n("Titlebar Buttons")
@@ -19,13 +19,13 @@ KCM.AbstractKCM {
 
     Rectangle {
         anchors.fill: parent
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        color: Kirigami.Theme.backgroundColor
+        LingmoUI.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        color: LingmoUI.Theme.backgroundColor
 
         Buttons {
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.largeSpacing
+            anchors.margins: LingmoUI.Units.largeSpacing
         }
     }
 
@@ -45,10 +45,10 @@ KCM.AbstractKCM {
             }
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             Layout.fillWidth: true
             id: infoLabel
-            type: Kirigami.MessageType.Information
+            type: LingmoUI.MessageType.Information
             text: i18nc("popup tip", "Click and hold on the menu button to show the menu.")
             showCloseButton: true
             visible: false

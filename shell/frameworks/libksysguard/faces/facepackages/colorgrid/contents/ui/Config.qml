@@ -9,7 +9,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 ColumnLayout {
     id: root
@@ -17,17 +17,17 @@ ColumnLayout {
     property alias cfg_columnCount: columnCountSpin.value
     property alias cfg_useSensorColor: sensorColorCheck.checked
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         id: form
 
         CheckBox {
             id: sensorColorCheck
-            Kirigami.FormData.label: i18n("Use sensor color:")
+            LingmoUI.FormData.label: i18n("Use sensor color:")
         }
 
         SpinBox {
             id: columnCountSpin
-            Kirigami.FormData.label: i18n("Number of Columns:")
+            LingmoUI.FormData.label: i18n("Number of Columns:")
             editable: true
             from: 0
             to: 99999

@@ -173,7 +173,7 @@ public:
         LoopSound = 0x08,
 
         /**
-         * Sends a hint to Plasma to skip grouping for this notification
+         * Sends a hint to Lingmo to skip grouping for this notification
          *
          * @since 5.18
          */
@@ -280,7 +280,7 @@ public:
     /**
      * Set the notification text that will appear in the popup.
      *
-     * In Plasma workspace, the text is shown in a QML label which uses Text.StyledText,
+     * In Lingmo workspace, the text is shown in a QML label which uses Text.StyledText,
      * ie. it supports a small subset of HTML entities (mostly just formatting tags)
      *
      * If the notifications server does not advertise "body-markup" capability,
@@ -332,7 +332,7 @@ public:
      * be wrapped in i18n() or tr() calls.
      *
      * The visual representation of actions depends on the notification server.
-     * In Plasma and Gnome desktops, the actions are performed by clicking on
+     * In Lingmo and Gnome desktops, the actions are performed by clicking on
      * the notification popup, and the label is not presented to the user.
      *
      * Calling this overrides the current default action
@@ -717,7 +717,7 @@ public:
      * @param text is the text of the notification to show in the popup.
      * @param pixmap is a picture which may be shown in the popup.
      * @param flags is a bitmask of NotificationFlag
-     * @param componentName used to determine the location of the config file.  by default, plasma_workspace is used
+     * @param componentName used to determine the location of the config file.  by default, lingmo_workspace is used
      */
     static KNotification *event(const QString &eventId,
                                 const QString &text = QString(),
@@ -769,7 +769,7 @@ public:
      * @param text is the text of the notification to show in the popup
      * @param iconName a Freedesktop compatible icon name to be shown in the popup
      * @param flags is a bitmask of NotificationFlag
-     * @param componentName used to determine the location of the config file.  by default, plasma_workspace is used
+     * @param componentName used to determine the location of the config file.  by default, lingmo_workspace is used
      * @since 5.4
      */
     static KNotification *event(const QString &eventId,

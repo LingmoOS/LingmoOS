@@ -78,7 +78,7 @@ KScreenSaverSettings::KScreenSaverSettings(QObject *parent)
 {
     setParent(parent);
 
-    const auto wallpaperPackages = KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/Wallpaper"));
+    const auto wallpaperPackages = KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/Wallpaper"));
     for (auto &package : wallpaperPackages) {
         m_availableWallpaperPlugins.append({package.name(), package.pluginId()});
     }

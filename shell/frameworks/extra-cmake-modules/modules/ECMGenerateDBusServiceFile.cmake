@@ -48,7 +48,7 @@ Example usage:
   ecm_generate_dbus_service_file(
       NAME org.kde.kded5
       EXECUTABLE ${KDE_INSTALL_FULL_BINDIR}/kded5
-      SYSTEMD_SERVICE plasma-kded.service
+      SYSTEMD_SERVICE lingmo-kded.service
       DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR}
       RENAME org.kde.daemon.service
   )

@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 T.RadioButton {
@@ -23,7 +23,7 @@ T.RadioButton {
                              implicitIndicatorHeight + topPadding + bottomPadding)
     baselineOffset: contentItem.y + contentItem.baselineOffset
 
-    spacing: indicator && typeof indicator.pixelMetric === "function" ? indicator.pixelMetric("radiobuttonlabelspacing") : Kirigami.Units.smallSpacing
+    spacing: indicator && typeof indicator.pixelMetric === "function" ? indicator.pixelMetric("radiobuttonlabelspacing") : LingmoUI.Units.smallSpacing
 
     hoverEnabled: true
 
@@ -45,13 +45,13 @@ T.RadioButton {
         control: controlRoot
     }
 
-    Kirigami.MnemonicData.enabled: enabled && visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.ActionElement
-    Kirigami.MnemonicData.label: text
+    LingmoUI.MnemonicData.enabled: enabled && visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.ActionElement
+    LingmoUI.MnemonicData.label: text
     Shortcut {
         //in case of explicit & the button manages it by itself
         enabled: !(RegExp(/\&[^\&]/).test(controlRoot.text))
-        sequence: controlRoot.Kirigami.MnemonicData.sequence
+        sequence: controlRoot.LingmoUI.MnemonicData.sequence
         onActivated: controlRoot.checked = true
     }
 
@@ -73,7 +73,7 @@ T.RadioButton {
         leftPadding: controlRoot.indicator && !controlRoot.mirrored ? indicatorEffectiveWidth : 0
         rightPadding: controlRoot.indicator && controlRoot.mirrored ? indicatorEffectiveWidth : 0
         opacity: controlRoot.enabled ? 1 : 0.6
-        text: controlRoot.Kirigami.MnemonicData.richTextLabel
+        text: controlRoot.LingmoUI.MnemonicData.richTextLabel
         font: controlRoot.font
         elide: Text.ElideRight
         visible: controlRoot.text
@@ -88,11 +88,11 @@ T.RadioButton {
                 left: parent.left
                 bottom: parent.bottom
                 topMargin: contentLabel.topPadding - 1
-                leftMargin: (controlRoot.mirrored ? contentLabel.rightPadding : contentLabel.leftPadding) - Kirigami.Units.smallSpacing / 2
+                leftMargin: (controlRoot.mirrored ? contentLabel.rightPadding : contentLabel.leftPadding) - LingmoUI.Units.smallSpacing / 2
                 bottomMargin: contentLabel.bottomPadding - 1
             }
 
-            width: contentLabel.paintedWidth + Kirigami.Units.smallSpacing
+            width: contentLabel.paintedWidth + LingmoUI.Units.smallSpacing
             visible: control.activeFocus
         }
     }

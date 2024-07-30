@@ -8,14 +8,14 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.Slider {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)

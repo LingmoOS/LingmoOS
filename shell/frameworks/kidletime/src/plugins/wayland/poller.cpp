@@ -24,7 +24,7 @@ Q_LOGGING_CATEGORY(POLLER, "kf5idletime_wayland")
  *
  * Pragmattically they're both the same, but we have to have two implementations for a while
  *
- * When a suitable amount of time passes (Plasma 5.24 being EOL) drop IdleTimeoutKwin and drop IdleManagerKwin as well as merge the abstract IdleTimeout class into the real implementation
+ * When a suitable amount of time passes (Lingmo 5.24 being EOL) drop IdleTimeoutKwin and drop IdleManagerKwin as well as merge the abstract IdleTimeout class into the real implementation
  */
 
 class IdleTimeout : public QObject

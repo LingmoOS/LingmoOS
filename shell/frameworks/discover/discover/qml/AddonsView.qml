@@ -12,10 +12,10 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
-Kirigami.OverlaySheet {
+LingmoUI.OverlaySheet {
     id: root
 
     property alias application: addonsModel.application
@@ -34,7 +34,7 @@ Kirigami.OverlaySheet {
     ListView {
         id: listview
 
-        implicitWidth: Kirigami.Units.gridUnit * 25
+        implicitWidth: LingmoUI.Units.gridUnit * 25
 
         visible: root.containsAddons
         enabled: !root.isInstalling
@@ -72,7 +72,7 @@ Kirigami.OverlaySheet {
     footer: RowLayout {
         id: footer
 
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         readonly property bool active: addonsModel.hasChanges && !root.isInstalling
 

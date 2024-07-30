@@ -73,14 +73,14 @@ void KUpdateLaunchEnvironmentJob::start()
         }
         const QString value = d->environment.value(varName);
 
-        // plasma-session
-        QDBusMessage plasmaSessionMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.Startup"),
+        // lingmo-session
+        QDBusMessage lingmoSessionMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.Startup"),
                                                                        QStringLiteral("/Startup"),
                                                                        QStringLiteral("org.kde.Startup"),
                                                                        QStringLiteral("updateLaunchEnv"));
-        plasmaSessionMsg.setArguments({QVariant::fromValue(varName), QVariant::fromValue(value)});
-        auto plasmaSessionReply = QDBusConnection::sessionBus().asyncCall(plasmaSessionMsg);
-        d->monitorReply(plasmaSessionReply);
+        lingmoSessionMsg.setArguments({QVariant::fromValue(varName), QVariant::fromValue(value)});
+        auto lingmoSessionReply = QDBusConnection::sessionBus().asyncCall(lingmoSessionMsg);
+        d->monitorReply(lingmoSessionReply);
 
         // DBus-activation environment
         dbusActivationEnv.insert(varName, value);

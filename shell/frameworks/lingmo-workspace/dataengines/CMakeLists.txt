@@ -1,0 +1,27 @@
+# TODO use modern compiler settings when dataengines are ported
+remove_definitions(-DQT_NO_CAST_FROM_ASCII)
+remove_definitions(-DQT_NO_CAST_TO_ASCII)
+remove_definitions(-DQT_NO_CAST_FROM_BYTEARRAY)
+
+add_subdirectory(applicationjobs)
+if (LingmoActivities_FOUND)
+    add_subdirectory(activities)
+endif ()
+add_subdirectory(apps)
+add_subdirectory(executable)
+add_subdirectory(favicons)
+add_subdirectory(filebrowser)
+if (KF6NetworkManagerQt_FOUND)
+    add_subdirectory(geolocation)
+endif ()
+add_subdirectory(hotplug)
+add_subdirectory(notifications)
+add_subdirectory(packagekit)
+add_subdirectory(places)
+add_subdirectory(powermanagement)
+add_subdirectory(soliddevice)
+
+add_subdirectory(time)
+add_subdirectory(weather)
+
+add_subdirectory(mouse)

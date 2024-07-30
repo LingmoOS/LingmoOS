@@ -6,7 +6,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMutils
 
 /**
@@ -54,7 +54,7 @@ KCMutils.AbstractKCM {
         let width = 0;
 
         // Show three columns at once, every column occupies implicitCellWidth + Units.gridUnit
-        width += 3 * (view.implicitCellWidth + Kirigami.Units.gridUnit);
+        width += 3 * (view.implicitCellWidth + LingmoUI.Units.gridUnit);
 
         const scrollBar = scroll.QQC2.ScrollBar.vertical;
         width += scrollBar.width + scrollBar.leftPadding + scrollBar.rightPadding;
@@ -64,7 +64,7 @@ KCMutils.AbstractKCM {
 
         return width;
     }
-    implicitHeight: view.implicitCellHeight * 3 + (header ? header.height : 0) + (footer ? footer.height : 0) + Kirigami.Units.gridUnit
+    implicitHeight: view.implicitCellHeight * 3 + (header ? header.height : 0) + (footer ? footer.height : 0) + LingmoUI.Units.gridUnit
 
     flickable: scroll.view
 

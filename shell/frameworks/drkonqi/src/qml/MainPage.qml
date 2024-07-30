@@ -4,12 +4,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.Page {
-    globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
+LingmoUI.Page {
+    globalToolBarStyle: LingmoUI.ApplicationHeaderStyle.None
 
     title: CrashedApplication.name
 
@@ -42,15 +42,15 @@ Kirigami.Page {
         GridLayout {
             Layout.alignment: Qt.AlignHCenter
 
-            columns: Kirigami.Settings.isMobile ? 1 : 2
-            rows: Kirigami.Settings.isMobile ? 2 : 1
+            columns: LingmoUI.Settings.isMobile ? 1 : 2
+            rows: LingmoUI.Settings.isMobile ? 2 : 1
 
             MainPageButton {
                 Layout.alignment: Qt.AlignHCenter
 
-                action: Kirigami.Action {
-                    enabled: Kirigami.Settings.isMobile ? true : canAutoReport
-                    visible: Kirigami.Settings.isMobile ? canAutoReport : true
+                action: LingmoUI.Action {
+                    enabled: LingmoUI.Settings.isMobile ? true : canAutoReport
+                    visible: LingmoUI.Settings.isMobile ? canAutoReport : true
                     icon.name: "document-send-symbolic"
                     text: i18nc("@action", "Send Automatic Report")
                     onTriggered: {
@@ -64,7 +64,7 @@ Kirigami.Page {
             MainPageButton {
                 Layout.alignment: Qt.AlignHCenter
 
-                action: Kirigami.Action {
+                action: LingmoUI.Action {
                     icon.name: "code-class-symbolic"
                     text: i18nc("@action", "See Developer Information")
                     onTriggered: pageStack.push("qrc:/ui/DeveloperPage.qml")

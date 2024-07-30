@@ -4,17 +4,17 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     title: i18nc("@title", "Crash Report Sent")
 
     property int bugNumber: 0
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "system-reboot-symbolic"
             text: i18nc("@action %1 is an application name e.g. kwrite", "Restart %1", CrashedApplication.name)
             visible: !CrashedApplication.hasBeenRestarted

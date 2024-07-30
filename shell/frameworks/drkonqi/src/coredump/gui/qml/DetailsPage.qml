@@ -4,12 +4,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import org.kde.syntaxhighlighting 1.0
 
 import org.kde.drkonqi.coredump.gui 1.0 as DrKonqi
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
 
     property alias patient: detailsLoader.patient
@@ -19,10 +19,10 @@ Kirigami.ScrollablePage {
     title: i18nc("@title", "Details")
     horizontalScrollBarPolicy: Qt.ScrollBarAsNeeded
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             enabled: state === ""
             icon.name: "edit-copy"
             text: i18nc("@action", "Copy to Clipboard")
@@ -31,7 +31,7 @@ Kirigami.ScrollablePage {
                 contentLoader.item.copy()
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             enabled: patient.canDebug
             icon.name: "debug-run"
             text: i18nc("@action", "Run Interactive Debugger")
@@ -60,7 +60,7 @@ Kirigami.ScrollablePage {
     Component {
         id: errorComponent
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             text: page.errorText
             icon.name: "data-warning"
@@ -80,7 +80,7 @@ Kirigami.ScrollablePage {
             background.visible: false
             font.family: "monospace"
             text: page.text
-            selectByMouse: Kirigami.Settings.isMobile ? false : true
+            selectByMouse: LingmoUI.Settings.isMobile ? false : true
 
             SyntaxHighlighter {
                 textEdit: textfield

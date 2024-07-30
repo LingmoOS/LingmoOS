@@ -267,7 +267,7 @@ bool PackagePrivate::isInsidePackageDir(const QString &canonicalPath) const
     Q_ASSERT(QFileInfo(canonicalPath).canonicalFilePath() == canonicalPath);
     // make sure that the base path is also canonical
     // this was not the case until 5.8, making this check fail e.g. if /home is a symlink
-    // which in turn would make plasmashell not find the .qml files
+    // which in turn would make lingmoshell not find the .qml files
     // installed package
     if (tempRoot.isEmpty()) {
         Q_ASSERT(QDir(path).exists());
@@ -519,9 +519,9 @@ void Package::setPath(const QString &path)
             d->path.append(QLatin1Char('/'));
         }
 
-        const QString fallbackPath = metadata().value(QStringLiteral("X-Plasma-RootPath"));
+        const QString fallbackPath = metadata().value(QStringLiteral("X-Lingmo-RootPath"));
         if (!fallbackPath.isEmpty()) {
-            const KPackage::Package fp = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Applet"), fallbackPath);
+            const KPackage::Package fp = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Applet"), fallbackPath);
             setFallbackPackage(fp);
         }
 

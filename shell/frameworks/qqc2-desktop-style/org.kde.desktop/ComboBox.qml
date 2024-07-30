@@ -9,15 +9,15 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.ComboBox {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: editable ? Kirigami.Theme.View : Kirigami.Theme.Button
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: editable ? LingmoUI.Theme.View : LingmoUI.Theme.Button
+    LingmoUI.Theme.inherit: false
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -41,8 +41,8 @@ T.ComboBox {
         text: model[controlRoot.textRole]
         highlighted: controlRoot.highlightedIndex === index
         property bool separatorVisible: false
-        Kirigami.Theme.colorSet: controlRoot.Kirigami.Theme.inherit ? controlRoot.Kirigami.Theme.colorSet : Kirigami.Theme.View
-        Kirigami.Theme.inherit: controlRoot.Kirigami.Theme.inherit
+        LingmoUI.Theme.colorSet: controlRoot.LingmoUI.Theme.inherit ? controlRoot.LingmoUI.Theme.colorSet : LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: controlRoot.LingmoUI.Theme.inherit
     }
 
     indicator: Item {}
@@ -77,12 +77,12 @@ T.ComboBox {
         // Work around Qt bug where NativeRendering breaks for non-integer scale factors
         // https://bugreports.qt.io/browse/QTBUG-67007
         renderType: Screen.devicePixelRatio % 1 !== 0 ? Text.QtRendering : Text.NativeRendering
-        color: controlRoot.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-        selectionColor: Kirigami.Theme.highlightColor
-        selectedTextColor: Kirigami.Theme.highlightedTextColor
+        color: controlRoot.enabled ? LingmoUI.Theme.textColor : LingmoUI.Theme.disabledTextColor
+        selectionColor: LingmoUI.Theme.highlightColor
+        selectedTextColor: LingmoUI.Theme.highlightedTextColor
 
-        selectByMouse: !Kirigami.Settings.tabletMode
-        cursorDelegate: Kirigami.Settings.tabletMode ? mobileCursor : null
+        selectByMouse: !LingmoUI.Settings.tabletMode
+        cursorDelegate: LingmoUI.Settings.tabletMode ? mobileCursor : null
 
         font: controlRoot.font
         horizontalAlignment: Text.AlignLeft
@@ -99,7 +99,7 @@ T.ComboBox {
         onPressed: Private.MobileTextActionsToolBar.shouldBeVisible = true;
 
         onPressAndHold: {
-            if (!Kirigami.Settings.tabletMode) {
+            if (!LingmoUI.Settings.tabletMode) {
                 return;
             }
             forceActiveFocus();
@@ -142,16 +142,16 @@ T.ComboBox {
     }
 
     popup: T.Popup {
-        Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.Menu
-        z: Kirigami.OverlayZStacking.z
+        LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.Menu
+        z: LingmoUI.OverlayZStacking.z
 
         y: controlRoot.height
         width: controlRoot.width
         implicitHeight: contentItem.implicitHeight
-        topMargin: Kirigami.Units.mediumSpacing
-        bottomMargin: Kirigami.Units.mediumSpacing
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: controlRoot.Kirigami.Theme.inherit
+        topMargin: LingmoUI.Units.mediumSpacing
+        bottomMargin: LingmoUI.Units.mediumSpacing
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: controlRoot.LingmoUI.Theme.inherit
         modal: true
         dim: true
         closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutside
@@ -167,8 +167,8 @@ T.ComboBox {
             LayoutMirroring.childrenInherit: true
 
             background: Rectangle {
-                color: Kirigami.Theme.backgroundColor
-                radius: Kirigami.Units.cornerRadius
+                color: LingmoUI.Theme.backgroundColor
+                radius: LingmoUI.Units.cornerRadius
             }
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ListView {
@@ -189,15 +189,15 @@ T.ComboBox {
                 boundsBehavior: Flickable.StopAtBounds
             }
         }
-        background: Kirigami.ShadowedRectangle {
+        background: LingmoUI.ShadowedRectangle {
             anchors {
                 fill: parent
                 margins: -1
             }
-            radius: Kirigami.Units.cornerRadius
-            color: Kirigami.Theme.backgroundColor
+            radius: LingmoUI.Units.cornerRadius
+            color: LingmoUI.Theme.backgroundColor
 
-            border.color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
+            border.color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
             border.width: 1
 
             shadow.xOffset: 0

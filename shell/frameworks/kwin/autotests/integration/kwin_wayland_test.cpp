@@ -63,7 +63,7 @@ WaylandTestApplication::WaylandTestApplication(OperationMode mode, int &argc, ch
         }
     }
 
-    QIcon::setThemeName(QStringLiteral("breeze"));
+    QIcon::setThemeName(QStringLiteral("ocean"));
 #if KWIN_BUILD_ACTIVITIES
     setUseKActivities(false);
 #endif
@@ -75,9 +75,9 @@ WaylandTestApplication::WaylandTestApplication(OperationMode mode, int &argc, ch
     qunsetenv("XKB_DEFAULT_VARIANT");
     qunsetenv("XKB_DEFAULT_OPTIONS");
 
-    auto breezerc = KSharedConfig::openConfig(QStringLiteral("breezerc"));
-    breezerc->group(QStringLiteral("Common")).writeEntry(QStringLiteral("OutlineIntensity"), QStringLiteral("OutlineOff"));
-    breezerc->sync();
+    auto oceanrc = KSharedConfig::openConfig(QStringLiteral("oceanrc"));
+    oceanrc->group(QStringLiteral("Common")).writeEntry(QStringLiteral("OutlineIntensity"), QStringLiteral("OutlineOff"));
+    oceanrc->sync();
 
     auto config = KSharedConfig::openConfig(QString(), KConfig::SimpleConfig);
     KConfigGroup windowsGroup = config->group(QStringLiteral("Windows"));

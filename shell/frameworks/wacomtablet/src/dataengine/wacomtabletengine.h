@@ -19,8 +19,8 @@
 #define WACOMTABLETENGINE_H
 
 #include "dbustabletinterface.h"
-#include <Plasma5Support/DataEngine>
-namespace Plasma = Plasma5Support;
+#include <Lingmo5Support/DataEngine>
+namespace Lingmo = Lingmo5Support;
 
 struct TabletData {
     QString name;
@@ -31,7 +31,7 @@ struct TabletData {
     bool touch;
 };
 
-class WacomTabletEngine : public Plasma::DataEngine
+class WacomTabletEngine : public Lingmo::DataEngine
 {
     Q_OBJECT
 
@@ -39,7 +39,7 @@ public:
     WacomTabletEngine(QObject *parent, const QVariantList &args);
     ~WacomTabletEngine();
 
-    Plasma::Service *serviceForSource(const QString &source) Q_DECL_OVERRIDE;
+    Lingmo::Service *serviceForSource(const QString &source) Q_DECL_OVERRIDE;
 private slots:
     void onDBusConnected();
     void onDBusDisconnected();

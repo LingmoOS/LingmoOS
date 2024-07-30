@@ -13,7 +13,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMUtils
 import org.kde.bluezqt as BluezQt
 import org.kde.bluedevil.kcm
@@ -27,12 +27,12 @@ KCMUtils.SimpleKCM {
     // Somehow even the name won't update in the ComboBox
     readonly property BluezQt.Adapter adapter: BluezQt.Manager.adapters[box.currentIndex] ?? null
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         id: form
 
         QQC2.ComboBox {
             id: box
-            Kirigami.FormData.label: i18n("Device:")
+            LingmoUI.FormData.label: i18n("Device:")
             model: BluezQt.Manager.adapters
             textRole: "name"
             visible: count > 1
@@ -40,29 +40,29 @@ KCMUtils.SimpleKCM {
 
         QQC2.TextField {
             text: root.adapter.name
-            Kirigami.FormData.label: i18n("Name:")
+            LingmoUI.FormData.label: i18n("Name:")
             onEditingFinished: root.adapter.name = text
         }
 
         QQC2.Label {
             text: root.adapter.address
-            Kirigami.FormData.label: i18n("Address:")
+            LingmoUI.FormData.label: i18n("Address:")
         }
 
         QQC2.CheckBox {
-            Kirigami.FormData.label: i18n("Enabled:")
+            LingmoUI.FormData.label: i18n("Enabled:")
             checked: root.adapter.powered
             onToggled: root.adapter.powered = checked
         }
 
         QQC2.CheckBox {
-            Kirigami.FormData.label: i18n("Visible:")
+            LingmoUI.FormData.label: i18n("Visible:")
             checked: root.adapter.discoverable
             onToggled: root.adapter.discoverable = checked
         }
 
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
+        LingmoUI.Separator {
+            LingmoUI.FormData.isSection: true
         }
 
         QQC2.ButtonGroup {
@@ -70,7 +70,7 @@ KCMUtils.SimpleKCM {
         }
 
         QQC2.RadioButton {
-            Kirigami.FormData.label: i18n("On login:")
+            LingmoUI.FormData.label: i18n("On login:")
             text: i18n("Enable Bluetooth")
             QQC2.ButtonGroup.group: loginStateRadioGroup
             checked: root.KCMUtils.ConfigModule.bluetoothStatusAtLogin === "enable"
@@ -101,8 +101,8 @@ KCMUtils.SimpleKCM {
             }
         }
 
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
+        LingmoUI.Separator {
+            LingmoUI.FormData.isSection: true
         }
 
         QQC2.ButtonGroup {
@@ -110,7 +110,7 @@ KCMUtils.SimpleKCM {
         }
 
         QQC2.RadioButton {
-            Kirigami.FormData.label: i18n("When receiving files:")
+            LingmoUI.FormData.label: i18n("When receiving files:")
             checked: FileReceiverSettings.autoAccept === 0
             text: i18n("Ask for confirmation")
             QQC2.ButtonGroup.group: receivingFilesRadioGroup
@@ -141,7 +141,7 @@ KCMUtils.SimpleKCM {
         }
 
         Row {
-            Kirigami.FormData.label: i18n("Save files in:")
+            LingmoUI.FormData.label: i18n("Save files in:")
             QQC2.TextField {
                 function urlToFilePath(url: url): string {
                     const urlString = url.toString();

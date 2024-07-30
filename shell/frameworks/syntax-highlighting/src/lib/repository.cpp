@@ -172,9 +172,9 @@ Theme Repository::theme(const QString &themeName) const
 Theme Repository::defaultTheme(Repository::DefaultTheme t) const
 {
     if (t == DarkTheme) {
-        return theme(QStringLiteral("Breeze Dark"));
+        return theme(QStringLiteral("Ocean Dark"));
     }
-    return theme(QStringLiteral("Breeze Light"));
+    return theme(QStringLiteral("Ocean Light"));
 }
 
 Theme Repository::themeForPalette(const QPalette &palette) const

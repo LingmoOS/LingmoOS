@@ -7,10 +7,10 @@
 import QtQuick 
 import QtQuick.Layouts 
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCM
 import org.kde.kitemmodels as KItemModels
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmo.printmanager as PM
 
 KCM.AbstractKCM {
     id: root
@@ -57,12 +57,12 @@ KCM.AbstractKCM {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Configure…")
             icon.name: "configure-symbolic"
             visible: !addMode
             onTriggered: PM.ProcessRunner.configurePrinter(modelData.printerName)
-        }, Kirigami.Action {
+        }, LingmoUI.Action {
             text: i18n("Remove")
             icon.name: "edit-delete-remove-symbolic"
             visible: !addMode
@@ -72,20 +72,20 @@ KCM.AbstractKCM {
 
     header: BannerWithTimer {
         id: msgBanner
-        position: Kirigami.InlineMessage.Position.Header
+        position: LingmoUI.InlineMessage.Position.Header
     }
 
     footer: RowLayout {
-        Layout.margins: Kirigami.Units.largeSpacing
-        spacing: Kirigami.Units.largeSpacing
+        Layout.margins: LingmoUI.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.UrlButton {
+        LingmoUI.UrlButton {
             text: i18nc("@action:button", "CUPS Printers Overview Help")
             url: "http://localhost:631/help/overview.html"
-            padding: Kirigami.Units.largeSpacing
+            padding: LingmoUI.Units.largeSpacing
         }
 
-        Kirigami.UrlButton {
+        LingmoUI.UrlButton {
             text: i18nc("@action:button", "Printer/Device Admin Page")
             visible: !modelData.isClass && url !== ""
             url: {
@@ -138,7 +138,7 @@ KCM.AbstractKCM {
                 config.hasPending = false
                 msgBanner.text = i18nc("@info:status", "Configuring %1, please wait….", !modelData.isClass ? "printer" : "group")
                 msgBanner.showCloseButton = false
-                msgBanner.type = Kirigami.MessageType.Positive
+                msgBanner.type = LingmoUI.MessageType.Positive
                 msgBanner.visible = true
                 kcm.savePrinter(queueName.text, config.pending, modelData.isClass)
             }
@@ -191,11 +191,11 @@ KCM.AbstractKCM {
         id: removeLoader
         active: false
 
-        sourceComponent: Kirigami.PromptDialog {
+        sourceComponent: LingmoUI.PromptDialog {
             id: prompt
             parent: root
 
-            dialogType: Kirigami.PromptDialog.Warning
+            dialogType: LingmoUI.PromptDialog.Warning
 
             Component.onCompleted: open()
             onClosed: removeLoader.active = false
@@ -206,10 +206,10 @@ KCM.AbstractKCM {
                             "'%1' will be removed.",
                             modelData.info)
 
-            standardButtons: Kirigami.Dialog.NoButton
+            standardButtons: LingmoUI.Dialog.NoButton
 
             customFooterActions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     text: modelData.isClass ? i18nc("@action:button", "Remove Group")
                                             : i18nc("@action:button", "Remove Printer")
                     icon.name: "edit-delete-remove-symbolic"
@@ -219,7 +219,7 @@ KCM.AbstractKCM {
                         close()
                     }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     text: i18n("Cancel")
                     icon.name: "dialog-cancel-symbolic"
                     onTriggered: close()
@@ -361,30 +361,30 @@ KCM.AbstractKCM {
         anchors.centerIn: parent
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 source: modelData.isClass ? "folder-print" : modelData.iconName
-                Layout.preferredWidth: Kirigami.Units.iconSizes.enormous
+                Layout.preferredWidth: LingmoUI.Units.iconSizes.enormous
                 Layout.preferredHeight: Layout.preferredWidth
             }
 
             ColumnLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: modelData.info ?? ""
                     visible: !addMode
                     level: 3
-                    type: Kirigami.Heading.Type.Primary
+                    type: LingmoUI.Heading.Type.Primary
                 }
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: modelData.kind.replace("Class", "Group")
                     visible: !addMode
                     level: 5
-                    type: Kirigami.Heading.Type.Secondary
+                    type: LingmoUI.Heading.Type.Secondary
                 }
 
                 QQC2.Label {
@@ -428,7 +428,7 @@ KCM.AbstractKCM {
             visible: markersView.count > 0
             Layout.fillWidth: true
             Layout.maximumHeight: Math.floor(root.height/4)
-            Layout.preferredHeight: contentHeight + Kirigami.Units.smallSpacing
+            Layout.preferredHeight: contentHeight + LingmoUI.Units.smallSpacing
 
             Component.onCompleted: {
                 if (background) {
@@ -441,12 +441,12 @@ KCM.AbstractKCM {
                 model: !addMode ? modelData.markers["marker-names"] : null
                 clip: true
                 delegate: RowLayout {
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
 
                     QQC2.Label {
                         text: modelData
                         horizontalAlignment: Text.AlignRight
-                        Layout.minimumWidth: Kirigami.Units.gridUnit*10
+                        Layout.minimumWidth: LingmoUI.Units.gridUnit*10
                     }
 
                     QQC2.ProgressBar {
@@ -463,7 +463,7 @@ KCM.AbstractKCM {
         // Maint actions
         RowLayout {
             visible: !addMode
-            Layout.topMargin: Kirigami.Units.largeSpacing
+            Layout.topMargin: LingmoUI.Units.largeSpacing
 
             QQC2.Button {
                 text: i18nc("@action:button", "Print Test Page")
@@ -486,15 +486,15 @@ KCM.AbstractKCM {
             }
         }
 
-        Kirigami.Separator {
-            Layout.topMargin: Kirigami.Units.largeSpacing*2
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+        LingmoUI.Separator {
+            Layout.topMargin: LingmoUI.Units.largeSpacing*2
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
             Layout.fillWidth: true
         }
 
         GridLayout {
             columns: 2
-            columnSpacing: Kirigami.Units.gridUnit
+            columnSpacing: LingmoUI.Units.gridUnit
 
             QQC2.Button {
                 Layout.fillWidth: true
@@ -512,7 +512,7 @@ KCM.AbstractKCM {
             }
 
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 PrinterField {
                     id: queueName
@@ -522,7 +522,7 @@ KCM.AbstractKCM {
                     validator: RegularExpressionValidator { regularExpression: /[^/#\\ ]*/ }
                 }
 
-                Kirigami.ContextualHelpButton {
+                LingmoUI.ContextualHelpButton {
                     visible: modelData.isClass
                     toolTipText: xi18nc("@info:whatsthis", "A <interface>printer group</interface> is used to pool printing resources.
                     Member printers can be added to a group and print jobs sent to that group
@@ -641,7 +641,7 @@ KCM.AbstractKCM {
                         function setChecked() {
                             for (let i=0; i<count; ++i) {
                                 const cb = itemAtIndex(i)
-                                if (cb instanceof Kirigami.CheckSubtitleDelegate)
+                                if (cb instanceof LingmoUI.CheckSubtitleDelegate)
                                     cb.checked = cb?.visible
                                         && root.modelData.memberNames.includes(cb.objectName)
                             }
@@ -670,7 +670,7 @@ KCM.AbstractKCM {
                             return changed
                         }
 
-                        delegate: Kirigami.CheckSubtitleDelegate {
+                        delegate: LingmoUI.CheckSubtitleDelegate {
                             width: ListView.view.width
                             icon.width: 0
                             objectName: printerName

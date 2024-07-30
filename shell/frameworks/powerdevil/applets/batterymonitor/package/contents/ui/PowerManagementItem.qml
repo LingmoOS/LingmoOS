@@ -11,11 +11,11 @@ import QtQuick.Controls
 
 import org.kde.notification
 import org.kde.kwindowsystem
-import org.kde.plasma.components as PlasmaComponents3
+import org.kde.lingmo.components as LingmoComponents3
 import org.kde.ksvg as KSvg
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     property bool pluggedIn
@@ -45,7 +45,7 @@ PlasmaComponents3.ItemDelegate {
 
     Notification {
         id: inhibitionError
-        componentName: "plasma_workspace"
+        componentName: "lingmo_workspace"
         eventId: "warning"
         iconName: "system-suspend-uninhibited"
         title: i18n("Power Management")
@@ -56,26 +56,26 @@ PlasmaComponents3.ItemDelegate {
     KeyNavigation.tab: manualInhibitionSwitch
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.gridUnit
+        spacing: LingmoUI.Units.gridUnit
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: icon
             source: root.isManuallyInhibited || root.inhibitions.length > 0 ? "system-suspend-inhibited" : "system-suspend-uninhibited"
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
         }
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     text: root.text
@@ -83,7 +83,7 @@ PlasmaComponents3.ItemDelegate {
                     wrapMode: Text.Wrap
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: pmStatusLabel
                     Layout.alignment: Qt.AlignRight | Qt.AlignTop
                     text: root.isManuallyInhibited || root.inhibitions.length > 0 ? i18nc("Sleep and Screen Locking after Inactivity", "Blocked") : i18nc("Sleep and Screen Locking after Inactivity", "Automatic")
@@ -93,7 +93,7 @@ PlasmaComponents3.ItemDelegate {
 
             RowLayout {
                 // UI to manually inhibit sleep and screen locking
-                PlasmaComponents3.Switch {
+                LingmoComponents3.Switch {
                     id: manualInhibitionSwitch
                     Layout.fillWidth: true
                     text: i18nc("@option:check Manually block sleep and screen locking after inactivity", "Manually block")
@@ -174,11 +174,11 @@ PlasmaComponents3.ItemDelegate {
                     text: i18nc("Minimize the length of this string as much as possible", "Your laptop is configured not to sleep when closing the lid while an external monitor is connected.")
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: inhibitionExplanation
                     Layout.fillWidth: true
                     visible: root.inhibitions.length > 1
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     wrapMode: Text.WordWrap
                     elide: Text.ElideRight
                     maximumLineCount: 3

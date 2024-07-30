@@ -10,16 +10,16 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.extras as PlasmaExtras
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.extras as LingmoExtras
 
 ColumnLayout {
     id: root
 
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
-    PlasmaComponents3.Switch {
+    LingmoComponents3.Switch {
         id: presentationModeSwitch
         Layout.fillWidth: true
         // Remove spacing between checkbox and the explanatory label below
@@ -51,10 +51,10 @@ ColumnLayout {
         }
     }
 
-    PlasmaExtras.DescriptiveLabel {
+    LingmoExtras.DescriptiveLabel {
         Layout.fillWidth: true
         Layout.leftMargin: presentationModeSwitch.indicator.width + presentationModeSwitch.spacing
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
         text: i18n("This will prevent your screen and computer from turning off automatically.")
         wrapMode: Text.WordWrap
     }

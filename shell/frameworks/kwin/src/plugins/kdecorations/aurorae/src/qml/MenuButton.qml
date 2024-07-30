@@ -5,7 +5,7 @@
 */
 import QtQuick
 import org.kde.kwin.decoration
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 Item {
     id: menuButton
@@ -15,7 +15,7 @@ Item {
     property bool toggled: false
     property bool closeOnDoubleClick: decorationSettings.closeOnDoubleClickOnMenu
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         anchors.fill: parent
         source: decoration.client.icon
     }

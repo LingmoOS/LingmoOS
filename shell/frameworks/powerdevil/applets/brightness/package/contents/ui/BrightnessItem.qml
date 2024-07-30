@@ -8,10 +8,10 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     enum Type {
@@ -56,13 +56,13 @@ PlasmaComponents3.ItemDelegate {
     Keys.forwardTo: [slider]
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.gridUnit
+        spacing: LingmoUI.Units.gridUnit
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: image
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
             source: root.icon.name
         }
 
@@ -73,9 +73,9 @@ PlasmaComponents3.ItemDelegate {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: title
                     Layout.fillWidth: true
                     text: root.text
@@ -83,7 +83,7 @@ PlasmaComponents3.ItemDelegate {
                     Accessible.ignored: true
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: percent
                     Layout.alignment: Qt.AlignRight
                     text: root.labelText
@@ -92,7 +92,7 @@ PlasmaComponents3.ItemDelegate {
                 }
             }
 
-            PlasmaComponents3.Slider {
+            LingmoComponents3.Slider {
                 id: control
                 Layout.fillWidth: true
 

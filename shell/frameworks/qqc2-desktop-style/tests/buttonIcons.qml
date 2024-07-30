@@ -7,16 +7,16 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: root
 
     width: 600
     height: 600
 
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+    LingmoUI.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Complementary
 
     header: Controls.MenuBar {
         Controls.Menu {
@@ -77,21 +77,21 @@ Kirigami.ApplicationWindow {
         width: childrenRect.width
         height: childrenRect.height
 
-        color: Kirigami.Theme.backgroundColor
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
+        color: LingmoUI.Theme.backgroundColor
+        LingmoUI.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.Complementary
 
         ColumnLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             Controls.ComboBox {
-                Kirigami.Theme.inherit: true
+                LingmoUI.Theme.inherit: true
                 currentIndex: 1
                 model: ["View", "Window", "Button", "Selection", "Tooltip", "Complementary"]
-                onCurrentTextChanged: background.Kirigami.Theme.colorSet = currentText
+                onCurrentTextChanged: background.LingmoUI.Theme.colorSet = currentText
             }
             Controls.Button {
-                Kirigami.Theme.inherit: true
+                LingmoUI.Theme.inherit: true
                 text: "text"
                 icon.name: "go-previous"
             }
@@ -101,7 +101,7 @@ Kirigami.ApplicationWindow {
                 icon.name: "go-previous"
             }
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 Controls.Label {
                     text: "RGB color for icon:"
@@ -117,7 +117,7 @@ Kirigami.ApplicationWindow {
                 }
                 Controls.SpinBox {
                     id: green
-                    Kirigami.Theme.inherit: true
+                    LingmoUI.Theme.inherit: true
                     editable: true
                     from: 0
                     to: 255

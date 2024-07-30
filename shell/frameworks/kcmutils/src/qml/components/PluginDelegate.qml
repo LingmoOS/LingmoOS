@@ -12,11 +12,11 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMUtils
 
 /// @since 6.0, this got renamed from KPluginDelegate to PluginDelegate
-Kirigami.CheckSubtitleDelegate {
+LingmoUI.CheckSubtitleDelegate {
     id: listItem
 
     // Note: when PluginDelegate is embedded in a more complex delegate, model
@@ -46,7 +46,7 @@ Kirigami.CheckSubtitleDelegate {
     onToggled: model.enabled = checked
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         // Used by CheckSubtitleDelegate through duck-typing
         readonly property alias truncated: titleSubtitle.truncated
@@ -56,7 +56,7 @@ Kirigami.CheckSubtitleDelegate {
             visible: target !== null
         }
 
-        Kirigami.IconTitleSubtitle {
+        LingmoUI.IconTitleSubtitle {
             id: titleSubtitle
 
             Layout.fillWidth: true
@@ -68,7 +68,7 @@ Kirigami.CheckSubtitleDelegate {
             reserveSpaceForSubtitle: true
         }
 
-        Kirigami.ActionToolBar {
+        LingmoUI.ActionToolBar {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignRight
             alignment: Qt.AlignRight
@@ -82,12 +82,12 @@ Kirigami.CheckSubtitleDelegate {
     }
 
     // Take care of displaying the actions
-    readonly property Kirigami.Action __infoAction: Kirigami.Action {
+    readonly property LingmoUI.Action __infoAction: LingmoUI.Action {
         id: infoAction
 
         icon.name: "help-about-symbolic"
         text: i18ndc("kcmutils6", "@info:tooltip", "About")
-        displayHint: Kirigami.DisplayHint.IconOnly
+        displayHint: LingmoUI.DisplayHint.IconOnly
         onTriggered: {
             const aboutDialog = (listItem.ListView.view ?? listItem.parent.ListView.view).__aboutDialog;
             aboutDialog.metaDataInfo = listItem.metaData;
@@ -95,14 +95,14 @@ Kirigami.CheckSubtitleDelegate {
         }
     }
 
-    readonly property Kirigami.Action __configureAction: Kirigami.Action {
+    readonly property LingmoUI.Action __configureAction: LingmoUI.Action {
         id: configureAction
 
         visible: listItem.configureVisible
         enabled: listItem.checked
         icon.name: "configure-symbolic"
         text: i18ndc("kcmutils6", "@info:tooltip", "Configure…")
-        displayHint: Kirigami.DisplayHint.IconOnly
+        displayHint: LingmoUI.DisplayHint.IconOnly
         onTriggered: listItem.configTriggered()
     }
 }

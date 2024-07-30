@@ -8,9 +8,9 @@ SPDX-License-Identifier: GPL-2.0-or-later
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.20 as Kirigami
-import org.kde.plasma.extras 2.0 as PlasmaExtras
-import org.kde.plasma.components 3.0 as PlasmaComponents3
+import org.kde.lingmoui 2.20 as LingmoUI
+import org.kde.lingmo.extras 2.0 as LingmoExtras
+import org.kde.lingmo.components 3.0 as LingmoComponents3
 import org.kde.kscreenlocker 1.0 as ScreenLocker
 
 Item {
@@ -27,15 +27,15 @@ Item {
         password.forceActiveFocus();
     }
 
-    implicitWidth: layoutItem.width + Kirigami.Units.largeSpacing * 2
-    implicitHeight: layoutItem.height + Kirigami.Units.largeSpacing * 2
+    implicitWidth: layoutItem.width + LingmoUI.Units.largeSpacing * 2
+    implicitHeight: layoutItem.height + LingmoUI.Units.largeSpacing * 2
 
     ColumnLayout {
         id: layoutItem
         anchors.centerIn: parent
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             id: message
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
@@ -47,12 +47,12 @@ Item {
             opacity: text == "" ? 0 : 1
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                 }
             }
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
@@ -63,35 +63,35 @@ Item {
             opacity: root.capsLockOn ? 1 : 0
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                 }
             }
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
             text: kscreenlocker_userName.length == 0 ? i18nd("kscreenlocker_greet", "The session is locked") :
                                                        i18nd("kscreenlocker_greet", "The session has been locked by %1", kscreenlocker_userName)
         }
-        PlasmaExtras.PasswordField {
+        LingmoExtras.PasswordField {
             id: password
             Layout.alignment: Qt.AlignHCenter
-            implicitWidth: Kirigami.Units.gridUnit * 15
+            implicitWidth: LingmoUI.Units.gridUnit * 15
             enabled: !authenticator.busy
             Keys.onEnterPressed: authenticator.startAuthenticating()
             Keys.onReturnPressed: authenticator.startAuthenticating()
             Keys.onEscapePressed: password.text = ""
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             visible: authenticator.authenticatorTypes & ScreenLocker.Authenticator.Fingerprint
             text: i18nd("kscreenlocker_greet", "(or place your fingerprint on the reader)")
             Layout.fillWidth: true
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             visible: authenticator.authenticatorTypes & ScreenLocker.Authenticator.Smartcard
             text: i18nd("kscreenlocker_greet", "(or use your smartcard)")
             Layout.fillWidth: true
@@ -99,16 +99,16 @@ Item {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
 
-            PlasmaComponents3.Button {
+            LingmoComponents3.Button {
                 text: i18nd("kscreenlocker_greet", "&Switch Users")
                 icon.name: "system-switch-user"
                 visible: root.switchUserEnabled
                 onClicked: switchUserClicked()
             }
 
-            PlasmaComponents3.Button {
+            LingmoComponents3.Button {
                 text: i18nd("kscreenlocker_greet", "Un&lock")
                 icon.name: "unlock"
                 enabled: !authenticator.graceLocked

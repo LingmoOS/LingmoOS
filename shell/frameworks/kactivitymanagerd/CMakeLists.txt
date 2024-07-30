@@ -13,7 +13,7 @@ set (Boost_MINIMUM_VERSION "1.58")
 if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
    message (
       FATAL_ERROR
-      "kactivities require an out of source build. Please create a separate build directory and run 'cmake path_to_plasma [options]' there."
+      "kactivities require an out of source build. Please create a separate build directory and run 'cmake path_to_lingmo [options]' there."
    )
 endif ()
 

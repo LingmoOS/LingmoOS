@@ -9,7 +9,7 @@ import QtQuick 2.5
 import QtQuick.Controls 2.5 as QQC2
 import QtQuick.Layouts 1.1
 
-import org.kde.kirigami 2.5 as Kirigami
+import org.kde.lingmoui 2.5 as LingmoUI
 
 QQC2.Button {
     // We're using custom properties rather than plain old icon.name: and text:
@@ -25,22 +25,22 @@ QQC2.Button {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    leftPadding: Kirigami.Units.largeSpacing
-    rightPadding: Kirigami.Units.largeSpacing
-    topPadding: Kirigami.Units.largeSpacing
-    bottomPadding: Kirigami.Units.largeSpacing
-    spacing: Kirigami.Units.smallSpacing
+    leftPadding: LingmoUI.Units.largeSpacing
+    rightPadding: LingmoUI.Units.largeSpacing
+    topPadding: LingmoUI.Units.largeSpacing
+    bottomPadding: LingmoUI.Units.largeSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
     Accessible.name: label.text
 
     contentItem: RowLayout {
         spacing: parent.spacing
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: iconItem
             Layout.alignment: Qt.AlignCenter
-            implicitWidth: Kirigami.Units.iconSizes.small
-            implicitHeight: Kirigami.Units.iconSizes.small
+            implicitWidth: LingmoUI.Units.iconSizes.small
+            implicitHeight: LingmoUI.Units.iconSizes.small
         }
 
         QQC2.Label {

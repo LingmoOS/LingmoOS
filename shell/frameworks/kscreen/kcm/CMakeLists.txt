@@ -31,7 +31,7 @@ target_link_libraries(kcm_kscreen PRIVATE
     KF6::ConfigGui
     KF6::CoreAddons
     KF6::I18n
-    Plasma::PlasmaQuick
+    Lingmo::LingmoQuick
     KF6::KCMUtilsQuick
     KF6::Screen
 )

@@ -9,17 +9,17 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCM
 import org.kde.kitemmodels as KItemModels
-import org.kde.plasma.kcm.flatpakpermissions
+import org.kde.lingmo.kcm.flatpakpermissions
 
 KCM.ScrollViewKCM {
     id: root
     title: i18n("Flatpak Applications")
-    Kirigami.ColumnView.fillWidth: false
-    implicitWidth: Kirigami.Units.gridUnit * 40
-    implicitHeight: Kirigami.Units.gridUnit * 20
+    LingmoUI.ColumnView.fillWidth: false
+    implicitWidth: LingmoUI.Units.gridUnit * 40
+    implicitHeight: LingmoUI.Units.gridUnit * 20
     framedView: false
 
     function shouldChange(toAppAtFilteredRowIndex: int) {
@@ -64,7 +64,7 @@ KCM.ScrollViewKCM {
     }
 
     Component.onCompleted: {
-        KCM.ConfigModule.columnWidth = Kirigami.Units.gridUnit * 15
+        KCM.ConfigModule.columnWidth = LingmoUI.Units.gridUnit * 15
         changeApp(KCM.ConfigModule.currentIndex());
     }
 
@@ -73,7 +73,7 @@ KCM.ScrollViewKCM {
     Component {
         id: applyOrDiscardDialogComponent
 
-        Kirigami.PromptDialog {
+        LingmoUI.PromptDialog {
             id: dialog
 
             required property string applicationName
@@ -83,26 +83,26 @@ KCM.ScrollViewKCM {
             required property int fromAppAtSourceRowIndex
             required property int toAppAtSourceRowIndex
 
-            readonly property bool narrow: (parent.width - leftMargin - rightMargin) < Kirigami.Units.gridUnit * 20
+            readonly property bool narrow: (parent.width - leftMargin - rightMargin) < LingmoUI.Units.gridUnit * 20
 
-            parent: root.Kirigami.ColumnView.view
+            parent: root.LingmoUI.ColumnView.view
             title: i18n("Apply Permissions")
             subtitle: i18n("The permissions of application %1 have been changed. Do you want to apply these changes or discard them?", applicationName)
             standardButtons: QQC2.Dialog.Apply | QQC2.Dialog.Discard
 
             GridLayout {
                 columns: dialog.narrow ? 1 : 2
-                columnSpacing: Kirigami.Units.largeSpacing
-                rowSpacing: Kirigami.Units.largeSpacing
+                columnSpacing: LingmoUI.Units.largeSpacing
+                rowSpacing: LingmoUI.Units.largeSpacing
 
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     source: dialog.applicationIcon.toString() !== "" ? dialog.applicationIcon : "application-vnd.flatpak.ref"
 
                     Layout.alignment: Qt.AlignCenter
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.large
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                    Layout.preferredWidth: LingmoUI.Units.iconSizes.large
+                    Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 }
-                Kirigami.SelectableLabel {
+                LingmoUI.SelectableLabel {
                     text: dialog.subtitle
                     wrapMode: Text.Wrap
 
@@ -138,7 +138,7 @@ KCM.ScrollViewKCM {
         }
     }
 
-    header: Kirigami.SearchField {
+    header: LingmoUI.SearchField {
         id: filterField
         KeyNavigation.tab: appsListView
         KeyNavigation.down: appsListView

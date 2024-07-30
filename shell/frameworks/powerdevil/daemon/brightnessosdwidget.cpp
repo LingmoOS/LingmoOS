@@ -27,7 +27,7 @@ void show(int percentage, PowerDevil::BrightnessControlType type)
         method = QLatin1String("brightnessChanged");
     }
 
-    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
+    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
                                                       QStringLiteral("/org/kde/osdService"),
                                                       QStringLiteral("org.kde.osdService"),
                                                       method);

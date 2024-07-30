@@ -26,7 +26,7 @@
 #include <KLocalizedString>
 #include <KPluginFactory>
 #include <KSharedConfig>
-#include <Kirigami/Platform/TabletModeWatcher>
+#include <LingmoUI/Platform/TabletModeWatcher>
 
 K_PLUGIN_CLASS_WITH_JSON(PowerDevil::BundledActions::DPMS, "powerdevildpmsaction.json")
 
@@ -88,8 +88,8 @@ DPMS::DPMS(QObject *parent)
             KGlobalAccel::self()->setGlobalShortcut(globalAction, Qt::Key_PowerOff);
         }
     };
-    auto interface = Kirigami::Platform::TabletModeWatcher::self();
-    connect(interface, &Kirigami::Platform::TabletModeWatcher::tabletModeChanged, globalAction, powerButtonMode);
+    auto interface = LingmoUI::Platform::TabletModeWatcher::self();
+    connect(interface, &LingmoUI::Platform::TabletModeWatcher::tabletModeChanged, globalAction, powerButtonMode);
     powerButtonMode(interface->isTabletMode());
 }
 

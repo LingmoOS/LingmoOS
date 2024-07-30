@@ -6,15 +6,15 @@
 
 import QtQuick
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
     id: shadow
 
     property int edge: Qt.LeftEdge
 
-    width: Kirigami.Units.gridUnit / 2
-    height: Kirigami.Units.gridUnit / 2
+    width: LingmoUI.Units.gridUnit / 2
+    height: LingmoUI.Units.gridUnit / 2
 
     Rectangle {
         x: shadow.width / 2 - width / 2

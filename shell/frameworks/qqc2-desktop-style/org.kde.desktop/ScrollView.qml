@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.ScrollView {
@@ -20,8 +20,8 @@ T.ScrollView {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              contentHeight + topPadding + bottomPadding)
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: !background || !background.visible
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: !background || !background.visible
 
     // size in pixel to accommodate the border drawn by qstyle
     topPadding: controlRoot.background?.visible ? (background.topPadding ?? 0) : 0
@@ -40,7 +40,7 @@ T.ScrollView {
     }
 
     data: [
-        Kirigami.WheelHandler {
+        LingmoUI.WheelHandler {
             target: controlRoot.contentItem
         },
         // create a background only after Component.onCompleted because:

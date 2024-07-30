@@ -9,19 +9,19 @@ import QtQuick.Dialogs 6.3
 import QtQuick.Layouts 1.15
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.14 as Kirigami
+import org.kde.lingmoui 2.14 as LingmoUI
 import org.kde.kitemmodels 1.0 as ItemModels
 import org.kde.private.kcms.sddm 1.0
 
-Kirigami.Page {
+LingmoUI.Page {
     title: i18nc("@title", "Behavior")
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         width: parent.width
 
         RowLayout {
-            Kirigami.FormData.label: i18nc("option:check", "Automatically log in:")
-            spacing: Kirigami.Units.smallSpacing
+            LingmoUI.FormData.label: i18nc("option:check", "Automatically log in:")
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.CheckBox {
                 id: autologinBox
@@ -114,18 +114,18 @@ Kirigami.Page {
                 }
             }
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: autologinMessage
 
             Layout.fillWidth: true
 
-            type: Kirigami.MessageType.Warning
+            type: LingmoUI.MessageType.Warning
 
             text: xi18nc("@info", "Auto-login does not support unlocking your KDE Wallet automatically, so it will ask you to unlock it every time you log in.\
 <nl/><nl/>\
 To avoid this, you can change the wallet to have a blank password. Note that this is insecure and should only be done in a trusted environment.")
 
-            actions: Kirigami.Action {
+            actions: LingmoUI.Action {
                 text: i18n("Open KDE Wallet Settings")
                 icon.name: "kwalletmanager"
                 onTriggered: kcm.openKDEWallet();
@@ -142,10 +142,10 @@ To avoid this, you can change the wallet to have a blank password. Note that thi
             }
         }
         Item {
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
         }
         QQC2.SpinBox {
-            Kirigami.FormData.label: i18nc("@label:spinbox", "Minimum user UID:")
+            LingmoUI.FormData.label: i18nc("@label:spinbox", "Minimum user UID:")
             id: minSpinBox
             from: 1000
             to: maxSpinBox.value
@@ -157,7 +157,7 @@ To avoid this, you can change the wallet to have a blank password. Note that thi
             }
         }
         QQC2.SpinBox {
-            Kirigami.FormData.label: i18nc("@label:spinbox", "Maximum user UID:")
+            LingmoUI.FormData.label: i18nc("@label:spinbox", "Maximum user UID:")
             id: maxSpinBox
             from: minSpinBox.value
             to: 60513
@@ -169,20 +169,20 @@ To avoid this, you can change the wallet to have a blank password. Note that thi
             }
         }
         Item {
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
         }
         RowLayout {
-            Kirigami.FormData.label: i18nc("@label:textbox", "Halt Command:")
+            LingmoUI.FormData.label: i18nc("@label:textbox", "Halt Command:")
             Layout.fillWidth: true
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
-            Kirigami.ActionTextField {
+            LingmoUI.ActionTextField {
                 id: haltField
                 Layout.fillWidth: true
                 text: kcm.sddmSettings.haltCommand
                 readOnly: false
                 onTextChanged: kcm.sddmSettings.haltCommand = text
-                rightActions: [ Kirigami.Action {
+                rightActions: [ LingmoUI.Action {
                     icon.name: haltField.LayoutMirroring.enabled ? "edit-clear-locationbar-ltr" : "edit-clear-locationbar-rtl"
                     visible: haltField.text.length > 0
                     onTriggered: kcm.sddmSettings.haltCommand = ""
@@ -205,16 +205,16 @@ To avoid this, you can change the wallet to have a blank password. Note that thi
         }
         RowLayout {
             Layout.fillWidth: true
-            Kirigami.FormData.label: i18nc("@label:textbox", "Reboot Command:")
-            spacing: Kirigami.Units.smallSpacing
+            LingmoUI.FormData.label: i18nc("@label:textbox", "Reboot Command:")
+            spacing: LingmoUI.Units.smallSpacing
 
-            Kirigami.ActionTextField {
+            LingmoUI.ActionTextField {
                 id: rebootField
                 Layout.fillWidth: true
                 text: kcm.sddmSettings.rebootCommand
                 readOnly: false
                 onTextChanged: kcm.sddmSettings.rebootCommand = text
-                rightActions: [ Kirigami.Action {
+                rightActions: [ LingmoUI.Action {
                     icon.name: rebootField.LayoutMirroring.enabled ? "edit-clear-locationbar-ltr" : "edit-clear-locationbar-rtl"
                     visible: rebootField.text.length > 0
                     onTriggered: kcm.sddmSettings.rebootCommand = ""

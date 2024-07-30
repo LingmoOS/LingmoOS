@@ -46,10 +46,10 @@ set_package_properties(KF6Attica PROPERTIES DESCRIPTION "A Qt library that imple
                        URL "https://commits.kde.org/attica"
                        TYPE REQUIRED
                       )
-find_package(KF6Kirigami2 2.12.0)
-set_package_properties(KF6Kirigami2 PROPERTIES
+find_package(KF6LingmoUI2 2.12.0)
+set_package_properties(KF6LingmoUI2 PROPERTIES
     DESCRIPTION "KDE's lightweight user interface framework for mobile and convergent applications"
-    URL "https://techbase.kde.org/Kirigami"
+    URL "https://techbase.kde.org/LingmoUI"
     PURPOSE "Required by KNewStuffQuick's qml components"
     TYPE RUNTIME)
 

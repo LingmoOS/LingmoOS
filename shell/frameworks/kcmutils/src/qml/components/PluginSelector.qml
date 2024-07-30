@@ -7,7 +7,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.kcmutils.private as KCMUtilsPrivate
 import "private" as Private
@@ -44,12 +44,12 @@ ListView {
     }
 
     section.property: "category"
-    section.delegate: Kirigami.ListSectionHeader {
+    section.delegate: LingmoUI.ListSectionHeader {
         width: pluginSelector.width
         text: section
     }
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: internalAboutDialog
         parent: pluginSelector.Window.window?.contentItem ?? null
         property var metaDataInfo
@@ -59,7 +59,7 @@ ListView {
             sourceComponent: ColumnLayout {
                 Private.AboutPlugin {
                     metaData: internalAboutDialog.metaDataInfo
-                    Layout.maximumWidth: Math.min(Kirigami.Units.gridUnit * 30, Math.round(pluginSelector.width * 0.8))
+                    Layout.maximumWidth: Math.min(LingmoUI.Units.gridUnit * 30, Math.round(pluginSelector.width * 0.8))
                 }
             }
         }
@@ -69,17 +69,17 @@ ListView {
 
     Loader {
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.gridUnit * 8)
+        width: parent.width - (LingmoUI.Units.gridUnit * 8)
         active: pluginSelector.count === 0 && !startupTimer.running
         opacity: active && status === Loader.Ready ? 1 : 0
         visible: opacity > 0
         Behavior on opacity {
             OpacityAnimator {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
-        sourceComponent: Kirigami.PlaceholderMessage {
+        sourceComponent: LingmoUI.PlaceholderMessage {
             icon.name: "edit-none"
             text: pluginSelector.query && pluginSelector.query.length > 0 ? i18nd("kcmutils6", "No matches") : i18nd("kcmutils6", "No plugins found")
         }
@@ -91,7 +91,7 @@ ListView {
     // suppress it appearing for a moment after the KCM loads.
     Timer {
         id: startupTimer
-        interval: Kirigami.Units.humanMoment
+        interval: LingmoUI.Units.humanMoment
         running: false
     }
     Component.onCompleted: {

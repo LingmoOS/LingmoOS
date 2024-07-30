@@ -98,7 +98,7 @@ static void startupFunc()
 
     if (!QCoreApplication::eventDispatcher()) {
         // We are called with event dispatcher being null when KXmlGui is being
-        // loaded through plasma-integration instead of being linked to the app
+        // loaded through lingmo-integration instead of being linked to the app
         // (i.e. QtCreator vs Okular) For apps that don't link directly to KXmlGui
         // do not do the accelerator magic
         doCheckAccelerators = false;

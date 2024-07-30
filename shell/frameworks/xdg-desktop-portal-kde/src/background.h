@@ -18,7 +18,7 @@ namespace KWayland
 {
 namespace Client
 {
-class PlasmaWindow;
+class LingmoWindow;
 }
 }
 
@@ -60,11 +60,11 @@ Q_SIGNALS:
     void RunningApplicationsChanged();
 
 private:
-    void addWindow(KWayland::Client::PlasmaWindow *window);
+    void addWindow(KWayland::Client::LingmoWindow *window);
     void setActiveWindow(const QString &appId, bool active);
 
     uint m_notificationCounter = 0;
-    QList<KWayland::Client::PlasmaWindow *> m_windows;
+    QList<KWayland::Client::LingmoWindow *> m_windows;
     QVariantMap m_appStates;
     QSet<QString> m_backgroundAppWarned;
     QDBusContext *const m_context;

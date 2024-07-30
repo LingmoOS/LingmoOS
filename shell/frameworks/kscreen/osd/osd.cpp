@@ -31,7 +31,7 @@ Osd::Osd(const KScreen::OutputPtr &output, QObject *parent)
 {
     connect(output.data(), &KScreen::Output::isConnectedChanged, this, &Osd::onOutputAvailabilityChanged);
     connect(output.data(), &KScreen::Output::isEnabledChanged, this, &Osd::onOutputAvailabilityChanged);
-    m_engine.setProperty("_kirigamiTheme", QStringLiteral("KirigamiPlasmaStyle"));
+    m_engine.setProperty("_lingmouiTheme", QStringLiteral("LingmoUILingmoStyle"));
 }
 
 Osd::~Osd()

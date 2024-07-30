@@ -4,13 +4,13 @@
    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ActionTextField {
+LingmoUI.ActionTextField {
     id: root
 
     focus: true
-    rightActions: Kirigami.Action {
+    rightActions: LingmoUI.Action {
         iconName: "edit-clear"
         visible: root.text !== ""
         onTriggered: {

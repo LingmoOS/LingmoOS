@@ -7,13 +7,13 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.MenuBar {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Header
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Header
+    LingmoUI.Theme.inherit: false
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
@@ -30,6 +30,6 @@ T.MenuBar {
     }
 
     background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
     }
 }

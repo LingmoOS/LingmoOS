@@ -7,12 +7,12 @@
 import QtQuick
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.kwin.private.kdecoration as KDecoration
 
 KCM.GridView {
     function updateDecoration(item, marginTopLeft, marginBottomRight) {
-        const mainMargin = Kirigami.Units.largeSpacing;
+        const mainMargin = LingmoUI.Units.largeSpacing;
         const shd = item.shadow;
         item.anchors.leftMargin   = mainMargin + marginTopLeft     - (shd ? shd.paddingLeft   : 0);
         item.anchors.rightMargin  = mainMargin + marginBottomRight - (shd ? shd.paddingRight  : 0);
@@ -24,7 +24,7 @@ KCM.GridView {
     view.currentIndex: kcm.theme
     view.onContentHeightChanged: view.positionViewAtIndex(view.currentIndex, GridView.Visible)
 
-    view.implicitCellWidth: Kirigami.Units.gridUnit * 18
+    view.implicitCellWidth: LingmoUI.Units.gridUnit * 18
 
     framedView: false
 
@@ -88,7 +88,7 @@ KCM.GridView {
             }
         }
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "edit-entry"
                 tooltip: i18n("Edit %1 Theme", model.display)
                 enabled: model.configureable

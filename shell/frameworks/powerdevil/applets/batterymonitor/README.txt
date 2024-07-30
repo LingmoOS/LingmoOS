@@ -1,4 +1,4 @@
-Obviously, this is a battery monitor applet for Plasma.
+Obviously, this is a battery monitor applet for Lingmo.
 
 The catch of those four .svg files is the following:
 

@@ -10,18 +10,18 @@ set(dataengine_SRCS
     multidbuspendingcallwatcher.h
 )
 
-add_library(plasma_engine_wacomtablet MODULE ${dataengine_SRCS})
-target_link_libraries(plasma_engine_wacomtablet
-                      Plasma::Plasma
+add_library(lingmo_engine_wacomtablet MODULE ${dataengine_SRCS})
+target_link_libraries(lingmo_engine_wacomtablet
+                      Lingmo::Lingmo
                       Qt::DBus
                       wacom_common
 )
 
-target_link_libraries(plasma_engine_wacomtablet Plasma::Plasma5Support)
+target_link_libraries(lingmo_engine_wacomtablet Lingmo::Lingmo5Support)
 
-install(TARGETS plasma_engine_wacomtablet
-        DESTINATION ${KDE_INSTALL_PLUGINDIR}/plasma5support/dataengine
+install(TARGETS lingmo_engine_wacomtablet
+        DESTINATION ${KDE_INSTALL_PLUGINDIR}/lingmo5support/dataengine
 )
 install(FILES wacomtablet.operations
-        DESTINATION ${KDE_INSTALL_DATADIR}/plasma5support/services
+        DESTINATION ${KDE_INSTALL_DATADIR}/lingmo5support/services
 )

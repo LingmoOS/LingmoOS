@@ -1,7 +1,7 @@
 # KI18N Translation Domain for this library
 add_definitions(-DTRANSLATION_DOMAIN=\"kcm_kwin_scripts\")
 
-kcmutils_add_qml_kcm(kcm_kwin_scripts INSTALL_NAMESPACE plasma/kcms/systemsettings)
+kcmutils_add_qml_kcm(kcm_kwin_scripts INSTALL_NAMESPACE lingmo/kcms/systemsettings)
 
 target_sources(kcm_kwin_scripts PRIVATE
     module.cpp

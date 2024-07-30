@@ -11,14 +11,14 @@ import QtQuick.Layouts
 
 import org.kde.kcmutils // KCMLauncher
 import org.kde.config as KConfig  // KAuthorized.authorizeControlModule
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 
-import org.kde.plasma.private.brightnesscontrolplugin
+import org.kde.lingmo.private.brightnesscontrolplugin
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     background.visible: highlighted
@@ -28,13 +28,13 @@ PlasmaComponents3.ItemDelegate {
     Accessible.description: status.text
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.gridUnit
+        spacing: LingmoUI.Units.gridUnit
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: image
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
             source: {
                 if (!control.enabled) {
                     return "redshift-status-on"; // not configured: show generic night light icon rather "manually turned off" icon
@@ -53,13 +53,13 @@ PlasmaComponents3.ItemDelegate {
         ColumnLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: title
                     text: root.text
                     textFormat: Text.PlainText
@@ -68,7 +68,7 @@ PlasmaComponents3.ItemDelegate {
                     Layout.fillWidth: true
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: status
                     text: {
                         if (control.inhibited && control.enabled) {
@@ -101,7 +101,7 @@ PlasmaComponents3.ItemDelegate {
                     enabled: false
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: currentTemp
                     visible: control.available && control.enabled && control.running
                     text: i18nc("Placeholder is screen color temperature", "%1K", control.currentTemperature)
@@ -112,9 +112,9 @@ PlasmaComponents3.ItemDelegate {
             }
 
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Switch {
+                LingmoComponents3.Switch {
                     id: inhibitionSwitch
                     visible: control.enabled
                     enabled: control.togglable
@@ -138,7 +138,7 @@ PlasmaComponents3.ItemDelegate {
                     onToggled: control.toggleInhibition()
                 }
 
-                PlasmaComponents3.Button {
+                LingmoComponents3.Button {
                     id: kcmButton
                     visible: KConfig.KAuthorized.authorizeControlModule("kcm_nightlight")
 
@@ -163,9 +163,9 @@ PlasmaComponents3.ItemDelegate {
             RowLayout {
                 visible: control.running && control.hasSwitchingTimes
 
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: transitionLabel
                     text: {
                         if (control.daylight && control.transitioning) {
@@ -181,12 +181,12 @@ PlasmaComponents3.ItemDelegate {
                     textFormat: Text.PlainText
 
                     enabled: false
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: transitionTime
                     text: {
                         if (control.transitioning) {
@@ -198,7 +198,7 @@ PlasmaComponents3.ItemDelegate {
                     textFormat: Text.PlainText
 
                     enabled: false
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignRight
                 }

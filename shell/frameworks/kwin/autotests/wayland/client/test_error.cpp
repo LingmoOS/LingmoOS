@@ -10,13 +10,13 @@
 // server
 #include "wayland/compositor.h"
 #include "wayland/display.h"
-#include "wayland/plasmashell.h"
+#include "wayland/lingmoshell.h"
 
 // client
 #include "KWayland/Client/compositor.h"
 #include "KWayland/Client/connection_thread.h"
 #include "KWayland/Client/event_queue.h"
-#include "KWayland/Client/plasmashell.h"
+#include "KWayland/Client/lingmoshell.h"
 #include "KWayland/Client/registry.h"
 #include "KWayland/Client/surface.h"
 
@@ -33,17 +33,17 @@ private Q_SLOTS:
     void init();
     void cleanup();
 
-    void testMultiplePlasmaShellSurfacesForSurface();
+    void testMultipleLingmoShellSurfacesForSurface();
 
 private:
     KWin::Display *m_display = nullptr;
     CompositorInterface *m_ci = nullptr;
-    PlasmaShellInterface *m_psi = nullptr;
+    LingmoShellInterface *m_psi = nullptr;
     KWayland::Client::ConnectionThread *m_connection = nullptr;
     QThread *m_thread = nullptr;
     KWayland::Client::EventQueue *m_queue = nullptr;
     KWayland::Client::Compositor *m_compositor = nullptr;
-    KWayland::Client::PlasmaShell *m_plasmaShell = nullptr;
+    KWayland::Client::LingmoShell *m_lingmoShell = nullptr;
 };
 
 static const QString s_socketName = QStringLiteral("kwayland-test-error-0");
@@ -57,7 +57,7 @@ void ErrorTest::init()
     QVERIFY(m_display->isRunning());
     m_display->createShm();
     m_ci = new CompositorInterface(m_display, m_display);
-    m_psi = new PlasmaShellInterface(m_display, m_display);
+    m_psi = new LingmoShellInterface(m_display, m_display);
 
     // setup connection
     m_connection = new KWayland::Client::ConnectionThread;
@@ -85,10 +85,10 @@ void ErrorTest::init()
     m_compositor =
         registry.createCompositor(registry.interface(KWayland::Client::Registry::Interface::Compositor).name, registry.interface(KWayland::Client::Registry::Interface::Compositor).version, this);
     QVERIFY(m_compositor);
-    m_plasmaShell = registry.createPlasmaShell(registry.interface(KWayland::Client::Registry::Interface::PlasmaShell).name,
-                                               registry.interface(KWayland::Client::Registry::Interface::PlasmaShell).version,
+    m_lingmoShell = registry.createLingmoShell(registry.interface(KWayland::Client::Registry::Interface::LingmoShell).name,
+                                               registry.interface(KWayland::Client::Registry::Interface::LingmoShell).version,
                                                this);
-    QVERIFY(m_plasmaShell);
+    QVERIFY(m_lingmoShell);
 }
 
 void ErrorTest::cleanup()
@@ -98,7 +98,7 @@ void ErrorTest::cleanup()
         delete variable;    \
         variable = nullptr; \
     }
-    CLEANUP(m_plasmaShell)
+    CLEANUP(m_lingmoShell)
     CLEANUP(m_compositor)
     CLEANUP(m_queue)
     if (m_connection) {
@@ -118,15 +118,15 @@ void ErrorTest::cleanup()
     m_ci = nullptr;
 }
 
-void ErrorTest::testMultiplePlasmaShellSurfacesForSurface()
+void ErrorTest::testMultipleLingmoShellSurfacesForSurface()
 {
     // this test verifies that creating two ShellSurfaces for the same Surface triggers a protocol error
     QSignalSpy errorSpy(m_connection, &KWayland::Client::ConnectionThread::errorOccurred);
-    // PlasmaShell is too smart and doesn't allow us to create a second PlasmaShellSurface
+    // LingmoShell is too smart and doesn't allow us to create a second LingmoShellSurface
     // thus we need to cheat by creating a surface manually
     auto surface = wl_compositor_create_surface(*m_compositor);
-    std::unique_ptr<KWayland::Client::PlasmaShellSurface> shellSurface1(m_plasmaShell->createSurface(surface));
-    std::unique_ptr<KWayland::Client::PlasmaShellSurface> shellSurface2(m_plasmaShell->createSurface(surface));
+    std::unique_ptr<KWayland::Client::LingmoShellSurface> shellSurface1(m_lingmoShell->createSurface(surface));
+    std::unique_ptr<KWayland::Client::LingmoShellSurface> shellSurface2(m_lingmoShell->createSurface(surface));
     QVERIFY(!m_connection->hasError());
     QVERIFY(errorSpy.wait());
     QVERIFY(m_connection->hasError());

@@ -8,12 +8,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     property alias cfg_showLegend: showSensorsLegendCheckbox.checked
@@ -39,8 +39,8 @@ Kirigami.FormLayout {
     property real cfg_rangeToX
 
     Item {
-        Kirigami.FormData.label: i18n("Appearance")
-        Kirigami.FormData.isSection: true
+        LingmoUI.FormData.label: i18n("Appearance")
+        LingmoUI.FormData.isSection: true
     }
     QQC2.CheckBox {
         id: showSensorsLegendCheckbox
@@ -64,14 +64,14 @@ Kirigami.FormLayout {
     }
     QQC2.SpinBox {
         id: fillOpacitySpin
-        Kirigami.FormData.label: i18n("Fill Opacity:")
+        LingmoUI.FormData.label: i18n("Fill Opacity:")
         editable: true
         from: 0
         to: 100
     }
     Item {
-        Kirigami.FormData.label: i18n("Data Ranges")
-        Kirigami.FormData.isSection: true
+        LingmoUI.FormData.label: i18n("Data Ranges")
+        LingmoUI.FormData.isSection: true
     }
     QQC2.CheckBox {
         id: rangeAutoYCheckbox
@@ -79,15 +79,15 @@ Kirigami.FormLayout {
     }
     Faces.SensorRangeSpinBox {
         id: rangeFromYSpin
-        Kirigami.FormData.label: i18n("From (Y):")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("From (Y):")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoYCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }
     Faces.SensorRangeSpinBox {
         id: rangeToYSpin
-        Kirigami.FormData.label: i18n("To (Y):")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("To (Y):")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoYCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }
@@ -96,7 +96,7 @@ Kirigami.FormLayout {
         editable: true
         from: 0
         to: Math.pow(2, 31) - 1
-        Kirigami.FormData.label: i18n("Amount of History to Keep:")
+        LingmoUI.FormData.label: i18n("Amount of History to Keep:")
 
         textFromValue: function(value, locale) {
             return i18ncp("%1 is seconds of history", "%1 second", "%1 seconds", Number(value).toLocaleString(locale, "f", 0));

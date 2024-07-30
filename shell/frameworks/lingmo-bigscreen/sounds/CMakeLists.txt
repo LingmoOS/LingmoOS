@@ -1,0 +1,1 @@
+install(DIRECTORY lingmo-bigscreen DESTINATION ${KDE_INSTALL_SOUNDDIR})

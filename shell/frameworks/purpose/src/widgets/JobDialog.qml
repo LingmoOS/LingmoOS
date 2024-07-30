@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.purpose as Purpose
 import org.kde.purpose.private.widgets as PurposeWidgets
 
@@ -22,11 +22,11 @@ QQC2.ApplicationWindow {
     title: i18n("Send File")
     visible: true
 
-    width: Math.max(screen.width / 6, Kirigami.Units.gridUnit * 16)
-    height: Math.max(screen.height / 4, Kirigami.Units.gridUnit * 20)
+    width: Math.max(screen.width / 6, LingmoUI.Units.gridUnit * 16)
+    height: Math.max(screen.height / 4, LingmoUI.Units.gridUnit * 20)
 
-    minimumWidth: Kirigami.Units.gridUnit * 16
-    minimumHeight: Kirigami.Units.gridUnit * 10
+    minimumWidth: LingmoUI.Units.gridUnit * 16
+    minimumHeight: LingmoUI.Units.gridUnit * 10
 
     required property PurposeWidgets.Menu menu
     required property Purpose.PurposeAlternativesModel model

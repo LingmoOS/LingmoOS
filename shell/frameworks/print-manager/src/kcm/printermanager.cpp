@@ -77,7 +77,7 @@ PrinterManager::PrinterManager(QObject *parent, const KPluginMetaData &metaData)
     });
 
     qmlRegisterUncreatableMetaObject(PMTypes::staticMetaObject,
-                                     "org.kde.plasma.printmanager", // use same namespace as kcupslib
+                                     "org.kde.lingmo.printmanager", // use same namespace as kcupslib
                                      1,
                                      0,
                                      "PPDType", // QML qualifier
@@ -87,7 +87,7 @@ PrinterManager::PrinterManager(QObject *parent, const KPluginMetaData &metaData)
     qDBusRegisterMetaType<DriverMatchList>();
 
 #ifdef SCP_INSTALL
-    qmlRegisterType<SCPInstaller>("org.kde.plasma.printmanager", 1, 0, "SCPInstaller");
+    qmlRegisterType<SCPInstaller>("org.kde.lingmo.printmanager", 1, 0, "SCPInstaller");
 #endif
 }
 

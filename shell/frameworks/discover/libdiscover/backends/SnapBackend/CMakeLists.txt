@@ -6,7 +6,7 @@ set(snap-backend_SRCS
     SnapTransaction.cpp
     snapui.qrc
 )
-ecm_qt_declare_logging_category(snap-backend_SRCS HEADER libdiscover_snap_debug.h IDENTIFIER LIBDISCOVER_SNAP_LOG CATEGORY_NAME org.kde.plasma.libdiscover.snap DESCRIPTION "libdiscover snap backend" EXPORT DISCOVER)
+ecm_qt_declare_logging_category(snap-backend_SRCS HEADER libdiscover_snap_debug.h IDENTIFIER LIBDISCOVER_SNAP_LOG CATEGORY_NAME org.kde.lingmo.libdiscover.snap DESCRIPTION "libdiscover snap backend" EXPORT DISCOVER)
 kcoreaddons_add_plugin(snap-backend SOURCES ${snap-backend_SRCS} INSTALL_NAMESPACE "discover")
 target_link_libraries(snap-backend
     Qt::Gui

@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Label {
     id: control
@@ -29,7 +29,7 @@ T.Label {
         cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : undefined
     }
 
-    color: Kirigami.Theme.textColor
-    linkColor: Kirigami.Theme.linkColor
-    font: Kirigami.Theme.defaultFont
+    color: LingmoUI.Theme.textColor
+    linkColor: LingmoUI.Theme.linkColor
+    font: LingmoUI.Theme.defaultFont
 }

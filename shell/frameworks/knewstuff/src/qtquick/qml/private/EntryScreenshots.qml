@@ -9,7 +9,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Flickable {
     id: root
@@ -19,7 +19,7 @@ Flickable {
     property int currentIndex: -1
     property Item currentItem: screenshotsRep.itemAt(currentIndex)
 
-    Layout.preferredHeight: Kirigami.Units.gridUnit * 13
+    Layout.preferredHeight: LingmoUI.Units.gridUnit * 13
     contentHeight: height
     contentWidth: screenshotsLayout.width
 
@@ -37,7 +37,7 @@ Flickable {
             : 1
 
         height: overlayImage.status === Image.Loading
-            ? Kirigami.Units.gridUnit * 5
+            ? LingmoUI.Units.gridUnit * 5
             : Math.min(parent.height * 0.9, (parent.width * 0.9) * proportion, overlayImage.sourceSize.height)
         width: height / proportion
 
@@ -75,7 +75,7 @@ Flickable {
             visible: rightAction.visible
         }
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: leftAction
             icon.name: "arrow-left"
             enabled: overlay.visible && visible
@@ -85,7 +85,7 @@ Flickable {
             }
         }
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: rightAction
             icon.name: "arrow-right"
             enabled: overlay.visible && visible
@@ -99,7 +99,7 @@ Flickable {
     Row {
         id: screenshotsLayout
         height: root.contentHeight
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
         leftPadding: spacing
         rightPadding: spacing
         focus: overlay.visible
@@ -126,7 +126,7 @@ Flickable {
 
                 anchors.verticalCenter: parent.verticalCenter
                 width: Math.max(50, height / proportion)
-                height: screenshotsLayout.height - 2 * Kirigami.Units.largeSpacing
+                height: screenshotsLayout.height - 2 * LingmoUI.Units.largeSpacing
 
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
@@ -136,11 +136,11 @@ Flickable {
                     overlay.open()
                 }
 
-                Kirigami.ShadowedRectangle {
+                LingmoUI.ShadowedRectangle {
                     visible: thumbnail.status === Image.Ready
                     anchors.fill: thumbnail
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
-                    shadow.size: Kirigami.Units.largeSpacing
+                    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+                    shadow.size: LingmoUI.Units.largeSpacing
                     shadow.color: Qt.rgba(0, 0, 0, 0.3)
                 }
 

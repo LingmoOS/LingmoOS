@@ -36,7 +36,7 @@ static bool isDelimiter(const ushort c)
  * Overlay scroll bar on the list according to the operating system
  * and/or the desktop environment. In some desktop themes the scroll bar
  * isn't transparent, so it's better not to overlap it on the list.
- * NOTE: Currently, in the Breeze theme, the scroll bar does not overlap
+ * NOTE: Currently, in the Ocean theme, the scroll bar does not overlap
  * the content. See: https://phabricator.kde.org/T9126
  */
 inline static bool overlapScrollBar()
@@ -57,7 +57,7 @@ void KateModeMenuList::onAboutToShowMenu()
     }
     /*
      * Fix font size & font style: display the font correctly when changing it from the
-     * KDE Plasma preferences. For example, the font type "Menu" is displayed, but "font()"
+     * KDE Lingmo preferences. For example, the font type "Menu" is displayed, but "font()"
      * and "fontMetrics()" return the font type "General". Therefore, this overwrites the
      * "General" font. This makes it possible to correctly apply word wrapping on items,
      * when changing the font or its size.
@@ -407,7 +407,7 @@ void KateModeMenuList::showEvent(QShowEvent *event)
     if (m_pushButton && m_pushButton->isVisible()) {
         /*
          * Get vertical position.
-         * NOTE: In KDE Plasma with Wayland, the reference point of the position
+         * NOTE: In KDE Lingmo with Wayland, the reference point of the position
          * is the main window, not the desktop. Therefore, if the window is vertically
          * smaller than the menu, it will be positioned on the upper edge of the window.
          */

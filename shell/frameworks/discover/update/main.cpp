@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
-    KLocalizedString::setApplicationDomain("plasma-discover-update");
+    KLocalizedString::setApplicationDomain("lingmo-discover-update");
     KAboutData about(QStringLiteral("discoverupdate"), i18n("Discover Update"), version, {}, KAboutLicense::GPL, i18n("© 2020 Aleix Pol Gonzalez"), {});
     about.addAuthor(QStringLiteral("Aleix Pol i Gonzàlez"), {}, QStringLiteral("aleixpolkde.org"));
     about.setProductName("discover/update");

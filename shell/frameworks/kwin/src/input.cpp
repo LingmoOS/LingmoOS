@@ -3143,7 +3143,7 @@ void InputRedirection::toggleTouchpads()
     }
     if (changed) {
         // send OSD message
-        QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
+        QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
                                                           QStringLiteral("/org/kde/osdService"),
                                                           QStringLiteral("org.kde.osdService"),
                                                           QStringLiteral("touchpadEnabledChanged"));

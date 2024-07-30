@@ -34,9 +34,9 @@ void ShellIntegration::init()
 
 QString ShellIntegration::defaultShell() const
 {
-    KSharedConfig::Ptr startupConf = KSharedConfig::openConfig(QStringLiteral("plasmashellrc"));
+    KSharedConfig::Ptr startupConf = KSharedConfig::openConfig(QStringLiteral("lingmoshellrc"));
     KConfigGroup startupConfGroup(startupConf, QStringLiteral("Shell"));
-    const QString defaultValue = qEnvironmentVariable("PLASMA_DEFAULT_SHELL", "org.kde.plasma.desktop");
+    const QString defaultValue = qEnvironmentVariable("LINGMO_DEFAULT_SHELL", "org.kde.lingmo.desktop");
     QString value = startupConfGroup.readEntry("ShellPackage", defaultValue);
 
     // In the global theme an empty value was written, make sure we still return a shell package

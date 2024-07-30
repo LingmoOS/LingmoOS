@@ -83,7 +83,7 @@ if(WITH_WAYLAND)
     find_package(Qt6Gui REQUIRED CONFIG COMPONENTS Private)
     find_package(Qt6WaylandClient ${REQUIRED_QT_VERSION} REQUIRED CONFIG)
     find_package(Wayland 1.9 REQUIRED Client)
-    find_package(PlasmaWaylandProtocols 1.6.0 CONFIG REQUIRED)
+    find_package(LingmoWaylandProtocols 1.6.0 CONFIG REQUIRED)
     find_package(WaylandProtocols 1.27)
     set_package_properties(WaylandProtocols PROPERTIES
         TYPE REQUIRED

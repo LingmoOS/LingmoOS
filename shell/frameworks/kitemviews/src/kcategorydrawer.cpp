@@ -42,7 +42,7 @@ KCategoryDrawer::~KCategoryDrawer() = default;
 
 void KCategoryDrawer::drawCategory(const QModelIndex &index, int /*sortRole*/, const QStyleOption &option, QPainter *painter) const
 {
-    // Keep this in sync with Kirigami.ListSectionHeader
+    // Keep this in sync with LingmoUI.ListSectionHeader
     painter->setRenderHint(QPainter::Antialiasing);
 
     const QString category = index.model()->data(index, KCategorizedSortFilterProxyModel::CategoryDisplayRole).toString();
@@ -50,8 +50,8 @@ void KCategoryDrawer::drawCategory(const QModelIndex &index, int /*sortRole*/, c
     font.setBold(true);
     const QFontMetrics fontMetrics = QFontMetrics(font);
 
-    const int topPadding = 8 + 4; // Kirigami.Units.largeSpacing + smallSpacing
-    const int sidePadding = 8; // Kirigami.Units.largeSpacing
+    const int topPadding = 8 + 4; // LingmoUI.Units.largeSpacing + smallSpacing
+    const int sidePadding = 8; // LingmoUI.Units.largeSpacing
 
     // BEGIN: text
     {
@@ -74,7 +74,7 @@ void KCategoryDrawer::drawCategory(const QModelIndex &index, int /*sortRole*/, c
     // BEGIN: horizontal line
     {
         QColor backgroundColor = option.palette.text().color();
-        backgroundColor.setAlphaF(0.7 * 0.15); // replicate Kirigami.Separator color
+        backgroundColor.setAlphaF(0.7 * 0.15); // replicate LingmoUI.Separator color
         QRect backgroundRect(option.rect);
         backgroundRect.setLeft(fontMetrics.horizontalAdvance(category) + sidePadding * 2);
         backgroundRect.setRight(backgroundRect.right() - sidePadding);
@@ -97,7 +97,7 @@ int KCategoryDrawer::categoryHeight(const QModelIndex &index, const QStyleOption
     QFont font(QApplication::font());
     QFontMetrics fontMetrics(font);
 
-    const int height = fontMetrics.height() + 8 + 8; // Kirigami.Units.largeSpacing + smallSpacing * 2
+    const int height = fontMetrics.height() + 8 + 8; // LingmoUI.Units.largeSpacing + smallSpacing * 2
     return height;
 }
 

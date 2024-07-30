@@ -6,7 +6,7 @@ kcmutils_add_qml_kcm(kcm_printer_manager SOURCES
 ecm_qt_declare_logging_category(kcm_printer_manager
     HEADER pmkcm_log.h
     IDENTIFIER PMKCM
-    CATEGORY_NAME org.kde.plasma.printmanager.kcm
+    CATEGORY_NAME org.kde.lingmo.printmanager.kcm
     DESCRIPTION "Print Manager (kcm)"
     EXPORT PMLOGS
 )

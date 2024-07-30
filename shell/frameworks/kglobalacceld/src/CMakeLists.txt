@@ -77,7 +77,7 @@ install(FILES
 
 include (ECMConfiguredInstall)
 ecm_install_configured_files(
-   INPUT plasma-kglobalaccel.service.in
+   INPUT lingmo-kglobalaccel.service.in
    DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR}
 )
 

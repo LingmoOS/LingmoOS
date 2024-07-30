@@ -19,7 +19,7 @@ theme configuration dialogs, and should not be used by applications.
 
 ## Icon Theme Deployment
 
-On Linux/BSD, it is expected that the main icon themes (hicolor, oxygen, breeze)
+On Linux/BSD, it is expected that the main icon themes (hicolor, oxygen, ocean)
 are installed by the distribution. The platform theme plugin reads the icon
 theme name from KConfig, and redirects QIcon::fromTheme calls to KIconEngine/KIconLoader,
 which brings some benefits over Qt's internal icon loading, such as a cache shared
@@ -36,7 +36,7 @@ The more usual deployment strategy on those platforms consists of creating stand
 where each has its own copy of all dependencies and required resources.
 
 Icon theme resources for standalone applications can be created and deployed as follows:
-- breeze-icons and other icon themes, when configured with -DBINARY\_ICONS\_RESOURCE=ON, install .rcc files (binary resources, loadable by Qt)
+- ocean-icons and other icon themes, when configured with -DBINARY\_ICONS\_RESOURCE=ON, install .rcc files (binary resources, loadable by Qt)
 - the installation process should copy one of these under the name "icontheme.rcc", in
     a directory found by [QStandardPaths::AppDataLocation](http://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum).
     For instance on Windows, icontheme.rcc is usually installed in APPROOT/data/,

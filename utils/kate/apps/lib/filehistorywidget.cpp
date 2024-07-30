@@ -248,7 +248,7 @@ FileHistoryWidget::FileHistoryWidget(const QString &gitDir, const QString &file,
     auto model = new CommitListModel(this);
     m_listView = new QListView;
     m_listView->setModel(model);
-    m_listView->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_listView->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     getFileHistory(file);
 
     setLayout(new QVBoxLayout);

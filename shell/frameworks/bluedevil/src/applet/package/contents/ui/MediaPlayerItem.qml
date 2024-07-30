@@ -11,8 +11,8 @@ import QtQuick
 import QtQuick.Layouts
 
 import org.kde.bluezqt as BluezQt
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents3
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components as LingmoComponents3
 
 ColumnLayout {
     id: root
@@ -21,36 +21,36 @@ ColumnLayout {
 
     spacing: 0
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: trackTitleLabel
         Layout.fillWidth: true
         elide: Text.ElideRight
         font.weight: root.mediaPlayer !== null && root.mediaPlayer.track.title !== "" ? Font.DemiBold : Font.Normal
         font.italic: root.mediaPlayer !== null && root.mediaPlayer.status === BluezQt.MediaPlayer.Playing
-        font.pointSize: Kirigami.Theme.smallFont.pointSize
-        font.family: Kirigami.Theme.smallFont.family
+        font.pointSize: LingmoUI.Theme.smallFont.pointSize
+        font.family: LingmoUI.Theme.smallFont.family
         opacity: 0.6
         text: root.trackTitleText()
         textFormat: Text.PlainText
         visible: text.length
     }
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: trackArtistLabel
         Layout.fillWidth: true
         elide: Text.ElideRight
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
         opacity: 0.6
         text: root.mediaPlayer?.track.artist ?? ""
         textFormat: Text.PlainText
         visible: text.length
     }
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: trackAlbumLabel
         Layout.fillWidth: true
         elide: Text.ElideRight
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
         opacity: 0.6
         text: root.mediaPlayer?.track.album ?? ""
         textFormat: Text.PlainText
@@ -60,21 +60,21 @@ ColumnLayout {
     RowLayout {
         spacing: 0
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: previousButton
             icon.name: "media-skip-backward-symbolic"
 
             onClicked: root.mediaPlayer?.previous()
         }
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: playPauseButton
             icon.name: root.playPauseButtonIcon()
 
             onClicked: root.playPauseButtonClicked()
         }
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: stopButton
             icon.name: "media-playback-stop-symbolic"
             enabled: root.mediaPlayer !== null && root.mediaPlayer.status !== BluezQt.MediaPlayer.Stopped
@@ -82,7 +82,7 @@ ColumnLayout {
             onClicked: root.mediaPlayer?.stop()
         }
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: nextButton
             icon.name: "media-skip-forward-symbolic"
 

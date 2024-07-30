@@ -8,12 +8,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     property alias cfg_groupByTotal: groupCheckbox.checked

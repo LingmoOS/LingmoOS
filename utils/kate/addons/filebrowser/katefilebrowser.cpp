@@ -98,7 +98,7 @@ KateFileBrowser::KateFileBrowser(KTextEditor::MainWindow *mainWindow, QWidget *p
     m_filter->setMaxCount(10);
     m_filter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     m_filter->lineEdit()->setPlaceholderText(i18n("Search"));
-    m_filter->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_filter->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     mainLayout->addWidget(m_filter);
 
     connect(m_filter, &KHistoryComboBox::editTextChanged, this, &KateFileBrowser::slotFilterChange);

@@ -127,13 +127,13 @@ bool ScriptedEffectLoader::loadEffect(const KPluginMetaData &effect, LoadEffectF
         return false;
     }
 
-    const QString api = effect.value(QStringLiteral("X-Plasma-API"));
+    const QString api = effect.value(QStringLiteral("X-Lingmo-API"));
     if (api == QLatin1String("javascript")) {
         return loadJavascriptEffect(effect);
     } else if (api == QLatin1String("declarativescript")) {
         return loadDeclarativeEffect(effect);
     } else {
-        qCWarning(KWIN_CORE, "Failed to load %s effect: invalid X-Plasma-API field: %s. "
+        qCWarning(KWIN_CORE, "Failed to load %s effect: invalid X-Lingmo-API field: %s. "
                              "Available options are javascript, and declarativescript", qPrintable(name), qPrintable(api));
     }
 

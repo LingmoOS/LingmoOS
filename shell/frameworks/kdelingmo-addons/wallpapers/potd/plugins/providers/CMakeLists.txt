@@ -1,0 +1,25 @@
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+kcoreaddons_add_plugin(lingmo_potd_flickrprovider SOURCES flickrprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_flickrprovider lingmopotdprovidercore lingmo_wallpaper_potdplugin_debug KF6::KIOCore KF6::CoreAddons)
+
+kcoreaddons_add_plugin(lingmo_potd_apodprovider SOURCES apodprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_apodprovider lingmopotdprovidercore KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_natgeoprovider SOURCES natgeoprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_natgeoprovider lingmopotdprovidercore KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_epodprovider SOURCES epodprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_epodprovider lingmopotdprovidercore KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_noaaprovider SOURCES noaaprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_noaaprovider lingmopotdprovidercore lingmo_wallpaper_potdplugin_debug KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_wcpotdprovider SOURCES wcpotdprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_wcpotdprovider lingmopotdprovidercore KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_bingprovider SOURCES bingprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_bingprovider lingmopotdprovidercore KF6::KIOCore)
+
+kcoreaddons_add_plugin(lingmo_potd_simonstalenhagprovider SOURCES simonstalenhagprovider.cpp INSTALL_NAMESPACE "potd")
+target_link_libraries(lingmo_potd_simonstalenhagprovider lingmopotdprovidercore KF6::KIOCore)

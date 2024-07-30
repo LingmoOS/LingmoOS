@@ -1,8 +1,8 @@
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ShadowedRectangle {
-    radius: Kirigami.Units.mediumSpacing / 2
+LingmoUI.ShadowedRectangle {
+    radius: LingmoUI.Units.mediumSpacing / 2
     shadow.color: Qt.rgba(0,0,0,0.2)
     shadow.size: 9
     shadow.yOffset: 2

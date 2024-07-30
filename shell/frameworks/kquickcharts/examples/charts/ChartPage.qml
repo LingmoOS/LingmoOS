@@ -9,12 +9,12 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.quickcharts as Charts
 import org.kde.quickcharts.controls as ChartsControls
 
-Kirigami.Page {
+LingmoUI.Page {
     id: page
 
     leftPadding: 0
@@ -40,24 +40,24 @@ Kirigami.Page {
             Layout.fillWidth: true
             Layout.preferredHeight: 400
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.leftMargin: Kirigami.Units.gridUnit
-            Layout.rightMargin: Kirigami.Units.gridUnit
-            Layout.topMargin: Kirigami.Units.gridUnit
+            Layout.leftMargin: LingmoUI.Units.gridUnit
+            Layout.rightMargin: LingmoUI.Units.gridUnit
+            Layout.topMargin: LingmoUI.Units.gridUnit
         }
 
         ColumnLayout {
             id: controlsArea
 
             Layout.fillHeight: false
-            Layout.leftMargin: Kirigami.Units.gridUnit
-            Layout.rightMargin: Kirigami.Units.gridUnit
-            Layout.topMargin: Kirigami.Units.largeSpacing
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            Layout.leftMargin: LingmoUI.Units.gridUnit
+            Layout.rightMargin: LingmoUI.Units.gridUnit
+            Layout.topMargin: LingmoUI.Units.largeSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
         }
 
-        Kirigami.Separator { Layout.fillWidth: true; visible: itemEditor.visible }
+        LingmoUI.Separator { Layout.fillWidth: true; visible: itemEditor.visible }
 
-        Kirigami.InlineViewHeader {
+        LingmoUI.InlineViewHeader {
             Layout.fillWidth: true
             visible: itemEditor.visible
             text: "Items"
@@ -80,7 +80,7 @@ Kirigami.Page {
             }
 
             background: Rectangle {
-                color: Kirigami.Theme.backgroundColor
+                color: LingmoUI.Theme.backgroundColor
             }
 
             HoverHandler {

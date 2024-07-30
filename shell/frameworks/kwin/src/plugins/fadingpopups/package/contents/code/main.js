@@ -16,7 +16,7 @@ var blacklist = [
     "ksmserver-logout-greeter ksmserver-logout-greeter",
     // The lockscreen isn't a popup window
     "kscreenlocker_greet kscreenlocker_greet",
-    // KDE Plasma splash screen has to be animated only by the login effect.
+    // KDE Lingmo splash screen has to be animated only by the login effect.
     "ksplashqml ksplashqml"
 ];
 

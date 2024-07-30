@@ -5,7 +5,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
 DiscoverPage {
@@ -37,7 +37,7 @@ DiscoverPage {
         }
     }
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: sheet
 
         property string errorMessage: ""
@@ -59,7 +59,7 @@ DiscoverPage {
                         id: friendlyMessage
                         Layout.fillWidth: true
                         Layout.maximumWidth: Math.round(page.width * 0.75)
-                        Layout.bottomMargin: Kirigami.Units.largeSpacing * 2
+                        Layout.bottomMargin: LingmoUI.Units.largeSpacing * 2
                         text: i18n("There was an issue installing this update. Please try again later.")
                         wrapMode: Text.WordWrap
                     }
@@ -79,7 +79,7 @@ DiscoverPage {
                 id: nerdyDetailsComponent
 
                 ColumnLayout {
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
 
                     QQC2.TextArea {
                         Layout.fillWidth: true
@@ -91,8 +91,8 @@ DiscoverPage {
                     QQC2.Label {
                         Layout.fillWidth: true
                         Layout.maximumWidth: Math.round(page.width*0.75)
-                        Layout.topMargin: Kirigami.Units.largeSpacing
-                        Layout.bottomMargin: Kirigami.Units.largeSpacing
+                        Layout.topMargin: LingmoUI.Units.largeSpacing
+                        Layout.bottomMargin: LingmoUI.Units.largeSpacing
                         text: i18nc("@info %1 is the name of the user's distro/OS", "If the error indicated above looks like a real issue and not a temporary network error, please report it to %1, not KDE.", Discover.ResourcesModel.distroName)
                         wrapMode: Text.WordWrap
                     }
@@ -136,14 +136,14 @@ DiscoverPage {
         backend: resourcesUpdatesModel
     }
 
-    Kirigami.Action {
+    LingmoUI.Action {
         id: updateAction
         text: page.unselected > 0 ? i18nc("@action:button as in, 'update the selected items' ", "Update Selected") : i18nc("@action:button as in, 'update all items'", "Update All")
         visible: updateModel.toUpdateCount
         icon.name: "update-none"
 
         function anyPageHeaderChildrenVisible() {
-            return page.header.children.some(item => item?.visible && item instanceof Kirigami.InlineMessage);
+            return page.header.children.some(item => item?.visible && item instanceof LingmoUI.InlineMessage);
         }
 
         enabled: !resourcesUpdatesModel.isProgressing && !Discover.ResourcesModel.isFetching && !anyPageHeaderChildrenVisible()
@@ -153,7 +153,7 @@ DiscoverPage {
     header: ColumnLayout {
         id: errorsColumn
 
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         DiscoverInlineMessage {
             Layout.fillWidth: true
@@ -162,20 +162,20 @@ DiscoverPage {
 
         Repeater {
             model: resourcesUpdatesModel.errorMessages
-            delegate: Kirigami.InlineMessage {
+            delegate: LingmoUI.InlineMessage {
                 id: inline
 
                 required property string modelData
 
                 Layout.fillWidth: true
-                position: Kirigami.InlineMessage.Position.Header
+                position: LingmoUI.InlineMessage.Position.Header
                 text: modelData
                 visible: true
-                type: Kirigami.MessageType.Error
+                type: LingmoUI.MessageType.Error
                 onVisibleChanged: errorsColumn.childrenChanged()
 
                 actions: [
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         icon.name: "dialog-cancel"
                         text: i18n("Ignore")
                         onTriggered: {
@@ -194,7 +194,7 @@ DiscoverPage {
         QQC2.ScrollView {
             id: scv
             Layout.fillWidth: true
-            Layout.preferredHeight: visible ? Kirigami.Units.gridUnit * 10 : 0
+            Layout.preferredHeight: visible ? LingmoUI.Units.gridUnit * 10 : 0
             visible: log.contents.length > 0
             QQC2.TextArea {
                 readOnly: true
@@ -244,7 +244,7 @@ DiscoverPage {
 
                 QQC2.Label {
                     Layout.fillWidth: true
-                    Layout.rightMargin: Kirigami.Units.largeSpacing
+                    Layout.rightMargin: LingmoUI.Units.largeSpacing
                     horizontalAlignment: Text.AlignRight
                     text: i18n("Total size: %1", updateModel.updateSize)
                     elide: Text.ElideLeft
@@ -253,7 +253,7 @@ DiscoverPage {
         }
     }
 
-    Kirigami.Action {
+    LingmoUI.Action {
         id: cancelUpdateAction
         icon.name: "dialog-cancel"
         text: i18n("Cancel")
@@ -272,20 +272,20 @@ DiscoverPage {
     readonly property Item report: ColumnLayout {
         parent: page
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.largeSpacing * 2
+        anchors.margins: LingmoUI.Units.largeSpacing * 2
         Item {
             Layout.fillHeight: true
             width: 1
         }
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: restartAction
             icon.name: "system-reboot"
             text: i18n("Restart Now")
             visible: false
             onTriggered: app.reboot()
         }
-        Kirigami.LoadingPlaceholder {
+        LingmoUI.LoadingPlaceholder {
             id: statusLabel
             icon.name: {
                 if (page.footerProgress === 0 && page.footerLabel !== "" && !page.busy) {
@@ -319,7 +319,7 @@ DiscoverPage {
 
         section {
             property: "section"
-            delegate: Kirigami.ListSectionHeader {
+            delegate: LingmoUI.ListSectionHeader {
                 required property string section
 
                 width: updatesView.width
@@ -362,10 +362,10 @@ DiscoverPage {
             }
 
             contentItem: ColumnLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 RowLayout {
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
@@ -377,8 +377,8 @@ DiscoverPage {
                         enabled: !resourcesUpdatesModel.isProgressing
                     }
 
-                    Kirigami.Icon {
-                        width: Kirigami.Units.gridUnit * 2
+                    LingmoUI.Icon {
+                        width: LingmoUI.Units.gridUnit * 2
                         Layout.preferredHeight: width
                         source: listItem.model.decoration
                         smooth: true
@@ -386,13 +386,13 @@ DiscoverPage {
 
                     ColumnLayout {
                         Layout.fillWidth: true
-                        Layout.leftMargin: Kirigami.Units.smallSpacing
+                        Layout.leftMargin: LingmoUI.Units.smallSpacing
                         Layout.alignment: Qt.AlignVCenter
 
                         spacing: 0
 
                         // App name
-                        Kirigami.Heading {
+                        LingmoUI.Heading {
                             Layout.fillWidth: true
                             text: listItem.model.display
                             level: 3
@@ -409,7 +409,7 @@ DiscoverPage {
                     }
 
                     LabelBackground {
-                        Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+                        Layout.minimumWidth: LingmoUI.Units.gridUnit * 6
                         text: listItem.model.resourceState === 2 ? i18n("Installing") : listItem.model.size
 
                         progress: listItem.model.resourceProgress / 100
@@ -436,18 +436,18 @@ DiscoverPage {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
                     visible: listItem.model.extended
 
                     QQC2.Label {
-                        Layout.leftMargin: Kirigami.Units.gridUnit
+                        Layout.leftMargin: LingmoUI.Units.gridUnit
                         text: i18n("Update from:")
                     }
                     // Backend icon
-                    Kirigami.Icon {
+                    LingmoUI.Icon {
                         source: listItem.model.resource.sourceIcon
-                        implicitWidth: Kirigami.Units.iconSizes.smallMedium
-                        implicitHeight: Kirigami.Units.iconSizes.smallMedium
+                        implicitWidth: LingmoUI.Units.iconSizes.smallMedium
+                        implicitHeight: LingmoUI.Units.iconSizes.smallMedium
                     }
                     // Backend label and origin/remote
                     QQC2.Label {

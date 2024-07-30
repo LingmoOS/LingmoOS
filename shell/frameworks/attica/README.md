@@ -10,6 +10,6 @@ https://www.freedesktop.org/wiki/Specifications/open-collaboration-services/
 
 It grants easy access to the services such as querying information about persons and contents.
 The library is used in KNewStuff3 as content provider.
-In order to integrate with KDE's Plasma Desktop, a platform plugin exists in [plasma-desktop](https://commits.kde.org/plasma-desktop?path=attica-kde).
+In order to integrate with KDE's Lingmo Desktop, a platform plugin exists in [lingmo-desktop](https://commits.kde.org/lingmo-desktop?path=attica-kde).
 
 Your basic entrypoint for using Attica's functionality is the Attica::ProviderManager class.

@@ -55,7 +55,7 @@ set(discovercommon_SRCS
 ecm_qt_declare_logging_category(discovercommon_SRCS
     HEADER libdiscover_debug.h
     IDENTIFIER LIBDISCOVER_LOG
-    CATEGORY_NAME org.kde.plasma.libdiscover
+    CATEGORY_NAME org.kde.lingmo.libdiscover
     DESCRIPTION "libdiscover"
     EXPORT DISCOVER
 )
@@ -88,5 +88,5 @@ generate_export_header(DiscoverCommon)
 
 target_include_directories(DiscoverCommon PRIVATE ${PHONON_INCLUDES} PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-install(TARGETS DiscoverCommon DESTINATION ${KDE_INSTALL_LIBDIR}/plasma-discover)
+install(TARGETS DiscoverCommon DESTINATION ${KDE_INSTALL_LIBDIR}/lingmo-discover)
 install(FILES resources/discoverabstractnotifier.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR})

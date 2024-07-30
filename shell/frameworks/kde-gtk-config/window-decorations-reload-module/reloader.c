@@ -21,7 +21,7 @@ GtkCssProvider *css_provider;
 void manage_css_provider(GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, gpointer user_data);
 void reload_css_provider();
 void remove_css_provider();
-int theme_is_breeze();
+int theme_is_ocean();
 void theme_changed(GtkSettings *settings, GParamSpec *param_spec, void *user_data);
 
 __attribute__((visibility("default"))) void gtk_module_init(gint *argc, gchar ***argv[])
@@ -60,7 +60,7 @@ void reload_css_provider()
 {
     remove_css_provider();
 
-    if (!theme_is_breeze()) {
+    if (!theme_is_ocean()) {
         return;
     }
 
@@ -81,7 +81,7 @@ void remove_css_provider()
     g_clear_object(&css_provider);
 }
 
-int theme_is_breeze()
+int theme_is_ocean()
 {
     GtkSettings *settings = gtk_settings_get_default();
     char *theme_name = NULL;
@@ -89,7 +89,7 @@ int theme_is_breeze()
     if (!theme_name) {
         return 0;
     }
-    int ret = !strcmp(theme_name, "Breeze");
+    int ret = !strcmp(theme_name, "Ocean");
     g_free(theme_name);
     return ret;
 }

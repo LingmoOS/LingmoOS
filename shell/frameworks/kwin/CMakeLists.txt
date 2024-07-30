@@ -122,12 +122,12 @@ set_package_properties(KWayland PROPERTIES
 )
 
 # optional frameworks
-find_package(PlasmaActivities ${PROJECT_DEP_VERSION} CONFIG)
-set_package_properties(PlasmaActivities PROPERTIES
+find_package(LingmoActivities ${PROJECT_DEP_VERSION} CONFIG)
+set_package_properties(LingmoActivities PROPERTIES
     PURPOSE "Enable building of KWin with kactivities support"
     TYPE OPTIONAL
 )
-add_feature_info("PlasmaActivities" PlasmaActivities_FOUND "Enable building of KWin with kactivities support")
+add_feature_info("LingmoActivities" LingmoActivities_FOUND "Enable building of KWin with kactivities support")
 
 find_package(KF6DocTools ${KF6_MIN_VERSION} CONFIG)
 set_package_properties(KF6DocTools PROPERTIES
@@ -136,14 +136,14 @@ set_package_properties(KF6DocTools PROPERTIES
 )
 add_feature_info("KF6DocTools" KF6DocTools_FOUND "Enable building documentation")
 
-find_package(KF6Kirigami ${KF6_MIN_VERSION} CONFIG)
-set_package_properties(KF6Kirigami PROPERTIES
+find_package(KF6LingmoUI ${KF6_MIN_VERSION} CONFIG)
+set_package_properties(KF6LingmoUI PROPERTIES
     DESCRIPTION "A QtQuick based components set"
     PURPOSE "Required at runtime for several QML effects"
     TYPE RUNTIME
 )
-find_package(Plasma ${PROJECT_DEP_VERSION} CONFIG)
-set_package_properties(Plasma PROPERTIES
+find_package(Lingmo ${PROJECT_DEP_VERSION} CONFIG)
+set_package_properties(Lingmo PROPERTIES
     DESCRIPTION "A QtQuick based components set"
     PURPOSE "Required at runtime for several QML effects"
     TYPE RUNTIME
@@ -155,21 +155,21 @@ set_package_properties(KDecoration2 PROPERTIES
     PURPOSE "Required for server side decoration support"
 )
 
-find_package(Breeze 5.9.0 CONFIG)
-set_package_properties(Breeze PROPERTIES
+find_package(Ocean 5.9.0 CONFIG)
+set_package_properties(Ocean PROPERTIES
     TYPE OPTIONAL
     PURPOSE "For setting the default window decoration plugin"
 )
-if (${Breeze_FOUND})
-    if (${BREEZE_WITH_KDECORATION})
-        set(HAVE_BREEZE_DECO true)
+if (${Ocean_FOUND})
+    if (${OCEAN_WITH_KDECORATION})
+        set(HAVE_OCEAN_DECO true)
     else()
-        set(HAVE_BREEZE_DECO FALSE)
+        set(HAVE_OCEAN_DECO FALSE)
     endif()
 else()
-    set(HAVE_BREEZE_DECO FALSE)
+    set(HAVE_OCEAN_DECO FALSE)
 endif()
-add_feature_info("Breeze-Decoration" HAVE_BREEZE_DECO "Default decoration plugin Breeze")
+add_feature_info("Ocean-Decoration" HAVE_OCEAN_DECO "Default decoration plugin Ocean")
 
 find_package(EGL)
 set_package_properties(EGL PROPERTIES
@@ -211,11 +211,11 @@ set_package_properties(WaylandProtocols PROPERTIES
     URL "https://gitlab.freedesktop.org/wayland/wayland-protocols/"
 )
 
-find_package(PlasmaWaylandProtocols 1.14.0 CONFIG)
-set_package_properties(PlasmaWaylandProtocols PROPERTIES
+find_package(LingmoWaylandProtocols 1.14.0 CONFIG)
+set_package_properties(LingmoWaylandProtocols PROPERTIES
     TYPE REQUIRED
-    PURPOSE "Collection of Plasma-specific Wayland protocols"
-    URL "https://invent.kde.org/libraries/plasma-wayland-protocols/"
+    PURPOSE "Collection of Lingmo-specific Wayland protocols"
+    URL "https://invent.kde.org/libraries/lingmo-wayland-protocols/"
 )
 
 find_package(XKB 0.7.0)
@@ -406,10 +406,10 @@ ecm_find_qmlmodule(QtQuick.Layouts 1.3)
 ecm_find_qmlmodule(QtQuick.Window 2.1)
 ecm_find_qmlmodule(QtMultimedia 5.0)
 ecm_find_qmlmodule(org.kde.kquickcontrolsaddons 2.0)
-ecm_find_qmlmodule(org.kde.plasma.core 2.0)
-ecm_find_qmlmodule(org.kde.plasma.components 2.0)
+ecm_find_qmlmodule(org.kde.lingmo.core 2.0)
+ecm_find_qmlmodule(org.kde.lingmo.components 2.0)
 
-cmake_dependent_option(KWIN_BUILD_ACTIVITIES "Enable building of KWin with kactivities support" ON "PlasmaActivities_FOUND" OFF)
+cmake_dependent_option(KWIN_BUILD_ACTIVITIES "Enable building of KWin with kactivities support" ON "LingmoActivities_FOUND" OFF)
 cmake_dependent_option(KWIN_BUILD_EIS "Enable building KWin with libeis support" ON "Libeis-1.0_FOUND" OFF)
 
 include_directories(BEFORE
@@ -496,10 +496,10 @@ configure_package_config_file(KWinDBusInterfaceConfig.cmake.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/KWinDBusInterfaceConfig.cmake
     DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
-ecm_install_configured_files(INPUT plasma-kwin_wayland.service.in @ONLY
+ecm_install_configured_files(INPUT lingmo-kwin_wayland.service.in @ONLY
             DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR})
 if (KWIN_BUILD_X11_BACKEND)
-    ecm_install_configured_files(INPUT plasma-kwin_x11.service.in @ONLY
+    ecm_install_configured_files(INPUT lingmo-kwin_x11.service.in @ONLY
                 DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR})
 endif()
 

@@ -3217,7 +3217,7 @@ static void aty_init_lcd(struct atyfb_par *par, u32 bios_base)
 			txtmonitor = "EL";
 			break;
 		case 4:
-			txtmonitor = "plasma";
+			txtmonitor = "lingmo";
 			break;
 		default:
 			txtmonitor = "unknown";

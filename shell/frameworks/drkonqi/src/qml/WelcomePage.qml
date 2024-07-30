@@ -4,11 +4,11 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
 
     title: i18nc("@title:window", "Welcome to the Reporting Assistant")
@@ -20,8 +20,8 @@ Kirigami.ScrollablePage {
             wrapMode: Text.Wrap
         }
         RowLayout {
-            Kirigami.Icon {
-                implicitWidth: Kirigami.Units.iconSizes.large
+            LingmoUI.Icon {
+                implicitWidth: LingmoUI.Units.iconSizes.large
                 implicitHeight: implicitWidth
                 source: "dialog-warning"
             }
@@ -40,7 +40,7 @@ to continue reporting this bug it is <emphasis strong='true'>required for you to
 
     footer: FooterActionBar {
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "document-sign"
                 text: i18nc("@action:button", "I Agree to be Contacted")
                 onTriggered: {

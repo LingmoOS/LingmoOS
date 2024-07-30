@@ -5,15 +5,15 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: root
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
-    property bool compact: root.width < Kirigami.Units.gridUnit * 28 || !applicationWindow().wideScreen
+    property bool compact: root.width < LingmoUI.Units.gridUnit * 28 || !applicationWindow().wideScreen
 
     Shortcut {
         sequences: [ StandardKey.MoveToNextPage ]

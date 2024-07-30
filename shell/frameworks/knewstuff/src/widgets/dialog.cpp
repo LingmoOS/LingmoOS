@@ -66,7 +66,7 @@ Dialog::Dialog(const QString &configFile, QWidget *parent)
     setMinimumSize(600, 400);
     // Keep in sync with the sizes in Dialog.qml and DialogContent.qml
     // (reminder that a default gridUnit is 18px).
-    // TODO: It would be best to use a Kirigami.ApplicationWindow and use
+    // TODO: It would be best to use a LingmoUI.ApplicationWindow and use
     // a multiple of gridUnit directly!
     resize(792, 540);
 

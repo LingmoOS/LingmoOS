@@ -18,9 +18,9 @@ ecm_qt_declare_logging_category(wayland_SRCS
 
 add_library(KSC_KWayland MODULE)
 qt6_generate_wayland_protocol_client_sources(KSC_KWayland FILES
-    ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
-    ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
-    ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-order-v1.xml
+    ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
+    ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
+    ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-order-v1.xml
 )
 
 target_sources(KSC_KWayland PRIVATE ${wayland_SRCS})

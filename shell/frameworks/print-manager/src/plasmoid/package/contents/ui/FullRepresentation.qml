@@ -8,23 +8,23 @@
 */
 
 import QtQuick
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
-import org.kde.plasma.printmanager as PrintManager
+import org.kde.lingmo.printmanager as PrintManager
 
-PlasmaExtras.Representation {
+LingmoExtras.Representation {
     collapseMarginsHint: true
 
-    header: PlasmaExtras.PlasmoidHeading {
-        PlasmaExtras.SearchField {
+    header: LingmoExtras.PlasmoidHeading {
+        LingmoExtras.SearchField {
             anchors.fill: parent
             onTextChanged: printersFilterModel.filterString = text.toLowerCase()
         }
     }
 
-    PlasmaComponents3.ScrollView {
+    LingmoComponents3.ScrollView {
         anchors.fill: parent
         contentWidth: availableWidth - contentItem.leftMargin - contentItem.rightMargin
 
@@ -34,7 +34,7 @@ PlasmaExtras.Representation {
 
             section {
                 property: printersModel.printersOnly ? "" : "isClass"
-                delegate: Kirigami.ListSectionHeader {
+                delegate: LingmoUI.ListSectionHeader {
                     width: ListView.view.width
                     required property bool section
                     label: !section ? i18n("Printers") : i18n("Printer Groups")
@@ -52,22 +52,22 @@ PlasmaExtras.Representation {
 
             }
 
-            topMargin: Kirigami.Units.smallSpacing * 2
-            bottomMargin: Kirigami.Units.smallSpacing * 2
-            leftMargin: Kirigami.Units.smallSpacing * 2
-            rightMargin: Kirigami.Units.smallSpacing * 2
-            spacing: Kirigami.Units.smallSpacing
+            topMargin: LingmoUI.Units.smallSpacing * 2
+            bottomMargin: LingmoUI.Units.smallSpacing * 2
+            leftMargin: LingmoUI.Units.smallSpacing * 2
+            rightMargin: LingmoUI.Units.smallSpacing * 2
+            spacing: LingmoUI.Units.smallSpacing
 
-            highlight: PlasmaExtras.Highlight {}
-            highlightMoveDuration: Kirigami.Units.shortDuration
-            highlightResizeDuration: Kirigami.Units.shortDuration
+            highlight: LingmoExtras.Highlight {}
+            highlightMoveDuration: LingmoUI.Units.shortDuration
+            highlightResizeDuration: LingmoUI.Units.shortDuration
             delegate: PrinterDelegate {}
 
             Loader {
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 4)
                 active: printersFilterModel.count === 0 || serverUnavailable
-                sourceComponent: PlasmaExtras.PlaceholderMessage {
+                sourceComponent: LingmoExtras.PlaceholderMessage {
                     text: serverUnavailable ? printersModelError || i18n("No printers have been configured or discovered") : i18n("No matches")
                     iconName: serverUnavailable ? "dialog-error" : "edit-none"
                 }

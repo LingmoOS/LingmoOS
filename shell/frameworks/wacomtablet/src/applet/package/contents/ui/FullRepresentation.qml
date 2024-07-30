@@ -20,10 +20,10 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.plasma.plasmoid
-import org.kde.plasma.components as PC3
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.components as PC3
 import org.kde.ksvg as KSvg
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
     function defaultValue(value, d) {
@@ -52,12 +52,12 @@ Item {
             left: parent.left
             right: parent.right
         }
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
         
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: titleIcon
             source: "input-tablet"
-            width: Kirigami.Units.iconSizes.medium
+            width: LingmoUI.Units.iconSizes.medium
             height: width
         }
         PC3.Label {
@@ -87,15 +87,15 @@ Item {
             bottom: parent.bottom
             left: parent.left
             right: parent.right
-            topMargin: Kirigami.Units.smallSpacing
-            leftMargin: Kirigami.Units.smallSpacing
+            topMargin: LingmoUI.Units.smallSpacing
+            leftMargin: LingmoUI.Units.smallSpacing
         }
         visible: !root.active
-        spacing: Kirigami.Units.smallSpacing * 2
+        spacing: LingmoUI.Units.smallSpacing * 2
         
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: errorIcon
-            width: Kirigami.Units.iconSizes.medium
+            width: LingmoUI.Units.iconSizes.medium
             height: width
             source: "dialog-warning"
         }
@@ -119,7 +119,7 @@ Item {
             left: parent.left
             right: parent.right
             top: separator.bottom
-            topMargin: Kirigami.Units.smallSpacing
+            topMargin: LingmoUI.Units.smallSpacing
         }
         visible: root.active
         columns: 2
@@ -206,7 +206,7 @@ Item {
             right: parent.right
             top: selector.bottom
             bottom: parent.bottom
-            topMargin: Kirigami.Units.smallSpacing
+            topMargin: LingmoUI.Units.smallSpacing
         }
         title: i18nc( "Groupbox Settings for the applet to change some values on the fly", "Settings" )
         GridLayout {
@@ -231,28 +231,28 @@ Item {
                     rotation: "none"
                     icon.name: "input-tablet"
                     PC3.ToolTip.text: i18nc("Either no orientation or the current screen orientation is applied to the tablet.", "Default Orientation");
-                    PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
                     PC3.ToolTip.visible: hovered
                 }
                 RotationButton {
                     rotation: "cw"
                     icon.name: "object-rotate-left"
                     PC3.ToolTip.text: i18nc("The tablet will be rotated clockwise.", "Rotate Tablet Clockwise")
-                    PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
                     PC3.ToolTip.visible: hovered
                 }
                 RotationButton {
                     rotation: "ccw"
                     icon.name: "object-rotate-right"
                     PC3.ToolTip.text: i18nc("The tablet will be rotated counterclockwise.", "Rotate Tablet Counterclockwise")
-                    PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
                     PC3.ToolTip.visible: hovered
                 }
                 RotationButton {
                     rotation: "half"
                     icon.name: "object-flip-vertical"
                     PC3.ToolTip.text: i18nc("The tablet will be rotated up side down.", "Rotate Tablet Upside-Down")
-                    PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+                    PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
                     PC3.ToolTip.visible: hovered
                 }
             }

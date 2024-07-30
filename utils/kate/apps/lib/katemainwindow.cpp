@@ -891,7 +891,7 @@ void KateMainWindow::ensureHamburgerBarSize()
             neededButtonWidth += combinedMargins.right();
 
             // The dynamic spacer is also an action leading to spacing being added.
-            // Not observable with Breeze but e.g. Fusion style has toolbar button spacing.
+            // Not observable with Ocean but e.g. Fusion style has toolbar button spacing.
             if (hamburgerBar->actions().count() > 1) {
                 neededButtonWidth += hamburgerBar->layout()->spacing();
             }

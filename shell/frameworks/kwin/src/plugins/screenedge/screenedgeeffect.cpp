@@ -48,10 +48,10 @@ void ScreenEdgeEffect::ensureGlowSvg()
 {
     if (!m_glow) {
         m_glow = new KSvg::Svg(this);
-        m_glow->imageSet()->setBasePath(QStringLiteral("plasma/desktoptheme"));
+        m_glow->imageSet()->setBasePath(QStringLiteral("lingmo/desktoptheme"));
 
         const QString groupName = QStringLiteral("Theme");
-        KSharedConfig::Ptr config = KSharedConfig::openConfig(QStringLiteral("plasmarc"));
+        KSharedConfig::Ptr config = KSharedConfig::openConfig(QStringLiteral("lingmorc"));
         KConfigGroup cg = KConfigGroup(config, groupName);
         m_glow->imageSet()->setImageSetName(cg.readEntry("name", QStringLiteral("default")));
 

@@ -27,10 +27,10 @@ set(CLIENT_LIB_SRCS
     pointer.cpp
     pointerconstraints.cpp
     pointergestures.cpp
-    plasmashell.cpp
-    plasmavirtualdesktop.cpp
-    plasmawindowmanagement.cpp
-    plasmawindowmodel.cpp
+    lingmoshell.cpp
+    lingmovirtualdesktop.cpp
+    lingmowindowmanagement.cpp
+    lingmowindowmodel.cpp
     region.cpp
     registry.cpp
     relativepointer.cpp
@@ -59,7 +59,7 @@ set(CLIENT_LIB_SRCS
 ecm_qt_declare_logging_category(CLIENT_LIB_SRCS
     HEADER logging.h
     IDENTIFIER KWAYLAND_CLIENT
-    CATEGORY_NAME kde.plasma.wayland.client
+    CATEGORY_NAME kde.lingmo.wayland.client
     OLD_CATEGORY_NAMES kwayland-client kf.wayland.client
     DEFAULT_SEVERITY Critical
     DESCRIPTION "KWayland Client Library"
@@ -67,55 +67,55 @@ ecm_qt_declare_logging_category(CLIENT_LIB_SRCS
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-shell.xml
-    BASENAME plasma-shell
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-shell.xml
+    BASENAME lingmo-shell
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-virtual-desktop.xml
-    BASENAME plasma-virtual-desktop
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-virtual-desktop.xml
+    BASENAME lingmo-virtual-desktop
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-window-management.xml
-    BASENAME plasma-window-management
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-window-management.xml
+    BASENAME lingmo-window-management
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
     BASENAME fake-input
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/shadow.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/shadow.xml
     BASENAME shadow
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/blur.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/blur.xml
     BASENAME blur
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/contrast.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/contrast.xml
     BASENAME contrast
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/slide.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/slide.xml
     BASENAME slide
 )
 
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/dpms.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/dpms.xml
     BASENAME dpms
 )
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/text-input.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/text-input.xml
     BASENAME text-input-v0
 )
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/text-input-unstable-v2.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/text-input-unstable-v2.xml
     BASENAME text-input-v2
 )
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
@@ -143,7 +143,7 @@ ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
     BASENAME idle-inhibit-unstable-v1
 )
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/appmenu.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/appmenu.xml
     BASENAME appmenu
 )
 ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
@@ -162,9 +162,9 @@ ecm_add_wayland_client_protocol(CLIENT_LIB_SRCS
 )
 
 set(CLIENT_GENERATED_FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/wayland-plasma-shell-client-protocol.h
-    ${CMAKE_CURRENT_BINARY_DIR}/wayland-plasma-shell-client-protocol.h
-    ${CMAKE_CURRENT_BINARY_DIR}/wayland-plasma-window-management-client-protocol.h
+    ${CMAKE_CURRENT_BINARY_DIR}/wayland-lingmo-shell-client-protocol.h
+    ${CMAKE_CURRENT_BINARY_DIR}/wayland-lingmo-shell-client-protocol.h
+    ${CMAKE_CURRENT_BINARY_DIR}/wayland-lingmo-window-management-client-protocol.h
     ${CMAKE_CURRENT_BINARY_DIR}/wayland-fake-input-client-protocol.h
     ${CMAKE_CURRENT_BINARY_DIR}/wayland-shadow-client-protocol.h
     ${CMAKE_CURRENT_BINARY_DIR}/wayland-blur-client-protocol.h
@@ -189,7 +189,7 @@ set_source_files_properties(${CLIENT_LIB_SRCS} PROPERTIES
     COMPILE_FLAGS -DQT_NO_KEYWORDS)
 
 add_library(KWaylandClient ${CLIENT_LIB_SRCS} surface_p.cpp)
-add_library(Plasma::KWaylandClient ALIAS KWaylandClient)
+add_library(Lingmo::KWaylandClient ALIAS KWaylandClient)
 
 ecm_generate_export_header(KWaylandClient
     BASE_NAME
@@ -247,10 +247,10 @@ set(CLIENT_LIB_HEADERS
   output.h
   pointer.h
   pointerconstraints.h
-  plasmashell.h
-  plasmavirtualdesktop.h
-  plasmawindowmanagement.h
-  plasmawindowmodel.h
+  lingmoshell.h
+  lingmovirtualdesktop.h
+  lingmowindowmanagement.h
+  lingmowindowmodel.h
   pointergestures.h
   region.h
   registry.h

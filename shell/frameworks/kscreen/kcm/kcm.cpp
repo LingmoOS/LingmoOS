@@ -431,7 +431,7 @@ void KCMKScreen::exportGlobalScale()
     // We use QT_SCREEN_SCALE_FACTORS as opposed to QT_SCALE_FACTOR as we need to use one that will
     // NOT scale fonts according to the scale.
     // Scaling the fonts makes sense if you don't also set a font DPI, but we NEED to set a font
-    // DPI for both PlasmaShell which does it's own thing, and for KDE4/GTK2 applications.
+    // DPI for both LingmoShell which does it's own thing, and for KDE4/GTK2 applications.
     QString screenFactors;
     const auto outputs = m_configHandler->config()->outputs();
     for (const auto &output : outputs) {

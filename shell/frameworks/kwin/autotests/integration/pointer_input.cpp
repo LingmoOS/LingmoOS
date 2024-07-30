@@ -122,7 +122,7 @@ void PointerInputTest::initTestCase()
 
     kwinApp()->setConfig(KSharedConfig::openConfig(QString(), KConfig::SimpleConfig));
 
-    qputenv("XCURSOR_THEME", QByteArrayLiteral("breeze_cursors"));
+    qputenv("XCURSOR_THEME", QByteArrayLiteral("ocean_cursors"));
     qputenv("XCURSOR_SIZE", QByteArrayLiteral("24"));
     qputenv("XKB_DEFAULT_RULES", "evdev");
 

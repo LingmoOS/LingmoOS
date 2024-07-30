@@ -1,1 +1,1 @@
-plasma_install_package(package org.kde.plasma.wacomtablet)
+lingmo_install_package(package org.kde.lingmo.wacomtablet)

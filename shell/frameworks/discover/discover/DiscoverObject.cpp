@@ -61,7 +61,7 @@
 #include <utils.h>
 
 #ifdef WITH_FEEDBACK
-#include "plasmauserfeedback.h"
+#include "lingmouserfeedback.h"
 #endif
 #include "PowerManagementInterface.h"
 #include "discoversettings.h"
@@ -103,8 +103,8 @@ DiscoverObject::DiscoverObject(const QVariantMap &initialProperties)
     qmlRegisterType<OdrsAppsModel>(uriApp, 1, 0, "OdrsAppsModel");
     qmlRegisterType<PowerManagementInterface>(uriApp, 1, 0, "PowerManagementInterface");
 #ifdef WITH_FEEDBACK
-    qmlRegisterSingletonType<PlasmaUserFeedback>(uriApp, 1, 0, "UserFeedbackSettings", [](QQmlEngine *, QJSEngine *) -> QObject * {
-        return new PlasmaUserFeedback(KSharedConfig::openConfig(QStringLiteral("PlasmaUserFeedback"), KConfig::NoGlobals));
+    qmlRegisterSingletonType<LingmoUserFeedback>(uriApp, 1, 0, "UserFeedbackSettings", [](QQmlEngine *, QJSEngine *) -> QObject * {
+        return new LingmoUserFeedback(KSharedConfig::openConfig(QStringLiteral("LingmoUserFeedback"), KConfig::NoGlobals));
     });
 #endif
     qmlRegisterSingletonType<DiscoverSettings>(uriApp, 1, 0, "DiscoverSettings", [](QQmlEngine *engine, QJSEngine *) -> QObject * {
@@ -458,7 +458,7 @@ bool DiscoverObject::quitWhenIdle()
 
         m_sni = new KStatusNotifierItem(this);
         m_sni->setStatus(KStatusNotifierItem::Active);
-        m_sni->setIconByName(QStringLiteral("plasmadiscover"));
+        m_sni->setIconByName(QStringLiteral("lingmodiscover"));
         m_sni->setTitle(i18n("Discover"));
         m_sni->setToolTip(QStringLiteral("process-working-symbolic"),
                           i18n("Discover"),

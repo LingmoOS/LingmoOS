@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.DelayButton {
@@ -24,18 +24,18 @@ T.DelayButton {
 
     hoverEnabled: Qt.styleHints.useHoverEffects
 
-    Kirigami.MnemonicData.enabled: enabled && visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.ActionElement
-    Kirigami.MnemonicData.label: display !== T.AbstractButton.IconOnly ? text : ""
+    LingmoUI.MnemonicData.enabled: enabled && visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.ActionElement
+    LingmoUI.MnemonicData.label: display !== T.AbstractButton.IconOnly ? text : ""
     Shortcut {
         //in case of explicit & the button manages it by itself
         enabled: !(RegExp(/\&[^\&]/).test(controlRoot.text))
-        sequence: controlRoot.Kirigami.MnemonicData.sequence
+        sequence: controlRoot.LingmoUI.MnemonicData.sequence
         onActivated: controlRoot.clicked()
     }
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
+    LingmoUI.Theme.inherit: false
 
     transition: Transition {
         NumberAnimation {
@@ -49,7 +49,7 @@ T.DelayButton {
         sunken: controlRoot.down
         on: controlRoot.checkable && controlRoot.checked
         hover: controlRoot.hovered
-        text: controlRoot.Kirigami.MnemonicData.mnemonicLabel
+        text: controlRoot.LingmoUI.MnemonicData.mnemonicLabel
         hasFocus: controlRoot.visualFocus || controlRoot.pressed
         flat: false
         minimum: 0
@@ -79,7 +79,7 @@ T.DelayButton {
 
         properties: {
             "icon": controlRoot.icon.name !== "" ? controlRoot.icon.name : controlRoot.icon.source,
-            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? Kirigami.Theme.textColor : controlRoot.icon.color,
+            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? LingmoUI.Theme.textColor : controlRoot.icon.color,
             "iconWidth": controlRoot.icon.width,
             "iconHeight": controlRoot.icon.height,
 

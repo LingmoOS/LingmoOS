@@ -72,14 +72,14 @@ add_library(powerdevilcore SHARED ${powerdevilcore_SRCS})
 set_target_properties(powerdevilcore PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 2)
 
 qt6_generate_wayland_protocol_client_sources(powerdevilcore
-    FILES ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-external-brightness-v1.xml
+    FILES ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-external-brightness-v1.xml
 )
 
 generate_export_header(powerdevilcore)
 
 # not exported, so just make the deps public
 target_link_libraries(powerdevilcore
-    Plasma::Activities
+    Lingmo::Activities
     Qt::DBus
     PW::KWorkspace
     KF6::CoreAddons
@@ -95,7 +95,7 @@ target_link_libraries(powerdevilcore
     KF6::Service
     KF6::Notifications
     KF6::XmlGui
-    KF6::KirigamiPlatform
+    KF6::LingmoUIPlatform
     XCB::DPMS
     powerdevil_log_static
     ${UDEV_LIBS}
@@ -199,5 +199,5 @@ install(TARGETS powerdevilcore ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 set(HAVE_XCB ${XCB_FOUND})
 configure_file(config-powerdevil.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-powerdevil.h )
 
-ecm_install_configured_files(INPUT plasma-powerdevil.service.in @ONLY DESTINATION
+ecm_install_configured_files(INPUT lingmo-powerdevil.service.in @ONLY DESTINATION
         ${KDE_INSTALL_SYSTEMDUSERUNITDIR})

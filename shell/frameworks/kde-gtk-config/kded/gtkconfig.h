@@ -54,7 +54,7 @@ public Q_SLOTS:
     void onKWinSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const;
     void onKCMFontsSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const;
     void onKCMInputSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const;
-    void onBreezeSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const;
+    void onOceanSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const;
 
 private:
     QScopedPointer<ConfigValueProvider> configValueProvider;
@@ -63,7 +63,7 @@ private:
     KConfigWatcher::Ptr kwinConfigWatcher;
     KConfigWatcher::Ptr kcmfontsConfigWatcher;
     KConfigWatcher::Ptr kcminputConfigWatcher;
-    KConfigWatcher::Ptr breezeConfigWatcher;
+    KConfigWatcher::Ptr oceanConfigWatcher;
     void setGtk2Theme(const QString &themeName, const bool preferDarkTheme) const;
 
     GSDXSettingsManager *m_gsdXsettingsManager = nullptr;

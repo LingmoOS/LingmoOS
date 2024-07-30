@@ -154,8 +154,8 @@ void ShakeCursorEffect::magnify(qreal magnification)
             const KXcursorTheme originalTheme = input()->pointer()->cursorTheme();
             if (m_cursorTheme.name() != originalTheme.name() || m_cursorTheme.size() != originalTheme.size() || m_cursorTheme.devicePixelRatio() != maxScale) {
                 static const QStringList embeddedCursorThemes{
-                    QStringLiteral("breeze_cursors"),
-                    QStringLiteral("Breeze_Light"),
+                    QStringLiteral("ocean_cursors"),
+                    QStringLiteral("Ocean_Light"),
                 };
 
                 QStringList searchPaths;

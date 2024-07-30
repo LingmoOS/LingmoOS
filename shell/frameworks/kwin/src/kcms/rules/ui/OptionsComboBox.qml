@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami 2.10 as Kirigami
+import org.kde.lingmoui 2.10 as LingmoUI
 import org.kde.kcms.kwinrules
 
 
@@ -66,14 +66,14 @@ QQC2.ComboBox {
                     activated(index);
                 }
             }
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 source: model.decoration
-                Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.small
+                Layout.preferredWidth: LingmoUI.Units.iconSizes.small
             }
             QQC2.Label {
                 text: model.display
-                color: highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                color: highlighted ? LingmoUI.Theme.highlightedTextColor : LingmoUI.Theme.textColor
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignLeft
             }

@@ -34,9 +34,9 @@ if (TARGET Qt6::Widgets)
     ecm_mark_as_test(dpmsTest)
 endif()
 
-add_executable(plasmasurface-test plasmasurfacetest.cpp)
-target_link_libraries(plasmasurface-test Qt6::Gui KWaylandClient)
-ecm_mark_as_test(plasmasurface-test)
+add_executable(lingmosurface-test lingmosurfacetest.cpp)
+target_link_libraries(lingmosurface-test Qt6::Gui KWaylandClient)
+ecm_mark_as_test(lingmosurface-test)
 
 add_executable(xdgforeign-test xdgforeigntest.cpp)
 target_link_libraries(xdgforeign-test Qt6::Gui KWaylandClient)

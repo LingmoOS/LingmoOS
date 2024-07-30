@@ -10,7 +10,7 @@ import QtQuick
 import QtQml
 import org.kde.qqc2desktopstyle.private as StylePrivate
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.ScrollBar {
     id: controlRoot
@@ -21,7 +21,7 @@ T.ScrollBar {
     hoverEnabled: true
 
     stepSize: 0.02
-    interactive: !Kirigami.Settings.hasTransientTouchInput
+    interactive: !LingmoUI.Settings.hasTransientTouchInput
 
     // Workaround for https://bugreports.qt.io/browse/QTBUG-106118
     Binding on visible {
@@ -64,7 +64,7 @@ T.ScrollBar {
                 id: resetAnim
                 from: handleGraphics.handleState
                 to: 0
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
                 // Same trick as in BusyIndicator. Animations using property
                 // interceptor syntax are running by default. We don't want
@@ -73,13 +73,13 @@ T.ScrollBar {
             }
 
             width: Math.round(controlRoot.vertical
-                    ? Math.max(2, Kirigami.Units.smallSpacing * handleState)
+                    ? Math.max(2, LingmoUI.Units.smallSpacing * handleState)
                     : parent.width)
             height: Math.round(controlRoot.horizontal
-                    ? Math.max(2, Kirigami.Units.smallSpacing * handleState)
+                    ? Math.max(2, LingmoUI.Units.smallSpacing * handleState)
                     : parent.height)
             radius: Math.min(width, height)
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
             opacity: 0.3
             Timer {
                 id: disappearTimer
@@ -287,7 +287,7 @@ T.ScrollBar {
             NumberAnimation {
                 targets: [style, inactiveStyle]
                 property: "opacity"
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }

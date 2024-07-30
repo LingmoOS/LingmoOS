@@ -6,7 +6,7 @@
 import QtQuick 2.15
 import QtQml 2.15
 
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 PathAnimation {
     id: root
@@ -29,7 +29,7 @@ PathAnimation {
     // we honor the "reduced animations" special case.
     // Animators with a duration of 0 do not fire reliably, which is why duration is at least 1.
     // see Bug 357532 and QTBUG-39766
-    duration: Kirigami.Units.longDuration <= 1 ? 1 : 600
+    duration: LingmoUI.Units.longDuration <= 1 ? 1 : 600
     easing.type: Easing.OutCubic
 
     path: Path {

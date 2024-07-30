@@ -413,7 +413,7 @@ static QString defaultComponentName()
 #if defined(Q_OS_ANDROID)
     return QStringLiteral("android_defaults");
 #else
-    return QStringLiteral("plasma_workspace");
+    return QStringLiteral("lingmo_workspace");
 #endif
 }
 

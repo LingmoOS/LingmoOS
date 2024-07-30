@@ -4,11 +4,11 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.Page {
+LingmoUI.Page {
     id: page
 
     Connections {
@@ -19,7 +19,7 @@ Kirigami.Page {
         function onSendReportError(msg) {
             console.log("ERRROR" + msg)
             // TODO should going back be a thing?
-            // pageStack.globalToolBar.showNavigationButtons = Kirigami.ApplicationHeaderStyle.Auto
+            // pageStack.globalToolBar.showNavigationButtons = LingmoUI.ApplicationHeaderStyle.Auto
             inlineMessage.errorContext = msg
             page.state = "error"
         }
@@ -39,7 +39,7 @@ Kirigami.Page {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             visible: page.state === "error"
             icon.name: "document-save"
             text: i18nc("@action:button", "Save Report to File")
@@ -52,17 +52,17 @@ Kirigami.Page {
         anchors.fill: parent
         visible: page.state === "error"
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: inlineMessage
 
             property string errorContext: ""
 
             Layout.fillWidth: true
             visible: true
-            type: Kirigami.MessageType.Error
+            type: LingmoUI.MessageType.Error
             text: xi18nc("@info", "Failed to submit bug report: <message>%1</message>", errorContext)
             actions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "document-send"
                     text: i18nc("@action retry submitting bug report", "Retry Submission")
                     onTriggered: {
@@ -74,10 +74,10 @@ Kirigami.Page {
         }
     }
 
-    Kirigami.PlaceholderMessage {
+    LingmoUI.PlaceholderMessage {
         visible: page.state ===  ""
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        width: parent.width - (LingmoUI.Units.largeSpacing * 4)
         text: i18nc("@info", "Submitting bug report...")
 
         QQC2.BusyIndicator {
@@ -87,7 +87,7 @@ Kirigami.Page {
 
     Component.onCompleted: {
         // Disable navigation from here on out, the report can't be changed anymore!
-        pageStack.globalToolBar.showNavigationButtons = Kirigami.ApplicationHeaderStyle.NoNavigationButtons
+        pageStack.globalToolBar.showNavigationButtons = LingmoUI.ApplicationHeaderStyle.NoNavigationButtons
 
         // Trigger relogin. If the user took a long time to prepare the login our
         // token might have gone invalid in the meantime. As a cheap way to prevent

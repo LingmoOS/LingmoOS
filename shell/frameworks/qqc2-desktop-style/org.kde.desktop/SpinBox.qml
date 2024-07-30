@@ -9,13 +9,13 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.SpinBox {
     id: controlRoot
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     implicitWidth: Math.max(styleitem.fullRectSizeHint.width,
                             implicitBackgroundWidth + leftInset + rightInset,
@@ -56,9 +56,9 @@ T.SpinBox {
         font: controlRoot.font
         palette: controlRoot.palette
         text: controlRoot.textFromValue(controlRoot.value, controlRoot.locale)
-        color: Kirigami.Theme.textColor
-        selectionColor: Kirigami.Theme.highlightColor
-        selectedTextColor: Kirigami.Theme.highlightedTextColor
+        color: LingmoUI.Theme.textColor
+        selectionColor: LingmoUI.Theme.highlightColor
+        selectedTextColor: LingmoUI.Theme.highlightedTextColor
         selectByMouse: true
         hoverEnabled: false // let hover events propagate to SpinBox
         verticalAlignment: Qt.AlignVCenter

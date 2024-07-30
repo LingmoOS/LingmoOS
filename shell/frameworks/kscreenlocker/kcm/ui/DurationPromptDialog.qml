@@ -4,13 +4,13 @@
 
     SPDX-License-Identifier: LGPL-2.1-or-later
 
-    Originating from kcm_screenlocker. Upstream any changes there until it goes into Kirigami (Addons).
+    Originating from kcm_screenlocker. Upstream any changes there until it goes into LingmoUI (Addons).
 */
 
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * A dialog that prompts the user to enter a duration.
@@ -22,7 +22,7 @@ import org.kde.kirigami as Kirigami
  * After the dialog has been accepted, the `value` property will contain the duration value entered
  * by the user. The `unit` property will contain the time unit of `value`.
  */
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: root
 
     /**
@@ -77,14 +77,14 @@ Kirigami.Dialog {
      */
     property int unit: acceptsUnits[0]
 
-    padding: Kirigami.Units.largeSpacing
-    standardButtons: Kirigami.Dialog.Ok | Kirigami.Dialog.Cancel
+    padding: LingmoUI.Units.largeSpacing
+    standardButtons: LingmoUI.Dialog.Ok | LingmoUI.Dialog.Cancel
     showCloseButton: false
 
     // FIXME: KF 6.3 and up doesn't need content.implicitWidth as part of preferredWidth, it will
     //        automatically expand to implicit content size. Remove this once we can rely on KF 6.3.
     preferredWidth: Math.max(content.implicitWidth,
-                             Kirigami.Units.gridUnit * 10, implicitHeaderWidth, implicitFooterWidth)
+                             LingmoUI.Units.gridUnit * 10, implicitHeaderWidth, implicitFooterWidth)
 
     onOpened: {
         // `focus: true` is not enough, because the OK button wants focus and gets priority.
@@ -97,20 +97,20 @@ Kirigami.Dialog {
         id: content
         anchors.centerIn: parent
 
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         QQC2.Label {
             id: labelItem
             visible: (root.label?.length ?? 0) > 0
 
-            Kirigami.MnemonicData.enabled: visible && durationValueSpinBox.enabled
-            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
-            Kirigami.MnemonicData.label: root.label ?? ""
-            text: Kirigami.MnemonicData.richTextLabel
+            LingmoUI.MnemonicData.enabled: visible && durationValueSpinBox.enabled
+            LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.FormLabel
+            LingmoUI.MnemonicData.label: root.label ?? ""
+            text: LingmoUI.MnemonicData.richTextLabel
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.SpinBox {
                 id: durationValueSpinBox
@@ -118,7 +118,7 @@ Kirigami.Dialog {
                 to: 9999
 
                 Shortcut {
-                    sequence: labelItem.Kirigami.MnemonicData.sequence
+                    sequence: labelItem.LingmoUI.MnemonicData.sequence
                     onActivated: { durationValueSpinBox.forceActiveFocus(); }
                 }
                 Keys.onReturnPressed: { root.accept(); }
@@ -162,7 +162,7 @@ Kirigami.Dialog {
 
             ColumnLayout {
                 id: unitSelectionRadios
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
                 visible: acceptsUnits.length > 1
 
                 function labelForUnit(unit) {

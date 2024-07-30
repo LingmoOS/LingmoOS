@@ -9,7 +9,7 @@ target_link_libraries(plank-player
     Qt::Qml
     Qt::QuickControls2
     Qt::Multimedia
-    KF6::Kirigami2
+    KF6::LingmoUI2
     KF6::I18n
 )
 

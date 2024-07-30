@@ -9,9 +9,9 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.ksvg 1.0 as KSvg
-import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.lingmo.components 3.0 as LingmoComponents
 import org.kde.kitemmodels as KitemModels
 
 FocusScope {
@@ -90,7 +90,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
         opacity: root.active ? 0.4 : 0
         Behavior on opacity {
             OpacityAnimator {
@@ -125,13 +125,13 @@ FocusScope {
         }
     }
 
-    PlasmaComponents.Control {
+    LingmoComponents.Control {
         z: 2
         anchors.right: parent.right
         y: root.active ? 0 : -height
         leftPadding: background.margins.left
-        topPadding: Kirigami.Units.smallSpacing
-        rightPadding: Kirigami.Units.smallSpacing
+        topPadding: LingmoUI.Units.smallSpacing
+        rightPadding: LingmoUI.Units.smallSpacing
         bottomPadding: background.margins.bottom
         opacity: root.active
         Behavior on opacity {
@@ -147,16 +147,16 @@ FocusScope {
             }
         }
         contentItem: RowLayout {
-            PlasmaComponents.Label {
+            LingmoComponents.Label {
                 text: i18nd("kwin","Padding:")
             }
-            PlasmaComponents.SpinBox {
+            LingmoComponents.SpinBox {
                 from: 0
-                to: Kirigami.Units.gridUnit * 2
+                to: LingmoUI.Units.gridUnit * 2
                 value: KWinComponents.Workspace.tilingForScreen(root.targetScreen.name).rootTile.padding
                 onValueModified: KWinComponents.Workspace.tilingForScreen(root.targetScreen.name).rootTile.padding = value
             }
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 icon.name: "document-open"
                 text: i18nd("kwin","Load Layout…")
                 onClicked: loadLayoutDialog.open()
@@ -164,7 +164,7 @@ FocusScope {
                 MouseArea {
                     anchors {
                         fill: parent
-                        margins: -Kirigami.Units.smallSpacing
+                        margins: -LingmoUI.Units.smallSpacing
                     }
                     z: -1
                     onClicked: parent.clicked()
@@ -176,18 +176,18 @@ FocusScope {
             enabledBorders: KSvg.FrameSvg.LeftBorder | KSvg.FrameSvg.BottomBorder
         }
     }
-    PlasmaComponents.Popup {
+    LingmoComponents.Popup {
         id: loadLayoutDialog
         x: Math.round(parent.width / 2 - width / 2)
         y: Math.round(parent.height / 2 - height / 2)
-        width: Math.min(root.width - Kirigami.Units.gridUnit * 4, implicitWidth)
+        width: Math.min(root.width - LingmoUI.Units.gridUnit * 4, implicitWidth)
         height: Math.round(implicitHeight * (width / implicitWidth))
 
         modal: true
         dim: true
         onOpened: forceActiveFocus()
         onClosed: root.forceActiveFocus()
-        component LayoutButton: PlasmaComponents.AbstractButton {
+        component LayoutButton: LingmoComponents.AbstractButton {
             id: button
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -266,7 +266,7 @@ FocusScope {
                     }
                 }
             }
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 Layout.alignment: Qt.AlignRight
                 text: i18nd("kwin","Close")
                 onClicked: loadLayoutDialog.close()

@@ -28,7 +28,7 @@ private Q_SLOTS:
     void testRegions();
     void testDefaultRegions();
     void testSolistaleInHolidays();
-    void testLoadFileCalendarSystemsForPlasma();
+    void testLoadFileCalendarSystemsForLingmo();
     void testDominicanRepublicDiadelaConstitucion();
     void testUsAmericanJuneteenth();
 

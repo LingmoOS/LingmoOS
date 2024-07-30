@@ -1,4 +1,4 @@
-add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.%{APPNAMELC}\")
+add_definitions(-DTRANSLATION_DOMAIN=\"lingmo_runner_org.kde.%{APPNAMELC}\")
 
 kcoreaddons_add_plugin(%{APPNAMELC} INSTALL_NAMESPACE "kf6/krunner")
 

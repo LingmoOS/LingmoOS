@@ -10,12 +10,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     property alias cfg_rangeAuto: rangeAutoCheckbox.checked
     property alias cfg_rangeFrom: rangeFromSpin.value
     property alias cfg_rangeFromUnit: rangeFromSpin.unit
@@ -30,15 +30,15 @@ Kirigami.FormLayout {
     }
     Faces.SensorRangeSpinBox {
         id: rangeFromSpin
-        Kirigami.FormData.label: i18n("From:")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("From:")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }
     Faces.SensorRangeSpinBox {
         id: rangeToSpin
-        Kirigami.FormData.label: i18n("To:")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("To:")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }

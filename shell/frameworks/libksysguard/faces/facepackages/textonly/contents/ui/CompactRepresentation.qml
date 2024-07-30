@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -30,15 +30,15 @@ Faces.CompactSensorFace {
 
     FontMetrics {
         id: defaultMetrics
-        font: Kirigami.Theme.defaultFont
+        font: LingmoUI.Theme.defaultFont
     }
 
     FontMetrics {
         id: smallMetrics
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
     }
 
-    readonly property bool useSmallFont: (horizontalFormFactor && height < defaultMetrics.lineSpacing + 2) || (verticalFormFactor && width < defaultMetrics.averageCharacterWidth * 6 + Kirigami.Units.smallSpacing)
+    readonly property bool useSmallFont: (horizontalFormFactor && height < defaultMetrics.lineSpacing + 2) || (verticalFormFactor && width < defaultMetrics.averageCharacterWidth * 6 + LingmoUI.Units.smallSpacing)
     readonly property real lineHeight: useSmallFont ? smallMetrics.lineSpacing : defaultMetrics.lineSpacing
 
     clip: true
@@ -46,7 +46,7 @@ Faces.CompactSensorFace {
     contentItem: GridLayout {
         id: layout
 
-        columnSpacing: Kirigami.Units.smallSpacing
+        columnSpacing: LingmoUI.Units.smallSpacing
         rowSpacing: 1
 
         flow: GridLayout.TopToBottom
@@ -72,7 +72,7 @@ Faces.CompactSensorFace {
 
             ChartsControls.LegendDelegate {
                 Layout.fillWidth: true
-                Layout.minimumWidth: root.horizontalFormFactor ? minimumWidth : Kirigami.Units.gridUnit
+                Layout.minimumWidth: root.horizontalFormFactor ? minimumWidth : LingmoUI.Units.gridUnit
                 Layout.preferredWidth: root.horizontalFormFactor ? preferredWidth : minimumWidth
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
@@ -81,9 +81,9 @@ Faces.CompactSensorFace {
                 value: sensor.formattedValue
                 color: root.colorSource.map[modelData]
 
-                font: root.useSmallFont ? Kirigami.Theme.smallFont : Kirigami.Theme.defaultFont
+                font: root.useSmallFont ? LingmoUI.Theme.smallFont : LingmoUI.Theme.defaultFont
 
-                maximumValueWidth: Formatter.Formatter.maximumLength(sensor.unit, root.useSmallFont ? Kirigami.Theme.smallFont : Kirigami.Theme.defaultFont)
+                maximumValueWidth: Formatter.Formatter.maximumLength(sensor.unit, root.useSmallFont ? LingmoUI.Theme.smallFont : LingmoUI.Theme.defaultFont)
 
                 ToolTip.visible: false
 

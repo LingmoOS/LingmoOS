@@ -7,14 +7,14 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs as Dialogs
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmo.printmanager as PM
 
 /*
 * PPD driver selection
 */
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: root
 
     property PM.PPDModel model
@@ -136,10 +136,10 @@ Kirigami.Dialog {
 
     onClosed: destroy(10)
 
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
     customFooterActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Save")
             enabled: !loading
             icon.name: "dialog-ok-symbolic"
@@ -191,7 +191,7 @@ Kirigami.Dialog {
     }
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
         enabled: !loading
 
         BannerWithTimer {
@@ -204,8 +204,8 @@ Kirigami.Dialog {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
-            Layout.margins: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.margins: LingmoUI.Units.smallSpacing
 
             QQC2.RadioButton {
                 id: rbMake
@@ -219,7 +219,7 @@ Kirigami.Dialog {
                 QQC2.ButtonGroup.group: buttonGroup
             }
 
-            Kirigami.SearchField {
+            LingmoUI.SearchField {
                 enabled: rbMake.checked && makesList.count > 0
                 placeholderText: i18nc("@info:placeholder", "Filter Models")
                 onAccepted: {
@@ -230,8 +230,8 @@ Kirigami.Dialog {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
-            Layout.margins: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.margins: LingmoUI.Units.smallSpacing
             enabled: rbMake.checked
 
             QQC2.ScrollView {
@@ -287,8 +287,8 @@ Kirigami.Dialog {
                         visible: loading
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
-                        implicitWidth: Kirigami.Units.gridUnit * 6
-                        implicitHeight: Kirigami.Units.gridUnit * 6
+                        implicitWidth: LingmoUI.Units.gridUnit * 6
+                        implicitHeight: LingmoUI.Units.gridUnit * 6
                     }
 
                     model: printerModels
@@ -311,8 +311,8 @@ Kirigami.Dialog {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
-            Layout.margins: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.margins: LingmoUI.Units.smallSpacing
 
             QQC2.RadioButton {
                 id: rbFile

@@ -72,8 +72,8 @@ QUrl KUrlHandler::concatDocsUrl(const QUrl &url) const
     // Special case for KCModules
     if (appName == QLatin1String("systemsettings") && path.startsWith(QLatin1String("/kcontrol"))) {
         // E.g. change "/kcontrol/fonts/index.html" to "&application=kcontrol/fonts&path=index.html"
-        // docs.kde.org will resolve the url and add the proper package name, e.g. plasma-workspace:
-        // https://docs.kde.org/stable5/en/plasma-workspace/kcontrol/fonts/index.html
+        // docs.kde.org will resolve the url and add the proper package name, e.g. lingmo-workspace:
+        // https://docs.kde.org/stable5/en/lingmo-workspace/kcontrol/fonts/index.html
         QString kcmAppName(path);
         kcmAppName.remove(0, 1); // Remove leading "/"
         const int idx = kcmAppName.indexOf(QLatin1String("/index.html"));

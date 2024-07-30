@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.BusyIndicator {
     id: control
@@ -20,7 +20,7 @@ T.BusyIndicator {
 
     // BusyIndicator doesn't need padding since it has no background.
     // A Control containing a BusyIndicator can have padding instead
-    // (e.g., a ToolBar, a Page or maybe a widget in a Plasma panel).
+    // (e.g., a ToolBar, a Page or maybe a widget in a Lingmo panel).
     padding: 0
 
     hoverEnabled: false
@@ -35,22 +35,22 @@ T.BusyIndicator {
         readonly property bool animationShouldBeRunning:
             visible
             && Window.visibility !== Window.Hidden
-            && Kirigami.Units.longDuration > 1
+            && LingmoUI.Units.longDuration > 1
 
         /* implicitWidth and implicitHeight won't work unless they come
          * from a child of the contentItem. No idea why.
          */
-        implicitWidth: Kirigami.Units.gridUnit * 2
-        implicitHeight: Kirigami.Units.gridUnit * 2
+        implicitWidth: LingmoUI.Units.gridUnit * 2
+        implicitHeight: LingmoUI.Units.gridUnit * 2
 
         // We can't bind directly to opacity, as Animator won't update its value immediately.
         visible: control.running || opacityAnimator.running
         opacity: control.running ? 1 : 0
         Behavior on opacity {
-            enabled: Kirigami.Units.shortDuration > 0
+            enabled: LingmoUI.Units.shortDuration > 0
             OpacityAnimator {
                 id: opacityAnimator
-                duration: Kirigami.Units.shortDuration
+                duration: LingmoUI.Units.shortDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -72,7 +72,7 @@ T.BusyIndicator {
             rotationAnimator.running = animationShouldBeRunning;
         }
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             /* Do not use `anchors.fill: parent` in here or else
              * the aspect ratio won't always be 1:1.
              */

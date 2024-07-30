@@ -24,7 +24,7 @@ ecm_qt_declare_logging_category(
     alpineapkbackend_SRCS  # sources_var
     HEADER alpineapk_backend_logging.h
     IDENTIFIER LOG_ALPINEAPK
-    CATEGORY_NAME org.kde.plasma.discover.alpineapk
+    CATEGORY_NAME org.kde.lingmo.discover.alpineapk
     DEFAULT_SEVERITY Debug
 )
 

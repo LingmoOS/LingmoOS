@@ -15,7 +15,7 @@
 #include "window.h"
 #include "workspace.h"
 
-#include <KWayland/Client/plasmawindowmanagement.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
 #include <KWayland/Client/surface.h>
 
 using namespace KWin;
@@ -112,22 +112,22 @@ void MinimizeAnimationTest::testMinimizeUnminimize()
     QCOMPARE(panel->frameGeometry(), panelRect);
 
     // Create the test window.
-    QSignalSpy plasmaWindowCreatedSpy(Test::waylandWindowManagement(), &KWayland::Client::PlasmaWindowManagement::windowCreated);
+    QSignalSpy lingmoWindowCreatedSpy(Test::waylandWindowManagement(), &KWayland::Client::LingmoWindowManagement::windowCreated);
     std::unique_ptr<KWayland::Client::Surface> surface(Test::createSurface());
     QVERIFY(surface != nullptr);
     std::unique_ptr<Test::XdgToplevel> shellSurface(Test::createXdgToplevelSurface(surface.get()));
     QVERIFY(shellSurface != nullptr);
     Window *window = Test::renderAndWaitForShown(surface.get(), QSize(100, 50), Qt::red);
     QVERIFY(window);
-    QVERIFY(plasmaWindowCreatedSpy.wait());
-    QCOMPARE(plasmaWindowCreatedSpy.count(), 1);
+    QVERIFY(lingmoWindowCreatedSpy.wait());
+    QCOMPARE(lingmoWindowCreatedSpy.count(), 1);
 
     // We have to set the minimized geometry because the squash effect needs it,
     // otherwise it won't start animation.
-    auto plasmaWindow = plasmaWindowCreatedSpy.last().first().value<KWayland::Client::PlasmaWindow *>();
-    QVERIFY(plasmaWindow);
+    auto lingmoWindow = lingmoWindowCreatedSpy.last().first().value<KWayland::Client::LingmoWindow *>();
+    QVERIFY(lingmoWindow);
     const QRect iconRect = QRect(0, 0, 42, 36);
-    plasmaWindow->setMinimizedGeometry(panelSurface.get(), iconRect);
+    lingmoWindow->setMinimizedGeometry(panelSurface.get(), iconRect);
     Test::flushWaylandConnection();
     QTRY_COMPARE(window->iconGeometry(), iconRect.translated(panel->frameGeometry().topLeft().toPoint()));
 

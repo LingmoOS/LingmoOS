@@ -8,8 +8,8 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KirigamiDelegates
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as LingmoUIDelegates
 import org.kde.newstuff as NewStuff
 
 /**
@@ -18,14 +18,14 @@ import org.kde.newstuff as NewStuff
  * This is used by the NewStuff.Page component
  * @since 5.63
  */
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: component
 
     property var entry
 
     // Ensure the dialog does not get too small
-    height: Math.max(Math.round(root.height - (root.height / 4)), Kirigami.Units.gridUnit  * 20)
-    width: Math.max(Math.round(root.width - (root.width / 4)), Kirigami.Units.gridUnit  * 25)
+    height: Math.max(Math.round(root.height - (root.height / 4)), LingmoUI.Units.gridUnit  * 20)
+    width: Math.max(Math.round(root.width - (root.width / 4)), LingmoUI.Units.gridUnit  * 25)
 
     property alias downloadLinks: itemsView.model
 
@@ -42,7 +42,7 @@ Kirigami.Dialog {
         headerPositioning: ListView.InlineHeader
         header: QQC2.Label {
             width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
-            padding: Kirigami.Units.largeSpacing
+            padding: LingmoUI.Units.largeSpacing
 
             text: i18nd("knewstuff6", "Please select the option you wish to install from the list of downloadable items below. If it is unclear which you should chose out of the available options, please contact the author of this item and ask that they clarify this through the naming of the items.")
             wrapMode: Text.Wrap
@@ -56,7 +56,7 @@ Kirigami.Dialog {
             icon.name: modelData.icon
             text: modelData.name
 
-            Kirigami.Theme.useAlternateBackgroundColor: true
+            LingmoUI.Theme.useAlternateBackgroundColor: true
 
             // Don't need a highlight, hover, or pressed effects
             highlighted: false
@@ -64,12 +64,12 @@ Kirigami.Dialog {
             down: false
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 // TODO: switch to just IconTitle once it exists, since we don't need
-                // the subtitle here and are only using a Kirigami delegate for the visual
+                // the subtitle here and are only using a LingmoUI delegate for the visual
                 // consistency it offers
-                Kirigami.IconTitleSubtitle {
+                LingmoUI.IconTitleSubtitle {
                     Layout.fillWidth: true
                     icon.name: delegate.icon.name
                     title: delegate.text
@@ -79,8 +79,8 @@ Kirigami.Dialog {
                 QQC2.Label {
                     text: modelData.formattedSize
                     color: delegate.highlighted
-                        ? Kirigami.Theme.highlightedTextColor
-                        : Kirigami.Theme.textColor
+                        ? LingmoUI.Theme.highlightedTextColor
+                        : LingmoUI.Theme.textColor
                 }
                 QQC2.ToolButton {
                     id: installButton

@@ -6,8 +6,8 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.9 as Kirigami
-import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.lingmoui 2.9 as LingmoUI
+import org.kde.lingmo.components 3.0 as LingmoComponents
 
 import PicoWizard 1.0
 
@@ -29,8 +29,8 @@ Module {
 
             radius: 4
             border.width: 2
-            border.color: Kirigami.Theme.backgroundColor
-            color: Qt.lighter(Kirigami.Theme.backgroundColor, 1.1)
+            border.color: LingmoUI.Theme.backgroundColor
+            color: Qt.lighter(LingmoUI.Theme.backgroundColor, 1.1)
 
             ScrollIndicator {
                 id: wifiScroll
@@ -53,7 +53,7 @@ Module {
                 ScrollIndicator.vertical: wifiScroll
 
                 delegate: Rectangle {
-                    color: Kirigami.Theme.backgroundColor
+                    color: LingmoUI.Theme.backgroundColor
                     width: parent ? parent.width : 0
                     height: 50
 
@@ -64,11 +64,11 @@ Module {
                             leftMargin: 12
                         }
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             Layout.leftMargin: 0
                             Layout.rightMargin: 4
-                            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                            Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
+                            Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
                             opacity: 0.7
                             source: wifiModule.getWifiIcon(signal)
                         }
@@ -78,7 +78,7 @@ Module {
                                 id: wifiName
                                 text: trimName(ssid)
                                 font.pointSize: 10
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
 
                                 function trimName(name) {
                                     if (name.length > 18) {
@@ -90,19 +90,19 @@ Module {
                             }
 
                             RowLayout {
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     visible: isSecured
                                     opacity: 0.7
                                     Layout.leftMargin: 0
                                     Layout.rightMargin: 0
-                                    Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                                    Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                                    Layout.preferredWidth: LingmoUI.Units.iconSizes.small
+                                    Layout.preferredHeight: LingmoUI.Units.iconSizes.small
                                     source: "object-locked"
                                 }
 
                                 Label {
                                     text: security
-                                    color: Kirigami.Theme.textColor
+                                    color: LingmoUI.Theme.textColor
                                     opacity: 0.5
                                     font.pointSize: 7
                                 }
@@ -110,9 +110,9 @@ Module {
                         }
                     }
 
-                    Kirigami.Icon {
-                        width: Kirigami.Units.iconSizes.medium
-                        height: Kirigami.Units.iconSizes.medium
+                    LingmoUI.Icon {
+                        width: LingmoUI.Units.iconSizes.medium
+                        height: LingmoUI.Units.iconSizes.medium
                         anchors {
                             right: parent.right
                             verticalCenter: parent.verticalCenter
@@ -145,8 +145,8 @@ Module {
                 visible: wifiListView.count <= 0
 
                 BusyIndicator {
-                    width: Kirigami.Units.smallMedium
-                    height: Kirigami.Units.smallMedium
+                    width: LingmoUI.Units.smallMedium
+                    height: LingmoUI.Units.smallMedium
                     Layout.alignment: Qt.AlignHCenter|Qt.AlignVCenter
 
                     opacity: 0.5
@@ -156,7 +156,7 @@ Module {
                 Label {
                     font.italic: true
                     text: qsTr("Listing Wifi Connections")
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     opacity: 0.5
                 }
             }
@@ -199,7 +199,7 @@ Module {
 
                 Label {
                     text: qsTr("Connect to %1").arg(trimName(passwordDialog.wifiName))
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     font.pointSize: 11
                     font.bold: true
                     topPadding: 8
@@ -214,7 +214,7 @@ Module {
                     }
                 }
 
-                PlasmaComponents.TextField {
+                LingmoComponents.TextField {
                     id: password
                     Layout.fillWidth: true
                     topPadding: 16
@@ -248,8 +248,8 @@ Module {
                 spacing: 12
 
                 BusyIndicator {
-                    width: Kirigami.Units.iconSizes.small
-                    height: Kirigami.Units.iconSizes.small
+                    width: LingmoUI.Units.iconSizes.small
+                    height: LingmoUI.Units.iconSizes.small
                     running: true
                     visible: true
 
@@ -258,7 +258,7 @@ Module {
 
                 Label {
                     text: qsTr("Connecting")
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     opacity: 0.5
                 }
             }

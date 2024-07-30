@@ -187,7 +187,7 @@ KTextEditor::DocumentPrivate::DocumentPrivate(const KPluginMetaData &data, bool 
     const auto &aboutData = EditorPrivate::self()->aboutData();
     setComponentName(aboutData.componentName(), aboutData.displayName());
 
-    // avoid spamming plasma and other window managers with progress dialogs
+    // avoid spamming lingmo and other window managers with progress dialogs
     // we show such stuff inline in the views!
     setProgressInfoEnabled(false);
 

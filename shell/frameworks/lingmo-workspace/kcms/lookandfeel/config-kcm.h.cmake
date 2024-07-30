@@ -1,0 +1,7 @@
+#cmakedefine HAVE_XFIXES 1
+#cmakedefine HAVE_XCURSOR 1
+#cmakedefine HAVE_OCEAN_DECO 1
+#ifdef HAVE_OCEAN_DECO
+#define OCEAN_KDECORATION_PLUGIN_ID "${OCEAN_KDECORATION_PLUGIN_ID}"
+#endif
+

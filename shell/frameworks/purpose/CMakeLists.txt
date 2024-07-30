@@ -43,7 +43,7 @@ endif()
 set(KF_VERSION "6.5.0") # handled by release scripts
 set(KF_DEP_VERSION "6.4.0") # handled by release scripts
 
-find_package(KF6 ${KF_DEP_VERSION} REQUIRED COMPONENTS CoreAddons I18n Config Kirigami Notifications KIO Service)
+find_package(KF6 ${KF_DEP_VERSION} REQUIRED COMPONENTS CoreAddons I18n Config LingmoUI Notifications KIO Service)
 
 find_package(KAccounts6)
 

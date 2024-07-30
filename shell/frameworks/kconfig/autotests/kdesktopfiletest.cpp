@@ -212,11 +212,11 @@ void KDesktopFileTest::testIsAuthorizedDesktopFile()
 
     QVERIFY(!KDesktopFile::isAuthorizedDesktopFile(fileName));
 
-    const QString autostartFile = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("autostart/plasma-desktop.desktop"));
+    const QString autostartFile = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("autostart/lingmo-desktop.desktop"));
     if (!autostartFile.isEmpty()) {
         QVERIFY(KDesktopFile::isAuthorizedDesktopFile(autostartFile));
     } else {
-        qWarning("Skipping test for plasma-desktop.desktop, not found. kde-workspace not installed?");
+        qWarning("Skipping test for lingmo-desktop.desktop, not found. kde-workspace not installed?");
     }
 }
 

@@ -7,10 +7,10 @@
 import QtQuick 
 import QtQuick.Layouts 
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCM
 import org.kde.kitemmodels as KItemModels
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmo.printmanager as PM
 
 /** Note: CUPS has nomenclature for groups of printers called a "Class".
 * For user-facing elements, we will use the term "Group".
@@ -58,11 +58,11 @@ KCM.ScrollViewKCM {
         }
     }
 
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: scpMessage
         showCloseButton: true
-        type: Kirigami.MessageType.Warning
-        position: Kirigami.InlineMessage.Position.Header
+        type: LingmoUI.MessageType.Warning
+        position: LingmoUI.InlineMessage.Position.Header
         visible: !kcm.isSCPAvailable()
         text: {
             if (PM.SCPInstaller === undefined) {
@@ -73,7 +73,7 @@ KCM.ScrollViewKCM {
         }
 
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 text: i18nc("@action:button Install printer setup helper package", "Install It")
                 icon.name: "install-symbolic"
                 visible: PM.SCPInstaller !== undefined
@@ -104,7 +104,7 @@ KCM.ScrollViewKCM {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button The thing being added is a printer", "Add…")
             Accessible.name: i18nc("@action:button", "Add Printer…")
             icon.name: "list-add-symbolic"
@@ -114,7 +114,7 @@ KCM.ScrollViewKCM {
                 dlg.open()
             }
         }
-        , Kirigami.Action {
+        , LingmoUI.Action {
             text: i18nc("@action:button", "Add Group…")
             icon.name: "folder-print-symbolic"
             visible: list.count > 1
@@ -123,7 +123,7 @@ KCM.ScrollViewKCM {
                 newPrinter(false)
             }
         }
-        , Kirigami.Action {
+        , LingmoUI.Action {
             text: i18nc("@action:button", "Configure Print Server…")
             icon.name: "configure-symbolic"
             onTriggered: {
@@ -209,7 +209,7 @@ KCM.ScrollViewKCM {
     view: ListView {
         id: list
         clip: true
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         Keys.onPressed: event => {
             if (event.key === Qt.Key_Home) {
@@ -224,9 +224,9 @@ KCM.ScrollViewKCM {
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             visible: list.count === 0
             icon.name: "printer"
             text: i18nc("@info:status", "No printers are currently set up")
@@ -237,7 +237,7 @@ KCM.ScrollViewKCM {
         // the section header
         section {
             property: pmModel.printersOnly ? "" : "isClass"
-            delegate: Kirigami.ListSectionHeader {
+            delegate: LingmoUI.ListSectionHeader {
                 width: ListView.view.width
                 required property bool section
                 label: !section ? i18n("Printers") : i18n("Printer Groups")
@@ -257,9 +257,9 @@ KCM.ScrollViewKCM {
             down: false
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
-                Kirigami.SubtitleDelegate {
+                LingmoUI.SubtitleDelegate {
                     Layout.fillWidth: true
                     text: model.info
                           + (model.location && pmModel.displayLocationHint

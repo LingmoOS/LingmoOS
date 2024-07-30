@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Spanish "INCLUDE">
+]>
+<article id="autostart" lang="&language;">
+<articleinfo>
+<title
+>Inicio automático</title>
+<authorgroup>
+<author
+>&Anne-Marie.Mahfouf;</author>
+<othercredit role="translator"
+> <firstname
+>Rocío</firstname
+> <surname
+>Gallego</surname
+> <affiliation
+><address
+><email
+>traducciones@rociogallego.com</email
+></address
+></affiliation
+> <contrib
+>Traducción</contrib
+> </othercredit
+> <othercredit role="translator"
+><firstname
+>Santiago</firstname
+><surname
+>Fernández Sancho</surname
+><affiliation
+><address
+><email
+>santi@kde-es.org</email
+></address
+></affiliation
+><contrib
+>Traducción</contrib
+></othercredit
+> 
+</authorgroup>
+
+<date
+>2021-04-05</date>
+<releaseinfo
+>&lingmo; 5.20</releaseinfo>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>Preferencias del sistema</keyword>
+<keyword
+>autostart</keyword>
+<keyword
+>archivo de escritorio</keyword>
+<keyword
+>archivo de guion</keyword>
+</keywordset>
+</articleinfo>
+
+<sect1 id="kcm_autostart">
+<title
+>Administrador de inicio automático</title>
+
+<para
+>Este módulo es una herramienta de configuración para administrar qué programas se inician con su &lingmo; personal. Le permite añadir programas o scripts de forma que se ejecuten automáticamente durante el arranque de su sesión &lingmo; y administrarlos.</para>
+
+<note
+><para
+>Tenga en cuenta que en este módulo todos los cambios se aplicarán inmediatamente.</para
+></note>
+
+<para
+>El programa busca aplicaciones y guiones de inicio de sesión en <filename
+>$HOME/.config/autostart/</filename
+>, guiones previos al arranque en <filename class="directory"
+>$HOME/.config/lingmo-workspace/env</filename
+> y guiones de cierre de sesión en <filename class="directory"
+>$HOME/.config/lingmo-workspace/shutdown</filename
+> para comprobar los programas y guiones que contienen y mostrarlos. Esto permite que pueda gestionarlos con sencillez. </para>
+
+<para
+>Los guiones de inicio de sesión son archivos <filename class="extension"
+>.desktop</filename
+> con una clave <literal
+>X-KDE-AutostartScript=true</literal
+>. Los guiones previos al inicio se ejecutan antes y se pueden usar para establecer variables de entorno. </para>
+
+<note
+><para
+>Tenga en cuenta que puede cambiar la ubicación de la carpeta <filename class="directory"
+>Autostart</filename
+> en <menuchoice
+><guimenu
+>Aplicaciones</guimenu
+> <guimenuitem
+>Lugares</guimenuitem
+></menuchoice
+> en la categoría <guilabel
+>Personalización</guilabel
+> de las &systemsettings; y establecer una carpeta distinta de <filename class="directory"
+>$HOME/.config/autostart</filename
+>.</para
+></note>
+
+<para
+>Lea también <ulink url="help:/kcontrol/kcmsmserver"
+>Sesión de escritorio</ulink
+> y <ulink url="help:/kcontrol/kded"
+>Servicios en segundo plano</ulink
+> para obtener más información sobre cómo configurar el comportamiento al iniciar su sesión de &lingmo;.</para>
+
+<para
+>Algunas aplicaciones de &kde; gestionan el comportamiento del inicio automático por su cuenta, &eg;, puede activar o desactivar el arranque automático de una aplicación en el diálogo de preferencias (&kalarm;) o bien,  tendrá que seleccionar <menuchoice
+><guimenu
+>Archivo</guimenu
+><guimenuitem
+>Salir</guimenuitem
+></menuchoice
+> (&konversation;, &kopete;), ya que si no, la aplicación aún se estará ejecutando en la bandeja del sistema y se volverá a arrancar la próxima vez que entre en el sistema. </para>
+
+<sect2 id="migration">
+<title
+>Migración desde los espacios de trabajo de &kde; 4</title>
+<para
+>Para migrar sus preferencias personales sobre el inicio automático desde los espacios de trabajo de &kde; 4:</para>
+<simplelist>
+<member
+>Copie los archivos del escritorio desde <filename class="directory"
+>$HOME/.kde/Autostart</filename
+> a <filename class="directory"
+>$HOME/.config/autostart</filename
+></member>
+<member
+>Copie los archivos de scripts previos al arranque desde <filename class="directory"
+>$HOME/.kde/Autostart</filename
+> a <filename class="directory"
+>$HOME/.config/lingmo-workspace/env</filename
+></member>
+<member
+>Copie los archivos de scripts de apagado desde <filename class="directory"
+>$HOME/.kde/Autostart</filename
+> a <filename class="directory"
+>$HOME/.config/lingmo-workspace/shutdown</filename
+></member>
+</simplelist>
+</sect2>
+
+<sect2 id="disabling_autostart">
+<title
+>Desactivar los archivos de inicio automático proporcionados por su distribución</title>
+<para
+>La forma correcta de desactivar un elemento de inicio automático (por ejemplo, la miniaplicación de la impresora si usa la impresora de vez en cuando) pasa por copiar su archivo <filename class="extension"
+>.desktop</filename
+> a su carpeta personal de inicio automático. Cualquier cosa con el mismo nombre en <filename class="directory"
+>$HOME/.config/autostart</filename
+> anula el archivo <filename class="extension"
+>.desktop</filename
+> del paquete predeterminado. Añada la siguiente línea al archivo <filename class="extension"
+>.desktop</filename
+> copiado:</para>
+<programlisting
+>Hidden=true
+</programlisting>
+</sect2>
+
+<sect2 id="current">
+<title
+>Mostrar archivos</title>
+<para
+>La parte principal del módulo muestra los programas que se cargan cuando se inicia &lingmo; y los guiones se ejecutan cuando se arranca o se apaga &lingmo;.</para>
+
+<variablelist>
+<varlistentry
+><term
+><guilabel
+>Icono</guilabel
+></term>
+<listitem>
+<para
+>Esta columna muestra el icono del programa o guion con el que desea iniciar &lingmo;. El icono se extrae del archivo de escritorio de un programa, a partir de la entrada <literal
+>Icon</literal
+>, y es el icono predeterminado de un guion. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry
+><term
+><guilabel
+>Nombre</guilabel
+></term>
+<listitem>
+<para
+>Esta columna muestra el nombre del programa o guion con el que desea iniciar &lingmo;. El nombre se extrae del archivo <filename class="extension"
+>.desktop</filename
+> de un programa, a partir de la entrada <literal
+>Name</literal
+>, y es el nombre de archivo de un guion. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry
+><term
+><guilabel
+>Propiedades</guilabel
+></term>
+<listitem>
+<para
+>Este botón solo se muestra cuando pasa el puntero del ratón sobre el elemento. El botón (solo activado para programas y guiones de inicio de sesión, es decir, archivos <filename class="extension"
+>.desktop</filename
+>) le permite cambiar las propiedades del programa o guion. Dispone de propiedades generales, propiedades de permisos, una vista previa cuando corresponda y propiedades relacionadas con la aplicación o el guion de inicio de sesión. La orden predeterminada se extrae del archivo <filename class="extension"
+>.desktop</filename
+> a partir de la entrada <literal
+>Exec</literal
+>. </para>
+<para
+>Para un guion de cierre de sesión, la orden es la ruta del guion y no se puede modificar. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry
+><term
+><guilabel
+>Eliminar</guilabel
+></term>
+<listitem>
+<para
+>Este botón solo se muestra cuando pasa el puntero del ratón sobre el elemento. Al pulsar el botón se eliminará inmediatamente el archivo de escritorio para el programa, guion o enlace simbólico en la carpeta <filename class="directory"
+>Autostart</filename
+>. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</sect2>
+
+<sect2 id="actions">
+<title
+>Acciones</title>
+<para
+>En la parte inferior tiene el botón combinado <guibutton
+>Añadir...</guibutton
+> para elegir el tipo de elemento que desea añadir. Puede añadir programas y guiones de inicio o cierre de sesión. </para>
+
+<variablelist>
+<varlistentry
+><term
+><guimenuitem
+>Añadir programa</guimenuitem
+></term>
+<listitem>
+<para
+>Al pulsar este elemento se muestra el diálogo estándar de &lingmo; para <guilabel
+>Elegir aplicación</guilabel
+>, que le permite elegir el programa que desea iniciar. Tras elegir el programa, pulse <guibutton
+>Aceptar</guibutton
+> para acceder a las propiedades del programa. </para>
+<para
+>Esto copiará el archivo <filename class="extension"
+>.desktop</filename
+> del programa en su carpeta <filename class="directory"
+>Autostart</filename
+>. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry
+><term
+><guimenuitem
+>Añadir guion de inicio de sesión...</guimenuitem
+></term>
+<listitem>
+<para
+>Este elemento abre un diálogo para solicitarle la ubicación del guion que desea añadir. Los guiones configurados para ejecutarse durante el inicio de sesión tendrán su correspondiente archivo <filename class="extension"
+>.desktop</filename
+> en su carpeta <filename class="directory"
+>Autostart</filename
+> y se ejecutarán durante el inicio de Lingmo. </para>
+</listitem>
+</varlistentry>
+<varlistentry
+><term
+><guimenuitem
+>Añadir guion de cierre de sesión...</guimenuitem
+></term>
+<listitem>
+<para
+>Este elemento abre un diálogo para solicitarle la ubicación del guion que desea añadir. Los guiones configurados para ejecutarse durante el cierre de sesión se copian o enlazan en el directorio <filename class="directory"
+>$HOME/.config/lingmo-workspace/shutdown</filename
+> y se ejecutarán automáticamente durante el apagado de &lingmo; después de que el usuario haya cerrado la sesión. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</sect2>
+</sect1>
+</article>
+
+<!--
+Local Variables:
+mode: xml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+
+vim:tabstop=2:shiftwidth=2:expandtab
+kate: space-indent on; indent-width 2; tab-width 2; indent-mode none;
+-->

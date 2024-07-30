@@ -7,9 +7,9 @@
 
 import QtQuick
 import QtQuick.Controls
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.SearchField {
+LingmoUI.SearchField {
     id: root
 
     // for appium tests

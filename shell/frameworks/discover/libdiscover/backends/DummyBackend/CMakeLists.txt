@@ -26,4 +26,4 @@ kcoreaddons_add_plugin(DummyNotifier SOURCES DummyNotifier.cpp INSTALL_NAMESPACE
 target_link_libraries(DummyNotifier
     Discover::Notifiers
 )
-set_target_properties(DummyNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/plasma-discover)
+set_target_properties(DummyNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/lingmo-discover)

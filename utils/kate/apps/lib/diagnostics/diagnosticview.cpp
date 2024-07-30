@@ -315,7 +315,7 @@ DiagnosticsView::DiagnosticsView(QWidget *parent, KTextEditor::MainWindow *mainW
     m_diagnosticsTree->setLayoutDirection(Qt::LeftToRight);
     m_diagnosticsTree->setSortingEnabled(false);
     m_diagnosticsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_diagnosticsTree->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_diagnosticsTree->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     m_diagnosticsTree->setUniformRowHeights(true);
     m_diagnosticsTree->setContextMenuPolicy(Qt::CustomContextMenu);
     m_diagnosticsTree->setItemDelegate(new DiagnosticsLocationTreeDelegate(this));

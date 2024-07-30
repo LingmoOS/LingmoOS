@@ -174,7 +174,7 @@ KateOutputView::KateOutputView(KateMainWindow *mainWindow, QWidget *parent)
     // filter line edit
     m_filterLine.setPlaceholderText(i18n("Search..."));
     m_filterLine.setClearButtonEnabled(true);
-    m_filterLine.setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
+    m_filterLine.setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
     connect(&m_filterLine, &QLineEdit::textChanged, this, [this]() {
         m_searchTimer.start();
     });

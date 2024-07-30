@@ -13,7 +13,7 @@
 class KCMultiDialogTest : public QObject
 {
     Q_OBJECT
-    const KPluginMetaData fakekcm{QStringLiteral("plasma/kcms/systemsettings_qwidgets/fakekcm")};
+    const KPluginMetaData fakekcm{QStringLiteral("lingmo/kcms/systemsettings_qwidgets/fakekcm")};
     void sleep(int ms)
     {
         QEventLoop l;

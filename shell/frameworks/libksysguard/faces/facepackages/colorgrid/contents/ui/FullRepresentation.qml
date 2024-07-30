@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -28,8 +28,8 @@ Faces.SensorFace {
     readonly property int autoColumnCount: Math.ceil(Math.sqrt(controller.highPrioritySensorIds.length))
 
     // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
-    Layout.preferredWidth: grid.preferredWidth + Kirigami.Units.largeSpacing
+    Layout.minimumWidth: LingmoUI.Units.gridUnit * 8
+    Layout.preferredWidth: grid.preferredWidth + LingmoUI.Units.largeSpacing
 
     contentItem: FaceGrid {
         id: grid

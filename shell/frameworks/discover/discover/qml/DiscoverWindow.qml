@@ -6,9 +6,9 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: window
 
     property string currentTopLevel
@@ -23,17 +23,17 @@ Kirigami.ApplicationWindow {
     objectName: "DiscoverMainWindow"
     title: leftPage?.title ?? ""
 
-    width: app.initialGeometry.width >= 10 ? app.initialGeometry.width : Kirigami.Units.gridUnit * 52
-    height: app.initialGeometry.height >= 10 ? app.initialGeometry.height : Math.max(Kirigami.Units.gridUnit * 38, window.globalDrawer.contentHeight)
+    width: app.initialGeometry.width >= 10 ? app.initialGeometry.width : LingmoUI.Units.gridUnit * 52
+    height: app.initialGeometry.height >= 10 ? app.initialGeometry.height : Math.max(LingmoUI.Units.gridUnit * 38, window.globalDrawer.contentHeight)
 
     visible: true
 
-    minimumWidth: Kirigami.Units.gridUnit * 17
-    minimumHeight: Kirigami.Units.gridUnit * 17
+    minimumWidth: LingmoUI.Units.gridUnit * 17
+    minimumHeight: LingmoUI.Units.gridUnit * 17
 
-    pageStack.defaultColumnWidth: Math.max(Kirigami.Units.gridUnit * 25, pageStack.width / 4)
-    pageStack.globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Titles : Kirigami.ApplicationHeaderStyle.Auto
-    pageStack.globalToolBar.showNavigationButtons: pageStack.currentIndex === 0 ? Kirigami.ApplicationHeaderStyle.None : Kirigami.ApplicationHeaderStyle.ShowBackButton
+    pageStack.defaultColumnWidth: Math.max(LingmoUI.Units.gridUnit * 25, pageStack.width / 4)
+    pageStack.globalToolBar.style: LingmoUI.Settings.isMobile ? LingmoUI.ApplicationHeaderStyle.Titles : LingmoUI.ApplicationHeaderStyle.Auto
+    pageStack.globalToolBar.showNavigationButtons: pageStack.currentIndex === 0 ? LingmoUI.ApplicationHeaderStyle.None : LingmoUI.ApplicationHeaderStyle.ShowBackButton
     pageStack.globalToolBar.canContainHandles: true // mobile handles in header
 
     readonly property Item leftPage: window.pageStack.depth > 0 ? window.pageStack.get(0) : null
@@ -106,7 +106,7 @@ Kirigami.ApplicationWindow {
         shortcut: StandardKey.Preferences
     }
 
-    Kirigami.Action {
+    LingmoUI.Action {
         id: refreshAction
         readonly property Discover.DiscoverAction action: Discover.ResourcesModel.updateAction
         text: action.text
@@ -116,7 +116,7 @@ Kirigami.ApplicationWindow {
         // Don't need to show this action on mobile since you can pull down
         // on the view to refresh, which is the common and expected behavior
         // on that platform - but is not possible on desktop
-        visible: !Kirigami.Settings.isMobile
+        visible: !LingmoUI.Settings.isMobile
         tooltip: shortcut.nativeText
 
         // Need to define an explicit Shortcut object so we can get its text
@@ -179,7 +179,7 @@ Kirigami.ApplicationWindow {
     Loader {
         id: footerLoader
         active: !window.wideScreen
-        sourceComponent: Kirigami.NavigationTabBar {
+        sourceComponent: LingmoUI.NavigationTabBar {
             actions: [
                 featuredAction,
                 searchAction,
@@ -195,7 +195,7 @@ Kirigami.ApplicationWindow {
 
     Component {
         id: errorPageComponent
-        Kirigami.Page {
+        LingmoUI.Page {
             id: page
             property string errorMessage: ""
             property string errorExplanation: ""
@@ -204,15 +204,15 @@ Kirigami.ApplicationWindow {
             property string buttonUrl: ""
             readonly property bool isHome: true
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 8)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 8)
                 visible: page.errorMessage !== ""
-                type: Kirigami.PlaceholderMessage.Type.Actionable // All error messages must be actionable
+                type: LingmoUI.PlaceholderMessage.Type.Actionable // All error messages must be actionable
                 icon.name: "emblem-warning"
                 text: page.errorMessage
                 explanation: page.errorExplanation
-                helpfulAction: Kirigami.Action {
+                helpfulAction: LingmoUI.Action {
                     icon.name: page.buttonIcon
                     text: page.buttonText
                     enabled: page.buttonText.length > 0 && page.buttonUrl.length > 0
@@ -227,7 +227,7 @@ Kirigami.ApplicationWindow {
 
     Component {
         id: proceedDialog
-        Kirigami.OverlaySheet {
+        LingmoUI.OverlaySheet {
             id: sheet
             showCloseButton: false
             property QtObject transaction
@@ -243,7 +243,7 @@ Kirigami.ApplicationWindow {
                     id: descriptionLabel
 
                     Layout.fillWidth: true
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                    Layout.maximumWidth: LingmoUI.Units.gridUnit * 20
 
                     textFormat: Text.StyledText
                     wrapMode: Text.WordWrap
@@ -290,7 +290,7 @@ Kirigami.ApplicationWindow {
 
     Component {
         id: distroErrorMessageDialog
-        Kirigami.OverlaySheet {
+        LingmoUI.OverlaySheet {
             id: sheet
             property alias message: messageLabel.text
 
@@ -303,7 +303,7 @@ Kirigami.ApplicationWindow {
                     id: messageLabel
 
                     Layout.fillWidth: true
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                    Layout.maximumWidth: LingmoUI.Units.gridUnit * 20
 
                     textFormat: Text.StyledText
                     wrapMode: Text.WordWrap
@@ -327,7 +327,7 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: messagesSheet
 
         property bool copyButtonEnabled: true
@@ -346,14 +346,14 @@ Kirigami.ApplicationWindow {
         ColumnLayout {
             Item {
                 Layout.fillWidth: true
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 20
+                Layout.maximumWidth: LingmoUI.Units.gridUnit * 20
             }
 
             StackLayout {
                 id: messagesSheetView
 
                 Layout.fillWidth: true
-                Layout.bottomMargin: Kirigami.Units.gridUnit
+                Layout.bottomMargin: LingmoUI.Units.gridUnit
 
                 Repeater {
                     // roles: {
@@ -475,7 +475,7 @@ Kirigami.ApplicationWindow {
         preventSleep: Discover.TransactionModel.count > 0
     }
 
-    contextDrawer: Kirigami.ContextDrawer {}
+    contextDrawer: LingmoUI.ContextDrawer {}
 
     globalDrawer: DiscoverDrawer {
         wideScreen: window.wideScreen

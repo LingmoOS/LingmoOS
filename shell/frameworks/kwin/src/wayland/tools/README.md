@@ -4,4 +4,4 @@ We have a temporary fork to deliver some crucial fixes that are affecting our co
 
 Patches should still go via upstream to Qt and be "cherry-picked" here.
 
-This folder should be dropped in Plasma 6
+This folder should be dropped in Lingmo 6

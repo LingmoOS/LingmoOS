@@ -82,12 +82,12 @@ class KQuickConfigModulePrivate;
  * import QtQuick
  * import QtQuick.Controls as QQC2
  * import org.kde.kcmutils as KCMUtils
- * import org.kde.kirigami as Kirigami
+ * import org.kde.lingmoui as LingmoUI
  *
  * Item {
  *     // implicit size will be used as initial size when loaded in kcmshell6
- *     implicitWidth: Kirigami.Units.gridUnit * 30
- *     implicitHeight: Kirigami.Units.gridUnit * 30
+ *     implicitWidth: LingmoUI.Units.gridUnit * 30
+ *     implicitHeight: LingmoUI.Units.gridUnit * 30
  *
  *     KCMUtils.ConfigModule.buttons: KCMUtils.ConfigModule.Help | KCMUtils.ConfigModule.Apply
  *
@@ -179,7 +179,7 @@ public:
 
 public Q_SLOTS:
     /**
-     * Push a new sub page in the KCM hierarchy: pages will be seen as a Kirigami PageRow
+     * Push a new sub page in the KCM hierarchy: pages will be seen as a LingmoUI PageRow
      */
     void push(const QString &fileName, const QVariantMap &initialProperties = QVariantMap());
 

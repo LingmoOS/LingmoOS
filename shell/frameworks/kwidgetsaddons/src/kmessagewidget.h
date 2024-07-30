@@ -300,7 +300,7 @@ public Q_SLOTS:
     /**
      * Set the message type to @p type.
      * By default, the message type is set to KMessageWidget::Information.
-     * Appropriate colors are chosen to mimic the appearance of Kirigami's
+     * Appropriate colors are chosen to mimic the appearance of LingmoUI's
      * InlineMessage.
      *
      * @see messageType(), KMessageWidget::MessageType

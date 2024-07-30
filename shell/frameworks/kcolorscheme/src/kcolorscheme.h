@@ -105,7 +105,7 @@ public:
          *
          * Some applications want some areas to have a different color scheme.
          * Usually dark areas over a light theme. For instance the fullscreen UI
-         * of a picture viewer, or the logout/lock screen of the plasma workspace
+         * of a picture viewer, or the logout/lock screen of the lingmo workspace
          * ask for a dark color scheme even on light themes.
          * @since 5.19
          */

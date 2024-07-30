@@ -79,7 +79,7 @@ install(EXPORT KF6FrameworkIntegrationTargets DESTINATION "${CMAKECONFIG_INSTALL
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/frameworkintegration_version.h
         DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/FrameworkIntegration COMPONENT Devel)
 
-install(FILES plasma_workspace.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR})
+install(FILES lingmo_workspace.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR})
 
 
 include(ECMFeatureSummary)

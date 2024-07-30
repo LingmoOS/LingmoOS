@@ -1,5 +1,5 @@
 #!/bin/sh
-# This helper script unlocks the Plasma5 screenlocker of the session given by argument,
+# This helper script unlocks the Lingmo5 screenlocker of the session given by argument,
 # should the locker ever crash.
 #
 # Requirements:	ConsoleKit[2] & qdbus

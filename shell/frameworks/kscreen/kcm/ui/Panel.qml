@@ -6,7 +6,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.kitemmodels 1.0
 
 import org.kde.kcmutils as KCM
@@ -19,15 +19,15 @@ ColumnLayout {
 
     signal reorder()
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         twinFormLayouts: globalSettingsLayout
         visible: kcm.multipleScreensAvailable
 
         RowLayout {
-            Kirigami.FormData.label: i18n("Device:")
+            LingmoUI.FormData.label: i18n("Device:")
 
             QQC2.ComboBox {
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 16
+                Layout.maximumWidth: LingmoUI.Units.gridUnit * 16
                 model: kcm.outputModel
                 textRole: "display"
                 Component.onCompleted: currentIndex = Qt.binding(() => root.selectedOutput);
@@ -61,18 +61,18 @@ ColumnLayout {
         }
     }
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         id: globalSettingsLayout
         Layout.fillWidth: true
 
-        Kirigami.Separator {
+        LingmoUI.Separator {
             Layout.fillWidth: true
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Kirigami.FormData.label: i18n("Global scale:")
+            LingmoUI.FormData.label: i18n("Global scale:")
 
             visible: !kcm.perOutputScaling
 
@@ -89,7 +89,7 @@ ColumnLayout {
             }
             QQC2.SpinBox {
                 id: spinbox
-                Layout.minimumWidth: Kirigami.Units.gridUnit * 6
+                Layout.minimumWidth: LingmoUI.Units.gridUnit * 6
 
                 // Because QQC2 SpinBox doesn't natively support decimal step
                 // sizes: https://bugreports.qt.io/browse/QTBUG-67349
@@ -132,8 +132,8 @@ ColumnLayout {
         RowLayout {
             visible: kcm.xwaylandClientsScaleSupported
 
-            Kirigami.FormData.label: i18n("Legacy applications (X11):")
-            spacing: Kirigami.Units.smallSpacing
+            LingmoUI.FormData.label: i18n("Legacy applications (X11):")
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.RadioButton {
                 id: x11ScalingApps
@@ -141,7 +141,7 @@ ColumnLayout {
                 checked: kcm.xwaylandClientsScale
                 QQC2.ButtonGroup.group: x11AppsScaling
             }
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: i18n("Legacy applications that support scaling will use it and look crisp, however those that don't will not be scaled at all.")
             }
         }
@@ -149,42 +149,42 @@ ColumnLayout {
         RowLayout {
             visible: kcm.xwaylandClientsScaleSupported
 
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.RadioButton {
-                Kirigami.FormData.label: i18n("Legacy applications (X11):")
+                LingmoUI.FormData.label: i18n("Legacy applications (X11):")
                 text: i18nc("The system will perform the x11 apps scaling", "Scaled by the system")
                 checked: !kcm.xwaylandClientsScale
                 QQC2.ButtonGroup.group: x11AppsScaling
             }
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: i18n("All legacy applications will be scaled by the system to the correct size, however they will always look slightly blurry.")
             }
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18nc("@label", "Screen tearing:")
+            LingmoUI.FormData.label: i18nc("@label", "Screen tearing:")
             visible: kcm.tearingSupported
             QQC2.CheckBox {
                 text: i18nc("@option:check The thing being allowed in fullscreen windows is screen tearing", "Allow in fullscreen windows")
                 checked: kcm.tearingAllowed
                 onToggled: kcm.tearingAllowed = checked
             }
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: i18nc("@info:tooltip", "Screen tearing reduces latency with most displays. Note that not all graphics drivers support this setting.")
             }
         }
 
         Item {
-            Kirigami.FormData.isSection: false
+            LingmoUI.FormData.isSection: false
             visible: kcm.xwaylandClientsScaleSupported
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: weirdScaleFactorMsg
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
             Layout.fillWidth: true
-            type: Kirigami.MessageType.Information
+            type: LingmoUI.MessageType.Information
             text: i18n("The global scale factor is limited to multiples of 6.25% to minimize visual glitches in applications using the X11 windowing system.")
             visible: false
             showCloseButton: true

@@ -17,9 +17,9 @@
 #include "idleinhibit.h"
 #include "logging.h"
 #include "output.h"
-#include "plasmashell.h"
-#include "plasmavirtualdesktop.h"
-#include "plasmawindowmanagement.h"
+#include "lingmoshell.h"
+#include "lingmovirtualdesktop.h"
+#include "lingmowindowmanagement.h"
 #include "pointerconstraints.h"
 #include "pointergestures.h"
 #include "relativepointer.h"
@@ -47,9 +47,9 @@
 #include <wayland-dpms-client-protocol.h>
 #include <wayland-fake-input-client-protocol.h>
 #include <wayland-idle-inhibit-unstable-v1-client-protocol.h>
-#include <wayland-plasma-shell-client-protocol.h>
-#include <wayland-plasma-virtual-desktop-client-protocol.h>
-#include <wayland-plasma-window-management-client-protocol.h>
+#include <wayland-lingmo-shell-client-protocol.h>
+#include <wayland-lingmo-virtual-desktop-client-protocol.h>
+#include <wayland-lingmo-window-management-client-protocol.h>
 #include <wayland-pointer-constraints-unstable-v1-client-protocol.h>
 #include <wayland-pointer-gestures-unstable-v1-client-protocol.h>
 #include <wayland-relativepointer-unstable-v1-client-protocol.h>
@@ -140,26 +140,26 @@ static const QMap<Registry::Interface, SuppertedInterfaceData> s_interfaces = {
         &Registry::subCompositorAnnounced,
         &Registry::subCompositorRemoved
     }},
-    {Registry::Interface::PlasmaShell, {
+    {Registry::Interface::LingmoShell, {
         8,
-        QByteArrayLiteral("org_kde_plasma_shell"),
-        &org_kde_plasma_shell_interface,
-        &Registry::plasmaShellAnnounced,
-        &Registry::plasmaShellRemoved
+        QByteArrayLiteral("org_kde_lingmo_shell"),
+        &org_kde_lingmo_shell_interface,
+        &Registry::lingmoShellAnnounced,
+        &Registry::lingmoShellRemoved
     }},
-    {Registry::Interface::PlasmaVirtualDesktopManagement, {
+    {Registry::Interface::LingmoVirtualDesktopManagement, {
         2,
-        QByteArrayLiteral("org_kde_plasma_virtual_desktop_management"),
-        &org_kde_plasma_virtual_desktop_management_interface,
-        &Registry::plasmaVirtualDesktopManagementAnnounced,
-        &Registry::plasmaVirtualDesktopManagementRemoved
+        QByteArrayLiteral("org_kde_lingmo_virtual_desktop_management"),
+        &org_kde_lingmo_virtual_desktop_management_interface,
+        &Registry::lingmoVirtualDesktopManagementAnnounced,
+        &Registry::lingmoVirtualDesktopManagementRemoved
     }},
-    {Registry::Interface::PlasmaWindowManagement, {
+    {Registry::Interface::LingmoWindowManagement, {
         18,
-        QByteArrayLiteral("org_kde_plasma_window_management"),
-        &org_kde_plasma_window_management_interface,
-        &Registry::plasmaWindowManagementAnnounced,
-        &Registry::plasmaWindowManagementRemoved
+        QByteArrayLiteral("org_kde_lingmo_window_management"),
+        &org_kde_lingmo_window_management_interface,
+        &Registry::lingmoWindowManagementAnnounced,
+        &Registry::lingmoWindowManagementRemoved
     }},
     {Registry::Interface::FakeInput, {
         4,
@@ -301,12 +301,12 @@ static const QMap<Registry::Interface, SuppertedInterfaceData> s_interfaces = {
         &Registry::xdgDecorationAnnounced,
         &Registry::xdgDecorationRemoved
     }},
-    {Registry::Interface::PlasmaActivationFeedback, {
+    {Registry::Interface::LingmoActivationFeedback, {
         1,
-        QByteArrayLiteral("org_kde_plasma_activation_feedback"),
-        &org_kde_plasma_activation_feedback_interface,
-        &Registry::plasmaActivationFeedbackAnnounced,
-        &Registry::plasmaActivationFeedbackRemoved
+        QByteArrayLiteral("org_kde_lingmo_activation_feedback"),
+        &org_kde_lingmo_activation_feedback_interface,
+        &Registry::lingmoActivationFeedbackAnnounced,
+        &Registry::lingmoActivationFeedbackRemoved
     }},
 };
 // clang-format on
@@ -587,10 +587,10 @@ BIND(Shell, wl_shell)
 BIND(Shm, wl_shm)
 BIND(SubCompositor, wl_subcompositor)
 BIND(DataDeviceManager, wl_data_device_manager)
-BIND(PlasmaShell, org_kde_plasma_shell)
-BIND(PlasmaActivationFeedback, org_kde_plasma_activation_feedback)
-BIND(PlasmaVirtualDesktopManagement, org_kde_plasma_virtual_desktop_management)
-BIND(PlasmaWindowManagement, org_kde_plasma_window_management)
+BIND(LingmoShell, org_kde_lingmo_shell)
+BIND(LingmoActivationFeedback, org_kde_lingmo_activation_feedback)
+BIND(LingmoVirtualDesktopManagement, org_kde_lingmo_virtual_desktop_management)
+BIND(LingmoWindowManagement, org_kde_lingmo_window_management)
 BIND(FakeInput, org_kde_kwin_fake_input)
 BIND(TextInputManagerUnstableV0, wl_text_input_manager)
 BIND(TextInputManagerUnstableV2, zwp_text_input_manager_v2)
@@ -646,10 +646,10 @@ CREATE(Shell)
 CREATE(SubCompositor)
 CREATE(Output)
 CREATE(DataDeviceManager)
-CREATE(PlasmaShell)
-CREATE(PlasmaActivationFeedback)
-CREATE(PlasmaVirtualDesktopManagement)
-CREATE(PlasmaWindowManagement)
+CREATE(LingmoShell)
+CREATE(LingmoActivationFeedback)
+CREATE(LingmoVirtualDesktopManagement)
+CREATE(LingmoWindowManagement)
 CREATE(FakeInput)
 CREATE(ShadowManager)
 CREATE(BlurManager)

@@ -1,6 +1,6 @@
 import QtQml
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.userfeedback as UserFeedback
 import org.kde.kcmutils as KCMUtils
 import org.kde.discover as Discover
@@ -10,25 +10,25 @@ UserFeedback.Provider {
     id: provider
 
     readonly property list<T.Action> actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Submit Usage Information")
             tooltip: i18n("Sends anonymized usage information to KDE so we can better understand our users. For more information see https://kde.org/privacypolicy-apps.php.")
-            displayHint: Kirigami.DisplayHint.AlwaysHide
+            displayHint: LingmoUI.DisplayHint.AlwaysHide
             onTriggered: {
                 provider.submit()
                 showPassiveNotification(i18n("Submitting usage information…"), "short", i18n("Configure"), provider.encouraged)
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Configure Feedback…")
-            displayHint: Kirigami.DisplayHint.AlwaysHide
+            displayHint: LingmoUI.DisplayHint.AlwaysHide
             onTriggered: {
                 provider.encouraged()
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Configure Updates…")
-            displayHint: Kirigami.DisplayHint.AlwaysHide
+            displayHint: LingmoUI.DisplayHint.AlwaysHide
             onTriggered: {
                 KCMUtils.KCMLauncher.openSystemSettings("kcm_updates");
             }

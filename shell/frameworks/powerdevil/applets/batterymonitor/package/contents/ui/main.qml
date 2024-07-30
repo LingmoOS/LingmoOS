@@ -14,13 +14,13 @@ import QtQuick.Layouts
 import org.kde.coreaddons as KCoreAddons
 import org.kde.kcmutils // KCMLauncher
 import org.kde.config // KAuthorized
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
-import org.kde.plasma.private.batterymonitor
-import org.kde.plasma.private.battery
+import org.kde.lingmo.private.batterymonitor
+import org.kde.lingmo.private.battery
 
 PlasmoidItem {
     id: batterymonitor
@@ -50,10 +50,10 @@ PlasmoidItem {
     readonly property bool kcmAuthorized: KAuthorized.authorizeControlModule("powerdevilprofilesconfig")
     readonly property bool kcmEnergyInformationAuthorized: KAuthorized.authorizeControlModule("kcm_energyinfo")
 
-    readonly property bool inPanel: (Plasmoid.location === PlasmaCore.Types.TopEdge
-        || Plasmoid.location === PlasmaCore.Types.RightEdge
-        || Plasmoid.location === PlasmaCore.Types.BottomEdge
-        || Plasmoid.location === PlasmaCore.Types.LeftEdge)
+    readonly property bool inPanel: (Plasmoid.location === LingmoCore.Types.TopEdge
+        || Plasmoid.location === LingmoCore.Types.RightEdge
+        || Plasmoid.location === LingmoCore.Types.BottomEdge
+        || Plasmoid.location === LingmoCore.Types.LeftEdge)
 
 
     function symbolicizeIconName(iconName) {
@@ -91,8 +91,8 @@ PlasmoidItem {
     }
 
 
-    switchWidth: Kirigami.Units.gridUnit * 10
-    switchHeight: Kirigami.Units.gridUnit * 10
+    switchWidth: LingmoUI.Units.gridUnit * 10
+    switchHeight: LingmoUI.Units.gridUnit * 10
 
     Plasmoid.title: batteryControl.hasBatteries ? i18n("Power and Battery") : i18n("Power Management")
 
@@ -102,14 +102,14 @@ PlasmoidItem {
     Plasmoid.status: {
 
         if (powerManagementControl.isManuallyInhibited || !powerProfilesControl.isInDefaultPowerProfile) {
-            return PlasmaCore.Types.ActiveStatus;
+            return LingmoCore.Types.ActiveStatus;
         }
 
         if (batteryControl.hasCumulative && batteryControl.state === BatteryControlModel.Discharging) {
-            return PlasmaCore.Types.ActiveStatus;
+            return LingmoCore.Types.ActiveStatus;
         }
 
-        return PlasmaCore.Types.PassiveStatus;
+        return LingmoCore.Types.PassiveStatus;
     }
 
     toolTipMainText: {
@@ -261,12 +261,12 @@ PlasmoidItem {
 
         readonly property var appletInterface: batterymonitor
 
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 10
-        Layout.maximumWidth: Kirigami.Units.gridUnit * 80
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+        Layout.minimumWidth: LingmoUI.Units.gridUnit * 10
+        Layout.maximumWidth: LingmoUI.Units.gridUnit * 80
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 20
 
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 10
-        Layout.maximumHeight: Kirigami.Units.gridUnit * 40
+        Layout.minimumHeight: LingmoUI.Units.gridUnit * 10
+        Layout.maximumHeight: LingmoUI.Units.gridUnit * 40
         Layout.preferredHeight: implicitHeight
 
         model: batteryControl
@@ -297,13 +297,13 @@ PlasmoidItem {
     }
 
     Plasmoid.contextualActions: [
-        PlasmaCore.Action {
+        LingmoCore.Action {
             text: i18n("&Show Energy Information…")
             icon.name: "documentinfo"
             visible: batterymonitor.kcmEnergyInformationAuthorized
             onTriggered: KCMLauncher.openInfoCenter("kcm_energyinfo")
         },
-        PlasmaCore.Action {
+        LingmoCore.Action {
             text: i18n("Show Battery Percentage on Icon When Not Fully Charged")
             icon.name: "format-number-percent"
             visible: batteryControl.hasBatteries
@@ -315,7 +315,7 @@ PlasmoidItem {
         }
     ]
 
-    PlasmaCore.Action {
+    LingmoCore.Action {
         id: configureAction
         text: i18n("&Configure Power Management…")
         icon.name: "configure"

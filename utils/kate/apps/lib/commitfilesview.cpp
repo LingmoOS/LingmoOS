@@ -370,7 +370,7 @@ CommitDiffTreeView::CommitDiffTreeView(const QString &repoBase, const QString &h
     m_tree.setEditTriggers(QTreeView::NoEditTriggers);
     m_tree.setItemDelegate(new DiffStyleDelegate(this));
     m_tree.setIndentation(10);
-    m_tree.setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_tree.setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
 
     m_tree.setContextMenuPolicy(Qt::CustomContextMenu);
     connect(&m_tree, &QTreeView::customContextMenuRequested, this, &CommitDiffTreeView::openContextMenu);

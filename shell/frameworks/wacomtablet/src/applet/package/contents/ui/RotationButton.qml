@@ -19,8 +19,8 @@
  */
 import QtQuick
 import QtQuick.Layouts
-import org.kde.plasma.plasmoid
-import org.kde.plasma.components as PC3
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.components as PC3
 
 PC3.ToolButton {
     property string rotation;

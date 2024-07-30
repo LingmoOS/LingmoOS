@@ -30,7 +30,7 @@
 #include <KNSWidgets/Button>
 #include <KPluginFactory>
 #include <KTitleWidget>
-// Plasma
+// Lingmo
 #include <KPackage/Package>
 #include <KPackage/PackageLoader>
 
@@ -118,13 +118,13 @@ static QList<KPackage::Package> availableLnFPackages()
     const QStringList dataPaths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 
     for (const QString &path : dataPaths) {
-        QDir dir(path + QLatin1String("/plasma/look-and-feel"));
+        QDir dir(path + QLatin1String("/lingmo/look-and-feel"));
         paths << dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     }
 
     const auto &p = paths;
     for (const QString &path : p) {
-        KPackage::Package pkg = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/LookAndFeel"));
+        KPackage::Package pkg = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/LookAndFeel"));
         pkg.setPath(path);
         pkg.setFallbackPackage(KPackage::Package());
         if (!pkg.filePath("defaults").isEmpty()) {

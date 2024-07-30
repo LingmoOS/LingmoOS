@@ -11,8 +11,8 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.kcm.flatpakpermissions
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.kcm.flatpakpermissions
 
 KCM.ScrollViewKCM {
     id: root
@@ -20,17 +20,17 @@ KCM.ScrollViewKCM {
     required property FlatpakReference ref
 
     title: i18n("Permissions")
-    implicitWidth: Kirigami.Units.gridUnit * 15
+    implicitWidth: LingmoUI.Units.gridUnit * 15
     framedView: false
 
-    Kirigami.PlaceholderMessage {
+    LingmoUI.PlaceholderMessage {
         text: i18n("Select an application from the list to view its permissions here")
-        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        width: parent.width - (LingmoUI.Units.largeSpacing * 4)
         anchors.centerIn: parent
         visible: ref === null
     }
 
-    Kirigami.Separator {
+    LingmoUI.Separator {
         anchors.left: parent.left
         height: parent.height
     }
@@ -39,7 +39,7 @@ KCM.ScrollViewKCM {
         id: addEnvironmentVariableDialogComponent
 
         AddEnvironmentVariableDialog {
-            parent: root.Kirigami.ColumnView.view
+            parent: root.LingmoUI.ColumnView.view
             model: permsModel
 
             onClosed: destroy()
@@ -50,7 +50,7 @@ KCM.ScrollViewKCM {
         id: textPromptDialogComponent
 
         TextPromptDialog {
-            parent: root.Kirigami.ColumnView.view
+            parent: root.LingmoUI.ColumnView.view
             model: permsModel
 
             onClosed: destroy()
@@ -72,32 +72,32 @@ KCM.ScrollViewKCM {
 
             width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 // Fallback doesn't kick in when source is an empty string/url
                 source: header.icon.toString() !== "" ? header.icon : "application-vnd.flatpak.ref"
 
                 Layout.alignment: Qt.AlignCenter
-                Layout.preferredWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.preferredWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
 
                 // RowLayout is incapable of paddings, so use margins on both child items instead.
-                Layout.margins: Kirigami.Units.largeSpacing
+                Layout.margins: LingmoUI.Units.largeSpacing
             }
             ColumnLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
                 Layout.fillWidth: true
 
-                Layout.margins: Kirigami.Units.largeSpacing
+                Layout.margins: LingmoUI.Units.largeSpacing
                 Layout.leftMargin: 0
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: header.title
                     wrapMode: Text.Wrap
                     Layout.fillWidth: true
                 }
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: header.subtitle
-                    type: Kirigami.Heading.Secondary
+                    type: LingmoUI.Heading.Secondary
                     level: 3
                     wrapMode: Text.Wrap
                     Layout.fillWidth: true
@@ -126,7 +126,7 @@ KCM.ScrollViewKCM {
 
         section.property: "section"
         section.criteria: ViewSection.FullString
-        section.delegate: Kirigami.ListSectionHeader {
+        section.delegate: LingmoUI.ListSectionHeader {
             id: sectionDelegate
 
             required property string section
@@ -148,8 +148,8 @@ KCM.ScrollViewKCM {
                 Layout.alignment: Qt.AlignRight
 
                 QQC2.ToolTip.text: text
-                QQC2.ToolTip.visible: Kirigami.Settings.tabletMode ? pressed : hovered
-                QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.visible: LingmoUI.Settings.tabletMode ? pressed : hovered
+                QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
             }
             QQC2.ToolButton {
                 text: i18n("Add New")
@@ -177,8 +177,8 @@ KCM.ScrollViewKCM {
                 Layout.alignment: Qt.AlignRight
 
                 QQC2.ToolTip.text: permsModel.sectionAddButtonToolTipTextForSectionType(sectionDelegate.sectionType)
-                QQC2.ToolTip.visible: Kirigami.Settings.tabletMode ? pressed : hovered
-                QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.visible: LingmoUI.Settings.tabletMode ? pressed : hovered
+                QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
             }
         }
 
@@ -209,7 +209,7 @@ KCM.ScrollViewKCM {
             onClicked: toggleAndUncheck()
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.CheckBox {
                     id: checkBox

@@ -4,11 +4,11 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.Page {
+LingmoUI.Page {
     id: page
 
     title: i18nc("@title", "Enter the Details about the Crash")
@@ -17,23 +17,23 @@ Kirigami.Page {
 
     ColumnLayout {
         anchors.fill: parent
-        Kirigami.Heading {
+        LingmoUI.Heading {
             level: 3
             text: i18nc("@info", "Please provide the following information in English.")
         }
 
         ColumnLayout {
             RowLayout {
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     level: 2
                     text: i18nc("@info", "Title of the bug report:")
                 }
 
-                Kirigami.ContextualHelpButton {
+                LingmoUI.ContextualHelpButton {
                     toolTipText: xi18nc("@info:tooltip examples of good bug report titles",
 `<subtitle>Examples of good titles:</subtitle>
 <list>
-<item>Plasma crashed after adding the Notes widget and writing on it</item>
+<item>Lingmo crashed after adding the Notes widget and writing on it</item>
 <item>Konqueror crashed when accessing the Facebook application 'X'</item>
 <item>Kopete closed after resuming the computer and talking to a MSN buddy</item>
 <item>Kate closed while editing a log file and pressing the Delete key a couple of times</item>
@@ -50,12 +50,12 @@ Kirigami.Page {
         }
 
         RowLayout {
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 level: 2
                 text: i18nc("@info", "Information about the crash:")
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: xi18nc("@info",
 `<subtitle>Describe in as much detail as possible the crash circumstances:</subtitle>
 <list>
@@ -98,7 +98,7 @@ Kirigami.Page {
             }
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             level: 2
             text: i18nc("@info", "Distribution method:")
         }
@@ -138,7 +138,7 @@ Kirigami.Page {
     footer: FooterActionBar {
         enabled: isComplete
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "preview"
                 text: i18nc("@action:button", "Preview Report")
                 onTriggered: pageStack.push("qrc:/ui/PreviewPage.qml")

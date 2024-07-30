@@ -16,7 +16,7 @@ MACRO(KSVG_UNIT_TESTS)
                endif()
                ecm_add_test(${_testname}.cpp
                             LINK_LIBRARIES ${libs}
-                            NAME_PREFIX "plasmasvg-")
+                            NAME_PREFIX "lingmosvg-")
                qt_add_resources(${_testname} "images"
                        FILES "data/background.svgz")
                target_include_directories(${_testname} PRIVATE )

@@ -30,10 +30,10 @@ class ServerSideDecorationManagerInterface;
 class ServerSideDecorationPaletteManagerInterface;
 class SurfaceInterface;
 class OutputInterface;
-class PlasmaShellInterface;
-class PlasmaWindowActivationFeedbackInterface;
-class PlasmaVirtualDesktopManagementInterface;
-class PlasmaWindowManagementInterface;
+class LingmoShellInterface;
+class LingmoWindowActivationFeedbackInterface;
+class LingmoVirtualDesktopManagementInterface;
+class LingmoWindowManagementInterface;
 class OutputDeviceV2Interface;
 class OutputManagementV2Interface;
 class XdgExportedSurface;
@@ -95,15 +95,15 @@ public:
     {
         return m_dataDeviceManager;
     }
-    PlasmaWindowActivationFeedbackInterface *plasmaActivationFeedback() const
+    LingmoWindowActivationFeedbackInterface *lingmoActivationFeedback() const
     {
-        return m_plasmaActivationFeedback;
+        return m_lingmoActivationFeedback;
     }
-    PlasmaVirtualDesktopManagementInterface *virtualDesktopManagement() const
+    LingmoVirtualDesktopManagementInterface *virtualDesktopManagement() const
     {
         return m_virtualDesktopManagement;
     }
-    PlasmaWindowManagementInterface *windowManagement() const
+    LingmoWindowManagementInterface *windowManagement() const
     {
         return m_windowManagement;
     }
@@ -255,10 +255,10 @@ private:
     SeatInterface *m_seat = nullptr;
     TabletManagerV2Interface *m_tabletManagerV2 = nullptr;
     DataDeviceManagerInterface *m_dataDeviceManager = nullptr;
-    PlasmaShellInterface *m_plasmaShell = nullptr;
-    PlasmaWindowActivationFeedbackInterface *m_plasmaActivationFeedback = nullptr;
-    PlasmaWindowManagementInterface *m_windowManagement = nullptr;
-    PlasmaVirtualDesktopManagementInterface *m_virtualDesktopManagement = nullptr;
+    LingmoShellInterface *m_lingmoShell = nullptr;
+    LingmoWindowActivationFeedbackInterface *m_lingmoActivationFeedback = nullptr;
+    LingmoWindowManagementInterface *m_windowManagement = nullptr;
+    LingmoVirtualDesktopManagementInterface *m_virtualDesktopManagement = nullptr;
     ServerSideDecorationManagerInterface *m_decorationManager = nullptr;
     OutputManagementV2Interface *m_outputManagement = nullptr;
     AppMenuManagerInterface *m_appMenuManager = nullptr;

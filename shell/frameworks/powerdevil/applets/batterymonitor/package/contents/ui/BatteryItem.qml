@@ -9,14 +9,14 @@ import QtQuick
 import QtQuick.Layouts
 
 import org.kde.coreaddons as KCoreAddons
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.workspace.components
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.workspace.components
+import org.kde.lingmoui as LingmoUI
 
-import org.kde.plasma.private.battery
+import org.kde.lingmo.private.battery
 
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     property int batteryPercent: 0
@@ -50,7 +50,7 @@ PlasmaComponents3.ItemDelegate {
     // margins for a progress bar, so that the row of labels on top of it
     // could visually look as if it were on the same distance from the bar as
     // they are from the slider.
-    property PlasmaComponents3.Slider matchHeightOfSlider: PlasmaComponents3.Slider {}
+    property LingmoComponents3.Slider matchHeightOfSlider: LingmoComponents3.Slider {}
     readonly property real extraMargin: Math.max(0, Math.floor((matchHeightOfSlider.height - chargeBar.height) / 2))
 
     background.visible: highlighted
@@ -61,14 +61,14 @@ PlasmaComponents3.ItemDelegate {
     Accessible.description: `${isPowerSupplyLabel.text} ${percentLabel.text}; ${details.Accessible.description}`
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.gridUnit
+        spacing: LingmoUI.Units.gridUnit
 
         BatteryIcon {
             id: batteryIcon
 
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
             
             batteryType: root.batteryType
             percent: root.batteryPercent
@@ -82,16 +82,16 @@ PlasmaComponents3.ItemDelegate {
             spacing: 0
 
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     text: root.text
                     textFormat: Text.PlainText
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: isPowerSupplyLabel
                     text: {
                         if(batteryPluggedIn) {
@@ -114,7 +114,7 @@ PlasmaComponents3.ItemDelegate {
                     enabled: false
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: percentLabel
                     horizontalAlignment: Text.AlignRight
                     visible: root.batteryPluggedIn
@@ -123,7 +123,7 @@ PlasmaComponents3.ItemDelegate {
                 }
             }
 
-            PlasmaComponents3.ProgressBar {
+            LingmoComponents3.ProgressBar {
                 id: chargeBar
 
                 Layout.fillWidth: true
@@ -143,10 +143,10 @@ PlasmaComponents3.ItemDelegate {
                 id: details
 
                 Layout.fillWidth: true
-                Layout.topMargin: Kirigami.Units.smallSpacing
+                Layout.topMargin: LingmoUI.Units.smallSpacing
 
                 columns: 2
-                columnSpacing: Kirigami.Units.smallSpacing
+                columnSpacing: LingmoUI.Units.smallSpacing
                 rowSpacing: 0
 
                 Accessible.description: {
@@ -159,25 +159,25 @@ PlasmaComponents3.ItemDelegate {
                     return description.join(" ");
                 }
 
-                component LeftLabel : PlasmaComponents3.Label {
+                component LeftLabel : LingmoComponents3.Label {
                     // fillWidth is true, so using internal alignment
                     horizontalAlignment: Text.AlignLeft
                     Layout.fillWidth: true
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     textFormat: Text.PlainText
                     wrapMode: Text.WordWrap
                     enabled: false
                 }
-                component RightLabel : PlasmaComponents3.Label {
+                component RightLabel : LingmoComponents3.Label {
                     // fillWidth is false, so using external (grid-cell-internal) alignment
                     Layout.alignment: Qt.AlignRight
                     Layout.fillWidth: false
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                     enabled: false
                     textFormat: Text.PlainText
                 }
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     Layout.fillWidth: true
                     Layout.columnSpan: 2
 
@@ -185,8 +185,8 @@ PlasmaComponents3.ItemDelegate {
                         ? i18n("This battery's health is at only %1% and it should be replaced. Contact the manufacturer.", root.batteryCapacity)
                         : ""
                     textFormat: Text.PlainText
-                    font: Kirigami.Theme.smallFont
-                    color: Kirigami.Theme.neutralTextColor
+                    font: LingmoUI.Theme.smallFont
+                    color: LingmoUI.Theme.neutralTextColor
                     visible: root.isBroken
                     wrapMode: Text.WordWrap
                 }
@@ -232,7 +232,7 @@ PlasmaComponents3.ItemDelegate {
 
             InhibitionHint {
                 Layout.fillWidth: true
-                Layout.topMargin: Kirigami.Units.smallSpacing
+                Layout.topMargin: LingmoUI.Units.smallSpacing
 
                 visible: root.pluggedIn && root.batteryIsPowerSupply && root.chargeStopThreshold > 0 && root.chargeStopThreshold < 100
                 iconSource: "kt-speed-limits" // FIXME good icon

@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * A ScrollView containing a GridView, with the default behavior about
@@ -42,8 +42,8 @@ QQC2.ScrollView {
     }
 
     activeFocusOnTab: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     Component.onCompleted: {
         if (background) {

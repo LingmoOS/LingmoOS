@@ -181,7 +181,7 @@ void PackageTool::runMain()
                     // plugin id given in command line
                     pluginName = d->package;
                 } else {
-                    // Parameter was a plasma package, get plugin id from the package
+                    // Parameter was a lingmo package, get plugin id from the package
                     pluginName = d->metadata.pluginId();
                 }
             }

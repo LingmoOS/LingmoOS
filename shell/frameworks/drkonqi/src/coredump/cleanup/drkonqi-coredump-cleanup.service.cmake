@@ -5,7 +5,7 @@
 Description=Cleanup lingering KCrash metadata
 ConditionPathExistsGlob=%C/kcrash-metadata/*.ini
 PartOf=graphical-session.target
-After=plasma-core.target
+After=lingmo-core.target
 
 [Service]
 ExecStart=@KDE_INSTALL_FULL_LIBEXECDIR@/drkonqi-coredump-cleanup %C/kcrash-metadata/

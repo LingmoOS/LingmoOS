@@ -225,7 +225,7 @@ void HolidayRegionTest::testSolistaleInHolidays()
     QCOMPARE(holidays.first().name(), QLatin1String("March Equinox"));
 }
 
-void HolidayRegionTest::testLoadFileCalendarSystemsForPlasma()
+void HolidayRegionTest::testLoadFileCalendarSystemsForLingmo()
 {
     KHolidays::HolidayRegion region(QFileInfo(KDESRCDIR "/holiday_calendar_systems"));
     printMetadata(region);

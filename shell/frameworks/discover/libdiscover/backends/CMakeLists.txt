@@ -14,7 +14,7 @@ endfunction()
 ecm_qt_declare_logging_category(libdiscover-backend-logging-category_SRCS
     HEADER libdiscover_backend_debug.h
     IDENTIFIER LIBDISCOVER_BACKEND_LOG
-    CATEGORY_NAME org.kde.plasma.libdiscover.backend
+    CATEGORY_NAME org.kde.lingmo.libdiscover.backend
     DESCRIPTION "libdiscover (backend)"
     EXPORT DISCOVER
 )

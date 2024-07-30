@@ -142,9 +142,9 @@ public:
         });
         connect(&m_interface, &OrgKdeKWinTabletModeManagerInterface::tabletModeChanged, this, [this](bool enabled) {
             Q_EMIT settingChanged(group(), KEY_ENABLED, QDBusVariant(enabled));
-            qputenv("BREEZE_IS_TABLET_MODE", enabled ? QByteArrayLiteral("1") : QByteArrayLiteral("0"));
+            qputenv("OCEAN_IS_TABLET_MODE", enabled ? QByteArrayLiteral("1") : QByteArrayLiteral("0"));
         });
-        qputenv("BREEZE_IS_TABLET_MODE", m_interface.tabletMode() ? QByteArrayLiteral("1") : QByteArrayLiteral("0"));
+        qputenv("OCEAN_IS_TABLET_MODE", m_interface.tabletMode() ? QByteArrayLiteral("1") : QByteArrayLiteral("0"));
     }
 
     inline QString group() final
@@ -396,10 +396,10 @@ private Q_SLOTS:
     {
         m_kdeglobals->reparseConfiguration();
 
-        // Mostly based on plasma-integration needs
+        // Mostly based on lingmo-integration needs
         switch (type) {
         case PaletteChanged:
-            // Plasma-integration will be loading whole palette again, there is no reason to try to identify
+            // Lingmo-integration will be loading whole palette again, there is no reason to try to identify
             // particular categories or colors
             Q_EMIT settingChanged(u"org.kde.kdeglobals.General"_s, u"ColorScheme"_s, readProperty(u"org.kde.kdeglobals.General"_s, u"ColorScheme"_s));
             break;

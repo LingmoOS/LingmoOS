@@ -16,7 +16,7 @@ namespace ScreenLocker
 {
 WallpaperIntegration::WallpaperIntegration(QQuickItem *parent)
     : QQuickItem(parent)
-    , m_package(KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Wallpaper")))
+    , m_package(KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Wallpaper")))
 {
     qRegisterMetaType<KConfigPropertyMap *>();
 }

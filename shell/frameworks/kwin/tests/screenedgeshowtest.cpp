@@ -21,7 +21,7 @@
 #include <KWindowSystem>
 
 #include <KWayland/Client/connection_thread.h>
-#include <KWayland/Client/plasmashell.h>
+#include <KWayland/Client/lingmoshell.h>
 #include <KWayland/Client/registry.h>
 #include <KWayland/Client/surface.h>
 
@@ -105,8 +105,8 @@ protected:
 
 private:
     void setupSurface();
-    KWayland::Client::PlasmaShell *m_shell = nullptr;
-    KWayland::Client::PlasmaShellSurface *m_shellSurface = nullptr;
+    KWayland::Client::LingmoShell *m_shell = nullptr;
+    KWayland::Client::LingmoShellSurface *m_shellSurface = nullptr;
     bool m_autoHide = true;
 };
 
@@ -214,11 +214,11 @@ ScreenEdgeHelperWayland::ScreenEdgeHelperWayland(QWidget *widget, QObject *paren
 
     connect(registry, &Registry::interfacesAnnounced, this,
             [registry, this] {
-                const auto interface = registry->interface(Registry::Interface::PlasmaShell);
+                const auto interface = registry->interface(Registry::Interface::LingmoShell);
                 if (interface.name == 0) {
                     return;
                 }
-                m_shell = registry->createPlasmaShell(interface.name, interface.version);
+                m_shell = registry->createLingmoShell(interface.name, interface.version);
             });
 
     registry->setup();
@@ -238,8 +238,8 @@ void ScreenEdgeHelperWayland::setupSurface()
     }
     if (auto s = Surface::fromWindow(window())) {
         m_shellSurface = m_shell->createSurface(s, window());
-        m_shellSurface->setRole(PlasmaShellSurface::Role::Panel);
-        m_shellSurface->setPanelBehavior(PlasmaShellSurface::PanelBehavior::AutoHide);
+        m_shellSurface->setRole(LingmoShellSurface::Role::Panel);
+        m_shellSurface->setPanelBehavior(LingmoShellSurface::PanelBehavior::AutoHide);
         m_shellSurface->setPosition(window()->position());
     }
 }
@@ -263,9 +263,9 @@ void ScreenEdgeHelperWayland::raiseOrShow(bool raise)
     m_autoHide = !raise;
     if (m_shellSurface) {
         if (raise) {
-            m_shellSurface->setPanelBehavior(PlasmaShellSurface::PanelBehavior::WindowsCanCover);
+            m_shellSurface->setPanelBehavior(LingmoShellSurface::PanelBehavior::WindowsCanCover);
         } else {
-            m_shellSurface->setPanelBehavior(PlasmaShellSurface::PanelBehavior::AutoHide);
+            m_shellSurface->setPanelBehavior(LingmoShellSurface::PanelBehavior::AutoHide);
         }
     }
 }

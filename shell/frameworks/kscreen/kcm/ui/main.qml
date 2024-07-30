@@ -6,8 +6,8 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.20 as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui 2.20 as LingmoUI
+import org.kde.lingmoui.delegates as KD
 import org.kde.kitemmodels 1.0
 
 import org.kde.kcmutils as KCM
@@ -19,10 +19,10 @@ KCM.SimpleKCM {
     property int selectedOutput: 0
     property int revertCountdown: 15
 
-    implicitWidth: Kirigami.Units.gridUnit * 32
-    implicitHeight: Kirigami.Units.gridUnit * 30
+    implicitWidth: LingmoUI.Units.gridUnit * 32
+    implicitHeight: LingmoUI.Units.gridUnit * 30
 
-    actions: Kirigami.Action {
+    actions: LingmoUI.Action {
         text: i18nc("@action:button Briefly show the display name in a popup label on each screen", "Identify Screens")
         icon.name: "documentinfo-symbolic"
         visible: kcm.multipleScreensAvailable
@@ -34,9 +34,9 @@ KCM.SimpleKCM {
     rightPadding: 0
 
     // This is to fix Output dragging
-    flickable.interactive: Kirigami.Settings.hasTransientTouchInput
+    flickable.interactive: LingmoUI.Settings.hasTransientTouchInput
 
-    Kirigami.PromptDialog {
+    LingmoUI.PromptDialog {
         id: confirmMsg
         title: i18n("Keep display configuration?")
         onVisibleChanged: {
@@ -141,60 +141,60 @@ KCM.SimpleKCM {
     header: ColumnLayout {
         spacing: 0
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: invalidConfigMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Error
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Error
             showCloseButton: true
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: errBackendMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Error
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Error
             text: i18n("No KScreen backend found. Please check your KScreen installation.")
             visible: false
             showCloseButton: false
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: errSaveMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Error
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Error
             text: i18n("Outputs could not be saved due to error.")
             visible: false
             showCloseButton: true
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: scaleMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Information
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Information
             text: i18n("Global scale changes will come into effect after the system is restarted.")
             visible: false
             showCloseButton: true
             actions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "system-reboot"
                     text: i18n("Restart")
                     onTriggered: kcm.requestReboot();
                 }
             ]
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: connectMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Information
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Information
             visible: false
             showCloseButton: true
         }
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: revertMsg
             Layout.fillWidth: true
-            position: Kirigami.InlineMessage.Position.Header
-            type: Kirigami.MessageType.Information
+            position: LingmoUI.InlineMessage.Position.Header
+            type: LingmoUI.MessageType.Information
             text: i18n("Display configuration reverted.")
             visible: false
             showCloseButton: true
@@ -202,19 +202,19 @@ KCM.SimpleKCM {
     }
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.Dialog {
+        LingmoUI.Dialog {
             id: reorderDialog
 
             title: i18nc("@title:window", "Change Priorities")
             showCloseButton: true
-            standardButtons: Kirigami.Dialog.Ok
+            standardButtons: LingmoUI.Dialog.Ok
 
             contentItem: ListView {
                 id: reorderView
 
-                implicitWidth: Math.min(root.width * 0.75, Kirigami.Units.gridUnit * 32)
+                implicitWidth: Math.min(root.width * 0.75, LingmoUI.Units.gridUnit * 32)
                 implicitHeight: contentHeight
 
                 reuseItems: true
@@ -226,7 +226,7 @@ KCM.SimpleKCM {
                     sortRoleName: "priority"
                     sortOrder: Qt.AscendingOrder
                 }
-                delegate: Kirigami.SwipeListItem {
+                delegate: LingmoUI.SwipeListItem {
                     id: delegate
 
                     property var output: model
@@ -239,7 +239,7 @@ KCM.SimpleKCM {
                         subtitle: (delegate.output.priority === 1) ? i18n("Primary") : ""
                     }
                     actions: [
-                        Kirigami.Action {
+                        LingmoUI.Action {
                             icon.name: "arrow-up"
                             text: i18n("Raise priority")
                             enabled: delegate.output.priority > 1
@@ -249,7 +249,7 @@ KCM.SimpleKCM {
                                 }
                             }
                         },
-                        Kirigami.Action {
+                        LingmoUI.Action {
                             icon.name: "arrow-down"
                             text: i18n("Lower priority")
                             enabled: delegate.output.priority < reorderView.count
@@ -310,11 +310,11 @@ KCM.SimpleKCM {
         }
 
         Rectangle {
-            Layout.preferredHeight: Math.max(root.height * 0.35, Kirigami.Units.gridUnit * 12)
+            Layout.preferredHeight: Math.max(root.height * 0.35, LingmoUI.Units.gridUnit * 12)
             Layout.fillWidth: true
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.View
-            color: Kirigami.Theme.backgroundColor
+            LingmoUI.Theme.inherit: false
+            LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+            color: LingmoUI.Theme.backgroundColor
 
             ScreenView {
                 id: screen
@@ -324,7 +324,7 @@ KCM.SimpleKCM {
                 outputs: kcm.outputModel
             }
 
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 anchors {
                     bottom: parent.bottom
                     left: parent.left

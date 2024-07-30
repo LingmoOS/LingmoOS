@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <Plasma/Applet>
+#include <Lingmo/Applet>
 
 #include <KScreen/Types>
 
 #include "../common/osdaction.h"
 
-class KScreenApplet : public Plasma::Applet
+class KScreenApplet : public Lingmo::Applet
 {
     Q_OBJECT
 

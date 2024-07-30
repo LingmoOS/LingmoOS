@@ -110,16 +110,16 @@ int main(int argc, char **argv)
     QSurfaceFormat::setDefaultFormat(format);
 
     QApplication app(argc, argv);
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("plasmadiscover")));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("lingmodiscover")));
     app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
     KCrash::initialize();
-    KLocalizedString::setApplicationDomain("plasma-discover");
+    KLocalizedString::setApplicationDomain("lingmo-discover");
     KAboutData about(QStringLiteral("discover"),
                      i18n("Discover"),
                      version,
                      i18n("An application explorer"),
                      KAboutLicense::GPL,
-                     i18n("© 2010-2024 Plasma Development Team"));
+                     i18n("© 2010-2024 Lingmo Development Team"));
     about.addAuthor(i18n("Aleix Pol Gonzalez"), QString(), QStringLiteral("aleixpol@kde.org"), QStringLiteral("https://proli.net"), QStringLiteral("apol"));
     about.addAuthor(i18n("Nate Graham"),
                     i18n("Quality Assurance, Design and Usability"),

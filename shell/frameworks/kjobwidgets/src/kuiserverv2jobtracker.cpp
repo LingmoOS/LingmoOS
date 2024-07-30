@@ -105,9 +105,9 @@ void KUiServerV2JobTrackerPrivate::requestView(KJob *job, const QString &desktop
     auto &view = jobViews[job];
 
     QVariantMap hints = view.currentState;
-    // Tells Plasma to show the job view right away, since the delay is always handled on our side
+    // Tells Lingmo to show the job view right away, since the delay is always handled on our side
     hints.insert(QStringLiteral("immediate"), true);
-    // Must not clear currentState as only Plasma 5.22+ will use properties from "hints",
+    // Must not clear currentState as only Lingmo 5.22+ will use properties from "hints",
     // there must still be a full update() call for earlier versions!
 
     if (job->isFinishedNotificationHidden()) {

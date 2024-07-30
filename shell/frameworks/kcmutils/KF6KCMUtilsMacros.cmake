@@ -154,7 +154,7 @@ function(kcmutils_generate_desktop_file kcm_target)
     endif()
 endfunction()
 
-# kcmutils_add_qml_kcm(target_name [SOURCES <src> [...]] [INSTALL_NAMESPACE "plasma/kcms/somesubdir"] [DISABLE_DESKTOP_FILE_GENERATION])
+# kcmutils_add_qml_kcm(target_name [SOURCES <src> [...]] [INSTALL_NAMESPACE "lingmo/kcms/somesubdir"] [DISABLE_DESKTOP_FILE_GENERATION])
 #
 # Since 6.0
 function(kcmutils_add_qml_kcm target_name)
@@ -163,7 +163,7 @@ function(kcmutils_add_qml_kcm target_name)
     set(multiValueArgs SOURCES)
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     if (NOT ARG_INSTALL_NAMESPACE)
-        set(ARG_INSTALL_NAMESPACE plasma/kcms/systemsettings)
+        set(ARG_INSTALL_NAMESPACE lingmo/kcms/systemsettings)
     endif()
 
     kcoreaddons_add_plugin(${target_name} INSTALL_NAMESPACE ${ARG_INSTALL_NAMESPACE} SOURCES ${ARG_SOURCES})

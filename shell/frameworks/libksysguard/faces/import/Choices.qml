@@ -12,7 +12,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQml.Models
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 import org.kde.ksysguard.sensors as Sensors
 
@@ -67,12 +67,12 @@ Control {
     }
 
     contentItem: Flow {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         move: Transition {
             NumberAnimation {
                 properties: "x,y"
-                duration: Kirigami.Units.shortDuration
+                duration: LingmoUI.Units.shortDuration
                 easing.type: Easing.InOutQuad
             }
         }
@@ -92,20 +92,20 @@ Control {
 
             delegate: Item {
                 id: delegate
-                implicitHeight: layout.implicitHeight + Kirigami.Units.smallSpacing * 2
-                implicitWidth: Math.min(layout.implicitWidth + Kirigami.Units.smallSpacing * 2,
+                implicitHeight: layout.implicitHeight + LingmoUI.Units.smallSpacing * 2
+                implicitWidth: Math.min(layout.implicitWidth + LingmoUI.Units.smallSpacing * 2,
                                         control.width - control.leftPadding - control.rightPadding)
                 readonly property int position: index
                 Rectangle {
                     id: delegateContents
                     z: 10
                     color: Qt.rgba(
-                                Kirigami.Theme.highlightColor.r,
-                                Kirigami.Theme.highlightColor.g,
-                                Kirigami.Theme.highlightColor.b,
+                                LingmoUI.Theme.highlightColor.r,
+                                LingmoUI.Theme.highlightColor.g,
+                                LingmoUI.Theme.highlightColor.b,
                                 0.25)
-                    radius: Kirigami.Units.smallSpacing
-                    border.color: Kirigami.Theme.highlightColor
+                    radius: LingmoUI.Units.smallSpacing
+                    border.color: LingmoUI.Theme.highlightColor
                     border.width: 1
                     opacity: (control.maxAllowedSensors <= 0 || index < control.maxAllowedSensors) ? 1 : 0.4
                     parent: drag.active ? control : delegate
@@ -166,14 +166,14 @@ Control {
                             target: delegateContents
                             from: delegateContents.x
                             to: 0
-                            duration: Kirigami.Units.shortDuration
+                            duration: LingmoUI.Units.shortDuration
                             easing.type: Easing.InOutQuad
                         }
                         YAnimator {
                             target: delegateContents
                             from: delegateContents.y
                             to: 0
-                            duration: Kirigami.Units.shortDuration
+                            duration: LingmoUI.Units.shortDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
@@ -183,7 +183,7 @@ Control {
                     Component.onCompleted: {
                         if (typeof control.colors === "undefined" ||
                             typeof control.colors[sensor.sensorId] === "undefined") {
-                            let color = Qt.hsva(Math.random(), Kirigami.Theme.highlightColor.hsvSaturation, Kirigami.Theme.highlightColor.hsvValue, 1);
+                            let color = Qt.hsva(Math.random(), LingmoUI.Theme.highlightColor.hsvSaturation, LingmoUI.Theme.highlightColor.hsvValue, 1);
                             control.colorForSensorGenerated(sensor.sensorId, color)
                         }
                     }
@@ -192,14 +192,14 @@ Control {
                         id: layout
 
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.smallSpacing
+                        anchors.margins: LingmoUI.Units.smallSpacing
 
                         ToolButton {
                             visible: control.supportsColors
-                            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                            Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
+                            Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
 
-                            padding: Kirigami.Units.smallSpacing
+                            padding: LingmoUI.Units.smallSpacing
                             flat: false
 
                             contentItem: Rectangle {
@@ -226,25 +226,25 @@ Control {
 
                                 ToolTip.text: sensor.name
                                 ToolTip.visible: handler.hovered && label.truncated
-                                ToolTip.delay: Kirigami.Units.toolTipDelay
+                                ToolTip.delay: LingmoUI.Units.toolTipDelay
                             }
                             ToolButton {
                                 id: editButton
                                 visible: control.labelsEditable
                                 icon.name: "document-edit"
-                                icon.width: Kirigami.Units.iconSizes.small
-                                icon.height: Kirigami.Units.iconSizes.small
-                                Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                                Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                                icon.width: LingmoUI.Units.iconSizes.small
+                                icon.height: LingmoUI.Units.iconSizes.small
+                                Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
+                                Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
                                 onClicked: layout.state = "editing"
                             }
                             ToolButton {
                                 id: removeButton
                                 icon.name: "edit-delete-remove"
-                                icon.width: Kirigami.Units.iconSizes.small
-                                icon.height: Kirigami.Units.iconSizes.small
-                                Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                                Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                                icon.width: LingmoUI.Units.iconSizes.small
+                                icon.height: LingmoUI.Units.iconSizes.small
+                                Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
+                                Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
 
                                 onClicked: {
                                     if (control.selected === undefined || control.selected === null) {
@@ -280,7 +280,7 @@ Control {
                                 }
                                 ToolButton {
                                     icon.name: "checkmark"
-                                    width: Kirigami.Units.iconSizes.smallMedium
+                                    width: LingmoUI.Units.iconSizes.smallMedium
                                     Layout.preferredHeight: textField.implicitHeight
                                     Layout.preferredWidth: Layout.preferredHeight
                                     onClicked: textField.accepted()
@@ -307,7 +307,7 @@ Control {
                             PropertyAnimation {
                                 target: delegate
                                 properties: "implicitWidth"
-                                duration: Kirigami.Units.shortDuration
+                                duration: LingmoUI.Units.shortDuration
                                 easing.type: Easing.InOutQuad
                             }
                         }
@@ -317,7 +317,7 @@ Control {
         }
 
         Item {
-            width: Kirigami.Units.iconSizes.smallMedium + Kirigami.Units.smallSpacing * 2
+            width: LingmoUI.Units.iconSizes.smallMedium + LingmoUI.Units.smallSpacing * 2
             height: width
             visible: control.maxAllowedSensors <= 0 || control.selected.length < control.maxAllowedSensors
         }
@@ -327,15 +327,15 @@ Control {
         id: popup
 
         // Those bindings will be immediately broken on show, but they're needed to not show the popup at a wrong position for an instant
-        y: (control.Kirigami.ScenePosition.y + control.height + height > control.Window.height)
+        y: (control.LingmoUI.ScenePosition.y + control.height + height > control.Window.height)
             ? - height
             : control.height
-        implicitHeight: Math.min(contentItem.implicitHeight + 2, Kirigami.Units.gridUnit * 20)
+        implicitHeight: Math.min(contentItem.implicitHeight + 2, LingmoUI.Units.gridUnit * 20)
         width: control.width + 2
         topMargin: 6
         bottomMargin: 6
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: false
         modal: true
         dim: false
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -343,7 +343,7 @@ Control {
         padding: 1
 
         onOpened: {
-            if (control.Kirigami.ScenePosition.y + control.height + height > control.Window.height) {
+            if (control.LingmoUI.ScenePosition.y + control.height + height > control.Window.height) {
                 y = - height;
             } else {
                 y = control.height
@@ -361,7 +361,7 @@ Control {
                 Layout.maximumHeight: implicitHeight
                 contentItem: ColumnLayout {
 
-                    Kirigami.SearchField {
+                    LingmoUI.SearchField {
                         id: searchField
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -382,7 +382,7 @@ Control {
                             display: Button.IconOnly
                             onClicked: delegateModel.rootIndex = delegateModel.parentModelIndex()
                         }
-                        Kirigami.Heading {
+                        LingmoUI.Heading {
                             level: 2
                             text: delegateModel.rootIndex.model ? delegateModel.rootIndex.model.data(delegateModel.rootIndex) : ""
                         }
@@ -419,15 +419,15 @@ Control {
 
                             text: model.display
 
-                            leftPadding: mirrored ? indicator.implicitWidth + Kirigami.Units.largeSpacing * 2 : Kirigami.Units.largeSpacing
-                            rightPadding: !mirrored ? indicator.implicitWidth + Kirigami.Units.largeSpacing * 2 : Kirigami.Units.largeSpacing
+                            leftPadding: mirrored ? indicator.implicitWidth + LingmoUI.Units.largeSpacing * 2 : LingmoUI.Units.largeSpacing
+                            rightPadding: !mirrored ? indicator.implicitWidth + LingmoUI.Units.largeSpacing * 2 : LingmoUI.Units.largeSpacing
 
-                            indicator: Kirigami.Icon {
+                            indicator: LingmoUI.Icon {
                                 anchors.right: parent.right
-                                anchors.rightMargin: Kirigami.Units.largeSpacing
+                                anchors.rightMargin: LingmoUI.Units.largeSpacing
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                width: Kirigami.Units.iconSizes.small
+                                width: LingmoUI.Units.iconSizes.small
                                 height: width
                                 source: "go-next-symbolic"
                                 opacity: model.SensorId.length == 0
@@ -480,17 +480,17 @@ Control {
                 margins: -1
             }
 
-            Kirigami.ShadowedRectangle {
+            LingmoUI.ShadowedRectangle {
                 anchors.fill: parent
                 anchors.margins: 1
 
-                Kirigami.Theme.colorSet: Kirigami.Theme.View
-                Kirigami.Theme.inherit: false
+                LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+                LingmoUI.Theme.inherit: false
 
                 radius: 2
-                color: Kirigami.Theme.backgroundColor
+                color: LingmoUI.Theme.backgroundColor
 
-                property color borderColor: Kirigami.Theme.textColor
+                property color borderColor: LingmoUI.Theme.textColor
                 border.color: Qt.rgba(borderColor.r, borderColor.g, borderColor.b, 0.3)
                 border.width: 1
 

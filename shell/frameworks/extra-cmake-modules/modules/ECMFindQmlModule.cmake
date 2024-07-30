@@ -24,10 +24,10 @@ Usage example:
 
 .. code-block:: cmake
 
-  ecm_find_qmlmodule(org.kde.kirigami 2.1)
-  ecm_find_qmlmodule(org.kde.kirigami 2.1 REQUIRED) # CMake will fail if the required version is not found
-  ecm_find_qmlmodule(org.kde.kirigami) # Find it without a given version
-  ecm_find_qmlmodule(org.kde.kirigami REQUIRED) # CMake will fail if it is not found
+  ecm_find_qmlmodule(org.kde.lingmoui 2.1)
+  ecm_find_qmlmodule(org.kde.lingmoui 2.1 REQUIRED) # CMake will fail if the required version is not found
+  ecm_find_qmlmodule(org.kde.lingmoui) # Find it without a given version
+  ecm_find_qmlmodule(org.kde.lingmoui REQUIRED) # CMake will fail if it is not found
 
 Since 5.38.0.
 #]=======================================================================]

@@ -20,9 +20,9 @@ ecm_generate_dbus_service_file(
     NAME org.kde.powerdevil.powerProfileOsdService
     EXECUTABLE ${KDE_INSTALL_FULL_LIBEXECDIR}/power_profile_osd_service
     DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR}
-    SYSTEMD_SERVICE plasma-powerprofile-osd.service
+    SYSTEMD_SERVICE lingmo-powerprofile-osd.service
 )
 
-ecm_install_configured_files(INPUT plasma-powerprofile-osd.service @ONLY
+ecm_install_configured_files(INPUT lingmo-powerprofile-osd.service @ONLY
     DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR}
 )

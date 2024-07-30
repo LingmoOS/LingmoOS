@@ -1,7 +1,7 @@
 ecm_qt_declare_logging_category(libdiscover-backend-flatpak-logging-category_SRCS
     HEADER libdiscover_backend_flatpak_debug.h
     IDENTIFIER LIBDISCOVER_BACKEND_FLATPAK_LOG
-    CATEGORY_NAME org.kde.plasma.libdiscover.backend.flatpak
+    CATEGORY_NAME org.kde.lingmo.libdiscover.backend.flatpak
     DESCRIPTION "libdiscover (backend - Flatpak)"
     EXPORT DISCOVER
 )
@@ -70,7 +70,7 @@ target_link_libraries(FlatpakNotifier
         libdiscover-backend-flatpak-logging-category
 
 )
-set_target_properties(FlatpakNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/plasma-discover)
+set_target_properties(FlatpakNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/lingmo-discover)
 
 if (Flatpak_VERSION VERSION_LESS 1.10.2)
     target_compile_definitions(flatpak-backend PRIVATE -DFLATPAK_EXTERNC_REQUIRED)

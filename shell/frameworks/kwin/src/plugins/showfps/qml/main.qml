@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami 2.18 as Kirigami
+import org.kde.lingmoui 2.18 as LingmoUI
 import org.kde.quickcharts as Charts
 import org.kde.quickcharts.controls as ChartControls
 
@@ -17,9 +17,9 @@ Rectangle {
 
     required property QtObject effect
 
-    readonly property color gridColor: Qt.rgba(Kirigami.Theme.backgroundColor.r,
-                                               Kirigami.Theme.backgroundColor.g,
-                                               Kirigami.Theme.backgroundColor.b,
+    readonly property color gridColor: Qt.rgba(LingmoUI.Theme.backgroundColor.r,
+                                               LingmoUI.Theme.backgroundColor.g,
+                                               LingmoUI.Theme.backgroundColor.b,
                                                0.25)
 
     color: Qt.rgba(1.0, 1.0, 1.0, 0.5)
@@ -34,7 +34,7 @@ Rectangle {
             Charts.BarChart {
                 id: fpsChart
 
-                Layout.preferredWidth: Kirigami.Units.gridUnit
+                Layout.preferredWidth: LingmoUI.Units.gridUnit
                 Layout.fillHeight: true
 
                 yRange.minimum: root.effect.maximumFps + 10
@@ -42,7 +42,7 @@ Rectangle {
 
                 valueSources: Charts.SingleValueSource { value: root.effect.fps }
 
-                colorSource: Charts.SingleValueSource { value: Kirigami.Theme.highlightColor }
+                colorSource: Charts.SingleValueSource { value: LingmoUI.Theme.highlightColor }
 
                 ChartControls.GridLines {
                     anchors.fill: parent
@@ -108,7 +108,7 @@ Rectangle {
                     anchors.top: parent.top
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: i18nc("@label", "Paint Duration")
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                 }
             }
 
@@ -160,7 +160,7 @@ Rectangle {
                     anchors.top: parent.top
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: i18nc("@label", "Paint Amount")
-                    font: Kirigami.Theme.smallFont
+                    font: LingmoUI.Theme.smallFont
                 }
             }
         }
@@ -174,7 +174,7 @@ Rectangle {
 
                 name: i18nc("@label", "Current FPS")
                 value: root.effect.fps
-                color: Kirigami.Theme.highlightColor
+                color: LingmoUI.Theme.highlightColor
             }
 
             ChartControls.LegendDelegate {
@@ -183,7 +183,7 @@ Rectangle {
 
                 name: i18nc("@label", "Maximum FPS")
                 value: root.effect.maximumFps
-                color: Kirigami.Theme.neutralTextColor
+                color: LingmoUI.Theme.neutralTextColor
             }
         }
 

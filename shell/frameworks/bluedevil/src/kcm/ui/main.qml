@@ -15,13 +15,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 import org.kde.kcmutils as KCMUtils
 
 import org.kde.bluezqt as BluezQt
 
-import org.kde.plasma.private.bluetooth
+import org.kde.lingmo.private.bluetooth
 
 import "script.js" as Script
 
@@ -29,7 +29,7 @@ KCMUtils.ScrollViewKCM {
     id: root
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             id: toggleBluetoothAction
             text: i18nc("@action: button as in, 'enable Bluetooth'", "Enabled")
             icon.name: "network-bluetooth-symbolic"
@@ -43,13 +43,13 @@ KCMUtils.ScrollViewKCM {
                 action: toggleBluetoothAction
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Add New Device…")
             icon.name: "list-add-symbolic"
             onTriggered: root.KCMUtils.ConfigModule.runWizard()
             visible: BluezQt.Manager.bluetoothOperational
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Configure…")
             icon.name: "configure-symbolic"
             onTriggered: root.KCMUtils.ConfigModule.push("General.qml")
@@ -87,8 +87,8 @@ KCMUtils.ScrollViewKCM {
         }
     }
 
-    implicitHeight: Kirigami.Units.gridUnit * 28
-    implicitWidth: Kirigami.Units.gridUnit * 28
+    implicitHeight: LingmoUI.Units.gridUnit * 28
+    implicitWidth: LingmoUI.Units.gridUnit * 28
 
     function toggleBluetooth(): void {
         const enable = !BluezQt.Manager.bluetoothOperational;
@@ -104,10 +104,10 @@ KCMUtils.ScrollViewKCM {
     }
 
     headerPaddingEnabled: false // Let the InlineMessage touch the edges
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: errorMessage
-        position: Kirigami.InlineMessage.Position.Header
-        type: Kirigami.MessageType.Error
+        position: LingmoUI.InlineMessage.Position.Header
+        type: LingmoUI.MessageType.Error
         showCloseButton: true
     }
 
@@ -115,7 +115,7 @@ KCMUtils.ScrollViewKCM {
         id: list
         clip: true
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             id: noBluetoothMessage
             // We cannot use the adapter count here because that can be zero when
             // bluetooth is disabled even when there are physical devices
@@ -123,19 +123,19 @@ KCMUtils.ScrollViewKCM {
             icon.name: "edit-none"
             text: i18n("No Bluetooth adapters found")
             explanation: i18n("Connect an external Bluetooth adapter")
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             anchors.centerIn: parent
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             id: bluetoothDisabledMessage
             visible: BluezQt.Manager.operational && !BluezQt.Manager.bluetoothOperational && !noBluetoothMessage.visible
             icon.name: "network-bluetooth-inactive"
             text: i18n("Bluetooth is disabled")
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             anchors.centerIn: parent
 
-            helpfulAction: Kirigami.Action {
+            helpfulAction: LingmoUI.Action {
                 icon.name: "network-bluetooth-symbolic"
                 text: i18n("Enable")
                 onTriggered: {
@@ -144,12 +144,12 @@ KCMUtils.ScrollViewKCM {
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             visible: !noBluetoothMessage.visible && !bluetoothDisabledMessage.visible && list.count === 0
             icon.name: "network-bluetooth-activated"
             text: i18n("No devices paired")
             explanation: xi18nc("@info", "Click <interface>Add New Device…</interface> to pair some")
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
             anchors.centerIn: parent
         }
 
@@ -168,7 +168,7 @@ KCMUtils.ScrollViewKCM {
         }
 
         section.property: "Section"
-        section.delegate: Kirigami.ListSectionHeader {
+        section.delegate: LingmoUI.ListSectionHeader {
             required property string section
 
             width: ListView.view.width
@@ -196,13 +196,13 @@ KCMUtils.ScrollViewKCM {
             onClicked: root.KCMUtils.ConfigModule.push("Device.qml", { device: model.Device })
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 KD.IconTitleSubtitle {
                     title: delegate.model.Name
                     subtitle: root.infoText(delegate.model.Device)
                     icon.name: delegate.model.Icon
-                    icon.width: Kirigami.Units.iconSizes.medium
+                    icon.width: LingmoUI.Units.iconSizes.medium
                     Layout.fillWidth: true
                 }
 

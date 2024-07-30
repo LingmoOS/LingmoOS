@@ -5,7 +5,7 @@
 Description=Consume pending crashes using DrKonqi
 PartOf=graphical-session.target
 Requires=drkonqi-coredump-launcher.socket
-After=plasma-core.target
+After=lingmo-core.target
 After=drkonqi-coredump-launcher.socket
 
 [Service]
@@ -13,4 +13,4 @@ ExecStart=@KDE_INSTALL_FULL_LIBEXECDIR@/drkonqi-coredump-processor --settle-firs
 RuntimeMaxSec=30 minutes
 
 [Install]
-WantedBy=plasma-core.target
+WantedBy=lingmo-core.target

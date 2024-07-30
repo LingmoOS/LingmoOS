@@ -3,7 +3,7 @@ find_package(KF6 REQUIRED Notifications)
 ecm_qt_declare_logging_category(libdiscover-backend-packagekit-logging-category_SRCS
     HEADER libdiscover_backend_packagekit_debug.h
     IDENTIFIER LIBDISCOVER_BACKEND_PACKAGEKIT_LOG
-    CATEGORY_NAME org.kde.plasma.libdiscover.backend.packagekit
+    CATEGORY_NAME org.kde.lingmo.libdiscover.backend.packagekit
     DESCRIPTION "libdiscover (backend - PackageKit)"
     EXPORT DISCOVER
 )
@@ -75,7 +75,7 @@ target_link_libraries(DiscoverPackageKitNotifier
         libdiscover-backend-packagekit-logging-category
 )
 
-set_target_properties(DiscoverPackageKitNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/plasma-discover)
+set_target_properties(DiscoverPackageKitNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/lingmo-discover)
 
 install(FILES packagekit-backend-categories.xml DESTINATION ${KDE_INSTALL_DATADIR}/libdiscover/categories)
 

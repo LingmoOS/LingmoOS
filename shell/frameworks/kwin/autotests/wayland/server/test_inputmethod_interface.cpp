@@ -417,10 +417,10 @@ void TestInputMethodInterface::testContext()
 
     // surrounding text
     QSignalSpy surroundingTextSpy(imContext, &InputMethodV1Context::surrounding_text);
-    serverContext->sendSurroundingText("Hello Plasma!", 2, 4);
+    serverContext->sendSurroundingText("Hello Lingmo!", 2, 4);
     QVERIFY(surroundingTextSpy.wait());
     QCOMPARE(surroundingTextSpy.count(), 1);
-    QCOMPARE(surroundingTextSpy.last().at(0).value<QString>(), "Hello Plasma!");
+    QCOMPARE(surroundingTextSpy.last().at(0).value<QString>(), "Hello Lingmo!");
     QCOMPARE(surroundingTextSpy.last().at(1).value<quint32>(), 2);
     QCOMPARE(surroundingTextSpy.last().at(2).value<quint32>(), 4);
 

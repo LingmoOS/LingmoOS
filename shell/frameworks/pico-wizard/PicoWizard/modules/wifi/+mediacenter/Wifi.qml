@@ -6,8 +6,8 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.9 as Kirigami
-import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.lingmoui 2.9 as LingmoUI
+import org.kde.lingmo.components 3.0 as LingmoComponents
 
 import PicoWizard 1.0
 
@@ -43,14 +43,14 @@ ModuleMediaCenter {
 
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignHCenter
 
                 Rectangle {
-                    color: Kirigami.Theme.highlightColor
+                    color: LingmoUI.Theme.highlightColor
                     radius: 4
-                    width: Kirigami.Units.gridUnit * 6
-                    height: Kirigami.Units.gridUnit * 1
+                    width: LingmoUI.Units.gridUnit * 6
+                    height: LingmoUI.Units.gridUnit * 1
                     anchors.top: parent.top
                     x: infoRectContent.x
                     y: -2
@@ -66,40 +66,40 @@ ModuleMediaCenter {
                         fontSizeMode: Text.Fit
                         wrapMode: Text.WordWrap
                         text: qsTr("Setting Up Your WiFi")
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                     }
                 }
 
                 Rectangle {
                     id: infoRectContent
-                    color: Kirigami.Theme.backgroundColor
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 4
                     width: parent.width
-                    height: Kirigami.Units.gridUnit * 5
+                    height: LingmoUI.Units.gridUnit * 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: Kirigami.Units.smallSpacing
+                    anchors.bottomMargin: LingmoUI.Units.smallSpacing
                     z: 1
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
 
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: wifiModule.dir() + "/assets/remote-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -117,11 +117,11 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: switchTextByFocus()[0]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
 
-                        Kirigami.Separator {
+                        LingmoUI.Separator {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 1
                         }
@@ -131,16 +131,16 @@ ModuleMediaCenter {
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: wifiModule.dir() + "/assets/keyboard-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -158,7 +158,7 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: switchTextByFocus()[1]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
                     }
@@ -173,8 +173,8 @@ ModuleMediaCenter {
 
                 radius: 4
                 border.width: wifiContainer.activeFocus ? 3 : 1
-                border.color: wifiContainer.activeFocus ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.5)
-                color: Kirigami.Theme.backgroundColor
+                border.color: wifiContainer.activeFocus ? LingmoUI.Theme.highlightColor : Qt.lighter(LingmoUI.Theme.backgroundColor, 1.5)
+                color: LingmoUI.Theme.backgroundColor
 
                 KeyNavigation.down: skipButton
                 Keys.onReturnPressed: {
@@ -187,7 +187,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                Kirigami.CardsListView {
+                LingmoUI.CardsListView {
                     id: wifiListView
                     objectName: "wifiListView"
                     anchors.fill: parent
@@ -208,7 +208,7 @@ ModuleMediaCenter {
                         }
                     }
 
-                    delegate: Kirigami.AbstractCard {
+                    delegate: LingmoUI.AbstractCard {
                         width: parent ? parent.width : 0
                         height: 60
                         showClickFeedback: true
@@ -216,7 +216,7 @@ ModuleMediaCenter {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: wifiListView.currentIndex == index ? Kirigami.Theme.highlightColor : "transparent"
+                            color: wifiListView.currentIndex == index ? LingmoUI.Theme.highlightColor : "transparent"
                             border.width: 0
                             radius: parent.background.radius
 
@@ -227,19 +227,19 @@ ModuleMediaCenter {
                                     leftMargin: 12
                                 }
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     Layout.leftMargin: 0
                                     Layout.rightMargin: 4
                                     Layout.preferredWidth: 24
                                     Layout.preferredHeight: 24
                                     opacity: 0.7
                                     source: wifiModule.getWifiIcon(signal)
-                                    color: Kirigami.Theme.textColor
+                                    color: LingmoUI.Theme.textColor
                                 }
 
                                 Label {
                                     id: wifiName
-                                    color: Kirigami.Theme.textColor
+                                    color: LingmoUI.Theme.textColor
                                     text: trimName(ssid)
                                     font.pointSize: 10
 
@@ -259,7 +259,7 @@ ModuleMediaCenter {
                                     verticalCenter: parent.verticalCenter
                                     rightMargin: 12
                                 }
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     visible: isSecured
                                     opacity: 0.7
                                     Layout.leftMargin: 0
@@ -267,12 +267,12 @@ ModuleMediaCenter {
                                     Layout.preferredWidth: 10
                                     Layout.preferredHeight: 10
                                     source: "lock"
-                                    color: Kirigami.Theme.textColor
+                                    color: LingmoUI.Theme.textColor
                                 }
 
                                 Label {
                                     text: security
-                                    color: Kirigami.Theme.textColor
+                                    color: LingmoUI.Theme.textColor
                                     opacity: 0.5
                                     font.pointSize: 7
                                 }
@@ -307,13 +307,13 @@ ModuleMediaCenter {
                     spacing: 12
                     visible: wifiListView.count <= 0
 
-                    Kirigami.Icon {
+                    LingmoUI.Icon {
                         width: 18
                         height: 18
                         Layout.alignment: Qt.AlignHCenter|Qt.AlignVCenter
 
                         source: wifiModule.dir() + "/assets/spinner.svg"
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                         opacity: 0.5
 
                         RotationAnimation on rotation {
@@ -328,7 +328,7 @@ ModuleMediaCenter {
                     Label {
                         font.italic: true
                         text: qsTr("Listing Wifi Connections")
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                         opacity: 0.5
                     }
                 }
@@ -336,14 +336,14 @@ ModuleMediaCenter {
 
             RowLayout {
                 Layout.preferredWidth: root.width * 0.7
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: backButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -368,10 +368,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: skipButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -414,7 +414,7 @@ ModuleMediaCenter {
             z: 10
             font.pixelSize: 10
             parent: Overlay.overlay
-            implicitWidth: Kirigami.Units.gridUnit * 30
+            implicitWidth: LingmoUI.Units.gridUnit * 30
 
             x: Math.round((parent.width - width) / 2)
             y: parent.height * 0.10
@@ -430,13 +430,13 @@ ModuleMediaCenter {
             contentItem: ColumnLayout {
                 Keys.onEscapePressed: passwordDialog.close()
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: qsTr("Connect to %1").arg(trimName(passwordDialog.wifiName))
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     level: 1
                     font.bold: true
-                    topPadding: Kirigami.Units.smallSpacing
-                    bottomPadding: Kirigami.Units.smallSpacing
+                    topPadding: LingmoUI.Units.smallSpacing
+                    bottomPadding: LingmoUI.Units.smallSpacing
 
                     function trimName(name) {
                         if (name.length > 15) {
@@ -447,7 +447,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                Kirigami.PasswordField {
+                LingmoUI.PasswordField {
                     id: password
                     Layout.fillWidth: true
                     topPadding: 16
@@ -505,7 +505,7 @@ ModuleMediaCenter {
         Popup {
             id: connectingPopup
             modal: true
-            implicitWidth: Kirigami.Units.gridUnit * 30
+            implicitWidth: LingmoUI.Units.gridUnit * 30
             z: 10
             closePolicy: Popup.NoAutoClose
 
@@ -521,12 +521,12 @@ ModuleMediaCenter {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 12
 
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     width: 18
                     height: 18
 
                     source: wifiModule.dir() + "/assets/spinner.svg"
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     opacity: 0.5
 
                     RotationAnimation on rotation {
@@ -540,7 +540,7 @@ ModuleMediaCenter {
 
                 Label {
                     text: qsTr("Connecting")
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                     opacity: 0.5
                 }
             }

@@ -7,7 +7,7 @@ import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.0
 
 
-import org.kde.kirigami 2.7 as Kirigami
+import org.kde.lingmoui 2.7 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -31,7 +31,7 @@ Item {
             font.weight: Font.Light
             font.pointSize: 32
             text: qsTr("Finalizing")
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
         }
 
         Label {
@@ -41,7 +41,7 @@ Item {
             font.weight: Font.Light
             font.pointSize: 10
             text: qsTr("Running Script [%1/%2]").arg(finishModule.runningScriptIndex + 1).arg(finishModule.totalScriptsCount)
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
             opacity: 0.5
         }
     }
@@ -52,12 +52,12 @@ Item {
         font.pointSize: 32
         text: qsTr("Setup complete")
         anchors.centerIn: parent
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
     }
 
     RoundButton {
-        width: Kirigami.Units.iconSizes.huge
-        height: Kirigami.Units.iconSizes.huge
+        width: LingmoUI.Units.iconSizes.huge
+        height: LingmoUI.Units.iconSizes.huge
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -73,15 +73,15 @@ Item {
         }
 
         background: Rectangle {
-            color: finishModule.isComplete ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.highlightColor
+            color: finishModule.isComplete ? LingmoUI.Theme.positiveTextColor : LingmoUI.Theme.highlightColor
             radius: parent.width
         }
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             visible: finishModule.isComplete && !runningFinishHook
-            width: Kirigami.Units.iconSizes.smallMedium
-            height: Kirigami.Units.iconSizes.smallMedium
-            color: Kirigami.Theme.highlightedTextColor
+            width: LingmoUI.Units.iconSizes.smallMedium
+            height: LingmoUI.Units.iconSizes.smallMedium
+            color: LingmoUI.Theme.highlightedTextColor
             isMask: true
 
             anchors.centerIn: parent
@@ -91,8 +91,8 @@ Item {
         BusyIndicator {
             anchors.centerIn: parent
             running: !finishModule.isComplete || runningFinishHook
-            width: Kirigami.Units.iconSizes.smallMedium
-            height: Kirigami.Units.iconSizes.smallMedium
+            width: LingmoUI.Units.iconSizes.smallMedium
+            height: LingmoUI.Units.iconSizes.smallMedium
             Layout.alignment: Qt.AlignHCenter
         }
     }

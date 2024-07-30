@@ -31,7 +31,7 @@ constexpr int defaultSchemeRow = 0;
 
 void KColorSchemeManagerPrivate::activateSchemeInternal(const QString &colorSchemePath)
 {
-    // hint for plasma-integration to synchronize the color scheme with the window manager/compositor
+    // hint for lingmo-integration to synchronize the color scheme with the window manager/compositor
     // The property needs to be set before the palette change because is is checked upon the
     // ApplicationPaletteChange event.
     qApp->setProperty("KDE_COLOR_SCHEME_PATH", colorSchemePath);
@@ -43,7 +43,7 @@ void KColorSchemeManagerPrivate::activateSchemeInternal(const QString &colorSche
 }
 
 // The meaning of the Default entry depends on the platform
-// On Windows and macOS we automatically apply Breeze/Breeze Dark depending on the system preference
+// On Windows and macOS we automatically apply Ocean/Ocean Dark depending on the system preference
 // On other platforms we apply a default KColorScheme
 QString KColorSchemeManagerPrivate::automaticColorSchemePath() const
 {
@@ -116,7 +116,7 @@ KColorSchemeManager::KColorSchemeManager(QObject *parent)
         // Color scheme might be already set from a platform theme
         // This is used for example by QGnomePlatform that can set color scheme
         // matching GNOME settings. This avoids issues where QGnomePlatform sets
-        // QPalette for dark theme, but end up mixing it also with Breeze light
+        // QPalette for dark theme, but end up mixing it also with Ocean light
         // that is going to be used as a fallback for apps using KColorScheme.
         // BUG: 447029
         schemePath = qApp->property("KDE_COLOR_SCHEME_PATH").toString();

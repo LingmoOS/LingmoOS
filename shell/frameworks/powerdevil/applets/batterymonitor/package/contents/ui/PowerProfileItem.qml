@@ -8,11 +8,11 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 import org.kde.notification
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     property alias slider: slider
@@ -70,7 +70,7 @@ PlasmaComponents3.ItemDelegate {
 
     Notification {
         id: powerProfileError
-        componentName: "plasma_workspace"
+        componentName: "lingmo_workspace"
         eventId: "warning"
         iconName: "speedometer"
         title: i18n("Power Management")
@@ -81,18 +81,18 @@ PlasmaComponents3.ItemDelegate {
         columns: 4
         columnSpacing: 0
         rows: repeater.count + 8
-        rowSpacing: Kirigami.Units.smallSpacing
+        rowSpacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             source: "speedometer"
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-            Layout.rightMargin: Kirigami.Units.gridUnit
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
+            Layout.rightMargin: LingmoUI.Units.gridUnit
             Layout.rowSpan: grid.rows
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             Layout.fillWidth: true
             Layout.columnSpan: grid.columns - 2
             elide: Text.ElideRight
@@ -101,7 +101,7 @@ PlasmaComponents3.ItemDelegate {
             Accessible.ignored: true
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             id: activeProfileLabel
             visible: !root.isTlpInstalled && !root.profilesInstalled
             Layout.alignment: Qt.AlignRight
@@ -110,7 +110,7 @@ PlasmaComponents3.ItemDelegate {
             enabled: root.profilesAvailable
         }
 
-        PlasmaComponents3.Slider {
+        LingmoComponents3.Slider {
             id: slider
             visible: root.profilesAvailable
             Layout.columnSpan: grid.columns - 1
@@ -121,7 +121,7 @@ PlasmaComponents3.ItemDelegate {
             to: 2
             stepSize: 1
             value: root.activeProfileIndex
-            snapMode: PlasmaComponents3.Slider.SnapAlways
+            snapMode: LingmoComponents3.Slider.SnapAlways
 
             Accessible.name: root.text
             Accessible.description: activeProfileLabel.text
@@ -158,7 +158,7 @@ PlasmaComponents3.ItemDelegate {
             Rectangle {
                 z: -1
                 visible: root.inhibited
-                color: Kirigami.Theme.backgroundColor
+                color: LingmoUI.Theme.backgroundColor
                 anchors {
                     top: parent.background.top
                     left: parent.horizontalCenter
@@ -170,9 +170,9 @@ PlasmaComponents3.ItemDelegate {
             }
         }
 
-        Kirigami.Icon {
-            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+        LingmoUI.Icon {
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
             Layout.alignment: Qt.AlignLeft
             visible: root.profilesAvailable
             source: "battery-profile-powersave-symbolic"
@@ -181,7 +181,7 @@ PlasmaComponents3.ItemDelegate {
                 id: powersaveIconHover
             }
 
-            PlasmaComponents3.ToolTip {
+            LingmoComponents3.ToolTip {
                 text: root.profileData.find(profile => profile.profile === "power-saver").label
                 visible: powersaveIconHover.hovered
             }
@@ -193,9 +193,9 @@ PlasmaComponents3.ItemDelegate {
             visible: root.profilesAvailable
         }
 
-        Kirigami.Icon {
-            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+        LingmoUI.Icon {
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
             Layout.alignment: Qt.AlignRight
             visible: root.profilesAvailable
             source: "battery-profile-performance-symbolic"
@@ -204,7 +204,7 @@ PlasmaComponents3.ItemDelegate {
                 id: performanceIconHover
             }
 
-            PlasmaComponents3.ToolTip {
+            LingmoComponents3.ToolTip {
                 text: root.profileData.find(profile => profile.profile === "performance").label
                 visible: performanceIconHover.hovered
             }
@@ -272,7 +272,7 @@ PlasmaComponents3.ItemDelegate {
                 Layout.columnSpan: grid.columns - 1
                 Layout.fillWidth: true
 
-                x: Kirigami.Units.smallSpacing
+                x: LingmoUI.Units.smallSpacing
                 iconSource: modelData.Icon
                 text: i18nc("%1 is the name of the application, %2 is the reason provided by it for activating performance mode",
                             "%1: %2", modelData.Name, modelData.Reason)
@@ -282,7 +282,7 @@ PlasmaComponents3.ItemDelegate {
         Item {
             Layout.fillWidth: true
             Layout.columnSpan: grid.columns - 1
-            Layout.preferredHeight: Kirigami.Units.smallSpacing
+            Layout.preferredHeight: LingmoUI.Units.smallSpacing
 
             visible: repeater.visibleChildren > 0
                 || inhibitionReasonHint.visible
@@ -290,14 +290,14 @@ PlasmaComponents3.ItemDelegate {
                 || inhibitionHoldersHint.visible
         }
 
-        PlasmaComponents3.Label {
+        LingmoComponents3.Label {
             visible: !root.profilesInstalled
             text: root.isTlpInstalled
                 ? i18n("The TLP service automatically controls power profiles")
                 : xi18n("Power profiles may be supported on your device.<nl/>Try installing the <command>power-profiles-daemon</command> package using your distribution's package manager and restarting the system.")
             textFormat: Text.PlainText
             enabled: false
-            font: Kirigami.Theme.smallFont
+            font: LingmoUI.Theme.smallFont
             wrapMode: Text.Wrap
             Layout.fillWidth: true
             Layout.columnSpan: grid.columns - 1

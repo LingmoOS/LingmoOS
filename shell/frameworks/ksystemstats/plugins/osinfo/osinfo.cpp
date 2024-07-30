@@ -85,10 +85,10 @@ public:
     KSysGuard::SensorProperty *osUrlProperty = nullptr;
     KSysGuard::SensorProperty *uptimeProperty = nullptr;
 
-    KSysGuard::SensorObject *plasmaObject = nullptr;
+    KSysGuard::SensorObject *lingmoObject = nullptr;
     KSysGuard::SensorProperty *qtVersionProperty = nullptr;
     KSysGuard::SensorProperty *kfVersionProperty = nullptr;
-    KSysGuard::SensorProperty *plasmaVersionProperty = nullptr;
+    KSysGuard::SensorProperty *lingmoVersionProperty = nullptr;
     KSysGuard::SensorProperty *windowSystemProperty = nullptr;
 };
 
@@ -122,11 +122,11 @@ OSInfoPrivate::OSInfoPrivate(OSInfoPlugin *qq)
     uptimeProperty = new KSysGuard::SensorProperty(QStringLiteral("uptime"), i18nc("@title", "Uptime"), systemObject);
     uptimeProperty->setUnit(KSysGuard::UnitTime);
 
-    plasmaObject = new KSysGuard::SensorObject(QStringLiteral("plasma"), i18nc("@title", "KDE Plasma"), container);
-    qtVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("qtVersion"), i18nc("@title", "Qt Version"), plasmaObject);
-    kfVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("kfVersion"), i18nc("@title", "KDE Frameworks Version"), plasmaObject);
-    plasmaVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("plasmaVersion"), i18nc("@title", "KDE Plasma Version"), plasmaObject);
-    windowSystemProperty = new KSysGuard::SensorProperty(QStringLiteral("windowsystem"), i18nc("@title", "Window System"), plasmaObject);
+    lingmoObject = new KSysGuard::SensorObject(QStringLiteral("lingmo"), i18nc("@title", "KDE Lingmo"), container);
+    qtVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("qtVersion"), i18nc("@title", "Qt Version"), lingmoObject);
+    kfVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("kfVersion"), i18nc("@title", "KDE Frameworks Version"), lingmoObject);
+    lingmoVersionProperty = new KSysGuard::SensorProperty(QStringLiteral("lingmoVersion"), i18nc("@title", "KDE Lingmo Version"), lingmoObject);
+    windowSystemProperty = new KSysGuard::SensorProperty(QStringLiteral("windowsystem"), i18nc("@title", "Window System"), lingmoObject);
 }
 
 OSInfoPlugin::~OSInfoPlugin() = default;
@@ -152,17 +152,17 @@ void OSInfoPrivate::init()
 
     dbusCall<QVariant>(
         QDBusConnection::sessionBus(),
-        QStringLiteral("org.kde.plasmashell"),
+        QStringLiteral("org.kde.lingmoshell"),
         QStringLiteral("/MainApplication"),
         QStringLiteral("org.freedesktop.DBus.Properties"),
         QStringLiteral("Get"),
         { QStringLiteral("org.qtproject.Qt.QCoreApplication"), QStringLiteral("applicationVersion") },
         [this](const QDBusPendingReply<QVariant> &reply) {
             if (reply.isError()) {
-                qWarning() << "Could not determine Plasma version, got: " << reply.error().message();
-                plasmaVersionProperty->setValue(i18nc("@info", "Unknown"));
+                qWarning() << "Could not determine Lingmo version, got: " << reply.error().message();
+                lingmoVersionProperty->setValue(i18nc("@info", "Unknown"));
             } else {
-                plasmaVersionProperty->setValue(reply.value());
+                lingmoVersionProperty->setValue(reply.value());
             }
         }
     );

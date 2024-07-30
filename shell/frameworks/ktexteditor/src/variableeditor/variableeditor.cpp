@@ -126,7 +126,7 @@ void VariableEditor::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
 
-    // draw highlighting rect like in plasma
+    // draw highlighting rect like in lingmo
     if (underMouse()) {
         QPainter painter(this);
 

@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
 import Qt5Compat.GraphicalEffects as GE
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
     id: delegate
@@ -62,7 +62,7 @@ Item {
     QQC2.AbstractButton {
         id: controlRoot
 
-        property real radius: Kirigami.Units.largeSpacing
+        property real radius: LingmoUI.Units.largeSpacing
 
         readonly property real minimumRatio: 1/2
         readonly property real maximumRatio: 2/1
@@ -125,17 +125,17 @@ Item {
             Rectangle {
                 anchors.fill: parent
 
-                color: Qt.tint(controlRoot.Kirigami.Theme.backgroundColor, Qt.alpha(controlRoot.Kirigami.Theme.textColor, 0.14))
+                color: Qt.tint(controlRoot.LingmoUI.Theme.backgroundColor, Qt.alpha(controlRoot.LingmoUI.Theme.textColor, 0.14))
 
                 QQC2.BusyIndicator {
                     anchors.centerIn: parent
                     running: controlRoot.activeImage?.status === Image.Loading
                 }
 
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     anchors.centerIn: parent
-                    implicitWidth: Kirigami.Units.iconSizes.large
-                    implicitHeight: Kirigami.Units.iconSizes.large
+                    implicitWidth: LingmoUI.Units.iconSizes.large
+                    implicitHeight: LingmoUI.Units.iconSizes.large
                     visible: controlRoot.activeImage?.status === Image.Error
                     source: "image-missing"
                 }
@@ -190,7 +190,7 @@ Item {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.InOutCubic
                 }
             }
@@ -229,8 +229,8 @@ Item {
                     shortcut: "Space"
                 }
                 // other icon properties are not bound automatically because RaoundButton overrides them
-                icon.width: Kirigami.Units.iconSizes.large
-                icon.height: Kirigami.Units.iconSizes.large
+                icon.width: LingmoUI.Units.iconSizes.large
+                icon.height: LingmoUI.Units.iconSizes.large
                 icon.color: "white"
 
                 transform: []
@@ -317,7 +317,7 @@ Item {
 
                 Timer {
                     id: autohidePlayPauseButtonTimer
-                    interval: Kirigami.Units.humanMoment
+                    interval: LingmoUI.Units.humanMoment
                     running: false
                     onTriggered: {
                         playPauseButton.hide(true);
@@ -329,7 +329,7 @@ Item {
                     target: playPauseButton
                     to: 1
                     running: false
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
 
@@ -338,7 +338,7 @@ Item {
                     target: playPauseButton
                     to: 0
                     running: false
-                    duration: Kirigami.Units.shortDuration
+                    duration: LingmoUI.Units.shortDuration
                     easing.type: Easing.InOutQuad
                 }
 
@@ -348,7 +348,7 @@ Item {
             }
         }
 
-        background: Kirigami.ShadowedRectangle {
+        background: LingmoUI.ShadowedRectangle {
             id: backgroundShadow
 
             color: "transparent"
@@ -367,7 +367,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             z: -1
-            hoverEnabled: !Kirigami.Settings.hasTransientTouchInput
+            hoverEnabled: !LingmoUI.Settings.hasTransientTouchInput
             visible: delegate.activeAnimatedImage && delegate.loadLargeImage && delegate.isCurrentItem
             onPositionChanged: mouse => {
                 playPauseButton.show(/*animated*/true, /*autohide*/true);

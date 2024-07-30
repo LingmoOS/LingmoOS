@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -23,10 +23,10 @@ GridLayout {
 
     readonly property int rowCount: Math.ceil(gridRepeater.count / columns)
 
-    columnSpacing: compact ? 1 : Kirigami.Units.largeSpacing
-    rowSpacing: compact ? 1 : Kirigami.Units.largeSpacing
+    columnSpacing: compact ? 1 : LingmoUI.Units.largeSpacing
+    rowSpacing: compact ? 1 : LingmoUI.Units.largeSpacing
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         id: heading
         Layout.fillWidth: true
         Layout.columnSpan: parent.columns > 0 ? parent.columns : 1

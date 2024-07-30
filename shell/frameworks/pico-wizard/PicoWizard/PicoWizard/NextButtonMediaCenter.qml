@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.0
 
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmoui 2.9 as LingmoUI
 
 Button {
     id: nextButtonComponent
@@ -38,9 +38,9 @@ Button {
         }
     }
 
-    Kirigami.Icon {
-        width: Kirigami.Units.iconSizes.smallMedium
-        height: Kirigami.Units.iconSizes.smallMedium
+    LingmoUI.Icon {
+        width: LingmoUI.Units.iconSizes.smallMedium
+        height: LingmoUI.Units.iconSizes.smallMedium
         // running: privateProps.showSpinner
 
         states: [

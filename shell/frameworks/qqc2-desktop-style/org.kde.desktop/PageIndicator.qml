@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.PageIndicator {
     id: control
@@ -18,25 +18,25 @@ T.PageIndicator {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    padding: Kirigami.Units.largeSpacing
-    spacing: Kirigami.Units.largeSpacing
+    padding: LingmoUI.Units.largeSpacing
+    spacing: LingmoUI.Units.largeSpacing
 
-    // QTBUG-115133: Kirigami/ShadowedRectangle renders smoother circles at HiDPI than plain QtQuick/Rectangle.
-    delegate: Kirigami.ShadowedRectangle {
+    // QTBUG-115133: LingmoUI/ShadowedRectangle renders smoother circles at HiDPI than plain QtQuick/Rectangle.
+    delegate: LingmoUI.ShadowedRectangle {
         required property int index
         // `pressed` is a context property, it can't be required in delegate.
 
-        implicitWidth: Kirigami.Units.largeSpacing
-        implicitHeight: Kirigami.Units.largeSpacing
+        implicitWidth: LingmoUI.Units.largeSpacing
+        implicitHeight: LingmoUI.Units.largeSpacing
 
         radius: width / 2
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
 
         opacity: index === currentIndex ? 1 : pressed ? 0.67 : 0.33
 
         Behavior on opacity {
             OpacityAnimator {
-                duration: Kirigami.Units.shortDuration
+                duration: LingmoUI.Units.shortDuration
             }
         }
     }

@@ -34,7 +34,7 @@ class AbstractRunnerPrivate;
 /**
  * @class AbstractRunner abstractrunner.h <KRunner/AbstractRunner>
  *
- * @short An abstract base class for Plasma Runner plugins.
+ * @short An abstract base class for Lingmo Runner plugins.
  *
  * Be aware that runners will be moved to their own thread after being instantiated.
  * This means that except for AbstractRunner::run and the constructor, all methods will be non-blocking
@@ -137,7 +137,7 @@ public:
     /**
      * This is the minimum letter count for the query. If the query is shorter than this value
      * and KRunner is not in the singleRunnerMode, match method is not called.
-     * This can be set using the X-Plasma-Runner-Min-Letter-Count property or the setMinLetterCount method.
+     * This can be set using the X-Lingmo-Runner-Min-Letter-Count property or the setMinLetterCount method.
      * The default value is 0.
      *
      * @see setMinLetterCount
@@ -232,7 +232,7 @@ protected:
     /**
      * Provides access to the runner's configuration object.
      * This config is saved in the "krunnerrc" file in the [Runners][<pluginId>] config group
-     * Settings should be written in a KDE config module. See https://develop.kde.org/docs/plasma/krunner/#runner-configuration
+     * Settings should be written in a KDE config module. See https://develop.kde.org/docs/lingmo/krunner/#runner-configuration
      */
     KConfigGroup config() const;
 

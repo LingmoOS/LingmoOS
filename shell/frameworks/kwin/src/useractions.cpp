@@ -19,7 +19,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // NOTE: if you change the menu, keep
-//       plasma-desktop/applets/taskmanager/package/contents/ui/ContextMenu.qml
+//       lingmo-desktop/applets/taskmanager/package/contents/ui/ContextMenu.qml
 //       in sync
 //////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,7 @@
 
 #if KWIN_BUILD_ACTIVITIES
 #include "activities.h"
-#include <PlasmaActivities/Info>
+#include <LingmoActivities/Info>
 #endif
 #include "appmenu.h"
 

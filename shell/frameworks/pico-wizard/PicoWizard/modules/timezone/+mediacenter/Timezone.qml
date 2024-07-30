@@ -5,8 +5,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -45,14 +45,14 @@ ModuleMediaCenter {
 
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignHCenter
 
                 Rectangle {
-                    color: Kirigami.Theme.activeTextColor
+                    color: LingmoUI.Theme.activeTextColor
                     radius: 4
-                    width: Kirigami.Units.gridUnit * 8
-                    height: Kirigami.Units.gridUnit * 1
+                    width: LingmoUI.Units.gridUnit * 8
+                    height: LingmoUI.Units.gridUnit * 1
                     anchors.top: parent.top
                     x: infoRectContent.x
                     y: -2
@@ -68,40 +68,40 @@ ModuleMediaCenter {
                         fontSizeMode: Text.Fit
                         wrapMode: Text.WordWrap
                         text: qsTr("Setting Up Your Timezone")
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                     }
                 }
 
                 Rectangle {
                     id: infoRectContent
-                    color: Kirigami.Theme.backgroundColor
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 4
                     width: parent.width
-                    height: Kirigami.Units.gridUnit * 5
+                    height: LingmoUI.Units.gridUnit * 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: Kirigami.Units.smallSpacing
+                    anchors.bottomMargin: LingmoUI.Units.smallSpacing
                     z: 1
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
 
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: timezoneModule.dir() + "/assets/remote-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -119,11 +119,11 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: switchTextByFocus()[0]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
 
-                        Kirigami.Separator {
+                        LingmoUI.Separator {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 1
                         }
@@ -133,16 +133,16 @@ ModuleMediaCenter {
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: timezoneModule.dir() + "/assets/keyboard-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -160,7 +160,7 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: switchTextByFocus()[1]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
                     }
@@ -175,8 +175,8 @@ ModuleMediaCenter {
 
                 radius: 4
                 border.width: tzContainer.activeFocus ? 3 : 1
-                border.color: tzContainer.activeFocus ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.5)
-                color: Kirigami.Theme.backgroundColor
+                border.color: tzContainer.activeFocus ? LingmoUI.Theme.highlightColor : Qt.lighter(LingmoUI.Theme.backgroundColor, 1.5)
+                color: LingmoUI.Theme.backgroundColor
 
                 KeyNavigation.down: searchFieldFocusBox
                 Keys.onReturnPressed: {
@@ -189,7 +189,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                Kirigami.CardsListView {
+                LingmoUI.CardsListView {
                     id: tzListView
                     objectName: "tzListView"
                     anchors.fill: parent
@@ -202,7 +202,7 @@ ModuleMediaCenter {
                         active: true
                     }
 
-                    delegate: Kirigami.BasicListItem {
+                    delegate: LingmoUI.BasicListItem {
                         width: parent ? parent.width : 0
                         height: 40
                         label: tz
@@ -245,16 +245,16 @@ ModuleMediaCenter {
 
             RowLayout {
                 Layout.preferredWidth: root.width * 0.7
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                 Rectangle {
                     id: searchFieldFocusBox
                     objectName: "searchFieldFocusBox"
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                     color: "transparent"
-                    border.color: searchFieldFocusBox.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+                    border.color: searchFieldFocusBox.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
                     border.width: searchFieldFocusBox.activeFocus ? 3 : 0
 
                     KeyNavigation.down: nextButton
@@ -268,7 +268,7 @@ ModuleMediaCenter {
                         }
                     }
 
-                    PlasmaComponents.TextField {
+                    LingmoComponents.TextField {
                         id: searchText
                         anchors.fill: parent
                         anchors.margins: 5
@@ -284,34 +284,34 @@ ModuleMediaCenter {
                 }
 
                 Rectangle {
-                    color: Kirigami.Theme.backgroundColor
+                    color: LingmoUI.Theme.backgroundColor
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
 
                     Label {
                         id: selectedZoneDisplayLabel
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         wrapMode: Text.WordWrap
                         text: "Selected Timezone: " + "Africa/Abidjan"
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                     }
                 }
             }
 
             RowLayout {
                 Layout.preferredWidth: root.width * 0.7
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: backButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -336,10 +336,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: nextButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     NextButtonMediaCenter {
@@ -368,10 +368,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: skipButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {

@@ -15,20 +15,20 @@ import org.kde.coreaddons as KCoreAddons
 import org.kde.kcmutils // KCMLauncher
 import org.kde.config // KAuthorized
 import org.kde.notification
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
-import org.kde.plasma.private.brightnesscontrolplugin
+import org.kde.lingmo.private.brightnesscontrolplugin
 
 PlasmoidItem {
     id: brightnessAndColorControl
 
-    readonly property bool inPanel: (Plasmoid.location === PlasmaCore.Types.TopEdge
-        || Plasmoid.location === PlasmaCore.Types.RightEdge
-        || Plasmoid.location === PlasmaCore.Types.BottomEdge
-        || Plasmoid.location === PlasmaCore.Types.LeftEdge)
+    readonly property bool inPanel: (Plasmoid.location === LingmoCore.Types.TopEdge
+        || Plasmoid.location === LingmoCore.Types.RightEdge
+        || Plasmoid.location === LingmoCore.Types.BottomEdge
+        || Plasmoid.location === LingmoCore.Types.LeftEdge)
 
     NightLightControl {
         id: nightLightControl
@@ -56,8 +56,8 @@ PlasmoidItem {
         return iconName + symbolicSuffix;
     }
 
-    switchWidth: Kirigami.Units.gridUnit * 10
-    switchHeight: Kirigami.Units.gridUnit * 10
+    switchWidth: LingmoUI.Units.gridUnit * 10
+    switchHeight: LingmoUI.Units.gridUnit * 10
 
     Plasmoid.title: i18n("Brightness and Color")
 
@@ -65,7 +65,7 @@ PlasmoidItem {
     LayoutMirroring.childrenInherit: true
 
     Plasmoid.status: {
-        return screenBrightnessControl.isBrightnessAvailable || keyboardBrightnessControl.isBrightnessAvailable || isNightLightActive || isNightLightInhibited ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus;
+        return screenBrightnessControl.isBrightnessAvailable || keyboardBrightnessControl.isBrightnessAvailable || isNightLightActive || isNightLightInhibited ? LingmoCore.Types.ActiveStatus : LingmoCore.Types.PassiveStatus;
     }
 
     toolTipMainText: {
@@ -193,23 +193,23 @@ PlasmoidItem {
 
         readonly property var appletInterface: brightnessAndColorControl
 
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 10
-        Layout.maximumWidth: Kirigami.Units.gridUnit * 80
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 20
+        Layout.minimumWidth: LingmoUI.Units.gridUnit * 10
+        Layout.maximumWidth: LingmoUI.Units.gridUnit * 80
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 20
 
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 10
-        Layout.maximumHeight: Kirigami.Units.gridUnit * 40
+        Layout.minimumHeight: LingmoUI.Units.gridUnit * 10
+        Layout.maximumHeight: LingmoUI.Units.gridUnit * 40
         Layout.preferredHeight: implicitHeight
 
     } // todo
 
     Plasmoid.contextualActions: [
-        PlasmaCore.Action {
+        LingmoCore.Action {
             id: configureNightLight
             icon.name: "configure"
             text: i18nc("@action:inmenu", "Configure Night Light…")
             visible: KAuthorized.authorize("kcm_nightlight")
-            priority: PlasmaCore.Action.LowPriority
+            priority: LingmoCore.Action.LowPriority
             onTriggered: KCMLauncher.openSystemSettings("kcm_nightlight")
         }
     ]

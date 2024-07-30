@@ -32,7 +32,7 @@ void NotifierItem::setupNotifierItem()
 
     QMenu *menu = new QMenu;
     connect(m_item, &QObject::destroyed, menu, &QObject::deleteLater);
-    auto discoverAction = menu->addAction(QIcon::fromTheme(QStringLiteral("plasmadiscover")), i18n("Open Discover…"));
+    auto discoverAction = menu->addAction(QIcon::fromTheme(QStringLiteral("lingmodiscover")), i18n("Open Discover…"));
     connect(discoverAction, &QAction::triggered, &m_notifier, [this] {
         m_notifier.showDiscover(m_item->providedToken());
     });

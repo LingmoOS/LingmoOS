@@ -28,7 +28,7 @@ endfunction()
 foreach(pofile IN LISTS pofiles)
     get_filename_component(name ${pofile} NAME)
     # Regex the basename, cmake only allows stripping the longest extension, we
-    # need the shortest or we'll screw up "org.kde.plasma.kittens.po"
+    # need the shortest or we'll screw up "org.kde.lingmo.kittens.po"
     # https://bugs.kde.org/show_bug.cgi?id=379116
     string(REGEX REPLACE "^(.+)(\\.[^.]+)$" "\\1" name ${name})
     get_filename_component(langdir ${pofile} DIRECTORY)

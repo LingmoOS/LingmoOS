@@ -9,7 +9,7 @@ import QtQuick 2.1
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.3 as QtControls
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.lingmoui 2.4 as LingmoUI
 import org.kde.kcmutils as KCM
 import org.kde.newstuff 1.91 as NewStuff
 
@@ -24,9 +24,9 @@ KCM.GridViewKCM {
     }
 
     headerPaddingEnabled: false // Let the InlineMessage touch the edges
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: infoLabel
-        position: Kirigami.InlineMessage.Position.Header
+        position: LingmoUI.InlineMessage.Position.Header
         showCloseButton: true
     }
 
@@ -49,7 +49,7 @@ KCM.GridViewKCM {
         }
 
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "edit-delete"
                 tooltip: i18n("Uninstall")
                 enabled: model.uninstallable
@@ -74,12 +74,12 @@ KCM.GridViewKCM {
     Connections {
         target: kcm
         function onShowSuccessMessage() {
-            infoLabel.type = Kirigami.MessageType.Positive;
+            infoLabel.type = LingmoUI.MessageType.Positive;
             infoLabel.text = message;
             infoLabel.visible = true;
         }
         function onShowErrorMessage() {
-            infoLabel.type = Kirigami.MessageType.Error;
+            infoLabel.type = LingmoUI.MessageType.Error;
             infoLabel.text = message;
             infoLabel.visible = true;
         }

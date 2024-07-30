@@ -12,7 +12,7 @@
 class TestAgent: public NetworkManager::SecretAgent {
 public:
     explicit TestAgent(QObject *parent = nullptr)
-    : NetworkManager::SecretAgent(QStringLiteral("org.kde.plasma.example-agent"), NetworkManager::SecretAgent::Capability::VpnHints, parent)
+    : NetworkManager::SecretAgent(QStringLiteral("org.kde.lingmo.example-agent"), NetworkManager::SecretAgent::Capability::VpnHints, parent)
     {
         qInfo() << "Starting fake secret agent";
     }

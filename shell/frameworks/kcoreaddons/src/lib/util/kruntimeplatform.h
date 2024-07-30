@@ -15,7 +15,7 @@ namespace KRuntimePlatform
  * formfactor and the last is the input method specialization.
  * If the string is empty, there is no specified runtime platform and a traditional desktop environment may be assumed.
  *
- * The value is read using the PLASMA_PLATFORM env variable
+ * The value is read using the LINGMO_PLATFORM env variable
  * @since 5.97
  */
 KCOREADDONS_EXPORT QStringList runtimePlatform();

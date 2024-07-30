@@ -11,17 +11,17 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
-Kirigami.LinkButton {
+LingmoUI.LinkButton {
     id: root
 
     // actual subtype: PackageKitResource
     required property Discover.AbstractResource resource
     Discover.Activatable.active: resource.dependencies.length > 0
 
-    property Kirigami.OverlaySheet __overlay
+    property LingmoUI.OverlaySheet __overlay
 
     function __open() {
         if (!__overlay) {
@@ -37,7 +37,7 @@ Kirigami.LinkButton {
     Component {
         id: overlaySheetComponent
 
-        Kirigami.OverlaySheet {
+        LingmoUI.OverlaySheet {
             parent: root.T.Overlay.overlay
 
             title: i18nd("libdiscover", "Dependencies for package: %1", root.resource.packageName)
@@ -47,7 +47,7 @@ Kirigami.LinkButton {
             ListView {
                 id: view
 
-                implicitWidth: Kirigami.Units.gridUnit * 26
+                implicitWidth: LingmoUI.Units.gridUnit * 26
 
                 // During initialization and initial section and row delegates
                 // creation, contentHeight may vary wildly. And it is also a
@@ -69,7 +69,7 @@ Kirigami.LinkButton {
                 model: root.resource.dependencies
 
                 section.property: "infoString"
-                section.delegate: Kirigami.ListSectionHeader {
+                section.delegate: LingmoUI.ListSectionHeader {
                     required property string section
 
                     width: ListView.view.width

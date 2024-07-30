@@ -9,15 +9,15 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.TextField {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     implicitWidth: Math.max(200,
                             placeholderText ? placeholder.implicitWidth + leftPadding + rightPadding : 0)
@@ -28,16 +28,16 @@ T.TextField {
 
     padding: 6
 
-    placeholderTextColor: Kirigami.Theme.disabledTextColor
-    color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-    selectionColor: Kirigami.Theme.highlightColor
-    selectedTextColor: Kirigami.Theme.highlightedTextColor
+    placeholderTextColor: LingmoUI.Theme.disabledTextColor
+    color: enabled ? LingmoUI.Theme.textColor : LingmoUI.Theme.disabledTextColor
+    selectionColor: LingmoUI.Theme.highlightColor
+    selectedTextColor: LingmoUI.Theme.highlightedTextColor
     verticalAlignment: TextInput.AlignVCenter
-    hoverEnabled: !Kirigami.Settings.tabletMode
+    hoverEnabled: !LingmoUI.Settings.tabletMode
 
-    selectByMouse: !Kirigami.Settings.tabletMode
+    selectByMouse: !LingmoUI.Settings.tabletMode
 
-    cursorDelegate: Kirigami.Settings.tabletMode ? mobileCursor : null
+    cursorDelegate: LingmoUI.Settings.tabletMode ? mobileCursor : null
 
     Component {
         id: mobileCursor
@@ -85,7 +85,7 @@ T.TextField {
     }
 
     onPressAndHold: event => {
-        if (!Kirigami.Settings.tabletMode) {
+        if (!LingmoUI.Settings.tabletMode) {
             return;
         }
         forceActiveFocus();

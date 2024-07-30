@@ -20,22 +20,22 @@ All non-trivial patches need to go through [code review][gitlab-reviews].
 
 Commits are applied on top of master and cherry-picked to release branches if appropriate. Use `-x` when cherry-picking. Larger changes should be split up into smaller logical commits.
 
-KScreen is released as part of Plasma. See the [Plasma schedule][plasma-schedule] for information on the release schedule.
+KScreen is released as part of Lingmo. See the [Lingmo schedule][lingmo-schedule] for information on the release schedule.
 
 ## Commit Message Guideline
 Please follow the [KDE Commit Policy][commit-policy]. In particular please make sure to use appropriate [commit keywords][commit-policy-keywords].
 
 ## Contact
-Real-time communication about the project happens on the IRC channel `#plasma` on irc.libera.chat and the bridged Matrix room `#plasma:kde.org`.
+Real-time communication about the project happens on the IRC channel `#lingmo` on irc.libera.chat and the bridged Matrix room `#lingmo:kde.org`.
 
-Emails about the project can be sent to the [plasma-devel][plasma-devel] mailing list.
+Emails about the project can be sent to the [lingmo-devel][lingmo-devel] mailing list.
 
 [kde-coc]: https://kde.org/code-of-conduct
 [community-working-group]: https://ev.kde.org/workinggroups/cwg.php
 [frameworks-style]: https://community.kde.org/Policies/Frameworks_Coding_Style
-[gitlab-reviews]: https://invent.kde.org/plasma/kscreen
-[plasma-schedule]: https://community.kde.org/Schedules/Plasma_5
+[gitlab-reviews]: https://invent.kde.org/lingmo/kscreen
+[lingmo-schedule]: https://community.kde.org/Schedules/Lingmo_5
 [commit-policy]: https://community.kde.org/Policies/Commit_Policy
 [bugzilla]: https://bugs.kde.org/describecomponents.cgi?product=KScreen
 [commit-policy-keywords]: https://community.kde.org/Policies/Commit_Policy#Special_keywords_in_GIT_and_SVN_log_messages
-[plasma-devel]: https://mail.kde.org/mailman/listinfo/plasma-devel
+[lingmo-devel]: https://mail.kde.org/mailman/listinfo/lingmo-devel

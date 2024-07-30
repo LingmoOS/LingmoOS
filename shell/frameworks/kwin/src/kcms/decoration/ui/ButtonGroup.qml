@@ -5,19 +5,19 @@
 */
 import QtQuick
 
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.kwin.private.kdecoration as KDecoration
 
 ListView {
     id: view
     property string key
     property bool dragActive: false
-    property int iconSize: Kirigami.Units.iconSizes.small
+    property int iconSize: LingmoUI.Units.iconSizes.small
     orientation: ListView.Horizontal
     interactive: false
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
     implicitHeight: iconSize
-    implicitWidth: count * (iconSize + Kirigami.Units.smallSpacing) - Math.min(1, count) * Kirigami.Units.smallSpacing
+    implicitWidth: count * (iconSize + LingmoUI.Units.smallSpacing) - Math.min(1, count) * LingmoUI.Units.smallSpacing
     delegate: Item {
         width: view.iconSize
         height: view.iconSize
@@ -52,14 +52,14 @@ ListView {
         }
     }
     add: Transition {
-        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Kirigami.Units.longDuration/2 }
-        NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: Kirigami.Units.longDuration/2 }
+        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: LingmoUI.Units.longDuration/2 }
+        NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: LingmoUI.Units.longDuration/2 }
     }
     move: Transition {
-        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: Kirigami.Units.longDuration/2 }
-        NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: Kirigami.Units.longDuration/2 }
+        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: LingmoUI.Units.longDuration/2 }
+        NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: LingmoUI.Units.longDuration/2 }
     }
     displaced: Transition {
-        NumberAnimation { properties: "x,y"; duration: Kirigami.Units.longDuration; easing.type: Easing.OutBounce }
+        NumberAnimation { properties: "x,y"; duration: LingmoUI.Units.longDuration; easing.type: Easing.OutBounce }
     }
 }

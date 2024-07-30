@@ -1,3 +1,3 @@
 #! /usr/bin/env bash
-$XGETTEXT *.cpp -o $podir/plasma_runner_powerdevil.pot
+$XGETTEXT *.cpp -o $podir/lingmo_runner_powerdevil.pot
 

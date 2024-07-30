@@ -33,7 +33,7 @@
 #include "useractions.h"
 #include "virtualdesktops.h"
 #include "wayland/output.h"
-#include "wayland/plasmawindowmanagement.h"
+#include "wayland/lingmowindowmanagement.h"
 #include "wayland/surface.h"
 #include "wayland_server.h"
 #include "workspace.h"
@@ -731,16 +731,16 @@ void Window::setDesktops(QList<VirtualDesktop *> desktops)
             windowManagementInterface()->setOnAllDesktops(true);
         } else {
             windowManagementInterface()->setOnAllDesktops(false);
-            auto currentDesktops = windowManagementInterface()->plasmaVirtualDesktops();
+            auto currentDesktops = windowManagementInterface()->lingmoVirtualDesktops();
             for (auto desktop : std::as_const(m_desktops)) {
                 if (!currentDesktops.contains(desktop->id())) {
-                    windowManagementInterface()->addPlasmaVirtualDesktop(desktop->id());
+                    windowManagementInterface()->addLingmoVirtualDesktop(desktop->id());
                 } else {
                     currentDesktops.removeOne(desktop->id());
                 }
             }
             for (const auto &desktopId : std::as_const(currentDesktops)) {
-                windowManagementInterface()->removePlasmaVirtualDesktop(desktopId);
+                windowManagementInterface()->removeLingmoVirtualDesktop(desktopId);
             }
         }
     }
@@ -1811,8 +1811,8 @@ void Window::setupWindowManagementInterface()
     connect(this, &Window::fullScreenChanged, w, [w, this] {
         w->setFullscreen(isFullScreen());
     });
-    connect(this, &Window::keepAboveChanged, w, &PlasmaWindowInterface::setKeepAbove);
-    connect(this, &Window::keepBelowChanged, w, &PlasmaWindowInterface::setKeepBelow);
+    connect(this, &Window::keepAboveChanged, w, &LingmoWindowInterface::setKeepAbove);
+    connect(this, &Window::keepBelowChanged, w, &LingmoWindowInterface::setKeepBelow);
     connect(this, &Window::minimizedChanged, w, [w, this] {
         w->setMinimized(isMinimized());
     });
@@ -1842,65 +1842,65 @@ void Window::setupWindowManagementInterface()
     connect(this, &Window::applicationMenuChanged, w, [w, this]() {
         w->setApplicationMenuPaths(applicationMenuServiceName(), applicationMenuObjectPath());
     });
-    connect(w, &PlasmaWindowInterface::closeRequested, this, [this] {
+    connect(w, &LingmoWindowInterface::closeRequested, this, [this] {
         closeWindow();
     });
-    connect(w, &PlasmaWindowInterface::moveRequested, this, [this]() {
+    connect(w, &LingmoWindowInterface::moveRequested, this, [this]() {
         Cursors::self()->mouse()->setPos(frameGeometry().center());
         performMouseCommand(Options::MouseMove, Cursors::self()->mouse()->pos());
     });
-    connect(w, &PlasmaWindowInterface::resizeRequested, this, [this]() {
+    connect(w, &LingmoWindowInterface::resizeRequested, this, [this]() {
         Cursors::self()->mouse()->setPos(frameGeometry().bottomRight());
         performMouseCommand(Options::MouseResize, Cursors::self()->mouse()->pos());
     });
-    connect(w, &PlasmaWindowInterface::fullscreenRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::fullscreenRequested, this, [this](bool set) {
         setFullScreen(set);
     });
-    connect(w, &PlasmaWindowInterface::minimizedRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::minimizedRequested, this, [this](bool set) {
         setMinimized(set);
     });
-    connect(w, &PlasmaWindowInterface::maximizedRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::maximizedRequested, this, [this](bool set) {
         maximize(set ? MaximizeFull : MaximizeRestore);
     });
-    connect(w, &PlasmaWindowInterface::keepAboveRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::keepAboveRequested, this, [this](bool set) {
         setKeepAbove(set);
     });
-    connect(w, &PlasmaWindowInterface::keepBelowRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::keepBelowRequested, this, [this](bool set) {
         setKeepBelow(set);
     });
-    connect(w, &PlasmaWindowInterface::demandsAttentionRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::demandsAttentionRequested, this, [this](bool set) {
         demandAttention(set);
     });
-    connect(w, &PlasmaWindowInterface::activeRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::activeRequested, this, [this](bool set) {
         if (set) {
             workspace()->activateWindow(this, true);
         }
     });
-    connect(w, &PlasmaWindowInterface::shadedRequested, this, [this](bool set) {
+    connect(w, &LingmoWindowInterface::shadedRequested, this, [this](bool set) {
         setShade(set);
     });
 
     for (const auto vd : std::as_const(m_desktops)) {
-        w->addPlasmaVirtualDesktop(vd->id());
+        w->addLingmoVirtualDesktop(vd->id());
     }
     // We need to set `OnAllDesktops` after the actual VD list has been added.
     // Otherwise it will unconditionally add the current desktop to the interface
     // which may not be the case, for example, when using rules
     w->setOnAllDesktops(isOnAllDesktops());
 
-    // Plasma Virtual desktop management
+    // Lingmo Virtual desktop management
     // show/hide when the window enters/exits from desktop
-    connect(w, &PlasmaWindowInterface::enterPlasmaVirtualDesktopRequested, this, [this](const QString &desktopId) {
+    connect(w, &LingmoWindowInterface::enterLingmoVirtualDesktopRequested, this, [this](const QString &desktopId) {
         VirtualDesktop *vd = VirtualDesktopManager::self()->desktopForId(desktopId);
         if (vd) {
             enterDesktop(vd);
         }
     });
-    connect(w, &PlasmaWindowInterface::enterNewPlasmaVirtualDesktopRequested, this, [this]() {
+    connect(w, &LingmoWindowInterface::enterNewLingmoVirtualDesktopRequested, this, [this]() {
         VirtualDesktopManager::self()->setCount(VirtualDesktopManager::self()->count() + 1);
         enterDesktop(VirtualDesktopManager::self()->desktops().last());
     });
-    connect(w, &PlasmaWindowInterface::leavePlasmaVirtualDesktopRequested, this, [this](const QString &desktopId) {
+    connect(w, &LingmoWindowInterface::leaveLingmoVirtualDesktopRequested, this, [this](const QString &desktopId) {
         VirtualDesktop *vd = VirtualDesktopManager::self()->desktopForId(desktopId);
         if (vd) {
             leaveDesktop(vd);
@@ -1908,34 +1908,34 @@ void Window::setupWindowManagementInterface()
     });
 
     for (const auto &activity : std::as_const(m_activityList)) {
-        w->addPlasmaActivity(activity);
+        w->addLingmoActivity(activity);
     }
 
     connect(this, &Window::activitiesChanged, w, [w, this] {
         const auto newActivities = QSet<QString>(m_activityList.begin(), m_activityList.end());
-        const auto oldActivitiesList = w->plasmaActivities();
+        const auto oldActivitiesList = w->lingmoActivities();
         const auto oldActivities = QSet<QString>(oldActivitiesList.begin(), oldActivitiesList.end());
 
         const auto activitiesToAdd = newActivities - oldActivities;
         for (const auto &activity : activitiesToAdd) {
-            w->addPlasmaActivity(activity);
+            w->addLingmoActivity(activity);
         }
 
         const auto activitiesToRemove = oldActivities - newActivities;
         for (const auto &activity : activitiesToRemove) {
-            w->removePlasmaActivity(activity);
+            w->removeLingmoActivity(activity);
         }
     });
 
-    // Plasma Activities management
+    // Lingmo Activities management
     // show/hide when the window enters/exits activity
-    connect(w, &PlasmaWindowInterface::enterPlasmaActivityRequested, this, [this](const QString &activityId) {
+    connect(w, &LingmoWindowInterface::enterLingmoActivityRequested, this, [this](const QString &activityId) {
         setOnActivity(activityId, true);
     });
-    connect(w, &PlasmaWindowInterface::leavePlasmaActivityRequested, this, [this](const QString &activityId) {
+    connect(w, &LingmoWindowInterface::leaveLingmoActivityRequested, this, [this](const QString &activityId) {
         setOnActivity(activityId, false);
     });
-    connect(w, &PlasmaWindowInterface::sendToOutput, this, [this](OutputInterface *output) {
+    connect(w, &LingmoWindowInterface::sendToOutput, this, [this](OutputInterface *output) {
         sendToOutput(output->handle());
     });
 

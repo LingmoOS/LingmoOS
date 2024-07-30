@@ -71,9 +71,9 @@ void Bluetooth::checkNetworkConnection(const QStringList &uuids, const QString &
 
 void Bluetooth::checkNetworkInternal(const QString &service, const QString &address)
 {
-    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmanetworkmanagement"),
-                                                      QStringLiteral("/org/kde/plasmanetworkmanagement"),
-                                                      QStringLiteral("org.kde.plasmanetworkmanagement"),
+    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmonetworkmanagement"),
+                                                      QStringLiteral("/org/kde/lingmonetworkmanagement"),
+                                                      QStringLiteral("org.kde.lingmonetworkmanagement"),
                                                       QStringLiteral("bluetoothConnectionExists"));
 
     msg << address;
@@ -92,9 +92,9 @@ void Bluetooth::checkNetworkInternal(const QString &service, const QString &addr
 
 void Bluetooth::setupNetworkConnection(const QString &service, const QString &address, const QString &deviceName)
 {
-    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmanetworkmanagement"),
-                                                      QStringLiteral("/org/kde/plasmanetworkmanagement"),
-                                                      QStringLiteral("org.kde.plasmanetworkmanagement"),
+    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmonetworkmanagement"),
+                                                      QStringLiteral("/org/kde/lingmonetworkmanagement"),
+                                                      QStringLiteral("org.kde.lingmonetworkmanagement"),
                                                       QStringLiteral("addBluetoothConnection"));
 
     msg << address;

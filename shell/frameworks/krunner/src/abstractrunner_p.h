@@ -17,11 +17,11 @@ public:
         : runnerDescription(data)
         , translatedName(data.name())
         , runner(r)
-        , minLetterCount(data.value(QStringLiteral("X-Plasma-Runner-Min-Letter-Count"), 0))
-        , hasUniqueResults(data.value(QStringLiteral("X-Plasma-Runner-Unique-Results"), false))
-        , hasWeakResults(data.value(QStringLiteral("X-Plasma-Runner-Weak-Results"), false))
+        , minLetterCount(data.value(QStringLiteral("X-Lingmo-Runner-Min-Letter-Count"), 0))
+        , hasUniqueResults(data.value(QStringLiteral("X-Lingmo-Runner-Unique-Results"), false))
+        , hasWeakResults(data.value(QStringLiteral("X-Lingmo-Runner-Weak-Results"), false))
     {
-        if (const QString regexStr = data.value(QStringLiteral("X-Plasma-Runner-Match-Regex")); !regexStr.isEmpty()) {
+        if (const QString regexStr = data.value(QStringLiteral("X-Lingmo-Runner-Match-Regex")); !regexStr.isEmpty()) {
             matchRegex = QRegularExpression(regexStr);
             hasMatchRegex = matchRegex.isValid() && !matchRegex.pattern().isEmpty();
         }

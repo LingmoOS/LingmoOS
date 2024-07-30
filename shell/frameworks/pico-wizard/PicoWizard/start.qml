@@ -6,11 +6,11 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.7 as Kirigami
+import org.kde.lingmoui 2.7 as LingmoUI
 
 import PicoWizard 1.0
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     property alias moduleLoader: moduleLoader
 
     id: appRoot
@@ -19,10 +19,10 @@ Kirigami.ApplicationWindow {
     x: Screen.width / 2 - width / 2
     y: Screen.height / 2 - height / 2
     visibility: maximizeWindow ? Window.Maximized : Window.AutomaticVisibility
-    color: Kirigami.Theme.backgroundColor
+    color: LingmoUI.Theme.backgroundColor
     visible: true
     background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
 
         Image {
             id: backgroundItem

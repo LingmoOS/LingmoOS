@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami 2 as Kirigami
+import org.kde.lingmoui 2 as LingmoUI
 import org.kde.kcmutils as KCM
 
 QQC2.ItemDelegate {
@@ -29,7 +29,7 @@ QQC2.ItemDelegate {
     }
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.RadioButton {
             readonly property bool _exclusive: model.ExclusiveRole != ""
@@ -69,11 +69,11 @@ QQC2.ItemDelegate {
         }
 
         ColumnLayout {
-            Layout.topMargin: Kirigami.Units.smallSpacing
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
+            Layout.topMargin: LingmoUI.Units.smallSpacing
+            Layout.bottomMargin: LingmoUI.Units.smallSpacing
             spacing: 0
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
 
                 level: 5

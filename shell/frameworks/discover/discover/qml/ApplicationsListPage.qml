@@ -9,7 +9,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
 
@@ -71,8 +71,8 @@ DiscoverPage {
 
     signal clearSearch()
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Window
+    LingmoUI.Theme.inherit: false
 
     onSearchChanged: {
         if (search.length > 0) {
@@ -94,10 +94,10 @@ DiscoverPage {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Sort: %1", sortGroup.checkedAction.text)
             icon.name: "view-sort"
-            Kirigami.Action {
+            LingmoUI.Action {
                 visible: appsModel.search.length > 0
                 QQC2.ActionGroup.group: sortGroup
                 text: i18nc("Search results most relevant to the search query", "Relevance")
@@ -109,7 +109,7 @@ DiscoverPage {
                 checkable: true
                 checked: appsModel.sortRole === Discover.ResourcesProxyModel.SearchRelevanceRole
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 QQC2.ActionGroup.group: sortGroup
                 text: i18n("Name")
                 icon.name: "sort-name"
@@ -120,7 +120,7 @@ DiscoverPage {
                 checkable: true
                 checked: appsModel.sortRole === Discover.ResourcesProxyModel.NameRole
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 QQC2.ActionGroup.group: sortGroup
                 text: i18n("Rating")
                 icon.name: "rating"
@@ -131,7 +131,7 @@ DiscoverPage {
                 checkable: true
                 checked: appsModel.sortRole === Discover.ResourcesProxyModel.SortableRatingRole
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 QQC2.ActionGroup.group: sortGroup
                 text: i18n("Size")
                 icon.name: "download"
@@ -142,7 +142,7 @@ DiscoverPage {
                 checkable: true
                 checked: appsModel.sortRole === Discover.ResourcesProxyModel.SizeRole
             }
-            Kirigami.Action {
+            LingmoUI.Action {
                 QQC2.ActionGroup.group: sortGroup
                 text: i18n("Release Date")
                 icon.name: "change-date-symbolic"
@@ -156,14 +156,14 @@ DiscoverPage {
         }
     ]
 
-    Kirigami.CardsListView {
+    LingmoUI.CardsListView {
         id: appsView
         footerPositioning: ListView.InlineFooter
         activeFocusOnTab: true
         currentIndex: -1
         footer: Item {
             id: appViewFooter
-            height: appsModel.busy ? Kirigami.Units.gridUnit * 8 : Kirigami.Units.gridUnit
+            height: appsModel.busy ? LingmoUI.Units.gridUnit * 8 : LingmoUI.Units.gridUnit
             width: parent.width
         }
         onActiveFocusChanged: if (activeFocus && currentIndex === -1) {
@@ -195,21 +195,21 @@ DiscoverPage {
             anchors.fill: parent
             opacity: nothingFound ? 1 : 0
             visible: opacity > 0
-            Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration; easing.type: Easing.InOutQuad } }
+            Behavior on opacity { NumberAnimation { duration: LingmoUI.Units.longDuration; easing.type: Easing.InOutQuad } }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 visible: !searchedForThingNotFound.visible
                 anchors.centerIn: visible ? parent : undefined
-                width: parent.width - (Kirigami.Units.largeSpacing * 8)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 8)
 
                 icon.name: "edit-none"
                 text: i18n("Nothing found")
             }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 id: searchedForThingNotFound
 
-                Kirigami.Action {
+                LingmoUI.Action {
                     id: searchAllCategoriesAction
                     text: i18nc("@action:button", "Search in All Categories")
                     icon.name: "search"
@@ -219,7 +219,7 @@ DiscoverPage {
                         Navigation.openApplicationList({ search: page.search });
                     }
                 }
-                Kirigami.Action {
+                LingmoUI.Action {
                     id: searchTheWebAction
                     text: i18nc("@action:button %1 is the name of an application", "Search the Web for \"%1\"", appsModel.search)
                     icon.name: "internet-web-browser"
@@ -230,7 +230,7 @@ DiscoverPage {
                 }
 
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 8)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 8)
 
                 visible: appsModel.search.length > 0 && stateFilter !== Discover.AbstractResource.Installed
 
@@ -248,13 +248,13 @@ DiscoverPage {
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             anchors.centerIn: parent
-            width: parent.width - (Kirigami.Units.largeSpacing * 4)
+            width: parent.width - (LingmoUI.Units.largeSpacing * 4)
 
             visible: opacity !== 0
             opacity: appsView.count === 0 && page.searchPage && appsModel.search.length === 0 ? 1 : 0
-            Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; easing.type: Easing.InOutQuad } }
+            Behavior on opacity { NumberAnimation { duration: LingmoUI.Units.shortDuration; easing.type: Easing.InOutQuad } }
 
             icon.name: "search"
             text: i18n("Search")
@@ -268,7 +268,7 @@ DiscoverPage {
             ColumnLayout {
                 anchors.centerIn: parent
                 opacity: parent.visible ? 0.5 : 0
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     id: headingText
                     Layout.alignment: Qt.AlignCenter
                     level: 2
@@ -278,11 +278,11 @@ DiscoverPage {
                     id: busyIndicator
                     Layout.alignment: Qt.AlignCenter
                     running: parent.visible
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                    Layout.preferredWidth: LingmoUI.Units.gridUnit * 4
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 4
                 }
                 Behavior on opacity {
-                    PropertyAnimation { duration: Kirigami.Units.longDuration; easing.type: Easing.InOutQuad }
+                    PropertyAnimation { duration: LingmoUI.Units.longDuration; easing.type: Easing.InOutQuad }
                 }
             }
         }

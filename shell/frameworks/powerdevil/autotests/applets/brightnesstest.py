@@ -29,7 +29,7 @@ from GLibMainLoopThread import GLibMainLoopThread
 from OrgFreedesktopPolicyKit1 import OrgFreedesktopPolicyKit1
 from OrgFreedesktopUPower import OrgFreedesktopUPower
 
-WIDGET_ID: Final = "org.kde.plasma.brightness"
+WIDGET_ID: Final = "org.kde.lingmo.brightness"
 KDE_VERSION: Final = 6
 POWERDEVIL_PATH: Final = os.environ.get("POWERDEVIL_PATH", "/usr/libexec/org_kde_powerdevil")
 POWERDEVIL_SERVICE_NAME: Final = "org.kde.Solid.PowerManagement"
@@ -199,12 +199,12 @@ class BrightnessTests(unittest.TestCase):
         assert cls.testbed.add_from_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "brightness.umockdev"))
 
         # Start the backlight helper interface
-        # NOTE the backend path is hardcoded and plasma and frameworks have different install paths, so we need to copy the backend plugins to the frameworks folder
+        # NOTE the backend path is hardcoded and lingmo and frameworks have different install paths, so we need to copy the backend plugins to the frameworks folder
         # define KAUTH_BACKEND_PLUGIN_DIR "${KDE_INSTALL_FULL_PLUGINDIR}/${KAUTH_BACKEND_PLUGIN_DIR}"
         # define KAUTH_HELPER_PLUGIN_DIR "${KDE_INSTALL_FULL_PLUGINDIR}/${KAUTH_HELPER_PLUGIN_DIR}"
         if "KDECI_BUILD" in os.environ:
             os.makedirs(f"/builds/frameworks/kauth/_install/lib64/plugins/kf{KDE_VERSION}", exist_ok=True)
-            shutil.copytree(f"/builds/{os.getenv('CI_PROJECT_PATH', 'plasma/plasma-workspace')}/_install/lib64/plugins/kf{KDE_VERSION}/kauth", f"/builds/frameworks/kauth/_install/lib64/plugins/kf{KDE_VERSION}/kauth")
+            shutil.copytree(f"/builds/{os.getenv('CI_PROJECT_PATH', 'lingmo/lingmo-workspace')}/_install/lib64/plugins/kf{KDE_VERSION}/kauth", f"/builds/frameworks/kauth/_install/lib64/plugins/kf{KDE_VERSION}/kauth")
             cls.addClassCleanup(shutil.rmtree, f"/builds/frameworks/kauth/_install/lib64/plugins/kf{KDE_VERSION}/kauth")
 
         debug_env = os.environ.copy()
@@ -239,13 +239,13 @@ class BrightnessTests(unittest.TestCase):
         assert powerdevil_started, "PowerDevil is not running"
         # Now start the appium test
         options = AppiumOptions()
-        options.set_capability("app", f"plasmawindowed -p org.kde.plasma.nano {WIDGET_ID}")
+        options.set_capability("app", f"lingmowindowed -p org.kde.lingmo.nano {WIDGET_ID}")
         options.set_capability("environ", {
             "DBUS_SYSTEM_BUS_ADDRESS": os.environ["DBUS_SYSTEM_BUS_ADDRESS"],
             "DBUS_SESSION_BUS_ADDRESS": os.environ["DBUS_SESSION_BUS_ADDRESS"],
             "LC_ALL": "en_US.UTF-8",
             "QT_FATAL_WARNINGS": "0",
-            "QT_LOGGING_RULES": "qt.accessibility.atspi.warning=false;qt.dbus.integration.warning=false;kf.plasma.core.warning=false;kf.windowsystem.warning=false;kf.kirigami.platform.warning=false",
+            "QT_LOGGING_RULES": "qt.accessibility.atspi.warning=false;qt.dbus.integration.warning=false;kf.lingmo.core.warning=false;kf.windowsystem.warning=false;kf.lingmoui.platform.warning=false",
         })
         cls.driver = webdriver.Remote(command_executor='http://127.0.0.1:4723', extensions=[SetValueCommand], options=options)
 
@@ -264,10 +264,10 @@ class BrightnessTests(unittest.TestCase):
         """
         Make sure to terminate the driver again, lest it dangles.
         """
-        subprocess.check_call([f"kquitapp{KDE_VERSION}", "plasmawindowed"])
+        subprocess.check_call([f"kquitapp{KDE_VERSION}", "lingmowindowed"])
         for _ in range(10):
             try:
-                subprocess.check_call(["pidof", "plasmawindowed"])
+                subprocess.check_call(["pidof", "lingmowindowed"])
             except subprocess.CalledProcessError:
                 break
             time.sleep(1)

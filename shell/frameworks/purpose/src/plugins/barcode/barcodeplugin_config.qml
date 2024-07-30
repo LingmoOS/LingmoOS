@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.prison as Prison
 
 ColumnLayout {
@@ -18,13 +18,13 @@ ColumnLayout {
 
     property list<string> urls
 
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
     Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 10
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
+        Layout.preferredHeight: LingmoUI.Units.gridUnit * 10
 
         Prison.Barcode {
             id: barcodeItem

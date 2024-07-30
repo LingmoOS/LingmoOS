@@ -20,7 +20,7 @@ class SeatInterface;
 class ClientConnection;
 class SurfaceInterface;
 class XdgActivationV1Interface;
-class PlasmaWindowActivationInterface;
+class LingmoWindowActivationInterface;
 
 class KWIN_EXPORT XdgActivationV1Integration : public QObject
 {
@@ -47,7 +47,7 @@ private:
         SeatInterface *seat;
         QString applicationId;
         bool showNotify;
-        std::unique_ptr<PlasmaWindowActivationInterface> activation;
+        std::unique_ptr<LingmoWindowActivationInterface> activation;
     };
     std::unique_ptr<ActivationToken> m_currentActivationToken;
 };

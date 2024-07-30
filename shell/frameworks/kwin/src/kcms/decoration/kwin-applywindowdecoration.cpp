@@ -96,7 +96,7 @@ int main(int argc, char **argv)
                                                                       QStringLiteral("org.kde.KWin"),
                                                                       QStringLiteral("reloadConfig"));
                     QDBusConnection::sessionBus().send(message);
-                    ts << i18n("Successfully applied the cursor theme %1 to your current Plasma session",
+                    ts << i18n("Successfully applied the cursor theme %1 to your current Lingmo session",
                                model->data(model->index(index), KDecoration2::Configuration::DecorationsModel::ThemeNameRole).toString())
                        << Qt::endl;
                 } else {
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
             const QString displayName = model->data(model->index(i), Qt::DisplayRole).toString();
             const QString themeName = model->data(model->index(i), KDecoration2::Configuration::DecorationsModel::ThemeNameRole).toString();
             if (settings->theme() == themeName) {
-                ts << QStringLiteral(" * %1 (theme name: %2 - current theme for this Plasma session)").arg(displayName, themeName) << Qt::endl;
+                ts << QStringLiteral(" * %1 (theme name: %2 - current theme for this Lingmo session)").arg(displayName, themeName) << Qt::endl;
             } else {
                 ts << QStringLiteral(" * %1 (theme name: %2)").arg(displayName, themeName) << Qt::endl;
             }

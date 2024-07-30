@@ -28,11 +28,11 @@ int main(int argc, char **argv)
                      i18n("(C) 2010-2018 Daniel Nicoletti"));
 
     about.addAuthor(QLatin1String("Daniel Nicoletti"), QString(), QLatin1String("dantti12@gmail.com"));
-    about.addAuthor(QStringLiteral("Lukáš Tinkl"), i18n("Port to Qt 5 / Plasma 5"), QStringLiteral("ltinkl@redhat.com"));
-    about.addAuthor(QStringLiteral("Mike Noe"), i18n("Port to Qt 6 / Plasma 6"), QStringLiteral("noeerover@gmail.com"));
+    about.addAuthor(QStringLiteral("Lukáš Tinkl"), i18n("Port to Qt 5 / Lingmo 5"), QStringLiteral("ltinkl@redhat.com"));
+    about.addAuthor(QStringLiteral("Mike Noe"), i18n("Port to Qt 6 / Lingmo 6"), QStringLiteral("noeerover@gmail.com"));
     KAboutData::setApplicationData(about);
 
-    qCWarning(PM_ADD_PRINTER) << i18n("NOTE: This application is deprecated and will be removed from Plasma in a future release.");
+    qCWarning(PM_ADD_PRINTER) << i18n("NOTE: This application is deprecated and will be removed from Lingmo in a future release.");
 
     QCommandLineParser parser;
     about.setupCommandLine(&parser);

@@ -12,12 +12,12 @@
 #include <KWindowSystem>
 
 #include <KWayland/Client/connection_thread.h>
-#include <KWayland/Client/plasmashell.h>
+#include <KWayland/Client/lingmoshell.h>
 #include <KWayland/Client/registry.h>
 #include <KWayland/Client/seat.h>
 #include <KWayland/Client/surface.h>
 
-#include "qwayland-plasma-window-management.h"
+#include "qwayland-lingmo-window-management.h"
 #include <QGuiApplication>
 #include <QPixmap>
 #include <QPoint>
@@ -30,7 +30,7 @@
 #include <qpa/qplatformnativeinterface.h>
 #include <qwaylandclientextension.h>
 
-class WindowManagement : public QWaylandClientExtensionTemplate<WindowManagement>, public QtWayland::org_kde_plasma_window_management
+class WindowManagement : public QWaylandClientExtensionTemplate<WindowManagement>, public QtWayland::org_kde_lingmo_window_management
 {
 public:
     WindowManagement()
@@ -38,7 +38,7 @@ public:
     {
     }
 
-    void org_kde_plasma_window_management_show_desktop_changed(uint32_t state) override
+    void org_kde_lingmo_window_management_show_desktop_changed(uint32_t state) override
     {
         showingDesktop = state == show_desktop_enabled;
     }
@@ -369,27 +369,27 @@ void WindowSystem::clearState(WId win, NET::States state)
         return;
     }
 
-    KWayland::Client::PlasmaShellSurface *plasmaShellSurface = nullptr;
+    KWayland::Client::LingmoShellSurface *lingmoShellSurface = nullptr;
 
     if (state & NET::SkipTaskbar || state & NET::SkipSwitcher) {
-        if (!WaylandIntegration::self()->waylandPlasmaShell()) {
+        if (!WaylandIntegration::self()->waylandLingmoShell()) {
             return;
         }
-        plasmaShellSurface = PlasmaShellSurface::get(s);
-        if (!plasmaShellSurface) {
-            plasmaShellSurface = WaylandIntegration::self()->waylandPlasmaShell()->createSurface(s, this);
+        lingmoShellSurface = LingmoShellSurface::get(s);
+        if (!lingmoShellSurface) {
+            lingmoShellSurface = WaylandIntegration::self()->waylandLingmoShell()->createSurface(s, this);
         }
-        if (!plasmaShellSurface) {
+        if (!lingmoShellSurface) {
             return;
         }
     }
 
     if (state & NET::SkipTaskbar) {
-        plasmaShellSurface->setSkipTaskbar(false);
+        lingmoShellSurface->setSkipTaskbar(false);
     }
 
     if (state & NET::SkipSwitcher) {
-        plasmaShellSurface->setSkipSwitcher(false);
+        lingmoShellSurface->setSkipSwitcher(false);
     }
 
     if (state & NET::Max) {
@@ -434,27 +434,27 @@ void WindowSystem::setState(WId win, NET::States state)
         return;
     }
 
-    KWayland::Client::PlasmaShellSurface *plasmaShellSurface = nullptr;
+    KWayland::Client::LingmoShellSurface *lingmoShellSurface = nullptr;
 
     if (state & NET::SkipTaskbar || state & NET::SkipSwitcher) {
-        if (!WaylandIntegration::self()->waylandPlasmaShell()) {
+        if (!WaylandIntegration::self()->waylandLingmoShell()) {
             return;
         }
-        plasmaShellSurface = PlasmaShellSurface::get(s);
-        if (!plasmaShellSurface) {
-            plasmaShellSurface = WaylandIntegration::self()->waylandPlasmaShell()->createSurface(s, this);
+        lingmoShellSurface = LingmoShellSurface::get(s);
+        if (!lingmoShellSurface) {
+            lingmoShellSurface = WaylandIntegration::self()->waylandLingmoShell()->createSurface(s, this);
         }
-        if (!plasmaShellSurface) {
+        if (!lingmoShellSurface) {
             return;
         }
     }
 
     if (state & NET::SkipTaskbar) {
-        plasmaShellSurface->setSkipTaskbar(true);
+        lingmoShellSurface->setSkipTaskbar(true);
     }
 
     if (state & NET::SkipSwitcher) {
-        plasmaShellSurface->setSkipSwitcher(true);
+        lingmoShellSurface->setSkipSwitcher(true);
     }
 
     if (state & NET::Max) {
@@ -494,33 +494,33 @@ void WindowSystem::setState(WId win, NET::States state)
 
 void WindowSystem::setType(WId win, NET::WindowType windowType)
 {
-    if (!WaylandIntegration::self()->waylandPlasmaShell()) {
+    if (!WaylandIntegration::self()->waylandLingmoShell()) {
         return;
     }
-    KWayland::Client::PlasmaShellSurface::Role role;
+    KWayland::Client::LingmoShellSurface::Role role;
 
     switch (windowType) {
     case NET::Normal:
-        role = KWayland::Client::PlasmaShellSurface::Role::Normal;
+        role = KWayland::Client::LingmoShellSurface::Role::Normal;
         break;
     case NET::Desktop:
-        role = KWayland::Client::PlasmaShellSurface::Role::Desktop;
+        role = KWayland::Client::LingmoShellSurface::Role::Desktop;
         break;
     case NET::Dock:
-        role = KWayland::Client::PlasmaShellSurface::Role::Panel;
+        role = KWayland::Client::LingmoShellSurface::Role::Panel;
         break;
     case NET::OnScreenDisplay:
-        role = KWayland::Client::PlasmaShellSurface::Role::OnScreenDisplay;
+        role = KWayland::Client::LingmoShellSurface::Role::OnScreenDisplay;
         break;
     case NET::Notification:
-        role = KWayland::Client::PlasmaShellSurface::Role::Notification;
+        role = KWayland::Client::LingmoShellSurface::Role::Notification;
         break;
     case NET::Tooltip:
     case NET::PopupMenu:
-        role = KWayland::Client::PlasmaShellSurface::Role::ToolTip;
+        role = KWayland::Client::LingmoShellSurface::Role::ToolTip;
         break;
     case NET::CriticalNotification:
-        role = KWayland::Client::PlasmaShellSurface::Role::CriticalNotification;
+        role = KWayland::Client::LingmoShellSurface::Role::CriticalNotification;
         break;
     default:
         return;
@@ -529,7 +529,7 @@ void WindowSystem::setType(WId win, NET::WindowType windowType)
     if (!s) {
         return;
     }
-    KWayland::Client::PlasmaShellSurface *shellSurface = WaylandIntegration::self()->waylandPlasmaShell()->createSurface(s, this);
+    KWayland::Client::LingmoShellSurface *shellSurface = WaylandIntegration::self()->waylandLingmoShell()->createSurface(s, this);
 
     shellSurface->setRole(role);
 }

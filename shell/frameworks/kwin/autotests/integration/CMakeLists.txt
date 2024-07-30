@@ -18,11 +18,11 @@ qt6_generate_wayland_protocol_client_sources(KWinIntegrationTestFramework
         ${WaylandProtocols_DATADIR}/staging/cursor-shape/cursor-shape-v1.xml
         ${WaylandProtocols_DATADIR}/staging/security-context/security-context-v1.xml
 
-        ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
-        ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
-        ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-screen-edge-v1.xml
-        ${PLASMA_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml
-        ${PLASMA_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
+        ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
+        ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
+        ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-screen-edge-v1.xml
+        ${LINGMO_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml
+        ${LINGMO_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
 )
 
 if (Qt6_VERSION VERSION_LESS "6.7.1")
@@ -64,7 +64,7 @@ target_link_libraries(KWinIntegrationTestFramework
     PUBLIC
         Qt::Test
         Qt::Concurrent
-        Plasma::KWaylandClient
+        Lingmo::KWaylandClient
         Wayland::Client
         Libdrm::Libdrm
         kwin
@@ -118,7 +118,7 @@ integrationTest(NAME testPlatformCursor SRCS platformcursor.cpp)
 integrationTest(NAME testDontCrashCancelAnimation SRCS dont_crash_cancel_animation.cpp LIBS KDecoration2::KDecoration)
 integrationTest(NAME testTransientPlacement SRCS transient_placement.cpp)
 integrationTest(NAME testDebugConsole SRCS debug_console_test.cpp)
-integrationTest(NAME testPlasmaSurface SRCS plasma_surface_test.cpp)
+integrationTest(NAME testLingmoSurface SRCS lingmo_surface_test.cpp)
 integrationTest(NAME testMaximized SRCS maximize_test.cpp LIBS KDecoration2::KDecoration KF6::Package)
 integrationTest(NAME testXdgShellWindow SRCS xdgshellwindow_test.cpp LIBS KDecoration2::KDecoration)
 integrationTest(NAME testSceneOpenGL SRCS scene_opengl_test.cpp )
@@ -151,7 +151,7 @@ integrationTest(NAME testMoveResize SRCS move_resize_window_test.cpp LIBS XCB::I
 integrationTest(NAME testStruts SRCS struts_test.cpp LIBS XCB::ICCCM KDecoration2::KDecoration)
 integrationTest(NAME testShade SRCS shade_test.cpp LIBS XCB::ICCCM KDecoration2::KDecoration)
 integrationTest(NAME testDontCrashAuroraeDestroyDeco SRCS dont_crash_aurorae_destroy_deco.cpp LIBS XCB::ICCCM KDecoration2::KDecoration)
-integrationTest(NAME testPlasmaWindow SRCS plasmawindow_test.cpp LIBS XCB::ICCCM)
+integrationTest(NAME testLingmoWindow SRCS lingmowindow_test.cpp LIBS XCB::ICCCM)
 integrationTest(NAME testX11DesktopWindow SRCS desktop_window_x11_test.cpp LIBS XCB::ICCCM)
 integrationTest(NAME testXwaylandInput SRCS xwayland_input_test.cpp LIBS XCB::ICCCM)
 integrationTest(NAME testWindowRules SRCS window_rules_test.cpp LIBS XCB::ICCCM)
@@ -185,7 +185,7 @@ if (TARGET K::KPipeWire)
 endif()
 
 if (KWIN_BUILD_ACTIVITIES)
-    integrationTest(NAME testActivities SRCS activities_test.cpp LIBS XCB::ICCCM Plasma::Activities)
+    integrationTest(NAME testActivities SRCS activities_test.cpp LIBS XCB::ICCCM Lingmo::Activities)
 endif()
 
 add_subdirectory(scripting)

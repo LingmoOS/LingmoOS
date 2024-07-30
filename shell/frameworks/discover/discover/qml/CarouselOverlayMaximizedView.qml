@@ -6,7 +6,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover
 
 CarouselAbstractMaximizedView {
@@ -28,8 +28,8 @@ CarouselAbstractMaximizedView {
     readonly property T.Popup popup: T.Popup {
         id: popup
 
-        Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.FullScreen
-        z: Kirigami.OverlayZStacking.z
+        LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.FullScreen
+        z: LingmoUI.OverlayZStacking.z
 
         implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                                 contentWidth + leftPadding + rightPadding)

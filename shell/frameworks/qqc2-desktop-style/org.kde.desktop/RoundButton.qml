@@ -8,13 +8,13 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.RoundButton {
     id: controlRoot
 
-    Kirigami.Theme.colorSet: !flat && (controlRoot.activeFocus || controlRoot.highlighted) ? Kirigami.Theme.Selection : Kirigami.Theme.Button
-    Kirigami.Theme.inherit: flat && !down && !checked
+    LingmoUI.Theme.colorSet: !flat && (controlRoot.activeFocus || controlRoot.highlighted) ? LingmoUI.Theme.Selection : LingmoUI.Theme.Button
+    LingmoUI.Theme.inherit: flat && !down && !checked
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
@@ -29,17 +29,17 @@ T.RoundButton {
         y: controlRoot.down || controlRoot.checked ? 1 : 0
     }
 
-    icon.width: Kirigami.Units.iconSizes.smallMedium
-    icon.height: Kirigami.Units.iconSizes.smallMedium
+    icon.width: LingmoUI.Units.iconSizes.smallMedium
+    icon.height: LingmoUI.Units.iconSizes.smallMedium
 
-    padding: 6 // Matches the button margins of Breeze, Fusion, Oxygen and QCommonStyle
+    padding: 6 // Matches the button margins of Ocean, Fusion, Oxygen and QCommonStyle
     spacing: 4 // Matches the default/hardcoded icon+label spacing of Qt Widgets
 
     contentItem: GridLayout {
         rowSpacing: controlRoot.spacing
         columnSpacing: controlRoot.spacing
         flow: iconContent.visible && labelContent.visible && controlRoot.display === T.AbstractButton.TextUnderIcon ? GridLayout.TopToBottom : GridLayout.LeftToRight
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: iconContent
             Layout.alignment: {
                 if (iconContent.visible && labelContent.visible) {
@@ -74,24 +74,24 @@ T.RoundButton {
         }
     }
     background: Rectangle {
-        property color borderColor: Kirigami.ColorUtils.linearInterpolation(controlRoot.palette.button, controlRoot.palette.buttonText, Kirigami.Theme.frameContrast)
+        property color borderColor: LingmoUI.ColorUtils.linearInterpolation(controlRoot.palette.button, controlRoot.palette.buttonText, LingmoUI.Theme.frameContrast)
 
         visible: !controlRoot.flat || controlRoot.hovered || controlRoot.activeFocus || controlRoot.highlighted || controlRoot.checked || controlRoot.down
 
-        implicitWidth: Kirigami.Units.gridUnit + 6 + 6
-        implicitHeight: Kirigami.Units.gridUnit + 6 + 6
+        implicitWidth: LingmoUI.Units.gridUnit + 6 + 6
+        implicitHeight: LingmoUI.Units.gridUnit + 6 + 6
         radius: controlRoot.radius
         color: {
             if (controlRoot.checked || controlRoot.down) {
-                return Qt.tint(Kirigami.Theme.textColor, Qt.alpha(borderColor, 0.8))
+                return Qt.tint(LingmoUI.Theme.textColor, Qt.alpha(borderColor, 0.8))
             } else if (controlRoot.flat) {
-                return Qt.alpha(Kirigami.Theme.backgroundColor, 0)
+                return Qt.alpha(LingmoUI.Theme.backgroundColor, 0)
             } else {
-                return Kirigami.Theme.backgroundColor
+                return LingmoUI.Theme.backgroundColor
             }
         }
 
-        border.color: controlRoot.flat ? Kirigami.Theme.highlightColor : borderColor
+        border.color: controlRoot.flat ? LingmoUI.Theme.highlightColor : borderColor
         border.width: controlRoot.flat && !(controlRoot.hovered || controlRoot.activeFocus || controlRoot.highlighted) ? 0 : 1
 
         Rectangle {

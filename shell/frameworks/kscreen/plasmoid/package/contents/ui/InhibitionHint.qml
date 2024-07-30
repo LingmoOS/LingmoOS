@@ -9,28 +9,28 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 
 // everything like in battery applet, but slightly bigger
 RowLayout {
     property alias iconSource: iconItem.source
     property alias text: label.text
 
-    spacing: Kirigami.Units.smallSpacing * 2
+    spacing: LingmoUI.Units.smallSpacing * 2
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         id: iconItem
-        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+        Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+        Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
         visible: valid
     }
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: label
         Layout.fillWidth: true
-        Layout.maximumWidth: Math.min(Kirigami.Units.gridUnit * 20, implicitWidth)
-        font: Kirigami.Theme.smallFont
+        Layout.maximumWidth: Math.min(LingmoUI.Units.gridUnit * 20, implicitWidth)
+        font: LingmoUI.Theme.smallFont
         textFormat: Text.PlainText
         wrapMode: Text.WordWrap
         elide: Text.ElideRight

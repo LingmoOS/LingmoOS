@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 T.SwitchDelegate {
@@ -23,18 +23,18 @@ T.SwitchDelegate {
 
     hoverEnabled: true
 
-    spacing: Kirigami.Units.smallSpacing
-    padding: Kirigami.Settings.tabletMode ? Kirigami.Units.largeSpacing : Kirigami.Units.mediumSpacing
-    horizontalPadding: Kirigami.Units.smallSpacing * 2
+    spacing: LingmoUI.Units.smallSpacing
+    padding: LingmoUI.Settings.tabletMode ? LingmoUI.Units.largeSpacing : LingmoUI.Units.mediumSpacing
+    horizontalPadding: LingmoUI.Units.smallSpacing * 2
     leftPadding: !mirrored ? horizontalPadding + implicitIndicatorWidth + spacing : horizontalPadding
     rightPadding: mirrored ? horizontalPadding + implicitIndicatorWidth + spacing : horizontalPadding
 
-    icon.width: Kirigami.Units.iconSizes.smallMedium
-    icon.height: Kirigami.Units.iconSizes.smallMedium
+    icon.width: LingmoUI.Units.iconSizes.smallMedium
+    icon.height: LingmoUI.Units.iconSizes.smallMedium
 
-    T.ToolTip.visible: (Kirigami.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
+    T.ToolTip.visible: (LingmoUI.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
     T.ToolTip.text: text
-    T.ToolTip.delay: Kirigami.Units.toolTipDelay
+    T.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
     leftInset: TableView.view ? 0 : horizontalPadding / 2
     rightInset: TableView.view ? 0 : horizontalPadding / 2
@@ -47,7 +47,7 @@ T.SwitchDelegate {
 
         property alias truncated: textLabel.truncated
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             Layout.alignment: Qt.AlignVCenter
             visible: controlRoot.icon.name !== "" || controlRoot.icon.source.toString() !== ""
             source: controlRoot.icon.name !== "" ? controlRoot.icon.name : controlRoot.icon.source
@@ -63,7 +63,7 @@ T.SwitchDelegate {
 
             text: controlRoot.text
             font: controlRoot.font
-            color: (controlRoot.pressed && !controlRoot.checked && !controlRoot.sectionDelegate) ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+            color: (controlRoot.pressed && !controlRoot.checked && !controlRoot.sectionDelegate) ? LingmoUI.Theme.highlightedTextColor : LingmoUI.Theme.textColor
             elide: Text.ElideRight
             visible: controlRoot.text
             horizontalAlignment: Text.AlignLeft

@@ -30,7 +30,7 @@ find_package(Qt6 ${QT_MIN_VERSION} CONFIG OPTIONAL_COMPONENTS WebView)
 
 find_package(PkgConfig REQUIRED)
 
-find_package(KF6 ${KF6_MIN_VERSION} REQUIRED Kirigami CoreAddons Config Crash DBusAddons I18n Archive XmlGui KIO KCMUtils IdleTime Notifications Purpose Auth StatusNotifierItem IconThemes)
+find_package(KF6 ${KF6_MIN_VERSION} REQUIRED LingmoUI CoreAddons Config Crash DBusAddons I18n Archive XmlGui KIO KCMUtils IdleTime Notifications Purpose Auth StatusNotifierItem IconThemes)
 find_package(KF6 ${KF6_MIN_VERSION} OPTIONAL_COMPONENTS UserFeedback)
 
 find_package(packagekitqt6 1.0.1 CONFIG)
@@ -38,8 +38,8 @@ find_package(AppStreamQt 1.0 CONFIG REQUIRED)
 find_package(KF6Attica 5.23 CONFIG)
 find_package(KF6NewStuff 5.53 CONFIG)
 
-find_package(KF${QT_MAJOR_VERSION}KirigamiAddons REQUIRED)
-set_package_properties(KF${QT_MAJOR_VERSION}KirigamiAddons PROPERTIES
+find_package(KF${QT_MAJOR_VERSION}LingmoUIAddons REQUIRED)
+set_package_properties(KF${QT_MAJOR_VERSION}LingmoUIAddons PROPERTIES
     TYPE REQUIRED
     PURPOSE "Provides additional visual components"
 )
@@ -85,9 +85,9 @@ set_package_properties(KF6Attica PROPERTIES
     DESCRIPTION "KDE Framework that implements the Open Collaboration Services API"
     PURPOSE "Required to build the KNewStuff3 backend"
     TYPE OPTIONAL)
-set_package_properties(KF6Kirigami2 PROPERTIES
+set_package_properties(KF6LingmoUI2 PROPERTIES
     DESCRIPTION "KDE's lightweight user interface framework for mobile and convergent applications"
-    URL "https://techbase.kde.org/Kirigami"
+    URL "https://techbase.kde.org/LingmoUI"
     PURPOSE "Required by discover qml components"
     TYPE RUNTIME)
 set_package_properties(KF6NewStuff PROPERTIES

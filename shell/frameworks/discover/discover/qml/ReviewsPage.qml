@@ -12,10 +12,10 @@ import QtQuick.Templates as T
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: page
 
     property Discover.ReviewsModel model
@@ -38,7 +38,7 @@ Kirigami.Dialog {
         reviewDialog.open()
     }
 
-    implicitWidth: Math.min(Kirigami.Units.gridUnit * 40, Math.max(Kirigami.Units.gridUnit * 30, parent.width * 0.8))
+    implicitWidth: Math.min(LingmoUI.Units.gridUnit * 40, Math.max(LingmoUI.Units.gridUnit * 30, parent.width * 0.8))
 
     title: i18n("Reviews for %1", page.resource.name)
 
@@ -51,19 +51,19 @@ Kirigami.Dialog {
         implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                                 implicitContentHeight + topPadding + bottomPadding)
 
-        padding: Kirigami.Units.largeSpacing
+        padding: LingmoUI.Units.largeSpacing
         bottomPadding: verticalPadding + headerSeparator.implicitHeight // add space for bottom separator
 
         contentItem: ColumnLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             // title and close button
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 Layout.fillWidth: true
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     id: heading
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
@@ -82,9 +82,9 @@ Kirigami.Dialog {
                     // We want to position the close button in the top-right
                     // corner if the header is very tall, but we want to
                     // vertically center it in a short header
-                    readonly property bool tallHeader: parent.height > (Kirigami.Units.iconSizes.smallMedium + Kirigami.Units.largeSpacing * 2)
+                    readonly property bool tallHeader: parent.height > (LingmoUI.Units.iconSizes.smallMedium + LingmoUI.Units.largeSpacing * 2)
                     Layout.alignment: tallHeader ? Qt.AlignRight | Qt.AlignTop : Qt.AlignRight | Qt.AlignVCenter
-                    Layout.topMargin: tallHeader ? Kirigami.Units.largeSpacing : 0
+                    Layout.topMargin: tallHeader ? LingmoUI.Units.largeSpacing : 0
 
                     visible: page.showCloseButton
                     icon.name: closeIcon.hovered ? "window-close" : "window-close-symbolic"
@@ -96,7 +96,7 @@ Kirigami.Dialog {
 
             // Review row
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 Layout.fillWidth: true
 
@@ -112,7 +112,7 @@ Kirigami.Dialog {
                 // This layout is intended as a mere container of messageLabel, don't put anything else in it
                 RowLayout {
                     id: inlineMessageParent
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
                     Layout.fillWidth: true
                     QQC2.Label {
                         id: messageLabel
@@ -134,31 +134,31 @@ Kirigami.Dialog {
                     id: sortGroup
                     exclusive: true
                 }
-                Kirigami.ActionToolBar {
+                LingmoUI.ActionToolBar {
                     id: actionToolBar
                     Layout.minimumWidth: implicitWidth + 1
 
                     alignment: Qt.AlignRight
                     Layout.fillWidth: false
-                    actions: Kirigami.Action {
+                    actions: LingmoUI.Action {
                         text: i18n("Sort: %1", sortGroup.checkedAction.text)
                         icon.name: "view-sort-symbolic"
-                        displayHint: Kirigami.DisplayHint.KeepVisible
-                        Kirigami.Action {
+                        displayHint: LingmoUI.DisplayHint.KeepVisible
+                        LingmoUI.Action {
                             text: i18nc("@label:listbox Most relevant reviews", "Most Relevant")
                             QQC2.ActionGroup.group: sortGroup
                             checkable: true
                             checked: sortModel.sortRoleName === "wilsonScore"
                             onTriggered: sortModel.sortRoleName = "wilsonScore"
                         }
-                        Kirigami.Action {
+                        LingmoUI.Action {
                             text: i18nc("@label:listbox Most recent reviews", "Most Recent")
                             QQC2.ActionGroup.group: sortGroup
                             checkable: true
                             checked: sortModel.sortRoleName === "date"
                             onTriggered: sortModel.sortRoleName = "date"
                         }
-                        Kirigami.Action {
+                        LingmoUI.Action {
                             text: i18nc("@label:listbox Reviews with the highest ratings", "Highest Ratings")
                             QQC2.ActionGroup.group: sortGroup
                             checkable: true
@@ -173,7 +173,7 @@ Kirigami.Dialog {
             RowLayout {
                 id: newlineMessageParent
 
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
                 visible: children.length > 0
 
                 Layout.fillWidth: true
@@ -182,7 +182,7 @@ Kirigami.Dialog {
 
         // header background
         background: Item {
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 id: headerSeparator
                 width: parent.width
                 anchors.bottom: parent.bottom
@@ -205,12 +205,12 @@ Kirigami.Dialog {
         }
         clip: true
 
-        topMargin: Kirigami.Units.largeSpacing
-        bottomMargin: Kirigami.Units.largeSpacing
+        topMargin: LingmoUI.Units.largeSpacing
+        bottomMargin: LingmoUI.Units.largeSpacing
 
-        spacing: Kirigami.Units.smallSpacing
-        implicitWidth: Math.max(Kirigami.Units.gridUnit * 25, Math.round(page.parent.width / 3))
-        implicitHeight: Math.max(Kirigami.Units.gridUnit * 25, page.parent.height - Kirigami.Units.gridUnit * 4)
+        spacing: LingmoUI.Units.smallSpacing
+        implicitWidth: Math.max(LingmoUI.Units.gridUnit * 25, Math.round(page.parent.width / 3))
+        implicitHeight: Math.max(LingmoUI.Units.gridUnit * 25, page.parent.height - LingmoUI.Units.gridUnit * 4)
 
         // Still preload some items to make the scrollbar behave better, but can't preload all the comments as some apps like Firefox have thousands of them which will freeze Discover for minutes
         cacheBuffer: height * 2

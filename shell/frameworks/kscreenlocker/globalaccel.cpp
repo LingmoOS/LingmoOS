@@ -27,7 +27,7 @@ static const QString s_componentInterface = QStringLiteral("org.kde.kglobalaccel
  * The DBus path of the component is the key for the whitelist.
  * The value for each key contains a regular expression matching unique shortcut names which are allowed.
  * This allows to not only restrict on component, but also restrict on the shortcuts.
- * E.g. plasmashell might accept media shortcuts, but not shortcuts for switching the activity.
+ * E.g. lingmoshell might accept media shortcuts, but not shortcuts for switching the activity.
  **/
 static const QMap<QString, QRegularExpression> s_shortcutWhitelist{
     {QStringLiteral("/component/mediacontrol"), QRegularExpression(QStringLiteral("stopmedia|nextmedia|previousmedia|playpausemedia"))},

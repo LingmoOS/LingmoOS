@@ -13,15 +13,15 @@ import QtQml.Models
 import QtQuick
 import QtQuick.Window
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.sonnet as Sonnet
 import org.kde.desktop.private as Private
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.TextArea {
     id: controlRoot
-    Kirigami.Theme.colorSet: Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     implicitWidth: Math.max(contentWidth + leftPadding + rightPadding,
                             implicitBackgroundWidth + leftInset + rightInset,
@@ -32,10 +32,10 @@ T.TextArea {
 
     padding: 6
 
-    color: Kirigami.Theme.textColor
-    selectionColor: Kirigami.Theme.highlightColor
-    selectedTextColor: Kirigami.Theme.highlightedTextColor
-    hoverEnabled: !Kirigami.Settings.tabletMode || !Kirigami.Settings.hasTransientTouchInput
+    color: LingmoUI.Theme.textColor
+    selectionColor: LingmoUI.Theme.highlightColor
+    selectedTextColor: LingmoUI.Theme.highlightedTextColor
+    hoverEnabled: !LingmoUI.Settings.tabletMode || !LingmoUI.Settings.hasTransientTouchInput
     verticalAlignment: TextEdit.AlignTop
 
     selectByMouse: hoverEnabled
@@ -73,13 +73,13 @@ T.TextArea {
         }
     }
 
-    Kirigami.SpellCheck.enabled: !controlRoot.readOnly
+    LingmoUI.SpellCheck.enabled: !controlRoot.readOnly
         && Private.GlobalSonnetSettings.checkerEnabledByDefault
 
     Instantiator {
         id: spellcheckHighlighterInstantiator
 
-        active: controlRoot.Kirigami.SpellCheck.enabled
+        active: controlRoot.LingmoUI.SpellCheck.enabled
         asynchronous: true
 
         Sonnet.SpellcheckHighlighter {
@@ -88,7 +88,7 @@ T.TextArea {
             cursorPosition: controlRoot.cursorPosition
             selectionStart: controlRoot.selectionStart
             selectionEnd: controlRoot.selectionEnd
-            misspelledColor: Kirigami.Theme.negativeTextColor
+            misspelledColor: LingmoUI.Theme.negativeTextColor
 
             onChangeCursorPosition: (start, end) => {
                 controlRoot.cursorPosition = start;
@@ -142,7 +142,7 @@ T.TextArea {
 
         text: controlRoot.placeholderText
         font: controlRoot.font
-        color: Kirigami.Theme.disabledTextColor
+        color: LingmoUI.Theme.disabledTextColor
         horizontalAlignment: controlRoot.horizontalAlignment
         verticalAlignment: controlRoot.verticalAlignment
         visible: !controlRoot.length && !controlRoot.preeditText && (!controlRoot.activeFocus || controlRoot.horizontalAlignment !== Qt.AlignHCenter)

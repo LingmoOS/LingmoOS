@@ -8,22 +8,22 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 KCM.AbstractKCM {
     id: root
 
     KCM.ConfigModule.buttons: KCM.ConfigModule.Default | KCM.ConfigModule.Apply | KCM.ConfigModule.Help
 
-    actions: Kirigami.Action {
+    actions: LingmoUI.Action {
         text: i18nc("@action:button", "Advanced Power &Settings…")
         icon.name: "settings-configure"
         enabled: kcm.powerManagementServiceRegistered
         onTriggered: { kcm.push("GlobalConfig.qml"); }
     }
 
-    implicitWidth: Kirigami.Units.gridUnit * 30
-    implicitHeight: Kirigami.Units.gridUnit * 35
+    implicitWidth: LingmoUI.Units.gridUnit * 30
+    implicitHeight: LingmoUI.Units.gridUnit * 35
     framedView: false
 
     Rectangle {
@@ -31,13 +31,13 @@ KCM.AbstractKCM {
         // doesn't get in the way of the "tab content" Flickable below.
         // Use this lovely rectangle instead to still give the view a default background color.
         anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
     }
 
-    Kirigami.PlaceholderMessage {
+    LingmoUI.PlaceholderMessage {
         id: errorMessage
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        width: parent.width - (LingmoUI.Units.largeSpacing * 4)
         visible: !kcm.powerManagementServiceRegistered
         icon.name: "dialog-error"
         text: i18nc("@text:placeholdermessage", "Power Management settings could not be loaded")
@@ -49,14 +49,14 @@ KCM.AbstractKCM {
         visible: kcm.powerManagementServiceRegistered
         spacing: 0
 
-        Kirigami.NavigationTabBar {
+        LingmoUI.NavigationTabBar {
             id: profileTabBar
 
             Layout.fillWidth: true
             visible: kcm.supportsBatteryProfiles
 
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.Window
+            LingmoUI.Theme.inherit: false
+            LingmoUI.Theme.colorSet: LingmoUI.Theme.Window
 
             property var selectedProfile: kcm.currentProfile || "AC"
             property bool allowAutoSwitchProfile: true // by binding to kcm.currentProfile
@@ -84,21 +84,21 @@ KCM.AbstractKCM {
             }
 
             actions: [ // can't use Repeater here, because Action is not an Item
-                Kirigami.Action {
+                LingmoUI.Action {
                     readonly property string profileId: "AC"
                     text: profileTabBar.profileInfo[profileId].label
                     icon.name: profileTabBar.profileInfo[profileId].icon
                     checked: profileTabBar.selectedProfile == profileId
                     onTriggered: { profileTabBar.setProfileAndStopAutoSwitch(profileId); }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     readonly property string profileId: "Battery"
                     text: profileTabBar.profileInfo[profileId].label
                     icon.name: profileTabBar.profileInfo[profileId].icon
                     checked: profileTabBar.selectedProfile == profileId
                     onTriggered: { profileTabBar.setProfileAndStopAutoSwitch(profileId); }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     readonly property string profileId: "LowBattery"
                     text: profileTabBar.profileInfo[profileId].label
                     icon.name: profileTabBar.profileInfo[profileId].icon
@@ -130,7 +130,7 @@ KCM.AbstractKCM {
                 rightMargin: QQC2.ScrollBar.vertical.visible && !QQC2.ScrollBar.vertical.mirrored ? QQC2.ScrollBar.vertical.width : 0
                 bottomMargin: QQC2.ScrollBar.horizontal.visible ? QQC2.ScrollBar.horizontal.height : 0
 
-                Kirigami.WheelHandler {
+                LingmoUI.WheelHandler {
                     id: wheelHandler
                     target: flickable
                     filterMouseEvents: true
@@ -157,8 +157,8 @@ KCM.AbstractKCM {
 
                 Item {
                     id: tabContentContainer
-                    width: Math.max(scrollBarContainer.width - flickable.leftMargin - flickable.rightMargin, profileConfig.width + Kirigami.Units.smallSpacing * 2)
-                    height: Math.max(scrollBarContainer.height - flickable.topMargin - flickable.bottomMargin, profileConfig.height + Kirigami.Units.smallSpacing)
+                    width: Math.max(scrollBarContainer.width - flickable.leftMargin - flickable.rightMargin, profileConfig.width + LingmoUI.Units.smallSpacing * 2)
+                    height: Math.max(scrollBarContainer.height - flickable.topMargin - flickable.bottomMargin, profileConfig.height + LingmoUI.Units.smallSpacing)
 
                     MouseArea {
                         anchors.fill: parent

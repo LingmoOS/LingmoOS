@@ -48,8 +48,8 @@ class AppMenuManager;
 class ConnectionThread;
 class Compositor;
 class Output;
-class PlasmaShell;
-class PlasmaWindowManagement;
+class LingmoShell;
+class LingmoWindowManagement;
 class Pointer;
 class PointerConstraints;
 class Seat;
@@ -579,7 +579,7 @@ public:
 
 enum class AdditionalWaylandInterface {
     Seat = 1 << 0,
-    PlasmaShell = 1 << 2,
+    LingmoShell = 1 << 2,
     WindowManagement = 1 << 3,
     PointerConstraints = 1 << 4,
     IdleInhibitV1 = 1 << 5,
@@ -693,8 +693,8 @@ KWayland::Client::SubCompositor *waylandSubCompositor();
 KWayland::Client::ShadowManager *waylandShadowManager();
 KWayland::Client::ShmPool *waylandShmPool();
 KWayland::Client::Seat *waylandSeat();
-KWayland::Client::PlasmaShell *waylandPlasmaShell();
-KWayland::Client::PlasmaWindowManagement *waylandWindowManagement();
+KWayland::Client::LingmoShell *waylandLingmoShell();
+KWayland::Client::LingmoWindowManagement *waylandWindowManagement();
 KWayland::Client::PointerConstraints *waylandPointerConstraints();
 KWayland::Client::AppMenuManager *waylandAppMenuManager();
 WaylandOutputManagementV2 *waylandOutputManagementV2();

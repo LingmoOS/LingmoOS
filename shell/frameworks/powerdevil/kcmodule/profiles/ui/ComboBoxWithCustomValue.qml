@@ -4,12 +4,12 @@
 
     SPDX-License-Identifier: LGPL-2.1-or-later
 
-    Originating from kcm_screenlocker. Upstream any changes there until it goes into Kirigami (Addons).
+    Originating from kcm_screenlocker. Upstream any changes there until it goes into LingmoUI (Addons).
 */
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * A specialized ComboBox that displays a list of preset options plus a "Custom" option,

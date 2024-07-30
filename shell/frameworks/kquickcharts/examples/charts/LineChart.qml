@@ -9,7 +9,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrols
 
 import org.kde.quickcharts as Charts
@@ -18,7 +18,7 @@ import org.kde.quickcharts.controls as ChartsControls
 ChartPage {
     title: "Line Chart"
 
-    chart: Kirigami.AbstractCard {
+    chart: LingmoUI.AbstractCard {
         anchors.centerIn: parent
         width: parent.width
         height: 400
@@ -41,7 +41,7 @@ ChartPage {
             pointDelegate: Item {
                 Rectangle {
                     anchors.centerIn: parent
-                    width: lineChart.lineWidth + Kirigami.Units.smallSpacing;
+                    width: lineChart.lineWidth + LingmoUI.Units.smallSpacing;
                     height: width
                     radius: width / 2;
                     color: parent.Charts.LineChart.color
@@ -123,11 +123,11 @@ ChartPage {
     }
 
     itemEditorActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Add Item";
             onTriggered: lineModel.append({label: "New", value1: 0, value2: 0, value3: 0})
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Remove Last";
             onTriggered: lineModel.remove(lineModel.count - 1)
         }

@@ -73,8 +73,8 @@ void PresetsModel::reload()
 {
     clear();
     QList<KPluginMetaData> plugins =
-        KPackage::PackageLoader::self()->findPackages(QStringLiteral("Plasma/Applet"), QString(), [](const KPluginMetaData &plugin) {
-            return plugin.value(QStringLiteral("X-Plasma-RootPath")) == QStringLiteral("org.kde.plasma.systemmonitor");
+        KPackage::PackageLoader::self()->findPackages(QStringLiteral("Lingmo/Applet"), QString(), [](const KPluginMetaData &plugin) {
+            return plugin.value(QStringLiteral("X-Lingmo-RootPath")) == QStringLiteral("org.kde.lingmo.systemmonitor");
         });
 
     QSet<QString> usedNames;
@@ -83,7 +83,7 @@ void PresetsModel::reload()
     auto it = plugins.rbegin();
     for (; it != plugins.rend(); ++it) {
         const auto &plugin = *it;
-        KPackage::Package p = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Applet"), plugin.pluginId());
+        KPackage::Package p = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Applet"), plugin.pluginId());
         auto metadata = p.metadata();
 
         QString baseName = metadata.name();
@@ -372,7 +372,7 @@ SensorFaceController::SensorFaceController(KConfigGroup &config, QQmlEngine *eng
     d->colorsGroup = KConfigGroup(&config, "SensorColors");
     d->labelsGroup = KConfigGroup(&config, "SensorLabels");
     d->engine = engine;
-    // Ensure we don't re-use the Plasma Theme coloring by using separate configEngine, BUG:483689
+    // Ensure we don't re-use the Lingmo Theme coloring by using separate configEngine, BUG:483689
     d->configEngine = configEngine;
     d->syncTimer = new QTimer(this);
     d->syncTimer->setSingleShot(true);
@@ -880,7 +880,7 @@ void SensorFaceController::loadPreset(const QString &preset)
         return;
     }
 
-    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Applet"));
+    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Applet"));
 
     presetPackage.setPath(preset);
 
@@ -888,7 +888,7 @@ void SensorFaceController::loadPreset(const QString &preset)
         return;
     }
 
-    if (presetPackage.metadata().value(QStringLiteral("X-Plasma-RootPath")) != QStringLiteral("org.kde.plasma.systemmonitor")) {
+    if (presetPackage.metadata().value(QStringLiteral("X-Lingmo-RootPath")) != QStringLiteral("org.kde.lingmo.systemmonitor")) {
         return;
     }
 
@@ -933,10 +933,10 @@ void SensorFaceController::loadPreset(const QString &preset)
 
 void SensorFaceController::savePreset()
 {
-    QString pluginName = QStringLiteral("org.kde.plasma.systemmonitor.") + title().simplified().replace(QLatin1Char(' '), QStringLiteral("")).toLower();
+    QString pluginName = QStringLiteral("org.kde.lingmo.systemmonitor.") + title().simplified().replace(QLatin1Char(' '), QStringLiteral("")).toLower();
     int suffix = 0;
 
-    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Applet"));
+    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Applet"));
 
     presetPackage.setPath(pluginName);
     if (presetPackage.isValid()) {
@@ -966,11 +966,11 @@ void SensorFaceController::savePreset()
              {"EnabledByDefault", true},
              {"Version", "0.1"},
          }},
-        {"X-Plasma-API", "declarativeappletscript"},
-        {"X-Plasma-MainScript", "ui/main.qml"},
-        {"X-Plasma-Provides", "org.kde.plasma.systemmonitor"},
-        {"X-Plasma-RootPath", "org.kde.plasma.systemmonitor"},
-        {"KPackageStructure", "Plasma/Applet"},
+        {"X-Lingmo-API", "declarativeappletscript"},
+        {"X-Lingmo-MainScript", "ui/main.qml"},
+        {"X-Lingmo-Provides", "org.kde.lingmo.systemmonitor"},
+        {"X-Lingmo-RootPath", "org.kde.lingmo.systemmonitor"},
+        {"KPackageStructure", "Lingmo/Applet"},
     });
 
     if (QFile file{dir.path() % QStringLiteral("/metadata.json")}; file.open(QIODevice::WriteOnly)) {
@@ -1006,7 +1006,7 @@ void SensorFaceController::savePreset()
     }
     configGroup.sync();
 
-    auto *job = KPackage::PackageJob::install(QStringLiteral("Plasma/Applet"), dir.path());
+    auto *job = KPackage::PackageJob::install(QStringLiteral("Lingmo/Applet"), dir.path());
     connect(job, &KJob::finished, this, [this]() {
         d->availablePresetsModel->reload();
     });
@@ -1014,15 +1014,15 @@ void SensorFaceController::savePreset()
 
 void SensorFaceController::uninstallPreset(const QString &pluginId)
 {
-    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Applet"), pluginId);
+    auto presetPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Applet"), pluginId);
 
-    if (presetPackage.metadata().value(QStringLiteral("X-Plasma-RootPath")) != QStringLiteral("org.kde.plasma.systemmonitor")) {
+    if (presetPackage.metadata().value(QStringLiteral("X-Lingmo-RootPath")) != QStringLiteral("org.kde.lingmo.systemmonitor")) {
         return;
     }
 
     QDir root(presetPackage.path());
     root.cdUp();
-    auto *job = KPackage::PackageJob::uninstall(QStringLiteral("Plasma/Applet"), pluginId, root.path());
+    auto *job = KPackage::PackageJob::uninstall(QStringLiteral("Lingmo/Applet"), pluginId, root.path());
 
     connect(job, &KJob::finished, this, [this]() {
         d->availablePresetsModel->reload();

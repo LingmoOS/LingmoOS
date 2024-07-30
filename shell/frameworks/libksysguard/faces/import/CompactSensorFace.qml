@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 // Sensor face subtype intended to be use for compact representations of faces
 SensorFace {
@@ -15,7 +15,7 @@ SensorFace {
     readonly property bool verticalFormFactor: formFactor == SensorFace.Vertical
     readonly property bool constrainedFormFactor: formFactor == SensorFace.Constrained
     readonly property real goldenRatio: 1.618
-    readonly property real defaultMinimumSize: Kirigami.Units.gridUnit
+    readonly property real defaultMinimumSize: LingmoUI.Units.gridUnit
 
     Layout.minimumWidth: defaultMinimumSize
     Layout.minimumHeight: defaultMinimumSize
@@ -26,6 +26,6 @@ SensorFace {
     Layout.preferredHeight: verticalFormFactor ? Math.min(Math.max(width, Layout.minimumHeight), Layout.maximumHeight) : -1
 
     // Limit the maximum size to a reasonably sensible value. This matches what some Plasmoids do.
-    Layout.maximumWidth: horizontalFormFactor ? Math.max(Kirigami.Units.iconSizes.enormous, Layout.minimumWidth) : -1
-    Layout.maximumHeight: verticalFormFactor ? Math.max(Kirigami.Units.iconSizes.enormous, Layout.minimumHeight) : -1
+    Layout.maximumWidth: horizontalFormFactor ? Math.max(LingmoUI.Units.iconSizes.enormous, Layout.minimumWidth) : -1
+    Layout.maximumHeight: verticalFormFactor ? Math.max(LingmoUI.Units.iconSizes.enormous, Layout.minimumHeight) : -1
 }

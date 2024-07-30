@@ -29,6 +29,6 @@ kconfig_add_kcfg_files(kcm_kwinoptions_PART_SRCS kwinoptions_kdeglobals_settings
 
 qt_add_dbus_interface(kcm_kwinoptions_PART_SRCS ${KWin_SOURCE_DIR}/src/org.kde.kwin.Effects.xml kwin_effects_interface)
 
-kcoreaddons_add_plugin(kcm_kwinoptions SOURCES ${kcm_kwinoptions_PART_SRCS} INSTALL_NAMESPACE "plasma/kcms/systemsettings_qwidgets")
+kcoreaddons_add_plugin(kcm_kwinoptions SOURCES ${kcm_kwinoptions_PART_SRCS} INSTALL_NAMESPACE "lingmo/kcms/systemsettings_qwidgets")
 kcmutils_generate_desktop_file(kcm_kwinoptions)
 target_link_libraries(kcm_kwinoptions kwin Qt::DBus KF6::KCMUtils KF6::I18n KF6::WindowSystem)

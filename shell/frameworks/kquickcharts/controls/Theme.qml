@@ -10,17 +10,17 @@ import QtQuick
 pragma Singleton;
 
 QtObject {
-    property Loader kirigamiThemeLoader: Loader {
-        source: "KirigamiTheme.qml"
+    property Loader lingmouiThemeLoader: Loader {
+        source: "LingmoUITheme.qml"
     }
 
-    property real gridUnit: kirigamiThemeLoader.item?.gridUnit ?? 20
-    property real smallSpacing: kirigamiThemeLoader.item?.smallSpacing ?? 5
-    property real largeSpacing: kirigamiThemeLoader.item?.largeSpacing ?? 10
-    property real cornerRadius: kirigamiThemeLoader.item?.cornerRadius ?? 5
+    property real gridUnit: lingmouiThemeLoader.item?.gridUnit ?? 20
+    property real smallSpacing: lingmouiThemeLoader.item?.smallSpacing ?? 5
+    property real largeSpacing: lingmouiThemeLoader.item?.largeSpacing ?? 10
+    property real cornerRadius: lingmouiThemeLoader.item?.cornerRadius ?? 5
 
-    property real smallIconSize: kirigamiThemeLoader.item?.smallIconSize ?? 16
+    property real smallIconSize: lingmouiThemeLoader.item?.smallIconSize ?? 16
 
-    property color highlightColor: kirigamiThemeLoader.item?.highlightColor ?? "blue"
-    property color backgroundColor: kirigamiThemeLoader.item?.backgroundColor ?? "white"
+    property color highlightColor: lingmouiThemeLoader.item?.highlightColor ?? "blue"
+    property color backgroundColor: lingmouiThemeLoader.item?.backgroundColor ?? "white"
 }

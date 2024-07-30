@@ -20,10 +20,10 @@
 
 #include <QtGlobal>
 
-#include <Plasma5Support/Service>
-namespace Plasma = Plasma5Support;
+#include <Lingmo5Support/Service>
+namespace Lingmo = Lingmo5Support;
 
-class WacomTabletService : public Plasma::Service
+class WacomTabletService : public Lingmo::Service
 {
     Q_OBJECT
 public:
@@ -31,7 +31,7 @@ public:
     ~WacomTabletService() override;
 
 protected:
-    Plasma::ServiceJob *createJob(const QString &operation, QMap<QString, QVariant> &parameters) Q_DECL_OVERRIDE;
+    Lingmo::ServiceJob *createJob(const QString &operation, QMap<QString, QVariant> &parameters) Q_DECL_OVERRIDE;
 };
 
 #endif // WACOMTABLETSERVICE_H

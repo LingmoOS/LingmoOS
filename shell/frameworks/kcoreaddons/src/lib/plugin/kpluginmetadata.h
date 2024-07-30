@@ -70,7 +70,7 @@ class KAboutPerson;
         "EnabledByDefault": "true",
         "License": "LGPL",
         "Version": "1.0",
-        "Website": "https://plasma.kde.org/"
+        "Website": "https://lingmo.kde.org/"
      }
    }
    @endverbatim

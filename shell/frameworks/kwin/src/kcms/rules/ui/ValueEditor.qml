@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami 2.10 as Kirigami
+import org.kde.lingmoui 2.10 as LingmoUI
 import org.kde.kquickcontrols as KQC
 import org.kde.kcms.kwinrules
 
@@ -53,13 +53,13 @@ Loader {
             QQC2.RadioButton {
                 text: i18n("Yes")
                 checked: ruleValue
-                Layout.margins: Kirigami.Units.smallSpacing
+                Layout.margins: LingmoUI.Units.smallSpacing
                 onToggled: valueEditor.valueEdited(checked)
             }
             QQC2.RadioButton {
                 text: i18n("No")
                 checked: !ruleValue
-                Layout.margins: Kirigami.Units.smallSpacing
+                Layout.margins: LingmoUI.Units.smallSpacing
                 onToggled: valueEditor.valueEdited(!checked)
             }
         }
@@ -167,8 +167,8 @@ Loader {
             QQC2.Label {
                 text: i18n("%1 %", Math.round(slider.value))
                 horizontalAlignment: Qt.AlignRight
-                Layout.minimumWidth: maxPercentage.width + Kirigami.Units.smallSpacing
-                Layout.margins: Kirigami.Units.smallSpacing
+                Layout.minimumWidth: maxPercentage.width + LingmoUI.Units.smallSpacing
+                Layout.margins: LingmoUI.Units.smallSpacing
             }
             TextMetrics {
                 id: maxPercentage
@@ -181,7 +181,7 @@ Loader {
         id: coordinateEditor
         RowLayout {
             id: coordItem
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             readonly property bool isSize: controlType == RuleItem.Size
             readonly property var coord: (isSize) ? Qt.size(coordX.value, coordY.value)

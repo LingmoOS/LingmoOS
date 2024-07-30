@@ -17,7 +17,7 @@ public:
     void initPackage(KPackage::Package *package) override
     {
         KPackage::PackageStructure::initPackage(package);
-        package->setDefaultPackageRoot(QStringLiteral("plasma/plasmoids/"));
+        package->setDefaultPackageRoot(QStringLiteral("lingmo/plasmoids/"));
 
         package->addDirectoryDefinition("ui", QStringLiteral("ui"));
         package->addFileDefinition("mainscript", QStringLiteral("ui/main.qml"));

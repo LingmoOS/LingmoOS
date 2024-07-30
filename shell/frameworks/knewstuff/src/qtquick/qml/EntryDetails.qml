@@ -6,7 +6,7 @@
 */
 
 /**
- * @brief A Kirigami.Page component used for displaying the details for a single entry
+ * @brief A LingmoUI.Page component used for displaying the details for a single entry
  *
  * This component is equivalent to the details view in the old DownloadDialog
  * @see KNewStuff::DownloadDialog
@@ -17,7 +17,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMUtils
 import org.kde.newstuff as NewStuff
 
@@ -106,7 +106,7 @@ KCMUtils.SimpleKCM {
     title: i18ndc("knewstuff6", "Combined title for the entry details page made of the name of the entry, and the author's name", "%1 by %2", component.name, entryAuthor.name)
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: component.downloadLinks.length === 1
                 ? i18ndc("knewstuff6", "Request installation of this item, available when there is exactly one downloadable item", "Install")
                 : i18ndc("knewstuff6", "Show installation options, where there is more than one downloadable item", "Install…")
@@ -124,14 +124,14 @@ KCMUtils.SimpleKCM {
             enabled: component.status === NewStuff.Entry.Downloadable || component.status === NewStuff.Entry.Deleted
             visible: enabled
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Request updating of this item", "Update")
             icon.name: "update-none"
             onTriggered: source => newStuffModel.update(component.entry, NewStuff.ItemsModel.AutoDetectLinkId)
             enabled: component.status === NewStuff.Entry.Updateable
             visible: enabled
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Request uninstallation of this item", "Uninstall")
             icon.name: "edit-delete"
             onTriggered: source => newStuffModel.engine.uninstall(component.entry)
@@ -141,9 +141,9 @@ KCMUtils.SimpleKCM {
     ]
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.AbstractCard {
+        LingmoUI.AbstractCard {
             id: statusCard
 
             readonly property string message: {
@@ -167,16 +167,16 @@ KCMUtils.SimpleKCM {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                 }
             }
 
             Layout.fillWidth: true
-            Layout.margins: Kirigami.Units.largeSpacing
+            Layout.margins: LingmoUI.Units.largeSpacing
 
             contentItem: RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.Label {
                     Layout.fillWidth: true
@@ -193,7 +193,7 @@ KCMUtils.SimpleKCM {
 
         Item {
             Layout.fillWidth: true
-            height: Kirigami.Units.gridUnit * 3
+            height: LingmoUI.Units.gridUnit * 3
         }
 
         Private.EntryScreenshots {
@@ -201,17 +201,17 @@ KCMUtils.SimpleKCM {
             Layout.fillWidth: true
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: shortSummaryItem
             wrapMode: Text.Wrap
             Layout.fillWidth: true
         }
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             Layout.fillWidth: true
 
-            Kirigami.LinkButton {
-                Kirigami.FormData.label: i18nd("knewstuff6", "Comments and Reviews:")
+            LingmoUI.LinkButton {
+                LingmoUI.FormData.label: i18nd("knewstuff6", "Comments and Reviews:")
                 enabled: component.commentsCount > 0
                 text: i18ndc("knewstuff6", "A link which, when clicked, opens a new sub page with comments (comments with or without ratings) for this entry", "%1 Reviews and Comments", component.commentsCount)
                 onClicked: mouse => pageStack.push(commentsPage)
@@ -219,30 +219,30 @@ KCMUtils.SimpleKCM {
 
             Private.Rating {
                 id: ratingsItem
-                Kirigami.FormData.label: i18nd("knewstuff6", "Rating:")
+                LingmoUI.FormData.label: i18nd("knewstuff6", "Rating:")
                 rating: component.rating
             }
 
-            Kirigami.UrlButton {
-                Kirigami.FormData.label: i18nd("knewstuff6", "Homepage:")
+            LingmoUI.UrlButton {
+                LingmoUI.FormData.label: i18nd("knewstuff6", "Homepage:")
                 text: i18ndc("knewstuff6", "A link which, when clicked, opens the website associated with the entry (this could be either one specific to the project, the author's homepage, or any other website they have chosen for the purpose)", "Open the homepage for %1", component.name)
                 url: component.homepage
                 visible: url !== ""
             }
 
-            Kirigami.UrlButton {
-                Kirigami.FormData.label: i18nd("knewstuff6", "How To Donate:")
+            LingmoUI.UrlButton {
+                LingmoUI.FormData.label: i18nd("knewstuff6", "How To Donate:")
                 text: i18ndc("knewstuff6", "A link which, when clicked, opens a website with information on donation in support of the entry", "Find out how to donate to this project")
                 url: component.donationLink
                 visible: url !== ""
             }
         }
 
-        Kirigami.SelectableLabel {
+        LingmoUI.SelectableLabel {
             id: summaryItem
 
             Layout.fillWidth: true
-            Layout.margins: Kirigami.Units.largeSpacing
+            Layout.margins: LingmoUI.Units.largeSpacing
 
             textFormat: Text.RichText
         }

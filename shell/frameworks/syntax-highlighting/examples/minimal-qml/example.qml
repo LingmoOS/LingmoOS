@@ -19,7 +19,7 @@ QQC2.ScrollView {
         wrapMode: TextEdit.Wrap
         focus: true
 
-        Kirigami.SpellCheck.enabled: false
+        LingmoUI.SpellCheck.enabled: false
 
         SyntaxHighlighter {
             textEdit: myText

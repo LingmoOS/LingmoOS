@@ -7,13 +7,13 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
-Kirigami.PromptDialog {
+LingmoUI.PromptDialog {
     id: root
 
-    preferredWidth: Kirigami.Units.gridUnit * 20
+    preferredWidth: LingmoUI.Units.gridUnit * 20
 
     required property string displayName
     required property Discover.AbstractSourcesBackend source
@@ -32,7 +32,7 @@ Kirigami.PromptDialog {
         if (source.addSource(repository.text)) {
             close()
         } else {
-            repository.color = Kirigami.Theme.negativeTextColor
+            repository.color = LingmoUI.Theme.negativeTextColor
         }
     }
 
@@ -41,12 +41,12 @@ Kirigami.PromptDialog {
     }
 
     customFooterActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Add")
             icon.name: "list-add"
             onTriggered: root.accept();
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Cancel")
             icon.name: "dialog-cancel"
             onTriggered: root.reject();
@@ -66,7 +66,7 @@ Kirigami.PromptDialog {
             Layout.fillWidth: true
             onAccepted: root.accept()
             focus: true
-            onTextChanged: color = Kirigami.Theme.textColor
+            onTextChanged: color = LingmoUI.Theme.textColor
         }
     }
 }

@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -21,13 +21,13 @@ Faces.SensorFace {
     id: root
 
     // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+    Layout.minimumWidth: LingmoUI.Units.gridUnit * 8
     Layout.preferredWidth: titleMetrics.width
 
     contentItem: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: heading
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
@@ -49,7 +49,7 @@ Faces.SensorFace {
 
             ColumnLayout {
                 Layout.fillWidth: true
-                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                Layout.bottomMargin: LingmoUI.Units.smallSpacing
                 spacing: 0
                 Bar {
                     sensor: sensor
@@ -67,7 +67,7 @@ Faces.SensorFace {
                     value: sensor.formattedValue
                     indicator: Item {}
 
-                    maximumValueWidth: Kirigami.Units.gridUnit * 2
+                    maximumValueWidth: LingmoUI.Units.gridUnit * 2
 
                     Sensors.Sensor {
                         id: sensor
@@ -77,7 +77,7 @@ Faces.SensorFace {
                 }
             }
         }
-        Kirigami.Separator {
+        LingmoUI.Separator {
             Layout.fillWidth: true
             visible: root.controller.lowPrioritySensorIds.length > 0
         }
@@ -92,7 +92,7 @@ Faces.SensorFace {
                 value: sensor.formattedValue
                 indicator: Item {}
 
-                maximumValueWidth: Kirigami.Units.gridUnit * 2
+                maximumValueWidth: LingmoUI.Units.gridUnit * 2
 
                 Sensors.Sensor {
                     id: sensor

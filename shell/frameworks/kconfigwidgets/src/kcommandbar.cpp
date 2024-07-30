@@ -553,7 +553,7 @@ KCommandBar::KCommandBar(QWidget *parent)
     , d(new KCommandBarPrivate)
 {
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    setProperty("_breeze_force_frame", true);
+    setProperty("_ocean_force_frame", true);
 
     QGraphicsDropShadowEffect *e = new QGraphicsDropShadowEffect(this);
     e->setColor(palette().color(QPalette::Dark));
@@ -576,7 +576,7 @@ KCommandBar::KCommandBar(QWidget *parent)
     layout->addWidget(&d->m_treeView);
     d->m_treeView.setTextElideMode(Qt::ElideLeft);
     d->m_treeView.setUniformRowHeights(true);
-    d->m_treeView.setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags(Qt::TopEdge)));
+    d->m_treeView.setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags(Qt::TopEdge)));
 
     CommandBarStyleDelegate *delegate = new CommandBarStyleDelegate(this);
     ShortcutStyleDelegate *del = new ShortcutStyleDelegate(this);

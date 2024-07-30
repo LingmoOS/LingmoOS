@@ -12,17 +12,17 @@ import QtQuick.Layouts
 
 import org.kde.config as KConfig
 import org.kde.kcmutils as KCMUtils
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasma5support as P5Support
-import org.kde.plasma.plasmoid
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.lingmo5support as P5Support
+import org.kde.lingmo.plasmoid
 import org.kde.private.kscreen as KScreen
 
 PlasmoidItem {
     id: root
 
     // Only show if the user enabled presentation mode
-    Plasmoid.status: presentationModeEnabled ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+    Plasmoid.status: presentationModeEnabled ? LingmoCore.Types.ActiveStatus : LingmoCore.Types.PassiveStatus
     toolTipSubText: presentationModeEnabled ? i18n("Presentation mode is enabled") : ""
 
     readonly property string kcmName: "kcm_kscreen"
@@ -50,7 +50,7 @@ PlasmoidItem {
             var data = pmSource.data.Inhibitions;
             if (data) {
                 for (var key in data) {
-                    if (key === "plasmashell" || key === "plasmoidviewer") { // ignore our own inhibition
+                    if (key === "lingmoshell" || key === "plasmoidviewer") { // ignore our own inhibition
                         continue;
                     }
 
@@ -62,7 +62,7 @@ PlasmoidItem {
         }
     }
 
-    PlasmaCore.Action {
+    LingmoCore.Action {
         id: configureAction
         text: i18n("Configure Display Settings…")
         icon.name: "preferences-desktop-display"
@@ -76,18 +76,18 @@ PlasmoidItem {
 
     fullRepresentation: ColumnLayout {
         spacing: 0
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 15
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 15
 
         ScreenLayoutSelection {
-            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: LingmoUI.Units.smallSpacing
             Layout.fillWidth: true
             screenLayouts: Plasmoid.availableActions
         }
 
         PresentationModeItem {
             Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.smallSpacing * 2
-            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.topMargin: LingmoUI.Units.smallSpacing * 2
+            Layout.leftMargin: LingmoUI.Units.smallSpacing
         }
 
         // compact the layout

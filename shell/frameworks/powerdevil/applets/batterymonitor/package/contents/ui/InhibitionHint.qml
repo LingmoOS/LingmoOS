@@ -7,26 +7,26 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 
 RowLayout {
     property alias iconSource: iconItem.source
     property alias text: label.text
 
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         id: iconItem
-        Layout.preferredWidth: Kirigami.Units.iconSizes.small
-        Layout.preferredHeight: Kirigami.Units.iconSizes.small
+        Layout.preferredWidth: LingmoUI.Units.iconSizes.small
+        Layout.preferredHeight: LingmoUI.Units.iconSizes.small
         visible: valid
     }
 
-    PlasmaComponents3.Label {
+    LingmoComponents3.Label {
         id: label
         Layout.fillWidth: true
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
         textFormat: Text.PlainText
         wrapMode: Text.WordWrap
         elide: Text.ElideRight

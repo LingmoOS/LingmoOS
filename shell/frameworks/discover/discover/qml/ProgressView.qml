@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.ItemDelegate {
     id: listItem
@@ -13,7 +13,7 @@ QQC2.ItemDelegate {
         QQC2.Label {
             id: label
             Layout.fillWidth: true
-            Layout.leftMargin: Kirigami.Units.iconSizes.smallMedium + (LayoutMirroring.enabled ? listItem.rightPadding : listItem.leftPadding)
+            Layout.leftMargin: LingmoUI.Units.iconSizes.smallMedium + (LayoutMirroring.enabled ? listItem.rightPadding : listItem.leftPadding)
             Layout.rightMargin: Layout.leftMargin
             text: Discover.TransactionModel.count ? i18n("Tasks (%1%)", Discover.TransactionModel.progress) : i18n("Tasks")
         }
@@ -25,7 +25,7 @@ QQC2.ItemDelegate {
 
     visible: Discover.TransactionModel.count > 0
 
-    property Kirigami.OverlaySheet sheetObject
+    property LingmoUI.OverlaySheet sheetObject
 
     onClicked: {
         if (!sheetObject) {
@@ -39,7 +39,7 @@ QQC2.ItemDelegate {
 
     Component {
         id: sheet
-        Kirigami.OverlaySheet {
+        LingmoUI.OverlaySheet {
             parent: listItem.QQC2.Overlay.overlay
 
             title: i18n("Tasks")
@@ -51,7 +51,7 @@ QQC2.ItemDelegate {
             ListView {
                 id: tasksView
                 spacing: 0
-                implicitWidth: Kirigami.Units.gridUnit * 30
+                implicitWidth: LingmoUI.Units.gridUnit * 30
 
                 Component {
                     id: listenerComp
@@ -88,13 +88,13 @@ QQC2.ItemDelegate {
                     down: false
 
                     contentItem: ColumnLayout {
-                        spacing: Kirigami.Units.smallSpacing
+                        spacing: LingmoUI.Units.smallSpacing
 
                         RowLayout {
-                            spacing: Kirigami.Units.smallSpacing
+                            spacing: LingmoUI.Units.smallSpacing
                             Layout.fillWidth: true
 
-                            Kirigami.Icon {
+                            LingmoUI.Icon {
                                 Layout.fillHeight: true
                                 Layout.minimumWidth: height
                                 source: delegate.model.transaction.icon

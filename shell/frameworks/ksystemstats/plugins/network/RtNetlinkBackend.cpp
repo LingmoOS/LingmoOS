@@ -31,7 +31,7 @@ RtNetlinkDevice::RtNetlinkDevice(const QString &id)
     : NetworkDevice(id, id)
 {
     // Even though we have no sensor, we need to have a name for the grouped text on the front page
-    // of plasma-systemmonitor
+    // of lingmo-systemmonitor
     m_networkSensor->setValue(id);
 
     std::array<KSysGuard::SensorProperty*, 6> statisticSensors {m_downloadSensor, m_downloadBitsSensor, m_totalDownloadSensor, m_uploadSensor, m_uploadBitsSensor, m_totalUploadSensor};

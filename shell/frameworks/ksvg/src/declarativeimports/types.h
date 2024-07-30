@@ -9,7 +9,7 @@
 
 #include <QQmlEngine>
 
-#include <Kirigami/Platform/PlatformTheme>
+#include <LingmoUI/Platform/PlatformTheme>
 
 #include <framesvg.h>
 #include <svg.h>
@@ -17,7 +17,7 @@
 struct PlatformThemeForeign {
     Q_GADGET
     QML_ANONYMOUS
-    QML_FOREIGN(Kirigami::Platform::PlatformTheme)
+    QML_FOREIGN(LingmoUI::Platform::PlatformTheme)
 };
 
 struct SvgForeign {

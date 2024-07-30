@@ -31,8 +31,8 @@
 // KWayland
 #include <KWayland/Client/connection_thread.h>
 #include <KWayland/Client/event_queue.h>
-#include <KWayland/Client/plasmawindowmanagement.h>
-#include <KWayland/Client/plasmawindowmodel.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
+#include <KWayland/Client/lingmowindowmodel.h>
 #include <KWayland/Client/registry.h>
 #include <KWayland/Client/surface.h>
 #include <KWayland/Client/xdgforeign.h>
@@ -212,9 +212,9 @@ void WaylandIntegration::setParentWindow(QWindow *window, const QString &parentW
     globalWaylandIntegration->setParentWindow(window, parentWindow);
 }
 
-KWayland::Client::PlasmaWindowManagement *WaylandIntegration::plasmaWindowManagement()
+KWayland::Client::LingmoWindowManagement *WaylandIntegration::lingmoWindowManagement()
 {
-    return globalWaylandIntegration->plasmaWindowManagement();
+    return globalWaylandIntegration->lingmoWindowManagement();
 }
 
 WaylandIntegration::WaylandIntegration *WaylandIntegration::waylandIntegration()
@@ -269,7 +269,7 @@ void WaylandIntegration::WaylandIntegrationPrivate::acquireStreamingInput(bool a
 WaylandIntegration::Stream WaylandIntegration::WaylandIntegrationPrivate::startStreamingWindow(const QMap<int, QVariant> &win,
                                                                                                Screencasting::CursorMode cursorMode)
 {
-    auto uuid = win[KWayland::Client::PlasmaWindowModel::Uuid].toString();
+    auto uuid = win[KWayland::Client::LingmoWindowModel::Uuid].toString();
     return startStreaming(m_screencasting->createWindowStream(uuid, cursorMode), {{QLatin1String("source_type"), static_cast<uint>(ScreenCastPortal::Window)}});
 }
 
@@ -651,7 +651,7 @@ void WaylandIntegration::WaylandIntegrationPrivate::authenticate()
     }
 }
 
-KWayland::Client::PlasmaWindowManagement *WaylandIntegration::WaylandIntegrationPrivate::plasmaWindowManagement()
+KWayland::Client::LingmoWindowManagement *WaylandIntegration::WaylandIntegrationPrivate::lingmoWindowManagement()
 {
     return m_windowManagement;
 }
@@ -671,9 +671,9 @@ void WaylandIntegration::WaylandIntegrationPrivate::initWayland()
             return;
         m_screencasting = new Screencasting(m_registry, name, version, this);
     });
-    connect(m_registry, &KWayland::Client::Registry::plasmaWindowManagementAnnounced, this, [this](quint32 name, quint32 version) {
-        m_windowManagement = m_registry->createPlasmaWindowManagement(name, version, this);
-        Q_EMIT waylandIntegration()->plasmaWindowManagementInitialized();
+    connect(m_registry, &KWayland::Client::Registry::lingmoWindowManagementAnnounced, this, [this](quint32 name, quint32 version) {
+        m_windowManagement = m_registry->createLingmoWindowManagement(name, version, this);
+        Q_EMIT waylandIntegration()->lingmoWindowManagementInitialized();
     });
     connect(m_registry, &KWayland::Client::Registry::importerUnstableV2Announced, this, [this](quint32 name, quint32 version) {
         m_xdgImporter = m_registry->createXdgImporter(name, std::min(version, quint32(1)), this);

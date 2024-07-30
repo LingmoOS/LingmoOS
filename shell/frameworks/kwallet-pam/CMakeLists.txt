@@ -101,5 +101,5 @@ install(PROGRAMS pam_kwallet_init DESTINATION ${KDE_INSTALL_LIBEXECDIR})
 
 install(FILES ${CMAKE_BINARY_DIR}/pam_kwallet_init.desktop DESTINATION ${KDE_INSTALL_AUTOSTARTDIR})
 
-ecm_install_configured_files(INPUT plasma-kwallet-pam.service.in @ONLY DESTINATION
+ecm_install_configured_files(INPUT lingmo-kwallet-pam.service.in @ONLY DESTINATION
         ${KDE_INSTALL_SYSTEMDUSERUNITDIR})

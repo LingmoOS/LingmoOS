@@ -12,7 +12,7 @@ import QtQml.Models
 import QtQuick
 import QtQuick.Templates as T
 import org.kde.desktop as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.sonnet as Sonnet
 
 QQC2.Menu {
@@ -25,10 +25,10 @@ QQC2.Menu {
     property int restoredSelectionEnd
     property bool persistentSelectionSetting
 
-    // assuming that Instantiator::active is bound to target.Kirigami.SpellCheck.enabled
+    // assuming that Instantiator::active is bound to target.LingmoUI.SpellCheck.enabled
     property Instantiator/*<Sonnet.SpellcheckHighlighter>*/ spellcheckHighlighterInstantiator
 
-    // assuming that spellchecker's active state is not writable, use target.Kirigami.SpellCheck.enabled instead.
+    // assuming that spellchecker's active state is not writable, use target.LingmoUI.SpellCheck.enabled instead.
     readonly property Sonnet.SpellcheckHighlighter spellcheckHighlighter:
         spellcheckHighlighterInstantiator?.object as Sonnet.SpellcheckHighlighter
 
@@ -237,12 +237,12 @@ QQC2.Menu {
         visible: root.__hasSpellcheckCapability()
 
         checkable: true
-        checked: root.target?.Kirigami.SpellCheck.enabled ?? false
+        checked: root.target?.LingmoUI.SpellCheck.enabled ?? false
         text: qsTr("Spell Check")
 
         onToggled: {
             if (root.target) {
-                root.target.Kirigami.SpellCheck.enabled = checked;
+                root.target.LingmoUI.SpellCheck.enabled = checked;
             }
         }
     }

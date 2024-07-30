@@ -8,12 +8,12 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Drawer {
     id: control
 
-    z: Kirigami.OverlayZStacking.z
+    z: LingmoUI.OverlayZStacking.z
 
     parent: T.ApplicationWindow.overlay
 
@@ -28,8 +28,8 @@ T.Drawer {
     bottomPadding: edge === Qt.TopEdge ? 1 : 0
 
     background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-        Kirigami.Separator {
+        color: LingmoUI.Theme.backgroundColor
+        LingmoUI.Separator {
             readonly property bool horizontal: control.edge === Qt.LeftEdge || control.edge === Qt.RightEdge
 
             width: horizontal ? 1 : parent.width
@@ -37,8 +37,8 @@ T.Drawer {
             x: control.edge === Qt.LeftEdge ? parent.width - 1 : 0
             y: control.edge === Qt.TopEdge ? parent.height - 1 : 0
 
-            Kirigami.Theme.inherit: false
-            Kirigami.Theme.colorSet: Kirigami.Theme.Header
+            LingmoUI.Theme.inherit: false
+            LingmoUI.Theme.colorSet: LingmoUI.Theme.Header
         }
     }
 

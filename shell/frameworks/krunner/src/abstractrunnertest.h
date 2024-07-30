@@ -92,7 +92,7 @@ public:
         auto md = manager->convertDBusRunnerToJson(QStringLiteral(KRUNNER_TEST_DESKTOP_FILE));
         QString serviceToWatch = waitForService;
         if (serviceToWatch.isEmpty()) {
-            serviceToWatch = md.value(QStringLiteral("X-Plasma-DBusRunner-Service"));
+            serviceToWatch = md.value(QStringLiteral("X-Lingmo-DBusRunner-Service"));
         }
         QEventLoop loop;
         // Wait for the service to show up. Same logic as the dbusrunner

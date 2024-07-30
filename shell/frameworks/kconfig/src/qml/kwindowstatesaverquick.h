@@ -14,7 +14,7 @@
  * @code
  * import org.kde.config as KConfig
  *
- * Kirigami.ApplicationWindow {
+ * LingmoUI.ApplicationWindow {
  *     id: root
  *
  *     title: i18n("My Window")

@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -21,13 +21,13 @@ Faces.SensorFace {
     id: root
 
     // Arbitrary minimumWidth to make easier to align plasmoids in a predictable way
-    Layout.minimumWidth: Kirigami.Units.gridUnit * 8
+    Layout.minimumWidth: LingmoUI.Units.gridUnit * 8
     Layout.preferredWidth: Math.max(Layout.minimumWidth, titleMetrics.width)
 
     contentItem: ColumnLayout {
         spacing: 0
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: heading
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
@@ -45,7 +45,7 @@ Faces.SensorFace {
         Item {
             Layout.fillWidth: true;
             Layout.fillHeight: true;
-            Layout.minimumHeight: heading.visible ? Kirigami.Units.largeSpacing : 0
+            Layout.minimumHeight: heading.visible ? LingmoUI.Units.largeSpacing : 0
         }
 
         GroupedText {
@@ -65,7 +65,7 @@ Faces.SensorFace {
             // Trick ColumnLayout into layouting this spacer and the one above
             // the same height. Apparently if only minimumHeight is set
             // ColumnLayout will still use that as "weight" for sizing.
-            Layout.preferredHeight: heading.visible ? Kirigami.Units.largeSpacing : 0
+            Layout.preferredHeight: heading.visible ? LingmoUI.Units.largeSpacing : 0
         }
     }
 }

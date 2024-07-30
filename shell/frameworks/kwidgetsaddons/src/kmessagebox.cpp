@@ -170,8 +170,8 @@ QDialogButtonBox::StandardButton createKMessageBox(QDialog *dialog,
         // Which will end up in QDialogButtonBoxPrivate::retranslateStrings and will overwrite the texts
         // we have just set. So here we save our texts, force load the interface and reset the texts
         // For people wondering if they can remove this bit of code later, this seems to only be an issue
-        // in non Plasma desktops, emulate by running something like XDG_CURRENT_DESKTOP=X-Cinnamon okular
-        // on plasma desktops the platform plugin already uses knotifications so it's qm has been loaded on startup
+        // in non Lingmo desktops, emulate by running something like XDG_CURRENT_DESKTOP=X-Cinnamon okular
+        // on lingmo desktops the platform plugin already uses knotifications so it's qm has been loaded on startup
         QMap<QPointer<QAbstractButton>, QString> buttonTexts;
         for (QAbstractButton *b : buttons->buttons()) {
             buttonTexts[b] = b->text();

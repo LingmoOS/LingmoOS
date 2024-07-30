@@ -64,13 +64,13 @@ target_link_libraries(kcupslib PUBLIC
     Cups::Cups
 )
 
-ecm_add_qml_module(kcupslib URI "org.kde.plasma.printmanager" GENERATE_PLUGIN_SOURCE)
+ecm_add_qml_module(kcupslib URI "org.kde.lingmo.printmanager" GENERATE_PLUGIN_SOURCE)
 ecm_finalize_qml_module(kcupslib)
 
 ecm_qt_declare_logging_category(kcupslib
     HEADER kcupslib_log.h
     IDENTIFIER LIBKCUPS
-    CATEGORY_NAME org.kde.plasma.printmanager.libkcups
+    CATEGORY_NAME org.kde.lingmo.printmanager.libkcups
     DESCRIPTION "Print Manager (libkcups)"
     EXPORT PMLOGS
 )

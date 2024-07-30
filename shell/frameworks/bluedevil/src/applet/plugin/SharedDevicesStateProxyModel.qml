@@ -8,9 +8,9 @@ pragma ComponentBehavior: Bound
 pragma Singleton
 
 import org.kde.bluezqt as BluezQt
-import org.kde.plasma.private.bluetooth as PlasmaBt
+import org.kde.lingmo.private.bluetooth as LingmoBt
 
 // State of ongoing pending calls is shared because this is a singleton.
-PlasmaBt.DevicesStateProxyModel {
+LingmoBt.DevicesStateProxyModel {
     sourceModel: BluezQt.DevicesModel { }
 }

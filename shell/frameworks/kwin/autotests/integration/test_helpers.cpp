@@ -27,8 +27,8 @@
 #include <KWayland/Client/connection_thread.h>
 #include <KWayland/Client/event_queue.h>
 #include <KWayland/Client/output.h>
-#include <KWayland/Client/plasmashell.h>
-#include <KWayland/Client/plasmawindowmanagement.h>
+#include <KWayland/Client/lingmoshell.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
 #include <KWayland/Client/pointer.h>
 #include <KWayland/Client/pointerconstraints.h>
 #include <KWayland/Client/registry.h>
@@ -295,8 +295,8 @@ static struct
     XdgShell *xdgShell = nullptr;
     KWayland::Client::ShmPool *shm = nullptr;
     KWayland::Client::Seat *seat = nullptr;
-    KWayland::Client::PlasmaShell *plasmaShell = nullptr;
-    KWayland::Client::PlasmaWindowManagement *windowManagement = nullptr;
+    KWayland::Client::LingmoShell *lingmoShell = nullptr;
+    KWayland::Client::LingmoWindowManagement *windowManagement = nullptr;
     KWayland::Client::PointerConstraints *pointerConstraints = nullptr;
     KWayland::Client::Registry *registry = nullptr;
     WaylandOutputManagementV2 *outputManagementV2 = nullptr;
@@ -580,16 +580,16 @@ bool setupWaylandConnection(AdditionalWaylandInterfaces flags)
             return false;
         }
     }
-    if (flags.testFlag(AdditionalWaylandInterface::PlasmaShell)) {
-        s_waylandConnection.plasmaShell = registry->createPlasmaShell(registry->interface(KWayland::Client::Registry::Interface::PlasmaShell).name,
-                                                                      registry->interface(KWayland::Client::Registry::Interface::PlasmaShell).version);
-        if (!s_waylandConnection.plasmaShell->isValid()) {
+    if (flags.testFlag(AdditionalWaylandInterface::LingmoShell)) {
+        s_waylandConnection.lingmoShell = registry->createLingmoShell(registry->interface(KWayland::Client::Registry::Interface::LingmoShell).name,
+                                                                      registry->interface(KWayland::Client::Registry::Interface::LingmoShell).version);
+        if (!s_waylandConnection.lingmoShell->isValid()) {
             return false;
         }
     }
     if (flags.testFlag(AdditionalWaylandInterface::WindowManagement)) {
-        s_waylandConnection.windowManagement = registry->createPlasmaWindowManagement(registry->interface(KWayland::Client::Registry::Interface::PlasmaWindowManagement).name,
-                                                                                      registry->interface(KWayland::Client::Registry::Interface::PlasmaWindowManagement).version);
+        s_waylandConnection.windowManagement = registry->createLingmoWindowManagement(registry->interface(KWayland::Client::Registry::Interface::LingmoWindowManagement).name,
+                                                                                      registry->interface(KWayland::Client::Registry::Interface::LingmoWindowManagement).version);
         if (!s_waylandConnection.windowManagement->isValid()) {
             return false;
         }
@@ -625,8 +625,8 @@ void destroyWaylandConnection()
     s_waylandConnection.subCompositor = nullptr;
     delete s_waylandConnection.windowManagement;
     s_waylandConnection.windowManagement = nullptr;
-    delete s_waylandConnection.plasmaShell;
-    s_waylandConnection.plasmaShell = nullptr;
+    delete s_waylandConnection.lingmoShell;
+    s_waylandConnection.lingmoShell = nullptr;
     delete s_waylandConnection.seat;
     s_waylandConnection.seat = nullptr;
     delete s_waylandConnection.pointerConstraints;
@@ -713,12 +713,12 @@ KWayland::Client::Seat *waylandSeat()
     return s_waylandConnection.seat;
 }
 
-KWayland::Client::PlasmaShell *waylandPlasmaShell()
+KWayland::Client::LingmoShell *waylandLingmoShell()
 {
-    return s_waylandConnection.plasmaShell;
+    return s_waylandConnection.lingmoShell;
 }
 
-KWayland::Client::PlasmaWindowManagement *waylandWindowManagement()
+KWayland::Client::LingmoWindowManagement *waylandWindowManagement()
 {
     return s_waylandConnection.windowManagement;
 }

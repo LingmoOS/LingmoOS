@@ -26,7 +26,7 @@ using namespace PowerDevil;
 
 void Osd::showActionSelector(const QString &currentProfile)
 {
-    m_engine.setProperty("_kirigamiTheme", QStringLiteral("KirigamiPlasmaStyle"));
+    m_engine.setProperty("_lingmouiTheme", QStringLiteral("LingmoUILingmoStyle"));
 
     if (!m_osdActionSelector) {
         m_osdActionSelector = std::make_unique<QQuickView>(&m_engine, nullptr);

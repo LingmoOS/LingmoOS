@@ -8,7 +8,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 
-import org.kde.plasma.core as PlasmaCore
+import org.kde.lingmo.core as LingmoCore
 
 Item
 {
@@ -29,7 +29,7 @@ Item
                         "opaque/widgets/tooltip"
                         ]
 
-            delegate: PlasmaCore.FrameSvgItem {
+            delegate: LingmoCore.FrameSvgItem {
                 width: 100
                 height: 100
                 imagePath: modelData

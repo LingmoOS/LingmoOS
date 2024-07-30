@@ -12,28 +12,28 @@ import QtQuick
 import QtQuick.Layouts
 
 import org.kde.bluezqt as BluezQt
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.plasmoid
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmo.plasmoid
 
-PlasmaExtras.PlasmoidHeading {
+LingmoExtras.PlasmoidHeading {
     id: root
 
     required property PlasmoidItem plasmoidItem
-    required property PlasmaCore.Action addDeviceAction
-    required property PlasmaCore.Action toggleBluetoothAction
+    required property LingmoCore.Action addDeviceAction
+    required property LingmoCore.Action toggleBluetoothAction
 
     readonly property alias onSwitch: onSwitch
 
-    leftPadding: mirrored ? 0 : Kirigami.Units.smallSpacing
-    rightPadding: mirrored ? Kirigami.Units.smallSpacing : 0
+    leftPadding: mirrored ? 0 : LingmoUI.Units.smallSpacing
+    rightPadding: mirrored ? LingmoUI.Units.smallSpacing : 0
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        PlasmaComponents3.Switch {
+        LingmoComponents3.Switch {
             id: onSwitch
             text: root.toggleBluetoothAction.text
             icon.name: root.toggleBluetoothAction.icon.name
@@ -47,34 +47,34 @@ PlasmaExtras.PlasmoidHeading {
             Layout.fillWidth: true
         }
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: addDeviceButton
 
-            readonly property PlasmaCore.Action qAction: root.addDeviceAction
+            readonly property LingmoCore.Action qAction: root.addDeviceAction
 
-            visible: !(Plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
+            visible: !(Plasmoid.containmentDisplayHints & LingmoCore.Types.ContainmentDrawsPlasmoidHeading)
             enabled: qAction.visible
 
             icon.name: "list-add-symbolic"
 
             onClicked: qAction.trigger()
 
-            PlasmaComponents3.ToolTip {
+            LingmoComponents3.ToolTip {
                 text: addDeviceButton.qAction.text
             }
             Accessible.name: qAction.text
         }
 
-        PlasmaComponents3.ToolButton {
+        LingmoComponents3.ToolButton {
             id: openSettingsButton
 
-            readonly property PlasmaCore.Action qAction: Plasmoid.internalAction("configure")
+            readonly property LingmoCore.Action qAction: Plasmoid.internalAction("configure")
 
-            visible: !(Plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
+            visible: !(Plasmoid.containmentDisplayHints & LingmoCore.Types.ContainmentDrawsPlasmoidHeading)
             icon.name: "configure-symbolic"
             onClicked: qAction.trigger()
 
-            PlasmaComponents3.ToolTip {
+            LingmoComponents3.ToolTip {
                 text: openSettingsButton.qAction.text
             }
             Accessible.name: qAction.text

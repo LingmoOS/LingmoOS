@@ -79,9 +79,9 @@ KPageListView::KPageListView(QWidget *parent)
     : QListView(parent)
 {
     if (layoutDirection() == Qt::RightToLeft) {
-        setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::LeftEdge}));
+        setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::LeftEdge}));
     } else {
-        setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
+        setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
     }
     setViewMode(QListView::ListMode);
     setMovement(QListView::Static);
@@ -140,9 +140,9 @@ KPageTreeView::KPageTreeView(QWidget *parent)
     : QTreeView(parent)
 {
     if (layoutDirection() == Qt::RightToLeft) {
-        setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::LeftEdge}));
+        setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::LeftEdge}));
     } else {
-        setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
+        setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::RightEdge}));
     }
     header()->hide();
 }

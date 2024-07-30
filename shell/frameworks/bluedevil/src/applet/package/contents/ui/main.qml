@@ -12,10 +12,10 @@ import QtQuick
 
 import org.kde.bluezqt as BluezQt
 import org.kde.kcmutils as KCMUtils
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
-import org.kde.plasma.private.bluetooth as PlasmaBt
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.private.bluetooth as LingmoBt
 
 PlasmoidItem {
     id: root
@@ -23,8 +23,8 @@ PlasmoidItem {
     readonly property alias addDeviceAction: addDeviceAction
     readonly property alias toggleBluetoothAction: toggleBluetoothAction
 
-    switchWidth: Kirigami.Units.gridUnit * 15
-    switchHeight: Kirigami.Units.gridUnit * 10
+    switchWidth: LingmoUI.Units.gridUnit * 15
+    switchHeight: LingmoUI.Units.gridUnit * 10
 
     // Only exists because the default CompactRepresentation doesn't expose
     // a middle-click action.
@@ -40,8 +40,8 @@ PlasmoidItem {
         toggleBluetoothAction: root.toggleBluetoothAction
     }
 
-    Plasmoid.status: BluezQt.Manager.bluetoothOperational ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
-    Plasmoid.busy: PlasmaBt.SharedDevicesStateProxyModel.connecting
+    Plasmoid.status: BluezQt.Manager.bluetoothOperational ? LingmoCore.Types.ActiveStatus : LingmoCore.Types.PassiveStatus
+    Plasmoid.busy: LingmoBt.SharedDevicesStateProxyModel.connecting
 
     Plasmoid.icon: {
         if (BluezQt.Manager.connectedDevices.length > 0) {
@@ -101,18 +101,18 @@ PlasmoidItem {
     }
 
     Plasmoid.contextualActions: [
-        PlasmaCore.Action {
+        LingmoCore.Action {
             id: addDeviceAction
             text: i18n("Add New Device…")
             icon.name: "list-add-symbolic"
             visible: !BluezQt.Manager.bluetoothBlocked
-            onTriggered: checked => PlasmaBt.LaunchApp.launchWizard()
+            onTriggered: checked => LingmoBt.LaunchApp.launchWizard()
         },
-        PlasmaCore.Action {
+        LingmoCore.Action {
             id: toggleBluetoothAction
             text: i18n("Enable Bluetooth")
             icon.name: "preferences-system-bluetooth-symbolic"
-            priority: PlasmaCore.Action.LowPriority
+            priority: LingmoCore.Action.LowPriority
             checkable: true
             checked: BluezQt.Manager.bluetoothOperational
             visible: BluezQt.Manager.bluetoothBlocked || BluezQt.Manager.adapters.length > 0
@@ -122,7 +122,7 @@ PlasmoidItem {
         }
     ]
 
-    PlasmaCore.Action {
+    LingmoCore.Action {
         id: configureAction
         text: i18n("Configure &Bluetooth…")
         icon.name: "configure-symbolic"

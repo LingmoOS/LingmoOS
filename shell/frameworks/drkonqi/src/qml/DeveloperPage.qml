@@ -4,12 +4,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import org.kde.syntaxhighlighting 1.0
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
 
     property alias reportActionVisible: reportAction.visible
@@ -25,10 +25,10 @@ Kirigami.ScrollablePage {
     title: i18nc("@title:window", "Developer Information")
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             id: reportAction
-            enabled: Kirigami.Settings.isMobile ? true : canReport
-            visible: Kirigami.Settings.isMobile ? canReport : true
+            enabled: LingmoUI.Settings.isMobile ? true : canReport
+            visible: LingmoUI.Settings.isMobile ? canReport : true
             icon.name: "story-editor-symbolic"
             text: i18nc("@action Report the bug on this domain", "Report on %1", Globals.bugzillaShortUrl)
             // TODO: could give context on why the button is disabled when canReport is false
@@ -36,7 +36,7 @@ Kirigami.ScrollablePage {
             onTriggered: pageStack.push("qrc:/ui/WelcomePage.qml")
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: installButton
             visible: false
             text: i18nc("@action:button", "Install Debug Symbols")
@@ -55,7 +55,7 @@ Kirigami.ScrollablePage {
             tooltip: i18nc("@info:tooltip", "Use this button to install the missing debug symbols packages.")
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: reloadAction
             enabled: BacktraceGenerator.state !== BacktraceGenerator.Loading
             icon.name: "view-refresh"
@@ -69,14 +69,14 @@ installed the proper debug symbol packages and you want to obtain a better backt
             }
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "edit-copy"
             text: i18nc("@action:button", "Copy")
             tooltip: i18nc("@info:tooltip", "Use this button to copy the crash information (backtrace) to the clipboard.")
             onTriggered: DrKonqi.copyToClipboard(traceArea.text)
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "document-save"
             text: i18nc("@action:button", "Save")
             tooltip: xi18nc("@info:tooltip",
@@ -87,7 +87,7 @@ installed the proper debug symbol packages and you want to obtain a better backt
 
     header: QQC2.ToolBar {
         ColumnLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             anchors.left: parent.left
             anchors.right: parent.right
@@ -116,11 +116,11 @@ installed the proper debug symbol packages and you want to obtain a better backt
 
         RowLayout {
             visible: page.basic
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Layout.fillHeight: true
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 source: "help-hint"
-                width: Kirigami.Units.iconSizes.enormous
+                width: LingmoUI.Units.iconSizes.enormous
                 height: width
             }
             QQC2.Label {
@@ -147,7 +147,7 @@ used during interactive and post-mortem debugging.</para>`)
             wrapMode: TextEdit.Wrap
             textFormat: TextEdit.PlainText
             readOnly: true
-            selectByMouse: Kirigami.Settings.isMobile ? false : true
+            selectByMouse: LingmoUI.Settings.isMobile ? false : true
 
             SyntaxHighlighter {
                 textEdit:  BacktraceGenerator.debuggerIsGDB() ? traceArea : undefined
@@ -229,7 +229,7 @@ backtrace; install the needed packages (<link url='%2'>list of files</link>) and
             Layout.fillWidth: true
             background: null
 
-            Kirigami.PromptDialog {
+            LingmoUI.PromptDialog {
                 id: filesDialog
                 title: i18nc("@title", "Not Sufficiently Useful")
                 function reload() {
@@ -264,7 +264,7 @@ backtrace; install the needed packages (<link url='%2'>list of files</link>) and
             }
         }
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             // Two bars because of https://bugs.kde.org/show_bug.cgi?id=451026
             // Awkard though, maybe we should just live with everything being right aligned
             FooterActionBar {

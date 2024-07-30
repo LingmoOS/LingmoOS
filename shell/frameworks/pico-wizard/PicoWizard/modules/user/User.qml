@@ -5,8 +5,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -24,7 +24,7 @@ Module {
             anchors.horizontalCenter: parent.horizontalCenter
             width: root.width * 0.7
 
-            PlasmaComponents.TextField {
+            LingmoComponents.TextField {
                 id: fullname
                 Layout.fillWidth: true
                 topPadding: 16
@@ -33,7 +33,7 @@ Module {
                 placeholderText: qsTr("Full Name")
             }
 
-            PlasmaComponents.TextField {
+            LingmoComponents.TextField {
                 id: username
                 validator: RegExpValidator { regExp: /[a-z_][a-z0-9_-]*[$]?/ }
                 maximumLength: 32
@@ -53,7 +53,7 @@ Module {
 
                     background: Rectangle {
                         radius: 2
-                        color: Kirigami.Theme.backgroundColor
+                        color: LingmoUI.Theme.backgroundColor
                     }
 
                     ColumnLayout {
@@ -61,25 +61,25 @@ Module {
 
                         Label {
                             text: "- Should be lowercase"
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                         Label {
                             text: "- Should start with [a-z] or '_'"
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                         Label {
                             text: "- Can contain [a-z], [0-9], '_', and '-'"
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                         Label {
                             text: "- May end with a '$'"
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                     }
                 }
             }
 
-            PlasmaComponents.TextField {
+            LingmoComponents.TextField {
                 id: password
                 validator: {
                     if (userModule.passwordType === 'digitsonly')
@@ -98,7 +98,7 @@ Module {
                 inputMethodHints: userModule.passwordType === 'digitsonly' ? Qt.ImhDigitsOnly : Qt.ImhNoAutoUppercase | Qt.ImhNoPredectiveText
             }
 
-            PlasmaComponents.TextField {
+            LingmoComponents.TextField {
                 id: cnfPassword
                 validator: {
                     if (userModule.passwordType === 'digitsonly')
@@ -118,8 +118,8 @@ Module {
 
                 // border.color: cnfPassword.text.length > 0
                 //                 ? cnfPassword.text !== password.text
-                //                     ? Kirigami.Theme.negativeTextColor
-                //                     : Kirigami.Theme.positiveTextColor
+                //                     ? LingmoUI.Theme.negativeTextColor
+                //                     : LingmoUI.Theme.positiveTextColor
                 //                 : password.borderColor
             }
         }

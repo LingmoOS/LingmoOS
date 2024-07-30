@@ -8,9 +8,9 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
-Kirigami.AbstractApplicationWindow {
+LingmoUI.AbstractApplicationWindow {
     id: root
     flags: Qt.FramelessWindowHint | Qt.Dialog
     color: Qt.rgba(0, 0, 0, 0.5)
@@ -23,28 +23,28 @@ Kirigami.AbstractApplicationWindow {
         id: windowItem
         anchors.centerIn: parent
         // margins for shadow
-        implicitWidth: Math.min(Screen.width, control.implicitWidth + 2 * Kirigami.Units.gridUnit)
-        implicitHeight: Math.min(Screen.height, control.implicitHeight + 2 * Kirigami.Units.gridUnit)
+        implicitWidth: Math.min(Screen.width, control.implicitWidth + 2 * LingmoUI.Units.gridUnit)
+        implicitHeight: Math.min(Screen.height, control.implicitHeight + 2 * LingmoUI.Units.gridUnit)
 
         // actual window
         QQC2.Control {
             id: control
             anchors.fill: parent
             anchors.margins: glow.cornerRadius
-            topPadding: Kirigami.Units.gridUnit
-            bottomPadding: Kirigami.Units.gridUnit
-            rightPadding: Kirigami.Units.gridUnit
-            leftPadding: Kirigami.Units.gridUnit
+            topPadding: LingmoUI.Units.gridUnit
+            bottomPadding: LingmoUI.Units.gridUnit
+            rightPadding: LingmoUI.Units.gridUnit
+            leftPadding: LingmoUI.Units.gridUnit
 
-            implicitWidth: Kirigami.Units.gridUnit * 22
+            implicitWidth: LingmoUI.Units.gridUnit * 22
 
-            background: Kirigami.ShadowedRectangle {
+            background: LingmoUI.ShadowedRectangle {
                 anchors.fill: parent
-                radius: Kirigami.Units.largeSpacing
-                color: Kirigami.Theme.backgroundColor
+                radius: LingmoUI.Units.largeSpacing
+                color: LingmoUI.Theme.backgroundColor
                 border {
                     width: 1
-                    color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
+                    color: Qt.darker(LingmoUI.Theme.backgroundColor, 1.5)
                 }
                 shadow {
                     yOffset: 1

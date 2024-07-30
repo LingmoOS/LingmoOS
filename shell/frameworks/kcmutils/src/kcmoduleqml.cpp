@@ -164,15 +164,15 @@ KCModuleQml::KCModuleQml(KQuickConfigModule *configModule, QWidget *parent)
     component->setData(QByteArrayLiteral(R"(
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami 2 as Kirigami
+import org.kde.lingmoui 2 as LingmoUI
 import org.kde.kcmutils as KCMUtils
 
-Kirigami.ApplicationItem {
+LingmoUI.ApplicationItem {
     // force it to *never* try to resize itself
     width: Window.width
 
-    implicitWidth: Math.max(pageStack.implicitWidth, Kirigami.Units.gridUnit * 36)
-    implicitHeight: Math.max(pageStack.implicitHeight, Kirigami.Units.gridUnit * 20)
+    implicitWidth: Math.max(pageStack.implicitWidth, LingmoUI.Units.gridUnit * 36)
+    implicitHeight: Math.max(pageStack.implicitHeight, LingmoUI.Units.gridUnit * 20)
 
     activeFocusOnTab: true
 
@@ -185,15 +185,15 @@ Kirigami.ApplicationItem {
     }
 
     pageStack.separatorVisible: pageStack.depth > 0 && (pageStack.items[0].sidebarMode ?? false)
-    pageStack.globalToolBar.preferredHeight: toolButton.implicitHeight + Kirigami.Units.smallSpacing * 2
-    pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.ToolBar
-    pageStack.globalToolBar.showNavigationButtons: pageStack.currentIndex > 0 ? Kirigami.ApplicationHeaderStyle.ShowBackButton : Kirigami.ApplicationHeaderStyle.NoNavigationButtons
+    pageStack.globalToolBar.preferredHeight: toolButton.implicitHeight + LingmoUI.Units.smallSpacing * 2
+    pageStack.globalToolBar.style: LingmoUI.ApplicationHeaderStyle.ToolBar
+    pageStack.globalToolBar.showNavigationButtons: pageStack.currentIndex > 0 ? LingmoUI.ApplicationHeaderStyle.ShowBackButton : LingmoUI.ApplicationHeaderStyle.NoNavigationButtons
 
-    pageStack.columnView.columnResizeMode: pageStack.items.length > 0 && (pageStack.items[0].Kirigami.ColumnView.fillWidth || pageStack.items.filter(item => item.visible).length === 1)
-        ? Kirigami.ColumnView.SingleColumn
-        : Kirigami.ColumnView.FixedColumns
+    pageStack.columnView.columnResizeMode: pageStack.items.length > 0 && (pageStack.items[0].LingmoUI.ColumnView.fillWidth || pageStack.items.filter(item => item.visible).length === 1)
+        ? LingmoUI.ColumnView.SingleColumn
+        : LingmoUI.ColumnView.FixedColumns
 
-    pageStack.defaultColumnWidth: kcm && kcm.columnWidth > 0 ? kcm.columnWidth : Kirigami.Units.gridUnit * 15
+    pageStack.defaultColumnWidth: kcm && kcm.columnWidth > 0 ? kcm.columnWidth : LingmoUI.Units.gridUnit * 15
 
     footer: null
     Keys.onReturnPressed: event => {

@@ -6,7 +6,7 @@
 
 import QtQuick
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
     id: root
@@ -16,18 +16,18 @@ Item {
     required property bool atBeginning
     required property bool atEnd
 
-    property real edgeMargin: Kirigami.Units.gridUnit
+    property real edgeMargin: LingmoUI.Units.gridUnit
 
     signal decrementCurrentIndex()
     signal incrementCurrentIndex()
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Complementary
+    LingmoUI.Theme.inherit: false
 
     anchors.fill: parent
 
     CarouselNavigationButton {
-        Kirigami.Theme.inherit: true
+        LingmoUI.Theme.inherit: true
         LayoutMirroring.enabled: root.LayoutMirroring.enabled
 
         animated: root.animated
@@ -42,7 +42,7 @@ Item {
     }
 
     CarouselNavigationButton {
-        Kirigami.Theme.inherit: true
+        LingmoUI.Theme.inherit: true
         LayoutMirroring.enabled: root.LayoutMirroring.enabled
 
         animated: root.animated

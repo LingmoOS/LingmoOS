@@ -9,11 +9,11 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.10
 
-//NOTE: PlasmaCore is still necessary to make KSvg load the correct plasma theme
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.components 3.0 as PlasmaComponents
+//NOTE: LingmoCore is still necessary to make KSvg load the correct lingmo theme
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.components 3.0 as LingmoComponents
 import org.kde.ksvg 1.0 as KSvg
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 // import org.kde.KScreen 1.0
 
@@ -36,14 +36,14 @@ Control {
                 id: actionRepeater
                 property int currentIndex: model.findIndex(action => action.id === currentProfile) || 0
                 model: root.actions
-                delegate: PlasmaComponents.Button {
+                delegate: LingmoComponents.Button {
                     property var profile: modelData.id
 
                     Accessible.name: modelData.label
 
                     icon.name: modelData.iconName
-                    icon.height: Kirigami.Units.gridUnit * 8
-                    icon.width: Kirigami.Units.gridUnit * 8
+                    icon.height: LingmoUI.Units.gridUnit * 8
+                    icon.width: LingmoUI.Units.gridUnit * 8
 
                     onClicked: root.clicked(modelData.id)
                     onHoveredChanged: {
@@ -74,14 +74,14 @@ Control {
             }
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             text: root.infoText
             horizontalAlignment: Text.AlignHCenter
             maximumLineCount: 2
             wrapMode: Text.WordWrap
 
             Layout.fillWidth: true
-            Layout.margins: Math.floor(Kirigami.Units.smallSpacing / 2)
+            Layout.margins: Math.floor(LingmoUI.Units.smallSpacing / 2)
         }
 
         // Shift current by delta, but do not wrap around when repeat is true.

@@ -38,7 +38,7 @@ class Decoration;
 
 namespace KWin
 {
-class PlasmaWindowInterface;
+class LingmoWindowInterface;
 class SurfaceInterface;
 class Group;
 class Output;
@@ -1309,7 +1309,7 @@ public:
     /**
      * Return window management interface
      */
-    PlasmaWindowInterface *windowManagementInterface() const
+    LingmoWindowInterface *windowManagementInterface() const
     {
         return m_windowManagementInterface;
     }
@@ -1791,7 +1791,7 @@ protected:
     static QHash<QString, std::weak_ptr<Decoration::DecorationPalette>> s_palettes;
     static std::shared_ptr<Decoration::DecorationPalette> s_defaultPalette;
 
-    PlasmaWindowInterface *m_windowManagementInterface = nullptr;
+    LingmoWindowInterface *m_windowManagementInterface = nullptr;
 
     Window *m_transientFor = nullptr;
     QList<Window *> m_transients;

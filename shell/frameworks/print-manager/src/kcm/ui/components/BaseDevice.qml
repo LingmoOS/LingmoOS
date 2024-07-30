@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import ".."
 
 /**
@@ -22,7 +22,7 @@ import ".."
 */
 ColumnLayout {
     id: root
-    spacing: Kirigami.Units.largeSpacing*2
+    spacing: LingmoUI.Units.largeSpacing*2
 
     property alias title: heading.title
     property alias subtitle: heading.subtitle
@@ -78,23 +78,23 @@ ColumnLayout {
         Layout.fillWidth: true
     }
 
-    Kirigami.IconTitleSubtitle {
+    LingmoUI.IconTitleSubtitle {
         id: heading
 
-        font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.15
-        subtitleFont.pointSize: Kirigami.Theme.defaultFont.pointSize
+        font.pointSize: LingmoUI.Theme.defaultFont.pointSize * 1.15
+        subtitleFont.pointSize: LingmoUI.Theme.defaultFont.pointSize
 
         elide: Text.ElideRight
 
         icon.source: "printer"
-        icon.width: Kirigami.Units.iconSizes.huge
-        icon.height: Kirigami.Units.iconSizes.huge
+        icon.width: LingmoUI.Units.iconSizes.huge
+        icon.height: LingmoUI.Units.iconSizes.huge
 
         Layout.alignment: Qt.AlignHCenter
-        Layout.bottomMargin: Kirigami.Units.largeSpacing
+        Layout.bottomMargin: LingmoUI.Units.largeSpacing
     }
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         id: helpLabel
         level: 4
         visible: text.length > 0
@@ -105,13 +105,13 @@ ColumnLayout {
     // Uri
     RowLayout {
         id: uriLayout
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.Label {
             text: i18nc("@label:textbox", "Address:")
         }
 
-        Kirigami.SearchField {
+        LingmoUI.SearchField {
             id: connSearch
             Layout.fillWidth: true
 

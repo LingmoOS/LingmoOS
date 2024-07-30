@@ -22,7 +22,7 @@ ApplicationWindow {
     Component {
         id: notificationComponent
         Notification {
-            componentName: Qt.platform.os === "android" ? "android_defaults" : "plasma_workspace"
+            componentName: Qt.platform.os === "android" ? "android_defaults" : "lingmo_workspace"
             eventId: "notification"
             text: "Temporary notification we can create new instances of."
             autoDelete: true
@@ -34,7 +34,7 @@ ApplicationWindow {
 
         Notification {
             id: basicNotification
-            componentName: Qt.platform.os === "android" ? "android_defaults" : "plasma_workspace"
+            componentName: Qt.platform.os === "android" ? "android_defaults" : "lingmo_workspace"
             eventId: "notification"
             title: titleField.text
             text: textField.text
@@ -123,7 +123,7 @@ ApplicationWindow {
 
         Notification {
             id: replyNotification
-            componentName: Qt.platform.os === "android" ? "android_defaults" : "plasma_workspace"
+            componentName: Qt.platform.os === "android" ? "android_defaults" : "lingmo_workspace"
             eventId: "notification"
             title: titleField.text
             text: textField.text

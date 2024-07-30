@@ -6,7 +6,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 QQC2.ScrollView {
     property var outputs
@@ -36,13 +36,13 @@ QQC2.ScrollView {
     readonly property int xOffset: (width - totalSize.width / relativeFactor) / 2;
     readonly property int yOffset: (height - totalSize.height / relativeFactor) / 2;
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         z: 90
         anchors {
             top: parent.top
             left: parent.left
             right: parent.right
-            margins: Kirigami.Units.smallSpacing
+            margins: LingmoUI.Units.smallSpacing
         }
         level: 4
         opacity: 0.6

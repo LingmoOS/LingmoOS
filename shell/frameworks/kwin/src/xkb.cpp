@@ -686,7 +686,7 @@ void Xkb::updateKeymap(xkb_keymap *keymap)
         s_startup = false;
         if (m_numLockConfig) {
             const KConfigGroup config = m_numLockConfig->group(QStringLiteral("Keyboard"));
-            // STATE_ON = 0,  STATE_OFF = 1, STATE_UNCHANGED = 2, see plasma-desktop/kcms/keyboard/kcmmisc.h
+            // STATE_ON = 0,  STATE_OFF = 1, STATE_UNCHANGED = 2, see lingmo-desktop/kcms/keyboard/kcmmisc.h
             const auto setting = config.readEntry("NumLock", 2);
             if (setting != 2) {
                 setLock(m_numModifier, !setting);

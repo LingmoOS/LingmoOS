@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -33,7 +33,7 @@ Faces.CompactSensorFace {
             Layout.alignment: Qt.AlignCenter
             updateRateLimit: root.controller.updateRateLimit
 
-            chart.thickness: Kirigami.Units.smallSpacing
+            chart.thickness: LingmoUI.Units.smallSpacing
         }
         QQC2.Label {
             id: label

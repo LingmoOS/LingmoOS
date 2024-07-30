@@ -3,7 +3,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Pane {
     id: control
@@ -13,10 +13,10 @@ T.Pane {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              contentHeight + topPadding + bottomPadding)
 
-    padding: Kirigami.Units.largeSpacing
+    padding: LingmoUI.Units.largeSpacing
 
     background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
     }
 }
 

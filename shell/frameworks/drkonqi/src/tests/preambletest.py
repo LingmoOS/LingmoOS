@@ -290,7 +290,7 @@ Mapped address spaces:
 
     def test_print_qml_frames(self):
         # the payload is missing a line -> we expect no assertions of any kind!
-        preamble.print_qml_frames('frame={level="0",func="saveConfig",file="/data/projects/kde/usr/share/plasma/shells/org.kde.plasma.desktop/contents/configuration/ConfigurationContainmentAppearance.qml",fullname="/data/project".')
+        preamble.print_qml_frames('frame={level="0",func="saveConfig",file="/data/projects/kde/usr/share/lingmo/shells/org.kde.lingmo.desktop/contents/configuration/ConfigurationContainmentAppearance.qml",fullname="/data/project".')
 
 if __name__ == '__main__':
     unittest.main()

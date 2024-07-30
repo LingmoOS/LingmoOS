@@ -8,12 +8,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     property alias cfg_showLegend: showSensorsLegendCheckbox.checked
@@ -35,7 +35,7 @@ Kirigami.FormLayout {
     }
     QQC2.SpinBox {
         id: fromAngleSpin
-        Kirigami.FormData.label: i18n("Start from Angle:")
+        LingmoUI.FormData.label: i18n("Start from Angle:")
         from: -180
         to: 360
         editable: true
@@ -48,7 +48,7 @@ Kirigami.FormLayout {
     }
     QQC2.SpinBox {
         id: toAngleSpin
-        Kirigami.FormData.label: i18n("Total Pie Angle:")
+        LingmoUI.FormData.label: i18n("Total Pie Angle:")
         from: 0
         to: 360
         editable: true
@@ -70,15 +70,15 @@ Kirigami.FormLayout {
     }
     Faces.SensorRangeSpinBox {
         id: rangeFromSpin
-        Kirigami.FormData.label: i18n("From:")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("From:")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }
     Faces.SensorRangeSpinBox {
         id: rangeToSpin
-        Kirigami.FormData.label: i18n("To:")
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 10
+        LingmoUI.FormData.label: i18n("To:")
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 10
         enabled: !rangeAutoCheckbox.checked
         sensors: controller.highPrioritySensorIds
     }

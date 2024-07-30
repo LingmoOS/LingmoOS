@@ -1,2 +1,2 @@
 add_subdirectory(plugin)
-plasma_install_package(package org.kde.plasma.bluetooth)
+lingmo_install_package(package org.kde.lingmo.bluetooth)

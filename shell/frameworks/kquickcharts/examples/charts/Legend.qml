@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrols
 
 import org.kde.quickcharts as Charts
@@ -17,7 +17,7 @@ import org.kde.quickcharts.controls as ChartsControls
 ChartPage {
     title: "Legend"
 
-    chart: Kirigami.AbstractCard {
+    chart: LingmoUI.AbstractCard {
         anchors.centerIn: parent
         width: parent.width
         height: 400
@@ -30,7 +30,7 @@ ChartPage {
                     right: parent.right
                     top: parent.top
                     bottom: legend.top
-                    bottomMargin: Kirigami.Units.largeSpacing
+                    bottomMargin: LingmoUI.Units.largeSpacing
                 }
 
                 valueSources: [
@@ -40,7 +40,7 @@ ChartPage {
                 ]
 
                 colorSource: Charts.ColorGradientSource {
-                    baseColor: Kirigami.Theme.highlightColor
+                    baseColor: LingmoUI.Theme.highlightColor
                     itemCount: itemModel.count * 3
                 }
                 nameSource: Charts.ArraySource {
@@ -130,12 +130,12 @@ ChartPage {
     }
 
     itemEditorActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Add Item"
             onTriggered: itemModel.append({label: "Item " + (itemModel.count + 1), value1: 10, value2: 10, value3: 10})
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Remove Last"
             onTriggered: itemModel.remove(itemModel.count - 1)
         }

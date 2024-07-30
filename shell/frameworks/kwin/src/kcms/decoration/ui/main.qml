@@ -10,7 +10,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.newstuff as NewStuff
 
 KCM.AbstractKCM {
@@ -20,11 +20,11 @@ KCM.AbstractKCM {
 
     framedView: false
 
-    implicitWidth: Kirigami.Units.gridUnit * 48
-    implicitHeight: Kirigami.Units.gridUnit * 33
+    implicitWidth: LingmoUI.Units.gridUnit * 48
+    implicitHeight: LingmoUI.Units.gridUnit * 33
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             id: borderSizeComboBox
             text: i18nc("Selector label", "Window border size:")
 
@@ -43,7 +43,7 @@ KCM.AbstractKCM {
                 }
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "configure"
             text: i18nc("button text", "Configure Titlebar Buttons…")
 

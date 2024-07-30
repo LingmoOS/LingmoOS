@@ -1,10 +1,10 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
-Kirigami.PromptDialog {
+LingmoUI.PromptDialog {
     id: reviewDialog
 
     required property Discover.AbstractResource application
@@ -15,14 +15,14 @@ Kirigami.PromptDialog {
     readonly property alias summary: titleInput.text
     readonly property alias review: reviewInput.text
 
-    preferredWidth: Kirigami.Units.gridUnit * 30
+    preferredWidth: LingmoUI.Units.gridUnit * 30
 
     title: i18n("Reviewing %1", application.name)
 
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
     customFooterActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             id: submitAction
             text: i18n("Submit review")
             icon.name: "document-send"
@@ -32,17 +32,17 @@ Kirigami.PromptDialog {
     ]
 
     ColumnLayout {
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             Layout.fillWidth: true
 
             Rating {
                 id: ratingInput
-                Kirigami.FormData.label: i18n("Rating:")
+                LingmoUI.FormData.label: i18n("Rating:")
                 readOnly: false
             }
             QQC2.TextField {
                 id: nameInput
-                Kirigami.FormData.label: i18n("Name:")
+                LingmoUI.FormData.label: i18n("Name:")
                 visible: page.reviewsBackend !== null && reviewDialog.backend.preferredUserName.length > 0
                 Layout.fillWidth: true
                 readOnly: !reviewDialog.backend.supportsNameChange
@@ -50,7 +50,7 @@ Kirigami.PromptDialog {
             }
             QQC2.TextField {
                 id: titleInput
-                Kirigami.FormData.label: i18n("Title:")
+                LingmoUI.FormData.label: i18n("Title:")
                 Layout.fillWidth: true
                 validator: RegularExpressionValidator { regularExpression: /.{3,70}/ }
             }
@@ -60,7 +60,7 @@ Kirigami.PromptDialog {
             id: reviewInput
             readonly property bool acceptableInput: length > 15 && length < 3000
             Layout.fillWidth: true
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 8
+            Layout.minimumHeight: LingmoUI.Units.gridUnit * 8
             KeyNavigation.priority: KeyNavigation.BeforeItem
             wrapMode: TextEdit.Wrap
         }

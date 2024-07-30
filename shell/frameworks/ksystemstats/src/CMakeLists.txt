@@ -21,11 +21,11 @@ install(TARGETS ksystemstats DESTINATION ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 ecm_generate_dbus_service_file(
     NAME org.kde.ksystemstats1
     EXECUTABLE "${KDE_INSTALL_FULL_BINDIR}/ksystemstats"
-    SYSTEMD_SERVICE plasma-ksystemstats.service
+    SYSTEMD_SERVICE lingmo-ksystemstats.service
     DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR}
 )
 
 ecm_install_configured_files(
-   INPUT plasma-ksystemstats.service.in
+   INPUT lingmo-ksystemstats.service.in
    DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR}
 )

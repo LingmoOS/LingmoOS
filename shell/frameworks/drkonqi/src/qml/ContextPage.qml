@@ -4,17 +4,17 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
 
     title: i18nc("@title:window", "What do You Know About the Crash?")
 
     ColumnLayout {
-        Kirigami.Heading {
+        LingmoUI.Heading {
             text: xi18nc("@info/rich", "Do you remember what you were doing prior to the crash?")
             level: 2
             wrapMode: Text.Wrap
@@ -35,7 +35,7 @@ Kirigami.ScrollablePage {
             checked: true
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             text: xi18nc("@info/rich", "Does the application crash again if you repeat the same situation?")
             level: 2
             wrapMode: Text.Wrap
@@ -48,7 +48,7 @@ Kirigami.ScrollablePage {
             onCurrentValueChanged: reportInterface.reproducible = currentValue
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             text: xi18nc("@info/rich", "Please select which additional information you can provide:")
             level: 2
             wrapMode: Text.Wrap
@@ -74,7 +74,7 @@ Kirigami.ScrollablePage {
     }
 
     footer: FooterActionBar {
-        Kirigami.PromptDialog {
+        LingmoUI.PromptDialog {
             id: problemDialog
             title: i18nc("@title", "Not Sufficiently Useful")
             subtitle: xi18nc("@info", "<para>The information you can provide is not considered helpful enough in this case. If you can't think of any more information you can close the bug report dialog.</para>")
@@ -83,7 +83,7 @@ Kirigami.ScrollablePage {
         }
 
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "go-next"
                 text: i18nc("@action:button", "Next")
                 onTriggered: {

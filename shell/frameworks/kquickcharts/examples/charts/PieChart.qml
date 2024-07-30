@@ -9,14 +9,14 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.quickcharts as Charts
 
 ChartPage {
     title: "Pie Chart"
 
-    chart: Kirigami.AbstractCard {
+    chart: LingmoUI.AbstractCard {
         width: 600
         height: 400
         anchors.centerIn: parent
@@ -24,14 +24,14 @@ ChartPage {
         Charts.PieChart {
             id: chart
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.smallSpacing;
+            anchors.margins: LingmoUI.Units.smallSpacing;
 
             range.to: 150
 
             valueSources: Charts.ModelSource { roleName: "data"; model: pieModel }
 
             colorSource: Charts.ColorGradientSource {
-                baseColor: Kirigami.Theme.highlightColor
+                baseColor: LingmoUI.Theme.highlightColor
                 itemCount: pieModel.count
             }
 
@@ -103,12 +103,12 @@ ChartPage {
     }
 
     itemEditorActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Add Item"
             onTriggered: pieModel.append({label: "Item " + (pieModel.count + 1), data: 50})
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Remove Last"
             onTriggered: pieModel.remove(pieModel.count - 1)
         }

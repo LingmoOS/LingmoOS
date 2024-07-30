@@ -88,7 +88,7 @@ void KNotificationTest::gettersTest()
 
     // DefaultEvent is reserved for Workspace events
     n->setFlags(KNotification::DefaultEvent);
-    QCOMPARE(n->appName(), QStringLiteral("plasma_workspace"));
+    QCOMPARE(n->appName(), QStringLiteral("lingmo_workspace"));
 
     n->setFlags(KNotification::CloseOnTimeout);
     n->setComponentName(QStringLiteral("testtest"));

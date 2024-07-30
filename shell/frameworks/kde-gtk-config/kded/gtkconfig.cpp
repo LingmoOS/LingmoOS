@@ -37,7 +37,7 @@ GtkConfig::GtkConfig(QObject *parent, const QVariantList &)
     , kwinConfigWatcher(KConfigWatcher::create(KSharedConfig::openConfig(QStringLiteral("kwinrc"))))
     , kcmfontsConfigWatcher(KConfigWatcher::create(KSharedConfig::openConfig(QStringLiteral("kcmfonts"))))
     , kcminputConfigWatcher(KConfigWatcher::create(KSharedConfig::openConfig(QStringLiteral("kcminputrc"))))
-    , breezeConfigWatcher(KConfigWatcher::create(KSharedConfig::openConfig(QStringLiteral("breezerc"))))
+    , oceanConfigWatcher(KConfigWatcher::create(KSharedConfig::openConfig(QStringLiteral("oceanrc"))))
 {
     QDBusConnection dbus = QDBusConnection::sessionBus();
     dbus.registerService(QStringLiteral("org.kde.GtkConfig"));
@@ -51,7 +51,7 @@ GtkConfig::GtkConfig(QObject *parent, const QVariantList &)
     connect(kwinConfigWatcher.data(), &KConfigWatcher::configChanged, this, &GtkConfig::onKWinSettingsChange);
     connect(kcmfontsConfigWatcher.data(), &KConfigWatcher::configChanged, this, &GtkConfig::onKCMFontsSettingsChange);
     connect(kcminputConfigWatcher.data(), &KConfigWatcher::configChanged, this, &GtkConfig::onKCMInputSettingsChange);
-    connect(breezeConfigWatcher.data(), &KConfigWatcher::configChanged, this, &GtkConfig::onBreezeSettingsChange);
+    connect(oceanConfigWatcher.data(), &KConfigWatcher::configChanged, this, &GtkConfig::onOceanSettingsChange);
 
     Gtk2ConfigEditor::removeLegacyStrings();
     applyAllSettings();
@@ -68,8 +68,8 @@ void GtkConfig::setGtk2Theme(const QString &themeName, const bool preferDarkThem
 {
     // GTK2 does not support using dark variant automatically, so we have to get dark preference and switch based on that
     QString possiblydarkthemeName = themeName;
-    if (themeName == QLatin1String("Breeze") && preferDarkTheme) {
-        possiblydarkthemeName = QStringLiteral("Breeze-Dark");
+    if (themeName == QLatin1String("Ocean") && preferDarkTheme) {
+        possiblydarkthemeName = QStringLiteral("Ocean-Dark");
     }
 
     Gtk2ConfigEditor::setValue(QStringLiteral("gtk-theme-name"), possiblydarkthemeName);
@@ -82,7 +82,7 @@ void GtkConfig::setGtkTheme(const QString &themeName) const
     GSettingsEditor::setValue("gtk-theme", themeName);
     SettingsIniEditor::setValue(QStringLiteral("gtk-theme-name"), themeName);
 
-    // Window decorations are part of the theme, in case of Breeze we inject custom ones from KWin
+    // Window decorations are part of the theme, in case of Ocean we inject custom ones from KWin
     setWindowDecorationsAppearance();
 }
 
@@ -213,7 +213,7 @@ void GtkConfig::setDarkThemePreference() const
 
 void GtkConfig::setWindowDecorationsAppearance() const
 {
-    if (gtkTheme() == QStringLiteral("Breeze")) { // Only Breeze GTK supports custom decoration buttons
+    if (gtkTheme() == QStringLiteral("Ocean")) { // Only Ocean GTK supports custom decoration buttons
         const auto windowDecorationsButtonsImages = configValueProvider->windowDecorationsButtonsImages();
         CustomCssEditor::setCustomClientSideDecorations(windowDecorationsButtonsImages);
     } else {
@@ -402,7 +402,7 @@ void GtkConfig::onKCMInputSettingsChange(const KConfigGroup &group, const QByteA
     }
 }
 
-void GtkConfig::onBreezeSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const
+void GtkConfig::onOceanSettingsChange(const KConfigGroup &group, const QByteArrayList &names) const
 {
     if (group.name() == QStringLiteral("Common") //
         && names.contains("OutlineCloseButton")) {

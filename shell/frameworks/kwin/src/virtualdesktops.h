@@ -29,7 +29,7 @@ namespace KWin
 {
 
 class Options;
-class PlasmaVirtualDesktopManagementInterface;
+class LingmoVirtualDesktopManagementInterface;
 
 class KWIN_EXPORT VirtualDesktop : public QObject
 {
@@ -162,7 +162,7 @@ public:
     /**
      * @internal, for Wayland case
      */
-    void setVirtualDesktopManagement(PlasmaVirtualDesktopManagementInterface *management);
+    void setVirtualDesktopManagement(LingmoVirtualDesktopManagementInterface *management);
 
     /**
      * @internal
@@ -522,7 +522,7 @@ private:
 #if KWIN_BUILD_X11
     NETRootInfo *m_rootInfo;
 #endif
-    PlasmaVirtualDesktopManagementInterface *m_virtualDesktopManagement = nullptr;
+    LingmoVirtualDesktopManagementInterface *m_virtualDesktopManagement = nullptr;
     KSharedConfig::Ptr m_config;
 
     std::unique_ptr<QAction> m_swipeGestureReleasedY;

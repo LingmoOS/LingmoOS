@@ -9,18 +9,18 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 KCM.ScrollViewKCM {
     id: root
 
-    implicitWidth: Kirigami.Units.gridUnit * 35
-    implicitHeight: Kirigami.Units.gridUnit * 30
+    implicitWidth: LingmoUI.Units.gridUnit * 35
+    implicitHeight: LingmoUI.Units.gridUnit * 30
 
     actions:  [
-        Kirigami.Action {
+        LingmoUI.Action {
             displayComponent: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.Label {
                     text: i18nc("@text:label Number of rows, label associated to a number input field", "Rows:")
@@ -50,7 +50,7 @@ KCM.ScrollViewKCM {
                 }
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button", "Add Desktop")
             icon.name: "list-add"
             onTriggered: kcm.desktopsModel.createDesktop()
@@ -67,14 +67,14 @@ KCM.ScrollViewKCM {
 
             // use alternating background colors to visually connect list items'
             // left and right side content elements
-            Kirigami.Theme.useAlternateBackgroundColor: true
+            LingmoUI.Theme.useAlternateBackgroundColor: true
 
             contentItem: RowLayout {
                 QQC2.TextField {
                     id: nameField
 
                     background: null
-                    leftPadding: Kirigami.Units.largeSpacing
+                    leftPadding: LingmoUI.Units.largeSpacing
                     topPadding: 0
                     bottomPadding: 0
 
@@ -107,11 +107,11 @@ KCM.ScrollViewKCM {
                 Rectangle {
                     id: defaultIndicator
                     radius: width * 0.5
-                    implicitWidth: Kirigami.Units.largeSpacing
-                    implicitHeight: Kirigami.Units.largeSpacing
+                    implicitWidth: LingmoUI.Units.largeSpacing
+                    implicitHeight: LingmoUI.Units.largeSpacing
                     visible: kcm.defaultsIndicatorsVisible
                     opacity: model ? !model.IsDefault : 0.0
-                    color: Kirigami.Theme.neutralTextColor
+                    color: LingmoUI.Theme.neutralTextColor
                 }
 
                 DelegateButton {
@@ -156,22 +156,22 @@ KCM.ScrollViewKCM {
     header: ColumnLayout {
         id: messagesLayout
 
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             Layout.fillWidth: true
 
-            type: Kirigami.MessageType.Error
+            type: LingmoUI.MessageType.Error
 
             text: kcm.desktopsModel.error
 
             visible: kcm.desktopsModel.error !== ""
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             Layout.fillWidth: true
 
-            type: Kirigami.MessageType.Information
+            type: LingmoUI.MessageType.Information
 
             text: i18n("Virtual desktops have been changed outside this settings application. Saving now will overwrite the changes.")
 
@@ -187,7 +187,7 @@ KCM.ScrollViewKCM {
         model: kcm.desktopsModel.ready ? kcm.desktopsModel : null
 
         section.property: "DesktopRow"
-        section.delegate: Kirigami.ListSectionHeader {
+        section.delegate: LingmoUI.ListSectionHeader {
             width: desktopsList.width
             label: i18n("Row %1", section)
         }
@@ -198,12 +198,12 @@ KCM.ScrollViewKCM {
 
     extraFooterTopPadding: true // re-add separator line
     footer: ColumnLayout {
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
 
             QQC2.CheckBox {
                 id: navWraps
 
-                Kirigami.FormData.label: i18n("Options:")
+                LingmoUI.FormData.label: i18n("Options:")
 
                 text: i18n("Navigation wraps around")
                 enabled: !kcm.virtualDesktopsSettings.isImmutable("rollOverDesktops")
@@ -312,7 +312,7 @@ KCM.ScrollViewKCM {
                 Layout.fillWidth: true
 
                 Item {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit
+                    Layout.preferredWidth: LingmoUI.Units.gridUnit
                 }
 
                 QQC2.CheckBox {

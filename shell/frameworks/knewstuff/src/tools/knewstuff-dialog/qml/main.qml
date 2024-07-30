@@ -5,15 +5,15 @@
 */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 import org.kde.newstuff.tools.dialog as Myself
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: root;
     title: "KNewStuff Dialog"
 
-    globalDrawer: Kirigami.GlobalDrawer {
+    globalDrawer: LingmoUI.GlobalDrawer {
         id: globalDrawer
         title: "KNewStuff Dialog"
         titleIcon: "get-hot-new-stuff"
@@ -24,7 +24,7 @@ Kirigami.ApplicationWindow {
         Instantiator {
             id: configsInstantiator
             model: Myself.KNSRCModel {}
-            Kirigami.Action {
+            LingmoUI.Action {
                 text: model.name
                 icon.name: "get-hot-new-stuff"
                 onTriggered: {
@@ -35,7 +35,7 @@ Kirigami.ApplicationWindow {
             onObjectAdded: (idx, object) => globalDrawer.actions.push(object);
         }
     }
-    contextDrawer: Kirigami.ContextDrawer {
+    contextDrawer: LingmoUI.ContextDrawer {
         id: contextDrawer
     }
 
@@ -46,7 +46,7 @@ Kirigami.ApplicationWindow {
     }
     Component {
         id: startPageComponent
-        Kirigami.AboutPage {
+        LingmoUI.AboutPage {
             aboutData: {
                 "displayName": "KNewStuff Dialog",
                 "productName": "org.kde.knewstuff.tools.dialog",

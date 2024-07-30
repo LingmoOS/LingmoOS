@@ -13,7 +13,7 @@ class TestMetaDataConversion : public QObject
 private Q_SLOTS:
     void testMetaDataConversion()
     {
-        const KPluginMetaData data = parseMetaDataFromDesktopFile(QFINDTESTDATA("plugins/plasma-runner-testconversionfile.desktop"));
+        const KPluginMetaData data = parseMetaDataFromDesktopFile(QFINDTESTDATA("plugins/lingmo-runner-testconversionfile.desktop"));
         QVERIFY(data.isValid());
         QCOMPARE(data.pluginId(), "testconversionfile");
         QCOMPARE(data.name(), "DBus runner test");

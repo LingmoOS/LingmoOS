@@ -5,15 +5,15 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import QtQuick.Controls 2.15 as Controls
 import QtMultimedia
 
-Kirigami.AbstractApplicationWindow {
+LingmoUI.AbstractApplicationWindow {
     id: window
     visible: true
     title: i18n("PlankPlayer")
-    color: Kirigami.Theme.backgroundColor
+    color: LingmoUI.Theme.backgroundColor
     width:  Screen.desktopAvailableWidth
     height: Screen.desktopAvailableHeight
     visibility: "FullScreen"

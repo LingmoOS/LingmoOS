@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmo.workspace.dialogs as PWD
 
 PWD.SystemDialog {
     id: root

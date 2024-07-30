@@ -32,7 +32,7 @@ void upgradeGtk2Theme()
         || currentGtk2Theme == QStringLiteral("oxygen-gtk") //
         || currentGtk2Theme == QStringLiteral("BreezyGTK") //
         || currentGtk2Theme == QStringLiteral("Orion")) {
-        Gtk2ConfigEditor::setValue(QStringLiteral("gtk-theme-name"), QStringLiteral("Breeze"));
+        Gtk2ConfigEditor::setValue(QStringLiteral("gtk-theme-name"), QStringLiteral("Ocean"));
     }
 }
 
@@ -43,9 +43,9 @@ void upgradeGtk3Theme()
         || currentGtk3Theme == QStringLiteral("oxygen-gtk") //
         || currentGtk3Theme == QStringLiteral("BreezyGTK") //
         || currentGtk3Theme == QStringLiteral("Orion")) {
-        GSettingsEditor::setValue("gtk-theme", QStringLiteral("Breeze"));
-        SettingsIniEditor::setValue(QStringLiteral("gtk-theme-name"), QStringLiteral("Breeze"), 3);
-        XSettingsEditor::setValue(QStringLiteral("Net/ThemeName"), QStringLiteral("Breeze"));
+        GSettingsEditor::setValue("gtk-theme", QStringLiteral("Ocean"));
+        SettingsIniEditor::setValue(QStringLiteral("gtk-theme-name"), QStringLiteral("Ocean"), 3);
+        XSettingsEditor::setValue(QStringLiteral("Net/ThemeName"), QStringLiteral("Ocean"));
     }
 }
 

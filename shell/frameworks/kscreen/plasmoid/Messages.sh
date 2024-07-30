@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-$XGETTEXT `find . -name \*.qml -o -name \*.cpp` -o $podir/plasma_applet_org.kde.kscreen.pot
+$XGETTEXT `find . -name \*.qml -o -name \*.cpp` -o $podir/lingmo_applet_org.kde.kscreen.pot

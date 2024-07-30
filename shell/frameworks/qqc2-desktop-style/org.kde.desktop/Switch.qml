@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 T.Switch {
@@ -23,7 +23,7 @@ T.Switch {
     baselineOffset: contentItem.y + contentItem.baselineOffset
 
     padding: 1
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
     hoverEnabled: true
 
@@ -44,13 +44,13 @@ T.Switch {
         control: control
     }
 
-    Kirigami.MnemonicData.enabled: enabled && visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.ActionElement
-    Kirigami.MnemonicData.label: text
+    LingmoUI.MnemonicData.enabled: enabled && visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.ActionElement
+    LingmoUI.MnemonicData.label: text
     Shortcut {
         //in case of explicit & the button manages it by itself
         enabled: !(RegExp(/\&[^\&]/).test(control.text))
-        sequence: control.Kirigami.MnemonicData.sequence
+        sequence: control.LingmoUI.MnemonicData.sequence
         onActivated: control.toggle();
     }
 
@@ -63,9 +63,9 @@ T.Switch {
         leftPadding: control.indicator && !control.mirrored ? control.indicator.width + control.spacing : 0
         rightPadding: control.indicator && control.mirrored ? control.indicator.width + control.spacing : 0
         opacity: control.enabled ? 1 : 0.6
-        text: control.Kirigami.MnemonicData.richTextLabel
+        text: control.LingmoUI.MnemonicData.richTextLabel
         font: control.font
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
         elide: Text.ElideRight
         visible: control.text
         horizontalAlignment: Text.AlignLeft

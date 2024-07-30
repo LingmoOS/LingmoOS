@@ -11,8 +11,8 @@ class DBusSanitizerTest : public QObject
 private Q_SLOTS:
     void test()
     {
-        QCOMPARE(kconfigDBusSanitizePath(QStringLiteral("/plasma_org-kde!plasma~desktop:appletsrc")),
-                 QStringLiteral("/plasma_org_kde_plasma_desktop_appletsrc"));
+        QCOMPARE(kconfigDBusSanitizePath(QStringLiteral("/lingmo_org-kde!lingmo~desktop:appletsrc")),
+                 QStringLiteral("/lingmo_org_kde_lingmo_desktop_appletsrc"));
     }
 };
 

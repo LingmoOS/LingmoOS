@@ -12,7 +12,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCMUtils
 
 import org.kde.bluezqt as BluezQt
@@ -80,27 +80,27 @@ KCMUtils.SimpleKCM {
     }
 
     headerPaddingEnabled: false // Let the InlineMessage touch the edges
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         id: errorMessage
-        position: Kirigami.InlineMessage.Position.Header
-        type: Kirigami.MessageType.Error
+        position: LingmoUI.InlineMessage.Position.Header
+        type: LingmoUI.MessageType.Error
         showCloseButton: true
     }
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             source: root.device.icon
-            Layout.preferredWidth: Kirigami.Units.iconSizes.enormous
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.enormous
             Layout.preferredHeight: Layout.preferredWidth
             Layout.alignment: Qt.AlignHCenter
         }
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
 
             Row {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.Button {
                     id: connectButton
@@ -129,29 +129,29 @@ KCMUtils.SimpleKCM {
 
             QQC2.Label {
                 text: Script.deviceTypeToString(root.device)
-                Kirigami.FormData.label: i18n("Type:")
+                LingmoUI.FormData.label: i18n("Type:")
             }
 
             QQC2.Label {
                 text: root.device.battery !== null ? i18n("%1%", root.device.battery.percentage) : ""
                 visible: root.device.battery !== null
-                Kirigami.FormData.label: i18n("Battery:")
+                LingmoUI.FormData.label: i18n("Battery:")
             }
 
             QQC2.Label {
                 text: root.device.address
-                Kirigami.FormData.label: i18n("Address:")
+                LingmoUI.FormData.label: i18n("Address:")
             }
 
             QQC2.Label {
                 text: root.device.adapter.name
-                Kirigami.FormData.label: i18n("Adapter:")
+                LingmoUI.FormData.label: i18n("Adapter:")
             }
 
             QQC2.TextField {
                 text: root.device.name
                 onTextEdited: root.device.name = text
-                Kirigami.FormData.label: i18n("Name:")
+                LingmoUI.FormData.label: i18n("Name:")
             }
 
             QQC2.CheckBox {
@@ -161,7 +161,7 @@ KCMUtils.SimpleKCM {
             }
 
             RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.CheckBox {
                     text: i18n("Blocked")
@@ -169,7 +169,7 @@ KCMUtils.SimpleKCM {
                     onClicked: root.device.blocked = !root.device.blocked
                 }
 
-                Kirigami.ContextualHelpButton {
+                LingmoUI.ContextualHelpButton {
                     toolTipText: i18n("Any incoming connections from a blocked device will be immediately rejected.")
                 }
             }
@@ -197,8 +197,8 @@ KCMUtils.SimpleKCM {
                 onClicked: root.KCMUtils.ConfigModule.setupNetworkConnection("dun", root.device.address, root.device.name)
             }
 
-            Kirigami.Separator {
-                Kirigami.FormData.isSection: true
+            LingmoUI.Separator {
+                LingmoUI.FormData.isSection: true
             }
 
             QQC2.Button {

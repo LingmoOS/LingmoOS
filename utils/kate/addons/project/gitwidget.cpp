@@ -322,7 +322,7 @@ void GitWidget::init()
 
     m_filterLineEdit = new QLineEdit(this);
     m_filterLineEdit->setPlaceholderText(i18n("Filter..."));
-    m_filterLineEdit->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_filterLineEdit->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     layout->addWidget(m_filterLineEdit);
 
     m_model = new GitStatusModel(this);
@@ -339,7 +339,7 @@ void GitWidget::init()
     m_treeView->installEventFilter(this);
     m_treeView->setRootIsDecorated(false);
     m_treeView->setAllColumnsShowFocus(true);
-    m_treeView->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    m_treeView->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     m_treeView->expandAll();
 
     if (m_treeView->style()) {

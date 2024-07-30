@@ -9,7 +9,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.Menu {
     id: menu
@@ -26,7 +26,7 @@ QQC2.Menu {
     Repeater {
         model: menu.parent.actions
         delegate: QQC2.MenuItem {
-            required property Kirigami.Action modelData
+            required property LingmoUI.Action modelData
 
             text: modelData.text || modelData.tooltip
             icon.name: modelData.icon.name

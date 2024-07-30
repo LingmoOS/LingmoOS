@@ -16,7 +16,7 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
 Window {
@@ -24,8 +24,8 @@ Window {
 
     // Keep in sync with the implicit sizes in DialogContent.qml and the default
     // size in dialog.cpp
-    width: Math.min(Kirigami.Units.gridUnit * 44, Screen.width)
-    height: Math.min(Kirigami.Units.gridUnit * 30, Screen.height)
+    width: Math.min(LingmoUI.Units.gridUnit * 44, Screen.width)
+    height: Math.min(LingmoUI.Units.gridUnit * 30, Screen.height)
 
     /**
      * The configuration file to use for this button
@@ -99,7 +99,7 @@ Window {
         }
     }
 
-    color: Kirigami.Theme.backgroundColor
+    color: LingmoUI.Theme.backgroundColor
 
     NewStuff.DialogContent {
         id: newStuffPage

@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.newstuff as NewStuff
 
@@ -26,10 +26,10 @@ Private.GridTileDelegate {
         });
     }
 
-    actionsAnchors.topMargin: bigPreview.height + Kirigami.Units.smallSpacing * 2
+    actionsAnchors.topMargin: bigPreview.height + LingmoUI.Units.smallSpacing * 2
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: root.useLabel
             icon.name: "dialog-ok-apply"
             onTriggered: source => {
@@ -38,7 +38,7 @@ Private.GridTileDelegate {
             enabled: (entry.status === NewStuff.Entry.Installed || entry.status === NewStuff.Entry.Updateable) && newStuffEngine.hasAdoptionCommand
             visible: enabled
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: model.downloadLinks.length === 1
                 ? i18ndc("knewstuff6", "Request installation of this item, available when there is exactly one downloadable item", "Install")
                 : i18ndc("knewstuff6", "Show installation options, where there is more than one downloadable item", "Install…")
@@ -55,7 +55,7 @@ Private.GridTileDelegate {
             enabled: entry.status === NewStuff.Entry.Downloadable || entry.status === NewStuff.Entry.Deleted
             visible: enabled
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18ndc("knewstuff6", "Request updating of this item", "Update")
             icon.name: "update-none"
             onTriggered: source => {
@@ -64,7 +64,7 @@ Private.GridTileDelegate {
             enabled: entry.status === NewStuff.Entry.Updateable
             visible: enabled
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: root.uninstallLabel
             icon.name: "edit-delete"
             onTriggered: source => {
@@ -79,7 +79,7 @@ Private.GridTileDelegate {
     tile: Item {
         anchors {
             fill: parent
-            margins: Kirigami.Units.smallSpacing
+            margins: LingmoUI.Units.smallSpacing
         }
         ColumnLayout {
             anchors.fill: parent
@@ -88,12 +88,12 @@ Private.GridTileDelegate {
                 Layout.fillHeight: true
                 Layout.minimumHeight: width / 5
                 Layout.maximumHeight: width / 1.8
-                Kirigami.ShadowedRectangle {
+                LingmoUI.ShadowedRectangle {
                     visible: bigPreview.status === Image.Ready
                     anchors.centerIn: bigPreview
                     width: Math.min(bigPreview.paintedWidth, bigPreview.width)
                     height: Math.min(bigPreview.paintedHeight, bigPreview.height)
-                    Kirigami.Theme.colorSet: Kirigami.Theme.View
+                    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
                     shadow.size: 10
                     shadow.color: Qt.rgba(0, 0, 0, 0.3)
                 }
@@ -104,27 +104,27 @@ Private.GridTileDelegate {
                     source: thumbnailAvailable ? model.previews[0] : ""
                     anchors.fill: parent
                 }
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     id: updateAvailableBadge
                     opacity: (entry.status === NewStuff.Entry.Updateable) ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration } }
+                    Behavior on opacity { NumberAnimation { duration: LingmoUI.Units.shortDuration } }
                     anchors {
                         top: parent.top
                         left: parent.left
                     }
-                    height: Kirigami.Units.iconSizes.medium
+                    height: LingmoUI.Units.iconSizes.medium
                     width: height
                     source: "package-installed-outdated"
                 }
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     id: installedBadge
                     opacity: (entry.status === NewStuff.Entry.Installed) ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: Kirigami.Units.shortDuration; } }
+                    Behavior on opacity { NumberAnimation { duration: LingmoUI.Units.shortDuration; } }
                     anchors {
                         top: parent.top
                         left: parent.left
                     }
-                    height: Kirigami.Units.iconSizes.medium
+                    height: LingmoUI.Units.iconSizes.medium
                     width: height
                     source: "package-installed-updated"
                 }
@@ -133,19 +133,19 @@ Private.GridTileDelegate {
                 Layout.fillWidth: true
                 rating: model.rating
             }
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 level: 5
                 elide: Text.ElideRight
                 text: i18ndc("knewstuff6", "The number of times the item has been downloaded", "%1 downloads", model.downloadCount)
             }
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 elide: Text.ElideRight
                 level: 3
                 text: model.name
             }
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 elide: Text.ElideRight
                 level: 4
@@ -155,8 +155,8 @@ Private.GridTileDelegate {
             QQC2.Label {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.minimumHeight: Kirigami.Units.gridUnit
-                Layout.maximumHeight: Kirigami.Units.gridUnit * 3
+                Layout.minimumHeight: LingmoUI.Units.gridUnit
+                Layout.maximumHeight: LingmoUI.Units.gridUnit * 3
                 wrapMode: Text.Wrap
                 text: model.shortSummary.length > 0 ? model.shortSummary : model.summary
                 elide: Text.ElideRight

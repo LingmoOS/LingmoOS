@@ -29,7 +29,7 @@ static QString resolveKCrashMetadataPath(const QString &exe, const QString &boot
     const QString nameV2 = QStringLiteral("kcrash-metadata/%1.%2.%3.ini").arg(command, bootId, QString::number(pid));
     const QString pathV2 = QStandardPaths::locate(QStandardPaths::GenericCacheLocation, nameV2);
 
-    // Backwards compat for a while. Can be dropped before/after Plasma 6.0
+    // Backwards compat for a while. Can be dropped before/after Lingmo 6.0
     const QString nameV1 = QStringLiteral("kcrash-metadata/%1.ini").arg(pid);
     const QString pathV1 = QStandardPaths::locate(QStandardPaths::GenericCacheLocation, nameV1);
 

@@ -7,21 +7,21 @@
 import QtQuick
 import QtQuick.Controls as QQC
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.kcmutils as KCM
-import org.kde.plasma.kwin.colorblindnesscorrectioneffect.kcm
+import org.kde.lingmo.kwin.colorblindnesscorrectioneffect.kcm
 
 KCM.SimpleKCM {
     id: root
 
-    implicitWidth: Kirigami.Units.gridUnit * 30
-    implicitHeight: Kirigami.Units.gridUnit * 24
+    implicitWidth: LingmoUI.Units.gridUnit * 30
+    implicitHeight: LingmoUI.Units.gridUnit * 24
 
     RowLayout {
         id: previewArea
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Item {
             Layout.fillWidth: true
@@ -41,8 +41,8 @@ KCM.SimpleKCM {
                 Repeater {
                     model: modelData.colors
                     delegate: Rectangle {
-                        width: Kirigami.Units.gridUnit * 5
-                        height: Kirigami.Units.gridUnit * 5
+                        width: LingmoUI.Units.gridUnit * 5
+                        height: LingmoUI.Units.gridUnit * 5
                         color: modelData
                     }
                 }
@@ -59,16 +59,16 @@ KCM.SimpleKCM {
         }
     }
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         id: formLayout
         anchors {
             top: previewArea.bottom
-            topMargin: Kirigami.Units.largeSpacing
+            topMargin: LingmoUI.Units.largeSpacing
         }
 
         QQC.ComboBox {
             id: colorComboBox
-            Kirigami.FormData.label: i18ndc("kwin", "@label", "Mode:")
+            LingmoUI.FormData.label: i18ndc("kwin", "@label", "Mode:")
             currentIndex: kcm.settings.mode
             textRole: "text"
             valueRole: "value"
@@ -82,7 +82,7 @@ KCM.SimpleKCM {
         }
 
         QQC.Slider {
-            Kirigami.FormData.label: i18ndc("kwin", "@label", "Intensity:")
+            LingmoUI.FormData.label: i18ndc("kwin", "@label", "Intensity:")
             Layout.preferredWidth: colorComboBox.implicitWidth
             from: 0.0
             to: 1.0

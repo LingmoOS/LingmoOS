@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Baloo is the file indexing and file search framework for KDE Plasma. It focuses 
+Baloo is the file indexing and file search framework for KDE Lingmo. It focuses 
 on speed and a very small memory footprint. It maintains an index of your files 
 and optionally their contents which [you can search](./docs/user/searching.md).
 

@@ -8,7 +8,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import org.kde.purpose
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
 
@@ -62,9 +62,9 @@ Item {
             Loader {
                 id: configLoader
 
-                Layout.leftMargin: Kirigami.Units.largeSpacing
-                Layout.rightMargin: Kirigami.Units.largeSpacing
-                Layout.topMargin: Kirigami.Units.largeSpacing
+                Layout.leftMargin: LingmoUI.Units.largeSpacing
+                Layout.rightMargin: LingmoUI.Units.largeSpacing
+                Layout.topMargin: LingmoUI.Units.largeSpacing
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -114,9 +114,9 @@ Item {
             // Not using a DialogButtonBox because it doesn't let us customize
             // the buttons and conditionally disable any of them, which we want
             RowLayout {
-                Layout.leftMargin: Kirigami.Units.largeSpacing
-                Layout.rightMargin: Kirigami.Units.largeSpacing
-                Layout.bottomMargin: Kirigami.Units.largeSpacing
+                Layout.leftMargin: LingmoUI.Units.largeSpacing
+                Layout.rightMargin: LingmoUI.Units.largeSpacing
+                Layout.bottomMargin: LingmoUI.Units.largeSpacing
                 Layout.alignment: Qt.AlignRight
 
                 Button {

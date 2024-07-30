@@ -10,17 +10,17 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.plasmoid
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.workspace.components as WorkspaceComponents
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.workspace.components as WorkspaceComponents
+import org.kde.lingmoui as LingmoUI
 
-import org.kde.plasma.private.battery
+import org.kde.lingmo.private.battery
 
 MouseArea {
     id: root
 
-    readonly property bool isConstrained: Plasmoid.formFactor === PlasmaCore.Types.Vertical || Plasmoid.formFactor === PlasmaCore.Types.Horizontal
+    readonly property bool isConstrained: Plasmoid.formFactor === LingmoCore.Types.Vertical || Plasmoid.formFactor === LingmoCore.Types.Horizontal
     property int batteryPercent : 0
     property bool batteryPluggedIn : false
     property bool hasBatteries: false
@@ -59,7 +59,7 @@ MouseArea {
 
     //Show only overall battery
     // "No Batteries" case
-    Kirigami.Icon {
+    LingmoUI.Icon {
         anchors.fill: parent
         visible: root.isConstrained && !root.hasBatteries || (root.isConstrained && !root.hasInternalBatteries)
         source: root.powerModeIconSrc
@@ -68,7 +68,7 @@ MouseArea {
 
     // Manual inhibition or power profile active while not discharging:
     // Show the active mode so the user can notice this at a glance
-    Kirigami.Icon {
+    LingmoUI.Icon {
         id: powerModeIcon
 
         anchors.fill: parent

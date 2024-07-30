@@ -127,7 +127,7 @@ enum class PinchDirection {
 
 /**
  * Represents the state of the session running outside kwin
- * Under Plasma this is managed by ksmserver
+ * Under Lingmo this is managed by ksmserver
  */
 enum class SessionState {
     Normal,

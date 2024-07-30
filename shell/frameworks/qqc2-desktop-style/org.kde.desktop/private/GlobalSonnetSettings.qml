@@ -17,7 +17,7 @@ Instantiator {
     // type-safe nullable reference
     readonly property Sonnet.Settings instance: object as Sonnet.Settings
 
-    // This property can be used as a default binding for Kirigami.SpellCheck.enabled flag.
+    // This property can be used as a default binding for LingmoUI.SpellCheck.enabled flag.
     readonly property bool checkerEnabledByDefault: instance?.checkerEnabledByDefault ?? false
 
     active: true

@@ -5,7 +5,7 @@
 After installing the required headers and CMake config files on your distro, the `install.sh` script can be run.
 
 After this the runner shows up in systemsettings:  
-`systemsettings kcm_plasmasearch`
+`systemsettings kcm_lingmosearch`
 
 You can also launch KRunner via Alt-F2 or Alt-Space and you will find your runner.
 

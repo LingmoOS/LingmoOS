@@ -9,8 +9,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 import org.kde.discover as Discover
 
 QQC2.Button {
@@ -23,7 +23,7 @@ QQC2.Button {
 
     onClicked: overlay.open()
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: overlay
 
         parent: root.QQC2.Overlay.overlay
@@ -43,7 +43,7 @@ QQC2.Button {
                 text: i18nd("libdiscover", "%1 - %2", modelData.name, modelData.version)
 
                 contentItem: RowLayout {
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
                     KD.IconTitleSubtitle {
                         Layout.fillWidth: true
                         icon: icon.fromControlsIcon(delegate.icon)

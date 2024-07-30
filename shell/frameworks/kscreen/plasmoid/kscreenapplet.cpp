@@ -23,7 +23,7 @@
 #include <algorithm>
 
 KScreenApplet::KScreenApplet(QObject *parent, const KPluginMetaData &data, const QVariantList &args)
-    : Plasma::Applet(parent, data, args)
+    : Lingmo::Applet(parent, data, args)
 {
     qmlRegisterUncreatableMetaObject(KScreen::OsdAction::staticMetaObject,
                                      "org.kde.private.kscreen",

@@ -36,8 +36,8 @@ public:
     QMap<QString, QColor> colors() const;
 
     // The global scale factor, as X11 doesn't support mixed-DPI
-    // setups. It's useful both for Plasma/X11 sessions and for
-    // XWayland apps in Plasma/Wayland sessions.
+    // setups. It's useful both for Lingmo/X11 sessions and for
+    // XWayland apps in Lingmo/Wayland sessions.
     //
     // On Wayland sessions returns 1.0 if XWayland client scaling
     // is disabled.

@@ -6,12 +6,12 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.printmanager as PM
 import org.kde.kitemmodels as KItemModels
 import "components"
 
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: root
 
     property bool loading: false
@@ -85,10 +85,10 @@ Kirigami.Dialog {
 
     title: i18nc("@title:window", "Set up a Printer Connection")
 
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
     customFooterActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: showingManual
                   ? i18nc("@action:button", "Show Detected Devices")
                   : i18nc("@action:button", "Show Manual Options")
@@ -109,7 +109,7 @@ Kirigami.Dialog {
                 }
             }
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18n("Refresh")
             enabled: !loading
             icon.name: "view-refresh-symbolic"
@@ -120,10 +120,10 @@ Kirigami.Dialog {
         }
     ]
 
-    footerLeadingComponent: Kirigami.UrlButton {
+    footerLeadingComponent: LingmoUI.UrlButton {
         text: i18n("CUPS Network Printers Help")
         url: "http://localhost:631/help/network.html"
-        padding: Kirigami.Units.largeSpacing
+        padding: LingmoUI.Units.largeSpacing
     }
 
     onClosed: destroy(10)
@@ -179,19 +179,19 @@ Kirigami.Dialog {
     Component {
         id: noDevicesComp
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             text: i18nc("@info:status", "Unable to automatically discover any printing devices")
             explanation: i18nc("@info:usagetip", "Choose \"Refresh\" to try again or choose a manual configuration option from the list")
-            Layout.maximumWidth: parent.width - Kirigami.Units.largeSpacing * 4
+            Layout.maximumWidth: parent.width - LingmoUI.Units.largeSpacing * 4
         }
     }
 
     Component {
         id: chooseManualComp
 
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             text: i18nc("@info:usagetip", "Choose a manual configuration option from the list")
-            Layout.maximumWidth: parent.width - Kirigami.Units.largeSpacing * 4
+            Layout.maximumWidth: parent.width - LingmoUI.Units.largeSpacing * 4
         }
     }
 
@@ -200,7 +200,7 @@ Kirigami.Dialog {
 
         QQC2.ScrollView {
             Layout.fillHeight: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit*13
+            Layout.preferredWidth: LingmoUI.Units.gridUnit*13
             clip: true
 
             contentItem: ListView {
@@ -224,14 +224,14 @@ Kirigami.Dialog {
 
                 section {
                     property: "deviceCategory"
-                    delegate: Kirigami.ListSectionHeader {
+                    delegate: LingmoUI.ListSectionHeader {
                         width: ListView.view.width
                         required property string section
                         label: section
                     }
                 }
 
-                delegate: Kirigami.SubtitleDelegate {
+                delegate: LingmoUI.SubtitleDelegate {
                     width: ListView.view.width
                     visible: deviceClass !== undefined
 
@@ -281,7 +281,7 @@ Kirigami.Dialog {
             }
         }
 
-        Kirigami.Separator {
+        LingmoUI.Separator {
             Layout.fillHeight: true
             width: 1
         }
@@ -292,7 +292,7 @@ Kirigami.Dialog {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.margins: Kirigami.Units.largeSpacing
+            Layout.margins: LingmoUI.Units.largeSpacing
 
             property string selector: ""
             property string info: ""

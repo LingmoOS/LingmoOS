@@ -90,7 +90,7 @@ install(TARGETS polkit-kde-authentication-agent-1 DESTINATION ${KDE_INSTALL_LIBE
 install(FILES ${CMAKE_BINARY_DIR}/polkit-kde-authentication-agent-1.desktop DESTINATION ${KDE_INSTALL_AUTOSTARTDIR})
 install(FILES ${CMAKE_BINARY_DIR}/polkit-kde-authentication-agent-1.desktop DESTINATION ${KDE_INSTALL_APPDIR} RENAME org.kde.polkit-kde-authentication-agent-1.desktop)
 
-ecm_install_configured_files(INPUT plasma-polkit-agent.service.in DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR})
+ecm_install_configured_files(INPUT lingmo-polkit-agent.service.in DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR})
 
 install(FILES policykit1-kde.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR})
 

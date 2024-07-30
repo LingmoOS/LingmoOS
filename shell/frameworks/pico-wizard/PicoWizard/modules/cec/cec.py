@@ -116,11 +116,11 @@ class Cec(Module):
 
     def cleanUpConfig(self):
         self.log.info("Cleaning up config")
-        if os.path.exists("/tmp/plasma-remotecontrollersrc"):
-            os.remove("/tmp/plasma-remotecontrollersrc")
+        if os.path.exists("/tmp/lingmo-remotecontrollersrc"):
+            os.remove("/tmp/lingmo-remotecontrollersrc")
 
     def appendStartToConfig(self):
-        configFile = open("/tmp/plasma-remotecontrollersrc", "a")
+        configFile = open("/tmp/lingmo-remotecontrollersrc", "a")
         configFile.write("[General]\n")
         configFile.close()
 

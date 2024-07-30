@@ -28,8 +28,8 @@ namespace Client
 class ConnectionThread;
 class EventQueue;
 class Registry;
-class PlasmaWindow;
-class PlasmaWindowManagement;
+class LingmoWindow;
+class LingmoWindowManagement;
 class RemoteBuffer;
 class XdgImporter;
 }
@@ -56,13 +56,13 @@ public:
 
     void initWayland();
 
-    KWayland::Client::PlasmaWindowManagement *plasmaWindowManagement();
+    KWayland::Client::LingmoWindowManagement *lingmoWindowManagement();
 
 private:
     bool m_registryInitialized = false;
 
     KWayland::Client::Registry *m_registry = nullptr;
-    KWayland::Client::PlasmaWindowManagement *m_windowManagement = nullptr;
+    KWayland::Client::LingmoWindowManagement *m_windowManagement = nullptr;
     KWayland::Client::XdgImporter *m_xdgImporter = nullptr;
 
 public:

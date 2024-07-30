@@ -17,7 +17,7 @@
 #include <QGuiApplication>
 #include <QRect>
 
-#include <KWayland/Client/plasmashell.h>
+#include <KWayland/Client/lingmoshell.h>
 #include <KWayland/Client/surface.h>
 
 WindowInfo::WindowInfo(WId window, NET::Properties properties, NET::Properties2 properties2)
@@ -26,7 +26,7 @@ WindowInfo::WindowInfo(WId window, NET::Properties properties, NET::Properties2 
     , m_properties(properties)
     , m_properties2(properties2)
     , m_surface(KWayland::Client::Surface::fromQtWinId(window))
-    , m_plasmaShellSurface(KWayland::Client::PlasmaShellSurface::get(m_surface))
+    , m_lingmoShellSurface(KWayland::Client::LingmoShellSurface::get(m_surface))
 {
     m_valid = m_surface != nullptr && m_surface->isValid();
 }
@@ -63,43 +63,43 @@ NETExtendedStrut WindowInfo::extendedStrut() const
 
 NET::WindowType WindowInfo::windowType(NET::WindowTypes supported_types) const
 {
-    if (!m_plasmaShellSurface || !m_plasmaShellSurface->isValid()) {
+    if (!m_lingmoShellSurface || !m_lingmoShellSurface->isValid()) {
         return NET::Unknown;
     }
 
     if (m_properties & NET::WMWindowType) {
-        switch (m_plasmaShellSurface->role()) {
-        case KWayland::Client::PlasmaShellSurface::Role::Normal:
+        switch (m_lingmoShellSurface->role()) {
+        case KWayland::Client::LingmoShellSurface::Role::Normal:
             if (supported_types & NET::NormalMask) {
                 return NET::Normal;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::Desktop:
+        case KWayland::Client::LingmoShellSurface::Role::Desktop:
             if (supported_types & NET::DesktopMask) {
                 return NET::Desktop;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::Panel:
+        case KWayland::Client::LingmoShellSurface::Role::Panel:
             if (supported_types & NET::DockMask) {
                 return NET::Dock;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::OnScreenDisplay:
+        case KWayland::Client::LingmoShellSurface::Role::OnScreenDisplay:
             if (supported_types & NET::OnScreenDisplayMask) {
                 return NET::OnScreenDisplay;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::Notification:
+        case KWayland::Client::LingmoShellSurface::Role::Notification:
             if (supported_types & NET::NotificationMask) {
                 return NET::Notification;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::ToolTip:
+        case KWayland::Client::LingmoShellSurface::Role::ToolTip:
             if (supported_types & NET::TooltipMask) {
                 return NET::Tooltip;
             }
             break;
-        case KWayland::Client::PlasmaShellSurface::Role::CriticalNotification:
+        case KWayland::Client::LingmoShellSurface::Role::CriticalNotification:
             if (supported_types & NET::CriticalNotificationMask) {
                 return NET::CriticalNotification;
             }

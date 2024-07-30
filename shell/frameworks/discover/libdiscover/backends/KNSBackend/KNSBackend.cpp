@@ -78,7 +78,7 @@ public:
         QVector<AbstractResourcesBackend *> ret;
         const QStringList availableConfigFiles = KNSCore::EngineBase::availableConfigFiles();
         for (const QString &configFile : availableConfigFiles) {
-            auto bk = new KNSBackend(parent, QStringLiteral("plasma"), configFile);
+            auto bk = new KNSBackend(parent, QStringLiteral("lingmo"), configFile);
             if (bk->isValid())
                 ret += bk;
             else
@@ -190,7 +190,7 @@ KNSBackend::KNSBackend(QObject *parent, const QString &iconName, const QString &
             if (m_hasApplications)
                 categories << new Category(cat, QStringLiteral("applications-other"), {CategoryFilter::CategoryNameFilter, cat}, backendName, {}, true);
             else
-                categories << new Category(cat, QStringLiteral("plasma"), {CategoryFilter::CategoryNameFilter, cat}, backendName, {}, true);
+                categories << new Category(cat, QStringLiteral("lingmo"), {CategoryFilter::CategoryNameFilter, cat}, backendName, {}, true);
         }
     }
 
@@ -254,10 +254,10 @@ KNSBackend::KNSBackend(QObject *parent, const QString &iconName, const QString &
         }
         m_engine->setTagFilter(tagFilter);
     } else {
-        static const QSet<QString> knsrcPlasma = {
+        static const QSet<QString> knsrcLingmo = {
             QStringLiteral("aurorae.knsrc"),       QStringLiteral("icons.knsrc"),
             QStringLiteral("kfontinst.knsrc"),     QStringLiteral("lookandfeel.knsrc"),
-            QStringLiteral("plasma-themes.knsrc"), QStringLiteral("plasmoids.knsrc"),
+            QStringLiteral("lingmo-themes.knsrc"), QStringLiteral("plasmoids.knsrc"),
             QStringLiteral("wallpaper.knsrc"),     QStringLiteral("wallpaper-mobile.knsrc"),
             QStringLiteral("xcursor.knsrc"),
 
@@ -270,11 +270,11 @@ KNSBackend::KNSBackend(QObject *parent, const QString &iconName, const QString &
             QStringLiteral("sddmtheme.knsrc"),     QStringLiteral("wallpaperplugin.knsrc"),
             QStringLiteral("ksplash.knsrc"),       QStringLiteral("window-decorations.knsrc"),
         };
-        const auto iconName = knsrcPlasma.contains(fileName) ? QStringLiteral("plasma") : QStringLiteral("applications-other");
+        const auto iconName = knsrcLingmo.contains(fileName) ? QStringLiteral("lingmo") : QStringLiteral("applications-other");
         auto actualCategory = new Category(m_displayName, iconName, filter, backendName, categories, true);
         actualCategory->setParent(this);
 
-        const auto topLevelName = knsrcPlasma.contains(fileName) ? i18n("Plasma Addons") : i18n("Application Addons");
+        const auto topLevelName = knsrcLingmo.contains(fileName) ? i18n("Lingmo Addons") : i18n("Application Addons");
         auto addonsCategory = new Category(topLevelName, iconName, filter, backendName, {actualCategory}, true);
         m_rootCategories = {addonsCategory};
     }

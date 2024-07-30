@@ -8,10 +8,10 @@ For hardware support have a look at https://linuxwacom.github.io/
 
 Configuration can be located in System Settings → Input devices → Tablets
 
-Easy profile switching is supported via hotkeys or a small plasma applet in tray notification area.
+Easy profile switching is supported via hotkeys or a small lingmo applet in tray notification area.
 In addition, a daemon running in the background helps with hotplug support.
 
-This project only works on X11. For Plasma Wayland there is a separate KCM to configure graphics tablets in [plasma-desktop](https://invent.kde.org/plasma/plasma-desktop/-/tree/master/kcms/tablet).
+This project only works on X11. For Lingmo Wayland there is a separate KCM to configure graphics tablets in [lingmo-desktop](https://invent.kde.org/lingmo/lingmo-desktop/-/tree/master/kcms/tablet).
 
 Hardware support
 ----------------
@@ -78,7 +78,7 @@ Build dependencies on Debian/Ubuntu:
 * libkf5config-dev
 * libkf5xmlgui-dev
 * libkf5notifications-dev
-* plasma-framework-dev
+* lingmo-framework-dev
 * kdoctools-dev
 * libxi-dev
 * libxcb-xinput-dev
@@ -86,7 +86,7 @@ Build dependencies on Debian/Ubuntu:
 
 You can install them by running:
 
-    $ apt install g++ cmake extra-cmake-modules gettext libqt5x11extras5-dev qtdeclarative5-dev libkf5coreaddons-dev libkf5i18n-dev libkf5dbusaddons-dev libkf5globalaccel-dev libkf5config-dev libkf5xmlgui-dev libkf5notifications-dev plasma-framework-dev kdoctools-dev libxi-dev libwacom-dev
+    $ apt install g++ cmake extra-cmake-modules gettext libqt5x11extras5-dev qtdeclarative5-dev libkf5coreaddons-dev libkf5i18n-dev libkf5dbusaddons-dev libkf5globalaccel-dev libkf5config-dev libkf5xmlgui-dev libkf5notifications-dev lingmo-framework-dev kdoctools-dev libxi-dev libwacom-dev
 
 Building from source
 --------------------

@@ -45,7 +45,7 @@ void KIconTheme::initTheme()
 
 #else
 
-#include <BreezeIcons>
+#include <OceanIcons>
 
 // do init only once and avoid later helpers to mess with it again
 static bool initThemeUsed = false;
@@ -53,12 +53,12 @@ static bool initThemeUsed = false;
 // startup function to set theme once the app got constructed
 static void initThemeHelper()
 {
-    // Makes sure the icon theme fallback is set to breeze or one of its
+    // Makes sure the icon theme fallback is set to ocean or one of its
     // variants. Most of our apps use "lots" of icons that most of the times
-    // are only available with breeze, we still honour the user icon theme
-    // but if the icon is not found there, we go to breeze since it's almost
+    // are only available with ocean, we still honour the user icon theme
+    // but if the icon is not found there, we go to ocean since it's almost
     // sure it'll be there
-    BreezeIcons::initIcons();
+    OceanIcons::initIcons();
 
     // ensure lib call above did the job
     Q_ASSERT(!QIcon::fallbackThemeName().isEmpty());
@@ -80,8 +80,8 @@ static void initThemeHelper()
     // https://codereview.qt-project.org/c/qt/qtbase/+/559108
 
     // enforce the theme configured by the user, with kdeglobals fallback
-    // if not set, use Breeze
-    QString themeToUse = KConfigGroup(config, "Icons").readEntry("Theme", QStringLiteral("breeze"));
+    // if not set, use Ocean
+    QString themeToUse = KConfigGroup(config, "Icons").readEntry("Theme", QStringLiteral("ocean"));
     QIcon::setThemeName(themeToUse);
     // Tell KIconTheme about the theme, in case KIconLoader is used directly
     *_themeOverride() = themeToUse;
@@ -629,7 +629,7 @@ QString KIconTheme::current()
     if (theme.isEmpty() || theme == QLatin1String("hicolor")) {
         // Still no theme, try config with kdeglobals.
         KConfigGroup cg(KSharedConfig::openConfig(), "Icons");
-        theme = cg.readEntry("Theme", QStringLiteral("breeze"));
+        theme = cg.readEntry("Theme", QStringLiteral("ocean"));
     }
     if (theme.isEmpty() || theme == QLatin1String("hicolor")) {
         // Still no good theme, use default.

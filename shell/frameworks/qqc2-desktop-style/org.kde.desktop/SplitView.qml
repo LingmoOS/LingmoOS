@@ -9,7 +9,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami.platform as Platform
+import org.kde.lingmoui.platform as Platform
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.SplitView {
@@ -30,12 +30,12 @@ T.SplitView {
         //
         // It could be adapted from QSplitterHandle::resizeEvent, but its
         // extra margins are kinda too small. Or it could be hardcoded to
-        // Breeze -> SplitterProxyWidth config which is 12, that is, assuming
+        // Ocean -> SplitterProxyWidth config which is 12, that is, assuming
         // the feature is enabled at all.
 
         // Increase the hit area
         containmentMask: Item {
-            // Dynamic margins like in Breeze/SplitterProxy
+            // Dynamic margins like in Ocean/SplitterProxy
             readonly property int handleMargin: handle.T.SplitHandle.hovered ? 12 : 6
 
             x: handle.horizontal ? -handleMargin : 0

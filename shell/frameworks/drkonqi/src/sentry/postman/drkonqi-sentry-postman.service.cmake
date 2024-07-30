@@ -4,7 +4,7 @@
 [Unit]
 Description=Submitting pending crash events
 PartOf=graphical-session.target
-After=plasma-core.target
+After=lingmo-core.target
 
 [Service]
 ExecStart=@KDE_INSTALL_FULL_LIBEXECDIR@/drkonqi-sentry-postman

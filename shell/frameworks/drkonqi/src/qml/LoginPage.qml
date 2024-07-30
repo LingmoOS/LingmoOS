@@ -4,12 +4,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.12 as Kirigami
+import org.kde.lingmoui 2.12 as LingmoUI
 import org.kde.syntaxhighlighting 1.0
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: page
     title: i18nc("@title", "Login into the bug tracking system")
 
@@ -52,10 +52,10 @@ Kirigami.ScrollablePage {
             Component.onCompleted: load()
         }
 
-       Kirigami.InlineMessage {
+       LingmoUI.InlineMessage {
             id: inlineMessage
             Layout.fillWidth: true
-            type: Kirigami.MessageType.Error
+            type: LingmoUI.MessageType.Error
             visible: text !== ""
         }
 
@@ -65,17 +65,17 @@ Kirigami.ScrollablePage {
             text: i18nc("@info:status '1' is replaced with the short URL of the bugzilla ",
                         "You need to login with your %1 account in order to proceed.", Globals.bugzillaShortUrl);
         }
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             QQC2.TextField {
                 id: emailField
-                Kirigami.FormData.label: i18nc("@label:textbox bugzilla account email", "E-mail Address:")
-                Accessible.name: Kirigami.FormData.label
+                LingmoUI.FormData.label: i18nc("@label:textbox bugzilla account email", "E-mail Address:")
+                Accessible.name: LingmoUI.FormData.label
                 onAccepted: loginAction.trigger()
             }
-            Kirigami.PasswordField {
+            LingmoUI.PasswordField {
                 id: passwordField
-                Kirigami.FormData.label: i18nc("@label:textbox bugzilla account password", "Password:")
-                Accessible.description: Kirigami.FormData.label
+                LingmoUI.FormData.label: i18nc("@label:textbox bugzilla account password", "Password:")
+                Accessible.description: LingmoUI.FormData.label
                 onAccepted: loginAction.trigger()
             }
             QQC2.CheckBox {
@@ -98,7 +98,7 @@ for requesting further information. If you do not have one, you can freely <link
 
     footer: FooterActionBar {
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 id: loginAction
                 enabled: emailField.text.length > 0 && passwordField.text.length > 0
                 icon.name: "network-connect"

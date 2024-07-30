@@ -27,9 +27,9 @@ class KPIPEWIRE_EXPORT ScreencastingRequest : public QObject
     /**
      * The unique identifier of the window we want to cast.
      *
-     * @see PlasmaWindow::uuid
-     * @see PlasmaWindow::stackingOrderUuids
-     * @see PlasmaWindowModel::Uuid
+     * @see LingmoWindow::uuid
+     * @see LingmoWindow::stackingOrderUuids
+     * @see LingmoWindowModel::Uuid
      * @see TasksModel::WinIdList
      */
     Q_PROPERTY(QString uuid READ uuid WRITE setUuid NOTIFY uuidChanged)

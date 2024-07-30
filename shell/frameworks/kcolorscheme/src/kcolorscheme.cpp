@@ -117,7 +117,7 @@ struct DecorationColors {
 
 // clang-format off
 // These numbers come from the default color scheme which is currently
-// Breeze Light ([breeze repo]/colors/BreezeLight.colors)
+// Ocean Light ([ocean repo]/colors/OceanLight.colors)
 static const SerializedColors defaultViewColors = {
     { 255, 255, 255 }, // Background
     { 247, 247, 247 }, // Alternate

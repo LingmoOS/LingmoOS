@@ -69,7 +69,7 @@ import org.kde.notification 1.0
 ... {
     Notification {
         id: myReplyNotification
-        componentName: "plasma_workspace"
+        componentName: "lingmo_workspace"
         eventId: "notification"
         title: "Chat message from Dr Konqui"
         text: "How are you?"
@@ -104,7 +104,7 @@ import org.kde.notification 1.0
     Component {
         id: notificationComponent
         Notification {
-            componentName: "plasma_workspace"
+            componentName: "lingmo_workspace"
             eventId: "notification"
             text: "Temporary notification we can create new instances of."
             autoDelete: true

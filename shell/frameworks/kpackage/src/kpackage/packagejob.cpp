@@ -170,7 +170,7 @@ void PackageJob::setupNotificationsOnJobFinished(const QString &messageName)
     auto onJobFinished = [=, this](bool ok, JobError errorCode, const QString &error) {
 #if HAVE_QTDBUS
         if (ok) {
-            auto msg = QDBusMessage::createSignal(QStringLiteral("/KPackage/") + kpackageType, QStringLiteral("org.kde.plasma.kpackage"), messageName);
+            auto msg = QDBusMessage::createSignal(QStringLiteral("/KPackage/") + kpackageType, QStringLiteral("org.kde.lingmo.kpackage"), messageName);
             msg.setArguments({pluginId});
             QDBusConnection::sessionBus().send(msg);
         }

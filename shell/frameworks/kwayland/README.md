@@ -56,7 +56,7 @@ To find the package use for example:
 Now to link against the Client library use:
 
     add_executable(exampleApp example.cpp)
-    target_link_libraries(exampleApp Plasma::KWaylandClient)
+    target_link_libraries(exampleApp Lingmo::KWaylandClient)
 
 Please make sure that your project is configured with C++11 support:
 

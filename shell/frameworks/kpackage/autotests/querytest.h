@@ -22,7 +22,7 @@ private Q_SLOTS:
     void queryCustomPlugin();
 
 private:
-    const QString packageFormat = "Plasma/TestKPackageInternalPlasmoid";
+    const QString packageFormat = "Lingmo/TestKPackageInternalPlasmoid";
     QDir m_dataDir;
 };
 

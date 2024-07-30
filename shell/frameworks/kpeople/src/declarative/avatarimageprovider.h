@@ -18,7 +18,7 @@
  *
  * Example:
  * \code
- * Kirigami.Avatar {
+ * LingmoUI.Avatar {
  *     source: person.photoImageProviderUri
  * }
  * \endcode

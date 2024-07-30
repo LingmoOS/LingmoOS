@@ -8,14 +8,14 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 RowLayout {
     id: view
     property bool editable: false
     property int max: 100
     property int rating: 0
-    property real starSize: Kirigami.Units.gridUnit
+    property real starSize: LingmoUI.Units.gridUnit
     property bool reverseLayout: false
 
     clip: true
@@ -33,13 +33,13 @@ RowLayout {
     Item {
         visible: view.reverseLayout
         Layout.minimumHeight: view.starSize;
-        Layout.minimumWidth: Kirigami.Units.smallSpacing;
-        Layout.maximumWidth: Kirigami.Units.smallSpacing;
+        Layout.minimumWidth: LingmoUI.Units.smallSpacing;
+        Layout.maximumWidth: LingmoUI.Units.smallSpacing;
     }
     Repeater {
         id: theRepeater
         model: 5
-        delegate: Kirigami.Icon {
+        delegate: LingmoUI.Icon {
             Layout.minimumWidth: view.starSize
             Layout.minimumHeight: view.starSize
             Layout.preferredWidth: view.starSize
@@ -70,8 +70,8 @@ RowLayout {
     Item {
         visible: !view.reverseLayout
         Layout.minimumHeight: view.starSize;
-        Layout.minimumWidth: Kirigami.Units.smallSpacing;
-        Layout.maximumWidth: Kirigami.Units.smallSpacing;
+        Layout.minimumWidth: LingmoUI.Units.smallSpacing;
+        Layout.maximumWidth: LingmoUI.Units.smallSpacing;
     }
     QQC2.Label {
         id: ratingAsText

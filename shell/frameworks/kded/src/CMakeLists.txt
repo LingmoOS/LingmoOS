@@ -34,9 +34,9 @@ target_compile_definitions(kded6 PRIVATE
 
 install(TARGETS kded6 ${KF_INSTALL_TARGETS_DEFAULT_ARGS} )
 
-configure_file(plasma-kded6.service.in
-               ${CMAKE_CURRENT_BINARY_DIR}/plasma-kded6.service @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plasma-kded6.service
+configure_file(lingmo-kded6.service.in
+               ${CMAKE_CURRENT_BINARY_DIR}/lingmo-kded6.service @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lingmo-kded6.service
         DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR})
 
 qt_generate_dbus_interface( kdedadaptor.h org.kde.kded6.xml )

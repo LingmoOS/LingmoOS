@@ -13,7 +13,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.purpose as Purpose
 
 DiscoverPage {
@@ -25,7 +25,7 @@ DiscoverPage {
     required property Discover.AbstractResource application
 
     readonly property int visibleReviews: 3
-    readonly property int internalSpacings: Kirigami.Units.largeSpacing
+    readonly property int internalSpacings: LingmoUI.Units.largeSpacing
     readonly property bool availableFromOnlySingleSource: !originsMenuAction.visible
 
     // Usually this page is not the top level page, but when we are, isHome being
@@ -60,7 +60,7 @@ DiscoverPage {
     }
 
     // Multi-source origin display and switcher
-    Kirigami.Action {
+    LingmoUI.Action {
         id: originsMenuAction
 
         text: i18nc("@item:inlistbox %1 is the name of an app source e.g. \"Flathub\" or \"Ubuntu\"", "From %1", appInfo.application.displayOrigin)
@@ -90,7 +90,7 @@ DiscoverPage {
         }
     }
 
-    Kirigami.Action {
+    LingmoUI.Action {
         id: invokeAction
         visible: application.isInstalled && application.canExecute && !appbutton.isActive
         text: application.executeLabel
@@ -100,13 +100,13 @@ DiscoverPage {
 
     InstallApplicationButton {
         id: appbutton
-        Layout.rightMargin: Kirigami.Units.smallSpacing
+        Layout.rightMargin: LingmoUI.Units.smallSpacing
         application: appInfo.application
         visible: false
         availableFromOnlySingleSource: appInfo.availableFromOnlySingleSource
     }
 
-    Kirigami.ImageColors {
+    LingmoUI.ImageColors {
         id: appImageColorExtractor
         source: appInfo.application.icon
     }
@@ -134,7 +134,7 @@ DiscoverPage {
             Layout.rightMargin: -appInfo.rightPadding
 
             implicitHeight: headerLayout.implicitHeight + (headerLayout.anchors.topMargin * 2)
-            color: Kirigami.ColorUtils.tintWithAlpha(Kirigami.Theme.backgroundColor, appImageColorExtractor.dominant, 0.1)
+            color: LingmoUI.ColorUtils.tintWithAlpha(LingmoUI.Theme.backgroundColor, appImageColorExtractor.dominant, 0.1)
 
             GridLayout {
                 id: headerLayout
@@ -164,9 +164,9 @@ DiscoverPage {
                     spacing: appInfo.internalSpacings
 
                     // App icon
-                    Kirigami.Icon {
-                        implicitWidth: Kirigami.Units.iconSizes.huge
-                        implicitHeight: Kirigami.Units.iconSizes.huge
+                    LingmoUI.Icon {
+                        implicitWidth: LingmoUI.Units.iconSizes.huge
+                        implicitHeight: LingmoUI.Units.iconSizes.huge
                         source: appInfo.application.icon
                     }
 
@@ -176,10 +176,10 @@ DiscoverPage {
                         spacing: 0
 
                         // App name
-                        Kirigami.Heading {
+                        LingmoUI.Heading {
                             Layout.fillWidth: true
                             text: appInfo.application.name
-                            type: Kirigami.Heading.Type.Primary
+                            type: LingmoUI.Heading.Type.Primary
                             wrapMode: Text.Wrap
                             maximumLineCount: 5
                             elide: Text.ElideRight
@@ -226,7 +226,7 @@ DiscoverPage {
                 }
 
                 // Metadata
-                // Not using Kirigami.FormLayout here because we never want it to move into Mobile
+                // Not using LingmoUI.FormLayout here because we never want it to move into Mobile
                 // mode and we also want to customize the spacing, neither of which it lets us do
                 GridLayout {
                     id: appMetadataLayout
@@ -235,7 +235,7 @@ DiscoverPage {
 
                     columns: 2
                     rows: Math.ceil(appMetadataLayout.visibleChildren.count / 2)
-                    columnSpacing: Kirigami.Units.smallSpacing
+                    columnSpacing: LingmoUI.Units.smallSpacing
                     rowSpacing: 0
 
                     // Not relevant to offline updates
@@ -271,7 +271,7 @@ DiscoverPage {
                         Layout.alignment: Qt.AlignRight
                     }
                     RowLayout {
-                        spacing: Kirigami.Units.smallSpacing
+                        spacing: LingmoUI.Units.smallSpacing
 
                         QQC2.Label {
                             visible : appInfo.application.licenses.length === 0
@@ -290,7 +290,7 @@ DiscoverPage {
 
                                 spacing: 0
 
-                                Kirigami.UrlButton {
+                                LingmoUI.UrlButton {
                                     enabled: url !== ""
                                     text: delegate.modelData.name
                                     url: delegate.modelData.url
@@ -299,7 +299,7 @@ DiscoverPage {
                                     wrapMode: Text.Wrap
                                     maximumLineCount: 3
                                     elide: Text.ElideRight
-                                    color: !delegate.modelData.hasFreedom ? Kirigami.Theme.neutralTextColor : (enabled ? Kirigami.Theme.linkColor : Kirigami.Theme.textColor)
+                                    color: !delegate.modelData.hasFreedom ? LingmoUI.Theme.neutralTextColor : (enabled ? LingmoUI.Theme.linkColor : LingmoUI.Theme.textColor)
                                 }
 
                                 // Button to open "What's the risk of proprietary software?" sheet
@@ -316,7 +316,7 @@ DiscoverPage {
                         }
 
                         // "See More licenses" link, in case there are a lot of them
-                        Kirigami.LinkButton {
+                        LingmoUI.LinkButton {
                             visible: application.licenses.length > 3
                             text: i18np("See more…", "See more…", appInfo.application.licenses.length)
                             horizontalAlignment: Text.AlignHCenter
@@ -334,7 +334,7 @@ DiscoverPage {
                     }
                     RowLayout {
                         visible: appInfo.application.contentRatingText.length > 0
-                        spacing: Kirigami.Units.smallSpacing
+                        spacing: LingmoUI.Units.smallSpacing
 
                         QQC2.Label {
                             visible: text.length > 0
@@ -352,11 +352,11 @@ DiscoverPage {
                             maximumLineCount: 3
                             elide: Text.ElideRight
 
-                            readonly property var colors: [ Kirigami.Theme.textColor, Kirigami.Theme.neutralTextColor ]
+                            readonly property var colors: [ LingmoUI.Theme.textColor, LingmoUI.Theme.neutralTextColor ]
                             color: colors[appInfo.application.contentRatingIntensity]
                         }
 
-                        Kirigami.LinkButton {
+                        LingmoUI.LinkButton {
                             visible: appInfo.application.contentRatingDescription.length > 0
                             text: i18nc("@action", "See details…")
                             elide: Text.ElideRight
@@ -366,14 +366,14 @@ DiscoverPage {
                 }
             }
 
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 width: parent.width
                 anchors.top: parent.bottom
             }
         }
 
         // Screenshots
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             Layout.fillWidth: true
 
             visible: carousel.hasFailed
@@ -392,9 +392,9 @@ DiscoverPage {
             Layout.rightMargin: -appInfo.rightPadding
             // This roughly replicates scaling formula for the screenshots
             // gallery on FlatHub website, adjusted to scale with gridUnit
-            Layout.minimumHeight: Math.round((16 + 1/9) * Kirigami.Units.gridUnit)
-            Layout.maximumHeight: 30 * Kirigami.Units.gridUnit
-            Layout.preferredHeight: Math.round(width / 2) + Math.round((2 + 7/9) * Kirigami.Units.gridUnit)
+            Layout.minimumHeight: Math.round((16 + 1/9) * LingmoUI.Units.gridUnit)
+            Layout.maximumHeight: 30 * LingmoUI.Units.gridUnit
+            Layout.preferredHeight: Math.round(width / 2) + Math.round((2 + 7/9) * LingmoUI.Units.gridUnit)
 
             edgeMargin: appInfo.padding
             visible: carouselModel.count > 0 && !hasFailed
@@ -489,11 +489,11 @@ DiscoverPage {
             spacing: appInfo.internalSpacings
 
             // Short description
-            // Not using Kirigami.Heading here because that component doesn't
+            // Not using LingmoUI.Heading here because that component doesn't
             // support selectable text, and we want this to be selectable because
             // it's also used to show the path for local packages, and that makes
             // sense to be selectable
-            Kirigami.SelectableLabel {
+            LingmoUI.SelectableLabel {
                 Layout.fillWidth: true
                 // Not relevant to the offline upgrade use case because we
                 // display the info in the header instead
@@ -501,15 +501,15 @@ DiscoverPage {
                 text: appInfo.application.comment
                 wrapMode: Text.Wrap
 
-                // Match `level: 1` in Kirigami.Heading
-                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.35
+                // Match `level: 1` in LingmoUI.Heading
+                font.pointSize: LingmoUI.Theme.defaultFont.pointSize * 1.35
                 font.weight: Font.DemiBold
 
                 Accessible.role: Accessible.Heading
             }
 
             // Long app description
-            Kirigami.SelectableLabel {
+            LingmoUI.SelectableLabel {
                 objectName: "applicationDescription" // for appium tests
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
@@ -543,8 +543,8 @@ DiscoverPage {
 
                 rows: stackedlayout ? visibleButtons : 1
                 columns: stackedlayout ? 1: visibleButtons
-                rowSpacing: Kirigami.Units.smallSpacing
-                columnSpacing: Kirigami.Units.smallSpacing
+                rowSpacing: LingmoUI.Units.smallSpacing
+                columnSpacing: LingmoUI.Units.smallSpacing
 
                 visible: visibleButtons > 0
 
@@ -617,7 +617,7 @@ DiscoverPage {
                     tooltipText: application.url.toString()
                     visible: tooltipText.length > 0 && !appInfo.isOfflineUpgrade
 
-                    Kirigami.PromptDialog {
+                    LingmoUI.PromptDialog {
                         id: shareSheet
                         parent: appInfo.QQC2.Overlay.overlay
                         title: shareButton.title
@@ -647,11 +647,11 @@ DiscoverPage {
                 }
             }
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 visible: changelogLabel.visible
                 text: i18n("What's New")
                 level: 2
-                type: Kirigami.Heading.Type.Primary
+                type: LingmoUI.Heading.Type.Primary
                 wrapMode: Text.Wrap
             }
 
@@ -676,25 +676,25 @@ DiscoverPage {
             }
 
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 visible: reviewsSheet.sortModel.count > 0 && !reviewsLoadingPlaceholder.visible && !reviewsError.visible
                 text: i18n("Reviews")
                 level: 2
-                type: Kirigami.Heading.Type.Primary
+                type: LingmoUI.Heading.Type.Primary
                 wrapMode: Text.Wrap
             }
 
-            Kirigami.LoadingPlaceholder {
+            LingmoUI.LoadingPlaceholder {
                 id: reviewsLoadingPlaceholder
                 Layout.alignment: Qt.AlignHCenter
-                Layout.maximumWidth: Kirigami.Units.gridUnit * 15
+                Layout.maximumWidth: LingmoUI.Units.gridUnit * 15
                 Layout.bottomMargin: appInfo.internalSpacings * 2
                 visible: reviewsModel.fetching
                 text: i18n("Loading reviews for %1", appInfo.application.name)
             }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 id: reviewsError
                 Layout.fillWidth: true
                 visible: reviewsModel.backend && reviewsModel.backend.errorMessage.length > 0 && text.length > 0 && reviewsModel.count === 0 && !reviewsLoadingPlaceholder.visible
@@ -745,11 +745,11 @@ DiscoverPage {
             }
 
             // "Get Involved" section
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 visible: getInvolvedLayout.visible
                 text: i18n("Get Involved")
                 level: 2
-                type: Kirigami.Heading.Type.Primary
+                type: LingmoUI.Heading.Type.Primary
                 wrapMode: Text.Wrap
             }
 
@@ -774,8 +774,8 @@ DiscoverPage {
 
                 rows: stackedlayout ? visibleButtons : 1
                 columns: stackedlayout ? 1: visibleButtons
-                rowSpacing: Kirigami.Units.smallSpacing
-                columnSpacing: Kirigami.Units.smallSpacing
+                rowSpacing: LingmoUI.Units.smallSpacing
+                columnSpacing: LingmoUI.Units.smallSpacing
 
                 visible: visibleButtons > 0
 
@@ -854,12 +854,12 @@ DiscoverPage {
         parent: appInfo.QQC2.Overlay.overlay
     }
 
-    Kirigami.Dialog {
+    LingmoUI.Dialog {
         id: allLicensesSheet
         title: i18n("All Licenses")
-        standardButtons: Kirigami.Dialog.NoButton
-        preferredWidth: Kirigami.Units.gridUnit * 16
-        maximumHeight: Kirigami.Units.gridUnit * 20
+        standardButtons: LingmoUI.Dialog.NoButton
+        preferredWidth: LingmoUI.Units.gridUnit * 16
+        maximumHeight: LingmoUI.Units.gridUnit * 20
 
         ColumnLayout {
             spacing: 0
@@ -872,26 +872,26 @@ DiscoverPage {
 
                     required property var modelData
 
-                    contentItem: Kirigami.UrlButton {
+                    contentItem: LingmoUI.UrlButton {
                         enabled: url !== ""
                         text: delegate.modelData.name
                         url: delegate.modelData.url
                         horizontalAlignment: Text.AlignLeft
                         color: !delegate.modelData.hasFreedom
-                            ? Kirigami.Theme.neutralTextColor
-                            : (enabled ? Kirigami.Theme.linkColor : Kirigami.Theme.textColor)
+                            ? LingmoUI.Theme.neutralTextColor
+                            : (enabled ? LingmoUI.Theme.linkColor : LingmoUI.Theme.textColor)
                     }
                 }
             }
         }
     }
 
-    Kirigami.PromptDialog {
+    LingmoUI.PromptDialog {
         id: contentRatingDialog
         parent: appInfo.QQC2.Overlay.overlay
         title: i18n("Content Rating")
-        preferredWidth: Kirigami.Units.gridUnit * 25
-        standardButtons: Kirigami.Dialog.NoButton
+        preferredWidth: LingmoUI.Units.gridUnit * 25
+        standardButtons: LingmoUI.Dialog.NoButton
 
         QQC2.Label {
             text: appInfo.application.contentRatingDescription
@@ -900,20 +900,20 @@ DiscoverPage {
         }
     }
 
-    Kirigami.Dialog {
+    LingmoUI.Dialog {
         id: properietarySoftwareRiskExplanationDialog
         parent: appInfo.QQC2.Overlay.overlay
-        width: Kirigami.Units.gridUnit * 25
-        standardButtons: Kirigami.Dialog.NoButton
+        width: LingmoUI.Units.gridUnit * 25
+        standardButtons: LingmoUI.Dialog.NoButton
 
         title: i18n("Risks of proprietary software")
 
         TextEdit {
             readonly property string proprietarySoftwareExplanationPage: "https://www.gnu.org/proprietary"
 
-            leftPadding: Kirigami.Units.largeSpacing
-            rightPadding: Kirigami.Units.largeSpacing
-            bottomPadding: Kirigami.Units.largeSpacing
+            leftPadding: LingmoUI.Units.largeSpacing
+            rightPadding: LingmoUI.Units.largeSpacing
+            bottomPadding: LingmoUI.Units.largeSpacing
 
             text: homepageButton.visible
                 ? xi18nc("@info", "Only install this application if you fully trust its authors (<link url='%1'>%2</link>).<nl/><nl/>Its source code is partially or entirely closed to public inspection and improvement, so third parties and users like you cannot verify its operation, security, and trustworthiness, or modify and redistribute it without the authors' express permission.<nl/><nl/>The application may be perfectly safe to use, or it may be acting against you in various ways—such as harvesting your personal information, tracking your location, or transmitting the contents of your files to someone else.<nl/><nl/>You can learn more at <link url='%3'>%3</link>.", application.homepage, author.text, proprietarySoftwareExplanationPage)
@@ -922,9 +922,9 @@ DiscoverPage {
             textFormat: TextEdit.RichText
             readOnly: true
 
-            color: Kirigami.Theme.textColor
-            selectedTextColor: Kirigami.Theme.highlightedTextColor
-            selectionColor: Kirigami.Theme.highlightColor
+            color: LingmoUI.Theme.textColor
+            selectedTextColor: LingmoUI.Theme.highlightedTextColor
+            selectionColor: LingmoUI.Theme.highlightColor
 
             onLinkActivated: url => Qt.openUrlExternally(url)
 

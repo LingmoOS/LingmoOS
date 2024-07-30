@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -23,8 +23,8 @@ Faces.CompactSensorFace {
 
     // For vertical panels, base minimum height on the amount of items in the face
     readonly property int barCount: controller.highPrioritySensorIds.length
-    readonly property real minimumTotalHeight: Kirigami.Units.smallSpacing * barCount + (barCount - 1)
-    Layout.minimumHeight: verticalFormFactor ? Math.max(minimumTotalHeight, Kirigami.Units.gridUnit) : defaultMinimumSize
+    readonly property real minimumTotalHeight: LingmoUI.Units.smallSpacing * barCount + (barCount - 1)
+    Layout.minimumHeight: verticalFormFactor ? Math.max(minimumTotalHeight, LingmoUI.Units.gridUnit) : defaultMinimumSize
 
     contentItem: ColumnLayout {
         spacing: 1
@@ -36,8 +36,8 @@ Faces.CompactSensorFace {
 
             Bar {
                 Layout.fillHeight: true
-                Layout.minimumHeight: Kirigami.Units.smallSpacing
-                Layout.maximumHeight: Kirigami.Units.largeSpacing
+                Layout.minimumHeight: LingmoUI.Units.smallSpacing
+                Layout.maximumHeight: LingmoUI.Units.largeSpacing
 
                 topInset: 0
                 bottomInset: 0

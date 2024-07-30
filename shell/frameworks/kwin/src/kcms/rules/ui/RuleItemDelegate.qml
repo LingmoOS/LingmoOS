@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils as KCM
 
 QQC2.ItemDelegate {
@@ -20,19 +20,19 @@ QQC2.ItemDelegate {
 
     contentItem: RowLayout {
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: itemIcon
             source: model.icon
-            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.smallMedium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.smallMedium
+            Layout.rightMargin: LingmoUI.Units.smallSpacing
             Layout.alignment: Qt.AlignVCenter
         }
 
         RowLayout {
-            Layout.preferredWidth: 10 * Kirigami.Units.gridUnit
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-            spacing: Kirigami.Units.smallSpacing
+            Layout.preferredWidth: 10 * LingmoUI.Units.gridUnit
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.Label {
                 id: label
@@ -49,10 +49,10 @@ QQC2.ItemDelegate {
 
                 QQC2.ToolTip.text: model.name
                 QQC2.ToolTip.visible: labelHover.hovered
-                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 Layout.alignment: Qt.AlignVCenter
                 visible: model.description.length > 0
                 toolTipText: model.description
@@ -62,8 +62,8 @@ QQC2.ItemDelegate {
         RowLayout {
             // This layout keeps the width constant between delegates, independent of items visibility
             Layout.fillWidth: true
-            Layout.preferredWidth: 20 * Kirigami.Units.gridUnit
-            Layout.minimumWidth: 13 * Kirigami.Units.gridUnit
+            Layout.preferredWidth: 20 * LingmoUI.Units.gridUnit
+            Layout.minimumWidth: 13 * LingmoUI.Units.gridUnit
 
             OptionsComboBox {
                 id: policyCombo

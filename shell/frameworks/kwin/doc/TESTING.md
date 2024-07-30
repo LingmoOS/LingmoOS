@@ -8,7 +8,7 @@ The following additional software needs to be installed for running the test sui
 * Xephyr
 * glxgears
 * DMZ-white cursor theme
-* breeze window decoration
+* ocean window decoration
 
 # Preparing OpenGL
 Some of the tests require OpenGL. The test suite is implemented against Mesa and uses the Mesa specific EGL extension

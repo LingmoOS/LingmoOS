@@ -25,7 +25,7 @@
 #include "kwincompositing_setting.h"
 #include "kwincompositingdata.h"
 
-static bool isRunningPlasma()
+static bool isRunningLingmo()
 {
     return qgetenv("XDG_CURRENT_DESKTOP") == "KDE";
 }
@@ -111,7 +111,7 @@ void KWinCompositingKCM::init()
         m_settings->setAnimationDurationFactor(s_animationMultipliers[m_form.animationDurationFactor->value()]);
     });
 
-    if (isRunningPlasma()) {
+    if (isRunningLingmo()) {
         m_form.animationSpeedLabel->hide();
         m_form.animationSpeedControls->hide();
     }
@@ -134,16 +134,16 @@ void KWinCompositingKCM::updateUnmanagedItemStatus()
 {
     const auto animationDuration = s_animationMultipliers[m_form.animationDurationFactor->value()];
 
-    const bool inPlasma = isRunningPlasma();
+    const bool inLingmo = isRunningLingmo();
 
     bool changed = false;
-    if (!inPlasma) {
+    if (!inLingmo) {
         changed |= (animationDuration != m_settings->animationDurationFactor());
     }
     unmanagedWidgetChangeState(changed);
 
     bool defaulted = true;
-    if (!inPlasma) {
+    if (!inLingmo) {
         defaulted &= animationDuration == m_settings->defaultAnimationDurationFactorValue();
     }
 
@@ -168,7 +168,7 @@ void KWinCompositingKCM::defaults()
     KCModule::defaults();
 
     // unmanaged widgets
-    if (!isRunningPlasma()) {
+    if (!isRunningLingmo()) {
         // corresponds to 1.0 seconds in s_animationMultipliers
         m_form.animationDurationFactor->setValue(3);
     }
@@ -176,7 +176,7 @@ void KWinCompositingKCM::defaults()
 
 void KWinCompositingKCM::save()
 {
-    if (!isRunningPlasma()) {
+    if (!isRunningLingmo()) {
         const auto animationDuration = s_animationMultipliers[m_form.animationDurationFactor->value()];
         m_settings->setAnimationDurationFactor(animationDuration);
     }

@@ -8,9 +8,9 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.GlobalDrawer {
+LingmoUI.GlobalDrawer {
     id: drawer
 
     property bool wideScreen: false
@@ -29,7 +29,7 @@ Kirigami.GlobalDrawer {
         }
     }
 
-    function createCategoryActions(categories /*list<Discover.Category>*/) /*list<Kirigami.Action>*/ {
+    function createCategoryActions(categories /*list<Discover.Category>*/) /*list<LingmoUI.Action>*/ {
         const ret = []
         for (const category of categories) {
             const categoryAction = categoryActionComponent.createObject(drawer, { category })
@@ -49,7 +49,7 @@ Kirigami.GlobalDrawer {
     horizontalPadding: undefined
 
     // FIXME: Dirty workaround for 385992
-    width: Kirigami.Units.gridUnit * 14
+    width: LingmoUI.Units.gridUnit * 14
 
     resetMenuOnTriggered: false
     modal: !drawer.wideScreen
@@ -62,7 +62,7 @@ Kirigami.GlobalDrawer {
         }
     }
 
-    header: Kirigami.AbstractApplicationHeader {
+    header: LingmoUI.AbstractApplicationHeader {
         visible: drawer.wideScreen
 
         contentItem: SearchField {
@@ -70,14 +70,14 @@ Kirigami.GlobalDrawer {
 
             anchors {
                 left: parent.left
-                leftMargin: Kirigami.Units.smallSpacing
+                leftMargin: LingmoUI.Units.smallSpacing
                 right: parent.right
-                rightMargin: Kirigami.Units.smallSpacing
+                rightMargin: LingmoUI.Units.smallSpacing
             }
 
             // Give the search field keyboard focus by default, unless it would
             // make the virtual keyboard appear, because we don't want that
-            focus: !Kirigami.InputMethod.willShowOnActive
+            focus: !LingmoUI.InputMethod.willShowOnActive
 
             visible: window.leftPage && (window.leftPage.searchFor !== null || window.leftPage.hasOwnProperty("search"))
 
@@ -133,11 +133,11 @@ Kirigami.GlobalDrawer {
         ActionListItem {
             action: aboutAction
         },
-        Kirigami.Separator {
+        LingmoUI.Separator {
             Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.smallSpacing
-            Layout.leftMargin: Kirigami.Units.largeSpacing
-            Layout.rightMargin: Kirigami.Units.largeSpacing
+            Layout.topMargin: LingmoUI.Units.smallSpacing
+            Layout.leftMargin: LingmoUI.Units.largeSpacing
+            Layout.rightMargin: LingmoUI.Units.largeSpacing
         }
     ]
 
@@ -150,7 +150,7 @@ Kirigami.GlobalDrawer {
         spacing: 0
         Layout.fillWidth: true
 
-        Kirigami.Separator {
+        LingmoUI.Separator {
             visible: progressView.visible
             Layout.fillWidth: true
         }
@@ -176,7 +176,7 @@ Kirigami.GlobalDrawer {
 
     Component {
         id: categoryActionComponent
-        Kirigami.Action {
+        LingmoUI.Action {
             required property Discover.Category category
 
             readonly property bool itsMe: window?.leftPage?.category === category

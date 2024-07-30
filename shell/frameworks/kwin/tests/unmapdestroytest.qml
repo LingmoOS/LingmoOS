@@ -21,7 +21,7 @@ import QtQuick.Controls
  *
  * In order to test different modes, the test application understands some arguments:
  * --unmanaged    Creates an override redirect window
- * --frameless    Creates a frameless window (comparable Plasma Dialog)
+ * --frameless    Creates a frameless window (comparable Lingmo Dialog)
  */
 
 Window {

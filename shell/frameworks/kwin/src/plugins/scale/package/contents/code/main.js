@@ -14,7 +14,7 @@ const blacklist = [
     "ksmserver ksmserver",
     "ksmserver-logout-greeter ksmserver-logout-greeter",
 
-    // KDE Plasma splash screen has to be animated only by the login effect.
+    // KDE Lingmo splash screen has to be animated only by the login effect.
     "ksplashqml ksplashqml",
 
     // Spectacle needs to be blacklisted in order to stay out of its own screenshots.
@@ -42,14 +42,14 @@ class ScaleEffect {
     }
 
     static isScaleWindow(window) {
-        // We don't want to animate most of plasmashell's windows, yet, some
+        // We don't want to animate most of lingmoshell's windows, yet, some
         // of them we want to, for example, Task Manager Settings window.
         // The problem is that all those window share single window class.
         // So, the only way to decide whether a window should be animated is
         // to use a heuristic: if a window has decoration, then it's most
         // likely a dialog or a settings window so we have to animate it.
-        if (window.windowClass == "plasmashell plasmashell"
-                || window.windowClass == "plasmashell org.kde.plasmashell") {
+        if (window.windowClass == "lingmoshell lingmoshell"
+                || window.windowClass == "lingmoshell org.kde.lingmoshell") {
             return window.hasDecoration;
         }
 

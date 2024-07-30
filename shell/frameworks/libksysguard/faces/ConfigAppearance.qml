@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrols
 import org.kde.config
 import org.kde.newstuff as NewStuff
@@ -19,7 +19,7 @@ import org.kde.quickcharts as Charts
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     signal configurationChanged
@@ -61,23 +61,23 @@ Kirigami.FormLayout {
 
     Charts.ColorGradientSource {
         id: automaticColorSource
-        baseColor: Kirigami.Theme.highlightColor
+        baseColor: LingmoUI.Theme.highlightColor
         itemCount: root.controller.highPrioritySensorIds.length
     }
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: presetSheet
         parent: root
         ListView {
-            implicitWidth: Kirigami.Units.gridUnit * 15
+            implicitWidth: LingmoUI.Units.gridUnit * 15
             focus: true
             model: controller.availablePresetsModel
-            delegate: Kirigami.SwipeListItem {
+            delegate: LingmoUI.SwipeListItem {
                 contentItem: QQC2.Label {
                     elide: Text.ElideRight
                     text: model.display
                 }
-                actions: Kirigami.Action {
+                actions: LingmoUI.Action {
                     icon.name: "delete"
                     visible: model.writable
                     onTriggered: controller.uninstallPreset(model.pluginId);
@@ -104,7 +104,7 @@ Kirigami.FormLayout {
         }
     }
     RowLayout {
-        Kirigami.FormData.label: i18nd("KSysGuardSensorFaces", "Presets:")
+        LingmoUI.FormData.label: i18nd("KSysGuardSensorFaces", "Presets:")
 
         QQC2.Button {
             icon.name: "document-open"
@@ -130,12 +130,12 @@ Kirigami.FormLayout {
         }
     }
 
-    Kirigami.Separator {
-        Kirigami.FormData.isSection: true
+    LingmoUI.Separator {
+        LingmoUI.FormData.isSection: true
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nd("KSysGuardSensorFaces", "Title:")
+        LingmoUI.FormData.label: i18nd("KSysGuardSensorFaces", "Title:")
         QQC2.TextField {
             id: titleField
         }
@@ -146,7 +146,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nd("KSysGuardSensorFaces", "Display Style:")
+        LingmoUI.FormData.label: i18nd("KSysGuardSensorFaces", "Display Style:")
         QQC2.ComboBox {
             id: faceCombo
             model: controller.availableFacesModel
@@ -176,7 +176,7 @@ Kirigami.FormLayout {
         id: updateRateLimitSpinBox
         Layout.preferredWidth: titleField.implicitWidth
 
-        Kirigami.FormData.label: i18nd("KSysGuardSensorFaces", "Minimum Time Between Updates:")
+        LingmoUI.FormData.label: i18nd("KSysGuardSensorFaces", "Minimum Time Between Updates:")
 
         from: 0
         to: 600000

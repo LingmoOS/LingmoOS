@@ -9,15 +9,15 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.plasmoid
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.workspace.components as WorkspaceComponents
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.workspace.components as WorkspaceComponents
+import org.kde.lingmoui as LingmoUI
 
 MouseArea {
     id: root
 
-    readonly property bool isConstrained: Plasmoid.formFactor === PlasmaCore.Types.Vertical || Plasmoid.formFactor === PlasmaCore.Types.Horizontal
+    readonly property bool isConstrained: Plasmoid.formFactor === LingmoCore.Types.Vertical || Plasmoid.formFactor === LingmoCore.Types.Horizontal
     property real brightnessError: 0
     property bool isBrightnessAvailable: false
 
@@ -28,7 +28,7 @@ MouseArea {
     Accessible.description: `${toolTipMainText}; ${toolTipSubText}`
     Accessible.role: Accessible.Button
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         anchors.fill: parent
         source: Plasmoid.icon
         active: root.containsMouse

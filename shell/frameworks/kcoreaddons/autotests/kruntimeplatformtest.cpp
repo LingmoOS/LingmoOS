@@ -11,7 +11,7 @@ class KRuntimePlatformTest : public QObject
 private Q_SLOTS:
     void testRuntimePlatform()
     {
-        qputenv("PLASMA_PLATFORM", "mobile:bigscreen");
+        qputenv("LINGMO_PLATFORM", "mobile:bigscreen");
         QStringList expected{QStringLiteral("mobile"), QStringLiteral("bigscreen")};
         QCOMPARE(KRuntimePlatform::runtimePlatform(), expected);
     }

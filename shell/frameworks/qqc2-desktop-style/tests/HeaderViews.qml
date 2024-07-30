@@ -7,8 +7,8 @@
 import QtQuick
 import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components 3 as PC3
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components 3 as PC3
 import Qt.labs.qmlmodels 1.0
 
 GridLayout {

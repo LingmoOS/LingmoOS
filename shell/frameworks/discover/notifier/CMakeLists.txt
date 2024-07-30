@@ -1,4 +1,4 @@
-add_definitions(-DTRANSLATION_DOMAIN=\"plasma-discover-notifier\")
+add_definitions(-DTRANSLATION_DOMAIN=\"lingmo-discover-notifier\")
 
 kconfig_add_kcfg_files(notifier_SRCS ../kcm/updatessettings.kcfgc GENERATE_MOC)
 
@@ -28,7 +28,7 @@ target_link_libraries(DiscoverNotifier
     Discover::Notifiers
 )
 
-set_target_properties(DiscoverNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/plasma-discover)
+set_target_properties(DiscoverNotifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/lingmo-discover)
 install(TARGETS DiscoverNotifier DESTINATION ${KDE_INSTALL_LIBEXECDIR})
 
 set(DesktopExec "${KDE_INSTALL_FULL_LIBEXECDIR}/DiscoverNotifier")

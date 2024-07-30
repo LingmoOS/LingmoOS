@@ -23,7 +23,7 @@ There are three parts to KNewStuff:
   as well as generic download and upload dialogues)
 * *KNewStuffQuick* - A set of Qt Quick based components designed to provide similar
   pattern support as KNewStuff, except for Qt Quick based applications, and specifically
-  in Kirigami based applications.
+  in LingmoUI based applications.
 
 If you are using CMake, you need to find the modules, which can be done by doing one of
 the following in your CMakeLists.txt:
@@ -69,7 +69,7 @@ When building applications designed to fit in with other classic, widget based
 applications, the application authors should use KNS3::DownloadDialog for
 downloading application content. For uploading KNS3::UploadDialog is used.
 
-When building Qt Quick (and in particular Kirigami) based applications, you can
+When building Qt Quick (and in particular LingmoUI) based applications, you can
 use the NewStuffList item from the org.kde.newstuff import to achieve a similar
 functionality to KNS3::DownloadDialog. You can also use the ItemsModel directly,
 if this is not featureful enough. Uploading is currently not exposed in KNewStuffQuick.
@@ -232,7 +232,7 @@ to standard output. If the return value is non-zero, KNewStuff will report this 
 primarily through the error displayer in NewStuff.Page (and associated components), and the KNS3::DownloadDialog.
 
 An example of this is how Plymouth graphical boot themes are handled, by running the `kplymouththemeinstaller` tool with the
-appropriate flags set. You can see the file here: [https://invent.kde.org/plasma/plymouth-kcm/-/blob/master/src/plymouth.knsrc]
+appropriate flags set. You can see the file here: [https://invent.kde.org/lingmo/plymouth-kcm/-/blob/master/src/plymouth.knsrc]
 
 ### <a id="kpackage-support" />KPackage Support
 
@@ -240,15 +240,15 @@ To make use of the KPackage option described above, in addition to the Uncompres
 the type of archive expected by KPackage. While it is possible to deduce this from the package metadata in many situations,
 it is not a requirement of the format that this information exists, and we need to have a fallback in the case it is not
 available there. As such, you will want to add a `KPackageType` entry to your knsrc file. The following example shows how this
-is done for Plasma themes:
+is done for Lingmo themes:
 
     [KNewStuff3]
-    Categories=Plasma Theme
+    Categories=Lingmo Theme
     StandardResource=tmp
-    TagFilter=ghns_excluded!=1,plasma##version==5
-    DownloadTagFilter=plasma##version==5
+    TagFilter=ghns_excluded!=1,lingmo##version==5
+    DownloadTagFilter=lingmo##version==5
     Uncompress=kpackage
-    KPackageStructure=Plasma/Theme
+    KPackageStructure=Lingmo/Theme
 
 Using KPackage support will automatically enable the removal of dead entries option. You can override this if you
 want to, by explicitly adding `RemoveDeadEntries=false` to your knsrc file, though this would likely result in your

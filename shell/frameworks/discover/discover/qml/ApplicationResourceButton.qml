@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.Button {
     id: root
@@ -30,10 +30,10 @@ QQC2.Button {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    leftPadding: Kirigami.Units.largeSpacing
-    rightPadding: Kirigami.Units.largeSpacing
-    topPadding: Kirigami.Units.largeSpacing
-    bottomPadding: Kirigami.Units.largeSpacing
+    leftPadding: LingmoUI.Units.largeSpacing
+    rightPadding: LingmoUI.Units.largeSpacing
+    topPadding: LingmoUI.Units.largeSpacing
+    bottomPadding: LingmoUI.Units.largeSpacing
 
     TextMetrics {
         id: textMetrics
@@ -44,20 +44,20 @@ QQC2.Button {
         spacing: 0
         RowLayout {
             id: layout
-            spacing: Kirigami.Units.smallSpacing
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 2 + spacing
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.minimumHeight: LingmoUI.Units.gridUnit * 2 + spacing
 
             // Icon
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 id: icon
-                Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
                 Layout.alignment: Qt.AlignVCenter
                 source: root.buttonIcon
             }
 
             // Title
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 level: 4
                 text: root.title

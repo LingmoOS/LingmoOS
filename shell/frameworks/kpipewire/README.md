@@ -14,7 +14,7 @@ At the moment we offer two main components:
 
 ## Usage
 
-You can refer to the `tests/` subdirectory for two examples of rendering Plasma video streams. One through the internal Plasma Wayland protocol and the other using the standard XDG Desktop Portals screencast API.
+You can refer to the `tests/` subdirectory for two examples of rendering Lingmo video streams. One through the internal Lingmo Wayland protocol and the other using the standard XDG Desktop Portals screencast API.
 
 ## Licence
 

@@ -45,7 +45,7 @@ find_package(KF5Wayland ${KF_MIN_VERSION} REQUIRED)
 find_package(WaylandProtocols 1.21 REQUIRED)
 find_package(Wayland 1.15 COMPONENTS Client)
 find_package(PkgConfig REQUIRED)
-find_package(PlasmaWaylandProtocols REQUIRED)
+find_package(LingmoWaylandProtocols REQUIRED)
 
 
 check_cxx_source_compiles("

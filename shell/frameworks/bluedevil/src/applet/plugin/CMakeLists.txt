@@ -1,7 +1,7 @@
-ecm_add_qml_module(bluetoothplugin URI org.kde.plasma.private.bluetooth GENERATE_PLUGIN_SOURCE)
+ecm_add_qml_module(bluetoothplugin URI org.kde.lingmo.private.bluetooth GENERATE_PLUGIN_SOURCE)
 
 # Reuse applet's domain, because the only strings here so far were moved from it
-target_compile_definitions(bluetoothplugin PRIVATE TRANSLATION_DOMAIN="plasma_applet_org.kde.plasma.bluetooth")
+target_compile_definitions(bluetoothplugin PRIVATE TRANSLATION_DOMAIN="lingmo_applet_org.kde.lingmo.bluetooth")
 
 target_sources(bluetoothplugin PRIVATE
     devicesproxymodel.cpp

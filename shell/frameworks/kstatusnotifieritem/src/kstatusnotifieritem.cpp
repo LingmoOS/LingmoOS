@@ -465,7 +465,7 @@ void KStatusNotifierItem::setContextMenu(QMenu *menu)
         if (getenv("KSNI_NO_DBUSMENU")) {
             // This is a hack to make it possible to disable DBusMenu in an
             // application. The string "/NO_DBUSMENU" must be the same as in
-            // DBusSystemTrayWidget::findDBusMenuInterface() in the Plasma
+            // DBusSystemTrayWidget::findDBusMenuInterface() in the Lingmo
             // systemtray applet.
             d->menuObjectPath = QStringLiteral("/NO_DBUSMENU");
             menu->installEventFilter(this);

@@ -91,7 +91,7 @@ kcmutils_generate_desktop_file(kcm_wacomtablet)
 
 target_link_libraries(kcm_wacomtablet ${kcm_wacomtablet_LIBS})
 
-install(TARGETS kcm_wacomtablet DESTINATION ${KDE_INSTALL_PLUGINDIR}/plasma/kcms/systemsettings_qwidgets)
+install(TARGETS kcm_wacomtablet DESTINATION ${KDE_INSTALL_PLUGINDIR}/lingmo/kcms/systemsettings_qwidgets)
 install(FILES org.kde.wacomtablet.metainfo.xml DESTINATION "${KDE_INSTALL_METAINFODIR}")
 
 ## LIBRARY FOR UNIT TESTS

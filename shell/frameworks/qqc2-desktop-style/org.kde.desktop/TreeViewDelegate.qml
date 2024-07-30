@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 import org.kde.desktop.private as Private
 
@@ -19,36 +19,36 @@ T.TreeViewDelegate {
     implicitWidth: leftMargin + __contentIndent + implicitContentWidth  + rightMargin + (mirrored ? leftPadding : rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight, implicitContentHeight, implicitIndicatorHeight) + topPadding + bottomPadding
 
-    // This is the default size of the indicator when using Breeze aka pixelMetric("treeviewindentation")
+    // This is the default size of the indicator when using Ocean aka pixelMetric("treeviewindentation")
     indentation: indicator ? indicator.width : 20
 
-    leftMargin: Kirigami.Units.smallSpacing
-    rightMargin: Kirigami.Units.smallSpacing
-    spacing:  Kirigami.Units.smallSpacing
+    leftMargin: LingmoUI.Units.smallSpacing
+    rightMargin: LingmoUI.Units.smallSpacing
+    spacing:  LingmoUI.Units.smallSpacing
 
     leftPadding: !mirrored ? leftMargin + __contentIndent : 0
     rightPadding: mirrored ? leftMargin + __contentIndent : 0
-    verticalPadding: Kirigami.Units.smallSpacing
+    verticalPadding: LingmoUI.Units.smallSpacing
 
     leftInset: TableView.view ? 0 : horizontalPadding / 2
     rightInset: TableView.view ? 0 : horizontalPadding / 2
     topInset: TableView.view ? 0 : Math.ceil(verticalPadding / 2)
     bottomInset: TableView.view ? 0 : Math.ceil(verticalPadding / 2)
 
-    Kirigami.Theme.colorSet: highlighted ? Kirigami.Theme.Selection : Kirigami.Theme.View
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: highlighted ? LingmoUI.Theme.Selection : LingmoUI.Theme.View
+    LingmoUI.Theme.inherit: false
 
     highlighted: controlRoot.selected || controlRoot.current
                || ((controlRoot.treeView.selectionBehavior === TableView.SelectRows
                || controlRoot.treeView.selectionBehavior === TableView.SelectionDisabled)
                && controlRoot.row === controlRoot.treeView.currentRow)
 
-    icon.width: Kirigami.Units.iconSizes.smallMedium
-    icon.height: Kirigami.Units.iconSizes.smallMedium
+    icon.width: LingmoUI.Units.iconSizes.smallMedium
+    icon.height: LingmoUI.Units.iconSizes.smallMedium
 
-    T.ToolTip.visible: (Kirigami.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
+    T.ToolTip.visible: (LingmoUI.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
     T.ToolTip.text: controlRoot.model.display
-    T.ToolTip.delay: Kirigami.Units.toolTipDelay
+    T.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
     required property int row
     required property int column
@@ -108,8 +108,8 @@ T.TreeViewDelegate {
     }
 
     background: Private.DefaultListItemBackground {
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: false
         // This is intentional and ensures the inset is not directly applied to
         // the background, allowing it to determine how to handle the inset.
         anchors.fill: parent
@@ -122,7 +122,7 @@ T.TreeViewDelegate {
 
         property alias truncated: textLabel.truncated
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             Layout.alignment: Qt.AlignVCenter
             visible: controlRoot.icon.name !== "" || controlRoot.icon.source.toString() !== "" || controlRoot.model.decoration !== undefined
             source: controlRoot.icon.name !== "" ? controlRoot.icon.name : controlRoot.icon.source.toString() !== "" ? controlRoot.icon.source : controlRoot.model.decoration
@@ -139,8 +139,8 @@ T.TreeViewDelegate {
             text: controlRoot.model.display
             font: controlRoot.font
             color: controlRoot.highlighted || controlRoot.checked || (controlRoot.pressed && !controlRoot.checked)
-                ? Kirigami.Theme.highlightedTextColor
-                : (controlRoot.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor)
+                ? LingmoUI.Theme.highlightedTextColor
+                : (controlRoot.enabled ? LingmoUI.Theme.textColor : LingmoUI.Theme.disabledTextColor)
             elide: Text.ElideRight
             visible: text !== ""
             horizontalAlignment: Text.AlignLeft

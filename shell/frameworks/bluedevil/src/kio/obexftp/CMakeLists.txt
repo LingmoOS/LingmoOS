@@ -9,7 +9,7 @@ ecm_qt_declare_logging_category(
     kio_obexftp_SRCS
     HEADER bluedevil_kio_obexftp.h
     IDENTIFIER BLUEDEVIL_KIO_OBEXFTP_LOG
-    CATEGORY_NAME org.kde.plasma.bluedevil.kioobexftp
+    CATEGORY_NAME org.kde.lingmo.bluedevil.kioobexftp
     DESCRIPTION "BlueDevil (kio obexftp)"
     EXPORT BLUEDEVIL
 )

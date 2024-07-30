@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.0
 
-import org.kde.kirigami 2.7 as Kirigami
+import org.kde.lingmoui 2.7 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -26,10 +26,10 @@ FocusScope {
             bottomMargin: 32
         }
         background: Rectangle {
-            color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.85)
+            color: Qt.rgba(LingmoUI.Theme.backgroundColor.r, LingmoUI.Theme.backgroundColor.g, LingmoUI.Theme.backgroundColor.b, 0.85)
             radius: 4
             border.width: 1
-            border.color: Qt.lighter(Kirigami.Theme.backgroundColor, 1.5)
+            border.color: Qt.lighter(LingmoUI.Theme.backgroundColor, 1.5)
         }
 
         ColumnLayout {
@@ -38,10 +38,10 @@ FocusScope {
             RowLayout {
                 Layout.alignment: Layout.Center
 
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     id: icon
                     isMask: true
-                    color: Qt.lighter(Kirigami.Theme.disabledTextColor, 1.5)
+                    color: Qt.lighter(LingmoUI.Theme.disabledTextColor, 1.5)
                     opacity: 0.8
                     Layout.preferredWidth: 64
                     Layout.preferredHeight: 64
@@ -52,8 +52,8 @@ FocusScope {
                 Label {
                     id: labelModuleName
                     font.weight: Font.Light
-                    font.pointSize: Kirigami.Settings.isMobile ? 16 : 24
-                    color: Kirigami.Theme.textColor
+                    font.pointSize: LingmoUI.Settings.isMobile ? 16 : 24
+                    color: LingmoUI.Theme.textColor
                 }
             }
 

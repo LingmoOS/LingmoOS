@@ -7,7 +7,7 @@
 
 #include "kquickstyleitem_p.h"
 
-#include <Kirigami/Platform/PlatformTheme>
+#include <LingmoUI/Platform/PlatformTheme>
 
 #include <QAbstractItemModel>
 #include <QGuiApplication>
@@ -18,9 +18,9 @@ ItemBranchIndicators::ItemBranchIndicators(QQuickItem *parent)
     : QQuickPaintedItem(parent)
     , m_selected(false)
 {
-    if (auto theme = static_cast<Kirigami::Platform::PlatformTheme *>(qmlAttachedPropertiesObject<Kirigami::Platform::PlatformTheme>(this, true))) {
+    if (auto theme = static_cast<LingmoUI::Platform::PlatformTheme *>(qmlAttachedPropertiesObject<LingmoUI::Platform::PlatformTheme>(this, true))) {
         m_palette = theme->palette();
-        connect(theme, &Kirigami::Platform::PlatformTheme::paletteChanged, this, [this](const QPalette &palette) {
+        connect(theme, &LingmoUI::Platform::PlatformTheme::paletteChanged, this, [this](const QPalette &palette) {
             m_palette = palette;
             update();
         });

@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * This component is intended to be used as root item for
@@ -29,13 +29,13 @@ import org.kde.kirigami as Kirigami
  *     footer: QQC2.ToolBar { }
  * }
  * @endcode
- * @inherits org.kde.kirigami.Page
+ * @inherits org.kde.lingmoui.Page
  * @since 6.0
  */
-Kirigami.Page {
+LingmoUI.Page {
     id: root
 
-    readonly property int margins: 6 // Layout_ChildMarginWidth from Breeze
+    readonly property int margins: 6 // Layout_ChildMarginWidth from Ocean
 
     /**
      * framedView: bool
@@ -97,10 +97,10 @@ Kirigami.Page {
     title: (typeof kcm !== "undefined") ? kcm.name : ""
 
     // Make pages fill the whole view by default
-    Kirigami.ColumnView.fillWidth: sidebarMode
-                                   ? Kirigami.ColumnView.view
-                                         && (Kirigami.ColumnView.view.width < Kirigami.Units.gridUnit * 36
-                                             || Kirigami.ColumnView.index >= Kirigami.ColumnView.view.count - 1)
+    LingmoUI.ColumnView.fillWidth: sidebarMode
+                                   ? LingmoUI.ColumnView.view
+                                         && (LingmoUI.ColumnView.view.width < LingmoUI.Units.gridUnit * 36
+                                             || LingmoUI.ColumnView.index >= LingmoUI.ColumnView.view.count - 1)
                                    : true
 
     padding: 0
@@ -112,7 +112,7 @@ Kirigami.Page {
     horizontalPadding: framedView ? margins : 0
 
     header: Column {
-        Kirigami.Padding {
+        LingmoUI.Padding {
             id: headerParent
 
             anchors {
@@ -126,7 +126,7 @@ Kirigami.Page {
 
         // When the scrollview isn't drawing its own frame, we need to add a
         // line below the header (when visible) to separate it from the view
-        Kirigami.Separator {
+        LingmoUI.Separator {
             anchors {
                 left: parent.left
                 right: parent.right
@@ -140,15 +140,15 @@ Kirigami.Page {
     Rectangle {
         anchors.fill: parent
         visible: !root.framedView
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: false
-        color: Kirigami.Theme.backgroundColor
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: false
+        color: LingmoUI.Theme.backgroundColor
     }
 
     footer: Column {
         // When the scrollview isn't drawing its own frame, we need to add a
         // line above the footer ourselves to separate it from the view
-        Kirigami.Separator {
+        LingmoUI.Separator {
             anchors {
                 left: parent.left
                 right: parent.right
@@ -157,7 +157,7 @@ Kirigami.Page {
             visible: root.__footerSeparatorVisible()
         }
 
-        Kirigami.Padding {
+        LingmoUI.Padding {
             id: footerParent
 
             anchors {
@@ -187,7 +187,7 @@ Kirigami.Page {
     function __adoptOverlaySheets(): void {
         // Search overlaysheets in contentItem, parent to root if found
         for (const object of contentItem.data) {
-            if (object instanceof Kirigami.OverlaySheet) {
+            if (object instanceof LingmoUI.OverlaySheet) {
                 if (object.parent === null) {
                     object.parent = this;
                 }

@@ -12,51 +12,51 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME wayland
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-device-v2.xml
     BASENAME kde-output-device-v2
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-management-v2.xml
     BASENAME kde-output-management-v2
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-shell.xml
-    BASENAME plasma-shell
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-shell.xml
+    BASENAME lingmo-shell
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-virtual-desktop.xml
-    BASENAME org-kde-plasma-virtual-desktop
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-virtual-desktop.xml
+    BASENAME org-kde-lingmo-virtual-desktop
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-window-management.xml
-    BASENAME plasma-window-management
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-window-management.xml
+    BASENAME lingmo-window-management
 )
 ecm_add_wayland_server_protocol(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/surface-extension.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/surface-extension.xml
     BASENAME qt-surface-extension
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/idle.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/idle.xml
     BASENAME idle
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/fake-input.xml
     BASENAME fake-input
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/shadow.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/shadow.xml
     BASENAME shadow
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/dpms.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/dpms.xml
     BASENAME dpms
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/blur.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/blur.xml
     BASENAME blur
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/contrast.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/contrast.xml
     BASENAME contrast
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -64,11 +64,11 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME relative-pointer-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/slide.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/slide.xml
     BASENAME slide
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/server-decoration.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/server-decoration.xml
     BASENAME server-decoration
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -76,7 +76,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME text-input-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/text-input-unstable-v2.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/text-input-unstable-v2.xml
     BASENAME text-input-unstable-v2
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -100,11 +100,11 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME idle-inhibit-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/appmenu.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/appmenu.xml
     BASENAME appmenu
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/server-decoration-palette.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/server-decoration-palette.xml
     BASENAME server-decoration-palette
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -120,7 +120,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME xdg-decoration-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/keystate.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/keystate.xml
     BASENAME keystate
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -152,7 +152,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME wp-primary-selection-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml
     BASENAME zkde-screencast-unstable-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -168,7 +168,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME drm-lease-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-lockscreen-overlay-v1.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-lockscreen-overlay-v1.xml
     BASENAME kde-lockscreen-overlay-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -192,7 +192,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME xwayland-shell-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-output-order-v1.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-output-order-v1.xml
     BASENAME kde-output-order-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -204,7 +204,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME drm
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-screen-edge-v1.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-screen-edge-v1.xml
     BASENAME kde-screen-edge-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
@@ -253,7 +253,7 @@ ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
     BASENAME linux-drm-syncobj-v1
 )
 ecm_add_qtwayland_server_protocol_kde(WaylandProtocols_xml
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/kde-external-brightness-v1.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/kde-external-brightness-v1.xml
     BASENAME kde-external-brightness-v1
 )
 
@@ -298,9 +298,9 @@ target_sources(kwin PRIVATE
     output_order_v1.cpp
     outputdevice_v2.cpp
     outputmanagement_v2.cpp
-    plasmashell.cpp
-    plasmavirtualdesktop.cpp
-    plasmawindowmanagement.cpp
+    lingmoshell.cpp
+    lingmovirtualdesktop.cpp
+    lingmowindowmanagement.cpp
     pointer.cpp
     pointerconstraints_v1.cpp
     pointergestures_v1.cpp
@@ -379,9 +379,9 @@ install(FILES
     output_order_v1.h
     outputdevice_v2.h
     outputmanagement_v2.h
-    plasmashell.h
-    plasmavirtualdesktop.h
-    plasmawindowmanagement.h
+    lingmoshell.h
+    lingmovirtualdesktop.h
+    lingmowindowmanagement.h
     pointer.h
     pointerconstraints_v1.h
     pointergestures_v1.h

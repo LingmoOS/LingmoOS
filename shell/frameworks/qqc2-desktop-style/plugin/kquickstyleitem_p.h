@@ -25,7 +25,7 @@ class QWidget;
 class QStyleOption;
 class QStyle;
 
-namespace Kirigami
+namespace LingmoUI
 {
 namespace Platform
 {
@@ -508,7 +508,7 @@ private:
     void styleChanged();
 
 protected:
-    Kirigami::Platform::PlatformTheme *m_theme = nullptr;
+    LingmoUI::Platform::PlatformTheme *m_theme = nullptr;
     QStyleOption *m_styleoption;
     QPointer<QQuickItem> m_control;
     QPointer<QWindow> m_window;

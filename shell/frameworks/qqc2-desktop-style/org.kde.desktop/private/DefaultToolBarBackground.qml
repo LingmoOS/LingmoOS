@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Rectangle {
     id: root
@@ -16,9 +16,9 @@ Rectangle {
     required property T.ToolBar control
 
     implicitHeight: 40
-    color: Kirigami.Theme.backgroundColor
+    color: LingmoUI.Theme.backgroundColor
 
-    Kirigami.Separator {
+    LingmoUI.Separator {
         id: separator
         anchors {
             left: parent.left

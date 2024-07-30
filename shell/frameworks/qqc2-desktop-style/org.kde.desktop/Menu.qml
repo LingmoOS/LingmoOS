@@ -9,13 +9,13 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.Menu {
     id: control
 
-    z: Kirigami.OverlayZStacking.z
+    z: LingmoUI.OverlayZStacking.z
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
@@ -50,7 +50,7 @@ T.Menu {
         implicitHeight: Math.max(1, contentItem.childrenRect.height)
         model: control.contentModel
 
-        spacing: 0 // Hardcoded to the Breeze theme value
+        spacing: 0 // Hardcoded to the Ocean theme value
 
         interactive: Window.window
                         ? contentHeight + control.topPadding + control.bottomPadding > Window.window.height
@@ -110,7 +110,7 @@ T.Menu {
             from: 0
             to: 1
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.shortDuration
+            duration: LingmoUI.Units.shortDuration
         }
     }
 
@@ -120,16 +120,16 @@ T.Menu {
             from: 1
             to: 0
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.shortDuration
+            duration: LingmoUI.Units.shortDuration
         }
     }
 
-    background: Kirigami.ShadowedRectangle {
-        radius: Kirigami.Units.cornerRadius
-        implicitWidth: Kirigami.Units.gridUnit * 8
-        color: Kirigami.Theme.backgroundColor
+    background: LingmoUI.ShadowedRectangle {
+        radius: LingmoUI.Units.cornerRadius
+        implicitWidth: LingmoUI.Units.gridUnit * 8
+        color: LingmoUI.Theme.backgroundColor
 
-        border.color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
+        border.color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
         border.width: 1
 
         shadow.xOffset: 0

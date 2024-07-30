@@ -26,7 +26,7 @@ KCMFlatpak::KCMFlatpak(QObject *parent, const KPluginMetaData &data, const QVari
         }
     }
 
-    constexpr const char *uri = "org.kde.plasma.kcm.flatpakpermissions";
+    constexpr const char *uri = "org.kde.lingmo.kcm.flatpakpermissions";
 
     qmlRegisterUncreatableType<KCMFlatpak>(uri, 1, 0, "KCMFlatpak", QString());
     qmlRegisterUncreatableType<FlatpakReference>(uri, 1, 0, "FlatpakReference", QStringLiteral("Should be obtained from a FlatpakReferencesModel"));

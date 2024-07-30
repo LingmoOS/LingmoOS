@@ -5,8 +5,8 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.kcmutils as KCMUtils
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
 DiscoverPage {
     id: page
@@ -17,10 +17,10 @@ DiscoverPage {
     clip: true
     title: i18n("Settings")
 
-    Kirigami.Action {
+    LingmoUI.Action {
         id: configureUpdatesAction
         text: i18n("Configure Updates…")
-        displayHint: Kirigami.DisplayHint.AlwaysHide
+        displayHint: LingmoUI.DisplayHint.AlwaysHide
         onTriggered: {
             KCMUtils.KCMLauncher.openSystemSettings("kcm_updates");
         }
@@ -29,21 +29,21 @@ DiscoverPage {
     actions: feedbackLoader.item?.actions ?? [configureUpdatesAction]
 
     header: ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Repeater {
             model: Discover.SourcesModel.sources
 
-            delegate: Kirigami.InlineMessage {
+            delegate: LingmoUI.InlineMessage {
                 id: delegate
 
                 required property Discover.AbstractSourcesBackend modelData
 
                 Layout.fillWidth: true
-                Layout.margins: Kirigami.Units.smallSpacing
+                Layout.margins: LingmoUI.Units.smallSpacing
                 text: modelData.inlineAction?.toolTip ?? ""
                 visible: modelData.inlineAction?.visible ?? false
-                actions: Kirigami.Action {
+                actions: LingmoUI.Action {
                     icon.name: delegate.modelData.inlineAction?.iconName ?? ""
                     text: delegate.modelData.inlineAction?.text ?? ""
                     onTriggered: delegate.modelData.inlineAction?.trigger()
@@ -59,12 +59,12 @@ DiscoverPage {
         currentIndex: -1
         pixelAligned: true
         section.property: "sourceName"
-        section.delegate: Kirigami.ListSectionHeader {
+        section.delegate: LingmoUI.ListSectionHeader {
             id: backendItem
 
             required property string section
 
-            height: Math.ceil(Math.max(Kirigami.Units.gridUnit * 2.5, contentItem.implicitHeight))
+            height: Math.ceil(Math.max(LingmoUI.Units.gridUnit * 2.5, contentItem.implicitHeight))
 
             readonly property Discover.AbstractSourcesBackend backend: Discover.SourcesModel.sourcesBackendByName(section)
             readonly property Discover.AbstractResourcesBackend resourcesBackend: backend.resourcesBackend
@@ -88,32 +88,32 @@ DiscoverPage {
             }
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: resourcesBackend.displayName
                     level: 3
                     font.weight: backendItem.isDefault ? Font.Bold : Font.Normal
                 }
 
-                Kirigami.ActionToolBar {
+                LingmoUI.ActionToolBar {
                     id: actionBar
 
                     alignment: Qt.AlignRight
 
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         id: isDefaultbackendLabelAction
 
                         visible: backendItem.isDefault
-                        displayHint: Kirigami.DisplayHint.KeepVisible
-                        displayComponent: Kirigami.Heading {
+                        displayHint: LingmoUI.DisplayHint.KeepVisible
+                        displayComponent: LingmoUI.Heading {
                             text: i18n("Default source")
                             level: 3
                             font.weight: Font.Bold
                         }
                     }
 
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         id: addSourceAction
                         text: i18n("Add Source…")
                         icon.name: "list-add"
@@ -138,7 +138,7 @@ DiscoverPage {
                         }
                     }
 
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         id: makeDefaultAction
                         visible: resourcesBackend && resourcesBackend.hasApplications && !backendItem.isDefault
 
@@ -148,7 +148,7 @@ DiscoverPage {
                     }
 
                     Component {
-                        id: kirigamiAction
+                        id: lingmouiAction
                         ConvertDiscoverAction {}
                     }
 
@@ -159,7 +159,7 @@ DiscoverPage {
                             addSourceAction
                         ]
                         for (const action of moreActions) {
-                            actions.push(kirigamiAction.createObject(this, { action }))
+                            actions.push(lingmouiAction.createObject(this, { action }))
                         }
                         return actions;
                     }
@@ -170,7 +170,7 @@ DiscoverPage {
 
         Component {
             id: sourceProceedDialog
-            Kirigami.OverlaySheet {
+            LingmoUI.OverlaySheet {
                 id: sheet
 
                 property Discover.AbstractSourcesBackend sourcesBackend
@@ -180,9 +180,9 @@ DiscoverPage {
                 parent: page.QQC2.Overlay.overlay
                 showCloseButton: false
 
-                implicitWidth: Kirigami.Units.gridUnit * 30
+                implicitWidth: LingmoUI.Units.gridUnit * 30
 
-                Kirigami.SelectableLabel {
+                LingmoUI.SelectableLabel {
                     id: descriptionLabel
                     width: parent.width
                     textFormat: TextEdit.RichText
@@ -228,7 +228,7 @@ DiscoverPage {
             }
         }
 
-        delegate: Kirigami.SwipeListItem {
+        delegate: LingmoUI.SwipeListItem {
             id: delegate
 
             required property int index
@@ -243,7 +243,7 @@ DiscoverPage {
             Keys.onReturnPressed: enabledBox.clicked()
             Keys.onSpacePressed: enabledBox.clicked()
             actions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "go-up"
                     tooltip: i18n("Increase priority")
                     enabled: delegate.model.sourcesBackend.firstSourceId !== delegate.model.sourceId
@@ -255,7 +255,7 @@ DiscoverPage {
                         }
                     }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "go-down"
                     tooltip: i18n("Decrease priority")
                     enabled: delegate.model.sourcesBackend.lastSourceId !== delegate.model.sourceId
@@ -267,7 +267,7 @@ DiscoverPage {
                         }
                     }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "edit-delete"
                     tooltip: i18n("Remove repository")
                     visible: delegate.model.sourcesBackend.supportsAdding
@@ -278,7 +278,7 @@ DiscoverPage {
                         }
                     }
                 },
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: delegate.mirrored ? "go-next-symbolic-rtl" : "go-next-symbolic"
                     tooltip: i18n("Show contents")
                     visible: delegate.model.sourcesBackend.canFilterSources
@@ -289,7 +289,7 @@ DiscoverPage {
             ]
 
             contentItem: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 QQC2.CheckBox {
                     id: enabledBox
@@ -316,10 +316,10 @@ DiscoverPage {
             anchors {
                 right: parent.right
                 left: parent.left
-                margins: Kirigami.Units.smallSpacing
+                margins: LingmoUI.Units.smallSpacing
             }
-            Kirigami.ListSectionHeader {
-                contentItem: Kirigami.Heading {
+            LingmoUI.ListSectionHeader {
+                contentItem: LingmoUI.Heading {
                     Layout.fillWidth: true
                     text: i18n("Missing Backends")
                     visible: back.count > 0
@@ -345,7 +345,7 @@ DiscoverPage {
                     down: false
 
                     contentItem: RowLayout {
-                        spacing: Kirigami.Units.smallSpacing
+                        spacing: LingmoUI.Units.smallSpacing
                         KD.IconTitleSubtitle {
                             title: name
                             icon.source: delegate.model.icon

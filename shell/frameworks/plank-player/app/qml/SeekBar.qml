@@ -5,7 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Templates 2.15 as QQCT
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import QtQuick.Controls 2.15 as Controls
 
 Item {
@@ -22,7 +22,7 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.largeSpacing
+        anchors.margins: LingmoUI.Units.largeSpacing
 
         QQCT.Slider {
             id: slider
@@ -42,25 +42,25 @@ Item {
                 if(slider.navSliderItem){
                     recthandler.color = "red"
                 } else if (slider.focus) {
-                    recthandler.color = Kirigami.Theme.linkColor
+                    recthandler.color = LingmoUI.Theme.linkColor
                 }
             }
 
             onFocusChanged: {
                 if(!slider.focus){
-                    recthandler.color = Kirigami.Theme.textColor
+                    recthandler.color = LingmoUI.Theme.textColor
                 } else {
-                    recthandler.color = Kirigami.Theme.linkColor
+                    recthandler.color = LingmoUI.Theme.linkColor
                 }
             }
 
             handle: Rectangle {
                 id: recthandler
                 x: slider.position * (parent.width - width)
-                implicitWidth: Kirigami.Units.largeSpacing
+                implicitWidth: LingmoUI.Units.largeSpacing
                 implicitHeight: parent.height
                 radius: 6
-                color: Kirigami.Theme.textColor
+                color: LingmoUI.Theme.textColor
             }
 
             background: Item {
@@ -73,7 +73,7 @@ Item {
                     }
                     height: parent.height
                     radius: 6
-                    color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
+                    color: Qt.rgba(LingmoUI.Theme.textColor.r, LingmoUI.Theme.textColor.g, LingmoUI.Theme.textColor.b, 0.3)
                     Rectangle {
                         anchors {
                             left: parent.left
@@ -81,7 +81,7 @@ Item {
                             bottom: parent.bottom
                         }
                         radius: 6
-                        color: Kirigami.Theme.highlightColor
+                        color: LingmoUI.Theme.highlightColor
                         width: slider.position * (parent.width - slider.handle.width/2) + slider.handle.width/2
                     }
                 }
@@ -114,7 +114,7 @@ Item {
         }
 
         Controls.Label {
-            Layout.preferredWidth: contentWidth + Kirigami.Units.gridUnit
+            Layout.preferredWidth: contentWidth + LingmoUI.Units.gridUnit
             Layout.fillHeight: true
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

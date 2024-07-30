@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import "private" as Private
 
 /**
@@ -49,15 +49,15 @@ T.ItemDelegate {
     property bool thumbnailAvailable: false
 
     /**
-     * actions: list<Kirigami.Action>
+     * actions: list<LingmoUI.Action>
      * A list of extra actions for the thumbnails. They will be shown as
      * icons on the bottom-right corner of the thumbnail on mouse over
      */
-    property list<Kirigami.Action> actions
+    property list<LingmoUI.Action> actions
 
     width: GridView.view.cellWidth
     height: GridView.view.cellHeight
-    hoverEnabled: !Kirigami.Settings.isMobile
+    hoverEnabled: !LingmoUI.Settings.isMobile
 
     Accessible.description: {
         if (toolTip.length === 0) {
@@ -72,19 +72,19 @@ T.ItemDelegate {
     Keys.onMenuPressed: event => thumbnail.trigger()
     Keys.onSpacePressed: event => thumbnail.trigger()
 
-    Kirigami.ShadowedRectangle {
+    LingmoUI.ShadowedRectangle {
         id: thumbnail
         anchors {
            centerIn: parent
            verticalCenterOffset: Math.ceil(-labelLayout.height / 2)
         }
-        width: Kirigami.Settings.isMobile ? delegate.width - Kirigami.Units.gridUnit : Math.min(delegate.GridView.view.implicitCellWidth, delegate.width - Kirigami.Units.gridUnit)
-        height: Kirigami.Settings.isMobile ? Math.round((delegate.width - Kirigami.Units.gridUnit) / 1.6)
-                                           : Math.min(delegate.GridView.view.implicitCellHeight - Kirigami.Units.gridUnit * 3,
-                                                      delegate.height - Kirigami.Units.gridUnit)
-        radius: Kirigami.Units.cornerRadius
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        width: LingmoUI.Settings.isMobile ? delegate.width - LingmoUI.Units.gridUnit : Math.min(delegate.GridView.view.implicitCellWidth, delegate.width - LingmoUI.Units.gridUnit)
+        height: LingmoUI.Settings.isMobile ? Math.round((delegate.width - LingmoUI.Units.gridUnit) / 1.6)
+                                           : Math.min(delegate.GridView.view.implicitCellHeight - LingmoUI.Units.gridUnit * 3,
+                                                      delegate.height - LingmoUI.Units.gridUnit)
+        radius: LingmoUI.Units.cornerRadius
+        LingmoUI.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
 
         shadow.xOffset: 0
         shadow.yOffset: 2
@@ -94,15 +94,15 @@ T.ItemDelegate {
         color: {
             if (delegate.GridView.isCurrentItem) {
                 if (delegate.enabled && delegate.GridView.view.neutralHighlight) {
-                    return Kirigami.Theme.neutralTextColor;
+                    return LingmoUI.Theme.neutralTextColor;
                 }
-                return Kirigami.Theme.highlightColor;
+                return LingmoUI.Theme.highlightColor;
             }
             if (delegate.enabled && delegate.hovered) {
                 // Match appearance of hovered list items
-                return Qt.alpha(Kirigami.Theme.highlightColor, 0.5);
+                return Qt.alpha(LingmoUI.Theme.highlightColor, 0.5);
             }
-            return Kirigami.Theme.backgroundColor;
+            return LingmoUI.Theme.backgroundColor;
         }
 
         // The menu is only used for keyboard navigation, so no need to always load
@@ -122,41 +122,41 @@ T.ItemDelegate {
         Rectangle {
             id: thumbnailArea
 
-            radius: Math.round(Kirigami.Units.cornerRadius / 2)
+            radius: Math.round(LingmoUI.Units.cornerRadius / 2)
             anchors {
                 fill: parent
-                margins: Kirigami.Units.smallSpacing
+                margins: LingmoUI.Units.smallSpacing
             }
 
-            color: Kirigami.Theme.backgroundColor
+            color: LingmoUI.Theme.backgroundColor
 
             // "None/There's nothing here" indicator
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 visible: !delegate.thumbnailAvailable
                 anchors.centerIn: parent
-                width: Kirigami.Units.iconSizes.large
-                height: Kirigami.Units.iconSizes.large
+                width: LingmoUI.Units.iconSizes.large
+                height: LingmoUI.Units.iconSizes.large
                 source: typeof pluginName === "string" && pluginName === "None" ? "edit-none" : "view-preview"
             }
 
             RowLayout {
                 anchors {
                     right: parent.right
-                    rightMargin: Kirigami.Units.smallSpacing
+                    rightMargin: LingmoUI.Units.smallSpacing
                     bottom: parent.bottom
-                    bottomMargin: Kirigami.Units.smallSpacing
+                    bottomMargin: LingmoUI.Units.smallSpacing
                 }
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 // Always show above thumbnail content
                 z: 9999
 
-                visible: delegate.actions.length > 0 && (Kirigami.Settings.isMobile || delegate.hovered || delegate.GridView.isCurrentItem)
+                visible: delegate.actions.length > 0 && (LingmoUI.Settings.isMobile || delegate.hovered || delegate.GridView.isCurrentItem)
 
                 Repeater {
                     model: delegate.actions
                     delegate: QQC2.Button {
-                        required property Kirigami.Action modelData
+                        required property LingmoUI.Action modelData
 
                         icon.name: modelData.icon.name
                         text: modelData.text || modelData.tooltip
@@ -169,8 +169,8 @@ T.ItemDelegate {
 
                         onClicked: modelData.trigger()
 
-                        QQC2.ToolTip.visible: (Kirigami.Settings.tabletMode ? pressed : hovered) && (QQC2.ToolTip.text !== "")
-                        QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+                        QQC2.ToolTip.visible: (LingmoUI.Settings.tabletMode ? pressed : hovered) && (QQC2.ToolTip.text !== "")
+                        QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
                         QQC2.ToolTip.text: text
                     }
                 }
@@ -182,12 +182,12 @@ T.ItemDelegate {
         id: labelLayout
 
         spacing: 0
-        height: Kirigami.Units.gridUnit * 2
+        height: LingmoUI.Units.gridUnit * 2
         anchors {
             left: thumbnail.left
             right: thumbnail.right
             top: thumbnail.bottom
-            topMargin: Kirigami.Units.largeSpacing
+            topMargin: LingmoUI.Units.largeSpacing
         }
 
         QQC2.Label {
@@ -197,7 +197,7 @@ T.ItemDelegate {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignTop
             text: delegate.text
-            color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
+            color: enabled ? LingmoUI.Theme.textColor : LingmoUI.Theme.disabledTextColor
             elide: Text.ElideRight
             font.bold: delegate.GridView.isCurrentItem
             textFormat: Text.PlainText
@@ -210,7 +210,7 @@ T.ItemDelegate {
             visible: delegate.subtitle.length > 0
             opacity: 0.6
             text: delegate.subtitle
-            font.pointSize: Kirigami.Theme.smallFont.pointSize
+            font.pointSize: LingmoUI.Theme.smallFont.pointSize
             font.bold: delegate.GridView.isCurrentItem
             elide: Text.ElideRight
             textFormat: Text.PlainText
@@ -222,7 +222,7 @@ T.ItemDelegate {
             Layout.maximumWidth: labelLayout.width // Otherwise labels can overflow
             Layout.alignment: Qt.AlignHCenter
 
-            color: Kirigami.Theme.highlightColor
+            color: LingmoUI.Theme.highlightColor
 
             opacity: delegate.visualFocus ? 1 : 0
         }
@@ -230,8 +230,8 @@ T.ItemDelegate {
         Item { Layout.fillWidth: true; Layout.fillHeight: true; }
     }
 
-    QQC2.ToolTip.visible: (Kirigami.Settings.tabletMode ? pressed : hovered) && (QQC2.ToolTip.text !== "")
-    QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+    QQC2.ToolTip.visible: (LingmoUI.Settings.tabletMode ? pressed : hovered) && (QQC2.ToolTip.text !== "")
+    QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
     QQC2.ToolTip.text: {
         if (delegate.toolTip.length > 0) {
             return delegate.toolTip;

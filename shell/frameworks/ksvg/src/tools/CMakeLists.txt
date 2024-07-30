@@ -1,1 +1,1 @@
-add_subdirectory(split-plasma-svgs)
+add_subdirectory(split-lingmo-svgs)

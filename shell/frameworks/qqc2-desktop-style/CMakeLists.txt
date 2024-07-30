@@ -42,7 +42,7 @@ if (BUILD_TESTING)
     find_package(Qt6 ${REQUIRED_QT_VERSION} REQUIRED COMPONENTS Test QuickTest)
 endif()
 
-find_package(KF6 ${KF_DEP_VERSION} REQUIRED COMPONENTS Config KirigamiPlatform)
+find_package(KF6 ${KF_DEP_VERSION} REQUIRED COMPONENTS Config LingmoUIPlatform)
 
 # IconThemes and ColorScheme are optional
 find_package(KF6IconThemes ${KF_DEP_VERSION})
@@ -56,13 +56,13 @@ set_package_properties(IconThemes
     PROPERTIES
         DESCRIPTION "KF6 IconThemes framework"
         TYPE OPTIONAL
-        PURPOSE "Optional integration of Kirigami with KIconLoader icons handling for a better integration with Plasma Desktop"
+        PURPOSE "Optional integration of LingmoUI with KIconLoader icons handling for a better integration with Lingmo Desktop"
 )
 set_package_properties(ColorScheme
     PROPERTIES
         DESCRIPTION "KF6 ColorScheme framework"
         TYPE OPTIONAL
-        PURPOSE "Optional integration of Kirigami with KColorScheme for color palettes integration with Plasma Desktop"
+        PURPOSE "Optional integration of LingmoUI with KColorScheme for color palettes integration with Lingmo Desktop"
 )
 
 find_package(PkgConfig)
@@ -99,7 +99,7 @@ ecm_set_disabled_deprecation_versions(
 add_subdirectory(plugin)
 
 if (KF6IconThemes_FOUND AND KF6ColorScheme_FOUND)
-    add_subdirectory(kirigami-plasmadesktop-integration)
+    add_subdirectory(lingmoui-lingmodesktop-integration)
 endif()
 
 ecm_add_qml_module(org_kde_desktop URI "org.kde.desktop" VERSION 1.0 GENERATE_PLUGIN_SOURCE DEPENDENCIES "org.kde.qqc2desktopstyle.private" "org.kde.desktop.private")

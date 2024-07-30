@@ -8,11 +8,11 @@
 import QtQuick
 import QtQuick.Window
 import Qt5Compat.GraphicalEffects
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.plasma.components 3.0 as PC3
-import org.kde.plasma.extras as PlasmaExtras
+import org.kde.lingmo.components 3.0 as PC3
+import org.kde.lingmo.extras as LingmoExtras
 import org.kde.ksvg 1.0 as KSvg
 
 Item {
@@ -132,11 +132,11 @@ Item {
 
         // Not using FrameSvg hover element intentionally for stylistic reasons
         Rectangle {
-            border.width: Kirigami.Units.largeSpacing
-            border.color: Kirigami.Theme.highlightColor
+            border.width: LingmoUI.Units.largeSpacing
+            border.color: LingmoUI.Theme.highlightColor
             anchors.fill: parent
             anchors.margins: -border.width
-            radius: Kirigami.Units.cornerRadius
+            radius: LingmoUI.Units.cornerRadius
             color: "transparent"
             visible: !thumb.windowHeap.dragActive && (hoverHandler.hovered || (thumb.selected && Window.window.activeFocusItem)) && windowHeap.effectiveOrganized
         }
@@ -157,10 +157,10 @@ Item {
         visible: !thumb.activeHidden && touchDragHandler.active
     }
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         id: icon
-        width: Kirigami.Units.iconSizes.large
-        height: Kirigami.Units.iconSizes.large
+        width: LingmoUI.Units.iconSizes.large
+        height: LingmoUI.Units.iconSizes.large
         source: thumb.window.icon
         anchors.horizontalCenter: thumbSource.horizontalCenter
         anchors.bottom: thumbSource.bottom
@@ -172,20 +172,20 @@ Item {
             width: cell.width
             maximumLineCount: 1
             anchors.top: parent.bottom
-            anchors.topMargin: Kirigami.Units.smallSpacing
+            anchors.topMargin: LingmoUI.Units.smallSpacing
             anchors.horizontalCenter: parent.horizontalCenter
             elide: Text.ElideRight
             text: thumb.window.caption
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
             textFormat: Text.PlainText
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             background: Rectangle {
                 anchors.centerIn: parent
-                height: parent.contentHeight + Kirigami.Units.smallSpacing
-                width: parent.contentWidth + Kirigami.Units.smallSpacing
-                color: Kirigami.Theme.backgroundColor
-                radius: Kirigami.Units.cornerRadius
+                height: parent.contentHeight + LingmoUI.Units.smallSpacing
+                width: parent.contentWidth + LingmoUI.Units.smallSpacing
+                color: LingmoUI.Theme.backgroundColor
+                radius: LingmoUI.Units.cornerRadius
             }
         }
     }
@@ -208,8 +208,8 @@ Item {
             name: "initial"
             PropertyChanges {
                 target: thumb
-                x: thumb.window.x - targetScreen.geometry.x - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.Kirigami.ScenePosition.x : 0)
-                y: thumb.window.y - targetScreen.geometry.y - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.Kirigami.ScenePosition.y : 0)
+                x: thumb.window.x - targetScreen.geometry.x - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.LingmoUI.ScenePosition.x : 0)
+                y: thumb.window.y - targetScreen.geometry.y - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.LingmoUI.ScenePosition.y : 0)
                 width: thumb.window.width
                 height: thumb.window.height
             }
@@ -233,8 +233,8 @@ Item {
             name: "partial"
             PropertyChanges {
                 target: thumb
-                x: (thumb.window.x - targetScreen.geometry.x - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.Kirigami.ScenePosition.x : 0)) * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + (thumb.activeHidden ? 0 : cell.x * thumb.partialActivationFactor)
-                y: (thumb.window.y - targetScreen.geometry.y - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.Kirigami.ScenePosition.y : 0)) * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + (thumb.activeHidden ? 0 : cell.y * thumb.partialActivationFactor)
+                x: (thumb.window.x - targetScreen.geometry.x - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.LingmoUI.ScenePosition.x : 0)) * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + (thumb.activeHidden ? 0 : cell.x * thumb.partialActivationFactor)
+                y: (thumb.window.y - targetScreen.geometry.y - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.LingmoUI.ScenePosition.y : 0)) * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + (thumb.activeHidden ? 0 : cell.y * thumb.partialActivationFactor)
                 width: thumb.window.width * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + cell.width * (thumb.activeHidden ? 0 : thumb.partialActivationFactor)
                 height: thumb.window.height * (thumb.activeHidden ? 1 : 1 - thumb.partialActivationFactor) + cell.height * (thumb.activeHidden ? 0 : thumb.partialActivationFactor)
                 opacity: thumb.initialHidden
@@ -428,8 +428,8 @@ Item {
                 return 0.0;
             }
 
-            const startDistance = thumb.windowHeap.Kirigami.ScenePosition.y + thumb.windowHeap.height - centroid.scenePressPosition.y;
-            const localPosition = thumb.windowHeap.Kirigami.ScenePosition.y + thumb.windowHeap.height - centroid.scenePosition.y;
+            const startDistance = thumb.windowHeap.LingmoUI.ScenePosition.y + thumb.windowHeap.height - centroid.scenePressPosition.y;
+            const localPosition = thumb.windowHeap.LingmoUI.ScenePosition.y + thumb.windowHeap.height - centroid.scenePosition.y;
             return 1 - Math.min(localPosition/startDistance, 1);
         }
 
@@ -449,9 +449,9 @@ Item {
         anchors {
             right: thumbSource.right
             top: thumbSource.top
-            margins: Kirigami.Units.smallSpacing
+            margins: LingmoUI.Units.smallSpacing
         }
-        active: thumb.closeButtonVisible && (hoverHandler.hovered || Kirigami.Settings.tabletMode || Kirigami.Settings.hasTransientTouchInput) && thumb.window.closeable && !thumb.activeDragHandler.active
+        active: thumb.closeButtonVisible && (hoverHandler.hovered || LingmoUI.Settings.tabletMode || LingmoUI.Settings.hasTransientTouchInput) && thumb.window.closeable && !thumb.activeDragHandler.active
 
         sourceComponent: PC3.Button {
             text: i18ndc("kwin", "@info:tooltip as in: 'close this window'", "Close window")
@@ -460,7 +460,7 @@ Item {
 
             PC3.ToolTip.text: text
             PC3.ToolTip.visible: hovered && display === PC3.AbstractButton.IconOnly
-            PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+            PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
             Accessible.name: text
 
             onClicked: thumb.window.closeWindow();

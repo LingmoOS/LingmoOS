@@ -37,10 +37,10 @@
 
 class KStylePrivate;
 /**
- * Provides integration with KDE Plasma Workspace settings for Qt styles.
+ * Provides integration with KDE Lingmo Workspace settings for Qt styles.
  *
  * Derive your Qt style from KStyle to automatically inherit
- * various settings from the KDE Plasma Workspace, providing a
+ * various settings from the KDE Lingmo Workspace, providing a
  * consistent user experience. For example, this will ensure a
  * consistent single-click or double-click activation setting,
  * and the use of standard themed icons.

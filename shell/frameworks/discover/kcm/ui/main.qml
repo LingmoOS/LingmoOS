@@ -7,7 +7,7 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.3 as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kcmutils
 
 SimpleKCM {
@@ -29,22 +29,22 @@ SimpleKCM {
         }
     }
 
-    implicitWidth: Kirigami.Units.gridUnit * 38
-    implicitHeight: Kirigami.Units.gridUnit * 35
+    implicitWidth: LingmoUI.Units.gridUnit * 38
+    implicitHeight: LingmoUI.Units.gridUnit * 35
 
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         width: parent.width
 
         QQC2.RadioButton {
-            Kirigami.FormData.label: i18n("Update software:")
+            LingmoUI.FormData.label: i18n("Update software:")
             text: i18n("Manually")
 
             QQC2.ButtonGroup.group: autoUpdatesGroup
             checked: !kcm.updatesSettings.useUnattendedUpdates
         }
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.RadioButton {
                 id: automaticallyRadio
@@ -54,7 +54,7 @@ SimpleKCM {
                 checked: kcm.updatesSettings.useUnattendedUpdates
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 toolTipText: xi18nc("@info", "Software updates will be downloaded automatically when they become available. Updates for applications will be installed immediately, while system updates will be installed the next time the computer is restarted.")
             }
         }
@@ -66,7 +66,7 @@ SimpleKCM {
         }
 
         QQC2.ComboBox {
-            Kirigami.FormData.label: kcm.updatesSettings.useUnattendedUpdates ? i18nc("@title:group", "Update frequency:") : i18nc("@title:group", "Notification frequency:")
+            LingmoUI.FormData.label: kcm.updatesSettings.useUnattendedUpdates ? i18nc("@title:group", "Update frequency:") : i18nc("@title:group", "Notification frequency:")
 
             readonly property var updatesFrequencyModel: [
                 i18nc("@item:inlistbox", "Daily"),
@@ -111,13 +111,13 @@ SimpleKCM {
         }
 
         Item {
-            implicitHeight: Kirigami.Units.largeSpacing
+            implicitHeight: LingmoUI.Units.largeSpacing
         }
 
         ColumnLayout {
             spacing: 0
-            Kirigami.FormData.label: i18n("Apply system updates:")
-            Kirigami.FormData.buddyFor: offlineUpdatesOption
+            LingmoUI.FormData.label: i18n("Apply system updates:")
+            LingmoUI.FormData.buddyFor: offlineUpdatesOption
             visible: !kcm.isRpmOstree
             enabled: !kcm.discoverSettings.isUseOfflineUpdatesImmutable
 
@@ -132,7 +132,7 @@ SimpleKCM {
             QQC2.Label {
                 text: i18nc("@label The thing being recommended is to use the 'apply updates when rebooting' setting", "Recommended to maximize system stability")
                 leftPadding: offlineUpdatesOption.indicator.width
-                font: Kirigami.Theme.smallFont
+                font: LingmoUI.Theme.smallFont
             }
 
             QQC2.RadioButton {

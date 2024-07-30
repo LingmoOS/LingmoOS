@@ -273,7 +273,7 @@ void PowerProfilesControl::showPowerProfileOsd(const QString &profile)
     if (isSilent()) {
         return;
     }
-    QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
+    QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
                                                          QStringLiteral("/org/kde/osdService"),
                                                          QStringLiteral("org.kde.osdService"),
                                                          QStringLiteral("powerProfileChanged"));

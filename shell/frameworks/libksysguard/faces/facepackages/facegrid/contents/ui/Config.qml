@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
 import org.kde.ksysguard.sensors as Sensors
@@ -27,12 +27,12 @@ ColumnLayout {
     // So declare this here since we need to use it in multiple places.
     readonly property int pluginIdRole: Qt.UserRole + 1
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         id: form
 
         SpinBox {
             id: columnCountSpin
-            Kirigami.FormData.label: i18n("Number of Columns:")
+            LingmoUI.FormData.label: i18n("Number of Columns:")
             editable: true
             from: 0
             to: 99999
@@ -51,7 +51,7 @@ ColumnLayout {
 
         ComboBox {
             id: faceCombo
-            Kirigami.FormData.label: i18n("Display Style:")
+            LingmoUI.FormData.label: i18n("Display Style:")
 
             model: KItemModels.KSortFilterProxyModel {
                 sourceModel: controller.availableFacesModel

@@ -8,9 +8,9 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: root
 
     title: i18nc("@title", "Advanced Power Settings")
@@ -48,25 +48,25 @@ Kirigami.ScrollablePage {
         chargeStartThresholdSpin.implicitWidth
     )
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         anchors.left: parent.left
         anchors.right: parent.right
 
         Item {
             id: batteryLevelsHeader
-            Kirigami.FormData.label: i18nc("@title:group", "Battery Levels")
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.label: i18nc("@title:group", "Battery Levels")
+            LingmoUI.FormData.isSection: true
             visible: batteryLowSpin.visible || batteryCriticalSpin.visible || batteryCriticalCombo.visible || peripheralBatteryLowSpin.visible
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:spinbox Low battery level percentage for the main power supply battery",
                 "&Low level:"
             )
-            Kirigami.FormData.buddyFor: batteryLowSpin
+            LingmoUI.FormData.buddyFor: batteryLowSpin
             visible: kcm.isPowerSupplyBatteryPresent
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.SpinBox {
                 id: batteryLowSpin
@@ -93,20 +93,20 @@ Kirigami.ScrollablePage {
                 valueFromText: extractPercent
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 id: batteryLowContextualHelp
                 toolTipText: i18nc("@info:whatsthis", "The battery charge will be considered low when it drops to this level. Settings for low battery will be used instead of regular battery settings.")
             }
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:spinbox Critical battery level percentage for the main power supply battery",
                 "Cr&itical level:"
             )
-            Kirigami.FormData.buddyFor: batteryCriticalSpin
+            LingmoUI.FormData.buddyFor: batteryCriticalSpin
             visible: kcm.isPowerSupplyBatteryPresent
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.SpinBox {
                 id: batteryCriticalSpin
@@ -133,23 +133,23 @@ Kirigami.ScrollablePage {
                 valueFromText: extractPercent
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 id: batteryCriticalContextualHelp
                 toolTipText: i18nc("@info:whatsthis", "The battery charge will be considered critical when it drops to this level. After a brief warning, the system will automatically suspend or shut down, according to the configured critical battery level action.")
             }
         }
 
-        Kirigami.InlineMessage {
-            Kirigami.FormData.isSection: true
+        LingmoUI.InlineMessage {
+            LingmoUI.FormData.isSection: true
             visible: batteryCriticalCombo.visible && !batteryCriticalCombo.isConfiguredValueSupported
             Layout.fillWidth: true
-            type: Kirigami.MessageType.Warning
+            type: LingmoUI.MessageType.Warning
             text: i18nc("@info:status", "The action you had previously configured for reaching the critical battery level is now unsupported on your system. Please select a different one.")
         }
 
         ComboBoxWithIcon {
             id: batteryCriticalCombo
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:combobox Power action such as sleep/hibernate that will be executed when the critical battery level is reached",
                 "A&t critical level:"
             )
@@ -176,13 +176,13 @@ Kirigami.ScrollablePage {
         }
 
         RowLayout {
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:spinbox Low battery level percentage for peripheral devices",
                 "Low level for peripheral d&evices:"
             )
-            Kirigami.FormData.buddyFor: peripheralBatteryLowSpin
+            LingmoUI.FormData.buddyFor: peripheralBatteryLowSpin
             visible: kcm.isPeripheralBatteryPresent
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.SpinBox {
                 id: peripheralBatteryLowSpin
@@ -209,7 +209,7 @@ Kirigami.ScrollablePage {
                 valueFromText: extractPercent
             }
 
-            Kirigami.ContextualHelpButton {
+            LingmoUI.ContextualHelpButton {
                 id: peripheralBatteryLowContextualHelp
                 toolTipText: i18nc("@info:whatsthis", "The battery charge for peripheral devices will be considered low when it reaches this level.")
             }
@@ -219,8 +219,8 @@ Kirigami.ScrollablePage {
 
         Item {
             id: chargeLimitHeader
-            Kirigami.FormData.label: i18nc("@title:group", "Charge Limit")
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.label: i18nc("@title:group", "Charge Limit")
+            LingmoUI.FormData.isSection: true
             visible: chargeStopThresholdSpin.visible || chargeStartThresholdSpin.visible || batteryConservationModeCheck.visible
         }
 
@@ -230,14 +230,14 @@ Kirigami.ScrollablePage {
             checked: externalSettings.batteryConservationMode
             onToggled: externalSettings.batteryConservationMode = checked
 
-            Kirigami.FormData.label: i18nc("@label:checkbox", "&Battery protection:")
+            LingmoUI.FormData.label: i18nc("@label:checkbox", "&Battery protection:")
             text: i18nc("@text:checkbox", "Limit the maximum battery charge")
             Accessible.name: text
         }
 
         QQC2.SpinBox {
             id: chargeStopThresholdSpin
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:spinbox Battery will stop charging when this charge percentage is reached",
                 "&Stop charging at:"
             )
@@ -263,7 +263,7 @@ Kirigami.ScrollablePage {
 
         QQC2.SpinBox {
             id: chargeStartThresholdSpin
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@label:spinbox Battery will start charging again when this charge percentage is reached, after having hit the stop-charging threshold earlier",
                 "Start charging once &below:"
             )
@@ -316,40 +316,40 @@ Kirigami.ScrollablePage {
             valueFromText: extractPercent
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: chargeStopThresholdReconnectMessage
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
             visible: chargeLimitHeader.visible && kcm.chargeStopThresholdMightNeedReconnect
             implicitWidth: batteryThresholdExplanation.implicitWidth
-            type: Kirigami.MessageType.Warning
+            type: LingmoUI.MessageType.Warning
             text: i18nc("@info:status", "You might have to disconnect and re-connect the power source to start charging the battery again.")
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: batteryThresholdExplanation
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
             // iFixit suggests keeping the charge between 40-80%, Battery University lists 25-85% as a decent tradeoff.
             // Show this reminder only when high charge thresholds are configured.
             visible: (chargeLimitHeader.visible && !chargeStopThresholdReconnectMessage.visible && chargeStopThresholdSpin.value > 85)
                   || (batteryConservationModeCheck.visible && !batteryConservationModeCheck.checked)
-            implicitWidth: Kirigami.Units.gridUnit * 16
+            implicitWidth: LingmoUI.Units.gridUnit * 16
             text: i18nc("@info", "Regularly charging the battery close to 100%, or fully discharging it, may accelerate deterioration of battery health. By limiting the maximum battery charge, you can help extend the battery lifespan.")
         }
 
         /////
 
         Item {
-            Kirigami.FormData.label: i18nc(
+            LingmoUI.FormData.label: i18nc(
                 "@title:group Miscellaneous power management settings that didn't fit elsewhere",
                 "Other Settings"
             )
-            Kirigami.FormData.isSection: true
+            LingmoUI.FormData.isSection: true
             // If these are the only settings, they're not "Other Settings" and we don't need a section title
             visible: batteryLevelsHeader.visible || chargeLimitHeader.visible
         }
 
         QQC2.CheckBox {
-            Kirigami.FormData.label: i18nc("@label:checkbox", "&Media playback:")
+            LingmoUI.FormData.label: i18nc("@label:checkbox", "&Media playback:")
             text: i18nc("@text:checkbox", "Pause media players when suspending")
             Accessible.name: text
 
@@ -363,8 +363,8 @@ Kirigami.ScrollablePage {
 
         ColumnLayout {
             id: relatedPagesLayout
-            Kirigami.FormData.label: i18nc("@label:button", "Related pages:")
-            Kirigami.FormData.buddyFor: firstRelatedPage
+            LingmoUI.FormData.label: i18nc("@label:button", "Related pages:")
+            LingmoUI.FormData.buddyFor: firstRelatedPage
             spacing: 0
 
             readonly property real maxPageButtonImplicitWidth: Math.max(

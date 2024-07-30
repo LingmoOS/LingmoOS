@@ -47,7 +47,7 @@ set_package_properties(XSettingsd PROPERTIES
 set_package_properties(Sass PROPERTIES
     DESCRIPTION "SASS compiler"
     URL "https://sass-lang.com/"
-    PURPOSE "Required for building a modification, that allows Breeze GTK to change it's window decorations' appearance"
+    PURPOSE "Required for building a modification, that allows Ocean GTK to change it's window decorations' appearance"
 )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake kded/config.h)

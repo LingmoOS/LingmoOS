@@ -14,14 +14,14 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
 import org.kde.bluezqt as BluezQt
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrolsaddons as KQuickControlsAddons
 import org.kde.ksvg as KSvg
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.private.bluetooth as PlasmaBt
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmo.private.bluetooth as LingmoBt
 
-PlasmaExtras.ExpandableListItem {
+LingmoExtras.ExpandableListItem {
     id: root
 
     required property int index
@@ -61,7 +61,7 @@ PlasmaExtras.ExpandableListItem {
             text: i18n("Send File")
 
             onTriggered: source => {
-                PlasmaBt.LaunchApp.launchSendFile(root.model.Ubi);
+                LingmoBt.LaunchApp.launchSendFile(root.model.Ubi);
             }
         }
     ]
@@ -76,15 +76,15 @@ PlasmaExtras.ExpandableListItem {
             MediaPlayerItem {
                 id: mediaPlayerItem
                 mediaPlayer: root.model.MediaPlayer
-                Layout.leftMargin: Kirigami.Units.gridUnit + Kirigami.Units.smallSpacing * 3
-                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                Layout.leftMargin: LingmoUI.Units.gridUnit + LingmoUI.Units.smallSpacing * 3
+                Layout.bottomMargin: LingmoUI.Units.smallSpacing
                 Layout.fillWidth: true
                 visible: mediaPlayer !== null
             }
 
             KSvg.SvgItem {
                 Layout.fillWidth: true
-                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                Layout.bottomMargin: LingmoUI.Units.smallSpacing
                 imagePath: "widgets/line"
                 elementId: "horizontal-line"
                 visible: mediaPlayerItem.visible
@@ -95,7 +95,7 @@ PlasmaExtras.ExpandableListItem {
                 id: clipboard
             }
 
-            PlasmaExtras.Menu {
+            LingmoExtras.Menu {
                 id: contextMenu
                 property string text
 
@@ -105,7 +105,7 @@ PlasmaExtras.ExpandableListItem {
                     open(x, y);
                 }
 
-                PlasmaExtras.MenuItem {
+                LingmoExtras.MenuItem {
                     text: i18n("Copy")
                     icon: "edit-copy-symbolic"
                     enabled: contextMenu.text !== ""
@@ -133,7 +133,7 @@ PlasmaExtras.ExpandableListItem {
                 }
 
                 onPressed: mouse => {
-                    const item = detailsGrid.childAt(mouse.x, mouse.y) as PlasmaComponents3.Label;
+                    const item = detailsGrid.childAt(mouse.x, mouse.y) as LingmoComponents3.Label;
                     if (!item || !item.isContent) {
                         return; // only let users copy the value on the right
                     }
@@ -147,7 +147,7 @@ PlasmaExtras.ExpandableListItem {
                     asynchronous: true
                     z: -1
 
-                    sourceComponent: PlasmaExtras.Highlight {
+                    sourceComponent: LingmoExtras.Highlight {
                         hovered: true
                     }
                 }
@@ -156,14 +156,14 @@ PlasmaExtras.ExpandableListItem {
                     id: detailsGrid
                     width: parent.width
                     columns: 2
-                    rowSpacing: Kirigami.Units.smallSpacing / 4
+                    rowSpacing: LingmoUI.Units.smallSpacing / 4
 
                     Repeater {
                         id: repeater
 
                         model: root.currentDeviceDetails
 
-                        PlasmaComponents3.Label {
+                        LingmoComponents3.Label {
                             id: detailLabel
 
                             required property int index
@@ -175,7 +175,7 @@ PlasmaExtras.ExpandableListItem {
 
                             horizontalAlignment: isContent ? Text.AlignLeft : Text.AlignRight
                             elide: isContent ? Text.ElideRight : Text.ElideNone
-                            font: Kirigami.Theme.smallFont
+                            font: LingmoUI.Theme.smallFont
                             opacity: isContent ? 1 : 0.6
                             text: isContent ? modelData : `${modelData}:`
                             textFormat: isContent ? Text.PlainText : Text.StyledText
@@ -206,7 +206,7 @@ PlasmaExtras.ExpandableListItem {
     }
 
     function adapterName(adapter: BluezQt.Adapter): string {
-        const hci = PlasmaBt.Utils.adapterHciString(adapter.ubi);
+        const hci = LingmoBt.Utils.adapterHciString(adapter.ubi);
         return (hci !== "")
             ? i18nc("@label %1 is human-readable adapter name, %2 is HCI", "%1 (%2)", adapter.name, hci)
             : adapter.name;
@@ -309,6 +309,6 @@ PlasmaExtras.ExpandableListItem {
             ? model.Device.disconnectFromDevice()
             : model.Device.connectToDevice();
 
-        PlasmaBt.SharedDevicesStateProxyModel.registerPendingCallForDeviceUbi(call, model.Ubi);
+        LingmoBt.SharedDevicesStateProxyModel.registerPendingCallForDeviceUbi(call, model.Ubi);
     }
 }

@@ -37,21 +37,21 @@ This document describes two ways to use KApiDox to generate documentation for KD
 
 ### The manual way
 
-With this method, we will be using three directories (kirigami, kapidox and kirigamidocs).
+With this method, we will be using three directories (lingmoui, kapidox and lingmouidocs).
 
-First, clone the desired repository as well as the KApiDox repository. In this example we will use Kirigami:
+First, clone the desired repository as well as the KApiDox repository. In this example we will use LingmoUI:
 
 ```bash
-git clone https://invent.kde.org/frameworks/kirigami.git
+git clone https://invent.kde.org/frameworks/lingmoui.git
 git clone https://invent.kde.org/frameworks/kapidox.git
 ```
 
 You may use the ssh:// version instead if you have a developer account.
 
-You should now have a `kirigami` and a `kapidox` folder. Make a new folder to store the local test HTML documentation, then switch to the kapidox directory:
+You should now have a `lingmoui` and a `kapidox` folder. Make a new folder to store the local test HTML documentation, then switch to the kapidox directory:
 
 ```bash
-mkdir kirigamidocs
+mkdir lingmouidocs
 cd kapidox
 ```
 
@@ -65,11 +65,11 @@ After the script is done, you should have a hidden folder called `.kapidox_venv/
 
 If the shell you are using is bash or zsh, you can run `source .kapidox_venv/bin/activate` to activate the Python virtual venv. If you are using csh or fish, you may use `source .kapidox_venv/bin/activate.csh` or `source .kapidox_venv/bin/activate.fish`, respectively.
 
-After activating the Python venv, your terminal prompt should change to that of a venv. Switch to the folder we created earlier and run kapidox-generate by pointing to the folder containing the target project repository (in this case, Kirigami):
+After activating the Python venv, your terminal prompt should change to that of a venv. Switch to the folder we created earlier and run kapidox-generate by pointing to the folder containing the target project repository (in this case, LingmoUI):
 
 ```bash
-cd ../kirigamidocs
-kapidox-generate ../kirigami
+cd ../lingmouidocs
+kapidox-generate ../lingmoui
 ```
 
 It can take a while. After it is done, for convenience, do not close this venv shell yet.
@@ -78,11 +78,11 @@ You should have an `index.html` file which should be the entrypoint of the new d
 
 After that, you may edit the Doxygen-formatted documentation in *.qml or *.h files using Kate or your favorite editor.
 
-After you're finished editing, you can switch back to the venv in the `kirigamidocs/` folder, check that you are in the correct folder with `pwd`, and run the following to regenerate the locally edited documentation:
+After you're finished editing, you can switch back to the venv in the `lingmouidocs/` folder, check that you are in the correct folder with `pwd`, and run the following to regenerate the locally edited documentation:
 
 ```bash
-pwd # Outputs e.g. ~/kirigamidocs
-rm -rf * && kapidox-generate ../kirigami
+pwd # Outputs e.g. ~/lingmouidocs
+rm -rf * && kapidox-generate ../lingmoui
 ```
 
 Now that you understand how to generate the venv and how to use `kapidox-generate`, you can easily apply this knowledge to projects built using kdesrc-build. Assuming you're using bash:
@@ -90,16 +90,16 @@ Now that you understand how to generate the venv and how to use `kapidox-generat
 ```bash
 kdesrc-build kapidox
 // ...building...
-kdesrc-build kirigami
+kdesrc-build lingmoui
 // ...building...
-mkdir ~/kirigamidocs
+mkdir ~/lingmouidocs
 cd ~/kde/src/kapidox
 bash bootstrap-devenv.sh
 source .kapidox_venv/bin/activate
-cd ~/kirigamidocs
-kapidox-generate ~/kde/src/kirigami
+cd ~/lingmouidocs
+kapidox-generate ~/kde/src/lingmoui
 // ...edit files...
-rm -rf * && kapidox-generate ~/kde/src/kirigami
+rm -rf * && kapidox-generate ~/kde/src/lingmoui
 ```
 
 ### The container way

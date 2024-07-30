@@ -101,7 +101,7 @@ bool SlidingPopupsEffect::supported()
 void SlidingPopupsEffect::reconfigure(ReconfigureFlags flags)
 {
     SlidingPopupsConfig::self()->read();
-    // Keep these durations in sync with the value of Kirigami.Units.longDuration
+    // Keep these durations in sync with the value of LingmoUI.Units.longDuration
     m_slideInDuration = std::chrono::milliseconds(
         static_cast<int>(animationTime(SlidingPopupsConfig::slideInTime() != 0 ? std::chrono::milliseconds(SlidingPopupsConfig::slideInTime()) : 200ms)));
     m_slideOutDuration = std::chrono::milliseconds(

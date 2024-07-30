@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 BasicAbstractCard {
     id: root
@@ -25,13 +25,13 @@ BasicAbstractCard {
 
     content: RowLayout {
         anchors.fill: parent
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             Layout.alignment: Qt.AlignVCenter
-            Layout.margins: Kirigami.Units.largeSpacing
-            implicitWidth: Kirigami.Units.iconSizes.huge
-            implicitHeight: Kirigami.Units.iconSizes.huge
+            Layout.margins: LingmoUI.Units.largeSpacing
+            implicitWidth: LingmoUI.Units.iconSizes.huge
+            implicitHeight: LingmoUI.Units.iconSizes.huge
             source: root.application.icon
             animated: false
         }
@@ -41,10 +41,10 @@ BasicAbstractCard {
             Layout.fillHeight: true
             spacing: 0
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 id: head
                 level: 2
-                type: Kirigami.Heading.Type.Primary
+                type: LingmoUI.Heading.Type.Primary
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignBottom
                 wrapMode: Text.Wrap

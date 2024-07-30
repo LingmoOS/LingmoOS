@@ -9,7 +9,7 @@
 import QtQuick
 import org.kde.qqc2desktopstyle.private as StylePrivate
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.ProgressBar {
     id: controlRoot
@@ -22,8 +22,8 @@ T.ProgressBar {
 
     baselineOffset: background ? background.y + background.baselineOffset : 0
 
-    topInset: Kirigami.Units.largeSpacing
-    bottomInset: Kirigami.Units.largeSpacing
+    topInset: LingmoUI.Units.largeSpacing
+    bottomInset: LingmoUI.Units.largeSpacing
 
     hoverEnabled: false
 

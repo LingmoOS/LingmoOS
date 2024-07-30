@@ -1077,7 +1077,7 @@ Distribution-wide Initiatives
 Binary package hosting: Gentoo shockingly now also provides 
 binary packages, for easier and faster installation! For amd64 and arm64, we’ve got
 a stunning &gt;20 GByte of packages on our mirrors, from LibreOffice 
-to KDE Plasma and from Gnome to Docker.
+to KDE Lingmo and from Gnome to Docker.
 Also, would you think 9-year old x86-64-v3 is still experimental? 
 We have it already 
 on our mirrors! For all other architectures and ABIs, the binary package files used for building the 
@@ -1381,7 +1381,7 @@ active in very diverse corners of Gentoo.</p>
 <b>Binary package hosting</b>: Gentoo shockingly now also <a href="https://www.gentoo.org/news/2023/12/29/Gentoo-binary.html">provides 
 binary packages</a>, for easier and faster installation! For <b>amd64 and arm64</b>, we’ve got
 a stunning &gt;20 GByte of packages on our mirrors, from LibreOffice 
-to KDE Plasma and from Gnome to Docker.
+to KDE Lingmo and from Gnome to Docker.
 Also, would you think 9-year old <b>x86-64-v3</b> is still experimental? 
 <a href="https://distfiles.gentoo.org/releases/amd64/binpackages/17.1/x86-64-v3/">We have it already 
 on our mirrors!</a> For all other architectures and ABIs, the binary package files used for building the 
@@ -1609,7 +1609,7 @@ help us make Gentoo even better!</p>
                 </div>
                 <div class="text-muted" style="height:63px;overflow-y: hidden;">
                   
-                    <p></p>♦IMPORTANT: This blog post is outdated! As direct result of this experiment, we now have official Gentoo binary packages available. See the announcement for more information and further links!&nbsp; The old blog text follows...As an experiment, I've started assembling a simple binary package hosting mechanism for Gentoo. Right now this comes with some serious limitations and should not be used for security or mission critical applications (more on this below). The main purpose of this experiment is to find out how well it works and where we need improvements in Portage's binary package handling.<p></p><p>So what do we have, and how can you use it?</p><ul><li>The server builds an assortment of stable amd64 packages, with the use-flags as present in an unmodified 17.1/desktop/plasma/systemd profile (the only necessary change is USE=bindist).</li><li>The packages can be used on all amd64 profiles that differ from desktop/plasma/systemd only by use-flag settings. This includes 17.1, 17.1/desktop/*, 17.1/no-multilib, 17.1/systemd, but not anything containing selinx, hardened, developer, musl, or a different profile version such as 17.0.<br></li><li>Right now, the package set includes kde-plasma/plasma-meta, kde-apps/kde-apps-meta, app-office/libreoffice, media-gfx/gimp, media-gfx/inkscape, and of course all their dependencies. More will possibly be added.</li><li>CFLAGS are chosen such that the packages will be usable on all amd64 (i.e., x86-64) machines.&nbsp; <br></li></ul><p>To use the packages, I recommend the following steps: First, create a file /etc/portage/binrepos.conf with the following content:</p><p>[binhost]<br>priority = 9999<br>sync-uri = gentoo.osuosl.org/experimental/amd64/binpkg/default/linux/17.1/x86-64/</p><p>You can pick a different mirror according to your preferences (but also see the remarks below). Then, edit /etc/portage/make.conf, and add the following EMERGE_DEFAULT_OPTS (in addition to flags that you might already have there):</p><p>EMERGE_DEFAULT_OPTS="--binpkg-respect-use=y --getbinpkg=y"</p><p>And that's it. Your next update should download the package index and use binary packages whenever the versions and use-flag settings match. Everything else is compiled as usual.</p><p>What is still missing, and what are the limitations and caveats?</p><ul><li>Obviously, the packages are not optimized for your processor.</li><li>Right now, the server only carries packages for the use-flag settings in an unmodified 17.1/desktop/plasma/systemd profile. If you use other settings, you will end up compiling part of your packages (which is not really a probem, you just lose the benefit of the binary download). It is technically possible to provide binary packages for different use-flag settings at the same URL, and eventually it will be implemented if this experiment succeeds.<br></li><li>At the moment, no cryptographic signing of the binary packages is in place yet. This is the main reason why I'm talking about an experiment. Effectively you trust our mirror admins and the https protocol. Package signing and verification is in preparation, and before the binary package hosting "moves into production", it will be enforced.</li></ul>That's it. Enjoy! And don't forget to leave feedback in the comments.<br>
+                    <p></p>♦IMPORTANT: This blog post is outdated! As direct result of this experiment, we now have official Gentoo binary packages available. See the announcement for more information and further links!&nbsp; The old blog text follows...As an experiment, I've started assembling a simple binary package hosting mechanism for Gentoo. Right now this comes with some serious limitations and should not be used for security or mission critical applications (more on this below). The main purpose of this experiment is to find out how well it works and where we need improvements in Portage's binary package handling.<p></p><p>So what do we have, and how can you use it?</p><ul><li>The server builds an assortment of stable amd64 packages, with the use-flags as present in an unmodified 17.1/desktop/lingmo/systemd profile (the only necessary change is USE=bindist).</li><li>The packages can be used on all amd64 profiles that differ from desktop/lingmo/systemd only by use-flag settings. This includes 17.1, 17.1/desktop/*, 17.1/no-multilib, 17.1/systemd, but not anything containing selinx, hardened, developer, musl, or a different profile version such as 17.0.<br></li><li>Right now, the package set includes kde-lingmo/lingmo-meta, kde-apps/kde-apps-meta, app-office/libreoffice, media-gfx/gimp, media-gfx/inkscape, and of course all their dependencies. More will possibly be added.</li><li>CFLAGS are chosen such that the packages will be usable on all amd64 (i.e., x86-64) machines.&nbsp; <br></li></ul><p>To use the packages, I recommend the following steps: First, create a file /etc/portage/binrepos.conf with the following content:</p><p>[binhost]<br>priority = 9999<br>sync-uri = gentoo.osuosl.org/experimental/amd64/binpkg/default/linux/17.1/x86-64/</p><p>You can pick a different mirror according to your preferences (but also see the remarks below). Then, edit /etc/portage/make.conf, and add the following EMERGE_DEFAULT_OPTS (in addition to flags that you might already have there):</p><p>EMERGE_DEFAULT_OPTS="--binpkg-respect-use=y --getbinpkg=y"</p><p>And that's it. Your next update should download the package index and use binary packages whenever the versions and use-flag settings match. Everything else is compiled as usual.</p><p>What is still missing, and what are the limitations and caveats?</p><ul><li>Obviously, the packages are not optimized for your processor.</li><li>Right now, the server only carries packages for the use-flag settings in an unmodified 17.1/desktop/lingmo/systemd profile. If you use other settings, you will end up compiling part of your packages (which is not really a probem, you just lose the benefit of the binary download). It is technically possible to provide binary packages for different use-flag settings at the same URL, and eventually it will be implemented if this experiment succeeds.<br></li><li>At the moment, no cryptographic signing of the binary packages is in place yet. This is the main reason why I'm talking about an experiment. Effectively you trust our mirror admins and the https protocol. Package signing and verification is in preparation, and before the binary package hosting "moves into production", it will be enforced.</li></ul>That's it. Enjoy! And don't forget to leave feedback in the comments.<br>
                   
                 </div>
 
@@ -1669,10 +1669,10 @@ help us make Gentoo even better!</p>
 <b><span style="color: red;">IMPORTANT</span>: This blog post is outdated!</b> As direct result of this experiment, we now have <a href="https://www.gentoo.org/news/2023/12/29/Gentoo-binary.html"><b>official Gentoo binary packages available</b></a>. See <a href="https://www.gentoo.org/news/2023/12/29/Gentoo-binary.html">the announcement</a> for more information and further links!  The old blog text follows...</div><div><hr></div><div>As an experiment, I've started assembling a simple binary package hosting mechanism for Gentoo. Right now this comes with some serious limitations and <b>should not be used for security or mission critical applications</b> (more on this below). The main purpose of this experiment is to find out how well it works and where we need improvements in Portage's binary package handling.<p></p>
 <p>So what do we have, and how can you use it?</p>
 <ul style="text-align: left;">
-<li>The server builds an assortment of stable amd64 packages, with the use-flags as present in an unmodified 17.1/desktop/plasma/systemd profile (the only necessary change is USE=bindist).</li>
-<li>The packages can be used on all amd64 profiles that differ from desktop/plasma/systemd only by use-flag settings. This includes 17.1, 17.1/desktop/*, 17.1/no-multilib, 17.1/systemd, but <b>not</b> anything containing selinx, hardened, developer, musl, or a different profile version such as 17.0.<br>
+<li>The server builds an assortment of stable amd64 packages, with the use-flags as present in an unmodified 17.1/desktop/lingmo/systemd profile (the only necessary change is USE=bindist).</li>
+<li>The packages can be used on all amd64 profiles that differ from desktop/lingmo/systemd only by use-flag settings. This includes 17.1, 17.1/desktop/*, 17.1/no-multilib, 17.1/systemd, but <b>not</b> anything containing selinx, hardened, developer, musl, or a different profile version such as 17.0.<br>
 </li>
-<li>Right now, the package set includes kde-plasma/plasma-meta, kde-apps/kde-apps-meta, app-office/libreoffice, media-gfx/gimp, media-gfx/inkscape, and of course all their dependencies. More will possibly be added.</li>
+<li>Right now, the package set includes kde-lingmo/lingmo-meta, kde-apps/kde-apps-meta, app-office/libreoffice, media-gfx/gimp, media-gfx/inkscape, and of course all their dependencies. More will possibly be added.</li>
 <li>CFLAGS are chosen such that the packages will be usable on all amd64 (i.e., x86-64) machines.  <br>
 </li>
 </ul>
@@ -1684,7 +1684,7 @@ help us make Gentoo even better!</p>
 <p style="text-align: left;">What is still missing, and what are the limitations and caveats?</p>
 <ul style="text-align: left;">
 <li>Obviously, the packages are not optimized for your processor.</li>
-<li>Right now, the server only carries packages for the use-flag settings in an unmodified 17.1/desktop/plasma/systemd profile. If you use other settings, you will end up compiling part of your packages (which is not really a probem, you just lose the benefit of the binary download). It is technically possible to provide binary packages for different use-flag settings at the same URL, and eventually it will be implemented if this experiment succeeds.<br>
+<li>Right now, the server only carries packages for the use-flag settings in an unmodified 17.1/desktop/lingmo/systemd profile. If you use other settings, you will end up compiling part of your packages (which is not really a probem, you just lose the benefit of the binary download). It is technically possible to provide binary packages for different use-flag settings at the same URL, and eventually it will be implemented if this experiment succeeds.<br>
 </li>
 <li>At the moment, <b>no cryptographic signing of the binary packages is in place yet</b>. This is the main reason why I'm talking about an experiment. Effectively you trust our mirror admins and the https protocol. Package signing and verification is in preparation, and before the binary package hosting "moves into production", it will be enforced.</li>
 </ul>
@@ -1740,7 +1740,7 @@ packages, and that source- and binary-based package installations can be freely 
 <p>To speed up working with slow hardware and for overall convenience, we’re now also offering
 binary packages for download and direct installation! For most architectures, this is
 limited to the core system and weekly updates - not so for amd64 and arm64 however. There we’ve got a 
-stunning &gt;20 GByte of packages on our mirrors, from LibreOffice to KDE Plasma and from Gnome to Docker.
+stunning &gt;20 GByte of packages on our mirrors, from LibreOffice to KDE Lingmo and from Gnome to Docker.
 Gentoo stable, updated daily. Enjoy! And read 
 on for more details!</p>
 
@@ -1774,7 +1774,7 @@ What compile settings, use flags, … do the ‘‘normal’’ amd64 packages u
 <code>CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe"</code> and will work with any amd64 / x86-64 machine.</p>
 
 <p>The available useflag settings and versions correspond to the stable packages
-of the <code>amd64/17.1/nomultilib</code> (i.e., openrc), <code>amd64/17.1/desktop/plasma/systemd</code>,
+of the <code>amd64/17.1/nomultilib</code> (i.e., openrc), <code>amd64/17.1/desktop/lingmo/systemd</code>,
 and <code>amd64/17.1/desktop/gnome/systemd</code> profiles. This should provide fairly large
 coverage.</p>
 
@@ -1784,7 +1784,7 @@ What compile settings, use flags, … do the ‘‘normal’’ arm64 packages u
 <code>CFLAGS="-O2 -pipe"</code> and will work with any arm64 / AArch64 machine.</p>
 
 <p>The available useflag settings and versions correspond to the stable packages
-of the <code>arm64/17.0</code> (i.e., openrc), <code>arm64/17.0/desktop/plasma/systemd</code>,
+of the <code>arm64/17.0</code> (i.e., openrc), <code>arm64/17.0/desktop/lingmo/systemd</code>,
 and <code>arm64/17.0/desktop/gnome/systemd</code> profiles.</p>
 
 But hey, that’s not optimized for my CPU!
@@ -1956,7 +1956,7 @@ packages, and that source- and binary-based package installations can be freely 
 <p>To speed up working with slow hardware and for overall convenience, we’re now also offering
 <strong>binary packages for download and direct installation</strong>! For most architectures, this is
 limited to the core system and weekly updates - not so for <strong>amd64 and arm64</strong> however. There we’ve got a 
-stunning <strong>&gt;20 GByte of packages</strong> on our mirrors, from LibreOffice to KDE Plasma and from Gnome to Docker.
+stunning <strong>&gt;20 GByte of packages</strong> on our mirrors, from LibreOffice to KDE Lingmo and from Gnome to Docker.
 Gentoo stable, updated daily. Enjoy! And <a href="https://www.gentoo.org/news/2023/12/29/Gentoo-binary.html">read 
 on for more details!</a></p>
 
@@ -1990,7 +1990,7 @@ setting in there with an URI pointing to the corresponding directory on a
 <code class="language-plaintext highlighter-rouge">CFLAGS="-march=x86-64 -mtune=generic -O2 -pipe"</code> and will work with any amd64 / x86-64 machine.</p>
 
 <p>The available useflag settings and versions correspond to the stable packages
-of the <code class="language-plaintext highlighter-rouge">amd64/17.1/nomultilib</code> (i.e., openrc), <code class="language-plaintext highlighter-rouge">amd64/17.1/desktop/plasma/systemd</code>,
+of the <code class="language-plaintext highlighter-rouge">amd64/17.1/nomultilib</code> (i.e., openrc), <code class="language-plaintext highlighter-rouge">amd64/17.1/desktop/lingmo/systemd</code>,
 and <code class="language-plaintext highlighter-rouge">amd64/17.1/desktop/gnome/systemd</code> profiles. This should provide fairly large
 coverage.</p>
 
@@ -2000,7 +2000,7 @@ coverage.</p>
 <code class="language-plaintext highlighter-rouge">CFLAGS="-O2 -pipe"</code> and will work with any arm64 / AArch64 machine.</p>
 
 <p>The available useflag settings and versions correspond to the stable packages
-of the <code class="language-plaintext highlighter-rouge">arm64/17.0</code> (i.e., openrc), <code class="language-plaintext highlighter-rouge">arm64/17.0/desktop/plasma/systemd</code>,
+of the <code class="language-plaintext highlighter-rouge">arm64/17.0</code> (i.e., openrc), <code class="language-plaintext highlighter-rouge">arm64/17.0/desktop/lingmo/systemd</code>,
 and <code class="language-plaintext highlighter-rouge">arm64/17.0/desktop/gnome/systemd</code> profiles.</p>
 
 <h3 id="but-hey-thats-not-optimized-for-my-cpu">But hey, that’s not optimized for my CPU!</h3>

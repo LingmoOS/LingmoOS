@@ -159,7 +159,7 @@ void GlobalShortcutsRegistry::migrateKHotkeys()
 }
 
 /*
- * Migrate the Plasma 5 config for service actions to a new format that only stores the actual shortcut if not default.
+ * Migrate the Lingmo 5 config for service actions to a new format that only stores the actual shortcut if not default.
  * All other information is read from the desktop file.
  */
 void GlobalShortcutsRegistry::migrateConfig()

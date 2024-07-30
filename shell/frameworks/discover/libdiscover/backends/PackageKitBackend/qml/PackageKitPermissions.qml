@@ -7,8 +7,8 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
 ColumnLayout {
     id: root
@@ -16,13 +16,13 @@ ColumnLayout {
     required property Discover.AbstractResource resource
     Discover.Activatable.active: true
 
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         Layout.fillWidth: true
         text: i18ndc("libdiscover", "%1 is the name of the application", "Permissions for %1", root.resource.name)
         level: 2
-        type: Kirigami.Heading.Type.Primary
+        type: LingmoUI.Heading.Type.Primary
         wrapMode: Text.Wrap
     }
 

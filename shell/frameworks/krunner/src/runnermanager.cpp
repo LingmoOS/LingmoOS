@@ -180,7 +180,7 @@ public:
 
         AbstractRunner *runner = nullptr;
 
-        const QString api = pluginMetaData.value(QStringLiteral("X-Plasma-API"));
+        const QString api = pluginMetaData.value(QStringLiteral("X-Lingmo-API"));
         const bool isCppPlugin = api.isEmpty();
 
         if (isCppPlugin) {
@@ -193,7 +193,7 @@ public:
         } else if (api.startsWith(QLatin1String("DBus"))) {
             runner = new DBusRunner(q, pluginMetaData);
         } else {
-            qCWarning(KRUNNER) << "Unknown X-Plasma-API requested for runner" << pluginMetaData.fileName();
+            qCWarning(KRUNNER) << "Unknown X-Lingmo-API requested for runner" << pluginMetaData.fileName();
             return nullptr;
         }
 
@@ -389,7 +389,7 @@ RunnerManager::RunnerManager(QObject *parent)
     auto defaultStatePtr = KSharedConfig::openConfig(QStringLiteral("krunnerstaterc"), KConfig::NoGlobals, QStandardPaths::GenericDataLocation);
     auto configPtr = KSharedConfig::openConfig(QStringLiteral("krunnerrc"), KConfig::NoGlobals);
     d = std::make_unique<RunnerManagerPrivate>(configPtr->group(QStringLiteral("Plugins")),
-                                               defaultStatePtr->group(QStringLiteral("PlasmaRunnerManager")),
+                                               defaultStatePtr->group(QStringLiteral("LingmoRunnerManager")),
                                                this);
 }
 

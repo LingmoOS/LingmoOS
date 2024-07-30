@@ -5,8 +5,8 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef PLASMA_SHAREDQMLENGINE_H
-#define PLASMA_SHAREDQMLENGINE_H
+#ifndef LINGMO_SHAREDQMLENGINE_H
+#define LINGMO_SHAREDQMLENGINE_H
 
 #include <QObject>
 #include <QQmlComponent>
@@ -21,11 +21,11 @@ class SharedQmlEnginePrivate;
 
 
 /**
- * @class Plasma::SharedQmlEngine Plasma/sharedqmlengine.h Plasma/SharedQmlEngine
+ * @class Lingmo::SharedQmlEngine Lingmo/sharedqmlengine.h Lingmo/SharedQmlEngine
  *
  * @short An object that instantiates an entire QML context, with its own declarative engine
  *
- * Plasma::SharedQmlEngine provides a class to conveniently use QML based
+ * Lingmo::SharedQmlEngine provides a class to conveniently use QML based
  * declarative user interfaces.
  * A SharedQmlEngine corresponds to one QML file (which can include others).
  * It will a shared QQmlEngine with a single root object, described in the QML file.
@@ -41,7 +41,7 @@ class SharedQmlEngine : public QObject
 
 public:
     /**
-     * Construct a new Plasma::SharedQmlEngine
+     * Construct a new Lingmo::SharedQmlEngine
      *
      * @param parent The QObject parent for this object.
      */

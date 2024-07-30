@@ -113,7 +113,7 @@ void DiscoverNotifier::showDiscover(const QString &xdgActivationToken)
 
 void DiscoverNotifier::showDiscoverUpdates(const QString &xdgActivationToken)
 {
-    auto *job = new KIO::CommandLauncherJob(QStringLiteral("plasma-discover"), {QStringLiteral("--mode"), QStringLiteral("update")});
+    auto *job = new KIO::CommandLauncherJob(QStringLiteral("lingmo-discover"), {QStringLiteral("--mode"), QStringLiteral("update")});
     job->setUiDelegate(new KNotificationJobUiDelegate(KJobUiDelegate::AutoErrorHandlingEnabled));
     job->setDesktopName(QStringLiteral("org.kde.discover"));
     job->setStartupId(xdgActivationToken.toUtf8());
@@ -136,7 +136,7 @@ bool DiscoverNotifier::notifyAboutUpdates() const
     }
 
     // To configure to a random value, execute:
-    // kwriteconfig5 --file PlasmaDiscoverUpdates --group Global --key RequiredNotificationInterval 3600
+    // kwriteconfig5 --file LingmoDiscoverUpdates --group Global --key RequiredNotificationInterval 3600
     const QDateTime earliestNextNotificationTime = m_settings->lastNotificationTime().addSecs(m_settings->requiredNotificationInterval());
     if (earliestNextNotificationTime.isValid() && earliestNextNotificationTime > QDateTime::currentDateTimeUtc()) {
         return false;

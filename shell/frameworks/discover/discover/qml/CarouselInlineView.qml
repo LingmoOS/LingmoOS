@@ -11,7 +11,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import QtQuick.Templates as T
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Control {
     id: root
@@ -68,10 +68,10 @@ T.Control {
             preferredHighlightBegin: currentItem ? Math.round((width - currentItem.width) / 2) : 0
             preferredHighlightEnd: currentItem ? preferredHighlightBegin + currentItem.width : 0
 
-            highlightMoveDuration: Kirigami.Units.longDuration
-            highlightResizeDuration: Kirigami.Units.longDuration
+            highlightMoveDuration: LingmoUI.Units.longDuration
+            highlightResizeDuration: LingmoUI.Units.longDuration
 
-            spacing: Kirigami.Units.gridUnit
+            spacing: LingmoUI.Units.gridUnit
             cacheBuffer: 10000
 
             currentIndex: root.currentIndex
@@ -105,7 +105,7 @@ T.Control {
             CarouselNavigationButtonsListViewAdapter {
                 LayoutMirroring.enabled: root.LayoutMirroring.enabled
 
-                Kirigami.Theme.colorSet: Kirigami.Theme.Button
+                LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
 
                 view: view
                 edgeMargin: root.edgeMargin
@@ -116,7 +116,7 @@ T.Control {
             id: pageIndicator
 
             Layout.fillWidth: true
-            topPadding: Kirigami.Units.largeSpacing * 3
+            topPadding: LingmoUI.Units.largeSpacing * 3
 
             focusPolicy: Qt.NoFocus
             interactive: true

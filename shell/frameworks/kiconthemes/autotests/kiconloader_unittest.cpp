@@ -39,12 +39,12 @@ private Q_SLOTS:
     {
         QStandardPaths::setTestModeEnabled(true);
 
-        // ensure we don't use the breeze icon set from our lib for these tests but the fake we set up below
-        KIconTheme::forceThemeForTests(QStringLiteral("fakebreeze"));
+        // ensure we don't use the ocean icon set from our lib for these tests but the fake we set up below
+        KIconTheme::forceThemeForTests(QStringLiteral("fakeocean"));
 
-        // we use an own fakebreeze that fallbacks to fakeoxygen
+        // we use an own fakeocean that fallbacks to fakeoxygen
         KConfigGroup cg(KSharedConfig::openConfig(), "Icons");
-        cg.writeEntry("Theme", "fakebreeze");
+        cg.writeEntry("Theme", "fakeocean");
         cg.sync();
 
         testDataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
@@ -83,53 +83,53 @@ private Q_SLOTS:
         QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeoxygen/22x22/mimetypes/unknown.png"))));
         QVERIFY(QFile::copy(QStringLiteral(":/test-32x32.png"), testIconsDir.filePath(QStringLiteral("fakeoxygen/32x32/apps/kde.png"))));
 
-        // set up a minimal fake Breeze icon theme, fallback to oxygen
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/actions")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/animations")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/apps")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/mimetypes")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/appsNoContext")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/appsNoType")));
-        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakebreeze/22x22/appsNoContextOrType")));
+        // set up a minimal fake Ocean icon theme, fallback to oxygen
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/actions")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/animations")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/apps")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/mimetypes")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/appsNoContext")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/appsNoType")));
+        QVERIFY(testIconsDir.mkpath(QStringLiteral("fakeocean/22x22/appsNoContextOrType")));
 
-        const QString breezeThemeFile = testIconsDir.filePath(QStringLiteral("fakebreeze/index.theme"));
-        QVERIFY(QFile::copy(QStringLiteral(":/breeze.theme"), breezeThemeFile));
+        const QString oceanThemeFile = testIconsDir.filePath(QStringLiteral("fakeocean/index.theme"));
+        QVERIFY(QFile::copy(QStringLiteral(":/ocean.theme"), oceanThemeFile));
         // kde.png is missing, it should fallback to oxygen
-        // QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/apps/kde.png"))));
+        // QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/apps/kde.png"))));
         QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"),
-                            testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/appsNoContext/iconindirectorywithoutcontext.png"))));
+                            testIconsDir.filePath(QStringLiteral("fakeocean/22x22/appsNoContext/iconindirectorywithoutcontext.png"))));
         QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"),
-                            testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/appsNoType/iconindirectorywithouttype.png"))));
+                            testIconsDir.filePath(QStringLiteral("fakeocean/22x22/appsNoType/iconindirectorywithouttype.png"))));
         QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"),
-                            testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/appsNoContextOrType/iconindirectorywithoutcontextortype.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/anim-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/animations/process-working.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/text-plain.png"))));
+                            testIconsDir.filePath(QStringLiteral("fakeocean/22x22/appsNoContextOrType/iconindirectorywithoutcontextortype.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/anim-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/animations/process-working.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/text-plain.png"))));
         QVERIFY(
-            QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/application-octet-stream.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/image-x-generic.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/video-x-generic.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/x-office-document.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/audio-x-generic.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/mimetypes/unknown.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/coloredsvgicon.svg"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/apps/coloredsvgicon.svg"))));
+            QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/application-octet-stream.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/image-x-generic.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/video-x-generic.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/x-office-document.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/audio-x-generic.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/mimetypes/unknown.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/coloredsvgicon.svg"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/apps/coloredsvgicon.svg"))));
 
         // prepare some icons for our actions test
-        // when querying breeze for 'one-two', we expect
-        // 'one' from breeze instead of oxygen's 'one-two'.
+        // when querying ocean for 'one-two', we expect
+        // 'one' from ocean instead of oxygen's 'one-two'.
         QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeoxygen/22x22/actions/one-two.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/actions/one.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/actions/one.png"))));
 
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/actions/one-symbolic.png"))));
-        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakebreeze/22x22/actions/three.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/actions/one-symbolic.png"))));
+        QVERIFY(QFile::copy(QStringLiteral(":/test-22x22.png"), testIconsDir.filePath(QStringLiteral("fakeocean/22x22/actions/three.png"))));
 
-        QVERIFY(QFile::setPermissions(breezeThemeFile, QFileDevice::ReadOwner | QFileDevice::WriteOwner));
-        KConfig configFile(breezeThemeFile);
+        QVERIFY(QFile::setPermissions(oceanThemeFile, QFileDevice::ReadOwner | QFileDevice::WriteOwner));
+        KConfig configFile(oceanThemeFile);
         KConfigGroup iconThemeGroup = configFile.group("Icon Theme");
         QVERIFY(iconThemeGroup.isValid());
         QStringList dirs = iconThemeGroup.readEntry("Directories", QStringList());
         for (int i : testSizes) {
             const QString relDir = QStringLiteral("%1x%1/emblems").arg(i);
-            const QString dir = testIconsDir.filePath(QStringLiteral("fakebreeze/") + relDir);
+            const QString dir = testIconsDir.filePath(QStringLiteral("fakeocean/") + relDir);
             QVERIFY(QDir().mkpath(dir));
 
             QPixmap img(i, i);
@@ -351,14 +351,14 @@ private Q_SLOTS:
             oxygen:
                 one-two
 
-            breeze:
+            ocean:
                 one
         */
-        // and we ask for 'one-two', we expect to see 'one' from breeze instead
+        // and we ask for 'one-two', we expect to see 'one' from ocean instead
         // of 'one-two' from oxygen.
         QString path;
         KIconLoader::global()->loadIcon(QStringLiteral("one-two"), KIconLoader::Desktop, 24, KIconLoader::DefaultState, QStringList(), &path);
-        QVERIFY(path.contains("fakebreeze/22x22/actions"));
+        QVERIFY(path.contains("fakeocean/22x22/actions"));
     }
 
     void testPathStore()
@@ -539,12 +539,12 @@ private Q_SLOTS:
         // Try to find "one-two-symbolic", but should fall back to "one-symbolic" which exists
         QString path;
         KIconLoader::global()->loadIcon(QStringLiteral("one-two-symbolic"), KIconLoader::Desktop, 24, KIconLoader::DefaultState, QStringList(), &path);
-        QVERIFY(path.contains("fakebreeze/22x22/actions"));
+        QVERIFY(path.contains("fakeocean/22x22/actions"));
         QVERIFY(path.contains("-symbolic"));
 
         // Try to find the non-existent "three-four-symbolic" but only "three" exists. It should fall back to the non-symbolic
         KIconLoader::global()->loadIcon(QStringLiteral("three-four-symbolic"), KIconLoader::Desktop, 24, KIconLoader::DefaultState, QStringList(), &path);
-        QVERIFY(path.contains("fakebreeze/22x22/actions"));
+        QVERIFY(path.contains("fakeocean/22x22/actions"));
         QVERIFY(!path.contains("-symbolic"));
     }
 };

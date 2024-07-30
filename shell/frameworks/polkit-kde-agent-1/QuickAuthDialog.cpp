@@ -48,10 +48,10 @@ QuickAuthDialog::QuickAuthDialog(const QString &actionId,
     engine->rootContext()->setContextObject(new KLocalizedContext(engine));
 
     if (KRuntimePlatform::runtimePlatform().contains("phone")) {
-        // If this is Plasma Mobile
+        // If this is Lingmo Mobile
         engine->load("qrc:/qml/MobileQuickAuthDialog.qml");
     } else {
-        // If this is Plasma Desktop, or other platforms
+        // If this is Lingmo Desktop, or other platforms
         engine->load("qrc:/qml/QuickAuthDialog.qml");
     }
 
@@ -69,7 +69,7 @@ QuickAuthDialog::QuickAuthDialog(const QString &actionId,
     connect(m_theDialog, SIGNAL(reject()), this, SIGNAL(rejected()));
 }
 
-enum KirigamiInlineMessageTypes { Information = 0, Positive = 1, Warning = 2, Error = 3 };
+enum LingmoUIInlineMessageTypes { Information = 0, Positive = 1, Warning = 2, Error = 3 };
 
 QString QuickAuthDialog::actionId() const
 {

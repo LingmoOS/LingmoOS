@@ -147,16 +147,16 @@ void WacomTabletEngine::setProfile(const QString &tabletId, const QString &profi
     setData(sourceName, QLatin1String("currentProfile"), item);
 }
 
-Plasma::Service *WacomTabletEngine::serviceForSource(const QString &source)
+Lingmo::Service *WacomTabletEngine::serviceForSource(const QString &source)
 {
     if (source == m_source) {
         return new WacomTabletService(source, this);
     }
 
-    return Plasma::DataEngine::serviceForSource(source);
+    return Lingmo::DataEngine::serviceForSource(source);
 }
 
-K_PLUGIN_CLASS_WITH_JSON(WacomTabletEngine, "plasma-dataengine-wacomtablet.json")
+K_PLUGIN_CLASS_WITH_JSON(WacomTabletEngine, "lingmo-dataengine-wacomtablet.json")
 
 #include "wacomtabletengine.moc"
 

@@ -27,7 +27,7 @@
 // KDE
 #include <KLocalizedString>
 #include <KPluginFactory>
-#include <Kirigami/Platform/TabletModeWatcher>
+#include <LingmoUI/Platform/TabletModeWatcher>
 #include <Solid/Battery>
 #include <Solid/Device>
 
@@ -52,7 +52,7 @@ namespace PowerDevil
 
 PowerConfigData::PowerConfigData(QObject *parent, const KPluginMetaData &metaData)
     : PowerConfigData(parent,
-                      Kirigami::Platform::TabletModeWatcher::self()->isTabletMode() /*isMobile*/,
+                      LingmoUI::Platform::TabletModeWatcher::self()->isTabletMode() /*isMobile*/,
                       PowerDevil::PowerManagement::instance()->isVirtualMachine() /*isVM*/,
                       PowerDevil::PowerManagement::instance()->canSuspend(),
                       PowerDevil::PowerManagement::instance()->canHibernate())

@@ -14,7 +14,7 @@
 #include <QLoggingCategory>
 #include <memory>
 
-Q_LOGGING_CATEGORY(NIGHTLIGHT_CONTROL, "org.kde.plasma.nightlightcontrol")
+Q_LOGGING_CATEGORY(NIGHTLIGHT_CONTROL, "org.kde.lingmo.nightlightcontrol")
 
 static const QString s_serviceName = QStringLiteral("org.kde.KWin.NightLight");
 static const QString s_path = QStringLiteral("/org/kde/KWin/NightLight");

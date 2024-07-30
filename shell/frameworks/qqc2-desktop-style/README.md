@@ -8,9 +8,9 @@ This framework has no public API, applications should not (and cannot) use it di
 
 The name of the style is `org.kde.desktop`. 
 
-On Plasma, this style is picked up automatically without the need to set an environment variable as long as both [Breeze](https://invent.kde.org/plasma/breeze) and [Plasma Integration](https://invent.kde.org/plasma/plasma-integration) are installed.
+On Lingmo, this style is picked up automatically without the need to set an environment variable as long as both [Ocean](https://invent.kde.org/lingmo/ocean) and [Lingmo Integration](https://invent.kde.org/lingmo/lingmo-integration) are installed.
 
-To support non-Plasma environments like Windows or GNOME, applications will need to define this style in code like [any other QQC style](https://doc.qt.io/qt-6/qtquickcontrols2-styles.html#using-styles-in-qt-quick-controls), e.g.:
+To support non-Lingmo environments like Windows or GNOME, applications will need to define this style in code like [any other QQC style](https://doc.qt.io/qt-6/qtquickcontrols2-styles.html#using-styles-in-qt-quick-controls), e.g.:
 
 ```c++
 #include <QQuickStyle>
@@ -36,8 +36,8 @@ If the application supports Android, check if  `Q_OS_ANDROID` is defined first:
 ```c++
 #ifdef Q_OS_ANDROID
     QGuiApplication app(argc, argv);
-    // Set your preferred Android QQC style here, in this case QQC2 Breeze Style
-    QQuickStyle::setStyle(QStringLiteral("org.kde.breeze"));
+    // Set your preferred Android QQC style here, in this case QQC2 Ocean Style
+    QQuickStyle::setStyle(QStringLiteral("org.kde.ocean"));
 #else
     QApplication app(argc, argv);
     if (qEnvironmentVariableIsEmpty("QT_QUICK_CONTROLS_STYLE")) {
@@ -46,11 +46,11 @@ If the application supports Android, check if  `Q_OS_ANDROID` is defined first:
 #endif
 ```
 
-## Differences from QQC2 Breeze Style
+## Differences from QQC2 Ocean Style
 
-QQC2 Desktop Style should be used in desktop applications thanks to its native QStyling, making it look and feel like a QtWidgets application. However it has a noticeable performance impact on mobile systems like Plasma Mobile and Android. It's also desirable to avoid using QtWidgets on those platforms too. 
+QQC2 Desktop Style should be used in desktop applications thanks to its native QStyling, making it look and feel like a QtWidgets application. However it has a noticeable performance impact on mobile systems like Lingmo Mobile and Android. It's also desirable to avoid using QtWidgets on those platforms too. 
 
-It's recommended to use [QQC2 Breeze Style](https://invent.kde.org/plasma/qqc2-breeze-style) as shown above for those platforms. It replicates the Breeze visual design without depending on QStyle. 
+It's recommended to use [QQC2 Ocean Style](https://invent.kde.org/lingmo/qqc2-ocean-style) as shown above for those platforms. It replicates the Ocean visual design without depending on QStyle. 
 
 ## Building
 

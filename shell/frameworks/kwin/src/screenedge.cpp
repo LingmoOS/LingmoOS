@@ -443,17 +443,17 @@ bool Edge::handleAction(ElectricBorderAction action)
     }
     case ElectricActionActivityManager: { // open activity manager
         QDBusConnection::sessionBus().asyncCall(
-            QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
-                                           QStringLiteral("/PlasmaShell"),
-                                           QStringLiteral("org.kde.PlasmaShell"),
+            QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
+                                           QStringLiteral("/LingmoShell"),
+                                           QStringLiteral("org.kde.LingmoShell"),
                                            QStringLiteral("toggleActivityManager")));
         return true;
     }
     case ElectricActionApplicationLauncher: {
         QDBusConnection::sessionBus().asyncCall(
-            QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
-                                           QStringLiteral("/PlasmaShell"),
-                                           QStringLiteral("org.kde.PlasmaShell"),
+            QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
+                                           QStringLiteral("/LingmoShell"),
+                                           QStringLiteral("org.kde.LingmoShell"),
                                            QStringLiteral("activateLauncherMenu")));
         return true;
     }

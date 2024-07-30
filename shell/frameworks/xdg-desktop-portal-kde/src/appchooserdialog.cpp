@@ -123,7 +123,7 @@ void AppChooserDialog::onApplicationSelected(const QString &desktopFile, const b
 {
     m_selectedApplication = desktopFile;
 
-    // When used by the private interface for plasma-integration autoremember is off and plasma-integration takes
+    // When used by the private interface for lingmo-integration autoremember is off and lingmo-integration takes
     // care of remembering.
     if (m_autoRemember && remember && !m_appChooserData->mimeName().isEmpty()) {
         KService::Ptr serv = KService::serviceByDesktopName(desktopFile);
@@ -141,7 +141,7 @@ void AppChooserDialog::onOpenDiscover()
     if (!m_appChooserData->mimeName().isEmpty()) {
         args << QStringLiteral("--mime") << m_appChooserData->mimeName();
     }
-    KProcess::startDetached(QStringLiteral("plasma-discover"), args);
+    KProcess::startDetached(QStringLiteral("lingmo-discover"), args);
 }
 
 void AppChooserDialog::updateChoices(const QStringList &choices)

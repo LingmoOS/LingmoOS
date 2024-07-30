@@ -20,7 +20,7 @@ namespace KWayland
 {
 namespace Client
 {
-class PlasmaWindow;
+class LingmoWindow;
 }
 }
 

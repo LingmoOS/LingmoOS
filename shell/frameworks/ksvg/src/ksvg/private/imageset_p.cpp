@@ -149,7 +149,7 @@ bool ImageSetPrivate::useCache()
         if (cacheSize == 0) {
             cacheSize = DEFAULT_CACHE_SIZE;
         }
-        QString cacheFile = QLatin1String("plasma_theme_") + imageSetName;
+        QString cacheFile = QLatin1String("lingmo_theme_") + imageSetName;
 
         // clear any cached values from the previous theme cache
         themeVersion.clear();
@@ -736,9 +736,9 @@ void ImageSetPrivate::setImageSetName(const QString &tempImageSetName, bool emit
         fallbackImageSets.append(QLatin1String(ImageSetPrivate::defaultImageSet));
     }
 
-    // Check for what Plasma version the theme has been done
-    // There are some behavioral differences between KDE4 Plasma and Plasma 5
-    const QString apiVersion = pluginMetaData.value(QStringLiteral("X-Plasma-API"));
+    // Check for what Lingmo version the theme has been done
+    // There are some behavioral differences between KDE4 Lingmo and Lingmo 5
+    const QString apiVersion = pluginMetaData.value(QStringLiteral("X-Lingmo-API"));
     apiMajor = 1;
     apiMinor = 0;
     apiRevision = 0;

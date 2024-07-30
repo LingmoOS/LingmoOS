@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Rectangle {
     id: background
@@ -20,15 +20,15 @@ Rectangle {
     readonly property bool useAlternatingColors: {
         if (control.TableView.view?.alternatingRows && row % 2) {
             return true
-        } else if (control.Kirigami.Theme.useAlternateBackgroundColor && index % 2) {
+        } else if (control.LingmoUI.Theme.useAlternateBackgroundColor && index % 2) {
             return true
         }
         return false
     }
 
-    readonly property color hoverColor: Qt.alpha(Kirigami.Theme.hoverColor, 0.3)
-    readonly property color highlightColor: Kirigami.Theme.highlightColor
-    readonly property color normalColor: useAlternatingColors ? Kirigami.Theme.alternateBackgroundColor : "transparent"
+    readonly property color hoverColor: Qt.alpha(LingmoUI.Theme.hoverColor, 0.3)
+    readonly property color highlightColor: LingmoUI.Theme.highlightColor
+    readonly property color normalColor: useAlternatingColors ? LingmoUI.Theme.alternateBackgroundColor : "transparent"
     // Workaround for QTBUG-113304
     readonly property bool reallyFocus: control.visualFocus || (control.activeFocus && control.focusReason === Qt.OtherFocusReason)
 
@@ -45,7 +45,7 @@ Rectangle {
             bottomMargin: background.control.bottomInset
         }
 
-        radius: background.hasInset ? Kirigami.Units.cornerRadius : 0
+        radius: background.hasInset ? LingmoUI.Units.cornerRadius : 0
 
         color: {
             if (background.highlight) {
@@ -60,7 +60,7 @@ Rectangle {
             if (background.highlight) {
                 return background.highlightColor
             } else {
-                return (background.control.hovered || background.reallyFocus) ? Kirigami.Theme.hoverColor : "transparent"
+                return (background.control.hovered || background.reallyFocus) ? LingmoUI.Theme.hoverColor : "transparent"
             }
         }
     }

@@ -14,7 +14,7 @@ set(sendfilehelper_SRCS
 ecm_qt_declare_logging_category(sendfilehelper_SRCS
     HEADER bluedevil_sendfile.h
     IDENTIFIER BLUEDEVIL_SENDFILE_LOG
-    CATEGORY_NAME org.kde.plasma.bluedevil.sendfile
+    CATEGORY_NAME org.kde.lingmo.bluedevil.sendfile
     DESCRIPTION "BlueDevil (send file)"
     EXPORT BLUEDEVIL
 )

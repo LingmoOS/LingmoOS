@@ -7,12 +7,12 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.pipewire.monitor as PWMonitor
 import org.kde.pipewire as PipeWire
 import org.kde.pipewire.record as PWR
 
-Kirigami.ApplicationWindow
+LingmoUI.ApplicationWindow
 {
     id: root
     width: 500
@@ -20,7 +20,7 @@ Kirigami.ApplicationWindow
     visible: true
     property QtObject app
 
-    pageStack.initialPage: Kirigami.Page {
+    pageStack.initialPage: LingmoUI.Page {
         ColumnLayout {
             anchors.fill: parent
 

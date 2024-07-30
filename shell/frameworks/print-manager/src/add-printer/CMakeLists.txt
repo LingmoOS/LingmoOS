@@ -61,7 +61,7 @@ target_link_libraries(kde-add-printer
 ecm_qt_declare_logging_category(kde-add-printer
     HEADER kde-add-printer_log.h
     IDENTIFIER PM_ADD_PRINTER
-    CATEGORY_NAME org.kde.plasma.printmanager.kde-add-printer
+    CATEGORY_NAME org.kde.lingmo.printmanager.kde-add-printer
     DESCRIPTION "Print Manager (legacy Add Printer App)"
     EXPORT PMLOGS
 )

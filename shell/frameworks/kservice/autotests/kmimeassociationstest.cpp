@@ -127,8 +127,8 @@ private Q_SLOTS:
     {
         setupXdgDirs();
         QStandardPaths::setTestModeEnabled(true);
-        // The Plasma bit makes no sense, but this is just to test that this is treated as a colon-separated list
-        qputenv("XDG_CURRENT_DESKTOP", "KDE:Plasma");
+        // The Lingmo bit makes no sense, but this is just to test that this is treated as a colon-separated list
+        qputenv("XDG_CURRENT_DESKTOP", "KDE:Lingmo");
 
         m_localConfig = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + QLatin1Char('/');
         QDir(m_localConfig).removeRecursively();

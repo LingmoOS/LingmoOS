@@ -1,0 +1,70 @@
+/*
+    SPDX-FileCopyrightText: 2007-2009 Aaron Seigo <aseigo@kde.org>
+    SPDX-FileCopyrightText: 2013 Sebastian Kügler <sebas@kde.org>
+
+    SPDX-License-Identifier: LGPL-2.0-or-later
+*/
+
+#include <KPackage/PackageLoader>
+#include <KPackage/PackageStructure>
+
+static constexpr QLatin1StringView DEFAULT_LOOKANDFEEL("org.kde.ocean.desktop");
+
+class LookAndFeelPackage : public KPackage::PackageStructure
+{
+    Q_OBJECT
+public:
+    using KPackage::PackageStructure::PackageStructure;
+
+    void initPackage(KPackage::Package *package) override
+    {
+        // https://community.kde.org/Lingmo/lookAndFeelPackage#
+        package->setDefaultPackageRoot(QStringLiteral("lingmo/look-and-feel/"));
+
+        // Defaults
+        package->removeDefinition("mainscript"); // This doesn't make sense, because we don't have one single entrypoint
+        package->addFileDefinition("defaults", QStringLiteral("defaults"));
+        package->addFileDefinition("layoutdefaults", QStringLiteral("layouts/defaults"));
+        package->addDirectoryDefinition("plasmoidsetupscripts", QStringLiteral("plasmoidsetupscripts"));
+        // Colors
+        package->addFileDefinition("colors", QStringLiteral("colors"));
+
+        // Directories
+        package->addDirectoryDefinition("previews", QStringLiteral("previews"));
+        package->addFileDefinition("preview", QStringLiteral("previews/preview.png"));
+        package->addFileDefinition("fullscreenpreview", QStringLiteral("previews/fullscreenpreview.jpg"));
+        package->addFileDefinition("lockscreenpreview", QStringLiteral("previews/lockscreen.png"));
+        package->addFileDefinition("splashpreview", QStringLiteral("previews/splash.png"));
+        package->addFileDefinition("windowswitcherpreview", QStringLiteral("previews/windowswitcher.png"));
+
+        package->addDirectoryDefinition("logout", QStringLiteral("logout"));
+        package->addFileDefinition("logoutmainscript", QStringLiteral("logout/Logout.qml"));
+
+        package->addDirectoryDefinition("splash", QStringLiteral("splash"));
+        package->addFileDefinition("splashmainscript", QStringLiteral("splash/Splash.qml"));
+
+        package->addDirectoryDefinition("windowswitcher", QStringLiteral("windowswitcher"));
+        package->addFileDefinition("windowswitchermainscript", QStringLiteral("windowswitcher/WindowSwitcher.qml"));
+
+        package->addDirectoryDefinition("systemdialog", QStringLiteral("systemdialog"));
+        package->addFileDefinition("systemdialogscript", QStringLiteral("systemdialog/SystemDialog.qml"));
+
+        package->addDirectoryDefinition("layouts", QStringLiteral("layouts"));
+
+        package->setPath(DEFAULT_LOOKANDFEEL);
+    }
+
+    void pathChanged(KPackage::Package *package) override
+    {
+        if (!package->metadata().isValid() || package->metadata().pluginId() != DEFAULT_LOOKANDFEEL) {
+            KPackage::Package pkg = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/LookAndFeel"), DEFAULT_LOOKANDFEEL);
+            package->setFallbackPackage(pkg);
+            return;
+        }
+        package->setFallbackPackage(KPackage::Package());
+    }
+};
+
+K_PLUGIN_CLASS_WITH_JSON(LookAndFeelPackage, "lingmo-packagestructure-lookandfeel.json")
+
+#include "lookandfeel.moc"

@@ -5,10 +5,10 @@
 ## [Unreleased]
 ### Added
   - Initial implementation of Locale module
-  - Support for Plasma Bigscreen interface via Qt FileSelectors
-  - Added Mycroft enablement module for Plasma Bigscreen
-  - Added support for HDMI CEC module for Plasma Bigscreen
-  - Better input method hints and improvements to Plasma Bigscreen key navigation interface
+  - Support for Lingmo Bigscreen interface via Qt FileSelectors
+  - Added Mycroft enablement module for Lingmo Bigscreen
+  - Added support for HDMI CEC module for Lingmo Bigscreen
+  - Better input method hints and improvements to Lingmo Bigscreen key navigation interface
 
 ## [v0.1.0] - 2021-06-22
 ### Added

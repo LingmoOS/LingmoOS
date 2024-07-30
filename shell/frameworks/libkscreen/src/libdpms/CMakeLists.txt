@@ -8,7 +8,7 @@ target_link_libraries(KF6ScreenDpms PUBLIC Qt::Gui
                                             Qt::GuiPrivate Qt::WaylandClient Wayland::Client
 )
 
-qt6_generate_wayland_protocol_client_sources(KF6ScreenDpms FILES ${PLASMA_WAYLAND_PROTOCOLS_DIR}/dpms.xml)
+qt6_generate_wayland_protocol_client_sources(KF6ScreenDpms FILES ${LINGMO_WAYLAND_PROTOCOLS_DIR}/dpms.xml)
 
 set_target_properties(KF6ScreenDpms PROPERTIES
     VERSION "${KSCREEN_VERSION}"

@@ -20,8 +20,8 @@ target_sources(KF6ColorScheme PRIVATE
 qt_add_resources(KF6ColorScheme "color_schemes"
     PREFIX "/org.kde.kcolorscheme"
     FILES
-        color-schemes/BreezeDark.colors
-        color-schemes/BreezeLight.colors
+        color-schemes/OceanDark.colors
+        color-schemes/OceanLight.colors
 )
 
 ecm_qt_declare_logging_category(KF6ColorScheme

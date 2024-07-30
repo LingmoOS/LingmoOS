@@ -83,7 +83,7 @@ if(WITH_WAYLAND)
         FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/recorder/keyboard-shortcuts-inhibit-unstable-v1.xml"
             "${CMAKE_CURRENT_SOURCE_DIR}/systemclipboard/wlr-data-control-unstable-v1.xml"
-            "${PLASMA_WAYLAND_PROTOCOLS_DIR}/keystate.xml"
+            "${LINGMO_WAYLAND_PROTOCOLS_DIR}/keystate.xml"
             "${Wayland_DATADIR}/wayland.xml"
     )
     target_sources(KF6GuiAddons PRIVATE

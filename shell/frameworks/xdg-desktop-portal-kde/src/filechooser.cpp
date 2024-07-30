@@ -416,7 +416,7 @@ uint FileChooserPortal::OpenFile(const QDBusObjectPath &handle,
     const QUrl translatedCurrentFolderUrl = kioUrlFromSandboxPath(currentFolder, Entity::Folder);
 
     // Use QFileDialog for most directory requests to utilize
-    // plasma-integration's KDirSelectDialog
+    // lingmo-integration's KDirSelectDialog
     if (directory && !options.contains(QStringLiteral("choices"))) {
         QFileDialog dirDialog;
         dirDialog.setWindowTitle(title);

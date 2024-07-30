@@ -7,7 +7,7 @@ import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.0
 
 
-import org.kde.kirigami 2.7 as Kirigami
+import org.kde.lingmoui 2.7 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -35,7 +35,7 @@ FocusScope {
             font.weight: Font.Light
             font.pointSize: 32
             text: qsTr("Finalizing")
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
         }
 
         Label {
@@ -45,7 +45,7 @@ FocusScope {
             font.weight: Font.Light
             font.pointSize: 10
             text: qsTr("Running Script [%1/%2]").arg(finishModule.runningScriptIndex + 1).arg(finishModule.totalScriptsCount)
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
         }
     }
 
@@ -55,19 +55,19 @@ FocusScope {
         font.pointSize: 32
         text: qsTr("Setup Complete")
         anchors.centerIn: parent
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
     }
 
     Button {
         id: finishBtn
-        width: Kirigami.Units.gridUnit * 4
-        height: Kirigami.Units.gridUnit * 3
+        width: LingmoUI.Units.gridUnit * 4
+        height: LingmoUI.Units.gridUnit * 3
         focus: true
 
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
-            bottomMargin: Kirigami.Units.gridUnit * 6
+            bottomMargin: LingmoUI.Units.gridUnit * 6
         }
         flat: true
 
@@ -81,17 +81,17 @@ FocusScope {
         }
 
         background: Rectangle {
-            color: finishModule.isComplete ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.highlightColor
+            color: finishModule.isComplete ? LingmoUI.Theme.positiveTextColor : LingmoUI.Theme.highlightColor
             radius: 2
             border.width: 1
-            border.color: finishBtn.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+            border.color: finishBtn.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
         }
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             visible: finishModule.isComplete && !runningFinishHook
-            width: Kirigami.Units.iconSizes.smallMedium
-            height: Kirigami.Units.iconSizes.smallMedium
-            color: Kirigami.Theme.highlightedTextColor
+            width: LingmoUI.Units.iconSizes.smallMedium
+            height: LingmoUI.Units.iconSizes.smallMedium
+            color: LingmoUI.Theme.highlightedTextColor
             isMask: true
 
             anchors.centerIn: parent
@@ -101,21 +101,21 @@ FocusScope {
         BusyIndicator {
             anchors.centerIn: parent
             running: !finishModule.isComplete || runningFinishHook
-            width: Kirigami.Units.iconSizes.smallMedium
-            height: Kirigami.Units.iconSizes.smallMedium
+            width: LingmoUI.Units.iconSizes.smallMedium
+            height: LingmoUI.Units.iconSizes.smallMedium
             Layout.alignment: Qt.AlignHCenter
         }
     }
 
     RowLayout {
         anchors.top: finishBtn.bottom
-        anchors.topMargin: Kirigami.Units.gridUnit
+        anchors.topMargin: LingmoUI.Units.gridUnit
         anchors.horizontalCenter: parent.horizontalCenter
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             source: finishModule.dir() + "/assets/remote.svg"
-            width: Kirigami.Units.iconSizes.smallMedium
-            height: Kirigami.Units.iconSizes.smallMedium
+            width: LingmoUI.Units.iconSizes.smallMedium
+            height: LingmoUI.Units.iconSizes.smallMedium
         }
 
         Label {
@@ -129,7 +129,7 @@ FocusScope {
             fontSizeMode: Text.Fit
             wrapMode: Text.WordWrap
             text: qsTr("Press Select Button To Continue!")
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
         }
     }
 }

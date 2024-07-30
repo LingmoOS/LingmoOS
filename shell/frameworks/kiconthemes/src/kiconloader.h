@@ -129,7 +129,7 @@ public:
         MainToolbar,
         /// Small icons, e.g. for buttons
         Small,
-        /// Panel (Plasma Taskbar) icons
+        /// Panel (Lingmo Taskbar) icons
         // TODO KF6: remove this (See https://phabricator.kde.org/T14340)
         Panel,
         /// Icons for use in dialog titles, page lists, etc
@@ -629,7 +629,7 @@ public:
 
 public Q_SLOTS:
     // TODO: while marked as deprecated, newIconLoader() is still used:
-    // internally by KIconLoadeer as well as by Plasma's Icons kcm module (state: 5.17)
+    // internally by KIconLoadeer as well as by Lingmo's Icons kcm module (state: 5.17)
     // this needs some further cleanup work before removing it from the API with KICONTHEMES_ENABLE_DEPRECATED_SINCE
     /**
      * Re-initialize the global icon loader

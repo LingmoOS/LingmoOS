@@ -9,8 +9,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.workspace.dialogs as PWD
 
 PWD.SystemDialog {
     id: root
@@ -20,11 +20,11 @@ PWD.SystemDialog {
     property alias realName: nameText.text
 
     ColumnLayout {
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: nameText
             Layout.fillWidth: true
         }
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: idText
             Layout.fillWidth: true
             level: 3

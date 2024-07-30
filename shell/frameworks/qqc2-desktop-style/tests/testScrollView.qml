@@ -8,12 +8,12 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ApplicationWindow {
-    pageStack.initialPage: Kirigami.Page {
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        Kirigami.Theme.inherit: false
+LingmoUI.ApplicationWindow {
+    pageStack.initialPage: LingmoUI.Page {
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        LingmoUI.Theme.inherit: false
 
         padding: 0
 
@@ -41,7 +41,7 @@ Integer in sapien eget quam vulputate lobortis. Morbi nibh elit, elementum vitae
                 }
             }
 
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 Layout.fillHeight: true
             }
 

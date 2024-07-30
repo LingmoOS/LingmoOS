@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2024 Natalie Clarius <natalie.clarius@kde.org>
 # SPDX-License-Identifier: BSD-3-Clause
 
-ecm_add_qml_module(brightnesscontrolplugin URI org.kde.plasma.private.brightnesscontrolplugin GENERATE_PLUGIN_SOURCE)
+ecm_add_qml_module(brightnesscontrolplugin URI org.kde.lingmo.private.brightnesscontrolplugin GENERATE_PLUGIN_SOURCE)
 target_sources(brightnesscontrolplugin PRIVATE
     nightlightinhibitor.cpp
     nightlightcontrol.cpp

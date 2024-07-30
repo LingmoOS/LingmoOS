@@ -22,7 +22,7 @@
 
 #include <cmath> //floor()
 
-#include <Kirigami/Platform/PlatformTheme>
+#include <LingmoUI/Platform/PlatformTheme>
 #include <debug_p.h>
 
 namespace KSvg
@@ -682,9 +682,9 @@ void FrameSvgItem::classBegin()
 
 void FrameSvgItem::componentComplete()
 {
-    m_kirigamiTheme = qobject_cast<Kirigami::Platform::PlatformTheme *>(qmlAttachedPropertiesObject<Kirigami::Platform::PlatformTheme>(this, true));
-    if (!m_kirigamiTheme) {
-        qCWarning(LOG_KSVGQML) << "no theme!" << qmlAttachedPropertiesObject<Kirigami::Platform::PlatformTheme>(this, true) << this;
+    m_lingmouiTheme = qobject_cast<LingmoUI::Platform::PlatformTheme *>(qmlAttachedPropertiesObject<LingmoUI::Platform::PlatformTheme>(this, true));
+    if (!m_lingmouiTheme) {
+        qCWarning(LOG_KSVGQML) << "no theme!" << qmlAttachedPropertiesObject<LingmoUI::Platform::PlatformTheme>(this, true) << this;
         return;
     }
 
@@ -701,16 +701,16 @@ void FrameSvgItem::componentComplete()
 
             return;
         }
-        m_frameSvg->setColor(Svg::Text, m_kirigamiTheme->textColor());
-        m_frameSvg->setColor(Svg::Background, m_kirigamiTheme->backgroundColor());
-        m_frameSvg->setColor(Svg::Highlight, m_kirigamiTheme->highlightColor());
-        m_frameSvg->setColor(Svg::HighlightedText, m_kirigamiTheme->highlightedTextColor());
-        m_frameSvg->setColor(Svg::PositiveText, m_kirigamiTheme->positiveTextColor());
-        m_frameSvg->setColor(Svg::NeutralText, m_kirigamiTheme->neutralTextColor());
-        m_frameSvg->setColor(Svg::NegativeText, m_kirigamiTheme->negativeTextColor());
+        m_frameSvg->setColor(Svg::Text, m_lingmouiTheme->textColor());
+        m_frameSvg->setColor(Svg::Background, m_lingmouiTheme->backgroundColor());
+        m_frameSvg->setColor(Svg::Highlight, m_lingmouiTheme->highlightColor());
+        m_frameSvg->setColor(Svg::HighlightedText, m_lingmouiTheme->highlightedTextColor());
+        m_frameSvg->setColor(Svg::PositiveText, m_lingmouiTheme->positiveTextColor());
+        m_frameSvg->setColor(Svg::NeutralText, m_lingmouiTheme->neutralTextColor());
+        m_frameSvg->setColor(Svg::NegativeText, m_lingmouiTheme->negativeTextColor());
     };
     applyTheme();
-    connect(m_kirigamiTheme, &Kirigami::Platform::PlatformTheme::colorsChanged, this, applyTheme);
+    connect(m_lingmouiTheme, &LingmoUI::Platform::PlatformTheme::colorsChanged, this, applyTheme);
     connect(m_frameSvg->imageSet(), &ImageSet::imageSetChanged, this, checkApplyTheme);
     connect(m_frameSvg, &Svg::imageSetChanged, this, checkApplyTheme);
 

@@ -589,7 +589,7 @@ void RulesModel::populateRuleList()
     addRule(new RuleItem(QLatin1String("skippager"),
                          RulePolicy::SetRule, RuleItem::Boolean,
                          i18n("Skip pager"), i18n("Arrangement & Access"),
-                         QIcon::fromTheme("org.kde.plasma.pager"),
+                         QIcon::fromTheme("org.kde.lingmo.pager"),
                          i18nc("@info:tooltip", "Controls whether or not the window appears in the Virtual Desktop manager.")));
 
     addRule(new RuleItem(QLatin1String("skipswitcher"),

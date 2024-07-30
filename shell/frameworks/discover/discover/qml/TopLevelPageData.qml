@@ -4,9 +4,9 @@
  *   SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.Action {
+LingmoUI.Action {
     property string component
 
     checked: window.currentTopLevel === component

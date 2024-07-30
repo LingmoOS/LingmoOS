@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.ToolSeparator {
     id: controlRoot
@@ -17,9 +17,9 @@ T.ToolSeparator {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    contentItem: Kirigami.Separator {
+    contentItem: LingmoUI.Separator {
         // implicitHeight is the same as ToolBar implicitHeight minus ToolBar padding if not horizontal
-        implicitWidth: !controlRoot.horizontal ? 1 : 40 - (Kirigami.Units.smallSpacing * 2)
-        implicitHeight: controlRoot.horizontal ? 1 : 40 - (Kirigami.Units.smallSpacing * 2)
+        implicitWidth: !controlRoot.horizontal ? 1 : 40 - (LingmoUI.Units.smallSpacing * 2)
+        implicitHeight: controlRoot.horizontal ? 1 : 40 - (LingmoUI.Units.smallSpacing * 2)
     }
 }

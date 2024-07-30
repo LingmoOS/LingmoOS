@@ -9,7 +9,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kquickcontrols
 
 import org.kde.quickcharts as Charts
@@ -18,7 +18,7 @@ import org.kde.quickcharts.controls as ChartsControls
 ChartPage {
     title: "Bar Chart"
 
-    chart: Kirigami.AbstractCard {
+    chart: LingmoUI.AbstractCard {
         anchors.centerIn: parent
         height: 400
         width: parent.width
@@ -85,7 +85,7 @@ ChartPage {
                 left: yAxisLabels.right
                 right: parent.right
                 bottom: parent.bottom
-                bottomMargin: Kirigami.Units.smallSpacing
+                bottomMargin: LingmoUI.Units.smallSpacing
             }
 
             chart: barChart
@@ -123,7 +123,7 @@ ChartPage {
             spacing: 2
 
             colorSource: Charts.ColorGradientSource {
-                baseColor: Kirigami.Theme.highlightColor
+                baseColor: LingmoUI.Theme.highlightColor
                 itemCount: 3
             }
             nameSource: Charts.ArraySource { array: ["Example 1", "Example 2", "Example 3"] }
@@ -218,12 +218,12 @@ ChartPage {
     }
 
     itemEditorActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Add Item"
             onTriggered: barModel.append({label: "Item " + (barModel.count + 1), value1: 10, value2: 10, value3: 10})
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: "Remove Last"
             onTriggered: barModel.remove(barModel.count - 1)
         }

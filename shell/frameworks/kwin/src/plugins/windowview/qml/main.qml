@@ -10,8 +10,8 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.kirigami 2.20 as Kirigami
-import org.kde.plasma.extras as PlasmaExtras
+import org.kde.lingmoui 2.20 as LingmoUI
+import org.kde.lingmo.extras as LingmoExtras
 import org.kde.KWin.Effect.WindowView
 
 Item {
@@ -77,7 +77,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
         opacity: container.organized ? 0.75 : 0
 
         TapHandler {
@@ -91,7 +91,7 @@ Item {
 
     Loader {
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.gridUnit * 8)
+        width: parent.width - (LingmoUI.Units.gridUnit * 8)
 
         active: heap.activeEmpty
 
@@ -102,7 +102,7 @@ Item {
             OpacityAnimator { duration: container.effect.animationDuration; easing.type: Easing.OutCubic }
         }
 
-        sourceComponent: PlasmaExtras.PlaceholderMessage {
+        sourceComponent: LingmoExtras.PlaceholderMessage {
             iconName: "edit-none"
             text: effect.searchText.length > 0 ? i18nd("kwin", "No Matches") : i18nd("kwin", "No Windows")
         }
@@ -111,11 +111,11 @@ Item {
     ColumnLayout {
         width: targetScreen.geometry.width
         height: targetScreen.geometry.height
-        PlasmaExtras.SearchField {
+        LingmoExtras.SearchField {
             id: searchField
             Layout.alignment: Qt.AlignCenter
-            Layout.topMargin: Kirigami.Units.gridUnit
-            Layout.preferredWidth: Math.min(parent.width, 20 * Kirigami.Units.gridUnit)
+            Layout.topMargin: LingmoUI.Units.gridUnit
+            Layout.preferredWidth: Math.min(parent.width, 20 * LingmoUI.Units.gridUnit)
             focus: false
 
             // Don't confuse users into thinking it's a full search
@@ -165,7 +165,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             focus: true
-            padding: Kirigami.Units.gridUnit
+            padding: LingmoUI.Units.gridUnit
             animationDuration: container.effect.animationDuration
             animationEnabled: container.animationEnabled
             organized: container.organized

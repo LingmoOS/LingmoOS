@@ -7,12 +7,12 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 2.1
-import org.kde.kirigami 2.15 as Kirigami
+import org.kde.lingmoui 2.15 as LingmoUI
 import org.kde.taskmanager
 
 import org.kde.pipewire 0.1 as PipeWire
 
-Kirigami.ApplicationWindow
+LingmoUI.ApplicationWindow
 {
     id: root
     width: 500
@@ -70,7 +70,7 @@ Kirigami.ApplicationWindow
             clip: true
             model: ListModel {}
             delegate: RowLayout {
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     source: sourceItem.usingDmaBuf ? "speedometer" : "delete"
                 }
 
@@ -87,8 +87,8 @@ Kirigami.ApplicationWindow
                 PipeWire.PipeWireSourceItem {
                     id: sourceItem
 
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+                    Layout.preferredWidth: LingmoUI.Units.gridUnit * 16
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 8
 
                     nodeId: model.nodeId
                     fd: model.fd

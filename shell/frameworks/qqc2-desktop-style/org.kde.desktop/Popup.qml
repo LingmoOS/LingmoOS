@@ -8,13 +8,13 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.Popup {
     id: control
 
-    Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.DefaultLowest
-    z: Kirigami.OverlayZStacking.z
+    LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.DefaultLowest
+    z: LingmoUI.OverlayZStacking.z
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
@@ -30,7 +30,7 @@ T.Popup {
             from: 0
             to: 1
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
         }
     }
 
@@ -40,17 +40,17 @@ T.Popup {
             from: 1
             to: 0
             easing.type: Easing.InOutQuad
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
         }
     }
 
     contentItem: Item {}
 
-    background: Kirigami.ShadowedRectangle {
-        radius: Kirigami.Units.cornerRadius
-        color: Kirigami.Theme.backgroundColor
+    background: LingmoUI.ShadowedRectangle {
+        radius: LingmoUI.Units.cornerRadius
+        color: LingmoUI.Theme.backgroundColor
 
-        border.color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
+        border.color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
         border.width: 1
 
         shadow.xOffset: 0

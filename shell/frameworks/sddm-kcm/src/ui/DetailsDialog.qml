@@ -12,9 +12,9 @@ import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import Qt5Compat.GraphicalEffects
 
-import org.kde.kirigami 2.14 as Kirigami
+import org.kde.lingmoui 2.14 as LingmoUI
 
-Kirigami.OverlaySheet {
+LingmoUI.OverlaySheet {
     property string themeName: ""
     property string previewPath: ""
     property string authorName: ""
@@ -27,7 +27,7 @@ Kirigami.OverlaySheet {
     ColumnLayout {
         id: layout
         Layout.preferredWidth: 0.75 * root.width
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Item {
             // we need this wrapper because of a limitation of Image where the implicitHeight is not adjusted when
@@ -51,7 +51,7 @@ Kirigami.OverlaySheet {
                 }
             }
         }
-        Kirigami.PlaceholderMessage {
+        LingmoUI.PlaceholderMessage {
             visible: previewImage.status !== Image.Ready && previewImage.status !== Image.Loading
             icon.name: "view-preview"
             text: i18n("No preview available")
@@ -66,7 +66,7 @@ Kirigami.OverlaySheet {
             visible: website !== ""
             text:("<a href='"+website+"'>"+website+"</a>")
             onLinkActivated: link => Qt.openUrlExternally(link)
-            font: Kirigami.Theme.smallFont
+            font: LingmoUI.Theme.smallFont
             Layout.fillWidth: true
             wrapMode: Text.Wrap
         }
@@ -75,9 +75,9 @@ Kirigami.OverlaySheet {
             visible: email !== ""
             text: ("<a href='"+email+"'>"+email+"</a>")
             onLinkActivated: Qt.openUrlExternally("mailto:"+email+"")
-            font: Kirigami.Theme.smallFont
+            font: LingmoUI.Theme.smallFont
             Layout.fillWidth: true
-            Layout.bottomMargin: Math.round(Kirigami.Units.smallSpacing * 1.5)
+            Layout.bottomMargin: Math.round(LingmoUI.Units.smallSpacing * 1.5)
             wrapMode: Text.Wrap
         }
     }

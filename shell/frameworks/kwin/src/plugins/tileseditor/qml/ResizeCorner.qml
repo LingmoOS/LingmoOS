@@ -9,7 +9,7 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Rectangle {
     id: handle
@@ -20,11 +20,11 @@ Rectangle {
 
     z: 2
 
-    implicitWidth: Kirigami.Units.gridUnit
-    implicitHeight: Kirigami.Units.gridUnit
+    implicitWidth: LingmoUI.Units.gridUnit
+    implicitHeight: LingmoUI.Units.gridUnit
 
-    radius: Kirigami.Units.cornerRadius
-    color: Kirigami.Theme.highlightColor
+    radius: LingmoUI.Units.cornerRadius
+    color: LingmoUI.Theme.highlightColor
     opacity: hoverHandler.hovered || dragHandler.active ? 0.4 : 0
     visible: tile &&
         (tile.layoutDirection === KWinComponents.Tile.Floating ||

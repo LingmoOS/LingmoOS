@@ -8,7 +8,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.quickcharts as Charts
 
@@ -16,7 +16,7 @@ RowLayout {
     property alias label: labelItem.text;
     property Charts.Range range;
 
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
     Label {
         id: labelItem;

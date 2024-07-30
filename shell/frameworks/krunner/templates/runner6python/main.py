@@ -6,7 +6,7 @@ from gi.repository import GLib
 
 DBusGMainLoop(set_as_default=True)
 
-objpath = "/runner" # Default value for X-Plasma-DBusRunner-Path metadata property
+objpath = "/runner" # Default value for X-Lingmo-DBusRunner-Path metadata property
 iface = "org.kde.krunner1"
 
 

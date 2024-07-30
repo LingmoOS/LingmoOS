@@ -8,11 +8,11 @@
 */
 
 import QtQuick
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.printmanager as PrintManager
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.printmanager as PrintManager
 
-PlasmaExtras.ExpandableListItem {
+LingmoExtras.ExpandableListItem {
     readonly property bool isPaused: model.printerState === 5
 
     icon: model.iconName
@@ -23,7 +23,7 @@ PlasmaExtras.ExpandableListItem {
     subtitle: model.stateMessage
     isDefault: model.isDefault
 
-    defaultActionButtonAction: Kirigami.Action {
+    defaultActionButtonAction: LingmoUI.Action {
         icon.name: isPaused ? "media-playback-start" : "media-playback-pause"
         text: isPaused ? i18n("Resume") : i18n("Pause")
 
@@ -37,12 +37,12 @@ PlasmaExtras.ExpandableListItem {
     }
 
     contextualActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "configure"
             text: i18n("Configure printer…")
             onTriggered: PrintManager.ProcessRunner.configurePrinter(model.printerName);
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "view-list-details"
             text: i18n("View print queue…")
             onTriggered: PrintManager.ProcessRunner.openPrintQueue(model.printerName);

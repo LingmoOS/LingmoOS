@@ -375,7 +375,7 @@ public:
      * that they should ideally show a progress bar, but not a finished notification.
      *
      * For example when opening a remote URL, a job will emit the progress of the
-     * download, which can be used to show a progress dialog or a Plasma notification,
+     * download, which can be used to show a progress dialog or a Lingmo notification,
      * then when the job is done it'll emit e.g. the finished signal. Showing the user the
      * progress dialog is useful, however the dialog/notification about the download being
      * finished isn't of much interest, because the user can see the application that invoked

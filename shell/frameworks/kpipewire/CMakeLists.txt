@@ -44,7 +44,7 @@ add_definitions(-DEGL_NO_X11)
 add_definitions(-DEGL_NO_PLATFORM_SPECIFIC_TYPES)
 
 if (BUILD_TESTING)
-   find_package(PlasmaWaylandProtocols REQUIRED)
+   find_package(LingmoWaylandProtocols REQUIRED)
    include(ECMAddTests)
    find_package(Qt6 REQUIRED COMPONENTS Test QuickTest)
    add_subdirectory(tests)

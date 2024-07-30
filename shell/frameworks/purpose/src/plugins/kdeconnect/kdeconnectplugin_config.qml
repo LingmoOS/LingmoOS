@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kdeconnect
 
 ColumnLayout {
@@ -15,9 +15,9 @@ ColumnLayout {
 
     property var device: undefined
 
-    anchors.bottomMargin: Kirigami.Units.smallSpacing
+    anchors.bottomMargin: LingmoUI.Units.smallSpacing
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         Layout.fillWidth: true
         text: i18nd("purpose6_kdeconnect", "Choose a device to send to:")
         visible: list.count !== 0
@@ -32,7 +32,7 @@ ColumnLayout {
         Layout.fillHeight: true
 
         // Make sure we have space to show the placeholdermessage when no explicit size is set
-        contentHeight: list.count !== 0 ? implicitContentHeight : Kirigami.Units.gridUnit * 3
+        contentHeight: list.count !== 0 ? implicitContentHeight : LingmoUI.Units.gridUnit * 3
 
         Component.onCompleted: scroll.background.visible = true
 
@@ -57,9 +57,9 @@ ColumnLayout {
                 highlighted: root.device === deviceId
             }
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 anchors.centerIn: parent
-                width: parent.width - (Kirigami.Units.largeSpacing * 4)
+                width: parent.width - (LingmoUI.Units.largeSpacing * 4)
                 visible: list.count === 0
                 text: i18nd("purpose6_kdeconnect", "No devices found")
             }

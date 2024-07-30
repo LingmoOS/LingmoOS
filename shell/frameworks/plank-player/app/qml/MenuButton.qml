@@ -5,12 +5,12 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Templates 2.15 as QQCT
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 QQCT.Button {
      id: menuBtn
      width: listView.width
-     height: Kirigami.Units.gridUnit * 3
+     height: LingmoUI.Units.gridUnit * 3
      property alias iconSource: menuBtnIcon.source
 
      readonly property Flickable listView: {
@@ -25,21 +25,21 @@ QQCT.Button {
      }
 
      background: Rectangle {
-         color: menuBtn.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+         color: menuBtn.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.backgroundColor
          radius: 6
      }
 
      contentItem: RowLayout {
-         Kirigami.Icon {
+         LingmoUI.Icon {
              id: menuBtnIcon
-             Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-             Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+             Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+             Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
          }
 
          QQCT.Label {
              id: menuBtnText
              text: menuBtn.text
-             color: Kirigami.Theme.textColor
+             color: LingmoUI.Theme.textColor
              wrapMode: Text.WordWrap
              Layout.fillWidth: true
          }

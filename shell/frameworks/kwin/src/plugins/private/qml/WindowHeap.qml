@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Window
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
 
@@ -37,7 +37,7 @@ FocusScope {
 
     property alias layout: expoLayout
     property int selectedIndex: -1
-    property int animationDuration: Kirigami.Units.longDuration
+    property int animationDuration: LingmoUI.Units.longDuration
     property bool animationEnabled: false
     property bool absolutePositioning: true
     property real padding: 0

@@ -8,16 +8,16 @@
 import QtQuick
 import QtQuick.Controls
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: window
     title: "Charts Example"
 
-    width: Kirigami.Units.gridUnit * 60
-    height: Kirigami.Units.gridUnit * 40
+    width: LingmoUI.Units.gridUnit * 60
+    height: LingmoUI.Units.gridUnit * 40
 
-    pageStack.initialPage: Kirigami.ScrollablePage {
+    pageStack.initialPage: LingmoUI.ScrollablePage {
         title: "Charts"
 
         ListView {

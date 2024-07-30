@@ -64,7 +64,7 @@ class DISCOVERCOMMON_EXPORT InlineMessage : public QObject
 {
     Q_OBJECT
 public:
-    // Keep in sync with Kirigami's in enums.h
+    // Keep in sync with LingmoUI's in enums.h
     enum InlineMessageType {
         Information = 0,
         Positive,

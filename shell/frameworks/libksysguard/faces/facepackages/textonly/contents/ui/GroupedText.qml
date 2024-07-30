@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.quickcharts as Charts
 import org.kde.quickcharts.controls as ChartsControls
 import org.kde.ksysguard.sensors as Sensors
@@ -38,7 +38,7 @@ ColumnLayout {
 
     readonly property bool hasGroups: showGroups && root.totalSensorIds.length > 0
 
-    Layout.minimumHeight: hasGroups ? Kirigami.Units.gridUnit * 3 : Kirigami.Units.gridUnit
+    Layout.minimumHeight: hasGroups ? LingmoUI.Units.gridUnit * 3 : LingmoUI.Units.gridUnit
 
     Repeater {
         model: root.hasGroups ? root.totalSensorIds : 1
@@ -51,7 +51,7 @@ ColumnLayout {
 
             readonly property alias preferredWidth: legend.preferredWidth
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 text: groupSensor.formattedValue
                 level: 3
@@ -69,8 +69,8 @@ ColumnLayout {
                 Layout.maximumHeight: implicitHeight
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
-                horizontalSpacing: Kirigami.Units.gridUnit
-                verticalSpacing: Kirigami.Units.smallSpacing
+                horizontalSpacing: LingmoUI.Units.gridUnit
+                verticalSpacing: LingmoUI.Units.smallSpacing
 
                 model: {
                     if (!root.hasGroups) {
@@ -104,7 +104,7 @@ ColumnLayout {
 
                     ChartsControls.LegendLayout.minimumWidth: minimumWidth
                     ChartsControls.LegendLayout.preferredWidth: preferredWidth
-                    ChartsControls.LegendLayout.maximumWidth: Math.max(preferredWidth, Kirigami.Units.gridUnit * 17)
+                    ChartsControls.LegendLayout.maximumWidth: Math.max(preferredWidth, LingmoUI.Units.gridUnit * 17)
                 }
             }
 

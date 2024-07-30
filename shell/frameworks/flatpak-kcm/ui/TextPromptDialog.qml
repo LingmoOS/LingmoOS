@@ -8,10 +8,10 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Dialogs as QtDialogs
 
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.kcm.flatpakpermissions
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.kcm.flatpakpermissions
 
-Kirigami.PromptDialog {
+LingmoUI.PromptDialog {
     id: root
 
     required property FlatpakPermissionModel model
@@ -29,12 +29,12 @@ Kirigami.PromptDialog {
 
     QQC2.Overlay.modal: KcmPopupModal {}
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Layout.fillWidth: true
 
-            Kirigami.FormData.label: switch (root.sectionType) {
+            LingmoUI.FormData.label: switch (root.sectionType) {
                 case FlatpakPermissionsSectionType.Filesystems: return i18n("Enter filesystem path…");
                 case FlatpakPermissionsSectionType.SessionBus: return i18n("Enter session bus name…");
                 case FlatpakPermissionsSectionType.SystemBus: return i18n("Enter system bus name…");

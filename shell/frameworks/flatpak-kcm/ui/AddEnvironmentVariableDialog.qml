@@ -7,10 +7,10 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.kcm.flatpakpermissions
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.kcm.flatpakpermissions
 
-Kirigami.PromptDialog {
+LingmoUI.PromptDialog {
     id: root
 
     required property FlatpakPermissionModel model
@@ -21,7 +21,7 @@ Kirigami.PromptDialog {
 
     QQC2.Overlay.modal: KcmPopupModal {}
 
-    Kirigami.FormLayout {
+    LingmoUI.FormLayout {
         QQC2.TextField {
             id: nameField
 
@@ -31,7 +31,7 @@ Kirigami.PromptDialog {
             Keys.onReturnPressed: valueField.forceActiveFocus(Qt.TabFocusReason)
             KeyNavigation.down: valueField
 
-            Kirigami.FormData.label: i18nc("@label:textbox name of environment variable", "Name:")
+            LingmoUI.FormData.label: i18nc("@label:textbox name of environment variable", "Name:")
         }
 
         QQC2.TextField {
@@ -42,7 +42,7 @@ Kirigami.PromptDialog {
             Keys.onEnterPressed: root.accepted()
             Keys.onReturnPressed: root.accepted()
 
-            Kirigami.FormData.label: i18nc("@label:textbox value of environment variable", "Value:")
+            LingmoUI.FormData.label: i18nc("@label:textbox value of environment variable", "Value:")
             // No validation needed, empty value is also acceptable.
         }
     }

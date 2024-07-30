@@ -244,7 +244,7 @@ void TestTextInputV3Interface::testEnableDisable()
     // Now enable the textInput, we should not get event just yet
     m_clientTextInputV3->enable();
     m_clientTextInputV3->set_cursor_rectangle(0, 0, 20, 20);
-    m_clientTextInputV3->set_surrounding_text("KDE Plasma Desktop", 0, 3);
+    m_clientTextInputV3->set_surrounding_text("KDE Lingmo Desktop", 0, 3);
     QCOMPARE(textInputEnabledSpy.count(), 0);
     QCOMPARE(cursorRectangleChangedSpy.count(), 0);
 
@@ -257,20 +257,20 @@ void TestTextInputV3Interface::testEnableDisable()
     QCOMPARE(textInputEnabledSpy.count(), 1);
     QCOMPARE(cursorRectangleChangedSpy.count(), 1);
     QCOMPARE(m_serverTextInputV3->cursorRectangle(), QRect(0, 0, 20, 20));
-    QCOMPARE(m_serverTextInputV3->surroundingText(), QString("KDE Plasma Desktop"));
+    QCOMPARE(m_serverTextInputV3->surroundingText(), QString("KDE Lingmo Desktop"));
     QCOMPARE(m_serverTextInputV3->surroundingTextCursorPosition(), 0);
     QCOMPARE(m_serverTextInputV3->surroundingTextSelectionAnchor(), 3);
 
     // Do another enable when it's already enabled.
     m_clientTextInputV3->enable();
     m_clientTextInputV3->set_cursor_rectangle(0, 0, 20, 20);
-    m_clientTextInputV3->set_surrounding_text("KDE Plasma Desktop", 0, 3);
+    m_clientTextInputV3->set_surrounding_text("KDE Lingmo Desktop", 0, 3);
     m_clientTextInputV3->commit();
     QVERIFY(enableRequestedSpy.wait());
     QCOMPARE(textInputEnabledSpy.count(), 1);
     QCOMPARE(cursorRectangleChangedSpy.count(), 1);
     QCOMPARE(m_serverTextInputV3->cursorRectangle(), QRect(0, 0, 20, 20));
-    QCOMPARE(m_serverTextInputV3->surroundingText(), QString("KDE Plasma Desktop"));
+    QCOMPARE(m_serverTextInputV3->surroundingText(), QString("KDE Lingmo Desktop"));
     QCOMPARE(m_serverTextInputV3->surroundingTextCursorPosition(), 0);
     QCOMPARE(m_serverTextInputV3->surroundingTextSelectionAnchor(), 3);
     m_totalCommits++;
@@ -330,7 +330,7 @@ void TestTextInputV3Interface::testEvents()
 
     m_serverTextInputV3->sendPreEditString("Hello KDE community!", 1, 2);
     m_serverTextInputV3->deleteSurroundingText(6, 10);
-    m_serverTextInputV3->commitString("Plasma");
+    m_serverTextInputV3->commitString("Lingmo");
     m_serverTextInputV3->done();
 
     QVERIFY(doneSpy.wait());
@@ -342,7 +342,7 @@ void TestTextInputV3Interface::testEvents()
     QCOMPARE(preEditSpy.last().at(0).value<QString>(), "Hello KDE community!");
     QCOMPARE(preEditSpy.last().at(1).value<quint32>(), 1);
     QCOMPARE(preEditSpy.last().at(2).value<quint32>(), 2);
-    QCOMPARE(commitStringSpy.last().at(0).value<QString>(), "Plasma");
+    QCOMPARE(commitStringSpy.last().at(0).value<QString>(), "Lingmo");
     QCOMPARE(deleteSurroundingSpy.last().at(0).value<quint32>(), 6);
     QCOMPARE(deleteSurroundingSpy.last().at(1).value<quint32>(), 10);
 

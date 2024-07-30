@@ -7,20 +7,20 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 Item {
     id: root
 
     width: 1 //<-important that this is actually a single device pixel
-    height: Kirigami.Units.gridUnit
+    height: LingmoUI.Units.gridUnit
 
     property /*TextInput | TextEdit*/ Item target
 
     property bool selectionStartHandle: false
 
-    visible: Kirigami.Settings.tabletMode && ((target.activeFocus && !selectionStartHandle) || target.selectedText.length > 0)
+    visible: LingmoUI.Settings.tabletMode && ((target.activeFocus && !selectionStartHandle) || target.selectedText.length > 0)
 
     Rectangle {
         width: 3
@@ -29,10 +29,10 @@ Item {
             top: parent.top
             bottom: parent.bottom
         }
-        color: Qt.tint(Kirigami.Theme.highlightColor, Qt.rgba(1,1,1,0.4))
+        color: Qt.tint(LingmoUI.Theme.highlightColor, Qt.rgba(1,1,1,0.4))
         radius: width
         Rectangle {
-            width: Math.round(Kirigami.Units.gridUnit/1.5)
+            width: Math.round(LingmoUI.Units.gridUnit/1.5)
             height: width
             visible: Private.MobileTextActionsToolBar.shouldBeVisible
             anchors {
@@ -40,12 +40,12 @@ Item {
                 verticalCenter: parent.bottom
             }
             radius: width
-            color: Qt.tint(Kirigami.Theme.highlightColor, Qt.rgba(1,1,1,0.4))
+            color: Qt.tint(LingmoUI.Theme.highlightColor, Qt.rgba(1,1,1,0.4))
         }
         MouseArea {
             anchors {
                 fill: parent
-                margins: -Kirigami.Units.gridUnit
+                margins: -LingmoUI.Units.gridUnit
             }
             preventStealing: true
             onPositionChanged: mouse => {

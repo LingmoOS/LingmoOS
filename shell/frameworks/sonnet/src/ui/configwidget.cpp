@@ -39,7 +39,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
     layout->setObjectName(QStringLiteral("SonnetConfigUILayout"));
     d->wdg = new QWidget(this);
     d->ui.setupUi(d->wdg);
-    d->ui.languageList->setProperty("_breeze_force_frame", true);
+    d->ui.languageList->setProperty("_ocean_force_frame", true);
 
     d->ui.m_langCombo->setCurrentByDictionary(d->settings->defaultLanguage());
 

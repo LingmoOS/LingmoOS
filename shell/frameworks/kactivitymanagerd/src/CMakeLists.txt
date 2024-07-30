@@ -28,11 +28,11 @@ include_directories (
 ecm_generate_dbus_service_file(
    NAME org.kde.ActivityManager
    EXECUTABLE "${KDE_INSTALL_FULL_LIBEXECDIR}/kactivitymanagerd"
-   SYSTEMD_SERVICE plasma-kactivitymanagerd.service
+   SYSTEMD_SERVICE lingmo-kactivitymanagerd.service
    DESTINATION ${KDE_INSTALL_DBUSSERVICEDIR}
 )
 ecm_install_configured_files(
-   INPUT plasma-kactivitymanagerd.service.in
+   INPUT lingmo-kactivitymanagerd.service.in
    DESTINATION ${KDE_INSTALL_SYSTEMDUSERUNITDIR}
 )
 

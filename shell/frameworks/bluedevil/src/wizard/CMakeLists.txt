@@ -12,7 +12,7 @@ set(wizard_SRCS
 ecm_qt_declare_logging_category(wizard_SRCS
     HEADER bluedevil_wizard.h
     IDENTIFIER BLUEDEVIL_WIZARD_LOG
-    CATEGORY_NAME org.kde.plasma.bluedevil.wizard
+    CATEGORY_NAME org.kde.lingmo.bluedevil.wizard
     DESCRIPTION "BlueDevil (wizard)"
     EXPORT BLUEDEVIL
 )

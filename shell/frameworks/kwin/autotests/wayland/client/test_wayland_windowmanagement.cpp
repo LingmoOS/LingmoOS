@@ -9,23 +9,23 @@
 // KWin
 #include "wayland/compositor.h"
 #include "wayland/display.h"
-#include "wayland/plasmawindowmanagement.h"
+#include "wayland/lingmowindowmanagement.h"
 #include "wayland/surface.h"
-#include <wayland-plasma-window-management-client-protocol.h>
+#include <wayland-lingmo-window-management-client-protocol.h>
 
 #include "KWayland/Client/compositor.h"
 #include "KWayland/Client/connection_thread.h"
 #include "KWayland/Client/event_queue.h"
-#include "KWayland/Client/plasmawindowmanagement.h"
+#include "KWayland/Client/lingmowindowmanagement.h"
 #include "KWayland/Client/region.h"
 #include "KWayland/Client/registry.h"
 #include "KWayland/Client/surface.h"
 
-typedef void (KWin::PlasmaWindowInterface::*ServerWindowSignal)();
+typedef void (KWin::LingmoWindowInterface::*ServerWindowSignal)();
 Q_DECLARE_METATYPE(ServerWindowSignal)
-typedef void (KWin::PlasmaWindowInterface::*ServerWindowBooleanSignal)(bool);
+typedef void (KWin::LingmoWindowInterface::*ServerWindowBooleanSignal)(bool);
 Q_DECLARE_METATYPE(ServerWindowBooleanSignal)
-typedef void (KWayland::Client::PlasmaWindow::*ClientWindowVoidSetter)();
+typedef void (KWayland::Client::LingmoWindow::*ClientWindowVoidSetter)();
 Q_DECLARE_METATYPE(ClientWindowVoidSetter)
 
 class TestWindowManagement : public QObject
@@ -64,16 +64,16 @@ private Q_SLOTS:
 private:
     KWin::Display *m_display;
     KWin::CompositorInterface *m_compositorInterface;
-    KWin::PlasmaWindowManagementInterface *m_windowManagementInterface;
-    KWin::PlasmaWindowInterface *m_windowInterface;
+    KWin::LingmoWindowManagementInterface *m_windowManagementInterface;
+    KWin::LingmoWindowInterface *m_windowInterface;
     QPointer<KWin::SurfaceInterface> m_surfaceInterface;
 
     KWayland::Client::Surface *m_surface = nullptr;
     KWayland::Client::ConnectionThread *m_connection;
     KWayland::Client::Compositor *m_compositor;
     KWayland::Client::EventQueue *m_queue;
-    KWayland::Client::PlasmaWindowManagement *m_windowManagement;
-    KWayland::Client::PlasmaWindow *m_window;
+    KWayland::Client::LingmoWindowManagement *m_windowManagement;
+    KWayland::Client::LingmoWindow *m_window;
     QThread *m_thread;
     KWayland::Client::Registry *m_registry;
 };
@@ -94,7 +94,7 @@ TestWindowManagement::TestWindowManagement(QObject *parent)
 void TestWindowManagement::init()
 {
     using namespace KWin;
-    qRegisterMetaType<KWin::PlasmaWindowManagementInterface::ShowingDesktopState>("ShowingDesktopState");
+    qRegisterMetaType<KWin::LingmoWindowManagementInterface::ShowingDesktopState>("ShowingDesktopState");
     delete m_display;
     m_display = new KWin::Display(this);
     m_display->addSocketName(s_socketName);
@@ -121,7 +121,7 @@ void TestWindowManagement::init()
     m_registry = new KWayland::Client::Registry(this);
     QSignalSpy compositorSpy(m_registry, &KWayland::Client::Registry::compositorAnnounced);
 
-    QSignalSpy windowManagementSpy(m_registry, &KWayland::Client::Registry::plasmaWindowManagementAnnounced);
+    QSignalSpy windowManagementSpy(m_registry, &KWayland::Client::Registry::lingmoWindowManagementAnnounced);
 
     QVERIFY(!m_registry->eventQueue());
     m_registry->setEventQueue(m_queue);
@@ -134,19 +134,19 @@ void TestWindowManagement::init()
     QVERIFY(compositorSpy.wait());
     m_compositor = m_registry->createCompositor(compositorSpy.first().first().value<quint32>(), compositorSpy.first().last().value<quint32>(), this);
 
-    m_windowManagementInterface = new PlasmaWindowManagementInterface(m_display, m_display);
+    m_windowManagementInterface = new LingmoWindowManagementInterface(m_display, m_display);
 
     QVERIFY(windowManagementSpy.wait());
-    m_windowManagement = m_registry->createPlasmaWindowManagement(windowManagementSpy.first().first().value<quint32>(),
+    m_windowManagement = m_registry->createLingmoWindowManagement(windowManagementSpy.first().first().value<quint32>(),
                                                                   windowManagementSpy.first().last().value<quint32>(),
                                                                   this);
 
-    QSignalSpy windowSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::windowCreated);
+    QSignalSpy windowSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::windowCreated);
     m_windowInterface = m_windowManagementInterface->createWindow(this, QUuid::createUuid());
     m_windowInterface->setPid(1337);
 
     QVERIFY(windowSpy.wait());
-    m_window = windowSpy.first().first().value<KWayland::Client::PlasmaWindow *>();
+    m_window = windowSpy.first().first().value<KWayland::Client::LingmoWindow *>();
 
     QSignalSpy serverSurfaceCreated(m_compositorInterface, &KWin::CompositorInterface::surfaceCreated);
     m_surface = m_compositor->createSurface(this);
@@ -161,7 +161,7 @@ void TestWindowManagement::testWindowTitle()
 {
     m_windowInterface->setTitle(QStringLiteral("Test Title"));
 
-    QSignalSpy titleSpy(m_window, &KWayland::Client::PlasmaWindow::titleChanged);
+    QSignalSpy titleSpy(m_window, &KWayland::Client::LingmoWindow::titleChanged);
 
     QVERIFY(titleSpy.wait());
 
@@ -174,7 +174,7 @@ void TestWindowManagement::testReallyLongTitle()
     title.fill(QLatin1Char('t'), 500000);
     m_windowInterface->setTitle(title);
 
-    QSignalSpy titleSpy(m_window, &KWayland::Client::PlasmaWindow::titleChanged);
+    QSignalSpy titleSpy(m_window, &KWayland::Client::LingmoWindow::titleChanged);
 
     QVERIFY(titleSpy.wait());
     QVERIFY(m_window->title().startsWith("t"));
@@ -184,7 +184,7 @@ void TestWindowManagement::testMinimizedGeometry()
 {
     m_window->setMinimizedGeometry(m_surface, QRect(5, 10, 100, 200));
 
-    QSignalSpy geometrySpy(m_windowInterface, &KWin::PlasmaWindowInterface::minimizedGeometriesChanged);
+    QSignalSpy geometrySpy(m_windowInterface, &KWin::LingmoWindowInterface::minimizedGeometriesChanged);
 
     QVERIFY(geometrySpy.wait());
     QCOMPARE(m_windowInterface->minimizedGeometries().values().first(), QRect(5, 10, 100, 200));
@@ -243,7 +243,7 @@ void TestWindowManagement::cleanup()
 void TestWindowManagement::testUseAfterUnmap()
 {
     // this test verifies that when the client uses a window after it's unmapped, things don't break
-    QSignalSpy unmappedSpy(m_window, &KWayland::Client::PlasmaWindow::unmapped);
+    QSignalSpy unmappedSpy(m_window, &KWayland::Client::LingmoWindow::unmapped);
     QSignalSpy destroyedSpy(m_window, &QObject::destroyed);
     m_windowInterface->deleteLater();
     m_windowInterface = nullptr;
@@ -255,7 +255,7 @@ void TestWindowManagement::testUseAfterUnmap()
 
 void TestWindowManagement::testServerDelete()
 {
-    QSignalSpy unmappedSpy(m_window, &KWayland::Client::PlasmaWindow::unmapped);
+    QSignalSpy unmappedSpy(m_window, &KWayland::Client::LingmoWindow::unmapped);
     QSignalSpy destroyedSpy(m_window, &QObject::destroyed);
     delete m_windowInterface;
     m_windowInterface = nullptr;
@@ -270,7 +270,7 @@ void TestWindowManagement::testActiveWindowOnUnmapped()
     // first make the window active
     QVERIFY(!m_windowManagement->activeWindow());
     QVERIFY(!m_window->isActive());
-    QSignalSpy activeWindowChangedSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::activeWindowChanged);
+    QSignalSpy activeWindowChangedSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::activeWindowChanged);
     m_windowInterface->setActive(true);
     QVERIFY(activeWindowChangedSpy.wait());
     QCOMPARE(m_windowManagement->activeWindow(), m_window);
@@ -291,7 +291,7 @@ void TestWindowManagement::testDeleteActiveWindow()
     // first make the window active
     QVERIFY(!m_windowManagement->activeWindow());
     QVERIFY(!m_window->isActive());
-    QSignalSpy activeWindowChangedSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::activeWindowChanged);
+    QSignalSpy activeWindowChangedSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::activeWindowChanged);
     m_windowInterface->setActive(true);
     QVERIFY(activeWindowChangedSpy.wait());
     QCOMPARE(activeWindowChangedSpy.count(), 1);
@@ -310,7 +310,7 @@ void TestWindowManagement::testCreateAfterUnmap()
     // this test verifies that we don't get a protocol error on client side when creating an already unmapped window.
     QCOMPARE(m_windowManagement->children().count(), 1);
 
-    QSignalSpy windowAddedSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::windowCreated);
+    QSignalSpy windowAddedSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::windowCreated);
 
     // create and unmap in one go
     // client will first handle the create, the unmap will be sent once the server side is bound
@@ -319,7 +319,7 @@ void TestWindowManagement::testCreateAfterUnmap()
     QCOMPARE(m_windowManagementInterface->children().count(), 0);
 
     windowAddedSpy.wait();
-    auto window = dynamic_cast<KWayland::Client::PlasmaWindow *>(m_windowManagement->children().last());
+    auto window = dynamic_cast<KWayland::Client::LingmoWindow *>(m_windowManagement->children().last());
     QVERIFY(window);
     // now this is not yet on the server, on the server it will be after next roundtrip
     // which we can trigger by waiting for destroy of the newly created window.
@@ -336,14 +336,14 @@ void TestWindowManagement::testRequests_data()
     QTest::addColumn<ServerWindowSignal>("changedSignal");
     QTest::addColumn<ClientWindowVoidSetter>("requester");
 
-    QTest::newRow("close") << &PlasmaWindowInterface::closeRequested << &KWayland::Client::PlasmaWindow::requestClose;
-    QTest::newRow("move") << &PlasmaWindowInterface::moveRequested << &KWayland::Client::PlasmaWindow::requestMove;
-    QTest::newRow("resize") << &PlasmaWindowInterface::resizeRequested << &KWayland::Client::PlasmaWindow::requestResize;
+    QTest::newRow("close") << &LingmoWindowInterface::closeRequested << &KWayland::Client::LingmoWindow::requestClose;
+    QTest::newRow("move") << &LingmoWindowInterface::moveRequested << &KWayland::Client::LingmoWindow::requestMove;
+    QTest::newRow("resize") << &LingmoWindowInterface::resizeRequested << &KWayland::Client::LingmoWindow::requestResize;
 }
 
 void TestWindowManagement::testRequests()
 {
-    // this test case verifies all the different requests on a PlasmaWindow
+    // this test case verifies all the different requests on a LingmoWindow
     QFETCH(ServerWindowSignal, changedSignal);
     QSignalSpy requestSpy(m_windowInterface, changedSignal);
     QFETCH(ClientWindowVoidSetter, requester);
@@ -357,38 +357,38 @@ void TestWindowManagement::testRequestsBoolean_data()
     QTest::addColumn<ServerWindowBooleanSignal>("changedSignal");
     QTest::addColumn<int>("flag");
 
-    QTest::newRow("activate") << &PlasmaWindowInterface::activeRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_ACTIVE);
-    QTest::newRow("minimized") << &PlasmaWindowInterface::minimizedRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_MINIMIZED);
-    QTest::newRow("maximized") << &PlasmaWindowInterface::maximizedRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_MAXIMIZED);
-    QTest::newRow("fullscreen") << &PlasmaWindowInterface::fullscreenRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_FULLSCREEN);
-    QTest::newRow("keepAbove") << &PlasmaWindowInterface::keepAboveRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_KEEP_ABOVE);
-    QTest::newRow("keepBelow") << &PlasmaWindowInterface::keepBelowRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_KEEP_BELOW);
-    QTest::newRow("demandsAttention") << &PlasmaWindowInterface::demandsAttentionRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_DEMANDS_ATTENTION);
-    QTest::newRow("closeable") << &PlasmaWindowInterface::closeableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_CLOSEABLE);
-    QTest::newRow("minimizable") << &PlasmaWindowInterface::minimizeableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_MINIMIZABLE);
-    QTest::newRow("maximizable") << &PlasmaWindowInterface::maximizeableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_MAXIMIZABLE);
-    QTest::newRow("fullscreenable") << &PlasmaWindowInterface::fullscreenableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_FULLSCREENABLE);
-    QTest::newRow("skiptaskbar") << &PlasmaWindowInterface::skipTaskbarRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_SKIPTASKBAR);
-    QTest::newRow("skipSwitcher") << &PlasmaWindowInterface::skipSwitcherRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_SKIPSWITCHER);
-    QTest::newRow("shadeable") << &PlasmaWindowInterface::shadeableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_SHADEABLE);
-    QTest::newRow("shaded") << &PlasmaWindowInterface::shadedRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_SHADED);
-    QTest::newRow("movable") << &PlasmaWindowInterface::movableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_MOVABLE);
-    QTest::newRow("resizable") << &PlasmaWindowInterface::resizableRequested << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_RESIZABLE);
-    QTest::newRow("virtualDesktopChangeable") << &PlasmaWindowInterface::virtualDesktopChangeableRequested
-                                              << int(ORG_KDE_PLASMA_WINDOW_MANAGEMENT_STATE_VIRTUAL_DESKTOP_CHANGEABLE);
+    QTest::newRow("activate") << &LingmoWindowInterface::activeRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_ACTIVE);
+    QTest::newRow("minimized") << &LingmoWindowInterface::minimizedRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_MINIMIZED);
+    QTest::newRow("maximized") << &LingmoWindowInterface::maximizedRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_MAXIMIZED);
+    QTest::newRow("fullscreen") << &LingmoWindowInterface::fullscreenRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_FULLSCREEN);
+    QTest::newRow("keepAbove") << &LingmoWindowInterface::keepAboveRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_KEEP_ABOVE);
+    QTest::newRow("keepBelow") << &LingmoWindowInterface::keepBelowRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_KEEP_BELOW);
+    QTest::newRow("demandsAttention") << &LingmoWindowInterface::demandsAttentionRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_DEMANDS_ATTENTION);
+    QTest::newRow("closeable") << &LingmoWindowInterface::closeableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_CLOSEABLE);
+    QTest::newRow("minimizable") << &LingmoWindowInterface::minimizeableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_MINIMIZABLE);
+    QTest::newRow("maximizable") << &LingmoWindowInterface::maximizeableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_MAXIMIZABLE);
+    QTest::newRow("fullscreenable") << &LingmoWindowInterface::fullscreenableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_FULLSCREENABLE);
+    QTest::newRow("skiptaskbar") << &LingmoWindowInterface::skipTaskbarRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_SKIPTASKBAR);
+    QTest::newRow("skipSwitcher") << &LingmoWindowInterface::skipSwitcherRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_SKIPSWITCHER);
+    QTest::newRow("shadeable") << &LingmoWindowInterface::shadeableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_SHADEABLE);
+    QTest::newRow("shaded") << &LingmoWindowInterface::shadedRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_SHADED);
+    QTest::newRow("movable") << &LingmoWindowInterface::movableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_MOVABLE);
+    QTest::newRow("resizable") << &LingmoWindowInterface::resizableRequested << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_RESIZABLE);
+    QTest::newRow("virtualDesktopChangeable") << &LingmoWindowInterface::virtualDesktopChangeableRequested
+                                              << int(ORG_KDE_LINGMO_WINDOW_MANAGEMENT_STATE_VIRTUAL_DESKTOP_CHANGEABLE);
 }
 
 void TestWindowManagement::testRequestsBoolean()
 {
-    // this test case verifies all the different requests on a PlasmaWindow
+    // this test case verifies all the different requests on a LingmoWindow
     QFETCH(ServerWindowBooleanSignal, changedSignal);
     QSignalSpy requestSpy(m_windowInterface, changedSignal);
     QFETCH(int, flag);
-    org_kde_plasma_window_set_state(*m_window, flag, flag);
+    org_kde_lingmo_window_set_state(*m_window, flag, flag);
     QVERIFY(requestSpy.wait());
     QCOMPARE(requestSpy.count(), 1);
     QCOMPARE(requestSpy.first().first().toBool(), true);
-    org_kde_plasma_window_set_state(*m_window, flag, 0);
+    org_kde_lingmo_window_set_state(*m_window, flag, 0);
     QVERIFY(requestSpy.wait());
     QCOMPARE(requestSpy.count(), 2);
     QCOMPARE(requestSpy.last().first().toBool(), false);
@@ -399,18 +399,18 @@ void TestWindowManagement::testShowingDesktop()
     using namespace KWin;
     // this test verifies setting the showing desktop state
     QVERIFY(!m_windowManagement->isShowingDesktop());
-    QSignalSpy showingDesktopChangedSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::showingDesktopChanged);
-    m_windowManagementInterface->setShowingDesktopState(PlasmaWindowManagementInterface::ShowingDesktopState::Enabled);
+    QSignalSpy showingDesktopChangedSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::showingDesktopChanged);
+    m_windowManagementInterface->setShowingDesktopState(LingmoWindowManagementInterface::ShowingDesktopState::Enabled);
     QVERIFY(showingDesktopChangedSpy.wait());
     QCOMPARE(showingDesktopChangedSpy.count(), 1);
     QCOMPARE(showingDesktopChangedSpy.first().first().toBool(), true);
     QVERIFY(m_windowManagement->isShowingDesktop());
     // setting to same should not change
-    m_windowManagementInterface->setShowingDesktopState(PlasmaWindowManagementInterface::ShowingDesktopState::Enabled);
+    m_windowManagementInterface->setShowingDesktopState(LingmoWindowManagementInterface::ShowingDesktopState::Enabled);
     QVERIFY(!showingDesktopChangedSpy.wait(100));
     QCOMPARE(showingDesktopChangedSpy.count(), 1);
     // setting to other state should change
-    m_windowManagementInterface->setShowingDesktopState(PlasmaWindowManagementInterface::ShowingDesktopState::Disabled);
+    m_windowManagementInterface->setShowingDesktopState(LingmoWindowManagementInterface::ShowingDesktopState::Disabled);
     QVERIFY(showingDesktopChangedSpy.wait());
     QCOMPARE(showingDesktopChangedSpy.count(), 2);
     QCOMPARE(showingDesktopChangedSpy.first().first().toBool(), true);
@@ -422,22 +422,22 @@ void TestWindowManagement::testRequestShowingDesktop_data()
 {
     using namespace KWin;
     QTest::addColumn<bool>("value");
-    QTest::addColumn<PlasmaWindowManagementInterface::ShowingDesktopState>("expectedValue");
+    QTest::addColumn<LingmoWindowManagementInterface::ShowingDesktopState>("expectedValue");
 
-    QTest::newRow("enable") << true << PlasmaWindowManagementInterface::ShowingDesktopState::Enabled;
-    QTest::newRow("disable") << false << PlasmaWindowManagementInterface::ShowingDesktopState::Disabled;
+    QTest::newRow("enable") << true << LingmoWindowManagementInterface::ShowingDesktopState::Enabled;
+    QTest::newRow("disable") << false << LingmoWindowManagementInterface::ShowingDesktopState::Disabled;
 }
 
 void TestWindowManagement::testRequestShowingDesktop()
 {
     // this test verifies requesting show desktop state
     using namespace KWin;
-    QSignalSpy requestSpy(m_windowManagementInterface, &PlasmaWindowManagementInterface::requestChangeShowingDesktop);
+    QSignalSpy requestSpy(m_windowManagementInterface, &LingmoWindowManagementInterface::requestChangeShowingDesktop);
     QFETCH(bool, value);
     m_windowManagement->setShowingDesktop(value);
     QVERIFY(requestSpy.wait());
     QCOMPARE(requestSpy.count(), 1);
-    QTEST(requestSpy.first().first().value<PlasmaWindowManagementInterface::ShowingDesktopState>(), "expectedValue");
+    QTEST(requestSpy.first().first().value<LingmoWindowManagementInterface::ShowingDesktopState>(), "expectedValue");
 }
 
 void TestWindowManagement::testKeepAbove()
@@ -445,7 +445,7 @@ void TestWindowManagement::testKeepAbove()
     using namespace KWin;
     // this test verifies setting the keep above state
     QVERIFY(!m_window->isKeepAbove());
-    QSignalSpy keepAboveChangedSpy(m_window, &KWayland::Client::PlasmaWindow::keepAboveChanged);
+    QSignalSpy keepAboveChangedSpy(m_window, &KWayland::Client::LingmoWindow::keepAboveChanged);
     m_windowInterface->setKeepAbove(true);
     QVERIFY(keepAboveChangedSpy.wait());
     QCOMPARE(keepAboveChangedSpy.count(), 1);
@@ -466,7 +466,7 @@ void TestWindowManagement::testKeepBelow()
     using namespace KWin;
     // this test verifies setting the keep below state
     QVERIFY(!m_window->isKeepBelow());
-    QSignalSpy keepBelowChangedSpy(m_window, &KWayland::Client::PlasmaWindow::keepBelowChanged);
+    QSignalSpy keepBelowChangedSpy(m_window, &KWayland::Client::LingmoWindow::keepBelowChanged);
     m_windowInterface->setKeepBelow(true);
     QVERIFY(keepBelowChangedSpy.wait());
     QCOMPARE(keepBelowChangedSpy.count(), 1);
@@ -491,15 +491,15 @@ void TestWindowManagement::testParentWindow()
     QVERIFY(parentWindow->parentWindow().isNull());
 
     // now let's create a second window
-    QSignalSpy windowAddedSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::windowCreated);
-    std::unique_ptr<KWin::PlasmaWindowInterface> serverTransient(m_windowManagementInterface->createWindow(this, QUuid::createUuid()));
+    QSignalSpy windowAddedSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::windowCreated);
+    std::unique_ptr<KWin::LingmoWindowInterface> serverTransient(m_windowManagementInterface->createWindow(this, QUuid::createUuid()));
     serverTransient->setParentWindow(m_windowInterface);
     QVERIFY(windowAddedSpy.wait());
-    auto transient = windowAddedSpy.first().first().value<KWayland::Client::PlasmaWindow *>();
+    auto transient = windowAddedSpy.first().first().value<KWayland::Client::LingmoWindow *>();
     QCOMPARE(transient->parentWindow().data(), parentWindow);
 
     // let's unset the parent
-    QSignalSpy parentWindowChangedSpy(transient, &KWayland::Client::PlasmaWindow::parentWindowChanged);
+    QSignalSpy parentWindowChangedSpy(transient, &KWayland::Client::LingmoWindow::parentWindowChanged);
     serverTransient->setParentWindow(nullptr);
     QVERIFY(parentWindowChangedSpy.wait());
     QVERIFY(transient->parentWindow().isNull());
@@ -521,7 +521,7 @@ void TestWindowManagement::testGeometry()
 {
     QVERIFY(m_window);
     QCOMPARE(m_window->geometry(), QRect());
-    QSignalSpy windowGeometryChangedSpy(m_window, &KWayland::Client::PlasmaWindow::geometryChanged);
+    QSignalSpy windowGeometryChangedSpy(m_window, &KWayland::Client::LingmoWindow::geometryChanged);
     m_windowInterface->setGeometry(QRect(20, -10, 30, 40));
     QVERIFY(windowGeometryChangedSpy.wait());
     QCOMPARE(m_window->geometry(), QRect(20, -10, 30, 40));
@@ -537,12 +537,12 @@ void TestWindowManagement::testGeometry()
     QCOMPARE(windowGeometryChangedSpy.count(), 2);
     QCOMPARE(m_window->geometry(), QRect(0, 0, 35, 45));
 
-    // let's bind a second PlasmaWindowManagement to verify the initial setting
-    std::unique_ptr<KWayland::Client::PlasmaWindowManagement> pm(
-        m_registry->createPlasmaWindowManagement(m_registry->interface(KWayland::Client::Registry::Interface::PlasmaWindowManagement).name,
-                                                 m_registry->interface(KWayland::Client::Registry::Interface::PlasmaWindowManagement).version));
+    // let's bind a second LingmoWindowManagement to verify the initial setting
+    std::unique_ptr<KWayland::Client::LingmoWindowManagement> pm(
+        m_registry->createLingmoWindowManagement(m_registry->interface(KWayland::Client::Registry::Interface::LingmoWindowManagement).name,
+                                                 m_registry->interface(KWayland::Client::Registry::Interface::LingmoWindowManagement).version));
     QVERIFY(pm != nullptr);
-    QSignalSpy windowAddedSpy(pm.get(), &KWayland::Client::PlasmaWindowManagement::windowCreated);
+    QSignalSpy windowAddedSpy(pm.get(), &KWayland::Client::LingmoWindowManagement::windowCreated);
     QVERIFY(windowAddedSpy.wait());
     auto window = pm->windows().first();
     QCOMPARE(window->geometry(), QRect(0, 0, 35, 45));
@@ -551,7 +551,7 @@ void TestWindowManagement::testGeometry()
 void TestWindowManagement::testIcon()
 {
     // initially, there shouldn't be any icon
-    QSignalSpy iconChangedSpy(m_window, &KWayland::Client::PlasmaWindow::iconChanged);
+    QSignalSpy iconChangedSpy(m_window, &KWayland::Client::LingmoWindow::iconChanged);
     QVERIFY(m_window->icon().isNull());
 
     // create an icon with a pixmap
@@ -579,10 +579,10 @@ void TestWindowManagement::testPid()
     QVERIFY(m_window->pid() == 1337);
 
     // test server not setting a PID for whatever reason
-    std::unique_ptr<KWin::PlasmaWindowInterface> newWindowInterface(m_windowManagementInterface->createWindow(this, QUuid::createUuid()));
-    QSignalSpy windowSpy(m_windowManagement, &KWayland::Client::PlasmaWindowManagement::windowCreated);
+    std::unique_ptr<KWin::LingmoWindowInterface> newWindowInterface(m_windowManagementInterface->createWindow(this, QUuid::createUuid()));
+    QSignalSpy windowSpy(m_windowManagement, &KWayland::Client::LingmoWindowManagement::windowCreated);
     QVERIFY(windowSpy.wait());
-    std::unique_ptr<KWayland::Client::PlasmaWindow> newWindow(windowSpy.first().first().value<KWayland::Client::PlasmaWindow *>());
+    std::unique_ptr<KWayland::Client::LingmoWindow> newWindow(windowSpy.first().first().value<KWayland::Client::LingmoWindow *>());
     QVERIFY(newWindow);
     QVERIFY(newWindow->pid() == 0);
 }
@@ -594,7 +594,7 @@ void TestWindowManagement::testApplicationMenu()
 
     m_windowInterface->setApplicationMenuPaths(serviceName, objectPath);
 
-    QSignalSpy applicationMenuChangedSpy(m_window, &KWayland::Client::PlasmaWindow::applicationMenuChanged);
+    QSignalSpy applicationMenuChangedSpy(m_window, &KWayland::Client::LingmoWindow::applicationMenuChanged);
     QVERIFY(applicationMenuChangedSpy.wait());
 
     QCOMPARE(m_window->applicationMenuServiceName(), serviceName);

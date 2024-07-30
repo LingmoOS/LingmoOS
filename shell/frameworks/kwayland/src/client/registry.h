@@ -30,10 +30,10 @@ struct org_kde_kwin_shadow_manager;
 struct org_kde_kwin_blur_manager;
 struct org_kde_kwin_contrast_manager;
 struct org_kde_kwin_slide_manager;
-struct org_kde_plasma_activation_feedback;
-struct org_kde_plasma_shell;
-struct org_kde_plasma_virtual_desktop_management;
-struct org_kde_plasma_window_management;
+struct org_kde_lingmo_activation_feedback;
+struct org_kde_lingmo_shell;
+struct org_kde_lingmo_virtual_desktop_management;
+struct org_kde_lingmo_window_management;
 struct xdg_shell;
 struct zxdg_shell_v6;
 struct xdg_wm_base;
@@ -63,10 +63,10 @@ class IdleInhibitManager;
 class Keystate;
 class RemoteAccessManager;
 class Output;
-class PlasmaActivationFeedback;
-class PlasmaShell;
-class PlasmaVirtualDesktopManagement;
-class PlasmaWindowManagement;
+class LingmoActivationFeedback;
+class LingmoShell;
+class LingmoVirtualDesktopManagement;
+class LingmoWindowManagement;
 class PointerConstraints;
 class PointerGestures;
 class Seat;
@@ -134,8 +134,8 @@ public:
         Output, ///< Refers to the wl_output interface
         SubCompositor, ///< Refers to the wl_subcompositor interface;
         DataDeviceManager, ///< Refers to the wl_data_device_manager interface
-        PlasmaShell, ///< Refers to org_kde_plasma_shell interface
-        PlasmaWindowManagement, ///< Refers to org_kde_plasma_window_management interface
+        LingmoShell, ///< Refers to org_kde_lingmo_shell interface
+        LingmoWindowManagement, ///< Refers to org_kde_lingmo_window_management interface
         FakeInput, ///< Refers to org_kde_kwin_fake_input interface
         Shadow, ///< Refers to org_kde_kwin_shadow_manager interface
         Blur, ///< refers to org_kde_kwin_blur_manager interface
@@ -153,11 +153,11 @@ public:
         XdgShellUnstableV6, ///< Refers to zxdg_shell_v6 (unstable version 6) @since 5.39
         IdleInhibitManagerUnstableV1, ///< Refers to zwp_idle_inhibit_manager_v1 (unstable version 1) @since 5.41
         AppMenu, ///< Refers to org_kde_kwin_appmenu @since 5.42
-        PlasmaVirtualDesktopManagement, ///< Refers to org_kde_plasma_virtual_desktop_management interface @since 5.52
+        LingmoVirtualDesktopManagement, ///< Refers to org_kde_lingmo_virtual_desktop_management interface @since 5.52
         XdgOutputUnstableV1, ///< refers to zxdg_output_v1 @since 5.47
         XdgShellStable, ///< refers to xdg_wm_base @since 5.48
         XdgDecorationUnstableV1, ///< refers to zxdg_decoration_manager_v1 @since 5.54
-        PlasmaActivationFeedback, ///< Refers to org_kde_plasma_activation_feedback interface, @since 5.83
+        LingmoActivationFeedback, ///< Refers to org_kde_lingmo_activation_feedback interface, @since 5.83
     };
     explicit Registry(QObject *parent = nullptr);
     ~Registry() override;
@@ -332,45 +332,45 @@ public:
      **/
     wl_data_device_manager *bindDataDeviceManager(uint32_t name, uint32_t version) const;
     /**
-     * Binds the org_kde_plasma_shell with @p name and @p version.
-     * If the @p name does not exist or is not for the Plasma shell interface,
+     * Binds the org_kde_lingmo_shell with @p name and @p version.
+     * If the @p name does not exist or is not for the Lingmo shell interface,
      * @c null will be returned.
      *
-     * Prefer using createPlasmaShell instead.
-     * @see createPlasmaShell
+     * Prefer using createLingmoShell instead.
+     * @see createLingmoShell
      * @since 5.4
      **/
-    org_kde_plasma_shell *bindPlasmaShell(uint32_t name, uint32_t version) const;
+    org_kde_lingmo_shell *bindLingmoShell(uint32_t name, uint32_t version) const;
     /**
-     * Binds the org_kde_plasma_activation_feedback with @p name and @p version.
-     * If the @p name does not exist or is not for the Plasma activation manager interface,
+     * Binds the org_kde_lingmo_activation_feedback with @p name and @p version.
+     * If the @p name does not exist or is not for the Lingmo activation manager interface,
      * @c null will be returned.
      *
-     * Prefer using createPlasmaActivationFeedback instead.
-     * @see createPlasmaActivationFeedback
+     * Prefer using createLingmoActivationFeedback instead.
+     * @see createLingmoActivationFeedback
      * @since 5.83
      **/
-    org_kde_plasma_activation_feedback *bindPlasmaActivationFeedback(uint32_t name, uint32_t version) const;
+    org_kde_lingmo_activation_feedback *bindLingmoActivationFeedback(uint32_t name, uint32_t version) const;
     /**
-     * Binds the org_kde_plasma_virtual_desktop_management with @p name and @p version.
-     * If the @p name does not exist or is not for the Plasma Virtual desktop interface,
+     * Binds the org_kde_lingmo_virtual_desktop_management with @p name and @p version.
+     * If the @p name does not exist or is not for the Lingmo Virtual desktop interface,
      * @c null will be returned.
      *
-     * Prefer using createPlasmaShell instead.
-     * @see createPlasmaShell
+     * Prefer using createLingmoShell instead.
+     * @see createLingmoShell
      * @since 5.52
      **/
-    org_kde_plasma_virtual_desktop_management *bindPlasmaVirtualDesktopManagement(uint32_t name, uint32_t version) const;
+    org_kde_lingmo_virtual_desktop_management *bindLingmoVirtualDesktopManagement(uint32_t name, uint32_t version) const;
     /**
-     * Binds the org_kde_plasma_window_management with @p name and @p version.
-     * If the @p name does not exist or is not for the Plasma window management interface,
+     * Binds the org_kde_lingmo_window_management with @p name and @p version.
+     * If the @p name does not exist or is not for the Lingmo window management interface,
      * @c null will be returned.
      *
-     * Prefer using createPlasmaWindowManagement instead.
-     * @see createPlasmaWindowManagement
+     * Prefer using createLingmoWindowManagement instead.
+     * @see createLingmoWindowManagement
      * @since 5.46
      **/
-    org_kde_plasma_window_management *bindPlasmaWindowManagement(uint32_t name, uint32_t version) const;
+    org_kde_lingmo_window_management *bindLingmoWindowManagement(uint32_t name, uint32_t version) const;
     /**
      * Binds the org_kde_kwin_fake_input with @p name and @p version.
      * If the @p name does not exist or is not for the fake input interface,
@@ -689,69 +689,69 @@ public:
      **/
     DataDeviceManager *createDataDeviceManager(quint32 name, quint32 version, QObject *parent = nullptr);
     /**
-     * Creates a PlasmaShell and sets it up to manage the interface identified by
+     * Creates a LingmoShell and sets it up to manage the interface identified by
      * @p name and @p version.
      *
-     * Note: in case @p name is invalid or isn't for the org_kde_plasma_shell interface,
-     * the returned PlasmaShell will not be valid. Therefore it's recommended to call
+     * Note: in case @p name is invalid or isn't for the org_kde_lingmo_shell interface,
+     * the returned LingmoShell will not be valid. Therefore it's recommended to call
      * isValid on the created instance.
      *
-     * @param name The name of the org_kde_plasma_shell interface to bind
-     * @param version The version or the org_kde_plasma_shell interface to use
-     * @param parent The parent for PlasmaShell
+     * @param name The name of the org_kde_lingmo_shell interface to bind
+     * @param version The version or the org_kde_lingmo_shell interface to use
+     * @param parent The parent for LingmoShell
      *
-     * @returns The created PlasmaShell.
+     * @returns The created LingmoShell.
      * @since 5.4
      **/
-    PlasmaShell *createPlasmaShell(quint32 name, quint32 version, QObject *parent = nullptr);
+    LingmoShell *createLingmoShell(quint32 name, quint32 version, QObject *parent = nullptr);
     /**
-     * Creates a PlasmaActivationFeedback and sets it up to manage the interface identified by
+     * Creates a LingmoActivationFeedback and sets it up to manage the interface identified by
      * @p name and @p version.
      *
-     * Note: in case @p name is invalid or isn't for the org_kde_plasma_activation_feedback interface,
-     * the returned PlasmaActivationFeedback will not be valid. Therefore it's recommended to call
+     * Note: in case @p name is invalid or isn't for the org_kde_lingmo_activation_feedback interface,
+     * the returned LingmoActivationFeedback will not be valid. Therefore it's recommended to call
      * isValid on the created instance.
      *
-     * @param name The name of the org_kde_plasma_activation_feedback interface to bind
-     * @param version The version or the org_kde_plasma_activation_feedback interface to use
-     * @param parent The parent for PlasmaActivationFeedback
+     * @param name The name of the org_kde_lingmo_activation_feedback interface to bind
+     * @param version The version or the org_kde_lingmo_activation_feedback interface to use
+     * @param parent The parent for LingmoActivationFeedback
      *
-     * @returns The created PlasmaActivationFeedback.
+     * @returns The created LingmoActivationFeedback.
      * @since 5.83
      **/
-    PlasmaActivationFeedback *createPlasmaActivationFeedback(quint32 name, quint32 version, QObject *parent = nullptr);
+    LingmoActivationFeedback *createLingmoActivationFeedback(quint32 name, quint32 version, QObject *parent = nullptr);
     /**
-     * Creates a PlasmaVirtualDesktopManagement and sets it up to manage the interface identified by
+     * Creates a LingmoVirtualDesktopManagement and sets it up to manage the interface identified by
      * @p name and @p version.
      *
-     * Note: in case @p name is invalid or isn't for the org_kde_plasma_virtual_desktop_management interface,
+     * Note: in case @p name is invalid or isn't for the org_kde_lingmo_virtual_desktop_management interface,
      * the returned VirtualDesktop will not be valid. Therefore it's recommended to call
      * isValid on the created instance.
      *
-     * @param name The name of the org_kde_plasma_virtual_desktop_management interface to bind
-     * @param version The version or the org_kde_plasma_virtual_desktop_management interface to use
-     * @param parent The parent for PlasmaShell
+     * @param name The name of the org_kde_lingmo_virtual_desktop_management interface to bind
+     * @param version The version or the org_kde_lingmo_virtual_desktop_management interface to use
+     * @param parent The parent for LingmoShell
      *
-     * @returns The created PlasmaShell.
+     * @returns The created LingmoShell.
      * @since 5.52
      **/
-    PlasmaVirtualDesktopManagement *createPlasmaVirtualDesktopManagement(quint32 name, quint32 version, QObject *parent = nullptr);
+    LingmoVirtualDesktopManagement *createLingmoVirtualDesktopManagement(quint32 name, quint32 version, QObject *parent = nullptr);
     /**
-     * Creates a PlasmaWindowManagement and sets it up to manage the interface identified by
+     * Creates a LingmoWindowManagement and sets it up to manage the interface identified by
      * @p name and @p version.
      *
-     * Note: in case @p name is invalid or isn't for the org_kde_plasma_window_management interface,
-     * the returned PlasmaWindowManagement will not be valid. Therefore it's recommended to call
+     * Note: in case @p name is invalid or isn't for the org_kde_lingmo_window_management interface,
+     * the returned LingmoWindowManagement will not be valid. Therefore it's recommended to call
      * isValid on the created instance.
      *
-     * @param name The name of the org_kde_plasma_window_management interface to bind
-     * @param version The version or the org_kde_plasma_window_management interface to use
-     * @param parent The parent for PlasmaWindowManagement
+     * @param name The name of the org_kde_lingmo_window_management interface to bind
+     * @param version The version or the org_kde_lingmo_window_management interface to use
+     * @param parent The parent for LingmoWindowManagement
      *
-     * @returns The created PlasmaWindowManagement.
+     * @returns The created LingmoWindowManagement.
      * @since 5.4
      **/
-    PlasmaWindowManagement *createPlasmaWindowManagement(quint32 name, quint32 version, QObject *parent = nullptr);
+    LingmoWindowManagement *createLingmoWindowManagement(quint32 name, quint32 version, QObject *parent = nullptr);
     /**
      * Creates a FakeInput and sets it up to manage the interface identified by
      * @p name and @p version.
@@ -1100,33 +1100,33 @@ Q_SIGNALS:
     void dataDeviceManagerAnnounced(quint32 name, quint32 version);
 
     /**
-     * Emitted whenever a org_kde_plasma_shell interface gets announced.
+     * Emitted whenever a org_kde_lingmo_shell interface gets announced.
      * @param name The name for the announced interface
      * @param version The maximum supported version of the announced interface
      * @since 5.4
      **/
-    void plasmaShellAnnounced(quint32 name, quint32 version);
+    void lingmoShellAnnounced(quint32 name, quint32 version);
     /**
-     * Emitted whenever a org_kde_plasma_activation_feedback interface gets announced.
+     * Emitted whenever a org_kde_lingmo_activation_feedback interface gets announced.
      * @param name The name for the announced interface
      * @param version The maximum supported version of the announced interface
      * @since 5.83
      **/
-    void plasmaActivationFeedbackAnnounced(quint32 name, quint32 version);
+    void lingmoActivationFeedbackAnnounced(quint32 name, quint32 version);
     /**
-     * Emitted whenever a org_kde_plasma_virtual_desktop_management interface gets announced.
+     * Emitted whenever a org_kde_lingmo_virtual_desktop_management interface gets announced.
      * @param name The name for the announced interface
      * @param version The maximum supported version of the announced interface
      * @since 5.52
      **/
-    void plasmaVirtualDesktopManagementAnnounced(quint32 name, quint32 version);
+    void lingmoVirtualDesktopManagementAnnounced(quint32 name, quint32 version);
     /**
-     * Emitted whenever a org_kde_plasma_window_management interface gets announced.
+     * Emitted whenever a org_kde_lingmo_window_management interface gets announced.
      * @param name The name for the announced interface
      * @param version The maximum supported version of the announced interface
      * @since 5.4
      **/
-    void plasmaWindowManagementAnnounced(quint32 name, quint32 version);
+    void lingmoWindowManagementAnnounced(quint32 name, quint32 version);
     /**
      * Emitted whenever a org_kde_kwin_fake_input interface gets announced.
      * @param name The name for the announced interface
@@ -1318,29 +1318,29 @@ Q_SIGNALS:
      **/
     void dataDeviceManagerRemoved(quint32 name);
     /**
-     * Emitted whenever a org_kde_plasma_shell interface gets removed.
+     * Emitted whenever a org_kde_lingmo_shell interface gets removed.
      * @param name The name for the removed interface
      * @since 5.4
      **/
-    void plasmaShellRemoved(quint32 name);
+    void lingmoShellRemoved(quint32 name);
     /**
-     * Emitted whenever a org_kde_plasma_activation_feedback interface gets removed.
+     * Emitted whenever a org_kde_lingmo_activation_feedback interface gets removed.
      * @param name The name for the removed interface
      * @since 5.83
      **/
-    void plasmaActivationFeedbackRemoved(quint32 name);
+    void lingmoActivationFeedbackRemoved(quint32 name);
     /**
-     * Emitted whenever a org_kde_plasma_virtual_desktop_management interface gets removed.
+     * Emitted whenever a org_kde_lingmo_virtual_desktop_management interface gets removed.
      * @param name The name for the removed interface
      * @since 5.52
      **/
-    void plasmaVirtualDesktopManagementRemoved(quint32 name);
+    void lingmoVirtualDesktopManagementRemoved(quint32 name);
     /**
-     * Emitted whenever a org_kde_plasma_window_management interface gets removed.
+     * Emitted whenever a org_kde_lingmo_window_management interface gets removed.
      * @param name The name for the removed interface
      * @since 5.4
      **/
-    void plasmaWindowManagementRemoved(quint32 name);
+    void lingmoWindowManagementRemoved(quint32 name);
     /**
      * Emitted whenever a org_kde_kwin_fake_input interface gets removed.
      * @param name The name for the removed interface

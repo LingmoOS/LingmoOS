@@ -37,7 +37,7 @@ FrameSvgItem {
 ```
 
 ## More documentation
-Assume the theme filesystem hierarchy used by the Plasma shell, but the general concepts apply everywhere:
+Assume the theme filesystem hierarchy used by the Lingmo shell, but the general concepts apply everywhere:
 
-* https://develop.kde.org/docs/plasma/theme/theme-elements/
-* https://develop.kde.org/docs/plasma/theme/quickstart/
+* https://develop.kde.org/docs/lingmo/theme/theme-elements/
+* https://develop.kde.org/docs/lingmo/theme/quickstart/

@@ -50,8 +50,8 @@ void TestDontCrashUseractionsMenu::initTestCase()
         QRect(1280, 0, 1280, 1024),
     });
 
-    // force style to breeze as that's the one which triggered the crash
-    QVERIFY(kwinApp()->setStyle(QStringLiteral("breeze")));
+    // force style to ocean as that's the one which triggered the crash
+    QVERIFY(kwinApp()->setStyle(QStringLiteral("ocean")));
 
     kwinApp()->start();
     QVERIFY(applicationStartedSpy.wait());

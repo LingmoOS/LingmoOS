@@ -667,7 +667,7 @@ void TestXdgShellWindow::testHidden()
 
 void TestXdgShellWindow::testDesktopFileName()
 {
-    QIcon::setThemeName(QStringLiteral("breeze"));
+    QIcon::setThemeName(QStringLiteral("ocean"));
     // this test verifies that desktop file name is passed correctly to the window
     std::unique_ptr<KWayland::Client::Surface> surface(Test::createSurface());
     // only xdg-shell as ShellSurface misses the setter

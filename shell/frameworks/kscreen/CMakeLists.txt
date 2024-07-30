@@ -43,13 +43,13 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
 )
 
 find_package(KF6Screen ${PROJECT_DEP_VERSION} REQUIRED)
-find_package(Plasma ${PROJECT_DEP_VERSION} REQUIRED)
-find_package(PlasmaQuick ${PROJECT_DEP_VERSION} REQUIRED)
+find_package(Lingmo ${PROJECT_DEP_VERSION} REQUIRED)
+find_package(LingmoQuick ${PROJECT_DEP_VERSION} REQUIRED)
 
 find_package(LayerShellQt)
 set_package_properties(LayerShellQt PROPERTIES
     DESCRIPTION "Layer shell Qt bindings"
-    URL "https://invent.kde.org/plasma/layer-shell-qt"
+    URL "https://invent.kde.org/lingmo/layer-shell-qt"
     PURPOSE "Required for the screen selection osd"
     TYPE REQUIRED
 )

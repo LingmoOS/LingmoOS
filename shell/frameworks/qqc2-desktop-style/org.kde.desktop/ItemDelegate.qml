@@ -9,7 +9,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.desktop.private as Private
 
 T.ItemDelegate {
@@ -23,18 +23,18 @@ T.ItemDelegate {
 
     hoverEnabled: true
 
-    spacing: Kirigami.Units.smallSpacing
-    padding: Kirigami.Settings.tabletMode ? Kirigami.Units.largeSpacing : Kirigami.Units.mediumSpacing
-    horizontalPadding: Kirigami.Units.smallSpacing * 2
+    spacing: LingmoUI.Units.smallSpacing
+    padding: LingmoUI.Settings.tabletMode ? LingmoUI.Units.largeSpacing : LingmoUI.Units.mediumSpacing
+    horizontalPadding: LingmoUI.Units.smallSpacing * 2
     leftPadding: !mirrored ? horizontalPadding + (indicator ? implicitIndicatorWidth + spacing : 0) : horizontalPadding
     rightPadding: mirrored ? horizontalPadding + (indicator ? implicitIndicatorWidth + spacing : 0) : horizontalPadding
 
-    icon.width: Kirigami.Units.iconSizes.smallMedium
-    icon.height: Kirigami.Units.iconSizes.smallMedium
+    icon.width: LingmoUI.Units.iconSizes.smallMedium
+    icon.height: LingmoUI.Units.iconSizes.smallMedium
 
-    T.ToolTip.visible: (Kirigami.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
+    T.ToolTip.visible: (LingmoUI.Settings.tabletMode ? down : hovered) && (contentItem.truncated ?? false)
     T.ToolTip.text: text
-    T.ToolTip.delay: Kirigami.Units.toolTipDelay
+    T.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
     leftInset: TableView.view ? 0 : horizontalPadding / 2
     rightInset: TableView.view ? 0 : horizontalPadding / 2
@@ -50,7 +50,7 @@ T.ItemDelegate {
 
         property alias truncated: textLabel.truncated
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             selected: controlRoot.highlighted || controlRoot.down
             Layout.alignment: Qt.AlignVCenter
             visible: controlRoot.icon.name.length > 0 || controlRoot.icon.source.toString().length > 0
@@ -68,8 +68,8 @@ T.ItemDelegate {
             text: controlRoot.text
             font: controlRoot.font
             color: controlRoot.highlighted || controlRoot.down
-                ? Kirigami.Theme.highlightedTextColor
-                : (controlRoot.enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor)
+                ? LingmoUI.Theme.highlightedTextColor
+                : (controlRoot.enabled ? LingmoUI.Theme.textColor : LingmoUI.Theme.disabledTextColor)
 
             elide: Text.ElideRight
             visible: controlRoot.text

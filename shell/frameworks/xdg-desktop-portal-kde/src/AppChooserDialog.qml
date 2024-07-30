@@ -12,8 +12,8 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import Qt.labs.platform
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.workspace.dialogs as PWD
 
 import org.kde.xdgdesktopportal
 
@@ -26,7 +26,7 @@ PWD.SystemDialog {
     onRememberChanged: AppChooserData.remember = remember
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.CheckBox {
             Layout.fillWidth: true
@@ -39,14 +39,14 @@ PWD.SystemDialog {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.ComboBox {
                 id: searchField
                 property bool ready: false
                 property string text: editText
 
-                implicitWidth: Kirigami.Units.gridUnit * 20
+                implicitWidth: LingmoUI.Units.gridUnit * 20
                 Layout.fillWidth: true
                 focus: true
                 editable: true
@@ -95,8 +95,8 @@ PWD.SystemDialog {
                     }
                 }
                 QQC2.ToolTip.text: text
-                QQC2.ToolTip.visible: Kirigami.Settings.tabletMode ? pressed : hovered
-                QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.visible: LingmoUI.Settings.tabletMode ? pressed : hovered
+                QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
             }
         }
 
@@ -116,7 +116,7 @@ PWD.SystemDialog {
             GridView {
                 id: grid
 
-                readonly property int gridDelegateSize: Kirigami.Units.iconSizes.huge + (Kirigami.Units.gridUnit * 4)
+                readonly property int gridDelegateSize: LingmoUI.Units.iconSizes.huge + (LingmoUI.Units.gridUnit * 4)
 
                 clip: true
 
@@ -157,10 +157,10 @@ PWD.SystemDialog {
                     Rectangle {
                         anchors.fill: parent
                         visible: hoverhandler.hovered || delegate.GridView.isCurrentItem
-                        border.color: Kirigami.Theme.highlightColor
+                        border.color: LingmoUI.Theme.highlightColor
                         border.width: 1
-                        color: taphandler.pressed ? Kirigami.Theme.highlightColor : Qt.alpha(Kirigami.Theme.highlightColor, 0.3)
-                        radius: Kirigami.Units.smallSpacing
+                        color: taphandler.pressed ? LingmoUI.Theme.highlightColor : Qt.alpha(LingmoUI.Theme.highlightColor, 0.3)
+                        radius: LingmoUI.Units.smallSpacing
                     }
 
                     ColumnLayout {
@@ -168,14 +168,14 @@ PWD.SystemDialog {
                             top: parent.top
                             left: parent.left
                             right: parent.right
-                            margins: Kirigami.Units.largeSpacing
+                            margins: LingmoUI.Units.largeSpacing
                         }
                         spacing: 0 // Items add their own as needed here
 
-                        Kirigami.Icon {
-                            Layout.preferredWidth: Kirigami.Units.iconSizes.huge
-                            Layout.preferredHeight: Kirigami.Units.iconSizes.huge
-                            Layout.bottomMargin: Kirigami.Units.largeSpacing
+                        LingmoUI.Icon {
+                            Layout.preferredWidth: LingmoUI.Units.iconSizes.huge
+                            Layout.preferredHeight: LingmoUI.Units.iconSizes.huge
+                            Layout.bottomMargin: LingmoUI.Units.largeSpacing
                             Layout.alignment: Qt.AlignHCenter
                             source: delegate.model.applicationIcon
                             smooth: true
@@ -213,17 +213,17 @@ PWD.SystemDialog {
                     id: placeholderLoader
 
                     anchors.centerIn: parent
-                    width: parent.width - Kirigami.Units.gridUnit * 4
+                    width: parent.width - LingmoUI.Units.gridUnit * 4
 
                     active: grid.count === 0
-                    sourceComponent: Kirigami.PlaceholderMessage {
+                    sourceComponent: LingmoUI.PlaceholderMessage {
                         anchors.centerIn: parent
 
                         icon.name: "edit-none"
                         text: searchField.editText.length > 0 ? i18n("No matches") : xi18nc("@info", "No installed applications can open <filename>%1</filename>", AppChooserData.fileName)
 
                         helpfulAction: QQC2.Action {
-                            icon.name: "plasmadiscover"
+                            icon.name: "lingmodiscover"
                             text: i18nc("Find some more apps that can open this content using the Discover app", "Find More in Discover")
                             onTriggered: AppChooserData.openDiscover()
                         }
@@ -237,17 +237,17 @@ PWD.SystemDialog {
 
             RowLayout {
                 id: rowLayout
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
                 property bool expanded: false
                 onExpandedChanged: containerItem.visibleHeight = expanded ? -1 : 0
 
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     Layout.fillWidth: rowLayout.children.length === 1
                     Layout.alignment: Qt.AlignVCenter
 
                     opacity: 0.7
                     level: 5
-                    type: Kirigami.Heading.Primary
+                    type: LingmoUI.Heading.Primary
                     text: i18nc("@title:group", "Terminal Options")
                     elide: Text.ElideRight
 
@@ -255,7 +255,7 @@ PWD.SystemDialog {
                     font.weight: Font.Bold
                 }
 
-                Kirigami.Separator {
+                LingmoUI.Separator {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
                 }
@@ -270,7 +270,7 @@ PWD.SystemDialog {
             QQC2.CheckBox {
                 // NOTE: this only ever works for konsole and xterm as per KTerminalLauncherJob. Trouble is this
                 // information is not exposed through API, so we have no way of hiding this when not supported.
-                Layout.leftMargin: Kirigami.Units.gridUnit
+                Layout.leftMargin: LingmoUI.Units.gridUnit
                 enabled: openInTerminal.checked
                 onCheckedChanged: AppChooserData.lingerTerminal = checked
                 text: i18nc("@option:check", "Do not close when command exits")
@@ -279,13 +279,13 @@ PWD.SystemDialog {
 
         RowLayout {
             visible: discoverMoreEdit.visible
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: rowLayout.children.length === 1
                 Layout.alignment: Qt.AlignVCenter
 
                 opacity: 0.7
                 level: 5
-                type: Kirigami.Heading.Primary
+                type: LingmoUI.Heading.Primary
                 text: i18nc("@title:group", "Discover More Applications")
                 elide: Text.ElideRight
 
@@ -293,7 +293,7 @@ PWD.SystemDialog {
                 font.weight: Font.Bold
             }
 
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
             }
@@ -305,15 +305,15 @@ PWD.SystemDialog {
 
         TextEdit {
             id: discoverMoreEdit
-            visible: !placeholderLoader.active && StandardPaths.findExecutable("plasma-discover").toString() !== ""
+            visible: !placeholderLoader.active && StandardPaths.findExecutable("lingmo-discover").toString() !== ""
             Layout.fillWidth: true
             text: xi18nc("@info", "Don't see the right app? Find more in <link>Discover</link>.")
             textFormat: Text.RichText
             wrapMode: Text.WordWrap
             readOnly: true
-            color: Kirigami.Theme.textColor
-            selectedTextColor: Kirigami.Theme.highlightedTextColor
-            selectionColor: Kirigami.Theme.highlightColor
+            color: LingmoUI.Theme.textColor
+            selectedTextColor: LingmoUI.Theme.highlightedTextColor
+            selectionColor: LingmoUI.Theme.highlightColor
 
             onLinkActivated: {
                 AppChooserData.openDiscover()

@@ -8,8 +8,8 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
-import org.kde.kirigami.delegates as KD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmoui.delegates as KD
 
 QQC2.ItemDelegate {
     id: item
@@ -35,7 +35,7 @@ QQC2.ItemDelegate {
     property string stateIconName
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
         KD.IconTitleSubtitle {
             Layout.fillWidth: true
             icon: icon.fromControlsIcon(item.icon)
@@ -44,29 +44,29 @@ QQC2.ItemDelegate {
             selected: item.highlighted
             font: item.font
         }
-        Kirigami.Icon {
+        LingmoUI.Icon {
             Layout.fillHeight: true
             visible: item.stateIconName.length > 0
             source: item.stateIconName
-            implicitWidth: Kirigami.Units.iconSizes.sizeForLabels
-            implicitHeight: Kirigami.Units.iconSizes.sizeForLabels
+            implicitWidth: LingmoUI.Units.iconSizes.sizeForLabels
+            implicitHeight: LingmoUI.Units.iconSizes.sizeForLabels
         }
     }
 
-    Kirigami.MnemonicData.enabled: item.enabled && item.visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.MenuItem
-    Kirigami.MnemonicData.label: action.text
+    LingmoUI.MnemonicData.enabled: item.enabled && item.visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.MenuItem
+    LingmoUI.MnemonicData.label: action.text
 
     // Note changing text here does not affect the action.text
-    text: Kirigami.MnemonicData.richTextLabel
+    text: LingmoUI.MnemonicData.richTextLabel
 
     QQC2.ToolTip.text: shortcut.nativeText
-    QQC2.ToolTip.visible: (Kirigami.Settings.tabletMode ? down : hovered) && QQC2.ToolTip.text.length > 0
-    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+    QQC2.ToolTip.visible: (LingmoUI.Settings.tabletMode ? down : hovered) && QQC2.ToolTip.text.length > 0
+    QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
     Shortcut {
         id: shortcut
-        sequence: item.Kirigami.MnemonicData.sequence
+        sequence: item.LingmoUI.MnemonicData.sequence
         onActivated: item.trigger()
     }
 

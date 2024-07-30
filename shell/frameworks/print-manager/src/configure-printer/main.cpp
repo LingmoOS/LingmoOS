@@ -28,8 +28,8 @@ int main(int argc, char **argv)
                          KAboutLicense::GPL,
                          i18n("(C) 2010-2018 Daniel Nicoletti"));
     aboutData.addAuthor(QStringLiteral("Daniel Nicoletti"), QString(), QLatin1String("dantti12@gmail.com"));
-    aboutData.addAuthor(QStringLiteral("Jan Grulich"), i18n("Port to Qt 5 / Plasma 5"), QStringLiteral("jgrulich@redhat.com"));
-    aboutData.addAuthor(QStringLiteral("Mike Noe"), i18n("Port to Qt 6 / Plasma 6"), QStringLiteral("noeerover@gmail.com"));
+    aboutData.addAuthor(QStringLiteral("Jan Grulich"), i18n("Port to Qt 5 / Lingmo 5"), QStringLiteral("jgrulich@redhat.com"));
+    aboutData.addAuthor(QStringLiteral("Mike Noe"), i18n("Port to Qt 6 / Lingmo 6"), QStringLiteral("noeerover@gmail.com"));
 
     KAboutData::setApplicationData(aboutData);
     KDBusService service(KDBusService::Unique);

@@ -6,7 +6,7 @@
 */
 
 /**
- * @brief A Kirigami.Page component used for showing how to upload KNS entries to a service
+ * @brief A LingmoUI.Page component used for showing how to upload KNS entries to a service
  *
  * This page shows a short guide for uploading new content to the service provided by a KNewStuff
  * provider. This attempts to use the information available through the provider itself, and
@@ -24,12 +24,12 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
 import "private" as Private
 
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: component
 
     /**
@@ -60,7 +60,7 @@ Kirigami.ScrollablePage {
 
     ColumnLayout {
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Item {
             Layout.fillWidth: true
@@ -68,13 +68,13 @@ Kirigami.ScrollablePage {
 
             Behavior on Layout.preferredHeight {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
             }
 
             implicitHeight: uploaderBusy.running
-                ? uploaderBusy.height + uploaderBusyInfo.height + Kirigami.Units.largeSpacing * 4
+                ? uploaderBusy.height + uploaderBusyInfo.height + LingmoUI.Units.largeSpacing * 4
                 : 0
 
             visible: uploaderBusy.running
@@ -82,7 +82,7 @@ Kirigami.ScrollablePage {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
             }
@@ -93,7 +93,7 @@ Kirigami.ScrollablePage {
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     bottom: parent.verticalCenter
-                    bottomMargin: Kirigami.Units.largeSpacing
+                    bottomMargin: LingmoUI.Units.largeSpacing
                 }
                 running: component.engine.isLoading && component.engine.isValid
             }
@@ -105,7 +105,7 @@ Kirigami.ScrollablePage {
                     top: parent.verticalCenter
                     left: parent.left
                     right: parent.right
-                    margins: Kirigami.Units.largeSpacing
+                    margins: LingmoUI.Units.largeSpacing
                 }
                 horizontalAlignment: Text.AlignHCenter
                 text: i18ndc("knewstuff6", "A text shown beside a busy indicator suggesting that data is being fetched", "Updating information…")
@@ -117,7 +117,7 @@ Kirigami.ScrollablePage {
                 engine: component.engine
             }
 
-            Kirigami.Card {
+            LingmoUI.Card {
                 enabled: !uploaderBusy.running
 
                 banner {
@@ -136,7 +136,7 @@ Kirigami.ScrollablePage {
                 }
 
                 actions: [
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         visible: model.website !== ""
                         text: i18ndc("knewstuff6", "Text for an action which causes the specified website to be opened using the user's system default browser", "Open Website: %1", model.website)
                         onTriggered: source => {
@@ -144,7 +144,7 @@ Kirigami.ScrollablePage {
                         }
                     },
 
-                    Kirigami.Action {
+                    LingmoUI.Action {
                         visible: model.contactEmail !== "" && model.name !== "api.kde-look.org"
                         text: i18ndc("knewstuff6", "Text for an action which will attempt to send an email using the user's system default email client", "Send Email To: %1", model.contactEmail)
                         onTriggered: source => {

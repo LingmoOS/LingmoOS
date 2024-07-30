@@ -1,11 +1,11 @@
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.Page {
+LingmoUI.Page {
     readonly property bool isHome: true
 
     title: placeholder.text
 
-    Kirigami.LoadingPlaceholder {
+    LingmoUI.LoadingPlaceholder {
         id: placeholder
         anchors.centerIn: parent
     }

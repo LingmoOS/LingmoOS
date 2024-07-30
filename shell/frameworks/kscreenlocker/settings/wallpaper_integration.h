@@ -67,7 +67,7 @@ Q_SIGNALS:
     void configurationChanged();
 
     /**
-     * This is to keep compatible with WallpaperInterface in plasma-framework.
+     * This is to keep compatible with WallpaperInterface in lingmo-framework.
      * It doesn't have any practical use.
      */
     void isLoadingChanged();

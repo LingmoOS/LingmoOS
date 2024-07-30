@@ -27,14 +27,14 @@ int main(int argc, char **argv)
 
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        u"Test helper: Migrate an existing Plasma 5 PowerDevil configuration its Plasma 6 equivalent, but write the output to a user-specified path."_s);
+        u"Test helper: Migrate an existing Lingmo 5 PowerDevil configuration its Lingmo 6 equivalent, but write the output to a user-specified path."_s);
 
     parser.addOption(
         {u"src-powerdevilrc"_s,
-         u"Path of an original global configuration file from Plasma 5 times. Doesn't have to be called powerdevilrc, but will be interpreted as such."_s,
+         u"Path of an original global configuration file from Lingmo 5 times. Doesn't have to be called powerdevilrc, but will be interpreted as such."_s,
          u"path"_s});
     parser.addOption({u"src-profilesrc"_s,
-                      u"Path of an original profile configuration file from Plasma 5 times. Doesn't have to be called powermanagementprofilesrc, but will be "
+                      u"Path of an original profile configuration file from Lingmo 5 times. Doesn't have to be called powermanagementprofilesrc, but will be "
                       "interpreted as such."_s,
                       u"path"_s});
     parser.addOption({u"dest-powerdevilrc"_s,
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
     parser.addOption({u"assert-no-powerdevilrc-after-migration"_s, u"Abort with a non-zero error code if powerdevilrc exists after migrating."_s});
 
-    parser.addOption({u"mobile"_s, u"Assume running on a mobile device (i.e. phones, tablets running Plasma Mobile) instead of regular desktop/laptop."_s});
+    parser.addOption({u"mobile"_s, u"Assume running on a mobile device (i.e. phones, tablets running Lingmo Mobile) instead of regular desktop/laptop."_s});
     parser.addOption({u"vm"_s, u"Assume running in a virtual machine environment instead of bare metal."_s});
     parser.addOption({u"cannot-suspend"_s, u"Assume that the device does not support suspending to RAM a.k.a. Sleep."_s});
 

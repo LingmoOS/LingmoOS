@@ -52,7 +52,7 @@ if (WITH_X11)
 endif()
 
 if (WITH_WAYLAND)
-    find_package(PlasmaWaylandProtocols 1.10.0 REQUIRED)
+    find_package(LingmoWaylandProtocols 1.10.0 REQUIRED)
     find_package(Qt6WaylandClient ${REQUIRED_QT_VERSION} REQUIRED CONFIG)
     find_package(Wayland 1.9 REQUIRED Client)
 endif()

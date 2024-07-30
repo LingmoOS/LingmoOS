@@ -39,8 +39,8 @@ DummyDecorationBridge::DummyDecorationBridge(const QString &decorationTheme, QOb
     // they were enabled, draw a buttons and then enable them again.
     if (decorationTheme == QStringLiteral("Oxygen")) {
         m_decorationsConfigFileName = QStringLiteral("oxygenrc");
-    } else { // for Breeze window decorations and its forks
-        m_decorationsConfigFileName = QStringLiteral("breezerc");
+    } else { // for Ocean window decorations and its forks
+        m_decorationsConfigFileName = QStringLiteral("oceanrc");
     }
 
     disableAnimations();
@@ -57,7 +57,7 @@ DummyDecorationBridge::DummyDecorationBridge(const QString &decorationTheme, QOb
     m_decoration->setSettings(decorationSettings);
     m_decoration->init();
 
-    // Update decoration settings, e.g. Breeze's "Draw a circle around close button"
+    // Update decoration settings, e.g. Ocean's "Draw a circle around close button"
     if (m_settings) {
         Q_EMIT m_settings->decorationSettings()->reconfigured();
     }
@@ -102,7 +102,7 @@ void DummyDecorationBridge::paintButton(QPainter &painter, const QString &button
 
     if (buttonType == QStringLiteral("maximized")) {
         // Different decorations use different ways to know if the window is maximized
-        // For example Breeze uses 'checked' property, but Oxygen uses client's 'isMaximized' method
+        // For example Ocean uses 'checked' property, but Oxygen uses client's 'isMaximized' method
         button->setChecked(true);
         if (m_client) {
             dynamic_cast<DummyDecoratedClient *>(m_client)->setMaximized(true);
@@ -162,7 +162,7 @@ QString DummyDecorationBridge::windowDecorationPluginPath(const QString &decorat
     QString defaultPluginPath;
 
     for (const auto &pluginMetaData : decorationPlugins) {
-        if (pluginMetaData.pluginId() == QLatin1String("org.kde.breeze")) {
+        if (pluginMetaData.pluginId() == QLatin1String("org.kde.ocean")) {
             defaultPluginPath = pluginMetaData.fileName();
         }
 

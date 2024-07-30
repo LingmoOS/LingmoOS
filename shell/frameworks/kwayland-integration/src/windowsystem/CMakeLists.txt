@@ -21,23 +21,23 @@ ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
     BASENAME xdg-activation-v1
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/blur.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/blur.xml
     BASENAME blur
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/contrast.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/contrast.xml
     BASENAME contrast
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/slide.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/slide.xml
     BASENAME slide
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/plasma-window-management.xml
-    BASENAME plasma-window-management
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/lingmo-window-management.xml
+    BASENAME lingmo-window-management
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS
-    PROTOCOL ${PLASMA_WAYLAND_PROTOCOLS_DIR}/shadow.xml
+    PROTOCOL ${LINGMO_WAYLAND_PROTOCOLS_DIR}/shadow.xml
     BASENAME shadow
 )
 ecm_add_qtwayland_client_protocol(wayland_plugin_SRCS

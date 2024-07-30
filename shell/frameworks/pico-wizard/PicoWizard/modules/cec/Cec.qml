@@ -4,8 +4,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -41,12 +41,12 @@ ModuleMediaCenter {
                 Rectangle {
                     id: setupCecBox
                     anchors.left: parent.left
-                    width: parent.width - Kirigami.Units.smallSpacing
+                    width: parent.width - LingmoUI.Units.smallSpacing
                     height: parent.height
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: Kirigami.Theme.backgroundColor
+                    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 3
-                    border.color: setupCecBox.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+                    border.color: setupCecBox.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.disabledTextColor
                     border.width: setupCecBox.activeFocus ? 3 : 1
 
                     KeyNavigation.down: nextButton.enabled ? nextButton : backButton
@@ -68,14 +68,14 @@ ModuleMediaCenter {
 
             RowLayout {
                 Layout.preferredWidth: root.width * 0.7
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: backButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -101,10 +101,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: restartButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
                     visible: delegateItem.setupStage == 3
                     enabled: delegateItem.setupStage == 3
@@ -131,10 +131,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: nextButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     enabled: delegateItem.setupStage == 2 || delegateItem.setupStage == 4
                     radius: 3
 
@@ -157,10 +157,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: skipButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -214,7 +214,7 @@ ModuleMediaCenter {
             ColumnLayout {
                 width: parent.width
                 height: parent.height
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Label {
                     wrapMode: Text.WordWrap
@@ -234,7 +234,7 @@ ModuleMediaCenter {
             ColumnLayout {
                 width: parent.width
                 height: parent.height
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Label {
                     wrapMode: Text.WordWrap
@@ -254,7 +254,7 @@ ModuleMediaCenter {
             ColumnLayout {
                 width: parent.width
                 height: parent.height
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Label {
                     wrapMode: Text.WordWrap
@@ -273,7 +273,7 @@ ModuleMediaCenter {
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -300,7 +300,7 @@ ModuleMediaCenter {
                         case 6: return "Home";
                     }
 
-                    Kirigami.Heading {
+                    LingmoUI.Heading {
                         wrapMode: Text.WordWrap
                         Layout.preferredWidth: parent.width / 2
                         Layout.fillHeight: true

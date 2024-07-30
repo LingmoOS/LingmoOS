@@ -23,7 +23,7 @@
 
 using namespace Qt::StringLiterals;
 
-K_PLUGIN_CLASS_WITH_JSON(PowerDevilRunner, "plasma-runner-powerdevil.json")
+K_PLUGIN_CLASS_WITH_JSON(PowerDevilRunner, "lingmo-runner-powerdevil.json")
 
 PowerDevilRunner::PowerDevilRunner(QObject *parent, const KPluginMetaData &metaData)
     : KRunner::AbstractRunner(parent, metaData)

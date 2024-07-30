@@ -114,7 +114,7 @@ void ResourceLinking::UnlinkResourceFromActivity(QString initiatingAgent, QStrin
                                       "WHERE "
                                       "initiatingAgent   = COALESCE(:initiatingAgent  , '') AND "
                                       "(targettedResource = COALESCE(:targettedResource, '') OR "
-                                      "(initiatingAgent = 'org.kde.plasma.favorites.applications' "
+                                      "(initiatingAgent = 'org.kde.lingmo.favorites.applications' "
                                       "AND targettedResource = 'applications:' || COALESCE(:targettedResource, '')))"));
         query = unlinkResourceFromAllActivitiesQuery.get();
     } else {
@@ -125,7 +125,7 @@ void ResourceLinking::UnlinkResourceFromActivity(QString initiatingAgent, QStrin
                                       "usedActivity      = COALESCE(:usedActivity     , '') AND "
                                       "initiatingAgent   = COALESCE(:initiatingAgent  , '') AND "
                                       "(targettedResource = COALESCE(:targettedResource, '') OR "
-                                      "(initiatingAgent = 'org.kde.plasma.favorites.applications'"
+                                      "(initiatingAgent = 'org.kde.lingmo.favorites.applications'"
                                       "AND targettedResource =  'applications:' || COALESCE(:targettedResource, '')))"));
         query = unlinkResourceFromActivityQuery.get();
     }
@@ -134,7 +134,7 @@ void ResourceLinking::UnlinkResourceFromActivity(QString initiatingAgent, QStrin
     // BUG 385814, some existing entries don't have the applications:
     // prefix, so we remove it and check in the sql if they match
     // TODO Remove when we can expect all users to have a fresher install than 5.18
-    if (initiatingAgent == QLatin1String("org.kde.plasma.favorites.applications")) {
+    if (initiatingAgent == QLatin1String("org.kde.lingmo.favorites.applications")) {
         targettedResource = targettedResource.remove(QLatin1String("applications:"));
     }
     Utils::exec(*resourcesDatabase(),

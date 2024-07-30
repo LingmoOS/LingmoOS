@@ -11,10 +11,10 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.plasmoid
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmo.plasmoid
 
 ColumnLayout {
     id: root
@@ -28,7 +28,7 @@ ColumnLayout {
     // }]
     property var screenLayouts
 
-    spacing: Kirigami.Units.smallSpacing * 2
+    spacing: LingmoUI.Units.smallSpacing * 2
 
     states: [
         State {
@@ -46,7 +46,7 @@ ColumnLayout {
         }
     ]
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         Layout.fillWidth: true
         level: 3
         text: i18n("Screen Layout")
@@ -57,13 +57,13 @@ ColumnLayout {
         id: screenLayoutRow
         readonly property int buttonSize: Math.floor((width - spacing * (screenLayoutRepeater.count - 1)) / screenLayoutRepeater.count)
         Layout.fillWidth: true
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         Repeater {
             id: screenLayoutRepeater
             model: root.screenLayouts
 
-            PlasmaComponents3.Button {
+            LingmoComponents3.Button {
                 id: screenLayoutDelegate
 
                 required property /*KScreen.OsdAction*/var modelData
@@ -80,18 +80,18 @@ ColumnLayout {
                 onClicked: Plasmoid.applyLayoutPreset(modelData.action)
 
                 Accessible.name: text
-                PlasmaComponents3.ToolTip { text: screenLayoutDelegate.text }
+                LingmoComponents3.ToolTip { text: screenLayoutDelegate.text }
             }
         }
     }
 
-    PlasmaExtras.DescriptiveLabel {
+    LingmoExtras.DescriptiveLabel {
         id: noScreenLabel
         Layout.fillWidth: true
-        Layout.maximumWidth: Math.min(Kirigami.Units.gridUnit * 20, implicitWidth)
+        Layout.maximumWidth: Math.min(LingmoUI.Units.gridUnit * 20, implicitWidth)
         wrapMode: Text.Wrap
         text: i18n("You can only apply a different screen layout when there is more than one display device plugged in.")
-        font: Kirigami.Theme.smallFont
+        font: LingmoUI.Theme.smallFont
         visible: false
     }
 }

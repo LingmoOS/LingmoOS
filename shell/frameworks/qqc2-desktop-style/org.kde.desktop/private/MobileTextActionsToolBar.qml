@@ -8,7 +8,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Loader {
     property /*TextInput | TextEdit*/ Item controlRoot
@@ -16,7 +16,7 @@ Loader {
 
     active: controlRoot !== null
         && shouldBeVisible
-        && Kirigami.Settings.tabletMode
+        && LingmoUI.Settings.tabletMode
         && (controlRoot.selectedText.length > 0 || controlRoot.canPaste)
 
     Component.onCompleted: {

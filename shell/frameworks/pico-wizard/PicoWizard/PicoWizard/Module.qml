@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtGraphicalEffects 1.0
 
-import org.kde.kirigami 2.7 as Kirigami
+import org.kde.lingmoui 2.7 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -20,13 +20,13 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: false
         Layout.topMargin: 64
-        Layout.rightMargin: Kirigami.Settings.isMobile ? 24 : 56
+        Layout.rightMargin: LingmoUI.Settings.isMobile ? 24 : 56
 
         RoundButton {
             Layout.fillWidth: false
             Layout.fillHeight: false
-            Layout.preferredWidth: Kirigami.Settings.isMobile ? 40 : 48
-            Layout.preferredHeight: Kirigami.Settings.isMobile ? 40 : 48
+            Layout.preferredWidth: LingmoUI.Settings.isMobile ? 40 : 48
+            Layout.preferredHeight: LingmoUI.Settings.isMobile ? 40 : 48
             hoverEnabled: false
 
             flat: true
@@ -40,12 +40,12 @@ ColumnLayout {
                 color: "transparent"
             }
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 anchors.fill: parent
                 anchors.centerIn: parent
                 source: "go-previous"
-                anchors.margins: Kirigami.Units.largeSpacing
-                color: Kirigami.Theme.highlightedTextColor
+                anchors.margins: LingmoUI.Units.largeSpacing
+                color: LingmoUI.Theme.highlightedTextColor
                 isMask: true
             }
         }
@@ -55,8 +55,8 @@ ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: false
             font.weight: Font.Light
-            font.pointSize: Kirigami.Settings.isMobile ? 16 : 24
-            color: Kirigami.Theme.highlightedTextColor
+            font.pointSize: LingmoUI.Settings.isMobile ? 16 : 24
+            color: LingmoUI.Theme.highlightedTextColor
         }
 
         Label {
@@ -64,8 +64,8 @@ ColumnLayout {
             Layout.fillWidth: false
             Layout.fillHeight: false
             font.weight: Font.Light
-            font.pointSize: Kirigami.Settings.isMobile ? 16 : 24
-            color: Kirigami.Theme.highlightedTextColor
+            font.pointSize: LingmoUI.Settings.isMobile ? 16 : 24
+            color: LingmoUI.Theme.highlightedTextColor
             text: qsTr("Skip")
             visible: !hideSkip
 
@@ -78,33 +78,33 @@ ColumnLayout {
         }
     }
 
-    Kirigami.Page {
+    LingmoUI.Page {
         id: control
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.leftMargin: Kirigami.Settings.isMobile ? 24 : 56
-        Layout.rightMargin: Kirigami.Settings.isMobile ? 24 : 56
+        Layout.leftMargin: LingmoUI.Settings.isMobile ? 24 : 56
+        Layout.rightMargin: LingmoUI.Settings.isMobile ? 24 : 56
         background: Rectangle {
-            color: Qt.lighter(Kirigami.Theme.backgroundColor, 1.1)
+            color: Qt.lighter(LingmoUI.Theme.backgroundColor, 1.1)
             radius: 4
             border.width: 1
-            border.color: Qt.darker(Kirigami.Theme.backgroundColor, 1.05)
+            border.color: Qt.darker(LingmoUI.Theme.backgroundColor, 1.05)
         }
 
         ColumnLayout {
             anchors.fill: parent
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 id: icon
                 isMask: true
-                color: Qt.lighter(Kirigami.Theme.disabledTextColor, 1.5)
+                color: Qt.lighter(LingmoUI.Theme.disabledTextColor, 1.5)
                 opacity: 0.8
 
-                Layout.preferredWidth: Kirigami.Settings.isMobile ? 64 : 196
-                Layout.preferredHeight: Kirigami.Settings.isMobile ? 64 : 196
+                Layout.preferredWidth: LingmoUI.Settings.isMobile ? 64 : 196
+                Layout.preferredHeight: LingmoUI.Settings.isMobile ? 64 : 196
                 Layout.alignment: Layout.Center
-                Layout.topMargin: Kirigami.Settings.isMobile ? 24 : 64
-                Layout.bottomMargin: Kirigami.Settings.isMobile ? 24 : 64
+                Layout.topMargin: LingmoUI.Settings.isMobile ? 24 : 64
+                Layout.bottomMargin: LingmoUI.Settings.isMobile ? 24 : 64
             }
 
             Loader {

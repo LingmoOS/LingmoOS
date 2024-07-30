@@ -10,15 +10,15 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Templates as T
 import org.kde.desktop as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.Popup {
     id: root
 
     required property /*TextInput | TextEdit*/ Item controlRoot
 
-    Kirigami.OverlayZStacking.layer: Kirigami.OverlayZStacking.Menu
-    z: Kirigami.OverlayZStacking.z
+    LingmoUI.OverlayZStacking.layer: LingmoUI.OverlayZStacking.Menu
+    z: LingmoUI.OverlayZStacking.z
 
     parent: controlRoot?.Window.window?.contentItem ?? null
     modal: false
@@ -45,7 +45,7 @@ QQC2.Popup {
         if (desiredY >= 0) {
             return Math.min(maxY, desiredY);
         } else {
-            const desiredY = controlRoot.mapToItem(parent, 0, controlRoot.positionToRectangle(controlRoot.selectionEnd).y + Math.round(Kirigami.Units.gridUnit * 1.5)).y;
+            const desiredY = controlRoot.mapToItem(parent, 0, controlRoot.positionToRectangle(controlRoot.selectionEnd).y + Math.round(LingmoUI.Units.gridUnit * 1.5)).y;
             return Math.min(maxY, Math.max(0, desiredY));
         }
     }

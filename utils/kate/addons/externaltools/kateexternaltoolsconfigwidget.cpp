@@ -219,7 +219,7 @@ KateExternalToolsConfigWidget::KateExternalToolsConfigWidget(QWidget *parent, Ka
     setupUi(this);
     layout()->setContentsMargins(0, 0, 0, 0);
     layout()->setSpacing(0);
-    lbTools->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::BottomEdge}));
+    lbTools->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::BottomEdge}));
     lbTools->setModel(&m_toolsModel);
     lbTools->setSelectionMode(QAbstractItemView::SingleSelection);
     lbTools->setDragEnabled(true);

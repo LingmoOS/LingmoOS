@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.RangeSlider {
     id: control
@@ -29,8 +29,8 @@ T.RangeSlider {
         implicitWidth: 18
         implicitHeight: 18
         radius: width / 2
-        border.color: control.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
-        color: Kirigami.Theme.backgroundColor
+        border.color: control.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
+        color: LingmoUI.Theme.backgroundColor
         Rectangle {
             z: -1
             x: 1
@@ -49,8 +49,8 @@ T.RangeSlider {
         implicitWidth: 18
         implicitHeight: 18
         radius: width / 2
-        border.color: control.activeFocus ? Kirigami.Theme.highlightColor :  Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
-        color: Kirigami.Theme.backgroundColor
+        border.color: control.activeFocus ? LingmoUI.Theme.highlightColor :  LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
+        color: LingmoUI.Theme.backgroundColor
         Rectangle {
             z: -1
             x: 1
@@ -71,7 +71,7 @@ T.RangeSlider {
         width: horizontal ? control.availableWidth : implicitWidth
         height: horizontal ? implicitHeight : control.availableHeight
         radius: Math.round(Math.min(width / 2, height / 2))
-        color: Qt.alpha(Kirigami.Theme.textColor, 0.3)
+        color: Qt.alpha(LingmoUI.Theme.textColor, 0.3)
         anchors.centerIn: parent
 
         Rectangle {
@@ -83,7 +83,7 @@ T.RangeSlider {
             y: backgroundRectangle.horizontal ? 0 : control.second.visualPosition * parent.height + 6
             width: backgroundRectangle.horizontal ? control.second.position * parent.width - control.first.position * parent.width - 6 : 6
             height: backgroundRectangle.horizontal ? 6 : control.second.position * parent.height - control.first.position * parent.height - 6
-            color: Kirigami.Theme.highlightColor
+            color: LingmoUI.Theme.highlightColor
         }
     }
 }

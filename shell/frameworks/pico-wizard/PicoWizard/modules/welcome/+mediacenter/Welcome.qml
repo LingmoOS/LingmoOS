@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.12 as Kirigami
+import org.kde.lingmoui 2.12 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -47,21 +47,21 @@ FocusScope {
                 maximumLineCount: 3
                 fontSizeMode: Text.Fit
                 wrapMode: Text.WordWrap
-                text: qsTr("<font color=\"#1e88e5\"><b>Hello</b></font> Plasma Bigscreen")
-                color: Kirigami.Theme.textColor
+                text: qsTr("<font color=\"#1e88e5\"><b>Hello</b></font> Lingmo Bigscreen")
+                color: LingmoUI.Theme.textColor
             }
         }
 
         Item {
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 18
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+            Layout.preferredWidth: LingmoUI.Units.gridUnit * 18
+            Layout.preferredHeight: LingmoUI.Units.gridUnit * 6
             Layout.alignment: Qt.AlignHCenter
 
             Rectangle {
-                color: Kirigami.Theme.highlightColor
+                color: LingmoUI.Theme.highlightColor
                 radius: 4
-                width: Kirigami.Units.gridUnit * 6
-                height: Kirigami.Units.gridUnit * 1
+                width: LingmoUI.Units.gridUnit * 6
+                height: LingmoUI.Units.gridUnit * 1
                 anchors.top: parent.top
                 x: infoRectContent.x
                 y: -2
@@ -77,40 +77,40 @@ FocusScope {
                     fontSizeMode: Text.Fit
                     wrapMode: Text.WordWrap
                     text: qsTr("Getting Started")
-                    color: Kirigami.Theme.textColor
+                    color: LingmoUI.Theme.textColor
                 }
             }
 
             Rectangle {
                 id: infoRectContent
-                color: Kirigami.Theme.backgroundColor
+                color: LingmoUI.Theme.backgroundColor
                 radius: 4
-                width: Kirigami.Units.gridUnit * 17.5
-                height: Kirigami.Units.gridUnit * 5
+                width: LingmoUI.Units.gridUnit * 17.5
+                height: LingmoUI.Units.gridUnit * 5
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: Kirigami.Units.smallSpacing
+                anchors.bottomMargin: LingmoUI.Units.smallSpacing
                 z: 1
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: Kirigami.Units.largeSpacing
+                    anchors.margins: LingmoUI.Units.largeSpacing
 
                     RowLayout {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
                         Item {
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                            Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                             Layout.fillHeight: true
 
-                            Kirigami.Icon {
+                            LingmoUI.Icon {
                                 anchors.fill: parent
                                 source: welcomeModule.dir() + "/assets/remote-ok.svg"
                             }
                         }
 
-                        Kirigami.Separator {
+                        LingmoUI.Separator {
                             Layout.preferredWidth: 1
                             Layout.fillHeight: true
                         }
@@ -128,11 +128,11 @@ FocusScope {
                             fontSizeMode: Text.Fit
                             wrapMode: Text.WordWrap
                             text: qsTr('Remote: Press the "Select|OK" button to continue')
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                     }
 
-                    Kirigami.Separator {
+                    LingmoUI.Separator {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
                     }
@@ -142,16 +142,16 @@ FocusScope {
                         Layout.fillHeight: true
 
                         Item {
-                            Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                            Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                             Layout.fillHeight: true
 
-                            Kirigami.Icon {
+                            LingmoUI.Icon {
                                 anchors.fill: parent
                                 source: welcomeModule.dir() + "/assets/keyboard-ok.svg"
                             }
                         }
 
-                        Kirigami.Separator {
+                        LingmoUI.Separator {
                             Layout.preferredWidth: 1
                             Layout.fillHeight: true
                         }
@@ -169,7 +169,7 @@ FocusScope {
                             fontSizeMode: Text.Fit
                             wrapMode: Text.WordWrap
                             text: qsTr('Keyboard: Press the "Enter" button to continue')
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                     }
                 }
@@ -184,20 +184,20 @@ FocusScope {
             Button {
                 id: nextBtn
                 focus: true
-                width: Kirigami.Units.gridUnit * 7 //parent.height * 0.6
+                width: LingmoUI.Units.gridUnit * 7 //parent.height * 0.6
                 height: parent.height * 0.6
                 anchors.centerIn: parent
 
                 background: Rectangle {
-                    color: nextBtn.activeFocus ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.2)
-                    border.color: nextBtn.activeFocus ? Kirigami.Theme.highlightColor : Qt.lighter(Kirigami.Theme.backgroundColor, 1.2)
+                    color: nextBtn.activeFocus ? LingmoUI.Theme.highlightColor : Qt.lighter(LingmoUI.Theme.backgroundColor, 1.2)
+                    border.color: nextBtn.activeFocus ? LingmoUI.Theme.highlightColor : Qt.lighter(LingmoUI.Theme.backgroundColor, 1.2)
                     border.width: nextBtn.activeFocus ? 4 : 0
                     radius: 4
                 }
 
                 contentItem: Item {
                     anchors.fill: parent
-                    anchors.margins: Kirigami.Units.smallSpacing
+                    anchors.margins: LingmoUI.Units.smallSpacing
 
                     Item {
                         id: nextBtnTextItem
@@ -212,7 +212,7 @@ FocusScope {
                             font.pixelSize: parent.width * 0.22
                             wrapMode: Text.WordWrap
                             text: qsTr("Continue")
-                            color: Kirigami.Theme.textColor
+                            color: LingmoUI.Theme.textColor
                         }
                     }
                     Item {
@@ -221,11 +221,11 @@ FocusScope {
                         width: parent.width * 0.25
                         height: parent.height
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             id: nextIcon
                             anchors.fill: parent
-                            anchors.margins: -Kirigami.Units.gridUnit
-                            color: Kirigami.Theme.highlightedTextColor
+                            anchors.margins: -LingmoUI.Units.gridUnit
+                            color: LingmoUI.Theme.highlightedTextColor
                             isMask: true
                             source: welcomeModule.dir() + "/assets/next.svg"
                         }

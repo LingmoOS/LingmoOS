@@ -138,7 +138,7 @@ void MagicLampEffect::apply(EffectWindow *w, int mask, WindowPaintData &data, Wi
                 if (!window->isDock()) {
                     continue;
                 }
-                // we have to use intersects as there seems to be a Plasma bug
+                // we have to use intersects as there seems to be a Lingmo bug
                 // the published icon geometry might be bigger than the panel
                 if (window->frameGeometry().intersects(icon)) {
                     panel = window;

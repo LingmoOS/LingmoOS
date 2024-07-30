@@ -4,12 +4,12 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.drkonqi as DrKonqi
 
 RowLayout {
-    spacing: Kirigami.Units.smallSpacing
+    spacing: LingmoUI.Units.smallSpacing
 
     QQC2.CheckBox {
         checked: DrKonqi.Settings.downloadSymbols
@@ -20,7 +20,7 @@ RowLayout {
         }
     }
 
-    Kirigami.ContextualHelpButton {
+    LingmoUI.ContextualHelpButton {
         toolTipText: i18nc("@info:tooltip",
 `Crash reports can be of greater value if additional debugging resources are downloaded from your distributor first.
 This causes downloads of unknown size when a crash occurs. This is skipped automatically when using a metered internet connection.`)

@@ -34,7 +34,7 @@ void PlasmoidPackageTest::init()
     qRegisterMetaType<KPackage::Package>(); // Needed for signal spy
     m_package = QStringLiteral("Package");
     m_packageRoot = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/packageRoot";
-    const auto pack = KPackage::PackageLoader::self()->loadPackageStructure("Plasma/TestKPackageInternalPlasmoid");
+    const auto pack = KPackage::PackageLoader::self()->loadPackageStructure("Lingmo/TestKPackageInternalPlasmoid");
     QVERIFY(pack);
     m_defaultPackage = KPackage::Package(pack);
     cleanup(); // to prevent previous runs from interfering with this one

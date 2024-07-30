@@ -198,7 +198,7 @@ void AppstreamDataDownloader::start()
     // If we're here, some files are outdated; download is needed
     qCDebug(LOG_ALPINEAPK) << "appstream_downloader: We will need to download " << m_urlsToDownload.size() << " file(s)";
 
-    const QString discoverVersion(QStringLiteral("plasma-discover %1").arg(DiscoverVersion::version));
+    const QString discoverVersion(QStringLiteral("lingmo-discover %1").arg(DiscoverVersion::version));
 
     m_jobs.clear();
     for (const QString &sUrl : std::as_const(m_urlsToDownload)) {

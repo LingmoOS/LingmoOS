@@ -9,7 +9,7 @@
 #include "screencast_debug.h"
 
 #include <KWayland/Client/output.h>
-#include <KWayland/Client/plasmawindowmanagement.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
 #include <KWayland/Client/registry.h>
 #include <QDebug>
 #include <QRect>

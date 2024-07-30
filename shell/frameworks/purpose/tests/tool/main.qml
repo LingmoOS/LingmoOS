@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.purpose as Purpose
 
 QQC2.ApplicationWindow {
@@ -29,7 +29,7 @@ QQC2.ApplicationWindow {
 
         anchors.fill: parent
 
-        header: Kirigami.Heading {
+        header: LingmoUI.Heading {
             text: {
                 const urls = window.inputData?.urls ?? [];
                 return i18n("Sharing %1", urls.join(", "));
@@ -37,7 +37,7 @@ QQC2.ApplicationWindow {
             level: 1
             wrapMode: Text.Wrap
             width: parent?.width
-            padding: Kirigami.Units.largeSpacing
+            padding: LingmoUI.Units.largeSpacing
         }
 
         pluginType: "Export"

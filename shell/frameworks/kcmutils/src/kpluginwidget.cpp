@@ -67,7 +67,7 @@ KPluginWidget::KPluginWidget(QWidget *parent)
     d->lineEdit->setPlaceholderText(i18n("Search…"));
     lineEditWrapperLayout->addWidget(d->lineEdit);
     d->listView = new KCategorizedView(this);
-    d->listView->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    d->listView->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     d->categoryDrawer = new KCategoryDrawer(d->listView);
     d->listView->setVerticalScrollMode(QListView::ScrollPerPixel);
     d->listView->setAlternatingRowColors(true);

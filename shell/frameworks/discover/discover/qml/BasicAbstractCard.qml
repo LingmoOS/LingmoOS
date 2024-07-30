@@ -7,13 +7,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /*
  * An AbstractCard with a default background but without any fancy sizing
  * features of an AbstractCard.
  */
-Kirigami.AbstractCard {
+LingmoUI.AbstractCard {
     id: root
 
     property Item content
@@ -24,7 +24,7 @@ Kirigami.AbstractCard {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              (content?.implicitHeight ?? 0) + topPadding + bottomPadding)
 
-    padding: Kirigami.Units.largeSpacing
+    padding: LingmoUI.Units.largeSpacing
     topPadding: undefined
     leftPadding: undefined
     rightPadding: undefined

@@ -51,7 +51,7 @@ find_package(KF6 ${KF_DEP_VERSION} REQUIRED
         ColorScheme
         CoreAddons
         GuiAddons      # KImageCache
-        KirigamiPlatform      # Kirigami.Theme
+        LingmoUIPlatform      # LingmoUI.Theme
 )
 
 #########################################################################
@@ -67,7 +67,7 @@ ecm_set_disabled_deprecation_versions(
 
 option(BUILD_TOOLS "Build and install KSVG tools." OFF)
 
-option(BUILD_COVERAGE "Build Plasma Frameworks with gcov support" OFF)
+option(BUILD_COVERAGE "Build Lingmo Frameworks with gcov support" OFF)
 
 if(BUILD_COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
@@ -84,7 +84,7 @@ if (BUILD_TESTING)
     add_subdirectory(autotests)
 endif()
 
-################ create PlasmaConfig.cmake and install it ###########################
+################ create LingmoConfig.cmake and install it ###########################
 
 # create a Config.cmake and a ConfigVersion.cmake file and install them
 

@@ -1,1 +1,1 @@
-plasma_install_package(package org.kde.plasma.printmanager)
+lingmo_install_package(package org.kde.lingmo.printmanager)

@@ -9,14 +9,14 @@ import QtQuick.Layouts
 
 import org.kde.kcmutils // KCMLauncher
 import org.kde.config as KConfig  // KAuthorized.authorizeControlModule
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmoui as LingmoUI
 
-import org.kde.plasma.private.brightnesscontrolplugin
+import org.kde.lingmo.private.brightnesscontrolplugin
 
-PlasmaComponents3.ItemDelegate {
+LingmoComponents3.ItemDelegate {
     id: root
 
     background.visible: highlighted
@@ -30,26 +30,26 @@ PlasmaComponents3.ItemDelegate {
     }
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.gridUnit
+        spacing: LingmoUI.Units.gridUnit
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: image
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
             source: "input-keyboard-color"
         }
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
-                PlasmaComponents3.Label {
+                LingmoComponents3.Label {
                     id: title
                     text: root.text
                     textFormat: Text.PlainText
@@ -61,17 +61,17 @@ PlasmaComponents3.ItemDelegate {
                 Rectangle {
                     id: colorIndicator
 
-                    width: Math.round(Kirigami.Units.gridUnit * 1.25)
-                    height: Math.round(Kirigami.Units.gridUnit * 1.25)
+                    width: Math.round(LingmoUI.Units.gridUnit * 1.25)
+                    height: Math.round(LingmoUI.Units.gridUnit * 1.25)
                     radius: 180
 
-                    color: keyboardColorControl.enabled ? Kirigami.Theme.highlightColor : "transparent"
+                    color: keyboardColorControl.enabled ? LingmoUI.Theme.highlightColor : "transparent"
                     border.color: Qt.rgba(0, 0, 0, 0.15)
                 }
             }
 
             RowLayout {
-                PlasmaComponents3.Switch {
+                LingmoComponents3.Switch {
                     id: syncAccentSwitch
                     checked: keyboardColorControl.enabled
                     text: i18n("Follow accent color")

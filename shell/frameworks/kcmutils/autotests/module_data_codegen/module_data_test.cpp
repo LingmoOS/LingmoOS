@@ -21,7 +21,7 @@ void ModuleDataTest::testReadingDefaults()
     Test::CursorThemeData data;
     Test::CursorThemeSettings *settings = data.settings();
     QVERIFY(settings);
-    QCOMPARE(settings->cursorTheme(), QStringLiteral("breeze_cursors"));
+    QCOMPARE(settings->cursorTheme(), QStringLiteral("ocean_cursors"));
     QCOMPARE(settings->cursorSize(), 24);
 }
 

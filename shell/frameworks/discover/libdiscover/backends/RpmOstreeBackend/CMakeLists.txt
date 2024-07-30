@@ -33,4 +33,4 @@ target_link_libraries(rpm-ostree-notifier
     Discover::Notifiers
     PkgConfig::Ostree
 )
-set_target_properties(rpm-ostree-notifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/plasma-discover)
+set_target_properties(rpm-ostree-notifier PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/lingmo-discover)

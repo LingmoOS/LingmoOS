@@ -3,7 +3,7 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
@@ -17,7 +17,7 @@ DeveloperPage {
     }
 
     footerActionsLeft: [
-        Kirigami.Action {
+        LingmoUI.Action {
             id: advancedAction
             checkable: true
             icon.name: "code-context"
@@ -25,7 +25,7 @@ DeveloperPage {
         }
     ]
     footerActionsRight: [
-        Kirigami.Action {
+        LingmoUI.Action {
             enabled: {
                 if (DrKonqi.ignoreQuality() && state == BacktraceGenerator.Loaded) {
                     return true;

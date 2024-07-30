@@ -4,15 +4,15 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.Page {
-    globalToolBarStyle: actions.size > 0 ? undefined : Kirigami.ApplicationHeaderStyle.None
+LingmoUI.Page {
+    globalToolBarStyle: actions.size > 0 ? undefined : LingmoUI.ApplicationHeaderStyle.None
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "system-reboot-symbolic"
             text: i18nc("@action %1 is an application name e.g. kwrite", "Restart %1", CrashedApplication.name)
             visible: !CrashedApplication.hasBeenRestarted
@@ -43,10 +43,10 @@ Kirigami.Page {
         ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
             visible: !progressBar.visible
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 Layout.alignment: Qt.AlignHCenter
                 source: "data-success"
-                width: Kirigami.Units.iconSizes.enormous
+                width: LingmoUI.Units.iconSizes.enormous
                 height: width
             }
             QQC2.Label {
@@ -54,11 +54,11 @@ Kirigami.Page {
             }
         }
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             Layout.alignment: Qt.AlignHCenter
 
             QQC2.CheckBox {
-                Kirigami.FormData.label: i18nc("@label other side of row 'in the future: [x] submit stuff automatically", "In the future:")
+                LingmoUI.FormData.label: i18nc("@label other side of row 'in the future: [x] submit stuff automatically", "In the future:")
 
                 checked: Settings.sentry
                 text: i18nc("@label", "Automatically report crashes")
@@ -67,7 +67,7 @@ Kirigami.Page {
                     Settings.save()
                 }
 
-                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: i18nc("@info:tooltip",
 `Always automatically submit a crash report to KDE's crash tracking system. No manual input required.
@@ -94,7 +94,7 @@ You will not receive any more crash notifications.`)
         QQC2.Button {
             Layout.alignment: Qt.AlignRight
             visible: detailView.visible
-            action: Kirigami.Action {
+            action: LingmoUI.Action {
                 enabled: detailArea.text.length > 3
                 icon.name: "document-send-symbolic"
                 text: i18nc("@action:button", "Send Message")

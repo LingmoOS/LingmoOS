@@ -9,9 +9,9 @@ import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     title: "Progress Bars & Sliders"
     width: demo.implicitWidth
     height: demo.implicitHeight
@@ -50,8 +50,8 @@ Kirigami.ApplicationWindow {
     component Demo : GridLayout {
         id: layout
         columns: 4
-        columnSpacing: Kirigami.Units.smallSpacing
-        rowSpacing: Kirigami.Units.smallSpacing
+        columnSpacing: LingmoUI.Units.smallSpacing
+        rowSpacing: LingmoUI.Units.smallSpacing
 
         Slider {
             orientation: Qt.Vertical
@@ -80,10 +80,10 @@ Kirigami.ApplicationWindow {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Label {
                 text: layout.LayoutMirroring.enabled ? "Enabled" : "Disabled"
-                Layout.rightMargin: Kirigami.Units.gridUnit * 2
+                Layout.rightMargin: LingmoUI.Units.gridUnit * 2
             }
 
             Label {
@@ -109,7 +109,7 @@ Kirigami.ApplicationWindow {
         }
 
         Item {
-            Layout.preferredHeight: Kirigami.Units.gridUnit
+            Layout.preferredHeight: LingmoUI.Units.gridUnit
             Layout.columnSpan: 2
         }
 
@@ -124,7 +124,7 @@ Kirigami.ApplicationWindow {
         }
 
         Item {
-            Layout.preferredHeight: Kirigami.Units.gridUnit
+            Layout.preferredHeight: LingmoUI.Units.gridUnit
             Layout.columnSpan: 2
         }
 
@@ -139,7 +139,7 @@ Kirigami.ApplicationWindow {
         }
 
         Item {
-            Layout.preferredHeight: Kirigami.Units.gridUnit
+            Layout.preferredHeight: LingmoUI.Units.gridUnit
             Layout.columnSpan: 2
         }
 
@@ -155,7 +155,7 @@ Kirigami.ApplicationWindow {
         }
 
         Item {
-            Layout.preferredHeight: Kirigami.Units.gridUnit
+            Layout.preferredHeight: LingmoUI.Units.gridUnit
             Layout.columnSpan: 2
         }
 
@@ -178,7 +178,7 @@ Kirigami.ApplicationWindow {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
             Layout.fillWidth: true
 
             // Test for BUG-473400
@@ -206,17 +206,17 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Kirigami.Page {
+    LingmoUI.Page {
         id: demo
 
         anchors.fill: parent
         contentItem: ColumnLayout {
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
             RowLayout {
                 Layout.fillWidth: false
                 Layout.fillHeight: false
                 Layout.alignment: Qt.AlignHCenter
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 Label {
                     text: "Application Layout Direction:"
@@ -226,24 +226,24 @@ Kirigami.ApplicationWindow {
                     text: Qt.application.layoutDirection === Qt.RightToLeft ? "Right to Left" : "Left to Right"
                 }
             }
-            Kirigami.Separator { Layout.fillWidth: true }
+            LingmoUI.Separator { Layout.fillWidth: true }
             RowLayout {
                 Layout.fillHeight: false
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Demo {
                     id: sampleDemo
                     LayoutMirroring.enabled: true
                     LayoutMirroring.childrenInherit: true
                 }
-                Kirigami.Separator { Layout.fillHeight: true }
+                LingmoUI.Separator { Layout.fillHeight: true }
                 Demo {
                     LayoutMirroring.enabled: false
                     LayoutMirroring.childrenInherit: true
                 }
-                Layout.bottomMargin: Kirigami.Units.gridUnit
+                Layout.bottomMargin: LingmoUI.Units.gridUnit
             }
-            Kirigami.Separator { Layout.fillWidth: true }
+            LingmoUI.Separator { Layout.fillWidth: true }
             Demo {
                 Layout.fillWidth: false
                 Layout.fillHeight: false
@@ -253,7 +253,7 @@ Kirigami.ApplicationWindow {
             Item {
                 Layout.fillHeight: true
             }
-            Kirigami.SelectableLabel {
+            LingmoUI.SelectableLabel {
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 textFormat: Text.MarkdownText

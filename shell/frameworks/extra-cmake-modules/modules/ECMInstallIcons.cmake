@@ -63,7 +63,7 @@ where ``<theme>`` is one of
 * ``lo`` for locolor
 * ``cr`` for the Crystal icon theme
 * ``ox`` for the Oxygen icon theme
-* ``br`` for the Breeze icon theme
+* ``br`` for the Ocean icon theme
 
 With this syntax, the file ``hi22-actions-menu_new.png`` would be installed
 into ``<icon_install_dir>/hicolor/22x22/actions/menu_new.png``
@@ -87,7 +87,7 @@ set(_ECM_ICON_GROUP_intl       "intl")
 
 # For the "compatibility" syntax: a "map" of short theme names to the theme
 # directory
-set(_ECM_ICON_THEME_br "breeze")
+set(_ECM_ICON_THEME_br "ocean")
 set(_ECM_ICON_THEME_ox "oxygen")
 set(_ECM_ICON_THEME_cr "crystalsvg")
 set(_ECM_ICON_THEME_lo "locolor")

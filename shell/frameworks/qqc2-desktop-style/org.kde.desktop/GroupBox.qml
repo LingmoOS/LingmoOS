@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.GroupBox {
     id: control
@@ -28,7 +28,7 @@ T.GroupBox {
 
         text: control.title
         font: control.font
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignVCenter
@@ -36,6 +36,6 @@ T.GroupBox {
 
     background: Rectangle {
         color: "transparent"
-        border.color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
+        border.color: LingmoUI.ColorUtils.linearInterpolation(LingmoUI.Theme.backgroundColor, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
     }
 }

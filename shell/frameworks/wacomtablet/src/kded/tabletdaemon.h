@@ -40,7 +40,7 @@ class TabletDaemonPrivate;
  * Once a tablet is recognised a default profile will be applied via the wacom::DeviceHandler.
  *
  * Profiles can be changed with the kcmodule.
- * In addition a plasma applet allows easy switching of different profiles.
+ * In addition a lingmo applet allows easy switching of different profiles.
  *
  * It registers the service @c "org.kde.Wacom" and exports the following objects on this service:
  *

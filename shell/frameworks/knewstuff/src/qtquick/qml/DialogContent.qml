@@ -17,10 +17,10 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
-Kirigami.ApplicationItem {
+LingmoUI.ApplicationItem {
     id: component
 
     property alias downloadNewWhat: newStuffPage.title
@@ -46,11 +46,11 @@ Kirigami.ApplicationItem {
     }
 
     // Keep in sync with the default sizes in Dialog.qml and dialog.cpp
-    implicitWidth: Kirigami.Units.gridUnit * 44
-    implicitHeight: Kirigami.Units.gridUnit * 30
+    implicitWidth: LingmoUI.Units.gridUnit * 44
+    implicitHeight: LingmoUI.Units.gridUnit * 30
 
     pageStack.defaultColumnWidth: pageStack.width
-    pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.Auto
+    pageStack.globalToolBar.style: LingmoUI.ApplicationHeaderStyle.Auto
     pageStack.globalToolBar.canContainHandles: true
     pageStack.initialPage: NewStuff.Page {
         id: newStuffPage
@@ -58,7 +58,7 @@ Kirigami.ApplicationItem {
         showUploadAction: false
     }
 
-    contextDrawer: Kirigami.ContextDrawer {
+    contextDrawer: LingmoUI.ContextDrawer {
         id: contextDrawer
     }
 }

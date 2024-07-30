@@ -24,7 +24,7 @@ namespace KWin
 
 class AppMenuInterface;
 class KillPrompt;
-class PlasmaShellSurfaceInterface;
+class LingmoShellSurfaceInterface;
 class ServerSideDecorationInterface;
 class ServerSideDecorationPaletteInterface;
 class XdgDialogV1Interface;
@@ -61,7 +61,7 @@ public:
     QRectF frameRectToBufferRect(const QRectF &rect) const override;
     void destroyWindow() override;
 
-    void installPlasmaShellSurface(PlasmaShellSurfaceInterface *shellSurface);
+    void installLingmoShellSurface(LingmoShellSurfaceInterface *shellSurface);
 
 protected:
     void moveResizeInternal(const QRectF &rect, MoveResizeMode mode) override;
@@ -75,7 +75,7 @@ protected:
     void scheduleConfigure();
     void sendConfigure();
 
-    QPointer<PlasmaShellSurfaceInterface> m_plasmaShellSurface;
+    QPointer<LingmoShellSurfaceInterface> m_lingmoShellSurface;
 
     WindowType m_windowType = WindowType::Normal;
     Gravity m_nextGravity = Gravity::None;

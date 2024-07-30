@@ -70,10 +70,10 @@ if (HAVE_QTDBUS)
   target_link_libraries(KF6IconThemes PRIVATE Qt6::DBus)
 endif()
 
-if(TARGET KF6::BreezeIcons)
+if(TARGET KF6::OceanIcons)
     target_link_libraries(KF6IconThemes
             PRIVATE
-            KF6::BreezeIcons
+            KF6::OceanIcons
     )
 endif ()
 

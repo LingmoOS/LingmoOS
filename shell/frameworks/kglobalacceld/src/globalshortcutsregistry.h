@@ -34,8 +34,8 @@ class KGlobalAccelInterface;
  * Shortcuts are registered by component. A component is for example kmail or
  * amarok.
  *
- * A component can have contexts. Currently on plasma is planned to support
- * that feature. A context enables plasma to keep track of global shortcut
+ * A component can have contexts. Currently on lingmo is planned to support
+ * that feature. A context enables lingmo to keep track of global shortcut
  * settings when switching containments.
  *
  * A shortcut (WIN+x) can be registered by one component only. The component

@@ -8,7 +8,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 
@@ -28,10 +28,10 @@ GridLayout {
 
     columns: columnCount > 0 ? columnCount : autoColumnCount
 
-    columnSpacing: Kirigami.Units.largeSpacing
-    rowSpacing: Kirigami.Units.largeSpacing
+    columnSpacing: LingmoUI.Units.largeSpacing
+    rowSpacing: LingmoUI.Units.largeSpacing
 
-    Kirigami.Heading {
+    LingmoUI.Heading {
         id: heading
         Layout.fillWidth: true
         Layout.columnSpan: parent.columns
@@ -57,7 +57,7 @@ GridLayout {
             Layout.fillHeight: true
             sensor: sensor
             text: sensor.formattedValue
-            sensorColor: grid.useSensorColor ? grid.colorSource.map[modelData] : Kirigami.Theme.highlightColor
+            sensorColor: grid.useSensorColor ? grid.colorSource.map[modelData] : LingmoUI.Theme.highlightColor
 
             Sensors.Sensor {
                 id: sensor

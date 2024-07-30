@@ -1,4 +1,4 @@
-add_subdirectory(kirigami-filepicker)
+add_subdirectory(lingmoui-filepicker)
 
 add_definitions(-DTRANSLATION_DOMAIN="xdg-desktop-portal-kde")
 
@@ -267,8 +267,8 @@ qt_add_dbus_interface(xdg_desktop_portal_kde_SRCS ${kglobalaccel_component_xml} 
 qt_add_dbus_interface(xdg_desktop_portal_kde_SRCS org.kde.KWin.TabletModeManager.xml tabletmodemanager_interface)
 qt_add_dbus_interface(xdg_desktop_portal_kde_SRCS org.kde.KWin.VirtualKeyboard.xml virtualkeyboard_interface)
 
-qt6_generate_wayland_protocol_client_sources(xdg-desktop-portal-kde FILES ${PLASMA_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml)
-qt6_generate_wayland_protocol_client_sources(xdg-desktop-portal-kde FILES ${PLASMA_WAYLAND_PROTOCOLS_DIR}/fake-input.xml)
+qt6_generate_wayland_protocol_client_sources(xdg-desktop-portal-kde FILES ${LINGMO_WAYLAND_PROTOCOLS_DIR}/zkde-screencast-unstable-v1.xml)
+qt6_generate_wayland_protocol_client_sources(xdg-desktop-portal-kde FILES ${LINGMO_WAYLAND_PROTOCOLS_DIR}/fake-input.xml)
 qt6_generate_wayland_protocol_client_sources(xdg-desktop-portal-kde FILES ${Wayland_DATADIR}/wayland.xml)
 
 
@@ -303,12 +303,12 @@ target_link_libraries(xdg-desktop-portal-kde
     KF6::KIOFileWidgets
     KF6::Notifications
     KF6::Service
-    Plasma::KWaylandClient
+    Lingmo::KWaylandClient
     KF6::WidgetsAddons
     KF6::WindowSystem
     KF6::IconThemes
     KF6::StatusNotifierItem
-    KirigamiFilepicker
+    LingmoUIFilepicker
     Wayland::Client
     PkgConfig::XKB
 )

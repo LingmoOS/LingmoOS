@@ -13,7 +13,7 @@
 #include <KWaylandExtras>
 #include <KWindowSystem>
 
-#include "qwayland-plasma-window-management.h"
+#include "qwayland-lingmo-window-management.h"
 #include <QEvent>
 #include <QGuiApplication>
 #include <QPixmap>
@@ -29,7 +29,7 @@ constexpr const char *c_kdeXdgForeignExportedProperty("_kde_xdg_foreign_exported
 constexpr const char *c_kdeXdgForeignImportedProperty("_kde_xdg_foreign_imported_v2");
 constexpr const char *c_kdeXdgForeignPendingHandleProperty("_kde_xdg_foreign_pending_handle");
 
-class WindowManagement : public QWaylandClientExtensionTemplate<WindowManagement>, public QtWayland::org_kde_plasma_window_management
+class WindowManagement : public QWaylandClientExtensionTemplate<WindowManagement>, public QtWayland::org_kde_lingmo_window_management
 {
 public:
     WindowManagement()
@@ -37,7 +37,7 @@ public:
     {
     }
 
-    void org_kde_plasma_window_management_show_desktop_changed(uint32_t state) override
+    void org_kde_lingmo_window_management_show_desktop_changed(uint32_t state) override
     {
         showingDesktop = state == show_desktop_enabled;
         KWindowSystem::self()->showingDesktopChanged(showingDesktop);

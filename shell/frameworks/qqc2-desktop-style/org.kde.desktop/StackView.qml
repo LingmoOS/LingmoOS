@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.StackView {
     id: control
@@ -18,13 +18,13 @@ T.StackView {
             property: "x"
             from: (control.mirrored ? -0.5 : 0.5) * control.width
             to: 0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 0.0; to: 1.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -33,13 +33,13 @@ T.StackView {
             property: "x"
             from: 0
             to: (control.mirrored ? -0.5 : 0.5) * -control.width
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 1.0; to: 0.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -48,13 +48,13 @@ T.StackView {
             property: "x"
             from: (control.mirrored ? -0.5 : 0.5) * -control.width
             to: 0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 0.0; to: 1.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -63,13 +63,13 @@ T.StackView {
             property: "x"
             from: 0
             to: (control.mirrored ? -0.5 : 0.5) * control.width
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 1.0; to: 0.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -78,13 +78,13 @@ T.StackView {
             property: "x"
             from: (control.mirrored ? -0.5 : 0.5) * control.width
             to: 0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 0.0; to: 1.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -93,13 +93,13 @@ T.StackView {
             property: "x"
             from: 0
             to: (control.mirrored ? -0.5 : 0.5) * -control.width
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
             property: "opacity"
             from: 1.0; to: 0.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }

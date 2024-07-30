@@ -36,7 +36,7 @@ enum NightLightMode {
     /**
      * Color temperature is computed based on the current position of the Sun.
      *
-     * Location of the user is provided by Plasma.
+     * Location of the user is provided by Lingmo.
      */
     Automatic,
     /**

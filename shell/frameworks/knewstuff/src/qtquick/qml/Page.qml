@@ -6,7 +6,7 @@
 */
 
 /**
- * @brief A Kirigami.Page component used for managing KNS entries
+ * @brief A LingmoUI.Page component used for managing KNS entries
  *
  * This component is functionally equivalent to the old DownloadDialog
  * @see KNewStuff::DownloadDialog
@@ -18,7 +18,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
 import org.kde.kcmutils as KCMUtils
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
 import "private" as Private
@@ -131,11 +131,11 @@ KCMUtils.GridViewKCM {
     title: newStuffEngine.name
 
     headerPaddingEnabled: false
-    header: Kirigami.InlineMessage {
+    header: LingmoUI.InlineMessage {
         readonly property bool riskyContent: newStuffEngine.contentWarningType === NewStuff.Engine.Executables
         visible: !loadingOverlay.visible
-        type: riskyContent ? Kirigami.MessageType.Warning : Kirigami.MessageType.Information
-        position: Kirigami.InlineMessage.Position.Header
+        type: riskyContent ? LingmoUI.MessageType.Warning : LingmoUI.MessageType.Information
+        position: LingmoUI.InlineMessage.Position.Header
         text: riskyContent
             ? xi18nd("knewstuff6", "Use caution when accessing user-created content shown here, as it may contain executable code that hasn't been tested by KDE or your distributor for safety, stability, or quality.")
             : i18nd("knewstuff6", "User-created content shown here hasn't been tested by KDE or your distributor for functionality or quality.")
@@ -158,15 +158,15 @@ KCMUtils.GridViewKCM {
     QQC2.ActionGroup { id: viewSortingActionGroup }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             visible: newStuffEngine.needsLazyLoadSpinner
             displayComponent: QQC2.BusyIndicator {
-                implicitWidth: Kirigami.Units.iconSizes.smallMedium
-                implicitHeight: Kirigami.Units.iconSizes.smallMedium
+                implicitWidth: LingmoUI.Units.iconSizes.smallMedium
+                implicitHeight: LingmoUI.Units.iconSizes.smallMedium
             }
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: {
                 if (newStuffEngine.filter === 0) {
                     return i18nd("knewstuff6", "Everything");
@@ -191,7 +191,7 @@ KCMUtils.GridViewKCM {
                 }
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "package-available"
                 text: i18ndc("knewstuff6", "List option which will set the filter to show everything", "Show All Entries")
                 checkable: true
@@ -202,7 +202,7 @@ KCMUtils.GridViewKCM {
                 QQC2.ActionGroup.group: viewFilterActionGroup
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "package-installed-updated"
                 text: i18ndc("knewstuff6", "List option which will set the filter so only installed items are shown", "Show Only Installed Entries")
                 checkable: true
@@ -213,7 +213,7 @@ KCMUtils.GridViewKCM {
                 QQC2.ActionGroup.group: viewFilterActionGroup
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "package-installed-outdated"
                 text: i18ndc("knewstuff6", "List option which will set the filter so only installed items with updates available are shown", "Show Only Updateable Entries")
                 checkable: true
@@ -225,7 +225,7 @@ KCMUtils.GridViewKCM {
             }
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: {
                 if (newStuffEngine.sortOrder === 0) {
                     return i18nd("knewstuff6", "Recent");
@@ -252,7 +252,7 @@ KCMUtils.GridViewKCM {
                 }
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "change-date-symbolic"
                 text: i18ndc("knewstuff6", "List option which will set the sort order to based on when items were most recently updated", "Show Most Recent First")
                 checkable: true
@@ -263,7 +263,7 @@ KCMUtils.GridViewKCM {
                 QQC2.ActionGroup.group: viewSortingActionGroup
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "sort-name"
                 text: i18ndc("knewstuff6", "List option which will set the sort order to be alphabetical based on the name", "Sort Alphabetically By Name")
                 checkable: true
@@ -274,7 +274,7 @@ KCMUtils.GridViewKCM {
                 QQC2.ActionGroup.group: viewSortingActionGroup
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "rating"
                 text: i18ndc("knewstuff6", "List option which will set the sort order to based on user ratings", "Show Highest Rated First")
                 checkable: true
@@ -285,7 +285,7 @@ KCMUtils.GridViewKCM {
                 QQC2.ActionGroup.group: viewSortingActionGroup
             }
 
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "download"
                 text: i18ndc("knewstuff6", "List option which will set the sort order to based on number of downloads", "Show Most Downloaded First")
                 checkable: true
@@ -297,7 +297,7 @@ KCMUtils.GridViewKCM {
             }
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             id: uploadAction
 
             text: i18nd("knewstuff6", "Upload…")
@@ -310,19 +310,19 @@ KCMUtils.GridViewKCM {
             }
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nd("knewstuff6", "Go to…")
             icon.name: "go-next"
             id: searchModelActions
             visible: children.length > 0
         },
 
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nd("knewstuff6", "Search…")
             icon.name: "system-search"
-            displayHint: Kirigami.DisplayHint.KeepVisible
+            displayHint: LingmoUI.DisplayHint.KeepVisible
 
-            displayComponent: Kirigami.SearchField {
+            displayComponent: LingmoUI.SearchField {
                 id: searchField
 
                 enabled: engine.isValid
@@ -335,7 +335,7 @@ KCMUtils.GridViewKCM {
                 }
 
                 Component.onCompleted: {
-                    if (!Kirigami.InputMethod.willShowOnActive) {
+                    if (!LingmoUI.InputMethod.willShowOnActive) {
                         forceActiveFocus();
                     }
                 }
@@ -348,7 +348,7 @@ KCMUtils.GridViewKCM {
 
         model: newStuffEngine.searchPresetModel
 
-        Kirigami.Action {
+        LingmoUI.Action {
             required property int index
 
             text: model.displayName
@@ -374,7 +374,7 @@ KCMUtils.GridViewKCM {
     }
 
     footer: RowLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         visible: visibleChildren.length > 0
         height: visible ? implicitHeight : 0
@@ -429,17 +429,17 @@ KCMUtils.GridViewKCM {
 
     view.implicitCellWidth: switch (root.viewMode) {
         case Page.ViewMode.Preview:
-            return Kirigami.Units.gridUnit * 25;
+            return LingmoUI.Units.gridUnit * 25;
 
         case Page.ViewMode.Tiles:
         case Page.ViewMode.Icons:
         default:
-            return Kirigami.Units.gridUnit * 30;
+            return LingmoUI.Units.gridUnit * 30;
     }
 
     view.implicitCellHeight: switch (root.viewMode) {
         case Page.ViewMode.Preview:
-            return Kirigami.Units.gridUnit * 25;
+            return LingmoUI.Units.gridUnit * 25;
 
         case Page.ViewMode.Tiles:
         case Page.ViewMode.Icons:
@@ -494,7 +494,7 @@ KCMUtils.GridViewKCM {
         opacity: newStuffEngine.isLoading && !newStuffEngine.needsLazyLoadSpinner ? 1 : 0
         Behavior on opacity {
             NumberAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
             }
         }
 
@@ -502,10 +502,10 @@ KCMUtils.GridViewKCM {
 
         Rectangle {
             anchors.fill: parent
-            color: Kirigami.Theme.backgroundColor
+            color: LingmoUI.Theme.backgroundColor
         }
 
-        Kirigami.LoadingPlaceholder {
+        LingmoUI.LoadingPlaceholder {
             anchors.centerIn: parent
             text: newStuffEngine.busyMessage
         }

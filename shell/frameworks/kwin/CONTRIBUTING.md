@@ -23,13 +23,13 @@ All the settings pages for KWin found in System Settings are located in `src/kcm
 
 ### Default Decorations
 
-The Breeze decorations theme is not located in the KWin repository, and is in fact part of the [Breeze repository here](https://invent.kde.org/plasma/breeze), in `kdecoration`.
+The Ocean decorations theme is not located in the KWin repository, and is in fact part of the [Ocean repository here](https://invent.kde.org/lingmo/ocean), in `kdecoration`.
 
 ### Tab Switcher
 
 The default visual appearance of the tab switcher is located in `src/tabbox/switchers`.
 
-Other window switchers usually shipped by default are located in [Plasma Addons](https://invent.kde.org/plasma/kdeplasma-addons), located in the `kwin/windowswitchers` directory.
+Other window switchers usually shipped by default are located in [Lingmo Addons](https://invent.kde.org/lingmo/kdelingmo-addons), located in the `kwin/windowswitchers` directory.
 
 ### Window Management
 
@@ -110,16 +110,16 @@ QT_PLUGIN_PATH tells Qt to load KWin's plugins from the build directory, and not
 
 The dbus-run-session is needed to prevent the nested KWin instance from conflicting with your session KWin instance when exporting objects onto the bus, or with stuff like global shortcuts.
 
-If you need to run a whole Wayland plasma session, you should install a development session by first building [plasma-workspace](https://invent.kde.org/plasma/plasma-workspace) and executing the `login-sessions/install-sessions.sh` in the build directory. This can be done using kdesrc-build.
+If you need to run a whole Wayland lingmo session, you should install a development session by first building [lingmo-workspace](https://invent.kde.org/lingmo/lingmo-workspace) and executing the `login-sessions/install-sessions.sh` in the build directory. This can be done using kdesrc-build.
 
 ```bash
-kdesrc-build plasma-workspace
+kdesrc-build lingmo-workspace
 # assuming the root directory for kdesrc-build is ~/kde
-bash ~/kde/build/plasma-workspace/login-sessions/install-sessions.sh
+bash ~/kde/build/lingmo-workspace/login-sessions/install-sessions.sh
 ```
 Then you can select the develop session in the sddm login screen.
 
-You can look up the current boot kwin log via `journalctl --user-unit plasma-kwin_wayland --boot 0`.
+You can look up the current boot kwin log via `journalctl --user-unit lingmo-kwin_wayland --boot 0`.
 
 ## Using A Debugger
 

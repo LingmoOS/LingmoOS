@@ -10,15 +10,15 @@
 import QtQuick
 //for TabBar.*
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.TabButton {
     id: controlRoot
 
     //Some qstyles like fusion don't have correct pixel metrics here and just return 0
-    implicitWidth: Math.max(styleitem.implicitWidth, textMetrics.width + Kirigami.Units.gridUnit * 2)
-    implicitHeight: styleitem.implicitHeight || Kirigami.Units.gridUnit * 2
+    implicitWidth: Math.max(styleitem.implicitWidth, textMetrics.width + LingmoUI.Units.gridUnit * 2)
+    implicitHeight: styleitem.implicitHeight || LingmoUI.Units.gridUnit * 2
     baselineOffset: contentItem.y + contentItem.baselineOffset
 
     //This width: is important to make the tabbar internals not assume
@@ -30,13 +30,13 @@ T.TabButton {
 
     contentItem: Item {}
 
-    Kirigami.MnemonicData.enabled: enabled && visible
-    Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.SecondaryControl
-    Kirigami.MnemonicData.label: text
+    LingmoUI.MnemonicData.enabled: enabled && visible
+    LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.SecondaryControl
+    LingmoUI.MnemonicData.label: text
     Shortcut {
         //in case of explicit & the button manages it by itself
         enabled: !(RegExp(/\&[^\&]/).test(controlRoot.text))
-        sequence: controlRoot.Kirigami.MnemonicData.sequence
+        sequence: controlRoot.LingmoUI.MnemonicData.sequence
         onActivated: controlRoot.checked = true;
     }
     background: StylePrivate.StyleItem {
@@ -44,7 +44,7 @@ T.TabButton {
 
         TextMetrics {
             id: textMetrics
-            font: Kirigami.Theme.defaultFont
+            font: LingmoUI.Theme.defaultFont
             text: controlRoot.text
         }
 
@@ -81,7 +81,7 @@ T.TabButton {
         properties: {
             "icon": controlRoot.display !== T.AbstractButton.TextOnly
                 ? (controlRoot.icon.name !== "" ? controlRoot.icon.name : controlRoot.icon.source) : null,
-            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? Kirigami.Theme.textColor : controlRoot.icon.color,
+            "iconColor": Qt.colorEqual(controlRoot.icon.color, "transparent") ? LingmoUI.Theme.textColor : controlRoot.icon.color,
             "iconWidth": controlRoot.icon.width,
             "iconHeight": controlRoot.icon.height,
 
@@ -93,7 +93,7 @@ T.TabButton {
 
         enabled: controlRoot.enabled
         selected: controlRoot.checked
-        text: controlRoot.Kirigami.MnemonicData.mnemonicLabel
+        text: controlRoot.LingmoUI.MnemonicData.mnemonicLabel
         hover: controlRoot.hovered
         hasFocus: controlRoot.activeFocus
     }

@@ -130,7 +130,7 @@ void PackageKitNotifier::checkOfflineUpdates()
 
         auto openDiscoverAction = notification->addAction(i18nc("@action:button", "Open Discover"));
         connect(openDiscoverAction, &KNotificationAction::activated, this, [] {
-            QProcess::startDetached(QStringLiteral("plasma-discover"), QStringList());
+            QProcess::startDetached(QStringLiteral("lingmo-discover"), QStringList());
         });
 
         auto repairAction = notification->addAction(i18nc("@action:button", "Repair System"));
@@ -184,7 +184,7 @@ void PackageKitNotifier::checkOfflineUpdates()
 
             auto openDiscoverAction = notification->addAction(i18nc("@action:button", "Open Discover"));
             connect(openDiscoverAction, &KNotificationAction::activated, this, []() {
-                QProcess::startDetached(QStringLiteral("plasma-discover"), QStringList());
+                QProcess::startDetached(QStringLiteral("lingmo-discover"), QStringList());
             });
 
             notification->sendEvent();

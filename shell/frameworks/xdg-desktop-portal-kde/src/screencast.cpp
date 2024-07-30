@@ -20,7 +20,7 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KSharedConfig>
-#include <KWayland/Client/plasmawindowmodel.h>
+#include <KWayland/Client/lingmowindowmodel.h>
 
 #include <QDBusArgument>
 #include <QDBusMetaType>
@@ -44,7 +44,7 @@ bool ScreenCastPortal::inhibitionsEnabled() const
         return false;
     }
 
-    auto cfg = KSharedConfig::openConfig(QStringLiteral("plasmanotifyrc"));
+    auto cfg = KSharedConfig::openConfig(QStringLiteral("lingmonotifyrc"));
 
     KConfigGroup grp(cfg, "DoNotDisturb");
 
@@ -173,12 +173,12 @@ uint ScreenCastPortal::Start(const QDBusObjectPath &handle,
 
             const QStringList restoreWindows = restoreDataPayload[QStringLiteral("windows")].toStringList();
             if (!restoreWindows.isEmpty()) {
-                const KWayland::Client::PlasmaWindowModel model(WaylandIntegration::plasmaWindowManagement());
+                const KWayland::Client::LingmoWindowModel model(WaylandIntegration::lingmoWindowManagement());
                 for (const QString &windowUuid : restoreWindows) {
                     for (int i = 0, c = model.rowCount(); i < c; ++i) {
                         const QModelIndex index = model.index(i, 0);
 
-                        if (model.data(index, KWayland::Client::PlasmaWindowModel::Uuid).toString() == windowUuid) {
+                        if (model.data(index, KWayland::Client::LingmoWindowModel::Uuid).toString() == windowUuid) {
                             selectedWindows << model.itemData(index);
                         }
                     }
@@ -244,7 +244,7 @@ uint ScreenCastPortal::Start(const QDBusObjectPath &handle,
             }
 
             if (allowRestore) {
-                windows += win[KWayland::Client::PlasmaWindowModel::Uuid].toString();
+                windows += win[KWayland::Client::LingmoWindowModel::Uuid].toString();
             }
             streams << stream;
         }

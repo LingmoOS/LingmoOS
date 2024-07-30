@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * Device setup for Socket/JetDirect printer devices (Legacy)
@@ -32,7 +32,7 @@ BaseDevice {
     contentItem: ColumnLayout {
         width: socketDevice.width
         // use large to match Base
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         Component.onCompleted: {
             const url = socketDevice.getUrl(settings.value("device-uri"))

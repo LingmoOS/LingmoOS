@@ -7,7 +7,7 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.kirigami 2.6 as Kirigami
+import org.kde.lingmoui 2.6 as LingmoUI
 import org.kde.kcmutils as KCM
 
 KCM.GridViewKCM {
@@ -26,7 +26,7 @@ KCM.GridViewKCM {
         toolTip: model.toolTip
 
         thumbnailAvailable: model.decoration
-        thumbnail: Kirigami.Icon {
+        thumbnail: LingmoUI.Icon {
             anchors.fill: parent
             source: model.decoration
         }

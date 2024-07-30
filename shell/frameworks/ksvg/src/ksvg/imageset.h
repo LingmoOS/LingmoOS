@@ -21,7 +21,7 @@ namespace KSvg
 class ImageSetPrivate;
 class SvgPrivate;
 
-// TODO: move in the plasma part the watching and regeneration of icon themes
+// TODO: move in the lingmo part the watching and regeneration of icon themes
 
 /**
  * @class ImageSet ksvg/imageset.h <KSvg/ImageSet>
@@ -84,7 +84,7 @@ public:
      * @brief This method sets the file selectors.
      *
      * The theme can have different svgs with the same name for different
-     * situations and platforms. The Plasma desktop for instance uses "opaque"
+     * situations and platforms. The Lingmo desktop for instance uses "opaque"
      * or "translucent" based on presence of compositing and KWin blur effects.
      * Other uses may be platform, like android-specific graphics.
      *

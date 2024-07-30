@@ -108,7 +108,7 @@ KateConfigPluginPage::KateConfigPluginPage(QWidget *parent, KateConfigDialog *di
     layout->addWidget(filter);
     filter->setPlaceholderText(QStringLiteral("Filter..."));
     filter->setClearButtonEnabled(true);
-    filter->setProperty("_breeze_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
+    filter->setProperty("_ocean_borders_sides", QVariant::fromValue(QFlags{Qt::TopEdge}));
     connect(filter, &QLineEdit::textChanged, sortModel, [sortModel](const QString &text) {
         sortModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
     });

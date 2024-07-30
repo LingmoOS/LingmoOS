@@ -31,7 +31,7 @@
 #include <KPluginFactory>
 #include <KPluginMetaData>
 
-#include <PlasmaActivities/Consumer>
+#include <LingmoActivities/Consumer>
 
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
@@ -40,7 +40,7 @@
 
 #include <QDebug>
 
-#include <Kirigami/Platform/TabletModeWatcher>
+#include <LingmoUI/Platform/TabletModeWatcher>
 #include <algorithm>
 
 #ifdef Q_OS_LINUX
@@ -100,7 +100,7 @@ void Core::onControllersReady()
 {
     qCDebug(POWERDEVIL) << "Controllers ready, KDE Power Management system initialized";
 
-    const bool isMobile = Kirigami::Platform::TabletModeWatcher::self()->isTabletMode();
+    const bool isMobile = LingmoUI::Platform::TabletModeWatcher::self()->isTabletMode();
     const bool isVM = PowerDevil::PowerManagement::instance()->isVirtualMachine();
     const bool canSuspend = m_suspendController->canSuspend();
     const bool canHibernate = m_suspendController->canHibernate();
@@ -319,7 +319,7 @@ void Core::loadProfile(bool force)
     }
 
     // Load settings for the current profile
-    const bool isMobile = Kirigami::Platform::TabletModeWatcher::self()->isTabletMode();
+    const bool isMobile = LingmoUI::Platform::TabletModeWatcher::self()->isTabletMode();
     const bool isVM = PowerDevil::PowerManagement::instance()->isVirtualMachine();
     bool canSuspend = m_suspendController->canSuspend();
 

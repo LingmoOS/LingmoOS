@@ -27,7 +27,7 @@ class FlatpakTest(unittest.TestCase):
         subprocess.run(['flatpak', 'uninstall', '--noninteractive', 'org.kde.kalzium'])
 
         options = ATSPIOptions()
-        options.app = "plasma-discover --backends flatpak-backend"
+        options.app = "lingmo-discover --backends flatpak-backend"
         self.driver = webdriver.Remote(
             command_executor='http://127.0.0.1:4723',
             options=options)

@@ -6,12 +6,12 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.printmanager as PM
 
 ColumnLayout {
     id: root
-    spacing: Kirigami.Units.largeSpacing
+    spacing: LingmoUI.Units.largeSpacing
 
     readonly property bool ippCapable: kcm.isIPPCapable(settings.value("device-uri"))
     readonly property alias busy: kcmConn.loading
@@ -33,7 +33,7 @@ ColumnLayout {
     }
 
     // Fallback msg with the option to select the driver manually
-    Kirigami.InlineMessage {
+    LingmoUI.InlineMessage {
         id: fallbackMsg
 
         text: xi18nc("@info:status", "Unable to locate recommended drivers.  Click <interface>Refresh</interface> to try again or choose a driver manually.")
@@ -41,13 +41,13 @@ ColumnLayout {
         Layout.fillWidth: true
 
         actions: [
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "favorites-symbolic"
                 visible: ippCapable
                 text: i18nc("@action:button", "Choose Driverless…")
                 onTriggered: selectDriver({"ppd-name": "everywhere", "ppd-type": PM.PPDType.Auto})
             },
-            Kirigami.Action {
+            LingmoUI.Action {
                 icon.name: "document-edit-symbolic"
                 text: i18nc("@action:button", "Choose Driver…")
                 onTriggered: manualDriverSelect()
@@ -74,8 +74,8 @@ ColumnLayout {
     QQC2.BusyIndicator {
         running: kcmConn.loading
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-        implicitWidth: Kirigami.Units.gridUnit * 6
-        implicitHeight: Kirigami.Units.gridUnit * 6
+        implicitWidth: LingmoUI.Units.gridUnit * 6
+        implicitHeight: LingmoUI.Units.gridUnit * 6
     }
 
     QQC2.Button {
@@ -121,7 +121,7 @@ ColumnLayout {
 
             model: kcm.recommendedDrivers
 
-            delegate: Kirigami.SubtitleDelegate {
+            delegate: LingmoUI.SubtitleDelegate {
                 width: ListView.view.width
 
                 text: {

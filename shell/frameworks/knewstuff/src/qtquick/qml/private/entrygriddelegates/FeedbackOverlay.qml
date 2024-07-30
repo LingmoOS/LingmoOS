@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.newstuff as NewStuff
 
@@ -17,17 +17,17 @@ Item {
     visible: opacity > 0
     opacity: (model.entry.status === NewStuff.Entry.Installing || model.entry.status === NewStuff.Entry.Updating) ? 1 : 0
 
-    Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration } }
+    Behavior on opacity { NumberAnimation { duration: LingmoUI.Units.longDuration } }
     Rectangle {
         anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
         opacity: 0.9
     }
     QQC2.BusyIndicator {
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: parent.verticalCenter
-            bottomMargin: Kirigami.Units.smallSpacing
+            bottomMargin: LingmoUI.Units.smallSpacing
         }
         running: parent.visible
     }
@@ -56,7 +56,7 @@ Item {
             top: parent.verticalCenter
             left: parent.left
             right: parent.right
-            margins: Kirigami.Units.smallSpacing
+            margins: LingmoUI.Units.smallSpacing
         }
         horizontalAlignment: Text.AlignHCenter
         // TODO: This is where we'd want to put the download progress and cancel button as well

@@ -10,8 +10,8 @@
 #include "../src/client/dataoffer.h"
 #include "../src/client/event_queue.h"
 #include "../src/client/keyboard.h"
-#include "../src/client/plasmashell.h"
-#include "../src/client/plasmawindowmanagement.h"
+#include "../src/client/lingmoshell.h"
+#include "../src/client/lingmowindowmanagement.h"
 #include "../src/client/pointer.h"
 #include "../src/client/registry.h"
 #include "../src/client/seat.h"
@@ -56,13 +56,13 @@ private:
     ShellSurface *m_shellSurface = nullptr;
     ShmPool *m_shm = nullptr;
     Surface *m_surface = nullptr;
-    PlasmaShell *m_plasmaShell = nullptr;
-    PlasmaShellSurface *m_plasmaShellSurface = nullptr;
-    PlasmaWindowManagement *m_windowManagement = nullptr;
+    LingmoShell *m_lingmoShell = nullptr;
+    LingmoShellSurface *m_lingmoShellSurface = nullptr;
+    LingmoWindowManagement *m_windowManagement = nullptr;
     struct {
         Surface *surface = nullptr;
         ShellSurface *shellSurface = nullptr;
-        PlasmaShellSurface *plasmaSurface = nullptr;
+        LingmoShellSurface *lingmoSurface = nullptr;
         bool visible = false;
     } m_tooltip;
 };
@@ -106,8 +106,8 @@ void PanelTest::showTooltip(const QPointF &pos)
     if (!m_tooltip.surface) {
         m_tooltip.surface = m_compositor->createSurface(this);
         m_tooltip.shellSurface = m_shell->createSurface(m_tooltip.surface, this);
-        if (m_plasmaShell) {
-            m_tooltip.plasmaSurface = m_plasmaShell->createSurface(m_tooltip.surface, this);
+        if (m_lingmoShell) {
+            m_tooltip.lingmoSurface = m_lingmoShell->createSurface(m_tooltip.surface, this);
         }
     }
     m_tooltip.shellSurface->setTransient(m_surface, pos.toPoint());
@@ -138,8 +138,8 @@ void PanelTest::hideTooltip()
 
 void PanelTest::moveTooltip(const QPointF &pos)
 {
-    if (m_tooltip.plasmaSurface) {
-        m_tooltip.plasmaSurface->setPosition(QPoint(10, 0) + pos.toPoint());
+    if (m_tooltip.lingmoSurface) {
+        m_tooltip.lingmoSurface->setPosition(QPoint(10, 0) + pos.toPoint());
     }
 }
 
@@ -192,55 +192,55 @@ void PanelTest::setupRegistry(Registry *registry)
             });
         });
     });
-    connect(registry, &Registry::plasmaShellAnnounced, this, [this, registry](quint32 name, quint32 version) {
-        m_plasmaShell = registry->createPlasmaShell(name, version, this);
+    connect(registry, &Registry::lingmoShellAnnounced, this, [this, registry](quint32 name, quint32 version) {
+        m_lingmoShell = registry->createLingmoShell(name, version, this);
     });
-    connect(registry, &Registry::plasmaWindowManagementAnnounced, this, [this, registry](quint32 name, quint32 version) {
-        m_windowManagement = registry->createPlasmaWindowManagement(name, version, this);
-        connect(m_windowManagement, &PlasmaWindowManagement::showingDesktopChanged, this, [](bool set) {
+    connect(registry, &Registry::lingmoWindowManagementAnnounced, this, [this, registry](quint32 name, quint32 version) {
+        m_windowManagement = registry->createLingmoWindowManagement(name, version, this);
+        connect(m_windowManagement, &LingmoWindowManagement::showingDesktopChanged, this, [](bool set) {
             qDebug() << "Showing desktop changed, new state: " << set;
         });
-        connect(m_windowManagement, &PlasmaWindowManagement::windowCreated, this, [this](PlasmaWindow *w) {
-            connect(w, &PlasmaWindow::titleChanged, this, [w] {
+        connect(m_windowManagement, &LingmoWindowManagement::windowCreated, this, [this](LingmoWindow *w) {
+            connect(w, &LingmoWindow::titleChanged, this, [w] {
                 qDebug() << "Window title changed to: " << w->title();
             });
-            connect(w, &PlasmaWindow::activeChanged, this, [w] {
+            connect(w, &LingmoWindow::activeChanged, this, [w] {
                 qDebug() << "Window active changed: " << w->isActive();
             });
-            connect(w, &PlasmaWindow::maximizedChanged, this, [w] {
+            connect(w, &LingmoWindow::maximizedChanged, this, [w] {
                 qDebug() << "Window maximized changed: " << w->isMaximized();
             });
-            connect(w, &PlasmaWindow::maximizedChanged, this, [w] {
+            connect(w, &LingmoWindow::maximizedChanged, this, [w] {
                 qDebug() << "Window minimized changed: " << w->isMinimized();
             });
-            connect(w, &PlasmaWindow::keepAboveChanged, this, [w] {
+            connect(w, &LingmoWindow::keepAboveChanged, this, [w] {
                 qDebug() << "Window keep above changed: " << w->isKeepAbove();
             });
-            connect(w, &PlasmaWindow::keepBelowChanged, this, [w] {
+            connect(w, &LingmoWindow::keepBelowChanged, this, [w] {
                 qDebug() << "Window keep below changed: " << w->isKeepBelow();
             });
-            connect(w, &PlasmaWindow::onAllDesktopsChanged, this, [w] {
+            connect(w, &LingmoWindow::onAllDesktopsChanged, this, [w] {
                 qDebug() << "Window on all desktops changed: " << w->isOnAllDesktops();
             });
-            connect(w, &PlasmaWindow::fullscreenChanged, this, [w] {
+            connect(w, &LingmoWindow::fullscreenChanged, this, [w] {
                 qDebug() << "Window full screen changed: " << w->isFullscreen();
             });
-            connect(w, &PlasmaWindow::demandsAttentionChanged, this, [w] {
+            connect(w, &LingmoWindow::demandsAttentionChanged, this, [w] {
                 qDebug() << "Window demands attention changed: " << w->isDemandingAttention();
             });
-            connect(w, &PlasmaWindow::closeableChanged, this, [w] {
+            connect(w, &LingmoWindow::closeableChanged, this, [w] {
                 qDebug() << "Window is closeable changed: " << w->isCloseable();
             });
-            connect(w, &PlasmaWindow::minimizeableChanged, this, [w] {
+            connect(w, &LingmoWindow::minimizeableChanged, this, [w] {
                 qDebug() << "Window is minimizeable changed: " << w->isMinimizeable();
             });
-            connect(w, &PlasmaWindow::maximizeableChanged, this, [w] {
+            connect(w, &LingmoWindow::maximizeableChanged, this, [w] {
                 qDebug() << "Window is maximizeable changed: " << w->isMaximizeable();
             });
-            connect(w, &PlasmaWindow::fullscreenableChanged, this, [w] {
+            connect(w, &LingmoWindow::fullscreenableChanged, this, [w] {
                 qDebug() << "Window is fullscreenable changed: " << w->isFullscreenable();
             });
-            connect(w, &PlasmaWindow::iconChanged, this, [w] {
+            connect(w, &LingmoWindow::iconChanged, this, [w] {
                 qDebug() << "Window icon changed: " << w->icon().name();
             });
         });
@@ -256,10 +256,10 @@ void PanelTest::setupRegistry(Registry *registry)
         Q_ASSERT(m_shellSurface);
         m_shellSurface->setToplevel();
         connect(m_shellSurface, &ShellSurface::sizeChanged, this, &PanelTest::render);
-        if (m_plasmaShell) {
-            m_plasmaShellSurface = m_plasmaShell->createSurface(m_surface, this);
-            m_plasmaShellSurface->setPosition(QPoint(10, 0));
-            m_plasmaShellSurface->setRole(PlasmaShellSurface::Role::Panel);
+        if (m_lingmoShell) {
+            m_lingmoShellSurface = m_lingmoShell->createSurface(m_surface, this);
+            m_lingmoShellSurface->setPosition(QPoint(10, 0));
+            m_lingmoShellSurface->setRole(LingmoShellSurface::Role::Panel);
         }
         render();
     });

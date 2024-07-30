@@ -59,8 +59,8 @@ set_package_properties(WaylandProtocols PROPERTIES TYPE REQUIRED)
 find_package(EGL)
 set_package_properties(EGL PROPERTIES TYPE REQUIRED)
 
-find_package(PlasmaWaylandProtocols 1.13.0 CONFIG)
-set_package_properties(PlasmaWaylandProtocols PROPERTIES TYPE REQUIRED)
+find_package(LingmoWaylandProtocols 1.13.0 CONFIG)
+set_package_properties(LingmoWaylandProtocols PROPERTIES TYPE REQUIRED)
 
 # adjusting CMAKE_C_FLAGS to get wayland protocols to compile
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu90")
@@ -115,7 +115,7 @@ install(FILES  "${CMAKE_CURRENT_BINARY_DIR}/KWaylandConfig.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel )
 
-install(EXPORT KWaylandTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}" FILE KWaylandTargets.cmake NAMESPACE Plasma::)
+install(EXPORT KWaylandTargets DESTINATION "${CMAKECONFIG_INSTALL_DIR}" FILE KWaylandTargets.cmake NAMESPACE Lingmo::)
 
 
 install(FILES ${kwayland_version_header}

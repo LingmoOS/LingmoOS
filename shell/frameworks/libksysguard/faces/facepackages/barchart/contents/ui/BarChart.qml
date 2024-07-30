@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -33,7 +33,7 @@ Charts.BarChart {
 
     stacked: controller.faceConfiguration.barChartStacked
 
-    spacing: Math.floor(Kirigami.Units.smallSpacing / 2)
+    spacing: Math.floor(LingmoUI.Units.smallSpacing / 2)
 
     readonly property real rangeFromY: controller.faceConfiguration.rangeFrom *
                                        controller.faceConfiguration.rangeFromMultiplier

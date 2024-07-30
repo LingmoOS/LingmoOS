@@ -8,7 +8,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 T.DialogButtonBox {
@@ -21,8 +21,8 @@ T.DialogButtonBox {
 
     contentWidth: (contentItem as ListView)?.contentWidth ?? 0
 
-    spacing: Kirigami.Units.mediumSpacing
-    padding: Kirigami.Units.largeSpacing
+    spacing: LingmoUI.Units.mediumSpacing
+    padding: LingmoUI.Units.largeSpacing
     alignment: Qt.AlignRight
 
     property Item __style: StylePrivate.StyleItem {
@@ -37,7 +37,7 @@ T.DialogButtonBox {
             // then subtract the spacing between each button.
             ((control.availableWidth - (control.spacing * (control.count - 1))) / control.count)
         ))
-        Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.DialogButton
+        LingmoUI.MnemonicData.controlType: LingmoUI.MnemonicData.DialogButton
     }
 
     contentItem: ListView {

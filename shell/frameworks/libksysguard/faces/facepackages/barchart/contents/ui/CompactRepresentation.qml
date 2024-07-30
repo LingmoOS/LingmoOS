@@ -11,7 +11,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.sensors as Sensors
 import org.kde.ksysguard.faces as Faces
@@ -24,13 +24,13 @@ Faces.CompactSensorFace {
 
     readonly property bool horizontalOrientation: controller.faceConfiguration.horizontalBars
 
-    readonly property real minimumBarSize: (horizontalFormFactor && !horizontalOrientation) || (verticalFormFactor && horizontalOrientation) ? Kirigami.Units.smallSpacing : 1
+    readonly property real minimumBarSize: (horizontalFormFactor && !horizontalOrientation) || (verticalFormFactor && horizontalOrientation) ? LingmoUI.Units.smallSpacing : 1
     readonly property real minimumBarSpacing: Math.floor(minimumBarSize * 0.25)
     readonly property real minimumTotalSize: minimumBarSize * barChart.barCount + minimumBarSpacing * (barChart.barCount - 1)
-    readonly property real preferredTotalSize: Kirigami.Units.largeSpacing * barChart.barCount + Kirigami.Units.largeSpacing * 0.25 * (barChart.barCount - 1)
+    readonly property real preferredTotalSize: LingmoUI.Units.largeSpacing * barChart.barCount + LingmoUI.Units.largeSpacing * 0.25 * (barChart.barCount - 1)
 
-    Layout.minimumWidth: (!horizontalFormFactor || horizontalOrientation) ? defaultMinimumSize : Math.max(minimumTotalSize, Kirigami.Units.largeSpacing)
-    Layout.minimumHeight: (!verticalFormFactor || !horizontalOrientation) ? defaultMinimumSize : Math.max(minimumTotalSize, Kirigami.Units.largeSpacing)
+    Layout.minimumWidth: (!horizontalFormFactor || horizontalOrientation) ? defaultMinimumSize : Math.max(minimumTotalSize, LingmoUI.Units.largeSpacing)
+    Layout.minimumHeight: (!verticalFormFactor || !horizontalOrientation) ? defaultMinimumSize : Math.max(minimumTotalSize, LingmoUI.Units.largeSpacing)
 
     Layout.preferredWidth: {
         if (!horizontalFormFactor) {

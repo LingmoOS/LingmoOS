@@ -19,7 +19,7 @@ namespace KStyleManager
 {
 
 /**
- * Enforces the style configured by the user with fallback to the Breeze style.
+ * Enforces the style configured by the user with fallback to the Ocean style.
  *
  * (following the settings in the application configuration with fallback to kdeglobals)
  *

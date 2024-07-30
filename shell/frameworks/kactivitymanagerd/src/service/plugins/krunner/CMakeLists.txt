@@ -9,7 +9,7 @@ target_link_libraries(org.kde.ActivityManager.ActivityRunner
 )
 
 install(
-   FILES plasma-runnners-activities.desktop
+   FILES lingmo-runnners-activities.desktop
    DESTINATION "${KDE_INSTALL_DATAROOTDIR}/krunner/dbusplugins"
 )
 

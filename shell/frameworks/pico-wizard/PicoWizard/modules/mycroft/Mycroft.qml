@@ -4,8 +4,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -35,12 +35,12 @@ ModuleMediaCenter {
                 Rectangle {
                     id: enableMycroftBox
                     anchors.left: parent.left
-                    width: parent.width / 2 - Kirigami.Units.smallSpacing
+                    width: parent.width / 2 - LingmoUI.Units.smallSpacing
                     height: parent.height
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: Kirigami.Theme.backgroundColor
+                    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 3
-                    border.color: enableMycroftBox.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+                    border.color: enableMycroftBox.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.disabledTextColor
                     border.width: enableMycroftBox.activeFocus ? 3 : 1
 
                     KeyNavigation.right: disableMycroftBox
@@ -48,9 +48,9 @@ ModuleMediaCenter {
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             source: mycroftModule.dir() + "/assets/tv.svg"
                             Layout.fillWidth: true
                             Layout.preferredHeight: parent.height / 4.5
@@ -61,13 +61,13 @@ ModuleMediaCenter {
                             Layout.fillWidth: true
                             Layout.preferredHeight: parent.height / 4.5
 
-                            Kirigami.Icon {
+                            LingmoUI.Icon {
                                 source: mycroftModule.dir() + "/assets/remote.svg"
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: remIcn.height
                                 color: "white"
                             }
-                            Kirigami.Icon {
+                            LingmoUI.Icon {
                                 source: mycroftModule.dir() + "/assets/micarray.svg"
                                 Layout.fillWidth: true
                                 Layout.preferredHeight: remIcn.height
@@ -91,7 +91,7 @@ ModuleMediaCenter {
                             }
                         }
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             source: mycroftModule.dir() + "/assets/greentick.svg"
                             visible: mycroftEnabled
                             Layout.fillWidth: true
@@ -113,12 +113,12 @@ ModuleMediaCenter {
                 Rectangle {
                     id: disableMycroftBox
                     anchors.right: parent.right
-                    width: parent.width / 2 - Kirigami.Units.smallSpacing
+                    width: parent.width / 2 - LingmoUI.Units.smallSpacing
                     height: parent.height
-                    Kirigami.Theme.colorSet: Kirigami.Theme.Button
-                    color: Kirigami.Theme.backgroundColor
+                    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 3
-                    border.color: disableMycroftBox.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+                    border.color: disableMycroftBox.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.disabledTextColor
                     border.width: disableMycroftBox.activeFocus ? 3 : 1
 
                     KeyNavigation.left: enableMycroftBox
@@ -126,16 +126,16 @@ ModuleMediaCenter {
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             source: mycroftModule.dir() + "/assets/tv.svg"
                             Layout.fillWidth: true
                             Layout.preferredHeight: parent.height / 4.5
                             color: "white"
                         }
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             id: remIcn
                             source: mycroftModule.dir() + "/assets/remote.svg"
                             Layout.fillWidth: true
@@ -159,7 +159,7 @@ ModuleMediaCenter {
                             }
                         }
 
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             source: mycroftModule.dir() + "/assets/greentick.svg"
                             visible: !mycroftEnabled
                             Layout.fillWidth: true
@@ -179,7 +179,7 @@ ModuleMediaCenter {
                 }
             }
 
-            Kirigami.Separator {
+            LingmoUI.Separator {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 1
             }
@@ -188,7 +188,7 @@ ModuleMediaCenter {
                 id: mycroftExplainBox
                 color: "transparent"
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 4
 
                 Loader {
                     id: textLoader
@@ -199,14 +199,14 @@ ModuleMediaCenter {
 
             RowLayout {
                 Layout.preferredWidth: root.width * 0.7
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: backButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     Button {
@@ -231,10 +231,10 @@ ModuleMediaCenter {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                    Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                     color: "transparent"
                     border.width: nextButton.activeFocus ? 3 : 0
-                    border.color: Kirigami.Theme.highlightColor
+                    border.color: LingmoUI.Theme.highlightColor
                     radius: 3
 
                     NextButtonMediaCenter {
@@ -291,7 +291,7 @@ ModuleMediaCenter {
             ColumnLayout {
                 width: parent.width
                 height: parent.height
-                spacing: Kirigami.Units.largeSpacing
+                spacing: LingmoUI.Units.largeSpacing
 
                 Label {
                     wrapMode: Text.WordWrap

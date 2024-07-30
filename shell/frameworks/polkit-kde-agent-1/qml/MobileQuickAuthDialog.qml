@@ -8,13 +8,13 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import org.kde.polkitkde 1.0
 
 MobileDialogWindow {
     id: root
     title: i18n("Authentication Required")
-    contentWidth: Kirigami.Units.gridUnit * 22
+    contentWidth: LingmoUI.Units.gridUnit * 22
 
     property alias password: passwordField.text
     property alias inlineMessageType: inlineMessage.type
@@ -43,7 +43,7 @@ MobileDialogWindow {
     }
 
     function authenticationFailure() {
-        inlineMessage.type = Kirigami.MessageType.Error;
+        inlineMessage.type = LingmoUI.MessageType.Error;
         inlineMessage.text = i18n("Authentication failure, please try again.");
         passwordField.clear()
         passwordField.enabled = true
@@ -88,9 +88,9 @@ MobileDialogWindow {
         id: column
         spacing: 0
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.fillWidth: true
-            Layout.topMargin: Kirigami.Units.largeSpacing
+            Layout.topMargin: LingmoUI.Units.largeSpacing
             level: 3
             text: i18n("Authentication Required")
             wrapMode: Text.Wrap
@@ -99,8 +99,8 @@ MobileDialogWindow {
         }
 
         QQC2.Label {
-            Layout.topMargin: Kirigami.Units.largeSpacing
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            Layout.topMargin: LingmoUI.Units.largeSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
             Layout.fillWidth: true
             text: root.mainText
             visible: text.length > 0
@@ -108,27 +108,27 @@ MobileDialogWindow {
             horizontalAlignment: Text.AlignHCenter
         }
 
-        Kirigami.Icon {
-            Layout.bottomMargin: Kirigami.Units.gridUnit
+        LingmoUI.Icon {
+            Layout.bottomMargin: LingmoUI.Units.gridUnit
             Layout.alignment: Qt.AlignCenter
             source: "dialog-password"
-            implicitWidth: Kirigami.Units.iconSizes.large
-            implicitHeight: Kirigami.Units.iconSizes.large
+            implicitWidth: LingmoUI.Units.iconSizes.large
+            implicitHeight: LingmoUI.Units.iconSizes.large
         }
 
         // user information, only shown if there is more than one user to select from
         RowLayout {
             visible: identitiesCombo.count > 1
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
             Layout.alignment: Qt.AlignHCenter
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
 
             QQC2.Label {
-                color: Kirigami.Theme.disabledTextColor
+                color: LingmoUI.Theme.disabledTextColor
                 text: i18n("User: %1", identitiesCombo.currentText)
                 wrapMode: Text.Wrap
             }
-            Kirigami.LinkButton {
+            LingmoUI.LinkButton {
                 id: switchButton
                 text: i18n("Switch…")
                 onClicked: {
@@ -138,17 +138,17 @@ MobileDialogWindow {
             }
         }
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: inlineMessage
             Layout.fillWidth: true
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
+            Layout.bottomMargin: LingmoUI.Units.smallSpacing
             showCloseButton: true
             visible: text.length !== 0
         }
 
-        Kirigami.PasswordField {
+        LingmoUI.PasswordField {
             id: passwordField
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
             Layout.fillWidth: true
             onAccepted: root.accept()
             placeholderText: i18n("Password…")
@@ -181,19 +181,19 @@ MobileDialogWindow {
             }
         }
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             visible: details.checked
-            Layout.bottomMargin: Kirigami.Units.largeSpacing
+            Layout.bottomMargin: LingmoUI.Units.largeSpacing
             QQC2.Label {
-                Kirigami.FormData.label: i18n("Action:")
+                LingmoUI.FormData.label: i18n("Action:")
                 text: descriptionString
             }
             QQC2.Label {
-                Kirigami.FormData.label: i18n("ID:")
+                LingmoUI.FormData.label: i18n("ID:")
                 text: descriptionActionId
             }
-            Kirigami.UrlButton {
-                Kirigami.FormData.label: i18n("Vendor:")
+            LingmoUI.UrlButton {
+                LingmoUI.FormData.label: i18n("Vendor:")
                 text: descriptionVendorName
                 url: descriptionVendorUrl
             }

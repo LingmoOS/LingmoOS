@@ -138,7 +138,7 @@ private Q_SLOTS:
                              " \"Copyright\": \"(c) Alex Richardson 2015\",\n"
                              " \"Id\": \"time\",\n"
                              " \"Version\": \"1.0\",\n"
-                             " \"Website\": \"https://plasma.kde.org/\",\n"
+                             " \"Website\": \"https://lingmo.kde.org/\",\n"
                              " \"MimeTypes\": [ \"image/png\" ]\n"
                              " }\n}\n",
                              &e)
@@ -164,7 +164,7 @@ private Q_SLOTS:
         QCOMPARE(m.license(), QStringLiteral("LGPL"));
         QCOMPARE(m.copyrightText(), QStringLiteral("(c) Alex Richardson 2015"));
         QCOMPARE(m.version(), QStringLiteral("1.0"));
-        QCOMPARE(m.website(), QStringLiteral("https://plasma.kde.org/"));
+        QCOMPARE(m.website(), QStringLiteral("https://lingmo.kde.org/"));
         QCOMPARE(m.mimeTypes(), QStringList(QStringLiteral("image/png")));
     }
 
@@ -252,7 +252,7 @@ private Q_SLOTS:
         QVERIFY(md.isValid());
         QCOMPARE(md.name(), QStringLiteral("Test"));
 
-        QCOMPARE(md.value(QStringLiteral("X-Plasma-MainScript")), QStringLiteral("ui/main.qml"));
+        QCOMPARE(md.value(QStringLiteral("X-Lingmo-MainScript")), QStringLiteral("ui/main.qml"));
         QJsonArray expected;
         expected.append(QStringLiteral("Export"));
         QCOMPARE(md.rawData().value(QStringLiteral("X-Purpose-PluginTypes")).toArray(), expected);

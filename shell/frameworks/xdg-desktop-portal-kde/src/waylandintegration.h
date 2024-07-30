@@ -23,7 +23,7 @@ namespace KWayland
 {
 namespace Client
 {
-class PlasmaWindowManagement;
+class LingmoWindowManagement;
 class ScreencastingSource;
 }
 }
@@ -51,7 +51,7 @@ class WaylandIntegration : public QObject
     Q_OBJECT
 Q_SIGNALS:
     void newBuffer(uint8_t *screenData);
-    void plasmaWindowManagementInitialized();
+    void lingmoWindowManagementInitialized();
 };
 
 bool isStreamingEnabled();
@@ -83,7 +83,7 @@ void setParentWindow(QWindow *window, const QString &parentWindow);
 
 void init();
 
-KWayland::Client::PlasmaWindowManagement *plasmaWindowManagement();
+KWayland::Client::LingmoWindowManagement *lingmoWindowManagement();
 
 WaylandIntegration *waylandIntegration();
 

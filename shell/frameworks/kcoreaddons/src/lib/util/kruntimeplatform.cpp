@@ -5,6 +5,6 @@
 
 QStringList KRuntimePlatform::runtimePlatform()
 {
-    const QString env = QString::fromLocal8Bit(getenv("PLASMA_PLATFORM"));
+    const QString env = QString::fromLocal8Bit(getenv("LINGMO_PLATFORM"));
     return QStringList(env.split(QLatin1Char(':'), Qt::SkipEmptyParts));
 }

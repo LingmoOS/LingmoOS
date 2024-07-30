@@ -1,0 +1,274 @@
+/*
+    SPDX-FileCopyrightText: 2019 Nicolas Fella <nicolas.fella@gmx.de>
+    SPDX-FileCopyrightText: 2020 Carson Black <uhhadd@gmail.com>
+
+    SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+*/
+
+import QtQuick 2.6
+import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.5 as QQC2
+
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmouiaddons.components 1.0 as LingmoUIComponents
+import org.kde.kcmutils as KCM
+import org.kde.lingmo.kcm.users 1.0 as UsersKCM
+
+KCM.SimpleKCM {
+    id: usersDetailPage
+
+    title: user.displayPrimaryName
+
+    property UsersKCM.User user
+    property bool overrideImage: false
+    property url oldImage
+
+    implicitWidth: LingmoUI.Units.gridUnit * 30
+    implicitHeight: LingmoUI.Units.gridUnit * 27
+    focus: true
+
+    Connections {
+        target: user
+        function onApplyError(errorText) {
+            errorMessage.visible = true
+            errorMessage.text = errorText
+        }
+    }
+
+    Connections {
+        target: user
+        function onPasswordSuccessfullyChanged() {
+            // Prompt to change the wallet password of the logged-in user
+            if (usersDetailPage.user.loggedIn && usersDetailPage.user.usesDefaultWallet()) {
+                changeWalletPassword.open()
+            }
+        }
+    }
+
+    Connections {
+        target: kcm
+
+        function onApply() {
+            errorMessage.visible = false
+            usersDetailPage.user.realName = realNametextField.text
+            usersDetailPage.user.email = emailTextField.text
+            usersDetailPage.user.name = userNameField.text
+            usersDetailPage.user.administrator = (usertypeBox.currentValue === "administrator")
+            user.apply()
+            usersDetailPage.overrideImage = false
+            usersDetailPage.oldImage = ""
+        }
+
+        function onReset() {
+            errorMessage.visible = false
+            realNametextField.text = usersDetailPage.user.realName
+            emailTextField.text = usersDetailPage.user.email
+            userNameField.text = usersDetailPage.user.name
+            usertypeBox.currentIndex = usersDetailPage.user.administrator ? 1 : 0
+            if (usersDetailPage.oldImage != "") {
+                usersDetailPage.overrideImage = false
+                usersDetailPage.user.face = usersDetailPage.oldImage
+            }
+        }
+    }
+
+    function resolvePending() {
+        let pending = false
+        let user = usersDetailPage.user
+        pending = pending || user.realName != realNametextField.text
+        pending = pending || user.email != emailTextField.text
+        pending = pending || user.name != userNameField.text
+        pending = pending || user.administrator != (usertypeBox.currentValue === "administrator")
+        pending = pending || usersDetailPage.overrideImage
+        return pending
+    }
+
+    Component.onCompleted: {
+        kcm.needsSave = Qt.binding(resolvePending)
+    }
+
+    headerPaddingEnabled: false // Let the InlineMessages touch the edges
+    header: LingmoUI.InlineMessage {
+        id: errorMessage
+        visible: false
+        type: LingmoUI.MessageType.Error
+        position: LingmoUI.InlineMessage.Position.Header
+    }
+
+    ColumnLayout {
+        LingmoUIComponents.AvatarButton {
+            readonly property int size: 6 * LingmoUI.Units.gridUnit
+
+            Layout.preferredWidth: size
+            Layout.preferredHeight: size
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: LingmoUI.Units.largeSpacing
+
+            source: usersDetailPage.user.face
+            cache: false
+            name: user.realName
+
+            focus: true
+            text: i18n("Change avatar")
+
+            KeyNavigation.down: realNametextField
+
+            onClicked: {
+                const component = Qt.createComponent("PicturesSheet.qml")
+                const obj = component.incubateObject(usersDetailPage, {
+                    focus: true,
+                    usersDetailPage: usersDetailPage
+                })
+                if (obj == null) {
+                    console.log(component.errorString())
+                }
+                component.destroy()
+            }
+        }
+
+        LingmoUI.FormLayout {
+            QQC2.TextField  {
+                id: realNametextField
+                text: user.realName
+                LingmoUI.FormData.label: i18n("Name:")
+
+                KeyNavigation.down: userNameField
+            }
+
+            QQC2.TextField {
+                id: userNameField
+                text: user.name
+                LingmoUI.FormData.label: i18n("Username:")
+
+                KeyNavigation.down: usertypeBox
+            }
+
+            RowLayout {
+                spacing: LingmoUI.Units.smallSpacing
+                LingmoUI.FormData.label: i18n("Account type:")
+
+                QQC2.ComboBox {
+                    id: usertypeBox
+
+                    readonly property bool shouldBeEnabled: kcm.userModel.moreThanOneAdminUser || !user.administrator
+
+                    textRole: "label"
+                    valueRole: "type"
+                    model: [
+                        { "type": "standard", "label": i18n("Standard") },
+                        { "type": "administrator", "label": i18n("Administrator") },
+                    ]
+
+                    currentIndex: user.administrator ? 1 : 0
+                    enabled: shouldBeEnabled
+
+                    KeyNavigation.down: emailTextField
+                }
+
+                LingmoUI.ContextualHelpButton {
+                    toolTipText: i18n("Cannot change the account type to Standard unless there is at least one other Administrator account on the system. Without one, authentication would become impossible or require the insecure use of the root password.")
+                    visible: !usertypeBox.shouldBeEnabled
+                }
+            }
+
+            QQC2.TextField {
+                id: emailTextField
+                text: user.email
+                LingmoUI.FormData.label: i18n("Email address:")
+                KeyNavigation.down: changeButton
+            }
+
+            QQC2.Button {
+                id: changeButton
+                text: i18n("Change Password")
+                KeyNavigation.down: deleteUser.enabled ? deleteUser : fingerprintButton
+                onClicked: {
+                    changePassword.user = user
+                    changePassword.openAndClear()
+                }
+            }
+
+            Item {
+                Layout.preferredHeight: deleteUser.height
+            }
+
+            QQC2.Button {
+                id: deleteUser
+
+                enabled: !usersDetailPage.user.loggedIn && (!kcm.userModel.rowCount() < 2)
+
+                KeyNavigation.down: fingerprintButton
+
+                QQC2.Menu {
+                    id: deleteMenu
+                    modal: true
+                    QQC2.MenuItem {
+                        text: i18n("Delete files")
+                        icon.name: "edit-delete-shred"
+                        onClicked: {
+                            kcm.mainUi.deleteUser(usersDetailPage.user.uid, true)
+                        }
+                    }
+                    QQC2.MenuItem {
+                        text: i18n("Keep files")
+                        icon.name: "document-multiple"
+                        onClicked: {
+                            kcm.mainUi.deleteUser(usersDetailPage.user.uid, false)
+                        }
+                    }
+                }
+                text: i18n("Delete User…")
+                icon.name: "edit-delete"
+                onClicked: deleteMenu.open()
+            }
+        }
+
+        QQC2.Button {
+            id: fingerprintButton
+            Layout.topMargin: deleteUser.height
+            Layout.alignment: Qt.AlignHCenter
+            flat: false
+            visible: kcm.fingerprintModel.deviceFound
+            text: i18n("Configure Fingerprint Authentication…")
+            icon.name: "fingerprint-gui"
+
+            property LingmoUI.OverlaySheet dialog: null
+
+            onClicked: {
+                if (kcm.fingerprintModel.currentlyEnrolling) {
+                    kcm.fingerprintModel.stopEnrolling();
+                }
+                kcm.fingerprintModel.switchUser(user.name == kcm.userModel.getLoggedInUser().name ? "" : user.name);
+
+                if (fingerprintButton.dialog === null) {
+                    const component = Qt.createComponent("FingerprintDialog.qml");
+                    if (component.status == Component.Error) {
+                        console.warn(component.errorString())
+                    }
+                    component.incubateObject(usersDetailPage, {
+                        focus: true,
+                    });
+                    component.destroy();
+                } else {
+                    fingerprintButton.dialog.open()
+                }
+            }
+        }
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.leftMargin: LingmoUI.Units.largeSpacing * 2
+            Layout.rightMargin: LingmoUI.Units.largeSpacing * 2
+
+            visible: kcm.fingerprintModel.deviceFound
+
+            text: xi18nc("@info", "Fingerprints can be used in place of a password when unlocking the screen and providing administrator permissions to applications and command-line programs that request them.<nl/><nl/>Logging into the system with your fingerprint is not yet supported.")
+            textFormat: Text.StyledText
+
+            font: LingmoUI.Theme.smallFont
+            wrapMode: Text.Wrap
+        }
+    }
+
+    ChangePassword { id: changePassword }
+    ChangeWalletPassword { id: changeWalletPassword }
+}

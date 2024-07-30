@@ -10,7 +10,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * Base delegate for KControlmodules based on Grid views of thumbnails
@@ -64,16 +64,16 @@ T.ItemDelegate {
     height: GridView.view.cellHeight
     hoverEnabled: true
 
-    Kirigami.ShadowedRectangle {
+    LingmoUI.ShadowedRectangle {
         id: tile
         anchors.centerIn: parent
-        width: Kirigami.Settings.isMobile
-            ? delegate.width - Kirigami.Units.gridUnit
-            : Math.min(delegate.GridView.view.implicitCellWidth, delegate.width - Kirigami.Units.gridUnit)
-        height: Math.min(delegate.GridView.view.implicitCellHeight, delegate.height - Kirigami.Units.gridUnit)
-        radius: Kirigami.Units.smallSpacing
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
+        width: LingmoUI.Settings.isMobile
+            ? delegate.width - LingmoUI.Units.gridUnit
+            : Math.min(delegate.GridView.view.implicitCellWidth, delegate.width - LingmoUI.Units.gridUnit)
+        height: Math.min(delegate.GridView.view.implicitCellHeight, delegate.height - LingmoUI.Units.gridUnit)
+        radius: LingmoUI.Units.smallSpacing
+        LingmoUI.Theme.inherit: false
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
 
         shadow.xOffset: 0
         shadow.yOffset: 2
@@ -84,38 +84,38 @@ T.ItemDelegate {
             // Otherwise the first item is focused, BUG: 417843
             // We should rethink this when fixing the keyboard navigation
             /*if (delegate.GridView.isCurrentItem) {
-                return Kirigami.Theme.highlightColor;
+                return LingmoUI.Theme.highlightColor;
             } else */ if (parent.hovered) {
                 // Match appearance of hovered list items
-                return Qt.alpha(Kirigami.Theme.highlightColor, 0.5);
+                return Qt.alpha(LingmoUI.Theme.highlightColor, 0.5);
 
             } else {
-                return Kirigami.Theme.backgroundColor;
+                return LingmoUI.Theme.backgroundColor;
             }
         }
         Behavior on color {
             ColorAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutQuad
             }
         }
 
         Rectangle {
             id: contentArea
-            radius: Kirigami.Units.smallSpacing/2
+            radius: LingmoUI.Units.smallSpacing/2
             anchors {
                 fill: parent
-                margins: Kirigami.Units.smallSpacing
+                margins: LingmoUI.Units.smallSpacing
             }
 
-            color: Kirigami.Theme.backgroundColor
+            color: LingmoUI.Theme.backgroundColor
         }
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             parent: thumbnailArea
             visible: !delegate.thumbnailAvailable
             anchors.centerIn: parent
-            width: Kirigami.Units.iconSizes.large
+            width: LingmoUI.Units.iconSizes.large
             height: width
             source: delegate.text === i18nd("knewstuff6", "None") ? "edit-none" : "view-preview"
         }
@@ -123,13 +123,13 @@ T.ItemDelegate {
         Rectangle {
             anchors.fill: contentArea
             visible: actionsColumn.children.length > 0
-            opacity: Kirigami.Settings.isMobile || delegate.hovered || (actionsScope.focus) ? 1 : 0
-            radius: Kirigami.Units.smallSpacing
-            color: Kirigami.Settings.isMobile ? "transparent" : Qt.rgba(1, 1, 1, 0.2)
+            opacity: LingmoUI.Settings.isMobile || delegate.hovered || (actionsScope.focus) ? 1 : 0
+            radius: LingmoUI.Units.smallSpacing
+            color: LingmoUI.Settings.isMobile ? "transparent" : Qt.rgba(1, 1, 1, 0.2)
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                     easing.type: Easing.OutQuad
                 }
             }
@@ -139,9 +139,9 @@ T.ItemDelegate {
 
                 anchors {
                     right: parent.right
-                    rightMargin: Kirigami.Units.smallSpacing
+                    rightMargin: LingmoUI.Units.smallSpacing
                     top: parent.top
-                    topMargin: Kirigami.Units.smallSpacing
+                    topMargin: LingmoUI.Units.smallSpacing
                 }
                 width: actionsColumn.width
                 height: actionsColumn.height
@@ -161,7 +161,7 @@ T.ItemDelegate {
                             //NOTE: there aren't any global settings where to take "official" tooltip timeouts
                             QQC2.ToolTip.delay: 1000
                             QQC2.ToolTip.timeout: 5000
-                            QQC2.ToolTip.visible: (Kirigami.Settings.isMobile ? pressed : hovered) && modelData.tooltip.length > 0
+                            QQC2.ToolTip.visible: (LingmoUI.Settings.isMobile ? pressed : hovered) && modelData.tooltip.length > 0
                             QQC2.ToolTip.text: modelData.tooltip
                         }
                     }

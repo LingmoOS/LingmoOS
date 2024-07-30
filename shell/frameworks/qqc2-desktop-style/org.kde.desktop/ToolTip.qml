@@ -8,19 +8,19 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.ToolTip {
     id: control
 
-    Kirigami.Theme.colorSet: parent && parent.Kirigami.Theme.colorSet === Kirigami.Theme.Complementary
-        ? Kirigami.Theme.Complementary : Kirigami.Theme.Tooltip
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: parent && parent.LingmoUI.Theme.colorSet === LingmoUI.Theme.Complementary
+        ? LingmoUI.Theme.Complementary : LingmoUI.Theme.Tooltip
+    LingmoUI.Theme.inherit: false
 
     x: parent ? Math.round((parent.width - implicitWidth) / 2) : 0
     y: -implicitHeight - 3
 
-    z: Kirigami.OverlayZStacking.z
+    z: LingmoUI.OverlayZStacking.z
 
     // Math.ceil() prevents blurry edges and prevents unnecessary text wrapping
     // (vs using floor or sometimes round).
@@ -36,12 +36,12 @@ T.ToolTip {
         if (!parent || text.length === 0) {
             return false;
         }
-        if (Kirigami.Settings.tabletMode) {
+        if (LingmoUI.Settings.tabletMode) {
             return parent.pressed ?? false;
         }
         return parent.hovered ?? parent.containsMouse ?? false;
     }
-    delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+    delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
     // Never time out while being hovered; it's annoying
     timeout: -1
 
@@ -52,7 +52,7 @@ T.ToolTip {
             property: "opacity"
             from: 0.0
             to: 1.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -62,7 +62,7 @@ T.ToolTip {
             property: "opacity"
             from: 1.0
             to: 0.0
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.OutCubic
         }
     }
@@ -75,7 +75,7 @@ T.ToolTip {
             id: label
 
             // This value is basically arbitrary. It just looks nice.
-            readonly property double maxTextLength: Kirigami.Units.gridUnit * 14
+            readonly property double maxTextLength: LingmoUI.Units.gridUnit * 14
 
             // Strip out ampersands right before non-whitespace characters, i.e.
             // those used to determine the alt key shortcut
@@ -85,9 +85,9 @@ T.ToolTip {
             // from overflowing
             wrapMode: Text.Wrap
             font: control.font
-            color: Kirigami.Theme.textColor
+            color: LingmoUI.Theme.textColor
 
-            Kirigami.Theme.colorSet: control.Kirigami.Theme.colorSet
+            LingmoUI.Theme.colorSet: control.LingmoUI.Theme.colorSet
             // ensure that long text actually gets wrapped
             onLineLaidOut: (line) => {
                 if (line.implicitWidth > maxTextLength)
@@ -97,13 +97,13 @@ T.ToolTip {
     }
 
     // TODO: Consider replacing this with a StyleItem
-    background: Kirigami.ShadowedRectangle {
-        radius: Kirigami.Units.cornerRadius
-        color: Kirigami.Theme.backgroundColor
-        Kirigami.Theme.colorSet: control.Kirigami.Theme.colorSet
+    background: LingmoUI.ShadowedRectangle {
+        radius: LingmoUI.Units.cornerRadius
+        color: LingmoUI.Theme.backgroundColor
+        LingmoUI.Theme.colorSet: control.LingmoUI.Theme.colorSet
 
-        // Roughly but doesn't exactly match the medium shadow setting for Breeze menus/tooltips.
-        // TODO: Find a way to more closely match the user's Breeze settings.
+        // Roughly but doesn't exactly match the medium shadow setting for Ocean menus/tooltips.
+        // TODO: Find a way to more closely match the user's Ocean settings.
         shadow.xOffset: 0
         shadow.yOffset: 4
         shadow.size: 16
@@ -111,7 +111,7 @@ T.ToolTip {
 
         border.width: 1
         // TODO: Replace this with a frame or separator color role if that becomes a thing.
-        // Matches the color used by Breeze::Style::drawPanelTipLabelPrimitive()
-        border.color: Kirigami.ColorUtils.linearInterpolation(color, Kirigami.Theme.textColor, Kirigami.Theme.frameContrast)
+        // Matches the color used by Ocean::Style::drawPanelTipLabelPrimitive()
+        border.color: LingmoUI.ColorUtils.linearInterpolation(color, LingmoUI.Theme.textColor, LingmoUI.Theme.frameContrast)
     }
 }

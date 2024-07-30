@@ -8,7 +8,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.Control {
     id: control
@@ -24,7 +24,7 @@ QQC2.Control {
         HalfStar
     }
 
-    property real starSize: Kirigami.Units.gridUnit
+    property real starSize: LingmoUI.Units.gridUnit
     property bool readOnly: true
     property /*EditPolicy*/ int editPolicy: Rating.EditPolicy.None
     property int /*Precision*/ precision: Rating.Precision.FullStar
@@ -124,7 +124,7 @@ QQC2.Control {
 
     hoverEnabled: !readOnly
 
-    padding: Kirigami.Units.smallSpacing
+    padding: LingmoUI.Units.smallSpacing
     // Reset paddings after qqc2-desktop-style Control
     topPadding: undefined
     leftPadding: undefined
@@ -149,7 +149,7 @@ QQC2.Control {
             Repeater {
                 model: Math.ceil(control.maximumValue / 2)
 
-                Kirigami.Icon {
+                LingmoUI.Icon {
                     required property int index
 
                     width: control.starSize
@@ -196,7 +196,7 @@ QQC2.Control {
 
         acceptedButtons: Qt.LeftButton
         hoverEnabled: true
-        // Event stealing prevention seem to be required for it to work in Kirigami.OverlaySheet dialog.
+        // Event stealing prevention seem to be required for it to work in LingmoUI.OverlaySheet dialog.
         preventStealing: true
 
         property int hoveredValue: 0
@@ -284,16 +284,16 @@ QQC2.Control {
 
     background: Rectangle {
         color: "transparent"
-        border.color: control.Kirigami.Theme.highlightColor
+        border.color: control.LingmoUI.Theme.highlightColor
         border.width: 1
-        radius: Kirigami.Units.smallSpacing
+        radius: LingmoUI.Units.smallSpacing
 
         opacity: control.activeFocus && [Qt.TabFocusReason, Qt.BacktabFocusReason].includes(control.focusReason)
             ? 1 : 0
 
         Behavior on opacity {
             OpacityAnimator {
-                duration: Kirigami.Units.shortDuration
+                duration: LingmoUI.Units.shortDuration
                 easing.type: Easing.InOutCubic
             }
         }

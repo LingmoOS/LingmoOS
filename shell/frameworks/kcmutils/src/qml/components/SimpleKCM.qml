@@ -6,35 +6,35 @@
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * This component is intended to be used as root item for
- * KCMs with arbitrary content. Often a Kirigami.FormLayout
+ * KCMs with arbitrary content. Often a LingmoUI.FormLayout
  * is used as main element.
  * It is possible to specify a header and footer component.
  * @code
  * import org.kde.kcmutils as KCMUtils
- * import org.kde.kirigami as Kirigami
+ * import org.kde.lingmoui as LingmoUI
  *
  * KCMUtils.SimpleKCM {
- *     Kirigami.FormLayout {
+ *     LingmoUI.FormLayout {
  *        TextField {
- *           Kirigami.FormData.label: "Label:"
+ *           LingmoUI.FormData.label: "Label:"
  *        }
  *        TextField {
- *           Kirigami.FormData.label: "Label:"
+ *           LingmoUI.FormData.label: "Label:"
  *        }
  *     }
  *     footer: Item {...}
  * }
  * @endcode
- * @inherits org.kde.kirigami.ScrollablePage
+ * @inherits org.kde.lingmoui.ScrollablePage
  */
-Kirigami.ScrollablePage {
+LingmoUI.ScrollablePage {
     id: root
 
-    readonly property int margins: 6 // Layout_ChildMarginWidth from Breeze
+    readonly property int margins: 6 // Layout_ChildMarginWidth from Ocean
 
     /**
      * extraFooterTopPadding: bool
@@ -66,7 +66,7 @@ Kirigami.ScrollablePage {
     title: (typeof kcm !== "undefined") ? kcm.name : ""
 
     // Make pages fill the whole view by default
-    Kirigami.ColumnView.fillWidth: true
+    LingmoUI.ColumnView.fillWidth: true
 
     property bool sidebarMode: false
 
@@ -76,7 +76,7 @@ Kirigami.ScrollablePage {
     bottomPadding: margins
 
     header: Column {
-        Kirigami.Padding {
+        LingmoUI.Padding {
             id: headerParent
 
             anchors {
@@ -90,7 +90,7 @@ Kirigami.ScrollablePage {
 
         // When the header is visible, we need to add a line below to separate
         // it from the view
-        Kirigami.Separator {
+        LingmoUI.Separator {
             anchors {
                 left: parent.left
                 right: parent.right
@@ -117,7 +117,7 @@ Kirigami.ScrollablePage {
     function __adoptOverlaySheets(): void {
         // Search overlaysheets in contentItem, parent to root if found
         for (const object of contentItem.data) {
-            if (object instanceof Kirigami.OverlaySheet) {
+            if (object instanceof LingmoUI.OverlaySheet) {
                 if (object.parent === null) {
                     object.parent = this;
                 }

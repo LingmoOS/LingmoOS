@@ -5,8 +5,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmo.components 3.0 as LingmoComponents
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -43,18 +43,18 @@ ModuleMediaCenter {
         ColumnLayout {
             anchors.horizontalCenter: parent.horizontalCenter
             width: root.width * 0.7
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 6
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 6
                 Layout.alignment: Qt.AlignHCenter
 
                 Rectangle {
-                    color: Kirigami.Theme.highlightColor
+                    color: LingmoUI.Theme.highlightColor
                     radius: 4
-                    width: Kirigami.Units.gridUnit * 8
-                    height: Kirigami.Units.gridUnit * 1
+                    width: LingmoUI.Units.gridUnit * 8
+                    height: LingmoUI.Units.gridUnit * 1
                     anchors.top: parent.top
                     x: infoRectContent.x
                     y: -2
@@ -70,40 +70,40 @@ ModuleMediaCenter {
                         fontSizeMode: Text.Fit
                         wrapMode: Text.WordWrap
                         text: qsTr("Setting Up Your User Account")
-                        color: Kirigami.Theme.textColor
+                        color: LingmoUI.Theme.textColor
                     }
                 }
 
                 Rectangle {
                     id: infoRectContent
-                    color: Kirigami.Theme.backgroundColor
+                    color: LingmoUI.Theme.backgroundColor
                     radius: 4
                     width: parent.width
-                    height: Kirigami.Units.gridUnit * 5
+                    height: LingmoUI.Units.gridUnit * 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: Kirigami.Units.smallSpacing
+                    anchors.bottomMargin: LingmoUI.Units.smallSpacing
                     z: 1
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: Kirigami.Units.largeSpacing
+                        anchors.margins: LingmoUI.Units.largeSpacing
 
                         RowLayout {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: userModule.dir() + "/assets/remote-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -121,11 +121,11 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: root.switchTextByFocus()[0]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
 
-                        Kirigami.Separator {
+                        LingmoUI.Separator {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 1
                         }
@@ -135,16 +135,16 @@ ModuleMediaCenter {
                             Layout.fillHeight: true
 
                             Item {
-                                Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                                Layout.preferredWidth: LingmoUI.Units.gridUnit * 2
                                 Layout.fillHeight: true
 
-                                Kirigami.Icon {
+                                LingmoUI.Icon {
                                     anchors.fill: parent
                                     source: userModule.dir() + "/assets/keyboard-ok.svg"
                                 }
                             }
 
-                            Kirigami.Separator {
+                            LingmoUI.Separator {
                                 Layout.preferredWidth: 1
                                 Layout.fillHeight: true
                             }
@@ -162,7 +162,7 @@ ModuleMediaCenter {
                                 fontSizeMode: Text.Fit
                                 wrapMode: Text.WordWrap
                                 text: root.switchTextByFocus()[1]
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
                     }
@@ -174,8 +174,8 @@ ModuleMediaCenter {
                 objectName: "fullNameContainer"
                 color: "transparent"
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.25
-                border.color: fullNameContainer.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 2.25
+                border.color: fullNameContainer.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
                 border.width: fullNameContainer.activeFocus ? 3 : 0
                 Layout.alignment: Qt.AlignTop
 
@@ -189,7 +189,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                PlasmaComponents.TextField {
+                LingmoComponents.TextField {
                     id: fullname
                     anchors.fill: parent
                     anchors.margins: 3
@@ -204,9 +204,9 @@ ModuleMediaCenter {
                 objectName: "userNameContainer"
                 color: "transparent"
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.25
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 2.25
                 Layout.alignment: Qt.AlignTop
-                border.color: userNameContainer.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+                border.color: userNameContainer.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
                 border.width: userNameContainer.activeFocus ? 3 : 0
 
                 Keys.onReturnPressed: username.forceActiveFocus()
@@ -219,7 +219,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                PlasmaComponents.TextField {
+                LingmoComponents.TextField {
                     id: username
                     validator: RegExpValidator { regExp: /[a-z_][a-z0-9_-]*[$]?/ }
                     maximumLength: 32
@@ -240,7 +240,7 @@ ModuleMediaCenter {
 
                         background: Rectangle {
                             radius: 2
-                            color: Kirigami.Theme.backgroundColor
+                            color: LingmoUI.Theme.backgroundColor
                         }
 
                         ColumnLayout {
@@ -248,19 +248,19 @@ ModuleMediaCenter {
 
                             Label {
                                 text: "- Should be lowercase"
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                             Label {
                                 text: "- Should start with [a-z] or '_'"
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                             Label {
                                 text: "- Can contain [a-z], [0-9], '_', and '-'"
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                             Label {
                                 text: "- May end with a '$'"
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
                     }
@@ -272,8 +272,8 @@ ModuleMediaCenter {
                 objectName: "passwordContainer"
                 color: "transparent"
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.25
-                border.color: passwordContainer.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 2.25
+                border.color: passwordContainer.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
                 border.width: passwordContainer.activeFocus ? 3 : 0
                 Layout.alignment: Qt.AlignTop
 
@@ -287,7 +287,7 @@ ModuleMediaCenter {
                     }
                 }
 
-                PlasmaComponents.TextField {
+                LingmoComponents.TextField {
                     id: password
                     validator: {
                         if (userModule.passwordType === 'digitsonly')
@@ -314,7 +314,7 @@ ModuleMediaCenter {
 
                         background: Rectangle {
                             radius: 2
-                            color: Kirigami.Theme.backgroundColor
+                            color: LingmoUI.Theme.backgroundColor
                         }
 
                         ColumnLayout {
@@ -322,7 +322,7 @@ ModuleMediaCenter {
 
                             Label {
                                 text: "- Should be digits only [0-9]"
-                                color: Kirigami.Theme.textColor
+                                color: LingmoUI.Theme.textColor
                             }
                         }
                     }
@@ -334,8 +334,8 @@ ModuleMediaCenter {
                 objectName: "cnfPasswordContainer"
                 color: "transparent"
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.25
-                border.color: cnfPasswordContainer.activeFocus ? Kirigami.Theme.highlightColor : "transparent"
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 2.25
+                border.color: cnfPasswordContainer.activeFocus ? LingmoUI.Theme.highlightColor : "transparent"
                 border.width: cnfPasswordContainer.activeFocus ? 3 : 0
                 Layout.alignment: Qt.AlignTop
 
@@ -349,7 +349,7 @@ ModuleMediaCenter {
                 KeyNavigation.up: passwordContainer
                 KeyNavigation.down: nextButton.enabled ? nextButton : backButton
 
-                PlasmaComponents.TextField {
+                LingmoComponents.TextField {
                     id: cnfPassword
                     validator: {
                         if (userModule.passwordType === 'digitsonly')
@@ -381,10 +381,10 @@ ModuleMediaCenter {
 
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                 color: "transparent"
                 border.width: backButton.activeFocus ? 3 : 0
-                border.color: Kirigami.Theme.highlightColor
+                border.color: LingmoUI.Theme.highlightColor
                 radius: 3
 
                 Button {
@@ -409,10 +409,10 @@ ModuleMediaCenter {
 
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+                Layout.preferredHeight: LingmoUI.Units.gridUnit * 3
                 color: "transparent"
                 border.width: nextButton.activeFocus ? 3 : 0
-                border.color: Kirigami.Theme.highlightColor
+                border.color: LingmoUI.Theme.highlightColor
                 radius: 3
 
                 NextButtonMediaCenter {

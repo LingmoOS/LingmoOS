@@ -58,7 +58,7 @@ find_package(
         StatusNotifierItem
 )
 
-ecm_find_qmlmodule(org.kde.kirigami 2.20)
+ecm_find_qmlmodule(org.kde.lingmoui 2.20)
 ecm_find_qmlmodule(org.kde.kitemmodels 1.0)
 ecm_find_qmlmodule(org.kde.syntaxhighlighting 1.0)
 

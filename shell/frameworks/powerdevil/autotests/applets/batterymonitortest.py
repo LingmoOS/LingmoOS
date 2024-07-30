@@ -24,7 +24,7 @@ from GLibMainLoopThread import GLibMainLoopThread
 from NetHadessPowerProfiles import NetHadessPowerProfiles
 from OrgFreedesktopUPower import OrgFreedesktopUPower
 
-WIDGET_ID: Final = "org.kde.plasma.battery"
+WIDGET_ID: Final = "org.kde.lingmo.battery"
 KDE_VERSION: Final = 6
 POWERDEVIL_PATH: Final = os.environ.get("POWERDEVIL_PATH", "/usr/libexec/org_kde_powerdevil")
 POWERDEVIL_SERVICE_NAME: Final = "org.kde.Solid.PowerManagement"
@@ -114,13 +114,13 @@ class BatteryMonitorTests(unittest.TestCase):
 
         # Now start the appium test
         options = AppiumOptions()
-        options.set_capability("app", f"plasmawindowed -p org.kde.plasma.nano {WIDGET_ID}")
+        options.set_capability("app", f"lingmowindowed -p org.kde.lingmo.nano {WIDGET_ID}")
         options.set_capability("environ", {
             "DBUS_SYSTEM_BUS_ADDRESS": os.environ["DBUS_SYSTEM_BUS_ADDRESS"],
             "DBUS_SESSION_BUS_ADDRESS": os.environ["DBUS_SESSION_BUS_ADDRESS"],
             "LC_ALL": "en_US.UTF-8",
             "QT_FATAL_WARNINGS": "1",
-            "QT_LOGGING_RULES": "qt.accessibility.atspi.warning=false;qt.dbus.integration.warning=false;kf.plasma.core.warning=false;kf.windowsystem.warning=false;kf.kirigami.platform.warning=false",
+            "QT_LOGGING_RULES": "qt.accessibility.atspi.warning=false;qt.dbus.integration.warning=false;kf.lingmo.core.warning=false;kf.windowsystem.warning=false;kf.lingmoui.platform.warning=false",
         })
         cls.driver = webdriver.Remote(command_executor='http://127.0.0.1:4723', extensions=[SetValueCommand], options=options)
 
@@ -139,10 +139,10 @@ class BatteryMonitorTests(unittest.TestCase):
         """
         Make sure to terminate the driver again, lest it dangles.
         """
-        subprocess.check_call([f"kquitapp{KDE_VERSION}", "plasmawindowed"])
+        subprocess.check_call([f"kquitapp{KDE_VERSION}", "lingmowindowed"])
         for _ in range(10):
             try:
-                subprocess.check_call(["pidof", "plasmawindowed"])
+                subprocess.check_call(["pidof", "lingmowindowed"])
             except subprocess.CalledProcessError:
                 break
             time.sleep(1)
@@ -211,7 +211,7 @@ class BatteryMonitorTests(unittest.TestCase):
     def test_13_hotplug_battery_when_discharging(self) -> None:
         """
         After the secondary battery is not present, the remaining time should also be updated accordingly.
-        In upower, "is-present" is not necessarily bound to "power-supply", so this also tests https://invent.kde.org/plasma/powerdevil/-/merge_requests/247
+        In upower, "is-present" is not necessarily bound to "power-supply", so this also tests https://invent.kde.org/lingmo/powerdevil/-/merge_requests/247
         """
         self.upower_interface.set_energy_props(OrgFreedesktopUPower.BATTERY0_OBJECT_PATH, 20)
         # double weight = 0.005 * std::min<qulonglong>(60, timestamp - m_lastRateTimestamp) = 0.3;
@@ -264,7 +264,7 @@ class BatteryMonitorTests(unittest.TestCase):
     def test_23_hotplug_battery_when_charging(self) -> None:
         """
         After the secondary battery is not present, the remaining time should also be updated accordingly.
-        In upower, "is-present" is not necessarily bound to "power-supply", so this also tests https://invent.kde.org/plasma/powerdevil/-/merge_requests/247
+        In upower, "is-present" is not necessarily bound to "power-supply", so this also tests https://invent.kde.org/lingmo/powerdevil/-/merge_requests/247
         """
         self.upower_interface.set_energy_props(OrgFreedesktopUPower.BATTERY0_OBJECT_PATH, -20.0)
         self.upower_interface.set_energy_props(OrgFreedesktopUPower.BATTERY1_OBJECT_PATH, 0, 80.0)

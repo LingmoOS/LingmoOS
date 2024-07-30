@@ -6,15 +6,15 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
 import org.kde.private.kcm.kscreen 1.0 as KScreen
 
 ColumnLayout {
-    Kirigami.FormData.label: i18n("Orientation:")
-    Kirigami.FormData.labelAlignment: autoRotateColumn.visible ? Qt.AlignTop : Qt.AlignVCenter
-    Kirigami.FormData.buddyFor: autoRotateColumn.visible ? autoRotateColumn : orientation
-    spacing: Kirigami.Units.smallSpacing
+    LingmoUI.FormData.label: i18n("Orientation:")
+    LingmoUI.FormData.labelAlignment: autoRotateColumn.visible ? Qt.AlignTop : Qt.AlignVCenter
+    LingmoUI.FormData.buddyFor: autoRotateColumn.visible ? autoRotateColumn : orientation
+    spacing: LingmoUI.Units.smallSpacing
 
     ColumnLayout {
         id: autoRotateColumn
@@ -38,7 +38,7 @@ ColumnLayout {
 
             QQC2.CheckBox {
                 id: autoRotateOnlyInTabletMode
-                Layout.leftMargin: Kirigami.Units.gridUnit
+                Layout.leftMargin: LingmoUI.Units.gridUnit
 
                 text: i18n("Only when in tablet mode")
                 enabled: autoRotateRadio.checked

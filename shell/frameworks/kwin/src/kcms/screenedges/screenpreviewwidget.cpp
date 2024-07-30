@@ -78,7 +78,7 @@ ScreenPreviewWidget::ScreenPreviewWidget(QWidget *parent)
     , d(std::make_unique<ScreenPreviewWidgetPrivate>(this))
 {
     d->svgImageSet = std::make_unique<KSvg::ImageSet>();
-    d->svgImageSet->setBasePath("plasma/desktoptheme");
+    d->svgImageSet->setBasePath("lingmo/desktoptheme");
     d->screenGraphics = new KSvg::FrameSvg(this);
     d->screenGraphics->setImageSet(d->svgImageSet.get());
     d->screenGraphics->setImagePath("widgets/monitor");

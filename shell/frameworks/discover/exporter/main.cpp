@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
-    KLocalizedString::setApplicationDomain("plasma-discover-exporter");
+    KLocalizedString::setApplicationDomain("lingmo-discover-exporter");
     KAboutData about(QStringLiteral("discover-exporter"),
                      i18n("Discover Exporter"),
                      version,

@@ -10,7 +10,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 FocusScope {
     id: root
@@ -22,9 +22,9 @@ FocusScope {
     RowLayout {
         id: row
         anchors.fill: parent
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.ActionTextField {
+        LingmoUI.ActionTextField {
             id: commandText
             focus: true
             Layout.fillWidth: true
@@ -34,7 +34,7 @@ FocusScope {
 
             onEditingFinished: { root.command = text; }
 
-            rightActions: Kirigami.Action {
+            rightActions: LingmoUI.Action {
                 icon.name: "edit-clear-symbolic"
                 visible: commandText.text !== ""
                 onTriggered: {
@@ -55,7 +55,7 @@ FocusScope {
 
             QQC2.ToolTip.visible: hovered
             QQC2.ToolTip.text: text
-            QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+            QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
         }
 
         Component {

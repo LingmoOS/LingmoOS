@@ -31,10 +31,10 @@ void KStyleManager::initStyle()
     const auto config = KSharedConfig::openConfig();
 
     // enforce the style configured by the user, with kdeglobals fallback
-    // if not set or the style is not there, use Breeze
+    // if not set or the style is not there, use Ocean
     QString styleToUse = KConfigGroup(config, QStringLiteral("General")).readEntry("widgetStyle", QString());
     if (styleToUse.isEmpty() || !QApplication::setStyle(styleToUse)) {
-        styleToUse = QStringLiteral("breeze");
+        styleToUse = QStringLiteral("ocean");
         QApplication::setStyle(styleToUse);
     }
 }
@@ -42,7 +42,7 @@ void KStyleManager::initStyle()
 QAction *KStyleManager::createConfigureAction(QObject *parent)
 {
     // if we are running with our application theme, just return a disabled & hidden action
-    // there we just follow the Plasma theme
+    // there we just follow the Lingmo theme
     if (QGuiApplicationPrivate::platformTheme() && QGuiApplicationPrivate::platformTheme()->name() == QLatin1String("kde")) {
         QAction *a = new QAction(parent);
         a->setEnabled(false);

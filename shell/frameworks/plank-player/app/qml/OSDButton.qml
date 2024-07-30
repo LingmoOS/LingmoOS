@@ -5,18 +5,18 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Templates 2.15 as QQCT
-import org.kde.kirigami 2.15 as Kirigami
+import org.kde.lingmoui 2.15 as LingmoUI
 
 QQCT.Button {
      id: osdBtn
      Layout.fillWidth: true
-     Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+     Layout.preferredHeight: LingmoUI.Units.gridUnit * 4
      property alias iconSource: osdBtnIcon.source
 
      background: Rectangle {
          id: osdBtnBackground
-         color: osdBtn.activeFocus ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
-         border.color: Kirigami.Theme.disabledTextColor
+         color: osdBtn.activeFocus ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.backgroundColor
+         border.color: LingmoUI.Theme.disabledTextColor
      }
 
      onFocusChanged: {
@@ -24,12 +24,12 @@ QQCT.Button {
      }
 
      contentItem: Item {
-         Kirigami.Icon {
+         LingmoUI.Icon {
              id: osdBtnIcon
              anchors.centerIn: parent
-             Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-             Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-             color: osdBtn.checked ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+             Layout.preferredWidth: LingmoUI.Units.iconSizes.medium
+             Layout.preferredHeight: LingmoUI.Units.iconSizes.medium
+             color: osdBtn.checked ? LingmoUI.Theme.negativeTextColor : LingmoUI.Theme.textColor
          }
      }
 

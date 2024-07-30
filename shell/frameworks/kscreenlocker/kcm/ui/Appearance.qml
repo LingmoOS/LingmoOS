@@ -9,9 +9,9 @@ import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 
-Kirigami.Page {
+LingmoUI.Page {
     // The following two must be set for correct alignment with wallpaper config
     id: appearanceRoot
     property alias parentLayout: parentLayout
@@ -21,22 +21,22 @@ Kirigami.Page {
 
     title: i18nc("@title", "Appearance")
 
-    padding: 6  // Layout_ChildMarginWidth from Breeze
+    padding: 6  // Layout_ChildMarginWidth from Ocean
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         ShellConfig {
             sourceFile: kcm.shellConfigFile
             onConfigurationChanged: kcm.updateState()
         }
 
-        Kirigami.FormLayout {
+        LingmoUI.FormLayout {
             id: parentLayout // Don't change needed for correct alignment with shell and wallpaper config
 
             QQC2.ComboBox {
-                Kirigami.FormData.label: i18n("Wallpaper type:")
+                LingmoUI.FormData.label: i18n("Wallpaper type:")
                 model: kcm.availableWallpaperPlugins()
                 textRole: "name"
                 valueRole: "id"

@@ -5,7 +5,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 import QtQuick.Controls 2.15 as Controls
 import Qt.labs.folderlistmodel 2.4
 import QtMultimedia
@@ -27,12 +27,12 @@ Controls.Popup {
     }
 
     Controls.Overlay.modeless: Rectangle {
-        color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.77)
+        color: Qt.rgba(LingmoUI.Theme.backgroundColor.r, LingmoUI.Theme.backgroundColor.g, LingmoUI.Theme.backgroundColor.b, 0.77)
     }
 
     background: Rectangle {
-        Kirigami.Theme.colorSet: Kirigami.Theme.View
-        color: Kirigami.Theme.backgroundColor
+        LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+        color: LingmoUI.Theme.backgroundColor
         border.color: "black"
     }
 
@@ -64,22 +64,22 @@ Controls.Popup {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: Kirigami.Units.gridUnit * 2
+            height: LingmoUI.Units.gridUnit * 2
 
             Rectangle {
-                color: Kirigami.Theme.backgroundColor
+                color: LingmoUI.Theme.backgroundColor
                 radius: 10
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.margins: Kirigami.Units.smallSpacing
+                Layout.margins: LingmoUI.Units.smallSpacing
 
                 Controls.Label {
                     anchors.fill: parent
-                    anchors.leftMargin: Kirigami.Units.largeSpacing
-                    anchors.topMargin: Kirigami.Units.smallSpacing
-                    anchors.bottomMargin: Kirigami.Units.smallSpacing
-                    anchors.rightMargin: Kirigami.Units.largeSpacing
-                    color: Kirigami.Theme.textColor
+                    anchors.leftMargin: LingmoUI.Units.largeSpacing
+                    anchors.topMargin: LingmoUI.Units.smallSpacing
+                    anchors.bottomMargin: LingmoUI.Units.smallSpacing
+                    anchors.rightMargin: LingmoUI.Units.largeSpacing
+                    color: LingmoUI.Theme.textColor
                     elide: Text.ElideRight
                     maximumLineCount: 1
                     text: folderModel.folder.toString().replace("file://", "")
@@ -93,7 +93,7 @@ Controls.Popup {
             }
         }
 
-        Kirigami.Separator {
+        LingmoUI.Separator {
             id: headrSeptBml
             anchors.top: headerAreaBMLPg1.bottom
             width: parent.width
@@ -105,7 +105,7 @@ Controls.Popup {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: Kirigami.Units.largeSpacing
+            anchors.margins: LingmoUI.Units.largeSpacing
 
             ListView {
                 id: fileModelFolderSelector
@@ -115,7 +115,7 @@ Controls.Popup {
                 keyNavigationEnabled: true
                 highlightFollowsCurrentItem: true
                 highlightRangeMode: GridView.ApplyRange
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
                 clip: true
                 KeyNavigation.right: testModelView
                 delegate: MenuButton {
@@ -140,7 +140,7 @@ Controls.Popup {
                 highlightRangeMode: GridView.ApplyRange
                 snapMode: GridView.SnapToRow
                 cacheBuffer: width
-                highlightMoveDuration: Kirigami.Units.longDuration
+                highlightMoveDuration: LingmoUI.Units.longDuration
                 clip: true
                 KeyNavigation.left: fileModelFolderSelector
                 enabled: fileModel.count > 0 ? 1 :0
@@ -165,7 +165,7 @@ Controls.Popup {
                 move: Transition {
                     SmoothedAnimation {
                         property: "x"
-                        duration: Kirigami.Units.longDuration
+                        duration: LingmoUI.Units.longDuration
                     }
                 }
             }

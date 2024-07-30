@@ -24,7 +24,7 @@ target_link_libraries(kded_printmanager PRIVATE
 ecm_qt_declare_logging_category(kded_printmanager
     HEADER pmkded_log.h
     IDENTIFIER PMKDED
-    CATEGORY_NAME org.kde.plasma.printmanager.kded
+    CATEGORY_NAME org.kde.lingmo.printmanager.kded
     DESCRIPTION "Print Manager (kded)"
     EXPORT PMLOGS
 )

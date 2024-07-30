@@ -8,8 +8,8 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.components 3.0 as PlasmaComponents
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.components 3.0 as LingmoComponents
 
 Item {
     id: delegate
@@ -107,21 +107,21 @@ Item {
         Rectangle {
             anchors {
                 fill: parent
-                margins: Kirigami.Units.smallSpacing
+                margins: LingmoUI.Units.smallSpacing
             }
             visible: tile.tiles.length === 0
-            radius: Kirigami.Units.cornerRadius
+            radius: LingmoUI.Units.cornerRadius
             opacity: tile.layoutDirection === KWinComponents.Tile.Floating ? 0.6 : 0.3
-            color: tile.layoutDirection === KWinComponents.Tile.Floating ? Kirigami.Theme.backgroundColor : "transparent"
-            border.color: Kirigami.Theme.textColor
+            color: tile.layoutDirection === KWinComponents.Tile.Floating ? LingmoUI.Theme.backgroundColor : "transparent"
+            border.color: LingmoUI.Theme.textColor
             Rectangle {
                 anchors {
                     fill: parent
                     margins: 1
                 }
-                radius: Kirigami.Units.cornerRadius
+                radius: LingmoUI.Units.cornerRadius
                 color: "transparent"
-                border.color: Kirigami.Theme.backgroundColor
+                border.color: LingmoUI.Theme.backgroundColor
             }
             MouseArea {
                 anchors.fill: parent
@@ -157,39 +157,39 @@ Item {
         GridLayout {
             anchors.centerIn: parent
             visible: tile.tiles.length === 0
-            readonly property bool compact: delegate.width < Kirigami.Units.gridUnit * 10 || delegate.height < splitButton.implicitHeight * visibleChildren.length + rowSpacing * visibleChildren.length + Kirigami.Units.gridUnit
+            readonly property bool compact: delegate.width < LingmoUI.Units.gridUnit * 10 || delegate.height < splitButton.implicitHeight * visibleChildren.length + rowSpacing * visibleChildren.length + LingmoUI.Units.gridUnit
             rows: compact ? 1 : -1
             columns: compact ? -1 : 1
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 id: splitButton
                 Layout.fillWidth: true
                 icon.name: "view-split-left-right"
                 text: i18nd("kwin","Split Left/Right")
-                display: parent.compact ? PlasmaComponents.Button.IconOnly : PlasmaComponents.Button.TextBesideIcon
+                display: parent.compact ? LingmoComponents.Button.IconOnly : LingmoComponents.Button.TextBesideIcon
                 onClicked: tile.split(KWinComponents.Tile.Horizontal)
             }
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 Layout.fillWidth: true
                 icon.name: "view-split-top-bottom"
                 text: i18nd("kwin","Split Top/Bottom")
-                display: parent.compact ? PlasmaComponents.Button.IconOnly : PlasmaComponents.Button.TextBesideIcon
+                display: parent.compact ? LingmoComponents.Button.IconOnly : LingmoComponents.Button.TextBesideIcon
                 onClicked: tile.split(KWinComponents.Tile.Vertical)
             }
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 Layout.fillWidth: true
                 visible: tile.layoutDirection !== KWinComponents.Tile.Floating
                 icon.name: "window-duplicate"
                 text: i18nd("kwin","Add Floating Tile")
-                display: parent.compact ? PlasmaComponents.Button.IconOnly : PlasmaComponents.Button.TextBesideIcon
+                display: parent.compact ? LingmoComponents.Button.IconOnly : LingmoComponents.Button.TextBesideIcon
                 onClicked: tile.split(KWinComponents.Tile.Floating)
             }
-            PlasmaComponents.Button {
+            LingmoComponents.Button {
                 id: deleteButton
                 visible: tile.canBeRemoved
                 Layout.fillWidth: true
                 icon.name: "edit-delete"
                 text: i18nd("kwin","Delete")
-                display: parent.compact ? PlasmaComponents.Button.IconOnly : PlasmaComponents.Button.TextBesideIcon
+                display: parent.compact ? LingmoComponents.Button.IconOnly : LingmoComponents.Button.TextBesideIcon
                 onClicked: {
                     tile.remove();
                 }
@@ -200,11 +200,11 @@ Item {
         enabled: tile.layoutDirection === KWinComponents.Tile.Floating && tile.isLayout
         onTapped: effect.deactivate(effect.animationDuration);
     }
-    PlasmaComponents.Button {
+    LingmoComponents.Button {
         anchors {
             right: parent.right
             bottom: parent.bottom
-            margins: Kirigami.Units.smallSpacing
+            margins: LingmoUI.Units.smallSpacing
         }
         visible: tile.layoutDirection === KWinComponents.Tile.Floating && tile.isLayout
         icon.name: "window-duplicate"

@@ -9,24 +9,24 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin.private.kdecoration as KDecoration
 
 // Fake Window
 Rectangle {
     id: baseLayout
 
-    readonly property int buttonIconSize: Kirigami.Units.iconSizes.medium
-    readonly property int titleBarSpacing: Kirigami.Units.largeSpacing
+    readonly property int buttonIconSize: LingmoUI.Units.iconSizes.medium
+    readonly property int titleBarSpacing: LingmoUI.Units.largeSpacing
     readonly property bool draggingTitlebarButtons: leftButtonsView.dragActive || rightButtonsView.dragActive
     readonly property bool hideDragHint: draggingTitlebarButtons || availableButtonsGrid.dragActive
 
     color: palette.base
-    radius: Kirigami.Units.cornerRadius
+    radius: LingmoUI.Units.cornerRadius
 
     KDecoration.Bridge {
         id: bridgeItem
-        plugin: "org.kde.breeze"
+        plugin: "org.kde.ocean"
     }
     KDecoration.Settings {
         id: settingsItem
@@ -40,7 +40,7 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: buttonPreviewRow.implicitHeight + 2 * baseLayout.titleBarSpacing
-            radius: Kirigami.Units.cornerRadius
+            radius: LingmoUI.Units.cornerRadius
             gradient: Gradient {
                 GradientStop { position: 0.0; color: palette.midlight }
                 GradientStop { position: 1.0; color: palette.window }
@@ -64,11 +64,11 @@ Rectangle {
                     Rectangle {
                         visible: stateBindingButtonLeft.nonDefaultHighlightVisible
                         anchors.fill: parent
-                        Layout.margins: Kirigami.Units.smallSpacing
+                        Layout.margins: LingmoUI.Units.smallSpacing
                         color: "transparent"
-                        border.color: Kirigami.Theme.neutralTextColor
+                        border.color: LingmoUI.Theme.neutralTextColor
                         border.width: 1
-                        radius: Kirigami.Units.cornerRadius
+                        radius: LingmoUI.Units.cornerRadius
                     }
 
                     KCM.SettingStateBinding {
@@ -93,11 +93,11 @@ Rectangle {
                     Rectangle {
                         visible: stateBindingButtonRight.nonDefaultHighlightVisible
                         anchors.fill: parent
-                        Layout.margins: Kirigami.Units.smallSpacing
+                        Layout.margins: LingmoUI.Units.smallSpacing
                         color: "transparent"
-                        border.color: Kirigami.Theme.neutralTextColor
+                        border.color: LingmoUI.Theme.neutralTextColor
                         border.width: 1
-                        radius: Kirigami.Units.cornerRadius
+                        radius: LingmoUI.Units.cornerRadius
                     }
 
                     KCM.SettingStateBinding {
@@ -176,23 +176,23 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: availableButtonsGrid.cellHeight * 2
-            Layout.margins: Kirigami.Units.largeSpacing
-            cellWidth: Kirigami.Units.gridUnit * 6
-            cellHeight: Kirigami.Units.gridUnit * 6
+            Layout.margins: LingmoUI.Units.largeSpacing
+            cellWidth: LingmoUI.Units.gridUnit * 6
+            cellHeight: LingmoUI.Units.gridUnit * 6
             model: kcm.availableButtonsModel
             interactive: false
 
             delegate: ColumnLayout {
-                width: availableButtonsGrid.cellWidth - Kirigami.Units.largeSpacing
-                height: availableButtonsGrid.cellHeight - Kirigami.Units.largeSpacing
+                width: availableButtonsGrid.cellWidth - LingmoUI.Units.largeSpacing
+                height: availableButtonsGrid.cellHeight - LingmoUI.Units.largeSpacing
                 opacity: baseLayout.draggingTitlebarButtons ? 0.15 : 1.0
 
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
                     color: palette.window
-                    radius: Kirigami.Units.cornerRadius
-                    implicitWidth: baseLayout.buttonIconSize + Kirigami.Units.largeSpacing
-                    implicitHeight: baseLayout.buttonIconSize + Kirigami.Units.largeSpacing
+                    radius: LingmoUI.Units.cornerRadius
+                    implicitWidth: baseLayout.buttonIconSize + LingmoUI.Units.largeSpacing
+                    implicitHeight: baseLayout.buttonIconSize + LingmoUI.Units.largeSpacing
 
                     KDecoration.Button {
                         id: availableButton
@@ -241,7 +241,7 @@ Rectangle {
                 onDropped: {
                     drag.source.buttonsModel.remove(drag.source.itemIndex);
                 }
-                Kirigami.Heading {
+                LingmoUI.Heading {
                     text: i18n("Drop button here to remove it")
                     font.weight: Font.Bold
                     level: 2
@@ -256,7 +256,7 @@ Rectangle {
             color: palette.windowText
             opacity: baseLayout.hideDragHint ? 0.0 : dragHintOpacitiy
             Layout.fillWidth: true
-            Layout.margins: Kirigami.Units.gridUnit * 3
+            Layout.margins: LingmoUI.Units.gridUnit * 3
             horizontalAlignment: Text.AlignHCenter
             text: i18n("Drag buttons between here and the titlebar")
         }

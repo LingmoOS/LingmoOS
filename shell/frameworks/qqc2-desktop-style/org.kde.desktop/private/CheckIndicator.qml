@@ -9,15 +9,15 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.qqc2desktopstyle.private as StylePrivate
 
 StylePrivate.StyleItem {
     id: styleitem
 
     property bool drawIcon: true
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.Button
+    LingmoUI.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Button
 
     readonly property T.AbstractButton buttonControl : control as T.AbstractButton
 
@@ -34,7 +34,7 @@ StylePrivate.StyleItem {
     properties: {
         "icon": drawIcon && buttonControl.display !== T.AbstractButton.TextOnly
             ? (buttonControl.icon.name !== "" ? buttonControl.icon.name : buttonControl.icon.source) : null,
-        "iconColor": Qt.colorEqual(buttonControl.icon.color, "transparent") ? Kirigami.Theme.textColor : buttonControl.icon.color,
+        "iconColor": Qt.colorEqual(buttonControl.icon.color, "transparent") ? LingmoUI.Theme.textColor : buttonControl.icon.color,
         "iconWidth": buttonControl.icon.width,
         "iconHeight": buttonControl.icon.height,
 

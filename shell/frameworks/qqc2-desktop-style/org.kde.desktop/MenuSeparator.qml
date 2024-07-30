@@ -9,7 +9,7 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 T.MenuSeparator {
     id: controlRoot
@@ -23,12 +23,12 @@ T.MenuSeparator {
     // RESET method so that width would follow implicit width automatically.
     width: parent?.width
 
-    verticalPadding: Math.round(Kirigami.Units.smallSpacing / 2)
+    verticalPadding: Math.round(LingmoUI.Units.smallSpacing / 2)
     hoverEnabled: false
     focusPolicy: Qt.NoFocus
 
-    contentItem: Kirigami.Separator {
+    contentItem: LingmoUI.Separator {
         // same as MenuItem background
-        implicitWidth: Kirigami.Units.gridUnit * 8
+        implicitWidth: LingmoUI.Units.gridUnit * 8
     }
 }

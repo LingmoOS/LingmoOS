@@ -8,12 +8,12 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Dialogs
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.kitemmodels 1.0
 
 import org.kde.private.kcm.kscreen 1.0 as KScreen
 
-Kirigami.FormLayout {
+LingmoUI.FormLayout {
     id: root
 
     property KSortFilterProxyModel enabledOutputs
@@ -47,17 +47,17 @@ Kirigami.FormLayout {
             onToggled: element.priority = 1
         }
 
-        Kirigami.ContextualHelpButton {
-            toolTipText: xi18nc("@info", "This determines which screen your main desktop appears on, along with any Plasma Panels in it. Some older games also use this setting to decide which screen to appear on.<nl/><nl/>It has no effect on what screen notifications or other windows appear on.")
+        LingmoUI.ContextualHelpButton {
+            toolTipText: xi18nc("@info", "This determines which screen your main desktop appears on, along with any Lingmo Panels in it. Some older games also use this setting to decide which screen to appear on.<nl/><nl/>It has no effect on what screen notifications or other windows appear on.")
         }
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Resolution:")
+        LingmoUI.FormData.label: i18n("Resolution:")
 
         QQC2.ComboBox {
             id: resolutionCombobox
-            Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+            Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
             visible: count > 1
             model: element.resolutions
             onActivated: element.resolutionIndex = currentIndex;
@@ -71,7 +71,7 @@ Kirigami.FormLayout {
             visible: resolutionCombobox.count <= 1
             text: element.resolutions[0] || ""
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             visible: resolutionCombobox.count <= 1
             toolTipText: xi18nc("@info", "&quot;%1&quot; is the only resolution supported by this display.", singleResolutionLabel.text)
         }
@@ -80,10 +80,10 @@ Kirigami.FormLayout {
     RowLayout {
         Layout.fillWidth: true
         // Set the same limit as the device ComboBox
-        Layout.maximumWidth: Kirigami.Units.gridUnit * 16
+        Layout.maximumWidth: LingmoUI.Units.gridUnit * 16
 
         visible: kcm.perOutputScaling
-        Kirigami.FormData.label: i18n("Scale:")
+        LingmoUI.FormData.label: i18n("Scale:")
 
         QQC2.Slider {
             id: scaleSlider
@@ -124,11 +124,11 @@ Kirigami.FormLayout {
     Orientation {}
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Refresh rate:")
+        LingmoUI.FormData.label: i18n("Refresh rate:")
 
         QQC2.ComboBox {
             id: refreshRateCombobox
-            Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+            Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
             visible: count > 1
             model: element.refreshRates
             onActivated: element.refreshRateIndex = currentIndex;
@@ -142,15 +142,15 @@ Kirigami.FormLayout {
             visible: refreshRateCombobox.count <= 1
             text: element.refreshRates[0] || ""
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             visible: refreshRateCombobox.count <= 1
             toolTipText: i18n("\"%1\" is the only refresh rate supported by this display.", singleRefreshRateLabel.text)
         }
     }
 
     QQC2.ComboBox {
-        Kirigami.FormData.label: i18n("Adaptive sync:")
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+        LingmoUI.FormData.label: i18n("Adaptive sync:")
+        Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
         model: [
             { label: i18n("Never"), value: KScreen.Output.VrrPolicy.Never },
             { label: i18n("Automatic"), value: KScreen.Output.VrrPolicy.Automatic },
@@ -165,7 +165,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Overscan:")
+        LingmoUI.FormData.label: i18n("Overscan:")
         visible: element.capabilities & KScreen.Output.Capability.Overscan
 
         QQC2.SpinBox {
@@ -179,17 +179,17 @@ Kirigami.FormLayout {
             Number.fromLocaleString(locale, text.replace("%", ""))
         }
 
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: xi18nc("@info", "Determines how much padding is put around the image sent to the display to compensate for part of the content being cut off around the edges.<nl/><nl/>This is sometimes needed when using a TV as a screen")
         }
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("RGB range:")
+        LingmoUI.FormData.label: i18n("RGB range:")
         visible: element.capabilities & KScreen.Output.Capability.RgbRange
 
         QQC2.ComboBox {
-            Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+            Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
             model: [
                 { label: i18n("Automatic"), value: KScreen.Output.RgbRange.Automatic },
                 { label: i18n("Full"), value: KScreen.Output.RgbRange.Full },
@@ -202,19 +202,19 @@ Kirigami.FormLayout {
             Component.onCompleted: currentIndex = indexOfValue(element.rgbRange);
         }
 
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: xi18nc("@info", "Determines whether or not the range of possible color values needs to be limited for the display. This should only be changed if the colors on the screen look washed out.")
         }
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nc("@label:combobox", "Color Profile:")
+        LingmoUI.FormData.label: i18nc("@label:combobox", "Color Profile:")
         visible: element.capabilities & KScreen.Output.Capability.IccProfile
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.ComboBox {
             enabled: !element.hdr || !root.hdrAvailable
-            Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+            Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
             model: [
                 { label: i18n("None"), value: KScreen.Output.ColorProfileSource.sRGB },
                 { label: i18n("ICC Profile"), value: KScreen.Output.ColorProfileSource.ICC },
@@ -226,11 +226,11 @@ Kirigami.FormLayout {
             onActivated: element.colorProfileSource = currentValue;
             Component.onCompleted: currentIndex = indexOfValue(element.colorProfileSource);
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: i18nc("@info:tooltip", "Note that built-in color profiles are sometimes wrong, and often inaccurate. For optimal color fidelity, calibration using a colorimeter is recommended.")
             visible: (!element.hdr || !root.hdrAvailable) && element.colorProfileSource == KScreen.Output.ColorProfileSource.EDID
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: i18nc("@info:tooltip", "The built-in color profile is always used with HDR.")
             visible: element.hdr && root.hdrAvailable
         }
@@ -238,16 +238,16 @@ Kirigami.FormLayout {
 
     RowLayout {
         visible: (element.capabilities & KScreen.Output.Capability.IccProfile) && (element.colorProfileSource == KScreen.Output.ColorProfileSource.ICC)
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
-        Kirigami.ActionTextField {
+        LingmoUI.ActionTextField {
             id: iccProfileField
             onTextChanged: element.iccProfilePath = text
             onTextEdited: element.iccProfilePath = text
             placeholderText: i18nc("@info:placeholder", "Enter ICC profile path…")
             enabled: !root.hdrAvailable || !element.hdr
 
-            rightActions: Kirigami.Action {
+            rightActions: LingmoUI.Action {
                 icon.name: "edit-clear-symbolic"
                 visible: iccProfileField.text !== ""
                 onTriggered: {
@@ -267,7 +267,7 @@ Kirigami.FormLayout {
 
             QQC2.ToolTip.visible: hovered
             QQC2.ToolTip.text: text
-            QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+            QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
             Accessible.role: Accessible.Button
             Accessible.name: text
@@ -303,16 +303,16 @@ Kirigami.FormLayout {
             }
         }
 
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             visible: root.hdrAvailable && element.hdr
             toolTipText: i18nc("@info:tooltip", "ICC profiles aren't compatible with HDR yet")
         }
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18nc("@label", "High Dynamic Range:")
+        LingmoUI.FormData.label: i18nc("@label", "High Dynamic Range:")
         visible: root.hdrAvailable
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         QQC2.CheckBox {
             text: i18nc("@option:check", "Enable HDR")
@@ -320,7 +320,7 @@ Kirigami.FormLayout {
             onToggled: element.hdr = checked
         }
 
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: i18nc("@info:tooltip", "HDR allows compatible applications to show brighter and more vivid colors. Note that this feature is still experimental")
         }
     }
@@ -328,11 +328,11 @@ Kirigami.FormLayout {
     RowLayout {
         Layout.fillWidth: true
         // Set the same limit as the device ComboBox
-        Layout.maximumWidth: Kirigami.Units.gridUnit * 16
-        spacing: Kirigami.Units.smallSpacing
+        Layout.maximumWidth: LingmoUI.Units.gridUnit * 16
+        spacing: LingmoUI.Units.smallSpacing
 
         visible: root.hdrAvailable && element.hdr
-        Kirigami.FormData.label: i18nc("@label", "SDR Brightness:")
+        LingmoUI.FormData.label: i18nc("@label", "SDR Brightness:")
 
         QQC2.Slider {
             Layout.fillWidth: true
@@ -350,7 +350,7 @@ Kirigami.FormLayout {
             value: element.sdrBrightness
             onValueModified: element.sdrBrightness = value
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: i18nc("@info:tooltip", "Sets the brightness of non-HDR content on the screen, in nits")
         }
     }
@@ -358,11 +358,11 @@ Kirigami.FormLayout {
     RowLayout {
         Layout.fillWidth: true
         // Set the same limit as the device ComboBox
-        Layout.maximumWidth: Kirigami.Units.gridUnit * 16
-        spacing: Kirigami.Units.smallSpacing
+        Layout.maximumWidth: LingmoUI.Units.gridUnit * 16
+        spacing: LingmoUI.Units.smallSpacing
 
         visible: root.hdrAvailable && element.hdr
-        Kirigami.FormData.label: i18nc("@label", "SDR Color Intensity:")
+        LingmoUI.FormData.label: i18nc("@label", "SDR Color Intensity:")
 
         QQC2.Slider {
             Layout.fillWidth: true
@@ -395,14 +395,14 @@ Kirigami.FormLayout {
 
             onValueModified: element.sdrGamutWideness = realValue
         }
-        Kirigami.ContextualHelpButton {
+        LingmoUI.ContextualHelpButton {
             toolTipText: i18nc("@info:tooltip", "Increases the intensity of non-HDR content on the screen")
         }
     }
 
     QQC2.ComboBox {
-        Kirigami.FormData.label: i18n("Replica of:")
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 11
+        LingmoUI.FormData.label: i18n("Replica of:")
+        Layout.minimumWidth: LingmoUI.Units.gridUnit * 11
         model: element.replicationSourceModel
         visible: kcm.outputReplicationSupported && kcm.multipleScreensAvailable
 

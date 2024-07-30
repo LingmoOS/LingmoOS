@@ -629,7 +629,7 @@ KWin::Scripting::Scripting(QObject *parent)
     , m_declarativeScriptSharedContext(new QQmlContext(m_qmlEngine, this))
     , m_workspaceWrapper(new QtScriptWorkspaceWrapper(this))
 {
-    m_qmlEngine->setProperty("_kirigamiTheme", QStringLiteral("KirigamiPlasmaStyle"));
+    m_qmlEngine->setProperty("_lingmouiTheme", QStringLiteral("LingmoUILingmoStyle"));
     m_qmlEngine->rootContext()->setContextObject(new KLocalizedContext(m_qmlEngine));
     init();
     QDBusConnection::sessionBus().registerObject(QStringLiteral("/Scripting"), this, QDBusConnection::ExportScriptableContents | QDBusConnection::ExportScriptableInvokables);
@@ -714,8 +714,8 @@ LoadScriptList KWin::Scripting::queryScriptsToLoad()
     for (const KPluginMetaData &service : offers) {
         const QString value = pluginStates.value(service.pluginId() + QLatin1String("Enabled"), QString());
         const bool enabled = value.isNull() ? service.isEnabledByDefault() : QVariant(value).toBool();
-        const bool javaScript = service.value(QStringLiteral("X-Plasma-API")) == QLatin1String("javascript");
-        const bool declarativeScript = service.value(QStringLiteral("X-Plasma-API")) == QLatin1String("declarativescript");
+        const bool javaScript = service.value(QStringLiteral("X-Lingmo-API")) == QLatin1String("javascript");
+        const bool declarativeScript = service.value(QStringLiteral("X-Lingmo-API")) == QLatin1String("declarativescript");
         if (!javaScript && !declarativeScript) {
             continue;
         }

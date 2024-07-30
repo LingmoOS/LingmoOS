@@ -6,19 +6,19 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.printmanager as PM
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.printmanager as PM
 
-Kirigami.Dialog {
+LingmoUI.Dialog {
 
     title: i18nc("@title:window", "Printer Setup Helpers")
 
     closePolicy: installer.installing
                  ? QQC2.Popup.NoAutoClose
                  : QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnReleaseOutside
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
-    padding: Kirigami.Units.largeSpacing
+    padding: LingmoUI.Units.largeSpacing
 
     Component.onCompleted: {
         open()
@@ -42,11 +42,11 @@ Kirigami.Dialog {
     }
 
     contentItem: RowLayout {
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Icon {
-            Layout.preferredWidth: Kirigami.Units.iconSizes.huge
-            Layout.preferredHeight: Kirigami.Units.iconSizes.huge
+        LingmoUI.Icon {
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.huge
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.huge
             source: {
                 if (installer.installing) {
                     "install"
@@ -59,7 +59,7 @@ Kirigami.Dialog {
         }
 
         ColumnLayout {
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
 
             QQC2.Label {
                 id: statusMsg
@@ -84,8 +84,8 @@ Kirigami.Dialog {
                 visible: installer.installing
             }
 
-            Kirigami.UrlButton {
-                Layout.topMargin: Kirigami.Units.largeSpacing
+            LingmoUI.UrlButton {
+                Layout.topMargin: LingmoUI.Units.largeSpacing
                 visible: installer.failed
                 text: i18nc("@info:usagetip", "Report this issue to %1", kcm.osName)
                 url: kcm.osBugReportUrl

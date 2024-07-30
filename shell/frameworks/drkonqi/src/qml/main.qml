@@ -3,11 +3,11 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.ApplicationWindow {
+LingmoUI.ApplicationWindow {
     id: appWindow
 
     property var reportInterface: ReportInterface
@@ -64,28 +64,28 @@ any side effects.</para>`);
                         Globals.aboutBugReportingUrl);
     }
 
-    pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.ToolBar
-    pageStack.globalToolBar.showNavigationButtons: Kirigami.ApplicationHeaderStyle.ShowBackButton | Kirigami.ApplicationHeaderStyle.ShowForwardButton
+    pageStack.globalToolBar.style: LingmoUI.ApplicationHeaderStyle.ToolBar
+    pageStack.globalToolBar.showNavigationButtons: LingmoUI.ApplicationHeaderStyle.ShowBackButton | LingmoUI.ApplicationHeaderStyle.ShowForwardButton
 
     title: CrashedApplication.name
-    minimumWidth: Kirigami.Settings.isMobile ? 0 : Kirigami.Units.gridUnit * 30
-    minimumHeight: Kirigami.Settings.isMobile ? 0 : Kirigami.Units.gridUnit * 22
+    minimumWidth: LingmoUI.Settings.isMobile ? 0 : LingmoUI.Units.gridUnit * 30
+    minimumHeight: LingmoUI.Settings.isMobile ? 0 : LingmoUI.Units.gridUnit * 22
     height: minimumHeight
 
     header: generatorFailure ? warningComponent.createObject(appWindow) : null
 
-    contextDrawer: Kirigami.ContextDrawer {
+    contextDrawer: LingmoUI.ContextDrawer {
         id: contextDrawer
     }
 
     Component {
         id: warningComponent
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             text: i18nc("@label", "Gathering crash information failed for unknown reasons. You can retry, or close the window.")
-            type: Kirigami.MessageType.Warning
+            type: LingmoUI.MessageType.Warning
             visible: true
             actions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     text: i18nc("@action retry gathering crash data", "Retry")
                     onTriggered: BacktraceGenerator.start()
                 }

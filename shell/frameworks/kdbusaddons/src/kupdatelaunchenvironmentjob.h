@@ -27,7 +27,7 @@ class KUpdateLaunchEnvironmentJobPrivate;
  * This includes:
  *  - DBus activation
  *  - Systemd units
- *  - Plasma-session
+ *  - Lingmo-session
  *
  * Environment variables are sanitized before uploading.
  *

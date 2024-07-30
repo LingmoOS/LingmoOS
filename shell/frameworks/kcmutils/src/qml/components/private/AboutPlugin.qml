@@ -10,10 +10,10 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
- * A copy of Kirigami.AboutPage adapted to KPluginMetadata instead of KAboutData
+ * A copy of LingmoUI.AboutPage adapted to KPluginMetadata instead of KAboutData
  */
 ColumnLayout {
     id: root
@@ -23,24 +23,24 @@ ColumnLayout {
     // Icon, name, version, and description
     RowLayout {
         Layout.fillWidth: true
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Icon {
-            Layout.preferredHeight: Kirigami.Units.iconSizes.huge
-            Layout.preferredWidth: Kirigami.Units.iconSizes.huge
+        LingmoUI.Icon {
+            Layout.preferredHeight: LingmoUI.Units.iconSizes.huge
+            Layout.preferredWidth: LingmoUI.Units.iconSizes.huge
             source: root.metaData.iconName
-            fallback: "application-x-plasma"
+            fallback: "application-x-lingmo"
         }
 
         ColumnLayout {
             Layout.fillWidth: true
 
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 text: root.metaData.version ? i18ndc("kcmutils6", "Plugin name and plugin version", "%1 %2", root.metaData.name, root.metaData.version) : root.metaData.name
                 wrapMode: Text.WordWrap
             }
-            Kirigami.Heading {
+            LingmoUI.Heading {
                 Layout.fillWidth: true
                 level: 2
                 text: root.metaData.description
@@ -50,24 +50,24 @@ ColumnLayout {
     }
 
 
-    Kirigami.Separator {
+    LingmoUI.Separator {
         Layout.fillWidth: true
-        Layout.topMargin: Kirigami.Units.largeSpacing
-        Layout.bottomMargin: Kirigami.Units.largeSpacing
+        Layout.topMargin: LingmoUI.Units.largeSpacing
+        Layout.bottomMargin: LingmoUI.Units.largeSpacing
     }
 
 
     // Copyright
-    Kirigami.Heading {
+    LingmoUI.Heading {
         text: i18nd("kcmutils6", "Copyright")
     }
     QQC2.Label {
-        Layout.leftMargin: Kirigami.Units.gridUnit
+        Layout.leftMargin: LingmoUI.Units.gridUnit
         text: root.metaData.copyrightText
         visible: text.length > 0
     }
-    Kirigami.UrlButton {
-        Layout.leftMargin: Kirigami.Units.gridUnit
+    LingmoUI.UrlButton {
+        Layout.leftMargin: LingmoUI.Units.gridUnit
         url: root.metaData.website ? root.metaData.website : ""
         visible: url.length > 0
     }
@@ -78,7 +78,7 @@ ColumnLayout {
         QQC2.Label {
             text: i18nd("kcmutils6", "License:")
         }
-        Kirigami.LinkButton {
+        LingmoUI.LinkButton {
             text: root.metaData.license
             onClicked: {
                 licenseSheet.text = root.metaData.licenseText
@@ -91,10 +91,10 @@ ColumnLayout {
 
     // Authors, if any
     Item {
-        implicitHeight: Kirigami.Units.largeSpacing
+        implicitHeight: LingmoUI.Units.largeSpacing
         visible: repAuthors.visible
     }
-    Kirigami.Heading {
+    LingmoUI.Heading {
         text: i18nd("kcmutils6", "Authors")
         visible: repAuthors.visible
     }
@@ -108,10 +108,10 @@ ColumnLayout {
 
     // Credits, if any
     Item {
-        implicitHeight: Kirigami.Units.largeSpacing
+        implicitHeight: LingmoUI.Units.largeSpacing
         visible: repCredits.visible
     }
-    Kirigami.Heading {
+    LingmoUI.Heading {
         text: i18nd("kcmutils6", "Credits")
         visible: repCredits.visible
     }
@@ -125,10 +125,10 @@ ColumnLayout {
 
     // Translators, if any
     Item {
-        implicitHeight: Kirigami.Units.largeSpacing
+        implicitHeight: LingmoUI.Units.largeSpacing
         visible: repTranslators.visible
     }
-    Kirigami.Heading {
+    LingmoUI.Heading {
         text: i18nd("kcmutils6", "Translators")
         visible: repTranslators.visible
     }
@@ -144,9 +144,9 @@ ColumnLayout {
         id: personDelegate
 
         RowLayout {
-            height: implicitHeight + (Kirigami.Units.largeSpacing)
+            height: implicitHeight + (LingmoUI.Units.largeSpacing)
 
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
 
             QQC2.Label {
                 text: modelData.name
@@ -154,7 +154,7 @@ ColumnLayout {
             QQC2.ToolButton {
                 visible: modelData.emailAddress
                 icon.name: "mail-sent"
-                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: i18nd("kcmutils6", "Send an email to %1", modelData.emailAddress)
                 onClicked: Qt.openUrlExternally("mailto:%1".arg(modelData.emailAddress))
@@ -162,7 +162,7 @@ ColumnLayout {
             QQC2.ToolButton {
                 visible: modelData.webAddress
                 icon.name: "globe"
-                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: modelData.webAddress
                 onClicked: Qt.openUrlExternally(modelData.webAddress)

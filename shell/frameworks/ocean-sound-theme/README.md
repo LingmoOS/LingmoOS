@@ -1,6 +1,6 @@
 # Ocean Sound Theme
 
-Ocean Sound Theme for Plasma
+Ocean Sound Theme for Lingmo
 
 ## Folders
 
@@ -14,9 +14,9 @@ Each sound is intended to be used in a specific situation:
 
 - **theme-demo**: A preview of the sound theme.
 
-- **desktop-login**: Play this sound after the computer boots up and the Plasma session starts.
+- **desktop-login**: Play this sound after the computer boots up and the Lingmo session starts.
 
-- **desktop-logout**: Play when exiting the Plasma session.
+- **desktop-logout**: Play when exiting the Lingmo session.
 
 - **service-login**: Play when logging into an application. (e.g. Instant Messaging app).
 
@@ -104,7 +104,7 @@ If you need a sound which is not provided by this pack, try to use Oxygen sounds
 
 - This sound theme is meant to sound soft, so if you want to make more sounds based on this, I suggest increasing the attack, release, and adding reverb (but not too much, unless we're talking about the login sound). This will help you keep the whole theme consistent.
 
-- This sound theme is NOT meant to be modern or minimalistic. Plasma itself is not minimalistic, so it wouldn't make sense to make a minimalistic sound theme. My inspirations were KDE 3 and Windows Vista sounds.
+- This sound theme is NOT meant to be modern or minimalistic. Lingmo itself is not minimalistic, so it wouldn't make sense to make a minimalistic sound theme. My inspirations were KDE 3 and Windows Vista sounds.
 
 - You may notice some tracks are disabled. The reason for that is that at some point I made the sound with the disabled instrument but then changed my mind. I kept them as backup. There's also an unused instrument for the "trash" sound. That instrument didn't fit very well with the rest of the theme, but I chose to leave it there just in case.
 

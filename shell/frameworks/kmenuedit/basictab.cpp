@@ -110,7 +110,7 @@ void BasicTab::initGeneralTab()
     generalTabLayout->addWidget(_launchCB, 6, 0, 1, 3);
 
     // KDE visibility
-    _onlyShowInKdeCB = new QCheckBox(i18n("Only show when logged into a Plasma session"));
+    _onlyShowInKdeCB = new QCheckBox(i18n("Only show when logged into a Lingmo session"));
     generalTabLayout->addWidget(_onlyShowInKdeCB, 7, 0, 1, 3);
 
     // hidden entry
@@ -452,7 +452,7 @@ void BasicTab::apply()
 
         QStringList onlyShowIn = df->desktopGroup().readXdgListEntry("OnlyShowIn");
         /* the exact semantics of this checkbox are unclear if there is more than just KDE in the list...
-         * For example: - The list is "Gnome;", the user enables "Only show when logged into a Plasma session" - should we remove Gnome?
+         * For example: - The list is "Gnome;", the user enables "Only show when logged into a Lingmo session" - should we remove Gnome?
          *              - The list is "Gnome;KDE;", the user unchecks the box - should we keep Gnome?
          */
         if (_onlyShowInKdeCB->isChecked() && !onlyShowIn.contains(QLatin1String("KDE"))) {

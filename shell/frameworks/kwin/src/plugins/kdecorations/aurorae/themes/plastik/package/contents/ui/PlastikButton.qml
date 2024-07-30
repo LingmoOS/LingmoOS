@@ -65,7 +65,7 @@ DecorationButton {
     width: size
     height: size
     Rectangle {
-        // Intentionally not using Kirigami.Units.cornerRadius to mimic a
+        // Intentionally not using LingmoUI.Units.cornerRadius to mimic a
         // particular style
         radius: 2
         smooth: true
@@ -81,7 +81,7 @@ DecorationButton {
             }
         }
         Rectangle {
-            // Intentionally not using Kirigami.Units.cornerRadius to mimic a
+            // Intentionally not using LingmoUI.Units.cornerRadius to mimic a
             // particular style
             radius: 2
             smooth: true

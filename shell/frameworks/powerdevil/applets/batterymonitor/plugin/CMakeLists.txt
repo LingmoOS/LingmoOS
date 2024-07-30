@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2024 Bohdan Onofriichuk <bogdan.onofriuchuk@gmail.com>
 # SPDX-License-Identifier: BSD-3-Clause
 
-ecm_add_qml_module(batterymonitorplugin URI org.kde.plasma.private.batterymonitor GENERATE_PLUGIN_SOURCE)
+ecm_add_qml_module(batterymonitorplugin URI org.kde.lingmo.private.batterymonitor GENERATE_PLUGIN_SOURCE)
 
 target_sources(batterymonitorplugin PRIVATE
         powerprofilescontrol.cpp

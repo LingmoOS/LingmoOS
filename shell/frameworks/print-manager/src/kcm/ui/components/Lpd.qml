@@ -6,7 +6,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 /**
  * Device setup for LPD/LPR printer devices (Legacy)
@@ -33,7 +33,7 @@ BaseDevice {
     contentItem: ColumnLayout {
         width: lpdDevice.width
         // use large here to match Base
-        spacing: Kirigami.Units.largeSpacing
+        spacing: LingmoUI.Units.largeSpacing
 
         Component.onCompleted: {
             const url = lpdDevice.getUrl(settings.value("device-uri"))
@@ -55,7 +55,7 @@ BaseDevice {
         }
 
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            spacing: LingmoUI.Units.smallSpacing
 
             QQC2.Label {
                 text: i18nc("@label:textbox", "Queue:")

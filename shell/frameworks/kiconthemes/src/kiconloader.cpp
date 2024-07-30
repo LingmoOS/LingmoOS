@@ -303,11 +303,11 @@ void KIconLoaderPrivate::_k_refreshIcons(int group)
 {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig();
     sharedConfig->reparseConfiguration();
-    const QString newThemeName = sharedConfig->group("Icons").readEntry("Theme", QStringLiteral("breeze"));
+    const QString newThemeName = sharedConfig->group("Icons").readEntry("Theme", QStringLiteral("ocean"));
     if (!newThemeName.isEmpty()) {
         // NOTE Do NOT use QIcon::setThemeName here it makes Qt not use icon engine of the platform theme
-        //      anymore (KIconEngine on Plasma, which breaks recoloring) and overwrites a user set themeName
-        // TODO KF6 this should be done in the Plasma QPT
+        //      anymore (KIconEngine on Lingmo, which breaks recoloring) and overwrites a user set themeName
+        // TODO KF6 this should be done in the Lingmo QPT
         QIconLoader::instance()->updateSystemTheme();
     }
 

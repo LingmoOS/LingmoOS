@@ -16,7 +16,7 @@
 #include <QSortFilterProxyModel>
 
 #if KWIN_BUILD_ACTIVITIES
-#include <PlasmaActivities/Consumer>
+#include <LingmoActivities/Consumer>
 #endif
 
 namespace KWin

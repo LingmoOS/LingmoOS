@@ -57,7 +57,7 @@ find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS
     Svg
 )
 
-find_package(PlasmaQuick ${PROJECT_VERSION} REQUIRED)
+find_package(LingmoQuick ${PROJECT_VERSION} REQUIRED)
 
 find_package(X11)
 set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
@@ -102,7 +102,7 @@ endif ()
 
 add_feature_info("Unlock broken screenlocker"
                  HAVE_UNLOCK_CAPABILITY
-                 "Needed for emergency unlock in case that the greeter is broken. In case your distribution does not provide loginctl or consolekit please contact plasma-devel@kde.org to discuss alternatives.")
+                 "Needed for emergency unlock in case that the greeter is broken. In case your distribution does not provide loginctl or consolekit please contact lingmo-devel@kde.org to discuss alternatives.")
 
 option(PAM_REQUIRED "Require building with PAM" ON)
 

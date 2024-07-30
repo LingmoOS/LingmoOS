@@ -21,11 +21,11 @@ class KIconEnginePrivate;
  *
  * \short A class to provide rendering of KDE icons.
  *
- * This is mostly used to provide Qt's icon loading in plasma-integration
+ * This is mostly used to provide Qt's icon loading in lingmo-integration
  *
  * Application developers should use QIcon::fromTheme instead of using it directly.
  */
-class KICONTHEMES_EXPORT KIconEngine : public QIconEngine // exported for plasma-integration
+class KICONTHEMES_EXPORT KIconEngine : public QIconEngine // exported for lingmo-integration
 {
 public:
     /**

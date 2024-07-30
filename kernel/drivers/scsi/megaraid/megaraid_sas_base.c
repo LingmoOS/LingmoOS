@@ -169,8 +169,8 @@ static struct pci_device_id megasas_pci_table[] = {
 	/* xscale IOP */
 	{PCI_DEVICE(PCI_VENDOR_ID_LSI_LOGIC, PCI_DEVICE_ID_LSI_FUSION)},
 	/* Fusion */
-	{PCI_DEVICE(PCI_VENDOR_ID_LSI_LOGIC, PCI_DEVICE_ID_LSI_PLASMA)},
-	/* Plasma */
+	{PCI_DEVICE(PCI_VENDOR_ID_LSI_LOGIC, PCI_DEVICE_ID_LSI_LINGMO)},
+	/* Lingmo */
 	{PCI_DEVICE(PCI_VENDOR_ID_LSI_LOGIC, PCI_DEVICE_ID_LSI_INVADER)},
 	/* Invader */
 	{PCI_DEVICE(PCI_VENDOR_ID_LSI_LOGIC, PCI_DEVICE_ID_LSI_FURY)},
@@ -2640,7 +2640,7 @@ static int megasas_get_ld_vf_affiliation(struct megasas_instance *instance,
 {
 	int retval;
 
-	if (instance->PlasmaFW111)
+	if (instance->LingmoFW111)
 		retval = megasas_get_ld_vf_affiliation_111(instance, initial);
 	else
 		retval = megasas_get_ld_vf_affiliation_12(instance, initial);
@@ -6427,14 +6427,14 @@ static int megasas_init_fw(struct megasas_instance *instance)
 	}
 	if (ctrl_info->host_interface.SRIOV) {
 		instance->requestorId = ctrl_info->iov.requestorId;
-		if (instance->pdev->device == PCI_DEVICE_ID_LSI_PLASMA) {
+		if (instance->pdev->device == PCI_DEVICE_ID_LSI_LINGMO) {
 			if (!ctrl_info->adapterOperations2.activePassive)
-			    instance->PlasmaFW111 = 1;
+			    instance->LingmoFW111 = 1;
 
 			dev_info(&instance->pdev->dev, "SR-IOV: firmware type: %s\n",
-			    instance->PlasmaFW111 ? "1.11" : "new");
+			    instance->LingmoFW111 ? "1.11" : "new");
 
-			if (instance->PlasmaFW111) {
+			if (instance->LingmoFW111) {
 			    iovPtr = (struct IOV_111 *)
 				((unsigned char *)ctrl_info + IOV_111_OFFSET);
 			    instance->requestorId = iovPtr->requestorId;
@@ -7090,7 +7090,7 @@ static inline void megasas_set_adapter_type(struct megasas_instance *instance)
 			instance->adapter_type = VENTURA_SERIES;
 			break;
 		case PCI_DEVICE_ID_LSI_FUSION:
-		case PCI_DEVICE_ID_LSI_PLASMA:
+		case PCI_DEVICE_ID_LSI_LINGMO:
 			instance->adapter_type = THUNDERBOLT_SERIES;
 			break;
 		case PCI_DEVICE_ID_LSI_INVADER:
@@ -7532,7 +7532,7 @@ static int megasas_probe_one(struct pci_dev *pdev,
 		goto fail_init_mfi;
 
 	if (instance->requestorId) {
-		if (instance->PlasmaFW111) {
+		if (instance->LingmoFW111) {
 			instance->vf_affiliation_111 =
 				dma_alloc_coherent(&pdev->dev,
 					sizeof(struct MR_LD_VF_AFFILIATION_111),

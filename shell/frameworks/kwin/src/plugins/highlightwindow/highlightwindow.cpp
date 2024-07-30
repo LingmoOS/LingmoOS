@@ -153,7 +153,7 @@ void HighlightWindowEffect::slotPropertyNotify(EffectWindow *w, long a, EffectWi
         }
         m_highlightedWindows.append(foundWin);
         // TODO: We cannot just simply elevate the window as this will elevate it over
-        // Plasma tooltips and other such windows as well
+        // Lingmo tooltips and other such windows as well
         // effects->setElevatedWindow( foundWin, true );
         found = true;
     }

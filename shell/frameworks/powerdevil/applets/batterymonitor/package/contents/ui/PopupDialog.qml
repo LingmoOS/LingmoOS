@@ -8,11 +8,11 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.kirigami as Kirigami
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmoui as LingmoUI
 
-PlasmaExtras.Representation {
+LingmoExtras.Representation {
     id: dialog
 
     property alias model: batteryRepeater.model
@@ -53,13 +53,13 @@ PlasmaExtras.Representation {
 
     KeyNavigation.down: batteryRepeater.headerItem
 
-    contentItem: PlasmaComponents3.ScrollView {
+    contentItem: LingmoComponents3.ScrollView {
         id: scrollView
 
         focus: false
 
         function positionViewAtItem(item) {
-            if (!PlasmaComponents3.ScrollBar.vertical.visible) {
+            if (!LingmoComponents3.ScrollBar.vertical.visible) {
                 return;
             }
             const rect = powerItemList.mapFromItem(item, 0, 0, item.width, item.height);
@@ -74,7 +74,7 @@ PlasmaExtras.Representation {
 
             id: batteryRepeater
 
-            spacing: Kirigami.Units.smallSpacing * 2
+            spacing: LingmoUI.Units.smallSpacing * 2
 
 
             header: Column {

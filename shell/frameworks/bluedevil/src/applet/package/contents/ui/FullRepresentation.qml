@@ -12,33 +12,33 @@ import QtQuick
 import QtQuick.Controls as QQC2
 
 import org.kde.bluezqt as BluezQt
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.ksvg as KSvg
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.plasmoid
-import org.kde.plasma.private.bluetooth as PlasmaBt
+import org.kde.lingmo.components as LingmoComponents3
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmo.extras as LingmoExtras
+import org.kde.lingmo.plasmoid
+import org.kde.lingmo.private.bluetooth as LingmoBt
 
-PlasmaExtras.Representation {
+LingmoExtras.Representation {
     id: root
 
     required property PlasmoidItem plasmoidItem
-    required property PlasmaCore.Action addDeviceAction
-    required property PlasmaCore.Action toggleBluetoothAction
+    required property LingmoCore.Action addDeviceAction
+    required property LingmoCore.Action toggleBluetoothAction
 
     readonly property bool emptyList: BluezQt.Manager.devices.length === 0
 
-    implicitWidth: Kirigami.Units.gridUnit * 24
-    implicitHeight: Kirigami.Units.gridUnit * 24
+    implicitWidth: LingmoUI.Units.gridUnit * 24
+    implicitHeight: LingmoUI.Units.gridUnit * 24
 
     focus: true
     collapseMarginsHint: true
 
-    PlasmaBt.DevicesProxyModel {
+    LingmoBt.DevicesProxyModel {
         id: devicesModel
         hideBlockedDevices: true
-        sourceModel: PlasmaBt.SharedDevicesStateProxyModel
+        sourceModel: LingmoBt.SharedDevicesStateProxyModel
     }
 
     Keys.onDownPressed: event => {
@@ -62,7 +62,7 @@ PlasmaExtras.Representation {
         onTriggered: source => root.addDeviceAction.trigger()
     }
 
-    // Unlike the associated Plasma Action, this one is for a non-checkable button
+    // Unlike the associated Lingmo Action, this one is for a non-checkable button
     QQC2.Action {
         id: toggleBluetoothAction
 
@@ -83,12 +83,12 @@ PlasmaExtras.Representation {
         focus: true
     }
 
-    PlasmaComponents3.ScrollView {
+    LingmoComponents3.ScrollView {
         id: scrollView
         anchors.fill: parent
 
         // HACK: workaround for https://bugreports.qt.io/browse/QTBUG-83890
-        PlasmaComponents3.ScrollBar.horizontal.policy: PlasmaComponents3.ScrollBar.AlwaysOff
+        LingmoComponents3.ScrollBar.horizontal.policy: LingmoComponents3.ScrollBar.AlwaysOff
 
         contentWidth: availableWidth - contentItem.leftMargin - contentItem.rightMargin
 
@@ -100,11 +100,11 @@ PlasmaExtras.Representation {
             currentIndex: -1
             boundsBehavior: Flickable.StopAtBounds
 
-            spacing: Kirigami.Units.smallSpacing
-            topMargin: Kirigami.Units.largeSpacing
-            leftMargin: Kirigami.Units.largeSpacing
-            rightMargin: Kirigami.Units.largeSpacing
-            bottomMargin: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.smallSpacing
+            topMargin: LingmoUI.Units.largeSpacing
+            leftMargin: LingmoUI.Units.largeSpacing
+            rightMargin: LingmoUI.Units.largeSpacing
+            bottomMargin: LingmoUI.Units.largeSpacing
 
             section.property: "Section"
             // We want to hide the section delegate for the "Connected"
@@ -118,7 +118,7 @@ PlasmaExtras.Representation {
                 width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
                 // Need to manually set the height or else the loader takes up
                 // space after the first time it unloads a previously-loaded item
-                height: active ? Kirigami.Units.gridUnit : 0
+                height: active ? LingmoUI.Units.gridUnit : 0
 
                 // give us 2 frames to try and figure out a layout, this reduces jumpyness quite a bit but doesn't
                 // entirely eliminate it https://bugs.kde.org/show_bug.cgi?id=438610
@@ -126,16 +126,16 @@ PlasmaExtras.Representation {
 
                 sourceComponent: Item {
                     KSvg.SvgItem {
-                        width: parent.width - Kirigami.Units.gridUnit * 2
+                        width: parent.width - LingmoUI.Units.gridUnit * 2
                         anchors.centerIn: parent
                         imagePath: "widgets/line"
                         elementId: "horizontal-line"
                     }
                 }
             }
-            highlight: PlasmaExtras.Highlight {}
-            highlightMoveDuration: Kirigami.Units.shortDuration
-            highlightResizeDuration: Kirigami.Units.shortDuration
+            highlight: LingmoExtras.Highlight {}
+            highlightMoveDuration: LingmoUI.Units.shortDuration
+            highlightResizeDuration: LingmoUI.Units.shortDuration
             delegate: DeviceItem {}
 
             Keys.onUpPressed: event => {
@@ -149,9 +149,9 @@ PlasmaExtras.Representation {
 
             Loader {
                 anchors.centerIn: parent
-                width: parent.width - (4 * Kirigami.Units.gridUnit)
+                width: parent.width - (4 * LingmoUI.Units.gridUnit)
                 active: BluezQt.Manager.rfkill.state === BluezQt.Rfkill.Unknown || BluezQt.Manager.bluetoothBlocked || root.emptyList
-                sourceComponent: PlasmaExtras.PlaceholderMessage {
+                sourceComponent: LingmoExtras.PlaceholderMessage {
                     iconName: BluezQt.Manager.rfkill.state === BluezQt.Rfkill.Unknown || BluezQt.Manager.bluetoothBlocked ? "network-bluetooth" : "edit-none"
 
                     text: {

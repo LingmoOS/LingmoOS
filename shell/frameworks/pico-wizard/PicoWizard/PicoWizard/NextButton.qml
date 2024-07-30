@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.0
 
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmoui 2.9 as LingmoUI
 
 RoundButton {
     property bool accepted: false
@@ -18,8 +18,8 @@ RoundButton {
         property bool showSpinner: false
     }
 
-    width: Kirigami.Units.iconSizes.huge
-    height: Kirigami.Units.iconSizes.huge
+    width: LingmoUI.Units.iconSizes.huge
+    height: LingmoUI.Units.iconSizes.huge
 
     flat: true
     onClicked: {
@@ -35,18 +35,18 @@ RoundButton {
     }
 
     background: Rectangle {
-        color: enabled ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+        color: enabled ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.disabledTextColor
         radius: parent.width
     }
 
-    Kirigami.Icon {
+    LingmoUI.Icon {
         id: nextIcon
-        width: Kirigami.Units.iconSizes.smallMedium
-        height: Kirigami.Units.iconSizes.smallMedium
+        width: LingmoUI.Units.iconSizes.smallMedium
+        height: LingmoUI.Units.iconSizes.smallMedium
         isMask: true
 
         anchors.centerIn: parent
-        color: Kirigami.Theme.highlightedTextColor
+        color: LingmoUI.Theme.highlightedTextColor
         source: "go-next"
 
         states: [
@@ -68,7 +68,7 @@ RoundButton {
         transitions: Transition {
             NumberAnimation {
                 property: "opacity"
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
@@ -77,8 +77,8 @@ RoundButton {
 
     BusyIndicator {
         id: spinnerIcon
-        width: Kirigami.Units.iconSizes.smallMedium
-        height: Kirigami.Units.iconSizes.smallMedium
+        width: LingmoUI.Units.iconSizes.smallMedium
+        height: LingmoUI.Units.iconSizes.smallMedium
 
         anchors.centerIn: parent
         running: privateProps.showSpinner

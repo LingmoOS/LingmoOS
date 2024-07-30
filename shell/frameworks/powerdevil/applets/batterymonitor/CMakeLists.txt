@@ -6,5 +6,5 @@ ecm_qt_install_logging_categories(
         DESTINATION ${KDE_INSTALL_LOGGINGCATEGORIESDIR}
 )
 
-plasma_install_package(package org.kde.plasma.battery)
+lingmo_install_package(package org.kde.lingmo.battery)
 

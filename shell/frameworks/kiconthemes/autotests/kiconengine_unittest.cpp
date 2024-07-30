@@ -27,9 +27,9 @@ private Q_SLOTS:
         const QString cacheFile = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + QStringLiteral("/icon-cache.kcache");
         QFile::remove(cacheFile);
 
-        // we have Breeze via it's library and it inherits hicolor
+        // we have Ocean via it's library and it inherits hicolor
         KConfigGroup cg(KSharedConfig::openConfig(), "Icons");
-        cg.writeEntry("Theme", "breeze");
+        cg.writeEntry("Theme", "ocean");
         cg.sync();
 
         QDir testDataDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));

@@ -8,8 +8,8 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import QtQuick.Templates as T
-import org.kde.kirigami as Kirigami
-import org.kde.kirigamiaddons.components as KirigamiComponents
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmouiaddons.components as LingmoUIComponents
 import org.kde.discover
 
 Item {
@@ -17,13 +17,13 @@ Item {
 
     required property CarouselAbstractMaximizedView host
 
-    readonly property real edgeMargin: Kirigami.Units.gridUnit
+    readonly property real edgeMargin: LingmoUI.Units.gridUnit
 
     readonly property real windowControlButtonsCollapsedMargin: host.toggleModeAvailable
         ? Math.round(edgeMargin / 2) : edgeMargin
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Complementary
+    LingmoUI.Theme.inherit: false
 
     RowLayout {
         z: 2
@@ -31,8 +31,8 @@ Item {
         anchors.right: parent.right
         spacing: 0
 
-        KirigamiComponents.FloatingButton {
-            Kirigami.Theme.inherit: true
+        LingmoUIComponents.FloatingButton {
+            LingmoUI.Theme.inherit: true
 
             text: {
                 switch (root.host.mode) {
@@ -63,14 +63,14 @@ Item {
             visible: root.host.toggleModeAvailable
 
             QQC2.ToolTip.text: text
-            QQC2.ToolTip.visible: (Kirigami.Settings.tabletMode ? pressed : hovered) && text !== ""
-            QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+            QQC2.ToolTip.visible: (LingmoUI.Settings.tabletMode ? pressed : hovered) && text !== ""
+            QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
 
             onClicked: root.host.toggleMode()
         }
 
-        KirigamiComponents.FloatingButton {
-            Kirigami.Theme.inherit: true
+        LingmoUIComponents.FloatingButton {
+            LingmoUI.Theme.inherit: true
 
             text: i18nc("@action:button Close overlay/window/popup with carousel of screenshots", "Close")
             icon.name: "window-close-symbolic"
@@ -83,8 +83,8 @@ Item {
             rightMargin: !mirrored ? margins : windowControlButtonsCollapsedMargin
 
             QQC2.ToolTip.text: text
-            QQC2.ToolTip.visible: (Kirigami.Settings.tabletMode ? pressed : hovered) && text !== ""
-            QQC2.ToolTip.delay: Kirigami.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : Kirigami.Units.toolTipDelay
+            QQC2.ToolTip.visible: (LingmoUI.Settings.tabletMode ? pressed : hovered) && text !== ""
+            QQC2.ToolTip.delay: LingmoUI.Settings.tabletMode ? Qt.styleHints.mousePressAndHoldInterval : LingmoUI.Units.toolTipDelay
 
             onClicked: root.host.close(true);
         }
@@ -118,10 +118,10 @@ Item {
             preferredHighlightBegin: currentItem ? Math.round((width - currentItem.width) / 2) : 0
             preferredHighlightEnd: currentItem ? preferredHighlightBegin + currentItem.width : 0
 
-            highlightMoveDuration: Kirigami.Units.longDuration
-            highlightResizeDuration: Kirigami.Units.longDuration
+            highlightMoveDuration: LingmoUI.Units.longDuration
+            highlightResizeDuration: LingmoUI.Units.longDuration
 
-            spacing: Kirigami.Units.gridUnit
+            spacing: LingmoUI.Units.gridUnit
             cacheBuffer: 10000
 
             Component.onCompleted: {
@@ -176,8 +176,8 @@ Item {
             id: pageIndicator
 
             Layout.fillWidth: true
-            topPadding: Kirigami.Units.largeSpacing * 3
-            bottomPadding: Kirigami.Units.largeSpacing * 3
+            topPadding: LingmoUI.Units.largeSpacing * 3
+            bottomPadding: LingmoUI.Units.largeSpacing * 3
 
             focusPolicy: Qt.NoFocus
             interactive: true

@@ -7,7 +7,7 @@
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 ApplicationsListPage {
     id: root
@@ -26,7 +26,7 @@ ApplicationsListPage {
 
     topPadding: 0
 
-    globalToolBarStyle: Kirigami.ApplicationHeaderStyle.ToolBar
+    globalToolBarStyle: LingmoUI.ApplicationHeaderStyle.ToolBar
 
     titleDelegate: SearchField {
         id: searchField

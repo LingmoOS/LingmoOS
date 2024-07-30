@@ -12,7 +12,7 @@
 
 #include <qqmlregistration.h>
 
-namespace Kirigami
+namespace LingmoUI
 {
 namespace Platform
 {
@@ -129,7 +129,7 @@ private:
     void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
     QPointer<KSvg::Svg> m_svg;
-    Kirigami::Platform::PlatformTheme *m_kirigamiTheme;
+    LingmoUI::Platform::PlatformTheme *m_lingmouiTheme;
     QString m_elementID;
     QImage m_image;
     bool m_textureChanged;

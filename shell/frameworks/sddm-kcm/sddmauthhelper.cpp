@@ -114,7 +114,7 @@ ActionReply SddmAuthHelper::sync(const QVariantMap &args)
         return ActionReply::HelperErrorReply();
     }
 
-    // In plasma-framework, ThemePrivate::useCache documents the requirement to
+    // In lingmo-framework, ThemePrivate::useCache documents the requirement to
     // clear the cache when colors change while the app that uses them isn't running;
     // that condition applies to the SDDM greeter here, so clear the cache if it
     // exists to make sure SDDM has a fresh state
@@ -165,11 +165,11 @@ ActionReply SddmAuthHelper::sync(const QVariantMap &args)
         copyFile(kdeglobalsSource.path(), kdeglobalsDestination.path());
     }
 
-    // copy plasmarc (icons, UI style)
-    if (!args[QStringLiteral("plasmarc")].isNull()) {
-        QDir plasmarcSource(args[QStringLiteral("plasmarc")].toString());
-        QDir plasmarcDestination(sddmConfigLocation.path() + QStringLiteral("/plasmarc"));
-        copyFile(plasmarcSource.path(), plasmarcDestination.path());
+    // copy lingmorc (icons, UI style)
+    if (!args[QStringLiteral("lingmorc")].isNull()) {
+        QDir lingmorcSource(args[QStringLiteral("lingmorc")].toString());
+        QDir lingmorcDestination(sddmConfigLocation.path() + QStringLiteral("/lingmorc"));
+        copyFile(lingmorcSource.path(), lingmorcDestination.path());
     }
 
     // If SDDM is set up to use Wayland with KWin, NumLock is controlled by this
@@ -244,7 +244,7 @@ ActionReply SddmAuthHelper::reset(const QVariantMap &args)
 
     fontconfigDir.removeRecursively();
     QFile::remove(sddmConfigLocation.path() + QStringLiteral("/kdeglobals"));
-    QFile::remove(sddmConfigLocation.path() + QStringLiteral("/plasmarc"));
+    QFile::remove(sddmConfigLocation.path() + QStringLiteral("/lingmorc"));
 
     QDir(sddmHomeDirPath + QStringLiteral("/.local/share/kscreen/")).removeRecursively();
 

@@ -11,9 +11,9 @@ import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app
 import org.kde.discover.qml
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.InlineMessage {
+LingmoUI.InlineMessage {
     id: root
 
     // actual subtype: FlatpakResource
@@ -29,7 +29,7 @@ Kirigami.InlineMessage {
         : i18ndc("libdiscover", "@label %1 is the name of an application", "A more stable version of %1 is available.", resource.name)
 
     height: visible ? implicitHeight : 0
-    type: __betaOlderThanStable ? Kirigami.MessageType.Warning : Kirigami.MessageType.Information
+    type: __betaOlderThanStable ? LingmoUI.MessageType.Warning : LingmoUI.MessageType.Information
 
     Instantiator {
         id: instantiator
@@ -39,7 +39,7 @@ Kirigami.InlineMessage {
             resourcesUrl: root.resource.url
         }
         active: root.resource.isDesktopApp
-        delegate: Kirigami.Action {
+        delegate: LingmoUI.Action {
             required property var model
 
             readonly property int versionCompare: root.resource.versionCompare(model.application)

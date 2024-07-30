@@ -7,9 +7,9 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.InlineMessage {
+LingmoUI.InlineMessage {
     required property Discover.AbstractResource resource
     Discover.Activatable.active: true
 

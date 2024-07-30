@@ -150,11 +150,11 @@ public:
      * matches from this runner, and should remain constant
      * for the same query for best results.
      *
-     * If the "X-Plasma-Runner-Unique-Results" property from the metadata
+     * If the "X-Lingmo-Runner-Unique-Results" property from the metadata
      * is set to true, the runnerId will not be prepended to the ID.
      * This allows KRunner to de-duplicate results from different runners.
      * In case the runner's matches are less specific than ones from other runners, the
-     * "X-Plasma-Runner-Weak-Results" property can be set so that duplicates from this
+     * "X-Lingmo-Runner-Weak-Results" property can be set so that duplicates from this
      * runner are removed.
      *
      * @param id the new identifying string to use to refer

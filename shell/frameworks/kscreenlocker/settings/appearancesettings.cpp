@@ -144,7 +144,7 @@ void AppearanceSettings::loadShellConfig()
 
     Q_ASSERT(!m_package.isValid() && !m_shellIntegration);
 
-    m_package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/Shell"));
+    m_package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/Shell"));
     m_shellIntegration = new ScreenLocker::ShellIntegration(this);
     m_package.setPath(m_shellIntegration->defaultShell());
     m_shellIntegration->setPackage(m_package);

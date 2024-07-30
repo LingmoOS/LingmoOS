@@ -4,13 +4,13 @@
  *   SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
  */
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtWebView
 
-Kirigami.OverlaySheet {
+LingmoUI.OverlaySheet {
     id: sheet
 
     property QtObject transaction

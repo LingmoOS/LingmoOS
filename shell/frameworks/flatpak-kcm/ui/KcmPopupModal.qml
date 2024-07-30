@@ -4,16 +4,16 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-// Copy of Kirigami.Dialog modal overlay, with adjustments for KCM footer margin.
+// Copy of LingmoUI.Dialog modal overlay, with adjustments for KCM footer margin.
 Item {
     id: background
 
     // to account for extra margin in KCM footer
     property int bottomMargin: 8
 
-    Kirigami.Separator {
+    LingmoUI.Separator {
         id: separator
         visible: false
     }
@@ -33,7 +33,7 @@ Item {
     // the opacity of the item is changed internally by QQuickPopup on open/close
     Behavior on opacity {
         OpacityAnimator {
-            duration: Kirigami.Units.longDuration
+            duration: LingmoUI.Units.longDuration
             easing.type: Easing.InOutQuad
         }
     }

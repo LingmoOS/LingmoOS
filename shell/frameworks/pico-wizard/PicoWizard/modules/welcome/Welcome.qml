@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
-import org.kde.kirigami 2.9 as Kirigami
+import org.kde.lingmoui 2.9 as LingmoUI
 
 import PicoWizard 1.0
 
@@ -20,7 +20,7 @@ Item {
         font.pointSize: 32
         text: qsTr("Welcome")
         anchors.centerIn: parent
-        color: Kirigami.Theme.textColor
+        color: LingmoUI.Theme.textColor
     }
 
     NextButton {

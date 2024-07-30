@@ -9,18 +9,18 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
-import org.kde.plasma.components as PC3
+import org.kde.lingmo.components as PC3
 
 Item {
     id: bar
 
-    readonly property real desktopHeight: Kirigami.Units.gridUnit * 5
+    readonly property real desktopHeight: LingmoUI.Units.gridUnit * 5
     readonly property real desktopWidth: desktopHeight * targetScreen.geometry.width / targetScreen.geometry.height
-    readonly property real columnHeight: desktopHeight + Kirigami.Units.gridUnit
-    readonly property real columnWidth: desktopWidth + Kirigami.Units.gridUnit
+    readonly property real columnHeight: desktopHeight + LingmoUI.Units.gridUnit
+    readonly property real columnWidth: desktopWidth + LingmoUI.Units.gridUnit
     readonly property int desktopCount: desktopRepeater.count
 
     property bool verticalDesktopBar
@@ -29,8 +29,8 @@ Item {
     property QtObject selectedDesktop: null
     property var heap
 
-    implicitHeight: columnHeight + 2 * Kirigami.Units.smallSpacing
-    implicitWidth: columnWidth + 2 * Kirigami.Units.smallSpacing
+    implicitHeight: columnHeight + 2 * LingmoUI.Units.smallSpacing
+    implicitWidth: columnWidth + 2 * LingmoUI.Units.smallSpacing
 
     Flickable {
         anchors.fill: parent
@@ -43,7 +43,7 @@ Item {
         flickableDirection: Flickable.HorizontalFlick
 
         Grid {
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
             columns: verticalDesktopBar ? 1 : desktopCount + 1
 
             Repeater {
@@ -54,7 +54,7 @@ Item {
                     activeFocusOnTab: true
                     width: bar.desktopWidth
                     height: bar.columnHeight
-                    spacing: Kirigami.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
 
                     required property QtObject desktop
                     required property int index
@@ -104,7 +104,7 @@ Item {
 
                         Behavior on scale {
                             NumberAnimation {
-                                duration: Kirigami.Units.shortDuration
+                                duration: LingmoUI.Units.shortDuration
                             }
                         }
 
@@ -139,10 +139,10 @@ Item {
                         Rectangle {
                             readonly property bool active: (delegate.activeFocus || dropArea.containsDrag || mouseArea.containsPress || bar.selectedDesktop === delegate.desktop)
                             anchors.fill: parent
-                            radius: Kirigami.Units.cornerRadius
+                            radius: LingmoUI.Units.cornerRadius
                             color: "transparent"
                             border.width: active ? 2 : 1
-                            border.color: active ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+                            border.color: active ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.textColor
                             opacity: dropArea.containsDrag || !active ? 0.5 : 1.0
                         }
 
@@ -158,7 +158,7 @@ Item {
 
                         Loader {
                             LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
-                            active: !bar.heap.dragActive && (hoverHandler.hovered || Kirigami.Settings.tabletMode || Kirigami.Settings.hasTransientTouchInput) && desktopCount > 1
+                            active: !bar.heap.dragActive && (hoverHandler.hovered || LingmoUI.Settings.tabletMode || LingmoUI.Settings.hasTransientTouchInput) && desktopCount > 1
                             anchors.right: parent.right
                             anchors.top: parent.top
                             sourceComponent: PC3.Button {
@@ -168,7 +168,7 @@ Item {
 
                                 PC3.ToolTip.text: text
                                 PC3.ToolTip.visible: hovered
-                                PC3.ToolTip.delay: Kirigami.Units.toolTipDelay
+                                PC3.ToolTip.delay: LingmoUI.Units.toolTipDelay
 
                                 onClicked: delegate.remove()
                             }
@@ -193,7 +193,7 @@ Item {
                     Item {
                         id: label
                         width: bar.desktopWidth
-                        height: Kirigami.Units.gridUnit
+                        height: LingmoUI.Units.gridUnit
                         state: "normal"
 
                         PC3.Label {
@@ -266,7 +266,7 @@ Item {
 
                 PC3.ToolTip.text: text
                 PC3.ToolTip.visible: hovered
-                PC3. ToolTip.delay: Kirigami.Units.toolTipDelay
+                PC3. ToolTip.delay: LingmoUI.Units.toolTipDelay
                 Accessible.name: text
 
                 Keys.onReturnPressed: action.trigger()

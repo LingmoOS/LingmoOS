@@ -7,8 +7,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
-import org.kde.plasma.workspace.dialogs as PWD
+import org.kde.lingmoui as LingmoUI
+import org.kde.lingmo.workspace.dialogs as PWD
 
 PWD.SystemDialog {
     id: root
@@ -24,18 +24,18 @@ PWD.SystemDialog {
     iconName: "preferences-system-windows-effect-screenshot"
     acceptable: screenshot.valid
 
-    Kirigami.FormLayout {
-        Kirigami.Heading {
+    LingmoUI.FormLayout {
+        LingmoUI.Heading {
             text: i18n("Capture Mode")
         }
         QQC2.ComboBox {
             id: areaCombo
-            Kirigami.FormData.label: i18n("Area:")
+            LingmoUI.FormData.label: i18n("Area:")
             textRole: "display"
         }
         QQC2.SpinBox {
             id: delayTime
-            Kirigami.FormData.label: i18n("Delay:")
+            LingmoUI.FormData.label: i18n("Delay:")
             from: 0
             to: 60
             stepSize: 1
@@ -43,7 +43,7 @@ PWD.SystemDialog {
             valueFromText: (text, locale) => parseInt(text);
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             text: i18n("Content Options")
         }
         QQC2.CheckBox {
@@ -58,7 +58,7 @@ PWD.SystemDialog {
             checked: true
         }
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             id: screenshot
             Layout.fillWidth: true
             Layout.fillHeight: true

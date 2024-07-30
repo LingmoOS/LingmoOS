@@ -165,7 +165,7 @@ void SddmKcm::synchronizeSettings()
         return;
     }
 
-    // read Plasma values
+    // read Lingmo values
     KConfig cursorConfig(QStringLiteral("kcminputrc"));
     KConfigGroup cursorConfigGroup(&cursorConfig, QStringLiteral("Mouse"));
     QString cursorTheme = cursorConfigGroup.readEntry("cursorTheme", QString());
@@ -181,14 +181,14 @@ void SddmKcm::synchronizeSettings()
     QString numLock = numLockConfigGroup.readEntry("NumLock");
 
     // Syncing the font only works with SDDM >= 0.19, but will not have a negative effect with older versions
-    KConfig plasmaFontConfig(QStringLiteral("kdeglobals"));
-    KConfigGroup plasmaFontGroup(&plasmaFontConfig, QStringLiteral("General"));
-    QString plasmaFont = plasmaFontGroup.readEntry("font", QApplication::font().toString());
+    KConfig lingmoFontConfig(QStringLiteral("kdeglobals"));
+    KConfigGroup lingmoFontGroup(&lingmoFontConfig, QStringLiteral("General"));
+    QString lingmoFont = lingmoFontGroup.readEntry("font", QApplication::font().toString());
 
     // define paths
     const QString fontconfigPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("fontconfig"), QStandardPaths::LocateDirectory);
     const QString kdeglobalsPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("kdeglobals"));
-    const QString plasmarcPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("plasmarc"));
+    const QString lingmorcPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("lingmorc"));
     const QString kcminputrcPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("kcminputrc"));
     const QString kwinoutputconfigPath = QStandardPaths::locate(QStandardPaths::GenericConfigLocation, QStringLiteral("kwinoutputconfig.json"));
 
@@ -230,10 +230,10 @@ void SddmKcm::synchronizeSettings()
         qDebug() << "Cannot find NumLock value.";
     }
 
-    if (!plasmaFont.isEmpty()) {
-        args[QStringLiteral("kde_settings.conf/Theme/Font")] = plasmaFont;
+    if (!lingmoFont.isEmpty()) {
+        args[QStringLiteral("kde_settings.conf/Theme/Font")] = lingmoFont;
     } else {
-        qDebug() << "Cannot find Plasma font value.";
+        qDebug() << "Cannot find Lingmo font value.";
     }
 
     if (!fontconfigPath.isEmpty()) {
@@ -248,10 +248,10 @@ void SddmKcm::synchronizeSettings()
         qDebug() << "Cannot find kdeglobals file.";
     }
 
-    if (!plasmarcPath.isEmpty()) {
-        args[QStringLiteral("plasmarc")] = plasmarcPath;
+    if (!lingmorcPath.isEmpty()) {
+        args[QStringLiteral("lingmorc")] = lingmorcPath;
     } else {
-        qDebug() << "Cannot find plasmarc file.";
+        qDebug() << "Cannot find lingmorc file.";
     }
 
     if (!kcminputrcPath.isEmpty()) {

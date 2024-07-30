@@ -8,31 +8,31 @@ import QtQuick
 import QtQuick.Layouts 
 import QtQuick.Controls as QQC2
 import org.kde.kcmutils as KCM
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.Dialog {
+LingmoUI.Dialog {
     id: root
 
     title: i18nc("@title:window", "CUPS Server Settings")
 
     property bool saving: false
 
-    standardButtons: Kirigami.Dialog.NoButton
+    standardButtons: LingmoUI.Dialog.NoButton
 
-    footerLeadingComponent: Kirigami.UrlButton {
+    footerLeadingComponent: LingmoUI.UrlButton {
         text: i18nc("@action:button", "CUPS Print Server Admin")
         url: "http://localhost:631/admin"
-        padding: Kirigami.Units.largeSpacing
+        padding: LingmoUI.Units.largeSpacing
     }
 
     customFooterActions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button Reset to current settings", "Reset")
             icon.name: "edit-reset-symbolic"
             enabled: settings.hasPending
             onTriggered: settings.reset()
         },
-        Kirigami.Action {
+        LingmoUI.Action {
             text: i18nc("@action:button Apply new settings", "Apply")
             icon.name: "dialog-ok-apply"
             enabled: settings.hasPending
@@ -84,7 +84,7 @@ Kirigami.Dialog {
         }
 
         function onServerStopped() {
-            error.type = Kirigami.MessageType.Information
+            error.type = LingmoUI.MessageType.Information
             error.text = i18n("Please wait while the CUPS server restarts")
             error.visible = true
         }
@@ -107,18 +107,18 @@ Kirigami.Dialog {
         RowLayout {
             id: layout
             enabled: false
-            spacing: Kirigami.Units.smallSpacing
-            Layout.margins: Kirigami.Units.largeSpacing*2
+            spacing: LingmoUI.Units.smallSpacing
+            Layout.margins: LingmoUI.Units.largeSpacing*2
 
-            Kirigami.Icon {
+            LingmoUI.Icon {
                 source: "printer"
-                Layout.preferredWidth: Kirigami.Units.iconSizes.enormous
+                Layout.preferredWidth: LingmoUI.Units.iconSizes.enormous
                 Layout.preferredHeight: Layout.preferredWidth
                 Layout.alignment: Qt.AlignHCenter
             }
 
             ColumnLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
 
                 SettingCheckBox {
                     id: share

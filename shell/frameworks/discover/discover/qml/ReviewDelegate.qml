@@ -8,7 +8,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 QQC2.ItemDelegate {
     id: root
@@ -21,15 +21,15 @@ QQC2.ItemDelegate {
 
     signal markUseful(bool useful)
 
-    leftPadding: Kirigami.Units.largeSpacing
-    rightPadding: Kirigami.Units.largeSpacing
-    bottomPadding: Kirigami.Units.largeSpacing
+    leftPadding: LingmoUI.Units.largeSpacing
+    rightPadding: LingmoUI.Units.largeSpacing
+    bottomPadding: LingmoUI.Units.largeSpacing
     background: null
 
     contentItem: ColumnLayout {
         id: mainContent
 
-        spacing: Kirigami.Units.smallSpacing
+        spacing: LingmoUI.Units.smallSpacing
 
         // Header with stars and date of review
         RowLayout {
@@ -38,7 +38,7 @@ QQC2.ItemDelegate {
                 id: rating
                 Layout.fillWidth: true
                 value: root.model.rating
-                starSize: Kirigami.Units.gridUnit
+                starSize: LingmoUI.Units.gridUnit
                 padding: 0
             }
             QQC2.Label {
@@ -62,7 +62,7 @@ QQC2.ItemDelegate {
         // Review text
         QQC2.Label {
             Layout.fillWidth: true
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
+            Layout.bottomMargin: LingmoUI.Units.smallSpacing
 
             text: root.model.display
             wrapMode: Text.Wrap
@@ -79,7 +79,7 @@ QQC2.ItemDelegate {
             Layout.fillWidth: true
             active: !root.compact
             sourceComponent: RowLayout {
-                spacing: Kirigami.Units.smallSpacing
+                spacing: LingmoUI.Units.smallSpacing
                 visible: !root.compact
 
                 QQC2.Label {
@@ -89,7 +89,7 @@ QQC2.ItemDelegate {
 
                 QQC2.Label {
                     Layout.fillWidth: true
-                    Layout.leftMargin: root.model.usefulnessTotal === 0 ? Kirigami.Units.largeSpacing : 0
+                    Layout.leftMargin: root.model.usefulnessTotal === 0 ? LingmoUI.Units.largeSpacing : 0
                     horizontalAlignment: Text.AlignRight
                     text: i18n("Was this review useful?")
                     elide: Text.ElideLeft
@@ -98,9 +98,9 @@ QQC2.ItemDelegate {
                 // Useful/Not Useful buttons
                 QQC2.Button {
                     id: yesButton
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 3
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    Layout.bottomMargin: Kirigami.Units.smallSpacing
+                    Layout.maximumWidth: LingmoUI.Units.gridUnit * 3
+                    Layout.topMargin: LingmoUI.Units.smallSpacing
+                    Layout.bottomMargin: LingmoUI.Units.smallSpacing
                     Layout.alignment: Qt.AlignVCenter
 
                     text: i18nc("Keep this string as short as humanly possible", "Yes")
@@ -114,9 +114,9 @@ QQC2.ItemDelegate {
                 }
                 QQC2.Button {
                     id: noButton
-                    Layout.maximumWidth: Kirigami.Units.gridUnit * 3
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    Layout.bottomMargin: Kirigami.Units.smallSpacing
+                    Layout.maximumWidth: LingmoUI.Units.gridUnit * 3
+                    Layout.topMargin: LingmoUI.Units.smallSpacing
+                    Layout.bottomMargin: LingmoUI.Units.smallSpacing
                     Layout.alignment: Qt.AlignVCenter
 
                     text: i18nc("Keep this string as short as humanly possible", "No")
@@ -131,7 +131,7 @@ QQC2.ItemDelegate {
             }
         }
 
-        Kirigami.Separator {
+        LingmoUI.Separator {
             Layout.fillWidth: true
             visible: root.separator
         }

@@ -10,7 +10,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
 
@@ -30,14 +30,14 @@ DiscoverPage {
 
     readonly property bool isHome: true
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
-    Kirigami.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.Window
+    LingmoUI.Theme.inherit: false
 
     DiscoverApp.FeaturedModel {
         id: featuredModel
     }
 
-    Kirigami.LoadingPlaceholder {
+    LingmoUI.LoadingPlaceholder {
         visible: featuredModel.isFetching
         anchors.centerIn: parent
     }
@@ -45,8 +45,8 @@ DiscoverPage {
     Loader {
         active: featuredModel.count === 0 && !featuredModel.isFetching
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.largeSpacing * 4)
-        sourceComponent: Kirigami.PlaceholderMessage {
+        width: parent.width - (LingmoUI.Units.largeSpacing * 4)
+        sourceComponent: LingmoUI.PlaceholderMessage {
             readonly property Discover.InlineMessage helpfulError: featuredModel.currentApplicationBackend?.explainDysfunction() ?? null
 
             icon.name: helpfulError?.iconName ?? ""
@@ -72,15 +72,15 @@ DiscoverPage {
 
     signal clearSearch()
 
-    Kirigami.CardsLayout {
+    LingmoUI.CardsLayout {
         id: apps
 
         maximumColumns: 4
         rowSpacing: page.padding
         columnSpacing: page.padding
-        maximumColumnWidth: Kirigami.Units.gridUnit * 6
+        maximumColumnWidth: LingmoUI.Units.gridUnit * 6
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             // Need to undo some the row spacing of the parent layout which looks bad here
             Layout.bottomMargin: -(apps.rowSpacing / 2)
             Layout.columnSpan: apps.columns
@@ -101,7 +101,7 @@ DiscoverPage {
             delegate: GridApplicationDelegate { visible: !featuredModel.isFetching }
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.topMargin: page.padding
             // Need to undo some the row spacing of the parent layout which looks bad here
             Layout.bottomMargin: -(apps.rowSpacing / 2)
@@ -144,7 +144,7 @@ DiscoverPage {
             }
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.topMargin: page.padding
             // Need to undo some the row spacing of the parent layout which looks bad here
             Layout.bottomMargin: -(apps.rowSpacing / 2)
@@ -161,7 +161,7 @@ DiscoverPage {
             delegate: GridApplicationDelegate { visible: !featuredModel.isFetching }
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.topMargin: page.padding
             // Need to undo some the row spacing of the parent layout which looks bad here
             Layout.bottomMargin: -(apps.rowSpacing / 2)
@@ -194,7 +194,7 @@ DiscoverPage {
             visible: gamesRep.count > 0 && !featuredModel.isFetching
         }
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.topMargin: page.padding
             Layout.columnSpan: apps.columns
             Layout.fillWidth: true

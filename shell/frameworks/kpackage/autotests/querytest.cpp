@@ -27,7 +27,7 @@ void QueryTest::initTestCase()
     m_dataDir = QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
 
     // verify that the test plugin if found
-    QVERIFY(KPackage::PackageLoader::self()->loadPackageStructure("Plasma/TestKPackageInternalPlasmoid"));
+    QVERIFY(KPackage::PackageLoader::self()->loadPackageStructure("Lingmo/TestKPackageInternalPlasmoid"));
 }
 
 static bool checkedInstall(const QString &packageFormat, const QString &source, int expectedError)
@@ -49,24 +49,24 @@ void QueryTest::installAndQuery()
 {
     m_dataDir.removeRecursively();
     // verify that no packages are installed
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 0);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 0);
 
     // install some packages
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackage"), KJob::NoError));
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testfallbackpackage"), KJob::NoError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 2);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 2);
 
     // installing package with invalid metadata should not be possible
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testinvalidmetadata"), KPackage::PackageJob::PluginIdInvalidError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 2);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 2);
 
     // package with valid dep information should be installed
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackagesdep"), KJob::NoError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 3);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 3);
 
     // package with invalid dep information should not be installed
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackagesdepinvalid"), KPackage::PackageJob::JobError::PackageCopyError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 3);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 3);
 }
 
 void QueryTest::queryCustomPlugin()
@@ -74,26 +74,26 @@ void QueryTest::queryCustomPlugin()
     m_dataDir.removeRecursively();
 
     // verify that no packages are installed
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 0);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 0);
 
-    auto testPackageStructure = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/TestKPackageInternalPlasmoid"));
+    auto testPackageStructure = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid"));
     // install some packages
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackage"), KJob::NoError));
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testfallbackpackage"), KJob::NoError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 2);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 2);
 
     // installing package with invalid metadata should not be possible
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testinvalidmetadata"), KPackage::PackageJob::JobError::PluginIdInvalidError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 2);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 2);
 
     // package with valid dep information should be installed
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackagesdep"), KJob::NoError));
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 3);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 3);
 
     // package with invalid dep information should not be installed
     QVERIFY(checkedInstall(packageFormat, QFINDTESTDATA("data/testpackagesdepinvalid"), KPackage::PackageJob::JobError::PackageCopyError));
 
-    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Plasma/TestKPackageInternalPlasmoid")).count(), 3);
+    QCOMPARE(KPackage::PackageLoader::self()->listPackages(QStringLiteral("Lingmo/TestKPackageInternalPlasmoid")).count(), 3);
 }
 
 QTEST_MAIN(QueryTest)

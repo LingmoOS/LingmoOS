@@ -26,7 +26,7 @@ class RenderViewport;
 enum EffectFrameStyle {
     EffectFrameNone, ///< Displays no frame around the contents.
     EffectFrameUnstyled, ///< Displays a basic box around the contents.
-    EffectFrameStyled ///< Displays a Plasma-styled frame around the contents.
+    EffectFrameStyled ///< Displays a Lingmo-styled frame around the contents.
 };
 
 class EffectFrameQuickScene : public OffscreenQuickScene
@@ -106,7 +106,7 @@ private:
  * @short Helper class for displaying text and icons in frames.
  *
  * Paints text and/or and icon with an optional frame around them. The
- * available frames includes one that follows the default Plasma theme and
+ * available frames includes one that follows the default Lingmo theme and
  * another that doesn't.
  * It is recommended to use this class whenever displaying text.
  */

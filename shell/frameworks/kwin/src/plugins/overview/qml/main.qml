@@ -9,12 +9,12 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kwin as KWinComponents
 import org.kde.kwin.private.effects
 import org.kde.milou as Milou
-import org.kde.plasma.components as PC3
-import org.kde.plasma.extras as PlasmaExtras
+import org.kde.lingmo.components as PC3
+import org.kde.lingmo.extras as LingmoExtras
 import org.kde.kcmutils as KCM
 
 FocusScope {
@@ -24,9 +24,9 @@ FocusScope {
     readonly property QtObject effect: KWinComponents.SceneView.effect
     readonly property QtObject targetScreen: KWinComponents.SceneView.screen
 
-    readonly property bool lightBackground: Math.max(Kirigami.Theme.backgroundColor.r,
-                                                     Kirigami.Theme.backgroundColor.g,
-                                                     Kirigami.Theme.backgroundColor.b) > 0.5
+    readonly property bool lightBackground: Math.max(LingmoUI.Theme.backgroundColor.r,
+                                                     LingmoUI.Theme.backgroundColor.g,
+                                                     LingmoUI.Theme.backgroundColor.b) > 0.5
 
     property bool animationEnabled: false
     property bool organized: false
@@ -263,7 +263,7 @@ FocusScope {
         id: underlay
         anchors.fill: parent
         opacity: 0.7
-        color: Kirigami.Theme.backgroundColor
+        color: LingmoUI.Theme.backgroundColor
 
         TapHandler {
             onTapped: effect.deactivate();
@@ -289,8 +289,8 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: container.verticalDesktopBar ? undefined : parent.right
         anchors.bottom: container.verticalDesktopBar ? parent.bottom : undefined
-        height: bar.implicitHeight + 2 * Kirigami.Units.smallSpacing
-        width: bar.implicitWidth + 2 * Kirigami.Units.smallSpacing
+        height: bar.implicitHeight + 2 * LingmoUI.Units.smallSpacing
+        width: bar.implicitWidth + 2 * LingmoUI.Units.smallSpacing
 
         DesktopBar {
             id: bar
@@ -309,13 +309,13 @@ FocusScope {
         anchors.left: container.verticalDesktopBar ? desktopBar.right : parent.left
         anchors.right: parent.right
         anchors.top: container.verticalDesktopBar || !container.anyDesktopBar ? parent.top : desktopBar.bottom
-        anchors.topMargin: Kirigami.Units.largeSpacing
-        height: searchField.height + 1 * Kirigami.Units.largeSpacing
+        anchors.topMargin: LingmoUI.Units.largeSpacing
+        height: searchField.height + 1 * LingmoUI.Units.largeSpacing
 
-        PlasmaExtras.SearchField {
+        LingmoExtras.SearchField {
             id: searchField
             anchors.centerIn: parent
-            width: Math.min(parent.width, 20 * Kirigami.Units.gridUnit)
+            width: Math.min(parent.width, 20 * LingmoUI.Units.gridUnit)
             focus: enabled
             readOnly: gridVal == 1
             onReadOnlyChanged: {
@@ -339,10 +339,10 @@ FocusScope {
     property var currentGeometry: targetScreen.geometry
 
     // These are the minimum position of maximum size of the desktop preview in the overview
-    property int minX: Kirigami.Units.largeSpacing + (container.verticalDesktopBar ? desktopBar.width : 0)
-    property int minY: Kirigami.Units.largeSpacing + topBar.height + (container.verticalDesktopBar || !container.anyDesktopBar ? 0 : desktopBar.height)
-    property int maxWidth: currentGeometry.width - minX - Kirigami.Units.gridUnit * 2
-    property int maxHeight: currentGeometry.height - minY - Kirigami.Units.gridUnit * 2
+    property int minX: LingmoUI.Units.largeSpacing + (container.verticalDesktopBar ? desktopBar.width : 0)
+    property int minY: LingmoUI.Units.largeSpacing + topBar.height + (container.verticalDesktopBar || !container.anyDesktopBar ? 0 : desktopBar.height)
+    property int maxWidth: currentGeometry.width - minX - LingmoUI.Units.gridUnit * 2
+    property int maxHeight: currentGeometry.height - minY - LingmoUI.Units.gridUnit * 2
 
     property int desktops: Math.max(bar.desktopCount, 2)
     property int columns: Math.ceil(desktops / rows)
@@ -375,9 +375,9 @@ FocusScope {
             anchors.verticalCenter: parent.verticalCenter
             visible: bar.desktopCount === 1
             opacity: gridVal
-            spacing: Kirigami.Units.largeSpacing
+            spacing: LingmoUI.Units.largeSpacing
 
-            Kirigami.PlaceholderMessage {
+            LingmoUI.PlaceholderMessage {
                 text: i18ndc("kwin", "@info:placeholder", "No other Virtual Desktops to show")
                 icon.name: "virtual-desktops-symbolic"
             }
@@ -521,22 +521,22 @@ FocusScope {
                         visible: false
                     }
 
-                    Kirigami.ShadowedTexture {
+                    LingmoUI.ShadowedTexture {
                         anchors.fill: parent
 
                         color: "transparent"
                         source: desktopElement
 
-                        radius: Kirigami.Units.cornerRadius * (overviewVal + gridVal * 2)
+                        radius: LingmoUI.Units.cornerRadius * (overviewVal + gridVal * 2)
 
                         shadow {
-                            size: Kirigami.Units.gridUnit * 2
+                            size: LingmoUI.Units.gridUnit * 2
                             color: Qt.rgba(0, 0, 0, 0.3)
                             yOffset: 3
                         }
 
-                        property var borderWidth: desktopHover.hovered ? Kirigami.Units.largeSpacing : (mainBackground.current ? Kirigami.Units.smallSpacing : 0);
-                        property var borderColor: desktopHover.hovered ? Kirigami.Theme.focusColor : (mainBackground.current ? Kirigami.Theme.highlightColor : "transparent")
+                        property var borderWidth: desktopHover.hovered ? LingmoUI.Units.largeSpacing : (mainBackground.current ? LingmoUI.Units.smallSpacing : 0);
+                        property var borderColor: desktopHover.hovered ? LingmoUI.Theme.focusColor : (mainBackground.current ? LingmoUI.Theme.highlightColor : "transparent")
                         border.width: gridVal == 1 ? borderWidth : 0
                         border.color: gridVal == 1 ? borderColor : "transparent"
                     }
@@ -624,7 +624,7 @@ FocusScope {
                     Drag.keys: ["kwin-desktop"]
 
                     focus: current
-                    padding: Kirigami.Units.largeSpacing
+                    padding: LingmoUI.Units.largeSpacing
                     animationDuration: effect.animationDuration
                     animationEnabled:  (gridVal !== 0 || mainBackground.current) && organized
                     organized: container.state !== "initial"
@@ -661,11 +661,11 @@ FocusScope {
                             if (!activeDragHandler.active) {
                                 return targetScale; // leave it alone, so it won't affect transitions before they start
                             }
-                            var localPressPosition = activeDragHandler.centroid.scenePressPosition[coordinate] - heap.layout.Kirigami.ScenePosition[coordinate];
+                            var localPressPosition = activeDragHandler.centroid.scenePressPosition[coordinate] - heap.layout.LingmoUI.ScenePosition[coordinate];
                             if (localPressPosition === 0) {
                                 return 0.1;
                             } else {
-                                var localPosition = activeDragHandler.centroid.scenePosition[coordinate] - heap.layout.Kirigami.ScenePosition[coordinate];
+                                var localPosition = activeDragHandler.centroid.scenePosition[coordinate] - heap.layout.LingmoUI.ScenePosition[coordinate];
                                 return Math.max(0.1, Math.min(localPosition / localPressPosition, 1));
                             }
                         }
@@ -731,7 +731,7 @@ FocusScope {
             height: parent.height - topBar.height
             opacity: overviewVal
 
-            PlasmaExtras.PlaceholderMessage {
+            LingmoExtras.PlaceholderMessage {
                 id: placeholderMessage
                 visible: allDesktopHeaps.currentHeap.count === 0 && effect.filterWindows
                 anchors.top: parent.top
@@ -744,7 +744,7 @@ FocusScope {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width / 2
-                height: effect.filterWindows ? parent.height - placeholderMessage.height - Kirigami.Units.largeSpacing : parent.height - Kirigami.Units.largeSpacing
+                height: effect.filterWindows ? parent.height - placeholderMessage.height - LingmoUI.Units.largeSpacing : parent.height - LingmoUI.Units.largeSpacing
                 queryString: effect.searchText
 
                 onActivated: {

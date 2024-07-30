@@ -10,7 +10,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 import org.kde.ksysguard.faces.private
 import org.kde.ksysguard.formatter
@@ -50,10 +50,10 @@ ChartsControls.Legend {
     Layout.maximumHeight: implicitHeight
     Layout.maximumWidth: parent.width
 
-    horizontalSpacing: Kirigami.Units.gridUnit
-    verticalSpacing: Kirigami.Units.smallSpacing
+    horizontalSpacing: LingmoUI.Units.gridUnit
+    verticalSpacing: LingmoUI.Units.smallSpacing
 
-    maximumDelegateWidth: Kirigami.Units.gridUnit * 15
+    maximumDelegateWidth: LingmoUI.Units.gridUnit * 15
 
     highlightEnabled: sourceModel.sensors.length > 1
 

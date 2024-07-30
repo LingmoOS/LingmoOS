@@ -72,7 +72,7 @@ void InhibitMonitor::beginSuppressingSleep(const QString &reason, bool isSilent)
             m_sleepInhibitionCookie = reply.value();
             if (!isSilent) {
                 qDebug() << "Begin Suppresing sleep signal is used";
-                QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
+                QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
                                                                      QStringLiteral("/org/kde/osdService"),
                                                                      QStringLiteral("org.kde.osdService"),
                                                                      QStringLiteral("powerManagementInhibitedChanged"));
@@ -109,7 +109,7 @@ void InhibitMonitor::stopSuppressingSleep(bool isSilent)
             m_sleepInhibitionCookie.reset();
             if (!isSilent) {
                 qDebug() << "Stop Suppresing sleep signal is used";
-                QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
+                QDBusMessage osdMsg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.lingmoshell"),
                                                                      QStringLiteral("/org/kde/osdService"),
                                                                      QStringLiteral("org.kde.osdService"),
                                                                      QStringLiteral("powerManagementInhibitedChanged"));

@@ -1,4 +1,4 @@
-add_definitions(-DTRANSLATION_DOMAIN=\"plasma_applet_org.kde.kscreen\")
+add_definitions(-DTRANSLATION_DOMAIN=\"lingmo_applet_org.kde.kscreen\")
 
 set(kscreenapplet_SRCS
     kscreenapplet.cpp
@@ -11,9 +11,9 @@ target_link_libraries(org.kde.kscreen
                       Qt::Qml
                       Qt::DBus
                       KF6::I18n
-                      Plasma::Plasma
+                      Lingmo::Lingmo
                       KF6::Screen)
 
-install(TARGETS org.kde.kscreen DESTINATION ${KDE_INSTALL_PLUGINDIR}/plasma/applets)
+install(TARGETS org.kde.kscreen DESTINATION ${KDE_INSTALL_PLUGINDIR}/lingmo/applets)
 
-plasma_install_package(package org.kde.kscreen)
+lingmo_install_package(package org.kde.kscreen)

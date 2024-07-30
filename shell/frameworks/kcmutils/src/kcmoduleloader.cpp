@@ -56,7 +56,7 @@ public:
         QVBoxLayout *topLayout = new QVBoxLayout(widget());
         QLabel *lab = new QLabel(msg, widget());
         {
-            // Similar to Kirigami.Heading: Primary, level 3
+            // Similar to LingmoUI.Heading: Primary, level 3
             QFont font = lab->font();
             font.setPointSizeF(font.pointSizeF() * 1.15);
             font.setBold(true);

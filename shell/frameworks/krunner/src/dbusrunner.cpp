@@ -23,10 +23,10 @@ namespace KRunner
 {
 DBusRunner::DBusRunner(QObject *parent, const KPluginMetaData &data)
     : KRunner::AbstractRunner(parent, data)
-    , m_path(data.value(QStringLiteral("X-Plasma-DBusRunner-Path"), QStringLiteral("/runner")))
-    , m_hasUniqueResults(data.value(QStringLiteral("X-Plasma-Runner-Unique-Results"), false))
-    , m_requestActionsOnce(data.value(QStringLiteral("X-Plasma-Request-Actions-Once"), false))
-    , m_callLifecycleMethods(data.value(QStringLiteral("X-Plasma-API")) == QLatin1String("DBus2"))
+    , m_path(data.value(QStringLiteral("X-Lingmo-DBusRunner-Path"), QStringLiteral("/runner")))
+    , m_hasUniqueResults(data.value(QStringLiteral("X-Lingmo-Runner-Unique-Results"), false))
+    , m_requestActionsOnce(data.value(QStringLiteral("X-Lingmo-Request-Actions-Once"), false))
+    , m_callLifecycleMethods(data.value(QStringLiteral("X-Lingmo-API")) == QLatin1String("DBus2"))
     , m_ifaceName(QStringLiteral("org.kde.krunner1"))
 {
     qDBusRegisterMetaType<RemoteMatch>();
@@ -35,7 +35,7 @@ DBusRunner::DBusRunner(QObject *parent, const KPluginMetaData &data)
     qDBusRegisterMetaType<KRunner::Actions>();
     qDBusRegisterMetaType<RemoteImage>();
 
-    QString requestedServiceName = data.value(QStringLiteral("X-Plasma-DBusRunner-Service"));
+    QString requestedServiceName = data.value(QStringLiteral("X-Lingmo-DBusRunner-Service"));
     if (requestedServiceName.isEmpty() || m_path.isEmpty()) {
         qCWarning(KRUNNER) << "Invalid entry:" << data;
         return;
@@ -80,8 +80,8 @@ DBusRunner::DBusRunner(QObject *parent, const KPluginMetaData &data)
     connect(this, &AbstractRunner::teardown, this, &DBusRunner::teardown);
 
     // Load the runner syntaxes
-    const QStringList syntaxes = data.value(QStringLiteral("X-Plasma-Runner-Syntaxes"), QStringList());
-    const QStringList syntaxDescriptions = data.value(QStringLiteral("X-Plasma-Runner-Syntax-Descriptions"), QStringList());
+    const QStringList syntaxes = data.value(QStringLiteral("X-Lingmo-Runner-Syntaxes"), QStringList());
+    const QStringList syntaxDescriptions = data.value(QStringLiteral("X-Lingmo-Runner-Syntax-Descriptions"), QStringList());
     const int descriptionCount = syntaxDescriptions.count();
     for (int i = 0; i < syntaxes.count(); ++i) {
         const QString &query = syntaxes.at(i);

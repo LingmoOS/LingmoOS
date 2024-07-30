@@ -7,9 +7,9 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.discover as Discover
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
-Kirigami.InlineMessage {
+LingmoUI.InlineMessage {
     id: root
 
     required property Discover.AbstractResource resource
@@ -27,7 +27,7 @@ Kirigami.InlineMessage {
     }
 
     actions: [
-        Kirigami.Action {
+        LingmoUI.Action {
             icon.name: "delete"
             text: i18nd("libdiscover", "Delete settings and user data")
             onTriggered: {

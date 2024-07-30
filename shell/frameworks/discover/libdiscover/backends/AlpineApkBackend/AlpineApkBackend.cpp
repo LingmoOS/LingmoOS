@@ -125,7 +125,7 @@ void AlpineApkBackend::parseAppStreamMetadata()
                     //   package name = "kate" too, bugged metadata?)
                     if (pkg.name == QStringLiteral("kate")) {
                         // qCDebug(LOG_ALPINEAPK) << appsC.packageNames() << appsC.id();
-                        // ^^ ("kate") "org.kde.plasma.katesessions"
+                        // ^^ ("kate") "org.kde.lingmo.katesessions"
                         if (appsC.id() != QStringLiteral("org.kde.kate")) {
                             continue;
                         }

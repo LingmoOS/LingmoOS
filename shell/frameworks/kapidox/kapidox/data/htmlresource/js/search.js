@@ -74,8 +74,8 @@ function search_json(type, json, query)
     $( '#results' ).append(results_html)
 
     document.querySelectorAll('h1, .dynheader, el, #results li a').forEach(h => {
-      h.innerText = h.innerText.replace('org::kde::kirigami::templates::', 'Kirigami.Templates.');
-      h.innerText = h.innerText.replace('org::kde::kirigami::', 'Kirigami.');
+      h.innerText = h.innerText.replace('org::kde::lingmoui::templates::', 'LingmoUI.Templates.');
+      h.innerText = h.innerText.replace('org::kde::lingmoui::', 'LingmoUI.');
     });
 
 }

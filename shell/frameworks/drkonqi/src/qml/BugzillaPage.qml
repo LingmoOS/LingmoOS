@@ -4,11 +4,11 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.lingmoui 2.19 as LingmoUI
 
 import org.kde.drkonqi 1.0
 
-Kirigami.Page {
+LingmoUI.Page {
     id: page
     // This item is intentionally not TITLED. The page should usually not show
     // up when when it shows up it should focus on the bare essentials!
@@ -33,17 +33,17 @@ Kirigami.Page {
         anchors.fill: parent
         visible: page.state === "error"
 
-        Kirigami.InlineMessage {
+        LingmoUI.InlineMessage {
             id: inlineMessage
 
             property string errorContext
 
             Layout.fillWidth: true
-            type: Kirigami.MessageType.Error
+            type: LingmoUI.MessageType.Error
             text: xi18nc("@info", "Failed to contact bugs.kde.org: <message>%1</message>", errorContext)
             visible: true
             actions: [
-                Kirigami.Action {
+                LingmoUI.Action {
                     icon.name: "cloudstatus"
                     text: i18nc("@action", "Retry")
                     onTriggered: {
@@ -55,10 +55,10 @@ Kirigami.Page {
         }
     }
 
-    Kirigami.PlaceholderMessage {
+    LingmoUI.PlaceholderMessage {
         visible: page.state === ""
         anchors.centerIn: parent
-        width: parent.width - (Kirigami.Units.largeSpacing * 4)
+        width: parent.width - (LingmoUI.Units.largeSpacing * 4)
         text: i18nc("@info", "Trying to contact bugs.kde.org...")
 
         QQC2.BusyIndicator {

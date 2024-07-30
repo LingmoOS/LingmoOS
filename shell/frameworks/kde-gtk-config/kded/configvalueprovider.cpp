@@ -36,7 +36,7 @@ ConfigValueProvider::ConfigValueProvider()
     , fontsConfig(KSharedConfig::openConfig(QStringLiteral("kcmfonts")))
     , inputConfig(KSharedConfig::openConfig(QStringLiteral("kcminputrc")))
     , kwinConfig(KSharedConfig::openConfig(QStringLiteral("kwinrc")))
-    , generatedCSDTempPath(QDir::tempPath() + QStringLiteral("/plasma-csd-generator"))
+    , generatedCSDTempPath(QDir::tempPath() + QStringLiteral("/lingmo-csd-generator"))
 {
 }
 
@@ -116,13 +116,13 @@ QString ConfigValueProvider::fontStyleHelper(const QFont &font) const
 QString ConfigValueProvider::iconThemeName() const
 {
     KConfigGroup configGroup = kdeglobalsConfig->group(QStringLiteral("Icons"));
-    return configGroup.readEntry(QStringLiteral("Theme"), QStringLiteral("breeze"));
+    return configGroup.readEntry(QStringLiteral("Theme"), QStringLiteral("ocean"));
 }
 
 QString ConfigValueProvider::cursorThemeName() const
 {
     KConfigGroup configGroup = inputConfig->group(QStringLiteral("Mouse"));
-    return configGroup.readEntry(QStringLiteral("cursorTheme"), QStringLiteral("breeze_cursors"));
+    return configGroup.readEntry(QStringLiteral("cursorTheme"), QStringLiteral("ocean_cursors"));
 }
 
 QString ConfigValueProvider::soundThemeName() const
@@ -209,7 +209,7 @@ QStringList ConfigValueProvider::windowDecorationsButtonsImages() const
     };
 
     KConfigGroup decorationGroup = kwinConfig->group(QStringLiteral("org.kde.kdecoration2"));
-    const QString themeName = decorationGroup.readEntry(QStringLiteral("theme"), QStringLiteral("Breeze"));
+    const QString themeName = decorationGroup.readEntry(QStringLiteral("theme"), QStringLiteral("Ocean"));
 
     auto decorationPainter = DecorationPainter::fromThemeName(themeName);
     QStringList decorationsImages{};
@@ -327,79 +327,79 @@ QMap<QString, QColor> ConfigValueProvider::colors() const
          */
 
         // General Colors
-        {"theme_fg_color_breeze", csc["active"]["window"].foreground(KCS::NormalText).color()},
-        {"theme_bg_color_breeze", csc["active"]["window"].background(KCS::NormalBackground).color()},
-        {"theme_text_color_breeze", csc["active"]["view"].foreground(KCS::NormalText).color()},
-        {"theme_base_color_breeze", csc["active"]["view"].background(KCS::NormalBackground).color()},
-        {"theme_view_hover_decoration_color_breeze", csc["active"]["view"].decoration(KCS::HoverColor).color()},
-        {"theme_hovering_selected_bg_color_breeze", csc["active"]["selection"].decoration(KCS::HoverColor).color()},
-        {"theme_selected_bg_color_breeze", csc["active"]["selection"].background(KCS::NormalBackground).color()},
-        {"theme_selected_fg_color_breeze", csc["active"]["selection"].foreground(KCS::NormalText).color()},
-        {"theme_view_active_decoration_color_breeze", csc["active"]["view"].decoration(KCS::HoverColor).color()},
+        {"theme_fg_color_ocean", csc["active"]["window"].foreground(KCS::NormalText).color()},
+        {"theme_bg_color_ocean", csc["active"]["window"].background(KCS::NormalBackground).color()},
+        {"theme_text_color_ocean", csc["active"]["view"].foreground(KCS::NormalText).color()},
+        {"theme_base_color_ocean", csc["active"]["view"].background(KCS::NormalBackground).color()},
+        {"theme_view_hover_decoration_color_ocean", csc["active"]["view"].decoration(KCS::HoverColor).color()},
+        {"theme_hovering_selected_bg_color_ocean", csc["active"]["selection"].decoration(KCS::HoverColor).color()},
+        {"theme_selected_bg_color_ocean", csc["active"]["selection"].background(KCS::NormalBackground).color()},
+        {"theme_selected_fg_color_ocean", csc["active"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_view_active_decoration_color_ocean", csc["active"]["view"].decoration(KCS::HoverColor).color()},
 
         // Button Colors
-        {"theme_button_background_normal_breeze", csc["active"]["button"].background(KCS::NormalBackground).color()},
-        {"theme_button_decoration_hover_breeze", csc["active"]["button"].decoration(KCS::HoverColor).color()},
-        {"theme_button_decoration_focus_breeze", csc["active"]["button"].decoration(KCS::FocusColor).color()},
-        {"theme_button_foreground_normal_breeze", csc["active"]["button"].foreground(KCS::NormalText).color()},
-        {"theme_button_foreground_active_breeze", csc["active"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_button_background_normal_ocean", csc["active"]["button"].background(KCS::NormalBackground).color()},
+        {"theme_button_decoration_hover_ocean", csc["active"]["button"].decoration(KCS::HoverColor).color()},
+        {"theme_button_decoration_focus_ocean", csc["active"]["button"].decoration(KCS::FocusColor).color()},
+        {"theme_button_foreground_normal_ocean", csc["active"]["button"].foreground(KCS::NormalText).color()},
+        {"theme_button_foreground_active_ocean", csc["active"]["selection"].foreground(KCS::NormalText).color()},
 
         // Misc Colors
-        {"borders_breeze", bordersColor},
-        {"warning_color_breeze", csc["active"]["view"].foreground(KCS::NeutralText).color()},
-        {"success_color_breeze", csc["active"]["view"].foreground(KCS::PositiveText).color()},
-        {"error_color_breeze", csc["active"]["view"].foreground(KCS::NegativeText).color()},
+        {"borders_ocean", bordersColor},
+        {"warning_color_ocean", csc["active"]["view"].foreground(KCS::NeutralText).color()},
+        {"success_color_ocean", csc["active"]["view"].foreground(KCS::PositiveText).color()},
+        {"error_color_ocean", csc["active"]["view"].foreground(KCS::NegativeText).color()},
 
         /*
          * Backdrop (Inactive)
          */
 
         // General
-        {"theme_unfocused_fg_color_breeze", csc["inactive"]["window"].foreground(KCS::NormalText).color()},
-        {"theme_unfocused_text_color_breeze", csc["inactive"]["view"].foreground(KCS::NormalText).color()},
-        {"theme_unfocused_bg_color_breeze", csc["inactive"]["window"].background(KCS::NormalBackground).color()},
-        {"theme_unfocused_base_color_breeze", csc["inactive"]["view"].background(KCS::NormalBackground).color()},
-        {"theme_unfocused_selected_bg_color_alt_breeze", csc["inactive"]["selection"].background(KCS::NormalBackground).color()},
-        {"theme_unfocused_selected_bg_color_breeze", csc["inactive"]["selection"].background(KCS::NormalBackground).color()},
-        {"theme_unfocused_selected_fg_color_breeze", csc["inactive"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_unfocused_fg_color_ocean", csc["inactive"]["window"].foreground(KCS::NormalText).color()},
+        {"theme_unfocused_text_color_ocean", csc["inactive"]["view"].foreground(KCS::NormalText).color()},
+        {"theme_unfocused_bg_color_ocean", csc["inactive"]["window"].background(KCS::NormalBackground).color()},
+        {"theme_unfocused_base_color_ocean", csc["inactive"]["view"].background(KCS::NormalBackground).color()},
+        {"theme_unfocused_selected_bg_color_alt_ocean", csc["inactive"]["selection"].background(KCS::NormalBackground).color()},
+        {"theme_unfocused_selected_bg_color_ocean", csc["inactive"]["selection"].background(KCS::NormalBackground).color()},
+        {"theme_unfocused_selected_fg_color_ocean", csc["inactive"]["selection"].foreground(KCS::NormalText).color()},
 
         // Button
-        {"theme_button_background_backdrop_breeze", csc["inactive"]["button"].background(KCS::NormalBackground).color()},
-        {"theme_button_decoration_hover_backdrop_breeze", csc["inactive"]["button"].decoration(KCS::HoverColor).color()},
-        {"theme_button_decoration_focus_backdrop_breeze", csc["inactive"]["button"].decoration(KCS::FocusColor).color()},
-        {"theme_button_foreground_backdrop_breeze", csc["inactive"]["button"].foreground(KCS::NormalText).color()},
-        {"theme_button_foreground_active_backdrop_breeze", csc["inactive"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_button_background_backdrop_ocean", csc["inactive"]["button"].background(KCS::NormalBackground).color()},
+        {"theme_button_decoration_hover_backdrop_ocean", csc["inactive"]["button"].decoration(KCS::HoverColor).color()},
+        {"theme_button_decoration_focus_backdrop_ocean", csc["inactive"]["button"].decoration(KCS::FocusColor).color()},
+        {"theme_button_foreground_backdrop_ocean", csc["inactive"]["button"].foreground(KCS::NormalText).color()},
+        {"theme_button_foreground_active_backdrop_ocean", csc["inactive"]["selection"].foreground(KCS::NormalText).color()},
 
         // Misc Colors
-        {"unfocused_borders_breeze", inactiveBordersColor},
-        {"warning_color_backdrop_breeze", csc["inactive"]["view"].foreground(KCS::NeutralText).color()},
-        {"success_color_backdrop_breeze", csc["inactive"]["view"].foreground(KCS::PositiveText).color()},
-        {"error_color_backdrop_breeze", csc["inactive"]["view"].foreground(KCS::NegativeText).color()},
+        {"unfocused_borders_ocean", inactiveBordersColor},
+        {"warning_color_backdrop_ocean", csc["inactive"]["view"].foreground(KCS::NeutralText).color()},
+        {"success_color_backdrop_ocean", csc["inactive"]["view"].foreground(KCS::PositiveText).color()},
+        {"error_color_backdrop_ocean", csc["inactive"]["view"].foreground(KCS::NegativeText).color()},
 
         /*
          * Insensitive (Disabled)
          */
 
         // General
-        {"insensitive_fg_color_breeze", csc["disabled"]["window"].foreground(KCS::NormalText).color()},
-        {"insensitive_base_fg_color_breeze", csc["disabled"]["view"].foreground(KCS::NormalText).color()},
-        {"insensitive_bg_color_breeze", csc["disabled"]["window"].background(KCS::NormalBackground).color()},
-        {"insensitive_base_color_breeze", csc["disabled"]["view"].background(KCS::NormalBackground).color()},
-        {"insensitive_selected_bg_color_breeze", csc["disabled"]["selection"].background(KCS::NormalBackground).color()},
-        {"insensitive_selected_fg_color_breeze", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
+        {"insensitive_fg_color_ocean", csc["disabled"]["window"].foreground(KCS::NormalText).color()},
+        {"insensitive_base_fg_color_ocean", csc["disabled"]["view"].foreground(KCS::NormalText).color()},
+        {"insensitive_bg_color_ocean", csc["disabled"]["window"].background(KCS::NormalBackground).color()},
+        {"insensitive_base_color_ocean", csc["disabled"]["view"].background(KCS::NormalBackground).color()},
+        {"insensitive_selected_bg_color_ocean", csc["disabled"]["selection"].background(KCS::NormalBackground).color()},
+        {"insensitive_selected_fg_color_ocean", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
 
         // Button
-        {"theme_button_background_insensitive_breeze", csc["disabled"]["button"].background(KCS::NormalBackground).color()},
-        {"theme_button_decoration_hover_insensitive_breeze", csc["disabled"]["button"].decoration(KCS::HoverColor).color()},
-        {"theme_button_decoration_focus_insensitive_breeze", csc["disabled"]["button"].decoration(KCS::FocusColor).color()},
-        {"theme_button_foreground_insensitive_breeze", csc["disabled"]["button"].foreground(KCS::NormalText).color()},
-        {"theme_button_foreground_active_insensitive_breeze", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_button_background_insensitive_ocean", csc["disabled"]["button"].background(KCS::NormalBackground).color()},
+        {"theme_button_decoration_hover_insensitive_ocean", csc["disabled"]["button"].decoration(KCS::HoverColor).color()},
+        {"theme_button_decoration_focus_insensitive_ocean", csc["disabled"]["button"].decoration(KCS::FocusColor).color()},
+        {"theme_button_foreground_insensitive_ocean", csc["disabled"]["button"].foreground(KCS::NormalText).color()},
+        {"theme_button_foreground_active_insensitive_ocean", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
 
         // Misc Colors
-        {"insensitive_borders_breeze", disabledBordersColor},
-        {"warning_color_insensitive_breeze", csc["disabled"]["view"].foreground(KCS::NeutralText).color()},
-        {"success_color_insensitive_breeze", csc["disabled"]["view"].foreground(KCS::PositiveText).color()},
-        {"error_color_insensitive_breeze", csc["disabled"]["view"].foreground(KCS::NegativeText).color()},
+        {"insensitive_borders_ocean", disabledBordersColor},
+        {"warning_color_insensitive_ocean", csc["disabled"]["view"].foreground(KCS::NeutralText).color()},
+        {"success_color_insensitive_ocean", csc["disabled"]["view"].foreground(KCS::PositiveText).color()},
+        {"error_color_insensitive_ocean", csc["disabled"]["view"].foreground(KCS::NegativeText).color()},
 
         /*
          * Insensitive Backdrop (Inactive Disabled)
@@ -408,76 +408,76 @@ QMap<QString, QColor> ConfigValueProvider::colors() const
          */
 
         // General
-        {"insensitive_unfocused_fg_color_breeze", csc["disabled"]["window"].foreground(KCS::NormalText).color()},
-        {"theme_unfocused_view_text_color_breeze", csc["disabled"]["view"].foreground(KCS::NormalText).color()},
-        {"insensitive_unfocused_bg_color_breeze", csc["disabled"]["window"].background(KCS::NormalBackground).color()},
-        {"theme_unfocused_view_bg_color_breeze", csc["disabled"]["view"].background(KCS::NormalBackground).color()},
-        {"insensitive_unfocused_selected_bg_color_breeze", csc["disabled"]["selection"].background(KCS::NormalBackground).color()},
-        {"insensitive_unfocused_selected_fg_color_breeze", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
+        {"insensitive_unfocused_fg_color_ocean", csc["disabled"]["window"].foreground(KCS::NormalText).color()},
+        {"theme_unfocused_view_text_color_ocean", csc["disabled"]["view"].foreground(KCS::NormalText).color()},
+        {"insensitive_unfocused_bg_color_ocean", csc["disabled"]["window"].background(KCS::NormalBackground).color()},
+        {"theme_unfocused_view_bg_color_ocean", csc["disabled"]["view"].background(KCS::NormalBackground).color()},
+        {"insensitive_unfocused_selected_bg_color_ocean", csc["disabled"]["selection"].background(KCS::NormalBackground).color()},
+        {"insensitive_unfocused_selected_fg_color_ocean", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
 
         // Button
-        {"theme_button_background_backdrop_insensitive_breeze", csc["disabled"]["button"].background(KCS::NormalBackground).color()},
-        {"theme_button_decoration_hover_backdrop_insensitive_breeze", csc["disabled"]["button"].decoration(KCS::HoverColor).color()},
-        {"theme_button_decoration_focus_backdrop_insensitive_breeze", csc["disabled"]["button"].decoration(KCS::FocusColor).color()},
-        {"theme_button_foreground_backdrop_insensitive_breeze", csc["disabled"]["button"].foreground(KCS::NormalText).color()},
-        {"theme_button_foreground_active_backdrop_insensitive_breeze", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
+        {"theme_button_background_backdrop_insensitive_ocean", csc["disabled"]["button"].background(KCS::NormalBackground).color()},
+        {"theme_button_decoration_hover_backdrop_insensitive_ocean", csc["disabled"]["button"].decoration(KCS::HoverColor).color()},
+        {"theme_button_decoration_focus_backdrop_insensitive_ocean", csc["disabled"]["button"].decoration(KCS::FocusColor).color()},
+        {"theme_button_foreground_backdrop_insensitive_ocean", csc["disabled"]["button"].foreground(KCS::NormalText).color()},
+        {"theme_button_foreground_active_backdrop_insensitive_ocean", csc["disabled"]["selection"].foreground(KCS::NormalText).color()},
 
         // Misc Colors
-        {"unfocused_insensitive_borders_breeze", unfocusedDisabledBordersColor},
-        {"warning_color_insensitive_backdrop_breeze", csc["disabled"]["view"].foreground(KCS::NeutralText).color()},
-        {"success_color_insensitive_backdrop_breeze", csc["disabled"]["view"].foreground(KCS::PositiveText).color()},
-        {"error_color_insensitive_backdrop_breeze", csc["disabled"]["view"].foreground(KCS::NegativeText).color()},
+        {"unfocused_insensitive_borders_ocean", unfocusedDisabledBordersColor},
+        {"warning_color_insensitive_backdrop_ocean", csc["disabled"]["view"].foreground(KCS::NeutralText).color()},
+        {"success_color_insensitive_backdrop_ocean", csc["disabled"]["view"].foreground(KCS::PositiveText).color()},
+        {"error_color_insensitive_backdrop_ocean", csc["disabled"]["view"].foreground(KCS::NegativeText).color()},
 
         /*
          * Ignorant Colors (These colors do not care about backdrop or insensitive states)
          */
 
-        {"link_color_breeze", csc["active"]["view"].foreground(KCS::LinkText).color()},
-        {"link_visited_color_breeze", csc["active"]["view"].foreground(KCS::VisitedText).color()},
+        {"link_color_ocean", csc["active"]["view"].foreground(KCS::LinkText).color()},
+        {"link_visited_color_ocean", csc["active"]["view"].foreground(KCS::VisitedText).color()},
 
-        {"tooltip_text_breeze", tooltipForegroundColor},
-        {"tooltip_background_breeze", tooltipBackgroundColor},
-        {"tooltip_border_breeze", tooltipBorderColor},
+        {"tooltip_text_ocean", tooltipForegroundColor},
+        {"tooltip_background_ocean", tooltipBackgroundColor},
+        {"tooltip_border_ocean", tooltipBorderColor},
 
-        {"content_view_bg_breeze", csc["active"]["view"].background(KCS::NormalBackground).color()},
+        {"content_view_bg_ocean", csc["active"]["view"].background(KCS::NormalBackground).color()},
 
     };
     // Handle Headers (menu bars and some of toolbars)
     if (KCS::isColorSetSupported(kdeglobalsConfig, KCS::Header)) {
         // If we have a separate Header color set, use it for both titlebar and header coloring...
-        result.insert({{"theme_header_background_breeze", csc["active"]["header"].background().color()},
-                       {"theme_header_foreground_breeze", csc["active"]["header"].foreground().color()},
-                       {"theme_header_background_light_breeze", csc["active"]["window"].background().color()},
-                       {"theme_header_foreground_backdrop_breeze", csc["inactive"]["header"].foreground().color()},
-                       {"theme_header_background_backdrop_breeze", csc["inactive"]["header"].background().color()},
-                       {"theme_header_foreground_insensitive_breeze", csc["inactive"]["header"].foreground().color()},
-                       {"theme_header_foreground_insensitive_backdrop_breeze", csc["inactive"]["header"].foreground().color()},
+        result.insert({{"theme_header_background_ocean", csc["active"]["header"].background().color()},
+                       {"theme_header_foreground_ocean", csc["active"]["header"].foreground().color()},
+                       {"theme_header_background_light_ocean", csc["active"]["window"].background().color()},
+                       {"theme_header_foreground_backdrop_ocean", csc["inactive"]["header"].foreground().color()},
+                       {"theme_header_background_backdrop_ocean", csc["inactive"]["header"].background().color()},
+                       {"theme_header_foreground_insensitive_ocean", csc["inactive"]["header"].foreground().color()},
+                       {"theme_header_foreground_insensitive_backdrop_ocean", csc["inactive"]["header"].foreground().color()},
 
-                       {"theme_titlebar_background_breeze", csc["active"]["header"].background().color()},
-                       {"theme_titlebar_foreground_breeze", csc["active"]["header"].foreground().color()},
-                       {"theme_titlebar_background_light_breeze", csc["active"]["window"].background().color()},
-                       {"theme_titlebar_foreground_backdrop_breeze", csc["inactive"]["header"].foreground().color()},
-                       {"theme_titlebar_background_backdrop_breeze", csc["inactive"]["header"].background().color()},
-                       {"theme_titlebar_foreground_insensitive_breeze", csc["inactive"]["header"].foreground().color()},
-                       {"theme_titlebar_foreground_insensitive_backdrop_breeze", csc["inactive"]["header"].foreground().color()}});
+                       {"theme_titlebar_background_ocean", csc["active"]["header"].background().color()},
+                       {"theme_titlebar_foreground_ocean", csc["active"]["header"].foreground().color()},
+                       {"theme_titlebar_background_light_ocean", csc["active"]["window"].background().color()},
+                       {"theme_titlebar_foreground_backdrop_ocean", csc["inactive"]["header"].foreground().color()},
+                       {"theme_titlebar_background_backdrop_ocean", csc["inactive"]["header"].background().color()},
+                       {"theme_titlebar_foreground_insensitive_ocean", csc["inactive"]["header"].foreground().color()},
+                       {"theme_titlebar_foreground_insensitive_backdrop_ocean", csc["inactive"]["header"].foreground().color()}});
     } else {
         //... if we don't we'll use regular window colors for headerbar and WM group for a titlebar
         result.insert({
-            {"theme_header_background_breeze", csc["active"]["window"].background().color()},
-            {"theme_header_foreground_breeze", csc["active"]["window"].foreground().color()},
-            {"theme_header_background_light_breeze", csc["active"]["window"].background().color()},
-            {"theme_header_foreground_backdrop_breeze", csc["inactive"]["window"].foreground().color()},
-            {"theme_header_background_backdrop_breeze", csc["inactive"]["window"].background().color()},
-            {"theme_header_foreground_insensitive_breeze", csc["inactive"]["window"].foreground().color()},
-            {"theme_header_foreground_insensitive_backdrop_breeze", csc["inactive"]["window"].foreground().color()},
+            {"theme_header_background_ocean", csc["active"]["window"].background().color()},
+            {"theme_header_foreground_ocean", csc["active"]["window"].foreground().color()},
+            {"theme_header_background_light_ocean", csc["active"]["window"].background().color()},
+            {"theme_header_foreground_backdrop_ocean", csc["inactive"]["window"].foreground().color()},
+            {"theme_header_background_backdrop_ocean", csc["inactive"]["window"].background().color()},
+            {"theme_header_foreground_insensitive_ocean", csc["inactive"]["window"].foreground().color()},
+            {"theme_header_foreground_insensitive_backdrop_ocean", csc["inactive"]["window"].foreground().color()},
 
-            {"theme_titlebar_background_breeze", windowManagerConfig.readEntry("activeBackground", QColor())},
-            {"theme_titlebar_foreground_breeze", windowManagerConfig.readEntry("activeForeground", QColor())},
-            {"theme_titlebar_background_light_breeze", csc["active"]["window"].background(KCS::NormalBackground).color()},
-            {"theme_titlebar_foreground_backdrop_breeze", windowManagerConfig.readEntry("inactiveForeground", QColor())},
-            {"theme_titlebar_background_backdrop_breeze", windowManagerConfig.readEntry("inactiveBackground", QColor())},
-            {"theme_titlebar_foreground_insensitive_breeze", windowManagerConfig.readEntry("inactiveForeground", QColor())},
-            {"theme_titlebar_foreground_insensitive_backdrop_breeze", windowManagerConfig.readEntry("inactiveForeground", QColor())},
+            {"theme_titlebar_background_ocean", windowManagerConfig.readEntry("activeBackground", QColor())},
+            {"theme_titlebar_foreground_ocean", windowManagerConfig.readEntry("activeForeground", QColor())},
+            {"theme_titlebar_background_light_ocean", csc["active"]["window"].background(KCS::NormalBackground).color()},
+            {"theme_titlebar_foreground_backdrop_ocean", windowManagerConfig.readEntry("inactiveForeground", QColor())},
+            {"theme_titlebar_background_backdrop_ocean", windowManagerConfig.readEntry("inactiveBackground", QColor())},
+            {"theme_titlebar_foreground_insensitive_ocean", windowManagerConfig.readEntry("inactiveForeground", QColor())},
+            {"theme_titlebar_foreground_insensitive_backdrop_ocean", windowManagerConfig.readEntry("inactiveForeground", QColor())},
         });
     }
 

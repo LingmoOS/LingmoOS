@@ -42,10 +42,10 @@
 
 inline QList<KPluginMetaData> findKCMsMetaData()
 {
-    QList<KPluginMetaData> metaDataList = KPluginMetaData::findPlugins(QStringLiteral("plasma/kcms"));
-    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("plasma/kcms/systemsettings"));
-    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("plasma/kcms/systemsettings_qwidgets"));
-    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("plasma/kcms/kinfocenter"));
+    QList<KPluginMetaData> metaDataList = KPluginMetaData::findPlugins(QStringLiteral("lingmo/kcms"));
+    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("lingmo/kcms/systemsettings"));
+    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("lingmo/kcms/systemsettings_qwidgets"));
+    metaDataList << KPluginMetaData::findPlugins(QStringLiteral("lingmo/kcms/kinfocenter"));
     return metaDataList;
 }
 

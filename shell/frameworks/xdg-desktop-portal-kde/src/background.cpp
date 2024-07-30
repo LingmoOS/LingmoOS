@@ -29,22 +29,22 @@
 #include <KService>
 #include <KShell>
 
-#include <KWayland/Client/plasmawindowmanagement.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
 
 BackgroundPortal::BackgroundPortal(QObject *parent, QDBusContext *context)
     : QDBusAbstractAdaptor(parent)
     , m_context(context)
 {
-    connect(WaylandIntegration::waylandIntegration(), &WaylandIntegration::WaylandIntegration::plasmaWindowManagementInitialized, this, [this]() {
-        connect(WaylandIntegration::plasmaWindowManagement(),
-                &KWayland::Client::PlasmaWindowManagement::windowCreated,
+    connect(WaylandIntegration::waylandIntegration(), &WaylandIntegration::WaylandIntegration::lingmoWindowManagementInitialized, this, [this]() {
+        connect(WaylandIntegration::lingmoWindowManagement(),
+                &KWayland::Client::LingmoWindowManagement::windowCreated,
                 this,
-                [this](KWayland::Client::PlasmaWindow *window) {
+                [this](KWayland::Client::LingmoWindow *window) {
                     addWindow(window);
                 });
 
-        m_windows = WaylandIntegration::plasmaWindowManagement()->windows();
-        for (KWayland::Client::PlasmaWindow *window : std::as_const(m_windows)) {
+        m_windows = WaylandIntegration::lingmoWindowManagement()->windows();
+        for (KWayland::Client::LingmoWindow *window : std::as_const(m_windows)) {
             addWindow(window);
         }
     });
@@ -69,9 +69,9 @@ uint BackgroundPortal::NotifyBackground(const QDBusObjectPath &handle, const QSt
     qCDebug(XdgDesktopPortalKdeBackground) << "    app_id: " << app_id;
     qCDebug(XdgDesktopPortalKdeBackground) << "    name: " << name;
 
-    // If KWayland::Client::PlasmaWindowManagement hasn't been created, we would be notified about every
+    // If KWayland::Client::LingmoWindowManagement hasn't been created, we would be notified about every
     // application, which is not what we want. This will be mostly happening on X11 session.
-    if (!WaylandIntegration::plasmaWindowManagement()) {
+    if (!WaylandIntegration::lingmoWindowManagement()) {
         results.insert(QStringLiteral("result"), static_cast<uint>(BackgroundPortal::AllowOnce));
         return 0;
     }
@@ -230,20 +230,20 @@ bool BackgroundPortal::EnableAutostart(const QString &app_id, bool enable, const
     return true;
 }
 
-void BackgroundPortal::addWindow(KWayland::Client::PlasmaWindow *window)
+void BackgroundPortal::addWindow(KWayland::Client::LingmoWindow *window)
 {
     const QString appId = window->appId();
     const bool isActive = window->isActive();
     m_appStates[appId] = QVariant::fromValue<uint>(isActive ? Active : Running);
 
-    connect(window, &KWayland::Client::PlasmaWindow::activeChanged, this, [this, window]() {
+    connect(window, &KWayland::Client::LingmoWindow::activeChanged, this, [this, window]() {
         setActiveWindow(window->appId(), window->isActive());
     });
-    connect(window, &KWayland::Client::PlasmaWindow::unmapped, this, [this, window]() {
+    connect(window, &KWayland::Client::LingmoWindow::unmapped, this, [this, window]() {
         uint windows = 0;
         const QString appId = window->appId();
-        const auto plasmaWindows = WaylandIntegration::plasmaWindowManagement()->windows();
-        for (KWayland::Client::PlasmaWindow *otherWindow : plasmaWindows) {
+        const auto lingmoWindows = WaylandIntegration::lingmoWindowManagement()->windows();
+        for (KWayland::Client::LingmoWindow *otherWindow : lingmoWindows) {
             if (otherWindow->appId() == appId && otherWindow->uuid() != window->uuid()) {
                 windows++;
             }

@@ -4,7 +4,7 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.15 as Kirigami
+import org.kde.lingmoui 2.15 as LingmoUI
 import QtQuick.Controls 2.15 as Controls
 import QtMultimedia
 
@@ -40,12 +40,12 @@ Item {
     Rectangle {
         width: parent.width
         height: parent.height
-        color: Qt.rgba(Kirigami.Theme.backgroundColor.r, Kirigami.Theme.backgroundColor.g, Kirigami.Theme.backgroundColor.b, 0.6)
+        color: Qt.rgba(LingmoUI.Theme.backgroundColor.r, LingmoUI.Theme.backgroundColor.g, LingmoUI.Theme.backgroundColor.b, 0.6)
         y: opened ? 0 : parent.height
 
         Behavior on y {
             YAnimator {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -53,12 +53,12 @@ Item {
         RowLayout {
             id: mainOSDLayout
             anchors.fill: parent
-            anchors.margins: Kirigami.Units.largeSpacing
+            anchors.margins: LingmoUI.Units.largeSpacing
 
             OSDButton {
                 id: menuButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "menu_new"
                 KeyNavigation.right: playPauseButton
 
@@ -69,8 +69,8 @@ Item {
 
             OSDButton {
                 id: playPauseButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: videoItem.playbackState === MediaPlayer.PlayingState ? "media-playback-pause"  : "media-playback-start"
                 KeyNavigation.right: mediaSkipBckButton
                 KeyNavigation.left: menuButton
@@ -82,8 +82,8 @@ Item {
 
             OSDButton {
                 id: mediaSkipBckButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "media-seek-backward"
                 KeyNavigation.right: mediaSkipFwdButton
                 KeyNavigation.left: playPauseButton
@@ -95,8 +95,8 @@ Item {
 
             OSDButton {
                 id: mediaSkipFwdButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "media-seek-forward"
                 KeyNavigation.right: osdSeekBar
                 KeyNavigation.left: mediaSkipBckButton
@@ -118,8 +118,8 @@ Item {
 
             OSDButton {
                 id: pinOsdButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "unlock"
                 KeyNavigation.right: fitVidOsdButton
                 KeyNavigation.left: osdSeekBar
@@ -138,8 +138,8 @@ Item {
 
             OSDButton {
                 id: fitVidOsdButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "zoom-fit-best"
                 checkable: true
                 KeyNavigation.right: exitPlayerButton
@@ -156,8 +156,8 @@ Item {
 
             OSDButton {
                 id: exitPlayerButton
-                Layout.maximumWidth: Kirigami.Units.iconSizes.large
-                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.maximumWidth: LingmoUI.Units.iconSizes.large
+                Layout.preferredHeight: LingmoUI.Units.iconSizes.large
                 iconSource: "window-close"
                 KeyNavigation.left: fitVidOsdButton
 

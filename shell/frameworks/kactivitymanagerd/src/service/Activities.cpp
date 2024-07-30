@@ -472,7 +472,7 @@ bool Activities::NextActivity()
 QString Activities::AddActivity(const QString &name)
 {
     // We do not care about authorization if this is the first start
-    if (!d->activities.isEmpty() && !KAuthorized::authorize(QStringLiteral("plasma-desktop/add_activities"))) {
+    if (!d->activities.isEmpty() && !KAuthorized::authorize(QStringLiteral("lingmo-desktop/add_activities"))) {
         return QString();
     }
 
@@ -481,7 +481,7 @@ QString Activities::AddActivity(const QString &name)
 
 void Activities::RemoveActivity(const QString &activity)
 {
-    if (!KAuthorized::authorize(QStringLiteral("plasma-desktop/add_activities"))) {
+    if (!KAuthorized::authorize(QStringLiteral("lingmo-desktop/add_activities"))) {
         return;
     }
 

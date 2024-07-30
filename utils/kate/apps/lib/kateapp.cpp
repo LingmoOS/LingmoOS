@@ -193,11 +193,11 @@ KateApp::KateApp(const QCommandLineParser &args, const ApplicationMode mode, con
     KStyleManager::initStyle();
 #else
     /**
-     * For Windows and macOS: use Breeze if available
+     * For Windows and macOS: use Ocean if available
      * Of all tested styles that works the best for us
      */
 #if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
-    QApplication::setStyle(QStringLiteral("breeze"));
+    QApplication::setStyle(QStringLiteral("ocean"));
 #endif
 #endif
 
@@ -220,7 +220,7 @@ KateApp::KateApp(const QCommandLineParser &args, const ApplicationMode mode, con
 
 #ifdef WITH_KUSERFEEDBACK
     /**
-     * defaults, inspired by plasma
+     * defaults, inspired by lingmo
      * important: choose between kate and kwrite mode here to submit the right product id
      */
     m_userFeedbackProvider.setProductIdentifier(isKate() ? QStringLiteral("org.kde.kate") : QStringLiteral("org.kde.kwrite"));

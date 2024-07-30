@@ -6,10 +6,10 @@
 
 import QtQuick
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.pipewire 0.1 as PipeWire
 
-Kirigami.Card {
+LingmoUI.Card {
     id: card
 
     property alias nodeId: pipeWireSourceItem.nodeId
@@ -18,12 +18,12 @@ Kirigami.Card {
 
     contentItem: PipeWire.PipeWireSourceItem {
         id: pipeWireSourceItem
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 7
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+        Layout.preferredHeight: LingmoUI.Units.gridUnit * 7
+        Layout.preferredWidth: LingmoUI.Units.gridUnit * 7
         Layout.fillWidth: true
         Layout.fillHeight: true
 
-        Kirigami.Icon {
+        LingmoUI.Icon {
             anchors.fill: parent
             visible: pipeWireSourceItem.nodeId === 0
             source: card.banner.titleIcon

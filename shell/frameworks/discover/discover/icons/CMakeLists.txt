@@ -1,11 +1,11 @@
 ecm_install_icons(
     ICONS
-        128-apps-plasmadiscover.png
-        16-apps-plasmadiscover.png
-        22-apps-plasmadiscover.png
-        32-apps-plasmadiscover.png
-        48-apps-plasmadiscover.png
-        sc-apps-plasmadiscover.svg
+        128-apps-lingmodiscover.png
+        16-apps-lingmodiscover.png
+        22-apps-lingmodiscover.png
+        32-apps-lingmodiscover.png
+        48-apps-lingmodiscover.png
+        sc-apps-lingmodiscover.svg
     DESTINATION ${KDE_INSTALL_ICONDIR}
     THEME hicolor
 )

@@ -11,7 +11,7 @@
  * This component is equivalent to the old Button component, but functions in more modern applications
  *
  * The following is a simple example of how to use this Action to show wallpapers from the KDE Store, on a
- * system where Plasma has been installed (and consequently the wallpaper knsrc file is available). This also
+ * system where Lingmo has been installed (and consequently the wallpaper knsrc file is available). This also
  * shows how to make the action push a page to a pageStack rather than opening a dialog:
  *
 \code{.qml}
@@ -37,10 +37,10 @@ NewStuff.Action {
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.newstuff as NewStuff
 
-Kirigami.Action {
+LingmoUI.Action {
     id: component
 
     /*
@@ -137,7 +137,7 @@ Kirigami.Action {
             if (NewStuff.Settings.allowedByKiosk) {
                 if (component.pageStack !== null) {
                     if (component._private.pageItem // If we already have a page created...
-                        && (component.pageStack.columnView !== undefined // first make sure that this pagestack is a Kirigami-style one (otherwise just assume we're ok)
+                        && (component.pageStack.columnView !== undefined // first make sure that this pagestack is a LingmoUI-style one (otherwise just assume we're ok)
                             && component.pageStack.columnView.contains(component._private.pageItem))) // and then check if the page is still in the stack before attempting to...
                     {
                         // ...set the already existing page as the current page

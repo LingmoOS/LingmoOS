@@ -5,7 +5,7 @@
  */
 
 import QtQuick
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
 Loader {
@@ -15,11 +15,11 @@ Loader {
 
     active: inlineMessage !== null
 
-    sourceComponent: Kirigami.InlineMessage {
+    sourceComponent: LingmoUI.InlineMessage {
         text: root.inlineMessage.message
         type: root.inlineMessage.type
         icon.name: root.inlineMessage.iconName
-        position: Kirigami.InlineMessage.Position.Header
+        position: LingmoUI.InlineMessage.Position.Header
 
         Component {
             id: component

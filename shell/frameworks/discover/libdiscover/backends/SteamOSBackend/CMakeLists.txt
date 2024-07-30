@@ -20,7 +20,7 @@ qt_add_dbus_interface(steamos-backend_SRCS org.freedesktop.DBus.Properties.xml d
 ecm_qt_declare_logging_category(steamos-backend_SRCS
     HEADER libdiscover_steamos_debug.h
     IDENTIFIER LIBDISCOVER_BACKEND_STEAMOS_LOG
-    CATEGORY_NAME org.kde.plasma.libdiscover.backend.steamos
+    CATEGORY_NAME org.kde.lingmo.libdiscover.backend.steamos
     DESCRIPTION "libdiscover (backend - SteamOS)"
     EXPORT DISCOVER
 )

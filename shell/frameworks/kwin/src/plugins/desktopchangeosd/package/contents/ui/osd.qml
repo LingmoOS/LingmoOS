@@ -8,12 +8,12 @@
 */
 import QtQuick
 import QtQuick.Window
-import org.kde.plasma.core as PlasmaCore
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.lingmo.core as LingmoCore
+import org.kde.lingmoui 2.20 as LingmoUI
 import org.kde.ksvg 1.0 as KSvg
 import org.kde.kwin
 
-PlasmaCore.Window {
+LingmoCore.Window {
     id: dialog
     visible: false
     flags: Qt.X11BypassWindowManagerHint | Qt.FramelessWindowHint
@@ -42,7 +42,7 @@ PlasmaCore.Window {
         implicitWidth: dialogItem.showGrid ? view.itemWidth * view.columns : Math.ceil(textElement.implicitWidth)
         implicitHeight: dialogItem.showGrid ? view.itemHeight * view.rows + textElement.implicitHeight : textElement.implicitHeight
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             id: textElement
             anchors.top: dialogItem.showGrid ? parent.top : undefined
             anchors.left: parent.left
@@ -90,12 +90,12 @@ PlasmaCore.Window {
                     Item {
                         id: arrowsContainer
                         anchors.fill: parent
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             anchors.fill: parent
                             source: "go-up"
                             visible: false
                         }
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             anchors.fill: parent
                             source: "go-down"
                             visible: {
@@ -121,7 +121,7 @@ PlasmaCore.Window {
                                 return false;
                             }
                         }
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             anchors.fill: parent
                             source: "go-up"
                             visible: {
@@ -147,7 +147,7 @@ PlasmaCore.Window {
                                 return false;
                             }
                         }
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             anchors.fill: parent
                             source: "go-next"
                             visible: {
@@ -181,7 +181,7 @@ PlasmaCore.Window {
                                 return false;
                             }
                         }
-                        Kirigami.Icon {
+                        LingmoUI.Icon {
                             anchors.fill: parent
                             source: "go-previous"
                             visible: {

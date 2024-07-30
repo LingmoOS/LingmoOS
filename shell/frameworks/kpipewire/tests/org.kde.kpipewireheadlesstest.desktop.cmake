@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=PlasmaHeadlessTest
+Name=LingmoHeadlessTest
 Exec=@CMAKE_INSTALL_PREFIX@/bin/kpipewireheadlesstest
 Icon=camera-video
 Type=Application

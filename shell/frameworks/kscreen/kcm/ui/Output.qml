@@ -8,7 +8,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 
 Item {
     id: output
@@ -48,16 +48,16 @@ Item {
         anchors.centerIn: parent
         width: parent.width
         height: parent.height
-        radius: Kirigami.Units.cornerRadius
-        color: Kirigami.Theme.alternateBackgroundColor
+        radius: LingmoUI.Units.cornerRadius
+        color: LingmoUI.Theme.alternateBackgroundColor
 
         border {
-            color: isSelected ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+            color: isSelected ? LingmoUI.Theme.highlightColor : LingmoUI.Theme.disabledTextColor
             width: 1
 
             Behavior on color {
                 PropertyAnimation {
-                    duration: Kirigami.Units.longDuration
+                    duration: LingmoUI.Units.longDuration
                 }
             }
         }
@@ -196,13 +196,13 @@ Item {
         x: 4
         width: childrenRect.width + 5
         height: childrenRect.height + 2
-        radius: Kirigami.Units.cornerRadius
+        radius: LingmoUI.Units.cornerRadius
 
         opacity: model.enabled &&
                  (tapHandler.isLongPressed || dragHandler.active) ? 0.9 : 0.0
 
 
-        color: Kirigami.Theme.disabledTextColor
+        color: LingmoUI.Theme.disabledTextColor
 
         Text {
             id: posLabelText
@@ -216,7 +216,7 @@ Item {
 
         Behavior on opacity {
             PropertyAnimation {
-                duration: Kirigami.Units.longDuration
+                duration: LingmoUI.Units.longDuration
             }
         }
     }

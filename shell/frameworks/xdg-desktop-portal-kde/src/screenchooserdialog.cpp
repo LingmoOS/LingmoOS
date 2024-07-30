@@ -13,8 +13,8 @@
 #include "region-select/SelectionEditor.h"
 
 #include <KLocalizedString>
-#include <KWayland/Client/plasmawindowmanagement.h>
-#include <KWayland/Client/plasmawindowmodel.h>
+#include <KWayland/Client/lingmowindowmanagement.h>
+#include <KWayland/Client/lingmowindowmodel.h>
 
 #include <QCoreApplication>
 #include <QScreen>
@@ -40,18 +40,18 @@ public:
             return false;
 
         const auto idx = sourceModel()->index(source_row, 0);
-        using KWayland::Client::PlasmaWindowModel;
+        using KWayland::Client::LingmoWindowModel;
 
-        return !idx.data(PlasmaWindowModel::SkipTaskbar).toBool() //
-            && !idx.data(PlasmaWindowModel::SkipSwitcher).toBool() //
-            && idx.data(PlasmaWindowModel::Pid) != QCoreApplication::applicationPid();
+        return !idx.data(LingmoWindowModel::SkipTaskbar).toBool() //
+            && !idx.data(LingmoWindowModel::SkipSwitcher).toBool() //
+            && idx.data(LingmoWindowModel::Pid) != QCoreApplication::applicationPid();
     }
 
     QMap<int, QVariant> itemData(const QModelIndex &index) const override
     {
-        using KWayland::Client::PlasmaWindowModel;
+        using KWayland::Client::LingmoWindowModel;
         auto ret = QSortFilterProxyModel::itemData(index);
-        for (int i = PlasmaWindowModel::AppId; i <= PlasmaWindowModel::Uuid; ++i) {
+        for (int i = LingmoWindowModel::AppId; i <= LingmoWindowModel::Uuid; ++i) {
             ret[i] = index.data(i);
         }
         return ret;
@@ -63,8 +63,8 @@ public:
             return false;
         }
 
-        using KWayland::Client::PlasmaWindowModel;
-        const QString uuid = index.data(PlasmaWindowModel::Uuid).toString();
+        using KWayland::Client::LingmoWindowModel;
+        const QString uuid = index.data(LingmoWindowModel::Uuid).toString();
         if (value == Qt::Checked) {
             m_selected.insert(index);
         } else {
@@ -155,7 +155,7 @@ ScreenChooserDialog::ScreenChooserDialog(const QString &appName, bool multiple, 
 
     int numberOfWindows = 0;
     if (types & ScreenCastPortal::Window) {
-        auto model = new KWayland::Client::PlasmaWindowModel(WaylandIntegration::plasmaWindowManagement());
+        auto model = new KWayland::Client::LingmoWindowModel(WaylandIntegration::lingmoWindowManagement());
         auto windowsProxy = new FilteredWindowModel(this);
         windowsProxy->setSourceModel(model);
         props.insert("windowsModel", QVariant::fromValue<QObject *>(windowsProxy));

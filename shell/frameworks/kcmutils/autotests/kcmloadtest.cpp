@@ -15,7 +15,7 @@ class KCMTest : public QObject
 private Q_SLOTS:
     void testLoadQmlPlugin()
     {
-        auto mod = KCModuleLoader::loadModule(KPluginMetaData(QStringLiteral("plasma/kcms/systemsettings/kcm_testqml")));
+        auto mod = KCModuleLoader::loadModule(KPluginMetaData(QStringLiteral("lingmo/kcms/systemsettings/kcm_testqml")));
         QVERIFY(mod);
         QCOMPARE(mod->metaObject()->className(), "KCModuleQml");
     }

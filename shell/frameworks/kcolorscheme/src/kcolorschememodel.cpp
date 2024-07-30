@@ -23,8 +23,8 @@
 #include <map>
 
 struct KColorSchemeModelData {
-    QString id; // e.g. BreezeDark
-    QString name; // e.g. "Breeze Dark" or "Breeze-Dunkel"
+    QString id; // e.g. OceanDark
+    QString name; // e.g. "Ocean Dark" or "Ocean-Dunkel"
     QString path;
     QIcon preview;
 };

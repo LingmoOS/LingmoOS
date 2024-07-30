@@ -11,7 +11,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.discover as Discover
 import org.kde.discover.app as DiscoverApp
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.kitemmodels as KItemModels
 
 BasicAbstractCard {
@@ -28,9 +28,9 @@ BasicAbstractCard {
         columns: root.compact ? 2 : 3
         flow: GridLayout.TopToBottom
         rowSpacing: 0
-        columnSpacing: Kirigami.Units.largeSpacing
+        columnSpacing: LingmoUI.Units.largeSpacing
 
-        Kirigami.Heading {
+        LingmoUI.Heading {
             Layout.fillWidth: true
             Layout.maximumWidth: globalRating.implicitWidth
             Layout.fillHeight: true
@@ -94,8 +94,8 @@ BasicAbstractCard {
             Layout.rowSpan: 5
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 18
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 8
+            Layout.preferredWidth: LingmoUI.Units.gridUnit * 18
+            Layout.preferredHeight: LingmoUI.Units.gridUnit * 8
             clip: true
             orientation: ListView.Horizontal
             currentIndex: 0
@@ -109,8 +109,8 @@ BasicAbstractCard {
             preferredHighlightBegin: currentItem ? Math.round((width - currentItem.width) / 2) : 0
             preferredHighlightEnd: currentItem ? preferredHighlightBegin + currentItem.width : 0
 
-            highlightMoveDuration: Kirigami.Units.longDuration
-            highlightResizeDuration: Kirigami.Units.longDuration
+            highlightMoveDuration: LingmoUI.Units.longDuration
+            highlightResizeDuration: LingmoUI.Units.longDuration
 
             model: DiscoverApp.PaginateModel {
                 sourceModel: sortModel
@@ -132,7 +132,7 @@ BasicAbstractCard {
                         right: parent.right
                         verticalCenter: parent.verticalCenter
                     }
-                    Kirigami.Heading {
+                    LingmoUI.Heading {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignCenter
                         horizontalAlignment: Text.AlignHCenter
@@ -171,7 +171,7 @@ BasicAbstractCard {
                     topMargin: quoteMetrics.boundingRect.top - quoteMetrics.tightBoundingRect.top
                 }
                 parent: reviewsPreview
-                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 4
+                font.pointSize: LingmoUI.Theme.defaultFont.pointSize * 4
                 text: i18nc("Opening upper air quote", "“")
                 opacity: 0.4
                 TextMetrics {
@@ -186,7 +186,7 @@ BasicAbstractCard {
                     bottom: parent.bottom
                 }
                 parent: reviewsPreview
-                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 4
+                font.pointSize: LingmoUI.Theme.defaultFont.pointSize * 4
                 text: i18nc("Closing lower air quote", "„")
                 opacity: 0.4
             }

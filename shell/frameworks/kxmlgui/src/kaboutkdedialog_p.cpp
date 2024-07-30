@@ -45,7 +45,7 @@ KAboutKdeDialog::KAboutKdeDialog(QWidget *parent)
         i18n("<html>"
              "<b>KDE</b> is a world-wide community of software engineers, artists, writers, "
              "translators and creators who are committed to <a href=\"%1\">Free Software</a> "
-             "development. KDE produces the Plasma desktop environment, hundreds of applications, "
+             "development. KDE produces the Lingmo desktop environment, hundreds of applications, "
              "and the many software libraries that support them.<br /><br />"
              "KDE is a cooperative enterprise: no single entity controls its direction or products. "
              "Instead, we work together to achieve the common goal of building the world's finest "

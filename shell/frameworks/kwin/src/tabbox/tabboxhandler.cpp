@@ -222,7 +222,7 @@ QObject *TabBoxHandlerPrivate::createSwitcherItem()
     // first try look'n'feel package
     QString file = QStandardPaths::locate(
         QStandardPaths::GenericDataLocation,
-        QStringLiteral("plasma/look-and-feel/%1/contents/windowswitcher/WindowSwitcher.qml").arg(config.layoutName()));
+        QStringLiteral("lingmo/look-and-feel/%1/contents/windowswitcher/WindowSwitcher.qml").arg(config.layoutName()));
     if (file.isNull()) {
         const QString type = QStringLiteral("KWin/WindowSwitcher");
 

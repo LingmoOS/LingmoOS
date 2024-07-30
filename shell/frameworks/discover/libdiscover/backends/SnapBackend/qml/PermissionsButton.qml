@@ -8,7 +8,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Controls as QQC2
-import org.kde.kirigami as Kirigami
+import org.kde.lingmoui as LingmoUI
 import org.kde.discover as Discover
 
 QQC2.Button {
@@ -21,7 +21,7 @@ QQC2.Button {
 
     onClicked: overlay.open()
 
-    Kirigami.OverlaySheet {
+    LingmoUI.OverlaySheet {
         id: overlay
 
         parent: root.QQC2.Overlay.overlay
