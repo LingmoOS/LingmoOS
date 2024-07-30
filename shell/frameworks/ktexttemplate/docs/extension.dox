@@ -1,0 +1,287 @@
+
+namespace KTextTemplate
+{
+
+/**
+
+  @page extension Extending the template system
+
+  @section libraries Filter and tag Libraries
+
+  As already noted, it is possible for application developers to create their own tags and filters. This feature is based on the QtPlugin system so that plugins can be loaded at run time.
+
+  @note If you are already familiar with Django, you will know that this is not necessary on that system. That is because Django libraries are just python modules, which can behave like dynamically loaded plugins.
+
+  @subsection filters Filters
+
+  A filter takes an object and an optional argument and returns a string. To create your own filter, create a concrete subclass of KTextTemplate::Filter and implement the Filter::doFilter method.
+
+  @code
+    /// Outputs its input string twice.
+    class TwiceFilter : public KTextTemplate::Filter
+    {
+      QVariant dofilter(const QVariant &input, const QVariant &arg = QVariant(), bool autoescape = false) const override
+      {
+        auto str = getSafeString(input);
+
+        return str + str;
+      }
+
+      bool isSafe() const override { return true; } // see the Autoescaping section
+    };
+
+    ...
+
+    Seeing double {{ name|twice }}?
+
+    // Renders: Seeing double MikeMike?
+  @endcode
+
+  The argument to doFilter is a QVariant, so it may contain any of the types supported by %KTextTemplate.
+
+  @code
+    /// Outputs its input n times.
+    class RepeatFilter : public KTextTemplate::Filter
+    {
+      QVariant dofilter(const QVariant &input, const QVariant &arg = QVariant(), bool autoescape = false) const override
+      {
+        auto str = getSafeString(input);
+
+        if ( arg.type() != QMetaType::Int )
+          return str; // Fail gracefully.
+
+        auto times = arg.toInt();
+        for (int i = 0; i < times ++i)
+        {
+          str.get().append(str);
+        }
+        return str;
+      }
+
+      bool isSafe() const { return true; }
+    };
+
+    ...
+
+    Seeing more {{ name|repeat:"3" }}?
+
+    // Renders: Seeing more NathalieNathalieNathalie?
+
+    Seeing more {{ name|repeat:"four" }}?
+
+    // Renders: Seeing more Otto? (failing gracefully)
+  @endcode
+
+  Note that the filter does not fail or throw an exception if the integer conversion fails. Filters should handle all errors gracefully. If an error occurs, return either the input, or an empty string. Whichever is more appropriate.
+
+  @section autoescaping Autoescaping and safe-ness
+
+  When implementing filters, it is necessary to consider whether string output from the template should be escaped by %KTextTemplate when rendering the template. %KTextTemplate features an autoescaping feature which ensures that a string which should only be escaped once is not escaped two or more times.
+
+  @see @ref templates_safestring
+
+  The filter interface contains two elements relevant to autoescaping. The first is the <tt>autoescape</tt> parameter to the Filter::doFilter method. The <tt>autoescape</tt> parameter indicates the current autoescaping state of the renderer, which can be manipulated in templates with the @gr_tag{autoescape} tag. Use of the <tt>autoescape</tt> parameter is rare. The second element of autoescaping in the Filter API is the Filter::isSafe method. This method can be reimplemented to indicate that a Filter is 'safe' - that is - if given safe input, it produces safe output.
+
+  @see http://docs.djangoproject.com/en/dev/howto/custom-template-tags/#filters-and-auto-escaping
+  @see http://groups.google.com/group/django-users/browse_thread/thread/311f336d74e7b643
+
+  @subsection tags Tags
+
+  A tag can really do anything with a template. To create your own tag, create a concrete subclass of KTextTemplate::AbstractNodeFactory and implement the AbstractNodeFactory::getNode method, and create a concrete subclass of KTextTemplate::Node and implement the Node::render method.
+
+  @note If you are familiar with Django you will recognise that defining a tag in Django involves creating a Node subclass (like %KTextTemplate), and a factory function where %KTextTemplate requires a factory class. This is because functions in python are objects, just like classes are, and dynamic typing allows easy creation of lists of those factory functions. In %KTextTemplate with statically-typed C++, we need to group the factories by interface (i.e, the KTextTemplate::AbstractNodeFactory interface).
+
+  Tags can take arguments, advance the parser, create nodes, and generally have broad control over the parsing and rendering stages.
+
+  Here is an example of a @gr_tag{current_time} tag which displays the current time.
+
+  @code
+    class CurrentTimeNode : public KTextTemplate::Node
+    {
+          Q_OBJECT
+
+       public:
+          CurrentTimeNode( QObject *parent = {} )
+             : KTextTemplate::Node( parent )
+          {
+          }
+
+          void render( KTextTemplate::OutputStream *stream, KTextTemplate::Context *c) const override
+          {
+             Q_UNUSED(c);
+             
+             (*stream) <<  QDateTime::currentDateTime().toString();
+          }
+    };
+
+    class CurrentTimeTagFactory : public KTextTemplate::AbstractNodeFactory
+    {
+          KTextTemplate::Node *getNode(const QString &tagContent, KTextTemplate::Parser *p) const override
+          {
+             Q_UNUSED(p);
+
+             // You almost always want to use smartSplit.
+             QStringList parts = smartSplit(tagContent);
+             parts.removeFirst(); // Not interested in the name of the tag.
+
+             if (!parts.isEmpty())
+                // The remaining parts are the arguments to the tag. If an incorrect number of arguments
+                // is supplied, and exception should be thrown.
+                throw KTextTemplate::Exception( KTextTemplate::TagSyntaxError, "current_time does not take any arguments" );
+
+             return new CurrentTimeNode();
+          }
+    };
+  @endcode
+
+  @see AbstractNodeFactory::smartSplit
+
+  @note The current_time tag could be extended to format the time in a particular way. That is the behaviour of the @gr_tag{now} tag. See its documentation and implementation for details.
+
+  Also, note that, AbstractNodeFactory::getNode implementation may throw an execption at template compilation time, but like implementations of Filter::doFilter, implememtations of Node::render should return an empty QString in most error cases.
+
+  @subsection tags_with_end_tags Tags with end tags
+
+  Often, tags will be not just one token in a template, but a start and end token such as <tt>range</tt>, <tt>spaceless</tt>, <tt>with</tt>, or a start, middle and end tokens, such as <tt>if</tt> and <tt>for</tt>.
+
+  When constructing a Node, a AbstractNodeFactory implementation can instruct the Parser to parse until any appropriate Token.
+
+  @code
+    text content
+    {% if foo %}
+      foo content
+    {% else %}
+      default content
+    {% endif %}
+    end content
+  @endcode
+
+  To implement such a tag the implementation of AbstractNodeFactory::getNode needs to parse until the optional intermediate tags and until the mandatory end tag, collecting the child nodes as it does so.
+
+  @code
+    Node* IfNodeFactory::getNode( const QString &tagContent, Parser *p ) const override
+    {
+      QStringList parts = smartSplit( tagContent );
+      parts.removeFirst(); // Remove "if"
+      
+      // Error handling etc.
+      
+      auto argsList = getFilterExpressionList( parts );
+      auto node = new IfNode( argsList, p );
+
+      // Parse until an else or endif token
+      auto trueList = p->parse( node, QStringList{"else", "endif"} );
+      node->setTrueList( trueList );
+      auto falseList;
+
+      auto nextToken = p->takeNextToken();
+      if ( nextToken.content == "else" )
+      {
+        falseList = p->parse( node, "endif" );
+        node->setFalseList( falseList );
+        // skip past the endif tag
+        p->removeNextToken();
+      } // else empty falseList.
+
+      return node;
+    }
+  @endcode
+
+  There is no limit to the number of intermediate tokens you can use in your tags. For example, a better @gr_tag{if} tag might support multiple elif tags.
+
+  @code
+    text content
+    {% if foo %}
+      foo content
+    {% elif bar %}
+      bar content
+    {% elif bat %}
+      bat content
+    {% else %}
+      default content
+    {% endif %}
+    end content
+  @endcode
+
+  @section cpp_libraries C++ Libraries
+
+  As already mentioned, it is neccessary to create a QtPlugin library to make your tags and filters available to %KTextTemplate. You need to implement TagLibraryInterface to return your custom node factories and filters. See the existing libraries in your %KTextTemplate distribution for full examples.
+
+  @code
+    #include <KTextTemplate/TagLibraryInterface>
+
+    #include "mytag.h"
+    #include "myfilter.h"
+
+    class MyLibrary : public QObject, public KTextTemplate::TagLibraryInterface
+    {
+      Q_OBJECT
+      Q_INTERFACES( KTextTemplate::TagLibraryInterface )
+    public:
+      MyLibrary(QObject *parent = 0)
+        : QObject (parent)
+      {
+        m_nodeFactories.insert("mytag", new MyNodeFactory());
+
+        m_filters.insert("myfilter", new MyFilter());
+      }
+
+      QHash<QString, KTextTemplate::AbstractNodeFactory*> nodeFactories(const QString &name = QString())
+      {
+        Q_UNUSED(name);
+        return m_nodeFactories;
+      }
+
+      QHash<QString, KTextTemplate::Filter*> filters(const QString &name = QString())
+      {
+        Q_UNUSED(name);
+        return m_filters;
+      }
+    };
+  @endcode
+
+  @section javascript_libraries Javascript Libraries
+
+  If you configure your application to use the ktexttemplate_scriptabletags_library, it will be possible for you and theme writers to write tags and filters in Javascript instead of C++. Themers would have as much control as a C++ plugin writer over those steps of processing and rendering the template.
+
+  Writing Javascript plugins is slightly different from writing C++ plugins, and is a bit more like writing Django plugins. Namely, in Javascript like python, functions are first-class objects, and Javascript is dynamically typed. Additionally Javascript plugins are just text files, so they can easily be dynamically loaded at runtime. Javascript files must be UTF-8 encoded.
+
+  Here is a complete Javascript library defining an @gr_tag{echo} tag which outputs its arguments:
+
+  @code
+    var EchoNode = function(content)
+    {
+      this.content = content;
+      this.render = function(context)
+      {
+        return content.join(" ");
+      };
+    };
+
+    function EchoNodeFactory(tagContent, parser)
+    {
+      var content = tagContent.split(" ");
+      content = content.slice(1, content.length);
+      return new Node("EchoNode", content);
+    };
+    EchoNodeFactory.tagName = "echo";
+    Library.addFactory("EchoNodeFactory");
+  @endcode
+
+  Some things to note:
+  - <tt>Library</tt> is a globally accessible object used to register <tt>Factories</tt>.
+  - The <tt>addFactory</tt> method takes a string which is the name of an object, not the object itself.
+  - The script factory function returns a <tt>%Node</tt>. The first argument to <tt>%Node</tt> is the name of the Javascript object in the library which defines the node. All additional arguments will be passed to the constructor of that node.
+  - The %Node function must have a callable render property which takes a context argument.
+
+  @todo \@section javascript_diff Differences between C++ and Javascript library plugins.
+
+  @subsection loaders Loaders
+
+  As noted in @ref creating_templates, you will usually not create a Template directly, but retrieve it from an Engine instance. The Engine allows you to define where the templates are retrieved from when you request them by name.
+
+  You can redefine the order of places in the filesystem which are searched for templates, and even define new ways to retrieve templates (i.e, not from the filesystem) by subclassing KTextTemplate::AbstractTemplateLoader and implementing the AbstractTemplateLoader::loadByName method. For existing loaders, see FileSystemTemplateLoader, InMemoryTemplateLoader, and AkonadiTemplateLoader.
+
+*/
+
+}

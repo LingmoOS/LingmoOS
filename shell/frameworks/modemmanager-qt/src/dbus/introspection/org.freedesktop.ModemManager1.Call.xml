@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2015 Marco Bascetta <marco.bascetta@sadel.it>
+   Copyright (C) 2015 Riccardo Vangelisti <riccardo.vangelisti@sadel.it>
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Call:
+      @short_description: The ModemManager Call interface.
+
+      The Call interface Defines operations and properties of a single Call.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Call">
+
+    <!--
+        Start:
+
+        If the outgoing call has not yet been started, start it.
+
+        Applicable only if state is <link linkend="MM-CALL-STATE-UNKNOWN:CAPS"><constant>MM_CALL_STATE_UNKNOWN</constant></link> and direction is
+        <link linkend="MM-CALL-DIRECTION-OUTGOING:CAPS"><constant>MM_CALL_DIRECTION_OUTGOING</constant></link>.
+    -->
+    <method name="Start" />
+
+    <!--
+        Accept:
+
+        Accept incoming call (answer).
+
+        Applicable only if state is <link linkend="MM-CALL-STATE-RINGING-IN:CAPS"><constant>MM_CALL_STATE_RINGING_IN</constant></link> and direction is
+        <link linkend="MM-CALL-DIRECTION-INCOMING:CAPS"><constant>MM_CALL_DIRECTION_INCOMING</constant></link>.
+    -->
+    <method name="Accept" />
+
+    <!--
+        Hangup:
+
+        Hangup the active call.
+
+        Applicable only if state is <link linkend="MM-CALL-STATE-UNKNOWN:CAPS"><constant>MM_CALL_STATE_UNKNOWN</constant></link>.
+    -->
+    <method name="Hangup"/>
+
+    <!--
+        SendDtmf:
+        @dtmf: DTMF tone identifier [0-9A-D*#].
+
+        Send a DTMF tone (Dual Tone Multi-Frequency) (only on supported modem).
+
+        Applicable only if state is <link linkend="MM-CALL-STATE-ACTIVE:CAPS"><constant>MM_CALL_STATE_ACTIVE</constant></link>.
+    -->
+    <method name="SendDtmf">
+      <arg name="dtmf" type="s" direction="in"/>
+    </method>
+
+    <!--
+        DtmfReceived:
+        @dtmf: DTMF tone identifier [0-9A-D*#].
+
+        Emitted when a DTMF tone is received (only on supported modem)
+    -->
+    <signal name="DtmfReceived">
+      <arg name="dtmf" type="s" />
+    </signal>
+
+    <!--
+        StateChanged:
+        @old: Old state MMCallState
+        @new: New state MMCallState
+        @reason: A <link linkend="MMCallStateReason">MMCallStateReason</link> value, specifying the reason for this state change.
+
+        Emitted when call changes state
+    -->
+    <signal name="StateChanged">
+      <arg name="old" type="i" />
+      <arg name="new" type="i" />
+      <arg name="reason" type="u" />
+    </signal>
+
+    <!--
+        State:
+
+        A <link linkend="MMCallState">MMCallState</link> value,
+        describing the state of the call.
+    -->
+    <property name="State" type="i" access="read" />
+
+    <!--
+        StateReason:
+
+        A <link linkend="MMCallStateReason">MMCallStateReason</link> value, describing why the state is changed.
+    -->
+    <property name="StateReason" type="i" access="read" />
+
+    <!--
+        Direction:
+
+        A <link linkend="MMCallDirection">MMCallDirection</link> value,
+        describing the direction of the call.
+    -->
+    <property name="Direction" type="i" access="read" />
+
+    <!--
+        Number:
+
+        The remote phone number.
+    -->
+    <property name="Number" type="s" access="read" />
+  </interface>
+</node>

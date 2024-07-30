@@ -1,0 +1,17 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(KF6WidgetsAddons "@KF_DEP_VERSION@")
+
+find_dependency(Qt6Widgets @REQUIRED_QT_VERSION@)
+find_dependency(Qt6Xml @REQUIRED_QT_VERSION@)
+
+if (NOT @BUILD_SHARED_LIBS@)
+    find_dependency(KF6CoreAddons "@KF_DEP_VERSION@")
+    find_dependency(KF6Codecs "@KF_DEP_VERSION@")
+    find_dependency(KF6Config "@KF_DEP_VERSION@")
+    find_dependency(KF6ConfigWidgets "@KF_DEP_VERSION@")
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF6BookmarksTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@

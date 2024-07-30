@@ -1,0 +1,381 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % French "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Manuel de l'utilisateur de KDE</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>18/09/2010</date>
+<productname
+>Environnement de bureau KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Exécute un programme avec élévation de privilèges</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+><replaceable
+> commande</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> fichier</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nom de l'icône</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priorité</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> user</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Options génériques de &kde;</arg
+> <arg choice="opt"
+>Options génériques de &Qt; </arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Description</title>
+<para
+>&kdesu; est une interface graphique de l'Environnement de Bureau KDE pour la commande &UNIX; <command
+>su</command
+>. Il vous permet d'exécuter un programme avec l'identité d'un autre utilisateur en fournissant le mot de passe de celui-ci. &kdesu; est un programme sans privilèges ; il utilise la commande <command
+>su</command
+> du système.</para>
+
+<para
+>&kdesu; a une fonction supplémentaire : il peut se souvenir de votre mot de passe. Si vous utilisez cette possibilité, vous n'aurais à saisir votre mot de passe qu'une seule fois pour chaque commande.</para>
+
+<para
+>Ce programme est prévu pour être démarré à partir de la ligne de commande ou de fichiers <filename
+>.desktop</filename
+>.</para>
+
+<para
+>Comme <command
+>kdesu</command
+> n'est plus installé dans <userinput
+>$(kde5-config --prefix)</userinput
+>/bin mais dans <userinput
+>kde5-config --path libexec</userinput
+> et par conséquent pas dans votre variable <envar
+>Path</envar
+>, vous devez utiliser <userinput
+>$(kde5-config --path libexec)<command
+>kdesu</command
+></userinput
+> pour lancer <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Options</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>commande</replaceable
+></option
+></term>
+<listitem
+><para
+>Ce paramètre spécifie la commande à lancer en tant que administrateur. Il doit être passé comme un seul argument. Ainsi, par exemple, si vous voulez lancer un nouveau gestionnaire de fichiers, vous saisirez la commande : <userinput
+>$(kde5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Affiche les informations de débogage.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fichier</replaceable
+></option
+></term>
+<listitem
+><para
+>Cette option permet une utilisation efficace de &kdesu; dans les fichiers <filename
+>.desktop</filename
+>. Elle indique à &kdesu; d'examiner le fichier spécifié par <parameter
+>fichier</parameter
+>. Si l'utilisateur peut écrire dans ce fichier, &kdesu; exécutera la commande avec le compte courant. Si l'écriture est impossible, la commande sera lancée avec le compte <parameter
+>utilisateur</parameter
+> (administrateur par défaut).</para>
+<para
+><parameter
+>fichier</parameter
+> est évalué comme suit : si <parameter
+>fichier</parameter
+> commence par un <literal
+>/</literal
+>, il est considéré comme un nom de fichier absolu. Autrement, il est considéré comme étant le nom d'un fichier de configuration global de &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nom de l'icône</replaceable
+></term>
+<listitem
+><para
+>Spécifie l'icône à utiliser dans la boîte de dialogue du mot de passe. Vous pouvez spécifier uniquement le nom, sans extensions.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Ne pas mémoriser le mot de passe. Ceci désactive la case à cocher <guilabel
+>mémoriser le mot de passe</guilabel
+> dans la boîte de dialogue du mot de passe.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>priorité</replaceable
+></term>
+<listitem>
+<para
+>Définie la priorité. La priorité est un nombre arbitraire entre 0 et 100, où 100 est la priorité la plus haute et 0 est la plus basse. Par défaut, elle est fixée à 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Utilise l'ordonnancement en temps réel.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Arrête le démon kdesu. Il s'agit du démon d'arrière plan chargé de conserver les mot de passes valables. Cette fonctionnalité peut aussi être désactivée avec <option
+>-n</option
+> lors du lancement initial de &kdesu;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Active la sortie dans le terminal. Ceci désactive la mémorisation du mot de passe. Elle est utilisée pour le débogage ; si vous souhaitez exécuter une application en mode console, préférez plutôt <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> utilisateur</replaceable
+></term>
+<listitem
+><para
+>Bien que &kdesu; servent le plus souvent à exécuter une commande en tant que administrateur, vous pouvez fournir n'importe quel nom d'utilisateur avec le mot de passe approprié.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Ne pas afficher le bouton « ignorer ».</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></term>
+<listitem
+><para
+>Rend la fenêtre passagère pour une application X définie par son identifiant de fenêtre (winid).</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Voir aussi</title>
+<para
+>su(1)</para>
+
+<para
+>Une documentation utilisateur plus détaillée est disponible à l'adresse <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (saisissez cette <acronym
+>&URL; </acronym
+> dans &konqueror; ou lancez <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Exemples</title>
+<para
+>Exécute <command
+>kfmclient</command
+> en tant qu'utilisateur <systemitem class="username"
+>jean</systemitem
+> et affiche l'icône de &konqueror; dans la boîte de dialogue du mot de passe :</para>
+<screen
+><userinput
+>$(kde5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jacques</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Auteurs</title>
+<para
+>&kdesu; a été écrit par &Geert.Jansen; &Geert.Jansen.mail; et <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

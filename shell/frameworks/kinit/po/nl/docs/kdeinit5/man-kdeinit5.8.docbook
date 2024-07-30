@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Dutch "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Gebruikershandleiding van kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2013-12-18</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Starter van toepassingen gebouwd met ondersteuning van kdeinit en voor KIO slaves.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Samenvatting</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programs</arg
+> <arg
+>programma's</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beschrijving</title>
+
+<para
+>kdeinit5 start processen enigszins vergelijkbaar met het beroemde <command
+>init</command
+> dat wordt gebruikt bij het opstarten van UNIX. Het voert &kde; programma's uit en kdeinit loadable modules (KLMs) worden efficiënter opgestart. </para>
+
+<para
+>&kde;-applicaties opstarten met kdeinit5 maakt het starten van een typische &kde;-applicatie enkele malen sneller en vermindert het geheugengebruik aanzienlijk.</para>
+
+<para
+>kdeinit5 is gelinkt tegen alle bibliotheken die een standaard &kde;-applicatie nodig heeft. Met deze techniek wordt het starten van een toepassing veel sneller omdat nu alleen de applicatie zelf gelinkt behoeft te worden waar anders beide, de applicatie zowel als alle bibliotheken die het gebruikt worden, gelinkt moeten worden. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Nadelen</title>
+
+<para
+>De procesnaam van applicaties die via kdeinit5 gestart worden is "kdeinit5". Dit probleem kan tot op zekere hoogte gecorrigeerd worden door de applicatienaam zoals deze getoond door <command
+>ps</command
+> te wijzigen. Echter, applicaties zoals <command
+>killall</command
+> zien alleen kdeinit5 als de procesnaam. De workaround hiervoor is het gebruik van <command
+>kdekillall</command
+> (uit de kdesdk/scripts) voor applicaties die via kdeinit5 gestart zijn. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Opties</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Hulp over de opties tonen </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Doe geen fork, dwz. stop niet voordat alle uitgevoerde programma's eindigen</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>kded niet starten</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Sluit af als geen KDE-applicatie meer wordt uitgevoerd </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programma's</option
+></term>
+<listitem>
+<para
+>voert de programma's uit die verzoeken behandelen </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programma's</option
+></term>
+<listitem>
+<para
+>voert de programma's zonder verzoeken te behandelen </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Gebruik</title>
+<para
+>Een standaard manier om dit programma uit te voeren is door eenvoudig het volgende commando <userinput
+><command
+>kdeinit5</command
+> programma</userinput
+> of <userinput
+><command
+>kdeinit5</command
+> +programma</userinput
+> te specificeren </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Bestanden</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Omgevingsvariabelen</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Specificeert de persoonlijke map van de huidige gebruiker</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Specificeert of de persoonlijke map van de huidige gebruiker alleen-lezen is</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Indien ingesteld, vertelt kdeinit5 dat de &kde; programma's voor-gelinkt zijn.</para>
+<para
+>(Voor-linken is een proces dat u toestaat om het proces van dynamisch linken te versnellen.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Indien ingesteld, vertelt kdeinit5 dat het op een &kde;-bureaublad draait.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Zie ook</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Fouten/bugs</title>
+<para
+>Gebruik <ulink url="http://bugskde.org"
+>De volger van bugs van KDE</ulink
+> om ze te rapporteren.</para>
+</refsect1>
+
+</refentry>
+
+
+

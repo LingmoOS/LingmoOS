@@ -1,0 +1,30 @@
+Ksshaskpass is a front-end for ssh-add which stores the password of the
+sh key in KWallet.
+Ksshaskpass is not meant to be executed directly, you need to tell
+ssh-add about it. ssh-add will then call it if it is not associated
+to a terminal.
+From the ssh-add manpage:
+/----------------
+|  DISPLAY and SSH_ASKPASS
+|    If ssh-add needs a passphrase, it will read the passphrase from the
+|     current terminal if it was run from a terminal.  If ssh-add does not
+|     have a terminal associated with it but DISPLAY and SSH_ASKPASS are
+|     set, it will execute the program specified by SSH_ASKPASS and open
+|     an X11 window to read the passphrase. This is particularly useful
+|     when calling ssh-add from a .xsession or related script.  (Note that
+|     on some machines it may be necessary to redirect the input from
+|     /dev/null to make this work.)
+\----------------
+
+This means you need to make sure to set the SSH_ASKPASS environment variable
+to the path of ksshaskpass and then call ssh-add from your autostart scripts.
+
+To add it to the KDE autostart sequence you could for example create an
+executable script with the following content in ~/.kde/Autostart/ (or maybe
+/.kde4/Autostart/, depending on the distribution).
+
+/----------------
+|#!/bin/sh
+|
+|SSH_ASKPASS=ksshaskpass ssh-add < /dev/null
+\----------------

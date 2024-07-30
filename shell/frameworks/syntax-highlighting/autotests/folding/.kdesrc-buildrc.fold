@@ -1,0 +1,74 @@
+# List of all options: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html
+
+<beginfold id='1'>global</beginfold id='1'>
+    branch-group kf6-qt6
+
+    # strange capitalisation of value
+    include-dependencies TrUe
+
+    # path with tilde
+    kdedir ~/kde/usr
+
+    # try using the existing option as value for other option
+    qtdir ${source-dir} # Comment on the same line with value
+
+    # Use line breaks
+    cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DQT_MAJOR_VERSION=6 \
+        -DBUILD_WITH_QT6=ON
+
+    num-cores ${non-existing-var}
+    num-cores-low-mem 4
+
+    non-existing-option 12345
+
+    # use int value for binary option
+    install-session-driver 5
+
+    # impossible enum value (allowed are: invent, flat, metadata)
+    directory-layout project-ids-as-folder-names
+
+    # option with valid value with spaces
+    cmake-generator Kate - Ninja
+<endfold id='1'>end global</endfold id='1'>
+
+# Comment with \
+# line break
+
+include ~/kde6/src/kdesrc-build/kf6-common-options-build-include
+
+<beginfold id='2'>options</beginfold id='2'> kcalc
+    # use of module-set only option in the options block:
+    use-modules one two \
+                three
+
+    # use of unrecognized option:
+    new-option true
+<endfold id='2'>end options</endfold id='2'>
+
+
+<beginfold id='3'>module-set</beginfold id='3'>
+    # use of global-only option in module-set:
+    stop-on-failure true
+
+    # use allowed option:
+    use-modules one two three
+<endfold id='3'>end module-set</endfold id='3'>
+
+# module block without the actual name
+<beginfold id='2'>module</beginfold id='2'>
+    repository kde-projects
+<endfold id='2'>end module</endfold id='2'>
+
+# double opening module block (forget ending the module block):
+<beginfold id='2'>module</beginfold id='2'> kcalc
+module kcalc
+    # body without options
+<endfold id='2'>end module</endfold id='2'> kcalc
+
+# non-recognized block
+kcalc
+    repository kde-projects
+end kcalc
+
+# kate: syntax kdesrc-buildrc;

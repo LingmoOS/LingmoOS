@@ -1,0 +1,521 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Italian "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>Manuale di &tablet;</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <othercredit role="translator"
+><firstname
+>Paolo</firstname
+><surname
+>Zamponi</surname
+><affiliation
+><address
+><email
+>zapaolo@email.it</email
+></address
+></affiliation
+><contrib
+>Traduzione</contrib
+></othercredit
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>17/10/2020</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>Questa è la documentazione per il modulo delle &systemsettings; di &kde; che configura le tavolette grafiche.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>Impostazioni di sistema</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>Tablet</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Impostazioni della tavoletta Wacom</title>
+    <para
+>Il modulo delle &systemsettings; della tavoletta gestisce tutte le impostazioni della tua tavoletta grafica. Sono supportate da questa interfaccia per le impostazioni tutte le tavolette supportate dal progetto dei <ulink url="https://linuxwacom.github.io"
+>driver Wacom per &Linux;</ulink
+>. Assicurati che tua la tavoletta sia rilevata o tramite xorg.conf oppure da udev e che sia funzionante in generale; fai riferimento alla sezione <link linkend="detection"
+>Riconoscimento della tavoletta</link
+> per ulteriori informazioni. </para>
+    <important>
+        <para
+>Affinché questo modulo possa funzionare in maniera corretta, il driver <application
+>xf86-input-wacom</application
+> deve essere installato nel tuo computer, inoltre deve essere disponibile <command
+>xsetwacom</command
+>. </para>
+    </important>
+    <para
+>Il modulo è diviso in varie pagine che gestiscono tutti gli aspetti della tavoletta e della penna: <link linkend="tablet-profiles"
+>Profili</link
+>, <link linkend="tablet-general"
+>Informazioni generali</link
+>, <link linkend="stylus"
+>Impostazioni del pennino</link
+>, <link linkend="pad-buttons"
+>Pulsanti rapidi</link
+>, <link linkend="pad-mapping"
+>Mappatura del pad</link
+> e <link linkend="touch-mapping"
+>Mappatura del tocco</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>Gestione del profilo</title>
+
+        <para
+>Questa è la casella a cascata con vicino i due pulsanti: ti permette di creare dei nuovi profili oppure di cancellare quelli già esistenti. Ciascun profilo è salvato ed è specifico per la tavoletta attualmente connessa; così, se crei un nuovo profilo, questo conterrà automaticamente le impostazioni predefinite rilevate dal driver. </para>
+
+        <para
+>Qui puoi specificare i vari profili per le tue impostazioni: ad esempio se vuoi che la penna abbia un comportamento diverso qualora venga utilizzata come rimpiazzo del mouse piuttosto che come uno strumento per disegnare. </para>
+        <para
+>Ciascun profilo può essere cambiato al volo, e questo cambia immediatamente il comportamento della tavoletta. </para>
+        <note>
+            <para
+>Il <link linkend="kded"
+>demone della tavoletta kded</link
+> deve essere in esecuzione in background affinché i profili possano essere cambiati ed applicati alla tavoletta. Tutto il lavoro viene svolto dal demone, mentre il modulo delle &systemsettings; si limita a cambiare solo le impostazioni del profilo impostato per conto del demone stesso. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>Impostazioni generali della tavoletta e informazioni</title>
+
+        <para
+>Mostra alcune informazioni generali sulla tavoletta rilevata. Vicino al nome e al produttore della tavoletta viene visualizzata un'immagine, inoltre vengono elencati tutti i dispositivi di ingresso rilevati. </para>
+
+        <note>
+            <para
+>La tavoletta deve essere connessa, e <link linkend="kded"
+>kded</link
+> deve essere in esecuzione per permettere al modulo di funzionare correttamente. </para>
+            <para
+>Fai riferimento alla sezione<link linkend="troubles"
+>Problemi di riconoscimento</link
+> per un ulteriore aiuto sul riconoscimento della tavoletta. </para>
+        </note>
+
+        <para
+>In aggiunta alle informazioni sulla tavoletta, la scheda generale ti permette di impostare molte scorciatoie globali. Ciascuna di queste permette di cambiare dinamicamente le opzioni per la tavoletta attualmente connessa. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>Impostazioni del pennino</title>
+
+        <para
+>La penna che viene usata insieme alla tavoletta ha due estremità diverse: la principale è chiamata pennino, mentre l'altra è detta gomma. In questa pagina puoi modificare ogni aspetto della penna, dall'assegnazione dei tasti alla curva di pressione, fino alla sua sensibilità. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>Sensibilità della gomma</title>
+            <para
+>Il cursore ti permette di modificare la sensibilità della gomma. Per una regolazione più fine della pressione è possibile modificare l'intera curva di pressione, nella finestra <guilabel
+>Modifica la curva di pressione</guilabel
+>. Per ulteriori informazioni vai nella <link linkend="presscurve"
+>Finestra della curva di pressione</link
+>. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>Impostazioni dei pulsanti</title>
+            <para
+>La casella <guilabel
+>Impostazioni dei pulsanti</guilabel
+> permette di modificare le azioni eseguite alla pressione di ciascun tasto sulla penna. Un semplice clic nella casella di modifica apre una nuova finestra, nella quale si possono selezionare diverse combinazioni di tasti, i pulsanti modificatori e i tasti del mouse. </para>
+
+            <para
+>Se l'opzione <guilabel
+>Tocca per eseguire l'azione</guilabel
+> è abilitata, il pennino deve essere in contatto con la tavoletta affinché l'azione del pulsante possa essere eseguita. Se invece questa opzione è disabilitata, le azioni dei pulsanti vengono eseguite anche quando il pennino sorvola sopra la superficie della tavoletta. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>Sensibilità della punta</title>
+            <para
+>Il cursore permette di modificare la sensibilità della punta del pennino. Per una regolazione più fine della pressione è possibile modificare l'intera curva di pressione, nella finestra <guilabel
+>Modifica la curva di pressione</guilabel
+>. Per ulteriori informazioni vai nella <link linkend="presscurve"
+>Finestra della curva di pressione</link
+>. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>Pulsanti rapidi</title>
+
+        <para
+>La pagina<guilabel
+>Pulsanti rapidi</guilabel
+> permette di impostare delle azioni particolari per tutti i pulsanti hardware presenti nella tavoletta. Per cambiare l'azione ad essi associata, fai clic nella casella di modifica e poi scegli l'azione nella nuova finestra. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>Tavoletta</title>
+
+       <para
+>La pagina <guilabel
+>Tavoletta</guilabel
+> ti permette di impostare ulteriori proprietà dell'area della tavoletta nel suo funzionamento insieme alla penna. Qui possono essere specificati l'orientazione della tavoletta, lo spazio valido della tavoletta e la modalità di tracciamento del puntatore. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>Modalità di tracciamento del pennino</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associa allo schermo</guilabel
+> : questa modalità associa il puntatore con un movimento assoluto sulla tavoletta. I bordi della tavoletta rappresentano direttamente lo spazio dello schermo. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associa al puntatore</guilabel
+> : questa modalità associa il puntatore penna con un movimento relativo alla tavoletta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>Orientazione</title>
+           <para
+>La finestra sull'orientazione specifica come viene ruotata l'area della tavoletta. Puoi impostare una rotazione specifica nella casella combinata, oppure, se l'opzione <guilabel
+>Ruota automaticamente con lo schermo</guilabel
+> è abilitata, la tavoletta verrà ruotata automaticamente insieme allo schermo. Questo è possibile ascoltando l'evento xrandr mentre lo schermo viene ruotato. </para>
+           <para
+>Se riscontri dei problemi con l'opzione di auto-rotazione, perché la tavoletta è sempre orientata nella direzione sbagliata, puoi provare ad abilitare l'opzione <guilabel
+>Inverti auto-rotazione</guilabel
+>. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>Mappatura della tavoletta</title>
+           <para
+>Questa associazione ti permette di specificare le proporzioni della tavoletta che saranno utilizzate per ciascuno schermo. Questo è necessario per mantenere l'area della tavoletta proporzionale allo spazio di schermo utilizzato nella modalità assoluta di tracciamento del pennino. Per maggiori informazioni controlla l'apposita sezione nella <link linkend="area-selection"
+>Finestra di selezione dell'area</link
+>. </para>
+           <note>
+               <para
+>Questa opzione non funziona nella modalità a puntatore relativo. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>Tocco</title>
+
+       <para
+>La pagina <guilabel
+>Tocco</guilabel
+> permette di impostare ulteriori proprietà per la parte tattile della tavoletta (se esistente). È possibile disabilitare le funzionalità tattili dalla casella di selezione <guilabel
+>Abilita tocco</guilabel
+>, ed esiste anche una scorciatoia globale per abilitare o per disabilitare queste funzionalità. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>Modalità di tracciamento del tocco</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associa allo schermo</guilabel
+> : questa modalità associa il puntatore con un movimento assoluto sulla tavoletta. I bordi della tavoletta rappresentano direttamente lo spazio sullo schermo. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associa al puntatore</guilabel
+> : questa modalità associa il cursore a movimenti relativi sulla tavoletta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>Gesti</title>
+
+           <para
+>Se l'opzione <guilabel
+>Abilita i gesti</guilabel
+> viene abilitata, la tavoletta può generare degli eventi gestuali per il dispositivo tattile. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Distanza di scorrimento</guilabel
+> : permette di scorrere lungo le finestre quando due dita sono sulla tavoletta: muovendole su e giù si crea un evento di scorrimento. La distanza viene data in unità di tavoletta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Distanza di ingrandimento</guilabel
+> : permette di ingrandire o di rimpicciolire muovendo due dita insieme, oppure ciascuna separatamente. La distanza viene data in unità di tavoletta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Tempo di tocco</guilabel
+> : questo tempo, in millisecondi, specifica quando un doppio tocco sul dispositivo viene riconosciuto come clic destro </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>Mappatura del tocco</title>
+           <para
+>Questa mappatura ti permette di specificare le proporzioni del dispositivo tattile che saranno usate per ciascun schermo. Questo è necessario per mantenere l'area della tavoletta proporzionale alla porzione di schermo usata nel modo di tracciamento assoluto del pennino. Per maggiori informazioni controlla la sezione nella <link linkend="area-selection"
+>Finestra di selezione dell'area</link
+>. </para>
+           <note>
+               <para
+>Questa opzione non funziona nella modalità a puntatore relativo. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>Finestra della curva di pressione</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Qui si può vedere una schermata della finestra della curva di pressione</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Modificare la curva di pressione</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>La curva di pressione definisce come viene trasdotta la pressione del pennino. È definita da quattro punti su di una curva di Bézier: può essere modificata spostando questi punti e muovendoci la curva intorno. </para>
+        <note>
+            <para
+>Si può utilizzare la penna all'interno della finestra della curva di pressione per vederne immediatamente i cambiamenti. L'area blu sotto la curva mostra la pressione applicata dalla penna. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>Finestra dell'area di selezione</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Qui si può vedere una schermata della finestra dell'area della tavoletta</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Definizione dell'area della tavoletta</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>Questa finestra permette di specificare l'area disponibile della tavoletta per ciascun spazio dello schermo selezionato. Per mantenere le giuste proporzioni è necessario ridurre l'area della tavoletta a seconda della risoluzione dello schermo. Questa finestra permette di specificare individualmente queste aree per ciascuno schermo selezionato. </para>
+        <para
+>Viene utilizzato il pulsante <guilabel
+>Commuta lo schermo</guilabel
+> per cambiare la visualizzazione da schermo intero (tutti i monitor connessi) a quella su ciascun monitor. L'impostazione viene salvata per ciascuna configurazione di schermo, e applicata alla tavoletta ogni volta che la selezione dello schermo viene cambiata da un'azione scorciatoia globale. </para>
+        <para
+>È possibile associare lo schermo con l'area di <guimenuitem
+>Tutta la tavoletta</guimenuitem
+> oppure definire semplicemente l'<guimenuitem
+>Area della tavoletta</guimenuitem
+> nel pannello <guilabel
+>Tavoletta</guilabel
+> a destra. Le proporzioni dell'area possono essere bloccate o sbloccate usando il pulsante <guibutton
+>Blocca le proporzioni</guibutton
+>. </para>
+        <para
+>Se vuoi mantenere le proporzioni della tavoletta con l'attuale selezione dello schermo puoi premere il pulsante <guilabel
+>Imposta le proporzioni dello schermo</guilabel
+>, in modo che l'area di lavoro della tavoletta venga calcolata e modificata automaticamente. </para>
+        <para
+>In aggiunta puoi aprire la finestra <guilabel
+>Calibra</guilabel
+> per calibrare la tavoletta con l'aiuto di quattro punti sullo schermo. </para>
+        <para
+>Quando la finestra verrà chiusa sarà utilizzato l'ultimo schermo scelto; se però vuoi cambiarlo in un secondo momento puoi usare le <link linkend="tablet-general"
+>Scorciatoie globali</link
+>. </para>
+        <note>
+            <para
+>L'area della tavoletta funziona solamente in modalità di tracciamento assoluto del dispositivo tattile e del puntatore; nella modalità relativa viene invece utilizzata tutta la tavoletta. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>Demone della tavoletta</title>
+    <para
+>Il demone della tavoletta viene eseguito in background, ed esegue il lavoro di base: rileva la tavoletta e la configura in base al profilo selezionato. Se il demone non è in esecuzione il modulo delle &systemsettings; e l'applet per Plasma non possono funzionare correttamente, e la tavoletta non può essere utilizzata con i profili. </para>
+
+    <sect1 id="detection">
+        <title
+>Rilevamento della tavoletta</title>
+        <para
+>Il rilevamento della <hardware
+>tavoletta</hardware
+> viene fatto in molti modi: il primo passo viene compiuto da <application
+>Solid</application
+>, che esegue il supporto per il collegamento a caldo. Se Solid fallisce, il secondo passo è costituito da <command
+>xsetwacom list dev</command
+>, <command
+>lsusb</command
+> e da <command
+>xinput --list</command
+>. </para>
+        <para
+>Qualora nessuno dei comandi sopra menzionati restituisse il nome della tavoletta questa non sarebbe supportata, e non può essere utilizzata con questo modulo. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>Problemi di rilevamento</title>
+        <para
+>Qualora la tavoletta non venga riconosciuta, controlla che sia supportata nella pagina <ulink url="https://linuxwacom.github.io"
+>driver Wacom per &Linux;</ulink
+> o in quella del <ulink url="https://digimend.github.io"
+>driver DIGImend</ulink
+>. Come passo ulteriore, controlla se riesci a vederla con il comando <command
+>lsusb</command
+>. </para>
+        <para
+>Se udev non gestisce il riconoscimento, aggiungi la tua tavoletta nel file <filename
+>/etc/X11/xorg.conf.d/50-tablet.conf</filename
+> (crealo se non esiste), quindi riavvia il server X. </para>
+        <para
+>Nel caso ci siano più dispositivi (tavolette e simili), controlla che i dispositivi d'ingresso (pennino, gomma, tavoletta) vengano elencati con <command
+>xinput --list</command
+>. Qualora questi dovessero essere elencati, dai un'occhiata all'id interno della tavoletta con <command
+>xsetwacom get "Nome della tavoletta o pennino" TabletID</command
+>. Se viene rilevato un id, per favore invia un'email all'autore con le informazioni necessarie. </para>
+        <note>
+        <para
+>Il collegamento a caldo è supportato solamente se la tavoletta è stata rilevata da <application
+>Solid</application
+> e dalle sue API di notifica. </para>
+        <para
+><application
+>Solid</application
+> controlla che il valore della voce <command
+>input.x11_options.Type</command
+> sia <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> o <command
+>cursor</command
+>, oppure che il valore della voce <command
+>input.x11_driver</command
+> sia <command
+>wacom</command
+>. </para>
+        <para
+>Per favore, spedisci un'email all'autore qualora la tavoletta venga rilevata da Solid con degli altri valori, in modo da migliorare il supporto per il dispositivo. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>Applet Tablet per Plasma</title>
+    <para
+>L'applet tablet rende possibile la modifica al volo dei profili disponibili. Inoltre puoi modificare la rotazione della tavoletta e passare dalla modalità da assoluta a quella relativa, sia del pennino che della gomma, indipendentemente dalle impostazioni attuali del profilo. </para>
+    <para
+>Non è necessario aggiungere il plasmoide per far funzionare questo modulo. Il profilo predefinito sarà attivato dal <link linkend="kded"
+>demone tablet</link
+> non appena la tavoletta viene riconosciuta, anche se il plasmoide, che è solo un aiuto visuale per scambiare i profili, non viene utilizzato. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>Riconoscimenti e licenza</title>
+    <para
+>Traduzione a cura di Paolo Zamponi<email
+>zapaolo@email.it</email
+></para
+> &underFDL; &underGPL; </chapter>
+</book>

@@ -1,0 +1,120 @@
+/** \page kte_plugin_hosting Hosting KTextEditor plugins
+
+While the KTextEditor framework provides a powerful text editor in itself, 
+further features are available from plugins (KTextEditor::Plugin). At the time of this writing,
+all known KTextEditor plugins are maintained by the kate project, but most
+can be used in other hosting applications, as well.
+
+This page is about supporting KTextEditor plugins in your application. For information on
+developing the plugins themselves, refer to KTextEditor::Plugin.
+
+\section kte_basic_plugin_loading Loading simple plugins
+The steps needed to find and load basic KTextEditor plugins are roughly as follows:
+
+\code
+  QStringList plugins_to_load = QStringList() << "openlinkplugin" << "rainbowparens";
+  QList<KPluginMetaData> plugins = KPluginMetaData::findPlugins(QStringLiteral("ktexteditor"));
+  for (const auto &plugin_meta_data : plugins) {
+    QString identifier = plugin_meta_data.filename().basename();
+    if (!plugins_to_load.contains(identifier)) {
+        continue;
+    }
+    plugins_to_load.removeOne(identifier); // avoid loading separate versions of the same plugin
+
+    KTextEditor::Plugin *plugin = KPluginFactory::instantiatePlugin<KTextEditor::Plugin>(plugin_meta_data, this, QVariantList() << identifier).plugin;
+    if (plugin) {
+      emit KTextEditor::Editor::instance()->application()->pluginCreated(identifier, plugin);
+      QObject* created = plugin->createView();
+      if (created) {
+        emit mainWindow()->main->pluginViewCreated(identifier, created);
+        KTextEditor::SessionConfigInterface *interface = qobject_cast<KTextEditor::SessionConfigInterface *>(created);
+        if (interface) {
+          // NOTE: Some plugins will misbehave, unless readSessionConfig has been called!
+          KConfigGroup group = KSharedConfig::openConfig()->group(QStringLiteral("KatePlugin:%1:").arg(identifier));
+          interface->readSessionConfig(group);
+        }
+      }
+    }
+  }
+\endcode
+
+Note, however, that only a few basic plugins will actually be functional with the above, alone.
+For others, we need to implement several additional functions, as detailed, below.
+
+\section kte_full_plugin_hosting Implementing full plugin hosting
+I order to allow plugins to interact with the hosting application (e.g. creating or activating additional windows/widgets),
+you need to implement two interfacing classes:
+- KTextEditor::Application (singleton)
+- KTextEditor::MainWindow
+
+The latter corresponds to top level windows in your application (it's ok, if your application only supports a single
+toplevel window), with the assumption being that several document- and/or tool-windows can existing in each main window.
+
+The two classes are really just a thin layer to dispatch from API to be used in plugins to the appropiate
+functionality in your application. For best runtime compatibility even across different version of KTextEditor, this is
+implemented using Qt slots. E.g. KTextEditor::MainWindow::activeView() is defined as:
+
+\code
+KTextEditor::View *MainWindow::activeView()
+ {
+     // dispatch to parent
+     KTextEditor::View *view = nullptr;
+     QMetaObject::invokeMethod(parent(), "activeView", Qt::DirectConnection, Q_RETURN_ARG(KTextEditor::View*, view));
+     return view;
+ }
+\endcode
+
+I.e. this function (and most others in KTextEditor::MainWindow and KTextEditor::Application) simply invokes
+a slot by the same name and signature in its parent QObject. This is what you need to provide. The following example should
+illustrate the idea:
+
+\code
+class MyKTEMainWindow : public QObject() {
+    MyKTEMainWindow() {
+        // create a dispatch object _as a child of this object_
+        kte_win = new KTextEditor::MainWindow(this);
+    }
+    [...]
+public slots:
+    KTextEditor::View* activateView(KTextEditor::Document *document) {
+        auto view = myFindViewForDoc(document);
+        myActivateView(view);
+        return view;
+    }
+    [further implementations]
+private:
+    friend class MyKTEApplication;
+    KTextEditor::MainWindow* kte_win;
+}
+
+class MyKTEApplication : public QObject() {
+    MyKTEApplicaiton() {
+        // create a dispatch object _as a child of this object_
+        kte_app = new KTextEditor::Application(this);
+        // For simplicity, let's assume a single main window, and create a wrapper for it, here
+        my_main_win = new MyKTEMainWindow;
+
+        // register with KTextEditor
+        KTextEditor::Editor::instance()->setApplication(kte_app);
+    }
+    [...]
+public slots:
+    KTextEditor::MainWindow* activeMainWindow() {
+        return my_main_win->kte_win;
+    }
+    [further implementations]
+private:
+    KTextEditor::Application* kte_app;
+    MyKTEMainWindow* my_main_win;
+}
+\endcode
+
+@note Due to the lose coupling via Qt slots, you may not need to implement a dispatch slots for every
+single member in KTextEditor::Application, and KTextEditor::MainWindow. Naturally, however, plugins will be
+more likely to work as expected, the more complete the hosting app implements these interfaces.
+
+@note Don't forget to integrate the plugin config pages, if desired: @see KTextEditor::Plugin::configPage(), @see KTextEditor::Plugin::configPages().
+
+\see KTextEditor::Plugin, KTextEditor::Application, KTextEditor::MainWindow
+
+*/

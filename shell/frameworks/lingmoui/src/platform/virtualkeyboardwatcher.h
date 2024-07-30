@@ -1,0 +1,66 @@
+/*
+ * SPDX-FileCopyrightText: 2018 Marco Martin <mart@kde.org>
+ * SPDX-FileCopyrightText: 2021 Arjen Hiemstra <ahiemstra@heimr.nl>
+ *
+ * SPDX-License-Identifier: LGPL-2.0-or-later
+ */
+
+#ifndef LINGMOUI_VIRTUALKEYBOARDWATCHER_H
+#define LINGMOUI_VIRTUALKEYBOARDWATCHER_H
+
+#include <memory>
+
+#include <QObject>
+
+#include "lingmouiplatform_export.h"
+
+namespace LingmoUI
+{
+namespace Platform
+{
+/**
+ * @class VirtualKeyboardWatcher virtualkeyboardwatcher.h <LingmoUI/VirtualKeyboardWatcher>
+ *
+ * This class reports on the status of KWin's VirtualKeyboard DBus interface.
+ *
+ * @since 5.91
+ */
+class LINGMOUIPLATFORM_EXPORT VirtualKeyboardWatcher : public QObject
+{
+    Q_OBJECT
+
+public:
+    VirtualKeyboardWatcher(QObject *parent = nullptr);
+    ~VirtualKeyboardWatcher();
+
+    Q_PROPERTY(bool available READ available NOTIFY availableChanged FINAL)
+    bool available() const;
+    Q_SIGNAL void availableChanged();
+
+    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged FINAL)
+    bool enabled() const;
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(bool active READ active NOTIFY activeChanged FINAL)
+    bool active() const;
+    Q_SIGNAL void activeChanged();
+
+    Q_PROPERTY(bool visible READ visible NOTIFY visibleChanged FINAL)
+    bool visible() const;
+    Q_SIGNAL void visibleChanged();
+
+    Q_PROPERTY(bool willShowOnActive READ willShowOnActive NOTIFY willShowOnActiveChanged FINAL)
+    bool willShowOnActive() const;
+    Q_SIGNAL void willShowOnActiveChanged();
+
+    static VirtualKeyboardWatcher *self();
+
+private:
+    class Private;
+    const std::unique_ptr<Private> d;
+};
+
+}
+}
+
+#endif // LINGMOUI_VIRTUALKEYBOARDWATCHER

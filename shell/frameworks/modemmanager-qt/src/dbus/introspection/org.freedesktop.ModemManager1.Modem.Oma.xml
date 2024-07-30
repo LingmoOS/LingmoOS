@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2013 Google, Inc.
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Oma:
+      @short_description: The ModemManager Open Mobile Alliance interface.
+
+      This interface allows clients to handle device management operations as
+      specified by the Open Mobile Alliance (OMA).
+
+      Device management sessions are either on-demand (client-initiated), or
+      automatically initiated by either the device itself or the network.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Oma">
+
+    <!--
+        Setup:
+        @features: Bitmask of <link linkend="MMModemOmaFeature">MMModemOmaFeature</link> flags, specifying which device management features should get enabled or disabled. <link linkend="MM-OMA-FEATURE-NONE:CAPS">MM_OMA_FEATURE_NONE</link> will disable all features.
+
+        Configures which OMA device management features should be enabled.
+    -->
+    <method name="Setup">
+      <arg name="features" type="u" direction="in" />
+    </method>
+
+    <!--
+        StartClientInitiatedSession:
+        @session_type: Type of client-initiated device management session,given as a <link linkend="MMModemOmaSessionType">MMModemOmaSessionType</link>
+
+        Starts a client-initiated device management session.
+    -->
+    <method name="StartClientInitiatedSession">
+      <arg name="session_type" type="u" direction="in" />
+    </method>
+
+    <!--
+        AcceptNetworkInitiatedSession:
+        @session_id: Unique ID of the network-initiated device management session.
+        @accept: Boolean specifying whether the session is accepted or rejected.
+
+        Accepts or rejects a network-initiated device management session.
+    -->
+    <method name="AcceptNetworkInitiatedSession">
+      <arg name="session_id" type="u" direction="in" />
+      <arg name="accept"     type="b" direction="in" />
+    </method>
+
+    <!--
+        CancelSession:
+
+        Cancels the current on-going device management session.
+    -->
+    <method name="CancelSession" />
+
+    <!--
+        Features:
+
+        Bitmask of <link linkend="MMModemOmaFeature">MMModemOmaFeature</link>
+        flags, specifying which device management features are enabled or
+        disabled.
+    -->
+    <property name="Features" type="u" access="read" />
+
+    <!--
+        PendingNetworkInitiatedSessions:
+
+        List of network-initiated sessions which are waiting to be accepted or
+        rejected, given as an array of unsigned integer pairs, where:
+
+        <variablelist>
+          <varlistentry>
+            <listitem>
+              The first integer is a <link linkend="MMOmaSessionType">MMOmaSessionType</link>.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <listitem>
+              The second integer is the unique session ID.
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <property name="PendingNetworkInitiatedSessions" type="a(uu)" access="read">
+        <annotation name="org.qtproject.QtDBus.QtTypeName" value="OmaSessionTypes"/>
+    </property>
+
+    <!--
+        SessionType:
+
+        Type of the current on-going device management session, given as a
+        <link linkend="MMOmaSessionType">MMOmaSessionType</link>.
+    -->
+    <property name="SessionType" type="u" access="read" />
+
+    <!--
+        SessionState:
+
+        State of the current on-going device management session, given as a
+        <link linkend="MMOmaSessionState">MMOmaSessionState</link>.
+    -->
+    <property name="SessionState" type="i" access="read" />
+
+    <!--
+        SessionStateChanged:
+        @old_session_state: Previous session state, given as a <link linkend="MMOmaSessionState">MMOmaSessionState</link>.
+        @new_session_state: Current session state, given as a <link linkend="MMOmaSessionState">MMOmaSessionState</link>.
+        @session_state_failed_reason: Reason of failure, given as a  <link linkend="MMOmaSessionStateFailedReason">MMOmaSessionStateFailedReason</link>, if @session_state is <link linkend="MM-OMA-SESSION-STATE-FAILED:CAPS">MM_OMA_SESSION_STATE_FAILED</link>.
+
+        The session state changed.
+    -->
+    <signal name="SessionStateChanged">
+      <arg name="old_session_state"           type="i" />
+      <arg name="new_session_state"           type="i" />
+      <arg name="session_state_failed_reason" type="u" />
+    </signal>
+
+  </interface>
+</node>

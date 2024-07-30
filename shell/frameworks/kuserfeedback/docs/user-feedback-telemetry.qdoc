@@ -1,0 +1,73 @@
+/*
+    SPDX-FileCopyrightText: 2017 Volker Krause <vkrause@kde.org>
+
+    SPDX-License-Identifier: MIT
+*/
+
+/*!
+    \page user-feedback-telemetry.html
+    \previouspage UserFeedback Manual
+    \nextpage Surveys
+    \title Telemetry
+
+    \section1 Overview
+
+    Telemetry for a product consists of a set of data sources. Each data source
+    can be a scalar, list or map, and consists of one or more elements.
+
+    \section1 Data Model
+
+    A data source represents a logically grouped and indivisible set of telemetry
+    data of the application.
+
+    If you are familiar with JSON, it might be useful to see the data model as
+    JSON structures with a depth limit of two.
+
+    \section2 Source Type
+
+    A data source has one of the following types:
+    \list
+        \li Scalar. A scalar source transmits a single sample of its elements.
+        A typical example would be a OS type/version source.
+        \li List. A list source transmits a sequence of its elements. The size
+        of that sequence is not pre-defined and can be empty. A typical example
+        would be the users screen configuration.
+        \li Map. A map source transmits a set of its elements keyed by a string
+        identifier. Map keys are not pre-defined but can contain arbitrary values.
+        A typical example would be the usage ratios of different views of the application.
+    \endlist
+
+    The type of a data source is static and defined in the product schema.
+
+    \section2 Elements
+
+    Each data source has one or more elements. Elements are named fields that contain
+    values of basic data types, and are fixed and pre-defined in the product schema.
+
+    The following data types are supported for source elements:
+    \list
+        \li Boolean
+        \li Integer
+        \li Float
+        \li String
+    \endlist
+
+
+    \section1 Aggregations
+
+    Aggregations of telemetry data have no impact on users, they purely serve analytics.
+    Aggregations use one or more data source elements as input. The following aggregations
+    are currently implemented:
+
+    \list
+        \li Category. The category aggregator counts the amount of samples grouped by the
+        value of the selected data source element. It can be used on any element which contains
+        a reasonably small set of discrete values. A typical example would be the OS type.
+        \li Numeric. The numeric aggregator computes the minimum/maximum and median values of
+        the selected data source element. It can be used on any element which contains numeric
+        values. A typical example would be the start count or usage time of the application.
+        \li RatioSet. The ratio set aggregator shows the distribution of a map data source
+        containing normalized numeric data. This is typically used for the usage ratio of
+        different views or features in the application.
+    \endlist
+*/

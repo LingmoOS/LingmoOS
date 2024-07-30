@@ -1,0 +1,517 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Estonian  "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>&kdesu; käsiraamat</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Marek</firstname
+><surname
+>Laane</surname
+><affiliation
+><address
+><email
+>bald@starman.ee</email
+></address
+></affiliation
+><contrib
+>Tõlge eesti keelde</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-09-21</date>
+<releaseinfo
+>&kde; 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; on &UNIX; käsu <command
+>su</command
+> graafiline kasutajaliides.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>parool</keyword>
+<keyword
+>administraator</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Sissejuhatus</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kde4-config - -path libexec)kdesu - - program_to_run
+  
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Tere tulemast kasutama &kdesu;'d! &kdesu; on &UNIX; käsu <command
+>su</command
+> graafiline kasutajaliides KDE töölaua keskkonnas.See võimaldab käivitada rakendusi teise kasutajana, andes vastava kasutaja parooli. &kdesu; on privileegideta rakendus, see kasutab süsteemi käsku <command
+>su</command
+>.</para>
+
+<para
+>&kdesu;'l on aga üks lisavõimalus: ta võib parooli sinu eest meeles pidada. Seda võimalust kasutades tuleb parool sisestada ainult üks kord. Sellest räägib lähemalt <xref linkend="sec-password-keeping"/>, kus on ka hinnatud selle turvalisust.</para>
+
+<para
+>Rakendust saab käivitada käsurealt või <filename
+>.desktop</filename
+>-faile avades. Kuigi see pärib administraatori (<systemitem class="username"
+>root</systemitem
+>) parooli &GUI; dialoogis, pean ma ise seda rohkem käsurea &lt;-&gt; &GUI; seguks kui puhtaks &GUI; rakenduseks.</para>
+
+<para
+>Et <command
+>kdesu</command
+> ei ole enam paigaldatud asukohta <userinput
+> $(kde4-config --prefix)</userinput
+>/bin, vaid hoopis <userinput
+>kde4-config --path libexec</userinput
+> ning ei asu seetõttu sinu otsinguteel (<envar
+>Path</envar
+>), tuleb <command
+>kdesu</command
+> käivitamiseks anda käsk <userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+></userinput
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>&kdesu; kasutamine</title>
+
+<para
+>kdesu; kasutamine on väga lihtne. Süntaks näeb välja selline:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> käsk</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> fail</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> ikooni nimi</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioriteet</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> user</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> akna ID</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>&kde; üldised võtmed</arg
+> <arg choice="opt"
+>&Qt; üldised võtmed</arg
+> </cmdsynopsis>
+
+<para
+>Käsurea võtmeid selgitatakse allpool.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>käsk</replaceable
+></option
+></term>
+<listitem
+><para
+>Määrab käsu käivitama administraatori õigustes. See tuleb anda ühe argumendina. Kui näiteks soovid käivitada uut failihaldurit, tuleb käsureale kirjutada <userinput
+>$(kde4-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Näitab silumisinfot.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fail</replaceable
+></option
+></term>
+<listitem
+><para
+>Võimaldab kasutada &kdesu;'d tõhusalt <filename
+>.desktop</filename
+>-failide puhul, käskides &kdesu;'l uurida faili, mille nimi on antud parameetriga <parameter
+>fail</parameter
+>. Kui käsuandjal on sellel failil kirjutamisõigus, käivitab &kdesu; faili kasutaja õigustes. Kui aga mitte, käivitatakse käsk kasutajana <parameter
+>kasutaja</parameter
+> (vaikimisi administraator).</para>
+<para
+>Parameetrit <parameter
+>fail</parameter
+> hinnatakse järgmiselt: kui <parameter
+>fail</parameter
+> algab märgiga <literal
+>/</literal
+>, on see absoluutne failinimi. Muul juhul peetakse seda &kde; globaalse seadistustefaili nimeks.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ikooni nimi</replaceable
+></term>
+<listitem
+><para
+>Määrab paroolidialoogis kasutatava ikooni nime. Määrata võib ka ainult nime, ilma faililaiendita.</para>
+<para
+>Näiteks &konqueror;i käivitamiseks failihalduri režiimis ja &konqueror;i ikooni näitamiseks paroolidialoogis:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Parooli ei jäeta meelde. See keelab paroolidialoogis märkekasti <guilabel
+>Parool jäetakse meelde</guilabel
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioriteet</replaceable
+></term>
+<listitem>
+<para
+>Määrab prioriteedi. Prioriteet on suvaline arv vahemikus 0 kuni 100, kusjuures 100 tähendab kõrgeimat ja 0 madalaimat prioriteeti. Vaikeväärtus on 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Kasutatakse reaalaja planeerijat.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Peatab kdesu deemoni. Lähemalt räägib sellest <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Võimaldab terminaliväljundi ning tühistab parooli säilitamise võimaluse. See on peamiselt mõeldud silumiseks, kui soovid käivitada konsoolirežiimis rakendust, kasuta parem tavapärast <command
+>su</command
+> käsku.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> kasutaja</replaceable
+></term>
+<listitem
+><para
+>Kuigi &kdesu; kõige levinum tarvitamine on käsu käivitamine administraatori õigustes, võib määrata suvalise kasutajanime ja vastava parooli.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Siseelu</title>
+
+<sect1 id="x-authentication">
+<title
+>X'i autentimine</title>
+
+<para
+>Käivitatav rakendus töötab administraatori ID-ga ning üldiselt ei ole sel ligipääsuõigust X'ile. &kdesu; saab sellest aga üle, lisades autentimisküpsise ajutisele <filename
+>.Xauthority</filename
+>-failile. Käsu lõppemisega fail kustutatakse. </para>
+
+<para
+>Kui sa X'i küpsiseid ei kasuta, ei ole midagi teha. &kdesu; avastab selle ega lisa küpsist, aga siis pead ise tagama, et administraatoril oleks ligipääs X'i seansile.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+><command
+>su</command
+> liides</title>
+
+<para
+>&kdesu; kasutab privileegide hankimiseks süsteemi <command
+>su</command
+> käsku. Siin seletan lähemalt, kuidas &kdesu; seda teeb. </para>
+
+<para
+>Kuna mõned <command
+>su</command
+> versioonid (&ie; seesamune &RedHat; oma) ei taha parooli lugeda <literal
+>stdin</literal
+>-ist, loob &kdesu; pty/tty paari ning käivitab <command
+>su</command
+> standardsete tty-ga seotud failikirjendajatega.</para>
+
+<para
+>Kasutaja antud käsu käivitamiseks kasutab &kdesu; <command
+>su</command
+> juures võtit <option
+>-c</option
+>. Seda argumenti tunnistavad kõik shellid, mida ma vähegi tean, nii et see peaks kõikjal toimima. <command
+>su</command
+> edastab argumendi <option
+>-c</option
+> sihtshellile ning see käivitab rakenduse. Näide: <command
+>su <option
+>root -c<replaceable
+>rakendus</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Selle asemel, et käivitada kasutaja antud käsk vahetult <command
+>su</command
+>-ga, käivitab &kdesu; väikese tüverakenduse nimetusega <application
+>kdesu_stub</application
+>. See tüvi (töötab sihtkasutajana) nõuab &kdesu;lt mõningat infot pty/tty kanali kaudu (tüve stdin ja stdout) ning käivitab siis kasutaja rakenduse. Saadetavaks infoks on: X'i seanss, X'i autentimisküpsis (kui on olemas), muutuja <envar
+>PATH</envar
+> ja käivitatav käsk. Tüve kasutamise põhjuseks on see, et X'i küpsis kujutab endast varjatud infot, mida ei saa edastada käsureal.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Parooli kontroll</title>
+
+<para
+>&kdesu; kontrollib sisestatud parooli ning annab veateate, kui see pole korrektne. Kontrollimiseks käivitatakse testprogramm: <filename
+>/bin/true</filename
+>. Kui see õnnestub, peetakse parooli õigeks.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Parooli meeldejätmine</title>
+
+<para
+>Puhtalt kasutaja mugavuse huvides kasutab &kdesu; võimalust <quote
+>parool jäetakse meelde</quote
+>. Kui sulle on aga oluline turvalisus, peaksid selle osa hoolikalt läbi lugema.</para>
+
+<para
+>Luba &kdesu;'l parooli säilitada avab (kuigi väikese) turvaaugu sinu süsteemis. On selge, et &kdesu; lubab paroole kasutada ainult sinu kasutaja-ID-ga, kuid kui siin ettevaatlikkust ei ilmutata, võrdsustab see administraatori (<systemitem class="username"
+>root</systemitem
+>) turvataseme tavakasutaja omaga. Sinu kontole sisse murdev häkker saab sel moel muidu <systemitem class="username"
+>administraator</systemitem
+>ile lubatud õigused. &kdesu; püüab seda vältida. Kasutatav turvaskeem on vähemalt minu hinnangul mõistuse piires turvaline.</para>
+
+<para
+>&kdesu; kasutab deemonit nimetusega <application
+>kdesud</application
+>. See deemon uurib &UNIX; soklit <filename
+>/tmp</filename
+>-s käskude saamiseks. Sokli režiim on 0600, nii et sellega saab ühendust ainult kasutaja ID-ga. Kui parooli meeldejätmine on lubatud, käivitab &kdesu; käsud deemoni kaudu. See kirjutab käsu ja <systemitem class="username"
+>administraator</systemitem
+>i parooli soklile ning deemon käivitab käsu <command
+>su</command
+> abil, nagu eespool kirjeldatud. Seejärel ei kustutata kohe käsku ja parooli, vaid need hoitakse teatud aeg alles. See ongi seadistusmoodulis määratav aegumisväärtus. Kui selle jooksul saabub sama käsk uuesti, ei ole kliendil vaja parooli uuesti sisestada. Häkkerite eemalhoidmiseks, kes võivad sinu kontole sisse murda ja deemonilt paroole varastada (näiteks seda silujaga ühendades), on deemon loonud set-group-id nogroup'i. See peaks takistama kõigil tavakasutajatel (ka sinul endal) hankimast paroole <application
+>kdesud</application
+> protsessilt. Deemon määrab ka keskkonnamuutuja <envar
+>DISPLAY</envar
+> väärtuseks käivitusaegse väärtuse. Sellisel juhul on ainus asi, mida häkker saab teha, rakenduse käivitamine sinu seansis.</para>
+
+<para
+>Selle skeemi nõrgaks kohaks on asjalu, et rakendused, mida sa käivitad, et ole tõenäoliselt loodud turvalisust silmas pidades (nagu setuid <systemitem class="username"
+>root</systemitem
+> rakendused). See tähendab, et neil võib esineda puhvri ületäide või muid probleeme, mida häkkerid saavad ära kasutada.</para>
+
+<para
+>Parooli meeldejätmise võimalus on kompromiss turvalisuse ja mugavuse vahel. Soovitan väga tungivalt sellele mõelda ja ise otsustada, kas seda kasutada või mitte.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autor</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Autoriõigus 2000: &Geert.Jansen;</para>
+
+<para
+>&kdesu; kirjutas &Geert.Jansen;. Selle aluseks on mõneti Pietro Iglio &kdesu; versioon 0.3, Me leppisime Pietroga kokku, et edaspidi olen selle hooldaja mina.</para>
+
+<para
+>Autoriga saab ühendust võtta meilitsi: &Geert.Jansen.mail;. Palun anna mulle teada kõigist leitud vigadest, et saaksin need ära parandada. Aga kirjuta ka siis, kui sul on hea mõte, kuidas midagi võiks paremaks muuta.</para>
+
+<para
+>Tõlge eesti keelde: Marek Laane <email
+>bald@smail.ee</email
+></para
+> 
+&underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

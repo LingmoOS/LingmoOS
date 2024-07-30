@@ -1,0 +1,81 @@
+- Vertical tabs and titles of dockwidgets are broken
+	Vertical tabs are drawn as yellow rectangle (unfilled) without title
+	Vertical titles of dockwidgets are not rotated
+
+drawComplexControl:
+  CC_SpinBox:
+    Needs to honor stepEnabled
+    
+  CC_ComboBox:
+    Interaction with some of the style option flags (frameless, non-editable, etc.) seems missing.
+    Frameless implemented via subControlRect, but probably best to honor in draw as well.
+    Need to check frame w/designer, at least. Not clear how editable interacts with the SC flags --- 
+    might still pass SC_All?
+
+  CC_ScrollBar:
+    Fallback to QCommonStyle. Should be OK...
+
+  CC_Slider:
+    Looks fine...
+
+  CC_ToolButton:
+    Needs to handle the QStyleOptionToolButton::Arrow feature, though perhaps in CE_ToolButtonLabel?
+
+  CC_TitleBar:
+    Looks OK
+
+  CC_Q3ListView:
+    Looks OK
+
+  CC_GroupBox:
+    No handling (Qt 4.1)
+
+    QCommonStyle breaks it up into PE_IndicatorCheckBox, PE_FrameGroupBox, and PE_FrameFocusRect,
+    along with drawItem text. Need to check with Oxy folks on what their goals are. Probably need at 
+    least a nice placeholder WT for the frame PE, not sure the rest can probably be pushed back to 
+    4.1 or 4.0.x
+
+    Also, need to file a Qt docs bug that drawComplexControl docs don't mention QStyleOptionGroupBox for CC_GroupBox
+    
+  CC_Dial:
+    QCommonStyle does something reasonable. No need to style this, I think, it's (thankfully) hardly ever used.
+
+  CC_MdiControls:
+    No handling (Qt 4.3)
+    Should probably integrate with CC_TitleBar handling somehow, but may need a flag or something to distinguish them, perhaps
+    some sort of bevel/bevelless mode in ButtonKOpt? Definitely a lot of overlap..
+    Side note: only passes in QStyleOptionComplex
+  
+drawControl
+  CE_PushButton
+    QStyleOptionButton::Flat not taken into account (thus the frame is always drawn).
+
+  CE_HeaderSection
+    The sort indicator is the same for both ascending and descending directions.
+
+sizeFromContents:
+    CT_CheckBox: OK
+    CT_ComboBox:
+      Missing! Should compute space much like subControlRect computations do
+
+    CT_Q3DockWindow: Missing, along with other Q3DockWindow primitives. Need to test in 
+      designer to see if it's drawn OK. 
+
+    CT_HeaderSection: Hardcodes icon size instead of using PM_SmallIconSize.
+      Probably should not apply the icon - text margin when there is no icon..
+
+    CT_LineEdit: should probably add it, especially if Oxygen needs it; 
+      unfortunately the QLineEdit internals seem to do some pretty weird stuff, 
+      hardcoding some margins and anything. But, well, a uniform margin model 
+      for this would be nice..
+      see also SE_LineEditContents..
+
+    CT_Menu: OK
+    
+    CT_Q3Header:
+      Missing. Probably share code with CT_HeaderSection, or OK as-is?
+
+    CT_MenuBar, CT_MenuItem: CT_MenuBarItem: OK
+
+    
+      

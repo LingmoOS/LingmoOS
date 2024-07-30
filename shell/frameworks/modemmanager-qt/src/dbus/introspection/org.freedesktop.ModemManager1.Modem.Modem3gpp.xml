@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Modem3gpp:
+      @short_description: The ModemManager 3GPP interface.
+
+      This interface provides access to specific actions that may be performed
+      in modems with 3GPP capabilities.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Modem3gpp">
+
+    <!--
+        Register:
+        @operator_id: The operator ID (ie, <literal>"MCCMNC"</literal>, like <literal>"310260"</literal>) to register. An empty string can be used to register to the home network.
+
+        Request registration with a given mobile network.
+    -->
+    <method name="Register">
+      <arg name="operator_id" type="s" direction="in" />
+    </method>
+
+    <!--
+        Scan:
+        @results: Array of dictionaries with the found networks.
+
+        Scan for available networks.
+
+        @results is an array of dictionaries with each array element describing
+        a mobile network found in the scan. Each dictionary may include one or
+        more of the following keys:
+        <variablelist>
+          <varlistentry><term><literal>"status"</literal></term>
+            <listitem>
+              A <link linkend="MMModem3gppNetworkAvailability">MMModem3gppNetworkAvailability</link>
+              value representing network availability status, given as an
+              unsigned integer (signature <literal>"u"</literal>). This key will
+              always be present.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"operator-long"</literal></term>
+            <listitem>
+              Long-format name of operator, given as a string value (signature
+              <literal>"s"</literal>). If the name is unknown, this field
+              should not be present.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"operator-short"</literal></term>
+            <listitem>
+              Short-format name of operator, given as a string value (signature
+              <literal>"s"</literal>). If the name is unknown, this field
+              should not be present.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"operator-code"</literal></term>
+            <listitem>
+              Mobile code of the operator, given as a string value (signature
+              <literal>"s"</literal>). Returned in the format
+              <literal>"MCCMNC"</literal>, where <literal>MCC</literal> is the
+              three-digit ITU E.212 Mobile Country Code and <literal>MNC</literal>
+              is the two- or three-digit GSM Mobile Network Code. e.g.
+              <literal>"31026"</literal> or <literal>"310260"</literal>.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"access-technology"</literal></term>
+            <listitem>
+              A <link linkend="MMModemAccessTechnology">MMModemAccessTechnology</link> value
+              representing the generic access technology used by this mobile network,
+              given as an unsigned integer (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="Scan">
+      <arg name="results" type="aa{sv}" direction="out">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMapList"/>
+      </arg>
+    </method>
+
+    <!--
+        Imei:
+
+        The <ulink url="http://en.wikipedia.org/wiki/Imei">IMEI</ulink> of the device.
+    -->
+    <property name="Imei" type="s" access="read" />
+
+    <!--
+        RegistrationState:
+
+        A <link linkend="MMModem3gppRegistrationState">MMModem3gppRegistrationState</link>
+        value specifying the mobile registration status as defined in 3GPP TS 27.007
+        section 10.1.19.
+    -->
+    <property name="RegistrationState" type="u" access="read" />
+
+    <!--
+        OperatorCode:
+
+        Code of the operator to which the mobile is currently registered.
+
+        Returned in the format <literal>"MCCMNC"</literal>, where
+        <literal>MCC</literal> is the three-digit ITU E.212 Mobile Country Code
+        and <literal>MNC</literal> is the two- or three-digit GSM Mobile Network
+        Code. e.g. e<literal>"31026"</literal> or <literal>"310260"</literal>.
+
+        If the <literal>MCC</literal> and <literal>MNC</literal> are not known
+        or the mobile is not registered to a mobile network, this property will
+        be a zero-length (blank) string.
+    -->
+    <property name="OperatorCode" type="s" access="read" />
+
+    <!--
+        OperatorName:
+
+        Name of the operator to which the mobile is currently registered.
+
+        If the operator name is not known or the mobile is not
+        registered to a mobile network, this property will be a zero-length
+        (blank) string.
+    -->
+    <property name="OperatorName" type="s" access="read" />
+
+    <!--
+        EnabledFacilityLocks:
+
+        Bitmask of <link linkend="MMModem3gppFacility">MMModem3gppFacility</link> values
+        for which PIN locking is enabled.
+    -->
+    <property name="EnabledFacilityLocks" type="u" access="read" />
+
+    <!--
+        SubscriptionState:
+
+        A <link linkend="MMModem3gppSubscriptionState">MMModem3gppSubscriptionState</link>
+        value representing the subscription status of the account and whether there
+        is any data remaining, given as an unsigned integer (signature <literal>"u"</literal>).
+    -->
+    <property name="SubscriptionState" type="u" access="read" />
+
+  </interface>
+</node>

@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2023 David Redondo <kde@david-redondo.de>
+# SPDX-License-Identifier: BSD-2-Clause
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(KF6Config "@KF_DEP_VERSION@")
+
+if (NOT @BUILD_SHARED_LIBS@)
+    find_dependency(Qt6Gui @REQUIRED_QT_VERSION@)
+    find_dependency(KF6GuiAddons "@KF_DEP_VERSION@")
+    find_dependency(KF6I18n "@KF_DEP_VERSION@")
+endif()
+
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF6ColorSchemeTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@

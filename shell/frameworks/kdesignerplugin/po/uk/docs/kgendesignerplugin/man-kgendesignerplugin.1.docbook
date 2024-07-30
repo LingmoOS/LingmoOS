@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Ukrainian "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde; Frameworks: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Авторство початкової версії документації.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Оновлена документація для &kde; Frameworks 5.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>28 травня 2014 року</date>
+  <releaseinfo
+>Frameworks 5.0</releaseinfo>
+  <productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Програма для створення додатків віджетів для &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>ПАРАМЕТРИ</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>файл</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Опис</title>
+  <para
+>Нетипові додатки віджетів для &Qt; Designer зазвичай мають стандартну структуру, класи, роботу яких забезпечує додаток, здебільшого надають статичну інформацію, а функція для створення екземпляра класу типово є простим викликом конструктора. За допомогою <command
+>kgendesignerplugin</command
+> розробники бібліотек, які створюють нові віджети, можуть створити такий додаток з усім стандартним кодом на основі простого файла опису у стилі ini. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> вибирає загальноприйнятні типові значення для більшості параметрів, отже, зазвичай, потрібні лише мінімальні зміни у налаштуваннях. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Параметри</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>файл</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Назва створеного програмою файла коду C++. Якщо назву не вказано, дані буде виведено до <varname
+>stdout</varname
+>. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>назва додатка</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Забезпечує сумісність із попередніми версіями. Типове значення для параметра PluginName у файлі вхідних даних. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>група</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Забезпечує сумісність із попередніми версіями. Типове значення для параметра DefaultGroup у файлі вхідних даних. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Вивести дані щодо авторства програми.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Вивести дані щодо умов ліцензування на програму.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Вивести короткий текст довідки.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v , --version</option
+></term>
+      <listitem>
+        <para
+>Вивести дані щодо версії програми.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Формат файлів</title>
+  <para
+>Файл вхідних даних є файлом налаштувань у стилі ini (якщо бути точнішим, то у форматі, підтримуваному бібліотекою KConfig), який містить опис набору віджетів. У ньому має бути розділ <literal
+>[Global]</literal
+>, де наведено загальні відомості щодо додатка, та окремий розділ для кожного з віджетів, які має бути включено до додатка. </para>
+
+  <para
+>У розділі <literal
+>[Global]</literal
+> може бути вказано такі записи: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>Типове значення для запису <varname
+>Group</varname
+> у розділах класів (типове значення: "<literal
+>Custom</literal
+>", якщо не вказано параметра <option
+>-g</option
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Список включень, відокремлених комами (типове значення: порожній). Зауважте, що тут не слід вказувати файли заголовків, які пізніше буде вказано у файлі; це лише спеціальні файли заголовків, які використовуватимуться лише самим додатком, якщо заголовки для класів, які надають можливість попереднього перегляду. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>Назва основного класу C++ у додатку (типове значення: <literal
+>WidgetsPlugin</literal
+>, якщо не вказано параметра <option
+>-n</option
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>У кожного класу має бути власний розділ <literal
+>[<replaceable
+>ClassName</replaceable
+>]</literal
+>, у якому мають бути такі записи: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>Значення, яке повертає функція <code
+>codeTemplate()</code
+> додатка, яку буде позначено для наступного використання &Qt; Designer (типове значення: порожнє). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Аргументи, які слід передати конструктору класу, вказаного за допомогою <literal
+>ImplClass</literal
+>; ці значення слід вказувати у дужках (типове значення: <literal
+>(parent)</literal
+>). Єдиною гарантовано доступною змінною є <varname
+>parent</varname
+>, тобто батьківський об’єкт <code
+>QWidget</code
+>, переданий &Qt; Designer. </para>
+          <para
+>Цей запис буде проігноровано, якщо встановлено значення для <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>Код, потрібний для створення екземпляра віджета (типове значення: використовувати <code
+>new</code
+> для створення екземпляра класу, вказаного записом <literal
+>ImplClass</literal
+>, передавати аргументи, вказані за допомогою <literal
+>ConstructorArgs</literal
+>). Див. опис записів <literal
+>ImplClass</literal
+> та <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Опис інтерфейсу користувача віджета у форматі XML (типове значення: типовий опис, створений на основі заголовків додатків &Qt; Designer). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>Група, у якій віджет буде показано у &Qt; Designer (типове значення: значення запису <varname
+>DefaultGroup</varname
+> у розділі <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>Файл зображення або назва стандартної піктограми, яку слід використовувати як піктограму для цього віджета у списку віджетів &Qt; Designer (типове значення: файл PNG, назва якого збігається з назвою розділу без подвійних двокрапок, розташований у каталозі pics вбудованого файла ресурсів; приклад: <filename
+>:/pics/Foo.png</filename
+> у розділі <literal
+>[Foo]</literal
+> або <filename
+>:/pics/FooBar.png</filename
+> у розділі <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>Клас, який слід використовувати для створення екземпляра віджета для використання у &Qt; Designer (типове значення: назва розділу). Зауважте, що насправді це може бути не той клас, який було б створено остаточною програмою: той клас визначається у <literal
+>DomXML</literal
+>. </para>
+          <para
+>Цей запис буде проігноровано, якщо встановлено значення для <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>Файл заголовків, який слід включити для використання цього віджета (типове значення: написана малими літерами назва розділу без двокрапок з дописаним «.h»; приклад: <literal
+>foo.h</literal
+> у розділі <literal
+>[Foo]</literal
+> або <literal
+>foobar.h</literal
+> у розділі <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Визначає, чи містить цей віджет інші віджети (типове значення: <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>Підказка, яку буде показано у відповідь на затримування вказівника миші на віджеті у списку віджетів &Qt; Designer (типове значення: назва розділу з дописуванням « Widget»; приклад: <literal
+>Foo Widget</literal
+> у розділі <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>Текст підказки «Що це?», пов’язаної з віджетом у &Qt; Designer (типове значення: назва розділу з дописаним « Widget»; приклад: <literal
+>Foo Widget</literal
+> у розділі <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Приклади</title>
+  <para
+>Найпростіший файл опису може виглядати так: <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Displays foos
+[Bar]
+ToolTip=Bar editor
+]]>
+    </screen
+> Зауважте, що у кожному класі має бути принаймні один встановлений ключ (у нашому прикладі використано ключ <literal
+>ToolTip</literal
+>), інакше запис класу буде проігноровано. </para>
+  <para
+>Зазвичай, виникає потреба у зміні принаймні видимого користувачем тексту, тобто записів <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> та <literal
+>Group</literal
+>. Крім того, варто також визначити назву додатка, щоб запобігти можливим конфліктам символів і не ускладнювати роботу засобів діагностики (самої програми та особи, яка шукає вади): <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Display
+
+[Foo]
+ToolTip=Displays bears
+WhatsThis=An image widget that displays dancing bears
+
+[Bar]
+ToolTip=Bar editor
+WhatsThis=An editor interface for bars for bears
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Якщо у вашій програмі використовуються окремі простори назв для різних класів або додаткові параметри, які слід передавати конструкторам, доведеться створити складніший файл. Приклад: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Foo
+
+[Foo::Bar]
+ToolTip=Displays bars
+WhatsThis=A widget that displays bars in a particular way
+IncludeFile=foo/bar.h
+IconName=:/previews/bar.png
+
+[Foo::Baz]
+IncludeFile=foo/baz.h
+ConstructorArgs=(Foo::Baz::SomeOption, parent)
+Group=Foo (Special)
+IsContainer=true
+IconName=:/previews/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>Іноді, у дуже складних віджетах потрібна особлива реалізація «класу попереднього перегляду» для використання у &Qt; Designer; це може бути підклас справжнього віджета, лише з деякими додатковими налаштуваннями, або зовсім відмінна від нього реалізація. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=foopreviews.h
+
+[FancyWidget]
+ImplClass=FancyWidgetPreview
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Прочитайте також</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>Документація з &Qt; Designer щодо створення додатків для нетипових віджетів.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Вади</title>
+  <para
+>Для повідомлення про вади, будь ласка, скористайтеся <ulink url="https://bugs.kde.org"
+>системою стеження за вадами &kde;</ulink
+>, не надсилайте електронних листів безпосередньо авторам. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

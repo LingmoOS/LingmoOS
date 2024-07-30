@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: 2015 Aleix Pol Gonzalez <aleixpol@blue-systems.com>
+# SPDX-FileCopyrightText: 2022 Harald Sitter <sitter@kde.org>
+
+include(FindPackageHandleStandardArgs)
+
+execute_process(COMMAND @Python3_EXECUTABLE@ -c "import @MODULE_NAME@" ERROR_VARIABLE ERRORS_OUTPUT OUTPUT_VARIABLE DISREGARD_VARIABLE RESULT_VARIABLE ExitCode TIMEOUT 30)
+
+if(ExitCode EQUAL 0)
+    set(@GENMODULE@_FOUND TRUE)
+else()
+    message(STATUS "python3 import failed for @MODULE_NAME@.")
+    set(@GENMODULE@_FOUND FALSE)
+endif()
+
+find_package_handle_standard_args(@GENMODULE@
+    FOUND_VAR
+        @GENMODULE@_FOUND
+    REQUIRED_VARS
+        @GENMODULE@_FOUND
+    HANDLE_COMPONENTS
+)

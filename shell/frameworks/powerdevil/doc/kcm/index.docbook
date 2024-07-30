@@ -1,0 +1,351 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+]>
+<article id="powerdevil" lang="&language;">
+<articleinfo>
+<title>Power Management</title>
+<authorgroup>
+<author>&Dario.Freddi;&Dario.Freddi.mail;</author>
+<author>&Jakob.Petsovits;&Jakob.Petsovits.mail;</author>
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<date>2024-02-09</date>
+<releaseinfo>&plasma; 6.0</releaseinfo>
+
+<keywordset>
+<keyword>Plasma</keyword>
+<keyword>System Settings</keyword>
+<keyword>powerdevil</keyword>
+<keyword>power management</keyword>
+<keyword>energy saving</keyword>
+<keyword>laptop power</keyword>
+</keywordset>
+</articleinfo>
+
+<sect1 id="kcm_powerdevilconfig">
+<title>Power Management</title>
+
+<para>This settings module configures &plasma;'s power management service, also known as PowerDevil. It allows you to make trade-offs between saving energy and making full use of your system's capabilities. The power management service is integrated into your desktop and can interact with your hardware.</para>
+
+<para>The module's main page shows settings that can help to save energy. Only the settings that are supported by your system will be shown. On battery-powered systems, the page provides three tabs with different settings for <guilabel>On AC Power</guilabel>, <guilabel>On Battery</guilabel>, and <guilabel>On Low Battery</guilabel> power states.
+</para>
+
+<para>
+<screenshot>
+<screeninfo>Power Management Settings</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="energy.png" format="PNG"/>
+    </imageobject>
+    <textobject>
+      <phrase>Power Management Settings</phrase>
+    </textobject>
+    <caption>
+      <para>Power Management Settings</para>
+    </caption>
+  </mediaobject>
+</screenshot>
+</para>
+
+<sect2 id="suspend-session-section">
+<title>Suspend Session</title>
+<para>
+There are common circumstances where you expect the system to sleep, shut down, or pause your regular desktop session in other ways. This section allows you to define how exactly your system will behave in these circumstances.
+</para>
+
+<variablelist>
+
+<varlistentry><term><guilabel>Do nothing</guilabel></term>
+<listitem>
+<para>Carry on with your desktop session as if nothing happened.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Sleep</guilabel></term>
+<listitem>
+<para>Save power and wake up quickly. Many hardware components enter a power-saving state without fully shutting down the system. Unsaved data will be lost if the power supply gets interrupted&#x2014;for example when the battery is fully depleted. The degree of power savings achieved while sleeping depend on hardware and firmware provided by the system manufacturer.</para>
+
+<para>The module provides an additional drop-down setting to select the exact sleep mode to enter when "Sleep" is activated:</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Standby</guilabel></term>
+<listitem>
+<para>Save the current desktop session to memory. This traditional sleep mode enters sleep quickly and wakes up quickly. Battery-powered systems are often designed to last anywhere between a day and 1-2 weeks in this state. Also known as "Suspend to RAM".</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><guilabel>Hybrid sleep</guilabel></term>
+<listitem>
+<para>Save the current desktop session to both memory and a storage drive, such as an SSD or hard drive. Waking up is quick like standby, but unsaved data will survive even if power runs out while sleeping. As a downside, this sleep mode puts the most strain on your storage drive, which potentially reduces its longevity and takes longer for the system to start sleeping compared to using standby. Also known as "Hybrid suspend".</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><guilabel>Standby, then hibernate</guilabel></term>
+<listitem>
+<para>Enter standby mode initially, then hibernate after a period of inactivity. If the system only sleeps for a while, this sleep mode provides the quick wake-up times and storage drive longevity benefits of regular standby. If the system remains inactive for a longer amount of time, hibernation reduces power consumption even further and ensures that unsaved data is not lost. The amount of time until hibernation is defined by your low-level system configuration. Also known as "Suspend, then hibernate".</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Hibernate</guilabel></term>
+<listitem>
+<para>Save the current desktop session to your storage drive and power off. Hibernating and restoring the session take longer than sleep in standby mode, but unsaved data will not be lost if the power supply gets interrupted. Hibernation is widely supported across different kinds of hardware, as long as your storage drive was set up with a large enough swap partition to store the contents of your system memory. Also known as "Suspend to disk".
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Shut down</guilabel></term>
+<listitem>
+<para>Log out of your desktop session and any other open sessions, then power off the system. Open applications will ask to save any unsaved data before closing. For future sessions, application state is only restored to the extent that the application itself supports it.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Lock screen</guilabel></term>
+<listitem>
+<para>Lock the screen without reducing power consumption. To save power while also locking the screen, select "Sleep" or "Hibernate" and ensure that locking after waking from sleep is enabled in the Screen Locking settings module. Note that the Screen Locking module provides a separate setting for locking after a period of inactivity, so this is only available as power button or laptop lid action.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Show logout screen</guilabel></term>
+<listitem>
+<para>Present a dialog with options to sleep, hibernate, shut down or log out. This is only available as an option when pressing the system's physical power button.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Turn off screen</guilabel></term>
+<listitem>
+<para>Fade to black and turn off the display backlight. The "Display and Brightness" section has its own setting for turning off the screen, independent from the inactivity action configured in "Suspend Session".
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2 id="display-and-brightness-section">
+<title>Display and Brightness</title>
+<para>
+Laptop displays and keyboard backlights account for much of the power draw of an otherwise idle laptop. Large monitors often draw more power than an entire laptop including its display. Certain kinds of displays are susceptible to burn-in or stuck pixels depending on the usage pattern. For all of these reasons, it helps to reduce brightness or turn off displays and backlights altogether if they're not needed.
+</para>
+
+<variablelist>
+
+<varlistentry><term><guilabel>Change screen brightness</guilabel> / <guilabel>Change keyboard brightness</guilabel></term>
+<listitem>
+<para>Define a brightness level to set when switching between <guilabel>On AC Power</guilabel>, <guilabel>On Battery</guilabel>, and <guilabel>On Low Battery</guilabel> power states.
+</para>
+<para>Screen and keyboard brightness can also be changed on the fly through the <guilabel>Brightness and Color</guilabel> applet, as well as with keyboard shortcuts. Changing brightness on the fly will not affect the settings in this module. If no brightness level is set in this settings module, the brightness will remain the same when switching between power states.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Dim automatically</guilabel></term>
+<listitem>
+<para>Reduce screen brightness after a period of inactivity. When user activity is detected again, the screen will return to its previous brightness level.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Turn off screen</guilabel></term>
+<listitem>
+<para>Fade to black and turn off the display backlight after a period of inactivity. When user activity is detected again, the screen will turn on again. A shorter wait time can be set for when the screen locker is active.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2 id="other-settings">
+<title>Other Settings</title>
+
+<variablelist>
+
+<varlistentry><term><guilabel>Switch to power profile</guilabel></term>
+<listitem>
+<para>Define system performance characteristics to set when switching between <guilabel>On AC Power</guilabel>, <guilabel>On Battery</guilabel>, and <guilabel>On Low Battery</guilabel> power states. A power profile such as <guilabel>Power Save</guilabel>, <guilabel>Balanced</guilabel> and <guilabel>Performance</guilabel> allows you to trade off performance vs. power consumption, which also affects the levels of heat and fan noise your system will produce.
+</para>
+<para>Power profiles can also be changed on the fly through the <guilabel>Power and Battery</guilabel> applet, as well as with keyboard shortcuts. Changing power profiles on the fly will not affect the settings in this module. If no brightness level is set in this settings module, the brightness will remain the same when switching between power states.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><guilabel>Run Script</guilabel></term>
+<listitem>
+<para>Configure a custom script to run when switching between <guilabel>On AC Power</guilabel>, <guilabel>On Battery</guilabel>, and <guilabel>On Low Battery</guilabel> power states, or after a period of inactivity.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</sect2>
+
+<sect2 id="advanced-power-settings">
+<title>Advanced Power Settings</title>
+<para>
+<screenshot>
+<screeninfo>Advanced Power Settings</screeninfo>
+  <mediaobject>
+    <imageobject>
+      <imagedata fileref="advanced.png" format="PNG"/>
+    </imageobject>
+    <textobject>
+      <phrase>Advanced Power Settings</phrase>
+    </textobject>
+    <caption>
+      <para>Advanced Power Settings</para>
+    </caption>
+  </mediaobject>
+</screenshot>
+</para>
+
+<para>Open this page by pressing the button in the corner of the settings module's main page.
+</para>
+
+<variablelist>
+
+<varlistentry><term><guilabel>Battery Levels</guilabel></term>
+<listitem>
+<para>These settings are only displayed on battery-powered systems.
+</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Low level</guilabel></term>
+<listitem>
+<para>Below this percentage, the battery charge will be considered low. If the system is unplugged, settings from the <guilabel>On Low Battery</guilabel> profile will be used instead of <guilabel>On Battery</guilabel>.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><guilabel>Critical level</guilabel></term>
+<listitem>
+<para>Below this percentage, the battery charge will be considered at a critical level.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><guilabel>At critical level</guilabel></term>
+<listitem>
+<para>Define the action that will be performed when the battery charge reaches the critical level.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Peripheral devices</term>
+<listitem>
+<para>Below this percentage, the battery charge for peripheral devices &eg; a wireless mouse will be considered low.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+
+</varlistentry>
+
+<varlistentry><term><guilabel>Charge Limit</guilabel></term>
+<listitem>
+<para>These settings are only displayed if the system supports charge limits for its battery.
+</para>
+
+<para>Regularly charging the battery close to 100% or fully discharging it close to 0% can cause it to deteriorate faster. By limiting the maximum battery charge, you can help extend your battery's lifespan.
+</para>
+
+<para>Different sources recommend different charge levels for lithium-ion batteries. The general consensus among available research indicates that keeping your battery within the 25%-75% range is optimal to retain its capacity over the years. A range of 15%-85% still significantly increases battery life compared to wider ranges.
+</para>
+
+<para>Note that battery lifespan is mainly affected by its charge level over time, more so than the number of charging and discharging cycles.
+</para>
+
+<variablelist>
+<varlistentry><term><guilabel>Stop charging at</guilabel></term>
+<listitem>
+<para>The upper charge limit for your battery. Once this level is reached, the battery is considered fully charged and the system won't charge it any further.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><guilabel>Start charging once below</guilabel></term>
+<listitem>
+<para>The lower charge limit. Once the battery discharges past this level, the system will start charging it again. This can be a little lower than the upper limit, or the same percentage to keep drawing power while the battery charge remains constant.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>Some systems require unplugging the power cable and reconnecting it before the settings are respected. Some systems don't store charge limits when powered off. Be aware of possible limitations.
+</para>
+</listitem>
+
+</varlistentry>
+</variablelist>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="powerdevilrunner">
+<title>PowerDevil Runner</title>
+
+<para>PowerDevil can be manually controlled through &krunner; (<keycombo action="simul">&Alt;<keycap>F2</keycap></keycombo>). This makes changing brightness, power profile, and more much easier and faster. The runner has various keywords you can enter to access its functions
+</para>
+<sect2 id="runnerwords">
+<title>Runner Keywords</title>
+<para>
+Here comes a list of keywords you can enter in &krunner; to perform PowerDevil related actions.
+</para>
+<variablelist>
+<varlistentry><term><userinput>power profile</userinput></term>
+<listitem>
+<para>
+You can manually choose a power profile using this keyword. All available profiles will be shown in form of &krunner; matches.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><userinput>screen brightness</userinput> or <userinput>dim screen</userinput></term>
+<listitem>
+<para>
+You can control screen brightness through this keyword. In this form, some &krunner; matches that let you run common power actions will be shown. If you enter a value after the keyword (&eg;: <userinput>screen brightness 50</userinput>), the brightness will be set to that value.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><userinput>suspend</userinput>, <userinput>sleep</userinput>, <userinput>hibernate</userinput>,
+<userinput>to ram</userinput> or <userinput>to disk</userinput></term>
+<listitem>
+<para>
+You can set your computer into a low power mode through these keywords. Available methods will be shown as &krunner; matches.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</sect2>
+</sect1>
+</article>
+<!--FIXME in 5.7
+plasma-workspace/runners/powerdevil/
+PowerDevilRunner.cpp:55:    commands << i18nc("Note this is a KRunner keyword", "power profile")
+PowerDevilRunner.cpp:56:             << i18nc("Note this is a KRunner keyword", "suspend")
+PowerDevilRunner.cpp:57:             << i18nc("Note this is a KRunner keyword", "sleep")
+PowerDevilRunner.cpp:58:             << i18nc("Note this is a KRunner keyword", "hibernate")
+PowerDevilRunner.cpp:59:             << i18nc("Note this is a KRunner keyword", "to disk")
+PowerDevilRunner.cpp:60:             << i18nc("Note this is a KRunner keyword", "to ram")
+PowerDevilRunner.cpp:61:             << i18nc("Note this is a KRunner keyword", "screen brightness")
+PowerDevilRunner.cpp:62:             << i18nc("Note this is a KRunner keyword", "dim screen");
+-->
+
+<!--
+Local Variables:
+mode: xml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+
+vim:tabstop=2:shiftwidth=2:expandtab
+kate: space-indent on; indent-width 2; tab-width 2; indent-mode none;
+-->

@@ -1,0 +1,101 @@
+# Wesnoth Markup Language
+
+#textdomain wesnoth-libs
+
+<beginfold id='1'>#define</beginfold id='1'> __GUI_WINDOW_HEIGHT
+(
+	if(window_height = 0, 9999, window_height)
+)<endfold id='1'>#enddef</endfold id='1'>
+
+<beginfold id='1'>#define</beginfold id='1'> __GUI_WINDOW_FUNCTIONS
+def reevaluate_best_size(w, s)
+(
+[
+	0,
+#
+	debug_print('window ', w),
+	debug_print('screen ', s)
+#
+][0]
+);
+<endfold id='1'>#enddef</endfold id='1'>
+
+# Don't highlight array indices as tags
+stored_unit[1].moves
+other[0][1][2]
+other[foo][bar]
+
+foo[<beginfold id='2'>{</beginfold id='2'>MACRO<endfold id='2'>}</endfold id='2'>]
+foo[$index]
+foo[  12 ]
+
+# Nested tags
+<beginfold id='3'>[allow_undo]</beginfold id='3'><endfold id='3'>[/allow_undo]</endfold id='3'><beginfold id='3'>[not]</beginfold id='3'><beginfold id='3'>[true]</beginfold id='3'>text<endfold id='3'>[/true]</endfold id='3'><endfold id='3'>[/not]</endfold id='3'>
+<beginfold id='3'>[foo]</beginfold id='3'><beginfold id='3'>[bar]</beginfold id='3'>text<endfold id='3'>[/bar]</endfold id='3'><endfold id='3'>[/foo]</endfold id='3'>
+
+<beginfold id='3'>[about]</beginfold id='3'>
+	title= _ "Campaign Designer"
+	text="Your Name"
+<endfold id='3'>[/about]</endfold id='3'>
+
+<beginfold id='3'>[window]</beginfold id='3'>
+	id = "tooltip"
+
+	<beginfold id='3'>[resolution]</beginfold id='3'>
+		definition = "tooltip"
+		automatic_placement = false
+		functions = "{__GUI_WINDOW_FUNCTIONS<endfold id='2'>}</endfold id='2'>"
+
+		<beginfold id='3'>[grid]</beginfold id='3'>
+
+			<beginfold id='3'>[row]</beginfold id='3'>
+
+				<beginfold id='3'>[column]</beginfold id='3'>
+
+					<beginfold id='3'>[label]</beginfold id='3'>
+						id = "label"
+						definition = "default_small"
+
+						use_markup = true
+						wrap = true
+					<endfold id='3'>[/label]</endfold id='3'>
+
+				<endfold id='3'>[/column]</endfold id='3'>
+
+			<endfold id='3'>[/row]</endfold id='3'>
+
+		<endfold id='3'>[/grid]</endfold id='3'>
+
+	<endfold id='3'>[/resolution]</endfold id='3'>
+
+<endfold id='3'>[/window]</endfold id='3'>
+
+<beginfold id='3'>[event]</beginfold id='3'>
+	name = preload
+	first_time_only = no
+	<beginfold id='3'>[lua]</beginfold id='3'>
+		code =<beginfold id='4'> <<</beginfold id='4'>
+			<beginfold id='5'>function</beginfold id='5'> narrator(t)
+				-- Behave like the [message] tag.
+				wesnoth.fire("message",
+				  <beginfold id='6'>{</beginfold id='6'> speaker = "narrator", message = t.sentence <endfold id='6'>}</endfold id='6'>)
+			<endfold id='5'>end</endfold id='5'>
+		<endfold id='4'>>></endfold id='4'>
+	<endfold id='3'>[/lua]</endfold id='3'>
+<endfold id='3'>[/event]</endfold id='3'>
+
+<beginfold id='3'>[event]</beginfold id='3'>
+	name = turn 1
+	<beginfold id='3'>[lua]</beginfold id='3'>
+		code =<beginfold id='4'> <<</beginfold id='4'> narrator(...) <endfold id='4'>>></endfold id='4'>
+		<beginfold id='3'>[args]</beginfold id='3'>
+			sentence = _ "Hello world!"
+		<endfold id='3'>[/args]</endfold id='3'>
+	<endfold id='3'>[/lua]</endfold id='3'>
+	<beginfold id='3'>[lua]</beginfold id='3'>
+		code =<beginfold id='4'> <<</beginfold id='4'> narrator(...) <endfold id='4'>>></endfold id='4'>
+		<beginfold id='3'>[args]</beginfold id='3'>
+			sentence = _ "How are you today?"
+		<endfold id='3'>[/args]</endfold id='3'>
+	<endfold id='3'>[/lua]</endfold id='3'>
+<endfold id='3'>[/event]</endfold id='3'>

@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "../../../bin/lingmo/kcms/kcm_about-distro.pdb"
+  "../../../bin/lingmo/kcms/kcm_about-distro.so"
+  "CMakeFiles/kcm_about-distro_autogen.dir/AutogenUsed.txt"
+  "CMakeFiles/kcm_about-distro_autogen.dir/ParseCache.txt"
+  "kcm_about-distro_autogen"
+  "CMakeFiles/kcm_about-distro.dir/CPUEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/CPUEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/Entry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/Entry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/FancyString.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/FancyString.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/GPUEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/GPUEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/GraphicsPlatformEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/GraphicsPlatformEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/KernelEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/KernelEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/MemoryEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/MemoryEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/OSVersionEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/OSVersionEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/LingmoEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/LingmoEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/ServiceRunner.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/ServiceRunner.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/ThirdPartyEntry.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/ThirdPartyEntry.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/kcm_about-distro_autogen/mocs_compilation.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/kcm_about-distro_autogen/mocs_compilation.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/main.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/main.cpp.o.d"
+  "CMakeFiles/kcm_about-distro.dir/qrc_kcm_about-distro.cpp.o"
+  "CMakeFiles/kcm_about-distro.dir/qrc_kcm_about-distro.cpp.o.d"
+  "kcm_about-distro_autogen/mocs_compilation.cpp"
+  "kcm_about-distro_autogen/timestamp"
+  "qrc_kcm_about-distro.cpp"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/kcm_about-distro.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

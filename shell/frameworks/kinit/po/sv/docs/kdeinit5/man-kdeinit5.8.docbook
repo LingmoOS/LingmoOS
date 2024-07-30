@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Swedish "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>kdeinit5 användarhandbok</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2013-12-18</date>
+<releaseinfo
+>Ramverk 5.0</releaseinfo>
+<productname
+>KDE Ramverk</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Startprogram för program byggda med stöd för kdeinit, och för I/O-slavar.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Översikt</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+program</arg
+> <arg
+>program</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beskrivning</title>
+
+<para
+>kdeinit5 är ett startprogram för processer som något liknar det berömda programmet <command
+>init</command
+> som används för att starta Unix. Det kör &kde;-program och laddningsbara kdeinit-moduler (KLM:er), som startas effektivare. </para>
+
+<para
+>Att använda kdeinit5 för att starta &kde;-program gör att ett typiskt &kde;-program startar ett antal gånger snabbare och reducerar minnesåtgång med en avsevärd mängd.</para>
+
+<para
+>kdeinit5 är länkat med alla bibliotek som ett typiskt &kde;-program behöver. Med denna teknik går det mycket fortare att starta ett program, eftersom bara själva programmet måste länkas, medan annars programmet samt alla bibliotek det använder måste länkas. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Nackdelar</title>
+
+<para
+>Processnamnet för program som startas via kdeinit5 är "kdeinit5". Problemet kan delvis lösas genom att ändra programnamnet som visas av <command
+>ps</command
+>. Dock ser program som <command
+>killall</command
+> bara kdeinit5 som processnamn. För att komma runt det, använd <command
+>kdekillall</command
+> (från kdesdk/scripts) för program startade via kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Väljare</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Visa hjälp om väljare </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Starta inte en ny process, dvs. avsluta inte förrän programmen som körs avslutas</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>Starta inte kded</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Avsluta när inga KDE-program längre körs </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+program</option
+></term>
+<listitem>
+<para
+>kör program och hantera begäran </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>program</option
+></term>
+<listitem>
+<para
+>kör program utan att hantera någon begäran </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Användning</title>
+<para
+>Ett vanligt sätt att köra programmet är att bara ange följande kommando <userinput
+><command
+>kdeinit5</command
+> program</userinput
+> eller <userinput
+><command
+>kdeinit5</command
+> +program </userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Filer</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Miljövariabler</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Anger nuvarande användares hemkatalog</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Anger om nuvarande användares hemkatalog är skrivskyddad</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Om angiven, talar om för kdeinit5 att &kde;-program är förlänkade.</para>
+<para
+>(Förlänkning är en process som gör det möjligt att snabba upp den dynamiska länkningsprocessen.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Om angiven, talar om för kdeinit5 att det kör på ett &kde;-skrivbord.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Se också</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Fel</title>
+<para
+>Använd <ulink url="http://bugs.kde.org"
+>KDE:s felspårningssystem</ulink
+> för att rapportera fel.</para>
+</refsect1>
+
+</refentry>
+
+
+

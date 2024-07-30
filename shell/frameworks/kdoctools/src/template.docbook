@@ -1,0 +1,549 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!-- Define an entity for your application if it is not part of KDE
+       Git -->
+  <!ENTITY kmyapplication "<application>KMyApp</application>">
+  <!ENTITY i18n-translatable-entity "<application>Translatable Entity</application>">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+
+  <!-- Do not define any other entities; instead, use the entities
+       from entities/general.entities and en/user.entities. -->
+]>
+
+<!--
+Use this template for application docbooks
+For KIO worker, systemsettings (kcontrol) modules and simple/short application docbooks use article-template.docbook
+Rename this template to index.docbook and place into the directory doc/ or doc/appname if you have several applications in one doc directory
+-->
+
+<!-- kdoctemplate v0.13.0 2017-07-31 ltoscano
+     add CC BY-SA 4.0 International and set as default
+
+     kdoctemplate v0.12.0 2016-04-23 lueck
+     add translatable entities
+     remove help.menu.documentation entity
+     and add some examples how to use the common menus Settings and Help
+
+     kdoctemplate v0.11.0 2015-04-03 lueck
+     updated instructions for date + releaseinfo
+     remove ENTITY package - not used anymore
+     add info about KDE Games special chapters
+     Appendix Installation is now optional
+
+     kdoctemplate v0.10.0 2014-04-02 ltoscano
+     updated to KF5/kdoctools
+     references to KDE reworded
+
+     kdoctemplate v0.9.2 2012-10-15 pino
+     update versions to 4.9
+     update years to 2012
+     switch from CVS to Git
+     add id attribute to <book>
+     
+     kdoctemplate v0.9.1 2010-10-27 lueck
+     changed releaseinfo format
+     removed screenshot format="EPS
+     added comment when to write a command reference
+     added tip using id's in varlistentries
+     removed refentry stuff
+     
+     kdoctemplate v0.9 January 10 2003
+     Changes to comments to clarify entity usage January 10 2003
+     Minor update to "Credits and Licenses" section on August 24, 2000
+     Removed "Revision history" section on 22 January 2001
+     Changed to Installation/Help menu entities 18 October 2001
+     Other minor cleanup and changes 18 October 2001
+     FPI change and minor changes November 2002 -->
+
+<!--
+This template was designed by: David Rugge davidrugge@mindspring.com
+with lots of help from: Eric Bischoff ebisch@cybercable.tm.fr
+and Frederik Fouvry fouvry@sfs.nphil.uni-tuebingen.de
+of the KDE DocBook team.
+
+You may freely use this template for writing any sort of KDE documentation.
+If you have any changes or improvements, please let us know.
+
+Remember:
+- in XML, the case of the <tags> and attributes is relevant ;
+- also, quote all attributes.
+
+Please don't forget to remove all these comments in your final documentation,
+thanks ;-).
+-->
+
+<!-- ................................................................ -->
+
+<!-- The language must NOT be changed here. -->
+<!-- If you are writing original documentation in a language other -->
+<!-- than English, change the language above ONLY, not here -->
+<!-- Change the value of id to the name of your application -->
+<book id="kmyapplication" lang="&language;">
+
+<!-- This header contains all of the meta-information for the document such
+as Authors, publish date, the abstract, and Keywords -->
+
+<bookinfo>
+<title>The &kmyapplication; Handbook</title>
+
+<authorgroup>
+<author>
+<!-- This is just put in as an example.  For real documentation, please
+     define a general entity in entities/contributor.entities, e.g.
+<!ENTITY George.N.Ugnacious "<personname><firstname>George</firstname><othername>N.</othername><surname>Ugnacious</surname></personname>">
+<!ENTITY George.N.Ugnacious.mail "<email>gnu@kde.org</email>">
+and use `&George.N.Ugnacious; &George.N.Ugnacious.mail;' in the author element.
+ -->
+<personname>
+<firstname>George</firstname>
+<othername>N.</othername>
+<surname>Ugnacious</surname>
+</personname>
+<email>gnu@kde.org</email>
+</author>
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<copyright>
+<year>2015</year>
+<holder>George N. Ugnacious</holder>
+</copyright>
+<legalnotice>&CCBYSA4Notice;</legalnotice>
+
+<!-- Date of the documentation
+Change date/releaseinfo only if
+   docbook is updated and verified to be valid for the current app version
+   or
+   docbook is proofread and verified to be valid for the current app version
+Don't forget to include this last date.
+Please respect the format of the date (YYYY-MM-DD),it is used by scripts.
+-->
+<date>2016-04-23</date>
+
+<!--version information of Frameworks/Plasma/Applications this documentation is valid for.
+Example:
+Frameworks xx.yy for docbooks in frameworks
+Plasma xx.yy for docbooks in plasma workspace
+Applications xx.yy for docbooks released as Applications
+xx.yy (Applications xx.yy) for docbooks with own version released as Applications
+$applicationname xx.yy for applications with independent release schedule (extragear/playground)
+-->
+<releaseinfo>Frameworks xx.yy or Plasma xx.yy or Applications xx.yy or xx.yy (Applications xx.yy) or $applicationname xx.yy</releaseinfo>
+
+<!-- Abstract about this handbook -->
+
+<abstract>
+<para>
+&kmyapplication; is an application specially designed to do nothing you would
+ever want.
+</para>
+</abstract>
+
+<!-- This is a set of Keywords for indexing by search engines.
+Please at least include KDE, the KDE section it is in, the name
+ of your application, and a few relevant keywords. -->
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>kdeutils</keyword>
+<keyword>Kapp</keyword>
+<keyword>nothing</keyword>
+<keyword>nothing else</keyword>
+</keywordset>
+
+</bookinfo>
+
+<!-- The contents of the documentation begin here.  Label
+each chapter so with the id attribute. This is necessary for two reasons: it
+allows you to easily reference the chapter from other chapters of your
+document, and if there is no ID, the name of the generated HTML files will vary
+from time to time making it hard to manage for maintainers and for the CVS
+system. Any chapter labelled (OPTIONAL) may be left out at the author's
+discretion. Other chapters should not be left out in order to maintain a
+consistent documentation style across all KDE apps. -->
+
+
+<!-- KDE Games have special chapters
+
+Introduction
+
+How to play
+
+Game Rules, Strategies and Tips
+
+Interface Overview
+
+Frequently asked questions
+
+Credits and License
+
+Please use one of index.docbook files from kdegames
+
+-->
+<chapter id="introduction">
+<title>Introduction</title>
+
+<!-- The introduction chapter contains a brief introduction for the
+application that explains what it does and where to report
+problems. Basically a long version of the abstract.  Don't include a
+revision history. (see installation appendix comment) -->
+
+<para>
+&kmyapplication; is a program that lets you do absolutely nothing. Please report
+any problems or feature requests to the &kde; mailing lists.
+</para>
+</chapter>
+
+<chapter id="using-kapp">
+<title>Using &kmyapplication;</title>
+
+<!-- This chapter should tell the user how to use your app. You should use as
+many sections (Chapter, Sect1, Sect3, etc...) as is necessary to fully document
+your application. -->
+
+<para>
+
+<!-- Note that all graphics should be in .png format. Use no gifs because of
+patent issues. -->
+
+<screenshot>
+<screeninfo>Here's a screenshot of &kmyapplication;</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="screenshot.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase>Screenshot</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+</para>
+
+
+<sect1 id="kapp-features">
+<title>More &kmyapplication; features</title>
+
+<para>It slices! It dices! and it comes with a free toaster!</para>
+<para>
+The Squiggle Tool <guiicon><inlinemediaobject>
+	  <imageobject>
+	    <imagedata fileref="squiggle.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase>Squiggle</phrase>
+	  </textobject>
+</inlinemediaobject></guiicon> is used to draw squiggly lines all over
+the &kmyapplication; main window. It's not a bug, it's a feature!
+</para>
+
+</sect1>
+</chapter>
+
+<chapter id="commands">
+<title>Command Reference</title>
+
+<!-- (OPTIONAL, BUT RECOMMENDED) This chapter should list all of the
+application windows and their menubar and toolbar commands for easy reference.
+Also include any keys that have a special function but have no equivalent in the
+menus or toolbars. 
+This may not be necessary for small apps or apps with no tool or menu bars.
+
+Don't bother users with well known kde menu items like Settings->Shortcuts etc. 
+
+Use cases for a command reference:
+
+Applications with many menu items (Kate/Konqueror) 
+Applications with different modes and menus (KWrite/Konqueror)
+-> Enables search for menu items
+
+For Applications with default menu items and some special items where user 
+needs additional information use something like:
+"Apart from the common KDE menu items you find these action in the menu:
+
+File -> Special Action: Explanation of special action
+
+Tools -> Special Tool: Explanation of special tool
+
+Use variablelist markup for this
+-->
+
+<sect1 id="kapp-mainwindow">
+<title>The main &kmyapplication; window</title>
+
+<sect2>
+<title>The File Menu</title>
+<para>
+<variablelist>
+<varlistentry  id="file-new">
+<!-- Tip: With id's here, then you can use them like 
+"select <xref linkend="file-new"/> to open the file dialog"
+which will be expanded to:
+"select File->New (Ctrl+N) to open the file dialog"
+-->
+<term><menuchoice>
+<shortcut>
+<keycombo action="simul">&Ctrl;<keycap>N</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>New</guimenuitem>
+</menuchoice></term>
+<listitem><para><action>Creates a new document</action></para></listitem>
+</varlistentry>
+
+<varlistentry  id="file-save">
+<term><menuchoice>
+<shortcut>
+<keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Save</guimenuitem>
+</menuchoice></term>
+<listitem><para><action>Saves the document</action></para></listitem>
+</varlistentry>
+
+<varlistentry  id="file-quit">
+<term><menuchoice>
+<shortcut>
+<keycombo action="simul">&Ctrl;<keycap>Q</keycap></keycombo>
+</shortcut>
+<guimenu>File</guimenu>
+<guimenuitem>Quit</guimenuitem>
+</menuchoice></term>
+<listitem><para><action>Quits</action> &kmyapplication;</para></listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+</sect2>
+
+<!-- Examples how to use the common menus Settings and Help -->
+
+<sect2 id="settings-help-menu">
+<title>The Settings and Help Menu</title>
+<para>
+&kmyapplication; has the common &kde; <guimenu>Settings</guimenu> and <guimenu>Help</guimenu>
+menu items, for more information read the sections about the <ulink url="help:/fundamentals/ui.html#menus-settings"
+>Settings Menu</ulink> and <ulink url="help:/fundamentals/ui.html#menus-help">Help Menu</ulink>
+of the &kde; Fundamentals.
+</para>
+</sect2>
+
+<sect2 id="help-menu1">
+<title>The Help Menu</title>
+<para>
+&kmyapplication; has the common &kde; <guimenu>Help</guimenu> menu item, for more information read the section
+about the <ulink url="help:/fundamentals/ui.html#menus-help">Help Menu</ulink> of the &kde; Fundamentals.
+</para>
+</sect2>
+
+<sect2 id="menu-commands">
+<title>Menu Items</title>
+<para>Apart from the common &kde; menus described in the <ulink url="help:/fundamentals/ui.html#menus">Menu</ulink>
+chapter of the &kde; Fundamentals documentation &kmyapplication; has these application specific menu entries:
+</para>
+<!-- variablelist -->
+</sect2>
+
+<sect2 id="help-menu2">
+<title>The Help Menu</title>
+<para>&kmyapplication; has a default &kde; <guimenu>Help</guimenu> menu as described in the
+<ulink url="help:/fundamentals/ui.html#menus-help">&kde; Fundamentals</ulink>
+with two additional entries:</para>
+<!-- variablelist -->
+</sect2>
+
+</sect1>
+</chapter>
+
+<chapter id="developers">
+<title>Developer's Guide to &kmyapplication;</title>
+
+<!-- (OPTIONAL) A Programming/Scripting reference chapter should be
+used for apps that use plugins or that provide their own scripting hooks
+and/or development libraries. -->
+
+<para>
+Programming &kmyapplication; plugins is a joy to behold.
+</para>
+
+
+</chapter>
+
+<chapter id="faq">
+<title>Questions and Answers</title>
+
+<!-- (OPTIONAL but recommended) This chapter should include all of the silly
+(and not-so-silly) newbie questions that fill up your mailbox. This chapter
+should be reserved for BRIEF questions and answers! If one question uses more
+than a page or so then it should probably be part of the
+"Using this Application" chapter instead. You should use links to
+cross-reference questions to the parts of your documentation that answer them.
+This is also a great place to provide pointers to other FAQ's if your users
+must do some complicated configuration on other programs in order for your
+application work. -->
+
+<qandaset id="faqlist">
+<qandaentry>
+<question>
+<para>My Mouse doesn't work. How do I quit &kmyapplication;?</para>
+</question>
+<answer>
+<para>Check out the <link linkend="commands">Commands Section</link> for the answer.</para>
+</answer>
+</qandaentry>
+<qandaentry>
+<question>
+<para>Why can I not twiddle my documents?</para>
+</question>
+<answer>
+<para>You can only twiddle your documents if you have the foobar.lib
+installed.</para>
+</answer>
+</qandaentry>
+</qandaset>
+</chapter>
+
+<chapter id="credits">
+
+<!-- Include credits for the programmers, documentation writers, and
+contributors here. The license for your software should then be included below
+the credits with a reference to the appropriate license file included in the KDE
+distribution. -->
+
+<title>Credits and License</title>
+
+<para>
+&kmyapplication;
+</para>
+<para>
+Program copyright 2010-2014 John Q. Hacker <email>jqh@kde.org</email>
+</para>
+<para>
+Contributors:
+<itemizedlist>
+<listitem><para>Konqui the &kde; Dragon <email>konqui@kde.org</email></para>
+</listitem>
+<listitem><para>Tux the &Linux; Penguin <email>tux@linux.org</email></para>
+</listitem>
+</itemizedlist>
+</para>
+
+<para>
+Documentation Copyright &copy; 2012-2014 George N. Ugnacious <email>gnu@kde.org</email>
+</para>
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+
+<!-- License for new documents after 2017-07-27 (or relicensed) -->
+
+&underCCBYSA4;           <!-- CC BY-SA 4.0: do not remove -->
+
+<!-- FDL: old license; only for reference (and old documents) -->
+<!--
+&underFDL;
+-->
+
+<!-- Determine which license your application is licensed under,
+     and delete all the remaining licenses below:
+
+     (NOTE:  All documentation are licensed under the CC BY-SA 4.0,
+     regardless of what license the application uses) -->
+
+&underGPL;        	 <!-- GPL License -->
+&underBSDLicense;        <!-- BSD License -->
+&underArtisticLicense;   <!-- BSD Artistic License -->
+&underX11License;        <!-- X11 License  -->
+
+</chapter>
+
+<!-- Appendix Installation is optional, usually not required
+
+Entities &install.intro.documentation; + &install.compile.documentation; will be removed in later kdoctools
+
+-->
+
+<appendix id="installation">
+<title>Installation</title>
+
+<sect1 id="getting-kapp">
+<title>How to obtain &kmyapplication;</title>
+
+<!-- This first entity contains boiler plate for applications that are
+part of KDE archive.  You should remove it if you are releasing your
+application -->
+
+&install.intro.documentation;
+
+</sect1>
+
+<sect1 id="requirements">
+<title>Requirements</title>
+
+<!--
+List any special requirements for your application here. This should include:
+.Libraries or other software that is not included in kdesupport or kf5
+.Hardware requirements like amount of RAM, disk space, graphics card
+capabilities, screen resolution, special expansion cards, etc.
+.Operating systems the app will run on. If your app is designed only for a
+specific OS, (you wrote a graphical LILO configurator for example) put this
+information here.
+-->
+
+<para>
+In order to successfully use &kmyapplication;, you need few libraries from
+&kde-frameworks; 5.1 (bar, baz). Foobar.lib is
+required in order to support the advanced &kmyapplication; features. &kmyapplication; uses
+about 5 megs of memory to run, but this may vary depending on your
+platform and configuration.
+</para>
+
+<para>
+All required libraries as well as &kmyapplication; itself can be found
+on <ulink url="ftp://ftp.kapp.org">The &kmyapplication; home page</ulink>.
+</para>
+
+<!-- For a list of updates, you may refer to the application web site
+or the ChangeLog file, or ... -->
+<para>
+You can find a list of changes at <ulink
+url="https://apps.kde.org/kapp">https://apps.kde.org/kapp</ulink>.
+</para>
+</sect1>
+
+<sect1 id="compilation">
+<title>Compilation and Installation</title>
+
+<!-- This entity contains the boilerplate text for standard -->
+<!-- compilation instructions.  If your application requires any -->
+<!-- special handling, remove it, and replace with your own text. -->
+
+&install.compile.documentation;
+
+</sect1>
+
+<sect1 id="configuration">
+<title>Configuration</title>
+
+<para>Don't forget to tell your system to start the <filename>dtd</filename>
+dicer-toaster daemon first, or &kmyapplication; won't work!</para>
+
+</sect1>
+
+</appendix>
+
+&documentation.index;
+</book>
+
+<!--
+Local Variables:
+mode: xml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+
+vim:tabstop=2:shiftwidth=2:expandtab
+kate: space-indent on; indent-width 2; tab-width 2; indent-mode none;
+-->

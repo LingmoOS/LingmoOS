@@ -1,0 +1,503 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Catalan  "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>El manual del &tablet;</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        &traductor.Antoni.Bella; 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>17 d'octubre de 2020</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>Aquesta és la documentació per al mòdul d'&systemsettings; del &kde; que configura les tauletes gràfiques.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>Arranjament del sistema</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>Tauleta</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Arranjament de les tauletes Wacom</title>
+    <para
+>El mòdul &systemsettings; de tauleta s'encarrega de tota la configuració de la tauleta gràfica. Totes les tauletes implementades pel projecte del <ulink url="https://linuxwacom.github.io"
+>controlador Wacom per a &Linux;</ulink
+> són gestionades per aquesta interfície de configuració. Assegureu-vos que la vostra tauleta és detectada ja sigui a través de «xorg.conf» o «udev» i que funciona en general. Per a obtenir més informació, vegeu la <link linkend="detection"
+>detecció de la tauleta</link
+>. </para>
+    <important>
+        <para
+>El controlador <application
+>xf86-input-wacom</application
+> haurà d'estar instal·lat en el vostre ordinador i <command
+>xsetwacom</command
+> haurà d'estar disponible perquè funcioni correctament aquest mòdul. </para>
+    </important>
+    <para
+>El mòdul es divideix en diverses pàgines de pestanya que s'encarreguen de tots els aspectes de la tauleta i del llapis: <link linkend="tablet-profiles"
+>Perfils</link
+>, <link linkend="tablet-general"
+>Informació general</link
+>, <link linkend="stylus"
+>Arranjament del llapis</link
+>, <link linkend="pad-buttons"
+>Botons exprés</link
+>, <link linkend="pad-mapping"
+>Mapatge del plafó</link
+> i <link linkend="touch-mapping"
+>Mapatge tàctil</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>Gestionar els perfils</title>
+
+        <para
+>Aquesta és la petita llista desplegable amb dos botons al seu costat. Podeu crear perfils nous i eliminar els ja existents. Cada perfil es desa i s'especifica per a la tauleta actualment connectada. Si creeu un perfil nou, es crearà automàticament amb les opcions de configuració predeterminades retornades pel controlador. </para>
+
+        <para
+>Aquí podeu especificar diferents perfils de configuració. Per exemple, si us agrada tenir un comportament diferent del llapis quan l'utilitzeu com a un substitut del ratolí per al vostre treball diari o si l'utilitzeu com un llapis per a dibuixar quelcom. </para>
+        <para
+>Cada perfil es pot canviar sobre la marxa i canvia directament el comportament de l'entrada de la vostra tauleta. </para>
+        <note>
+            <para
+>El <link linkend="kded"
+>dimoni de tauleta del kded</link
+> s'haurà d'estar executant en segon pla per a poder canviar els perfils i aplicar-los a la tauleta. Tot el treball és realitzat pel dimoni. El mòdul &systemsettings; només canviarà el perfil de configuració d'aquesta. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>Configuració i informació general de la tauleta</title>
+
+        <para
+>Mostra alguna informació general sobre la tauleta detectada. Al costat del nom i l'empresa de la vostra tauleta es mostra una imatge i s'enumeren tots els dispositius d'entrada detectats. </para>
+
+        <note>
+            <para
+>La tauleta haurà d'estar connectada i el <link linkend="kded"
+>kded</link
+> haurà d'estar en execució perquè el mòdul funcioni correctament. </para>
+            <para
+>Per a obtenir més ajuda en la detecció de la tauleta, vegeu la secció dels <link linkend="troubles"
+>problemes de detecció</link
+>. </para>
+        </note>
+
+        <para
+>A més de la informació tauleta, la pestanya general permet ajustar diverses dreceres globals. Cada drecera permet canviar dinàmicament les opcions de la tauleta actualment connectada. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>Arranjament del llapis</title>
+
+        <para
+>El llapis que s'utilitza juntament amb la tauleta té dos costats diferents, el principal s'anomena llapis i l'altre és la goma d'esborrar. En aquesta pestanya podreu canviar qualsevol aspecte del llapis, des de l'assignació de botons fins a la corba de la pressió i el llindar. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>Sensibilitat de la goma d'esborrar</title>
+            <para
+>El control lliscant permet modificar el llindar de la goma d'esborrar. Per a un ajust més fi de la pressió, és possible alterar tota la corba de pressió al diàleg <guilabel
+>Edita la corba de pressió</guilabel
+>. Per a més informació, vegeu el <link linkend="presscurve"
+>Diàleg corba de pressió</link
+>. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>Arranjament del botó</title>
+            <para
+>El quadre <guilabel
+>Arranjament del botó</guilabel
+> permet alterar l'acció a executar assignada a cada botó del llapis. Un simple clic dins del quadre d'edició obrirà un nou diàleg on podreu seleccionar diferents combinacions de tecla, tecles modificadores i botons del ratolí. </para>
+
+            <para
+>Si <guilabel
+>Tocar per a realitzar l'acció</guilabel
+> està activada, el llapis haurà d'estar en contacte amb la tauleta per a permetre executar l'acció del botó. Si aquesta opció està desmarcada, cada acció del botó també funcionarà quan el llapis resti surant per sobre de la tauleta. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>Sensibilitat de la punta</title>
+            <para
+>El control lliscant permet modificar el llindar del llapis. Per a un ajust més fi de la pressió, és possible alterar tota la corba de pressió al diàleg <guilabel
+>Edita la corba de pressió</guilabel
+>. Per a més informació, vegeu el <link linkend="presscurve"
+>Diàleg corba de pressió</link
+>. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>Botons exprés</title>
+
+        <para
+>La pestanya <guilabel
+>Botons exprés</guilabel
+> permet establir accions del botó específiques per a tots els botons del maquinari de la tauleta. Per a canviar l'acció que s'utilitza, feu clic al quadre d'edició i escolliu l'acció en el nou diàleg. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>Tauleta</title>
+
+       <para
+>La pestanya <guilabel
+>Tauleta</guilabel
+> permet ajustar les propietats addicionals de l'àrea de la tauleta quan s'utilitza juntament amb un llapis. Aquí es poden especificar l'orientació de l'àrea de la tauleta, l'espai vàlid utilitzat de la tauleta i el mode de seguiment del cursor. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>Mode de seguiment del llapis</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associa a la pantalla</guilabel
+>: Aquest mode associa el cursor del llapis amb el moviment absolut a la tauleta. Les vores de la tauleta representen directament l'espai de la pantalla. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associa al cursor</guilabel
+>: Aquest mode assigna el cursor del llapis amb el moviment relatiu a la tauleta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>Orientació</title>
+           <para
+>El quadre d'orientació especifica com es girarà l'àrea de la tauleta. Podeu establir un gir específic pel vostre compte en el quadre combinat o si activeu l'opció <guilabel
+>Gira automàticament amb la pantalla</guilabel
+>, la tauleta girarà automàticament juntament amb la pantalla. Això es fa per a escoltar els esdeveniments de «xrandr» quan es gira la pantalla. </para>
+           <para
+>Si teniu problemes amb l'opció de gir automàtic i la tauleta es gira sempre en la direcció equivocada, activeu l'opció <guilabel
+>Inverteix el gir automàtic</guilabel
+> per a invertir-ho. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>Mapatge de la tauleta</title>
+           <para
+>Aquesta assignació permet especificar les proporcions de la tauleta que s'utilitzaran per a cada pantalla. Això és necessari per a mantenir l'àrea de la tauleta proporcional amb l'espai de la pantalla utilitzat en el mode absolut de seguiment del llapis. Per a obtenir més informació, visiteu la secció <link linkend="area-selection"
+>Diàleg de selecció de l'àrea</link
+>. </para>
+           <note>
+               <para
+>Aquesta opció no funciona per al mode de cursor relatiu. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>Tàctil</title>
+
+       <para
+>La pestanya <guilabel
+>Tàctil</guilabel
+> permet establir propietats addicionals per a la part tàctil de la tauleta (si està disponible). És possible desactivar la característica tàctil a través de la casella de selecció <guilabel
+>Activa el tàctil</guilabel
+>. També existeix una drecera global que permet activar/desactivar la característica tàctil. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>Mode de seguiment tàctil</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associa a la pantalla</guilabel
+>: Aquest mode assigna el cursor tàctil amb el moviment absolut a la tauleta. Les vores de la tauleta representen directament l'espai de la pantalla. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associa al cursor</guilabel
+>: Aquest mode assigna el cursor tàctil amb el moviment relatiu a la tauleta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>Gestos</title>
+
+           <para
+>Si <guilabel
+>Activa els gestos</guilabel
+> està activada, la tauleta podrà generar esdeveniments de gestos per al dispositiu tàctil. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Distància de desplaçament</guilabel
+>: Permet desplaçar-se a través de les finestres quan es col·loquen dos dits sobre la tauleta, movent-los cap amunt/avall es crea un esdeveniment de desplaçament. La distància s'indica en unitats de tauleta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Distància d'ampliació</guilabel
+>: Permet ampliar/allunyar movent dos, ajuntant-los o separant-los. La distància s'indica en unitats de tauleta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Temps de tocs</guilabel
+>: Aquesta vegada s'especifica en mil·lisegons quan un doble toc sobre el dispositiu es reconeixerà com a clic dret. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>Mapatge tàctil</title>
+           <para
+>Aquesta assignació permet especificar les proporcions del dispositiu tàctil que s'utilitzaran per a cada pantalla. Això és necessari per a mantenir l'àrea de la tauleta proporcional amb l'espai de la pantalla utilitzat en el mode absolut de seguiment del llapis. Per a obtenir més informació, visiteu la secció <link linkend="area-selection"
+>Diàleg de selecció de l'àrea</link
+>. </para>
+           <note>
+               <para
+>Aquesta opció no funciona per al mode de cursor relatiu. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>Diàleg corba de pressió</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Aquí hi ha una captura de pantalla del diàleg, corba de pressió</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Canviant la corba de pressió</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>La corba de pressió defineix com es traduirà la pressió del llapis. La corba de pressió es defineix a través de quatre punts d'una corba de Bézier. Per a canviar aquesta corba podeu alterar els punts vermells i moure'ls al voltant de la corba. </para>
+        <note>
+            <para
+>Utilitzeu el llapis dins del diàleg corba de pressió, per a veure els canvis directament en la corba de pressió. Una àrea blava sota la corba mostrarà la pressió aplicada del llapis. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>Diàleg de selecció de l'àrea</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Aquí hi ha una captura de pantalla del diàleg àrea de la tauleta</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Definint l'àrea de la tauleta</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>Aquest diàleg permet especificar l'àrea disponible de la tauleta per a cada espai seleccionat de la pantalla. Per tal de mantenir la relació d'aspecte de la tauleta, cal reduir l'àrea de la tauleta en funció de la resolució de la pantalla. Aquest diàleg permet especificar cada pantalla individualment. </para>
+        <para
+>Utilitzeu el botó <guilabel
+>Commuta a pantalla</guilabel
+> per a canviar entre pantalla completa (tots els monitors connectats) i cada monitor individual. Les opcions es desen per a cada configuració de la pantalla i s'aplica a la tauleta quan la selecció de pantalla és activada per la drecera global. </para>
+        <para
+>És possible fer un mapatge de la pantalla amb l'<guimenuitem
+>Àrea de la tauleta</guimenuitem
+> o definir aquesta àrea a la subfinestra <guilabel
+>Tauleta</guilabel
+> que hi ha a la dreta. Les proporcions de l'àrea es poden bloquejar o desbloquejar utilitzant el botó alternable <guibutton
+>Bloqueja les proporcions</guibutton
+>. </para>
+        <para
+>Per a mantenir la relació d'aspecte de la tauleta amb la selecció actual de la pantalla, podeu prémer el botó <guilabel
+>Estableix les proporcions de la pantalla</guilabel
+>. L'àrea de la tauleta es calcularà i es canviarà automàticament. </para>
+        <para
+>A més, podeu obrir el diàleg <guilabel
+>Calibra</guilabel
+> per a calibrar la tauleta amb l'ajuda de quatre punts sobre la pantalla. </para>
+        <para
+>Quan es tanqui el diàleg, s'utilitzarà l'última pantalla seleccionada. Si més endavant voleu alternar la pantalla, podeu utilitzar la <link linkend="tablet-general"
+>Drecera global</link
+>. </para>
+        <note>
+            <para
+>L'àrea de la tauleta només funcionarà per al mode de seguiment absolut del dispositiu de cursor tàctil i el llapis. En el mode relatiu s'utilitzarà tota la tauleta. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>Dimoni de la tauleta</title>
+    <para
+>El dimoni de tauleta s'executarà en segon pla i farà el treball de camp. La detecció de la tauleta i l'establirà amb els perfils seleccionats. Si el dimoni no s'està executant el mòdul &systemsettings; i la miniaplicació del &plasma; no podran funcionar correctament i la tauleta no es podrà utilitzar amb els perfils. </para>
+
+    <sect1 id="detection">
+        <title
+>Detecció de la tauleta</title>
+        <para
+>La detecció del <hardware
+>dispositiu de tauleta</hardware
+> es realitza de diverses maneres. «<application
+>Solid</application
+>» s'utilitza en el primer pas i realitza la implementació de «hotplug». Si «Solid» falla, els següents passos són <command
+>xsetwacom list dev</command
+>, <command
+>lsusb</command
+> i <command
+>xinput --list</command
+>. </para>
+        <para
+>Si alguna de les ordres anteriors retornen el nom de la tauleta, és que no està implementada i no pot ser utilitzada per aquest mòdul. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>Problemes en la detecció</title>
+        <para
+>Si no es detecta la tauleta, comproveu la pàgina del <ulink url="https://linuxwacom.github.io"
+>controlador Wacom del &Linux;</ulink
+> o del <ulink url="https://digimend.github.io"
+>controlador DIGImend</ulink
+> si la tauleta està admesa. D'altra banda, comproveu a través de <command
+>lsusb</command
+> si podeu trobar la vostra tauleta. </para>
+        <para
+>Si «udev» no s'ocupa de la detecció, afegiu la tauleta al vostre fitxer <filename
+>/etc/X11/xorg.conf.d/50-tauleta.conf</filename
+> (creeu-lo si no existeix) i torneu a iniciar el servidor X. </para>
+        <para
+>En el cas d'un dispositiu sèrie (Tauleta PC i semblants) comproveu si <command
+>xinput --list</command
+> enumera els dispositius d'entrada (llapis/goma d'esborrar/plafó). Si s'enumeren, doneu una ullada a la tauleta per a l'identificador intern del dispositiu de tauleta a través de <command
+>xsetwacom get "Name of your pad or stylus" TabletID</command
+>. Si es retorna un identificador, si us plau, envieu un correu electrònic amb tota la informació necessària a l'autor. </para>
+        <note>
+        <para
+>La implementació de «hotplug» només està disponible si la tauleta es troba a través de «<application
+>Solid</application
+>» i la seva API de notificació. </para>
+        <para
+>«<application
+>Solid</application
+>» comprova si el valor per a l'entrada <command
+>input.x11_options.Type</command
+> és <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> o <command
+>cursor</command
+>, o si el valor de l'entrada <command
+>input.x11_driver</command
+> és <command
+>wacom</command
+>. </para>
+        <para
+>Feu el favor d'enviar a l'autor si la vostra tauleta és detectada per «Solid» però amb altres valors per a millorar la compatibilitat amb la tauleta. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>Miniaplicació de la tauleta del Plasma</title>
+    <para
+>La miniaplicació de tauleta fa possible canviar els perfils disponibles sobre la marxa. A més podreu canviar el gir del teclat i canviar entre el mode absolut/relatiu del llapis/goma d'esborrar, independentment del perfil de configuració actual. </para>
+    <para
+>No cal afegir el plasmoide perquè funcioni aquest mòdul. El perfil predeterminat serà activat pel <link linkend="kded"
+>dimoni de la tauleta</link
+> tan aviat com es detecti la tauleta, encara que no s'utilitzi el plasmoide. El plasmoide només és una ajuda visual per a canviar amb facilitat entre els perfils. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>Crèdits i llicència</title>
+    <para
+>Traductor/Revisor de la documentació: &credits.Antoni.Bella;</para
+> &underFDL; &underGPL; </chapter>
+</book>

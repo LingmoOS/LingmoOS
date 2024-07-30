@@ -1,0 +1,385 @@
+/*
+ *  SPDX-FileCopyrightText: 2012 Marco Martin <mart@kde.org>
+ *
+ *  SPDX-License-Identifier: LGPL-2.0-or-later
+ */
+
+import QtQuick
+import QtQuick.Templates as T
+import QtQuick.Controls as QQC2
+import org.kde.lingmoui as LingmoUI
+import "private" as KTP
+
+/**
+ * Overlay Drawers are used to expose additional UI elements needed for
+ * small secondary tasks for which the main UI elements are not needed.
+ * For example in Okular Mobile, an Overlay Drawer is used to display
+ * thumbnails of all pages within a document along with a search field.
+ * This is used for the distinct task of navigating to another page.
+ *
+ * @inherit QtQuick.Controls.Drawer
+ */
+T.Drawer {
+    id: root
+
+//BEGIN properties
+    /**
+     * @brief This property tells whether the drawer is open and visible.
+     *
+     * default: ``false``
+     */
+    property bool drawerOpen: false
+
+    /**
+     * @brief This property tells whether the drawer is in a state between open
+     * and closed.
+     *
+     * The drawer is visible but not completely open. This is usually the case when
+     * the user is dragging the drawer from a screen edge, so the user is "peeking"
+     * at what's in the drawer.
+     *
+     * default: ``false``
+     */
+    property bool peeking: false
+
+    /**
+     * @brief This property tells whether the drawer is currently opening or closing itself.
+     */
+    readonly property bool animating : enterAnimation.animating || exitAnimation.animating || positionResetAnim.running
+
+    /**
+     * @brief This property holds whether the drawer can be collapsed to a
+     * very thin, usually icon only sidebar.
+     *
+     * Only modal drawers are collapsible. Collapsible is not supported in
+     * the mobile mode.
+     *
+     * @since 2.5
+     */
+    property bool collapsible: false
+
+    /**
+     * @brief This property tells whether the drawer is collapsed to a
+     * very thin sidebar, usually icon only.
+     *
+     * When true, the drawer will be collapsed to a very thin sidebar,
+     * usually icon only.
+     *
+     * default: ``false``
+     *
+     * @see collapsible Only collapsible drawers can be collapsed.
+     */
+    property bool collapsed: false
+
+    /**
+     * @brief This property holds the size of the collapsed drawer.
+     *
+     * For vertical drawers this will be the width of the drawer and for horizontal
+     * drawers this will be the height of the drawer.
+     *
+     * default: ``Units.iconSizes.medium``, just enough to accommodate medium sized icons
+     */
+    property int collapsedSize: LingmoUI.Units.iconSizes.medium
+
+    /**
+     * @brief This property holds the options for handle's open icon.
+     *
+     * This is a grouped property with following components:
+     *
+     * * ``source: var``: The name of a freedesktop-compatible icon.
+     * * ``color: color``: An optional tint color for the icon.
+     *
+     * If no custom icon is set, a menu icon is shown for the application globalDrawer
+     * and an overflow menu icon is shown for the contextDrawer.
+     * That's the default for the GlobalDrawer and ContextDrawer components respectively.
+     *
+     * For OverlayDrawer the default is view-right-close or view-left-close depending on
+     * the drawer location
+     *
+     * @since 2.5
+     */
+    readonly property KTP.IconPropertiesGroup handleOpenIcon: KTP.IconPropertiesGroup {
+        source: root.edge === Qt.RightEdge ? "view-right-close" : "view-left-close"
+    }
+
+    /**
+     * @brief This property holds the options for the handle's close icon.
+     *
+     * This is a grouped property with the following components:
+     * * ``source: var``: The name of a freedesktop-compatible icon.
+     * * ``color: color``: An optional tint color for the icon.
+     *
+     * If no custom icon is set, an X icon is shown,
+     * which will morph into the Menu or overflow icons.
+     *
+     * For OverlayDrawer the default is view-right-new or view-left-new depending on
+     * the drawer location.
+     *
+     * @since 2.5
+     */
+    property KTP.IconPropertiesGroup handleClosedIcon: KTP.IconPropertiesGroup {
+        source: root.edge === Qt.RightEdge ? "view-right-new" : "view-left-new"
+    }
+
+    /**
+     * @brief This property holds the tooltip displayed when the drawer is open.
+     * @since 2.15
+     */
+    property string handleOpenToolTip: qsTr("Close drawer")
+
+    /**
+     * @brief This property holds the tooltip displayed when the drawer is closed.
+     * @since 2.15
+     */
+    property string handleClosedToolTip: qsTr("Open drawer")
+
+    /**
+     * @brief This property holds whether the handle is visible, to make opening the
+     * drawer easier.
+     *
+     * Currently supported only on left and right drawers.
+     */
+    property bool handleVisible: {
+        if (typeof applicationWindow === "function") {
+            const w = applicationWindow();
+            if (w) {
+                return w.controlsVisible;
+            }
+        }
+        // For a generic-purpose OverlayDrawer its handle is visible by default
+        return true;
+    }
+
+    /**
+     * @brief Readonly property that points to the item that will act as a physical
+     * handle for the Drawer.
+     * @property MouseArea handle
+     **/
+    readonly property Item handle: KTP.DrawerHandle {
+        drawer: root
+    }
+//END properties
+
+    interactive: modal
+
+    z: LingmoUI.OverlayZStacking.z
+
+    LingmoUI.Theme.inherit: false
+    LingmoUI.Theme.colorSet: modal ? LingmoUI.Theme.View : LingmoUI.Theme.Window
+    LingmoUI.Theme.onColorSetChanged: {
+        contentItem.LingmoUI.Theme.colorSet = LingmoUI.Theme.colorSet
+        background.LingmoUI.Theme.colorSet = LingmoUI.Theme.colorSet
+    }
+
+//BEGIN reassign properties
+    //default paddings
+    leftPadding: LingmoUI.Units.smallSpacing
+    topPadding: LingmoUI.Units.smallSpacing
+    rightPadding: LingmoUI.Units.smallSpacing
+    bottomPadding: LingmoUI.Units.smallSpacing
+
+    y: modal ? 0 : ((T.ApplicationWindow.menuBar ? T.ApplicationWindow.menuBar.height : 0) + (T.ApplicationWindow.header ? T.ApplicationWindow.header.height : 0))
+
+    height: parent && (root.edge === Qt.LeftEdge || root.edge === Qt.RightEdge) ? (modal ? parent.height : (parent.height - y - (T.ApplicationWindow.footer ? T.ApplicationWindow.footer.height : 0))) : implicitHeight
+
+    parent: modal || edge === Qt.LeftEdge || edge === Qt.RightEdge ? T.ApplicationWindow.overlay : T.ApplicationWindow.contentItem
+
+    edge: Qt.LeftEdge
+    modal: true
+    dim: modal
+    QQC2.Overlay.modal: Rectangle {
+        color: Qt.rgba(0, 0, 0, 0.35)
+    }
+
+    dragMargin: enabled && (edge === Qt.LeftEdge || edge === Qt.RightEdge) ? Math.min(LingmoUI.Units.gridUnit, Qt.styleHints.startDragDistance) : 0
+
+    contentWidth: contentItem.implicitWidth || (contentChildren.length === 1 ? contentChildren[0].implicitWidth : 0)
+    contentHeight: contentItem.implicitHeight || (contentChildren.length === 1 ? contentChildren[0].implicitHeight : 0)
+
+    implicitWidth: contentWidth + leftPadding + rightPadding
+    implicitHeight: contentHeight + topPadding + bottomPadding
+
+    enter: Transition {
+        SequentialAnimation {
+            id: enterAnimation
+            /* NOTE: why this? the running status of the enter transition is not relaible and
+             * the SmoothedAnimation is always marked as non running,
+             * so the only way to get to a reliable animating status is with this
+             */
+            property bool animating
+            ScriptAction {
+                script: {
+                    enterAnimation.animating = true
+                    // on non modal dialog we don't want drawers in the overlay
+                    if (!root.modal) {
+                        root.background.parent.parent = applicationWindow().overlay.parent
+                    }
+                }
+            }
+            SmoothedAnimation {
+                velocity: 5
+            }
+            ScriptAction {
+                script: enterAnimation.animating = false
+            }
+        }
+    }
+
+    exit: Transition {
+        SequentialAnimation {
+            id: exitAnimation
+            property bool animating
+            ScriptAction {
+                script: exitAnimation.animating = true
+            }
+            SmoothedAnimation {
+                velocity: 5
+            }
+            ScriptAction {
+                script: exitAnimation.animating = false
+            }
+        }
+    }
+//END reassign properties
+
+
+//BEGIN signal handlers
+    onCollapsedChanged: {
+        if (LingmoUI.Settings.isMobile) {
+            collapsed = false;
+        }
+        if (!__internal.completed) {
+            return;
+        }
+        if ((!collapsible || modal) && collapsed) {
+            collapsed = true;
+        }
+    }
+    onCollapsibleChanged: {
+        if (LingmoUI.Settings.isMobile) {
+            collapsible = false;
+        }
+        if (!__internal.completed) {
+            return;
+        }
+        if (!collapsible) {
+            collapsed = false;
+        } else if (modal) {
+            collapsible = false;
+        }
+    }
+    onModalChanged: {
+        if (!__internal.completed) {
+            return;
+        }
+        if (modal) {
+            collapsible = false;
+        }
+    }
+
+    onPositionChanged: {
+        if (peeking) {
+            visible = true
+        }
+    }
+    onVisibleChanged: {
+        if (peeking) {
+            visible = true
+        } else {
+            drawerOpen = visible;
+        }
+    }
+    onPeekingChanged:  {
+        if (peeking) {
+            root.enter.enabled = false;
+            root.exit.enabled = false;
+        } else {
+            drawerOpen = position > 0.5 ? 1 : 0;
+            positionResetAnim.running = true
+            root.enter.enabled = true;
+            root.exit.enabled = true;
+        }
+    }
+    onDrawerOpenChanged: {
+        // sync this property only when the component is properly loaded
+        if (!__internal.completed) {
+            return;
+        }
+        positionResetAnim.running = false;
+        if (drawerOpen) {
+            open();
+        } else {
+            close();
+        }
+        Qt.callLater(() => root.handle.displayToolTip = true)
+    }
+
+    Component.onCompleted: {
+        // if defined as drawerOpen by default in QML, don't animate
+        if (root.drawerOpen) {
+            root.enter.enabled = false;
+            root.visible = true;
+            root.position = 1;
+            root.enter.enabled = true;
+        }
+        __internal.completed = true;
+        contentItem.LingmoUI.Theme.colorSet = LingmoUI.Theme.colorSet;
+        background.LingmoUI.Theme.colorSet = LingmoUI.Theme.colorSet;
+    }
+//END signal handlers
+
+    // this is as hidden as it can get here
+    property QtObject __internal: QtObject {
+        //here in order to not be accessible from outside
+        property bool completed: false
+        property SequentialAnimation positionResetAnim: SequentialAnimation {
+            id: positionResetAnim
+            property alias to: internalAnim.to
+            NumberAnimation {
+                id: internalAnim
+                target: root
+                to: drawerOpen ? 1 : 0
+                property: "position"
+                duration: (root.position)*LingmoUI.Units.longDuration
+            }
+            ScriptAction {
+                script: {
+                    root.drawerOpen = internalAnim.to !== 0;
+                }
+            }
+        }
+        readonly property Item statesItem: Item {
+            states: [
+                State {
+                    when: root.collapsed
+                    PropertyChanges {
+                        target: root
+                        implicitWidth: edge === Qt.TopEdge || edge === Qt.BottomEdge ? applicationWindow().width : Math.min(collapsedSize + leftPadding + rightPadding, Math.round(applicationWindow().width*0.8))
+
+                        implicitHeight: edge === Qt.LeftEdge || edge === Qt.RightEdge ? applicationWindow().height : Math.min(collapsedSize + topPadding + bottomPadding, Math.round(applicationWindow().height*0.8))
+                    }
+                },
+                State {
+                    when: !root.collapsed
+                    PropertyChanges {
+                        target: root
+                        implicitWidth: edge === Qt.TopEdge || edge === Qt.BottomEdge ? applicationWindow().width : Math.min(contentItem.implicitWidth, Math.round(applicationWindow().width*0.8))
+
+                        implicitHeight: edge === Qt.LeftEdge || edge === Qt.RightEdge ? applicationWindow().height : Math.min(contentHeight + topPadding + bottomPadding, Math.round(applicationWindow().height*0.4))
+
+                        contentWidth: contentItem.implicitWidth || (contentChildren.length === 1 ? contentChildren[0].implicitWidth : 0)
+                        contentHeight: contentItem.implicitHeight || (contentChildren.length === 1 ? contentChildren[0].implicitHeight : 0)
+                    }
+                }
+            ]
+            transitions: Transition {
+                reversible: true
+                NumberAnimation {
+                    properties: root.edge === Qt.TopEdge || root.edge === Qt.BottomEdge ? "implicitHeight" : "implicitWidth"
+                    duration: LingmoUI.Units.longDuration
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        }
+    }
+}

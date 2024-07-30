@@ -1,0 +1,10 @@
+add_executable(Test.KDED.TabletDatabase testtabletdatabase.cpp ../kdedtestutils.cpp)
+add_test(NAME Test.KDED.TabletDatabase COMMAND Test.KDED.TabletDatabase)
+ecm_mark_as_test(Test.KDED.TabletDatabase)
+target_link_libraries(Test.KDED.TabletDatabase ${WACOM_KDED_TEST_LIBS})
+
+configure_file(testtabletdatabase.companylist ${CMAKE_CURRENT_BINARY_DIR}/testtabletdatabase.companylist COPYONLY)
+configure_file(testtabletdatabase.default_devicelist ${CMAKE_CURRENT_BINARY_DIR}/testtabletdatabase.default_devicelist COPYONLY)
+configure_file(testtabletdatabase.aiptek_devicelist ${CMAKE_CURRENT_BINARY_DIR}/testtabletdatabase.aiptek_devicelist COPYONLY)
+configure_file(testtabletdatabase.toshiba_devicelist ${CMAKE_CURRENT_BINARY_DIR}/testtabletdatabase.toshiba_devicelist COPYONLY)
+configure_file(testtabletdatabase.wacom_devicelist ${CMAKE_CURRENT_BINARY_DIR}/testtabletdatabase.wacom_devicelist COPYONLY)

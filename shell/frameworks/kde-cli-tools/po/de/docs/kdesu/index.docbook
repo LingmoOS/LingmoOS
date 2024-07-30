@@ -1,0 +1,520 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % German "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Das Handbuch zu &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Philipp</firstname
+><surname
+>Siegert</surname
+><affiliation
+><address
+><email
+>siegert@pp-services.de</email
+></address
+></affiliation
+><contrib
+>Übersetzung</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-09-21</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; ist eine grafische Oberfläche für den &UNIX;-Befehl <command
+>su</command
+>. </para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>Passwort</keyword>
+<keyword
+>Systemverwalter</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Einleitung</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Willkommen bei &kdesu;! &kdesu; ist eine grafische Oberfläche für den &UNIX;-Befehl <command
+>su</command
+> in KDE. Es ermöglicht Ihnen, ein Programm mit einer anderen Benutzerkennung auszuführen, indem Sie das Passwort dieses Benutzers angeben. &kdesu; hat keine speziellen Systemrechte; es benutzt den Befehl <command
+>su</command
+>. </para>
+
+<para
+>&kdesu; hat eine zusätzliche Funktion: Es kann Passwörter speichern. Wenn Sie diese Funktion benutzen, müssen Sie das Passwort für jeden Befehl nur einmal eingeben. Weitere Informationen und eine Sicherheitsanalyse finden Sie unter <xref linkend="sec-password-keeping"/>.</para>
+
+<para
+>Dieses Programm sollte von der Befehlszeile oder durch <filename
+>.desktop</filename
+>-Dateien gestartet werden. Obwohl es über einen Dialog nach dem Passwort des Systemverwalters (<systemitem class="username"
+>root</systemitem
+>) fragt, ist es trotzdem eher ein Befehlszeilen- als ein reines &GUI;-Programm.</para>
+
+<para
+><command
+>kdesu</command
+> wird nicht mehr in <userinput
+> $(kf5-config --prefix)</userinput
+>/bin, sondern in <userinput
+>kf5-config --path libexec</userinput
+> installiert. Daher ist es nicht mehr in Ihrem <envar
+>Pfad</envar
+>. Verwenden Sie deshalb <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+>, um <command
+>kdesu</command
+> aufzurufen.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>&kdesu; benutzen</title>
+
+<para
+>Die Benutzung von &kdesu; ist einfach. Der Syntax ist folgendermaßen:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> command</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> icon name</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priority</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> user</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Allgemeine Einstellungen für &kde;</arg
+> <arg choice="opt"
+>Allgemeine Einstellungen zu &Qt;</arg
+> </cmdsynopsis>
+
+<para
+>Die Befehlszeilen-Parameter sind weiter unten erklärt.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>command</replaceable
+></option
+></term>
+<listitem
+><para
+>Dies gibt den Befehl an, der als Benutzer root ausgeführt werden soll. Er muss als Parameter übergeben werden. Wenn Sie beispielsweise eine neue Dateiverwaltung starten wollen, geben Sie auf der Befehlszeile Folgendes ein: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Debug-Informationen anzeigen. (<emphasis
+>Anmerkung des Übersetzers: Diese Option funktioniert nicht mit der in &kde; 3.0 enthaltenen Version von &kdesu;.</emphasis
+>)</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>Datei</replaceable
+></option
+></term>
+<listitem
+><para
+>Dieser Parameter erlaubt den effizienten Einsatz von &kdesu; bei <filename
+>.desktop</filename
+> Dateien. Er weist &kdesu; an, die Datei, die mit <parameter
+>Datei</parameter
+> angegeben wurde, zu untersuchen. Besitzt der aktuelle Benutzer Schreibrechte auf die Datei, wird die Datei unter seinem Namen ausgeführt. Besitzt er keine Schreibrechte, wird die Datei unter dem Benutzernamen <parameter
+>Benutzer</parameter
+> (Voreinstellung: Systemverwalter) ausgeführt.</para>
+<para
+><parameter
+>Datei</parameter
+> wird folgendermaßen ausgewertet: Wenn <parameter
+>Datei</parameter
+> mit <literal
+>/</literal
+> beginnt, wird es als absoluter Dateiname behandelt. Anderenfalls wird es als Name einer globalen &kde;-Konfigurationsdatei behandelt.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>Symbolname</replaceable
+></term>
+<listitem
+><para
+>Legt fest, welches Symbol im Passwortdialog verwendet wird. Sie können einfach nur den Namen ohne Erweiterung eingeben.</para>
+<para
+>Um zum Beispiel &konqueror; im Dateiverwaltungs-Modus mit dem &konqueror;-Symbol im Passwortdialog zu starten, geben Sie dies ein:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Das Passwort nicht speichern. Dieser Parameter schaltet das Ankreuzfeld <guilabel
+>Passwort beibehalten</guilabel
+> im Passwort-Dialog aus.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>Priorität</replaceable
+></term>
+<listitem>
+<para
+>Stellt die Priorität ein. Dies ist eine Nummer zwischen 0 und 100, wobei 100 für die höchste und 0 für die niedrigste Priorität steht. Die Voreinstellung ist 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Aktiviert die Echtzeit-Ausführung.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Den kdesu-Dämon anhalten. Weitere Details finden Sie unter <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Terminal-Ausgabe einschalten. Dieser Parameter schaltet das Speichern von Passwörtern aus. Dies ist hauptsächlich für Debugging-Zwecke interessant. Wenn Sie eine Anwendung benutzen wollen, die im Konsolen-Modus läuft, sollten Sie stattdessen den Standardbefehl <command
+>su</command
+> verwenden.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> Benutzer</replaceable
+></term>
+<listitem
+><para
+>Die häufigste Verwendung von &kdesu; ist, ein Programm als Systemverwalter auszuführen. Sie können aber auch einen anderen Benutzernamen und Passwort übergeben.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Interne Funktionsweise</title>
+
+<sect1 id="x-authentication">
+<title
+>X-Authentifizierung</title>
+
+<para
+>Das Programm, das Sie aufrufen, wird unter der Benutzer-Kennung (User ID) des Systemverwalters ausgeführt und hat grundsätzlich keinen Zugriff auf Ihre X-Anzeige. &kdesu; umgeht dies, indem es Ihrer Anzeige ein Cookie zur Authentifizierung hinzufügt. Dazu wird eine zeitlich befristete <filename
+>.Xauthority</filename
+>-Datei angelegt. Nach Beendigung des Befehls wird die Datei wieder gelöscht. </para>
+
+<para
+>Wenn Sie keine X-Cookies benutzen, sind Sie auf sich alleine gestellt. &kdesu; wird dies erkennen und kein Cookie hinzufügen. Sie müssen sich vergewissern, dass der Systemverwalter berechtigt ist, auf die Anzeige zuzugreifen.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Schnittstelle zu <command
+>su</command
+></title>
+
+<para
+>&kdesu; benutzt den Systembefehl <command
+>su</command
+>, um Rechte zu erhalten. In diesem Abschnitt wird erklärt, wie &kdesu; dabei vorgeht. </para>
+
+<para
+>Da manche Implementierungen von <command
+>su</command
+> (&eg; die von &RedHat;) keine Passwörter von <literal
+>stdin</literal
+> lesen, erstellt &kdesu; ein pty/tty-Paar und führt <command
+>su</command
+> so aus, dass die Standard-Dateideskriptoren mit dem tty verbunden sind.</para>
+
+<para
+>Um anstelle einer interaktiven Shell einen vom Benutzer angegebenen Befehl auszuführen, benutzt &kdesu; den Befehl <command
+>su</command
+> mit dem Parameter <option
+>-c</option
+>. Dieser Parameter wird von jeder bekannten Shell verstanden, sodass er portabel einsetzbar sein sollte. <command
+>su</command
+> übergibt den Parameter <option
+>-c</option
+> an die Shell des Benutzers, unter dessen ID der Befehl ausgeführt werden soll. Diese Shell führt dann das Programm aus. Beispiel: <command
+>su <option
+>root -c <replaceable
+>das_programm</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Statt den Befehl des Benutzers direkt mit <command
+>su</command
+> auszuführen, führt &kdesu; das Hilfsprogramm <application
+>kdesu_stub</application
+> aus. Dieses Hilfsprogramm, das unter der ID des Zielbenutzers läuft, fordert über den pty/tty-Kanal (stdin und stdout des Hilfsprogramms) einige Informationen von &kdesu; an. Danach wird das Programm des Benutzers ausgeführt. Folgende Informationen werden übergeben: die X-Anzeige, ein X-Authentifizierungs-Cookie (wenn verfügbar), die Variable <envar
+>PATH</envar
+> und der auszuführende Befehl. Der Grund für die Benutzung eines Hilfsprogramms ist der X-Cookie. Dieser beinhaltet sensible Informationen und kann deshalb nicht auf der Befehlszeile übergeben werden.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Passwort-Überprüfung</title>
+
+<para
+>&kdesu; überprüft die Passwörter, die Sie eingeben und gibt bei Falscheingabe eine Fehlermeldung zurück. Die Überprüfung erfolgt durch ein Testprogramm (<filename
+>/bin/true</filename
+>). Wenn die Ausführung dieses Programms erfolgreich ist, wird angenommen, dass das Passwort richtig ist.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Passwörter speichern</title>
+
+<para
+>Um es Ihnen so einfach wie möglich zu machen, enthält &kdesu; eine Funktion <quote
+>Passwort beibehalten</quote
+>. Falls Sie sich für die Sicherheit dieser Funktion interessieren, sollten Sie diesen Absatz lesen.</para>
+
+<para
+>Indem Sie &kdesu; erlauben, die Passwörter zu speichern, entsteht eine (kleine) Sicherheitslücke in Ihrem System. &kdesu; erlaubt offensichtlich nur Ihrer User-ID die Verwendung der Passwörter. Wenn Sie allerdings nicht aufpassen, kann hierdurch die Sicherheitsstufe des Systemverwalters (<systemitem class="username"
+>root</systemitem
+>) auf die eines normalen Benutzers (Ihre Benutzer-ID) herabgesetzt werden. Ein Hacker, der versucht, in Ihren Zugang einzubrechen, würde dann Zugang zu den Funktionen von <systemitem class="username"
+>root</systemitem
+> erhalten. &kdesu; versucht dies zu verhindern. Das Sicherheitskonzept, das benutzt wird, ist angemessen sicher, zumindest nach bestem Wissen des Autors. Das Konzept wird hier weiter erklärt.</para>
+
+<para
+>&kdesu; benutzt den Dämon <application
+>kdesud</application
+>. Der Dämon nimmt auf einem &UNIX;-Socket in <filename
+>/tmp</filename
+> Befehle entgegen. Die Zugriffsrechte des Sockets sind auf 0600 eingestellt, sodass nur Ihre Benutzer-ID Verbindungen zu dem Socket aufbauen kann. Wurde <quote
+>Passwort beibehalten</quote
+> aktiviert, führt &kdesu; Befehle durch diesen Dämon aus. &kdesu; schreibt dann den Befehl und das Passwort des Systemverwalters auf den Socket. Der Dämon führt daraufhin, wie oben beschrieben, mit Hilfe von <command
+>su</command
+> den Befehl aus. Danach werden Befehl und Passwort nicht gelöscht, sondern für eine bestimmte Zeit zwischengespeichert. Diese Zeit wird dem Kontrollmodul entnommen. Erfolgt innerhalb dieser Zeitspanne eine andere Anfrage für den Befehl, muss der Benutzer das Passwort nicht erneut eingeben. Um zu verhindern, dass Hacker, die in Ihren Zugang eingedrungen sind, Passwörter stehlen, wird der Dämon mit den Parametern <quote
+>set-group-id nogroup</quote
+> eingerichtet. Dies sollte alle normalen Benutzer (Sie eingeschlossen) daran hindern, Passwörter von dem Prozess <application
+>kdesud</application
+> zu bekommen. Der Dämon setzt außerdem die Umgebungsvariable <envar
+>DISPLAY</envar
+> auf den Wert, den der Dämon hatte, als er gestartet wurde. Das Einzige, was ein Hacker demnach tun könnte, wäre Anwendungen auf Ihrer Anzeige auszuführen.</para>
+
+<para
+>Ein Schwachpunkt in diesem Sicherheitskonzept ist die Tatsache, dass die auszuführenden Programme wahrscheinlich nicht nach Sicherheitsgesichtpunkten geschrieben wurden (&eg; setuid <systemitem class="username"
+>root</systemitem
+> Programme). Dies bedeutet, dass in diesen Programme Puffer-Überläufe oder andere Probleme auftreten könnten, die ein Hacker ausnutzen könnte.</para>
+
+<para
+>Die Benutzung der Funktion zum Speichern der Passwörter ist ein Kompromiss zwischen Sicherheitsansprüchen und Komfort. Überdenken Sie dies bitte und entscheiden Sie selbst ob Sie diese Funktion benutzen wollen oder nicht.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autor</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Copyright 2000 &Geert.Jansen;</para>
+
+<para
+>&kdesu; wurde von &Geert.Jansen; geschrieben. Es basiert irgendwie auf Pietro Iglios &kdesu;, Version 0.3. Pietro und Geert Jansen sind übereingekommen, dass Geert Jansen das Programm in Zukunft pflegen wird.</para>
+
+<para
+>Der Autor ist unter folgender Adresse zu erreichen: &Geert.Jansen.mail;. Bitte schicken Sie ihm alle Fehler die Sie finden, sodass er Sie entfernen kann. Wenn Sie Vorschläge zu diesem Programm haben, können Sie Geert Jansen gerne anschreiben.</para>
+
+<para
+>Übersetzung  Philipp Siegert<email
+>siegert@pp-services.de</email
+></para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

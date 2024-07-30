@@ -1,0 +1,435 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application>KCM Tablet</application>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title>The &tablet; Handbook</title>
+
+    <authorgroup>
+        <author>
+            <firstname>Jörg</firstname>
+            <surname>Ehrichs</surname>
+            <affiliation>
+                <address><email>joerg.ehrichs@gmx.de</email></address>
+            </affiliation>
+        </author>
+        <!-- TRANS:ROLES_OF_TRANSLATORS -->
+    </authorgroup>
+    <copyright>
+        <year>2013</year>
+        <holder>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice>&FDLNotice;</legalnotice>
+
+    <date>2020-10-17</date><!-- Date of (re)writing, or update.-->
+    <releaseinfo>&kappversion;</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para>This is the documentation for the &kde; &systemsettings; module that configures graphic tablets.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword>KDE</keyword><!-- do not change this! -->
+        <keyword>System Settings</keyword>
+        <keyword>Wacom</keyword>
+        <keyword>Tablet</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title>Wacom Tablet Settings</title>
+    <para>
+        The tablet &systemsettings; module handles all setting for your graphic tablet. All tablets supported by
+        the <ulink url="https://linuxwacom.github.io">&Linux; Wacom driver</ulink> project are handled by this settings interface.
+        Make sure your tablet is detected either via xorg.conf or udev and works in general. Refer to the <link linkend="detection">tablet detection</link> section for more information.
+    </para>
+    <important>
+        <para>
+            The <application>xf86-input-wacom</application> driver must be installed on your computer and <command>xsetwacom</command> must be available in order to make this module work correctly.
+        </para>
+    </important>
+    <para>
+        The module is split into various tab pages that handle all aspects of your tablet and the pen:
+        <link linkend="tablet-profiles">Profiles</link>,
+        <link linkend="tablet-general">General Information</link>,
+        <link linkend="stylus">Stylus Settings</link>,
+        <link linkend="pad-buttons">Express Buttons</link>,
+        <link linkend="pad-mapping">Pad Mapping</link> and
+        <link linkend="touch-mapping">Touch Mapping</link>.
+    </para>
+    <sect1 id="tablet-profiles">
+        <title>Profile Management</title>
+
+        <para>
+            This is the small drop down box with the two buttons next to it. You can create new profiles and delete already existing ones.
+            Each profile is saved and specified for the currently connected tablet. If you create a new profile, it automatically creates one
+            with the default settings as returned by the driver.
+        </para>
+
+        <para>
+            Here you can specify different profiles for your settings.
+            For example if you like to have a different behavior of the pen when you use it
+            as a mouse replacement for your day to day work or using it as pen to draw something.
+        </para>
+        <para>
+            Each profile can be changed on the fly and directly changes the behavior of your tablet input.
+        </para>
+        <note>
+            <para>
+                The <link linkend="kded">kded tablet daemon</link> must be running in the background to be able to change the profiles and apply them to the tablet.
+                All the work is done by the daemon. The &systemsettings; module just change the profile settings for it.
+            </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title>General Tablet Settings and Information</title>
+
+        <para>
+            Shows some general Information about the detected tablet.
+            Beside the name and company of your tablet an image is shown and all detected input devices are listed.
+        </para>
+
+        <note>
+            <para>
+                The tablet must be connected and the <link linkend="kded">kded</link> must be running to allow the module to work correctly.
+            </para>
+            <para>
+                See the <link linkend="troubles">Detection problems</link> section for further help on the tablet detection.
+            </para>
+        </note>
+
+        <para>
+            In addition to the tablet information the general tab allows to set various global shortcuts. Each shortcut allows to dynamically
+            change the options for the current connected tablet.
+        </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title>Stylus Settings</title>
+
+        <para>
+            The pen that is used together with the tablet has two different sides, the main side is called stylus the other end is the eraser.
+            In this tab you can change any aspect of the pen from the button assignment to the pressure curve and threshold.
+        </para>
+
+        <sect2 id="eraser-settings">
+            <title>Eraser Feel</title>
+            <para>
+                The slider allows to alter the threshold of the eraser. For a more fine grained setting of the pressure it is possible
+                to alter the complete pressure curve in the <guilabel>Edit Pressure Curve</guilabel> dialog.
+                See <link linkend="presscurve">Press Curve Dialog</link> for more information.
+            </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title>Button Settings</title>
+            <para>
+                The <guilabel>Button Settings</guilabel> box allows to alter the executed action assigned to each button of the pen.
+                A simple click into the edit box opens a new dialog where different key combinations, modifier keys and mouse buttons can be selected.
+            </para>
+
+            <para>
+                If <guilabel>Tap to execute action</guilabel> is enabled the stylus must be in contact with the tablet in order to allow the button action
+                to be executed. If this option is disabled each button action works also when the stylus is hovering above the tablet.
+            </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title>Tip Feel</title>
+            <para>
+                The slider allows to alter the threshold of the stylus tip. For a more fine grained setting of the pressure it is possible
+                to alter the complete pressure curve in the <guilabel>Edit Pressure Curve</guilabel> dialog.
+                See <link linkend="presscurve">Presscurve Dialog</link> for more information.
+            </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title>Express Buttons</title>
+
+        <para>
+            The <guilabel>Express Buttons</guilabel> tab allows to set specific button actions for all hardware buttons for the tablet.
+            To change the used action, you need to click into the edit box and choose the action in the new dialog.
+        </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title>Tablet</title>
+
+       <para>
+           The <guilabel>Tablet</guilabel> tab allows to set further properties of the tablet area when used together with a pen.
+           In here the orientation of the tablet area, valid space of the used tablet and the cursor tracking mode can be specified.
+       </para>
+       <sect2 id="tablet-tracking">
+           <title>Stylus Tracking Mode</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para>
+                       <guilabel>Map to Screen</guilabel> :
+                       This mode maps the pen cursor with absolute movement to the tablet.
+                       The edges of the tablet represent directly the space of the screen.
+                   </para>
+               </listitem>
+               <listitem>
+                   <para>
+                       <guilabel>Map to Cursor</guilabel> :
+                       This mode maps the pen cursor with relative movement to the tablet.
+                   </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title>Orientation</title>
+           <para>
+               The orientation box specifies how the tablet area is rotated. You can set a specific rotation on your own in the combobox or if you enable the <guilabel>Auto-Rotate with Screen</guilabel> option, the tablet will automatically rotated together with the screen. This is done by listening to
+               the xrandr events when the screen is rotated.
+           </para>
+           <para>
+               If you have problems with the autorotation option and the tablet is always rotated into the wrong direction, enable the <guilabel>Invert Auto-Rotation</guilabel> option to invert this.
+           </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title>Tablet Mapping</title>
+           <para>
+               This mapping allows to specify the proportions of the tablet that will be used for each screen. This is necessary to keep the tablet area proportional to the used screen space in absolute stylus tracking mode. For more information check the <link linkend="area-selection">Area Selection Dialog</link> section.
+           </para>
+           <note>
+               <para>
+                   This option does not work for relative cursor mode.
+               </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title>Touch</title>
+
+       <para>
+           The <guilabel>Touch</guilabel> tab allows to set further properties for the touch part of the tablet (if available).
+           It is possible to disable the touch feature via the <guilabel>Enable Touch</guilabel> check box. Also a global shortcut exist that allows to enable/disable the touch feature.
+       </para>
+
+       <sect2 id="touch-tracking">
+           <title>Touch Tracking Mode</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para>
+                       <guilabel>Map to Screen</guilabel> :
+                       This mode maps the touch cursor with absolute movement to the tablet.
+                       The edges of the tablet represent directly the space of the screen.
+                   </para>
+               </listitem>
+               <listitem>
+                   <para>
+                       <guilabel>Map to Cursor</guilabel> :
+                       This mode maps the touch cursor with relative movement to the tablet.
+                   </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title>Gestures</title>
+
+           <para>
+               If <guilabel>Enable Gestures</guilabel> is enabled, the tablet can generate gesture events for the touch device.
+           </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para>
+                       <guilabel>Scroll Distance</guilabel> :
+                       Allows to scroll through windows when two fingers are placed on the tablet, moving them up/down creates a scroll event.
+                       The Distance is given in tablet units.
+                   </para>
+               </listitem>
+               <listitem>
+                   <para>
+                       <guilabel>Zoom Distance</guilabel> :
+                       Allows to zoom in/out by moving two fingers together or apart from each other.
+                       The Distance is given in tablet units.
+                   </para>
+               </listitem>
+               <listitem>
+                   <para>
+                       <guilabel>Tap Time</guilabel> :
+                       This time in milliseconds specifies when a double tap on the device is recognized as right-click
+                   </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title>Touch Mapping</title>
+           <para>
+               This mapping allows to specify the proportions of the touch device that will be used for each screen. This is necessary to keep the tablet area proportional to the used screen space in absolute stylus tracking mode. For more information check the <link linkend="area-selection">Area Selection Dialog</link> section.
+           </para>
+           <note>
+               <para>
+                   This option does not work for relative cursor mode.
+               </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title>Press Curve Dialog</title>
+
+        <para>
+            <screenshot>
+                <screeninfo>Here's a screenshot of the Press Curve dialog</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase>Changing the press curve</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para>
+            The press curve defines how the pressure of the stylus is translated. The press curve is defined via four points of a Bézier curve.
+            To change this curve you can alter the red dots and move the curve around.
+        </para>
+        <note>
+            <para>
+                Use your pen inside the press curve dialog to see the changes in the press curve directly.
+                A blue area below the curve shows the applied pressure of the pen.
+            </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title>Area Selection Dialog</title>
+
+        <para>
+            <screenshot>
+                <screeninfo>Here's a screenshot of the Tablet Area Dialog</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase>Defining the Tablet Area</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para>
+            This dialog allows to specify the available tablet area for each selected screen space. In order to keep the aspect ratio of the tablet it
+            is necessary to reduce the tablet area depending on the screen resolution. This Dialog allows to specify them for each screen individually.
+        </para>
+        <para>
+            Use the <guilabel>Toggle Screen</guilabel> button to switch between fullscreen (all connected monitors) and each individual monitor.
+            The settings will be saved for each screen configuration and applied to the tablet whenever the screen selection is switched by the global shortcut action.
+        </para>
+        <para>
+            It is possible to map the screen with the <guimenuitem>Full Tablet</guimenuitem> area or just defined <guimenuitem>Tablet Area</guimenuitem> on the <guilabel>Tablet</guilabel> pane rightwards. The proportions of the area can be locked or unlocked using the <guibutton>Lock proportions</guibutton> switch button.
+        </para>
+        <para>
+            If you want to keep the aspect ratio of the tablet with the current screen selection you can press the <guilabel>Set Screen Proportions</guilabel> button. The tablet area will be calculated and changed automatically.
+        </para>
+        <para>
+        In addition you can open the <guilabel>Calibrate</guilabel> dialog to calibrate your tablet with the help of four points on the screen.
+        </para>
+        <para>
+            When the dialog is closed, the last selected screen will be used. If you want to switch the screen later on, you can use the <link linkend="tablet-general">Global Shortcut</link>.
+        </para>
+        <note>
+            <para>
+                The tablet area only works for absolute tracking mode of the touch and pen cursor device.
+                In relative mode the full tablet is used.
+            </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title>Tablet daemon</title>
+    <para>
+        The tablet daemon runs in the background and does the ground work. Detecting the tablet and set it up with the selected profiles.
+        If the daemon is not running the &systemsettings; module and the plasma applet cannot work properly and the tablet cannot be used with the profiles.
+    </para>
+
+    <sect1 id="detection">
+        <title>Tablet detection</title>
+        <para>
+            The detection of the <hardware>tablet device</hardware> is done in several ways.
+            <application>Solid</application> is used in the first step and does the hotplug support.
+            If Solid fails the next steps are <command>xsetwacom list dev</command>, <command>lsusb</command> and <command>xinput --list</command>.
+        </para>
+        <para>
+            Should none of the commands above return the name of the tablet, it is not supported and cannot be used by this module.
+        </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title>Detection problems</title>
+        <para>
+            If the tablet is not detected check the <ulink url="https://linuxwacom.github.io">&Linux; Wacom driver</ulink> or <ulink url="https://digimend.github.io">DIGImend driver</ulink> page if your tablet is supported.
+            Furthermore check via <command>lsusb</command> if you can find your tablet.
+        </para>
+        <para>
+            If udev does not handle the detection add the tablet to your <filename>/etc/X11/xorg.conf.d/50-tablet.conf</filename> file (create it if it does not exist) and restart the x-server.
+        </para>
+        <para>
+            In case of a serial device (Tablet PC and such) check if <command>xinput --list</command> lists your input devices (Stylus/Eraser/Pad).
+            Should they be listed take a look at the internal tablet device id via <command>xsetwacom get "Name of your pad or stylus" TabletID</command>.
+            If an id is returned please mail all the necessary information to the author.
+        </para>
+        <note>
+        <para>
+            Hotplug support is only available if the tablet is found via <application>Solid</application> and its notification API.
+        </para>
+        <para>
+            <application>Solid</application> checks if the value for the entry <command>input.x11_options.Type</command> is <command>pen</command>,
+            <command>stylus</command>, <command>eraser</command> or <command>cursor</command> or if the value for the entry <command>input.x11_driver</command> is <command>wacom</command>.
+        </para>
+        <para>
+            Please mail the author if your tablet is detected by Solid but with other values to enhance the tablet support.
+        </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title>Tablet plasma applet</title>
+    <para>
+        The tablet applet makes it possible to change the available profiles on the fly. Furthermore you can change the pad rotation and switch between absolute/relative mode
+        of the stylus/eraser regardless of the current profile settings.
+    </para>
+    <para>
+        It is not necessary to add the plasmoid for this module to work. The default profile will be activated by the  <link linkend="kded">tablet daemon</link> as soon as it
+        detects your tablet even if the plasmoid is not used. The plasmoid is just a visual helper to switch easily between the profiles.
+    </para>
+    </chapter>
+    <chapter id="credits"><title>Credits and License</title>
+    <!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+
+    &underFDL;
+
+    &underGPL;
+
+    </chapter>
+</book>

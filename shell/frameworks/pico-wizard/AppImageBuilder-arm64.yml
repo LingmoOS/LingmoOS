@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2021 Anupam Basak <anupam.basak27@gmail.com>
+
+version: 1
+script:
+  - rm -rf AppDir || true
+  - mkdir -p AppDir/usr/share/icons/
+  - cp pico-wizard.svg AppDir/usr/share/icons/
+  - mkdir -p AppDir/pico-wizard/
+  - cp -r pico/ AppDir/pico-wizard/
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: pico-wizard
+    name: pico-wizard
+    icon: pico-wizard
+    version: '0.1'
+    exec: pico-wizard/pico/__main__.py
+    exec_args: $@
+
+  pacman:
+    Architecture: aarch64
+    repositories:
+      core:
+        - https://mirror.alpix.eu/manjaro/unstable/$repo/$arch
+        - https://manjaro.moson.eu/unstable/$repo/$arch
+        - https://manjaro.re/unstable/$repo/$arch
+      extra:
+        - https://mirror.alpix.eu/manjaro/unstable/$repo/$arch
+        - https://manjaro.moson.eu/unstable/$repo/$arch
+        - https://manjaro.re/unstable/$repo/$arch
+      community:
+        - https://mirror.alpix.eu/manjaro/unstable/$repo/$arch
+        - https://manjaro.moson.eu/unstable/$repo/$arch
+        - https://manjaro.re/unstable/$repo/$arch
+      multilib:
+        - https://mirror.alpix.eu/manjaro/unstable/$repo/$arch
+        - https://manjaro.moson.eu/unstable/$repo/$arch
+        - https://manjaro.re/unstable/$repo/$arch
+    include:
+      - python
+      - pyside2
+      
+AppImage:
+  update-information: None
+  sign-key: None
+  arch: aarch64

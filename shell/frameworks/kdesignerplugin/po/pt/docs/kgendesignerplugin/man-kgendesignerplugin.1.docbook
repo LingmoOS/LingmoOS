@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Portuguese "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>Plataformas do &kde;: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Criador da documentação original.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Actualizou a documentação para as Plataformas 5 do &kde;.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>2014-05-28</date>
+  <releaseinfo
+>Plataformas 5.0</releaseinfo>
+  <productname
+>Plataformas do KDE</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Gera 'plugins' de elementos gráficos para o &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>OPÇÕES</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>ficheiro</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Descrição</title>
+  <para
+>Os 'plugins' de elementos gráficos personalizados do &Qt; Designer normalmente seguem um padrão normal, sendo que as classes oferecidas pelo 'plugin' fornecem na sua maioria alguma informação estática, em conjunto com a função para criar uma instância, a qual será normalmente uma simples chamada ao construtor. O <command
+>kgendesignerplugin</command
+> permite aos programadores das bibliotecas que fornecem elementos novos a criação de um desses 'plugins', sem ter de cria todo o código acessório associado, oferecendo um ficheiro de descrição do tipo INI. </para>
+
+  <para
+>O <command
+>kgendesignerplugin</command
+> escolhe opções predefinidas para a maioria das definições, pelo que normalmente é necessária apenas alguma configuração mínima. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Opções</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>ficheiro</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>O nome do ficheiro em C++ gerado. Se não for indicado, será usado o <varname
+>stdout</varname
+>. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>nome-plugin</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Fornecido para fins de compatibilidade. O valor por omissão da opção 'PluginName' no ficheiro de entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>grupo</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Oferecido por razões de compatibilidade. O valor por omissão para a opção 'DefaultGroup' no ficheiro de entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Mostra informações sobre o autor.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Mostra informações acerca da licença.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Mostra um breve texto de ajuda.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v , --version</option
+></term>
+      <listitem>
+        <para
+>Mostra a informação da versão.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Formato do Ficheiro</title>
+  <para
+>O ficheiro de entrada é um ficheiro de configuração do tipo INI (para ser mais específico, está no formato suportado pela plataforma KConfig) que descreve um conjunto de itens gráficos. Contém uma secção <literal
+>[Global]</literal
+>, que oferece informações gerais acerca do 'plugin', assim como uma secção para cada elemento que deverá ser incluído no 'plugin'. </para>
+
+  <para
+>A secção <literal
+>[Global]</literal
+> pode ter os seguintes elementos: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>O valor por omissão para o item <varname
+>Group</varname
+> nas secções das classes (por omissão: "<literal
+>Custom</literal
+>", a menos que seja usada a opção <option
+>-g</option
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Uma lista (separada por vírgulas) dos ficheiros de inclusão necessários (por omissão: vazio). Repare que os ficheiros de inclusão definidos posteriormente no ficheiro não deverão ser indicados aqui; em vez disso, este campo serve para os ficheiros de inclusão especiais para o uso próprio do 'plugin', como os das classes que possuem antevisões. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>O nome da classe principal em C++ no 'plugin' (por omissão: "<literal
+>WidgetsPlugin</literal
+>", a menos que seja usada a opção <option
+>-n</option
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Cada classe deverá ter a sua própria secção <literal
+>[<replaceable
+>ClassName</replaceable
+>]</literal
+>, a qual poderá incluir os seguintes elementos: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>O valor devolvido pela função <code
+>codeTemplate()</code
+> do 'plugin', o qual está marcado para "uso futuro" pelo &Qt; Designer (por omissão: vazio). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Os argumentos a passar ao construtor da classe indicada por <literal
+>ImplClass</literal
+>; estes deverão estar entre parêntesis (por omissão: "<literal
+>(parent)</literal
+>"). A única variável que é garantido estar disponível é a <varname
+>parent</varname
+>, que é o <code
+>QWidget</code
+>-pai passado pelo &Qt; Designer. </para>
+          <para
+>Este item é ignorado se estiver definido o valor de <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>O código necessário para criar uma instância do elemento gráfico (por omissão: usa o <code
+>new</code
+> para criar uma instância da classe indicada pelo item <literal
+>ImplClass</literal
+>, passando os argumentos definidos em <literal
+>ConstructorArgs</literal
+>). Veja as notas sobre o <literal
+>ImplClass</literal
+> e o <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Uma descrição da UI em XML do elemento gráfico (por omissão: o valor fornecido pelos ficheiros de inclusão do 'plugin' do &Qt; Designer). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>O grupo sob o qual mostrar o elemento no &Qt; Designer (por omissão: o valor do elemento <varname
+>DefaultGroup</varname
+> na secção <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>O ficheiro de imagem ou o nome do ícone-padrão a usar como ícone para este elemento na lista de elementos gráficos do &Qt; Designer (por omissão: um ficheiro PNG com o nome da secção, sem quaisquer dois-pontos duplos, na pasta "pics" de um ficheiro de recursos compilado; por exemplo, <filename
+>:/pics/Xpto.png</filename
+> na secção <literal
+>[Xpto]</literal
+>, ou <filename
+>:/pics/XptoOla.png</filename
+> na secção <literal
+>[Xpto::Ola]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>A classe que deverá ser usada para criar uma instância do elemento para o usar no &Qt; Designer (por omissão: o nome da secção). Lembre-se que esta não tem de ser a classe que seria criada para uma aplicação final: isso é determinado pelo <literal
+>DomXML</literal
+>. </para>
+          <para
+>Este item é ignorado se estiver definido o valor de <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>O ficheiro que deverá ser incluído para usar este item gráfico (por omissão: a versão em minúsculas do nome da secção, retirando todos os dois-pontos e adicionando o texto ".h"; por exemplo, <literal
+>xpto.h</literal
+> na secção <literal
+>[Xpto]</literal
+>, ou <literal
+>xptoola.h</literal
+> na secção <literal
+>[Xpto::Ola]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Se este elemento poderá conter ou não outros elementos (por omissão: <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>A dica a mostrar quando passar o cursor do rato sobre o elemento na lista de elementos gráficos no &Qt; Designer (por omissão: o nome da secção, com o texto " Widget" adicionado; por exemplo, <literal
+>XPTO Widget</literal
+> na secção <literal
+>[XPTO]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>O texto 'O que é Isto?' associado com o elemento no &Qt; Designer (por omissão: o nome da secção, com o texto " Widget" adicionado; por exemplo, <literal
+>XPTO Widget</literal
+> na secção <literal
+>[XPTO]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Exemplos</title>
+  <para
+>O ficheiro de descrição mais simples poderá ser algo do tipo <screen language="ini">
+<![CDATA[
+[XPTO]
+ToolTip=Mostra elementos XPTO
+[Bar]
+ToolTip=Editor de barras
+]]>
+    </screen
+> Repare que cada classe deverá ter pelo menos uma chave definida (<literal
+>ToolTip</literal
+> foi usado neste exemplo), caso contrário será ignorada. </para>
+  <para
+>Normalmente, irá querer alterar pelo menos o texto visível para o utilizador, o que corresponde aos itens <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> e <literal
+>Group</literal
+>. Para além disso, definir o nome do 'plugin' poderá ser uma boa ideia para evitar possíveis conflitos de símbolos e para não confundir os depuradores (tanto a aplicação de depuração como a pessoa que efectua a mesma): <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=ElementosXPTO
+DefaultGroup=Visualização
+
+[XPTO]
+ToolTip=Mostra ursos
+WhatsThis=Um item de imagens que mostra ursos a dançar
+
+[Ola]
+ToolTip=Editor de barras
+WhatsThis=Uma interface de edição para barras para ursos
+Group=Edição
+]]>
+    </screen>
+  </para>
+  <para
+>Poderão ser necessários ficheiros mais complexos, caso tenha classes com espaços de nomes ou opções extra que seja necessário passar aos construtores, como por exemplo: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=ElementosXpto
+DefaultGroup=XPTO
+
+[XPTO::Ola]
+ToolTip=Mostra barras
+WhatsThis=Um elemento que mostra elementos de uma determinada forma
+IncludeFile=xpto/ola.h
+IconName=:/antevisoes/ola.png
+
+[XPTO::Ola2]
+IncludeFile=xpto/ola2.h
+ConstructorArgs=(XPTO::Ola2::UmaOpcao, parent)
+Group=XPTO (Especial)
+IsContainer=true
+IconName=:/antevisoes/ola2.png
+]]>
+    </screen>
+  </para>
+  <para
+>Em alguns casos, os itens gráficos especialmente complexos poderão necessitar de uma implementação de uma "classe de antevisão" para usar no &Qt; Designer; esta poderá ser uma sub-classe do elemento real que simplesmente faz mais algumas configurações adicionais, ou poderá então ser uma implementação completamente diferente. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=xpto-antevisoes.h
+
+[ElementoBonito]
+ImplClass=ElementoBonitoAntevisao
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Veja Também</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>http://qt-project.org/doc/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>A documentação do &Qt; Designer para criar 'plugins' de itens gráficos personalizados.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Problemas</title>
+  <para
+>Use por favor o <ulink url="http://bugs.kde.org"
+>bugs.kde.org</ulink
+> para comunicar os erros; não os envie directamente para os autores por e-mail. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

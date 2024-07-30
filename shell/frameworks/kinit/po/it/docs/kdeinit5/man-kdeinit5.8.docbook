@@ -1,0 +1,342 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Italian "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manuale dell'utente di kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2013-12-18</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Avviatore per applicazioni con supporto per kdeinit integrato, e per KIO slave.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Sintassi</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programmi</arg
+> <arg
+>programmi</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descrizione</title>
+
+<para
+>kdeinit5 è un avviatore di processi in qualche modo simile al più noto <command
+>init</command
+>, usato per avviare UNIX. Esegue i programmi di &kde; e i moduli caricabili di kdeinit (KLM), avviandoli più efficientemente. </para>
+
+<para
+>Usare kdeinit5 per avviare le applicazioni di &kde; rende l'avviamento di una tipica applicazione di &kde; raddoppia la velocità di avviamento e riduce significativamente il consumo di memoria.</para>
+
+<para
+>kdeinit5 è collegato a tutte le librerie necessarie a una comune applicazione di &kde;. Con questa tecnica, avviare un'applicazione è molto più veloce perché ora deve essere collegata solo l'applicazione stessa, mentre altrimenti sia l'applicazione che le librerie da essa usate avrebbero dovuto essere collegate. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Svantaggi</title>
+
+<para
+>Il nome del processo delle applicazioni avviate con kdeinit5 è <computeroutput
+>kdeinit5</computeroutput
+>. Questo problema può essere corretto fino ad un certo punto cambiando il nome dell'applicazione indicato da <command
+>ps</command
+>. Tuttavia, applicazioni come <command
+>killall</command
+> vedranno solo <computeroutput
+>kdeinit5</computeroutput
+> come nome del processo. Per aggirare il problema, usa <command
+>kdekillall</command
+> (dal pacchetto kdesdk/scripts) per le applicazioni avviate con kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Opzioni</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Mostra la guida sulle opzioni </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Non biforcare, cioè non uscire finché non sono finiti tutti i programmi in esecuzione</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>Non avviare kded</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Termina quando non ci sono più applicazioni di &kde; in esecuzione </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programmi</option
+></term>
+<listitem>
+<para
+>esegue le richieste di gestione dei programmi </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programmi</option
+></term>
+<listitem>
+<para
+>esegue i programmi senza richieste di gestione </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Uso</title>
+<para
+>Un modo comune per eseguire questo programma è specificare semplicemente il seguente comando al prompt:  <userinput
+><command
+>kdeinit5</command
+> <option
+>programma</option
+></userinput
+> o <userinput
+><command
+>kdeinit5</command
+> <option
+>+programma</option
+></userinput
+>. </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>File</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$UTENTE/kdeinit5_$ISTANZA</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Variabili d'ambiente</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Specifica la cartella Home dell'utente attuale</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Specifica se la cartella Home dell'utente attuale è di sola lettura</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Se impostato, dice a kdeinit5 che i programmi di &kde; sono precollegati.</para>
+<para
+>(Il precollegamento è un processo che permette di accelerare il collegamento dinamico).</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Se impostato, dice a kdeinit5 che sta lavorando con un desktop &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Vedi anche</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Errori</title>
+<para
+>Usa <ulink url="http://bugs.kde.org"
+>il sito di gestione dei bug di KDE</ulink
+> per segnalarli.</para>
+</refsect1>
+
+</refentry>
+
+
+

@@ -1,0 +1,64 @@
+---
+image: archlinux:base-devel
+
+stages:
+  - lint
+  - test
+
+ruff:
+  stage: lint
+  needs: []
+  only:
+    - merge_requests
+  before_script:
+    - pacman -Syu --needed --noconfirm ruff
+  script:
+    - ruff check -q .
+
+ruff-format:
+  stage: lint
+  needs: []
+  only:
+    - merge_requests
+  before_script:
+    - pacman -Syu --needed --noconfirm ruff
+  script:
+    - ruff format --check -q .
+
+mypy:
+  stage: test
+  needs: []
+  only:
+    - branches
+    - merge_requests
+  before_script:
+    - pacman -Syu --needed --noconfirm mypy python-pytest python-pyelftools
+  script:
+    - mypy
+
+pytest:
+  stage: test
+  needs: []
+  only:
+    - branches
+    - merge_requests
+  before_script:
+    - pacman -Syu --needed --noconfirm python-pytest python-pytest-cov pyalpm python-pyelftools python-six python-license-expression
+    # makepkg does not like running as root
+    - useradd --home-dir / --no-create-home builduser
+  script:
+    # Use hard-coded $PATH as the shebangdepends rule is sensitive to $PATH,
+    # and the default $PATH in containers is different from the one in Arch.
+    # See: https://gitlab.archlinux.org/archlinux/archlinux-docker/-/issues/64
+    - |
+      sudo -u builduser PARSE_PKGBUILD_PATH="$PWD" \
+                        PATH="$PWD/scripts:/usr/local/sbin:/usr/local/bin:/usr/bin" \
+                        coverage run -m pytest
+    - coverage report
+    - coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml

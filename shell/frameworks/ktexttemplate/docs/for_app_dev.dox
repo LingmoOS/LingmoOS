@@ -1,0 +1,376 @@
+namespace KTextTemplate
+{
+
+/**
+
+  @page for_app_dev %KTextTemplate for application developers
+
+  Integrating %KTextTemplate into applications is very simple. This page describes
+
+  @li How to render a Template with a Context
+  @li How to load Templates
+  @li How to extend the syntax of %KTextTemplate
+  @li Patterns of use of %KTextTemplate
+
+  If you are not already familiar with Django template syntax and structure, start with @ref for_themers. If you are already familiar with Django, you might find @ref differences_django informative.
+
+  @section rendering_templates Rendering Templates
+
+  @subsection creating_templates Creating Templates
+
+  Rendering templates is very easy in application code. A single Template may be rendered multiple times with different Context objects.
+
+  @code
+    auto engine = new KTextTemplate::Engine( this );
+    auto t = engine->newTemplate("My name is {{ name }}.", "my_template_name");
+    QVariantHash mapping;
+    mapping.insert("name", "Grainne");
+    KTextTemplate::Context c(mapping);
+
+    t->render(&c); // Returns "My name is Grainne."
+
+    mapping.insert("name", "Henry");
+    c = KTextTemplate::Context(mapping);
+
+    t->render(&c); // Returns "My name is Henry."
+  @endcode
+
+  Usually, applications do not create a Template directly, but instead use a KTextTemplate::Engine to load external files. This allows artists to define the template without needing to recompile.
+
+  @code
+    auto t = engine->loadByName("template.html");
+
+    t->render(&c)
+  @endcode
+
+  @subsection variables Variables
+
+  A Context object maps a string to another object for reference in the template. String keys in the Context object are available as variables in the Template, and can be used with the @gr_var{variable} syntax or inside @gr_tag{control&nbsp;tags}. In the above example, we mapped the string <tt>"name"</tt> to the string <tt>"Grainne"</tt> and then to the string <tt>"Henry"</tt>. We can create more than just string mappings though.
+
+  @code
+    mapping.insert("myint", 6); // Can insert ints
+    mapping.insert("mydouble", 6.5); // Can insert doubles
+    mapping.insert("mybool", false); // Can insert bools
+
+    QVariantList mylist{"Ingrid", 3};
+    mapping.insert("mylist", mylist); // Can insert QVariantList
+
+    QVariantHash myhash;
+    myhash.insert("James", "Artist");
+    myhash.insert("Kiera", "Dreamer");
+    mapping.insert("myhash", myhash); // Can insert QVariantHash
+
+    QObject *obj = getObj();
+    auto objVar = QVariant::fromValue(obj);
+    mapping.insert("myobject", objVar); // Can insert QObject*
+  @endcode
+
+  It is additionally possible to insert any type of object or any container (not just QVariantHash and QVariantList) into the Context.
+  @see @ref generic_types_and_templates.
+
+  @section extending_ktexttemplate Extending KTextTemplate
+
+  %KTextTemplate has 5 extension points.
+
+  - Custom object variables
+  - Generic types and containers
+  - Filters
+  - Tags
+  - Loaders
+
+  @subsection custom_objects Custom objects
+
+  Instances of <tt>QObject*</tt> can be inserted into templates. The recommended way to insert custom objects into templates is to create QObject wrappers for your objects. As QObject is introspectable, this will allow lookups to work in a way you define.
+
+  @note If you are already familiar with Django you will know that creating wrappers is not necessary in Django. That is because python objects are already fully introspectable.
+
+  @code
+    #include "myperson.h"
+
+    class PersonWrapper : public QObject
+    {
+      Q_OBJECT
+      Q_PROPERTY(QString name READ name)
+    public:
+      PersonWrapper(const QString &name, int age);
+
+      QString name() const;
+
+      int age() const;
+
+      QString clear();
+
+    };
+
+    ...
+
+    auto linda = new PersonWrapper("Linda", 21);
+
+    mapping.insert("person", linda);
+
+    ...
+
+    The name is {{ person.name }} and age is {{ person.age }}.
+
+    // Will be rendered as
+    // The name is Linda and age is .
+  @endcode
+
+  Note that the <tt>'name'</tt> of <tt>PersonWrapper</tt> is accessible in the template, but the <tt>'age'</tt> is not. Note also that rendering fails silently if the method can not be found. Only methods which have a corresponding <tt>Q_PROPERTY</tt> declaration are accessible from templates. To make <tt>age</tt> accessible in the template, we would need to add
+
+  @verbatim
+    Q_PROPERTY(int age READ age)
+  @endverbatim
+
+  to the class. Note also that those methods are <tt>const</tt>. Rendering a template should never change an object it is rendering. Always make sure the READ properties of your wrapper objects are <tt>const</tt>. It is also possible to lookup dynamic properties of <tt>QObject</tt>s. In the case of dynamic properties, the property name must be UTF-8 encoded.
+
+  If you already have <tt>QObject</tt>s in your application which would be suitable for use in templates, you only need to add some <tt>Q_PROPERTY</tt> entries to the classes to make them accessible to %KTextTemplate.
+
+  @note If you are familiar with Django you may be aware of the <tt>alters_data</tt> attribute for methods. This method of using wrappers and <tt>const</tt> is the equivalent to the <tt>alters_data</tt> attribute. You the wrapper writer choose the properties which will be accessible from the templates and makes them <tt>const</tt>, so there's no need to mark other methods as <tt>alters_data</tt>.
+
+  For most uses of %KTextTemplate, this is enough to get make an application themable easily and quickly. For more advanced usage, see @ref extension. For some example uses of %KTextTemplate, see @ref examples.
+
+  @subsection custom_object_properties Custom Object Properties
+
+  The broad introspection features of Qt5 are relied upon by %KTextTemplate via the <tt>Q_PROPERTY</tt> macro.  Most types used with that macro may be accessed in %KTextTemplate templates without further code.
+
+  We can define a <tt>Home</tt> type like this:
+
+  @code
+    class Home : public QObject
+    {
+        Q_OBJECT
+        Q_PROPERTY(int houseNumber READ houseNumber)
+        Q_PROPERTY(QString streetName READ streetName)
+        Q_PROPERTY(QString city READ city)
+    public:
+        // ...
+    };
+  @endcode
+
+  And we can use it in a <tt>Q_PROPERTY</tt> macro in our <tt>PersonWrapper</tt> type:
+
+  @code
+    class PersonWrapper : public QObject
+    {
+      Q_OBJECT
+      Q_PROPERTY(QString name READ name)
+      Q_PROPERTY(Home* home READ home)
+    public:
+      PersonWrapper(const QString &name, int age, Home *home);
+
+      Home* home() const;
+
+      // ...
+    }
+  @endcode
+
+  And then use it in a template:
+
+  @code
+    <h1>{{ person.name }}</h1>
+    House number: {{ person.home.houseNumber }}
+    Street: {{ person.home.streetName }}
+  @endcode
+
+  Using containers such as QList and QSharedPointer with the <tt>Q_PROPERTY</tt> macro is also possible.
+
+  @code
+    class PersonWrapper : public QObject
+    {
+      Q_OBJECT
+      Q_PROPERTY(QString name READ name)
+      Q_PROPERTY(QList<PersonWrapper*> friends READ friends)
+    public:
+      PersonWrapper(const QString &name, int age, Home *home);
+
+      QList<PersonWrapper> friends() const { return m_friends; }
+      void setFriends(const QList<PersonWrapper*> friends) { m_friends = friends; }
+
+      // ...
+
+    private:
+      QList<PersonWrapper*> m_friends;
+    };
+  @endcode
+
+  Classes which do not derive from QObject, but which are decorated with the <tt>Q_GADGET</tt> and <tt><Q_PROPERTY</tt> macros may also be used as expected.
+
+  @subsection generic_variables
+
+  An alternative to writing wrapper QObject classes with <tt>Q_PROPERTY</tt> macros is to use the KTextTemplate::MetaType system to provide introspection
+  for any type or any container. This subject is treated in detail in @ref generic_types_and_templates
+
+  @subsection enumerator_variables Enumerators
+
+  %KTextTemplate has built-in support for enumerators which use the <tt>Q_ENUMS</tt> macro.
+
+  @code
+  class MyClass : public QObject
+  {
+    Q_OBJECT
+    Q_ENUMS(PersonName)
+    Q_PROPERTY(PersonName personName READ personName)
+  public:
+
+    enum PersonName
+    {
+      Mike,
+      Natalie,
+      Oliver,
+      Patrica = 9
+      Quentin
+    };
+
+    MyClass(QObject *parent = 0 );
+
+    PersonName personName() const { return Quentin; }
+
+  };
+
+  ...
+
+  {
+    QObject *object = new MyClass(this);
+    context.insert("myObj", object);
+    t->render(context);
+  }
+  @endcode
+
+  The enums can be used and accessed in various ways. See QMetaEnum for details.
+
+  @code
+    Oliver is value {{ myObj.Oliver }}.
+    // Output: "Oliver is value 2".
+
+    ...
+
+    Oliver key is {{ myObj.Oliver.key }}.
+    // Output: "Oliver key is Oliver".
+
+    ...
+
+    Oliver value is {{ myObj.Oliver.value }}.
+    // Output: "Oliver value is 2".
+
+    ...
+
+    Oliver scope is {{ myObj.Oliver.scope }}.
+    // Output: "Oliver scope is MyClass".
+
+    ...
+
+    Oliver scope is {{ myObj.Oliver.name }}.
+    // Output: "Oliver scope is PersonName".
+
+    ...
+
+    Patrica is value {{ myObj.Patrica }}.
+    // Output: "Patrica is value 9".
+
+    ...
+
+    PersonName has {{ myObj.PersonName.keyCount }} items.
+    // Output: "PersonName has 5 items".
+
+    ...
+
+    Second item is {{ myObj.PersonName.1 }}.
+    // Output: "Second item is 1".
+
+    ...
+
+    Second item is {{ myObj.PersonName.1.key }}.
+    // Output: "Second item is Natalie".
+
+    ...
+
+    Fourth item is {{ myObj.PersonName.3 }}.
+    // Output: "Fourth item is 9".
+
+    ...
+
+    Fourth item is {{ myObj.PersonName.3.key }}.
+    // Output: "Fourth item is Patrica".
+
+    ...
+
+    The personName property is {{ myObj.personName }}.
+    // Output: "The personName property is 10".
+
+    ...
+
+    The personName property is {{ myObj.personName.key }}.
+    // Output: "The personName property is Quentin".
+
+    ...
+
+    The personName type is {{ myObj.personName.scope }}.
+    // Output: "The personName type is PersonName".
+
+    ...
+
+    The personName is {% with myObj.personName as var %}{{ var }}, {{ var.key }}{% endwith %}.
+    // Output: "The personName is 10, Quentin".
+
+    ...
+
+    The enum is {% with myObj.PersonName as enum %}{{ enum.3 }}, {{ enum.4 }}, {{ enum.4.key }}{% endwith %}.
+    // Output: "The enum is 9, 10, Quentin".
+
+    ...
+
+    The enum is {% for enum in myObj.PersonName %}{{ enum }} : {{ enum.key }}, {% endfor %}.
+    // Output: "The enum 0 : Mike, 1 : Natalie, 2 : Oliver, 9 : Patrica, 10 : Quentin, ".
+
+    ...
+
+    The enum is {% for enum in myObj.PersonName %}
+                    {% ifequal enum Oliver %}**{{ enum }} : {{ enum.key }}**
+                    {% else %}{{ enum }} : {{ enum.key }},
+                    {% endifequal %}
+                {% endfor %}.
+    // Output: "The enum 0 : Mike, 1 : Natalie, **2 : Oliver**, 9 : Patrica, 10 : Quentin, ".
+
+    ...
+
+    The enum is {% for enum in myObj.PersonName %}
+                    {% ifequal enum myObj.personName %}**{{ enum }} : {{ enum.key }}**
+                    {% else %}{{ enum }} : {{ enum.key }},
+                    {% endifequal %}
+                {% endfor %}.
+    // Output: "The enum 0 : Mike, 1 : Natalie, 2 : Oliver, 9 : Patrica, **10 : Quentin**, ".
+  @endcode
+
+  Enumerators in the Qt namespaces are also supported.
+
+  @code
+    AlignRight value is {{ Qt.AlignRight }}.
+    // Output: "AlignRight value is 2".
+
+    ...
+
+    AlignRight key is {{ Qt.AlignRight.key }}.
+    // Output: "AlignRight value is AlignRight".
+
+    ...
+
+    AlignRight scope is {{ Qt.AlignRight.scope }}.
+    // Output: "AlignRight scope is Qt".
+
+    ...
+
+    AlignRight name is {{ Qt.AlignRight.name }}.
+    // Output: "AlignRight scope is Alignment".
+
+    ...
+
+    {% ifequal myObj.alignment Qt.AlignRight %}RightAligned{% else %}Not RightAligned{% endifequal %}.
+    // Output: "RightAligned". or "Not RightAligned", depending on the value of myObj.alignment.
+
+    ...
+  @endcode
+
+*/
+
+}

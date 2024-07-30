@@ -1,0 +1,521 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Swedish "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>Handbok &tablet;</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <othercredit role="translator"
+> <firstname
+>Stefan</firstname
+> <surname
+>Asserhäll</surname
+> <affiliation
+><address
+><email
+>stefan.asserhall@bredband.net</email
+></address
+></affiliation
+> <contrib
+>Översättare</contrib
+></othercredit
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>2020-10-17</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>Det här är dokumentationen för &kde;:s modul i systeminställningarna som ställer in grafiska ritplattor.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>Systeminställningar</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>Ritplatta</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Inställningar av Wacom ritplatta</title>
+    <para
+>Modulen för ritplattor i systeminställningarna hanterar alla inställningar av en grafisk ritplatta. Alla ritplattor som stöds av projektet för <ulink url="https://linuxwacom.github.io"
+>&Linux; Wacom drivrutin</ulink
+> hanteras av det här inställningsgränssnittet. Försäkra dig om att ritplattan detekteras, antingen via xorg.conf eller udev och fungerar i allmänhet. Se avsnittet <link linkend="detection"
+>detektering av ritplattor</link
+> för mer information. </para>
+    <important>
+        <para
+>Drivrutinen <application
+>xf86-input-wacom</application
+> måste vara installerad på datorn och <command
+>xsetwacom</command
+> måste vara tillgängligt för att modulen ska fungera riktigt. </para>
+    </important>
+    <para
+>Modulen är uppdelad i olika fliksidor som hanterar ritplattans och pennans alla aspekter: <link linkend="tablet-profiles"
+>Profiler</link
+>, <link linkend="tablet-general"
+>Allmän information</link
+>, <link linkend="stylus"
+>Inställningar av penna</link
+>, <link linkend="pad-buttons"
+>Expressknappar</link
+>, <link linkend="pad-mapping"
+>Avbildning av ritplattan</link
+> och <link linkend="touch-mapping"
+>Avbildning av beröring</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>Profilhantering</title>
+
+        <para
+>Det här är den lilla kombinationsrutan med de två knapparna intill. Du kan skapa nya profiler och ta bort befintliga. Varje profil sparas och specificeras för ritplattan som för närvarande är ansluten. Om du skapar en ny profil, skapas den automatiskt med förvalda inställningar som returneras av drivrutinen. </para>
+
+        <para
+>Här kan du ange olika profiler för dina inställningar. Om du till exempel vill ha annorlunda beteende för pennan när den används som ersättning för musen vid dagligt arbete, eller när den används som en penna för att rita någonting. </para>
+        <para
+>Varje profil kan ändras i farten, och ändrar direkt beteendet hos inmatning från ritplattan. </para>
+        <note>
+            <para
+><link linkend="kded"
+>KDED demonen för ritplattor</link
+> måste köra i bakgrunden för att kunna ändra profilerna och tillämpa dem på ritplattan. Allt arbete utförs av demonen. Modulen i systeminställningarna ändrar bara dess profilinställningar. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>Allmänna inställningar av ritplattan och information.</title>
+
+        <para
+>Visar en del allmän information om den detekterade ritplattan. Förutom ritplattans namn och tillverkare, visas en bild och alla detekterade inmatningsenheter listas. </para>
+
+        <note>
+            <para
+>Ritplattan måste vara ansluten och <link linkend="kded"
+>kded</link
+> måste köra för att modulen ska kunna fungera som den ska. </para>
+            <para
+>Se avsnittet <link linkend="troubles"
+>Detekteringsproblem</link
+> för ytterligare hjälp med detektering av ritplattan. </para>
+        </note>
+
+        <para
+>Förutom informationen om ritplattan gör den allmänna fliken det möjligt att ställa in diverse globala genvägar. Varje genväg gör det möjligt att ändra alternativen för ritplattan som för närvarande är ansluten. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>Penninställningar</title>
+
+        <para
+>Verktyget som används tillsammans med ritplattan har två olika ändor. Huvudändan kallas pennan och den andra ändan radergummit. Under den här fliken kan du ändra alla verktygets aspekter från knapptilldelning till tryckkurva och tröskel. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>Raderkänsla</title>
+            <para
+>Skjutreglaget gör det möjligt att ändra radergummits tröskel. Det är möjligt att ändra hela tryckkurvan i dialogrutan <guilabel
+>Redigera tryckkurva</guilabel
+> för en mer detaljerad inställning av trycket. Se <link linkend="presscurve"
+>Dialogrutan för tryckkurva</link
+> för mer information. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>Knappinställningar</title>
+            <para
+>Rutan <guilabel
+>Knappinställningar</guilabel
+> låter dig ändra utförd åtgärd som är tilldelad till varje knapp på pennan. Ett enkelt klick i redigeringsrutan öppnar en ny dialogruta där olika tangentkombinationer, väljartangenter och musknappar kan väljas. </para>
+
+            <para
+>Om <guilabel
+>Berör för att utföra åtgärden</guilabel
+> är aktiverad måste pennan vara i kontakt med ritplattan för att låta knappåtgärden utföras. Om alternativet är inaktiverat fungerar också alla knappåtgärder när pennan hålls ovanför ritplattan. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>Spetskänsla</title>
+            <para
+>Skjutreglaget gör det möjligt att ändra pennspetsens tröskel. Det är möjligt att ändra hela tryckkurvan i dialogrutan <guilabel
+>Redigera tryckkurva</guilabel
+> för en mer detaljerad inställning av trycket. Se <link linkend="presscurve"
+>Dialogrutan för tryckkurva</link
+> för mer information. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>Expressknappar</title>
+
+        <para
+>Fliken <guilabel
+>Expressknappar</guilabel
+> gör det möjligt att ange specifika åtgärder för alla hårdvaruknappar på ritplattan. För att ändra använd åtgärd måste man klicka i redigeringsrutan och välja åtgärden i den nya dialogrutan. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>Ritplatta</title>
+
+       <para
+>Fliken <guilabel
+>Ritplatta</guilabel
+> gör det möjligt att ställa in ytterligare egenskaper för ritplattans yta när den används tillsammans med en penna. Här kan orientering av ritplattans yta, giltigt utrymme på den använda ritplattan och markörföljningsläget anges. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>Följningsläge för penna</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Avbilda på skärm</guilabel
+>: Detta läge avbildar pennmarkören med absoluta rörelser på ritplattan. Ritplattans kanter representerar direkt skärmutrymmet. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Avbilda på markör</guilabel
+>: Avbildar pennans markör med relativa rörelser på ritplattan. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>Orientering</title>
+           <para
+>Orienteringsrutan anger hur ritplattans yta är roterad. Du kan ställa in en specifik egen orientering i kombinationsrutan, eller om alternativet <guilabel
+>Rotera automatiskt med skärm</guilabel
+> anges, roteras ritplattan automatiskt med skärmen. Det görs genom att övervaka xrandr-händelser när skärmen roteras. </para>
+           <para
+>Om du har problem med alternativet för automatisk rotation och ritplattan alltid roteras åt fel håll, aktivera alternativet <guilabel
+>Invertera automatisk rotation</guilabel
+> för att invertera detta. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>Avbildning av ritplatta</title>
+           <para
+>Den här avbildningen gör det möjligt att ange delarna av ritplattan som kommer att användas för varje skärm. Det är nödvändigt för att hålla ritplattans yta proportionell mot det använda skärmområdet i absolut pennföljningsläge. För mer information se avsnittet <link linkend="area-selection"
+>Dialogrutan för val av yta</link
+>. </para>
+           <note>
+               <para
+>Alternativet fungerar inte med relativt markörläge. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>Beröring</title>
+
+       <para
+>Fliken <guilabel
+>Beröring</guilabel
+> gör det möjligt att ställa in ytterligare egenskaper för ritplattans beröringsdel (om tillgänglig). Det är möjligt att inaktivera beröringsfunktionen via kryssrutan <guilabel
+>Aktivera beröring</guilabel
+>. Det finns också en global genväg som gör det möjligt att aktivera eller inaktivera beröringsfunktionen. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>Beröringsföljning</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Avbilda på skärm</guilabel
+>: Detta läge avbildar beröringsmarkören med absoluta rörelser på ritplattan. Ritplattans kanter representerar direkt skärmutrymmet. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Avbilda på markör</guilabel
+>: Avbildar beröringsmarkören med relativa rörelser på ritplattan. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>Gester</title>
+
+           <para
+>Om <guilabel
+>Aktivera gester</guilabel
+> är valt, kan ritplattan skapa gesthändelser för pekenheten. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Rullningsavstånd</guilabel
+>: Gör det möjligt att rulla i fönster när två fingrar placeras på ritplattan, flyttas de uppåt eller neråt skapas en rullningshändelse. Avståndet anges i ritplattans enheter. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Zoomavstånd</guilabel
+>:  Gör det möjligt att zooma in eller ut genom att flytta ihop eller isär två fingrar. Avståndet anges i ritplattans enheter. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Beröringstid</guilabel
+>: Tiden i millisekunder anger när en dubbel beröring av enheten känns igen som ett högerklick. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>Beröringstilldelning</title>
+           <para
+>Den här avbildningen gör det möjligt att ange delarna av beröringsenheten som kommer att användas för varje skärm. Det är nödvändigt för att hålla ritplattans yta proportionell mot det använda skärmområdet i absolut pennföljningsläge. För mer information se avsnittet <link linkend="area-selection"
+>Dialogrutan för val av yta</link
+>. </para>
+           <note>
+               <para
+>Alternativet fungerar inte med relativt markörläge. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>Dialogrutan för tryckkurva</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Här är en skärmbild av dialogrutan för tryckkurva</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Ändra tryckkurvan</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>Tryckkurvan definierar hur pennans tryck översätts. Tryckkurvan definieras via fyra punkter på en Bézier-kurva. Du kan ändra de röda punkterna och flytta omkring kurvan för att modifiera den. </para>
+        <note>
+            <para
+>Använd pennan inne i dialogrutan för tryckkurvan för att direkt se ändringar av tryckkurvan. Ett blått område under kurvan visar pennans använda tryck. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>Dialogrutan för val av yta</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Här är en skärmbild av dialogrutan för val av yta</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Definiera ritplattans yta</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>En dialogruta gör det möjligt att ange tillgängligt yta på ritplattan för varje valt skärmområde. För att behålla ritplattans proportion är det nödvändigt att reducera ritplattans yta beroende på skärmupplösningen. Den här dialogrutan låter dig specificera dem individuellt för varje skärm. </para>
+        <para
+>Använd knappen <guilabel
+></guilabel
+> för att byta mellan fullskärmsläge (alla anslutna bildskärmar) och varje enskild bildskärm. Inställningarna sparas för varje skärminställning och tillämpas på ritplattan så fort vald skärm ändras genom en åtgärd från den globala genvägen. </para>
+        <para
+>Det är möjligt att avbilda skärmen med området <guimenuitem
+>Hela ritplattan</guimenuitem
+> eller bara definiera <guimenuitem
+>Område på ritplattan</guimenuitem
+> på  rutan <guilabel
+>Ritplatta</guilabel
+> åt höger. Områdets proportion kan låsas eller låsas upp genom att använda inställningsknappen <guibutton
+>Lås proportioner</guibutton
+>. </para>
+        <para
+>Om du vill låta ritplattans proportion vara som nuvarande markering på skärmen, kan du klicka på knappen <guilabel
+>Ställ in skärmproportioner</guilabel
+>. Ritplattans yta beräknas och ändras automatiskt. </para>
+        <para
+>Du kan dessutom öppna dialogrutan <guilabel
+>Kalilbrera</guilabel
+> för att kalibrera ritplattan med hjälp av fyra punkter på skärmen. </para>
+        <para
+>När dialogrutan stängs, kommer den senast valda skärmen att användas. Om du senare vill byta skärm, kan du använda den <link linkend="tablet-general"
+>globala genvägen</link
+>. </para>
+        <note>
+            <para
+>Ritplattans yta fungerar bara för absolut följningsläge för berörings- och pennmarkör-enheten. I relativt läge används hela ritplattan. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>Ritplattans demon</title>
+    <para
+>Ritplattans demon kör i bakgrunden och gör markarbetet: detektera ritplattan och ställa in den med vald profil. Om demonen inte kör, kan inte modulen i systeminställningarna och miniprogrammet i Plasma inte fungera som de ska, och ritplattan kan inte användas med profiler. </para>
+
+    <sect1 id="detection">
+        <title
+>Detektering av ritplatta</title>
+        <para
+>Detektering av <hardware
+>ritplattans enhet</hardware
+> görs på flera olika sätt. <application
+>Solid</application
+> används i det första steget och stöder inkoppling i farten. Om Solid misslyckas är följande steg <command
+>xsetwacom list dev</command
+>, <command
+>lsusb</command
+> och <command
+>xinput --list</command
+>. </para>
+        <para
+>Skulle inget av ovanstående kommandon returnera ritplattans namn, stöds den inte och kan inte användas av den här modulen. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>Detekteringsproblem</title>
+        <para
+>Om ritplattan inte detekteras, kontrollera på sidan <ulink url="https://linuxwacom.github.io"
+>&Linux; Wacom driver</ulink
+> eller <ulink url="https://digimend.github.io"
+>DIGImend driver</ulink
+> om ritplattan stöds. Kontrollera dessutom om det går att hitta ritplattan via <command
+>lsusb</command
+>. </para>
+        <para
+>Om udev inte hanterar detekteringen, lägg till ritplattan i filen <filename
+>/etc/X11/xorg.conf.d/50-tablet.conf</filename
+> (skapa den om den inte finns) och starta om X-servern. </para>
+        <para
+>I fallet med en seriell enhet (pc med ritplatta eller liknande) kontrollera om <command
+>xinput --list</command
+> listar dina in-enheter (penna, radergummi, knappsats). Om de listas ta en titt på den interna identifieraren för ritplattans enhet via <command
+>xsetwacom get "Namn på ritplattan eller pennan" ritplattans-identifierare</command
+>. Om en identifierare returneras, var vänlig skicka all nödvändig information till upphovsmannen. </para>
+        <note>
+        <para
+>Inkoppling under gång är bara tillgänglig om ritplattan hittas via <application
+>Solid</application
+> och dess programmeringsgränssnitt för underrättelser. </para>
+        <para
+><application
+>Solid</application
+> kontrollerar om värdet av <command
+>input.x11_options.Type</command
+> är <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> eller <command
+>cursor</command
+>, eller om värdet av <command
+>input.x11_driver</command
+> är <command
+>wacom</command
+>. </para>
+        <para
+>Skicka gärna e-post till upphovsmannen om ritplattan detekteras av Solid, men med andra värden, för att förbättra stödet för ritplattor. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>Miniprogram i Plasma för ritplatta</title>
+    <para
+>Miniprogrammet för ritplattan gör det möjligt att ändra tillgängliga profiler i farten. Dessutom kan du ändra ritplattans rotation och byta mellan absolut och relativt läge för pennan och radergummit oberoende av de aktuella profilinställningarna. </para>
+    <para
+>Det är inte nödvändigt att lägga till Plasmoiden för att modulen ska fungera. Standardprofilen aktiveras av <link linkend="kded"
+>ritplattans demon</link
+> så fort ritplattan detekteras även om Plasmoiden inte används. Plasmoiden är bara ett visuellt hjälpmedel för att enkelt byta mellan profilerna. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>Tack till och licens</title>
+    <para
+>Översättning Stefan Asserhäll <email
+>stefan.asserhall@bredband.net</email
+></para
+> &underFDL; &underGPL; </chapter>
+</book>

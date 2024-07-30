@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2023 Alexander Lohnau <alexander.lohnau@gmx.de>
+# SPDX-License-Identifier: BSD-2-Clause
+if(KF6Baloo_FOUND)
+ add_subdirectory(baloo)
+endif()
+add_subdirectory(bookmarks)
+if (QALCULATE_FOUND)
+    add_subdirectory(calculator)
+endif()
+add_subdirectory(helprunner)
+add_subdirectory(locations)
+add_subdirectory(places)
+add_subdirectory(services)
+add_subdirectory(recentdocuments)
+add_subdirectory(shell)
+add_subdirectory(webshortcuts)
+
+if(AppStreamQt_FOUND)
+    add_subdirectory(appstream)
+endif()
+
+add_subdirectory(sessions)
+add_subdirectory(kill)

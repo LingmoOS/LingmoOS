@@ -1,0 +1,496 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Catalan  "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>El manual del &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+&traductor.Antoni.Bella; 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21 de setembre de 2010</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>El &kdesu; és un frontal gràfic per a l'ordre <command
+>su</command
+> d'&UNIX;.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>contrasenya</keyword>
+<keyword
+>arrel</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introducció</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Us donem la benvinguda al &kdesu;! El &kdesu; és un frontal gràfic de l'entorn d'escriptori K per a l'ordre <command
+>su</command
+> d'&UNIX;. Us permetrà executar un programa com a un usuari diferent indicant la contrasenya per a aquest usuari. El &kdesu; és un programa sense privilegis que empra el sistema de <command
+>su</command
+>.</para>
+
+<para
+>El &kdesu; disposa d'una característica addicional: pot conservar les contrasenyes. Si esteu emprant aquesta característica, tan sols us caldrà introduir la contrasenya una vegada per a cada ordre. Per a més informació quant a això i una anàlisi de seguretat, vegeu <xref linkend="sec-password-keeping"/>.</para>
+
+<para
+>Aquest programa està principalment dissenyat per a executar-se des de la línia d'ordres o des de fitxers <filename
+>.desktop</filename
+>. Tot i que després demana per la contrasenya de <systemitem class="username"
+>root</systemitem
+> emprant un diàleg &IGU;, de fet considero més un pegat de línia d'ordres &lt;-&gt; &IGU; en comptes d'un programa d'&IGU; pur.</para>
+
+<para
+>Atès que el <command
+>kdesu</command
+> no s'instal·la més a <userinput
+> $(kf5-config --prefix)</userinput
+>/bin sinó a <userinput
+>kf5-config --path libexec</userinput
+> i aquest no es troba a la vostra <envar
+>Path</envar
+>, haureu d'utilitzar <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> per a iniciar el <command
+>kdesu</command
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Ús del &kdesu;</title>
+
+<para
+>L'ús del &kdesu; és fàcil. La sintaxi és com la següent:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> ordre</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> fitxer</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nom icona</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioritat</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> usuari</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opcions genèriques de &kde;</arg
+> <arg choice="opt"
+>Opcions genèriques de les &Qt;</arg
+> </cmdsynopsis>
+
+<para
+>Les opcions de la línia d'ordres s'expliquen a sota.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>ordre</replaceable
+></option
+></term>
+<listitem
+><para
+>Especifica l'ordre a executar com a root. Aquesta se li ha d'especificar com a un únic argument. De manera que, per exemple, si voleu executar un nou gestor de fitxers, haureu d'introduir a l'indicatiu: <userinput
+>$(kf5-config --path libexec) <command
+>kdesu <option
+>-c <replaceable
+>&dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Mostra la informació de depuració.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fitxer</replaceable
+></option
+></term>
+<listitem
+><para
+>Aquesta opció permet un ús eficient del &kdesu; en els fitxers <filename
+>.desktop</filename
+>. Li indica al &kdesu; que examini el fitxer especificat per <parameter
+>fitxer</parameter
+>. Si aquest fitxer és d'escriptura per a l'usuari actual, el &kdesu; executarà l'ordre com a aquest l'usuari. Si no fos d'escriptura, l'ordre seria executada com a l'usuari <parameter
+>usuari</parameter
+> (de manera predeterminada el root).</para>
+<para
+>El paràmetre <parameter
+>fitxer</parameter
+> s'avalua de la següent manera: si <parameter
+>fitxer</parameter
+> comença per <literal
+>/</literal
+>, es pren com a un nom de fitxer absolut. D'altra manera, es pren com al nom d'un fitxer de configuració global del &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nom icona</replaceable
+></term>
+<listitem
+><para
+>Especifica la icona a emprar en el diàleg de contrasenya. Podeu especificar el nom sense cap extensió.</para>
+<para
+>Per exemple, per a executar el &konqueror; en el mode de gestor de fitxers i mostrar-ne la icona al diàleg de contrasenya:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>No demana la contrasenya. Això inhabilita la casella de selecció <guilabel
+>Conserva la contrasenya</guilabel
+> al diàleg de la contrasenya.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritat</replaceable
+></term>
+<listitem>
+<para
+>Estableix el valor de la prioritat. La prioritat és un número arbitrari entre 0 i 100. El valor predeterminat és 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Utilitza una planificació en temps real.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Atura el dimoni kdesu. Vegeu <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Habilita l'eixida de terminal. També inhabilita el requisit de la contrasenya. És molt recomanable per a la finalitat de depuració, si voleu executar una aplicació en mode consola, en comptes d'aquest, empreu el <command
+>su</command
+> estàndard.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> usuari</replaceable
+></term>
+<listitem
+><para
+>L'ús més comú per al &kdesu; és executar una ordre com a superusuari, tot i que se li pot indicar un nom d'usuari i la contrasenya apropiada.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Interioritats</title>
+
+<sect1 id="x-authentication">
+<title
+>Autenticació X</title>
+
+<para
+>El programa que executeu ho farà sota la ID d'usuari del root i generalment no està autoritzat a accedir a la vostra pantalla X. El &kdesu; evita aquest problema afegint una galeta d'autenticació per a la pantalla a un fitxer temporal <filename
+>.Xauthority</filename
+>. Després que aquesta ordre finalitzi, aquest fitxer serà eliminat. </para>
+
+<para
+>Si no empreu galetes X, haureu de resoldre aquest problema pel vostre compte. El &kdesu; ho detectarà i no afegirà cap galeta, però us haureu d'assegurar que root té permès l'accés a la vostra pantalla.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Interfície per a <command
+>su</command
+></title>
+
+<para
+>El &kdesu; empra el sistema de <command
+>su</command
+> per a adquirir privilegis. En aquesta secció s'expliquen els detalls de com es fa això. </para>
+
+<para
+>A causa d'algunes implementacions de <command
+>su</command
+> (&pex; la de &RedHat;), no volen llegir la contrasenya des de <literal
+>stdin</literal
+>, el &kdesu; crea un parell pty/tty i executa <command
+>su</command
+> amb els seus descriptors de fitxer (filedescriptors) estàndards connectats a la tty.</para>
+
+<para
+>Per a executar l'ordre seleccionada per l'usuari, en comptes d'un intèrpret d'ordres interactiu, el &kdesu; empra l'argument <option
+>-c</option
+> amb <command
+>su</command
+>. Aquest argument és entès per tots els intèrprets d'ordres coneguts, de manera que hauria de funcionar. <command
+>su</command
+> passa aquest argument a l'intèrpret d'ordres de l'usuari de destinació, i aquest executa el programa. Ordre d'exemple: <command
+>su <option
+>root -c <replaceable
+>el_programa</replaceable
+></option
+></command
+>.</para>
+
+<para
+>En comptes d'executar directament l'ordre de l'usuari amb <command
+>su</command
+>, el &kdesu; executa un petit programa intermedi anomenat <application
+>kdesu_stub</application
+>. Aquest intermediari (que s'executa com a usuari de destinació), sol·licita informació del &kdesu; a sobre del canal pty/tty (l'entrada i eixida estàndard de l'intermediari) i després executa el programa de l'usuari. La informació que es passa és: la pantalla X, una galeta d'autenticació X (si està disponible), la variable d'entorn <envar
+>PATH</envar
+> i l'ordre a executar. El motiu pel qual s'empra un programa intermedi és que la galeta X és informació privada i per això no es pot passar a través de la línia d'ordres.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Comprovació de la contrasenya</title>
+
+<para
+>El &kdesu; comprovarà la contrasenya introduïda i generarà un missatge d'error si no és correcta. La comprovació es realitza executant un programa de prova: <filename
+>/bin/true</filename
+>. Si el resultat és positiu, s'assumeix que la contrasenya és correcta.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Conserva la contrasenya</title>
+
+<para
+>Per al vostre confort, el &kdesu; implementa una característica per a «conservar la contrasenya». Si esteu interessat en la seguretat, hauríeu de llegir aquest paràgraf.</para>
+
+<para
+>Si permeteu que el &kdesu; conservi les contrasenyes, estareu obrint un (petit) forat de seguretat en el vostre sistema. Òbviament, el &kdesu; no permet més que a l'identificador del vostre usuari utilitzar les seves contrasenyes, però si es fa sense precaució, s'estaria rebaixant el nivell de seguretat de <systemitem class="username"
+>root</systemitem
+> al d'un usuari normal (com ara vosaltres). Un intrús que aconsegueixi accés al vostre compte, podria aconseguir accés automàtic a <systemitem class="username"
+>root</systemitem
+>. El &kdesu; intenta prevenir això. L'esquema de seguretat que s'utilitza és, en la meva opinió, raonablement segur i s'explica tot seguit.</para>
+
+<para
+>El &kdesu; utilitza un dimoni, anomenat <application
+>kdesud</application
+>. El dimoni escolta a un sòcol d'&UNIX; en <filename
+>/tmp</filename
+> a punt per a executar ordres. El mode del sòcol és 0600 de tal manera que només el seu identificador d'usuari s'hi pugui connectar. Si s'habilita conservar la contrasenya, el &kdesu; executarà ordres a través d'aquest dimoni. Escriurà l'ordre i la contrasenya de <systemitem class="username"
+>root</systemitem
+> en el sòcol i el dimoni executarà l'ordre emprant <command
+>su</command
+>, tal com s'ha descrit anteriorment. Després d'aquesta operació l'ordre i la contrasenya no es descarten. Es registren durant un cert temps. Aquest temps és el valor temps d'expiració que apareix en el mòdul de control. Si li arriba una altra sol·licitud per a la mateixa ordre durant aquest període de temps, el client no haurà de tornar a introduir la contrasenya. Per a evitar que possibles intrusos al vostre compte robin aquesta contrasenya des del dimoni (per exemple, afegint-li un depurador), el dimoni s'instal·la com a set-group-id nogroup. Això hauria de prevenir l'obtenció de contrasenyes des del procés <application
+>kdesud</application
+> per a tots els usuaris normals (vosaltres inclosos). A més a més, el dimoni també estableix la variable d'entorn <envar
+>DISPLAY</envar
+> al valor que tenia quan s'inicià. L'únic que un intrús pot fer és executar una aplicació sobre la vostra pantalla.</para>
+
+<para
+>Un possible problema amb aquest disseny és que els programes que executeu probablement no estan escrits tenint en compte la seguretat (com els programes setuid <systemitem class="username"
+>root</systemitem
+>). Això principalment vol dir que poden tenir desbordaments de la memòria intermèdia o d'altres problemes que un intrús podria explotar.</para>
+
+<para
+>L'ús de la característica per a conservar les contrasenyes és un compromís entre la seguretat i la comoditat. Us encoratjo a què ho penseu detingudament i decidiu si voleu o no utilitzar-la.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autor</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Copyright 2000 &Geert.Jansen;</para>
+
+<para
+>El &kdesu; ha estat escrit per en &Geert.Jansen;. Està d'alguna manera basat en la versió 0.3 del &kdesu; d'en Pietro Iglio. En Pietro i jo vàrem acordar que en el futur aquest programa el mantindria jo mateix.</para>
+
+<para
+>Es pot contactar amb l'autor a través de correu electrònic en &Geert.Jansen.mail;. Si us plau, informeu de qualsevol error que trobeu de manera que el pugui solucionar. Si teniu cap suggeriment, trobeu-vos lliure d'enviar-me'l, també.</para>
+
+<para
+>Traductor/Revisor de la documentació: &credits.Antoni.Bella;</para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

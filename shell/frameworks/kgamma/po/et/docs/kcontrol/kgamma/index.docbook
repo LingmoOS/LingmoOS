@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+ "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Estonian  "INCLUDE"
+><!-- change language only here -->
+]>
+
+<article id="kgamma" lang="&language;">
+<title
+>Monitori gamma</title>
+
+<articleinfo>
+<authorgroup>
+<author
+><firstname
+>Michael</firstname
+> <surname
+>v.Ostheim</surname
+> <affiliation
+> <address
+><email
+>ostheimm@users.berlios.de</email
+></address>
+</affiliation>
+</author>
+<othercredit role="translator"
+><firstname
+>Marek</firstname
+><surname
+>Laane</surname
+><affiliation
+><address
+><email
+>bald@smail.ee</email
+></address
+></affiliation
+><contrib
+>Tõlge eesti keelde</contrib
+></othercredit
+> 
+</authorgroup>
+
+<date
+>2013-12-05</date>
+<releaseinfo
+>&kde; 4.12</releaseinfo>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>Süsteemi seadistused</keyword>
+<keyword
+>Monitor</keyword>
+<keyword
+>Kalibreerimine</keyword>
+<keyword
+>Gamma</keyword>
+</keywordset>
+
+</articleinfo>
+
+<sect1 id="introduction">
+<title
+>Sissejuhatus</title>
+
+<para
+>See moodul on monitori gammakorrektsiooni vahend. Selle eesmärk on tagada, et sinu tehtu (veebileheküljed, pildid &etc;) näeb täpselt samamoodi välja ka teiste inimeste monitoril ning teiste tehtu näeb sinu monitoril välja täpselt nii, nagu autor seda soovis.</para>
+<para
+>See võimaldab muuta monitoril &X-Server;i gammakorrektsiooni. Aga see ei ole veel kõik: korraliku tulemuse saavutamiseks tuleb määrata monitori korrektne eredus, kontrast ja värvitasakaal. See võib olla üpris vaevaline tegevus ning mõningaid samme tuleb võib-olla isegi päris mitu korda uuesti läbi teha. Perfektse tulemuse tagab väga hea (paraku küll ka kallis) riistvara.</para>
+<para
+>Nelja liuguri abil saab määrata gammakorrektsiooni kas üheainsa väärtusena või eraldi punase, rohelise ja sinise komponendi jaoks. &X-Server;i gamma vaikeväärtus on 1,00 (&Mac; 1,80, WinXX 2,20). Testpildid aitavad leida sobiva seadistuse.</para>
+<para
+>Gamma korrigeerimiseks süsteemselt märgi ära kast <guilabel
+>Seadistused salvestatakse süsteemselt</guilabel
+>. Need seadistused rakendatakse siis järgmisel &X-Server;i käivitamisel. Selle faili salvestamiseks läheb vaja administraatori (root) õigusi. See on kasulik eriti siis, kui soovitakse gammakorrektsiooni pakkuda arvuti kõigile kasutajatele mis tahes keskkonna puhul.</para>
+<para
+>Gamma korrigeerimiseks ainult omaenda &kde; vajaduste tarbeks jäta see kast märkimata. Sellisel juhul rakendatakse seadistus &kde; järgmisel käivitamisel, asendades ajutiselt süsteemse gammaseadistuse. Viimaseid iseenesest see ei mõjuta ning süsteemsed väärtused taastatakse &X-Server;i järgmisel käivitamisel.</para>
+<para
+>Mitmepäise süsteemi korral vali liitkastist monitor, mida soovid muuta. See toimib ka siis, kui sisse on lülitatud Xinerama. Kui soovid määrata kõigile monitoridele sama gammaväärtust, lülita sisse võimalus <guilabel
+>Monitoride sünkroniseerimine</guilabel
+>. Ainult ühe monitoriga süsteemis ei avalda see mingit mõju.</para>
+</sect1>
+
+<sect1 id="using_test_images">
+<title
+>Testpiltide kasutamine</title>
+<para
+>See moodul palub kuut eri testpilti, mida saab valida akna ülaosas olevast rippmenüüst.</para>
+<sect2 id="grey">
+<title
+>Hallskaala testpilt</title>
+<para
+>Sa peaksid nägema sellist pilti:</para>
+<itemizedlist>
+<listitem>
+<para
+>20 eri sektsiooniga hallskaala</para>
+</listitem>
+<listitem>
+<para
+>Tumedaim osa puhas must</para>
+</listitem>
+<listitem>
+<para
+>Heledaim osa puhas valge</para>
+</listitem>
+<listitem>
+<para
+>Mitte ühtegi värvivihjet halltoonides</para>
+</listitem>
+</itemizedlist>
+
+<para
+>Kui sa ei näe kõiki 20 sektsiooni, kasuta parandamiseks monitori kontrastsusseadistusi või liugurit <guilabel
+>Gamma</guilabel
+>. Kui must ei ole puhas, püüa monitor tumedamaks keerata, kui valge ei ole puhas, siis heledamaks. Kui näed halltoonides mingeidki vihjeid värvile, muuda monitori värvitasakaalu või kasuta liugureid <guilabel
+>Punane</guilabel
+>, <guilabel
+>Roheline</guilabel
+> ja <guilabel
+>Sinine</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="RGB-Scale">
+<title
+>RGB skaala testpilt</title>
+<para
+>Sa peaksid nägema kolme triipu, igal 16 erinevat punase, rohelise või sinise tooni. Tumedaimad sektsioonid peaks olema puhas must, heledaimad puhas punane, roheline või sinine. Kui sa ei näe kõiki värviribade sektsioone, püüa seda värvi heledamaks või tumedamaks keerata.</para>
+</sect2>
+
+<sect2 id="CMY-Scale">
+<title
+>CMY skaala testpilt</title>
+<para
+>Sa peaksid nägema kolme triipu, igal 11 tsüaani, magenta või kollase tooni. Heledaimad sektsioonid peaks olema puhas valge, tumedaimad puhas tsüaan, magenta või kollane.</para>
+
+<itemizedlist>
+<listitem>
+<para
+>Kui sa ei näe kõiki tsüaani sektsioone, püüa punast heledamaks või tumedamaks keerata.</para>
+</listitem>
+<listitem>
+<para
+>Kui sa ei näe kõiki magenta sektsioone, püüa rohelist heledamaks või tumedamaks keerata.</para>
+</listitem>
+<listitem>
+<para
+>Kui sa ei näe kõiki kollase sektsioone, püüa sinist heledamaks või tumedamaks keerata.</para>
+</listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="advanced">
+<title
+>Täpsemad testpildid</title>
+<para
+>Järgmised kolm pilti näitavad monitori suutlikkust halli kolme erineva tooni vallas. Kui sa kõiki üksikasju ei näe, ei ole siiski põhjust muret tunda - nojah, võib-olla tasuks küll parem riistvara hankida. </para>
+<sect3 id="dark-gray">
+<title
+>Tumehalli testpilt</title>
+<para
+>Sa peaksid nägema mustas kastis 10 erinevat tumehalli ristkülikut. Diagramm näitab 1%-lisi erinevusi mustast. </para>
+</sect3>
+<sect3 id="mid-gray">
+<title
+>Keskmise halli testpilt</title>
+<para
+>See pilt näitab 50% hallis kastis 11 halli ristkülikut. Sa peaksid nägema kõiki ristkülikuid, välja arvatud keskmine. Ristkülikud kujutavad endast halliskaalal väärtusi 45% kuni 55%. </para>
+</sect3>
+<sect3 id="light-gray">
+<title
+>Helehalli testpilt</title>
+<para
+>Sa peaksid nägema valges kastis 10 erinevat helehalli ristkülikut. Diagramm näitab 1%-lisi erinevusi valgest. </para>
+</sect3>
+</sect2>
+</sect1>
+
+</article>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+-->

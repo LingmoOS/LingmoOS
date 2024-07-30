@@ -1,0 +1,511 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Korean "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>&tablet; 도움말</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <othercredit lang="ko" role="translator"
+><surname
+>이</surname
+><firstname
+>정희</firstname
+><affiliation
+><address
+><email
+>daemul72@gmail.com</email
+></address
+></affiliation
+><contrib
+>한국어 번역</contrib
+></othercredit
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>2013-03-16</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>이 문서에서는 그래픽 태블릿을 구성하는 &kde; &systemsettings; 모듈에 대하여 설명합니다.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>시스템 설정</keyword>
+        <keyword
+>와콤</keyword>
+        <keyword
+>태블릿</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>와콤 태블릿 설정</title>
+    <para
+>태블릿 &systemsettings; 모듈은 그래픽 태블릿에 대한 모든 설정을 처리합니다. <ulink url="http://linuxwacom.sourceforge.net"
+>&Linux; 와콤 드라이버</ulink
+> 프로젝트에서 지원되는 모든 태블릿은 이 설정 인터페이스에서 처리됩니다. xorg.conf 또는 HAL을 통해 태블릿이 감지되고 일반적으로 작동하는지 확인합니다. 자세한 내용은 <link linkend="detection"
+>태블릿 감지</link
+> 장을 참조하십시오. </para>
+    <important>
+        <para
+><application
+>wacom-tools</application
+> 또는 <application
+>xf86-input-wacom</application
+> 드라이버가 컴퓨터에 설치되어 있어야 하며, 이 모듈이 올바르게 작동하려면 <command
+>xsetwacom</command
+>을 사용할 수 있어야 합니다. </para>
+    </important>
+    <para
+>모듈은 태블릿과 펜의 모든 측면을 처리하는 다양한 탭 페이지로 분할됩니다: <link linkend="tablet-profiles"
+>프로필</link
+>, <link linkend="tablet-general"
+>일반 정보</link
+>, <link linkend="stylus"
+>스타일러스 설정</link
+>, <link linkend="pad-buttons"
+>익스프레스 단추</link
+>, <link linkend="pad-mapping"
+>패드 매핑</link
+> 및 <link linkend="touch-mapping"
+>터치 매핑</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>프로필 관리</title>
+
+        <para
+>이것은 두 개의 단추가 옆에 있는 작은 드롭 다운 상자입니다. 새 프로필을 생성하고 이미 존재하는 프로필을 삭제할 수 있습니다. 현재 연결된 태블릿에 대해 각 프로필이 저장되고 지정됩니다. 새 프로필을 생성하면 wacom-tools에서 반환되는 기본 설정으로 프로필을 자동으로 생성합니다. </para>
+
+        <para
+>여기서 설정에 대해 서로 다른 프로필을 지정할 수 있습니다. 예를 들어 펜을 일상적인 작업에 마우스 대신 사용하거나 펜으로 사용하여 무언가를 그릴 때 펜의 동작이 달라지길 원하는 경우입니다. </para>
+        <para
+>각 프로필은 즉시 변경할 수 있으며 태블릿 입력의 동작을 직접 변경할 수 있습니다. </para>
+        <note>
+            <para
+>프로필을 변경하고 태블릿에 적용하려면 <link linkend="kded"
+>kded 태블릿 데몬</link
+>이 백그라운드에서 실행 중이어야 합니다. 모든 일은 데몬에 의해 이루어집니다. &systemsettings; 모듈은 이에 대한 프로필 설정을 변경하기만 하면 됩니다. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>일반 태블릿 설정 및 정보</title>
+
+        <para
+>감지된 태블릿에 대한 몇 가지 일반 정보를 표시합니다. 태블릿의 이름과 회사 옆에 이미지가 표시되고 감지된 모든 입력 장치가 나열됩니다. </para>
+
+        <note>
+            <para
+>태블릿을 연결해야 하며 모듈이 올바르게 작동하려면 <link linkend="kded"
+>kded</link
+>가 실행 중이어야 합니다. </para>
+            <para
+><link linkend="troubles"
+>인식 문제</link
+> 장에서 태블릿 인식에 대한 자세한 내용을 볼 수 있습니다. </para>
+        </note>
+
+        <para
+>일반 탭에서는 태블릿 정보 외에도 다양한 전역 단축키를 설정할 수 있습니다. 각 단축키를 사용하면 현재 연결된 태블릿의 옵션을 동적으로 변경할 수 있습니다. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>스타일러스 설정</title>
+
+        <para
+>태블릿과 함께 사용되는 펜은 두 개의 다른 면을 가지고 있으며, 다른 쪽 끝은 스타일러스라고 합니다. 이 탭에서는 버튼 할당에서 압력 곡선 및 임곗값에 이르기까지 펜의 모든 측면을 변경할 수 있습니다. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>지우개 촉감</title>
+            <para
+>슬라이더를 사용하여 지우개의 임곗값을 변경할 수 있습니다. 압력에 대한 보다 세밀한 배율 설정을 위해 <guilabel
+>압력 곡선 편집</guilabel
+> 대화 상자에서 전체 압력 곡선을 변경할 수 있습니다. 자세한 내용은 <link linkend="presscurve"
+>압력 곡선 대화 상자</link
+>를 참조하십시오. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>버튼 설정</title>
+            <para
+><guilabel
+>버튼 설정</guilabel
+> 상자를 사용하면 펜의 각 버튼에 할당된 실행 작업을 변경할 수 있습니다. 편집 상자를 간단히 클릭하면 다른 키 조합, 수정자 키 및 마우스 단추를 선택할 수 있는 새 대화 상자가 열립니다. </para>
+
+            <para
+><guilabel
+>탭하여 작업 실행</guilabel
+>을 활성화한 경우, 버튼 동작을 실행하려면 스타일러스가 태블릿과 접촉해야 합니다. 이 옵션을 사용하지 않도록 설정하면 스타일러스가 태블릿 위에 있을 때도 각 버튼 작업이 작동합니다. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>팁 촉감</title>
+            <para
+>슬라이더를 사용하여 스타일러스 팁의 임계값을 변경할 수 있습니다. 압력에 대한 보다 세밀한 배율 설정을 위해 <guilabel
+>압력 곡선 편집</guilabel
+> 대화 상자에서 전체 압력 곡선을 변경할 수 있습니다. 자세한 내용은 <link linkend="presscurve"
+>압력 곡선 대화 상자</link
+>를 참조하십시오. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>익스프레스 단추</title>
+
+        <para
+><guilabel
+>익스프레스 단추</guilabel
+> 탭을 통해 태블릿의 모든 하드웨어 단추에 대한 특정 단추 작업을 설정할 수 있습니다. 사용된 작업을 변경하려면 편집 상자를 클릭하고 새 대화 상자에서 작업을 선택해야 합니다. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>태블릿</title>
+
+       <para
+><guilabel
+>태블릿</guilabel
+> 탭을 사용하면 펜과 함께 사용할 때 태블릿 영역의 추가 속성을 설정할 수 있습니다. 여기서 태블릿 영역의 방향은 사용된 태블릿의 유효한 공간과 커서 추적 모드를 지정할 수 있습니다. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>스타일러스 추적 모드</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>화면에 대응</guilabel
+>: 이 모드는 펜 커서를 절대 이동으로 태블릿에 대응합니다. 태블릿의 가장자리는 화면의 공간을 직접 나타냅니다. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>커서에 대응</guilabel
+>: 이 모드는 펜 커서를 태블릿에 상대적인 움직임으로 대응합니다. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>방향</title>
+           <para
+>방향 상자는 태블릿 영역 회전 방법을 지정합니다. 콤보 상자에서 특정 회전을 단독으로 설정할 수 있으며, <guilabel
+>화면과 함께 회전</guilabel
+> 옵션을 활성화하면 태블릿이 화면과 함께 자동으로 회전합니다. 이 작업은 화면이 회전할 때 xrandr 이벤트를 수신하여 수행합니다. </para>
+           <para
+>자동 설정 옵션에 문제가 있고 태블릿이 항상 잘못된 방향으로 회전하는 경우 <guilabel>
+자동 회전 반전</guilabel
+> 옵션을 활성화하여 이 옵션을 반전시킵니다. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>태블릿 매핑</title>
+           <para
+>이 매핑을 사용하면 각 화면에 사용할 태블릿의 비율을 지정할 수 있습니다. 이 작업은 사용된 화면 공간에 비례하는 태블릿 영역을 절대 스타일러스 추적 모드에서 유지해야 합니다. 자세한 내용은 <link linkend="area-selection"
+>영역 선택 대화 상자</link
+> 절을 참조하십시오. </para>
+           <note>
+               <para
+>이 옵션은 상대 커서 모드에서는 작동하지 않습니다. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>터치</title>
+
+       <para
+><guilabel
+>터치</guilabel
+> 탭을 통해 태블릿의 터치 부분에 대한 추가 속성을 설정할 수 있습니다(사용 가능한 경우). <guilabel
+>터치 사용</guilabel
+> 체크 상자를 통해서 터치 기능을 비활성화할 수 있습니다. 터치 기능을 활성화/비활성화할 수 있는 전역 단축키 기능도 있습니다. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>터치 추적 모드</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>터치 영역을 화면에 대응</guilabel
+>: 이 모드는 터치 커서를 태블릿에 절대 이동으로 대응합니다. 태블릿의 가장자리는 화면의 공간을 직접 나타냅니다. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>커서에 대응</guilabel
+>: 이 모드는 터치 커서를 태블릿에 대한 상대적인 움직임과 함께 대응합니다. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>제스처</title>
+
+           <para
+><guilabel
+>제스처 사용</guilabel
+> 옵션을 활성화하면 태블릿에서 터치 장치에 대한 제스처 이벤트를 생성할 수 있습니다. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>스크롤 거리</guilabel
+>: 손가락 두 개가 태블릿에 있을 때 창을 스크롤할 수 있습니다. 손가락을 위/아래로 움직이면 스크롤 이벤트가 생성됩니다. 간격은 태블릿 단위로 직정됩니다. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>크기 조정 거리</guilabel
+>: 두 손가락을 모으거나 펼쳐서 확대/축소할 수 있습니다. 간격은 태블릿 단위로 지정됩니다. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>탭 시간</guilabel
+>: 이 시간(밀리초)은 장치를 두 번 탭했을 때 마우스 오른쪽 단추로 클릭으로 인식되는 시간을 지정합니다. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>터치 매핑</title>
+           <para
+>이 매핑을 사용하면 각 화면에 사용할 터치 장치의 비율을 지정할 수 있습니다. 이 작업은 사용된 화면 공간에 비례하는 태블릿 영역을 절대 스타일러스 추적 모드에서 유지해야 합니다. 자세한 내용은 <link linkend="area-selection"
+>영역 선택 대화 상자</link
+> 장을 참조하십시오. </para>
+           <note>
+               <para
+>이 옵션은 상대 커서 모드에서는 작동하지 않습니다. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>압력 곡선 대화 상자</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>압력 곡선 대화 상자의 모습입니다.</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>압력 곡선 변경하기</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>압력 곡선은 스타일러스의 압력이 변환되는 방법을 정의합니다. 압력 곡선은 베지에 곡선의 네 점을 통해 정의됩니다. 이 곡선을 변경하려면 빨간색 점을 변경하고 곡선을 이동할 수 있습니다. </para>
+        <note>
+            <para
+>압력 곡선 대화 상자에서 펜을 사용하여 압력 곡선의 변경 사항을 직접 확인하십시오. 곡선 아래의 파란색 영역은 펜의 적용 압력을 나타냅니다. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>영역 선택 대화 상자</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>태블릿 영역 대화 상자의 스크린샷입니다.</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>태블릿 영역 정의</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>이 대화 상자에서는 선택한 각 화면 공간에 사용할 수 있는 태블릿 영역을 지정할 수 있습니다. 태블릿의 가로 세로 비율을 유지하려면 화면 해상도에 따라 태블릿 영역을 줄여야 합니다. 이 대화 상자에서는 각 화면에 대해 개별적으로 지정할 수 있습니다. </para>
+        <para
+><guilabel
+>화면 전환</guilabel
+> 단추를 사용하여 전체 화면(모든 연결된 모니터)과 각 개별 모니터 사이를 전환합니다. 설정은 각 화면 구성에 대해 저장되고 전역 바로 가기 작업에 의해 화면 선택이 전환될 때마다 태블릿에 적용됩니다. </para>
+        <para
+>현재 화면 선택 시 태블릿의 가로 세로 비율을 유지하려면 <guilabel
+>화면 비율 설정</guilabel
+> 단추를 누르면 됩니다. 태블릿 영역이 자동으로 계산되고 변경됩니다. </para>
+        <para
+>또한 <guilabel
+>보정</guilabel
+> 대화 상자를 열어 화면의 4개 점을 사용하여 태블릿을 보정할 수 있습니다. </para>
+        <para
+>대화 상자가 닫히면 마지막으로 선택한 화면이 사용됩니다. 나중에 화면을 켜려면 <link linkend="tablet-general"
+>전역 단축키</link
+>를 사용할 수 있습니다. </para>
+        <note>
+            <para
+>태블릿 영역은 터치 및 펜 커서 장치의 절대 추적 모드에서만 작동합니다. 상대 모드에서는 전체 태블릿이 사용됩니다. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>태블릿 데몬</title>
+    <para
+>태블릿 데몬은 백그라운드에서 실행되며 작동합니다. 태블릿을 감지하고 선택한 프로필로 설정합니다. 데몬이 &systemsettings; 모듈을 실행하고 있지 않고 Plasma 애플릿이 제대로 작동하지 않으며 태블릿을 프로필과 함께 사용할 수 없습니다. </para>
+
+    <sect1 id="detection">
+        <title
+>태블릿 감지</title>
+        <para
+><hardware
+>태블릿 장치</hardware
+>의 검출은 여러 가지 방법으로 이루어집니다. <application
+>Solid</application
+>는 첫 번째 단계에서 사용되며 핫플러그를 지원합니다. Solid가 실패할 경우 다음 단계는 <command
+>xsetwacom list dev</command
+>, <command
+>lsusb</command
+> 및 <command
+>xinput --list</command
+>입니다. </para>
+        <para
+>위의 명령 중 어느 것도 태블릿 이름을 반환하지 않는 경우 태블릿은 지원되지 않으며 이 모듈에서 사용할 수 없습니다. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>인식 문제</title>
+        <para
+>태블릿이 인식되지 않으면 <ulink url="http://linuxwacom.sourceforge.net"
+>&Linux; 와콤 드라이버 </ulink
+> 페이지를 확인하십시오. 또한 <command
+>lsusb</command
+>를 통해 태블릿을 찾을 수 있는지 확인하십시오. </para>
+        <para
+>HAL이 자동 감지를 처리하지 않으면 태블릿을 <filename
+>/etc/X11/xorg.conf </filename
+> 파일에 추가하고 X 서버를 다시 시작하십시오. </para>
+        <para
+>직렬 장치(태블릿 PC 등)의 경우, <command
+>xinput --list </command
+>에 입력 장치(스타일러스/지우개/패드)가 표시되어 있는지 확인하십시오. 목록에 장치가 표시되어 있다면 <command
+>xsetwacom get "패드나 스타일러스의 이름" TabletID</command
+> 명령을 실행했을 때 내장 태블릿 장치의 ID를 확인하십시오. ID 값이 반환되었다면 모든 필요한 정보를 작성자에게 메일로 보내 주십시오. </para>
+        <note>
+        <para
+>핫플러그 ​​지원은 태블릿이 <application
+>Solid</application
+> 및 알림 API를 통해 발견된 경우에만 사용할 수 있습니다. </para>
+        <para
+><application
+>Solid</application
+>는 <command
+>input.x11_options.Type</command
+> 입력 값이 <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> 또는 <command
+>cursor</command
+>인지 또는 입력 <command
+>input.x11_driver</command
+>의 값이 <command
+>wacom</command
+>인지 확인합니다. </para>
+        <para
+>Solid에서 태블릿이 감지되지만 다른 값을 감지하는 경우, 더 나은 태블릿 지원을 위하여 작성자에게 연락해 주십시오. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>태블릿 Plasma 애플릿</title>
+    <para
+>태블릿 애플릿을 사용하면 사용 가능한 프로필을 즉시 변경할 수 있습니다. 또한 현재 프로필 설정에 관계없이 패드 회전 및 스타일러스/지우개의 절대/상대 모드 간을 전환할 수 있습니다. </para>
+    <para
+>이 모듈이 작동하기 위해 Plasmoid를 추가할 필요는 없습니다. 기본 프로필은 Plasmoid를 사용하지 않더라도 태블릿을 감지하는 즉시 <link linkend="kded"
+>태블릿 데몬</link
+>에 의해 활성화됩니다. Plasmoid는 프로필 사이를 쉽게 전환할 수 있는 시각적 도우미일 뿐입니다. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>작성자 및 라이선스</title>
+    <para
+>한국어 번역: 이정희<email
+>daemul72@gmail.com</email
+></para
+> &underFDL; &underGPL; </chapter>
+</book>

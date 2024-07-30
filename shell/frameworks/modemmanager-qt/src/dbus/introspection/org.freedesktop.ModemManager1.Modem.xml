@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem:
+      @short_description: The ModemManager Modem interface.
+
+      The Modem interface controls the status and actions in a given modem
+      object.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem">
+
+    <!--
+        Enable:
+        @enable: %TRUE to enable the modem and %FALSE to disable it.
+
+        Enable or disable the modem.
+
+        When enabled, the modem's radio is powered on and data sessions, voice
+        calls, location services, and Short Message Service may be available.
+
+        When disabled, the modem enters low-power state and no network-related
+        operations are available.
+    -->
+    <method name="Enable">
+      <arg name="enable" type="b" direction="in" />
+    </method>
+
+    <!--
+        ListBearers:
+        @bearers: The list of bearer object paths.
+
+        List configured packet data bearers (EPS Bearers, PDP Contexts, or
+        CDMA2000 Packet Data Sessions).
+    -->
+    <method name="ListBearers">
+      <arg name="bearers" type="ao" direction="out" />
+    </method>
+
+    <!--
+        CreateBearer:
+        @properties: List of properties to assign to the bearer after creating it.
+        @path: On success, the object path of the newly created bearer.
+
+        Create a new packet data bearer using the given characteristics.
+
+        This request may fail if the modem does not support additional bearers,
+        if too many bearers are already defined, or if properties are invalid.
+
+        Allowed properties are:
+        <variablelist>
+        <varlistentry><term><literal>"apn"</literal></term>
+          <listitem><para>Access Point Name, given as a string value (signature <literal>"s"</literal>). Required in 3GPP.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"ip-type"</literal></term>
+          <listitem><para>Addressing type, given as a <link linkend="MMBearerIpFamily">MMBearerIpFamily</link> value (signature <literal>"u"</literal>). Optional in 3GPP and CDMA.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"allowed-auth"</literal></term>
+          <listitem><para>The authentication method to use, given as a <link linkend="MMBearerAllowedAuth">MMBearerAllowedAuth</link> value (signature <literal>"u"</literal>). Optional in 3GPP.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"user"</literal></term>
+          <listitem><para>User name (if any) required by the network, given as a string value (signature <literal>"s"</literal>). Optional in 3GPP.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"password"</literal></term>
+          <listitem><para>Password (if any) required by the network, given as a string value (signature <literal>"s"</literal>). Optional in 3GPP.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"allow-roaming"</literal></term>
+          <listitem><para>Flag to tell whether connection is allowed during roaming, given as a boolean value (signature <literal>"b"</literal>). Optional in 3GPP.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"rm-protocol"</literal></term>
+          <listitem><para>Protocol of the Rm interface, given as a <link linkend="MMModemCdmaRmProtocol">MMModemCdmaRmProtocol</link> value (signature <literal>"u"</literal>). Optional in CDMA.</para></listitem></varlistentry>
+        <varlistentry><term><literal>"number"</literal></term>
+          <listitem><para>Telephone number to dial, given as a string value (signature <literal>"s"</literal>). Required in POTS.</para></listitem></varlistentry>
+        </variablelist>
+
+        Some properties are only applicable to a bearer of certain access
+        technologies, for example the <literal>"apn"</literal> property is not
+        applicable to CDMA2000 Packet Data Session bearers.
+    -->
+    <method name="CreateBearer">
+      <arg name="properties" type="a{sv}" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap" />
+      </arg>
+      <arg name="path"       type="o"     direction="out" />
+    </method>
+
+    <!--
+        DeleteBearer:
+        @bearer: Object path of the bearer to delete.
+
+        Delete an existing packet data bearer.
+
+        If the bearer is currently active and providing packet data server, it
+        will be disconnected and that packet data service will terminate.
+    -->
+    <method name="DeleteBearer">
+      <arg name="bearer" type="o" direction="in" />
+    </method>
+
+    <!--
+        Reset:
+
+        Clear non-persistent configuration and state, and return the device to
+        a newly-powered-on state.
+
+        This command may power-cycle the device.
+    -->
+    <method name="Reset" />
+
+    <!--
+        FactoryReset:
+        @code: Carrier-supplied code required to reset the modem.
+
+        Clear the modem's configuration (including persistent configuration and
+        state), and return the device to a factory-default state.
+
+        If not required by the modem, @code may be ignored.
+
+        This command may or may not power-cycle the device.
+    -->
+    <method name="FactoryReset">
+      <arg name="code" type="s" direction="in" />
+    </method>
+
+    <!--
+        SetPowerState:
+	@state: A <link linkend="MMModemPowerState">MMModemPowerState</link> value, to specify the desired power state.
+
+        Set the power state of the modem. This action can only be run when the
+	modem is in <link linkend="MM-MODEM-STATE-DISABLED:CAPS"><constant>MM_MODEM_STATE_DISABLED</constant></link>
+	state.
+    -->
+    <method name="SetPowerState">
+      <arg name="state" type="u" direction="in" />
+    </method>
+
+    <!--
+        SetCurrentCapabilities:
+        @capabilities: Bitmask of <link linkend="MMModemCapability">MMModemCapability</link> values, to specify the capabilities to use.
+
+        Set the capabilities of the device. A restart of the modem may be required.
+    -->
+    <method name="SetCurrentCapabilities">
+      <arg name="capabilities" type="u" direction="in" />
+    </method>
+
+    <!--
+        SetCurrentModes:
+        @modes: A pair of <link linkend="MMModemMode">MMModemMode</link> values, where the first one is a bitmask of allowed modes, and the second one the preferred mode, if any.
+
+        Set the access technologies (e.g. 2G/3G/4G preference) the device is
+        currently allowed to use when connecting to a network.
+
+        The given combination should be supported by the modem, as specified in the
+        #org.freedesktop.ModemManager1.Modem:SupportedModes property.
+    -->
+    <method name="SetCurrentModes">
+      <arg name="modes" type="(uu)" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="CurrentModesType"/>
+      </arg>
+    </method>
+
+    <!--
+        SetCurrentBands:
+        @bands: List of <link linkend="MMModemBand">MMModemBand</link> values, to specify the bands to be used.
+
+        Set the radio frequency and technology bands the device is currently
+        allowed to use when connecting to a network.
+    -->
+    <method name="SetCurrentBands">
+      <arg name="bands" type="au" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QList&lt;uint&gt;" />
+      </arg>
+    </method>
+
+    <!--
+       Command
+       @cmd The command string, e.g. "AT+GCAP" or "+GCAP" (leading AT is inserted if necessary).
+       @timeout The number of seconds to wait for a response.
+       @response The modem's response.
+
+       Send an arbitrary AT command to a modem and get the response.
+
+       Note that using this interface call is only allowed when running
+       ModemManager in debug mode.
+      -->
+    <method name="Command">
+      <arg name="cmd"      type="s" direction="in"  />
+      <arg name="timeout"  type="u" direction="in"  />
+      <arg name="response" type="s" direction="out" />
+    </method>
+
+    <!--
+        StateChanged:
+        @old: A <link linkend="MMModemState">MMModemState</link> value, specifying the new state.
+        @new: A <link linkend="MMModemState">MMModemState</link> value, specifying the new state.
+        @reason: A <link linkend="MMModemStateChangeReason">MMModemStateChangeReason</link> value, specifying the reason for this state change.
+
+        The modem's state (see #org.freedesktop.ModemManager1.Modem:State) changed.
+    -->
+    <signal name="StateChanged">
+      <arg name="old"    type="i" />
+      <arg name="new"    type="i" />
+      <arg name="reason" type="u" />
+    </signal>
+
+    <!--
+        Sim:
+
+        The path of the SIM object available in this device, if any.
+    -->
+    <property name="Sim" type="o" access="read" />
+
+    <!--
+        Bearers:
+
+        The list of bearer object paths (EPS Bearers, PDP Contexts, or
+        CDMA2000 Packet Data Sessions).
+    -->
+    <property name="Bearers" type="ao" access="read" />
+
+    <!--
+        SupportedCapabilities:
+
+        List of <link linkend="MMModemCapability">MMModemCapability</link>
+        values, specifying the combinations of generic family of access
+        technologies the modem supports.
+
+        If the modem doesn't allow changing the current capabilities, a single entry with
+        <link linkend="MM-MODEM-CAPABILITY-ANY:CAPS"><constant>MM_MODEM_CAPABILITY_ANY</constant></link>
+        will be given.
+    -->
+    <property name="SupportedCapabilities" type="au" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="UIntList"/>
+    </property>
+
+    <!--
+        CurrentCapabilities:
+
+        Bitmask of <link linkend="MMModemCapability">MMModemCapability</link>
+        values, specifying the  generic family of access technologies the modem
+        currently supports without a firmware reload or reinitialization.
+    -->
+    <property name="CurrentCapabilities" type="u" access="read" />
+
+    <!--
+        MaxBearers:
+
+        The maximum number of defined packet data bearers the modem supports.
+
+        This is not the number of active/connected bearers the modem supports,
+        but simply the number of bearers that may be defined at any given time.
+        For example, POTS and CDMA2000-only devices support only one bearer,
+        while GSM/UMTS devices typically support three or more, and any
+        LTE-capable device (whether LTE-only, GSM/UMTS-capable, and/or
+        CDMA2000-capable) also typically support three or more.
+    -->
+    <property name="MaxBearers" type="u" access="read" />
+
+    <!--
+        MaxActiveBearers:
+
+        The maximum number of active packet data bearers the modem supports.
+
+        POTS and CDMA2000-only devices support one active bearer, while GSM/UMTS
+        and LTE-capable devices (including LTE/CDMA devices) typically support
+        at least two active bearers.
+    -->
+    <property name="MaxActiveBearers" type="u" access="read" />
+
+    <!--
+        Manufacturer:
+
+        The equipment manufacturer, as reported by the modem.
+    -->
+    <property name="Manufacturer" type="s" access="read" />
+
+    <!--
+        Model:
+
+        The equipment model, as reported by the modem.
+    -->
+    <property name="Model" type="s" access="read" />
+
+    <!--
+        Revision:
+
+        The revision identification of the software, as reported by the modem.
+    -->
+    <property name="Revision" type="s" access="read" />
+
+    <!--
+        DeviceIdentifier:
+
+        A best-effort device identifier based on various device information like
+        model name, firmware revision, USB/PCI/PCMCIA IDs, and other properties.
+
+        This ID is not guaranteed to be unique and may be shared between
+        identical devices with the same firmware, but is intended to be "unique
+        enough" for use as a casual device identifier for various user
+        experience operations.
+
+        This is not the device's IMEI or ESN since those may not be available
+        before unlocking the device via a PIN.
+    -->
+    <property name="DeviceIdentifier" type="s" access="read" />
+
+    <!--
+        Device:
+
+        The physical modem device reference (ie, USB, PCI, PCMCIA device), which
+        may be dependent upon the operating system.
+
+        In Linux for example, this points to a sysfs path of the usb_device
+        object.
+    -->
+    <property name="Device" type="s" access="read" />
+
+    <!--
+        Drivers:
+
+        The Operating System device drivers handling communication with the modem
+        hardware.
+    -->
+    <property name="Drivers" type="as" access="read" />
+
+    <!--
+        Plugin:
+
+        The name of the plugin handling this modem.
+    -->
+    <property name="Plugin" type="s" access="read" />
+
+    <!--
+        PrimaryPort:
+
+        The name of the primary port using to control the modem.
+    -->
+    <property name="PrimaryPort" type="s" access="read" />
+
+    <!--
+        Ports:
+
+        The list of ports in the modem, given as an array of string and unsigned
+        integer pairs. The string is the port name or path, and the integer is
+        the port type given as a
+        <link linkend="MMModemPortType">MMModemPortType</link> value.
+    -->
+    <property name="Ports" type="a(su)" access="read">
+        <annotation name="org.qtproject.QtDBus.QtTypeName" value="PortList"/>
+    </property>
+
+    <!--
+        EquipmentIdentifier:
+
+        The identity of the device.
+
+        This will be the IMEI number for GSM devices and the hex-format ESN/MEID
+        for CDMA devices.
+    -->
+    <property name="EquipmentIdentifier" type="s" access="read" />
+
+    <!--
+        UnlockRequired:
+
+        Current lock state of the device, given as a
+        <link linkend="MMModemLock">MMModemLock</link> value.
+    -->
+    <property name="UnlockRequired" type="u" access="read" />
+
+    <!--
+        UnlockRetries:
+
+        A dictionary in which the keys are <link linkend="MMModemLock">MMModemLock</link>
+        flags, and the values are integers giving the number of PIN tries remaining
+        before the code becomes blocked (requiring a PUK) or permanently blocked. Dictionary
+        entries exist only for the codes for which the modem is able to report retry
+        counts.
+     -->
+    <property name="UnlockRetries" type="a{uu}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="UnlockRetriesMap"/>
+    </property>
+
+    <!--
+        State:
+
+        Overall state of the modem, given as a
+        <link linkend="MMModemState">MMModemState</link> value.
+
+        If the device's state cannot be determined,
+        <link linkend="MM-MODEM-STATE-UNKNOWN:CAPS"><constant>MM_MODEM_STATE_UNKNOWN</constant></link>
+        will be reported.
+    -->
+    <property name="State" type="i" access="read" />
+
+    <!--
+        StateFailedReason:
+
+        Error specifying why the modem is in
+	<link linkend="MM-MODEM-STATE-FAILED:CAPS"><constant>MM_MODEM_STATE_FAILED</constant></link>
+	state, given as a
+	<link linkend="MMModemStateFailedReason">MMModemStateFailedReason</link> value.
+    -->
+    <property name="StateFailedReason" type="u" access="read" />
+
+    <!--
+        AccessTechnologies:
+
+        Bitmask of <link linkend="MMModemAccessTechnology">MMModemAccessTechnology</link> values,
+        specifying the current network access technologies used by the device to communicate
+        with the network.
+
+        If the device's access technology cannot be determined,
+        <link linkend="MM-MODEM-ACCESS-TECHNOLOGY-UNKNOWN:CAPS"><constant>MM_MODEM_ACCESS_TECHNOLOGY_UNKNOWN</constant></link>
+        will be reported.
+    -->
+    <property name="AccessTechnologies" type="u" access="read" />
+
+    <!--
+        SignalQuality:
+
+        Signal quality in percent (0 - 100) of the dominant access technology
+        the device is using to communicate with the network. Always 0 for POTS
+        devices.
+
+        The additional boolean value indicates if the quality value given was
+        recently taken.
+    -->
+    <property name="SignalQuality" type="(ub)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="SignalQualityPair"/>
+    </property>
+
+    <!--
+        OwnNumbers:
+
+        List of numbers (e.g. MSISDN in 3GPP) being currently handled by this
+        modem.
+    -->
+    <property name="OwnNumbers" type="as" access="read" />
+
+    <!--
+        PowerState:
+
+	A <link linkend="MMModemPowerState">MMModemPowerState</link> value
+	specifying the current power state of the modem.
+    -->
+    <property name="PowerState" type="u" access="read" />
+
+    <!--
+        SupportedModes:
+
+        This property exposes the supported mode combinations, given as an array of unsigned
+        integer pairs, where:
+
+        <variablelist>
+          <varlistentry>
+            <listitem>
+              The first integer is a bitmask of <link linkend="MMModemMode">MMModemMode</link> values,
+              specifying the allowed modes.
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <listitem>
+              The second integer is a single <link linkend="MMModemMode">MMModemMode</link>, which
+              specifies the preferred access technology, among the ones defined in the allowed modes.
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <property name="SupportedModes" type="a(uu)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="SupportedModesType"/>
+    </property>
+
+    <!--
+        CurrentModes:
+
+        A pair of <link linkend="MMModemMode">MMModemMode</link> values, where the first one
+        is a bitmask specifying the access technologies (eg 2G/3G/4G) the device
+        is currently allowed to use when connecting to a network, and the second one is the
+        preferred mode of those specified as allowed.
+
+        The pair must be one of those specified in
+        #org.freedesktop.ModemManager1.Modem:SupportedModes.
+    -->
+    <property name="CurrentModes" type="(uu)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="CurrentModesType"/>
+    </property>
+
+    <!--
+        SupportedBands:
+
+        List of <link linkend="MMModemBand">MMModemBand</link> values,
+        specifying the radio frequency and technology bands supported by the
+        device.
+
+        For POTS devices, only the
+        <link linkend="MM-MODEM-BAND-ANY:CAPS"><constant>MM_MODEM_BAND_ANY</constant></link>
+        mode will be returned.
+    -->
+    <property name="SupportedBands" type="au" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="UIntList"/>
+    </property>
+
+    <!--
+        CurrentBands:
+
+        List of <link linkend="MMModemBand">MMModemBand</link> values,
+        specifying the radio frequency and technology bands the device is
+        currently using when connecting to a network.
+
+        It must be a subset of #org.freedesktop.ModemManager1.Modem:SupportedBands.
+    -->
+    <property name="CurrentBands" type="au" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="UIntList"/>
+    </property>
+
+    <!--
+        SupportedIpFamilies:
+
+        Bitmask of <link linkend="MMBearerIpFamily">MMBearerIpFamily</link> values,
+        specifying the IP families supported by the device.
+    -->
+    <property name="SupportedIpFamilies" type="u" access="read" />
+
+  </interface>
+</node>

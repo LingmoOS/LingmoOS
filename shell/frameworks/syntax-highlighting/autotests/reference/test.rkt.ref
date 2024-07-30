@@ -1,0 +1,43 @@
+<Comment>#lang racket/gui</Comment><br/>
+<Normal></Normal><br/>
+<Brackets>(</Brackets><Definition>define</Definition><Function> my-language </Function><Normal>'English</Normal><Brackets>)</Brackets><br/>
+<Normal></Normal><br/>
+<Brackets>(</Brackets><Definition>define</Definition><Function> translations</Function><br/>
+<Normal>  #hash</Normal><Brackets>([</Brackets><Normal>English . </Normal><String>"Hello world"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>French . </Normal><String>"Bonjour le monde"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>German . </Normal><String>"Hallo Welt"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>Greek . </Normal><String>"Γειά σου, κόσμε"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>Portuguese . </Normal><String>"Olá mundo"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>Spanish . </Normal><String>"Hola mundo"</String><Brackets>]</Brackets><br/>
+<Normal>        </Normal><Brackets>[</Brackets><Normal>Thai . </Normal><String>"สวัสดีชาวโลก"</String><Brackets>]))</Brackets><br/>
+<Normal></Normal><br/>
+<Brackets>(</Brackets><Definition>define</Definition><Function> my-hello-world</Function><br/>
+<Normal>  </Normal><Brackets>(</Brackets><Normal>hash-ref translations my-language</Normal><br/>
+<Normal>            </Normal><String>"hello world"</String><Brackets>))</Brackets><br/>
+<Normal></Normal><br/>
+<Brackets>(</Brackets><Normal>message-box </Normal><String>""</String><Normal> my-hello-world</Normal><Brackets>)</Brackets><br/>
+<Normal></Normal><br/>
+<Comment>; Organizing interconnected function definitions with local</Comment><br/>
+<Comment>; [List-of Number] [Number Number -> Boolean]</Comment><br/>
+<Comment>; -> [List-of Number]</Comment><br/>
+<Comment>; produces a version of alon0, sorted according to cmp</Comment><br/>
+<Brackets>(</Brackets><Definition>define</Definition><Function> </Function><Brackets>(</Brackets><Normal>sort-cmp alon0 cmp</Normal><Brackets>)</Brackets><br/>
+<Normal>  </Normal><Brackets>(</Brackets><Normal>local </Normal><Brackets>(</Brackets><Comment>; [List-of Number] -> [List-of Number]</Comment><br/>
+<Normal>          </Normal><Comment>; produces the sorted version of alon</Comment><br/>
+<Normal>          </Normal><Brackets>(</Brackets><Definition>define</Definition><Function> </Function><Brackets>(</Brackets><Normal>isort alon</Normal><Brackets>)</Brackets><br/>
+<Normal>            </Normal><Brackets>(</Brackets><Keyword>cond</Keyword><br/>
+<Normal>              </Normal><Brackets>[(</Brackets><Normal>empty? alon</Normal><Brackets>)</Brackets><Normal> '</Normal><Brackets>()]</Brackets><br/>
+<Normal>              </Normal><Brackets>[</Brackets><Keyword>else</Keyword><br/>
+<Normal>               </Normal><Brackets>(</Brackets><Normal>insert </Normal><Brackets>(</Brackets><Normal>first alon</Normal><Brackets>)</Brackets><Normal> </Normal><Brackets>(</Brackets><Normal>isort </Normal><Brackets>(</Brackets><Normal>rest alon</Normal><Brackets>)))]))</Brackets><br/>
+<Normal></Normal><br/>
+<Normal>          </Normal><Comment>; Number [List-of Number] -> [List-of Number]</Comment><br/>
+<Normal>          </Normal><Comment>; inserts n into the sorted list of numbers alon</Comment><br/>
+<Normal>          </Normal><Brackets>(</Brackets><Definition>define</Definition><Function> </Function><Brackets>(</Brackets><Normal>insert n alon</Normal><Brackets>)</Brackets><br/>
+<Normal>            </Normal><Brackets>(</Brackets><Keyword>cond</Keyword><br/>
+<Normal>              </Normal><Brackets>[(</Brackets><Normal>empty? alon</Normal><Brackets>)</Brackets><Normal> </Normal><Brackets>(</Brackets><Keyword>cons</Keyword><Normal> n '</Normal><Brackets>())]</Brackets><br/>
+<Normal>              </Normal><Brackets>[</Brackets><Keyword>else</Keyword><Normal> </Normal><Brackets>(</Brackets><Keyword>if</Keyword><Normal> </Normal><Brackets>(</Brackets><Normal>cmp n </Normal><Brackets>(</Brackets><Normal>first alon</Normal><Brackets>))</Brackets><br/>
+<Normal>                        </Normal><Brackets>(</Brackets><Keyword>cons</Keyword><Normal> n alon</Normal><Brackets>)</Brackets><br/>
+<Normal>                        </Normal><Brackets>(</Brackets><Keyword>cons</Keyword><Normal> </Normal><Brackets>(</Brackets><Normal>first alon</Normal><Brackets>)</Brackets><br/>
+<Normal>                              </Normal><Brackets>(</Brackets><Normal>insert n </Normal><Brackets>(</Brackets><Normal>rest alon</Normal><Brackets>))))])))</Brackets><br/>
+<Normal>    </Normal><Brackets>(</Brackets><Normal>isort alon0</Normal><Brackets>)))</Brackets><br/>
+<Normal></Normal><br/>

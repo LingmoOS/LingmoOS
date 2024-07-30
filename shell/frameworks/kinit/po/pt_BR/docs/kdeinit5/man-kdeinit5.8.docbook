@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Brazilian-Portuguese "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manual do Usuário do kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>18/12/2013</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Lançador de aplicativos compilados com suporte para o kdeinit e KIO slaves.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Sintaxe</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programas</arg
+> <arg
+>programas</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descrição</title>
+
+<para
+>O kdeinit5 é um lançador de processos, de certa forma semelhante ao famoso <command
+>init</command
+>, que é usado na inicialização do UNIX. Ele executa os programas do &kde; e os módulos dinâmicos do kdeinit (KLMs), iniciando-os de forma mais eficiente. </para>
+
+<para
+>A utilização do kdeinit5 para lançar os aplicativos do &kde; torna a inicialização de um aplicativo típico do &kde; muito mais rápida e reduz substancialmente o consumo de memória.</para>
+
+<para
+>O kdeinit5 é compilado dinamicamente com todas as bibliotecas que um aplicativo normal do &kde; necessita. Graças a essa técnica, a inicialização de um aplicativo torna-se muito mais rápida, porque com ele somente o aplicativo é que necessita ser compilado, enquanto que sem ele seria necessário compilar o aplicativo e as bibliotecas que ele usa. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Desvantagens</title>
+
+<para
+>O nome do processo dos aplicativos iniciadas pelo kdeinit5 chama-se "kdeinit5". Este problema pode ser corrigido, de certa forma, mudando o nome do aplicativo, tal como aparece no <command
+>ps</command
+>. Contudo, os aplicativos como o <command
+>killall</command
+> só irão ver o kdeinit5 como nome do processo. Para contornar esta situação, use o comando <command
+>kdekillall</command
+> (que existe em 'kdesdk/scripts') para os aplicativos que sejam iniciados com o kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Opções</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Mostra a ajuda sobre as opções </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Não faz um 'fork', i.e., não sai até que todos os programas executados terminem</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>Não inicia o 'kded'</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Termina o aplicativo quando mais nenhum aplicativo do KDE estiver em execução </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programas</option
+></term>
+<listitem>
+<para
+>executa os programas, tratando dos pedidos </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programas</option
+></term>
+<listitem>
+<para
+>executa os programas sem tratar dos pedidos </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Utilização</title>
+<para
+>Uma forma padrão de executar este programa é simplesmente digitar o seguinte comando no console: <userinput
+><command
+>kdeinit5</command
+> programa</userinput
+> ou <userinput
+><command
+>kdeinit5</command
+> +programa </userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Arquivos</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Variáveis de Ambiente</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Indica a pasta pessoal do usuário atual</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Indica se a pasta pessoal do usuário é apenas para leitura</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Se estiver definida, indica ao kdeinit5 que os programas do &kde; são pré-carregados dinamicamente.</para>
+<para
+>(Este processo permite-lhe acelerar a funcionalidade de edição de ligações dinâmicas.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Se estiver definida, indica ao kdeinit5 que está rodando em um ambiente de trabalho do &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Veja também</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Problemas</title>
+<para
+>Use o <ulink url="http://bugs.kde.org"
+>sistema de gerenciamento de erros do KDE</ulink
+> para relatar erros.</para>
+</refsect1>
+
+</refentry>
+
+
+

@@ -1,0 +1,30 @@
+<!-- Copyright: Mark Pilgrim (feed parser test suite). See LICENSE.UNITTESTS for details. -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <entry>
+        <summary>A &amp; B. The history of the &lt;blink> tag.</summary>
+    </entry>
+    <entry>
+        <summary type="text">A &amp; B. The history of the &lt;blink> tag.</summary>
+    </entry>
+    <entry>
+        <summary type="html">A &amp;amp; B. The history of the &amp;lt;blink> tag. And a &lt;a href=&quot;http://www.example.com/&quot;>link&lt;/a>.</summary>
+    </entry>
+    <entry>
+        <summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">History of the &lt;blink&gt; tag</div></summary>
+    </entry>
+
+    <entry>
+        <summary type="text/plain">A &amp; B. The history of the &lt;blink> tag.
+            This one is actually invalid in Atom 1.0.</summary>
+        <content>summary with type=text/plain. This is not valid in Atom 1.0, where type must be one of text|html|xhtml.
+        So libsyndication does not parse it for now. If this becomes a problem with real-world feeds, 
+        we might parse less strict in future.</content>
+    </entry>
+    <entry>
+        <summary type="application/octet-stream">
+            RXhhbXBsZSA8Yj5BdG9tPC9iPg==
+        </summary>
+        <content>Invalid. base64-encoded summary with type=application/octet-stream. Types other than text, 
+            html, xhtml are invalid in Atom 1.0.</content>
+    </entry>
+</feed>

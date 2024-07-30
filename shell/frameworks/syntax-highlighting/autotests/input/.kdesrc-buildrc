@@ -1,0 +1,74 @@
+# List of all options: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html
+
+global
+    branch-group kf6-qt6
+
+    # strange capitalisation of value
+    include-dependencies TrUe
+
+    # path with tilde
+    kdedir ~/kde/usr
+
+    # try using the existing option as value for other option
+    qtdir ${source-dir} # Comment on the same line with value
+
+    # Use line breaks
+    cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DQT_MAJOR_VERSION=6 \
+        -DBUILD_WITH_QT6=ON
+
+    num-cores ${non-existing-var}
+    num-cores-low-mem 4
+
+    non-existing-option 12345
+
+    # use int value for binary option
+    install-session-driver 5
+
+    # impossible enum value (allowed are: invent, flat, metadata)
+    directory-layout project-ids-as-folder-names
+
+    # option with valid value with spaces
+    cmake-generator Kate - Ninja
+end global
+
+# Comment with \
+# line break
+
+include ~/kde6/src/kdesrc-build/kf6-common-options-build-include
+
+options kcalc
+    # use of module-set only option in the options block:
+    use-modules one two \
+                three
+
+    # use of unrecognized option:
+    new-option true
+end options
+
+
+module-set
+    # use of global-only option in module-set:
+    stop-on-failure true
+
+    # use allowed option:
+    use-modules one two three
+end module-set
+
+# module block without the actual name
+module
+    repository kde-projects
+end module
+
+# double opening module block (forget ending the module block):
+module kcalc
+module kcalc
+    # body without options
+end module kcalc
+
+# non-recognized block
+kcalc
+    repository kde-projects
+end kcalc
+
+# kate: syntax kdesrc-buildrc;

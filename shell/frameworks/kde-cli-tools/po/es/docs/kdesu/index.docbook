@@ -1,0 +1,530 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Spanish "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Manual de &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Pablo</firstname
+><surname
+>de Vicente</surname
+><affiliation
+><address
+><email
+>pvicentea@nexo.es</email
+></address
+></affiliation
+><contrib
+>Traductor</contrib
+></othercredit
+> <othercredit role="translator"
+> <firstname
+>Marcos</firstname
+> <surname
+>Fouces Lago</surname
+> <affiliation
+><address
+><email
+>mfouces@yahoo.es</email
+></address
+></affiliation
+> <contrib
+>Traductor</contrib
+> </othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21-09-2010</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; es un interfaz gráfico de la orden &UNIX; <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>contraseña</keyword>
+<keyword
+>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introducción</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>¡Bienvenido a &kdesu;! &kdesu; es un interfaz gráfico de la orden &UNIX; <command
+>su</command
+> para el Entorno de Escritorio K. Le permite ejecutar un programa como usuario diferente proporcionando la contraseña de dicho usuario. &kdesu; es un programa sin privilegios. Utiliza la orden <command
+>su</command
+> del sistema.</para>
+
+<para
+>&kdesu; tiene una característica añadida: puede recordar las contraseñas que usted haya introducido previamente. Si usted utiliza esta característica, solo necesitará introducir una vez la contraseña para cada usuario. Consulte <xref linkend="sec-password-keeping"/> para obtener más información sobre este apartado y sobre el análisis de seguridad.</para>
+
+<para
+>Este programa se debe iniciar desde la línea de órdenes o desde los archivos <filename
+>.desktop</filename
+>. Aunque solicita la contraseña de <systemitem class="username"
+>root</systemitem
+> utilizando un diálogo &GUI; (gráfico), se puede considerar más una línea de órdenes &lt;-&gt; asociada a un &GUI; que un programa &GUI; puro.</para>
+
+<para
+>Puesto que <command
+>kdesu</command
+> ya no está instalado en <userinput
+> $(kf5-config --prefix)</userinput
+>/bin sino en <userinput
+>kf5-config --path libexec</userinput
+> y además no está en su <envar
+>Path</envar
+>, tiene que utilizar <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> para lanzar <command
+>kdesu</command
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Uso de &kdesu;</title>
+
+<para
+>El uso de &kdesu; es sencillo. La sintaxis es del tipo:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> orden </replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> archivo</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nombre del icono </replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioridad</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> usuario</replaceable
+></group
+> <group choice="opt"
+><option
+>--boton_no_ignorar</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opciones genéricas de &kde;</arg
+> <arg choice="opt"
+>Opciones genéricas de &Qt;</arg
+> </cmdsynopsis>
+
+<para
+>Las opciones de la línea de órdenes se explican a continuación.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>orden</replaceable
+></option
+></term>
+<listitem
+><para
+>Especifica la instrucción a ejecutar como root. Esta se debe pasar en un argumento. De modo que, por ejemplo, si desea iniciar un nuevo administrador de archivos, debería introducir en el prompt: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Mostrar información de depuración.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>archivo</replaceable
+></option
+></term>
+<listitem
+><para
+>Esta opción le permite un uso eficiente de &kdesu; en archivos <filename
+>.desktop</filename
+>. Le indica a &kdesu; que examine el archivo especificado por <parameter
+>archivo</parameter
+>. Si este archivo tiene privilegios de escritura para el usuario actual, &kdesu; ejecutará la orden como usuario actual. Si no tiene privilegios de escritura, la orden se ejecutará como el usuario <parameter
+>usuario</parameter
+> (de forma predeterminada es root).</para>
+<para
+><parameter
+>archivo</parameter
+> se evalúa del siguiente modo: si <parameter
+>archivo</parameter
+> comienza por <literal
+>/</literal
+>, se toma como un nombre de archivo absoluto. De lo contrario, se toma como el nombre de un archivo de configuración global de &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nombre del icono</replaceable
+></term>
+<listitem
+><para
+>Especifica el icono a utilizar en el diálogo de contraseñas. Puede especificar el nombre sin la extensión.</para>
+<para
+>Por ejemplo, para ejecutar &konqueror; en modo gestor de archivos y mostrar el icono de &konqueror; en el diálogo de contraseña:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+ <option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>No guarda la contraseña. Esto desactiva la casilla <guilabel
+>guardar contraseña</guilabel
+> en el diálogo de contraseña.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioridad</replaceable
+></term>
+<listitem>
+<para
+>Asigne el valor de la prioridad. La prioridad es un número arbitrario entre 0 y 100. 100 es la prioridad más alta y 0 la más baja. El valor predeterminado es 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Utilizar planificación en tiempo real.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Detener el demonio kdesu daemon. Consulte <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Activa la salida por terminal. Esta opción desactiva la posibilidad de recordar contraseñas. La razón es por motivos de depuración del código: si desea ejecutar una aplicación desde consola, utilice la orden <command
+>su</command
+> estándar en su lugar.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> usuario</replaceable
+></term>
+<listitem
+><para
+>El uso más común para &kdesu; es ejecutar una orden como superusuario, aunque puede proporcionar un nombre de usuario y la contraseña apropiada.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Propiedades internas</title>
+
+<sect1 id="x-authentication">
+<title
+>Autenticación X</title>
+
+<para
+>El programa que usted ejecute lo hará bajo el ID de root y habitualmente no tendrá permiso para escribir en su pantalla X. &kdesu; evita este problema añadiendo una cookie de autenticación para su pantalla en un archivo temporal <filename
+>.Xauthority</filename
+>. Después de que esta orden finalice, este archivo se suprime. </para>
+
+<para
+>Si no utiliza cookies X, usted tendrá que resolver este problema por su cuenta. &kdesu; lo detectará y no añadirá una cookie pero usted debe asegurarse de que root tiene acceso a su pantalla.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Interfaz a <command
+>su</command
+></title>
+
+<para
+>&kdesu; utiliza la orden <command
+>su</command
+> del sistema para obtener privilegios. En esta sección se explican los detalles de como &kdesu; lleva a cabo esta operación. </para>
+
+<para
+>Debido a que ciertas implementaciones de <command
+>su</command
+> (&ie;, la de &RedHat;) no desean leer la contraseña de <literal
+>stdin</literal
+>, &kdesu; crea un par pty/tty y ejecuta <command
+>su</command
+> con sus descriptores de archivos estándar conectados a tty.</para>
+
+<para
+>Para ejecutar la orden seleccionada por el usuario, en lugar de un intérprete interactivo, &kdesu; utiliza el argumento <option
+>-c</option
+> con <command
+>su</command
+>. Este argumento es entendido por todos los intérpretes conocidos y debería por tanto funcionar. <command
+>Su</command
+> pasa este argumento <option
+>-c</option
+> al intérprete de destino del usuario y el intérprete de órdenes ejecuta el programa. Ejemplo: <command
+>su <option
+>root -c <replaceable
+>el_programa</replaceable
+></option
+></command
+>.</para>
+
+<para
+>En lugar de ejecutar la orden del usuario directamente con <command
+>su</command
+>, &kdesu; ejecuta un pequeño programa intermediario denominado <application
+>kdesu_stub</application
+>. Este intermediario (ejecutándose como usuario de destino), solicita algo de información de &kdesu; por el canal pty/tty (la entrada y salida estándar del intermediario) y después ejecuta el programa del usuario. La información que se pasa es: la pantalla X, una cookie de acreditación X (si está disponible), la variable <envar
+>PATH</envar
+> y la orden a ejecutar. La razón por la que se utiliza un programa intermediario es que la cookie X es información privada y por tanto no se puede pasar en la línea de órdenes.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Comprobación de contraseñas</title>
+
+<para
+>&kdesu; comprobará la contraseña introducida y generará un mensaje de error si no es correcta. La comprobación se realiza ejecutando un programa de prueba: <filename
+>/bin/true</filename
+>. Si el resultado es positivo, se asumirá que la contraseña es correcta.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Registro de contraseñas</title>
+
+<para
+>Para su comodidad, &kdesu; implementa una propiedad de «registro de contraseña». Si está interesado en la seguridad, debería leer el siguiente parrafo.</para>
+
+<para
+>Si permite que &kdesu; recuerde las contraseñas estará abriendo un (pequeño) agujero en la seguridad de su sistema. Obviamente, &kdesu; no permite más que al identificador de su usuario utilizar sus contraseñas, pero si esto se hace descuidadamente, se rebajaría el nivel de seguridad de <systemitem class="username"
+>root</systemitem
+> al de un usuario normal (usted). Un hacker (intruso) que consiga acceso a su cuenta, puede conseguir automáticamente el acceso a <systemitem class="username"
+>root</systemitem
+>. &kdesu; intenta impedir esto. El esquema de seguridad, es razonablemente seguro y se explica a continuación.</para>
+
+<para
+>&kdesu; utiliza un demonio, llamado <application
+>kdesud</application
+>. El demonio escucha a un socket de &UNIX; en <filename
+>/tmp</filename
+> listo para ejecutar órdenes. El modo del socket es 0600 de tal manera que solo su identificador de usuario se pueda conectar a él. Si se activa el registro de contraseñas, &kdesu; ejecuta órdenes a través de este demonio. Escribe la orden y la contraseña de <systemitem class="username"
+>root</systemitem
+> en el socket y el demonio ejecuta la orden utilizando <command
+>su</command
+>, como ya se ha descrito anteriormente. Después de esta operación la orden y la contraseña no se descartan. Se registran durante un cierto tiempo. Este tiempo es el valor tiempo de expiración que aparece en el módulo de control. Si llega otra petición para la misma orden durante este periodo de tiempo, el cliente no debe introducir la contraseña. Para evitar que los hackers que puedan entrar en su cuenta roben la contraseña del demonio (por ejemplo añadiendo un depurador), el demonio se instala como set-group-id nogroup. Esto debería impedir el robo de contraseñas del proceso <application
+>kdesud</application
+> a todos los usuarios normales (incluyendole a usted). También, el demonio fija la variable de entorno <envar
+>DISPLAY</envar
+> al valor que tenía cuando se inició. Lo único que un hacker puede hacer es ejecutar una aplicación en su pantalla.</para>
+
+<para
+>Un posible problema de este diseño es que los programas que usted ejecuta probablemente no están escritos teniendo en cuenta la seguridad (como los programas setuid <systemitem class="username"
+>root</systemitem
+>). Ello significa que pueden tener derrames de buffer u otros problemas y un hacker podría explotarlos.</para>
+
+<para
+>El uso del registro de contraseñas es un compromiso entre seguridad y comodidad. Es recomendable que usted lo piense detenidamente y decida si desea usarlo o no.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autor</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Copyright 2000 &Geert.Jansen;</para>
+
+<para
+>El autor de &kdesu; es &Geert.Jansen;. Está basado de algún modo en la versión 0.3 de &kdesu; de Pietro Iglio. Pietro y el autor acordaron que este programa sería mantenido por el autor actual en el futuro.</para>
+
+<para
+>Puede contactar con el autor por correo electrónico en &Geert.Jansen.mail;. Por favor informe de cualquier error que encuentre de modo que pueda solucionarlo. Siéntase libre de contactar conmigo para enviar sugerencias.</para>
+
+<para
+>Traducido por Pablo de Vicente <email
+>pvicentea@nexo.es</email
+> y Marcos Fouces Lago <email
+>mfouces@yahoo.es</email
+>.</para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

@@ -1,0 +1,10 @@
+include(ECMAddTests)
+find_package(Qt6Test REQUIRED)
+configure_file(config-kdesutest.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdesutest.h)
+ecm_add_test(kdesutest.cpp TEST_NAME kdesutest LINK_LIBRARIES Qt6::Test KF6::Su KF6::CoreAddons KF6::ConfigCore)
+
+if(KDESU_USE_SUDO_DEFAULT)
+  target_compile_definitions(kdesutest PRIVATE -DKDESU_USE_SUDO_DEFAULT="true")
+elseif(KDESU_USE_DOAS_DEFAULT)
+  target_compile_definitions(kdesutest PRIVATE -DKDESU_USE_DOAS_DEFAULT="true")
+endif()

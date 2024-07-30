@@ -1,0 +1,269 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % French "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manuel Utilisateur de « kded6 »</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Mainteneur</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Auteur originel</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>22-06-2023</date>
+<releaseinfo
+>Environnements de développement 6.0</releaseinfo>
+<productname
+>Environnements de développement de KDE</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>Démon &kde; - déclenche les mises à jour de la base de données « sycoca » lorsque nécessaire.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Synopsis</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Description</title>
+
+<para
+>La commande <command
+>kded6</command
+> regroupe de nombreux services élémentaires en un seul processus. Il s'agit essentiellement de services « &DBus; » fournis par les modules de « KDED ». Mais, il gère aussi « sycoca » (un cache binaire de types de services &MIME; et de services utilisés par « KService ») et les scripts de mise à jour de « KConfig » lorsque nécessaire.</para>
+
+<para
+>Pour « sycoca », il surveille les dossiers contenant des fichiers « .desktop ». Lorsqu'un fichier est ajouté / supprimé, il attend 5 secondes (en cas de mise à jour en série), puis lance <command
+>kbuildsycoca6</command
+> pour mettre à jour « sycoca ».</para>
+
+<para
+>Pour « KConfig », il vérifie les fichiers de mise à jour nouvellement installés, &cad; les fichiers « *.upd » utilisés pour mettre à jour les fichiers de configuration des utilisateurs lorsque les formats de fichiers de configuration sont modifiés. Il exécute l'utilitaire de mise à jour de « KConfig » pour réaliser les mises à jour.</para>
+
+<para
+>Ces tâches sont aussi exécutées lorsque <command
+>kded6</command
+>est démarré afin de s'assurer que la configuration utilisateur est à jour.</para>
+
+<para
+>Vous ne devriez pas avoir besoin normalement de lancer directement <command
+>kded6</command
+>. Les sessions de bureau de &plasma; le démarrent automatiquement. Il est démarré à la demande lorsqu'une application tente d'utiliser son interface &DBus; ou via un de ses modules.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Options</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>Vérifier la base de données « sycoca », la mettre à jour si nécessaire et fermer. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Configuration</title>
+
+<para
+>La commande <command
+>kded6</command
+> peut être configurée avec le fichier de configuration <filename
+>kded6rc</filename
+> ini-style. Sur les systèmes &UNIX; ceci peut être trouvé dans <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+>; si la variable <varname
+>$XDG_CONFIG_HOME</varname
+> n'est pas définie, la valeur par défaut est <filename
+>~/.config/kded6rc</filename
+>.</para>
+
+<para
+>Les entrées dans le fichier de configuration sont lues à la demande. Ainsi, les modifications peuvent être effectuées lors de l'exécution de la commande <command
+>kded6</command
+>. Cependant, toutes les options de configuration courantes n'affectent réellement que le comportement au démarrage de <command
+>kded5</command
+>.</para>
+
+<para
+>La section <option
+>[Générale]</option
+> possède les options suivantes : <variablelist>
+<varlistentry>
+<term
+><option
+>CheckSycoca</option
+></term>
+<listitem
+><para
+>Mise à jour ou non de « sycoca » au démarrage (Par défaut : <constant
+>True</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckUpdates</option
+></term>
+<listitem
+><para
+>Réaliser ou non une mise à jour en suspens de « KConfig » au démarrage (Par défaut : <constant
+>True</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckFileStamps</option
+></term>
+<listitem
+><para
+>Vérifier ou non les marqueurs d'horodatage lors de la réalisation de la mise à jour de « sycoca » (Par défaut : <constant
+>True</constant
+>). Veuillez consulter la documentation de <command
+>kbuildsycoca6</command
+> pour plus de détails.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>DelayedCheck</option
+></term>
+<listitem
+><para
+>Retarder ou non la mise à jour initiale de « sycoca » jusqu'à environ une minute après le démarrage (Par défaut : <constant
+>False</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Chaque module possède aussi une section <option
+>[Module-<replaceable
+>nom</replaceable
+>]</option
+> dans <filename
+>kded6rc</filename
+>, où le paramètre <replaceable
+>nom</replaceable
+> est le nom du fichier de module de bureau sans l'extension <filename
+>.desktop</filename
+>. Ceci contient une option <option
+>autoload</option
+> spécifiant si le module doit être automatiquement chargé quand la commande <command
+>kded6</command
+> est démarrée (Par défaut : <constant
+>False</constant
+>). Veuillez noter que ce paramètre peut aussi être modifié par l'interface &DBus; par la commande <command
+>kded6</command
+>.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Voir Aussi</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Bogues</title>
+<para
+>Veuillez utiliser le <ulink url="https://bugs.kde.org"
+>traqueur de bogues</ulink
+> pour les signaler.</para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,336 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % German "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>kdeinit5-Benutzerhandbuch</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2013-12-18</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Starter für Anwendungen mit Unterstützung von kdeinit und für Ein-/Ausgabemodule.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Übersicht</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programs</arg
+> <arg
+>programs</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beschreibung</title>
+
+<para
+>kdeinit5 ist ein Prozess-Starter, ähnlich dem Programm <command
+>init</command
+> zum Starten von UNIX. Es führt &kde;-Programme und ladbare kdeinit-Module (KLMs) auf effiziente Weise aus. </para>
+
+<para
+>Wenn Sie kdeinit5 zum Starten von &kde;-Anwendungen verwenden, wird der Anwendungsstart um ein vielfaches beschleunigt und der Speicherverbrauch stark vermindert.</para>
+
+<para
+>kdeinit5 ist mit allen Bibliotheken verlinkt, die eine typische &kde;-Anwendung benötigt. Mit dieser Technik ist es möglich, den Anwendungsstart um ein Vielfaches zu beschleunigen, weil nun nur noch die Anwendung selbst verlinkt werden muss und nicht mehr alle benötigten Bibliotheken. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Nachteile</title>
+
+<para
+>Der Prozessname von allen Anwendungen, die mit kdeinit5 gestartet werden, lautet einheitlich <quote
+>kdeinit5</quote
+>. Dieses Problem kann teils behoben werden, indem man den Anwendungsnamen ändert, so wie er von <command
+>ps</command
+> angezeigt wird. Jedoch werden Werkzeuge wie <command
+>killall</command
+> weiterhin nur kdeinit5 als Prozessname sehen. Um diesem Problem zu begegnen, können Sie das Programm <command
+>kdekillall</command
+> aus kdesdk/scripts verwenden, um von kdeinit5 gestartete Anwendungen zu beenden. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Optionen</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Hilfe zu verfügbaren Optionen anzeigen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Stellt das Programm nicht in den Hintergrund. D. h. es wird nicht beendet, solange noch ausgeführte Programme ausgeführt werden.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>kded nicht starten</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Beendet sich automatisch selbst, wenn keine weiteren KDE-Programme mehr ausgeführt werden. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programs</option
+></term>
+<listitem>
+<para
+>Führt das Programm aus, und wird dabei Anfragen bearbeiten. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programs</option
+></term>
+<listitem>
+<para
+>Führt das Programm aus, ohne Anfragen zu bearbeiten. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Benutzung</title>
+<para
+>Ein Standard-Aufruf für dieses Programm sieht so aus: <userinput
+><command
+>kdeinit5</command
+> program</userinput
+> oder <userinput
+><command
+>kdeinit5</command
+> +program</userinput
+>. </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Dateien</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Umgebungsvariablen</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Gibt den persönlichen Ordner des aktuellen Benutzers an.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Gibt an, ob der persönliche Ordner des aktuellen Benutzers nur lesbar ist.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Mit Hilfe dieser Variable wird kdeinit5 darüber informiert, dass &kde;-Programme vor-verlinkt sind.</para>
+<para
+>(Vor-Verlinken ist eine Technik, mit der das dynamische Verlinken von Prozessen enorm beschleunigt werden kann.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Diese Variable teilt kdeinit5 mit, dass es in einer &kde;-Umgebung ausgeführt wird.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Siehe auch</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Fehler</title>
+<para
+>Bitte berichten Sie Fehler im <ulink url="http://bugs.kde.org"
+>Fehlerverfolgungssystem von KDE</ulink
+>.</para>
+</refsect1>
+
+</refentry>
+
+
+

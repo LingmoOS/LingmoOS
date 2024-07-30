@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% macro write_toc(title, subgroups) %}
+  <li>{{ title }}
+    <ul>
+      {% for subgroup in subgroups %}
+        <li><a href="#sg-{{ subgroup.name }}">{{ subgroup.fancyname }}</a></li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endmacro %}
+
+{% macro write_library_list(libs) %}
+  <table class="doxtable libraries">
+    <tr>
+      <th class="library-main-column">Framework</th>
+      <th class="library-detail-column library-maintainer-column">Maintainer</th>
+    </tr>
+  {% for lib in libs | sort(attribute='fancyname')%}
+    <tr class="library-row" id="lib-{{ lib.name }}" data-platforms="{{ lib.platforms|join(',') }}">
+      <td class="library-main-column">
+        <img class="indicator not-available-indicator" src="{{resources}}/icons/bad.png"/>
+        <img class="indicator available-indicator" src="{{resources}}/icons/ok.png"/>
+        <div>
+          <div class="library-platforms">
+          {% for platform in available_platforms %}
+            <span class="library-platform
+              library-platform-{{ platform }}
+              {% if platform not in lib.platforms %}library-platform-unsupported{% endif %}"
+              >
+            {% if lib.platforms.get(platform) %}
+              <a data-note="{{ lib.platforms.get(platform) }}" href="#">
+            {% endif %}
+                <span class="library-platform-text">{{ platform }}</span>
+            {% if lib.platforms.get(platform) %}
+                <img class="warning-tooltip" src="{{resources}}/icons/warning.png"/></a>
+            {% endif %}
+            </span>
+          {% endfor %}
+          </div>
+          <a class="library-fancyname" href="{{lib.href}}">{{lib.fancyname}}</a>
+                {% if qch %} [<a href="{{ lib.name }}/qch/{{lib.fancyname }}.qch">QCH file</a>]{% endif %}
+                {% if man %} <a href="{{ product.href }}/{{product.name}}.man">MAN</a>{% endif %}
+        </div>
+        <span class="library-description">{{lib.description}}</span>
+      </td>
+      <td class="library-detail-column library-maintainer-column">{% set product = lib %}{% include "maintainers.html" %}</td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endmacro %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block footer %}
+  <script type="text/javascript" src="{{resources}}/js/notetip.js"></script>
+  <script type="text/javascript" src="{{resources}}/js/subgroup.js"></script>
+  <script defer>
+  $(document).ready(main);
+  </script>
+{% endblock %}
+
+{% block title %}
+    {{ group.fancyname }}
+{% endblock %}
+
+{% block content %}
+            <div class="contents">
+              <div class="textblock">
+                {% for paragraph in group.long_description %}
+                    <p>{{ paragraph }}</p>
+                {% endfor %}
+
+              </div>
+              <h2>List of the libraries</h2>
+
+              {% if group.libraries | selectattr('subproduct', 'none') | list | length > 0 %}
+                {% if group.subproducts | length > 0 %}
+                <h3><a name="sg-{{ nosubproduct }}"></a>Without subgroup</h3>
+                {% endif %}
+                {{ write_library_list(group.libraries | selectattr('subproduct', 'none') )}}
+              {% endif %}
+              {% for subproduct in group.subproducts |sort(attribute='order') %}
+                <h3><a name="sg-{{ subproduct.name }}"></a>{{ subproduct.fancyname }}</h3>
+                <p> {{ subproduct.description }}</p>
+                {{ write_library_list(subproduct.libraries) }}
+              {% endfor %}
+
+
+            </div>
+
+{% endblock content %}
+
+{% block sidebar %}
+    {% include "subgroup-sidebar.html" %}
+{% endblock %}

@@ -1,0 +1,269 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Turkish "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>kded6 Kullanıcı Kılavuzu</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Bakımcı</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Özgün yazar</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2023-06-22</date>
+<releaseinfo
+>Frameworks 6</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>&kde; ardalan süreci, gerektiğinde Sycoca veritabanını günceller.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Özet</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Açıklama</title>
+
+<para
+><command
+>kded6</command
+>, tek süreçte birden çok küçük hizmeti birleştirir. Bunlar çoğunlukla KDED modülleri tarafından sağlanan &DBus; hizmetleridir; ancak gerekirse sycoca (hizmet türleri, &MIME; türleri ve KService tarafından kullanılan hizmetlerin ikili önbelleği) ve KConfig güncelleme betiklerini de yönetir.</para>
+
+<para
+>Sycoca için, .desktop dosyalarını içeren dizinleri izler. Bir dosya eklendiğinde veya kaldırıldığında 5 saniye kadar bekler (bir güncelleme serisi durumunda), ardından sycoca’yı güncellemek için <command
+>kbuildsycoca6</command
+> komutunu başlatır.</para>
+
+<para
+>KConfig için yeni kurulan güncelleme dosyalarını denetler, örn. yapılandırma dosyası biçimleri değiştiğinde kullanıcıların yapılandırma dosyalarını güncellemek için kullanılan *.upd dosyaları ve güncellemeleri gerçekleştirmek için KConfig güncelleme izlencesini çalıştırır.</para>
+
+<para
+>Bu görevler <command
+>kded6</command
+> başladığında da kullanıcı yapılandırmasını güncel tutmak için çalıştırılır.</para>
+
+<para
+>Normalde <command
+>kded6</command
+> komutunu doğrudan çalıştırmanız gerekmez; &plasma; masaüstü oturumu kendiliğinden çalıştırır ve bir uygulama onun tarafından sağlanan bir &DBus; arayüzünü veya modüllerinden birini çağırdığında başlatılır.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Seçenekler</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>sycoca veritabanını denetleyin, gerekliyse güncelleyin ve çıkın. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Yapılandırma</title>
+
+<para
+><command
+>kded6</command
+> komutu, <filename
+>kded6rc</filename
+> ini-biçemli yapılandırma dosyasıyla yapılandırılabilir. &UNIX; sistemlerde, bu <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+> konumunda bulunabilir; <varname
+>$XDG_CONFIG_HOME</varname
+> ayarlanmamışsa öntanımlı değer <filename
+>~/.config/kded6rc</filename
+> olur.</para>
+
+<para
+>Yapılandırma dosyası girdileri istendiğinde okunur, böylece değişiklikler <command
+>kded6</command
+> çalışırken yapılabilir. Ancak tüm geçerli yapılandırma seçenekleri gerçekten yalnızca <command
+>kded6</command
+> davranışını etkiler.</para>
+
+<para
+><option
+>[Genel]</option
+> bölümü şu seçenekleri içerir: <variablelist>
+<varlistentry>
+<term
+><option
+>CheckSycoca</option
+></term>
+<listitem
+><para
+>Sycoca’nın açılışta güncellenip güncellenmeyeceği (öntanımlı: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckUpdates</option
+></term>
+<listitem
+><para
+>Kalmış KConfig güncellemelerinin açılışta yapılıp yapılmayacağı (öntanımlı: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckFileStamps</option
+></term>
+<listitem
+><para
+>İlk sycoca güncellemesini yaparken dosya zaman damgalarının denetlenip denetlenmeyeceği (öntanımlı: <constant
+>true</constant
+>). Ayrıntılar için <command
+>kbuildsycoca6</command
+> belgelendirmesine göz atın.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>DelayedCheck</option
+></term>
+<listitem
+><para
+>İlk sycoca güncellemesinin başlangıçtan bir dakika sonraya kadar geciktirilip geciktirilmemesi (öntanımlı: <constant
+>false</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Her modül ayrıca <filename
+>kded6rc</filename
+> içinde bir <option
+>[Modül-<replaceable
+>ad</replaceable
+>]</option
+> kısmına sahiptir, burada <replaceable
+>ad</replaceable
+>, modülün masaüstü dosyasının <filename
+>.desktop</filename
+> uzantısı olmadan adıdır. Bu modülün <command
+>kded6</command
+> başlatıldığında kendiliğinden yüklenip yüklenmemesi gerektiğini belirten bir <option
+>autoload</option
+> seçeneği içerir (öntanımlı: <constant
+>false</constant
+>). Bu ayarın <command
+>kded6</command
+> &DBus; arayüzüyle de değiştirilebileceğini söyleyelim.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Ayrıca Bakınız</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Hatalar</title>
+<para
+>Hataları bildirmek için lütfen <ulink url="https://bugs.kde.org"
+>&kde;'nin hata izleyicisini</ulink
+> kullanın.</para>
+</refsect1>
+
+</refentry>

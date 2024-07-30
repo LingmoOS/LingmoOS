@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Swedish "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde; ramverk: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Skrev den ursprungliga dokumentationen.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Uppdaterade dokumentationen för &kde; ramverk 5.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>2014-05-28</date>
+  <releaseinfo
+>Ramverk 5.0</releaseinfo>
+  <productname
+>KDE Ramverk</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Skapar grafiska instickskomponenter för &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>VÄLJARE</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>fil</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Beskrivning</title>
+  <para
+>De anpassade insticksmodulerna för &Qt; Designer följer vanligtvis ett standardmönster, och klasserna som tillhandahålls av insticksmodulen tillhandahåller statisk information, tillsammans med en funktion för att skapa en instans som normalt bara är ett enkelt konstruktoranrop. <command
+>kgendesignerplugin</command
+> låter utvecklare av bibliotek som tillhandahåller nya grafiska komponenter skapa en sådan insticksmodul utan att skapa all tillhörande standardkod, genom att tillhandahålla en enkel beskrivningsfil med ini-stil. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> väljer rimliga standardvärden för de flesta inställningarna, så minimal inställning är oftast nödvändig. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Väljare</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>fil</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Namnet på den skapade C++ filen. Om inte angiven, används <varname
+>standardutmatningen</varname
+>. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>insticksnamn</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Tillhandahålls för kompatibilitet. Standardvärdet på alternativet PluginName i indatafilen. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>grupp</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Tillhandahålls för kompatibilitet. Standardvärdet på alternativet DefaultGroup i indatafilen. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Visa information om upphovsman.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Visa licensinformation.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Visa en kortfattad hjälptext.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v , --version</option
+></term>
+      <listitem>
+        <para
+>Visa versionsinformation.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Filformat</title>
+  <para
+>Indatafilen är en inställningsfil med ini-stil (mer specifikt använder den formatet som stöds av ramverket KConfig) som beskriver en uppsättning grafiska komponenter. Den innehåller sektionen <literal
+>[Global]</literal
+>, som tillhandahåller allmän information om insticksmodulen, och en sektion för varje grafisk komponent som ska ingå i insticksmodulen. </para>
+
+  <para
+>Sektionen <literal
+>[Global]</literal
+> kan ha följande poster: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>Standardvärdet för posten <varname
+>Group</varname
+> i klassektionen (standardvärde: "<literal
+>Custom</literal
+>", om inte väljaren <option
+>-g</option
+> anges). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>En lista med deklarationsfiler som krävs (åtskilda med kommatecken, normalt tom). Observera att deklarationsfilerna för de grafiska komponenterna som specificeras senare i filen inte ska listas här, istället är detta till för särskilda deklarationsfiler för insticksmodulens egen användning, såsom de för klasser som tillhandahåller förhandsgranskningar. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>Namnet på den huvudsakliga C++ klassen i insticksmodulen (standardvärde: "<literal
+>WidgetsPlugin</literal
+>", om inte väljaren <option
+>-n</option
+> anges). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Varje klass ska ha sin egen sektion <literal
+>[<replaceable
+>klassnamn</replaceable
+>]</literal
+>, som kan innehålla följande poster: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>Värdet som returneras av insticksmodulens funktion <code
+>codeTemplate()</code
+>, som är markerad för "framtida användning" av &Qt; Designer (standardvärde: tom). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Argumentet att skicka till klassens konstruktor given av <literal
+>ImplClass</literal
+>. De måste vara omgivna av parenteser(standardvärde: "<literal
+>(parent)</literal
+>"). Den enda variabel som garanterat är tillgänglig är <varname
+>parent</varname
+>, som är den överliggande <code
+>QWidget</code
+>-klassen som skickas med av &Qt; Designer. </para>
+          <para
+>Den här posten ignoreras om <literal
+>CreateWidget</literal
+> är angivet. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>Koden som är nödvändig för att skapa en instans av den grafiska komponenten (standardvärde: använder <code
+>new</code
+> för att skapa en instans av klassen given av posten <literal
+>ImplClass</literal
+>, och skickar med argumenten som anges av <literal
+>ConstructorArgs</literal
+>). Se anmärkningarna för <literal
+>ImplClass</literal
+> och <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>En &XML; UI-beskrivning av den grafiska komponenten (standardvärde: de förvalda värden som tillhandahålls av &Qt; Designer deklarationsfiler för insticksmoduler). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>Grupp att visa den grafiska komponenten under i &Qt; Designer (standardvärde: värdet på posten <varname
+>DefaultGroup</varname
+> i sektionen <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>Bildfilen eller standardikonnamnet att använda som ikon för den här grafiska komponenten i &Qt; Designers komponentlista (standardvärde: en PNG-fil namngiven med sektionsnamnet, med eventuella dubbla kolon borttagna, i katalogen "pics" i en inkompilerad resursfil, till exempel <filename
+>:/pics/Sektion.png</filename
+> för sektionen <literal
+>[Sektion]</literal
+>, eller <filename
+>:/pics/SektionKlass.png</filename
+> för sektionen <literal
+>[Sektion::Klass]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>Klassen som ska användas för att skapa en instans av den grafiska komponenten för användning av &Qt; Designer (standardvärde: sektionsnamnet). Observera att det inte behöver vara klassen som ska skapas för en slutapplikation: Den bestäms av <literal
+>DomXML</literal
+>. </para>
+          <para
+>Den här posten ignoreras om <literal
+>CreateWidget</literal
+> är angivet. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>Deklarationsfilen som måste inkluderas för att använda den här grafiska komponenten (standardvärde: sektionsnamnet med små bokstäver, med eventuella kolon borttagna och ".h" tillagt sist, exempelvis <literal
+>sektion.h</literal
+> för sektionen <literal
+>[Sektion]</literal
+> eller <literal
+>sektionklass</literal
+> för sektionen <literal
+>[Sektion::Klass]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Om den här grafiska komponenten kan innehålla andra grafiska komponenter (standardvärde <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>Verktygstipset att visa när musen hålls över den grafiska komponenten i &Qt; Designers komponentlista (standardvärde: sektionsnamnet med "Widget" tillagt sist, exempelvis <literal
+>Sektion Widget</literal
+> i sektionen <literal
+>[Sektion]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>Vad är det här-texten som hör ihop med den grafiska komponenten i &Qt; Designer (standardvärde: sektionsnamnet med "Widget" tillagt sist, exempelvis <literal
+>Sektion Widget</literal
+> för sektionen <literal
+>[Sektion]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Exempel</title>
+  <para
+>Den enklast möjliga beskrivningsfilen kan se ut så här <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Displays foos
+[Bar]
+ToolTip=Bar editor
+]]>
+    </screen
+> Observera att varje klass måste ha minst en nyckeluppsättning (<literal
+>ToolTip</literal
+> användes i det här exemplet), annars ignoreras den. </para>
+  <para
+>Oftast vill man åtminstone ändra den användarsynliga texten, vilket betyder posterna <literal
+>ToolTip</literal
+><literal
+>WhatsThis</literal
+> och <literal
+>Group</literal
+>. Dessutom kan det vara en bra idé att ange insticksmodulens namn för att förhindra möjliga symbolkollisioner och inte göra avlusare förvirrade (både avlusningsprogrammet och personen som avlusar). <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=MinaKomponenter
+DefaultGroup=Display
+
+[X]
+ToolTip=Visar björnar
+WhatsThis=En bildkomponent som visar dansande björnar
+
+[Bar]
+ToolTip=Bar-editor
+WhatsThis=En editorgränssnitt för björnbarer
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Mer komplexa filer kan behövas om man exempelvis har klasser med namnrymder eller extra alternativ som måste skickas till konstruktorer. <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=MinaKomponenter
+DefaultGroup=Grupp
+
+[Grupp::Bar]
+ToolTip=Visar barer
+WhatsThis=En grafisk komponent som visar barer på ett visst sätt
+IncludeFile=grupp/bar.h
+IconName=:/förhandsgranskning/bar.png
+
+[Grupp::Baz]
+IncludeFile=grupp/baz.h
+ConstructorArgs=(Grupp::Baz::Ett_alternativ, parent)
+Group=Grupp (Special)
+IsContainer=true
+IconName=:/förhandsgranskning/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>Ibland kan särskilt komplexa grafiska komponenter kräva en särskild implementering av en "förhandsgranskningsklass" för användning i &Qt; Designer. Det kan vara en delklass av den verkliga grafiska komponenten som bara gör en del extra inställningar, eller en helt annorlunda implementering. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=gruppförhandsgranskningar.h
+
+[Snygg_komponent]
+ImplClass=Snygg_komponent_förhandsgranskning
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Se också</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>&Qt; Designer-dokumentationen om hur man skapar insticksmoduler för egna grafiska komponenter.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Fel</title>
+  <para
+>Använd <ulink url="https://bugs.kde.org"
+>&kde;:s felspårningsverktyg</ulink
+> för att rapportera fel, skicka inte e-post direkt till upphovsmännen. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

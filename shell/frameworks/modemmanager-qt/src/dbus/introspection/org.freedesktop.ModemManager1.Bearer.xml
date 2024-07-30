@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2011-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Bearer:
+      @short_description: The ModemManager Bearer interface.
+
+      This interface provides access to specific actions that may be performed
+      on available bearers.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Bearer">
+
+    <!--
+        Connect:
+
+        Requests activation of a packet data connection with the network using
+        this bearer's properties. Upon successful activation, the modem can
+        send and receive packet data and, depending on the addressing
+        capability of the modem, a connection manager may need to start PPP,
+        perform DHCP, or assign the IP address returned by the modem to the
+        data interface. Upon successful return, the
+        #org.freedesktop.ModemManager1.Bearer:Ip4Config
+        and/or
+        #org.freedesktop.ModemManager1.Bearer:Ip6Config
+        properties become valid and may contain IP configuration information for
+        the data interface associated with this bearer.
+    -->
+    <method name="Connect" />
+
+    <!--
+        Disconnect:
+
+        Disconnect and deactivate this packet data connection.
+
+        Any ongoing data session will be terminated and IP addresses become
+        invalid when this method is called.
+    -->
+    <method name="Disconnect" />
+
+    <!--
+        For 3GPP (GSM/UMTS/LTE) technologies, Bearer objects represent only
+        Primary PDP contexts; Secondary contexts are not exposed as a concept
+        because they share everything with their parent primary PDP context
+        except QoS and traffic flows.  Instead, methods for setting QoS and
+        Traffic Flow Templates (TFTs) should be provided here which could as a
+        result of being called create secondary PDP contexts with those QoS and
+        TFT parameters.
+
+        FIXME: add methods to set QoS/TFT on the Bearer object, which should
+        create Secondary contexts if needed, and figure out some method of
+        disposing of those secondary contexts when no longer required.
+    -->
+
+    <!--
+        Interface:
+
+        The operating system name for the network data interface that provides
+        packet data using this bearer.
+
+        Connection managers must configure this interface depending on the IP
+        <literal>"method"</literal> given by the
+        #org.freedesktop.ModemManager1.Bearer:Ip4Config
+        or
+        #org.freedesktop.ModemManager1.Bearer:Ip6Config
+        properties set by bearer activation.
+
+        If <link linkend="MM-BEARER-IP-METHOD-STATIC:CAPS">MM_BEARER_IP_METHOD_STATIC</link>
+        or
+        <link linkend="MM-BEARER-IP-METHOD-DHCP:CAPS">MM_BEARER_IP_METHOD_DHCP</link>
+        methods are given, the interface
+        will be an ethernet-style interface suitable for DHCP or setting static
+        IP configuration on, while if the
+        <link linkend="MM-BEARER-IP-METHOD-PPP:CAPS">MM_BEARER_IP_METHOD_PPP</link>
+        method is given, the interface
+        will be a serial TTY which must then have PPP run over it.
+    -->
+    <property name="Interface" type="s" access="read" />
+
+    <!--
+        Connected:
+
+        Indicates whether or not the bearer is connected and thus whether
+        packet data communication using this bearer is possible.
+    -->
+    <property name="Connected" type="b" access="read" />
+
+    <!--
+        Suspended:
+
+        In some devices, packet data service will be suspended while the device
+        is handling other communication, like a voice call. If packet data
+        service is suspended (but not deactivated) this property will be %TRUE.
+    -->
+    <property name="Suspended" type="b" access="read" />
+
+    <!--
+        Ip4Config:
+
+        If the bearer was configured for IPv4 addressing, upon activation this
+        property contains the addressing details for assignment to the data
+        interface.
+
+        Mandatory items include:
+        <variablelist>
+          <varlistentry><term><literal>"method"</literal></term>
+            <listitem>
+              A <link linkend="MMBearerIpMethod">MMBearerIpMethod</link>,
+              given as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        If the bearer specifies configuration via PPP or DHCP, only the
+        <literal>"method"</literal> item will be present.
+
+        Additional items which are only applicable when using the
+        <link linkend="MM-BEARER-IP-METHOD-STATIC:CAPS">MM_BEARER_IP_METHOD_STATIC</link>
+        method are:
+        <variablelist>
+          <varlistentry><term><literal>"address"</literal></term>
+            <listitem>
+              IP address, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"prefix"</literal></term>
+            <listitem>
+              Numeric CIDR network prefix (ie, 24, 32, etc), give as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns1"</literal></term>
+            <listitem>
+              IP address of the first DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns2"</literal></term>
+            <listitem>
+              IP address of the second DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns3"</literal></term>
+            <listitem>
+              IP address of the third DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"gateway"</literal></term>
+            <listitem>
+              IP address of the default gateway, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <property name="Ip4Config" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        Ip6Config:
+
+        If the bearer was configured for IPv6 addressing, upon activation this
+        property contains the addressing details for assignment to the data
+        interface.
+
+        Mandatory items include:
+        <variablelist>
+          <varlistentry><term><literal>"method"</literal></term>
+            <listitem>
+              A <link linkend="MMBearerIpMethod">MMBearerIpMethod</link>,
+              given as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        If the bearer specifies configuration via PPP or DHCP, only the
+        <literal>"method"</literal> item will be present.
+
+        Additional items which are only applicable when using the
+        <link linkend="MM-BEARER-IP-METHOD-STATIC:CAPS">MM_BEARER_IP_METHOD_STATIC</link>
+        method are:
+        <variablelist>
+          <varlistentry><term><literal>"address"</literal></term>
+            <listitem>
+              IP address, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"prefix"</literal></term>
+            <listitem>
+              Numeric CIDR network prefix (ie, 24, 32, etc), give as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns1"</literal></term>
+            <listitem>
+              IP address of the first DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns2"</literal></term>
+            <listitem>
+              IP address of the second DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dns3"</literal></term>
+            <listitem>
+              IP address of the third DNS server, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"gateway"</literal></term>
+            <listitem>
+              IP address of the default gateway, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <property name="Ip6Config" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        IpTimeout:
+
+        Maximum time to wait for a successful IP establishment, when PPP is used.
+    -->
+    <property name="IpTimeout" type="u" access="read" />
+
+    <!--
+        Properties:
+
+        List of properties used when creating the bearer.
+    -->
+    <property name="Properties" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+  </interface>
+</node>

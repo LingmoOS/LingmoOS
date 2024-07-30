@@ -1,0 +1,202 @@
+#!/usr/bin/env lua
+
+-- Metatables
+t = <beginfold id='1'>{</beginfold id='1'>
+    __add=<beginfold id='2'>function</beginfold id='2'>(a,b)return a+b <endfold id='2'>end</endfold id='2'>,
+    __sub=<beginfold id='2'>function</beginfold id='2'>(a,b)return a-b <endfold id='2'>end</endfold id='2'>,
+    __mul=<beginfold id='2'>function</beginfold id='2'>(a,b)return a*b <endfold id='2'>end</endfold id='2'>,
+    __div=<beginfold id='2'>function</beginfold id='2'>(a,b)return a/b <endfold id='2'>end</endfold id='2'>,
+    __mod=<beginfold id='2'>function</beginfold id='2'>(a,b)return a%b <endfold id='2'>end</endfold id='2'>,
+    __pow=<beginfold id='2'>function</beginfold id='2'>(a,b)return a^b <endfold id='2'>end</endfold id='2'>,
+    __unm=<beginfold id='2'>function</beginfold id='2'>(a)return -a <endfold id='2'>end</endfold id='2'>,
+    __idiv=<beginfold id='2'>function</beginfold id='2'>(a,b)return a//b <endfold id='2'>end</endfold id='2'>,
+    __band=<beginfold id='2'>function</beginfold id='2'>(a,b)return a&b <endfold id='2'>end</endfold id='2'>,
+    __bor=<beginfold id='2'>function</beginfold id='2'>(a,b)return a|b <endfold id='2'>end</endfold id='2'>,
+    __bxor=<beginfold id='2'>function</beginfold id='2'>(a,b)return a~b <endfold id='2'>end</endfold id='2'>,
+    __bnot=<beginfold id='2'>function</beginfold id='2'>(a)return ~a <endfold id='2'>end</endfold id='2'>,
+    __shl=<beginfold id='2'>function</beginfold id='2'>(a,b)return a<<b <endfold id='2'>end</endfold id='2'>,
+    __shr=<beginfold id='2'>function</beginfold id='2'>(a,b)return a>>b <endfold id='2'>end</endfold id='2'>,
+    __concat=<beginfold id='2'>function</beginfold id='2'>(a,b)return a..b <endfold id='2'>end</endfold id='2'>,
+    __len=<beginfold id='2'>function</beginfold id='2'>(a)return #a <endfold id='2'>end</endfold id='2'>,
+    __eq=<beginfold id='2'>function</beginfold id='2'>(a,b)return a==b <endfold id='2'>end</endfold id='2'>,
+    __lt=<beginfold id='2'>function</beginfold id='2'>(a,b)return a<b <endfold id='2'>end</endfold id='2'>,
+    __le=<beginfold id='2'>function</beginfold id='2'>(a,b)return a<=b <endfold id='2'>end</endfold id='2'>,
+    __index=<beginfold id='2'>function</beginfold id='2'>(t,k)return t[k] <endfold id='2'>end</endfold id='2'>,
+    __newindex=<beginfold id='2'>function</beginfold id='2'>(t,k,v)return t[k]=v <endfold id='2'>end</endfold id='2'>,
+    __call=<beginfold id='2'>function</beginfold id='2'>(f, ...)return f(...) <endfold id='2'>end</endfold id='2'>,
+
+   __tostring=<beginfold id='2'>function</beginfold id='2'>(a)return tostring(a) <endfold id='2'>end</endfold id='2'>,
+   __pairs=<beginfold id='2'>function</beginfold id='2'>(t)return pairs(a) <endfold id='2'>end</endfold id='2'>,
+   -- setmetatable
+   __metatable=true
+   -- Garbage collector
+   __gc=<beginfold id='2'>function</beginfold id='2'>() <endfold id='2'>end</endfold id='2'>
+   -- Weak table
+   __mode='k' -- or 'v'
+<endfold id='1'>}</endfold id='1'>
+
+a or b
+a and b
+a~=b
+a>=b
+true or false
+a or nil
+a::m
+a.m
+a;a
+
+
+-- String
+'\a'
+'\b'
+'\f'
+'\n'
+'\r'
+'\t'
+'\v'
+'\\'
+'\"'
+'\''
+'\z'
+'\xff'
+'\xFF'
+'\231'
+'\23'
+'\2'
+'\u{100201}' -- max 6 digits
+'\2a\ks' -- error
+
+'multi\
+line'
+'multi\z
+line'
+'multi\z    line\
+2'
+
+a = 'alo\n123"'
+a = "alo\n123\""
+a = '\97lo\10\04923"'
+a = [[alo
+123"]]
+a = [==[
+alo
+123"]==]
+
+
+-- Decimal
+3
+345
+0xff
+0xBEBADA
+
+-- Float
+3.
+.3
+3.0
+3.1416
+314.16e-2
+314.e+2
+0.31416E1
+34e1
+0.e3
+0x0.1E
+0xA23p-4
+0xA.p+4
+0x.ap4
+0X1.921FB54442D18P+1
+-- error
+32p
+0xp-4
+0x.p-4
+3.x
+
+
+-- single comment
+xyz()
+<beginfold id='3'>--[[</beginfold id='3'>
+ long comment
+<endfold id='3'>]]</endfold id='3'>
+xyz()
+
+-- TODO bla bla
+<beginfold id='3'>--[[</beginfold id='3'> TODO bla bla <endfold id='3'>]]</endfold id='3'>
+
+a = <beginfold id='1'>{</beginfold id='1'> [f(1)] = g; "x", "y"; x = 1, f(x), [30] = 23; 45 <endfold id='1'>}</endfold id='1'>
+
+-- is equivalent to
+
+<beginfold id='2'>do</beginfold id='2'>
+  local t = <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+  t[f(1)] = g
+  t[1] = "x" -- 1st exp
+  t[2] = "y" -- 2nd exp
+  t.x = 1 -- t["x"] = 1
+  t[3] = f(x) -- 3rd exp
+  t[30] = 23
+  t[4] = 45 -- 4th exp
+  a = t
+<endfold id='2'>end</endfold id='2'>
+
+32-0x43+0x2-5
+return"a"
+return'a'
+return<beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+f(3)
+f'a'
+f"a"
+f<beginfold id='1'>{</beginfold id='1'>s=2<endfold id='1'>}</endfold id='1'>
+f[[s]]
+f[=[s]=]
+#a
+
+local CONSTANT = a
+
+a = <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+local x = 20
+for i=1,10 <beginfold id='2'>do</beginfold id='2'>
+  local y = 0
+  a[i] = <beginfold id='2'>function</beginfold id='2'> () y=y+1; return x+y <endfold id='2'>end</endfold id='2'>
+<endfold id='2'>end</endfold id='2'>
+
+local <beginfold id='2'>function</beginfold id='2'> foo()
+<endfold id='2'>end</endfold id='2'>
+
+<beginfold id='2'>function</beginfold id='2'> obj:foo()
+  print(self:bar())
+<endfold id='2'>end</endfold id='2'>
+
+<beginfold id='2'>function</beginfold id='2'> obj.bar(self)
+  print(self)
+  print(self.value)
+<endfold id='2'>end</endfold id='2'>
+
+--! \brief gfind is deprecated
+string.gfind('s')
+string.gmatch('f')
+
+<beginfold id='2'>function</beginfold id='2'> foo()
+  <beginfold id='2'>if</beginfold id='2'> x then
+    <beginfold id='2'>function</beginfold id='2'>() <endfold id='2'>end</endfold id='2'>
+    bar=<beginfold id='2'>function</beginfold id='2'>()
+      <beginfold id='2'>if</beginfold id='2'> y then
+        <beginfold id='2'>if</beginfold id='2'> z then <endfold id='2'>end</endfold id='2'>
+      <endfold id='2'>end</endfold id='2'>
+    <endfold id='2'>end</endfold id='2'>
+  <endfold id='2'>end</endfold id='2'>
+<endfold id='2'>end</endfold id='2'>
+
+-- attributes
+local a<const> = 2
+local a<const> print(a)
+local f <close>, const <    const >
+local a <cloe>, b< cons >, c<const, d<close> ; a<b
+local a <cloe> -- bla, 
+b< cons >
+local a <close> <beginfold id='3'>--[[</beginfold id='3'>
+b <const><endfold id='3'>]]</endfold id='3'>, b <const> <beginfold id='3'>--[[</beginfold id='3'> xyz <endfold id='3'>]]</endfold id='3'> , c <close>
+b< cons >
+
+--- <beginfold id='4'>\code</beginfold id='4'>
+--! a = 3
+--! <endfold id='4'>\endcode</endfold id='4'>
+a = 3

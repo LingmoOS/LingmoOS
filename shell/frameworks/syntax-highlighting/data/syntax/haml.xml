@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<language name="Haml" version="15" kateversion="5.79" section="Markup"
+          extensions="*.haml"
+          author="Cies Breijs (cies_at_kde_nl)" license="LGPL"
+          mimetype="text/x-haml">
+<!--      mimetype="text/x-haml"     this might be a problem as is doesn't exist -->
+
+<!-- learned and copied a lot from rhtml.xml -->
+<!-- ripped out some functionality from rhtml, like GDL, maybe put this back in some day... -->
+<!-- rhtml is rails specific, i ripped the rails helper keywords out as i'm a _merb_ guy... -->
+
+<!-- 1.1: fixed many many many buggers, clearly shows how arbitrary the title '1.0' was -->
+
+<!-- TODO: multi-line-based-on-indenting (comments, filters) don't work, mark more errors with error_hl_test.haml(?) (currently only unpaired spaces on indentation), give ruby code a little background, pipe character as a multiline splitter can use a little color (can it be escaped? "\|"), use hamls unittests for inspiration for better *_test.haml files -->
+
+  <highlighting>
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="normal" >
+        <RegExpr attribute="Error" firstNonSpace="false" context="#stay" String="^ (  )*[^ ]+" column="0" />
+        <StringDetect attribute="Doctype" context="Doctype" String="!!!" column="0"/>
+
+<!--         2 failed attempts to implement multiline comments -->
+
+<!--        <RegExpr attribute="Comment" String="/.*$" context="#stay" beginRegion="comment0" column="0"/>
+        <RegExpr attribute="Comment" String="[^ /]" context="#stay" endRegion="comment0" column="0"/>
+
+        <RegExpr attribute="Comment" String="^[ ]{2}/.*$" context="#stay" beginRegion="comment2" column="0"/>
+        <RegExpr attribute="Comment" String="^[^ ]{4}" context="#stay" endRegion="comment2" column="0"/>-->
+
+<!--        <RegExpr attribute="Comment" context="comment0" String="^/.*" />
+        <RegExpr attribute="Comment" context="comment2" String="^[ ]{2}/.*" />
+        <RegExpr attribute="Comment" context="comment4" String="^[ ]{4}/.*" />-->
+
+        <!-- match filters for special syntax highlighting before detecting spaces so we know how far we need to indent -->
+        <IncludeRules context="Detect filter" />
+
+        <DetectChar attribute="Escaped Text" context="escaped" char="\" />
+        <DetectChar attribute="Comment" context="comment" char="/" />
+
+        <Detect2Chars attribute="Keyword" context="unquoted" char="=" char1="=" />
+        <AnyChar attribute="Keyword" context="rubysourceline" String="=-~" />
+        <Detect2Chars attribute="Keyword" context="rubysourceline" char="!" char1="=" />
+        <Detect2Chars attribute="Keyword" context="rubysourceline" char="&amp;" char1="=" />
+
+        <!-- HAML can do Ruby substitution anywhere in the template -->
+        <Detect2Chars attribute="Substitution" char="#" char1="{" context="Subst"/>
+
+        <DetectChar attribute="Operator" context="array" char="[" beginRegion="Array" />
+        <DetectChar attribute="Operator" context="hash" char="{" beginRegion="Hash" />
+
+        <RegExpr attribute="Tag" firstNonSpace="true" context="#stay" String="%[a-zA-Z_][a-zA-Z0-9_\-]*" />
+        <RegExpr attribute="Div Id" firstNonSpace="true" context="#stay" String="#[a-zA-Z_][a-zA-Z0-9_\-]*" />
+        <RegExpr attribute="Div Class" firstNonSpace="true" context="#stay" String="\.[a-zA-Z_][a-zA-Z0-9_\-]*" />
+        <RegExpr attribute="Element Id" context="#stay" String="#[a-zA-Z_][a-zA-Z0-9_\-]*" />
+        <RegExpr attribute="Element Class" context="#stay" String="\.[a-zA-Z_][a-zA-Z0-9_\-]*" />
+        <RegExpr attribute="Entity" context="#stay" String="&amp;[a-zA-Z]+;" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#pop" name="Detect filter">
+        <RegExpr attribute="Filter" column="0" context="filterRuby" String="^(\s*):ruby\b" />
+        <RegExpr attribute="Filter" column="0" context="filterCSS" String="^(\s*):css\b" />
+        <RegExpr attribute="Filter" column="0" context="filterCoffeeScript" String="^(\s*):coffee(?:script)?\b" />
+        <RegExpr attribute="Filter" column="0" context="filterERB" String="^(\s*):erb\b" />
+        <RegExpr attribute="Filter" column="0" context="filterPlain" String="^(\s*):[a-zA-Z0-9_\-]*\b" />
+        <DetectSpaces context="#pop#pop!normal" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="filterRuby">
+        <!-- detect base indentation + 1 whitespace for code -->
+        <StringDetect context="rubysourceline" String="%1 " dynamic="true" />
+        <!-- any other indentation means we're done here -->
+        <IncludeRules context="Detect filter" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="filterCoffeeScript">
+        <!-- detect base indentation + 1 whitespace for code -->
+        <StringDetect context="coffeesourceline" String="%1 " dynamic="true" />
+        <!-- any other indentation means we're done here -->
+        <IncludeRules context="Detect filter" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="filterCSS">
+        <!-- detect base indentation + 1 whitespace for code -->
+        <StringDetect context="csssourceline" String="%1 " dynamic="true" />
+        <!-- any other indentation means we're done here -->
+        <IncludeRules context="Detect filter" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="filterERB">
+        <!-- detect base indentation + 1 whitespace for code -->
+        <StringDetect context="erbsourceline" String="%1 " dynamic="true" />
+        <!-- any other indentation means we're done here -->
+        <IncludeRules context="Detect filter" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="filterPlain">
+        <!-- detect base indentation + 1 whitespace for code -->
+        <StringDetect context="plainsourceline" String="%1 " dynamic="true" />
+        <!-- any other indentation means we're done here -->
+        <IncludeRules context="Detect filter" />
+      </context>
+
+      <context attribute="Operator" lineEndContext="#stay" name="array">
+        <DetectSpaces/>
+        <DetectChar attribute="Operator" context="#pop" char="]" endRegion="Array" />
+        <IncludeRules context="rubysourceline" />
+      </context>
+
+      <context attribute="Hash" lineEndContext="#stay" name="hash">
+        <DetectSpaces/>
+        <DetectChar attribute="Operator" context="#pop" char="}" endRegion="Hash" />
+        <IncludeRules context="rubysourceline" />
+      </context>
+
+      <context attribute="Unquoted String" lineEndContext="#pop" name="unquoted">
+        <IncludeRules context="Quoted String" />
+      </context>
+
+<!--      <context attribute="Comment" lineEndContext="#pop" name="comment0">
+        <DetectSpaces/>
+        <IncludeRules context="##Comments" />
+        <DetectIdentifier/>
+<!- - was commented out         <RegExpr attribute="Comment" context="#pop" String="^[^/ ]" endRegion="comment" />  attempt for multiline comments  - ->
+      </context>
+-->
+<!--      <context attribute="Comment" lineEndContext="#pop" name="comment2">
+        <DetectSpaces/>
+        <IncludeRules context="##Comments" />
+        <DetectIdentifier/>
+        <RegExpr attribute="Comment" context="#pop" String="^[ ]{2}[^ /]" endRegion="comment" />
+      </context>-->
+
+
+      <context attribute="Comment" lineEndContext="#pop" name="comment">
+        <DetectSpaces/>
+        <IncludeRules context="##Comments" />
+        <DetectIdentifier/>
+        <StringDetect attribute="Comment" context="#pop" String="--&gt;" endRegion="comment" />
+      </context>
+
+      <context attribute="Escaped Text" lineEndContext="#pop" name="escaped">
+      </context>
+
+      <context name="rubysourceline" attribute="Ruby embedded in haml" lineEndContext="#pop">
+        <!-- ruby ignores newline after \ -->
+        <LineContinue attribute="Ruby Normal Text" context="#stay"/>
+        <!-- HAML allows lines ending with `,` to continue to the next line -->
+        <LineContinue attribute="Ruby Normal Text" context="#stay" char="," />
+
+        <IncludeRules context="##Ruby" />
+      </context>
+
+      <context name="csssourceline" attribute="Other code embedded in haml" lineEndContext="#pop">
+        <IncludeRules context="##CSS" />
+      </context>
+
+      <context name="coffeesourceline" attribute="Other code embedded in haml" lineEndContext="#pop">
+        <IncludeRules context="##CoffeeScript" />
+      </context>
+
+      <context name="erbsourceline" attribute="Other code embedded in haml" lineEndContext="#pop">
+        <IncludeRules context="##Ruby/Rails/RHTML" />
+      </context>
+
+      <context name="plainsourceline" attribute="Other code embedded in haml" lineEndContext="#pop" />
+
+      <context name="Quoted String" attribute="String" lineEndContext="#stay">
+        <Detect2Chars attribute="String" char="\" char1="\" context="#stay"/>
+        <Detect2Chars attribute="String" char="\" char1="&quot;" context="#stay"/>
+        <StringDetect attribute="Substitution" String="#@@" context="Short Subst"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="Short Subst"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="{" context="Subst"/>
+        <!--HlCChar attribute="Char" context="#pop"/-->
+        <DetectChar char="&quot;" attribute="String" context="#pop"/>
+      </context>
+
+      <!-- Substitutions can be nested -->
+      <context name="Subst" attribute="Ruby Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Substitution" char="}" context="#pop"/>
+        <!-- Highlight substitution as code. -->
+        <IncludeRules context="##Ruby"/>
+      </context>
+
+      <context name="Short Subst" attribute="Substitution" lineEndContext="#pop">
+        <!-- Check for e.g.: "#@var#@@xy" -->
+        <StringDetect attribute="Substitution" String="#@@" context="#stay"/>
+        <Detect2Chars attribute="Substitution" char="#" char1="@" context="#stay"/>
+        <RegExpr attribute="Substitution" String="\w(?!\w)" context="#pop"/>
+      </context>
+
+      <context name="Doctype" attribute="Doctype" lineEndContext="#pop"/>
+    </contexts>
+
+
+
+
+    <itemDatas>
+    <!-- Ruby itemData -->
+      <itemData name="Ruby Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Ruby embedded in haml" defStyleNum="dsNormal"/>
+      <itemData name="Other code embedded in haml" defStyleNum="dsNormal"/>
+
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Escaped Text" defStyleNum="dsChar"/>
+      <itemData name="Unquoted String" defStyleNum="dsString"/>
+      <itemData name="Substitution" defStyleNum="dsOthers"/>
+
+      <!-- use these to mark errors and alerts things -->
+      <itemData name="Error" defStyleNum="dsError" />
+
+      <itemData name="Operator" defStyleNum="dsChar"/>
+
+     <!-- HAML itemData -->
+
+      <itemData name="Normal Text" defStyleNum="dsNormal" />
+      <itemData name="Hash" defStyleNum="dsNormal" />
+      <itemData name="Comment" defStyleNum="dsComment" />
+      <itemData name="Doctype" defStyleNum="dsDataType" bold="1" />
+      <itemData name="Filter" defStyleNum="dsOthers" />
+      <itemData name="Element Id" defStyleNum="dsFloat" bold="1" />
+      <itemData name="Element Class" defStyleNum="dsFloat" />
+      <itemData name="Div Id" defStyleNum="dsDecVal" bold="1" />
+      <itemData name="Div Class" defStyleNum="dsDecVal" />
+      <itemData name="Tag" defStyleNum="dsKeyword" />
+      <itemData name="Entity" defStyleNum="dsDecVal" />
+    </itemDatas>
+  </highlighting>
+  <general>
+    <folding indentationsensitive="1" />
+    <emptyLines>
+      <emptyLine regexpr="\s+"/>
+    </emptyLines>
+    <comments>
+      <comment name="singleLine" start="/" position="afterwhitespace"/>
+    </comments>
+    <keywords casesensitive="1"/>
+  </general>
+</language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: none
+SPDX-License-Identifier: CC0-1.0
+-->
+<!DOCTYPE kcfg SYSTEM "http://www.kde.org/standards/kcfg/1.0/kcfg.dtd">
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name="powerdevilrc">
+        <parameter name="ProfileId"/>
+        <parameter name="IsMobile" type="Bool"/>
+        <parameter name="IsVM" type="Bool"/>
+        <parameter name="CanSuspend" type="Bool"/>
+    </kcfgfile>
+
+    <include>powerdevilenums.h</include>
+    <include>powerdevilsettingsdefaults.h</include>
+
+    <group name="$(ProfileId)">
+    </group>
+
+    <group name="Keyboard" parentGroupName="$(ProfileId)">
+        <entry name="UseProfileSpecificKeyboardBrightness" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="KeyboardBrightness" type="Int">
+            <default>50</default>
+        </entry>
+    </group>
+
+    <group name="Display" parentGroupName="$(ProfileId)">
+        <entry name="UseProfileSpecificDisplayBrightness" type="Bool">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultUseProfileSpecificDisplayBrightness(mParamProfileId)
+            </default>
+        </entry>
+        <entry name="DisplayBrightness" type="Int">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultDisplayBrightness(mParamProfileId)
+            </default>
+        </entry>
+        <entry name="DimDisplayWhenIdle" type="Bool">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultDimDisplayWhenIdle()
+            </default>
+        </entry>
+        <entry name="DimDisplayIdleTimeoutSec" type="Int">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultDimDisplayIdleTimeoutSec(mParamProfileId, mParamIsMobile)
+            </default>
+        </entry>
+        <entry name="TurnOffDisplayWhenIdle" type="Bool">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultTurnOffDisplayWhenIdle()
+            </default>
+        </entry>
+        <entry name="TurnOffDisplayIdleTimeoutSec" type="Int">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultTurnOffDisplayIdleTimeoutSec(mParamProfileId, mParamIsMobile)
+            </default>
+        </entry>
+        <entry name="TurnOffDisplayIdleTimeoutWhenLockedSec" type="Int">
+            <default>60</default>
+        </entry>
+        <entry name="LockBeforeTurnOffDisplay" type="Bool">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultLockBeforeTurnOffDisplay(mParamIsMobile)
+            </default>
+        </entry>
+    </group>
+
+    <group name="SuspendAndShutdown" parentGroupName="$(ProfileId)">
+        <entry name="AutoSuspendAction" type="UInt">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultAutoSuspendAction(mParamIsVM, mParamCanSuspend)
+            </default>
+        </entry>
+        <entry name="AutoSuspendIdleTimeoutSec" type="Int">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultAutoSuspendIdleTimeoutSec(mParamProfileId, mParamIsMobile)
+            </default>
+        </entry>
+        <entry name="PowerButtonAction" type="UInt">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultPowerButtonAction(mParamIsMobile)
+            </default>
+        </entry>
+        <entry name="PowerDownAction" type="UInt">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultPowerDownAction()
+            </default>
+        </entry>
+        <entry name="LidAction" type="UInt">
+            <default type="code">
+                PowerDevil::ProfileDefaults::defaultLidAction(mParamIsVM, mParamCanSuspend)
+            </default>
+        </entry>
+        <entry name="InhibitLidActionWhenExternalMonitorPresent" type="Bool">
+            <default>true</default>
+        </entry>
+        <entry name="SleepMode" type="UInt">
+            <default type="code">
+                qToUnderlying(PowerDevil::SleepMode::SuspendToRam)
+            </default>
+        </entry>
+    </group>
+
+    <group name="Performance" parentGroupName="$(ProfileId)">
+        <entry name="PowerProfile" type="String">
+        </entry>
+    </group>
+
+    <group name="RunScript" parentGroupName="$(ProfileId)">
+        <entry name="ProfileLoadCommand" type="String">
+        </entry>
+        <entry name="ProfileUnloadCommand" type="String">
+        </entry>
+        <entry name="IdleTimeoutCommand" type="String">
+        </entry>
+        <entry name="RunScriptIdleTimeoutSec" type="Int">
+            <default>600</default>
+        </entry>
+    </group>
+</kcfg>

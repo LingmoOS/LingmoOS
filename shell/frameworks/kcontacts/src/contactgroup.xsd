@@ -1,0 +1,63 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!--
+    SPDX-FileCopyrightText: 2007 Tobias Koenig <tokoe@kde.org>
+
+    SPDX-License-Identifier: LGPL-2.0-or-later
+-->
+
+  <!-- The root element of every ContactGroup document -->
+  <xsd:element name="contactGroup">
+    <xsd:complexType>
+      <!-- A list of contacts or contact references -->
+      <xsd:choice minOccurs="0" maxOccurs="unbound">
+        <xsd:element name="contactData" type="contactDataType"/>
+        <xsd:element name="contactReference" type="contactReferenceType"/>
+      </xsd:choice>
+
+      <!-- The unique identifier of this contact group -->
+      <xsd:attribute name="uid" type="xsd:string" use="required" />
+
+      <!-- The i18n'ed name of this contact group -->
+      <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- The type for inline contacts. -->
+  <xsd:complexType name="contactDataType">
+    <xsd:sequence>
+      <!-- The i18n'ed name of this contact -->
+      <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+      <!-- The plain email address (without the name) of this contact -->
+      <xsd:element name="email" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+      <!-- A list of custom fields for this contact -->
+      <xsd:element name="custom" minOccurs="0" maxOccurs="unbound">
+        <xsd:complexType>
+          <xsd:attribute name="key" type="xsd:string" use="required" />
+          <xsd:attribute name="value" type="xsd:string" use="required" />
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="contactReferenceType">
+    <xsd:sequence>
+      <!-- The uid of the contact this entry references -->
+      <xsd:element name="uid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+      <!-- The preferred email address which shall be used for the contact -->
+      <xsd:element name="preferredEmail" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+
+      <!-- A list of custom fields for this contact -->
+      <xsd:element name="custom" minOccurs="0" maxOccurs="unbound">
+        <xsd:complexType>
+          <xsd:attribute name="key" type="xsd:string" use="required" />
+          <xsd:attribute name="value" type="xsd:string" use="required" />
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

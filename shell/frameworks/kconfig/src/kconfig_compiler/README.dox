@@ -1,0 +1,560 @@
+/**
+\page kconfig_compiler The KDE Configuration Compiler
+
+kconfig_compiler generates C++ source code from an XML file containing
+information about configuration options (.kcfg) and a file that provides
+the code generation options (.kcfgc) The generated class is based on
+KConfigSkeleton and provides an API for the application to access its
+configuration data.
+
+The generated C++ source code is output to a .h and a .cpp file, whose base
+name is the same as that of the .kcfgc file.
+
+\section kcfg_format The .kcfg XML file format: description of the configuration skeleton
+
+The structure of the .kcfg file is described by its DTD kcfg.xsd.
+
+The \<kcfgfile\> tag may contain either the "name" attribute, which should be the name
+of the configuration file described, or the "arg" attribute, which, if set to
+"true", will allow you to pass the KSharedConfig::Ptr object to use.
+
+If neither "name" nor "arg" is set, the default configuration file
+("\<appname\>rc") will be used.
+
+The \<include\> tags are optional and may contain C++ header files that
+are needed to compile the code needed to compute default values. To generate
+a \#include "..." statement instead of \#include \<...\>, enclose the header
+file name in double quotes (e.g. \<include\>"header.h"\</include\>).
+
+The remaining entries in the XML file are grouped by the tag \<group\>
+which describes the corresponding group in the configuration file.
+
+The individual entries must have at least a name or a key. The key is used
+as the key in the config file, while the name is used to create accessor and
+modifier functions. If \<key\> is given, but not \<name\>, the name is
+constructed by removing all spaces from \<key\>. If \<name\> is given, but
+not \<key\>, the key is the same as \<name\>.
+
+An entry must also have a type. The list of allowable types is
+specified in the DTD and loosely follows the list of types supported
+by the QVariant with exception of the clearly binary types
+(e.g. Pixmap, Image...) which are not supported. Besides those basic
+types the following special types are supported:
+
+<dl>
+  <dt>Path</dt>
+  <dd>
+    This is a string that is specially treated as a file-path.
+    In particular paths in the home directory are prefixed with $HOME in
+    when being stored in the configuration file.
+  </dd>
+
+  <dt>Enum</dt>
+  <dd>
+    This indicates an enumeration. The possible enum values and optional
+    enum name should be provided via the \<choices\> tag. Enum values are
+    accessed as integers by the application but stored as strings in the
+    configuration file. This makes it possible to add more values at a later
+    date without breaking compatibility.
+  </dd>
+
+  <dt>IntList</dt>
+  <dd>
+    This indicates a list of integers. This information is provided
+    to the application as QList<int>. Useful for storing QSplitter
+    geometries.
+  </dd>
+
+  <dt>Color</dt>
+  <dd>
+    Isn't a special type but has special input. It is generated as QColor.
+    Any valid input to QColor(QString) can be used (hex or SVG keyword notation)
+    as well as a special format r,g,b,a where the a denotes the alpha channel and
+    may be omitted.
+  </dd>
+</dl>
+
+An entry can optionally have a default value which is used as default when
+the value isn't specified in any config file. Default values are interpreted
+as literal constant values. If a default value needs to be computed
+or if it needs to be obtained from a function call, the \<default\> tag
+should contain the code="true" attribute. The contents of the \<default\>
+tag is then considered to be a C++ expression. Note that in this case you
+might have to add an \<include\> tag as described above, or a
+SourceIncludeFiles entry in the .kcfgc file as described below, so that the
+code which computes the default value can be compiled.
+
+Additional code for computing default values can be provided outside any
+entry definition via the \<code\> tag. The contents of the \<code\> tag is
+inserted as-is. A typical use for this is to compute a common default value
+which can then be referenced by multiple entries that follow.
+
+\section kcfgc_format The .kcfgc file format: code generation options
+
+The options for generating the C++ sources are read from the file with the
+extension .kcfgc. To generate a class add the corresponding kcfgc file to the
+SOURCES line in the Makefile.am.
+
+The following options are read from the kcfgc file:
+
+
+<dl>
+  <dt>File=\<string\></dt>
+  <dd>
+    Default: \<programname\>.kcfg \n
+    Name of kcfg file containing the options the class is generated for
+    <!-- what? -->
+  </dd>
+
+  <dt>HeaderExtension=\<string\></dt>
+  <dd>
+    Default: h \n
+    Since KF 5.57 \n
+    Extension to use for the name of the generated C++ header files.
+  </dd>
+
+  <dt>NameSpace=\<string\></dt>
+  <dd>
+    Optional namespace for generated class
+  </dd>
+
+  <dt>ClassName=\<string\></dt>
+  <dd>
+    Name of generated class (required)
+  </dd>
+
+  <dt>Inherits=\<string\></dt>
+  <dd>
+    Default: KConfigSkeleton \n
+    Class the generated class inherits from.
+
+    This class must inherit KConfigSkeleton and must provide a default
+    constructor (kcfgfile not specified), a constructor taking a
+    QString argument (kcfgfile with "name" attribute) and a constructor
+    taking a KSharedConfig::Ptr as argument (kcfgfile with "arg" attribute).
+    Please refer to the documentation of KConfigSkeleton.
+  </dd>
+
+  <dt>Visibility=\<string\></dt>
+  <dd>
+    Inserts visibility directive (for example KDE_EXPORT) between
+    "class" keyword and class name in header file
+  </dd>
+
+  <dt>Singleton=\<bool\></dt>
+  <dd>
+    Default: false \n
+    Generated class is a singleton.
+  </dd>
+
+  <dt>CustomAdditions=\<bool\></dt>
+  <dd>
+    <!-- what? -->
+  </dd>
+
+  <dt>MemberVariables=\<string\></dt>
+  <dd>
+    Values: public, protected, private, dpointer \n
+    Default: private \n
+    C++ access modifier used for member variables holding the configuration
+    values
+  </dd>
+
+  <dt>IncludeFiles=\<string\>, \<string\> ...</dt>
+  <dd>
+    Names of files to be included in the header of the generated class.
+
+    Enclose a file name in (escaped) double quotes to generate
+    \#include "..." instead of \#include \<...\>.
+  </dd>
+
+  <dt>SourceIncludeFiles=\<string\>, \<string\> ...</dt>
+  <dd>
+    Names of files to be included in the source file of the generated class.
+
+    Enclose a file name in (escaped) double quotes to generate
+    \#include "..." instead of \#include \<...\>.
+  </dd>
+
+  <dt>Mutators=\<value\></dt>
+  <dd>
+    Values: true, false or a comma separated list of options \n
+    Default: false \n
+    If true, mutator functions for all configuration options are generated.
+    If false, no mutator functions are generated. If a list is provided,
+    mutator functions are generated for the options that are listed.
+  </dd>
+
+  <dt>Notifiers=\<value\></dt>
+  <dd>
+    Values: true, false or a comma separated list of options \n
+    Default: false \n
+    If true, entries will be written with the <b>Notify</b> flag enabled,
+    so changes can be detected using <b>KConfigWatcher</b>.
+    If a list is provided, the options that are listed are written with
+    said flag.
+  </dd>
+
+  <dt>DefaultValueGetters=\<value\></dt>
+  <dd>
+    Values: true, false or a comma separated list of options \n
+    Default: false \n
+    If true, functions to return the default value of all configuration options
+    are generated. If false, no default value functions are generated. If a list
+    is provided, default value functions are generated for the options that are listed.
+  </dd>
+
+  <dt>ItemAccessors=\<bool\></dt>
+  <dd>
+    Default: false \n
+    Generate accessor functions for the KConfigSkeletonItem objects
+    corresponding to the configuration options. If <b>SetUserTexts</b> is set,
+    <b>ItemAccessors</b> also has to be set.
+  </dd>
+
+  <dt>SetUserTexts=\<bool\></dt>
+  <dd>
+    Default: false \n
+    Set the label and whatthis texts of the items from the kcfg file.
+    If <b>SetUserTexts</b> is set, <b>ItemAccessors</b> also has to be set.
+  </dd>
+
+  <dt>GlobalEnums=\<bool\></dt>
+  <dd>
+    Default: false \n
+    If set to true all choices of Enum items will be created in the global
+    scope of the generated class. If set to false, each Enum item whose enum is not
+    explicitly named will get its own namespace for its choices.
+  </dd>
+
+  <dt>UseEnumTypes=\<bool\></dt>
+  <dd>
+    Default: false \n
+    If set to true, all Enum items whose enums are named will use enum types for
+    the return value of accessor functions and for the parameter of mutator
+    functions. This eliminates the need to cast accessor return values to the enum
+    type if you want to use the enum type in your own code. If set to false,
+    accessor return values and mutator parameters will be of type int.
+  </dd>
+
+  <dt>ForceStringFilename=\<bool\></dt>
+  <dd>
+    Default: false \n
+    If set to true, forces the first parameter of the generated class
+    to be a QString when using an argument for the filename.
+    This is useful to specify at runtime the filename of the configuration class.
+  </dd>
+
+  <dt>GenerateProperties=\<bool\></dt>
+  <dd>
+    Default: false \n
+    If set to true, a Q_PROPERTY will be generated for each member variable holding a
+    configuration value and the Q_OBJECT macro will be added to the generated class.
+    Note that you will also need to pass the GENERATE_MOC option to the
+    kconfig_add_kcfg_files macro.
+  </dd>
+
+
+  <dt>ParentInConstructor=\<bool\></dt>
+  <dd>
+    Default: false \n
+    If set to true, the generated constructor will take an additional QObject*
+    parameter that will be used as the object's parent.
+    This is useful when working with KQuickAddons::ManagedConfigModule
+    to set it as the parent of the generated class to allow automatic
+    settings discovery and handle the deallocation.
+    Note this parameter is incompatible with <b>Singleton</b> set to true.
+  </dd>
+
+  <dt>TranslationSystem=\<string\></dt>
+  <dd>
+    Default: qt \n
+    Set the translation system for label, tooltip and whatsthis text in generated KConfigSkeleton.
+    Set the value to <b>kde</b> to use the KDE Framework translation system, see KI18n.
+  </dd>
+
+  <dt>TranslationDomain=\<value\></dt>
+  <dd>
+    When <b>TranslationSystem=kde</b> is set, allow to specify the domain in which to look for translations.
+  </dd>
+
+  <dt>QmlRegistration=\<bool></dt>
+  <dd>
+    Default: false\n
+    If set to true the generated code will use the QML_ELEMENT macro to register the type to QML.
+    If Singleton is also true it will be registered as a QML singleton using QML_SINGLETON
+
+  </dd>
+
+</dl>
+
+
+\section entry_options Advanced entry options
+
+There are several possibilities to parameterize entries.
+
+\subsection parametrized_entries Parameterized entries
+
+An entry can be parameterized using a fixed range parameter specified with
+the \<parameter\> tag. Such parameter can either be an Enum or an int. An Enum
+parameter should specify the possible enumeration values with the \<choices\>
+tag. An int parameter should specify its maximum value. Its minimum value
+is always 0.
+
+A parameterized entry is expanded to a number of entries, one for each
+value in the parameter range. The name and key should contain a reference
+to the parameter in the form of $(parameter-name). When expanding the entries
+the $(parameter-name) part is replaced with the value of the parameter.
+In the case of an Enum parameter it is replaced with the name of the
+enumuration value. In the case of an int parameter it is replaced with
+the numeric value of the parameter.
+
+Parameterized entries all share the same default value unless different
+default values have been specified for specific parameter values.
+This can be done with the param= attribute of the \<default\>. When a
+param attribute is specified the default value only applies to that
+particular parameter value.
+
+Example 1:
+\code{.xml}
+<entry name="Color$(ColorIndex)" type="Color" key="color_$(ColorIndex)">
+  <parameter name="ColorIndex" type="Int" max="3"/>
+  <default param="0">#ff0000</default>
+  <default param="1">#00ff00</default>
+  <default param="2">#0000ff</default>
+  <default param="3">#ffff00</default>
+</entry>
+\endcode
+
+The above describes 4 color configuration entries with the following defaults:
+
+\verbatim
+color_0=#ff0000
+color_1=#00ff00
+color_2=#0000ff
+color_3=#ffff00
+\endverbatim
+
+The configuration options will be accessible to the application via
+a QColor color(int ColorIndex) and a
+void setColor(int ColorIndex, const QColor &v) function.
+
+Example 2:
+\code{.xml}
+<entry name="Sound$(SoundEvent)" type="String" key="sound_$(SoundEvent)">
+  <parameter name="SoundEvent" type="Enum">
+    <values>
+      <value>Explosion</value>
+      <value>Crash</value>
+      <value>Missile</value>
+    </values>
+  </parameter>
+  <default param="Explosion">boom.wav</default>
+  <default param="Crash">crash.wav</default>
+  <default param="Missile">missile.wav</default>
+</entry>
+\endcode
+
+The above describes 3 string configuration entries with the following defaults:
+
+\verbatim
+sound_Explosion=boom.wav
+sound_Crash=crash.wav
+sound_Missile=missile.wav
+\endverbatim
+
+The configuration options will be accessible to the application via
+a QString sound(int SoundEvent) and a
+void setSound(int SoundEvent, const QString &v) function.
+
+\subsection parametrized_groups Parameterized groups
+
+A group name can be parametrized using a parameter given to the KConfigSkeleton
+instance (which means this feature cannot be used with singleton classes).
+
+Example 1:
+\code{.xml}
+<kcfgfile name="testrc">
+  <parameter name="groupname"/>
+</kcfgfile>
+<group name="$(groupname)">
+  <entry key="Text" type="string">
+  </entry>
+</group>
+\endcode
+
+In this case passing "Group2" as the 'groupname' parameter to the generated class
+will make it use group "Group2" for the entry "Text".
+
+By setting the stateConfig attribute of kcfgfile to "true", KSharedConfig::openStateConfig is used.
+This should be used when one stores volatile data, like window sizes or autocompletion texts.
+It is recommended to have at least two separate kcfg files for the different kinds of data.
+NOTE: This option is ignored when ForceStringFilename is set.
+
+\subsection enums Enums
+
+By default, if <b>GlobalEnums</b> is set to false, a separate named enum will be generated
+for each Enum entry. Since each enum is defined in a little enclosing class of its own,
+this allows the same Enum value names to be used in different enums. For example, the
+.kcfg entry
+
+\code{.xml}
+<entry name="KeepData" type="Enum">
+  <choices>
+    <choice name="Do"/>
+    <choice name="Dont" value="Don't"/>
+  </choices>
+</entry>
+\endcode
+
+will generate this public class containing the enum definition, inside the generated class:
+
+\code{.cpp}
+class EnumKeepData
+{
+  public:
+  enum type { Do, Dont, COUNT };
+};
+\endcode
+
+Since 5.68, if present the <b>value</b> attribute will be used as the choice value written to the backend
+instead of the <b>name</b>, allowing to write text incompatible with enum naming.
+
+Alternatively, if <b>GlobalEnums</b> is set to true, all Enum items are defined as
+unnamed enums in the global scope of the generated class. In this case, all Enum values
+must have different names to avoid clashes. However, you can use a 'prefix' argument
+in \<choices\> to prevent duplicate enum member names clashing. Using this, the Enum value
+names are prefixed in code with the string you specify. For example, if <b>GlobalEnums</b>
+is set to true, the .kcfg entry
+
+\code{.xml}
+<entry name="KeepData" type="Enum">
+  <choices prefix="Keep_">
+    <choice name="Do"/>
+    <choice name="Dont" value="Don't"/>
+  </choices>
+</entry>
+\endcode
+
+will generate config file entries of "KeepData=Do" and "KeepData=Dont", but the enum
+will be declared
+
+\code{.cpp}
+enum { Keep_Do, Keep_Dont };
+\endcode
+
+It is possible to specify your own name for a generated enum, by including a
+'name' parameter in \<choices\>. Just like unnamed enums, this enum will be defined in
+the global scope of the generated class (without any enclosing class of its own).
+Therefore the names of Enum values must be unique across both unnamed enums (if
+<b>GlobalEnums</b> is set to true) and all specifically named enums.
+
+An example of a specifically named enum:
+
+\code{.xml}
+<entry name="KeepData" type="Enum">
+  <choices name="Types">
+    <choice name="Do"/>
+    <choice name="Dont"/>
+  </choices>
+</entry>
+\endcode
+
+which results in the following enum declaration, inside the generated class:
+
+\code{.cpp}
+enum Types { Do, Dont };
+\endcode
+
+It is also possible to specify the use of enums external to the generated class, by
+including the string "::" in the enum name - just ensure that it is sufficiently
+qualified to be unambiguous in use. To specify use of an unnamed enum, append a
+trailing "::". For example, to use the enum 'myEnum' defined in class ClassA, use
+either of
+
+\code{.xml}
+<choices name="ClassA::myEnum">
+<choices name="::ClassA::myEnum">
+\endcode
+
+To specify an unnamed enum in namespace ProgSpace, use
+
+\code{.xml}
+<choices name="ProgSpace::">
+\endcode
+
+To specify a top-level unnamed enum, use
+
+\code{.xml}
+<choices name="::">
+\endcode
+
+To specify the top-level enum 'anotherEnum', use
+
+\code{.xml}
+
+<choices name="::anotherEnum">
+\endcode
+
+
+\subsection notify_signals Notify signals
+
+An entry can emit a signal when it gets changed. First of all, you must
+define a list of signals for the configuration class. The signal's name may be
+any legal identifier you wish. The \<argument\> tag allows you to specify arguments
+for the emitted signal. It supports all types as defined in
+the KConfigXT DTD. The argument value must specify the name, without spaces, of one
+of the entries defined in the .kcfg file.
+A signal definition can also contain a \<label\> tag which will be
+the documentation line in the generated file.
+
+\code{.xml}
+<signal name="emoticonSettingsChanged" />
+
+<signal name="styleChanged">
+  <label>Tell when a complete style change.</label>
+  <argument type="String">stylePath</argument>
+  <argument type="String">StyleCSSVariant</argument>
+</signal>
+\endcode
+
+After defining the signals, you must tell which signal to emit for the entry.
+A signal can be emitted by multiple entries. Also, you don't need to specify the arguments
+for a signal, the signal name will suffice.
+
+\code{.xml}
+<entry key="stylePath" type="String">
+  <label>Absolute path to a directory containing a Adium/Kopete chat window style.</label>
+  <emit signal="styleChanged" />
+</entry>
+\endcode
+
+The signal will be emitted when save() is called.
+
+@warning
+You must not call save() in direct response to any notify signal.
+If you need to call save(),
+use a QueuedConnection to listen to the notify signal.
+
+You can also listen to the generic configChanged() signal from KConfigSkeleton to
+notify your application about configuration changes.
+In that case you may also call save() in direct response.
+
+Note that you will also need to pass the GENERATE_MOC option to the kconfig_add_kcfg_files macro.
+
+\subsection translation_context Translation context
+
+In the kcfg file you can specify the translation's context for \<tooltip\>, \<whatsthis\> and \<label\> element for an entry.
+
+\code{.xml}
+<entry type="Bool" key="Auto Save">
+  <label>Enable automatic saving of calendar</label>
+  <whatsthis context="@info:whatsthis">Enable automatic saving of calendars to have calendars saved automatically.</whatsthis>
+  <default>false</default>
+</entry>
+\endcode
+
+For more information on translation context and how to write good translatable text,
+please refer to https://api.kde.org/frameworks/ki18n/html/prg_guide.html
+
+*/

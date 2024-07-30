@@ -1,0 +1,48 @@
+This is how the KNS::Engine works....
+it is a higher-level view which does not talk about KNS::DxsEngine
+or KNS::CoreEngine yet, those will be documented later.
+
+General
+-------
+
+The KNS::Engine class is the only class that applications need to care
+about (beside the information from *.knsrc files of course).
+As such, this class should be as comfortable as possible.
+
+There are two principal operations supported by it, upload and download.
+Other operations, especially direct interaction through DXS, is also
+handled by it since it inherits from DxsEngine.
+
+Both principal operations have a modal and a non-modal way of being called.
+The modal way is the easiest one and translates the old
+	KNS::DownloadDialog::open()
+call from KNewStuff1 to the new
+	KNS::Engine::downloadDialogModal()
+call in KNewStuff2. Similarly, calling ::uploadDialogModal() handles all
+upload in a modal way, without the need for signals and slots.
+
+The modal calls return the list of affected entries directly. These entries
+should be queried about their status for installed, removed and updated
+entries in the download dialog, and a single entry returned for the upload
+dialog.
+The non-modal calls will send signals for each affected entry.
+
+Upload
+------
+
+The state machine for modal upload is as follows:
+
+* provider loading
+  * failure(*) -> stop
+  * finish(*) -> next/provider selection
+  * provider(1) -> discard
+* provider selection
+  * reject -> stop
+  * accept -> next/meta data selection
+* meta data selection
+  * reject -> stop
+  * accept -> next/upload
+* upload
+  * failure -> stop
+  * success -> stop + result
+

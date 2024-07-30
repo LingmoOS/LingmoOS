@@ -1,0 +1,1060 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+ <!ENTITY kappname "&kde; Menu Editor">
+  <!ENTITY package "kdebase">
+  <!ENTITY firefox "<application
+>Firefox</application
+>">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Catalan  "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kmenuedit" lang="&language;">
+
+<bookinfo>
+
+<title
+>El manual de l'editor de menú del &kde;</title>
+
+<authorgroup>
+<author
+>&Milos.Prudek; &Milos.Prudek.mail;</author>
+<author
+>&Anne-Marie.Mahfouf; &Anne-Marie.Mahfouf.mail;</author>
+<othercredit role="reviewer"
+>&Lauri.Watts; &Lauri.Watts.mail; </othercredit>
+&traductor.Antoni.Bella; 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Milos.Prudek;</holder>
+</copyright>
+<copyright>
+<year
+>2008</year>
+<holder
+>&Anne-Marie.Mahfouf;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>27 d'abril de 2015</date>
+<releaseinfo
+>Plasma 5.3</releaseinfo>
+
+<abstract
+><para
+>El &kmenuedit; permet l'edició d'un dels llançadors d'aplicacions del &kde;. </para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>Editor del menú KDE</keyword>
+<keyword
+>kmenuedit</keyword>
+<keyword
+>aplicació</keyword>
+<keyword
+>programa</keyword>
+<keyword
+>menú</keyword>
+<keyword
+>kickoff</keyword>
+<keyword
+>Lancelot</keyword>
+</keywordset>
+
+</bookinfo>
+<chapter id="introduction">
+<title
+>Introducció</title>
+
+<para
+>El &kmenuedit; permet l'edició del menú dels llançadors d'aplicacions del &kde;.</para>
+
+<para
+>El &kmenuedit; es pot iniciar bé fent clic del &BDR; al botó del llançador d'aplicacions en el plafó i escollint <guimenuitem
+>Edita les aplicacions...</guimenuitem
+> o escrivint <userinput
+>kmenuedit</userinput
+> en la línia del &krunner;.</para>
+
+<para
+>El &kmenuedit; us permet:</para>
+
+<itemizedlist>
+<listitem
+><para
+>Veure i editar el menú utilitzat pel llançador d'aplicacions actual.</para
+></listitem>
+<listitem
+><para
+>Els elements i submenús <guimenuitem
+>Retalla</guimenuitem
+>, <guimenuitem
+>Copia</guimenuitem
+> i <guimenuitem
+>Enganxa</guimenuitem
+>.</para
+></listitem>
+<listitem
+><para
+>Crear i eliminar elements i submenús.</para
+></listitem>
+<listitem
+><para
+>Canviar l'ordre dels submenús i elements.</para
+></listitem>
+<listitem
+><para
+>Ocultar elements i afegir nous submenús i elements.</para
+></listitem>
+</itemizedlist>
+
+<para
+>Per omissió, totes les aplicacions instal·lades a l'ordinador apareixen al menú del llançador d'aplicacions de tots els usuaris. Les aplicacions poden aparèixer més d'una vegada en diversos menús diferents. Les categories de submenú buides definides en l'especificació de menú d'escriptori també es mostren, però no seran visibles en els llançadors d'aplicacions a menys que instal·leu aplicacions que pertanyin a aquestes categories. </para>
+
+<para
+>La vista en arbre té dos tipus diferents d'entrada:</para>
+<itemizedlist>
+<listitem
+><para
+>Submenú: Només els camps <guilabel
+>Nom</guilabel
+>, <guilabel
+>Comentari</guilabel
+> i <guilabel
+>Descripció</guilabel
+>, i el botó per a seleccionar una icona estan habilitats, la pestanya <guilabel
+>Avançat</guilabel
+> està inhabilitada. Qualsevol submenú pot contenir submenús i/o elements addicionals. </para
+></listitem>
+<listitem
+><para
+>Elements: Utilitzeu aquesta entrada per a introduir les dades de l'aplicació que voleu afegir. Per a obtenir informació més detallada vegeu <link linkend="using-kmenuedit"
+>Ús del &kmenuedit;</link
+>. </para
+></listitem>
+</itemizedlist>
+
+<para
+>El &kmenuedit; té dos modes de vista en arbre -normal i amb les entrades ocultes-. Per a veure l'última marqueu l'opció <guilabel
+>Mostra les entrades ocultes</guilabel
+> al diàleg de configuració a la pàgina <guilabel
+>Opcions generals</guilabel
+>. </para>
+<para
+>Moltes entrades addicionals apareixen a l'arbre en el mode de vista ocult. Diverses entrades ocultes semblen ser només duplicats, però tenen diferents opcions d'ordre. En general, no heu de canviar aquestes entrades ocultes o correreu el risc de trencar part de la funcionalitat del sistema. </para>
+<para
+>En el mode ocult tindreu un submenú especial <guilabel
+>.hidden [Hidden]</guilabel
+> a l'arbre com a element de nivell superior. Aquest submenú especial no es pot editar. En aquest submenú tots els elements suprimits es mostraran al proper inici del &kmenuedit;.</para>
+<para
+>No és possible suprimir les entrades utilitzant la &IGU; en aquest submenú especial. Tornaran a aparèixer al proper inici del &kmenuedit;. </para>
+
+<sect1 id="use-cases">
+<title
+>Casos d'ús</title>
+
+<sect2 id="use-cases-adapt">
+<title
+>Adaptar el menú per a un usuari</title
+> 
+
+<sect3 id="use-cases-adapt-order">
+<title
+>Tornar a ordenar els elements</title
+> 
+
+<para
+>Això s'ha de fer en el mode de vista ocult on només es mostren els submenús i elements visibles al menú del llançador d'aplicacions. </para>
+<para
+>Per omissió, el menú s'ordena alfabèticament utilitzant els noms o descripcions en anglès. En utilitzar un altre idioma que no sigui l'anglès, alguns submenús i elements apareixeran en un ordre sense ordenació. </para>
+<para
+>Utilitzeu les opcions a <menuchoice
+><guimenu
+>Edita</guimenu
+><guimenuitem
+>Ordena</guimenuitem
+></menuchoice
+> per a ordenar per nom o descripció. Si utilitzeu el llançador d'aplicacions clàssic, haureu de seleccionar la corresponent opció <guilabel
+>Format</guilabel
+> al diàleg de configuració. En el llançador &kickoff; marqueu <guilabel
+>Mostra les aplicacions per nom</guilabel
+> si ordeneu pel nom. </para>
+<para
+>Quan agrupeu els submenús o elements utilitzats amb freqüència, &pex;, a la part superior del menú, fareu que la selecció sigui més fàcil. Per a canviar l'ordre a l'arbre d'elements o submenús en particular, utilitzeu el botó <guibutton
+>Mou amunt</guibutton
+> o <guibutton
+>Mou avall</guibutton
+> a la barra d'eines o aquestes mateixes accions des del menú. </para>
+<para
+>Tots els llançadors d'aplicacions utilitzaran l'ordre de submenús definit al &kmenuedit;. </para>
+</sect3>
+
+<sect3 id="use-cases-adapt-hide">
+<title
+>Eliminar elements de la vista del menú</title
+> 
+
+<para
+>El fet d'haver de mostrar totes les aplicacions instal·lades a un ordinador pot ser confús per a alguns usuaris, així que podeu ocultar alguns elements o submenús d'ús menys freqüent. Hi ha dues maneres de fer-ho: </para>
+
+<para
+>Canvieu al mode de vista normal sense entrades ocultes. Si suprimiu elements, es mouran al submenú <guilabel
+>.hidden [Hidden]</guilabel
+>. Els podreu moure una altra vegada a l'arbre per a tenir-los al menú. </para>
+<para
+>Si elimineu un submenú, serà realment eliminat amb tots els seus submenús i elements. Per a tornar-lo a crear, podeu utilitzar <menuchoice
+><guimenu
+>Edita</guimenu
+><guimenuitem
+>Restaura al menú del sistema</guimenuitem
+></menuchoice
+>, però això eliminarà tots els submenús i elements personalitzats, i també s'eliminaran els fitxers <filename class="extension"
+>.desktop</filename
+>. Aquesta acció no es pot revertir. </para>
+
+<para
+>La millor manera d'eliminar els submenús i elements del menú d'un llançador d'aplicacions, és marcar <guilabel
+>Entrada oculta</guilabel
+> a la pestanya <guilabel
+>General</guilabel
+> i canviar al mode de vista ocult. En aquest mode és fàcil revertir els canvis sense destruir l'estructura del menú. L'únic inconvenient és que haureu d'ocultar totes les entrades en un submenú manualment per a ocultar tot el submenú de la vista. </para>
+</sect3>
+
+</sect2>
+
+<sect2 id="use-cases-additems">
+<title
+>Afegir elements personalitzats</title
+> 
+
+<para
+>Per a afegir elements personalitzats (submenú o element), utilitzeu les accions al menú o barra d'eines. Els elements necessiten un nom i una ordre, sense introduir una ordre, un element no serà desat i el vostre afegit es perdrà. </para>
+<para
+>Si afegiu una entrada que s'insereix a l'arbre com a subentrada a la posició ressaltada real. Moveu una entrada arrossegant-la amb el ratolí o utilitzant el botó <guibutton
+>Mou avall</guibutton
+> a la part inferior de l'arbre perquè sigui una entrada de nivell superior. </para>
+
+</sect2>
+
+<sect2 id="use-cases-transfer">
+<title
+>Transferir la configuració del llançador d'aplicacions</title
+> 
+
+<para
+>No hi ha manera de transferir la configuració utilitzant la &IGU;, cal fer-ho manualment i copiar els fitxers següents a l'usuari de destinació:</para>
+<para
+>El &kmenuedit; emmagatzema la jerarquia del menú a <filename
+>menus/applications-kmenuedit.menu</filename
+> a la carpeta <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+> i <filename class="directory"
+>desktop-directories</filename
+> a la carpeta <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+> conté els fitxers d'escriptori per als submenús que heu creat. A <filename class="directory"
+>applications/</filename
+> a la carpeta <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+> trobareu els fitxers d'escriptori per als elements personalitzats que heu creat. </para>
+<para
+>Les dreceres per a cada aplicació s'emmagatzemen a <filename
+>kglobalshortcutsrc</filename
+> a la carpeta <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+>, però l'exportació/importació no funcionarà perquè els UUID de les dreceres no coincideixen entre els sistemes, encara que els fitxers <filename class="extension"
+>.desktop</filename
+> siguin els mateixos. Haureu d'assignar manualment totes les dreceres una altra vegada. </para>
+
+</sect2>
+
+</sect1>
+</chapter>
+
+<chapter id="quickstart">
+<chapterinfo>
+<authorgroup>
+<author
+>&Virgil.J.Nisly; &Virgil.J.Nisly.mail;</author>
+</authorgroup>
+</chapterinfo>
+<title
+>Afegir una entrada de menú</title>
+
+  <para
+>En aquest exemple, afegirem el &firefox; al submenú <guisubmenu
+>Internet</guisubmenu
+>.</para>
+  <para
+>Per a començar, necessitarem obrir el &kmenuedit;, feu clic del &BDR; sobre el menú de llançador d'aplicacions, feu clic a <guimenuitem
+>Edita les aplicacions...</guimenuitem
+> per a iniciar el &kmenuedit;. Després que s'hagi iniciat, seleccioneu <guisubmenu
+>Internet</guisubmenu
+> tal com es mostra a la imatge de sota. <screenshot>
+<screeninfo
+>Seleccionant <guisubmenu
+>Internet</guisubmenu
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selectinternet.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Seleccionant <guisubmenu
+>Internet</guisubmenu
+></phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+  <para
+>Una vegada que heu seleccionat <guisubmenu
+>Internet</guisubmenu
+>, feu clic a <menuchoice
+><guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Element nou...</guimenuitem
+></menuchoice
+>, obrirà el diàleg <guilabel
+>Element nou</guilabel
+>, tal com es mostra a sota. Escriviu el nom del programa que voleu afegir, en aquest cas, escriviu <userinput
+>firefox</userinput
+>. <screenshot>
+<screeninfo
+>El diàleg <guilabel
+>Element nou</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="itemname.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>El diàleg <guilabel
+>Element nou</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot>
+</para>
+<para
+>Premeu &Intro;, i hauríeu de veure a la finestra principal quelcom similar a la imatge de sota. <screenshot>
+<screeninfo
+>Element nou</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="new.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>L'element nou creat.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Ara omplirem la <guilabel
+>Descripció:</guilabel
+>, en aquest cas escriviu <userinput
+>Navegador web</userinput
+>. <note
+><para
+>L'aparença de com es mostraran la descripció i el nom dependrà de la configuració al llançador d'aplicacions, &pex;, «Navegador web (Firefox)» o «Firefox (Navegador web)».</para
+></note
+> Ens caldrà omplir el nom de l'executable en el camp <guilabel
+>Ordre:</guilabel
+>, en aquest cas escriurem <userinput
+><command
+>firefox</command
+></userinput
+>.</para>
+<para
+>L'ordre haurà d'estar a la vostra variable <envar
+>PATH</envar
+> o haureu d'especificar el camí sencer a l'executable. Si no coneixeu el nom de l'executable d'una aplicació, utilitzeu l'ordre <userinput
+><command
+>locate</command
+></userinput
+> per a cercar el fitxer d'escriptori i introduir la cadena de la línia Exec com a ordre. </para>
+<note
+><para
+>Després de l'ordre, podeu incloure text variable que se substituirà amb els valors reals quan el programa sigui executat: <simplelist>
+<member
+>%f - un únic nom de fitxer</member>
+<member
+>%F - una llista de fitxers; s'usa en aplicacions que poden obrir diversos fitxers locals a la vegada</member>
+<member
+>%u - un únic &URL;</member>
+<member
+>%U - una llista d'&URL;</member>
+<member
+>%d - la carpeta d'un fitxer a obrir</member>
+<member
+>%D - una llista de carpetes</member>
+<member
+>%i - la icona</member>
+<member
+>%m - la miniicona</member>
+<member
+>%c - la llegenda</member>
+</simplelist
+></para>
+<informalexample
+><para
+>Per exemple: Si voleu que el firefox iniciï la navegació web a www.kde.org - en comptes de <command
+>firefox</command
+> haureu d'escriure <command
+>firefox %u www.kde.org</command
+>.</para
+></informalexample
+></note>
+<para
+>La majoria de les aplicacions accepten opcions addicionals, &pex;, el nom d'un perfil definit com a &konqueror; o &konsole;. Per a veure totes les opcions per a un llançador d'aplicacions feu <userinput
+><command
+><replaceable
+>nom_aplicació</replaceable
+></command
+> <option
+>--help</option
+></userinput
+> al &konsole;.</para>
+<para
+>Si volem una icona més creativa, farem clic sobre la icona genèrica situada al costat de <guilabel
+>Nom:</guilabel
+> (Nota: la icona per omissió pot estar en blanc, en aquest cas, feu clic a l'àrea a la dreta del quadre d'entrada de nom). Apareixerà el diàleg <guilabel
+>Selector d'icones</guilabel
+> que us permetrà escollir la nova icona, tal com es mostra a sota. <screenshot>
+<screeninfo
+>El diàleg <guilabel
+>Trieu una icona</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selecticon.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>El diàleg <guilabel
+>Trieu una icona</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+  <para
+>Escollirem la icona de firefox de la llista i premerem &Intro;. La vostra pantalla final s'hauria d'assemblar a la captura de pantalla de sota. <screenshot>
+<screeninfo
+>S'ha fet la captura de pantalla</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="done.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Això és al que s'hauria d'assemblar l'element de menú.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>El lloc del nou element de menú es pot canviar ara utilitzant els botons <guibutton
+>Mou amunt</guibutton
+> i <guibutton
+>Mou avall</guibutton
+> de la barra d'eines del &kmenuedit; o arrossegant-lo amb el ratolí.</para>
+ <para
+>Els elements de submenú es poden ordenar utilitzant el botó <guibutton
+>Ordena</guibutton
+> situat a la barra d'eines del &kmenuedit; o els elements del submenú <menuchoice
+><guimenu
+>Edita</guimenu
+><guisubmenu
+>Ordena</guisubmenu
+></menuchoice
+>.</para>
+
+<para
+>Feu clic a <menuchoice
+><guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Desa</guimenuitem
+></menuchoice
+>, espereu que aparegui el diàleg <guilabel
+>S'està actualitzant la configuració del sistema</guilabel
+> per a finalitzar, hauríeu de trobar el &firefox; al submenú <guisubmenu
+>Internet</guisubmenu
+> del llançador d'aplicacions.</para>
+
+</chapter>
+
+<chapter id="using-kmenuedit">
+<title
+>Ús del &kmenuedit;</title>
+
+<para
+>El plafó esquerre d'aplicacions mostra l'estructura del llançador d'aplicacions. Quan navegueu a través dels elements en el plafó esquerre, el plafó dret mostrarà informació detallada per a l'element ressaltat del menú.</para>
+
+<sect1 id="details-general">
+<title
+>La pestanya General</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Nom:</guilabel
+></term>
+<listitem
+><para
+>Aquest és el nom del vostre programa tal com apareix en el menú del llançador d'aplicacions. Pot ser diferent del nom real de l'executable. Per exemple, el nom de l'executable <command
+>mc</command
+> és «<application
+>Midnight Commander</application
+>».</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Descripció:</guilabel
+></term>
+<listitem
+><para
+>La descripció es mostra junt amb el nom en el llançador d'aplicacions. Això és totalment opcional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Comentari:</guilabel
+></term>
+<listitem
+><para
+>En aquest camp es descriu el programa amb més detall. Això és totalment opcional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Ordre:</guilabel
+></term>
+<listitem
+><para
+>Aquest és el nom del programa executable. Assegureu-vos que teniu permisos per a executar el programa.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Habilita la confirmació de llançament</guilabel
+></term>
+<listitem
+><para
+>Si es marca aquesta casella, es mostrarà una confirmació quan s'iniciï una aplicació. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Mostra només en el &kde;</guilabel
+></term>
+<listitem
+><para
+>Quan està marcada, l'entrada de l'aplicació només serà visible en tots els llançadors d'aplicacions de &kde;, però no en els altres entorns d'escriptori. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Entrada oculta</guilabel
+></term>
+<listitem
+><para
+>Elimina una entrada de la vista del menú al llançador d'aplicacions. </para
+></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="details-advanced">
+<title
+>La pestanya Avançat</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Camí de treball:</guilabel
+></term>
+<listitem
+><para
+>Especifiqueu el camí de treball del programa. Aquest serà el camí actual quan es llanci el programa. No cal que sigui igual que la mateixa localització que l'executable.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Executa en un terminal</guilabel
+></term>
+<listitem
+><para
+>Haureu de marcar aquesta opció si el vostre programa requereix emulador de terminal per a executar-se. Això s'aplica principalment a <link linkend="gloss-console-application"
+>aplicacions de consola</link
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Opcions del terminal:</guilabel
+></term>
+<listitem
+><para
+>Poseu totes les opcions del terminal en aquest camp.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Executa com a usuari diferent</guilabel
+></term>
+<listitem
+><para
+>Si voleu executar aquest programa com a un usuari diferent (vosaltres no), marqueu aquesta casella de selecció, i proporcioneu el nom d'usuari en el camp <guilabel
+>Nom d'usuari:</guilabel
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Tecla de drecera actual:</guilabel
+></term>
+<listitem
+><para
+>Podeu assignar una drecera de teclat especial per a engegar el vostre programa.</para>
+
+<para
+>Feu clic al botó <guibutton
+>Cap</guibutton
+> a la dreta de la casella de selecció <guilabel
+>Tecla de drecera actual:</guilabel
+>.</para>
+
+<para
+>El text del botó canviarà a <guilabel
+>Entrada...</guilabel
+> i podreu prémer la combinació de tecles en el teclat que desitgeu assignar al programa. </para>
+<para
+>Podeu restablir la drecera a <guilabel
+>Cap</guilabel
+> usant aquest botó: <inlinemediaobject
+><imageobject
+> <imagedata fileref="reset.png" format="PNG"/></imageobject
+></inlinemediaobject
+>. </para>
+
+<para
+>No us oblideu de desar la configuració fent clic a la icona <guiicon
+>Desa</guiicon
+> en la barra d'eines o utilitzant l'element de menú <menuchoice
+> <guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Desa</guimenuitem
+> </menuchoice
+>.</para>
+
+</listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="menu-reference">
+<title
+>Referència del menú</title>
+
+<para
+>La majoria de les accions a la barra de menús també estan disponibles al menú contextual que s'obre amb un clic del &BDR; sobre un element de la vista en arbre.</para>
+
+<variablelist>
+<varlistentry id="file-new-item">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Fitxer</guimenu
+> <guimenuitem
+>Element nou...</guimenuitem
+> </menuchoice
+></term
+> <listitem
+><para
+><action
+>Afegeix un element nou al menú.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-new-submenu">
+<term
+><menuchoice
+><guimenu
+>Fitxer</guimenu
+> <guimenuitem
+>Submenú nou...</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Afegeix un submenú nou.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-save">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Desa</guimenuitem
+> </menuchoice
+></term>
+<listitem>
+<para
+><action
+>Desa el menú.</action
+></para>
+</listitem>
+</varlistentry>
+
+<varlistentry id="file-quit">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Fitxer</guimenu
+> <guimenuitem
+>Surt</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Surt</action
+> del &kmenuedit;.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-up">
+<term
+><menuchoice
+><guimenu
+>Edita</guimenu
+> <guimenuitem
+>Mou amunt</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Mou</action
+> l'element seleccionat cap amunt en el seu submenú.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-down">
+<term
+><menuchoice
+><guimenu
+>Edita</guimenu
+> <guimenuitem
+>Mou avall</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Mou</action
+> l'element seleccionat cap avall en el seu submenú.</para
+></listitem>
+</varlistentry>
+
+
+<varlistentry id="edit-cut">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>X</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Edita</guimenu
+> <guimenuitem
+>Retalla</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Retalla l'element de menú actual cap al porta-retalls</action
+>. Si voleu moure l'element de menú, primer hauríeu de tallar-lo cap al porta-retalls, moure'l cap al lloc de destinació emprant el plafó esquerre, i usar la funció <guimenuitem
+>Enganxa</guimenuitem
+> per a enganxar-lo des del porta-retalls.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-copy">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+> </shortcut
+> <guimenu
+> Edita</guimenu
+> <guimenuitem
+>Copia</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Copia l'element de menú actual cap al porta-retalls</action
+>. Més tard podeu usar la funció <guimenuitem
+>Enganxa</guimenuitem
+> per a enganxar-lo des del porta-retalls cap a la seva destinació. Podeu enganxar el mateix element moltes vegades.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-paste">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>V</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Edita</guimenu
+> <guimenuitem
+>Enganxa</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Enganxa l'element de menú des del porta-retalls</action
+> a la ubicació seleccionada en el menú principal. Primer hauríeu d'utilitzar <guimenuitem
+>Talla</guimenuitem
+> o <guimenuitem
+>Copia</guimenuitem
+> abans de poder fer <guimenuitem
+>Enganxa</guimenuitem
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-delete">
+<term
+><menuchoice
+><shortcut
+><keycap
+>Supr</keycap
+></shortcut
+> <guimenu
+>Edita</guimenu
+> <guimenuitem
+>Suprimeix</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Suprimeix l'element del menú actualment seleccionat.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-sort">
+<term
+><menuchoice
+><guimenu
+>Edita</guimenu
+> <guimenuitem
+>Ordena</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Obre</action
+> el submenú per a ordenar el submenú seleccionat o tot l'arbre del menú. Hi ha implementats dos mètodes d'ordenació, anomenats, pel nom i per la descripció.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-restore">
+<term
+><menuchoice
+><guimenu
+>Edita</guimenu
+> <guimenuitem
+>Restaura al menú del sistema</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Això restaurarà el llançador d'aplicacions a tal com estava per omissió i eliminarà totes les opcions personalitzades. Un quadre de missatge us demanarà si ho voleu fer realment.</action
+></para
+></listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>El &kmenuedit; té la configuració comuna al &kde; i els elements dels menús <guimenu
+>Arranjament</guimenu
+> i <guimenu
+>Ajuda</guimenu
+>. Per a obtenir més informació, vegeu les seccions sobre <ulink url="help:/fundamentals/menus.html#menus-settings"
+>El menú Arranjament</ulink
+> i <ulink url="help:/fundamentals/menus.html#menus-help"
+>El menú Ajuda</ulink
+> en els Fonaments del &kde;. </para>
+
+</chapter>
+
+<chapter id="credits">
+
+<title
+>Crèdits i llicència</title>
+
+<para
+>&kmenuedit; </para>
+<para
+>Copyright del programa &copy; 2002, &Raffaele.Sandrini;</para>
+
+<para
+>Col·laboradors:</para>
+<itemizedlist>
+<listitem
+><para
+>&Matthias.Elter; &Matthias.Elter.mail; - Autor original</para>
+</listitem>
+<listitem
+><para
+>&Matthias.Ettrich; &Matthias.Ettrich.mail;</para>
+</listitem>
+<listitem
+><para
+>&Daniel.M.Duley; &Daniel.M.Duley.mail;</para>
+</listitem>
+<listitem
+><para
+>&Preston.Brown; &Preston.Brown.mail;</para>
+</listitem>
+</itemizedlist>
+
+<para
+>Copyright de la documentació &copy; 2000 &Milos.Prudek;</para>
+<para
+>Copyright de la documentació &copy; 2008 &Anne-Marie.Mahfouf;</para>
+<para
+>Actualització per al &kde; 3.0 per &Lauri.Watts; &Lauri.Watts.mail; 2002</para>
+
+<para
+>Traductor/Revisor de la documentació: &credits.Antoni.Bella;</para
+> &underFDL; &underGPL; </chapter>
+
+<glossary id="glossary">
+<title
+>Glossari</title>
+
+<glossentry id="gloss-console-application">
+<glossterm
+>Aplicació de consola</glossterm>
+<glossdef>
+
+<para
+>Aplicació originalment escrita per a entorns no gràfics, entorn orientat a text. Aquestes aplicacions s'executen bé en el &kde;. S'han d'executar dintre d'un emulador de consola, com el &konsole;. No reben avís automàtic de finalització quan sortiu de la vostra sessió del &kde;. Pel qual no us haureu d'oblidar de desar els documents oberts en aquestes aplicacions abans de sortir del &kde;.</para>
+
+<para
+>Les aplicacions de consola accepten copiar i enganxar des de les aplicacions que compleixen els requisits del &kde;. Simplement marqueu el text en l'aplicació de consola amb el vostre ratolí, canvieu a l'aplicació que compleix els requisits del &kde; i premeu <keycombo action="simul"
+>&Ctrl; <keycap
+>V</keycap
+></keycombo
+> per a enganxar el text. Si voleu copiar des d'una aplicació &kde; cap a una aplicació de consola, primer marqueu el text amb el vostre ratolí, premeu <keycombo action="simul"
+>&Ctrl; <keycap
+>C</keycap
+></keycombo
+>, canvieu a l'aplicació de consola i feu clic amb el &BMR;<footnote
+><para
+>Si el vostre ratolí no disposa de botó del mig, haureu de prémer els botons <mousebutton
+>esquerre</mousebutton
+> i <mousebutton
+>dret</mousebutton
+> a l'hora. Això s'anomena «emulació del botó del mig» i perquè funcioni haurà d'estar acceptat pel vostre sistema operatiu.</para
+></footnote
+>.</para>
+
+</glossdef>
+</glossentry>
+
+</glossary>
+
+&documentation.index;
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+End:
+-->
+

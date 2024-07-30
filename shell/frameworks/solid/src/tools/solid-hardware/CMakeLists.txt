@@ -1,0 +1,7 @@
+add_executable(solid-hardware6 solid-hardware.cpp)
+ecm_mark_nongui_executable(solid-hardware6)
+target_link_libraries(solid-hardware6 PUBLIC KF6::Solid)
+if (HAVE_DBUS)
+  target_link_libraries(solid-hardware6 PRIVATE Qt6::DBus)
+endif()
+install(TARGETS solid-hardware6 ${KF_INSTALL_TARGETS_DEFAULT_ARGS})

@@ -1,0 +1,379 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Swedish "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>KDE användarhandbok</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>2010-09-18</date>
+<productname
+>K-skrivbordsmiljön</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Kör ett program med förhöjda rättigheter</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> kommando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> fil</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> ikonnamn</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioritet</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> användare</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> fönster-id</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Allmänna &kde;-väljare</arg
+> <arg choice="opt"
+>Allmänna &Qt;-väljare</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beskrivning</title>
+<para
+>&kdesu; är ett grafiskt gränssnitt för &UNIX;-kommandot <command
+>su</command
+> för K-skrivbordsmiljön. Det låter dig köra ett program som en annan användare, genom att tillhandahålla ett lösenord för den användaren. &kdesu; är ett program utan privilegier: Det använder systemets <command
+>su</command
+>.</para>
+
+<para
+>&kdesu; har ytterligare en funktion: Det kan valfritt komma ihåg lösenord åt dig. Om du använder funktionen behöver du bara skriva in lösenordet första gången för varje kommando.</para>
+
+<para
+>Programmet är avsett att startas från kommandoraden eller från <filename
+>.desktop</filename
+>-filer.</para>
+
+<para
+>Eftersom <command
+>kdesu</command
+> inte längre installeras i <userinput
+> $(kf5-config --prefix)</userinput
+>/bin utan i <userinput
+>kf5-config --path libexec</userinput
+> och därigenom inte ingår i <envar
+>Path</envar
+>, måste man använda <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> för att starta <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Väljare</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>kommando</replaceable
+></option
+></term>
+<listitem
+><para
+>Det här anger kommandot att köra som systemadministratör. Det måste skickas i ett argument. Om du till exempel vill starta en ny filhanterare, skulle du skriva in: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Visa felsökningsinformation.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fil</replaceable
+></option
+></term>
+<listitem
+><para
+>Väljaren gör det möjligt att använda &kdesu; effektivt i <filename
+>.desktop</filename
+>-filer. Den talar om för &kdesu; att undersöka filen angiven av <parameter
+>fil</parameter
+>. Om filen är skrivbar av den aktuella användaren, körs kommandot som aktuell användare. Om den inte är skrivbar, körs kommandot som användaren <parameter
+>användare</parameter
+> (förvald som systemadministratör).</para>
+<para
+><parameter
+>fil</parameter
+> utvärderas så här: om <parameter
+>fil</parameter
+> börjar med <literal
+>/</literal
+>, tolkas den som ett absolut filnamn. Annars tolkas den som namnet på en global &kde;-inställningsfil.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ikonnamn</replaceable
+></term>
+<listitem
+><para
+>Ange ikon att använda i lösenordsdialogrutan. Du kan ange bara namnet, utan någon filändelse.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Behåll inte lösenordet. Det inaktiverar kryssrutan <guilabel
+>behåll lösenord </guilabel
+> i lösenordsdialogrutan.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></term>
+<listitem>
+<para
+>Ange prioritetsvärde. Prioriteten är ett godtyckligt tal mellan 0 och 100, där 100 betyder högst prioritet och 0 betyder lägst. Förval är 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Använd realtidsschemaläggning.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Stoppa kdesu-demonen. Det är demonen som lagrar lyckade lösenord i bakgrunden. Funktionen kan också inaktiveras med <option
+>-n</option
+> när &kdesu; körs för första gången.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Aktiver terminalutmatning. Det inaktiverar att behålla lösenord. Det är i stort sett till för avlusning. Om du vill köra ett program i terminalen, använd det vanliga kommandot <command
+>su</command
+> istället.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> användare</replaceable
+></term>
+<listitem
+><para
+>Även om den vanligaste användningen av &kdesu; är att köra ett kommando som systemadministratör, kan du ange vilket användarnamn som helst och lämpligt lösenord.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Visa inte knappen Ignorera.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> fönster-id</replaceable
+></term>
+<listitem
+><para
+>Gör dialogrutan tillfällig för ett X-program som anges av fönster-id.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Se också</title>
+<para
+>su(1)</para>
+
+<para
+>Mer detaljerad användardokumentation är tillgänglig med <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (skriv antingen in webbadressen i &konqueror;, eller kör <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Exempel</title>
+<para
+>Kör <command
+>kfmclient</command
+> som användaren <systemitem class="username"
+>jim</systemitem
+>, och visa &konqueror;s ikon i lösenordsdialogrutan:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jim</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Upphovsmän</title>
+<para
+>&kdesu; är skrivet av &Geert.Jansen; &Geert.Jansen.mail; och <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

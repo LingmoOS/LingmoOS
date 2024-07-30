@@ -1,0 +1,63 @@
+How do providers, categories, feeds and entries correlate?
+And authors on top of that?
+
+Authors are simple: each entry is linked to one author, even if the
+author is the same the objects differ. We can change this in the future,
+right now there is no need to do that.
+The other objects are a bit more difficult.
+
+DXS: provider -> category -> feed/list -> entries
+GHNS: provider -> feed [with categories] -> entries
+
+Example
+-------
+
+The maintainer of an application offers extensions in the categories
+"image" and "script". Since the application has a lot of users, both
+kde-coolextensions.org and kde-betterextensions.org offer such extensions.
+The provider.xml file would thus contain the two <provider>s. When fetching
+the feed files for most popular/most downloaded/most recent, those files
+need to contain entries of *all* categories! A workaround is to add virtual
+providers for each category (there won't be much difference in the UI), but
+ideally with frameworks such as Hotstuff the right number of items will be
+inserted into the feed.
+With DXS, the problem doesn't exist since DXS fetches all categories first
+and then the feeds for each category. DXS also allows to retrieve all entries
+of a certain category, so it is much more flexible in general.
+
+GHNS setup:
+-----------
+ provider kde-coolextensions.org
+  feed most-recent
+   entry a [category image]
+   entry b [category script]
+   ...
+  feed most-downloaded
+  ...
+ provider kde-betterextensions.org
+  ...
+
+Alternative GHNS setup:
+-----------------------
+ provider kde-coolextensions.org/image
+  feed most-recent
+   entry a [image]
+   entry c [image]
+   ..
+  ..
+ provider kde-coolextensions.org/script
+  ...
+
+DXS setup:
+----------
+ provider kde-coolextensions.org
+  category image
+   feed most-recent
+    entry a [image]
+    entry c [image]
+    ...
+   ...
+  ...
+ provider kde-betterextensions.org
+  ...
+

@@ -1,0 +1,128 @@
+/*
+ *  SPDX-FileCopyrightText: 2018 Marco Martin <mart@kde.org>
+ *
+ *  SPDX-License-Identifier: LGPL-2.0-or-later
+ */
+
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Templates as T
+import org.kde.lingmoui as LingmoUI
+
+/**
+ * A AbstractCard is the base for cards. A Card is a visual object that serves
+ * as an entry point for more detailed information. An abstractCard is empty,
+ * providing just the look and the base properties and signals for an ItemDelegate.
+ * It can be filled with any custom layout of items, its content is organized
+ * in 3 properties: header, contentItem and footer.
+ * Use this only when you need particular custom contents, for a standard layout
+ * for cards, use the Card component.
+ *
+ * @see Card
+ * @inherit QtQuick.Controls.ItemDelegate
+ * @since 2.4
+ */
+T.ItemDelegate {
+    id: root
+
+//BEGIN properties
+    /**
+     * @brief This property holds an item that serves as a header.
+     *
+     * This item will be positioned on top if headerOrientation is ``Qt.Vertical``
+     * or on the left if it is ``Qt.Horizontal``.
+     */
+    property alias header: headerFooterLayout.header
+
+    /**
+     * @brief This property sets the card's orientation.
+     *
+     * * ``Qt.Vertical``: the header will be positioned on top
+     * * ``Qt.Horizontal``: the header will be positioned on the left (or right if an RTL layout is used)
+     *
+     * default: ``Qt.Vertical``
+     *
+     * @property Qt::Orientation headerOrientation
+     */
+    property int headerOrientation: Qt.Vertical
+
+    /**
+     * @brief This property holds an item that serves as a footer.
+     *
+     * This item will be positioned at the bottom if headerOrientation is ``Qt.Vertical``
+     * or on the right if it is ``Qt.Horizontal``.
+     */
+    property alias footer: headerFooterLayout.footer
+
+    /**
+     * @brief This property sets whether clicking or tapping on the card area shows a visual click feedback.
+     *
+     * Use this if you want to do an action in the onClicked signal handler of the card.
+     *
+     * default: ``false``
+     */
+    property bool showClickFeedback: false
+
+//END properties
+
+    Layout.fillWidth: true
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            outerPaddingLayout.implicitWidth)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             outerPaddingLayout.implicitHeight)
+
+    hoverEnabled: !LingmoUI.Settings.tabletMode && showClickFeedback
+
+    LingmoUI.Theme.inherit: false
+    LingmoUI.Theme.colorSet: LingmoUI.Theme.View
+
+    width: ListView.view ? ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin : undefined
+    padding: LingmoUI.Units.largeSpacing
+
+    // Card component repurposes control's contentItem property, so it has to
+    // reimplement content layout and its padding manually.
+    LingmoUI.Padding {
+        id: outerPaddingLayout
+
+        anchors.fill: parent
+
+        topPadding: root.topPadding
+        leftPadding: root.leftPadding
+        rightPadding: root.rightPadding
+        bottomPadding: root.bottomPadding
+
+        contentItem: LingmoUI.HeaderFooterLayout {
+            id: headerFooterLayout
+
+            contentItem: LingmoUI.Padding {
+                id: innerPaddingLayout
+
+                contentItem: root.contentItem
+
+                // Hide it altogether, so that vertical padding won't be
+                // included in control's total implicit height.
+                visible: contentItem !== null
+
+                topPadding: headerFooterLayout.header ? LingmoUI.Units.largeSpacing : 0
+                bottomPadding: headerFooterLayout.footer ? LingmoUI.Units.largeSpacing : 0
+            }
+        }
+    }
+
+    // HACK: A Control like this ItemDelegate tries to manage its
+    // contentItem's positioning, so we need to override that. This is
+    // equivalent to declaring x/y/width/height bindings in QQC2 style
+    // implementations.
+    Connections {
+        target: root.contentItem
+
+        function onXChanged() {
+            root.contentItem.x = 0;
+        }
+
+        function onYChanged() {
+            root.contentItem.y = Qt.binding(() => innerPaddingLayout.topPadding);
+        }
+    }
+}

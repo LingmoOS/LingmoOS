@@ -1,0 +1,38 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:@Gradle_ANDROID_GRADLE_PLUGIN_VERSION@'
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion @ANDROID_SDK_COMPILE_API@
+    buildToolsVersion '@ANDROID_SDK_BUILD_TOOLS_REVISION@'
+
+    sourceSets {
+        main {
+            manifest.srcFile '@CMAKE_CURRENT_SOURCE_DIR@/AndroidManifest.xml'
+            java.srcDirs = ['@CMAKE_CURRENT_SOURCE_DIR@/org']
+       }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    defaultConfig {
+        minSdkVersion @ANDROID_API_LEVEL@
+        targetSdkVersion @ANDROID_SDK_COMPILE_API@
+    }
+}

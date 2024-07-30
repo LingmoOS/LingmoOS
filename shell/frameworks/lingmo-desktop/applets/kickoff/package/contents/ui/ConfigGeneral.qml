@@ -1,0 +1,308 @@
+/*
+    SPDX-FileCopyrightText: 2013 David Edmundson <davidedmundson@kde.org>
+    SPDX-FileCopyrightText: 2021 Mikel Johnson <mikel5764@gmail.com>
+    SPDX-FileCopyrightText: 2022 Nate Graham <nate@kde.org>
+    SPDX-FileCopyrightText: 2022 ivan tkachenko <me@ratijas.tk>
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+*/
+
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+
+import org.kde.lingmo.core as LingmoCore
+import org.kde.ksvg as KSvg
+import org.kde.iconthemes as KIconThemes
+import org.kde.lingmoui as LingmoUI
+import org.kde.kcmutils as KCM
+import org.kde.config as KConfig
+import org.kde.lingmo.plasmoid
+import org.kde.kcmutils as KCM
+
+import "code/tools.js" as Tools
+
+KCM.SimpleKCM {
+    id: root
+
+    property string cfg_menuLabel: menuLabel.text
+    property string cfg_icon: Plasmoid.configuration.icon
+    property bool cfg_paneSwap: Plasmoid.configuration.paneSwap
+    property int cfg_favoritesDisplay: Plasmoid.configuration.favoritesDisplay
+    property int cfg_applicationsDisplay: Plasmoid.configuration.applicationsDisplay
+    property alias cfg_alphaSort: alphaSort.checked
+    property var cfg_systemFavorites: String(Plasmoid.configuration.systemFavorites)
+    property int cfg_primaryActions: Plasmoid.configuration.primaryActions
+    property alias cfg_showActionButtonCaptions: showActionButtonCaptions.checked
+    property alias cfg_compactMode: compactModeCheckbox.checked
+
+    LingmoUI.FormLayout {
+        QQC2.Button {
+            id: iconButton
+
+            LingmoUI.FormData.label: i18n("Icon:")
+
+            implicitWidth: previewFrame.width + LingmoUI.Units.smallSpacing * 2
+            implicitHeight: previewFrame.height + LingmoUI.Units.smallSpacing * 2
+            hoverEnabled: true
+
+            Accessible.name: i18nc("@action:button", "Change Application Launcher's icon")
+            Accessible.description: i18nc("@info:whatsthis", "Current icon is %1. Click to open menu to change the current icon or reset to the default icon.", root.cfg_icon)
+            Accessible.role: Accessible.ButtonMenu
+
+            QQC2.ToolTip.delay: LingmoUI.Units.toolTipDelay
+            QQC2.ToolTip.text: i18nc("@info:tooltip", "Icon name is \"%1\"", root.cfg_icon)
+            QQC2.ToolTip.visible: iconButton.hovered && root.cfg_icon.length > 0
+
+            KIconThemes.IconDialog {
+                id: iconDialog
+                onIconNameChanged: {
+                    root.cfg_icon = iconName || Tools.defaultIconName;
+                }
+            }
+
+            onPressed: iconMenu.opened ? iconMenu.close() : iconMenu.open()
+
+            KSvg.FrameSvgItem {
+                id: previewFrame
+                anchors.centerIn: parent
+                imagePath: Plasmoid.formFactor === LingmoCore.Types.Vertical || Plasmoid.formFactor === LingmoCore.Types.Horizontal
+                        ? "widgets/panel-background" : "widgets/background"
+                width: LingmoUI.Units.iconSizes.large + fixedMargins.left + fixedMargins.right
+                height: LingmoUI.Units.iconSizes.large + fixedMargins.top + fixedMargins.bottom
+
+                LingmoUI.Icon {
+                    anchors.centerIn: parent
+                    width: LingmoUI.Units.iconSizes.large
+                    height: width
+                    source: Tools.iconOrDefault(Plasmoid.formFactor, root.cfg_icon)
+                }
+            }
+
+            QQC2.Menu {
+                id: iconMenu
+
+                // Appear below the button
+                y: parent.height
+
+                QQC2.MenuItem {
+                    text: i18nc("@item:inmenu Open icon chooser dialog", "Choose…")
+                    icon.name: "document-open-folder"
+                    Accessible.description: i18nc("@info:whatsthis", "Choose an icon for Application Launcher")
+                    onClicked: iconDialog.open()
+                }
+                QQC2.MenuItem {
+                    text: i18nc("@item:inmenu Reset icon to default", "Reset to default icon")
+                    icon.name: "edit-clear"
+                    enabled: root.cfg_icon !== Tools.defaultIconName
+                    onClicked: root.cfg_icon = Tools.defaultIconName
+                }
+                QQC2.MenuItem {
+                    text: i18nc("@action:inmenu", "Remove icon")
+                    icon.name: "delete"
+                    enabled: root.cfg_icon !== "" && menuLabel.text && Plasmoid.formFactor !== LingmoCore.Types.Vertical
+                    onClicked: root.cfg_icon = ""
+                }
+            }
+        }
+
+        LingmoUI.ActionTextField {
+            id: menuLabel
+            enabled: Plasmoid.formFactor !== LingmoCore.Types.Vertical
+            LingmoUI.FormData.label: i18nc("@label:textbox", "Text label:")
+            text: Plasmoid.configuration.menuLabel
+            placeholderText: i18nc("@info:placeholder", "Type here to add a text label")
+            onTextEdited: {
+                root.cfg_menuLabel = menuLabel.text
+
+                // This is to make sure that we always have a icon if there is no text.
+                // If the user remove the icon and remove the text, without this, we'll have no icon and no text.
+                // This is to force the icon to be there.
+                if (!menuLabel.text) {
+                    root.cfg_icon = root.cfg_icon || Tools.defaultIconName
+                }
+            }
+            rightActions: QQC2.Action {
+                icon.name: "edit-clear"
+                enabled: menuLabel.text !== ""
+                text: i18nc("@action:button", "Reset menu label")
+                onTriggered: {
+                    menuLabel.clear()
+                    root.cfg_menuLabel = ""
+                    root.cfg_icon = root.cfg_icon || Tools.defaultIconName
+                }
+            }
+        }
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.maximumWidth: LingmoUI.Units.gridUnit * 25
+            visible: Plasmoid.formFactor === LingmoCore.Types.Vertical
+            text: i18nc("@info", "A text label cannot be set when the Panel is vertical.")
+            wrapMode: Text.Wrap
+            font: LingmoUI.Theme.smallFont
+        }
+
+        Item {
+            LingmoUI.FormData.isSection: true
+        }
+
+        QQC2.CheckBox {
+            id: alphaSort
+            LingmoUI.FormData.label: i18nc("General options", "General:")
+            text: i18n("Always sort applications alphabetically")
+        }
+
+        QQC2.CheckBox {
+            id: compactModeCheckbox
+            text: i18n("Use compact list item style")
+            checked: LingmoUI.Settings.tabletMode ? true : Plasmoid.configuration.compactMode
+            enabled: !LingmoUI.Settings.tabletMode
+        }
+        QQC2.Label {
+            visible: LingmoUI.Settings.tabletMode
+            text: i18nc("@info:usagetip under a checkbox when Touch Mode is on", "Automatically disabled when in Touch Mode")
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+            font: LingmoUI.Theme.smallFont
+        }
+
+        QQC2.Button {
+            enabled: KConfig.KAuthorized.authorizeControlModule("kcm_lingmosearch")
+            icon.name: "settings-configure"
+            text: i18nc("@action:button", "Configure Enabled Search Plugins…")
+            onClicked: KCM.KCMLauncher.openSystemSettings("kcm_lingmosearch")
+        }
+
+        Item {
+            LingmoUI.FormData.isSection: true
+        }
+
+        QQC2.RadioButton {
+            id: paneSwapOff
+            LingmoUI.FormData.label: i18n("Sidebar position:")
+            text: mirrored ? i18n("Right") : i18n("Left")
+            QQC2.ButtonGroup.group: paneSwapGroup
+            property int index: 0
+            checked: !Plasmoid.configuration.paneSwap
+        }
+
+        QQC2.RadioButton {
+            id: paneSwapOn
+            text: mirrored ? i18n("Left") : i18n("Right")
+            QQC2.ButtonGroup.group: paneSwapGroup
+            property int index: 1
+            checked: Plasmoid.configuration.paneSwap
+        }
+
+        QQC2.RadioButton {
+            id: showFavoritesInGrid
+            LingmoUI.FormData.label: i18n("Show favorites:")
+            text: i18nc("Part of a sentence: 'Show favorites in a grid'", "In a grid")
+            QQC2.ButtonGroup.group: favoritesDisplayGroup
+            property int index: 0
+            checked: Plasmoid.configuration.favoritesDisplay === index
+        }
+
+        QQC2.RadioButton {
+            id: showFavoritesInList
+            text: i18nc("Part of a sentence: 'Show favorites in a list'", "In a list")
+            QQC2.ButtonGroup.group: favoritesDisplayGroup
+            property int index: 1
+            checked: Plasmoid.configuration.favoritesDisplay === index
+        }
+
+        QQC2.RadioButton {
+            id: showAppsInGrid
+            LingmoUI.FormData.label: i18n("Show other applications:")
+            text: i18nc("Part of a sentence: 'Show other applications in a grid'", "In a grid")
+            QQC2.ButtonGroup.group: applicationsDisplayGroup
+            property int index: 0
+            checked: Plasmoid.configuration.applicationsDisplay === index
+        }
+
+        QQC2.RadioButton {
+            id: showAppsInList
+            text: i18nc("Part of a sentence: 'Show other applications in a list'", "In a list")
+            QQC2.ButtonGroup.group: applicationsDisplayGroup
+            property int index: 1
+            checked: Plasmoid.configuration.applicationsDisplay === index
+        }
+
+        Item {
+            LingmoUI.FormData.isSection: true
+        }
+
+        QQC2.RadioButton {
+            id: powerActionsButton
+            LingmoUI.FormData.label: i18n("Show buttons for:")
+            text: i18n("Power")
+            QQC2.ButtonGroup.group: radioGroup
+            property string actions: "suspend,hibernate,reboot,shutdown"
+            property int index: 0
+            checked: Plasmoid.configuration.primaryActions === index
+        }
+
+        QQC2.RadioButton {
+            id: sessionActionsButton
+            text: i18n("Session")
+            QQC2.ButtonGroup.group: radioGroup
+            property string actions: "lock-screen,logout,save-session,switch-user"
+            property int index: 1
+            checked: Plasmoid.configuration.primaryActions === index
+        }
+
+        QQC2.RadioButton {
+            id: allActionsButton
+            text: i18n("Power and session")
+            QQC2.ButtonGroup.group: radioGroup
+            property string actions: "lock-screen,logout,save-session,switch-user,suspend,hibernate,reboot,shutdown"
+            property int index: 3
+            checked: Plasmoid.configuration.primaryActions === index
+        }
+
+        QQC2.CheckBox {
+            id: showActionButtonCaptions
+            text: i18n("Show action button captions")
+        }
+    }
+
+    QQC2.ButtonGroup {
+        id: paneSwapGroup
+        onCheckedButtonChanged: {
+            if (checkedButton) {
+                root.cfg_paneSwap = checkedButton.index === 1
+            }
+        }
+    }
+
+    QQC2.ButtonGroup {
+        id: favoritesDisplayGroup
+        onCheckedButtonChanged: {
+            if (checkedButton) {
+                root.cfg_favoritesDisplay = checkedButton.index
+            }
+        }
+    }
+
+    QQC2.ButtonGroup {
+        id: applicationsDisplayGroup
+        onCheckedButtonChanged: {
+            if (checkedButton) {
+                root.cfg_applicationsDisplay = checkedButton.index
+            }
+        }
+    }
+
+    QQC2.ButtonGroup {
+        id: radioGroup
+        onCheckedButtonChanged: {
+            if (checkedButton) {
+                root.cfg_primaryActions = checkedButton.index
+                root.cfg_systemFavorites = checkedButton.actions
+            }
+        }
+    }
+}

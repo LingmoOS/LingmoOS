@@ -1,0 +1,187 @@
+% ConTeXt test file for Kate's syntax highlighting and code folding
+
+
+%% Comments
+%   This is a comment
+\%  Not a comment
+\\% This is a comment
+
+% Titles should be bold
+\subject<beginfold id='1'>{</beginfold id='1'>Subject<endfold id='1'>}</endfold id='1'>
+\subsubject<beginfold id='1'>{</beginfold id='1'>Sub-subject<endfold id='1'>}</endfold id='1'>
+\subsubsubject<beginfold id='1'>{</beginfold id='1'>Sub-sub-subject<endfold id='1'>}</endfold id='1'>
+\subsubsubsubject<beginfold id='1'>{</beginfold id='1'>Sub-sub-sub-subject<endfold id='1'>}</endfold id='1'>
+\subsubsubsubsubject<beginfold id='1'>{</beginfold id='1'>Sub-sub-sub-sub-subject<endfold id='1'>}</endfold id='1'>
+\section<beginfold id='1'>{</beginfold id='1'>Section<endfold id='1'>}</endfold id='1'>
+\subsection<beginfold id='1'>{</beginfold id='1'>Sub-section<endfold id='1'>}</endfold id='1'>
+\subsubsection<beginfold id='1'>{</beginfold id='1'>Sub-sub-section<endfold id='1'>}</endfold id='1'>
+\subsubsubsection<beginfold id='1'>{</beginfold id='1'>Sub-sub-sub-section<endfold id='1'>}</endfold id='1'>
+\subsubsubsubsection<beginfold id='1'>{</beginfold id='1'>Sub-sub-sub-sub-section<endfold id='1'>}</endfold id='1'>
+
+%% Start/stop blocks
+<beginfold id='1'>\startsection</beginfold id='1'>
+Can be nested
+<beginfold id='1'>\startitemize</beginfold id='1'>
+\item normal
+<endfold id='1'>\stopitemize</endfold id='1'>
+normal
+<endfold id='1'>\stopsection</endfold id='1'>
+% \startblock \stopblock should be comments
+
+
+%% Commands
+\def<beginfold id='1'>\startstuff</beginfold id='1'><beginfold id='1'>{</beginfold id='1'>Custom environment start<endfold id='1'>}</endfold id='1'>
+\def<endfold id='1'>\stopstuff</endfold id='1'><beginfold id='1'>{</beginfold id='1'>Custom environment stop<endfold id='1'>}</endfold id='1'>
+<beginfold id='1'>\startstuff</beginfold id='1'> should not be normal command colour (it is an error to miss <endfold id='1'>\stopstuff</endfold id='1'>)
+
+\def\sayHello<beginfold id='1'>{</beginfold id='1'>Héllò Wø®łÐ<endfold id='1'>}</endfold id='1'>
+% This prints Héllò Wø®łÐ@@@ , If it were \sayHelloAAA it would be
+% an error, so the @ is not in the macro
+\sayHello@@@
+
+\def\testUnderscores<beginfold id='1'>{</beginfold id='1'>Text_With_Underscores<endfold id='1'>}</endfold id='1'>
+% This prints Text_With_Underscores_ note the final underscore and no error
+\testUnderscores_
+
+\def\€<beginfold id='1'>{</beginfold id='1'>Macro with sign<endfold id='1'>}</endfold id='1'>
+% This is a single macro
+\€ % This prints Macro with sign
+\€A % This prints Macro with signA   (not an error)
+
+\setupindenting[yes, big]
+
+
+%% Inline math
+$equations are green, \commands somewhat darker
+it can also run over multiple lines
+% Comment
+$
+normal
+\mathematics{equations are green, \commands somewhat darker
+it can also run over multiple lines
+\mathematics{nested math should be green} this should still be green
+% Comment
+}
+normal
+\math{equations are green, \commands somewhat darker
+it can also run over multiple lines
+\math{nested math should be green} this should still be green
+% Comment
+}
+normal
+\m{equations are green, \commands somewhat darker
+it can also run over multiple lines
+\m{nested math should be green} this should still be green
+% Comment
+}
+normal
+\mathematics the first character should be green <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+\math        the first character should be green <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+\m           the first character should be green <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+\formula     the first character should be green <beginfold id='1'>{</beginfold id='1'><endfold id='1'>}</endfold id='1'>
+normal
+% $should$ \mathematics{still} \math{be} \m{commented}
+
+% The underscore after sum should be blue, not macro color
+Math macro with underscores \m { v = \sum_0^1{ \sqrt{2} }! }
+
+%% Display math
+$$
+equations are green, \commands somewhat darker
+it can also run over multiple lines
+% Comment
+$$
+normal
+<beginfold id='2'>\startformula</beginfold id='2'>
+equations are green, \commands somewhat darker
+it can also run over multiple lines
+% Comment
+
+Nested formulae should not work
+The following should be red:
+\startformula
+Should still be math colour
+<endfold id='2'>\stopformula</endfold id='2'>
+normal
+
+% This is a regular macro, not math macro
+\def\mathematicsMacroShouldNotMatchThis<beginfold id='1'>{</beginfold id='1'>Not Math<endfold id='1'>}</endfold id='1'>
+
+%% Verbatim
+<beginfold id='3'>\starttyping</beginfold id='3'>
+All text in here should be verbatim colour
+% This should not be a comment
+&@@#^%&^#$
+
+Nested typing should be displayed in verbatim colour
+\starttyping
+\stoptyping
+should still be verbatim colour
+% This should not be a comment
+<endfold id='3'>\stoptyping</endfold id='3'>
+
+normal
+
+
+%% Tables
+<beginfold id='1'>\starttabulate</beginfold id='1'>[|c|c|c|]
+\FL
+\NC header1 \NC header2 \NC header3 \NR
+\ML
+\NC value1 \NC value2 \NC value3 \NR
+\NC value4 \NC value5 \NC value6 \NR
+\BL
+<endfold id='1'>\stoptabulate</endfold id='1'>
+
+Commands for TABLE environment (<beginfold id='1'>\bTABLE</beginfold id='1'> and <endfold id='1'>\eTABLE</endfold id='1'>, <beginfold id='1'>\bTD</beginfold id='1'> and <endfold id='1'>\eTD</endfold id='1'>, etc.) should emulate start/stop blocks
+<beginfold id='1'>\bTABLE</beginfold id='1'>[split=yes]
+  <beginfold id='1'>\bTR</beginfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value1 <endfold id='1'>\eTD</endfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value2 <endfold id='1'>\eTD</endfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value3 <endfold id='1'>\eTD</endfold id='1'> <endfold id='1'>\eTR</endfold id='1'>
+  <beginfold id='1'>\bTR</beginfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value4 <endfold id='1'>\eTD</endfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value5 <endfold id='1'>\eTD</endfold id='1'> <beginfold id='1'>\bTD</beginfold id='1'> value6 <endfold id='1'>\eTD</endfold id='1'> <endfold id='1'>\eTR</endfold id='1'>
+<endfold id='1'>\eTABLE</endfold id='1'>
+
+<beginfold id='1'>\startxtable</beginfold id='1'>
+  <beginfold id='1'>\startxrow</beginfold id='1'>
+    <beginfold id='1'>\startxcell</beginfold id='1'> value1 <endfold id='1'>\stopxcell</endfold id='1'>
+    <beginfold id='1'>\startxcell</beginfold id='1'> value2 <endfold id='1'>\stopxcell</endfold id='1'>
+  <endfold id='1'>\stopxrow</endfold id='1'>
+  <beginfold id='1'>\startxrow</beginfold id='1'>
+    <beginfold id='1'>\startxcell</beginfold id='1'> value3 <endfold id='1'>\stopxcell</endfold id='1'>
+    <beginfold id='1'>\startxcell</beginfold id='1'> value5 <endfold id='1'>\stopxcell</endfold id='1'>
+  <endfold id='1'>\stopxrow</endfold id='1'>
+<endfold id='1'>\stopxtable</endfold id='1'>
+
+
+
+\subject<beginfold id='1'>{</beginfold id='1'> Languajes directly usable in \CONTEXT <endfold id='1'>}</endfold id='1'>
+
+% These three sould have their own separate syntax highlighting
+
+<beginfold id='4'>\startluacode</beginfold id='4'>
+    context.chapter(<beginfold id='5'>{</beginfold id='5'>first<endfold id='5'>}</endfold id='5'>, "Some title")
+    context.startcolumns(<beginfold id='5'>{</beginfold id='5'>n = 3, rule = "on"<endfold id='5'>}</endfold id='5'>)
+        context("Hello one")
+    context.column()
+        context("Hello two")
+    context.column()
+        context("Hello three")
+    context.stopcolumns()
+<endfold id='4'>\stopluacode</endfold id='4'>
+
+<beginfold id='6'>\startMPcode</beginfold id='6'>
+    transform pagecoords;
+    pagecoords := identity scaled 10mm shifted (100mm,150mm);
+    fill ( (0,0) -- (2,0) -- (2,1) -- (1,1) -- (1,2) -- cycle )
+        transformed pagecoords withcolor green;
+    draw ( (2,0) .. (2,1) .. (1,1) .. (1,2) .. (0,2) )
+        transformed pagecoords;
+    drawarrow ( (0,0) -- (2,2) ) transformed pagecoords;
+<endfold id='6'>\stopMPcode</endfold id='6'>
+
+<beginfold id='7'>\startXML</beginfold id='7'>
+<beginfold id='8'><</beginfold id='8'>context name="MathModeMacroFind" attribute="Math" lineEndContext="#stay">
+    <beginfold id='8'><</beginfold id='8'>DetectChar char="{"              attribute="Brace" context="#pop!MathModeMacro"<endfold id='8'>/></endfold id='8'>
+    <beginfold id='8'><</beginfold id='8'>RegExpr    String="&macro_math;" attribute="Macro" context="#pop"<endfold id='8'>/></endfold id='8'> <beginfold id='9'><!--</beginfold id='9'> 1 token <endfold id='9'>--></endfold id='9'>
+    <beginfold id='8'><</beginfold id='8'>RegExpr    String="[[:graph:]]"  attribute="Math"  context="#pop"<endfold id='8'>/></endfold id='8'> <beginfold id='9'><!--</beginfold id='9'> 1 token <endfold id='9'>--></endfold id='9'>
+</context<endfold id='8'>></endfold id='8'>
+<endfold id='7'>\stopXML</endfold id='7'>
+

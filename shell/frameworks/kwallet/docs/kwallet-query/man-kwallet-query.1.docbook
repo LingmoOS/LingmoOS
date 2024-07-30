@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE 
+refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd"
+[
+  <!ENTITY % English "INCLUDE"><!-- change language only here -->
+]>
+<refentry lang="&language;">
+  <refentryinfo>
+    <title>kwallet-query(1)</title>
+    <author>
+      <firstname>Valentin</firstname>
+      <surname>Rusu</surname>
+      <contrib>Original author</contrib>
+      <address>
+        <email>kde@rusu.info</email>
+      </address>
+    </author>
+    <date>2015-06-14</date>
+    <releaseinfo>Frameworks 5.11</releaseinfo>
+    <productname>KDE Frameworks</productname>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>kwallet-query</refentrytitle>
+    <manvolnum>1</manvolnum>
+    <refmiscinfo class="source">&#160;</refmiscinfo>
+    <refmiscinfo class="manual">&#160;</refmiscinfo>
+  </refmeta>
+  <refnamediv>
+    <refname>kwallet-query</refname>
+    <refpurpose>&kde; Wallet command-line manipulation tool</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv id="_synopsis">
+    <simpara>
+      <emphasis role="strong">kwallet-query</emphasis>
+      <emphasis>OPTIONS</emphasis>
+      <emphasis>wallet</emphasis>
+    </simpara>
+  </refsynopsisdiv>
+  <refsect1 id="_description">
+    <title>DESCRIPTION</title>
+    <simpara><command>kwallet-query</command> comes in handy when shell scripts need to read or update the &kde; Wallet. It works by manipulating the entries displayed in the <emphasis role="strong">&kde; Wallet Manager</emphasis> utility. It&#8217;s only parameter is the <emphasis>wallet</emphasis>name the tool should read or update. The operation mode is specified by the options.</simpara>
+  </refsect1>
+  <refsect1 id="_options">
+    <title>OPTIONS</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-h,--help</emphasis>
+        </term>
+        <listitem>
+          <simpara>Display a short help message.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-l,--list-entries</emphasis>
+        </term>
+        <listitem>
+          <simpara>List password entries. These are the folder names displayed in the <emphasis role="strong">&kde; Wallet Manager</emphasis> utility. If the <emphasis role="strong">-f</emphasis> option is given, this will only display the subfolders of the specified folder.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-r,--read-password</emphasis>
+          <emphasis>Entry</emphasis>
+        </term>
+        <listitem>
+          <simpara>Read the contents of the given <emphasis>Entry</emphasis> from the <emphasis role="strong">Folder</emphasis>section of the <emphasis>wallet</emphasis> and output it on the standard output. Maps are exported as &JSON; object.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-w,--write-password</emphasis>
+          <emphasis>Entry</emphasis>
+        </term>
+        <listitem>
+          <simpara>Write secrets to the given <emphasis>Entry</emphasis> under the <emphasis role="strong">Folder</emphasis> section of the given <emphasis>wallet</emphasis>. The secrets are read from the standard input. Maps take in input a well-formed &JSON; object. <emphasis role="strong">IMPORTANT</emphasis> previous wallet entry value will be overwritten by this option, so be careful when using it!</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-f,--folder</emphasis>
+          <emphasis>Folder</emphasis>
+        </term>
+        <listitem>
+          <simpara>Set the <emphasis>wallet</emphasis> folder to <emphasis>Folder</emphasis> value. By default <emphasis role="strong">Passwords</emphasis> is used.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">-v,--verbose</emphasis>
+        </term>
+        <listitem>
+          <simpara>Output more information when performing the operation, to
+          help debugging.</simpara>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="_exit_status">
+    <title>EXIT STATUS</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">0</emphasis>
+        </term>
+        <listitem>
+          <simpara>Success.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">1</emphasis>
+        </term>
+        <listitem>
+          <simpara>The wallet
+          <emphasis>wallet</emphasis> was not found.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">2</emphasis>
+        </term>
+        <listitem>
+          <simpara>The wallet
+          <emphasis>wallet</emphasis> could not be opened. For example, that
+          would be an indication of a bad password entry or some other
+          problem with the &kde; Wallet system.</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">3</emphasis>
+        </term>
+        <listitem>
+          <simpara>The <emphasis role="strong">Folder</emphasis> section was not found inside the wallet <emphasis>wallet</emphasis>. Perhaps the wallet file is corrupt?</simpara>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <emphasis role="strong">4</emphasis>
+        </term>
+        <listitem>
+          <simpara>The read or write operation has failed for some
+          reason.</simpara>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="_bugs">
+    <title>BUGS</title>
+    <simpara>Please report all bugs on the &kde; bug reporting website:
+    bugs.kde.org. Be sure to select <quote>kwallet-query</quote> when submitting your
+    bug-report.</simpara>
+  </refsect1>
+  <refsect1 id="_author">
+    <title>AUTHOR</title>
+    <simpara><command>kwallet-query</command> was originally written by Valentin Rusu and is
+    part of &kde;.</simpara>
+  </refsect1>
+  <refsect1 id="_copying">
+    <title>COPYING</title>
+    <simpara>Copyright (C) 2015 Valentin Rusu. Free use of this software is
+    granted under the terms of the &GNU; General Public License
+    (GPL).</simpara>
+  </refsect1>
+</refentry>
+

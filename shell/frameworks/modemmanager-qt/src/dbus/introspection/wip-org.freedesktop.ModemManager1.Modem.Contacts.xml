@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Contacts:
+      @short_description: The ModemManager Contacts interface.
+
+      This interface provides access to contacts stored in various locations,
+      including SIM cards, device storage, and other locations. Operations
+      generally operate on all contacts regardless of their actual storage
+      location.
+
+      Contacts are referred to by index numbers, which are internal to
+      ModemManager and do not represent indexes of SIM cards or the device.
+      Indexes may not be contiguous.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Contacts">
+
+    <!--
+        Add:
+        @properties: Dictionary of properties describing the contact.
+        @index: The index number of the new contact
+
+        Add a new contact.
+
+        If any of the property in @properties exceeds the modem's size limit,
+        that property will be truncated to fit.
+
+        Known properties are:
+        <variablelist>
+          <varlistentry><term><literal>"name"</literal></term>
+            <listitem>
+              Full name of the contact, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"number"</literal></term>
+            <listitem>
+              Telephone number, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"email"</literal></term>
+            <listitem>
+              Email address, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"group"</literal></term>
+            <listitem>
+              Group this contact belongs to, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"name2"</literal></term>
+            <listitem>
+              Additional contact name, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"number2"</literal></term>
+            <listitem>
+              Additional contact telephone number, given as a string value
+              (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"hidden"</literal></term>
+            <listitem>
+              Boolean flag to specify whether this entry is hidden or not,
+              (signature <literal>"b"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"storage"</literal></term>
+            <listitem>
+              Phonebook in which the contact is stored, given as a
+              <link linkend="MMModemContactsStorage">MMModemContactsStorage</link>,
+              (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        The @index number is an internal private number to ModemManager and does
+        not correspond to the index of the contact in the modem or SIM itself.
+    -->
+    <method name="Add">
+      <arg name="properties" type="a{sv}" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+      </arg>
+      <arg name="index"      type="u"     direction="out" />
+    </method>
+
+    <!--
+        Delete:
+        @index: The index of the contact to delete.
+
+        Delete a contact.
+    -->
+    <method name="Delete">
+      <arg name="index" type="u" direction="in" />
+    </method>
+
+    <!--
+        Get:
+        @index: The index of the contact.
+        @properties: The properties of the contact.
+
+        Retrieve a contact.
+    -->
+    <method name="Get">
+      <arg name="index"      type="u"     direction="in"  />
+      <arg name="properties" type="a{sv}" direction="out">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
+      </arg>
+    </method>
+
+    <!--
+        List:
+        @results: An array of dictionaries, each dictionary representing a contact.
+
+        List all contacts.
+    -->
+    <method name="List">
+      <arg name="results" type="aa{sv}" direction="out">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMapList"/>
+      </arg>
+    </method>
+
+    <!--
+        Find:
+        @pattern: The pattern to search for.
+        @results: An array of dictionaries, each dictionary representing a contact.
+
+        Find a contact.
+    -->
+    <method name="Find">
+      <arg name="pattern" type="s"      direction="in"  />
+      <arg name="results" type="aa{sv}" direction="out">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMapList"/>
+      </arg>
+    </method>
+
+    <!--
+        GetCount:
+        @count: The number of contacts.
+
+        Get the number of contacts.
+    -->
+    <method name="GetCount">
+      <arg name="count" type="u" direction="out" />
+    </method>
+
+    <!--
+        Added:
+        @index: The index number of the new contact.
+        @properties: The properties of the contact.
+
+        Emitted when a new contact is added.
+    -->
+    <signal name="Added">
+      <arg name="index"      type="u"     />
+      <arg name="properties" type="a{sv}">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
+      </arg>
+    </signal>
+
+    <!--
+        Deleted:
+        @index: The index number of the now deleted contact.
+
+        Emitted when a new contact has been deleted.
+    -->
+    <signal name="Deleted">
+      <arg name="index" type="u" />
+    </signal>
+
+  </interface>
+</node>

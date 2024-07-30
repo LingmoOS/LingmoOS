@@ -1,0 +1,30 @@
+
+namespace KTextTemplate
+{
+
+/**
+
+  @page differences_django Differences between Django and KTextTemplate
+
+  There are several notable differences between Django and %KTextTemplate, which arise mostly due to different implementation languages and features of the %Qt framework.
+
+  Everything in python is a first class object, which means that django filter functions and tag functions can have properties and attributes. In %KTextTemplate, it is necessary to use classes to obtain the same effect, where Django uses only functions for filters. Additionally, C++ classes need to share an interface if they are to be treated the same way. This is not necessary in Django because python uses dynamic typing, and all methods behave similarly to virtual functions. %KTextTemplate uses the Abstract Factory pattern to achieve the same affect for tags, and a simple interface for filters.
+
+  Django tag libraries are loaded through normal python modules. This means that all libraries can be loaded dynamically. %KTextTemplate achieves the same effect by using the <a href="http://doc.trolltech.com/latest/plugins-howto.html">QtPlugin system</a> to load additional libraries dynamically.
+
+  In Django, any python object can be inserted into a Context. Then, methods which can change a class must have the '<tt>alters_data</tt>' attribute, so that rendering a template can not alter the objects being rendered. Objects in %KTextTemplate are only introspectable to a limited amount determined by <tt>Q_PROPERTIES</tt> defined in wrapper classes. Therefore, the programmer can decide which properties to make available to the template system by wrapping them or not. It is encouraged, but not enforced to make sure scriptable wrapper methods are const.
+
+  Django uses PHP datetime string format for the @gr_tag{now} tag, whereas %KTextTemplate uses QDateTime format.
+
+  The Django autoescape system is based on marking a string object as safe. In %Qt, this is not directly possible, so a wrapper class, KTextTemplate::SafeString is provided with several convenient operator overloads. This has (hopefully) minimal impact on plugin writers.
+
+  Django performs string escaping on the assumption that the output string is HTML. In %KTextTemplate it is possible to implement escaping for other markups and text outputs by reimplementing OutputStream::escape.
+
+  The Django <tt>dictsort</tt> filter only works on a list of dictionary-like-objects. In %KTextTemplate, is is possible to sort a list of any kinds of objects by any property of the objects. For example a list of QObjects can be sorted by a certain property, a list of lists can be sorted by size etc.
+
+  The Django cache system makes a lot of sense where templates are rendered in a fire-and-forget manner for a stateless protocol. It is not implemented in %KTextTemplate because we're generally not rendering similar templates from scratch multiple times and the templates can keep state for multiple uses.
+
+*/
+
+}
+

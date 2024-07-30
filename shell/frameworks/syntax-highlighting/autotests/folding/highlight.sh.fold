@@ -1,0 +1,588 @@
+#! /bin/sh
+# This is a test script for the Katepart Bash Syntax Highlighting by
+#	Wilbert Berendsen.  This is not runnable !!!
+
+
+# The highlighting recognizes basic types of input, and has a few special cases that
+# are all in FindCommands.  The main objective is to create really proper nesting of
+# (multiline) strings, variables, expressions, etc.
+
+
+
+# ============== Tests: ===============
+
+# basic types:
+echo 'single quoted string'
+echo "double quoted string"
+echo $'string with esc\apes\x0din it'
+echo $"string meant to be translated"
+echo "$"
+
+
+# comments:
+# this is a comment
+#this too
+echo this is#nt a comment
+dcop kate EditInterface#1 #this is
+grep -e "^default/linux/amd64/" |\ #this is not a comment but #this is
+mkdir this\ isnt\ #a\ comment
+mkdir this\ isnt\\\;#a\ comment
+mkdir this\\ #is a comment
+
+<<'#BLOCK-COMMENT'
+NOTE This is the "miltiline" comment.
+
+<beginfold id='1'>[===[.rst:</beginfold id='1'>
+
+Docs
+----
+
+Documentation block in ``RST`` format **starts** *here*.
+
+<endfold id='1'>]===]</endfold id='1'>
+#BLOCK-COMMENT
+
+: << '#SC2188'
+<beginfold id='1'>[====[.rst:</beginfold id='1'>
+The *multiline* comment does not trigger the SC2188_ warning of `shellcheck`.
+
+.. _SC2188: https://www.shellcheck.net/wiki/SC2188
+<endfold id='1'>]====]</endfold id='1'>
+
+... continue with _normal_ Bash comment.
+#SC2188
+
+# brace expansion
+mv my_file.{JPG,jpg}
+echo f.{01..100..3} f.{Z..a..-3}
+echo f.{01..100} f.{a..Z}
+# no brace expansion
+echo f.{..100} f.{1..Z} f.{a..Z..}
+
+
+# special characters are escaped:
+echo \(output\) \&\| \> \< \" \' \*
+
+
+# variable substitution:
+echo $filename.ext
+echo $filename_ext
+echo ${filename}_ext
+echo text${array[$subscript]}.text
+echo text${array["string"]}.text
+echo ${!prefix*}
+echo ${!redir} ${!3} ${!#} ${!##} ${!@###} ${!}
+echo short are $_, $$, $?, ${@}, etc.
+echo ${variable/a/d}
+echo ${1:-default}
+echo ${10} $10a # 9 is max
+
+
+# expression subst:
+echo <beginfold id='2'>$((</beginfold id='2'> cd << ed + 1 <endfold id='2'>))</endfold id='2'>
+
+
+# command subst:
+echo <beginfold id='3'>$(</beginfold id='3'>ls -l<endfold id='3'>)</endfold id='3'>
+echo `cat myfile`
+
+
+# file subst:
+echo <beginfold id='3'>$(</beginfold id='3'><$filename<endfold id='3'>)</endfold id='3'>
+echo <beginfold id='3'>$(</beginfold id='3'></path/to/myfile<endfold id='3'>)</endfold id='3'>
+
+# process subst:
+sort <(show_labels) | sed 's/a/bg' > my_file.txt 2>&1
+
+
+# All substitutions also work in strings:
+echo "subst ${in}side string"  'not $inside this ofcourse'
+echo "The result is <beginfold id='2'>$((</beginfold id='2'> $a + $b <endfold id='2'>))</endfold id='2'>. Thanks!"
+echo "Your homedir contains `ls $HOME |wc -l` files."
+
+
+# Escapes in strings:
+p="String \` with \$ escapes \" ";
+
+
+# keywords are black, builtins dark purple and common commands lighter purple
+set
+exit
+login
+
+
+# Other colorings:
+error() <beginfold id='4'>{</beginfold id='4'>
+	cat /usr/bin/lesspipe.sh
+	runscript >& redir.bak
+	exec 3>&4
+<endfold id='4'>}</endfold id='4'>
+
+
+# do - done make code blocks
+while <beginfold id='2'>[</beginfold id='2'> $p -lt $q <endfold id='2'>]</endfold id='2'>
+<beginfold id='5'>do</beginfold id='5'>
+	chown 0644 $file.$p
+<endfold id='5'>done</endfold id='5'>
+
+
+# braces as well
+run_prog | sort -u |
+<beginfold id='4'>{</beginfold id='4'>
+	echo Header
+	while read a b d
+	<beginfold id='5'>do</beginfold id='5'>
+		echo $a/$b/$c
+	<endfold id='5'>done</endfold id='5'>
+	echo Footer
+<endfold id='4'>}</endfold id='4'>
+
+
+# Any constructions can be nested:
+echo "A long string with <beginfold id='3'>$(</beginfold id='3'>
+	<beginfold id='6'>if</beginfold id='6'> <beginfold id='2'>[</beginfold id='2'> $count -gt 100 <endfold id='2'>]</endfold id='2'> ; then
+		echo "much"
+	else
+		echo "not much"
+	<endfold id='6'>fi</endfold id='6'> <endfold id='3'>)</endfold id='3'> substitutions." ;
+
+
+# Even the case construct is correctly folded:
+test -f blaat &&
+<beginfold id='3'>(</beginfold id='3'>	do_something
+	<beginfold id='7'>case</beginfold id='7'> $p in
+		*bak<beginfold id='8'>)</beginfold id='8'>
+			do_bak $p
+			<endfold id='8'>;;</endfold id='8'>
+		*<beginfold id='8'>)</beginfold id='8'>
+			dont_bak $p
+			<endfold id='8'>;;</endfold id='8'>
+	<endfold id='7'>esac</endfold id='7'>
+<endfold id='3'>)</endfold id='3'> # despite the extra parentheses in the case construction.
+
+
+# more control flow
+while :;
+  break
+  continue
+  return
+<endfold id='5'>done</endfold id='5'>
+
+
+# variable assignments:
+DIR=/dev
+p=`ls`
+LC_ALL="nl" dcop 'kate*'
+_VAR=val
+ARR=(this is an array)
+ARR2=([this]=too [and]="this too")
+usage="$0 -- version $VERSION
+Multiple lines of output
+can be possible."
+ANSWER=yes	# here 'yes' isn't highlighed as command
+
+
+# Some commands expect variable names, these are colored correctly:
+export PATH=/my/bin:$PATH BLAAT
+export A B D
+local p=3  x  y='\'
+read x y z <<< $hallo
+unset B
+declare -a VAR1 VAR2 && exit
+declare less a && b
+declare a=(1 2)
+getopts :h:l::d arg
+read #comment
+let a=4+4 3+a b=c+3 d+3 d*4 # * is a glob
+
+# options are recoqnized:
+zip -f=file.zip
+./configure  --destdir=/usr
+make  destdir=/usr/
+
+
+# [[ and [ correctly need spaces to be regarded as structure,
+# otherwise they are patterns (currently treated as normal text)
+<beginfold id='6'>if</beginfold id='6'> <beginfold id='2'>[</beginfold id='2'> "$p" == "" <endfold id='2'>]</endfold id='2'> ; then
+	ls /usr/bin/[a-z]*
+elif <beginfold id='2'>[[</beginfold id='2'> $p == 0 <endfold id='2'>]]</endfold id='2'> ; then
+	ls /usr/share/$p
+<endfold id='6'>fi</endfold id='6'>
+
+# Fixed:
+ls a[ab]*		# dont try to interprete as assignment with subscript (fixed)
+a[ab]
+a[ab]=sa
+
+
+# Here documents are difficult to catch:
+cat > myfile << __EOF__
+You're right, this is definitely no bash code
+But ls more $parameters should be expanded.
+__EOF__
+
+
+# quoted:
+cat << "EOF" | egrep "this" >&4   # the rest of the line is still considered bash source
+You're right, this is definitely no bash code
+But ls more $parameters should be expanded. :->
+EOF
+
+cat <<bla || exit
+bla bla
+bla
+
+
+# indented:
+<beginfold id='6'>if</beginfold id='6'> true
+then
+	cat <<- EOF
+		Indented text with a $dollar or \$two
+	EOF
+elif <beginfold id='2'>[</beginfold id='2'> -d $file <endfold id='2'>]</endfold id='2'>; then
+	cat <<- "EOF"
+		Indented text without a $dollar
+	EOF
+<endfold id='6'>fi</endfold id='6'>
+
+<beginfold id='6'>if</beginfold id='6'> ! <beginfold id='4'>{</beginfold id='4'> cmd1 && cmd2 ; <endfold id='4'>}</endfold id='4'>; then echo ok ; <endfold id='6'>fi</endfold id='6'>
+<beginfold id='6'>if</beginfold id='6'> ! cmd1 arg; then echo ok ; <endfold id='6'>fi</endfold id='6'>
+
+<beginfold id='7'>case</beginfold id='7'> 1 in
+2<beginfold id='8'>)</beginfold id='8'> echo xxx;
+<endfold id='8'>;;</endfold id='8'>
+?<beginfold id='8'>)</beginfold id='8'> foo || yyy ; foo abc || echo abc <endfold id='8'>;;</endfold id='8'>
+1<beginfold id='8'>)</beginfold id='8'> echo yyy;
+<endfold id='8'></endfold id='8'><endfold id='7'>esac</endfold id='7'>
+
+ls #should be outside of case 1 folding block
+
+for i in `ls tests/auto/output/*.html`; <beginfold id='5'>do</beginfold id='5'>
+    refFile=`echo $i | sed -e s,build,src, | sed -e s,output,reference, | sed -e s,.html,.ref.html,`
+    cp -v $i $refFile
+<endfold id='5'>done</endfold id='5'>
+
+## >Settings >Configure Kate >Fonts & Colors >Highlitghing Text Styles >Scripts/Bash >Option >Change colors to some distinct color
+## 1- In following line the -ucode should not be colored as option
+
+pacman -Syu --needed intel-ucode grub
+pacman -syu --needed intel-ucode grub
+
+# Braces (bug ##387915)
+<beginfold id='2'>[[</beginfold id='2'> $line_name =~ \{([0-9]{1,})\}\{([0-9]{1,})\}(.*) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> $name =~ (.*)_(S[0-9]{2})(E[0-9]{2,3}[a-z]{0,1})_(.*) <endfold id='2'>]]</endfold id='2'>
+# Comments in Braces (bug 450878)
+<beginfold id='2'>[[</beginfold id='2'> # comment 1
+   1 == 1 # comment 2
+   # comment 3
+<endfold id='2'>]]</endfold id='2'>
+
+rm /data/{hello1,hello2}/input/{bye1,$bye2}/si{a,${b},c{k,p{e,a}}}/*.non
+rm /data/{aa,{e,i}t{b,c} # Not closed
+rm /data/{aa,{e,i}t{b,c}}
+rm /data/{aa,{i}}
+rm /data{aa{bb{cc{dd}}}}
+rm /data{aaa`aaa}aa`aaa}a
+
+${array[0]: -7 : +  22  }  ${array[1]: num  }
+${parameter##word} ${parameter%%word} ${parameter^^pattern} ${parameter,,pattern} ${parameter@operator}
+
+# TODO `
+
+# commands
+abc
+cp
+:
+.
+:#nokeyword
+path/cmd
+ec\
+ho
+2
+{ab}c
+{a,b}c
+'a'c
+$ab
+${ab}c
+\ a
+!a
+{ab}[
+{a,b}[
+'a'[
+\ [
+!a[
+a{}d
+a{bc}d
+a{b,c}d
+a'b'c
+a$bc
+a${bc}d
+a\ b
+a!b
+a{}[
+a{bc}[
+a{b,c}[
+a'b'[
+a\ [
+a!b[
+
+# commands + params
+shortopt -ol -f/fd/fd -hfd/fds - -ol'a'b -f'a'/fd/fd -h'a'fd/fds
+longopt --long-a --long-b=value --file=* --file=file* --file=dir/file
+longopt --long-a'a'b --long'a'-b=value --fi'a'le=*
+noopt 3 3d -f -- -f --xx dir/file
+opt param#nocomment ab'a'cd [[ param ]] } { ~a .a #comments
+path path/file dir/ / // 3/f a@/ 'a'/b d/'a'b a\ d/f f/f\
+ile
+path ~ ~/ ~a/ . .. ./a ../a
+path /path/* /path/f* /path/f@ /path/f@(|) {a/b} a{b}/c a/b{c} a/{b} a/{b}c
+glob ? * ?f *f f* f? **/ ~/* ~* /path/f* 'a'* 'a'f/?
+extglob @ @(*) @(f*|f??(f)) f!(+(?(@(*(f)f)f)f)f)f @'a'@(|) a@(?)
+subs f! f!! f!s 'a'!s \( $v {a,b} {a} {a}/d {a\,} {a,} {a,\},b} ds/{a,b}sa/s
+2 - f -f
+!a -f
+'a' -f
+$a -f
+! cmd
+
+# coproc command (#460301)
+coproc ls thisfiledoesntexist 2>&1
+coproc <beginfold id='4'>{</beginfold id='4'> ls thisfiledoesntexist; read; <endfold id='4'>}</endfold id='4'> 2>&1
+coproc mycoproc <beginfold id='4'>{</beginfold id='4'> awk '{print "foo" $0;fflush()}'; <endfold id='4'>}</endfold id='4'> >&3
+
+# redirections (prefix)
+<<<s cat
+<<<'s' cat
+<<<'s's cat
+<<<s's's cat
+<<<s${s}s cat
+<<< s${s}s cat
+>&2 cat
+<f cat
+< f cat
+2>3 cat
+2>&3 cat
+2>& 3 cat
+2>f cat
+&>f cat
+
+<<<# comment
+<# comment
+># comment
+<<< # comment
+< # comment
+> # comment
+
+# redirections
+cat f>2
+cat d/f>2
+cat d/f >2
+cat d/f >& 2
+cat >2 d/f
+cat > 2
+cat <(echo) <(echo a) <(echo a/f) <(echo ) <(echo a ) <(echo a/f )
+cat 2>&1 &>f &>>f 2<&1- 2<>f 2<<heredoc
+bla bla
+heredoc
+<<-'h' cat
+bla
+h
+<<"'" cat
+bla
+'
+cat <<heredoc
+bla bla
+heredoc
+cat <<heredoc -a
+bla bla
+heredoc
+r=<beginfold id='3'>$(</beginfold id='3'>xxx $@ 2>&1<endfold id='3'>)</endfold id='3'>
+
+cat <<<# comment
+cat <# comment
+cat ># comment
+cat <<< # comment
+cat < # comment
+cat > # comment
+
+# branches
+cat a|cat
+cat a&cat
+cat a||cat
+cat a&&cat
+cat a;cat
+cat a | cat
+cat a & cat
+cat a || cat
+cat a && cat
+cat a ; cat
+cat a'a';cat
+
+# substitutions
+echo '' 'a' '\' "" "a" "\\" "$a" "a""a"'a''a' a'b'c a"b"c a$'\n'c
+echo a!bc a{a}b a{b,c}d a{b,{d,e}}d a\ b
+echo a$bc a$b/c a${b}c a<beginfold id='2'>$((</beginfold id='2'>b-3<endfold id='2'>))</endfold id='2'>c a<beginfold id='3'>$(</beginfold id='3'>b<endfold id='3'>)</endfold id='3'>c a<beginfold id='3'>$(</beginfold id='3'>a b c<endfold id='3'>)</endfold id='3'>c
+echo ${a[*]} ${a[@]} ${a[${b}]} ${a:-x$z} ${a-x} ${a/g} ${a//f/f} ${a//f*/f*}
+echo ${a^^l*} ${a,} ${!a} ${#a[1]} ${a:1:$b} <beginfold id='2'>$((</beginfold id='2'>++i,i--<endfold id='2'>))</endfold id='2'>
+echo "${var#lo+(r)em}" x "${var#+(r)em}" x
+echo "${var#refs/heads}" x "${var#refs}" x
+
+<beginfold id='2'>[</beginfold id='2'> a <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -f f'f'f <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -f f]'f'f] <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -t 13 <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -t 13] <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -t 13] <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -v abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -z abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc -ef abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc -ef abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc-ef -ef abc-ef <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc == abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc < abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> abc -eq abc <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> abc -eq abc <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> 1+2 -eq 1+2 <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> 1+2 -eq 1+2 <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> a = b <endfold id='2'>c</endfold id='2'> ]
+<beginfold id='2'>[[</beginfold id='2'> a = b <endfold id='2'>c</endfold id='2'> ]]
+<beginfold id='2'>[</beginfold id='2'> -z 1 -a 1 -eq 1 <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> 2 -eq 1 -o 1 -eq 1 <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> x =~ a(b c|$)' '{1,}[a[.digit.]] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> x =~ [ <endfold id='2'>] </endfold id='2'>]]
+<beginfold id='2'>[[</beginfold id='2'> x =~ ([ ]) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> x =~ [ <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> x =~ ([) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> (a =~ a) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a =~ a || a -eq 2 <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> (a =~ a) || a -eq 2 <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> (0 -le $b) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ( 0 -le $b ) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ( 0 -le $b || $b -le 100 ) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a<b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a <b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a< b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a < b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'>(! -d .)<endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ! -d . <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> !(-d .) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -f a || -f b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -f a||-f b <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ! (a -eq b) <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[</beginfold id='2'> -d `echo .`] <endfold id='2'>]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -d `echo .`]] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a != b && ${a}a = b${b} <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'>
+  1 -eq 2
+<endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -&&- <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -f <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -f [0-9a] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ?*[0-9] = [^0-9] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> -f = ?*[0-9] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> ?*[0-9] = ?*[0-9] <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a/sa[s = dsad?*[0-9]dsa$ds <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a/sa[s = dsad?*[0-9]ds/a$ds <endfold id='2'>]]</endfold id='2'>
+<beginfold id='2'>[[</beginfold id='2'> a =~ [12]a([!d]a?s[x[:alnum:]]|d?)p <endfold id='2'>]]</endfold id='2'>
+
+<beginfold id='2'>[[</beginfold id='2'> #comm1
+ #comm2
+ p[1] == p[2]
+ #comm3
+ #comm4
+<endfold id='2'>]]</endfold id='2'>
+
+<beginfold id='2'>[[</beginfold id='2'> #comm1
+ #comm2
+ -f p[2]
+ #comm3
+ #comm4
+<endfold id='2'>]]</endfold id='2'>
+
+<beginfold id='2'>((</beginfold id='2'>3+1+a+$c*(x) & 0x43422fd+03-085/23#D9a@_^8<endfold id='2'>))</endfold id='2'>
+<beginfold id='2'>((</beginfold id='2'>1/(2-(a-4))<endfold id='2'>))</endfold id='2'>
+
+# they are not arithmetic evaluations...
+<beginfold id='3'>(</beginfold id='3'><beginfold id='3'>(</beginfold id='3'>cmd && cmd<endfold id='3'>)</endfold id='3'> || cmd<endfold id='3'>)</endfold id='3'>
+<beginfold id='3'>$(</beginfold id='3'><beginfold id='3'>(</beginfold id='3'>cmd && cmd<endfold id='3'>)</endfold id='3'> || cmd<endfold id='3'>)</endfold id='3'>
+<beginfold id='2'>((</beginfold id='2'>cmd &&
+cmd<endfold id='2'></endfold id='2'><beginfold id='3'>)</beginfold id='3'> || cmd<endfold id='3'>)</endfold id='3'>
+<beginfold id='2'>$((</beginfold id='2'>cmd &&
+cmd<endfold id='2'></endfold id='2'><beginfold id='3'>)</beginfold id='3'> || cmd<endfold id='3'>)</endfold id='3'>
+
+<beginfold id='4'>{</beginfold id='4'> echo
+    echo
+<endfold id='4'>}</endfold id='4'>
+<beginfold id='4'>{</beginfold id='4'> echo ; <endfold id='4'>}</endfold id='4'>
+<beginfold id='3'>(</beginfold id='3'>echo ; echo<endfold id='3'>)</endfold id='3'>
+<beginfold id='3'>(</beginfold id='3'>echo
+    echo<endfold id='3'>)</endfold id='3'>
+<beginfold id='3'>(</beginfold id='3'>echo a<endfold id='3'>)</endfold id='3'>
+<beginfold id='3'>(</beginfold id='3'><beginfold id='4'>{</beginfold id='4'> echo plop;<endfold id='4'>}</endfold id='4'><endfold id='3'>)</endfold id='3'>
+<beginfold id='2'>[</beginfold id='2'> a -eq 2 <endfold id='2'>]</endfold id='2'> || <beginfold id='2'>[</beginfold id='2'> a -eq 2] <endfold id='2'>]</endfold id='2'> && <beginfold id='2'>[[</beginfold id='2'> a -eq 2 <endfold id='2'>]]</endfold id='2'> || <beginfold id='2'>[[</beginfold id='2'> a != b <endfold id='2'>]]</endfold id='2'>;
+<beginfold id='2'>[</beginfold id='2'> a -eq 2 <endfold id='2'>]</endfold id='2'>||<beginfold id='2'>[</beginfold id='2'> a -eq 2] <endfold id='2'>]</endfold id='2'>&&<beginfold id='2'>[[</beginfold id='2'> a -eq 2 <endfold id='2'>]]</endfold id='2'>||<beginfold id='2'>[[</beginfold id='2'> a != b <endfold id='2'>]]</endfold id='2'>;
+test a -eq b
+
+# functions
+a() <beginfold id='4'>{</beginfold id='4'> echo x; <endfold id='4'>}</endfold id='4'>
+a  () <beginfold id='4'>{</beginfold id='4'> echo x; <endfold id='4'>}</endfold id='4'>
+function f <beginfold id='4'>{</beginfold id='4'> echo x; <endfold id='4'>}</endfold id='4'>
+kde.org() <beginfold id='4'>{</beginfold id='4'> echo x; <endfold id='4'>}</endfold id='4'>
+--func() <beginfold id='4'>{</beginfold id='4'> echo x; <endfold id='4'>}</endfold id='4'>
+
+# variables
+a=(a b c)
+a='a'
+a+=b
+a[1]='a'
+a[$i]='x'
+a[<beginfold id='2'>$((</beginfold id='2'>
+    2+4
+<endfold id='2'>))</endfold id='2'>]='x'
+a=([a]=2 `echo` -s > 'ds')
+a=(#comment
+value#nocomment #comment)
+)
+a=a cat
+a=`ls` cat
+
+# errors
+a a(s<endfold id='3'>)</endfold id='3'> a
+
+# control structure
+for name in a b c {d,e} ; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+for name; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+for name <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+for ((i=0;i<5;++i)) ; <beginfold id='5'>do</beginfold id='5'> echo $i ; <endfold id='5'>done</endfold id='5'>
+select name in a ; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+select name; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+<beginfold id='6'>if</beginfold id='6'> : ; then echo ; elif <beginfold id='2'>[[</beginfold id='2'> : <endfold id='2'>]]</endfold id='2'> ; then echo ; else echo ; <endfold id='6'>fi</endfold id='6'>
+while : || : ; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+until : ; : ; <beginfold id='5'>do</beginfold id='5'> echo ; <endfold id='5'>done</endfold id='5'>
+<beginfold id='7'>case</beginfold id='7'> a in a<beginfold id='8'>)</beginfold id='8'> <endfold id='8'></endfold id='8'><endfold id='7'>esac</endfold id='7'>
+<beginfold id='7'>case</beginfold id='7'> a in a<beginfold id='8'>)</beginfold id='8'> echo ; <endfold id='8'></endfold id='8'><endfold id='7'>esac</endfold id='7'>
+<beginfold id='7'>case</beginfold id='7'> pwd in (patt1<beginfold id='8'>)</beginfold id='8'> echo ; echo <endfold id='8'>;;</endfold id='8'> (patt*<beginfold id='8'>)</beginfold id='8'> echo <endfold id='8'>;;&</endfold id='8'> patt?|patt<beginfold id='8'>)</beginfold id='8'> echo <endfold id='8'>;&</endfold id='8'>
+patt<beginfold id='8'>)</beginfold id='8'> echo <endfold id='8'>;;</endfold id='8'> <endfold id='7'>esac</endfold id='7'>
+
+for name in a
+ b c ;
+<beginfold id='5'>do</beginfold id='5'>
+echo
+<endfold id='5'>done</endfold id='5'>
+
+<beginfold id='7'>case</beginfold id='7'> a in
+  a\( | b*c? <beginfold id='8'>)</beginfold id='8'> echo
+  <beginfold id='3'>(</beginfold id='3'>b$c<endfold id='3'>)</endfold id='3'> # no pattern
+  <endfold id='8'>;;</endfold id='8'>
+  (b$c<beginfold id='8'>)</beginfold id='8'> <endfold id='8'>;;</endfold id='8'>
+  # no pattern
+  (b$c<beginfold id='8'>)</beginfold id='8'>
+<endfold id='8'></endfold id='8'><endfold id='7'>esac</endfold id='7'>
+
+<beginfold id='7'>case</beginfold id='7'> "$1" in
+ "a"<beginfold id='8'>)</beginfold id='8'> run_a|&a<endfold id='8'>;;</endfold id='8'>
+ "b"<beginfold id='8'>)</beginfold id='8'> run_b<endfold id='8'>;;</endfold id='8'>
+ "c"<beginfold id='8'>)</beginfold id='8'> run_c<endfold id='8'>;;</endfold id='8'>
+ *<beginfold id='8'>)</beginfold id='8'> echo "Plase choose between 'a', 'b' or 'c'" && exit 1<endfold id='8'>;;</endfold id='8'>
+<endfold id='7'>esac</endfold id='7'>

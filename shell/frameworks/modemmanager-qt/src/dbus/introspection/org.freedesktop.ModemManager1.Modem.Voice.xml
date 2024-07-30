@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2015 Marco Bascetta <marco.bascetta@sadel.it>
+   Copyright (C) 2015 Riccardo Vangelisti <riccardo.vangelisti@sadel.it>
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Voice:
+      @short_description: The ModemManager Voice interface.
+
+      The Voice interface handles Calls.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Voice">
+
+    <!--
+        ListCalls:
+        @result: The list of call object paths.
+
+        Retrieve all Calls.
+
+        This method should only be used once and subsequent information
+        retrieved either by listening for the
+        #org.freedesktop.ModemManager1.Modem.Voice::Added signal,
+        or by querying the specific Call object of interest.
+    -->
+    <method name="ListCalls">
+      <arg name="result" type="ao" direction="out" />
+    </method>
+
+    <!--
+        DeleteCall:
+        @path: The object path of the Call to delete.
+
+        Delete a Call from the list of calls.
+
+        The call will be hangup if it is still active.
+    -->
+    <method name="DeleteCall">
+      <arg name="path" type="o" direction="in" />
+    </method>
+
+    <!--
+        CreateCall:
+        @properties: Call properties from the <link linkend="gdbus-org.freedesktop.ModemManager1.Call">Call D-Bus interface</link>.
+        @path: The object path of the new call object.
+
+        Creates a new call object.
+
+        The '<link linkend="gdbus-property-org-freedesktop-ModemManager1-Call.Number">Number</link>' is mandatory
+    -->
+    <method name="CreateCall">
+      <arg name="properties" type="a{sv}" direction="in"/>
+      <arg name="path" type="o" direction="out" />
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+    </method>
+
+    <!--
+        CallAdded:
+        @path: Object path of the new call.
+
+        Emitted when any part of a Call has been received or added.
+    -->
+    <signal name="CallAdded">
+      <arg name="path" type="o" />
+    </signal>
+
+    <!--
+        CallDeleted:
+        @path: Object path of the now deleted Call.
+
+        Emitted when a call has been deleted.
+    -->
+    <signal name="CallDeleted">
+      <arg name="path" type="o" />
+    </signal>
+
+    <!--
+        Calls:
+
+        The list of calls object paths.
+    -->
+    <property name="Calls" type="ao" access="read" />
+
+  </interface>
+</node>

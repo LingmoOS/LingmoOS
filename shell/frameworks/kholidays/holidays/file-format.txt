@@ -1,0 +1,105 @@
+The file format was originally adopted from PLAN (http://www.bitrot.de/plan.html)
+but has since been heavily modified to add new features such as holiday categories
+and alternative calendar systems, or to remove unused features.
+
+The file format is currently defined using Bison and Flex in the following files:
+
+    kholidays/src/parsers/plan2/holidayscannerplan.ypp
+    kholidays/src/parsers/plan2/holidayscannerplan.lpp
+
+(In the following definition, optional parts are in [square brackets],
+nonterminals are in CAPS, alternatives are separated by |, everything must be
+entered in lower case. In all cases defer to the defintiion in the ypp/lpp
+files.)
+
+A holiday file consists of an optional metadata header section, followed by an
+optional holiday list:
+
+    [METADATA]
+    [LIST]
+
+The metadata can contain country code, language code, name and description:
+
+    [COUNTRY_CODE]
+    [LANGUAGE_CODE]
+    ["Name"]
+    ["Description"]
+
+The list holds 0 or more holiday definitions:
+
+    "Event Name" CATEGORIES DATE_RULE
+
+CATEGORIES can be 0 or more of the following keywords:
+
+    public
+    civil
+    religious
+    school
+    government
+    financial
+    cultural
+    commemorative
+    historical
+    nameday
+    seasonal
+
+The "public" category caries the extra meaning of being a day off.
+
+There are several possible ways for a date rule to be defined
+
+    [CALENDAR] DATE [OFFSET] [LENGTH]
+
+Calendar can be 0 or 1 of the following keywords:
+
+    gregorian
+    julian
+    coptic
+    ethiopian
+    hebrew
+    hijri
+    indiannational
+    jalali
+
+"gregorian" is the default value if not defined.
+
+There are several formats for DATE:
+
+    DAY.MONTH[.YEAR]
+    MONTH/DAY[/YEAR]
+    DAY MONTHNAME [YEAR]
+    MONTHNAME DAY [YEAR]
+    [every NTH] WEEKDAY [in MONTH]
+    WEEKDAY before LIT_DATE
+    WEEKDAY after LIT_DATE
+    easter
+    pascha
+
+It is recommended to always use month names where-ever possible to avoid confusion,
+but if a month number is used then use DAY.MONTH[.YEAR] format for consistency.
+
+DAY, MONTH, YEAR, NTH, and NUMBER can be C expressions; in
+dates, they must be parenthesized.  The special values "any" and "last" are
+also available. Any valid DATE description specifying a single day may
+be converted to a NUMBER by enclosing it in square brackets [].
+NTH can alternatively be first, second, ..., fifth, last.
+
+The words "on", "every", "day", and "days" are syntactic sugar without meaning.
+LIT_DATE stands for one of the first two alternatives, DAY.MONTH[.YEAR]
+or MONTH/DAY[/YEAR].
+
+Dates can be converted to numbers by enclosing them in square brackets.
+For example, the number of days between Easter and May 1 can be
+computed with ([may 1] - [easter]). As with C expressions, bracketed
+expressions must be parenthesized.
+
+The OFFSET after DATE is used to calculate a holiday date relative to another date
+and is defined as:
+
+    [plus|minus] NUMBER [days]
+
+The LENGTH is used to calculate how long a holiday is and is defined as:
+
+    length NUMBER [days]
+
+Restrictions: plus, minus, and length may not cross over to the next or
+previous year, you cannot define New Year's as "last/last plus 1 day".

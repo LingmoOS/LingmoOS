@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>.kdesrc-buildrc</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (kdesrc-buildrc) - Theme (Breeze Dark)"/>
+</head><body style="background-color:#232629;color:#cfcfc2"><pre>
+<span style="color:#7a7c7d"># List of all options: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html</span>
+
+<span style="font-weight:bold">global</span>
+    branch-group <span style="color:#f67400">kf6-qt6</span>
+
+    <span style="color:#7a7c7d"># strange capitalisation of value</span>
+    include-dependencies <span style="color:#f67400">TrUe</span>
+
+    <span style="color:#7a7c7d"># path with tilde</span>
+    kdedir ~<span style="color:#f67400">/kde/usr</span>
+
+    <span style="color:#7a7c7d"># try using the existing option as value for other option</span>
+    qtdir <span style="color:#27ae60">${source-dir}</span> <span style="color:#7a7c7d"># Comment on the same line with value</span>
+
+    <span style="color:#7a7c7d"># Use line breaks</span>
+    cmake-options -DCMAKE_BUILD_TYPE=<span style="color:#f67400">RelWithDebInfo</span> <span style="color:#f67400">\</span>
+        <span style="color:#da4453;text-decoration:underline">-DQT_MAJOR_VERSION</span><span style="color:#f67400">=6</span> <span style="color:#f67400">\</span>
+        <span style="color:#f67400">-DBUILD_WITH_QT6=ON</span>
+
+    num-cores <span style="color:#27ae60">${non-existing-var}</span>
+    num-cores-low-mem <span style="color:#f67400">4</span>
+
+    <span style="color:#7d4c0b">non-existing-option</span> <span style="color:#f67400">12345</span>
+
+    <span style="color:#7a7c7d"># use int value for binary option</span>
+    install-session-driver <span style="color:#da4453;text-decoration:underline">5</span>
+
+    <span style="color:#7a7c7d"># impossible enum value (allowed are: invent, flat, metadata)</span>
+    directory-layout <span style="color:#f67400">project-ids-as-folder-names</span>
+
+    <span style="color:#7a7c7d"># option with valid value with spaces</span>
+    cmake-generator <span style="color:#f67400">Kate</span> <span style="color:#f67400">-</span> <span style="color:#f67400">Ninja</span>
+end global
+
+<span style="color:#7a7c7d"># Comment with \</span>
+<span style="color:#7a7c7d"># line break</span>
+
+include<span style="color:#f67400"> ~/kde6/src/kdesrc-build/kf6-common-options-build-include</span>
+
+options<span style="color:#27ae60;font-weight:bold"> kcalc</span>
+    <span style="color:#7a7c7d"># use of module-set only option in the options block:</span>
+    <span style="color:#da4453;text-decoration:underline">use-modules</span> <span style="color:#7d4c0b">one</span> <span style="color:#f67400">two</span> <span style="color:#f67400">\</span>
+                <span style="color:#f67400">three</span>
+
+    <span style="color:#7a7c7d"># use of unrecognized option:</span>
+    <span style="color:#7d4c0b">new-option</span> <span style="color:#f67400">true</span>
+end options
+
+
+module-set
+    <span style="color:#7a7c7d"># use of global-only option in module-set:</span>
+    <span style="color:#da4453;text-decoration:underline">stop-on-failure</span> <span style="color:#f67400">true</span>
+
+    <span style="color:#7a7c7d"># use allowed option:</span>
+    use-modules<span style="color:#27ae60;font-weight:bold"> one two three</span>
+end module-set
+
+<span style="color:#7a7c7d"># module block without the actual name</span>
+module
+    repository <span style="color:#f67400">kde-projects</span>
+end module
+
+<span style="color:#7a7c7d"># double opening module block (forget ending the module block):</span>
+module<span style="color:#27ae60;font-weight:bold"> kcalc</span>
+<span style="color:#7d4c0b">module</span> <span style="color:#f67400">kcalc</span>
+    <span style="color:#7a7c7d"># body without options</span>
+end module kcalc
+
+<span style="color:#7a7c7d"># non-recognized block</span>
+kcalc
+    repository kde-projects
+end kcalc
+
+<span style="color:#7a7c7d"># </span><span style="color:#3f8058">kate:</span><span style="color:#7a7c7d"> </span><span style="color:#7f8c8d">syntax</span><span style="color:#f44f4f"> kdesrc-buildrc</span><span style="color:#7f8c8d">;</span>
+</pre></body></html>

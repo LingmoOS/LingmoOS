@@ -1,0 +1,269 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Dutch "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Gebruikershandleiding van kded6</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Onderhouder</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Oorspronkelijke auteur</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2023-06-22</date>
+<releaseinfo
+>Frameworks 6</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>&kde;-daemon - start Sycoca-database-updates wanneer nodig.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Samenvatting</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beschrijving</title>
+
+<para
+><command
+>kded6</command
+> consolideert verschillende kleine services in één proces. Dit zijn meestal &DBus;-services geleverd door KDED-modules, maar het bestuurt ook sycoca (een binaire cache van service-typen, &MIME;-typen en services gebruikt door KService) en KConfig-scripts voor bijwerken zoals nodig is.</para>
+
+<para
+>Voor sycoca monitort het de mappen die .desktop-bestanden bevatten. Wanneer een bestand wordt toegevoegd/verwijderd, dan wacht het 5 seconden (voor het geval van een serie wijzigingen) en start dan <command
+>kbuildsycoca6</command
+> om de sycoca bij te werken.</para>
+
+<para
+>Voor KConfig controleert het nieuw geïnstalleerd bestanden voor bijwerken, &ie; de *.upd bestanden die worden gebruikt om configuratiebestanden van gebruikers bij te werken wanneer de bestandsformaten voor de configuratie zich wijzigen en voert het hulpprogramma voor bijwerken van KConfig om het bijwerken uit te voeren.</para>
+
+<para
+>Deze taken worden ook altijd uitgevoerd bij het starten van <command
+>kded6</command
+> om er zeker van te zijn dat de configuratie van de gebruiker up-to-date is.</para>
+
+<para
+>Normaal is het niet nodig om <command
+>kded6</command
+> direct uit te voeren; bureaubladsessies van &plasma; vieren het automatisch uit en het wordt op aanvraag gestart wanneer een toepassing een &DBus;-interface probeert te gebruiken dat er door geleverd wordt of door een van zijn modulen.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Opties</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>Controleer de database van sycoca, werk het zo nodig bij en eindig. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Configuratie</title>
+
+<para
+><command
+>kded6</command
+> kan geconfigureerd worden met het configuratiebestand <filename
+>kded6rc</filename
+> in ini-stijl. Onder &UNIX;-systemen, is het te vinden in <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+>; als <varname
+>$XDG_CONFIG_HOME</varname
+> niet is ingesteld, dan krijgt dit de standaard waarde <filename
+>~/.config/kded6rc</filename
+>.</para>
+
+<para
+>Items in een configuratiebestand worden op verzoek gelezen, er kunnen dus wijzigingen aangebracht worden terwijl <command
+>kded6</command
+> actief is. Alle huidige configuratie-opties hebben echter alleen effect bij het opstarten van <command
+>kded6</command
+>.</para>
+
+<para
+>De sectie <option
+>[General]</option
+> heeft de volgende opties: <variablelist>
+<varlistentry>
+<term
+><option
+>CheckSycoca</option
+></term>
+<listitem
+><para
+>Of sycoca bij opstarten moet worden bijgewerkt (standaard: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckUpdates</option
+></term>
+<listitem
+><para
+>Of wachtende elementen voor bijwerken van KConfig bij opstarten moeten uitgevoerd (standaard: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckFileStamps</option
+></term>
+<listitem
+><para
+>Of datum-tijd van bestanden gecontroleerd moeten worden bij het uitvoeren van het initiële bijwerken van sycoca (standaard: <constant
+>true</constant
+>). Zie de documentatie voor <command
+>kbuildsycoca6</command
+> voor meer details.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>DelayedCheck</option
+></term>
+<listitem
+><para
+>Of het initiële bijwerken van sycoca moet worden uitgesteld tot ongeveer een minuut na opstarten (standaard: <constant
+>false</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Elke module heeft ook een sectie <option
+>[Module-<replaceable
+>naam</replaceable
+>]</option
+> in <filename
+>kded6rc</filename
+>, waar <replaceable
+>naam</replaceable
+> de naam is van het desktop-bestand van de module zonder de extensie <filename
+>.desktop</filename
+>. Deze bevat een optie <option
+>autoload</option
+> die specificeert of de module automatisch geladen moet worden wanneer <command
+>kded6</command
+> wordt gestart (standaard: <constant
+>false</constant
+>). Merk op dat deze instelling gewijzigd kan worden via het &DBus;-interface van <command
+>kded6</command
+>.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Zie ook</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Fouten/bugs</title>
+<para
+>Gebruik <ulink url="https://bugskde.org"
+>De volger van bugs van &kde;</ulink
+> om ze te rapporteren.</para>
+</refsect1>
+
+</refentry>

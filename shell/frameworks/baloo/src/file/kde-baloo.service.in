@@ -1,0 +1,18 @@
+[Unit]
+Description=Baloo File Indexer Daemon
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=@KDE_INSTALL_FULL_LIBEXECDIR_KF@/baloo_file
+BusName=org.kde.baloo
+Slice=background.slice
+ExecCondition=@KDE_INSTALL_FULL_BINDIR@/kde-systemd-start-condition --condition "baloofilerc:Basic Settings:Indexing-Enabled:true"
+# We'll basically only want to consume resources if they aren't needed anywhere else, hence weights are way low.
+CPUWeight=1
+IOWeight=1
+# Memory should comfortably fit the binary itself, any extra data loaded ought to be subject to extreme constraints
+# though - so as to avoid OOM conditions caused by baloo.
+MemoryHigh=512M
+
+[Install]
+WantedBy=graphical-session.target

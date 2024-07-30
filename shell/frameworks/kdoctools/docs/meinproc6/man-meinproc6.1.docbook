@@ -1,0 +1,225 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % English "INCLUDE"><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title>meinproc6 User's Manual</title>
+<!-- There is no author in the meinproc.cpp file 
+Also, based on the information from http://olympus.het.brown.edu/cgi-bin/man/man2html?meinproc+1
+
+<author>
+<firstname>Matthias </firstname>
+<surname>Hoelzer-Kluepfel</surname>
+<affiliation>
+<address><email>hoelzer@kde.org</email></address>
+</affiliation>
+</author>
+
+<author>
+<firstname>Stephan</firstname>
+<surname>Kulow</surname>
+<affiliation>
+<address><email>coolo@kde.org</email></address>
+</affiliation>
+</author>
+
+<author>
+<firstname>Cornelius</firstname>
+<surname>Schumacher</surname>
+<affiliation>
+<address><email>schumacher@kde.org</email></address>
+</affiliation>
+</author>
+-->
+<date>2014-05-08</date>
+<releaseinfo>Frameworks 5.0</releaseinfo>
+<productname>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle><command>meinproc6</command></refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname><command>meinproc6</command></refname>
+<refpurpose>&kde; translator for &XML;</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title>Synopsis</title>
+
+<cmdsynopsis>
+<command>meinproc6</command>
+
+<arg choice="opt">-h, --help</arg>
+<arg choice="opt">-v, --version</arg>
+<arg choice="opt">--cache<replaceable> file</replaceable></arg>
+<arg choice="opt">--check</arg>
+<arg choice="opt">--srcdir<replaceable> dir</replaceable></arg>
+<arg choice="opt">--param <replaceable>key</replaceable>=<replaceable>value</replaceable></arg>
+
+<group>
+<group>
+<arg>-o</arg>
+<arg>--output</arg>
+</group>
+<replaceable> file</replaceable>
+</group>
+<arg choice="opt">--stdout</arg>
+<arg choice="opt">--stylesheet<replaceable> xsl</replaceable></arg>
+<arg choice="plain">docbook_file</arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Description</title>
+
+<para><command>meinproc6</command> converts DocBook files to &HTML;.
+</para>
+</refsect1>
+
+<refsect1>
+<title>Generic Options</title>
+<para>
+<variablelist>
+
+<varlistentry>
+  <term><option>-h</option><option>--help</option></term>
+<listitem>
+<para>
+Show help about options.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-v</option><option>--version</option></term>
+<listitem>
+<para>
+Show version information.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+</refsect1>
+
+<refsect1>
+<title>Application Options</title>
+<variablelist>
+
+<varlistentry>
+<term><option>--cache</option> <parameter>file</parameter></term>
+<listitem>
+<para>
+Create a cache file for the document.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--check</option></term>
+<listitem>
+<para>Check the document for validity.</para>
+<screen>The output can be a bit daunting, since one small mistake can cause a cascade of errors. 
+The trick is to look at the first error, fix that error, save the file, and run <command>meinproc6</command> again.
+</screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-o</option>, <option>--output</option><parameter> file</parameter></term>
+<listitem>
+<para>
+Output whole document to <parameter>file</parameter>.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--stdout</option></term>
+<listitem>
+<para>
+Output whole document to stdout.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--stylesheet</option> <parameter>xsl</parameter></term>
+<listitem>
+<para>
+Stylesheet to use.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--srcdir</option> <parameter>dir</parameter></term>
+<listitem>
+<para>
+  Set the root directory to look for kdoctools.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>--param</option> key=value</term>
+<listitem>
+<para>
+Set parameters to pass to the stylesheet.
+</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title>Usage</title>
+<para>
+The most common way to run <command>meinproc6</command> is simply as
+<literallayout>
+<userinput><command>meinproc6</command> <replaceable>docbook-file</replaceable>
+</userinput>
+</literallayout>
+where <replaceable>docbook-file</replaceable> is usually index.docbook. 
+This command creates &HTML; pages from the DocBook file.
+Note that these pages are only viewable in &kde;-based browsers (like &konqueror;).
+</para>
+<para>
+If you need to view the &HTML; output in another browser (for example, if you're placing it on line), use
+<literallayout>
+<userinput><command>meinproc6</command> --stylesheet <replaceable>stylesheet-name</replaceable> <replaceable>docbook-file</replaceable>
+</userinput>
+</literallayout>
+where <replaceable>stylesheet-name</replaceable> is the full path to one of the &XSL;
+stylesheets in &lt;kdoctools_installation_prefix&gt;/share/kf5/kdoctools/customization/. 
+To produce output suitable for the web, you can use <command>kde-web.xsl</command> or 
+<command>kde-chunk-online.xsl</command>. See the <filename>README</filename>
+file in that directory for more details. 
+</para>
+
+</refsect1>
+
+<refsect1>
+<title>See Also</title>
+<para><replaceable>kf6options</replaceable>(7), <replaceable>qt6options</replaceable>(7)</para>
+</refsect1>
+
+<refsect1>
+<title>Bugs</title>
+<para>Please use <ulink url="https://bugs.kde.org">&kde;'s bugtracker</ulink> to report bugs.</para>
+</refsect1>
+
+</refentry>
+
+
+

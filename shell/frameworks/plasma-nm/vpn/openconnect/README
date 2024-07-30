@@ -1,0 +1,89 @@
+README taken with slight modifications from the network-manager-openconnect
+auth dialog
+
+AnyConnect works over HTTPS; authentication is through HTTP forms and
+POST responses. Once you've filled in the forms that the server demands,
+you're rewarded with an HTTP cookie which is handed on to OpenConnect to
+actually make the connection.
+
+The auth-dialog handles the arbitrary forms as the server presents them,
+and spits out the cookie after a successful authentication. It's just a
+really simple web-browser, effectively. (It has its own HTTP client
+implementation instead of using libsoup because it needs to be able to
+support certificates from a TPM, and to work around Cisco bugs).
+
+To make it slightly more fun, you have a *choice* of servers; an
+AnyConnect VPN is provisioned with an XML file that gives various pieces
+of configuration for the client. We ignore most of the XML file, except
+the list of available VPN server addresses.
+
+So this is a brief flow of what the auth-dialog does...
+
+ 1. Choose a server to connect to.
+
+    If we already have the XML configuration file for this VPN, you get
+    to choose a server from the list. Otherwise, you only have the host
+    that you configured in the VPN setup.
+
+    The auth-dialog will give you the choice of automatically connecting
+    to the last server you used. It does so by storing the boolean
+    'autoconnect' option, as well as the address of the last successful
+    server, in "secrets" that NetworkManager stores for it, but which
+    aren't actually used by OpenConnect itself at all.
+
+ 2. Offer your SSL certificate and fill in all the forms it presents.
+
+    The server will present a sequence of forms which are filled in just
+    like normal web forms. At this point, the auth-dialog is just acting
+    like a really simple web browser. It uses the same trick with fake
+    secrets to remember the answers for any multiple-choice selection,
+    or input elements of type 'text'. Input elements of type 'password'
+    are not currently saved, but probably should be.
+
+    The choices and input boxes that we fill in at this point may not be
+    limited to *just* authenticating ourselves. You may also get to make
+    choices which affect your resulting connectivity. Some networks
+    offer the choice of full-tunnel or split-tunnel routing, IPv6 or
+    Legacy-only connectivity, etc. (The routing configuration is not
+    handled by the auth-dialog; that just manifests itself in the IP
+    configuration which is given to OpenConnect by the server, much
+    later when the connection is actually made.)
+
+(
+ 2½. Run the "Cisco Secure Desktop"[sic] trojan.
+
+    In some cases you are required to download a strange executable from
+    the server and run it. It is supposed to perform various "checks" on
+    your system and report its results to the server. The authentication
+    sequence is kept in a holding pattern with HTTP refresh responses
+    until the "trojan" has done its job.
+
+    Most people seem to bypass this crap and run a local tool of their
+    own devising to report the "correct" results. It's just another
+    simple HTTP POST, although the exact results that are expected may
+    vary from one server/configuration to another.
+
+    Try not to think about it. It will only make you sad.
+)
+
+ 3. Note the 'webvpn' cookie.
+
+    Once authentication is complete, the server's HTTP response will
+    include a 'webvpn' cookie.
+
+    This cookie is one of the three *real* secrets which are actually
+    passed to OpenConnect to make the connection. The other two are
+    the address of the server we finally ended up talking to (after
+    the user's initial choice and any HTTP redirects), and a hash of
+    the server's SSL certificate (to prevent MiTM attacks).
+
+ 4. Check the XML configuration file.
+
+    With a successful authentication, we are *also* given the SHA1 of
+    the current XML configuration for this VPN connection. If it differs
+    from what we have, we are expected to fetch the new one. We store
+    this, base64-encoded, in yet another fake "secret".
+
+ 5. Dump all the "secrets" to NetworkManager.
+
+    Finally, we write the secrets into the setting, so that NM can use them.

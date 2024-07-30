@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2011-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Time:
+      @short_description: The ModemManager Time interface.
+
+      This interface allows clients to receive network time and timezone
+      updates broadcast by mobile networks.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Time">
+
+    <!--
+        GetNetworkTime:
+        @time: If the network time is known, a string containing local date,
+        time, and (if available) UTC offset in ISO 8601 format. If the network
+        time is unknown, the empty string.
+
+        Gets the current network time in local time.
+
+        This method will only work if the modem tracks, or can request, the
+        current network time; it will not attempt to use previously-received
+        network time updates on the host to guess the current network time.
+    -->
+    <method name="GetNetworkTime">
+      <arg name="time" type="s" direction="out" />
+    </method>
+
+    <!--
+        NetworkTimezone:
+
+        The timezone data provided by the network. It may include one or more
+        of the following fields:
+
+        <variablelist>
+          <varlistentry><term><literal>"offset"</literal></term>
+            <listitem>
+              Offset of the timezone from UTC, in minutes (including DST, if applicable),
+              given as a signed integer value (signature <literal>"i"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"dst-offset"</literal></term>
+            <listitem>
+              Amount of offset that is due to DST (daylight saving time),
+              given as a signed integer value (signature <literal>"i"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"leap-seconds"</literal></term>
+            <listitem>
+              Number of leap seconds included in the network time,
+              given as a signed integer value (signature <literal>"i"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <property name="NetworkTimezone" type="a{sv}" access="read">
+    <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        NetworkTimeChanged:
+        @time: A string containing date and time in ISO 8601 format.
+
+        Sent when the network time is updated.
+    -->
+    <signal name="NetworkTimeChanged">
+      <arg name="time" type="s" />
+    </signal>
+
+  </interface>
+</node>

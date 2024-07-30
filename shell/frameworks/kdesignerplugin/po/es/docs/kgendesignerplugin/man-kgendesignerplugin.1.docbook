@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Spanish "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde-frameworks;: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Escribió la documentación original</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Actualización de la documentación para &kf5-full;.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>28-05-2014</date>
+  <releaseinfo
+>Frameworks 5.0</releaseinfo>
+  <productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Genera complementos de elementos gráficos para &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>OPCIONES</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>archivo</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Descripción</title>
+  <para
+>Normalmente, los complementos de los widget personalizados para &Qt; Designer siguen un patrón estándar y las clases proporcionadas por el complemento proceden en su mayoría de información estática junto con funciones para crear una instancia que normalmente solo es una simple llamada a un constructor. <command
+>kgendesignerplugin</command
+> permite a los desarrolladores de bibliotecas que proporcionan nuevos widgets crear dichos complementos sin tener que escribir todo el código repetitivo asociado proporcionando un sencillo archivo de descripción de estilos. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> elige valores predeterminados de manera sensata para la mayoría de las preferencias, por lo que normalmente, solo es necesaria una configuración mínima. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Opciones</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>archivo</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Nombre del archivo C++ generado. Si no se proporciona, se utilizará <varname
+>stdout</varname
+> will be used. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>nombre-del-complemento</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Se proporciona con fines de compatibilidad. Es el valor predeterminado para la opción PluginName en el archivo de entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>grupo</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Se proporciona con fines de compatibilidad. Es el valor predeterminado para la opción DefaultGroup en el archivo de entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Mostrar información sobre el autor.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Mostrar información sobre la licencia.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Mostrar un breve texto de ayuda.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v , --version</option
+></term>
+      <listitem>
+        <para
+>Mostrar información sobre la versión.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Formato de archivo</title>
+  <para
+>El archivo de entrada es de tipo INI (en concreto, está en el formato que usa el framework KConfig) que describe un conjunto de widgets. Contiene una sección <literal
+>[Global]</literal
+>, que proporciona información general sobre el complemento, y una sección para cada widget que se debe incluir en el complemento. </para>
+
+  <para
+>La sección <literal
+>[Global]</literal
+> puede tener las siguientes entradas: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>El valor predeterminado para la entrada <varname
+>Group</varname
+> en las secciones de la clase (por omisión: «<literal
+>Custom</literal
+>», a menos que se use la opción <option
+>-g</option
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Una lista (separada por comas) de los archivos de cabecera necesarios (por omisión está vacía). Tenga en cuenta que los archivos de cabecera para los elementos gráficos indicados posteriormente en el archivo no se deben incluir aquí; en lugar de ello, esto es para archivos de cabecera especiales para el propio uso del complemento, como los de las clases que proporcionan vistas previas. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>El nombre de la clase de C++ principal del complemento (por omisión, «<literal
+>WidgetsPlugin</literal
+>», a menos que se use la opción <option
+>-n</option
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Cada clase debe tener su propia sección <literal
+>[<replaceable
+>NombreDeClase</replaceable
+>]</literal
+>, que puede incluir las siguientes entradas: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>El valor devuelto por la función <code
+>codeTemplate()</code
+> del complemento, que el Diseñador de &Qt; ha marcado para «uso futuro» (vacío por omisión). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Los argumentos a pasar al constructor de la clase indicada por <literal
+>ImplClass</literal
+>; deben estar entre paréntesis (por omisión: «<literal
+>(parent)</literal
+>»). La única variable cuya disponibilidad está garantizada es <varname
+>parent</varname
+>, que es el <code
+>QWidget</code
+> padre pasado por &Qt; Designer. </para>
+          <para
+>Esta entrada se ignora si está definido <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>El código necesario para crear una instancia del widget (por omisión: usa <code
+>new</code
+> para crear una instancia de la clase indicada en la entrada <literal
+>ImplClass</literal
+>, pasando los argumentos indicados en <literal
+>ConstructorArgs</literal
+>). Consulte las notas para <literal
+>ImplClass</literal
+> y <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Una descripción de la interfaz de usuario del widget en &XML; (por omisión: la predeterminada que proporcionan las cabeceras del complemento de &Qt; Designer). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>El grupo bajo el que mostrar el widget en &Qt; Designer (por omisión: el valor de la entrada <varname
+>DefaultGroup</varname
+> en la sección <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>El archivo de imagen o el nombre del icono estándar a usar como icono para este widget en la lista de widgets de &Qt; Designer (por omisión, un archivo PNG con el nombre similar al nombre de la sección, sin los dos puntos dobles, en el directorio «pics» de un archivo de recursos compilado; como <filename
+>:/pics/Foo.png</filename
+> en la sección <literal
+>[Foo]</literal
+>, o <filename
+>:/pics/FooBar.png</filename
+> en la sección <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>La clase que se debe usar para crear una instancia del widget para que se pueda usar en &Qt; Designer (por omisión, el nombre de la sección). Tenga en cuenta que no tiene por qué ser la clase que se creará en una aplicación final, que se define en <literal
+>DomXML</literal
+>. </para>
+          <para
+>Esta entrada se ignora si está definido <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>El archivo de cabecera que se debe incluir para usar este widget (por omisión, la versión en minúsculas del nombre de la sección, sin dos puntos y terminado en «.h». Por ejemplo, <literal
+>foo.h</literal
+> en la sección <literal
+>[Foo]</literal
+>, o <literal
+>foobar.h</literal
+> en la sección <literal
+>[Foo::Bar]</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Determina si este widget puede contener otros widgets (por omisión, <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>La ayuda emergente a mostrar cuando se sitúa el cursor sobre el widget en la lista de widgets de &Qt; Designer (por omisión, el nombre de la sección, terminado en « Widget»; por ejemplo, <literal
+>Foo Widget</literal
+> en la sección <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>El texto para «¿Qué es esto?» asociado con el widget en &Qt; Designer (por omisión, el nombre de la sección terminado en « Widget»; por ejemplo, <literal
+>Foo Widget</literal
+> en la sección <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Ejemplos</title>
+  <para
+>El archivo de descripción más sencillo sería parecido a: <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Muestra foo
+[Bar]
+ToolTip=Editor de Bar
+]]>
+    </screen
+> Note que cada clase debe tener al menos un conjunto de claves (en este ejemplo se ha usado <literal
+>ToolTip</literal
+>). En caso contrario se ignorará. </para>
+  <para
+>Normalmente querrá cambiar al menos el texto visible al usuario. Es decir, las entradas <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> y <literal
+>Group</literal
+>. Además, definir un nombre para el complemento suele ser una buena idea para prevenir posibles colisiones de símbolos y no confundir a los depuradores (tanto a la aplicación de depuración como a la persona que realiza la depuración): <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Display
+
+[Foo]
+ToolTip=Muestra osos
+WhatsThis=Un elemento de imagen que muestra osos bailando
+
+[Bar]
+ToolTip=Editor de barras
+WhatsThis=Una interfaz de edición de barras para los osos
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Es posible que necesite archivos más complejos si tiene clases dentro de espacios de nombres o necesita pasar opciones adicionales a los constructores. Por ejemplo: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Foo
+
+[Foo::Bar]
+ToolTip=Muestra barras
+WhatsThis=Un elemento gráfico que mustra barras de una forma particular
+IncludeFile=foo/bar.h
+IconName=:/previews/bar.png
+
+[Foo::Baz]
+IncludeFile=foo/baz.h
+ConstructorArgs=(Foo::Baz::SomeOption, parent)
+Group=Foo (Special)
+IsContainer=true
+IconName=:/previews/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>A veces, los widgets especialmente complejos pueden necesitar una implementación especial para «previsualizar la clase» en &Qt; Designer. Puede ser una subclase del widget real que solo contiene algún tipo de configuración adicional, o puede ser una implementación completamente distinta. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=foopreviews.h
+
+[FancyWidget]
+ImplClass=FancyWidgetPreview
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Consulte también</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>La documentación del Diseñador de &Qt; sobre cómo crear complementos para elementos gráficos personalizados.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Fallos</title>
+  <para
+>Para informar sobre fallos use el <ulink url="https://bugs.kde.org"
+>sistema de seguimiento de fallos de &kde;</ulink
+> en lugar de enviar un mensaje directamente a los autores. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

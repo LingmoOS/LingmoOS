@@ -1,0 +1,389 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Indonesian "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Manual Penggunaan KDE</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>18-09-2010</date>
+<productname
+>K Desktop Environment</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Jalankan program dengan hak akses yang lebih tinggi</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> perintah</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nama ikon</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioritas</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> pengguna</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opsi-opsi Generik KDE</arg
+> <arg choice="opt"
+>Opsi-opsi Generik Qt</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Deskripsi</title>
+<para
+>&kdesu; adalah sebuah front end grafik untuk perintah <command
+>su</command
+> &UNIX; untuk K Desktop Environment. Yang memungkinkanmu untuk menjalankan program sebagai pengguna yang berbeda dengan menyuplai kata sandi bagi pengguna. &kdesu; adalah sebuah program tidak perlu hak akses; ia menggunakan <command
+>su</command
+> milik sistem.</para>
+
+<para
+>&kdesu; memiliki salahsatu fitur tambahan: ia bisa secara opsional mengingat kata sandi untukmu. Jika kamu menggunakan fitur ini, kamu hanya perlu memasukkan kata sandi sekali untuk setiap perintah.</para>
+
+<para
+>Program ini bermaksud untuk dijalankan dari baris perintah atau dari file-file <filename
+>.desktop</filename
+>.</para>
+
+<para
+>Sejak <command
+>kdesu</command
+> tidak lagi diinstal dalam <userinput
+> $(kde4-config --prefix)</userinput
+>/bin tetapi dalam <userinput
+>kde4-config --path libexec</userinput
+> dan oleh karenanya tidak di <envar
+>Path</envar
+>-mu, kamu harus menggunakan <userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+></userinput
+> untuk meluncurkan <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Opsi</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>perintah</replaceable
+></option
+></term>
+<listitem
+><para
+>Penentuan perintah ini untuk berjalan sebagai root. Itu harus dilalui dalam satu argumen. Jadi jika, misalnya, kamu ingin menjalankan sebuah pengelola file baru kamu harus memasukkan prompt: <userinput
+>$(kde4-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Tampilkan informasi debug.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>file</replaceable
+></option
+></term>
+<listitem
+><para
+>Opsi ini memungkinkan &kdesu; penggunaan yang efisien dalam file <filename
+>.desktop</filename
+>. Yang memberi tahu &kdesu; untuk memeriksa file yang ditentukan oleh <parameter
+>file</parameter
+>. Jika file ini dapat ditulis oleh pengguna saat ini, &kdesu; akan mengeksekusi perintah sebagai pengguna saat ini. Jika ia tidak dapat ditulis, perintah dieksekusi sebagai <parameter
+>pengguna</parameter
+> (bakunya kepada root).</para>
+<para
+><parameter
+>file</parameter
+> telah dievaluasikan seperti ini: jika <parameter
+>file</parameter
+> memulai dengan sebuah <literal
+>/</literal
+>, ia telah diambil sebagai sebuah nama file yang mutlak. Meskipun demikian, ia telah diambil sebagai nama dari sebuah file konfigurasi &kde; global.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nama ikon</replaceable
+></term>
+<listitem
+><para
+>Ikon ditentukan untuk penggunaan di dalam dialog kata sandi. Mungkin kamu hanya menentukan nama, tanpa ekstensi apa pun.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Jangan menjaga kata sandi. Ini menonfungsikan kotak-centang <guilabel
+>jaga kata sandi</guilabel
+> di dalam dialog kata sandi.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritas</replaceable
+></term>
+<listitem>
+<para
+>Set nilai prioritas. Prioritas adalah sebuah nomor bebas antara 0 dan 100, yang mana 100 maksudnya berprioritas lebih tinggi, dan 0 maksudnya berprioritas lebih rendah. Bakunya adalah 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Gunakan penjadwalan waktu nyata.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Hentikan daemon kdesu. Ini adalah daemon yang men-cache kata sandi yang berhasil di latarbelakang. Fitur ini juga bisa dinonfungsikan dengan <option
+>-n</option
+> ketika &kdesu; pertama dijalankan.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Fungsikan output terminal. Ini menonfungsikan penjagaan kata sandi. Ini adalah sebagian besar untuk tujuan pendebugan; jika kamu ingin menjalankan aplikasi mode console, gunakan <command
+>su</command
+> standar sebagai gantinya.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> pengguna</replaceable
+></term>
+<listitem
+><para
+>Penggunaan yang paling umum &kdesu; adalah menjalankan perintah sebagai superuser, kamu bisa menyuplai nama pengguna dan kata sandi apa pun yang sesuai.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Jangan displaikan sebuah tombol abaikan.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></term>
+<listitem
+><para
+>Buat dialog tampak sebentar untuk aplikasi X yang ditentukan oleh winid.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Lihat Juga</title>
+<para
+>su(1)</para>
+
+<para
+>Dokumentasi pengguna yang lebih terperinci telah tersedia dari <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (antara masuk <acronym
+>URL</acronym
+> ini ke dalam &konqueror;, atau menjalankan <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Contoh</title>
+<para
+>Jalankan <command
+>kfmclient</command
+> sebagai pengguna <systemitem class="username"
+>budi</systemitem
+>, dan tampilkan ikon &konqueror; di dalam dialog password:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+> <option
+>-u budi</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Penulis</title>
+<para
+>&kdesu; ditulis oleh <personname
+><firstname
+>Geert</firstname
+><surname
+>Jansen</surname
+></personname
+> <email
+>jansen@kde.org</email
+> dan <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

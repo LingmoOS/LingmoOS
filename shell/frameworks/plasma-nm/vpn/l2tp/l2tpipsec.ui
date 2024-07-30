@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>L2tpIpsecWidget</class>
+ <widget class="QDialog" name="L2tpIpsecWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>538</width>
+    <height>660</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="gbEnableTunnelToHost">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Enable IPsec tunnel to L2TP host</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QGroupBox" name="gbAuthentication">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Machine Authentication</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelAuthType">
+             <property name="text">
+              <string>Type:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+             <property name="buddy">
+              <cstring>cmbAuthType</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cmbAuthType">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Select an authentication mode.</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Pre-shared Key (PSK)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Certificates (TLS)</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QStackedWidget" name="stackedWidget">
+           <widget class="QWidget" name="page">
+            <layout class="QFormLayout" name="formLayout_5">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Pre-shared Key:</string>
+               </property>
+               <property name="buddy">
+                <cstring>presharedKey</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="PasswordField" name="presharedKey">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pre-shared key (PSK) secret.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="passwordModeEnabled" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="page_1">
+            <layout class="QFormLayout" name="formLayout_2">
+             <item row="0" column="1">
+              <widget class="KUrlRequester" name="machineCA">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Certificate authority (CA) file in .pem, .der, .crt, .cer or .p12 formats.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="nameFilters">
+                <StringList>
+                 <string notr="true">*.pem *.der *.crt *.cer *.p12</string>
+                </StringList>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Machine Certificate:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+               <property name="buddy">
+                <cstring>machineCert</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="KUrlRequester" name="machineCert">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Certificate in .pem, .der or .p12 formats.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="nameFilters">
+                <StringList>
+                 <string notr="true">*.pem *.der *.crt *.cer *.p12</string>
+                </StringList>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Private Key:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+               <property name="buddy">
+                <cstring>machineKey</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="KUrlRequester" name="machineKey">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Private key in .pem, .der, .key, .pk8 or .p12 formats.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="nameFilters">
+                <StringList>
+                 <string notr="true">*.pem *.der *.key *.pk8 *.p12</string>
+                </StringList>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Private Key Password:</string>
+               </property>
+               <property name="buddy">
+                <cstring>machineKeyPassword</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="PasswordField" name="machineKeyPassword">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Password for private key or PKCS#12 certificate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="passwordModeEnabled" stdset="0">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>CA Certificate:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+               <property name="buddy">
+                <cstring>machineCA</cstring>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gbAdvanced">
+        <property name="title">
+         <string>Advanced</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Phase1 Algorithms:</string>
+           </property>
+           <property name="buddy">
+            <cstring>ike</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Phase2 Algorithms:</string>
+           </property>
+           <property name="buddy">
+            <cstring>esp</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="esp">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional. A list of proposals for ESP - Quick Mode. The format is “enc-integ,enc-integ, …”.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QTimeEdit" name="ikelifetime">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How long the keying channel of a connection should last before being renegotiated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="displayFormat">
+            <string>hh:mm:ss</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="cbIkelifetime">
+           <property name="text">
+            <string>Phase1 Lifetime:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="ike">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional. A list of proposals for IKE - Main Mode. The format is “enc-integ-group,enc-integ-group, …”.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QCheckBox" name="cbSalifetime">
+           <property name="text">
+            <string>Phase2 Lifetime:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QTimeEdit" name="salifetime">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How long a particular instance of a connection (a set of encryption/authentication keys for user packets) should last, from successful negotiation to expiry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="displayFormat">
+            <string>hh:mm:ss</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="remoteId">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Optional. How the IPsec server should be identified for authentication. Sometimes referred to as Peer ID or Gateway ID, also referred to as rightid by strongSwan, Libreswan, Openswan and FreeS/WAN. See strongSwan or Libreswan documentation for leftid/rightid syntax and identity parsing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbIPComp">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;IPComp compresses raw IP packets before they get encrypted. This saves some bandwidth, but uses more processing power.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Use IP compression</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbPFS">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Disable perfect forward secrecy. Enable this option only if the server doesn’t support PFS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Disable PFS</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="2">
+          <widget class="QCheckBox" name="cbForceEncaps">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some firewalls block ESP traffic. Enforcing UDP encapsulation even if no NAT situation is detected might help in such cases.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Enforce UDP encapsulation</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Remote ID:</string>
+           </property>
+           <property name="buddy">
+            <cstring>remoteId</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>510</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <zorder>buttonBox</zorder>
+  <zorder>gbEnableTunnelToHost</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>KUrlRequester</class>
+   <extends>QWidget</extends>
+   <header>kurlrequester.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PasswordField</class>
+   <extends>QLineEdit</extends>
+   <header>passwordfield.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>cmbAuthType</tabstop>
+  <tabstop>presharedKey</tabstop>
+  <tabstop>machineCA</tabstop>
+  <tabstop>machineCert</tabstop>
+  <tabstop>machineKey</tabstop>
+  <tabstop>machineKeyPassword</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cmbAuthType</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>345</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>L2tpIpsecWidget</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>L2tpIpsecWidget</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
+     <y>68</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbIkelifetime</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ikelifetime</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>393</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSalifetime</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>salifetime</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>418</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

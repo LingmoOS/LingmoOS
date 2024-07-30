@@ -1,0 +1,356 @@
+This is wrong but should not crash ] ) } !
+
+# comment
+
+<beginfold id='1'>config</beginfold id='1'> BR2_PACKAGE_GAMMARAY
+        bool "gammaray"
+        depends on BR2_PACKAGE_QT5
+        <beginfold id='2'>help</beginfold id='2'>
+          GammaRay Qt introspection probe.
+          second line of help, with correct indentation
+
+          GammaRay Qt introspection probe.
+          second line of help, with correct indentation
+         <endfold id='2'></endfold id='2'>third line underindented and thus wrong
+        default 'true'
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> W1_MASTER_GPIO_CUSTOM
+	tristate "Custom GPIO-based W1 driver"
+	depends on GENERIC_GPIO
+	select W1_GPIOconfig AG71XX
+	tristate "Atheros AR7XXX/AR9XXX built-in ethernet mac support"
+	depends on ATH79
+	imply HAS_TXX9_SERIAL
+	def_bool LD_VERSION >= 225000000 || LD_IS_LLD
+	select PHYLIB
+	<beginfold id='2'>---help---</beginfold id='2'>
+	  If you wish to compile a kernel for AR7XXX/91XXX and enable
+	  ethernet support, then you should always answer Y to this.
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><beginfold id='3'>comment</beginfold id='3'> "module support disabled"
+    depends on !MODULES
+
+<endfold id='3'></endfold id='3'><beginfold id='4'>menu</beginfold id='4'> myMenu
+      depends on NET
+<beginfold id='1'>config</beginfold id='1'> NETDEVICES
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	def_bool ds
+	default n
+	<beginfold id='2'>help</beginfold id='2'>
+	  Atheros AR71xx built-in ethernet driver debugging messages.
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><endfold id='4'>endmenu</endfold id='4'>
+<beginfold id='5'>if</beginfold id='5'> TARGET_OX820
+
+<beginfold id='1'>config</beginfold id='1'> SYS_CPU
+	default "arm1136"
+
+<endfold id='1'></endfold id='1'><endfold id='5'>endif</endfold id='5'>
+
+<beginfold id='5'>if</beginfold id='5'> AG71XX
+<beginfold id='1'>config</beginfold id='1'> AG71XX_DEBUG
+	bool "Atheros AR71xx built-in ethernet driver debugging"
+	default n
+	<beginfold id='2'>help</beginfold id='2'>
+	  Atheros AR71xx built-in ethernet driver debugging messages.
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><endfold id='5'>endif</endfold id='5'>
+
+# comment
+
+<beginfold id='4'>menu</beginfold id='4'> "System setup"
+
+<beginfold id='6'>choice</beginfold id='6'>
+	prompt "Alpha system type"
+	default ALPHA_GENERIC
+	string "bad"
+	<beginfold id='2'>---help---</beginfold id='2'>
+	  This is the system type of your hardware.
+
+	<endfold id='2'></endfold id='2'><beginfold id='1'>config</beginfold id='1'> HZ_32
+		bool "32 Hz"
+	<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> HZ_64
+		bool "64 Hz"
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> ALPHA_GENERIC
+	bool "Generic"
+	depends on TTY
+	select HAVE_EISA
+	select GENERIC_BUG_RELATIVE_POINTERS if X86_64
+	bool "64-bit kernel" if "$(SUBARCH)" = "x86"
+	bool "Support the legacy \"mmu-masters\" devicetree bindings"
+	depends on ARM_SMMU=y && OF
+	<beginfold id='2'>help</beginfold id='2'>
+	  A generic kernel will run on all supported Alpha hardware.
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><endfold id='6'>endchoice</endfold id='6'>
+
+<beginfold id='1'>config</beginfold id='1'> VGA_HOSE
+	bool
+	def_bool y
+	depends on VGA_CONSOLE && <beginfold id='7'>(</beginfold id='7'>ALPHA_GENERIC || ALPHA_TITAN || ALPHA_MARVEL || ALPHA_TSUNAMI<endfold id='7'>)</endfold id='7'>
+	default y
+	default n
+	default 3
+	bool "Use WTINT" if ALPHA_SRM || ALPHA_GENERIC
+	default y if ALPHA_QEMU
+	default n if ALPHA_EV5 || ALPHA_EV56 || <beginfold id='7'>(</beginfold id='7'>ALPHA_EV4 && !ALPHA_LCA<endfold id='7'>)</endfold id='7'>
+	default n if !ALPHA_SRM && !ALPHA_GENERIC
+	default y if SMP
+	default "y" if PPC_POWERNV
+	range 2 32
+	depends on SMP
+	default "32" if ALPHA_GENERIC || ALPHA_MARVEL
+	default '4' if !ALPHA_GENERIC && !ALPHA_MARVEL
+	<beginfold id='2'>help</beginfold id='2'>
+	  Support VGA on an arbitrary hose; needed for several platforms
+	  which always have multiple hoses, and whose consoles support it.
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><endfold id='4'>endmenu</endfold id='4'>
+
+<beginfold id='4'>menu</beginfold id='4'> "ARC Architecture Configuration"
+
+<beginfold id='4'>menu</beginfold id='4'> "ARC Platform/SoC/Board"
+
+#New platform adds here
+source "arch/arc/plat-eznps/Kconfig"
+source 'arch/arc/plat-hsdk/Kconfig'
+
+<endfold id='4'>endmenu</endfold id='4'>
+
+<beginfold id='4'>menu</beginfold id='4'> "ARC CPU Configuration"
+
+<beginfold id='6'>choice</beginfold id='6'>
+	prompt "ARC Core"
+	default ARC_CPU_HS if ISA_ARCV2
+	<beginfold id='2'>help</beginfold id='2'>
+	  bla bla
+
+<endfold id='2'></endfold id='2'><beginfold id='5'>if</beginfold id='5'> ISA_ARCOMPACT
+
+<beginfold id='1'>config</beginfold id='1'> ARC_CPU_750D
+	bool "ARC750D"
+	select ARC_CANT_LLSC
+	<beginfold id='2'>help</beginfold id='2'>
+	  Support for ARC750 core
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><endfold id='5'>endif</endfold id='5'> #ISA_ARCOMPACT
+
+<endfold id='6'>endchoice</endfold id='6'>
+
+<beginfold id='5'>if</beginfold id='5'> SMP
+
+<beginfold id='1'>config</beginfold id='1'> NR_CPUS
+	int "Maximum number of CPUs (2-4096)"
+	range 2 4096
+	default "4"
+
+<endfold id='1'></endfold id='1'><endfold id='5'>endif</endfold id='5'> #SMP
+
+<beginfold id='1'>config</beginfold id='1'> ARC_MMU_V4
+	bool "MMU v4"
+	depends on ISA_ARCV2
+
+<endfold id='1'></endfold id='1'><endfold id='4'>endmenu</endfold id='4'>   # "ARC CPU Configuration"
+
+<beginfold id='1'>menuconfig</beginfold id='1'> ARC_PLAT_EZNPS
+	bool "\"EZchip\" ARC dev platform"
+	depends on ISA_ARCOMPACT
+	select CPU_BIG_ENDIAN
+	select CLKSRC_NPS if !PHYS_ADDR_T_64BIT
+	<beginfold id='2'>help</beginfold id='2'>
+	  Support for EZchip development platforms,
+	  based on ARC700 cores.
+	  We handle few flavors:
+	    - Hardware Emulator AKA HE which is FPGA based chassis
+	    - Simulator based on MetaWare nSIM
+	    - NPS400 chip based on ASIC
+
+<endfold id='2'></endfold id='2'># SPDX-License-Identifier: GPL-2.0-only
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> ARM64
+	def_bool y
+	select HAVE_DYNAMIC_FTRACE_WITH_REGS \
+		if $(cc-option,-fpatchable-function-entry=2)
+	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+	<beginfold id='2'>help</beginfold id='2'>
+	  ARM 64-bit (AArch64) Linux support.
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> PHYS_OFFSET
+	hex "Physical address of main memory" if MMU
+	depends on !ARM_PATCH_PHYS_VIRT
+	default DRAM_BASE if !MMU
+	default 0x00000000 if ARCH_EBSA110 || \
+			ARCH_FOOTBRIDGE || \
+			ARCH_INTEGRATOR || \
+			ARCH_REALVIEW
+	default 0x10000000 if ARCH_OMAP1 || ARCH_RPC
+	default 0x20000000 if ARCH_S5PV210
+	default 0xc0000000 if ARCH_SA1100
+	<beginfold id='2'>help</beginfold id='2'>
+	  Please provide the physical address corresponding to the
+	  location of main memory in your system.
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><beginfold id='3'>comment</beginfold id='3'> "S3C2416 Boards"
+
+<endfold id='3'></endfold id='3'><beginfold id='1'>config</beginfold id='1'> KERNEL_RAM_BASE_ADDRESS
+	hex "Virtual address of memory base"
+	default 0xe0000000 if SOC_TMS320C6455
+	default 0xe0000000 if SOC_TMS320C6457
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> CC_IS_GCC
+	def_bool $(success,echo "$(CC_VERSION_TEXT)" | grep -q gcc)
+
+<endfold id='1'></endfold id='1'>endif # error
+
+# next line caused hang, see https://phabricator.kde.org/D18509
+<beginfold id='4'>menu</beginfold id='4'>
+
+# the next lines should all be fine
+plain:=plain_value
+ 	 with_whitespace 	:= 	 plain value whitespace
+value_with_expansion		:= $(ARCH)
+plain_expansion_mix		:= Linux/$(ARCH) $(KERNELVERSION) Kernel Configuration
+
+# function definition
+cc-option-bit 			= $(if-success,$(CC) -Werror $(1) -E -x c /dev/null -o /dev/null,$(1))
+
+# function call
+$(cc-option-bit,-m64)
+
+# function call and storing the result
+m32-flag			:= $(cc-option-bit,-m32)
+
+# call to known function
+name				:= $(filename)
+
+# call to known function with arguments
+$(warning-if,y,hello world 1)
+
+# ... with nested expansions
+$(error-if,$(success, $(LD) -v | grep -q gold), gold linker '$(LD)' not supported)
+
+# expansion in different contexts
+<beginfold id='1'>config</beginfold id='1'> FOO_$(BAR$(BAZ))
+	int "$(filename)"
+	default $(lineno) if $(lineno) >= 5
+
+<endfold id='1'></endfold id='1'><beginfold id='4'>menu</beginfold id='4'> "A MENU"
+visible if 01 > 00
+
+<beginfold id='1'>config</beginfold id='1'> A_BOOL
+	def_bool y && m || !!<beginfold id='7'>(</beginfold id='7'>!<beginfold id='7'>(</beginfold id='7'>!!n<endfold id='7'>)</endfold id='7'><endfold id='7'>)</endfold id='7'> || "$(foo)"
+
+<endfold id='1'></endfold id='1'><endfold id='4'>endmenu</endfold id='4'>
+
+# Advanced real world example taken from init/Kconfig in Linux 5.10:
+# Invoke the system shell /bin/sh with a command to pipe a C program with an
+# asm goto statement to the C compiler that is set by the environment. If the
+# exit code is 0 then set the default value of CC_HAS_ASM_GOTO_OUTPUT to y,
+# otherwise to n.
+<beginfold id='1'>config</beginfold id='1'> CC_HAS_ASM_GOTO_OUTPUT
+	depends on CC_HAS_ASM_GOTO
+	def_bool $(success,echo 'int foo(int x) { asm goto ("": "=r"(x) ::: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
+
+# Real world example with irregular indentation
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> W1_MASTER_DS2490
+	tristate "DS2490 USB <-> W1 transport layer for 1-wire"
+  	depends on USB
+  	<beginfold id='2'>help</beginfold id='2'>
+	  Say Y here if you want to have a driver for DS2490 based USB <-> W1 bridges,
+	  for example DS9490*.
+
+  	  This support is also available as a module.  If so, the module
+	  will be called ds2490.
+
+<endfold id='2'></endfold id='2'># synthetic example
+<endfold id='1'></endfold id='1'>to_upper=$(shell,echo $(1) | tr [:lower:] [:upper:])
+
+<beginfold id='1'>config</beginfold id='1'> ARGS_$(to_upper,$(CC))
+	string "Arguments for the current compiler \"$(CC)\""
+	<beginfold id='2'>help</beginfold id='2'>
+	  This is a bad idea.
+	  See <file:Documentation/completely/made-up.rst>
+
+<endfold id='2'></endfold id='2'># binary operator in expression of an if statement
+<endfold id='1'></endfold id='1'><beginfold id='5'>if</beginfold id='5'> CPU_SUPPORTS_CPUFREQ && MIPS_EXTERNAL_TIMER
+source "drivers/cpufreq/Kconfig"
+<endfold id='5'>endif</endfold id='5'>
+
+# alert on characters (here a colon) that are ignored (taken from axTLS 2.1.5)
+<beginfold id='1'>config</beginfold id='1'> CONFIG_LUA_CORE
+    string "Location of Lua CORE"
+    default "/usr/local"
+    <beginfold id='2'>help</beginfold id='2'>:
+        If the Lua exists on another directory then this needs to be changed
+
+<endfold id='2'></endfold id='2'><endfold id='1'></endfold id='1'><beginfold id='3'>comment</beginfold id='3'> "Comment texts know expansions, too: $(CC), and the depends property:"
+	depends on A_BOOL
+
+# "boolean" is now a free variable name ...
+<endfold id='1'></endfold id='1'>boolean=foo
+# ... but it looks like a bad idea. This may be disputed.
+
+<beginfold id='1'>menuconfig</beginfold id='1'> MODULES
+	bool "Enable loadable module support"
+	modules
+
+# the three modern options
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> OPTIONS
+	option allnoconfig_y
+	option modules
+	option defconfig_list
+
+# old option "env" and obsolete custom options
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> OPTIONS
+	option env=ARCH
+	option custom-without-argument
+	option custom-with-argument=ABC
+
+# old syntax
+<endfold id='1'></endfold id='1'><beginfold id='4'>menu</beginfold id='4'> OLD_STYLE_PROMPT
+visible if CPU_SUPPORTS_CPUFREQ
+
+# busybox 1.31.1
+source libbb/Config.in
+
+# uClibc-ng-1.0.37
+<beginfold id='1'>config</beginfold id='1'> DESIRED_TARGET_ARCH
+	string
+	option env="ARCH"
+
+<endfold id='1'></endfold id='1'><beginfold id='1'>config</beginfold id='1'> OLD_HELP
+	hex
+	<beginfold id='2'>---help---</beginfold id='2'>
+		old help property
+	<endfold id='2'></endfold id='2'>default 0x1CEC0FEE
+<endfold id='1'></endfold id='1'><endfold id='4'>endmenu</endfold id='4'>
+
+# a few errors
+allnoconfig_y
+bool
+def_bool
+def_tristate
+default
+defconfig_list
+depends
+endchoice
+endif
+help
+hex
+imply
+int
+mainmenu
+modules
+on
+option
+optional
+prompt
+range
+select
+string
+tristate
+visible
+
+<beginfold id='1'>config</beginfold id='1'> OK
+    bool "still OK"
+    <beginfold id='2'>help</beginfold id='2'>
+        still OK
+<endfold id='2'></endfold id='2'>now=fail
+<endfold id='1'></endfold id='1'>andNow=OK

@@ -1,0 +1,42 @@
+#!/bin/tcsh -f
+
+<beginfold id='1'>[</beginfold id='1'> a != b<endfold id='1'> ]</endfold id='1'> && echo a || echo b
+# + not an operator
+<beginfold id='1'>[</beginfold id='1'> 1+2 == '1+2'<endfold id='1'> ]</endfold id='1'> && echo a || echo b
+<beginfold id='1'>[</beginfold id='1'> 1 != '1+2'<endfold id='1'> ]</endfold id='1'> && echo a || echo b
+<beginfold id='1'>[</beginfold id='1'> a =~ b<endfold id='1'> ]</endfold id='1'> && echo a || echo b
+<beginfold id='1'>[</beginfold id='1'> a !~ b<endfold id='1'> ]</endfold id='1'> && echo a || echo b
+
+set a = 1
+set b = 2
+
+# arithmetic operators
+if <beginfold id='2'>(</beginfold id='2'>$a < $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a << $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a > $b - 2<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a + 11 >> $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a <= $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a + 1 >= $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a / $b + 1<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a % $b<endfold id='2'>)</endfold id='2'> echo 1
+if <beginfold id='2'>(</beginfold id='2'>$a * $b<endfold id='2'>)</endfold id='2'> echo 1
+
+# string operators
+if <beginfold id='2'>(</beginfold id='2'>$a == $b<endfold id='2'>)</endfold id='2'> echo s
+if <beginfold id='2'>(</beginfold id='2'>$a != $b<endfold id='2'>)</endfold id='2'> echo s
+if <beginfold id='2'>(</beginfold id='2'>$a =~ $b<endfold id='2'>)</endfold id='2'> echo s
+if <beginfold id='2'>(</beginfold id='2'>$a !~ $b<endfold id='2'>)</endfold id='2'> echo s
+
+set val = 0
+
+<beginfold id='3'>foreach</beginfold id='3'> scen <beginfold id='4'>(</beginfold id='4'> a b <endfold id='4'>)</endfold id='4'>
+  echo $scen
+
+  if <beginfold id='2'>(</beginfold id='2'>$scen == a<endfold id='2'>)</endfold id='2'> <beginfold id='5'>then</beginfold id='5'>
+    echo $scen
+  else if <beginfold id='2'>(</beginfold id='2'>$scen == x<endfold id='2'>)</endfold id='2'> then
+    echo x
+  else
+    echo $val
+  <endfold id='5'>endif</endfold id='5'>
+<endfold id='3'>end</endfold id='3'>

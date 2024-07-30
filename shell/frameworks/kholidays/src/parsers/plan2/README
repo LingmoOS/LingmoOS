@@ -1,0 +1,22 @@
+To generate the Bison/Flex parser/scanner code after any changes to
+holidayparserplan.ypp or holidayscannerplan.lpp run:
+
+    bison -d -o holidayparserplan.cpp holidayparserplan.ypp
+    flex -i -B -oholidayscannerplan.cpp holidayscannerplan.lpp
+
+Do not add this to the build system as it may be broken by differences in the
+installed versions of Bison and Flex on the build system.
+
+The following files will be generated:
+
+    holidayparserplan.hpp
+    holidayparserplan.cpp
+    holidayscannerplan.hpp
+    holidayscannerplan.cpp
+    stack.hh
+    location.hh
+    position.hh
+
+This version was built using Bison v2.3 and Flex v2.5.35.  No later versions
+are guaranteed to work.  In particular, it uses v2.1a of the Bison C++
+skeleton (lalr1.cc), this skeleton was changed and renamed in Bison v2.4.

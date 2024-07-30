@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SelectMakeModel</class>
+ <widget class="QWidget" name="SelectMakeModel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>467</width>
+    <height>358</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Select a Driver</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
+   <item row="3" column="1">
+    <widget class="KUrlRequester" name="ppdFilePathUrl">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QListView" name="makeView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+     <widget class="QListView" name="ppdsLV">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="radioButtonSelectDriver">
+       <property name="text">
+        <string>Choose &amp;the driver</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="QRadioButton" name="ppdFileRB">
+     <property name="text">
+      <string>Ma&amp;nually Provide a PPD File:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="KMessageWidget" name="messageWidget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KUrlRequester</class>
+   <extends>QWidget</extends>
+   <header location="global">kurlrequester.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KMessageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">kmessagewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>ppdFileRB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ppdFilePathUrl</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>341</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>342</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ppdFileRB</sender>
+   <signal>clicked()</signal>
+   <receiver>ppdFilePathUrl</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>340</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>462</x>
+     <y>344</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonSelectDriver</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>makeView</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonSelectDriver</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ppdsLV</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>291</x>
+     <y>12</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>297</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

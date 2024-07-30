@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.ModemCdma:
+      @short_description: The ModemManager CDMA interface.
+
+      This interface provides access to specific actions that may be performed
+      in modems with CDMA capabilities.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.ModemCdma">
+
+    <!--
+        Activate:
+        @carrier_code: Name of carrier, or carrier-specific code.
+
+        Provisions the modem for use with a given carrier using the modem's
+        <ulink url="http://en.wikipedia.org/wiki/Over-the-air_programming">Over-The-Air (OTA)</ulink>
+        activation functionality, if any.
+
+        Some modems will reboot after this call is made.
+    -->
+    <method name="Activate">
+      <arg name="carrier_code" type="s" direction="in" />
+    </method>
+
+    <!--
+        ActivateManual:
+        @properties: A dictionary of properties to set on the modem.
+
+        Sets the modem provisioning data directly, without contacting the
+        carrier over the air.
+
+        Some modems will reboot after this call is made.
+
+        This dictionary is composed of a string identifier key
+        with an associated data which contains type-specific location
+        information:
+
+        <variablelist>
+        <varlistentry><term>"spc"</term>
+          <listitem>
+            <para>
+              The Service Programming Code, given as a string of exactly 6 digit characters. Mandatory parameter.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"sid"</term>
+          <listitem>
+            <para>
+              The System Identification Number, given as a 16-bit unsigned integer (signature <literal>"q"</literal>). Mandatory parameter.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"mdn"</term>
+          <listitem>
+            <para>
+              The Mobile Directory Number, given as a string of maximum 15 characters. Mandatory parameter.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"min"</term>
+          <listitem>
+            <para>
+              The Mobile Identification Number, given as a string of maximum 15 characters. Mandatory parameter.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"mn-ha-key"</term>
+          <listitem>
+            <para>
+              The MN-HA key, given as a string of maximum 16 characters.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"mn-aaa-key"</term>
+          <listitem>
+            <para>
+              The MN-AAA key, given as a string of maximum 16 characters.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term>"prl"</term>
+          <listitem>
+            <para>
+              The Preferred Roaming List, given as an array of maximum 16384 bytes.
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <method name="ActivateManual">
+      <arg name="properties" type="a{sv}" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+      </arg>
+    </method>
+
+    <!--
+        ActivationStateChanged:
+        @activation_state: Current activation state, given as a <link linkend="MMModemCdmaActivationState">MMModemCdmaActivationState</link>.
+        @activation_error: Carrier-specific error code, given as a <link linkend="MMCdmaActivationError">MMCdmaActivationError</link>.
+        @status_changes: Properties that have changed as a result of this activation state change, including <literal>"mdn"</literal> and <literal>"min"</literal>. The dictionary may be empty if the changed properties are unknown.
+
+        The device activation state changed.
+    -->
+    <signal name="ActivationStateChanged">
+      <arg name="activation_state" type="u"     />
+      <arg name="activation_error" type="u"     />
+      <arg name="status_changes"   type="a{sv}">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In2" value="QVariantMap"/>
+      </arg>
+    </signal>
+
+    <!--
+        ActivationState:
+
+        A <link linkend="MMModemCdmaActivationState">MMModemCdmaActivationState</link>
+        value specifying the state of the activation in the 3GPP2 network.
+    -->
+    <property name="ActivationState" type="u" access="read" />
+
+    <!--
+        Meid:
+
+        The modem's <ulink url="http://en.wikipedia.org/wiki/MEID">Mobile Equipment Identifier</ulink>.
+    -->
+    <property name="Meid" type="s" access="read" />
+
+
+    <!--
+        Esn:
+
+        The modem's
+        <ulink url="http://en.wikipedia.org/wiki/Electronic_serial_number">Electronic Serial Number</ulink>
+        (superseded by MEID but still used by older devices).
+    -->
+    <property name="Esn" type="s" access="read" />
+
+    <!--
+        Sid:
+
+        The
+        <ulink url="http://en.wikipedia.org/wiki/System_Identification_Number">System Identifier</ulink>
+        of the serving CDMA 1x network, if known, and
+        if the modem is registered with a CDMA 1x network.
+
+        See <ulink url="http://ifast.org">ifast.org</ulink> or the mobile
+        broadband provider database for mappings of SIDs to network providers.
+    -->
+    <property name="Sid" type="u" access="read" />
+
+    <!--
+        Nid:
+
+        The
+        <ulink url="http://en.wikipedia.org/wiki/Network_Identification_Number">Network Identifier</ulink>
+        of the serving CDMA 1x network, if known, and
+        if the modem is registered with a CDMA 1x network.
+    -->
+    <property name="Nid" type="u" access="read" />
+
+    <!--
+        Cdma1xRegistrationState:
+
+        A <link linkend="MMModemCdmaRegistrationState">MMModemCdmaRegistrationState</link>
+        value specifying the CDMA 1x registration state.
+    -->
+    <property name="Cdma1xRegistrationState" type="u" access="read" />
+
+    <!--
+        EvdoRegistrationState:
+
+        A <link linkend="MMModemCdmaRegistrationState">MMModemCdmaRegistrationState</link>
+        value specifying the EVDO registration state.
+    -->
+    <property name="EvdoRegistrationState" type="u" access="read" />
+
+  </interface>
+</node>

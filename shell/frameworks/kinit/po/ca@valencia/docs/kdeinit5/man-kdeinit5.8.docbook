@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Catalan-Valencian "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manual d'usuari de kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>18 de desembre de 2013</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>Frameworks de KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Un iniciador d'aplicacions implementades per kdeinit, i per als esclaus KIO.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Sinopsi</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programes</arg
+> <arg
+>programes</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descripció</title>
+
+<para
+>kdeinit5 és un iniciador de processos pareixent a l'ordre <command
+>init</command
+> que s'utilitza per a l'arrancada de UNIX. Executa els programes de &kde; i els mòduls que es poden carregar de kdeinit (KLM), iniciant-los de forma més eficient. </para>
+
+<para
+>L'ús de kdeinit5 per a iniciar les aplicacions &kde;, fa que el temps d'inici d'una aplicació &kde; típica, siga dues vegades més ràpid i reduïx el consum de memòria de manera substancial.</para>
+
+<para
+>kdeinit5 està enllaçat contra totes les biblioteques que necessita una aplicació &kde; estàndard. Mitjançant esta tècnica, l'inici d'una aplicació és molt més ràpid perquè només necessita enllaçar amb l'aplicació mateixa, mentre que d'altra manera necessita enllaçar tant amb l'aplicació com amb les biblioteques que utilitza. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Desavantatges</title>
+
+<para
+>El nom del procés de les aplicacions iniciades mitjançant kdeinit5 és «kdeinit5». Este problema es pot corregir en cert grau canviant el nom de l'aplicació com es mostra amb <command
+>ps</command
+>. De totes maneres, aplicacions com <command
+>killall</command
+> tan sols veuran kdeinit5 com a nom de procés. Per a solucionar-ho utilitzeu <command
+>kdekillall</command
+> (de kdesdk/scripts) per a les aplicacions iniciades mitjançant kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Opcions</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Mostra ajuda quant a les opcions. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>No bifurcar, és a dir, no eixir fins que finalitzen tots els programes executats.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>No inicia kded.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Finalitza quan no queden aplicacions KDE en execució. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programes</option
+></term>
+<listitem>
+<para
+>Executa els programes tramitant les peticions de manipulació. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programes</option
+></term>
+<listitem>
+<para
+>Executa els programes sense tramitar les peticions de manipulació. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Ús</title>
+<para
+>Una manera estàndard per a executar este programa és senzillament especificant l'ordre següent a l'indicatiu; <userinput
+><command
+>kdeinit5</command
+> programa</userinput
+> o <userinput
+><command
+>kdeinit5</command
+> +programa </userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Fitxers</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Variables d'entorn</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Especifica el directori d'inici de l'usuari actual.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Especifica si el directori d'inici de l'usuari actual és de només lectura.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Si està establida, li indica a kdeinit5 que els programes &kde; estan preenllaçats.</para>
+<para
+>(El preenllaçat és un procés que us permet augmentar la velocitat del procés d'enllaçat dinàmic).</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Si està establida, li indica a kdeinit5 que s'està executant en un escriptori &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Vegeu també</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Errors</title>
+<para
+>Utilitzeu el <ulink url="http://bugs.kde.org"
+>seguidor d'errors de KDE</ulink
+> (escriviu-hi en anglés) per a informar-ne.</para>
+</refsect1>
+
+</refentry>
+
+
+

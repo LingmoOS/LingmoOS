@@ -1,0 +1,16 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt6DBus @REQUIRED_QT_VERSION@)
+
+if(NOT @BUILD_SHARED_LIBS@)
+    # Qt5::DBus target will have been defined by the find_dependency() call above
+    # at the time where this file is used
+    if(@Qt6Gui_FOUND@)
+        find_dependency(Qt6Gui @REQUIRED_QT_VERSION@) # qtx11extras_p.h
+    endif()
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF6DBusAddonsTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@
+include("${CMAKE_CURRENT_LIST_DIR}/KF6DBusAddonsMacros.cmake")

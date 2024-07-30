@@ -1,0 +1,269 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Ukrainian "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Інструкція користувача kded6</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Супровідник</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Автор початкової версії</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>22 червня 2023 року</date>
+<releaseinfo
+>Frameworks 6</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>Фонова служба &kde; — за потреби запускає оновлення бази даних Sycoca.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Короткий опис</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Опис</title>
+
+<para
+><command
+>kded6</command
+> поєднує у одному процесі декілька невеликих служб. Цими службами є здебільшого служби &DBus;, роботу яких забезпечують модулі KDED. Окрім того, програма керує sycoca (бінарним кешем даних щодо типів файлів, типів &MIME; та служб, які використовуються KService) та скриптами оновлення KConfig, якщо це потрібно.</para>
+
+<para
+>Для кешу sycoca ця програма слідкує за каталогами, у яких містяться файли .desktop. Після того, як до такого каталогу буде додано або вилучено файл, програма зачекає 6 секунд (щоб відстежити послідовність оновлень), а потім запустить команду <command
+>kbuildsycoca6</command
+> для оновлення бази даних sycoca.</para>
+
+<para
+>Для KConfig програма шукає нововстановлені файли оновлень, тобто файли *upd, які використовуються для оновлення файлів налаштувань користувачів у разі зміни формату файлів налаштувань. Для виконання оновлень програма запускає засіб оновлення KConfig.</para>
+
+<para
+>Ці завдання також виконуються після запуску <command
+>kded6</command
+> для забезпечення актуальності налаштувань для користувача.</para>
+
+<para
+>Зазвичай, потреби у запуску <command
+>kded6</command
+> вручну немає. Сеанси стільничного середовища Плазми запускають програму автоматично. Також програма запускається за потреби, якщо якась інша програма намагається скористатися інтерфейсом D-Bus, що надається kded5 або якимсь із модулів цієї програми.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Параметри</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>Перевірити актуальність бази даних sycoca, оновити її, якщо це потрібно, і завершити роботу. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Налаштування</title>
+
+<para
+><command
+>kded6</command
+> можна налаштувати за допомогою файла налаштувань <filename
+>kded6rc</filename
+> у форматі ini. У системах Unix теку цей файл зберігається за адресою <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+>. Якщо змінну середовища <varname
+>$XDG_CONFIG_HOME</varname
+> не визначено, типовим місцем для файла є <filename
+>~/.config/kded6rc</filename
+>.</para>
+
+<para
+>Записи файла налаштувань буде прочитано за потреби, тому можна вносити до файла налаштувань зміни, не зупиняючи роботи <command
+>kded6</command
+>. Втім, усі поточні значення параметрів налаштування впливають лише на поведінку <command
+>kded6</command
+> під час запуску програми.</para>
+
+<para
+>У розділі <option
+>[General]</option
+> зберігаються значення таких параметрів: <variablelist>
+<varlistentry>
+<term
+><option
+>CheckSycoca</option
+></term>
+<listitem
+><para
+>Визначає, чи слід оновлювати sycoca під час запуску (типове значення: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckUpdates</option
+></term>
+<listitem
+><para
+>Визначає, чи слід виконувати додаткові оновлення KConfig під час запуску (типове значення: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckFileStamps</option
+></term>
+<listitem
+><para
+>Визначає, чи слід виконувати перевірку часових позначок під час початкового оновлення sycoca (типове значення: <constant
+>true</constant
+>). Щоб дізнатися більше, зверніться до документації з <command
+>kbuildsycoca6</command
+>.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>DelayedCheck</option
+></term>
+<listitem
+><para
+>Визначає, чи слід відкладати початкове оновлення sycoca на одну хвилину після запуску (типове значення: <constant
+>false</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Крім того, для кожного модуля у <filename
+>kded6rc</filename
+> передбачено власний розділ <option
+>[Module-<replaceable
+>назва</replaceable
+>]</option
+>, де <replaceable
+>назва</replaceable
+> — назва файла desktop модуля без розширення <filename
+>.desktop</filename
+>. У цьому розділі міститься запис параметра <option
+>autoload</option
+>, який визначає, чи слід завантажувати модуль автоматично під час запуску <command
+>kded6</command
+> (типове значення: <constant
+>false</constant
+>). Зауважте, що значення цього параметра можна змінити за допомогою інтерфейсу D-Bus <command
+>kded6</command
+>.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Прочитайте також</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Вади</title>
+<para
+>Для сповіщення про вади скористайтеся адресою <ulink url="http://bugs.kde.org"
+>системою стеження за вадами &kde;</ulink
+>.</para>
+</refsect1>
+
+</refentry>

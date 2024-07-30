@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Spanish "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manual del usuario de kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2013-12-18</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Lanzador para aplicaciones preparadas para usar kdeinit y para los esclavos KIO.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Resumen</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programs</arg
+> <arg
+>programs</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descripción</title>
+
+<para
+>kdeinit5 es un lanzador de procesos parecido a la orden <command
+>init</command
+> que se utiliza para arrancar UNIX. Ejecuta los programas de &kde; y los módulos cargables de kdeinit (KLM) iniciándolos de manera más eficiente. </para>
+
+<para
+>El uso de kdeinit5 para lanzar una aplicación de &kde; hace que el tiempo de inicio de una aplicación típica de &kde; sea dos veces más rápido y reduce el consumo de memoria de forma importante.</para>
+
+<para
+>kdeinit5 está enlazado con todas las bibliotecas que necesita una aplicación estándar de &kde;. Mediante esta técnica, el inicio de una aplicación es mucho más rápido porque solo se necesita enlazar a la propia aplicación, mientras que en otro caso se necesita, enlazar tanto a la aplicación como a las bibliotecas. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Desventajas</title>
+
+<para
+>El nombre del proceso de una aplicación arrancada mediante kdeinit4 es «kdeinit5». Este problema puede corregirse hasta cierto punto cambiando el nombre de la aplicación como se muestra con <command
+>ps</command
+>. Sin embargo, aplicaciones como <command
+>killall</command
+> solo verán kdeinit5 como nombre de proceso. Para solucionar esto utilice <command
+>kdekillall</command
+> (de kdesdk/scripts) para las aplicaciones arrancadas mediante kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Opciones</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Muestra ayuda sobre las opciones </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>No bifurcar, es decir, no salir hasta que todos los programas ejecutados finalicen</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>No iniciar kded</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Finalizar cuando no queden aplicaciones de KDE en ejecución </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programs</option
+></term>
+<listitem>
+<para
+>ejecuta las peticiones de manipulación de los programas </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programas</option
+></term>
+<listitem>
+<para
+>ejecuta los programas sin peticiones de manipulación </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Utilización</title>
+<para
+>Un modo estándar de ejecutar este programa es especificar lo siguiente en la línea de ordenes <userinput
+><command
+>kdeinit5</command
+> program</userinput
+> or <userinput
+><command
+>kdeinit5</command
+> +program </userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Archivos</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Variables de entorno</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Especifica el directorio personal del usuario actual</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Especifica si el directorio personal del usuario actual es de solo lectura</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Si está activado, indica a kdeinit5 que los programas de &kde; están enlazados previamente.</para>
+<para
+>(El preenlazado es un proceso que le permite aumentar la velocidad del proceso de enlace dinámico).</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Si está activado, indica a kdeinit5 que se está ejecutando en un escritorio &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Vea también</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Fallos</title>
+<para
+>Por favor, use <ulink url="http://bugs.kde.org"
+>KDE's bugtracker</ulink
+> para informar de fallos.</para>
+</refsect1>
+
+</refentry>
+
+
+

@@ -1,0 +1,598 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname-n '<application>КДЕ су</application>'>
+  <!ENTITY kappname-g '<application>КДЕ суа</application>'>
+  <!ENTITY kappname-d '<application>КДЕ суу</application>'>
+  <!ENTITY kappname-a '<application>КДЕ су</application>'>
+  <!ENTITY kappname-i '<application>КДЕ суом</application>'>
+  <!ENTITY kappname-l '<application>КДЕ суу</application>'>
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Serbian "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Приручник за <application
+>КДЕ су</application
+></title>
+
+<authorgroup>
+<author
+><personname
+><firstname
+>Герт</firstname
+> <surname
+>Јансен</surname
+></personname
+> &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Драган</firstname
+><surname
+>Пантелић</surname
+><affiliation
+><address
+><email
+>falcon-10@gmx.de</email
+></address
+></affiliation
+><contrib
+>превод</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>Герт Јансен</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21. 9. 2010.</date>
+<releaseinfo
+>КДЕ 4.5</releaseinfo>
+
+
+<abstract
+><para
+><application
+>КДЕ су</application
+> је графичко прочеље за уникс наредбу <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>КДЕ</keyword>
+<keyword
+>su</keyword>
+<keyword
+>лозинка</keyword>
+<keyword
+>корен</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Увод</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kde4-config - -path libexec)kdesu - - program_to_run
+  
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Добро дошли у <application
+>КДЕ су</application
+>! <application
+>КДЕ су</application
+> је графичко прочеље за уникс наредбу <command
+>su</command
+> за КДЕ. Омогућава вам да покренете програм под другим корисником, задавши његову лозинку. <application
+>КДЕ су</application
+> није повлашћен програм, већ користи системску <command
+>su</command
+>.</para>
+
+<para
+><application
+>КДЕ су</application
+> има једну додатну могућност: може опционо да памти лозинке уместо вас. Ако се ослоните на ово, за сваку наредбу треба само једанпут да унесете лозинку. За више информација и безбедносну анализу, погледајте <xref linkend="sec-password-keeping"/>.</para>
+
+<para
+>Овај програм је намењен покретању из командне линије или из .десктоп фајлова. Мада захтева корену лозинку кроз графички дијалог, пре је мост између командне линије и ГУИ‑ја него чисти ГУИ програм.</para>
+
+<para
+>Пошто се <command
+>kdesu</command
+> више не инсталира у <filename
+><userinput
+>$(kde4-config --prefix)</userinput
+>/bin/</filename
+> већ у <filename
+><userinput
+>kde4-config --path libexec</userinput
+></filename
+>, и стога више није у путањи (<envar
+>PATH</envar
+>), мораћете да је покрећете помоћу <userinput
+>$(kde4-config --path libexec)<command
+>/kdesu</command
+></userinput
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Коришћење <application
+>КДЕ суа</application
+></title>
+
+<para
+>Употреба <application
+>КДЕ суа</application
+> је лака. Синтакса гласи:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+>наредба</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+>фајл</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+>име‑иконице</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+>приоритет</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+>корисник</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+>ИД‑прозора</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>генеричке‑КДЕ‑опције</arg
+> <arg choice="opt"
+>генеричке‑КуТ‑опције</arg
+> </cmdsynopsis>
+
+<para
+>Опције командне линије објашњене су испод.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>наредба</replaceable
+></option
+></term>
+<listitem
+><para
+>Задаје да се наредба прослеђена као аргумент извршава под кореном. На пример, када пожелите да покренете нови менаџер фајлова, унели бисте у одзивник: <userinput
+>$(kde4-config --path libexec)/<command
+>kdesu</command
+> <option
+>-c</option
+> dolphin</userinput
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Приказ исправљачких података.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>фајл</replaceable
+></option
+></term>
+<listitem
+><para
+>Ова опција омогућава ефикасно коришћење <application
+>КДЕ суа</application
+> у .десктоп фајловима. Говори <application
+>КДЕ суу</application
+> да испита фајл задат параметром <parameter
+>фајл</parameter
+>: ако је тај фајл уписив за тренутног корисника, <application
+>КДЕ су</application
+> ће извршити наредбу под тим корисником; ако није, наредба се извршава под задатим корисником (подразумевано је то корен, <literal
+>root</literal
+>).</para>
+<para
+>Параметар <parameter
+>фајл</parameter
+> обрађује се овако: ако почиње са <literal
+>/</literal
+>, узима се за апсолутну путању до фајла; иначе, узима се за име глобалног КДЕ поставног фајла.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>име‑иконице</replaceable
+></term>
+<listitem
+><para
+>Задаје иконицу за употребу у дијалогу лозинке. Можете задати само име без наставка.</para>
+<para
+>На пример, да покренете <application
+>К‑освајач</application
+> у режиму менаџера фајлова и добијете иконицу <application
+>К‑освајача</application
+> у дијалогу лозинке:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i</option
+> konqueror 
+<option
+>-c</option
+> "konqueror --profile filemanagement"</userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Без памћења лозинке. Искључује кућицу <guilabel
+>Упамти лозинку</guilabel
+> у дијалогу лозинке.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>приоритет</replaceable
+></term>
+<listitem>
+<para
+>Поставља вредност приоритета, на број између 0 и 100: 0 значи најнижи приоритет, а 100 највиши. Подразумевано је 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Стварновременско распоређивање.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Зауставља демона <application
+>КДЕ суа</application
+>. Погледајте <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Укључује терминалски излаз. Такође искључује памћење лозинки. Ово умногоме служи у исправљачке сврхе; ако желите да покренете програм конзолног режима, употребите уместо овога стандардну <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>корисник</replaceable
+></term>
+<listitem
+><para
+>Иако је најчешћа примена <application
+>КДЕ суа</application
+> извршавање наредбе под кореном, можете задати било које корисничко име и одговарајућу лозинку.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Изнутрице</title>
+
+<sect1 id="x-authentication">
+<title
+>Икс аутентификација</title>
+
+<para
+>Покренути програм радиће под ИД‑ом кореног корисника и генерално неће имати овлашћење да приступи вашем икс приказу. <application
+>КДЕ су</application
+> заобилази ово додавањем аутентификационог колачића у привремени фајл <filename
+>.Xauthority</filename
+>. По окончању наредбе, овај фајл се уклања. </para>
+
+<para
+>Ако не користите икс колачиће, препуштени сте сами себи. <application
+>КДЕ су</application
+> ће ово открити и неће додати колачић, али ћете морати да обезбедите да је корену дозвољено да приступи вашем икс приказу.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Сучеље за <command
+>su</command
+></title>
+
+<para
+><application
+>КДЕ су</application
+> користи системску <command
+>su</command
+> за добављање овлашћења. У овој секцији објаснићемо како <application
+>КДЕ су</application
+> то ради. </para>
+
+<para
+>Пошто неке изведбе наредбе <command
+>su</command
+> (тј. она Редхетова) неће да читају лозинку са стдул., <application
+>КДЕ су</application
+> ствара пар ПТИ/ТТИ и извршава <command
+>su</command
+> са стандардним фајл описницима повезаним на ТТИ.</para>
+
+<para
+>За извршење задате наредбе, уместо интерактивне шкољке <application
+>КДЕ су</application
+> користи опцију <option
+>-c</option
+> са аргументом наредбе <command
+>su</command
+>. Овај аргумент разуме свака шкољка за коју знамо, па би требао да буде преносиво. <command
+>su</command
+> прослеђује аргумент <option
+>-c</option
+> шкољци циљног корисника, а она извршава програм. Пример: <command
+>su<option
+>root -c <replaceable
+>наредба</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Уместо непосредног извршења задате наредбе кроз <command
+>su</command
+>, <application
+>КДЕ су</application
+> извршава мали програм заметак <command
+>kdesu_stub</command
+>. Овај заметак (ради под циљним корисником) добавља нешто података од <application
+>КДЕ суа</application
+> преко ПТИ/ТТИ канала (заметковог стдул. и стдиз.), а затим извршава задату наредбу. Подаци који се прослеђују: икс приказ, икс аутентификациони колачић (ако је расположив), променљива <envar
+>PATH</envar
+> и наредба за покретање. Употреба заметка је неопходна зато што је икс колачић приватан податак, те се не може проследити кроз командну линију.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Провера лозинке</title>
+
+<para
+><application
+>КДЕ су</application
+> ће проверити унету лозинку, и ако није исправна, издати поруку о грешци. Провера се спроводи пробним извршавањем <filename
+>/bin/true</filename
+>: ако успе, претпоставља се да је лозинка исправна.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Памћење лозинки</title>
+
+<para
+>Ради ваше удобности, <application
+>КДЕ су</application
+> изводи могућност <emphasis
+>памћења лозинки</emphasis
+>. Ако вас занима безбедност тога, треба да прочитате наредне пасусе.</para>
+
+<para
+>Дозвољавање <application
+>КДЕ суу</application
+> да памти лозинке отвара (малу) безбедносну рупу на систему. Очигледно, <application
+>КДЕ су</application
+> неће дозволити ниједном осим вашем корисничком ИД‑у да користи лозинке, али, ако се ово неопрезно изведе, спушта безбедносни ниво корена на онај нормалног корисника (вас); провалник који би упао у ваш налог добио би и корени приступ. <application
+>КДЕ су</application
+> покушава ово да спречи, безбедносном шемом која је, барем по нашем мишљењу, разумно сигурна и изложена испод.</para>
+
+<para
+><application
+>КДЕ су</application
+> користи демон, <command
+>kdesud</command
+>, који ослушкује за наредбама на уникс сокету у <filename
+>/tmp</filename
+>. Режим сокета је 0600, тако да се на њега може повезати само ваш кориснички ИД. Ако је укључено памћење лозинки, <application
+>КДЕ су</application
+> извршава наредбе преко овог демона: упише наредбу и корену лозинку у сокет, а демон је изврши кроз <command
+>su</command
+> као што је претходно описано. Наредба и лозинка се потом не одбацују, већ се задржавају одређено време, тј. до прековремена задатог у контролном модулу. Ако стигне још један захтев за исту наредбу током овог временског периода, клијент не мора да наводи лозинку. Да би се спречили провалници који упадну на ваш налог да покраду лозинке из демона (нпр. прикључивањем исправљача), демон се инсталира са сУИД‑ом <literal
+>nogroup</literal
+>. Ово би требало да спречи све обичне кориснике (укључујући и вас) у добављању лозинки из процеса <command
+>kdesud</command
+>. Демон такође поставља променљиву окружења <envar
+>DISPLAY</envar
+> на вредност коју је имала кад је био покренут. Једино што провалник може да уради јесте да покрене програм на вашем икс приказу.</para>
+
+<para
+>Једна слаба тачка у овој шеми је у томе што програми које извршавате вероватно нису писани са безбедношћу на уму (попут програма са сУИД‑ом <literal
+>root</literal
+>). Могли би имати прекорачења бафера или друге проблеме које би провалник могао да искористи.</para>
+
+<para
+>Могућност памћења лозинки је трампа између безбедности и удобности. Охрабрујемо вас да ово размотрите и сами донесете одлуку да ћете је користити.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Аутор</title>
+
+<para
+><application
+>КДЕ су</application
+></para>
+
+<para
+>© 2000, <personname
+><firstname
+>Герт</firstname
+> <surname
+>Јансен</surname
+></personname
+></para>
+
+<para
+><application
+>КДЕ су</application
+> је написао <personname
+><firstname
+>Герт</firstname
+> <surname
+>Јансен</surname
+></personname
+>, донекле на основу <application
+>КДЕ суа</application
+> верзије 0.3 <personname
+><firstname
+>Пијетра</firstname
+> <surname
+>Иља</surname
+></personname
+>. Нас двојица смо се сложили да убудуће ја одржавам овај програм.</para>
+
+<para
+>Аутору се можете обратити путем е‑поште, на &Geert.Jansen.mail;. Ако пронађете било какве грешке, пријавите их да бих их могао исправити. Такође ми се слободно обратите ако имате неки предлог.</para>
+
+<para
+>Превео Драган Пантелић <email
+>falcon-10@gmx.de</email
+>.</para
+> 
+&underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

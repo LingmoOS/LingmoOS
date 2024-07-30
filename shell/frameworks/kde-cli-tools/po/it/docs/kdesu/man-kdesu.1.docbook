@@ -1,0 +1,379 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Italian "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Manuale utente di KDE</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>2010-09-18</date>
+<productname
+>K Desktop Environment</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Esegue un programma con privilegi elevati</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> comando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nome icona</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priorità</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> utente</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opzioni generiche di &kde;</arg
+> <arg choice="opt"
+>Opzioni generiche di &Qt;</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descrizione</title>
+<para
+>&kdesu; è un'interfaccia grafica per KDE del programma <command
+>su</command
+> di &UNIX;. Permette di eseguire un programma come se si fosse un utente diverso, fornendo la password di tale utente. &kdesu; è un programma senza particolari privilegi; usa il comando <command
+>su</command
+> del sistema.</para>
+
+<para
+>&kdesu; ha una funzione aggiuntiva: può ricordarsi, opzionalmente, la password. Se usi questa funzione devi inserire la password una volta sola per ciascun comando.</para>
+
+<para
+>Questo programma è progettato per essere eseguito dalla riga di comando o dai file <filename
+>.desktop</filename
+>.</para>
+
+<para
+>Dal momento che <command
+>kdesu</command
+> non è più installato in <userinput
+> $(kf5-config --prefix)</userinput
+>/bin, ma in <userinput
+>kf5-config --path libexec</userinput
+> e non è più quindi nella variabile <envar
+>Path</envar
+>, devi usare <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> per eseguire <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Opzioni</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>comando</replaceable
+></option
+></term>
+<listitem
+><para
+>Specifica il comando da eseguire come root. Deve essere passato come unico argomento. Così se, per esempio, vuoi lanciare un nuovo gestore di file, dovrai inserire alla riga di comando: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Visualizza le informazioni di debug.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>file</replaceable
+></option
+></term>
+<listitem
+><para
+>Questa opzione permette un uso efficiente di &kdesu; nei file <filename
+>.desktop</filename
+>. Dice a &kdesu; di esaminare il file specificato da <parameter
+>file</parameter
+>. Se questo file è scrivibile dall'utente corrente, &kdesu; esegue il comando con l'utente corrente. Se non è scrivibile, il comando viene eseguito con l'utente <parameter
+>utente</parameter
+> (valore predefinito impostato a root).</para>
+<para
+><parameter
+>file</parameter
+> è valutato in questo modo: se <parameter
+>file</parameter
+> comincia con una <literal
+>/</literal
+>, viene interpretato come un nome di file assoluto. Altrimenti, viene preso come nome di un file di configurazione globale di &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nome icona</replaceable
+></term>
+<listitem
+><para
+>Specifica l'icona da utilizzare nella finestra di dialogo della password. Puoi specificarne semplicemente il nome, senza alcuna estensione.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Non memorizzare la password. Disabilita la casella <guilabel
+>ricorda password</guilabel
+> nella finestra di dialogo della password.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>priorità</replaceable
+></term>
+<listitem>
+<para
+>Imposta il valore della priorità. La priorità è un numero arbitrario compreso tra 0 e 100, dove 100 significa la priorità massima e 0 la minima. L'impostazione predefinita è 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Uitlizza lo scheduling realtime.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Interrompe il demone kdesu, cioè il demone che tiene a memoria le password usate con successo. Questa funzione può essere anche disabilitata usando <option
+>-n</option
+> come argomento dell'esecuzione iniziale di &kdesu;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Abilita l'output del terminale. Ciò disabilita la memorizzazione della password. È principalmente per scopi di debug; se vuoi lanciare un'applicazione della modalità console, usa piuttosto il comando standard <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> utente</replaceable
+></term>
+<listitem
+><para
+>Anche se l'utilizzo principale di &kdesu; è quello di eseguire un comando come superutente, puoi fornire qualsiasi nome utente e la password appropriata.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Non mostrare il pulsante Ignora.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></term>
+<listitem
+><para
+>Rende la finestra di dialogo transitoria per un'applicazione X specificata da winid.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Vedi anche</title>
+<para
+>su(1)</para>
+
+<para
+>Documentazione per l'utente più dettagliata è disponibile con <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (puoi inserire questo &URL; in &konqueror;, o eseguire <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Esempi</title>
+<para
+>Esegue <command
+>kfmclient</command
+> come utente <systemitem class="username"
+>jim</systemitem
+> e mostra l'icona di &konqueror; nella finestra della password.</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jim</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Autori</title>
+<para
+>&kdesu; è stato scritto da &Geert.Jansen; &Geert.Jansen.mail; e <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

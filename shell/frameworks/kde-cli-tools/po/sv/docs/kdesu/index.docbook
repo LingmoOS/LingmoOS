@@ -1,0 +1,516 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Swedish "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Kör som root handbok</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+> <firstname
+>Stefan</firstname
+> <surname
+>Asserhäll</surname
+> <affiliation
+><address
+><email
+>stefan.asserhall@bredband.net</email
+></address
+></affiliation
+> <contrib
+>Översättare</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-09-21</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>Kör som root är ett grafiskt gränssnitt för &UNIX;-kommandot <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>lösenord</keyword>
+<keyword
+>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Inledning</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Välkommen till Kör som root! Kör som root är ett grafiskt gränssnitt för &UNIX;-kommandot <command
+>su</command
+> för skrivbordsmiljön KDE. Det låter dig köra ett program som en annan användare genom att ange lösenordet för den användaren. Kör som root är ett program utan särskilda behörigheter. Det använder systemets <command
+>su</command
+>.</para>
+
+<para
+>Kör som root har ytterligare en funktion: det kan komma ihåg lösenord åt dig. Om du använder den här funktionen behöver du bara ange lösenordet en gång för varje kommando. Se <xref linkend="sec-password-keeping"/> för mer information om det här och en säkerhetsanalys.</para>
+
+<para
+>Det är meningen att det här programmet ska startas från kommandoraden eller från <filename
+>.desktop</filename
+>-filer. Även om det frågar efter <systemitem class="username"
+>root</systemitem
+>-lösenordet med en grafisk dialogruta, anser jag att det är mer som en kommandorad &lt;-&gt; grafiskt gränssnitt koppling, än ett program med ett rent grafiskt gränssnitt.</para>
+
+<para
+>Eftersom <command
+>kdesu</command
+> inte längre installeras i <userinput
+> $(kf5-config --prefix)</userinput
+>/bin utan i <userinput
+>kf5-config --path libexec</userinput
+> och därför inte finns i <envar
+>PATH</envar
+>, måste man använda <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> för att starta <command
+>kdesu</command
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Att använda Kör som root</title>
+
+<para
+>Användningen av Kör som root är enkel. Syntaxen är så här:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> kommando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> fil</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> ikonnamn</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioritet</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> användare</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> fönster-id</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Generella &kde;-väljare</arg
+> <arg choice="opt"
+>Generella &Qt;-väljare</arg
+> </cmdsynopsis>
+
+<para
+>Kommandoradsparametrarna förklaras nedan.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>kommando</replaceable
+></option
+></term>
+<listitem
+><para
+>Det här anger kommandot att köra som systemadministratör. Det måste skickas i ett argument. Om du till exempel vill starta en ny filhanterare, skulle du skriva in: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Visa felsökningsinformation.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fil</replaceable
+></option
+></term>
+<listitem
+><para
+>Den här parametern tillåter effektiv användning av Kör som root i <filename
+>.desktop</filename
+>-filer. Det talar om för Kör som root att det ska titta i filen som anges av <parameter
+>fil</parameter
+>. Om filen är skrivbar för den nuvarande användaren körs kommandot som det nuvarande användaren. Om den inte är skrivbar, körs kommandot som användaren <parameter
+> användare</parameter
+> (standardvärde är root).</para>
+<para
+><parameter
+>fil</parameter
+> utvärderas så här: om <parameter
+>fil</parameter
+> börjar med <literal
+>/</literal
+>, tolkas den som ett absolut filnamn. Annars tolkas den som namnet på en global &kde;-inställningsfil.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ikonnamn</replaceable
+></term>
+<listitem
+><para
+>Ange ikon att använda i lösenordsdialogrutan. Du kan ange bara namnet, utan någon filändelse.</para>
+<para
+>För att till exempel köra &konqueror; med filhanteringsläge och visa &konqueror;s ikon i lösenordsdialogrutan:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Behåll inte lösenordet. Det inaktiverar kryssrutan <guilabel
+>behåll lösenord </guilabel
+> i lösenordsdialogrutan.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></term>
+<listitem>
+<para
+>Ange prioritetsvärde. Prioriteten är ett godtyckligt tal mellan 0 och 100, där 100 betyder högsta prioritet, och 0 betyder lägsta. Standardvärdet är 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Använd realtidsschemaläggning.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Avbryt kdesu-demonen. Se <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Aktivera terminalutmatning. Det här stänger av funktionen att behålla lösenord. Det här är enbart för avlusningssyfte. Om du vill köra ett kommandoradsprogram, använd det vanliga <command
+>su</command
+> istället.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>användare</replaceable
+></term>
+<listitem
+><para
+>Även om den vanligaste användningen av &kdesu; är att köra ett kommando som systemadministratör, kan du ange vilket användarnamn som helst och lämpligt lösenord.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Interna funktioner</title>
+
+<sect1 id="x-authentication">
+<title
+>X-identifiering</title>
+
+<para
+>Programmet du startar kör med användaridentiteten root och har i allmänhet inga behörigheter att komma åt din X-skärm. Kör som root kommer runt detta genom att lägga till en identifieringskaka för din skärm i en tillfällig <filename
+>.Xauthority</filename
+>-fil. Efter kommandot avslutats, tas den här filen bort. </para>
+
+<para
+>Om du inte använder X-kakor, är du utelämnad till dig själv. Kör som root upptäcker det här och lägger inte till en kaka, men du måste försäkra dig om att root har behörigheter att komma åt din skärm.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Gränssnitt med <command
+>su</command
+></title>
+
+<para
+>Kör som root använder systemets <command
+>su</command
+> kommando för att erhålla behörigheter. I det här avsnittet förklarar jag detaljerna om hur Kör som root gör det här. </para>
+
+<para
+>Eftersom vissa <command
+>su</command
+>-implementeringar (dvs. den från &RedHat;) inte vill läsa lösenordet från <literal
+>stdin</literal
+>, så skapar Kör som root ett pty/tty-par och kör <command
+>su</command
+> med dess standard fildeskriptorer anslutna till tty:n.</para>
+
+<para
+>För att köra kommandot som användaren valt, istället för ett interaktivt skal, använder Kör som root parametern <option
+>-c</option
+> till <command
+>su</command
+>. Den här parametern förstås av alla skal som jag känner till, så det här bör vara flyttningsbart. <command
+>Su</command
+> skickar parametern <option
+>-c</option
+> till den slutliga användarens skal, och skalet kör programmet. Exempel på kommando: <command
+>su <option
+>root -c <replaceable
+>programmet</replaceable
+></option
+></command
+>.</para>
+
+<para
+>I stället för att köra användarkommandot direkt med <command
+>su</command
+>, startar Kör som root ett litet stödprogram som heter <application
+>kdesu_stub</application
+>. Detta stödprogram (som kör som målanvändaren), begär en del information från Kör som root över pty/tty-kanalen (stödprogrammets stdin och stdout) och kör sedan användarens program. Informationen som skickas över är: X-skärmen, en X-identifieringskaka (om tillgänglig), <envar
+>PATH</envar
+> och kommandot som ska köras. Orsaken att ett stödprogram används är att X-kakan är privat information och kan därför inte skickas på kommandoraden.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Lösenordskontroll</title>
+
+<para
+>Kör som root kontrollerar lösenordet som du skrivit in och ger ett felmeddelande om det inte är riktigt. Kontrollen görs genom att köra ett testprogram: <filename
+>/bin/true</filename
+>. Om det här lyckas, antas lösenordet vara riktigt.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Kom ihåg lösenord</title>
+
+<para
+>För din bekvämlighet implementerar Kör som root en funktion för att <quote
+>behålla lösenord</quote
+>. Om du är intresserad av säkerhet, bör du läsa det här stycket.</para>
+
+<para
+>Att låta Kör som root komma ihåg lösenord öppnar en (liten) säkerhetslucka i ditt system. Uppenbarligen låter inte Kör som root någon annan än din användaridentitet använda lösenorden, men, om det görs utan försiktighet, sänker detta säkerhetsnivån för <systemitem class="username"
+>root</systemitem
+> till en vanlig användares nivå (din). En hackare som bryter sig in i ditt konto, skulle komma åt <systemitem class="username"
+>root</systemitem
+>. Kör som root försöker hindra detta. Säkerhetsmetoden som används är, iallafall enligt min mening, rimligt säker och förklaras här.</para>
+
+<para
+>Kör som root använder en demon, som kallas <application
+>kdesud</application
+>. Demonen lyssnar med ett &UNIX;-uttag (socket) i <filename
+>/tmp</filename
+> efter kommandon. Uttagets behörigheter är 0600, så att bara din användaridentitet kan ansluta till det. Om funktionen att komma ihåg lösenord är aktiverad, startar Kör som root kommandon via den här demonen. Det skriver kommandon och <systemitem class="username"
+>root</systemitem
+>-lösenordet till uttaget och demonen kör kommandot med <command
+>su</command
+>, som beskrivits ovan. Därefter slängs inte kommandot och lösenordet som beskrivits ovan, utan de behålls en angiven tid. Det här är tidsgränsen från inställningsmodulen. Om en annan förfrågan med samma kommando anländer inom den här tidsperioden, behöver inte klienten ange lösenordet. För att förhindra att hackare som brutit sig in i ditt konto stjäl lösenorden från demonen (till exempel genom att ansluta en avlusare), installeras demonen som en set-group-id med ingen grupp. Detta bör förhindra alla normala användare (inklusive dig själv) från att ta reda på lösenord från <application
+>kdesud</application
+>-processen. Dessutom sätter demonen <envar
+>DISPLAY</envar
+>-miljövariabeln till värdet den hade när den startade. Det enda en hackare kan göra är att köra ett program på din skärm.</para>
+
+<para
+>En svaghet med den här metoden är att program som du kör förmodligen inte är skrivna med säkerhet i åtanke (som setuid <systemitem class="username"
+>root</systemitem
+>-program). Det betyder att de kan ha buffrar som blir överfulla eller andra problem, och att en hackare skulle kunna utnyttja dessa.</para>
+
+<para
+>Användning av funktionen att komma ihåg lösenord är en kompromiss mellan säkerhet och bekvämlighet. Jag uppmuntrar dig att tänka igenom och bestämma själv om du vill använda den eller inte.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Upphovsman</title>
+
+<para
+>Kör som root</para>
+
+<para
+>Copyright 2000 &Geert.Jansen;</para>
+
+<para
+>Kör som root är skrivet av &Geert.Jansen;. Det är till viss del baserat på Pietro Iglios Kör som root, version 0.3. Pietro och jag kom överens om att jag ska underhålla det här programmet i framtiden.</para>
+
+<para
+>Upphovsmannen kan nås via e-post på &Geert.Jansen.mail;. Rapportera alla fel du hittar så att jag kan rätta dem. Om du har ett förslag, tveka inte att kontakta mig.</para>
+
+<para
+>Översättning Stefan Asserhäll <email
+>stefan.asserhall@bredband.net</email
+></para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

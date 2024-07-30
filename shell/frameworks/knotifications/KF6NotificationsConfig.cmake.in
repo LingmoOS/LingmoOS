@@ -1,0 +1,24 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt6Gui @REQUIRED_QT_VERSION@)
+if (@HAVE_DBUS@)
+    find_dependency(Qt6DBus @REQUIRED_QT_VERSION@)
+endif()
+
+if (NOT @BUILD_SHARED_LIBS@) 
+    find_dependency(KF6Config "@KF_DEP_VERSION@")
+
+    if (@WITH_SNORETOAST@)
+        find_dependency(LibSnoreToast)
+        find_dependency(Qt6Network @REQUIRED_QT_VERSION@)
+    endif()
+
+    if (@Canberra_FOUND@)
+        find_dependency(Canberra)
+    endif()
+
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF6NotificationsTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@

@@ -1,0 +1,148 @@
+#!/bin/bash
+set -e
+
+TEST_FRAMEWORKS="kapidox kcoreaddons kitemmodels kauth kcompletion kwidgetsaddons kiconthemes"
+
+PROGNAME=$(basename $0)
+
+oldpwd=$PWD
+cd $(dirname $0)
+SRC_DIR=$PWD/../src
+cd $oldpwd
+
+
+die() {
+    echo "$PROGNAME: ERROR: $*" | fold -s -w "${COLUMNS:-80}" >&2
+    exit 1
+}
+
+
+usage() {
+    if [ "$*" != "" ] ; then
+        echo "ERROR: $*"
+    fi
+
+    cat << EOF
+Usage: $PROGNAME [OPTION ...] <framework-base-dir> [<test>...]
+  ...program description...
+Options:
+  -v                  display command output
+  --keep              keep temporary dir
+  -h, --help          display this usage message and exit
+EOF
+
+    exit 1
+}
+
+is_in_list() {
+    local wanted="$1"
+    shift
+    for item in $* ; do
+        if [ "$wanted" = "$item" ] ; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+fails=""
+run_test() {
+    local name=$1
+    local dir=$2
+    local cmd="$3"
+    local log="$sandbox_dir/$name.log"
+
+    if [ -n "$tests" ] ; then
+        if ! is_in_list $name $tests ; then
+            return
+        fi
+    fi
+
+    cd $dir
+    local exitcode
+    if [ "$verbose" = true ] ; then
+        echo "$name: $cmd"
+        $cmd 2>&1 | tee $log
+        exitcode=${PIPESTATUS[0]}
+    else
+        echo -n "$name: "
+        if $cmd > $log 2>&1 ; then
+            exitcode=0
+        else
+            exitcode=$?
+        fi
+    fi
+    if [ $exitcode -eq 0 ] ; then
+        echo "OK"
+    else
+        echo "FAIL, see $log"
+        fails="$fails $name"
+    fi
+}
+
+
+show_results() {
+    echo "------------------"
+    if [ -n "$fails" ] ; then
+        echo "Failures: $fails"
+        echo "$sandbox_dir has been kept for inspection"
+        exit 1
+    else
+        echo "Success"
+        if [ "$keep_tmp_dir" = "true" ] ; then
+            echo "$sandbox_dir kept"
+        else
+            rm -rf $sandbox_dir
+        fi
+    fi
+}
+
+
+src_fw_base_dir=""
+verbose=false
+keep_tmp_dir=false
+tests=""
+while [ $# -gt 0 ] ; do
+    case "$1" in
+    -h|--help)
+        usage
+        ;;
+    -v)
+        verbose=true
+        ;;
+    --keep)
+        keep_tmp_dir=true
+        ;;
+    -*)
+        usage "Unknown option '$1'"
+        ;;
+    *)
+        if [ -z "$src_fw_base_dir" ] ; then
+            src_fw_base_dir="$1"
+        else
+            tests="$tests $1"
+        fi
+        ;;
+    esac
+    shift
+done
+
+if [ -z "$src_fw_base_dir" ] ; then
+    usage "Not enough arguments"
+fi
+
+sandbox_dir=$(mktemp --directory --tmpdir kapidox-test-XXXXX)
+fw_base_dir=$sandbox_dir/frameworks
+mkdir $fw_base_dir
+
+cd $fw_base_dir
+for fw in $TEST_FRAMEWORKS ; do
+    ln -s $src_fw_base_dir/$fw
+done
+mkdir $sandbox_dir/fwapidox
+
+ls $fw_base_dir
+run_test kapidox_generate-kcompletion $fw_base_dir/kcompletion "$SRC_DIR/kapidox_generate $fw_base_dir/kcompletion"
+ls $fw_base_dir
+run_test kapidox_generate-fw $sandbox_dir/fwapidox "$SRC_DIR/kapidox_generate $fw_base_dir"
+show_results

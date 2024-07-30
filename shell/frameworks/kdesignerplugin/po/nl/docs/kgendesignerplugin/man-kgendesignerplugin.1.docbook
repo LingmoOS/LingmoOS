@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Dutch "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde-frameworks;: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Schreef de originele documentatie.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>De documentatie voor &kf5-full; is bijgewerkt.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>2014-05-28</date>
+  <releaseinfo
+>Frameworks 5.0</releaseinfo>
+  <productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Genereert widget-plug-ins voor &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>OPTIES</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>bestand</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Beschrijving</title>
+  <para
+>De aangepaste widget-plug-ins voor &Qt; Designer volgen gewoonlijk een standaard patroon en de door de plug-in geleverde klassen beiden meestal statische informatie, samen met de functie om een exemplaar te maken die normaal gewoon een eenvoudige aanroep van een constructor is. <command
+>kgendesignerplugin</command
+> stelt ontwikkelaars van bibliotheken die nieuwe widgets leveren om zo'n plug-in te maken zonder alle geassocieerde boilerplate-code te maken, door een eenvoudige ini-stijl beschrijvingsbestand te leveren. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> kiest zinvolle standaarden voor de meeste instellingen, dus is een minimale configuratie gewoonlijk nodig. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Opties</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>bestand</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>De naam voor het gegenereerde C++ bestand. Indien niet gegeven zal <varname
+>stdout</varname
+> worden gebruikt. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>plug-in-naam</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Geboden voor compatibiliteit. De standaard waarde voor de PluginName-optie is in het invoerbestand. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>groep</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Geboden voor compatibiliteit. De standaard waarde voor de DefaultGroup-optie in het invoerbestand. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Auteurinformatie tonen.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Licentie-informatie tonen.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Een korte helptekst tonen.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v , --version</option
+></term>
+      <listitem>
+        <para
+>Versie-informatie tonen</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Bestandsformaat</title>
+  <para
+>Het invoerbestand is een configuratiebestand in ini-stijl (meer specifiek is het in het formaat ondersteund door het framework van KConfig) dat een set widgets beschrijft. Het bevat een sectie <literal
+>[Global]</literal
+>, die algemene informatie over de plug-in levert en een sectie voor elk widget dat ingevoegd zou moeten worden in de plug-in. </para>
+
+  <para
+>De sectie <literal
+>[Global]</literal
+> kan de volgende items bevatten: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>De standaard waarde voor het item <varname
+>Group</varname
+> in de secties klasse is standaard: "<literal
+>Custom</literal
+>", tenzij de optie <option
+>-g</option
+> is gegeven. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Een (kommagescheiden) lijst van vereiste includes (standaard: leeg). Merk op dat de header-bestanden voor de widgets later gespecificeerd in het bestand hier niet in de lijst moet staan; in plaats daarvan is dit voor speciale headers voor eigen gebruik van de plug-in, zoals die voor klassen die previews leveren. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>De naam van de hoofd C++ klasse in de plug-in (standaard: "<literal
+>WidgetsPlugin</literal
+>", tenzij de optie <option
+>-n</option
+> is gegeven). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Elk klasse moet zijn eigen sectie <literal
+>[<replaceable
+>ClassName</replaceable
+>]</literal
+> hebben, die de volgende items ingevoegd kan hebben: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>De waarde teruggegeven door de functie <code
+>codeTemplate()</code
+> van de plug-in, die gemarkeerd is voor "toekomstig gebruik" door &Qt; Designer (standaard: leeg). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>De argumenten om door te geven aan de constructor van de klasse gegeven door <literal
+>ImplClass</literal
+>; deze moeten omgeven worden door ronde haakjes (standaard: "<literal
+>(parent)</literal
+>"). De enige gegarandeerde variabele die beschikbaar is is <varname
+>parent</varname
+>, wat de ouder is van <code
+>QWidget</code
+> doorgegeven door &Qt; Designer. </para>
+          <para
+>Dit item wordt genegeerd als <literal
+>CreateWidget</literal
+> is ingesteld. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>De code nodig om een exemplaar van het widget te maken (standaard: gebruikt <code
+>new</code
+> om een exemplaar van de klasse gegeven door het item <literal
+>ImplClass</literal
+> te maken, waarbij de argumenten gespecificeerd door <literal
+>ConstructorArgs</literal
+>) worden doorgegeven. Zie de notities voor <literal
+>ImplClass</literal
+> en <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Een &XML; UI beschrijving van het widget (standaard: de standaard geleverd door de plug-in-headers van &Qt; Designer). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>De groep waaronder het widget wordt getoond in &Qt; Designer (standaard: de waarde van het item <varname
+>DefaultGroup</varname
+> in de sectie <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Pictogramnaam</varname
+></term>
+        <listitem>
+          <para
+>De naam van het afbeeldingsbestand of standaard pictogramnaam voor gebruik als het pictogram voor dit widget in de lijst met &Qt; Designer widgets (standaard: een PNG-bestandsnaam met de sectienaam, met elke dubbele dubbelpunt verwijdert, in de map "pics" van een bij compileren ingesloten broncodebestand; bijvoorbeeld, <filename
+>:/pics/Foo.png</filename
+> in de sectie <literal
+>[Foo]</literal
+> of <filename
+>:/pics/FooBar.png</filename
+> in de sectie <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>De klasse die gebruikt zou moeten worden om een exemplaar van het widget te maken voor gebruik van &Qt; Designer (standaard: de sectienaam). Merk op dat dit niet echt de klasse hoeft te zijn die zou worden genaakt voor een eindtoepassing: die bepaald wordt door de <literal
+>DomXML</literal
+>. </para>
+          <para
+>Dit item wordt genegeerd als <literal
+>CreateWidget</literal
+> is ingesteld. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>De header die ingesloten moet worden om dit widget te gebruiken (standaard: de versie in kleine letters van de sectienaam, met elke dubbelpunt verwijdert en ".h" achtergevoegt; bijvoorbeeld, <literal
+>foo.h</literal
+> in de sectie <literal
+>[Foo]</literal
+> of <literal
+>foobar.h</literal
+> in de sectie <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Of dit widget andere widgets kan bevatten (standaard: <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Tekstballon</varname
+></term>
+        <listitem>
+          <para
+>De te tonen tekstballon bij zweven boven het widget in de lijst met widgets van &Qt; Designer (standaard: de sectienaam, met " Widget" achtergevoegd; bijvoorbeeld, <literal
+>Foo Widget</literal
+> in de sectie <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WatisDit</varname
+></term>
+        <listitem>
+          <para
+>De WatisDit-tekst verbonden aan het widget in &Qt; Designer (standaard: de sectienaam, met " Widget" achtergevoegd; bijvoorbeeld, <literal
+>Foo Widget</literal
+> in de sectie <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Voorbeelden</title>
+  <para
+>Het eenvoudigste beschrijvingsbestand kan er zo uit zien: <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Toont foo's
+[Bar]
+ToolTip=Balk-editor
+]]>
+    </screen
+> Merk op dat elke klasse minstens één set toetsen moet hebben (<literal
+>ToolTip</literal
+> is in dit voorbeeld gebruikt), anders zal het worden genegeerd. </para>
+  <para
+>Gewoonlijk zult u de voor de gebruiker zichtbare tekst willen wijzigen, dus de items <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> en <literal
+>Group</literal
+>. Bovendien kan het instellen van de naam van de plug-in een goed idee zijn om mogelijke botsingen tussen symbolen te voorkomen en debuggers niet te verwarren (zowel de toepassing voor debuggen als de persoon die de debugging uitvoert): <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Display
+
+[Foo]
+ToolTip=Displays bears
+WhatsThis=Een afbeeldingswidget dat dansende beren toont
+
+[Bar]
+ToolTip=Bar editor
+WhatsThis=Een editor-interface voor balken voor beren
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Meer complexe bestanden kunnen noodzakelijk zijn als u klassen met naamruimten hebt of extra opties die het leveren van constructors nodig hebben, bijvoorbeeld: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Foo
+
+[Foo::Bar]
+ToolTip=Toon balken
+WhatsThis=Een widget die balken toont op een speciale manier
+IncludeFile=foo/bar.h
+IconName=:/previews/bar.png
+
+[Foo::Baz]
+IncludeFile=foo/baz.h
+ConstructorArgs=(Foo::Baz::SomeOption, parent)
+Group=Foo (Special)
+IsContainer=true
+IconName=:/previews/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>Soms is, speciaal bij complexe widgets, een speciale "preview class" implementatie nodig bij gebruik in &Qt; Designer; dit kan een subklasse zijn van de echte widget die gewoon enige extra instellingen doet of het kan een compleet andere implementatie zijn. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=foopreviews.h
+
+[FancyWidget]
+ImplClass=FancyWidgetPreview
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Zie ook</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/doc/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>De documentatie van &Qt; Designer over het maken van plug-ins voor eigen widgets.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Fouten/bugs</title>
+  <para
+>Gaarne <ulink url="http://bugs.kde.org"
+>bugvolger van &kde;</ulink
+> gebruiken om bugrapporten in te dienen, stuur geen e-mail direct naar de auteurs. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

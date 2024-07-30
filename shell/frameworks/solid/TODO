@@ -1,0 +1,79 @@
+Temporary Roadmap before inclusion in trunk
+
+Mn : Milestone n
+- : done
++ : to do
+# : in progress
+! : cancelled or postponed
+
+Inception Phase
+---------------
+
+M1 Architecture design and quick prototyping
+- Prepare architecture view for handling hardware discovery, power management and
+  networking (done)
+- Prepare a high level model for hardware handling (done)
+- Implement partly (no capability support) this high level model using HAL as
+  backend (done)
+- Make a tiny 'lshal' clone using the implementation (done)
+
+M2 Cleaning up and preparing construction
+- Fully document implemented classes and methods
+- Split out the HAL specific code in its own backend
+- Implement the stub backend for unit testing
+- First unit tests
+- Syncing with D-BUS, HAL and KDE latest version
+- Add unit tests in the HAL backend
+
+
+Construction Phase
+------------------
+From here, a feature is considered implemented when:
+1) The classes and methods are fully documented
+2) Unit tests for the feature are implemented
+
+M3 Completing hardware handling
+! Implement bus specific data gathering in the backends:
+	Postpone? might not be useful...
+- Implement job support for slow operations (mount/umount for example)
+	- Reuse the Job logic from KIO, provides progress, etc.
+	- Means that we'll have to track the refactoring that will happen there
+	  KIO::Job should become more generic in the future (KJob is in now in
+          kdecore)
+- Implement support for the first capabilities
+-   Storage and Cdrom
+-   Volume and Disc
+-   Camera
+-   PortableMediaPlayer
+
+M4 Network Management
+- Select a first backend target : NetworkManager is the current candidate
+- Prepare a high-level model
+- Implement support for the following capabilities in the hardware layer
+-   NetworkHw (handle both Ethernet and Wireless)
+# Implement the network management model and the first backend
+
+M5 Power Management
+- Prepare a high-level model
+! Implement suspend/resume notification and inhibit
+- Implement support for the following capabilities in the hardware layer
+-   AcAdaptor
+-   Battery
+-   Button
+- Implement the power management model and the first backend
+
+M6 Migration to trunk
+- Clean up code and comments
++ Prepare documentation about how to work with this new framework
+- Add even more unit tests if appropriate
+- Merge to trunk
+
+M7 Make use of it
++ Port the mediamanager and the medianotifier to this framework
++ Make a Plasma Engine to encapsulate this framework
++ Reimplement the media applet using the new engine
+
+Stop a bit... And rethink the way the user will be able to interact with the hardware.
+If we reach M7 we'll have a strong base to create a great new interaction model with
+the hardware.
+

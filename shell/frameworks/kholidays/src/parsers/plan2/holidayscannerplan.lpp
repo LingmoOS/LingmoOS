@@ -1,0 +1,354 @@
+/*
+    Original version from plan:
+        SPDX-FileCopyrightText: Thomas Driemeyer <thomas@bitrot.de>
+
+    Adapted for use in KOrganizer:
+        SPDX-FileCopyrightText: Preston Brown <pbrown@kde.org> and
+        SPDX-FileCopyrightText: Reinhold Kainhofer <reinhold@kainhofer.com>
+
+    Major rewrite using Bison C++ skeleton:
+        SPDX-FileCopyrightText: 2010 John Layt <john@layt.net>
+
+    SPDX-License-Identifier: LGPL-2.0-or-later
+*/
+
+%{ /*** C/C++ Declarations ***/
+# include <cstdlib>
+# include <errno.h>
+# include <limits.h>
+# include <string>
+
+# include <kholidays_debug.h>
+
+# include "holidayscannerplan_p.h"
+# include "holidayparserdriverplan_p.h"
+# include "holidayparserplan.hpp"
+
+/* import the parser's token type into a local typedef */
+typedef KHolidays::HolidayParserPlan::token token;
+typedef KHolidays::HolidayParserPlan::token_type token_type;
+
+/* By default yylex returns int, we use token_type. Unfortunately yyterminate
+ * by default returns 0, which is not of token_type. */
+# define yyterminate() return token::END
+
+/* This disables inclusion of unistd.h, which is not available under Visual C++
+ * on Win32. The C++ scanner uses STL streams instead. */
+# define YY_NO_UNISTD_H
+%}
+
+/*** Flex Declarations and Options ***/
+
+/* enable c++ scanner class generation */
+%option c++
+
+/* change the name of the scanner class. results in "HolidayScannerFlexLexer" */
+%option prefix="HolidayScanner"
+
+/* the manual says "somewhat more optimized" */
+%option batch
+
+/* enable scanner to generate debug output. disable this for release
+ * versions. */
+%option debug
+
+/* no support for include files is planned */
+%option yywrap nounput
+
+/* enables the use of start condition stacks */
+%option stack
+
+%option 8bit
+
+/* The following paragraph suffices to track locations accurately. Each time
+ * yylex is invoked, the begin position is moved onto the end position. */
+%{
+# define YY_USER_ACTION  yylloc->columns( yyleng );
+%}
+
+%% /*** Regular Expressions Part ***/
+
+%{
+    /* code to place at the beginning of yylex() */
+    // reset location
+    yylloc->step();
+%}
+
+#.*\n               { yylloc->lines( yyleng ); yylloc->step(); }
+^:.*\n              { yylloc->lines( yyleng ); yylloc->step(); }
+[ \t\r]+            { yylloc->step(); }
+[\n]+               { yylloc->lines( yyleng ); yylloc->step(); }
+[-+*/%.!?:()\[\]]   { return KHolidays::HolidayParserPlan::token_type( *yytext ); }
+
+country             { return token::COUNTRY; }
+language            { return token::LANGUAGE; }
+name                { return token::NAME; }
+description         { return token::DESCRIPTION; }
+
+[0-9]+              { yylval->ival = atoi( yytext ); return token::NUMBER; }
+
+\"[^"]*\"           { yylval->sval = strdup( yytext + 1 );
+                      yylval->sval[ strlen( yylval->sval ) - 1 ] = 0;
+                      return token::STRING; }
+
+every               ;
+day                 ;
+days                ;
+on                  ;
+to                  ;
+in                  { return token::INOP; }
+if                  { return token::IF; }
+plus                { return token::PLUS; }
+minus               { return token::MINUS; }
+year                { return token::YEAR; }
+leapyear            { return token::LEAPYEAR; }
+easter              { return token::EASTER; }
+pascha              { return token::PASCHA; }
+length              { return token::LENGTH; }
+shift               { return token::SHIFT; }
+
+"=="                { return token::EQ; }
+"!="                { return token::NE; }
+"<="                { return token::LE; }
+">="                { return token::GE; }
+"<"                 { return token::LT; }
+">"                 { return token::GT; }
+"&&"                { return token::AND;}
+"||"                { return token::OR; }
+
+1st|first           { yylval->ival =      1; return token::NUMBER; }
+2nd|second          { yylval->ival =      2; return token::NUMBER; }
+3rd|third           { yylval->ival =      3; return token::NUMBER; }
+4th|fourth          { yylval->ival =      4; return token::NUMBER; }
+5th|fifth           { yylval->ival =      5; return token::NUMBER; }
+last                { yylval->ival =  99999; return token::NUMBER; }
+any                 { yylval->ival = -99999; return token::NUMBER; }
+noop                { yylval->ival =      0; return token::NUMBER; }
+
+before              { yylval->ival =  -1; return token::NUMBER; }
+after               { yylval->ival =   1; return token::NUMBER; }
+
+public              { yylval->sval = (char *)"public"; return token::CATEGORY; }
+civil               { yylval->sval = (char *)"civil"; return token::CATEGORY; }
+religious           { yylval->sval = (char *)"religious"; return token::CATEGORY; }
+school              { yylval->sval = (char *)"school"; return token::CATEGORY; }
+government          { yylval->sval = (char *)"government"; return token::CATEGORY; }
+financial           { yylval->sval = (char *)"financial"; return token::CATEGORY; }
+cultural            { yylval->sval = (char *)"cultural"; return token::CATEGORY; }
+commemorative       { yylval->sval = (char *)"commemorative"; return token::CATEGORY; }
+historical          { yylval->sval = (char *)"historical"; return token::CATEGORY; }
+nameday             { yylval->sval = (char *)"nameday"; return token::CATEGORY; }
+seasonal            { yylval->sval = (char *)"seasonal"; return token::CATEGORY; }
+
+gregorian           { yylval->sval = (char *)"gregorian"; return token::CALENDAR; }
+julian              { yylval->sval = (char *)"julian"; return token::CALENDAR; }
+
+january             { yylval->ival =   1; return token::MONTH; }
+february            { yylval->ival =   2; return token::MONTH; }
+march               { yylval->ival =   3; return token::MONTH; }
+april               { yylval->ival =   4; return token::MONTH; }
+may                 { yylval->ival =   5; return token::MONTH; }
+june                { yylval->ival =   6; return token::MONTH; }
+july                { yylval->ival =   7; return token::MONTH; }
+august              { yylval->ival =   8; return token::MONTH; }
+september           { yylval->ival =   9; return token::MONTH; }
+october             { yylval->ival =  10; return token::MONTH; }
+november            { yylval->ival =  11; return token::MONTH; }
+december            { yylval->ival =  12; return token::MONTH; }
+
+monday              { yylval->ival =   1; return token::WDAY; }
+tuesday             { yylval->ival =   2; return token::WDAY; }
+wednesday           { yylval->ival =   3; return token::WDAY; }
+thursday            { yylval->ival =   4; return token::WDAY; }
+friday              { yylval->ival =   5; return token::WDAY; }
+saturday            { yylval->ival =   6; return token::WDAY; }
+sunday              { yylval->ival =   7; return token::WDAY; }
+
+coptic              { yylval->sval = (char *)"coptic"; return token::CALENDAR; }
+
+thoout              { yylval->ival =   1; return token::MONTH; }
+paope               { yylval->ival =   2; return token::MONTH; }
+hathor              { yylval->ival =   3; return token::MONTH; }
+kiahk               { yylval->ival =   4; return token::MONTH; }
+tobe                { yylval->ival =   5; return token::MONTH; }
+meshir              { yylval->ival =   6; return token::MONTH; }
+paremhotep          { yylval->ival =   7; return token::MONTH; }
+parmoute            { yylval->ival =   8; return token::MONTH; }
+pashons             { yylval->ival =   9; return token::MONTH; }
+paone               { yylval->ival =  10; return token::MONTH; }
+epep                { yylval->ival =  11; return token::MONTH; }
+mesore              { yylval->ival =  12; return token::MONTH; }
+koujinabot          { yylval->ival =  13; return token::MONTH; }
+
+pesnau              { yylval->ival =   1; return token::WDAY; }
+pshoment            { yylval->ival =   2; return token::WDAY; }
+peftoou             { yylval->ival =   3; return token::WDAY; }
+ptiou               { yylval->ival =   4; return token::WDAY; }
+psoou               { yylval->ival =   5; return token::WDAY; }
+psabbaton           { yylval->ival =   6; return token::WDAY; }
+tkyriake            { yylval->ival =   7; return token::WDAY; }
+
+ethiopian           { yylval->sval = (char *)"ethiopian"; return token::CALENDAR; }
+
+meskerem            { yylval->ival =   1; return token::MONTH; }
+tequemt             { yylval->ival =   2; return token::MONTH; }
+hedar               { yylval->ival =   3; return token::MONTH; }
+tahsas              { yylval->ival =   4; return token::MONTH; }
+ter                 { yylval->ival =   5; return token::MONTH; }
+yakatit             { yylval->ival =   6; return token::MONTH; }
+magabit             { yylval->ival =   7; return token::MONTH; }
+miyazya             { yylval->ival =   8; return token::MONTH; }
+genbot              { yylval->ival =   9; return token::MONTH; }
+sene                { yylval->ival =  10; return token::MONTH; }
+hamle               { yylval->ival =  11; return token::MONTH; }
+nehase              { yylval->ival =  12; return token::MONTH; }
+pagumen             { yylval->ival =  13; return token::MONTH; }
+
+segno               { yylval->ival =   1; return token::WDAY; }
+maksegno            { yylval->ival =   2; return token::WDAY; }
+rob                 { yylval->ival =   3; return token::WDAY; }
+hamus               { yylval->ival =   4; return token::WDAY; }
+arb                 { yylval->ival =   5; return token::WDAY; }
+qedame              { yylval->ival =   6; return token::WDAY; }
+ehud                { yylval->ival =   7; return token::WDAY; }
+
+hebrew              { yylval->sval = (char *)"hebrew"; return token::CALENDAR; }
+
+tishrey             { yylval->ival =   1; return token::MONTH; }
+heshvan             { yylval->ival =   2; return token::MONTH; }
+kislev              { yylval->ival =   3; return token::MONTH; }
+tevet               { yylval->ival =   4; return token::MONTH; }
+shvat               { yylval->ival =   5; return token::MONTH; }
+adar                { yylval->ival =   6; return token::MONTH; }
+nisan               { yylval->ival =   7; return token::MONTH; }
+iyar                { yylval->ival =   8; return token::MONTH; }
+sivan               { yylval->ival =   9; return token::MONTH; }
+tamuz               { yylval->ival =  10; return token::MONTH; }
+av                  { yylval->ival =  11; return token::MONTH; }
+elul                { yylval->ival =  12; return token::MONTH; }
+adari               { yylval->ival =  13; return token::MONTH; }
+adarii              { yylval->ival =  14; return token::MONTH; }
+
+yomsheni            { yylval->ival =   1; return token::WDAY; }
+yomshlishi          { yylval->ival =   2; return token::WDAY; }
+yomrevii            { yylval->ival =   3; return token::WDAY; }
+yomchamishi         { yylval->ival =   4; return token::WDAY; }
+yomshishi           { yylval->ival =   5; return token::WDAY; }
+shabbat             { yylval->ival =   6; return token::WDAY; }
+yomrishon           { yylval->ival =   7; return token::WDAY; }
+
+hijri               { yylval->sval = (char *)"hijri"; return token::CALENDAR; }
+
+muharram            { yylval->ival =   1; return token::MONTH; }
+safar               { yylval->ival =   2; return token::MONTH; }
+rabialawal          { yylval->ival =   3; return token::MONTH; }
+rabialthaani        { yylval->ival =   4; return token::MONTH; }
+jumaadaalawal       { yylval->ival =   5; return token::MONTH; }
+jumaadaalthaani     { yylval->ival =   6; return token::MONTH; }
+rajab               { yylval->ival =   7; return token::MONTH; }
+shaban              { yylval->ival =   8; return token::MONTH; }
+ramadan             { yylval->ival =   9; return token::MONTH; }
+shawwal             { yylval->ival =  10; return token::MONTH; }
+thualqidah          { yylval->ival =  11; return token::MONTH; }
+thualhijjah         { yylval->ival =  12; return token::MONTH; }
+
+yaumalithnain       { yylval->ival =   1; return token::WDAY; }
+yaualthulatha       { yylval->ival =   2; return token::WDAY; }
+yaumalarbia         { yylval->ival =   3; return token::WDAY; }
+yaumalkhamees       { yylval->ival =   4; return token::WDAY; }
+yaumaljumma         { yylval->ival =   5; return token::WDAY; }
+yaumalsabt          { yylval->ival =   6; return token::WDAY; }
+yaumalahad          { yylval->ival =   7; return token::WDAY; }
+
+indiannational      { yylval->sval = (char *)"indiannational"; return token::CALENDAR; }
+
+chaitra             { yylval->ival =   1; return token::MONTH; }
+vaishakh            { yylval->ival =   2; return token::MONTH; }
+jyaishtha           { yylval->ival =   3; return token::MONTH; }
+ashadha             { yylval->ival =   4; return token::MONTH; }
+shravana            { yylval->ival =   5; return token::MONTH; }
+bhadrapad           { yylval->ival =   6; return token::MONTH; }
+ashwin              { yylval->ival =   7; return token::MONTH; }
+kartik              { yylval->ival =   8; return token::MONTH; }
+agrahayana          { yylval->ival =   9; return token::MONTH; }
+paush               { yylval->ival =  10; return token::MONTH; }
+magh                { yylval->ival =  11; return token::MONTH; }
+phalgun             { yylval->ival =  12; return token::MONTH; }
+
+somavara            { yylval->ival =   1; return token::WDAY; }
+mangalva            { yylval->ival =   2; return token::WDAY; }
+budhavara           { yylval->ival =   3; return token::WDAY; }
+guruvara            { yylval->ival =   4; return token::WDAY; }
+sukravara           { yylval->ival =   5; return token::WDAY; }
+sanivara            { yylval->ival =   6; return token::WDAY; }
+raviara             { yylval->ival =   7; return token::WDAY; }
+
+jalali              { yylval->sval = (char *)"jalali"; return token::CALENDAR; }
+
+farvardin           { yylval->ival =   1; return token::MONTH; }
+ordibehesht         { yylval->ival =   2; return token::MONTH; }
+khordad             { yylval->ival =   3; return token::MONTH; }
+tir                 { yylval->ival =   4; return token::MONTH; }
+mordad              { yylval->ival =   5; return token::MONTH; }
+shahrivar           { yylval->ival =   6; return token::MONTH; }
+mehr                { yylval->ival =   7; return token::MONTH; }
+aban                { yylval->ival =   8; return token::MONTH; }
+azar                { yylval->ival =   9; return token::MONTH; }
+dei                 { yylval->ival =  10; return token::MONTH; }
+bahman              { yylval->ival =  11; return token::MONTH; }
+esfand              { yylval->ival =  12; return token::MONTH; }
+
+doshanbe            { yylval->ival =   1; return token::WDAY; }
+seshanbe            { yylval->ival =   2; return token::WDAY; }
+chaharshanbe        { yylval->ival =   3; return token::WDAY; }
+panjshanbe          { yylval->ival =   4; return token::WDAY; }
+jumee               { yylval->ival =   5; return token::WDAY; }
+shanbe              { yylval->ival =   6; return token::WDAY; }
+yekshanbe           { yylval->ival =   7; return token::WDAY; }
+
+.                   { LexerError( yytext ); }
+
+%% /*** Additional Code ***/
+
+namespace KHolidays {
+
+HolidayScannerPlan::HolidayScannerPlan(std::istream* in, std::ostream* out)
+                  : HolidayScannerFlexLexer(in, out)
+{
+}
+
+HolidayScannerPlan::~HolidayScannerPlan()
+{
+}
+
+void HolidayScannerPlan::set_debug(bool b)
+{
+    yy_flex_debug = b;
+}
+
+} // namespace KHolidays
+
+/* This implementation of HolidayScannerFlexLexer::yylex() is required to fill the
+ * vtable of the class HolidayScannerFlexLexer. We define the scanner's main yylex
+ * function via YY_DECL to reside in the HolidayScannerPlan class instead. */
+
+#ifdef yylex
+#undef yylex
+#endif
+
+int HolidayScannerFlexLexer::yylex()
+{
+    qCDebug(KHOLIDAYS_LOG) << "in HolidayScannerFlexLexer::yylex() !";
+    return 0;
+}
+
+/* When the scanner receives an end-of-file indication from YY_INPUT, it then
+ * checks the yywrap() function. If yywrap() returns false (zero), then it is
+ * assumed that the function has gone ahead and set up `yyin' to point to
+ * another input file, and scanning continues. If it returns true (non-zero),
+ * then the scanner terminates, returning 0 to its caller. */
+
+int HolidayScannerFlexLexer::yywrap()
+{
+    return 1;
+}

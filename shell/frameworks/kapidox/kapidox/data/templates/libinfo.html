@@ -1,0 +1,58 @@
+<div class="menu-box">
+  <div class="menu-title">
+    <h2 class="h4 mt-2">About {{ fwinfo.fancyname }}</h2>
+  </div>
+  <div class="menu-content">
+    <p>{{ fwinfo.description }}</p>
+
+    <dl class="pl-0">
+      <dt>Maintainer{% if fwinfo.maintainers|count > 1 %}s{% endif %}</dt>
+        <dd>{% set product = fwinfo %}{% include "maintainers.html" %}</dd>
+
+      <dt>Supported platforms</dt>
+        <dd>
+      {% for platform in fwinfo.platforms | sort %}
+        {% if platform.name == "UNKNOWN" %}
+            All the platforms supported by Qt
+        {% else %}
+            {{ platform }}{% if not loop.last %}, {% endif %}
+        {% endif %}
+      {% endfor %}
+         </dd>
+
+      <dt>Community</dt>
+        {% if fwinfo.irc %}
+        <dd>IRC: <a href="irc://irc.libera.chat/#{{ fwinfo.irc }}">#{{ fwinfo.irc }}</a> on Libera Chat</dd>
+        {% endif %}
+        {% if fwinfo.mailinglist %}
+        <dd>Mailing list: <a href="https://mail.kde.org/mailman/listinfo/{{ fwinfo.mailinglist }}">{{ fwinfo.mailinglist }}</a></dd>
+        {% endif %}
+
+    {% if fwinfo.libraries is iterable and fwinfo.libraries|count != 0 %}
+      <dt>Use with <a href="https://techbase.kde.org/Development/Tutorials/CMake">CMake</a></dt>
+        <dd><pre class="fragment">find_package({{ fwinfo.cmakename }})
+target_link_libraries(yourapp{% for lib in fwinfo.libraries %} {{ lib.cmake }}{% endfor %})</pre>
+        </dd>
+
+    {% endif %}
+    {% if fwinfo.libraries|selectattr("qmake")|list|count != 0 %}
+      <dt>Use with QMake</dt>
+        <dd><pre class="fragment">QT +={% for lib in fwinfo.libraries|selectattr("qmake") %} {{ lib.qmake }}{% endfor %} {% for line in fwinfo.qmakepro %}<br/>{{ line }} {% endfor %}</pre></dd>
+    {% endif %}
+
+    {% if fwinfo.libraries|selectattr("license")|list|count != 0 %}
+      <dt>Licenses</dt>
+        <dd>{% for lib in fwinfo.libraries|selectattr("license") %}<dd>{{ lib.cmake }}: {{ lib.license }}</dd> {% endfor %}
+    {% endif %}
+
+    {% if fwinfo.repopath %}
+      <dt>Clone with SSH</dt>
+        <dd><pre class="fragment">git clone git@invent.kde.org:{{ fwinfo.repopath }}.git</pre></dd>
+      <dt>Clone with HTTPS</dt>
+        <dd><pre class="fragment">git clone https://invent.kde.org/{{ fwinfo.repopath }}.git</pre></dd>
+      <dt>Browse source</dt>
+        <dd>{{ fwinfo.fancyname }} on <a href="https://invent.kde.org/{{ fwinfo.repopath }}.git">invent.kde.org</a></dd>
+    {% endif %}
+    </dl>
+  </div>
+</div>

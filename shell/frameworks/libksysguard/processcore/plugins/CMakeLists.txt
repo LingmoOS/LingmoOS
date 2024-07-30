@@ -1,0 +1,5 @@
+add_definitions(-DTRANSLATION_DOMAIN=\"ksysguard_plugins_process\")
+if (BUILD_NETWORK_PLUGIN)
+    add_subdirectory(network)
+endif()
+add_subdirectory(nvidia)

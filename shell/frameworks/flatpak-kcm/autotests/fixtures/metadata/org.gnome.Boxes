@@ -1,0 +1,45 @@
+[Application]
+name=org.gnome.Boxes
+runtime=org.gnome.Platform/x86_64/43
+sdk=org.gnome.Sdk/x86_64/43
+command=gnome-boxes
+
+[Context]
+shared=network;ipc;
+sockets=x11;wayland;pulseaudio;fallback-x11;
+devices=all;
+filesystems=xdg-run/dconf;~/.config/dconf:ro;host;
+
+[Session Bus Policy]
+org.gnome.ControlCenter=talk
+# Note: intentionally broken policy value
+org.freedesktop.secrets=hello
+ca.desrt.dconf=talk
+
+[System Bus Policy]
+# Note: intentionally broken policy value
+org.freedesktop.timedate1=world
+
+[Environment]
+DCONF_USER_CONFIG_DIR=.config/dconf
+
+[Policy Tracker3]
+dbus:org.freedesktop.Tracker3.Miner.Files=tracker:Software;
+
+[Extension org.gnome.Boxes.Extension.OsinfoDb]
+directory=share/osinfo
+autodelete=true
+version=stable
+
+[Extension org.gnome.Boxes.Locale]
+directory=share/runtime/locale
+autodelete=true
+locale-subset=true
+
+[Extension org.gnome.Boxes.Debug]
+directory=lib/debug
+autodelete=true
+no-autodownload=true
+
+[Build]
+built-extensions=org.gnome.Boxes.Locale;org.gnome.Boxes.Debug;org.gnome.Boxes.Sources;

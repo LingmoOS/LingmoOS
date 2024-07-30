@@ -1,0 +1,72 @@
+Q: On my SuSE system, KDE su does not compile. I get an error that some Qt
+   header files cannot be found.
+A: Install the package qtcompat.
+
+Q: Is KDE su safe?
+A: No program is 100% safe. However, KDE su is not setuid root and it
+   handles the password you enter with great care so it should be safe
+   enough.
+
+Q: How safe is password keeping?
+A: Enabling password keeping is less secure that disabling it. However, the
+   scheme kdesu uses to keep passwords prevents everyone (including you, the
+   user) from accessing them. Please see the HTML documentation for a full
+   description of this scheme.
+
+Q: Can I execute tty applications with kdesu?
+A: No. TTY application will probably never be supported. Use the Unix su for
+   those.
+   NOTE: As of version 0.94, tty _output_ _only_ is supported with the `-t'
+   switch. This disables password keeping, though.
+
+Q: What systems does KDE su support?
+A: Tested are:
+    * Linux 2.x (Redhat 6.x, Mandrake "Cooker", Debian potato, SuSE 6.1)
+    * Solaris 7 (intel)
+    * FreeBSD 3.2 (intel, w/ egcs 1.1.2)
+   It will probably work on more systems but I cannot test that.
+
+Q: Why doesn't it support every system that is out there.
+A: KDE su needs to setup a pty/tty pair for communicating with `su'. This is
+   because some `su' implementations refuse to read a password from stdin if 
+   that is not a tty.  Setting up a pty/tty pair is not completely portable.
+
+Q: A good debug tip?
+A: If kdesu doesn't fire up your application, use the '-t' switch.
+   This way, you'll get terminal output. Maybe there is something wrong with 
+   the program you're trying to run.
+
+Q: I always get the warning: "Terminal output not available on non-terminal".
+A: Maybe you're not logged on from a terminal but probably you're using
+   UNIX98 pty's without glibc 2.1 (Linux). The glibc 2.0 ttyname() function 
+   incorrectly reports that UNIX98 slave pty's are no tty's.
+
+Q: Why not use DBUS for the communications with the daemon?
+A: KDE su needs one instance of the daemon per host, instead of per desktop
+   session.
+
+Q: How do I attach the dialog box properly to my program?
+A: Using --attach <winid>.  In C++, for example, you can call kdesu like:
+
+     QStringList arguments;
+     arguments << "--attach" << QString::number(window()->winId())
+     arguments << "--" << "program_to_run";
+     //kdesu is a libexec program, so it will not be in the path.  findExe will find it correctly anyway
+     QString su = KStandardDirs::findExe("kdesu");  
+     if(su.isEmpty()) return false; //Cannot find kdesu
+     QProcess *process = new QProcess(NULL);
+     connect(process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processFailed()));
+     connect(process, SIGNAL(finished( int, QProcess::ExitStatus) ), this, SLOT(processFinished()));
+     process->start(su, arguments);
+
+Q: How do I use kdesu from a bash script?
+A: kdesu is a libexec program, so does not normally reside in your PATH.
+   Use something like:
+
+     $(kde4-config --path libexec)kdesu -- program_to_run
+
+  If you want kdesu to attach as a proper dialog box of the current 
+  konsole window, you can do (bash specific):
+     
+     $(kde4-config --path libexec)kdesu ${WINDOWID:+--attach $WINDOWID} -- program_to_run
+

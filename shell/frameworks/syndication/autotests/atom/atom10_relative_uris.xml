@@ -1,0 +1,42 @@
+<!-- Copyright: Frank Osterfeld (libsyndication). See LICENSE.UNITTESTS for details. -->
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/feed/">
+    <generator uri="generator.html">This generator's uri is relative, and must be completed to http://example.com/feed/generator.html, using xml:base</generator>
+    
+    <category term="some category" scheme="schemes/localSchemeName" label="This is a category from scheme schemes/localSchemeName. We do not complete the scheme IRI, being an IRI, not an IRI reference."/>
+    
+    <logo>someicon.png</logo>
+    
+    <title>This test feeds contains relative URIs of all kinds, which should be completed using xml:base.
+        Affected are: Attributes: generator uri, content src, link href. Elements: &lt;uri> and &lt;logo>.
+        XHTML in text constructs and content. Exceptions: category scheme, and the &lt;id> element, 
+        they are expected to contain absolute IRIs.</title>
+    
+    <entry xml:base="http://example.com/test/">
+        <title type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">Example <a href="test.html">test</a>. 
+                The link must point to http://example.com/test/test.html.</div></title>
+    </entry>
+    
+    <entry xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/parent/">
+        <title type="xhtml" xml:base="http://example.com/test/"><div xmlns="http://www.w3.org/1999/xhtml">Example <a href="test.html">test</a>. The link must point to http://example.com/test/test.html. (not .../parent/test.html)</div></title>
+    </entry>
+    
+    <entry>
+        <title>This is item's &lt;content> has a src attribute pointing to http://example.com/feed/somesrc.html</title>
+        <content src="somesrc.html"/>
+    </entry>
+    
+    <entry xml:base="http://example.com/test/">
+        <title>This entry's link and author uri point to test.html. Both must be completed to http://example.com/test/test.html</title>
+        <author>
+            <name>Test</name>
+            <uri>test.html</uri>
+        </author>
+        <link type="text/html" href="test.html"/>
+    </entry>
+    
+    <entry>
+        <title>Although this entry's id contains a relative URL, libsyndication should not complete it, as
+        IDs are expected to be absolute IRIs.</title>
+        <id>test/someRelativeUri.html</id>
+    </entry>
+</feed>

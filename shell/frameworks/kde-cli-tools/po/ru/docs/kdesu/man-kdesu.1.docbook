@@ -1,0 +1,375 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Russian "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Руководство пользователя KDE</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>18 сентября 2010 г.</date>
+<productname
+>KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Запуск программ с повышенными привилегиями</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> команда</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> файл</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> имя значка</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> приоритет</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> пользователь</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Типовые параметры &kde;</arg
+> <arg choice="opt"
+>Типовые параметры &Qt;</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Описание</title>
+<para
+>&kdesu; — графическая оболочка к &UNIX;-команде <command
+>su</command
+> для средыKDE. Позволяет запустить программу от имени другого пользователя при условии ввода пароля этого пользователя. &kdesu; — непривилегированная программа, она использует системную команду <command
+>su</command
+>.</para>
+
+<para
+>&kdesu; предоставляет ещё одну дополнительную возможность &mdash; запоминание паролей. При использовании этой функции необходимо всего один раз ввести пароль для каждой команды. </para>
+
+<para
+>Программа предназначена для запуска из командной строки или файлов <filename
+>.desktop</filename
+>.</para>
+
+<para
+>Так как команда <command
+>kdesu</command
+> теперь установлена не в <userinput
+> $(kf5-config --prefix)</userinput
+>/bin, а в <userinput
+>kf5-config --path libexec</userinput
+>, следовательно, не в переменной среды <envar
+>Path</envar
+>, для запуска этой команды необходимо использовать <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Параметры</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>команда</replaceable
+></option
+></term>
+<listitem
+><para
+>Этот параметр позволяет указать команду для запуска с правами root. Это должен быть один аргумент. Поэтому, если требуется запустить новый диспетчер файлов, следует ввести следующее: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет выводить информацию для отладки.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>файл</replaceable
+></option
+></term>
+<listitem
+><para
+>Этот параметр позволяет эффективно использовать &kdesu; в файлах <filename
+>.desktop</filename
+>. При этом &kdesu; проверяет <parameter
+>файл</parameter
+>. Если он доступен для записи текущему пользователю, то &kdesu; запустит команду с правами этого пользователя. Иначе команда будет запущена с правами пользователя <parameter
+>пользователь</parameter
+> (root по умолчанию).</para>
+<para
+>Параметр <parameter
+>файл</parameter
+> анализируется следующим образом: если он начинается с <literal
+>/</literal
+>, то считается абсолютным путем. Иначе &mdash; именем глобального файла конфигурации &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>имя значка</replaceable
+></term>
+<listitem
+><para
+>Этот параметр позволяет указать значок, который следует показывать в окне ввода пароля. Расширение указывать не обязательно.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Этот параметр отключает сохранение пароля. Он делает недоступным флажок <guilabel
+>Сохранить пароль</guilabel
+> в окне ввода пароля.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>приоритет</replaceable
+></term>
+<listitem>
+<para
+>Этот параметр задаёт значение приоритета. Приоритет — это любое число от 0 до 100, где 100 означает наивысший приоритет, а 0 — низший. По умолчанию: 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Этот параметр задаёт использование приоритета реального времени.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет остановить управляющую программу kdesu, которая кэширует успешно введённые пароли в фоновом режиме. Эту функцию также возможно отключить с помощью параметра <option
+>-n</option
+> при первоначальном запуске &kdesu;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет включить терминальный вывод, что делает невозможным запоминание паролей. Эта возможность в основном предназначена для отладки. Если требуется запустить обычное консольное приложение, используйте стандартную команду <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>пользователь</replaceable
+></term>
+<listitem
+><para
+>Чаще всего этот параметр используется в &kdesu; для запуска команды от имени суперпользователя, но также можно ввести любое имя пользователя и соответствующий пароль.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет отключить показ кнопки «Игнорировать».</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></term>
+<listitem
+><para
+>Этот параметр позволяет привязать диалог к графическому приложению, указанному по winid.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Смотрите также</title>
+<para
+>su(1)</para>
+
+<para
+>Более подробная документация доступна по ссылке <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (введите этот &URL; в строку адреса &konqueror; или выполните команду <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Примеры</title>
+<para
+>Выполнить <command
+>kfmclient</command
+> под правами пользователя <systemitem class="username"
+>jim</systemitem
+> и показать значок &konqueror; в диалоге ввода пароля:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jim</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Авторы</title>
+<para
+>Разработчики &kdesu;: &Geert.Jansen; &Geert.Jansen.mail; и <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,52 @@
+/** \page kte_design Overview of the Core Interface Design
+
+<p><b>
+\ref index "Overview" |
+Design |
+\ref kte_guidelines "Coding Guidelines" |
+\ref kte_port_to_5 "Porting to KDE Frameworks 5"
+</b></p>
+
+The core of the KTextEditor interfaces consists of three main interfaces:
+- KTextEditor::Editor (singleton) \n
+  The Editor is a singleton accessed through KTextEditor::Editor::instance().
+  This singleton allows to create documents, get a document list, and a be
+  informed when a new document is created.
+- KTextEditor::Document \n
+  The Document interface represents a single document and enables the creation of
+  views, access to and manipulation of document contents, and access to document
+  extension interfaces.
+- KTextEditor::View \n
+  The View provides a widget that displays the contents of a Document, and its
+  interface allows for manipulation of text selection, position of the cursor and mouse,
+  text selections, and behavior of the view.  Additionally it provides access to
+  the view extension interfaces.
+
+The hierarchy can be illustrated as follows:
+\image html ktexteditorhierarchy.png "Basic KTextEditor Hierarchy"
+
+\section kte_design_user Notes for KTextEditor Users
+To use the KTextEditor framework you first have to get the KTextEditor::Editor
+singleton through KTextEditor::Editor::instance(). Using this object, documents
+can be created and deleted.
+
+\section kte_design_part Using KTextEditor as KPart
+If linking to KF5::TextEditor is not an option, you can also access the
+KTextEditor framework as follows
+\code
+  KService::Ptr service = KService::serviceByDesktopPath("katepart");
+  if (service) {
+      m_part = service->createInstance<KParts::ReadWritePart>(0);
+  }
+\endcode
+
+\section kte_design_developer Notes for KTextEditor Developers
+The KTextEditor::Editor has a list of all opened documents and can create new
+documents. A Document's content is visualized by a KTextEditor::View. A Document
+can have any number of views (or none). When the content of the document is
+changed, the change is reflected in all views.
+
+\see KTextEditor::Editor, KTextEditor::Document, KTextEditor::View
+
+\author Dominik Haumann \<dhaumann@kde.org\>
+*/

@@ -1,0 +1,413 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Serbian-Latin "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Korisnički priručnik KDE-a</title>
+<author
+><personname
+><firstname
+>Lori</firstname
+> <surname
+>Vots</surname
+></personname
+> &Lauri.Watts.mail;</author>
+<date
+>18.9.2010.</date>
+<productname
+>KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Pokreće program sa povišenim ovlašćenjima.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+>naredba</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+>fajl</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+>ime-ikonice</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+>korisnik</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+>ID-prozora</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>generičke-KDE-opcije</arg
+> <arg choice="opt"
+>generičke-Qt-opcije</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Opis</title>
+<para
+><application
+>KDE su</application
+> je grafičko pročelje za Unix naredbu <command
+>su</command
+> za KDE. Omogućava vam da pokrenete program pod drugim korisnikom, zadavši njegovu lozinku. <application
+>KDE su</application
+> nije povlašćen program, već koristi sistemsku <command
+>su</command
+>.</para>
+
+<para
+><application
+>KDE su</application
+> ima jednu dodatnu mogućnost: može opciono da pamti lozinke umesto vas. Ako se oslonite na ovo, za svaku naredbu treba samo jedanput da unesete lozinku.</para>
+
+<para
+>Ovaj program je namenjen pokretanju iz komandne linije ili iz .desktop fajlova.</para>
+
+<para
+>Pošto se <command
+>kdesu</command
+> više ne instalira u <filename
+><userinput
+>$(kde4-config --prefix)</userinput
+>/bin/</filename
+> već u <filename
+><userinput
+>kde4-config --path libexec</userinput
+></filename
+>, i stoga više nije u putanji (<envar
+>PATH</envar
+>), moraćete da je pokrećete pomoću <userinput
+>$(kde4-config --path libexec)<command
+>/kdesu</command
+></userinput
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Opcije</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>naredba</replaceable
+></option
+></term>
+<listitem
+><para
+>Zadaje da se naredba prosleđena kao argument izvršava pod korenom. Na primer, kada poželite da pokrenete novi menadžer fajlova, uneli biste u odzivnik: <userinput
+>$(kde4-config --path libexec)/<command
+>kdesu</command
+> <option
+>-c</option
+> dolphin</userinput
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Ispis ispravljačkih podataka.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fajl</replaceable
+></option
+></term>
+<listitem
+><para
+>Ova opcija omogućava efikasno korišćenje <application
+>KDE sua</application
+> u .desktop fajlovima. Govori <application
+>KDE suu</application
+> da ispita fajl zadat parametrom <parameter
+>fajl</parameter
+>: ako je taj fajl upisiv za trenutnog korisnika, <application
+>KDE su</application
+> će izvršiti naredbu pod tim korisnikom; ako nije, naredba se izvršava pod zadatim korisnikom (podrazumevano je to koren, <literal
+>root</literal
+>).</para>
+<para
+>Parametar <parameter
+>fajl</parameter
+> obrađuje se ovako: ako počinje sa <literal
+>/</literal
+>, uzima se za apsolutnu putanju do fajla; inače, uzima se za ime globalnog KDE postavnog fajla.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ime-ikonice</replaceable
+></term>
+<listitem
+><para
+>Zadaje ikonicu za upotrebu u dijalogu lozinke. Možete zadati samo ime bez nastavka.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Bez pamćenja lozinke. Isključuje kućicu <guilabel
+>Upamti lozinku</guilabel
+> u dijalogu lozinke.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></term>
+<listitem>
+<para
+>Postavlja vrednost prioriteta, na broj između 0 i 100: 0 znači najniži prioritet, a 100 najviši. Podrazumevano je 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Stvarnovremensko raspoređivanje.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Zaustavlja demona <application
+>KDE sua</application
+>, koji u pozadini kešira prihvaćene lozinke. Ova mogućnost takođe se može isključiti opcijom <option
+>-n</option
+> pri prvom pokretanju <application
+>KDE sua</application
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Uključuje terminalski izlaz. Takođe isključuje pamćenje lozinki. Ovo umnogome služi u ispravljačke svrhe; ako želite da pokrenete program konzolnog režima, upotrebite umesto ovoga standardnu <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>korisnik</replaceable
+></term>
+<listitem
+><para
+>Iako je najčešća primena <application
+>KDE sua</application
+> izvršavanje naredbe pod korenom, možete zadati bilo koje korisničko ime i odgovarajuću lozinku.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Bez dugmeta za ignorisanje.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+>ID-prozora</replaceable
+></term>
+<listitem
+><para
+>Čini dijalog prolaznim za X program određen ID-om prozora.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Vidi još</title>
+<para
+><command
+>su</command
+>(1)</para>
+
+<para
+>Detaljnija korisnička dokumentacija raspoloživa je kroz <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (unesite ovaj URL u <application
+>K-osvajač</application
+>, ili izvršite <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Primeri</title>
+<para
+>Izvršite <command
+>kfmclient</command
+> pod korisnikom <systemitem class="username"
+>pera</systemitem
+>, s ikonicom <application
+>K-osvajača</application
+> u dijalogu lozinke:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+> <option
+>-u</option
+> jim <option
+>-i</option
+> konqueror <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Autori</title>
+<para
+><application
+>KDE su</application
+> napisali su <personname
+><firstname
+>Gert</firstname
+> <surname
+>Jansen</surname
+></personname
+> <email
+>jansen@kde.org</email
+> i <personname
+><firstname
+>Pijetro</firstname
+> <surname
+>Iljo</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

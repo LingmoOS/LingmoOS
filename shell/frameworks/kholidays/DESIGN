@@ -1,0 +1,338 @@
+What:       A New kholiday library
+Author:     Allen Winter <winter@kde.org>
+Version:    0.92 2006-04-02
+
+This is a draft.  Please send constructive comments to the author.
+I'm trying hard not to offend anybody.  If I make a mistake, particularly
+about religious holidays, please let me know about it. --Allen
+
+[JPL 2009-12-13 Added a few comments.  John Layt <john@layt.net>]
+
+I. Introduction
+
+   The current kholidays library code was borrowed from the 'plan' project
+   many years ago and, has been discussed often on the KDE-PIM mailing list,
+   we need to replace it with a modern library with a friendly license.
+
+   See http://www.wikipedia.org/Holidays for better, clearer explanations.
+
+II. Goals
+
+   We hope that the new kholidays library will:
+
+   A. allow KOrganizer to replace the holidays plugin with a KOCore
+      implementation that links to the kholidays library.  
+
+   B. allow KOrganizer to support the holidays of many religions (through
+      plugins if desired)
+
+   C. be part of kdelibs so other applications and components (eg. kdatepicker)
+      can access holidays.
+
+   D. be licensed so that it can be linked directly to all KDE applications
+      and can be ported freely to other platforms with binary-only Qt.
+
+III. Definitions
+
+   Holiday: any day that may have special significance to a fairly large
+       number of people.  A "holy day" can be a holiday, a "day-off" for 
+       all public employees can be a holiday.  Also, the remembrance of an
+       historical event can be a holiday.
+
+   Public Holiday: a day-off from work or school (typically) to commemorate
+        a historical event, or to honor people.  Public holidays are always
+        bounded to a political region at national, regional or local level.
+
+   Public/Civil Service Holiday: a day-off from work for government workers
+        but not a day off for private sector workers. (name Government Holiday,
+        or is that different?)
+
+   Cultural Holiday : a special day in the culture and therefore usually
+        bounded to a political region.  A day where people "celebrate"
+        in some fashion.  eg. Halloween, St. Valentines, ...
+
+   Religious Holiday: a special day in a religion and not bounded to any
+        political region.  Religions can have holidays that range in
+        devotion to those were work/school are forbidden, days of 
+        prayer obligation, to historical remembrances, etc.
+        Governments often have public holidays for some religious holidays.
+
+   Financial Holiday: banks and markets may close on some public holidays.
+        it would be useful for financial applications to know when.
+        Financial holidays are tied to public holidays and therefore are
+        always bounded to a political region.  Not sure if financial holidays
+        move from weekends; eg. if Christmas lands on a weekend is it moved
+        to a nearby business day?
+
+   School Holiday:a day-off from school, either as a one-off Public Holiday or
+        extended periods between school terms.  This can vary widely depending
+        on school level, type, location.  The differing holidays can be held in
+        separate files, e.g. State Primary, State Secondary, State University,
+        local religious school, etc.
+
+   Name Day Holiday: (See Bug #92919) In some countries each day is assigned
+        a first name and persons with that name celebrate that day as their
+        "Name Day".  We will require Name Days to be bounded to a political
+        region.
+ 
+   Noteworthy Event: a day of interest.  eg. Daylight Savings Time Start/Stop,
+        Election Day, ...
+
+IV. Requirements
+
+   * All non-religious date calculations will be performed according to the
+     Gregorian calendar.  To use another calendar, one will need to convert
+     their date to Gregorian first.
+
+   [JPL: No.  In Iran for instance if the rule for a public holiday is defined
+         as the 1st occurrence of the 3rd weekday of the 9th month of the Jalali
+         calendar (first Chahar Shanbe of Azar) it would not be valid to
+         convert that into the first Wednesday of September in the Gregorian
+         calendar, there could be no formulation that would always work other
+         than expressing the rule in the Calendar System that it applies to.
+         This means all holiday recurrence rules not defined in the Gregorian
+         default must define the Calendar System used to calculate them.  This
+         may also mean the recurrence rules must always use month and weekday
+         numbers rather than names, except that some calendar systems such as
+         the Hebrew add leap months in the middle of the year which change the
+         month numbering but are not counted when calculating recurrances. Use
+         either the existing calendarType e.g. "jalali" or a new short code
+         "JA" or a new standard agreed on FDO?]
+
+   * Religious holidays will be computed on the appropriate calendar.
+     i.e. Jewish holidays on the Hebrew calendar.  The calling application
+     can then convert the date to Gregorian, if desired.
+
+   * The political regions will have their own holiday file containing
+     (possibly through inheritance) the public, cultural, and financial holidays
+
+   * Holidays of political regions will be specified in in files in a
+     hierarchy similar to how timezones are stored in /usr/share/zoneinfo.
+      eg. holidays/Canada/<Province>, holidays/US/<State>,
+          holidays/Europe/Germany/<Province>, holidays/Australia/<State>, ...
+
+   [JPL: Political regions could be incorporated into KLocale and the Region
+         KCM to allow users to set a global default.  The ISO standard is
+         for-pay at this level, but Wikipedia has a fairly complete set so it
+         may still be legal to use.  We could also then tie regions and
+         timezones together for better timezone defaults.]
+
+   * Religious holidays will be specified in files separate from the
+     political region files, by religion name:
+       eg. holidays/Religious/Jewish, holidays/Religious/Catholic, ...
+
+   * Be able to specify where to move public, day-off holidays if they
+     land on a weekend.  This occurs for holidays with a fixed date.
+
+   [JPL
+   * Be able to specify where to move holidays if they reccur on a day that
+     doesn't exist, e.g. whether holiday on 29th February should only ever
+     occur on 29th Feb or should be moved to the 28th Feb or 1st March.  This
+     particularly applies to religious holidays in calendar systems where the
+     number of months and days in  months can vary more than in Gregorian. ]
+
+   * Be able to specify holidays with compound dates; i.e, be able to 
+     combine specifications.  For example: "First Monday after May 1"
+
+   * Support lunar phases for the new moon, first quarter moon,
+     last quarter moon, and full moon.
+     (One should be able to see moon phases on the calendar as this is
+      important to some religions -- but this is an application issue)
+
+   * Support june solstice, december solstice, march equinox, and
+     september equinox -- the so-called "astronomical seasons".
+     So, in the US for example, one could set a holiday of
+     summer is on the june solstice.
+
+   * Public holidays that are moved when they land on a weekend will have
+     their names changed to "Name (Day off)".  For example, in the US if
+     Christmas is on a Sunday, then it will be moved to Monday and have the
+     name changed to "Christmas (Day off)".  Note that if the user has chosen
+     a Christian set of holidays they will also see "Christmas" on the Sunday.
+
+   * Local governments (states, provinces) will be able to inherit their
+     holidays from the national government.  In general, any holiday set
+     can inherit holidays from any other holiday set.  We expect to use
+     an "include file" mechanism to support inheritance.
+
+   * Support Holiday categories:
+        work day-off (public),
+        school day-off (public),
+        bank-closed holiday (financial),
+        noteworthy event (cultural),
+        religious holiday (religious),
+        holy day (religious),
+        name day (cultural),
+        ...
+
+   * Each Holiday can have any combination of Holiday type.
+
+   * Each Holiday can have its own icon.
+
+   [JPL: Each Holiday Type could also have a default icon and colour, e.g.
+         national work day-off marked in red, regional day off in blue,
+         financial in green, etc.  Perhaps able to be user or locale modified?]
+
+   * For the most part, keep religious holidays out of public holidays
+     and in their own specific holiday files.  The exception is when
+     the governments have religious, public holidays.  A religious holiday
+     that is also a public, work/school day-off should be specified in
+     government (political) holiday files.
+ 
+   * Be able to activate more than one region/locale at a time and more
+     than one religion at a time.
+
+   * Holiday names should be in English so they can be translated with the
+     usual tools. If a holiday name has no English equivalent then it can
+     be written in the "native" language.  If English is not practical,
+     then the holiday names can be written in the "native" language and
+     possibly translated into English later.  In other words, we want to
+     make it easy for people to contribute holiday files so don't exclude
+     non-English speakers from writing one.
+
+   * The standard KDE tools will be used to translate holiday names.
+
+   * Holiday file format will in XML according to a RELAX NG schema.
+     There will be tools written to parse and validate our file format
+     if none are currently available.
+
+   * We will write simple tools to convert existing holiday file formats to
+     our new format.  These tools should provide some easy validation checks.
+     The new files will be used to bootstrap the new library into KDE.
+     It might also be useful to write a program to convert iCalendar files into
+     our format (see http://www.mozilla.org/projects/calendar/holidays.html).
+
+V. Functionality
+
+   A. The library will provide functions that:
+
+      * Returns a list of all holidays per date.  The list will have duplicate
+        holidays removed (deduped).
+
+      * Returns a list of all holidays for a range of dates, in date order.
+        The list will have duplicate holidays removed (deduped).
+
+      * Returns a list of all holidays for a Gregorian year, in date order.
+        The list will have duplicate holidays removed (deduped).
+
+      * "Add" a list of Holidays together.
+
+      * "Dedupe" a list of Holidays.
+
+      * Determine if a date lands on a new moon, first quarter moon,
+        last quarter moon, or full moon.
+
+      * Determine if a date lands on a solstice or equinox.
+
+      * Determine if a date is a work day-off, school day-off, or bank-closure.
+
+      * Provides holiday names in current language
+
+      * Returns a QStringList of all political regions supported,
+        (possibly/probably) extracted from the holiday file names.
+        The region names will need to be translated into all languages.
+
+      * Returns a QStringList of all religions supported,
+        (possibly/probably) extracted from the holiday file names.
+        The religion names will need to be translated into all languages.
+
+      *
+
+   B. A KGetNewStuff mechanism will be implemented so that holiday files
+      can be donated to the project and installed by using this common 
+      PIM mechanism.
+
+
+   C. Provide a GUI to create, edit, and translate the holiday files.
+
+VI. Date Specification
+
+   The holiday date can have one of the following specifications:
+
+   * Fixed date: the date is fixed on the calendar.
+
+   * Postional date: the date occurs according to a position,
+                       eg. "first Monday in September".
+
+   * Moon date:  the date corresponds to a phase of the moon.
+
+   * Solstice date: the date corresponds to the June or December solstice.
+
+   * Equinox date: the date corresponds to the March or September equinox.
+
+   * Christmas: the holiday occurs on Christmas.
+
+   * Easter: the holiday occurs on Easter.
+
+   In addition, the date can have a "before weekend" or "after weekend"
+   modifier, meaning that if the holiday date lands on a weekend, the date
+   is moved to the first workday/schoolday before or after the weekend.
+
+APPENDIX A.  Classifying Holidays (Sample)
+
+   This list of holidays was extracted from the US Holidays
+   at http://www.mozilla.org/projects/calendar/holidays.html
+
+   New Year's Day:  public, work day-off, school day-off, bank-closed, move from weekend
+   Groundhog Day: noteworthy event. no day-offs
+   Lincoln's birthday: noteworthy event, no day-offs
+   Washington's birthday: noteworthy event, no day-offs
+   Valentine's Day: cultural, no day-offs
+   Palm Sunday: religious, no day-offs
+   Good Friday: religious, no day-offs
+   Easter  (Western): religious, no day-offs
+   Easter (Orthodox): religious, no day-offs
+   Tax Day: noteworthy event, no day-offs
+   April Fool's Day: cultural, no day-offs
+   St. Patrick's Day: cultural, no day-offs (perhaps religious,  I don't know)
+   Flag Day: noteworthy event, no day-offs
+   Independence Day: public, work day-off, school day-off, bank-closed, move from weekend
+   Columbus Day: public, work day-off, school day-off, bank-closed
+   Halloween: cultural, no day-offs
+   Veteran's Day: public, work day-off, school day-off, bank-closed, move from weekend
+   Christmas: public, work day-off, school day-off, bank-closed, move from weekend
+   Martin Luther King's Birthday: public, work day-off, school day-off, bank-closed
+   President's Day: public, work day-off, school day-off, bank-closed
+   Daylight Savings Time begins: noteworthy event
+   ASH Wednesday: religious, no days-off
+   Memorial Day: public, work day-off, school day-off, bank-closed
+   Mother's Day: cultural, no days-off
+   Father's Day: cultural, no days-off
+   Labor Day: public, work day-off, school day-off, bank-closed
+   Daylight Savings Time ends: noteworthy event
+   Election Day: noteworthy event, school day-off
+   Thanksgiving: public, work day-off, school day-off, bank-closed
+
+
+
+-----end here-----
+
+Religions: Catholic, Greek Orthodox, Jewish, Islam, Protestants,...
+
+Other special dates of interest:
+ + start/end daylight savings time
+ + election day
+ + 
+
+See Reinhold's XML DTD (holiday.dtd)
+[Reinhold: I didn't check the DTD at all, so it might be completely wrong 
+ or breaks with all XML specs or whatever. Basically, currently it's meant
+ only to develop a nice structure of the files, not for real use in code yet.]
+
+A good starting point [..for parsing Reinhold's XML..] would be to use some code
+from the kconfig_compiler in kdelibs/kdecore/kconfig_compiler, which parses
+the XML file.
+
+-----------------
+
+JPL  Pre-requisite steps?:
+
+KLocale & KCM:   Add political regions to countries, allow kcm to set up
+                 Add users lat/lon for use in lunar calculations, allow KCM to set up
+
+KCalendarSystem: Proper astronomical (lunar/solar) calendar support
+                 Additional calendar systems as required (e.g. Julian, Chinese, etc)
+                 Add standard short code for each calendar system?
+
+freedesktop.org: Common XML format and location for holiday files to save duplication?
+                 Common definitions for calendar system names and formulas?

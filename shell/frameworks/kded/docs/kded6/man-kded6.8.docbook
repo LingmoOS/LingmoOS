@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % English "INCLUDE"><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title>kded6 User's Manual</title>
+<author>
+<firstname>David</firstname>
+<surname>Faure</surname>
+<contrib>Maintainer</contrib>
+<affiliation>
+<address><email>faure@kde.org</email></address>
+</affiliation>
+</author>
+
+<author>
+<firstname>Waldo</firstname>
+<surname>Bastian</surname>
+<contrib>Original author</contrib>
+<affiliation>
+<address><email>bastian@kde.org</email></address>
+</affiliation>
+</author>
+
+<date>2023-06-22</date>
+<releaseinfo>Frameworks 6</releaseinfo>
+<productname>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle><command>kded6</command></refentrytitle>
+<manvolnum>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname><command>kded6</command></refname>
+<refpurpose>&kde; daemon - triggers Sycoca database updates when needed.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title>Synopsis</title>
+
+<cmdsynopsis>
+<command>kded6</command>
+<arg choice="opt">--check</arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title>Description</title>
+
+<para><command>kded6</command> consolidates several small services in one process. These are mostly &DBus; services provided by KDED modules, but it also manages sycoca (a binary cache of servicetypes, &MIME; types and services used by KService) and KConfig update scripts as needed.</para>
+
+<para>For sycoca, it monitors the directories containing .desktop files. When a file is added/removed, it waits 5 seconds (in case of a series of updates), and then launches <command>kbuildsycoca6</command> to update the sycoca.</para>
+
+<para>For KConfig, it checks newly-installed update files, &ie; the *.upd files used to update configuration files of users when the configuration file formats changes, and runs the KConfig update utility to perform the updates.</para>
+
+<para>Those tasks are also run when <command>kded6</command> is started to ensure that the user configuration is up to date.</para>
+
+<para>You do not normally need to run <command>kded6</command> directly; &plasma; desktop sessions run it automatically, and it is started on demand when an application attempts to use a &DBus; interface provided by it or one of its modules.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title>Options</title>
+
+<variablelist>
+<varlistentry>
+<term><option>--check</option></term>
+<listitem>
+<para>Check the sycoca database, updating it if necessary, and exit.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title>Configuration</title>
+
+<para><command>kded6</command> can be configured with the <filename>kded6rc</filename> ini-style configuration file. On &UNIX; systems, this can be found at <filename><varname>$XDG_CONFIG_HOME</varname>/kded6rc</filename>; if <varname>$XDG_CONFIG_HOME</varname> is not set, this defaults to <filename>~/.config/kded6rc</filename>.</para>
+
+<para>Configuration file entries are read on-demand, so changes can be made while <command>kded6</command> is running. However, all the current configuration options only really affect the startup behaviour of <command>kded6</command>.</para>
+
+<para>The <option>[General]</option> section has the following options:
+<variablelist>
+<varlistentry>
+<term><option>CheckSycoca</option></term>
+<listitem><para>Whether to update sycoca at startup (default: <constant>true</constant>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>CheckUpdates</option></term>
+<listitem><para>Whether to perform outstanding KConfig updates at startup (default: <constant>true</constant>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>CheckFileStamps</option></term>
+<listitem><para>Whether to check file timestamps when performing the initial sycoca update (default: <constant>true</constant>). See the documentation for <command>kbuildsycoca6</command> for more details.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>DelayedCheck</option></term>
+<listitem><para>Whether to delay the initial sycoca update until about a minute after starting (default: <constant>false</constant>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>Each module also has a <option>[Module-<replaceable>name</replaceable>]</option> section in <filename>kded6rc</filename>, where <replaceable>name</replaceable> is the name of the module's desktop file without the <filename>.desktop</filename> extension. This contains an <option>autoload</option> option that specifies whether the module should be automatically loaded when <command>kded6</command> is started (default: <constant>false</constant>). Note that this setting can also be changed via <command>kded6</command>'s &DBus; interface.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title>See Also</title>
+<para>
+<citerefentry><refentrytitle>kbuildsycoca6</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+<citerefentry><refentrytitle>kdeinit6</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+</para>
+</refsect1>
+
+
+
+<refsect1>
+<title>Bugs</title>
+<para>Please use <ulink url="https://bugs.kde.org">&kde;'s bugtracker</ulink> to report bugs.</para>
+</refsect1>
+
+</refentry>

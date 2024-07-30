@@ -1,0 +1,1 @@
+add_share_plugin(bluetoothplugin bluetoothplugin.cpp)

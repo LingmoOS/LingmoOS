@@ -1,0 +1,389 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Norwegian-Bokmal "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>KDE brukerhåndbok</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>2010-09-18</date>
+<productname
+>K Desktop Environment</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Kjører et program med høyere rettigheter</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> kommando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> icon name</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priority</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> user</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>&kde;-spesifikke valg</arg
+> <arg choice="opt"
+>&Qt;-spesifikke valg</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beskrivelse</title>
+<para
+>&kdesu; er et grafisk grensesnitt for &UNIX;-kommandoen <command
+>su</command
+> for skrivebordsmiljøet KDE. Med det kan du kjøre et program som en annen bruker ved å oppgi den brukerens passord. &kdesu; er et ikke-privilegert program, det bruker systemets <command
+>su</command
+>-kommando.</para>
+
+<para
+>&kdesu; har en funksjon til: det kan huske passord for deg. Hvis du bruker denne funksjonen trenger du bare oppgi passordet én gang for hver kommando.</para>
+
+<para
+>Dette programmet er ment å startes fra kommandolinja eller fra <filename
+>.desktop</filename
+>-filer.</para>
+
+<para
+>Siden <command
+>kdesu</command
+> ikke lenger blir installert i <userinput
+>$(kde4-config --prefix)</userinput
+>/bin  men i <userinput
+>kde4-config --path libexec</userinput
+> og derfor ikke finnes i din søkesti <envar
+>Path</envar
+>, så må du bruke <userinput
+>$(kde4-config --prefix)<command
+>kdesu</command
+></userinput
+> for å starte <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Valg</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>kommando</replaceable
+></option
+></term>
+<listitem
+><para
+>Dette oppgir kommandoen som skal kjøres som root. Den må ha ett argument: navnet på kommandoen. Så hvis du for eksempel vil kjøre en filbehandler som root, så skriver du inn på kommandolinja: <userinput
+>$(kde4-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Vis feilsøkingsinformasjon.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fil</replaceable
+></option
+></term>
+<listitem
+><para
+>Dette valget fører til effektiv bruk av &kdesu; i <filename
+>.desktop</filename
+>-filer. det får &kdesu; til  undersøke fila <parameter
+>fil</parameter
+>, og hvis gjelddende bruker kan skrive til den, så kjører &kdesu; kommandoen som gjeldende bruker. Hvis fila ikke er skrivbar, så kjøres kommandoen som bruker <parameter
+>bruker</parameter
+> (standard er root).</para>
+<para
+><parameter
+>fil</parameter
+> utvikles slik: hvis <parameter
+>fil</parameter
+> begynner med en <literal
+>/</literal
+>, så er det et absolutt filnavn, ellers blir det tatt for navnet på en global &kde; oppsettsfil.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ikonnavn</replaceable
+></term>
+<listitem
+><para
+>Oppgi iklon som skal brukes i passord-dialogen. Du kan oppgi bare navnet, uten etternavn.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Ikke behold passordet. Dette slår av avkryssingsboksen <guilabel
+>Husk passord</guilabel
+> i passord-dialogen.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></term>
+<listitem>
+<para
+>Sett prioritet. Prioriteten er et fritt valgt tall mellom 0 og 100, der 100 er høyeste prioritet og 0 er laveste. Standard er 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Bruk sanntidsplanlegging.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Stopp kdesu-daemonen. Dette er daemonen som i bakgrunnen husker godkjente passord. Dette kan også slås av med <option
+>-n</option
+> når &kdesu; først startes.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Slå på utdata til terminal. Dette slår av passordlagring. Brukes for det meste til feilsøking, hvis du vil bruke et konsollprogram, så bruk standard <command
+>su</command
+>-kommando i stedet.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> bruker</replaceable
+></term>
+<listitem
+><para
+>Det vanligste ved bruk av &kdesu; er å kjøre en kommando som superbruker, men du kan også oppgi andre brukernavn og tilhørende passord.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Ikke vis en Ignorer-knapp.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+>vindus-id</replaceable
+></term>
+<listitem
+><para
+>Gjør dialogen midlertidig for et X-program oppgitt ved vindus-id.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Se også</title>
+<para
+>su(1)</para>
+
+<para
+>Mer detaljert brukerdokumentasjon finnes fra <ulink url="help:/kfind"
+>help:/kdesu</ulink
+> (skriv enten denne <acronym
+>URL</acronym
+>-en inn i &konqueror; eller kjør <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Eksempler</title>
+<para
+>Kjør <command
+>kfmclient</command
+> som bruker <systemitem class="username"
+>jon</systemitem
+>, og vis &konqueror;-ikonet i passord-dialogen:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jon</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Utviklere</title>
+<para
+>&kdesu; ble skrevet av <personname
+><firstname
+>Geert</firstname
+> <surname
+>Jansen</surname
+></personname
+> <email
+>jansen@kde.org</email
+> og <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+><email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

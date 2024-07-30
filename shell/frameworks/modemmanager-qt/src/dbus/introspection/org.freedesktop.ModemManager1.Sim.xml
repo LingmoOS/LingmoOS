@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2011-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Sim:
+      @short_description: The ModemManager SIM interface.
+
+      The SIM interface handles communication with SIM, USIM, and RUIM (CDMA
+      SIM) cards.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Sim">
+
+    <!--
+        SendPin:
+        @pin: A string containing the PIN code.
+
+        Send the PIN to unlock the SIM card.
+
+        Since: 1.0
+    -->
+    <method name="SendPin">
+      <arg name="pin" type="s" direction="in" />
+    </method>
+
+    <!--
+        SendPuk:
+        @puk: A string containing the PUK code.
+        @pin: A string containing the PIN code.
+
+        Send the PUK and a new PIN to unlock the SIM card.
+
+        Since: 1.0
+    -->
+    <method name="SendPuk">
+      <arg name="puk" type="s" direction="in" />
+      <arg name="pin" type="s" direction="in" />
+    </method>
+
+    <!--
+        EnablePin:
+        @pin: A string containing the PIN code.
+        @enabled: %TRUE to enable PIN checking, %FALSE otherwise.
+
+        Enable or disable the PIN checking.
+
+        Since: 1.0
+    -->
+    <method name="EnablePin">
+      <arg name="pin"     type="s" direction="in" />
+      <arg name="enabled" type="b" direction="in" />
+    </method>
+
+    <!--
+        ChangePin:
+        @old_pin: A string containing the current PIN code.
+        @new_pin: A string containing the new PIN code.
+
+        Change the PIN code.
+
+        Since: 1.0
+    -->
+    <method name="ChangePin">
+      <arg name="old_pin" type="s" direction="in" />
+      <arg name="new_pin" type="s" direction="in" />
+    </method>
+
+    <!--
+        SetPreferredNetworks:
+        @preferred_plmns: List of preferred networks.
+
+        Stores the provided preferred network list to the SIM card. Each entry contains
+        an operator id string (<literal>"MCCMNC"</literal>) consisting of 5 or 6 digits,
+        and an <link linkend="MMModemAccessTechnology">MMModemAccessTechnology</link> mask
+        to store to SIM card if supported.
+
+        This method removes any pre-existing entries of the preferred network list. Note
+        that even if this operation fails, the preferred network list on the SIM card may
+        have changed. Read the <link linkend="gdbus-property-org-freedesktop-ModemManager1-Sim.PreferredNetworks">
+        PreferredNetworks</link> property to get the up-to-date list.
+
+        Since: 1.18
+    -->
+    <method name="SetPreferredNetworks">
+      <arg name="preferred_networks" type="a(su)" direction="in" />
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+    </method>
+
+    <!--
+        Active:
+
+        Boolean indicating whether the SIM is currently active.
+
+        On systems that support Multi SIM Single Standby, only one SIM may be
+        active at any given time, which will be the one considered primary.
+
+        On systems that support Multi SIM Multi Standby, more than one SIM may
+        be active at any given time, but only one of them is considered primary.
+
+        Since: 1.16
+    -->
+    <property name="Active" type="b" access="read" />
+
+    <!--
+        SimIdentifier:
+
+        The ICCID of the SIM card.
+
+        This may be available before the PIN has been entered depending
+        on the device itself.
+
+        Since: 1.0
+    -->
+    <property name="SimIdentifier" type="s" access="read" />
+
+    <!--
+        Imsi:
+
+        The IMSI of the SIM card, if any.
+
+        Since: 1.0
+    -->
+    <property name="Imsi" type="s" access="read" />
+
+    <!--
+        Eid:
+
+        The EID of the SIM card, if any.
+
+        Since: 1.16
+    -->
+    <property name="Eid" type="s" access="read" />
+
+    <!--
+        OperatorId:
+
+        The ID of the network operator that issued the SIM card,
+        formatted as a 5 or 6-digit MCC/MNC code (e.g. <literal>"310410"</literal>).
+
+        Since: 1.0
+    -->
+    <property name="OperatorIdentifier" type="s" access="read" />
+
+    <!--
+        OperatorName:
+
+        The name of the network operator, as given by the SIM card, if known.
+
+        Since: 1.0
+    -->
+    <property name="OperatorName" type="s" access="read" />
+
+    <!--
+        EmergencyNumbers:
+
+        List of emergency numbers programmed in the SIM card.
+
+        These numbers should be treated as numbers for emergency calls in
+        addition to 112 and 911.
+
+        Since: 1.12
+    -->
+    <property name="EmergencyNumbers" type="as" access="read" />
+
+    <!--
+        PreferredNetworks:
+
+        List of preferred networks with access technologies configured in the SIM card.
+
+        Each entry contains an operator id string (<literal>"MCCMNC"</literal>)
+        consisting of 5 or 6 digits, and an
+        <link linkend="MMModemAccessTechnology">MMModemAccessTechnology</link> mask.
+        If the SIM card does not support access technology storage, the mask will be
+        set to <link linkend="MM-MODEM-ACCESS-TECHNOLOGY-UNKNOWN:CAPS">
+        MM_MODEM_ACCESS_TECHNOLOGY_UNKNOWN</link>.
+
+        Since: 1.18
+    -->
+    <property name="PreferredNetworks" type="a(su)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        Gid1:
+
+        Group identifier 1evel 1.
+
+        Since: 1.20
+    -->
+    <property name="Gid1" type="ay" access="read">
+      <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+    </property>
+
+    <!--
+        Gid2:
+
+        Group identifier 1evel 2.
+
+        Since: 1.20
+    -->
+    <property name="Gid2" type="ay" access="read">
+      <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+    </property>
+
+    <!--
+        SimType:
+
+        Indicates whether the current primary SIM is a ESIM or a physical SIM,
+        given as <link linkend="MMSimType">MMSimType</link> value.
+
+        Since: 1.20
+    -->
+    <property name="SimType" type="u" access="read" />
+
+    <!--
+        EsimStatus:
+
+        If current SIM is ESIM then this indicates whether there
+        is a profile or not, given as
+        <link linkend="MMSimEsimStatus">MMSimEsimStatus</link> value.
+
+        Since: 1.20
+    -->
+    <property name="EsimStatus" type="u" access="read" />
+
+    <!--
+        Removability:
+
+        Indicates whether the current SIM is a removable SIM or not, given as a
+        <link linkend="MMSimRemovability">MMSimRemovability</link> value.
+
+        Since: 1.20
+    -->
+    <property name="Removability" type="u" access="read" />
+
+  </interface>
+</node>

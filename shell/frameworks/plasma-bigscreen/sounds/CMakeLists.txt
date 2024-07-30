@@ -1,0 +1,1 @@
+install(DIRECTORY plasma-bigscreen DESTINATION ${KDE_INSTALL_SOUNDDIR})

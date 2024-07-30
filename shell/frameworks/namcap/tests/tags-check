@@ -1,0 +1,44 @@
+#!/usr/bin/python3
+# This file is part of the namcap test suite.
+# It checks whether tags defined in the modules
+# have been entered in the 'tags' file.
+# Author: Abhishek Dasgupta <abhidg@gmail.com>
+# License: GPL
+
+import os
+import re
+import sys
+
+def process_tags(file):
+	tags = set()
+	f = open(file)
+	for i in f.readlines():
+		if i == "": continue
+		if i[0] == '#': continue
+		tags.add(i.split('::')[0].strip())
+	return tags
+
+tagpath = '../namcap-tags'
+basepath = '../Namcap'
+modules = filter(lambda s: s.endswith('.py'), os.listdir(basepath))
+tags = process_tags(tagpath)
+
+tagre = re.compile(r'.*ret\[.\]\.append\(\(\"([^,]*)\",.*\)\).*')
+tags_in_modules = set()
+tags_by_file = {}
+
+for m in modules:
+	f = open(os.path.join(basepath, m))
+	for l in f.readlines():
+		regexp = tagre.match(l)
+		if regexp != None:
+			tag = regexp.group(1)
+			tags_in_modules.add(tag)
+			tags_by_file[tag] = m
+
+if tags_in_modules - tags != set([]):
+	print("Some tags are defined in the modules")
+	print("but not in the 'namcap-tags' file")
+	for t in (tags_in_modules - tags):
+		print(" %s (in %s)" % (t, tags_by_file[t]))
+	sys.exit(1)

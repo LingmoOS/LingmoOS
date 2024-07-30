@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block page_title %}{% endblock %}</title>
+  <link rel="meta" href="https://www.kde.org/labels.rdf" type="application/rdf+xml" title="ICRA labels" />
+  <meta name="trademark" content="KDE e.V." />
+  <meta name="description" content="KDE products API documentation" />
+  <meta name="MSSmartTagsPreventParsing" content="true" />
+  <meta name="robots" content="all" />
+  <meta name="no-email-collection" content="http://www.unspam.com/noemailcollection" />
+  {% if kapidox_version %}
+    <meta name="generator" content="kapidox {{ kapidox_version }}" />
+  {% endif %}
+  <link rel="shortcut icon" href="{{resources}}/favicon.ico" />
+  <link rel="icon" href="{{resources}}/favicon.ico" />
+  {% if doxygencss %}
+    <link rel="stylesheet" type="text/css" href="{{doxygencss}}" />
+  {% endif %}
+  <!-- CSS can be edited in https://invent.kde.org/websites/aether-sass -->
+  <link href="https://cdn.kde.org/aether-devel/aether-docsy.css" rel="stylesheet">
+  <link href="https://cdn.kde.org/breeze-icons/icons.css" rel="stylesheet">
+  <link href="{{resources}}/css/customdoxygen.css" rel="stylesheet">
+  {% block head %}{% endblock %}
+  <style>
+.td-content .header, #nav-path {
+  display: none;
+}
+div.contents {
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+  </style>
+</head>
+
+<body>
+  <ul class="sr-only">
+    <li><a href="#cp-content" accesskey="2">Skip to content</a></li>
+    <li><a href="#cp-menu" accesskey="5">Skip to link menu</a></li>
+  </ul>
+  <div class="container-fluid td-outer">
+    <header class="header row">
+      <nav class="col-12 col-md-9 col-xl-8 offset-md-3 offset-xl-2 js-navbar-scroll navbar navbar-expand flex-column flex-md-row td-navbar">
+        <a class="navbar-brand kde-logo active d-none d-lg-flex" href="/">Developer</a>
+        <div class="td-navbar-nav-scroll" id="main_navbar">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link kde-logo active d-lg-none d-flex active" href="/">API</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://develop.kde.org/docs/"><span>Documentation</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="https://api.kde.org" target="_blank"><span class="active">API</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://develop.kde.org/hig/"><span>KDE Human Interface Guidelines</span></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <div class="td-main">
+      <div class="row flex-xl-nowrap">
+        <!-- left sidebar -->
+        <div class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+          <div id="td-sidebar-menu" class="td-sidebar__inner">
+            <form action="search.html" method="get" class="td-sidebar__search d-flex p-2 pt-0 align-items-center">
+              <input type="text" id="SearchBox" name="query" aria-label="Search input" class="form-control" placeholder="Search..."></input>
+              <button class="btn btn-link td-sidebar__toggle d-md-none p-0 m-0 ml-3 icon icon_application-menu" type="button" data-toggle="collapse" data-target="#td-section-nav" aria-controls="td-docs-nav" aria-expanded="false" style="font-size: 1.5rem; height: 40px; width: 40px; border-width: 0" aria-label="Toggle section navigation"></button>
+            </form>
+            <div id="td-section-nav" class="td-sidebar-nav p-2 collapse">
+              {% block sidebar %}{% endblock %}
+            </div>
+          </div>
+        </div>
+
+        <!-- right sidebar -->
+        {% if fwinfo %}
+          <div class="d-xl-block col-xl-2 td-toc d-print-none">
+            {% include "libinfo.html" %}
+          </div>
+        {% endif %}
+
+        <!-- main content -->
+        <main class="col-12 col-md-9 col-xl-8 pl-md-5" role="main">
+          <nav aria-label="breadcrumb" class="d-md-block d-print-none">
+            <!-- breadcrumb -->
+            <ol class="breadcrumb spb-1">
+              {% for entry in breadcrumbs.entries %}
+                <li class="breadcrumb-item"><a href="{{ entry.href }}">{{ entry.text }}</a></li>
+              {% endfor %}
+            </ol>
+          </nav>
+
+          <!-- content -->
+          <div class="td-content">
+            <h1 class="mt-2">{% block title %}{% endblock %}</h1>
+            {% block content %}{% endblock %}
+          </div>
+        </main>
+      </div>
+    </div>
+    <footer class="bg-dark py-4 row d-print-none">
+      <div class="container-fluid mx-sm-5">
+        {% include 'footer.html' %}
+        <div id="footer-text" class="col-md-5 center-block text-white">
+          <p>Generated by <a href="https://api.kde.org/frameworks/kapidox/html/index.html">KApiDox</a>, a <a href="https://www.kde.org">KDE</a> product.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.kde.org/aether-devel/bootstrap.js"></script>
+  <script src="{{resources}}/js/main.js"></script>
+  <script src="dynsections.js"></script>
+  <script>
+    document.querySelectorAll('h1, .dynheader, .el').forEach(h => {
+      h.innerHTML = h.innerHTML.replace('org::kde::kirigami::templates::', 'Kirigami.<wbr>Templates.<wbr>');
+      h.innerHTML = h.innerHTML.replace('org::kde::kirigami::', 'Kirigami.<wbr>');
+      h.innerHTML = h.innerHTML.replace('org::kde::plasma::components::', 'PlasmaComponents2.<wbr>');
+      h.innerHTML = h.innerHTML.replace('org::kde::plasma::extras::', 'PlasmaExtras.<wbr>');
+    });
+    document.querySelectorAll('.memname, #class-picker option').forEach(h => {
+      h.innerText = h.innerText.replace('org::kde::kirigami::templates::', 'Templates.');
+      h.innerText = h.innerText.replace('org::kde::kirigami::', '');
+      h.innerHTML = h.innerHTML.replace('org::kde::plasma::components::', 'PlasmaComponents2.<wbr>');
+      h.innerHTML = h.innerHTML.replace('org::kde::plasma::extras::', 'PlasmaExtras.<wbr>');
+      h.innerHTML = h.innerHTML.replace('org::kde::plasma::calendar::MonthView', 'MonthView.<wbr>');
+    });
+  </script>
+
+  {% block footer %}
+  {% endblock %}
+
+<!--
+WARNING: DO NOT SEND MAIL TO THE FOLLOWING EMAIL ADDRESS! YOU WILL
+BE BLOCKED INSTANTLY AND PERMANENTLY!
+<a href="mailto:aaaatrap-45abe0e0c3bebc77@kde.org">Block me</a>
+WARNING END
+-->
+
+</body>
+</html>

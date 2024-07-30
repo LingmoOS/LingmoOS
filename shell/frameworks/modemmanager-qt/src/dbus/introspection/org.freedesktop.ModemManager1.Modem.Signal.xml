@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 0.8 Interface Specification
+
+   Copyright (C) 2013 Aleksander Morgado <aleksander@gnu.org>
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Signal:
+      @short_description: The ModemManager Signal interface.
+
+      This interface provides access to extended signal quality information.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Signal">
+
+    <!--
+        Setup:
+        @rate: refresh rate to set, in seconds. 0 to disable retrieval.
+
+        Setup extended signal quality information retrieval.
+    -->
+    <method name="Setup">
+      <arg name="rate" type="u" direction="in" />
+    </method>
+
+    <!--
+        Rate:
+
+        Refresh rate for the extended signal quality information updates,
+        in seconds. A value of 0 disables the retrieval of the values.
+    -->
+    <property name="Rate" type="u" access="read" />
+
+    <!--
+        Cdma:
+
+        Dictionary of available signal information for the CDMA1x access
+        technology.
+
+        This dictionary is composed of a string key, with an associated data
+        which contains type-specific information.
+
+        <variablelist>
+        <varlistentry><term><literal>"rssi"</literal></term>
+          <listitem>
+            <para>
+              The CDMA1x RSSI (Received Signal Strength Indication), in dBm,
+              given as a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"ecio"</literal></term>
+          <listitem>
+            <para>
+              The CDMA1x Ec/Io, in dBm, given as a floating point value
+              (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Cdma" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+  </property>
+    <!--
+        Evdo:
+
+        Dictionary of available signal information for the CDMA EV-DO access
+        technology.
+
+        This dictionary is composed of a string key, with an associated data
+        which contains type-specific information.
+
+        <variablelist>
+        <varlistentry><term><literal>"rssi"</literal></term>
+          <listitem>
+            <para>
+              The CDMA EV-DO RSSI (Received Signal Strength Indication), in dBm,
+              given as a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"ecio"</literal></term>
+          <listitem>
+            <para>
+              The CDMA EV-DO Ec/Io, in dBm, given as a floating point value
+              (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"sinr"</literal></term>
+          <listitem>
+            <para>
+              CDMA EV-DO SINR level, in dB, given as a floating point value
+              (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"io"</literal></term>
+          <listitem>
+            <para>
+              The CDMA EV-DO Io, in dBm, given as a floating point value
+              (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Evdo" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        Gsm:
+
+        Dictionary of available signal information for the GSM/GPRS access
+        technology.
+
+        This dictionary is composed of a string key, with an associated data
+        which contains type-specific information.
+
+        <variablelist>
+        <varlistentry><term><literal>"rssi"</literal></term>
+          <listitem>
+            <para>
+              The GSM RSSI (Received Signal Strength Indication), in dBm,
+              given as a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Gsm" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        Umts:
+
+        Dictionary of available signal information for the UMTS (WCDMA) access
+        technology.
+
+        This dictionary is composed of a string key, with an associated data
+        which contains type-specific information.
+
+        <variablelist>
+        <varlistentry><term><literal>"rssi"</literal></term>
+          <listitem>
+            <para>
+              The UMTS RSSI (Received Signal Strength Indication), in dBm,
+              given as a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"ecio"</literal></term>
+          <listitem>
+            <para>
+              The UMTS Ec/Io, in dBm, given as a floating point value
+              (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Umts" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+    <!--
+        Lte:
+
+        Dictionary of available signal information for the UMTS (WCDMA) access
+        technology.
+
+        This dictionary is composed of a string key, with an associated data
+        which contains type-specific information.
+
+        <variablelist>
+        <varlistentry><term><literal>"rssi"</literal></term>
+          <listitem>
+            <para>
+              The LTE RSSI (Received Signal Strength Indication), in dBm,
+              given as a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"rsrq"</literal></term>
+          <listitem>
+            <para>
+              The LTE RSRQ (Reference Signal Received Quality), in dB, given as
+              a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"rsrp"</literal></term>
+          <listitem>
+            <para>
+              The LTE RSRP (Reference Signal Received Power), in dBm, given as
+              a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"snr"</literal></term>
+          <listitem>
+            <para>
+              The LTE S/R ratio, in dB, given as
+              a floating point value (signature <literal>"d"</literal>).
+            </para>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Lte" type="a{sv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="QVariantMap"/>
+    </property>
+
+  </interface>
+</node>

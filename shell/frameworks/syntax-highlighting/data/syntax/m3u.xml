@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+
+<!-- Changelog:
+
+v1.2: (kde4)
+- mimetype set to audio/x-mpegurl (fdo standard)
+
+v1.1:
+- mimetype korrigiert zu "audio/mpegurl"
+- Syntax verbessert
+
+v1.0:
+-first Release
+-->
+
+<language name="M3U" section="Other" extensions="*.m3u" mimetype="audio/x-mpegurl" version="5" kateversion="5.0" author="Jan Janssen (medhefgo@web.de)" license="LGPL" >
+
+<highlighting>
+<contexts>
+ <context name="M3U" attribute="Normal Text" lineEndContext="#stay">
+  <StringDetect attribute="M3USpec" context="#pop" String="#EXTM3U" column="0" />
+  <StringDetect attribute="EXTINF" context="FindEXTINF" String="#EXTINF" column="0" />
+  <DetectChar attribute="Comment" char="#" context="Comment" firstNonSpace="true" />
+ </context>
+
+ <context name="FindEXTINF" attribute="Normal Text" lineEndContext="#stay">
+  <RegExpr attribute="Lenght" String=":\d+" />
+  <DetectChar attribute="Descr" context="#pop" char="," />
+ </context>
+
+ <context name="Comment" attribute="Comment" lineEndContext="#pop">
+  <DetectSpaces />
+  <IncludeRules context="##Comments" />
+ </context>
+
+</contexts>
+
+<itemDatas>
+ <itemData name="Normal Text" defStyleNum="dsNormal" />
+ <itemData name="M3USpec" defStyleNum="dsKeyword"/>
+ <itemData name="Comment" defStyleNum="dsComment" />
+
+ <itemData name="EXTINF" defStyleNum="dsOthers" />
+ <itemData name="Lenght" defStyleNum="dsDecVal" />
+ <itemData name="Descr" defStyleNum="dsString" />
+</itemDatas>
+</highlighting>
+
+
+<general>
+ <comments>
+  <comment name="singleLine" start="#" />
+ </comments>
+</general>
+
+</language>
+<!-- kate: replace-tabs on; indent-width 1; -->

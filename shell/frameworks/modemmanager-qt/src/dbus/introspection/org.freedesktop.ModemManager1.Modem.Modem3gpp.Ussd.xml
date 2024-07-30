@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd:
+      @short_description: The ModemManager 3GPP USSD interface.
+
+      This interface provides access to actions based on the USSD protocol.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd">
+
+    <!--
+        Initiate:
+        @command: The command to start the USSD session with.
+        @reply: The network response to the command which started the USSD session.
+
+        Sends a USSD command string to the network initiating a USSD session.
+
+        When the request is handled by the network, the method returns the
+        response or an appropriate error. The network may be awaiting further
+        response from the ME after returning from this method and no new command
+        can be initiated until this one is cancelled or ended.
+    -->
+    <method name="Initiate">
+      <arg name="command" type="s" direction="in"  />
+      <arg name="reply"   type="s" direction="out" />
+    </method>
+
+    <!--
+        Respond:
+        @response: The response to network-initiated USSD command, or a response to a request for further input.
+        @reply: The network reply to this response to the network-initiated USSD command. The reply may require further responses.
+
+        Respond to a USSD request that is either initiated by the mobile network,
+        or that is awaiting further input after
+        <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Modem3gpp-Ussd.Initiate">Initiate()</link>
+        was called.
+    -->
+    <method name="Respond">
+      <arg name="response" type="s" direction="in"  />
+      <arg name="reply"    type="s" direction="out" />
+    </method>
+
+    <!--
+        Cancel:
+
+        Cancel an ongoing USSD session, either mobile or network initiated.
+    -->
+    <method name="Cancel" />
+
+    <!--
+        State:
+
+        A <link linkend="MMModem3gppUssdSessionState">MMModem3gppUssdSessionState</link> value,
+        indicating the state of any ongoing USSD session.
+    -->
+    <property name="State" type="u" access="read" />
+
+    <!--
+        NetworkNotification:
+
+        Contains any network-initiated request to which no USSD response is
+        required.
+
+        When no USSD session is active, or when there is no network-
+        initiated request, this property will be a zero-length string.
+    -->
+    <property name="NetworkNotification" type="s" access="read" />
+
+    <!--
+        NetworkRequest:
+
+        Contains any pending network-initiated request for a response. Client
+        should call
+        <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Modem3gpp-Ussd.Respond">Respond()</link>
+        with the appropriate response to this request.
+
+        When no USSD session is active, or when there is no pending
+        network-initiated request, this property will be a zero-length string.
+    -->
+    <property name="NetworkRequest" type="s" access="read" />
+
+  </interface>
+</node>

@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % German "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde-frameworks;: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Schrieb die ursprüngliche Dokumentation.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Aktualisierte die Dokumentation für &kf5-full;.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>2014-05-28</date>
+  <releaseinfo
+>Frameworks 5.0</releaseinfo>
+  <productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Generiert Bedienelement-Module (Widgets) für &Qt;-Designer </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>Optionen</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>Datei</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Beschreibung</title>
+  <para
+>Die benutzerdefinierten Bedienelement-Module für &Qt;-Designer folgen normalerweise einem Standardmuster, und die vom Modul bereitgestellten Klassen bieten meist statische Informationen, zusammen mit einer Funktion zum Erstellen einer Instanz, die normalerweise nur ein einfacher Konstruktoraufruf ist. <command
+>kgendesignerplugin</command
+> erlaubt Entwicklern von Bibliotheken, die neue Bedienelemente bereitstellen, die Erstellung eines solchen Moduls ohne den gesamten zugehörigen Boilerplate-Code zu erstellen, indem eine einfache Beschreibungsdatei im Ini-Stil bereitgestellt wird. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> verwendet sinnvolle Voreinstellungen für die meisten Einstellungen, daher ist normalerweise nur eine minimale Konfiguration erforderlich. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Optionen</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>datei</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Der Name der generierten C++-Datei. Ist er nicht angegeben, wird <varname
+>stdout</varname
+> benutzt. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>plugin-name</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Nur zur Kompatibilität. Der Standardwert für die Option PluginName in der Eingabedatei. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>group</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Nur zur Kompatibilität. Der Standardwert für die Option DefaultGroup in der Eingabedatei. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Zeigt Informationen über den Autor.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Zeigt Lizenz-Informationen an.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Zeigt einen kurzen Hilfetext.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v, --version</option
+></term>
+      <listitem>
+        <para
+>Zeigt Versionsinformationen an.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Dateiformat</title>
+  <para
+>Die Eingabedatei ist eine Einrichtungsdatei im Ini-Stile im Format, das von der Bibliothek KConfig unterstützt wird, und beschreibt eine Gruppe von Widgets. Sie enthält einen Abschnitt <literal
+>[Global]</literal
+> mit allgemeinen Informationen über das Modul und einen Abschnitt für jedes Widget in diesem Modul. </para>
+
+  <para
+>Im Abschnitt <literal
+>[Global]</literal
+> kann es folgende Einträge geben: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>Der Standardwert für den Eintrag <varname
+>Group</varname
+> in den Klassenabschnitten. Voreinstellung ist <literal
+>Custom</literal
+>, wenn nicht die Option <option
+>-g</option
+> angegeben ist. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Eine (durch Komma getrennte) Liste der erforderlichen Includes (Standard: leer). Beachten Sie, dass die Header-Dateien für die Bedienelemente, die später in der Datei angegeben werden, hier nicht aufgeführt werden sollten. Stattdessen ist dies für spezielle Header für die eigene Verwendung des Moduls gedacht, wie die für Klassen, die Vorschauen bereitstellen. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>Der Name der Haupt-C++-Klasse im Modul, Vorgabe <literal
+>WidgetsPlugin</literal
+>, wenn nicht die Option <option
+>-n</option
+> angeben ist. </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Jede Klasse sollte einen eigenen Abschnitt <literal
+>[<replaceable
+>ClassName</replaceable
+>]</literal
+> haben, der folgende Einträge enthalten kann: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>Der Rückgabewert der Funktion <code
+>codeTemplate()</code
+> des Moduls, der als „future use“ in &Qt;-Designer gekennzeichnet ist, Vorgabewert leer. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Die Argumente, die an den Konstruktor der durch <literal
+>ImplClass</literal
+> angegebenen Klasse übergeben werden, müssen von Klammern umgeben sein (Standard: "<literal
+>(parent)</literal
+>"). Die einzige Variable, die garantiert verfügbar ist, ist <varname
+>parent</varname
+>, das ist der Elternteil <code
+>QWidget</code
+>, das von &Qt; Designer übergeben wird. </para>
+          <para
+>Dieser Eintrag wird ignoriert, wenn <literal
+>CreateWidget</literal
+> festgelegt ist. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>Der notwendige Code, um eine Instanz des Bedienelements zu erzeugen: Standard: verwendet <code
+>new</code
+>, um eine Instanz der durch den Eintrag <literal
+>ImplClass</literal
+> angegebenen Klasse zu erzeugen, die  Klasse zu erzeugen, wobei die durch <literal
+>ConstructorArgs</literal
+> angegebenen Argumente übergeben werden. Siehe die Hinweise zu <literal
+>ImplClass</literal
+> und <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Eine &XML;-UI-Beschreibung des Bedienelements. Standard ist die Einstellung aus den Headern der &Qt;-Designermodule. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>Die Gruppe unter der das Bedienelement im &Qt;-Designer angezeigt wird. Die Voreinstellung ist der Wert des Eintrags <varname
+>DefaultGroup</varname
+> im Abschnitt <literal
+>[Global]</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>Die Bilddatei oder der Name des Standardsymbols, das als Symbol für dieses Bedienelement in der &Qt; Designer-Liste verwendet werden soll. (Standard: eine PNG-Datei mit dem Namen des Abschnitts, wobei Doppelpunkte entfernt werden, im Verzeichnis "pics" einer kompilierten Ressourcendatei. Zum Beispiel <filename
+>:/pics/Foo.png</filename
+> im Abschnitt <literal
+>[Foo]</literal
+> oder <filename
+>:/pics/FooBar.png</filename
+> im Abschnitt <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>Die Klasse, die verwendet werden soll, um eine Instanz des Bedienelements für die Verwendung von &Qt;-Designer (Standard: der Name des Abschnitts). Beachten Sie, dass dies nicht tatsächlich die Klasse sein muss, die für eine Endanwendung erzeugt werden würde. Das wird durch das <literal
+>DomXML</literal
+> bestimmt. </para>
+          <para
+>Dieser Eintrag wird ignoriert, wenn <literal
+>CreateWidget</literal
+> festgelegt ist. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>Die Header, der zur Verwendung dieses Bedienelements enthalten sein müssen. Standard: der kleingeschriebene Abschnittsnamen, wobei alle Doppelpunkte entfernt und ".h" angehängt werden. Zum Beispiel <literal
+>foo.h</literal
+> im Abschnitt <literal
+>[Foo]</literal
+> oder <literal
+>foobar.h</literal
+> im Abschnitt <literal
+>[Foo::Bar]</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Ob diese Bedienelement andere Bedienelement enthalten kann. Vorgabe ist <literal
+>false</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>Die Kurzinfo, die angezeigt wird, wenn der Mauszeiger über das Bedienelement in der Liste von &Qt;-Designer geführt wird. Standard: der Name des Abschnitts, mit angehängtem " Widget". Zum Beispiel: <literal
+>Foo Widget</literal
+> im Abschnitt <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>Der „Was ist das“-Text zum zugehörigen Bedienelement in der Liste vom &Qt;--Designer. Standard: der Name des Abschnitts, mit angehängtem " Widget". Zum Beispiel: <literal
+>Foo Widget</literal
+> im Abschnitt <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Beispiele</title>
+  <para
+>Die einfachste Beschreibungsdatei kann so aussehen: <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Displays foos
+[Bar]
+ToolTip=Bar editor
+]]>
+    </screen
+> Beachten Sie, dass jede Klasse mindestens einen Schlüsselwert festlegen muss (<literal
+>ToolTip</literal
+> wurde zum Beispiel hier verwendet), ansonsten wird sie ignoriert. </para>
+  <para
+>Normalerweise wollen Sie zumindest den für den Benutzer sichtbaren Text ändern, also die Einträge <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> und <literal
+>Group</literal
+>. Zusätzlich kann das Setzen des Modul-Namens eine gute Idee sein, um mögliche Symbolkonflikte zu vermeiden und Debugger nicht zu verwirren, sowohl die Anwendung als auch die Person: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Display
+
+[Foo]
+ToolTip=Displays bears
+WhatsThis=An image widget that displays dancing bears
+
+[Bar]
+ToolTip=Bar editor
+WhatsThis=An editor interface for bars for bears
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Komplexere Dateien können nötig sein, wenn Sie Klassen  mit Namensraum oder zusätzliche Einstellungen, die vom Konstruktor unterstützt werden, wie zum Beispiel: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Foo
+
+[Foo::Bar]
+ToolTip=Displays bars
+WhatsThis=A widget that displays bars in a particular way
+IncludeFile=foo/bar.h
+IconName=:/previews/bar.png
+
+[Foo::Baz]
+IncludeFile=foo/baz.h
+ConstructorArgs=(Foo::Baz::SomeOption, parent)
+Group=Foo (Special)
+IsContainer=true
+IconName=:/previews/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>Manchmal benötigen besonders komplexe Bedienelemente eine spezielle "Vorschauklassen"-Implementierung für die Verwendung in &Qt;-Designer;. Dies kann eine Unterklasse des eigentlichen Bedienelements sein, die nur einige zusätzliche Einstellungen vornimmt, oder es kann eine völlig andere Implementierung sein. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=foopreviews.h
+
+[FancyWidget]
+ImplClass=FancyWidgetPreview
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Siehe auch</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>Die Dokumentation zu &Qt;-Designer für die Erstellung von Modulen für benutzerdefinierte Bedienelemente.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Fehler</title>
+  <para
+>Bitte verwenden Sie <ulink url="https://bugs.kde.org"
+>bugs.kde.org</ulink
+> für Fehlerberichte, schicken Sie keine E-Mails direkt an die Autoren. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

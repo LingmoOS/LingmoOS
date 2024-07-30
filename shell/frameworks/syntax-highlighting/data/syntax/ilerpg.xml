@@ -1,0 +1,587 @@
+<!DOCTYPE language>
+<!--
+    *************************************************************************
+    *                                                                       *
+    *               Syntax highlighting for IBM iSeries ILE RPG             *
+    *                   Copyright (C) 2003, Nick Roux                       *
+    *                                                                       *
+    *************************************************************************
+
+    Updated: Nick Roux <nick@sundown.homeip.net>
+    Date:    2006/04/12
+    Version: 1.05
+             Added support for compiler directives and especially /free
+	     Added positional check for opcodes and validation of conditioning indicators
+
+    Author:  Nick Roux <nick@sundown.homeip.net>
+    Date:    Sometime during 2003
+    Version: 1.0
+
+	This file contains the XML syntax highlighting description for the IBM
+	iSeries ILE RPG, for KATE, the KDE Advanced Editor.  
+	Based on information from IBM publication SC09-2508-05
+	
+	Known problems: 
+	 1) Calculation Specification Factor1 does not get highlighted
+	 2) Calculation Specification Extended Factor2 Continuation Line does not work correctly
+	 3) Everything from the start of Factor2 is assumed free format
+	 4) Will make a total mess of compile time array data, but that seems rather fitting
+	 5) Operation Code Extenders are not check/highlighted
+	 6) It is slow
+
+	This program, including associated files, is free software.  You may
+	distribute it and/or modify it under the terms of the GNU General Public
+	License as published by the Free Software Foundation; either Version 2 of
+	the license, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful, but
+	WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+	for more details.
+
+	You should have received a copy of the GNU General Public License along
+	with this program; if not, write to the Free Software Foundation, Inc.,
+	51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
+-->
+
+<language name="ILERPG" version="12" kateversion="2.2" section="Sources" extensions="QRPG*.*;qrpg*.*" mimetype="text/x-ilerpg-src" casesensitive="0" license="GPLv2+" author="Nick Roux (nick@sundown.homeip.net)">
+  <highlighting>
+	<list name="dkeywords">
+		<item>EXTPROC</item>
+		<item>EXTPGM</item>
+		<item>OPDESC</item>
+		<item>DATFMT</item>
+		<item>DIM</item>
+		<item>LIKEDS</item>
+		<item>LIKEREC</item>
+		<item>LIKE</item>
+		<item>PROCPTR</item>
+		<item>TIMFMT</item>
+		<item>VARYING</item>
+		<item>ASCEND</item>
+		<item>CONST</item>
+		<item>NOOPT</item>
+		<item>OPTIONS</item>
+		<item>VALUE</item>
+		<item>QUALIFIED</item>
+		<item>INZ</item>
+		<item>BASED</item>
+	</list>
+	<list name="directives">
+		<item>FREE</item>
+		<item>END-FREE</item>
+		<item>TITLE</item>
+		<item>EJECT</item>
+		<item>SPACE</item>
+		<item>COPY</item>
+		<item>INCLUDE</item>
+		<item>DEFINE</item>
+		<item>UNDEFINE</item>
+		<item>IF</item>
+		<item>ELSE</item>
+		<item>EXEC</item>
+		<item>END-EXEC</item>
+		<item>ELSEIF</item>
+		<item>ENDIF</item>
+		<item>EOF</item>
+	</list> 
+	<list name="directives2">
+		<item>NOT</item>
+		<item>DEFINED</item>
+	</list> 
+	<list name="directives3">
+		<item>DEFINED</item>
+	</list> 
+	<list name="biffs">
+		<item>ABS</item>
+		<item>ADDR</item>
+		<item>ALLOC</item>
+		<item>BITAND</item>
+		<item>BITNOT</item>
+		<item>BITOR</item>
+		<item>BITXOR</item>
+		<item>CHAR</item>
+		<item>CHECK</item>
+		<item>CHECKR</item>
+		<item>DATE</item>
+		<item>DAYS</item>
+		<item>DEC</item>
+		<item>DECH</item>
+		<item>DECPOS</item>
+		<item>DIFF</item>
+		<item>DIV</item>
+		<item>EDITC</item>
+		<item>EDITFLT</item>
+		<item>EDITW</item>
+		<item>ELEM</item>
+		<item>EOF</item>
+		<item>EQUAL</item>
+		<item>ERROR</item>
+		<item>FIELDS</item>
+		<item>FLOAT</item>
+		<item>FOUND</item>
+		<item>GRAPH</item>
+		<item>HOURS</item>
+		<item>INT</item>
+		<item>INTH</item>
+		<item>KDS</item>
+		<item>LEN</item>
+		<item>LOOKUP</item>
+		<item>LOOKUPLT</item>
+		<item>LOOKUPLE</item>
+		<item>LOOKUPGT</item>
+		<item>LOOKUPGE</item>
+		<item>MINUTES</item>
+		<item>MONTHS</item>
+		<item>MSECONDS</item>
+		<item>NULLIND</item>
+		<item>OCCUR</item>
+		<item>OPEN</item>
+		<item>PADDR</item>
+		<item>PARMS</item>
+		<item>REALLOC</item>
+		<item>REM</item>
+		<item>REPLACE</item>
+		<item>SCAN</item>
+		<item>SECONDS</item>
+		<item>SHTDN</item>
+		<item>SIZE</item>
+		<item>SQRT</item>
+		<item>STATUS</item>
+		<item>STR</item>
+		<item>SUBARR</item>
+		<item>SUBDT</item>
+		<item>SUBST</item>
+		<item>THIS</item>
+		<item>TIME</item>
+		<item>TIMESTAMP</item>
+		<item>TLOOKUP</item>
+		<item>TLOOKUPLT</item>
+		<item>TLOOKUPLE</item>
+		<item>TLOOKUPGT</item>
+		<item>TLOOKUPGE</item>
+		<item>TRIM</item>
+		<item>TRIML</item>
+		<item>TRIMR</item>
+		<item>UCS2</item>
+		<item>UNS</item>
+		<item>UNSH</item>
+		<item>XFOOT</item>
+		<item>XLATE</item>
+		<item>YEARS</item>
+	</list>
+	<list name="opcodes2">
+		<item>IF</item>
+		<item>DO</item>
+		<item>IN</item>
+		<item>OR</item>
+	</list>
+	<list name="opcodes3">
+		<item>DOW</item>
+		<item>DOU</item>
+		<item>FOR</item>
+		<item>ACQ</item>
+		<item>ADD</item>
+		<item>AND</item>
+		<item>CAB</item>
+		<item>CAS</item>
+		<item>CAT</item>
+		<item>DIV</item>
+		<item>DOU</item>
+		<item>END</item>
+		<item>MVR</item>
+		<item>OUT</item>
+		<item>REL</item>
+		<item>SUB</item>
+		<item>TAG</item>
+	</list>
+	<list name="opcodes4">
+		<item>WHEN</item>
+		<item>EVAL</item>
+		<item>CALL</item>
+		<item>COMP</item>
+		<item>DUMP</item>
+		<item>ELSE</item>
+		<item>EXSR</item>
+		<item>FEOD</item>
+		<item>GOTO</item>
+		<item>IFGT</item>
+		<item>IFLT</item>
+		<item>IFEQ</item>
+		<item>IFNE</item>
+		<item>IFGE</item>
+		<item>IFLE</item>
+		<item>ITER</item>
+		<item>KFLD</item>
+		<item>MOVE</item>
+		<item>MULT</item>
+		<item>NEXT</item>
+		<item>OPEN</item>
+		<item>ORGT</item>
+		<item>ORLT</item>
+		<item>OREQ</item>
+		<item>ORNE</item>
+		<item>ORGE</item>
+		<item>ORLE</item>
+		<item>PARM</item>
+		<item>POST</item>
+		<item>READ</item>
+		<item>SCAN</item>
+		<item>SQRT</item>
+		<item>TEST</item>
+		<item>TIME</item>
+	</list>
+	<list name="opcodes5">
+		<item>EVALR</item>
+		<item>ALLOC</item>
+		<item>ANDGT</item>
+		<item>ANDLT</item>
+		<item>ANDEQ</item>
+		<item>ANDNE</item>
+		<item>ANDGE</item>
+		<item>ANDLE</item>
+		<item>BEGSR</item>
+		<item>BITON</item>
+		<item>CABGT</item>
+		<item>CABLT</item>
+		<item>CABEQ</item>
+		<item>CABNE</item>
+		<item>CABGE</item>
+		<item>CABLE</item>
+		<item>CALLB</item>
+		<item>CALLP</item>
+		<item>CASGT</item>
+		<item>CASLT</item>
+		<item>CASEQ</item>
+		<item>CASNE</item>
+		<item>CASGE</item>
+		<item>CASLE</item>
+		<item>CHAIN</item>
+		<item>CHECK</item>
+		<item>CLEAR</item>
+		<item>CLOSE</item>
+		<item>CHECK</item>
+		<item>CLEAR</item>
+		<item>CLOSE</item>
+		<item>DOWGT</item>
+		<item>DOWLT</item>
+		<item>DOWEQ</item>
+		<item>DOWNE</item>
+		<item>DOWGE</item>
+		<item>DOWLE</item>
+		<item>DOUGT</item>
+		<item>DOULT</item>
+		<item>DOUEQ</item>
+		<item>DOUNE</item>
+		<item>DOUGE</item>
+		<item>DOULE</item>
+		<item>DSPLY</item>
+		<item>ENDCS</item>
+		<item>ENDDO</item>
+		<item>ENDIF</item>
+		<item>ENDSL</item>
+		<item>ENDSR</item>
+		<item>EXFMT</item>
+		<item>FORCE</item>
+		<item>KLIST</item>
+		<item>LEAVE</item>
+		<item>MHHZO</item>
+		<item>MHLZO</item>
+		<item>MLHZO</item>
+		<item>MLLZO</item>
+		<item>MOVEA</item>
+		<item>MOVEL</item>
+		<item>OCCUR</item>
+		<item>OTHER</item>
+		<item>PLIST</item>
+		<item>READC</item>
+		<item>READE</item>
+		<item>READP</item>
+		<item>RESET</item>
+		<item>ROLBK</item>
+		<item>SETGT</item>
+		<item>SETLL</item>
+		<item>SETON</item>
+		<item>SHTDN</item>
+		<item>SORTA</item>
+		<item>SUBST</item>
+		<item>TESTB</item>
+		<item>TESTN</item>
+		<item>TESTZ</item>
+		<item>WRITE</item>
+		<item>XFOOT</item>
+		<item>XLATE</item>
+	</list>
+	<list name="opcodes6">
+		<item>RETURN</item>
+		<item>ADDDUR</item>
+		<item>BITOFF</item>
+		<item>CHECKR</item>
+		<item>COMMIT</item>
+		<item>DEFINE</item>
+		<item>DELETE</item>
+		<item>EXCEPT</item>
+		<item>EXTRCT</item>
+		<item>LOOKUP</item>
+		<item>READPE</item>
+		<item>RETURN</item>
+		<item>SELECT</item>
+		<item>SETOFF</item>
+		<item>SUBDUR</item>
+		<item>UNLOCK</item>
+		<item>UPDATE</item>
+		<item>WHENGT</item>
+		<item>WHENLT</item>
+		<item>WHENEQ</item>
+		<item>WHENNR</item>
+		<item>WHENGE</item>
+		<item>WHENLE</item>
+	</list>
+	<list name="opcodes7">
+		<item>DEALLOC</item>
+		<item>REALLOC</item>
+	</list>
+	<list name="freeopcodes">
+		<item>ACQ</item>
+		<item>BEGSR</item>
+		<item>CALLP</item>
+		<item>CHAIN</item>
+		<item>CLEAR</item>
+		<item>CLOSE</item>
+		<item>COMMIT</item>
+		<item>DEALLOC</item>
+		<item>DELETE</item>
+		<item>DOU</item>
+		<item>DOW</item>
+		<item>DSPLY</item>
+		<item>DUMP</item>
+		<item>ELSE</item>
+		<item>ELSEIF</item>
+		<item>ENDDO</item>
+		<item>ENDFOR</item>
+		<item>ENDIF</item>
+		<item>ENDMON</item>
+		<item>ENDSL</item>
+		<item>ENDSR</item>
+		<item>EVAL</item>
+		<item>EVALR</item>
+		<item>EXCEPT</item>
+		<item>EXFMT</item>
+		<item>EXSR</item>
+		<item>FEOD</item>
+		<item>FOR</item>
+		<item>FORCE</item>
+		<item>IF</item>
+		<item>IN</item>
+		<item>ITER</item>
+		<item>LEAVE</item>
+		<item>LEAVESR</item>
+		<item>MONITOR</item>
+		<item>NEXT</item>
+		<item>ON-ERROR</item>
+		<item>OPEN</item>
+		<item>OTHER</item>
+		<item>OUT</item>
+		<item>POST</item>
+		<item>READ</item>
+		<item>READC</item>
+		<item>READE</item>
+		<item>READP</item>
+		<item>READPE</item>
+		<item>REL</item>
+		<item>RESET</item>
+		<item>RETURN</item>
+		<item>ROLBK</item>
+		<item>SELECT</item>
+		<item>SETGT</item>
+		<item>SETLL</item>
+		<item>SORTA</item>
+		<item>TEST</item>
+		<item>UNLOCK</item>
+		<item>UPDATE</item>
+		<item>WHEN</item>
+		<item>WRITE</item>
+	</list>
+
+    <contexts>
+    
+<!-- Start here -->
+	<!-- Form Type -->
+	<context name="Default" attribute="Normal Text" lineEndContext="#stay">
+		<RegExpr attribute="Comment" context="Comments" String="[PpOoIiHhFfDdCc ]?\*"/>
+		<RegExpr attribute="Directive" context="Directives" String="[PpOoIiHhFfDdCc ]?/"/>
+		<AnyChar attribute="Keyword" context="AnyCode" String="OoIiHhFf"/>
+		<AnyChar attribute="Keyword" context="D_or_P" String="DdPp"/>
+		<AnyChar attribute="Keyword" context="CControlLevel" String="Cc"/>
+	</context>
+	
+<!-- Calculation Specifications -->
+	<!-- Control Level -->
+	<context name="CControlLevel" attribute="Normal Text" lineEndContext="#pop">
+		<RegExpr attribute="Indicator" context="CIndicators" String="  |[Ll][0-9]|[OoLlSs][Rr]|[Aa][Nn]"/>
+		<RegExpr attribute="Alert"   context="CIndicators" String=".."/>
+	</context>
+	
+	<!-- Indicators -->
+	<context name="CIndicators" attribute="Normal Text" lineEndContext="#pop#pop">
+		<RegExpr attribute="Indicator" context="CFactor1" String="   |[ N](?:[0-9]{2}|K[A-NP-Y]|[LH][1-9]|[LM]R|RT|U[1-8]|O[VA-G])" insensitive="1"/>
+		<RegExpr attribute="Alert" context="CFactor1" String="..."/>
+	</context>
+	
+	<!-- Factor1 -->
+	<context name="CFactor1" attribute="Normal Text" lineEndContext="#pop#pop#pop">
+		<!-- TODO -->
+		<RegExpr attribute="Normal Text" context="FindOC" String=".{14}"/>
+	</context>
+	
+	<!-- FindOpcode -->
+      <context name="FindOC" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop">
+		<keyword attribute="Keyword" context="OC2" String="opcodes2"/>
+		<keyword attribute="Keyword" context="OC3" String="opcodes3"/>
+		<keyword attribute="Keyword" context="OC4" String="opcodes4"/>
+		<keyword attribute="Keyword" context="OC5" String="opcodes5"/>
+		<keyword attribute="Keyword" context="OC6" String="opcodes6"/>
+		<keyword attribute="Keyword" context="OC7" String="opcodes7"/>
+		<WordDetect attribute="Keyword" context="OC5" String="Z-ADD" insensitive="1"/>
+		<WordDetect attribute="Keyword" context="OC5" String="Z-SUB" insensitive="1"/>
+		<WordDetect attribute="Keyword" context="OC8" String="ON-ERR" insensitive="1"/>
+		<WordDetect attribute="Keyword" context="OC8" String="ON-OR" insensitive="1"/>
+		<StringDetect attribute="Normal Text" context="CFactor2" String="          "/>
+		<RegExpr attribute="Alert"   context="CFactor2" String=".{10}"/>
+      </context>
+
+      <!-- Opcodes that can or not be followed by evaluation expressions -->
+      <context name="OC2" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="        "/>
+      </context>
+      <context name="OC3" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="       "/>
+      </context>
+      <context name="OC4" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="      "/>
+      </context>
+      <context name="OC5" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="     "/>
+      </context>
+      <context name="OC6" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="    "/>
+      </context>
+      <context name="OC7" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <StringDetect attribute="Normal Text" context="CFactor2" String="   "/>
+      </context>
+      <context name="OC8" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <Detect2Chars attribute="Normal Text" context="CFactor2" char=" " char1=" "/>
+      </context>
+      
+      <context name="CFactor2" attribute="Normal Text" lineEndContext="#pop#pop#pop#pop#pop">
+	      <DetectChar attribute="Biff" context="Biffs" char="%"/>
+	      <IncludeRules context="CommonCode" />
+      </context>
+ 
+      <!-- Comments -->
+      <context name="Comments" attribute="Comment" lineEndContext="#pop">
+        <RegExpr attribute="BoldComment" context="#stay" String="\(*(?:FIXME|TODO|NOTE:)\)*" />
+        <AnyChar attribute="DivideComment" context="#stay" String="-="/>
+      </context>
+
+      <!-- String Constants -->
+      <context name="StringConstants" attribute="ConstantChar" lineEndContext="#pop">
+	      <DetectChar attribute="ConstantChar" context="#pop" char="'"/>
+      </context>
+
+      <!-- Compiler Directives -->
+      <context name="Directives" attribute="Normal Text" lineEndContext="#pop">
+	      <StringDetect attribute="Directive" context="Free" String="FREE" insensitive="1"/>
+	      <StringDetect attribute="Directive" context="Exec" String="EXEC" insensitive="1"/>
+	      <keyword attribute="Directive" context="Directives2" String="directives"/>
+      </context>
+      <context name="Directives2" attribute="Normal Text" lineEndContext="#pop#pop">
+	      <keyword attribute="Directive" context="Directives3" String="directives2"/>
+      </context>
+      <context name="Directives3" attribute="Normal Text" lineEndContext="#pop#pop#pop">
+	      <keyword attribute="Directive" context="#stay" String="directives3"/>
+      </context>
+
+      <!-- Free -->
+      <context name="Free" attribute="Normal Text" lineEndContext="#stay">
+	      <RegExpr attribute="Directive" context="#pop" String="[POIHFDC ]?/[Ee][Nn][Dd]-[Ff][Rr][Ee][Ee]"/>
+	      <IncludeRules context="CommonCode" />
+	      <DetectChar attribute="Biff" context="Biffs" char="%"/>
+	      <Detect2Chars attribute="Comment" context="Comments" char="/" char1="/"/>
+	      <keyword attribute="Keyword" context="#stay" String="freeopcodes"/>
+      </context>
+      
+      <!-- Exec -->
+      <context name="Exec" attribute="Normal Text" lineEndContext="#stay">
+	      <RegExpr attribute="Directive" context="#pop" String="[POIHFDC ]?/[Ee][Nn][Dd]-[Ee][Xx][Ee][Cc]"/>
+      </context>
+      
+      <context name="Biffs" attribute="Biff" lineEndContext="#pop">
+	      <keyword attribute="Biff" context="#pop" String="biffs"/>
+	      <RegExpr attribute="Normal Text" context="#pop" String="."/>
+      </context>
+
+      <!-- Stuff common to all code Use as Include -->
+      <context name="CommonCode" attribute="Normal Text" lineEndContext="#stay">
+	      <IncludeRules context="ReservedWords" />
+	      <IncludeRules context="Indicators" />
+	      <DetectChar attribute="ConstantChar" context="StringConstants" char="'"/>
+	      <Float attribute="Float" context="#stay"/>
+	      <RegExpr attribute="Hex" context="#stay" String="[Xx]'[0-9a-fA-F]{2,}'"/>
+	      <Int attribute="Decimal" context="#stay"/>
+      </context>
+
+      <!-- Reserved words - Use as include -->
+      <context name="Indicators" attribute="Normal Text" lineEndContext="#stay">
+	      <RegExpr attribute="Indicator" context="#stay" String="\*IN\(?(?:[0-9][0-9]|1P|[HL][1-9]|[LM]R|O[A-GV]|U[1-8]|K[A-NP-Y]|RT)\)?" insensitive="1"/>
+      </context>
+      
+      <!-- Reserved words - Use as include -->
+      <context name="ReservedWords" attribute="Normal Text" lineEndContext="#stay">
+	      <!-- Date stuff -->
+	      <RegExpr attribute="Reserved" context="#stay" String="[\*U](?:DATE|MONTH|YEAR|DAY)| PAGE[1-7]?|\*(?:CDMY|CMDY|CYMD|DMY|EUR|HMS|ISO|JIS|JOB(?:RUN)?|(?:LONG)?JUL|MDY|SYS|USA|YMD|ALTSEQ|EQUATE|FILE|FTRANS|ILERPG|CRTBNDRPG|CRTRPGMOD|V[0-9]R[0-9]M[0-9])" insensitive="1"/>
+	      <!-- *ALL(X/G) *BLANKS *ON *OFF *NULL *ZERO(s) *HIVAL *LOVAL *PSSR *END *START-->
+	      <RegExpr attribute="Constant" context="#stay" String="\*(?:ALL[XG]?|BLANKS?|ON|OFF|NULL|ZEROS?|HIVAL|LOVAL|PSSR|END|START)" insensitive="1"/>
+      </context>
+
+      <!-- AnyCode -->
+      <context name="AnyCode" attribute="Normal Text" lineEndContext="#pop">
+	      <IncludeRules context="CommonCode" />
+      </context>
+      
+      <!-- D -->
+      <!-- P -->
+      <context name="D_or_P" attribute="Normal Text" lineEndContext="#pop">
+	      <keyword attribute="Keyword" context="#stay" String="dkeywords"/>
+	      <RegExpr attribute="Reserved" context="#stay" String="\*(?:NOPASS|OMIT|VARSIZE|RIGHTADJ|STRING|TRIM)" insensitive="1"/>
+	      <DetectChar attribute="Biff" context="Biffs" char="%"/>
+	      <IncludeRules context="CommonCode" />
+      </context>
+      
+    </contexts>
+		<itemDatas>
+		<itemData name="Alert" 		 defStyleNum="dsAlert" />
+		<itemData name="Normal Text"       defStyleNum="dsNormal" />
+		<itemData name="Keyword"           defStyleNum="dsKeyword" />
+		<itemData name="Biff"              defStyleNum="dsKeyword" />
+		<itemData name="Decimal"           defStyleNum="dsDecVal" />
+		<itemData name="Float"             defStyleNum="dsFloat"/>
+		<itemData name="Hex"               defStyleNum="dsBaseN"/>
+		<itemData name="ConstantChar"      defStyleNum="dsNormal" color="#DD0022" selColor="#000000" bold="0" italic="0"/>
+		<itemData name="Constant"          defStyleNum="dsNormal" color="#CC2222" selColor="#000000" bold="0" italic="0"/>
+		<itemData name="Reserved"          defStyleNum="dsNormal" color="#BB1133" selColor="#000000" bold="0" italic="0"/>
+		<itemData name="Indicator"         defStyleNum="dsNormal" color="#CC0000" selColor="#000000" bold="0" italic="0"/>
+		<itemData name="Comment"           defStyleNum="dsComment"/>
+		<itemData name="BoldComment"       defStyleNum="dsNormal" color="#CD853F" selColor="#808080" bold="1" italic="1"/>
+		<itemData name="DivideComment"     defStyleNum="dsComment" bold="1"/>
+		<itemData name="Directive"         defStyleNum="dsOthers"/>
+    </itemDatas>
+  </highlighting>
+  <general>
+    <keywords casesensitive="0"/>
+    <comments>
+      <comment name="singleLine" start="*"/>
+    </comments>
+  </general>
+</language>

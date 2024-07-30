@@ -1,0 +1,100 @@
+/** \mainpage KNotifications
+
+KNotifications is a cross-platform library for creating popup notifications.
+
+It currently supports Linux (and other Unix platforms that implement freedesktop.org notifications), Windows (8 or later), macOS and Android (version 5.0 or later).
+
+Please consult the <a href="https://develop.kde.org/hig/platform/notification//">KDE Human Interface Guidelines</a> for when using Notifications is appropriate.
+
+KNotification is the main entry point for using KNotifications.
+
+\section file The global config file
+In order to perform a notification, you need to create a description file, which contains
+default parameters of the notification. It needs to be installed to <em>knotifications6/appname.notifyrc</em>
+in a QStandardPaths::GenericDataLocation directory.
+On Android, this path is <em>qrc:/knotifications6/</em>.
+
+The filename must either match QCoreApplication::applicationName or be specified as the
+component name to the KNotification object.
+@warning Notifications won't be visible otherwise.
+
+You can do this with the following CMake command, if you use ECM's KDEInstallDirs:
+@code
+install(FILES appname.notifyrc  DESTINATION ${KDE_INSTALL_KNOTIFYRCDIR})
+@endcode
+
+ This file contains  mainly 2 parts
+  <ol>
+  <li>\ref global "Global information"</li>
+  <li>\ref events "Definition of individual events"</li>
+  </ol>
+
+\subsection global Global information
+The global part looks like that
+<pre>
+    [Global]
+    IconName=myicon
+    Name=Name of Application
+    Comment=A brief description of the application
+    DesktopEntry=DesktopFileName
+</pre>
+  The icon filename is just the name, without extension. It follows the same
+  behavior as `Icon=` as defined in the Freedesktop Desktop Entry specification.
+  The Name field may be used as the application name for popup, it may also be used
+  to visualize the application's notification settings in KCModule instances.
+  If Name is not present, Comment is used instead. Either must be present.
+  Make sure to follow <a href="https://develop.kde.org/hig/style/writing/capitalization/">the HIG</a>
+
+  The DesktopEntry field is required in order for the application to be listed
+  in the notifications KCModule, and for its notifications to appear in the
+  notification history. Ensure that its value matches the application's desktop
+  file name, that the desktop file name is set in the QGuiApplication or
+  KAboutData desktopFileName property, and that the desktop file is not marked
+  as Hidden.
+
+\subsection events Definition of Events
+
+The definition of the events forms the most important part of the config file
+<pre>
+    [Event/newmail]
+    Name=New E-Mail
+    Comment=You have got a new email
+    Action=Sound|Popup
+
+    [Event/contactOnline]
+    Name=Contact Goes Online
+    Comment=One of your contact has been connected
+    Sound=filetoplay.ogg
+    Action=None
+    Urgency=Low
+ </pre>
+These are the default settings for each notifiable event.
+Action is the string representing the action. Actions can be added to
+KNotification as plugins, by deriving from KNotificationPlugin.
+At the time of writing, the following actions are available: Taskbar,
+Sound, Popup, Logfile, TTS, Execute.
+Actions can be combined by separating them with '|'.
+
+Urgency can be any of: Low, Normal, Critical.
+
+\section example Example of code
+
+This portion of code will fire the event for the "contactOnline" event
+
+@code
+    KNotification *notification = new KNotification("contactOnline");
+    notification->setText(i18n("The contact <i>%1</i> has gone online", contact->name());
+    notification->setPixmap(contact->pixmap());
+    notification->setActions({i18n("Open chat")});
+
+    connect(notification, QOverload<unsigned int>::of(&KNotification::activated), contact, &Contact::slotOpenChat);
+
+    notification->sendEvent();
+    // Note: notification autodeletes itself with deleteLater() when no longer needed
+@endcode
+*/
+
+// DOXYGEN_SET_RECURSIVE = YES
+// DOXYGEN_SET_EXCLUDE_PATTERNS += *_p.h */private/* */examples/*
+// DOXYGEN_SET_PROJECT_NAME = KNotifications
+// vim:ts=4:sw=4:expandtab:filetype=doxygen

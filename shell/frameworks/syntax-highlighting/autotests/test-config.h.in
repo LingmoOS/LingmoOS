@@ -1,0 +1,93 @@
+/*
+    SPDX-FileCopyrightText: 2016 Volker Krause <vkrause@kde.org>
+
+    SPDX-License-Identifier: MIT
+*/
+
+#ifndef TEST_CONFIG_H
+#define TEST_CONFIG_H
+
+#include <QFile>
+#include <QProcess>
+#include <QStandardPaths>
+#include <QString>
+#include <QTextStream>
+#include <QTest>
+
+#include <KSyntaxHighlighting/Repository>
+
+#define TESTSRCDIR "@CMAKE_CURRENT_SOURCE_DIR@"
+#define TESTBUILDDIR "@CMAKE_CURRENT_BINARY_DIR@"
+
+/**
+ * init repository with right search paths, is needed if the files are not compiled in
+ * as resources
+ *
+ * @param repository repository to init search paths
+ */
+inline void initRepositorySearchPaths(KSyntaxHighlighting::Repository &repository)
+{
+    // add extra search path for e.g. broken highlighting test
+    repository.addCustomSearchPath(QStringLiteral(TESTSRCDIR "/input"));
+
+    // handle no-resources case
+#ifndef HAS_SYNTAX_RESOURCE
+    repository.addCustomSearchPath(QStringLiteral("@CMAKE_SOURCE_DIR@/data"));
+    repository.addCustomSearchPath(QStringLiteral("@CMAKE_BINARY_DIR@/data/generated"));
+#endif
+}
+
+/**
+ * helper to compare files
+ * @param refFile reference file
+ * @param outFile output file
+ */
+inline void compareFiles(const QString &refFile, const QString &outFile)
+{
+    /**
+     * quick compare, all fine, if no diffs!
+     * use text mode + text streams to avoid unix/windows mismatches
+     */
+    QFile ref(refFile);
+    QFile out(outFile);
+    QVERIFY(ref.open(QIODevice::ReadOnly | QIODevice::Text));
+    QVERIFY(out.open(QIODevice::ReadOnly | QIODevice::Text));
+    QTextStream refIn(&ref);
+    QTextStream outIn(&out);
+    const QString refContent = refIn.readAll();
+    const QString outContent = outIn.readAll();
+    const bool equalResults = refContent == outContent;
+    if (equalResults) {
+        return;
+    }
+
+    /**
+     * elaborate diff output, if possible
+     */
+    const QString diffExecutable = QStandardPaths::findExecutable(QStringLiteral("diff"));
+    if (!diffExecutable.isEmpty()) {
+        QProcess proc;
+        proc.setProcessChannelMode(QProcess::ForwardedChannels);
+        proc.start(diffExecutable, {QStringLiteral("-u"), refFile, outFile});
+        QVERIFY(proc.waitForFinished());
+        QCOMPARE(proc.exitCode(), 0);
+    }
+
+    /**
+     * else: trivial output of mismatching characters, e.g. for windows testing without diff
+     */
+    else {
+        qDebug() << "Trivial differences output as the 'diff' executable is not in the PATH";
+        for (int i = 0; i < refContent.size() && i < outContent.size(); ++i) {
+            QCOMPARE(refContent[i], outContent[i]);
+        }
+        QCOMPARE(refContent.size(), outContent.size());
+    }
+
+    /**
+     * if we arrive here, all lost!
+     */
+    QVERIFY(equalResults);
+}
+
+#endif // TEST_CONFIG_H

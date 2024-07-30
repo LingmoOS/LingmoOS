@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Messaging:
+      @short_description: The ModemManager Messaging interface.
+
+      The Messaging interface handles sending SMS messages and notification of new
+      incoming messages.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Messaging">
+
+    <!--
+        List:
+        @result: The list of SMS object paths.
+
+        Retrieve all SMS messages.
+
+        This method should only be used once and subsequent information
+        retrieved either by listening for the
+        #org.freedesktop.ModemManager1.Modem.Messaging::Added signal,
+        or by querying the specific SMS object of interest.
+    -->
+    <method name="List">
+      <arg name="result" type="ao" direction="out" />
+    </method>
+
+    <!--
+        Delete:
+        @path: The object path of the SMS to delete.
+
+        Delete an SMS message.
+    -->
+    <method name="Delete">
+      <arg name="path" type="o" direction="in" />
+    </method>
+
+    <!--
+        Create:
+        @properties: Message properties from the <link linkend="gdbus-org.freedesktop.ModemManager1.Sms">SMS D-Bus interface</link>.
+        @path: The object path of the new message object.
+
+        Creates a new message object.
+
+        The '<link linkend="gdbus-property-org-freedesktop-ModemManager1-Sms.Number">Number</link>'
+        and
+        either '<link linkend="gdbus-property-org-freedesktop-ModemManager1-Sms.Text">Text</link>' or
+        '<link linkend="gdbus-property-org-freedesktop-ModemManager1-Sms.Data">Data</link>'
+        properties are mandatory, others are optional.
+
+        If the SMSC is not specified and one is required, the default SMSC is
+        used.
+    -->
+    <method name="Create">
+      <arg name="properties" type="a{sv}" direction="in">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
+      </arg>
+      <arg name="path"       type="o"     direction="out" />
+    </method>
+
+    <!--
+        Added:
+        @path: Object path of the new SMS.
+        @received: %TRUE if the message was received from the network, as opposed to being added locally.
+
+        Emitted when any part of a new SMS has been received or added (but not
+        for subsequent parts, if any). For messages received from the network,
+        not all parts may have been received and the message may not be
+        complete.
+
+        Check the
+        '<link linkend="gdbus-property-org-freedesktop-ModemManager1-Sms.State">State</link>'
+        property to determine if the message is complete.
+    -->
+    <signal name="Added">
+      <arg name="path" type="o" />
+      <arg name="received" type="b" />
+    </signal>
+
+    <!--
+        Deleted:
+        @path: Object path of the now deleted SMS.
+
+        Emitted when a message has been deleted.
+    -->
+    <signal name="Deleted">
+      <arg name="path" type="o" />
+    </signal>
+
+    <!--
+        Messages:
+
+        The list of SMS object paths.
+    -->
+    <property name="Messages" type="ao" access="read" />
+
+    <!--
+        SupportedStorages:
+
+        A list of <link linkend="MMSmsStorage">MMSmsStorage</link> values,
+        specifying the storages supported by this modem for storing and
+        receiving SMS.
+    -->
+    <property name="SupportedStorages" type="au" access="read">
+    <annotation name="org.qtproject.QtDBus.QtTypeName" value="UIntList"/>
+    </property>
+
+    <!--
+        DefaultStorage:
+
+        A <link linkend="MMSmsStorage">MMSmsStorage</link> value,
+        specifying the storage to be used when receiving or storing SMS.
+    -->
+    <property name="DefaultStorage" type="u" access="read" />
+
+  </interface>
+</node>

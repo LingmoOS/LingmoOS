@@ -1,0 +1,245 @@
+/*
+    Original version from plan:
+        SPDX-FileCopyrightText: Thomas Driemeyer <thomas@bitrot.de>
+
+    Adapted for use in KOrganizer:
+        SPDX-FileCopyrightText: Preston Brown <pbrown@kde.org> and
+        SPDX-FileCopyrightText: Reinhold Kainhofer <reinhold@kainhofer.com>
+
+    Portions contributed:
+        SPDX-FileCopyrightText: Peter Littlefield <plittle@sofkin.ca>
+
+    Major rewrite using Bison C++ skeleton:
+        SPDX-FileCopyrightText: 2010 John Layt <john@layt.net>
+
+    SPDX-License-Identifier: LGPL-2.0-or-later
+*/
+
+%{ /*** C/C++ Declarations ***/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <string>
+
+#include <QString>
+
+
+%}
+
+/*** yacc/bison Declarations ***/
+
+/* Require bison 2.3 or later */
+%require "2.3"
+
+/* add debug output code to generated parser. disable this for release
+ * versions. */
+%debug
+
+/* write out a header file containing the token defines */
+%defines
+
+/* use newer C++ skeleton file */
+%skeleton "lalr1.cc"
+
+/* namespace to enclose parser in */
+%name-prefix="KHolidays"
+
+/* set the parser's class identifier */
+%define "parser_class_name" "HolidayParserPlan"
+
+/* keep track of the current position within the input */
+%locations
+%initial-action
+{
+    // initialize the initial location object
+    @$.begin.filename = driver.fileToParse();
+    @$.end.filename = @$.begin.filename;
+};
+
+/* The driver is passed by reference to the parser and to the scanner. This
+ * provides a simple but effective pure interface, not relying on global
+ * variables. */
+%parse-param { class HolidayParserDriverPlan& driver }
+
+/* verbose error messages */
+%error-verbose
+
+/*** Grammar Tokens ***/
+
+%union { int  ival; char *sval; }
+
+%type   <ival> offset conditionaloffset length expr pexpr number month reldate wdaycondition monthnumber
+%type   <sval> categories
+%token  END 0
+%token  <ival> NUMBER MONTH WDAY
+%token  <sval> STRING CATEGORY CALENDAR
+%token  INOP PLUS MINUS YEAR LEAPYEAR SHIFT IF
+%token  LENGTH EASTER EQ NE LE GE LT GT PASCHA COUNTRY LANGUAGE NAME DESCRIPTION
+
+%destructor { free( $$ ); } STRING
+
+%left OR
+%left AND
+%right EQ NE LE GE LT GT
+%left '-' '+'
+%left '*' '/' '%'
+%nonassoc '!'
+%nonassoc UMINUS
+%left '?' ':'
+
+%start planfile
+
+/*** End Grammar Tokens ***/
+
+%{
+
+#include "holidayparserdriverplan_p.h"
+#include "holidayscannerplan_p.h"
+
+/* this "connects" the bison parser in the driver to the flex scanner class
+ * object. it defines the yylex() function call to pull the next token from the
+ * current lexer object of the driver context. */
+#undef yylex
+#define yylex driver.m_scanner->lex
+
+%}
+
+%% /*** Grammar Rules ***/
+
+planfile : metadata list
+;
+
+metadata : countrycode languagecode name description
+;
+
+countrycode :                { driver.setFileCountryCode( QString() ); }
+            | COUNTRY STRING { char *s = $2; driver.setFileCountryCode( QString::fromUtf8( s ) ); free( s ); $2 = NULL; }
+;
+
+languagecode :                 { driver.setFileLanguageCode( QString() ); }
+             | LANGUAGE STRING { char *s = $2; driver.setFileLanguageCode( QString::fromUtf8( s ) ); free( s ); $2 = NULL; }
+;
+
+name :             { driver.setFileName( QString() ); }
+     | NAME STRING { char *s = $2; driver.setFileName( QString::fromUtf8( s ) ); free( s ); $2 = NULL; }
+;
+
+description :                    { driver.setFileDescription( QString() ); }
+            | DESCRIPTION STRING { char *s = $2; driver.setFileDescription( QString::fromUtf8( s ) ); free( s ); $2 = NULL; }
+;
+
+list :
+     | list eventname categories calendar eventrule
+;
+
+eventname : STRING { char *s = $1; driver.setEventName( QString::fromUtf8( s ) ); free( s ); $1 = NULL; }
+;
+
+categories : CATEGORY { driver.setEventCategory( $1 ); }
+           | categories CATEGORY { driver.setEventCategory( $1 ); }
+;
+
+calendar :           { driver.setEventCalendarType( QLatin1String("gregorian") ); }
+         | CALENDAR  { driver.setEventCalendarType( QString::fromUtf8( $1 ) ); }
+;
+
+eventrule : EASTER offset length                  { driver.setFromEaster( $2, $3 ); }
+          | PASCHA offset length                  { driver.setFromPascha( $2, $3 ); }
+          | date offset conditionaloffset length  { driver.setFromDate( $2, $3, $4 ); }
+          | WDAY offset length                    { driver.setFromWeekdayInMonth( 1, $1, 1, $2, $3 ); }
+          | pexpr WDAY offset length              { driver.setFromWeekdayInMonth( $1, $2, 1, $3, $4 ); }
+          | pexpr WDAY INOP month offset length   { driver.setFromWeekdayInMonth( $1, $2, $4, $5, $6 ); }
+          | WDAY pexpr date offset length         { driver.setFromRelativeWeekday( $2, $1, $4, $5 ); }
+;
+
+offset :             { $$ =   0; }
+       | PLUS expr   { $$ =  $2; }
+       | MINUS expr  { $$ = -$2; }
+;
+
+conditionaloffset :                                       { $$ = 0; }
+                  | SHIFT wdaycondition IF wdaycondition  { $$ = ( $2 << 8 ) | $4; }
+;
+
+wdaycondition :                        { $$ = 0; }
+              | WDAY                   { $$ = ( 1 << $1 ); }
+              | WDAY OR wdaycondition  { $$ = ( 1 << $1 ) | $3; }
+;
+
+length :              { $$ =  1; }
+       | LENGTH expr  { $$ = $2; }
+;
+
+date : pexpr '.' month            { driver.setEventDate( -99999, $3, $1 ); }
+     | pexpr '.' month '.'        { driver.setEventDate( -99999, $3, $1 ); }
+     | pexpr '.' month '.' expr   { driver.setEventDate(     $5, $3, $1 ); }
+     | month '/' pexpr            { driver.setEventDate( -99999, $1, $3 ); }
+     | month '/' pexpr '/' pexpr  { driver.setEventDate(     $5, $1, $3 ); }
+     | monthnumber pexpr          { driver.setEventDate( -99999, $1, $2 ); }
+     | monthnumber pexpr pexpr    { driver.setEventDate(     $3, $1, $2 ); }
+     | pexpr monthnumber          { driver.setEventDate( -99999, $2, $1 ); }
+     | pexpr monthnumber pexpr    { driver.setEventDate(     $3, $2, $1 ); }
+     | pexpr '.' MONTH pexpr      { driver.setEventDate(     $4, $3, $1 ); }
+     | pexpr                      { driver.setEventDate( $1 ); }
+;
+
+reldate : STRING                 { char *s = $1; $$ = driver.julianDayFromEventName( s ); free( s ); $1 = NULL; }
+        | EASTER                 { $$ = driver.julianDayFromEaster(); }
+        | PASCHA                 { $$ = driver.julianDayFromPascha(); }
+        | pexpr '.' month        { $$ = driver.julianDayFromMonthDay( $3, $1 ); }
+        | pexpr '.' month '.'    { $$ = driver.julianDayFromMonthDay( $3, $1 ); }
+        | month '/' pexpr        { $$ = driver.julianDayFromMonthDay( $1, $3 ); }
+        | pexpr MONTH            { $$ = driver.julianDayFromMonthDay( $2, $1 ); }
+        | monthnumber pexpr      { $$ = driver.julianDayFromMonthDay( $1, $2 ); }
+        | WDAY pexpr pexpr       { $$ = driver.julianDayFromRelativeWeekday( $2, $1, $3 ); }
+        | pexpr WDAY INOP month  { $$ = driver.julianDayFromWeekdayInMonth( $1, $2, $4 ); }
+;
+
+month : monthnumber
+      | pexpr        { $$ = driver.adjustedMonthNumber( $1 ); }
+;
+
+monthnumber : MONTH  { $$ = driver.adjustedMonthNumber( $1 ); }
+;
+
+expr : pexpr                   { $$ = $1; }
+     | expr OR  expr           { $$ = $1 || $3; }
+     | expr AND expr           { $$ = $1 && $3; }
+     | expr EQ  expr           { $$ = $1 == $3; }
+     | expr NE  expr           { $$ = $1 != $3; }
+     | expr LE  expr           { $$ = $1 <= $3; }
+     | expr GE  expr           { $$ = $1 >= $3; }
+     | expr LT  expr           { $$ = $1 <  $3; }
+     | expr GT  expr           { $$ = $1 >  $3; }
+     | expr '+' expr           { $$ = $1 +  $3; }
+     | expr '-' expr           { $$ = $1 -  $3; }
+     | expr '*' expr           { $$ = $1 *  $3; }
+     | expr '/' expr           { $$ = $3 ?  $1 / $3 : 0; }
+     | expr '%' expr           { $$ = $3 ?  $1 % $3 : 0; }
+     | expr '?' expr ':' expr  { $$ = $1 ?  $3 : $5; }
+     | '!' expr                { $$ = !$2; }
+     | '[' reldate ']'         { $$ = $2; }
+;
+
+pexpr : '(' expr ')'  { $$ = $2; }
+      | number        { $$ = $1; }
+;
+
+number : NUMBER
+       | '-' NUMBER %prec UMINUS  { $$ = -$2; }
+       | YEAR                     { $$ = driver.parseYear(); }
+       | LEAPYEAR pexpr           { $$ = driver.isLeapYear( $2 ); }
+;
+
+%%
+
+/*** Private Yacc callbacks and helper functions ***/
+
+void KHolidays::HolidayParserPlan::error( const KHolidays::HolidayParserPlan::location_type &errorLocation, const std::string &errorMessage )
+{
+    driver.error( errorLocation, errorMessage.c_str() );
+}

@@ -1,0 +1,534 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % Catalan  "INCLUDE">
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+  <title
+>&kde-frameworks;: KDesignerPlugin</title>
+  <author
+><firstname
+>Richard</firstname
+> <surname
+>Johnson</surname
+> <contrib
+>Va escriure la documentació original.</contrib>
+    <affiliation>
+      <address
+><email
+>rjohnson@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <author
+><firstname
+>Alex</firstname
+> <surname
+>Merry</surname
+> <contrib
+>Ha actualitzat la documentació al &kf5-full;.</contrib>
+    <affiliation>
+      <address
+><email
+>alexmerry@kde.org</email
+></address>
+    </affiliation>
+  </author>
+  <date
+>28 de maig de 2014</date>
+  <releaseinfo
+>Frameworks 5.0</releaseinfo>
+  <productname
+>Frameworks del KDE</productname>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle
+><command
+>kgendesignerplugin</command
+></refentrytitle>
+  <manvolnum
+>1</manvolnum>
+</refmeta>
+
+
+
+<refnamediv>
+  <refname
+><command
+>kgendesignerplugin</command
+></refname>
+  <refpurpose
+>Genera connectors de giny per al &Qt; Designer. </refpurpose>
+</refnamediv>
+
+
+
+<refsynopsisdiv>
+  <cmdsynopsis
+><command
+>kgendesignerplugin</command
+> <group choice="opt" rep="repeat"
+><replaceable class="option"
+>OPCIONS</replaceable
+></group
+> <arg choice="plain"
+><replaceable
+>fitxer</replaceable
+></arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+
+
+<refsect1>
+  <title
+>Descripció</title>
+  <para
+>Els connectors de giny personalitzats per al &Qt; Designer solen seguir un patró estàndard, i les classes proporcionades pel connector proporcionen principalment informació estàtica, juntament amb la funció de crear una instància que normalment només és una crida de constructor simple. <command
+>kgendesignerplugin</command
+> permet als desenvolupadors de biblioteques que proporcionen ginys nous, el fet de crear un connector d'aquest tipus sense necessitat de crear tot el codi repetitiu associat, proporcionant un simple fitxer de descripció d'estil ini. </para>
+
+  <para
+><command
+>kgendesignerplugin</command
+> tria els valors predeterminats per a la majoria de les opcions de configuració, de manera que sol ser necessària una configuració mínima. </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Opcions</title>
+  <variablelist>
+    <varlistentry>
+      <term
+><option
+>-o <replaceable
+>fitxer</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>El nom per al fitxer C++ generat. Si no es dona, s'utilitza la sortida estàndard (<varname
+>stdout</varname
+>). </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-n <replaceable
+>nom_del_connector</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Es proporciona per compatibilitat. El valor predeterminat per a l'opció PluginName al fitxer d'entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-g <replaceable
+>grup</replaceable
+></option
+></term>
+      <listitem>
+        <para
+>Es proporciona per compatibilitat. El valor predeterminat per a l'opció DefaultGroup al fitxer d'entrada. </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--author</option
+></term>
+      <listitem>
+        <para
+>Mostra informació sobre l'autor.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>--license</option
+></term>
+      <listitem>
+        <para
+>Mostra informació sobre la llicència.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-h, --help</option
+></term>
+      <listitem>
+        <para
+>Mostra un text breu d'ajuda.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term
+><option
+>-v, --version</option
+></term>
+      <listitem>
+        <para
+>Mostra informació sobre la versió.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Format del fitxer</title>
+  <para
+>El fitxer d'entrada és un fitxer de configuració d'estil ini (en concret, és el format implementat per l'entorn de treball KConfig), el qual descriu un conjunt de ginys. Conté una secció <literal
+>[Global]</literal
+>, la qual proporciona informació general sobre el connector, i una secció per a cada giny que s'ha d'incloure en el connector. </para>
+
+  <para
+>La secció <literal
+>[Global]</literal
+> conté les següents entrades: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>DefaultGroup</varname
+></term>
+        <listitem>
+          <para
+>El valor predeterminat per a l'entrada <varname
+>Group</varname
+> en les seccions de classe (predeterminat: «<literal
+>Custom</literal
+>», a menys que s'indiqui l'opció <option
+>-g</option
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Includes</varname
+></term>
+        <listitem>
+          <para
+>Una llista (separada per comes) dels «includes» requerits (predeterminat: buida). Cal tenir en compte que els fitxers de capçalera per als ginys especificats més endavant al fitxer no s'han de llistar aquí. En canvi, això és per a les capçaleres especials per a l'ús propi del connector, com les de les classes que proporcionen vistes prèvies. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>PluginName</varname
+></term>
+        <listitem>
+          <para
+>El nom de la classe de C++ principal en el connector (predeterminat: «<literal
+>WidgetsPlugin</literal
+>», a menys que s'indiqui l'opció <option
+>-n</option
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+
+  <para
+>Cada classe ha de tenir la seva pròpia secció <literal
+>[<replaceable
+>ClassName</replaceable
+>]</literal
+>, la qual pot incloure les següents entrades: <variablelist>
+      <varlistentry>
+        <term
+><varname
+>CodeTemplate</varname
+></term>
+        <listitem>
+          <para
+>El valor retornat per la funció <code
+>codeTemplate()</code
+> del connector, la qual és marcada per a «ús futur» pel &Qt; Designer (predeterminat: buida). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ConstructorArgs</varname
+></term>
+        <listitem>
+          <para
+>Els arguments que s'ha de passar al constructor de la classe indicada per <literal
+>ImplClass</literal
+>. Aquests han d'estar envoltats entre parèntesis (predeterminat: «<literal
+>(parent)</literal
+>»). L'única variable garantida que estarà disponible és la <varname
+>parent</varname
+>, la qual és la pare de <code
+>QWidget</code
+> passada pel &Qt; Designer. </para>
+          <para
+>Aquesta entrada serà ignorada si s'estableix <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>CreateWidget</varname
+></term>
+        <listitem>
+          <para
+>El codi necessari per a crear una instància del giny (predeterminat: utilitza <code
+>new</code
+> per a crear una instància de la classe indicada per l'entrada <literal
+>ImplClass</literal
+>, passant els arguments especificats per <literal
+>ConstructorArgs</literal
+>). Vegeu les notes per a <literal
+>ImplClass</literal
+> i <literal
+>ConstructorArgs</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>DomXML</varname
+></term>
+        <listitem>
+          <para
+>Una descripció IU en &XML; del giny (predeterminat: el valor predeterminat proporcionat per les capçaleres al connector del &Qt; Designer). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>Group</varname
+></term>
+        <listitem>
+          <para
+>El grup per a mostrar el giny sota el &Qt; Designer (predeterminat: el valor de l'entrada <varname
+>DefaultGroup</varname
+> a la secció <literal
+>[Global]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IconName</varname
+></term>
+        <listitem>
+          <para
+>El fitxer d'imatge o nom d'icona estàndard que s'utilitza com a icona per a aquest giny en la llista de ginys del &Qt; Designer (predeterminat: un fitxer PNG anomenat amb el nom de la secció, eliminant qualsevol caràcter de dos punts, al directori «pics» dins d'un fitxer de recursos compilat. Per exemple, <filename
+>:/pics/Foo.png</filename
+> a la secció <literal
+>[Foo]</literal
+>, o <filename
+>:/pics/FooBar.png</filename
+> a la secció <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ImplClass</varname
+></term>
+        <listitem>
+          <para
+>La classe que s'ha d'utilitzar per a crear una instància del giny per a l'ús del &Qt; Designer (predeterminat: el nom de la secció). Cal tenir en compte que aquest en realitat no ha de per què ser la classe que es crearia per a una aplicació final: està determinat per la <literal
+>DomXML</literal
+>. </para>
+          <para
+>Aquesta entrada serà ignorada si s'estableix <literal
+>CreateWidget</literal
+>. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IncludeFile</varname
+></term>
+        <listitem>
+          <para
+>La capçalera que s'ha d'incloure per a utilitzar-la amb aquest giny (predeterminat: la versió en minúscules del nom de la secció, eliminant qualsevol caràcter de dos punts i annexant «*.h». Per exemple, <literal
+>foo.h</literal
+> a la secció <literal
+>[Foo]</literal
+>, o <literal
+>foobar.h</literal
+> a la secció <literal
+>[Foo::Bar]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>IsContainer</varname
+></term>
+        <listitem>
+          <para
+>Si aquest giny pot contenir altres ginys (predeterminat: <literal
+>false</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>ToolTip</varname
+></term>
+        <listitem>
+          <para
+>El consell d'eina que es mostrarà quan es passi per sobre del giny a la llista de ginys del &Qt; Designer (predeterminat: el nom de la secció, amb «Widget» annexat. Per exemple, <literal
+>Foo Widget</literal
+> a la secció <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term
+><varname
+>WhatsThis</varname
+></term>
+        <listitem>
+          <para
+>El text de «Què és això» associat amb el giny al &Qt; Designer (predeterminat: el nom de la secció, amb «Widget» annexat. Per exemple, <literal
+>Foo Widget</literal
+> a la secció <literal
+>[Foo]</literal
+>). </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Exemples</title>
+  <para
+>El fitxer de descripció més senzill podria semblar-se a això: <screen language="ini">
+<![CDATA[
+[Foo]
+ToolTip=Displays foos
+[Bar]
+ToolTip=Bar editor
+]]>
+    </screen
+> Cal tenir en compte que cada classe almenys haurà de tenir un conjunt de claus (en aquest exemple s'utilitza <literal
+>ToolTip</literal
+>), en cas contrari s'ignorarà. </para>
+  <para
+>Usualment, voldreu canviar el text a almenys visible per l'usuari, el qual vol dir les entrades <literal
+>ToolTip</literal
+>, <literal
+>WhatsThis</literal
+> i <literal
+>Group</literal
+>. A més, establir el nom del connector pot ser una bona idea per a evitar possibles col·lisions de símbol i no confondre als depuradors (tant l'aplicació del depurador com la persona que realitza la depuració): <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Display
+
+[Foo]
+ToolTip=Displays bears
+WhatsThis=An image widget that displays dancing bears
+
+[Bar]
+ToolTip=Bar editor
+WhatsThis=An editor interface for bars for bears
+Group=Editing
+]]>
+    </screen>
+  </para>
+  <para
+>Poden ser necessaris fitxers més complexos si teniu classes d'espais de nom o opcions addicionals que necessiten ser subministrades als constructors, per exemple: <screen language="ini"
+><![CDATA[
+[Global]
+PluginName=FooWidgets
+DefaultGroup=Foo
+
+[Foo::Bar]
+ToolTip=Displays bars
+WhatsThis=A widget that displays bars in a particular way
+IncludeFile=foo/bar.h
+IconName=:/previews/bar.png
+
+[Foo::Baz]
+IncludeFile=foo/baz.h
+ConstructorArgs=(Foo::Baz::SomeOption, parent)
+Group=Foo (Special)
+IsContainer=true
+IconName=:/previews/baz.png
+]]>
+    </screen>
+  </para>
+  <para
+>De vegades els ginys especialment complexos poden necessitar una implementació «classe de vista prèvia» especial per al seu ús en el &Qt; Designer. Aquesta podria ser una subclasse del giny real, la qual només faria alguna configuració addicional, o podria ser una implementació completament diferent. <screen language="ini"
+><![CDATA[
+[Global]
+Includes=foopreviews.h
+
+[FancyWidget]
+ImplClass=FancyWidgetPreview
+]]>
+    </screen>
+  </para>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Vegeu també</title>
+  <variablelist>
+    <varlistentry>
+      <term>
+        <uri
+>https://doc.qt.io/qt-5/designer-creating-custom-widgets.html</uri>
+      </term>
+      <listitem>
+        <para
+>La documentació del &Qt; Designer sobre la creació de connectors per a ginys personalitzats.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+</refsect1>
+
+
+
+<refsect1>
+  <title
+>Errors</title>
+  <para
+>Si us plau, empreu el <ulink url="https://bugs.kde.org"
+>Seguidor d'errors del &kde;</ulink
+> (escriviu-hi en anglès) per a informar-ne, no envieu cap correu directament als autors. </para>
+</refsect1>
+
+</refentry>
+<!--
+vim:sts=2:sw=2:et
+-->

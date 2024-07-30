@@ -1,0 +1,31 @@
+How to identify entries
+-----------------------
+
+The KNS2::CoreEngine uses id() for entries and pid() for providers to find out
+a unique identifier which can be used to compare one of them to another one of
+the same kind.
+
+In KNS1, the name and the payload URL were used to compare the entries, as
+they're guaranteed to exist. In KNS2, the internationalised nature of those
+tags is honoured.
+The proposed comparison algorithm is hence called "internationalised
+identification" (i18n-id) and is already implemented by Hotstuff.
+It will also be implemented by KNewStuff2.
+
+How does i18n-id work?
+Out of all the tags of an entry, one is taken randomly. Its content together
+with its language form the identity tuple. When an entry is to be compared,
+the tag with the same language as used in the id is used for comparison.
+Note that i18n-id works even in the absence of a language attribute. However,
+in GHNS, a language attribute will almost always be present. It'd be naive to
+throw information away when it is present already.
+
+What i18n-id assumes is that translations never vanish, once added. It would
+of course be trivial to extend the algorithm to check through all of the
+languages once present, hence it would work as long as at least one
+translation is kept.
+
+What i18n-id achieves is that one doesn't have to rely on "unique ids"
+maintained by the server, which would definitely change if repositories are
+merged.
+

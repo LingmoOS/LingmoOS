@@ -1,0 +1,171 @@
+# SPDX-FileCopyrightText: 2006 Alexander Neundorf <neundorf@kde.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+find_package(Gettext REQUIRED)
+
+# The Python executable used for building ki18n will be used as a fallback
+# solution if it cannot be found in $PATH when building applications.
+set(_KI18N_PYTHON_EXECUTABLE "@Python3_EXECUTABLE@")
+
+find_program(KI18N_PYTHON_EXECUTABLE NAMES python3 python2 python)
+if(NOT KI18N_PYTHON_EXECUTABLE)
+    set(KI18N_PYTHON_EXECUTABLE "${_KI18N_PYTHON_EXECUTABLE}")
+endif()
+
+set(_ki18n_pmap_compile_script ${CMAKE_CURRENT_LIST_DIR}/ts-pmap-compile.py)
+set(_ki18n_uic_script ${CMAKE_CURRENT_LIST_DIR}/kf6i18nuic.cmake)
+set(_ki18n_build_pofiles_script ${CMAKE_CURRENT_LIST_DIR}/build-pofiles.cmake)
+set(_ki18n_build_tsfiles_script ${CMAKE_CURRENT_LIST_DIR}/build-tsfiles.cmake)
+
+# Creates the implementation files from the ui files and adds them to the list of sources,
+# either to the variable of the given name or, since KF 5.62, if the given argument is
+# a target (must not be an alias), to the list of private sources of that target.
+#
+#   ki18n_wrap_ui(<sources_var_name(|target (since 5.62))>
+#      [<ui_file> [...]]
+#   )
+#
+# Example usages:
+#
+#   ki18n_wrap_ui(foo_SRCS ${ui_files})
+#   ki18n_wrap_ui(foo ${ui_files})
+#
+macro (KI18N_WRAP_UI _sources )
+   if(NOT TARGET Qt6::uic)
+      message(FATAL_ERROR "Qt6Widgets should be found before calling ki18n_wrap_ui(). Please add find_package(Qt6Widgets ...)")
+   endif()
+   if (TARGET ${_sources})
+      get_target_property(aliased_target ${_sources} ALIASED_TARGET)
+      if(aliased_target)
+         message(FATAL_ERROR "Target argument passed to ki18n_wrap_ui must not be an alias: ${_sources}")
+      endif()
+   endif()
+
+   foreach (_current_FILE ${ARGN})
+
+      get_filename_component(_tmp_FILE ${_current_FILE} ABSOLUTE)
+      if(NOT EXISTS ${_tmp_FILE})
+         message(SEND_ERROR
+         " Cannot find ui file:\n \n"
+         "    ${_current_FILE}\n")
+      endif()
+      get_filename_component(_basename ${_tmp_FILE} NAME_WE)
+      set(_header ${CMAKE_CURRENT_BINARY_DIR}/ui_${_basename}.h)
+
+      get_target_property(QT_UIC_EXECUTABLE Qt6::uic LOCATION)
+      # we need to run uic and replace some things in the generated file
+      # this is done by executing the cmake script kf6i18nuic.cmake
+      add_custom_command(OUTPUT ${_header}
+         COMMAND ${CMAKE_COMMAND}
+         ARGS
+         -DKDE_UIC_EXECUTABLE:FILEPATH=${QT_UIC_EXECUTABLE}
+         -DKDE_UIC_FILE:FILEPATH=${_tmp_FILE}
+         -DKDE_UIC_H_FILE:FILEPATH=${_header}
+         -DKDE_UIC_BASENAME:STRING=${_basename}
+         -P ${_ki18n_uic_script}
+         MAIN_DEPENDENCY ${_tmp_FILE}
+      )
+      set_source_files_properties(${_tmp_FILE} PROPERTIES SKIP_AUTOUIC ON)
+      set_source_files_properties(${_header} PROPERTIES SKIP_AUTOMOC ON)
+      set_source_files_properties(${_header} PROPERTIES SKIP_AUTOUIC ON)
+      if(TARGET ${_sources})
+         target_sources(${_sources} PRIVATE ${_header})
+      else()
+         list(APPEND ${_sources} ${_header})
+      endif()
+   endforeach (_current_FILE)
+endmacro (KI18N_WRAP_UI)
+
+option(KF_SKIP_PO_PROCESSING "Skip processing of po files" OFF)
+
+# KI18N_INSTALL(podir)
+# Search for .po files and scripting modules and install them to the standard
+# location. The instalation can be skipped using the KF_SKIP_PO_PROCESSING option.
+#
+# This is a convenience function which relies on the following directory
+# structure:
+#
+#  <podir>/
+#    <lang>/
+#      scripts/
+#        <domain>/
+#          *.js
+#      *.po
+#
+# .po files are passed to build-pofiles.cmake
+#
+# .js files are installed using build-tsfiles.cmake
+#
+# For example, given the following directory structure:
+#
+#  po/
+#    fr/
+#      scripts/
+#        kfoo/
+#          kfoo.js
+#      kfoo.po
+#
+# KI18N_INSTALL(po) does the following:
+# - Compiles kfoo.po into kfoo.mo and installs it in
+#   ${KDE_INSTALL_LOCALEDIR}/fr/LC_MESSAGES or share/locale/fr/LC_MESSAGES if
+#   ${KDE_INSTALL_LOCALEDIR} is not set.
+# - Installs kfoo.js in ${KDE_INSTALL_LOCALEDIR}/fr/LC_SCRIPTS/kfoo
+#
+function(KI18N_INSTALL podir)
+    if (KF_SKIP_PO_PROCESSING)
+        return()
+    endif()
+    if (NOT KDE_INSTALL_LOCALEDIR)
+        set(KDE_INSTALL_LOCALEDIR share/locale)
+    endif()
+
+    # First try to find the po directory in the source directory, where the release scripts copy them before making the tarballs
+    get_filename_component(absolute_podir ${podir} ABSOLUTE)
+
+    # we try to find the po directory in the binary directory, in case it was downloaded
+    # using ECM
+    if (NOT (EXISTS "${absolute_podir}" AND IS_DIRECTORY "${absolute_podir}"))
+	    get_filename_component(absolute_podir ${CMAKE_CURRENT_BINARY_DIR}/${podir} ABSOLUTE)
+    endif()
+
+    if (NOT (EXISTS "${absolute_podir}" AND IS_DIRECTORY "${absolute_podir}"))
+        # Nothing to do if there's no podir and it would create an empty
+        # KDE_INSTALL_LOCALEDIR in that case.
+        return()
+    endif()
+
+    get_filename_component(dirname ${KDE_INSTALL_LOCALEDIR} NAME)
+    get_filename_component(destname ${KDE_INSTALL_LOCALEDIR} DIRECTORY)
+    string(MD5 pathmd5 ${absolute_podir})
+
+    add_custom_target(pofiles-${pathmd5} ALL
+        COMMENT "Generating mo..."
+        COMMAND ${CMAKE_COMMAND}
+                -DGETTEXT_MSGFMT_EXECUTABLE=${GETTEXT_MSGFMT_EXECUTABLE}
+                -DCOPY_TO=${CMAKE_CURRENT_BINARY_DIR}/${dirname}
+                -DPO_DIR=${absolute_podir}
+                -P ${_ki18n_build_pofiles_script}
+    )
+    add_custom_target(tsfiles-${pathmd5} ALL
+        COMMENT "Generating ts..."
+        COMMAND ${CMAKE_COMMAND}
+                -DPython3_EXECUTABLE=${KI18N_PYTHON_EXECUTABLE}
+                -D_ki18n_pmap_compile_script=${_ki18n_pmap_compile_script}
+                -DCOPY_TO=${CMAKE_CURRENT_BINARY_DIR}/${dirname}
+                -DPO_DIR=${absolute_podir}
+                -P ${_ki18n_build_tsfiles_script}
+    )
+
+    if (NOT TARGET pofiles)
+        add_custom_target(pofiles)
+    endif()
+    if (NOT TARGET tsfiles)
+        add_custom_target(tsfiles)
+    endif()
+    add_dependencies(pofiles pofiles-${pathmd5})
+    add_dependencies(tsfiles tsfiles-${pathmd5})
+
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${dirname})
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${dirname} DESTINATION ${destname})
+endfunction()

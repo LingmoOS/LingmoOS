@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Simple:
+      @short_description: The ModemManager Simple interface.
+
+      The Simple interface allows controlling and querying the status of Modems.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Simple">
+
+    <!--
+        Connect:
+        @properties: Dictionary of properties needed to get the modem connected.
+        @bearer: On successful connect, returns the object path of the connected packet data bearer used for the connection attempt.
+
+        Do everything needed to connect the modem using the given properties.
+
+        This method will attempt to find a matching packet data bearer and
+        activate it if necessary, returning the bearer's IP details.  If no
+        matching bearer is found, a new bearer will be created and activated,
+        but this operation may fail if no resources are available to complete
+        this connection attempt (ie, if a conflicting bearer is already active).
+
+        This call may make a large number of changes to modem configuration
+        based on properties passed in. For example, given a PIN-locked, disabled
+        GSM/UMTS modem, this call may unlock the SIM PIN, alter the access
+        technology preference, wait for network registration (or force
+        registration to a specific provider), create a new packet data bearer
+        using the given "apn", and connect that bearer.
+
+        Allowed key/value pairs in @properties are:
+        <variablelist>
+          <varlistentry><term><literal>"pin"</literal></term>
+            <listitem>
+              SIM-PIN unlock code, given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"operator-id"</literal></term>
+            <listitem>
+              ETSI MCC-MNC of a network to force registration with,
+              given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"apn"</literal></term>
+            <listitem>
+              For GSM/UMTS and LTE devices the APN to use,
+              given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"ip-type"</literal></term>
+            <listitem>
+              For GSM/UMTS and LTE devices the IP addressing type to use,
+              given as a <link linkend="MMBearerIpFamily">MMBearerIpFamily</link>
+              value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"allowed-auth"</literal></term>
+            <listitem>
+              The authentication method to use, given as a
+              <link linkend="MMBearerAllowedAuth">MMBearerAllowedAuth</link>
+              value (signature <literal>"u"</literal>). Optional in 3GPP.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"user"</literal></term>
+            <listitem>
+              User name (if any) required by the network, given as a string
+              value (signature <literal>"s"</literal>). Optional in 3GPP.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"password"</literal></term>
+            <listitem>
+              Password (if any) required by the network, given as a string value
+              (signature <literal>"s"</literal>). Optional in 3GPP.
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"number"</literal></term>
+            <listitem>
+              For POTS devices the number to dial,,
+              given as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"allow-roaming"</literal></term>
+            <listitem>
+              %FALSE to allow only connections to home networks,
+              given as a boolean value (signature <literal>"b"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"rm-protocol"</literal></term>
+            <listitem>
+              For CDMA devices, the protocol of the Rm interface, given as a
+              <link linkend="MMModemCdmaRmProtocol">MMModemCdmaRmProtocol</link>
+              value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="Connect">
+      <arg name="properties" type="a{sv}" direction="in"  />
+      <arg name="bearer"     type="o"     direction="out" />
+    </method>
+
+    <!--
+        Disconnect:
+        @bearer: If given this method will disconnect the referenced packet
+        data bearer, while if "/" (ie, no object given) this method will
+        disconnect all active packet data bearers.
+
+        Disconnect an active packet data connection.
+    -->
+    <method name="Disconnect">
+      <arg name="bearer" type="o" direction="in" />
+    </method>
+
+    <!--
+        GetStatus:
+        @properties: Dictionary of properties.
+
+        Get the general modem status.
+
+        The predefined common properties returned are:
+        <variablelist>
+          <varlistentry><term><literal>"state"</literal></term>
+            <listitem>
+              A <link linkend="MMModemState">MMModemState</link> value
+              specifying the overall state of the modem, given as an
+              unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"signal-quality"</literal></term>
+            <listitem>
+              Signal quality value, given only when registered,
+              as an unsigned integer value
+              (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"current-bands"</literal></term>
+            <listitem>
+              List of <link linkend="MMModemBand">MMModemBand</link> values,
+              given only when registered, as a list of
+              unsigned integer values (signature <literal>"au"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"access-technology"</literal></term>
+            <listitem>
+              A <link linkend="MMModemAccessTechnology">MMModemAccessTechnology</link> value,
+              given only when registered, as an unsigned integer value
+              (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"m3gpp-registration-state"</literal></term>
+            <listitem>
+              A <link linkend="MMModem3gppRegistrationState">MMModem3gppRegistrationState</link> value
+              specifying the state of the registration, given only when registered
+              in a 3GPP network, as an unsigned integer value (signature
+              <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"m3gpp-operator-code"</literal></term>
+            <listitem>
+              Operator <literal>MCC-MNC</literal>, given only when registered
+              in a 3GPP network, as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"m3gpp-operator-name"</literal></term>
+            <listitem>
+              Operator name, given only when registered in a 3GPP network,
+              as a string value (signature <literal>"s"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"cdma-cdma1x-registration-state"</literal></term>
+            <listitem>
+              A <link linkend="MMModemCdmaRegistrationState">MMModemCdmaRegistrationState</link> value
+              specifying the state of the registration, given only when registered
+              in a CDMA1x network, as an unsigned integer value (signature
+              <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"cdma-evdo-registration-state"</literal></term>
+            <listitem>
+              A <link linkend="MMModemCdmaRegistrationState">MMModemCdmaRegistrationState</link> value
+              specifying the state of the registration, given only when registered
+              in a EV-DO network, as an unsigned integer value (signature
+              <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"cdma-sid"</literal></term>
+            <listitem>
+              The System Identifier of the serving network, if registered in a CDMA1x network and if known.
+              Given as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+          <varlistentry><term><literal>"cdma-nid"</literal></term>
+            <listitem>
+              The Network Identifier of the serving network, if registered in a CDMA1x network and if known.
+              Given as an unsigned integer value (signature <literal>"u"</literal>).
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="GetStatus">
+      <arg name="properties" type="a{sv}" direction="out" />
+    </method>
+
+  </interface>
+</node>

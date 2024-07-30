@@ -1,0 +1,175 @@
+On the server every single KDE repo  is downloaded.
+
+SEE BELOW FOR THE REAL EXAMPLE (EASY, FULL EXAMPLE)
+
+default Doxygen configuration:
+    DOTFILE_DIRS = docs/dot
+
+Frameworks
+
+need to consider platform/type stuff for frameworks as well as tier (platform is generally applicable, but type?)
+
+KArchive/config.kapidox:
+    public_source_dirs:
+        - src
+    group: Frameworks
+    subgroup: tier 1 # actually omit; use tier from metainfo.yaml as special case for frameworks
+
+frameworks-docs:
+    group: Frameworks
+    group_info:
+        maintainer: dfaure
+        description: "whatever short description we have about Frameworks"
+        allowed_subgroups:
+            - Tier 1
+            - Tier 2
+            - Tier 3
+            - Tier 4
+            - Porting Aids
+
+Easy
+
+config.kapidox:
+    # info is taken from metainfo.yaml, CMakeLists.txt etc. if available, but can be overridden here
+    public_source_dirs:
+        - src/lib
+    private_source_dirs:
+        - src/app
+
+Full example
+config.kapidox:
+    # info is taken from metainfo.yaml, CMakeLists.txt etc if available, but can be overridden here
+    name: <user-visible name, including caps> # eg: KArchive
+    maintainer: <identity username> # or list of usernames
+    description: <one-line description>
+    group: <name> # optional; eg: frameworks
+    subgroup: <subgroup> # optional; eg: tier 1
+    public_source_dirs:
+        - src/lib
+    examples_code_dirs: # Doxygen EXAMPLES key; default docs/examples
+        - doc/examples
+    extra_doc_dirs: # default ./docs
+        - doc
+    private_source_dirs:
+        - src/app
+    main_page: # defaults to README.md
+    doxygen_overrides:
+        | # some text in doxygen config format (using yaml's block text feature)
+        | FOO = bar
+    group_info: # only in one member of the group; doxygen will be run in this repo for the group top-level pages
+        group: <name> # defaults to top-level group info
+        maintainer: <identity username> # maintainer of group as a whole (eg: dfaure for frameworks)
+        description: <one-line description>
+        allowed_subgroups:
+            - tier 1
+            - tier 2
+    subprojects:
+        name:
+            main_page: src/some_project/README.md
+            public_source_dirs:
+                - src/some_project
+            # any keys valid at top level (except group_info); anything not specified will default to top-level value
+        other_name:
+            # as above
+
+if config.kapidox is missing, repo is ignored
+
+a "project" is generated for the top-level data in config.kapidox and for each subproject:
+    in "public" mode (api.kde.org):
+        private_source_dirs is ignored
+        if a project does not have public_source_dirs, it is ignored (but group_info is still used if present)
+    in "private" mode:
+        public_source_dirs is ignored
+        private_source_dirs is added to Doxygen INPUT
+    extra_doc_dirs is added to Doxygen INPUT
+
+
+
+Reflection
+Each git repo /product contains a yaml file:
+
+metainfo.yaml / projectinfo.yaml:
+    maintainer: <identity username>
+    description: <one-line description>
+    release: <true|false>
+    deprecated: <true|false>
+    group: <name> # eg: frameworks/tier1
+    subprojects:
+        - name:
+          all the keys you can do outside to override
+    documentation:
+        group_documentation_dirs:
+            - docs
+        public_libraries: # runs separate doxygen instances on these dirs; group will default to this repo name
+            - name: <name of the lib> #optional, default to framework
+               description: #optional, default to the one above
+               lib doc: <>
+               lib example: <>
+              dirs: #where to run
+                - directory1
+                - directory2
+            - name: <name of the other lib> #optional, default to framework
+              dirs:
+                - directory1
+                - directory2
+        public_library_dirs: # these will be documented on api.kde.org   -- empty by default
+            - src
+            - libs/my_public_lib
+        private_code_dirs: # these will be documented only when running in internal mode -- full repo by default
+            - src
+
+
+
+
+layouts:
+    frameworks:
+        each lib own repo:
+            src/
+            docs/
+            examples/
+            README.md
+            metainfo.yml
+        separate doc repo with group docs
+    calligra(?):
+        core repo including group docs + public libraries:
+            doc_for_scripting/ (md files?)
+            src/
+            examples/
+        app repos
+    amarok:
+        one repo with:
+            public lib for plugins to link against
+            user manual
+            extra docs for how to write plugins
+            application code (+ private libraries?)
+    Kate:
+        need some way to document writing syntax files
+    KDiagram
+
+        one repo with 2 independent libs, KChart & KGantt
+
+    src/KChart
+
+    src/KGantt
+
+
+
+kapidox reads all repositories to find the metainfo.yaml files to organize the documentation pages.
+
+Needs:
+    The doc of
+
+          each product
+
+    each group
+
+    all kde products
+
+    ....are build with the same script
+
+
+
+Current script info sources:
+    the repo/dir name is used
+    parses project() command from CMakeLists.txt to figure out name of project ("fancyname" - the one displayed to the user)
+

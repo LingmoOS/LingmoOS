@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % French "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manuel utilisateur de « kdeinit5 »</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>18-12-2013</date>
+<releaseinfo
+>Environnement de développement 5.0</releaseinfo>
+<productname
+>Environnement de développement pour KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Lanceur pour les applications développées avec la prise en charge de « kdeinit » et pour les processus fils « KIO ».</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Synopsis</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+programmes</arg
+> <arg
+>programmes</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Description</title>
+
+<para
+>kdeinit5 est un lanceur de processus, un peu similaire d'une certaine manière à la célèbre commande <command
+>init</command
+> utilisée pour démarrer UNIX. Elle exécute les programmes &kde; et les modules chargeables (KLM) et leur permet de démarrer de manière plus efficace. </para>
+
+<para
+>L'utilisation de « kdeinit5 » pour lancer les applications &kde; rend le démarrage d'une application standard de &kde; beaucoup plus rapide et réduit la consommation de mémoire vive de manière substantielle.</para>
+
+<para
+>« kdeinit5 » est lié à toutes les bibliothèques dont une application &kde; standard a besoin. Grâce à cette technique, le démarrage d'une application devient beaucoup rapide car seule l'application elle-même a besoin d'être liée. Dans le cas contraire, l'application et les bibliothèques qu'elle utilise doivent être liées. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Désavantages</title>
+
+<para
+>Le nom du processus des applications démarrées via « kdeinit5 » est « kdeinit5 ». Ce problème peut être corrigé à un certain degré en modifiant le nom de l'application comme il est affiché par <command
+>ps</command
+>. Toutefois, les applications comme <command
+>killall</command
+> ne verront que « kdeinit5 » comme nom de processus. Pour contourner ce problème, utilisez <command
+>kdekillall</command
+> (de kdesdk/scripts) pour les applications démarrées via « kdeinit5 ». </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Options</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Affiches l'aide à propos des options </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Ne pas bifurquer (forker), c'est-à-dire ne pas quitter avant que tous les programmes exécutés soient terminés.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>Ne pas démarrer kded</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Terminer lorsque plus aucune application KDE n'est en fonctionnement. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programs</option
+></term>
+<listitem>
+<para
+>lance les requêtes de gestion des programmes </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programs</option
+></term>
+<listitem>
+<para
+>lance les programmes sans gérer les requêtes </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Utilisation</title>
+<para
+>Une manière standard de lancer ce programme est de simplement spécifier la commande suivante sur une invite de commandes : <userinput
+><command
+> « kdeinit5 » </command
+>programme</userinput
+> ou <userinput
+><command
+>kdeinit5</command
+> +programme </userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Fichiers</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Variables d'Environnement</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Spécifié le dossier personnel de l'utilisateur actuel</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Spécifie si le dossier personnel de l'utilisateur actuel est en lecture seule</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Si défini, indique à « kdeinit5 » que les programmes &kde; sont pré liés.</para>
+<para
+>(La pré liaison est un processus qui vous permet d'accélérer le processus de liaison dynamique).</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Si défini, indique à « kdeinit5 » qu'il s'exécute sur un bureau &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Voir Aussi</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Bogues</title>
+<para
+>Veuillez utiliser<ulink url="http://bugs.kde.org"
+>le traqueur de bogues de KDE</ulink
+> pour signaler les bogues.</para>
+</refsect1>
+
+</refentry>
+
+
+

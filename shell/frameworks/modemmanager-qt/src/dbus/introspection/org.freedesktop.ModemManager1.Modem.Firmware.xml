@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2011-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Firmware:
+      @short_description: The ModemManager Firmware interface.
+
+      This interface allows clients to select or install firmware images on
+      modems.
+
+      Firmware slots and firmware images are identified by arbitrary opaque
+      strings.
+
+      Firmware images are represented as dictionaries of properties.
+      Certain properties are pre-defined, and some are required:
+
+      <variablelist>
+        <varlistentry><term><literal>"image-type"</literal></term>
+          <listitem>
+            (Required) Type of the firmware image, given as a
+            <link linkend="MMFirmwareImageType">MMFirmwareImageType</link> value
+            (signature <literal>"u"</literal>). Firmware images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GENERIC:CAPS">MM_FIRMWARE_IMAGE_TYPE_GENERIC</link>
+            will only expose only the mandatory properties.
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"unique-id"</literal></term>
+          <listitem>
+            (Required) A user-readable unique ID for the firmware image, given as a
+            string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"gobi-pri-version"</literal></term>
+          <listitem>
+            (Optional) The version of the PRI firmware image, in images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GOBI:CAPS">MM_FIRMWARE_IMAGE_TYPE_GOBI</link>,
+            given as a string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"gobi-pri-info"</literal></term>
+          <listitem>
+            (Optional) Additional information of the PRI image, in images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GOBI:CAPS">MM_FIRMWARE_IMAGE_TYPE_GOBI</link>,
+            given as a string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"gobi-boot-version"</literal></term>
+          <listitem>
+            (Optional) The boot version of the PRI firmware image, in images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GOBI:CAPS">MM_FIRMWARE_IMAGE_TYPE_GOBI</link>,
+            given as a string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"gobi-pri-unique-id"</literal></term>
+          <listitem>
+            (Optional) The unique ID of the PRI firmware image, in images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GOBI:CAPS">MM_FIRMWARE_IMAGE_TYPE_GOBI</link>,
+            given as a string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><literal>"gobi-modem-unique-id"</literal></term>
+          <listitem>
+            (Optional) The unique ID of the Modem firmware image, in images of type
+            <link linkend="MM-FIRMWARE-IMAGE-TYPE-GOBI:CAPS">MM_FIRMWARE_IMAGE_TYPE_GOBI</link>,
+            given as a string value (signature <literal>"s"</literal>).
+          </listitem>
+        </varlistentry>
+      </variablelist>
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Firmware">
+
+    <!--
+        List:
+        @selected: The unique name of the selected firmware image, or the empty string if no image is selected.
+        @installed: An array of dictionaries containing the properties of the installed firmware images.
+
+        List installed firmware images.
+
+        Depending on the type of modem, installed images may be stored on the
+        host or the modem.
+
+        Installed images can be selected non-destructively.
+    -->
+    <method name="List">
+      <arg name="selected"  type="s"        direction="out" />
+      <arg name="installed" type="aa{sv}" direction="out" />
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out1" value="QVariantMapList"/>
+    </method>
+
+    <!--
+        Select:
+        @uniqueid: The unique ID of the firmware image to select.
+
+        Selects a different firmware image to use, and immediately resets the
+        modem so that it begins using the new firmware image.
+
+        The method will fail if the identifier does not match any of the names
+        returned by
+        <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Firmware.List">List()</link>,
+        or if the image could not be selected for some reason.
+    -->
+    <method name="Select">
+      <arg name="uniqueid" type="s" direction="in" />
+    </method>
+
+    <!--
+        Install:
+        @image: The identifier of the firmware image to install.
+        @slot: The identifier of the slot into which the firmware should be installed.
+
+        Install an available firmware image into a slot.
+
+        It does not guarantee that the image will be installed into the
+        specified slot, but does guarantee that, if the slot is empty, no
+        image will be overwritten, and if the slot is not empty, no image
+        other than the one in that slot will be overwritten.
+
+        The method will fail if either of the identifiers is invalid, or if the
+        image could not be installed into the slot for some reason.
+
+    <method name="Install">
+      <arg name="image" type="s" direction="in" />
+      <arg name="slot"  type="s" direction="in" />
+    </method-->
+
+  </interface>
+</node>

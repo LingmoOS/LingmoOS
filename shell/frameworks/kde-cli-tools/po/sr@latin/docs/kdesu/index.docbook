@@ -1,0 +1,598 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname-n '<application>KDE su</application>'>
+  <!ENTITY kappname-g '<application>KDE sua</application>'>
+  <!ENTITY kappname-d '<application>KDE suu</application>'>
+  <!ENTITY kappname-a '<application>KDE su</application>'>
+  <!ENTITY kappname-i '<application>KDE suom</application>'>
+  <!ENTITY kappname-l '<application>KDE suu</application>'>
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Serbian-Latin "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Priručnik za <application
+>KDE su</application
+></title>
+
+<authorgroup>
+<author
+><personname
+><firstname
+>Gert</firstname
+> <surname
+>Jansen</surname
+></personname
+> &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Dragan</firstname
+><surname
+>Pantelić</surname
+><affiliation
+><address
+><email
+>falcon-10@gmx.de</email
+></address
+></affiliation
+><contrib
+>prevod</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>Gert Jansen</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21. 9. 2010.</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+><application
+>KDE su</application
+> je grafičko pročelje za Unix naredbu <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>lozinka</keyword>
+<keyword
+>koren</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Uvod</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kde4-config - -path libexec)kdesu - - program_to_run
+  
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Dobro došli u <application
+>KDE su</application
+>! <application
+>KDE su</application
+> je grafičko pročelje za Unix naredbu <command
+>su</command
+> za KDE. Omogućava vam da pokrenete program pod drugim korisnikom, zadavši njegovu lozinku. <application
+>KDE su</application
+> nije povlašćen program, već koristi sistemsku <command
+>su</command
+>.</para>
+
+<para
+><application
+>KDE su</application
+> ima jednu dodatnu mogućnost: može opciono da pamti lozinke umesto vas. Ako se oslonite na ovo, za svaku naredbu treba samo jedanput da unesete lozinku. Za više informacija i bezbednosnu analizu, pogledajte <xref linkend="sec-password-keeping"/>.</para>
+
+<para
+>Ovaj program je namenjen pokretanju iz komandne linije ili iz .desktop fajlova. Mada zahteva korenu lozinku kroz grafički dijalog, pre je most između komandne linije i GUI‑ja nego čisti GUI program.</para>
+
+<para
+>Pošto se <command
+>kdesu</command
+> više ne instalira u <filename
+><userinput
+>$(kde4-config --prefix)</userinput
+>/bin/</filename
+> već u <filename
+><userinput
+>kde4-config --path libexec</userinput
+></filename
+>, i stoga više nije u putanji (<envar
+>PATH</envar
+>), moraćete da je pokrećete pomoću <userinput
+>$(kde4-config --path libexec)<command
+>/kdesu</command
+></userinput
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Korišćenje <application
+>KDE sua</application
+></title>
+
+<para
+>Upotreba <application
+>KDE sua</application
+> je laka. Sintaksa glasi:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+>naredba</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+>fajl</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+>ime‑ikonice</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+>korisnik</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+>ID-prozora</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>generičke-KDE-opcije</arg
+> <arg choice="opt"
+>generičke-Qt-opcije</arg
+> </cmdsynopsis>
+
+<para
+>Opcije komandne linije objašnjene su ispod.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>naredba</replaceable
+></option
+></term>
+<listitem
+><para
+>Zadaje da se naredba prosleđena kao argument izvršava pod korenom. Na primer, kada poželite da pokrenete novi menadžer fajlova, uneli biste u odzivnik: <userinput
+>$(kde4-config --path libexec)/<command
+>kdesu</command
+> <option
+>-c</option
+> dolphin</userinput
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Prikaz ispravljačkih podataka.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>fajl</replaceable
+></option
+></term>
+<listitem
+><para
+>Ova opcija omogućava efikasno korišćenje <application
+>KDE sua</application
+> u .desktop fajlovima. Govori <application
+>KDE suu</application
+> da ispita fajl zadat parametrom <parameter
+>fajl</parameter
+>: ako je taj fajl upisiv za trenutnog korisnika, <application
+>KDE su</application
+> će izvršiti naredbu pod tim korisnikom; ako nije, naredba se izvršava pod zadatim korisnikom (podrazumevano je to koren, <literal
+>root</literal
+>).</para>
+<para
+>Parametar <parameter
+>fajl</parameter
+> obrađuje se ovako: ako počinje sa <literal
+>/</literal
+>, uzima se za apsolutnu putanju do fajla; inače, uzima se za ime globalnog KDE postavnog fajla.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>ime‑ikonice</replaceable
+></term>
+<listitem
+><para
+>Zadaje ikonicu za upotrebu u dijalogu lozinke. Možete zadati samo ime bez nastavka.</para>
+<para
+>Na primer, da pokrenete <application
+>K‑osvajač</application
+> u režimu menadžera fajlova i dobijete ikonicu <application
+>K‑osvajača</application
+> u dijalogu lozinke:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i</option
+> konqueror 
+<option
+>-c</option
+> "konqueror --profile filemanagement"</userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Bez pamćenja lozinke. Isključuje kućicu <guilabel
+>Upamti lozinku</guilabel
+> u dijalogu lozinke.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritet</replaceable
+></term>
+<listitem>
+<para
+>Postavlja vrednost prioriteta, na broj između 0 i 100: 0 znači najniži prioritet, a 100 najviši. Podrazumevano je 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Stvarnovremensko raspoređivanje.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Zaustavlja demona <application
+>KDE sua</application
+>. Pogledajte <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Uključuje terminalski izlaz. Takođe isključuje pamćenje lozinki. Ovo umnogome služi u ispravljačke svrhe; ako želite da pokrenete program konzolnog režima, upotrebite umesto ovoga standardnu <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>korisnik</replaceable
+></term>
+<listitem
+><para
+>Iako je najčešća primena <application
+>KDE sua</application
+> izvršavanje naredbe pod korenom, možete zadati bilo koje korisničko ime i odgovarajuću lozinku.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Iznutrice</title>
+
+<sect1 id="x-authentication">
+<title
+>X autentifikacija</title>
+
+<para
+>Pokrenuti program radiće pod ID‑om korenog korisnika i generalno neće imati ovlašćenje da pristupi vašem X prikazu. <application
+>KDE su</application
+> zaobilazi ovo dodavanjem autentifikacionog kolačića u privremeni fajl <filename
+>.Xauthority</filename
+>. Po okončanju naredbe, ovaj fajl se uklanja. </para>
+
+<para
+>Ako ne koristite X kolačiće, prepušteni ste sami sebi. <application
+>KDE su</application
+> će ovo otkriti i neće dodati kolačić, ali ćete morati da obezbedite da je korenu dozvoljeno da pristupi vašem X prikazu.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Sučelje za <command
+>su</command
+></title>
+
+<para
+><application
+>KDE su</application
+> koristi sistemsku <command
+>su</command
+> za dobavljanje ovlašćenja. U ovoj sekciji objasnićemo kako <application
+>KDE su</application
+> to radi. </para>
+
+<para
+>Pošto neke izvedbe naredbe <command
+>su</command
+> (tj. ona RedHatova) neće da čitaju lozinku sa stdul., <application
+>KDE su</application
+> stvara par PTY/TTY i izvršava <command
+>su</command
+> sa standardnim fajl opisnicima povezanim na TTY.</para>
+
+<para
+>Za izvršenje zadate naredbe, umesto interaktivne školjke <application
+>KDE su</application
+> koristi opciju <option
+>-c</option
+> sa argumentom naredbe <command
+>su</command
+>. Ovaj argument razume svaka školjka za koju znamo, pa bi trebao da bude prenosivo. <command
+>su</command
+> prosleđuje argument <option
+>-c</option
+> školjci ciljnog korisnika, a ona izvršava program. Primer: <command
+>su<option
+>root -c <replaceable
+>naredba</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Umesto neposrednog izvršenja zadate naredbe kroz <command
+>su</command
+>, <application
+>KDE su</application
+> izvršava mali program zametak <command
+>kdesu_stub</command
+>. Ovaj zametak (radi pod ciljnim korisnikom) dobavlja nešto podataka od <application
+>KDE sua</application
+> preko PTY/TTY kanala (zametkovog stdul. i stdiz.), a zatim izvršava zadatu naredbu. Podaci koji se prosleđuju: X prikaz, X autentifikacioni kolačić (ako je raspoloživ), promenljiva <envar
+>PATH</envar
+> i naredba za pokretanje. Upotreba zametka je neophodna zato što je X kolačić privatan podatak, te se ne može proslediti kroz komandnu liniju.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Provera lozinke</title>
+
+<para
+><application
+>KDE su</application
+> će proveriti unetu lozinku, i ako nije ispravna, izdati poruku o grešci. Provera se sprovodi probnim izvršavanjem <filename
+>/bin/true</filename
+>: ako uspe, pretpostavlja se da je lozinka ispravna.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Pamćenje lozinki</title>
+
+<para
+>Radi vaše udobnosti, <application
+>KDE su</application
+> izvodi mogućnost <emphasis
+>pamćenja lozinki</emphasis
+>. Ako vas zanima bezbednost toga, treba da pročitate naredne pasuse.</para>
+
+<para
+>Dozvoljavanje <application
+>KDE suu</application
+> da pamti lozinke otvara (malu) bezbednosnu rupu na sistemu. Očigledno, <application
+>KDE su</application
+> neće dozvoliti nijednom osim vašem korisničkom ID‑u da koristi lozinke, ali, ako se ovo neoprezno izvede, spušta bezbednosni nivo korena na onaj normalnog korisnika (vas); provalnik koji bi upao u vaš nalog dobio bi i koreni pristup. <application
+>KDE su</application
+> pokušava ovo da spreči, bezbednosnom šemom koja je, barem po našem mišljenju, razumno sigurna i izložena ispod.</para>
+
+<para
+><application
+>KDE su</application
+> koristi demon, <command
+>kdesud</command
+>, koji osluškuje za naredbama na Unix soketu u <filename
+>/tmp</filename
+>. Režim soketa je 0600, tako da se na njega može povezati samo vaš korisnički ID. Ako je uključeno pamćenje lozinki, <application
+>KDE su</application
+> izvršava naredbe preko ovog demona: upiše naredbu i korenu lozinku u soket, a demon je izvrši kroz <command
+>su</command
+> kao što je prethodno opisano. Naredba i lozinka se potom ne odbacuju, već se zadržavaju određeno vreme, tj. do prekovremena zadatog u kontrolnom modulu. Ako stigne još jedan zahtev za istu naredbu tokom ovog vremenskog perioda, klijent ne mora da navodi lozinku. Da bi se sprečili provalnici koji upadnu na vaš nalog da pokradu lozinke iz demona (npr. priključivanjem ispravljača), demon se instalira sa sUID‑om <literal
+>nogroup</literal
+>. Ovo bi trebalo da spreči sve obične korisnike (uključujući i vas) u dobavljanju lozinki iz procesa <command
+>kdesud</command
+>. Demon takođe postavlja promenljivu okruženja <envar
+>DISPLAY</envar
+> na vrednost koju je imala kad je bio pokrenut. Jedino što provalnik može da uradi jeste da pokrene program na vašem X prikazu.</para>
+
+<para
+>Jedna slaba tačka u ovoj šemi je u tome što programi koje izvršavate verovatno nisu pisani sa bezbednošću na umu (poput programa sa sUID‑om <literal
+>root</literal
+>). Mogli bi imati prekoračenja bafera ili druge probleme koje bi provalnik mogao da iskoristi.</para>
+
+<para
+>Mogućnost pamćenja lozinki je trampa između bezbednosti i udobnosti. Ohrabrujemo vas da ovo razmotrite i sami donesete odluku da ćete je koristiti.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autor</title>
+
+<para
+><application
+>KDE su</application
+></para>
+
+<para
+>© 2000, <personname
+><firstname
+>Gert</firstname
+> <surname
+>Jansen</surname
+></personname
+></para>
+
+<para
+><application
+>KDE su</application
+> je napisao <personname
+><firstname
+>Gert</firstname
+> <surname
+>Jansen</surname
+></personname
+>, donekle na osnovu <application
+>KDE sua</application
+> verzije 0.3 <personname
+><firstname
+>Pijetra</firstname
+> <surname
+>Ilja</surname
+></personname
+>. Nas dvojica smo se složili da ubuduće ja održavam ovaj program.</para>
+
+<para
+>Autoru se možete obratiti putem e‑pošte, na &Geert.Jansen.mail;. Ako pronađete bilo kakve greške, prijavite ih da bih ih mogao ispraviti. Takođe mi se slobodno obratite ako imate neki predlog.</para>
+
+<para
+>Preveo Dragan Pantelić <email
+>falcon-10@gmx.de</email
+>.</para
+> 
+&underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

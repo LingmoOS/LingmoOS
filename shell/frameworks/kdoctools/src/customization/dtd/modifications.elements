@@ -1,0 +1,65 @@
+<!-- -*- dtd -*-
+    Fills in declarations that were switched off earlier (to provide them 
+    anew and more restrictive this time)
+    
+    SPDX-FileCopyrightText: 2001, 2002 Frederik Fouvry
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+    
+    Send suggestions, comments, etc. to the KDE docbook list 
+    <kde-docbook@kde.org>.
+
+    USAGE
+
+    Refer to this DTD as
+
+      "-//KDE//ELEMENTS DocBook XML Modifications (Restrictions) V1.1//EN"
+
+    For instance
+
+      <!ENTITY % kde.modifications PUBLIC
+       "-//KDE//ELEMENTS DocBook XML Modifications (Restrictions) V1.1//EN">
+
+-->
+
+<!-- ONLY to supply declarations that were switched off earlier 
+     Take care to make it only _more_ restrictive.  -->
+
+<!-- One modification: BookInfo is compulsory, because
+     it contains ReleaseInfo, which is compulsory -->
+<!ELEMENT book %ho; ((%div.title.content;)?, bookinfo,
+ 		(dedication | toc | lot
+ 		| glossary | bibliography | preface
+		| %chapter.class; | reference | part
+		| %article.class;
+ 		| %appendix.class;
+		| %index.class;
+		| colophon)*)
+		%ubiq.inclusion;>
+
+<!-- Modification: ReleaseInfo, Date, Abstract and Keywordset are
+     compulsory.  Not all orders that could be valid are allowed (the
+     number increases factorial).  The current restrictions are quite
+     strict, and it is foreseen that they will be relaxed.  Date and 
+     ReleaseInfo must come together, as must Abstract and Keywordset.
+     Abstract and Keywordset must follow Date and ReleaseInfo when they
+     are used the first time.
+-->
+<!ELEMENT bookinfo %ho; ((%kde.info.class;)*, date, releaseinfo, 
+                         (%kde.info.class;)*, abstract, keywordset, 
+                         (%info.class;)*)
+		%beginpage.exclusion;>
+
+<!-- value of Type changed from IMPLIED CDATA
+     default value of LinkMode set from #IMPLIED to kdems-default -->
+<!ATTLIST olink
+		targetdocent	ENTITY 		#IMPLIED
+		linkmode	IDREF		"kdems-default"
+		localinfo 	CDATA		#IMPLIED
+		type		(href|other)	"href"
+		targetdoc	CDATA		#IMPLIED
+		targetptr	CDATA		#IMPLIED
+		%common.attrib;
+		%olink.role.attrib;
+		%local.olink.attrib;
+>

@@ -1,0 +1,3 @@
+add_executable(ipvalidatortest ipvalidatortest.cpp)
+target_link_libraries(ipvalidatortest kcm_firewall_core Qt::Test)
+add_test(NAME ipvalidatortest COMMAND ipvalidatortest)

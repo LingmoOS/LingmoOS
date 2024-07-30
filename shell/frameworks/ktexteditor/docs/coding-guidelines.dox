@@ -1,0 +1,40 @@
+/** \page kte_guidelines Coding Guidelines and API Conventions
+
+<p><b>
+\ref index "Overview" |
+\ref kte_design "Design" |
+Coding Guidelines |
+\ref kte_port_to_5 "Porting to KDE Frameworks 5"
+</b></p>
+
+All KTextEditor interfaces have a consistent design.
+- naming follows Qt style. Avoid Java style getters like getSomeData()
+  for example,
+- core interfaces (see \ref kte_design) which inherit QObject declare all
+  signals as real signals,
+- all other interfaces, which do not subclass QObject, must declare their
+  signals as virtual private member functions. An implementation must
+  reimplement this virtual member function as a real signal.
+- all signals have the sender object as first parameter, for example
+  all document signals have to look like this:
+  \code
+  void signalFromDocument (KTextEditor::Document *doc, ...);
+  \endcode
+  This allows easy and consistent query which object did send the signal,
+  which is important for most applications, as they listen to multiple
+  documents/views/editors/...
+- all interface functions should be virtual, to allow subclasses to
+  overwrite them, most members should even be pure virtual, beside
+  additional convenience/helper functions.
+
+The interface KTextEditor::Cursor represents a cursor position, i.e. a
+line/column tuple. The same holds for KTextEditor::Range. As both of this
+concepts are much cleaner than tuples, please keep the following guidelines:
+- never use line/column tuples in parameter lists, use KTextEditor::Cursor
+  instead,
+- never use Cursor/Cursor tuples for ranges, use KTextEditor::Range
+  instead of two Cursors.
+
+\author Christoph Cullmann \<cullmann@kde.org\>
+\author Dominik Haumann \<dhaumann@kde.org\>
+*/

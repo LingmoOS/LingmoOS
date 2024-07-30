@@ -1,0 +1,537 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Brazilian-Portuguese "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>Manual do &tablet;</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <othercredit role="translator"
+><firstname
+>Marcus</firstname
+><surname
+>Gama</surname
+><affiliation
+><address
+><email
+>marcus.gama@gmail.com</email
+></address
+></affiliation
+><contrib
+>Tradução</contrib
+></othercredit
+><othercredit role="translator"
+><firstname
+>André Marcelo</firstname
+><surname
+>Alvarenga</surname
+><affiliation
+><address
+><email
+>alvarenga@kde.org</email
+></address
+></affiliation
+><contrib
+>Tradução</contrib
+></othercredit
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>17/10/2020</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>Esta é a documentação do módulo do &systemsettings; para o &kde; para configurar as mesas digitalizadoras.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>Configurações do sistema</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>Mesa digitalizadora</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Configurações da mesa digitalizadora Wacom</title>
+    <para
+>O módulo da mesa digitalizadora para o &systemsettings; lida com toda a configuração da sua mesa digitalizadora. Todas as mesas digitalizadoras suportadas pelo <ulink url="https://linuxwacom.github.io"
+>controlador Wacom para &Linux;</ulink
+> são tratadas por esta interface de configuração. Certifique-se de que a sua mesa digitalizadora é detectada pelo 'xorg.conf' ou pelo udev, e se está funcionando. Veja a seção da <link linkend="detection"
+>detecção da mesa digitalizadora</link
+> para obter mais informações. </para>
+    <important>
+        <para
+>Você deverá ter instalado o controlador <application
+>xf86-input-wacom</application
+> no seu computador e deverá ter disponível o programa <command
+>xsetwacom</command
+> para que este módulo funcione corretamente. </para>
+    </important>
+    <para
+>O módulo é dividido em várias páginas que gerenciam todos os aspectos da sua mesa digitalizadora e caneta: <link linkend="tablet-profiles"
+>Perfis</link
+>, <link linkend="tablet-general"
+>Informações gerais</link
+>, <link linkend="stylus"
+>Configuração da caneta</link
+>, <link linkend="pad-buttons"
+>Botões expressos</link
+>, <link linkend="pad-mapping"
+>Associação do painel</link
+> e <link linkend="touch-mapping"
+>Mapeamento de toque</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>Gerenciamento de perfis</title>
+
+        <para
+>Isto é uma pequena lista com os dois botões ao lado. Você poderá criar perfis novos e apagar os já existentes. Cada perfil é gravado e definido para a mesa digitalizadora conectada neste exato momento. Se você criar um novo perfil, ele irá criar um automaticamente com as opções padrão que são devolvidas pelo controlador. </para>
+
+        <para
+>Aqui você poderá indicar diferentes perfis para a sua configuração. Por exemplo, se quiser ter um comportamento diferente da caneta, caso a use como substituto do mouse no seu dia a dia ou a use para desenhar qualquer coisa. </para>
+        <para
+>Cada perfil poderá ser alterado instantaneamente e muda diretamente o comportamento dos dados inseridos pela sua mesa digitalizadora. </para>
+        <note>
+            <para
+>O <link linkend="kded"
+>servidor tablet do kded</link
+> deverá estar em execução, em segundo plano, para poder alterar os perfis e aplicá-los na mesa digitalizadora. Todo esse trabalho é feito pelo servidor. O módulo do &systemsettings; apenas altera a configuração dos perfis para ele. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>Configuração e informações gerais da mesa digitalizadora</title>
+
+        <para
+>Mostra algumas informações gerais sobre a mesa digitalizadora selecionada. Além do nome e do fabricante da sua mesa digitalizadora, é apresentada uma imagem onde aparecem enumerados todos os dispositivos de entrada. </para>
+
+        <note>
+            <para
+>A mesa digitalizadora deverá estar conectada e o serviço do <link linkend="kded"
+>kded</link
+> deverá estar rodando, de modo a que o módulo funcione corretamente. </para>
+            <para
+>Veja a seção de <link linkend="troubles"
+>Problemas na detecção</link
+> para obter mais alguma ajuda na detecção da mesa digitalizadora. </para>
+        </note>
+
+        <para
+>Além da informação da mesa digitalizadora, a aba geral permite definir vários atalhos globais. Cada atalho permite mudar de forma dinâmica as opções da mesa digitalizadora atualmente conectada. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>Configuração da Caneta</title>
+
+        <para
+>A caneta usada com a mesa digitalizadora tem dois lados diferentes, sendo o lado principal chamado de caneta e o outro a borracha. Nesta aba você pode alterar qualquer aspecto desse lado da caneta, desde a atribuição de botões até a curva e os limites de pressão. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>Sensibilidade da borracha</title>
+            <para
+>A barra deslizante permite alterar o limite da borracha. Para uma definição mais precisa da pressão, é possível alterar a curva de pressão completa na janela <guilabel
+>Editar a curva de pressão</guilabel
+>. Veja mais informações na <link linkend="presscurve"
+>Janela da curva de pressão</link
+>. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>Configurações do botão</title>
+            <para
+>A área de <guilabel
+>Configurações do botão</guilabel
+> permite alterar a ação executada que está atribuída a cada botão da caneta. Se clicar uma única vez no campo de edição, irá abrir uma nova janela onde é possível selecionar as diferentes combinações de teclas, teclas modificadoras e botões do mouse. </para>
+
+            <para
+>Se a opção <guilabel
+>Tocar para executar a ação</guilabel
+> estiver ativa, a caneta precisa estar em contato com a mesa digitalizadora para permitir que a ação do botão seja executada. Se esta opção estiver desativada, cada ação do botão funciona mesmo quando a caneta estiver simplesmente próxima da mesa digitalizadora. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>Sensibilidade da ponta</title>
+            <para
+>A barra deslizante permite alterar o limite da ponta da caneta. Para uma definição mais precisa da pressão, é possível alterar a curva de pressão completa na janela <guilabel
+>Editar a curva de pressão</guilabel
+>. Veja mais informações na <link linkend="presscurve"
+>Janela da curva de pressão</link
+>. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>Botões expressos</title>
+
+        <para
+>A aba <guilabel
+>Botões expressos</guilabel
+> permite definir as ações específicas dos botões para todos os botões do hardware da mesa digitalizadora. Para mudar a ação usada, você precisa clicar no campo de edição e escolher a ação na nova janela. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>Mesa digitalizadora</title>
+
+       <para
+>A aba <guilabel
+>Mesa digitalizadora</guilabel
+> permite definir mais propriedades da área da mesa digitalizadora, quando for usada em conjunto com uma caneta. Aqui você pode definir a orientação e o espaço válido em uso da mesa digitalizadora e o modo de seguimento do cursor. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>Modo do seguimento da caneta</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associar à tela</guilabel
+>: Este modo associa o cursor da caneta a um movimento absoluto na mesa digitalizadora. Os cantos da mesma representam diretamente o espaço da tela. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associar ao cursor</guilabel
+>: Este modo associa o cursor da caneta um determinado movimento relativo na mesa digitalizadora. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>Orientação</title>
+           <para
+>O campo da orientação define como é rotacionada a área da mesa digitalizadora. Você pode definir uma rotação específica para si próprio na lista ou, se ativar a opção <guilabel
+>Girar automaticamente com a tela</guilabel
+>, a mesa digitalizadora será rotacionada automaticamente em conjunto com a tela. Isto é feito ao aguardar os eventos do xrandr quando a tela for rotacionada. </para>
+           <para
+>Se tiver problemas com a opção de rotação automática e a mesa digitalizadora ficar sempre girada na direção errada, ative a opção <guilabel
+>Inverter a rotação automática</guilabel
+> para inverter o comportamento. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>Mapeamento da mesa digitalizadora</title>
+           <para
+>Esta associação permite definir as proporções da mesa digitalizadora que serão usadas para cada tela. Isto é necessário para manter proporcional a área da mesa digitalizadora face ao espaço usado pela tela no modo de seguimento absoluto. Para mais informações, veja a seção <link linkend="area-selection"
+>Janela de seleção da área</link
+>. </para>
+           <note>
+               <para
+>Esta opção não funciona para o modo de cursor relativo. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>Toque</title>
+
+       <para
+>A aba <guilabel
+>Toque</guilabel
+> permite definir mais propriedades para o componente de toque da mesa digitalizadora (se disponível). É possível desativar a funcionalidade de toque através da opção <guilabel
+>Ativar o toque</guilabel
+>. Do mesmo modo, existe um atalho global que permite ativar/desativar a funcionalidade de toque. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>Modo do seguimento do toque</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Associar à tela</guilabel
+>: Este modo associa o cursor de toque a um movimento absoluto na mesa digitalizadora. Os cantos da mesa digitalizadora representam diretamente o espaço da tela. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Associar ao cursor</guilabel
+>: Este modo associa o cursor de toque com o movimento relativo na mesa digitalizadora. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>Gestos</title>
+
+           <para
+>Se a opção <guilabel
+>Ativar gestos</guilabel
+> estiver ativa, a mesa digitalizadora poderá gerar eventos de gestos para o dispositivo de toque. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Distância de deslocamento</guilabel
+>: Permite percorrer as janelas quando dois dedos estiverem colocados na mesa digitalizadora, onde um movimento para cima ou para baixo cria um evento de deslocamento. A distância é indicada em unidades da mesa digitalizadora. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Distância de ampliação</guilabel
+>: Permite ampliar/reduzir ao mover dois dedos para fora ou para dentro deles. A distância é indicada em unidades da mesa digitalizadora. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Tempo de toque</guilabel
+>: Este tempo em milissegundos define quando um toque duplo no dispositivo é reconhecido como um botão direito </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>Mapeamento de toque</title>
+           <para
+>Esta associação permite definir as proporções do dispositivo de toque que serão usadas para cada tela. Isto é necessário para manter proporcional a área da mesa digitalizadora face ao espaço usado pela tela no modo de seguimento absoluto. Para mais informações, veja a seção <link linkend="area-selection"
+>Janela de seleção da área</link
+>. </para>
+           <note>
+               <para
+>Esta opção não funciona para o modo de cursor relativo. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>Janela da curva de pressão</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Aqui está uma imagem da janela da curva de pressão</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Alterando a curva de pressão</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>A curva de pressão define como se traduz a pressão da caneta. Esta é definida através dos quatro pontos de uma curva Bézier. Para mudar esta curva, você pode alterar os pontos vermelhos e mover a curva. </para>
+        <note>
+            <para
+>Use a sua caneta dentro da janela da curva de pressão para ver diretamente as alterações na curva de pressão. Uma área azul, abaixo da curva, mostra a pressão aplicada da caneta. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>Janela de seleção da área</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Aqui está uma imagem da janela da área da mesa digitalizadora</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Definindo a área da mesa digitalizadora</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>Esta janela permite definir a área disponível da mesa digitalizadora para cada espaço selecionado na tela. Para manter as proporções da mesa digitalizadora é necessário reduzir a área da mesma, dependendo da resolução da tela. Esta janela permite defini-las individualmente para cada tela. </para>
+        <para
+>Use o botão <guilabel
+>Alternar tela</guilabel
+> para alternar entre o modo de tela inteira (todos os monitores ligados) e cada monitor individual. As configurações serão salvas para cada definição de tela e será aplicada à mesa digitalizadora sempre que a seleção da tela é alterada pela ação do atalho global. </para>
+        <para
+>É possível mapear a tela com a <guimenuitem
+>Mesa digitalizadora completa</guimenuitem
+> ou apenas definir a <guimenuitem
+>Área da mesa digitalizadora</guimenuitem
+> no painel <guilabel
+>Mesa digitalizadora</guilabel
+> no lado direito. As proporções da área podem ser bloqueadas ou desbloqueadas usando o botão <guibutton
+>Bloquear proporções</guibutton
+>. </para>
+        <para
+>Se quiser manter as proporções da mesa digitalizadora com a seleção da tela atual, você pode clicar no botão <guilabel
+>Definir as proporções da tela</guilabel
+>. A área da mesa digitalizadora será calculada e alterada automaticamente. </para>
+        <para
+>Adicionalmente, você poderá abrir a janela <guilabel
+>Calibrar</guilabel
+> para calibrar a sua mesa digitalizadora com a ajuda dos quatro pontos na tela. </para>
+        <para
+>Quando fechar a janela, será usada a última tela selecionada. Se quiser mudar de tela posteriormente, você pode usar o <link linkend="tablet-general"
+>Atalho global</link
+>. </para>
+        <note>
+            <para
+>A área da mesa digitalizadora só funciona para o modo de seguimento absoluto do dispositivo de toque e da caneta. No modo relativo, é usada a mesa digitalizadora por completo. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>Servidor da mesa digitalizadora</title>
+    <para
+>O servidor da mesa digitalizadora roda em segundo plano e faz todo o trabalho: a detecção da mesa digitalizadora e a sua configuração com os perfis selecionados. Se o servidor não estiver rodando, o módulo do &systemsettings; e o miniaplicativo do Plasma não poderão funcionar corretamente e, assim sendo, a mesa digitalizadora não poderá ser usada com os perfis. </para>
+
+    <sect1 id="detection">
+        <title
+>Detecção da mesa digitalizadora</title>
+        <para
+>A detecção do <hardware
+>dispositivo da mesa digitalizadora</hardware
+> é feita de várias formas. O <application
+>Solid</application
+> é usado em primeiro lugar e faz o suporte de conexão instantânea. Se o Solid não funcionar, os próximos passos são o <command
+>xsetwacom list dev</command
+>, o <command
+>lsusb</command
+> e o <command
+>xinput --list</command
+>. </para>
+        <para
+>Se nenhum dos comandos acima devolver o nome da mesa digitalizadora, ela não é suportada e não poderá ser usada com este módulo. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>Problemas de detecção</title>
+        <para
+>Se a mesa digitalizadora não for detectada, veja a página do <ulink url="https://linuxwacom.github.io"
+>controlador Wacom para &Linux;</ulink
+> ou <ulink url="https://digimend.github.io"
+>controlador DIGImend</ulink
+> para saber se a sua mesa digitalizadora é suportada. Além disso, veja o resultado do <command
+>lsusb</command
+> para ver se consegue descobrir a sua mesa digitalizadora. </para>
+        <para
+>Se o udev não conseguir lidar com a detecção, adicione a mesa digitalizadora ao seu arquivo <filename
+>/etc/X11/xorg.conf.d/50-tablet.conf</filename
+> (crie ele se não exisitir) e reinicie o servidor X. </para>
+        <para
+>No caso de um dispositivo serial (Tablet PC ou outros), verifique se o <command
+>xinput --list</command
+> apresenta os seus dispositivos de entrada (Caneta/Borracha/Painel). Caso apareçam, veja o ID interno do dispositivo da mesa digitalizadora com o comando <command
+>xsetwacom get "Nome do seu painel ou caneta" TabletID</command
+>. Se for devolvido algum identificador, por favor envie toda a informação necessária para o autor. </para>
+        <note>
+        <para
+>O suporte de conexão instantânea só está disponível se a mesa digitalizadora for detectada pelo <application
+>Solid</application
+> e pela sua API de notificações. </para>
+        <para
+>O <application
+>Solid</application
+> verifica se o valor do item <command
+>input.x11_options.Type</command
+> é igual a <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> ou <command
+>cursor</command
+>, ou então se o valor do item <command
+>input.x11_driver</command
+> é igual a <command
+>wacom</command
+>. </para>
+        <para
+>Envie por favor um e-mail ao autor, caso a sua mesa digitalizadora seja detectada pelo Solid, mas devolvendo outros valores, de modo a melhorar o suporte das mesas digitalizadoras. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>Miniaplicativo do plasma para a mesa digitalizadora</title>
+    <para
+>O miniaplicativo da mesa digitalizadora possibilita a alteração instantânea dos perfis. Além disso, você poderá alterar a rotação do painel, bem como a comutação entre o modo relativo e absoluto da caneta/borracha, independentemente da configuração atual do perfil. </para>
+    <para
+>Não é necessário adicionar o plasmoide para que este módulo funcione. O perfil predefinido será ativado pelo <link linkend="kded"
+>servidor da mesa digitalizadora</link
+>, assim que detectar a sua mesa digitalizadora, mesmo que não esteja usando o plasmoide. Este é apenas um auxiliar visual para mudar facilmente entre os vários perfis. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>Créditos e licença</title>
+    <para
+>Tradução de Marcus Gama <email
+>marcus.gama@gmail.com</email
+> e André Marcelo Alvarenga <email
+>alvarenga@kde.org</email
+></para
+> &underFDL; &underGPL; </chapter>
+</book>

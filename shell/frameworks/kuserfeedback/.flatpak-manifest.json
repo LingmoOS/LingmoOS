@@ -1,0 +1,35 @@
+{
+    "id": "org.kde.kuserfeedback-console",
+    "branch": "master",
+    "runtime": "org.kde.Platform",
+    "runtime-version": "6.6",
+    "sdk": "org.kde.Sdk",
+    "command": "UserFeedbackConsole",
+    "tags": ["nightly"],
+    "desktop-file-name-suffix": " (Nightly)",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--share=network"
+    ],
+    "modules": [
+        {
+            "name": "kuserfeedback",
+            "config-opts": [ "-DBUILD_TESTING=OFF", "-DENABLE_DOCS=OFF" ],
+            "buildsystem": "cmake-ninja",
+            "builddir": true,
+            "sources": [ { "type": "dir", "path": "." } ],
+            "cleanup": [ "/include", "/lib/cmake", "/mkspecs", "/etc/xdg/*categories", "/lib/libexec" ]
+        },
+        {
+            "name": "icon",
+            "buildsystem": "simple",
+            "build-commands": [
+                "mkdir -p /app/share/icons/hicolor/32x32/apps/",
+                "install -D /usr/share/icons/breeze/actions/16/search.svg /app/share/icons/hicolor/32x32/apps/"
+            ]
+        }
+    ]
+}

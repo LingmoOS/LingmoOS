@@ -1,0 +1,5 @@
+add_executable(ksvgtopng ksvgtopng.cpp)
+ecm_mark_nongui_executable(ksvgtopng)
+target_link_libraries(ksvgtopng Qt::Svg)
+install_compat_symlink(ksvgtopng)
+install(TARGETS ksvgtopng DESTINATION ${KDE_INSTALL_FULL_BINDIR})

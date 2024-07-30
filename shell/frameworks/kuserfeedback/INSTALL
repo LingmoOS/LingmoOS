@@ -1,0 +1,34 @@
+# Telemetry library, management/analysis console
+
+The usual cmake/make/make install.
+
+# Server
+
+Requires PHP >= 5.5 and Sqlite, MySQL or PostgreSQL, Apache with SSL set up.
+
+- copy src/server to your webserver
+- (alternatively) use "make deploy", after setting the SERVER_DEPLOY_HOST and SERVER_DEPLOY_PATH
+  cmake options accordingly
+- make sure .htaccess files are enabled by your Apache settings
+- set up authentication:
+    - users with access to the analytics sub-folder have read-only access to all product settings
+      and telemetry data
+    - users with additional access to the admin sub-folder have write access to all products
+- rename config/localconfig.php.example to config/localconfig.php and adjust
+  settings in there based on your database setup
+- connect to the server using either UserFeedbackConsole or the userfeedbackctl command line tool,
+  that will trigger the database
+- (optional) verify that access controls a set up correctly using the 'userfeedbackctl scan-server'
+  command
+
+Docker users might find https://github.com/KDAB/kuserfeedbackdocker useful.
+
+
+## Local Development
+
+The following setup works locally without the need of a full webserver with SSL and authentication
+setup. It's also used by the automated tests.
+
+- configure database access via src/server/config/localconfig.php as described above
+- in src/testserver, run: 'php -S localhost:1984 router.php'
+- connect via UserFeedbackConsole to trigger database setup

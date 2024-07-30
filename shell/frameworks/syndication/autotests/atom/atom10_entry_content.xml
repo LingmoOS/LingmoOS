@@ -1,0 +1,51 @@
+<!-- Copyright: Mark Pilgrim (feed parser test suite). See LICENSE.UNITTESTS for details. -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+<entry>
+    <title>This entry contains plain text with no type set</title>
+    <content>Me &amp; You, &lt; and &gt; History of the &lt;blink&gt; tag.</content>
+</entry>
+<entry>
+    <title>This entry contains plain text with type=text</title>
+    <content type="text">Me &amp; You. History of the &lt;blink&gt; tag.</content>
+</entry>
+<entry>
+    <title>This entry contains plain text with type=text/plain</title>
+    <content type="text/plain">Me &amp; You. History of the &lt;blink&gt; tag.</content>
+</entry>
+<entry>
+    <title>This entry contains escaped HTML with type=text/html</title>
+    <content type="text/html">Me &amp;amp; You. History of the &amp;lt;blink&amp;gt; tag.
+        And a &lt;a href=&quot;http://akregator.sf.net/&quot;>link&lt;/a></content>
+</entry>
+<entry>
+    <title>This entry contains escaped HTML with type=html</title>
+    <content type="html">Me &amp;amp; You. History of the &amp;lt;blink&amp;gt; tag.
+        And a &lt;a href=&quot;http://akregator.sf.net/&quot;>link&lt;/a></content>
+</entry>
+<entry>
+    <title>This entry links to remote content via src attribute</title>
+    <content src="http://example.com/movie.mp4"/>
+</entry>
+<entry>
+    <title>This entry contains embedded XHTML with type=xhtml</title>
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">A &amp; B. History of the &lt;blink&gt; tag.</div>
+    <div xmlns="http://www.w3.org/1999/xhtml">Example <b>Atom</b></div>
+    </content>
+</entry>
+
+<entry>
+    <title>This entry contains base64-encoded binary content (&quot;Example &lt;b>Atom&lt;/b>&quot;)</title>
+<content type="application/octet-stream">
+    RXhhbXBsZSA8Yj5BdG9tPC9iPg==
+</content>
+</entry>
+<entry>
+    <title>This entry contains embedded XHTML, but the mimetype is application/x-pdf, so 
+           the parser should try to interpret it as binary content (And fail gracefully, without
+           crashing)</title>
+    <content type="application/x-pdf"><div xmlns="http://www.w3.org/1999/xhtml">A &amp; B. History of the &lt;blink&gt; tag.</div>
+        <div xmlns="http://www.w3.org/1999/xhtml">Example <b>Atom</b></div>
+    </content>
+</entry>
+
+</feed>

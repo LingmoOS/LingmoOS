@@ -1,0 +1,15 @@
+
+let $b := for $_name in ('testInsert', 'testLookup', 'testReverseLookup', 'testRemoveKey', 'testRemoveValue', 'testUpdateKey', 'testUpdateValue')
+  let $a := for $_tag in (1, 2 , 3, 5, 8, 13, 21, 34, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 2500, 5000, 10000, 15000, 20000, 25000)
+      let $sum := for $num in (0 to 9)
+          for $i in doc(concat($container, '_', $type, '_', $type, $num, '.xml'))//TestCase/TestFunction[@name=$_name]/BenchmarkResult[@tag=$_tag]/@value
+            return $i
+
+        return <BenchmarkResult metric="InstructionReads" tag="{$_tag}" value="{max($sum)}" iterations="1" />
+  return   <TestFunction name="{$_name}">{$a}</TestFunction>
+return <TestCase name="BiHashBenchmarks">
+<Environment>
+    <QtVersion>{$cml_container}({$type}, {$type})</QtVersion>
+    <QTestVersion>{$cml_container}({$type}, {$type})</QTestVersion>
+</Environment>{$b}
+</TestCase>

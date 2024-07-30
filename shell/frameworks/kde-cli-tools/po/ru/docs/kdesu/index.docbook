@@ -1,0 +1,532 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Russian "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Руководство пользователя &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Екатерина</firstname
+> <surname
+>Пыжова</surname
+> <affiliation
+><address
+><email
+>haleth@yandex.ru</email
+></address
+></affiliation
+> <contrib
+>Перевод на русский язык</contrib
+></othercredit
+> <othercredit role="translator"
+><firstname
+>Олеся</firstname
+> <surname
+>Герасименко</surname
+> <affiliation
+><address
+><email
+>gammaray@basealt.ru</email
+></address
+></affiliation
+> <contrib
+>Перевод на русский язык</contrib
+></othercredit
+><othercredit role="reviewer"
+><firstname
+>Александр</firstname
+><surname
+>Яворский</surname
+><contrib
+>Рецензирование</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21 сентября 2010 г.</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; представляет собой графическую оболочку к &UNIX;-команде <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>пароль</keyword>
+<keyword
+>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Введение</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Добро пожаловать в &kdesu;! Эта программа представляет собой графическую оболочку к &UNIX;-команде <command
+>su</command
+> для среды &kde;. Позволяет запустить программу от имени другого пользователя при условии ввода пароля этого пользователя. &kdesu; — непривилегированная программа, она использует системную команду <command
+>su</command
+>.</para>
+
+<para
+>&kdesu; предоставляет ещё одну дополнительную возможность &mdash; запоминание паролей. При использовании этой функции необходимо всего один раз ввести пароль для каждой команды. Подробные сведения и анализ безопасности: <xref linkend="sec-password-keeping"/>.</para>
+
+<para
+>Программа предназначена для запуска из командной строки или файлов <filename
+>.desktop</filename
+>. Она запрашивает пароль пользователя <systemitem class="username"
+>root</systemitem
+>, используя графический интерфейс, но она, скорее, основана на слиянии командной строки и графического интерфейса, а не исключительно на графическом интерфейсе.</para>
+
+<para
+>Так команда <command
+>kdesu</command
+> теперь установлена не в <userinput
+> $(kf5-config --prefix)</userinput
+>/bin, а в <userinput
+>kf5-config --path libexec</userinput
+>, следовательно, не в переменной среды <envar
+>Path</envar
+>, для запуска этой команды необходимо использовать <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Использование &kdesu;</title>
+
+<para
+>Использовать &kdesu; просто. Синтаксис следующий:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> команда</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> файл</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> имя значка</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priority</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> пользователь</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Типовые параметры &kde;</arg
+> <arg choice="opt"
+>Типовые параметры &Qt;</arg
+> </cmdsynopsis>
+
+<para
+>Параметры командной строки описаны ниже.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>команда</replaceable
+></option
+></term>
+<listitem
+><para
+>Этот параметр позволяет указать команду для запуска с правами root. Это должен быть один аргумент. Поэтому, если требуется запустить новый диспетчер файлов, следует ввести следующее: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет выводить информацию для отладки.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>файл</replaceable
+></option
+></term>
+<listitem
+><para
+>Этот параметр позволяет эффективно использовать &kdesu; в файлах <filename
+>.desktop</filename
+>. При этом &kdesu; проверяет <parameter
+>файл</parameter
+>. Если он доступен для записи текущему пользователю, то &kdesu; запустит команду с правами этого пользователя. Иначе команда будет запущена с правами пользователя <parameter
+>пользователь</parameter
+> (root по умолчанию).</para>
+<para
+>Параметр <parameter
+>файл</parameter
+> анализируется следующим образом: если он начинается с <literal
+>/</literal
+>, то считается абсолютным путем. Иначе &mdash; именем глобального файла конфигурации &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>имя значка</replaceable
+></term>
+<listitem
+><para
+>Этот параметр позволяет указать значок, который следует показывать в окне ввода пароля. Расширение указывать не обязательно.</para>
+<para
+>Например, чтобы запустить браузер &konqueror; в режиме диспетчера файлов и показать значок &konqueror; в окне ввода пароля:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Этот параметр отключает сохранение пароля. Он делает недоступным флажок <guilabel
+>Сохранить пароль</guilabel
+> в окне ввода пароля.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>приоритет</replaceable
+></term>
+<listitem>
+<para
+>Этот параметр задаёт значение приоритета. Приоритет — это любое число от 0 до 100, где 100 означает наивысший приоритет, а 0 — низший. По умолчанию: 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Этот параметр задаёт использование приоритета реального времени.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Этот параметр останавливает управляющую программу kdesu. Подробные сведения: <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Этот параметр позволяет включить терминальный вывод, что делает невозможным запоминание паролей. Эта возможность в основном предназначена для отладки. Если требуется запустить обычное консольное приложение, используйте стандартную команду <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>пользователь</replaceable
+></term>
+<listitem
+><para
+>Чаще всего этот параметр используется в &kdesu; для запуска команды от имени суперпользователя, но также можно ввести любое имя пользователя и соответствующий пароль.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Внутренние особенности</title>
+
+<sect1 id="x-authentication">
+<title
+>Авторизация X</title>
+
+<para
+>Запускаемая программа будет работать с идентификатором пользователя root и, в общем случае, не будет иметь прав для доступа к X-дисплею. &kdesu; исправляет это, добавляя авторизационный cookie для дисплея во временный файл <filename
+>.Xauthority</filename
+>. После завершения команды файл удаляется. </para>
+
+<para
+>Если система X cookie не используется, это будет обнаружено &kdesu; и новый cookie не будет добавлен, но в этом случае будет необходимо убедиться, что для пользователя root разрешён доступ к дисплею.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Взаимодействие с <command
+>su</command
+></title>
+
+<para
+>&kdesu; использует системную команду <command
+>su</command
+>, чтобы получить привилегированный доступ. В этом разделе подробно объясняется то, как &kdesu; это делает. </para>
+
+<para
+>Так как некоторые реализации команды <command
+>su</command
+> (например, в &RedHat;) не позволяют вводить пароль, используя <literal
+>stdin</literal
+>, &kdesu; создаёт пару терминалов pty/tty и запускает <command
+>su</command
+> с его стандартными файловыми дескрипторами, настроенными на такой tty.</para>
+
+<para
+>Чтобы выполнить программу, которую выбрал пользователь, а не запустить оболочку интерактивно, для команды <command
+>su</command
+> используется аргумент <option
+>-c</option
+>. Этот аргумент понимается всеми  оболочками, соответственно, он должен быть переносимым. Команда <command
+>su</command
+> передаёт аргумент <option
+>-c</option
+> оболочке пользователя, которая и запускает программу на исполнение. Пример: <command
+>su <option
+>root -c <replaceable
+>программа</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Вместо прямого запуска команды пользователя через <command
+>su</command
+>, &kdesu; запускает небольшую программу, называемую <application
+>kdesu_stub</application
+>. Она (запущенная с правами требуемого пользователя) запрашивает определённую информацию от &kdesu; через канал pty/tty (stdin и stdout для этой программы), а затем уже выполняет программу пользователя. Передаваемая информация: номер X-дисплея, авторизационный X cookie (если доступен), переменная <envar
+>PATH</envar
+> и команда для запуска. Такая вспомогательная программа нужна, потому что X cookie содержит секретную информацию и поэтому не может быть передан в командной строке.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Проверка пароля</title>
+
+<para
+>&kdesu; проверяет введённый пароль и выдаёт сообщение об ошибке, если он не верен. Проверка организована с помощью выполнения программы-теста <filename
+>/bin/true</filename
+>. Если проверка пройдена успешно, пароль считается правильным.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Хранение паролей</title>
+
+<para
+>Для удобства пользователя в &kdesu; реализован механизм хранения паролей. В этом разделе освещены вопросы безопасности.</para>
+
+<para
+>Запоминание паролей в &kdesu; создаёт небольшую брешь в системе безопасности. Очевидно, что &kdesu; позволяет пользоваться этими паролями только пользователю с вашим идентификатором. Но если это реализовать без предосторожностей, системный уровень безопасности <systemitem class="username"
+>root</systemitem
+> понизится до уровня обычного пользователя (вас). И человек, который получит доступ к вашей учётной записи, получит доступ уровня <systemitem class="username"
+>root</systemitem
+>. &kdesu; пытается не допустить этого. Схема безопасности, используемая программой, обеспечивает достаточный уровень безопасности. Описание этой схемы приведено далее.</para>
+
+<para
+>&kdesu; использует управляющую программу, которая называется <application
+>kdesud</application
+>. Эта управляющая программа ожидает команды с &UNIX;-сокета, расположенного в <filename
+>/tmp</filename
+>. Режим его доступа равен 0600, то есть только пользователь с вашим идентификатором может соединиться с ним. Если хранение паролей включено, &kdesu; выполняет команды через эту управляющую программу. Программа пишет команды и пароль пользователя <systemitem class="username"
+>root</systemitem
+> в сокет, и управляющая программа выполняет команду <command
+>su</command
+>, как описано выше. После этого команда и пароль не удаляются, а хранятся в течение указанного времени (устанавливается в модуле настройки). Если другой запрос на запуск такой же команды приходит в течение этого периода времени, клиент может не предоставлять пароль. Чтобы не дать человеку, получившему доступ к вашей учётной записи, украсть у управляющей программы пароль (например, запуском отладчика), дляsgid сервиса (группа при запуске) установлено значение nogroup. Это не даёт обычным пользователям, в том числе и вам, получать пароли от процесса <application
+>kdesud</application
+>. Также эта управляющая программа устанавливает переменную окружения <envar
+>DISPLAY</envar
+> в значение при запуске. Всё, что сможет сделать взломщик, &mdash; это запустить на вашем дисплее приложение.</para>
+
+<para
+>Слабое место в этой схеме в том, что запускаемые программы могут быть написаны без соблюдения правил защиты (например, программы с setuid <systemitem class="username"
+>root</systemitem
+>). Это означает, что они могут вызвать переполнение буферов или другие проблемы, а взломщик может использовать это.</para>
+
+<para
+>Использование хранения паролей &mdash; это компромисс между безопасностью и удобством. Подумайте и определите, что имеет приоритетное значение, и, соответственно, следует ли пользоваться этой возможностью программы.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Автор</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>© &Geert.Jansen;, 2000</para>
+
+<para
+>Программа &kdesu; написана &Geert.Jansen;. Она частично основана на &kdesu;, версии 0.3, написанной Pietro Iglio. По договорённости между авторами дальнейшую поддержку этой программы будет выполнять &Geert.Jansen;.</para>
+
+<para
+>С автором можно связаться по адресу &Geert.Jansen.mail;. Пожалуйста, сообщайте о всех встреченных ошибках, чтобы автор мог их исправить. Также приветствуются любые предложения и комментарии.</para>
+
+ <para
+>Олеся Герасименко<email
+>gammaray@basealt.ru</email
+></para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

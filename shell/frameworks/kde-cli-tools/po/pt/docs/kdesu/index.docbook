@@ -1,0 +1,517 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Portuguese "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Manual do &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>José</firstname
+><surname
+>Pires</surname
+><affiliation
+><address
+><email
+>zepires@gmail.com</email
+></address
+></affiliation
+><contrib
+>Tradução</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-09-21</date>
+<releaseinfo
+>&kde; 4.5</releaseinfo>
+
+
+<abstract
+><para
+>O &kdesu; é um interface gráfico para o comando &UNIX; <command
+>su</command
+>.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>senha</keyword>
+<keyword
+>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introdução</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kde4-config - -path libexec)kdesu - - program_to_run
+  
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Bem-vindo ao &kdesu;! O &kdesu; é uma interface gráfica para o comando Unix <command
+>su</command
+>, para o ambiente de trabalho K. Permite-lhe executar um programa como um utilizador diferente, fornecendo a senha desse utilizador. O &kdesu; é um programa sem privilégios e usa o <command
+>su</command
+> do sistema.</para>
+
+<para
+>O &kdesu; tem uma função adicional: permite ao utilizador recordar as senhas. Se estiver a usar esta funcionalidade, necessita apenas de introduzir a senha uma vez para cada comando. Veja em <xref linkend="sec-password-keeping"/> para mais informações e uma análise à segurança.</para>
+
+<para
+>Este programa pretende ser executado a partir da linha de comandos ou de ficheiros <filename
+>.desktop</filename
+>. Embora seja pedida a senha do <systemitem class="username"
+>root</systemitem
+>, usando uma janela gráfica, é considerada como sendo mais uma associação linha de comando &lt;-&gt; gráfica em vez de um puro programa gráfico.</para>
+
+<para
+>Dado que o <command
+>kdesu</command
+> não está mais instalado em <userinput
+> $(kde4-config --prefix)</userinput
+>/bin mas sim em <userinput
+>kde4-config --path libexec</userinput
+> e, por isso, fora da sua <envar
+>Path</envar
+>, terá de usar o comando <userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+></userinput
+> para invocar o <command
+>kdesu</command
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Usar o &kdesu;</title>
+
+<para
+>A utilização do &kdesu; é fácil. A sintaxe é a seguinte:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> comando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> ficheiro</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nome do ícone</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioridade</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> utilizador</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> ID</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opções Genéricas do &kde;</arg
+> <arg choice="opt"
+>Opções Genéricas do Qt</arg
+> </cmdsynopsis>
+
+<para
+>As opções da linha de comandos são explicadas em baixo.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>comando</replaceable
+></option
+></term>
+<listitem
+><para
+>Isto indica o comando a ser executado como 'root'. Tem de ser passado um argumento. Assim se, por exemplo, quiser iniciar um novo gestor de ficheiros, iria introduzir na linha de comandos: <userinput
+>$(kde4-config --path libexec)<command
+>kdesu<option
+>-c <replaceable
+>&dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Mostra informações sobre a depuração.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>ficheiro</replaceable
+></option
+></term>
+<listitem
+><para
+>Esta opção permite um uso eficiente do &kdesu; em ficheiros <filename
+>.desktop</filename
+>. Isto diz ao &kdesu; para examinar o ficheiro indicado em <parameter
+>ficheiro</parameter
+>. Se este ficheiro puder ser alterado pelo utilizador actual, o &kdesu; irá executar o comando com esse utilizador. Se não puder ser alterado, o comando é executado com o utilizador <parameter
+>utilizador</parameter
+> (o 'root', por omissão).</para>
+<para
+>O <parameter
+>ficheiro</parameter
+> é avaliado da seguinte maneira: se o <parameter
+>ficheiro</parameter
+> começar com um <literal
+>/</literal
+>, é tomado como um nome de ficheiro absoluto. De outra maneira, é tomado como o nome de um ficheiro de configuração global do &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nome do ícone</replaceable
+></term>
+<listitem
+><para
+>Indique o ícone a usar na janela da senha. Poderá indicar apenas o nome, sem qualquer extensão.</para>
+<para
+>Por exemplo, para executar o &konqueror; como gestor de ficheiros e mostrar o ícone do &konqueror; na janela da senha:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Não memorizar a senha. Isto desactiva a opção "<guilabel
+>Guardar a senha</guilabel
+>" na janela correspondente.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioridade</replaceable
+></term>
+<listitem>
+<para
+>Indica o valor da prioridade. A prioridade é um número qualquer entre 0 e 100, onde o 100 corresponde à prioridade máxima e o 0 à mínima. O valor por omissão é 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Usa o escalonamento em tempo-real.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Pára o servidor do 'kdesu'. Veja em <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Permite enviar o resultado para o terminal. Isto desactiva a memorização de senhas. É largamente usado para efeitos de depuração; se você quiser executar uma aplicação no modo de consola, use o comando "<command
+>su</command
+>" normal.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>utilizador</replaceable
+></term>
+<listitem
+><para
+>Embora a utilização mais comum do &kdesu; seja correr um comando como super-utilizador, poderá indicar qualquer nome de utilizador e a senha apropriada.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Detalhes Internos</title>
+
+<sect1 id="x-authentication">
+<title
+>Autenticação X</title>
+
+<para
+>O programa que executar irá correr com o utilizador 'root' e, geralmente, não terá autorização para aceder ao seu ecrã do X. O &kdesu; contorna isto, adicionando uma 'cookie' de autenticação para o seu ecrã, num ficheiro temporário <filename
+>.Xauthority</filename
+>. Assim que o comando é terminado, o ficheiro é removido. </para>
+
+<para
+>Se você não usar os 'cookies' do X, então estará por sua conta e risco. O &kdesu; irá detectar isto e não adicionará qualquer 'cookie', contudo dever-se-á certificar que é permitido ao 'root' aceder ao seu ecrã.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Interface para o <command
+>su</command
+></title>
+
+<para
+>O &kdesu; usa o comando <command
+>su</command
+> do sistema para obter privilégios. Nesta secção, serão explicados os detalhes de como o &kdesu; faz isso. </para>
+
+<para
+>Dado que algumas das implementações do <command
+>su</command
+> (&ie; a da &RedHat;) não querem ler a senha a partir do <literal
+>stdin</literal
+>, o &kdesu; cria um par PTY/TTY e executa o <command
+>su</command
+> com os seus descritores-padrão de ficheiros associados ao TTY.</para>
+
+<para
+>Para executar o comando seleccionado pelo utilizador, em vez de uma linha de comandos interactiva, o &kdesu; usa o argumento <option
+>-c</option
+> com o <command
+>su</command
+>. Este argumento é entendido por todas as linhas de comando conhecidas, por isso deve funcionar sem problemas. O <command
+>su</command
+> passa o argumento <option
+>-c</option
+> para a linha de comandos de destino do utilizador, para que esta execute o programa. Um comando de exemplo: <command
+>su<option
+>root -c <replaceable
+>programa</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Em vez de executar o comando do utilizador directamente com o <command
+>su</command
+>, o &kdesu; executa uma pequena porção de programa chamada <application
+>kdesu_stub</application
+>. Esta porção (correndo com o utilizador de destino), pede alguma informação ao &kdesu; sobre o canal PTY/TTY (a parte do 'stdin' e 'stdout') e, a seguir, executa o programa do utilizador. A informação recebida é: o ecrã do X, uma 'cookie' de autenticação X (se disponível), o <envar
+>PATH</envar
+> e o comando a executar. A razão porque é usada uma parte do programa é que a 'cookie' do X contém informação privada e, por conseguinte, não pode ser passada na linha de comandos.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Verificação de Senhas</title>
+
+<para
+>O &kdesu; verificará a senha que o utilizador introduziu e dá uma mensagem de erro se não for correcta. A verificação é feita executando um programa de teste: /bin/true. Se obtiver sucesso, a senha é assumida como correcta.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Guardar Senhas</title>
+
+<para
+>Para o conforto do utilizador, o &kdesu; implementou a função <quote
+>Guardar a senha</quote
+>. Se estiver interessado em segurança, deverá ler este parágrafo.</para>
+
+<para
+>Ao permitir que o &kdesu; guarde as senhas, abre um buraco (pequeno) na segurança do seu sistema. Obviamente, o KDE não permite que qualquer um use as senhas mas apenas o seu ID de utilizador mas, se isto for feito sem precauções, irá diminuir o nível de segurança do <systemitem class="username"
+>root</systemitem
+> para um utilizador normal (como você próprio). Um 'hacker' que entrar na sua conta, obterá acesso de <systemitem class="username"
+>root</systemitem
+>. O &kdesu; tenta prevenir isto. O esquema de segurança que usa é razoavelmente seguro e é explicado aqui.</para>
+
+<para
+>O &kdesu; usa um servidor, chamado <application
+>kdesud</application
+>. O servidor espera num 'socket' UNIX em <filename
+>/tmp</filename
+> por comandos. O modo de permissões do 'socket' é 0600, de maneira a que apenas o seu utilizador possa ligar-se a ele. Se a opção <quote
+>Guardar a senha</quote
+> estiver activada, o &kdesu; executa os comandos através deste servidor. Escreva o comando e a senha do <systemitem class="username"
+>root</systemitem
+>, para que o 'socket' e o servidor executem o comando, usando o <command
+>su</command
+>, como descrito anteriormente. Depois disto, o comando e a senha não serão deitados fora. Em vez disso, são mantidas durante um espaço de tempo. Este é o tempo-limite do módulo de controlo. Se outro pedido para o mesmo comando chegar dentro deste período de tempo, o cliente não terá de fornecer a senha. Para não deixar que os 'hackers' entrem na sua conta, para roubar senhas do servidor (por exemplo, anexando um depurador), o servidor é instalado com 'set-group-id nogroup'. Isto deve fazer com que os utilizadores normais (incluindo você mesmo) não consigam obter senhas do processo <application
+>kdesud</application
+>. O servidor define ainda a variável de ambiente <envar
+>DISPLAY</envar
+>, com o valor que tinha quando foi iniciado. A única coisa que um 'hacker' pode fazer é executar uma aplicação no seu ecrã.</para>
+
+<para
+>Um ponto fraco neste esquema é que os programas que você executar não são escritos, provavelmente, tendo em mente a segurança (como os programas que definem um setuid <systemitem class="username"
+>root</systemitem
+>). Isto significa que eles podem ter sobrecargas de 'buffers' ou outros problemas que um 'hacker' pode explorar.</para>
+
+<para
+>O uso da função para guardar as senhas é um compromisso entre o conforto e a segurança. Será encorajado a pensar sobre isto e decidir por si mesmo, se quiser usar esta função ou não.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Autoria</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Copyright 2000 &Geert.Jansen;</para>
+
+<para
+>O &kdesu; foi escrito por &Geert.Jansen;. É baseado no &kdesu; versão 0.3 de Pietro Iglio. O Pietro e eu acordámos que eu faria a manutenção deste programa no futuro.</para>
+
+<para
+>O autor pode ser contactado através do e-mail em &Geert.Jansen.mail;. Por favor relate quaisquer erros que encontrar, de maneira a que eu os possa arranjar. Se tiver uma sugestão, sinta-se à vontade para me contactar.</para>
+
+<para
+>Tradução de José Nuno Pires <email
+>zepires@gmail.com</email
+></para
+> 
+&underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

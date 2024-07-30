@@ -1,0 +1,379 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % German "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>KDE-Benutzerhandbuch</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>2010-09-18</date>
+<productname
+>K Desktop Environment</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Führt ein Programm mit erweiterten Rechten aus.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> command</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> icon name</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> priority</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> user</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Allgemeine &kde;-Optionen</arg
+> <arg choice="opt"
+>Allgemeine &Qt;-Optionen</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Beschreibung</title>
+<para
+>&kdesu; ist die grafische Oberfläche von KDE für den &UNIX;-Befehl <command
+>su</command
+>. Sie können damit durch Eingabe des Passworts ein Programm unter einem anderen Benutzer laufen lassen. &kdesu; ist ein unprivilegiertes Programm, es verwendet das im System vorhandene <command
+>su</command
+>.</para>
+
+<para
+>&kdesu; bietet eine zusätzliche Funktionalität: Es kann sich Passwörter merken. Wenn Sie diese Funktion benutzen, müssen Sie für jeden Befehl das Passwort nur einmal eingeben.</para>
+
+<para
+>Dieses Programm ist für den Start aus der Befehlszeile oder über <filename
+>.desktop</filename
+>-Dateien gedacht.</para>
+
+<para
+><command
+>kdesu</command
+> wird nicht mehr in <userinput
+> $(kf5-config --prefix)</userinput
+>/bin, sondern in <userinput
+>kf5-config --path libexec</userinput
+> installiert. Daher ist es nicht mehr in Ihrem <envar
+>Pfad</envar
+>. Verwenden Sie deshalb <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+>, um <command
+>kdesu</command
+> aufzurufen.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Parameter</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>command</replaceable
+></option
+></term>
+<listitem
+><para
+>Dies gibt den Befehl an, der als Benutzer root ausgeführt werden soll. Er muss als Parameter übergeben werden. Wenn Sie beispielsweise eine neue Dateiverwaltung starten wollen, geben Sie auf der Befehlszeile Folgendes ein: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Debug-Informationen anzeigen.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>datei</replaceable
+></option
+></term>
+<listitem
+><para
+>Dieser Parameter erlaubt die Verwendung von in &kdesu; in <filename
+>.desktop</filename
+>-Dateien. Hierüber wird &kdesu; mitgeteilt die durch <parameter
+>file</parameter
+> angegebene Datei zu untersuchen. Ist die Datei vom aktuellen Benutzer schreibbar, führt &kdesu; den Befehl als aktueller Benutzer aus. Ist die Datei nicht schreibbar, wird der Befehl als Benutzer <parameter
+>user</parameter
+> (Vorgabe ist hier root) ausgeführt.</para>
+<para
+><parameter
+>file</parameter
+> wird wie folgt ausgewertet: wenn <parameter
+>file</parameter
+> mit einem <literal
+>/</literal
+> beginnt, wird er als absoluter Dateiname behandelt. Anderenfalls wird er als Name einer globalen Einrichtungsdatei von &kde; behandelt.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>symbolname</replaceable
+></term>
+<listitem
+><para
+>Angabe des Symbols für den Passwort-Dialog. Sie können hier auch nur den Namen ohne Erweiterung angeben.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Passwort nicht merken. Hierüber wird das Ankreuzfeld <guilabel
+>Passwort beibehalten</guilabel
+> deaktiviert.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>priorität</replaceable
+></term>
+<listitem>
+<para
+>Legt die Priorität fest. Diese kann eine beliebige Zahl zwischen 0 und 100 sein, wobei 100 die höchste Priorität ist und 0 die niedrigste. Die Voreinstellung ist 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Echtzeit-Priorität verwenden.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Hält den kdesu-Dienst an. Das ist der Dienst, der im Hintergrund die Passwörter vorhält. Diese Funktion kann auch beim ersten Start von &kdesu; über <option
+>-n</option
+> abgeschaltet werden.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Terminal-Ausgabe aktivieren. Hierdurch wird das Beibehalten der Passwörter ausgeschaltet. Dies dient hauptsächlich dem Debuggen. Wenn Sie eine Anwendung für die Konsole ausführen wollen, benutzen Sie stattdessen den Befehl <command
+>su</command
+>.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> benutzer</replaceable
+></term>
+<listitem
+><para
+>Obwohl &kdesu; meistens dazu verwendet wird einen Befehl als Systemverwalter auszuführen, können Sie jeden Benutzer mit dem entsprechenden Passwort angeben.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Keinen Ignorieren-Knopf anzeigen.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></term>
+<listitem
+><para
+>Macht den Dialog temporär für das durch winid angegebene Fenster.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Siehe auch</title>
+<para
+>su(1)</para>
+
+<para
+>Eine ausführlichere Dokumentation finden Sie über <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (Geben Sie diese &URL; in die Adressleiste von &konqueror; ein oder rufen Sie <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+> auf.)</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Beispiele</title>
+<para
+>Starte <command
+>kfmclient</command
+> als Benutzer <systemitem class="username"
+>jim</systemitem
+>, und zeige das Symbole von &konqueror; im Passwortdialog:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jim</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Autoren</title>
+<para
+>&kdesu; wurde geschrieben von &Geert.Jansen; &Geert.Jansen.mail; und <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

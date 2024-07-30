@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>devicedetect.vcl</title>
+<meta name="generator" content="KF5::SyntaxHighlighting - Definition (Varnish Configuration Language) - Theme (Breeze Light)"/>
+</head><body style="background-color:#ffffff;color:#1f1c1b"><pre>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># Copyright (c) 2016-2018 Varnish Cache project</span>
+<span style="color:#898887"># Copyright (c) 2012-2016 Varnish Software AS</span>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># </span><span style="color:#ca60ca;font-style:italic">SPDX-License-Identifier:</span><span style="color:#ca60ca;font-style:italic"> </span><span style="color:#ca60ca;font-style:italic">BSD-2-Clause</span>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># Redistribution and use in source and binary forms, with or without</span>
+<span style="color:#898887"># modification, are permitted provided that the following conditions</span>
+<span style="color:#898887"># are met:</span>
+<span style="color:#898887"># 1. Redistributions of source code must retain the above copyright</span>
+<span style="color:#898887">#    notice, this list of conditions and the following disclaimer.</span>
+<span style="color:#898887"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span style="color:#898887">#    notice, this list of conditions and the following disclaimer in the</span>
+<span style="color:#898887">#    documentation and/or other materials provided with the distribution.</span>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND</span>
+<span style="color:#898887"># ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span style="color:#898887"># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
+<span style="color:#898887"># ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE</span>
+<span style="color:#898887"># FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span style="color:#898887"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span>
+<span style="color:#898887"># OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span>
+<span style="color:#898887"># HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<span style="color:#898887"># LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span>
+<span style="color:#898887"># OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span>
+<span style="color:#898887"># SUCH DAMAGE.</span>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># detectdevice.vcl - regex based device detection for Varnish</span>
+<span style="color:#898887"># https://github.com/varnishcache/varnish-devicedetect/</span>
+<span style="color:#898887">#</span>
+<span style="color:#898887"># Original author: Lasse Karstensen &lt;lkarsten@varnish-software.com></span>
+
+<span style="font-weight:bold">sub</span> devicedetect {
+	<span style="font-weight:bold">unset</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span>;
+	<span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"pc"</span>;
+
+	<span style="color:#898887"># Handle that a cookie may override the detection alltogether.</span>
+	<span style="font-weight:bold">if</span> (<span style="color:#0095ff">req.http.Cookie</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)X-UA-Device-force"</span>) {
+		<span style="color:#898887">/* ;?? means zero or one ;, non-greedy to match the first. */</span>
+		<span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#644a9b">regsub</span>(<span style="color:#0095ff">req.http.Cookie</span>, <span style="color:#bf0303">"(?i).*X-UA-Device-force=([^;]+);??.*"</span>, <span style="color:#bf0303">"\1"</span>);
+		<span style="color:#898887">/* Clean up our mess in the cookie header */</span>
+		<span style="font-weight:bold">set</span> <span style="color:#0095ff">req.http.Cookie</span> <span style="color:#006e28">=</span> <span style="color:#644a9b">regsuball</span>(<span style="color:#0095ff">req.http.Cookie</span>, <span style="color:#bf0303">"(^|; ) *X-UA-Device-force=[^;]+;? *"</span>, <span style="color:#bf0303">"\1"</span>);
+		<span style="color:#898887">/* If the cookie header is now empty, or just whitespace, unset it. */</span>
+		<span style="font-weight:bold">if</span> (<span style="color:#0095ff">req.http.Cookie</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"^ *$"</span>) { <span style="font-weight:bold">unset</span> <span style="color:#0095ff">req.http.Cookie</span>; }
+	} <span style="font-weight:bold">else</span> {
+        <span style="font-weight:bold">if</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"\(compatible; Googlebot-Mobile/2.1; \+http://www.google.com/bot.html\)"</span> <span style="color:#006e28">||</span>
+            (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(Android|iPhone)"</span> <span style="color:#006e28">&amp;&amp;</span> <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"\(compatible.?; Googlebot/2.1.?; \+http://www.google.com/bot.html"</span>) <span style="color:#006e28">||</span>
+			(<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(iPhone|Windows Phone)"</span> <span style="color:#006e28">&amp;&amp;</span> <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"\(compatible; bingbot/2.0; \+http://www.bing.com/bingbot.htm"</span>)) {
+            <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-bot"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)(ads|google|bing|msn|yandex|baidu|ro|career|seznam|)bot"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)(baidu|jike|symantec)spider"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)pingdom"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)facebookexternalhit"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)scanner"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)slurp"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)(web)crawler"</span>) {
+			<span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"bot"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)ipad"</span>)        { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-ipad"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)ip(hone|od)"</span>) { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-iphone"</span>; }
+		<span style="color:#898887">/* how do we differ between an android phone and an android tablet?</span>
+<span style="color:#898887">		   http://stackoverflow.com/questions/5341637/how-do-detect-android-tablets-in-general-useragent */</span>
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)android.*(mobile|mini)"</span>) { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-android"</span>; }
+		<span style="color:#898887">// android 3/honeycomb was just about tablet-only, and any phones will probably handle a bigger page layout.</span>
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)android 3"</span>)              { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-android"</span>; }
+		<span style="color:#898887">/* Opera Mobile */</span>
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Opera Mobi"</span>)                  { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-smartphone"</span>; }
+		<span style="color:#898887">// May very well give false positives towards android tablets. Suggestions welcome.</span>
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)android"</span>)         { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-android"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"PlayBook; U; RIM Tablet"</span>)         { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-rim"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"hp-tablet.*TouchPad"</span>)         { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-hp"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Kindle/3"</span>)         { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-kindle"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Touch.+Tablet PC"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Windows NT [0-9.]+; ARM;"</span> ) {
+		        <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"tablet-microsoft"</span>;
+		}
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Mobile.+Firefox"</span>)     { <span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-firefoxos"</span>; }
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"^HTC"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"Fennec"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"IEMobile"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"BlackBerry"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"BB10.*Mobile"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"GT-.*Build/GINGERBREAD"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"SymbianOS.*AppleWebKit"</span>) {
+			<span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-smartphone"</span>;
+		}
+		<span style="font-weight:bold">elsif</span> (<span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)symbian"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)^sonyericsson"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)^nokia"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)^samsung"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)^lg"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)bada"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)blazer"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)cellphone"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)iemobile"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)midp-2.0"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)u990"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)netfront"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)opera mini"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)palm"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)nintendo wii"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)playstation portable"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)portalmmm"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)proxinet"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)windows\ ?ce"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)winwap"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)eudoraweb"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)htc"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)240x320"</span> <span style="color:#006e28">||</span>
+		    <span style="color:#0095ff">req.http.User-Agent</span> <span style="color:#006e28">~</span> <span style="color:#bf0303">"(?i)avantgo"</span>) {
+			<span style="font-weight:bold">set</span> <span style="color:#0095ff;font-style:italic">req.http.X-UA-Device</span> <span style="color:#006e28">=</span> <span style="color:#bf0303">"mobile-generic"</span>;
+		}
+	}
+}
+</pre></body></html>

@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: KDE Contributors
+# SPDX-License-Identifier: BSD-2-Clause
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(KF6NewStuffCore "@KF_VERSION@")
+find_dependency(Qt6Widgets @REQUIRED_QT_VERSION@)
+
+if (NOT @BUILD_SHARED_LIBS@)
+    find_dependency(Qt6Qml @REQUIRED_QT_VERSION@)
+    find_dependency(Qt6Quick @REQUIRED_QT_VERSION@)
+
+    find_dependency(KF6I18n "@KF_DEP_VERSION@")
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF6NewStuffTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@

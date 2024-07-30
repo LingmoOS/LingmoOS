@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ ModemManager 1.0 Interface Specification
+
+   Copyright (C) 2008 Novell, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2011-2013 Google, Inc.
+   Copyright (C) 2011-2013 Lanedo GmbH
+-->
+
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <!--
+      org.freedesktop.ModemManager1.Modem.Location:
+      @short_description: The ModemManager Location interface.
+
+      The Location interface allows devices to provide location information to
+      client applications. Not all devices can provide this information, or even
+      if they do, they may not be able to provide it while a data session is
+      active.
+  -->
+  <interface name="org.freedesktop.ModemManager1.Modem.Location">
+
+    <!--
+        Setup:
+        @sources: Bitmask of <link linkend="MMModemLocationSource">MMModemLocationSource</link> flags, specifying which sources should get enabled or disabled. <link linkend="MM-MODEM-LOCATION-SOURCE-NONE:CAPS">MM_MODEM_LOCATION_SOURCE_NONE</link> will disable all location gathering.
+        @signal_location: Flag to control whether the device emits signals with the new location information. This argument is ignored when disabling location information gathering.
+
+        Configure the location sources to use when gathering location
+        information. Also enable or disable location information gathering.
+        This method may require the client to authenticate itself.
+
+        When signals are emitted, any client application (including malicious
+        ones!) can listen for location updates unless D-Bus permissions restrict
+        these signals from certain users. If further security is desired, the
+        @signal_location argument can be set to %FALSE to disable location
+        updates via D-Bus signals and require applications to call
+        authenticated APIs (like
+        <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Location.GetLocation">GetLocation()</link>
+        ) to get
+        location information.
+    -->
+    <method name="Setup">
+      <arg name="sources"         type="u" direction="in" />
+      <arg name="signal_location" type="b" direction="in" />
+    </method>
+
+    <!--
+        GetLocation:
+        @location: Dictionary of available location information when location information gathering is enabled.
+
+        Return current location information, if any. If the modem supports
+        multiple location types it may return more than one. See the
+        #org.freedesktop.ModemManager1.Modem.Location:Location property
+        for more information on the dictionary returned at @location.
+
+        This method may require the client to authenticate itself.
+    -->
+    <method name="GetLocation">
+      <arg name="Location" type="a{uv}" direction="out">
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="LocationInformationMap"/>
+      </arg>
+    </method>
+
+    <!--
+        Capabilities:
+
+        Bitmask of <link linkend="MMModemLocationSource">MMModemLocationSource</link>
+        values, specifying the supported location sources.
+    -->
+    <property name="Capabilities" type="u" access="read" />
+
+    <!--
+        Enabled:
+
+        Bitmask specifying which of the supported
+        <link linkend="MMModemLocationSource">MMModemLocationSource</link>
+        location sources is currently enabled in the device.
+    -->
+    <property name="Enabled" type="u" access="read" />
+
+    <!--
+        SignalsLocation:
+
+        %TRUE if location updates will be emitted via D-Bus signals, %FALSE if
+        location updates will not be emitted.
+
+        See the
+        <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Location.Setup">Setup()</link>
+        method for more information.
+    -->
+    <property name="SignalsLocation" type="b" access="read" />
+
+    <!--
+        Location:
+
+        Dictionary of available location information when location information
+        gathering is enabled. If the modem supports multiple location types it
+        may return more than one here.
+
+        Note that if the device was told not to emit updated location
+        information when location information gathering was initially enabled,
+        this property may not return any location information for security reasons.
+
+        This dictionary is composed of a
+        <link linkend="MMModemLocationSource">MMModemLocationSource</link>
+        key, with an associated data which contains type-specific location
+        information:
+
+        <variablelist>
+        <varlistentry><term><link linkend="MM-MODEM-LOCATION-SOURCE-3GPP-LAC-CI:CAPS">MM_MODEM_LOCATION_SOURCE_3GPP_LAC_CI</link></term>
+          <listitem>
+            <para>
+              Devices supporting this
+              capability return a string in the format <literal>"MCC,MNC,LAC,CI"</literal> (without the
+              quotes of course) where the following applies:
+            </para>
+            <variablelist>
+              <varlistentry><term><literal>MCC</literal></term>
+                <listitem>
+                  This is the three-digit ITU E.212 Mobile Country Code of the
+                  network provider to which the mobile is currently registered.
+                  e.g. <literal>"310"</literal>.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>MNC</literal></term>
+                <listitem>
+                  This is the two- or three-digit GSM Mobile Network Code of the
+                  network provider to which the mobile is currently registered.
+                  e.g. <literal>"26"</literal> or <literal>"260"</literal>.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>LAC</literal></term>
+                <listitem>
+                  This is the two-byte Location Area Code of the base station with
+                  which the mobile is registered, in upper-case hexadecimal format
+                  without leading zeros, as specified in 3GPP TS 27.007 section
+                  10.1.19. e.g. <literal>"84CD"</literal>.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>CI</literal></term>
+                <listitem>
+                  This is the two- or four-byte Cell Identifier with which the mobile
+                  is registered, in upper-case hexadecimal format without leading
+                  zeros, as specified in 3GPP TS 27.007.
+                  e.g. <literal>"2BAF"</literal> or <literal>"D30156"</literal>.
+                </listitem>
+              </varlistentry>
+            </variablelist>
+            <para>
+              The entire string may only be composed of the ASCII digits <literal>[0-9]</literal>,
+              the alphabetical characters <literal>[A-F]</literal>, and the comma (<literal>,</literal>) character.
+              No other characters are allowed.  For example: <literal>"310,260,8BE3,2BAF"</literal> or
+              <literal>"250,40,CE00,1CEAD8F0"</literal>.
+            </para>
+            <para>
+              If any of these four items (<literal>MCC</literal>, <literal>MNC</literal>,
+              <literal>LAC</literal>, <literal>CI</literal>) is unknown or the
+              mobile is not registered with a network, then the
+              <link linkend="MM-MODEM-LOCATION-SOURCE-3GPP-LAC-CI:CAPS">MM_MODEM_LOCATION_SOURCE_3GPP_LAC_CI</link>
+              location
+              information item should not be provided as a returned value from the
+              <link linkend="gdbus-method-org-freedesktop-ModemManager1-Modem-Location.GetLocation">GetLocation()</link>
+              method or in the #org.freedesktop.ModemManager1.Modem.Location:Location property.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><link linkend="MM-MODEM-LOCATION-SOURCE-GPS-RAW:CAPS">MM_MODEM_LOCATION_SOURCE_GPS_RAW</link></term>
+          <listitem>
+            <para>
+              Devices supporting this
+              capability return a D-Bus dictionary (signature <literal>"a{sv}"</literal>) mapping well-known
+              keys to values with defined formats.
+            </para>
+            <para>
+              The allowed key/value pairs and their formats are:
+            </para>
+            <variablelist>
+              <varlistentry><term><literal>"utc-time"</literal></term>
+                <listitem>
+                  (Required) UTC time in ISO 8601 format, given as a string value (signature <literal>"s"</literal>). e.g. <literal>203015</literal>.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>"latitude"</literal></term>
+                <listitem>
+                  (Required) Latitude in Decimal Degrees (positive numbers mean N quadrasphere, negative mean S quadrasphere), given as a double value (signature <literal>"d"</literal>). e.g. <literal>38.889722</literal>, meaning 38d 53' 22" N.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>"longitude"</literal></term>
+                <listitem>
+                  (Required) Longitude in Decimal Degrees (positive numbers mean E quadrasphere, negative mean W quadrasphere), given as a double value (signature <literal>"d"</literal>). e.g. <literal>-77.008889</literal>, meaning 77d 0' 32" W.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>"altitude"</literal></term>
+                <listitem>
+                  (Optional) Altitude above sea level in meters, given as a double value (signature <literal>"d"</literal>). e.g. <literal>33.5</literal>.
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><link linkend="MM-MODEM-LOCATION-SOURCE-GPS-NMEA:CAPS">MM_MODEM_LOCATION_SOURCE_GPS_NMEA</link></term>
+          <listitem>
+            <para>
+              Devices supporting this capability return
+              a string containing one or more NMEA sentences (D-Bus signature <literal>'s'</literal>).
+              The manager will cache the most recent NMEA sentence of each type for
+              a period of time not less than 30 seconds.  When reporting multiple
+              NMEA sentences, sentences shall be separated by an ASCII Carriage
+              Return and Line Feed (<literal>&lt;CR&gt;&lt;LF&gt;</literal>) sequence.
+            </para>
+            <para>
+              For example, if the device sends a <literal>$GPRMC</literal> sentence immediately
+              followed by a <literal>$GPGGA</literal> sentence, the reported location string would be
+              (where of course the <literal>&lt;CR&gt;&lt;LF&gt;</literal> is replaced with the actual
+              ASCII <literal>CR</literal> (0x0D) and <literal>LF</literal> (0x0A) control characters):
+              <para><literal>
+                $GPRMC,134523.92,V,,,,,,,030136,,,N*73&lt;CR&gt;&lt;LF&gt;$GPGGA,,,,,,0,00,0.5,,M,0.0001999,M,0.0000099,0000*45
+              </literal></para>
+              If the device sends a new <literal>$GPRMC</literal> three seconds later, the new <literal>$GPRMC</literal>
+              replaces the previously received <literal>$GPRMC</literal> sentence, and the updated
+              string would be:
+              <para><literal>
+                $GPRMC,134526.92,V,,,,,,,030136,,,N*76&lt;CR&gt;&lt;LF&gt;$GPGGA,,,,,,0,00,0.5,,M,0.0001999,M,0.0000099,0000*45
+              </literal></para>
+              If the device then sends a <literal>$GPGSA</literal> sentence about 5 seconds later, the
+              <literal>$GPGSA</literal> sentence is added to the string (since no <literal>$GPGSA</literal> sentence was
+              obviously received in this session), the updated string would be:
+              <para><literal>
+                $GPRMC,134526.92,V,,,,,,,030136,,,N*76&lt;CR&gt;&lt;LF&gt;$GPGGA,,,,,,0,00,0.5,,M,0.0001999,M,0.0000099,0000*45&lt;CR&gt;&lt;LF&gt;$GPGSA,A,1,,,,,,,,,,,,,1.1,0.5,1.0*34
+              </literal></para>
+              The manager may discard any cached sentences older than 30 seconds.
+            </para>
+            <para>
+              This allows clients to read the latest positioning data as soon as
+              possible after they start, even if the device is not providing
+              frequent location data updates.
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry><term><link linkend="MM-MODEM-LOCATION-SOURCE-CDMA-BS:CAPS">MM_MODEM_LOCATION_SOURCE_CDMA_BS</link></term>
+          <listitem>
+            <para>
+              Devices supporting this
+              capability return a D-Bus dictionary (signature <literal>"a{sv}"</literal>) mapping well-known
+              keys to values with defined formats.
+            </para>
+            <para>
+              The allowed key/value pairs and their formats are:
+            </para>
+            <variablelist>
+              <varlistentry><term><literal>"latitude"</literal></term>
+                <listitem>
+                  (Required) Latitude in Decimal Degrees (positive numbers mean N quadrasphere, negative mean S quadrasphere), given as a double value (signature <literal>"d"</literal>). e.g. <literal>38.889722</literal>, meaning 38d 53' 22" N.
+                </listitem>
+              </varlistentry>
+              <varlistentry><term><literal>"longitude"</literal></term>
+                <listitem>
+                  (Required) Longitude in Decimal Degrees (positive numbers mean E quadrasphere, negative mean W quadrasphere), given as a double value (signature <literal>"d"</literal>). e.g. <literal>-77.008889</literal>, meaning 77d 0' 32" W.
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          </listitem>
+        </varlistentry>
+        </variablelist>
+    -->
+    <property name="Location" type="a{uv}" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="LocationInformationMap"/>
+    </property>
+
+  </interface>
+</node>

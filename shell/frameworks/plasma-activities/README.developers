@@ -1,0 +1,87 @@
+
+
+.\" " " " " " " " " " " " " " " " " " " " " " " " " " " "
+.\"                                                     "
+.\" It is best to view this file with the man tool:     "
+.\" man ./README.developers                             "
+.\"                                                     "
+.\" " " " " " " " " " " " " " " " " " " " " " " " " " " "
+
+
+.TH README KAMD  2012-08-29 "KDE" "KActivities Developers"
+
+.SH COMMIT POLICY
+
+Every non-trivial patch must go through the review before it goes into the
+master branch.
+
+    http://git.reviewboard.kde.org
+        repository: kactivities
+        groups:     plasma
+        people:     Ivan Cukic
+
+If you don't have an account for identity.kde.org, you can send smaller
+patches to the plasma-devel@kde.org mailing list, or (please don't) directly
+to the repository maintainer (see MAINTAINER file).
+
+
+.SH CODE POLICY
+
+The code needs to follow KDElibs coding style in *all* parts of the project,
+not only the library. You can find more information about the style here:
+http://techbase.kde.org/Policies/Kdelibs_Coding_Style
+
+Macros in CMakeLists.txt should be lowercase throughout the project,
+and indentation should be 4, with the closing parenthesis in the same level
+as the content.
+
+.SH COMPILER COMPATIBILITY
+
+The library (src/lib) needs to be compilable with these:
+    - GCC 4.5
+    - MSVC 2010
+    - Clang 3.1
+      (or newer)
+This is the same policy the KDE Frameworks have.
+
+Other parts require modern compilers. You can (and should) use more modern
+C++ coding practices. Including auto, lambdas, smart pointers etc. You can
+use anything that GCC 4.7 can compile.
+
+These are the compilers you need to test your patches against:
+    - GCC 4.7
+    - LLVM/Clang 3.1
+
+When you set up different builds alongside the main one, you can use
+scripts/commit.sh to build them all before committing. The script
+calls git commit if all builds finished successfully. See the script
+for more info.
+
+
+.SH FILE NAMING
+
+The library files are lower-case, apart from the "pretty" headers.
+The service, and the rest of the repository should be in camel-case
+(with the exception of source files that don't have corresponding
+headers, or vice-versa).
+
+
+.SH CONVENIENCE MACROS AND METHODS
+
+There are some convenience macros and methods defined in the headers placed
+in the service/utils/ directory.
+
+.TP
+.B D_PTR
+d_ptr.h and d_ptr_implementation.h define a smart pointer way of doing
+the d-ptr (aka pimpl) idiom.
+
+.TP
+.B remove_if
+remove_if.h is a generic implementation of the erase-remove idiom
+
+.TP
+.B for_each_assoc, find_if_assoc
+for_each_assoc.h and find_if_assoc.h define the for_each and find_if
+algorithms for associative containers. Works with both Qt and STL containers.
+

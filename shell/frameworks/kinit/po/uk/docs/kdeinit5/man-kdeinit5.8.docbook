@@ -1,0 +1,334 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Ukrainian "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Інструкція користувача kdeinit5</title>
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <affiliation
+> <address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Mario</firstname
+> <surname
+>Weilguni</surname
+> <affiliation
+> <address
+><email
+>mweilguni@sime.com</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Lubos</firstname
+> <surname
+>Lunak</surname
+> <affiliation
+> <address
+><email
+>l.lunak@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>18 грудня 2013 року</date>
+<releaseinfo
+>Frameworks 5.0</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdeinit5</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdeinit5</command
+></refname>
+<refpurpose
+>Засіб запуску для програм, зібраних із підтримкою kdeinit та допоміжних засобів введення-виведення KIO.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Короткий опис</title>
+
+<cmdsynopsis
+><command
+>kdeinit5</command
+> <arg choice="opt"
+>--help</arg
+> <group
+> <arg
+>--no-fork</arg
+> <arg
+>--no-kded</arg
+> <arg
+>--suicide</arg
+> </group
+> <group
+> <arg
+>+програми</arg
+> <arg
+>програми</arg
+> </group
+> </cmdsynopsis>
+
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Опис</title>
+
+<para
+>kdeinit5 — це інструмент запуску процесів, який до певної міри схожий на знаменитий <command
+>init</command
+>, який використовується для завантаження UNIX. Цей інструмент виконує програми &kde; і модулі, які завантажуються kdeinit (KLM), при цьому запускаючи їх у найефективніший спосіб. </para>
+
+<para
+>Використання kdeinit5 для запуску програм &kde; у рази зменшує час, потрібний на запуск типової програми &kde;, і значно зменшує споживання пам’яті.</para>
+
+<para
+>kdeinit5 скомпоновано з всіма бібліотеками, які можуть знадобитися стандартній програмі &kde;. Ця методика значно пришвидшує запуск програм, оскільки за таких умов потрібно компонувати лише саму програму, тоді як у іншому випадку довелося б компонувати як програму, так і бібліотеки, які потрібні програмі для роботи. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Недоліки</title>
+
+<para
+>Процес програм, запущених за допомогою kdeinit5 називається «kdeinit5». Цю проблему до певної міри можна виправити, якщо змінити назву програму, яку показує команда <command
+>ps</command
+>. Але програми на зразок <command
+>killall</command
+> реагуватимуть лише на kdeinit5 як назву процесу. Щоб обійти ці труднощі, скористайтеся командою <command
+>kdekillall</command
+> (з kdesdk/scripts) для програм, запущених за допомогою kdeinit5. </para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Параметри</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><option
+>--help</option
+></term>
+<listitem>
+<para
+>Показати довідку щодо параметрів </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-fork</option
+></term>
+<listitem>
+<para
+>Не розгалужувати програму, тобто не завершувати роботу до завершення всіх виконаних програм</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--no-kded</option
+></term>
+<listitem>
+<para
+>Не запускати kded</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--suicide</option
+></term>
+<listitem>
+<para
+>Припинити роботу, якщо більше не залишиться запущених програм KDE </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>+programs</option
+></term>
+<listitem>
+<para
+>запускає програми обробки запитів </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>programs</option
+></term>
+<listitem>
+<para
+>запускає програми без обробки запитів </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Користування</title>
+<para
+>Звичайним способом запуску цієї програми є така команда, введена у відповідь на запрошення командного рядка: <userinput
+><command
+>kdeinit5</command
+> program</userinput
+> або <userinput
+><command
+>kdeinit5</command
+> +program</userinput
+> </para>
+
+</refsect1>
+
+<!--
+<refsect1>
+<title
+>Examples</title>
+<para>
+<userinput
+><command
+>kdeinit5</command
+> +kwrite</userinput>
+</para>
+</refsect1>
+-->
+
+<refsect1>
+<title
+>Файли</title>
+
+<variablelist>
+<varlistentry>
+<term
+><filename
+>/tmp/kde-$USER/kdeinit5_$INSTANCE</filename
+></term>
+<listitem>
+<para
+>...</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Змінні середовища</title>
+<variablelist>
+
+<varlistentry>
+<term
+>$<envar
+>HOME</envar
+></term>
+<listitem>
+<para
+>Вказує домашній каталог поточного користувача</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_HOME_READONLY</envar
+></term>
+<listitem>
+<para
+>Вказує, чи є домашній каталог поточного користувача придатним лише для читання</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_IS_PRELINKED</envar
+></term>
+<listitem>
+<para
+>Якщо встановлено, вказує kdeinit5, що програми &kde; попередньо скомпоновано.</para>
+<para
+>(Попереднє компонування — це процес, який надає вам змогу пришвидшити процес динамічного компонування.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>$<envar
+>KDE_DISPLAY</envar
+></term>
+<listitem>
+<para
+>Якщо встановлено, вказує kdeinit5, що запуск відбувається у стільничному середовищі &kde;.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Прочитайте також</title>
+<para
+>kded5, kdekillall</para>
+</refsect1>
+
+<refsect1>
+<title
+>Вади</title>
+<para
+>Для сповіщення про вади скористайтеся адресою <ulink url="http://bugs.kde.org"
+>системою стеження за вадами KDE</ulink
+>.</para>
+</refsect1>
+
+</refentry>
+
+
+

@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language
+[
+        <!ENTITY funcname "[A-Za-z_:][A-Za-z0-9_:#&#37;@-]*">
+        <!ENTITY varname  "[A-Za-z_][A-Za-z0-9_]*">
+        <!ENTITY word     "[|&amp;;()&lt;&gt;\s]+">	<!-- see man csh -->
+        <!ENTITY eos      "(?=($|\s))">			<!-- eol or space following -->
+        <!ENTITY noword   "(?![\w$+-])">		<!-- no word, $, + or - following -->
+        <!ENTITY pathpart "([\w_@.&#37;*?+-]|\\ )">     <!-- valid character in a file name -->
+        <!ENTITY tab      "&#9;">
+]>
+<language name="Tcsh" version="10" kateversion="5.53" section="Scripts" extensions="*.csh;*.tcsh;csh.cshrc;csh.login;.tcshrc;.cshrc;.login" mimetype="application/x-csh" casesensitive="1" author="Matthew Woehlke (mw_triad@users.sourceforge.net)" license="LGPL">
+
+<!-- (c) 2006 Matthew Woehlke (mw_triad@users.sourceforge.net)
+    Based on the bash highlighter by Wilbert Berendsen (wilbert@kde.nl)
+    Released under the LGPL -->
+
+  <highlighting>
+    <list name="keywords">
+      <item>function</item>
+      <item>in</item>
+      <item>.</item>
+    </list>
+
+    <list name="builtins">
+      <item>:</item>
+      <item>alias</item>
+      <item>alloc</item>
+      <item>bg</item>
+      <item>bindkey</item>
+      <item>break</item>
+      <item>builtins</item>
+      <item>bye</item>
+      <item>cd</item>
+      <item>chdir</item>
+      <item>complete</item>
+      <item>continue</item>
+      <item>dirs</item>
+      <item>echo</item>
+      <item>echotc</item>
+      <item>eval</item>
+      <item>exec</item>
+      <item>exit</item>
+      <item>fg</item>
+      <item>filetest</item>
+      <item>glob</item>
+      <item>hashstat</item>
+      <item>history</item>
+      <item>hup</item>
+      <item>inlib</item>
+      <item>jobs</item>
+      <item>kill</item>
+      <item>limit</item>
+      <item>log</item>
+      <item>login</item>
+      <item>logout</item>
+      <item>ls-F</item>
+      <item>migrate</item>
+      <item>newgrp</item>
+      <item>nice</item>
+      <item>nohup</item>
+      <item>notify</item>
+      <item>onintr</item>
+      <item>popd</item>
+      <item>printenv</item>
+      <item>pushd</item>
+      <item>rehash</item>
+      <item>repeat</item>
+      <item>sched</item>
+      <item>settc</item>
+      <item>setty</item>
+      <item>shift</item>
+      <item>source</item>
+      <item>stop</item>
+      <item>suspend</item>
+      <item>telltc</item>
+      <item>time</item>
+      <item>umask</item>
+      <item>unalias</item>
+      <item>uncomplete</item>
+      <item>unhash</item>
+      <item>unlimit</item>
+      <item>ver</item>
+      <item>wait</item>
+      <item>watchlog</item>
+      <item>where</item>
+      <item>which</item>
+    </list>
+
+    <list name="builtins_var">
+      <item>unset</item>
+      <item>unsetenv</item>
+    </list>
+
+    <list name="unixcommands">
+      <include>unixcommands##Bash</include>
+      <item>command</item>
+      <item>pwd</item>
+      <item>printf</item>
+      <item>test</item>
+    </list>
+
+
+    <contexts>
+      <context attribute="Normal Text" lineEndContext="#stay" name="Start">
+        <IncludeRules context="FindAll" />
+      </context>
+
+<!-- ====== The following rulessets are meant to be included ======== -->
+      <!-- FindAll tries to interpret everything -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindAll">
+        <IncludeRules context="FindComments" />
+        <IncludeRules context="FindCommands" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+
+      <!-- FindMost tries to interpret anything except commands -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindMost">
+        <IncludeRules context="FindComments" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+
+
+      <!-- FindComments consumes shell comments till EOL -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindComments">
+        <DetectChar attribute="Comment" context="Comment" char="#" firstNonSpace="true"/>
+        <RegExpr attribute="Normal Text" context="Comment" String="[\s;](?=#)" />
+      </context>
+      <context attribute="Comment" lineEndContext="#pop" name="Comment">
+        <DetectSpaces />
+        <IncludeRules context="##Comments" />
+      </context>
+
+      <!-- FindCommentsParen consumes shell comments till EOL or a closing parenthese -->
+<!--      <context attribute="Normal Text" lineEndContext="#pop" name="FindCommentsParen">
+        <DetectChar attribute="Comment" context="CommentParen" char="#" firstNonSpace="true"/>
+        <RegExpr attribute="Normal Text" context="CommentParen" String="[\s;](?=#)" />
+      </context>
+      <context attribute="Comment" lineEndContext="#pop" name="CommentParen">
+        <RegExpr attribute="Comment" context="#pop" String="[^)](?=\))" />
+        <IncludeRules context="##Comments" />
+      </context> -->
+
+      <!-- FindCommentsBackq consumes shell comments till EOL or a backquote -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="FindCommentsBackq">
+        <DetectChar attribute="Comment" context="CommentBackq" char="#" firstNonSpace="true"/>
+        <RegExpr attribute="Normal Text" context="CommentBackq" String="[\s;](?=#)" />
+      </context>
+      <context attribute="Comment" lineEndContext="#pop" name="CommentBackq">
+        <RegExpr attribute="Comment" context="#pop" String="[^`](?=`)" />
+        <IncludeRules context="##Comments" />
+      </context>
+
+
+      <!-- breaksw case default if else end endif endsw foreach goto
+           set setenv switch while -->
+
+      <!-- FindCommands matches many items that can be expected outside strings, substitutions etc. -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindCommands">
+        <!-- start expression in double parentheses -->
+<!--!--><Detect2Chars attribute="Keyword" context="ExprDblParen" char="(" char1="(" beginRegion="expression" />
+        <!-- start expression in single brackets -->
+<!--!--><RegExpr attribute="Builtin" context="ExprBracket" String="(^\[|\s\[)&eos;" beginRegion="expression" column="0"/>
+        <!-- start a group command with { -->
+<!--!--><RegExpr attribute="Keyword" context="Group" String="\{&eos;" beginRegion="group" />
+        <!-- start a subshell -->
+<!--!--><DetectChar attribute="Keyword" context="SubShell" char="(" beginRegion="subshell" />
+        <!-- match do and if blocks -->
+<!--!--><RegExpr attribute="Control Flow" context="If" String="\bif&noword;" />
+<!--!--><RegExpr attribute="Control Flow" context="ElseIf" String="\belse\s+if&noword;" />
+<!--!--><RegExpr attribute="Control Flow" context="#stay" String="\belse&noword;" />
+<!--!--><RegExpr attribute="Control Flow" context="#stay" String="\bendif&noword;" endRegion="if" />
+        <!-- handle switch as a special case -->
+<!--!--><RegExpr attribute="Control Flow" context="Switch" String="\bswitch&noword;" beginRegion="switch" />
+<!--!--><RegExpr attribute="Control Flow" context="#stay" String="\b(foreach|while)&noword;" beginRegion="loop" />
+<!--!--><RegExpr attribute="Control Flow" context="#stay" String="\bend&noword;" endRegion="loop" />
+        <!-- handle command line options -->
+        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9][A-Za-z0-9_]*|--[a-z][A-Za-z0-9_-]*" />
+        <!-- handle variable assignments -->
+<!--R--><RegExpr attribute="Keyword" context="#stay" String="\b@\s" />
+<!--R--><WordDetect attribute="Keyword" context="#stay" String="set" />
+        <WordDetect attribute="Keyword" context="CmdSetEnv" String="setenv" />
+        <!-- handle functions with function keyword before keywords -->
+<!--!--><StringDetect attribute="Function" context="#stay" String=":()" />
+<!--!--><WordDetect attribute="Keyword" context="FunctionDef" String="function" />
+        <!-- handle keywords -->
+        <keyword attribute="Keyword" context="#stay" String="keywords" />
+        <keyword attribute="Builtin" context="#stay" String="builtins" />
+        <keyword attribute="Command" context="#stay" String="unixcommands" />
+        <!-- handle commands that have variable names as argument -->
+        <keyword attribute="Builtin" context="VarName" String="builtins_var" />
+        <!-- handle redirection -->
+        <RegExpr attribute="Redirection" context="#stay" String="(&lt;&lt;?|&gt;&gt;?&amp;?!?)" />
+        <!-- handle &, &&, | and || -->
+        <RegExpr attribute="Control" context="#stay" String="([|&amp;])\1?" />
+        <!-- mark function definitions without function keyword -->
+        <RegExpr attribute="Function" context="#stay" String="&funcname;\s*\(\)" />
+      </context>
+
+      <!-- FindOthers contains various rules to mark different shell input -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindOthers">
+        <RegExpr attribute="Escape" context="#stay" String="\\[;&quot;\\'$`{}()|&amp;&lt;&gt;* ]" />
+<!--?   <RegExpr attribute="Escape" context="#stay" String="\{(?!(\s|$))\S*\}" />-->
+        <RegExpr attribute="Path" context="#stay" String="&pathpart;*(?=/)|~\w*|/&pathpart;*(?=([\s/):;$`'&quot;]|$))" />
+        <!-- TODO: shell globs -->
+      </context>
+
+      <!-- FindStrings looks for single and double quoted strings, also with $-prefix -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindStrings">
+        <DetectChar attribute="String SingleQ" context="StringSQ" char="'" />
+        <DetectChar attribute="String DoubleQ" context="StringDQ" char="&quot;" />
+        <Detect2Chars attribute="String SingleQ" context="StringEsc" char="$" char1="'" />
+        <Detect2Chars attribute="String Transl." context="StringDQ" char="$" char1="&quot;" />
+      </context>
+
+      <!-- FindSubstitutions goes after anything starting with $ and ` and their escapes -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindSubstitutions">
+        <RegExpr attribute="Variable" context="Subscript" String="\$&varname;\[" />
+        <RegExpr attribute="Variable" context="#stay" String="\$(&varname;)|\$[*@#?$!_0-9-]|\$\{[*@#?$!_0-9-]\}|\$\{#&varname;\}|\$\{!&varname;\*?\}" />
+        <RegExpr attribute="Variable" context="VarBrace" String="\$\{&varname;|\$\{[*@#?$!_0-9-](?=[:#%/])" />
+        <StringDetect attribute="Variable" context="ExprDblParenSubst" String="$((" beginRegion="expression" />
+<!--?   <StringDetect attribute="Redirection" context="SubstFile" String="$(&lt;" />-->
+<!--?   <StringDetect attribute="Variable" context="SubstCommand" String="$(" />-->
+        <DetectChar attribute="Backquote" context="SubstBackq" char="`" />
+        <RegExpr attribute="Escape" context="#stay" String="\\[`$\\]" />
+      </context>
+
+      <!-- FindTests finds operators valid in tests -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="FindTests">
+        <RegExpr attribute="Expression" context="#stay" String="-[rwxXeozsfdlbcpSugktRLDIFNZ](?=\s)|-[AMCUG]:?(?=\s)|-P[0-7]{,3}:?(?=\s)|[=!][~=]|[*>&lt;!~]"/>
+      </context>
+
+
+<!-- ====== These are the contexts that can be branched to ======= -->
+
+      <!-- ExprDblParen consumes an expression started in command mode till )) -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParen">
+        <Detect2Chars attribute="Keyword" context="#pop" char=")" char1=")" endRegion="expression" />
+        <DetectChar attribute="Normal Text" context="ExprSubParen" char="(" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- ExprDblParenSubst like ExprDblParen but matches )) as Variable -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprDblParenSubst">
+        <Detect2Chars attribute="Variable" context="#pop" char=")" char1=")" endRegion="expression" />
+        <DetectChar attribute="Normal Text" context="ExprSubParen" char="(" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- ExprSubParen consumes an expression till ) -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprSubParen">
+        <DetectChar attribute="Normal Text" context="#pop" char=")" />
+        <DetectChar attribute="Normal Text" context="ExprSubParen" char="(" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- ExprBracket consumes an expression till ] -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="ExprBracket">
+        <RegExpr attribute="Builtin" context="#pop" String="(\s\]|^\])(?=($|[\s;|&amp;]))" endRegion="expression" />
+        <DetectChar attribute="Normal Text" context="ExprSubParen" char="(" />
+        <IncludeRules context="FindTests" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- Group consumes shell input till } -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="Group">
+        <DetectChar attribute="Keyword" context="#pop" char="}" endRegion="group" />
+        <IncludeRules context="FindAll" />
+      </context>
+
+      <!-- SubShell consumes shell input till ) -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="SubShell">
+        <DetectChar attribute="Keyword" context="#pop" char=")" endRegion="subshell" />
+        <IncludeRules context="FindAll" />
+      </context>
+
+      <!-- Assign consumes an expression till EOL or whitespace -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="Assign" fallthrough="true" fallthroughContext="#pop">
+        <DetectChar attribute="Variable" context="AssignArray" char="(" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+        <RegExpr attribute="Normal Text" context="#stay" String="[\w:,+_./-]+" />
+      </context>
+
+      <!-- AssignArray consumes everything till ), marking assignments -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="AssignArray">
+        <DetectChar attribute="Variable" context="#pop" char=")" />
+        <DetectChar attribute="Variable" context="Subscript" char="[" />
+        <DetectChar attribute="Variable" context="Assign" char="=" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- Subscript consumes anything till ], marks as Variable -->
+      <context attribute="Variable" lineEndContext="#stay" name="Subscript">
+        <DetectChar attribute="Variable" context="#pop" char="]" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+
+      <!-- FunctionDef consumes a name, possibly with (), marks as Function -->
+      <context attribute="Function" lineEndContext="#pop" name="FunctionDef" fallthrough="true" fallthroughContext="#pop">
+        <RegExpr attribute="Function" context="#pop" String="\s+&funcname;(\s*\(\))?" />
+      </context>
+
+      <!-- CmdSetEnv handles the name part of setenv -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="CmdSetEnv" fallthrough="true" fallthroughContext="#pop">
+        <!-- handle command line options -->
+        <RegExpr attribute="Variable" context="#pop" String="\b&varname;" />
+        <AnyChar attribute="Variable" context="Assign" String="&tab; " />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- VarName consumes spare variable names and assignments -->
+      <context attribute="Normal Text" lineEndContext="#pop" name="VarName" fallthrough="true" fallthroughContext="#pop">
+        <!-- handle command line options -->
+        <RegExpr attribute="Option" context="#stay" String="-[A-Za-z0-9]+|--[a-z][A-Za-z0-9_-]*" />
+        <RegExpr attribute="Variable" context="#stay" String="\b&varname;" />
+        <DetectChar attribute="Variable" context="Subscript" char="[" />
+        <DetectChar attribute="Variable" context="Assign" char="=" />
+        <IncludeRules context="FindMost" />
+        <!-- stay here in spaces and other safe characters -->
+        <RegExpr attribute="Normal Text" context="#stay" String="[^]})|;`&amp;&gt;&lt;]" />
+      </context>
+
+      <!-- StringSQ consumes anything till ' -->
+      <context attribute="String SingleQ" lineEndContext="#stay" name="StringSQ">
+        <DetectChar attribute="String SingleQ" context="#pop" char="'" />
+      </context>
+
+      <!-- StringDQ consumes anything till ", substitutes vars and expressions -->
+      <context attribute="String DoubleQ" lineEndContext="#stay" name="StringDQ">
+        <DetectChar attribute="String DoubleQ" context="#pop" char="&quot;" />
+        <RegExpr attribute="String Escape" context="#stay" String="\\[`&quot;\\$\n]" />
+        <IncludeRules context="FindSubstitutions" />
+      </context>
+
+      <!-- StringEsc eats till ', but escaping many characters -->
+      <context attribute="String SingleQ" lineEndContext="#stay" name="StringEsc">
+        <DetectChar attribute="String SingleQ" context="#pop" char="'" />
+        <RegExpr attribute="String Escape" context="#stay" String="\\[abefnrtv\\']|\\([0-7]{1,3}|x[A-Fa-f0-9]{1,2}|c.)" />
+      </context>
+
+      <!-- VarBrace is called as soon as ${xxx is encoutered -->
+      <context attribute="Variable" lineEndContext="#stay" name="VarBrace">
+        <DetectChar attribute="Variable" context="#pop" char="}" />
+        <DetectChar attribute="Variable" context="Subscript" char="[" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <!-- TODO: highlight various special parameter expansions } -->
+      </context>
+
+      <!-- SubstFile is called after a <( or >( is encoutered -->
+<!--      <context attribute="Normal Text" lineEndContext="#stay" name="SubstFile">
+        <DetectChar attribute="Redirection" context="#pop" char=")" />
+        <IncludeRules context="FindCommentsParen" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+-->
+      <!-- SubstCommand is called after a $( is encountered -->
+<!--      <context attribute="Normal Text" lineEndContext="#stay" name="SubstCommand">
+        <DetectChar attribute="Variable" context="#pop" char=")" />
+        <IncludeRules context="FindCommentsParen" />
+        <IncludeRules context="FindCommands" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+-->
+
+      <!-- SubstBackq is called when a backquote is encountered -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="SubstBackq">
+        <DetectChar attribute="Backquote" context="#pop" char="`" />
+        <IncludeRules context="FindCommentsBackq" />
+        <IncludeRules context="FindCommands" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+
+      <!-- Switch is called after the switch keyword is encoutered. This is
+           left over from the bash highlighter where the lonely parentheses
+           would otherwise cause trouble. We keep it because it lets us do a
+           bit of extra syntax validation. -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="Switch">
+        <RegExpr attribute="Keyword" context="SwitchCase" String="\scase\b" />
+        <RegExpr attribute="Keyword" context="SwitchDefault" String="\sdefault\b" />
+        <RegExpr attribute="Keyword" context="#pop" String="\bendsw(?=$|[\s;)])" endRegion="switch" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#pop" name="If" fallthrough="true" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Keyword" context="ArithmeticCondition" char="(" beginRegion="cond" />
+        <DetectChar attribute="Variable" context="Subscript" char="[" />
+        <StringDetect attribute="Control Flow" context="#pop" String="then" beginRegion="if" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#pop" name="ElseIf" fallthrough="true" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Keyword" context="ArithmeticCondition" char="(" beginRegion="cond" />
+        <DetectChar attribute="Variable" context="Subscript" char="[" />
+        <StringDetect attribute="Control Flow" context="#pop" String="then" />
+      </context>
+
+      <context attribute="Normal Text" lineEndContext="#stay" name="ArithmeticCondition">
+        <DetectChar attribute="Keyword" context="#pop" char=")" endRegion="cond" />
+        <DetectChar attribute="Keyword" context="ArithmeticCondition" char="(" beginRegion="cond" />
+        <RegExpr attribute="Expression" context="#stay" String="[=!]~|[=!>&lt;]="/>
+        <AnyChar attribute="Expression" context="#stay" String="|^&amp;>&lt;+-*/%!~"/>
+        <IncludeRules context="FindComments" />
+        <IncludeRules context="FindStrings" />
+        <IncludeRules context="FindSubstitutions" />
+        <IncludeRules context="FindOthers" />
+      </context>
+
+      <!-- SwitchCase is called when the construct 'switch ... case' has been found. -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="SwitchCase">
+        <DetectChar attribute="Keyword" context="SwitchExpr" char=":" beginRegion="switchexpr" />
+        <IncludeRules context="FindMost" />
+      </context>
+
+      <!-- SwitchDefault is called when the construct 'switch ... default' has been found. -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="SwitchDefault">
+        <DetectChar attribute="Keyword" context="SwitchExpr" char=":" beginRegion="switchexpr" />
+      </context>
+
+      <!-- SwitchExpr eats shell input till breaksw -->
+      <context attribute="Normal Text" lineEndContext="#stay" name="SwitchExpr">
+        <RegExpr attribute="Keyword" context="#pop#pop" String="\sbreaksw\b" endRegion="switchexpr" />
+        <RegExpr attribute="Keyword" context="#pop#pop" String="\scase\b" endRegion="switchexpr" lookAhead="true" />
+        <IncludeRules context="FindAll" />
+      </context>
+
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text"	defStyleNum="dsNormal" />
+      <itemData name="Comment"		defStyleNum="dsComment" />
+      <itemData name="Control Flow" 	defStyleNum="dsControlFlow" spellChecking="false" />
+      <itemData name="Keyword" 		defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Control" 		defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Builtin" 		defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Command" 		defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Redirection" 	defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="Escape" 		defStyleNum="dsDataType" spellChecking="false" />
+      <itemData name="String SingleQ" 	defStyleNum="dsString" />
+      <itemData name="String DoubleQ" 	defStyleNum="dsString" />
+      <itemData name="Backquote" 	defStyleNum="dsKeyword" spellChecking="false" />
+      <itemData name="String Transl." 	defStyleNum="dsString" spellChecking="false" />
+      <itemData name="String Escape" 	defStyleNum="dsDataType" spellChecking="false" />
+      <itemData name="Variable" 	defStyleNum="dsOthers" spellChecking="false" />
+      <itemData name="Expression" 	defStyleNum="dsOthers" spellChecking="false" />
+      <itemData name="Function" 	defStyleNum="dsFunction" spellChecking="false" />
+      <itemData name="Path" 		defStyleNum="dsNormal" spellChecking="false" />
+      <itemData name="Option" 		defStyleNum="dsNormal" spellChecking="false" />
+    </itemDatas>
+  </highlighting>
+  <general>
+    <comments>
+      <comment name="singleLine" start="#"/>
+    </comments>
+    <keywords casesensitive="1" weakDeliminator="^%#[]$._{}:-" additionalDeliminator="`"/>
+  </general>
+</language>
+<!-- kate: replace-tabs on; tab-width 2; indent-width 2; -->

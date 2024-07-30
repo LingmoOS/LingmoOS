@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-FileCopyrightText: 2023 Harald Sitter <sitter@kde.org>
+
+export QT_LOGGING_RULES="*=false"
+
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+  exec kcmshell6 kcm_about-distro --args dump --platform wayland
+elif [ -n "${DISPLAY+x}" ]; then
+  exec kcmshell6 kcm_about-distro --args dump --platform xcb
+else
+  exec kcmshell6 kcm_about-distro --args dump --platform offscreen
+fi

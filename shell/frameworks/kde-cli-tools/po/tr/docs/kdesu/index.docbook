@@ -1,0 +1,515 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Turkish "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>&kdesu; El Kitabı</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Emir</firstname
+><surname
+>SARI</surname
+><affiliation
+><address
+><email
+>emir_sari@icloud.com</email
+></address
+></affiliation
+><contrib
+>Çeviri</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-09-21</date>
+<releaseinfo
+>KDE 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; &UNIX; <command
+>su</command
+> komutu için bir grafiksel ön yüzdür.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>parola</keyword>
+<keyword
+>kök</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Giriş</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>&kdesu;'ya hoş geldiniz! &kdesu;, &UNIX; <command
+>su</command
+> komutunun K Masaüstü Ortamı için hazırlanmış bir grafiksel ön yüzüdür. Bir programı, başka bir kullanıcının parolasını sağlayarak o kullanıcıymış gibi çalıştırmaya izin verir. &kdesu; ayrıcalıksız bir programdır, sistemin <command
+>su</command
+> komutunu kullanır.</para>
+
+<para
+>&kdesu; programının bir ek özelliği vardır: Sizin için parolaları anımsayabilir. Bu özelliği kullanıyorsanız her bir komut için parolanızı yalnızca bir kez girmeniz gerekir. Bunun ve bir güvenlik çözümlemesi üzerine daha fazla bilgi için <xref linkend="sec-password-keeping"/> bölümüne bakın.</para>
+
+<para
+>Bu program, komut satırından veya <filename
+>.desktop</filename
+> dosyalarından başlatılmak üzere tasarlanmıştır. Bir &GUI; iletişim kutusu kullanarak <systemitem class="username"
+>root</systemitem
+> parolasını sorsa da, bir &GUI; programından daha çok bir &lt;-&gt; &GUI; yapıştırıcısıdır.</para>
+
+<para
+><command
+>kdesu</command
+> komutu, artık <userinput
+> $(kf5-config --prefix)</userinput
+>/bin değil de <userinput
+>kf5-config --path libexec</userinput
+> konumunda kurulu olduğundan ve dolayısıyla <envar
+>PATH</envar
+>'inizde olmadığından, <command
+>kdesu</command
+> komutunu başlatmak için <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> kullanmalısınız.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>&kdesu; Kullanımı</title>
+
+<para
+>&kdesu; kullanımı çok kolaydır. Sözdizim şöyledir:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> komut</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> dosya</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> simge adı</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> öncelik</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> kullanıcı</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>&kde; Genel Seçenekleri</arg
+> <arg choice="opt"
+>&Qt; Genel Seçenekleri</arg
+> </cmdsynopsis>
+
+<para
+>Komut satırı seçenekleri aşağıda açıklanmıştır.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>komut</replaceable
+></option
+></term>
+<listitem
+><para
+>Bu, komutun yönetici olarak çalışacağını belirtir. Bir argüman ile geçirilmelidir. Örneğin, yeni bir dosya yöneticisi başlatmak istiyorsanız komut isteminde şunu girerdiniz: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Hata ayıklama bilgisini gösterin.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>dosya</replaceable
+></option
+></term>
+<listitem
+><para
+>Bu seçenek, &kdesu;'nun <filename
+>.desktop</filename
+> dosyalarında etkili kullanımını sağlar. &kdesu;'ya <parameter
+>dosya</parameter
+> parametresiyle verilen dosyayı incelemesini söyler. Dosyaya geçerli kullanıcı tarafından yazılabiliyorsa &kdesu; komutu geçerli kullanıcı olarak yürütür. Aksi durumda, komut <parameter
+>kullanıcı</parameter
+> olarak yürütülür (öntanımlı olarak yönetici).</para>
+<para
+><parameter
+>dosya</parameter
+> parametresi şöyle değerlendirilir: Eğer <parameter
+>dosya</parameter
+> bir <literal
+>/</literal
+> ile başlıyorsa mutlak bir dosya adı olarak alınır. Aksi takdirde global bir &kde; yapılandırma dosyası olarak kabul edilir.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>simge adı</replaceable
+></term>
+<listitem
+><para
+>Parola iletişim kutusunda kullanılmak üzere bir simge belirtin. Herhangi bir uzantı olmadan yalnızca adı belirtebilirsiniz.</para>
+<para
+>Örneğin &konqueror; uygulamasını dosya yöneticisi kipinde çalıştırmak ve &konqueror; simgesini parola iletişim kutusunda göstermek için:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option>
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Parolayı tutmayın. Bu seçenek, parola iletişim kutusundaki <guilabel
+>parolayı tut</guilabel
+> onay kutusunu devre dışı bırakır.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>öncelik</replaceable
+></term>
+<listitem>
+<para
+>Öncelik değerini ayarlayın. Öncelik, 1-100 arasında herhangi bir numaradır; 100 en yüksek önceliği ve 0 ise en düşük önceliği belirtir. Öntanımlı değer 50’dir.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Gerçek zamanlı zamanlama kullanın.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>kdesu ardalan sürecini durdurun. Bkz. <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Uçbirim çıktısını etkinleştirin. Bu, parola tutmayı devre dışı bırakır. Bu genelde hata ayıklama amaçlı kullanılır; bir konsol kipli uygulama çalıştırmak istiyorsanız bunun yerine standart olan <command
+>su</command
+> komutunu kullanın.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> kullanıcı</replaceable
+></term>
+<listitem
+><para
+>&kdesu;'nun en yaygın kullanımı bir komutu yönetici kullanıcı olarak çalıştırmak olsa da, herhangi bir kullanıcı adını ve parolayı da verebilirsiniz.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>İç Yapılar</title>
+
+<sect1 id="x-authentication">
+<title
+>X kimlik doğrulaması</title>
+
+<para
+>Yürüttüğünüz program yönetici kimliği altında çalışır ve genelde X ekranınıza ulaşmak için yetkisi yoktur. &kdesu;, geçici bir <filename
+>.Xauthority</filename
+> dosyasına bir kimlik doğrulama çerezi ekleyerek bunun tarafından dolaşır. Komut çıktığında dosya kaldırılır. </para>
+
+<para
+>X çerezleri kullanmıyorsanız kendi başınızasınız. &kdesu; bunu algılar ve bir tanımlama bilgisi eklemez; ancak yöneticinin ekranınıza erişmesine izin verildiğinden emin olmanız gerekir.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+><command
+>su</command
+> Komutuyla Etkileşim</title>
+
+<para
+>&kdesu;, yetki almak için sistemin <command
+>su</command
+> komutunu kullanır. Bu bölümde, &kdesu;'nun bunu nice yaptığı anlatılır. </para>
+
+<para
+>Bazı <command
+>su</command
+> uygulamaları (örn. &RedHat;), parolaları <literal
+>stdin</literal
+>’den okumak istemez; &kdesu; bir pty/tty çifti oluşturur ve <command
+>su</command
+> komutunu kendi dosya tanımlayıcıları tty’ye iliştirilmiş bir biçimde yürütür.</para>
+
+<para
+>Etkileşimli bir kabuk yerine kullanıcının seçtiği komutu yürütmek için &kdesu;, <command
+>su</command
+> komutunu <option
+>-c</option
+> argümanıyla kullanır. Bu argüman bilinen her kabukla çalışır, bu yüzden sıkıntı çıkarmaması gerekir. <command
+>su</command
+>, bu <option
+>-c</option
+> argümanını hedef kullanıcının kabuğuna geçiriri ve kabuk programı yürütür. Örnek komut: <command
+>su <option
+>root -c <replaceable
+>program</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Kullanıcı komutunu doğrudan <command
+>su</command
+> ile yürütmek yerine, &kdesu; <application
+>kdesu_stub</application
+> denen ufak bir yalancı program yürütür. Bu program (hedef kullanıcı olarak çalışır), &kdesu;’dan pty/tty kanalı üzerine bilgi ister (programcığın stdin’i ve stdout’u) ve sonrasında kullanıcının programını yürütür. Diğer yana geçirilen bilgi X ekranı, bir X kimlik doğrulama çerezi (varsa), <envar
+>PATH</envar
+> ve çalıştırılacak komuttur. Yalancı bir programın kullanılma nedeni, X çerezinin gizli bilgi olması ve komut satırında geçirilememesidir.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Parola Denetimi</title>
+
+<para
+>&kdesu; girdiğiniz parolaları denetler ve yanlışsa bir hata iletisi verir. Denetim, bir sınama programı yürütülerek yapılır: <filename
+>/bin/true</filename
+>. Bu başarılı olursa parola doğru varsayılır.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Parolayı Tutmak</title>
+
+<para
+>Konforunuz için &kdesu; bir <quote
+>parolayı tut</quote
+> özelliği içerir. Güvenlik konusunda ilgiliyseniz bu paragrafı okumalısınız.</para>
+
+<para
+>&kdesu;'nun parolaları anımsamasına izin vermek sisteminizde (ufak) bir güvenlik açığı doğurur. Tabii ki &kdesu; sizin kullanıcı kimliğiniz dışındaki kimsenin parolanızı kullanmasına izin vermez; ancak dikkatli kullanılmazsa bu <systemitem class="username"
+>yönetici</systemitem
+>'nin güvenlik düzeyini normal bir kullanıcının düzeyine (sen) düşürür. Hesabınızı kıran bir deşici, <systemitem class="username"
+>yönetici</systemitem
+> erişimi alabilir. &kdesu; bunu engellemeye çalışır. Kullandığı güvenlik şeması görece güvenlidir ve burada açıklanmıştır.</para>
+
+<para
+>&kdesu;, <application
+>kdesud</application
+> denen bir ardalan süreci kullanır. Süreç, komutlar için <filename
+>/tmp</filename
+> içindeki bir &UNIX; yuvasını dinler. Yuvanın kipi 0600’dır; böylece yalnızca sizin kullanıcı kimliğiniz ona bağlanabilir. Parolayı tutma etkinleştirilmişse &kdesu; komutları bu ardalan süreci üzerinden yürütür. Komutu ve <systemitem class="username"
+>yönetici</systemitem
+>’nin parolasını yuvaya yazar ve ardalan komutu daha önce açıklandığı üzere <command
+>su</command
+> ile yürütür. Sonrasında komut ve parola atılmaz. Bunun yerine belirli bir süre tutulurlar. Bu, denetim modülündeki zaman aşımı değeridir. Bu süre içinde aynı komut için bir istek gelirse istemcinin parolayı sağlamasına gerek kalmaz. Deşicilerin ardalan sürecinden parolaları çıkarmasına engel olmak için (örneğin bir hata ayıklayıcı iliştirerek) ardalan süreci set-group-id nogroup olarak kurulmuştur. Bu, tüm normal kullanıcıların (sen de dahil olmak üzere) parolaları <application
+>kdesud</application
+> sürecinden almasına engel olmalıdır. Ayrıca, ardalan süreci <envar
+>DISPLAY</envar
+> çevre değişkenini başlatıldığındaki değere geri ayarlar. Bir deşicinin yapabileceği tek şey ekranınızda bir program yürütmek olabilir.</para>
+
+<para
+>Bu şemadaki bir olası zayıf nokta ise yürüttüğünüz programların güvenlik temel alınarak yazılmamış olmasıdır (setuid <systemitem class="username"
+>yönetici</systemitem
+> programları gibi). Bu, önbellek taşmaları veya başka sorunların olabileceği ve bir deşicinin bunları kullanabileceği anlamına gelir.</para>
+
+<para
+>Parola tutma özelliği güvenlik ve konfor arasında bir feragattir. Buna göre kullanmak isteyip istemediğinizi bir düşünün.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Yazar</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Telif hakkı 2000 &Geert.Jansen;</para>
+
+<para
+>&kdesu;, &Geert.Jansen; tarafından yazılmıştır. Pietro Iglio’nun &kdesu; 0.3 sürümü temellidir. Pietro ve ben, bu programın bakımını bundan sonra benim yapacağım konusunda anlaştık.</para>
+
+<para
+>Yazara &Geert.Jansen.mail; üzerinden ulaşabilirsiniz. Bulduğunuz tüm hataları bana bildirin ki onları düzeltebileyim. Sorunuz varsa sormaktan çekinmeyin.</para>
+
+<para
+>Çeviri: Emir SARI <email
+>emir_sari@icloud.com</email
+></para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

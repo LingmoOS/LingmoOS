@@ -1,0 +1,516 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Indonesian "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title
+>Buku petunjuk &kdesu;</title>
+
+<authorgroup>
+<author
+>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<othercredit role="translator"
+><firstname
+>Wantoyo</firstname
+><surname
+></surname
+><affiliation
+><address
+><email
+>wantoyek@gmail.com</email
+></address
+></affiliation
+><contrib
+>Terjemahan</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>21-09-2010</date>
+<releaseinfo
+>&kde; 4.5</releaseinfo>
+
+
+<abstract
+><para
+>&kdesu; adalah sebuah front end grafik untuk perintah <command
+>su</command
+> &UNIX;.</para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>su</keyword>
+<keyword
+>kata sandi</keyword>
+<keyword
+>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Pengenalan</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command
+>$(kde4-config - -path libexec)kdesu - - program_to_run
+  
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para
+>Selamat datang di &kdesu;! &kdesu; adalah front end grafis untuk perintah  <command
+>su</command
+> &UNIX; untuk K Desktop Environment. Ini memungkinkan kamu untuk menjalankan programkan sebagai pengguna yang berbeda dengan menyuplai kata sandi untuk pengguna tersebut. &kdesu; adalah program yang tidak diprivasi; ia menggunakan <command
+>su</command
+> sistem.</para>
+
+<para
+>&kdesu; memiliki salahsatu fitur tambahan: ia bisa mengingat kata sandi untukmu. Jika kamu menggunakan fitur ini, kamu hanya perlu memasukkan kata sandi sekali untuk setiap perintah. Lihatlah <xref linkend="sec-password-keeping"/> untuk informasi selebihnya atas hal ini dan analisis keamanan.</para>
+
+<para
+>Program ini adalah bermaksud untuk dijalankan dari baris perintah atau dari file-file  <filename
+>.desktop</filename
+>. Dengan demikian ia menanyakan kata sandi  <systemitem class="username"
+>root</systemitem
+> menggunakan sebuah dialog &GUI;, aku menganggapnya lebih sebagai baris perintah &lt;-&gt; lem &GUI; bukan program &GUI; murni.</para>
+
+<para
+>Sejak <command
+>kdesu</command
+> tidak lagi diinstal dalam <userinput
+> $(kde4-config --prefix)</userinput
+>/bin tetapi dalam <userinput
+>kde4-config --path libexec</userinput
+> dan oleh karenanya tidak di <envar
+>Path</envar
+>-mu, kamu harus menggunakan <userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+></userinput
+> untuk meluncurkan <command
+>kdesu</command
+>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title
+>Menggunakan &kdesu;</title>
+
+<para
+>Penggunaan &kdesu; cukup mudah. Sintaksnya seperti ini:</para>
+
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> perintah</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> file</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nama ikon</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioritas</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> pengguna</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> winid</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>Opsi-opsi Generik &kde;</arg
+> <arg choice="opt"
+>Opsi-opsi Generik &Qt;</arg
+> </cmdsynopsis>
+
+<para
+>Opsi-opsi baris perintah dijelaskan di bawah.</para>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>perintah</replaceable
+></option
+></term>
+<listitem
+><para
+>Penentuan perintah ini untuk berjalan sebagai root. Itu harus dilalui dalam satu argumen. Jadi jika, misalnya, kamu ingin menjalankan sebuah pengelola file baru kamu harus memasukkan prompt: <userinput
+>$(kde4-config --path libexec)<command
+>kdesu <option
+>-c <replaceable
+> &dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Tampilkan informasi debug.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>file</replaceable
+></option
+></term>
+<listitem
+><para
+>Opsi ini memungkinkan &kdesu; penggunaan yang efisien dalam file <filename
+>.desktop</filename
+>. Yang memberi tahu &kdesu; untuk memeriksa file yang ditentukan oleh <parameter
+>file</parameter
+>. Jika file ini dapat ditulis oleh pengguna saat ini, &kdesu; akan mengeksekusi perintah sebagai pengguna saat ini. Jika ia tidak dapat ditulis, perintah dieksekusi sebagai <parameter
+>pengguna</parameter
+> (bakunya kepada root).</para>
+<para
+><parameter
+>file</parameter
+> telah dievaluasikan seperti ini: jika <parameter
+>file</parameter
+> memulai dengan sebuah <literal
+>/</literal
+>, ia telah diambil sebagai sebuah nama file yang mutlak. Meskipun demikian, ia telah diambil sebagai nama dari sebuah file konfigurasi &kde; global.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nama ikon</replaceable
+></term>
+<listitem
+><para
+>Ikon ditentukan untuk penggunaan di dalam dialog kata sandi. Mungkin kamu hanya menentukan nama, tanpa ekstensi apa pun.</para>
+<para
+>Misalnya menjalankan &konqueror; dalam mode filemanager dan menampilkan ikon &konqueror; di dalam dialog kata sandi:</para>
+<screen
+><userinput
+>$(kde4-config --path libexec)<command
+>kdesu</command
+>  <option
+>-i konqueror</option
+> 
+<option
+>-c "konqueror --profile filemanagement"</option
+></userinput
+></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Jangan menjaga kata sandi. Ini menonfungsikan kotak-centang <guilabel
+>jaga kata sandi</guilabel
+> di dalam dialog kata sandi.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioritas</replaceable
+></term>
+<listitem>
+<para
+>Set nilai prioritas. Prioritas adalah sebuah nomor bebas antara 0 dan 100, yang mana 100 maksudnya berprioritas lebih tinggi, dan 0 maksudnya berprioritas lebih rendah. Bakunya adalah 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Gunakan penjadwalan waktu nyata.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Hentikan daemon kdesu. Lihatlah <xref linkend="sec-password-keeping"/>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Fungsikan output terminal. Ini menonfungsikan penjagaan kata sandi. Ini adalah sebagian besar untuk tujuan pendebugan; jika kamu ingin menjalankan aplikasi mode console, gunakan <command
+>su</command
+> standar sebagai gantinya.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+> pengguna</replaceable
+></term>
+<listitem
+><para
+>Penggunaan yang paling umum &kdesu; adalah menjalankan perintah sebagai superuser, kamu bisa menyuplai nama pengguna dan kata sandi apa pun yang sesuai.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title
+>Internal</title>
+
+<sect1 id="x-authentication">
+<title
+>Autentikasi X</title>
+
+<para
+>Program yang kamu eksekusi akan berjalan di bawah id pengguna root dan akan biasanya tidak memiliki otoritas untuk mengakses displai X kamu. &kdesu; dapat melakukan ini dengan menambahkan sebuah cookie autentikasi untuk displaimu ke sebuah file <filename
+>.Xauthority</filename
+> temporer. Sesudah perintahnya keluar, file ini dihapus. </para>
+
+<para
+>Jika kamu tidak menggunakan cookie X, kamu berada pada milikmu. &kdesu; akan mendeteksi ini dan tidak akan menambahkan cookie tetapi kamu nanti harus memastikan bahwa root diperbolehkan untuk mengakses ke displaimu.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title
+>Antarmuka untuk <command
+>su</command
+></title>
+
+<para
+>&kdesu; menggunakan <command
+>su</command
+> sistem untuk mendapatkan hak istimewa. Di bagian ini, aku berencana memerincikan bagaimana &kdesu; melakukan ini. </para>
+
+<para
+>Karena beberapa penerapan <command
+>su</command
+> (&ie; seseorang dari &RedHat;) tidak menginginkan pembacaan kata sandi dari <literal
+>stdin</literal
+>, &kdesu; menciptakan sebuah pair pty/tty dan mengeksekusi <command
+>su</command
+> dengan filedescriptors standarnya yang terkoneksi ke tty.</para>
+
+<para
+>Untuk menjalankan perintah yang dipilih pengguna, bukan shell interaktif, &kdesu; menggunakan argumen <option
+>-c</option
+> dengan <command
+>su</command
+>. Argumen ini dipahami oleh setiap shell yang saya tahu sehingga harus bekerja secara portable. <command
+>su</command
+> meneruskan argumen <option
+>-c</option
+> ini ke shell pengguna target, dan shell mengeksekusi program. Contoh perintah: <command
+>su<option
+> root -c <replaceable
+>the_program</replaceable
+></option
+></command
+>.</para>
+
+<para
+>Alih-alih mengeksekusi perintah pengguna secara langsung dengan <command
+>su</command
+>, &kdesu; menjalankan program stub kecil yang disebut <application
+>kdesu_stub</application
+>. Stub ini (berjalan sebagai pengguna target), meminta beberapa informasi dari &kdesu; melalui pair pty/tty (stdin stub dan stdout) dan kemudian menjalankan program pengguna. Informasi yang diteruskan adalah: tampilan X, cookie otentikasi X (jika tersedia), <envar
+>PATH</envar
+> dan perintah untuk dijalankan. Alasan mengapa program stub ini digunakan adalah bahwa cookie X adalah informasi pribadi dan oleh karena itu tidak dapat diteruskan di baris perintah.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title
+>Pemeriksaan Kata Sandi</title>
+
+<para
+>&kdesu; akan memeriksa kata sandi yang kamu masukkan dan memberikan sebuah pesan error jika tidak benar. Pemeriksaan dilakukan dengan mengeksekusi sebuah program uji: <filename
+>/bin/true</filename
+>. Jika ini berhasil, kata sandi diasumsikan benar.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title
+>Penjagaan Kata Sandi</title>
+
+<para
+>Untuk kesenanganmu, &kdesu; mengimplementasikan fitur <quote
+>jaga kata sandi</quote
+>. Jika kamu mementingkan keamanan, kamu seharusnya membaca paragraf ini.</para>
+
+<para
+>&kdesu; memungkinkan mengingat kata sandi membukakan sebuah lubang keamanan (kecil) di sistem kamu. Jelas, &kdesu; tidak mengizinkan siapa pun selain id pengguna kamu untuk menggunakan kata sandi, tetapi, jika dilakukan tanpa hati-hati, ini akan menurunkan tingkat keamanan <systemitem class="username"
+>root</systemitem
+> ke pengguna normal (kamu). Seorang peretas yang membobol akunmu, akan mendapatkan akses <systemitem class="username"
+>root</systemitem
+>. &kdesu; mencoba untuk mencegah ini. Skema keamanan yang digunakannya, setidaknya menurut saya, cukup aman dan sudah dijelaskan di sini.</para>
+
+<para
+>&kdesu; menggunakan daemon, yang disebut <application
+>kdesud</application
+>. Daemon mendaftar ke sebuah soket &UNIX; di <filename
+>/tmp</filename
+> untuk perintah. Mode soketnya adalah 0600 jadi hanya id pengguna kamu yang dapat terkoneksi kepadanya. Jika penjagaan kata sandi difungsikan, &kdesu; mengeksekusi perintah melalui daemon ini. Ia menulis perintah dan kata sandi <systemitem class="username"
+>root</systemitem
+> ke soket dan daemon mengeksekusi perintah menggunakan <command
+>su</command
+>, seperti yang dijelaskan sebelumnya. Setelah ini, perintah dan kata sandi tidak dibuang. Sebaliknya, mereka disimpan untuk waktu yang ditentukan. Ini adalah nilai batas waktu dari dalam modul kendali. Jika ada permintaan lain untuk perintah yang sama akan datang dalam periode waktu ini, klien tidak harus memberikan kata sandi. Untuk menjaga dari  peretas yang membobol akun kamu yang mencuri kata sandi dari daemon (misalnya, dengan melampirkan debugger), daemon yang terinstal set-group-id nogroup. Ini seharusnya mencegah semua pengguna normal (termasuk kamu) dari pendapatan kata sandi dari proses <application
+>kdesud</application
+>. Juga, daemon menetapkan variabel lingkungan <envar
+>DISPLAY</envar
+> ke nilai yang dimilikinya ketika dimulai. Satu-satunya hal seorang peretas yang bisa lakukan adalah menjalankan aplikasi di displaimu.</para>
+
+<para
+>Satu titik lemah dalam skema ini adalah bahwa program yang kamu jalankan mungkin tidak ditulis dengan keamanan yang dimaksud (seperti program <systemitem class="username"
+>root</systemitem
+> setuid). Ini berarti mereka mungkin ada serangan atau masalah lain dan seorang peretas dapat mengeksploitasinya.</para>
+
+<para
+>Penggunaan fitur penjagaan kata sandi merupakan pertukaran antara keamanan dan kenyamanan. Aku mendorongmu untuk memikirkannya dan memutuskan sendiri apakah kamu mau menggunakannya atau tidak.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title
+>Penulis</title>
+
+<para
+>&kdesu;</para>
+
+<para
+>Hakcipta 2000 &Geert.Jansen;</para>
+
+<para
+>&kdesu; ditulis oleh &Geert.Jansen;. Agak didasarkan pada &kdesu; Pietro Iglio's, versi 0.3. Pietro dan saya setuju bahwa saya akan memelihara program ini di masa depan.</para>
+
+<para
+>Penulis bisa dihubungi melalui email di &Geert.Jansen.mail;. Silakan laporkan bug apa pun yang kamu temukan kepadaku sehingga aku bisa memperbaikinya. Jika kamu punya saran, jangan ragu untuk menghubungi saya.</para>
+
+<para
+>Wantoyo<email
+>wantoyek@gmail.com</email
+></para
+> &underFDL; &underArtisticLicense; </chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

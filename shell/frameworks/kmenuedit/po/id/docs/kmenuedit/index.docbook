@@ -1,0 +1,1082 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+ <!ENTITY kappname "&kde; Menu Editor">
+  <!ENTITY package "kdebase">
+  <!ENTITY firefox "<application
+>Firefox</application
+>">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Indonesian "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kmenuedit" lang="&language;">
+
+<bookinfo>
+
+<title
+>Buku Petunjuk Pengedit Menu &kde;</title>
+
+<authorgroup>
+<author
+>&Milos.Prudek; &Milos.Prudek.mail;</author>
+<author
+>&Anne-Marie.Mahfouf; &Anne-Marie.Mahfouf.mail;</author>
+<othercredit role="reviewer"
+>&Lauri.Watts; &Lauri.Watts.mail; </othercredit>
+<othercredit role="translator"
+><firstname
+>Wantoyo</firstname
+><surname
+></surname
+><affiliation
+><address
+><email
+>wantoyek@gmail.com</email
+></address
+></affiliation
+><contrib
+>Terjemahan</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Milos.Prudek;</holder>
+</copyright>
+<copyright>
+<year
+>2008</year>
+<holder
+>&Anne-Marie.Mahfouf;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>27-04-2015</date>
+<releaseinfo
+>Plasma 5.3</releaseinfo>
+
+<abstract
+><para
+>&kmenuedit; memungkinkan pengeditan peluncur aplikasi &kde;. </para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KDE Menu Editor</keyword>
+<keyword
+>kmenuedit</keyword>
+<keyword
+>aplikasi</keyword>
+<keyword
+>program</keyword>
+<keyword
+>menu</keyword>
+<keyword
+>kickoff</keyword>
+<keyword
+>Lancelot</keyword>
+</keywordset>
+
+</bookinfo>
+<chapter id="introduction">
+<title
+>Pengenalan</title>
+
+<para
+>&kmenuedit; memungkinkan pengeditan menu peluncuran aplikasi &kde;.</para>
+
+<para
+>&kmenuedit; bisa dimulai baik dengan mengeklik &RMB; pada tombol peluncur aplikasi pada panel dan memilih <guimenuitem
+>Edit Aplikasi...</guimenuitem
+>, atau dengan mengetik <userinput
+>kmenuedit</userinput
+> di dalam baris &krunner;.</para>
+
+<para
+>&kmenuedit; memungkinkan kamu untuk:</para>
+
+<itemizedlist>
+<listitem
+><para
+>Meninjau dan mengedit menu yang digunakan oleh peluncur aplikasi saat ini.</para
+></listitem>
+<listitem
+><para
+><guimenuitem
+>Potong</guimenuitem
+>, <guimenuitem
+>Salin</guimenuitem
+> dan <guimenuitem
+>Tempel</guimenuitem
+> submenu dan item</para
+></listitem>
+<listitem
+><para
+>Ciptakan dan hapus submenu dan item</para
+></listitem>
+<listitem
+><para
+>Ubah urutan submenu dan item-itemnya</para
+></listitem>
+<listitem
+><para
+>Sembunyikan item dan tambahkan item dan submenu baru</para
+></listitem>
+</itemizedlist>
+
+<para
+>Secara baku semua aplikasi yang diinstal pada komputer muncul di menu peluncur aplikasi semua pengguna. Aplikasi mungkin muncul lebih dari satu dalam beberapa menu yang berbeda. Kategori submenu kosong didefinisikan dalam spesifikasi menu desktop juga akan muncul, tetapi tidak terlihat di peluncur aplikasi kecuali jika kamu menginstal aplikasi yang memiliki kategori tersebut. </para>
+
+<para
+>Tampilan hierarki memiliki dua tipe entri yang berbeda:</para>
+<itemizedlist>
+<listitem
+><para
+>Submenu: Hanya bidang <guilabel
+>Nama</guilabel
+>, <guilabel
+>Komentar</guilabel
+> dan <guilabel
+>Deskripsi</guilabel
+> dan tombol untuk memilih sebuah ikon yang difungsikan, tab <guilabel
+>Tingkat lanjut</guilabel
+> adalah dinonfungsikan. Submenu apa pun bisa menahan submenus dan/atau item tambahan. </para
+></listitem>
+<listitem
+><para
+>Item: Gunakan entri ini untuk memasukkan data untuk aplikasi yang ingin kamu tambahkan. Untuk informasi terperinci lihatlah <link linkend="using-kmenuedit"
+>Menggunakan &kmenuedit;</link
+>. </para
+></listitem>
+</itemizedlist>
+
+<para
+>&kmenuedit; memiliki dua mode tampilan hierarki - normal dan dengan entri tersembunyi. Untuk melihat yang terakhir centanglah opsi <guilabel
+>Tampilkan entri tersembunyi</guilabel
+> di dialog konfigurasi pada halaman <guilabel
+>Opsi umum</guilabel
+>. </para>
+<para
+>Banyak entri tambahan muncul dalam mode tampilan tersembunyi di hierarki. Beberapa entri tersembunyi tampaknya hanya duplikat tetapi memiliki opsi perintah yang berbeda. Biasanya kamu seharusnya tidak usah mengubah entri tersembunyi ini atau kamu berisiko hancurnya beberapa fungsionalitas sistem. </para>
+<para
+>Dalam mode tersembunyi kamu akan memiliki submenu khusus <guilabel
+>.hidden [Tersembunyi]</guilabel
+> sebagai item level teratas di dalam hierarki. Submenu spesial ini tidaklah dapat-diedit. Dalam submenu ini semua item yang dihapus akan ditampilkan di pemulaian &kmenuedit; selanjutnya.</para>
+<para
+>Tidak mungkin menghapus entri menggunakan &GUI; di submenu spesial ini. Mereka akan muncul kembali pada pemulaian  &kmenuedit; selanjutnya. </para>
+
+<sect1 id="use-cases">
+<title
+>Soal Penggunaan</title>
+
+<sect2 id="use-cases-adapt">
+<title
+>Adaptasi Menu untuk Pengguna</title
+> 
+
+<sect3 id="use-cases-adapt-order">
+<title
+>Pengurutan-ulang Item</title
+> 
+
+<para
+>Ini harus dilakukan dalam mode tampilan tersembunyi di mana hanya submenu dan item yang terlihat di menu peluncur aplikasi yang akan didisplaikan. </para>
+<para
+>Secara baku menu diurutkan secara alfabet menggunakan nama-nama bahasa Inggris atau deskripsi. Menggunakan bahasa lain selain bahasa Inggris beberapa submenu dan item akan muncul dalam urutan yang tidak diurutkan. </para>
+<para
+>Gunakan opsi-opsi dalam <menuchoice
+><guimenu
+>Edit</guimenu
+><guimenuitem
+>Urutkan</guimenuitem
+></menuchoice
+> untuk mengurutkan baik nama atau deskripsi. Jika kamu menggunakan peluncur aplikasi klasik, kamu harus memilih opsi <guilabel
+>Format</guilabel
+> yang sesuai di dalam dialog pengaturan. Di dalam peluncur &kickoff; centang <guilabel
+>Tampilkan aplikasi berdasarkan nama</guilabel
+> jika kamu mengurutkannya berdasarkan nama di sini. </para>
+<para
+>Pengelompokan submenu atau item yang sering kamu gunakan selalu &eg; di puncak menu membuat pemilihannya menjadi mudah. Untuk mengubah urutan item atau submenu yang sesuai di dalam hierarki gunakan tombol <guibutton
+>Pindah Naik</guibutton
+> atau <guibutton
+>Pindah Turun</guibutton
+> di bilah-alat atau aksi-aksi tersebut di dalam menu. </para>
+<para
+>Semua peluncur aplikasi akan menggunakan urutan submenu yang ditentukan di &kmenuedit;. </para>
+</sect3>
+
+<sect3 id="use-cases-adapt-hide">
+<title
+>Hapus Item dari Tampilan Menu</title
+> 
+
+<para
+>Setelah memiliki tampilan semua aplikasi yang diinstal pada komputer mungkin membingungkan untuk beberapa pengguna sehingga kamu mungkin ingin menyembunyikan beberapa item atau submenu yang jarang digunakan. Ada dua cara berbeda untuk melakukan itu: </para>
+
+<para
+>Beralih ke mode tampilan normal tanpa entri tersembunyi. Jika kamu menghapus item, mereka dipindahkan ke submenu <guilabel
+>.hidden [Tersembunyi]</guilabel
+>. Kamu bisa memindahkan mereka kembali ke hierarki untuk memasukkannya ke dalam menu lagi. </para>
+<para
+>Jika kamu menghapus submenu, itu akan benar-benar dihapus dengan semua submenu dan itemnya. Untuk membuatnya kembali, kamu bisa menggunakan <menuchoice
+><guimenu
+>Edit</guimenu
+> <guimenuitem
+>Kembalikan ke Menu Sistem</guimenuitem
+></menuchoice
+>, tetapi ini akan menghapus semua item dan submenu kustommu dan file <filename class="extension"
+>.desktop</filename
+> juga dihapus. Aksi ini tidak bisa dikembalikan. </para>
+
+<para
+>Cara yang disukai untuk menghapus submenu dan item di menu peluncur aplikasi adalah dengan mencentang <guilabel
+>Entri tersembunyi</guilabel
+> pada <guilabel
+>Tab Umum</guilabel
+> dan beralih ke mode tampilan tersembunyi. Dalam mode ini mudah untuk mengembalikan perubahan tanpa merusak struktur menu. Salahsatu kekurangannya adalah kamu harus menyembunyikan semua entri dalam submenu secara manual untuk menyembunyikan seluruh submenu dari tampilan. </para>
+</sect3>
+
+</sect2>
+
+<sect2 id="use-cases-additems">
+<title
+>Menembahkan Item Kustom</title
+> 
+
+<para
+>Untuk menambahkan item kustom (submenu atau item) gunakan aksi di menu atau bilah-alat. Item membutuhkan Nama dan Perintah, tanpa entri perintah, item tidak akan disimpan dan penambahanmu hilang. </para>
+<para
+>Jika kamu menambahkan entri, itu dimasukkan sebagai sub entri yang sebenarnya pada posisi tersorot di dalam hierarki. Pindahkan entri dengan menyeretnya memakai mouse atau menggunakan tombol <guibutton
+>Pindah Turun</guibutton
+> ke bagian bawah hierarki untuk menjadikan entri berada level teratas. </para>
+
+</sect2>
+
+<sect2 id="use-cases-transfer">
+<title
+>Transfer pengaturan peluncur aplikasi</title
+> 
+
+<para
+>Tidak ada cara untuk mentransfer pengaturan menu menggunakan &GUI;, yang harus kamu lakukan adalah secara manual dan menyalin file berikut ke pengguna target:</para>
+<para
+>&kmenuedit; menyimpankan hierarki menu dalam <filename
+>menus/applications-kmenuedit.menu</filename
+> di dalam folder <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+> dan <filename class="directory"
+>desktop-directories</filename
+> di dalam folder <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+> berisi file desktop untuk submenu yang kamu ciptakan. Di <filename class="directory"
+>applications/</filename
+> di dalam folder <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+> kamu temukan file desktop untuk item-item kustom yang kamu ciptakan. </para>
+<para
+>Pintasan untuk setiap aplikasi akan disimpan dalam <filename
+>kglobalshortcutsrc</filename
+> di dalam folder <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+>, tetapi ekspor/impor tidaklah bekerja, karena UUID-nya pintasan tidaklah cocok atara sistem bahkan file <filename class="extension"
+>.desktop</filename
+> sekalipun. Kamu harus menandai semua pintasan secara manual lagi. </para>
+
+</sect2>
+
+</sect1>
+</chapter>
+
+<chapter id="quickstart">
+<chapterinfo>
+<authorgroup>
+<author
+>&Virgil.J.Nisly; &Virgil.J.Nisly.mail;</author>
+</authorgroup>
+</chapterinfo>
+<title
+>Menambahkan sebuah Entri Menu</title>
+
+  <para
+>Dalam contoh ini, kita akan menambahkan &firefox; ke submenu <guisubmenu
+>Internet</guisubmenu
+>.</para>
+  <para
+>Untuk memulainya, kita perlu membuka &kmenuedit;, jadi &RMB; pada menu peluncur aplikasi, klik <guimenuitem
+>Edit Aplikasi...</guimenuitem
+> untuk memulai &kmenuedit;. Sesudah &kmenuedit; dimulai, pilihlah <guisubmenu
+>Internet</guisubmenu
+> sebagaimana ditampilkan dalam gambar di bawah ini. <screenshot>
+<screeninfo
+>Pilih <guisubmenu
+>Internet</guisubmenu
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selectinternet.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Pilih <guisubmenu
+>Internet</guisubmenu
+></phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+  <para
+>Setelah kamu memilih <guisubmenu
+>Internet</guisubmenu
+>, klik pada <menuchoice
+><guimenu
+>File</guimenu
+><guimenuitem
+>Item Baru...</guimenuitem
+></menuchoice
+>, membuka dialog <guilabel
+>Item Baru</guilabel
+>, sebagaimana ditampilkan di bawah ini. Ketiklah nama si program yang kamu ingin tambahkan, dalam kasus ini, ketiklah <userinput
+>firefox</userinput
+>. <screenshot>
+<screeninfo
+>Dialog <guilabel
+>Item Baru</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="itemname.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Dialog <guilabel
+>Item Baru</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot>
+</para>
+<para
+>Tekan enter, dan kamu seharusnya melihat sesuatu seperti gambar di bawah ini di dalam window utama. <screenshot>
+<screeninfo
+>Item Baru</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="new.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Item baru diciptakan.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Sekarang mari kita isi <guilabel
+>Deskripsi:</guilabel
+>, dalam hal ini ketik <userinput
+>Browser Web</userinput
+>. <note
+><para
+>Tampilan bagaimana deskripsi dan nama akan ditampilkan tergantung pada pengaturan di peluncur aplikasi &eg; <quote
+>Browser Web (Firefox)</quote
+> atau <quote
+>Firefox (Browser Web)</quote
+>. </para
+></note
+>Kita perlu mengisi di dalam nama dapat-dilaksanakan dalam bidang <guilabel
+>Perintah:</guilabel
+>, dalam hal ini kita akan mengetikkan <userinput
+><command
+>firefox</command
+></userinput
+>.</para>
+<para
+>Perintah tersebut harus berada di variabel <envar
+>PATH</envar
+>-mu atau kamu harus menspesifikasikan alur lengkap ke dapat-dilaksanakan. Jika kamu tidak tahu nama aplikasi yang dapat-dilaksanakan gunakanlah perintah <userinput
+><command
+>locate</command
+></userinput
+> untuk mencari file desktop dan memasukkan string dari baris Exec sebagai perintah di sini. </para>
+<note
+><para
+>Mengikuti perintah, kamu bisa memiliki beberapa place holder yang akan diganti dengan nilai aktual ketika program dijalankan: <simplelist>
+<member
+>%f - sebuah nama file tunggal</member>
+<member
+>%F - sebuah daftar file; digunakan untuk aplikasi yang bisa membuka bermacam file lokal sekaligus</member>
+<member
+>%u - sebuah &URL; tunggal</member>
+<member
+>%U - sebuah daftar &URL;</member>
+<member
+>%d - foldernya file yang dibuka</member>
+<member
+>%D - sebuah daftar folder</member>
+<member
+>%i - ikon</member>
+<member
+>%m - ikon mini</member>
+<member
+>%c - bab</member>
+</simplelist
+></para>
+<informalexample
+><para
+>Misalnya: jika kamu ingin firefox untuk memulai penelusuran web di www.kde.org - alih-alih <command
+>firefox</command
+> kamu bisa mengetikkan <command
+>firefox %u www.kde.org</command
+>.</para
+></informalexample
+></note>
+<para
+>Sebagian besar aplikasi menerima opsi tambahan &eg; nama profil yang ditentukan seperti &konqueror; atau &konsole;. Untuk melihat semua opsi peluncur aplikasi <userinput
+><command
+><replaceable
+>nama-aplikasi</replaceable
+></command
+> <option
+>--help</option
+></userinput
+> di &konsole;.</para>
+<para
+>Kita ingin memiliki ikon yang lebih kreatif, jadi kita akan mengeklik ikon generik yang duduk di sebelah <guilabel
+>Nama:</guilabel
+> (perhatikan, ikon baku mungkin kosong, dalam hal ini klik area di sebelah kanan kotak entri nama.) Itu akan membawa dialog <guilabel
+>Pilih Ikon</guilabel
+> yang akan membiarkan kita memilih ikon baru, seperti yang ditampilkan di bawah ini. <screenshot>
+<screeninfo
+>Dialog <guilabel
+>Pilih Ikon</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selecticon.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Dialog <guilabel
+>Pilih Ikon</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+  <para
+>Kita memilih ikon firefox dari daftar, dan tekan &Enter;. Layarmu yang sudah selesai seharusnya terlihat seperti cuplikan di bawah ini. <screenshot>
+<screeninfo
+>Screenshot selesai</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="done.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Seperti inilah tampilan item menu yang sudah selesai.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Tempatnya item menu baru, sekarang bisa diubah menggunakan tombol <guibutton
+>Pindah Naik</guibutton
+> dan <guibutton
+>Pindah Turun</guibutton
+> pada bilah-alat &kmenuedit; atau dengan menyeretnya pakai mouse.</para>
+ <para
+>Item-item submenu bisa diurutkan menggunakan tombol <guibutton
+>Urutkan</guibutton
+> pada bilah-alat &kmenuedit; atau item submenu <menuchoice
+><guimenu
+>Edit</guimenu
+><guisubmenu
+>Urutkan</guisubmenu
+></menuchoice
+>.</para>
+
+<para
+>Klik <menuchoice
+><guimenu
+>File</guimenu
+><guimenuitem
+>Simpan</guimenuitem
+></menuchoice
+>, tunggu dialog <guilabel
+>Memperbarui Konfigurasi Sistem</guilabel
+> sampai selesai, kamu seharusnya menemukan &firefox; di dalam peluncur aplikasi submenu <guisubmenu
+>Internet</guisubmenu
+>.</para>
+
+</chapter>
+
+<chapter id="using-kmenuedit">
+<title
+>Menggunakan &kmenuedit;</title>
+
+<para
+>Panel aplikasi sebelah kiri menampilkan struktur peluncur aplikasi. Ketika kamu menelusuri item-item di panel sebelah kiri, panel sebelah kanan menampilkan informasi terperinci mengenai item menu yang disorot.</para>
+
+<sect1 id="details-general">
+<title
+>Tab umum</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Nama:</guilabel
+></term>
+<listitem
+><para
+>Ini adalah nama programmu sebagaimana yang muncul di menu peluncur aplikasi. Ini bisa berbeda dari nama yang dapat-dilaksanakan yang sesungguhnya. Misalnya nama dapat-dilaksanakan <command
+>mc</command
+> adalah "<application
+>Midnight Commander</application
+>".</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Deskripsi:</guilabel
+></term>
+<listitem
+><para
+>Deskripsi akan didisplaikan bersama dengan nama di dalam peluncur aplikasi. Ini seluruhnya opsional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Komentar:</guilabel
+></term>
+<listitem
+><para
+>Deskripsikan program seperinci mungkin di bidang ini. Ini seluruhnya opsional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Perintah:</guilabel
+></term>
+<listitem
+><para
+>Ini adalah nama program yang dapat-dilaksanakan. Pastikan bahwa kamu memiliki perizinan untuk menjalankan program.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Fungsikan feedback luncur</guilabel
+></term>
+<listitem
+><para
+>Jika kotak ini dicentang, ini akan mendisplaikan feedback ketika sebuah aplikasi dijalankan. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Hanya tampilkan di &kde;</guilabel
+></term>
+<listitem
+><para
+>Ketika dicentang, entri aplikasi hanya akan terlihat di semua peluncur aplikasi &kde; tetapi tidak di desktop environment lainnya. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Isi tersembunyi</guilabel
+></term>
+<listitem
+><para
+>Hapus entri dari tampilan menu di dalam peluncur aplikasi. </para
+></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="details-advanced">
+<title
+>Tab tingkat lanjut</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Alur kerja:</guilabel
+></term>
+<listitem
+><para
+>Tentukan alur kerja program. Ini akan menjadi alur saat ini ketika peluncuran program.ini tidaklah harus sama sebagaimana lokasi yang dapat-dilaksanakan.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Jalankan di terminal</guilabel
+></term>
+<listitem
+><para
+>Kamu harus centang ini jika programmu memerlukan emulator terminal agar berjalan. Ini terutama diterapkan untuk <link linkend="gloss-console-application"
+>aplikasi konsol</link
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Opsi terminal:</guilabel
+></term>
+<listitem
+><para
+>Bubuhkan semua opsi terminal di bidang ini.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Jalankan sebagai pengguna yang berbeda</guilabel
+></term>
+<listitem
+><para
+>Jika kamu ingin menjalankan program ini sebagai pengguna yang berbeda (bukan kamu), centang kotak-centang ini, dan sediakan nama pengguna di dalam bidang <guilabel
+>Nama pengguna:</guilabel
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Tuts pintasan saat ini:</guilabel
+></term>
+<listitem
+><para
+>Kamu bisa menandai sebuah pintasan keyboard spesial untuk meluncurkan programmu.</para>
+
+<para
+>Klik tombol <guibutton
+>Nihil</guibutton
+> sebelah kanannya kotak-centang <guilabel
+>Tuts pintasan saat ini:</guilabel
+>.</para>
+
+<para
+>Teks tombol akan berubah menjadi <guilabel
+>Input...</guilabel
+> dan kamu bisa tekan tuts kombinasi pada keyboard-mu yang kamu inginkan untuk ditandai ke programmu. </para>
+<para
+>Kamu bisa mengeset ulang pintasan ke <guilabel
+>Nihil</guilabel
+> dengan menggunakan tombol ini: <inlinemediaobject
+><imageobject
+> <imagedata fileref="reset.png" format="PNG"/></imageobject
+></inlinemediaobject
+>. </para>
+
+<para
+>Jangan lupa untuk menyimpan pengaturanmu dengan mengeklik ikon <guiicon
+>Simpan</guiicon
+> bilah-alat atau menggunakan item menu <menuchoice
+> <guimenu
+>File</guimenu
+><guimenuitem
+>Simpan</guimenuitem
+> </menuchoice
+>.</para>
+
+</listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="menu-reference">
+<title
+>Referensi Menu</title>
+
+<para
+>Banyak aksi di dalam bilah-menu yang juga tersedia di menu konteks yang dibuka dengan sebuah klik &RMB; pada item di dalam tampilan hierarki.</para>
+
+<variablelist>
+<varlistentry id="file-new-item">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>File</guimenu
+> <guimenuitem
+>Item Baru...</guimenuitem
+> </menuchoice
+></term
+> <listitem
+><para
+><action
+>Menambahkan item menu baru.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-new-submenu">
+<term
+><menuchoice
+><guimenu
+>File</guimenu
+> <guimenuitem
+>Submenu Baru...</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Menambahkan submenu baru.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-save">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+></shortcut
+> <guimenu
+>File</guimenu
+><guimenuitem
+>Simpan</guimenuitem
+> </menuchoice
+></term>
+<listitem>
+<para
+><action
+>Menyimpan menu</action
+></para>
+</listitem>
+</varlistentry>
+
+<varlistentry id="file-quit">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>File</guimenu
+> <guimenuitem
+>Berhenti</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Memberhentikan</action
+> &kmenuedit;.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-up">
+<term
+><menuchoice
+><guimenu
+>Edit</guimenu
+> <guimenuitem
+>Pindah Naik</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Memindahkan</action
+> naik item yang dipilih di submenunya.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-down">
+<term
+><menuchoice
+><guimenu
+>Edit</guimenu
+> <guimenuitem
+>Pindah Turun</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Memindahkan</action
+> item yang dipilih di submenunya.</para
+></listitem>
+</varlistentry>
+
+
+<varlistentry id="edit-cut">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>X</keycap
+></keycombo
+> </shortcut
+> <guimenu
+> Edit</guimenu
+> <guimenuitem
+>Potong</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Memotong item menu saat ini ke papan klip.</action
+> Jika kamu ingin memindahkan item menu, pertama-tama kamu harus memotongnya ke papan klip, pindah ke tempat tujuan menggunakan panel kiri, dan gunakan <guimenuitem
+>Tempel </guimenuitem
+> yang berfungsi untuk menempelkan item menu dari papan klip.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-copy">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Edit</guimenu
+> <guimenuitem
+>Salin</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Menyalin item menu saat ini ke papan klip</action
+>. Kamu nanti bisa gunakan fungsi <guimenuitem
+>Tempel</guimenuitem
+> untuk menempelkan menu yang menyalin item dari papan klip ke tujuannya. Kamu bisa menempelkan item yang sama banyaknya.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-paste">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>V</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Edit</guimenu
+> <guimenuitem
+>Tempel</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Menempel item menu dari papan klip</action
+> ke tempat yang dipilih saat ini di dalam menu utama. Kamu harus terlebih dahulu menggunakan <guimenuitem
+>Potong</guimenuitem
+> atau <guimenuitem
+>Salin</guimenuitem
+> sebelum kamu bisa <guimenuitem
+>Tempel</guimenuitem
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-delete">
+<term
+><menuchoice
+><shortcut
+><keycap
+>Del</keycap
+></shortcut
+> <guimenu
+>Edit</guimenu
+> <guimenuitem
+>Hapus</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Menghapus item menu yang dipilih saat ini.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-sort">
+<term
+><menuchoice
+><guimenu
+>Edit</guimenu
+> <guisubmenu
+>Urutkan</guisubmenu
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Membukakan</action
+> submenu untuk mengurutkan submenu yang dipilih atau semua hierarki menu. Ada dua metode pengurutan yang diimplementasikan, yaitu, berdasarkan nama dan berdasarkan deskripsi.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-restore">
+<term
+><menuchoice
+><guimenu
+>Edit</guimenu
+> <guimenuitem
+>Kembalikan ke Menu Sistem</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Ini akan mengembalikan peluncur aplikasi sebagaimana bakunya dan menghapus semua pengaturan kustommu. Kotak pesan akan menanyakan apakah kamu benar-benar ingin melakukan itu.</action
+></para
+></listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>&kmenuedit; memiliki <guimenu
+>Pengaturan</guimenu
+> &kde; pada umumnya dan item menu <guimenu
+>Bantuan</guimenu
+>, untuk informasi selebihnya bacalah bagian tentang <ulink url="help:/fundamentals/ui.html#menus-settings"
+>Menu Pengaturan</ulink
+> dan <ulink url="help:/fundamentals/ui.html#menus-help"
+>Menu Bantuan</ulink
+> pada &kde; Fundamental. </para>
+
+</chapter>
+
+<chapter id="credits">
+
+<title
+>Penghargaan dan Lisensi</title>
+
+<para
+>&kmenuedit; </para>
+<para
+>Hakcipta program &copy; 2002, &Raffaele.Sandrini;</para>
+
+<para
+>Para Kontributor:</para>
+<itemizedlist>
+<listitem
+><para
+> &Matthias.Elter; &Matthias.Elter.mail; - Penulis Asli</para>
+</listitem>
+<listitem
+><para
+>&Matthias.Ettrich; &Matthias.Ettrich.mail;</para>
+</listitem>
+<listitem
+><para
+>&Daniel.M.Duley; &Daniel.M.Duley.mail;</para>
+</listitem>
+<listitem
+><para
+>&Preston.Brown; &Preston.Brown.mail;</para>
+</listitem>
+</itemizedlist>
+
+<para
+>Hakcipta dokumentasi &copy; 2000 &Milos.Prudek;</para>
+<para
+>Hakcipta dokumentasi &copy; 2008 &Anne-Marie.Mahfouf;</para>
+<para
+>Diperbarui untuk &kde; 3.0 oleh &Lauri.Watts; &Lauri.Watts.mail; 2002</para>
+
+<para
+>Wantoyo<email
+>wantoyek@gmail.com</email
+></para
+> &underFDL; &underGPL; </chapter>
+
+<glossary id="glossary">
+<title
+>Glosarium</title>
+
+<glossentry id="gloss-console-application">
+<glossterm
+>Aplikasi Konsol</glossterm>
+<glossdef>
+
+<para
+>Aplikasi awalnya ditulis untuk lingkungan non-grafis, berorientasi teks. Aplikasi semacam itu berjalan dengan baik di &kde;. Mereka harus berjalan di dalam emulator konsol, seperti &konsole;. Mereka tidak diperingatkan secara otomatis ketika kamu mematikan sesi &kde;. Karena itu, jangan lupa untuk menyimpan dokumen yang terbuka di aplikasi ini sebelum kamu logout dari &kde;.</para>
+
+<para
+>Aplikasi konsol mendukung penyalinan dan penempelan dari aplikasi-aplikasi &kde; yang disesuaikan. Cukup menandai teks di dalam aplikasi konsol pakai mouse, beralih ke aplikasi &kde; yang sesuai dan tekan <keycombo action="simul"
+>&Ctrl; <keycap
+>V</keycap
+></keycombo
+> untuk menempel teks. Jika kamu ingin menyalin dari aplikasi &kde; ke aplikasi konsol, pertama tandai teks pakai mouse-mu, tekan <keycombo action="simul"
+>&Ctrl; <keycap
+>C</keycap
+></keycombo
+>, beralih ke aplikasi konsol dan tekan tombol tengah pada mouse-mu <footnote
+><para
+>Jika mouse-mu tidak ada tombol tengahnya, kamu harus tekan tombol <mousebutton
+>kiri</mousebutton
+> dan <mousebutton
+>kanan</mousebutton
+> berserentak. Ini adalah disebut <quote
+>emulasi tombol tengah</quote
+> dan itu mestinya didukung oleh sistem-operasimu untuk kinerja.</para
+></footnote
+>.</para>
+
+</glossdef>
+</glossentry>
+
+</glossary>
+
+&documentation.index;
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+End:
+-->
+

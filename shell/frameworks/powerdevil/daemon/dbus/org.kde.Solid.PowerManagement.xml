@@ -1,0 +1,121 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.kde.Solid.PowerManagement">
+    <method name="refreshStatus" />
+    <method name="reparseConfiguration" />
+    <method name="backendCapabilities">
+      <arg type="u" direction="out" />
+    </method>
+    <method name="loadProfile">
+      <arg type="b" direction="in" />
+    </method>
+    <method name="currentProfile">
+      <arg type="s" direction="out" />
+    </method>
+    <method name="batteryRemainingTime">
+      <arg type="t" direction="out" />
+    </method>
+    <method name="smoothedBatteryRemainingTime">
+      <arg type="t" direction="out" />
+    </method>
+    <method name="isLidClosed">
+        <arg type="b" direction="out" />
+    </method>
+    <method name="isLidPresent">
+        <arg type="b" direction="out" />
+    </method>
+    <method name="isActionSupported">
+      <arg type="s" direction="in" />
+      <arg type="b" direction="out" />
+    </method>
+    <method name="hasDualGpu">
+      <arg type="b" direction="out" />
+    </method>
+    <method name="isBatteryConservationModeEnabled">
+      <arg type="b" direction="out" />
+    </method>
+    <method name="chargeStartThreshold">
+      <arg type="i" direction="out" />
+    </method>
+    <method name="chargeStopThreshold">
+      <arg type="i" direction="out" />
+    </method>
+
+    <!-- schedule system wakeup in future -->
+    <!--
+    This method allows to wake system instantly or in future.
+    There's 3 parameters
+
+    - dbus service
+    - dbus object path
+    - timestamp to wake system (in seconds from epoch)
+
+    This method may return 2 errors,
+
+    - org.kde.PowerDevil.Core.Wakeup.InvalidTime : If you try to schedule wakeup in past
+    - org.kde.PowerDevil.Core.Wakeup.Unsupported : If called on non-Linux platforms where
+      timer_fd interface is not supported
+
+    If wakeup is scheduled successfully, it returns the integer cookie which can be used by
+    the application for keeping track and referencing to it during wakeup
+
+    Upon waking up system, powerdevil will call the specified the dbus service and path on
+    interface org.kde.PowerManagement, wakeupCallback (XML for implementing this can be found
+    in this repo) method.
+
+    It will send out a single argument, which would be cookie number associated with the wakeup.
+    -->
+    <method name="scheduleWakeup">
+      <arg type="u" direction="out" />
+      <arg type="s" direction="in" name="service" />
+      <arg type="o" direction="in" name="path" />
+      <arg type="t" direction="in" name="timestamp"/>
+    </method>
+
+    <!-- wake system up immediately -->
+    <!-- this method can be used to wake system immediately from dpms off mode -->
+    <method name="wakeup" />
+
+    <!-- clear previously registered wakeups -->
+    <!--
+    This method clears out the previously registered wakeups and takes a single argument which
+    is the cookie supplied by the powerdevil earlier.
+    -->
+    <method name="clearWakeup">
+      <arg type="i" direction="in" />
+    </method>
+
+    <!--<method name="turnOffScreen" />-->
+
+    <!--<method name="getSupportedSuspendMethods">
+      <arg type="a{sv}" direction="out" />
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap" />
+    </method>-->
+
+    <!--<signal name="DPMSconfigUpdated">
+    </signal>-->
+    <signal name="profileChanged">
+      <arg type="s" direction="out" />
+    </signal>
+    <signal name="configurationReloaded">
+    </signal>
+    <signal name="batteryRemainingTimeChanged">
+      <arg type="t" direction="out" />
+    </signal>
+    <signal name="smoothedBatteryRemainingTimeChanged">
+      <arg type="t" direction="out" />
+    </signal>
+    <signal name="lidClosedChanged">
+      <arg type="b" direction="out" />
+    </signal>
+    <signal name="batteryConservationModeChanged">
+      <arg type="b" direction="out" />
+    </signal>
+    <signal name="chargeStartThresholdChanged">
+      <arg type="i" direction="out" />
+    </signal>
+    <signal name="chargeStopThresholdChanged">
+      <arg type="i" direction="out" />
+    </signal>
+  </interface>
+</node>

@@ -1,0 +1,4 @@
+add_subdirectory(draganddrop)
+add_subdirectory(kquickcontrolsaddons)
+add_subdirectory(graphicaleffects)
+add_subdirectory(kquickcontrols)

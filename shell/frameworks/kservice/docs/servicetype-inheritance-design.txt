@@ -1,0 +1,49 @@
+Service types
+=============
+A service type is a capability that a set of services (applications or plugins) have.
+For instance the service type KParts/ReadOnlyPart means "this plugin has the capability
+to provide a class that derives from KParts::ReadOnlyPart" (i.e. an embeddable viewer).
+The coincidence in naming is just a coincidence, we could have named that servicetype
+"EmbeddableKPartsViewer" or whatever, it's just a name.
+
+A service type is defined by a .desktop file (installed into the servicetypes directory),
+containing name, translated description, and a few additional things like inheritance
+and additional properties.
+
+Mime types
+==========
+In KDE3 and KDE4, a mimetype was a special kind of servicetype.
+However since KF5 we are moving away from this, and splitting out the two.
+This document was written before that, however.
+
+Service type inheritance (X-KDE-Derived)
+========================================
+X-KDE-Derived is the desktop file key that defines inheritance for a service type.
+"ST1 derives from ST2" means "ST1 is more specific than ST2".
+If a service implements ST1, it also implements ST2, but not the other way round.
+
+For instance, KoDocument derives from KParts/ReadWritePart, which derives from KParts/ReadOnlyPart,
+so KWord's part (which implements KoDocument) can be used as a readonly viewer for KWord files
+in Konqueror (which looks for a KParts/ReadOnlyPart).
+
+Mimetype "inheritance"
+======================
+For mimetypes, we need a mechanism to also say that "text/xml is a special case of text/plain",
+or "text/docbook is a kind of text/sgml", or "application/x-smb-workgroup is a kind
+of inode/directory", etc. See below.
+
+Why mimetype "inheritance" doesn't use X-KDE-Derived
+====================================================
+The confusing thing is that we said "a mimetype is a servicetype". But that's not exactly correct.
+As Waldo noted, "the ability to open a mimetype" is what's a servicetype.
+So if text/xml said X-KDE-Derived=text/plain (i.e. ST1=text/xml, ST2=text/plain),
+then an application opening text/xml (ST1) would end up being associated with any text/plain (ST2) file,
+which would be wrong.
+
+We want the other way round: to be able to open special kinds of text/plain in a plain text editor.
+This is why mimetypes have their own inheritance mechanism ("X-KDE-IsAlso" in KDE3, and since KDE4,
+the inheritance mechanism defined in shared-mime-info).
+It kind of "works the other way" than X-KDE-Derived.
+If M1 is a special kind of M2 (mimetypes), then "the ability to open M2" derives from "the ability to open M1"
+The ability to open any text/plain file derives (is more specific than) the ability to open text/xml only.
+"text/xml inherits from text/plain" means that applications that can open text/plain can also open text/xml.

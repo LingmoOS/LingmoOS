@@ -1,0 +1,2 @@
+add_executable(kstatusnotifieritemtest kstatusnotifieritemtest.cpp)
+target_link_libraries(kstatusnotifieritemtest KF6::StatusNotifierItem)

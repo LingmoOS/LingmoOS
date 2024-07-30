@@ -1,0 +1,1126 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+ <!ENTITY kappname "&kde; Menu Editor">
+  <!ENTITY package "kdebase">
+  <!ENTITY firefox "<application
+>Firefox</application
+>">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Spanish "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kmenuedit" lang="&language;">
+
+<bookinfo>
+
+<title
+>Manual del editor de menús de &kde;</title>
+
+<authorgroup>
+<author
+>&Milos.Prudek; &Milos.Prudek.mail;</author>
+<author
+>&Anne-Marie.Mahfouf; &Anne-Marie.Mahfouf.mail;</author>
+<othercredit role="reviewer"
+>&Lauri.Watts; &Lauri.Watts.mail; </othercredit>
+<othercredit role="translator"
+> <firstname
+>Rocío</firstname
+> <surname
+>Gallego</surname
+> <affiliation
+><address
+><email
+>traducciones@rociogallego.com</email
+></address
+></affiliation
+> <contrib
+>Traducción</contrib
+> </othercredit
+><othercredit role="translator"
+><firstname
+>Pablo</firstname
+><surname
+>de Vicente</surname
+><affiliation
+><address
+><email
+>pvicentea@nexo.es</email
+></address
+></affiliation
+><contrib
+>Traductor</contrib
+></othercredit
+> <othercredit role="translator"
+> <firstname
+>Marcos</firstname
+> <surname
+>Fouces Lago</surname
+> <affiliation
+><address
+><email
+>mfouces@yahoo.es</email
+></address
+></affiliation
+> <contrib
+>Traductor</contrib
+> </othercredit
+> <othercredit role="translator"
+> <firstname
+>Santiago</firstname
+> <surname
+>Fernández Sancho</surname
+> <affiliation
+><address
+><email
+>santi@kde-es.org</email
+></address
+></affiliation
+> <contrib
+>Traductor</contrib
+> </othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Milos.Prudek;</holder>
+</copyright>
+<copyright>
+<year
+>2008</year>
+<holder
+>&Anne-Marie.Mahfouf;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2015-04-27</date>
+<releaseinfo
+>Plasma 5.3</releaseinfo>
+
+<abstract
+><para
+>&kmenuedit; le permite editar uno de los lanzadores de aplicaciones de &kde;. </para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>Editor de menús de KDE</keyword>
+<keyword
+>kmenuedit</keyword>
+<keyword
+>aplicación</keyword>
+<keyword
+>programa</keyword>
+<keyword
+>menú</keyword>
+<keyword
+>kickoff</keyword>
+<keyword
+>Lancelot</keyword>
+</keywordset>
+
+</bookinfo>
+<chapter id="introduction">
+<title
+>Introducción</title>
+
+<para
+>&kmenuedit; le permite editar el menú de los lanzadores de aplicaciones de &kde;.</para>
+
+<para
+>&kmenuedit; se puede iniciar pulsando con el &RMB; en el botón del lanzador de aplicaciones en el panel y seleccionando <guimenuitem
+>Editar aplicaciones...</guimenuitem
+> o escribiendo <userinput
+>kmenuedit</userinput
+> en la línea de &krunner;.</para>
+
+<para
+>&kmenuedit; le permite:</para>
+
+<itemizedlist>
+<listitem
+><para
+>Ver y editar el menú que usa el lanzador de aplicaciones actual</para
+></listitem>
+<listitem
+><para
+><guimenuitem
+>Cortar</guimenuitem
+>, <guimenuitem
+>Copiar</guimenuitem
+> y <guimenuitem
+>Pegar</guimenuitem
+> submenús y elementos.</para
+></listitem>
+<listitem
+><para
+>Crear y borrar submenús y elementos</para
+></listitem>
+<listitem
+><para
+>Cambiar el orden de los submenús y de los elementos</para
+></listitem>
+<listitem
+><para
+>Ocultar elementos y añadir nuevos submenús y elementos</para
+></listitem>
+</itemizedlist>
+
+<para
+>De manera predeterminada, todas las aplicaciones instaladas en la computadora aparecen en el menú de los lanzadores de aplicaciones de todos los usuarios. Las aplicaciones pueden aparecer más de una vez en varios menús diferentes. Las categorías de submenú vacías definidas en la especificación del menú del escritorio también aparecerán, pero no estarán visibles en los lanzadores de aplicaciones a menos que instale aplicaciones que pertenezcan a dichas categorías. </para>
+
+<para
+>La vista de árbol tiene dos tipos de entradas distintos:</para>
+<itemizedlist>
+<listitem
+><para
+>Submenú: Solo están activos los campos <guilabel
+>Nombre</guilabel
+>, <guilabel
+>Comentario</guilabel
+> y <guilabel
+>Descripción</guilabel
+>, así como el botón para seleccionar un icono. La pestaña <guilabel
+>Avanzado</guilabel
+> está desactivada. Un submenú puede contener otros submenús y/o elementos. </para
+></listitem>
+<listitem
+><para
+>Elementos: Use esta entrada para introducir los datos de la aplicación que quiere añadir. Para una información detallada, consulte <link linkend="using-kmenuedit"
+>Uso de &kmenuedit;</link
+>. </para
+></listitem>
+</itemizedlist>
+
+<para
+>&kmenuedit; tiene dos modos de vista en árbol: normal y con entradas ocultas. Para ver este último, marque la opción <guilabel
+>Mostrar entradas ocultas</guilabel
+> en el diálogo de configuración de la página <guilabel
+>Opciones generales</guilabel
+>. </para>
+<para
+>En el modo de vista con entradas ocultas aparecen muchas entradas adicionales en el árbol. Algunas de estas entradas parecen ser solo duplicados, aunque tienen distintas opciones para la orden. Por lo general, no debería modificar nunca estas entradas ocultas, ya que corre el riesgo de estropear alguna funcionalidad del sistema. </para>
+<para
+>En el modo con entradas ocultas tendrá un submenú especial <guilabel
+>.hidden (oculto)</guilabel
+> como elemento superior del árbol. Este submenú especial no se puede editar. Este submenú mostrará todos los elementos borrados la próxima vez que lance &kmenuedit;.</para>
+<para
+>No se pueden borrar entradas de este submenú especial usando la interfaz gráfica. Volverán a aparecer la próxima vez que inicie &kmenuedit;. </para>
+
+<sect1 id="use-cases">
+<title
+>Casos de uso</title>
+
+<sect2 id="use-cases-adapt">
+<title
+>Adaptar el menú para un usuario</title
+> 
+
+<sect3 id="use-cases-adapt-order">
+<title
+>Reordenar elementos</title
+> 
+
+<para
+>Esto debe hacerse en el modo de vista oculta donde solo se muestran los submenús y los elementos visibles del menú del lanzador de aplicaciones. </para>
+<para
+>De forma predeterminada, el menú se ordena alfabéticamente usando los nombres en inglés o las descripciones. El uso de otro idioma distinto al inglés hará que algunos submenús y elementos aparezcan desordenados. </para>
+<para
+>Use las opciones de <menuchoice
+><guimenu
+>Editar</guimenu
+><guimenuitem
+>Ordenar</guimenuitem
+></menuchoice
+> para ordenar por nombre o por descripción. Si usa el lanzador de aplicaciones clásico, tendrá que seleccionar la correspondiente opción de <guilabel
+>Formato</guilabel
+> en el diálogo de preferencias. En el lanzador &kickoff;, marque <guilabel
+>Mostrar aplicaciones por nombre</guilabel
+> si las ordena por nombre aquí. </para>
+<para
+>Puede agrupar los submenús y elementos que use con frecuencia al principio del menú, por ejemplo, para poder seleccionarlos con más facilidad. Para cambiar el orden de cualquier elemento o submenú, use los botones <guibutton
+>Subir</guibutton
+> y <guibutton
+>Bajar</guibutton
+> de la barra de herramientas o sus correspondientes acciones en el menú. </para>
+<para
+>Todos los lanzadores de aplicaciones usarán el orden de los submenús que haya definido en &kmenuedit;. </para>
+</sect3>
+
+<sect3 id="use-cases-adapt-hide">
+<title
+>Eliminar elementos del la vista del menú</title
+> 
+
+<para
+>Algunos usuarios pueden encontrar confuso que se muestren todas las aplicaciones instaladas en el sistema, por lo que tal vez quiera ocultar algunos elementos o submenús de uso menos frecuente. Puede hacerlo de dos formas distintas: </para>
+
+<para
+>Cambie al modo de vista normal sin entradas ocultas. Si borra elementos aquí, se moverán al submenú <guilabel
+>.hidden (oculto)</guilabel
+>. Puede volver a moverlos al árbol para que aparezcan de nuevo en el menú. </para>
+<para
+>Si borra un submenú, se borrará realmente junto con todos los submenús y elementos que contenga. Para volver a crearlo puede usar <menuchoice
+><guimenu
+>Editar</guimenu
+><guimenuitem
+>Restaurar al menú del sistema</guimenuitem
+></menuchoice
+>, pero esto eliminará todos los submenús y entradas personalizadas, así como sus correspondientes archivos <filename class="extension"
+>.desktop</filename
+>. Esta acción no se puede deshacer. </para>
+
+<para
+>El modo preferido para eliminar submenús y elementos del menú de un lanzador de aplicaciones consiste en marcar <guilabel
+>Entrada oculta</guilabel
+> en la pestaña <guilabel
+>General</guilabel
+> y cambiar al modo de vista con elementos ocultos. En este modo resulta más fácil deshacer los cambios sin destruir la estructura del menú. El único inconveniente es que debe ocultar todas las entradas de un submenú de forma manual para ocultar todo el submenú de la vista. </para>
+</sect3>
+
+</sect2>
+
+<sect2 id="use-cases-additems">
+<title
+>Añadir elementos personalizados</title
+> 
+
+<para
+>Para añadir elementos personalizados (submenús o elementos) use las acciones del menú o de la barra de herramientas. Cada elemento necesita un nombre y una orden. Sin una entrada de orden, un elemento no se guardaría, por lo que se perdería la entrada que acaba de añadir. </para>
+<para
+>Si añade una entrada, se insertará como subentrada en la posición del árbol que esté resaltada en la actualidad. Puede mover una entrada arrastrándola con el ratón o usando el botón <guibutton
+>Bajar</guibutton
+> de la parte inferior del árbol para convertirla en entrada del nivel superior. </para>
+
+</sect2>
+
+<sect2 id="use-cases-transfer">
+<title
+>Transferir las preferencias del lanzador de aplicaciones</title
+> 
+
+<para
+>No hay ninguna forma de transferir las preferencias del menú usando la interfaz gráfica. Tendrá que hacerlo de forma manual y copiar los siguientes archivos al usuario de destino:</para>
+<para
+>&kmenuedit; guarda la jerarquía del menú en <filename
+>menus/applications-kmenuedit.menu</filename
+> dentro de la carpeta <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+>; <filename class="directory"
+>desktop-directories</filename
+>, dentro de la carpeta <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+>, contiene los archivos de escritorio de los submenús que haya creado. En <filename class="directory"
+>applications/</filename
+>, dentro de la carpeta <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+>, encontrará los archivos de escritorio de los elementos personalizados que haya creado. </para>
+<para
+>Los atajos de teclado de cada aplicación se guardan en <filename
+>kglobalshortcutsrc</filename
+>, dentro de la carpeta <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+>, aunque no podrá exportarlos ni importarlos porque los UUID de los atajos de teclado no coinciden entre distintos sistemas, incluso aunque los archivos <filename class="extension"
+>.desktop</filename
+> sean idénticos. Tendrá que volver a asignar todos los atajos de teclado a mano. </para>
+
+</sect2>
+
+</sect1>
+</chapter>
+
+<chapter id="quickstart">
+<chapterinfo>
+<authorgroup>
+<author
+>&Virgil.J.Nisly; &Virgil.J.Nisly.mail;</author>
+</authorgroup>
+</chapterinfo>
+<title
+>Añadir una entrada de menú</title>
+
+  <para
+>En este ejemplo, añadiremos &firefox; al submenú <guisubmenu
+>Internet</guisubmenu
+>.</para>
+  <para
+>Para empezar, necesitaremos abrir &kmenuedit;, por tanto, pulse el &RMB; en el menú lanzador de aplicaciones y haga clic en <guimenuitem
+>Editar aplicaciones...</guimenuitem
+> para iniciar &kmenuedit;. Después de que se haya iniciado &kmenuedit;, seleccione <guisubmenu
+>Internet</guisubmenu
+> como se muestra en la imagen inferior. <screenshot>
+<screeninfo
+>Seleccionar <guisubmenu
+>Internet</guisubmenu
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selectinternet.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Seleccionar <guisubmenu
+>Internet</guisubmenu
+></phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+  <para
+>Una vez que haya seleccionado <guisubmenu
+>Internet</guisubmenu
+>, pulse en <menuchoice
+><guimenu
+>Archivo</guimenu
+><guimenuitem
+>Nuevo elemento...</guimenuitem
+></menuchoice
+>, que abrirá el diálogo <guilabel
+>Nuevo elemento</guilabel
+>, tal y como se muestra a continuación. Teclee el nombre del programa que desea añadir, en este caso, teclee <userinput
+>firefox</userinput
+>. <screenshot>
+<screeninfo
+>Diálogo <guilabel
+>Elemento nuevo</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="itemname.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>El diálogo <guilabel
+>Elemento nuevo</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot>
+</para>
+<para
+>Pulse entrar, y debería ver algo similar al dibujo inferior en la ventana principal. <screenshot>
+<screeninfo
+>Nuevo elemento</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="new.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>El nuevo elemento creado.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Ahora rellenamos <guilabel
+>Descripción:</guilabel
+>. Para este caso, escriba <userinput
+>Navegador web</userinput
+>. <note
+><para
+>El aspecto en el que se muestra la descripción y el nombre depende de las preferencias del lanzador de aplicaciones; por ejemplo, «Navegador web (Firefox)» o «Firefox (Navegador web)».</para
+></note
+> Debemos rellenar el nombre del ejecutable en el campo <guilabel
+>Orden:</guilabel
+>, por lo que escribiremos <userinput
+><command
+>firefox</command
+></userinput
+>.</para>
+<para
+>La orden debe estar en la variable de entorno <envar
+>PATH</envar
+> o tendrá que especificar la ruta completa del ejecutable. Si no conoce el nombre del ejecutable de una determinada aplicación, use la orden <userinput
+><command
+>locate</command
+></userinput
+> para encontrar su archivo de escritorio y luego introduzca aquí la cadena de texto que contiene la línea «Exec». </para>
+<note
+><para
+>Después de la orden puede incluir varios argumentos, que se reemplazarán con los valores reales cuando el programa se vaya a ejecutar: <simplelist>
+<member
+>%f - un solo nombre de archivo.</member>
+<member
+>%F - una lista de archivos. Se utiliza en aplicaciones que pueden abrir varios archivos locales simultáneamente.</member>
+<member
+>%u - una sola &URL;.</member>
+<member
+>%U - una lista de &URL;s.</member>
+<member
+>%d - la carpeta de un archivo para abrir.</member>
+<member
+>%D - una lista de carpetas.</member>
+<member
+>%i - el icono.</member>
+<member
+>%m - el mini icono.</member>
+<member
+>%c - el título.</member>
+</simplelist
+></para>
+<informalexample
+><para
+>Por ejemplo: si desea que firefox inicie su navegador web en www.kde.org, en lugar de <command
+>firefox</command
+> debería teclear <command
+>firefox %u www.kde.org</command
+>.</para
+></informalexample
+></note>
+<para
+>La mayoría de las aplicaciones aceptan opciones adicionales, &eg;, el nombre de un perfil determinado como &konqueror; o &konsole;. Para ver todas las opciones de una aplicación, lance <userinput
+><command
+><replaceable
+>applicationname</replaceable
+></command
+><option
+>--help</option
+></userinput
+> en &konsole;.</para>
+<para
+>Si prefiere un icono más creativo, pulse sobre el icono genéricosituado al lado de <guilabel
+>Nombre:</guilabel
+> (tenga en cuenta que el icono predeterminado puede estar en blanco, en cuyo caso haga clic en el área situada a la derecha del nombre de la casilla de entrada). Aparecerá el diálogo <guilabel
+>Seleccionar icono</guilabel
+> que le permitirá escoger el nuevo icono, tal y como se muestra a continuación. <screenshot>
+<screeninfo
+>Diálogo <guilabel
+>Seleccionar icono</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selecticon.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>El diálogo <guilabel
+>Seleccionar icono</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+  <para
+>Seleccionamos el icono de firefox en la lista y pulsamos &Enter;. Su pantalla final debería parecerse a la captura de pantalla inferior. <screenshot>
+<screeninfo
+>Captura de pantalla tras terminar.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="done.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Esto es a lo que debería parecerse el elemento de menú.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Ahora puede cambiar el lugar que ocupa el nuevo elemento del menú usando los botones <guibutton
+>Subir</guibutton
+> y <guibutton
+>Bajar</guibutton
+> de la barra de herramientas de &kmenuedit; o arrastrándolo con el ratón.</para>
+ <para
+>Puede ordenar los elementos del submenú usando el botón <guibutton
+>Ordenar</guibutton
+> de la barra de herramientas de &kmenuedit; o los elementos del submenú <menuchoice
+><guimenu
+>Editar</guimenu
+><guisubmenu
+>Ordenar</guisubmenu
+></menuchoice
+>.</para>
+
+<para
+>Haga clic en <menuchoice
+><guimenu
+>Archivo</guimenu
+><guimenuitem
+>Guardar</guimenuitem
+></menuchoice
+>, espere a que termine el diálogo <guilabel
+>Actualizando configuración del sistema</guilabel
+>, y ya debería ver &firefox; en el submenú <guisubmenu
+>Internet</guisubmenu
+> del lanzador de aplicaciones.</para>
+
+</chapter>
+
+<chapter id="using-kmenuedit">
+<title
+>Utilizando &kmenuedit;</title>
+
+<para
+>El panel izquierdo de la aplicación muestra la estructura del lanzador de aplicaciones. Cuando navegue por los elementos de dicho panel, el panel derecho mostrará información detallada del elemento de menú resaltado.</para>
+
+<sect1 id="details-general">
+<title
+>Pestaña General</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Nombre:</guilabel
+></term>
+<listitem
+><para
+>Este es el nombre de su programa tal y como aparece en el menú lanzador de aplicaciones. Puede ser diferente del nombre real del ejecutable, por ejemplo, el nombre del ejecutable de <command
+>mc</command
+> es «<application
+>Midnight Commander</application
+>».</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Descripción:</guilabel
+></term>
+<listitem
+><para
+>La descripción se mostrará junto al nombre en el lanzador de aplicaciones. Es totalmente opcional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Comentario:</guilabel
+></term>
+<listitem
+><para
+>Describa en este campo el programa con mayor detalle. Esto es totalmente opcional.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Orden:</guilabel
+></term>
+<listitem
+><para
+>Este es el nombre del programa ejecutable. Asegurese de que tiene permiso para ejecutar este programa.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Activar lanzamiento de retroalimentación</guilabel
+></term>
+<listitem
+><para
+>Si esta casilla está marcada, se mostrará información cuando se inicia la aplicación. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Solo visible en &kde;</guilabel
+></term>
+<listitem
+><para
+>Si se activa, la entrada de la aplicación solo será visible en los lanzadores de aplicaciones de &kde;, no en otros entornos de escritorio. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Entrada oculta</guilabel
+></term>
+<listitem
+><para
+>Eliminar una entrada de la vista de menú del lanzador de aplicaciones. </para
+></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="details-advanced">
+<title
+>Pestaña Avanzado</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Ruta de trabajo:</guilabel
+></term>
+<listitem
+><para
+>Especifique la ruta de trabajo del programa. Esta será la ruta actual cuando el programa se inicie. No necesita ser igual a la ubicación del ejecutable.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Ejecutar en terminal</guilabel
+></term>
+<listitem
+><para
+>Debe seleccionar esta opción si su programa requiere emulador de terminal para ejecutarse. Esto se aplica a <link linkend="gloss-console-application"
+>aplicaciones de consola</link
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Opciones del terminal:</guilabel
+></term>
+<listitem
+><para
+>Ponga todas las opciones de terminal en este campo.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Ejecutar como otro usuario</guilabel
+></term>
+<listitem
+><para
+>Si desea ejecutar este programa como un usuario diferente (no el suyo), seleccione esta casilla y proporcione el nombre de usuario en el campo <guilabel
+>Usuario</guilabel
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Atajo de teclado actual:</guilabel
+></term>
+<listitem
+><para
+>Puede asignar un atajo de teclado especial para iniciar el programa.</para>
+
+<para
+>Pulse el botón <guibutton
+>Ninguno</guibutton
+> situado a la derecha de la casilla <guilabel
+>Tecla de atajo de teclado actual</guilabel
+>.</para>
+
+<para
+>El texto del botón cambiará a <guilabel
+>Entrada...</guilabel
+> y podrá presionar la combinación de teclado que desee asignar al programa. </para>
+<para
+>Puede restablecer el atajo a <guilabel
+>Ninguno</guilabel
+> usando este botón: <inlinemediaobject
+><imageobject
+> <imagedata fileref="reset.png" format="PNG"/></imageobject
+></inlinemediaobject
+>. </para>
+
+<para
+>No olvide guardar sus preferencias haciendo clic en el icono <guiicon
+>Guardar</guiicon
+> de la barra de herramientas o mediante el elemento <menuchoice
+> <guimenu
+>Archivo</guimenu
+><guimenuitem
+>Guardar</guimenuitem
+> </menuchoice
+> del menú.</para>
+
+</listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="menu-reference">
+<title
+>Menú Referencia</title>
+
+<para
+>La mayoría de las acciones de la barra de menú también están disponibles en el menú de contexto que se muestra al hacer clic con el &RMB; sobre algún elemento de la vista de árbol.</para>
+
+<variablelist>
+<varlistentry id="file-new-item">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Archivo</guimenu
+> <guimenuitem
+>Nuevo elemento...</guimenuitem
+> </menuchoice
+></term
+> <listitem
+><para
+><action
+>Añade un nuevo elemento.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-new-submenu">
+<term
+><menuchoice
+><guimenu
+>Archivo</guimenu
+> <guimenuitem
+>Nuevo submenú</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Añade un nuevo submenú.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-save">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Archivo</guimenu
+><guimenuitem
+>Guardar</guimenuitem
+> </menuchoice
+></term>
+<listitem>
+<para
+><action
+>Guarda el menú.</action
+></para>
+</listitem>
+</varlistentry>
+
+<varlistentry id="file-quit">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Archivo</guimenu
+> <guimenuitem
+>Salir</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Sale</action
+> de &kmenuedit;.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-up">
+<term
+><menuchoice
+><guimenu
+>Editar</guimenu
+> <guimenuitem
+>Subir</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Sube</action
+> el elemento seleccionado en su submenú.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-down">
+<term
+><menuchoice
+><guimenu
+>Editar</guimenu
+> <guimenuitem
+>Bajar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Baja</action
+> el elemento seleccionado en su submenú.</para
+></listitem>
+</varlistentry>
+
+
+<varlistentry id="edit-cut">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>X</keycap
+></keycombo
+> </shortcut
+> <guimenu
+> Editar</guimenu
+> <guimenuitem
+>Cortar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Corta el elemento actual y lo envía al portapapeles.</action
+> Si desea mover el elemento del menú, debería primero cortarlo hasta el portapapeles, moverlo al lugar de destino usando el panel izquierdo y usar la función <guimenuitem
+>Pegar</guimenuitem
+> para pegar el elemento de menú desde el portapapeles.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-copy">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+> </shortcut
+> <guimenu
+> Editar</guimenu
+> <guimenuitem
+>Copiar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Copia el elemento de menú actual en el portapapeles</action
+>. Más tarde puede usar la función <guimenuitem
+>Pegar</guimenuitem
+> para pegar el elemento del menú pegado desde el portapapeles hasta su destino. Puede pegar el mismo elemento muchas veces.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-paste">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>V</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Ediart</guimenu
+> <guimenuitem
+>Pegar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Pega el elemento del menú desde el portapapeles</action
+> a la ubicación actualmente seleccionada en el menú principal. Debe usar primero <guimenuitem
+>Cortar</guimenuitem
+> o <guimenuitem
+>Copiar</guimenuitem
+> antes de <guimenuitem
+>Pegar</guimenuitem
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-delete">
+<term
+><menuchoice
+><shortcut
+><keycap
+>Supr</keycap
+></shortcut
+> <guimenu
+>Editar</guimenu
+> <guimenuitem
+>Borrar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Borra el elemento de menú actualmente seleccionado.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-sort">
+<term
+><menuchoice
+><guimenu
+>Editar</guimenu
+> <guimenuitem
+>Ordenar</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Abre</action
+> un submenú para ordenar el submenú seleccionado o todo el árbol del menú. Puede escoger entre dos métodos para ordenar las entradas: por nombre o por descripción.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-restore">
+<term
+><menuchoice
+><guimenu
+>Editar</guimenu
+> <guimenuitem
+>Restaurar el menú del sistema</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Esto restaurará el lanzador de aplicaciones a su estado por defecto y eliminará todas las preferencias configuradas. Se le pedirá la confirmación en un cuadro de mensaje.</action
+></para
+></listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>&kmenuedit; dispone de las opciones de menú comunes de &kde; <guimenu
+>Preferencias</guimenu
+> y <guimenu
+>Ayuda</guimenu
+>, para más información, lea las secciones sobre el <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Menú de preferencias</ulink
+> y <ulink url="help:/fundamentals/menus.html#menus-help"
+>Menú de ayuda</ulink
+> de los fundamentos de &kde;. </para>
+
+</chapter>
+
+<chapter id="credits">
+
+<title
+>Créditos y licencia</title>
+
+<para
+>&kmenuedit; </para>
+<para
+>Derechos de autor del programa &copy; 2002, &Raffaele.Sandrini;</para>
+
+<para
+>Colaboradores:</para>
+<itemizedlist>
+<listitem
+><para
+>Autor original - &Matthias.Elter; &Matthias.Elter.mail;.</para>
+</listitem>
+<listitem
+><para
+>&Matthias.Ettrich; &Matthias.Ettrich.mail;.</para>
+</listitem>
+<listitem
+><para
+>&Daniel.M.Duley; &Daniel.M.Duley.mail;.</para>
+</listitem>
+<listitem
+><para
+>&Preston.Brown; &Preston.Brown.mail;.</para>
+</listitem>
+</itemizedlist>
+
+<para
+>Derechos de autor de la documentación. &copy; 2000. &Milos.Prudek;.</para>
+<para
+>Derechos de autor de la documentación &copy; 2008 &Anne-Marie.Mahfouf;</para>
+<para
+>Actualizado para &kde; 3.0 por Lauri Watts <email
+>lauri@kde.org</email
+>, 2002.</para>
+
+<para
+>Traducido por Rocío Gallego <email
+>traducciones@rociogallego.com</email
+>, Pablo de Vicente <email
+>pablo.devicente@gmail.com</email
+>, Marcos Fouces Lago <email
+>mfouces@yahoo.es</email
+> y Santiago Fernández Sancho <email
+>santi@kde-es.org</email
+>.</para
+> &underFDL; &underGPL; </chapter>
+
+<glossary id="glossary">
+<title
+>Glosario</title>
+
+<glossentry id="gloss-console-application">
+<glossterm
+>Aplicación de consola</glossterm>
+<glossdef>
+
+<para
+>Aplicación originalmente escrita para entornos no gráficos, solo tipo texto. Estas aplicaciones se ejecutan bien en &kde;. Deben ejecutarse dentro de un emulador de consola como &konsole;. No reciben aviso automático de finalización al cerrar sesión de &kde;. Por lo tanto, no debe olvidarse de guardar los documentos abiertos en estas aplicaciones antes de salir de &kde;.</para>
+
+<para
+>Las aplicaciones de consola admiten la copia y pegado de las aplicaciones válidas de &kde;. Simplemente marque el texto en la aplicación de consola con su ratón, cambie a la aplicación &kde; y pulse <keycombo action="simul"
+>&Ctrl; <keycap
+>V</keycap
+></keycombo
+> para pegar el texto. Si desea copiar desde una aplicación &kde; a una aplicación de consola, primero marque el texto con su ratón, pulse <keycombo action="simul"
+>&Ctrl; <keycap
+>C</keycap
+></keycombo
+>,cambie a la aplicación de consola y pulse el botón central de su ratón<footnote
+><para
+>Si su ratón no dispone de botón central, debe pulsar los botones <mousebutton
+>izquierdo</mousebutton
+> y <mousebutton
+>derecho</mousebutton
+> simultáneamente. Esto se denomina «emulación del botón central» y debe estar admitido por su sistema operativo para que funcione.</para
+></footnote
+>.</para>
+
+</glossdef>
+</glossentry>
+
+</glossary>
+
+&documentation.index;
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+End:
+-->
+

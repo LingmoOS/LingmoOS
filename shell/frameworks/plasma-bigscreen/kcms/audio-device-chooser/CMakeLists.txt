@@ -1,0 +1,2 @@
+kcmutils_add_qml_kcm(kcm_mediacenter_audiodevice SOURCES audiodevice.cpp INSTALL_NAMESPACE "kcms")
+target_link_libraries(kcm_mediacenter_audiodevice KF6::KCMUtilsQuick)

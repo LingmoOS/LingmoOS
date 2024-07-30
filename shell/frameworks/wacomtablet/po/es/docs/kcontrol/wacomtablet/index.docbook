@@ -1,0 +1,537 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Spanish "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>Manual de &tablet;</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <othercredit role="translator"
+><firstname
+>Rocío</firstname
+><surname
+>Gallego</surname
+><affiliation
+><address
+><email
+>traducciones@rociogallego.com</email
+></address
+></affiliation
+><contrib
+>Traducción</contrib
+></othercredit
+><othercredit role="translator"
+><firstname
+>Cristina Yenyxe</firstname
+><surname
+>González García</surname
+><affiliation
+><address
+><email
+>the.blue.valkyrie@gmail.com</email
+></address
+></affiliation
+><contrib
+>Traductor</contrib
+></othercredit
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>2020-10-17</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>Esta es la documentación del módulo de &systemsettings; de &kde; para configurar tabletas gráficas.</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>Preferencias del sistema</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>Tableta</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Preferencias de tabletas Wacom</title>
+    <para
+>El módulo de tabletas de &systemsettings; gestiona todas las preferencias de su tableta gráfica. Esta interfaz de preferencias gestiona todas las aceptadas por el proyecto del <ulink url="https://linuxwacom.github.io"
+>controlador Wacom para &Linux;</ulink
+>. Asegúrese de que su tableta se detecta correctamente mediante xorg.conf o udev y que en general funciona. Para más información consulte la sección de <link linkend="detection"
+>detección de tabletas</link
+>. </para>
+    <important>
+        <para
+>Para que este módulo funcione correctamente debe tener instalado el controlador <application
+>xf86-input-wacom</application
+> en su equipo y <command
+>xsetwacom</command
+> debe estar disponible. </para>
+    </important>
+    <para
+>El módulo se divide en varias pestañas que controlan todos los aspectos de la tableta y del lápiz: <link linkend="tablet-profiles"
+>Perfiles</link
+>, <link linkend="tablet-general"
+>Información general</link
+>, <link linkend="stylus"
+>Configuración del lápiz</link
+>, <link linkend="pad-buttons"
+>Botones exprés</link
+>, <link linkend="pad-mapping"
+>Correspondencia del panel</link
+> y <link linkend="touch-mapping"
+>Correspondencia de toques</link
+>. </para>
+    <sect1 id="tablet-profiles">
+        <title
+>Gestión de perfiles</title>
+
+        <para
+>Esta es la pequeña lista desplegable con los dos botones junto a ella. Puede crear nuevos perfiles y eliminar otros ya existentes. Cada perfil se guarda y se especifica para la tableta conectada actualmente. Si crea un nuevo perfil, automáticamente se actualiza con las preferencias por defecto tal como las devuelve el controlador. </para>
+
+        <para
+>Aquí puede especificar diferentes perfiles para sus preferencias. Por ejemplo, si desea que el lápiz se comporte de manera distinta cuando sustituye al ratón en el uso diario y cuando lo utiliza propiamente como lápiz para dibujar algo. </para>
+        <para
+>Cada perfil se puede modificar sobre la marcha y los cambios se aplicarán directamente al comportamiento de la entrada de su tableta. </para>
+        <note>
+            <para
+>El <link linkend="kded"
+>demonio kded de la tableta</link
+> debe estar ejecutándose en segundo plano para poder cambiar los perfiles y aplicarlos a la tableta. Todo este proceso lo realiza el demonio y el módulo de &systemsettings; simplemente modifica las preferencias del perfil. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>Preferencias generales de la tableta e información general</title>
+
+        <para
+>Muestra información general sobre la tableta detectada. Además del nombre y la marca, se muestra una imagen y se listan todos los dispositivos de entrada detectados. </para>
+
+        <note>
+            <para
+>Para que el módulo funcione correctamente, la tableta debe estar conectada y <link linkend="kded"
+>kded</link
+> debe estar ejecutándose. </para>
+            <para
+>Para obtener más ayuda sobre la detección de tabletas, consulte la sección <link linkend="troubles"
+>Problemas de detección</link
+>. </para>
+        </note>
+
+        <para
+>Además de la información de la tableta, la pestaña «General» permite establecer varios atajos de teclado globales. Cada atajo de teclado permite cambiar de manera dinámica las opciones de la tableta conectada actualmente. </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>Preferencias del lápiz</title>
+
+        <para
+>El bolígrafo que se usa junto con la tableta tiene dos lados diferentes. El lado principal el el lápiz y el otro lado es el borrador. En esta pestaña, puede cambiar cualquier aspecto del bolígrafo, desde el botón de asignación hasta la curva de presión y el umbral. </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>Tacto del borrador</title>
+            <para
+>El deslizador permite modificar el umbral del borrador. Para configurar la presión de manera más precisa, se puede modificar la curva de presión completa en el diálogo <guilabel
+>Editar curva de presión</guilabel
+>. Consulte <link linkend="presscurve"
+>Diálogo de curva de presión</link
+> para obtener más información. </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>Preferencias de los botones</title>
+            <para
+>El cuadro <guilabel
+>Preferencias del botón</guilabel
+> permite modificar la acción asignada a cada botón del lápiz. Un solo clic en el cuadro de edición abre un nuevo diálogo en el que se puede seleccionar diferentes combinaciones de teclas, teclas modificadoras y botones del ratón. </para>
+
+            <para
+>Si la opción <guilabel
+>Toque para ejecutar acción</guilabel
+> está marcada, el punzón deberá estar en contacto con la tableta para permitir que el botón de acción se ejecute. Si esta opción está desactivada, cada botón de acción funciona también cuando el lápiz está planeando sobre la tableta. </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>Tacto de la punta</title>
+            <para
+>El deslizador permite modificar el umbral de la punta del lápiz. configurar la presión de manera más precisa, se puede modificar la curva de presión completa en el diálogo <guilabel
+>Editar curva de presión</guilabel
+>. Consulte <link linkend="presscurve"
+>Diálogo de curva de presión</link
+> para obtener más información. </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>Botones exprés</title>
+
+        <para
+>La pestaña <guilabel
+>Botones exprés</guilabel
+> permite configurar acciones específicas para cada uno de los botones hardware de la tableta. Para cambiar la acción utilizada, tiene que hacer clic en el cuadro de edición y seleccionar la acción en el nuevo diálogo. </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>Tableta</title>
+
+       <para
+>La pestaña <guilabel
+>Tableta</guilabel
+> permite establecer más propiedades del área de la tableta que se utiliza junto con el lápiz. Aquí, se pueden especificar la orientación del área de la tableta, el espacio válido de la tableta que se esté utilizando y el modo de seguimiento del ratón. </para>
+       <sect2 id="tablet-tracking">
+           <title
+>Modo de seguimiento del lápiz</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Correspondencia con la pantalla</guilabel
+>: este modo establece la correspondencia del cursor del lápiz con el movimiento absoluto en la tableta. Los bordes de la tableta representan directamente el espacio de la pantalla. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Correspondencia con el cursos</guilabel
+> :este modo establece la correspondencia del cursor con el movimiento relativo en la tableta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>Orientación</title>
+           <para
+>La casilla de orientación especifica cómo se rota el área de la tableta. Se puede seleccionar una rotación concreta en la lista desplegable o si activa la opción <guilabel
+>Rotar automáticamente con la pantalla</guilabel
+>, la tableta se rotará automáticamente junto con la pantalla. Esto se hace escuchando los eventos xrandr cuando la pantalla está rotada. </para>
+           <para
+>Si encuentra alguna dificultad al utilizar la opción de rotación automática y la tableta siempre se rota en la dirección incorrecta, active la opción <guilabel
+>Invertir rotación automática</guilabel
+> para cambiar dicho comportamiento. </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>Mapeo de la tableta</title>
+           <para
+>Esta correspondencia permite especificar las proporciones de la tableta que se utilizará para cada pantalla. Esto es necesario para mantener él área de la tableta proporcional al espacio de la pantalla utilizada en el modo de seguimiento absoluto del lápiz. Para obtener más información, consulte la sección <link linkend="area-selection"
+>Diálogo de selección de área</link
+>. </para>
+           <note>
+               <para
+>Esta opción no funciona en el modo de cursor relativo. </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>Toque</title>
+
+       <para
+>La pestaña <guilabel
+>Toque</guilabel
+> permite establecer más propiedades para la parte táctil de la tableta (si está disponible. Se puede desactivar la funcionalidad táctil mediante la casilla de verificación <guilabel
+>Activar toque</guilabel
+>. También existe un atajo de teclado global que permite activar o desactivar la funcionalidad táctil. </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>Modo de seguimiento del toque</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Correspondencia con la pantalla</guilabel
+>: realiza la correspondencia entre el toque del cursor con el movimiento absoluto en la tableta. Los bordes de la tableta representan directamente el espacio de la pantalla. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Correspondencia con el cursor</guilabel
+> : este modo realiza la correspondencia del toque del cursor con el movimiento relativo en la tableta. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>Gestos</title>
+
+           <para
+>Si se activa la opción <guilabel
+>Activar gestos</guilabel
+>, la tableta puede generar eventos de gestos para el dispositivo táctil. </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>Distancia de desplazamiento</guilabel
+>: permite desplazarse a través de las ventanas cuando se colocan dos dedos en la tableta. Al moverlos hacia arriba o hacia abajo, se crea un evento de desplazamiento. La distancia se mide en unidades de tableta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Distancia de la escala</guilabel
+>: permite aumentar o disminuir la escala juntando o separando dos dedos. La distancia se mide en unidades de tableta. </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>Tiempo de toque</guilabel
+>: este tiempo, en milisegundos, especifica cuándo se reconoce un doble toque en el dispositivo como pulsar el botón derecho del ratón. </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>Correspondencia de toques</title>
+           <para
+>Esta correspondencia permite especificar las proporciones del dispositivo táctil que se utilizará para cada pantalla. Esto es necesario para mantener el área de la tableta proporcional a la pantalla utilizada en el modo de seguimiento absoluto del lápiz. Para obtener más información, consulte la sección <link linkend="area-selection"
+>Diálogo de selección de área</link
+>. </para>
+           <note>
+               <para
+>Esta opción no funciona en el modo de cursor relativo. </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>Diálogo de curva de presión</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Esta es una captura de pantalla del diálogo de curva de presión</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Modificación de la curva de presión</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>La curva de presión define cómo se traduce la presión del lápiz. La curva de presión se define a través de cuatro puntos de una curva de Bézier. Para modificar esta curva puede cambiar los puntos rojos y mover la curva. </para>
+        <note>
+            <para
+>Use su bolígrafo dentro del diálogo de la curva de presión para ver los cambios directamente en ella. Un área azul bajo la curva muestra la presión aplicada sobre el bolígrafo. </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>Diálogo de selección de área</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>Aquí hay una captura de pantalla del diálogo de área de tableta</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>Definición del área de la tableta</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>Este diálogo permite especificar el área de la tableta disponible para cada espacio seleccionado en la pantalla. Para poder mantener la proporción del aspecto de la tableta, es necesario reducir el área de la tableta dependiendo de la resolución de la pantalla. Este diálogo permite especificarlo para cada pantalla de manera individual. </para>
+        <para
+>Utilice el botón <guilabel
+>Conmutar pantalla</guilabel
+> para cambiar entre la pantalla completa (todos los monitores conectados) y cada monitor individual. Las preferencias se guardarán para cada configuración de pantalla y se aplicarán a la tableta cada vez que se cambie la selección de la pantalla mediante el atajo de teclado global. </para>
+        <para
+>Se puede mapear el área de la pantalla con la <guimenuitem
+>Tableta completa</guimenuitem
+> o con un <guimenuitem
+>Área de la tableta</guimenuitem
+> en el panel de la <guilabel
+>Tableta</guilabel
+> directamente. Las proporciones del área se pueden bloquear y desbloquear usando el botón interruptor <guibutton
+>Bloquear proporciones</guibutton
+>. </para>
+        <para
+>Si quiere mantener la proporción del aspecto de la pantalla con la selección actual de la pantalla, puede pulsar el botón <guilabel
+>Establecer proporciones de la pantalla</guilabel
+>. El área de la tableta se calculará y se modificará automáticamente. </para>
+        <para
+>Además, se puede abrir el diálogo <guilabel
+>Calibrar</guilabel
+> para calibrar la tableta con la ayuda de cuatro puntos en la pantalla. </para>
+        <para
+>Cuando se cierre el diálogo, se utilizará la pantalla seleccionada. Si quiere cambiar la pantalla más adelante, puede utilizar el <link linkend="tablet-general"
+>atajo de teclado global</link
+>. </para>
+        <note>
+            <para
+>El área de la tableta solo funciona en el modo de seguimiento absoluto del toque y del dispositivo de lápiz. En el modo relativo, se utiliza toda la tableta. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>Demonio de tableta</title>
+    <para
+>El demonio de tableta se ejecuta en segundo plano y realiza el trabajo de base, detectando la tableta y configurándola con los perfiles seleccionados. Si el demonio no se está ejecutando, el módulo de &systemsettings; y la miniaplicación Plasma no funcionarán correctamente y no se podrán usar perfiles con la tableta. </para>
+
+    <sect1 id="detection">
+        <title
+>Detección de la tableta</title>
+        <para
+>La detección del <hardware
+>dispositivo tablet</hardware
+> se hace de varias maneras. <application
+>Solid</application
+> se usa en primer lugar, y se encarga de la implementación de la conexión en caliente. Si Solid falla, los siguientes pasos son <command
+>xsetwacom list dev</command
+>, <command
+>lsusb</command
+> and <command
+>xinput --list</command
+>. </para>
+        <para
+>Si ninguna de las órdenes anteriores le devuelve el nombre de la tableta, significa que no está aceptada y no se puede usar en este módulo. </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>Problemas de detección</title>
+        <para
+>Si no se detecta su tableta, compruebe si está entre las aceptadas en la página del <ulink url="https://linuxwacom.github.io"
+>controlador Wacom para &Linux;</ulink
+> o en la del <ulink url="https://digimend.github.io"
+>controlador DIGImend</ulink
+>. Además, compruebe con la orden <command
+>lsusb</command
+> si se puede encontrar su tableta. </para>
+        <para
+>Si udev no gestiona la detección añada la tableta a su archivo <filename
+>/etc/X11/xorg.conf.d/50-tablet.conf</filename
+> (créelo si no existe) y reinicie el servidor X. </para>
+        <para
+>En el caso de dispositivos serie (Tablet PC y similares), compruebe si <command
+>xinput --list</command
+> lista todos sus dispositivos de entrada (punzón/borrador/panel). Si deberían estar listados, échele un vistazo a la identificación interna del tablet por medio de <command
+>xsetwacom get "Name of your pad or stylus" TabletID</command
+>. Si se devuelve alguna id, por favor envíele toda la información necesaria al autor. </para>
+        <note>
+        <para
+>La conexión en caliente solo está disponible si la tableta se detecta mediante <application
+>Solid</application
+> y su API de notificación. </para>
+        <para
+><application
+>Solid</application
+> comprueba que el valor de la entrada <command
+>input.x11_options.Type</command
+> es <command
+>pen</command
+>, <command
+>stylus</command
+>, <command
+>eraser</command
+> o <command
+>cursor</command
+> o si el valor de la entrada <command
+>input.x11_driver</command
+> es <command
+>wacom</command
+>. </para>
+        <para
+>Por favor, escriba al autor si Solid detecta su tableta con otros valores para poder mejorar el soporte. </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>Miniaplicación Plasma para tabletas</title>
+    <para
+>La miniaplicación de la tableta hace posible cambiar entre los perfiles disponibles al vuelo. Más aún, puede cambiar la rotación del panel y cambiar entre el modo absoluto y relativo del punzón/borrador, independientemente de la configuración actual del perfil. </para>
+    <para
+>No es necesario añadir el plasmoide para que este módulo funcione. El perfil por defecto se activará mediante el <link linkend="kded"
+>demonio de la tableta</link
+> tan pronto como lo detecte, incluso si el plasmoide no está en uso. El plasmoide es solo una ayuda visual para cambiar fácilmente entre perfiles. </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>Créditos y licencia</title>
+    <para
+>Traducido por Rocío Gallego <email
+>traducciones@rociogallego.com</email
+> y Cristina Yenyxe González García <email
+>the.blue.valkyrie@gmail.com</email
+>.</para
+> &underFDL; &underGPL; </chapter>
+</book>

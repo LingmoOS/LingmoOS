@@ -1,0 +1,605 @@
+2) provide some way to save/restore the positions of the menu/toolbar(s)
+   when changing the active part ( I remember Reggie asking for that :)
+
+(David) Sounds good. I might have a look at that next.
+Comment : the menubar is cleared, not destroyed, so it seems we don't have
+to do anything for it (it remains where it is). We still need to save
+the BarPosition of the toolbars, though (see comment in
+KTMainWindowGUIBuilder::createContainer).
+(David) : With Torben's idea of inheriting KTMW, the problem of accessing
+the BarPosition of the toolbars is solved. Nice :-)
+
+(David) Not sure we want to save whether the statusbar is shown/hidden.
+
+(Simon) Another thought: Perhaps we should store the geometry information of
+	the containers of the KPartHost in the KPart itself?
+	(something like KPart-Session Management ;-)
+(David) Sounds strange (the child taking care of its host's containers...)
+In SM, it's the host (the WM) that stores the position of its children (the
+windows) :-)
+One possible problem (I'm not sure) : are the toolbars shared between the host
+and the part, or are there only toolbars for one and toolbars for the others ?
+In the first case, there's a problem because the toolbar will remain when
+switching part, so shouldn't get moved back when switching back.
+In fact we only want to store the position of the toolbars that fully "belong"
+to the part, right (i.e. that only contain items from the part) ?
+In this case, yes, that could be saved in the part.
+
+--------------
+
+4) Perhaps a part wants to know if it got activated, so we might want to
+   re-introduce that PartActivateEvent from kdelibs/kparts.
+   Question: Shall this event be sent when the GUI of the part is activated
+   or shall it be sent when the part "really" got activated (via KPartManager)?
+
+(David) Any example of usage ?
+I think what it wants is "really" activated, no ?
+
+(Simon) Konqueror for example wants to know when it gets activated, in order to access the KPartHost
+	and query for the container objects (*bars) .
+	Hmmmmmm, that sounds like two possible events. A PartActivateEvent and a GUIActivateEvent...
+        What do you think?
+
+(David) 1 - I don't see the difference between "the gui of the part gets activated" and "the part
+gets activated", in this simple model (no Document/View). The Part gets activated when you can see
+its items in the menus/toolbars, there is no "in between" IMO ?
+        2 - Remind me what konq does with the *bars when a part gets activated ?
+I couldn't find anything with a quick grep in the sources...
+I'm still looking for an example when it's useful :)
+
+(Simon) I think that's the whole idea of making KPartManager independent from
+	the guibuilder. Perhaps some apps wants to embed stuff without showing
+	the parts a full-fledged gui (remember the part-children thingy in the
+	old OpenParts? ;-) ) . Konqueror is one example. However I think
+	KOffice could benefit from this, too, for the inplace editing
+	(where the part is active, in terms of the KOffice document/view model,
+	but still has a different gui or even none at all) .
+
+(David) : I start to see :-)
+But what I don't see is how does KPart know whether it's activated
+simply or activated with its GUI... i.e. how does it know the way
+it is embedded (with or without GUI items). Hmmm..
+
+
+(Simon) Konqueror (2) : When a parts get activated (this is "detected" via
+	KonqViewManager) , then in general the actions of the view get plugged
+	into the menus and the main toolbar (which is acccessed via
+	Shell::viewToolBar() (hmmm, I'm looking forward to the new KParts :-)
+(David) Ah yes we don't have that in "example" currently. Dynamic actions.
+    So you would add an event (or signal) to KPart for that ? Sounds ok to me.
+
+(Simon) That means that the (old) KParts doesn't know anything about the
+	embedding in Konqueror.
+(David) Didn't get that ?!? :-)
+
+--------------
+
+	BrowserView inheriting KReadOnlyPart is the way to go, IMHO.
+
+	The question if Konqueror itself should be a KPart is difficult.
+	All the BrowserViews are embeddable already, so it's "questionable"
+	if it makes sense to have the embeddable Konqueror shell (KonqMainView) .
+
+(David) indeed.
+
+	OTOH that shell makes these views "interact", makes them switch. So if
+	someone wants to embed a browse-all-stuff widget, then embedding Konqueror
+	would probably be cool, as the mainview handles all the stuff like determining
+	the correct mimetype, loading the view, receiving and sending openUrl requests, etc.
+	Something like a shoot-and-forget for embedding ;-) (embed-and-forget ;)
+	Loading and saving in that case would mean save/load the view profile.
+
+(David) Hmmm... somebody wanting to embed a full konqy ? Component technology allows
+you to avoid duplicate code by embedding a component that does what you want. Like kdevelop
+embeds a kedit component. Which app would want to embed a huge component containing
+a file maneger + a web browser + a generic viewer + ... ? I think this is not a component,
+but an application. Views are components...
+
+(Simon) Yes, that is true.
+	What about this: We don't make Konqueror's Mainview a KPart, but still
+	use the XMLGUI and the pluginaction stuff. (because these two things
+	are importan and very nice IMHO). (I don't want to miss the action
+	stuff in Konqueror, neither you I guess :-)
+
+(David) Sure, actions rock. But KTMainWindowGUIBuilder exists for that exact
+reason, no? The mainview would be a KTMainWindow, so its GUI is described in
+XML and with actions.
+
+
+------------
+(David) This lib offers :
+KReadOnlyPart for viewers
+KReadWritePart for editors
+KPart for a generic part (?)
+
+We could easily port BrowserView to inherit KReadOnlyPart, and call it
+KBrowserPart.
+Proposed changes :
+- The action stuff gets ported, of course (structs disappear)
+- started/completed/canceled already exist -> removed
+- setStatusBarText() -> see below, wondering about status bar
+- setLocationBarURL() -> removed - konqueror will set it from url()
+    [ is that correct ? ]
+
+(Simon) I think we still need it. When a view gets a redirection signal, then
+	it wants to change the displayed URL.
+(David) Ah right (I think support for redirection is missing from konqueror on
+the whole, at other places).
+
+- openUrlRequest and createNewWindow remain.
+
+(Simon) <sidenote> We will want to add a serviceType argument to openUrlRequest.
+	At least we need it to get rid of these changeViewMode() hacks in
+	konq_htmlview/konq_iconview :P
+(David) ok
+
+- popupMenu remains ?
+
+(Simon) What about putting that popupMenu into an extension interface,
+	contained in libkonq? IMHO the popupMenu is very libkonq specific.
+(David) Depends how we want to handle the popupmenu in KonqHTMLView, for
+instance.
+At the moment it's missing, and it will be a problem when that view is moved to
+kdelibs : no more libkonq for it. But anyway I agree : the part should
+generally take care of its own menu (I'm thinking of KNotePadPart for instance)
+Perhaps this would remain in KBrowserPart though (we need it in konqueror).
+
+----
+
+On second thought : why should we make KReadOnlyPart different from
+KBrowserPart ?
+Any "viewer" should be embeddable in konqueror. The additional signals we
+currently have in BrowserView could be simply added to KReadOnlyPart, and
+it doesn't make it more complex (kedit can simply not care about the loading
+progress, the popupMenu signal, ...)
+In fact the loading progress should even be emitted by KReadOnlyPart
+itself (it handles the kiojob), for the simple cases. Of course
+konqueror views will reimplement openUrl and send the signals themselves.
+The main problem I see is that BrowserView is asynchronous
+and KReadOnlyPart is .. a bit of both (asynchronous for remote URLs,
+synchronous in openFile()). But for konqy, openFile() means nothing
+and never gets called (because openUrl is reimplemented).
+For the history stuff, we can provide the default implementation
+in KReadOnlyPart (just like we did in BrowserView).
+About the "offset stuff" - well it even makes sense in kedit
+so the host can ask for going to a particular line when opening the
+file (hyper cool !). Anyway, for parts which have nothing to do with
+offsets, this gets simply ignored.
+
+In short, we can take advantage of the fact that we have a lib now,
+as opposed to an interface alone (BrowserView), and provide default
+implementations (when possible, for example the history stuff)
+which make every "viewer"-type part a part useable in konqueror
+- but also in koffice, and whereever.
+
+This would reduce the number of "type of parts" and make it simpler
+to embed anything into anything. OTOH, it makes KReadOnlyPart a bit more
+difficult to understand.
+
+What do you think ? Did I overlook something ?
+
+(Simon) I don't think there's a problem with the async stuff
+	(BrowserView/KReadOnlyPart) . Mosfet's KGhostView browserview or
+	his dviview are both 100% like KReadOnlyPart (yes, they launch KIOJob::copy()
+	and copy the file to some local temp) . It works :-) and noone complains :-))
+	-> I see no problem with that :-)
+(David) Sure - but does that answer the question : KReadOnlyPart==KBrowserPart ?
+    Now that I think of it, it's probably not a good idea - there are many
+    things that BrowserPart has in addition, finally. I'm still not sure. I
+    like making it simple, but this might be an over-simplification.
+
+------------
+
+(Simon) About KXMLGUIBuilder<->non-KTMW builder: One possible case coming to my mind are dialogs. If you want to
+embed a small "part-applet" ;) (perhaps as embedded preview part for some open-foo-dialog?) , then a non-KTMW
+builder might be useful (and might have containers) .
+I don't see any problem in having a separate (abstract) interface for the GUI builder. We gain flexibility
+IMHO, and taking into account that this KParts stuff should probably be something highly finalized for
+KDE 2.0, its worth having as much flexibility as possible (while keeping it easy to use by providing the
+easy-to-use KTMW implementation) , IMHO.
+
+(David) Excellent idea !! A part in a dialog :-) Don't think you can have that in Windows :-))
+But .. how can you have containers (menubars, toolbars, ...) in a dialog ? Or were you thinking of
+another kind of container ?
+
+(Simon) Containers in a dialog? See kfd :-))
+	(altho kfd uses ktmw AFAIK ;)
+(David)  ... because there is no support for toolbars in a dialog.
+    I still think you can't have containers in a QDialog :-)
+
+(Simon) Another possible thing is perhaps kpropsdlg. IMHO it'd be cool if
+	it would be very easy and simple to add new props pages for certain
+	mimetypes dynamically via shlibs.
+(David) Sounds good but not very useful. :-)
+
+---------------
+
+(Torben) I did not follow the latest discussions due to a lack of time. However, I made some
+         small remarks on stuff I did not understand (yet?).
+
+(Torben) KReadWritePart and KReadOnlyPart use the three signals canceled, started, completed in
+         two different contexts. One can not see wether a KReadWritePart started loading or
+         started saving. I would like to introduce
+         a) three new signals for KReadWritePart
+         b) A parameter to the signals telling wether this is a read or write operation.
+         Basically I am in favor for a small API -> b)
+         And b) is source compatible to the current solution!
+(David)  ok
+
+(Torben) In example.cpp addPart is called twice and each time the active part is changed. Would not it be
+         more clever to add parts and activate one later instead of activating the last one inserted ?
+(David) no no, example.cpp doesn't even know when the active part changes.
+Did you try running the example ? It features a part that is dynamically
+embedded and de-embedded, the notepadpart. That's why there is an addPart()
+call - to add the new part when the user asks for it. Not when the active part
+changes.
+
+(Torben) You guys are busting QDOM. You can NOT assign an element of document A to an element of document B.
+         That means: There is no way to mix two documents. What you are doing is asking for trouble.
+         The ownerDocument() function will not work as one might expect after the assignment: The element
+         of B assigned to A will still claim to be a child of B :-(
+         And there are few chances that this may change in the Qt implementation in the next few weeks.
+(to myself) I tro to fix that in QDom ....
+
+<weis> Hi
+<dfaure> Hi !
+<weis> dfaure: Just looked into new kparts
+<dfaure> ah ?
+<weis> dfaure: You have a major problem: One can NOT mix QDomElements of different documents!
+<dfaure> weis: why ?
+<weis> dfaure: Because the ownerDocument wont change as one might expect.
+<dfaure> weis: not sure I have the full picture (Simon did that part). What should we do instead ?
+<weis> dfaure: Either I manage to hack QDom (very hard) or ..... dont know currently ....
+<dfaure> the problem is .. memory management, right ?
+<weis> dfaure: I just checked in my CVS irc stuff :-)
+<dfaure> ok :-)
+<weis> dfaure: Can you have a look at kparts/COMMENTS ?
+--
+<dfaure> weis: you should have come before. coolo is talking about re-writing libkio.
+<dfaure> well in fact he started the rewrite
+ dfaure having a look
+<weis> dfaure: Unfortunately I am not paid for KDE but for Qt hacking :-( So I fear I have no time for kio anyway.
+<dfaure> weis: I know that, but perhaps a little discussion would help him with the new design :)
+<weis> dfaure: So you are not convinced by his design ?
+<weis> dfaure: It is about this daemon that forks and loads ioslaves as libs, or ?
+<dfaure> yes, this looks fine
+<dfaure> but then what about filters, and especially the problem is the API
+<dfaure> each slave currently implements stuff like recurse copying
+<dfaure> and we would perfer that in a single location, obviously :-)
+<weis> dfaure: Thta is true!
+<weis> dfaure: The new design would mean: We write an abstract interface for basic IO stuff.
+<dfaure> yup
+<weis> dfaure: Basically every slave would have to implement usual UNIX IO functions.
+<weis> dfaure: Does coolo want to do it that way ?
+<dfaure> unix io ?
+<dfaure> like read, write, open ?
+<weis> dfaure: unix io: open/read/write/opendir ...
+<dfaure> that would be great IMHO
+<dfaure> I think he didn't realize that - the fact that moving the code to a central place involves switching to a lowlevel unix-like aPI for the slaves
+<weis> dfaure: If I have  a nested URL: Are we going to start two processes to get the URL from the net or one (with Coolos approach)
+<weis> dfaure: Currently it is two processes. One for file and one for tar, for example.
+<dfaure> weis: we're not sure. would one be ok ? (like opening the two libs and connecting signals and slots..)
+--
+<dfaure> weis : > I think this KPartsMainWindow should inherit KTMainWindow directly
+<dfaure> weis: I thought the whole idea was NOT to inherit KTM
+<dfaure> so that one could use anything as a KTM child
+<weis> dfaure: But this KTMainWindowGUIBuilder is already KTMainWindow dependenat. So why not derive ?
+<dfaure> well we're back to the shell, then...
+<weis> dfaure: Of course. Excuse me!
+<dfaure> > Why should one want to access the parents containers?
+<dfaure> know the View and Edit menus in konqueror ?
+<dfaure> They are view dependant ...
+<dfaure> and dynamically added into the menu
+<dfaure> although ... we could use XML instead
+<dfaure> can't remember why we don't
+<weis> dfaure: Using XML seems to be the clean approach IMHO.
+<dfaure> yes ... damn can't remember the reason
+<dfaure> lazyness perhaps
+<dfaure> :-)
+<weis> dfaure: What about me hacking a KPartsMainWindow that resembles the old shell pattern. Since it is useful in many cases and easy to understand/use ?
+<dfaure> yes, I guess it's ok to have a KTM child. The difference with the old shell is that the gui building is separate from it, right ?
+<dfaure> in fact, do people already inherit KTM, usually ?
+<dfaure> hmm ... they would simply inherit KPartMainWindow instead.
+<weis> dfaure: Exactly.
+<dfaure> so .... what was the problem with the shell ?
+<weis> dfaure: The problem was ..... aehmmm .....
+<weis> .... there was some problem .....
+<dfaure> :-))))))
+<weis> dfaure: What about mergeXML? Can it move ? .... still thinking about shell ....
+--
+<weis> dfaure: I know again! It may happen that the shell uses a widget which in turn uses a component. So the shell does not now that KParts are involved at all!
+<weis> s/now/know/
+<dfaure> ah - and then the widget would NOT use KPartsMainWindow, right ?
+<weis> dfaure: Yep!
+<dfaure> ok
+--
+<weis> dfaure: Another problem are nested KPartManagers. Imagine Widget W1 has some Parts P1 ... Pn. Part Pn has in turn a widget W2 that uses Parts P1_2...Pm_2. Then W1 and W2 would feature a KPartManager ....
+<weis> dfaure: The general problem is: A widget may use parts internally but the one who uses the widget does (and should) not know that.
+<dfaure> yes - I guess we need to try that,
+<dfaure> I'm not sure what's needed for that to work
+<weis> dfaure: Currently I am almost shure it wont work.
+<weis> dfaure: We must ashure that there is only ONE GUIBuilder per main window. That is one thing to do.
+<dfaure> ah yes
+<weis> dfaure: If window W1 becomes active (focus) it may activate its KPartManager. If W2 becomes active its KPartManager may do something.
+<weis> dfaure: Ooooops, I think I am on the wrong track perhaps.....
+<weis> dfaure: I started dealing with kparts like I do with widgets. If a kpart is just a widget that you can load at runtime, then it wont do gui merging anyway. So may above example seems to be very theoretically, perhaps ....
+<dfaure> yes, if you have two KPartManager you have a problem anyway (if the parts have a GUI)
+<dfaure> you want only ONE part active at a time ... one gui .
+<dfaure> so you can't have one part active in each kpartmanager, unless the whole partmanager can be deactivated.
+<weis> dfaure: Correct.
+<weis> dfaure: BUTTTH: Imagine you embed a browser widget. Would you expect that it suddenly plays around in your MenuBar and ToolBars? No, or ? It should only do so if you ask for it.
+<dfaure> well I think _yes_ you would expect its actions to become available to the user, no ?
+<weis> dfaure: Imagine you write a report generator that shows database queries using the browser view. Would you as a programmer want to have menu entries like "OpenURL" and "History" in your report generator? I would not.
+<dfaure> hmmm ... then it's the HTML widget you're using, not the part...
+<dfaure> when kdevelop embeds kwrite, it wants the actions from kwrite...
+<dfaure> open file, save file, ...
+<weis> dfaure: Well,. why not load a HTML widget at runtime as a part ...
+<dfaure> sure, why not :-)
+<dfaure> I suppose the answer is, as always : configurable.
+<dfaure> as you said.
+<weis> dfaure: Yep!
+<weis> dfaure: But that luckily voids my above example. If W1 wants that parts of W2 change the GUI then it has to tell W2 about the GUIBuilder. If W1 does not want that, then it does not tell W2 and no GUI merging will be done.
+<dfaure> yup
+<weis> dfaure: This way we stay with one KPartManager and GUIBuilder and W1 is responsible of propagating it  to W2 :-) Problem solved :-)
+
+--------------------------
+
+David wondering about Status Bar
+--------------------------------
+Should the statusbar be a *bar like toolbar/menubar, handled by the XML GUI building
+(soon "KPartsMainWindow"), and shown/hidden depending on the
+active part, OR a global statusbar, always shown or hidden, and
+made available to the parts, through KPartManager or KPartsMainWindow ?
+
+Currently it's the first one, but since we removed access to the toplevel
+containers, ...
+Visually, I think I prefer the statusbar not to show/hide when the active
+part changes. But for consistency with toolbars perhaps it should ? Dunno.
+
+(Simon) IMHO the statusbar should behave like toolbars. A part may "have" (allocate) a statusbar
+        or just leave out the <StatusBar/> tag. The question IMHO is: How can the part access the
+        statusbar?
+        Hmmmmmmmm, I think we should solve this by making use of the xmlgui concept:
+        (example)
+        <StatusBar>
+          <Action name="progressaction"/>
+          <Label><text>Blah</text></Label>
+        <StatusBar/>
+        I think that would solve the problem, and it's what we currently support/implemented.
+        What do you think?
+       (update) ahh, grmbl, it won't help much ;-) , as it makes KStatusBar::message() impossible..
+        hmmmmmmm
+        *thinking*
+        I vote for keeping the currently implemented way (as described above) . Perhaps we should add
+        sth. like KPartManager::statusBarMessage() ? (as that message concept of kstatusbar is really
+        different to the container concept (which kstatusbar supports aswell...) .
+
+Torben brainstorming about Nested Parts
+---------------------------------------
+
+(In the following text I mix the words "components" and "parts". In addition I assume that
+ KPartManager and KPartHost become one class. )
+
+
+Imagine a very complex situation like this:
+
+KOfficeMainWindow (a kparts aware shell)
+ |
+ |- KWordView/Part (a koffice component)
+    |
+    |- KSpreadView/Part (a koffice component)
+       |
+       |- KReportGeneratorView/Part (a koffice component)
+          |
+          |- KHTMLBrowserView/Part (something like konqui, this is a kpart)
+
+Imagine all are added to one KPartManager.
+Now the user clicks on the report generator and gets the
+usual GUI merging.
+
+Now imagine the user pressed directly on the Browser that is used
+by the report generator just to display some HTML. We would get GUI
+merging so that the menus of the browser appear.
+But that is a mistake! How the report is made visible is an implementation
+detail of the report generator. And it is in turn an implementation detail of KWord
+that is allows KSpread to play around in the menu/toolbars if activated.
+
+What we learn from that is the following:
+Observation 1) Whether a part - that is the child of some other part - may do GUI merging or
+               not is determined by the parent part.
+
+
+Another example: We use a widget Kalender which uses KSpread to display a table.
+                 The KSpreadPart is turned into ReadOnly mode.
+
+KalenderMainWindow (this is NOT a parts enabled main window)
+ |
+ |-KalenderWidget (this is NOT a part)
+   |
+   |-KSpreadView (this is a part)
+
+Here KSpreadView is used like a usual widget. That means it does not get added to some KPartManager
+and sees no KGUIBilder or stuff like that. "KalenderMainWindow" constructs the GUI itself.
+
+Observation 2) It should be possible to use a part just like a usual widget. So it must work without
+               a KGUIBuilder and without being added to some KPartManager.
+
+** (David) : I'll try that now.
+
+Lets extend the example: KalenderWidget shows a very nice kalender. That means it puts images
+inside of KSpread by using KImage.
+
+KalenderMainWindow (this is NOT a parts enabled main window)
+ |
+ |-KalenderWidget (this is NOT a part)
+   |
+   |-KSpreadView (this is a part)
+     |
+     |- KImage (this is a part)
+     |
+     |- KImage (this is a part)
+
+Somehow KSpread must handle its children. It wants to know which one is active for example.
+Usually KSpread would use KPartManager but it did not get one from its shell/parent.
+
+Observation 3) If a KPart is not added to some KPartManager then it creates its own KPartManager where
+               it insertes itself and its children (if there are any children).
+
+That has an impact on Observation 2 - since the KPart will create its own KPartManager, so we rewrite it like this:
+
+Observation 2b) It should be possible to use a part just like a usual widget. So it must work without a KGUIBuilder.
+
+This is no problem, since the Part never directly talks to the GUIBuilder anyway.
+
+
+Now imagine someone made a KOffice component out of KalenderWidget and embeds it in KWord:
+
+KOfficeMainWindow (a kparts aware shell)
+ |
+ |- KWordView/Part (a koffice component)
+    |
+    |-KalenderWidget (this is NOT a part)
+      |
+      |-KSpreadView (this is a part)
+        |
+        |- KImage (this is a part)
+        |
+        |- KImage (this is a part)
+
+Do we want GUI merging with KSpread now? No, since the use of KSpread in KalenderWidget is
+an implementation detail. In this case we get two KPartManagers. One belongs to the
+KofficeMainWindow and is connected to the GUI Builder while the other one belongs to
+KSpread and is NOT connected to some GUI builder. This will work magically if we obeye
+observation 2b + 3.
+
+Observation 4) There may be multiple KPartManagers in one toplevel window, but only one is
+               associated with a GUIBuilder. That means the managers are not really nested. They
+               dont know about each others.
+
+
+Lets take another look at our first example:
+
+KOfficeMainWindow (a kparts aware shell)
+ |
+ |- KWordView/Part (a koffice component)
+    |
+    |- KSpreadView/Part (a koffice component)
+       |
+       |- KReportGeneratorView/Part (a koffice component)
+          |
+          |- KHTMLBrowserView/Part (something like konqui, this is a kpart)
+
+The report generator does not want GUI merging of its HTML browser. But it wants to offer an action
+called "HTMLSettings" to allow choosing the default font of the HTML Widget. Obviously this action
+is offered by the HTMLBrowserView. So instead of reimplementing this action, the report generator
+may propagate actions of the html browser. Its KPart::action() method just calls the browsers
+action() function if queried for an action named "HTMLSettings".
+
+Observation 5) In addition to turning GUI building on or off for components one may do partial gui merging.
+               That means actions of some child component are propagated by the parent component.
+
+Observation5 does not cause additional code in libkparts. It just shows a possible usage and the flexibility of the
+action concept.
+
+
+Something else comes to my mind: We can safely reintroduce the shell pattern. The KPartManager/KHostPart is
+split of the shell and that is a MUST.
+But it does not make sense to create a KTMainWindow and then a KTMainWindowGUIBuilder to manage menubar/toolbars/statusbar.
+Imagine an application that uses KTMainWindow. Either the application programmer knows that he wants to embed
+some components and that they should use GUI merging => He can use KPartsMainWindow from the start.
+Or the application programmer does not want that any component that it uses directly or indirectly merges in
+its GUI. In this case he uses KTMainWindow and does not expect someone to override this decision by installing
+a KTMainWindowGUIBuilder.
+
+Imagine someone is writing a time scheduler which uses a KalenderWidget Version 1.0:
+
+SchedulerMainWindow ( a KTMainWindow )
+ |
+ |- SchedulerCanvas
+    |
+    |- KalenderWidget (which uses NO parts currently).
+
+Here no GUI merging happens. Now someone improves KalenderWidget in Version 2.0 to use
+KSpread internally (once again: This is an implementation detail):
+
+SchedulerMainWindow ( a KTMainWindow )
+ |
+ |- SchedulerCanvas
+    |
+    |- KalenderWidget (which USES parts now).
+	|
+        |- KSpreadView/Part
+
+When clicking on KSpread: Do you want GUI merging now? No! The GUI of the scheduler should stay
+the same. Just the implementation of the KalenderWidget changed.
+
+Observation 6) The application programmer determines wether he wants GUI merging or not. That means it is his
+               decision to choose KTMainWindow or a GUI merging enabled KTMainWindow. And that in turn means that we can merge
+               KTMainWindow and KTMainWindowGUIBuilder in one class called KPartsMainWindow.
+               KPartsMainWindow will feature its special implementation of KPartManager (with KPartHost already merged with KPartManager).
+
+If some component wants to offer all of its functionality even in the case that nobody allowed it to do
+GUI merging then the component can still put all of its actions in a QPopupMenu instead of the menubar.
+
+
+Conclusion:
+I think with this model we can have an object tree that mixes usual widgets and components in any order
+and we always get it right. But it is late and I may get things wrong :-)
+In addition my approach reduces the amount of classes and the complexity of the API (at least I hope so).
+
+Lets put the four most important things together:
+
+Point 1) The application developer decides wether his app (->toplevel window) features GUI merging or not.
+Point 2) A part decides wether it allows its child parts to do GUI merging.
+Point 3) If one part in the big object tree is not allowed to do GUI merging (that means it is not registered
+         at the KPartMainWindows KPartManager, but on some additional KPartManager) then none of its direct or
+         indirect child parts can ever do GUI merging.
+Point 4) Wether some custom widget uses parts internally or not is an implementation detail and not visible to
+         the user of this custom widget.
+
+
+(David) : I obviously agree with all this. This is a very nice derivation of
+the few ideas we had on irc - making GUI merging configurable, at both ends in
+fact, plus all the issues associated with nesting.
+
+(Simon) /me too :-)
+
+(David) Torben : perhaps you could also comment on the KReadOnlyPart ==? KBrowserPart issue ?
+Look for "second thought" in this file. Trying to decide between
+each read-only part can be embedded in konqueror and only those who implement
+KBrowserPart can be embedded in konqueror... I realize in the first case even
+ReadWrite parts would be embeddable since they inherit readonly part... A minor
+issue compared to what's above though.
+
+(Torben) When I draw my university education out of the had (and my master thesis :-)) then
+         I think your problem can not be solved by deriving from some class but by doing
+         delegation.
+         It works like this:
+         We have KReadOnlyPart (short KROP) and KonqyViewerExtension (short KVE). KVE is just
+	 a child of KROP that you can query with the QObject::child method.
+         Views which are konquy aware feature their own implementation of KVE and konquy is
+         happy :-)
+         If a KROP does not feature a KVE then Konqui installs a default KVE that just ignores
+         offsets etc.
+         I think the little difficulty is to implement the default KVE, but it should be possible.
+         With this solution we get both: Konquy can embed all KROPs and some KROPs can be Konquy
+         aware and we do not bloat the KROP interface.
+
+(Torben) About the fact that konqy can embed a KReadWritePart (short KRWP):
+         This is IMHO not a konqy problem but a KRWP design bug. KRWP overloads
+         KROP and changes the semantics (editing is possible). By default KRWP should
+         go into ReadOnly mode. Only if one calls rwpart->setEditable( TRUE ) it should
+         offer editing of the data. It may still happen that some KRWPs dont obeye the
+         "editable" flag, but that is a bug inside of the KRWP.
+
+(Simon) I definitely agree with all this :-)
+
+         KROP -- (this is what konqueror embeds)
+           |
+           (child qobj) KonqyViewExtension (konqy specific stuff)
+                        |
+                        (current browserview extension objects)
+                        ...
+
+        Can we go for this? :-)
+

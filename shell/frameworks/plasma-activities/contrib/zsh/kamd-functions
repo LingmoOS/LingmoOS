@@ -1,0 +1,141 @@
+# Module: KDE Aliases
+# Priority: 10
+
+autoload -U colors
+colors
+
+# Defining aliases for common kamd dbus objects
+alias kamd_dbus="qdbus org.kde.ActivityManager"
+
+alias kamd_activities="qdbus org.kde.ActivityManager /ActivityManager/Activities"
+alias kamd_resources="qdbus org.kde.ActivityManager /ActivityManager/Resources"
+alias kamd_resources_linking="qdbus org.kde.ActivityManager /ActivityManager/Resources/Linking"
+alias kamd_features="qdbus org.kde.ActivityManager /ActivityManager/Features"
+
+alias kamd_addactivity="qdbus org.kde.ActivityManager /ActivityManager/Activities AddActivity"
+alias kamd_removeactivity="qdbus org.kde.ActivityManager /ActivityManager/Activities RemoveActivity"
+
+# Open the KAMD database
+alias kamd_database="sqlite3 ~/.local/share/kactivitymanagerd/resources/database"
+
+# Lists the existing activities, along with their state
+function kamd_listactivities() {
+    echo -n "Service version: "
+    qdbus org.kde.ActivityManager /ActivityManager serviceVersion
+
+    CURRENT_ACTIVITY=`qdbus org.kde.ActivityManager /ActivityManager/Activities CurrentActivity`
+
+    for activity in `qdbus org.kde.ActivityManager /ActivityManager/Activities ListActivities`; do
+
+        STATE=""
+
+        if [ "$CURRENT_ACTIVITY" = "$activity" ]; then
+            STATE="$fg[green][CURRENT]"
+
+        else
+            STATE=`qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityState $activity`
+
+            case "state$STATE" in
+                state0)
+                    STATE="$fg[red]$bg[black][INVALID]"
+                    ;;
+                state2)
+                    STATE="$fg[blue][RUNNING]"
+                    ;;
+                state3)
+                    STATE="$fg[red]$bg[black][STARTING]"
+                    ;;
+                state4)
+                    STATE="$fg[black][STOPPED]"
+                    ;;
+                state5)
+                    STATE="$fg[red]$bg[black][STOPPING]"
+                    ;;
+            esac
+        fi
+
+        echo -n "$STATE$reset_color $activity "
+
+        ACTIVITY_NAME=`qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityName $activity`
+        ACTIVITY_DESC=`qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityDescription $activity`
+        ACTIVITY_ICON=`qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityIcon $activity`
+
+        if [ -n "$ACTIVITY_DESC" ]; then
+            echo "$ACTIVITY_NAME ($ACTIVITY_DESC, $ACTIVITY_ICON)"
+        else
+            echo "$ACTIVITY_NAME ($ACTIVITY_ICON)"
+        fi
+    done
+}
+
+# Shows the information about the current activity
+function kamd_currentactivity() {
+    for activity in `qdbus org.kde.ActivityManager /ActivityManager/Activities CurrentActivity`; do
+        STATE=`qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityState $activity`
+
+        case "state$STATE" in
+            state0)
+                STATE="[INVALID] "
+                ;;
+            state2)
+                STATE="[RUNNING] "
+                ;;
+            state3)
+                STATE="[STARTING]"
+                ;;
+            state4)
+                STATE="[STOPPED] "
+                ;;
+            state5)
+                STATE="[STOPPING]"
+                ;;
+        esac
+
+        echo -n "$STATE $activity "
+        qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityName $activity
+    done
+}
+
+# Returns the current activity ID
+function kamd_get_currentactivity_id() {
+    qdbus org.kde.ActivityManager /ActivityManager/Activities CurrentActivity
+}
+
+# Returns the current activity name
+function kamd_get_currentactivity_name() {
+    CURRENT_ACTIVITY_ID=$(kamd_get_currentactivity_id)
+    qdbus org.kde.ActivityManager /ActivityManager/Activities ActivityName $CURRENT_ACTIVITY_ID
+}
+
+# Returns the current activity name
+function kamd_get_currentactivity_name_normalized() {
+    CURRENT_ACTIVITY_NAME=$(kamd_get_currentactivity_name)
+    echo $CURRENT_ACTIVITY_NAME | tr '[:upper:] ' '[:lower:]-'
+}
+
+# Returns the current activity ID
+function kamd_STOP_ALL_BUT_CURRENT() {
+    CURRENT_ACTIVITY_ID=$(kamd_get_currentactivity_id)
+
+    for activity in `qdbus org.kde.ActivityManager /ActivityManager/Activities ListActivities`; do
+        if [ "$activity" != "$CURRENT_ACTIVITY_ID" ]; then
+            echo "Stop: $activity"
+            qdbus org.kde.ActivityManager /ActivityManager/Activities StopActivity $activity
+            sleep 1
+        fi
+    done
+}
+
+# Returns the current activity ID
+function kamd_REMOVE_ALL_BUT_CURRENT() {
+    CURRENT_ACTIVITY_ID=$(kamd_get_currentactivity_id)
+
+    for activity in `qdbus org.kde.ActivityManager /ActivityManager/Activities ListActivities`; do
+        if [ "$activity" != "$CURRENT_ACTIVITY_ID" ]; then
+            echo "Remove: $activity"
+            qdbus org.kde.ActivityManager /ActivityManager/Activities RemoveActivity $activity
+            sleep 1
+        fi
+    done
+}
+

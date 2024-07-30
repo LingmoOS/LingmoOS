@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+import sys
+import getpass
+from enum import Enum, unique
+from subprocess import call
+
+
+@unique
+class State(Enum):
+     NEW = 1
+     SECOND = 2
+     THIRD = 3
+     GOOD = 4
+     FAIL = 5
+
+class Sudo:
+
+    def __init__(self):
+        self.state = State.NEW
+        self.read = None
+        self.password = 'ilovekde'
+
+    def process(self):
+        if self.state == State.NEW:
+            self.read = getpass.getpass('[sudo] password for jr: ')
+            if self.read == self.password:
+                self.state = State.GOOD
+                call([sys.argv[3]])
+                exit(0)
+            else:
+                self.state = State.SECOND
+        elif self.state == State.SECOND:
+            print('Sorry, try again.')
+            self.read = getpass.getpass('[sudo] password for jr: ')
+            if self.read == self.password:
+                self.state = State.GOOD
+                exit(0)
+            else:
+                self.state = State.THIRD
+        elif self.state == State.THIRD:
+            print('Sorry, try again.')
+            self.read = getpass.getpass('[sudo] password for jr: ')
+            if self.read == self.password:
+                self.state = State.GOOD
+                exit(0)
+            else:
+                print("sudo: 3 incorrect password attempts")
+                self.state = State.FAIL
+                exit(1)
+
+sudo = Sudo()
+while True:
+    sudo.process()

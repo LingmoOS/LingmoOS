@@ -1,0 +1,177 @@
+Modem Manager (MM) specification: https://developer.gnome.org/ModemManager/unstable/ref-dbus.html
+
+// TODO - UPDATE
+Requirements
+============
+Backend tested using git versions of NetworkManager and ModemManager as of May 16, 2010. To verify which interfaces ModemManager and your modem supports do:
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1 org.freedesktop.DBus.Introspectable.Introspect
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1/Modems/<modem number> org.freedesktop.DBus.Introspectable.Introspect
+
+where:
+<modem number> is returned by dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1 org.freedesktop.ModemManager1.EnumerateDevices
+
+I had to add the uni() method to NetworkManager backend because most MM methods requires a path that looks like /org/freedesktop/ModemManager1/Modems/<modem number>. uni() return such path, so it is the easier way to find a MM object from a NM object.
+
+Implementation
+==============
+The backend organizes MM interfaces as follow:
+
+→ class ModemManager
+    org.freedesktop.ModemManager1
+
+    → class ModemDevice
+        - doesn't have an interface on dbus, represents /org/freedesktop/ModemManager1/Modems/<modem number>
+        - contains all the interfaces below
+
+        → class Modem
+            org.freedesktop.ModemManager1.Modem
+            org.freedesktop.ModemManager1.Modem.Simple
+
+        → class Modem3gpp inherits from Interface
+            org.freedesktop.ModemManager1.Modem.Modem3gpp
+
+        → class Modem3gppUssd inherits from Interface
+            org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd
+
+        → class ModemCdma inherits from Interface
+            org.freedesktop.ModemManager1.Modem.ModemCdma
+
+        → class ModemLocation inherits from Interface
+            org.freedesktop.ModemManager1.Modem.Location
+
+        → class ModemMessaging inherits from Interface
+            org.freedesktop.ModemManager1.Modem.Messaging
+
+        → class ModemTime inherits from Interface
+            org.freedesktop.ModemManager1.Modem.Time
+
+        // TODO - missing
+            → class ModemFirmware inherits from Interface
+                org.freedesktop.ModemManager1.Modem.Firmware
+
+            → class ModemContacts inherits from Interface
+                org.freedesktop.ModemManager1.Modem.Contacts
+
+    → class Bearer
+        org.freedesktop.ModemManager1.Bearer
+
+    → class Sim
+        org.freedesktop.ModemManager1.Sim
+
+    → class Sms
+        org.freedesktop.ModemManager1.Sms
+
+// TODO - needs to update to mach the new ModemManager
+
+Current Implementation Status
+============================
+org.freedesktop.ModemManager1
+        - fully implemented
+        - still needs testing: signals DeviceAdded and DeviceRemoved
+
+org.freedesktop.DBus.Properties
+        - fully implemented and tested
+
+org.freedesktop.ModemManager1.Modem
+        - fully implemented, needs more testing
+        - modem MD300 does not supports: method GetIP4Config
+
+org.freedesktop.ModemManager1.Modem.Simple
+        - fully implemented, needs more testing
+
+org.freedesktop.ModemManager1.Modem.Location
+        - fully implemented, not tested yet
+        - modem MD300 does not support this interface (it is not listed when calling org.freedesktop.DBus.Introspectable.Introspect)
+
+org.freedesktop.ModemManager1.Modem.Cdma
+        - fully implemented, not tested yet
+        - modem MD300 does not support this interface
+
+org.freedesktop.ModemManager1.Modem.3gpp
+        - fully implemented and tested
+
+org.freedesktop.ModemManager1.Modem.Gsm.Card
+        - fully implemented, needs more testing
+
+org.freedesktop.ModemManager1.Modem.Gsm.Contacts
+        - fully implemented, not tested yet
+        - modem MD300 does not support this interface
+
+org.freedesktop.ModemManager1.Modem.Gsm.Network
+        - fully implemented
+        - to be tested: methods Register and SetApn
+        - still not working (returns error): method scan
+        - modem MD300 does not support: method GetBand and probably method SetBand too. SignalQuality method only works in 2G mode for MD300 modem, maybe for other modems it works in 3G mode.
+
+org.freedesktop.ModemManager1.Modem.Gsm.SMS
+        - fully implemented, not tested yet
+        - modem MD300 does not support method List and probably all other methods in this interface.
+org.freedesktop.ModemManager1.Modem.Gsm.Hso                                                                                                                           - fully implemented, not tested yet
+        - modem MD300 does not support this interface
+
+org.freedesktop.ModemManager.Modem.Gsm.Ussd
+        - fully implemented, not tested yet
+        - modem MD300 does not support this interface
+
+Pending Problems
+================
+1. Needs more testing with other modems/cell phones.
+
+2. When I hook up a second 3G modem (my cell phone actually) in my notebook
+sometimes ModemManager disconnects the first modem from Internet. This is not a
+KDE problem, just to warn everybody.
+
+3. I still need to implement some caching to prevent stress in the DBus bus.
+
+4. Missing comments about methods, enum and signal in some classes. Now that everything is implemented I will add the missing comments.
+
+Command line
+============
+
+The dbus methods can be tested in command line with:
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1 org.freedesktop.ModemManager1.EnumerateDevices
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1/Modems/<modem number> org.freedesktop.ModemManager1.Modem.Gsm.Network.GetSignalQuality
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1/Modems/<modem number> org.freedesktop.ModemManager1.Modem.Gsm.Network.GetRegistrationInfo
+
+dbus-send --system --print-reply --dest=org.freedesktop.ModemManager1 /org/freedesktop/ModemManager1/Modems/<modem number> org.freedesktop.DBus.Properties.GetAll string:<interface name>
+
+<modem number> is returned by the first command (EnumerateDevices).
+<interface name> is either of
+
+org.freedesktop.ModemManager1 (do not use /Modems/<modem number> with this one)
+org.freedesktop.DBus.Properties (do not use /Modems/<modem number> with this one)
+org.freedesktop.ModemManager1.Modem
+org.freedesktop.ModemManager1.Modem.Simple
+org.freedesktop.ModemManager1.Modem.Location
+org.freedesktop.ModemManager1.Modem.Cdma
+org.freedesktop.ModemManager1.Modem.Gsm
+org.freedesktop.ModemManager1.Modem.Gsm.Card
+org.freedesktop.ModemManager1.Modem.Gsm.Contacts
+org.freedesktop.ModemManager1.Modem.Gsm.Network
+org.freedesktop.ModemManager1.Modem.Gsm.SMS
+org.freedesktop.ModemManager1.Modem.Gsm.Hso
+org.freedesktop.ModemManager1.Modem.Gsm.Ussd
+
+Devices Known to Work
+=====================
+
+. Sony Ericsson MD300 modem
+    - connects to the Internet.
+    - Signal Quality indication only in Edge mode. When in 3G mode the modem only reports the number of bars (zero to five), but Modem Manager does not report that either. We can change Modem Manager to report an approximation of the signal quality based on the number of bars.
+
+. Samsung Omnia HD i8910
+    - connects to the Internet.
+    - Select "Any" in Plasma NM -> Manage Connections -> Mobile Broadband -> <connection name> -> Edit -> Type or it will not connect
+    - Access technology not reported by Modem Manager.
+
+. Nokia N95
+    - connects to the Internet.
+    - Access technology not reported by Modem Manager.
+
+. Huwaei e226
+    - connects to the Internet.

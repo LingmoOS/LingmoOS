@@ -1,0 +1,146 @@
+KNewStuff2 Engine Design
+========================
+
+The KNewStuff2 engine is one of the central pieces of activity of the
+KNewStuff2 library. First and foremost, it handles the synchronization of
+data on the internet with data on the local hard disk. The local data
+might come from previous downloads, but also from (initial) installation.
+
+On startup, after being initialized to use a certain configuration,
+the engine loads up potentially dozens of files. This will require some
+activity on the harddisk, but will speed up network operations by quite
+a bit afterwards.
+
+There are three groups of files being loaded: the cache for providers,
+the cache for entries, and the registry of entries.
+The first two ones may contain all data about providers and entries
+ever downloaded by KNewStuff2. The cache doesn't have to survive
+machine reboots, but should generally live very long. A strategy for
+file replacements and invalidation will have to be found.
+The third group contains all the entries which are currently installed.
+This group starts out empty, or with some initial system-wide installed
+files. For every download, the corresponding cache file (which exists) is
+copied to the registry dir, afterwards the cached file isn't strictly
+needed anymore. Such files might also be removed again, in case the referenced
+data is deinstalled.
+
+Entity         | Loading                 | Root tag
+---------------+-------------------------+---------
+               |                         |
+provider cache | file(s)                 | <ghnsproviders>
+               |                         |
+entry cache    | directory(ies)->file(s) | <ghnscache>
+               |                         |
+entry registry | directory->file(s)      | <ghnsinstall>
+
+Directly after a download, the downloaded files are scanned for their
+objects (providers or entries), which are added to the in-memory cache.
+By doing so, they might replace older cached entries. For all those older
+entries which are already installed, their status is marked as updateable.
+
+On shutdown of the engine, e.g. when deleting the object, the whole
+cache in memory is freed, but the cache files remain of course.
+
+KNewStuff2 Workflow
+===================
+
+There are two main workflows with KNewStuff: Uploads and downloads. Together
+and repeated over time, these workflows form the data sharing cycle.
+In addition, when DXS is used, some direct interaction with the service is
+possible, which adds a few workflows. Those will be explained after upload
+and download.
+
+Uploads
+-------
+The engine fetches information about the providers which accept uploads for
+a certain mime type or data type. Basically, the list of providers is taken
+minus those who do not support uploads, because not all of them do.
+A provider selection dialog lets the user select one of the remaining
+providers. In case no upload is possible at all, a webpage with uploading
+capabilities or at least information about contact by e-mail may be offered
+by at least one provider. This so-called 'noupload' fallback page will be
+displayed in a browser to the user.
+
+If upload is available, the upload dialog pops up. In it, metadata about the
+upload can be edited. Some of it (especially preview images) might be preset
+already by the application.
+Upload then happens through the engine again. The upload might require
+authentication, which is handled transparently.
+
+When server-side versioning is activated, then no version number needs to be
+given by the user for updates to existing entries.
+
+Downloads
+---------
+Similar to uploads, all providers suitable for the application's data types
+are loaded. However, they appear in parallel, whereas only one provider is
+selected for uploads. Each provider might offer different data types, some
+matching those needed by the application, some rather not. The provider's
+download URL is used to download meta information about all entries, and those
+whose data type is not of interest are filtered out.
+The provider can offer "tagged" download URLs, the so-called feeds, for
+the latest entries, the highest rated ones, or certain other criteria. When
+this is the case, the generic download URL is not used, and instead the
+feeds are offered to the user as alternative selections, e.g. by being
+displayed as tabs on a dialog.
+
+Entries provide meta information which can be viewed, and which might include
+a preview image. They also reference the data itself, which is called payload.
+Installing the payload means downloading the data, and running it through
+a series of checks and installation steps. The data integrity is checked for
+using hash sums and digital signatures, if available. The installation routine
+moves the data file to its correct location, probably involving decompression,
+unpacking and the emission of signals.
+
+For each downloaded and installed entry, the meta information is kept in an
+entry registry. In general, all entries and providers are cached.
+Deinstallation works the other way around: The meta information is read,
+the data deleted and the meta file also deleted afterwards.
+
+Direct interaction
+------------------
+As opposed to upload and download, all other workflows are only possible when
+the provider supports DXS. Such interaction includes:
+* Translation. An entry is referenced and a translation for it is submitted
+  to the server. Translations might end up in an admin queue or be applied
+  directly, depending on the site configuration.
+* Request for removal. Entries which are deemed unnecessary or offending
+  are scheduled for removal into an admin queue.
+* Comments. Comments can be added (again ending up in a queue or applied
+  directly), but they can also be requested for viewing.
+* Several others. See short descriptions in the feature guide.
+
+Library structure
+=================
+
+Proposed structure:
+knewstuff/knewstuff2/core - conventional ghns + coreengine
+knewstuff/knewstuff2/dxs  - dxs + dxsengine
+knewstuff/knewstuff2/ui   - dialogs
+knewstuff/knewstuff2      - workflow wrapper (engine)
+knewstuff/tests           - test applications
+knewstuff/data            - icons and other data
+knewstuff/doc             - documentation
+
+Under review:
+plasmagik/                - packaging handler
+
+
+knsrc file format:
+[KNewStuff2]
+Name=
+ProvidersUrl=
+TargetDir/InstallPath/etc=
+Uncompress=always/never/archive/subdir
+CachePolicy=never/resident/only/replaceable
+Categories=foo,bar
+
+[foo]
+TargetDir/InstallPath/etc=
+Uncompress=...
+CachePolicy=
+
+[bar]
+# empty, then use defaults
+
+

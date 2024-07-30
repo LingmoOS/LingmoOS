@@ -1,0 +1,58 @@
+KScrenLocker and PAM
+--------------------
+
+KScreenLocker can be configured to support the PAM ("Pluggable Authentication
+Modules") system for password checking (for unlocking the display).
+
+PAM is a flexible application-transparent configurable user-authentication 
+system found on FreeBSD, Solaris, and Linux (and maybe other unixes).
+
+Information about PAM may be found on its homepage
+      http://www.kernel.org/pub/linux/libs/pam/
+(Despite the location, this information is NOT Linux-specific.)
+
+
+Known Solaris Issues:
+--------------------
+
+For compiling PAM support on Solaris, PAM_MESSAGE_CONST must NOT
+be defined. This should now be handled automatically by the
+configure script.
+
+
+Using PAM
+---------
+
+By default, PAM is automatically used, if it is found.
+
+If PAM is found, Plasma by default uses the PAM service "kde". You may
+override it for KScreenLocker by using -DKSCREENLOCKER_PAM_SERVICE=<service>.
+
+A valid PAM service definition must be specified, either by installing
+files into /etc/pam.d/ or by adding service configuration to /etc/pam.conf.
+
+Either a valid "kde" service must be installed (or copied from the "login"
+service), or an alternative service must be specified using one of the
+definitions above.  If the service is misconfigured, you will NOT be able
+to unlock a locked screen!
+
+If there is ever any doubt about which PAM service a program was
+compiled with, it can be determined by examining the PAM-generated 
+entries in the system log associated with KScreenLocker authentication
+failures.
+
+PAM configuration files have four types of entries for each service,
+however KScreenLocker only uses the "auth" entries.  Other programs
+using PAM may use other entries.
+
+There may be more than one entry of each type. Check existing PAM
+configuration files and PAM documentation on your system for guidance as
+to what entries to make.  If you call a PAM service that is not
+configured, the default action of PAM is likely to be denial of service.
+
+Note: Screen lockers typically only authenticate a user to allow her to
+continue working. They may also renew tokens etc., where supported.
+See the Linux PAM Administrators guide, which is part of the PAM
+distribution, for more details. 
+
+

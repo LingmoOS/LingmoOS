@@ -1,0 +1,298 @@
+; This is a test file to test kates scheme highlighting
+; This is a comment
+
+; Brackets colors
+((((((((((((( )))))))))))))
+
+;; Another comment, usually used.
+;BEGIN region marker
+;; a vektor
+#(1 2 3 4 5)
+['a 'b 'c]
+;END region marker
+;; this represents integer 28 (FIXME: does not work perfectly atm!)
+28 028 #e28 #i28       ;; Normal, normal, exact, inexact
+#b11100 #o34 #d28 #x1c ;; Bin, oct, dec, hex
+#oe34 #eo34            ;; combined.
+#o#e34 #e#o34          ;; combined.
+;; inf
+#i+inf.0 3+inf.0
+
+;; symbols
+&symbol-42
+symbol-42;comment
+
+;; char.
+(#\y #\space) ;; list: `y' space.
+(#\  #\\ #\)) ;; list of spaces, backslash and`)'.
+#\newline     ;; a newline-char
+#\NewLine     ;; another one :)
+#\pager       ;; bad char
+
+"Hello, world" ;; a string
+
+"hoho, what do you
+want to do  ;; this is NO comment
+with that?"
+
+;; R5RS definiert diese beiden.
+"Das ist \"in Anführungszeichen\" und mit \\ Backslash."
+
+"hexadecimal char \x1aF;."
+
+;; Kawa string templates
+&{Hello &[name]!} 'no-string
+&{This has a {braced} section.} 'no-string
+&{&#27; &#x1B; &amp; &lt; &gt; &quot; &apos;} 'no-string
+; Multiline string literals
+(string-capitalize &{one two three
+uno dos tres
+})
+(write (string-capitalize &{
+     &|one two three
+     &|uno dos tres
+}) out)
+&{abc&- #|comment|#
+  def} 'no-string
+&{&#|line 1|#one two
+  &#|line 2|# three
+  &#|line 3|#uno dos tres
+} 'no-string
+; Embedded expressions
+&{Hello &[(string-capitalize name)]!} 'no-string
+&{Hello &(string-capitalize name)!} 'no-string
+; formatting
+&{&~{&[arr]&~^_&~}} 'no-string
+&{&~{&~a[arr]&~^_&~}} 'no-string
+
+;; Kawa XML literals
+#<p>The result is <b>final</b>!</p> 'no-xml
+#<em>The result is &{result}.</em> 'no-xml
+#<p>This is <(if be-bold 'strong 'em)>important</>!</p> 'no-xml
+#<p>This is <{(if be-bold 'strong 'em)}>important</>!</p> 'no-xml
+#<p>Special characters <![CDATA[< > & ' "]]> here.</p> 'no-xml
+#<p>Special characters &lt; &gt; &amp; &quot; &apos; here.</p> 'no-xml
+#<gnu:b xmlns:gnu="http://gnu.org/"/> 'no-xml
+#<chapter><?dbhtml filename="intro.html" ?>
+<title>Introduction</title>
+...
+</chapter> 'no-xml
+
+
+;; Kawa Regular expression
+#/a\.c/
+#/a/i
+#/a/im
+
+
+(let ((x (+ 1 2)) (y "blah")) ;; `let' highlighting.
+  (and (number? x)            ;; `and' highlighting.
+       (string? y)))
+
+(let* ((x 2) (y (+ x 1))) ;; `let*' too.
+  (or (negative? x)       ;; `or' anyways.
+      (negative? y)))
+
+(do ((vec (make-vector 5)) ;; `do' you may guess!
+     (i 0 (+ i 1)))
+    ((= i 5) vec)
+  (vector-set! vec i i))
+
+(quasiquote ((+ 1 2) (unquote (+ 1 2))))
+;; same as: `((+ 1 2) ,(+ 1 2))
+
+;; see above.
+(quasiquote ((+ 1 2) (unquote-splicing (list 1 2 3))))
+;; same as: `((+ 1 2) ,@(+ 1 2))
+
+;; not necessary.
+(quote ())
+
+(cond ((string? x) (string->symbol x)) ;; `cond' highlighting.
+      ((symbol? x) => (lambda (x) x))  ;; `=>' highlighting.
+      (else ;; `else' highlighting.
+       (error "Blah")))
+
+(case x ;; `case' highlighting.
+  ((#t) 'true) ((#f) 'false)
+  ((()) 'null)
+  ((0) 'zero))
+
+;; highlight `let-syntax' and `syntax-rules' .
+(let-syntax ((when (syntax-rules ()
+                     ((when test stmt1 stmt2 ...)
+                      ;; hl `begin' .
+                      (if test (begin stmt1 stmt2 ...))))))
+  (let ((if #t)) ;; here`if' is actually no keyword.
+    (when if (set! if 'now)) ;; nor here.
+    if))
+
+(letrec-syntax ...) ;; hl `letrec-syntax'.
+
+(define-syntax when
+  (syntax-rules ()
+    ((when test stmt1 stmt2 ...)
+     (if test (begin stmt1 stmt2 ...))))))
+
+;; variable definitions.
+(define natural-numbers ;; hl `define' and the var name
+  ;; endless stream of all natual numbers.
+  (letrec ((next-cell    ;; hl `letrec'.
+            (lambda (x)  ;; hl `lambda'.
+              ;; hl `delay' .
+              (cons x (delay (next-cell (+ x 1)))))))
+    (next-cell 0)))
+
+;; a procedure with unusual but allowed name.
+(define 1+
+  (lambda (x)
+    (+ x 1)))
+
+;; a predicate
+(define between?
+  (lambda (x y z)
+    (if (and (>= x y) (<= x z))
+        #t ;; True
+      #f))) ;; False.
+
+;; imperative procedure
+(define set-something!
+  (lambda (required-argument another-one . all-remaining-args)
+    (set-car! another-one (lambda all-args
+                            (set-cdr! required-argument
+                                      (append all-remaining-args
+                                              all-args))))))
+
+(define compose
+  (lambda (f g)
+    (lambda (x)
+      (f (g x)))))
+
+;; syntactical sugar for procedure-definitions.
+(define (compose f g)
+  (lambda (x)
+    (f (g x))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; NOW: Guile extensions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; procedure-generator.
+(define ((compose f g) x)
+  (f (g x)))
+
+;; scheme doesn't say, which chars may be in variables...
+;; At least: Guile accepts umlauts
+(define-private (timetr??? sprache) ;; hl `define-private'.
+  (list-dialekt? sprache))
+
+(define-public x #t)  ;; hl `define-public'.
+(define-module (foo bar)) ;; hl `define-module'.
+(define-macro (neither . exprs) ;; hl `define-macro'.
+  `(and ,@(map (lambda (x) `(not ,x)) exprs)))
+
+(defmacro neither exprs ;; `defmacro' as well.
+  `(and ,@(map (lambda (x) `(not ,x)) exprs)))
+
+;; hl, but I really don't know what this is supposed to do :-)
+(define-syntax-macro ...)
+
+;; hl GOOPS-`defines'
+(define-method (foo bar (baz <vector>) qux) ...)
+(define-class <foo> ...)
+(define-generic foo)
+(define-accessor bar)
+
+;; Keywords!
+(blah #:foo 33 #:bar 44)
+
+;; another convention for symbols:
+#{foo}#
+
+#{a
+few
+lines}#
+
+#{4711}#
+
+;; more chars.
+#\nul #\nl #\esc #\bs #\bel #\syn #\ack #\sp ;; etc, utc, itc, oops (this is boring)
+
+#| R6RS / SRFI-30 block comment
+supports #| nested block |# comments |#
+'now-no-comment-anymore
+
+#!
+ guile block-comment.
+!#
+
+;; now, a bit hairy:
+#! comment !#
+still comment!!!
+!#
+'now-no-comment-anymore
+
+;; more precise:
+#! comment !#
+still comment
+!# still comment!
+!#
+'now-no-comment-anymore
+
+;; Datum comment
+#;(1 2 3) 'now-no-comment-anymore
+#;1 'now-no-comment-anymore
+#;#o12 'now-no-comment-anymore
+#;"bla bla\"" 'now-no-comment-anymore
+#;[1 2 3] 'now-no-comment-anymore
+#;[1 [2 (3 (4))]] 'now-no-comment-anymore
+#;(1 (2 [3 [4]])) 'now-no-comment-anymore
+#;#/reg/im 'now-no-comment-anymore
+#;#<p>The result is <b>final</b>!</p> 'now-no-comment-anymore
+#;#<em>The result is &{result}.</em> 'now-no-comment-anymore
+#;#<p>This is <(if be-bold 'strong 'em)>important</>!</p> 'now-no-comment-anymore
+#;#<p>This is <{(if be-bold 'strong 'em)}>important</>!</p> 'now-no-comment-anymore
+#;#<p>Specal characters <![CDATA[< > & ' "]]> here.</p> 'now-no-comment-anymore
+#;#<p>Specal characters &lt; &gt; &amp; &quot; &apos; here.</p> 'now-no-comment-anymore
+#;#<gnu:b xmlns:gnu="http://gnu.org/"/> 'now-no-comment-anymore
+#;#<chapter><?dbhtml filename="intro.html" ?>
+<title>Introduction</title>
+...
+</chapter> 'now-no-comment-anymore
+#;#&{Hello &[name]!} 'now-no-comment-anymore
+#;&{This has a {braced} section.} 'now-no-comment-anymore
+#;&{&#27;&#x1B; &amp; &lt; &gt; &quot; &apos;} 'now-no-comment-anymore
+#;(string-capitalize &{one two three
+uno dos tres
+}) 'now-no-comment-anymore
+#;(write (string-capitalize &{
+     &|one two three
+     &|uno dos tres
+}) out) 'now-no-comment-anymore
+#;&{abc&-
+  def} 'now-no-comment-anymore
+#;&{&#|line 1|#one two
+  &#|line 2|# three
+  &#|line 3|#uno dos tres
+} 'now-no-comment-anymore
+#;&{Hello &[(string-capitalize name)]!} 'now-no-comment-anymore
+#;&{Hello &(string-capitalize name)!} 'now-no-comment-anymore
+#;&{&~{&[arr]&~^_&~}} 'now-no-comment-anymore
+#;&{&~{&~a[arr]&~^_&~}} 'now-no-comment-anymore
+#;(
+1
+2
+3) 'now-no-comment-anymore
+
+; identifier with hex-escape
+H\x65;llo; commment
+H\x65;\x6c;lo; commment
+
+(while (> foo 10) ;; Highlight `while'.
+  (set! foo (- foo 1))
+  (catch #t ;; Highlight `catch'.
+    (lambda () (display foo))
+    (lambda (key . args)
+      (if (eq? key 'system-error)
+          (break) ;; Highlight `break'.
+        (continue))))) ;; Highlight `continue'.

@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-FileCopyrightText: 2021 Harald Sitter <sitter@kde.org>
+
+[Unit]
+Description=Socket to launch DrKonqi for a systemd-coredump crash
+DefaultDependencies=no
+
+[Socket]
+# This is a bit problematic. Technically the user should be able to set the runtime dir via env as well, but we need
+# a persistent location so the system-level service can talk to us :|
+ListenSequentialPacket=/run/user/%U/drkonqi-coredump-launcher
+SocketMode=0600
+Accept=yes
+# Disable trigger limit for the benefit of older systemds
+# TODO: remove in favor of PollLimitBurst mechanism once systemd 255 is in ubuntu LTS
+TriggerLimitBurst=0
+# NB: this effectively also limits how many concurrent drkonqis run!
+MaxConnections=16
+
+[Install]
+WantedBy=sockets.target
+# Prevents trigger-limit-hit failure state by restarting the unit (systemd 250[?])
+UpheldBy=sockets.target

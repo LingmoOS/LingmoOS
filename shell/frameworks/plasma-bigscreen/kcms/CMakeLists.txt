@@ -1,0 +1,5 @@
+add_subdirectory(audio-device-chooser)
+add_subdirectory(plasma-settings-shell)
+add_subdirectory(wifi)
+add_subdirectory(kdeconnect)
+add_subdirectory(bigscreen-settings)

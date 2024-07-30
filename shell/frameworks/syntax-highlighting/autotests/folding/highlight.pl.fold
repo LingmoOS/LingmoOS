@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+# This is a pseudo Perl file to test Kate's Perl syntax highlighting.
+# TODO: this is incomplete, add more syntax examples!
+
+sub prg($)
+<beginfold id='1'>{</beginfold id='1'>
+	my $var = shift;
+
+	$var =~ s<beginfold id='2'>/</beginfold id='2'>bla<endfold id='2'></endfold id='2'><beginfold id='3'>/</beginfold id='3'>foo<endfold id='3'>/igs</endfold id='3'>;
+	$var =~ s<beginfold id='2'>!</beginfold id='2'>bla<endfold id='2'></endfold id='2'><beginfold id='3'>!</beginfold id='3'>foo<endfold id='3'>!igs</endfold id='3'>;
+	$var =~ s<beginfold id='2'>#</beginfold id='2'>bla<endfold id='2'></endfold id='2'><beginfold id='3'>#</beginfold id='3'>foo<endfold id='3'>#igs</endfold id='3'>;
+	$var =~ tr/a-z/A-Z/;
+	($match) = ($var =~ m<beginfold id='2'>/</beginfold id='2'>(.*?)<endfold id='2'>/igs</endfold id='2'>);
+
+	$test = 2/453453.21;
+	$test /= 2;
+
+	print qq<beginfold id='4'>~</beginfold id='4'>d fsd fsdf sdfl sd<endfold id='4'>~</endfold id='4'>
+	
+	$" = <beginfold id='4'>'</beginfold id='4'>/<endfold id='4'>'</endfold id='4'>;
+	
+	$foo = <beginfold id='5'><<</beginfold id='5'>__EOF;
+d ahfdklf klsdfl sdf sd
+fsd sdf sdfsdlkf sd
+<endfold id='5'>__EOF</endfold id='5'>
+
+	$x = <beginfold id='4'>"</beginfold id='4'>dasds<endfold id='4'>"</endfold id='4'>;
+
+	next if( $match eq <beginfold id='4'>"</beginfold id='4'>two<endfold id='4'>"</endfold id='4'> );
+	next if( $match =~ <beginfold id='2'>/</beginfold id='2'>go<endfold id='2'>/i</endfold id='2'> );
+
+	@array = (1,2,3);		# a comment
+	# Test qw versions with special ending characters
+	@array = qw<beginfold id='6'>(</beginfold id='6'>apple foo bar<endfold id='6'>)</endfold id='6'>;
+	@array = qw<beginfold id='6'>[</beginfold id='6'>apple foo bar<endfold id='6'>]</endfold id='6'>;
+	@array = qw<beginfold id='6'>{</beginfold id='6'>apple foo bar<endfold id='6'>}</endfold id='6'>;
+	@array = qw<beginfold id='6'><</beginfold id='6'>apple foo bar<endfold id='6'>></endfold id='6'>;
+	@array = qw<beginfold id='6'>(</beginfold id='6'>
+		multi
+		line
+		test
+	<endfold id='6'>)</endfold id='6'>;
+	# Test qw with non special ending characters;
+	@array = qw<beginfold id='6'>/</beginfold id='6'>apple foo bar<endfold id='6'>/</endfold id='6'>;
+	@array = qw<beginfold id='6'>|</beginfold id='6'>apple foo bar<endfold id='6'>|</endfold id='6'>;
+	@array = qw<beginfold id='6'>@</beginfold id='6'>apple foo bar<endfold id='6'>@</endfold id='6'>;
+	@array = qw<beginfold id='6'>!</beginfold id='6'>apple foo bar<endfold id='6'>!</endfold id='6'>;
+	@array = qw<beginfold id='6'>"</beginfold id='6'>apple foo bar<endfold id='6'>"</endfold id='6'>;
+	@array = qw<beginfold id='6'>'</beginfold id='6'>apple foo bar<endfold id='6'>'</endfold id='6'>;
+	push(@array, 4);
+	%hash = (red => <beginfold id='4'>'</beginfold id='4'>rot<endfold id='4'>'</endfold id='4'>,
+		blue => <beginfold id='4'>'</beginfold id='4'>blau<endfold id='4'>'</endfold id='4'>);
+	print keys(%hash);
+<endfold id='1'>}</endfold id='1'>
+
+sub blah <beginfold id='1'>{</beginfold id='1'>
+    my $str = <beginfold id='5'><<</beginfold id='5'> '    EOS';
+        this is my string
+        and it's continuation
+<endfold id='5'>    EOS</endfold id='5'>
+
+    $str = <beginfold id='4'>"</beginfold id='4'>hello world<endfold id='4'>"</endfold id='4'>;
+
+    $str = <beginfold id='5'><<</beginfold id='5'> "    EOS";
+        this is my string
+        and it's continuation
+<endfold id='5'>    EOS</endfold id='5'>
+<endfold id='1'>}</endfold id='1'>
+
+&blah;
+prg(<beginfold id='4'>"</beginfold id='4'>test<endfold id='4'>"</endfold id='4'>);
+
+# Bracket closures in RegExp patterns (bug #364866)
+qr<beginfold id='2'>{</beginfold id='2'> ${var} aa{aa{a}a} aa*b?<endfold id='2'>}</endfold id='2'>;
+qr<beginfold id='2'>(</beginfold id='2'>aa(a(a(a(b|c)a)a)a)aa*b?<endfold id='2'>)</endfold id='2'>;
+s<beginfold id='2'>{</beginfold id='2'>aaa {aaa} a \x{A2} *b?<endfold id='2'>}</endfold id='2'><beginfold id='3'>{</beginfold id='3'>aa<endfold id='3'>}</endfold id='3'>;
+s<beginfold id='2'>(</beginfold id='2'>aa(a(a(a(b|c)a)a)a)aa<endfold id='2'>)</endfold id='2'><beginfold id='3'>(</beginfold id='3'>aa<endfold id='3'>)</endfold id='3'>;
+
+# Strings as scalar references (bug #348765)
+$x = \<beginfold id='4'>'</beginfold id='4'>Reference of a String<endfold id='4'>'</endfold id='4'>;
+$y = \<beginfold id='4'>"</beginfold id='4'>Reference of a String<endfold id='4'>"</endfold id='4'>;
+
+# Variables that start with underscore (bug #355300)
+$_variable
+$_ # Reserved var.
+
+for my $x ($hash-><beginfold id='1'>{</beginfold id='1'>arr<endfold id='1'>}</endfold id='1'>->@*) <beginfold id='1'>{</beginfold id='1'>
+    for my $k (keys $k->%*) <beginfold id='1'>{</beginfold id='1'>
+        ...
+    <endfold id='1'>}</endfold id='1'>
+<endfold id='1'>}</endfold id='1'>
+
+# Highlight correctly operator // (bug #407327)
+$x = ns // <beginfold id='4'>"</beginfold id='4'><endfold id='4'>"</endfold id='4'>;
+print $x;

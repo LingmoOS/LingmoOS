@@ -1,0 +1,87 @@
+; This is a test file for kate's PureBasic highlighting.
+
+; BMP2x Converter by Sven Langenkamp
+
+UseJPEGImageEncoder()
+UsePNGImageEncoder()
+
+Declare Convert(JPEG)
+
+<beginfold id='1'>Enumeration </beginfold id='1'>1
+    #JPEG
+    #PNG
+<endfold id='1'>EndEnumeration</endfold id='1'>
+
+<beginfold id='2'>; BEGIN section</beginfold id='2'>
+
+
+<endfold id='2'>; END</endfold id='2'>
+
+Global Count
+Global file.s
+Global filename.s
+Global fileext.s
+Global OutputFormat
+Global JPEGQuality
+
+Count        = 0
+OutputFormat = 1
+JPEGQuality  = -1
+
+; MAIN PROGRAM------------------------------------------------------------------
+
+;Request Options
+PrintN("Output Format")
+PrintN("  [1] JPEG")
+PrintN("  [2] PNG")
+Print ("> ")
+OutputFormat = Int(Input())
+
+<beginfold id='3'>Select </beginfold id='3'>OutputFormat
+    Case #JPEG:
+        fileext = ".jpg"
+        ;Request JPEG Quality
+        PrintN("")
+        PrintN("JPEG Quality")
+        PrintN("  [0-10]")
+        Print ("> ")
+        JPEGQuality = Int(Input())
+    
+    Case #PNG:
+        fileext = ".png"
+<endfold id='3'>EndSelect</endfold id='3'>
+
+;Convert all BMP files in the current directory
+ExamineDirectory(0, "", "*.bmp")
+<beginfold id='4'>While </beginfold id='4'>NextDirectoryEntry()   
+    file     = DirectoryEntryName()
+    filename = GetFilePart(file)
+    
+    <beginfold id='5'>If </beginfold id='5'>LoadImage(0, file)
+        <beginfold id='3'>Select </beginfold id='3'>OutputFormat
+	    Case #JPEG:
+	      Convert(JPEGQuality)
+	      
+	    Case #PNG:
+	        Convert(-1)
+	<endfold id='3'>EndSelect</endfold id='3'>
+	Count = Count +1
+    <endfold id='5'>EndIf</endfold id='5'>
+    
+<endfold id='4'>Wend</endfold id='4'>
+
+PrintN(Str(Count) + " files converted")
+CloseConsole()
+
+; PROCUDURES--------------------------------------------------------------------
+
+<beginfold id='6'>Procedure </beginfold id='6'>Convert(JPEG)
+    Shared filename, fileext
+    
+    <beginfold id='5'>If </beginfold id='5'>JPEG > -1
+        SaveImage(0, filename + fileext, #PB_ImagePlugin_JPEG, JPEG)
+    Else
+        SaveImage(0, filename + fileext, #PB_ImagePlugin_PNG)    
+    <endfold id='5'>EndIf</endfold id='5'>
+    PrintN(file + " converted to " + filename + fileext)
+<endfold id='6'>EndProcedure</endfold id='6'>

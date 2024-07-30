@@ -1,0 +1,339 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY kappname "&kdesu;">
+  <!ENTITY package "kdebase">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE" > <!-- change language only here -->
+]>
+
+<book id="kdesu" lang="&language;">
+<bookinfo>
+
+<title>The &kdesu; handbook</title>
+
+<authorgroup>
+<author>&Geert.Jansen; &Geert.Jansen.mail;</author>
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+</authorgroup>
+
+<copyright>
+<year>2000</year>
+<holder>&Geert.Jansen;</holder>
+</copyright>
+
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>2010-09-21</date>
+<releaseinfo>KDE 4.5</releaseinfo>
+
+
+<abstract><para>&kdesu; is a graphical front end for the &UNIX;
+<command>su</command> command.</para></abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>su</keyword>
+<keyword>password</keyword>
+<keyword>root</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Introduction</title>
+
+<!-- from kdebase/runtime/kdesu/FAQ since rev 855297
+kdesu is a libexec program, so does not normally reside in your PATH.
+Use something like:
+<command>$(kf5-config - -path libexec)kdesu - - program_to_run
+
+https://bugs.kde.org/show_bug.cgi?id=194267
+"one needs to create a
+~/.kde/share/config/kdesurc file to tell KDE to use sudo instead of su."
+~/.kde/share/config/kdesurc
+[super-user-command]
+super-user-command=sudo
+does this really work?
+-->
+
+<para>Welcome to &kdesu;! &kdesu; is a graphical front end for the
+&UNIX; <command>su</command> command for the K Desktop Environment.
+It allows you to run a program as different user by supplying the
+password for that user. &kdesu; is an unprivileged program; it uses
+the system's <command>su</command>.</para>
+
+<para>&kdesu; has one additional feature: it can remember passwords
+for you. If you are using this feature, you only need to enter the
+password once for each command. See <xref
+linkend="sec-password-keeping"/> for more information on this and a
+security analysis.</para>
+
+<para>This program is meant to be started from the command line or
+from <filename>.desktop</filename> files. Although it asks for the
+<systemitem class="username">root</systemitem> password using a &GUI;
+dialog, I consider it to be more of a command line &lt;-&gt; &GUI;
+glue instead of a pure &GUI; program.</para>
+
+<para>Since <command>kdesu</command> is no longer installed in <userinput>
+$(kf5-config --prefix)</userinput>/bin but in <userinput>kf5-config --path libexec</userinput>
+and therefore not in your <envar>Path</envar>, you have to use <userinput>$(kf5-config
+--path libexec)<command>kdesu</command></userinput> to launch <command>kdesu</command>.</para>
+</chapter>
+
+<chapter id="using-kdesu">
+<title>Using &kdesu;</title>
+
+<para>Usage of &kdesu; is easy. The syntax is like this:</para>
+
+<cmdsynopsis>
+<command>kdesu</command>
+
+<group choice="opt"><option>-c</option> <replaceable> command</replaceable></group>
+<group choice="opt"><option>-d</option></group>
+<group choice="opt"><option>-f</option> <replaceable> file</replaceable></group>
+<group choice="opt"><option>-i</option> <replaceable> icon name</replaceable></group>
+<group choice="opt"><option>-n</option></group>
+<group choice="opt"><option>-p</option> <replaceable> priority</replaceable></group>
+<group choice="opt"><option>-r</option></group>
+<group choice="opt"><option>-s</option></group>
+<group choice="opt"><option>-t</option></group>
+<group choice="opt"><option>-u</option> <replaceable> user</replaceable></group>
+<group choice="opt"><option>--noignorebutton</option></group>
+<group choice="opt"><option>--attach</option> <replaceable> winid</replaceable></group>
+<!--group choice="opt"><option>- -nonewdcop</option></group>
+
+<group><arg choice="req"><replaceable>command</replaceable> <arg><replaceable>arg1</replaceable></arg>
+	  <arg><replaceable>arg2</replaceable></arg>
+          <arg rep="repeat"><replaceable></replaceable></arg></arg></group-->
+</cmdsynopsis>
+<cmdsynopsis>
+<command>kdesu</command>
+<arg choice="opt">&kde; Generic Options</arg>
+<arg choice="opt">&Qt; Generic Options</arg>
+</cmdsynopsis>
+
+<para>The command line options are explained below.</para>
+
+<variablelist>
+<varlistentry>
+<term><option>-c <replaceable>command</replaceable></option></term>
+<listitem><para>This specifies the command to run as root. It has to be passed
+in one argument. So if, for example, you want to start a new file manager, you
+would enter at the prompt: <userinput>$(kf5-config --path libexec)<command>kdesu <option>-c <replaceable>
+&dolphin;</replaceable></option></command></userinput></para></listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-d</option></term>
+<listitem><para>Show debug information.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-f <replaceable>file</replaceable></option></term>
+<listitem><para>This option allow efficient use of &kdesu; in
+<filename>.desktop</filename> files. It tells &kdesu; to examine the
+file specified by <parameter>file</parameter>. If this file is
+writable by the current user, &kdesu; will execute the command as the
+current user. If it is not writable, the command is executed as user
+<parameter>user</parameter> (defaults to root).</para>
+<para><parameter>file</parameter> is evaluated like this: if
+<parameter>file</parameter> starts with a <literal>/</literal>, it is
+taken as an absolute filename. Otherwise, it is taken as the name of a
+global &kde; configuration file.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-i</option> <replaceable>icon name</replaceable></term>
+<listitem><para>Specify icon to use in the password dialog.  You may specify
+just the name, without any extension.</para>
+<para>For instance to run &konqueror; in filemanager mode and show the
+&konqueror; icon in the password dialog:</para>
+<screen><userinput>$(kf5-config --path libexec)<command>kdesu</command>  <option>-i konqueror</option>
+<option>-c "konqueror --profile filemanagement"</option></userinput></screen>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-n</option></term>
+<listitem><para>Do not keep the password. This disables the <guilabel>keep
+password</guilabel> checkbox in the password dialog.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-p</option> <replaceable>priority</replaceable></term>
+<listitem>
+<para>Set priority value.  The priority is an arbitrary number between 0 and
+100, where 100 means highest priority, and 0 means lowest.  The default is
+50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-r</option></term>
+<listitem><para>Use realtime scheduling.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term><option>-s</option></term>
+<listitem><para>Stop the kdesu daemon. See <xref
+linkend="sec-password-keeping"/>.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-t</option></term>
+<listitem><para>Enable terminal output. This disables password keeping. This is
+largely for debugging purposes; if you want to run a console mode app, use the
+standard <command>su</command> instead.</para> </listitem>
+</varlistentry>
+<varlistentry>
+<term><option>-u</option> <replaceable> user</replaceable></term>
+<listitem><para>While the most common use for &kdesu; is to run a command as
+the superuser, you can supply any user name and the appropriate
+password.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="Internals">
+<title>Internals</title>
+
+<sect1 id="x-authentication">
+<title>X authentication</title>
+
+<para>The program you execute will run under the root user id and will
+generally have no authority to access your X display. &kdesu; gets
+around this by adding an authentication cookie for your display to a
+temporary <filename>.Xauthority</filename> file. After the command
+exits, this file is removed. </para>
+
+<para>If you don't use X cookies, you are on your own. &kdesu; will
+detect this and will not add a cookie but you will have to make sure
+that root is allowed to access to your display.</para>
+
+</sect1>
+
+<sect1 id="interface-to-su">
+<title>Interface to <command>su</command></title>
+
+<para>&kdesu; uses the sytem's <command>su</command> for acquiring
+priviliges. In this section, I explain the details of how &kdesu; does
+this. </para>
+
+<para>Because some <command>su</command> implementations (&ie; the one
+from &RedHat;) don't want to read the password from
+<literal>stdin</literal>, &kdesu; creates a pty/tty pair and executes
+<command>su</command> with its standard filedescriptors connected to
+the tty.</para>
+
+<para>To execute the command the user selected, rather than an
+interactive shell, &kdesu; uses the <option>-c</option> argument with
+<command>su</command>. This argument is understood by every shell that
+I know of so it should work portably. <command>su</command> passes
+this <option>-c</option> argument to the target user's shell, and the
+shell executes the program. Example command: <command>su <option>root
+-c <replaceable>the_program</replaceable></option></command>.</para>
+
+<para>Instead of executing the user command directly with
+<command>su</command>, &kdesu; executes a little stub program called
+<application>kdesu_stub</application>. This stub (running as the
+target user), requests some information from &kdesu; over the pty/tty
+channel (the stub's stdin and stdout) and then executes the user's
+program. The information passed over is: the X display, an X
+authentication cookie (if available), the <envar>PATH</envar> and the
+command to run. The reason why a stub program is used is that the X
+cookie is private information and therefore cannot be passed on the
+command line.</para>
+
+</sect1>
+
+<sect1 id="password-checking">
+<title>Password Checking</title>
+
+<para>&kdesu; will check the password you entered and gives an error
+message if it is not correct. The checking is done by executing a test
+program: <filename>/bin/true</filename>. If this succeeds, the
+password is assumed to be correct.</para>
+
+</sect1>
+
+<sect1 id="sec-password-keeping">
+<title>Password Keeping</title>
+
+<para>For your comfort, &kdesu; implements a <quote>keep
+password</quote> feature. If you are interested in security, you
+should read this paragraph.</para>
+
+<para>Allowing &kdesu; to remember passwords opens up a (small)
+security hole in your system. Obviously, &kdesu; does not allow
+anybody but your user id to use the passwords, but, if done without
+caution, this would lowers <systemitem
+class="username">root</systemitem>'s security level to that of a
+normal user (you). A hacker who breaks into your account, would get
+<systemitem class="username">root</systemitem> access. &kdesu; tries
+to prevent this. The security scheme it uses is, in my opinion at
+least, reasonably safe and is explained here.</para>
+
+<para>&kdesu; uses a daemon, called
+<application>kdesud</application>. The daemon listens to a &UNIX;
+socket in <filename>/tmp</filename> for commands. The mode of the
+socket is 0600 so that only your user id can connect to it. If
+password keeping is enabled, &kdesu; executes commands through this
+daemon. It writes the command and <systemitem
+class="username">root</systemitem>'s password to the socket and the
+daemon executes the command using <command>su</command>, as describe
+before. After this, the command and the password are not thrown
+away. Instead, they are kept for a specified amount of time. This is
+the timeout value from in the control module.  If another request for
+the same command is coming within this time period, the client does
+not have to supply the password. To keep hackers who broke into your
+account from stealing passwords from the daemon (for example, by
+attaching a debugger), the daemon is installed set-group-id
+nogroup. This should prevent all normal users (including you) from
+getting passwords from the <application>kdesud</application>
+process. Also, the daemon sets the <envar>DISPLAY</envar> environment
+variable to the value it had when it was started. The only thing a
+hacker can do is execute an application on your display.</para>
+
+<para>One weak spot in this scheme is that the programs you execute
+are probably not written with security in mind (like setuid
+<systemitem class="username">root</systemitem> programs). This means
+that they might have buffer overruns or other problems and a hacker
+could exploit those.</para>
+
+<para>The use of the password keeping feature is a tradeoff between
+security and comfort. I encourage you to think it over and decide for
+yourself if you want to use it or not.</para>
+
+</sect1>
+</chapter>
+
+<chapter id="Author">
+<title>Author</title>
+
+<para>&kdesu;</para>
+
+<para>Copyright 2000 &Geert.Jansen;</para>
+
+<para>&kdesu; is written by &Geert.Jansen;. It is somewhat based on
+Pietro Iglio's &kdesu;, version 0.3. Pietro and I agreed that I will
+maintain this program in the future.</para>
+
+<para>The author can be reached through email at &Geert.Jansen.mail;.
+Please report any bugs you find to me so that I can fix them. If you
+have a suggestion, feel free to contact me.</para>
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+
+&underFDL;
+&underArtisticLicense;
+
+</chapter>
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-omittag: nil
+sgml-shorttag: t
+End:
+-->
+

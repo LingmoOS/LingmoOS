@@ -1,0 +1,45 @@
+This file describes everything that the Daemon does or should do.
+
+This daemon will restore and save screen configurations depending on which monitors are connected.
+In case not known configuration is saved, a new one will be created following some principles.
+
+This daemon also handles the laptop keys for managing screens.
+
+-Configuration format:
+    Each configuration will represent a set of connected outputs, atm we are using the hash of their
+    EDID sorted alphabetically to identify a unique set of outputs
+-Config generator for unknown set of outputs.
+
+    Laptop:
+        -If embedded display is running
+            -Embedded enabled
+            -Embedded primary
+            -External extended to the right
+
+        -If docked and embedded is running
+            -Embedded enabled
+            -External extended to the right
+            -External primary
+
+        -If embedded display is NOT running
+            -External primary
+
+        -When no more monitors can be enabled
+            -If the difference is only 1, disable embedded
+            -Notification for opening KCM
+
+    Desktop:
+        The configuration of a desktop machine is different from a laptop since a desktop machine
+        is way more static than a notebook and the set of monitors doesn't change that much.
+
+        -Always extend to the right
+        -When no more monitors can be enabled show KCM
+
+Laptop special key:
+    This key is usually used to go from mode to mode, we will implement it in the following order:
+
+        -Clone
+        -Extended to the left
+        -Extended to the right
+
+    Since by default we are extending to the right, make sense to clone next.

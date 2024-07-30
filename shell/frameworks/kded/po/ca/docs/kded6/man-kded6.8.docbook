@@ -1,0 +1,271 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Catalan  "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manual d'usuari del kded6</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Mantenidor</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Autor original</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>22 de juny de 2023</date>
+<releaseinfo
+>Frameworks 6</releaseinfo>
+<productname
+>Frameworks del KDE</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>Dimoni del &kde;: provoca l'actualització de la base de dades Sycoca quan cal.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Sinopsi</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descripció</title>
+
+<para
+>El <command
+>kded6</command
+> consolida una sèrie de serveis petits en un sol procés. Es tracta principalment de serveis de &DBus; proporcionats pels mòduls del KDED, però també gestiona «sycoca» (un cau binari dels tipus de servei, els tipus &MIME; i els serveis utilitzats pel KService) i els scripts d'actualització de KConfig, segons sigui necessari.</para>
+
+<para
+>Per a «sycoca», efectuarà un seguiment dels directoris que contenen fitxers .desktop. Quan s'afegeix o elimina un fitxer, espera 5 segons (en el cas d'una sèrie d'actualitzacions) i, a continuació, llança el <command
+>kbuildsycoca6</command
+> per a actualitzar el «sycoca».</para>
+
+<para
+>Per a KConfig, comprova els fitxers d'actualització instal·lats recentment, &pex;, els fitxers <filename class="extension"
+>*.upd</filename
+> utilitzats per a actualitzar els fitxers de configuració quan es canvia el format d'aquests, i executa la utilitat d'actualització KConfig per a realitzar les actualitzacions.</para>
+
+<para
+>Aquestes tasques també s'executen quan s'inicia el <command
+>kded6</command
+> per a assegurar que la configuració d'usuari està actualitzada.</para>
+
+<para
+>Normalment no necessitareu executar el <command
+>kded6</command
+> directament. Les sessions d'escriptori &plasma; ho fan automàticament, i s'inicia sota demanda quan una aplicació intenta utilitzar una interfície de &DBus; que el proveeix o un dels seus mòduls.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Opcions</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>Comprova la base de dades de «sycoca», actualitzant-la si cal, i surt. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Configurar</title>
+
+<para
+>El <command
+>kded6</command
+> es pot configurar amb el fitxer de configuració a l'estil ini <filename
+>kded6rc</filename
+>. Sobre els sistemes &UNIX;, el trobareu a <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+>. Si no s'ha establert <varname
+>$XDG_CONFIG_HOME</varname
+>, de manera predeterminada estarà a <filename
+>~/.config/kded6rc</filename
+>.</para>
+
+<para
+>Les entrades al fitxer de configuració es llegeixen sota demanda, de manera que es poden fer canvis mentre s'està executant el <command
+>kded6</command
+>. No obstant això, totes les opcions de configuració actuals, en realitat només afectaran el comportament durant l'arrencada del <command
+>kded6</command
+>.</para>
+
+<para
+>La secció <option
+>[General]</option
+> disposa de les següents opcions: <variablelist>
+<varlistentry>
+<term
+><option
+>CheckSycoca</option
+></term>
+<listitem
+><para
+>Per a actualitzar «sycoca» durant l'arrencada (predeterminat: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckUpdates</option
+></term>
+<listitem
+><para
+>Per a realitzar les actualitzacions pendents del KConfig durant l'arrencada (predeterminat: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>CheckFileStamps</option
+></term>
+<listitem
+><para
+>Per a comprovar les marques de temps dels fitxers en realitzar l'actualització inicial de «sycoca» (predeterminat: <constant
+>true</constant
+>). Per a més detalls, vegeu la documentació per a <command
+>kbuildsycoca6</command
+>.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>DelayedCheck</option
+></term>
+<listitem
+><para
+>Per a retardar l'actualització inicial de «sycoca» prop d'un minut després de començar (predeterminat: <constant
+>false</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Cada mòdul també compta amb una secció <option
+>[Module-<replaceable
+>nom</replaceable
+>]</option
+> al <filename
+>kded6rc</filename
+>, on el <replaceable
+>nom</replaceable
+> és el nom del fitxer d'escriptori del mòdul sense l'extensió <filename
+>.desktop</filename
+>. Aquest conté una opció <option
+>autoload</option
+> que especifica si el mòdul s'haurà de carregar automàticament quan s'inicia el <command
+>kded6</command
+> (predeterminat: <constant
+>false</constant
+>). Cal tenir en compte que aquest valor també es pot canviar a través de la interfície de &DBus; del <command
+>kded6</command
+>.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Vegeu també</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Errors</title>
+<para
+>Si us plau, empreu el <ulink url="https://bugs.kde.org"
+>Seguidor d'errors del &kde;</ulink
+> (escriviu-hi en anglès) per a informar dels errors.</para>
+</refsect1>
+
+</refentry>

@@ -1,0 +1,1080 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+ <!ENTITY kappname "&kde; Menu Editor">
+  <!ENTITY package "kdebase">
+  <!ENTITY firefox "<application
+>Firefox</application
+>">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Swedish "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<book id="kmenuedit" lang="&language;">
+
+<bookinfo>
+
+<title
+>Handbok &kde;:s Menyeditor</title>
+
+<authorgroup>
+<author
+>&Milos.Prudek; &Milos.Prudek.mail;</author>
+<author
+>&Anne-Marie.Mahfouf; &Anne-Marie.Mahfouf.mail;</author>
+<othercredit role="reviewer"
+>&Lauri.Watts; &Lauri.Watts.mail; </othercredit>
+<othercredit role="translator"
+> <firstname
+>Stefan</firstname
+> <surname
+>Asserhäll</surname
+> <affiliation
+><address
+><email
+>stefan.asserhall@bredband.net</email
+></address
+></affiliation
+> <contrib
+>Översättare</contrib
+></othercredit
+> 
+</authorgroup>
+
+<copyright>
+<year
+>2000</year>
+<holder
+>&Milos.Prudek;</holder>
+</copyright>
+<copyright>
+<year
+>2008</year>
+<holder
+>&Anne-Marie.Mahfouf;</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2015-04-27</date>
+<releaseinfo
+>Plasma 5.3</releaseinfo>
+
+<abstract
+><para
+>Menyeditorn erbjuder redigering av &kde;:s programstartfunktioner. </para
+></abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KDE menyeditor</keyword>
+<keyword
+>kmenuedit</keyword>
+<keyword
+>program</keyword>
+<keyword
+>program</keyword>
+<keyword
+>meny</keyword>
+<keyword
+>kickoff</keyword>
+<keyword
+>Lancelot</keyword>
+</keywordset>
+
+</bookinfo>
+<chapter id="introduction">
+<title
+>Inledning</title>
+
+<para
+>Menyeditorn erbjuder redigering menyn i &kde;:s programstartfunktioner.</para>
+
+<para
+>Menyeditorn startas antingen genom att högerklicka på programstartknappen i panelen och välja <guimenuitem
+>Redigera program...</guimenuitem
+>, eller genom att skriva <userinput
+>kmenuedit</userinput
+> på textraden i Kör program.</para>
+
+<para
+>Menyeditorn låter dig:</para>
+
+<itemizedlist>
+<listitem
+><para
+>Visa och redigera menyn som används av aktuellt startprogram</para
+></listitem>
+<listitem
+><para
+><guimenuitem
+>Klippa ut</guimenuitem
+>, <guimenuitem
+>kopiera</guimenuitem
+> och <guimenuitem
+>klistra in</guimenuitem
+> undermenyer och poster</para
+></listitem>
+<listitem
+><para
+>Skapa och ta bort undermenyer och poster</para
+></listitem>
+<listitem
+><para
+>Ändra ordning på undermenyer och poster</para
+></listitem>
+<listitem
+><para
+>Dölj poster och lägg till nya undermenyer och poster</para
+></listitem>
+</itemizedlist>
+
+<para
+>Normalt visas alla program installerade på datorn i programstartfunktionens meny för alla användare. Program kan visas på mer än ett ställe i flera olika menyer. Tomma kategorier av undermenyer som är definierade i skrivbordets menyspecifikation visas också, men alla är inte synliga i programstartfunktioner om program som hör till kategorierna inte installeras. </para>
+
+<para
+>Trädvyn har två olika typer av alternativ:</para>
+<itemizedlist>
+<listitem
+><para
+>Undermeny: Bara fälten <guilabel
+>Namn</guilabel
+>, <guilabel
+>Kommentar</guilabel
+> och <guilabel
+>Beskrivning</guilabel
+> samt knappen för att välja en ikon är aktiverade. Fliken <guilabel
+>Avancerat</guilabel
+> är inaktiverad. Alla undermenyer kan innehålla andra undermenyer och/eller poster. </para
+></listitem>
+<listitem
+><para
+>Poster: Använd alternativet för att ange information för programmet som ska läggas till. För detaljerad information se <link linkend="using-kmenuedit"
+>Att använda menyeditorn</link
+>. </para
+></listitem>
+</itemizedlist>
+
+<para
+>Menyeditorn har två sorters trädvy: normal, och med dolda alternativ. </para>
+<para
+>Många ytterligare alternativ visas i trädet med dold visning. Flera dolda alternativ verkar bara vara dubbletter men har annorlunda kommandoalternativ. I allmänhet ska dessa dolda alternativ aldrig ändras, annars riskerar man att vissa systemfunktioner slutar fungera. </para>
+<para
+>Med dold visning finns en särskild undermeny <guilabel
+>.hidden [Dold]</guilabel
+> som toppnivåpost i trädet. Denna särskilda undermeny går inte att redigera. Alla borttagna poster visas i denna undermeny nästa gång menyeditorn startas.</para>
+<para
+>Det är inte möjligt att ta bort alternativ med det grafiska användargränssnittet i denna särskilda undermeny. De dyker upp igen vid nästa start av menyeditorn. </para>
+
+<sect1 id="use-cases">
+<title
+>Användarfall</title>
+
+<sect2 id="use-cases-adapt">
+<title
+>Anpassa en användares meny</title
+> 
+
+<sect3 id="use-cases-adapt-order">
+<title
+>Ordna om poster</title
+> 
+
+<para
+>Det ska göras med dold visning där bara undermenyerna och posterna som är synliga i programstartfunktionens meny visas. </para>
+<para
+>Normalt sorteras menyerna alfabetiskt med de engelska namnen eller beskrivningarna. Genom att använda ett annat språk än engelska visas därför vissa undermenyer och poster i en osorterad ordning. </para>
+<para
+>Använd alternativen under <menuchoice
+><guimenu
+>Redigera</guimenu
+><guimenuitem
+>Sortera</guimenuitem
+></menuchoice
+> för att antingen sortera enligt namn eller beskrivning. Om den klassiska programstartfunktionen används, måste motsvarande alternativ, <guilabel
+>Format</guilabel
+>, användas i inställningsdialogrutan. Välj <guilabel
+>Visa program enligt namn</guilabel
+> för programstartfunktionen &kickoff; om de sorteras enligt namn här. </para>
+<para
+>Genom att exempelvis gruppera ofta använda undermenyer eller poster överst i menyn, blir det enklare att välja dem. Använd knapparna <guibutton
+>Flytta upp</guibutton
+> eller <guibutton
+>Flytta ner</guibutton
+> eller åtgärderna i menyn för att ändra ordning på specifika poster eller undermenyer. </para>
+<para
+>Alla programstartfunktioner använder undermenyernas ordning som definieras i menyeditorn. </para>
+</sect3>
+
+<sect3 id="use-cases-adapt-hide">
+<title
+>Ta bort poster från menyvisningen</title
+> 
+
+<para
+>Att låta alla program installerade på en dator visas kan vara förvirrande för vissa användare, alltså kan man vilja dölja vissa mindre ofta använda poster eller undermenyer. Det finns två olika sätt att göra det: </para>
+
+<para
+>Byt till normal visning utan dolda alternativ. Om poster tas bort flyttas de till undermenyn <guilabel
+>.hidden [Dold]</guilabel
+>. Det går att flytta tillbaka dem till trädet för att få med dem i menyn igen. </para>
+<para
+>Om en undermeny tas bort, kommer den verkligen att tas bort med alla sina undermenyer och poster. För att återskapa dem kan <menuchoice
+><guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Återställ systemmeny</guimenuitem
+></menuchoice
+> användas, men det tar bort alla egna undermenyer och poster och motsvarande <filename class="extension"
+>.desktop</filename
+>-filer tas också bort. Åtgärden går inte att ångra. </para>
+
+<para
+>Det bästa sättet att ta bort undermenyer och poster i en programstartfunktions meny är att markera <guilabel
+>Dolt alternativ</guilabel
+> under fliken <guilabel
+>Allmänt</guilabel
+> och byta till dold visning. Med denna är det enkelt att ångra ändringar utan att förstöra menystrukturen. Den enda nackdelen är att alla alternativ i en undermeny måste döljas manuellt för att dölja hela undermenyn från att visas. </para>
+</sect3>
+
+</sect2>
+
+<sect2 id="use-cases-additems">
+<title
+>Lägga till egna poster</title
+> 
+
+<para
+>Använd åtgärderna i menyn eller verktygsraden för att lägga till egna poster (undermeny eller post). Poster kräver Namn och Kommando. Utan ett kommandoalternativ kan inte en post sparas, och tillägget går förlorat. </para>
+<para
+>Om ett alternativ läggs till infogas det som ett underalternativ vid själva den markerade positionen i trädet. Flytta ett alternativ genom att dra det med musen eller genom att använda knappen <guibutton
+>Flytta ner</guibutton
+> längst ner i trädet för att göra det till ett toppnivåalternativ. </para>
+
+</sect2>
+
+<sect2 id="use-cases-transfer">
+<title
+>Överföra inställningar av programstartfunktioner</title
+> 
+
+<para
+>Det finns inget sätt att överföra menyinställningar med användning av det grafiska gränssnittet. Det måste göras manuellt genom att kopiera följande filer till användaren ifråga:</para>
+<para
+>Menyeditorn lagrar menyhierarkin i <filename
+>menus/applications-kmenuedit.menu</filename
+> i katalogen <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+> och <filename class="directory"
+>desktop-directories</filename
+> i katalogen <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+> innehåller skrivbordsfiler för undermenyer som skapas. Skrivbordsfiler för egna poster som skapas finns i <filename class="directory"
+>applications/</filename
+> i katalogen <filename class="directory"
+>$(qtpaths --paths GenericDataLocation)</filename
+>. </para>
+<para
+>Genvägarna för varje program lagras i <filename
+>kglobalshortcutsrc </filename
+> i katalogen <filename class="directory"
+>$(qtpaths --paths GenericConfigLocation)</filename
+>, men export och import fungerar inte eftersom genvägarnas UUID inte matchar mellan system även om <filename class="extension"
+>.desktop</filename
+>-filerna är likadana. Alla genvägar måste tilldelas manuellt igen. </para>
+
+</sect2>
+
+</sect1>
+</chapter>
+
+<chapter id="quickstart">
+<chapterinfo>
+<authorgroup>
+<author
+>&Virgil.J.Nisly; &Virgil.J.Nisly.mail;</author>
+</authorgroup>
+</chapterinfo>
+<title
+>Lägga till ett menyalternativ</title>
+
+  <para
+>I det här exemplet lägger vi till &firefox; i undermenyn <guisubmenu
+>Internet</guisubmenu
+>.</para>
+  <para
+>Till att börja med måste vi starta Menyeditorn. Högerklicka alltså på programstartmenyn och klicka på <guimenuitem
+>Menyeditor</guimenuitem
+> för att starta Menyeditorn. När Menyeditorn har startat, markera <guisubmenu
+>Internet</guisubmenu
+>, som visas på bilden nedan. <screenshot>
+<screeninfo
+>Markera <guisubmenu
+>Internet</guisubmenu
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selectinternet.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Markera <guisubmenu
+>Internet</guisubmenu
+></phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+  <para
+>När du väl har markerat <guisubmenu
+>Internet</guisubmenu
+>, klicka på <menuchoice
+><guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Ny post...</guimenuitem
+></menuchoice
+>, vilket visar dialogrutan <guilabel
+>Ny post</guilabel
+>, som syns nedan. Skriv in namnet på programmet du vill lägga till, skriv alltså i detta fall <userinput
+>firefox</userinput
+>. <screenshot>
+<screeninfo
+>Dialogrutan <guilabel
+>Ny post</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="itemname.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Dialogrutan <guilabel
+>Ny post</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot>
+</para>
+<para
+>Tryck på returtangenten, så bör du se något som liknar bilden nedan i huvudfönstret. <screenshot>
+<screeninfo
+>Ny post</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="new.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Den nya posten har skapats.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Låt oss nu fylla i <guilabel
+>Beskrivning:</guilabel
+>, i detta fall skriver vi <userinput
+>Webbläsare</userinput
+>. <note
+><para
+>Hur beskrivning och namn ser ut, t.ex. <quote
+>Webbläsare (Firefox)</quote
+> eller <quote
+>Firefox (Webbläsare)</quote
+> beror på inställningarna i startprogrammet.</para
+></note
+> Vi måste fylla i det körbara filnamnet i fältet <guilabel
+>Kommando:</guilabel
+>, i vårt fall skriver vi <userinput
+><command
+>firefox</command
+></userinput
+>.</para>
+<para
+>Kommandot måste finnas i variabeln <envar
+>PATH</envar
+>, eller så måste den fullständiga sökvägen till den körbara filen anges. Om du inte vet det körbara filnamnet för ett program, använd kommandot <userinput
+><command
+>locate</command
+></userinput
+> för att söka efter skrivbordsfilen och ange strängen från raden Exec som kommando här. </para>
+<note
+><para
+>Efter kommandot kan du ha flera platsmarkörer som ersätts med verkliga värden när programmet körs. <simplelist>
+<member
+>%f - ett ensamt filnamn</member>
+<member
+>%F - en lista med filer att använda för program som kan öppna flera lokala filer på en gång</member>
+<member
+>%u - en ensam webbadress</member>
+<member
+>%U - en lista med webbadresser</member>
+<member
+>%d - katalog för en fil att öppna</member>
+<member
+>%D - en lista med kataloger</member>
+<member
+>%i - ikonen</member>
+<member
+>%m - miniikonen</member>
+<member
+>%c - rubriken</member>
+</simplelist
+></para>
+<informalexample
+><para
+>Om du till exempel vill att Firefox ska starta webbläsaren med www.kde.org, istället för <command
+>firefox</command
+>, skulle du skriva <command
+>firefox %u www.kde.org</command
+>.</para
+></informalexample
+></note>
+<para
+>De flesta program hanterar ytterligare väljare, t.ex. namnet på en fördefinierad profil, som &konqueror; eller &konsole;. För att se ett programs alla väljare, kör <userinput
+><command
+><replaceable
+>programnamn</replaceable
+></command
+> <option
+>--help</option
+></userinput
+> i &konsole;.</para>
+<para
+>Vi skulle vilja ha mer meningsfull ikon, så vi klickar på den generella ikonen intill <guilabel
+>Namn:</guilabel
+> (Observera att den förvalda ikonen kan vara tom. Om så är fallet, klicka på området till höger om rutan för namninmatning). Det gör att dialogrutan <guilabel
+>Välj ikon</guilabel
+> visas, som låter oss välja den nya ikonen, som visas nedan. <screenshot>
+<screeninfo
+>Dialogrutan <guilabel
+>Välj ikon</guilabel
+></screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="selecticon.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Dialogrutan <guilabel
+>Välj ikon</guilabel
+>.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+  <para
+>Vi väljer ikonen för firefox i listan, och trycker på returtangenten. Den slutliga skärmen ska troligtvis se ut ungefär som skärmbilden nedan. <screenshot>
+<screeninfo
+>Färdig skärmbild</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="done.png" format="PNG"/>
+</imageobject>
+<textobject>
+<phrase
+>Så här ska det färdiga menyalternativet se ut.</phrase>
+</textobject>
+</mediaobject>
+</screenshot
+></para>
+
+<para
+>Det nya menyalternativets plats kan nu ändras med knapparna <guibutton
+>Flytta upp</guibutton
+> och <guibutton
+>Flytta ner</guibutton
+> i &kmenuedit;s verktygsrad eller genom att dra med musen.</para>
+ <para
+>Undermenyernas alternativ kan sorteras med knappen <guibutton
+>Sortera</guibutton
+> på &kmenuedit;s verktygsrad eller <menuchoice
+><guimenu
+>Redigera</guimenu
+> <guisubmenu
+>Sortera</guisubmenu
+></menuchoice
+>.</para>
+
+<para
+>Klicka på <menuchoice
+><guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Spara</guimenuitem
+></menuchoice
+>, vänta på att dialogrutan <guilabel
+>Uppdaterar systeminställning</guilabel
+> ska bli klar, och därefter ska du finna Firefox i programstartfunktionens undermeny <guisubmenu
+>Internet</guisubmenu
+>.</para>
+
+</chapter>
+
+<chapter id="using-kmenuedit">
+<title
+>Att använda menyeditorn</title>
+
+<para
+>Den vänstra rutan i programfönstret visar programstartfunktionens struktur. När du bläddrar bland posterna i vänsterrutan, visas detaljerad information om det markerade menyalternativet i högerrutan.</para>
+
+<sect1 id="details-general">
+<title
+>Fliken Allmänt</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Namn:</guilabel
+></term>
+<listitem
+><para
+>Det här är namnet på programmet som det visas i programstartmenyn. Det kan skilja sig från det riktiga namnet på den körbara filen. Namnet på den körbara filen <command
+>mc</command
+> är till exempel "<application
+>Midnight Commander</application
+>".</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Beskrivning:</guilabel
+></term>
+<listitem
+><para
+>Beskrivningen visas tillsammans med namnet i programstartfunktionen. Detta är helt valfritt.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Kommentar:</guilabel
+></term>
+<listitem
+><para
+>Beskriv programmet med mer detaljer i det här fältet. Detta är helt valfritt.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Kommando:</guilabel
+></term>
+<listitem
+><para
+>Det här är namnet på det körbara programmet. Försäkra dig om att du har behörighet att köra programmet.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Aktivera gensvar vid programstart</guilabel
+></term>
+<listitem
+><para
+>Om rutan är markerad, visas gensvar när ett program startas. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Visa bara i &kde;</guilabel
+></term>
+<listitem
+><para
+>Om markerad, visas programmets alternativ bara i alla &kde;:s programstartfunktioner men inte i andra skrivbordsmiljöer. </para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Dolt alternativ</guilabel
+></term>
+<listitem
+><para
+>Ta bort ett alternativ från menyvisningen i programstartfunktionen. </para
+></listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+<sect1 id="details-advanced">
+<title
+>Fliken Avancerat</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Arbetskatalog:</guilabel
+></term>
+<listitem
+><para
+>Ange arbetskatalogen för programmet. Det här är den aktuella sökvägen när programmet startar. Den behöver inte vara samma som sökvägen till den körbara filen.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Kör i terminal</guilabel
+></term>
+<listitem
+><para
+>Du måste markera det här om ditt program kräver en terminalemulator för att köras. Detta gäller i huvudsak för <link linkend="gloss-console-application"
+>konsollprogram</link
+>.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Terminalinställningar:</guilabel
+></term>
+<listitem
+><para
+>Ange alla terminalalternativ i det här fältet.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><guilabel
+>Kör som en annan användare</guilabel
+></term>
+<listitem
+><para
+>Om du vill köra det här programmet som en annan användare (inte dig själv), markera den här rutan, och ange användarnamnet i fältet <guilabel
+>Användarnamn:</guilabel
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Aktuell snabbtangent:</guilabel
+></term>
+<listitem
+><para
+>Du kan ange en särskild snabbtangent för att starta programmet.</para>
+
+<para
+>Klicka på knappen <guibutton
+>Ingen</guibutton
+> till höger om kryssrutan <guilabel
+>Aktuell snabbtangent:</guilabel
+>.</para>
+
+<para
+>Knapptexten ändras till <guilabel
+>Inmatning...</guilabel
+> och du kan trycka på tangentkombinationen som du vill tilldela till programmet på tangentbordet. </para>
+<para
+>Du kan återställa snabbtangenten till <guilabel
+>Ingen</guilabel
+> genom att använda följande knapp: <inlinemediaobject
+><imageobject
+><imagedata fileref="reset.png" format="PNG"/></imageobject
+></inlinemediaobject
+>. </para>
+
+<para
+>Glöm inte bort att spara inställningen genom att klicka på ikonen <guiicon
+>Spara</guiicon
+> i verktygsraden eller använda menyalternativet <menuchoice
+><guimenu
+>Arkiv</guimenu
+><guimenuitem
+>Spara</guimenuitem
+></menuchoice
+>.</para>
+
+</listitem>
+</varlistentry>
+</variablelist>
+</sect1>
+
+</chapter>
+
+<chapter id="menu-reference">
+<title
+>Menyreferens</title>
+
+<para
+>De flesta åtgärderna i menyraden är också tillgängliga i den sammanhangsberoende menyn som visas med ett högerklick på en post i trädvyn.</para>
+
+<variablelist>
+<varlistentry id="file-new-item">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Ny post...</guimenuitem
+> </menuchoice
+></term
+> <listitem
+><para
+><action
+>Lägger till en ny menypost.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-new-submenu">
+<term
+><menuchoice
+><guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Ny undermeny...</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Lägger till en ny undermeny.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="file-save">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Arkiv</guimenu
+><guimenuitem
+>Spara</guimenuitem
+> </menuchoice
+></term>
+<listitem>
+<para
+><action
+>Sparar menyn</action
+></para>
+</listitem>
+</varlistentry>
+
+<varlistentry id="file-quit">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Avsluta</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Avslutar</action
+> menyeditorn.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-up">
+<term
+><menuchoice
+><guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Flytta upp</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Flyttar</action
+> den markerade posten uppåt i dess undermeny.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-move-down">
+<term
+><menuchoice
+><guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Flytta ner</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Flyttar</action
+> den markerade posten neråt i dess undermeny.</para
+></listitem>
+</varlistentry>
+
+
+<varlistentry id="edit-cut">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>X</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Klipp ut</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Klipper ut nuvarande menypost och lägger den på klippbordet.</action
+> Om du vill flytta en menypost, klipp först ut den och lägg den på klippbordet, flytta till destinationsstället i vänsterrutan, och använd funktionen <guimenuitem
+>Klistra in</guimenuitem
+> för att klistra in menyposten från klippbordet.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-copy">
+<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Kopiera</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Kopierar nuvarande menypost till klippbordet.</action
+> Senare kan du använd funktionen <guimenuitem
+>Klistra in</guimenuitem
+> för att klistra in menyposten från klippbordet till dess destination. Du kan klistra in samma post flera gånger.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-paste">
+<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;<keycap
+>V</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Klistra in</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Klistra in en menypost från klippbordet.</action
+> till det aktuella markerade stället i huvudmenyn. Du måste först använda <guimenuitem
+>Klipp ut</guimenuitem
+> eller <guimenuitem
+>Kopiera</guimenuitem
+> innan du kan använda <guimenuitem
+>Klistra in</guimenuitem
+>.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-delete">
+<term
+><menuchoice
+><shortcut
+><keycap
+>Delete</keycap
+></shortcut
+> <guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Ta bort</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Tar bort den aktuella markerade menyposten.</action
+></para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-sort">
+<term
+><menuchoice
+><guimenu
+>Redigera</guimenu
+> <guisubmenu
+>Sortera</guisubmenu
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Öppnar</action
+> undermeny för att sortera markerad undermeny eller hela menyträdet. Det finns två sorteringsmetoder implementerade, närmare bestämt enligt namn och enligt beskrivning.</para
+></listitem>
+</varlistentry>
+
+<varlistentry id="edit-restore">
+<term
+><menuchoice
+><guimenu
+>Redigera</guimenu
+> <guimenuitem
+>Återställ till systemmeny</guimenuitem
+> </menuchoice
+></term>
+<listitem
+><para
+><action
+>Det återställer programstartfunktionen som den var från början och ta bort alla dina egna inställningar. En meddelanderuta frågar dig om du verkligen vill göra det.</action
+></para
+></listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>Menyeditorn har de vanliga menyalternativen i &kde;, <guimenu
+>Inställningar</guimenu
+> och <guimenu
+>Hjälp</guimenu
+>. För mer information läs avsnitten om <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Menyn Inställningar</ulink
+> och <ulink url="help:/fundamentals/menus.html#menus-help"
+>Menyn Hjälp</ulink
+> i &kde;:s grunder. </para>
+
+</chapter>
+
+<chapter id="credits">
+
+<title
+>Tack till och licens</title>
+
+<para
+>&kmenuedit; </para>
+<para
+>Program copyright &copy; 2002, &Raffaele.Sandrini;</para>
+
+<para
+>Bidragsgivare:</para>
+<itemizedlist>
+<listitem
+><para
+>&Matthias.Elter; &Matthias.Elter.mail; - Ursprunglig upphovsman</para>
+</listitem>
+<listitem
+><para
+>&Matthias.Ettrich; &Matthias.Ettrich.mail;</para>
+</listitem>
+<listitem
+><para
+>&Daniel.M.Duley; &Daniel.M.Duley.mail;</para>
+</listitem>
+<listitem
+><para
+>&Preston.Brown; &Preston.Brown.mail;</para>
+</listitem>
+</itemizedlist>
+
+<para
+>Dokumentation copyright &copy; 2000 &Milos.Prudek;</para>
+<para
+>Dokumentation copyright &copy; 2008 &Anne-Marie.Mahfouf;</para>
+<para
+>Uppdaterad för &kde; 3.0 av &Lauri.Watts; &Lauri.Watts.mail; 2002</para>
+
+<para
+>Översättning Stefan Asserhäll <email
+>stefan.asserhall@bredband.net</email
+></para
+> &underFDL; &underGPL; </chapter>
+
+<glossary id="glossary">
+<title
+>Ordlista</title>
+
+<glossentry id="gloss-console-application">
+<glossterm
+>Konsollprogram</glossterm>
+<glossdef>
+
+<para
+>Program som ursprungligen är skrivna för en icke-grafisk textbaserad miljö. Sådana program kan användas utan problem i &kde;. De måste köras i en terminalemulator, som <application
+>Terminal</application
+>. De varnas inte automatiskt när du stänger av din &kde;-session. Därför får du inte glömma att spara dokument som är öppna i dessa program innan du loggar ut från &kde;.</para>
+
+<para
+>Konsollprogram klarar att kopiera till och klistra in från program som stöder &kde;. Markera texten i konsollprogrammet med musen, byt till programmet som stöder &kde; och tryck på <keycombo action="simul"
+>&Ctrl; <keycap
+>V</keycap
+></keycombo
+> för att klippa in texten. Om du vill kopiera från ett &kde;-program till ett konsollprogram, markera först texten med musen, tryck <keycombo action="simul"
+>&Ctrl; <keycap
+>C</keycap
+></keycombo
+>, byt till konsollprogrammet och tryck på mittenknappen på musen.<footnote
+><para
+>Om din mus inte har en mittenknapp, måste du trycka på <mousebutton
+>vänster</mousebutton
+>- och <mousebutton
+>höger</mousebutton
+>knappen samtidigt. Detta kallas <quote
+>emulering av mittenknapp</quote
+> och måste stödas av ditt operativsystem för att fungera.</para
+></footnote
+>.</para>
+
+</glossdef>
+</glossentry>
+
+</glossary>
+
+&documentation.index;
+
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+End:
+-->
+

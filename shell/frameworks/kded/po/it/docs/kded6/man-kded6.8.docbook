@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Italian "INCLUDE"
+><!-- change language only here -->
+]>
+
+<refentry lang="&language;">
+
+<refentryinfo>
+<title
+>Manuale dell'utente di kded6</title>
+<author
+><firstname
+>David</firstname
+> <surname
+>Faure</surname
+> <contrib
+>Responsabile</contrib>
+<affiliation>
+<address
+><email
+>faure@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<author
+><firstname
+>Waldo</firstname
+> <surname
+>Bastian</surname
+> <contrib
+>Autore originale</contrib>
+<affiliation>
+<address
+><email
+>bastian@kde.org</email
+></address>
+</affiliation>
+</author>
+
+<date
+>2023-06-22</date>
+<releaseinfo
+>Frameworks 6</releaseinfo>
+<productname
+>KDE Frameworks</productname>
+
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kded6</command
+></refentrytitle>
+<manvolnum
+>8</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kded6</command
+></refname>
+<refpurpose
+>Demone di &kde; - aggiorna la banca dati di Sycoca quando necessario.</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<title
+>Sintassi</title>
+
+<cmdsynopsis
+><command
+>kded6</command
+> <arg choice="opt"
+>--check</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descrizione</title>
+
+<para
+><command
+>kded6</command
+> mette insieme diversi piccoli servizi in un processo. Questi sono per lo più servizi &DBus; forniti dai moduli KDED, ma gestisce anche sycoca (una cache binaria di tipi di servizi, di tipi &MIME; e di servizi usati da KService) e gli script di aggiornamento di KConfig secondo necessità.</para>
+
+<para
+>Per sycoca, sorveglia le cartelle contenenti file <literal role="extension"
+>.desktop</literal
+>. Quando un file viene aggiunto o rimosso, attende cinque secondi (per il caso di una serie di aggiornamenti), e quindi avvia <command
+>kbuildsycoca6</command
+> per aggiornare Sycoca.</para>
+
+<para
+>Per KConfig, controlla i file di aggiornamento installati recentemente, &ie; i file <literal role="extension"
+>*.upd</literal
+> usati per aggiornare i file di configurazione degli utenti quando cambia il formato dei file di configurazione, ed esegue il programma di aggiornamento di KConfig per effettuare gli aggiornamenti.</para>
+
+<para
+>Questi compiti sono effettuati anche all'avvio di <command
+>kded6</command
+> per assicurarsi che la configurazione dell'utente sia aggiornata.</para>
+
+<para
+>Normalmente non devi eseguire <command
+>kded6</command
+> direttamente; le sessioni desktop di &plasma; lo eseguono da sé, e viene avviato a richiesta quando un'applicazione cerca di usare un'interfaccia &DBus; fornita da kded5 o da uno dei suoi moduli.</para>
+
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Opzioni</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>--check</option
+></term>
+<listitem>
+<para
+>Controlla la banca dati di sycoca, aggiornandola se necessario, ed esce. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Configurazione</title>
+
+<para
+><command
+>kded6</command
+> può essere configurato con il file di configurazione in stile ini <filename
+>kded6rc</filename
+>. Sui sistemi &UNIX;, questo si può trovare sotto <filename
+><varname
+>$XDG_CONFIG_HOME</varname
+>/kded6rc</filename
+>; se <varname
+>$XDG_CONFIG_HOME</varname
+> non è impostata, il suo valore predefinito è <filename
+>~/.config/kded6rc</filename
+>.</para>
+
+<para
+>Le voci del file di configurazione sono lette a ogni richiesta, quindi si possono apportare modifiche mentre <command
+>kded6</command
+> è in esecuzione. Però, tutte le attuali opzioni di configurazione hanno effetto solo sul comportamento di avvio di <command
+>kded6</command
+>.</para>
+
+<para
+>La sezione <option
+>[Generale]</option
+> ha le seguenti opzioni: <variablelist>
+<varlistentry>
+<term
+><option
+>Controlla Sycoca</option
+></term>
+<listitem
+><para
+>Se aggiornare sycoca all'avvio (predefinito: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>Controlla aggiornamenti</option
+></term>
+<listitem
+><para
+>Se effettuare gli aggiornamenti di KConfig pendenti all'avvio (predefinito: <constant
+>true</constant
+>).</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>Controlla date e ore dei file</option
+></term>
+<listitem
+><para
+>Se controllare le date e le ore dei file nell'effettuare l'aggiornamento iniziale di sycoca (predefinito: <constant
+>true</constant
+>). Vedi la documentazione di <command
+>kbuildsycoca6</command
+> per maggiori dettagli.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>Controllo ritardato</option
+></term>
+<listitem
+><para
+>Se ritardare l'aggiornamento iniziale di sycoca a circa un minuto dopo l'avvio (predefinito: <constant
+>false</constant
+>).</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para
+>Ogni modulo ha inoltre una sezione <option
+>[Module-<replaceable
+>nome</replaceable
+>]</option
+> in <filename
+>kded6rc</filename
+>, dove <replaceable
+>nome</replaceable
+> è il nome del file desktop del modulo senza l'estensione <literal role="extension"
+>.desktop</literal
+>. Questo contiene un'opzione <option
+>autoload</option
+> che specifica se il modulo va caricato automaticamente all'avvio di <filename
+>kded6</filename
+> (predefinito: <constant
+>false</constant
+>). Nota che questa impostazione può essere modificata anche con l'interfaccia &DBus; di <command
+>kded6</command
+>.</para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Vedi anche</title>
+<para
+><citerefentry
+><refentrytitle
+>kbuildsycoca6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+>, <citerefentry
+><refentrytitle
+>kdeinit6</refentrytitle
+><manvolnum
+>8</manvolnum
+></citerefentry
+> </para>
+</refsect1>
+
+
+
+<refsect1>
+<title
+>Errori</title>
+<para
+>Usa <ulink url="https://bugs.kde.org"
+>il sito di gestione dei bug di &kde;</ulink
+> per segnalarli.</para>
+</refsect1>
+
+</refentry>

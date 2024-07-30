@@ -1,0 +1,149 @@
+.TH namcap 1 "Jan 14, 2024" "namcap 3.5.2" "User Commands"
+.SH NAME
+namcap \- package analysis utility
+.SH SYNOPSIS
+\fBnamcap [options] <package|PKGBUILD> [package|PKGBUILD] ...
+.SH DESCRIPTION
+.PP
+\fBnamcap\fP is a \fIpackage analysis\fP utility that looks for problems with Arch Linux packages or their PKGBUILD files.  It can apply rules to the file list, the files themselves, or individual PKGBUILD files.
+.PP
+Rules return lists of messages.  Each message can be one of three types: error, warning, or information (think of them as notes or comments).  Errors (designated by 'E:') are things that namcap is very sure are wrong and need to be fixed.  Warnings (designated by 'W:') are things that namcap thinks should be changed but if you know what you're doing then you can leave them.  Information (designated 'I:') are only shown when you use the info argument.  Information messages give information that might be helpful but isn't anything that needs changing.
+.SH OPTIONS
+.TP
+\fB\-e\fR RULELIST, \fB\-\-exclude=\fRRULELIST
+Do not run RULELIST rules on the package
+.TP
+.B "\-i, \-\-info"
+display information messages
+.TP
+.B "\-L, \-\-list
+return a list of valid rules and their descriptions
+.TP
+.B "\-m, \-\-machine\-readable"
+displays easily parseable namcap tags instead of the normal human readable description; for example using non-fhs-man-page instead of "Non-FHS man page (%s) found. Use /usr/share/man instead". A full list of namcap tags along with their human readable descriptions can be found at /usr/share/namcap/tags.
+.TP
+\fB\-r\fR RULELIST, \fB\-\-rules=\fRRULELIST
+only apply RULELIST rules to the package
+.IP
+RULELIST is a comma-separated list of rule names
+.TP
+.B "\-v, \-\-version"
+print version and exit
+.SH RULES
+.TP
+.B arrays
+Verifies that array variables are actually arrays and not strings
+.TP
+.B badbackups
+Verifies that backup entries don't begin with /
+.TP
+.B carch
+Looks for references to i686 and i586 and tells you to use $CARCH instead
+.TP
+.B capsnames
+Checks a PKGBUILD to verify that the package name has no upper case characters
+.TP
+.B capsnamespkg
+Checks a package to verify that the package name has no upper case characters
+.TP
+.B checksums
+Makes sure that a PKGBUILD includes valid checksums
+.TP
+.B depends
+This module runs ldd on all executables, gets the link-level dependencies, finds the smallest subset of dependencies that cover the link-level dependencies, and compares that list to the depends of the package.  It returns messages in three cases: dependency detected and not included, dependency included but already satisfied, and dependency included and not needed.  These suggestions are just guidelines and all package builders should take this into account (i.e. you're smarter than namcap is)
+
+Some cases where namcap fails are dlopen() and obscure links.  dlopen()'d libraries don't show up because they are loaded at run time: in the case of a program that loads plugins.  Obscure links are the cases where only a small portion of the package needs something to run; usually, the small portion won't be accessed unless that thing is installed (i.e. a java plugin for mozilla included in the java package).
+.TP
+.B directoryname
+Checks the directory names in the package file list for standard directories (i.e. /etc, /usr/bin, /usr/lib).  All files in directories that are non-standard are returned
+.TP
+.B elffiles
+Gives an error if it finds ELF (binary) files outside the standard paths (/bin, /usr/bin, etc.)
+.TP
+.B emptydir
+Looks for directories in a package that don't contain any files
+.TP
+.B extravars
+Verifies that extra variables start with an underscore
+.TP
+.B fhsinfopages
+Verifies correct installation of info pages
+.TP
+.B fhsmanpages
+Verifies correct installation of man pages
+.TP
+.B fileownership
+Verifies that all files are owned by root:root and not some other user or group
+.TP
+.B gnomemime
+Checks for generated GNOME mime files
+.TP
+.B hicoloricons
+Checks whether the hicolor icon cache is updated when a package installs
+files in /usr/share/icons/hicolor
+.TP
+.B infodirectory
+Verifies that a package does not contain the info directory file (/usr/share/info/dir)
+.TP
+.B invalidstartdir
+Any PKGBUILDs that refer to files in $startdir are incorrect
+.TP
+.B libtool
+Warns if libtool (*.la) files are present
+.TP
+.B license
+Verifies that the licenses variable has been filled in in a PKGBUILD.
+.TP
+.B licensepkg
+Verifies that the licenses variable has been filled in in a package. For packages with a custom license it
+checks whether the license file has been installed in
+/usr/share/licenses/$pkgname/
+.TP
+.B perllocal
+Searches for perllocal.pod.  perllocal.pod is a nasty file that's included during most perl module installations
+.TP
+.B permissions
+Checks basic file and and directory permissions.  It returns warnings about world readable bits not being set, world writable bits being set, and world executable bit not being set for directories
+.TP
+.B rpath
+Gives an error if a binary has RPATH set to something other than /usr/lib
+.TP
+.B runpath
+Gives an error if a binary has RUNPATH set to something other than /usr/lib, /usr/lib32
+.TP
+.B scrollkeeper
+Verifies that there aren't any scrollkeeper directories
+.TP
+.B sfurl
+Warns if a PKGBUILD is downloading from a specific sourceforge mirror instead of the generic downloads.sourceforge.net
+.TP
+.B symlink
+Finds out symbolic and hard links which do not point to a valid path in the package
+.TP
+.B tags
+For package maintainers, this module verifies that we have remembered to add a Maintainer and Contributor comment.
+.TP
+.B url
+Verifies that we have the url variable set in the PKGBUILD
+.TP
+.B urlpkg
+Verifies that we have the url variable set in the package file
+.SH EXAMPLES
+.TP
+.B namcap foo.pkg.tar.gz
+apply all rules to foo.pkg.tar.gz
+.TP
+.B namcap -r depends,symlink foo.pkg.tar.gz
+apply the depends and symlink rules to foo.pkg.tar.gz
+.TP
+.B namcap PKGBUILD
+apply all PKGBUILD based rules to the file PKGBUILD
+.TP
+.B namcap --list
+list all of the available rules
+.SH COPYRIGHT
+Copyright \(co 2003-2023 Namcap contributors, see AUTHORS for details.
+.PP
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.fi

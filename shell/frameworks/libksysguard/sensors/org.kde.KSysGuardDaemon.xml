@@ -1,0 +1,39 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.kde.KSysGuardDaemon">
+    <signal name="sensorAdded">
+      <arg name="sensorId" type="s" direction="out"/>
+    </signal>
+    <signal name="sensorRemoved">
+      <arg name="sensorId" type="s" direction="out"/>
+    </signal>
+    <signal name="newSensorData">
+      <arg name="sensorData" type="a(sv)" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="KSysGuard::SensorDataList"/>
+    </signal>
+    <signal name="sensorMetaDataChanged">
+      <arg name="metaData" type="a{s(sssuuddi)}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QHash&lt;QString,KSysGuard::SensorInfo&gt;"/>
+    </signal>
+    <method name="allSensors">
+      <arg name="sensorInfo" type="a{s(sssuuddi)}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QHash&lt;QString,KSysGuard::SensorInfo&gt;"/>
+    </method>
+    <method name="sensors">
+      <arg name="sensorsIds" type="as" direction="in"/>
+      <arg name ="sensorInfo" type="a{s(sssuuddi)}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QHash&lt;QString,KSysGuard::SensorInfo&gt;"/>
+    </method>
+    <method name="subscribe">
+      <arg name="sensorIds" type="as" direction="in"/>
+    </method>
+    <method name="unsubscribe">
+      <arg name="sensorIds" type="as" direction="in"/>
+    </method>
+    <method name="sensorData">
+      <arg name="sensorIds" type="as" direction="in"/>
+      <arg name="sensorData" type="a(sv)" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="KSysGuard::SensorDataList"/>
+    </method>
+  </interface>
+</node>

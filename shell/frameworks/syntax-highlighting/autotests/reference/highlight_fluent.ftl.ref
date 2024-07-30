@@ -1,0 +1,95 @@
+<DocumentationComment>### File wide comment, for reference see https://projectfluent.org</DocumentationComment><br/>
+<DocumentationComment>### And for a EBNF-Syntax, see https://github.com/projectfluent/fluent/blob/master/spec/fluent.ebnf</DocumentationComment><br/>
+<Normal Text></Normal Text><br/>
+<Normal Text></Normal Text><br/>
+<DocumentationComment>## Section comment: Simple texts</DocumentationComment><br/>
+<Comment># identifier = matched word</Comment><br/>
+<Identifier>hello-world</Identifier><Normal Text> = </Normal Text><Text>Hello World</Text><br/>
+<Text></Text><br/>
+<Comment># multiline text</Comment><br/>
+<Identifier>multiline</Identifier><Normal Text> = </Normal Text><Text>Some text on the first line</Text><br/>
+<Text>    And more text on the next line</Text><br/>
+<Text>    One could even go further</Text><br/>
+<Text></Text><br/>
+<Comment># block text</Comment><br/>
+<Identifier>block</Identifier><Normal Text> =</Normal Text><br/>
+<Text>    No content on first line</Text><br/>
+<Text>    rest is like multiline</Text><br/>
+<Text></Text><br/>
+<Text></Text><br/>
+<DocumentationComment>## Placeables, insert text from variables etc.</DocumentationComment><br/>
+<Identifier>variable-placeable</Identifier><Normal Text> = </Normal Text><Text>We currently have </Text><Placeable>{ </Placeable><Variable>$users</Variable><Placeable> }</Placeable><Text> users</Text><br/>
+<Identifier>stacked-placeable</Identifier><Normal Text> = </Normal Text><Text>More </Text><Placeable>{{</Placeable><Quoted>"Placeables"</Quoted><Placeable>}}</Placeable><br/>
+<Text></Text><br/>
+<Comment># Term, used only in other texts, not final translation string</Comment><br/>
+<Identifier>-name</Identifier><Normal Text> = </Normal Text><Text>Fluent</Text><br/>
+<Identifier>about</Identifier><Normal Text> = </Normal Text><Placeable>{ -name }</Placeable><Text> is great</Text><br/>
+<Text></Text><br/>
+<Comment># Term with parameters</Comment><br/>
+<Identifier>-special-term</Identifier><Normal Text> = </Normal Text><Text>Wrapper around </Text><Placeable>{ </Placeable><Variable>$parameter</Variable><Placeable> }</Placeable><br/>
+<Identifier>using-wrapper</Identifier><Normal Text> = </Normal Text><Text>Wrapping </Text><Placeable>{ </Placeable><Function>-special-term(parameter: </Function><Quoted>"stuff"</Quoted><Function>)</Function><Placeable> }</Placeable><br/>
+<Text></Text><br/>
+<Identifier>placeable-with-special-character</Identifier><Normal Text> = </Normal Text><Text>Using a </Text><Placeable>{</Placeable><Quoted>"{ and \U01F91A or \\"</Quoted><Placeable>}</Placeable><br/>
+<Text></Text><br/>
+<Identifier>builtin-number</Identifier><Normal Text> = </Normal Text><Text>Time elapsed: </Text><Placeable>{ </Placeable><Function>NUMBER(</Function><Variable>$duration</Variable><Function>, maximumFractionDigits: </Function><Number>0</Number><Function>)</Function><Placeable> }</Placeable><Text>s.</Text><br/>
+<Text></Text><br/>
+<Identifier>builtin-date</Identifier><Normal Text> = </Normal Text><Text>Last checked: </Text><Placeable>{ </Placeable><Function>DATETIME(</Function><Variable>$lastChecked</Variable><Function>, day: </Function><Quoted>"numeric"</Quoted><Function>, month: </Function><Quoted>"long"</Quoted><Function>)</Function><Placeable> }</Placeable><Text>.</Text><br/>
+<Text></Text><br/>
+<Text></Text><br/>
+<DocumentationComment>## Selectors, different options for different types of numbers</DocumentationComment><br/>
+<Comment># by variable</Comment><br/>
+<Identifier>emails</Identifier><Normal Text> =</Normal Text><br/>
+<Text>    </Text><Placeable>{ </Placeable><Variable>$unreadEmails</Variable><Placeable> -></Placeable><br/>
+<Placeable>        </Placeable><Identifier>[one]</Identifier><Text> You have one unread email.</Text><br/>
+<Placeable>        </Placeable><DefaultIdentifier>*[other]</DefaultIdentifier><Text> You have </Text><Placeable>{ </Placeable><Variable>$unreadEmails</Variable><Placeable> }</Placeable><Text> unread emails.</Text><br/>
+<Placeable>    }</Placeable><br/>
+<Text></Text><br/>
+<Comment># by function</Comment><br/>
+<Identifier>your-score</Identifier><Normal Text> =</Normal Text><br/>
+<Text>    </Text><Placeable>{ </Placeable><Function>NUMBER(</Function><Variable>$score</Variable><Function>, minimumFractionDigits: </Function><Number>1</Number><Function>)</Function><Placeable> -></Placeable><br/>
+<Placeable>        </Placeable><Identifier>[0.0]</Identifier><Text>   You scored zero points. What happened?</Text><br/>
+<Placeable>       </Placeable><DefaultIdentifier>*[other]</DefaultIdentifier><Text> You scored </Text><Placeable>{ </Placeable><Function>NUMBER(</Function><Variable>$score</Variable><Function>, minimumFractionDigits: </Function><Number>1</Number><Function>)</Function><Placeable> }</Placeable><Text> points.</Text><br/>
+<Placeable>    }</Placeable><br/>
+<Text></Text><br/>
+<Comment># with keywords</Comment><br/>
+<Identifier>your-rank</Identifier><Normal Text> = </Normal Text><Placeable>{ </Placeable><Function>NUMBER(</Function><Variable>$pos</Variable><Function>, type: </Function><Quoted>"ordinal"</Quoted><Function>)</Function><Placeable> -></Placeable><br/>
+<Placeable>   </Placeable><Identifier>[1]</Identifier><Text> You finished first!</Text><br/>
+<Placeable>   </Placeable><Identifier>[one]</Identifier><Text> You finished </Text><Placeable>{</Placeable><Variable>$pos</Variable><Placeable>}</Placeable><Text>st</Text><br/>
+<Placeable>   </Placeable><Identifier>[two]</Identifier><Text> You finished </Text><Placeable>{</Placeable><Variable>$pos</Variable><Placeable>}</Placeable><Text>nd</Text><br/>
+<Placeable>   </Placeable><Identifier>[few]</Identifier><Text> You finished </Text><Placeable>{</Placeable><Variable>$pos</Variable><Placeable>}</Placeable><Text>rd</Text><br/>
+<Placeable>  </Placeable><DefaultIdentifier>*[other]</DefaultIdentifier><Text> You finished </Text><Placeable>{</Placeable><Variable>$pos</Variable><Placeable>}</Placeable><Text>th</Text><br/>
+<Placeable>}</Placeable><br/>
+<Text></Text><br/>
+<DocumentationComment>## Attributes</DocumentationComment><br/>
+<Identifier>login-input</Identifier><Normal Text> = </Normal Text><Text>Predefined value</Text><br/>
+<Text>    </Text><Identifier>.placeholder</Identifier><Normal Text> = </Normal Text><Text>email@example.com</Text><br/>
+<Text>    </Text><Identifier>.aria-label</Identifier><Normal Text> = </Normal Text><Text>Login input value</Text><br/>
+<Text>    </Text><Identifier>.title</Identifier><Normal Text> = </Normal Text><Text>Type your login email</Text><br/>
+<Text></Text><br/>
+<Comment># accessible via .</Comment><br/>
+<Identifier>login-placeholder</Identifier><Normal Text> = </Normal Text><Placeable>{login-input.placeholder}</Placeable><br/>
+<Text></Text><br/>
+<DocumentationComment>## Faulty code, no gurantees for sense of the end of errors</DocumentationComment><br/>
+<Normal Text></Normal Text><br/>
+<Identifier>faulty-quote</Identifier><Normal Text> = </Normal Text><Text>Won't work </Text><Placeable>{</Placeable><Quoted>"\"}</Quoted><br/>
+<Placeable>    still-inside</Placeable><Error>\</Error><br/>
+<Text>    </Text><Placeable>{</Placeable><Quoted>"lonely \\ </Quoted><Error>\ "}</Error><br/>
+<Placeable>}</Placeable><br/>
+<Text></Text><br/>
+<Identifier>disallowed-identifier</Identifier><Error> characters</Error><br/>
+<Identifier>disallowed-character</Identifier><Error>$</Error><br/>
+<Normal Text></Normal Text><br/>
+<Comment># Hilight only at the end of the line, not visible since err only visible on same line</Comment><br/>
+<Identifier>broken-function</Identifier><Normal Text> = </Normal Text><Placeable>{</Placeable><Function>fn(</Function><br/>
+<Placeable>    </Placeable><Function>fn(smth:</Function><Number>123</Number><Function>, </Function><Number>0</Number><Function>, </Function><Placeable>{</Placeable><Error>)</Error><br/>
+<Placeable>    </Placeable><Function>fn(noth</Function><Error>!ng:3)</Error><br/>
+<Placeable>    </Placeable><Function>fn(</Function><Error>\)</Error><br/>
+<Placeable>}</Placeable><br/>
+<Text></Text><br/>
+<Comment># Same for open ended string and wron unicode characters</Comment><br/>
+<Identifier>broken-string</Identifier><Normal Text> = </Normal Text><Placeable>{</Placeable><br/>
+<Placeable>    </Placeable><Quoted>"</Quoted><br/>
+<Placeable>    </Placeable><Quoted>"</Quoted><Error>\u923"</Error><br/>
+<Placeable>    </Placeable><Quoted>"</Quoted><Error>\U92345"</Error><br/>
+<Placeable>    </Placeable><Quoted>"</Quoted><Error>\Ubcdefg"</Error><br/>
+<Placeable>}</Placeable><br/>

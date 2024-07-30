@@ -1,0 +1,5 @@
+add_executable(ksyntaxhighlighter6 ksyntaxhighlighter.cpp)
+ecm_mark_nongui_executable(ksyntaxhighlighter6)
+target_link_libraries(ksyntaxhighlighter6 KF6SyntaxHighlighting)
+
+install(TARGETS ksyntaxhighlighter6 ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

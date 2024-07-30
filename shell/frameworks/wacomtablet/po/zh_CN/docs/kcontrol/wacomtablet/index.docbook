@@ -1,0 +1,523 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY tablet "<application
+>KCM Tablet</application
+>">
+  <!ENTITY kappname "&tablet;">
+  <!ENTITY package "kcontrol">
+  <!ENTITY kappversion "2.0"
+><!--Application version. Use this variable everywhere it's needed.-->
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Continental-Chinese "INCLUDE">
+]>
+<book id="wacomtablet" lang="&language;">
+    <bookinfo>
+    <title
+>&tablet; 使用手册</title>
+
+    <authorgroup>
+        <author
+><firstname
+>Jörg</firstname
+> <surname
+>Ehrichs</surname
+> <affiliation
+> <address
+><email
+>joerg.ehrichs@gmx.de</email
+></address>
+            </affiliation>
+        </author>
+        <author
+><firstname
+>Yunhe</firstname
+><surname
+>Guo</surname
+></author
+><author
+><firstname
+>Henry</firstname
+><surname
+>Hu</surname
+></author
+><author
+><firstname
+>Tyson</firstname
+><surname
+>Tan</surname
+></author
+> 
+    </authorgroup>
+    <copyright>
+        <year
+>2013</year>
+        <holder
+>Jörg Ehrichs</holder>
+    </copyright>
+
+    <legalnotice
+>&FDLNotice;</legalnotice>
+
+    <date
+>2020-10-17</date
+><!-- Date of (re)writing, or update.-->
+    <releaseinfo
+>&kappversion;</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+    <abstract>
+        <para
+>本文档介绍了用于配置数位板的 &kde;系统设置模块。</para>
+    </abstract>
+
+    <keywordset>
+        <keyword
+>KDE</keyword
+><!-- do not change this! -->
+        <keyword
+>系统设置</keyword>
+        <keyword
+>Wacom</keyword>
+        <keyword
+>数位板</keyword>
+    </keywordset>
+
+    </bookinfo>
+
+    <chapter id="introduction">
+    <title
+>Wacom 数位板设置</title>
+    <para
+>数位板系统设置模块用于管理数位板的所有设置。所有 <ulink url="https://linuxwacom.github.io"
+>&Linux; Wacom 驱动程序</ulink
+> 项目支持的数位板均在此界面进行设置。请确保数位板已被 xorg.conf 或者 udev 检测到并能正常工作。详情请参考 <link linkend="detection"
+>数位板检测</link
+> 一节。 </para>
+    <important>
+        <para
+>要使此模块正常工作，计算机必须先安装 <application
+>xf86-input-wacom</application
+> 驱动程序，而且 <command
+>xsetwacom</command
+> 指令可用。 </para>
+    </important>
+    <para
+>本模块分成多个标签页，不同的标签页分别管理数位板和压感笔的不同设置：<link linkend="tablet-profiles"
+>配置方案</link
+>，<link linkend="tablet-general"
+>常规信息</link
+>，<link linkend="stylus"
+>压感笔设置</link
+>，<link linkend="pad-buttons"
+>快捷按钮</link
+>，<link linkend="pad-mapping"
+>数位板映射</link
+> 以及 <link linkend="touch-mapping"
+>触控映射</link
+>。 </para>
+    <sect1 id="tablet-profiles">
+        <title
+>配置方案管理</title>
+
+        <para
+>这个小的下拉列表框边上带有两个按钮。您可以建立新的配置方案，或者删除旧的。每个配置方案都是针对当前连接的数位板来指定与保存的。如果您建立了一个新的配置方案，它会根据驱动程序返回的默认设置来创建。 </para>
+
+        <para
+>你可以在此为设置指定不同的配置方案。例如在鼠标和绘画用途之间切换不同的行为模式。 </para>
+        <para
+>配置方案可以随时更改并立即在数位板上生效。 </para>
+        <note>
+            <para
+>需要 <link linkend="kded"
+>kded 数位板守护进程</link
+> 在后台运行时才能切换配置方案或者将更改应用于数位板，因为这些操作都是通过这个守护进程完成的。这个系统设置模块只负责修改配置方案本身。 </para>
+        </note>
+    </sect1>
+
+    <sect1 id="tablet-general">
+        <title
+>常规数位板设置和信息</title>
+
+        <para
+>显示已检测到的数位板的常规信息，包括设备名称、制造商、图片，以及列出全部检测到的该数位板的输入设备。 </para>
+
+        <note>
+            <para
+>要让该模块正常工作，数位板必须已经连接，同时 <link linkend="kded"
+>kded</link
+> 必须正在运行。 </para>
+            <para
+>参见 <link linkend="troubles"
+>数位板检测问题</link
+> 一节来获取关于数位板检测方面的更多帮助。 </para>
+        </note>
+
+        <para
+>除了显示数位板信息以外，常规标签页还用于设置各种全局快捷方式。这些快捷方式可以实时调整当前连接的数位板的设置。 </para>
+
+    </sect1>
+
+    <sect1 id="stylus">
+        <title
+>压感笔设置</title>
+
+        <para
+>与数位板配合使用的压感笔有两头，主要的一侧是笔尖，另外的一侧是橡皮擦。在这个标签页里你可以更改按钮的功能分配、压力响应曲线和阈值等参数。 </para>
+
+        <sect2 id="eraser-settings">
+            <title
+>橡皮擦手感</title>
+            <para
+>该滑动条用于更改橡皮擦的阈值。如果需要更精细的控制，可在 <guilabel
+>编辑压力响应曲线</guilabel
+> 对话框中修改整条压力响应曲线。参见 <link linkend="presscurve"
+>压感曲线对话框</link
+> 一节获取更多信息。 </para>
+        </sect2>
+
+        <sect2 id="pen-button-settings">
+            <title
+>按钮设置</title>
+            <para
+><guilabel
+>按钮设置</guilabel
+> 框用于更改被分配到压感笔按钮上的操作。点击该框会弹出新的对话框，在里面可以选择不同的按键组合，修饰键以及鼠标按钮。 </para>
+
+            <para
+>在启用<guilabel
+>点击执行操作</guilabel
+>时，只有在压感笔笔尖与数位板接触时，按钮的操作才会触发。如果禁用此选项，则压感笔在数位板表面附近悬空时，按钮的操作即可触发。 </para>
+        </sect2>
+
+        <sect2 id="tip-settings">
+            <title
+>笔尖手感</title>
+            <para
+>该滑动条用于更改压感笔笔尖的阈值。如果需要更精细的控制，可在 <guilabel
+>编辑压力响应曲线</guilabel
+> 对话框中修改整条压力响应曲线。参见 <link linkend="presscurve"
+>压力响应曲线对话框</link
+> 一节来获取更多信息。 </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="pad-buttons">
+        <title
+>快捷按钮</title>
+
+        <para
+><guilabel
+>快捷按钮</guilabel
+> 标签页用于为数位板的硬件按钮分配操作。如需修改现有操作，请点击编辑框，并在出现的新对话框中选择所需操作。 </para>
+    </sect1>
+
+
+   <sect1 id="pad-mapping">
+       <title
+>数位板</title>
+
+       <para
+><guilabel
+>数位板</guilabel
+> 标签页用于设置数位板区域与压感笔联动方式的更多选项。数位板的朝向、有效区域和光标定位模式均可在此设置。 </para>
+       <sect2 id="tablet-tracking">
+           <title
+>压感笔定位模式</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>映射到屏幕</guilabel
+>：按照压感笔在数位板上的绝对位置映射其光标。数位板的四边对应屏幕的四边。 </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>映射到光标</guilabel
+>：按照压感笔在数位板上的相对位移映射其光标。 </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+       <sect2 id="tablet-orientation">
+           <title
+>朝向</title>
+           <para
+>朝向选框用于指定数位板区域的旋转情况。你可以在组合框中选择某个特定的朝向，或者启用 <guilabel
+>跟随屏幕自动旋转</guilabel
+> 选项，让数位板跟随屏幕自动旋转。此功能是通过监视 xrandr 的屏幕旋转事件来实现的。 </para>
+           <para
+>如果在启用自动旋转后数位板向错误的方向旋转，请启用 <guilabel
+>反转自动旋转</guilabel
+> 选项。 </para>
+       </sect2>
+       <sect2 id="tablet-area-mapping">
+           <title
+>数位板映射</title>
+           <para
+>此映射用于指定数位板与每个屏幕配合时的宽高比，当压感笔处于绝对定位模式时，它可以维持数位板与屏幕的宽高比一致。详情请见 <link linkend="area-selection"
+>区域选择对话框</link
+> 一节。 </para>
+           <note>
+               <para
+>此选项在相对光标模式下无效。 </para>
+           </note>
+       </sect2>
+   </sect1>
+
+   <sect1 id="touch-mapping">
+       <title
+>触控</title>
+
+       <para
+><guilabel
+>触控</guilabel
+> 标签页用于设置数位板的触控功能的更多选项 (如果可用)。可以通过 <guilabel
+>启用触控</guilabel
+> 选框来禁用触摸功能。还可以通过一个全局快捷方式用于启用/禁用触控功能。 </para>
+
+       <sect2 id="touch-tracking">
+           <title
+>触控定位模式</title>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>映射到屏幕</guilabel
+>：按照触摸点在数位板上的绝对位置映射其光标。数位板的四边对应屏幕的四边。 </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>映射到光标</guilabel
+>：按照触摸点在数位板上的相对位移映射其光标。 </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-gestures">
+           <title
+>手势</title>
+
+           <para
+>选中 <guilabel
+>启用手势</guilabel
+> 后，数位板可以通过触控设备产生手势事件。 </para>
+
+           <itemizedlist>
+               <listitem>
+                   <para
+><guilabel
+>滚动距离</guilabel
+>：两根手指按住数位板表面上下滑动可在窗口中进行滚动操作。“距离”数值按照数位板的单位指定。 </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>缩放距离</guilabel
+>：两根手指按在数位板上相互拉近/拉远可以进行放大/缩小。“距离”数值按照数位板的单位指定。 </para>
+               </listitem>
+               <listitem>
+                   <para
+><guilabel
+>点击时间</guilabel
+>：用于指定在数位板上的两次点击间隔多久会被识别为右键单击，以毫秒为单位 </para>
+               </listitem>
+           </itemizedlist>
+       </sect2>
+
+       <sect2 id="touch-area-mapping">
+           <title
+>触控映射</title>
+           <para
+>此映射用于指定触控设备在每个屏幕下面的可用区域。如果使用的是数位屏类设备，应将触控设备的映射模式设为和压感笔一样的绝对定位模式。详情请见 <link linkend="area-selection"
+>区域选择对话框</link
+> 一节。 </para>
+           <note>
+               <para
+>此选项在相对光标模式下无效。 </para>
+           </note>
+       </sect2>
+
+    </sect1>
+
+
+    <sect1 id="presscurve">
+        <title
+>压感曲线对话框</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>这是压感曲线对话框的截图</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="presscurve.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>改变压感曲线</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>压感曲线用于控制压感笔压力数值的转换。压感曲线通过一条贝塞尔曲线上的四个点进行定义，拖拽红点即可移动曲线。 </para>
+        <note>
+            <para
+>在压力响应曲线对话框中按压笔尖可以直观地看到更改曲线带来的变化。曲线下方的蓝色区域显示笔尖压力的大小。 </para>
+        </note>
+    </sect1>
+
+    <sect1 id="area-selection">
+        <title
+>区域选择对话框</title>
+
+        <para>
+            <screenshot>
+                <screeninfo
+>这是数位板区域对话框的截图</screeninfo>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="tabletarea.png" format="PNG"/>
+                    </imageobject>
+                    <textobject>
+                        <phrase
+>定义数位板区域</phrase>
+                    </textobject>
+                </mediaobject>
+            </screenshot>
+        </para>
+
+        <para
+>此对话框用于设置数位板在每个屏幕下的有效区域。如果某个屏幕与数位板的宽高比不同，则必需牺牲一部分数位板区域才能维持两者的宽高比一致。可以针对每个屏幕分别进行设置。 </para>
+        <para
+>使用 <guilabel
+>切换屏幕</guilabel
+> 按钮来在全屏 (所有已连接的显示器) 与每个单独的显示器之间切换。每个屏幕的设定会被分别保存，并在使用全局快捷键切换到该屏幕时实时应用到数位板。 </para>
+        <para
+><guilabel
+>数位板</guilabel
+> 选项卡的右侧有两个按钮用于控制数位板区域的映射。你可以点击 <guimenuitem
+>全部区域</guimenuitem
+> 按钮来将整个数位板的可用区域映射到整个屏幕区域。你也可以点击 <guimenuitem
+>部分区域</guimenuitem
+> 按钮，手动指定如何映射。你可以点击 <guibutton
+>锁定宽高比</guibutton
+> 按钮来确数位板与屏幕保持宽高比一致。 </para>
+        <para
+>如果需要让数位板与所选屏幕的宽高比保持一致，请点击 <guilabel
+>设置屏幕宽高比</guilabel
+> 按钮。数位板的有效区域会被自动计算并据此调整。 </para>
+        <para
+>你还可以打开 <guilabel
+>校准</guilabel
+> 对话框，根据屏幕显示的四个点来校准数位屏视差。 </para>
+        <para
+>对话框关闭时，最后选中的屏幕会被启用。如需在之后切换到其他屏幕，可使用 <link linkend="tablet-general"
+>全局快捷键</link
+>。 </para>
+        <note>
+            <para
+>数位板区域只在压感笔和触摸设备被设为绝对定位模式时有效。设为相对定位模式时，整个数位板都可被使用。 </para>
+        </note>
+    </sect1>
+    </chapter>
+
+
+
+
+
+    <chapter id="kded">
+    <title
+>数位板守护进程</title>
+    <para
+>数位板守护进程作为基础服务在后台运行。它会检测数位板并根据所选的配置方案应用设置。如果守护进程没有运行，则系统设置模块和 Plasma 小部件将不能正常工作，配置方案也将无法被应用到数位板。 </para>
+
+    <sect1 id="detection">
+        <title
+>数位板检测</title>
+        <para
+>系统会通过多种途径来检测 <hardware
+>数位板设备</hardware
+> 。首先它会使用 <application
+>Solid</application
+> 进行检测，同时通过它来支持热插拔。如果 Solid 失败了，它会换用 <command
+>xsetwacom list dev</command
+>、<command
+>lsusb</command
+>、<command
+>xinput --list</command
+> 等指令进行检测。 </para>
+        <para
+>如果上述所有命令都不能返回数位板的名称，则该设备不受支持，无法在本模块中使用。 </para>
+    </sect1>
+    <sect1 id="troubles">
+        <title
+>数位板检测问题</title>
+        <para
+>如果您的数位板未被检测到，请访问 <ulink url="https://linuxwacom.github.io"
+>&Linux; Wacom 驱动程序</ulink
+> 还有 <ulink url="https://digimend.github.io"
+>DIGImend driver</ulink
+> 页面来了解您的数位板是否被支持。另一方面，您也可以运行 <command
+>lsusb</command
+> 看看系统是否已经检测到并列出了您的数位板。 </para>
+        <para
+>如果 udev 不能正确进行检测，请将您的数位板添加到您的 <filename
+>/etc/X11/xorg.conf.d/50-tablet.conf</filename
+> 文件中 (如果该文件不存在，请创建它)，并重启 X 服务器。 </para>
+        <para
+>当使用串口设备时 (TabletPC 等)，可通过 <command
+>xinput --list</command
+> 指令来检查您的设备是否被列出 (压感笔/橡皮擦/数位板)。如果已被列出，可通过 <command
+>xsetwacom get "数位板或者压感笔设备名称" TabletID</command
+> 指令来获取数位板的内部设备编号。如果此操作返回了一个 ID，请将所有必需信息用邮件发送给开发人员。 </para>
+        <note>
+        <para
+>热插拔支持只有在数位板通过 <application
+>Solid</application
+> 及其通知 API 被检测到时可用。 </para>
+        <para
+><application
+>Solid</application
+> 检查 <command
+>input.x11_options.Type</command
+> 的值是否为 <command
+>pen</command
+>、<command
+>stylus</command
+>、<command
+>eraser</command
+>、<command
+>cursor</command
+> 的其中一个；或者 <command
+>input.x11_driver</command
+> 的值是否为 <command
+>wacom</command
+>。 </para>
+        <para
+>如果你的数位板能被 Solid 检测到却返回了不同的数值，请通过电邮联系开发人员以改进数位板支持。 </para>
+        </note>
+    </sect1>
+    </chapter>
+
+    <chapter id="applet">
+    <title
+>数位板 Plasma 小部件</title>
+    <para
+>数位板小工具用于随时切换可用配置方案。你也可以用它来更改数位板旋转方向、切换压感笔/橡皮擦的绝对/相对模式等，此类设置不受当前配置方案的影响。 </para>
+    <para
+>添加这个 plasmoid 对于这个模块的工作并不是必需的。当 <link linkend="kded"
+>数位板守护进程</link
+>检测到数位板时，即使这个 plasmoid 并没有被使用，默认配置方案也会被激活。这个 plasmoid 只是一个视觉上的辅助程序，帮助你更容易地在配置方案之间切换。 </para>
+    </chapter>
+    <chapter id="credits"
+><title
+>致谢和许可证</title>
+    <para
+>本文档由 Guo Yunhe, Henry Hu 和 Tyson Tan 同学翻译。</para
+> &underFDL; &underGPL; </chapter>
+</book>

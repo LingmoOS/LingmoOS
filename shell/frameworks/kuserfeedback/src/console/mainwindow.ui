@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KUserFeedback::Console::MainWindow</class>
+ <widget class="QMainWindow" name="KUserFeedback::Console::MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>User Feedback Console</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QStackedWidget" name="viewStack">
+      <widget class="KUserFeedback::Console::AnalyticsView" name="analyticsView"/>
+      <widget class="KUserFeedback::Console::SurveyEditor" name="surveyEditor"/>
+      <widget class="KUserFeedback::Console::SchemaEditor" name="schemaEdit"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionConnectToServer"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Products">
+    <property name="title">
+     <string>Pro&amp;ducts</string>
+    </property>
+    <addaction name="actionAddProduct"/>
+    <addaction name="actionDeleteProduct"/>
+    <addaction name="actionImportProduct"/>
+    <addaction name="actionExportProduct"/>
+   </widget>
+   <widget class="QMenu" name="menuSurvey">
+    <property name="title">
+     <string>&amp;Survey</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAnalytics">
+    <property name="title">
+     <string>Anal&amp;ytics</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionUserManual"/>
+    <addaction name="actionContribute"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuSchema">
+    <property name="title">
+     <string>S&amp;chema</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionViewAnalytics"/>
+    <addaction name="actionViewSurveys"/>
+    <addaction name="actionViewSchema"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_View"/>
+   <addaction name="menu_Products"/>
+   <addaction name="menuSurvey"/>
+   <addaction name="menuAnalytics"/>
+   <addaction name="menuSchema"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menu_Help"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="logDock">
+   <property name="windowTitle">
+    <string>Log Messages</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPlainTextEdit" name="logWidget">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="productsDock">
+   <property name="windowTitle">
+    <string>Products</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QTreeView" name="productListView">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ActionsContextMenu</enum>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="viewToolBar">
+   <property name="windowTitle">
+    <string>View Toolbar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionViewAnalytics"/>
+   <addaction name="actionViewSurveys"/>
+   <addaction name="actionViewSchema"/>
+  </widget>
+  <action name="actionConnectToServer">
+   <property name="icon">
+    <iconset theme="network-connect"/>
+   </property>
+   <property name="text">
+    <string>&amp;Connect to Server...</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect to analytics server.</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset theme="application-exit"/>
+   </property>
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit the user feedback console.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
+  </action>
+  <action name="actionAddProduct">
+   <property name="icon">
+    <iconset theme="folder-add"/>
+   </property>
+   <property name="text">
+    <string>&amp;Add Product...</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new product.</string>
+   </property>
+  </action>
+  <action name="actionDeleteProduct">
+   <property name="icon">
+    <iconset theme="edit-delete"/>
+   </property>
+   <property name="text">
+    <string>&amp;Delete Product</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete product and all associated data.</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
+   <property name="text">
+    <string>&amp;About...</string>
+   </property>
+   <property name="toolTip">
+    <string>Information about this program.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionContribute">
+   <property name="text">
+    <string>&amp;Contribute...</string>
+   </property>
+   <property name="toolTip">
+    <string>Help to make this application better for you!</string>
+   </property>
+  </action>
+  <action name="actionViewSchema">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="document-edit"/>
+   </property>
+   <property name="text">
+    <string>&amp;Schema</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit product telemetry schema.</string>
+   </property>
+  </action>
+  <action name="actionViewSurveys">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="question"/>
+   </property>
+   <property name="text">
+    <string>S&amp;urveys</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage product surveys.</string>
+   </property>
+  </action>
+  <action name="actionViewAnalytics">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="office-chart-area"/>
+   </property>
+   <property name="text">
+    <string>&amp;Analytics</string>
+   </property>
+   <property name="toolTip">
+    <string>Analyze product telemetry.</string>
+   </property>
+  </action>
+  <action name="actionUserManual">
+   <property name="icon">
+    <iconset theme="help-contents"/>
+   </property>
+   <property name="text">
+    <string>User Manual...</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the user manual</string>
+   </property>
+  </action>
+  <action name="actionImportProduct">
+   <property name="icon">
+    <iconset theme="document-import"/>
+   </property>
+   <property name="text">
+    <string>Import Product...</string>
+   </property>
+   <property name="toolTip">
+    <string>Import product settings and data.</string>
+   </property>
+  </action>
+  <action name="actionExportProduct">
+   <property name="icon">
+    <iconset theme="document-export"/>
+   </property>
+   <property name="text">
+    <string>Export Product...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export all product settings and data.</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KUserFeedback::Console::SchemaEditor</class>
+   <extends>QWidget</extends>
+   <header>schemaeditor/schemaeditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>KUserFeedback::Console::SurveyEditor</class>
+   <extends>QWidget</extends>
+   <header location="global">surveyeditor/surveyeditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>KUserFeedback::Console::AnalyticsView</class>
+   <extends>QWidget</extends>
+   <header location="global">analytics/analyticsview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

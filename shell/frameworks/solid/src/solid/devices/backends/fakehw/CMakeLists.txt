@@ -1,0 +1,17 @@
+set(backend_sources
+    fakebattery.cpp
+    fakeblock.cpp
+    fakecamera.cpp
+    fakecdrom.cpp
+    fakedevice.cpp
+    fakedeviceinterface.cpp
+    fakegenericinterface.cpp
+    fakemanager.cpp
+    fakenetworkshare.cpp
+    fakeopticaldisc.cpp
+    fakeportablemediaplayer.cpp
+    fakeprocessor.cpp
+    fakestorage.cpp
+    fakestorageaccess.cpp
+    fakevolume.cpp
+)

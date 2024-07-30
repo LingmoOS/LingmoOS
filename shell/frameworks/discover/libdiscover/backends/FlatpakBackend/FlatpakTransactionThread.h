@@ -1,0 +1,83 @@
+/*
+ *   SPDX-FileCopyrightText: 2017 Jan Grulich <jgrulich@redhat.com>
+ *   SPDX-FileCopyrightText: 2023 Harald Sitter <sitter@kde.org>
+ *
+ *   SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+ */
+
+#pragma once
+
+#include "flatpak-helper.h"
+#include <gio/gio.h>
+#include <glib.h>
+
+#include <QMap>
+#include <QMutex>
+#include <QRunnable>
+#include <QStringList>
+#include <QThread>
+#include <QWaitCondition>
+#include <Transaction/Transaction.h>
+
+class FlatpakResource;
+class FlatpakTransactionThread : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    FlatpakTransactionThread(FlatpakResource *app, Transaction::Role role);
+    ~FlatpakTransactionThread() override;
+
+    void proceed();
+    void cancel();
+    void run() override;
+
+    int progress() const;
+    void setProgress(int progress);
+    void setSpeed(quint64 speed);
+
+    QString errorMessage() const;
+    bool result() const;
+    bool cancelled() const;
+
+    void addErrorMessage(const QString &error);
+
+    /** Mapping of repositories where a key is an installation path and a value is a list of names */
+    using Repositories = QMap<QString, QStringList>;
+    Repositories addedRepositories() const;
+    [[nodiscard]] bool end_of_lifed_with_rebase(const char *remote, const char *ref, const char *reason, const char *rebased_to_ref, const char **previous_ids);
+
+Q_SIGNALS:
+    void progressChanged(int progress);
+    void speedChanged(quint64 speed);
+    void passiveMessage(const QString &msg);
+    void webflowStarted(const QUrl &url, int id);
+    void webflowDone(int id);
+    void finished();
+    void proceedRequest(const QString &title, const QString &description);
+
+private:
+    static gboolean
+    add_new_remote_cb(FlatpakTransaction * /*object*/, gint /*reason*/, gchar *from_id, gchar *suggested_remote_name, gchar *url, gpointer user_data);
+    static void progress_changed_cb(FlatpakTransactionProgress *progress, gpointer user_data);
+    static void
+    new_operation_cb(FlatpakTransaction * /*object*/, FlatpakTransactionOperation *operation, FlatpakTransactionProgress *progress, gpointer user_data);
+    void fail(const char *refName, GError *error);
+
+    static gboolean webflowStart(FlatpakTransaction *transaction, const char *remote, const char *url, GVariant *options, guint id, gpointer user_data);
+    static void webflowDoneCallback(FlatpakTransaction *transaction, GVariant *options, guint id, gpointer user_data);
+
+    FlatpakTransaction *m_transaction;
+    bool m_result = false;
+    int m_progress = 0;
+    quint64 m_speed = 0;
+    QString m_errorMessage;
+    GCancellable *m_cancellable;
+    FlatpakResource *const m_app;
+    const Transaction::Role m_role;
+    QMap<QString, QStringList> m_addedRepositories;
+    QMutex m_proceedMutex;
+    QWaitCondition m_proceedCondition;
+    bool m_proceed = false;
+
+    QVector<int> m_webflows;
+};

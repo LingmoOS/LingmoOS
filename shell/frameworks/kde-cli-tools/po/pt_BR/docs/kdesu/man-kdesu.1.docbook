@@ -1,0 +1,379 @@
+<?xml version="1.0" ?>
+<!DOCTYPE refentry PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+<!ENTITY % Brazilian-Portuguese "INCLUDE">
+]>
+
+<refentry lang="&language;">
+<refentryinfo>
+<title
+>Manual do usuário do KDE</title>
+<author
+>&Lauri.Watts; &Lauri.Watts.mail;</author>
+<date
+>18/09/2010</date>
+<productname
+>KDE</productname>
+</refentryinfo>
+
+<refmeta>
+<refentrytitle
+><command
+>kdesu</command
+></refentrytitle>
+<manvolnum
+>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname
+><command
+>kdesu</command
+></refname>
+<refpurpose
+>Executa um programa com privilégios elevados</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis
+><command
+>kdesu</command
+> <group choice="opt"
+><option
+>-c</option
+> <replaceable
+> comando</replaceable
+></group
+> <group choice="opt"
+><option
+>-d</option
+></group
+> <group choice="opt"
+><option
+>-f</option
+> <replaceable
+> arquivo</replaceable
+></group
+> <group choice="opt"
+><option
+>-i</option
+> <replaceable
+> nome do ícone</replaceable
+></group
+> <group choice="opt"
+><option
+>-n</option
+></group
+> <group choice="opt"
+><option
+>-p</option
+> <replaceable
+> prioridade</replaceable
+></group
+> <group choice="opt"
+><option
+>-r</option
+></group
+> <group choice="opt"
+><option
+>-s</option
+></group
+> <group choice="opt"
+><option
+>-t</option
+></group
+> <group choice="opt"
+><option
+>-u</option
+> <replaceable
+> usuário</replaceable
+></group
+> <group choice="opt"
+><option
+>--noignorebutton</option
+></group
+> <group choice="opt"
+><option
+>--attach</option
+> <replaceable
+> ID da janela</replaceable
+></group
+> </cmdsynopsis>
+<cmdsynopsis
+><command
+>kdesu</command
+> <arg choice="opt"
+>opções genéricas do &kde;</arg
+> <arg choice="opt"
+>opções genéricas do &Qt;</arg
+> </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1>
+<title
+>Descrição</title>
+<para
+>O &kdesu; é uma interface gráfica para o comando <command
+>su</command
+> do &UNIX; no Ambiente de Trabalho K. Ele permite-lhe executar um programa como um usuário diferente fornecendo a senha deste usuário. O &kdesu; é um programa com privilégios especiais; ele usa o <command
+>su</command
+> do sistema.</para>
+
+<para
+>O &kdesu; tem uma funcionalidade adicional: ele poderá recordar opcionalmente as senhas para você. Se estiver usando esta funcionalidade, você só terá que inserir a senha uma vez para cada comando.</para>
+
+<para
+>Este programa pode ser iniciado a partir da linha de comando ou a partir de arquivos <filename
+>.desktop</filename
+>.</para>
+
+<para
+>Uma vez que o <command
+>kdesu</command
+> não é mais instalado em <userinput
+> $(kf5-config --prefix)</userinput
+>/bin mas em <userinput
+>kf5-config --path libexec</userinput
+> e por essa razão não em seu <envar
+>Path</envar
+>, você deve usar <userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+></userinput
+> para iniciar o <command
+>kdesu</command
+>.</para>
+</refsect1>
+
+<refsect1>
+<title
+>Opções</title>
+
+<variablelist>
+<varlistentry>
+<term
+><option
+>-c <replaceable
+>comando</replaceable
+></option
+></term>
+<listitem
+><para
+>Isto especifica o comando a ser executado como 'root'. Tem que ser passado um argumento. Assim se, por exemplo, quiser iniciar um novo gerenciador de arquivos, você deve inserir na linha de comando algo como: <userinput
+>$(kf5-config --path libexec)<command
+>kdesu<option
+>-c <replaceable
+>&dolphin;</replaceable
+></option
+></command
+></userinput
+></para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-d</option
+></term>
+<listitem
+><para
+>Mostra informações de depuração.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-f <replaceable
+>arquivo</replaceable
+></option
+></term>
+<listitem
+><para
+>Esta opção permite um uso eficiente do &kdesu; em arquivos <filename
+>.desktop</filename
+>. Isto diz ao &kdesu; para examinar o arquivo indicado em <parameter
+>arquivo</parameter
+>. Se este arquivo puder ser alterado pelo usuário atual, o &kdesu; irá executar o comando com esse usuário. Se não puder ser alterado, o comando é executado com o usuário <parameter
+>usuário</parameter
+> (o 'root', por padrão).</para>
+<para
+>O <parameter
+>arquivo</parameter
+> é avaliado da seguinte forma: se o <parameter
+>arquivo</parameter
+> começar com uma <literal
+>/</literal
+>, é usado como um arquivo absoluto. Caso contrário, é tratado como o nome de um arquivo de configuração global do &kde;.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-i</option
+> <replaceable
+>nome do ícone</replaceable
+></term>
+<listitem
+><para
+>Indica o ícone a usar na janela da senha. Você poderá indicar apenas o nome, sem qualquer extensão.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-n</option
+></term>
+<listitem
+><para
+>Não mantém a senha. Isto desabilita a opção <guilabel
+>Lembrar senha</guilabel
+> no diálogo de senha.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-p</option
+> <replaceable
+>prioridade</replaceable
+></term>
+<listitem>
+<para
+>Indica o valor da prioridade. A prioridade é um número qualquer entre 0 e 100, onde o 100 corresponde à prioridade máxima e o 0 à mínima. O valor padrão é 50.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-r</option
+></term>
+<listitem
+><para
+>Usar escalonamento em tempo real.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>-s</option
+></term>
+<listitem
+><para
+>Interrompe o servidor do 'kdesu'. Este é o servidor que coloca, em segundo plano, em 'cache' as senhas corretas. Esta funcionalidade também poderá ser desativada com o <option
+>-n</option
+>, quando o &kdesu; é executado inicialmente.</para
+></listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-t</option
+></term>
+<listitem
+><para
+>Permite enviar o resultado para o terminal. Isto desativa a memorização de senhas e é amplamente usado para fins de depuração. Se você quiser executar um aplicativo no modo de console, use o comando <command
+>su</command
+> normal.</para
+> </listitem>
+</varlistentry>
+<varlistentry>
+<term
+><option
+>-u</option
+> <replaceable
+>usuário</replaceable
+></term>
+<listitem
+><para
+>Embora a utilização mais comum do &kdesu; seja rodar um comando como superusuário, você poderá indicar qualquer nome de usuário e a senha apropriada.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--noignorebutton</option
+></term>
+<listitem
+><para
+>Não exibe um botão para ignorar.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><option
+>--attach</option
+> <replaceable
+> ID da janela</replaceable
+></term>
+<listitem
+><para
+>Torna a janela de uma aplicação X, identificada pela sua ID, transitória.</para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</refsect1>
+
+<refsect1>
+<title
+>Veja também</title>
+<para
+>su(1)</para>
+
+<para
+>Está disponível um documentação de usuário mais detalhada em <ulink url="help:/kdesu"
+>help:/kdesu</ulink
+> (insira esta &URL; no &konqueror; ou execute <userinput
+><command
+>khelpcenter</command
+> <parameter
+>help:/kdesu</parameter
+></userinput
+>).</para>
+
+</refsect1>
+
+<refsect1>
+<title
+>Exemplos</title>
+<para
+>Executar o <command
+>kfmclient</command
+> com o usuário <systemitem class="username"
+>jose</systemitem
+> e mostrar o ícone do &konqueror; na janela de senhas:</para>
+<screen
+><userinput
+>$(kf5-config --path libexec)<command
+>kdesu</command
+> <option
+>-u jose</option
+> <option
+>-i konqueror</option
+> <command
+>kfmclient</command
+></userinput
+></screen>
+
+</refsect1>
+
+<refsect1>
+<title
+>Autores</title>
+<para
+>O &kdesu; foi criado por &Geert.Jansen; &Geert.Jansen.mail; e <personname
+><firstname
+>Pietro</firstname
+><surname
+>Iglio</surname
+></personname
+> <email
+>iglio@fub.it</email
+>. </para>
+</refsect1>
+
+</refentry>

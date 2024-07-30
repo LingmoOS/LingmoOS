@@ -1,0 +1,34 @@
+#!/bin/sh
+# Script used by kdesktop to eject a removable media (CDROM/Tape/SCSI/Floppy)
+# Relies on the 'eject' program, 'cdcontrol' on *BSD
+#
+# Copyright GPL v2 by David Faure <david@mandrakesoft.com>
+#
+if test $# -ge 1 -a "$1" != "--help"; then
+  quiet=0
+  if test "$1" = "-q"; then
+    quiet=1
+    shift
+  fi
+  # Checking for stuff in the PATH is ugly with sh.
+  # I guess this is the reason for making this a kde app...
+  OS=`uname -s`
+  case "$OS" in
+    OpenBSD)
+      cdio -f $1 eject >/dev/null 2>&1
+      ;;
+    *BSD)
+      dev=`echo $1 | sed -E -e 's#/dev/##' -e 's/([0-9])./\1/'`
+      cdcontrol -f $dev eject >/dev/null 2>&1
+      ;;
+    *)
+      eject $1 >/dev/null 2>&1
+      ;;
+  esac
+  if test $quiet -eq 0; then
+    kdialog --title "KDE Eject" --error "Eject $1 failed!"
+  fi
+else
+  kdialog --title "KDE Eject" --msgbox "Usage: $0 <name> where name is a device or a mountpoint."
+fi
+exit 1
