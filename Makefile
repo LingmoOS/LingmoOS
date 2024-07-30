@@ -760,15 +760,16 @@ endif
 		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf.d directory"; exit 1; } || true
 	mkdir -p $(TARGET_DIR)/etc
 	( \
-		echo "PRETTY_NAME="Lingmo Next OS""; \
+		echo "PRETTY_NAME='Lingmo OS Helium'"; \
 		echo "NAME=Lingmo OS"; \
 		echo "RELEASE=NON-RELEASE"; \
-		echo "VERSION_ID=3.x"; \
-		echo "VERSION=3.x (NEXT)"; \
-		echo "VERSION_CODENAME=next"; \
+		echo "VERSION_ID=2.9"; \
+		echo "VERSION=2.9 (Helium)"; \
+		echo "VERSION_CODENAME=helium"; \
 		echo "VERSION_BUILD=${SYS_BUILD_ID}"; \
 		echo "VERSION_TYPE=unstable"; \
 		echo "ID=lingmo"; \
+		echo "LOGO=lingmo"; \
 		echo "HOME_URL=https://lingmo.org"; \
 		echo "SUPPORT_URL=https://bbs.lingmo.org/"; \
 		echo "COMMUNITY_URL=https://bbs.lingmo.org/"; \

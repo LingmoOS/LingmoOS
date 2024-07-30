@@ -11,9 +11,9 @@ import inkex
 import pathmodifier
 
 
-class PlasmaNamesEffect(pathmodifier.PathModifier):
+class LingmoNamesEffect(pathmodifier.PathModifier):
     """
-    Renames 9 selected elements as a plasma theme frame
+    Renames 9 selected elements as a lingmo theme frame
     """
 
     def add_arguments(self, pars):
@@ -62,4 +62,4 @@ class PlasmaNamesEffect(pathmodifier.PathModifier):
 
 
 if __name__ == '__main__':
-    PlasmaNamesEffect().run()
+    LingmoNamesEffect().run()

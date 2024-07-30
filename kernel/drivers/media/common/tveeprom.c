@@ -12,7 +12,7 @@
 
  * Adjustments to fit a more general model and all bugs:
 
-	Copyright (C) 2003 John Klar <linpvr at projectlingmo.com>
+	Copyright (C) 2003 John Klar <linpvr at projectplasma.com>
 
  */
 

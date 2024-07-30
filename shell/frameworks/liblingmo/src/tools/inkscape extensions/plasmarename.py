@@ -19,7 +19,7 @@ import pathmodifier
 
 class LingmoNamesEffect(pathmodifier.PathModifier):
     """
-    Renames 9 selected elements as a plasma theme frame
+    Renames 9 selected elements as a lingmo theme frame
     """
     def __init__(self):
         pathmodifier.PathModifier.__init__(self)
