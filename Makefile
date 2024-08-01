@@ -781,6 +781,9 @@ endif
 	cp -rv $(TOPDIR)/init/data_base/* $(TARGET_DIR)/var/lib/pacman/local/
 	cp -rv $(TOPDIR)/init/data_base/* $(TARGET_DIR)/var/lib/lpm/local/
 
+	# init rootfs
+	cp -v $(TOPDIR)/init/hooks/*.sh $(TARGET_DIR)/home/
+
 	@$(call MESSAGE,"Sanitizing RPATH in target tree")
 	PARALLEL_JOBS=$(PARALLEL_JOBS) \
 		PER_PACKAGE_DIR=$(PER_PACKAGE_DIR) \
