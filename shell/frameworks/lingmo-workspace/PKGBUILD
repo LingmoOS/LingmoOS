@@ -38,8 +38,8 @@ depends=(accountsservice
          kio
          kio-extras
          kio-fuse
-         kirigami
-         kirigami-addons
+         lingmoui
+         lingmoui-addons
          kitemmodels
          kjobwidgets
          knewstuff
@@ -69,7 +69,7 @@ depends=(accountsservice
          libice
          libkexiv2
          libksysguard
-         libplasma
+         liblingmo
          libqalculate
          libsm
          libx11
