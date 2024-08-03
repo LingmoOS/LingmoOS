@@ -1,0 +1,46 @@
+pkgname=lpm-extra
+pkgver=2.9.0
+pkgrel=1
+pkgdesc='Contributed scripts and tools for lpm systems'
+arch=('x86_64')
+url="https://github.com/LingmoOS/$pkgname"
+license=('GPL-2.0-or-later')
+depends=('lpm')
+makedepends=('asciidoc' 'git')
+optdepends=(
+  'diffutils: for pacdiff'
+  'fakeroot: for checkupdates'
+  'findutils: for pacdiff --find'
+  'mlocate: for pacdiff --locate'
+  'perl: for pacsearch'
+  'sudo: privilege elevation for several scripts'
+  'vim: default merge program for pacdiff'
+)
+source=("git+$url.git#tag=v$pkgver")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd $pkgname
+  ./autogen.sh
+}
+
+build() {
+  cd $pkgname
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var
+  make
+}
+
+check() {
+  cd $pkgname
+  make check
+}
+
+package() {
+  cd $pkgname
+  make DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:

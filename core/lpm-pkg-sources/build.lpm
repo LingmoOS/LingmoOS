@@ -1,0 +1,15 @@
+pkgname=lpm-pkg-sources
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Lingmo OS mirror list for use by pacman"
+arch=('any')
+url="https://lingmo.org"
+license=('GPL')
+backup=(etc/lpm/pkg_sources.list)
+source=(pkg_sources.list)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+package() {
+  mkdir -p "$pkgdir/etc/lpm"
+  install -m0644 "$srcdir/pkg_sources.list" "$pkgdir/etc/lpm/"
+}

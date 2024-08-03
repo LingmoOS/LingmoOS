@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh lpm files databases
+RequiresMountsFor="/var/lib/lpm/sync"
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=@bindir@/lpm -Fy
+Nice=19
+StandardOutput=null
+StandardError=journal

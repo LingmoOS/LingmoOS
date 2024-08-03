@@ -1,0 +1,78 @@
+pacdiff(8)
+==========
+
+Name
+----
+pacdiff - pacorig, pacnew and pacsave maintenance utility
+
+
+Synopsis
+--------
+'pacdiff' [options]
+
+
+Description
+-----------
+'pacdiff' is a script which looks for pacorig, pacnew and pacsave files from the
+backup entries found in the local lpm db. For every found file the option is
+given to view, merge, skip, diff, remove or overwrite the found pacorig, pacnew
+or pacsave file.
+
+Options
+-------
+
+Search Options
+~~~~~~~~~~~~~~
+*-f, \--find*::
+	Scan using find.
+
+*-l, \--locate*::
+	Scan using locate.
+
+*-p, \--lpmdb*::
+	Scan active config files from lpm database. (default)
+
+General Options
+~~~~~~~~~~~~~~~
+*-b, \--backup*::
+	When overwriting, save old files with .bak.
+
+*-c, \--cachedir <dir>*::
+	Scan 'dir' instead as the lpm cache for 3-way merge base candidates.
+
+*-h, \--help*::
+	Display syntax and command-line options.
+
+*\--nocolor*::
+	Do not colorize output.
+
+*-o, \--output*::
+	Print files instead of merging them.
+
+*-s, \--sudo*::
+	Use sudo and sudoedit to merge/remove files.
+
+*-3, \--threeway*::
+	View diffs in 3-way fashion if the base package is available in the cache.
+	Fall back to regular 2-way diff otherwise.
+
+*-V, \--version*::
+	Display version information.
+
+Environment
+-----------
+*DIFFPROG*::
+	Override the default 'vim -d' merge program.
+
+*DIFFSEARCHPATH*::
+	Override the default search path '/etc', only when using find.
+
+*MERGEPROG*::
+	Override the default 'diff3 -m' 3-way merge program. One possible
+	alternative is 'git merge-file -p'.
+
+See Also
+--------
+linkman:lpm[8], linkman:lpm.conf[5]
+
+include::footer.adoc[]
