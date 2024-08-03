@@ -1,0 +1,43 @@
+pkgname=fakeroot
+pkgver=1.35
+pkgrel=1
+pkgdesc='Tool for simulating superuser privileges'
+arch=('x86_64')
+license=('GPL')
+url='https://tracker.debian.org/pkg/fakeroot'
+install=fakeroot.install
+depends=('glibc' 'filesystem' 'sed' 'util-linux' 'sh')
+makedepends=('systemd' 'po4a')
+checkdepends=('sharutils')
+source=("https://deb.debian.org/debian/pool/main/f/$pkgname/${pkgname}_${pkgver}.orig.tar.gz")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr \
+    --libdir=/usr/lib/libfakeroot \
+    --disable-static \
+    --with-ipc=sysv
+
+  make
+
+  cd doc
+  po4a -k 0 --rm-backups --variable 'srcdir=../doc/' po4a/po4a.cfg
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+
+  install -dm0755 "$pkgdir/usr/lib/ld.so.conf.d/"
+  echo '/usr/lib/libfakeroot' > "$pkgdir/usr/lib/ld.so.conf.d/fakeroot.conf"
+
+  # install README for sysv/tcp usage
+  install -Dm0644 README "$pkgdir/usr/share/doc/$pkgname/README"
+}

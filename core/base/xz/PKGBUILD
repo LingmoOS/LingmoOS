@@ -1,0 +1,45 @@
+pkgname=xz
+pkgver=5.6.2
+pkgrel=1
+pkgdesc='Library and command line tools for XZ and LZMA compressed files'
+arch=('x86_64')
+url='https://tukaani.org/xz/'
+license=('GPL' 'LGPL' 'custom')
+depends=('sh')
+makedepends=('git' 'po4a' 'doxygen')
+provides=('liblzma.so')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=("git+https://github.com/tukaani-project/xz#tag=v${pkgver}")
+
+
+prepare() {
+  cd ${pkgname}
+
+  ./autogen.sh
+}
+
+build() {
+  cd ${pkgname}
+
+  ./configure \
+    --prefix=/usr \
+    --disable-rpath \
+    --enable-doxygen \
+    --enable-werror
+  make
+}
+
+check() {
+  cd ${pkgname}
+
+  make check
+}
+
+package() {
+  cd ${pkgname}
+
+  make DESTDIR="${pkgdir}" install
+
+  install -d -m0755 "${pkgdir}/usr/share/licenses/xz/"
+  ln -sf /usr/share/doc/xz/COPYING "${pkgdir}/usr/share/licenses/xz/"
+}

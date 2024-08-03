@@ -1,0 +1,51 @@
+pkgname=iproute2
+pkgver=6.10.0
+pkgrel=2
+pkgdesc='IP Routing Utilities'
+arch=('x86_64')
+license=('GPL2')
+url='https://git.kernel.org/pub/scm/network/iproute2/iproute2.git'
+depends=('glibc'
+         'libxtables.so' # from iptables or iptables-nft
+         'libcap' 'libcap.so'
+         'libelf'
+         'libbpf' 'libbpf.so')
+makedepends=('db5.3' 'linux-atm' 'iptables')
+optdepends=('db5.3: userspace arp daemon'
+            'linux-atm: ATM support'
+            'python: for routel')
+provides=('iproute')
+options=('staticlibs')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=("https://www.kernel.org/pub/linux/utils/net/${pkgname}/${pkgname}-${pkgver}.tar."{xz,sign}
+        '0001-make-iproute2-fhs-compliant.patch'
+        '0002-bdb-5-3.patch')
+
+prepare() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # set correct fhs structure
+  patch -Np1 -i "${srcdir}"/0001-make-iproute2-fhs-compliant.patch
+
+  # use Berkeley DB 5.3
+  patch -Np1 -i "${srcdir}"/0002-bdb-5-3.patch
+
+  # do not treat warnings as errors
+  sed -i 's/-Werror//' Makefile
+
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CFLAGS+=' -ffat-lto-objects'
+
+  ./configure
+  make DBM_INCLUDE='/usr/include/db5.3'
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" SBINDIR="/usr/bin" install
+}
