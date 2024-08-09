@@ -778,8 +778,7 @@ endif
 # mkdir -v $(TARGET_DIR)/var/lib/pacman/
 # mkdir -v $(TARGET_DIR)/var/lib/pacman/local/
 # mkdir -v $(TARGET_DIR)/var/lib/lpm/local/
-	cp -rv $(TOPDIR)/init/data_base/* $(TARGET_DIR)/var/lib/pacman/local/
-	cp -rv $(TOPDIR)/init/data_base/* $(TARGET_DIR)/var/lib/lpm/local/
+# cp -rv $(TOPDIR)/init/data_base/* $(TARGET_DIR)/var/lib/lpm/local/
 
 	# init rootfs
 	cp -v $(TOPDIR)/init/hooks/*.sh $(TARGET_DIR)/home/
