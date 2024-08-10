@@ -32,6 +32,14 @@ jobs:
 
       - name: Init build
         run: cp -v system/non-kernel .config
+
+      - name: Get Core Sources Code
+        run: |
+            rm -r core/lpm
+            git clone https://github.com/LingmoOS/lpm
+            tar -Jcvf lpm.tar.xz lpm/
+            mv lpm.tar.xz core/
+            rm -r lpm/
       
       - name: Build System
         run: make -j4
