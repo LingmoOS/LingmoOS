@@ -85,7 +85,7 @@
 #define SUN4I_TVE_TINT_BURST_PHASE_CHROMA(x)	(x)
 
 #define SUN4I_TVE_BURST_WIDTH_REG	0x114
-#define SUN4I_TVE_BURST_WIDTH_OCEANWAY(x)	((x) << 16)
+#define SUN4I_TVE_BURST_WIDTH_BREEZEWAY(x)	((x) << 16)
 #define SUN4I_TVE_BURST_WIDTH_BURST_WIDTH(x)	((x) << 8)
 #define SUN4I_TVE_BURST_WIDTH_HSYNC_WIDTH(x)	(x)
 
@@ -355,7 +355,7 @@ static void sun4i_tv_enable(struct drm_encoder *encoder,
 	regmap_write(tv->regs, SUN4I_TVE_BURST_WIDTH_REG,
 		     SUN4I_TVE_BURST_WIDTH_HSYNC_WIDTH(126) |
 		     SUN4I_TVE_BURST_WIDTH_BURST_WIDTH(68) |
-		     SUN4I_TVE_BURST_WIDTH_OCEANWAY(22));
+		     SUN4I_TVE_BURST_WIDTH_BREEZEWAY(22));
 
 	regmap_write(tv->regs, SUN4I_TVE_CB_CR_GAIN_REG,
 		     SUN4I_TVE_CB_CR_GAIN_CB(tv_mode->color_gains->cb) |

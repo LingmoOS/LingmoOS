@@ -48,3 +48,21 @@ jobs:
         run: |
             ls output/
             tree output/
+      
+      - name: Make release
+        run: |
+            tar -Jcvf build_output.tar.xz output/images/
+
+      - name: Read Upload
+        run: |
+            mkdir artifact/
+            # find build-sys -type f -name "*.iso" -exec mv {} artifact/ \;
+            sudo mv build_output.tar.xz artifact/
+
+      - name: Artifact - Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact
+          path: ${{ github.workspace }}/artifact/*
+          compression-level: 9 # maximum compression
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`

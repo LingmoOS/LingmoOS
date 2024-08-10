@@ -39,7 +39,7 @@
 #define	PCI_DEVICE_ID_LSI_SAS0073SKINNY		0x0073
 #define	PCI_DEVICE_ID_LSI_SAS0071SKINNY		0x0071
 #define	PCI_DEVICE_ID_LSI_FUSION		0x005b
-#define PCI_DEVICE_ID_LSI_LINGMO		0x002f
+#define PCI_DEVICE_ID_LSI_PLASMA		0x002f
 #define PCI_DEVICE_ID_LSI_INVADER		0x005d
 #define PCI_DEVICE_ID_LSI_FURY			0x005f
 #define PCI_DEVICE_ID_LSI_INTRUDER		0x00ce
@@ -2431,7 +2431,7 @@ struct megasas_instance {
 	struct timer_list sriov_heartbeat_timer;
 	char skip_heartbeat_timer_del;
 	u8 requestorId;
-	char LingmoFW111;
+	char PlasmaFW111;
 	char clusterId[MEGASAS_CLUSTER_ID_SIZE];
 	u8 peerIsPresent;
 	u8 passive;
@@ -2485,7 +2485,7 @@ struct MR_LD_VF_AFFILIATION {
 	struct MR_LD_VF_MAP map[1];
 };
 
-/* Lingmo 1.11 FW backward compatibility structures */
+/* Plasma 1.11 FW backward compatibility structures */
 #define IOV_111_OFFSET 0x7CE
 #define MAX_VIRTUAL_FUNCTIONS 8
 #define MR_LD_ACCESS_HIDDEN 15
