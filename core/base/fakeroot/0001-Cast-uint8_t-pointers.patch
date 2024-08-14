@@ -1,0 +1,36 @@
+From 2660e24756d2b89064b8879e4a376a2063c546e7 Mon Sep 17 00:00:00 2001
+From: Clint Adams <clint@debian.org>
+Date: Sun, 11 Aug 2024 17:35:58 -0400
+Subject: Cast uint8_t pointers.  closes: #1074365.
+
+---
+ communicate.c | 2 +-
+ faked.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/communicate.c b/communicate.c
+index 56eba7a..580ce63 100644
+--- a/communicate.c
++++ b/communicate.c
+@@ -576,7 +576,7 @@ void send_get_fakem(struct fake_msg *buf)
+                &fm,
+                sizeof(fm)-sizeof(fm.mtype),0,0);
+ 
+-      ptr = &fm;
++      ptr = (uint8_t *)&fm;
+       for (k=0; k<16; k++) {
+         magic_candidate = *(uint32_t*)&ptr[k];
+         if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
+diff --git a/faked.c b/faked.c
+index 6212a58..d6e1b50 100644
+--- a/faked.c
++++ b/faked.c
+@@ -1089,7 +1089,7 @@ void get_msg()
+   do {
+     r=msgrcv(msg_get,&fm,sizeof(struct fake_msg_buf),0,0);
+ 
+-    ptr = &fm;
++    ptr = (uint8_t *)&fm;
+     for (k=0; k<16; k++) {
+       magic_candidate = *(uint32_t*)&ptr[k];
+       if (magic_candidate == FAKEROOT_MAGIC_LE || magic_candidate == FAKEROOT_MAGIC_BE) {
