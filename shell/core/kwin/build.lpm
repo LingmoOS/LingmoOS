@@ -1,0 +1,89 @@
+# Maintainer: Lingmo OS Team <team@lingmo.org>
+
+pkgname=kwin
+pkgver=6.1.4
+_dirver=$(echo $pkgver | cut -d. -f1-3)
+pkgrel=1
+pkgdesc='An easy to use, but flexible, composited Window Manager'
+arch=(x86_64)
+url='https://kde.org/plasma-desktop/'
+license=(LGPL-2.0-or-later)
+depends=(gcc-libs
+         glibc
+         kcmutils
+         kcolorscheme
+         kconfig
+         kconfigwidgets
+         kcoreaddons
+         kcrash
+         kdbusaddons
+         kdeclarative
+         kdecoration
+         kglobalaccel
+         kglobalacceld
+         kguiaddons
+         ki18n
+         kidletime
+         kitemmodels
+         knewstuff
+         knotifications
+         kpackage
+         kquickcharts
+         kservice
+         ksvg
+         kwayland
+         kwidgetsaddons
+         kwindowsystem
+         lcms2
+         libdisplay-info
+         libdrm
+         libei
+         libepoxy
+         libinput
+         libpipewire
+         libqaccessibilityclient-qt6
+         libx11
+         libxcb
+         libxcvt
+         libxi
+         libxkbcommon
+         libxkbcommon-x11
+         mesa
+         pipewire-session-manager
+         libplasma
+         qt6-5compat
+         qt6-base
+         qt6-declarative
+         qt6-multimedia
+         qt6-sensors
+         qt6-tools
+         qt6-wayland
+         systemd-libs
+         wayland
+         xcb-util-cursor
+         xcb-util-keysyms
+         xcb-util-wm)
+makedepends=(extra-cmake-modules
+             kdoctools
+             krunner
+             plasma-wayland-protocols
+             python
+             wayland-protocols
+             xorg-xwayland)
+optdepends=('maliit-keyboard: virtual keyboard for kwin-wayland')
+groups=(lingmo)
+source=(https://download.kde.org/stable/plasma/$_dirver/$pkgname-$pkgver.tar.xz)
+install=$pkgname.install
+sha256sums=('SKIP')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+  cmake -B build  -S $pkgname-$pkgver \
+    -DCMAKE_INSTALL_LIBEXECDIR=lib \
+    -DBUILD_TESTING=OFF
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}

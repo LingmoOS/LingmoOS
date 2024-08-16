@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# 确保脚本在包含软件包的目录中运行
-
 for pkg in *.lpk; do
-    echo "正在签名: $pkg"
-    # 使用你的 GPG 密钥对软件包进行签名
+    echo "Signing: $pkg"
+
     gpg --detach-sign -o "$pkg".sig -a "$pkg"
     if [ $? -eq 0 ]; then
-        echo "签名成功: $pkg"
+        echo "Sign: $pkg"
     else
-        echo "签名失败: $pkg"
+        echo "Error: $pkg"
     fi
 done
