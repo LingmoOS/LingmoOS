@@ -66,3 +66,20 @@ jobs:
           path: ${{ github.workspace }}/artifact/*
           compression-level: 9 # maximum compression
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+
+  config_chroot:
+    steps:
+      - name: Unzip rootfs
+        run: |
+            mkdir -v workspace/
+            mv output/images/rootfs.tar.xz workspace/
+            cd workspace/
+            mkdir -v rootfs
+            tar -xvf rootfs.tar.xz -C rootfs/
+            cd ../
+      
+      - name: Config rootfs
+        run: |
+            cd workspace/
+            cp -v ../utils/init_chroot rootfs/home
+            arch-chroot rootfs /bin/bash -c "lpm -Syyu"
