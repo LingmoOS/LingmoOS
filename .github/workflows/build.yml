@@ -31,7 +31,7 @@ jobs:
         run: sudo apt install -y sudo tree arch-install-scripts dctrl-tools devscripts wget isolinux syslinux binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils make sed python3 cvs git mercurial subversion libncurses5 asciidoc w3m dblatex python3-aiohttp python3-matplotlib graphviz
 
       - name: Init build
-        run: cp -v system/non-kernel .config
+        run: cp -v configs/lingmo_pc_config .config
 
       - name: Get Core Sources Code
         run: |
@@ -65,21 +65,4 @@ jobs:
           name: artifact
           path: ${{ github.workspace }}/artifact/*
           compression-level: 9 # maximum compression
-          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-
-  config_chroot:
-    steps:
-      - name: Unzip rootfs
-        run: |
-            mkdir -v workspace/
-            mv output/images/rootfs.tar.xz workspace/
-            cd workspace/
-            mkdir -v rootfs
-            tar -xvf rootfs.tar.xz -C rootfs/
-            cd ../
-      
-      - name: Config rootfs
-        run: |
-            cd workspace/
-            cp -v ../utils/init_chroot rootfs/home
-            arch-chroot rootfs /bin/bash -c "lpm -Syyu"
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`s
