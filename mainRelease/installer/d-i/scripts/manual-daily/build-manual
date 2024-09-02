@@ -1,0 +1,430 @@
+#!/bin/bash
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+mainlog=$logdir/main.log
+
+DILLON_MANUAL_PATH=/srv/d-i.debian.org/www/doc/installation-guide
+
+# Remove xml-containing directories for po-based languages, since they will
+# confuse translation statistics for xml-based languages.
+# They will later be freshly generated anyway.
+# 
+# ! Include all po-based languages here !
+rm -fR $source/ca $source/cs $source/da $source/de $source/el $source/es $source/fi $source/fr $source/hu $source/id $source/it $source/ja $source/kab $source/ko $source/nb $source/nl $source/nn $source/pt $source/ro $source/ru $source/sv $source/tl $source/uk $source/vi $source/zh_CN $source/zh_TW
+
+usage() {
+    if [ "$@" ]; then
+        echo "Error: $@"
+        echo
+    fi
+    echo "Usage: $(basename $0) [-r|--retry|--restart] [language ...]"
+    echo "If any languages are specified, they will also be built if not updated."
+    exit 1
+}
+
+uses_po() {
+    local lang=$1
+
+    if [ -d "$source/po/$lang" ]; then
+        return 0
+    fi
+    return 1
+}
+
+is_updated() {
+    local lang=$1
+
+    if uses_po "$lang"; then
+        grepexp="^[[:space:]]po/${lang}/"
+    else
+        grepexp="^[[:space:]]${lang}/"
+    fi
+
+    if egrep -q $grepexp $logdir/git_pull.log; then
+        return 0
+    fi
+    return 1
+}
+
+global_build_options_changed() {
+    if egrep -q "^[[:space:]]build/" $logdir/git_pull.log; then
+        return 0
+    fi
+    return 1
+}
+
+do_extra() {
+    local lang
+    for lang in $EXTRA_LANGS; do
+        [ "$lang" = "$1" ] && return 0
+    done
+    return 1
+}
+
+update_templates() {
+    echo "Generating integrated XML files and POT files..."
+    ./scripts/merge_xml en
+    [ $? -ne 0 ] && return 1
+    ./scripts/update_pot
+    [ $? -ne 0 ] && return 1
+    return 0
+}
+
+update_po() {
+    ./scripts/update_po $1
+    return $?
+}
+generate_xml() {
+    ./scripts/create_xml $1
+    return $?
+}
+
+get_formats() {
+    formats=""
+    for format in html pdf ps txt; do
+        case $format in
+            html)  GETCOL=3;;
+            pdf)   GETCOL=4;;
+            ps)    GETCOL=5;;
+            txt)   GETCOL=6;;
+        esac
+        if [ "$(egrep "^$1[[:space:]]" $ROOT/bin/langlist | cut -f $GETCOL)" = "Y" ]; then
+            formats="$formats $format"
+        fi
+    done
+    echo "$(echo "$formats" | sed "s:^ ::")"
+}
+
+update_from_git() {
+    echo >>$mainlog
+    echo "Performing GIT update..." >>$mainlog
+    git pull >>$logdir/git_pull.log 2>&1
+    RESULT=$?
+    if [ ! $RESULT = 0 ]; then
+        echo "GIT pull failed with code $RESULT" >>$mainlog
+        echo >>$mainlog
+        cat $logdir/git_pull.log >>$mainlog
+        rm -f $ROOT/lockfile
+        exit 1
+    fi
+    if [ -n "$(git status -s -uno .)" ] ; then
+        echo
+    fi
+}
+
+commit_to_git() {
+    git diff --exit-code >$logdir/git_diff.log
+    GITDIFF=$?
+        if [ $GITDIFF == 0 ]; then
+            echo "No changes in manual/po|pot to be pushed to GIT..." >>$mainlog
+        else
+            echo "Committing/pushing changes in pot|po files to GIT..." >>$mainlog
+            git add */*.pot
+            git add */*.po
+            git commit -m "[SILENT_COMMIT] Update of POT and PO files for the installation-guide" >>$logdir/git_push.log 2>&1
+            git push
+        fi
+}
+
+build_lang() {
+    local lang=$1
+
+    BUILDRESULT=0
+    cd $source/build
+    if is_updated "$lang" || do_extra "$lang" || [ "$EN_UPDATED" ]; then
+        case "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 2)" in
+            Y)
+                formats=$(get_formats $lang)
+                echo "Language $lang - full build: $formats" >>$mainlog
+                buildarchs=$architectures
+                ;;
+            S)
+                formats=$(get_formats $lang)
+                echo "Language $lang - partial build: $formats" >>$mainlog
+                buildarchs="amd64"
+                ;;
+            N)
+                echo "Language $lang - updated; not building" >>$mainlog
+                continue
+                ;;
+            *)
+                echo "Language $lang - invalid build indication $BUILDIND" >>$mainlog
+                continue
+                ;;
+        esac
+        if ! egrep -q $grepexp $logdir/git_pull.log; then
+            echo "NOTE: extra build!" >>$mainlog
+        fi
+
+        if [ -z "$formats" ]; then
+            echo "No output formats specified for $lang" >>$mainlog
+            continue
+        fi
+
+        langlog=$logdir/$lang.log
+        echo "Starting build for language $lang - $(date -u)" >>$langlog
+        echo >>$langlog
+
+        for arch in $buildarchs; do
+            destsuffix="${lang}.${arch}"
+            if [ $BUILDRESULT = 0 ]; then
+                echo "Building installation-guide for $arch" >>$langlog
+                echo -n "  $arch" >>$mainlog
+
+                ./buildone.sh "$arch" "$lang" "$formats" &>$langlog.arch
+                RESULT=$?
+
+                cat $langlog.arch >>$langlog
+                echo >>$langlog
+                case $RESULT in
+                    0|2)
+                        if [ $RESULT = 2 ]; then
+                            # Check if at least html was built correctly; if not, we won't upload
+                            # As index.html is the last file created, we check that
+                            if [ -s build.out/html/index.html ]; then
+                                echo "Error: error building some output format(s) for '$arch'" >>$langlog
+                                echo "  Error: error building some output format(s) for '$lang.$arch'" >>$mainlog
+                            else
+                                BUILDRESULT=1
+                                echo "Error: error building html output for '$arch'" >>$langlog
+                                echo "  Error: error building html output format for '$lang.$arch'" >>$mainlog
+                            fi
+                        fi
+                        ;;
+                    *)
+                        BUILDRESULT=1
+                        echo "Errors while building installation-guide for $arch" >>$langlog
+                        ;;
+                esac
+                if [ $BUILDRESULT = 0 ]; then
+                    mkdir "$destination/$destsuffix"
+                    # First copy placeholder docs for pdf and txt
+                    echo $formats | grep -q "pdf" && \
+                        cp $ROOT/bin/nopdf.pdf "$destination/$destsuffix/install.$lang.pdf"
+                    echo $formats | grep -q "txt" && \
+                        cp $ROOT/bin/notxt.txt "$destination/$destsuffix/install.$lang.txt"
+                    # Next copy the real documents
+                    mv ./build.out/html/* "$destination/$destsuffix"
+                    mv ./build.out/install.$lang.* "$destination/$destsuffix"
+                else
+                    echo "Note: remaining architectures will not be built" >>$langlog
+                    echo >>$langlog
+                    echo >>$mainlog
+                    echo "  Error: fatal error building installation-guide for $lang.$arch" >>$mainlog
+                fi
+                ./clear.sh
+
+            else
+                echo "*** Not building installation-guide for $lang.$arch" >>$langlog
+            fi
+        done
+
+        rm $langlog.arch
+        [ $BUILDRESULT = 0 ] && echo >>$mainlog
+
+        # Check if any architectures have actually been built
+        if ls $destination | grep -q "$lang\."; then
+            NR_BUILDS=$(($NR_BUILDS + 1))
+        fi
+
+    else
+        echo "No updates for $lang" >>$mainlog
+    fi
+    return $BUILDRESULT
+}
+
+# We want the installation-guide files group writable
+umask 0002
+
+RETRY=""
+EXTRA_LANGS=""
+while true; do
+    case $1 in
+        "")
+            break ;;
+        -r|--retry|--restart)
+            RETRY=1 ;;
+        -*)
+            usage "unrecognized option '$1'" ;;
+        *)
+            EXTRA_LANGS="$EXTRA_LANGS $1" ;;
+    esac
+    shift
+done
+
+for lang in $EXTRA_LANGS; do
+    if ! grep -q "^${lang}[[:space:]]" $ROOT/bin/langlist; then
+        usage "unknown language '$lang'"
+    fi
+done
+
+if [ "$RETRY" ]; then
+    rm -f $ROOT/do_not_build
+fi
+
+[ -f $ROOT/do_not_build ] && exit 1
+[ -f $ROOT/lockfile ] && exit 1 || touch $ROOT/lockfile
+
+[ -e "$source" ] && cd $source || exit 1
+
+[ -f $ROOT/bin/langlist ] || exit 1
+[ -f $ROOT/bin/archlist ] || exit 1
+
+# Order of translations is order in list
+translations=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | cut -f 1 | \
+	grep -v "^en$")
+
+# Order of architectures is order in list
+architectures=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | cut -f 1)
+
+## Create directories
+[ -e "$destination" ] || mkdir -p "$destination"
+[ -e "$logdir" ] || mkdir -p "$logdir"
+
+## Clean old files
+rm -R $destination/* &>/dev/null
+
+if [ "$DI_BUILDING_FROM_MAIN" ] && [ "$DI_BUILD_MANUAL" = 0 ]; then
+    echo "Not building D-I installation-guide (as per configuration settings)" >$mainlog
+    rm -f $ROOT/lockfile
+    exit 0
+elif [ -z "$RETRY" ]; then
+    : >$logdir/git_pull.log
+    : >$logdir/git_push.log
+    echo "Starting D-I installation-guide build -- $(date -u)" >$mainlog
+else
+    echo >>$mainlog
+    echo >>$mainlog
+    echo "Starting D-I installation-guide build (RETRY) -- $(date -u)" >>$mainlog
+fi
+
+update_from_git
+echo >>$mainlog
+
+NR_BUILDS=0
+
+# Build the installation-guide for English
+EN_UPDATED=""
+if is_updated en || global_build_options_changed; then
+    EN_UPDATED=1
+    langlog=$logdir/en.log
+    : >$langlog
+    echo "Info: installation-guide for en has been changed" >>$mainlog
+    echo "Preparing build for language $lang - $(date -u)" >>$langlog
+    echo "Info: building installation-guide from XML files" >>$langlog
+
+    build_lang en
+    echo >>$mainlog
+fi
+
+# Do we need to merge the XML and update the POT files?
+cd $source
+if is_updated en || [ ! -d "$source/integrated/en" ] || global_build_options_changed; then
+    update_templates >>$mainlog 2>&1
+    echo >>$mainlog
+
+# Extract release codename for example-preseed from entity file
+export manual_release="`grep "releasename " $source/build/entities/common.ent | awk '{print $3}' | cut -d'"' -f2`"
+export manual_target="for_dillon"
+
+    # Extract preconfiguration example from the installation-guide
+    cd $source/build
+    PRESEED="../en/appendix/preseed.xml"
+    if [ -f $PRESEED ] && [ -x preseed.pl ]; then
+        echo '#_preseed_V1' >$destination/example-preseed.txt
+        ./preseed.pl -r $manual_release $PRESEED >>$destination/example-preseed.txt
+        echo "Extracting example-preseed.txt for $manual_release from installation-guide" >>$mainlog
+        echo >>$mainlog
+    fi
+    cd ..
+fi
+
+# Prepare for the build of translations
+echo "Updating POT and PO files..." >>$mainlog
+for lang in $translations; do
+    langlog=$logdir/$lang.log
+    : >$langlog
+
+    if is_updated "$lang" || do_extra "$lang" || [ "$EN_UPDATED" ]; then
+        echo "Preparing build for language $lang - $(date -u)" >>$langlog
+    fi
+
+    # For translations, we may need to update PO and generate XML files
+    # PO files are updated for all translations if there was an update for English
+    if [ -d "./po/$lang" ]; then
+        if is_updated "$lang" || [ "$EN_UPDATED" ]; then
+            echo "Info: updating PO files for $lang" >>$mainlog
+            update_po $lang >>$langlog 2>&1
+        fi
+    fi
+
+    if is_updated "$lang" || do_extra "$lang" || [ "$EN_UPDATED" ]; then
+        if uses_po "$lang"; then
+            echo "Info: building installation-guide from PO files" >>$langlog
+            generate_xml $lang >>$langlog 2>&1
+            echo "Info: generation of XML files complete" >>$langlog
+        else
+            echo "Info: building installation-guide from XML files" >>$langlog
+        fi
+        echo >>$langlog
+    fi
+done
+
+echo >>$mainlog
+# Commit updates to POT and PO files to GIT
+if [ "$DI_LOCAL_BUILD" = 1 ]; then
+    echo "Local build! Changes to POT/PO files are not committed/pushed to GIT." >>$mainlog
+else
+    commit_to_git
+fi
+
+echo >>$mainlog
+# Build translations
+for lang in $translations; do
+    build_lang $lang
+done
+
+echo >>$mainlog
+# Copy the created files (if any) to www dir
+if [ $NR_BUILDS -gt 0 ]; then
+    echo "$NR_BUILDS languages have been (partially) built." >>$mainlog
+    cat $mainlog
+
+    echo >>$mainlog
+    echo "Create index page:" >>$mainlog
+    $ROOT/bin/create-index
+
+    echo >>$mainlog
+    cd $destination
+
+    if [ "$DI_LOCAL_BUILD" = 1 ]; then
+        echo "Local build! No changes have been permanently saved." >>$mainlog
+    else
+       # Copy to www dir
+       cp -Ru $destination/* $DILLON_MANUAL_PATH
+       rm -rf $destination/*
+    fi
+else
+    echo "No languages built." >>$mainlog
+fi
+
+# Clean up some
+find $source/po -name "*.po~" -exec rm {} +
+if [ "$DI_LOCAL_BUILD" = 1 ]; then
+	# Needed to avoid conflicts with next git pull
+        echo "Reverting changes in PO files..." >>$mainlog
+        cd $source/po
+	git checkout -- */*.po >>$mainlog 2>&1
+fi
+
+echo >>$mainlog
+echo "Done -- $(date -u)" >>$mainlog
+rm -f $ROOT/lockfile
+
+# Copy logfiles to www dir
+mkdir -p $DILLON_MANUAL_PATH/logs
+cp -u $logdir/* $DILLON_MANUAL_PATH/logs
+
+exit 0

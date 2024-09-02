@@ -1,0 +1,42 @@
+#!/bin/sh
+set -e
+
+# install-info has an unstable sort order when a new section is added
+# Fixed by https://git.savannah.gnu.org/cgit/texinfo.git/commit/?id=01b5a4b9c33bef08feae041c221f820a1c76749f
+#
+# The postinst-hook of install-info depends on the natural order of the
+# filesystem and deletes the existing dir file beforehand.
+# Installing the same info.gz file again follows a different code path,
+# which has a stable sort order
+
+# Don't run if install-info is not installed
+if [ ! -x /usr/bin/install-info ];
+then
+  exit 0
+fi
+
+# Don't run if install-info is sufficiently new
+if dpkg --compare-versions $(dpkg-query --show --showformat '${Version}\n' install-info | head -1) gt 7.2~;
+then
+  exit 0
+fi
+
+# Keep the original file
+cp /usr/share/info/dir /tmp/before
+
+# dir, dircolors, dirname / pr, printenv, printf / tr, true, truncate / who, whoami
+install-info /usr/share/info/coreutils.info.gz /usr/share/info/dir
+# diff, diff3
+install-info /usr/share/info/diffutils.info.gz /usr/share/info/dir
+# dirmngr, dirmngr-client
+if [ -e /usr/share/info/gnupg.info.gz ];
+then
+  install-info /usr/share/info/gnupg.info.gz /usr/share/info/dir
+fi
+
+# Only report when the hook has made a difference
+if ! diff /tmp/before /usr/share/info/dir > /dev/null;
+then
+  echo "P: $(basename $0) Reproducible hook has been applied"
+fi
+rm -f /tmp/before

@@ -1,0 +1,588 @@
+'\" t
+.\" $Id: cdk_matrix.3,v 1.30 2019/02/15 00:49:43 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_matrix 3
+.SH NAME
+.XX activateCDKMatrix
+.XX cleanCDKMatrix
+.XX cleanCDKMatrixCell
+.XX destroyCDKMatrix
+.XX drawCDKMatrix
+.XX eraseCDKMatrix
+.XX getCDKMatrixBox
+.XX getCDKMatrixCell
+.XX getCDKMatrixCol
+.XX getCDKMatrixRow
+.XX injectCDKMatrix
+.XX jumpToCell
+.XX moveToCDKMatrixCell
+.XX newCDKMatrix
+.XX setCDKMatrix
+.XX setCDKMatrixBackgroundAttrib
+.XX setCDKMatrixBackgroundColor
+.XX setCDKMatrixBox
+.XX setCDKMatrixBoxAttribute
+.XX setCDKMatrixCB
+.XX setCDKMatrixCell
+.XX setCDKMatrixCells
+.XX setCDKMatrixHorizontalChar
+.XX setCDKMatrixLLChar
+.XX setCDKMatrixLRChar
+.XX setCDKMatrixPostProcess
+.XX setCDKMatrixPreProcess
+.XX setCDKMatrixULChar
+.XX setCDKMatrixURChar
+.XX setCDKMatrixVerticalChar
+cdk_matrix \- curses matrix widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKMatrix ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype * " "actions");
+.TP 15
+.B "void cleanCDKMatrix ("
+.BI "CDKMATRIX *" "matrix");
+.TP
+.B "void cleanCDKMatrixCell ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "row",
+.BI "int " "col");
+.TP 15
+.B "void destroyCDKMatrix ("
+.BI "CDKMATRIX *" "matrix");
+.TP 15
+.B "void drawCDKMatrix ("
+.BI "CDKMATRIX *" "matrix",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKMatrix ("
+.BI "CDKMATRIX *" "matrix");
+.TP 15
+.B "boolean getCDKMatrixBox ("
+.BI "CDKMENTRY *" "matrix");
+.TP 15
+.B "char * getCDKMatrixCell ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "row",
+.BI "int " "col");
+.TP 15
+.B "int getCDKMatrixCol ("
+.BI "CDKMENTRY *" "matrix");
+.TP 15
+.B "int getCDKMatrixRow ("
+.BI "CDKMENTRY *" "matrix");
+.TP 15
+.B "int injectCDKMatrix ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "input");
+.TP 15
+.B "int jumpToCell ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "row",
+.BI "int " "col");
+.TP 15
+.B "void moveCDKMatrix ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "int moveToCDKMatrixCell ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "row",
+.BI "int " "col");
+.TP 15
+.B "CDKMATRIX *newCDKMatrix ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "screenRows",
+.BI "int " "screenCols",
+.BI "int " "actualRows",
+.BI "int " "actualCols",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "rowTitles",
+.BI "CDK_CONST char **" "colTitles",
+.BI "int *" "columnWidths",
+.BI "int *" "columnTypes",
+.BI "int " "rowSpace",
+.BI "int " "colSpace",
+.BI "chtype " "filler",
+.BI "int " "dominantAttribute",
+.BI "boolean " "boxMatrix",
+.BI "boolean " "boxCell",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKMatrix ("
+.BI "CDKMATRIX *" "matrix");
+.TP 15
+.B "void setCDKMatrix ("
+.BI "CDKMATRIX *" "matrix",
+.BI "char *" "info"[MAX_MATRIX_ROWS][MAX_MATRIX_COLS],
+.BI "int " "rows",
+.BI "int *" "columnLengths");
+.TP 15
+.B "void setCDKMatrixBackgroundAttrib ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKMatrixBackgroundColor ("
+.BI "CDKMATRIX *" "matrix",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKMatrixBox ("
+.BI "CDKMENTRY *" "matrix",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDKMatrixBoxAttribute ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixCB ("
+.BI "CDKMATRIX *" "matrix",
+.BI "MATRIXCB " "callbackFunction");
+.TP 15
+.B "int setCDKMatrixCell ("
+.BI "CDKMATRIX *" "matrix",
+.BI "int " "row",
+.BI "int " "col",
+.BI "const char *" "value");
+.TP 15
+.B "void setCDKMatrixCells ("
+.BI "CDKMATRIX *" "matrix",
+.BI "CDK_CONST char **" "info",
+.BI "int " "rows",
+.BI "int " "cols",
+.BI "int *" "columnLengths");
+.TP 15
+.B "void setCDKMatrixHorizontalChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixLLChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixLRChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixPostProcess ("
+.BI "CDKMATRIX *" "matrix",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMatrixPreProcess ("
+.BI "CDKMATRIX *" "matrix",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMatrixULChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixURChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMatrixVerticalChar ("
+.BI "CDKMATRIX *" "matrix",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk matrix widget creates a matrix widget.
+The following are functions which
+create or manipulate the Cdk matrix box widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKMatrix
+activates the matrix widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBmatrix\fR is a pointer to a non-NULL matrix widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.IP
+If the character
+entered into this widget is \fIRETURN\fR then this function will return 1.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this widget was \fIESCAPE\fR then the widget
+will return a value of -1 and the widget data \fIexitType\fR will be
+set to \fIvESCAPE_HIT\fR.
+.bP
+The matrix cell contents can be retrieved by using
+the \fBinfo\fR array of the matrix widget.
+.RE
+.TP 5
+.B cleanCDKMatrix
+clears the information from all cells of the matrix.
+.TP
+.B cleanCDKMatrixCell
+clears the information from the specified cell of the matrix.
+.TP 5
+.B destroyCDKMatrix
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKMatrix
+draws the matrix widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKMatrix
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKMatrixBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKMatrixCell
+returns the contents of the cell located by the \fBrow\fR and \fBcol\fR pair.
+.TP 5
+.B getCDKMatrixCol
+returns the current column index.
+.TP 5
+.B getCDKMatrixRow
+returns the current row index.
+.TP 5
+.B injectCDKMatrix
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBmatrix\fR is a pointer to a non-NULL matrix widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+1.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.bP
+The matrix cell contents can be retrieved by
+using the \fBinfo\fR array of the matrix widget.
+.RE
+.TP 5
+.B jumpToCell
+provides an interactive method of moving to a cell.
+It pops up a
+scale widget and asks which cell the user wants to go to.
+Then it performs the jump.
+.TP 5
+.B moveCDKMatrix
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+.IP
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B moveToCDKMatrixCell
+jumps to the given cells dictated by the parameters \fBrow\fR and \fBcol\fR.
+It returns a value of \fITRUE\fR or \fIFALSE\fR depending if
+the move was successful.
+.TP 5
+.B newCDKMatrix
+creates a matrix widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBscreenRows\fR and
+.TP 5
+\fBscreenCols\fR
+are the number of rows and
+columns to be displayed on the screen respectively.
+.TP 5
+\fBactualRows\fR and
+.TP 5
+\fBactualCols\fR
+are the number of actual rows and columns the matrix has.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBrowTitles\fR and
+.TP 5
+\fBcolTitles\fR
+are the titles along the row and columns respectively.
+.TP 5
+\fBcolumnWidths\fR
+is an array of integers stating how wide the individual columns are to be.
+.TP 5
+\fBcolumnTypes\fR
+is an array of integers
+which correspond to the individual column display types.
+The values of the array should be assigned a value of type \fIEDisplayType\fR.
+See \fBcdk_display (3)\fR for legal values of \fIEDisplayType\fR.
+.TP 5
+\fBrowSpace\fR and
+.TP 5
+\fBcolSpace\fR
+dictate how much white space is to be between rows and columns respectively.
+.TP 5
+\fBfiller\fR
+is the character to use in empty space within a cell.
+.TP 5
+\fBdominantAttribute\fR
+states which (the rows or the columns)
+will have the dominant character attributes.
+This is stated when a cell has
+both a row attribute and a column attribute.
+.IP
+If the value of the parameter
+\fBdominantAttribute\fR is set to \fBROW\fR then the attribute of the row
+will be displayed.
+If it is set to \fBCOL\fR then the column's attributes
+will be displayed instead.
+.TP 5
+\fBboxMatrix\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBboxCell\fR
+is true if the individual cells should have boxes drawn around them.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKMatrix
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKMatrix
+lets the programmer modify certain elements of an existing matrix widget.
+.RS
+.bP
+The parameter \fBinfo\fR is an array of \fIchar *\fR which
+contains the cell information.
+.bP
+The parameter \fBrows\fR has the number of rows
+.bP
+the parameter \fBinfo\fR contains,
+.bP
+\fBcolumnLengths\fR has the lengths of
+the individual columns in \fBinfo\fR.
+.RE
+.IP
+Do not use this function.
+It is obsolete, provided only for compatibility with older versions of CDK.
+Use \fBsetCDKMatrixCells\fP.
+.TP 5
+.B setCDKMatrixBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKMatrixBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKMatrixBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKMatrixBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKMatrixCB
+allows the programmer to set a different widget input handler.
+The parameter \fBcallbackFunction\fR is of type \fIMATRIXCB\fR.
+The default function is \fICDKMatrixCallBack\fR.
+.TP 5
+.B setCDKMatrixCell
+sets the contents of the cell located by the \fBrow\fR and \fBcol\fR pair.
+The value of the cell will be set to \fBvalue\fR.
+.TP
+.B setCDKMatrixCells,
+lets the programmer initialize elements of an existing matrix widget.
+.bP
+The parameter \fBinfo\fR is an array of \fIchar *\fR which
+contains the cell information.
+.RS
+.bP
+The parameter \fBrows\fR has the number of rows
+.bP
+The parameter \fBcols\fR has the number of columns
+.bP
+The parameter \fBinfo\fR contains, while \fBcolumnLengths\fR has the lengths of
+the individual columns in \fBinfo\fR.
+.RE
+.TP 5
+.B setCDKMatrixHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKMatrixLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMatrixLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMatrixPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMatrixPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMatrixULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMatrixURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMatrixVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/Moves one cell to the left.
+Right Arrow/Moves the cell to the right.
+Tab/Moves the cell to the right.
+Up Arrow/Moves one cell up.
+Down Arrow/Moves one cell down.
+Next Page/Moves one page forward.
+Ctrl-F/Moves one page forward.
+Prev Page/Moves one page backward.
+Ctrl-B/Moves one page backward.
+Ctrl-G/T{
+Calls the function \fBjumpToCell\fR and requests which cell the user wishes to jump to.
+T}
+Ctrl-P/T{
+Pastes whatever is in the paste buffer, into the current cell.
+T}
+Ctrl-K/T{
+Cuts the contents from the current cell and saves a copy in the paste buffer.
+T}
+Ctrl-T/T{
+Copies the contents of the current cell into the paste buffer.
+T}
+Ctrl-E/Erases the contents of the current cell.
+Delete/T{
+Deletes the character before the cursor, moves cursor left.
+There is no function to delete the character at the cursor since there
+are no functions for moving the cursor within the edited text.
+T}
+Backspace/T{
+Deletes the character before cursor, moves cursor left.
+T}
+Ctrl-H/Deletes the character before the cursor.
+Return/T{
+Exits the widget and returns 1.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns -1.
+This also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

@@ -1,0 +1,520 @@
+'\" t
+.\" $Id: cdk_alphalist.3,v 1.30 2019/02/15 00:28:31 tom Exp $"
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_alphalist 3
+.SH NAME
+.XX activateCDKAlphalist
+.XX destroyCDKAlphalist
+.XX drawCDKAlphalist
+.XX eraseCDKAlphalist
+.XX getCDKAlphalistBox
+.XX getCDKAlphalistContents
+.XX getCDKAlphalistCurrentItem
+.XX getCDKAlphalistFillerChar
+.XX getCDKAlphalistHighlight
+.XX injectCDKAlphalist
+.XX moveCDKAlphalist
+.XX newCDKAlphalist
+.XX positionCDKAlphalist
+.XX setCDKAlphalist
+.XX setCDKAlphalistBackgroundAttrib
+.XX setCDKAlphalistBackgroundColor
+.XX setCDKAlphalistBox
+.XX setCDKAlphalistBoxAttribute
+.XX setCDKAlphalistContents
+.XX setCDKAlphalistCurrentItem
+.XX setCDKAlphalistFillerChar
+.XX setCDKAlphalistHighlight
+.XX setCDKAlphalistHorizontalChar
+.XX setCDKAlphalistLLChar
+.XX setCDKAlphalistLRChar
+.XX setCDKAlphalistPostProcess
+.XX setCDKAlphalistPreProcess
+.XX setCDKAlphalistULChar
+.XX setCDKAlphalistURChar
+.XX setCDKAlphalistVerticalChar
+cdk_alphalist \- curses sorted list widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "char *activateCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype *" "actions");
+.TP 15
+.B "void destroyCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "void drawCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "boolean getCDKAlphalistBox ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "char **getCDKAlphalistContents ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "int *" "size");
+.TP 15
+.B "int getCDKAlphalistCurrentItem ("
+.BI "CDKALPHALIST *" "widget");
+.TP 15
+.B "chtype getCDKAlphalistFillerChar ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "chtype getCDKAlphalistHighlight ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "char *injectCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKALPHALIST *newCDKAlphalist ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "const char * " "title",
+.BI "const char * " "label",
+.BI "CDK_CONST char ** " "list",
+.BI "int " "listSize",
+.BI "chtype " "fillerCharacter",
+.BI "chtype " "highlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist");
+.TP 15
+.B "void setCDKAlphalist ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "CDK_CONST char ** " "list",
+.BI "int " "listSize",
+.BI "chtype " "fillerCharacter",
+.BI "chtype " "highlight",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKAlphalistBackgroundAttrib ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKAlphalistBackgroundColor ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKAlphalistBox ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKAlphalistBoxAttribute ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistContents ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "CDK_CONST char ** " "list",
+.BI "int " "listSize");
+.TP 15
+.B "void setCDKAlphalistCurrentItem ("
+.BI "CDKALPHALIST *" "widget",
+.BI "int " "item");
+.TP 15
+.B "void setCDKAlphalistFillerChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "fillerCharacter");
+.TP 15
+.B "void setCDKAlphalistHighlight ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKAlphalistHorizontalChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistLLChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistLRChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistPostProcess ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKAlphalistPreProcess ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKAlphalistULChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistURChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKAlphalistVerticalChar ("
+.BI "CDKALPHALIST *" "alphalist",
+.BI "chtype " "character");
+.SH DESCRIPTION
+The Cdk alphalist allows a user to select from a list of alphabetically
+sorted words.
+The user can use the arrow keys to traverse through the
+list or type in the beginning of the word and the list will automatically
+adjust itself in the correct place in the scrolling list.
+This widget,
+like the file selector widget, is a compound widget of both the entry
+field widget and the scrolling list widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKAlphalist
+activates the alphalist widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBalphalist\fR is a pointer to a non-NULL alphalist widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the
+characters in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR then this function will return a \fIchar *\fR
+of the information which was typed in the field.
+.IP
+If the \fITAB\fR character is hit
+then the widget will try to complete the word in the entry field.
+.IP
+If the widget
+is exited with the \fIRETURN\fR character then the widget data \fIexitType\fR
+will be set to \fIvNORMAL\fR.
+.IP
+If the widget was exited with the \fIESCAPE\fR key
+then the widget data \fIexitType\fR will be set to \fIvESCAPE_HIT\fR and
+the widget returns \fINULL\fR.
+.TP 5
+.B destroyCDKAlphalist
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKAlphalist
+draws the alphalist widget on the screen.
+.IP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKAlphalist
+removes the widget from the screen.
+This does \fINOT\fR destroy
+the widget.
+.TP 5
+.B getCDKAlphalistBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKAlphalistContents
+returns the contents of the alphalist.
+.TP 5
+.B getCDKAlphalistCurrentItem
+returns the current position in the scroll-widget.
+.TP 5
+.B getCDKAlphalistFillerChar
+returns the character being used as the filler character in the
+entry field portion of the widget.
+.TP 5
+.B getCDKAlphalistHighlight
+returns the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP 5
+.B injectCDKAlphalist
+injects a single character into the widget (actually the entry widget).
+.RS
+.bP
+The parameter \fBalphalist\fR is a pointer to a non-NULL alphalist widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+the information in the entry field.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+a \fINULL\fR pointer.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+a \fINULL\fR pointer.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKAlphalist
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer,
+or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+The final parameter \fBrefresh\fR is a boolean value
+which states whether the widget will get refreshed after the move.
+.TP 5
+.B newCDKAlphalist
+creates a pointer to an alphalist widget.
+Parameters:
+.RS
+.bP
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.bP
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+This parameter
+can take an integer or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+\fBypos\fR
+controls the placement
+of the object along the vertical axis.
+This parameter may be an integer value,
+or one of the pre-defined values \fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+\fBheight\fR and
+\fBwidth\fR
+control the height and width of the widget.
+If you provide a value of zero for either of the height or the width,
+the widget will be created with the full width and height of the screen.
+If you provide a negative value, the widget will be created the full height
+or width minus the value provided.
+.bP
+\fBtitle\fR
+is the string which will be displayed at the top of the scrolling list.
+The title can be more than one
+line; just provide a carriage return character at the line break.
+.bP
+\fBlabel\fR
+is the string which will be displayed in the label of the entry field.
+.bP
+\fBlist\fR
+is the list of words which will be displayed in the
+scrolling list.
+This list does not have to be sorted, this widget automatically
+sorts the list
+(note that it modifies the caller's copy of the list to do this).
+.bP
+\fBlistSize\fR
+tells the widget how large the word list is.
+.bP
+\fBfillerCharacter\fR
+is the character which is to be displayed in an empty space in the entry field.
+.bP
+\fBhighlight\fR
+is the attribute of the highlight bar in the scrolling list.
+.bP
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.bP
+\fBshadow\fR
+is true to turn the shadow on around this widget.
+.RE
+.IP
+If the
+widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKAlphalist
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKAlphalist
+lets the programmer modify certain elements of an existing alphalist widget.
+.IP
+The parameter names correspond to the same parameter
+names listed in the \fBnewCDKAlphalist\fR function.
+.TP 5
+.B setCDKAlphalistBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKAlphalistBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKAlphalistBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKAlphalistBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKAlphalistContents
+sets the contents of the alphalist widget
+(note that it sorts the caller's copy of the list).
+.TP 5
+.B setCDKAlphalistCurrentItem
+set the current position in the scroll-widget.
+.TP 5
+.B setCDKAlphalistFillerChar
+sets the character to use when drawing the entry field portion of the widget.
+.TP 5
+.B setCDKAlphalistHighlight
+sets the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP 5
+.B setCDKAlphalistHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKAlphalistLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKAlphalistLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKAlphalistPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKAlphalistPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKAlphalistULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKAlphalistURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKAlphalistVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+Since this widget is
+built from both the scrolling list widget and the entry field widget, the key
+bindings are the same for the respective fields.
+The extra key bindings are
+listed below.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Up Arrow/T{
+Scrolls the scrolling list up one line.
+T}
+Down Arrow/T{
+Scrolls the scrolling list down one line.
+T}
+Page Up/T{
+Scrolls the scrolling list up one page.
+T}
+CTRL-B/T{
+Scrolls the scrolling list up one page.
+Page Down/Scrolls the scrolling list down one page.
+T}
+CTRL-F/T{
+Scrolls the scrolling list down one page.
+T}
+Tab/T{
+Tries to complete the word in the entry field.
+If the word segment is not unique then the
+widget will beep and present a list of close matches.
+T}
+Return/T{
+Returns the word in the entry field.
+It also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns a \fINULL\fR pointer.
+It also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)
+.SH NOTES
+.PP
+This widget is created from the scrolling list widget
+and the entry field widget.
+This is a good example on how to build your own widgets using the
+base widgets provided in this distribution.

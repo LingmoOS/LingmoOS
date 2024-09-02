@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+############################################################################
+# Copyright (c) 2006 O.S. Systems
+#
+# Author: Otavio Salvador <otavio@ossystems.com.br>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+############################################################################
+
+from optparse import OptionParser
+import serial
+
+def check_status(port, num):
+    port.write("s")
+    
+    return map(lambda x: x.endswith('1') , port.read(39).split())[int(num)-1] == True
+
+parser = OptionParser(usage="serial-control <options> arg1")
+parser.add_option("-o", "--power-on", dest="on_port",
+                  help="power on the machine NUMBER", metavar="NUMBER")
+parser.add_option("-f", "--power-off", dest="off_port",
+                  help="power off the machine NUMBER", metavar="NUMBER")
+parser.add_option("-s", "--status", dest="status_port",
+                  help="get the status of machine NUMBER", metavar="NUMBER")
+
+(options, args) = parser.parse_args()
+
+port = serial.Serial('/dev/ttyS0')
+if options.on_port:
+    machine = int(options.on_port)
+    print "Machine %s now is ON." % machine
+    if check_status(port, options.on_port) == False:
+        port.write(options.on_port)
+
+if options.off_port:
+    machine = int(options.off_port)
+    print "Machine %s now is power OFF." % machine
+    if check_status(port, options.off_port) == True:
+        port.write(options.off_port)
+
+if options.status_port:
+    status = check_status(port, options.status_port) and "ON" or "OFF"
+    print "Current status of machine %s is %s." % (options.status_port, status)

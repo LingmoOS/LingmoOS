@@ -1,0 +1,47 @@
+#!/usr/bin/expect
+# Expect script to run for interactive first stage debian-edu installs.
+
+spawn -noecho $env(CONSOLECOMMAND)
+
+set timeout $env(STAGE_1_MAX_TIME)
+
+expect {
+	-re "ep.*failed" {
+		exit 1
+	} "English" {
+		sleep 1
+		send "\r"
+		exp_continue -continue_timer
+	} -re "<Go.*Back>" {
+		sleep 1
+		send "\r"
+		exp_continue -continue_timer
+	} "<Cont" {
+		# Needed for the long message before profile selection.
+		sleep 1
+		send "\r"
+		exp_continue -continue_timer
+	} -re "Choose.*Debian.*Edu.*profile" {
+		# Pick the first one, main-server. TODO: parameterise
+		sleep 1
+		send " \t\r"
+		exp_continue -continue_timer
+	} -re "use.*the.*automatic.*partit" {
+		# Move over to the yes button.
+		sleep 1
+		puts "select yes\n"
+		send "\[D\r"
+		exp_continue -continue_timer
+	} -re "down.*NOW" {
+		exit
+	} -re "Sending.*SIGTERM" {
+		exit
+	} -re "rebooting.*the.*system." {
+		exit
+	} timeout {
+		puts "timeout!"
+		exit 1
+	}
+}
+
+exit

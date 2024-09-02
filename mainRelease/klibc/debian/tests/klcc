@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+cat >"$AUTOPKGTEST_TMP/hello.c" <<EOF
+#include <stdio.h>
+int main(void)
+{
+    printf("Hello world\n");
+}
+EOF
+
+klcc "$AUTOPKGTEST_TMP/hello.c" -o "$AUTOPKGTEST_TMP/hello"
+"$AUTOPKGTEST_TMP/hello" >"$AUTOPKGTEST_TMP/hello.out"
+grep -F 'Hello world' "$AUTOPKGTEST_TMP/hello.out"

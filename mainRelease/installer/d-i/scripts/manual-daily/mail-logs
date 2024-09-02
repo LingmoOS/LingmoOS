@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Note: this script should be run from _outside_ the chroot
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+mainlog=$logdir/main.log
+builddate=$(date +"%d %b %Y")
+logpage="http://d-i.debian.org/manual/logs"
+
+[ -e "$logdir" ] && cd $logdir || exit 1
+
+if ! tmpdir=$(mktemp -td mail-logs.XXXXXX); then
+	exit 1
+fi
+
+add-gitlog () {
+    echo "" >>$mainlog
+    echo "" >>$mainlog
+    echo "=============== svn up ===============" >>$mainlog
+    cat $logdir/git_pull.log >>$mainlog
+    echo "" >>$mainlog
+    echo "=============== svn ci ===============" >>$mainlog
+    cat $logdir/git_push.log >>$mainlog
+}
+
+if [ -f $ROOT/do_not_build ] ; then
+    echo "" >>$mainlog
+    echo "Build or upload failed; no mails sent!" >>$mainlog
+    add-gitlog
+
+    mutt -s "D-I installation-guide build failed ($builddate)" $MAIL_FROM <$mainlog
+    exit 0
+fi
+
+if [ "$DI_LOCAL_BUILD" != 1 ]; then
+    # Only create mails for languages that were built
+    for lang in $(grep -E "Language .* - (full|partial) build:" $mainlog | \
+            cut -d " " -f 2 | sort -u); do
+        mailaddress=$(grep -E "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8)
+
+        # Check for errors during build
+        BUILD_ERRORS=0
+        grepexp="^((Preparing|Starting) build|Building manual|(Updating PO|Creating XML) files for language|- (upd|cre)ating|Writing|Info:|Warning:|dvips:|found empty tag para|Error: no ID for constraint linkend:|$)"
+        if grep -Eqv "$grepexp" $logdir/$lang.log; then
+            BUILD_ERRORS=1
+        fi
+
+        # Create header file
+        echo "From: $NAME_FROM <$MAIL_FROM>" >$tmpdir/header
+        echo "To: $mailaddress" >>$tmpdir/header
+        echo "Reply-To: $NAME_FROM <$MAIL_FROM>" >>$tmpdir/header
+        if [ "$BUILD_ERRORS" = "0" ]; then
+            echo "Subject: [D-I installation-guide] Build log for $lang ($builddate)" >>$tmpdir/header
+        else
+            echo "Subject: [D-I installation-guide] Build log for $lang ($builddate) - ERRORS DURING BUILD" >>$tmpdir/header
+        fi
+
+        # Create message file
+        if [ "$BUILD_ERRORS" = "0" ]; then
+            cat $ROOT/bin/msgtxt.ok >$tmpdir/message
+        else
+            cat $ROOT/bin/msgtxt.fail >$tmpdir/message
+        fi
+
+        ATTACHMENT=""
+        # Check whether upload of logfile was successful
+        if grep -Eq "Upload of $lang.log success" $mainlog ; then
+            echo "A log of the build is available at:" >>$tmpdir/message
+            echo "- $logpage/$lang.log" >>$tmpdir/message
+        else
+            echo "A log of the build has been attached." >>$tmpdir/message
+            # Create attachment
+            gzip -c $logdir/$lang.log >$logdir/$lang.log.gz
+            ATTACHMENT="-a $logdir/$lang.log.gz"
+        fi
+
+        cat $ROOT/bin/msgtxt.common >>$tmpdir/message
+        grep -E "^([UAD].[[:space:]]*(po/|)$lang/|Updated to revision)" \
+                $logdir/svn_up.log >>$tmpdir/message
+
+        # Mail message
+        mutt -H $tmpdir/header $ATTACHMENT <$tmpdir/message
+
+        [ -f $logdir/$lang.log.gz ] && rm $logdir/$lang.log.gz
+    done
+
+    echo "" >>$mainlog
+    echo "Build successful; logmails have been sent!" >>$mainlog
+fi
+
+add-gitlog
+
+mutt -s "D-I installation-guide build success ($builddate)" $MAIL_FROM <$mainlog
+
+rm -rf $tmpdir
+exit 0

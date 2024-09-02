@@ -1,0 +1,584 @@
+'\" t
+.\" $Id: cdk_calendar.3,v 1.28 2019/02/15 00:29:55 tom Exp $"
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_calendar 3
+.SH NAME
+.XX activateCDKCalendar
+.XX destroyCDKCalendar
+.XX drawCDKCalendar
+.XX eraseCDKCalendar
+.XX getCDKCalendarBox
+.XX getCDKCalendarDate
+.XX getCDKCalendarDayAttribute
+.XX getCDKCalendarHighlight
+.XX getCDKCalendarMarker
+.XX getCDKCalendarMonthAttribute
+.XX getCDKCalendarYearAttribute
+.XX injectCDKCalendar
+.XX moveCDKCalendar
+.XX newCDKCalendar
+.XX positionCDKCalendar
+.XX removeCDKCalendarMarker
+.XX setCDKCalendar
+.XX setCDKCalendarBackgroundAttrib
+.XX setCDKCalendarBackgroundColor
+.XX setCDKCalendarBox
+.XX setCDKCalendarBoxAttribute
+.XX setCDKCalendarDate
+.XX setCDKCalendarDayAttribute
+.XX setCDKCalendarDaysNames
+.XX setCDKCalendarHighlight
+.XX setCDKCalendarHorizontalChar
+.XX setCDKCalendarLLChar
+.XX setCDKCalendarLRChar
+.XX setCDKCalendarMarker
+.XX setCDKCalendarMonthAttribute
+.XX setCDKCalendarMonthsNames
+.XX setCDKCalendarPostProcess
+.XX setCDKCalendarPreProcess
+.XX setCDKCalendarULChar
+.XX setCDKCalendarURChar
+.XX setCDKCalendarVerticalChar
+.XX setCDKCalendarYearAttribute
+cdk_calendar \- curses calendar widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "time_t activateCDKCalendar (CDKCALENDAR *" "calendar",
+.BI "chtype " "*actions");
+.TP 15
+.B "void destroyCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "void drawCDKCalendar (CDKCALENDAR *" "calendar",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "boolean getCDKCalendarBox ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "void getCDKCalendarDate (CDKCALENDAR *" "calendar",
+.BI "int *" "day",
+.BI "int *" "month",
+.BI "int *" "year");
+.TP 15
+.B "chtype getCDKCalendarDayAttribute ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "chtype getCDKCalendarHighlight ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "chtype getCDKCalendarMarker ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year");
+.TP 15
+.B "chtype getCDKCalendarMonthAttribute ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "chtype getCDKCalendarYearAttribute ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "time_t injectCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKCALENDAR *newCDKCalendar (CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "const char *" "title",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year",
+.BI "chtype " "dayAttrib",
+.BI "chtype " "monthAttrib",
+.BI "chtype " "yearAttrib",
+.BI "chtype " "highlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar");
+.TP 15
+.B "void removeCDKCalendarMarker ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year");
+.TP 15
+.B "void setCDKCalendar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year",
+.BI "chtype " "dayAttrib",
+.BI "chtype " "monthAttrib",
+.BI "chtype " "yearAttrib",
+.BI "chtype " "highlight",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKCalendarBackgroundAttrib ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKCalendarBackgroundColor ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKCalendarBox ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "boolean " "box");
+.TP 15
+.B setCDKCalendarBoxAttribute ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B "void setCDKCalendarDate ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year");
+.TP 15
+.B "void setCDKCalendarDayAttribute ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "attribute");
+.TP
+.B "void setCDKCalendarDaysNames ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "const char *" "days");
+.TP 15
+.B "void setCDKCalendarHighlight ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKCalendarHorizontalChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B "void setCDKCalendarLLChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B "void setCDKCalendarLRChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B "void setCDKCalendarMarker ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "int " "day",
+.BI "int " "month",
+.BI "int " "year",
+.BI "chtype " "marker");
+.TP 15
+.B "void setCDKCalendarMonthAttribute ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "attribute");
+.TP
+.B "void setCDKCalendarMonthsNames ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "CDK_CONST char **" "months");
+.TP 15
+.B "void setCDKCalendarPostProcess ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKCalendarPreProcess ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B setCDKCalendarULChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B setCDKCalendarURChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B setCDKCalendarVerticalChar ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "ch");
+.TP 15
+.B "void setCDKCalendarYearAttribute ("
+.BI "CDKCALENDAR *" "calendar",
+.BI "chtype " "attribute");
+.fi
+.SH DESCRIPTION
+The Cdk calendar widget creates a pop-up calendar.
+The calendar widget allows the user to traverse through
+months/years using the cursor keys.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKCalendar
+activates the calendar widget and lets the user interact with the widget.
+.RS
+.bP
+The \fBcalendar\fR widget is a pointer to a non-NULL calendar widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.IP
+If the character
+entered into this widget is \fIRETURN\fR then this function will return a type
+of \fItime_t\fR.
+.bP
+The \fItime_t\fR type is used in the functions defined in the
+time.h header file.
+(see \fIlocaltime\fR or \fIctime\fR for more information).
+.RE
+.IP
+If the character entered into this widget was \fIESCAPE\fR or
+\fITAB\fR then this function will return a value of (time_t)-1
+and the widget data \fIexitType\fR will be set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDKCalendar
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKCalendar
+draws the label widget on the screen.
+.IP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKCalendar
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKCalendarBox
+returns whether the widget will be drawn with a box around it.
+.TP 5
+.B getCDKCalendarDate
+returns the current date the calendar is displaying.
+.TP 5
+.B getCDKCalendarDayAttribute
+returns the attribute of the day attribute of the calendar.
+.TP 5
+.B getCDKCalendarHighlight
+returns the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP
+.B getCDKCalendarMarker
+returns the marker set on the calendar by \fBsetCDKCalendarMarker\fP.
+.TP 5
+.B getCDKCalendarMonthAttribute
+returns the attribute of the month attribute of the calendar.
+.TP 5
+.B getCDKCalendarYearAttribute
+returns the attribute of the year attribute of the calendar.
+.TP 5
+.B injectCDKCalendar
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBcalendar\fR is a pointer to a non-NULL calendar widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value of type \fItime_t\fR
+(see \fIlocaltime\fR or \fIctime\fR for more information).
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+(time_t)-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+(time_t)-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKCalendar
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer,
+or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKCalendar
+creates a calendar widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just
+provide a carriage return character at the line break.
+.TP 5
+\fByear\fR,
+.TP 5
+\fBmonth\fR and
+.TP 5
+\fBday\fR
+.br
+set the initial date of the calendar.
+.TP 5
+\fByearAttrib\fR,
+.TP 5
+\fBmonthAttrib\fR and
+.TP 5
+\fBdayAttrib\fR
+represent the attributes of the year, month, and day respectively.
+.TP 5
+\fBhighlight\fR
+sets the highlight of the currently selected day.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created
+then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKCalendar
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B removeCDKCalendarMarker
+removes a marker from the calendar.
+.TP 5
+.B setCDKCalendar
+lets the programmer modify certain elements of an existing
+calendar widget.
+.RS
+.bP
+The \fBcalendar\fR parameter represents an existing calendar pointer.
+.bP
+The other parameter names correspond to the same parameter names listed
+in the \fBnewCDKCalendar\fR function.
+.RE
+.TP 5
+.B setCDKCalendarBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKCalendarBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKCalendarBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKCalendarBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKCalendarDate
+sets the calendar to the given date.
+.IP
+If the value of the \fBday\fR,
+\fBmonth\fR, or \fByear\fR parameters is -1 then the current day, month, or year
+is used to set the date.
+.TP 5
+.B setCDKCalendarDayAttribute
+sets the attribute of the day in the calendar.
+.TP
+.B setCDKCalendarDaysNames
+sets the names of the days of the week.
+.IP
+The parameter is a string listing the 2-character abbreviations for the
+days.
+.IP
+The default value is
+.RS
+"Su Mo Tu We Th Fr Sa"
+.RE
+.IP
+"Su" (Sunday) is numbered zero internally,
+making it by default the first day of the week.
+Set the \fBweekBase\fP member of the widget to select a different day.
+For example, Monday would be 1, Tuesday 2, etc.
+.TP 5
+.B setCDKCalendarHighlight
+sets the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP 5
+.B setCDKCalendarHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKCalendarLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKCalendarLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKCalendarMarker
+allows the user to set a marker which will be displayed when the month is drawn.
+.IP
+The \fBmarker\fR parameter is the attribute to use when drawing the marker.
+If more than one marker is set on a single day, then the day will blink
+with the original marker attribute.
+.TP 5
+.B setCDKCalendarMonthAttribute
+sets the attribute of the month in the calendar.
+.TP
+.B setCDKCalendarMonthsNames
+sets the names of the months of the year.
+.IP
+The parameter is a 13-element array (since indexing starts with 1).
+.IP
+The default values are the English month names, e.g., "January".
+.TP 5
+.B setCDKCalendarPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKCalendarPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKCalendarULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKCalendarURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKCalendarVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.TP 5
+.B setCDKCalendarYearAttribute
+sets the attribute of the year in the calendar.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/Moves the cursor to the previous day.
+Right Arrow/Moves the cursor to the next day.
+Up Arrow/Moves the cursor to the next week.
+Down Arrow/Moves the cursor to the previous week.
+t/Sets the calendar to the current date.
+T/Sets the calendar to the current date.
+n/Advances the calendar one month ahead.
+N/Advances the calendar six months ahead.
+p/Advances the calendar one month back.
+P/Advances the calendar six months back.
+-/Advances the calendar one year ahead.
++/Advances the calendar one year back.
+Return/T{
+Exits the widget and returns a value of \fItime_t\fR which represents the day selected at 1 second after midnight.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exits the widget and returns a value of \fItime_t\fR which represents the day selected at 1 second after midnight.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns (time_)-1.
+This also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

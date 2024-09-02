@@ -1,0 +1,346 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Installs syslinux into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_BOOTLOADER_BIOS}" != "syslinux" ]; then
+	exit 0
+fi
+
+Echo_message "Begin installing syslinux..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Check architecture
+Check_architectures amd64 i386
+Check_crossarchitectures
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		_INITRAMFS="live"
+		;;
+	*)
+		_INITRAMFS="boot"
+		;;
+esac
+
+# Assembling image specifics
+case "${LINGMO_SYS_BUILD_IMAGE_TYPE}" in
+	iso|iso-hybrid)
+		_BOOTLOADER="isolinux"
+		_TARGET="binary/isolinux"
+		;;
+
+	netboot)
+		_BOOTLOADER="pxelinux"
+		_TARGET="tftpboot"
+		;;
+
+	hdd|tar)
+		case ${LINGMO_SYS_BUILD_BINARY_FILESYSTEM} in
+			fat*|ntfs)
+				_BOOTLOADER="syslinux"
+				_TARGET="binary/syslinux"
+				;;
+
+			ext[234]|btrfs)
+				_BOOTLOADER="extlinux"
+				_TARGET="binary/boot/extlinux"
+				;;
+			*)
+				Echo_error "syslinux/extlinux doesn't support ${LINGMO_SYS_BUILD_BINARY_FILESYSTEM}"
+				exit 1
+				;;
+		esac
+		;;
+esac
+
+# User config replacement/additional files
+_SOURCE_USER="config/bootloaders/${_BOOTLOADER}"
+_SOURCE_USER_COMMON="config/bootloaders/syslinux_common"
+
+if [ -n "${LIVE_BUILD}" ]; then
+	_SOURCE="${LIVE_BUILD}/share/bootloaders/${_BOOTLOADER}"
+	_SOURCE_COMMON="${LIVE_BUILD}/share/bootloaders/syslinux_common"
+else
+	_SOURCE="/usr/share/live/build/bootloaders/${_BOOTLOADER}"
+	_SOURCE_COMMON="/usr/share/live/build/bootloaders/syslinux_common"
+fi
+
+# Checking depends
+Check_package chroot /usr/lib/$(echo ${_BOOTLOADER} | tr '[a-z]' '[A-Z]') ${_BOOTLOADER}
+Check_package chroot /usr/lib/syslinux syslinux-common
+Check_package chroot /usr/bin/rsvg-convert librsvg2-bin
+Check_package chroot /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf fonts-dejavu-core
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+# Ensure fresh
+rm -rf ${_TARGET}
+mkdir -p ${_TARGET}
+
+# Copying files
+case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+	true)
+		# Ensure fresh
+		rm -rf chroot/root/${_BOOTLOADER}
+		rm -rf chroot/root/${_BOOTLOADER}.tmp
+		mkdir -p chroot/root/${_BOOTLOADER}
+
+		# Copy in two steps since the theme can have absolute symlinks and would therefore not be dereferenced correctly
+		cp -a ${_SOURCE_COMMON}/* chroot/root/${_BOOTLOADER}/
+		cp -af ${_SOURCE}/* chroot/root/${_BOOTLOADER}/
+		if [ -e "${_SOURCE_USER_COMMON}" ]; then
+			cp -af ${_SOURCE_USER_COMMON}/* chroot/root/${_BOOTLOADER}/
+		fi
+		if [ -e "${_SOURCE_USER}" ]; then
+			cp -af ${_SOURCE_USER}/* chroot/root/${_BOOTLOADER}/
+		fi
+		Chroot chroot cp -aL /root/${_BOOTLOADER} /root/${_BOOTLOADER}.tmp > /dev/null 2>&1 || true
+		cp -a chroot/root/${_BOOTLOADER}.tmp/* ${_TARGET}
+		rm -rf chroot/root/${_BOOTLOADER} chroot/root/${_BOOTLOADER}.tmp
+		;;
+
+	false)
+		cp -aL ${_SOURCE_COMMON}/* ${_TARGET} > /dev/null 2>&1 || true
+		cp -aLf ${_SOURCE}/* ${_TARGET} > /dev/null 2>&1 || true
+		if [ -e "${_SOURCE_USER_COMMON}" ]; then
+			cp -aLf ${_SOURCE_USER_COMMON}/* ${_TARGET} > /dev/null 2>&1 || true
+		fi
+		if [ -e "${_SOURCE_USER}" ]; then
+			cp -aLf ${_SOURCE_USER}/* ${_TARGET} > /dev/null 2>&1 || true
+		fi
+		;;
+esac
+
+# Use correct install menu set
+if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER_GUI}" = "true" ]; then
+	rm "${_TARGET}"/install_text.cfg
+	mv "${_TARGET}"/install_gui.cfg "${_TARGET}"/install.cfg
+else
+	rm "${_TARGET}"/install_gui.cfg
+	mv "${_TARGET}"/install_text.cfg "${_TARGET}"/install.cfg
+fi
+# Move user advanced.cfg to utilities.cfg for backwards compatibility
+if [ -e "${_TARGET}"/advanced.cfg ]; then
+	mv -f "${_TARGET}"/advanced.cfg "${_TARGET}"/utilities.cfg
+fi
+
+# Configuring files
+if [ -e "${_TARGET}/live.cfg.in" ]
+then
+	# This is all rather suboptimal.. needs prettifying at some point
+	_FLAVOURS="$(echo ${LINGMO_SYS_BUILD_LINUX_FLAVOURS} | wc -w)"
+
+	case "${_FLAVOURS}" in
+		1)
+			# Rename kernel files
+			# If multiple initrd images are being generated (by DKMS packages, etc),
+			# we likely only want the latest version.
+			ln -f $(ls -r1 --sort=version binary/${_INITRAMFS}/vmlinuz-* | head -n 1) binary/${_INITRAMFS}/vmlinuz
+			ln -f $(ls -r1 --sort=version binary/${_INITRAMFS}/initrd.img-* | head -n 1) binary/${_INITRAMFS}/initrd.img
+
+			sed -e "s|@FLAVOUR@|${LINGMO_SYS_BUILD_LINUX_FLAVOURS}|g" \
+			    -e "s|@LINUX@|/${_INITRAMFS}/vmlinuz|g" \
+			    -e "s|@INITRD@|/${_INITRAMFS}/initrd.img|g" \
+			"${_TARGET}/live.cfg.in" >> "${_TARGET}/live.cfg"
+
+			rm -f "${_TARGET}/live.cfg.in"
+			;;
+
+		*)
+			_NUMBER="0"
+
+			for _FLAVOUR in ${LINGMO_SYS_BUILD_LINUX_FLAVOURS}
+			do
+				_NUMBER="$((${_NUMBER} + 1))"
+
+				# Rename kernel files
+				# If multiple initrd images are being generated (by DKMS packages, etc),
+				# we likely only want the latest version.
+				ln -f $(ls -r1 --sort=version binary/${_INITRAMFS}/vmlinuz-*-${_FLAVOUR} | head -n 1) binary/${_INITRAMFS}/vmlinuz${_NUMBER}
+				ln -f $(ls -r1 --sort=version binary/${_INITRAMFS}/initrd.img-*-${_FLAVOUR} | head -n 1) binary/${_INITRAMFS}/initrd${_NUMBER}.img
+
+				if [ "${_NUMBER}" -gt 1 ]
+				then
+					echo "" >> "${_TARGET}/live.cfg"
+					grep -v 'menu default' "${_TARGET}/live.cfg.in" >> "${_TARGET}/live.cfg"
+				else
+					cat "${_TARGET}/live.cfg.in" >> "${_TARGET}/live.cfg"
+				fi
+
+				sed -i -e "s|@FLAVOUR@|${_FLAVOUR}|g" \
+				       -e "s|@LINUX@|/${_INITRAMFS}/vmlinuz${_NUMBER}|g" \
+				       -e "s|@INITRD@|/${_INITRAMFS}/initrd${_NUMBER}.img|g" \
+				"${_TARGET}/live.cfg"
+			done
+
+			rm -f "${_TARGET}/live.cfg.in"
+			;;
+	esac
+fi
+
+if [ -e chroot/etc/os-release ]
+then
+	_VERSION="$(. chroot/etc/os-release && echo ${VERSION_ID})"
+fi
+
+_VERSION="${_VERSION:-none}"
+
+_DISTRIBUTION="${LINGMO_SYS_BUILD_DISTRIBUTION_BINARY}"
+
+_DATE="$(date $DATE_UTC_OPTION -R -d@${SOURCE_DATE_EPOCH})"
+_YEAR="$(date $DATE_UTC_OPTION -d "${_DATE}" +%Y)"
+_MONTH="$(date $DATE_UTC_OPTION -d "${_DATE}" +%m)"
+_DAY="$(date $DATE_UTC_OPTION -d "${_DATE}" +%d)"
+_HOUR="$(date $DATE_UTC_OPTION -d "${_DATE}" +%H)"
+_MINUTE="$(date $DATE_UTC_OPTION -d "${_DATE}" +%M)"
+_SECOND="$(date $DATE_UTC_OPTION -d "${_DATE}" +%S)"
+_TIMEZONE="$(date $DATE_UTC_OPTION -d "${_DATE}" +%Z)"
+_TIMEZONE_NUM="$(date $DATE_UTC_OPTION -d "${_DATE}" +%z)"
+
+_LINUX_VERSIONS="$(for _LINUX in chroot/boot/vmlinuz-* ; do chroot chroot apt-cache policy $(basename ${_LINUX} | sed -e 's|vmlinuz-|linux-image-|') | awk '/Installed: / { print $2 }' ; done | sort -Vru | tr "\n" " ")"
+
+_LIVE_BOOT_VERSION="$(chroot chroot apt-cache policy live-boot | awk '/Installed: / { print $2 }')"
+_LIVE_CONFIG_VERSION="$(chroot chroot apt-cache policy live-config | awk '/Installed: / { print $2 }')"
+_LIVE_TOOLS_VERSION="$(chroot chroot apt-cache policy live-tools | awk '/Installed: / { print $2 }')"
+
+_PROJECT="Debian GNU/Linux"
+
+for _FILE in "${_TARGET}"/*.cfg ${_TARGET}/*.svg
+do
+	if [ -e "${_FILE}" ] && [ ! -d "${_FILE}" ]
+	then
+		sed -i  -e "s#@APPEND_LIVE@#${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}#g" \
+			-e "s#@APPEND_LIVE_FAILSAFE@#${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}#g" \
+			-e "s#@APPEND_INSTALL@#${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}#g" \
+			-e "s|@PROJECT@|${_PROJECT}|g" \
+			-e "s|@DISTRIBUTION@|${_DISTRIBUTION}|g" \
+			-e "s|@PARENT_DISTRIBUTION@|${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_BINARY}|g" \
+			-e "s|@VERSION@|${_VERSION}|g" \
+			-e "s|@ARCHITECTURE@|${LINGMO_SYS_BUILD_ARCHITECTURE}|g" \
+			-e "s|@DATE@|${_DATE}|g" \
+			-e "s|@YEAR@|${_YEAR}|g" \
+			-e "s|@MONTH@|${_MONTH}|g" \
+			-e "s|@DAY@|${_DAY}|g" \
+			-e "s|@HOUR@|${_HOUR}|g" \
+			-e "s|@MINUTE@|${_MINUTE}|g" \
+			-e "s|@SECOND@|${_SECOND}|g" \
+			-e "s|@TIMEZONE@|${_TIMEZONE}|g" \
+			-e "s|@TIMEZONE_NUM@|${_TIMEZONE_NUM}|g" \
+			-e "s|@LINUX_VERSIONS@|${_LINUX_VERSIONS}|g" \
+			-e "s|@LIVE_BUILD_VERSION@|${LIVE_BUILD_VERSION}|g" \
+			-e "s|@LIVE_BOOT_VERSION@|${_LIVE_BOOT_VERSION}|g" \
+			-e "s|@LIVE_CONFIG_VERSION@|${_LIVE_CONFIG_VERSION}|g" \
+			-e "s|@LIVE_TOOLS_VERSION@|${_LIVE_TOOLS_VERSION}|g" \
+			-e "s|@LINGMO_SYS_BUILD_ISO_APPLICATION@|${LINGMO_SYS_BUILD_ISO_APPLICATION}|g" \
+			-e "s|@LINGMO_SYS_BUILD_ISO_PUBLISHER@|${LINGMO_SYS_BUILD_ISO_PUBLISHER}|g" \
+			-e "s|@LINGMO_SYS_BUILD_LINUX_PACKAGES@|${LINGMO_SYS_BUILD_LINUX_PACKAGES}|g" \
+		"${_FILE}"
+	fi
+done
+
+KERNEL_DI="/install/vmlinuz"
+INITRD_DI="/install/initrd.gz"
+KERNEL_GI="/install/gtk/vmlinuz"
+INITRD_GI="/install/gtk/initrd.gz"
+
+sed -i \
+    -e "s|@KERNEL_GI@|${KERNEL_GI}|" \
+    -e "s|@INITRD_GI@|${INITRD_GI}|" \
+    -e "s|@KERNEL_DI@|${KERNEL_DI}|" \
+    -e "s|@INITRD_DI@|${INITRD_DI}|" \
+    "${_TARGET}"/install.cfg
+
+if [ -e "binary/${_INITRAMFS}/memtest.bin" ]
+then
+	MEMTEST_PATH="${_INITRAMFS}/memtest.bin"
+else
+	MEMTEST_PATH="${_INITRAMFS}/memtest"
+fi
+sed -i -e "s#@MEMTEST_VERSION@#${LINGMO_SYS_BUILD_MEMTEST}#g" -e "s#@MEMTEST@#/${MEMTEST_PATH}#g" "${_TARGET}"/memtest.cfg
+
+# Replace placeholder for optional install menu entries include
+if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER}" = "none" ]; then
+	rm -f "${_TARGET}"/install.cfg
+	sed -i "/@OPTIONAL_INSTALLER_INCLUDE@/d" "${_TARGET}"/menu.cfg
+else
+	sed -i "s#@OPTIONAL_INSTALLER_INCLUDE@#include install.cfg#g" "${_TARGET}"/menu.cfg
+fi
+
+# Replace placeholder for optional memtest menu entry include
+if [ ! -f "binary/${MEMTEST_PATH}" ]; then
+	rm -f "${_TARGET}"/memtest.cfg
+	sed -i -e "/@OPTIONAL_MEMTEST_INCLUDE@/d" "${_TARGET}"/utilities.cfg
+else
+	sed -i -e "s#@OPTIONAL_MEMTEST_INCLUDE@#include memtest.cfg#g" "${_TARGET}"/utilities.cfg
+fi
+
+if [ -e "${_TARGET}/splash.svg" ] && [ ! -e "${_TARGET}/splash.png" ]
+then
+	case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+		true)
+			cp "${_TARGET}/splash.svg" chroot
+			Chroot chroot "rsvg-convert --format png --height 480 --width 640 splash.svg -o splash.png"
+			mv chroot/splash.png "${_TARGET}"
+			Chroot chroot "rsvg-convert --format png --height 600 --width 800 splash.svg -o splash800x600.png"
+			mv chroot/splash800x600.png "${_TARGET}"
+			rm -f chroot/splash.svg
+			;;
+
+		false)
+			rsvg-convert --format png --height 480 --width 640 "${_TARGET}/splash.svg" -o "${_TARGET}/splash.png"
+			rsvg-convert --format png --height 600 --width 800 "${_TARGET}/splash.svg" -o "${_TARGET}/splash800x600.png"
+			;;
+	esac
+fi
+rm -f "${_TARGET}/splash.svg"
+
+# Tweak the grub theme to reuse the syslinux background image if grub doesn't have its own
+if [ -e binary/boot/grub/live-theme/theme.txt ] && [ ! -e binary/boot/grub/splash.png ]; then
+	sed -i -e 's|^desktop-image:.*|desktop-image: "/isolinux/splash800x600.png"|' \
+	-e 's|^title-text:.*|title-text: ""|' \
+	binary/boot/grub/live-theme/theme.txt
+fi
+
+case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+	true)
+		# Saving cache
+		Save_package_cache binary
+
+		# Removing depends
+		Remove_packages
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

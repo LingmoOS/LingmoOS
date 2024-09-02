@@ -1,0 +1,297 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Generates config for grub-pc and grub-efi, and installs loopback support"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# NOTE: This creates the config used for both grub-pc and grub-efi.
+# It also installs loopback.cfg for looback support, which depends upon that
+# config. Since loopback support is added unconditionally, this script is
+# thus run unconditionally!
+# TODO: Add an option to allow disabling loopback.cfg creation? (and thus conditionally run the script)
+
+Echo_message "Begin installing config for grub-pc and/or grub-efi, and loopback support..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Check architecture
+Check_architectures amd64 i386 arm64
+Check_crossarchitectures
+
+_TARGET="binary/boot/grub"
+
+# Local functions
+Grub_live_menu_entry() {
+	local LABEL="$1"
+	local KERNEL="$2"
+	local INITRD="$3"
+	local APPEND="$4"
+	local HOTKEY="${5:+ --hotkey=$5}"
+
+	cat >> "${LIVE_ENTRIES_TMP}" <<END
+menuentry "${LABEL}"${HOTKEY} {
+	linux	$KERNEL $APPEND
+	initrd	$INITRD
+}
+END
+}
+
+Grub_live_autodetect_menu_entry ()
+{
+	local LABEL="${1}"
+	local AMD64_KERNEL="${2}"
+	local AMD64_INITRD="${3}"
+	local _686_KERNEL="${4}"
+	local _686_INITRD="${5}"
+	local APPEND="${6}"
+
+	cat >> "${LIVE_ENTRIES_TMP}" <<END
+# Autodetect if amd64 is supported
+menuentry "$LABEL" {
+	if cpuid -l; then
+		linux ${AMD64_KERNEL} ${APPEND}
+		initrd ${AMD64_INITRD}
+	else
+		linux ${_686_KERNEL} ${APPEND}
+		initrd ${_686_INITRD}
+	fi
+}
+END
+}
+
+# User config replacement/additional files
+_SOURCE_USER="config/bootloaders/grub-pc"
+
+# Copying templates
+mkdir -p "${_TARGET}"
+if [ -n "${LIVE_BUILD}" ]; then
+	cp -a "${LIVE_BUILD}/share/bootloaders/grub-pc"/* "${_TARGET}"/
+else
+	cp -a "/usr/share/live/build/bootloaders/grub-pc"/* "${_TARGET}"/
+fi
+if [ -e "${_SOURCE_USER}" ]; then
+	cp -af "${_SOURCE_USER}"/* "${_TARGET}"/
+fi
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		INITFS="live"
+		;;
+
+	*)
+		INITFS="boot"
+		;;
+esac
+
+# Setting boot parameters
+if [ "${LINGMO_SYS_BUILD_UNION_FILESYSTEM}" != "overlay" ]; then
+	LINGMO_SYS_BUILD_BOOTAPPEND_LIVE="${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE} union=${LINGMO_SYS_BUILD_UNION_FILESYSTEM}"
+fi
+
+# Default entries
+DEFAULT_FLAVOUR="$(echo ${LINGMO_SYS_BUILD_LINUX_FLAVOURS} | awk '{ print $1 }')"
+DEFAULT_KERNEL="$(basename chroot/boot/vmlinuz-${DEFAULT_FLAVOUR})"
+DEFAULT_INITRD="initrd.img-$(echo ${DEFAULT_KERNEL} | sed -e 's|vmlinuz-||')"
+
+KERNEL_LIVE="/${INITFS}/${DEFAULT_KERNEL}"
+INITRD_LIVE="/${INITFS}/${DEFAULT_INITRD}"
+APPEND_LIVE="${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE} findiso=\${iso_path}"
+FLAVOUR_LIVE="${DEFAULT_FLAVOUR}"
+
+# Ensure fresh live entries
+LIVE_ENTRIES_TMP="${_TARGET}/live.cfg.tmp"
+rm -f "${LIVE_ENTRIES_TMP}"
+
+# Assemble live menu entries
+_AMD64_686_NUMBER="0"
+
+for _FLAVOUR in ${LINGMO_SYS_BUILD_LINUX_FLAVOURS}; do
+	if [ "${_FLAVOUR}" = "amd64" -o "${_FLAVOUR}" = "686" ]; then
+		_AMD64_686_NUMBER="$((${_AMD64_686_NUMBER} + 1))"
+	fi
+done
+
+if [ "${_AMD64_686_NUMBER}" -ge 2 ] ; then
+	# Default entries
+	AMD64_KERNEL="$(basename chroot/boot/vmlinuz-*amd64)"
+	AMD64_INITRD="initrd.img-$(echo ${AMD64_KERNEL} | sed -e 's|vmlinuz-||')"
+	_686_KERNEL="$(basename chroot/boot/vmlinuz-*686)"
+	_686_INITRD="initrd.img-$(echo ${_686_KERNEL} | sed -e 's|vmlinuz-||')"
+
+	Grub_live_autodetect_menu_entry "Live system (autodetect)" \
+		"/${INITFS}/${AMD64_KERNEL}" \
+		"/${INITFS}/${AMD64_INITRD}" \
+		"/${INITFS}/${_686_KERNEL}" \
+		"/${INITFS}/${_686_INITRD}" \
+		"${APPEND_LIVE}"
+
+	if [ "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}" != "none" ]; then
+		Grub_live_autodetect_menu_entry "Live system (autodetect) (fail-safe mode)" \
+			"/${INITFS}/${AMD64_KERNEL}" \
+			"/${INITFS}/${AMD64_INITRD}" \
+			"/${INITFS}/${_686_KERNEL}" \
+			"/${INITFS}/${_686_INITRD}" \
+			"${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+	fi
+else
+	Grub_live_menu_entry "Live system (${_FLAVOUR})" \
+		"/${INITFS}/${DEFAULT_KERNEL}" \
+		"/${INITFS}/${DEFAULT_INITRD}" \
+		"${APPEND_LIVE}" \
+		"l"
+	if [ "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}" != "none" ]; then
+		Grub_live_menu_entry "Live system (${_FLAVOUR} fail-safe mode)" \
+			"/${INITFS}/${DEFAULT_KERNEL}" \
+			"/${INITFS}/${DEFAULT_INITRD}" \
+			"${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+	fi
+fi
+
+_COUNT=0
+for KERNEL in chroot/boot/vmlinuz-*; do
+	_COUNT=$(( $_COUNT + 1 ))
+done
+
+if [ $_COUNT -gt 1 ]; then
+	for KERNEL in chroot/boot/vmlinuz-*; do
+		VERSION="$(basename ${KERNEL} | sed -e 's|vmlinuz-||')"
+
+		Grub_live_menu_entry "Live system, kernel ${VERSION}" \
+			"/${INITFS}/$(basename ${KERNEL})" \
+			"/${INITFS}/initrd.img-${VERSION}" \
+			"${APPEND_LIVE}"
+
+		if [ "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}" != "none" ]; then
+			Grub_live_menu_entry "Live system, kernel ${VERSION} (fail-safe mode)" \
+				"/${INITFS}/$(basename ${KERNEL})" \
+				"/${INITFS}/initrd.img-${VERSION}" \
+				"${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+		fi
+	done
+fi
+
+# Replace placeholder with compiled live entries temporarily held in live.cfg.tmp
+sed -i -e "/@LINUX_LIVE@/r ${LIVE_ENTRIES_TMP}" -e "/@LINUX_LIVE@/d" "${_TARGET}"/*.cfg
+sed -i -e "/LINUX_LIVE/r ${LIVE_ENTRIES_TMP}" -e "/LINUX_LIVE/d" "${_TARGET}"/*.cfg #backwards compatibility
+rm -f "${LIVE_ENTRIES_TMP}"
+
+# Assembling debian-installer configuration
+if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER}" != "none" ]; then
+	ENABLE_INSTALL_MENU="true"
+
+	KERNEL_DI="/install/vmlinuz"
+	INITRD_DI="/install/initrd.gz"
+	APPEND_DI="vga=normal ${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL} --- quiet"
+
+	KERNEL_GI="/install/gtk/vmlinuz"
+	INITRD_GI="/install/gtk/initrd.gz"
+	APPEND_GI="vga=788 ${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL} --- quiet"
+
+	if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER_GUI}" = "true" ]; then
+		rm ${_TARGET}/install_text.cfg
+		rm ${_TARGET}/install_start_text.cfg
+		mv ${_TARGET}/install_gui.cfg ${_TARGET}/install.cfg
+		mv ${_TARGET}/install_start_gui.cfg ${_TARGET}/install_start.cfg
+	else
+		rm ${_TARGET}/install_gui.cfg
+		rm ${_TARGET}/install_start_gui.cfg
+		mv ${_TARGET}/install_text.cfg ${_TARGET}/install.cfg
+		mv ${_TARGET}/install_start_text.cfg ${_TARGET}/install_start.cfg
+	fi
+else
+	ENABLE_INSTALL_MENU="false"
+	rm "${_TARGET}"/install_text.cfg
+	rm "${_TARGET}"/install_gui.cfg
+	rm "${_TARGET}"/install_start_text.cfg
+	rm "${_TARGET}"/install_start_gui.cfg
+fi
+
+# Assembling memtest configuration
+MEMTEST_DIR="/${INITFS}"
+if [ -f "binary/${MEMTEST_DIR}/memtest.bin" ]
+then
+	MEMTEST_BIN="${MEMTEST_DIR}/memtest.bin"
+else
+	MEMTEST_BIN="${MEMTEST_DIR}/memtest"
+fi
+if [ -f "binary/${MEMTEST_DIR}/memtest" ] || [ -f "binary/${MEMTEST_DIR}/memtest.bin" ] || [ -f "binary/${MEMTEST_DIR}/memtest.efi" ]; then
+	ENABLE_MEMTEST="true"
+	MEMTEST="source /boot/grub/memtest.cfg" #for backwards compatibility
+else
+	ENABLE_MEMTEST="false"
+	rm -f "${_TARGET}"/memtest.cfg
+fi
+
+# These must be held in variables to avoid mistake by checkbashisms
+LINUX_INSTALL="source /boot/grub/install_start.cfg"
+LINUX_ADVANCED_INSTALL="source /boot/grub/install.cfg"
+
+# Those without '@' markers are for backwards compatibility
+sed -i \
+    -e "s|@KERNEL_GI@|${KERNEL_GI}|" \
+    -e "s|@INITRD_GI@|${INITRD_GI}|" \
+    -e "s|@APPEND_GI@|${APPEND_GI}|" \
+    -e "s|@KERNEL_DI@|${KERNEL_DI}|" \
+    -e "s|@INITRD_DI@|${INITRD_DI}|" \
+    -e "s|@APPEND_DI@|${APPEND_DI}|" \
+    -e "s|@KERNEL_LIVE@|${KERNEL_LIVE}|" \
+    -e "s|@INITRD_LIVE@|${INITRD_LIVE}|" \
+    -e "s|@APPEND_LIVE@|${APPEND_LIVE}|" \
+    -e "s|@LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL@|${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}|" \
+    -e "s|@LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE@|${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}|" \
+    -e "s|@LINGMO_SYS_BUILD_BOOTAPPEND_LIVE@|${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}|" \
+    -e "s|@APPEND_INSTALL@|${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}|" \
+    -e "s|@ENABLE_INSTALL_MENU@|${ENABLE_INSTALL_MENU}|" \
+    -e "s|@ENABLE_MEMTEST@|${ENABLE_MEMTEST}|" \
+    -e "s|@MEMTEST_DIR@|${MEMTEST_DIR}|" \
+    -e "s|@MEMTEST_BIN@|${MEMTEST_BIN}|" \
+    -e "s|@MEMTEST_VERSION@|${LINGMO_SYS_BUILD_MEMTEST}|" \
+    -e "s|@FLAVOUR_LIVE@|${FLAVOUR_LIVE}|" \
+    -e "s|LINUX_INSTALL|${LINUX_INSTALL}|" \
+    -e "s|LINUX_ADVANCED_INSTALL|${LINUX_ADVANCED_INSTALL}|" \
+    -e "s|MEMTEST|${MEMTEST}|" \
+    -e "s|KERNEL_GI|${KERNEL_GI}|" \
+    -e "s|INITRD_GI|${INITRD_GI}|" \
+    -e "s|APPEND_GI|${APPEND_GI}|" \
+    -e "s|KERNEL_DI|${KERNEL_DI}|" \
+    -e "s|INITRD_DI|${INITRD_DI}|" \
+    -e "s|APPEND_DI|${APPEND_DI}|" \
+    -e "s|KERNEL_LIVE|${KERNEL_LIVE}|" \
+    -e "s|INITRD_LIVE|${INITRD_LIVE}|" \
+    -e "s|APPEND_LIVE|${APPEND_LIVE}|" \
+    -e "s|LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL|${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}|" \
+    -e "s|LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE|${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}|" \
+    -e "s|LINGMO_SYS_BUILD_BOOTAPPEND_LIVE|${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}|" \
+    "${_TARGET}"/*.cfg
+
+sed -i -e 's|//|/|g' "${_TARGET}"/*.cfg
+sed -i -e 's|\ $||g' "${_TARGET}"/*.cfg
+
+# Add loopback support
+echo "source /boot/grub/grub.cfg" > "${_TARGET}"/loopback.cfg
+
+# Creating stage file
+Create_stagefile

@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+# Summary of pending changes in git for all suites/branches, configured
+# through the %branches hash below.
+use strict;
+use warnings;
+
+use File::Basename;
+use List::MoreUtils qw(all any);
+
+# What the branches mean in term of suites:
+my %branches = qw(
+  oldstable    bullseye
+  stable       bookworm
+  testing      trixie
+  unstable     master
+);
+my @important = qw(oldstable stable testing);
+
+# Where the packages checkout live, assuming "usual" layout:
+my $di_dir = "../installer";
+my $root_dir = "../packages";
+
+my @git_stats;
+for my $package_dir ($di_dir, <$root_dir/*/>) {
+  # Compute git commits for all branches/suites:
+  my $package = basename $package_dir;
+  my %package_commits;
+  for my $suite (sort keys %branches) {
+    my $branch = $branches{ $suite };
+    my $desc = `GIT_DIR=$package_dir/.git git describe --tags origin/$branch 2>/dev/null`;
+    chomp $desc;
+    # git describe worked so the branch is there:
+    if ($desc) {
+      # if testing and fully merged into unstable, skip it, that was
+      # most likely a staging branch:
+      if ($suite eq 'testing') {
+        my $merge_base = `GIT_DIR=$package_dir/.git git merge-base origin/$branch origin/master`;
+        my $merge_desc = `GIT_DIR=$package_dir/.git git describe --tags $merge_base 2>/dev/null`;
+        chomp $merge_desc;
+        if ($merge_desc eq $desc) {
+          $package_commits{$suite} = '-';
+          next;
+        }
+      }
+
+      my $commits = $desc =~ /-(\d+)-g/ ? $1 : 0;
+      $package_commits{$suite} = $commits;
+    }
+    else {
+      $package_commits{$suite} = '-';
+    }
+  }
+
+  # Skip packages with uninteresting stats:
+  next
+    if all { $_ eq '-' or $_ eq '0' } (values %package_commits);
+
+  # Pre-compute interest:
+  my $interesting = any { $_ ne '-' and $_ ne '0' } (@package_commits{@important});
+
+  push @git_stats, {
+    package => $package,
+    commits => \%package_commits,
+    highlight => $interesting,
+  };
+}
+
+# Generate output:
+my $html = << 'EOS';
+<html>
+  <head>
+    <title>Git status</title>
+    <link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+    <link rel="icon"       type="text/png" href="/static/favicon.png" />
+    <style>
+      .rightalign { text-align: right; }
+      .highlight { background: #ff8080; }
+      .todo { font-weight: bold; }
+      th, td { padding: 2px 5px; }
+      table { border-collapse: collapse; }
+    </style>
+  </head>
+  <body>
+    <h1>Git status</h1>
+    <table>
+EOS
+
+# Headers:
+$html .= "<tr><th>&nbsp;</th>";
+for my $suite (sort keys %branches) {
+  $html .= "<th class=\"rightalign\">$suite<br /><i><small>$branches{ $suite }</small></i></th>";
+}
+$html .= "</tr>\n";
+
+# Contents:
+for my $stat (@git_stats) {
+  my $style = $stat->{highlight} ? ' class="highlight"' : '';
+  $html .= "      <tr$style><td>" . $stat->{package} . "</td>";
+  for my $suite (sort keys %branches) {
+    my $extrastyle = '';
+    if (! grep { $stat->{commits}{$suite} eq $_ } qw(- 0)
+        and grep { $suite eq $_ } @important) {
+      $extrastyle = ' todo';
+    }
+    $html .= "<td class=\"rightalign$extrastyle\">" . $stat->{commits}{$suite} . "</td>";
+  }
+  $html .= "</tr>\n";
+}
+
+# Trailer:
+my $date = `LC_ALL=C TZ=UTC date`;
+chomp $date;
+$html .= << "EOS";
+    </table>
+    <hr />
+    Last update: $date
+  </body>
+</html>
+EOS
+
+print $html;

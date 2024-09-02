@@ -1,0 +1,120 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2021-2021 The Debian Live team
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Add dm-verity hash for rootfs"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_DM_VERITY}"  != "true" ]
+then
+    Create_stagefile
+    exit 0
+fi
+
+Echo_message "Begin creating dm-verity hash for rootfs"
+
+case ${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} in
+    squashfs|ext2|ext3|ext4)
+        ;;
+    *)
+        Echo_error "dm-verity support is not implemented for ${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}!"
+        exit 1
+        ;;
+esac
+
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		INITFS="live"
+		;;
+
+	*)
+		INITFS="boot"
+		;;
+esac
+
+ROOT_FS="binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}"
+HASH_FS="${ROOT_FS}.verity"
+HASH_FILE="${ROOT_FS}.roothash"
+FEC_FILE="${ROOT_FS}.fec"
+FEC_ROOTS_FILE="${FEC_FILE}.roots"
+SIGNATURE_FILE="${HASH_FILE}.p7s"
+Check_package chroot /usr/sbin/veritysetup cryptsetup
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+
+# Remove old files if existing
+for file in "${HASH_FS}" "${HASH_FILE}" "${FEC_FILE}"  "${SIGNATURE_FILE}" "${FEC_ROOTS_FILE}"
+do
+    if [ -f ${file} ]
+    then
+        Echo_message "Removing old ${file}"
+        rm -f  "${file}"
+    fi
+done
+
+Echo_message "Create dm-verity hash table"
+
+verity_flags=""
+if [ -n "${LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS}" ]
+then
+Echo_message "Enabling FEC support for dm-verity rootfs"
+verity_flags="${verity_flags} --fec-device=${FEC_FILE} --fec-roots=${LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS}"
+fi
+
+ROOT_HASH=$(veritysetup ${verity_flags} format ${ROOT_FS} ${HASH_FS} |  awk -F ":" '$1=="Root hash" {print $2}' | tr -d [:space:])
+
+if [ "$?" != "0" ]
+then
+    Echo_error "veritysetup failed"
+    exit 1
+fi
+
+if [ -n "${LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS}" ]
+then
+    echo -n "${LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS}" > "${FEC_ROOTS_FILE}"
+fi
+
+echo -n "${ROOT_HASH}" > "${HASH_FILE}"
+Echo_message "Creating the hash table was successful"
+
+# Sign root hash if a signing script is provided The script gets called with the
+# hash as the first argument and a output file as the second.
+if [ -n "${LINGMO_SYS_BUILD_DM_VERITY_SIGN}" ]
+then
+    Echo_message "Enabling root hash signing"
+    TMP_SIGN=$(mktemp)
+    Echo_message "Calling sign script ${LINGMO_SYS_BUILD_DM_VERITY_SIGN}"
+    ${LINGMO_SYS_BUILD_DM_VERITY_SIGN} ${ROOT_HASH} ${TMP_SIGN}
+    if [ "$?" != "0" ]
+    then
+        Echo_error "Sign script failed with exit code: $? !"
+        exit 1
+    fi
+    cat "${TMP_SIGN}" > "${SIGNATURE_FILE}"
+    rm "${TMP_SIGN}"
+fi
+
+
+# Creating stage file
+Create_stagefile

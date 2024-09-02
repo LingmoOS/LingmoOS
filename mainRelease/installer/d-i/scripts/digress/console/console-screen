@@ -1,0 +1,12 @@
+#!/bin/sh
+# For console via screen session.
+set -e
+
+session=digress-$MACHINE-$SCHEME
+
+# Allow running from cron.
+if [ -z "$TERM" ] || [ "$TERM" = dumb ]; then
+	export TERM=vt100
+fi
+
+screen -D -r $session

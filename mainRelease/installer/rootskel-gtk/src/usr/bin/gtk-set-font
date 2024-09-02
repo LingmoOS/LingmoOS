@@ -1,0 +1,102 @@
+#! /bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+[ "$DEBIAN_FRONTEND" = "gtk" ] || exit 0
+
+GTKRC="/etc/gtk-2.0/gtkrc"
+[ -f "$GTKRC" ] || exit 1
+
+if db_get debconf/language && [ "$RET" ]; then
+	# The value can be a list; take only first value
+	language="${RET%%:*}"
+else
+	language=en
+fi
+
+DEFAULT_FONT="DejaVu Sans"
+# Default font size; good for 640x480 or 800x600 screens
+FONT_SIZE=9
+
+# Set by cdebconf
+if [ -f /var/lib/cdebconf/zoom ]; then
+	ZOOM="$(cat /var/lib/cdebconf/zoom)"
+	FONT_SIZE=$(( $FONT_SIZE * $ZOOM / 100 ))
+fi
+
+# Set the primary GTK font according to language
+FONT_NAME=$DEFAULT_FONT
+case "$language" in
+    ar|fa)
+	FONT_NAME="Nazli"
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+    am)
+	FONT_NAME="Abyssinica SIL"
+	FONT_SIZE=$(($FONT_SIZE + 1))
+	;;
+    dz|bo)
+	FONT_NAME="Tibetan Machine Uni"
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+    gu)
+	FONT_NAME="Noto Serif Gujarati"
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+    ja)
+	FONT_NAME="VL Gothic"
+	;;
+    km)
+	FONT_NAME="Khmer OS System"
+	FONT_SIZE=$(($FONT_SIZE + 1))
+	;;
+    kn)
+	FONT_SIZE=$(($FONT_SIZE + 1))
+	;;
+    ko)
+	FONT_NAME="UnDotum"
+	;;
+    pa)
+	FONT_NAME="Lohit Punjabi"
+	;;
+    si)
+	FONT_NAME="Noto Sans Sinhala"
+	;;
+    ta)
+	FONT_NAME="TSCu_Paranar"
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+    th)
+	FONT_NAME="Loma"
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+    ug)
+	FONT_NAME="UKIJ Tuz"
+	FONT_SIZE=$(($FONT_SIZE + 1))
+	;;
+    zh*)
+	FONT_NAME="AR PL ShanHeiSun Uni"
+	;;
+    bn|hi|ml|mr|ne)
+	FONT_SIZE=$(($FONT_SIZE + 2))
+	;;
+esac
+
+if db_get debian-installer/theme && [ "$RET" = dark ]; then
+	# Theme for visually impaired; increase fontsize
+	FONT_SIZE=$(($FONT_SIZE + 7))
+fi
+
+# Fall back to default if font does not exist; default is assumed to exist
+if fc-list | grep -q "$FONT_NAME"; then
+	logger -t gtk-set-font "Switching to font '$FONT_NAME' for '$language'"
+else
+	FONT_NAME=$DEFAULT_FONT
+	logger -t gtk-set-font "Requested font for '$language' not found; using default"
+fi
+
+sed -i "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" $GTKRC
+
+exit 0

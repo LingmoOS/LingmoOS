@@ -1,0 +1,536 @@
+'\" t
+.\" $Id: gen-slider.3,v 1.9 2019/02/15 01:06:47 tom Exp $"
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_<MODEL>slider 3
+.SH NAME
+.XX activateCDK<MIXED>
+.XX destroyCDK<MIXED>
+.XX drawCDK<MIXED>
+.XX eraseCDK<MIXED>
+.XX getCDK<MIXED>Box
+#if <FLOAT>
+.XX getCDK<MIXED>Digits
+#endif <FLOAT>
+.XX getCDK<MIXED>HighValue
+.XX getCDK<MIXED>LowValue
+.XX getCDK<MIXED>Value
+.XX injectCDK<MIXED>
+.XX moveCDK<MIXED>
+.XX newCDK<MIXED>
+.XX positionCDK<MIXED>
+.XX setCDK<MIXED>
+.XX setCDK<MIXED>BackgroundAttrib
+.XX setCDK<MIXED>BackgroundColor
+.XX setCDK<MIXED>Box
+.XX setCDK<MIXED>BoxAttribute
+#if <FLOAT>
+.XX setCDK<MIXED>Digits
+#endif <FLOAT>
+.XX setCDK<MIXED>HorizontalChar
+.XX setCDK<MIXED>LLChar
+.XX setCDK<MIXED>LRChar
+.XX setCDK<MIXED>LowHigh
+.XX setCDK<MIXED>PostProcess
+.XX setCDK<MIXED>PreProcess
+.XX setCDK<MIXED>ULChar
+.XX setCDK<MIXED>URChar
+.XX setCDK<MIXED>Value
+.XX setCDK<MIXED>VerticalChar
+cdk_<MODEL>slider \- curses slider widget (type <CTYPE>)
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype *" "actions");
+.TP 15
+.B "void destroyCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "void drawCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "boolean getCDK<MIXED>Box ("
+.BI "CDK<UPPER> *" "slider");
+#if <FLOAT>
+.TP 15
+.B "int getCDK<MIXED>Digits ("
+.BI "CDK<UPPER> *" "scale");
+#endif <FLOAT>
+.TP 15
+.B "<CTYPE> getCDK<MIXED>HighValue ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "<CTYPE> getCDK<MIXED>LowValue ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "<CTYPE> getCDK<MIXED>Value ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "<CTYPE> injectCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDK<UPPER> *newCDK<MIXED> ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "const char *" "title",
+.BI "const char *" "label",
+.BI "chtype " "fillerCharacter",
+.BI "int " "fieldWidth",
+.BI "int " "currentValue",
+.BI "<CTYPE> " "lowValue",
+.BI "<CTYPE> " "highValue",
+.BI "<CTYPE> " "increment",
+.BI "<CTYPE> " "fastIncrement",
+#if <FLOAT>
+.BI "int " "digits",
+#endif <FLOAT>
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider");
+.TP 15
+.B "void setCDK<MIXED> ("
+.BI "CDK<UPPER> *" "slider",
+.BI "<CTYPE> " "lowValue",
+.BI "<CTYPE> " "highValue",
+.BI "<CTYPE> " "currentValue",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDK<MIXED>BackgroundAttrib ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDK<MIXED>BackgroundColor ("
+.BI "CDK<UPPER> *" "slider",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDK<MIXED>Box ("
+.BI "CDK<UPPER> *" "slider",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDK<MIXED>BoxAttribute ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+#if <FLOAT>
+.TP 15
+.B "void setCDK<MIXED>Digits ("
+.BI "CDK<UPPER> *" "scale",
+.BI "int " "digits");
+#endif <FLOAT>
+.TP 15
+.B "void setCDK<MIXED>HorizontalChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDK<MIXED>LLChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDK<MIXED>LRChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDK<MIXED>LowHigh ("
+.BI "CDK<UPPER> *" "slider",
+.BI "<CTYPE> " "lowValue",
+.BI "<CTYPE> " "highValue");
+.TP 15
+.B "void setCDK<MIXED>PostProcess ("
+.BI "CDK<UPPER> *" "slider",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDK<MIXED>PreProcess ("
+.BI "CDK<UPPER> *" "slider",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDK<MIXED>ULChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDK<MIXED>URChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDK<MIXED>Value ("
+.BI "CDK<UPPER> *" "slider",
+.BI "<CTYPE> " "value");
+.TP 15
+.B "void setCDK<MIXED>VerticalChar ("
+.BI "CDK<UPPER> *" "slider",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk slider widget creates a visual slider box
+with a label and a slider field.
+The following are functions which create or manipulate the Cdk slider
+box widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDK<MIXED>
+activates the slider widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBslider\fR is a pointer to a non-NULL slider widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return a
+value from the low value to the high value.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this
+widget was \fIESCAPE\fR then the widget returns
+the unknown<DTYPE> value (see the cdk_objs.h header file).
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDK<MIXED>
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDK<MIXED>
+draws the slider widget on the screen.
+If the \fBbox\fR option is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDK<MIXED>
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDK<MIXED>Box
+returns true if the widget will be drawn with a box around it.
+#if <FLOAT>
+.TP 5
+.B getCDK<MIXED>Digits
+returns the number of digits shown after the decimal point for the box value.
+#endif <FLOAT>
+.TP 5
+.B getCDK<MIXED>HighValue
+returns the high value of the slider widget.
+.TP 5
+.B getCDK<MIXED>LowValue
+returns the low value of the slider widget.
+.TP 5
+.B getCDK<MIXED>Value
+returns the current value of the widget.
+.TP 5
+.B injectCDK<MIXED>
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBslider\fR is a pointer to a non-NULL slider widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value ranging from the slider's low value to the slider's high value.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+the unknown<DTYPE> value (see the cdk_objs.h header file).
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.RE
+.RE
+.IP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+the unknown<DTYPE> value (see the cdk_objs.h header file).
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.TP 5
+.B moveCDK<MIXED>
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDK<MIXED>
+function creates a slider widget and returns a pointer to it..
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBtitle\fR
+is the string to display at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBlabel\fR
+is the string to display in the label of the slider field.
+.TP 5
+\fBfillerCharacter\fR
+is the character to be used to draw the slider bar in the field.
+.TP 5
+\fBfieldWidth\fR
+controls the width of the widget.
+If you provide a value
+of zero the widget will be created with the full width of the screen.
+If you provide a negative value, the widget will be created the full width
+minus the value provided.
+.TP 5
+\fBcurrentValue\fR
+is the value of the slider field when the widget is activated.
+.TP 5
+\fBlowValue\fR and
+.TP 5
+\fBhighValue\fR
+are the low and high values of the widget respectively.
+.TP 5
+\fBincrement\fR
+is the regular increment value
+.TP 5
+\fBfastIncrement\fR
+is the accelerated increment value.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDK<MIXED>
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDK<MIXED>
+lets the programmer modify certain elements of an existing slider widget.
+The parameter names correspond to the same parameter
+names listed in the \fInewCDK<MIXED>\fR function.
+.TP 5
+.B setCDK<MIXED>BackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDK<MIXED>BackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDK<MIXED>Box
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDK<MIXED>BoxAttribute
+function sets the attribute of the box.
+#if <FLOAT>
+.TP 5
+.B setCDK<MIXED>Digits
+sets the number of digits shown after the decimal point for the box value.
+#endif <FLOAT>
+.TP 5
+.B setCDK<MIXED>HorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDK<MIXED>LLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDK<MIXED>LRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDK<MIXED>LowHigh
+sets the low and high values of the widget.
+.TP 5
+.B setCDK<MIXED>PostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDK<MIXED>PreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDK<MIXED>ULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDK<MIXED>URChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDK<MIXED>Value
+sets the current value of the widget.
+.TP 5
+.B setCDK<MIXED>VerticalChar
+sets the vertical drawing character for the box to the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw50 .
+\fBKey/Action\fR
+=
+Down Arrow/T{
+Decrements the field by the normal decrement value.
+T}
+Up Arrow/T{
+Increments the field by the normal increment value.
+T}
+u/T{
+Increments the field by the normal increment value.
+T}
+Prev Page/T{
+Decrements the field by the accelerated decrement value.
+T}
+U/T{
+Decrements the field by the accelerated decrement value.
+T}
+Ctrl-B/T{
+Decrements the field by the accelerated decrement value.
+T}
+Next Page/T{
+Increments the field by the accelerated increment value.
+T}
+D/T{
+Increments the field by the accelerated increment value.
+T}
+Ctrl-F/T{
+Increments the field by the accelerated increment value.
+T}
+Home/Sets the value to the low value.
+g/Sets the value to the low value.
+End/Sets the value to the high value.
+G/Sets the value to the high value.
+$/Sets the value to the high value.
+Return/T{
+Exits the widget and returns the
+current value.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exits the widget and returns the current value.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns
+the unknown<DTYPE> value (see the cdk_objs.h header file).
+This also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-R/Refreshes the screen.
+.TE
+.LP
+If the cursor is not pointing to the field's value, the following
+key bindings apply.
+You may use the left/right arrows to move the
+cursor onto the field's value and modify it by typing characters to
+replace the digits and sign.
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw50 .
+\fBKey/Action\fR
+=
+Left Arrow/T{
+Decrements the scale by the normal value.
+T}
+Right Arrow/Increments the scale by the normal value.
+=
+d/Decrements the scale by the normal value.
+D/Increments the scale by the accelerated value.
+-/Decrements the scale by the normal value.
++/Increments the scale by the normal value.
+0/Sets the scale to the low value.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

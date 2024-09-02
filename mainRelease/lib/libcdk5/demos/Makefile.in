@@ -1,0 +1,130 @@
+# $Id: Makefile.in,v 1.21 2020/09/23 20:27:42 tom Exp $
+#
+# Makefile for the demos directory.
+#
+SHELL		= /bin/sh
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+srcdir		= @srcdir@
+VPATH		= $(srcdir)
+
+CC		= @CC@
+RM		= rm -f
+CTAGS		= @CTAGS@
+ETAGS		= @ETAGS@
+LINT		= @LINT@
+LINT_OPTS	= @LINT_OPTS@
+
+LIBS		= -l@LIB_ROOTNAME@ @LIBS@
+
+LIBTOOL		= @LIBTOOL@ @ECHO_LT@
+LIBTOOL_CLEAN	= @LIB_CLEAN@
+LIBTOOL_LINK	= @LIB_LINK@
+LINK		= $(LIBTOOL_LINK)
+
+x		= @EXEEXT@
+o		= .@OBJEXT@
+LOCAL_LIBDIR	= @top_builddir@
+
+CFLAGS		= @CFLAGS@ @EXTRA_CFLAGS@
+CPPFLAGS	= @DEFS@ -I../include -I$(srcdir)/../include -I. @CPPFLAGS@
+LDFLAGS		= -L.. @LDFLAGS@ @LOCAL_LDFLAGS@
+
+BINS		= \
+		fileview$x \
+		rolodex$x \
+		command$x \
+		clock$x \
+		stopSign$x \
+		appointment$x \
+		vinstall$x
+
+# this needs configure-script work:
+OTHER_BINS	= \
+		serial$x
+
+CDKSRC		= \
+		fileview.c \
+		rolodex.c \
+		command.c \
+		clock.c \
+		stopSign.c \
+		appointment.c \
+		vinstall.c \
+		serial.c
+
+# If you have Sybase installed on your system, try making
+# syb. It's a full screen interface to Sybase.
+#
+SYBROOT		= $(SYBASE)
+SYBINCDIR	= -I$(SYBROOT)/include
+SYBLIBDIR	= -L$(SYBROOT)/devlib
+SYBLIBS		= -lnsl -lsybdb
+
+@MAKE_PHONY@.PHONY: all clean distclean lint
+
+all : $(BINS)
+
+#
+# Standard .c to .o compile line.
+#
+.c.o:
+	@RULE_CC@
+	@ECHO_CC@$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+#
+# Most of the examples are built from a single .c file using the same libraries
+#
+LINKIT	= @ECHO_LD@$(LINK) $(CFLAGS) $(CPPFLAGS) $? -o $@ $(LDFLAGS) $(LIBS)
+
+# fileview    - Basic file selector/file viewer combination.
+fileview$x :	fileview.o	; $(LINKIT)
+
+# rolodex     - A fairly robust rolodex.
+rolodex$x :	rolodex.o	; $(LINKIT)
+
+# command     - A basic command interface with command history.
+command$x :	command.o	; $(LINKIT)
+
+# clock       - A simple little clock.
+clock$x :	clock.o	; $(LINKIT)
+
+# stopSign    - A simple demo I wrote after a couple of pints. :)
+stopSign$x :	stopSign.o	; $(LINKIT)
+
+# appointment - A basic appointment book/date keeper.
+appointment$x :	appointment.o	; $(LINKIT)
+
+# serial      - This probes the serial port.
+serial$x :	serial.o	; $(LINKIT)
+
+# keycheck    - This prints out the keys ASCII and Octal values.
+keycheck$x :	keycheck.o	; $(LINKIT)
+
+# vinstall    - CDK based installer.
+vinstall$x :	vinstall.o	; $(LINKIT)
+
+#
+# A Sybase interface.
+#
+syb$x :		syb.c
+	$(CC) $(CFLAGS) -o $@ $? $(CPPFLAGS) $(SYBINCDIR) $(LDFLAGS) $(SYBLIBDIR) $(LIBS) $(SYBLIBS)
+
+#
+# Standard clean directives.
+#
+clean::
+	-$(LIBTOOL_CLEAN) $(RM) *.o core $(BINS) $(OTHER_BINS)
+
+distclean::	clean
+	-rm -f Makefile
+
+@MAKE_LOWER_TAGS@tags :
+@MAKE_LOWER_TAGS@	$(CTAGS) *.[ch] */*.[ch]
+
+@MAKE_LOWER_TAGS@TAGS :
+@MAKE_LOWER_TAGS@	$(ETAGS) *.[ch] */*.[ch]
+
+lint: $(CDKSRC)
+	$(LINT) $(LINT_OPTS) $(CPPFLAGS) $(CDKSRC)

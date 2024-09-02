@@ -1,0 +1,2082 @@
+grub (0.97-82) UNRELEASED; urgency=medium
+
+  * Make grub-legacy a transistional package depending on grub-pc.
+  * Switch section to oldlibs.
+  * Update Standards-Version to 4.6.2.
+
+ -- Felix Zielcke <fzielcke@z-51.de>  Fri, 12 Jan 2024 09:21:50 +0100
+
+grub (0.97-81) unstable; urgency=medium
+
+  * Bump debhelper from old 12 to 13.
+  * Set upstream metadata fields: Repository-Browse.
+  * Use a separate build directory, avoiding problems with the clean target
+    (closes: #1044728).
+
+ -- Colin Watson <cjwatson@debian.org>  Tue, 15 Aug 2023 18:54:02 +0100
+
+grub (0.97-80) unstable; urgency=medium
+
+  * Make convert_to_ascii non-variadic, since GCC 11 seemed to miscompile
+    this very dodgy by-hand imitation of va_arg otherwise (closes:
+    #1003008).
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 03 Jan 2022 03:50:34 +0000
+
+grub (0.97-79) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + grub-legacy-doc: Drop versioned constraint on dpkg and install-info in
+      Depends.
+  * Set upstream metadata fields: Repository, Repository-Browse.
+
+  [ Colin Watson ]
+  * debian/watch: Upgrade to version 4; use HTTPS.
+  * Set Rules-Requires-Root: no.
+  * Move grub-set-default manual page to section 8.
+  * Remove obsolete Lintian overrides.
+  * Remove maintainer script code for upgrades from extremely old versions.
+
+ -- Colin Watson <cjwatson@debian.org>  Sun, 26 Dec 2021 14:00:43 +0000
+
+grub (0.97-78) unstable; urgency=medium
+
+  * Use mktemp rather than tempfile (closes: #992915).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 27 Aug 2021 15:44:10 +0100
+
+grub (0.97-77) unstable; urgency=medium
+
+  * Remove grub-disk, grub-doc, and multiboot-doc packages.  They've all
+    been dummy transitional packages since 2010 or earlier.
+
+ -- Colin Watson <cjwatson@debian.org>  Sun, 13 Dec 2020 10:15:26 +0000
+
+grub (0.97-76) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Bump debhelper from old 9 to 12.
+  * Set debhelper-compat version in Build-Depends.
+  * Remove patches fix_amd64_compile.patch that are missing from
+    debian/patches/series.
+  * Add missing colon in closes line.
+  * Drop unnecessary dependency on dh-autoreconf.
+  * Fix day-of-week for changelog entries 0.5-1.
+
+  [ Vagrant Cascadian ]
+  * Enable reproducible builds by switching to help2man from Debian (closes:
+    #961766).
+
+  [ Colin Watson ]
+  * Stop texi2html embedding the building user's name in generated
+    documentation.
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 29 May 2020 16:12:18 +0100
+
+grub (0.97-75) unstable; urgency=medium
+
+  * Change priority to optional, since "Priority: extra" is now deprecated.
+  * Remove obsolete DM-Upload-Allowed field.
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 01 Nov 2018 17:50:10 +0000
+
+grub (0.97-74) unstable; urgency=medium
+
+  * Fix segfault when compiled with GCC 7 (thanks, Bernhard Übelacker;
+    closes: #898553).
+  * Add ext4 support (thanks, Quentin Godfroy and Colin Ian King; closes:
+    #511121).
+  * Mark all binary packages as Multi-Arch: foreign.
+  * Build without ncurses support on amd64, since the multilib packages are
+    likely to go away (closes: #848166).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 26 Oct 2018 15:27:17 +0100
+
+grub (0.97-73) unstable; urgency=medium
+
+  * Move transitional packages to Section: oldlibs.
+  * Fix more typos in README.Debian.
+  * Change Maintainer to pkg-grub-devel@alioth-lists.debian.net, following
+    Alioth lists migration.
+  * Switch to git; move VCS to salsa.debian.org.
+
+ -- Colin Watson <cjwatson@debian.org>  Sat, 05 May 2018 14:29:02 +0100
+
+grub (0.97-72) unstable; urgency=medium
+
+  * Fix typo in README.Debian.
+  * Disable PIE for stage1 and stage2.
+  * Fix objcopy build-id handling (closes: #837492).
+
+ -- Colin Watson <cjwatson@debian.org>  Sun, 09 Oct 2016 14:07:58 +0100
+
+grub (0.97-71) unstable; urgency=medium
+
+  * Restrict grub-disk to "Architecture: i386 hurd-i386 amd64" (the same set
+    as grub-legacy) rather than "Architecture: all", since its dependency on
+    grub-rescue-pc is unsatisfiable on most other architectures.
+  * Move remaining upstream changes outside debian/ (a snapshot up to
+    2009-07-02) into debian/patches/snapshot.patch.
+  * Convert to source format 3.0 (quilt).
+  * Drop build compatibility with ancient (at least pre-lenny) dpkg
+    versions.
+  * Convert to dh(1).
+
+ -- Colin Watson <cjwatson@debian.org>  Wed, 30 Dec 2015 17:17:43 +0000
+
+grub (0.97-70) unstable; urgency=medium
+
+  * Stop linking statically on amd64, which was a holdover from a long time
+    ago when we couldn't just depend on biarch libraries (closes: #769349).
+
+ -- Colin Watson <cjwatson@debian.org>  Sun, 16 Nov 2014 17:57:54 +0000
+
+grub (0.97-69) unstable; urgency=medium
+
+  * Revert the parts of the CVS sync in 0.97-8 that introduced the GNU FDL,
+    restoring the version of the documentation from the 0.97 release that
+    was under a simple permissive licence; this undoes a few minor textual
+    fixes, but avoids problems with Front-Cover and Back-Cover Texts without
+    having to create a separate grub-legacy-doc package in non-free (closes:
+    #708946).
+  * Build with -fno-combine-stack-adjustments, since that optimisation pass
+    confuses the stack games played by GRUB itself (closes: #768135).
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 07 Nov 2014 12:19:38 +0000
+
+grub (0.97-68) unstable; urgency=low
+
+  * Update Vcs-* fields for Bazaar (closes: #628651).
+  * Use 'set -e' rather than '#!/bin/bash -e' in various scripts.
+  * Port to modern Automake versions and use dh-autoreconf (closes:
+    #724383).
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 24 Jul 2014 00:31:36 +0100
+
+grub (0.97-67) unstable; urgency=low
+
+  * Fix typo in grub-set-default calls when generating /boot/grub/default
+    from scratch (closes: #560417).
+
+ -- Colin Watson <cjwatson@debian.org>  Tue, 29 Jan 2013 16:13:56 +0000
+
+grub (0.97-66.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Drop the grub dummy package (closes: #686182).
+  * rules: Update lintian-overrides for statically-linked-binary.
+
+ -- David Prévot <taffit@debian.org>  Mon, 03 Dec 2012 17:05:45 -0400
+
+grub (0.97-66) unstable; urgency=low
+
+  [ Colin Watson ]
+  * Build stage2 with -fno-reorder-functions to prevent
+    unlikely-to-be-executed functions being reordered before _start with GCC
+    4.6 (LP: #837815).
+
+  [ Didier Raboud ]
+  * Build with the default gcc (closes: #594283).
+
+ -- Colin Watson <cjwatson@debian.org>  Sat, 19 Nov 2011 01:54:49 +0000
+
+grub (0.97-65) unstable; urgency=low
+
+  * Fix grub/migrate_from_legacy title to not end with a full stop.
+  * Fix update-grub(8) groff typo (".bar" instead of ".br").
+  * Adjust doc-base file to account for renaming of grub.info to
+    grub-legacy.info.
+  * Compare -trunk kernels earlier than numeric ABIs (thanks, Aaron M. Ucko
+    and Andreas Beckmann; closes: #570318).
+  * Convert from home-grown patch system to quilt.
+
+ -- Colin Watson <cjwatson@debian.org>  Thu, 17 Mar 2011 13:34:14 +0000
+
+grub (0.97-64) unstable; urgency=low
+
+  * Exit silently from zz-update-grub kernel hook if update-grub does not
+    exist (e.g. if grub has been removed but not purged; closes: #606377).
+
+ -- Colin Watson <cjwatson@debian.org>  Wed, 08 Dec 2010 21:08:19 +0000
+
+grub (0.97-63) unstable; urgency=low
+
+  * Make /etc/kernel/postrm.d/zz-update-grub a real file rather than a
+    symlink (closes: #592105).
+  * Restrict watch file to match only GRUB Legacy versions.
+  * Escape single quotes when removing them from $mode in zz-update-grub, so
+    that this works when /bin/sh is bash (thanks, Will Dyson).
+  * Run update-grub from kernel hooks if DEB_MAINT_PARAMS is unset, for
+    compatibility with old kernel packages.  This may produce duplicate runs
+    of update-grub, but that's better than not running it at all.
+  * Adjust Maintainer field capitalisation to be consistent with grub2.
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 03 Sep 2010 15:38:42 +0100
+
+grub (0.97-62) unstable; urgency=low
+
+  * Lower priority to extra (also done in archive overrides).
+  * Add kernel hook scripts and remove any uses of update-grub as a
+    postinst_hook or postrm_hook in /etc/kernel-img.conf (closes: #587266).
+    Thanks to Ben Hutchings for advice and to Harald Braumann for an early
+    implementation.
+
+ -- Colin Watson <cjwatson@debian.org>  Fri, 06 Aug 2010 17:47:25 +0100
+
+grub (0.97-61) unstable; urgency=low
+
+  * Build-depend on gcc-4.3 (closes: #564451).
+  * Add myself to Uploaders.
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 19 Apr 2010 10:52:38 +0100
+
+grub (0.97-60) unstable; urgency=low
+
+  [ Robert Millan ]
+  * Turn multiboot-doc into a dummy transitional package.
+  * Keep building with GCC 4.3.  We didn't test GRUB Legacy with GCC 4.4,
+    and it's not worth the risk since it's being replaced by GRUB 2.
+  * Remove patches/cvs-sync.patch.  We use Bazaar branching now.
+  * Fix FTBFS due to texi2html change in default output directory.
+
+ -- Felix Zielcke <fzielcke@z-51.de>  Sun, 03 Jan 2010 20:49:21 +0100
+
+grub (0.97-59) unstable; urgency=low
+
+  [ Felix Zielcke ]
+  * Use /usr/lib/grub-legacy/grub-set-default if it exists in
+    update-grub, in preparation for GRUB 2's grub-set-default.
+
+  [ Robert Millan ]
+  * Rename grub.info to grub-legacy.info to avoid conflict with upcoming
+    GRUB 2 manual.
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Fri, 02 Oct 2009 19:37:55 +0200
+
+grub (0.97-58) unstable; urgency=low
+
+  * Upgrade path is now GRUB 2.
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Fri, 04 Sep 2009 15:20:16 +0200
+
+grub (0.97-57) unstable; urgency=low
+
+  * Remove the /sbin/grub-install and update-grub wrapper.
+  * Edit /etc/kernel-img.conf with sed in grub-legacy.postinst if it
+    still uses /sbin/update-grub. According to Colin Watson policy seems
+    to allow this.
+  * Add  to all packages.
+  * Add a depency on `dpkg (>= 1.15.4) | install-info' for grub-legacy-
+    doc.
+  * Fix the 2 statically-linked-binary lintian overrides.
+  * Update Standards-Version to 3.8.3.
+  * Build depend on lib32ncurses5-dev on amd64. (Closes: #423273)
+  * Change the grub/migrate_from_legacy template a bit to fix the
+    lintian warnings for it.
+  * Add #DEBHELPER# token to grub.postinst.
+
+ -- Felix Zielcke <fzielcke@z-51.de>  Thu, 03 Sep 2009 19:56:01 +0200
+
+grub (0.97-56) unstable; urgency=low
+
+  [ Felix Zielcke ]
+  * Really add DM-Upload-Allowed: yes.
+
+  [ Robert Millan ]
+  * Remove GNU/kFreeBSD support, since it can't be used without an external
+    loader that is not in Debian.  GNU/kFreeBSD users should upgrade to
+    GRUB 2.
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Thu, 13 Aug 2009 00:05:21 +0200
+
+grub (0.97-55) unstable; urgency=low
+
+  * Add a Provides: grub to grub-legacy.
+  * Update Standards version to 3.8.2. No changes needed.
+  * patches/xfs_freeze.diff: Fix "/usr/sbin/grub-install: line 374: [:
+    =: unary operator expected". (Closes: #513216)
+  * Add myself to Uploaders and set DM-Upload-Allowed: yes.
+  * Remove Jason and Otavio from Uploaders with their permission.
+  * Fix a spelling error in grub/migrate_from_legacy template
+    (s/untill/until). (Closes: #537815)
+  * Rename XS-X-Vcs-Svn flag to Vcs-Svn.
+  * Don't ignore make distclean errors
+  * Fix a spelling error in the description of grub-legacy
+    (s/maintainance/maintenance/).
+  * Bump to debhelper compat level 5.
+
+ -- Felix Zielcke <fzielcke@z-51.de>  Tue, 21 Jul 2009 09:35:58 +0200
+
+grub (0.97-54) unstable; urgency=low
+
+  * Rename grub to grub-legacy.
+  * Add a debconf note explaining that GRUB Legacy is now deprecated.
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Sat, 11 Jul 2009 21:54:44 +0200
+
+grub (0.97-53) unstable; urgency=low
+
+  * Update my email address.
+  * Upload to unstable.
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Mon, 06 Apr 2009 17:57:36 +0200
+
+grub (0.97-52) experimental; urgency=low
+
+  * update-grub: Try to regenerate device.map when grub-probe fails (and
+    inform the user about it).  Thanks Raphaël Hertzog.  (Closes: #501306)
+  * update-grub: Do not attempt to detect CONFIG_PARAVIRT Xen images.
+    Thanks Raphaël Hertzog et al.  (Closes: #500336)
+  * patches/xfs_freeze.diff: Replace with a new patch, which thaws XFS
+    inmediately after freezing it.  (Closes: #239111, #243835, #246111,
+    #309218, #425367) hopefully for good this time.  Thanks everyone
+    who sent their feedback, too many to list them here.
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 16 Jan 2009 22:23:50 +0100
+
+grub (0.97-51) experimental; urgency=low
+
+  * Move example kernel to examples/ directory.
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 11 Sep 2008 23:45:14 +0200
+
+grub (0.97-50) experimental; urgency=low
+
+  * Remove multiboot-example-kernel package, as it was rejected by
+    ftp-masters.  Install the example kernel as part of the multiboot-doc
+    package instead.
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 11 Sep 2008 22:49:28 +0200
+
+grub (0.97-49) experimental; urgency=low
+
+  * Fix multiboot-example-kernel install path.
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue,  9 Sep 2008 18:39:26 +0200
+
+grub (0.97-48) experimental; urgency=low
+
+  * Add `multiboot-example-kernel' package, containing the example Multiboot
+    kernel image provided by upstream (in docs/kernel).
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue,  9 Sep 2008 17:35:29 +0200
+
+grub (0.97-47) unstable; urgency=high
+
+  * update-grub: Send grub-probe stderr output to /dev/null.  (Closes: #495909)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 31 Aug 2008 20:03:11 +0200
+
+grub (0.97-46) unstable; urgency=high
+
+  * Bring the rc/pre/etc exceptions back again when comparing versions.
+    (Closes: #493389)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sat,  9 Aug 2008 21:07:20 +0200
+
+grub (0.97-45) unstable; urgency=high
+
+  * use dpkg --compare-versions in update-grub.  (Closes: #493389)
+
+ -- Felix Zielcke <fzielcke@z-51.de>  Thu, 07 Aug 2008 15:57:02 +0200
+
+grub (0.97-44) unstable; urgency=low
+
+  * Ignore -y option.  When menu.lst doesn't exist, it's always generated.
+    (Closes: #492213)
+  * NEWS: Add note recommending that users update their GRUB installs.
+    (Closes: #451701)
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon, 28 Jul 2008 21:00:09 +0200
+
+grub (0.97-43) unstable; urgency=high
+
+  [ Felix Zielcke ]
+  * debian/rules: changed cvs rules to svn
+  * Update Standards version to 3.8.0. No changes need.
+  * add 2 overrides to make lintian happy
+
+  [ Robert Millan ]
+  * Fix regression in patches/ext3_256byte_inode.diff, thanks Eric Sandeen
+    <sandeen@redhat.com>.  (Closes: #491076)
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 25 Jul 2008 14:36:15 +0200
+
+grub (0.97-42) unstable; urgency=high
+
+  * Avoid passing UUIDs to Linux when "/dev/disk/by-uuid/${root_uuid}" does
+    not exist
+  * control (grub): Add a note in description pointing at GRUB 2.
+    (Closes: #488304)
+  * patches/use_grub-probe_in_grub-install.diff: Use grub-mkdevicemap when
+    device.map needs to be regenerated (this brings in Virtio support, and
+    probably others).
+    (Closes: #491745)
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 23 Jul 2008 01:19:36 +0200
+
+grub (0.97-41) unstable; urgency=low
+
+  * Fix problem with root= argument generation in loop-AES.  Reported by
+    Max Vozeler.  (Closes: #488016)
+  * update-grub: Only special-case Xen detection for older Linux images
+    without CONFIG_PARAVIRT.  Thanks Ian Campbell.  (Closes: #468824)
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 25 Jun 2008 23:09:27 +0200
+
+grub (0.97-40) unstable; urgency=low
+
+  * Remove obsolete note about initrd size.  (Closes: #482611)
+  * update-grub: Use filesystem UUIDs when available.
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue, 10 Jun 2008 16:40:44 +0200
+
+grub (0.97-39) unstable; urgency=low
+
+  * New upstream snapshot.
+    - Fixes license violation.  (Closes: #479623)
+    - patches/1tib_disk_limit.diff: Merged.
+    - patches/geometry-26kernel.diff: Resync.
+  * Adjust make_system_path_relative_to_its_root() not to print trailing
+    slashes.  (Closes: #479169)
+  * Handle relative paths for splash images.  Thanks Petter
+    Reinholdtsen.  (Closes: #477791)
+  * Support for Xen style xvd[a-z] devices.  Thanks Ian Campbell.
+    (Closes: #456776)
+  * Document that grub-set-default counts entries starting with 0.
+    (Closes: #451709)
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue, 20 May 2008 14:16:58 +0200
+
+grub (0.97-38) unstable; urgency=high
+
+  * patches/use_grub-probe_in_grub-install.diff: Reinstate RAID1 hack.
+    Based on patch from Goswin Brederlow <goswin-v-b@web.de>.
+    (Closes: #478547, #464146)
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 30 Apr 2008 22:51:42 +0200
+
+grub (0.97-37) unstable; urgency=high
+
+  * update-grub: Fix detection of /dev/md/X RAID.  Thanks Stephen Kitt.
+    (Closes: #477998)
+  * update-grub/grub-install: Pass --device-map to grub-probe.  Thanks
+    segmentation@ntlworld.com.  (Closes: #476833)
+  * script: Fix use of uninitialised $i.
+  * update-grub: Make relative path resolution more robust.  (Closes: #478006)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sat, 26 Apr 2008 19:37:58 +0200
+
+grub (0.97-36) unstable; urgency=low
+
+  * Add debian/script.
+  * Set grub-reboot interpreter to /bin/bash.  (Closes: #473685)
+  * update-grub: Create device.map if it doesn't exist.  (Closes: #473889)
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon,  7 Apr 2008 17:49:48 +0200
+
+grub (0.97-35) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 28 Mar 2008 14:27:07 +0100
+
+grub (0.97-34) experimental; urgency=low
+
+  * patches/128gib_disk_limit.diff: Extend disk addressing up to 2 TiB.
+    (Closes: #450951)
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 20 Mar 2008 02:52:07 +0100
+
+grub (0.97-33) experimental; urgency=low
+
+  * control (grub): Suggest multiboot-doc.
+  * update-grub: Rewrite find_device() and convert() using grub-probe from
+    grub-common package.  (Closes: #435708, #443897, #463274, #301373, #284790)
+  * patches/use_grub-probe_in_grub-install.diff: Do the same for grub-install.
+    (Closes: #441080)
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 29 Feb 2008 20:31:41 +0100
+
+grub (0.97-32) unstable; urgency=low
+
+  * Split grub-doc in multiboot-doc and grub-legacy-doc.
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 28 Feb 2008 12:16:06 +0100
+
+grub (0.97-31) unstable; urgency=low
+
+  * README.Debian, NEWS.Debian: Recommend that users invoke update-grub
+    directly without hardcoding its path.  (Closes: #465235)
+  * savedefault command is now issued when enabled via menu.lst variable
+    of the same name, when user accepts the implications (note, that in
+    the default configuration it was already disabled).
+    (Closes: #393079, #462701)
+  * Restrict license in debian/copyright to GPLv2-only.  (Closes: #438177)
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon, 11 Feb 2008 17:32:57 +0100
+
+grub (0.97-30) unstable; urgency=low
+
+  * update-grub:
+    - Update Marc Haber's address.  (Closes: #432700)
+    - Make it more friendly to its GRUB 2 compatibiliy fork.
+  * control (Build-Depends-Indep): Remove e2tools and mkisofs.
+  * patches/ext3_256byte_inode.diff: New.  Support 256-byte inodes in ext3.
+    Thanks Stefan Lippers-Hollmann.  (Closes: #463236)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun,  3 Feb 2008 01:19:47 +0100
+
+grub (0.97-29) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * update-grub: Improve sorting with mixed numeric and non-numeric
+    characters. Thanks dann frazier <dannf@debian.org> for the
+    patch. Closes: #422759
+
+  [ Robert Millan ]
+  * Add myself to Uploaders.
+  * update-grub: Remove core.img handling.  It was becoming meaningless
+    without presence of the grub-pc package.
+  * control (Architecture): Replace any-* arches with the old, boring,
+    hardcoded list.  (Closes: #424510)
+  * Get rid of grub-disk, mkbimage and grub-floppy.  They're deprecated
+    in favour of grub-rescue-pc now.  (Closes: #399168, #250938, #429576,
+    #352731)
+
+ -- Robert Millan <rmh@debian.org>  Tue, 26 Jun 2007 07:48:57 +0200
+
+grub (0.97-28) unstable; urgency=low
+
+  * Remove second /sbin/update-grub warning.  Apparently, it is
+    impossible to detect /etc/kernel-img.conf syntax by checking $0.
+    (Closes: #421321)
+  * update-grub.8: Don't recommend /sbin/update-grub anymore. (Closes: #418064)
+  * control (Build-Depends): s/libc6-dev-i386/gcc-multilib/g.
+  * update-grub: When GRUB 2 core.img is detected, set it as first option
+    (note that first doesn't imply default).
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon,  7 May 2007 20:58:31 +0200
+
+grub (0.97-27) unstable; urgency=high
+
+  * When counting the number of kernels, do not count invalid xen
+    ones. Thanks to "Jon H. Davis" <jon@mast.queensu.ca> by investigate
+    and produce the patch for it. Closes: #411908
+
+ -- Otavio Salvador <otavio@ossystems.com.br>  Fri, 30 Mar 2007 02:38:31 -0300
+
+grub (0.97-26) unstable; urgency=high
+
+  * Brown bag release!
+  * Fix two stupid mistakes on previous changes. Thanks to Steve Langasek
+    <vorlon@debian.org> by identify them.
+
+ -- Otavio Salvador <otavio@ossystems.com.br>  Fri, 23 Mar 2007 08:34:00 -0300
+
+grub (0.97-25) unstable; urgency=high
+
+  * Fix grub-install regexp to work when providing the whole device as in
+    /dev/cciss/c0d0. Thanks to Jason Cormie <j.cormie@abertay.ac.uk> by
+    the patch. Closes: #414161
+
+ -- Otavio Salvador <otavio@ossystems.com.br>  Thu, 22 Mar 2007 23:04:13 -0300
+
+grub (0.97-24) unstable; urgency=high
+
+  [ Leandro Dorileo ]
+  * Changed grub-set-default to search for grub dir if rootdir is not
+    informed. Closes:  #411109, #412334
+  * Applied changes from Friedemann Baitinger <baiti@web.de>
+    to savedefault-once. closes: #254475
+
+ -- Otavio Salvador <otavio@ossystems.com.br>  Tue, 20 Mar 2007 23:37:46 -0300
+
+grub (0.97-23) unstable; urgency=high
+
+  [ Tomas Pospisek ]
+  * Cross-referenced grub-install(8), grub(8) and update-grub(8) with
+    each other. Closes: #267998,
+  * Mention in the manpages that the info documentation comes with
+    the grub-doc package. Closes: #160337, #345655
+  * Note in the referring manpage, that kernel-img.conf comes with the
+    kernel-package package. Closes: #398419
+
+  [ Otavio Salvador ]
+  * Applied patch from Jason Rhinelander <jason@imaginary.ca> to fix
+    kernel ordering on menu.lst generated file. Closes: #374371, #410464
+
+ -- Otavio Salvador <otavio@debian.org>  Tue, 13 Feb 2007 14:48:40 -0200
+
+grub (0.97-22) unstable; urgency=high
+
+  * Applied patch from Chip Salzenberg <chip@pobox.com> to avoid to write
+    to stdout. Fix kernel postrm calls. Closes: #409190.
+  * Applied patch from Joey Hess <joeyh@debian.org> to put xen kernels
+    when running inside of a domU. Closes: #404536.
+
+ -- Otavio Salvador <otavio@debian.org>  Wed, 31 Jan 2007 21:49:14 -0200
+
+grub (0.97-21) unstable; urgency=medium
+
+  [ Leandro Dorileo ]
+  * Changed update-grub to call grub-set-default 0, and a warning a message
+    telling the user that the default file was regeneraged. Closes: #406068.
+  * Added some missing savedefault_func return in stage2.c and how the read
+    default buf was being handled. Thanks Len Sorensen
+    <lennartsorensen@ruggedcom.com> by the suggestions. Closes: #403763.
+
+ -- Otavio Salvador <otavio@debian.org>  Sun, 14 Jan 2007 23:20:48 -0200
+
+grub (0.97-20) unstable; urgency=low
+
+  * Add manpage for grub-set-default. Thanks for Patrick Schönfeld
+    <schoenfeld@in-medias-res.com> by the patch. Closes: #399699
+  * Write grub-install wrapper messages on stderr instead of stdout.
+    Closes: #390038, #388696, #395359.
+  * Write update-grub wrapper messages on stderr instead of stdout.
+
+ -- Otavio Salvador <otavio@debian.org>  Wed,  6 Dec 2006 11:01:44 -0200
+
+grub (0.97-19) unstable; urgency=low
+
+  [ Leandro Dorileo ]
+  * Changed how grub handles the saved default entry in the savedefault(once)
+    patch in stage2/stage2.c cmain function, changed grub-reboot to print
+    the warning already being printed in grub-set-default to default file.
+    Closes: #367889, #397021.
+
+  [ Otavio Salvador ]
+  * Applied patch from "Christian Eckerle" <ce@publishing-etc.de> to not
+    always prepend /boot in front of the kernel line for xen if /boot is
+    on its on partition. Closes: #393488.
+  * Applied patch from Mike Kasick <mkasick@club.cc.cmu.edu> to fix the
+    handle of null options. Closes: #395275.
+  * Applied patch from Markus Schulz <msc@antzsystem.de> to fix xen kernel
+    name detection. Closes: #397775.
+  * Fix grub-install and update-grub mess. Closes: #394020.
+  * Applied patch from "A. Costa" <agcosta@gis.net> to fix a typo on
+    update-grub.8. Closes: #396315.
+
+ -- Otavio Salvador <otavio@debian.org>  Thu,  9 Nov 2006 11:15:39 -0200
+
+grub (0.97-18) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * Fix clean target to remove generated files. Thanks to Joey Hess
+    <joeyh@debian.org> for the patch. Closes: #385980
+  * Fix grub-install.wrapper to check for /usr/sbin/grub-install.real
+    otherwise grub-install will never be run. Thanks to Pier Luigi Pau
+    <pigipau@gmail.com> by noticed it. Closes: #387729
+
+  [ Robert Millan ]
+  * grub-floppy: Update old /lib path.  (Closes: #390167)
+
+ -- Otavio Salvador <otavio@debian.org>  Tue,  3 Oct 2006 14:03:35 -0300
+
+grub (0.97-17) unstable; urgency=low
+
+  [ Petter Reinholdtsen ]
+  * Install grub-install.wrapper as /sbin/grub-install, not
+    /usr/sbin/grub-install. (Closes: #387500, #387729)
+
+  [ Leandro Dorileo ]
+  * Changed few mistakes in NEWS. Closes: #387700
+  * Install grub-install as /usr/sbin/grub-install.real and changed its wrapper.
+  * Corrected few english mistakes in grub-install.wrapper and
+    update-grub.wrapper.
+  * Changed the wrappers to call the real script with "$@" instead of $*.
+    Closes: #388277
+
+  [ Robert Millan ]
+  * update-grub: Detect GRUB 2 core image (and add title to chainload it).
+  * Get rid of type-handling.
+    - control.in: Remove.
+    - rules: Drop control generation target.
+    - control: Staticalise the dynamicaly generated tags.
+  * control (Suggests): Remove grubconf (Closes: #389094).
+  * Add a big warning to bug reporters, explaining that GRUB Legacy is feature
+    frozen.
+    - presubj: New.  Install it in every package.
+
+  [ Otavio Salvador ]
+  * Add XS-X-Vcs-Svn on control file and point it to our current svn
+    repository.
+
+ -- Otavio Salvador <otavio@debian.org>  Mon,  2 Oct 2006 11:42:58 -0300
+
+grub (0.97-16) unstable; urgency=high
+
+  ### High urgency since it solve a installation problem on beta3 of d-i ###
+
+  [ Bastian Blank ]
+  * Add selection of xen hypervisors.
+
+  [ Robert Millan ]
+  * rules:  Install grub-disk iso uncompressed (tradeoff is reasonable, unlike
+    the ext2fs image).
+
+  [ Otavio Salvador ]
+  * Add grub-install wrapper forgotten in transition handle. Closes: #387500
+  * Edited NEWS.Debian following Manoj Srivastava <srivasta@debian.org>
+    suggestion to avoid brokeness when removing old kernels. Closes: #387325
+  * Fix README.Debian to cite the new scripts place.
+
+ -- Otavio Salvador <otavio@debian.org>  Fri, 15 Sep 2006 09:50:32 -0300
+
+grub (0.97-15) unstable; urgency=low
+
+  * Remove bashism from update-grub wrapper.
+
+ -- Otavio Salvador <otavio@debian.org>  Sat,  2 Sep 2006 08:53:20 -0300
+
+grub (0.97-14) unstable; urgency=low
+
+  [ Robert Millan ]
+  * Make update-grub more $menu_file agnostic to ease code sharing with grub2
+    (which uses grub.cfg).  Also remove explicit "boot" command that has never
+    been required, and would break grub2.
+  * Fix FHS-me-harder headache.  (Closes: #361929)
+    - rules:  --prefix=/usr.
+    - grub.install:  Move the stuff to /usr.
+  * update-grub:  Set interpreter to /bin/bash to cope with non-POSIX
+    extensions.  (also mentioned in #361929)
+
+  [ Otavio Salvador ]
+  * Remove convert_kernel26 usage since it's not necessary anymore and due
+    initramfs-tools changes it's bug too.
+  * Add a NEWS file describing how to upgrade the system regarting to
+    grub-install and update-grub moving.
+  * Change the way we handle FHS headache:
+    - debian/wrappers: New. Provide a wrapper to old locations.
+  	- debian/rules: install the wrappers.
+    - grub.dirs: New. Create /sbin.
+
+ -- Otavio Salvador <otavio@debian.org>  Wed, 30 Aug 2006 12:24:48 -0300
+
+grub (0.97-13) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * Use automake1.9 instead of automake1.8;
+  * Added build-depends of autotools-dev since it uses autoconf;
+  * Applied patch to add support to Xen hypervisor kernel handling. Thanks
+    to Alastair McKinstry <mckinstry@debian.org> and Thomas Schwinge
+    <tschwinge@gnu.org> for the patch. (Closes: #343076)
+  * Remove all autogenerated files before make the package diff so we
+    reduce the delta size between us and upstream a lot.
+  * Applied patch to add support to AoE devices. Thanks to James Harper
+    <james.harper@bendigoit.com.au> for the patch. (Closes: #377005)
+  * Add mdadm as suggested since it's need to support RAID installations.
+    (Closes: #299751)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon, 24 Jul 2006 10:43:07 -0300
+
+grub (0.97-12) unstable; urgency=HIGH
+
+  [ Otavio Salvador ]
+  * Bump Standards-Version to 3.7.2.1 (no changes);
+
+  [ Robert Millan ]
+  * New snapshot. (Closes: #374952)
+    patches:
+    - cvs-sync.patch: Update manualy to latest version _before_ GFDL change.
+    - grub-special_device_names.diff: Resync.
+
+  [ Otavio Salvador ]
+  * Applied patch from Michael Biebl <biebl@teco.edu> to fix failure to
+    catch the right root device when using RAID and new mdadm
+    packages. (Closes: #375927)
+  * Set urgency as 'high' due the mdadm issue that can break installations
+    on Etch.
+
+ -- Otavio Salvador <otavio@debian.org>  Mon,  3 Jul 2006 20:25:36 -0300
+
+grub (0.97-11) unstable; urgency=low
+
+  * Don't use /dev/ida!cXdYpZ format since ida RAID controllers aren't
+    using that format in newer kernels. Current code already skip
+    /dev/cciss devices. Closes: #362095
+  * Applied patch from Matt Taggart <taggart@debian.org> to fix a
+    regression in update-grub code when using memtest86 enabled.
+    Closes: #371196, #372648
+
+ -- Otavio Salvador <otavio@debian.org>  Thu, 15 Jun 2006 08:53:14 -0300
+
+grub (0.97-10) unstable; urgency=low
+
+  * Fix build-depends for amd64. Closes: #369452, #369723.
+  * Apply patch from Tino Keitel <tino.keitel@web.de> to allow grub to
+    work in Apple Intel based machines. Closes: #369655.
+  * Fix problem registering documentation in doc-base. Closes: #369578.
+  * Add doc-base as suggestion for grub-doc package.
+  * Replace the alternative boot images from recovery mode to single-user
+    mode. Closes: 370110.
+  * Apply patch from Martin F. Krafft <madduck@debian.org> to implement
+    the lockold feature, which allows older kernel stanzas to be
+    automatically locked (pasword-protected). His work is based on a patch
+    by Dominic Hargreaves Closes: #120125.
+
+ -- Otavio Salvador <otavio@debian.org>  Mon,  5 Jun 2006 12:26:47 -0300
+
+grub (0.97-9) unstable; urgency=low
+
+  * Revert move of files to /usr/sbin 'cause it broke d-i. (reopen: #361929)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon, 29 May 2006 15:21:56 -0300
+
+grub (0.97-8) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * Sync with CVS due to 20060529.
+  * Ack NMU:
+    - Regenerate control file. (closes: #360987)
+  * Use POSIX regexp to support more locales. Thanks to Hasso Tepper
+    <hasso@linux.ee> for the patch. (closes: #361438, #352670)
+  * Fix doc-base files. Thanks to Russ Allbery <rra@debian.org> for the
+    patch. (closes: #362993)
+  * Fix regexp to allow partitions later of hdg to work. Thanks to Andreas
+    John <aj@net-lab.net>. (closes: #362658)
+  * Move update-grub and grub-install to /usr/sbin since they are intent
+    to be only in full system. (closes: #361929)
+  * Apply patch from Robert Millan <rmh@aybabtu.com> to fix kFreeBSD issues.
+    (closes: #363698)
+  * Apply patch from Luca Capello <luca@pca.it> to improve update-grub
+    output regarding to splash images. (closes: #368097)
+
+  [ Leandro Dorileo ]
+  * Fix a typo in mkbimage.8. (closes: #277039)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon, 29 May 2006 13:45:06 -0300
+
+grub (0.97-7) unstable; urgency=low
+
+  [ Kristian Edlund ]
+  * Added the feature of letting update-grub update the default entry when
+    a new kernel is installed. Done partly by applying a patch from Thomas
+    Braun <thomas@akwgegner.de> (closes: #233966, #276477, #330083)
+  * Applied a patch from Vince Busam <vbusam@google.com> sort suffixes on
+    the kernel more detailed. (closes: #355790)
+
+  [ Leandro Dorileo ]
+  * Changed grub-reboot to handle /boot in other partition.
+    (closes: #360041)
+
+ -- Otavio Salvador <otavio@debian.org>  Sat,  1 Apr 2006 09:43:24 -0300
+
+grub (0.97-6) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * Applied patch from Colin Watson <cjwatson@debian.org> to fix segfaults
+    in hardware that has NX bit available (amd64, for example).
+    (closes: #293722)
+  * Remove comment from grub-reboot since we'll have savedefault --once
+    back :-D
+  * Applied patch from Frans Pop <aragorn@tiscali.nl> to invert
+    convert_kernel26 logic. (closes: #353725)
+  * Change build-dependencie for amd64. (closes: #357287, #357286)
+
+  [ Leandro Dorileo ]
+  * Reimplementation of savedefault --once. Now it reads and writes to
+    /boot/grub/default.
+    (closes: #254475, #341106, #341995, #353691, #355870, #342590)
+
+ -- Otavio Salvador <otavio@debian.org>  Tue, 28 Mar 2006 23:12:45 -0300
+
+grub (0.97-5) unstable; urgency=HIGH
+
+  [ Urgency set to HIGH since it broke LVM installations ]
+
+  [ Otavio Salvador ]
+  * Applied patch from David Golombek <daveg@permabit.com> to handle
+    DEB_BUILD_GNU_SYSTEM definition while building in sarge.
+    (closes: #351822, #350168)
+  * Fix device handling allowing LVM installation. (closes: #352654)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon, 13 Feb 2006 21:19:09 -0200
+
+grub (0.97-4) unstable; urgency=low
+
+  [ Kristian Edlund ]
+  * Solved problems in update-grub so running the script will sort
+    the kernels the same way using dash or bash. (closes: #346544)
+  * Applied patch provided by Ole Janssen <ole.janssen@o2online.de>
+    to fix a problem when /boot is on an extra partion (closes: #346596)
+  * Fixed the problem with multiple splashimage lines, if there is a
+    splashimage outside the autoupdated part of the file. (closes: #341538,
+    #318706, #345208, #283308, #345346)
+  * Corrected the README.Debian to contain the right path if /boot
+    is on another partion. (closes: #281051)
+
+  [ Otavio Salvador ]
+  * Don't convert /dev/mapper to new kernel 2.6 device scheme.
+    (closes: #347482)
+
+ -- Otavio Salvador <otavio@debian.org>  Thu, 19 Jan 2006 07:02:55 -0200
+
+grub (0.97-3) unstable; urgency=low
+
+  * Replace automake1.9 build-dependencie with automake1.8 to fix a FTBFS
+    issue. (closes: #344739, #346080)
+  * Redirect output to stderr. Thanks Bastian Blank <waldi@debian.org> for
+    a better solution. (closes: #344767, #346327)
+  * Add print_func.diff patch to beep in menu.lst. Useful for blind
+    people. Really thank up Osvaldo La rosa <vzwab@tiscali.be> for the
+    patch. (closes: #314210)
+  * Applied patch provided by Kristian Edlund <edlund@groenstue.dk> to fix
+    ordering kernel issues. (closes: #264312, #342221)
+  * Applied patch provided by Michal Cihar <michal@cihar.com> to allow
+    update-grub to run with dash. (closes: #346127)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon,  9 Jan 2006 13:37:41 -0200
+
+grub (0.97-2) unstable; urgency=low
+
+  * Update debian/control. This caused the wrong NMU identification :(
+  * Disable fix_amd64_compile.diff since it broke amd64 building. (closes: #340849)
+  * Add message to show that grub-reboot isn't supported in this release anymore.
+  * Drop odirect.diff since it broke RAID disk detection. (closes: #341888)
+  * Applied patch from Piotr Roszatycki <Piotr_Roszatycki@netia.net.pl> to
+    fix grub-install detection of RAID root device. (closes: #302359)
+  * Applied patch from Sven Joachim <sven_joachim@web.de> to fix some
+    typos on grub-floppy manpage. (closes: #342259)
+
+ -- Otavio Salvador <otavio@debian.org>  Thu, 22 Dec 2005 15:57:17 -0200
+
+grub (0.97-1) unstable; urgency=low
+
+  * New upstream release: (closes: #303967)
+    Patches:
+    - 2gb_limit.diff: resync;
+    - kfbsd_chainload.diff: dropped; not needed;
+    - fwritable-strings_remove.diff: dropped, merged upstream;
+    - console_current_color.diff: dropped, merged upstream;
+    - xsi_mkbimage.diff: dropped, merged upstream;
+    - smp-imps.diff: dropped, not needed;
+    - revert_grub-set-default.diff: dropped, not needed;
+    - savedefault.diff: disabled, don't apply anymore; (reopen: #195833)
+    - static_subfunc.diff: dropped, not needed;
+    Fixes:
+    -  Fallback to a sane console if fail to set graphical mode; (closes: #267224)
+  * Doesn't output a error when no kernel is installed. (closes: #336730)
+  * Make update-grub output consistent. (closes: #336729)
+  * Applied patch from Antonio Kanouras <solist@solistland.dnsalias.org>
+    to remove bashism from update-grub and allow it to run with
+    dash. (closes: #337145)
+  * Add a watch file to be easier to identify upstream releases
+  * debian/patches/fix_amd64_compile.diff: Added. Ensure that we build in
+    64bit mode in x86_64 arch. (closes: #337288)
+  * Start to use automake1.9 when building.
+  * Applied patch from Marco Amadori <marco.amadori@gmail.com> to
+    document, in menu.lst, to avoid _default saved_ option in case of
+    being use dmraid.
+  * Applied patch from Jason Thomas <jason@debian.org> to give a example
+    how to use kernel options to specific kernel version. (closes: #338371)
+  * Applied patches from Andrew Stribblehill <ads@debian.org> and Tony
+    Mancill <tmancill@debian.org> to fix grub-floppy to don't falsely
+    reports "stage1" as missing. (closes: #288678)
+  * Applied patch from Free Ekanayaka <free@agnula.org> to allow custom
+    title name in menu.lst. (closes: #298110, #138318)
+  * Applied patch from Georg Wittenburg <georg.wittenburg@gmx.net> to
+    allow specific options to default entry. (closes: #266101)
+  * Fix documentation installing. (closes: #339687)
+  * Clean the source code. (closes: #340656)
+  * Patches stolen from other vendors:
+    - [SuSE] initrd_max_address.diff: added. This change the max address
+      to host initrd image and add a safe default value in case of failure;
+    - [Fedora] splashimage_help.diff: added. Add documentation about
+      splashimage option; (closes: #200269)
+    - [Fedora] grub-install_addsyncs.diff: added. Ensure that filesystem
+      caches are flushed;
+    - [Fedora] geometry-26kernel.diff: added. Add geometry detection since
+      kernel 2.6 doesn't do that anymore, for IDE devices;
+    - [Fedora] odirect.diff: added. Use O_DIRECT to avoid cache issues.
+    - [Mandriva] graphics.diff: updated;
+
+ -- Otavio Salvador <otavio@debian.org>  Thu, 24 Nov 2005 22:52:31 -0200
+
+grub (0.95+cvs20040624-19) unstable; urgency=low
+
+  * Applied patch to fix a typo on update-grub script. (closes: #336573)
+
+ -- Otavio Salvador <otavio@debian.org>  Mon, 31 Oct 2005 18:54:39 -0200
+
+grub (0.95+cvs20040624-18) unstable; urgency=low
+
+  * Fix update-grub to handle the case when /boot is in another partition
+    then /. (closes: #280086, #261936)
+  * Fix update-grub to don't fail when called from /usr/bin. (closes: #321072)
+  * Applied patch from Martin Michlmayr <tbm@cyrius.com> to not generate
+    trailing white space. (closes: #310030)
+  * Applied patch from Y Giridhar Appaji Nag <debian@appaji.net> to fix
+    FTBFS due invalid storage class for function. (closes: #318539)
+  * Remove code to use gcc-3.4 in case of x86-64 architecture since we now
+    use gcc-4.0 as default compiler.
+  * fwritable-strings_remove.diff: New. Remove -fwritable-strings from
+    Makefiles to allow the build with GCC 4.0.
+  * Change code to handle architectures to be compatible with new dpkg
+    versions but maintaining it backward compatible to make easier to
+    backport it to stable. (closes: #335038)
+  * Clean up doc directory in clean targe of rules.
+  * Bump Standards-Version to 3.6.2.1 (no changes need).
+  * Add myself in Uploaders field.
+  * Remove Robert Millan <rmh@debian.org> from Uploaders field as
+    requested by him.
+  * Applied patch from Jason Thomas <jason@debian.org> to remove the use
+    of awk. (closes: #266243)
+  * Applied patch from Jens Kubieziel <jens@kubieziel.de> to fix a typo in
+    update-grub script. (closes: #333181, #306255)
+  * Add gen-control target in rules and remove the control update from
+    clean target since it isn't allowed in Debian Police anymore.
+  * Update FSF address in copyright file.
+
+ -- Otavio Salvador <otavio@debian.org>  Sat, 29 Oct 2005 14:14:27 -0200
+
+grub (0.95+cvs20040624-17) unstable; urgency=low
+
+  * update-grub: fix sort order of new 4 digit kernel versions.
+    (closes: #304841)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 19 Apr 2005 09:38:07 +1000
+
+grub (0.95+cvs20040624-16) unstable; urgency=low
+
+  * update-grub: fix kopt parsing to handle + signs in kernel versions
+    (closes: #299528)
+  * update-grub: fix variable parsing in get_kernel_opt function.
+    (closes: #296724)
+  * update-grub: don't add savedefault entry to memtest86 entries.
+    (closes: #291733)
+  * update-grub: fixed spelling mistake
+    (closes: #283072)
+  * update-grub: remove temp files
+    (closes: #284731)
+  * grub-floppy: fixed shell expansion
+    finally a nice patch from "Clement 'nodens' Hermann"
+    (closes: #278529)
+
+ -- Jason Thomas <jason@debian.org>  Sun, 20 Mar 2005 10:25:41 +1100
+
+grub (0.95+cvs20040624-15) unstable; urgency=low
+
+  * update-grub: fix kopt parsing to support -anything kernel versions.
+    (closes: #295749)
+
+ -- Jason Thomas <jason@debian.org>  Fri, 18 Feb 2005 10:20:31 +1100
+
+grub (0.95+cvs20040624-14) unstable; urgency=low
+
+  * update-grub: add support for raid1
+    (closes: #292274)
+
+ -- Jason Thomas <jason@debian.org>  Fri,  4 Feb 2005 13:28:53 +1100
+
+grub (0.95+cvs20040624-13) unstable; urgency=high
+
+  * patches/grub-special_device_names.diff: add support for special devices.
+    (closes: #290098)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 17 Jan 2005 09:29:18 +1100
+
+grub (0.95+cvs20040624-12) unstable; urgency=low
+
+  * update-grub should look for memtest86 in /boot
+    (closes: #229649)
+  * Add support for memtest86+ to update-grub
+    (closes: #282530)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 23 Nov 2004 10:07:30 +1100
+
+grub (0.95+cvs20040624-11) unstable; urgency=low
+
+  * Added support for LABEL/UUID to update-grub.
+    (Closes: #211096, #215116)
+  * Added support for 4 digit kernel version to update-grub.
+    (Closes: #266049)
+  * Added support for memtest86 to update-grub.
+    (Closes: #229649)
+  * Fixed update-grub to detect default and previous kernels correctly.
+    (Closes: #230136, #240599, #250545, #268141)
+  * Update-grub now ignores .dpkg-*
+    (Closes: #265915)
+  * Added support for fat_stage1_5 to linux build.
+    (Closes: #281652)
+  * Removed e2fsprogs from Build-Depends-Indep as it is an Essential package.
+
+ -- Jason Thomas <jason@debian.org>  Fri, 19 Nov 2004 09:40:53 +1100
+
+grub (0.95+cvs20040624-10) unstable; urgency=medium
+
+  * Fixes to build on x86_64 cpus. Thanks Andreas Jochens. (Closes: #250225)
+    - control.in (Build-Depends):  Add ia32-libs [@x86_64@], gcc-3.4 [@x86_64@]
+    - rules
+  * update-grub: detect and handle splash images.  Thanks Nathaniel McCallum.
+    (Closes: #261936)
+  * patches/raid_cciss.diff:  Add analogous support for IDA devices.
+    Thanks Piotr Roszatycki.  (Closes: #265027)
+
+ -- Robert Millan <rmh@debian.org>  Thu, 14 Oct 2004 02:18:15 +0200
+
+grub (0.95+cvs20040624-9) unstable; urgency=low
+
+  * patches/kfreebsd.diff: New.  Support for direct loading of kFreeBSD.
+    Thanks Guillem Jover.
+
+ -- Robert Millan <rmh@debian.org>  Fri,  1 Oct 2004 21:45:13 +0200
+
+grub (0.95+cvs20040624-8) unstable; urgency=low
+
+  * patches/2gb_limit.diff: New.  Fix problem with systems with more than
+    2 GB memory (notably, x86_64-based systems).  Thanks Goswin Brederlow.
+
+ -- Robert Millan <rmh@debian.org>  Sat, 14 Aug 2004 19:29:55 +0200
+
+grub (0.95+cvs20040624-7) unstable; urgency=low
+
+  * patches/xfs_freeze.diff: New. Fix grub-install for XFS. (Closes: #239111)
+  * update-grub: s/local tmp//g. Thanks again, David. (Closes: #261570)
+  * patches/raid_cciss.diff: New. Support for CCISS devices. (Closes: #261447)
+  * Use type-handling to auto-generate dpkg archlist for i386 cpus.
+    - control.in: New. Set 'Architecture: @i386@' and add type-handling to
+      Build-Depends.
+    - rules: Auto-generate debian/control in clean target.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 26 Jul 2004 23:39:43 +0200
+
+grub (0.95+cvs20040624-6) unstable; urgency=low
+
+  * Fix XSI-isms in update-grub and mkbimage. Thanks David Weinehall.
+    (Closes: #256100)
+    - patches/xsi_mkbimage.diff: New. Fix util/mkbimage.
+    - update-grub
+  * rules: Select only filesystems supported natively in Debian for installing
+    ${fs}_stage1_5 files (non-native filesystems are supported in stage2).
+  * Fix syntax error introduced in previous upload.
+    - patches/raid.diff
+    - update-grub
+
+ -- Robert Millan <rmh@debian.org>  Fri, 23 Jul 2004 00:49:10 +0200
+
+grub (0.95+cvs20040624-5) unstable; urgency=low
+
+  * Fix update-grub and grub-install for d-i installs on RAID hardware.
+    Thanks Charles Steinkuehler. (Closes: #259238)
+    - patches/raid.diff: New. Fix util/grub-install.in.
+    - update-grub
+
+ -- Robert Millan <rmh@debian.org>  Wed, 21 Jul 2004 01:03:34 +0200
+
+grub (0.95+cvs20040624-4) unstable; urgency=low
+
+  * rules:
+    - Make build not depend on build-indep. (Closes: #258643)
+    - Use stage2_eltorito for building cdrom image.
+  * control:
+    - Make grub suggest grubconf.
+    - Merge Build-Depends in a single line to keep lintian happy.
+    - s/Grub-Devel/Grub Maintainers/g with the same goal.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 12 Jul 2004 14:09:29 +0200
+
+grub (0.95+cvs20040624-3) unstable; urgency=low
+
+  * rules: Nuke --exec-prefix and replace the install target prefix overrides
+    with DESTDIR override, in order to fix grub-install breakage.
+    As a side effect, this moves /usr/lib/grub to /lib/grub (which happens
+    to fix FHS compliance ;)
+  * grub-floppy: Cope with that.
+
+ -- Robert Millan <rmh@debian.org>  Sat, 26 Jun 2004 04:07:39 +0200
+
+grub (0.95+cvs20040624-2) unstable; urgency=low
+
+  * update-grub: Really apply Kiko's patch. (Realy closes: #224441)
+
+ -- Robert Millan <rmh@debian.org>  Sat, 26 Jun 2004 02:15:06 +0200
+
+grub (0.95+cvs20040624-1) unstable; urgency=low
+
+  * New upstream snapshot. (Closes: #254433)
+    - Fixes FTBFS in UFS2 code. (Closes: #253945)
+    - Resync all patches.
+    - patches/revert_grub-set-default.diff: New. Revert to old interface in
+      setdefault, untill we implement --once with the new one.
+    * FHS compliance for stage files.
+      - rules: Unset --datadir.
+      - rules: s|/usr/lib/grub|/lib/grub|g.
+      - grub-floppy: Likewise.
+      - patches/02grub-doco-path.patch: Nuked. Merged in upstream.
+  * update-grub: Fix ordering by Linux version for test/rc/ac/pre.
+    Gràcis Kiko Piris. (Closes: #224441)
+  * update-grub: Minor k*bsd-related portability fixes.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 24 Jun 2004 16:56:19 +0200
+
+grub (0.94+cvs20040511-1) unstable; urgency=low
+
+  * New upstream snapshot.
+  * patches/ufs2.diff: New. Add UFS2 support. (Closes: #212340)
+    - patches/graphics.diff: Resync.
+  * control (Build-Depends): Moved e2tools, e2fsprogs and mkisofs to
+    Build-Depends-Indep (they are only needed for grub-disk).
+  * control (Build-Depends): Bump debhelper dependency to >= 4.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 11 May 2004 22:13:15 +0200
+
+grub (0.94+cvs20040429-1) unstable; urgency=low
+
+  * New upstream snapshot. (Closes: #245350)
+    - patches/*.diff: Resync.
+    - Syntax fixes in mkbimage. Thanks Yann Dirson. (Closes: #239066, #242319)
+    - Includes CDROM support (at last!). (Closes: #154534)
+    - Fixes for kernel of FreeBSD 5.x. (Closes: #216875)
+  * Migrating to automake 1.8.
+    - control (Build-Depends): s/1.7/1.8/g
+    - rules: Ditto.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 29 Apr 2004 21:15:59 +0200
+
+grub (0.93+cvs20031021-8) unstable; urgency=high
+
+  * debian/update-grub: Fix initrd entry generation. Thanks Jean Charles
+    Delepine. (Closes: #224853).
+  * Set Maintainer to mailing list.
+    - debian/control (Maintainer): Set to pkg-grub-devel@lists.alioth.d.o.
+    - debian/control (Uploaders): Add Jason.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  6 Jan 2004 21:34:29 +0100
+
+grub (0.93+cvs20031021-7) unstable; urgency=low
+
+  * debian/update-grub: more missing quotes in get_kernel_opt func
+
+ -- Jason Thomas <jason@debian.org>  Thu, 11 Dec 2003 11:26:51 +1100
+
+grub (0.93+cvs20031021-6) unstable; urgency=low
+
+  * debian/update-grub: was generating mangled menu.lst due to missing quotes
+    around arguments to function.
+    (closes: #222411, #222738, #222789, #222800)
+
+ -- Jason Thomas <jason@debian.org>  Wed, 10 Dec 2003 10:01:40 +1100
+
+grub (0.93+cvs20031021-5) unstable; urgency=low
+
+  * debian/update-grub: fixed to handle seperate /boot partition.
+    (closes: #219833)
+
+ -- Jason Thomas <jason@debian.org>  Thu, 20 Nov 2003 11:52:02 +1100
+
+grub (0.93+cvs20031021-4) unstable; urgency=low
+
+  * debian/update-grub: fixed bug introduced by patch below.
+    (closes: #221395)
+  * patches/00list: disabled update-grub-linux2.6.diff as it is now permanetly
+    applied. will delete it later.
+  * debian/grub-reboot: add --version parameter
+  * created manpage for grub-reboot.
+  * debian/rules: moved compat version to debian/compat and made version 4
+  * debian/rules: moved multiple install lines to grub.install for use by
+    dh_install
+  * debian/rules: updated to closely match what dh_make produces for multi
+    binary packages. so added binary-common target and install-arch targets.
+  * debian/control: updated standards-version to 3.6.1.0
+
+ -- Jason Thomas <jason@debian.org>  Tue, 18 Nov 2003 14:04:01 +1100
+
+grub (0.93+cvs20031021-3) unstable; urgency=low
+
+  * Provide an iso9660 CD image with grub-disk
+    - control (Build-Depends): Add mkisofs.
+    - rules: Uncomment and misc fixes in mkisofs commands.
+
+ -- Robert Millan <rmh@debian.org>  Sat, 15 Nov 2003 19:53:46 +0100
+
+grub (0.93+cvs20031021-2) unstable; urgency=low
+
+  * Added "one-time savedefault" feature, thanks to Keir Freser for his
+    patch. (Closes: #195833)
+    - patches/savedefault.diff: New.
+    - patches/00list: Add it.
+  * Wrote script for "lilo -R" like functionality, using the feature above).
+    (Closes: #155807)
+    - grub-reboot: New.
+    - rules: Install grub-reboot.
+  * rules: Move mkbimage to /bin since non-root may also use it now.
+
+ -- Robert Millan <rmh@debian.org>  Wed,  5 Nov 2003 13:20:03 +0100
+
+grub (0.93+cvs20031021-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - patches/automake.diff: Nuked.
+    - patches/graphics.diff: Update.
+  * patches/menu.lst_gnu-hurd.diff: New. Clarify GNU/Hurd entry.
+  * patches/update-grub_linux2.6.diff: New. Support different options for
+    Linux 2.6. Thanks Michal Cihar. (Closes: #208051)
+  * rules (clean): Remove config.log.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 21 Oct 2003 14:41:08 +0000
+
+grub (0.93+cvs20031008-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - mkbimage: Nuked.
+    - rules: install mkbimage from util/mkbimage.
+    - patches/04ext2_msdos.patch: Nuked.
+    - patches/00list: Update.
+  * Update autotools. (Closes: #212092)
+    - patches/automake.patch: New.
+    - patches/00list: Add it.
+    - control: Build-Depend on automake1.7 and autoconf (2.5x).
+    - rules: Use automake1.7 and autoconf (2.5x).
+  * Chainload fix for KFreeBSD. (Closes: #201760)
+    - patches/07kfbsd_chainload.patch: Rename to..
+    - patches/kfbsd_chainload.diff: This.
+    - patches/00list: Enable it.
+  * grub-doc.install: Add '\n'.
+  * patches/01misc_doc.patch: Commented.
+
+ -- Robert Millan <rmh@debian.org>  Wed,  8 Oct 2003 20:49:58 +0000
+
+grub (0.93+cvs20030905-2) unstable; urgency=low
+
+  * rules (clean): Get rid of config.{log,status} hack.
+  * Reapplied graphics patch. (Closes: #209068)
+    - patches/graphics.diff: New.
+    - patches/00list: Add graphics.diff.
+  * Generate autotools stuff dynamicaly (for graphics.diff to take effect).
+    - control (Build-Depends): Add automake1.5 and autoconf2.13.
+    - rules (configure): Run aclocal-1.5 && automake-1.5 && autoconf2.13.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  9 Sep 2003 17:31:06 +0000
+
+grub (0.93+cvs20030905-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - debian/patches/06bsd_menu.lst.patch: Nuked (merged in upstream).
+  * build-indep split.
+    - debian/rules: Split build-indep stuff into build-indep target.
+    - debian/control: Move texi2html to Build-Depends-Indep.
+    - debian/rules: Moved grub-doc html install to grub-doc.install.
+    - debian/grub-doc.install: New.
+  * debian/grub-floppy: Use /bin/echo which supports -e. (Closes: #208216)
+  * debian/patches/01misc_doc.patch: New. Extracted from debian diff.gz.
+    What is it? :)
+  * debian/patches/04ext2_msdos.patch: New. Fix ext2fs detected as msdos,
+    patch from upstream. (Closes: #175358)
+  * Add 00list support in patch system; patches are now selectable.
+    - debian/patches/00list: New.
+    - debian/rules (patch): Use 00list for patch selection.
+  * debian/patches/00list: Disable 07kfbsd_chainload.patch, since it's causing
+    FTBFS. Will ask for a review. (Reopens: #201760)
+  * debian/rules (clean): Remove config.{log,status} to fix possible FTBFS in
+    autobuilders. Should be fixed in upstream Makefiles.
+
+ -- Robert Millan <rmh@debian.org>  Fri,  5 Sep 2003 03:05:56 +0000
+
+grub (0.93+cvs20030813-4) unstable; urgency=low
+
+  * update-grub: abort function is called from find_grub_dir so needs to be
+    declared above this.
+    (closes: #206134)
+  * removed resolve_symlink function in favour of the readlink from the
+    coreutils package. Thanks to Steven Barker <steve@blckknght.org>
+    (closes: #205726)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 19 Aug 2003 10:24:54 +1000
+
+grub (0.93+cvs20030813-3) unstable; urgency=low
+
+  * added patch to make chainloading FreeBSD work when using the graphic mode.
+    thanks to Carlos Liu <carlos@linuxfire.com>
+    (closes: #201760)
+
+ -- Jason Thomas <jason@debian.org>  Thu, 14 Aug 2003 10:53:33 +1000
+
+grub (0.93+cvs20030813-2) unstable; urgency=low
+
+  * update-grub: we need to have initial values for menu.lst in case they
+    where accidentally removed from the menu.lst
+    (closes: #188084)
+
+ -- Jason Thomas <jason@debian.org>  Wed, 13 Aug 2003 14:41:24 +1000
+
+grub (0.93+cvs20030813-1) unstable; urgency=low
+
+  * New CVS snapshot
+    - resolves symlinks for devices
+    (closes: #204991, #189815, #181243)
+    - support for --no-floppy with grub-install
+    (closes: #199470)
+
+  * update-grub: added function to resolve symlinks.
+    other places in the script that were doing this now use this function.
+    default/previous now handle absolute symlinks.
+
+ -- Jason Thomas <jason@debian.org>  Wed, 13 Aug 2003 12:44:17 +1000
+
+grub (0.93+cvs20030624-6) unstable; urgency=low
+
+  * update-grub was using '==' for comparsion in some places which is wrong.
+    (closes: #189253, #204331)
+  * update-grub now resolves root device if its a symlink
+  * update-grub now resolves symlinks for default/previous kernels and put in
+    the verison number.
+
+ -- Jason Thomas <jason@debian.org>  Tue, 12 Aug 2003 14:34:25 +1000
+
+grub (0.93+cvs20030624-5) unstable; urgency=low
+
+  * added new package grub-disk which provides a 1.44meg bootable image.
+    (closes: #190392)
+  * debian/update-grub: added patch to fix sorting of kernels
+    (closes: #187006)
+  * debian/control: added Robert Millan to Uploaders
+
+ -- Jason Thomas <jason@debian.org>  Fri,  1 Aug 2003 12:44:50 +1000
+
+grub (0.93+cvs20030624-4) unstable; urgency=low
+
+  * updated update-grub, to support a default and previous kernel image.
+    using /boot/vmlinuz and /boot/vmlinuz.old.
+
+ -- Jason Thomas <jason@debian.org>  Fri,  1 Aug 2003 10:57:43 +1000
+
+grub (0.93+cvs20030624-3) unstable; urgency=low
+
+  * Updated mkbimage, from upstream plus patch from Robert Millan
+    (closes: #200282)
+
+ -- Jason Thomas <jason@debian.org>  Mon,  7 Jul 2003 14:03:21 +1000
+
+grub (0.93+cvs20030624-2) unstable; urgency=low
+
+  * debian/control: added freebsd and netbsd arches
+  * docs/menu.lst: added patch to update this with examples for freebsd and
+    netbsd.
+    (closes: #199301)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 30 Jun 2003 07:46:21 +1000
+
+grub (0.93+cvs20030624-1) unstable; urgency=low
+
+  * New CVS snapshot.
+  * Fixes FTBFS with gcc-3.3
+    (closes: #195234)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 24 Jun 2003 07:35:30 +1000
+
+grub (0.93+cvs20030224-2) unstable; urgency=low
+
+  * applied patch to mkbimage which fixes it for other filesystems types,
+    thanks to Carlo Contavalli.
+    (closes: #182646)
+  * update-grub should not go looking for a root device and friends if we
+    already have a menu.lst file as it will have all the info we need in it.
+  * update-grub does not try to calculate the grub root device if we don't
+    have a device.map file or if /boot is the root dir
+    (closes: #182504)
+
+ -- Jason Thomas <jason@debian.org>  Thu, 27 Feb 2003 12:13:46 +1100
+
+grub (0.93+cvs20030224-1) unstable; urgency=low
+
+  * New CVS snapshot.
+    - upstream fixed a bug in grub-install caused by new sed.
+    (closes: #182071)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 24 Feb 2003 12:58:53 +1100
+
+grub (0.93+cvs20030217-1) unstable; urgency=low
+
+  * New CVS snapshot.
+  * Allow mkbimage to be installed into different dir on gnu systems, thanks
+    to Robert Millan.
+    (closes: #160912)
+  * Fixed error in mkbimage script, thanks to Bruce Edge.
+    (closes: #176607)
+  * This could bite me in that ass later, but update-grub now figures out the
+    root_device and grub_device.
+    (closes: #110431)
+  * update-grub now prints each kernel that it finds.
+  * more info about splashimages in README.Debian, thanks to Jeronimo
+    Pellegrini
+    (closes: #176055)
+  * update-grub can now run can now be run noninteractively.
+    (closes: #158485)
+  * forgot to close a bunch of bugs todo with splashimage last upload.
+    (closes: #121083, #116965, #118701)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 17 Feb 2003 11:45:45 +1100
+
+grub (0.93+cvs20030102-1) unstable; urgency=low
+
+  * New CVS snapshot + automake patch + splashimage patch
+  * It was necessary to apply the automake and splashimage patches before
+    creating the tarball, so I would not need to run automake and autoconf
+    from the build scripts.
+
+ -- Jason Thomas <jason@debian.org>  Thu,  9 Jan 2003 14:26:20 +1100
+
+grub (0.92+cvs20021128-1) unstable; urgency=low
+
+  * New CVS snapshot.
+  * removed 01force-lba.patch which is no longer needed
+
+ -- Jason Thomas <jason@debian.org>  Mon, 28 Oct 2002 12:52:42 +1100
+
+grub (0.92+cvs20020923-1) unstable; urgency=low
+
+  * CVS snapshot, fixes:
+    - /dev/root problem with devfs.
+    - kernel to big for memory problem.
+    - -no-curses option causes bad output.
+    (closes: #154543, #153978, #136766)
+  * remove patch 04device.map_dup.patch, not needed now!
+
+ -- Jason Thomas <jason@debian.org>  Fri, 23 Aug 2002 10:40:09 +1000
+
+grub (0.92-4) unstable; urgency=low
+
+  * update-grub now handles rc kernels thanks to Decklin Foster.
+    (closes: #155455)
+
+ -- Jason Thomas <jason@debian.org>  Sat, 17 Aug 2002 09:55:26 +1000
+
+grub (0.92-3) unstable; urgency=low
+
+  * added 01force-lba.patch to fix grub install when --force-lba is specified
+    (closes: #152420)
+  * added 04device.map_dup.patch which checks for duplicates in the device.map
+    (closes: #147109)
+  * update-grub now writes the implied boot line to menu.lst
+    (closes: #150570)
+  * fixed typo in README.Debian, fdo should be fd0
+    (closes: #151476)
+
+ -- Jason Thomas <jason@debian.org>  Wed, 10 Jul 2002 10:22:58 +1000
+
+grub (0.92-2) unstable; urgency=low
+
+  * added 05hurd-boot.patch again, which was still needed.
+    (closes: #145673)
+  * fixed typo in update-grub manpage.
+    (closes: #146318)
+  * added info about splashimage to README.Debian
+    (closes: #145418)
+
+ -- Jason Thomas <jason@debian.org>  Thu,  9 May 2002 10:36:47 +1000
+
+grub (0.92-1) unstable; urgency=low
+
+  * New upstream release
+  * removed the following unneeded patches:
+    04xfs_md5_serial.patch
+    05hurd-boot.patch
+    06xfs_savedefault.patch
+
+ -- Jason Thomas <jason@debian.org>  Wed,  1 May 2002 15:17:56 +1000
+
+grub (0.91-6) unstable; urgency=low
+
+  * patch from upstream for xfs and jfs savedefault.  Thanks to Ian Cumming.
+
+ -- Jason Thomas <jason@debian.org>  Tue, 23 Apr 2002 11:33:51 +1000
+
+grub (0.91-5) unstable; urgency=low
+
+  * update-grub now adds more comments to the generated menu.lst file.
+    error messages are more verbose.
+    makes a back up copy of the existing menu.lst
+    (closes: #142961)
+  * some updates to README.Debian thanks to Grant Bowman.
+    (closes: #142959)
+  * correct example menu.lst patch for booting the hurd
+    (closes: #142362)
+
+ -- Jason Thomas <jason@debian.org>  Thu, 18 Apr 2002 08:57:23 +1000
+
+grub (0.91-4) unstable; urgency=low
+
+  * fix to make mkbimage create a node directory, from Robert Millan
+    (closes: #142211)
+
+ -- Jason Thomas <jason@debian.org>  Thu, 11 Apr 2002 08:26:20 +1000
+
+grub (0.91-3) unstable; urgency=low
+
+  * removed special mention of xfs and jfs from README.debian since they are
+    now in upstream tarball. also fixed small typo
+    (closes: #130526)
+  * updated the example menu.lst to have current boot method for GNU/Hurd
+    (closes: #141048)
+  * added mkbimage
+    (closes: #121640)
+
+ -- Jason Thomas <jason@debian.org>  Thu,  4 Apr 2002 16:29:21 +1000
+
+grub (0.91-2) unstable; urgency=low
+
+  * added patch from upstream which fixes a typo in the makefile that broke
+    xfs support, md5crypt, serial support and hercules support
+
+ -- Jason Thomas <jason@debian.org>  Mon,  4 Feb 2002 15:35:01 +1100
+
+grub (0.91-1) unstable; urgency=low
+
+  * New upstream release
+    (closes: #130272)
+  * removed the following unneeded patches:
+    00grub-dac960.patch
+    01grub-devfs-floppy.patch
+    04grub-jfs+xfs-0.9-build.patch
+    05grub-jfs+xfs-0.9-core.patch
+    06grub-hide-unhide.patch
+    07grub-md5-crypt.patch
+    08grub-mkreiserfs.patch
+    09grub-sigwinch.patch
+  * added info about *bsd's to README.Debian
+  * removed mention of bsd from the description for now as they are not
+    properly supported.
+
+ -- Jason Thomas <jason@debian.org>  Wed, 23 Jan 2002 13:02:44 +1100
+
+grub (0.90-19) unstable; urgency=low
+
+  * typo in update-grub which caused an syntax error with ash.
+    (closes: #126174)
+
+ -- Jason Thomas <jason@debian.org>  Wed,  2 Jan 2002 09:02:42 +1100
+
+grub (0.90-18) unstable; urgency=low
+
+  * add patch from upstream to ignore SIGWINCH.
+    (closes: #122905)
+  * update-grub now allows you to control howmany kernels will be added
+    to the menu.lst
+    (closes: #123038)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 10 Dec 2001 10:15:42 +1100
+
+grub (0.90-17) unstable; urgency=low
+
+  * kernel sorting function in update-grub now handles other kernel suffixes
+    it doesn't know about properly
+    (closes: #122013)
+  * fixed blank line that had a 'tab' in it, in the rules file
+    (closes: #121955)
+  * only look for update-grub configuration options between the magic markers.
+    (closes: #121320)
+
+ -- Jason Thomas <jason@debian.org>  Sat,  8 Dec 2001 16:32:28 +1100
+
+grub (0.90-16) unstable; urgency=low
+
+  * added new function to update-grub which looks for the various formats of
+    initrd images, looks like we have a new name initrd.img. this currently
+    supports 'initrd', 'initrd.img', 'initrd-lvm' and those three with .gz.
+    (closes: #116153, #121084)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 26 Nov 2001 09:19:25 +1100
+
+grub (0.90-15) unstable; urgency=low
+
+  * fixed a cosmetic error message in the update-grubs new function to sort
+    the kernels
+  * added a y to Crispins last name in the changelog below. Sorry!
+  * initrd line in update-grub was missing the version string.
+    (closes: #120196)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 20 Nov 2001 08:01:53 +1100
+
+grub (0.90-14) unstable; urgency=low
+
+  * I broke update-grub on /boot partitions
+    "sed -e" is not the same as "sed -ne"
+    changed it to use basename instead of sed, a few variable name changes
+    (closes: #119453, #119455)
+  * added suport allow multiple alternative boot options
+  * added 'lockalternatives' to support locking of alternative boot options
+    so no we have 'alternatives', 'lockalternatives' and 'altoptions'
+  * updated the man page to reflect the above changes
+  * added a function from Crispin Flowerday which sorts the kernels properly
+    by weighting the kernels by their suffix, being 'ac', 'pre' or nothing.
+    (closes: #103437)
+
+ -- Jason Thomas <jason@debian.org>  Fri, 16 Nov 2001 15:19:06 +1100
+
+grub (0.90-13) unstable; urgency=low
+
+  * 0.90-11 closes the wrong bug should have been 113460 not 114360.
+    (closes: #113460)
+  * new option for update-grub to allow alternative boot options, rather than
+    just the recovery option, Thanks to Marc Haber.
+  * added some examples to the menu.lst output by update-grub.
+  * updated update-grub man page to reflect the above change.
+  * added initrd info about ramdisk size to README.Debian.
+    (closes: #117252)
+  * added support to update-grub for saveddefault, see grub doc.
+  * added more explanation about default to update-grub generated menu.lst
+  * added support to update-grub to lock for the alternative boot option, see
+    grub doc.
+    (closes: #116988)
+  * updated update-grub man page to reflect the above change.
+
+ -- Jason Thomas <jason@debian.org>  Fri,  9 Nov 2001 10:05:09 +1100
+
+grub (0.90-12) unstable; urgency=low
+
+  * changed naming scheme for debian/patchs/* so they can be applied and
+    reversed safely.
+  * added patch to fsys_reiserfs.c which enables booting on newer reiserfs
+    partitions.
+
+ -- Jason Thomas <jason@debian.org>  Sun, 21 Oct 2001 11:27:02 +1000
+
+grub (0.90-11) unstable; urgency=low
+
+  * fixed update-grub to sort kernels better. Thanks to Matthew Mueller
+    (closes: #113460)
+  * added a mention about grub-doc package in README.Debian (closes: #116095)
+
+ -- Jason Thomas <jason@debian.org>  Fri, 19 Oct 2001 07:51:53 +1000
+
+grub (0.90-10) unstable; urgency=low
+
+  * added --disable-auto-mem-opt to configure options in debian/rules
+    this option stops grub from automatically adding a mem= option to
+    the kernel command line. From discussions on the grub mailing list
+    adding this option should not cause any problems.
+    (closes: #110793)
+  * added a quick setup section to README.Debian
+  * debian/rules commented out dh_installman in binary-indep
+  * debian/rules commented out dh_installinfo in binary-dep
+  * update-grub should work on systems that have the grub directory
+    mounted under /boot  (closes: #113380)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 25 Sep 2001 08:59:25 +1000
+
+grub (0.90-9) unstable; urgency=low
+
+  * more patches
+  * patch to support DAC960 raid controller (closes: #104558)
+  * patch to support hide and unhide of logical partitions
+  * updated devfs-floppy.patch to not conflict with DAC960 patch
+
+ -- Jason Thomas <jason@debian.org>  Fri, 31 Aug 2001 10:46:55 +1000
+
+grub (0.90-8) unstable; urgency=low
+
+  * okay i fixed up authors in debian/copyright to be less ugly.
+  * added patches to support jfs and xfs,
+    http://tzukanov.narod.ru/grub-jfs_xfs/
+  * added info about theses patches to debian/README.debian
+  * updated md5-crypt patch to work with the jfs/xfs patches
+
+ -- Jason Thomas <jason@debian.org>  Wed, 29 Aug 2001 16:38:45 +1000
+
+grub (0.90-7) unstable; urgency=low
+
+  * added support to debian/rules to handle appling patches to upstream
+    source
+  * added debian/patches directory which is used to hold  the patches
+  * modified update-grub to output more comments to the menu.lst and
+    modified util/grub-install.in to output more info on what it does in
+    the usage, which will inturn be added to the grub-install.8 manpage
+    (closes: #110152)
+  * updated standards-version to 3.5.6
+  * changed dashes to underscores in changelog for
+    emacs add_log_mailing_address to remove lintian warning
+  * added to debian/rules generation of manpages,
+    grub.8, grub-install.8, grub-md5-crypt.8 and mbchk.1.
+  * some tidying up in debian/rules file
+  * changed "Upstream Author(s)" to "Author(s)" in debian/copyright
+    to remove lintian error.
+  * changed debian/README.Debian to mention update-grub manpage
+  * changed debian/rules so clean does not nuke texinfo.tex from doc dir
+
+ -- Jason Thomas <jason@debian.org>  Mon, 27 Aug 2001 15:35:34 +1000
+
+grub (0.90-6) unstable; urgency=low
+
+  * added a shell script (grub-floppy) for creating a grub boot floppy
+  * added a manpage for the above script.
+
+ -- Jason Thomas <jason@debian.org>  Fri, 17 Aug 2001 10:38:49 +1000
+
+grub (0.90-5) unstable; urgency=low
+
+  * patched stage2/Makefile.am to build md5cyrpt support, from upstream
+    cvs (closes: #106407)
+
+ -- Jason Thomas <jason@debian.org>  Thu,  2 Aug 2001 16:32:52 +1000
+
+grub (0.90-4) unstable; urgency=low
+
+  * patched update-grub to correctly generate the initrd line (closes: #106807)
+
+ -- Jason Thomas <jason@debian.org>  Sat, 28 Jul 2001 00:10:59 +1000
+
+grub (0.90-3) unstable; urgency=low
+
+  * updated grub doc to show correct location of arch specific files
+    thanks to Carlos Valdivia Yague
+  * add Build-Depends on libncurses5-dev | libncurses-dev (closes: #105557)
+  * added recovery option to update-grub, if recovery=false is set in
+    menu.lst update-grub will not create the recovery lines in menu.lst
+  * updated update-grub man page to reflect above.
+
+ -- Jason Thomas <jason@debian.org>  Mon, 23 Jul 2001 18:07:30 +1000
+
+grub (0.90-2) unstable; urgency=low
+
+  * patched grub-install to handle devfs when making a boot floppy.
+    thanks to upstream OKUJI Yoshinori
+
+ -- Jason Thomas <jason@debian.org>  Fri, 13 Jul 2001 21:30:33 +1000
+
+grub (0.90-1) unstable; urgency=low
+
+  * New upstream release
+  * removed mention of version from doc-base files so there is no
+    need to update with each new release
+
+ -- Jason Thomas <jason@debian.org>  Fri, 13 Jul 2001 09:20:59 +1000
+
+grub (0.5.96.1.cvs20010530-7) unstable; urgency=low
+
+  * patched update-grub to detect /boot on seperate partition
+    thanks to Aaron Schrab (closes: #103082, #103662)
+  * patched update-grub to support loading of ramdisks,
+    thanks to Francis J. Lacoste (closes: #103498)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 10 Jul 2001 12:53:19 +1000
+
+grub (0.5.96.1.cvs20010530-6) unstable; urgency=low
+
+  * add postrm_hook to README.debian
+  * corrected bad grammar and other stuff in the manpage,
+    thanks to David B. Harris
+
+ -- Jason Thomas <jason@debian.org>  Tue, 19 Jun 2001 13:23:35 +1000
+
+grub (0.5.96.1.cvs20010530-5) unstable; urgency=low
+
+  * fixed bashism in update-grub, "echo -e". (closes: #101378)
+
+ -- Jason Thomas <jason@debian.org>  Tue, 19 Jun 2001 12:06:08 +1000
+
+grub (0.5.96.1.cvs20010530-4) unstable; urgency=low
+
+  * fixed the doc-base stuff. (closes: #101305)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 18 Jun 2001 19:05:27 +1000
+
+grub (0.5.96.1.cvs20010530-3) unstable; urgency=low
+
+  * moved grub binaries and scripts to /sbin from /usr/sbin (closes: #100854)
+  * added update-grub script which generates menu.lst.
+  * removed gen-menu.sh example, now we have update-grub
+  * added manpage for update-grub.
+  * added instructions for adding update-grub to kernel-img.conf in
+    README.Debian
+
+ -- Jason Thomas <jason@debian.org>  Mon, 18 Jun 2001 14:21:55 +1000
+
+grub (0.5.96.1.cvs20010530-2) unstable; urgency=low
+
+  * moved html doco in grub-doc from /usr/share/doc/grub-doc/ to
+    /usr/share/doc/grub-doc/html/
+  * added support for doc-base
+  * moved the info files from grub to grub-doc.
+  * use dh_installinfo so that info files are registered (closes: #100484)
+  * added example menu generation script, thanks to
+    Wichert Akkerman (closes: #86750)
+  * removed add_log_mailing_address from bottom of changelog
+  * updated standards version
+
+ -- Jason Thomas <jason@debian.org>  Tue, 12 Jun 2001 12:50:40 +1000
+
+grub (0.5.96.1.cvs20010530-1) unstable; urgency=low
+
+  * New cvs snapshot
+  * Upstream has removed the debian specific files from cvs.
+  * Corrected the Sections in the Control file for each package.
+  * Corrected documentation to reflect change of directory for arch
+    specific files. (closes: #99429)
+
+ -- Jason Thomas <jason@debian.org>  Fri,  1 Jun 2001 12:03:41 +1000
+
+grub (0.5.96.1.cvs20010528-1) unstable; urgency=low
+
+  * New Maintainer (closes: #80394)
+  * updated standards version.
+  * changed to use debhelper.
+  * move html doco into a seperate grub-doc package.
+  * Took a cvs snapshot to help close a bunch of bugs.
+  * cvs snapshot fixes grub-install (closes: #75333, #80276, #98750)
+  * cvs snapshot should fix "Error 22: No such partition" (closes: #80241)
+  * cvs snapshot should fix symlink problem (closes: #95594)
+  * grub supports /boot as seperate partition (closes: #78471)
+  * grub supports devfs already (closes: #72346)
+  * Changed dir of architecture specific files to /usr/lib (closes: #72311)
+  * texi2html problem fixed in previous NMU (closes: #80422)
+  * kernel-package supports kernel images in /boot (closes: #74429)
+  * the current method for a temporary modification of a menu option is
+    to press 'e' for edit. I think this is satisfactory. (closes: #35849)
+  * update-grub is in the progeny package of grub
+    please contact them (closes: #92269)
+
+ -- Jason Thomas <jason@debian.org>  Mon, 28 May 2001 17:04:44 +1000
+
+grub (0.5.96.1-0.1) unstable; urgency=low
+
+  * Non Maintainer Update by Ralf Treinen <treinen@debian.org>
+  * added build-dependencies: texi2html (bug #80394)
+  * applied patch of bug report # 80394: insert blank after "-I" option
+    to texi2html in rules file (thanks to Matt Zimmerman <mdz@debian.org>)
+
+ --  Ralf Treinen <treinen@debian.org>  Sat, 24 Feb 2001 23:09:55 +0100
+
+grub (0.5.96.1) unstable; urgency=low
+
+  * We lied: this release is to fix some important bugs before 1.0.
+  * Open devices with O_RDWR in the grub shell. (closes:bug#73654)
+  * Stricter Linux kernel command line passing. (closes:bug#74618)
+  * Linux devfs support added to the grub shell. (closes:bug#74740)
+
+ -- Gordon Matzigkeit <gord@debian.org>  Mon, 16 Oct 2000 12:43:30 -0600
+
+grub (0.5.96) unstable; urgency=low
+
+  * Many, many new features and bugfixes.  This is the final test release;
+    the next release will be version 1.0.
+  * Install HTML documentation in addition to Info pages.
+    (closes:bug#42242,bug#42273)
+  * Fix documentation to refer to /usr/sbin/grub as well as
+    /sbin/grub. (closes:bug#67132)
+  * Be more verbose about missing setup files. (closes:bug#71661)
+
+ -- Gordon Matzigkeit <gord@debian.org>  Wed,  4 Oct 2000 10:44:42 -0600
+
+grub (0.5.95) unstable; urgency=low
+
+  * ReiserFS support from Jochen Hoenicke.
+  * `--disable-lba-support-bitmap-check' is now a runtime option,
+    `--force-lba', which works with `install', `setup', and
+    `grub-install.' (closes:bug#61513)
+  * Fixed a bug in LBA support checking.  Please let us know if you
+    need to use `--force-lba' for Grub to work.
+  * NetBSD ELF kernel support is added.
+
+ -- Gordon Matzigkeit <gord@debian.org>  Tue, 27 Jun 2000 09:44:41 -0600
+
+grub (0.5.94) unstable; urgency=low
+
+  * Fix /usr/doc symlink. (closes:bug#50932)
+  * Better testing for BIOS LBA support. (closes:bug#53507)
+  * New installation script. (closes:bug#48755)
+
+ -- Gordon Matzigkeit <gord@debian.org>  Fri, 10 Mar 2000 14:55:02 -0600
+
+grub (0.5.93.1) unstable; urgency=low
+
+  * Update to Standards-Version: 3.0.1, mainly for FHS support.
+  * Fix definition of ext2_dir_entry. (closes:bug#49017)
+  * Fix rules for cross-compiling. (closes:bug#49034)
+  * Update synopsis for grub(8). (closes:bug#48991)
+  * Don't clear the line when hitting enter in the GRUB shell.
+    (closes:bug#48989)
+
+ -- Gordon Matzigkeit <gord@debian.org>  Fri,  5 Nov 1999 22:31:30 -0600
+
+grub (0.5.93) unstable; urgency=low
+
+  * Updated example configurations. (closes:bug#42136)
+  * Highlight color set correctly when editing. (closes:bug#42549)
+  * dpkg-shlibdeps called on /usr/sbin/grub. (closes:bug#42704)
+  * Properly install Texinfo documentation. (closes:bug#42705,bug#42919)
+    (closes:bug#43080,bug#45150)
+  * Update file locations in README.debian. (closes:bug#42834)
+  * Upstream fixes for new binutils assembler syntax. (closes:bug#47946)
+  * FAT32 support. (closes:bug#47970)
+  * Password option fixed. (closes:bug#43798)
+  * Sample menu.lst included in doc directory. (closes:bug#47181)
+
+ -- Gordon Matzigkeit <gord@debian.org>  Sat, 30 Oct 1999 09:59:09 -0600
+
+grub (0.5.92) unstable; urgency=low
+
+  * Data files are now in /usr/lib/grub/$(HWARCH).
+  * Unix boot utility available as /usr/sbin/grub.
+  * Full Texinfo documentation.
+
+ -- GRUB Maintainers <bug-grub@gnu.org>  Mon, 26 Jul 1999 12:46:37 -0600
+
+grub (0.5.91) unstable; urgency=low
+
+  * Added support for LBA mode and preliminary AWARD/AMI hard disk BIOS
+    extensions.
+  * GRUB data now installed in /share/grub/$(host_cpu)-$(host_vendor).
+  * Preliminary Texinfo documentation.
+
+ -- Gordon Matzigkeit <gord@debian.org>  Sun, 14 Mar 1999 20:23:04 -0600
+
+grub (0.5.90) unstable; urgency=low
+
+  * Beta-testing release.
+  * GRUB is now officially part of the GNU Project, and the Debian package
+    is maintained by its upstream maintainers.
+  * LS-120 IDE floppy support should work now (fixes: #33720).
+
+ -- Gordon Matzigkeit <gord@debian.org>  Mon,  1 Mar 1999 12:59:06 -0600
+
+grub (0.5-3) unstable; urgency=low
+
+  * GRUB now understands symbolic links (fixes: #17306).
+
+ -- Gordon Matzigkeit <gord@debian.org>  Sun, 21 Feb 1999 05:13:25 -0600
+
+grub (0.5-2) unstable; urgency=low
+
+  * Assembly source cleanups.
+
+ -- Gordon Matzigkeit <gord@debian.org>  Sun, 14 Feb 1999 20:33:39 -0600
+
+grub (0.5-1) unstable; urgency=low
+
+  * Put everything in /lib/grub (not /boot/grub) and don't install during
+    postinst so that we can't accidentally wreck a working system.  This
+    means the package needn't be experimental anymore.
+  * Get rid of grubinst because it doesn't work with 0.5, and I'd rather
+    improve GRUB's builtin installation process.
+  * Use `e' rather than enter to edit.
+  * Minor bug fixes.
+
+ -- Gordon Matzigkeit <gord@debian.org>  Sat, 31 Jan 1998 14:11:32 -0600
+
+grub (0.4-2) experimental; urgency=low
+
+  * Make postinstall script
+  * Create manpage for grubinst
+  * Make grubinst more flexible
+  * Address bugs 15227 and 15163 (packaging and clue endowment)
+
+ -- Steve Dunham <dunham@debian.org>  Thu,  1 Jan 1998 00:38:22 -0500
+
+grub (0.4-2) experimental; urgency=low
+
+  * Make postinstall script
+  * Create manpage for grubinst
+  * Make grubinst more flexible
+  * Address bugs 15227 and 15163 (packaging and clue endowment)
+
+ -- Steve Dunham <dunham@debian.org>  Thu,  1 Jan 1998 00:38:22 -0500
+
+grub (0.4-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Steve Dunham <dunham@debian.org>  Wed, 19 Nov 1997 23:42:47 -0500

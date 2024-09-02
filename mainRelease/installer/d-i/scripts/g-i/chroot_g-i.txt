@@ -1,0 +1,72 @@
+#!/bin/bash
+# -*-sh-*-
+#
+#     Copyright (C) 2005 Davide Viti <zinosat@tiscali.it>
+#
+#     
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License
+#     as published by the Free Software Foundation; either version 2
+#     of the License, or (at your option) any later version.
+#     
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#     
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# ** This script is not meant to be run explicitily** : I just gathered all
+# the commands which need to be run here and there while debugging
+# mainly font issues; so it's more a set of notes than a proper script
+
+## Once you've compiled mini.iso, you can runs some tests
+## by chroot-ing inside build/tmp/gtk-miniiso/tree/
+
+
+# In case you need to bring something inside the chroot
+# which needs an unstripped libc, take it from the proper place
+#dpkg -x build/apt.udeb/cache/archives/libc6-*.udeb build/tmp/gtk-miniiso/tree/
+
+if [ -f /usr/bin/strace ]
+then
+	cp /usr/bin/strace tree/usr/bin/
+else
+	echo 'strace was not found please install it in the Sid environment (not the d-i tree), if you want strace!'
+fi
+
+mount -t proc proc tree/proc/
+mount -t sysfs sysfs tree/sys/
+mknod tree/dev/fb0 c 29 0
+
+for i in $(seq 0 10) ; do
+    mknod tree/dev/tty${i} c 4 ${i}
+done
+
+# mknod tree/dev/psaux c 10 1
+
+
+cat >tree/run_gtk <<-GTK_RUN_CMDS
+debconf-loadtemplate d-i /var/lib/dpkg/info/*.templates
+export DEBIAN_FRONTEND=gtk
+
+TERM_UTF8=yes
+export LANG=C.UTF-8
+echo -ne "\033%G" # Enable UTF-8 console
+debconf -o d-i /usr/bin/main-menu
+GTK_RUN_CMDS
+
+chmod +x tree/run_gtk
+
+echo You have now a debian installer chroot prepared for debugging. Have fun!
+echo Just type \'chroot tree /bin/ash\' and then run /run_gtk and start debugging
+
+
+# sudo kill -9 $(ps aux | grep debconf | awk '{print $2}' | head -n1)
+## ran from another shell will terminate it (eventually use bash and ctrl-c)
+#debconf -o d-i /usr/bin/main-menu
+
+# If you tweak fonts somehow, remember to run this
+#fc-cache -fv

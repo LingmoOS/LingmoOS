@@ -1,0 +1,1189 @@
+win32-loader (0.10.7) UNRELEASED; urgency=medium
+
+  [ Thomas Gaugler ]
+  * Retain WINEARCH and WINEPREFIX enviroment variables
+  * Check wine availability via command -v
+  * Disable prompt for mono installer within wine
+  * Avoid immediate exit for expected command fails
+  * Delegate skipping of tests to the test runner script
+  * Mark test dependencies with <!nocheck>, Closes: #1010488
+  * d/control: Update to Standards-Version 4.6.0
+
+  [ Baurzhan Muftakhidinov ]
+  * Updated Kazakh translation.
+
+  [ d manye ]
+  * Updated Catalan translation.
+
+ -- Thomas Gaugler <thomas@dadie.net>  Tue, 03 May 2022 21:21:47 +0200
+
+win32-loader (0.10.6) unstable; urgency=medium
+
+  * Team upload
+
+  [ Andika Triwidada ]
+  * Update Indonesian translation. Closes: #1007707
+
+ -- Holger Wansing <hwansing@mailbox.org>  Mon, 21 Mar 2022 23:58:02 +0100
+
+win32-loader (0.10.5) unstable; urgency=medium
+
+  [ Valentin Vidic ]
+  * Update Croatian translation
+
+  [ Didier Raboud ]
+  * Run wrap-and-sort -baskt
+  * Remove myself from Uploaders
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 01 Sep 2021 18:28:42 +0200
+
+win32-loader (0.10.4) unstable; urgency=medium
+
+  [ Thomas Gaugler ]
+  * Run win64 tests only on 64-bit wine
+  * Makefile: Add build directory as prerequisite for icon generation
+  * s_install.nsi: Fix indentation
+  * Use signed grub efi file of testing instead of buster
+    The signed grub efi file of buster lacks the leading / in the prefix.
+  * l10n: Generate translations only via shell script,
+    update po and pot files
+  * Write entries to preseed.cfg one by one
+    By default NSIS limits strings to 1024 characters. Writing each entry
+    destined for preseed.cfg on its own prevents a possible data loss.
+  * Use "create error" message in case adding preseed.cfg to
+    installer's initrd.gz fails
+  * Restore variables before returning from Get_SHA256_ref
+  * Download signed grub efi file of testing (bullseye) if the one
+    of stable (buster) is faulty determined by its sha256 fingerprint
+
+  [ Updated translations ]
+  * Russian (ru.po) by Yuri Kozlov. Closes: #974891
+
+  [ Didier Raboud ]
+  * Bump S-V to 4.5.1 without changes needed
+
+ -- Thomas Gaugler <thomas@dadie.net>  Mon, 11 Jan 2021 08:24:07 +0100
+
+win32-loader (0.10.2) unstable; urgency=medium
+
+  [ Didier Raboud ]
+  * Correct typo in 0.10.1 changelog entry
+  * Coerce same-author d/changelog entries
+
+  [ Thomas Gaugler ]
+  * Update patch of signed netboot grub EFI file as required by a newly
+    released and signed netboot grub EFI file addressing the GRUB2
+    "BootHole" vulnerability
+  * Use respective prefix path of netboot grub
+    - The default netboot grub prefix is /debian-installer/amd64/grub
+      but /grub for the patched version.
+  * helpers/instdlg: Consolidate image base definition in one place
+  * tests/sha256: Release crypto context instead of file handle
+  * tests:
+    - Launch shell scripts via -e option to exit in case of failure
+    - Change camelCase functions into lowercase named ones
+    - Map uninstaller init function un..onInit to un.onInit
+    - Move run and check functions of (Un)Installer to common place
+  * tests/cpio: Run tests in uninstaller context as well
+  * SYSINFO_ComputerName replace StrLoc with custom implementation
+  * tests/sysinfo: Run tests in uninstaller context as well
+  * Support output format filters for cpio
+  * miniz compression helper
+  * Provide interface and tests for miniz helper
+  * Use MINIZ_CPIO_GZ_* functions to append preseed.cfg to initrd.gz
+  * Be explicit about path receiving translated installer messages (.nsh)
+  * Run tests based on availability of wine and host architecture
+  * Add cpio required during test phase as dependency
+  * Remove no longer needed gzip-win32 dependency
+  * Increase to debhelper compatibility level 13
+  * Dropping Win ME/98/95 support in favor of Unicode support
+  * Enable Farsi translation
+  * d/copyright: Add license information for helpers and include directories
+
+ -- Didier Raboud <odyx@debian.org>  Sat, 03 Oct 2020 15:38:07 +0200
+
+win32-loader (0.10.1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Thomas Gaugler ]
+  * Skip blhc job in Salsa CI pipeline
+  * Generate the installer icon from the SVG source in one go, so drop
+    icoutils B-D
+  * d/control: Set Rules-Requires-Root to no
+  * d/control: Update to Standards-Version 4.5.0
+  * Test win32-loader in its installed state
+  * Limit updating of timestamps to build directory
+
+  [ Updated translations ]
+  * Czech (cs.po) by Miroslav Kure
+  * German (de.po) by Holger Wansing
+  * Korean (ko.po) by Changwoo Ryu
+  * Portuguese (Brazil) (pt_BR.po) by Adriano Rafael Gomes
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 16 Jul 2020 18:18:40 +0200
+
+win32-loader (0.10.0) unstable; urgency=medium
+
+  [ Thomas Gaugler ]
+  * Introduce UEFI boot manager and Secure Boot support (Closes: #918863)
+    - Patch netboot debian-installer grub efi file (temporary workaround)
+  * Use Modern User Interface
+  * Replace 'vga=' option with gfxpayload in grub.cfg
+  * Major code refactor and cleanup:
+    - Enable downloading via https for Windows 7 or newer
+    - Allow GPG validity check in a folder with spaces
+    - Add progress text and tidy up localization files
+    - Replace use of external cpio.exe
+    - Remove obsolete plugins
+    - Use SOURCE_DATE_EPOCH and DEB_VERSION
+
+  [ Didier Raboud ]
+  * Trim trailing whitespace.
+  * Disable Farsi translation as its NSIS translation doesn't convert
+    correctly to its designated codepage, see #939151
+  * Bump debhelper from old 11 to 12, and S-V to 4.4.0 without changes needed
+  * Add standard Salsa Gitlab-CI configuration
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 02 Sep 2019 08:50:12 +0200
+
+win32-loader (0.9.5) unstable; urgency=medium
+
+  [ Didier Raboud ]
+  * Add Thomas Gaugler as co-maintainer
+  * Trim trailing whitespace
+
+  [ Thomas Gaugler ]
+  * Restore register $9 in BOOTCFG_RemoveBootEntry
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 06 Mar 2019 10:57:10 +0100
+
+win32-loader (0.9.4) unstable; urgency=medium
+
+  [ Thomas Gaugler ]
+  * Simplification of BOOTCFG_CreateGUID function (Closes: #919023)
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 16 Jan 2019 21:12:07 +0100
+
+win32-loader (0.9.3) unstable; urgency=medium
+
+  [ Thomas Gaugler ]
+  * Fix memory leaks in BOOTCFG_CreateGUID
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 02 Jan 2019 18:38:43 +0100
+
+win32-loader (0.9.2) unstable; urgency=medium
+
+  * The « Panosse » release
+
+  [ Holger Wansing ]
+  * Refresh po files, to remove old, no longer used translation strings
+    for desktop selection (feature was deleted with commit 56afa6af, in
+    package version 0.7.6, Closes: #915211)
+
+ -- Didier Raboud <odyx@debian.org>  Sat, 01 Dec 2018 19:40:56 +0100
+
+win32-loader (0.9.1) unstable; urgency=medium
+
+  * The « Knöpfle » release
+
+  [ Cyril Brulebois ]
+  * Update Vcs-{Browser,Git} to point to salsa (alioth's replacement)
+
+  [ Didier Raboud ]
+  * Use `cme` to rewrite dpkg-control; declare compliance to Debian
+    Policy 4.1.2
+  * Bump debhelper to 11
+  * Also embed debian-archive-removed-keys keyring, as current stable's
+    Release file is also signed with Wheezy's Archive signing key, which
+    makes gpgv exit with 2
+
+ -- Didier Raboud <odyx@debian.org>  Fri, 30 Nov 2018 23:45:20 +0100
+
+win32-loader (0.9.0) unstable; urgency=medium
+
+  * The « ፨ ለስላሳ » release
+
+  * Migrate to NSIS 3
+
+  [ Thomas Gaugler ]
+  * Code cleanup; port to NSIS 3 and BCD
+
+  [ Didier Raboud ]
+  * Remove Robert Millan and Christian Perrier from Uploaders with thanks for
+    their past work
+  * Link statically against libwsock32.a
+  * Bump Standards-Version to 4.1.3
+  * Set priority to optional
+
+  [ Eva Vranici ]
+  * Translation of win32-loader to Albanian (sq)
+
+ -- Didier Raboud <odyx@debian.org>  Sun, 01 Apr 2018 16:34:36 +0200
+
+win32-loader (0.8.4) unstable; urgency=medium
+
+  * The « Folivora » release
+
+  * Drop bz2 compression for source
+  * Replace all mirror urls with deb.debian.org
+
+ -- Didier Raboud <odyx@debian.org>  Sun, 18 Jun 2017 10:01:32 +0200
+
+win32-loader (0.8.3) unstable; urgency=low
+
+  * The « Pippita » release
+
+  * Fix FTBFS on i386: use gawk to prepare README file (Closes: #860695)
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 19 Apr 2017 18:03:11 +0200
+
+win32-loader (0.8.2) unstable; urgency=medium
+
+  * The « Iao » release
+
+  * Fix dpkg-query calls to use source:* for Version and Package directly
+    - Add Build-Dependency on dpkg (>= 1.16.2) for that support
+    - Fixes the FTBFS revealed by loadlin's binNMU
+    (Closes: #858104)
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 20 Mar 2017 21:23:59 +0100
+
+win32-loader (0.8.1) unstable; urgency=medium
+
+  * The « poipoi » release
+
+  * As NSIS doesn't support downloading from https (#819092), and as
+    d-i dailies are now on an https-enforced hosts: don't allow branch
+    or kernel selection
+  * Replace the Lines screenshot by a recent softWaves screenshot
+  * Refresh debian/copyright in CF1.0
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 29 Dec 2016 20:57:22 +0100
+
+win32-loader (0.8.0) unstable; urgency=low
+
+  * The « Κρυπτεία σκυτάλη » release
+
+  * Refresh the crypto management code:
+   - Replace the sha1sum.c NSIS with a more generic libgcrypt_hash.c plugin,
+     therefore Build-Depend on libgcrypt-mingw-w64-dev for static linking, and
+     add these to the Built-Using list
+   - Rewrite the NSIS code to be more hash-independent
+   - Use SHA256SUMS instead of MD5SUMS everywhere possible (Closes: #818604)
+   - Remove all MD5-checking code
+
+  * Bump Build-Depends against nsis to 2.48 as it fixes a privilege escalation
+    in generated installers
+  * Update the non-Linux comments for the stretch release
+  * Lift constraint on Windows versions; all >= Win7 versions use bcdedit.exe
+    apparently (Closes: #775055)
+  * Specify msgid-bugs-address in xgettext call to avoid noisy diffs
+  * Bump Standards-Version to 3.9.8 without changes needed
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 21 Apr 2016 23:22:22 +0200
+
+win32-loader (0.7.14) unstable; urgency=medium
+
+  [ Colin Watson ]
+  * Use HTTPS for Vcs-* URLs, and link to cgit rather than gitweb.
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 07 Feb 2016 19:13:03 +0100
+
+win32-loader (0.7.13) unstable; urgency=medium
+
+  [ Cyril Brulebois ]
+  * Switch d-i.debian.org URIs from http to https.
+
+ -- Christian Perrier <bubulle@debian.org>  Mon, 04 Jan 2016 06:57:56 +0100
+
+win32-loader (0.7.12) unstable; urgency=medium
+
+  * Revert premature and wrong Vcs-Browser URL update
+  * Remove 'Introduce a trust chain …' from TODO list, that's implemented
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 03 Dec 2015 08:58:33 +0100
+
+win32-loader (0.7.11) unstable; urgency=medium
+
+  * Bump Standards-Version without changes needed
+  * Update Vcs-Browser URLs
+  * Add missing ImageMagick Build-Depends (Closes: #806447)
+  * Fix function implicit declaration warning
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 30 Nov 2015 19:25:40 +0100
+
+win32-loader (0.7.10) unstable; urgency=medium
+
+  [ Jérémy Bobbio ]
+  * Make package build reproducibly:
+    - Don't insert timestamps when building NSIS DLLs
+    - Allow to set build date externally
+    - Reset embedded file modification times to the build date
+    - Set build date in debian/rules to the latest debian/changelog entry
+  * Makefile syntax fix in PXE targets definition
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 29 Apr 2015 09:25:43 +0200
+
+win32-loader (0.7.9) unstable; urgency=medium
+
+  * Add NSIS in the Built-Using list, given that win32-loader embeds (at least)
+    NSISdl.dll
+  * Build the icon out of a square SVG file; add librsvg2-bin and icoutils to
+    Build-Depends
+  * Replace the Joy screenshot by a recent Lines screenshot
+  * Replace http.debian.net with httpredir.debian.org
+
+ -- Didier Raboud <odyx@debian.org>  Sun, 26 Apr 2015 14:06:59 +0200
+
+win32-loader (0.7.8) unstable; urgency=medium
+
+  * Disable 'Download Debian GNU/kFreeBSD as stable' as this won't be possible
+    in jessie
+  * Bump Build-Depends against nsis to 2.46-10 as -9 has a NSISdl.dll that
+    depends on runtime on libwinpthread-1.dll, which fails to load on Windows
+    (Closes: #772898) Thanks to Bernhard Übelacker.
+
+ -- Didier Raboud <odyx@debian.org>  Tue, 16 Dec 2014 17:00:15 +0100
+
+win32-loader (0.7.7) unstable; urgency=medium
+
+  The « Lineus longissimus » release
+
+  [ Cyril Brulebois ]
+  * Fix typo in previous changelog entry.
+
+  [ Didier Raboud ]
+  * Use '---' instead of '--' for the kernel command-line (Closes: #768340)
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 13 Nov 2014 14:50:11 +0100
+
+win32-loader (0.7.6) unstable; urgency=medium
+
+  The « Munchkin Katz » release
+
+  * Drop now-redundant desktop selection, arch-specifics will be handled by
+    tasksel, also drop the related translations. (Closes: #762478)
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 01 Oct 2014 08:31:32 +0200
+
+win32-loader (0.7.5) unstable; urgency=medium
+
+  The « Schistocerca gregaria » release
+
+  * Replicate d-i's change for the video mode for the graphical installer:
+      Remove old video=vesa:ywrap,mtrr option from VIDEO_MODE_GTK
+      DirectFB apparently needed those at some point. Let's see whether
+      letting the kernel do its job just works. (See: #395040)
+  * Fetch hurd dailies from d-i.debian.org
+  * Replace deprcated wiki.d.o errata url with the one from www.d.o
+  * Use http.d.n instead of cdn.d.n
+
+ -- Didier Raboud <odyx@debian.org>  Tue, 12 Aug 2014 22:51:27 +0200
+
+win32-loader (0.7.4.10) unstable; urgency=medium
+
+  [ Changwoo Ryu ]
+  * Updated translations:
+    - Korean
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 23 Apr 2014 07:31:52 +0200
+
+win32-loader (0.7.4.9) unstable; urgency=low
+
+  [ Dmitrijs Ledkovs ]
+  * Bump debhelper compat level to 9.
+  * Set Vcs-* to canonical format.
+
+  [ Christian Perrier ]
+  * Add myself to Uploaders
+  * Update Standards to 3.9.4 (checked)
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 14 Jul 2013 13:08:00 +0200
+
+win32-loader (0.7.4.8) unstable; urgency=low
+
+  * Post-Wheezy release: rebuild to embed up-to-date dependencies.
+
+ -- Didier Raboud <odyx@debian.org>  Fri, 31 May 2013 08:54:10 +0200
+
+win32-loader (0.7.4.7) unstable; urgency=low
+
+  The « أسد » release.
+
+  [ Christian Perrier ]
+  * Updated translations:
+    - Arabic (Ossama Khayat) Closes: #679660
+    - Fix PO-Revision-Date's.
+
+  [ Didier Raboud ]
+  * Disable 'Download Debian GNU/Hurd as stable' as this won't be
+    possible in wheezy.
+  * Replace the 'spacefun' screenshot with a 'Joy' screenshot.
+  * Sync default video modes for Linux with the rest of d-i.
+  * Default to the graphical install for all kernels.
+
+  * Bug-fixing:
+    - Drop the lonely opening parenthesis around the options specifiers
+      in BrandingText.
+    - Drop useless branch in dailies URL handler.
+
+ -- Didier Raboud <odyx@debian.org>  Tue, 07 Aug 2012 22:05:25 +0200
+
+win32-loader (0.7.4.6) unstable; urgency=low
+
+  [ Christian Perrier ]
+  * Updated translations:
+    - Brazilian Portuguese (Felipe Augusto van de Wiel (faw)).
+
+ -- Didier Raboud <odyx@debian.org>  Sat, 07 Jul 2012 23:28:50 +0200
+
+win32-loader (0.7.4.5) unstable; urgency=low
+
+  * Updated translations:
+    - Asturian (ivarela)
+    - Slovenian (Vanja Cvelbar). Closes: #670621
+    - Vietnamese (Hai Lang)
+    - Traditional Chinese (Vincent Chen). Closes: #672324
+  * Added translations:
+    - Khmer (Khoem Sokhem)
+    - Latvian (Rūdolfs Mazurs). Closes: #674702
+    - Welsh (Daffyd Tomos).
+  * Thanks to Christian Perrier for most updates above.
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 07 Jun 2012 16:31:54 +0200
+
+win32-loader (0.7.4.4) unstable; urgency=low
+
+  The « Миш » release.
+
+  * Updated translations:
+    - Hebrew (Lior Kaplan)
+    - Simplified Chinese (YunQiang Su). Closes: #656772
+    - Serbian (Karolina Kalic). Closes: #656905
+    - Serbian Latin (Karolina Kalic). Closes: #656906
+    - Polish (Michał Kułach). Closes: #657268
+    - Indonesian (Mahyuddin Susanto).
+    - Danish (Joe Hansen). Closes: #661986
+    - Croatian (Tomislav Krznar). Closes: #664982
+  * Thanks to Christian Perrier for most updates above.
+
+  [ Didier Raboud ]
+  * Make XFCE the default desktop on !linux.
+  * Mark some targets as .PHONY to make sure they get rebuilt for each
+    flavour.
+  * Enable the two Serbian translations.
+  * Add PXE functionality to the standalone flavour. (Closes: #657830)
+  * Bump Standards-Version to 3.9.3.1 without changes needed.
+  * Drop the versionned dependency on base-files, now satisfied in
+    oldstable.
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 28 Mar 2012 09:40:03 +0200
+
+win32-loader (0.7.4.3) unstable; urgency=low
+
+  The « Гнулар » release.
+
+  * Updated translations:
+    - Czech (Miroslav Kure)
+    - Dutch (Jeroen Schot)
+    - French (Christian Perrier)
+    - German (Philipp Kern)
+    - Icelandic (Sveinn í Felli)
+    - Italian (Milo Casagrande)
+    - Kazakh (Baurzhan Muftakhidinov, Closes: #653344)
+    - Norwegian Bokmål (Hans Fredrik Nordhaug)
+    - Persian (Hamid, Christian Perrier, Closes: #643728)
+    - Portuguese (Miguel Figueiredo)
+    - Russian (Yuri Kozlov, Closes: #646082)
+    - Slovak (Ivan Masár, Christian Perrier, Closes: #648198)
+    - Spanish (Javier Fernández-Sanguino Peña, Closes: #654535)
+    - Swedish (Martin Bagge)
+    - Belarusian, Bulgarian, Bosnian, Catalan, Greek
+      Esperanto, Spanish, Finnish, Irish, Galician,
+      Hungarian, Japanese, Thai, Turkish, Ukrainian updated
+      (Christian Perrier in multilingual mode)
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 09 Jan 2012 10:27:10 +0100
+
+win32-loader (0.7.4.2) unstable; urgency=low
+
+  The « شراب » release.
+
+  * Updated translations:
+    - Turkish (hadi canım)
+    - Dutch (Jeroen Schot)
+    - Spanish (Javier Fernández-Sanguino Peña, Closes: #642362)
+    - Persian (New, behrad eslami, Closes: #643297, #643295)
+  * Use the -c iconv option to be more fault-tolerant with weird
+    translation files.
+  * Refresh translations.
+
+ -- Didier Raboud <odyx@debian.org>  Tue, 27 Sep 2011 15:08:48 +0200
+
+win32-loader (0.7.4.1) unstable; urgency=low
+
+  The « Yesterday was C&W party » release.
+
+  * Correct bugnumber closed in previous upload.
+  * Fix source packages locations references.
+    - In debian/copyright, make sure the path is under debian/.
+    - In debian/rules, make sure to point in pool/main and not main/pool.
+
+ -- Didier Raboud <odyx@debian.org>  Sun, 07 Aug 2011 15:54:14 +0200
+
+win32-loader (0.7.4) unstable; urgency=low
+
+  The « Amigne de Vétroz » release.
+
+  [ Samuel Thibault ]
+  * Add GNU/Hurd support, disabled for now.
+  * Add graphical choice for the GNU/Hurd case.
+
+  [ Colin Watson ]
+  * Add loopback and iso9660 GRUB modules, useful for loading files from ISO
+    images.
+
+  [ Didier Raboud ]
+  * Update debian/copyright and the companion text to point to the real
+    source locations.
+  * Use the Built-Using field and enhance the sources documentation.
+  * Rename the NO_KFREEBSD make envvar to NOT_ALLKERNELS to open the doors
+    to GNU/Hurd too.
+  * Update hurd-i386 daily images location.
+  * Allow one to choose GNU/Hurd from the listed kernels.
+  * Rename "Linux cmdline" to "Kernel commandline".
+  * Point to the Installation Guide in the companion text. (Closes: 635657).
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 03 Aug 2011 20:45:20 +0200
+
+win32-loader (0.7.3) unstable; urgency=low
+
+  The « Gamaret » release.
+
+  * Updated translations:
+    - Uyghur (Gheyret Tohti)
+      (Still not activated, no NSIS translation)
+
+  * Fix kFreeBSD kernel variables in win32-loader.ini.
+
+ -- Didier Raboud <odyx@debian.org>  Sun, 19 Jun 2011 14:59:22 +0200
+
+win32-loader (0.7.2) unstable; urgency=low
+
+  The « Raisinée » release.
+
+  * Use bzip2 compression for the source tarball.
+  * Make win32-loader work from kFreeBSD CDs.
+    - Add gzio grub module as kernels are gz-compressed.
+    - Allow new win32-loader.ini option: kernel=, to be specified on the CDs.
+
+ -- Didier Raboud <odyx@debian.org>  Thu, 16 Jun 2011 21:59:55 +0200
+
+win32-loader (0.7.1) unstable; urgency=low
+
+  The « Fendant » release.
+
+  * Updated translations:
+    - Catalan (Jordi Mallach, Closes: #619378)
+    - Japanese (Kenshi Muto)
+    - Bosnian (Armin Besirovic)
+
+  [ Joey Hess ]
+  * Update i386 daily build location.
+
+  [ Colin Watson ]
+  * Build-depend on the new grub-pc-bin, which is a less intrusive
+    build-dependency than grub-pc.
+
+  [ Stephen Kitt ]
+  * Build with mingw-w64. (Closes: #623621)
+
+  [ Didier Raboud ]
+  * Fix long description to remove the mention of the standalone version
+    which is uploaded "byhand" anyway.
+  * Replace the GTK screenshot by a more recent one, featuring SpaceFun.
+    Document the creation of the bmp picture from its bigger-size png
+    source using convert.
+  * Build-Depend on the mingw-w64-based NSIS.
+  * Bump Standards-Version to 3.9.2.0 without changes needed.
+
+ -- Didier Raboud <odyx@debian.org>  Wed, 15 Jun 2011 12:54:25 +0200
+
+win32-loader (0.7.0) unstable; urgency=low
+
+  The « Petite Arvine » release.
+
+  * Standalone flavour:
+    - Fork gcrypt's win32 sha1um implementation into a NSIS plugin.
+    - Implement the last "Trusted download" bits:
+      1) Check Release{,.gpg} against debian-archive-keyring.gpg.
+      2) Check installer MD5SUMS against its sha1sum in Release, thanks to
+         FTP Masters for the archive-side changes.
+      3) Check kernel and initrd against their md5sum in MD5SUMS.
+    - Print downloaded URLs to details buffer.
+
+  * Network flavour:
+    - Don't download g2ldr{,.mbr} from the net: too tiny to be worth.
+    - Make the network mode work securely by allowing preseed.cfg checksum
+      embedding (Closes: #442180).
+
+  * Updated translations:
+    - Galician (Miguel Anxo Bouzada, Closes: #617397)
+    - Belarusian (Viktar Siarheichyk, Closes: #617702)
+    - Swedish (Martin Bagge, Closes: #618663)
+
+  * Bug-fixing:
+    - Don't create a useless boot.ini at uninstall time if it doesn't exist.
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 21 Mar 2011 13:40:11 +0100
+
+win32-loader (0.6.91) unstable; urgency=low
+
+  [ Updated translations ]
+    - Bulgarian (Damyan Ivanov, Closes: #614843)
+    - Czech (Miroslav Kure)
+    - Esperanto (Felipe Castro)
+    - Finnish (Tommi Vainikainen, Closes: #614428)
+    - German (Holger Wansing, Closes: #617287)
+    - Greek (Thomas Vasileiou)
+    - Hebrew (Lior Kaplan)
+    - Hungarian (SZERVÁC Attila)
+    - Icelandic (Sveinn í Felli)
+    - Irish (Kevin Scannell)
+    - Portuguese (Miguel Figueiredo)
+    - Russian (Yuri Kozlov, Closes: #614613)
+    - Simplified Chinese (Qijiang Fan)
+    - Slovak (Ivan Masár, Closes: #614552)
+    - Thai (Theppitak Karoonboonyanan)
+    - Ukrainian (Яценко Олександр)
+
+  * Standalone flavour companion text
+    - Replace "GPL acceptance" by "language choice"
+    - Add acknowledgement to NSIS
+    - Include win32-loader version number
+  * Translations
+    - Also update non-supported languages.
+    - Enable Danish.
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 07 Mar 2011 21:09:59 +0100
+
+win32-loader (0.6.90) unstable; urgency=low
+
+  The "Let's Squeeze win32-loader!" release
+
+  * General
+    - Remove license click-trough.
+    - Add executable properties and proper branding.
+    - Also add branding to the Uninstaller info in the Windows registry.
+    - Split main.nsi in multiple files, make sure GPLv3+ license headers are
+      in all split files.
+    - Allow build-time outfile name selection.
+    - Allow build-time choice of Company Name.
+    - Enhance >= Vista boot device detection with bcdedit.exe.
+    - Update my copyright notices to 2011.
+
+  * Standalone flavour
+    - Add PXE functionality (Closes: #607417).
+    - Add a PXE-specific boot text.
+    - Add a notice in THANKS for the people behind the PXE patch.
+    - Make the Windows bootloader entry distro- and kernel- specific.
+    - Debian GNU/kFreeBSD was released as "stable", remove the corresponding
+      TODO.
+    - Allow opt-out of the the GNU/kFreeBSD download possibility.
+    - Make sure default desktop is GNOME.
+    - Use cdn.debian.net instead of ftp.se.d.o to download d-i kernels and
+      initrd's.
+    - Trustful download
+      - Download and check Release{,.gpg} against debian-archive-keyring.gpg
+        with gpgv.exe (thanks to the GnuPG maintainers).
+      - Check downloaded kernels and initrd's against MD5SUMS.
+    - Enhance message for download errors.
+    - Don't install the standalone flavour, as it reaches the mirrors trough
+      byhand.
+    - Only build the standalone version if BYHAND is yes.
+    - Document which packages in which versions are embedded.
+    - Build the standalone exe with its definitive name.
+
+  * Bug-fixing
+    - Make sure grub.cfg is always referred to as being in $INSTDIR
+      (C:\win32-loader\).
+    - Feed the $windows_version variable with something sensible (instead
+      of nothing).
+    - Use the charset-secured $d-i_ntldr for modern Windows 7 hosts too.
+    - Create variable d only on the CD flavours.
+    - Define Windows register indexes as build-time variables.
+    - Move bcdedit.exe finding earlier.
+
+  * Localisation
+    - Fix the Icelandic translation.
+    - Add new strings for PXE boot, GPG checking, checksum computation.
+    - Force LANGUAGE to fallback to LANG_ENGLISH.
+    - Re-brand the program as 'Debian-Installer loader'.
+    - Add target distribution and kernel to boot line.
+
+  * Packaging
+   - Append version and arch to the byhand filenames, to make dak happy;
+     thanks to Joerg Jaspert for the dak digging!
+   - Add a gitignore file.
+   - Bump B-D on grub-pc to >= 1.99~rc1-3 (see #613245).
+
+ -- Didier Raboud <odyx@debian.org>  Mon, 21 Feb 2011 21:15:32 +0100
+
+win32-loader (0.6.22) unstable; urgency=low
+
+  [ Joey Hess ]
+  * update Vcs fields
+
+  [ Didier Raboud ]
+  * Add a dpkg-distaddfile byhand call to install win32-loader-
+    standalone.exe as tools/$(SUITE)/win32-loader.exe on the mirrors.
+  * Set BYHAND to "yes".
+  * Use my @d.o address and remove the DMUA flag.
+
+ -- Didier Raboud <odyx@debian.org>  Tue, 25 Jan 2011 23:28:30 +0100
+
+win32-loader (0.6.21) unstable; urgency=low
+
+  [ Updated translations ]
+    - Slovenian (Vanja Cvelbar)
+    - Dzongkha (dawa pemo)
+      (Still not activated, no NSIS translation)
+    - Dutch (Eric Spreen)
+    - Greek (Emmanuel Galatoulas, Closes: #604454)
+
+ -- Didier Raboud <didier@raboud.com>  Sun, 28 Nov 2010 16:52:09 +0100
+
+win32-loader (0.6.20) unstable; urgency=low
+
+  [ Updated translations ]
+    - Belarusian (Viktar Siarheichyk)
+    - Tamil (Dr.T.Vasudevan)
+      (Still not activated, no NSIS translation)
+    - Esperanto (Felipe Castro)
+    - Catalan (Jordi Mallach, Closes: #600640)
+
+ -- Didier Raboud <didier@raboud.com>  Thu, 21 Oct 2010 09:25:00 +0200
+
+win32-loader (0.6.19) unstable; urgency=low
+
+  [ Updated translations ]
+    - Asturian (Maacub)
+    - Spanish (Javier Fernández-Sanguino)
+    - Icelandic added (Sveinn í Felli)
+    - Telegu (Veeven). Closes: #593097
+
+  * Update the kfreebsd daily netboot download.
+  * Fix wrong Windows 7 detection as Windows NT and specify the device name in
+    the bootmgr (Closes: #595140)
+
+ -- Didier Raboud <didier@raboud.com>  Thu, 02 Sep 2010 20:04:38 +0200
+
+win32-loader (0.6.18) unstable; urgency=low
+
+  [ Updated translations ]
+    - Galician (Jorge Barreiro)
+    - Kazakh (Baurzhan Muftakhidinov). Closes: #587208
+      (Still not activated, no NSIS translation)
+    - Traditional Chinese (Tetralet). Closes: #494361, #513917
+    - Bosnian added (Armin Beširović)
+    - Esperanto fixed (LANG_ESPERANTO)
+    - Danish added (Joe Hansen). Closes: #591103
+    - Asturian added (Marcos Alvarez Costales). Closes: #511625
+      (Not activated, no NSIS translation)
+
+  [ Christian Perrier ]
+  * Activate Bosnian translation
+  * Activate Arabic translation (supported in NSIS 2.46)
+  * Activate Esperanto translation (supported in NSIS 2.46)
+  * Activate Irish translation (supported in NSIS 2.46)
+  * Activate Slovenian translation (supported in NSIS 2.46)
+  * Activate Ukrainian translation (supported in NSIS 2.46)
+  * Update versioned build dependency on nsis to 2.43 (introduction
+    of Esperanto)
+
+  [ Didier Raboud ]
+  * Call makensis verbosely.
+  * Vietnamese is not activated; document that in l10n/Makefile
+  * Bump Standards to 3.9.1.0 without changes needed.
+
+ -- Didier Raboud <didier@raboud.com>  Tue, 03 Aug 2010 20:57:36 +0200
+
+win32-loader (0.6.17) unstable; urgency=low
+
+  [ Updated translations ]
+    - Bulgarian (Damyan Ivanov)
+    - Czech (Miroslav Kure)
+    - German (Holger Wansing). Closes: #580755
+    - Norwegian Bokmal (Hans Fredrik Nordhaug)
+    - Portuguese (Miguel Figueiredo)
+    - Slovak (Ivan Masár)
+    - Simplified Chinese (YunQiang Su)
+    - Thai (Theppitak Karoonboonyanan)
+    - Romanian (Andrei Popescu)
+
+  * Specify grub-mkimage's --format to i386-pc (Closes: #584371)
+
+ -- Didier Raboud <didier@raboud.com>  Thu, 03 Jun 2010 14:12:11 +0200
+
+win32-loader (0.6.16) unstable; urgency=low
+
+  * Add basic kFreeBSD support (Closes: #579742)
+    + What works: fetching and booting a kFreeBSD d-i from standalone version
+    - What doesn't: preseeding, stable install, g-i, media install
+
+  * Move files to /usr/share/win32/ to be consistent with other win32 packages.
+  * Sync linux bootparam VIDEO_MODE definition with rest of d-i
+    - Revert the grub.cfg generation code update (aka s/vga=/set gfxpayload/g)
+
+ -- Didier Raboud <didier@raboud.com>  Wed, 05 May 2010 18:28:39 +0200
+
+win32-loader (0.6.15) unstable; urgency=low
+
+  * Update the daily images URLs.
+  * Remove hardcoded release codenames.
+  * Remove the getwindowsversion.nsh code duplicate (included in nsis).
+    - Take the opportunity to widen Windows version conditions.
+  * Separate network (with a http shipped preseed.cfg) from standalone
+    functionality (completely lonely executable).
+  * Store the old boot.ini timeout value. Closes: #476777
+  * Update the grub.cfg generation code to cope with recent grub-pc
+    (aka s/vga=/set gfxpayload/g)
+  * Update Build-Dependency on cpio-win32 to >= 2.11-4 to fix initramfs
+    preseed.cfg embedding which broke the installer boot.
+
+  * Add myself to copyright files.
+  * Add the DM-Upload-Allowed field to debian/control.
+
+ -- Didier Raboud <didier@raboud.com>  Fri, 30 Apr 2010 10:00:00 +0200
+
+win32-loader (0.6.14) unstable; urgency=high
+
+  [ Updated translations ]
+    - Simplified Chinese (苏运强).
+    - German (Holger Wansing). Closes: #566567
+    - Slovak (Ivan Masár). Closes: #568370
+    - Bengali (Sadia Afroz).
+    - Vietnamese (Clytie Siddall). Closes: #568978
+    - Japanese.
+    - Tamil added (but not activated as not supported in NSIS)
+      Closes: #578501.
+
+  [ Didier Raboud ]
+  * Add myself to Uploaders.
+  * Add mingw32-runtime to Build-Depends. Closes: #569389
+    - Urgency high for RC bug fixing.
+  * Convert packaging to tiny debhelper style.
+    - Drop cdbs B-D, bump debhelper B-D version and compat.
+  * Use 3.0 (native) source format.
+  * Provide the standalone version. Closes: #464233
+  * Point to specific GPL version in debian/copyright
+  * Rewrite description. Closes: #578567
+  * Add Vcs-* fields to debian/control.
+  * Bump Standards to 3.8.4 without changes needed.
+
+ -- Christian Perrier <bubulle@debian.org>  Fri, 23 Apr 2010 07:14:40 +0200
+
+win32-loader (0.6.13) unstable; urgency=low
+
+  [ Robert Millan ]
+  * Update for GRUB module rename.  (Closes: #545648)
+  * Make all strings distro-agnostic.
+  * Include vbe.mod for video mode initialization.
+  * Move grub.cfg to win32-loader directory.
+  * Make it buildable with nsis 2.25 again.
+  * Split functionality back into different plugins.  svn-bisect reveals
+    that the plugin split (r57832) is correlated to the memory
+    corruption problem on Win98, see #538762 for details.
+  * Ditch grubutil-win32 dependency.
+
+  [ Updated translations ]
+  * Catalan (ca.po) by Robert Millan
+  * French (fr.po) by Christian Perrier
+  * Norwegian Bokmal (nb.po) by Hans Fredrik Nordhaug
+  * Russian (ru.po) by Yuri Kozlov (Closes: #558467)
+  * Thai (th.po) by Theppitak Karoonboonyanan
+  * Vietnamese (vi.po) by Clytie Siddall
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Mon, 30 Nov 2009 16:39:15 +0100
+
+win32-loader (0.6.12) unstable; urgency=low
+
+  * Detect (but don't yet enable) Windows 7.
+  * Update GRUB module selection.  (Closes: #536961)
+  * Build with gcc-mingw32.
+
+  [ Updated translations ]
+  * Catalan (ca.po) by Jordi Mallach.
+  * Japanese (ja.po) by Hideki Yamane, commited by Kenshi Muto.
+  * Bengali (bn.po) by Md. Rezwan Shahid
+  * Czech (cs.po) by Miroslav Kure
+  * Spanish (es.po) by Javier Fernández-Sanguino
+  * Italian (it.po) by Milo Casagrande
+  * Slovak (sk.po) by Ivan Masár
+  * Turkish (tr.po) by Mert Dirik
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Fri, 21 Aug 2009 22:26:27 +0200
+
+win32-loader (0.6.11) unstable; urgency=low
+
+  * Remove kludge for etch support.
+  * Merge all plugin code into a single DLL.
+  * Update to new NSIS plugin API.  (Closes: #517174)
+  * Update my email address.
+
+  [ Added translations ]
+  * Kazakh (kk.po) by Dauren Sarsenov. Closes: #520999
+    This language is not activated yet because NSIS is not
+    translated.
+  * Bengali (bn.po) by Rezwan Shahid
+    This language is not activated yet because NSIS is not
+    translated.
+
+  [ Updated translations ]
+  * Belarusian (be.po) by Pavel Piatruk
+  * German (de.po) by Jan Keller
+  * Esperanto (eo.po) by Felipe Castro
+  * Kazakh (kk.po) by Dauren Sarsenov
+  * Bokmål, Norwegian (nb.po) by Hans Fredrik Nordhaug
+  * Russian (ru.po) by Yuri Kozlov  (Closes: #522653)
+  * Traditional Chinese (zh_TW.po) by Tetralet
+
+ -- Robert Millan <rmh.debian@aybabtu.com>  Mon, 06 Apr 2009 21:02:05 +0200
+
+win32-loader (0.6.10) unstable; urgency=low
+
+  * Scan for the System Partition and use it consistently.  Fix problem that
+    breaks cpio.bat when system partition != boot partition.  (Closes: #509299)
+
+  [ Updated translations ]
+  * Bulgarian (bg.po) by Damyan Ivanov
+  * Basque (eu.po) by Piarres Beobide
+  * French (fr.po) by Christian Perrier
+  * Galician (gl.po) by mvillarino  (Closes: #510388)
+  * Japanese (ja.po) by Hideki Yamane (Debian-JP)
+  * Portuguese (pt.po) by Miguel Figueiredo
+  * Romanian (ro.po) by Eddy Petrișor
+  * Slovak (sk.po) by Ivan Masár  (Closes: #510199)
+  * Thai (th.po) by Theppitak Karoonboonyanan
+  * Vietnamese (vi.po) by Clytie Siddall  (Closes: #509711)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 18 Jan 2009 13:07:46 +0100
+
+win32-loader (0.6.9) unstable; urgency=high
+
+  [ Updated translations ]
+  * Arabic (ar.po) by Ossama M. Khayat  (Closes: #499605)
+  * Turkish (tr.po) by Mert Dirik  (Closes: #500962)
+
+  [ Robert Millan ]
+  * Build-depend on a DFSG-clean version of loadlin.  (Closes: #497676)
+  * Remove workaround for #469533 (it was no longer useful with Linux
+    images in lenny, anyway).
+  * main.nsi: Remove "search" command in grub.cfg.  It was a no-op.
+  * Build-depend on grubutil-win32 >= 1.1-18-3.  (Closes: #503432)
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 30 Oct 2008 16:29:24 +0100
+
+win32-loader (0.6.8) unstable; urgency=low
+
+  [ Updated translations ]
+  * Finnish (fi.po) unfuzzied
+  * Russian (ru.po) by Yuri Kozlov  (Closes: #491446)
+  * Swedish (sv.po) by Martin Bagge  (Closes: #490155)
+  * Vietnamese (vi.po) by Clytie Siddall.
+  * Romanian (ro.po) by Eddy Petrișor
+  * Traditional Chinese (zh_TW.po) by Tetralet
+
+  [ Added translations ]
+  * Dzongkha (dz.po) by Tenzin Dendup.
+    This language is not activated yet because NSIS is not
+    translated. It is not even guaranteed that Windows
+    supports Dzongkha, indeed.
+  * Lithuanian (lt.po) by Gintautas Miliauskas. Closes: #497458
+  * Greek (el.po) by Emmanuel galatoulas (reviewed by Faidon Liambotis).
+  * Croatian (hr.po) by Josip Rodin.
+
+  [ Robert Millan ]
+  * Build-Depend on grub-pc >= 1.96+20080724-10.  (Closes: #496981)
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 10 Sep 2008 00:38:00 +0200
+
+win32-loader (0.6.7) unstable; urgency=low
+
+  [ Updated translations ]
+  * Belarusian (be.po) by Pavel Piatruk
+  * Hebrew (he.po) by Lior Kaplan
+  * Italian (it.po) by Stefano Canepa
+  * Polish (pl.po) by Wiktor Wandachowicz
+  * Albanian (sq.po) by Elian Myftiu
+  * Turkish (tr.po) by Mert Dirik
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 22 Jun 2008 00:05:53 +0200
+
+win32-loader (0.6.6) unstable; urgency=low
+
+  * l10n-ize the DetailPrint calls.
+  * Move "compact" call down _after_ all the files it's supposed to
+    uncompress have been fetched.
+  * Accept "default_desktop" parameter in "[installer]" section of
+    win32-loader.ini.  (Closes: #473320)
+  * Probe for boot.ini in all conceiveable drives.  (Closes: #479180,
+    #442262)
+
+  [ Updated translations ]
+  * Bulgarian (bg.po) by Damyan Ivanov
+  * Catalan (ca.po) by Robert Millan
+  * Czech (cs.po) by Miroslav Kure
+  * Spanish (es.po) by Javier Fernández-Sanguino
+  * Basque (eu.po) by Piarres Beobide
+  * Finnish (fi.po) by Tommi Vainikainen
+  * French (fr.po) by Christian Perrier
+  * Galician (gl.po) by Jacobo Tarrio
+  * Hungarian (hu.po) by SZERVÁC Attila
+  * Japanese (ja.po) by Hideki Yamane (Debian-JP) (Closes: #473186)
+  * Korean (ko.po) by Sunjae Park
+  * Norwegian Bokmål (nb.po) by Hans Fredrik Nordhaug
+  * Dutch (nl.po) by Frans Pop
+  * Portuguese (Brazil) (pt_BR.po) by Felipe Augusto van de Wiel (faw)
+  * Portuguese (pt.po) by Miguel Figueiredo
+  * Slovak (sk.po) by Peter Mann
+  * Thai (th.po) by Theppitak Karoonboonyanan
+  * Simplified Chinese (zh_CN.po) by Deng Xiyue (Closes: #478988)
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon,  5 May 2008 16:45:14 +0200
+
+win32-loader (0.6.5) unstable; urgency=low
+
+  * echo 5 > debian/compat
+  * Makefile: Fix stamp handling in iso target.
+  * Add a few DetailPrint calls.
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue, 18 Mar 2008 01:17:01 +0100
+
+win32-loader (0.6.4) experimental; urgency=low
+
+  * Rename "Debconf preseed line:" to "Linux cmdline".
+  * Bring back support for Windows 98.
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed,  5 Mar 2008 19:56:57 +0100
+
+win32-loader (0.6.3) unstable; urgency=low
+
+  * Use RequestExecutionLevel to disable idiotic compatibility mode where
+    Vista identifies itself as XP.
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 24 Feb 2008 21:24:40 +0100
+
+win32-loader (0.6.2) unstable; urgency=low
+
+  * s/XFCE/Xfce/g.  (Closes: #466333)
+  * Fix bcdedit load in 64-bit Vista.  Thanks Amir Szekely for the hints.
+    (Closes: #441379)
+
+  [ Updated translations ]
+  * Traditional Chinese (zh_TW.po) by Tetralet (Closes: #464972)
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 24 Feb 2008 11:29:54 +0100
+
+win32-loader (0.6.1) unstable; urgency=low
+
+  * Set the "seen" flag to false for preseed variables that weren't intended
+    to be skipped.
+  * control (Build-Depends): Avoid grub-pc (>= 1.96+20080203) & grubutil-win32
+    (<< 1.1-18-2) deadly combination.
+
+  [ Updated translations ]
+  * Portuguese (Brazil) (pt_BR.po) by Felipe Augusto van de Wiel (faw)
+  * Traditional Chinese (zh_TW.po) by Tetralet
+
+ -- Robert Millan <rmh@aybabtu.com>  Sun, 17 Feb 2008 12:34:44 +0100
+
+win32-loader (0.6.0) unstable; urgency=low
+
+  * Add page to allow user into rescue mode.
+  * Preseed quietness on non-expert installs.
+  * Disable LicenseForceSelection.
+  * Add dialog to choose desktop environment (GNOME, KDE, XFCE, None).
+    (Closes: #442209)
+  * Detect and preseed passwd/user-fullname (without setting the seen flag).
+  * Do not preseed "interface=auto". Do not set the seen flag for
+    "domain" and "time/zone".
+  * Correct a pair of mistakes in English strings (thanks Jens Seidel).
+  * Fix dialog.nsh generation for languages whose names have more than
+    one word (welcome, Norwegian Bokmål).
+  * Clarify translator note for "windows-1252" string.
+  * Add "biosdisk", "ntfscomp" and "gpt" GRUB modules.  Build-Depend on
+    grub-pc (>= 1.95+20080101-1).
+  * Abort on Windows 95 / 98.  (Closes: #461344)
+  * Implement preseeding via initrd (with gzip.exe / cpio.exe).  Migrate the
+    majority of preseed parameters to this method, in order to avoid Linux
+    cmdline limits.  (Closes: #442474)
+
+  [ Updated translations ]
+  * Bulgarian (bg.po) by Damyan Ivanov
+  * Catalan (ca.po) by Robert Millan
+  * Czech (cs.po) by Miroslav Kure
+  * German (de.po) by Jan Keller
+  * Spanish (es.po) by Javier Fernández-Sanguino
+  * Basque (eu.po) by Piarres Beobide
+  * French (fr.po) by Christian Perrier
+  * Galician (gl.po) by Jacobo Tarrio (Closes: #446611)
+  * Hebrew (he.po) by Lior Kaplan (Closes: #442153)
+  * Hungarian (hu.po) by SZERVÁC Attila
+  * Korean (ko.po) by Sunjae Park
+  * Malayalam (ml.po) by Praveen|????????? A|?
+  * Norwegian Bokmål (nb.po) by Hans Fredrik Nordhaug
+  * Portuguese (pt.po) by Miguel Figueiredo
+  * Russian (ru.po) by Yuri Kozlov
+  * Albanian (sq.po) by Elian Myftiu (Closes: #444766)
+  * Swedish (sv.po) by Daniel Nylander (Closes: #442098)
+  * Thai (th.po) by Theppitak Karoonboonyanan
+  * Vietnamese (vi.po) by Clytie Siddall
+  * Simplified Chinese (zh_CN.po) by Deng Xiyue (Closes: #461177)
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu,  7 Feb 2008 00:57:42 +0100
+
+win32-loader (0.6.0~pre3) unstable; urgency=low
+
+  * Implement support for loading README.html.
+
+  [ Updated translations ]
+  * Bulgarian (bg.po) by Damyan Ivanov
+  * Japanese (ja.po) by Hideki Yamane (Debian-JP) (Closes: #441566)
+  * Russian (ru.po) by Yuri Kozlov
+  * Vietnamese (vi.po) by Clytie Siddall
+
+ -- Robert Millan <rmh@aybabtu.com>  Tue, 11 Sep 2007 14:35:52 +0200
+
+win32-loader (0.6.0~pre2) unstable; urgency=low
+
+  * Add reference to /usr/share/common-licenses.
+    - debian/copyright
+    - debian/control (Depends): Add base-files (>= 4.0.1).
+  * Put debian-boot as Maintainer, and myself in Uploaders.
+  * Support for using a different charset in NTLDR.  Defaults to cp437,
+    which works for languages with latin charset.  Other translations
+    will need to change this setting in their respective PO files.
+    (Closes: #440471)
+  * Misc fixes in l10n infrastructure that will enable build on any system
+    where locales-all (added to Build-Depends) is installed, no matter the
+    locale setup.  (Closes: #441193)
+  * Get rid of hardcoded language lists in main.nsi.  All this cruft is
+    now generated dynamicaly by l10n/Makefile (based on $(LINGUAS)).
+
+  [ Updated translations ]
+  * Catalan (ca.po) by Robert Millan
+  * Basque (eu.po) by Piarres Beobide
+  * French (fr.po) by Christian Perrier
+  * Hungarian (hu.po) by SZERVÁC Attila
+  * Italian (it.po) by Stefano Canepa
+  * Portuguese (pt.po) by Miguel Figueiredo
+
+ -- Robert Millan <rmh@debian.org>  Sun,  9 Sep 2007 16:06:51 +0200
+
+win32-loader (0.6.0~pre1) unstable; urgency=low
+
+  * Initial release (Closes: #425038).
+
+ -- Robert Millan <rmh@debian.org>  Tue, 28 Aug 2007 23:14:19 +0200

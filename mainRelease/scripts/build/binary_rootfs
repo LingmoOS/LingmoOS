@@ -1,0 +1,414 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build rootfs image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin building root filesystem image..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap binary_chroot
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+case "${LINGMO_SYS_BUILD_ARCHITECTURE}" in
+	amd64|i386)
+		LINUX="vmlinuz"
+		;;
+
+	powerpc|ppc64el|riscv64)
+		LINUX="vmlinux"
+		;;
+esac
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		INITFS="live"
+		;;
+
+	*)
+		INITFS="boot"
+		;;
+esac
+
+# Creating directory
+mkdir -p binary/${INITFS}
+
+if In_list "rootfs" ${LINGMO_SYS_BUILD_CACHE_STAGES} && [ -d cache/binary_rootfs ]
+then
+	# Removing old chroot
+	rm -rf binary/"${INITFS}"/filesystem.*
+
+	# Restoring old cache
+	mkdir -p binary/"${INITFS}"
+	cp -a cache/binary_rootfs/filesystem.* binary/"${INITFS}"
+
+	# Creating stage file
+	Create_stagefile
+	exit 0
+fi
+
+case "${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}" in
+	ext2|ext3|ext4)
+		# Checking depends
+		Check_package chroot /sbin/mkfs.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} e2fsprogs
+
+		# Restoring cache
+		Restore_package_cache binary
+
+		# Installing depends
+		Install_packages
+
+		# Remove old image
+		if [ -f binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} ]
+		then
+			rm -f binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}
+		fi
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				DU_DIM="$(du -ms chroot/chroot | cut -f1)"
+				INODES="$(find chroot/chroot | wc -l)"
+				;;
+
+			false)
+				DU_DIM="$(du -ms chroot | cut -f1)"
+				INODES="$(find chroot | wc -l)"
+				;;
+		esac
+
+		REAL_DIM="$(Calculate_partition_size ${DU_DIM} ${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM})"
+		REAL_INODES="$(Calculate_partition_size ${INODES} ${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM})"
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				dd if=/dev/zero of=chroot/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} bs=1024k count=0 seek=${REAL_DIM}
+
+				FAKE_MTAB=false
+				if ! Chroot chroot "test -e /etc/mtab"
+				then
+					Chroot chroot "ln -s /proc/mounts/mtab /etc/mtab"
+					FAKE_MTAB=true
+				fi
+				BLOCK_SIZE=1024
+				if [ "${LINGMO_SYS_BUILD_DM_VERITY}" = "true" ]
+				then
+					# dm-verity needs a block size of at least 4k
+					BLOCK_SIZE=4096
+				fi
+				Chroot chroot "mkfs.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} -F -b ${BLOCK_SIZE} -N ${REAL_INODES} -m 0 filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}"
+
+				mkdir -p filesystem.tmp
+				mount -o loop chroot/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} filesystem.tmp
+				cp -a chroot/chroot/* filesystem.tmp
+
+				if $FAKE_MTAB; then
+					Chroot chroot "rm -f /etc/mtab"
+				fi
+
+				umount filesystem.tmp
+				rmdir filesystem.tmp
+
+				# Move image
+				mv chroot/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} binary/${INITFS}
+
+				du -B 1 -s chroot/chroot | cut -f1 > binary/${INITFS}/filesystem.size
+
+				# Removing depends
+				Remove_packages
+				
+				if [ -e chroot/chroot.cache ]
+				then
+					Remove_lockfile
+					mv chroot/chroot chroot.tmp
+
+					lingmo-sys-build chroot_prep remove all mode-archives-binary "${@}"
+
+					rm -rf chroot
+					mv chroot.tmp chroot
+
+					lingmo-sys-build chroot_prep install all mode-archives-binary "${@}"
+
+					touch .lock
+				else
+					rm -rf chroot/chroot
+				fi
+				;;
+
+			false)
+				dd if=/dev/zero of=binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} bs=1024k count=0 seek=${REAL_DIM}
+				mkfs.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} -F -b 1024 -N ${REAL_INODES} -m 0 binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}
+
+				mkdir -p filesystem.tmp
+				mount -o loop binary/${INITFS}/filesystem.${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM} filesystem.tmp
+				cp -a chroot/* filesystem.tmp
+
+				umount filesystem.tmp
+				rmdir filesystem.tmp
+				;;
+		esac
+
+		# Saving cache
+		Save_package_cache binary
+		;;
+
+	jffs2)
+		# Checking depends
+		Check_package chroot /usr/sbin/mkfs.jffs2 mtd-tools
+
+		# Restoring cache
+		Restore_package_cache binary
+
+		# Installing depends
+		Install_packages
+
+		# Remove old jffs2 image
+		if [ -f binary/${INITFS}/filesystem.jffs2 ]
+		then
+			rm -f binary/${INITFS}/filesystem.jffs2
+		fi
+
+		if [ -n "${LINGMO_SYS_BUILD_JFFS2_ERASEBLOCK}" ]
+		then
+			JFFS2_OPTIONS="--eraseblock=${LINGMO_SYS_BUILD_JFFS2_ERASEBLOCK}"
+		fi
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				Chroot chroot "mkfs.jffs2 ${JFFS2_OPTIONS} --root=chroot --output filesystem.jffs2"
+
+				# Move image
+				mv chroot/filesystem.jffs2 binary/${INITFS}
+
+				# Removing depends
+				Remove_packages
+
+				if [ -e chroot/chroot.cache ]
+				then
+					Remove_lockfile
+					mv chroot/chroot chroot.tmp
+
+					lingmo-sys-build chroot_prep remove all mode-archives-binary "${@}"
+
+					rm -rf chroot
+					mv chroot.tmp chroot
+
+					lingmo-sys-build chroot_prep install all mode-archives-binary "${@}"
+
+					touch .lock
+				else
+					rm -rf chroot/chroot
+				fi
+				;;
+
+			false)
+				mkfs.jffs2 ${JFFS2_OPTIONS} --root=chroot --output binary/${INITFS}/filesystem.jffs2
+				;;
+		esac
+
+		# Saving cache
+		Save_package_cache binary
+		;;
+
+	plain)
+		if [ -d binary/${INITFS}/filesystem.dir ]
+		then
+			rm -rf binary/${INITFS}/filesystem.dir
+		fi
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				if [ -e chroot/chroot.cache ]
+				then
+					# Different from the other LINGMO_SYS_BUILD_CHROOT_FILESYSTEM values:
+					# continue working in the bootstrap chroot, not the generated chroot.
+					# This saves the time to create a full copy of the generated chroot.
+					cp -a chroot/chroot/boot chroot
+					mv chroot/chroot binary/${INITFS}/filesystem.dir
+				else
+					rm -fr chroot/chroot
+
+					# Removing depends
+					Remove_packages
+				fi
+				;;
+
+			false)
+				cp -a chroot binary/${INITFS}/filesystem.dir
+				;;
+		esac
+		;;
+
+	squashfs)
+		# Checking depends
+		Check_package chroot /usr/share/doc/squashfs-tools squashfs-tools
+
+		# Restoring cache
+		Restore_package_cache binary
+
+		# Installing depends
+		Install_packages
+
+		Echo_message "Preparing squashfs image..."
+		Echo_message "This may take a while."
+
+		# Remove old squashfs image
+		if [ -f binary/${INITFS}/filesystem.squashfs ]
+		then
+			rm -f binary/${INITFS}/filesystem.squashfs
+		fi
+
+		# Remove stale squashfs image
+		rm -f chroot/filesystem.squashfs
+
+		# Do not display progress bar if:
+		# - Run with --quiet, or
+		# - stdin is not a terminal (e.g. in CI, cron, etc)
+		if [ "${_QUIET}" = "true" ] || [ ! -t 0 ]
+		then
+			MKSQUASHFS_OPTIONS="-no-progress ${MKSQUASHFS_OPTIONS}"
+		fi
+
+		if [ "${_VERBOSE}" = "true" ]
+		then
+			MKSQUASHFS_OPTIONS="-info ${MKSQUASHFS_OPTIONS}"
+		fi
+
+		if [ -f config/rootfs/squashfs.sort ]
+		then
+			MKSQUASHFS_OPTIONS="-sort squashfs.sort ${MKSQUASHFS_OPTIONS}"
+
+			case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+				true)
+					cp -a config/rootfs/squashfs.sort chroot
+					;;
+
+				false)
+					cp -a config/rootfs/squashfs.sort .
+					;;
+			esac
+		fi
+
+		# Set squashfs compression type or default to xz
+		if [ -n "${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_TYPE}" ]
+		then 
+			MKSQUASHFS_OPTIONS="-comp ${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_TYPE} ${MKSQUASHFS_OPTIONS}"
+		else 
+			MKSQUASHFS_OPTIONS="-comp xz ${MKSQUASHFS_OPTIONS}"
+		fi
+
+		if [ -n "${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_LEVEL}" ]
+		then
+			MKSQUASHFS_OPTIONS="-Xcompression-level ${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_LEVEL} ${MKSQUASHFS_OPTIONS}"
+		fi
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				if [ -e config/rootfs/excludes ]
+				then
+					cp -a config/rootfs/excludes chroot/excludes
+
+					MKSQUASHFS_OPTIONS="-wildcards -ef /excludes ${MKSQUASHFS_OPTIONS}"
+				fi
+
+				# Create image
+				Chroot chroot "nice -n 17 mksquashfs chroot filesystem.squashfs ${MKSQUASHFS_OPTIONS}"
+
+				rm -f chroot/excludes
+
+				# Move image
+				mv chroot/filesystem.squashfs binary/${INITFS}
+				rm -f chroot/squashfs.sort
+
+				# Removing depends
+				Remove_packages
+
+				if [ -e chroot/chroot.cache ]
+				then
+					Remove_lockfile
+					mv chroot/chroot chroot.tmp
+
+					lingmo-sys-build chroot_prep remove all mode-archives-binary "${@}"
+
+					rm -rf chroot
+					mv chroot.tmp chroot
+
+					lingmo-sys-build chroot_prep install all mode-archives-binary "${@}"
+
+					touch .lock
+				else
+					rm -rf chroot/chroot
+				fi
+				;;
+
+			false)
+				if [ -e config/rootfs/excludes ]
+				then
+					MKSQUASHFS_OPTIONS="-wildcards -ef config/rootfs/excludes ${MKSQUASHFS_OPTIONS}"
+				fi
+
+				nice -n 19 mksquashfs chroot binary/${INITFS}/filesystem.squashfs ${MKSQUASHFS_OPTIONS}
+				;;
+		esac
+
+		chmod 0644 binary/${INITFS}/filesystem.squashfs
+
+		# Saving cache
+		Save_package_cache binary
+		;;
+
+	none)
+		if [ -d binary ]
+		then
+			rm -rf binary
+		fi
+
+		case "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" in
+			true)
+				mv chroot/chroot binary
+				;;
+
+			false)
+				Echo_message "This may take a while."
+				cp -a chroot binary
+				;;
+		esac
+		;;
+
+esac
+
+if In_list "rootfs" ${LINGMO_SYS_BUILD_CACHE_STAGES}
+then
+	rm -rf cache/binary_rootfs
+
+	mkdir -p cache/binary_rootfs
+
+	if [ "${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}" != "none" ]
+	then
+		cp -a binary/"${INITFS}"/filesystem.* cache/binary_rootfs
+	fi
+fi
+
+# Creating stage file
+Create_stagefile

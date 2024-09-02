@@ -1,0 +1,43 @@
+Source: klibc
+Priority: optional
+Maintainer: Debian Kernel Team <debian-kernel@lists.debian.org>
+Uploaders: Ben Hutchings <benh@debian.org>, maximilian attems <maks@debian.org>, Salvatore Bonaccorso <carnil@debian.org>
+Build-Depends: debhelper-compat (= 12), linux-libc-dev, m4 [sparc]
+Section: libs
+Standards-Version: 4.1.2
+Vcs-Browser: https://salsa.debian.org/kernel-team/klibc
+Vcs-Git: https://salsa.debian.org/kernel-team/klibc.git
+# maybe some day replace with a real one?
+Homepage: https://git.kernel.org/cgit/libs/klibc/klibc.git
+
+Package: libklibc-dev
+Section: libdevel
+Architecture: linux-any
+Depends: libklibc (= ${binary:Version}), linux-libc-dev, ${misc:Depends},
+ ${perl:Depends}
+Description: kernel headers used during the build of klibc
+ This package contains the set of kernel headers that were required to
+ build klibc and the utilities that ship with it.  This may or may
+ not be a complete enough set to build other programs that link against
+ klibc.  If in doubt, use real kernel headers instead.
+
+Package: libklibc
+Architecture: linux-any
+Multi-Arch: same
+Depends: ${misc:Depends}
+Description: minimal libc subset for use with initramfs
+ klibc is intended to be a minimalistic libc subset for use with
+ initramfs.  It is deliberately written for small size, minimal
+ entanglement, and portability, not speed.  It is definitely a work in
+ progress, and a lot of things are still missing.
+
+Package: klibc-utils
+Architecture: linux-any
+Multi-Arch: foreign
+Depends: libklibc (= ${binary:Version}), ${misc:Depends}
+Description: small utilities built with klibc for early boot
+ This package contains a collection of programs that are linked
+ against klibc. These duplicate some of the functionality of a
+ regular Linux toolset, but are typically much smaller than their
+ full-function counterparts.  They are intended for inclusion in
+ initramfs images and embedded systems.

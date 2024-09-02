@@ -1,0 +1,465 @@
+'\" t
+.\" $Id: cdk_viewer.3,v 1.30 2019/02/15 01:05:03 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_viewer 3
+.SH NAME
+.XX activateCDKViewer
+.XX cleanCDKViewer
+.XX destroyCDKViewer
+.XX drawCDKViewer
+.XX eraseCDKViewer
+.XX getCDKViewerBox
+.XX getCDKViewerHighlight
+.XX getCDKViewerInfo
+.XX getCDKViewerInfoLine
+.XX getCDKViewerTitle
+.XX moveCDKViewer
+.XX newCDKViewer
+.XX positionCDKViewer
+.XX setCDKViewer
+.XX setCDKViewerBackgroundAttrib
+.XX setCDKViewerBackgroundColor
+.XX setCDKViewerBox
+.XX setCDKViewerBoxAttribute
+.XX setCDKViewerHighlight
+.XX setCDKViewerHorizontalChar
+.XX setCDKViewerInfo
+.XX setCDKViewerInfoLine
+.XX setCDKViewerLLChar
+.XX setCDKViewerLRChar
+.XX setCDKViewerTitle
+.XX setCDKViewerULChar
+.XX setCDKViewerURChar
+.XX setCDKViewerVerticalChar
+cdk_viewer \- curses viewer list widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKViewer ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "void cleanCDKViewer ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "void destroyCDKViewer ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "void drawCDKViewer ("
+.BI "CDKVIEWER *" "viewer",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKViewer ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "boolean getCDKViewerBox ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "chtype getCDKViewerHighlight ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "chtype **getCDKViewerInfo ("
+.BI "CDKVIEWER *" "viewer",
+.BI "char **" "itemList");
+.TP 15
+.B "boolean getCDKViewerInfoLine ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "chtype **getCDKViewerTitle ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "void moveCDKViewer ("
+.BI "CDKVIEWEE *" "viewer",
+.BI "int " "box",
+.BI "int " "box",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKVIEWER *newCDKViewer ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "CDK_CONST char **" "buttonList",
+.BI "int " "buttonCount",
+.BI "chtype " "buttonHighlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKViewer ("
+.BI "CDKVIEWER *" "viewer");
+.TP 15
+.B "void setCDKViewer ("
+.BI "CDKVIEWER *" "viewer",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize",
+.BI "chtype " "buttonAttribute",
+.BI "boolean " "interpret",
+.BI "boolean " "showLineInfo",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKViewerBackgroundAttrib ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKViewerBackgroundColor ("
+.BI "CDKVIEWER *" "viewer",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKViewerBox ("
+.BI "CDKVIEWER *" "viewer",
+.BI "boolean " "Box");
+.TP 15
+.B "void setCDKViewerBoxAttribute ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerHighlight ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKViewerHorizontalChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerInfo ("
+.BI "CDKVIEWER *" "viewer",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize",
+.BI "boolean " "interpret");
+.TP 15
+.B "void setCDKViewerInfoLine ("
+.BI "CDKVIEWER *" "viewer",
+.BI "boolean " "showInfoLine");
+.TP 15
+.B "void setCDKViewerLLChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerLRChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerTitle ("
+.BI "CDKVIEWER *" "viewer",
+.BI "const char *" "title");
+.TP 15
+.B "void setCDKViewerULChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerURChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKViewerVerticalChar ("
+.BI "CDKVIEWER *" "viewer",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk viewer widget creates a file viewer widget.
+This widget allows a user
+to interact with a file.
+It does \fINOT\fR allow editing, this is view only.
+The following are functions which create or
+manipulate the Cdk viewer list widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKViewer
+activates the viewer widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBviewer\fR is a pointer to a non-NULL viewer widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR then this function will return a value from
+0 to the number of buttons -1, representing the button selected.
+It will also
+set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character
+entered into this widget was \fIESCAPE\fR,
+then the widget will return a value of -1
+and the widget data \fIexitType\fR will be set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B cleanCDKViewer
+clears the information from the window.
+.TP 5
+.B destroyCDKViewer
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKViewer
+draws the viewer widget on the screen.
+If the \fBbox\fR option is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKViewer
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKViewerBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKViewerHighlight
+returns the attribute of the buttons.
+.TP 5
+.B getCDKViewerInfo
+returns the contents of the viewer widget.
+.TP 5
+.B getCDKViewerInfoLine
+returns true if the information line is on.
+.TP 5
+.B getCDKViewerTitle
+returns the title of the widget.
+.TP 5
+.B moveCDKViewer
+function moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B *newCDKViewer
+function creates a viewer widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBheight\fR and
+.TP 5
+\fBwidth\fR
+are the height and width of the viewer window.
+.TP 5
+\fBbuttons\fR
+is an array of the button labels which are
+to be attached to the viewer on the bottom.
+.TP 5
+\fBbuttonCount\fR
+is the number of buttons in \fBbuttons\fP.
+.TP 5
+\fBbuttonHighlight\fR
+is the highlight attribute of the currently selected button.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKViewer
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKViewer
+lets the programmer modify several elements of an existing
+viewer widget.
+.RS
+.bP
+\fBtitle\fR is the title to be displayed on
+the top of the viewer.
+.bP
+\fBlist\fR is the information to display,
+.bP
+\fBlistSize\fR states how many rows there are in the \fBlist\fR array.
+If \fBlistSize\fR is negative, \fBlist\fR is scanned to find its
+length, including files which will be included via embedded links.
+.bP
+\fBbuttonAttribute\fR states the attribute of the current
+highlighted button.
+.bP
+The boolean parameter \fBinterpret\fR tells the viewer to
+interpret the contents of \fBlist\fR for Cdk display command.
+.bP
+The \fBshowLineInfo\fR boolean flag tells the viewer to show to show the
+line number and percentage in the top left corner of the viewer window.
+.bP
+The parameters \fBbox\fR and \fBshadow\fR are the same as in the function
+description of \fBnewCDKViewer\fR.
+.RE
+.TP 5
+.B setCDKViewerBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKViewerBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKViewerBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKViewerBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKViewerHighlight
+sets the highlight attribute of the buttons on the widget.
+.TP 5
+.B setCDKViewerHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKViewerInfo
+sets the contents of the viewer widget.
+.IP
+See \fBsetCDKViewer\fP for parameter descriptions.
+.TP 5
+.B setCDKViewerInfoLine
+turns on/off the information line in the top left hand corner of
+the widget.
+If the value of \fBshowInfoLine\fR is \fITRUE\fR, the information
+line will be displayed.
+If it is \fIFALSE\fR it won't.
+.TP 5
+.B setCDKViewerLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKViewerLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKViewerTitle
+sets the title of the widget.
+.TP 5
+.B setCDKViewerULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKViewerURChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKViewerVerticalChar
+sets the vertical drawing character for the box to the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center box;
+l l
+l l
+lw15 lw35 .
+\fBKey	Action\fR
+=
+Left Arrow	Shifts the viewport one column left.
+Right Arrow	Shifts the viewport one column left
+Up Arrow	Scrolls the viewport one line up.
+Down Arrow	Scrolls the viewport one line down.
+_
+Prev Page
+Ctrl-B
+B
+b	Scroll one page backward.
+_
+Next Page
+Ctrl-F
+Space
+F
+f	Scroll one page forward.
+_
+Home
+|	Shift the whole list to the far left.
+_
+End
+$	Shift the whole list to the far right.
+_
+1
+<
+g	Moves to the first line in the viewer.
+_
+>
+G	Moves to the last line in the viewer.
+_
+L	T{
+Moves half the distance to the end of the viewer.
+T}
+l	T{
+Moves half the distance to the top of the viewer.
+T}
+_
+?	Searches up for a pattern.
+/	Searches down for a pattern.
+n	Repeats last search.
+N	Repeats last search, reversed direction.
+:	Jumps to a given line.
+_
+i	Displays file statistics.
+s	Displays file statistics.
+_
+Tab	Switches buttons.
+Return	T{
+Exit the widget and return the index of the selected button.
+Set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape	T{
+Exit the widget and return -1.
+Set the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L	Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

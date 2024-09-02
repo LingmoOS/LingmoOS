@@ -1,0 +1,165 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /etc/apt/sources.list"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+Echo_message "Configuring file /etc/apt/sources.list"
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Restoring cache
+Restore_package_cache chroot
+
+# Mount local repository
+if echo "${LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT}" | grep -q '^file:/'
+then
+	Chroot_bind_path chroot "$(echo ${LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT} | sed -e 's|file:||')"
+fi
+
+# Configure custom sources.list
+Create_apt_sources_list chroot
+
+# Adding local apt sources (chroot)
+for FILE in config/archives/*.list config/archives/*.list.chroot
+do
+	if [ -e "${FILE}" ]
+	then
+		sed -e "s|@DISTRIBUTION@|${LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT}|g" \
+		    -e "s|@PARENT_DISTRIBUTION@|${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}|g" \
+		    -e "s|@ARCHIVE_AREAS@|${LINGMO_SYS_BUILD_ARCHIVE_AREAS}|g" \
+		    -e "s|@PARENT_ARCHIVE_AREAS@|${LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS}|g" \
+		"${FILE}" > "chroot/etc/apt/sources.list.d/$(basename ${FILE} .chroot)"
+	fi
+done
+
+# Adding local apt configuration (chroot)
+for FILE in config/archives/*.conf config/archives/*.conf.chroot
+do
+	if [ -e "${FILE}" ]
+	then
+		cp ${FILE} chroot/etc/apt/apt.conf.d/$(basename ${FILE} .chroot)
+	fi
+done
+
+# Adding local apt preferences (chroot)
+for FILE in config/archives/*.pref config/archives/*.pref.chroot
+do
+	if [ -e "${FILE}" ]
+	then
+		cp ${FILE} chroot/etc/apt/preferences.d/$(basename ${FILE} .chroot)
+	fi
+done
+
+# Adding local apt auth (chroot)
+# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+for FILE in config/archives/*.auth
+do
+	if [ -e "${FILE}" ]
+	then
+		cp ${FILE} chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth).conf
+	fi
+done
+
+# Adding local apt auth (chroot)
+# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+for FILE in config/archives/*.auth.chroot
+do
+	if [ -e "${FILE}" ]
+	then
+		cp ${FILE} chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth.chroot).conf
+	fi
+done
+
+# Check local archive keys
+if Find_files config/archives/*.key || \
+   Find_files config/archives/*.key.chroot
+then
+	for FILE in config/archives/*.key \
+		    config/archives/*.key.chroot
+	do
+		if [ -e "${FILE}" ]
+		then
+			if grep -q "PGP PUBLIC KEY BLOCK" "${FILE}"
+			then
+				cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).asc
+			else
+				cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).gpg
+			fi
+		fi
+	done
+fi
+
+# Check local keyring packages
+if Find_files config/archives/*.deb
+then
+	for PACKAGE in config/archives/*.deb
+	do
+		cp ${PACKAGE} chroot/root
+		Chroot chroot "dpkg -i /root/$(basename ${PACKAGE})"
+		rm -f chroot/root/$(basename ${PACKAGE})
+	done
+fi
+
+# Installing aptitude
+if [ "${LINGMO_SYS_BUILD_APT}" = "aptitude" ] && [ ! -x chroot/usr/bin/aptitude ]
+then
+	Chroot chroot "apt-get ${APT_OPTIONS} update"
+	Chroot chroot "apt-get ${APT_OPTIONS} install aptitude"
+fi
+
+# Rebuild apt indices from scratch.
+# Due to the fact that apt doesn't understand
+# pinning on the fly, we need to manually remove
+# the cached indices and rebuild them again.
+rm -rf chroot/var/cache/apt/*.bin
+
+Apt chroot update
+
+# Installing keyring packages
+if [ -n "${LINGMO_SYS_BUILD_KEYRING_PACKAGES}" ]
+then
+	Apt chroot "install ${LINGMO_SYS_BUILD_KEYRING_PACKAGES}"
+fi
+
+rm -rf chroot/var/cache/apt/*.bin
+
+Apt chroot update
+
+if [ "${LINGMO_SYS_BUILD_DERIVATIVE}" = "true" ]
+then
+	Apt chroot install apt dpkg
+fi
+
+Apt chroot "upgrade"
+Apt chroot "dist-upgrade"
+
+# Saving cache
+Save_package_cache chroot
+
+# Creating stage file
+Create_stagefile

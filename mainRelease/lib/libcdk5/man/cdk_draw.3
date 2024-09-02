@@ -1,0 +1,198 @@
+.\" $Id: cdk_draw.3,v 1.4 2009/02/15 17:10:04 tom Exp $
+.de XX
+..
+.TH cdk_draw 3
+.XX boxWindow
+.XX attrbox
+.XX drawObjBox
+.XX drawLine
+.XX drawShadow
+.XX writeBlanks
+.XX writeChar
+.XX writeCharAttrib
+.XX writeChtype
+.XX writeChtypeAttrib
+.SH NAME
+cdk_draw \- Cdk Drawing Functions
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "void boxWindow ("
+.BI "WINDOW *" "window",
+.BI "chtype " "attr");
+.TP 15
+.B "void attrbox ("
+.BI "WINDOW *" "win",
+.BI "chtype " "tlc",
+.BI "chtype " "trc",
+.BI "chtype " "blc",
+.BI "chtype " "brc",
+.BI "chtype " "horz",
+.BI "chtype " "vert",
+.BI "chtype " "attr");
+.TP 15
+.B "void drawObjBox ("
+.BI "WINDOW *" "win",
+.BI "CDKOBJS *" "object");
+.TP 15
+.B "void drawLine ("
+.BI "WINDOW *" "window",
+.BI "int " "startx",
+.BI "int " "starty",
+.BI "int " "endx",
+.BI "int " "endy",
+.BI "chtype " "line");
+.TP 15
+.B "void drawShadow ("
+.BI "WINDOW *" "shadowWin");
+.TP 15
+.B "void writeBlanks ("
+.BI "WINDOW *" "window",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "align",
+.BI "int " "start",
+.BI "int " "end");
+.TP 15
+.B "void writeChar ("
+.BI "WINDOW *" "window",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "char *" "string",
+.BI "int " "align",
+.BI "int " "start",
+.BI "int " "end");
+.TP 15
+.B "void writeCharAttrib ("
+.BI "WINDOW *" "window",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "char *" "string",
+.BI "chtype " "attr",
+.BI "int " "align",
+.BI "int " "start",
+.BI "int " "end");
+.TP 15
+.B "void writeChtype ("
+.BI "WINDOW *" "window",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "chtype *" "string",
+.BI "int " "align",
+.BI "int " "start",
+.BI "int " "end");
+.TP 15
+.B "void writeChtypeAttrib ("
+.BI "WINDOW *" "window",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "chtype *" "string",
+.BI "chtype " "attr",
+.BI "int " "align",
+.BI "int " "start",
+.BI "int " "end");
+.fi
+.SH DESCRIPTION
+These functions perform useful drawing and attribute operations.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B boxWindow
+draw a box with on the window \fIwin\fP.
+Like \fBattrbox\fP, 
+this function ORs \fIattr\fP with each character as it draws the box.
+.TP 5
+.B attrbox
+draw a box with on the window \fIwin\fP
+letting the caller define each element of the box.
+.IP
+The parameters \fItlc\fP, \fItrc\fP, \fIblc\fP, \fIbrc\fP
+are used for the
+top-left,
+top-right,
+bottom-left and
+bottom-right corners respectively.
+The parameters
+\fIhorz\fP and
+\fIvert\fP
+are used for the horizontal and vertical sides of the box.
+Any of these parameters may be zero.
+In that case, the function skips the corresponding element of the box.
+.IP
+The function ORs \fIattr\fP with each character as it draws the box.
+.TP 5
+.B drawObjBox
+Draw a box around the given window \fIwin\fP
+using the \fIobject\fP's defined line-drawing characters.
+.TP 5
+.B drawLine
+draw a line on the given window.
+.IP
+The parameters \fIstarty\fP, \fIstartx\fP are the starting coordinates.
+The parameters \fIendy\fP, \fIendx\fP are the ending coordinates.
+The function writes the data in \fIline\fP to each coordinate in that
+range including the start/end coordinates.
+.IP
+The function handles lines other than vertical or horizontal,
+but normally it is used for that, e.g., with \fIline\fP set to
+\fBACS_HLINE\fP or \fBACS_VLINE\fP.
+.TP 5
+.B drawShadow
+draw a shadow on the right and bottom edges of a window.
+.TP 5
+.B writeBlanks
+write a string of blanks, using \fBwriteChar\fP.
+The parameters are passed to \fBwriteChar\fP as is.
+There is no corresponding \fBwriteBlanksAttrib\fP function.
+.TP 5
+.B writeChar
+writes out a \fBchar\ *\fP string without adding attributes.
+The parameters are passed to \fBwriteCharAttrib\fP as is.
+.TP 5
+.B writeCharAttrib
+writes out a \fBchar\ *\fP string with the given attributes added.
+The string is written to the given \fIwindow\fP,
+using its relative screen coordinates \fIypos\fP and \fIxpos\fP.
+.IP
+Compare with \fBwriteChtypeAttrib\fP, which writes a \fBchtype\ *\fP string.
+.IP
+The function ORs the attribute \fIattr\fP with each item from the string.
+For instance, it may be \fBA_BOLD\fP.
+The \fIalign\fP parameter controls whether it is written horizontally
+(\fBHORIZONTAL\fP) or vertically (\fBVERTICAL\fP).
+.IP
+Finally, only a subset of the string is written.
+The function starts with the data from the \fIstart\fP item of
+\fIstring\fP, and ends before the \fIend\fP item.
+If \fIstart\fP is greater than, or equal to \fIend\fP, no data is written.
+.TP 5
+.B writeChtype
+writes out a \fBchtype\ *\fP string without adding attributes.
+The parameters are passed to \fBwriteChtypeAttrib\fP as is.
+.TP 5
+.B writeChtypeAttrib
+writes out a \fIchtype\ *\fP string with the given attributes added.
+The string is written to the given \fIwindow\fP,
+using its relative screen coordinates \fIypos\fP and \fIxpos\fP.
+You would normally construct the string from a \fIchar\ *\fP string
+using \fBchar2Chtype\fP (3).
+.IP
+The function ORs the attribute \fIattr\fP with each item from the string.
+For instance, it may be \fBA_BOLD\fP.
+The \fIalign\fP parameter controls whether it is written horizontally
+(\fBHORIZONTAL\fP) or vertically (\fBVERTICAL\fP).
+.IP
+Finally, only a subset of the string is written.
+The function starts with the data from the \fIstart\fP item of
+\fIstring\fP, and ends before the \fIend\fP item.
+If \fIstart\fP is greater than, or equal to \fIend\fP, no data is written.
+.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_util (3)

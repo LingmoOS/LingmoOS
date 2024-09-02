@@ -1,0 +1,107 @@
+.\" Please adjust this date whenever revising the manpage.
+.\" 
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.TH "update-grub" "8" "June 18, 2001" "Jason Thomas"
+.SH "NAME"
+update\-grub \- program to generate GRUB's menu.lst file
+.SH "SYNOPSIS"
+.B update\-grub
+.SH "DESCRIPTION"
+.B \fBupdate\-grub\fR
+is a program used to generate the \fImenu.lst\fR file used by the grub bootloader.
+It works by looking in \fI/boot\fR for all files which start with "\fIvmlinuz\-\fR". They will be treated as kernels, and grub menu entries will be created for each. It will also create the initial \fImenu.lst\fR if none exists, after prompting the user.
+It will also add initrd lines for ramdisk images found with the same version as kernels found. e.g. /boot/vmlinuz-2.4.5 and /boot/initrd-2.4.5 will cause a line of "initrd=/boot/initrd-2.4.5 or similar to be added for the kernel entry in the menu.lst.
+
+After \fBupdate\-grub\fR has been run for the first time, the user is required to edit the generated \fBmenu.lst\fR. The user must set the two options \fBupdate\-grub\fR uses. Then re\-run the \fBupdate\-grub\fR script to update the \fImenu.lst\fR file using the default's that have been set.
+
+These are the options passed to the linux kernel:
+.br 
+# kopt=root=/dev/hda1 ro
+.br 
+Everything after "kopt=" is passed to the kernel as parameters. See bootparam(7) for more information.
+
+This is the grub device from which grub loads the kernel:
+.br 
+# groot=(hd0,1)
+.br 
+(hd0,1) is a partition in grub notation. See grub(8) for more information.
+
+This option controls if grub should create the alternative boot options in the menu entries
+.br
+# alternative=true
+.br
+# alternative=false
+
+This option controls if grub should lock the alternative boot options see grub(8) for more information.
+.br
+# lockalternative=true
+.br
+# lockalternative=false
+
+This option controls if grub should lock the old kernels.
+.br
+# lockold=true
+.br
+# lockold=false
+
+This options controls what is used for the alternative boot options, multiple altoptions lines are allowed.
+.br
+# altoptions=(some description) some kernel command line options
+.br
+# altoptions=(recovery option) single
+.br
+The description is placed in '()' and the kernel command line options follow that.
+.br
+# updatedefault=true
+.br
+# updatedefault=false
+
+This option controls if grub should update the default entry to keep
+booting the same kernel even if a new one is installed.
+
+
+The \fBupdate\-grub\fR script can be ran automagically from the \fI/etc/kernel\-img.conf\fR file by adding the following lines:
+
+postinst_hook = update\-grub
+.br 
+postrm_hook = update\-grub
+.br 
+do_bootloader = no
+
+For further information related to \fI/etc/kernel\-img.conf\fR, see the manpage kernel\-img.conf(5).
+.SH "SEE ALSO"
+.BR grub (8),
+.BR grub\-install (8),
+.BR kernel\-img.conf (5)
+(contained in the
+.B kernel-package
+package),
+.BR bootparam (7).
+.PP
+The full documentation for
+.B grub
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B grub
+programs are properly installed at your site, the command
+.IP
+.B info grub
+.PP
+should give you access to the complete manual.
+You may need to install the
+.B grub\-legacy\-doc
+package.
+.SH "AUTHOR"
+This manual page was written by Jason Thomas <jason@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).
+.\" vim:syn=nroff

@@ -1,0 +1,206 @@
+.TH LIVE\-BOOT 5 2015\-09\-22 5.0~a5-1 "Debian Live Project"
+
+.SH NAME
+\fBpersistence.conf\fR \- Configuration file for persistence media in
+live\-boot
+
+.SH DESCRIPTION
+If live-boot probes a persistence volume with the label (or GPT name,
+or file name, but from now on we will just say "label") "persistence",
+that volume's persistence is fully customizable through the
+\fBpersistence.conf\fR file stored on the root of its file system. Any such
+labeled volume must have such a file, or it will be ignored.
+.PP
+The format of \fBpersistence.conf\fR allows empty lines and lines starting
+with a "#" (used for comments), both which will be ignored. A so
+called "custom mount" has the format:
+.PP
+.RS
+\fIDIR\fR [\fIOPTION\fR]...
+.RE
+.PP
+which roughly translates to "make \fIDIR\fR persistence in the way
+described by the list of \fIOPTION\fRs".
+.PP
+For each custom mount \fIDIR\fR must be an absolute path that cannot
+contain white spaces or the special . and .. path components, and
+cannot be /live (or any of its sub-directories).
+Once activated all changes (file
+deletion, creation and modification) to \fIDIR\fR on the live file
+system are stored persistently into a path equivalent to \fIDIR\fR on
+the persistence media, called the source directory. The default way to
+achieve persistence is to simply bind-mount the corresponding source
+directory to \fIDIR\fR, but this can be changed through the use of
+\fIOPTION\fRs.
+.PP
+All custom mounts will be done in an order so that no two custom
+mounts can "hide" each other. For instance, if we have the two
+\fIDIR\fR:s /a and /a/b it would always be the case that /a is mounted
+first, then /a/b. This remains true no matter how the lines in
+\fBpersistence.conf\fR are ordered, or if several \fBpersistence.conf\fR files
+on different persistence media are used at the same time. However, it
+is forbidden for custom mounts to have their source directory inside
+the source directory of another custom mount, so the source
+directories that are auto-created by live-boot does not support
+"nested" mounts like /a and /a/b on the same media. In this case you
+must use the \fBsource\fR option (see below) to make sure that they
+are stored in different source directories.
+.PP
+When a source directory doesn't exist on the persistence media for a
+certain custom mount, it will be created automatically, and
+permissions and ownership will be optimistically set according to
+\fIDIR\fR. It will also be bootstrapped by copying the contents of the
+\fIDIR\fR into its source directory on the persistence media. The
+bootstrapping will not happen when the \fBlink\fR or \fBunion\fR
+options are used (see below).
+
+.SH OPTIONS
+Custom mounts defined in \fBpersistence.conf\fR accept the following
+options in a comma-separated list:
+.IP "\fBsource\fR=\fIPATH\fR" 4
+When given, store the persistence changes into \fIPATH\fR on the
+persistence media. \fIPATH\fR must be a relative path (with respect to the
+persistence media root) that cannot contain white spaces or the
+special . or .. path components, with the exception that it can be
+just . which means the persistence media root. This option is mostly
+relevant if you want to nest custom mounts, which otherwise would
+cause errors, or if you want to make the whole media root available
+(similar to the now deprecated \fBhome-rw\fR type of persistence).
+.PP
+The following options are mutually exclusive (only the last given one
+will be in effect):
+.IP "\fBbind\fR" 4
+Bind-mount the source directory to \fIDIR\fR. This is the default.
+.IP "\fBlink\fR" 4
+Create the directory structure of the source directory on the
+persistence media in \fIDIR\fR and create symbolic links from the
+corresponding place in \fIDIR\fR to each file in the source directory.
+Existing files or directories with the same name as any link will be
+overwritten. Note that deleting the links in \fIDIR\fR will only
+remove the link, not the corresponding file in the source; removed
+links will reappear after a reboot. To permanently add or delete a
+file one must do so directly in the source directory.
+.IP
+Effectively \fBlink\fR will make only files already in the source
+directory persistent, not any other files in \fIDIR\fR. These files
+must be manually added to the source directory to make use of this
+option, and they will appear in \fIDIR\fR in addition to files already
+there. This option is useful when only certain files need to be
+persistent, not the whole directory they're in, e.g. some
+configuration files in a user's home directory.
+.IP "\fBunion\fR" 4
+Save the rw branch of a union on the persistence media, so only the
+changes are stored persistently. This can potentially reduce disk
+usage compared to bind-mounts, and will not hide files added to the
+read-only media. One caveat is that the union will use \fIDIR\fR from
+the image's read-only file system, not the real file system root, so
+files created after boot (e.g. by live-config) will not appear in the
+union. This option will use the union file system specified by
+live-boot's \fBunion\fR boot parameter.
+
+.SH DIRECTORIES
+.IP "\fB/live/persistence\fR" 4
+All persistence volumes will be mounted here (in a directory
+corresponding to the device name). The \fBpersistence.conf\fR file can
+easily be edited through this mount, as well as any source directories
+(which is especially practical for custom mounts using the
+\fBlink\fR option).
+
+.SH EXAMPLES
+
+Let's say we have a persistence volume \fIVOL\fR with the a
+\fBpersistence.conf\fR file containing the following four lines (numbered
+for ease of reference):
+.TP 7
+1.
+/home/user1 link,source=config-files/user1
+.TP
+2.
+/home/user2 link,source=config-files/user2
+.TP
+3.
+/home
+.TP
+4.
+/usr union
+.PP
+The corresponding source directories are:
+.TP 7
+1.
+\fIVOL\fR/config-files/user1 (but it would be \fIVOL\fR/home/user1
+without the \fBsource\fR option)
+.TP
+2.
+\fIVOL\fR/config-files/user2 (but it would be \fIVOL\fR/home/user2
+without the \fBsource\fR option)
+.TP
+3.
+\fIVOL\fR/home
+.TP
+4.
+\fIVOL\fR/usr
+.PP
+It was necessary to set the \fBsource\fR options for 1 and 2, since
+they otherwise would become nested with 3's source, which is invalid.
+.PP
+Line 3 will be taken care of before line 1 and 2 in order to prevent
+custom mounts 1 and 2 from being hidden by 3. When line 3 is handled,
+\fIVOL\fR/home is simply bind-mounted on /home. To illustrate what
+happens for lines 1 and 2, let's say that the following files exist:
+.TP 7
+a.
+\fIVOL\fR/config-files/user1/.emacs
+.TP
+b.
+\fIVOL\fR/config-files/user2/.bashrc
+.TP
+c.
+\fIVOL\fR/config-files/user2/.ssh/config
+.PP
+Then the following links and directories will be created:
+.TP 7
+Link:
+/home/user1/.emacs -> \fIVOL\fR/config-files/user1/.emacs (from a)
+.TP
+Link:
+/home/user2/.bashrc -> \fIVOL\fR/config-files/user2/.bashrc (from b)
+.TP
+Dir:
+/home/user2/.ssh (from c)
+.TP
+Link:
+/home/user2/.ssh/config -> \fIVOL\fR/config-files/user2/.ssh/config
+(from c)
+.PP
+One could argue, though, that lines 1 and 2 in the example
+\fBpersistence.conf\fR file above are unnecessary since line 3 already
+would make all of /home persistent. The \fBlink\fR option is
+intended for situations where you don't want a complete directory to
+be persistent, only certain files in it or its sub-directories.
+.PP
+Line 4 can be mounted at any time since its \fIDIR\fR (and source
+directory) is completely disjoint from all the other custom
+mounts. When mounted, \fIVOL\fR/usr will be the rw branch due to the
+\fBunion\fR option, and will only contain the difference compared to
+the underlying read-only file system. Hence packages could be
+installed into /usr with great space-wise efficiency compared to
+bind-mounts, since in the latter case all of /usr would have to be
+copied into \fIVOL\fR/usr during the initial bootstrap.
+
+.SH SEE ALSO
+\fIlive\-boot\fR(7)
+.PP
+\fIlive\-build\fR(7)
+.PP
+\fIlive\-config\fR(7)
+.PP
+\fIlive\-tools\fR(7)
+
+.SH HOMEPAGE
+More information about live\-boot and the Debian Live project can be found on the homepage at <\fIhttps://wiki.debian.org/DebianLive\fR> and in the manual at <\fIhttps://live-team.pages.debian.net/live-manual/\fR>.
+
+.SH BUGS
+Bugs can be reported by submitting a bugreport for the live\-boot package in the Bug Tracking System at <\fIhttp://bugs.debian.org/\fR> or by writing a mail to the Debian Live mailing list at <\fIdebian-live@lists.debian.org\fR>.
+
+.SH AUTHOR
+live\-boot was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

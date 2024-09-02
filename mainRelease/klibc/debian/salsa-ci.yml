@@ -1,0 +1,12 @@
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/salsa-ci.yml
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/pipeline-jobs.yml
+
+variables:
+  RELEASE: 'unstable'
+  # klibc does not support many of these hardening options
+  SALSA_CI_DISABLE_BLHC: 1
+  # We don't build any arch:all packages
+  SALSA_CI_DISABLE_BUILD_PACKAGE_ALL: 'true'
+  # Currently triggering falsely (bugs #973313, #1000977)
+  SALSA_CI_LINTIAN_SUPPRESS_TAGS: 'groff-message,elf-error'

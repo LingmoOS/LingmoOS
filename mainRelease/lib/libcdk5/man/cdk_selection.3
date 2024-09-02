@@ -1,0 +1,581 @@
+'\" t
+.\" $Id: cdk_selection.3,v 1.29 2019/02/20 14:28:42 tom Exp $"
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_selection 3
+.SH NAME
+.XX activateCDKSelection
+.XX destroyCDKSelection
+.XX drawCDKSelection
+.XX eraseCDKSelection
+.XX getCDKSelectionBox
+.XX getCDKSelectionChoice
+.XX getCDKSelectionChoices
+.XX getCDKSelectionCurrent
+.XX getCDKSelectionHighlight
+.XX getCDKSelectionItems
+.XX getCDKSelectionMode
+.XX getCDKSelectionModes
+.XX getCDKSelectionTitle
+.XX injectCDKSelection
+.XX moveCDKSelection
+.XX newCDKSelection
+.XX positionCDKSelection
+.XX setCDKSelection
+.XX setCDKSelectionBackgroundAttrib
+.XX setCDKSelectionBackgroundColor
+.XX setCDKSelectionBox
+.XX setCDKSelectionBoxAttribute
+.XX setCDKSelectionChoice
+.XX setCDKSelectionChoices
+.XX setCDKSelectionCurrent
+.XX setCDKSelectionHighlight
+.XX setCDKSelectionHorizontalChar
+.XX setCDKSelectionItems
+.XX setCDKSelectionLLChar
+.XX setCDKSelectionLRChar
+.XX setCDKSelectionMode
+.XX setCDKSelectionModes
+.XX setCDKSelectionPostProcess
+.XX setCDKSelectionPreProcess
+.XX setCDKSelectionTitle
+.XX setCDKSelectionULChar
+.XX setCDKSelectionURChar
+.XX setCDKSelectionVerticalChar
+cdk_selection \- curses selection list widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKSelection ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype * " "actions");
+.TP 15
+.B "void destroyCDKSelection ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "void drawCDKSelection ("
+.BI "CDKSELECTION *" "selection",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKSelection ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "boolean getCDKSelectionBox ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "int getCDKSelectionChoice ("
+.BI "CDKSELECTION *" "selection",
+.BI "int " "index");
+.TP 15
+.B "int *getCDKSelectionChoices ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "int getCDKSelectionCurrent ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "chtype getCDKSelectionHighlight ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "int getCDKSelectionItems ("
+.BI "CDKSELECTION *" "selection",
+.BI "char **" "list");
+.TP 15
+.B "int getCDKSelectionMode ("
+.BI "CDKSELECTION *" "selection",
+.BI "int " "index");
+.TP 15
+.B "int *getCDKSelectionModes ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "char *getCDKSelectionTitle ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "int injectCDKSelection ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKSelection ("
+.BI "CDKSELECTION *" "selection",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKSELECTION *newCDKSelection ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "spos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "selectionList",
+.BI "int " "selectionListLength",
+.BI "CDK_CONST char **" "choiceList",
+.BI "int " "choiceListLength",
+.BI "chtype " "highlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKSelection ("
+.BI "CDKSELECTION *" "selection");
+.TP 15
+.B "void setCDKSelection ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "highlight",
+.BI "int *" "defChoices",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKSelectionBackgroundAttrib ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKSelectionBackgroundColor ("
+.BI "CDKSELECTION *" "selection",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKSelectionBox ("
+.BI "CDKSELECTION *" "selection",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDKSelectionBoxAttribute ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionChoice ("
+.BI "CDKSELECTION *" "selection",
+.BI "int " "index",
+.BI "int " "choice");
+.TP 15
+.B "void setCDKSelectionChoices ("
+.BI "CDKSELECTION *" "selection",
+.BI "int *" "choices");
+.TP 15
+.B "void setCDKSelectionCurrent ("
+.BI "CDKSELECTION *" "selection",
+.BI "int" "index");
+.TP 15
+.B "void setCDKSelectionHighlight ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKSelectionHorizontalChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionItems ("
+.BI "CDKSELECTION *" "selection",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize");
+.TP 15
+.B "void setCDKSelectionLLChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionLRChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionMode ("
+.BI "CDKSELECTION *" "selection",
+.BI "int " "index",
+.BI "int " "mode");
+.TP 15
+.B "void setCDKSelectionModes ("
+.BI "CDKSELECTION *" "selection",
+.BI "int *" "modes");
+.TP 15
+.B "void setCDKSelectionPostProcess ("
+.BI "CDKSELECTION *" "selection",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKSelectionPreProcess ("
+.BI "CDKSELECTION *" "selection",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKSelectionTitle ("
+.BI "CDKSELECTION *" "selection",
+.BI "const char *" "title");
+.TP 15
+.B "void setCDKSelectionULChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionURChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKSelectionVerticalChar ("
+.BI "CDKSELECTION *" "selection",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk selection widget creates a selection list.
+The following functions create or manipulate the Cdk selection list widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKSelection
+activates the selection widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBselection\fR is a pointer to a non-NULL selection widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return 1.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+If the
+character entered into this widget was \fIESCAPE\fR then the widget will return
+a value of -1 and the widget data \fIexitType\fR will be set to
+\fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDKSelection
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKSelection
+draws the selection widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKSelection
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKSelectionBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKSelectionChoice
+returns the selection choice at the given index.
+.TP 5
+.B getCDKSelectionChoices
+returns an array of the current selection choices for the widget.
+.TP 5
+.B getCDKSelectionCurrent 
+returns the current selection index.
+.TP 5
+.B getCDKSelectionHighlight
+returns the attribute of the highlight bar.
+.TP 5
+.B getCDKSelectionItems
+optionally copies the selection-list items into the caller's list,
+which must be large enough since this function does not allocate it.
+If the \fIlist\fP parameter is null, no copying is done.
+It returns the list size whether or not the \fIlist\fP parameter is null.
+.TP 5
+.B getCDKSelectionMode
+returns the selection mode at the given index.
+.TP 5
+.B getCDKSelectionModes
+returns an array of the current modes for the widget.
+.TP 5
+.B getCDKSelectionTitle
+returns the first line of the title of the selection widget.
+The caller must free the returned value.
+.TP 5
+.B injectCDKSelection
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBselection\fR is a pointer to a non-NULL selection widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+1.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+\fIvESCAPE_HIT\fR.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKSelection
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.bP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKSelection
+creates a selection widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBspos\fR
+is where the scroll bar is to be placed.
+It may be one of three values:
+.RS
+.TP 5
+\fILEFT\fR
+puts the scroll bar on the left
+of the scrolling list.
+\fIRIGHT\fR
+puts the scroll bar on the right side of the list, and
+.TP 5
+\fINONE\fR
+does not add a scroll bar.
+.RE
+.TP 5
+\fBheight\fR and
+.TP 5
+\fBwidth\fR
+control the height and width of the widget.
+If you provide a value of zero for either of the height or the width, the widget
+will be created with the full width and height of the screen.
+If you provide a
+negative value, the widget will be created the full height or width minus the
+value provided.
+.TP 5
+\fBtitle\fR
+is the string which to display at the top of the widget.
+The title can be more than one line; just
+provide a carriage return character at the line break.
+.TP 5
+\fBselectionList\fR
+is the list of items to display in the selection list
+.TP 5
+\fBselectionListLength\fR
+is the number of elements in the given list.
+.TP 5
+\fBchoiceList\fR
+is the list of choices that will
+be selected when the user presses the space bar.
+.TP 5
+\fBchoiceListLength\fR
+is the length of this list.
+.TP 5
+\fBhighlight\fR
+specifies the display attribute of the currently selected item.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKSelection
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKSelection
+lets the programmer modify certain elements of an existing selection widget.
+The parameter names correspond to the same
+parameter names listed in the \fBnewCDKSelection\fR function.
+.TP 5
+.B setCDKSelectionBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKSelectionBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKSelectionBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKSelectionBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKSelectionChoice
+sets the selection choice value at the given index.
+.TP 5
+.B setCDKSelectionChoices
+sets the selection choice values of the widget.
+.TP 5
+.B setCDKSelectionCurrent 
+sets the current selection index.
+.TP 5
+.B setCDKSelectionHighlight
+sets the attribute of the highlight bar.
+.TP 5
+.B setCDKSelectionHorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDKSelectionItems
+sets the selection list items.
+The previous selection list items stored in the widget are freed.
+.TP 5
+.B setCDKSelectionLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKSelectionLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKSelectionMode
+sets the selection mode at the given index.
+.TP 5
+.B setCDKSelectionModes
+sets the selection mode of the elements of the widget.
+There are two acceptable values for the modes:
+.RS 5
+.TP 3
+0
+which allows the user to change the selection value at the given index; and
+.TP 3
+1
+which sets the element to a read-only state.
+.RE
+.TP 5
+.B setCDKSelectionPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+The parameter \fBfunction\fR is the callback function.
+The parameter \fBdata\fR points to data passed to the callback function.
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKSelectionPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+The parameter \fBfunction\fR is the callback function.
+The parameter \fBdata\fR is a pointer to
+\fIvoid\fR.
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKSelectionTitle
+set the selection list's title.
+.TP 5
+.B setCDKSelectionULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKSelectionURChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKSelectionVerticalChar
+sets the vertical drawing character for the box to the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which
+help the user enter or manipulate the information quickly:
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/T{
+Shift the whole list left one column.
+T}
+Right Arrow/T{
+Shift the whole list right one column.
+T}
+Up Arrow/T{
+Select the previous item in the list.
+T}
+Down Arrow/T{
+Select the next item in the list.
+T}
+_
+Prev Page
+Ctrl-B/Scroll one page backward.
+_
+Next Page
+Ctrl-F/Scroll one page forward.
+_
+1
+<
+g
+Home/Move to the first element in the list.
+_
+>
+G
+End/Move to the last element in the list.
+_
+$/Shift the whole list to the far right.
+|/Shift the whole list to the far left.
+_
+Space/T{
+Cycles to the next choice on the current item.
+T}
+Return/T{
+Exit the widget and return 1.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exit the widget and return 1.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exit the widget and return -1.
+Also set the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

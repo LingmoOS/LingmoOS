@@ -1,0 +1,83 @@
+---
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/salsa-ci.yml
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/pipeline-jobs.yml
+
+variables:
+  SALSA_CI_DISABLE_BLHC: 1
+  SALSA_CI_DISABLE_BUILD_PACKAGE_ANY: 1
+
+# stages can only be overridden not extended, so we have to list all of them
+stages:
+  - provisioning
+  - build
+  - test
+  - test extras
+  - publish # Stage referenced by Salsa-CI template aptly stanza, so must exist even though not used
+
+# This tests running debootstrap inside an unshared user namespace.
+# Inside that namespace, mknod is not available.
+# In such an environment "mount -t proc proc /proc" will not work (see
+# #1031222) so this also tests whether the fallingmo-sys-buildack to bind-mounting
+# proc works as systemd-tmpfiles will otherwise not create several files.
+test-unshare:
+  stage: test extras
+  image: $SALSA_CI_IMAGES_BASE
+  needs:
+    - job: build
+      artifacts: true
+  variables:
+    DEBOOTSTRAP_SCRIPT: $CI_PROJECT_DIR/debootstrap
+    DEBOOTSTRAP_DIR: $CI_PROJECT_DIR
+    AUTOPKGTEST_TMP: /tmp
+  script:
+    - apt-get update
+    - apt-get install --no-install-recommends -y libdistro-info-perl libdpkg-perl libipc-run-perl perl systemd systemd-container ca-certificates mmdebstrap uidmap wget distro-info
+    - mmdebstrap --variant=custom --mode=unshare --setup-hook=./debian/tests/debian-testing --skip=update,setup,cleanup - "$AUTOPKGTEST_TMP/chroot.d"
+
+test-buildd:
+  stage: test extras
+  image: $SALSA_CI_IMAGES_BASE
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - |
+      set -x
+      apt-get update
+      apt-get install --no-install-recommends -y wget distro-info
+      for SUITE in bullseye bookworm trixie; do
+          env DEBOOTSTRAP_DIR="$CI_PROJECT_DIR" ./debootstrap --variant=buildd "$SUITE" ./chroot
+          # check if chroots before trixie are unmerged and chroots of trixie
+          # or later are using merged-/usr
+          case "$SUITE" in
+              bullseye|bookworm)
+                  for f in bin sbin lib; do
+                      [ ! -d "./chroot/$f" ] && echo "E: /$f is not a directory" && exit 1
+                      [ -L "./chroot/$f" ]   && echo "E: /$f is a symlink"       && exit 1
+                  done
+                  ;;
+              trixie)
+                  for f in bin sbin lib; do
+                      [ ! -L "./chroot/$f" ] && echo "E: /$f is not a symlink"  && exit 1
+                  done
+                  ;;
+          esac
+          # check if trixie buildd chroots do not contain Priority:required
+          # packages like tzdata
+          case "$SUITE" in
+              bullseye|bookworm)
+                  if [ "$(chroot ./chroot dpkg-query --no-pager --showformat '${db:Status-Status}' --show tzdata)" != "installed" ]; then
+                      echo "E: tzdata should be installed in the buildd variant for bullseye and bookworm"
+                      exit 1
+                  fi
+                  ;;
+              trixie)
+                  if [ "$(chroot ./chroot dpkg-query --no-pager --showformat '${db:Status-Status}' --show tzdata)" = "installed" ]; then
+                      echo "E: tzdata should not be installed in the buildd variant for trixie"
+                      exit 1
+                  fi
+                  ;;
+          esac
+          rm -rf ./chroot
+      done

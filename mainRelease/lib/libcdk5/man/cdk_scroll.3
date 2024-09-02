@@ -1,0 +1,594 @@
+'\" t
+.\" $Id: cdk_scroll.3,v 1.36 2019/02/20 14:29:03 tom Exp $"
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_scroll 3
+.SH NAME
+.XX activateCDKScroll
+.XX addCDKScrollItem
+.XX deleteCDKScrollItem
+.XX destroyCDKScroll
+.XX drawCDKScroll
+.XX eraseCDKScroll
+.XX getCDKScrollBox
+.XX getCDKScrollCurrent
+.XX getCDKScrollCurrentItem
+.XX getCDKScrollCurrentTop
+.XX getCDKScrollHighlight
+.XX getCDKScrollItems
+.XX injectCDKScroll
+.XX insertCDKScrollItem
+.XX moveCDKScroll
+.XX newCDKScroll
+.XX positionCDKScroll
+.XX setCDKScroll
+.XX setCDKScrollBackgroundAttrib
+.XX setCDKScrollBackgroundColor
+.XX setCDKScrollBox
+.XX setCDKScrollBoxAttribute
+.XX setCDKScrollCurrent
+.XX setCDKScrollCurrentItem
+.XX setCDKScrollCurrentTop
+.XX setCDKScrollHighlight
+.XX setCDKScrollHorizontalChar
+.XX setCDKScrollItems
+.XX setCDKScrollLLChar
+.XX setCDKScrollLRChar
+.XX setCDKScrollPosition
+.XX setCDKScrollPostProcess
+.XX setCDKScrollPreProcess
+.XX setCDKScrollULChar
+.XX setCDKScrollURChar
+.XX setCDKScrollVerticalChar
+cdk_scroll \- curses scrolling list widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKScroll ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype * " "actions");
+.TP 15
+.B "void addCDKScrollItem ("
+.BI "CDKSCROLL *" "scroll",
+.BI "const char *" "item");
+.TP 15
+.B "void deleteCDKScrollItem ("
+.BI "CDKSCROLL *" "scroll",
+.BI "int " "position");
+.TP 15
+.B "void destroyCDKScroll ("
+.BI "CDKSCROLL *" "scroll");
+.TP 15
+.B "void drawCDKScroll ("
+.BI "CDKSCROLL *" "scroll",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKScroll ("
+.BI "CDKSCROLL *" "scroll");
+.TP 15
+.B "boolean getCDKScrollBox ("
+.BI "CDKSCROLL *" "scroll");
+.TP 15
+.B "int getCDKScrollCurrent("
+.BI "CDKSCROLL *" "scroll");
+.TP 15
+.B "int getCDKScrollCurrentItem ("
+.BI "CDKSCROLL *" "widget");
+.TP 15
+.B "chtype getCDKScrollHighlight ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "highlight");
+.TP 15
+.B "int getCDKScrollCurrentTop ("
+.BI "CDKSCROLL *" "widget");
+.TP 15
+.B "int getCDKScrollItems ("
+.BI "CDKSCROLL *" "scroll",
+.BI "char **" "list");
+.TP 15
+.B "int injectCDKScroll ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "input");
+.TP 15
+.B void insertCDKScrollItem (
+.BI "CDKSCROLL *" "scroll",
+.BI "const char *" "item");
+.TP 15
+.B "void moveCDKScroll ("
+.BI "CDKSCROLL *" "scroll",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKSCROLL *newCDKScroll ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "spos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "items",
+.BI "boolean " "numbers",
+.BI "chtype " "highlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKScroll ("
+.BI "CDKSCROLL *" "scroll");
+.TP 15
+.B "void setCDKScroll ("
+.BI "CDKSCROLL *" "scroll",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "items",
+.BI "boolean " "numbers",
+.BI "chtype " "highlight",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKScrollBackgroundAttrib ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKScrollBackgroundColor ("
+.BI "CDKSCROLL *" "scroll",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKScrollBox ("
+.BI "CDKSCROLL *" "scroll",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKScrollBoxAttribute ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollCurrent(
+.BI "CDKSCROLL *" "scroll",
+.BI "int" "item");
+.TP 15
+.B "void setCDKScrollCurrentItem ("
+.BI "CDKSCROLL *" "widget",
+.BI "int" "item");
+.TP 15
+.B "void setCDKScrollHighlight ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKScrollHorizontalChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollItems ("
+.BI "CDKSCROLL *" "scroll",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "listSize",
+.BI "boolean " "numbers");
+.TP 15
+.B "void setCDKScrollLLChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollLRChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollPosition ("
+.BI "CDKSCROLL *" "scroll",
+.BI "int" "item");
+.TP 15
+.B "void setCDKScrollPostProcess ("
+.BI "CDKSCROLL *" "scroll",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKScrollPreProcess ("
+.BI "CDKSCROLL *" "scroll",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKScrollULChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollURChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKScrollVerticalChar ("
+.BI "CDKSCROLL *" "scroll",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk scroll widget creates a scrolling list.
+The following are functions
+which create or manipulate the Cdk scrolling list widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKScroll
+activates the scroll widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBscroll\fR points to a non-NULL scroll widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return a
+value from 0 to the number of items-1, representing the item selected.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this widget was \fIESCAPE\fR,
+then the widget will return a value of -1
+and the widget data \fIexitType\fR will be set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B addCDKScrollItem
+allows the user to add an item into an existing scrolling list.
+.RS
+.bP
+The \fBscroll\fR parameter points to the scrolling list to add the
+item to.
+.bP
+The parameter \fBitem\fR is a \fIchar *\fR representing the new item
+to add.
+The item is always added to the end of the list.
+.RE
+.TP 5
+.B deleteCDKScrollItem
+allows the user to add an item into an existing scrolling list.
+.RS
+.bP
+The \fBscroll\fR parameter points to the scrolling list to add the
+item to.
+.bP
+The parameter \fBf2position\fR is an \fIint\fR which specifies which
+element to remove.
+.RE
+.TP 5
+.B destroyCDKScroll
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKScroll
+draws the scroll widget on the screen.
+If the \fBbox\fR option is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKScroll
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKScrollBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKScrollCurrent
+returns the current item's index.
+.IP
+This is deprecated because the name is inconsistent with other widgets:
+use \fBgetCDKScrollCurrentItem\fP.
+.TP 5
+.B getCDKScrollCurrentItem
+returns the current item's index in the scroller.
+.TP 5
+.B getCDKScrollHighlight
+returns the attribute of the highlight bar.
+.TP 5
+.B getCDKScrollCurrentTop
+returns the top line of the scroller, counting from zero.
+.TP 5
+.B getCDKScrollItems
+optionally copies the scrolling-list items into the caller's list,
+which must be large enough since this function does not allocate it.
+If the \fIlist\fP parameter is null, no copying is done.
+It returns the list size whether or not the \fIlist\fP parameter is null.
+.TP 5
+.B injectCDKScroll
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBscroll\fR points to a non-NULL scroll widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value ranging from zero to one less than the number of items,
+representing the item selected.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B insertCDKScrollItem
+allows the user to add an item into an existing scrolling list.
+.RS
+.bP
+The \fBscroll\fR parameter points to the scrolling list to add the item to.
+.bP
+The parameter \fBitem\fR is a \fIchar *\fR representing the new item to add.
+.RE
+.IP
+The item is always added before the current item in the list.
+.TP 5
+.B moveCDKScroll
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which states
+whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKScroll
+creates a scroll widget and returns a pointer to it.
+Parameters:
+.RS
+.bP
+The \fBscreen\fR parameter is the screen you wish this widget to be placed in.
+.bP
+The parameter \fBxpos\fR
+controls the placement of the object along the horizontal axis.
+This parameter
+may be an integer or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+\fBypos\fR
+controls the placement
+of the object along the vertical axis.
+This parameter may be an integer value
+or one of the pre-defined values \fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+\fBspos\fR
+is where the scroll bar is to be placed.
+This may be one of three values:
+.RS
+.TP 5
+\fILEFT\fR,
+which puts the scroll bar on the left
+of the scrolling list.
+.TP 5
+\fIRIGHT\fR
+which puts the scroll bar on the right side
+of the list, and
+.TP 5
+\fINONE\fR which does not add a scroll bar.
+.RE
+.bP
+\fBheight\fR and
+\fBwidth\fR
+control the height and width of the widget.
+.IP
+If you provide a value of zero
+for either of the height or the width, the widget will
+be created with the full width and height of the screen.
+If you provide a negative value,
+the widget will be created the full height or width minus the value provided.
+.bP
+\fBtitle\fR
+is the string which will be displayed
+at the top of the widget.
+The title can be more than one line; just provide a
+carriage return character at the line break.
+.bP
+\fBitemList\fR
+is the list of items to be displayed in the scrolling list.
+.bP
+\fBitems\fR
+is the number of elements in the given list.
+.bP
+\fBnumbers\fR
+is true if you want the items in the list to have a number
+attached to the front of the list items.
+.bP
+\fBhighlight\fR
+specifies
+the display attribute of the currently selected item.
+.bP
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.bP
+\fBshadow\fR
+is true to turn the shadow on around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKScroll
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKScroll
+lets the programmer modify certain elements of an existing
+scroll widget.
+.IP
+The parameter names correspond to the same parameter names listed
+in the \fBnewCDKScroll\fR function.
+.TP 5
+.B setCDKScrollBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKScrollBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKScrollBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKScrollBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKScrollCurrent
+sets the index for the current item.
+.TP 5
+.B setCDKScrollCurrentItem
+set the current item number in the scroller.
+.TP 5
+.B setCDKScrollCurrentTop
+set the top line number of the scroller.
+.TP 5
+.B setCDKScrollHighlight
+sets the attribute of the highlight bar.
+.TP 5
+.B setCDKScrollHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKScrollItems
+sets the contents of the scrolling list.
+The previous contents of the scrolling list stored in the widget are freed.
+.TP 5
+.B setCDKScrollLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKScrollLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKScrollPosition
+sets the current item in the widget to the given position.
+.TP 5
+.B setCDKScrollPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKScrollPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKScrollULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKScrollURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKScrollVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/Shift the list left one column.
+Right Arrow/Shift the list right one column.
+Up Arrow/Select the previous item in the list.
+Down Arrow/Select the next item in the list.
+_
+Prev Page
+Ctrl-B/Scroll one page backward.
+Next Page
+Ctrl-F/Scroll one page forward.
+_
+1
+<
+g
+Home/Move to the first element in the list.
+_
+>
+G
+End/Move to the last element in the list.
+_
+$/Shift the list to the far right.
+|/Shift the list to the far left.
+_
+Return/T{
+Exit the widget and return the index of the selected item.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exit the widget and return the index of the selected item.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exit the widget and return -1.
+Also set the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

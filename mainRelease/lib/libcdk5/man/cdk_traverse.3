@@ -1,0 +1,227 @@
+.\" $Id: cdk_traverse.3,v 1.11 2019/02/15 01:03:42 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_traverse 3
+.SH NAME
+.XX exitCancelCDKScreen
+.XX exitCancelCDKScreenOf
+.XX exitOKCDKScreen
+.XX exitOKCDKScreenOf
+.XX getCDKFocusCurrent
+.XX resetCDKScreen
+.XX resetCDKScreenOf
+.XX setCDKFocusCurrent
+.XX setCDKFocusFirst
+.XX setCDKFocusLast
+.XX setCDKFocusNext
+.XX setCDKFocusPrevious
+.XX traverseCDKOnce
+.XX traverseCDKScreen
+cdk_traverse - functions to support keyboard traversal
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+.nf
+#include <cdk.h>
+.LP
+.BI "CDKOBJS *getCDKFocusCurrent (CDKSCREEN *" "screen");
+.LP
+.BI "CDKOBJS *setCDKFocusCurrent (CDKSCREEN *" "screen\fB, CDKOBJS *\fPobj");
+.LP
+.BI "CDKOBJS *setCDKFocusFirst (CDKSCREEN *" "screen");
+.LP
+.BI "CDKOBJS *setCDKFocusLast (CDKSCREEN *" "screen");
+.LP
+.BI "CDKOBJS *setCDKFocusNext (CDKSCREEN *" "screen");
+.LP
+.BI "CDKOBJS *setCDKFocusPrevious (CDKSCREEN *" "screen");
+.LP
+.BI "int traverseCDKScreen (CDKSCREEN *" "screen");
+.LP
+.BI "void exitOKCDKScreen (CDKSCREEN *" "screen");
+.LP
+.BI "void exitCancelCDKScreen (CDKSCREEN *" "screen");
+.LP
+.BI "void resetCDKScreen (CDKSCREEN *" "screen");
+.LP
+.BI "void exitOKCDKScreenOf(CDKOBJS *" "obj");
+.LP
+.BI "void exitCancelCDKScreenOf (CDKOBJS *" "obj");
+.LP
+.BI "void resetCDKScreenOf (CDKOBJS *" "obj");
+.TP 15
+.B "void traverseCDKOnce ("
+.BI "CDKSCREEN *" "screen,"
+.BI "CDKOBJS *" "curobj,"
+.BI "int " "keyCode,"
+.BI "boolean " "functionKey,"
+.BI "CHECK_KEYCODE " "funcMenuKey);"
+.fi
+.
+.SH DESCRIPTION
+The functions above handle the traversal of a screen populated with various
+widgets.
+Once the screen has been created and populated with widgets, a
+single call to \fBtraverseCDKScreen()\fP will allow the user to move between
+widgets and enter data (or otherwise manipulate widgets).
+Other functions are provided for use as callbacks by the widgets on
+the screen.
+Finally, there are several functions which allow the caller to manipulate
+the state of the traversal, i.e., the object which has focus.
+.LP
+In order for widgets to be used on a screen which is to be handled by
+\fBtraverseCDKScreen()\fP, it must have the following methods available:
+.nf
+.ft C
+   injectCharObj
+   inputWindowObj
+   focusObj
+   unfocusObj
+   saveDataObj
+   refreshDataObj
+.ft R
+.fi
+.LP
+In addition, the following object properties must be properly handled:
+.nf
+.ft C
+   acceptsFocus
+   hasFocus
+   inputWindow
+   dataPtr
+   dataType  
+.ft R
+.fi
+.LP
+At the time of this writing, not all widgets have been modified to work with
+the screen-traversal facility.
+.SH AVAILABLE FUNCTIONS
+.B int traverseCDKScreen (CDKSCREEN *\fIscreen\fP);
+.RS 3
+This function contains the main screen traversal engine.
+It does the following:
+.TP 4 
+ 1.
+Calls the refreshData method on each of the widgets to tell them to
+update their appearance to match the data which are referenced by their
+respective data pointers.
+.TP 4
+ 2.
+Calls the focusObject method on the first widget.
+.TP 4
+ 3.
+Repeats the following until one of the exit functions listed above has been
+called:
+.RS 4
+.bP
+Read a keystroke from the keyboard.
+.bP
+If the keystroke is ESCAPE and a menu widget is present, activate the
+menu and traverse it until the user selects an entry or hits TAB.
+.bP
+If the keystroke is TAB/BACKTAB then call the unfocusObject method on the
+current widget, and move focus to the next/previous widget (not counting
+menu widgets).
+Call the focusObject method on the newly current widget.
+.bP
+If the keystroke is the EXIT-SAVE keystroke, then call the saveData method
+on each widget and return 1.
+.bP
+If the keystroke is the EXIT-CANCEL keystroke, return 0 without saving
+changes made by the user.
+.bP
+If the keystroke is the RESET-DATA keystroke, then call the refreshData
+method on each of the widgets to reset their appearance to match the data
+values that were present upon entry.
+.bP
+Otherwise, pass the keystroke to the current widget.
+.RE
+.RE
+.TP 5
+.B CDKOBJS *getCDKFocusCurrent (CDKSCREEN *\fIscreen\fP);
+Return a pointer to the object which currently has focus in the given screen.
+.TP 5
+.B CDKOBJS *setCDKFocusCurrent (CDKSCREEN *\fIscreen\fP, CDKOBJS *\fIobj\fP);
+Set the focus to the given object, if the screen contains that object.
+If the screen does not contain the object, return null.
+Otherwise, return the object.
+.TP 5
+.B CDKOBJS *setCDKFocusFirst (CDKSCREEN *\fIscreen\fP);
+Set focus on the first object in the given screen.
+.TP 5
+.B CDKOBJS *setCDKFocusLast (CDKSCREEN *\fIscreen\fP);
+Set focus on the last object in the given screen.
+.TP 5
+.B CDKOBJS *setCDKFocusNext (CDKSCREEN *\fIscreen\fP);
+Set focus on the next object in the given screen.
+.TP 5
+.B CDKOBJS *setCDKFocusPrevious (CDKSCREEN *\fIscreen\fP);
+Set focus on the previous object in the given screen.
+.TP 5
+.B exitOKCDKScreen
+.RS 3
+Causes the traversal engine to exit after calling the saveData
+method for each of the widgets.
+.RE
+.TP 5
+.B exitOKCDKScreenOf
+.RS 3
+Calls \fBexitOKCDKScreen()\fP on the screen associated with widget
+\fIobj\fP.
+This function was designed to be used as a callback routine
+for a button widget used as an OK button on a data-entry screen.
+.RE
+.TP 5
+.B exitCancelCDKScreen 
+.RS 3
+Causes the traversal engine to exit without saving 
+user modified data.
+.RE
+.TP 5
+.B exitCancelCDKScreenOf
+.RS 3
+Calls \fBexitCancelCDKScreen()\fP on the screen associated with widget
+\fIobj\fP.
+This function was designed to be used as a callback routine
+for a button widget used as a Cancel button on a data-entry screen.
+.RE
+.TP 5
+.B resetCDKScreen
+.RS 3 
+Causes the traversal engine to call the refreshData method for each widget.
+This will cause any unsaved changes to be discarded
+and the widget states will be restored to their initial values.
+.RE
+.TP 5
+.B resetCDKScreenOf
+.RS 3
+Calls \fBresetCDKScreen()\fP on the screen associated with widget \fIobj\fP.
+This function was designed to be used as a callback routine
+for a button widget used as a Reset button on a data-entry screen.
+.RE
+.TP 5
+.B traverseCDKOnce
+.RS 3
+This is a utility function, one of the pieces from which you can
+construct a customized version of \fBtraverseCDKScreen\fP.
+.RE
+.SH BUGS
+Not all widgets have had the extra methods added so that they work with 
+the screen traversal engine.
+.SH AUTHOR
+Grant Edwards, Aspen Research Corporation
+.br
+Thomas E. Dickey and contributors.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_screen (3)

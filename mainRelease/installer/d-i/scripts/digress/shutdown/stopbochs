@@ -1,0 +1,15 @@
+#!/bin/sh
+PIDFILE=$STATE_DIR/bochs-$MACHINE-$SCHEME.pid
+# Stop bochs.
+if [ ! -e $PIDFILE ]; then
+	echo "No pid file $PIDFILE" >&2
+	exit 1
+fi
+pid=$(cat $PIDFILE)
+if ! pidof bochs-bin | grep -q $pid; then
+	echo "stale pid" >&2
+else
+	kill -9 $pid
+	echo "Stopped bochs (pid $pid)"
+fi
+rm -f $STATE_DIR/bochs-$MACHINE-$SCHEME.*

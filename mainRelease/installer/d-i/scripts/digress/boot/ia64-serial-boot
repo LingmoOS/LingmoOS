@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+# Expect script to make an ia64 boot a given entry in the efi menu.
+# Needs a serial console.
+use Expect;
+my $exp = new Expect;
+#$exp->debug(2);
+#$exp->exp_internal(1);
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "failed to run CONSOLECOMMAND";
+
+$exp->send("(\r");
+# Make sure it's powered on..
+$exp->send("p 1\r");
+$exp->send("rs\r");
+$exp->send(")\r");
+
+# It can take some time to get to the efi boot menu..
+$exp->expect(360, "Please select a boot option") || die "did not boot to menu";
+
+# Wait for the whole menu to be displayed once.
+$exp->expect(10, "Use Enter to select an option") || die "did not see prompt";
+
+# Look to see if entry is selected. If not, go down the menu, and look
+# again. Currently requires that the entry be the first or second item on
+# the menu.
+my $down=0;
+$exp->expect(60,
+	["Debian GNU/Linux" => sub { if (! $down) { $down=1; print "other\n" ; $exp->send("v") } ; exp_continue } ],
+	[$ENV{EFI_MENUENTRY} => sub { 1 } ],
+) || die "did not drive menu";
+
+sleep 2;
+
+# Boot it. Not sure why I need multiple newlines, it sometimes seems to
+# not see the first.
+$exp->send("\r\r\r");
+
+$exp->expect(10, "Loading");
+
+exit

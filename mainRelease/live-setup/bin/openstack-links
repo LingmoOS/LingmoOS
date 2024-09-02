@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# Helper script to put an openstack build into place with extra
+# helpful symlinks. Use this once a build is complete, and the only
+# parameter it wants is the directory name of the build output, which
+# should already be renamed to something of the form
+#
+#   XX.YY.XX[-DATE]
+#
+# (c) 2017 Steve McIntyre <steve@einval.com> 2017
+#
+# GPL v2+
+
+DIR="$1"
+if [ "$DIR"x = ""x ]; then
+    echo "$0: Needs the output dir name"
+    exit 1
+fi
+
+BASE=$(dirname $DIR)
+DIR=$(basename $DIR)
+
+VERSION=$(echo $DIR | cut -d- -f1)
+DATE=$(echo $DIR | cut -d- -f2)
+if [ "$DATE"x = "$DIR"x ]; then
+    DATE=""
+else
+    DATE="-"${DATE}
+fi
+MAJ=$(echo $VERSION | cut -d. -f 1)
+MIN=$(echo $VERSION | cut -d. -f 2)
+BUILD=$(echo $VERSION | cut -d. -f 3)
+
+if [ "$VERSION"x = ""x ] || \
+   [ "$MAJ"x = ""x ] || \
+   [ "$MIN"x = ""x ] || \
+   [ "$BUILD"x = ""x ]; then
+    echo "Can't parse version number out of $DIR, aborting"
+    exit 1
+fi
+
+cd $BASE
+if [ $? -ne 0 ]; then
+    echo "Can't cd to $BASE, aborting"
+    exit 1
+fi
+
+if [ ! -d $DIR ]; then
+    echo "Can't find $DIR, aborting"
+    exit 1
+fi
+
+mkdir -v current-${MAJ}
+if [ $? -ne 0 ]; then
+    echo "Can't make current-${MAJ}, aborting"
+    exit 1
+fi
+
+cd current-${MAJ}
+for file in ../${DIR}/*; do
+    case $file in
+	*SUMS)
+	    # Modify it as we copy it over
+	    target=$(basename $file)
+	    sed "s/${MAJ}\.${MIN}\.${BUILD}${DATE}/${MAJ}/g" $file > $target
+	    echo current-${MAJ}/$target
+	    ;;     
+	*)
+	    # otherwise link it
+	    target=$(basename $file | sed "s/${MAJ}\.${MIN}\.${BUILD}${DATE}/${MAJ}/g")
+	    ln -s $file $target
+	    echo current-${MAJ}/$target
+	    ;;  
+    esac
+done

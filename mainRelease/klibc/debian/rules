@@ -1,0 +1,125 @@
+#!/usr/bin/make -f
+
+# let debhelper be verbose
+#export DH_VERBOSE=1
+
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildtools.mk
+
+empty :=
+space := $(empty) $(empty)
+
+# klibc architecture names mostly match Debian CPU names.  This is
+# overrridden as necessary.
+KLIBCARCH := $(patsubst %el,%,$(DEB_HOST_ARCH_CPU))
+
+ifneq (,$(filter amd64 x32,$(DEB_HOST_ARCH)))
+KLIBCARCH := x86_64
+endif
+ifeq ($(DEB_HOST_ARCH),armel)
+KLIBC_MAKEFLAGS := CONFIG_AEABI=y
+endif
+ifeq ($(DEB_HOST_ARCH),armhf)
+KLIBC_MAKEFLAGS := CONFIG_AEABI=y CPU_ARCH=armv7-a+fp CPU_TUNE=cortex-a8 CONFIG_KLIBC_THUMB=y
+endif
+ifeq ($(DEB_HOST_ARCH),hppa)
+KLIBCARCH := parisc
+endif
+ifeq ($(DEB_HOST_ARCH),loong64)
+KLIBCARCH := loongarch64
+endif
+ifneq (,$(filter powerpc%,$(DEB_HOST_ARCH)))
+KLIBCARCH := ppc
+endif
+ifeq ($(DEB_HOST_ARCH),sh4)
+KLIBCARCH := sh
+endif
+
+KLIBC_MAKEFLAGS := -C debian/build -f $(CURDIR)/Makefile KBUILD_SRC=$(CURDIR) INSTALLROOT=../tmp ARCH=$(KLIBCARCH) $(KLIBC_MAKEFLAGS)
+
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+    KLIBC_MAKEFLAGS += CROSS_COMPILE=$(DEB_HOST_GNU_TYPE)-
+endif
+KLIBC_MAKEFLAGS += CC='$(CC)' HOSTCC='$(CC_FOR_BUILD)' LD='$(LD)'
+
+# Avoid embedding build directory.  We should be able to use just
+# -ffile-prefix-map, but that has no effect on assembly sources!
+KLIBC_MAKEFLAGS += KCFLAGS='-fdebug-prefix-map=$(CURDIR)/= -fmacro-prefix-map=$(CURDIR)/='
+
+# Enable this to get verbose build information
+KLIBC_MAKEFLAGS += KBUILD_VERBOSE=1
+
+# Defer stripping of debug symbols to debhelper
+KLIBC_MAKEFLAGS += CONFIG_DEBUG_INFO=y
+
+# Install shared library in /usr/lib, not /lib
+KLIBC_MAKEFLAGS += SHLIBDIR=/usr/lib
+
+# klcc will depend on ccache if it is in $PATH at build time; see #777217
+PATH := $(subst $(space),:,$(filter-out %/ccache %/ccache/,$(subst :,$(space),$(PATH))))
+
+%:
+	dh $@ --link-doc=libklibc
+
+override_dh_auto_build:
+	rm -rf debian/build/linux
+	mkdir -p debian/build/linux/include
+	for x in /usr/include/linux /usr/include/asm-generic \
+		/usr/include/$(DEB_HOST_MULTIARCH)/asm; do \
+		ln -s $${x} debian/build/linux/include || exit; \
+	done
+	$(MAKE) all $(KLIBC_MAKEFLAGS)
+	! grep ccache debian/build/klcc/klcc
+
+override_dh_auto_clean:
+	rm -rf debian/build
+
+override_dh_auto_install:
+	$(MAKE) install $(KLIBC_MAKEFLAGS)
+# Replace kernel UAPI header copies with links
+	for x in /usr/include/linux /usr/include/asm-generic \
+		/usr/include/$(DEB_HOST_MULTIARCH)/asm; do \
+		rm -rf debian/tmp/usr/lib/klibc/include/$$(basename $${x}) \
+		&& ln -s $${x} debian/tmp/usr/lib/klibc/include/ \
+		|| exit; \
+	done
+
+define run_test_program
+cd debian/build && usr/klibc/tests/$(1) > test-$(1).log
+! grep -qw ERROR debian/build/test-$(1).log
+$(if $(2),grep -qF -- $(2) debian/build/test-$(1).log)
+$(if $(3),grep -qF -- $(3) debian/build/test-$(1).log)
+endef
+
+comma=,
+
+override_dh_auto_test:
+ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
+	$(MAKE) test $(KLIBC_MAKEFLAGS)
+	$(call run_test_program,microhello)
+	$(call run_test_program,minihello)
+	$(call run_test_program,hello)
+	$(call run_test_program,environ,'Verifying envp == environ... ok')
+	$(call run_test_program,fcntl)
+	$(call run_test_program,malloctest)
+	$(call run_test_program,malloctest2)
+	$(call run_test_program,opentest,"Line 1 = $$(head -1 /etc/passwd)")
+	$(call run_test_program,pipetest)
+	$(call run_test_program,select)
+	$(call run_test_program,setjmptest,"calling longjmp with 256... setjmp returned 256")
+	$(call run_test_program,sigint,"Signal received OK")
+	$(call run_test_program,socket)
+	$(call run_test_program,sscanf)
+	$(call run_test_program,stdio,"Hello$(comma) World!","Hello again - and some more - and some more")
+	$(call run_test_program,strlcpycat)
+	$(call run_test_program,vfork)
+	debian/build/usr/dash/static/sh -c "exit"
+	debian/build/usr/dash/static/sh -c "debian/build/usr/utils/static/true; exit"
+endif
+
+override_dh_fixperms:
+	dh_fixperms -X.so
+
+override_dh_strip:
+	dh_strip -pklibc-utils -plibklibc
+	dh_strip -plibklibc-dev -X.so

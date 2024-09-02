@@ -1,0 +1,649 @@
+# $Id: Makefile.in,v 1.136 2022/10/18 21:32:59 tom Exp $
+#
+# Copyright 2001-2021,2022 Thomas E. Dickey
+# Copyright 1999, Mike Glover
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, distribute with
+# modifications, sublicense, and/or sell copies of the Software, and to permit
+# persons to whom the Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+# ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+# IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# Except as contained in this notice, the name(s) of the above copyright
+# holders shall not be used in advertising or otherwise to promote the sale,
+# use or other dealings in this Software without prior written authorization.
+#
+SHELL		= /bin/sh
+@SET_MAKE@
+MAKE_RECUR	= @cf_cv_makeflags@ prefix=$(prefix)
+
+PACKAGE		= @PACKAGE@
+
+CFG_ROOTNAME	= @CFG_ROOTNAME@
+HDR_ROOTNAME	= @HDR_ROOTNAME@
+LIB_ROOTNAME	= @LIB_ROOTNAME@
+LIB_PREFIX	= @LIB_PREFIX@
+LIB_SUFFIX	= @DFT_LIB_SUFFIX@
+
+VERSION_MAJOR	= @VERSION_MAJOR@
+VERSION_MINOR	= @VERSION_MINOR@
+VERSION		= $(VERSION_MAJOR).$(VERSION_MINOR)
+REL_VERSION	= @REL_VERSION@
+ABI_VERSION	= @ABI_VERSION@
+
+RESULTING_SYMS	= @RESULTING_SYMS@
+VERSIONED_SYMS	= @VERSIONED_SYMS@
+
+@SET_SHLIB_VARS@
+CDKLIB		= @LIB_TARGET@
+IMPORT_LIB	= lib$(LIB_ROOTNAME).dll.a
+@MAKE_NORMAL@OLD_SHLIB_LINK	= @LIB_PREFIX@$(LIB_ROOTNAME).so
+@MAKE_NORMAL@OLD_SONAME	= $(OLD_SHLIB_LINK).$(VERSION_MAJOR)
+@MAKE_NORMAL@OLD_SHLIB_FILE	= $(OLD_SONAME).$(VERSION_MINOR)
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+top_srcdir	= @top_srcdir@
+srcdir		= @srcdir@
+VPATH		= $(srcdir)
+
+x		= @EXEEXT@
+o		= .@OBJEXT@
+a		= $(LIB_SUFFIX)
+
+DESTDIR		=
+bindir		= @bindir@
+includedir	= @includedir@
+libdir		= @libdir@
+shlibdir	= @shlibdir@
+datarootdir	= @datarootdir@
+datadir		= @datadir@
+mandir		= @mandir@
+
+DOCUMENT_DIR	= $(DESTDIR)$(datadir)/doc/$(HDR_ROOTNAME)
+BIN_DIR		= $(DESTDIR)$(bindir)
+INCLUDE_DIR	= $(DESTDIR)$(includedir)
+INCLUDE_SUBDIR	= $(DESTDIR)$(includedir)/$(HDR_ROOTNAME)
+SHLIB_DIR	= $(DESTDIR)$(shlibdir)
+LIB_DIR		= $(DESTDIR)$(libdir)
+MAN1_DIR	= $(DESTDIR)$(mandir)/man1
+MAN1SECT	= 1
+MAN3_DIR	= $(DESTDIR)$(mandir)/man@MAN_TAG@
+MANSECT		= @MANSECT@
+
+CC		= @CC@
+CPP		= @CPP@
+AR		= @AR@
+RANLIB		= @LIB_PREP@
+RM		= rm -f
+LN_S		= @LN_S@
+CTAGS		= @CTAGS@
+ETAGS		= @ETAGS@
+LINT		= @LINT@
+LINT_OPTS	= @LINT_OPTS@
+
+LIBS		= @LIBS@
+
+CFLAGS		= @CFLAGS@ @EXTRA_CFLAGS@
+CPPFLAGS	= @DEFS@ -I./include -I$(srcdir)/include @CPPFLAGS@
+
+LDFLAGS		= @LDFLAGS@
+RPATH_LIST	= @RPATH_LIST@
+
+LIBTOOL		= @LIBTOOL@ @ECHO_LT@
+LIBTOOL_OPTS	= @LIBTOOL_OPTS@
+LIBTOOL_CLEAN	= @LIB_CLEAN@
+LIBTOOL_COMPILE	= @LIB_COMPILE@
+LIBTOOL_CREATE	= @LIB_CREATE@ $(EXTRA_LDFLAGS)
+LIBTOOL_LINK	= @LIB_LINK@
+LIBTOOL_INSTALL	= @LIB_INSTALL@
+LIBTOOL_UNINSTALL = @LIB_UNINSTALL@
+LIBTOOL_VERSION = @LIBTOOL_VERSION@
+
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= $(LIBTOOL_INSTALL) @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_LIB	= $(LIBTOOL_INSTALL) $(INSTALL_DATA)
+UNINSTALL_LIB	= $(LIBTOOL_UNINSTALL) $(RM)
+
+.SUFFIXES: .c .o .lo .os .i
+
+@MAKE_PHONY@.PHONY: all cdklib check clean cli default demos distclean examples lint manpages realclean sources
+@MAKE_PHONY@.PHONY: installCDKHeaderFiles installCDKLibrary installCDKManPages installCDKReadme
+@MAKE_PHONY@.PHONY: uninstallCDKHeaderFiles uninstallCDKLibrary uninstallCDKManPages uninstallCDKReadme
+
+default :: $(CDKLIB)
+
+#
+# Create the file lists.
+#
+AUTO_HDR	= \
+		include/dscale.h \
+		include/fscale.h \
+		include/fslider.h \
+		include/scale.h \
+		include/slider.h \
+		include/uscale.h \
+		include/uslider.h
+
+AUTO_SRC	= \
+		dscale.c \
+		fscale.c \
+		fslider.c \
+		scale.c \
+		slider.c \
+		uscale.c \
+		uslider.c
+
+AUTO_MAN	= \
+		man/cdk_dscale.3 \
+		man/cdk_fscale.3 \
+		man/cdk_fslider.3 \
+		man/cdk_scale.3 \
+		man/cdk_slider.3 \
+		man/cdk_uscale.3 \
+		man/cdk_uslider.3
+
+MY_HDR		= \
+		include/cdk_config.h \
+		$(AUTO_HDR)
+
+CDKHDR		= \
+		alphalist.h \
+		binding.h \
+		button.h \
+		buttonbox.h \
+		calendar.h \
+		cdk.h \
+		cdk_compat.h \
+		cdk_objs.h \
+		cdk_params.h \
+		cdk_test.h \
+		cdk_util.h \
+		cdk_version.h \
+		cdkscreen.h \
+		curdefs.h \
+		dialog.h \
+		draw.h \
+		entry.h \
+		fselect.h \
+		graph.h \
+		histogram.h \
+		itemlist.h \
+		label.h \
+		marquee.h \
+		matrix.h \
+		mentry.h \
+		menu.h \
+		radio.h \
+		scroll.h \
+		scroller.h \
+		selection.h \
+		swindow.h \
+		template.h \
+		traverse.h \
+		viewer.h
+
+CDKSRC		= \
+		$(AUTO_SRC) \
+		alphalist.c \
+		binding.c \
+		button.c \
+		buttonbox.c \
+		calendar.c \
+		cdk.c \
+		cdk_compat.c \
+		cdk_display.c \
+		cdk_objs.c \
+		cdk_params.c \
+		cdkscreen.c \
+		debug.c \
+		dialog.c \
+		draw.c \
+		entry.c \
+		fselect.c \
+		get_index.c \
+		get_string.c \
+		graph.c \
+		histogram.c \
+		itemlist.c \
+		label.c \
+		marquee.c \
+		matrix.c \
+		mentry.c \
+		menu.c \
+		popup_dialog.c \
+		popup_label.c \
+		position.c \
+		radio.c \
+		scroll.c \
+		scroller.c \
+		selection.c \
+		swindow.c \
+		select_file.c \
+		template.c \
+		traverse.c \
+		version.c \
+		view_file.c \
+		view_info.c \
+		viewer.c
+
+CDKMAN1		= \
+		cdk5-config.1
+CDKMAN3		= \
+		cdk.3 \
+		cdk_alphalist.3 \
+		cdk_binding.3 \
+		cdk_button.3 \
+		cdk_buttonbox.3 \
+		cdk_calendar.3 \
+		cdk_compat.3 \
+		cdk_dialog.3 \
+		cdk_display.3 \
+		cdk_draw.3 \
+		cdk_entry.3 \
+		cdk_fscale.3 \
+		cdk_fselect.3 \
+		cdk_graph.3 \
+		cdk_histogram.3 \
+		cdk_itemlist.3 \
+		cdk_label.3 \
+		cdk_marquee.3 \
+		cdk_matrix.3 \
+		cdk_mentry.3 \
+		cdk_menu.3 \
+		cdk_misc.3 \
+		cdk_objs.3 \
+		cdk_params.3 \
+		cdk_position.3 \
+		cdk_process.3 \
+		cdk_radio.3 \
+		cdk_scale.3 \
+		cdk_screen.3 \
+		cdk_scroll.3 \
+		cdk_selection.3 \
+		cdk_swindow.3 \
+		cdk_template.3 \
+		cdk_traverse.3 \
+		cdk_util.3 \
+		cdk_viewer.3
+
+CDKREADME	= COPYING README
+
+OBJECTS		= $(CDKSRC:.c=.o)
+CDKSHOBJS	= $(CDKSRC:.c=.os)
+LIB_OBJECT	= @LIB_OBJECT@
+
+all sources :: $(AUTO_SRC)
+
+# make sure we generate all headers before trying
+# to build first source file.
+$(OBJECTS) :	$(MY_HDR)
+
+#
+# Standard library directive.
+#
+all cdklib :: $(CDKLIB)
+
+@MAKE_NORMAL@cdkshlib $(OLD_SHLIB_FILE) :: $(CDKSHOBJS)
+@MAKE_NORMAL@	gcc -shared -Wl,-soname=$(OLD_SONAME) $(LDFLAGS) $(LIBS) -o $(OLD_SHLIB_FILE) $(CDKSHOBJS)
+
+#
+# Make the examples directory.
+#
+all examples ::
+	cd examples && $(MAKE) $(MAKE_RECUR)
+
+#
+# Make the demos directory.
+#
+all demos ::
+	cd demos && $(MAKE) $(MAKE_RECUR)
+
+#
+# Make the cli directory.
+#
+all cli ::
+	cd cli && $(MAKE) $(MAKE_RECUR)
+
+#
+# Make the generated manpages.
+#
+all manpages :: $(AUTO_MAN)
+
+# Order of install-targets should match the order of uninstalls.  Put the
+# documentation first, then the headers, and finally the library:
+#	(un)installCDKReadme
+#	(un)installCDKManPages
+#	(un)installCDKHeaderFiles
+#	(un)installCDKLibrary
+
+#
+# This installs the informational readme files.
+#
+install \
+installCDKReadme :: $(DOCUMENT_DIR)
+	@echo "Installing CDK Readme files in $(DOCUMENT_DIR)..."
+	@for i in $(CDKREADME); do \
+	   echo "	... $$i"; \
+	   $(INSTALL_DATA) $(srcdir)/$$i $(DOCUMENT_DIR)/$$i; \
+	done
+
+uninstall \
+uninstallCDKReadme ::
+	@echo "Uninstalling CDK Readme files from $(DOCUMENT_DIR)..."
+	@- for i in $(CDKREADME); do \
+	   $(RM) $(DOCUMENT_DIR)/$$i; \
+	done
+
+#
+# This installs the CDK man pages.
+#
+install \
+installCDKManPages ::  headers.sed $(MAN1_DIR) manpage.sed $(AUTO_MAN)
+	@echo "Installing the CDK man pages in $(MAN1_DIR) ..."
+	@for i in $(CDKMAN1); do \
+	   $(SHELL) ./headers \
+			-x "$(INSTALL_DATA)" \
+			-d $(MAN1_DIR) \
+			-s . \
+			-t $(MAN1SECT) \
+			-e manpage.sed $(srcdir)/man/$$i; \
+	   $(SHELL) $(srcdir)/manlinks.sh installing $(srcdir) $(MAN1_DIR) $(MAN1SECT) $(srcdir)/man/$$i;  \
+	done
+
+install \
+installCDKManPages ::  headers.sed $(MAN3_DIR) manpage.sed $(AUTO_MAN)
+	@echo "Installing the CDK man pages in $(MAN3_DIR) ..."
+	@for i in $(AUTO_MAN); do \
+	   $(SHELL) ./headers \
+			-x "$(INSTALL_DATA)" \
+			-d $(MAN3_DIR) \
+			-s . \
+			-t $(MANSECT) \
+			-e manpage.sed $$i; \
+	   $(SHELL) $(srcdir)/manlinks.sh installing $(srcdir) $(MAN3_DIR) $(MANSECT) $$i;  \
+	done
+	@for i in $(CDKMAN3); do \
+	   $(SHELL) ./headers \
+			-x "$(INSTALL_DATA)" \
+			-d $(MAN3_DIR) \
+			-s . \
+			-t $(MANSECT) \
+			-e manpage.sed $(srcdir)/man/$$i; \
+	   $(SHELL) $(srcdir)/manlinks.sh installing $(srcdir) $(MAN3_DIR) $(MANSECT) $(srcdir)/man/$$i;  \
+	done
+
+uninstall \
+uninstallCDKManPages ::
+	@echo "Uninstalling the CDK man pages from $(MAN3_DIR) ..."
+	@- for i in $(AUTO_MAN); do \
+	   $(SHELL) $(srcdir)/manlinks.sh removing $(srcdir) $(MAN3_DIR) $(MANSECT) $(srcdir)/$$i; \
+	done
+	@- for i in $(CDKMAN3); do \
+	   $(SHELL) $(srcdir)/manlinks.sh removing $(srcdir) $(MAN3_DIR) $(MANSECT) $(srcdir)/man/$$i; \
+	done
+	@- for i in $(CDKMAN1); do \
+	   $(SHELL) $(srcdir)/manlinks.sh removing $(srcdir) $(MAN1_DIR) $(MAN1SECT) $(srcdir)/man/$$i; \
+	done
+
+#
+# This installs the header files.
+#
+HDR_SUBDIR = @HDR_SUBDIR@ -h cdk.h
+HEADERS_SH = $(SHELL) ./headers $(HDR_SUBDIR) -x "$(INSTALL_DATA)" -d $(INCLUDE_SUBDIR) -s $(srcdir)
+install \
+installCDKHeaderFiles :: \
+		$(INCLUDE_DIR) \
+		$(INCLUDE_SUBDIR) \
+		headers.sed \
+		$(MY_HDR)
+	@echo "Installing CDK header files in $(INCLUDE_SUBDIR)..."
+	$(HEADERS_SH) $(MY_HDR)
+	@for i in $(CDKHDR); do \
+	   $(HEADERS_SH) include/$$i; \
+	done
+@HDR_SUBDIR@	$(RM) $(INCLUDE_DIR)/cdk.h && mv $(INCLUDE_SUBDIR)/cdk.h $(INCLUDE_DIR)/$(HDR_ROOTNAME).h
+
+uninstall \
+uninstallCDKHeaderFiles ::
+	@echo "Uninstalling CDK header files from $(INCLUDE_SUBDIR)..."
+	@- for i in $(MY_HDR); do \
+	   $(RM) $(INCLUDE_SUBDIR)/`basename $$i`; \
+	done
+	@- for i in $(CDKHDR); do \
+	   $(RM) $(INCLUDE_SUBDIR)/$$i; \
+	done
+@HDR_SUBDIR@	$(RM) $(INCLUDE_DIR)/cdk.h
+
+#
+# This installs the CDK library.
+#
+install \
+install.libs :: $(SHLIB_DIR) $(CDKLIB)
+@MAKE_STATIC@	@echo "Installing CDK library"
+@MAKE_STATIC@		@$(INSTALL_LIB) $(CDKLIB) $(SHLIB_DIR)/$(CDKLIB)
+
+installCDKLibrary : install.libs
+
+uninstall \
+uninstall.libs ::
+@MAKE_STATIC@		@echo "Uninstalling CDK library"
+@MAKE_STATIC@		@- $(UNINSTALL_LIB) $(SHLIB_DIR)/$(CDKLIB)
+
+uninstallCDKLibrary : uninstall.libs
+
+@MAKE_DLLS@install \
+@MAKE_DLLS@installImportLibrary :: $(LIB_DIR) $(IMPORT_LIB)
+@MAKE_DLLS@	@echo "Installing Import library"
+@MAKE_DLLS@	@$(INSTALL_LIB) $(IMPORT_LIB) $(LIB_DIR)/$(IMPORT_LIB)
+
+@MAKE_DLLS@uninstall \
+@MAKE_DLLS@uninstallImportLibrary ::
+@MAKE_DLLS@	@echo "Uninstalling Import library"
+@MAKE_DLLS@	@- $(UNINSTALL_LIB) $(LIB_DIR)/$(IMPORT_LIB)
+
+#
+# This installs the CDK package-config script.
+#
+install \
+installCDKHeaderFiles \
+install.libs :: $(BIN_DIR) cdk-config
+	@echo "Installing script $(CFG_ROOTNAME)$(VERSION_MAJOR)-config"
+	@$(INSTALL) cdk-config $(BIN_DIR)/$(CFG_ROOTNAME)$(VERSION_MAJOR)-config
+
+uninstall \
+uninstall.libs \
+uninstallCDKHeaderFiles :: cdk-config
+	@echo "Uninstalling script $(CFG_ROOTNAME)$(VERSION_MAJOR)-config"
+	@$(RM) $(BIN_DIR)/$(CFG_ROOTNAME)$(VERSION_MAJOR)-config
+
+#
+# This installs the CDK shared library.  The rules are for an RPM spec, and
+# not of general interest.
+#
+@MAKE_NORMAL@installCDKSHLibrary :: $(SHLIB_DIR) $(OLD_SHLIB_FILE)
+@MAKE_NORMAL@	@echo "Installing CDK library"
+@MAKE_NORMAL@	@ECHO_CC@$(INSTALL_DATA) $(OLD_SHLIB_FILE) $(SHLIB_DIR)
+@MAKE_NORMAL@	@ECHO_CC@$(SHELL) -c "cd $(SHLIB_DIR) && $(LN_S) $(OLD_SHLIB_FILE) $(OLD_SONAME)"
+@MAKE_NORMAL@	@ECHO_CC@$(SHELL) -c "cd $(SHLIB_DIR) && $(LN_S) $(OLD_SHLIB_FILE) $(OLD_SHLIB_LINK)"
+@MAKE_NORMAL@
+@MAKE_NORMAL@uninstall \
+@MAKE_NORMAL@uninstallCDKSHLibrary ::
+@MAKE_NORMAL@	@ECHO_CC@- $(RM) $(SHLIB_DIR)/$(LIB_BASENAME)
+@MAKE_NORMAL@	@ECHO_CC@- $(RM) $(SHLIB_DIR)/$(OLD_SONAME)
+@MAKE_NORMAL@	@ECHO_CC@- $(RM) $(SHLIB_DIR)/$(OLD_SHLIB_FILE)
+
+headers.sed : ./headers
+	$(SHELL) ./headers -p CDK $(HDR_SUBDIR) -c include/cdk_config.h -d $(INCLUDE_SUBDIR) -s $(srcdir)/include -i -s include -i
+
+manpage.sed :
+	@echo "creating $@"
+	@echo "s/(3)/($(MANSECT))/g" >$@
+	@echo "/^\.TH/s/\<3\>/$(MANSECT)/" >>$@
+
+@MAKE_LOWER_TAGS@tags :
+@MAKE_LOWER_TAGS@	$(CTAGS) *.[ch] */*.[ch]
+
+@MAKE_LOWER_TAGS@TAGS :
+@MAKE_LOWER_TAGS@	$(ETAGS) *.[ch] */*.[ch]
+
+lint: $(AUTO_HDR) $(AUTO_SRC) $(CDKSRC)
+	$(LINT) $(LINT_OPTS) $(CPPFLAGS) $(AUTO_SRC) $(CDKSRC)
+
+all-lint: lint
+	cd examples 	&& $(MAKE) $(MAKE_RECUR) lint
+	cd demos    	&& $(MAKE) $(MAKE_RECUR) lint
+	cd cli      	&& $(MAKE) $(MAKE_RECUR) lint
+
+check:
+	@echo "This interactive program has no automated tests"
+#
+# Clean up after ourselves...
+#
+clean ::
+	@- $(RM) -r autom4te.cache
+	- $(LIBTOOL_CLEAN) $(RM) $(LIB_OBJECT) $(CDKLIB) $(RM_SHARED_OPTS)
+@MAKE_NORMAL@	- $(RM) *.os $(OLD_SHLIB_FILE)
+	- $(RM) headers.sed manpage.sed core tags *.i *~
+	$(RM) $(AUTO_HDR)
+	$(RM) $(AUTO_SRC)
+	$(RM) $(AUTO_MAN)
+
+realclean :: clean
+	cd examples	&& $(MAKE) $(MAKE_RECUR) clean
+	cd demos	&& $(MAKE) $(MAKE_RECUR) clean
+	cd cli		&& $(MAKE) $(MAKE_RECUR) clean
+
+#
+# Use this to clean the distribution.
+#
+distclean :: realclean
+	$(RM) config.cache config.log config.status
+	cd examples	&& $(RM) Makefile
+	cd demos	&& $(RM) Makefile
+	cd cli		&& $(RM) Makefile
+	$(RM) include/cdk_config.h
+	$(RM) include/cdk_version.h
+	$(RM) Makefile
+	$(RM) cdk-config
+	$(RM) headers
+	$(RM) mk_shared_lib.sh
+	@- $(SHELL) -c 'if test "$(srcdir)" != . ; then \
+			rmdir examples; \
+			rmdir demos; \
+			rmdir cli; \
+			rmdir include; \
+		fi'
+
+#
+# Standard .c to .o compile line.
+#
+.c.o:
+	@RULE_CC@
+	@ECHO_CC@$(LIBTOOL_COMPILE) $(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+
+.c.lo:
+	@RULE_CC@
+	@ECHO_CC@$(LIBTOOL_COMPILE) $(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+
+.c.i:
+	@RULE_CC@
+	@ECHO_CC@$(CPP) $(CPPFLAGS) -E -C $< >$@
+
+.c.os:
+	@RULE_CC@
+	@ECHO_CC@$(CC) $(CFLAGS) $(CPPFLAGS) -c -fPIC $< -o $@
+
+man \
+$(BIN_DIR) \
+$(DOCUMENT_DIR) \
+$(INCLUDE_DIR) \
+$(INCLUDE_SUBDIR) \
+$(LIB_DIR) \
+$(MAN1_DIR) \
+$(MAN3_DIR) : ; mkdir -p $@
+
+#
+# Files generated from templates:
+#
+GEN_SCALE	= $(SHELL) $(srcdir)/gen-scale.sh
+
+SCALE_H		= $(srcdir)/include/gen-scale.h
+SCALE_C		= $(srcdir)/gen-scale.c
+SCALE_M		= $(srcdir)/man/gen-scale.3
+
+MKDIR_MAN	= test -d man || mkdir man
+
+include/dscale.h :	$(SCALE_H)
+	$(GEN_SCALE) DSCALE DScale Double double $(SCALE_H) >$@
+dscale.c :		$(SCALE_C) $(AUTO_HDR)
+	$(GEN_SCALE) DSCALE DScale Double double $(SCALE_C) >$@
+man/cdk_dscale.3 :	$(SCALE_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) DSCALE DScale Double double $(SCALE_M) >$@
+
+include/fscale.h :	$(SCALE_H)
+	$(GEN_SCALE) FSCALE FScale Float float $(SCALE_H) >$@
+fscale.c :		$(SCALE_C) $(AUTO_HDR)
+	$(GEN_SCALE) FSCALE FScale Float float $(SCALE_C) >$@
+man/cdk_fscale.3 :	$(SCALE_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) FSCALE FScale Float float $(SCALE_M) >$@
+
+include/scale.h :	$(SCALE_H)
+	$(GEN_SCALE) SCALE Scale Int int $(SCALE_H) >$@
+scale.c :		$(SCALE_C) $(AUTO_HDR)
+	$(GEN_SCALE) SCALE Scale Int int $(SCALE_C) >$@
+man/cdk_scale.3 :	$(SCALE_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) SCALE Scale Int int $(SCALE_M) >$@
+
+include/uscale.h :	$(SCALE_H)
+	$(GEN_SCALE) USCALE UScale Unsigned unsigned $(SCALE_H) >$@
+uscale.c :		$(SCALE_C) $(AUTO_HDR)
+	$(GEN_SCALE) USCALE UScale Unsigned unsigned $(SCALE_C) >$@
+man/cdk_uscale.3 :	$(SCALE_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) USCALE UScale Unsigned unsigned $(SCALE_M) >$@
+
+SLIDER_H	= $(srcdir)/include/gen-slider.h
+SLIDER_C	= $(srcdir)/gen-slider.c
+SLIDER_M	= $(srcdir)/man/gen-slider.3
+
+include/fslider.h :	$(SLIDER_H)
+	$(GEN_SCALE) FSLIDER FSlider Float float $(SLIDER_H) >$@
+fslider.c :		$(SLIDER_C) $(AUTO_HDR)
+	$(GEN_SCALE) FSLIDER FSlider Float float $(SLIDER_C) >$@
+man/cdk_fslider.3 :	$(SLIDER_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) FSLIDER FSlider Float float $(SLIDER_M) >$@
+
+include/slider.h :	$(SLIDER_H)
+	$(GEN_SCALE) SLIDER Slider Int int $(SLIDER_H) >$@
+slider.c :		$(SLIDER_C) $(AUTO_HDR)
+	$(GEN_SCALE) SLIDER Slider Int int $(SLIDER_C) >$@
+man/cdk_slider.3 :	$(SLIDER_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) SLIDER Slider Int int $(SLIDER_M) >$@
+
+include/uslider.h :	$(SLIDER_H)
+	$(GEN_SCALE) USLIDER USlider Unsigned unsigned $(SLIDER_H) >$@
+uslider.c :		$(SLIDER_C) $(AUTO_HDR)
+	$(GEN_SCALE) USLIDER USlider Unsigned unsigned $(SLIDER_C) >$@
+man/cdk_uslider.3 :	$(SLIDER_M) man
+	-$(MKDIR_MAN)
+	$(GEN_SCALE) USLIDER USlider Unsigned unsigned $(SLIDER_M) >$@

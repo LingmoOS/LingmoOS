@@ -1,0 +1,58 @@
+#!/bin/bash
+
+F=`cat /dev/stdin | sort -r`
+TEMP=$RANDOM
+
+X=0
+C=0
+IFS="
+"
+for I in $F; do
+        N=`echo "$I" | sed "s/%.*//g"`
+        if [ "$N" = "$O" ]; then
+                STR[$X]="${STR[$X]}\n$I"
+        else
+                O=$N
+                C=$(($C + 1))
+                [ $X -gt 0 ] && echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
+                X=$(($X + 1))
+                STR[$X]="${STR[$X]}$I"
+        fi
+done
+echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
+
+C=0
+T=0
+O=""
+SAME=0
+echo "<TABLE>"
+echo "<TR><TH>Rank</TH><TH>Percentage</TH><TH>Language</TH><TH>Count</TH></TR>"
+for I in `cat /tmp/$TEMP`; do
+        N=`echo "$I" | sed "s/%.*//"`
+        lang=`echo "$I" | sed "s/^.*%[[:space:]]*//"`
+	NAME=$(grep "^$lang[[:space:]]" "$LANG_NAMES" | cut -f 7)
+	LINK="<a href="po_stats/$lang.txt" target="_blank">$NAME</a>"
+        if [ "$N" = "$O" ]; then
+		if [ $SAME -ge 1 ]; then
+			echo "<TD>&nbsp;</TD></TR>"
+		fi
+                echo -n "<TR><TD>&nbsp;</TD><TD>$N%</TD><TD>$LINK</TD>"
+		SAME=$(($SAME + 1))
+        else
+                C=$(($C + 1))
+		if [ "$SAME" -ge 1 ]; then
+			echo "<TD style=\"text-align: right;\">$SAME</TD></TR>"
+		elif [ "$O" ]; then
+			echo "<TD>&nbsp;</TD></TR>"
+		fi
+                echo -n "<TR><TD class=\"col1r\">$C</TD><TD>$N%</TD><TD>$LINK</TD>"
+                O=$N
+		SAME=1
+        fi
+        T=$(($T + 1))
+done
+echo "<TD style=\"text-align: right;\">$SAME</TD></TR>"
+
+echo "<TR><TD style=\"font-weight: bold; text-align: left;\" colspan=\"3\">Total</TD><TD style=\"text-align: right;\">$T</TD></TR>"
+echo "</TABLE>"
+rm /tmp/$TEMP

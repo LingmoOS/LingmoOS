@@ -1,0 +1,380 @@
+#!/usr/bin/perl
+# © 2013-2015 Cyril Brulebois <kibi@debian.org>
+#
+# NOTE: The first version of this script used edos (in wheezy) before
+# it got replaced with dose (in jessie). Supporting both doesn't seem
+# too interesting since the whole point is running that on the current
+# d-i.debian.org host. If the edos-based version is needed at some
+# point, it's sufficient to roll back to svn revision 70000.
+
+use strict;
+use warnings;
+
+use Email::MIME;
+use Email::Sender::Simple qw(sendmail);
+use File::Path qw(make_path);
+use File::Slurp;
+use Getopt::Long;
+use List::MoreUtils qw(uniq);
+use Storable;
+
+# Option handling:
+my $sync = 1;
+my $store = 1;
+my $mail;
+my $index_output = 'index.html';
+my $diff_output = 'diff.txt';
+my $workdir = 'dose.tmp';
+my $mirror = "/srv/ftp.debian.org/ftp";
+GetOptions(
+  "sync!"   => \$sync,
+  "store!"  => \$store,
+  "mail=s"  => \$mail,
+  "index=s" => \$index_output,
+  "diff=s"  => \$diff_output,
+  "workdir=s" => \$workdir,
+  "mirror=s" => \$mirror,
+) or die "Usage: $0 --[no]sync --[no]store --mail=notification\@somewhere --index=$index_output --diff=$diff_output --workdir=$workdir --mirror=$mirror";
+
+# Configuration goes here: package/bug number hash
+my %known = qw(
+);
+
+my @suites = qw(oldstable stable testing unstable);
+
+# Work starts here:
+my @allarchs;
+my %availables;
+my %new;
+for my $suite (@suites) {
+  my $suitedir = "$workdir/$suite";
+  my %failed;
+  make_path($suitedir, { error => my $err });
+  if ($err && @$err) {
+    die "Unable to create workdir: $suitedir: @$err";
+  }
+  for my $arch_dir (glob "$mirror/dists/$suite/main/debian-installer/binary-*") {
+    (my $arch = $arch_dir) =~ s{.*/binary-}{};
+    (my $deb_arch_dir = $arch_dir) =~ s{/debian-installer/}{/};
+    # binary-all isn't interesting:
+    next if $arch eq 'all';
+
+    # uniq-ified once later:
+    push @allarchs, $arch;
+    $availables{$suite}{$arch} = 1;
+
+    # FIXME: IO::Compress::Gzip would be nicer to use
+    my $udeb_file = "$suitedir/$arch-Packages.udeb";
+    my $deb_file = "$suitedir/$arch-Packages.deb";
+
+    # For debugging purposes, this sync can be disabled (--nosync):
+    if ($sync) {
+      system("zcat $arch_dir/Packages.gz > $udeb_file")==0
+        or system("xzcat $arch_dir/Packages.xz > $udeb_file")==0
+        or die "Unable to zcat/xzcat $arch_dir/Packages.gz/xz";
+
+      system("zcat $deb_arch_dir/Packages.gz > $deb_file")==0
+        or system("xzcat $deb_arch_dir/Packages.xz > $deb_file")==0
+        or die "Unable to zcat/xzcat $deb_arch_dir/Packages.gz/xz";
+
+      # Prepare for adding a few deb packages in there; during the
+      # build, that only happens when the package pops up through
+      # dpkg -s, while that's done unconditionally here.
+      open my $fh, '>>', $udeb_file
+        or die "Unable to append to $udeb_file";
+
+      # NOTE: Please keep this list in sync with the one in
+      # get-packages (from src:debian-installer)
+      my @fakepkgs = qw(libgcc1 libgcc-s1 libatomic1);
+      my $curpkg;
+      my $stanza;
+      open my $deb, '<', $deb_file
+        or die "Unable to open $deb_file";
+      for my $line (<$deb>) {
+        chomp $line;
+        if ($line eq '') {
+          # Terminator case:
+          if (grep {$curpkg eq $_} @fakepkgs) {
+            print $fh "$stanza\n";
+          }
+          # Reset:
+          $stanza = '';
+        }
+        elsif ($line =~ /^Package: (.+)$/) {
+          # New stanza:
+          $curpkg = $1;
+          $stanza = "$line\n";
+        }
+        elsif ($line =~ /^(?:Pre-|)Depends:/) {
+          # Ignore dependencies, packages are supposed to be
+          # installable and installed on the build host.
+        }
+        else {
+          # Stanza keeps on growing:
+          $stanza .= "$line\n";
+        }
+      }
+      close $deb
+        or die "Unable to close $deb_file";
+
+      close $fh
+        or die "Unable to close $udeb_file";
+    }
+
+    # Call dose, explaining issues.
+    my $current;
+    my $alt;
+    my $graph = "digraph {\n";
+    $graph .= "node[shape=box];\n";
+    my @deps;
+    my @involved;
+    my $mode;
+    my $package;
+    my $problem;
+    for my $line (`dose-debcheck --quiet --failures --explain $udeb_file`) {
+      if ($line =~ /^report:$/ or $line =~ /^ -$/) {
+        $mode = undef;
+        next;
+      }
+      elsif ($line =~ /^  package: (\S+)/) {
+        $package = $1;
+        push @{$failed{$package}}, $arch;
+      }
+      elsif ($line =~ /^\s+(missing|depchain):$/) {
+        $mode = $1;
+      }
+      elsif ($line =~ /^  \s+package: (\S+)$/) {
+        $current = $1;
+        push @involved, $current;
+      }
+      elsif ($line =~ /^\s+depends: (\S+)\s.*$/) {
+        # don't consider version, thanks to \s.*
+        my $depends = $1;
+        if ($mode ne 'depchain') {
+            print "woops, getting a depends while not being in depchain mode\n";
+        }
+        push @deps, "\"$current\" -> \"$depends\"";
+        push @involved, $depends;
+      }
+      elsif ($line =~ /^\s+unsat-dependency: (\S+)\s.*$/) {
+        # don't consider version, thanks to \s.*
+        my $unsat_dep = $1;
+        if ($mode ne 'missing') {
+            print "woops, getting an unsat-dependency while not being in missing mode\n";
+        }
+        push @deps, "\"$current\" -> \"$unsat_dep\"";
+        push @involved, $unsat_dep;
+      }
+      else {
+        # too many things to ignore to list them all
+      }
+    }
+
+    # dose doesn't mentioned packages providing virtual ones, so do
+    # the lookup manually:
+    open my $udeb, '<', $udeb_file
+      or die "unable to open $udeb_file";
+    my %providers;
+    my $realpkg;
+    while (my $line = <$udeb>) {
+      if ($line =~ /^Package: (\S+)$/) {
+        $realpkg = $1;
+      }
+      elsif ($line =~ /^Provides: (.*)$/) {
+        my $provides = $1;
+        foreach my $p (split(/, /, $provides)) {
+          push @{$providers{$p}}, $realpkg;
+        }
+      }
+    }
+    close $udeb
+      or die "unable to close $udeb_file";
+
+    foreach my $pkg (uniq sort @involved) {
+      if (grep { $_ eq $pkg } keys %providers) {
+        foreach my $realpkg (@{$providers{$pkg}}) {
+          push @deps, "\"$pkg\" -> \"$realpkg\" [color=blue]";
+        }
+        push @deps, "\"$pkg\" [shape=ellipse,color=blue]";
+      }
+    }
+
+    $graph .= join "\n", uniq sort @deps;
+
+    # Special style for known, buggy packages:
+    for my $package (uniq sort @involved) {
+      if (grep { $package eq $_ } keys %known) {
+        my $bug = "#". $known{$package};
+        $graph .= "  \"$package\"[color=\"red\",style=\"dashed,bold\",label=\"$package\\n$bug\"];\n";
+      }
+    }
+
+    $graph .= "}\n";
+    write_file("$workdir/graph-$suite-$arch.dot", $graph);
+  }
+
+  for my $package (sort keys %failed) {
+    $new{ "$suite/$package" } = join ' ', @{$failed{$package}};
+  }
+}
+
+# Little helpers for the HTML output:
+sub link2graph {
+  my $suite = shift;
+  my $arch = shift;
+  return ""
+    if ! $availables{$suite}{$arch};
+  return "<a href=\"graph-$suite-$arch.png\">$arch</a>";
+}
+
+sub link2bug {
+  my $p = shift;
+  my $b = $known{ $p };
+  if ($b) {
+    return "$p (<a href=\"http://bugs.debian.org/$b\">#$b</a>)";
+  }
+  else {
+    return "$p";
+  }
+}
+
+### HTML summary, current state
+@allarchs = uniq sort @allarchs;
+my $colspan = 1+scalar(@allarchs);
+my $html = << 'EOS';
+<html>
+  <head>
+    <title>udeb uninstallability status</title>
+    <link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+    <link rel="icon"       type="text/png" href="/static/favicon.png" />
+  </head>
+  <body>
+EOS
+$html .= "<p>Jump to suite:" . (join '', map { " <a href=\"#$_\">$_</a>" } @suites) . "; display <a href=\"$diff_output\">diff from previous run</a></p>";
+$html .= "<table border=\"1\" cellpadding=3 style=\"border-collapse: collapse; margin: auto; \">\n";
+
+my $total=0;
+for my $suite (@suites) {
+  $html .= "<tr><td colspan=\"$colspan\"><h1 style=\"margin-top: 20px; text-align: center;\"><a name=\"$suite\">Uninstallable packages in $suite</a></h1></td></tr>\n";
+  $html .= "<tr><td></td>" . (join '', map { "<td>" . link2graph($suite, $_) ."</td>" } @allarchs) . "</tr>\n";
+  for my $k (sort keys %new) {
+    next if $k !~ m{^$suite/};
+    (my $package = $k ) =~ s{.*/}{};
+    $html .= "<tr><td>" . link2bug($package) . "</td>";
+    my @broken = split / /, $new{$k};
+    for my $arch (@allarchs) {
+      if (grep { $arch eq $_ } @broken) {
+        $html .= "<td>$arch</td>";
+        $total += 1;
+      }
+      else {
+        $html .= "<td></td>";
+      }
+    }
+    $html .= "</tr>\n";
+  }
+}
+$html .= "</table>";
+
+# Make it easy to detect an outdated page:
+my $date = `LC_ALL=C TZ=UTC date`;
+chomp $date;
+$html .= "<hr/>\n";
+$html .= "Last update: $date\n";
+
+$html .= "</body></html>\n";
+write_file("$workdir/$index_output", $html);
+
+
+### Text summary, diff against previous state
+my $memory = "$workdir/dose.storable";
+my %old = (-f $memory) ? %{ retrieve($memory) } : ();
+
+if (%old) {
+  # NOTE: We could easily distinguish new broken packages, along with
+  # entirely fixed packages, but there are always a bunch of
+  # arch-specific udebs/dependencies, etc. which will make that less
+  # useful than it could be. So stick to per-arch granularity for a
+  # given suite/package.
+  my $diff;
+  my %changed;
+  for my $k (uniq sort (keys %old, keys %new)) {
+    my @o = split / /, ($old{$k}||'');
+    my @n = split / /, ($new{$k}||'');
+    my @ko;
+    my @ok;
+    for my $arch (uniq sort (@o, @n)) {
+      if (not grep { $arch eq $_ } @o) {
+        push @ko, $arch;
+      }
+      elsif (not grep { $arch eq $_ } @n) {
+        push @ok, $arch;
+      }
+    }
+    (my $suite = $k) =~ s{/.*}{};
+    (my $package = $k) =~ s{.*/}{};
+    $changed{$suite}{ko}{$package} = join ' ', @ko if @ko;
+    $changed{$suite}{ok}{$package} = join ' ', @ok if @ok;
+  }
+
+  my %states = (
+    "ok" => "Newly-fixed packages",
+    "ko" => "Newly-broken packages",
+  );
+  my %stats = (
+    "ok" => 0,
+    "ko" => 0,
+  );
+
+  # Walk suites, check which changed, in which direction:
+  for my $suite (@suites) {
+    next
+      if not $changed{$suite};
+    for my $state (keys %states) {
+      next
+        if not $changed{$suite}{$state};
+
+      $diff .= "$states{$state} in $suite\n";
+      for my $package (sort keys %{ $changed{$suite}{$state} }) {
+        $diff .= sprintf "  %-40s %s\n", $package, $changed{$suite}{$state}{$package};
+        $stats{$state}+=split ' ', $changed{$suite}{$state}{$package};
+      }
+      $diff .= "\n";
+    }
+  }
+
+  # Karma computing:
+  my $trend = (($stats{ko} == $stats{ok})?"equilibrium":(($stats{ko} < $stats{ok})?"better":"worse")) . " (+$stats{ko}/-$stats{ok})";
+  $diff .= "Uninstallability trend: $trend\n";
+  $diff .= "Uninstallability count: $total\n";
+  write_file("$workdir/$diff_output", $diff);
+
+  # Optional mail:
+  if ($stats{ok} + $stats{ko} > 0) {
+    if ($mail) {
+      my $subject = "udeb uninstallability trend: $trend";
+      my $message = Email::MIME->create(
+        header_str => [
+          From    => 'udeb uninstallability watcher <debian-boot@lists.debian.org>',
+          To      => $mail,
+          Subject => $subject,
+        ],
+        attributes => {
+          encoding => "quoted-printable",
+          charset  => "UTF-8",
+        },
+        body_str => "$diff\nFull status: https://d-i.debian.org/dose/\n",
+      );
+      sendmail($message);
+    }
+  }
+} else {
+  # Touch the file for the caller to be happy:
+  write_file("$workdir/$diff_output", 'No previous state');
+}
+
+# This can be disabled (--nostore):
+if ($store) {
+  store \%new, $memory
+    or die "Unable to store current status to $memory";
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+tmp=$(tempfile)
+
+HOST="$MACHINE"
+if [ -n "$TEST_HOSTNAME" ]; then
+	HOST="$TEST_HOSTNAME"
+fi
+
+if ! wget "http://$HOST/" -O - > /dev/null; then
+	echo "wget http://$HOST/ failed" >&2
+	exit 1
+fi
+echo "Web server: ok"
+exit 0

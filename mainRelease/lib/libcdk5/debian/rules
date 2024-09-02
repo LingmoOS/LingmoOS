@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+export PVER=$(shell dpkg-parsechangelog --show-field version | cut -d"-" -f1 )
+
+export DEB_CFLAGS_MAINT_APPEND  = -fPIE
+export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
+
+DEB_HOST_MULTIARCH?=$(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- --with-pkg-config
+
+
+override_dh_auto_install:
+	dh_auto_install -- installCDKSHLibrary
+	mv debian/tmp/usr/share/doc/cdk debian/tmp/usr/share/doc/libcdk5-dev
+	mkdir -p debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libcdk5-dev/bin
+	cp -a debian/tmp/usr/bin/cdk5-config debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libcdk5-dev/bin
+
+override_dh_compress:
+	dh_compress -Xexamples
+
+override_dh_makeshlibs:
+	dh_makeshlibs -- -v$(PVER)

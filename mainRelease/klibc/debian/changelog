@@ -1,0 +1,1687 @@
+klibc (2.0.13-4) unstable; urgency=medium
+
+  [ Sven Joachim ]
+  * debian/initramfs-tools/hooks/klibc-utils: Avoid the use of "cp -n"
+    (Closes: #1055694).
+
+  [ Salvatore Bonaccorso ]
+  * debian/control: Add myself to Uploaders
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Wed, 21 Feb 2024 13:08:58 +0100
+
+klibc (2.0.13-3) experimental; urgency=medium
+
+  * Install klibc shared library in /usr/lib
+
+ -- Ben Hutchings <benh@debian.org>  Sat, 25 Nov 2023 00:49:35 +0000
+
+klibc (2.0.13-2) unstable; urgency=medium
+
+  * d/rules: Handle loong64 architecture (thanks to Peng Fan)
+    (Closes: #1053742)
+
+ -- Ben Hutchings <benh@debian.org>  Tue, 24 Oct 2023 18:11:43 +0200
+
+klibc (2.0.13-1) unstable; urgency=medium
+
+  * New upstream version:
+    - time: Use clock_* system calls for time-of-day and sleep
+      (Closes: #923098)
+    - Install command links as appropriate (LP: #2028571)
+
+ -- Ben Hutchings <benh@debian.org>  Mon, 31 Jul 2023 15:04:13 +0200
+
+klibc (2.0.12-1) unstable; urgency=medium
+
+  * New upstream version:
+    - mips64: Fix struct stat layout (Closes: #1030673)
+
+ -- Ben Hutchings <benh@debian.org>  Sun, 12 Feb 2023 23:57:04 +0100
+
+klibc (2.0.11-1) unstable; urgency=medium
+
+  * New upstream version:
+    - Kbuild: Properly disable executable stacks in static builds
+      (Closes: #1020883)
+    - fcntl: Fix build failure for some architectures with Linux 5.19
+      (fixes FTBFS on several architectures)
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster:
+    + klibc-utils: Drop versioned constraint on initramfs-tools in Breaks.
+
+  [ Ben Hutchings ]
+  * lintian: Update override in libklibc for lintian 2.115
+
+ -- Ben Hutchings <benh@debian.org>  Sun, 02 Oct 2022 03:09:49 +0200
+
+klibc (2.0.10-4) unstable; urgency=medium
+
+  * d/control, d/rules: Remove ccache from $PATH instead of Build-Conflicting
+  * d/salsa-ci.yml: Add CI configuration for salsa.debian.org
+  * d/tests: Add klcc smoke test
+  * Fix header installation from out-of-tree build (Closes: #1004465)
+
+ -- Ben Hutchings <benh@debian.org>  Mon, 31 Jan 2022 00:28:16 +0100
+
+klibc (2.0.10-3) unstable; urgency=medium
+
+  * ia64: Fix out-of-tree build
+
+ -- Ben Hutchings <benh@debian.org>  Sat, 01 Jan 2022 16:55:44 +0100
+
+klibc (2.0.10-2) unstable; urgency=medium
+
+  * Use KCFLAGS to pass options to Kbuild, rather than CFLAGS and LDFLAGS
+    (fixes FTBFS on several architectures)
+
+ -- Ben Hutchings <benh@debian.org>  Fri, 31 Dec 2021 15:05:03 +0100
+
+klibc (2.0.10-1) unstable; urgency=medium
+
+  * New upstream version:
+    - Build fixes for Clang (Closes: #787063):
+      - Kbuild: Fix include path for Clang builds
+      - sparc64: Remove redundant/unsupported compiler option -mptr64
+      - s390: mmap: Change inline assembly to work with Clang
+  * debian/rules: Pass through $(CC), $(CC_FOR_BUILD), and $(LD) to ease
+    building with alternate toolchain
+  * debian/rules: Build under debian/build
+  * debian/rules: Put test output under debian/build
+  * Fix warnings from dh_missing:
+    - debian/not-installed: Note duplicate klibc-<hash>.so as not installed
+    - debian/libklibc-dev.manpages: Install klcc.1 from debian/tmp
+  * debian/*.{install,manpages}: Delete redundant debian/tmp/ prefixes
+  * libklibc-dev: Add generated perl dependency for klcc
+  * debian/*.lintian-overrides: Delete obsolete overrides
+  * debian/libklibc.lintian-overrides: Override
+    arch-dependent-file-not-in-arch-specific-directory
+  * Kbuild: Use provided CFLAGS, LDFLAGS
+  * debian/rules: Use -f{debug,macro}-prefix-map to keep build dir out of
+    binaries
+
+ -- Ben Hutchings <benh@debian.org>  Thu, 30 Dec 2021 21:54:47 +0100
+
+klibc (2.0.9-1) unstable; urgency=medium
+
+  * New upstream version
+  * armhf: Update compiler options for gcc 11 (Closes: #996906)
+  * sig{set,long}jmp: do not ignore sigsetjmp's second argument
+    (Closes: #988027)
+  * Fix implementation of utimes
+
+ -- Ben Hutchings <benh@debian.org>  Mon, 27 Dec 2021 00:17:05 +0100
+
+klibc (2.0.8-6.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * {set,long}jmp [s390x]: save/restore the correct FPU registers
+    (f8‥f15 not f1/f3/f5/f7) (Closes: #943425)
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Thu, 27 May 2021 00:12:10 +0200
+
+klibc (2.0.8-6) unstable; urgency=medium
+
+  * Upload to unstable
+  * malloc: Set errno on failure
+  * malloc: Fail if requested size > PTRDIFF_MAX (CVE-2021-31873)
+  * calloc: Fail if multiplication overflows (CVE-2021-31870)
+  * cpio: Fix possible integer overflow on 32-bit systems (CVE-2021-31872)
+  * cpio: Fix possible crash on 64-bit systems (CVE-2021-31871)
+
+ -- Ben Hutchings <benh@debian.org>  Fri, 30 Apr 2021 03:05:23 +0200
+
+klibc (2.0.8-5) experimental; urgency=medium
+
+  * alpha: Fix definitions of _NSIG and struct sigaction
+  * ia64: Fix definition of struct sigaction
+
+ -- Ben Hutchings <benh@debian.org>  Fri, 28 Aug 2020 17:41:47 +0100
+
+klibc (2.0.8-4) experimental; urgency=medium
+
+  * signal: Note another reason to define _KLIBC_NEEDS_SA_RESTORER
+  * signal: Add sysconfig setting to force SA_SIGINFO on
+  * s390: Force SA_SIGINFO on and use rt_sigreturn
+  * alpha: Force SA_SIGINFO on
+  * sparc: Force SA_SIGINFO on
+
+ -- Ben Hutchings <benh@debian.org>  Tue, 25 Aug 2020 01:49:14 +0100
+
+klibc (2.0.8-3) experimental; urgency=medium
+
+  * s390: Define __sigreturn() on both s390 and s390x
+  * Revert "alpha: Set sa_restorer for signals and disable executable stack"
+  * alpha: Pass restorer to rt_sigaction() and disable executable stack
+
+ -- Ben Hutchings <benh@debian.org>  Sun, 23 Aug 2020 15:24:00 +0100
+
+klibc (2.0.8-2) experimental; urgency=medium
+
+  * {alpha,s390,sparc}: Set sa_restorer for signals and disable executable
+    stack
+
+ -- Ben Hutchings <benh@debian.org>  Sat, 22 Aug 2020 21:35:52 +0100
+
+klibc (2.0.8-1) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * New upstream version:
+    - ipconfig: Ignore NTP server address and any additional fields
+      (Closes: #931416)
+    - Kbuild: Add "-fcommon" for clang builds (Closes: #957405)
+    - Kbuild: Add a per-architecture option to disable exectable stacks
+    - arch: Explicitly disable or enable executable stacks (Closes: #959070)
+  * debian/control: Use my debian.org email in Uploaders field
+  * Use debhelper compatibility level 12:
+    - Build-Depend on debhelper-compat and remove debian/compat
+    - debian/klibc-utils.triggers: Delete as redundant
+  * debian/rules: Really disable stripping libc.so in libklibc-dev
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Set upstream metadata fields: Repository.
+
+ -- Ben Hutchings <benh@debian.org>  Fri, 21 Aug 2020 01:34:13 +0100
+
+klibc (2.0.7-1) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * New upstream version:
+    - klcc: Enable stripping even if CONFIG_DEBUG_INFO is enabled
+    - run-init: Allow the initramfs to be persisted across root changes
+      (thanks to Matthew Garrett)
+    - ipconfig: Implement support -d ...:dns0:dns1 options (Closes: #931416)
+    - Kbuild: Work around broken "ar s" in binutils 2.32 (see #941921)
+  * debian/rules: Reorganise make flags variables
+  * debian/rules: Define ARCH for klibc, for all architectures
+  * debian/rules: Delete redundant architecture mappings
+  * debian/rules: Delete redundant export
+  * klibc-utils: Trigger update-initramfs on install/upgrade
+  * initramfs-tools: Don't install commands that already exist in /sbin
+  * initramfs-tools: Exclude kinit and zcat commands earlier
+  * initramfs-tools: Exclude gzip command
+  * Drop "resume: Backward compatibility for resume_offset", which will
+    not be needed in the next release
+  * [klibc] fstype: Drop obsolete support for "ext4dev" (Closes: #932926)
+  * debian/control: Set Maintainer to Debian Kernel Team; move maks to
+    Uploaders
+
+  [ James Clarke ]
+  * debian/control: Restrict m4 build dependency to just sparc
+
+  [ Helmut Grohne ]
+  * Honour DEB_BUILD_OPTIONS=nocheck. (Closes: #922814)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Tue, 08 Oct 2019 02:14:11 +0100
+
+klibc (2.0.6-1) unstable; urgency=medium
+
+  * New upstream version:
+    - ia64: Fix shared build (thanks to James Clarke)
+    - Drop nearly all patches, which are either included or obsoleted
+  * debian/control: Change Architecture of all packages to linux-any
+  * debian/control: Mark libklibc as M-A: same (suggested by Matthias Klose)
+  * debian/control: Mark klibc-utils as M-A: foreign
+  * initramfs-tools: Remove checks for shell installed as "sh.shared"
+  * debian/rules: Change override_dh_auto_test rule to actually run tests
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Fri, 01 Feb 2019 05:00:57 +0000
+
+klibc (2.0.5-2) unstable; urgency=medium
+
+  * Drop redundant patch "Include the multiarch include directory in klcc's
+    path"
+  * Drop "Fix klibc Debian specific build trouble" and introduce links in
+    debian/rules
+  * Fix up debug symbol support:
+    - Use -Ttext-segment to link shared library on all arches (Closes: #919855)
+    - Drop "kbuild: Enable build IDs"
+    - Kbuild: Add option to install unstripped binaries
+    - Kbuild: Enable full debug information
+    - Set CONFIG_DEBUG_INFO instead of overriding STRIP
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 20 Jan 2019 22:49:25 +0000
+
+klibc (2.0.5-1) unstable; urgency=medium
+
+  * New upstream version:
+    - Drop most of our patches, which are now included upstream
+
+  [ Ben Hutchings ]
+  * Simplify commands to set up UAPI headers directory
+  * debian/rules: Use $(MAKE) for recursive make
+  * Build debug symbols packages
+  * libklibc-dev: Remove redundant copy of shared library
+  * Fix cross-building for powerpc*, ppc*, s390x
+
+  [ Benjamin Drung ]
+  * Fix shellcheck issues in initramfs-tools hook
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 19 Jan 2019 02:53:52 +0000
+
+klibc (2.0.4-15) unstable; urgency=medium
+
+  * resume: Write resume_offset attribute
+  * resume: Backward compatibility for resume_offset
+  * x86_64: Use -Ttext-segment to avoid address collision
+  * i386: Use -Ttext-segment to avoid address collision
+  * Disable PIE, since we link all executables as non-relocatable
+    (Closes: #907404)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 06 Jan 2019 19:33:01 +0000
+
+klibc (2.0.4-14) unstable; urgency=medium
+
+  [ James Clarke ]
+  * [klibc] Fix sparc assembly when compiled as PIC (Closes: #885852)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 19 Jul 2018 01:13:54 +0100
+
+klibc (2.0.4-13) unstable; urgency=medium
+
+  * [klibc] rename, renameat: Use renameat2() system call
+  * [klibc] Add RISC-V (RV64) port
+  * debian/rules: Add architecture mapping for riscv64
+  * debian/control: Drop obsolete build-dependency on bison
+  * debian/control: Restrict build-dependency on m4 to sparc, sparc64
+  * debian/patches: Add Forwarded fields as appropriate
+  * debian/rules: Add architecture mapping for sparc64
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Wed, 18 Jul 2018 00:27:22 +0100
+
+klibc (2.0.4-12) unstable; urgency=medium
+
+  [ Ben Hutchings ]
+  * debian/control: Point Vcs URLs to Salsa
+  * debian/klibc-utils.postinst: Remove diversion of initramfs-tools hook
+    script (Closes: #886939)
+  * [klibc] mips64: compile with -mno-abicalls, thanks to James Cowgill
+    (Closes: #891924)
+  * reboot: Add support for reboot syscall argument, thanks to Alfonso
+    Sanchez-Beato (Closes: #863761, LP: #1692494)
+  * [klibc] x86_64: Reduce ld max-page-size option again (Closes: #903849)
+  * Never clean files in quilt status directory
+
+  [ Frank Scheiner ]
+  * [klibc] ia64: Build static tools (again)
+
+  [ Benjamin Drung ]
+  * ipconfig: Implement classless static routes (Closes: #884716, LP: #1526956)
+  * mount_main: Fix empty string check
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 15 Jul 2018 22:22:07 +0100
+
+klibc (2.0.4-11) unstable; urgency=medium
+
+  * Apply i386 syscall changes from upstream (fixes FTBFS):
+    - [klibc] i386: remove special handling of socketcall
+    - [klibc] Add accept4(), handle fallback from accept() to accept4()
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 30 Dec 2017 22:09:36 +0000
+
+klibc (2.0.4-10) unstable; urgency=medium
+
+  [ Steve Langasek ]
+  * debian/patches/broadcast_dhcp_send.patch: Set broadcast when sending
+    DHCPREQUEST and DHCPDISCOVER.  Thanks to Mathieu Trudel-Lapierre
+    <mathieu.trudel-lapierre@canonical.com>.  Closes: #733988, LP:
+    #1327412.
+  * debian/patches/dhcp-one-socket-per-interface.patch: Use separate
+    sockets for DHCP from multiple interfaces.  Thanks to Jay Vosburgh
+    <jay.vosburgh@canonical.com>.  Closes: #852480, LP: #1652348.
+
+  [ Ben Hutchings ]
+  * Drop patches no longer required after stretch release:
+    - "Fix minimal mv to work across fs"
+    - "Implement realpath()" and "readlink: Add -f option"
+    - "syscalls: Override detection of direct socket syscalls on i386, m68k,
+      s390"
+  * Replace diversion of initramfs-tools' klibc hook script with versioned
+    Breaks
+  * debian/control: Bump Standards-Version to 4.1.2; no changes required
+  * debian/rules: Use /usr/share/dpkg/architecture.mk
+  * Use debhelper compatibility level 9
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Fri, 29 Dec 2017 00:58:39 +0000
+
+klibc (2.0.4-9) unstable; urgency=medium
+
+  * Change dh_fixperms arguments to restore binary reproducibility
+  * initramfs-tools: Ensure busybox's hook runs before ours if it is
+    going to be used in the initramfs (Closes: #823323)
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 08 May 2016 21:59:37 +0100
+
+klibc (2.0.4-8) unstable; urgency=medium
+
+  * run-init: Update documentation comment to cover -n option
+  * Add initramfs-tools hook script, in preparation for dropping it from
+    the initramfs-tools-core package
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Wed, 10 Feb 2016 23:33:55 +0000
+
+klibc (2.0.4-7) unstable; urgency=medium
+
+  * Drop "revert upstream nuked insmod", as nothing needs it any more
+  * Drop "Use static tools on IA64", as this architecture is dead
+  * Drop "Use static tools on ppc64", as shared builds appear to work now
+  * run-init: Add dry-run mode
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Mon, 18 Jan 2016 17:02:18 +0000
+
+klibc (2.0.4-6) unstable; urgency=medium
+
+  * Revert "syscalls: Use direct socket syscalls on i386" (Closes: #809927)
+  * syscalls: Override detection of direct socket syscalls on i386, m68k, s390
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Tue, 05 Jan 2016 21:18:07 +0000
+
+klibc (2.0.4-5) unstable; urgency=medium
+
+  * syscalls: Use direct socket syscalls on i386 (Closes: 809423).
+    This requires Linux 4.3.
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Mon, 04 Jan 2016 19:14:50 +0000
+
+klibc (2.0.4-4) unstable; urgency=medium
+
+  * Fix another issue that prevents a reproducible build:
+    - Use dh_lintian-overrides instead of direct installation
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 19 Sep 2015 11:23:44 +0200
+
+klibc (2.0.4-3) unstable; urgency=medium
+
+  * Fix issues that prevent a reproducible build:
+    - Install headers with consistent mode
+    - dash: mkbuiltins: Fix sort order harder
+  * debian/watch: Look for xz-compressed tarballs (Closes: #778299)
+    and use HTTP-S
+  * Remove udebs as they are no longer used (see #653840)
+  * [klibc] Add pread and pwrite 32bit syscall wrappers for parisc
+    (Closes: #745660)
+  * [klibc] ppc64: fix struct stat (Closes: #783292)
+  * debian/control: Add Build-Conflicts: ccache (Closes: #777217)
+  * gzip: Fix silent fallback to decompression (Closes: #355809)
+  * [klibc] mips/setjmp.S: don't save and restore floating-point registers
+    (Closes: #789683)
+  * debian/rules: Fix mips* architecture mapping (fixes FTBFS on mips, mipsel)
+  * debian/control: Change Vcs-Git, Vcs-Browser and Homepage to canonical
+    HTTP-S URLs
+  * debian/control: Bump Standards-Version to 3.9.6; no changes required
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Fri, 18 Sep 2015 23:39:49 +0200
+
+klibc (2.0.4-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add mips64 support. (Closes: #741241)
+
+ -- YunQiang Su <syq@debian.org>  Thu, 27 Aug 2015 21:17:00 +0800
+
+klibc (2.0.4-2) unstable; urgency=medium
+
+  * debian/control: Add myself to Uploaders
+  * [klibc] MIPS: Update archfcntl.h (fixes FTBFS)
+  * Fix compiler warning in usr/klibc/realpath.c
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sun, 05 Oct 2014 01:13:31 +0100
+
+klibc (2.0.4-1.2) unstable; urgency=medium
+
+  * Non-maintainer upload
+  * Implement features needed for mounting /usr in initramfs (Closes: #763049):
+    - Implement realpath()
+    - readlink: Add -f option
+    - mount: Implement -o defaults
+  * debian/rules: Fix clean when userland and kernel architecture differ
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 04 Oct 2014 17:01:24 +0100
+
+klibc (2.0.4-1.1) unstable; urgency=medium
+
+  [ Aurelien Jarno ]
+  * Non-maintainer upload.
+
+  [ Mauricio Faria de Oliveira ]
+  * Add ppc64el-load-toc-syscall-stub.patch: fix segfault on dynamically-linked
+    binaries on ppc64el. (Closes: #749060)
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 17 Sep 2014 13:47:02 +0200
+
+klibc (2.0.4-1) unstable; urgency=medium
+
+  * New upstream release (x86, readlink) (closes: #760587)
+
+ -- maximilian attems <maks@debian.org>  Thu, 11 Sep 2014 21:23:25 +0200
+
+klibc (2.0.3-1) unstable; urgency=medium
+
+  * New upstream release (arm64, ppc64) (closes: #698018, #744884)
+    Thanks to Steve Capper <steve.capper@linaro.org>
+    and Anton Blanchard <anton@samba.org>.
+  * Pump standard version to 3.9.5 without changes.
+
+ -- maximilian attems <maks@debian.org>  Mon, 21 Apr 2014 10:52:22 -0700
+
+klibc (2.0.2-1) unstable; urgency=low
+
+  * New upstream release (dash, arm)
+    - drop merged patches
+    - build fixes for Linux > 3.4 (closes: #702068)
+
+ -- maximilian attems <maks@debian.org>  Mon, 19 Aug 2013 22:59:22 +0200
+
+klibc (2.0.1-3) unstable; urgency=medium
+
+  [ Bill Pringlemeir ]
+  * [f05ff11] [klibc] fix ARM longjmp with zero 'val'.
+
+ -- maximilian attems <maks@debian.org>  Mon, 08 Oct 2012 21:57:01 +0200
+
+klibc (2.0.1-2) unstable; urgency=low
+
+  [ Sven Joachim ]
+  * [08c03cf] klibc: produces 64-bit binaries on i386 with x86_64 kernel
+    (Closes: #677087)
+
+  [ Thorsten Glaser ]
+  * [d8eae3a] [klibc] arm: fix trashing of callee-saved registers in thumb
+     setjmp() (Closes: #634890)
+  * [81170b5] [klibc] arm: unbreak armhf shared binaries (those with thumb)
+  * [aeb7847] armhf builds are always thumb
+
+  [ Jim Meyering ]
+  * [9ba90cd] [klibc] Avoid overflow for very long variable name
+
+ -- maximilian attems <maks@debian.org>  Mon, 01 Oct 2012 15:54:05 +0200
+
+klibc (2.0.1-1) unstable; urgency=high
+
+  * New upstream release (nfsmount, get{host,domain}name())
+  * debian/watch: fix file for new repo layout.
+
+ -- maximilian attems <maks@debian.org>  Thu, 28 Jun 2012 18:29:48 +0200
+
+klibc (2.0-2) unstable; urgency=low
+
+  * debian/control: Add breaks to initramfs-tools for ipconfig /run switch.
+
+ -- maximilian attems <maks@debian.org>  Thu, 31 May 2012 15:42:03 +0200
+
+klibc (2.0-1) unstable; urgency=low
+
+  * New upstream release (arch, ipconfig)
+    - ipconfig support domain-search, lease (closes: #627166)
+
+ -- maximilian attems <maks@debian.org>  Thu, 31 May 2012 15:05:55 +0200
+
+klibc (2.0~rc5-1) unstable; urgency=low
+
+  * New upstream snapshot (arch fixes) (closes: #673413)
+
+ -- maximilian attems <maks@debian.org>  Fri, 18 May 2012 18:16:51 +0200
+
+klibc (2.0~rc4-1) unstable; urgency=low
+
+  * New upstream snapshot (stdio work)
+    - drop merged m68k-support
+  * armel: Set arm arch for cross compiling.
+  * klibc-linux-libc-dev: Adapt for cross building (closes: #666389)
+    Based on Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+
+ -- maximilian attems <maks@debian.org>  Fri, 18 May 2012 14:48:04 +0200
+
+klibc (2.0~rc3-1) unstable; urgency=low
+
+  * New upstream snapshot (closes: #653790)
+    - klibc/s390x klcc fix thanks to Aurelien Jarno <aurel32@debian.org>.
+  * Pump standard version to 3.9.3 without changes.
+
+ -- maximilian attems <maks@debian.org>  Fri, 02 Mar 2012 11:08:51 +0100
+
+klibc (2.0~rc2-0.1) unstable; urgency=low
+
+  * Non-maintainer upload with consent of maintainer.
+  * Upload to unstable (maks says we target 2.0 for wheezy)
+  * New upstream snapshot (fixes FTBFS)
+  * Update Vcs-* for (temporary) move to collab-maint
+  * Refresh all patches
+  * Add m68k patch submitted upstream, for testing (Closes: #334917)
+  * Shut up lintian
+
+ -- Thorsten Glaser <tg@mirbsd.de>  Sat, 11 Feb 2012 19:25:23 +0000
+
+klibc (1.5.25-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix build to work with multiarched linux-libc-dev (using patch from
+    Ubuntu), closes: #645738.
+
+ -- Julien Cristau <jcristau@debian.org>  Fri, 30 Dec 2011 17:04:30 +0100
+
+klibc (2.0~rc1-1experimental1) experimental; urgency=low
+
+  * New upstream snapshot release (buffered stdio)
+  * Ubuntu sync fix klcc for multiarch. (closes: #639057, LP: #829356)
+    Thanks Colin Watson <cjwatson@ubuntu.com>.
+
+ -- maximilian attems <maks@debian.org>  Tue, 06 Sep 2011 17:57:54 +0200
+
+klibc (1.5.25-1) unstable; urgency=low
+
+  * New upstream release (scandir, capset, capget, kinit drop_capabilities)
+
+ -- maximilian attems <maks@debian.org>  Tue, 23 Aug 2011 17:54:43 +0200
+
+klibc (1.5.24-1) unstable; urgency=low
+
+  * New upstream release (sched_setaffinity, sched_getaffinity, kexec_load)
+    - ipconfig: Don't try to guess the nameserver. (closes: #594638)
+    - refresh debian/patches/klibc-linux-libc-dev
+
+ -- maximilian attems <maks@debian.org>  Wed, 27 Jul 2011 16:54:47 +0200
+
+klibc (1.5.23-2) unstable; urgency=low
+
+  * Really apply Fix-minimal-mv-to-work-across-fs.
+
+ -- maximilian attems <maks@debian.org>  Fri, 08 Jul 2011 01:09:48 +0200
+
+klibc (1.5.23-1) unstable; urgency=low
+
+  * New upstream release (arm, dash sync, limits.h, ppc64)
+    - minimal mv in klibc-utils.
+    - refresh debian/patches/insmod
+  * Add Fix-minimal-mv-to-work-across-fs.patch (closes: #627808)
+  * Add armhf support. (closes: #627252)
+    Thanks to Konstantinos Margaritis <markos@genesi-usa.com>.
+  * Add klibc crosscompile support. (closes: #629934)
+    Thanks to Steve McIntyre <steve.mcintyre@linaro.org>.
+  * debian/copyright: Add specific BSD license text to keep lintian happy.
+
+ -- maximilian attems <maks@debian.org>  Tue, 14 Jun 2011 17:32:53 +0200
+
+klibc (1.5.22-1) unstable; urgency=high
+
+  * New upstream release (arm, ipconfig)
+    - arm: fix build failure with latest binutils. (closes: #618616)
+    - arm: use bx on thumb2 (v3) (LP: #527720)
+    - ipconfig: handle multiple connected network dev. (closes: #621065)
+  * Ubuntu sync add ppc64-static. (closes: #613955)
+    Thanks Colin Watson <cjwatson@ubuntu.com>.
+  * Ubuntu sync add klcc multiarch-include-path. (closes: #622814)
+    Thanks Steve Langasek <steve.langasek@canonical.com>
+  * Pump standard version to 3.9.2 without changes.
+  * Drop Jeff Bailey from Uploaders.
+
+ -- maximilian attems <maks@debian.org>  Wed, 18 May 2011 13:39:01 +0200
+
+klibc (1.5.21-1) unstable; urgency=low
+
+  * New upstream release (i386 signal(), make 3.82, cleanups)
+
+ -- maximilian attems <maks@debian.org>  Tue, 25 Jan 2011 23:45:20 +0100
+
+klibc (1.5.20-1) unstable; urgency=high
+
+  * New upstream release
+    - ipconfig: fix infinite loop. (closes: #552554)
+    - ipconfig: fix multiple dns domains. (closes: #594208)
+  * klibc-utils.postinst: Nuke non empty dirs too. (closes: #594651)
+
+ -- maximilian attems <maks@debian.org>  Sat, 28 Aug 2010 12:23:51 +0200
+
+klibc (1.5.19-1) unstable; urgency=high
+
+  * New upstream release
+   - resume: silence warning on resume try. (closes: #586006)
+   - sh4: syscalls fixes. (closes: #578076)
+  * Fix doc symlinks on upgrade. (closes: #588763)
+    Thanks Sven Joachim <svenjoac@gmx.de>.
+  * Pump standard version to 3.9.1 without changes.
+
+ -- maximilian attems <maks@debian.org>  Wed, 25 Aug 2010 13:07:03 +0200
+
+klibc (1.5.18-1) unstable; urgency=medium
+
+  * New upstream release (dash 0.5.6)
+    - fstype btrfs (closes: #548047), ext4 !journal (closes: #536592)
+    - sh4 build fix (closes: #574834)
+    - shipp renamed README.ipconfig (closes: #478589)
+
+ -- maximilian attems <maks@debian.org>  Thu, 22 Apr 2010 03:38:55 +0200
+
+klibc (1.5.17-4) unstable; urgency=medium
+
+  * libklibc-dev: On preinst remove old include dirs that hinder
+    shipped symlinks to linux-libc-dev. (closes: #574854)
+
+ -- maximilian attems <maks@debian.org>  Sun, 21 Mar 2010 22:51:11 +0100
+
+klibc (1.5.17-3) unstable; urgency=low
+
+  * Override dh_auto_test to pass DEB_HOST_ARCH on make test. (closes: #574746)
+
+ -- maximilian attems <maks@debian.org>  Sat, 20 Mar 2010 20:52:09 +0100
+
+klibc (1.5.17-2) unstable; urgency=low
+
+  * Set DEB_HOST_ARCH using dpkg-architecture. (closes: #574740)
+
+ -- maximilian attems <maks@debian.org>  Sat, 20 Mar 2010 18:24:16 +0100
+
+klibc (1.5.17-1) unstable; urgency=low
+
+  [ Jan Hauke Rahm ]
+  * Switch from cdbs to debhelper 7
+  * Switch to Source Format 3.0 (quilt) (closes: #573908)
+  * Make documentation of klibc-utils and libklibc-dev be a symlink to
+    libklibc
+
+  [ maximilian attems ]
+  * New upstream release
+    - Fix FTFBS i386/sparc. (closes: #573926)
+    - sparc, sparc64 use sys_socketcall unconditionally. (closes: #444087)
+    - ipconfig may discard useful packets. (closes: #511959)
+
+ -- maximilian attems <maks@debian.org>  Sat, 20 Mar 2010 02:11:20 +0100
+
+klibc (1.5.16-1) unstable; urgency=low
+
+  [ maximilian attems ]
+  * New upstream release
+    - ipconfig: raise field length for rootpath DHCP option.
+      (closes: #497800)
+    - ipconfig: send requested hostname in DHCP discover/request.
+      (closes: #367301)
+    - ipconfig: set null ciaddr on DHCPREQUEST during SELECTING state.
+      (closes: #497879)
+    - mount: list fs all mounted fs, support -t switch for one fs.
+      (closes: #491067)
+    - refresh 10_insmod.patch.
+    - readlink be silent on failure. (closes: #565224)
+    - fix compilation against up to 2.6.33 linux-libc-dev. (closes: #552825)
+  * watch file fixup for new upstream directories.
+  * Pump standard version to 3.8.4 without changes.
+  * Add lintian overrides for embedded-zlib needed for early userspace.
+
+  [ Nobuhiro Iwamatsu ]
+  * klibc: add support Renesas SH(sh4) (closes: #540126)
+
+  [ Ben Hutchings ]
+  * Fix klibc Debian specific build with 02-klibc_linux_libc_dev.patch.
+  * Add libklibc-dev depends on linux-libc-dev.
+
+ -- maximilian attems <maks@debian.org>  Sun, 14 Mar 2010 22:46:21 +0100
+
+klibc (1.5.15-1) unstable; urgency=low
+
+  [ maximilian attems ]
+  * New upstream release:
+    - fstype ext4 support. (closes: #510758)
+    - chroot cmd fixed. (closes: #494829)
+  * Pump standard version to 3.8.0 without changes.
+  * Drop arm of the klibc-utils-floppy-udeb arch list.
+  * Fix debhelper-but-no-misc-depends.
+  * debian/copyright refer to GPL v2.
+  * debian/rules nuke old commented unused lines.
+
+  [ Colin Watson ]
+  * Add lpia to the architecture list for klibc-utils-floppy-udeb.
+    (closes: #506427)
+
+  [ Thiemo Seufer ]
+  * Fix FTBFS on MIPS64 kernel. (closes: #496175)
+
+ -- maximilian attems <maks@debian.org>  Mon, 16 Feb 2009 16:41:51 +0100
+
+klibc (1.5.14-1~exp1) experimental; urgency=low
+
+  * New upstream version
+    - nuke merged 11_klibc-Default-signal-3-to-bsd_signal-3.patch
+    - no longer hardcode gcc
+
+ -- maximilian attems <maks@debian.org>  Mon, 11 Aug 2008 16:34:11 +0200
+
+klibc (1.5.12-2) unstable; urgency=medium
+
+  * Add backport 11_klibc-Default-signal-3-to-bsd_signal-3.patch.
+  * Adjust watch file.
+
+ -- maximilian attems <maks@debian.org>  Mon, 11 Aug 2008 16:09:45 +0200
+
+klibc (1.5.12-1) unstable; urgency=low
+
+  * New upstream release (memmove, fflush, cpio) (closes: #489945)
+
+ -- maximilian attems <maks@debian.org>  Sat, 12 Jul 2008 21:48:56 +0200
+
+klibc (1.5.11-3) unstable; urgency=high
+
+  * libklibc-dev depend on gcc-4.1. (closes: #489103)
+
+ -- maximilian attems <maks@debian.org>  Thu, 03 Jul 2008 19:33:56 +0200
+
+klibc (1.5.11-2) unstable; urgency=high
+
+  * gcc-4.1 build dep.
+
+ -- maximilian attems <maks@debian.org>  Fri, 27 Jun 2008 01:40:39 +0200
+
+klibc (1.5.11-1) unstable; urgency=high
+
+  * New upstream release (ext4, ipconfig, mount)
+    - drop merged 11-klibc-run-init-drop-executable-stack.patch,
+      12-klibc-avoid-.gitignore-in-the-include-directory.patch
+  * Fallback to gcc-4.1 4.3 miscompiles. (closes: #486557)
+
+ -- maximilian attems <maks@debian.org>  Fri, 27 Jun 2008 00:59:27 +0200
+
+klibc (1.5.10-1) unstable; urgency=low
+
+  * New upstream release (dmesg, nfsmount)
+    - dmesg: fix the stripping of priority codes (closes: #483186)
+    - ubuntu sync rework 11-klibc-run-init-drop-executable-stack.patch
+    - add git fix 12-klibc-avoid-.gitignore-in-the-include-directory.patch
+
+ -- maximilian attems <maks@debian.org>  Fri, 27 Jun 2008 00:59:21 +0200
+
+klibc (1.5.9-2) unstable; urgency=low
+
+  * debian/control: Fix Description klibc-utils are not statically linked.
+    Thanks Anthony Towns <ajt@debian.org> for noticing.
+  * klibc-utils-floppy-udeb.install: Drop mkdir, mknod, sh due to full floppy.
+    Thanks Joey Hess <joeyh@debian.org>. (closes: #474061)
+
+ -- maximilian attems <maks@debian.org>  Wed, 09 Apr 2008 11:00:29 +0200
+
+klibc (1.5.9-1) unstable; urgency=low
+
+  * New upstream release (fstype jfs + nilfs2, ipconfig, nfsmount)
+    - Drop merged 02_header_clean_install.patch, 20_mount-options.patch
+    - mknod gained -m permission switch. (closes: #469577)
+  * debian/control: Add git Vcs fields.
+
+ -- maximilian attems <maks@debian.org>  Fri, 28 Mar 2008 23:09:57 +0100
+
+klibc (1.5.8-1) unstable; urgency=low
+
+  * New upstream release (fstype squashfs-lzma, ipconfig) (closes: #455703)
+  * Ubuntu sync add 20_mount-options.patch for FUSE mount. (closes: #463258)
+  * Add 02_header_clean_install.patch.
+  * Drop unused 03-sparc-libgcc42.patch.
+  * Add 10_insmod.patch for d-i floppy usage.
+  * Fix copyright notice.
+  * Newer standard version without changes.
+
+ -- maximilian attems <maks@debian.org>  Sat, 22 Mar 2008 14:09:56 +0100
+
+klibc (1.5.7-4) unstable; urgency=high
+
+  * debian/rules: Set verbose kbuild for toolchain troubles.  Compile
+    32 bit on ppc and 31 bit on s390. (closes: #453422, #453424)
+
+ -- maximilian attems <maks@debian.org>  Fri,  7 Dec 2007 16:12:36 +0100
+
+klibc (1.5.7-3) unstable; urgency=high
+
+  * debian/rules: s/sparc64/sparc/ thanks to the Debian sparc folks.
+    (closes: #399724)
+
+ -- maximilian attems <maks@debian.org>  Thu, 22 Nov 2007 18:50:55 +0100
+
+klibc (1.5.7-2) unstable; urgency=high
+
+  * Add 03-sparc-libgcc42.patch (closes: #440721)
+    Thanks for report and testing to Kilian Krause <kilian@debian.org>
+
+ -- maximilian attems <maks@debian.org>  Thu, 22 Nov 2007 18:50:50 +0100
+
+klibc (1.5.7-1) unstable; urgency=low
+
+  * New upstream release
+  * Build-dep on s/flex/m4/.
+
+ -- maximilian attems <maks@debian.org>  Tue, 04 Sep 2007 13:03:09 +0200
+
+klibc (1.5.6-2) unstable; urgency=high
+
+  * debian/rules: Pass for ia64 ARCH=ia64 on install target, enables static
+    workaround. (closes: #439548)
+
+ -- maximilian attems <maks@debian.org>  Sat, 25 Aug 2007 17:39:35 +0200
+
+klibc (1.5.6-1) unstable; urgency=low
+
+  * New upstream release (mount, bzero)
+  * debian/rules: Disable verbose build.
+
+ -- maximilian attems <maks@debian.org>  Sat, 25 Aug 2007 01:54:22 +0200
+
+klibc (1.5.5-1) unstable; urgency=low
+
+  * New upstream release (dash 0.5.4)
+
+ -- maximilian attems <maks@debian.org>  Thu, 23 Aug 2007 18:15:24 +0200
+
+klibc (1.5.4-1) unstable; urgency=low
+
+  * New upstream release (dmesg, fstype ocfs2)
+
+ -- maximilian attems <maks@debian.org>  Tue, 21 Aug 2007 12:31:27 +0200
+
+klibc (1.5.3-1) unstable; urgency=low
+
+  * New upstream (ext4 gfs2 reiser4 squashfs fstype, sync) (closes: #392073)
+    - Drop merged 09_mips-linux-libc-dev.patch,
+    08_nfsmount-rpc_header_length.patch, 02-squashfs.diff.
+    - Drop dubious Debian unused 07_kinit_no_vfork.patch.
+
+ -- maximilian attems <maks@debian.org>  Wed, 15 Aug 2007 21:32:06 +0200
+
+klibc (1.5-4) unstable; urgency=low
+
+  * Add 09_mips-linux-libc-dev.patch. (closes: 435113)
+
+ -- maximilian attems <maks@debian.org>  Sat, 04 Aug 2007 23:24:10 +0200
+
+klibc (1.5-3) unstable; urgency=low
+
+  * Build-dep on linux-libc-dev - ubuntu sync + rules cleanup. (closes: 423998)
+    Thus drop 08-revert_nostdinc_iwithprefix_include.patch
+  * Switch to ${binary:Version}
+  * Add 08_nfsmount-rpc_header_length.patch. (closes: 428832)
+    Thanks Tomas Vanderka <tomas_vanderka@tempest.sk> for patch.
+  * Add armel support. (closes: 430593)
+    Thanks Riku Voipio <riku.voipio@iki.fi>
+
+ -- maximilian attems <maks@debian.org>  Sat, 28 Jul 2007 12:44:57 +0200
+
+klibc (1.5-2) unstable; urgency=low
+
+  * klibc-utils-floppy-udeb.install: sort + add cpio.
+
+ -- maximilian attems <maks@debian.org>  Mon,  2 Apr 2007 23:25:38 +0200
+
+klibc (1.5-1) unstable; urgency=low
+
+  * New upstream (cpio, read -t, resume offset, support newer linux headers)
+  * Change Maintainers field
+
+ -- maximilian attems <maks@debian.org>  Sat, 31 Mar 2007 17:09:59 +0200
+
+klibc (1.4.34-1) unstable; urgency=low
+
+  * New upstream release (pwd, FD_ZERO, __sum*)
+    - drop 09-qsort-infinite-loop.patch
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  7 Feb 2007 23:52:30 +0100
+
+klibc (1.4.31-1) unstable; urgency=low
+
+  * New minor upstream release (fstype endian fixes)
+    - drop merged 09-klibc-utils-add_swsusp_to_fstype.patch
+    - add out of current git 09-qsort-infinite-loop.patch
+  * Build against linux-headers-2.6.18-4.
+    Use one variable to set them in order to ease stable updates.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 26 Jan 2007 20:29:07 +0100
+
+klibc (1.4.30-3) unstable; urgency=high
+
+  * Disable klibc-utils-floppy-udeb build on ia64 by explicitly listing
+    all other architectures. ia64 does not build shared binaries.
+    urgency high as fixes RC bugs in etch.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 13 Dec 2006 10:04:40 +0100
+
+klibc (1.4.30-2) unstable; urgency=low
+
+  * Build against linux-headers-2.6.18-3. (closes: 398334)
+  * Add klibc-utils-add_swsusp_to_fstype.patch (closes: 398302)
+    thanks David Härdeman <david@2gen.com>.
+  * Add klibc-utils-floppy-udeb on request by the d-i folks.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 29 Nov 2006 11:39:52 +0100
+
+klibc (1.4.30-1) unstable; urgency=low
+
+  * New upstream release (ia64, vsscanf, signal, creat)
+  * Fix watch file, remove stray newline in changelog. Thanks Christoph Berg
+    <myon@nm.debian.org> for review.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri,  3 Nov 2006 08:53:02 +0100
+
+klibc (1.4.29-1) unstable; urgency=low
+
+  * New upstream release (closes: 362442)
+    - fstype iso9660 detection thanks David Härdeman <david@2gen.com>
+    - rediff 02-squashfs.diff
+  * Build against linux-headers-2.6.18-1. (closes: 392855)
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 14 Oct 2006 13:31:24 +0200
+
+klibc (1.4.27-1) unstable; urgency=low
+
+  * New upstream release (mips, sh, malloc, free, fnmatch, getopt_long)
+    - Corrects mips statfs (closes: 347827)
+    - Drop merged 08_nuke_no_error_return.patch
+    - Drop merged 05_ipconfig_d-i.patch (closes: 374982)
+    - Add build fix 08-revert_nostdinc_iwithprefix_include.patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 25 Aug 2006 08:12:10 +0200
+
+klibc (1.4.19-2) unstable; urgency=high
+
+  * Add 08_nuke_no_error_return.patch -
+    urgency high to get into testing before udev.
+  * debian/control, debian/rules: Use newer linux-headers-2.6.17-2.
+    Thanks Michael Banck for noticing.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 19 Aug 2006 10:45:18 +0200
+
+klibc (1.4.19-1) unstable; urgency=low
+
+  * New upstream release (kbuild, readlink, shm_open() + shm_unlink())
+    - Drop merged 06_ppc_kbuild.patch,
+      keep 07_kinit_no_vfork.patch until vfork() is sorted on parisc.
+    - Build against linux-headers-2.6.17-1.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  8 Aug 2006 09:17:32 +0200
+
+klibc (1.4.11-3) unstable; urgency=low
+
+  * Add 06_ppc_kbuild.patch, 07_kinit_no_vfork.patch. closes: 378953
+
+ -- maximilian attems <maks@sternwelten.at>  Sun, 23 Jul 2006 22:10:17 +0200
+
+klibc (1.4.11-2) unstable; urgency=low
+
+  * Add the changelog of the 1.4.8-1.1. Ack NMU. (closes: #378426)
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 19 Jul 2006 10:26:41 +0200
+
+klibc (1.4.11-1) experimental; urgency=low
+
+  * New upstream release (kbuild, arm, s390, mknod, kill, resume)
+    - reworked 01-ia64-static.diff touches more dirs and reapplies
+    - 02-squashfs.diff reapplies
+    - Thanks Martin Michlmayr <tbm@cyrius.com> for arm segfault fix.
+      (closes: #378426)
+
+ -- maximilian attems <maks@sternwelten.at>  Mon, 17 Jul 2006 00:40:56 +0200
+
+klibc (1.4.8-1.1) unstable; urgency=high
+
+  * NMU with the permission of the maintainer.
+  * Fix segfault on ARM when compiling without EABI. (closes: #378426)
+
+ -- Martin Michlmayr <tbm@cyrius.com>  Mon, 17 Jul 2006 16:31:15 +0200
+
+klibc (1.4.8-1) unstable; urgency=low
+
+  * New upstream release (arch fixes)
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  3 Jul 2006 20:24:33 +0200
+
+klibc (1.4.6-1) unstable; urgency=low
+
+  * New upstream release (s390, i386)
+    - Drop merged 00-reboot-poweroff-install.patch and 03-mknod.patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat,  1 Jul 2006 16:28:16 +0200
+
+klibc (1.4.2-3) unstable; urgency=low
+
+  * Add 05_ipconfig_d-i.patch to allow d-i dhcp file preseeding.
+    Thanks Geert Stappers <stappers@debian.org>. (closes: #374982)
+
+ -- maximilian attems <maks@sternwelten.at>  Thu, 22 Jun 2006 21:38:34 +0200
+
+klibc (1.4.2-2) unstable; urgency=low
+
+  * klibc-utils: Pick up the new puppys reboot/poweroff - added
+    00-reboot-poweroff-install.patch.
+
+  * Tweaked 01-ia64-static.diff
+
+ -- maximilian attems <maks@sternwelten.at>  Thu, 22 Jun 2006 08:44:42 +0200
+
+klibc (1.4.2-1) unstable; urgency=low
+
+  * New upstream release (arm, halt/reboot/poweroff)
+
+  * Add from git upstream 03-mknod.patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu, 22 Jun 2006 00:53:03 +0200
+
+klibc (1.3.38-1) unstable; urgency=low
+
+  * New upstream release (syscalls, sparc32)
+    - Drop 04-libgcc-dep.diff thanks to upstream fixes.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 14 Jun 2006 19:10:22 +0200
+
+klibc (1.3.35-1) unstable; urgency=low
+
+  * New upstream release (No c++)
+
+  * debian/control,debian/rules: Pump build-dep on newer linux-headers.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  8 Jun 2006 23:32:52 +0200
+
+klibc (1.3.34-1) unstable; urgency=low
+
+  * New upstream release (kinit, s390, dash)
+    - Rework 01-ia64-static.diff
+    upload to unstable to fix sparc32
+  * Drop debian/config, no need for gzip atm.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  8 Jun 2006 12:12:43 +0200
+
+klibc (1.3.27-2) experimental; urgency=low
+
+  * debian/rules: Don't override DEB_ARCH on sparc. Thanks to Jurij Smakov
+    <jurij@debian.org> for testing sparc32 and sparc64 32-bit build and boot.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  6 Jun 2006 11:28:34 +0200
+
+klibc (1.3.27-1) experimental; urgency=low
+
+  * New upstream release
+    (kernel CodingStyle, kinit, arm+alpha+m68k+sparc32+sparc64 fixes)
+    - Drop hopefully fixed 05-sparc64_statfs.patch.
+    - Drop merged 06-s390-syscall-declare-err.patch.
+    - Rework 02-squashfs.diff.
+    - Remove zlib1g-dev Build-Dep, include dir for zlib.h got fixed.
+    - dd: handle trunc/notrunc correctly (closes: #367387)
+    Upload to experimental to give aboves porters chance to check changes.
+
+  * debian/rules: Use mrproper on clean run to get rid of generated .config.
+
+  * debian/config: Build with CONFIG_KLIB_ZIP, gzip does zip not only unzip.
+    (closes: #355809)
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  6 Jun 2006 00:34:13 +0200
+
+klibc (1.3.19-5) experimental; urgency=low
+
+  Thanks to Jeff Bailey <jbailey@raspberryginger.com> for eagle eyes:
+
+  * debian/rules: On clean use proper make clean target.
+
+  * debian/control: Fix dep for klibc-utils-udeb.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  9 May 2006 21:11:48 +0200
+
+klibc (1.3.19-4) experimental; urgency=low
+
+  * Mentors eats udeb, retry upload.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  8 May 2006 21:12:03 +0200
+
+klibc (1.3.19-3) experimental; urgency=low
+
+  * Add klibc-utils and libklibc udeb targets on request of the nice d-i folks.
+
+  * Pump standard version to 3.7.2 without changes.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  8 May 2006 19:27:15 +0200
+
+klibc (1.3.19-2) unstable; urgency=medium
+
+  * Add 06-s390-syscall-declare-err.patch (closes: 366385)
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  8 May 2006 11:21:05 +0200
+
+klibc (1.3.19-1) unstable; urgency=medium
+
+  * New upstream release (m68k build fixes, dash cleanup)
+    - Drop 06-clz-builtins-return.patch
+
+  * Set urgency to medium to get newer klibc into testing.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  8 May 2006 09:29:52 +0200
+
+klibc (1.3.16-2) unstable; urgency=low
+
+  * Add new missing build-dep zlib1g-dev.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri,  5 May 2006 15:15:03 +0200
+
+klibc (1.3.16-1) unstable; urgency=low
+
+  * New upstream release (m68k + mips work, tree reorganisation, zlib copy)
+    - Drop merged 06-fix-arch-without-ppoll.patch
+    - Rework 01-ia64-static.diff, 05-sparc64_statfs.patch
+    - Add git patch 06-clz-builtins-return.patch
+
+  * Pump standard version to 3.7.1.0 without changes.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri,  5 May 2006 00:20:45 +0200
+
+klibc (1.3.11-2) unstable; urgency=medium
+
+  * Add gone missing bit 06-fix-arch-without-ppoll.patch.
+
+  * Urgency medium to get that latest with all fixes into Testing.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  1 May 2006 02:17:32 +0200
+
+klibc (1.3.11-1) unstable; urgency=low
+
+  * New upstream release (m68k port, kinit)
+    - Drop no longer needed m68k-syscall.patch
+    - Drop merged ia64-syscall.patch
+
+  * Rename 05-sparc64_statfs.patch for consistent patch numbering.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 29 Apr 2006 20:16:48 +0200
+
+klibc (1.3.7-2) unstable; urgency=low
+
+  * Add ia64-syscall.patch, thanks to Jeff Bailey
+    <jbailey@raspberryginger.com>
+  * Readd sparc64_statfs.patch, not fixed by proposed sparc_v9 upstream fix.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 22 Apr 2006 18:41:52 +0200
+
+klibc (1.3.7-1) unstable; urgency=low
+
+  * New upstream release (Kbuild, dash, ..):
+   - Drop merged fstype-lvm2-ext3.patch, alpha-syscall.patch.
+   - Drop upstream reworked 03-sparc-fix-paths.diff.
+   - Rework 02-squashfs.diff.
+   - Rework 01-ia64-static.diff to apply cleanly too.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 22 Apr 2006 13:39:57 +0200
+
+klibc (1.3.3-4) unstable; urgency=low
+
+  * Add alpha-syscall.patch, use the available rt syscalls. (closes: 361910)
+    Thanks Falk Hueffner <falk@debian.org> and Norbert Tretkowski
+    <norbert@tretkowski.de> for testing the fix.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue, 18 Apr 2006 23:08:08 +0200
+
+klibc (1.3.3-3) unstable; urgency=low
+
+  * Add fstype-lvm2-ext3.patch thanks David Härdeman <david@2gen.com>
+    for the fix. (closes: 362631)
+
+ -- maximilian attems <maks@sternwelten.at>  Mon, 17 Apr 2006 21:29:53 +0200
+
+klibc (1.3.3-1) unstable; urgency=low
+
+  * New upstream release (kinit, run-init)
+    - Drop merged s390-syscall.patch, statfs-sparc64-mips.patch
+      (the mips part didn't help, stat() needs more work there).
+    - Drop upstream nacked gcc-nohardcode.patch, sparc works fine with gcc-4.0.
+    - Drop arm-build-fix.patch, fixed by coreutils 5.93.
+      Thanks to Martin Michlmayr <tbm@cyrius.com> for fixing that issue.
+
+  * debian/rules: Fix ppc build with linux-headers-2.6.16-1 -
+    thanks a lot to Roger Leigh <rleigh@debian.org>.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  6 Apr 2006 17:59:34 +0200
+
+klibc (1.3.1-1) unstable; urgency=low
+
+  * New upstream release
+    (kinit, lvm2 fstype, minix detection fix, zlib 1.2.3, whitespace cleanup)
+    - Rework 02-squashfs.diff.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  4 Apr 2006 01:37:04 +0200
+
+klibc (1.2.6-1) unstable; urgency=low
+
+  * New upstream release
+
+  * Pump build-dep on linux-headers-2.6.16-1.
+
+  * Rework statfs-sparc64.patch into statfs-sparc64-mips.patch
+
+  * Rework 01-ia64-static.diff build dash, fstype, ipconfig and run-init
+    static too. (closes: #357414)
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 22 Mar 2006 09:54:38 +0100
+
+klibc (1.2.4-1) unstable; urgency=low
+
+  * New upstream release
+    drop merged patches: include-cleanup.patch, mips-pipe.patch.
+    drop unneeded klibc-sparc64-def-pagesize.patch.
+
+  * debian/watch: Add watch upstream.
+
+  * s390-syscall.patch: Fix wrapper to return positive errno values.
+    Thanks Bastian Blank <waldi@debian.org> (closes: #355548)
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  9 Mar 2006 01:05:25 +0100
+
+klibc (1.2.2-3) unstable; urgency=medium
+
+  * Upload with medium urgency to fix sparc ftbfs.
+
+  * Add include-cleanup.patch which removes useless <asm/page.h> includes.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 17 Feb 2006 22:02:28 +0100
+
+klibc (1.2.2-2) unstable; urgency=high
+
+  * Upload with high urgency as this fixes sparc boots.
+    (Closes: #347902)
+
+  * Add sparc64_statfs.patch thanks to Sjoerd Simons <sjoerd@spring.luon.net>.
+
+  * Add git upstream mips-pipe.patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu, 16 Feb 2006 18:40:37 +0100
+
+klibc (1.2.2-1) unstable; urgency=low
+
+  * New upstream release (kinit work, LUKS and swap detection)
+    - reworked 02-squashfs.diff
+
+  * Merge 1.1.16-1ubuntu3 (thanks Jeff Bailey <jbailey@ubuntu.com>):
+    - Do not override the compiler for sparc anymore.
+    - Link in libc.a after libgcc.a as well to resolve symbols:
+      04-libgcc-dep.diff.
+    - /usr/lib/klibc/include contained symlinks to the real include
+      directories before.  Remove the symlinks in the preinst to avoid
+      overwriting bits of linux-kernel-headers on upgrade.
+
+  * We no longer need to pass CC to the make invocation.
+
+  * Add m68k-syscall.patch thanks to Kyle McMartin <kyle@parisc-linux.org>.
+    Still needs setjmp/longjmp, crt0, and sysstub.ph to be usefull.
+
+  * Change arch list to any to encourage m68k porting.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue, 14 Feb 2006 09:54:36 +0100
+
+klibc (1.2.1-3) unstable; urgency=high
+
+  * Add gcc-nohardcode.patch to really build sparc with gcc-3.3.
+    Thanks to Jurij Smakov <jurij@wooyd.org> for spotting the trouble.
+    (Closes: #347902, #349857)
+
+  * Set urgency high to get all the previous arch fixes into testing.
+
+  * Ack old accidental NMU. (Closes: #336620)
+
+ -- maximilian attems <maks@sternwelten.at>  Tue, 31 Jan 2006 10:20:02 +0100
+
+klibc (1.2.1-2) unstable; urgency=low
+
+  * Add armeb to the arch list.
+
+  * Add temporary buildfix for arm: arm-build-fix.patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue, 31 Jan 2006 01:39:24 +0100
+
+klibc (1.2.1-1) unstable; urgency=low
+
+  * New upstream release (kinit work)
+    Drop merged patches: klibc-hppa-fix-atexit.patch,
+    klibc-hppa-set-sharedflags.patch, klibc-mipsel-build.patch,
+    klibc-mips-newline-warning.patch, klibc-mips-path-linker.patch,
+
+  * Add ubuntu patch 03-sparc-fix-paths.diff.
+
+  * Add ARCH overrides for armeb and mipsel,
+    thanks Martin Michlmayr <tbm@cyrius.com>. (closes: #350592)
+
+ -- maximilian attems <maks@sternwelten.at>  Tue, 31 Jan 2006 00:16:36 +0100
+
+klibc (1.1.16-3) unstable; urgency=low
+
+  * Add mipsel build fix, thanks Martin Michlmayr <tbm@cyrius.com>.
+
+  * Add mips and mipsel to the build archs - shared libraries may still segv.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 21 Jan 2006 10:10:16 +0100
+
+klibc (1.1.16-2) unstable; urgency=low
+
+  * Fixed powerpc build, working around the ARCH=ppc/ARCH=powerpc mess on
+    32bit powerpc. Closes: #347551.
+  * Add myself to uploaders.
+
+ -- Sven Luther <luther@debian.org>  Fri, 20 Jan 2006 15:33:41 +0000
+
+klibc (1.1.16-1) unstable; urgency=low
+
+  * New upstream version.
+    Drop merged patches: alpha-kbuild.patch, parisc-arch.patch.
+
+  * Add new upstream patches for better hppa and mips support:
+    klibc-hppa-fix-atexit.patch, klibc-hppa-set-sharedflags.patch.
+    Thanks Kyle McMartin <kyle@parisc-linux.org>
+    klibc-mips-newline-warning.patch, klibc-mips-path-linker.patch.
+    Thanks Martin Michlmayr <tbm@cyrius.com>
+
+  * Pass ARCH we are building on to the make call,
+    fixes build on ppc64 kernel.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon,  9 Jan 2006 18:06:04 +0100
+
+klibc (1.1.15-4) unstable; urgency=low
+
+  "Soiree Tranquille Release"
+
+  * Really add 01-ia64-static.diff, 02-squashfs.diff.
+    Thanks again Jeff Bailey for spotting.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  5 Jan 2006 23:58:55 +0100
+
+klibc (1.1.15-3) unstable; urgency=low
+
+  * Add alpha-kbuild.patch fixes alpha kbuild rules.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  5 Jan 2006 22:20:31 +0100
+
+klibc (1.1.15-2) unstable; urgency=low
+
+  * Revert sparc personality switch as buildds inbetween invoke with linux64.
+    Thanks Jeff Bailey for spotting.
+
+  * Add klibc-sparc64-def-pagesize.patch, should define the chosen PAGE_SIZE.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  5 Jan 2006 20:07:12 +0100
+
+klibc (1.1.15-1) unstable; urgency=low
+
+  * New upstream version.
+    Drop merged patches: klibc-1.1.14-fstype-segv-1.patch,
+    klibc-endian.h-dangerous.patch
+
+  * Build against latest linux-headers-2.6.15-1.
+
+  * Try fixing sparc by building with linux26 personality.
+
+  * Add the following ubuntu patches:
+    - 01-ia64-static.diff (static klibc works on ia64).
+    - 02-squashfs.diff adds sqashfs support to fstype.
+
+ -- maximilian attems <maks@sternwelten.at>  Thu,  5 Jan 2006 17:22:03 +0100
+
+klibc (1.1.14-2) unstable; urgency=low
+
+  * Fix new hppa kbuild issue, add parisc-arch.patch.
+    Thanks Kyle McMartin <kyle@parisc-linux.org>.
+
+  * Add klibc-1.1.14-fstype-segv-1.patch allowing previous interface to work.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  4 Jan 2006 00:03:47 +0100
+
+klibc (1.1.14-1) unstable; urgency=low
+
+  * New upstream release (merged all of our patches).
+    Features: dash, kbuild and shiny new packaging by Jeff Bailey!
+
+  * Add klibc-endian.h-dangerous.patch upstream build fix.
+
+  * Don't forget about our linitian overrides.
+    Added unstripped-binary-or-object libklibc-dev override.
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 31 Dec 2005 00:24:42 +0100
+
+klibc (1.1.8-0ubuntu1) dapper; urgency=low
+
+  * New upstream release.
+    - Obseletes all preview patches.
+
+  * Redo packaging.
+    - Upstream changed packaging.  Redo all packaging to match.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Wed, 21 Dec 2005 01:05:04 +0000
+
+klibc (1.1.1-10) unstable; urgency=low
+
+  * Correct the powerpc to ppc mapping.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed, 28 Dec 2005 01:35:56 +0100
+
+klibc (1.1.1-9) unstable; urgency=low
+
+  * Redrop klibc-sparc64-signals.diff, the buildd now uses correct cflags.
+    Thanks to Jurij Smakov <jurij@wooyd.org>
+  * Map powerpc to ppc for 2.6.14 based builds, useless for later kernels.
+  * Pump dephelper dependency as pointed out by linda.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 23 Dec 2005 20:41:13 +0100
+
+klibc (1.1.1-8) unstable; urgency=low
+
+  * Add hppa to the mapped archs, sparc was already there. (Closes: #344482)
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 23 Dec 2005 15:17:22 +0100
+
+klibc (1.1.1-7) unstable; urgency=low
+
+  * Now that we handle the asm arch symlink by owerself, take care on the $arch
+    mapping.
+
+ -- maximilian attems <maks@sternwelten.at>  Fri, 23 Dec 2005 14:39:49 +0100
+
+klibc (1.1.1-6) unstable; urgency=low
+
+  [ Steve Langasek ]
+  * Fix the definition of struct statfs64, required for run-init to work on
+    alpha.
+    (Closes: #342931)
+
+ -- maximilian attems <maks@sternwelten.at>  Mon, 19 Dec 2005 10:22:38 +0100
+
+klibc (1.1.1-5) unstable; urgency=low
+
+  [ Steve Langasek ]
+  * Grab the errno from the right register after syscalls on alpha!
+
+  [ maximilian attems ]
+  * Add s390 to the current arch list.
+
+  * Bump Build-Deps on newer linux-headers.
+
+  * Sync with 1.1.1-4ubuntu7.
+    - Use the newer klibc-parisc.diff version, which got upstream.
+      Thanks a lot Kyle McMartin <kyle@parisc-linux.org>.
+    - Add lintian overrides for libklibc-dev.
+
+  * Add kosmetic klibc-parisc-clean-crash.diff for newer toolchain.
+    Again thanks to Kyle McMartin <kyle@parisc-linux.org>.
+
+  * linux-kernel-headers is lacking the asm symlink from include/asm-$arch.
+    Add it by ourself when builing against it.  ATTENTION: breaks klibc
+    crosscompiles. Will be solved by stabilized upstream kbuild tree.
+
+ -- maximilian attems <maks@sternwelten.at>  Mon, 19 Dec 2005 09:37:36 +0100
+
+klibc (1.1.1-4ubuntu7) dapper; urgency=low
+
+  * Patch to get 5 and 6 argument syscalls working on hppa.
+    Thanks to Kyle McMartin for this patch!
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Tue, 22 Nov 2005 13:27:15 -0500
+
+klibc (1.1.1-4ubuntu6) dapper; urgency=low
+
+  * Replace the sleep utility with one that calls nanosleep instead, so
+    can be used for sleeping microseconds.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue, 22 Nov 2005 07:38:22 +0000
+
+klibc (1.1.1-4ubuntu5) dapper; urgency=low
+
+  * Include /usr/lib/klibc/lib/libc.so in the development package, as you
+    can't link against the uber-stripped klibc-*.so.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 10 Nov 2005 16:44:58 -0500
+
+klibc (1.1.1-4ubuntu4) dapper; urgency=low
+
+  * Include /usr/lib/klibc/lib/interp.o in the development package.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Thu, 10 Nov 2005 15:33:59 -0500
+
+klibc (1.1.1-4ubuntu3) dapper; urgency=low
+
+  * Somewhere, in a hotel room in Montreal, one can hear the sounds of
+    a big Italian man crying as he places a brown paper bag over his
+    head and admits that sparc really did need gcc-3.3 after all.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Wed,  9 Nov 2005 17:29:33 -0500
+
+klibc (1.1.1-4ubuntu2) dapper; urgency=low
+
+  * Fix build-failure on sparc, Debian hadn't fully applied the
+    "use gcc-3.3 for sparc" patch.
+  * Use gcc-3.4 on sparc instead.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Tue,  8 Nov 2005 16:01:17 -0500
+
+klibc (1.1.1-4ubuntu1) dapper; urgency=low
+
+  * Manual merge with Debian:
+    - Drop klibc-mount-opts.diff, merged upstream.
+    - Drop mconfig-parisc.patch, merged upstream.
+    - Keep klibc-sparc64-signals.diff, not yet merged and fabbione
+      isn't sure whether it's still necessary or not.
+    - Adjust build-dep on linux-headers to that in dapper
+
+ -- Scott James Remnant <scott@ubuntu.com>  Mon,  7 Nov 2005 12:47:13 -0500
+
+klibc (1.1.1-4) unstable; urgency=low
+
+  * debian/rules,debian/control: Use gcc-3.3 for sparc.
+
+  * Drop klibc-sparc64-signals.diff.
+    Thanks to Andrew Pollock <apollock@debian.org> for the test box,
+    to Jurij Smakov <jurij@wooyd.org> and Fabio M. Di Nitto
+    <fabbione@ubuntu.com> for confirming.  (closes: #330191)
+
+  * Build on archs we do support: sparc, alpha, ppc, i386, amd64, hppa, ia64,
+    arm. Will need work for m68k, mips, mipsel.
+    Workaround for #334917
+
+  * debian/patches/fstype-jfs.patch: New file to support jfs. :)
+    Thanks to Jeff Bailey. (closes: #336620)
+
+  * debian/patches/sparc64_archstat.patch: New file to fix stat() on sparc64.
+    Thanks to Jurij Smakov <jurij@wooyd.org> for the patch.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  2 Nov 2005 09:46:00 +0100
+
+klibc (1.1.1-2) unstable; urgency=low
+
+  * Work around bug#328850 in lintian per request of the FTP Master:
+    Add lintian override for "statically-linked-binary".
+
+ -- maximilian attems <maks@sternwelten.at>  Sat, 17 Sep 2005 19:52:49 +0200
+
+klibc (1.1.1-1) unstable; urgency=low
+
+  The "Actions Publiques" release
+  * New upstream release:
+    - improved mount, umount: drop merged stamp-patch-klibc-mount-opts.diff.
+    - build warnings cleanup
+
+  * Ready to hit the debian archive. closes: #312563
+
+ -- maximilian attems <maks@sternwelten.at>  Mon, 12 Sep 2005 13:48:05 +0200
+
+klibc (1.0.14-5) unstable; urgency=low
+
+  * Remove old dup useless debian changelog.
+
+  * Fix amusing typos in debian/copyright.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  7 Sep 2005 09:13:50 +0200
+
+klibc (1.0.14-4) unstable; urgency=low
+
+  * Rebuild to include original source archive for the upload.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  7 Sep 2005 00:37:03 +0200
+
+klibc (1.0.14-3) unstable; urgency=low
+
+  * Build it as non-native package.
+
+  * Lintian prefers Changelog and Maintainer entries in the same
+    capitalisation - otherwise it detects an NMU.
+
+ -- maximilian attems <maks@sternwelten.at>  Wed,  7 Sep 2005 00:25:59 +0200
+
+klibc (1.0.14-2) unstable; urgency=low
+
+  * Release it for Debian.
+    Thanks to Jeff Bailey for all the hard work.
+
+  * Adapt ubuntu Build-Deps for Debian unstable.
+
+  * klibc happily complies to 3.6.3 standard version.
+
+  * Refer to the BSD and GPL license file in the debian/copyright file.
+
+ -- maximilian attems <maks@sternwelten.at>  Tue,  6 Sep 2005 13:14:31 +0200
+
+klibc (1.0.14-1ubuntu1) breezy; urgency=low
+
+  * Bump Build-Deps on newer linux-headers.
+
+  * Fix sparc64 signals special cases:
+    - Add patch klibc-sparc64-signals.diff.
+
+ -- Fabio M. Di Nitto <fabbione@ubuntu.com>  Wed, 17 Aug 2005 09:07:13 +0200
+
+klibc (1.0.14-1) breezy; urgency=low
+
+  The "OMG, A User!" Release.
+
+  * New upstream release.
+
+  * Fix mount option handling (Thanks to mdz@ubuntu.com for the patch)
+
+  * Prune unnecessary substitution variables from control file.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Wed,  1 Jun 2005 09:33:38 -0400
+
+klibc (1.0.10-0ubuntu1) breezy; urgency=low
+
+  * New upstream release.
+
+  * klibc-utils must depend on the library.
+  * Add section: libs for the source package.
+
+ -- Jeff Bailey <jbailey@buntu.com>  Tue, 24 May 2005 14:34:05 +0000
+
+klibc (1.0.8-0ubuntu2) breezy; urgency=low
+
+  * Bump linux-headers dep to 2.6.12, suggested by Fabio.
+
+  * Build-dep on bison and flex.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Sun, 15 May 2005 22:22:21 -0400
+
+klibc (1.0.8-0ubuntu1) breezy; urgency=low
+
+  * Initial upload to Ubuntu.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Mon,  9 May 2005 13:28:30 -0400
+
+klibc (0.197-2) breezy; urgency=low
+
+  * Make sure the shell is called 'sh' not 'sh.shared' when installed
+  * Don't strip execute permissions from the klibc
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Fri, 28 Jan 2005 17:27:07 -0500
+
+klibc (0.197-1) breezy; urgency=low
+
+  * Initial Release.
+
+ -- Jeff Bailey <jbailey@ubuntu.com>  Sun, 23 Jan 2005 21:11:50 -0500

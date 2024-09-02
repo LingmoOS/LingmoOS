@@ -1,0 +1,20 @@
+#!/bin/sh
+# Selects a hopefully unused port in a given range and outputs it.
+# Assumes that nothing else is racing to open a port in the same range.
+low=$1
+high=$2
+	
+used () {
+	netstat --inet -n | grep '^tcp' | awk '{print $4}' | \
+		cut -d : -f 2 | egrep -q "^$p$"
+}
+
+for p in $(seq $low $high); do
+	if ! used; then
+		echo $p
+		exit
+	fi
+done
+
+echo "Could not find free port between $low and $high"
+exit 1

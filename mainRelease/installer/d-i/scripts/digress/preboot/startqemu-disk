@@ -1,0 +1,22 @@
+#!/bin/sh
+# Runs qemu, booting from disk.
+set -e
+
+if [ -z "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
+if [ -z "$QEMU_DISK" ]; then
+	QEMU_DISK=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
+fi
+
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec $QEMU_COMMAND \
+	--cdrom "$ISO" \
+	-hda $QEMU_DISK \
+	-nographic \
+	-net nic -net user,hostname=$MACHINE \
+	-boot c -no-reboot \
+	$QEMU_EXTRA_PARAMS \
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server

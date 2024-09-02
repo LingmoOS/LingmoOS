@@ -1,0 +1,13 @@
+#!/usr/bin/expect
+# Add support to pxelinux boot-loader in serial consoles
+spawn -noecho $env(CONSOLECOMMAND)
+sleep 2
+
+set timeout 60
+expect "boot:"
+send "$env(BOOTCOMMAND)\r"
+
+set timeout 60
+expect "Ready."
+exit
+

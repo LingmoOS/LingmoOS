@@ -1,0 +1,263 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/initramfs-tools/hook-functions
+
+[ "${QUIET}" ] || echo -n "live-boot:"
+
+# Reading configuration file from filesystem and live-media
+for _FILE in /etc/live/boot.conf /etc/live/boot/* \
+	     /run/live/medium/live/boot.conf /run/live/medium/live/boot/*
+do
+	if [ -e "${_FILE}" ]
+	then
+		. "${_FILE}"
+	fi
+done
+
+# Checking live-boot
+if [ ! -e /bin/live-boot ]
+then
+	echo
+	echo "W: live-boot-initramfs-tools (backend) installed without live-boot,"
+	echo "W: this initramfs will *NOT* have live support."
+	exit 0
+fi
+
+[ "${QUIET}" ] || echo -n " core"
+
+mkdir -p "${DESTDIR}/bin"
+cp -a /bin/live-boot "${DESTDIR}/bin"
+
+mkdir -p "${DESTDIR}/lib/live"
+cp -a /lib/live/boot "${DESTDIR}/lib/live"
+
+mkdir -p "${DESTDIR}/etc/live"
+if [ -e /etc/live/boot.conf ]
+then
+	cp -a /etc/live/boot.conf "${DESTDIR}/etc/live"
+fi
+if [ -e /etc/live/boot ]
+then
+	cp -a /etc/live/boot "${DESTDIR}/etc/live"
+fi
+
+# klibc dependencies
+for FILE in /lib/libacl* /lib/libblkid* /lib/libuuid* /lib/libdevmapper* /lib/libattr*
+do
+	if [ ! -e "${DESTDIR}/${FILE}" ] && ls "${FILE}" > /dev/null 2>&1
+	then
+		cp -a "${FILE}" "${DESTDIR}/${FILE}"
+	fi
+done
+
+# udev dependencies
+if [ "${MINIMAL:-}" != "true" ] &&  [ "${MINIMAL:-}" != "yes" ]
+then
+	for FILE in /lib/udev/*_id
+	do
+		copy_exec "${FILE}"
+	done
+fi
+
+if [ -e /lib/udev/rules.d/60-cdrom_id.rules ] && [ "${DISABLE_CDROM:-}" != "true" ] && \
+	[ "${DISABLE_CDROM:-}" != "yes" ]
+then
+	mkdir -p "${DESTDIR}/lib/udev/rules.d"
+	cp -p /lib/udev/rules.d/60-cdrom_id.rules "${DESTDIR}/lib/udev/rules.d"
+fi
+
+[ "${QUIET}" ] || echo -n " filesystems"
+
+# Configuration: keymap (usefull when using encryption)
+if [ -x /bin/loadkeys ] && [ -r /etc/console/boottime.kmap.gz ]
+then
+	copy_exec /bin/loadkeys
+
+	mkdir -p "${DESTDIR}/etc"
+	cp /etc/console/boottime.kmap.gz "${DESTDIR}/etc"
+fi
+
+# Configuration: Unique ID
+if [ -n "${LIVE_GENERATE_UUID}" ]
+then
+	mkdir -p "${DESTDIR}/conf"
+	uuidgen -r > "${DESTDIR}/conf/uuid.conf"
+fi
+
+# Filesystem: btrfs
+manual_add_modules btrfs
+
+# Filesystem: cifs
+if [ -x /sbin/mount.cifs ]
+then
+	copy_exec /sbin/mount.cifs
+        manual_add_modules cifs
+fi
+
+# Filesystem: ext3/ext4
+manual_add_modules ext3
+manual_add_modules ext4
+
+# Filesystem: hfs/hfsplus
+manual_add_modules hfs
+manual_add_modules hfsplus
+
+# Filesystem: jffs2
+manual_add_modules jffs2
+
+if [ -x /usr/bin/rsync ] && [ "${MINIMAL:-}" != "true" ] && [ "${MINIMAL:-}" != "yes" ]
+then
+	copy_exec /usr/bin/rsync /bin
+fi
+
+# Filesystem: squashfs
+copy_exec /sbin/losetup
+manual_add_modules loop
+manual_add_modules squashfs
+manual_add_modules sqlzma
+manual_add_modules unlzma
+
+# Filesystem: aufs/overlay
+manual_add_modules aufs
+manual_add_modules overlay
+
+# Filesystem: vfat
+if [ "${DISABLE_FAT:-}" != "true" ] &&  [ "${DISABLE_FAT:-}" != "yes" ]
+then
+	manual_add_modules nls_cp437
+	manual_add_modules nls_iso8859-1
+	manual_add_modules nls_utf8
+	manual_add_modules nls_ascii
+	manual_add_modules vfat
+fi
+
+# Filesystem: ntfs
+if [ "${DISABLE_NTFS:-}" != "true" ] && [ "${DISABLE_NTFS:-}" != "yes" ]
+then
+	manual_add_modules ntfs
+fi
+
+# dm-verity support
+if [ "${DISABLE_DM_VERITY:-}" != "true" ] && [ "${DISABLE_DM_VERITY:-}" != "yes" ]
+then
+	[ "${QUIET}" ] || echo -n " dm-verity"
+	manual_add_modules dm-verity
+	# The BusyBox mount does not support dm-verity so we use the util-linux version.
+	copy_exec /bin/mount /bin
+fi
+
+[ "${QUIET}" ] || echo -n " devices"
+# Hardware: cdrom
+if [ "${DISABLE_CDROM:-}" != "true" ] && [ "${DISABLE_CDROM:-}" != "yes" ]
+then
+	manual_add_modules ide-cd
+	manual_add_modules ide-generic
+	manual_add_modules ohci1394
+	manual_add_modules sbp2
+	manual_add_modules sr_mod
+fi
+
+# Hardware: usb
+if [ "${DISABLE_USB:-}" != "true" ] && [ "${DISABLE_USB:-}" != "yes" ]
+then
+	manual_add_modules sd_mod
+fi
+
+# Hardware: network
+auto_add_modules net
+
+# Program: eject
+if [ -x /usr/bin/eject ]
+then
+	copy_exec /usr/bin/eject /bin
+fi
+
+[ "${QUIET}" ] || echo -n " utils"
+
+# Feature: Verify Checksums
+if [ -e /etc/progress-linux_version ]
+then
+	copy_exec /usr/bin/sha256sum /bin
+else
+	copy_exec /usr/bin/md5sum /bin
+fi
+
+# Program: memdisk
+if [ -x /usr/bin/memdiskfind ]
+then
+[ "${QUIET}" ] || echo -n " memdisk"
+	copy_exec /usr/bin/memdiskfind
+	manual_add_modules phram
+	manual_add_modules mtdblock
+fi
+
+# Program: udev
+if [ -x /bin/udevadm ]
+then
+	[ "${QUIET}" ] || echo -n " udev"
+	copy_exec /bin/udevadm
+fi
+
+# Program: blockdev
+if [ -x /sbin/blockdev ]
+then
+	[ "${QUIET}" ] || echo -n " blockdev"
+	copy_exec /sbin/blockdev
+fi
+
+# FUSE kernel module
+if [ "${DISABLE_FUSE:-n}" != "true" ] && [ "${DISABLE_FUSE:-n}" != "yes" ]
+then
+	manual_add_modules fuse
+
+	# FUSE filesystem: httpfs2
+	if [ -x /usr/bin/httpfs2_ssl ]
+	then
+		[ "${QUIET}" ] || echo -n " httpfs:ssl"
+		copy_exec /usr/bin/httpfs2_ssl /bin/httpfs
+	elif [ -x /usr/bin/httpfs2 ]
+	then
+		[ "${QUIET}" ] || echo -n " httpfs"
+		copy_exec /usr/bin/httpfs2 /bin/httpfs
+	fi
+
+	# FUSE filesystem: curlftpfs
+	if [ -x /usr/bin/curlftpfs ]
+	then
+		[ "${QUIET}" ] || echo -n " ftpfs"
+		copy_exec /usr/bin/curlftpfs /bin
+	fi
+fi
+
+# iSCSI
+if [ -x /usr/sbin/iscsistart ]
+then
+	[ "${QUIET}" ] || echo -n " iscsi"
+	copy_exec /usr/sbin/iscsistart /bin
+	#manual_add_modules ib_iser
+	manual_add_modules iscsi_tcp
+	manual_add_modules crc32c
+fi
+
+# Some experimental stuff
+
+[ "${QUIET}" ] || echo -n " dns"
+
+# libnss_dns.so.*:    DNS
+# libnss_files.so.*:  /etc/hosts and /etc/passwd
+# libnss_compat.so.*: /etc/passwd
+
+for _SHLIB in $(find /lib /usr/lib -name 'libnss_dns.so.*' -o -name 'libnss_files.so.*')
+do
+	copy_exec "${_SHLIB}"
+done
+
+if [ ! -e "${DESTDIR}/etc/nsswitch.conf" ]
+then
+	# Needed to make "hostname -f" honor the domainname provided by DHCP
+	echo "hosts: files dns" > "${DESTDIR}/etc/nsswitch.conf"
+fi
+
+[ "${QUIET}" ] || echo .

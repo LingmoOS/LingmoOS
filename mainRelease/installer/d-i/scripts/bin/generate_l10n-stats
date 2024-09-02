@@ -1,0 +1,19 @@
+#!/bin/sh
+ROOT=$HOME/l10n
+umask 002
+cd $ROOT/config
+git pull
+cd ..
+for i in `seq 1 3` ; do
+  $ROOT/gen-stats $i $ROOT/config/gen-stats.conf fetch
+done
+$ROOT/update-html $ROOT/config/update-html-vcs.conf
+$ROOT/update-html $ROOT/config/update-html-unstable.conf
+$ROOT/update-html $ROOT/config/update-html-testing.conf
+#$ROOT/quick-overview $ROOT/config/gen-stats.conf
+#. $ROOT/config/gen-stats.conf
+cd $ROOT/results
+find level? -name \*.po >list
+find level? -name \*.pot >>list
+tar --gzip --create --files-from list --file all-po.tar.gz
+

@@ -1,0 +1,290 @@
+#!/bin/bash
+
+# Raise the maximum number of open files we're allowed, so we can do
+# lots of network access in parallel
+ulimit -n 4096
+
+DIR=/srv/cdbuilder.debian.org/dst/debian-live
+WORKSPACE_IMAGE=workspace.img
+RSYNC_PORT=10873
+SSH_PORT=10022
+SCRIPTS_SOURCE="$(dirname $(realpath ${BASH_SOURCE-$0}))/../available"
+
+. $SCRIPTS_SOURCE/common.sh
+
+ARCH=amd64
+TYPE=live
+RELEASE=bookworm
+NOSCRIPTS=0
+OUTPUT=""
+
+if [ "$DRYRUN"x != ""x ]; then
+    echo "Dry-run $0: ARCH $ARCH TYPE $TYPE RELEASE $RELEASE"
+    exit 0
+fi
+
+mkdir -p ~/live-logs
+
+usage() {
+    echo "$0"
+    echo
+    echo "Usage: $0 <-a ARCH> <-t TYPE> <-r RELEASE> [-n] [-o OUTPUT]" 1>&2
+    echo
+    echo "Run a VM for building stuff".
+    echo
+    echo "-a ARCH      Select architecture; amd64/arm64"
+    echo "             (default $ARCH)"
+    echo "-t TYPE      Select build type: live/openstack"
+    echo "             (default $TYPE)"
+    echo "-r RELEASE   Select Debian release to use: stretch/buster/bullseye/bookworm/trixie"
+    echo "             (default $RELEASE)"
+    echo
+    echo "Optional args:"
+    echo "-n           Don't run the normal startup scripts in the VM"
+    echo "-o OUTPUT    Write details of the VM started to the file OUTPUT"
+    exit 1
+}
+
+while getopts ":a:t:r:no:" o; do
+    case "${o}" in
+        a)
+            ARCH=${OPTARG}
+            ;;
+        t)
+            TYPE=${OPTARG}
+            ;;
+        r)
+            RELEASE=${OPTARG}
+            ;;
+        n)
+            NOSCRIPTS=0
+            ;;
+        o)
+            OUTPUT=$(realpath ${OPTARG})
+            ;;
+        *)
+	    usage
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+validate_arg ARCH "amd64:arm64"
+validate_arg TYPE "live:openstack"
+validate_arg RELEASE "stretch:buster:bullseye:bookworm:trixie"
+
+case $(hostname) in
+    casulana)
+	# We run with -j20, so need a *lot* of RAM here
+	MEM=192G
+	CPUS=40
+	VNC_BASE=4
+	;;
+    *)
+	echo "FAILED: Unknown host machine, abort"
+	exit 1
+	;;
+esac
+
+make_hd_arg()
+{
+        echo "-drive if=none,file=$1,id=$2,format=raw" \
+             "-device virtio-blk-device,drive=$2"
+}
+
+make_pflash_arg()
+{
+    echo -drive file=$1,if=pflash,format=raw
+}
+
+IP_BASE=2
+CORE_IMAGE="${RELEASE}-debian-${TYPE}-maker-${ARCH}.img"
+TUPLE="$ARCH-$TYPE-$RELEASE"
+LOGFILE=~/live-logs/$TUPLE.log
+
+case $TUPLE in
+
+    amd64-live-buster)
+	WORK="-drive file=$WORKSPACE_IMAGE,format=raw,if=virtio"
+	OFFSET=0;;
+    amd64-live-bullseye)
+	WORK="-drive file=$WORKSPACE_IMAGE,format=raw,if=virtio"
+	OFFSET=1;;
+    amd64-live-bookworm)
+	WORK="-drive file=$WORKSPACE_IMAGE,format=raw,if=virtio"
+	OFFSET=2;;
+    amd64-live-trixie)
+	WORK="-drive file=$WORKSPACE_IMAGE,format=raw,if=virtio"
+	OFFSET=3;;
+
+    amd64-openstack-buster)
+	# Override resource sizing for the openstack VMs
+	MEM=16G
+	CPUS=8
+	OFFSET=4;;
+
+    arm64-openstack-buster)
+	# Override resource sizing for the openstack VMs
+	MEM=16G
+	CPUS=8
+	OFFSET=5;;
+    *)
+	run_log "FAILED: Unrecognised tuple $TUPLE"
+	exit 1
+	;;
+esac
+
+# Set up state for the VM
+VM_IP=127.16.2.$(($IP_BASE + $OFFSET))
+VNC=":"$(($VNC_BASE + $OFFSET))
+SHARE=/home/debian-cd/publish/.live/mount/${TUPLE}
+P9="-virtfs local,path=$SHARE/,mount_tag=host0,security_model=none,id=host0"
+SERIAL="-serial telnet:${VM_IP}:4444,server,nowait"
+PIDFILE=/home/debian-cd/debian-$TUPLE.pid
+
+if [ ! -d $SHARE ]; then
+    mkdir -p $SHARE
+fi
+
+# Remove the flag file that we look for
+rm -rf $SHARE/*
+
+cd $DIR
+
+run_log "-----------"
+run_log "Starting VM"
+
+if [ $ARCH = amd64 ]; then
+    STARTUP_TIMEOUT=60
+    /usr/bin/kvm \
+        -name $TUPLE \
+	-cpu host \
+        -m $MEM \
+        -smp $CPUS \
+        -pidfile $PIDFILE \
+        -boot order=c \
+	-drive file=$CORE_IMAGE,format=raw,if=virtio \
+        -daemonize \
+        -netdev user,id=usernet,hostfwd=tcp:${VM_IP}:${SSH_PORT}-10.0.2.15:22,hostfwd=tcp:${VM_IP}:${RSYNC_PORT}-10.0.2.15:873 \
+        -device virtio-net-pci,netdev=usernet \
+	-k en-gb \
+	-vnc ${VNC} \
+	$SERIAL \
+	$P9 \
+	$WORK
+	ERR=$?
+#	-nographic \
+#        -curses \
+#	-cdrom /mnt/nfs-cdimage/release/6.0.5/amd64/iso-cd/debian-6.0.5-amd64-netinst.iso \
+else
+    PF0_ARGS=$(make_pflash_arg ${DIR}/arm64-${RELEASE}-pflash0.img)
+    PF1_ARGS=$(make_pflash_arg ${DIR}/arm64-${RELEASE}-pflash1.img)
+    HD0_ARGS=$(make_hd_arg $CORE_IMAGE hd0)
+    STARTUP_TIMEOUT=300
+    qemu-system-aarch64 \
+	-cpu cortex-a57 -M virt \
+	-smp $CPUS \
+	-name $TUPLE \
+	-m $MEM \
+        -daemonize \
+	${PF0_ARGS} ${PF1_ARGS} \
+        -pidfile $PIDFILE \
+	$HD0_ARGS \
+	-netdev user,id=usernet,hostfwd=tcp:${VM_IP}:${SSH_PORT}-10.0.2.15:22,hostfwd=tcp:${VM_IP}:${RSYNC_PORT}-10.0.2.15:873 \
+	-device virtio-net-device,netdev=usernet \
+	-k en-gb \
+	-vnc ${VNC} \
+	$SERIAL \
+	$P9 \
+	$WORK >&2
+	ERR=$?
+fi
+
+if [ $ERR -ne 0 ]; then
+    run_log "FAILED, error $ERR"
+    exit 1
+fi
+
+# qemu started ok \o/
+# Now, wait for the VM to start up and respond. Loop waiting for the
+# flag file to turn up
+sleep_loop $STARTUP_TIMEOUT "$TUPLE VM startup" $SHARE/running
+if [ ! -f $SHARE/running ]; then
+    run_log "FAILED to start up, waited $STARTUP_TIMEOUT seconds"
+    exit 1
+fi
+
+if [ "$RELEASE_BUILD"x = ""x ] ; then
+    CONF=${SCRIPTS_SOURCE}/CONF.sh
+else
+    CONF=$SCRIPTS_SOURCE/CONF.sh.${RELEASE_BUILD}
+fi
+
+IP=$(host -t a local-mirror.cdbuilder.debian.org | awk '{print $4}')
+SALSA_ADDR=$(host -4 salsa.debian.org | awk '/has address/ {print $4}')
+DI_ADDR=$(host -4 d-i.debian.org | awk '/has address/ {print $4; exit}')
+# We're ~ready. Run the startup scripts now
+if [ $NOSCRIPTS = 0 ]; then
+    CONFDIR=$(mktemp -d)
+    cp $CONF $CONFDIR/CONF.sh
+    echo "BUILDHOST=\"$IP\"" >> $CONFDIR/CONF.sh
+    echo "SALSA_ADDR=\"$SALSA_ADDR\"" >> $CONFDIR/CONF.sh
+    echo "DI_ADDR=\"$DI_ADDR\"" >> $CONFDIR/CONF.sh
+
+    # First, copy in the config/scripts/common bits that we'll want to
+    # use
+    SCRIPTS="$CONFDIR/CONF.sh \
+    	     $SCRIPTS_SOURCE/common.sh \
+	     $SCRIPTS_SOURCE/run-10clean \
+	     $SCRIPTS_SOURCE/run-20update \
+	     $SCRIPTS_SOURCE/run-25update-rs \
+	     $SCRIPTS_SOURCE/run-50halt \
+	     $SCRIPTS_SOURCE/dnsmasq.conf"
+    if [ $TYPE = live ]; then
+	SCRIPTS="$SCRIPTS \
+	     $SCRIPTS_SOURCE/live-customise.sh \
+	     $SCRIPTS_SOURCE/live-build-binary \
+	     $SCRIPTS_SOURCE/live-wrapper-binary"
+    else
+	SCRIPTS="$SCRIPTS \
+	     $SCRIPTS_SOURCE/openstack-wrapper-binary \
+	     $SCRIPTS_SOURCE/openstack-hook"
+    fi
+    if [ -f $SCRIPTS_SOURCE/splash-${CODENAME}.png ] ; then
+	SCRIPTS="$SCRIPTS $SCRIPTS_SOURCE/splash-${CODENAME}.png"
+    fi
+    scp -q -P $SSH_PORT $SCRIPTS root@$VM_IP:/w
+    if [ $? -ne 0 ]; then
+	run_log "FAILED to copy config and scripts into worker VM"
+	exit 1
+    fi
+
+    rm -rf $CONFDIR
+
+    # Now specifically run the clean and update scripts; these are run
+    # once per invocation of the VM
+    for script in run-10clean run-20update run-25update-rs; do
+	ssh root@$VM_IP -p $SSH_PORT /w/$script >> $LOGFILE 2>&1
+	if [ $? -ne 0 ]; then
+	    run_log "FAILED to execute startup script $script"
+	    exit 1
+	fi
+    done
+fi
+
+if [ "$OUTPUT"x != ""x ]; then
+    echo "OUTDIR=$SHARE" > $OUTPUT
+    echo "VM_IP=$VM_IP" >> $OUTPUT
+    echo "SSH_PORT=$SSH_PORT" >> $OUTPUT
+    echo "PIDFILE=$PIDFILE" >> $OUTPUT
+    echo "TUPLE=$TUPLE" >> $OUTPUT
+    echo "$0: Wrote details to $OUTPUT"
+else
+    echo "OUTDIR=$SHARE"
+    echo "VM_IP=$VM_IP"
+    echo "SSH_PORT=$SSH_PORT"
+    echo "PIDFILE=$PIDFILE"
+    echo "TUPLE=$TUPLE"
+fi
+exit 0

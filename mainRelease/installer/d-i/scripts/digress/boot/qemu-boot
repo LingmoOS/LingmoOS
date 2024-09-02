@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+# Boots qemu, assuming that it doesn't need any serial console commands to
+# start.
+use warnings;
+use strict;
+use Expect;
+use POSIX 'setsid';
+
+# Run in the background, because qemu won't begin accepting console input
+# until the connection is made to its serial port, by console-qemu.
+open STDIN, '/dev/null';
+defined(my $pid = fork) or die "Can'fork: $!";
+if ($pid) {
+	sleep 2;
+	exit;
+}
+setsid;
+
+my $exp = new Expect;
+#$exp->debug(2);
+$exp->raw_pty(1);
+$SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
+$exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
+
+open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
+print OUT "$$\n";
+close OUT;
+$SIG{USR1}=sub {
+	if (! exists $ENV{QEMU_SAVE_STATE} || $ENV{QEMU_SAVE_STATE} ne 0) {
+		print STDERR "saving qemu state on SIGUSR1\n";
+		$exp->send("savevm 1\n");
+		$exp->expect(60, "(qemu)");
+	}
+	$exp->send("quit\n");
+	$exp->expect(undef, "eof");
+	exit;
+};
+
+$exp->expect(undef, "eof");

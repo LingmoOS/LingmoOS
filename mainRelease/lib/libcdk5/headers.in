@@ -1,0 +1,184 @@
+#! /bin/sh
+# $Id: headers.in,v 1.2 2022/10/18 21:32:59 tom Exp $
+# vi:ts=4 sw=4
+# ---------------------------------------------------------------------------
+# Copyright 2001-2012,2022 Thomas E. Dickey
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, distribute
+# with modifications, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to the
+# following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+#
+# Except as contained in this notice, the name(s) of the above copyright
+# holders shall not be used in advertising or otherwise to promote the sale,
+# use or other dealings in this Software without prior written
+# authorization.
+# ---------------------------------------------------------------------------
+#
+# Adjust includes for header files that reside in a subdirectory of
+# /usr/include, etc.
+#
+# Options:
+#	-c CFG	specify an alternate name for config.h
+#	-d DIR	target directory
+#	-e FILE	extra editing commands, e.g., for manpage references
+#	-h FILE install the given file in subdirectory DIR rather than parent
+#	-i    	create/update the headers.sed script
+#	-p PKG	specify the package name
+#	-s DIR	source directory
+#	-t TYPE renaming for manpage-sections
+#	-x PRG	install-program (plus options, the whole value in quotes)
+#
+# Other parameters are assumed to be provided only for the install scenario.
+
+SCRIPT=headers.sed
+MYFILE=headers.tmp
+
+OPT_C=config.h
+OPT_D=
+OPT_E=
+OPT_H=
+OPT_I=n
+OPT_P=
+OPT_S=
+OPT_T=
+OPT_X=install
+
+while test $# != 0
+do
+	case $1 in
+	-c)	# CFG	specify an alternate name for config.h
+		shift
+		OPT_C="$1"
+		;;
+	-d)	# DIR	target directory
+		shift
+		OPT_D="$1"
+		;;
+	-e)	# FILE	extra sed-commands
+		shift
+		OPT_E="$OPT_E -f $1"
+		;;
+	-h)	# FILE	special-case of header in subdirectory
+		shift
+		OPT_H="$1"
+		;;
+	-i)	# create the headers.sed script
+		if test "$OPT_I" = n
+		then
+			rm -f $SCRIPT
+		fi
+		OPT_I=y
+
+		if test -n "$OPT_D"
+		then
+			if test -n "$OPT_S" && test -d "$OPT_S"
+			then
+				LEAF=`basename "$OPT_D"`
+				case $OPT_D in
+				/*/include/$LEAF)
+					END=`basename "$OPT_D"`
+					for i in "$OPT_S"/*.h
+					do
+						NAME=`basename "$i"`
+						if test -z "$OPT_H" || test "$OPT_H" != "$NAME"
+						then
+							echo "s%<$NAME>%<$END/$NAME>%g" >> $SCRIPT
+						fi
+					done
+					;;
+				*)
+					echo "" >> $SCRIPT
+					;;
+				esac
+				OPT_S=
+				if test -f $SCRIPT ; then
+					sort -u $SCRIPT >$MYFILE
+					rm -f $SCRIPT
+					mv $MYFILE $SCRIPT
+				fi
+			fi
+		fi
+
+		if test -n "$OPT_P"
+		then
+			for name in `
+			@EGREP@ "#define[ 	][ 	]*[A-Z]" "$OPT_C" \
+				| sed	-e 's/^#define[ 	][ 	]*//' \
+					-e 's/[ 	].*//' \
+				| @FGREP@ -v GCC_ \
+				| sort -u \
+				| @EGREP@ -v "^${OPT_P}_"`
+			do
+				echo "s%\\<$name\\>%${OPT_P}_$name%g" >>$SCRIPT
+			done
+			if test -f $SCRIPT ; then
+				sort -u $SCRIPT >$MYFILE
+				rm -f $SCRIPT
+				mv $MYFILE $SCRIPT
+			fi
+			OPT_P=
+		fi
+		;;
+	-p)	# PKG	specify the package name
+		shift
+		OPT_P="$1"
+		;;
+	-s)	# DIR	source directory
+		shift
+		OPT_S="$1"
+		;;
+	-t)	# rename suffix of target
+		shift
+		OPT_T="$1"
+		;;
+	-x)	# PRG	install-program (plus options, the whole value in quotes)
+		shift
+		OPT_X="$1"
+		;;
+	-*)
+		usage
+		;;
+	*)
+		FILE=$1
+
+		SHOW=`basename "$FILE"`
+		TMPSRC=${TMPDIR-/tmp}/${SHOW}$$
+
+		echo "	... $SHOW"
+		test -f "$OPT_S/$FILE" && FILE="$OPT_S/$FILE"
+
+		if test -f "$FILE"
+		then
+			rm -f "$TMPSRC"
+			sed -f "$SCRIPT" $OPT_E "$FILE" > "$TMPSRC"
+			NAME=`basename "$FILE"`
+			if test -n "$OPT_T" ; then
+				NAME=`echo "$NAME" | sed -e 's/\.[^.]*$//'`.$OPT_T
+			fi
+
+			# Just in case someone gzip'd manpages,
+			# remove the conflicting copy.
+			test -f "$OPT_D/$NAME.gz" && rm -f "$OPT_D/$NAME.gz"
+
+			eval "$OPT_X" "$TMPSRC" "$OPT_D/$NAME"
+			rm -f "$TMPSRC"
+		fi
+		;;
+	esac
+	shift
+done

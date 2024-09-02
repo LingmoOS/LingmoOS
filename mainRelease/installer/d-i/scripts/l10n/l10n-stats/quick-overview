@@ -1,0 +1,98 @@
+#!/bin/bash
+# Copyright (c) 2004-2006 Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2006 Christian Perrier <bubulle@debian.org>
+# Licensed under the GNU General Public License
+#
+# Generates overview files for D-I translation status
+#
+# NOT WORKING YET. This is currently seppy's script which I just commit in the SVN
+
+############################### Functions ##################################
+usage(){
+  echo Usage: $0 [config]
+  echo 
+  echo  "               config: optional config file"
+}
+########################### End of functions ##################################
+
+
+########################### Defaults ##########################################
+WD="."
+FETCH=""
+GETTEXT="/usr/bin"
+LEVEL=1
+########################### End of Defaults ###################################
+
+##########################  Command line parsing ##############################
+if [ "$1" ] ; then
+  CONFIG=$1
+fi
+
+if [ "$CONFIG" ] ; then
+  if [ -r "$CONFIG" ] ; then
+    . "$CONFIG"
+  else
+    echo $CONFIG does not exist or unreadable
+    exit 1
+  fi
+fi
+########################## End of command line parsing ###################
+
+LANG_LIST="$WD/config/languages.names"
+PROSPECT_FILE="$WD/material/packages.vcs1/debian-installer/packages/po/PROSPECTIVE"
+LANGUAGES="$WD/config/languages"
+
+date -u >$WD/results/quick-overview.txt
+echo "Complete list of languages and levels:" >>$WD/results/quick-overview.txt
+echo  >>$WD/results/quick-overview.txt
+
+CLEVEL[1]=0
+CLEVEL[2]=0
+CLEVEL[3]=0
+
+for LANG in `grep -v "^#" $LANGUAGES`; do
+    TOTAL=0
+    cat $LANG_LIST | grep $LANG":"  >>$WD/results/quick-overview.txt || echo $LANG:   >>$WD/results/quick-overview.txt
+    for LEVEL in `seq 3`; do
+    	CURR=`cat $WD/results/level$LEVEL/$LANG.txt | grep "Global statistics:" | sed "s/^.*u (//g" | sed "s/%).*$//g"`
+	echo -e "\t$LEVEL: $CURR%"  >>$WD/results/quick-overview.txt
+	TOTAL=`echo "scale=2;$TOTAL + $CURR" | bc`
+	CLEVEL[$LEVEL]=`echo "scale=2; ${CLEVEL[$LEVEL]} + $CURR" | bc`
+    done
+
+    TOTAL=`echo "scale=2;$TOTAL / 5"|bc`
+    echo -e "\t ->$TOTAL%<-"  >>$WD/results/quick-overview.txt
+
+    if [ -f level1/master/$LANG.po ]; then
+    	MASTER=`cat level1/$LANG.txt | grep "Master:"`
+    	MASTERT=`echo $MASTER | sed -e "s/Master: //g" | sed -e "s/t.*//g"`
+    	MASTERF=`echo $MASTER | sed -e "s/f.*//g"  | sed -e "s/.*t//g"`
+    	test -z $MASTERF && MASTERF=0
+    	MASTERU=`echo $MASTER | sed -e "s/.*f//g"  | sed -e "s/u//g";`
+    	test -z $MASTERU && MASTERU=0
+    	MASTERP=`echo "scale=4; (100 / ($MASTERT + $MASTERF + $MASTERU) ) * $MASTERT" | bc`
+    	echo -e "\t$MASTER ($MASTERP%)"  >>$WD/results/quick-overview.txt
+    fi
+    echo  >>$WD/results/quick-overview.txt
+done
+
+LC=`cat $LANGUAGES | grep -v "^#" | wc -l | sed "s/ //g"`
+if [ "$1" != "--prospective" ]; then
+	PROS=`cat $PROSPECT_FILE | grep -v "^#" | wc -l | sed "s/ //g"`
+	LC=`expr $LC - $PROS`
+fi
+
+
+CLEVEL[1]=`echo "scale=2;${CLEVEL[1]} / $LC" | bc`
+CLEVEL[2]=`echo "scale=2;${CLEVEL[2]} / $LC" | bc`
+CLEVEL[3]=`echo "scale=2;${CLEVEL[3]} / $LC" | bc`
+
+echo "$LC languages listed: (English not included)"  >>$WD/results/quick-overview.txt
+echo "  Level1: ${CLEVEL[1]}%"  >>$WD/results/quick-overview.txt
+echo "  Level2: ${CLEVEL[2]}%"  >>$WD/results/quick-overview.txt
+echo "  Level3: ${CLEVEL[3]}%"  >>$WD/results/quick-overview.txt
+TOTAL=`echo "scale=2;( ${CLEVEL[1]} + ${CLEVEL[2]} + ${CLEVEL[3]} ) / 3" | bc`
+echo "        ->$TOTAL%<-" >>$WD/results/quick-overview.txt
+
+
+

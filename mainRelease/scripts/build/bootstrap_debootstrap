@@ -1,0 +1,127 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Bootstrap a Debian system with debootstrap(8)"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if ! command -v debootstrap >/dev/null
+then
+	Echo_error "debootstrap - command not found"
+	exit 1
+fi
+
+# Check architecture
+Check_crossarchitectures
+
+Echo_message "Begin bootstrapping system..."
+
+Check_package host /usr/sbin/debootstrap debootstrap
+
+# Checking stage file
+Check_stagefile "bootstrap"
+# Note, this must match that used in `bootstrap_cache`
+Check_stagefile "bootstrap_cache.restore"
+
+# Acquire lock file
+Acquire_lockfile
+
+Print_breakage ()
+{
+	Echo_message "If the following stage fails, the most likely cause of the problem is with your mirror configuration or a caching proxy."
+}
+
+# Creating chroot directory
+mkdir -p chroot
+
+# Setting debootstrap options
+if [ -n "${LINGMO_SYS_BUILD_ARCHITECTURE}" ]
+then
+	DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --arch=${LINGMO_SYS_BUILD_ARCHITECTURE}"
+fi
+
+if [ "${LINGMO_SYS_BUILD_ARCHIVE_AREAS}" != "main" ]
+then
+	# Modify archive areas to remove leading/trailing whitespaces and replace other whitepspace with commas
+	DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --components=$(echo ${LINGMO_SYS_BUILD_ARCHIVE_AREAS} | sed -e 's| |,|g')"
+	FOREIGN_DEBOOTSTRAP_OPTIONS="--components=$(echo ${LINGMO_SYS_BUILD_ARCHIVE_AREAS} | sed -e 's| |,|g')"
+fi
+
+if [ "${_VERBOSE}" = "true" ]
+then
+	DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --verbose"
+fi
+
+# If LINGMO_SYS_BUILD_APT_SECURE is false, do not check signatures of the Release file
+if [ "${LINGMO_SYS_BUILD_APT_SECURE}" = "false" ]
+then
+	DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --no-check-gpg"
+else
+	DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --force-check-gpg"
+fi
+
+if [ "${LINGMO_SYS_BUILD_CACHE_PACKAGES}" = "true" ]
+then
+	if ls cache/packages.bootstrap/*.deb > /dev/null 2>&1
+	then
+		mkdir -p chroot/var/cache/apt/archives
+		cp cache/packages.bootstrap/*.deb chroot/var/cache/apt/archives
+	fi
+
+	Print_breakage
+	Echo_message "Running debootstrap (download-only)..."
+	debootstrap ${DEBOOTSTRAP_OPTIONS} --download-only "${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}" chroot "${LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP}" ${DEBOOTSTRAP_SCRIPT}
+
+	# Removing old cache
+	rm -f cache/packages.bootstrap/*.deb
+
+	# Saving new cache
+	mkdir -p cache/packages.bootstrap
+	cp chroot/var/cache/apt/archives/*.deb cache/packages.bootstrap
+fi
+
+Print_breakage
+Echo_message "Running debootstrap..."
+
+# Run appropriate bootstrap, i.e. foreign or regular bootstrap
+if [ "${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_ARCHITECTURE}" = "${LINGMO_SYS_BUILD_ARCHITECTURE}" ]; then
+
+	if [ -n "${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_EXCLUDE}" ]
+	then
+		DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS} --exclude=$(echo ${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_EXCLUDE} | sed 's|  *|,|g')"
+	fi
+
+	Echo_message "Bootstrap will be foreign"
+	debootstrap ${DEBOOTSTRAP_OPTIONS} --foreign "${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}" chroot "${LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP}" ${DEBOOTSTRAP_SCRIPT}
+
+	Echo_message "Running debootstrap second stage under QEMU"
+	cp ${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_STATIC} chroot/usr/bin
+	Chroot chroot /bin/sh /debootstrap/debootstrap --second-stage ${FOREIGN_DEBOOTSTRAP_OPTIONS}
+else
+	debootstrap ${DEBOOTSTRAP_OPTIONS} "${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}" chroot "${LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP}" ${DEBOOTSTRAP_SCRIPT}
+fi
+
+# Deconfiguring debootstrap configurations
+rm -f chroot/etc/hosts
+
+# Removing bootstrap cache
+rm -f chroot/var/cache/apt/archives/*.deb
+
+# Creating stage file
+Create_stagefile "bootstrap"

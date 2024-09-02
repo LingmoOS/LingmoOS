@@ -1,0 +1,123 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+STATE="${TOP}/state"
+
+. ${LOCALCONF}/common.sh
+. ${LOCALCONF}/CONF.sh
+
+export CODENAME VERSION
+
+NAME="debian-live-$VERSION"
+
+if [ "$BUILDS"x = ""x ] ; then
+    case $CODENAME in
+        bookworm)
+            BUILDS="cinnamon gnome kde lxde lxqt mate standard xfce"
+            ;;
+        *)
+            log "  ABORTING: Don't know what to build for CODENAME $CODENAME"
+            exit 1
+            ;;
+    esac
+fi
+
+rename_zsync () {
+    for file in *.zsync; do
+        BASE=$(basename $file .zsync)
+        sed -i "s/^Filename:.*$/Filename: $BASE/g;s/^URL:.*$/URL: $BASE/g" $file
+    done
+}
+
+mkdir -p ${STATE}
+rm -rf ${STATE}/*
+
+# Ensure that the frontend script (lb) is available
+apt-get install -y live-build
+
+# See https://wiki.debian.org/ReproducibleInstalls/LiveImages
+# And https://salsa.debian.org/qa/jenkins.debian.net/-/blob/master/bin/reproducible_debian_live_build.sh
+log "Preparing the live-build environment"
+export BUILDDIR=$(mktemp --tmpdir=${TOP} -d -t LIVE-BUILD.XXXXXXXX)
+cd ${BUILDDIR}
+
+OUT="${TOP}/out/amd64"
+
+# Fetch the rebuild script (and nothing else)
+git clone https://salsa.debian.org/live-team/live-build.git rebuild_script --no-checkout --depth 1
+cd rebuild_script
+git checkout HEAD test/rebuild.sh
+# The rebuild script also runs in Jenkins and does not run as root there and therefore requires 'sudo'
+# Here the script will run as root and must not have 'sudo', otherwise it will lose access to its environment variables
+sed -i -e 's/sudo //' test/rebuild.sh
+cd ..
+
+BUILD_START=`now`
+log "Starting live build images (codename $CODENAME, version $VERSION)"
+
+for BUILD in ${BUILDS}; do
+    log "Running the rebuild script for ${BUILD}."
+    rebuild_script/test/rebuild.sh ${BUILD} ${VERSION} snapshot ${INSTALLER_ORIGIN}
+    RETURNVALUE=$?
+    grep --quiet --no-messages "Build result: 0" summary.txt
+    BUILD_OK_FOUND=$?
+
+    if [ ${RETURNVALUE} -ne 0 -o ${BUILD_OK_FOUND} -ne 0 ]; then
+        # Something went wrong. Perhaps an alternative timestamp is proposed
+        SNAPSHOT_TIMESTAMP=$(grep --no-messages "Alternative timestamp:" summary.txt | cut -f 3 -d " ")
+        if [ -z ${SNAPSHOT_TIMESTAMP} ]; then
+            log "Error: the image could not be built, no alternative was proposed."
+        else
+            log "Warning: the build failed with ${RETURNVALUE}. The latest snapshot might not be complete (yet). Now trying again using the previous snapshot instead."
+            rebuild_script/test/rebuild.sh ${BUILD} ${VERSION} ${SNAPSHOT_TIMESTAMP} ${INSTALLER_ORIGIN}
+            RETURNVALUE=$?
+        fi
+    fi
+
+    mkdir -p ${OUT}/amd64/iso-hybrid
+    BIN_STEM="${OUT}/amd64/iso-hybrid/debian-live-${VERSION}-amd64-${BUILD}"
+    if [ ${RETURNVALUE} -eq 0 ]; then
+        # Move the image away
+        mv live-image-amd64.hybrid.iso ${BIN_STEM}.iso
+        mv live-image-amd64.contents ${BIN_STEM}.iso.contents
+        mv live-image-amd64.packages ${BIN_STEM}.iso.packages
+        mv live-image-amd64.hybrid.iso.zsync ${BIN_STEM}.iso.zsync
+    else
+        # Remove the previous, stale image
+        log "Error: the build for ${BUILD} failed with ${RETURNVALUE}"
+        rm -f ${BIN_STEM}.iso
+        rm -f ${BIN_STEM}.iso.contents
+        rm -f ${BIN_STEM}.iso.packages
+        rm -f ${BIN_STEM}.iso.zsync
+    fi
+    mv summary.txt ${BIN_STEMP}.iso.summary.txt
+    mv lb_output.txt ${BIN_STEM}.iso.log
+
+    # Clean up the local files
+    lb clean --purge
+    rm -f wget-log*
+    rm -f but_latest
+    rm -fr config
+done
+end=`now`
+time_spent=`calc_time $BUILDSTART $end`
+log "  build started at $BUILDSTART, ended at $end (took $time_spent)"
+
+CKSUMSTART=`now`
+cd ${OUT}/amd64/iso-hybrid && rename_zsync && checksum_files
+end=`now`
+time_spent=`calc_time $CKSUMSTART $end`
+log "  $TYPE checksums started at $CKSUMSTART, ended at $end (took $time_spent)"
+
+cd ..
+# Cleanup the workspace
+if [ ! -z "${BUILDDIR}" ]; then
+    rm -rf --one-file-system ${BUILDDIR}
+fi
+
+BUILD_END=`now`
+time_spent=`calc_time $BUILD_START $BUILD_END`
+log "DONE. Full build started at $BUILD_START, ended at $BUILD_END (took $time_spent)"

@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+# © 2014 Cyril Brulebois <kibi@debian.org>
+
+use strict;
+use warnings;
+
+use Date::Manip qw(ParseDate UnixDate);
+use Date::Manip::Date;
+use File::Basename;
+use File::Slurp;
+use GD::Graph::bars;
+use HTML::Template;
+use List::MoreUtils qw(uniq);
+
+my $logdir;
+my $outdir;
+my $max = 90;
+my $pseudo_arch = 'cdimage';
+
+
+# Generate a graph for the given architecture and data, and return the
+# name of the saved image
+sub compute_graph {
+  my $arch  = shift;
+  my @data  = @_;
+
+  my $mygraph = GD::Graph::bars->new(600, 200);
+  $mygraph->set(
+    x_label       => "days",
+    y_label       => "% OK",
+    transparent   => 0,
+    x_label_skip  => '5',
+    x_tick_offset => '-1',
+    dclrs         => [ 'dgreen', 'red', 'white' ],
+    borderclrs    => [ undef, undef, undef ],
+    accent_treshold => 1,
+    cumulate      => 1,
+    box_axis      => 0,
+  ) or warn $mygraph->error;
+
+  my $myimage = $mygraph->plot(\@data)
+    or die $mygraph->error;
+
+  my $output = "daily-build-overview.${arch}.png";
+  write_file("$outdir/$output", { binmode => ':raw' }, $myimage->png);
+  return $output;
+}
+
+
+# Compute ok/ko/missing percentages for a given daily directory
+sub get_percentage {
+  my $dir = shift;
+  my $ok = 0;
+  my $total = 0;
+
+  # Don't work on undefined things:
+  return (0, 0, 100)
+    if not defined $dir or ! -f "$dir/overview.log";
+
+  foreach my $line (read_file("$dir/overview.log")) {
+    $total++;
+    $ok++
+      if $line =~ /success$/;
+  }
+
+  # Avoid divide by 0:
+  return (0, 100, 0)
+    if $total == 0;
+
+  return (100*$ok/$total, 100-100*$ok/$total, 0);
+}
+
+
+# Get last log directory for a given architecture
+sub last_log_dir {
+  my $arch = shift;
+
+  if ($arch ne $pseudo_arch) {
+    return (<$logdir/$arch/*>) [-1];
+  }
+  else {
+    return $pseudo_arch;
+  }
+}
+
+
+# Get all architectures
+sub get_archs {
+  my @archs = (<$logdir/*/>);
+  # Filter empty directories (architectures going away):
+  @archs = grep { scalar @{[glob ("$_/*")]} > 0 } @archs;
+  return map { basename($_) } @archs;
+}
+
+
+# Generate per-day ok/ko/missing percentages for a given architecture
+sub gather_data {
+  my $arch = shift;
+  my $date = new Date::Manip::Date;
+  my (@xs, @oks, @noks, @missings);
+
+  for my $n (reverse (0 .. $max-1)) {
+    $date->parse("$n days ago");
+    my $ts = $date->printf("%Y%m%d");
+    # Note: if there are several directories, latest wins.
+    my ($ok, $nok, $missing) = (0, 0, 100);
+    while (<$logdir/$arch/$ts*>) {
+      ($ok, $nok, $missing) = get_percentage($_);
+    }
+    push @xs, $n;
+    push @oks, $ok;
+    push @noks, $nok;
+    push @missings, $missing;
+  }
+
+  return \@xs, \@oks, \@noks, \@missings;
+}
+
+# Check usage:
+($logdir, $outdir) = @ARGV;
+die "Usage: $0 daily-build-log-dir output-dir (both must exist)"
+  if not defined $logdir or not -d $logdir
+  or not defined $outdir or not -d $outdir;
+
+# Hold results until they are passed on to the html template:
+my @failing_archs;
+my @missing_archs;
+my @arch_details;
+
+# Common data:
+my $date = new Date::Manip::Date;
+my $now  = new Date::Manip::Date;
+$now->parse("now");
+
+for my $arch (get_archs()) {
+  my $file;
+  if ($arch ne $pseudo_arch) {
+    # Get data and draw the graph for this arch:
+    my @data = gather_data($arch);
+    $file = compute_graph($arch, @data);
+  }
+
+  # Get the last log, and analyze it:
+  my $inner_html;
+  my $i=2;
+  my $last_log_dir = last_log_dir($arch);
+  my $last_date = basename($last_log_dir);
+  for my $line (read_file("$last_log_dir/overview.log")) {
+    $i++;
+    if ($line =~ /^(\S+)\s\((.+)\) (\S+)\s(\S+)\s(\S+)$/) {
+      my ($reported_arch, $ts, $buildd, $target, $status) = ($1, $2, $3, $4, $5);
+
+      # Check whether there's a missing build:
+      $date->parse($ts);
+      my $delta = $date->calc($now);
+      my $deltahours = $delta->printf("%hv");
+      my $date_style = '';
+      # Yell after more than 1 day (or 7 for cdimage's weekly builds):
+      if ($deltahours > 24 * ($arch eq $pseudo_arch ? 7.5 : 1.5)) {
+        $date_style = 'color: red;';
+        push @missing_archs, $arch;
+      }
+
+      # Check whether that's a success:
+      my $status_style;
+      if ($status eq 'success') {
+        $status_style = 'color: green;';
+      }
+      else {
+        $status_style = 'color: red;';
+        push @failing_archs, $arch;
+      }
+
+      $inner_html .= qq{
+        <tr class="normal">
+          <td>$arch</td>
+          <td><span style="$date_style">$ts</span></td>
+          <td>$buildd</td>
+          <td><a href="$arch/$last_date/$target.log">$target</a></td>
+          <td><span style="$status_style">$status</span></td>
+        </tr>
+      };
+    }
+    else {
+      # Unable to parse the line, too bad:
+      $inner_html .= qq{
+        <tr class="normal">
+          <td colspan="5"><pre style="color: magenta;">Unable to parse: $line</pre></td>
+        </tr>
+      };
+      push @failing_archs, $arch;
+    }
+  }
+  push @arch_details, {
+    'ARCH' => $arch,
+    'FILE' => $file,
+    'ROWSPAN' => $i,
+    'INNER_HTML' => $inner_html,
+  };
+}
+
+# Load the template, fill the parameters, and output the results:
+my $rfc822_format = "%a, %d %b %Y %H:%M %Z";
+my $rfc822_now = UnixDate(ParseDate("Now"), $rfc822_format);
+my $template = HTML::Template->new(filename => 'daily-build-overview.tmpl');
+$template->param(TITLE => 'D-I daily build overview');
+$template->param(MISSING_ARCHS => [ map { 'ARCH' => $_ }, (uniq @missing_archs)]);
+$template->param(FAILING_ARCHS => [ map { 'ARCH' => $_ }, (uniq @failing_archs)]);
+$template->param(ARCH_DETAILS  => [ @arch_details ]);
+$template->param(NOW => $rfc822_now);
+write_file("$outdir/daily-build-overview.html", $template->output);

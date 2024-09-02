@@ -1,0 +1,38 @@
+Description: Make convert_to_ascii non-variadic
+ This is unnecessary complexity since all callers passed a single unsigned
+ long argument.  GCC 11 seemed to miscompile the previous code, though it's
+ hard to complain about that since imitating va_arg by hand like this was
+ very much a non-standard approach.
+Author: Colin Watson <cjwatson@debian.org>
+Bug-Debian: https://bugs.debian.org/1003008
+Last-Update: 2022-01-03
+
+Index: b/stage2/char_io.c
+===================================================================
+--- a/stage2/char_io.c
++++ b/stage2/char_io.c
+@@ -131,9 +131,9 @@
+ }
+ 
+ char *
+-convert_to_ascii (char *buf, int c,...)
++convert_to_ascii (char *buf, int c, unsigned long num)
+ {
+-  unsigned long num = *((&c) + 1), mult = 10;
++  unsigned long mult = 10;
+   char *ptr = buf;
+ 
+ #ifndef STAGE1_5
+Index: b/stage2/shared.h
+===================================================================
+--- a/stage2/shared.h
++++ b/stage2/shared.h
+@@ -914,7 +914,7 @@
+ /* misc */
+ void init_page (void);
+ void print_error (void);
+-char *convert_to_ascii (char *buf, int c, ...);
++char *convert_to_ascii (char *buf, int c, unsigned long num);
+ int get_cmdline (char *prompt, char *cmdline, int maxlen,
+ 		 int echo_char, int history);
+ int substring (const char *s1, const char *s2);

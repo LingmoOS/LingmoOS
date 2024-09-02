@@ -1,0 +1,616 @@
+'\" t
+.\" $Id: cdk_mentry.3,v 1.30 2019/02/15 00:51:07 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_mentry 3
+.SH NAME
+.XX activateCDKMentry
+.XX cleanCDKMentry
+.XX destroyCDKMentry
+.XX drawCDKMentry
+.XX drawCDKMentryField
+.XX eraseCDKMentry
+.XX getCDKMentryBox
+.XX getCDKMentryFillerChar
+.XX getCDKMentryHiddenChar
+.XX getCDKMentryMin
+.XX getCDKMentryValue
+.XX injectCDKMentry
+.XX moveCDKMentry
+.XX newCDKMentry
+.XX positionCDKMentry
+.XX setCDKMentry
+.XX setCDKMentryBackgroundAttrib
+.XX setCDKMentryBackgroundColor
+.XX setCDKMentryBox
+.XX setCDKMentryBoxAttribute
+.XX setCDKMentryCB
+.XX setCDKMentryFillerChar
+.XX setCDKMentryHiddenChar
+.XX setCDKMentryHorizontalChar
+.XX setCDKMentryLLChar
+.XX setCDKMentryLRChar
+.XX setCDKMentryMin
+.XX setCDKMentryPostProcess
+.XX setCDKMentryPreProcess
+.XX setCDKMentryULChar
+.XX setCDKMentryURChar
+.XX setCDKMentryValue
+.XX setCDKMentryVerticalChar
+cdk_mentry \- curses multiple line entry widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "char *activateCDKMentry ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype *" "actions");
+.TP 15
+.B "void cleanCDKMentry ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "void destroyCDKMentry ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "void drawCDKMentry ("
+.BI "CDKMENTRY *" "mentry",
+.BI "boolean " "box");
+.TP 15
+.B "void drawCDKMentryField ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "void eraseCDKMentry ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "boolean getCDKMentryBox ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "chtype getCDKMentryFillerChar ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "chtype getCDKMentryHiddenChar ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "int getCDKMentryMin ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "char *getCDKMentryValue ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "char *injectCDKMentry ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKMentry ("
+.BI "CDKMENTRY *" "mentry",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKMENTRY *newCDKMentry ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "const char *" "title",
+.BI "const char *" "label",
+.BI "chtype " "fieldAttribute",
+.BI "chtype " "fillerCharacter",
+.BI "EDisplayType " "displayType",
+.BI "int " "fieldWidth",
+.BI "int " "fieldRows",
+.BI "int " "logicalRows",
+.BI "int " "minimumLength",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKMentry ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "void setCDKMentry ("
+.BI "CDKMENTRY *" "mentry",
+.BI "const char *" "value",
+.BI "int " "minimumLength",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKMentryBackgroundAttrib ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKMentryBackgroundColor ("
+.BI "CDKMENTRY *" "mentry",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKMentryBox ("
+.BI "CDKMENTRY *" "mentry",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDKMentryBoxAttribute ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryCB ("
+.BI "CDKMENTRY *" "mentry",
+.BI "MENTRYCB " "callBackFunction");
+.TP 15
+.B "void setCDKMentryFillerChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "filler");
+.TP 15
+.B "void setCDKMentryHiddenChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryHorizontalChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryLLChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryLRChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryMin ("
+.BI "CDKMENTRY *" "mentry",
+.BI "int " "maximum");
+.TP 15
+.B "void setCDKMentryPostProcess ("
+.BI "CDKMENTRY *" "mentry",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMentryPreProcess ("
+.BI "CDKMENTRY *" "mentry",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMentryULChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryURChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMentryValue ("
+.BI "CDKMENTRY *" "mentry",
+.BI "const char *" "value");
+.TP 15
+.B "void setCDKMentryVerticalChar ("
+.BI "CDKMENTRY *" "mentry",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk mentry widget creates a multiple line entry box with a label and an
+entry field.
+The following are functions which create or manipulate the Cdk
+mentry box widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKMentry
+activates the mentry widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBmentry\fR is a pointer to a non-NULL mentry widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return
+a \fIchar *\fR representing the information typed into the widget and the
+widget data \fIexitType\fR will be set to \fIvNORMAL\fR.
+.IP
+If the character
+entered was \fIESCAPE\fR then the function will return \fINULL\fR pointer and
+the widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B cleanCDKMentry
+clears the information from the field.
+.TP 5
+.B destroyCDKMentry
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKMentry
+draws the widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B drawCDKMentryField
+redraws the multiple line entry field.
+.TP 5
+.B eraseCDKMentry
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKMentryBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKMentryFillerChar
+returns the character being used to draw unused space in the widget.
+.TP 5
+.B getCDKMentryHiddenChar
+returns the character being used
+to draw hidden characters in the widget (obsolete).
+.TP 5
+.B getCDKMentryMin
+returns the minimum length of a string the widget will allow.
+.TP 5
+.B getCDKMentryValue
+returns the current value of the widget.
+.TP 5
+.B injectCDKMentry
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBmentry\fR is a pointer to a non-NULL mentry.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a \fIchar *\fR representing the information typed into the widget.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+a \fINULL\fR pointer.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+a \fINULL\fR pointer.
+.RE
+.bP
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKMentry
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+.IP
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKMentry
+creates a mentry widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBlabel\fR
+is the string which will be displayed in the label of the mentry field.
+.TP 5
+\fBfieldAttribute\fR
+is the attribute of the characters to be displayed when they are typed in.
+.TP 5
+\fBfiller\fR
+is the character which is to display in an empty space in the mentry field.
+.TP 5
+\fBdisplayType\fR
+tells how the mentry field will behave
+when a character is entered into the field.
+The following table outlines valid values for this field and what they mean:
+.LP
+.TS
+center tab(/);
+l l
+lw10 lw30 .
+\fBDisplay_Type/Meaning\fR
+=
+vCHAR/Only accepts alphabetic characters.
+vLCHAR/T{
+Only accepts alphabetic characters.
+Maps the character to lower case
+when a character has been accepted.
+T}
+vUCHAR/T{
+Only accepts alphabetic characters.
+Maps the character to upper case
+when a character has been accepted.
+T}
+vHCHAR/T{
+Only accepts alphabetic characters.
+Displays a \fI.\fR when a character
+has been accepted.
+T}
+vUHCHAR/T{
+Only accepts alphabetic characters.
+Displays a \fI.\fR and maps the
+character to upper case when a
+character has been accepted.
+T}
+vLHCHAR/T{
+Only accepts alphabetic characters.
+Displays a \fI.\fR and maps the
+character to lower case when a
+character has been accepted.
+T}
+vINT/Only accepts numeric characters.
+vHINT/T{
+Only accepts numeric characters.
+Displays a \fI.\fR when a character
+has been accepted.
+T}
+vMIXED/Accepts any character types.
+vLMIXED/T{
+Accepts any character types.
+Maps the character to lower case
+when an alphabetic character has
+been accepted.
+T}
+vUMIXED/T{
+Accepts any character types.
+Maps the character to upper case
+when an alphabetic character has
+been accepted.
+T}
+vHMIXED/T{
+Accepts any character types.
+Displays a \fI.\fR when a character
+has been accepted.
+T}
+vLHMIXED/T{
+Accepts any character types.
+Displays a \fI.\fR and maps the
+character to lower case when a
+character has been accepted.
+T}
+vUHMIXED/T{
+Accepts any character types.
+Displays a \fI.\fR and maps the
+character to upper case when a
+character has been accepted.
+T}
+vVIEWONLY/Uneditable field.
+=
+.TE
+.TP 5
+\fBfieldRows\fR and
+.TP 5
+\fBfieldWidth\fR
+control the height and width of the field of the widget.
+If you provide a value of zero for either of the values,
+the field in the widget will be made
+as large as it can both in width and in height.
+If you provide a negative value,
+the field will be created the full height or width minus the value provided.
+.TP 5
+\fBlogicalRows\fR
+is the number of rows for the mentry field.
+.TP 5
+\fBminimumLength\fR
+is the number of characters which must
+be entered before the use can exit the mentry field.
+.TP 5
+\fBcallBackFunction\fR
+allows the user to override the key processing element of the widget.
+.TP 5
+\fBbox\fR
+is true if widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.RE
+.TP 5
+.B positionCDKMentry
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKMentry
+lets the programmer modify certain elements of an existing
+entry widget.
+The parameter names correspond to the same parameter names listed
+in the \fBnewCDKMentry\fR function.
+.TP 5
+.B setCDKMentryBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKMentryBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKMentryBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKMentryBoxAttribute
+function sets the attribute of the box.
+.TP 5
+.B setCDKMentryCB
+function allows the programmer to set a different widget input handler.
+The parameter \fBcallbackFunction\fR is of type \fIMENTRYCB\fR.
+The default function is \fICDKMentryCallBack\fR.
+.TP 5
+.B setCDKMentryFillerChar
+sets the character to use when drawing unused space in the field.
+.TP 5
+.B setCDKMentryHiddenChar
+sets the character to use when a hidden character type is used (obsolete).
+.TP 5
+.B setCDKMentryHorizontalChar
+function sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKMentryLLChar
+function sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMentryLRChar
+function sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMentryMin
+sets the minimum length of the string that the widget will allow.
+.TP 5
+.B setCDKMentryPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMentryPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMentryULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMentryURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKMentryValue
+sets the current value of the widget.
+.TP 5
+.B setCDKMentryVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) box;
+l l
+lw(10) lw(30) .
+\fBKey/Action\fR
+=
+Left Arrow/Moves the cursor to the left.
+CTRL-B/Moves the cursor to the left.
+Right Arrow/Moves the cursor to the right.
+CTRL-F/Moves the cursor to the right.
+Up Arrow/Moves the cursor one row down.
+Down Arrow/Moves the cursor one row up.
+Delete/Deletes the character at the cursor.
+Backspace/Deletes the character before cursor, moves cursor left.
+CTRL-V/T{
+Pastes whatever is in the paste buffer, into the widget.
+T}
+CTRL-X/T{
+Cuts the contents from the widget and saves a copy in the paste buffer.
+T}
+CTRL-Y/T{
+Copies the contents of the widget into the paste buffer.
+T}
+CTRL-U/T{
+Erases the contents of the widget.
+T}
+CTRL-A/T{
+Moves the cursor to the beginning of the entry field.
+T}
+CTRL-E/T{
+Moves the cursor to the end of the entry field.
+T}
+CTRL-T/T{
+Transposes the character under the cursor with the character to the right.
+T}
+Return/T{
+Exits the widget and returns a \fIchar *\fR representing
+the information which was typed into the field.
+It also sets the widget data \fIexitType\fR in the widget
+pointer to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exits the widget and returns a \fIchar *\fR representing
+the information which was typed into the field.
+It also sets the widget data \fIexitType\fR in the widget
+pointer to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns a \fINULL\fR pointer.
+It also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.fi
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

@@ -1,0 +1,56 @@
+Setup for automating the debian-live image production on pettersson
+
+The problem
+===========
+
+debian-live needs to run as root, and we don't like to do that on
+debian.org machines. So we've set up a "disposable" VM to do this.
+
+What needs setting up
+=====================
+
+Files in the "inside_vm" directory are things that will need to be set
+up inside the VM to make it work.
+
+How it works
+============
+
+Files in the "available" directory are scripts that will be used. We
+need to co-ordinate things inside and outside the VM, and we do that
+by copying the correct files from the "available" directory into the
+"input" directory in the correct sequence. The scripts inside the VM
+will grab scripts from the "input" directory when needed, and will
+execute anything called "run-*". Those "run-*" scripts output
+appropriate formatted log messages that the scripts running on the
+host can grab and parse to see what current status is. The host
+scripts can therefore see when state changes and copy the next
+script(s) into the input directory, for example.
+
+This is a crude method of IPC inside and outside the VM, but it
+basically works!
+
+How to start stuff
+==================
+
+To start things, there are two options:
+
+ 1. For a clean startup of the VM which won't run a build, make sure
+    the "input" directory is empty, and run bin/vm-start to start the
+    kvm instance. You can then ssh in via port 10022 to do management,
+    debug a build failure etc.
+
+ 2. To run a live build, edit things as appropriate in the scripts in
+    "available", particularly in "run-30build". Then run bin/run-live
+    and wait for things to happen! You can also ssh in at this point,
+    but be aware that the VM may well halt itself under you...
+
+Future stuff
+============
+
+The next plan is to extend this:
+
+ * actually make the VM disposable? Create and destroy on demand?
+
+ * use a similar method for other things that need root access,
+   e.g. live cloud images?
+

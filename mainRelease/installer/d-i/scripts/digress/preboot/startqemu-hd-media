@@ -1,0 +1,43 @@
+#!/bin/sh
+# Runs qemu, booting from hd-media image.
+#
+# This is tricky, since qemu can only boot from the first disk, and we want
+# to have two disks, the first being used to install to, and the second
+# used for the hd-media. (Installing the the second disk probably wouldn't
+# result in a bootable system). So, boot qemu using the hd-media kernel and 
+# initrd and let it find the hd-media on the second disk.
+set -e
+
+if [ -z "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
+if [ -z "$QEMU_DISK" ]; then
+	QEMU_DISK=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
+fi
+
+if [ ! -e "$QEMU_KERNEL" ]; then
+	echo "QEMU_KERNEL $QEMU_KERNEL does not exist" >&2
+	exit 1
+fi
+if [ ! -e "$QEMU_INITRD" ]; then
+	echo "QEMU_INITRD $QEMU_INITRD does not exist" >&2
+	exit 1
+fi
+
+QEMU_DISK2=$STATE_DIR/qemu-$MACHINE-$SCHEME.hd-media.img
+piggyback_hd-media "$QEMU_DISK2"
+
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec $QEMU_COMMAND -cdrom "$ISO" \
+	-hda $QEMU_DISK \
+	-hdb $QEMU_DISK2 \
+	-kernel $QEMU_KERNEL \
+	-initrd $QEMU_INITRD \
+	-nographic \
+	-net nic -net user,hostname=$MACHINE \
+	-no-reboot \
+	$QEMU_EXTRA_PARAMS \
+	-append "root=/dev/ram $CONSOLEPARAMS $BOOTPARAMS" \
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 

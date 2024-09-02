@@ -1,0 +1,25 @@
+#!/bin/sh
+# hook for adding kms modules
+
+set -e
+
+# initramfs-tools header
+
+PREREQ=""
+prereqs()
+{
+	echo "${PREREQ}"
+}
+
+case "${1}" in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+for module in i915 radeon nouveau ; do
+	manual_add_modules $module
+done

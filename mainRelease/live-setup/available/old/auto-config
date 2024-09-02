@@ -1,0 +1,96 @@
+#!/bin/sh
+
+#set -x
+
+M="http://local-mirror.cdbuilder.debian.org/debian"
+S="http://security.debian.org/debian-security"
+
+case "$DEBIAN_BUILD_ARCH" in
+	amd64)
+		_LINUX_FLAVOURS="amd64"
+		_SOURCE="false"
+		;;
+
+	i386)
+		if [ $CODENAME = wheezy ] ; then
+			_LINUX_FLAVOURS="486 686-pae"
+		else
+			_LINUX_FLAVOURS="586 686-pae"
+		fi
+		_SOURCE="true"
+		;;
+
+	*)
+		echo "DEBIAN_BUILD_ARCH not set; abort!"
+		exit 1
+		;;
+esac
+
+case "$DEBIAN_BUILD_WITH_NONFREE" in
+	1)
+		ARCHIVE_AREAS="main contrib non-free"
+		FW=true
+		;;
+        *)
+		ARCHIVE_AREAS="main"
+		FW=false
+		;;
+esac
+
+if [ $CODENAME = wheezy ] ; then
+    lb config noauto \
+	--archive-areas "${ARCHIVE_AREAS}" \
+	--firmware-binary ${FW} \
+	--firmware-chroot ${FW} \
+	--verbose \
+	--clean \
+	--ignore-system-defaults \
+	--mode debian \
+	--debian-installer live \
+	--linux-flavours "${_LINUX_FLAVOURS}" \
+	--linux-packages "linux-image linux-headers" \
+	--source "${_SOURCE}" \
+	--updates false \
+	--parent-mirror-bootstrap $M \
+	--parent-mirror-chroot $M \
+	--parent-mirror-chroot-security $S \
+	--parent-mirror-chroot-updates $M \
+	--parent-mirror-chroot-backports $M \
+	--parent-mirror-debian-installer $M \
+	--parent-mirror-binary-security $S \
+	--mirror-bootstrap $M \
+	--mirror-chroot $M \
+	--mirror-chroot-security $S \
+	--mirror-chroot-updates $M \
+	--mirror-chroot-backports $M \
+	--mirror-debian-installer $M \
+	-a $DEBIAN_BUILD_ARCH \
+	"${@}"
+else
+    lb config noauto \
+	--archive-areas "${ARCHIVE_AREAS}" \
+	--firmware-binary ${FW} \
+	--firmware-chroot ${FW} \
+	--verbose \
+	--clean \
+	--ignore-system-defaults \
+	--mode debian \
+	--debian-installer live \
+	--linux-flavours "${_LINUX_FLAVOURS}" \
+	--linux-packages "linux-image linux-headers" \
+	--source "${_SOURCE}" \
+	--updates false \
+	--parent-mirror-bootstrap $M \
+	--parent-mirror-chroot $M \
+	--parent-mirror-chroot-security $S \
+	--parent-mirror-debian-installer $M \
+	--parent-mirror-binary-security $S \
+	--mirror-bootstrap $M \
+	--mirror-chroot $M \
+	--mirror-chroot-security $S \
+	--mirror-debian-installer $M \
+	-a $DEBIAN_BUILD_ARCH \
+	"${@}"
+fi
+
+#    --parent-distribution stable \

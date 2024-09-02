@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+# Create a disk image.
+if [ -n "$QEMU_DISK_SIZE" ]; then
+	disk=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
+	rm -f $disk
+	qemu-img create -f qcow2 $disk "$QEMU_DISK_SIZE"
+fi

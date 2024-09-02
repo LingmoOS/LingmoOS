@@ -1,0 +1,198 @@
+'\" t
+.\" $Id: cdk.3,v 1.16 2019/12/31 20:22:36 tom Exp $
+.de It
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.ie \n(.g .ds `` \(lq
+.el       .ds `` ``
+.ie \n(.g .ds '' \(rq
+.el       .ds '' ''
+.TH Cdk 3
+.SH NAME
+cdk - \fBCurses Development Kit\fR
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.LP
+Cdk provides functions to use a large number of predefined curses widgets.
+To use the Cdk widgets the header file,
+\fIcdk.h\fR must be included in the source.
+.LP
+The widgets available from Cdk are listed below.
+.LP
+.TS
+center tab(/);
+l l
+l l .
+\fBWidget Type/Manual Page Name\fR
+=
+Alphalist/cdk_alphalist (3)
+Button/cdk_button (3)
+Buttonbox/cdk_buttonbox (3)
+Calendar/cdk_calendar (3)
+Dialog/cdk_dialog (3)
+DoubleFloat Scale/cdk_dscale (3)
+Entry Field/cdk_entry (3)
+File Selector/cdk_fselect (3)
+File Viewer/cdk_viewer (3)
+Floating Scale/cdk_fscale (3)
+Floating Slider/cdk_fslider (3)
+Graph/cdk_graph (3)
+Histogram/cdk_histogram (3)
+Integer Scale/cdk_scale (3)
+Integer Slider/cdk_slider (3)
+Item List/cdk_itemlist (3)
+Label/cdk_label (3)
+Marquee/cdk_marquee (3)
+Matrix/cdk_matrix (3)
+Multiple Line Entry Field/cdk_mentry (3)
+Pulldown Menu/cdk_menu (3)
+Radio List/cdk_radio (3)
+Scrolling List/cdk_scroll (3)
+Scrolling Selection List/cdk_selection (3)
+Scrolling Window/cdk_swindow (3)
+Template/cdk_template (3)
+Unsigned Scale/cdk_uscale (3)
+Unsigned Slider/cdk_uslider (3)
+.TE
+.LP
+The rest of the manual pages describe supporting functions:
+.LP
+.TS
+center tab(/);
+l l
+l l
+lw18 lw35 .
+\fBManual Page Name/Description\fR
+=
+cdk_binding (3)/T{
+Outlines how to create user definable key bindings.
+T}
+cdk_display (3)/T{
+Shows how to add special display attributes,
+colors, and justification into a widget.
+T}
+cdk_draw (3)/T{
+Outlines functions used for drawing text and lines.
+T}
+cdk_screen (3)/T{
+Demonstrates the use of screens within Cdk.
+T}
+cdk_misc (3)/T{
+Outlines miscellaneous functions provided with the Cdk library.
+T}
+cdk_process (3)/T{
+Demonstrates the use of the pre- and post-process function class.
+T}
+.TE
+.SH DESCRIPTION
+Cdk is a library of functions which allow a programmer to quickly create a 
+full screen interactive program with ease.
+The Cdk widgets support the 
+following features:
+.It "\(bu Ncurses library." 5
+Instead of using the standard curses library, Cdk can take advantage of the
+colors that Ncurses provides.
+To learn how to take advantage of Cdk's color
+capabilities, see \fIcdk_display (3)\fR.
+.PP
+.It "\(bu Key Bindings." 5
+Individual keys can be overridden with a callback.
+The callback is set up using
+the \fBbindCDKObject\fR function.
+To learn more about this see \fIcdk_binding (3)\fR.
+.PP
+.It "\(bu Pre and Post Processing." 5
+Certain widgets allow the user to trap a character before and after the 
+character has been applied to the widget.
+This allows programmers to \*(``filter\*('' character input.
+To learn more about this see \fIcdk_process (3)\fR.
+.PP
+.It "\(bu Self Test Widgets." 5
+With the use of the inject function class and the activate function, 
+programmers can have the widgets test themselves.
+This allows the programmer
+to perform automated tests on a final program.
+.PP
+.It "\(bu Special Display Formats" 5
+There are special character format commands that can be inserted into any 
+string in Cdk and the contents will get mapped to a \fIchtype\fR (see the
+curses manual page) with character attributes.
+This allows the programmer to 
+insert format types on each character if they wish.
+.PP
+.It "\(bu The Ability To Build Predefined Screens" 5
+Widgets can be associated to any given screen.
+If there is more than one 
+screen defined, then Cdk has the ability to "flip" from one screen to another
+with ease.
+See the \fIcdk_screen\fR manual page for more details.
+.PP
+.SH STANDARD WIDGET BEHAVIOR
+All of the widgets have a member of the structure called \fIexitType\fR.
+This member states how the widget exited.
+There are three values in which to check
+for, they are as follows:
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBValue/Meaning\fR
+=
+vNORMAL/T{
+This means the widget exited normally.
+This value is set when the widget is given the characters TAB or RETURN.
+T}
+vEARLY_EXIT/T{
+This means the widget exited early.
+This value is set when characters such as
+TAB or RETURN are injected into the 
+widget via the injectCDKXXX function and the 
+character injected does not exit the widget.
+T}
+vERROR/T{
+This value states that an error was returned by curses, e.g., if the
+terminal was disconnected.
+T}
+vESCAPE_HIT/T{
+This value states the user hit ESCAPE to leave the widget.
+T}
+vNEVER_ACTIVATED/T{
+This is the initial state of the value.
+This means that the widget has not been activated.
+T}
+.TE
+.SH SEE ALSO
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_draw (3),
+.BR cdk_misc (3),
+.BR cdk_process (3),
+.BR cdk_screen (3)
+.
+.SH NOTES
+.PP
+The header file \fI<cdk.h>\fR automatically includes the header files
+\fI<curses.h>\fR,
+\fI<stdlib.h>\fR,
+\fI<string.h>\fR,
+\fI<ctype.h>\fR,
+\fI<unistd.h>\fR,
+\fI<dirent.h>\fR,
+\fI<time.h>\fR,
+\fI<errno.h>\fR,
+\fI<pwd.h>\fR,
+\fI<grp.h>\fR,
+\fI<sys/stat.h>\fR, and
+\fI<sys/types.h>\fR.
+The \fI<curses.h>\fR header file includes \fI<stdio.h>\fR and \fI<unctrl.h>\fR.

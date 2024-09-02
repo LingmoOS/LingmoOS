@@ -1,0 +1,131 @@
+grub for Debian
+---------------
+
+GRUB is a GPLed bootloader intended to unify bootloading across x86
+operating systems.  In addition to loading Linux and FreeBSD, it
+implements the Multiboot standard, which allows for flexible loading
+of multiple boot images (needed for modular kernels such as the GNU
+Hurd).
+
+One unique feature of GRUB is that it can understand filesystems at
+boot time, rather than just simple blocklists.  Hence, you can load
+any kernel in the file system from the boot prompt without having to
+edit configuration files or rerun a special installation program.
+
+GRUB also automatically detects BIOS lba block addressing.  To force
+lba mode see the GRUB `setup` command.  Lilo's install and map 
+directives are fulfilled by GRUB's `root` and `setup` commands.  To
+reinstall GRUB, the installation location is either determined at 
+runtime by the `grub-install` script or given as an option to the 
+`setup` command.
+
+more documentation
+------------------
+the full grub documentation is available in the grub-legacy-doc package.
+
+quick setup
+-----------
+
+after installing the package:
+
+1) grub-install "(hd0)"
+   or if /boot is a separate partition
+   grub-install --root-directory=/boot "(hd0)"
+
+   using in place of "(hd0)" the device that you boot from
+
+2) update-grub which will create a menu.lst for you if one does not exist
+   or manually create one, and skip to step 4
+
+3) edit /boot/grub/menu.lst
+   or if /boot is a separate partition
+   edit /boot/boot/grub/menu.lst
+
+   and change groot, and kopt to whatever settings you need.
+   modify anything else in the menu.lst you want,
+
+   re-run update-grub to update the lines for each kernel to those
+   that you specified with groot and kopt
+
+4) that's it, making sure you have a rescue disk or some other way to boot
+   your machine attempt to reboot using grub!
+
+   to create a grub boot floppy:
+
+   cat /boot/grub/stage1 /boot/grub/stage2 > /dev/fd0
+   
+   using in place of /dev/fd0 the device that is for your floppy drive.
+
+   note: that you need to run grub-install each time a new grub package
+         is installed, this script updates the grub images in /boot/grub
+	 or /boot/boot/grub and installs grub into the boot sector.
+
+for more detailed information see the info documentation or manpages
+
+update-grub
+-----------
+This script is a debian specific addon used to generate a menu.lst for you
+either initially, and/or automatically every time you install a new kernel.
+
+To setup automatic updates add these lines to your /etc/kernel-img.conf:
+
+postinst_hook = update-grub
+postrm_hook   = update-grub
+do_bootloader = no
+
+For further information see the manpage kernel-img.conf(5) or update-grub(8)
+
+Unlike Lilo, it is not necessary to re-run or re-install the boot loader 
+after every change to /boot/grub/menu.lst.  menu.lst is automatically 
+found on GRUB's root disk and read during GRUB's boot process.
+
+splashimage support
+-------------------
+The use of graphics is an unofficial extension to Grub that has not yet been
+included by the developers in the official software. The patch
+was first proposed on the bug-grub mail list late in 2001. This feature will
+not be supported by upstream until after the 1.0 version of Grub is released.
+
+However, this Debian package has been patched and supports splash images.
+This is how you can add a splash image to your grub configuration:
+
+1) Be sure to run grub-install, or you will still be running the old
+   (unpatched) version
+
+2) Create your image, and transform it into a XPM file, 640x480, with
+   14 colors:
+
+   $ convert my-nice-image.jpg -colors 14 -geometry 640x480! my-nice-image.xpm
+
+    gzip it:
+
+   $ gzip my-nice-image.xpm
+
+3) Change your menu.lst file to include the new commands:
+
+# Set colors for foreground and background:
+# (RRGGBB, in hex)
+#
+# These are optional it will still work without them
+#
+foreground  = ffffff
+background  = 000000
+
+# The splash image location (doesn't need to be the root partition, BTW,
+# since grub can read your filesystem):
+#
+splashimage=(hd0,5)/boot/grub/my-nice-image.xpm.gz
+
+4) Reboot, and see your splash image. You may want to fine tune the colors used
+   for the text
+
+Note if the path to the splashimage file happens to be wrong you will get a really messed up looking screen.
+
+There is a grub splashimage howto here:
+http://ruslug.rutgers.edu/~mcgrof/grub-images/
+
+netbsd/freebsd/*bsd
+-------------------
+
+Loading kernels from *BSD systems is supported in GRUB 2.  You can upgrade to
+GRUB 2 by installing the `grub-pc' package.

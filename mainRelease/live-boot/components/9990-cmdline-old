@@ -1,0 +1,325 @@
+#!/bin/sh
+
+#set -e
+
+Cmdline_old ()
+{
+	for _PARAMETER in ${LIVE_BOOT_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			skipconfig)
+				NOFSTAB="true"
+				NONETWORKING="true"
+
+				export NOFSTAB NONETWORKING
+				;;
+
+			BOOTIF=*)
+				BOOTIF="${_PARAMETER#BOOTIF=}"
+				;;
+			dns=*)
+				DNS=${_PARAMETER#dns=}
+				DNSSERVERS=$(echo ${DNS} | sed 's/,/ /g')
+				export DNSSERVERS
+				unset DNS
+				;;
+			dhcp)
+				# Force dhcp even while netbooting
+				# Use for debugging in case somebody works on fixing dhclient
+				DHCP="true";
+				export DHCP
+				;;
+
+			nodhcp)
+				DHCP=""
+				export DHCP
+				NODHCP="true"
+				export NODHCP
+				;;
+
+			dm-verity-root-hash=*)
+				DM_VERITY_ROOT_HASH="${_PARAMETER#dm-verity-root-hash=}"
+				export DM_VERITY_ROOT_HASH
+				;;
+			dm-verity-oncorruption=*)
+				DM_VERITY_ONCORRUPTION="${_PARAMETER#dm-verity-oncorruption=}"
+				export DM_VERITY_ONCORRUPTION
+				;;
+			dm-verity-enforce-roothash-signature)
+				DM_VERITY_ENFORCE_ROOT_HASH_SIG="true"
+				export DM_VERITY_ENFORCE_ROOT_HASH_SIG
+				;;
+
+			ethdevice=*)
+				DEVICE="${_PARAMETER#ethdevice=}"
+				ETHDEVICE="${DEVICE}"
+				export DEVICE ETHDEVICE
+				;;
+
+			ethdevice-timeout=*)
+				ETHDEV_TIMEOUT="${_PARAMETER#ethdevice-timeout=}"
+				export ETHDEV_TIMEOUT
+				;;
+
+			fetch=*)
+				FETCH="${_PARAMETER#fetch=}"
+				export FETCH
+				;;
+
+			findiso=*)
+				FINDISO="${_PARAMETER#findiso=}"
+				export FINDISO
+				;;
+
+			ftpfs=*)
+				FTPFS="${_PARAMETER#ftpfs=}"
+				export FTPFS
+				;;
+
+			httpfs=*)
+				HTTPFS="${_PARAMETER#httpfs=}"
+				export HTTPFS
+				;;
+
+			iscsi=*)
+				ISCSI="${_PARAMETER#iscsi=}"
+				#ip:port - separated by ;
+				ISCSI_PORTAL="${ISCSI%;*}"
+				if echo "${ISCSI_PORTAL}" | grep -q , ; then
+					ISCSI_SERVER="${ISCSI_PORTAL%,*}"
+					ISCSI_PORT="${ISCSI_PORTAL#*,}"
+				fi
+				#target name
+				ISCSI_TARGET="${ISCSI#*;}"
+				export ISCSI ISCSI_PORTAL ISCSI_TARGET ISCSI_SERVER ISCSI_PORT
+				;;
+
+			isofrom=*|fromiso=*)
+				FROMISO="${_PARAMETER#*=}"
+				export FROMISO
+				;;
+
+			ignore_uuid)
+				IGNORE_UUID="true"
+				export IGNORE_UUID
+				;;
+
+			ip=*)
+				STATICIP="${_PARAMETER#ip=}"
+
+				if [ -z "${STATICIP}" ]
+				then
+					STATICIP="frommedia"
+				fi
+
+				export STATICIP
+				;;
+
+			live-media=*|bootfrom=*)
+				LIVE_MEDIA="${_PARAMETER#*=}"
+				export LIVE_MEDIA
+				;;
+
+			live-media-offset=*)
+				LIVE_MEDIA_OFFSET="${_PARAMETER#live-media-offset=}"
+				export LIVE_MEDIA_OFFSET
+				;;
+
+			live-media-path=*)
+				LIVE_MEDIA_PATH="${_PARAMETER#live-media-path=}"
+				export LIVE_MEDIA_PATH
+				;;
+
+			live-media-timeout=*)
+				LIVE_MEDIA_TIMEOUT="${_PARAMETER#live-media-timeout=}"
+				export LIVE_MEDIA_TIMEOUT
+				;;
+
+			module=*)
+				MODULE="${_PARAMETER#module=}"
+				export MODULE
+				;;
+
+			netboot=*)
+				NETBOOT="${_PARAMETER#netboot=}"
+				export NETBOOT
+				;;
+
+			nfsopts=*)
+				NFSOPTS="${_PARAMETER#nfsopts=}"
+				export NFSOPTS
+				;;
+
+			nfsoverlay=*)
+				NFS_COW="${_PARAMETER#nfsoverlay=}"
+				export NFS_COW
+				;;
+
+			nofstab)
+				NOFSTAB="true"
+				export NOFSTAB
+				;;
+
+			nonetworking)
+				NONETWORKING="true"
+				export NONETWORKING
+				;;
+
+			ramdisk-size=*)
+				ramdisk_size="${_PARAMETER#ramdisk-size=}"
+				;;
+
+			overlay-size=*)
+				OVERLAY_SIZE="${_PARAMETER#overlay-size=}"
+				export OVERLAY_SIZE
+				;;
+
+			persistence)
+				PERSISTENCE="true"
+				export PERSISTENCE
+				;;
+
+			persistence-encryption=*)
+				PERSISTENCE_ENCRYPTION="${_PARAMETER#*=}"
+				export PERSISTENCE_ENCRYPTION
+				;;
+
+			persistence-media=*)
+				PERSISTENCE_MEDIA="${_PARAMETER#*=}"
+				export PERSISTENCE_MEDIA
+				;;
+			persistence-method=*)
+				PERSISTENCE_METHOD="${_PARAMETER#*=}"
+				export PERSISTENCE_METHOD
+				;;
+
+			persistence-path=*)
+				PERSISTENCE_PATH="${_PARAMETER#persistence-path=}"
+				export PERSISTENCE_PATH
+				;;
+			persistence-read-only)
+				PERSISTENCE_READONLY="true"
+				export PERSISTENCE_READONLY
+				;;
+
+			persistence-storage=*)
+				PERSISTENCE_STORAGE="${_PARAMETER#persistence-storage=}"
+				export PERSISTENCE_STORAGE
+				;;
+
+			persistence-label=*)
+				custom_overlay_label=$(echo ${_PARAMETER#persistence-label=*} | sed -e 's/,/ /g')
+				;;
+
+			nopersistence)
+				NOPERSISTENCE="true"
+				export NOPERSISTENCE
+				;;
+
+			quickusbmodules)
+				QUICKUSBMODULES="true"
+				export QUICKUSBMODULES
+				;;
+
+			todisk=*)
+				TODISK="${_PARAMETER#todisk=}"
+				export TODISK
+				;;
+
+			toram)
+				TORAM="true"
+				export TORAM
+				;;
+
+			toram=*)
+				TORAM="true"
+				MODULETORAM="${_PARAMETER#toram=}"
+				export TORAM MODULETORAM
+				;;
+
+			exposedroot)
+				EXPOSED_ROOT="true"
+				export EXPOSED_ROOT
+				;;
+
+			plainroot)
+				PLAIN_ROOT="true"
+				export PLAIN_ROOT
+				;;
+
+			skipunion)
+				SKIP_UNION_MOUNTS="true"
+				export SKIP_UNION_MOUNTS
+				;;
+
+			root=*)
+				ROOT="${_PARAMETER#root=}"
+				export ROOT
+				;;
+
+			union=*)
+				UNIONTYPE="${_PARAMETER#union=}"
+				export UNIONTYPE
+				;;
+		esac
+	done
+
+	# sort of compatibility with netboot.h from linux docs
+	if [ -z "${NETBOOT}" ]
+	then
+		if [ "${ROOT}" = "/dev/nfs" ]
+		then
+			NETBOOT="nfs"
+			export NETBOOT
+		elif [ "${ROOT}" = "/dev/cifs" ]
+		then
+			NETBOOT="cifs"
+			export NETBOOT
+		fi
+	fi
+
+	if [ -z "${MODULE}" ]
+	then
+		MODULE="filesystem"
+		export MODULE
+	fi
+
+	if [ -z "${UNIONTYPE}" ]
+	then
+		UNIONTYPE="overlay"
+		export UNIONTYPE
+	fi
+
+	if [ -z "${PERSISTENCE_ENCRYPTION}" ]
+	then
+		PERSISTENCE_ENCRYPTION="none"
+		export PERSISTENCE_ENCRYPTION
+	elif is_in_comma_sep_list luks ${PERSISTENCE_ENCRYPTION} || is_in_comma_sep_list lukslabel ${PERSISTENCE_ENCRYPTION}
+	then
+		if ! modprobe dm-crypt
+		then
+			log_warning_msg "Unable to load module dm-crypt"
+			PERSISTENCE_ENCRYPTION=$(echo ${PERSISTENCE_ENCRYPTION} |  sed -e 's/\<lukslabel,\|,\?lukslabel$//g' | sed -e 's/\<luks,\|,\?luks$//g')
+			export PERSISTENCE_ENCRYPTION
+		fi
+
+		if [ ! -x /lib/cryptsetup/askpass ] || [ ! -x /sbin/cryptsetup ]
+		then
+			log_warning_msg "cryptsetup is unavailable"
+			PERSISTENCE_ENCRYPTION=$(echo ${PERSISTENCE_ENCRYPTION} | sed -e 's/\<lukslabel,\|,\?lukslabel$//g' | sed -e 's/\<luks,\|,\?luks$//g')
+			export PERSISTENCE_ENCRYPTION
+		fi
+	fi
+
+	if [ -z "${PERSISTENCE_METHOD}" ]
+	then
+		PERSISTENCE_METHOD="overlay"
+		export PERSISTENCE_METHOD
+	fi
+
+	if [ -z "${PERSISTENCE_STORAGE}" ]
+	then
+		PERSISTENCE_STORAGE="filesystem,file"
+		export PERSISTENCE_STORAGE
+	fi
+}

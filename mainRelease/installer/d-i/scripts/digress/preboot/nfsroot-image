@@ -1,0 +1,28 @@
+#!/bin/sh
+# Unpack a nfs root image into place.
+set -e
+
+error () {
+	echo "$@" >&2
+	exit 1
+}
+
+if [ -z "$NFSROOT_DIR" ] || [ "$NFSROOT_DIR" = / ]; then
+	error "Bad NFSROOT_DIR $NFSROOT_DIR"
+fi
+
+mkdir -p $NFSROOT_DIR
+cd $NFSROOT_DIR
+
+if [ -e "$NFSROOT_IMAGE_ALT" ] && [ "$NFSROOT_IMAGE_ALT" -nt "$NFSROOT_IMAGE" ]; then
+	echo "Using nfsroot image: alternate"
+	NFSROOT_IMAGE="$NFSROOT_IMAGE_ALT"
+else
+	echo "Using nfsroot image: primary"
+fi
+
+if [ ! -e "$NFSROOT_IMAGE" ]; then
+	error "NFSROOT_IMAGE $NFSROOT_IMAGE does not exist"
+fi
+
+tar zxf $NFSROOT_IMAGE

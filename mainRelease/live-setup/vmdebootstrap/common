@@ -1,0 +1,62 @@
+
+BASE_OPTS="
+ --owner debian-cd --verbose \
+ --sudo \
+ --lock-root-password \
+ --mirror http://cdbuilder.debian.org/debian/ \
+ --apt-mirror http://httpredir.debian.org/debian \
+ --enable-dhcp \
+ --configure-apt \
+ --squash \
+ --log debian-cd-${SUITE}-${ARCH}.log --log-level debug \
+"
+
+cleanup() {
+    umount ${rootdir}/proc
+    umount ${rootdir}/sys
+}
+
+export DEBIAN_FRONTEND=noninteractive
+export LC_ALL=C
+export LANG=C
+export LANGUAGE=C
+
+mount_support() {
+    mount proc -t proc ${rootdir}/proc
+    mount sys -t sysfs ${rootdir}/sys
+}
+
+disable_daemons() {
+    # prevent packages starting daemons inside the chroot until after boot.
+    # https://wiki.debian.org/chroot
+    cat > ${rootdir}/usr/sbin/policy-rc.d <<EOF
+#!/bin/sh
+exit 101
+EOF
+    chmod a+x ${rootdir}/usr/sbin/policy-rc.d
+}
+
+prepare_apt_source() {
+    # handle the apt source
+    mv ${rootdir}/etc/apt/sources.list.d/base.list ${rootdir}/etc/apt/
+    echo "deb http://cdbuilder.debian.org/debian/ jessie main contrib non-free" > ${rootdir}/etc/apt/sources.list
+    chroot ${rootdir} apt update
+}
+
+remove_daemon_block() {
+    rm ${rootdir}/usr/sbin/policy-rc.d
+}
+
+replace_apt_source() {
+    # Undo apt source change
+    rm ${rootdir}/etc/apt/sources.list
+    mv ${rootdir}/etc/apt/base.list ${rootdir}/etc/apt/sources.list.d/
+}
+
+TASK_PACKAGES="task-laptop task-english"
+
+# packages which are not (yet) part of a task
+EXTRA_PACKAGES="dkms locales whois telnet aptitude lsof host \
+ bash-completion firmware-linux-free dnsutils time rsync reportbug w3m \
+ ethtool ftp host lsof debian-faq debian-installer-launcher doc-debian \
+"

@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+# First stage install on s390. This is special in a number of ways.
+use Expect;
+
+my $down="OB";
+my $up="OA";
+my $left="OD";
+
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+	$ENV{TERM}="vt100";
+}
+
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+#$exp->debug(2);
+#$exp->exp_internal(1);
+
+sub console_question {
+	my $question=shift;
+	my $response=shift;
+
+	if (! length $response) {
+		$response="."; # take default
+	}
+	
+	$exp->expect($ENV{STAGE_1_MAX_TIME}, $question) or die "failed to find $question";
+	$exp->expect(3, "Prompt: '?' for help>");
+	$exp->send(".".$response."\r");
+}
+
+# Setting up point to point network and network-console:
+console_question("Network device type:", 1);
+console_question("CTC read device:", 1);
+console_question("CTC write device:", 2);
+console_question("Protocol for this connection:", 1);
+console_question("IP address:", $ENV{S390_IP});
+console_question("Point-to-point address:", $ENV{S390_PTP_IP});
+console_question("Name server addresses:", $ENV{S390_NAMESERVER_IP});
+console_question("Hostname:", $ENV{MACHINE});
+console_question("Domain name:");
+console_question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
+console_question("Re-enter password to verify:", $ENV{ROOT_PASSWORD});
+$exp->expect($ENV{STAGE_1_MAX_TIME}, "To continue the installation, please use an SSH client");
+
+if (exists $ENV{HERCULES_MASQ_COMMAND}) {
+	if (system($ENV{HERCULES_MASQ_COMMAND}) != 0) {
+		die "failed to run HERCULES_MASQ_COMMAND";
+	}
+}
+
+# Now use ssh to log in to d-i and finish the installation.
+my $ssh_exp = Expect->spawn("ssh -t -v -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
+#$ssh_exp->debug(2);
+#$ssh_exp->exp_internal(1);
+
+sub ssh_question {
+	my $question=shift;
+	my $response=shift;
+	
+	$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, $question) or die "failed to find \"$question\"";
+	sleep 1;
+	$ssh_exp->send($response."\r");
+}
+
+ssh_question("password:", $ENV{ROOT_PASSWORD});
+ssh_question("Network console option:");
+
+# Complete the install.
+my $formatted=0;
+my $partition_setup=0;
+my $partman_done=0;
+$ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
+	[ "-re", "step.*failed" => sub { exit 1 } ],
+
+	# driving s390-dasd, not preseedable :-(
+	[ "Format the disk" => sub { sleep 2; $ssh_exp->send($left); exp_continue_timeout } ],
+	[ "-re", "\\(configured\\)" => sub { 
+		sleep 2;
+		if (! $formatted) {
+			$ssh_exp->send($down);
+			$formatted=1;
+		}
+		exp_continue_timeout
+	} ],
+
+	# partman-auto doesn't support dasds, drive partman by hand :-(
+	[ "Finish partitioning" => sub {
+		sleep 2;
+		if (! $partition_setup) {
+			$ssh_exp->send($up);
+		}
+		elsif (! $partman_done) {
+			$ssh_exp->send($down.$down.$down);
+			$partman_done=1;
+		}
+		exp_continue_timeout
+	} ],
+	[ "Partition settings" => sub {
+		sleep 2;
+		if (! $partition_setup) {
+			$ssh_exp->send($down.$down.$down.$down.$down.$down.$down.$down);
+			$partition_setup=1;
+		}
+		else {
+			die "loop detected";
+		}
+		exp_continue_timeout
+	} ],
+
+	[ "English" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "Start.*install" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "Choose the next step" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "rebooting.*the.*system." => sub { } ],
+	[ "-re", "down.*NOW" => sub { } ],
+	[ "-re", "Sending.*SIGTERM" => sub { } ],
+	[ "-re", "Rebooting into your new system" => sub { } ],
+	[ 'eof' => sub {} ],
+) || die "failed";
+
+# Wait for it to finish.
+$exp->expect($ENV{STAGE_1_MAX_TIME}, "The system is halted.") or die "timeout waiting for halt";
+
+exit

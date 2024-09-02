@@ -1,0 +1,91 @@
+#!/bin/bash
+set -e
+
+NAME=grub-reboot
+VERSION=0.01
+
+if ! test -n "$1" || test "$1" = "-h" || test "$1" = "--help" ; then
+  echo $NAME
+  echo
+  echo "Reboots into the specified OS entry in menu.lst"
+  echo
+  echo "Usage: $0 entry [options to grub]"
+  echo "       (where \"entry\" is the entry number in menu.lst)"
+  echo
+  exit
+fi
+
+if test "$1" = "-v" || test "$1" = "--version" ; then
+  echo $NAME $VERSION
+  exit
+fi
+
+if test "`whoami`" != "root" ; then
+  echo "You must be root"
+  exit
+fi
+
+abort() {
+       message=$@
+
+       echo >&2
+       echo -e "$message" >&2
+       echo >&2
+       exit 1
+}
+
+find_grub_dir ()
+{
+	echo  -n "Searching for GRUB installation directory ... " >&2
+
+	for d in $grub_dirs ; do
+		if [ -d "$d" ] ; then
+			grub_dir="$d"
+			break
+		fi
+	done
+	
+	if [ -z "$grub_dir" ] ; then
+		abort "No GRUB directory found.\n###"
+	else
+		echo "found: $grub_dir" >&2
+	fi
+
+	echo $grub_dir
+}
+
+grub_dirs="/boot/grub /boot/boot/grub"
+
+grub_dir=$(find_grub_dir)
+
+config_file=$grub_dir/menu.lst
+
+default_file=$grub_dir/default
+
+default="$1" ; shift
+grub --batch --config-file=$config_file $@ <<EOT
+savedefault --once --default=$default
+quit
+EOT
+
+echo "
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# WARNING: If you want to edit this file directly, do not remove any line
+# from this file, including this warning. Using \`grub-set-default\' is
+# strongly recommended." >> $default_file
+
+echo
+echo -n "Do you want to reboot now? [y/N] "
+read REBOOT
+case $REBOOT in
+  y*|Y*) reboot ;;
+esac

@@ -1,0 +1,43 @@
+#!/bin/sh
+# Unpack (or copy) a netboot image into place.
+set -e
+
+error () {
+	echo "$@" >&2
+	exit 1
+}
+
+if [ ! -e "$TFTP_DIR" ]; then
+	error "Bad TFTPDIR $TFTP_DIR does not exist"
+fi
+
+if [ -e "$NETBOOT_IMAGE_ALT" ] && [ "$NETBOOT_IMAGE_ALT" -nt "$NETBOOT_IMAGE" ]; then
+	echo "Using netboot image: alternate"
+	NETBOOT_IMAGE="$NETBOOT_IMAGE_ALT"
+else
+	echo "Using netboot image: primary"
+fi
+
+if [ ! -e "$NETBOOT_IMAGE" ]; then
+	error "NETBOOT_IMAGE $NETBOOT_IMAGE does not exist"
+fi
+
+(
+	if [ "$ARCH" = sparc ] || [ "$ARCH" = hppa ] || [ "$ARCH" = alpha ]; then
+		cp -f "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
+	else
+		temp=$(mktemp -d)
+		cd $temp
+		if ! tar zxf $NETBOOT_IMAGE; then
+			error "failed to untar NETBOOT_IMAGE in $temp"
+		fi
+		find $temp | xargs chmod g+w
+		find $temp -type d | xargs chmod g+s
+		
+		cd $TFTP_DIR
+		if ! cp -fr $temp/* .; then
+			error "copy to TFTP_DIR failed"
+		fi
+		rm -rf $temp
+	fi
+)

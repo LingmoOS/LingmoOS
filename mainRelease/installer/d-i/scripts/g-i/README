@@ -1,0 +1,70 @@
+This document describes the procedure used to optimize font usage
+for G-I.
+
+1) determine the set of codes (glyphs) available in the font files
+two "levels" of results:
+ * list of codes _per_ font file (fontX.lst)
+
+ * list of codes available _at least_ in one of the font files
+(avail_codes.lst)
+
+note that one particular codepoint can be in many font files.
+
+ +---------------+      +---------------+
+ | +-----------+ |      | +-----------+ |
+ | | font1.ttf | |      | | font1.lst | |
+ | +-----------+ |      | +-----------+ |
+ |               |      |               |
+ | +-----------+ |      | +-----------+ |
+ | | font2.ttf | |      | | font2.lst | |
+ | +-----------+ |  =>  | +-----------+ | => avail_codes.lst
+ |               |      |               |
+ |   ...         |      |   ...         |
+ | 	         |      |               |
+ | +-----------+ |      | +-----------+ |
+ | | fontN.ttf | |      | | fontN.lst | |
+ | +-----------+ |      | +-----------+ |
+ +---------------+      +---------------+
+
+
+2) determine the set of codes (glyphs) needed to display translation
+files (.po)
+
+ +---------------+      +---------------+
+ | +-----------+ |      | +-----------+ |
+ | | lang1.po  | |      | | lang1.lst | |
+ | +-----------+ |      | +-----------+ |
+ |               |      |               |
+ | +-----------+ |      | +-----------+ |
+ | | lang2.po  | |      | | lang2.lst | |
+ | +-----------+ |  =>  | +-----------+ | => needed_codes.lst
+ |               |      |               |
+ |   ...         |      |   ...         |
+ | 	         |      |               |
+ | +-----------+ |      | +-----------+ |
+ | | langN.po  | |      | | langN.lst | |
+ | +-----------+ |      | +-----------+ |
+ +---------------+      +---------------+
+
+
+with the above information is possible to find out:
+
+ ** missing glyphs :
+
+    codes listed in "needed_codes.lst" and not contained in
+    "avail_codes.lst" this information is associated to language files
+
+    langX -> langX.mis
+    langY -> langY.mis
+
+ ** extra glyphs :
+
+    avail_codes.lst - needed_codes.lst = xtra_codes.lst
+    this information is associated to font files:
+
+    fontX.ttf -> fontX.xtr
+    fontY.ttf -> fontY.xtr
+
+using the .xtr files is possible to remove unused glypph from the
+associated font files; this does not cover the problem of overlapping
+codes.

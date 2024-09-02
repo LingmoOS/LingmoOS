@@ -1,0 +1,33 @@
+#! /usr/bin/make -f
+
+ifeq (0,$(shell dpkg-vendor --derives-from Ubuntu; echo $$?))
+  RECOMMENDS := ubuntu-keyring
+  SUGGESTS   := debian-archive-keyring, arch-test (>= 0.11~),
+else ifeq (0,$(shell dpkg-vendor --derives-from Tanglu; echo $$?))
+  RECOMMENDS := tanglu-archive-keyring, arch-test (>= 0.11~),
+  SUGGESTS   := debian-archive-keyring, ubuntu-archive-keyring, binutils, xz-utils, zstd
+else ifeq (0,$(shell dpkg-vendor --derives-from Kali; echo $$?))
+  RECOMMENDS := kali-archive-keyring, arch-test (>= 0.11~),
+  SUGGESTS   := debian-archive-keyring, ubuntu-archive-keyring, binutils, xz-utils, zstd
+else ifeq (0,$(shell dpkg-vendor --derives-from Pardus; echo $$?))
+  RECOMMENDS := pardus-archive-keyring, arch-test (>= 0.11~),
+  SUGGESTS   := debian-archive-keyring, ubuntu-archive-keyring, binutils, xz-utils, zstd
+else
+  RECOMMENDS := debian-archive-keyring, arch-test (>= 0.11~),
+  SUGGESTS   := ubuntu-archive-keyring, binutils, xz-utils, zstd
+endif
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/debootstrap
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/debootstrap-udeb
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vdebootstrap:Recommends='$(RECOMMENDS)' -Vdebootstrap:Suggests='$(SUGGESTS)'
+
+# Specify gzip to mitigate #770217:
+override_dh_builddeb:
+	dh_builddeb -pdebootstrap      -- -Zgzip
+	dh_builddeb -pdebootstrap-udeb -- -Zxz

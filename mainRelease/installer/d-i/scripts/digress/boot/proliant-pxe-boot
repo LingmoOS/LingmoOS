@@ -1,0 +1,15 @@
+#!/usr/bin/expect
+# Make a proliant PXE boot by looking for the boot menu and pressing F12.
+spawn -noecho $env(CONSOLECOMMAND)
+
+set timeout 360
+expect "F12"
+puts "Sending F12 for pxeboot\n"
+sleep 1
+send "\[24~"
+
+expect "DHCP"
+
+sleep 2
+
+exit

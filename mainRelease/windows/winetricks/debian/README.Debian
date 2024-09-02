@@ -1,0 +1,73 @@
+Using Winetricks with non-default Wine versions
+===============================================
+
+Winetricks expects Wine in /usr/bin/wine and /usr/bin/wineserver. If you
+want to use another version of Wine you should execute the following
+commands before running winetricks, e.g.:
+
+  export WINE=/usr/bin/wine-development
+  export WINESERVER=/usr/bin/wineserver-development
+
+If you have compiled Wine from source and installed it out of dpkg(1)'s
+control, the winetricks package's depends wouldn't know about it.  To
+install winetricks anyway, create a "dummy wine" package by using tools
+in the equivs package before installing winetricks. An example:
+
+  git clone https://github.com/jaalto/project--debian-wine-dummy.git
+  cd project--debian-wine-dummy
+  make
+  dpkg -i wine*.deb
+  apt-get install winetricks
+
+
+About optional packages
+=======================
+
+The GUI requires zenity, but some of that functionality is also provided
+by kdialog or xmessage (in package x11-utils).
+
+For improved downloading install aria2.
+
+xdg-open (xdg-utils) is used to open download pages if manual
+interaction is required.
+
+xz-utils is required by some verbs to decompress tar archives.
+
+Winetricks caches *.iso files, if started with the -k option.  Later on
+you can often mount them without needing root privileges with fuseiso or
+archivemount.  Where this is not supported yet, mounting them requires
+pkexec (policykit-1), kdesu (kde-cli-tools) or sudo.
+
+If download sites, e.g. archive.org, are blocked in your country install
+tor and start winetricks with the option "--torify".
+
+
+32- and 64-bit
+==============
+
+Most of the software is 32bit only, so if you have 64bit OS, consider
+setting:
+
+  export WINEARCH=win32
+
+before ~/.wine is created. This prevents Wine being structured as a
+64-bit installation and allows winetricks to work. Refer to LP#1006909
+for more information:
+
+  https://bugs.launchpad.net/ubuntu/+source/winetricks/+bug/1006909
+
+
+Winetricks' self-update
+======================
+
+Winetricks' automatic online version check and selfupdate is disabled in
+Debian.  Although you may still run a manual "winetricks --self-update",
+be aware that this will install /usr/bin/winetricks directly from its
+developers, without any lookover from Debian.  What happens then, is out
+of Debian's control.
+Assuming the self-update only changed /usr/bin/winetricks, but nothing
+else was changed by this subsequently, then a future update of the
+winetricks package will bring back the regular Winetricks by Debian.
+But again: Debian cannot guarantee this.
+
+ -- Jens Reyer <jre.winesim@gmail.com>, Sat, 25 Feb 2023 16:21:11 +0100

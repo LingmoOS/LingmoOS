@@ -1,0 +1,140 @@
+The bootstrap-installer udeb is responsible for calling debootstrap to
+install the base system, as well as selecting and installing a kernel.
+
+The base-installer udeb provides a framework that can be used by
+alternative udebs that install the base system in other ways. A simplified
+example of using this framework:
+
+	#!/bin/sh
+	. /usr/share/debconf/confmodule
+	. /usr/lib/base-installer/library.sh
+
+	install_base_system () {
+		# stuff to install base here
+		# cd /target && tar zxvf /tmp/base.tgz
+		log "base system installed!"
+	}
+
+	waypoint 	1	check_target
+	waypoint	1	pre_install_hooks
+	waypoint	100	install_base_system
+	waypoint	1	configure_apt
+	waypoint	5	post_install_hooks
+	waypoint	10	install_extra
+	
+	run_waypoints
+	exit 0
+
+
+The waypoints are positions on the progress bar, which will be
+automatically advanced to the next waypoint as each section of the base
+installation completes (you can also advance it manually within a step). In
+the example above all the sections except for install_base_system are
+provided by library.sh. As a section is running, the progress bar displays
+the text in the debconf template base-installer/debootstrap/section/<name>.
+
+
+On progress bars
+----------------
+run-debootstrap translates the debootstrap progress stream into debconf
+progress bars. There are essentially two ways the progress information from
+debootstrap can be dislayed. The naive way is to start a new progress bar
+for each new progress id debootstrap dislays; the problem with this
+approach is it gives the user no clue as to the overall progress as they
+just see a bewildering series of progress bars.
+
+A more sophisticated approach is to use only one logical progress bar, and
+know about various debootstrap waypoints, using each as it appears to
+update the bar to a given point, and using the more detailed progress
+information to keep the bar updating in between. The waypoints we currently
+care about, and where the progress bar will be when they complete are
+listed in waypoints.h.
+
+Say between 30 and 50%, while downloading debs, debootstrap sends us
+progress commands telling us what the current amount done is, and what the
+total amount is. For example:
+
+P: 22422934 31625258 DOWNDEBS
+
+This is 22422934 / 31625258 = 70% of the way done with downloading debs.
+Since the DOWNDEBS waypoint uses 20% of the progress bar, that scales to
+70% of 20, or 14%. So the progress bar should be positioned to 30+14, or
+44%.
+
+Since we want to use the same progress bar for both run-debootstrap and
+for the end of the base-installer postinst, the actual setup of the
+progress bar should happen in base-installer's postinst. Then
+run-debootstrap just updates it to 90%, and finally the end of the
+postinst takes care of updating it to the final waypoint as it does the
+apt-install stuff.
+
+
+Appendix A: The debootstrap --debian-installer progress stream
+==============================================================
+
+As far as I know, there is no other documentation of the data debootstrap
+outputs on fd 3 if run with --debian-installer (except its source). 
+But then I have not looked too hard. Here is what I have been able to piece
+together.
+
+The stream consists of a number of lines. Each line is of the form:
+CODE: arg1 [arg2 .. argn]
+
+The codes are:
+
+P (progress)
+arg1 is an integer, the current amount done
+arg2 is the total amount of work that must be done for this progress item
+arg3 is a unique identifier for the progress item. It may be omitted
+sometimes.
+
+P is generally followed by PA and PF to build up a message to dislay. If
+they are left off, an earlier info message can be displayed to indicate what
+is being done.
+
+PA (progress arguments)
+args combine to form the value of one argument
+
+PF (progress format)
+args combine to be a progress format string.
+
+PF (progress format)
+args combine to form a format string. The info arguments are then
+substituted in turn into the %s tokens in the string to form the message to
+display to the user to indicate progress.
+
+I (info)
+arg1 is an identifier for the information message in question
+Generally followed by an IA and IF.
+
+IA (info arguments)
+args combine to form the value of one argument
+
+IF (info format)
+args combine to form a format string. The info arguments are then
+substituted in turn into the %s tokens in the string to form the message to
+display to the user to indicate info.
+
+E (error)
+arg1 is the id of the error
+May be followed by EA, and EF
+
+EA (error arguments)
+args combine to form the value of one argument
+
+EF (error format)
+args combine to form a format string. The info arguments are then
+substituted in turn into the %s tokens in the string to form the error
+message.
+
+W (warning)
+arg1 is the id of the warning
+May be followed by WA, and WF
+
+WA (warning arguments)
+args combine to form the value of one argument
+
+WF (warning format)
+args combine to form a format string. The info arguments are then
+substituted in turn into the %s tokens in the string to form the warning
+message.

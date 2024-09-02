@@ -1,0 +1,70 @@
+#!/bin/bash -e
+
+# This script outputs a valid .pif "Program Information File"
+#
+# There is some documentation available there: http://www.smsoft.ru/en/pifdoc.htm
+
+# supress dd stderr
+exec 2>/dev/null
+
+# hello, I am a PIF
+echo -en "\x00\x78"
+
+# program name, displayed in the confirmation dialog (space-padded to 30)
+echo -en "Installer Loader              "
+
+# Conventional memory limits
+echo -en "\x80\x02\x00\x00"
+
+# exec file (zero-padded)
+(echo -en "loadlin.exe" ; cat /dev/zero) | dd bs=1 count=129
+
+# linux_image + cmdline arguments (we don't use it)
+args=""
+(echo -en "${args}" ; cat /dev/zero) | dd bs=1 count=64
+
+# some crap
+(echo -en "\x00\x01\x00\xff\x19\x50\x00\x00\x07" ; cat /dev/zero) | dd bs=1 count=140
+
+echo -en "MICROSOFT PIFEX\x00"
+
+# more crap
+echo -en "\x87\x01\x00\x00\x71\x01"
+
+echo -en "WINDOWS 386 3.0\x00"
+
+# even more crap
+echo -en "\x05\x02\x9d\x01\x68\x00\x80\x02\x00\x00\x64\x00\x32\x00\xff\xff\x00\x00\xff\xff\x00\x00\x02\x10\x82"
+
+# confirmation dialog.  enable=0x00, diable=0x10
+echo -en "\x00"
+
+echo -en "\x1f"
+dd bs=1 count=19 < /dev/zero
+
+# I told you already...
+(echo -en "${args}" ; cat /dev/zero) | dd bs=1 count=64
+
+echo -en "WINDOWS VMM 4.0\x00"
+
+echo -en "\xff\xff\x1b\x02\xac\x01"
+
+dd bs=1 count=88 < /dev/zero
+
+# icon associated with this PIF. "PIFMGR.DLL" is the default MSDOS logo
+(echo -en "PIFMGR.DLL" ; cat /dev/zero) | dd bs=1 count=82
+
+# more of the same crap
+echo -en "\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x32\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+echo -en "\x01\x00\x00\x00\x05\x00\x19\x00\x03\x00\xc8\x00\xe8\x03\x02\x00\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00"
+echo -en "\x00\x00\x00\x00\x08\x00\x0c\x00"
+
+# this string describes the state of Windows 9x in our modern world...
+(echo -en "Terminal" ; cat /dev/zero) | dd bs=1 count=32
+
+# do we really care?
+(echo -en "Lucida Console" ; cat /dev/zero) | dd bs=1 count=34
+
+# okay whatever you say
+(echo -en "\x03\x00\x00\x00\x50\x00\x19\x00\x50\x02\x40\x01\x00\x00\x00\x00\x16" ; cat /dev/zero) | dd bs=1 count=126
+echo -en "\x01\x00"

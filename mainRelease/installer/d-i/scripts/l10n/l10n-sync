@@ -1,0 +1,778 @@
+#!/bin/bash
+# (there may be some bashisms in this script)
+#
+# This script synchronises the D-I package maintainer's templates
+# and translator's translations
+#
+# Translators, DO NOT RUN THIS SCRIPT YOURSELVES!!!!
+#
+#
+# This process has two parts:
+#   1. the packages/po directory, where translators are working in;
+#   2. the around 97 directories for the different packages in d-i.
+# In the past, part 1 was in svn, while part 2 was git.
+#
+# Starting with May 2018, the first part is also in a git repository,
+# so this script was moved from mixed svn/git operations to only git
+# calls.
+
+export LC_ALL=en_US.UTF-8
+
+COMMIT_MARKER="[l10n] "
+
+# Defaults
+ONLINE=N
+COMMIT=N
+KEEP_REVISION=N
+FORCE_RUN=N
+NUMLEVELS=5
+UPDATEPO=Y
+SYNCPKGS=Y
+QUIET=N
+debconfupdatepo=debconf-updatepo
+
+if [ "$DI_L10NSYNC_LOGDIR" ] ; then
+	LOG="$DI_L10NSYNC_LOGDIR/l10n-sync.log"
+else
+	LOG="$(pwd)/l10n-sync.log"
+fi
+
+# Save logfiles to .old for further inspection:
+cp -a $LOG $LOG.old
+cp -a l10n-sync_commit.log l10n-sync_commit.log.old
+
+usage() {
+echo  "Usage:"
+echo  "$0 [--online] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--levels="number_of_levels"] [--git="path_to_git"] [--debconf-updatepo="debconf-updatepo command"] [--quiet|--nolog] <D-I repository path>"
+echo  "    --online            : Work online (will update the local copy on"
+echo  "                          the fly)"
+echo  "    --commit            : Commit changed files (implies --online)"
+echo  "    --force             : Forced run even if 'run=0'"
+echo  "                          appears in packages/po/run-l10n-sync"
+echo  "                          Should only be used in manual runs"
+echo  "    --noupdatepo        : Do not run debconf-updatepo for each package"
+echo  "    --nosyncpkgs        : Do not sync PO files for each package"
+echo  "    --keep-revision     : Force keeping the old PO-Revision-Date"
+echo  "                          for a given language"
+echo  "                          meant for use when switching a language"
+echo  "                          NOT RECOMMENDED in other situations"
+echo  "    --levels            : number of levels"
+echo  "    --git               : path to the git binary"
+echo  "    --debconf-updatepo  : debconf-updatepo command line"
+echo  "                          (for using hacked debconf-updatepo)"
+echo  "    --merge="other_dir" : merge master files from master files"
+echo  "                          in another directory"
+echo  "    --quiet             : don't display progress info, only errors"
+echo  "    --nolog             : output all messages to stdout instead of"
+echo  "                          the log file"
+echo  " <D-I repository path>: path to the local copy of the D-I repository"
+}
+
+gitpoerr() {
+	echo "Error in a GIT operation at packages/po dir, please investigate"
+	exit 1
+}
+
+giterr() {
+	echo "Error in a GIT operation in one of the package dirs, please investigate"
+	exit 2
+}
+
+# Syntax: log_cmd [-m|-p "<message>"] command <arguments>
+# Note that any quotes in the <arguments> must be escaped to preserve them.
+#
+# Unless --nolog was passed, all output of the command will be redirected
+# to the log file.
+# If the -m or -p option is used, a progress message is be printed when the
+# command is executed. With -m just the message will be printed, with -p the
+# result of the command will be printed after the message (only on stdout).
+# Use the --pass option if output of the command is redirected; because of
+# this option messages are redirected to stderr.
+log_cmd() {
+	local progress message redir
+	if [ "$1" = "--pass" ] ; then
+		redir="$REDIRERR"
+		shift
+	else
+		redir="$REDIR"
+	fi
+
+	progress=""
+	if [ "$1" = -m ] || [ "$1" = -p ] ; then
+		if [ "$1" = -p ] && [ "$LOG" ] ; then
+			progress=1
+		fi
+		message="$2"
+		shift 2
+	fi
+
+	if [ "$message" ] ; then
+		if [ "$QUIET" = N ] ; then
+			[ "$progress" ] && echo -n "$message" >&2 || echo "$message" >&2
+		fi
+		[ -z "$LOG" ] || echo "$message" >>$LOG
+	fi
+
+	RET=0
+	eval "$@" $redir || RET=$?
+
+	if [ "$progress" ] && [ "$QUIET" = N ] ; then
+		[ $RET -eq 0 ] && echo " done." >&2 || echo " failed." >&2
+	fi
+	return $RET
+}
+
+log() {
+	[ "$QUIET" = Y ] || echo "$1"
+	[ -z "$LOG" ] || echo "$1" >>$LOG
+}
+
+# Log without newline
+logn() {
+	[ "$QUIET" = Y ] || echo -n "$1"
+	[ -z "$LOG" ] || echo -n "$1" >>$LOG
+}
+
+# Special logging
+log_s1() {
+	if [ "$LOG" ] ; then
+		[ "$QUIET" = Y ] || echo -n "($2) "
+		echo "$1 $2" >>$LOG
+	else
+		echo "$1 $2"
+	fi
+}
+
+error() {
+	echo "$1" >&2
+	[ -z "$LOG" ] || echo "$1" >>$LOG
+}
+
+gettexterr() {
+	error "Error in a gettext operation, please investigate"
+	error "Lock file NOT removed"
+	exit 2
+}
+
+criticalerr() {
+	error "Critical error during run, please investigate"
+	error "Lock file NOT removed"
+	exit 3
+}
+
+
+po_last_updated() {
+	local key files file lastfile lastdate tdate
+	key=$1
+	shift
+	files="$*"
+
+	lastdate=0
+	for file in $files ; do
+		tdate=$(date -d "$(grep "^\"$key:" $file | \
+			sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%s")
+		if [ $tdate -gt $lastdate ] ; then
+			lastdate=$tdate
+			lastfile=$file
+		fi
+	done
+	echo "$lastfile"
+}
+
+# Get the whole line
+# The --no-wrap is needed because translator can span more than one line
+# The last sed statement is needed to preserve the \n at the end
+po_get_header() {
+	local key=$1
+	local file=$2
+	msgattrib --no-wrap $file | grep "^\"$key:" | sed 's/^.*: \(.*\)\\n.*$/\1/'
+}
+
+# Replace a header with a new value
+# The complex sed expression is to allow for the fact that a header may span
+# two lines; spanning three lines is not supported
+po_replace_header() {
+	local key="$1"
+	local value="$2"
+	local file="$3"
+	sed -i "/^\"$key:/ N; s/^\"$key.*\\\\n\"\(\n.*\|$\)/\"$key: $value\\\\n\"\1/" \
+		$file
+}
+
+# Print anything up to the first msgid (the header)
+po_print_header() {
+	awk 'BEGIN {found = 0}
+	     /^msgid ""/ {found = 1}
+	     /^$/ {if (found == 1) exit}
+	     {print $0}' $1
+}
+
+# Print anything after the first msgid (the header)
+po_print_body() {
+	awk 'BEGIN {found = 0}
+	     /^msgid ""/ {if (found == 0) found = 1}
+	     /^$/ {if (found == 1) found = 2}
+	     {if (found == 2) print $0}' $1
+}
+
+# Print obsolete strings
+po_print_obsolete() {
+#	# Old "manual" version
+#	awk 'BEGIN {found = 0; lead=""}
+#	     /^#~ msgid/ {if (found == 0) {found = 1; print lead}}
+#	     {if (found == 0) lead=lead"\n"$0}
+#	     /^$/ {if (found == 0) lead=""}
+#	     {if (found == 1) print $0}' $1
+
+	msgattrib --only-obsolete --width=79 $1 | po_print_body
+}
+
+##  Command line parsing
+MORETODO=true
+while $MORETODO ; do
+	case "$1" in
+	"--online")
+		ONLINE=Y
+		;;
+	"--keep-revision"*)
+		KEEP_REVISION=`echo $1|cut -f2 -d=`
+		if [ -z "$KEEP_REVISION" ] ; then
+			usage
+			exit 1
+		fi
+		;;
+	"--commit")
+		COMMIT=Y
+		;;
+	"--force")
+		FORCE_RUN=Y
+		;;
+	"--noupdatepo")
+		UPDATEPO=N
+		;;
+	"--nosyncpkgs")
+		SYNCPKGS=N
+		;;
+	"--merge="*)
+		MERGEDIR=`echo $1|cut -f2 -d=`
+		;;
+	"--levels="*)
+		NUMLEVELS=`echo $1|cut -f2 -d=`
+		;;
+	"--git="*)
+		git=`echo $1|cut -f2 -d=`
+		;;
+	"--debconf-updatepo="*)
+		debconfupdatepo=`echo $1|cut -f2 -d=`
+		;;
+	"--quiet")
+		QUIET=Y
+		;;
+	"--nolog")
+		LOG=""
+		;;
+	"--"*)
+		echo "Illegal option: $1" >&2
+		usage
+		exit 1
+		;;
+	*)
+		DI_COPY=$1
+		MORETODO=false
+		;;
+	esac
+	shift
+done
+
+if [ -z "$DI_COPY" ] ; then
+	usage
+	exit 1
+fi
+
+REDIR=""
+REDIRERR=""
+if [ "$LOG" ] ; then
+	if ! touch $LOG 2>/dev/null ; then
+		echo "Cannot write to log file '$LOG'" >&2
+		exit 1
+	fi
+	> $LOG
+	REDIR=">>$LOG 2>&1"	
+	REDIRERR="2>>$LOG"	
+else
+	# Ensure output goes at least somewhere
+	QUIET=N
+fi
+
+if [ "$NUMLEVELS" -gt 9 ] ; then
+	error "Maximum of 9 sublevels supported"
+	exit 1
+fi
+LEVELS=`seq 1 $NUMLEVELS`
+
+# If we asked for commits we are online...:-)
+if [ "$COMMIT" = "Y" ] ; then
+	ONLINE=Y
+fi
+
+
+# A few checks about the D-I copy directory
+if [ ! -d $DI_COPY ] ; then
+	error "$DI_COPY does not exist"
+	exit 1
+fi
+
+if [ -n "$MERGEDIR" ] ; then
+	if [ ! -d "$MERGEDIR" ] ; then
+		error "$MERGEDIR is not a directory"
+		exit 1
+	elif [ ! -d "$MERGEDIR/packages/po" ] ; then
+		error "$MERGEDIR/packages/po does not exist; please check that"
+		error "$MERGEDIR is a complete local Debian Installer repository"
+		exit 1
+	fi   
+fi
+
+# Check that utilities we need are available
+for i in msgcat msgmerge msgattrib `echo ${debconfupdatepo} | awk '{print $1};'` ; do
+	if ! which $i >/dev/null 2>&1 ; then
+		error "$i not found in the PATH"
+		exit 1
+	fi
+done
+
+# Do not accept working on an unclean copy
+if [ -n "$(git status -s -uno $DI_COPY/packages/po)" ] ; then
+	error "$DI_COPY seems to contain some GIT conflict files"
+	error "in packages/po (check 1)."
+	error "Please fix this before launching the script again"
+	exit 1
+fi
+
+### From here we start the real work
+log "Starting l10n-sync run - $(date -u)"
+
+COMMITLOGFILE=$DI_COPY/l10n-sync_commit.log
+echo "Starting l10n-sync run - $(date -u)" >$COMMITLOGFILE
+echo "" >>$COMMITLOGFILE
+
+# First, update the packages/po directory
+# to get the run-l10n-sync file
+cd $DI_COPY/packages/po
+if [ "$ONLINE" = "Y" ] ; then
+	log_cmd -p "Synchronize $DI_COPY/packages..." \
+		git pull || gitpoerr
+fi
+
+# Check the packages/po/run-l10n-sync file
+markerfile=${DI_COPY}/packages/po/run-l10n-sync
+if [ -f ${markerfile} ] ; then
+	. ${markerfile}
+	if [ -n "${run}" ] ; then
+		if [ ${run} = 0 ] ; then
+			if [ "${FORCE_RUN}" = "Y" ] ; then
+				log "Enforce running despite instruction in ${markerfile}"
+			else
+				log "Explicit request to not run the script in ${markerfile}"
+				exit 0
+			fi
+		fi
+	fi
+else
+	error "No ${markerfile} file: aborting"
+	exit 1
+fi
+log ""
+
+# Check the packages/po/packages_list* files
+listfile=${DI_COPY}/packages/po/packages_list
+
+# Do not accept working on a locked copy
+LOCKFILE=$DI_COPY/.l10n.lock
+if [ -f $LOCKFILE ] ; then
+	error "$LOCKFILE file detected"
+	error "$DI_COPY seems to be locked by another l10n process"
+	error "Please fix this before lauching the script again"
+	exit 1
+else
+	touch $LOCKFILE
+fi
+
+# First, update the copy of D-I repository
+#cd $DI_COPY
+#if [ "$ONLINE" = "Y" ] ; then
+#	log_cmd -p "Synchronize $DI_COPY/packages..." \
+#		$svn update || gitpoerr
+#fi
+
+# Let's check the thing again....ceinture et bretelles as we say in French
+if [ -n "$(git status -s -uno $DI_COPY/packages/po)" ] ; then
+	error "$DI_COPY seems to contain some GIT conflict files"
+	error "in packages/po (check 2)."
+	error "Please fix this before lauching the script again"
+	exit 1
+fi
+
+# Build a list of all D-I packages with i18n material
+# The list of packages is taken from the file
+# "packages_list" maintained in packages/po
+packages=$(grep -v -E "^\#|^[[:space:]]*$" ${listfile} | sed -r "s/[[:space:]]+-//")
+
+pots=''
+for package in $packages ; do
+	pots="$pots ${package}/debian/po/templates.pot"
+done
+
+# Loop over packages
+#  1a) sync the debian/ directory
+#  1b) run debconf-updatepo
+#  1c) commit back the changes
+log "Phase I: run debconf-updatepo for all packages"
+if [ "$UPDATEPO" = "Y" ]; then
+
+	for i in  $packages; do 
+		log "- $i"
+		cd $DI_COPY/packages/$i/debian
+		log_cmd -p "  - Run debconf-updatepo..." \
+			$debconfupdatepo
+		if [ "$COMMIT" = "Y" ] ; then
+			git diff --exit-code >$DI_COPY/l10n-sync_git-diff.log
+			GITDIFF=$?
+			if [ $GITDIFF == 0 ]; then
+				log "Nothing to commit here"
+				log ""
+			else
+				git add po/templates.pot
+				echo "Commit changed templates.pot to GIT - $i" >>$COMMITLOGFILE
+				git status >>$COMMITLOGFILE
+				echo "" >>$COMMITLOGFILE
+				git commit -uno -m "$COMMIT_MARKER Update templates.pot (from l10n-sync run at dillon)"
+				git push
+				log ""
+			fi
+		fi
+	done
+else
+	log "- Not running debconf-updatepo for packages as requested"
+fi
+log ""
+
+# 2) Merge all templates.pot files together
+cd $DI_COPY/packages
+log "Phase II: update master template files"
+
+# First we create the overall template.pot file
+log "- Merge all package templates.pot files..."
+# Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
+if ! msgcat ${pots} >/dev/null 2>&1 ; then
+	gitpoerr
+fi
+log_cmd --pass msgcat $pots | \
+	sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
+# Determine the most recent POT-Creation-Date for individual components
+# Include sublevel template.pot files too so the timestamp will never be set back
+mpots=""
+for i in $LEVELS; do
+	if [ -f po/sublevel$i/template.pot ]; then
+		mpots="$mpots po/sublevel$i/template.pot"
+	fi
+done
+LASTDATE="$(po_get_header "POT-Creation-Date" \
+		$(po_last_updated "POT-Creation-Date" $pots $mpots))"
+
+# We don't want all templates.pot files headers as we don't care about them
+# So we merge the generated file with a simple header.pot file
+if [ -f po/header.pot -a -s po/template.pot.new ] ; then
+	msgcat --use-first po/header.pot po/template.pot.new | \
+		sed 's/charset=UTF-8/charset=CHARSET/g' > po/template.pot
+	po_replace_header "POT-Creation-Date" "$LASTDATE" po/template.pot
+	rm po/template.pot.new
+else
+	error "ERROR: no $DI_COPY/packages/po/header.pot file. Cannot continue."
+	exit 1
+fi
+
+# Now we create template.pot files for the sublevels
+pot_master=${DI_COPY}/packages/po/template.pot
+
+# Temporarily restore charset header
+sed -i 's/charset=CHARSET/charset=UTF-8/g' $pot_master
+# Sanity check: template.pot should not contain incorrect sublevels
+if [ "$(LC_ALL=en_US.UTF-8 msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
+	error "Invalid sublevel comments detected in template.pot"
+	exit 1
+fi
+for i in $LEVELS; do
+	# Sanity check
+	if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
+		error "Error: directory for sublevel$i does not exist"
+		exit 1
+	fi
+	pot_sublevel=${DI_COPY}/packages/po/sublevel$i/template.pot
+	log "- Create the template.pot file for sublevel $i..."
+	if [ $i -eq 1 ]; then
+		# Select strings without a level
+		# NOTE: this will fail in the case where a string exists in
+		# more than one package POT file and has no level set in one
+		# of them, but does have it set in others! The string will
+		# then end up in the highest level that is explicitly set.
+		msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pot_master >$pot_sublevel.none
+		# Select strings with level 1 set
+		msggrep -X -E -e ":sl1:" $pot_master >$pot_sublevel.sl1
+		# Merge them
+		msgcat $pot_sublevel.none $pot_sublevel.sl1 >$pot_sublevel.new
+		rm $pot_sublevel.none $pot_sublevel.sl1
+	else
+		# Select strings with level N set, but exclude any strings that
+		# also have a level smaller than N set to avoid duplicates
+		msggrep -X -E -e ":sl$i:" $pot_master | \
+			msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+			>$pot_sublevel.new
+	fi
+	sed -i 's/charset=UTF-8/charset=CHARSET/g' $pot_sublevel.new
+
+	# If the only change is the POT-Creation-Date, then ignore it
+	oldfiltered=`mktemp`
+	newfiltered=`mktemp`
+	filter="^\"POT-Creation-Date:"
+	egrep -v "$filter" $pot_sublevel >$oldfiltered
+	egrep -v "$filter" $pot_sublevel.new >$newfiltered
+	if [ -z "$(diff $oldfiltered $newfiltered)" ]; then
+		rm $pot_sublevel.new
+	else
+		mv $pot_sublevel.new $pot_sublevel
+	fi
+	rm $oldfiltered $newfiltered
+done
+# Reset the charset header again
+sed -i 's/charset=UTF-8/charset=CHARSET/g' $pot_master
+log ""
+
+# Update PO files for sublevels:
+# 3a) Synchronize with D-I GIT
+# 3b) Merge the sublevel PO files into a master PO file
+# 3c) Update the master PO file from the master POT file as it will be used
+#     to update package PO files
+# 3d) Update the sublevel PO files from this master PO file and the sublevel POT file
+# 3e) commit back the changed file
+log "Phase III: update master translation files"
+cd $DI_COPY/packages/po
+languages=""
+for po in sublevel1/*.po ; do
+	lang=$(basename $po .po)
+	# Next line is just for quicker testing
+	#[ $lang = nl ] || continue
+	log "- $lang"
+	if [ ! -r PROSPECTIVE ] || \
+	   ([ -r PROSPECTIVE ] && \
+	    ! grep -q "^$lang[[:space:]]*$" PROSPECTIVE); then
+		languages="${languages:+$languages }$lang"
+	fi
+
+	log "  - Merge sublevel PO files into master PO file and update..."
+	list=""
+	for i in $LEVELS; do
+		if [ -f sublevel$i/$lang.po ]; then
+			# First test the validity of the PO file and exit in case it is not valid
+			if ! msgfmt -c sublevel$i/$lang.po >/dev/null ; then
+				echo "Error in sublevel$i/$lang.po"
+				gettexterr
+			fi
+			list="${list:+$list }sublevel$i/$lang.po"
+		fi
+	done
+	# Retain the date and translator of the last updated sublevel PO file
+	LASTFILE="$(po_last_updated "PO-Revision-Date" $list)"
+	LASTDATE="$(po_get_header "PO-Revision-Date" $LASTFILE)"
+	LASTTRANS="$(po_get_header "Last-Translator" $LASTFILE)"
+	msgcat --use-first $list >${lang}.po || gettexterr
+	po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
+	po_replace_header "Last-Translator" "$LASTTRANS" $lang.po
+
+	# Update the master PO file (as it's used to update package PO files)
+	log_cmd --pass msgmerge --previous $lang.po template.pot >$lang.po.new || \
+		gettexterr
+
+	# Remember obsolete strings
+	OBSOLETE="$(po_print_obsolete $lang.po.new)"
+
+	# Optionally merge with PO files from a different source
+	# Strings from the other source are preferred!
+	# Should we disallow automatic commits for this?
+	# WARNING: NOT TESTED!!!
+	if [ -n "$MERGEDIR" ] && [ -r $MERGEDIR/$lang.po ]; then
+		log "  - Merge with $MERGEDIR/$lang.po !!"
+		msgcat --use-first "$MERGEDIR/$lang.po" $lang.po.new \
+			>$lang.po.merge || gettexterr
+		log_cmd --pass msgmerge --previous $lang.po.merge template.pot | \
+			msgattrib --no-obsolete	>$lang.po.new || gettexterr
+		rm $lang.po.merge
+	fi
+
+	# Clean up new master PO file
+	msgattrib --width=79 --no-obsolete $lang.po.new >$lang.po
+	rm $lang.po.new
+
+	# Get the master file's Content-Type header
+	MASTERENCODING=$(po_get_header "Content-Type" $lang.po)
+	
+	# Update the sublevel PO files
+	# We keep its old header and only update the POT-Creation-Date
+	for i in $LEVELS; do
+		if [ -f sublevel$i/$lang.po ]; then
+			OLDHEADER="$(po_print_header sublevel$i/$lang.po)"
+		fi
+		if [ -f sublevel$i/$lang.po ]; then
+			log_cmd --pass -m "  - Merge with template.pot for sublevel $i..." \
+				# First test the validity of the PO file and exit in case it is not valid
+				if ! msgfmt -c $lang.po >/dev/null ; then
+					echo "Error in sublevel$i/$lang.po"
+					gettexterr
+				fi
+				msgmerge --previous $lang.po \
+					sublevel$i/template.pot \
+				>sublevel$i/$lang.po.new || gettexterr
+			POTDATE="$(po_get_header "POT-Creation-Date" sublevel$i/$lang.po.new)"
+
+			# Combine old header and new content
+			( echo "$OLDHEADER"
+			  po_print_body sublevel$i/$lang.po.new	) | \
+				msgattrib --width=79 --no-obsolete \
+				>sublevel$i/$lang.po
+			po_replace_header "POT-Creation-Date" "$POTDATE" sublevel$i/$lang.po
+
+			# If the master file is UTF-8, then all sublevel files *must* be UTF-8
+			echo "$MASTERENCODING" | grep -q -i utf-8 && \
+				po_replace_header "Content-Type" "text\/plain; charset=UTF-8" sublevel$i/$lang.po
+
+			# Append any obsolete strings to sublevel1 PO file
+			if [ $i -eq 1 ] && [ "$OBSOLETE" ]; then
+				echo "$OBSOLETE" >>sublevel$i/$lang.po
+			fi
+			rm sublevel$i/$lang.po.new
+		fi
+	done
+
+	# Remove all custom headers so they don't clutter the PO files in
+	# the packages directories
+	msgattrib --no-wrap $lang.po | \
+		grep -v "^\"X-.*: .*\\n\"$" | \
+		msgattrib --width=79 >$lang.po.new
+	mv $lang.po.new $lang.po
+done
+
+if [ "$COMMIT" = "Y" ] ; then
+	git diff --exit-code >$DI_COPY/l10n-sync_git-diff.log
+	GITDIFF=$?
+	if [ $GITDIFF == 0 ]; then
+		log ""
+		log "No changes in master po|pot files to commit"
+	else
+	log_cmd -p "Commit all master PO/POT files to GIT..." \
+		git add $DI_COPY/*/*.po
+		git add $DI_COPY/*/*.pot
+		echo "Commit master PO/POT files to GIT:" >>$COMMITLOGFILE
+		git status >>$COMMITLOGFILE
+		echo "" >>$COMMITLOGFILE
+		git commit -uno -m "$COMMIT_MARKER Updated packages/po/* against package templates (from l10n-sync run at dillon)"
+		git push
+	fi
+fi
+log ""
+
+# Loop over D-I packages:
+# 4a) synchronize the local copy with the D-I GIT
+# 4b) update debian/po/*.po files with files in packages/po/
+# 4c) commit back the changes to D-I GIT
+log "Phase IV: update translations for D-I packages"
+if [ "$SYNCPKGS" = "Y" ]; then
+	
+	for package in $packages ; do
+		log "- $package"
+		cd $DI_COPY/packages/$package/debian/po
+		if [ "$ONLINE" = "Y" ] ; then
+			log_cmd -p "  - synchronize with D-I repository..." \
+				git pull || giterr
+		fi
+		log "  - rebuild language files"
+		# For each language listed in packages/po, update PO files
+		for lang in $languages ; do
+			logn "$lang "
+			cat >$lang.po.new <<EOF
+# THIS FILE IS GENERATED AUTOMATICALLY FROM THE D-I PO MASTER FILES
+# The master files can be found under packages/po/
+#
+# DO NOT MODIFY THIS FILE DIRECTLY: SUCH CHANGES WILL BE LOST
+#
+EOF
+			log_cmd --pass msgmerge $DI_COPY/packages/po/$lang.po templates.pot | \
+				msgattrib --width=79 --no-obsolete - >>$lang.po.new
+			if [ -f $lang.po ] ; then
+				# We change PO-Revision-Date in the new file only if 
+				# the changes are more than just changing a header
+				# or comment line. For this we "filter" the files
+				# using a carefully crafted regexp.
+				# Comment lines (^\#.*$) are filtered, EXCEPT for
+				# the fuzzy markers (^\#,.*$).
+				oldfiltered=`mktemp`
+				newfiltered=`mktemp`
+				filter="^(\"(PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|Language|Plural-Forms|MIME-Version|Content-Type|Content-Transfer-Encoding|X-.*):|#[^,]|#$)"
+				msgattrib --width=500 $lang.po | egrep -v "$filter" >$oldfiltered
+				msgattrib --width=500 $lang.po.new | egrep -v "$filter" >$newfiltered
+				if [ -z "$(diff $oldfiltered $newfiltered)" ] ; then
+					# Don't commit if the only changes are in filtered lines
+					rm $lang.po.new
+				else
+					# Remember original PO-Revision-Date
+					LASTDATE="$(po_get_header "PO-Revision-Date" $lang.po)"
+					mv $lang.po.new $lang.po
+					# At least one unfiltered line changed
+					# Put the old Revision-Date back if asked for
+					if [ "$KEEP_REVISION" != "N" ] && \
+					   [ "$KEEP_REVISION" = "$lang" ] ; then
+						# Restore original PO-Revision-Date
+						po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
+						log_s1 "$package/debian/po/$lang.po" "CHANGED, revision kept"
+					else
+						log_s1 "$package/debian/po/$lang.po" "CHANGED"
+					fi
+				fi
+				# Remove temporary files
+				rm $oldfiltered $newfiltered
+			else
+				mv $lang.po.new $lang.po
+				log_s1 "$package/debian/po/$lang.po" "CHANGED"
+			fi
+		done
+		log ""
+		if [ "$COMMIT" = "Y" ] ; then
+			git diff --exit-code >$DI_COPY/l10n-sync_git-diff.log
+			GITDIFF=$?
+			if [ $GITDIFF == 0 ]; then
+				log "No changed po|pot files to commit here"
+				log ""
+			else
+				git add *.po
+				echo "Commit changed/added po files to GIT - $package:" >>$COMMITLOGFILE
+				git status >>$COMMITLOGFILE
+				echo "" >>$COMMITLOGFILE
+				git commit -uno -m "$COMMIT_MARKER Commit changed/added po files (from l10n-sync run at dillon)"
+				git push
+				log ""
+			fi
+		fi
+	done
+else
+	log "- Not syncing D-I packages as requested"
+fi
+
+log ""
+log "Run successfully completed - $(date -u)"
+
+# Clean-up some left-over files
+rm $DI_COPY/packages/po/template.pot   # the overall template.pot file from 2)
+rm $DI_COPY/packages/po/*.po           # the master PO files from 3b)
+rm $DI_COPY/packages/po/messages.mo
+
+# Remove the lock file
+rm -f $LOCKFILE || true

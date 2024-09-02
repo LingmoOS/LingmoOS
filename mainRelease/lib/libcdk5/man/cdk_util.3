@@ -1,0 +1,391 @@
+'\" t
+.\" $Id: cdk_util.3,v 1.14 2019/02/20 23:22:06 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.ie \n(.g .ds `` \(lq
+.el       .ds `` ``
+.ie \n(.g .ds '' \(rq
+.el       .ds '' ''
+.de XX
+..
+.TH cdk_util 3
+.SH NAME
+.XX CDKgetDirectoryContents
+.XX CDKreadFile
+.XX alignxy
+.XX char2Chtype
+.XX char2DisplayType
+.XX checkForLink
+.XX chtype2String
+.XX deleteCursesWindow
+.XX eraseCursesWindow
+.XX getListIndex
+.XX getString
+.XX justifyString
+.XX mode2Filetype
+.XX moveCursesWindow
+.XX popupDialog
+.XX popupLabel
+.XX popupLabelAttrib
+.XX selectFile
+.XX setWidgetDimension
+.XX stripWhiteSpace
+.XX viewFile
+.XX viewInfo
+cdk_util \- Cdk utility functions
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int CDKgetDirectoryContents ("
+.BI "const char *" "directory",
+.BI "char ***" "list");
+.TP 15
+.B "int CDKreadFile ("
+.BI "const char *" "filename",
+.BI "char ***" "info");
+.TP 15
+.B "void alignxy ("
+.BI "WINDOW *" "window",
+.BI "int *" "xpos",
+.BI "int *" "ypos",
+.BI "int " "boxWidth",
+.BI "int " "boxHeight");
+.TP 15
+.B "chtype *char2Chtype ("
+.BI "const char *" "string",
+.BI "int *" "length",
+.BI "int *" "align");
+.TP 15
+.B "EDisplayType char2DisplayType ("
+.BI "const char *" "string");
+.TP 15
+.B "int checkForLink ("
+.BI "const char *" "line",
+.BI "char *" "filename");
+.TP 15
+.B "char *chtype2String (
+.BI "const chtype *" "string");
+.TP 15
+.B "void deleteCursesWindow ("
+.BI "WINDOW *" "window");
+.TP 15
+.B "void eraseCursesWindow ("
+.BI "WINDOW *" "window");
+.TP 15
+.B "int getListIndex ("
+.BI "CDKSCREEN *" "screen",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize",
+.BI "boolean " "numbers");
+.TP 15
+.B "char *getString ("
+.BI "CDKSCREEN *" "screen",
+.BI "const char *" "title",
+.BI "const char *" "label",
+.BI "const char *" "init");
+.TP 15
+.B "int justifyString ("
+.BI "int " "fieldWidth",
+.BI "int " "mesglen",
+.BI "int " "justify");
+.TP 15
+.B "int mode2Filetype ("
+.BI "mode_t " "fileMode");
+.TP 15
+.B "void moveCursesWindow ("
+.BI "WINDOW *" "window",
+.BI "int " "xdiff",
+.BI "int " "ydiff");
+.TP 15
+.B "int popupDialog ("
+.BI "CDKSCREEN *" "screen",
+.BI "CDK_CONST char **" "mesg",
+.BI "int " "mesgCount",
+.BI "CDK_CONST char **" "buttons",
+.BI "int " "buttonCount");
+.TP 15
+.B "void popupLabel ("
+.BI "CDKSCREEN *" "win",
+.BI "CDK_CONST char **" "mesg",
+.BI "int " "count");
+.TP 15
+.B "void popupLabelAttrib ("
+.BI "CDKSCREEN *" "win",
+.BI "CDK_CONST char **" "mesg",
+.BI "int " "count",
+.BI "chtype " "attribute");
+.TP 15
+.B "char *selectFile ("
+.BI "CDKSCREEN *" "screen",
+.BI "const char *" "title");
+.TP 15
+.B "int setWidgetDimension ("
+.BI "int " "parentDim",
+.BI "int " "proposedDim",
+.BI "int " "adjustment");
+.TP 15
+.B "void stripWhiteSpace ("
+.BI "EStripType " "stripType",
+.BI "char *" "string");
+.TP 15
+.B "int viewFile ("
+.BI "CDKSCREEN *" "screen",
+.BI "const char *" "title",
+.BI "const char *" "filename",
+.BI "CDK_CONST char **" "buttons",
+.BI "int " "buttonCount");
+.TP 15
+.B "int viewInfo ("
+.BI "CDKSCREEN *" "screen",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "info",
+.BI "int " "size",
+.BI "CDK_CONST char **" "buttons",
+.BI "int " "buttonCount",
+.BI "boolean " "interpret");
+.fi
+.SH DESCRIPTION
+These are utility functions that one may use to initialize,
+build or customize widgets.
+.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B CDKgetDirectoryContents
+opens and reads the contents of the given directory, filling
+the array \fBlist\fR with the sorted contents of the directory.
+If the directory cannot be opened then it returns a value of -1.
+.TP 5
+.B CDKreadFile
+Read the file \fIfilename\fP,
+load the contents into a dynamically allocated array,
+storing its address via \fIinfo\fP.
+It returns the number of lines
+read if the file could be opened, -1 otherwise.
+.TP 5
+.B alignxy
+Aligns a box on the given \fIwindow\fP with the height and width given.
+See cdk_position (3) for the interpretation of the
+\fIxpos\fP,
+\fIypos\fP,
+\fIboxWidth\fP and
+\fIboxHeight\fP,
+parameters.
+.TP 5
+.B char2Chtype
+Translate a character \fIstring\fP with embedded format markers
+(e.g., \*(``</X/Y>Blah Blah\*('')
+to a null-terminated array of chtype's.
+.RS
+.bP
+The length of the array is stored via the \fIlength\fP parameter.
+.bP
+The \fBalign\fR parameter contains justification information
+(LEFT, CENTER, RIGHT).
+.IP
+The caller is responsible for freeing the result.
+.RE
+.IP
+See \fBcdk_display\fP(3) for details on formatting.
+.TP 5
+.B char2DisplayType
+Lookup the given name in \fIstring\fP and return the equivalent display type.
+See also cdk_display (3).
+.TP 5
+.B checkForLink
+Check if the given \fIline\fP is of the form
+.RS
+<F=\fIfilename\fP>
+.RE
+.IP
+If so, extract the filename from the line, storing it in the \fIfilename\fP
+buffer (which must hold at least CDK_PATHMAX characters).
+Return nonzero if a filename is extracted.
+.TP 5
+.B chtype2String
+Extract the characters and formatting information
+from a null-terminated array of chtype's \fIstring\fP.
+A dynamically allocated string is returned.
+.IP
+See \fBcdk_display\fP(3) for details on Cdk's formatting.
+.IP
+In addition, this function supports a feature needed to represent
+multi-line title strings returned by \fBgetCdkTitle\fP (see \fBcdk_objs\fP(3)).
+Each newline separating lines in the title
+is represented by \*(``<#10>\*('' to
+allow Cdk to display the string in a text field.
+.TP 5
+.B deleteCursesWindow
+Safely delete a given window,
+i.e., first check if the \fIwindow\fP parameter is nonnull.
+.TP 5
+.B eraseCursesWindow
+Safely erase a given window,
+i.e., first check if the \fIwindow\fP parameter is nonnull.
+.TP 5
+.B getListIndex
+Display a scrollable list of strings in a dialog,
+allow the user to select one.
+Return the index in the list of the value selected.
+.RS
+.bP
+The \fIlist\fP parameter contains the strings to display;
+there are \fIlistSize\fP strings in the list.
+.bP
+If \fInumbers\fP is true, the displayed list items will be numbered.
+.RE
+.TP 5
+.B getString
+pops up an entry widget with
+.RS
+.bP
+a title supplied by the value
+of the \fBtitle\fR parameter,
+.bP
+a label supplied by the \fBlabel\fR parameter,
+and
+.bP
+an initial value supplied by the \fBinitialValue\fR parameter.
+.RE
+.IP
+It returns
+a pointer to the value typed in or NULL if the widget was exited early.
+.TP 5
+.B justifyString
+Given a string length \fImesglen\fP,
+the available field width \fIfieldWidth\fP
+and a justification type \fIjustify\fP,
+return the number of characters by which to shift the string.
+.TP 5
+.B mode2Filetype
+Given a file protection mode \fIfileMode\fP,
+return ignoring the file-type bits,
+i.e., ignoring the corresponding permissions data.
+.TP 5
+.B moveCursesWindow
+Move a given \fIwindow\fP by the amounts in \fIxdiff\fP and \fIydiff\fP.
+.TP 5
+.B popupDialog
+creates a quick pop-up dialog box.
+Pass in
+.RS
+.bP
+the message in the \fBmesg\fR parameter,
+.bP
+the size of the message in the \fBmesgCount\fR parameter,
+.bP
+the button labels in the \fBbuttons\fR parameter and
+.bP
+the number of buttons in the \fBbuttonCount\fR parameter.
+.RE
+.IP
+The dialog box will be centered on the screen.
+.TP 5
+.B popupLabel
+creates a quick pop-up label widget.
+.IP
+The message and the size of
+the message are passed in via
+the \fBmesg\fR and \fBcount\fR parameters respectively.
+.IP
+The label widget waits until the user hits a character and is centered
+on the screen.
+.TP 5
+.B popupLabelAttrib
+Display a simple dialog with
+a list of \fIcount\fP message strings \fImesg\fP.
+Use the given \fIattribute\fP for the background of the dialog.
+.TP 5
+.B selectFile
+Display a file-selection dialog.
+Return the selected filename, or null if none is selected.
+The caller should free the return-value.
+.TP 5
+.B setWidgetDimension
+This is a helper function used to set the height/width of a widget:
+.RS
+.bP
+If the proposed dimension \fIproposedDim\fP is FULL or zero,
+the return value will be \fIparentDim\fP.
+.bP
+If the proposed dimension \fIproposedDim\fP is positive,
+.RS
+.bP
+and it is larger than \fIparentDim\fP, return \fIproposedDim\fP,
+.bP
+otherwise return \fIproposedDim\fP plus \fIadjustment\fP.
+.RE
+.bP
+If the proposed dimension \fIproposedDim\fP is negative,
+the return value will be \fIparentDim\fP plus \fIproposedDim\fP.
+.bP
+Otherwise, the return value will be \fIproposedDim\fP.
+.RE
+.TP 5
+.B stripWhiteSpace
+Strip whitespace from the front and/or back of the given \fIstring\fP.
+.IP
+The \fIstripType\fP parameter controls the type of stripping done:
+vFRONT, vBACK or vBOTH.
+.TP 5
+.B viewFile
+Read the file specified by \fIfilename\fP and display it in a CDKVIEWER window.
+The \fItitle\fP, \fIbuttons\fP and \fIbuttonCount\fP are applied to the
+CDKVIEWER window.
+.RS
+.bP
+The viewer shows
+the contents of the file supplied by the \fBfilename\fR value.
+.bP
+The buttons on
+the file viewer are supplied by the \fBbuttons\fR parameter.
+.RE
+.IP
+It returns the index of the button selected,
+or -1 if the file does not exist or if the widget was exited early.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBStrip_Type/Result\fR
+=
+vFRONT/T{
+This tells the function to remove
+all of the white space from the
+front of the given string.
+T}
+vBACK/T{
+This tells the function to remove
+all of the white space from the
+back of the given string.
+T}
+vBOTH/T{
+This tells the function to remove
+all of the white space from both
+the front and the back of the given string.
+T}
+.TE
+.TP 5
+.B viewInfo
+Display the list of strings in \fIinfo\fP in a CDKVIEWER window.
+The number of strings is given by \fIsize\fP.
+The \fItitle\fP, \fIbuttons\fP and \fIbuttonCount\fP are applied to the
+CDKVIEWER window.
+.
+.SH SEE ALSO
+.BR cdk_dialog (3),
+.BR cdk_display (3),
+.BR cdk_misc (3),
+.BR cdk_objs (3),
+.BR cdk_position (3).

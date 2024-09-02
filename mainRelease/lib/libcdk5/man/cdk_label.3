@@ -1,0 +1,284 @@
+.\" $Id: cdk_label.3,v 1.20 2019/02/15 00:49:26 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_label 3
+.SH NAME
+.XX activateCDKLabel
+.XX destroyCDKLabel
+.XX drawCDKLabel
+.XX eraseCDKLabel
+.XX getCDKLabelBox
+.XX getCDKLabelMessage
+.XX moveCDKLabel
+.XX newCDKLabel
+.XX positionCDKLabel
+.XX setCDKLabel
+.XX setCDKLabelBackgroundAttrib
+.XX setCDKLabelBackgroundColor
+.XX setCDKLabelBox
+.XX setCDKLabelBoxAttribute
+.XX setCDKLabelHorizontalChar
+.XX setCDKLabelLLChar
+.XX setCDKLabelLRChar
+.XX setCDKLabelMessage
+.XX setCDKLabelULChar
+.XX setCDKLabelURChar
+.XX setCDKLabelVerticalChar
+.XX waitCDKLabel
+cdk_label \- Creates a managed curses label widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "void activateCDKLabel ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "unused");
+.TP 15
+.B "void destroyCDKLabel ("
+.BI "CDKLABEL *" "label");
+.TP 15
+.B "void drawCDKLabel ("
+.BI "CDKLABEL *" "label",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKLabel ("
+.BI "CDKLABEL *" "label");
+.TP 15
+.B "boolean getCDKLabelBox ("
+.BI "CDKLABEL *" "label");
+.TP 15
+.B "chtype **getCDKLabelMessage ("
+.BI "CDKLABEL *" "label"
+.BI "int *" "messageLines");
+.TP 15
+.B "void moveCDKLabel ("
+.BI "CDKLABEL *" "label",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKLABEL *newCDKLabel ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "CDK_CONST char **" "message",
+.BI "int " "messageLines",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKLabel ("
+.BI "CDKLABEL *" "label");
+.TP 15
+.B "void setCDKLabel ("
+.BI "CDKLABEL *" "label",
+.BI "CDK_CONST char **" "message",
+.BI "int " "messageLines",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKLabelBackgroundAttrib ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKLabelBackgroundColor ("
+.BI "CDKLABEL *" "label",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKLabelBox ("
+.BI "CDKLABEL *" "label",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKLabelBoxAttribute ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelHorizontalChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelLLChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelLRChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelMessage ("
+.BI "CDKLABEL *" "label",
+.BI "CDK_CONST char **" "message",
+.BI "int " "messageLines");
+.TP 15
+.B "void setCDKLabelULChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelURChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKLabelVerticalChar ("
+.BI "CDKLABEL *" "label",
+.BI "chtype " "character");
+.TP 15
+.B "char waitCDKLabel ("
+.BI "CDKLABEL *" "label",
+.BI "char " "key");
+.fi
+.SH DESCRIPTION
+The Cdk label widget creates a pop-up label window.
+The following functions create or manipulate the Cdk label widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKLabel
+obsolete entrypoint which calls \fBdrawCDKLabel\fP.
+.TP 5
+.B destroyCDKLabel
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKLabel
+draws the label widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKLabel
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKLabelBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKLabelMessage
+returns the contents of the label widget.
+The parameter \fBmessageLines\fR points to the location
+which will be given the number of message-lines.
+.TP 5
+.B moveCDKLabel
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKLabel
+creates a label widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBmessage\fR
+is the message to be displayed in the window.
+It may contain any of the standard Cdk display format commands.
+To learn more about this see \fIcdk_display (3)\fR.
+.TP 5
+\fBrows\fR
+is the number of message rows that were passed in the \fBmessage\fR parameter.
+.TP 5
+\fBbox\fR
+is true if widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKLabel
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKLabel
+allows the user to change the contents of the label widget.
+The parameters are the same as the \fBnewCDKLabel\fR.
+.TP 5
+.B setCDKLabelBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKLabelBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR is in the format of the Cdk format strings.
+For more information see \fIcdk_display (3)\fR.
+.TP 5
+.B setCDKLabelBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKLabelBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKLabelHorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDKLabelLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKLabelLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKLabelMessage
+This sets the contents of the label widget.
+.TP 5
+.B setCDKLabelULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKLabelURChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKLabelVerticalChar
+sets the vertical drawing character for the box to the given character.
+.TP 5
+.B waitCDKLabel
+waits for a user to press a key.
+The \fBlabel\fR parameter is the pointer to a label widget,
+and \fBkey\fR is the key to wait for.
+If no specific key is desired, use \fI(char)0\fR.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

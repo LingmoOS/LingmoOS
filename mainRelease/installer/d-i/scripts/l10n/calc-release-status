@@ -1,0 +1,221 @@
+#! /bin/bash
+set -e
+
+# Determine how complete translations are for the next release of D-I.
+# Should be run by the D-I release manager as part of the preparations
+# for a new release. The resulting file should be included in images
+# and is used by localechooser to print a warning in case a translation
+# is incomplete.
+
+# It is suggested to run this script from an empty directory.
+# The output of the script is the file 'translation-status'.
+# Format of that file is '<lang>: <sublevel> <status>', where:
+# - <sublevel> is the first sublevel that is not fully translated or,
+#   if the language /is/ fully translated, the highest sublevel;
+# - <status> is: F (full), M (mostly: >90%), P (partial: 50-90%),
+#   L (limited: <50%).
+# Note that sublevels 1 and 2 are taken together.
+
+# By default the script will:
+# - process all packages listed in trunk/packages/po/packages_list;
+# - use the version of each package currently in testing.
+#
+# If a package in packages_list has a "-" after its name, it will be
+# skipped. It is also possible to use a different version or to skip a
+# package by creating a file 'packages_exceptions'. Example of contents:
+# <package>	x.y	# Use version x.y instead of version in testing
+# <package>	-	# Skip this package
+#
+# Notes regarding the use of exceptions:
+# - other version: only to be used if that version has already been
+#   uploaded and tagged and will be migrated to testing _before_ the
+#   release;
+# - skip package: only to be used if a package is not used in this
+#   D-I release (e.g: new package; specific to a non-release arch).
+
+# Copyright: Frans Pop <fjp@debian.org>, 2008
+# Copyright: Otavio Salvador <otavio@debian.org>, 2010
+# Copyright: Cyril Brulebois <kibi@debian.org>, 2013-2017
+
+# Make sure output of gettext commands are in English
+export LC_ALL=C
+
+export NUMLEVELS=5
+export SUITE=testing
+export GITREPO=${GITREPO:-https://salsa.debian.org/installer-team}
+
+log() {
+	echo "$*" >&2
+}
+error() {
+	echo "E: $*" >&2
+}
+
+# Remove comment lines and blank lines
+real_contents() {
+	grep -Ev "^(#.*|)[[:space:]]*$" $1
+}
+
+# Use rmadison to get the current version of a package in $SUITE
+# Check first if an exception has been defined
+get_version() {
+	local package madison
+	package=$1
+
+	if [ -r packages_exceptions ]; then
+		version=$(sed -n -r "/^$package[[:space:]]/ s/^$package[[:space:]]+//p" packages_exceptions)
+		if [ "$version" = "-" ]; then
+			log "- INFO: skipping $package (excluded in packages_exceptions)"
+			echo "$package (skipped)" >>packages.log
+			return 1
+		elif [ "$version" ]; then
+			log "- INFO: version exception for $package; using version '$version'"
+			echo "$version"
+			return 0
+		fi
+	fi
+
+	madison="$(rmadison -u debian -s $SUITE $package -a source)"
+	if [ -z "$madison" ]; then
+		error "error getting madison info for $package for '$SUITE'"
+		exit 1
+	elif [ $(echo "$madison" | wc -l) -gt 1 ]; then
+		error "got multiple lines from madison for $package"
+		exit 1
+	fi
+	echo "$madison" | cut -d"|" -f2 | sed "s/[[:space:]]//g;s/+nmu.*//g"
+}
+
+# Output number of translated/fuzzy/untranslated messages in a file
+po_status() {
+	local pofile stat_info type stats
+	pofile=$1
+
+	stat_info=$(msgfmt --stat -c -o /dev/null $pofile 2>&1 | \
+		grep -E "^[0-9]+ .* messages?")
+	for type in translated fuzzy untranslated; do
+		if $(echo $stat_info | grep -Eq "[0-9]+ $type"); then
+			stats=${stats:+$stats }$(echo $stat_info | \
+				sed -r "s/(^|.*[^0-9])([0-9]+) $type.*/\2/")
+		else
+			stats=${stats:+$stats }0
+		fi
+	done
+	echo "$stats"
+}
+
+# Split a PO or POT file into the different sublevels
+# This function uses the same logic as l10n-sync and should be kept
+# in sync with that!
+split_levels() {
+	local pofile lpofile i
+	pofile=$1
+
+	[ -f $pofile ] || return 0
+	for i in $(seq 1 $NUMLEVELS); do
+		lpofile=sublevel$i/$(basename $pofile)
+		mkdir -p sublevel$i
+
+		if [ $i -eq 1 ]; then
+			# Select strings without a sublevel
+			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pofile \
+				>$lpofile.none 2>/dev/null
+			# Select strings with sublevel 1 set
+			msggrep -X -E -e ":sl1:" $pofile \
+				>$lpofile.sl1  2>/dev/null
+			# Merge them
+			msgcat $lpofile.none $lpofile.sl1 >$lpofile
+			rm $lpofile.none $lpofile.sl1
+		else
+			# Select strings with sublevel N set, but exclude any
+			# strings that also have a sublevel smaller than N set
+			# to avoid duplicates
+			msggrep -X -E -e ":sl$i:" $pofile 2>/dev/null | \
+				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+				>$lpofile 2>/dev/null
+		fi
+	done
+}
+
+# FIXME: no real need for a local copy, no more “svn export” since the conversion to git
+cp ../../packages/po/packages_list .
+
+version=$(get_version localechooser)
+
+mkdir -p stats
+rm -f stats/*
+
+log "Gathering the data using parallelism..."
+> packages.log
+
+> stats/languages
+p_dirs=$(real_contents packages_list | sort)
+procs=$(grep -c ^processor /proc/cpuinfo)
+echo $p_dirs | xargs -n 1 -P $procs ./calc-release-status-helper
+
+log "Calculating statistics..."
+
+: > translation-status
+echo "# Installer translation status generated by the script:" >> translation-status
+echo "# scripts/l10n/calc-release-status" >> translation-status
+echo "# This file should be updated before every official release." >> translation-status
+echo "# Generated on: $(date -uR)" >> translation-status
+echo "#" >> translation-status
+
+languages="$(cat stats/languages | grep -v "^en$" | sort)"
+
+compute_lang() {
+	lang=$1
+	for level in $(seq 1 $NUMLEVELS); do
+		# Sublevels 1 and 2 are taken together
+		if [ $level -ne 2 ]; then
+			total=0; t_trans=0; t_untrans=0
+		fi
+
+		# If a translation was not present for a package, take the
+		# values from the template (which is always untranslated)
+		for plfile in stats/*.$level; do
+			if ! stat=$(grep "^$lang:" $plfile); then
+				stat="$(grep "^template:" $plfile)"
+			fi
+			trans=$(echo "$stat" | awk '{print $2}')
+			fuzzy=$(echo "$stat" | awk '{print $3}')
+			untrans=$(echo "$stat" | awk '{print $4}')
+			t_trans=$(($t_trans + $trans))
+			t_untrans=$(($t_untrans + $fuzzy + $untrans))
+		done
+		total=$(($t_trans + $t_untrans))
+
+		# Sublevels 1 and 2 are taken together
+		[ $level -gt 1 ] || continue
+
+		if [ $t_untrans -gt 0 ]; then
+			if [ $(($t_trans * 100 / $total)) -gt 90 ]; then
+				log "- $lang is mostly translated at $level: $t_trans/$total"
+				echo "$lang: $level M" >>translation-status.tmp
+			elif [ $(($t_trans * 100 / $total)) -gt 50 ]; then
+				log "- $lang is partially translated at $level: $t_trans/$total"
+				echo "$lang: $level P" >>translation-status.tmp
+			elif [ $(($t_trans * 100 / $total)) -gt 0 ]; then
+				log "- $lang is limited translated at $level: $t_trans/$total"
+				echo "$lang: $level L" >>translation-status.tmp
+			else
+				log "- $lang is untranslated at $level"
+				echo "$lang: $level U" >>translation-status.tmp
+			fi
+			break
+		elif [ $level -eq $NUMLEVELS ]; then
+			log "- $lang is fully translated"
+			echo "$lang: $level F" >>translation-status.tmp
+		fi
+	done
+}
+
+# Do all computations at once:
+for lang in $languages; do
+	compute_lang $lang &
+done
+wait
+
+# Sort and merge the results:
+sort translation-status.tmp >> translation-status && rm -f translation-status.tmp

@@ -1,0 +1,109 @@
+# $Id: Makefile.in,v 1.8 2020/09/23 20:27:16 tom Exp $
+#
+# Makefile for the cli directory.
+#
+SHELL		= /bin/sh
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+srcdir		= @srcdir@
+VPATH		= $(srcdir)
+
+CC		= @CC@
+RM		= rm -f
+CTAGS		= @CTAGS@
+ETAGS		= @ETAGS@
+LINT		= @LINT@
+LINT_OPTS	= @LINT_OPTS@
+
+LIBS		= -l@LIB_ROOTNAME@ @LIBS@
+
+LIBTOOL		= @LIBTOOL@ @ECHO_LT@
+LIBTOOL_CLEAN	= @LIB_CLEAN@
+LIBTOOL_LINK	= @LIB_LINK@
+LINK		= $(LIBTOOL_LINK)
+
+x		= @EXEEXT@
+o		= .@OBJEXT@
+LOCAL_LIBDIR	= @top_builddir@
+
+CFLAGS		= @CFLAGS@ @EXTRA_CFLAGS@
+CPPFLAGS	= @DEFS@ -I../include -I$(srcdir)/../include -I. @CPPFLAGS@
+LDFLAGS		= -L.. @LDFLAGS@ @LOCAL_LDFLAGS@
+
+BINS	= \
+	cdkalphalist$x \
+	cdkcalendar$x \
+	cdkdialog$x \
+	cdkentry$x \
+	cdkfselect$x \
+	cdkitemlist$x \
+	cdklabel$x \
+	cdkmatrix$x \
+	cdkmentry$x \
+	cdkradio$x \
+	cdkscale$x \
+	cdkscroll$x \
+	cdkselection$x \
+	cdkslider$x \
+	cdktemplate$x \
+	cdkviewer$x
+
+CDKSRC	= \
+	cdkalphalist.c \
+	cdkcalendar.c \
+	cdkdialog.c \
+	cdkentry.c \
+	cdkfselect.c \
+	cdkitemlist.c \
+	cdklabel.c \
+	cdkmatrix.c \
+	cdkmentry.c \
+	cdkradio.c \
+	cdkscale.c \
+	cdkscroll.c \
+	cdkselection.c \
+	cdkslider.c \
+	cdktemplate.c \
+	cdkviewer.c
+
+LINKIT	= @ECHO_LD@$(LINK) $(CFLAGS) $(CPPFLAGS) $? -o $@ $(LDFLAGS) $(LIBS)
+
+@MAKE_PHONY@.PHONY: all clean distclean lint
+
+all : $(BINS)
+
+cdkalphalist$x :	cdkalphalist.c	; $(LINKIT)
+cdkcalendar$x :		cdkcalendar.c	; $(LINKIT)
+cdkdialog$x :		cdkdialog.c	; $(LINKIT)
+cdkentry$x :		cdkentry.c	; $(LINKIT)
+cdkfselect$x :		cdkfselect.c	; $(LINKIT)
+cdkitemlist$x :		cdkitemlist.c	; $(LINKIT)
+cdklabel$x :		cdklabel.c	; $(LINKIT)
+cdkmatrix$x :		cdkmatrix.c	; $(LINKIT)
+cdkmentry$x :		cdkmentry.c	; $(LINKIT)
+cdkradio$x :		cdkradio.c	; $(LINKIT)
+cdkscale$x :		cdkscale.c	; $(LINKIT)
+cdkscroll$x :		cdkscroll.c	; $(LINKIT)
+cdkselection$x :	cdkselection.c	; $(LINKIT)
+cdkslider$x :		cdkslider.c	; $(LINKIT)
+cdktemplate$x :		cdktemplate.c	; $(LINKIT)
+cdkviewer$x :		cdkviewer.c	; $(LINKIT)
+#
+# Standard clean directives.
+#
+clean::
+	- $(LIBTOOL_CLEAN) $(RM) *.o core $(BINS)
+
+distclean:: clean
+	$(RM) Makefile
+
+@MAKE_LOWER_TAGS@tags :
+@MAKE_LOWER_TAGS@	$(CTAGS) *.[ch] */*.[ch]
+
+@MAKE_LOWER_TAGS@TAGS :
+@MAKE_LOWER_TAGS@	$(ETAGS) *.[ch] */*.[ch]
+
+lint: $(CDKSRC)
+	$(LINT) $(LINT_OPTS) $(CPPFLAGS) $(CDKSRC)

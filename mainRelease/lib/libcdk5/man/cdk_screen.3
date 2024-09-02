@@ -1,0 +1,151 @@
+.\" $Id: cdk_screen.3,v 1.10 2019/02/15 00:23:20 tom Exp $
+.\" Bulleted paragraph
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_screen 3
+.SH NAME
+.XX destroyCDKScreen
+.XX endCDK
+.XX eraseCDKScreen
+.XX initCDKColor
+.XX initCDKScreen
+.XX lowerCDKObject
+.XX raiseCDKObject
+.XX refreshCDKScreen
+.XX registerCDKObject
+.XX unregisterCDKObject
+cdk_screen \- Cdk Screen and Widget Manipulation Functions
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "void destroyCDKScreen("
+.BI "CDKSCREEN *" "screen");
+.TP 15
+.B "void endCDK(void)";
+.TP 15
+.B "void eraseCDKScreen("
+.BI "CDKSCREEN *" "screen");
+.TP 15
+.B "void initCDKColor (void)";
+.TP 15
+.B "CDKSCREEN *initCDKScreen ("
+.BI "WINDOW *" "cursesWindow");
+.TP 15
+.B "void lowerCDKObject("
+.BI "EObjectType " "widgetType",
+.BI "void *" "object");
+.TP 15
+.B "void raiseCDKObject("
+.BI "EObjectType " "widgetType",
+.BI "void *" "object");
+.TP 15
+.B "void refreshCDKScreen("
+.BI "CDKSCREEN *" "screen");
+.TP 15
+.B "void registerCDKObject ("
+.BI "CDKSCREEN *" "screen",
+.BI "EObjectType " "widgetType",
+.BI "void *" "object");
+.TP 15
+.B "void unregisterCDKObject("
+.BI "EObjectType " "widgetType",
+.BI "void *" "object");
+.fi
+.SH DESCRIPTION
+Cdk manages all of the widgets for you.
+These functions perform some of the management of the widgets in a screen.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B destroyCDKScreen
+frees any memory allocated by the Cdk screen pointer.
+.TP 5
+.B endCDK
+cleans up any memory created by starting Cdk and shuts down curses.
+.TP 5
+.B eraseCDKScreen
+erases all of the widgets which are currently associated to the
+given screen.
+This does \fBNOT\fR destroy the widgets.
+.TP 5
+.B initCDKColor
+starts the Cdk color capabilities.
+It defines 64 color pairs each
+of which is accessible using the COLOR_PAIR macro.
+If you do not have color
+support, this function call makes no difference.
+.TP 5
+.B initCDKScreen
+takes a \fBWINDOW*\fR parameter \fIcursesWindow\fR and returns a
+pointer to a \fBCDKSCREEN\fR.
+.IP
+Since all of the widgets take a
+\fBCDKSCREEN\fR pointer as a first argument,
+this is one of the first calls made.
+.IP
+If the \fIcursesWindow\fP parameter is a null pointer,
+\fBinitCDKScreen\fP initializes curses and
+replaces the parameter with \fBstdscr\fP.
+Otherwise, it assumes that your application has already
+initialized the locale and then called \fBinitscr\fP
+.IP
+In either case, the (possibly updated) \fIcursesWindow\fP parameter is
+used as the window for the \fBCDKSCREEN\fP result.
+.TP 5
+.B lowerCDKObject
+has the opposite effect of the \fBraiseCDKObject\fR function call.
+.TP 5
+.B raiseCDKObject
+raises the widget to the top of the screen.
+If there are any
+widgets which overlap the given object when a refresh is done, calling this
+function has the effect of raiding the object so no other widgets obstruct it.
+.RS
+.bP
+The \fIwidgetType\fR parameter states what Cdk widget type this object is.
+.bP
+The \fIobject\fR parameter is a void pointer to the object.
+.RE
+.TP 5
+.B refreshCDKScreen
+redraws all of the widgets which are currently associated to the
+given screen.
+.TP 5
+.B registerCDKObject
+is called automatically when a widget is created.
+If for some
+reason an object does get unregistered, by calling \fBunregisterCDKObject\fR,
+the widget can be registered again by calling this function.
+.RS
+.bP
+The \fIwidgetType\fR parameter states what Cdk widget type this object is.
+.bP
+The \fIobject\fR parameter is a void pointer to the object.
+.RE
+.TP 5
+.B unregisterCDKObject
+removes the widget from the screen.
+This does \fBNOT\fR destroy
+the object, it removes the widget from any further refreshes by the function
+\fBrefreshCDKScreen\fR.
+.RS
+.bP
+The \fIwidgetType\fR parameter states what Cdk widget
+type this object is.
+.bP
+The \fIobject\fR parameter is a void pointer to the object.
+.RE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3)

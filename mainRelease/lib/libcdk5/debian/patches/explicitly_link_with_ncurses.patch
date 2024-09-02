@@ -1,0 +1,19 @@
+Description: Fix missing libncurses5 dependency
+             2017 - '$(CC)' instead of hard code 'gcc' - #876031
+             Thanks Helmut Grohne
+Author: Sam Hocevar <sho@debian.org>
+Reviewed-by: Herbert Parentes Fortes Neto <hpfn@ig.com.br>
+Last-Update: 2017-09-18
+Index: libcdk5-5.0.20161210/Makefile.in
+===================================================================
+--- libcdk5-5.0.20161210.orig/Makefile.in
++++ libcdk5-5.0.20161210/Makefile.in
+@@ -296,7 +296,7 @@ $(OBJECTS) :	include/cdk_config.h
+ all cdklib :: $(CDKLIB)
+ 
+ @MAKE_NORMAL@cdkshlib $(OLD_SHLIB_FILE) :: $(CDKSHOBJS)
+-@MAKE_NORMAL@	gcc -shared -Wl,-soname=$(OLD_SONAME) $(LDFLAGS) $(LIBS) -o $(OLD_SHLIB_FILE) $(CDKSHOBJS)
++@MAKE_NORMAL@	$(CC) -shared -Wl,-soname=$(OLD_SONAME) $(LDFLAGS) $(LIBS) -o $(OLD_SHLIB_FILE) $(CDKSHOBJS) $(LIBS)
+ 
+ #
+ # Make the examples directory.

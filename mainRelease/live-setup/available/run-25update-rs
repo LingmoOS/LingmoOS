@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#set -x
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+# Update the local git clone of the live script rebuild_script
+RS_DIR=/w/rebuild_script
+
+if [ ! -d $RS_DIR ]; then
+    log "No copy of rebuild_script found, cloning"
+    git clone https://salsa.debian.org/live-team/live-build.git \
+	$RS_DIR --no-checkout --depth 5
+fi
+
+cd $RS_DIR
+log "Updating clone of rebuild_script"
+git pull
+log "git pull done, error $?"
+git checkout HEAD test/rebuild.sh
+log "git checkout done, error $?"
+
+# Update the local git clone of the live-build tree too
+LB_DIR=/w/live-build
+
+if [ ! -d $LB_DIR ]; then
+    log "No copy of live-build found, cloning"
+    git clone https://salsa.debian.org/live-team/live-build.git \
+	$LB_DIR
+fi
+
+cd $LB_DIR
+log "Updating clone of live-build"
+git pull
+log "git pull done, error $?"

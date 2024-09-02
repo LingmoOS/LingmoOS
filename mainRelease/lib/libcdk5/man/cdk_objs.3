@@ -1,0 +1,132 @@
+.\" $Id: cdk_objs.3,v 1.6 2019/02/20 22:16:25 tom Exp $
+.de XX
+..
+.ie \n(.g .ds `` \(lq
+.el       .ds `` ``
+.ie \n(.g .ds '' \(rq
+.el       .ds '' ''
+.TH cdk_objs 3
+.SH NAME
+.XX cleanCdkTitle
+.XX drawCdkTitle
+.XX getCdkTitle
+.XX positionCDKObject
+.XX setCDKObjectBackgroundColor
+.XX setCDKObjectPostProcess
+.XX setCDKObjectPreProcess
+.XX setCdkExitType
+.XX setCdkTitle
+.XX validCDKObject
+cdk_objs \- Cdk object-support functions
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+.nf
+.TP 15
+.B "void cleanCdkTitle ("
+.BI "CDKOBJS *" "obj");
+.TP 15
+.B "void drawCdkTitle ("
+.BI "WINDOW *" "window",
+.BI "CDKOBJS *" "object");
+.TP 15
+.B "char * getCdkTitle ("
+.BI "CDKOBJS *" "obj");
+.TP 15
+.B "void positionCDKObject ("
+.BI "CDKOBJS *" "object",
+.BI "WINDOW *" "win");
+.TP 15
+.B "void setCDKObjectBackgroundColor ("
+.BI "CDKOBJS *" "object",
+.BI "const 3char *" "color");
+.TP 15
+.B "void setCDKObjectPostProcess ("
+.BI "CDKOBJS *" "object",
+.BI "PROCESSFN " "func",
+.BI "void *" "data");
+.TP 15
+.B "void setCDKObjectPreProcess ("
+.BI "CDKOBJS *" "object",
+.BI "PROCESSFN " "func",
+.BI "void *" "data");
+.TP 15
+.B "void setCdkExitType("
+.BI "CDKOBJS *" "obj",
+.BI "EExitType *" "type",
+.BI "chtyp " "ch");
+.TP 15
+.B "int setCdkTitle ("
+.BI "CDKOBJS *" "obj",
+.BI "const char *" "title",
+.BI "int " "boxWidth");
+.TP 15
+.B "bool validCDKObject ("
+.BI "CDKOBJS *" "obj");
+.fi
+.SH DESCRIPTION
+Cdk is written in ANSI C, which has "no" object support.
+Most of the object support in Cdk is done using macros and a small number
+of types which hold object information:
+.RS 5
+.TP 5
+CDKFUNCS
+contains the function pointers for common methods of the widgets.
+It is separate from CDKOBJS because it is compiled into each widget's C code
+(see the DeclareCDKObjects() and DeclareSetXXchar() macros.
+The widget instances point to a single copy of CDKFUNCS for each widget.
+.TP 5
+CDKOBJS
+Holds data common to all objects (widget instances).
+It appears first in each widget's struct to allow Cdk
+to use generic functions in binding.c, cdkscreen.c, position.c, etc.
+.RE
+
+.SH AVAILABLE FUNCTIONS
+The functions declared in <cdk_objs.h> are used in situations where the
+expressions are too complex for a macro.
+.TP 5
+.B cleanCdkTitle
+Remove storage for the widget's title.
+.TP 5
+.B drawCdkTitle,
+Draw the widget's title.
+.TP 5
+.B getCdkTitle
+Returns the widget's title as a string.
+Colors are encoded as described in \fBcdk_display\fP(3).
+The lines of text in a multi-line title are separated by \*(``<#10>\*(''
+markers (an encoded \fInewline\fP).
+.TP 5
+.B positionCDKObject
+This allows the user to use the cursor keys to adjust the
+position of the widget.
+.TP 5
+.B setCDKObjectBackgroundColor
+Set the background color of the widget.
+.TP 5
+.B setCDKObjectPostProcess
+Set data for postprocessing.
+.TP 5
+.B setCDKObjectPreProcess
+Set data for preprocessing.
+.TP 5
+.B setCdkExitType
+Set the object's exit-type based on the input.
+The \fB.exitType\fP field should have been part of the CDKOBJS struct, but it
+is used too pervasively in Cdk4 applications to move.
+.TP 5
+.B setCdkTitle
+Set the widget's title.
+.TP 5
+.B validCDKObject 
+Returns true if a "new" was done on the object but no "destroy".
+.
+.SH SEE ALSO
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_process (3).

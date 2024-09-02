@@ -1,0 +1,583 @@
+'\" t
+.\" $Id: cdk_fselect.3,v 1.30 2019/02/15 00:45:08 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_fselect 3
+.SH NAME
+.XX activateCDKFselect
+.XX deleteFileCB
+.XX destroyCDKFselect
+.XX drawCDKFselect
+.XX eraseCDKFselect
+.XX getCDKFselectBox
+.XX getCDKFselectContents
+.XX getCDKFselectCurrentItem
+.XX getCDKFselectDirAttribute
+.XX getCDKFselectDirContents
+.XX getCDKFselectDirectory
+.XX getCDKFselectFileAttribute
+.XX getCDKFselectFillerChar
+.XX getCDKFselectHighlight
+.XX getCDKFselectLinkAttribute
+.XX getCDKFselectSocketAttribute
+.XX injectCDKFselect
+.XX moveCDKFselect
+.XX newCDKFselect
+.XX positionCDKFselect
+.XX setCDKFselect
+.XX setCDKFselectBackgroundAttrib
+.XX setCDKFselectBackgroundColor
+.XX setCDKFselectBox
+.XX setCDKFselectBoxAttribute
+.XX setCDKFselectContents
+.XX setCDKFselectCurrentItem
+.XX setCDKFselectDirAttribute
+.XX setCDKFselectDirContents
+.XX setCDKFselectDirectory
+.XX setCDKFselectFileAttribute
+.XX setCDKFselectFillerChar
+.XX setCDKFselectHighlight
+.XX setCDKFselectHorizontalChar
+.XX setCDKFselectLLChar
+.XX setCDKFselectLRChar
+.XX setCDKFselectLinkAttribute
+.XX setCDKFselectSocketAttribute
+.XX setCDKFselectULChar
+.XX setCDKFselectURChar
+.XX setCDKFselectVerticalChar
+cdk_fselect \- curses file selector widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "char *activateCDKFselect ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype *" "actions");
+.TP 15
+.B "void deleteFileCB ("
+.BI "EObjectType " "objectType",
+.BI "void *" "object",
+.BI "void *" "clientData");
+.TP 15
+.B "void destroyCDKFselect ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "void drawCDKFselect ("
+.BI "CDKFSELECT *" "fselect",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKFselect ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "boolean getCDKFselectBox ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char **getCDKFselectContents ("
+.BI "CDKFSELECT *" "widget",
+.BI "int *" "size");
+.TP 15
+.B "int getCDKFselectCurrentItem ("
+.BI "CDKFSELECT *" "widget");
+.TP 15
+.B "char *getCDKFselectDirAttribute ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char **getCDKFselectDirContents ("
+.BI "CDKFSELECT *"  "fselect",
+.BI "int *" "count");
+.TP 15
+.B "char *getCDKFselectDirectory ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char *getCDKFselectFileAttribute ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "chtype getCDKFselectFillerChar ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "chtype getCDKFselectHighlight ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char *getCDKFselectLinkAttribute ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char *getCDKFselectSocketAttribute ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "char *injectCDKFselect ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKFselect ("
+.BI "CDKFSELECT *" "fselect",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKFSELECT *newCDKFselect ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "const char *" "title",
+.BI "const char *" "label",
+.BI "chtype " "fieldAttribute",
+.BI "chtype " "fillerCharacter",
+.BI "chtype " "highlight",
+.BI "const char *" "dirAttribute",
+.BI "const char *" "fileAttribute",
+.BI "const char *" "linkAttribute",
+.BI "const char *" "sockAttribute",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKFselect ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "void setCDKFselect ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "directory",
+.BI "chtype " "fieldAttribute",
+.BI "chtype " "fillerCharacter",
+.BI "chtype " "highlight",
+.BI "const char *" "dirAttribute",
+.BI "const char *" "fileAttribute",
+.BI "const char *" "linkAttribute",
+.BI "const char *" "sockAttribute",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKFselectBackgroundAttrib ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKFselectBackgroundColor ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKFselectBox ("
+.BI "CDKFSELECT *" "fselect",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKFselectBoxAttribute ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectContents ("
+.BI "CDKFSELECT *" "widget",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize");
+.TP 15
+.B "void setCDKFselectCurrentItem ("
+.BI "CDKFSELECT *" "widget",
+.BI "int " "item");
+.TP 15
+.B "void setCDKFselectDirAttribute ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "attribute");
+.TP 15
+.B "int setCDKFselectDirContents ("
+.BI "CDKFSELECT *" "fselect");
+.TP 15
+.B "int setCDKFselectDirectory ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "directory");
+.TP 15
+.B "void setCDKFselectFileAttribute ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "attribute");
+.TP 15
+.B "void setCDKFselectFillerChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "filler");
+.TP 15
+.B "void setCDKFselectHighlight ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKFselectHorizontalChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectLLChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectLRChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectLinkAttribute ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "attribute");
+.TP 15
+.B "void setCDKFselectSocketAttribute ("
+.BI "CDKFSELECT *" "fselect",
+.BI "const char *" "attribute");
+.TP 15
+.B "void setCDKFselectULChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectURChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKFselectVerticalChar ("
+.BI "CDKFSELECT *" "fselect",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk file selector widget creates a widget which allows a user to interact
+with the Unix file system.
+This widget allows the user to traverse the file
+system and even delete files.
+(See \fINOTES\fR below for more information)
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKFselect
+activates the file selector widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBfselect\fR is a pointer to a non-NULL file selector widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return
+a \fIchar *\fR representing the information typed into the widget and the
+widget data \fIexitType\fR will be set to \fIvNORMAL\fR.
+.IP
+If the character
+entered was \fIESCAPE\fR then the function will return \fINULL\fR pointer and
+the widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B deleteFileCB
+Prompts the user to confirm,
+and deletes the current item in the file-list.
+.TP 5
+.B destroyCDKFselect
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKFselect
+draws the fselect widget on the screen.
+If the \fBbox\fR option is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKFselect
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKFselectBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKFselectContents
+returns the directory-contents (which are formatted),
+and sets the number of entries via the \fIsize\fP parameter.
+.TP 5
+.B getCDKFselectCurrentItem
+returns the current position in the scroll-widget.
+.TP 5
+.B getCDKFselectDirAttribute
+returns the attribute that directories are drawn with in the
+scrolling region of the widget.
+.TP
+.B getCDKFselectDirContents
+returns the list of files and the corresponding count as a side-effect.
+If no files are found, this function returns zero, otherwise one.
+.TP 5
+.B getCDKFselectDirectory
+returns the current directory of the widget.
+.TP 5
+.B getCDKFselectFileAttribute
+returns the attribute that plain files are drawn with in the
+scrolling region of the widget.
+.TP 5
+.B getCDKFselectFillerChar
+returns the character being used as the filler character in the
+entry field portion of the widget.
+.TP 5
+.B getCDKFselectHighlight
+returns the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP 5
+.B getCDKFselectLinkAttribute
+returns the attribute that symbolic links are drawn with in the
+scrolling region of the widget.
+.TP 5
+.B getCDKFselectSocketAttribute
+returns the attribute that sockets are drawn with in the
+scrolling region of the widget.
+.TP 5
+.B injectCDKFselect
+injects a single character into the widget.
+The parameter \fBfselect\fR is a pointer to a non-NULL file selector widget.
+The parameter \fBcharacter\fR is the character to inject into the widget.
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a \fIchar *\fR representing the information typed into the widget.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+a \fINULL\fR pointer.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+a \fINULL\fR pointer.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKFselect
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.bP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which states
+whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKFselect
+creates an fselect widget and returns a pointer to it.
+Parameters:
+.RS
+.bP
+The \fBscreen\fR parameter
+is the screen you wish this widget to be placed in.
+.bP
+The parameter \fBxpos\fR
+controls the placement of the object along the horizontal axis.
+This parameter
+may be an integer or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer value or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+\fBheight\fR and \fBwidth\fR
+control the height and width of the widget.
+If you provide a value of zero for either of the height or the width,
+the widget will be created with the full width and height of the screen.
+If you provide a negative value, the widget will be created the full height or
+width minus the value provided.
+.bP
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one
+line; just provide a carriage return character at the line break.
+.bP
+\fBlabel\fR
+is the text to use as the label of the file selector.
+.bP
+\fBfieldAttribute\fR
+is the attribute of the entry field at the top of the widget;
+.bP
+\fBfillerCharacter\fR
+is the filler character for the entry field.
+.bP
+\fBhighlight\fR
+is the highlight attribute on the scrolling list.
+.bP
+\fBdirAttribute\fR,
+\fBfileAttribute\fR,
+\fBlinkAttribute\fR and
+\fBsockAttribute\fR
+are the attributes of directories, files, links, and
+sockets found in the directory list.
+.bP
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.bP
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKFselect
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKFselect
+lets the programmer modify certain elements of an existing fselect widget.
+The parameter names correspond to the same parameter
+names listed in the \fBnewCDKFselect\fR function.
+.TP 5
+.B setCDKFselectBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKFselectBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKFselectBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKFselectBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKFselectContents
+sets the contents of the widget.
+.TP 5
+.B setCDKFselectCurrentItem
+set the current position in the scroll-widget.
+.TP 5
+.B setCDKFselectDirAttribute
+sets the attribute that directories will be drawn with in the scrolling
+region of the widget.
+.B
+.B setCDKFselectDirContents
+This creates a list of the files in the current directory.
+See \fBgetCDKFselectDirContents\FP.
+.TP 5
+.B setCDKFselectDirectory
+sets the current directory of the widget.
+.TP 5
+.B setCDKFselectFileAttribute
+sets the attribute that plain files will be drawn with in the scrolling
+region of the widget.
+.TP 5
+.B setCDKFselectFillerChar
+sets the character to use when drawing the entry field portion of the widget.
+.TP 5
+.B setCDKFselectHighlight
+sets the attribute of the highlight bar of the scrolling
+list portion of the widget.
+.TP 5
+.B setCDKFselectHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKFselectLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKFselectLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKFselectLinkAttribute
+sets the attribute that symbolic links will be drawn with in the scrolling
+region of the widget.
+.TP 5
+.B setCDKFselectSocketAttribute
+sets the attribute that sockets will be drawn with in the scrolling
+region of the widget.
+.TP 5
+.B setCDKFselectULChar
+sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKFselectURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKFselectVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+Since this widget is
+built from both the scrolling list widget and the entry field widget, the key
+bindings are the same for the respective fields.
+The extra key bindings are
+listed below.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+CTRL-^/Displays statistics about the current filename.
+Tab/Tries to complete the current filename.
+Up Arrow/Scrolls the scrolling list up one line.
+Down Arrow/Scrolls the scrolling list down one line.
+Page Up/Scrolls the scrolling list up one page.
+CTRL-B/Scrolls the scrolling list up one page.
+Page Down/T{
+Scrolls the scrolling list down one page.
+T}
+CTRL-F/T{
+Scrolls the scrolling list down one page.
+T}
+Return/T{
+Returns the filename in the entry field of the file selector.
+It also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns a \fINULL\fR pointer.
+It also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)
+.SH NOTES
+.PP
+This widget is created from the scrolling list widget,
+and the entry field widget.
+This is a good example on how to build your own widgets using the
+base widgets provided in this distribution.
+In order for you to delete
+files using the file selector, you must add the following call
+into your program.
+(the character X is the character you wish to use to
+tell the file selector you want to delete a file.)
+.RS 5
+\fBbindCDKObject (vSCROLL, fselect->filelist, X, deleteFile, fselect);\fR
+.RE
+where \fBfselect\fR is a pointer to the object.
+This was originally turned on,
+but I thought it better to put the control of file deletion
+on an 'as-need' basis.

@@ -1,0 +1,266 @@
+.\" $Id: cdk_marquee.3,v 1.20 2019/02/15 00:49:26 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_marquee 3
+.SH NAME
+.XX activateCDKMarquee
+.XX deactivateCDKMarquee
+.XX destroyCDKMarquee
+.XX drawCDKMarquee
+.XX eraseCDKMarquee
+.XX getCDKMarqueeBox
+.XX moveCDKMarquee
+.XX newCDKMarquee
+.XX positionCDKMarquee
+.XX setCDKMarqueeBackgroundAttrib
+.XX setCDKMarqueeBackgroundColor
+.XX setCDKMarqueeBox
+.XX setCDKMarqueeBoxAttribute
+.XX setCDKMarqueeHorizontalChar
+.XX setCDKMarqueeLLChar
+.XX setCDKMarqueeLRChar
+.XX setCDKMarqueeULChar
+.XX setCDKMarqueeURChar
+.XX setCDKMarqueeVerticalChar
+cdk_marquee \- curses marquee widget
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "const char *" "message",
+.BI "int " "delay",
+.BI "int " "repeat",
+.BI "boolean " "box");
+.TP 15
+.B "void deactivateCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee");
+.TP 15
+.B "void destroyCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee");
+.TP 15
+.B "void drawCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee");
+.TP 15
+.B "boolean getCDKMarqueeBox ("
+.BI "CDKMENTRY *" "mentry");
+.TP 15
+.B "void moveCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKMARQUEE *newCDKMarquee ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "fieldWidth",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKMarquee ("
+.BI "CDKMARQUEE *" "marquee");
+.TP 15
+.B "void setCDKMarqueeBackgroundAttrib ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKMarqueeBackgroundColor ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKMarqueeBox ("
+.BI "CDKMENTRY *" "mentry",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDKMarqueeBoxAttribute ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeHorizontalChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeLLChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeLRChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeULChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeURChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKMarqueeVerticalChar ("
+.BI "CDKMARQUEE *" "marquee",
+.BI "chtype " "character");
+.fi
+.LP
+.SH DESCRIPTION
+The Cdk marquee widget creates a pop-up marquee window.
+The following functions create or manipulate the Cdk marquee widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKMarquee
+activates the marquee widget.
+.RS
+.bP
+The \fBmarquee\fR parameter is a
+pointer to a defined marquee widget.
+.bP
+The \fBdelay\fR parameter states how long
+to wait between movements.
+This value is highly dependent on each machine the
+program runs on.
+.bP
+The \fBrepeat\fR value tells the marquee widget how many times
+to display the given message.
+.bP
+The \fBbox\fR option draws the widget with or
+without a box.
+This function returns -1 if the message passed is \fINULL\fR,
+0 otherwise.
+.RE
+.TP 5
+.B deactivateCDKMarquee
+deactivates the marquee widget.
+.TP 5
+.B destroyCDKMarquee
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKMarquee
+draws the marquee widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKMarquee
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKMarqueeBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B moveCDKMarquee
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.bP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKMarquee
+creates a marquee widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBwidth\fR
+controls the width of the field.
+If you provide a value of zero for the width,
+the widget uses the width of the screen.
+If a negative value is provided,
+then the widget uses the width of the screen less the value provided.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKMarquee
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKMarqueeBackgroundAttrib
+sets the background attribute of the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKMarqueeBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR is in the format of the Cdk format strings.
+For more information see \fIcdk_display (3)\fR.
+.TP 5
+.B setCDKMarqueeBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKMarqueeBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKMarqueeHorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDKMarqueeLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKMarqueeLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKMarqueeULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKMarqueeURChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKMarqueeVerticalChar
+sets the vertical drawing character for the box to the given character.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

@@ -1,0 +1,96 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /sbin/dpkg"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Configuring file /sbin/start-stop-daemon"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Create custom start-stop-daemon program
+		Chroot chroot dpkg-divert --rename --quiet --add /sbin/start-stop-daemon
+		ln -fs /bin/true chroot/sbin/start-stop-daemon
+
+		# Disable dpkg syncing
+
+cat > chroot/etc/dpkg/dpkg.cfg.d/lingmo-system-build << EOF
+force-unsafe-io
+EOF
+
+		# Manual hacks for special packages
+
+		# Generic lingmo-system-build handle for other live packages to act upon
+		touch chroot/.lingmo-system-build
+
+		# flash-kernel
+		Chroot chroot dpkg-divert --rename --quiet --add /usr/sbin/flash-kernel
+		ln -fs /bin/true chroot/usr/sbin/flash-kernel
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /sbin/start-stop-daemon"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Manual hacks for special packages
+
+		# Generic lingmo-system-build handle
+		rm -f chroot/.lingmo-system-build
+
+		# flash-kernel
+		rm -f chroot/usr/sbin/flash-kernel
+		Chroot chroot dpkg-divert --rename --quiet --remove /usr/sbin/flash-kernel
+
+		# Remove custom start-stop-daemon program
+		rm -f chroot/sbin/start-stop-daemon
+		Chroot chroot dpkg-divert --rename --quiet --remove /sbin/start-stop-daemon
+
+		# Remove dpkg sync configuration
+		rm -f chroot/etc/dpkg/dpkg.cfg.d/lingmo-system-build
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

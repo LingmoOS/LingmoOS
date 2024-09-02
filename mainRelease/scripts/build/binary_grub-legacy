@@ -1,0 +1,235 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Installs grub-legacy into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_BOOTLOADER_BIOS}" != "grub-legacy" ]; then
+	exit 0
+fi
+
+if In_list "${LINGMO_SYS_BUILD_IMAGE_TYPE}" hdd netboot; then
+	exit 0
+fi
+
+Echo_message "Begin installing grub-legacy..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Check architecture
+Check_architectures amd64 i386
+Check_crossarchitectures
+
+# Checking depends
+Check_package chroot /usr/sbin/grub grub-legacy
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+# Local functions
+Grub_live_entry ()
+{
+	local LABEL="${1}"
+	local KERNEL="${2}"
+	local INITRD="${3}"
+	local APPEND="${4}"
+
+	LINUX_LIVE="${LINUX_LIVE}\ntitle\t\tDebian GNU/Linux - ${LABEL}"
+	LINUX_LIVE="${LINUX_LIVE}\nkernel\t\t/${KERNEL} ${INITFS:+boot=${INITFS} }config LINGMO_SYS_BUILD_BOOTAPPEND_LIVE ${APPEND}"
+	LINUX_LIVE="${LINUX_LIVE}\ninitrd\t\t/${INITRD}"
+}
+
+Grub_install_entry ()
+{
+	local LABEL="${1}"
+	local KERNEL="${2}"
+	local INITRD="${3}"
+	local APPEND="${4}"
+
+	local APPEND="${APPEND} LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL"
+
+	if [ "${LABEL}" != "expert" ] && [ "${LABEL}" != "expertgui" ]; then
+		APPEND="${APPEND} --- quiet"
+	fi
+
+	LINUX_INSTALL="${LINUX_INSTALL}\ntitle\t\tDebian GNU/Linux - ${LABEL}"
+	LINUX_INSTALL="${LINUX_INSTALL}\nkernel\t\t/${KERNEL} ${APPEND}"
+	LINUX_INSTALL="${LINUX_INSTALL}\ninitrd\t\t/${INITRD}"
+}
+
+if [ -e "config/bootloaders/grub-legacy" ]
+then
+	# Internal local copy
+	_SOURCE="config/bootloaders/grub-legacy"
+else
+	# Internal system copy
+	if [ -n "${LIVE_BUILD}" ]
+	then
+		_SOURCE="${LIVE_BUILD}/share/bootloaders/grub-legacy"
+	else
+		_SOURCE="/usr/share/live/build/bootloaders/grub-legacy"
+	fi
+fi
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		INITFS="live"
+		;;
+
+	*)
+		INITFS=""
+		;;
+esac
+
+# Setting destination directory
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		DESTDIR_LIVE="binary/live"
+		;;
+
+	*)
+		DESTDIR_LIVE="binary/boot"
+		;;
+esac
+DESTDIR_INSTALL="binary/install"
+
+# Creating directory
+mkdir -p "${DESTDIR_LIVE}"
+
+# Setting boot parameters
+if [ "${LINGMO_SYS_BUILD_UNION_FILESYSTEM}" != "overlay" ]
+then
+	LINGMO_SYS_BUILD_BOOTAPPEND_LIVE="${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE} union=${LINGMO_SYS_BUILD_UNION_FILESYSTEM}"
+fi
+
+LINGMO_SYS_BUILD_BOOTAPPEND_LIVE="$(echo ${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE} | sed -e 's|  ||')"
+
+# Assembling kernel configuration
+
+# Default entries
+DEFAULT_FLAVOUR="$(echo ${LINGMO_SYS_BUILD_LINUX_FLAVOURS} | awk '{ print $1 }')"
+DEFAULT_KERNEL="$(basename chroot/boot/vmlinuz-*${DEFAULT_FLAVOUR})"
+DEFAULT_INITRD="initrd.img-$(echo ${DEFAULT_KERNEL} | sed -e 's|vmlinuz-||')"
+
+Grub_live_entry "live" "$(basename ${DESTDIR_LIVE})/${DEFAULT_KERNEL}" "$(basename ${DESTDIR_LIVE})/${DEFAULT_INITRD}" "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}"
+
+if [ "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}" != "none" ]
+then
+	Grub_live_entry "live (fail-safe mode)" "$(basename ${DESTDIR_LIVE})/${DEFAULT_KERNEL}" "$(basename ${DESTDIR_LIVE})/${DEFAULT_INITRD}" "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+fi
+
+for KERNEL in chroot/boot/vmlinuz-*
+do
+	VERSION="$(basename ${KERNEL} | sed -e 's|vmlinuz-||')"
+
+	Grub_live_entry "live, kernel ${VERSION}" "$(basename ${DESTDIR_LIVE})/$(basename ${KERNEL})" "$(basename ${DESTDIR_LIVE})/initrd.img-${VERSION}" "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}"
+	Grub_live_entry "live, kernel ${VERSION} (fail-safe mode)" "$(basename ${DESTDIR_LIVE})/$(basename ${KERNEL})" "$(basename ${DESTDIR_LIVE})/initrd.img-${VERSION}" "${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+done
+
+LINUX_LIVE="$(/bin/echo ${LINUX_LIVE} | sed -e 's|binary||g' -e 's|//|/|g')"
+
+# Assembling debian-installer configuration
+if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER}" != "none" ]
+then
+	LINUX_LIVE="title\t\tLive:\nroot\n\n${LINUX_LIVE}"
+	LINUX_INSTALL="title\t\tInstaller:\nroot"
+
+	VMLINUZ_DI="install/vmlinuz"
+	INITRD_DI="install/initrd.gz"
+	APPEND_DI="vga=normal"
+
+	VMLINUZ_GI="install/gtk/vmlinuz"
+	INITRD_GI="install/gtk/initrd.gz"
+	APPEND_GI="vga=788"
+
+	if [ -f "binary/${VMLINUZ_GI}" ] && [ -f "binary/${INITRD_GI}" ]
+	then
+		Grub_install_entry "GUI Install" "${VMLINUZ_GI}" "${INITRD_GI}" "${APPEND_GI}"
+		Grub_install_entry "GUI Expert" "${VMLINUZ_GI}" "${INITRD_GI}" "priority=low ${APPEND_GI}"
+		Grub_install_entry "GUI Rescue" "${VMLINUZ_GI}" "${INITRD_GI}" "rescue/enable=true ${APPEND_GI}"
+		Grub_install_entry "GUI Auto" "${VMLINUZ_GI}" "${INITRD_GI}" "auto=true priority=critical ${APPEND_GI}"
+		# Note, the following speech synthesis entry deliberately uses graphical kernel, but normal video params, copying the official Debian install disc
+		Grub_install_entry "GUI Install with speech synthesis" "${VMLINUZ_GI}" "${INITRD_GI}" "speakup.synth=soft ${APPEND_GI}"
+	fi
+
+	if [ -f "binary/${VMLINUZ_DI}" ] && [ -f "binary/${INITRD_DI}" ]
+	then
+		Grub_install_entry "Text Install" "${VMLINUZ_DI}" "${INITRD_DI}" "${APPEND_DI}"
+		Grub_install_entry "Text Expert" "${VMLINUZ_DI}" "${INITRD_DI}" "priority=low ${APPEND_DI}"
+		Grub_install_entry "Text Rescue" "${VMLINUZ_DI}" "${INITRD_DI}" "rescue/enable=true ${APPEND_DI}"
+		Grub_install_entry "Text Auto" "${VMLINUZ_DI}" "${INITRD_DI}" "auto=true priority=critical ${APPEND_DI}"
+	fi
+fi
+
+LINUX_INSTALL="$(/bin/echo ${LINUX_INSTALL} | sed -e 's|binary||g' -e 's|//|/|g')"
+
+# Assembling memtest configuration
+if [ -f "${DESTDIR_LIVE}"/memtest ]
+then
+	MEMTEST="title\t\tOther:\nroot"
+	MEMTEST="${MEMTEST}\n\ntitle\t\t${LINGMO_SYS_BUILD_MEMTEST}\nkernel\t\t/$(basename ${DESTDIR_LIVE})/memtest"
+	MEMTEST="$(/bin/echo ${MEMTEST} | sed -e 's|//|/|g')"
+fi
+
+# Copying templates
+mkdir -p binary/boot/grub
+cp -r "${_SOURCE}"/* binary/boot/grub
+
+case ${LINGMO_SYS_BUILD_IMAGE_TYPE} in
+	iso|iso-hybrid)
+		FILES="chroot/usr/lib/grub/*/stage2_eltorito"
+		;;
+
+	hdd|tar)
+		FILES="chroot/usr/lib/grub/*/stage1 chroot/usr/lib/grub/*/e2fs_stage1_5 chroot/usr/lib/grub/*/stage2"
+		;;
+esac
+
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" = "false" ]
+then
+	FILES="$(echo ${FILES} | sed -e 's|chroot||g')"
+fi
+
+# Copying grub
+cp ${FILES} binary/boot/grub
+
+sed -i -e "s|LINUX_LIVE|${LINUX_LIVE}|" -e "s|LINUX_INSTALL|${LINUX_INSTALL}|" -e "s|MEMTEST|${MEMTEST}|" binary/boot/grub/menu.lst
+sed -i -e "s#LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL#${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}#" binary/boot/grub/menu.lst
+
+sed -i -e 's|\ $||g' binary/boot/grub/menu.lst
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

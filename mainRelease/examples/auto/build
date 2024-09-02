@@ -1,0 +1,31 @@
+#!/bin/bash
+
+source config/System/system.conf
+
+set -e
+
+lingmo-sys-build build noauto "${@}" 2>&1 | tee build.log
+
+# live-image-amd64.hybrid.iso 
+
+if [ -f "LingmoOS-amd64.hybrid.iso" ];then
+   # *.sum
+    mv LingmoOS-amd64.hybrid.iso $NAME-$BASE_VERSION-$CODE_NAME-$DATE-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH$DISK
+    md5sum ./*$DISK >> md5sum.README
+    md5sum ./*$DISK >> md5sum.txt
+    sha1sum ./*$DISK >> sha1sum.README
+    sha1sum ./*$DISK >> sha1sum.txt
+    sha256sum ./*$DISK >> sha256sum.README
+    sha256sum ./*$DISK >> sha256sum.txt
+    sha384sum ./*$DISK >> sha384sum.README
+    sha384sum ./*$DISK >> sha384sum.txt
+    sha512sum ./*$DISK >> sha512sum.README
+    sha512sum ./*$DISK >> sha512sum.txt
+    mkdir -p $OUT
+    mv ./*$DISK $OUT
+    mv ./*.README $OUT
+    mv ./*.txt $OUT
+    mv ./*tar* $OUT
+else
+    echo "\033[34mError!"
+fi

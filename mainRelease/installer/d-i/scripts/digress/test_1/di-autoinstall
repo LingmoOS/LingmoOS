@@ -1,0 +1,35 @@
+#!/usr/bin/expect
+# Expect script to run for mostly automatic first stage installs (or after 
+# doing an initial interactive bit). Set up for the text frontend.
+# Just logs everything, and waits for the install to finish or timeout.
+
+spawn -noecho $env(CONSOLECOMMAND)
+
+set timeout $env(STAGE_1_MAX_TIME)
+
+#exp_internal 1
+
+expect {
+	-re "step.*failed" {
+		exit 1
+	} "Prompt:" {
+		sleep 2
+		send "\r"
+		exp_continue -continue_timer
+	} -re "Press.*cont" {
+		sleep 2
+		send "\r"
+		exp_continue -continue_timer
+	} -re "rebooting.*the.*system." {
+		exit
+	} -re "down.*NOW" {
+		exit
+	} -re "Sending.*SIGTERM" {
+		exit
+	} timeout {
+		puts "timeout!"
+		exit 1
+	}
+}
+
+exit

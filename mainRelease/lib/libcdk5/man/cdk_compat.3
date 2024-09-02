@@ -1,0 +1,109 @@
+'\" t
+.\" $Id: cdk_compat.3,v 1.6 2019/02/20 23:05:18 tom Exp $
+.de XX
+..
+.TH cdk_compat 3
+.SH NAME
+.XX getDirectoryContents
+.XX readFile
+.XX splitString
+cdk_compat \- Cdk4 compatibility functions
+.SH SYNOPSIS
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk_compat.h>
+.nf
+.TP 15
+.B "int getDirectoryContents ("
+.BI "char *directory",
+.BI "char **list",
+.BI "int " "maxListSize");
+.TP 15
+.B "int readFile ("
+.BI "char *" "filename",
+.BI "char **" "info",
+.BI "int " "maxlines");
+.TP 15
+.B "int splitString ("
+.BI "char *" "string",
+.BI "char **" "items",
+.BI "char " "splitChar");
+.fi
+.SH DESCRIPTION
+These functions and macros make it simpler to port applications from
+the older Cdk4 library to Cdk5.
+.PP
+A few functions are deprecated in Cdk5,
+because they rely upon the caller to know in advance the size of
+data which will be returned by the function.
+.PP
+Additionally, some macros are deprecated because they serve no
+realistic purpose: they have direct (standard) equivalents in all modern
+curses implementations.
+.PP
+Finally, a few macro definitions are added to iron out naming inconsistencies
+across the Cdk4 header files.
+.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B getDirectoryContents 
+This opens the current directory and reads the contents.
+Use \fBCDKgetDirectoryContents()\fP in new code.
+.TP 5
+.B readFile
+This reads a file and sticks it into the \fBchar\ **\fP provided.
+Use \fBCDKreadFile()\fP for new code.
+.TP 5
+.B splitString
+This splits a string into one or more parts given the split character.
+Use \fBCDKsplitString()\fP for new code.
+.
+.SH EXAMPLE
+Start the porting process by changing the \fB#include\fP's to use
+.RS
+#include <cdk_compat.h>
+.RE
+.PP
+rather than
+.RS
+#include <cdk.h>
+.RE
+Some adjustments of course are needed to make your compiler see the
+compatibility header file.
+A separate name was chosen so that it in turn can (by adjusting the
+include path) include either the old Cdk4 \fBcdk.h\fP or the new.
+If the old is included, you should link your program against the old library.
+Likewise, including the new requires that you link against the new library.
+.PP
+That is the first step: making your program compile using the compatibility
+header file using the old headers and library.
+.PP
+The next step is to get it to compile against the new headers and library.
+Most of the changes will require modifying bare references to certain
+pointers to wrap them with the \fBObjOf()\fP and \fBScreenOf()\fP macros.
+New Cdk uses these to provide functions which are easily shared among
+the different widget types.
+Your compiler should be able to tell you where the changes should be made.
+See the example programs which are included with Cdk as a guide.
+.PP
+That is the hard part of porting.
+But even for a large program, the changes can be made simply:
+there are not that many types of change to make.
+At the end of this step, you should still be able to build and run your
+program against the old headers and library.
+It is reasonably likely that you can do the same with the new headers and
+library.
+By using the same source for old/new versions of Cdk, you can test and
+verify that your program still works properly after these modifications.
+.PP
+Finally, unless this is a purely academic exercise, you will want to
+remove references to the deprecated functions and macros.
+.
+.SH SEE ALSO
+.BR cdk_objs (3),
+.BR cdk_util (3)

@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+# Make a sparc boot over serial console.
+use Expect;
+my $exp = new Expect;
+#$exp->debug(2);
+$exp->raw_pty(1);
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "failed to run CONSOLECOMMAND";
+
+# retry a few times, the sparc OF might sometimes get glitcy input and a
+# retry will help
+for (1..2) {
+	# TODO: this needs to be parameterised
+	# This is the conserver break sequence.
+	#$exp->send("cl0");
+	#$exp->expect(5, "halt sent");
+	#
+	# This is the termnetd break sequence.
+	$exp->expect(60, "Initializing Memory");
+	$exp->send("");
+	sleep 2;
+	# In case we were already in OF
+	$exp->send("\r\r\r\r\r");
+	$exp->expect(20, "ok ") or die "didn't get to OF";
+	print "(Sending: $ENV{OF_BOOT_COMMAND})\n";
+	$exp->send_slow(0.1, $ENV{OF_BOOT_COMMAND});
+	sleep 1;
+	$exp->send("\r");
+	if ($exp->expect(600, "Booting Linux...")) {
+		exit;
+	}
+}
+
+die "didn't boot";

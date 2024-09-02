@@ -1,0 +1,186 @@
+#!/usr/bin/perl
+#
+# Author: Petter Reinholdtsen <pere@hungry.com>
+# Date:   2003-01-17
+#
+# Combine several .po files into on large file, or spread the
+# translations from the large file into the small files.
+
+# Run it like this in the toplevel directory:
+#   ./scripts/gettext-helper export nb
+# Translate nb.po
+#   ./scripts/gettext-helper import nb
+# Commit new translations.
+
+# Depends: libtimedate-perl
+
+use strict;
+use warnings;
+use Date::Format;
+use File::Basename;
+use IO::File;
+use Locale::Language;
+
+my $cmd = $ARGV[0] or die "no command specified";
+my $langcode = $ARGV[1] or die "no langcode specified";
+my $langcode_real = $langcode;
+$langcode_real =~ s/^(\w\w).*/$1/;
+my $lang = code2language ($langcode_real) or die "can't find language for code $langcode_real";
+
+sub statistics ($)
+{
+  my $file = shift;
+
+  my %ret =
+  (
+    translated => 0,
+    fuzzy => 0,
+    untranslated => 0,
+  );
+
+  return %ret if not -f $file;
+
+  $_ = `msgfmt --statistics -o /dev/null $file 2>&1`;
+  chomp;
+  $ret{translated} = $1 if $_ =~ m/(\d+)\s+translated/;
+  $ret{fuzzy} = $1 if $_ =~ m/(\d+)\s+fuzzy/;
+  $ret{untranslated} = $1 if $_ =~ m/(\d+)\s+untranslated/;
+
+  return %ret;
+}
+
+sub print_statistics (%)
+{
+  my %stats = %{$_[0]};
+
+  my $ret = "$stats{translated} translated messages";
+  $ret .= ", $stats{fuzzy} fuzzy translations" if $stats{fuzzy};
+  $ret .= ", $stats{untranslated} untranslated message" if $stats{untranslated};
+  $ret .= ".";
+
+  return $ret;
+}
+
+sub print_check ($)
+{
+  my $file = shift;
+
+  return system ("msgfmt -o /dev/null $file 2>&1");
+}
+
+my @pots = split /\0/, `find . -name "*.pot" -mindepth 3 -print0`;
+my @pos = split /\0/, `find . -name "$langcode.po" -mindepth 3 -print0`;
+
+my $po_common = "po/$langcode.po";
+
+if ($cmd eq "import")
+{
+  die "Unable to find $po_common." if not -f $po_common;
+
+  exit 1 if (print_check ($po_common));
+
+  foreach my $pot (@pots)
+  {
+    my $dir = dirname ($pot);
+    my $po = "$dir/$langcode.po";
+    my $po_old = "$dir/$langcode.po.old";
+    my $po_new = "$dir/$langcode.po.new";
+
+    print $po, ":\n";
+
+    system ("msgmerge -q $po_common $pot | msgattrib --no-obsolete -o $po_new");
+
+    my %stat = statistics ($po);
+    my %stat_new = statistics ($po_new);
+
+    my $change = 0;
+    if ($stat_new{translated} > $stat{translated})
+    {
+      $change = 1;
+    }
+    elsif ($stat_new{translated} < $stat{translated})
+    {
+      $change = -1;
+    }
+
+    if ($change == 1)
+    {
+      print "    your update looks good, please recheck and modify the changelog\n";
+    }
+    elsif ($change == -1)
+    {
+      print "    your update looks bad, please recheck manually\n";
+    }
+    else
+    {
+      print "    can't find updates, please recheck manually\n";
+    }
+
+    print "    original file: " . print_statistics (\%stat) . "\n";
+    print "    new file:      " . print_statistics (\%stat_new) . "\n";
+  }
+}
+elsif ($cmd eq "export")
+{
+  system ("msgcat " . join (" ", @pots) . " > po/template.pot");
+  system ("msgcat " . join (" ", @pos) . " > $po_common.new");
+
+  my $in = IO::File -> new ("msgmerge --no-location $po_common.new po/template.pot |");
+  my $out = IO::File -> new ("> $po_common");
+
+  print $out <<EOF;
+# $lang messages for debian-installer.
+# Copyright (C) 2003 Software in the Public Interest, Inc.
+# This file is distributed under the same license as debian-installer.
+#
+EOF
+
+  my $status = 0;
+  my %header;
+
+  while (<$in>)
+  {
+    chomp;
+
+    next if m/^#(\s+|~|$)/;
+
+    if ($status == 0)
+    {
+      $status = 1 if m/^msgstr/;
+    }
+    elsif ($status == 1)
+    {
+      if (m/"(\S+):\s+(.*)\\n"/)
+      {
+        $header{$1} = $2;
+      }
+
+      if (m/^\s*$/)
+      {
+        $status = 2;
+        print $out "msgid \"\"\nmsgstr \"\"\n";
+        print $out "\"Project-Id-Version: debian-installer\\n\"\n";
+        print $out "\"POT-Creation-Date: $header{'POT-Creation-Date'}\\n\"\n";
+        my $date = time2str ('%Y-%m-%d %R%z', time);
+        print $out "\"PO-Revision-Date: $date\\n\"\n";
+        print $out "\"Last-Translator: $ENV{DEBFULLNAME} <$ENV{DEBEMAIL}>\\n\"\n";
+        my $lang_lower = $lang;
+        $lang_lower =~ tr/A-Z/a-z/;
+        print $out "\"Language-Team: Debian L10n $lang <debian-l10n-$lang_lower\@lists.debian.org>\\n\"\n";
+        print $out "\"MIME-Version: $header{'MIME-Version'}\\n\"\n";
+        print $out "\"Content-Type: $header{'Content-Type'}\\n\"\n";
+        print $out "\"Content-Transfer-Encoding: $header{'Content-Transfer-Encoding'}\\n\"\n";
+        print $out "\n";
+      }
+    }
+    else
+    {
+      print $out $_, "\n";
+    }
+  }
+
+  unlink "$po_common.new";
+
+  system ("msgfmt --statistics $po_common 2>&1");
+}
+

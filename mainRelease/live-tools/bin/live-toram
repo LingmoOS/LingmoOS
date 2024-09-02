@@ -1,0 +1,132 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+# Read cmdline
+for _PARAMETER in $(cat /proc/cmdline)
+do
+	case "${_PARAMETER}" in
+		module=*)
+			_MODULE="${_PARAMETER#module=}"
+			;;
+	esac
+done
+
+# Assemble filesystems
+if [ -z "${_MODULE}" ]
+then
+	_FILESYSTEMS="/run/live/medium/live/filesystem.squashfs"
+else
+	for _FILESYSTEM in _MODULE
+	do
+		_FILESYSTEMS="${_FILESYSTEMS} /run/live/medium/live/${_FILESYSTEM}"
+	done
+fi
+
+# Exit if system is not live system
+if [ ! -d /run/live/medium ]
+then
+	echo "E: live-toram only works on live systems."
+
+	exit 1
+fi
+
+# Exit if filesystem not accessible
+for _FILESYSTEM in ${_FILESYSTEMS}
+do
+	if [ ! -r ${_FILESYSTEM} ]
+	then
+		echo "E: ${_FILESYSTEM}: No such file"
+		echo "I: live-toram already run?"
+
+		exit 1
+	fi
+done
+
+# Exit if user is unprivileged
+if [ "$(id -u)" -ne 0 ]
+then
+	echo "E: need root privileges"
+
+	exit 1
+fi
+
+# Exit if not enough free memory
+_SIZE=0
+
+for _FILESYSTEM in ${_FILESYSTEMS}
+do
+	_SIZE="$((${_SIZE} + $(du ${_FILESYSTEM} | awk '{ print $1 }')))"
+	_MEMORY="$(awk '/MemFree/ { print $2 }' /proc/meminfo)"
+done
+
+case ${@} in
+	-f|--force)
+		echo "I: Ignoring memory constrains as requested"
+		;;
+
+	*)
+		if [ $_MEMORY -lt $_SIZE ]
+		then
+			echo "E: not enough free memory available."
+			echo "I: filesystems need ${_SIZE}kB, free memory is ${_MEMORY}kB."
+
+			exit 1
+		fi
+		;;
+esac
+
+# Copying filesystems to memory
+echo "P: Copying filesystems to memory."
+echo "I: This may take a while..."
+
+# FIXME: doesn't work with multiple filesystems
+for _FILESYSTEM in ${_FILESYSTEMS}
+do
+	if [ -x "$(which rsync 2> /dev/null)" ]
+	then
+		rsync -a --progress ${_FILESYSTEM} /tmp/live
+	else
+		cp -av ${_FILESYSTEM} /tmp/live
+	fi
+
+LANGUAGE=C LANG=C LC_ALL=C perl << EOF
+open LOOP, '</dev/loop0' or die $!;
+open DEST, '</tmp/live' or die $!;
+ioctl(LOOP, 0x4C06, fileno(DEST)) or die $!
+close LOOP;
+close DEST;
+EOF
+
+done
+
+# Unmounting live media
+_DEVICE="$(awk '/\/run\/live\/medium / { print $1 }' /proc/mounts)"
+_MOUNTS=$(awk "/$(echo ${_DEVICE} | sed 's|/|\\/|g')/ { print \$2 }" /proc/mounts)
+
+for mnt in $_MOUNTS
+do
+        if [ -d $mnt ]
+        then
+                umount $mnt
+                rmdir --ignore-fail-on-non-empty $mnt || true
+        fi
+done
+
+# Ejecting live media if it is not an optical device
+if [ "$(expr substr ${_DEVICE} 1 2)" != "sd" ] && \
+   ! readlink /sys/block/$(expr substr ${_DEVICE} 6 3) | grep -q usb
+then
+	if [ ! -x "$(which eject 2> /dev/null)" ]
+	then
+		eject -p -m ${_DEVICE} > /dev/null 2>&1
+	fi
+fi

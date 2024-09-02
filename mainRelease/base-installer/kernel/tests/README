@@ -1,0 +1,52 @@
+base-installer regression test interface
+========================================
+
+This test suite attempts to test base-installer's per-architecture kernel
+selection, using a few shims. Run it using 'make test' in the
+base-installer/kernel/ directory or './runtests <architecture>' in the
+base-installer/kernel/tests/ directory.
+
+Individual tests consist of a .test file in the appropriate per-architecture
+subdirectory, plus optionally some auxiliary files. The .test file consists
+of a series of directives, one per line. All lists are space-separated, and
+all kernel versions are the names of kernel packages. The available
+directives are as follows:
+
+  subarch <subarchitecture>
+    The subarchitecture, if relevant: e.g. powermac_newworld.
+
+  cpuinfo <cpuinfo file>
+    Path (relative to the .test file) to a file to be used instead of
+    /proc/cpuinfo while running this test. If not specified, $CPUINFO will
+    be unset.
+
+  numcpus <number of processors>
+    The number of processors in the machine to emulate for the test.
+    Only needed on arches that expect a /var/numcpus file and don't have
+    the info in /proc/cpuinfo.
+
+  machine <machine hardware name>
+    The machine hardware name, as returned by 'uname -m'.
+
+  majors <kernel major versions>
+    The kernel major versions to test: e.g. 2.6.
+
+  flavour <arch_get_kernel_flavour output>
+    The expected kernel flavour for this machine.
+
+  kernel-2.6 <kernel version>
+    The "best" 2.6 kernel versions for this machine, as expected to be
+    returned by arch_get_kernel.
+
+  usable <kernel versions>
+    A list of kernel versions that are expected to be usable on this
+    machine.
+
+  unusable <kernel versions>
+    A list of kernel versions that are expected to be unusable on this
+    machine.
+
+  env <name> <value>
+    Any environment variable you want to set.
+
+Please add to the test suite as appropriate.

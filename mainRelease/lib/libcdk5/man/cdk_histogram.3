@@ -1,0 +1,421 @@
+'\" t
+.\" $Id: cdk_histogram.3,v 1.19 2019/02/15 00:46:28 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_histogram 3
+.SH NAME
+.XX activateCDKHistogram
+.XX destroyCDKHistogram
+.XX drawCDKHistogram
+.XX eraseCDKHistogram
+.XX getCDKHistogramBox
+.XX getCDKHistogramFillerChar
+.XX getCDKHistogramHighValue
+.XX getCDKHistogramLowValue
+.XX getCDKHistogramStatsAttr
+.XX getCDKHistogramStatsPos
+.XX getCDKHistogramValue
+.XX getCDKHistogramViewType
+.XX moveCDKHistogram
+.XX newCDKHistogram
+.XX positionCDKHistogram
+.XX setCDKHistogram
+.XX setCDKHistogramBackgroundAttrib
+.XX setCDKHistogramBackgroundColor
+.XX setCDKHistogramBox
+.XX setCDKHistogramBoxAttribute
+.XX setCDKHistogramDisplayType
+.XX setCDKHistogramFillerChar
+.XX setCDKHistogramHorizontalChar
+.XX setCDKHistogramLLChar
+.XX setCDKHistogramLRChar
+.XX setCDKHistogramStatsAttr
+.XX setCDKHistogramStatsPos
+.XX setCDKHistogramULChar
+.XX setCDKHistogramURChar
+.XX setCDKHistogramValue
+.XX setCDKHistogramVerticalChar
+.XX setCDKHistogramViewType
+cdk_histogram \- curses histogram widget
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "void activateCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "unused");
+.TP 15
+.B "void destroyCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "void drawCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "boolean getCDKHistogramBox ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "chtype getCDKHistogramFillerChar ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "int getCDKHistogramHighValue ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "int getCDKHistogramLowValue ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "chtype getCDKHistogramStatsAttr ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "int getCDKHistogramStatsPos ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "int getCDKHistogramValue ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "EHistogramDisplayType getCDKHistogramViewType ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "void moveCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKHISTOGRAM *newCDKHistogram ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "int " "orient",
+.BI "const char *" "title",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram");
+.TP 15
+.B "void setCDKHistogram ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "EHistogramDisplayType " "viewType",
+.BI "int " "statsPos",
+.BI "chtype " "statsAttribute",
+.BI "int " "lowValue",
+.BI "int " "highValue",
+.BI "int " "currentValue",
+.BI "chtype " "fillerCharacter",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKHistogramBackgroundAttrib ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKHistogramBackgroundColor ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKHistogramBox ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKHistogramBoxAttribute ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramDisplayType ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "EHistogramDisplayType " "viewtype");
+.TP 15
+.B "void setCDKHistogramFillerChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "fillerCharacter");
+.TP 15
+.B "void setCDKHistogramHorizontalChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramLLChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramLRChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramStatsAttr ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "statsAttribute");
+.TP 15
+.B "void setCDKHistogramStatsPos ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "int " "statsPosition");
+.TP 15
+.B "void setCDKHistogramULChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramURChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramValue ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "int " "lowValue",
+.BI "int " "highValue",
+.BI "int " "currentValue");
+.TP 15
+.B "void setCDKHistogramVerticalChar ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKHistogramViewType ("
+.BI "CDKHISTOGRAM *" "histogram",
+.BI "EHistogramDisplayType " "viewType");
+.fi
+.SH DESCRIPTION
+The Cdk histogram widget creates a histogram widget.
+This widget can draw a vertical or horizontal histogram.
+The functions create or manipulate the Cdk histogram box widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKHistogram
+obsolete entrypoint which calls \fBdrawCDKHistogram\fP.
+.TP 5
+.B destroyCDKHistogram
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKHistogram
+draws the histogram widget on the screen.
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKHistogram
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKHistogramBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKHistogramFillerChar
+returns the character being used to draw the histogram bar.
+.TP 5
+.B getCDKHistogramHighValue
+returns the high value of the histogram.
+.TP 5
+.B getCDKHistogramLowValue
+returns the low value of the histogram.
+.TP 5
+.B getCDKHistogramStatsAttr
+returns the attribute of the statistics of the histogram.
+.TP 5
+.B getCDKHistogramStatsPos
+returns where the histogram will draw the statistics.
+.TP 5
+.B getCDKHistogramValue
+returns the current value of the histogram.
+.TP 5
+.B getCDKHistogramViewType
+returns the view type of the histogram widget.
+.TP 5
+.B moveCDKHistogram
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.bP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBypos\fR can be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which states
+whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKHistogram
+creates a histogram widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBheight\fR and
+.TP 5
+\fBwidth\fR
+control the height and width of the widget.
+If you provide a value of zero for either
+of the height or the width, the widget will be created with the full width and
+height of the screen.
+If you provide a negative value, the widget will be created
+the full height or width minus the value provided.
+.TP 5
+\fBorient\fR
+specifies the orientation of the histogram.
+It is one of these pre-defined values: \fIVERTICAL\fR and \fIHORIZONTAL\fR.
+.TP 5
+\fBlabel\fR
+is the string to use as the label of the histogram.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKHistogram
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKHistogram
+lets the programmer set the specific values of the histogram widget.
+.RS
+.bP
+The parameter \fBviewType\fR specifies the type of histogram to draw.
+The following table lists the valid values and the results.
+.LP
+.TS
+center tab(/) allbox;
+l l
+lw15 lw30 .
+\fBDisplay_Type/Result\fR
+vNONE/T{
+Displays no information about the current values.
+T}
+vPERCENT/T{
+Displays the current value as a percentage.
+T}
+vFRACTION/T{
+Displays the current value as a fraction.
+T}
+vREAL/Displays the current value.
+.TE
+.sp
+.bP
+The \fBstatsPosition\fR parameter states where the statistics will be displayed.
+It accepts \fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBstatsAttribute\fR sets the attributes of the statistics.
+.bP
+The parameters
+\fBlowValue\fR,
+\fBhighValue\fR, and
+\fBcurrentValue\fR are the low, high, and current values respectively.
+.bP
+The \fBfiller\fR character is the character
+to use in the unused space in the histogram.
+.bP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.RE
+.TP 5
+.B setCDKHistogramBackgroundAttrib
+the background color attribute the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKHistogramBackgroundColor
+the background color of the widget.
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKHistogramBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKHistogramBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKHistogramDisplayType
+sets the display type (see \fBgetCDKHistogramViewType\fP).
+.TP 5
+.B setCDKHistogramFillerChar
+sets the character to use when drawing the histogram bar.
+.TP 5
+.B setCDKHistogramHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKHistogramLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKHistogramLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKHistogramStatsAttr
+sets the attribute to use when drawing the histogram statistics.
+.TP 5
+.B setCDKHistogramStatsPos
+sets where the statistics will be drawn on the widget.
+See the \fBsetCDKHistogram\fR description for more details.
+.TP 5
+.B setCDKHistogramULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKHistogramURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKHistogramValue
+sets the low, high, and current value of the histogram.
+.TP 5
+.B setCDKHistogramVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.TP 5
+.B setCDKHistogramViewType
+sets the view type of the histogram.
+Look at the \fBsetCDKHistogram\fR description for more details.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

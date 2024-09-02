@@ -1,0 +1,211 @@
+#!/usr/bin/make -f
+# $Id: rules,v 1.31 2021/03/24 22:30:29 tom Exp $
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+# packages
+PACKAGES.indep = libcdk5-doc
+PACKAGES.arch  = libcdk5-dev libcdk5
+
+CPPFLAGS	:= $(shell dpkg-buildflags --get CPPFLAGS)
+CFLAGS		:= $(shell dpkg-buildflags --get CFLAGS)
+LDFLAGS		:= $(shell dpkg-buildflags --get LDFLAGS)
+
+SCREEN = ncursesw6
+TARGET = $(CURDIR)/debian
+P_SHARED = $(CURDIR)/t/shared
+P_STATIC = $(CURDIR)/t/static
+
+verbose = # -v
+
+LOG = @echo "**"
+
+configure = \
+	CPPFLAGS="$(CPPFLAGS)" \
+	CFLAGS="$(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS)" \
+	../../configure \
+		--disable-echo \
+		--host=$(DEB_HOST_GNU_TYPE) \
+		--build=$(DEB_BUILD_GNU_TYPE) \
+		--prefix=/usr \
+		--mandir=\$${prefix}/share/man \
+		--with-shlib-version=abi \
+		--with-screen=$(SCREEN) \
+		--with-versioned-syms \
+		--with-libname=cdk \
+		--disable-rpath-hack \
+		--enable-warnings \
+		--enable-stdnoreturn \
+		--enable-const
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CFLAGS += -O0
+else
+        CFLAGS += -O2
+endif
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+        INSTALL_PROGRAM += -s
+endif
+
+.PHONY: all config build install binary clean config-indep config-arch \
+    build-indep build-arch install-indep install-arch binary-indep \
+    binary-arch
+
+all: build
+
+config: config-indep config-arch
+build: build-indep build-arch
+install: install-indep install-arch
+binary: binary-indep binary-arch
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean $(verbose)
+	rm -rf t
+
+config-indep: $(PACKAGES.indep:%=config-%-stamp)
+config-arch: $(PACKAGES.arch:%=config-%-stamp)
+
+build-indep: $(PACKAGES.indep:%=build-%-stamp)
+build-arch: $(PACKAGES.arch:%=build-%-stamp)
+
+install-indep: $(PACKAGES.indep:%=install-%-stamp)
+install-arch: $(PACKAGES.arch:%=install-%-stamp)
+
+binary-indep: install-indep
+ifneq ($(PACKAGES.indep),)
+	rm -f $(PACKAGES.indep:%=install-%-stamp)
+	dh_testdir
+	dh_testroot
+	dh_installdocs       $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_installman        $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_installexamples   $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_installchangelogs $(verbose) $(PACKAGES.indep:%=-p%) -k CHANGES
+	dh_compress          $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_fixperms          $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_lintian           $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_installdeb        $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_gencontrol        $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_md5sums           $(verbose) $(PACKAGES.indep:%=-p%)
+	dh_builddeb          $(verbose) $(PACKAGES.indep:%=-p%)
+endif
+
+binary-arch: install-arch
+ifneq ($(PACKAGES.arch),)
+	rm -f $(PACKAGES.arch:%=install-%-stamp)
+	dh_testdir
+	dh_testroot
+	dh_link              $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_installdocs       $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_installchangelogs $(verbose) $(PACKAGES.arch:%=-p%) -k CHANGES
+	dh_installmenu       $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_strip             $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_compress          $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_fixperms          $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_makeshlibs        $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_lintian           $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_installdeb        $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_shlibdeps         $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_gencontrol        $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_md5sums           $(verbose) $(PACKAGES.arch:%=-p%)
+	dh_builddeb          $(verbose) $(PACKAGES.arch:%=-p%)
+endif
+
+#------------------------------------------------------------------------------
+config-libcdk5-stamp       :
+	$(LOG) "configuring libcdk5"
+	dh_testdir
+
+	rm -rf $(P_SHARED)
+	mkdir -p $(P_SHARED)
+
+	cd $(P_SHARED); CFLAGS="$(CFLAGS)" \
+	$(configure) --with-shared --with-versioned-syms
+
+	rm -rf $(P_STATIC)
+	mkdir -p $(P_STATIC)
+
+	cd $(P_STATIC); CFLAGS="$(CFLAGS)" \
+	$(configure)
+
+	touch $@
+
+build-libcdk5-stamp        : config-libcdk5-stamp
+	$(LOG) "building libcdk5"
+	dh_testdir
+
+	$(MAKE) -C $(P_SHARED) all
+	$(MAKE) -C $(P_STATIC) all
+
+	touch $@
+
+install-libcdk5-stamp      : build-libcdk5-stamp
+	$(LOG) "installing libcdk5"
+	dh_testdir
+	dh_testroot
+	dh_prep $(verbose) -plibcdk5
+	dh_installdirs $(verbose) -plibcdk5
+
+	$(MAKE) -C $(P_SHARED) DESTDIR=$(TARGET)/libcdk5 install.libs
+	find $(TARGET)/libcdk5/usr/lib -type l -name '*.so*' -exec rm -f {} \;
+
+	# remove -config file also in -dev package
+	rm -rf $(TARGET)/libcdk5/usr/bin
+
+	touch $@
+
+#------------------------------------------------------------------------------
+config-libcdk5-dev-stamp   : config-libcdk5-stamp
+	touch $@
+
+build-libcdk5-dev-stamp    : build-libcdk5-stamp
+	touch $@
+
+install-libcdk5-dev-stamp  : install-libcdk5-stamp
+	$(LOG) "installing libcdk5-dev"
+	dh_testdir
+	dh_testroot
+	dh_prep $(verbose) -plibcdk5-dev
+	dh_installdirs $(verbose) -plibcdk5-dev
+
+	$(MAKE) -C $(P_SHARED) DESTDIR=$(TARGET)/libcdk5-dev installCDKHeaderFiles
+	$(MAKE) -C $(P_STATIC) DESTDIR=$(TARGET)/libcdk5-dev install.libs
+
+	if [ $(SCREEN) = ncursesw6 ]; \
+	then \
+		sed -i 's,<curses.h>,<ncursesw6/curses.h>,' $(TARGET)/libcdk5-dev/usr/include/cdk.h; \
+		sed -i 's,<ncurses.h>,<ncursesw6/ncurses.h>,' $(TARGET)/libcdk5-dev/usr/include/cdk.h; \
+	fi
+
+	# get the symbolic link, but not the actual file
+	$(MAKE) -C $(P_SHARED) DESTDIR=$(TARGET)/libcdk5-dev install.libs
+	find $(TARGET)/libcdk5-dev/usr/lib -type f -name '*.so*' -exec rm -f {} \;
+
+	touch $@
+
+#------------------------------------------------------------------------------
+config-libcdk5-doc-stamp   : config-libcdk5-stamp
+	touch $@
+
+build-libcdk5-doc-stamp    : build-libcdk5-stamp
+	touch $@
+
+install-libcdk5-doc-stamp  : install-libcdk5-stamp
+	$(LOG) "installing libcdk5-doc"
+	dh_testdir
+	dh_testroot
+	dh_prep $(verbose) -plibcdk5-doc
+	dh_installdirs $(verbose) -plibcdk5-doc
+
+	$(MAKE) -C $(P_SHARED) DESTDIR=$(TARGET)/libcdk5-doc installCDKManPages
+	dh_installexamples $(verbose) -plibcdk5-doc examples demos
+
+	touch $@
+

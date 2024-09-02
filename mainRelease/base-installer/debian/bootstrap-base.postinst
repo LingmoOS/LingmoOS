@@ -1,0 +1,196 @@
+#! /bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+db_capb backup
+
+. /usr/lib/base-installer/library.sh
+
+ETCDIR=/target/etc
+KEYRING=/usr/share/keyrings/archive.gpg
+
+# Architecture and OS detection
+ARCH=`udpkg --print-architecture`
+OS=`udpkg --print-os`
+
+# Set initial value to includes and excludes
+db_get base-installer/includes
+INCLUDES="$(printf '%s' "$RET" | sed 's/ /,/g')" || true
+
+db_get base-installer/excludes
+EXCLUDES="$(printf '%s' "$RET" | sed 's/ /,/g')" || true
+
+# Check if a specific script should be used
+if db_get base-installer/debootstrap_script && [ "$RET" ]; then
+	if expr "$RET" : / >/dev/null ; then
+		DEBOOTSTRAP_SCRIPT="$RET"
+	else
+		DEBOOTSTRAP_SCRIPT=/usr/share/debootstrap/scripts/"$RET"
+	fi
+	if [ ! -e "$DEBOOTSTRAP_SCRIPT" ]; then
+		error "debootstrap script '$DEBOOTSTRAP_SCRIPT' doesn't exist"
+	fi
+fi
+
+# Check if a specific variant should be used
+if db_get base-installer/debootstrap_variant && [ "$RET" ]; then
+	DEBOOTSTRAP_VARIANT="--variant=$RET"
+fi
+
+# Avoid debconf sending email during the base install process
+DEBCONF_ADMIN_EMAIL=""
+export DEBCONF_ADMIN_EMAIL
+
+SUBARCH="$(archdetect)"
+SUBARCH="${SUBARCH#*/}"
+
+# Avoid locale related errors during package installations
+export IT_LANG_OVERRIDE=C
+
+
+# See kernel/README for the architecture-specific functions expected here
+if [ -f /usr/lib/base-installer/kernel.sh ]; then
+	. /usr/lib/base-installer/kernel.sh
+else
+	arch_get_kernel_flavour () {
+		warning "Unknown architecture '$ARCH'."
+		return 0
+	}
+	arch_check_usable_kernel () {
+		warning "Unknown architecture '$ARCH'."
+		return 0
+	}
+	arch_get_kernel () {
+		warning "Unknown architecture '$ARCH'."
+	}
+fi
+
+FLAVOUR="$(arch_get_kernel_flavour || true)"
+
+install_base_system () {
+	# library.sh sets variables depending on various checks,
+	# including base's installability. In this case
+	# (e.g. netinst), PROTOCOL will be set to file, MIRROR empty,
+	# and DIRECTORY to /cdrom; let's look at mirror/protocol to
+	# see whether some https is wanted in the installed system,
+	# and add packages which can be guessed by debootstrap:
+	db_get mirror/protocol
+	mirror_protocol="$RET" || true
+	if [ "$mirror_protocol" = https ]; then
+		INCLUDES="$INCLUDES,ca-certificates"
+	fi
+
+	if [ -s /cdrom/.disk/base_include ]; then
+		INCLUDES="$INCLUDES,`grep -v '^#' /cdrom/.disk/base_include | tr '\n' , | sed 's/^,//g;s/,$//'`"
+	fi
+
+	if [ -s /cdrom/.disk/base_exclude ]; then
+		EXCLUDES="$EXCLUDES,`grep -v '^#' /cdrom/.disk/base_exclude | tr '\n' , | sed 's/^,//g;s/,$//'`"
+	fi
+
+	db_progress INFO base-installer/progress/preparing
+
+	if [ "${INCLUDES}" ]; then
+		include="--include=${INCLUDES}"
+	fi
+	if [ "${EXCLUDES}" ]; then
+		exclude="--exclude=${EXCLUDES}"
+	fi
+	sigcheck="--no-check-gpg"
+	if [ "$PROTOCOL" = http ] || [ "$PROTOCOL" = ftp ]; then
+		if type gpgv >/dev/null; then
+			if ! db_get debian-installer/allow_unauthenticated || [ "$RET" != true ]; then
+				sigcheck="--keyring=${KEYRING}"
+			fi
+		else
+			warning "gpgv not found, not authenticating archive"
+		fi
+	elif [ "$PROTOCOL" = https ]; then
+		if db_get debian-installer/allow_unauthenticated_ssl && [ "$RET" = true ]; then
+			sigcheck="$sigcheck --no-check-certificate"
+		fi
+	fi
+
+	test -d $ETCDIR || mkdir -p $ETCDIR
+
+	local copied_fstab=
+	if [ -f /target/etc/fstab ] ; then
+		# programs in debootstrap may scrawl on the fstab and
+		# a configured fstab can cause problems, so make a backup
+		# to be restored later and create a dummy file instead
+		copied_fstab=1
+		cp /target/etc/fstab /target/etc/fstab.orig
+		echo "# UNCONFIGURED FSTAB FOR BASE SYSTEM" >/target/etc/fstab
+	fi
+
+	if [ "$PROTOCOL" = "http" ]; then
+		db_get mirror/http/proxy
+		http_proxy="$RET" || true
+		if [ "$http_proxy" ]; then
+			export http_proxy
+		fi
+	elif [ "$PROTOCOL" = "https" ]; then
+		db_get mirror/https/proxy
+		https_proxy="$RET" || true
+		if [ "$https_proxy" ]; then
+			export https_proxy
+		fi
+	fi
+
+	# clean up after any past debootstrap run
+	rm -f /target/var/lib/apt/* 2>/dev/null || true
+
+	local debootstrap_failed=
+	if search-path cdebootstrap; then
+		cdebootstrap || debootstrap_failed=$?
+	else
+		log-output -t debootstrap run-debootstrap \
+			--components="${COMPONENTS}" \
+			--debian-installer \
+			--resolve-deps \
+			${include} ${exclude} \
+			${sigcheck} \
+			${DEBOOTSTRAP_VARIANT} \
+			${DISTRIBUTION} /target \
+			"$PROTOCOL://$MIRROR$DIRECTORY" \
+			${DEBOOTSTRAP_SCRIPT} \
+			|| debootstrap_failed=$?
+	fi
+
+	if [ "$copied_fstab" ]; then
+		mv /target/etc/fstab.orig /target/etc/fstab
+	fi
+
+	if [ "$debootstrap_failed" ]; then
+		exit_error base-installer/debootstrap-failed
+	fi
+
+	# If we need SSL certificates, copy them in now.
+	if [ "$PROTOCOL" = "https" -o "$mirror_protocol" = "https" ] && [ -d /etc/ssl/certs ]; then
+		if find /etc/ssl/certs/ -name \*.crt | grep -q .; then
+			mkdir -p /target/usr/local/share/ca-certificates
+			cp -a /etc/ssl/certs/*.crt /target/usr/local/share/ca-certificates/
+			chroot /target update-ca-certificates || true
+		fi
+	fi
+
+	# Progress bar is now stepped to 100
+}
+
+waypoint 1	check_target
+waypoint 1	get_mirror_info
+waypoint 100	install_base_system
+waypoint 1	pre_install_hooks
+waypoint 1	setup_dev
+waypoint 1	configure_apt_preferences
+waypoint 1	configure_apt
+waypoint 3	apt_update
+waypoint 5	post_install_hooks
+waypoint 1	pick_kernel
+waypoint 20	install_kernel
+waypoint 10	install_extra
+waypoint 0	final_apt_preferences
+waypoint 0	cleanup
+
+run_waypoints base-installer/progress/installing-base
+exit 0

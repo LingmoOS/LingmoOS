@@ -1,0 +1,14 @@
+on: [push, pull_request]
+name: Update
+jobs:
+  update:
+    name: self-update-test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v3
+      - name: run self-update-test
+        run: ./tests/self-update-test

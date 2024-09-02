@@ -1,0 +1,457 @@
+'\" t
+.\" $Id: cdk_display.3,v 1.17 2019/02/20 22:15:59 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.ie \n(.g .ds `` \(lq
+.el       .ds `` ``
+.ie \n(.g .ds '' \(rq
+.el       .ds '' ''
+.de It
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.TH cdk_display 3
+.SH NAME
+cdk_display - \fBCurses Development Kit\fR Display Capabilities.
+.SH SYNOPSIS
+Cdk has a number of pre-defined display types.
+The following are outlined in this manual page:
+.It "\(bu How To Use Colors" 5
+.It "\(bu How To Use Different Character Attributes" 5
+.It "\(bu How To Justify Strings" 5
+.It "\(bu How To Use Special Drawing Characters" 5
+.It "\(bu Edit/Display Type Codes (EDisplayType)" 5
+.SH DESCRIPTION
+Cdk has special formatting commands which can be included in any string which
+add highlights, justification, or even colors to a basic string.
+These attributes, once set, remain in effect until changed explicitly,
+or until the end of the string.
+.LP
+This manual
+page outlines and demonstrates how they work.
+.
+.SS How To Use Colors
+Cdk has the capability to display colors in almost every string type displayed
+in a Cdk widget.
+.PP
+Normally the color pairs are accessed via the COLOR_PAIR macro.
+You can still do this, but creating a string with multiple colors is tedious.
+That is why the color commands were created.
+Use \fBinitCDKColor\fR to create up to 64 color pairs
+which you can refer to by number in strings.
+.LP
+The color settings are stored directly in the string.
+When the widget is created or activated, the string is converted
+to take advantage of any color commands in the string.
+.bP
+To turn on a color pair
+insert \fI</XX>\fP into the string;
+where \fIXX\fR is a numeric value from 0 to the maximum color pair.
+.IP
+Color pair 0 is the standard default color pair for the screen.
+.IP
+If you used \fBinitCDKColor\fP, the maximum value for \fIXX\fR is 63
+for terminals supporting 8 ANSI colors.
+.IP
+If you created color pairs directly using \fBinit_pair\fP,
+the maximum value for \fIXX\fR is implementation-dependent,
+e.g., 63 (for Unix systems) and 255 for ncurses.
+.IP
+If the terminal does not support color, Cdk uses the \fBbold\fP attribute.
+.bP
+To turn off a
+color pair use the format command <!XX> where \fIXX\fR is a numeric value from
+0 to the maximum color pair.
+.LP
+The following example demonstrates the use of the color commands.
+.ne 10
+.sp 1
+.nf
+.ce
+\fI----------------------------------------\fR
+#include <cdk/cdk.h>
+
+void main()
+{
+   CDKSCREEN	*cdkscreen;
+   CDKLABEL	*demo;
+   char		*mesg[4];
+
+   cdkscreen = initCDKScreen (NULL);
+
+   /* Start CDK Colors */
+   initCDKColor();
+
+   /* Set the labels up.		*/
+   mesg[0] = "</31>This line should have a yellow foreground and a cyan background.<!31>";
+   mesg[1] = "</05>This line should have a white  foreground and a blue background.<!05>";
+   mesg[2] = "</26>This line should have a yellow foreground and a red  background.<!26>";
+   mesg[3] = "<C>This line should be set to whatever the screen default is.";
+
+   /* Declare the labels.	*/
+   demo	= newCDKLabel (cdkscreen, CENTER, CENTER, mesg, 4, TRUE, TRUE);
+
+   /* Draw the label		*/
+   drawCDKLabel (demo, TRUE);
+   waitCDKLabel (demo, ' ');
+
+   /* Clean up			*/
+   destroyCDKLabel (demo);
+   destroyCDKScreen (cdkscreen);
+   endCDK();
+   exit (0);
+}
+.fi
+.ce
+\fI----------------------------------------\fR
+.PP
+.
+.SS How To Use Different Character Attributes
+Cdk also provides attribute commands which allow different character attributes
+to be displayed in a Cdk widget.
+To use a character attribute the format command
+is \fI</X>\fR where \fIX\fR is one of several command characters.
+To turn a attribute off use the command \fI<!X>\fR.
+The following table outlines the command characters:
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBCommand Character/Character Attribute\fR
+=
+B/Bold
+U/Underline
+K/Blink
+R/Reverse
+S/Standout
+D/Dim
+N/Normal
+.TE
+.LP
+The following example demonstrates the use of character display attributes.
+.ne 10
+.sp 2
+.nf
+.ce
+\fI----------------------------------------\fR
+#include <cdk/cdk.h>
+
+void main()
+{
+   CDKSCREEN    *cdkscreen;
+   CDKLABEL     *demo;
+   char         *mesg[4];
+
+   cdkscreen = initCDKScreen (NULL);
+
+   /* Start CDK Colors */
+   initCDKColor();
+
+   /* Set the labels up.  */
+   mesg[0] = "</B/31>Bold text            yellow foreground / blue background.<!31>";
+   mesg[1] = "</U/05>Underlined text      white  foreground / blue background.<!05>";
+   mesg[2] = "</K/26>Blinking text        yellow foreground / red  background.<!26>";
+   mesg[3] = "<C>This line uses the screen default colors.";
+
+   /* Declare the labels.  */
+   demo = newCDKLabel (cdkscreen, CENTER, CENTER, mesg, 4, TRUE, TRUE);
+
+   /* Draw the label */
+   drawCDKLabel (demo, TRUE);
+   waitCDKLabel (demo, ' ');
+
+   /* Clean up */
+   destroyCDKLabel (demo);
+   destroyCDKScreen (cdkscreen);
+   endCDK();
+   exit (0);
+}
+.ce
+\fI----------------------------------------\fR
+.fi
+.LP
+Note that color commands and format commands can be mixed inside the same
+format marker.
+The above example underlines the label marker, which also sets
+color pair number 2.
+.
+.SS How To Justify Strings
+Justification commands can
+left justify,
+right justify,
+or center a string of text.
+To use a justification format in a string the command <X> is used.
+The following table lists the format commands:
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBCommand/Action.\fR
+=
+<L>/Left Justified. Default if not stated.
+<C>/Centered text.
+<R>/Right justified.
+<I=X>/Indent the line X characters.
+<B=X>/Bullet. X is the bullet string to use.
+<F=X>/T{
+Links in a file where X is the filename.
+This works only with the viewer widget.
+T}
+.TE
+
+The following example demonstrates how to use the justification commands
+in a Cdk widget.
+.ce
+\fI----------------------------------------\fR
+.nf
+#include <cdk/cdk.h>
+
+void main()
+{
+   CDKSCREEN    *cdkscreen;
+   CDKLABEL     *demo;
+   char         *mesg[5];
+
+   cdkscreen = initCDKScreen (NULL);
+
+   /* Start CDK Colors */
+   initCDKColor();
+
+   /* Set the labels up.  */
+   mesg[0] = "<R></B/31>This line should have a yellow foreground and a blue background.<!31>";
+   mesg[1] = "</U/05>This line should have a white  foreground and a blue background.<!05>";
+   mesg[2] = "<B=+>This is a bullet.";
+   mesg[3] = "<I=10>This is indented 10 characters.";
+   mesg[4] = "<C>This line should be set to whatever the screen default is.";
+
+   /* Declare the labels.  */
+   demo = newCDKLabel (cdkscreen, CENTER, CENTER, mesg, 5, TRUE, TRUE);
+
+   /* Draw the label */
+   drawCDKLabel (demo, TRUE);
+   waitCDKLabel (demo, ' ');
+
+   /* Clean up */
+   destroyCDKLabel (demo);
+   destroyCDKScreen (cdkscreen);
+   endCDK();
+   exit (0);
+}
+.fi
+.ce
+\fI----------------------------------------\fR
+.PP
+The bullet format command can take either a single character or a string.
+The bullet in the above example would look like
+.RS 3
+\fI+\fR This is a bullet.
+.RE
+but if we were to use the following command instead
+.RS 3
+<B=***>This is a bullet.
+.RE
+it would look like
+.RS 3
+\fI***\fR This is a bullet.
+.RE
+.PP
+A format command must be at the beginning of the string.
+.
+.SS How To Use Special Drawing Characters
+Cdk has a set of special drawing characters which can be inserted into any
+ASCII file.
+These characters are encoded using the format command \*(``<#\fIXX\fP>\*(''
+where \fIXX\fP is a two-character name.
+The \fBchar2Chtype\fP and \fBchtype2String\fP functions
+provide conversion to/from curses \fBchtype\fP data (see \fBcdk_util\fP(3)).
+.PP
+The following table lists the supported special character commands.
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBSpecial_Character/Character\fR
+=
+<#UL>/Upper Left Corner
+<#UR>/Upper Right Corner
+<#LL>/Lower Left Corner
+<#LR>/Lower Right Corner
+=
+<#LT>/Left Tee
+<#RT>/Right Tee
+<#TT>/Top Tee
+<#BT>/Bottom Tee
+=
+<#HL>/Horizontal Line
+<#VL>/Vertical Line
+=
+<#PL>/Plus Sign
+<#PM>/Plus or Minus Sign
+<#DG>/Degree Sign
+<#CB>/Checker Board
+<#DI>/Diamond
+<#BU>/Bullet
+<#S1>/Scan line 1
+<#S9>/Scan line 9
+=
+<#LA>/Left Arrow
+<#RA>/Right Arrow
+<#TA>/Top Arrow
+<#BA>/Bottom Arrow
+.TE
+.LP
+The character formats can be repeated using an optional numeric repeat value.
+To repeat a character add the repeat count within parentheses
+to the end of the character format.
+The following example draws 10 horizontal-line characters:
+.LP
+<#HL(10)>
+.LP
+The following example draws a box within a label window:
+.ce
+\fI----------------------------------------\fR
+.nf
+#include <cdk/cdk.h>
+
+void main()
+{
+   /* Declare variables.  */
+   CDKSCREEN    *cdkscreen;
+   CDKLABEL     *demo;
+   char         *mesg[4];
+
+   cdkscreen = initCDKScreen (NULL);
+
+   /* Start CDK Colors */
+   initCDKColor();
+
+   /* Set the labels up.  */
+   mesg[0] = "<C><#UL><#HL(26)><#UR>";
+   mesg[1] = "<C><#VL></R>This text should be boxed.<!R><#VL>";
+   mesg[2] = "<C><#LL><#HL(26)><#LR>";
+   mesg[3] = "<C>While this is not.";
+
+   /* Declare the labels.  */
+   demo = newCDKLabel (cdkscreen, CENTER, CENTER, mesg, 4, TRUE, TRUE);
+
+   /* Is the label NULL???  */
+   if (demo == (CDKLABEL *)NULL)
+   {
+      /* Clean up the memory.  */
+      destroyCDKScreen (cdkscreen);
+
+      /* End curses...  */
+      endCDK();
+
+      /* Spit out a message.  */
+      printf ("Oops. Can't seem to create the label. Is the window too small?\\n");
+      exit (1);
+   }
+
+   /* Draw the CDK screen.  */
+   refreshCDKScreen (cdkscreen);
+   waitCDKLabel (demo, ' ');
+
+   /* Clean up */
+   destroyCDKLabel (demo);
+   destroyCDKScreen (cdkscreen);
+   endCDK();
+   exit (0);
+}
+.fi
+.ce
+\fI----------------------------------------\fR
+.LP
+Notice that drawn text can also be justified.
+.LP
+.
+.SS Edit/Display Type Codes (EDisplayType)
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw45 .
+\fBDisplay_Type/Result\fR
+=
+vCHAR/Only accepts alphabetic characters.
+vLCHAR/T{
+Only accepts alphabetic characters.
+Maps the character to lower case
+when a character has been accepted.
+T}
+vUCHAR/T{
+Only accepts alphabetic characters.
+Maps the character to upper case
+when a character has been accepted.
+T}
+vHCHAR/T{
+Only accepts alphabetic characters.
+Displays a period (\fI.\fR) when a character
+has been accepted.
+T}
+vUHCHAR/T{
+Only accepts alphabetic characters.
+Displays a period (\fI.\fR) and maps the
+character to upper case when a
+character has been accepted.
+T}
+vLHCHAR/T{
+Only accepts alphabetic characters.
+Displays a period (\fI.\fR) and maps the
+character to lower case when a
+character has been accepted.
+T}
+vINT/T{
+Only accepts numeric characters.
+T}
+vHINT/T{
+Only accepts numeric characters.
+Displays a period (\fI.\fR) when a character
+has been accepted.
+T}
+vMIXED/Accepts any character types.
+vLMIXED/T{
+Accepts any character types.
+Maps the character to lower case
+when an alphabetic character has
+been accepted.
+T}
+vUMIXED/T{
+Accepts any character types.
+Maps the character to upper case
+when an alphabetic character has
+been accepted.
+T}
+vHMIXED/T{
+Accepts any character types.
+Displays a period (\fI.\fR) when a character
+has been accepted.
+T}
+vLHMIXED/T{
+Accepts any character types.
+Displays a period (\fI.\fR) and maps the
+character to lower case when a
+character has been accepted.
+T}
+vUHMIXED/T{
+Accepts any character types.
+Displays a period (\fI.\fR) and maps the
+character to upper case when a
+character has been accepted.
+T}
+vVIEWONLY/Uneditable field.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_screen (3),
+.BR cdk_util (3)

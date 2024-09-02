@@ -1,0 +1,580 @@
+#!/bin/bash
+# Copyright (c) 2004-2006 Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2006 Christian Perrier <bubulle@debian.org>
+# Copyright (c) 2018 Holger Wansing <linux@wansing-online.de>
+# Licensed under the GNU General Public License
+#
+# Fetches sources for the installer packages and generates
+# some translation-related statistics.
+#
+# The script is running on dillon to generate the statistics webpages under
+# https://d-i.debian.org/l10n-stats/translation-status.html
+# 
+# Files:
+#   o config/packages.$dist$LEVEL
+#     Names of the packages to download
+#   o config/packages.vcs.commands$LEVEL
+#     Commands to update the sources for packages from VCS
+#   o config/paths.$dist$LEVEL
+#     where are the po-files located?
+#     (sometimes more than one, like shadow)
+#   o config/languages 
+#     what languages to be checked?
+#
+#   o material/packages.$dist$LEVEL (folder)
+#     The packages get downloaded into $TEMPDIR, cleaned up
+#     and moved to packages/.
+# 
+#
+
+############################### Functions ##################################
+fancy_output() {
+#	echo "==============================================================================="
+	echo -n ""
+}
+
+create_dir() {
+  if [ ! -d "$1" ] ; then
+    if [ ! -e "$1" ] ; then
+      mkdir -p "$1"
+    else
+      echo "$1" already exists and is not a directory
+    fi
+  fi
+}
+
+usage(){
+  echo Usage: $0 level [config] [fetch]
+  echo 
+  echo  "               level: the D-I \"level\" to work on"
+  echo  "               config: optional config file"
+  echo  "               fetch: fetch translations from repositories"
+}
+
+translated () {  #how many are translated?
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1  | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+}
+
+
+fuzzy() {  #how many fuzzy?
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+}
+
+untranslated () {  #guess, what does this do?
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+}
+
+stats () {  #guess, what does this do?
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}{print $3}' |sed -e 's/\.//g'|sed -e 's/ .*$//g'
+}
+
+translator () { #who is last-translator?
+  #awk '/Last-Translator:/ { print $2,$3 } ' $1
+  grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
+}
+
+print_text () { # print standard-text
+echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang$ext.txt
+date -u  >> $TARGET_DIR/$lang.txt
+echo "
+
+Read: $URL_UNSTABLE" >> $TARGET_DIR/$lang$ext.txt
+}
+########################### End of functions ##################################
+
+
+
+########################### Defaults ##########################################
+WD="."
+FETCH=""
+GETTEXT="/usr/bin"
+LEVEL=1
+SUBLEVELS=0
+########################### End of Defaults ###################################
+
+
+##########################  Command line parsing ##############################
+if [ "$3" = "fetch" ] ; then
+  FETCH=Y
+fi
+
+if [ "$2" ] ; then
+  CONFIG=$2
+fi
+
+if [ "$1" ] ; then
+  LEVEL=$1
+else
+  usage
+  exit 1
+fi
+
+if [ "$CONFIG" ] ; then
+  if [ -r "$CONFIG" ] ; then
+    . "$CONFIG"
+    export GETTEXT WD APT_OPT URL_UNSTABLE URL_TESTING SUBLEVELS
+  else
+    echo $CONFIG does not exist or unreadable
+    exit 1
+  fi
+fi
+########################## End of command line parsing ###################
+
+########################## Definitions, which depend on command-line #####
+# Directory with config files
+CONFIG_DIR=$WD/config
+# Directory for results
+RESULTS_DIR=$WD/results
+# Directory for graphs (translation ratio over time)
+GRAPHS_DIR=$WD/graphs
+# Directory for lock files and other temporary stuff
+RUN_DIR=$WD/run
+
+SCRIPTNAME="level $LEVEL"
+COPY_TO_DIR=$WD/material/level$LEVEL
+TARGET_DIR=$RESULTS_DIR/level$LEVEL
+GRAPH_FILE=".l${LEVEL}.dat"
+
+export PATH=$GETTEXT:$PATH
+
+TEMPDIR="${RUN_DIR}/gen-stats-temp-$RANDOM"
+export GETTEXT
+LANG=C
+########################## End of definitions ############################
+
+########################## Sanity and consistency checks #################
+
+# Here we'll need to add some sanity check on LEVEL
+
+if [ ! -d "$GETTEXT" ] ; then
+  echo $GETTEXT is not a directory
+  exit 1
+fi
+
+if [ ! -x "$GETTEXT/msgfmt" -o ! -x "$GETTEXT/msgmerge" -o ! -x "$GETTEXT/debconf-updatepo" ] ; then
+  echo Missing gettext utilities in $GETTEXT
+  exit 1
+fi
+
+# Create all the needed directories (safely)
+create_dir $WD
+create_dir $CONFIG_DIR
+create_dir $RESULTS_DIR
+create_dir $TARGET_DIR
+create_dir $TARGET_DIR/POT
+create_dir $COPY_TO_DIR
+create_dir $RUN_DIR
+create_dir $GRAPHS_DIR/data
+
+PROSPECTIVE="$WD/material/packages.vcs1/packages/po/PROSPECTIVE"
+if [ ! -f $PROSPECTIVE ] ; then
+  echo No PROSPECTIVE file found
+  echo Please run $0 at least once for level 1 with \"fetch\"
+  exit 1
+fi
+
+if [ ! -x $WD/sort-ranktxt ] ; then
+  echo No $WD/sort-ranktxt script found
+  exit 1
+fi
+
+LANG_NAMES="$WD/config/languages.names"
+if [ ! -f "${LANG_NAMES}" ] ; then
+  echo "No language names file (${LANG_NAMES}) found"
+  exit 1
+fi
+
+if [ -f "${RUN_DIR}/$LEVEL.lock" ]; then
+	echo "A lockfile ${RUN_DIR}/$LEVEL.lock exists. Exiting..." 1>&2
+	exit 1
+fi
+############### End of sanity and consistency checks #############
+
+
+############### THE REAL BEGINNING ###############################
+
+# Do not accept working on a locked copy
+if [ "$LEVEL" = "1" ] ; then
+	LOCKFILE=$WD/material/packages.vcs$LEVEL/.l10n.lock
+	if [ -f $LOCKFILE ] ; then
+		echo $LOCKFILE file detected.
+		echo $DI_COPY seems to be locked by another l10n process
+		echo Please fix this before lauching the script again...
+		exit 1
+	else
+		touch $LOCKFILE
+	fi
+fi
+
+# Create the lock file
+cd $WD
+touch "${RUN_DIR}/$LEVEL.lock"
+
+# Create the directories for the material
+for dist in testing unstable vcs ; do 
+	create_dir $WD/material/packages.$dist$LEVEL
+done
+
+# Some output
+#echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
+#date
+echo "-------------- Level $LEVEL --------------"
+
+## echo "Working directory is $WD"
+## echo "Skipping in rank.txt:"
+## grep -v "^#" $PROSPECTIVE
+
+rm -rf $TARGET_DIR/*
+
+### Don't remove po files this way. This would remove all po files from the d-i git repo.
+#if [ "$FETCH" ]; then
+#	for dist in testing unstable vcs ; do
+#		for I in `find $WD/material/packages.$dist$LEVEL/ -name "*.po"`; do 
+#			rm $I
+#		done
+#	done
+#fi
+
+fancy_output
+
+#get sources:
+if [ "$FETCH" ]; then
+#	echo "Getting sources:"
+	echo -n "Getting sources:"
+	
+	rm -rf $TEMPDIR > /dev/null
+
+	#get files:
+	mkdir $TEMPDIR
+	cd $TEMPDIR
+
+	apt-get $APT_OPT update --allow-releaseinfo-change >/dev/null
+	for dist in testing unstable ; do #####  removed cvs here. There is no need to apt-get sources for vcs sources here. That is done by the l10n/config/packages.vcs.commandsX scripts.
+		date -u >> $TARGET_DIR/packages-list-$dist
+#		echo -n "  $dist:	"
+		echo -n " $dist..."
+		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
+			cd $TEMPDIR
+#  			echo -n "$pkg "
+			rm -rf $WD/material/packages.$dist$LEVEL/$pkg
+	  		apt-get $APT_OPT -t $dist source $pkg >/dev/null  || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
+	  		rm -f *.tar.bz2 *.tar.xz *.tar.gz *.dsc *.diff.gz
+			
+			create_dir $WD/material/packages.$dist$LEVEL/$pkg
+  			mv ${pkg}* $WD/material/packages.$dist$LEVEL/$pkg
+			if [ "$pkg" = "debconf" ]; then
+				cd $WD/material/packages.$dist$LEVEL/$pkg/*/po
+				rm debconf.pot >/dev/null 2>&1 || true
+				make debconf.pot >/dev/null
+				chmod a+r debconf.pot
+			fi
+			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/*/debian/changelog >> $TARGET_DIR/packages-list-$dist
+		done
+	done
+	cd $WD
+
+# Updating git / getting sources for vcs packages
+echo " vcs..."
+		if [ -f $WD/config/packages.vcs.commands$LEVEL ] ; then
+			cd $WD/material/packages.vcs$LEVEL/
+			sh $WD/config/packages.vcs.commands$LEVEL
+		fi
+#		echo ""
+
+else
+	echo "no download... (use 'fetch' to force)"
+
+	for dist in unstable testing ; do
+		date -u > $TARGET_DIR/packages-list-$dist
+		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
+		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
+			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/*/debian/changelog >> $TARGET_DIR/packages-list-$dist
+		done
+	done
+	echo ""
+fi
+
+
+fancy_output
+
+echo "Number of strings:"
+
+for dist in testing unstable vcs ; do
+	echo -n "  In $dist... "
+	#check how many strings at all
+	eval "TOTAL_$dist=0"
+	LANG=C
+	mkdir -p $TARGET_DIR/POT
+#	echo -n "    "
+	for path in `cat $WD/config/paths.$dist$LEVEL`; do
+		test -f $WD/material/packages.$dist$LEVEL/$path/*.pot || continue
+		U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
+		# If the POT file is invalid, return 0
+		if [ -z "$U" ] ; then U=0 ; fi
+		
+		# Copy files only for vcs repos
+		if [ "$dist" = "vcs" ] ; then
+			cp $WD/material/packages.$dist$LEVEL/$path/*.pot $TARGET_DIR/POT/${path//\//_}.pot
+		fi
+		
+#	  	echo "      $path/*.pot:  $U"
+#	  	echo -n "${U}+"
+		TOTALTEMP=`eval "expr \\$TOTAL_$dist + $U"`
+
+		eval "TOTAL_$dist=$TOTALTEMP"
+		
+		if [ `eval "echo \\$TOTAL_$dist"` = "0" -o -z `eval "echo \\$TOTAL_$dist"` ]; then
+			echo "Error while counting untranslated strings in templates."
+			$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/*.pot
+			#	exit
+		fi
+
+
+		#backup everylanguage-file to check against debconf-updatepo later
+#		for lang in `cat $WD/config/languages`; do
+#			test -f $WD/material/packages.$dist$LEVEL/$path/$lang.po || continue
+#			cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
+#		done
+	done		
+	eval "echo \$TOTAL_$dist"
+done
+
+fancy_output
+
+# spellcheck is no longer used.
+#wget -q -O $WD/material/spellcheck${LEVEL}.txt http://d-i.debian.org/l10n-spellcheck/level${LEVEL}/latest/stats.txt || echo "Could not fetch spellcheck stats file for level $I."
+
+mkdir $TARGET_DIR/files
+rm -f $TARGET_DIR/.rank.txt$LEVEL
+rm -rf $TEMPDIR
+
+
+echo "Statistics:"
+for dist in testing unstable vcs ; do
+#	echo "Statistics for $dist:"
+	echo "  $dist..."
+#	echo -n "  "
+	if [ "$dist" = "vcs" ] ; then
+		ext=""
+	else
+		ext=".$dist"
+	fi
+
+	RANK=""
+
+	#following 3 variables for generating the graph. they include all
+	#strings of all languages of all packages
+	GR_TRANSLATED=0
+	GR_FUZZY=0
+	GR_UNTRANSLATED=0
+	for lang in `cat $WD/config/languages`; do #run for every language
+#		echo -n "$lang "
+		NAME=`cat $LANG_NAMES | grep "$lang:" | cut -f2 -d: || echo $lang`
+		echo -e "Statistics of $SCRIPTNAME packages for$NAME in $dist:\nRead http://d-i.debian.org/l10n-stats\n\nOutdated:" >>  $TARGET_DIR/$lang$ext.txt
+		MISSING=""
+
+		#for total strings of a language
+		TU=0
+		TT=0
+		TF=0
+		for path in `cat $WD/config/paths.$dist$LEVEL`; do #for every package
+			if [ -e $WD/material/packages.$dist$LEVEL/$path/$lang.po ]; then #if the file does exist
+				LASTT=`translator $WD/material/packages.$dist$LEVEL/$path/$lang.po`
+#  Do not msgmerge here. Instead, let l10n-sync script do this job. holgerw
+#				$GETTEXT/msgmerge -U $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/*.pot > /dev/null 2>&1
+      				SIGNS="  "	
+				#now check if a file has been modified by debconf-updatepo and output a *
+				#for lang in `cat $WD/languages`; do
+				#	test -f packages/$path/$lang.po || continue
+#				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
+#				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
+#				if [ "$ORIG" != "$NEW" ]; then
+#					SIGNS="$SIGNS*"
+#				fi
+				
+	
+				#done
+#     				$GETTEXT/msgfmt $WD/material/packages.$dist$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
+
+				#strings of this package:
+				STATS=`LC_ALL=C msgfmt -o /dev/null --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
+      				U=`echo $STATS | grep " untranslated" | sed 's/ untranslated.*//g' | awk '{print $(NF)};'`
+      				F=`echo $STATS | grep " fuzzy" | sed 's/ fuzzy.*//g' | awk '{print $(NF)};'`
+      				T=`echo $STATS | grep " translated" | sed 's/ translated.*//g' | awk '{print $(NF)};'`
+      				test -z "$U" && U=0
+      				test -z "$F" && F=0
+      				test -z "$T" && T=0
+
+
+      				#get infos:
+				TU=`expr $TU + $U`
+      				TT=`expr $TT + $T`
+      				TF=`expr $TF + $F`
+
+
+				#for the graph:
+				GR_TRANSLATED=`expr $GR_TRANSLATED + $TT`
+				GR_UNTRANSLATED=`expr $GR_UNTRANSLATED + $TU`
+				GR_FUZZY=`expr $GR_FUZZY + $TF`
+      			
+				#don't show completely translated files:
+      				if [ "$U" = "0" -a "$F" = "0" ]; then
+         				OK="  $path/$lang.po $T"t" [$LASTT]\n$OK"
+					echo -n
+				else
+      					echo "  $SIGNS$path/$lang.po: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang$ext.txt
+      				fi
+			
+			
+				#copy (updated) files so that they can be translated:
+				# Only do it for unstable
+				if [ -z "$ext" ] ; then
+					test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
+					cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//\//_}"_$lang.po"
+				fi
+
+#				mv $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig $WD/material/packages.$dist$LEVEL/$path/$lang.po >/dev/null 2>&1
+    			else #=if not existing
+				MISSING_U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
+				test -z $MISSING_U && MISSING_U=0
+      				MISSING="$MISSING  $path/$lang.po "$MISSING_U"u\n"
+      				#echo "  !!$path/$lang.po"
+    			fi
+
+		done #for path in `cat paths`; do
+ 
+	 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang$ext.txt
+		echo -e "$OK" >> $TARGET_DIR/$lang$ext.txt
+		OK=""
+
+  		echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang$ext.txt
+		TOTAL=`eval "echo \\$TOTAL_$dist"`
+		if [ "$TOTAL" != 0 ] ; then
+			P=`echo "$TT * 100 / $TOTAL"|bc`
+		else
+		P=0
+		fi
+	  	STR=`echo "$TT + $TU + $TF" | bc`	
+	  	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTAL=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang$ext.txt
+	  	if [ "$STR" -gt "$TOTAL" ]; then
+  			echo "  You have more strings translated/fuzzy/untranslated that in
+  the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang$ext.txt
+	  	fi
+	  	test -e /tmp/.$LEVEL.error && echo -e "SOME FILE(S) ARE CORRUPTED! Those are marked with \"!\".\n Run a \"msgfmt --check <po-file> to see what's wrong!\"" >>  $TARGET_DIR/$lang$ext.txt
+		
+		# generate ranking information
+		LEAD="000";
+		if [ `expr ${#LEAD} - ${#P}` -ne 0 ]; then
+		 	P="${LEAD:0:${#LEAD}-${#P}}$P"
+		fi
+		echo -en "$P%\t $lang" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+		if [ `grep "^${lang}$" $PROSPECTIVE` ]; then
+	 		echo -en " (P)" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+		fi
+  		test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+	  	echo >> $TARGET_DIR/.rank$ext.txt$LEVEL
+
+	  	rm -f /tmp/.$LEVEL.error 
+
+
+		# Data needed by graphs
+		test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
+	
+#	  	echo -n "($P%) "
+		
+	done # for lang...
+#	echo ""
+
+done # for dist...
+
+fancy_output
+
+# spellcheck is no longer used.
+#echo "Generating spellcheck information..."
+# echo -n "  "
+# Add spellcheck info to the unstable files
+#for lang in `cat $WD/config/languages`; do #run for every language
+#	if [ "$dist" = "unstable" ] ; then
+#		ext=""
+#	else
+#		ext=".$dist"
+#	fi
+#	SPELLCHECK=`grep "$lang" $WD/material/spellcheck${LEVEL}.txt | sed "s/$lang //g"`
+#	if [ "$SPELLCHECK" != "" ]; then
+#		printf  "Spellcheck:
+#   %3s unknown words (-1 if no wordlist available)
+#   %3s wrong variables
+#   %3s codepoints
+#   %3s level-specific wrong msgstrs
+#" $SPELLCHECK >> $TARGET_DIR/$lang.txt
+##		echo -n "$lang "
+#	else
+#		echo "No spellcheck available."  >>$TARGET_DIR/$lang.txt
+#	fi
+#  	print_text
+#done
+#echo ""
+
+	
+# done
+#for lang in `cat languages`; do
+
+fancy_output
+
+echo -n "Final steps: "
+
+echo -n "Ranking... "
+# Generate ranking
+for dist in testing unstable vcs; do
+#	echo -n " $dist..."
+	if [ "$dist" = "vcs" ] ; then
+		ext=""
+	else
+		ext=".$dist"
+	fi
+	echo "Rankings for $SCRIPTNAME packages in $dist:" > $TARGET_DIR/rank$ext.txt
+	date -u >> $TARGET_DIR/rank$ext.txt
+	echo >> $TARGET_DIR/rank$ext.txt
+	$WD/sort-ranktxt $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
+	rm $TARGET_DIR/.rank$ext.txt$LEVEL
+done
+
+# Move files to their destination
+cp $WD/config/HEADER.txt $TARGET_DIR/
+
+
+if [ $LEVEL = 1 ]; then
+	echo -n "Moving master sublevel files... "
+        for level in `seq 1 $SUBLEVELS`; do
+		mkdir $TARGET_DIR/master/sublevel${level}
+		cp $WD/material/packages.vcs1/debian-installer/packages/po/sublevel${level}/*po $TARGET_DIR/master/sublevel${level}
+		cp $WD/material/packages.vcs1/debian-installer/packages/po/sublevel${level}/*pot $TARGET_DIR/master/sublevel${level}
+	done
+fi
+
+# Cleanup
+echo -n "Cleanup..."
+
+rm -rf $COPY_TO_DIR
+# rm $WD/material/spellcheck${LEVEL}.txt
+cp -r $TARGET_DIR $COPY_TO_DIR
+
+rm -f $LOCKFILE
+
+
+rm -f $TARGET_DIR/.rank.txt$LEVEL
+rm -rf $TEMPDIR
+rm -rf messages messages.mo
+
+chmod -R a+r $TARGET_DIR
+
+rm $RUN_DIR/$LEVEL.lock
+
+echo ""
+
+fancy_output
+
+#echo -n "Script end: "
+#date
+
+fancy_output

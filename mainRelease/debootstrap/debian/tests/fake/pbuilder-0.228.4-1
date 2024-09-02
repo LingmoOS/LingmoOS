@@ -1,0 +1,37 @@
+#!/bin/sh
+# fake/pbuilder-0.228.4-1 -- emulate how pbuilder/0.228.4-1 would chroot.
+#
+# Please do not modify this script without verifying that its behaviour
+# is still equivalent to the stated versions of pbuilder.
+#
+# This version has #841935 unfixed. It mounts /dev/pts, without explicitly
+# requesting a new instance or a usable /dev/pts/ptmx.
+# (There is of course a lot more that it does, but these are the parts that
+# affect pty users like script(1).)
+#
+# Reference: pbuilder/pbuilder-modules, search for dev/pts.
+#
+# Copyright © 2017 Simon McVittie
+# SPDX-License-Identifier: MIT
+# (see debian/copyright)
+
+set -e
+
+chroot="$1"
+shift
+if test -z "$chroot" || test -z "$1"; then
+	echo "Usage: $0 CHROOT COMMAND...">&2
+	exit 2
+fi
+
+mkdir -p "$chroot/dev/pts"
+mount -t devpts none "$chroot/dev/pts" -onoexec,nosuid,gid=5,mode=620
+
+ls -l "$chroot/dev/ptmx" | sed -e 's/^/# fake-pbuilder: /' >&2
+ls -l "$chroot/dev/pts/ptmx" | sed -e 's/^/# fake-pbuilder: /' >&2
+
+e=0
+chroot "$chroot" "$@" || e=$?
+
+umount "$chroot/dev/pts"
+exit "$e"

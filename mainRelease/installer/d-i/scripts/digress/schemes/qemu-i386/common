@@ -1,0 +1,19 @@
+config ARCH i386
+config PREBOOT setupqemu
+config SHUTDOWN stopqemu cleanupqemu
+config START_COMMAND startqemu-cdrom
+config DISK_START_COMMAND startqemu-disk
+config CONSOLECOMMAND console-qemu
+config BOOT qemu-syslinux-boot
+config TEST_1 di-install
+config TEST_2 stopqemu qemu-disk-boot boot-to-password ssh-data-gather
+config STAGE_1_MAX_TIME 3600
+config STAGE_2_MAX_TIME 600
+config USER root
+config USER_PASSWORD foo
+config QEMU_DISK_SIZE 4G
+config SSHPORT $(free-port 7001 7010)
+config TEST_HOSTNAME localhost
+config QEMU_SERIAL_PORT $(free-port 7011 7020)
+config QEMU_EXTRA_PARAMS -redir tcp:$SSHPORT::22
+config ISO ~/sid_d-i_etch-i386-netinst.iso

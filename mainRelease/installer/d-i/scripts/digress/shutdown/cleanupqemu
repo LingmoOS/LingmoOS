@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ -z "$STATE_DIR" ] || [ -z "$MACHINE" ] || [ -z "$SCHEME" ]; then
+	echo "cleanupqemu: error!" >&2
+	exit 1
+fi
+if [ "$KEEP_DISK" ] && [ -n "$LOGDIR" ]; then
+	mv -f "$STATE_DIR/qemu-$MACHINE-$SCHEME.img" "$LOGDIR/$DATESTAMP/""$MACHINE-$SCHEME.disk.img"
+fi
+rm -rf "$STATE_DIR/qemu-$MACHINE-$SCHEME".*

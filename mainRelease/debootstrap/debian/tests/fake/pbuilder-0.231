@@ -1,0 +1,64 @@
+#!/bin/sh
+# fake/pbuilder-0.231 -- emulate how pbuilder >= 0.228.6 sets up its chroot
+#
+# Please do not modify this script without verifying that its behaviour
+# is still equivalent to the stated versions of pbuilder. If a future
+# version of pbuilder changes its behaviour, please copy this script and
+# modify the copy instead.
+#
+# This has #841935 fixed (commit 4a4134dd). It was checked for equivalence
+# to pbuilder 0.231, which is the version included in Debian 11 and 12,
+# but the versions in Debian 10 and 9 have equivalent code here.
+#
+# Reference: pbuilder/pbuilder-modules, search for dev/pts.
+#
+# Copyright © 2017-2021 Simon McVittie
+# SPDX-License-Identifier: MIT
+# (see debian/copyright)
+
+set -e
+
+BUILDPLACE="$1"
+shift
+if test -z "$BUILDPLACE" || test -z "$1"; then
+	echo "Usage: $0 CHROOT COMMAND...">&2
+	exit 2
+fi
+
+mkdir -p "$BUILDPLACE/dev/pts"
+TTYGRP=5
+TTYMODE=620
+mount -t devpts devpts "$BUILDPLACE/dev/pts" -o "newinstance,noexec,nosuid,gid=$TTYGRP,mode=$TTYMODE,ptmxmode=0666"
+
+mounted_ptmx=no
+
+if ! [ -L "$BUILDPLACE/dev/ptmx" ]; then
+    echo "# fake-pbuilder: redirecting /dev/ptmx to /dev/pts/ptmx" >&2
+    mount --bind "$BUILDPLACE/dev/pts/ptmx" "$BUILDPLACE/dev/ptmx"
+    mounted_ptmx=yes
+fi
+
+mounted_console=no
+
+if stdin_tty="$(tty)"; then
+    if [ ! -e "$BUILDPLACE/dev/console" ]; then
+        echo "# fake-pbuilder: creating /dev/console" >&2
+        mknod -m600 "$BUILDPLACE/dev/console" c 5 1
+    fi
+
+    echo "# fake-pbuilder: mounting $stdin_tty over /dev/console" >&2
+    mount --bind "$stdin_tty" "$BUILDPLACE/dev/console"
+    mounted_console=yes
+fi
+
+ls -l "$BUILDPLACE/dev/console" | sed -e 's/^/# fake-pbuilder: /' >&2
+ls -l "$BUILDPLACE/dev/ptmx" | sed -e 's/^/# fake-pbuilder: /' >&2
+ls -l "$BUILDPLACE/dev/pts/ptmx" | sed -e 's/^/# fake-pbuilder: /' >&2
+
+e=0
+chroot "$BUILDPLACE" "$@" || e=$?
+
+[ "$mounted_console" = no ] || umount "$BUILDPLACE/dev/console"
+[ "$mounted_ptmx" = no ] || umount "$BUILDPLACE/dev/ptmx"
+umount "$BUILDPLACE/dev/pts"
+exit "$e"

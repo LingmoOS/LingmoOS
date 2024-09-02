@@ -1,0 +1,66 @@
+This documents the steps necessary to upgrade the Debian source package
+to a new upstream version.  It's a suggestion for a common workflow for
+maintainers and a reminder for myself.
+Please change it whereever senseful.
+See also the note about pristine-tar in d/gbp.conf.
+
+
+Update upstream version:
+========================
+
+1. Update from Debian and upstream repositories
+-----------------------------------------------
+
+$ gbp pull
+$ git fetch --tags https://github.com/winetricks/winetricks.git master
+
+
+2. Import new upstream version
+------------------------------
+
+$ gbp import-orig \
+      --merge-mode=replace \
+      --uscan
+
+
+3. Make changes
+---------------
+
+Do whatever makes sense.
+
+A good way to prepare (but always verify its results!) repetitive changes is:
+
+$ while quilt push; do quilt refresh || break; done
+$ quilt pop -a
+$ lintian-brush
+$ wrap-and-sort --wrap-always --short-indent --trailing-comma
+
+
+4. Create changelog
+---------------------
+
+[...]
+$ gbp dch \
+      --commit \
+      --full \
+      --spawn-editor=always \
+      -- debian/
+
+
+5. Update and commit upstream changelog
+---------------------------------------
+
+$ ./debian/rules get-changelog
+$ git add debian/upstream/changelog
+$ git commit --amend
+
+This amends the updated upstream changelog to the debian release commit.
+
+
+6. Build package
+----------------
+
+$ gbp buildpackage \
+      --git-tag
+
+ -- Jens Reyer <jre.winesim@gmail.com>, Sun,  3 Oct 2021 16:17:34 +0200

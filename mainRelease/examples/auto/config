@@ -1,0 +1,46 @@
+#!/bin/sh
+#    --mode debian \
+# --archive-area "main contrib non-free non-free-firmware" \
+set -e
+
+lingmo-sys-build config noauto \
+    --color \
+    --mode debian \
+    --architectures "$ARCH" \
+    --binary-filesystem ext4 \
+    --architecture amd64 \
+    --archive-area "main contrib non-free non-free-firmware" \
+    --bootappend-live "boot=live username=lingmo noautologin quiet splash" \
+    --memtest memtest86+ \
+    --distribution testing \
+    --parent-distribution testing \
+    --win32-loader true \
+    --apt-recommends true \
+    --cache-packages false \
+    --firmware-binary true \
+    --firmware-chroot true \
+    --uefi-secure-boot enable \
+    --initramfs live-boot \
+    --linux-packages "linux-image-6.7.4-amd64-unsigned linux-headers-6.7.4-amd64" \
+    --linux-flavours "6.7.4-amd64-unsigned" \
+    --binary-images iso \
+    --debian-installer live \
+    --debian-installer-gui true \
+    --checksums md5 \
+    --security false \
+    --iso-application "LingmoOS" \
+    --iso-publisher "LingmoOS Project" \
+    --iso-volume "Lingmo OS Live" \
+    --mirror-binary https://deb.debian.org/debian \
+    --mirror-binary-security https://deb.debian.org/debian-security \
+    --mirror-bootstrap https://deb.debian.org/debian \
+    --mirror-chroot https://deb.debian.org/debian \
+    --mirror-chroot-security https://deb.debian.org/debian-security \
+    --mirror-debian-installer https://deb.debian.org/debian \
+    --keyring-packages debian-keyring \
+    --debootstrap-options "--include=apt-transport-https,ca-certificates,openssl,debootstrap,vim" \
+    --updates false \
+    --clean
+    "${@}"
+#    --linux-packages "linux-image-6.7.4-amd64-unsigned linux-headers-6.7.4-amd64" \
+#        --linux-flavours "6.7.4-amd64-unsigned" \

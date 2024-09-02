@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+# Handles base-config on s390 via network-console.
+use Expect;
+
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+	$ENV{TERM}="vt100";
+}
+
+# Boot up..
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+#$exp->debug(2);
+#$exp->exp_internal(1);
+$exp->expect(600, "Command ==>");
+$exp->send("ipl 0120\r");
+$exp->expect($ENV{STAGE_2_MAX_TIME}, "ogin:");
+
+# Login to network-console.
+my $ssh_exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
+#$ssh_exp->debug(2);
+#$ssh_exp->exp_internal(1);
+$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "assword:");
+$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
+
+# Finish the install.
+$ssh_exp->expect($ENV{STAGE_2_MAX_TIME},
+	[	"Root password:" =>
+		sub {
+			$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "enter the same root password again");
+			$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "Enter a password for the new user");
+			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "enter the same user password again");
+			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
+			exp_continue_timeout;
+		}
+	],
+	[	"<Ok>" =>
+		sub {
+			$ssh_exp->send("\r");
+			exp_continue_timeout;
+		}
+	],
+	[	"Reloading exim4 configuration files" =>
+		# There's no other message output before it just closes
+		# the network-console connection that indicates success.
+		sub {
+			# Wait for it to finish.
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "closed by remote host.");
+			exit;
+		}
+	],
+	[	timeout =>
+		sub {
+			die "timeout in base-config\n";
+		}
+	],
+);
+
+exit

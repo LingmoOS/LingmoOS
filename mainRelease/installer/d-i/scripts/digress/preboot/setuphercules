@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+
+# Create parm file with any additional boot options.
+parm=hercules-$MACHINE-$SCHEME.parmfile
+echo $(cat $S390_IMAGE_DIR/parmfile.debian) "$BOOT_OPTS" > $STATE_DIR/$parm
+
+# Set up config file. 
+rc=$STATE_DIR/hercules-$MACHINE-$SCHEME.cnf
+if [ -e $DI_TESTDIR/hercules/$HERCULESCFG ]; then
+	cat $DI_TESTDIR/hercules/$HERCULESCFG > $rc
+else
+	cat $DIGRESSDIR/hercules/$HERCULESCFG > $rc
+fi
+
+echo >> $rc
+
+# This is a hack to use shorter filenames for the kernel and initrd, since
+# hercules has a limit on the length of config file lines and using full
+# paths might go over that limit.
+ln -sf $S390_IMAGE_DIR/kernel.debian $STATE_DIR/hercules-$MACHINE-$SCHEME.kernel
+ln -sf $S390_IMAGE_DIR/initrd.debian $STATE_DIR/hercules-$MACHINE-$SCHEME.initrd
+
+# Add card deck to boot d-i.
+echo "000C	3505	hercules-$MACHINE-$SCHEME.kernel $parm hercules-$MACHINE-$SCHEME.initrd autopad eof" >> $rc
+
+# Create a disk image and add to config file.
+if [ -n "$DASDINIT" ]; then
+	disk=$STATE_DIR/hercules-$MACHINE-$SCHEME.img
+	rm -f $disk
+	dasdinit $disk $DASDINIT
+	echo "0120	3390	$disk" >> $rc
+fi
+
+# Add network setup to config file.
+if [ -n "$S390_IP" ] && [ -n "$S390_PTP_IP" ]; then
+	echo "0A00	3088	CTCI /dev/net/tun 1500 $S390_IP $S390_PTP_IP $S390_PTP_MASK" >> $rc
+	echo "0A01	3088	CTCI /dev/net/tun 1500 $S390_IP $S390_PTP_IP $S390_PTP_MASK" >> $rc
+fi

@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+# mkconf of mdadm creates a file with a timestamp
+# A bug report with patch is available at https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=982607
+# This script duplicates that patch
+
+# Don't run if mdadm is not installed
+if [ ! -e /usr/share/mdadm/mkconf ];
+then
+  exit 0
+fi
+
+# If mkconf already contains references to SOURCE_DATE_EPOCH, there is no need to patch the file
+if grep -q SOURCE_DATE_EPOCH /usr/share/mdadm/mkconf;
+then
+  exit 0
+fi
+sed -i -e '/# This configuration was auto-generated on/cif [ -z $SOURCE_DATE_EPOCH ]; then\n  echo "# This configuration was auto-generated on $(date -R) by mkconf"\nelse\n  echo "# This configuration was auto-generated on $(date -R --utc -d@$SOURCE_DATE_EPOCH) by mkconf"\nfi' /usr/share/mdadm/mkconf
+
+echo "P: $(basename $0) Reproducible hook has been applied"

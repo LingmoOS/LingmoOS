@@ -1,0 +1,145 @@
+#!/bin/bash
+#
+# A simple script to create and rebuild partial debian test mirrors
+# suitable for testing the debian installer.
+#
+# This script does _no_ proper updating of the partial mirror, it
+# just accumulates the packages and creates an apt-getable archive
+# structure for them.
+#
+# The following variables are intended for customization:
+#
+# MIRROR: The mirror URL to download from. E.g. "http://localhost/debian"
+#         If not set, the script will only rebuild the archive
+#         metainformation for the packages already available.
+#
+# SUITE: The suite to mirror, e.g. "testing". Defaults to "unstable".
+#
+# DIST: The distribution's code name. If not set, it tries to guess one
+#       based on SUITE.
+#
+# ARCH: The architecture to mirror. This can only be a single value.
+#
+# TARGET: The root directory of the partial mirror to build. Defaults
+#         to the current directory.
+
+#
+# useful shell functions
+#
+download ()
+{
+	_wget="wget -nc -q"
+
+	mkdir -p $_target
+
+	$_wget -P $_workdir $_mirror/dists/$_dist/main/binary-$_arch/Packages.gz
+	gzip -cd $_workdir/Packages.gz |grep '^Filename: ' |sed 's/^Filename: //' >$_workdir/deblist
+	rm $_workdir/Packages.gz
+	$_wget -P $_workdir $_mirror/dists/$_dist/main/debian-installer/binary-$_arch/Packages.gz
+	gzip -cd $_workdir/Packages.gz |grep '^Filename: ' |sed 's/^Filename: //' >$_workdir/udeblist
+	rm $_workdir/Packages.gz
+
+	# We mindlessly grab every available .udeb
+	for i in $(<$_workdir/udeblist); do
+		$_wget -P $_target $_mirror/$i
+	done
+
+	for i in $(debootstrap --keep-debootstrap-dir --print-debs --arch $_arch $_dist $_workdir); do
+		_file=$(grep "/${i}_.*_\(all\|${_arch}\)\.deb$" $_workdir/deblist)
+		$_wget -P $_target $_mirror/$_file
+	done
+
+	# Don't miss the kernel, bootloaders, and initrd tools if necessary
+	# FIXME: Definitions for more architectures
+	case $_arch in
+		alpha) echo "Extra packages unknown"; exit 1 ;;
+		amd64) echo "Extra packages unknown"; exit 1 ;;
+		arm) echo "Extra packages unknown"; exit 1 ;;
+		hppa) echo "Extra packages unknown"; exit 1 ;;
+		i386) extra="kernel-image-2.4-latest kernel-image-2.6-latest lilo grub initrd-tools" ;;
+		ia64) echo "Extra packages unknown"; exit 1 ;;
+		m68k) echo "Extra packages unknown"; exit 1 ;;
+		mips) extra="kernel-image-2.4.27-r4k-ip22 kernel-image-2.4.27-r5k-ip22 kernel-image-2.4.27-sb1-swarm-bn arcboot dvhtool file libmagic1 sibyl" ;;
+		mipsel) extra="kernel-image-2.4.27-r5k-cobalt kernel-image-2.4.27-sb1-swarm-bn sibyl colo" ;;
+		powerpc) echo "Extra packages unknown"; exit 1 ;;
+		s390) echo "Extra packages unknown"; exit 1 ;;
+		sparc) echo "Extra packages unknown"; exit 1 ;;
+		*) echo "Unknown architecture"; exit 1 ;;
+	esac
+	for i in $extra; do
+		_file=$(grep "/${i}_.*_\(all\|${_arch}\)\.deb$" $_workdir/deblist)
+		$_wget -P $_target $_mirror/$_file
+	done
+}
+
+rescan ()
+{
+	_tdist="$_target/dists/$_suite/main"
+	_debpkg="$_tdist/binary-$_arch/Packages"
+	_udebpkg="$_tdist/debian-installer/binary-$_arch/Packages"
+
+	mkdir -p $_tdist $_tdist/binary-$_arch $_tdist/debian-installer/binary-$_arch
+	(cd $_target/dists && rm -f $_dist && ln -s $_suite $_dist)
+
+	dpkg-scanpackages $_target /dev/null >$_debpkg
+	gzip -c $_debpkg >${_debpkg}.gz
+	dpkg-scanpackages -u $_target /dev/null >$_udebpkg
+	gzip -c $_udebpkg >${_udebpkg}.gz
+
+	_debmd5sum=$(md5sum $_debpkg |cut -d' ' -f 1)
+	_debsize=$(find $_debpkg -printf %s )
+	_udebmd5sum=$(md5sum $_udebpkg |cut -d' ' -f 1)
+	_udebsize=$(find $_udebpkg -printf %s )
+
+	cat >$_target/dists/$_suite/Release <<- EOF
+	Origin: Debian
+	Label: Debian
+	Suite: $_suite
+	Codename: $_dist
+	Date: $(date -R)
+	Architectures: $_arch
+	Components: main
+	Description: Debian Test Mirror - Not Released
+	MD5Sum:
+	 ${_debmd5sum}            ${_debsize} main/binary-$_arch/Packages
+	 ${_udebmd5sum}            ${_udebsize} main/debian-installer/binary-$_arch/Packages
+	EOF
+}
+
+cleanup ()
+{
+	rm -rf ${_workdir}
+}
+
+#
+# set some variables used in the shell functions
+#
+set -e
+
+_workdir=$(mktemp -d)
+trap cleanup EXIT
+
+_mirror=$MIRROR
+_suite=${SUITE:-"unstable"}
+if [ -n "$DIST" ]; then
+	_dist=$DIST;
+	case $_dist in
+		lenny) _suite="stable" ;;
+		squeeze) _suite="testing" ;;
+		sid | *) _suite="unstable" ;;
+	esac
+else
+	case $_suite in
+		stable) _dist="lenny" ;;
+		testing) _dist="squeeze" ;;
+		unstable | *) _dist="sid" ;;
+	esac
+fi
+_arch=${ARCH:-$(dpkg --print-architecture)}
+_target=${TARGET:-"."}
+
+#
+# do the work
+#
+[ -z "$_mirror" ] || download
+rescan

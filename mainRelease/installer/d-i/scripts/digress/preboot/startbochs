@@ -1,0 +1,9 @@
+#!/bin/sh
+
+rc=$STATE_DIR/bochs-$MACHINE-$SCHEME.bochsrc
+
+# Store the pid so stopbochs can stop it later.
+echo "$$" > $STATE_DIR/bochs-$MACHINE-$SCHEME.pid
+# Run bochs-bin since the bochs wrapper script does not propigate kill
+# signals to bochs-bin.
+exec bochs-bin -qf $rc

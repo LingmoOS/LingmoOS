@@ -1,0 +1,473 @@
+'\" t
+.\" $Id: cdk_dialog.3,v 1.23 2019/02/15 00:32:59 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_dialog 3
+.SH NAME
+.XX activateCDKDialog
+.XX destroyCDKDialog
+.XX drawCDKDialog
+.XX drawCDKDialogButtons
+.XX eraseCDKDialog
+.XX getCDKDialog
+.XX getCDKDialogBox
+.XX getCDKDialogHighlight
+.XX getCDKDialogSeparator
+.XX injectCDKDialog
+.XX moveCDKDialog
+.XX newCDKDialog
+.XX positionCDKDialog
+.XX setCDKDialog
+.XX setCDKDialogBackgroundAttrib
+.XX setCDKDialogBackgroundColor
+.XX setCDKDialogBox
+.XX setCDKDialogBox
+.XX setCDKDialogBoxAttribute
+.XX setCDKDialogHighlight
+.XX setCDKDialogHorizontalChar
+.XX setCDKDialogLLChar
+.XX setCDKDialogLRChar
+.XX setCDKDialogPostProcess
+.XX setCDKDialogPreProcess
+.XX setCDKDialogSeparator
+.XX setCDKDialogULChar
+.XX setCDKDialogURChar
+.XX setCDKDialogVerticalChar
+cdk_dialog \- curses dialog widget
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKDialog ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype * " "actions");
+.TP 15
+.B "void destroyCDKDialog ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "void drawCDKDialog ("
+.BI "CDKDIALOG *" "dialog",
+.BI "boolean " "box");
+.TP 15
+.B "void drawCDKDialogButtons ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "void eraseCDKDialog ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "boolean getCDKDialog ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "boolean getCDKDialogBox ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "chtype getCDKDialogHighlight ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "boolean getCDKDialogSeparator ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "int injectCDKDialog ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKDialog ("
+.BI "CDKDIALOG *" "dialog",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKDIALOG *newCDKDialog ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "CDK_CONST char ** " "message" ,
+.BI "int " "rows",
+.BI "CDK_CONST char ** " "buttons" ,
+.BI "int " "buttonCount",
+.BI "chtype " "highlight" ,
+.BI "boolean " "separator",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKDialog ("
+.BI "CDKDIALOG *" "dialog");
+.TP 15
+.B "void setCDKDialogBox ("
+.BI "CDKDIALOG *" "dialog",
+.BI "boolean " "boxWidget");
+.TP 15
+.B "void setCDKDialog ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "highlight",
+.BI "boolean " "separator",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKDialogBackgroundAttrib ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKDialogBackgroundColor ("
+.BI "CDKDIALOG *" "dialog",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKDialogBox ("
+.BI "CDKDIALOG *" "dialog",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKDialogBoxAttribute ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogHighlight ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKDialogHorizontalChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogLLChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogLRChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogPostProcess ("
+.BI "CDKDIALOG *" "dialog",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKDialogPreProcess ("
+.BI "CDKDIALOG *" "dialog",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKDialogSeparator ("
+.BI "CDKDIALOG *" "dialog",
+.BI "boolean " "separator");
+.TP 15
+.B "void setCDKDialogULChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogURChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKDialogVerticalChar ("
+.BI "CDKDIALOG *" "dialog",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk dialog widget creates a dialog box with a message and a varied number of
+buttons to choose from.
+The following functions create or manipulate the Cdk dialog box widget.
+.PP
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKDialog
+activates the dialog widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBdialog\fR is a pointer to a non-NULL dialog widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return a
+value from 0 to the number of buttons -1, representing the button selected.
+It also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this widget was \fIESCAPE\fR,
+then the widget returns
+a value of -1 and the widget data \fIexitType\fR will be set to
+\fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDKDialog
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKDialog
+draws the dialog widget on the screen.
+.IP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B drawCDKDialogButtons
+draws the dialog buttons and the separation line.
+.TP 5
+.B eraseCDKDialog
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKDialog
+returns true if the list will be drawn with a box around it.
+.TP 5
+.B getCDKDialogBox
+returns true if the dialog will be drawn with a box around it.
+.TP 5
+.B getCDKDialogHighlight
+returns the highlight attribute of the widget.
+.TP 5
+.B getCDKDialogSeparator
+returns the state of the separator flag.
+.TP 5
+.B injectCDKDialog
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBdialog\fR is a pointer to a non-NULL dialog widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value from zero to one less than the number of buttons,
+representing the button selected.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKDialog
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.IP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which states
+whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKDialog
+creates a dialog widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBmessage\fR
+is the text to be displayed in the message region of the dialog box.
+.TP 5
+\fBrows\fR
+is the number of elements in the \fBmessage\fR list.
+.TP 5
+\fBbuttons\fR
+is an array containing the button labels
+to be displayed on the bottom of the dialog box.
+.TP 5
+\fBbuttonCount\fR
+is the number of elements in the \fBbuttons\fR array.
+.TP 5
+\fBhighlight\fR
+is the attribute of the currently highlighted button.
+.TP 5
+\fBbox\fR
+is true if the widget should be drawn with a box around it.
+.TP 5
+\fBseparator\fR
+is true if a separator line should be drawn
+between the message region and the buttons.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR
+pointer is returned.
+.TP 5
+.B positionCDKDialog
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKDialogBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKDialog
+lets the programmer modify certain elements of an existing
+dialog widget.
+.IP
+The parameter names correspond to the same parameter names listed
+in the \fBnewCDKDialog\fR function.
+.TP 5
+.B setCDKDialogBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKDialogBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.B setCDKDialogBox
+sets the box attribute of the dialog widget.
+.TP 5
+.B setCDKDialogBoxAttribute
+function sets the attribute of the box.
+.TP 5
+.B setCDKDialogHighlight
+sets the highlight attribute of the selected button.
+.TP 5
+.B setCDKDialogHorizontalChar
+sets the horizontal drawing character for the box to
+the given character.
+.TP 5
+.B setCDKDialogLLChar
+sets the lower left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKDialogLRChar
+sets the lower right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKDialogPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR is a pointer to
+\fIvoid\fR.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKDialogPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKDialogSeparator
+sets the boolean flag whether the widget will be drawn with the
+separator bar between the buttons and the message area.
+.TP 5
+.B setCDKDialogULChar
+function sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKDialogURChar
+sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKDialogVerticalChar
+sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/T{
+Selects the button to the left of the current button.
+T}
+Right Arrow/T{
+Selects the button to the right of the current button.
+T}
+Tab/T{
+Selects the button to the right of the current button.
+T}
+Space/T{
+Selects the button to the right of the current button.
+T}
+Return/T{
+Exits the widget and returns the index of the selected button.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exits the widget and returns the index of the selected button.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns -1.
+This also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_process (3),
+.BR cdk_screen (3)

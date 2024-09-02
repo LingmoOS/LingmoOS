@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+rm -f /target/etc/apt/apt.conf.d/00NoMountCDROM \
+	/target/etc/apt/apt.conf.d/00IgnoreTimeConflict \
+	/target/etc/apt/apt.conf.d/00AllowUnauthenticated \
+	/target/etc/dpkg/dpkg.cfg.d/force-unsafe-io
+
+# Copy any created static devices (as /dev was not bind mounted recursively)
+cp -a /target/dev/.static/dev/* /dev/.static/dev/ 2>/dev/null || true

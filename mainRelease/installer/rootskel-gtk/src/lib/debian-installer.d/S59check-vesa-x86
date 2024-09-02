@@ -1,0 +1,16 @@
+# Graphical installer currently only works on VESA framebuffer
+if [ "$TERM_FRAMEBUFFER" ]; then
+	if grep -qs VESA /proc/fb; then
+		FB_INDEX=$(grep VESA /proc/fb | cut -d " " -f 1 | head -n 1)
+		if [ $FB_INDEX -ne 0 ]; then
+			echo "fbdev=/dev/fb$FB_INDEX" >> /etc/directfbrc
+		fi
+	elif grep -qs xen /proc/fb; then
+		FB_INDEX=$(grep xen /proc/fb | cut -d " " -f 1 | head -n 1)
+		if [ $FB_INDEX -ne 0 ]; then
+			echo "fbdev=/dev/fb$FB_INDEX" >> /etc/directfbrc
+		fi
+	else
+		GTK_NOVESA=1
+	fi
+fi

@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND += -DNETNS_RUN_DIR=\"/run/netns\"
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build -- V=$(if $(filter terse,$(DEB_BUILD_OPTIONS)),0,1)
+
+override_dh_auto_clean:
+	# dh_auto_clean does not set PKG_CONFIG according to the cross-compilation
+	# environment, but the Makefile calls it even for the `clean` target, which
+	# causes a FTCBFS (see #836095). There is no need for calling pkg-config
+	# for the `clean` target, and setting NO_PKG_CONFIG=1 prevents it.
+	# The same goes for dh_auto_install and the `install` target.
+	dh_auto_clean -- NO_PKG_CONFIG=1
+
+override_dh_auto_install:
+	# See the comment for override_dh_auto_clean.
+# Add SBINDIR=/sbin if backporting to bookworm or earlier
+	dh_auto_install -- NO_PKG_CONFIG=1

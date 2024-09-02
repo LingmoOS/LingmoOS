@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+for i in /boot/grub/device.map ; do
+  if test -e $i ; then
+    echo -e "\n*********************** BEGIN $i" >&3
+    cat $i >&3
+    echo "*********************** END $i" >&3
+  fi
+done
+
+for i in /proc/mounts ; do
+  if test -e $i ; then
+    echo -e "\n*********************** BEGIN $i" >&3
+    grep ^/dev/ $i >&3
+    echo "*********************** END $i" >&3
+  fi
+done
+
+for i in /boot/grub/menu.lst ; do
+  if test -e $i ; then
+    echo -e "\n*********************** BEGIN $i" >&3
+    sed $i -e "s/.*password.*/### PASSWORD LINE REMOVED ###/g" >&3
+    echo "*********************** END $i" >&3
+  fi
+done
+
+exit 0

@@ -1,0 +1,44 @@
+#!/bin/sh
+set -e
+
+ANON_BASE_URL=https://salsa.debian.org/installer-team/
+AUTH_BASE_URL=git@salsa.debian.org:installer-team/
+
+runshow () {
+	echo "$@"
+	eval "$@"
+}
+
+config () {
+	# use ssh for pushes
+	echo >&2 "Configuring git to push to $AUTH_BASE_URL instead of $ANON_BASE_URL"
+	runshow git config --global "url.$AUTH_BASE_URL.pushInsteadOf" "$ANON_BASE_URL"
+	echo >&2 "Cleaning up legacy configuration left over by this script"
+	runshow git config --global --unset "url.$ANON_BASE_URL.insteadOf" "$AUTH_BASE_URL"
+}
+
+case "${1:-}" in
+    anon*)
+	echo >&2 "This argument is a noop"
+	exit 0
+	;;
+
+    auth*)
+	echo >&2 "This argument is a noop"
+	exit 0
+	;;
+
+    '')
+	config
+	;;
+
+    *)
+	echo >&2 "Usage: $0"
+	exit 2
+	;;
+esac
+
+echo ""
+echo "Your git is now configured to checkout d-i optimally."
+echo "Now run 'mr checkout'"
+

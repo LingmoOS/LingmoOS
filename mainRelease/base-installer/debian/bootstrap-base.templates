@@ -1,0 +1,454 @@
+Template: debian-installer/bootstrap-base/title
+Type: text
+#  Item in the main menu to select this package
+# TRANSLATORS: <65 columns
+# :sl1:
+_Description: Install the base system
+
+Template: base-installer/cannot_install
+Type: error
+# The base system is the minimal Debian system 
+# See http://www.debian.org/doc/debian-policy/ch-binary.html#s3.7
+# :sl2:
+_Description: Cannot install base system
+ The installer cannot figure out how to install the base system. It found no
+ installable image, and no valid mirror was configured.
+
+Template: base-installer/no_codename
+Type: error
+# :sl2:
+_Description: Debootstrap Error
+ Failed to determine the codename for the release.
+
+Template: base-installer/debootstrap-failed
+Type: error
+# :sl2:
+_Description: Failed to install the base system
+ The base system installation into /target/ failed.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/debootstrap/error-exitcode
+Type: error
+# :sl2:
+_Description: Base system installation error
+ The debootstrap program exited with an error (return value ${EXITCODE}).
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/debootstrap/error-abnormal
+Type: error
+# :sl2:
+_Description: Base system installation error
+ The debootstrap program exited abnormally.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/debootstrap/fallback-error
+Type: error
+# :sl2:
+#flag:translate!:3
+_Description: Debootstrap Error
+ The following error occurred:
+ .
+ ${ERROR}
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/initramfs/generator
+Type: select
+Choices: ${GENERATORS}
+# :sl3:
+_Description: Tool to use to generate boot initrd:
+ The list shows the available tools. If you are unsure which to select,
+ you should select the default. If your system fails to boot, you can
+ retry the installation using the other options.
+
+Template: base-installer/initramfs/unsupported
+Type: error
+# :sl3:
+_Description: Unsupported initrd generator
+ The package ${GENERATOR} that was selected to generate the
+ initrd is not supported.
+
+Template: base-installer/initramfs-tools/driver-policy
+Type: select
+Choices-C: most, dep
+# :sl3:
+__Choices: generic: include all available drivers, targeted: only include drivers needed for this system
+# :sl3:
+_Description: Drivers to include in the initrd:
+ The primary function of an initrd is to allow the kernel to mount the
+ root file system. It therefore needs to contain all drivers and supporting
+ programs required to do that.
+ .
+ A generic initrd is much larger than a targeted one and may even be so
+ large that some boot loaders are unable to load it but has the advantage that
+ it can be used to boot the target system on almost any hardware. With the
+ smaller targeted initrd there is a very small chance that not all needed
+ drivers are included.
+
+Template: base-installer/kernel/failed-install
+Type: error
+# :sl2:
+_Description: Unable to install the selected kernel
+ An error was returned while trying to install the kernel into the
+ target system.
+ .
+ Kernel package: '${KERNEL}'.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/kernel/image
+Type: select
+# :sl2:
+#flag:translate!:1
+# For base-installer, "none" is an additional choice to a list of kernels.
+# It means "no kernel"
+__Choices: ${KERNELS}, none[ Do not translate what's inside the brackets and just put the translation for the word "none" in your language without any brackets. This "none" means "no kernel" ]
+# :sl2:
+_Description: Kernel to install:
+ The list shows the available kernels. Please choose one of them in order
+ to make the system bootable from the hard drive.
+
+Template: base-installer/kernel/altmeta
+Type: text
+Description: for internal use; can be preseeded
+ Optional postfix for kernel meta packages; can be used for example to
+ support installation of an updated kernel for stable.
+ Don't include the leading hyphen: it will be prepended in the code.
+
+Template: base-installer/kernel/skip-install
+Type: boolean
+Default: false
+# :sl2:
+_Description: Continue without installing a kernel?
+ No installable kernel was found in the defined APT sources.
+ .
+ You may try to continue without a kernel, and manually install your own
+ kernel later. This is only recommended for experts, otherwise you will
+ likely end up with a machine that doesn't boot.
+
+Template: base-installer/kernel/no-kernels-found
+Type: error
+# :sl2:
+_Description: Cannot install kernel
+ The installer cannot find a suitable kernel package to install. 
+
+Template: base-installer/kernel/failed-package-install
+Type: error
+# :sl2:
+_Description: Unable to install ${PACKAGE}
+ An error was returned while trying to install the ${PACKAGE} package
+ onto the target system.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+
+Template: base-installer/debootstrap/error/nogetrel
+Type: error
+# :sl2:
+# SUBST0 is a Release file name.
+_Description: Debootstrap Error
+ Failed getting Release file ${SUBST0}.
+
+Template: base-installer/debootstrap/error/nogetrelsig
+Type: error
+# :sl2:
+# SUBST0 is a Release.gpg file name
+_Description: Debootstrap Error
+ Failed getting Release signature file ${SUBST0}.
+
+Template: base-installer/debootstrap/error/unknownrelsig
+Type: error
+# :sl2:
+# SUBST0 is a gpg key ID
+_Description: Debootstrap Error
+ Release file signed by unknown key (key id ${SUBST0})
+
+Template: base-installer/debootstrap/error/invalidrel
+Type: error
+# :sl2:
+_Description: Debootstrap Error
+ Invalid Release file: no valid components.
+
+Template: base-installer/debootstrap/error/missingrelentry
+Type: error
+# :sl2:
+# SUBST0 is a filename
+_Description: Debootstrap Error
+ Invalid Release file: no entry for ${SUBST0}.
+
+Template: base-installer/debootstrap/error/couldntdl
+Type: error
+# :sl2:
+# SUBST0 is a filename or package name
+# Debootstrap is a program name: should not be translated
+_Description: Debootstrap Error
+ Couldn't retrieve ${SUBST0}. This may be due to a network problem or bad
+ media, depending on your installation method.
+ .
+ If you are installing from CD-R or CD-RW, burning the CD at a lower
+ speed may help.
+
+Template: base-installer/debootstrap/section/downrel
+Type: text
+# :sl1:
+# Release is a filename which should not be translated
+_Description: Retrieving Release file
+
+Template: base-installer/debootstrap/progress/downrelsig
+Type: text
+# :sl1:
+# Release is a filename which should not be translated
+_Description: Retrieving Release file signature
+
+Template: base-installer/debootstrap/section/sizedebs
+Type: text
+# :sl1:
+# "packages" here can be translated
+_Description: Finding package sizes
+
+Template: base-installer/debootstrap/section/downpkgs
+Type: text
+# :sl1:
+# Packages is a filename which should not be translated
+_Description: Retrieving Packages files
+
+Template: base-installer/debootstrap/section/downmainpkgs
+Type: text
+# :sl1:
+# Packages is a filename which should not be translated
+_Description: Retrieving Packages file
+
+Template: base-installer/debootstrap/section/downdebs
+Type: text
+# :sl1:
+# "packages" here can be translated
+_Description: Retrieving packages
+
+Template: base-installer/debootstrap/section/extractpkgs
+Type: text
+# :sl1:
+# "packages" here can be translated
+_Description: Extracting packages
+
+Template: base-installer/debootstrap/section/instbase
+Type: text
+# :sl1:
+_Description: Installing the base system
+
+Template: base-installer/debootstrap/section/instcore
+Type: text
+# :sl1:
+# Core packages are packages that are part of the Debian base system
+# The "core" packages are indeed packages that are specifically
+# recorded as part of the base system. Other packages may
+# be installed on the base system because of dependency resolution
+_Description: Installing core packages
+
+Template: base-installer/debootstrap/section/unpackreq
+Type: text
+# :sl1:
+# Required packages are packages which installation is triggered
+# by the dependency chain of core packages
+# In short, they are "required" because at least one of the
+# packages from the core packages depends on them
+_Description: Unpacking required packages
+
+Template: base-installer/debootstrap/section/confreq
+Type: text
+# :sl1:
+_Description: Configuring required packages
+
+Template: base-installer/debootstrap/section/unpackbase
+Type: text
+# :sl1:
+# The base system is the minimal Debian system 
+# See http://www.debian.org/doc/debian-policy/ch-binary.html#s3.7
+_Description: Unpacking the base system
+
+Template: base-installer/debootstrap/section/confbase
+Type: text
+# :sl1:
+# The base system is the minimal Debian system 
+# See http://www.debian.org/doc/debian-policy/ch-binary.html#s3.7
+_Description: Configuring the base system
+
+Template: base-installer/debootstrap/fallback-info
+Type: text
+# :sl1:
+_Description: ${SECTION}: ${INFO}...
+
+Template: base-installer/debootstrap/info/validating
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Validating ${SUBST0}...
+
+Template: base-installer/debootstrap/info/retrieving
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Retrieving ${SUBST0}...
+
+Template: base-installer/debootstrap/info/extracting
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Extracting ${SUBST0}...
+
+Template: base-installer/debootstrap/info/unpacking
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Unpacking ${SUBST0}...
+
+Template: base-installer/debootstrap/info/configuring
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Configuring ${SUBST0}...
+
+Template: base-installer/debootstrap/info/releasesig
+Type: text
+# :sl1:
+# Release is a filename which should not be translated
+_Description: Checking Release signature
+
+Template: base-installer/debootstrap/info/validrelsig
+Type: text
+# :sl1:
+# SUBST0 is a gpg key id
+# Release is a filename which should not be translated
+_Description: Valid Release signature (key id ${SUBST0})
+
+Template: base-installer/debootstrap/info/resolvebase
+Type: text
+# :sl1:
+_Description: Resolving dependencies of base packages...
+
+Template: base-installer/debootstrap/info/newbase
+Type: text
+# :sl1:
+# SUBST0 is a list of packages
+_Description: Found additional base dependencies: ${SUBST0}
+
+Template: base-installer/debootstrap/info/newrequired
+Type: text
+# :sl1:
+# SUBST0 is a list of packages
+_Description: Found additional required dependencies: ${SUBST0}
+
+Template: base-installer/debootstrap/info/redundantbase
+Type: text
+# :sl1:
+# SUBST0 is a list of packages
+_Description: Found packages in base already in required: ${SUBST0}
+
+Template: base-installer/debootstrap/info/resolvereq
+Type: text
+# :sl1:
+_Description: Resolving dependencies of required packages...
+
+Template: base-installer/debootstrap/info/checkingsizes
+Type: text
+# :sl1:
+# SUBST0 is an archive component (main, etc)
+# SUBST1 is a mirror
+_Description: Checking component ${SUBST0} on ${SUBST1}...
+
+Template: base-installer/debootstrap/info/instcore
+Type: text
+# :sl1:
+# Core packages are packages that are part of the Debian base system
+# The "core" packages are indeed packages that are specifically
+# recorded as part of the base system. Other packages may
+# be installed on the base system because of dependency resolution
+_Description: Installing core packages...
+
+Template: base-installer/debootstrap/info/unpackreq
+Type: text
+# :sl1:
+# Required packages are packages which installation is triggered
+# by the dependency chain of core packages
+# In short, they are "required" because at least one of the
+# packages from the core packages depends on them
+_Description: Unpacking required packages...
+
+Template: base-installer/debootstrap/info/confreq
+Type: text
+# :sl1:
+# Required packages are packages which installation is triggered
+# by the dependency chain of core packages
+# In short, they are "required" because at least one of the
+# packages from the core packages depends on them
+_Description: Configuring required packages...
+
+Template: base-installer/debootstrap/info/instbase
+Type: text
+# :sl1:
+_Description: Installing base packages...
+
+Template: base-installer/debootstrap/info/unpackbase
+Type: text
+# :sl1:
+_Description: Unpacking the base system...
+
+Template: base-installer/debootstrap/info/confbase
+Type: text
+# :sl1:
+_Description: Configuring the base system...
+
+Template: base-installer/debootstrap/info/basesuccess
+Type: text
+# :sl1:
+_Description: Base system installed successfully.
+
+Template: base-installer/debootstrap/fallback-warning
+Type: error
+# Debootstrap is a program name: should not be translated
+# :sl2:
+_Description: Debootstrap warning
+ Warning: ${INFO}
+
+Template: base-installer/debootstrap/warning/retrying
+Type: text
+# SUBST0 is an url
+# :sl2:
+_Description: Retrying failed download of ${SUBST0}
+
+Template: base-installer/section/configure_apt
+Type: text
+# :sl1:
+_Description: Configuring APT sources...
+
+Template: base-installer/section/pick_kernel
+Type: text
+# :sl1:
+_Description: Selecting the kernel to install...
+
+Template: base-installer/section/install_linux
+Type: text
+# :sl1:
+_Description: Installing the kernel...
+
+Template: base-installer/section/install_kernel_package
+Type: text
+# :sl1:
+# SUBST0 is a package name
+_Description: Installing the kernel - retrieving and installing ${SUBST0}...
+
+Template: base-installer/includes
+Type: string
+Description: for internal use; can be preseeded
+ Packages to be included in base installation
+
+Template: base-installer/excludes
+Type: string
+Description: for internal use; can be preseeded
+ Packages to be excluded in base installation
+
+Template: base-installer/debootstrap_script
+Type: string
+Description: for internal use; can be preseeded
+ Force use of a specific debootstrap script

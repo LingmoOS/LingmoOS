@@ -1,0 +1,159 @@
+commit 6451ed7b8b7c40de68d7deb84a0f26544594fc7c
+Author: Joey Hess <joey@kitenet.net>
+Date:   Wed Oct 20 18:18:26 2010 -0400
+
+    patch2, hand-applied
+
+diff --git a/src/repository.cpp b/src/repository.cpp
+index b7faaa7..a0e5f4c 100644
+--- a/src/repository.cpp
++++ b/src/repository.cpp
+@@ -51,7 +51,7 @@ public:
+ static ProcessCache processCache;
+ 
+ Repository::Repository(const Rules::Repository &rule)
+-    : name(rule.name), commitCount(0), outstandingTransactions(0), processHasStarted(false)
++    : name(rule.name), commitCount(0), outstandingTransactions(0), lastrevmark(0), processHasStarted(false)
+ {
+     foreach (Rules::Repository::Branch branchRule, rule.branches) {
+         Branch branch;
+@@ -108,8 +108,8 @@ void Repository::reloadBranches()
+     }
+ }
+ 
+-void Repository::createBranch(const QString &branch, int revnum,
+-                              const QString &branchFrom, int)
++int Repository::createBranch(const QString &branch, int revnum,
++                              const QString &branchFrom, int origrev)
+ {
+     startFastImport();
+     if (!branches.contains(branch)) {
+@@ -122,7 +122,10 @@ void Repository::createBranch(const QString &branch, int revnum,
+         branchRef.prepend("refs/heads/");
+ 
+     Branch &br = branches[branch];
+-    if (br.created && br.created != revnum) {
++    /* avoid rewinding master, this crashes if master exists but all
++     * commits so far have gone to a branch and the branch is then copied
++     * to master. JEH */
++    if (br.created && br.created != revnum && ! branch.startsWith("master")) {
+         QByteArray backupBranch = branchRef + '_' + QByteArray::number(revnum);
+         qWarning() << branch << "already exists; backing up to" << backupBranch;
+ 
+@@ -138,13 +141,21 @@ void Repository::createBranch(const QString &branch, int revnum,
+     if (!branches.contains(branchFrom) || !branches.value(branchFrom).created) {
+         qCritical() << branch << "in repository" << name
+                     << "is branching from branch" << branchFrom
+-                    << "but the latter doesn't exist. Can't continue.";
+-        exit(1);
++                    << "but the latter doesn't exist. Falling back to copy.";
++        return 0;
+     }
+ 
+-    fastImport.write("reset " + branchRef + "\nfrom " + branchFromRef + "\n\n"
+-                     "progress Branch " + branchRef + " created from "
+-                     + branchFromRef + " r" + QByteArray::number(revnum) + "\n\n");
++    if (origrev == revnum - 1 || rev2mark[origrev] == 0) {
++      fastImport.write("reset " + branchRef + "\nfrom " + branchFromRef + "\n\n"
++                       "progress Branch " + branchRef + " created from plain branch "
++                       + branchFromRef + " r" + QByteArray::number(revnum) + "\n\n");
++    }
++    else {
++       fastImport.write("reset " + branchRef + "\nfrom :1000" + QByteArray::number(rev2mark[origrev]) + "\n\n"
++                     "progress Branch " + branchRef + " created from mark "
++                     + branchFromRef + " r" + QByteArray::number(origrev) + "\n\n");
++    }
++    return 1;
+ }
+ 
+ Repository::Transaction *Repository::newTransaction(const QString &branch, const QString &svnprefix,
+@@ -318,6 +329,7 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
+ 
+ void Repository::Transaction::commit()
+ {
++	int i;
+     processCache.touch(repository);
+ 
+     // create the commit message
+@@ -334,6 +346,18 @@ void Repository::Transaction::commit()
+ 
+         QTextStream s(&repository->fastImport);
+         s << "commit " << branchRef << endl;
++	
++	for (i=repository->lastrevmark+1;i<revnum; i++) {
++		repository->rev2mark[i]=repository->lastrevmark;
++	}
++	if (repository->lastrevmark+1 != revnum -1)
++		printf("debug: added rev2marks %i..%i = %i\n", repository->lastrevmark+1, revnum-1, repository->lastrevmark);
++	repository->lastrevmark=revnum;
++	
++	repository->rev2mark[revnum]=revnum;
++	s << "mark :1000" << revnum << endl;
++	printf("debug: added mark for %i\n", revnum);
++
+         s << "committer " << QString::fromUtf8(author) << ' ' << datetime << " -0000" << endl;
+ 
+         Branch &br = repository->branches[branch];
+diff --git a/src/repository.h b/src/repository.h
+index ad23559..61fb09d 100644
+--- a/src/repository.h
++++ b/src/repository.h
+@@ -58,7 +58,7 @@ public:
+     ~Repository();
+ 
+     void reloadBranches();
+-    void createBranch(const QString &branch, int revnum,
++    int createBranch(const QString &branch, int revnum,
+                       const QString &branchFrom, int revFrom);
+     Transaction *newTransaction(const QString &branch, const QString &svnprefix, int revnum);
+ 
+@@ -84,11 +84,13 @@ private:
+ 
+     QHash<QString, Branch> branches;
+     QHash<QString, AnnotatedTag> annotatedTags;
++    QHash<int, int> rev2mark;
+     QString name;
+     QProcess fastImport;
+     int commitCount;
+     int outstandingTransactions;
+     int lastmark;
++    int lastrevmark;
+     bool processHasStarted;
+ 
+     void startFastImport();
+diff --git a/src/svn.cpp b/src/svn.cpp
+index 04cf6bf..916a38a 100644
+--- a/src/svn.cpp
++++ b/src/svn.cpp
+@@ -600,7 +600,7 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
+                          << "is an SVN rename from"
+                          << qPrintable(previous) << "rev" << rev_from;
+                 return EXIT_SUCCESS;
+-            } else if (0) { /* XXX HACH REMOVE JEH */
++            } else {
+                 // same repository but not same branch
+                 // this means this is a plain branch
+                 qDebug() << qPrintable(repository) << ": branch"
+@@ -615,14 +615,15 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
+                     return EXIT_FAILURE;
+                 }
+ 
+-                repo->createBranch(branch, revnum, prevbranch, rev_from);
+-                if (rule.annotate) {
+-                    // create an annotated tag
+-                    fetchRevProps();
+-                    repo->createAnnotatedTag(branch, svnprefix, revnum, authorident,
++                if (repo->createBranch(branch, revnum, prevbranch, rev_from)) {
++                	if (rule.annotate) {
++                    		// create an annotated tag
++                    		fetchRevProps();
++                    		repo->createAnnotatedTag(branch, svnprefix, revnum, authorident,
+                                              epoch, log);
+-                }
+-                return EXIT_SUCCESS;
++                	}
++                	return EXIT_SUCCESS;
++		}
+             }
+         }
+     }

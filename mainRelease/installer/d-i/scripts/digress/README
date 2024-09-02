@@ -1,0 +1,202 @@
+This directory contains digress, the d-i automatic regression tester.
+
+To set it up locally, you can edit the files here (but don't commit them!),
+or create a directory elsewhere containing config and schemes/ and point
+DI_TESTDIR at it. Once it's all working, the daily-tests script can be used
+to log everything in a format that will let it be put on the test log page.
+
+Warning about passwords: No real effort is made to keep root or user
+passwords from leaking into the output or log files. Hashed versions of the
+passwords will be put in preseed files. Don't use important passwords, and
+don't put test machines on a insecure network!
+
+The automatic testing is accomplished by the test-harness script. This
+script reads global configs from the file config, and takes the name of a
+test scheme. Schemes are defined by files in the schemes/ directory, which
+has subdirs for each machine, that contain a common file with common
+settings for the machines, and other files defining each scheme. These
+files can set config options or use other schemes. These config options
+should always be set:
+
+DESCRIPTION		Short description of what's being tested.
+ARCH			Architecture of the test machine.
+PRESEED_URL		URL to the directory containing preseed files to use.
+INSTALL_LOCALE		Locale to run the install in.
+PREBOOT			Commands to run before booting.
+BOOT			Command to run to boot the installer.
+TEST_1			Commands to use to test the first stage of the install.
+TEST_2			Commands to use to test the second stage of the install.
+SHUTDOWN		Commands to run to shutdown the system.
+STATE_DIR		Directory to use to hold state used for tests.
+			Created if nonexistant.
+
+Some others that can be set:
+
+BOOT_OPTS		Options to pass to the kernel.
+TFTP_DIR		Path to your tftpboot directory. You need write access.
+TFTP_IMAGE		File name of image file to tftp boot. (sparc, hppa)
+NETBOOT_IMAGE		Path to netboot.tar.gz to boot.
+NETBOOT_IMAGE_ALT	Alternate netboot.tar.gz to boot (if it's newer).
+NETBOOT_IMAGE_DIR	Directory to set $TFTP_DIR/$ARCH-boot to (netboot-links)
+NETBOOT_KERNEL		File name of kernel to use for netbooting. Only
+			needed when netbooting via qemu.
+BOOT_SELECTION		Boot option to select in boot loader (bootloader-setup)
+GRAPHICS_DISABLE	Disable graphical boot screen in boot loader (bootloader-setup)
+EFI_MENUENTRY		Option to choose in the efi boot menu (ia64-boot)
+CONSOLECOMMAND		Command to run to get access to the console (ia64-boot)
+BOOTCOMMAND		Command to enter at boot prompt. (cdrom-boot)
+BOOTPARAMS		Parameters to pass to the kernel while booting
+			first stage.
+			(startqemu-netboot)
+CONSOLEPARAMS		Parameters to pass to the kernel to control what
+			console is used (only for mips qemu currently)
+CONSERVER_CONSOLE	Conserver console to connect to if using that.
+STAGE_1_MAX_INACTIVITY	Maximum number of seconds of inactivity before failure.
+			Optional. (di-install)
+STAGE_1_MAX_TIME	Maximum number of seconds runtime before failure.
+STAGE_2_MAX_TIME	Maximum number of seconds runtime before failure.
+ROOT_PASSWORD_FILE	A file containing a root password for the installed
+			machine.
+ROOT_PASSWORD		A root password for the installed machine.
+ISO			Path to an iso image.
+ISO_ALT			Alternate iso image to use (if it's newer).
+SCREEN_COMMAND		Command to run inside the screen session (inscreen)
+TASK			Task to install. (preseed-setup)
+SUITE			Suite to install. (preseed-setup)
+PRIORITY		Debconf priority to preseed (preseed-setup)
+USER			Non-root user to create on host.
+USER_PASSWORD		Password of user.
+USER_PASSWORD_FILE	File containing password of user.
+RETRY			If set, daily-tests will retry a test once.
+			Useful if the test setup occasionally breaks,
+			though it may also mask other intermittent
+			problems.
+LOGDIR			Directory to save logs to. Default is
+			$DI_TESTDIR/logs
+MAXLOGS			Number of logs to keep.
+KEEP_DISK		Set to 1 to retain disk images after installs.
+			(Using emulators only.)
+			The disk images will be saved to the LOGDIR.
+NETWORK_CONSOLE_PASSWORD
+			Password to use for network-console installs.
+SSHPORT			Port to ssh to when running ssh-data-gather.
+TEST_HOSTNAME		Hostname or IP to use to access the installed
+			system for testing.
+SERVER			The hostname -f of the server that can handle
+			digress testing of the machine in this scheme.
+			If set, the machine will only be available on that
+			server even if the scheme is checked out elsehwere.
+
+Qemu options:
+
+QEMU_COMMAND		Command to run for qemu.
+QEMU_DISK_SIZE		Size of disk file to create. Passed to qemu-img.
+QEMU_DISK		Existing file/device to use as disk. Optional.
+QEMU_EXTRA_PARAMSS	Additional parameters to pass to qemu.
+QEMU_SERIAL_PORT	Port that qemu should listen to for the serial
+			console.
+QEMU_SAVE_STATE		Set to zero to disable qemu saving state on
+			shutdown.
+QEMU_KERNEL		Kernel to boot qemu with.
+QEMU_INITRD		Initrd to boot qemu with.
+QEMU_HD_MEDIA		boot.img.gz to piggyback ISO into for hd-media nstall
+			
+
+Hercules options:
+
+HERCULESCFG		Hercules config file to use, if running hercules.
+			Read from the hercules directory. Note that dasd,
+			card deck, and network devices should not be
+			included.
+DASDINIT		Parameters to pass to dasdinit to create dasd image.
+			Do not include filename. Example: 3390-1 root 1114
+S390_IMAGE_DIR		Directory containing s390 installer files.
+S390_IP			IP address for the s390 machine.
+S390_PTP_IP		IP address of the local end of the PTP link.
+S390_PTP_MASK		Netmask of the PTP link.
+S390_NAMESERVER_IP	IP address of the name server.
+HERCULES_MASQ_COMMAND	A command to run to set up ip masq for hercules.
+
+If your test system supports Integrated Lights Out, you can set the
+following options. To use it, you'll need to get the tarball from
+http://h18004.www1.hp.com/support/files/server/us/download/21456.html and
+extract locfg.pl from it and place it in your path or in the utils/
+directory. Note that locfg is not free software; someone want to write a
+free version?
+
+Bochs options:
+
+BOCHSRC			Bochs config file to use, if running bochs.
+			Read from the bochsrc directory.
+BOCHS_DISK_SIZE		Size in megabytes of a bochs disk to create.
+
+
+
+HP_ILO_HOST		Hostname of HP Integrated Lights Out server.
+HP_ILO_USER		Username for the ILO.
+HP_ILO_PASSWORD		Password to use to log into the ILO.
+HP_ILO_PASSWORD_FILE	A file containing the password to use to log into
+			the ILO.
+HP_ILO_ISO_PATH		Where to put the iso image to boot using ILO.
+			The iso specified in the ISO option is hard linked
+			to this location, which should be somewhere in your
+			web site.
+HP_ILO_ISO_URL		Url to iso image made available at the HP_ILO_ISO_PATH.
+HP_ILO_STAGE2_CD_HACK	Make CD available by downloading and loop mounting
+			it, in case your network or iLO sucks and the
+			virtual CD provided by iLO is not sufficiently
+			reliable.
+
+If your test system has a Hewlett-Packard Guardian Service Processor,
+as used in some hppa systems, set the following options:
+
+HP_GSP_CONNECTCOMMAND	Command to use to connect to the GSP.
+			For example, "telnet gsp-host"
+HP_GSP_USER		Username for GSP login.
+HP_GSP_PASSWORD		Password for GSP login.
+HP_GSP_PASSWORD_FILE	A file containing the password to use for GSP login.
+HP_GSP_BOOTCOMMAND	Command to enter at the main boot menu to boot d-i.
+			For example "bo pri" or "bo 0/0/0/0"
+HP_GSP_REBOOTCOMMAND	Command to enter at the main boot menu to boot
+			installed system. Useful if debian is installed to
+			non-primary media.
+If you have a sparc:
+
+OF_BOOT_COMMAND		Command to send at the openfirmware prompt to boot
+			the installer.
+
+If you have an alpha:
+
+ALPHA_BOOT_COMMAND	Command to send at the prompt to boot the installer.
+ALPHA_REBOOT_COMMAND	Command to send at the prompt to boot the installed
+			system.
+
+If you have a raq or other machine that needs a nfs root directory to
+boot from:
+
+NFSROOT_DIR		nfs root directory to unpack image into (eg, /nfsroot)
+NFSROOT_IMAGE		Path to nfsroot.tar.gz to unpack into nfs root directory.
+NFSROOT_IMAGE_ALT	Alternete nfsroot image to use (if it's newer)
+NFSROOT_LINK		Symlink to create to NFSROOT_DIR (nfsroot-links)
+
+If you have a raq:
+
+RAQ_BOOTNUM		Boot number for CoLO for 1st stage install
+
+If you have X10 power control, you can use these settings, and use x10-on
+and x10-off, or use x10-reset to force a device to cold boot.
+
+X10_HOUSE		House code of the device.
+X10_DEVICE		Device code of the device.
+X10_DELAY		Delay in seconds to wait for x10 command to take
+			effect. 2 is a good value, unless you need to catch
+			a machine very very early in its boot process.
+X10_PORT		Serial port to use. Optional.
+
+If you build a serial port power control, you can use these settings
+and use serial-on and serial-off or use use serial-reset to
+force a device to cold boot.
+
+SERIAL_POWER_PIN      Pin that need to be set to control the power of machine
+
+-- Joey Hess <joeyh@debian.org>

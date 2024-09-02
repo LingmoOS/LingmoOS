@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# This sends a bug report against cdimage.debian.org about a broken or
+# problematic image.
+
+# get the version
+found=
+while [ -z "$found" ]; do
+	cat <<EOF
+Please specify the image that is affected by the bug. The supported
+format is:
+
+ - for daily use the date (e.g: 20110724)
+ - for weekly just use 'weekly'
+ - a release (e.g: 5.0.0)
+
+or press ENTER to quit.
+
+WARNING: be aware that the bug reported using this tool will be used
+         to warn users on download page so write an informative text
+         target for users not Debian Installer or Debian CD Team
+         members.
+
+EOF
+	echo -n "Version: "
+	read version
+
+	if [ -z "$version" ]; then
+		echo "Exiting..."
+		exit 0
+	fi
+
+	# in case the version is a date, we accept revisions
+	if echo "$version" | egrep -q "^[0-9]{8}$"; then
+		version_re="^$version-[1-9]$"
+		images_url="ftp://cdimage.debian.org/cdimage/daily-builds/daily/"
+		version_str="daily-image-$version"
+	elif [ "$version" = "weekly" ]; then
+		version_re="^weekly-builds$"
+		images_url="ftp://cdimage.debian.org/cdimage/"
+		version_str="weekly-image"
+	elif echo "$version" | egrep -q "^([0-9]+.)+[0-9]$"; then
+		version_re="^$version$"
+		images_url="ftp://cdimage.debian.org/cdimage/release/ ftp://cdimage.debian.org/cdimage/archive/"
+		version_str="$version-image"
+	else
+		echo "ERROR: an invalid version has been entered. Try again..."
+		echo
+		continue
+	fi
+
+	for url in $images_url; do
+		if curl --silent --list $url | egrep -q "$version_re"; then
+			found=true
+			break
+		fi
+	done
+
+	if [ -z "$found" ]; then
+		echo "ERROR: version $version is not available. Try again..."
+		echo
+	fi
+done
+
+reportbug --offline --severity=critical --tag=d-i  --header 'X-Debbugs-CC: debian-boot@lists.debian.org' --package-version=$version_str cdimage.debian.org

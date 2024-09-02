@@ -1,0 +1,43 @@
+#!/bin/bash
+# Copyright (c) 2006 Davide Viti <zinosat@tiscali.it>
+# Licensed under the GNU General Public License
+#
+# Finds out which languages contain errors in the po file(s)
+# and display it in a table. Useful before a string freeze or
+# before any call for help on the MLs
+
+STATS=stats.txt
+wget http://d-i.alioth.debian.org/spellcheck/level1/latest/${STATS}
+
+awk '{print $1 " " $3 " " $5}' ${STATS} | grep -v " 0 0$" > guilty.txt
+
+echo " +----------+------+------+"
+printf " | %-8s | %-4s | %-4s |\n" "Language" "SV" "LS"
+echo " +----------+------+------+"
+
+TOT_SV=0
+TOT_LS=0
+
+while read LINE  ; do
+    LANG=$(echo $LINE | awk '{print $1}')
+    SV=$(echo $LINE | awk '{print $2}')
+    LS=$(echo $LINE | awk '{print $3}')
+
+    printf " | %-8s | %-4s | %-4s |\n" "${LANG}" "${SV}" "${LS}"
+
+    TOT_SV=$((${TOT_SV}+${SV}))
+    TOT_LS=$((${TOT_LS}+${LS}))
+
+done < guilty.txt
+
+echo " +----------+------+------+"
+printf " | %-8s | %-4s | %-4s |\n" "TOTAL" "${TOT_SV}" "${TOT_LS}"
+echo " +----------+------+------+"
+
+printf "\nLEGENDA:\n"
+echo "SV - Suspect variable(s)"
+echo "LS - Level specific error(s)"
+echo "refer to http://d-i.alioth.debian.org/spellcheck/level1/index.html"
+echo ""
+
+rm guilty.txt stats.txt

@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+# Boots up a cobalt raq using serial and, hopefully, CoLo.
+use strict;
+use Expect;
+
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot start console: $!\n";
+
+$exp->send(" "); # break;
+
+$exp->expect(60, 
+	[ 'CoLo' => sub { $exp->send(" "); exp_continue } ],
+	[ 'Microserver Diagnostics' => sub { $exp->send(" "); exp_continue } ],
+	[ '> ' => sub {
+		# CoLO boot
+		$exp->send("boot $ENV{RAQ_BOOTNUM}\r");
+		$exp->expect(10, "1>");
+	}],
+	[ 'Cobalt: ' => sub {
+		# firmware boot
+		$exp->send_slow(0.1, "bfd /vmlinux.gz nfsroot=/nfsroot\r");
+		# Now CoLO will boot, but currently it fails to entirely
+		# boot up (doesn't use NFS). So continue, wait for the
+		# colo prompt, and netboot as usual.
+		exp_continue;
+	}],
+	[ 'timeout' => sub { die "failed to break to command prompt" } ],
+);
+
+exit;

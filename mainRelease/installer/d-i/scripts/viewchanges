@@ -1,0 +1,128 @@
+#! /bin/sh
+
+# Script uses rmadison to get versions of a source package in different suites
+# and displays the changes between those versions.
+# The script is intended to be called from within an SVN checkout.
+# By default translation updates are suppressed.
+
+# Usage: viewchanges <path-to-source>
+
+# Copyright: Frans Pop <elendil@planet.nl>, 2007
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+
+# TODO:
+# - usage info display
+# - parameter parsing
+#   - take parameter to set combination of suites to check
+#     (for example: -ut, -us, -uo, -ts, -to; default should be -ut)
+#   - take parameter to show unreleased changes
+#   - take parameter to do all packages under given directory
+#   - take parameter for WITH_TRANSLATIONS
+# - handle renaming of a source package between suites
+#   This command could be used to get all source names:
+#   'grep "^[^[:space:]]" $changelog | sed "s/ .*//" | uniq'
+# - direct messages and errors to stderr; suppress informational messages;
+#   verbose option?; vary exit code (e.g. if no changes)
+# - optional features
+#   - retrieve changelog from internet
+#   - get versions using a different method than rmadison
+#   - take parameter specifying version range
+
+suite1=unstable
+suite2=stable
+
+changelog=$1/debian/changelog
+package=$(basename $(echo $1 | sed "s:/*$::"))
+rmadison_out=""
+
+if [ -z "$package" ] || [ ! -f $changelog ]; then
+	echo "You must privide a path to the source directory of a package"
+	exit 1
+elif ! type rmadison >/dev/null 2>&1; then
+	echo "This script requires rmadison to be available"
+	echo "Please install the package devscripts"
+	exit 1
+fi
+
+get_rmadison () {
+	if ! rmadison_out="$(rmadison $package | grep source)"; then
+		echo "Error getting version information for $package"
+		exit 1
+	fi
+}
+
+get_version () {
+	# Only fetch version info once
+	if [ -z "$rmadison_out" ]; then
+		get_rmadison 
+	fi
+	# Assumes highest version listed last; ignore stable updates
+	echo "$rmadison_out" | grep " $1 " | awk '{print $3}' | \
+		tail -n1 | sed -r "s/[a-z]+[0-9]$//"
+}
+
+checkversion () {
+	grep -q "^$package ($1)" $changelog
+	return $?
+}
+
+print_changelog () {
+	local address_range
+	if [ "$2" ]; then
+		address_range="/^$package ($suite1_ver)/,/^$package ($suite2_ver)/"
+	else
+		address_range="/^$package ($suite1_ver)/,$"
+	fi
+	if [ "$WITH_TRANSLATIONS" ]; then
+		sed -n "$address_range p" $changelog
+	else
+		sed -n "$address_range p" $changelog | \
+			sed "/Updated translations/,/^$/ d"
+	fi
+}
+
+suite1_ver=$(get_version $suite1)
+suite2_ver=$(get_version $suite2)
+
+if [ -z "$suite1_ver" ]; then
+	echo "Package $package does exist in $suite1"
+	exit 1
+elif ! checkversion $suite1_ver; then
+	echo "That's weird, version '$suite1_ver' does not appear in the changelog"
+	exit 1
+fi
+
+# TODO: handle package renames?
+if [ "$suite2_ver" ]; then
+	if ! checkversion $suite2_ver; then
+		if echo $suite2_ver | grep -q "[[:alpha:]]+[0-9]+$"; then
+			echo "Removing point release suffix from '$suite2_ver'"
+			suite2_altver=$(echo $suite2_ver | sed "s/[[:alpha:]]+[0-9]+$//")
+		elif echo $suite2_ver | grep -q "\.[0-9]+$"; then
+			echo "Removing possible point release suffix from '$suite2_ver'"
+			suite2_altver=$(echo $suite2_ver | sed "s/\.[0-9]+$//")
+		fi
+		if checkversion $suite2_altver; then
+			echo "Using version '$suite2_altver' instead of '$suite2_ver'"
+			suite2_ver=$suite2_altver
+		else
+			echo "Unable to find entry for '$suite2_ver' in changelog"
+			exit 1
+		fi
+	fi
+
+	if [ "$suite1_ver" = "$suite2_ver" ]; then
+		echo "There have been no changes in $package"
+	else
+		echo "Showing changes from version $suite2_ver to $suite1_ver"
+		echo "----"
+		print_changelog $suite1_ver $suite2_ver
+	fi
+else
+	echo "Package does not exist in $suite2; displaying full changelog up to $suite1_ver"
+	echo "----"
+	print_changelog $suite1_ver
+fi

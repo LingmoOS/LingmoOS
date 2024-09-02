@@ -1,0 +1,112 @@
+#!/bin/bash
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+mainlog=$logdir/main.log
+pagefile=$destination/index.html
+
+[ -f "$ROOT/bin/langlist" ] || exit 1
+[ -f "$ROOT/bin/archlist" ] || exit 1
+
+
+build_link_table () {
+    # Count languages
+    num_lang=0
+    for lang in $languages; do
+        num_lang=$(($num_lang + 1))
+    done
+
+    echo "<h2><a name=\"links\"></a>Links per architecture/language</h2>" >>$pagefile
+    echo "" >>$pagefile
+    echo "<table>" >>$pagefile
+    echo "  <tr>" >>$pagefile
+    echo "    <th class=\"col1\">Architecture</th>" >>$pagefile
+    for lang in $languages ; do
+        langname=$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7)
+        echo "    <th class=\"t1\">$langname</th>" >>$pagefile
+    done
+
+    echo "  </tr>" >>$pagefile
+
+    for arch in $architectures ; do
+        archname=$(egrep "^$arch[[:space:]]" $ROOT/bin/archlist | cut -f 2)
+        echo "" >>$pagefile
+        echo "  <tr>" >>$pagefile
+        echo "    <td class=\"col1\">$archname</td>" >>$pagefile
+
+        for lang in $languages ; do
+            langname=$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7)
+            destsuffix="${lang}.${arch}"
+            echo "    <td>" >>$pagefile
+            echo "      <a href=\"$destsuffix/index.html\">html</a>" >>$pagefile
+            SEP="<br/>"
+            if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 4)" = "Y" ] ; then
+                echo "      $SEP<a href=\"$destsuffix/install.${lang}.pdf\">pdf</a>" >>$pagefile
+                SEP=""
+            fi
+            if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 6)" = "Y" ] ; then
+                echo "      $SEP<a href=\"$destsuffix/install.${lang}.txt\">text</a>" >>$pagefile
+            fi
+            echo "    </td>" >>$pagefile
+        done
+
+        echo "  </tr>" >>$pagefile
+    done
+
+    echo "" >>$pagefile
+    echo "</table>" >>$pagefile
+}
+
+# MAINLINE
+
+echo "- calculating translation statistics for PO-based translations..." >>$mainlog
+$ROOT/bin/po_stats/gen &>$logdir/po-stats.log
+
+echo "- assembling page..." >>$mainlog
+
+cat $ROOT/bin/index.head >$pagefile
+
+# First, we build the table for the languages that have all architectures built
+
+# Order of languages is alphabetic by name, but keep English first.
+languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | \
+	    sed "s/English/0English/" | sort -k 7,7 | \
+	    cut -f 1,2 | egrep "Y$" | cut -f 1)
+
+# Order of architectures is alphabetic by name.
+architectures=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | \
+		sort -k 2,2 | cut -f 1)
+
+build_link_table
+
+cat $ROOT/bin/index.single >>$pagefile
+
+# Next, we build the table for the languages that have only amd64 built
+
+# Order of languages is alphabetic by name.
+languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 7,7 |
+	    cut -f 1,2 | egrep "S$" | cut -f 1)
+
+# Order of architectures is alphabetic by name.
+architectures="amd64"
+
+build_link_table
+
+
+
+cat $ROOT/bin/index.stats >>$pagefile
+echo "" >>$pagefile
+
+# Statistics for PO-based translations
+cat $ROOT/bin/index.pohead >>$pagefile
+cat $ROOT/bin/index.podata >>$pagefile
+
+sed "s/%date%/$(date -u)/; s/%email%/$MAIL_FROM/g" $ROOT/bin/index.tail >>$pagefile
+
+cp $ROOT/bin/translators.html $destination
+chmod 664 $destination/translators.html
+
+rm -f $ROOT/bin/index.podata
+
+exit 0

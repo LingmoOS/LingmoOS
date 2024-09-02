@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <title><TMPL_VAR NAME=TITLE></title>
+    <link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+    <style>
+table, tr, th, td {
+  padding: 2px 5px;
+  empty-cells: show;
+}
+table {
+  border-collapse: collapse;
+  font-family: monospace;
+}
+tr.title {
+  vertical-align: bottom;
+  font-family: sans-serif;
+  bottom: 0;
+  border-top: solid 1px blue;
+}
+tr.title span {
+  font-size: 200%;
+}
+tr.title td {
+  padding: 5px;
+}
+tr.normal {
+  height: 20px;
+}
+th {
+  text-align: left;
+}
+img {
+  float: left;
+}
+br {
+  clear: both;
+}
+ul, li {
+  display: inline;
+  margin: 0;
+  text-indent: 0;
+  padding-left: 0;
+}
+td {
+  vertical-align: top;
+}
+    </style>
+  </head>
+  <body>
+    <h1><TMPL_VAR NAME=TITLE></h1>
+
+    <h2>Summary</h2>
+
+    <TMPL_IF NAME=MISSING_ARCHS>
+      <div>Architectures with missing build:
+        <ul id="missingarchs">
+          <TMPL_LOOP NAME=MISSING_ARCHS>
+            <li><a href="#<TMPL_VAR NAME=ARCH>"><TMPL_VAR NAME=ARCH></a></li>
+          </TMPL_LOOP>
+        </ul>
+      </div>
+    <TMPL_ELSE>
+      <div>No architectures with missing build</div>
+    </TMPL_IF>
+
+    <br />
+
+    <TMPL_IF NAME=FAILING_ARCHS>
+      <div>Architectures with failing build:
+        <ul id="failingarchs">
+          <TMPL_LOOP NAME=FAILING_ARCHS>
+            <li><a href="#<TMPL_VAR NAME=ARCH>"><TMPL_VAR NAME=ARCH></a></li>
+          </TMPL_LOOP>
+        </ul>
+      </div>
+    <TMPL_ELSE>
+      <div>No architectures with failing build</div>
+    </TMPL_IF>
+
+
+    <h2>Per-architecture details</h2>
+
+    <table>
+      <TMPL_LOOP NAME=ARCH_DETAILS>
+        <!-- Title row for this architecture -->
+        <tr class="title">
+          <td colspan="6">
+            <a name="<TMPL_VAR NAME=ARCH>"><span><TMPL_VAR NAME=ARCH></span></a>
+          </td>
+        </tr>
+        <!-- Row with the graph and headers for this architecture -->
+        <tr class="normal">
+          <td rowspan="<TMPL_VAR NAME=ROWSPAN>">
+            <TMPL_IF NAME=FILE>
+              <img src="<TMPL_VAR NAME=FILE>" />
+            <TMPL_ELSE>
+              No graph available for this architecture
+            </TMPL_IF>
+          </td>
+          <th>Arch</th>
+          <th>Timestamp</th>
+          <th>Builder</th>
+          <th>Target</th>
+          <th>Status</th>
+        </tr>
+        <!-- Rows with the actual details -->
+        <TMPL_VAR NAME="INNER_HTML">
+        <!-- Row acting like a spacer on the right column -->
+        <tr>
+          <td colspan="5"><br /></td>
+        </tr>
+        <!-- Row acting like a separator -->
+        <tr>
+          <td colspan="6"><br /></td>
+        </tr>
+      </TMPL_LOOP>
+    </table>
+
+    <p>Last update: <TMPL_VAR NAME=NOW></p>
+  </body>
+</html>

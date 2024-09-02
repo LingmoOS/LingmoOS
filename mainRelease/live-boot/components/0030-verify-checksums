@@ -1,0 +1,89 @@
+#!/bin/sh
+
+#set -e
+
+Verify_checksums ()
+{
+	for _PARAMETER in ${LIVE_BOOT_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-boot.verify-checksums=*|verify-checksums=*)
+				LIVE_VERIFY_CHECKSUMS="true"
+				LIVE_VERIFY_CHECKSUMS_DIGESTS="${_PARAMETER#*verify-checksums=}"
+				;;
+
+			live-boot.verify-checksums|verify-checksums)
+				LIVE_VERIFY_CHECKSUMS="true"
+				;;
+		esac
+	done
+
+	case "${LIVE_VERIFY_CHECKSUMS}" in
+		true)
+			;;
+
+		*)
+			return 0
+			;;
+	esac
+
+	_MOUNTPOINT="${1}"
+
+	LIVE_VERIFY_CHECKSUMS_DIGESTS="${LIVE_VERIFY_CHECKSUMS_DIGESTS:-sha512 sha384 sha256 sha224 sha1 md5}"
+	_TTY="/dev/tty8"
+
+	log_begin_msg "Verifying checksums"
+
+	cd "${_MOUNTPOINT}"
+
+	for _DIGEST in $(echo ${LIVE_VERIFY_CHECKSUMS_DIGESTS} | sed -e 's|,| |g')
+	do
+		_CHECKSUMS="$(echo ${_DIGEST} | tr [a-z] [A-Z])SUMS ${_DIGEST}sum.txt"
+
+		for _CHECKSUM in ${_CHECKSUMS}
+		do
+			if [ -e "${_CHECKSUM}" ]
+			then
+				echo "Found ${_CHECKSUM}..." > "${_TTY}"
+
+				if [ -e "/bin/${_DIGEST}sum" ]
+				then
+					echo "Checking ${_CHECKSUM}..." > "${_TTY}"
+
+					# Verify checksums
+					grep -v '^#' "${_CHECKSUM}" | /bin/${_DIGEST}sum -c > "${_TTY}"
+					_RETURN="${?}"
+
+					# Stop after first verification
+					break
+				else
+					echo "Not found /bin/${_DIGEST}sum..." > "${_TTY}"
+				fi
+			fi
+		done
+	done
+
+	log_end_msg
+
+	case "${_RETURN}" in
+		0)
+			log_success_msg "Verification successfull, rebooting in 10 seconds."
+			sleep 10
+
+			# Unmount live-media
+			cd /
+			umount -f "${_MOUNTPOINT}" > /dev/null 2>&1
+			sync
+
+			# Attempt to remount all mounted filesystems read-only
+			echo u > /proc/sysrq-trigger
+
+			# Immediately reboot the system without syncing or unmounting filesystems
+			echo b > /proc/sysrq-trigger
+			;;
+
+		*)
+			panic "Verification failed, $(basename ${_TTY}) for more information."
+			;;
+	esac
+}

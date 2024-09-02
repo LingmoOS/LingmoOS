@@ -1,0 +1,297 @@
+'\" t
+.\" $Id: cdk_misc.3,v 1.22 2019/02/15 00:53:27 tom Exp $
+.de XX
+..
+.TH cdk_misc 3
+.SH NAME
+.XX Beep
+.XX CDKallocStrings
+.XX CDKcountStrings
+.XX CDKfreeChtypes
+.XX CDKfreeStrings
+.XX CDKsplitString
+.XX baseName
+.XX ceilCDK
+.XX chlen
+.XX chstrncpy
+.XX chtype2Char
+.XX cleanChar
+.XX cleanChtype
+.XX cmpStrChstr
+.XX copyChar
+.XX copyCharList
+.XX copyChtype
+.XX copyChtypeList
+.XX dirName
+.XX floorCDK
+.XX freeChar
+.XX freeCharList
+.XX freeChtype
+.XX freeChtypeList
+.XX intlen
+.XX lenCharList
+.XX lenChtypeList
+.XX mode2Char
+.XX searchList
+.XX sortList
+cdk_misc - \fBCurses Development Kit\fR Miscellaneous Routines
+.LP
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "void Beep(void);
+.TP 15
+.B "unsigned CDKallocStrings("
+.BI "char ***" "list"/,
+.BI "char *" "item"/,
+.BI "unsigned " "length"/,
+.BI "unsigned " "used"/);
+.TP 15
+.B "unsigned CDKcountStrings ("
+.BI "CDK_CONST char **\fIlist");
+.TP 15
+.B "void CDKfreeChtypes("
+.BI "chtype **" "list");
+.TP 15
+.B "void CDKfreeStrings ("
+.BI "char **" "list");
+.TP 15
+.B "char ** CDKsplitString ("
+.BI "const char *" "string",
+.BI "int " "splitChar);
+.TP 15
+.B "char * baseName ("
+.BI "char *" "string");
+.TP 15
+.B "int ceilCDK("
+.BI "double" "value");
+.TP 15
+.B "int chlen ("
+.BI "const chtype *" "string");
+.TP 15
+.B "void chstrncpy(
+.BI "char *" "dest",
+.BI "const chtype *" "src",
+.BI "int " "maxcount");
+.TP 15
+.B "char *chtype2Char ("
+.BI "const chtype *" "string");
+.TP 15
+.B "void cleanChar ("
+.BI "char *" "string",
+.BI "int " "length",
+.BI "char " "character");
+.TP 15
+.B "void cleanChtype ("
+.BI "chtype *" "string",
+.BI "int " "length",
+.BI "chtype " "character");
+.TP 15
+.B "int cmpStrChstr("
+.BI "const char *" "str",
+.BI "const chtype *" "chstr");
+.TP 15
+.B "char *copyChar ("
+.BI "const char *" "string");
+.TP 15
+.B "char **copyCharList ("
+.BI "const char **" "list");
+.TP 15
+.B "chtype *copyChtype ("
+.BI "const chtype *" "string");
+.TP 15
+.B "chtype **copyChtypeList ("
+.BI "const chtype **" "list");
+.TP 15
+.B "char *dirName ("
+.BI "char *" "filename");
+.TP 15
+.B "int floorCDK("
+.BI "double " "value");
+.TP 15
+.B "void freeChar ("
+.BI "char *" "string");
+.TP 15
+.B "void freeCharList ("
+.BI "char **" "list",
+.BI "unsigned " "size");
+.TP 15
+.B "void freeChtype ("
+.BI "chtype *" "string");
+.TP 15
+.B void freeChtypeList ("
+.BI "chtype **" "list",
+.BI "unsigned " "size");
+.TP 15
+.B "int intlen ("
+.BI "int " "value");
+.TP 15
+.B "int lenCharList ("
+.BI "const char **" "list");
+.TP 15
+.B "int lenChtypeList ("
+.BI "const chtype **" "list");
+.TP 15
+.B "int mode2Char ("
+.BI "char *" "string",
+.BI "mode_t " "fileMode");
+.TP 15
+.B "int searchList ("
+.BI "CDK_CONST char * CDK_CONST *" "list",
+.BI "int " "listSize",
+.BI "const char *" "pattern");
+.TP 15
+.B "void sortList ("
+.BI "CDK_CONST char **" "list",
+.BI "int " "length");
+.fi
+.SH DESCRIPTION
+These are miscellaneous functions
+which may be useful with the Cdk widget set.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B Beep
+makes an audible beep.
+The standard curses beep() does not
+flush the stream, so it will only beep until a force is made.
+This forces a flush after issuing the beep command.
+.TP 5
+.B CDKallocStrings
+Add a new string \fIitem\fP to a \fIlist\fP.
+Keep a null pointer on the end so one may use
+\fBCDKfreeStrings()\fP to deallocate the whole list.
+The caller is responsible for updating the \fIlength\fP of the list.
+The return value is the updated number of chars \fIused\fP.
+.TP 5
+.B CDKcountStrings
+Count the number of items in a null-terminated \fIlist\fP of character strings.
+Return the count.
+.TP 5
+.B CDKfreeChtypes
+Free a \fIlist\fP of chtype-strings which is terminated by a null pointer.
+.TP 5
+.B CDKfreeStrings
+Free a \fIlist\fP of character strings which is terminated by a null pointer.
+Also free \fIlist\fR itself.
+.TP 5
+.B CDKsplitString
+split the \fIstring\fP at each occurrence of \fIseparator\fP,
+returning a pointer to a dynamically allocated array of the pieces.
+The original \fIstring\fP is unmodified.
+The caller is responsible for freeing the result.
+.TP 5
+.B baseName
+returns a pointer to the first character of the filename in
+the given pathname.
+The result should be freed by the caller.
+.TP 5
+.B ceilCDK
+Return an integer like the math library \fBceil()\fP, which returns a double.
+.TP 5
+.B chlen
+returns the length of the (null-terminated) \fIstring\fP of chtype's.
+.TP 5
+.B chstrncpy
+Extract the characters from a null-terminated array of chtype's \fIsrc\fP.
+The size of the destination \fIdest\fP is given in \fImaxcount\fP.
+.TP 5
+.B chtype2Char
+Extract the characters from a null-terminated array of chtype's \fIstring\fP.
+A dynamically allocated string is returned.
+The caller is responsible for freeing the result.
+.TP 5
+.B cleanChar
+is analogous to \fImemset\fR.
+Set the characters in \fIstring\fP to the given \fIcharacter\fP.
+The length of \fIstring\fP is given by \fIlength\fP.
+character which will be written.
+.TP 5
+.B cleanChtype
+is analogous to \fImemset\fR.
+Set the chtype's in \fIstring\fP to the given \fIcharacter\fP.
+The length of \fIstring\fP is given by \fIlength\fP.
+.TP 5
+.B cmpStrChstr
+Compare a char string \fIstr\fP to a chtype string \fIchstr\fP.
+Return -1, 0 or 1 according to whether \fIstr\fP is less than, equal to
+to greater than \fIchstr\fP.
+.TP 5
+.B copyChar
+copies the string passed in.
+Unlike \fIstrdup\fR this checks to see if the string is NULL before copying.
+.TP 5
+.B copyCharList
+copies the given list.
+.TP 5
+.B copyChtype
+function copies the string passed in, analogous to \fBcopyChar\fR, but
+for chtype strings.
+.TP 5
+.B copyChtypeList
+copies the given list.
+.TP 5
+.B dirName
+Returns the directory for the given \fIfilename\fP,
+i.e., the part before the * last slash.
+The return value should be freed by the caller.
+.TP 5
+.B floorCDK
+Return an integer like the math function floor(), which returns a double.
+.TP 5
+.B freeChar
+is a wrapper for \fIfree\fR.
+It checks to see if the string
+is NULL before trying to free the string.
+.TP 5
+.B freeCharList
+Free the memory used by the given \fIlist\fP of strings.
+The number of strings to free is given by \fIsize\fP.
+.TP 5
+.B freeChtype
+is a wrapper for \fIfree\fR, like \fIfreeChar\fR.
+.TP 5
+.B freeChtypeList
+Free the memory used by the given \fIlist\fP of chtype strings.
+The number of strings to free is given by \fIsize\fP.
+.TP 5
+.B intlen
+returns the length of an integer, i.e., the number of characters
+needed to represent it.
+.TP 5
+.B lenCharList
+returns the length of the given list.
+.TP 5
+.B lenChtypeList
+returns the length of the given list.
+.TP 5
+.B mode2Char
+Given a file protection mode \fIfileMode\fP,
+store a printable version of the permissions in \fIstring\fP,
+formatted as if by "ls -l").
+Return the corresponding permissions data,
+i.e., ignoring the file-type bits.
+.TP 5
+.B searchList
+Search the given \fIlist\fP of \fIlistSize\fP strings
+for a subset of a word \fIpattern\fP in the given list.
+Return the index in the list if it is found, or -1 if not found.
+.TP 5
+.B sortList
+performs a quick sort of the given list.
+This is a wrapper for qsort,
+used to sort the \fIlist\fP of strings.
+The number of strings in \fIlist\fP is given by \fIlength\fP.
+The list is sorted alphabetically in increasing order.
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_screen (3),
+.BR cdk_display (3),
+.BR cdk_binding (3),
+.BR cdk_util (3)

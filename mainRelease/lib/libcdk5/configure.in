@@ -1,0 +1,227 @@
+dnl $Id: configure.in,v 1.80 2023/02/02 01:18:06 tom Exp $
+dnl Process this file with autoconf to produce a configure script for CDK.
+dnl ---------------------------------------------------------------------------
+dnl Copyright 1999-2022,2023 Thomas E. Dickey
+dnl
+dnl Permission is hereby granted, free of charge, to any person obtaining a
+dnl copy of this software and associated documentation files (the "Software"),
+dnl to deal in the Software without restriction, including without limitation
+dnl the rights to use, copy, modify, merge, publish, distribute, distribute
+dnl with modifications, sublicense, and/or sell copies of the Software, and to
+dnl permit persons to whom the Software is furnished to do so, subject to the
+dnl following conditions:
+dnl
+dnl The above copyright notice and this permission notice shall be included in
+dnl all copies or substantial portions of the Software.
+dnl
+dnl THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+dnl IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+dnl FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+dnl THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+dnl LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+dnl FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+dnl DEALINGS IN THE SOFTWARE.
+dnl
+dnl Except as contained in this notice, the name(s) of the above copyright
+dnl holders shall not be used in advertising or otherwise to promote the sale,
+dnl use or other dealings in this Software without prior written
+dnl authorization.
+dnl ---------------------------------------------------------------------------
+AC_INIT(include/cdk.h)
+AC_CONFIG_HEADER(include/cdk_config.h:include/config.hin)
+
+CF_CHECK_CACHE
+CF_VERSION_INFO(cdk)
+CF_TOP_BUILDDIR(.)
+
+dnl
+dnl Checks for programs.
+dnl
+CF_PROG_CC
+AC_PROG_CPP
+AC_PROG_RANLIB 
+AC_PROG_INSTALL
+CF_PROG_LN_S
+CF_PROG_LINT
+
+dnl needed for CF_WITH_LIBTOOL
+AC_CHECK_TOOL(AR, ar, ar)
+
+AC_PROG_MAKE_SET
+CF_MAKEFLAGS
+CF_MAKE_PHONY
+CF_MAKE_TAGS
+
+CF_XOPEN_SOURCE
+AC_CHECK_DECL(exit)
+
+CF_DISABLE_ECHO
+CF_PROG_EXT
+CF_LIB_PREFIX
+
+AC_ARG_WITH(man-section,
+	[  --with-man-section=XXX  change manpage section (default 3)],
+	[MANSECT=$with_man_section],
+	[MANSECT=3])
+case .$MANSECT in
+.yes|.no)
+	MANSECT=3
+	;;
+esac
+MAN_TAG=`echo $MANSECT | sed -e 's/^\(.\).*/\1/'`
+AC_SUBST(MAN_TAG)
+AC_SUBST(MANSECT)
+
+CF_WITH_CURSES_DIR
+CF_WITH_SCREEN_PDCURSES
+CF_ENABLE_WARNINGS
+CF_PKG_CONFIG
+
+CF_ENABLE_RPATH
+CF_DISABLE_RPATH_HACK
+CF_WITH_SHARED_OR_LIBTOOL(CDK,${VERSION_MAJOR}.${VERSION_MINOR},`echo "$VERSION" |sed -e 's/:/./g'`)
+
+dnl
+dnl Checks for libraries.
+dnl
+
+CF_DISABLE_LEAKS
+
+dnl
+dnl Checks for header files.
+dnl
+AC_HEADER_DIRENT
+AC_CHECK_HEADERS(\
+limits.h \
+pwd.h \
+grp.h \
+)
+
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
+AC_TYPE_MODE_T
+AC_STRUCT_TM
+CF_CURSES_CHTYPE
+CF_GETOPT_HEADER
+
+dnl
+dnl Checks for library functions.
+dnl
+AC_CHECK_FUNCS(\
+getcwd \
+mktime \
+strdup \
+strerror \
+getlogin \
+sleep \
+)
+
+CF_FUNC_LSTAT
+CF_LOCALE([AC_DEFINE(HAVE_SETLOCALE,1,[Define to 1 if we have setlocale function])])
+
+dnl Check for curses libraries last, since XCurses has dependencies which
+dnl break the checks for other functions.
+CF_WITH_NCURSES_ETC
+
+CFG_ROOTNAME=cdk
+HDR_ROOTNAME=cdk
+LIB_ROOTNAME=cdk
+
+case $cf_cv_screen in #(vi
+ncurses) #(vi
+	;;
+ncursesw)
+	LIB_ROOTNAME=cdkw
+	;;
+pdcurses) #(vi
+	LIB_ROOTNAME=cdkX
+	;;
+esac
+
+AC_MSG_CHECKING(for XXX-config rootname)
+AC_ARG_WITH(cfgname,
+	[  --with-cfgname=XXX      override the XXX-config rootname],
+	[CFG_ROOTNAME=$withval])
+AC_MSG_RESULT($CFG_ROOTNAME)
+AC_SUBST(CFG_ROOTNAME)
+
+AC_MSG_CHECKING(if cdk.h should be in header subdirectory)
+AC_ARG_WITH(hdrname,
+	[  --enable-hdr-subdir     install cdk.h in the header subdirectory],
+	[HDR_ROOTNAME=no])
+AC_MSG_RESULT($HDR_SUBDIR)
+AC_SUBST(HDR_SUBDIR)
+
+if test "$HDR_SUBDIR" = yes
+then
+	HDR_SUBDIR="#"
+else
+	HDR_SUBDIR=
+fi
+
+AC_MSG_CHECKING(for header subdirectory)
+AC_ARG_WITH(hdrname,
+	[  --with-hdrname=XXX      override the header subdirectory],
+	[HDR_ROOTNAME=$withval])
+AC_MSG_RESULT($HDR_ROOTNAME)
+AC_SUBST(HDR_ROOTNAME)
+
+AC_MSG_CHECKING(for library name)
+AC_ARG_WITH(libname,
+	[  --with-libname=XXX      override the library name],
+	[LIB_ROOTNAME=$withval])
+AC_MSG_RESULT($LIB_ROOTNAME)
+AC_SUBST(LIB_ROOTNAME)
+
+AC_MSG_CHECKING(if improved const-typing should be used)
+AC_ARG_ENABLE(const,
+	[  --enable-const          use improved const-typing],
+	[CDK_CONST=$enableval],
+	[CDK_CONST=no])
+AC_MSG_RESULT($CDK_CONST)
+if test "$CDK_CONST" = yes
+then
+	AC_DEFINE(CDK_CONST,const,[Define to const if improved const-typing should be used])
+else
+	AC_DEFINE(CDK_CONST,/*nothing*/)
+fi
+
+# define these for casting convenience
+AC_DEFINE(CDK_CSTRING,CDK_CONST char *,[Define to simplify casting CDK_CONST])
+AC_DEFINE(CDK_CSTRING2,CDK_CONST char * CDK_CONST *,[Define to simplify casting CDK_CONST])
+
+CF_CURSES_FUNCS(\
+	Xinitscr\
+	getbegx \
+	getbegy \
+	getmaxx \
+	getmaxy \
+	start_color \
+	\
+)
+
+CF_WITH_NC_ALLOC_H
+CF_CURSES_SETBEGYX
+
+CF__DEFINE_SHLIB_VARS
+
+dnl
+dnl Set pre-processor compile time variables.
+dnl
+AC_OUTPUT(
+	cdk-config
+	headers
+	include/cdk_version.h:include/cdk_version.hin
+	Makefile
+	cli/Makefile
+	examples/Makefile
+	demos/Makefile,[
+CF__ADD_SHLIB_RULES(
+	Makefile,
+	$LIB_MODEL,
+	[\${LIB_OBJECT}],
+	[\${LIBS} \${LDFLAGS}])
+],[
+CF__INIT_SHLIB_RULES
+],sort)

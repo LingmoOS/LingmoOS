@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+# Connect to the ILO console via telnet. Note that you must turn off SSL
+# requirement as this does not do encryption.
+use strict;
+use Expect;
+
+my $exp = new Expect;
+$exp->raw_pty(1);
+
+$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
+
+$exp->expect(60, "Login Name:");
+$exp->send($ENV{HP_ILO_USER}."\r");
+
+$exp->expect(10, "Password:");
+$exp->send($ENV{HP_ILO_PASSWORD}."\r");
+
+# for newer iLO with command line interface
+$exp->expect(10, "iLO>");
+$exp->send("remcons\r");
+
+$exp->interact;

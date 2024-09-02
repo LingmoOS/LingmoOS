@@ -1,0 +1,91 @@
+'\" t
+.\" $Id: cdk_params.3,v 1.5 2019/02/20 23:05:36 tom Exp $
+.de XX
+..
+.TH cdk_params 3
+.SH NAME
+.XX CDKparamNumber
+.XX CDKparamNumber2
+.XX CDKparamString
+.XX CDKparamString2
+.XX CDKparseParams
+.XX CDKparsePosition
+.XX CDKparamValue
+cdk_params \- Cdk command-line parsing
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int CDKparamNumber ("
+.BI "CDK_PARAMS *" "params",
+.BI "int " "option");
+.TP 15
+.B "int CDKparamNumber2 ("
+.BI "CDK_PARAMS *" "params",
+.BI "int " "option",
+.BI "int " "missing");
+.TP 15
+.B "char * CDKparamString ("
+.BI "CDK_PARAMS *" "params",
+.BI "int " "option");
+.TP 15
+.B "char * CDKparamString2 ("
+.BI "CDK_PARAMS *" "params",
+.BI "int " "option",
+.BI "const char *" "missing");
+.TP 15
+.B "void CDKparseParams ("
+.BI "int " "argc",
+.BI "char **" "argv",
+.BI "CDK_PARAMS *" "params",
+.BI "const char *" "options");
+.TP 15
+.B "int CDKparsePosition ("
+.BI "char *" "string");
+.TP 15
+.B "int CDKparamValue ("
+.BI "CDK_PARAMS * " "params",
+.BI "int " "option",
+.BI "int " "missing");
+.fi
+.SH DESCRIPTION
+These are a set of functions used to implement the command-line utilities and
+demonstration programs for Cdk.
+Rather than set the programs' options at initialization,
+they construct a simple database which holds the common parameters
+using \fBCDKparseParams()\fP.
+.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B CDKparamNumber
+Retrieves an integer (or boolean) option value from the parsed command-line.
+.TP 5
+.B CDKparamNumber2
+Retrieves an optional integer (or boolean) value from the parsed command-line.
+If the command line option is not present, the \fImissing\fP value is used.
+.TP 5
+.B CDKparamString
+Retrieves a string option value from the parsed command-line.
+.TP 5
+.B CDKparamString2
+Retrieve an optional string option value from the parsed command-line.
+.TP 5
+.B CDKparamValue
+Retrieve an integer (or boolean) option value from the parsed command-line.
+.TP 5
+.B CDKparseParams
+Parse the given argc/argv command-line, with the options passed to
+getopt()'s 3rd parameter.
+.TP 5
+.B CDKparsePosition
+Parse the string as one of CDK's positioning keywords, or an actual position.
+.
+.SH SEE ALSO
+.BR cdk_position (3),
+.BR getopt (3)

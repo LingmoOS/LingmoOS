@@ -1,0 +1,45 @@
+iw package for Debian
+=====================
+
+iw is a new tool for configuration of wireless settings on Linux. iw combines
+cfg80211, the new Linux wireless configuration API [0], and nl80211, the
+new 802.11 netlink interface public header [1], to form a tool which aims to
+replace the functionality of wireless-tools, which is built upon on the
+incumbent Wireless Extensions (WEXT or WE) API [2].
+
+The tool is currently mainly used for drivers based on the mac80211 stack but
+work is under way to make it useful for other drivers as well.
+
+[0] http://wireless.kernel.org/en/developers/Documentation/cfg80211
+[1] http://wireless.kernel.org/en/developers/Documentation/nl80211
+[2] http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Linux.Wireless.Extensions.html
+
+
+Why is wireless-tools being replaced?
+=====================================
+
+A complete summary of technical reasons for the abandonment of Linux Wireless
+Extensions API is documented on the wireless.kernel.org wiki page for WEXT [3].
+
+In brief, WEXT uses ioctl's as the kernel<->userspace communication mechanism,
+but some developers wish to have a more structured transport mechanism, which
+cfg80211 and nl80211 provide, to allow them to address old nagging problems
+with the current wireless device configuration implementation, and give them
+more freedom to enhance the process of wireless configuration [4].
+
+WEXT is in deep maintenance mode, cfg80211 and nl80211 are the communication
+transport mechanism of the future.
+
+[3] http://wireless.kernel.org/en/developers/Documentation/Wireless-Extensions
+[4] which is one of the areas which, in my opinion, has always been difficult
+    for new adopters on Linux, especially on the desktop.
+
+
+How does iw integrate into the Debian system?
+=============================================
+
+At the time of writing, it does not. The iw binary is provided as is, without
+any system integration (eg. with ifupdown).
+
+
+ -- Kel Modderman <kel@otaku42.de>  Mon, 30 Jul 2012

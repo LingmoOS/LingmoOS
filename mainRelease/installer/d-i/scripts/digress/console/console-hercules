@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+# ssh to console on hercules
+use Expect;
+
+my $down="OB";
+my $left="OD";
+
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+#$exp->debug(2);
+#$exp->exp_internal(1);
+
+sub console_question {
+	my $question=shift;
+	my $response=shift;
+
+	if (! length $response) {
+		$response="."; # take default
+	}
+	
+	$exp->expect($ENV{STAGE_1_MAX_TIME}, $question) or die "failed to find $question";
+	$exp->expect(3, "Prompt: '?' for help>");
+	$exp->send(".".$response."\r");
+}
+
+# Setting up point to point network and network-console:
+console_question("Network device type:", 1);
+console_question("CTC read device:", 1);
+console_question("CTC write device:", 2);
+console_question("Protocol for this connection:", 1);
+#console_question("Primary network interface:", 2); # ctc0
+console_question("IP address:", $ENV{S390_IP});
+console_question("Point-to-point address:", $ENV{S390_PTP_IP});
+console_question("Name server addresses:", $ENV{S390_NAMESERVER_IP});
+console_question("Hostname:", $ENV{MACHINE});
+console_question("Domain name:");
+console_question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
+console_question("Re-enter password to verify:", $ENV{ROOT_PASSWORD});
+$exp->expect($ENV{STAGE_1_MAX_TIME}, "To continue the installation, please use an SSH client");
+
+if (exists $ENV{HERCULES_MASQ_COMMAND}) {
+	if (system($ENV{HERCULES_MASQ_COMMAND}) != 0) {
+		die "failed to run HERCULES_MASQ_COMMAND";
+	}
+}
+
+exec("ssh -t -v -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";

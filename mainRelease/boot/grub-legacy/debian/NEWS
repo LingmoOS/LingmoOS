@@ -1,0 +1,49 @@
+grub (0.97-44) unstable; urgency=low
+
+  Versions of the kernel Linux newer than 2.6.23, like the ones included in
+  Debian Lenny, are known to differ slightly in their binary format, in a way
+  that very old versions of GRUB are unable to boot.
+
+  If you're upgrading GRUB in a system that was installed before Debian Etch,
+  and you have never manually updated your GRUB install, it is possible that
+  your system stops booting.
+
+  In order to prevent that, it is recommended that you install the latest GRUB
+  by issuing (as root) the following command after upgrading the grub package:
+
+    grub-install "(hd0)"
+
+  (assuming hd0 is mapped in /boot/grub/device.map to the disk used by your
+  BIOS to boot;  in a multi-disk environment you might need to use a different
+  parameter)
+
+  Note: even if your setup is not affected by this problem, it is always a
+  good idea to keep your GRUB install up-to-date, so if in doubt it's best
+  that you update it anyway.
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon, 28 Jul 2008 20:19:52 +0200
+
+grub (0.97-16) unstable; urgency=low
+
+  grub-install and update-grub has changed location.
+  
+  There's a wrapper available in /sbin to keep backward compatibility but
+  it'll be removed once Etch is release as stable. You _must_ edit your
+  /etc/kernel-img.conf and change the paths to /usr/sbin/update-grub. 
+  For example:
+
+  ,----[ /etc/kernel-img.conf ]
+  | ...
+  | postinst_hook = /sbin/update-grub
+  | postrm_hook   = /sbin/update-grub
+  `----
+
+  Should be change to:
+  
+  ,----[ /etc/kernel-img.conf ]
+  | ...
+  | postinst_hook = update-grub
+  | postrm_hook   = update-grub
+  `----
+
+ -- Otavio Salvador <otavio@debian.org>  Thu, 14 Sep 2006 23:25:36 -0300

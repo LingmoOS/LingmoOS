@@ -1,0 +1,11 @@
+version=4
+
+# Download the tarball from the releases website (directory
+# prefix "winetricks-$tag/") instead of the tarball from the api
+# release file ("Winetricks-winetricks-$tag-$commit/")
+opts="searchmode=plain,\
+downloadurlmangle=s#api.github.com/repos/([^/]+)/([^/]+)/tarball/(@ANY_VERSION@)#github.com/${1}/${2}/archive/refs/tags/${3}.tar.gz#,\
+pgpsigurlmangle=s#archive/refs/tags/(@ANY_VERSION@)\.tar\.gz#releases/download/${1}/${1}.tar.gz.asc#,\
+filenamemangle=s#.+/@ANY_VERSION@#winetricks-${1}.tar.gz#" \
+https://api.github.com/repos/Winetricks/winetricks/releases \
+https://api\.github\.com/repos/[^/]+/[^/]+/tarball/@ANY_VERSION@

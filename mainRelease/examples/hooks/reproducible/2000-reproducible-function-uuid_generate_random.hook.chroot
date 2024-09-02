@@ -1,0 +1,63 @@
+#!/bin/sh
+set -e
+
+# util-linux creates random UUIDs when uuid_generate_random is called
+# Use LD_PRELOAD to replace uuid_generate_random with a less random version
+
+# Don't run if gcc is not installed
+if [ ! -e /usr/bin/cc ];
+then
+  exit 0
+fi
+
+cat > unrandomize_uuid_generate_random.c << END_OF_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+
+#define SEQUENCE_FILENAME "/var/cache/unrandomize_uuid_generate_random.sequence_number"
+
+/* https://tools.ietf.org/html/rfc4122 */
+typedef unsigned char uuid_t[16];
+
+/* Our pseudo-random version */
+void uuid_generate_random(uuid_t out)
+{
+  /* Nil UUID */
+  for (int i=0;i<16;i++) {
+    out[i] = 0x00;
+  }
+  out[6]=0x40; /* UUID version 4 means randomly generated */
+  out[8]=0x80; /* bit7=1,bit6=0 */
+
+  /* The file doesn't need to exist yet */
+  FILE *f = fopen(SEQUENCE_FILENAME, "rb");
+  if (f) {
+    fread(out+12, 4, 1, f);
+    fclose(f);
+  }
+  /* Use the next number. Endianness is not important */
+  (*(unsigned long*)(out+12))++;
+
+  unsigned long long epoch;
+  /* Use SOURCE_DATE_EPOCH when provided */
+  char *date = getenv("SOURCE_DATE_EPOCH");
+  if (date) {
+    epoch = strtoll(date, NULL, 10);
+  } else {
+    epoch = 0ll;
+  }
+  out[0] = (epoch & 0xFF000000) >> 24;
+  out[1] = (epoch & 0x00FF0000) >> 16;
+  out[2] = (epoch & 0x0000FF00) >>  8;
+  out[3] = (epoch & 0x000000FF);
+
+  /* Write the sequence number */
+  f = fopen(SEQUENCE_FILENAME, "wb");
+  if (f) {
+    fwrite(out+12, 4, 1, f);
+    fclose(f);
+  }
+}
+END_OF_SOURCE
+/usr/bin/cc -shared -fPIC unrandomize_uuid_generate_random.c -Wall --pedantic -o /usr/lib/unrandomize_uuid_generate_random.so
+rm -f unrandomize_uuid_generate_random.c

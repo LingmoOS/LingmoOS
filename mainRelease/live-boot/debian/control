@@ -1,0 +1,78 @@
+Source: live-boot
+Section: misc
+Priority: optional
+Maintainer: Debian Live Maintainers <debian-live@lists.debian.org>
+Uploaders: Raphaël Hertzog <raphael@offensive-security.com>,
+ Luca Boccassi <bluca@debian.org>
+Build-Depends:
+ debhelper-compat (= 12),
+ po4a,
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
+Homepage: https://wiki.debian.org/DebianLive
+Vcs-Browser: https://salsa.debian.org/live-team/live-boot
+Vcs-Git: https://salsa.debian.org/live-team/live-boot.git
+
+Package: live-boot
+Architecture: all
+Depends:
+ live-boot-initramfs-tools | live-boot-backend,
+ ${misc:Depends},
+Recommends:
+ live-boot-doc,
+ live-tools,
+ rsync,
+ uuid-runtime,
+Suggests:
+ cryptsetup,
+ curlftpfs,
+ httpfs2,
+ wget,
+Description: Live System Boot Components
+ The Debian Live project maintains the components to build Debian based Live
+ systems and the official Debian Live images themselves.
+ .
+ live-boot contains the components to configure a live system during the boot
+ process (early userspace). Do not install this package on your regular system,
+ it is only meant to be used in a live image.
+ .
+ In addition to live-boot, a backend for the initrd generation is required, such
+ as live-boot-initramfs-tools.
+
+Package: live-boot-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ ${misc:Depends},
+Description: Live System Boot Components (documentation)
+ The Debian Live project maintains the components to build Debian based Live
+ systems and the official Debian Live images themselves.
+ .
+ live-boot contains the components to configure a live system during the boot
+ process (early userspace).
+ .
+ This package contains the documentation.
+
+Package: live-boot-initramfs-tools
+Architecture: all
+Depends:
+ busybox | busybox-initramfs,
+ initramfs-tools,
+ udev,
+ ${misc:Depends},
+Conflicts:
+ live-boot-backend,
+Replaces:
+ live-boot-backend,
+Provides:
+ live-boot-backend,
+Description: Live System Boot Components (initramfs-tools backend)
+ The Debian Live project maintains the components to build Debian based Live
+ systems and the official Debian Live images themselves.
+ .
+ live-boot contains the components to configure a live system during the boot
+ process (early userspace). Do not install this package on your regular system,
+ it is only meant to be used in a live image.
+ .
+ This package contains the initramfs-tools backend.

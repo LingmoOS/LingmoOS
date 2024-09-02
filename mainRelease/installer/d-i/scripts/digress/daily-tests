@@ -1,0 +1,206 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "-v" ]; then
+	VERBOSE=1
+	shift 1
+fi
+
+DATESTAMP=$(date +%Y%m%d%H%M)
+export DATESTAMP
+MACHINE="$1"
+shift 1
+
+if [ -z "$MACHINE" ]; then
+	echo "Usage: $0 [-v] machine scheme [scheme ...]" >&2
+	exit 1
+fi
+
+config () {
+	var="$1"
+	shift 1
+	eval "$var='$@'"
+}
+
+use () {
+	. $DI_TESTDIR/schemes/$MACHINE/$1
+}
+
+overview_add () {
+	mkdir -p $LOGDIR/$DATESTAMP
+	touch $LOGDIR/overview.log
+	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log
+}
+
+overview () {
+	mkdir -p "$LOGDIR"
+	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new || true
+	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
+	overview_add "$@"
+}
+
+failure_overview () {
+	status=$(cat $FAILURE_STATUS_FILE)
+	if [ "$status" != "SIGNAL" ] && [ "$status" != "TEST_2" ]; then
+		overview "failed $status $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
+	else
+		overview "failed $status"
+	fi
+}
+
+rawlog () {
+	local machine=$1
+	local scheme=$2
+	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
+
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log \
+		$LOGDIR/$MACHINE-$SCHEME.log
+
+	if [ "$VERBOSE" = 1 ]; then
+		exec tee $logfile
+	else
+		exec cat > $logfile
+	fi
+}
+
+htmllog_start () {
+	local machine=$1
+	local scheme=$2
+
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html \
+		$LOGDIR/$MACHINE-$SCHEME.html
+
+	cat > $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+<html>
+<head>
+<title>$MACHINE $SCHEME test log for $DATESTAMP</title>
+</head>
+<body>
+This test is still in progress. See the
+<a href="$MACHINE-$SCHEME.log">raw log file</a>.
+</body>
+</html>
+EOF
+}
+
+htmllog_finish () {
+	local machine=$1
+	local scheme=$2
+
+	cat > $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+<html>
+<head>
+<title>$MACHINE $SCHEME test log for $DATESTAMP</title>
+</head>
+<body>
+This is a slightly sanitised version of the 
+<a href="$MACHINE-$SCHEME.log">raw log file</a>.
+<hr>
+<pre>
+EOF
+
+	cat $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log |
+	sed -re "s/[[:space:]]*CPU[0-9]+ PSW=.*instcount=[0-9]+[[:space:]]*//" |
+	sed -e "s/\x0f/\n/g" \
+	    -e "s/\x0e//g" \
+	    -e "s/\r//g" \
+	    -e "s/[\x1b]\()0\|(B\|[\x5b][;0-9]*[CHJhlmr]\)//g" |
+	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x\?$//g" |
+	tr -s "\n" |
+	sed -e "/qqu$/{N;s/\n//}" \
+	    -e "s/^lqq/\n\nlqq/" |
+	sed -e 's/&/&amp;/g' \
+		-e 's/</\&lt;/g' \
+		-e 's/>/\&gt;/g' \
+		>> $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html
+	
+	cat >> $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+</pre>
+</body>
+</html>
+EOF
+}
+
+why_failed () {
+	if grep -q timeout "$1"; then
+		echo "timeout"
+		return
+	fi
+
+	# Try to find a failure message in the log.
+	# This is dependent on both d-i output formats and on the log being
+	# in a parseable format.
+	di_err=$(strings "$1" | grep '\[!!\]' |tail -n 1 | sed 's/.*\[!!\] *//')
+	if [ -n "$di_err" ]; then
+		echo "$di_err"
+	fi
+}
+
+DIGRESSDIR=$(dirname $0)
+cd $DIGRESSDIR
+
+PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2:$DIGRESSDIR/shutdown:$DIGRESSDIR/utils
+export PATH
+
+if [ -z "$DI_TESTDIR" ]; then
+	DI_TESTDIR=$DIGRESSDIR
+fi
+
+if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
+	echo "Cannot determine DI_TESTDIR" >&2
+	exit 1
+fi
+
+. $DI_TESTDIR/config
+
+use common
+SCHEME=daily-tests overview incomplete
+echo "Running daily tests.." | rawlog $MACHINE daily-tests
+htmllog_start $MACHINE daily-tests
+
+for SCHEME in $@; do
+	RETRY=""
+	LOGDIR=$DI_TESTDIR/logs
+	export LOGDIR
+	use common
+	use $SCHEME
+
+	# ensure that the logs don't use too much disk
+	if [ -d "$LOGDIR" ] && [ "$MAXLOGS" ]; then
+		(
+			cd "$LOGDIR"
+			for dir in $(find -type d -name '[0-9]*' | sort -n); do
+				if [ "$(find -type d -name '[0-9]*' | wc -l)" -gt "$MAXLOGS" ]; then
+					rm -rf "$dir"
+				fi
+			done
+		)
+	fi
+	
+	overview_add incomplete
+
+	FAILURE_STATUS_FILE=$(tempfile)
+	export FAILURE_STATUS_FILE
+	
+	htmllog_start $MACHINE $SCHEME
+	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
+		overview success
+	else
+		if [ -n "$RETRY" ]; then
+			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1; then
+				overview "success second try"
+			else
+				failure_overview
+			fi
+		else
+			failure_overview
+		fi
+	fi) 2>&1 | rawlog $MACHINE $SCHEME
+
+	htmllog_finish $MACHINE $SCHEME
+
+	rm -f $FAILURE_STATUS_FILE
+done
+
+SCHEME=daily-tests overview finished
+htmllog_finish $MACHINE daily-tests

@@ -1,0 +1,83 @@
+*** WARNING ***
+A new version of the spellchecker has just been committed:
+this document is out of date, but can still be used if you really
+need to know what's goin' on here.
+I'll update it ASAP: promise!
+*** WARNING ***
+
+
+The following files should help translators to find typos in po files:
+
+check_dit.sh 
+check_all.sh
+lang2dict.txt
+msgstr_extract.awk
+
+In order to be able to use all the scripts above you need the following packages:
+gnuplot
+aspell
+aspell-bin
+aspell-${DICT}
+
+where ${DICT} is the aspell-suffix (see the second column of lang2dict.txt)
+
+
+Run the following command in order to spellcheck the languages listed
+in lang2dict.txt:
+
+	 sh check_all.sh <D-I repository>
+
+
+This will create a subdirectory "check_${TODAY}" containing various
+files organized as described later in this document.
+
+check_dit.sh 
+	Usage: check_dit <lang> <aspell-suffix> <D-I repository> <out dir>
+
+	is the "heart" of the project: it spell checks one single language of
+	installer and writes the results inside an output dir.
+
+	      <out dir>
+		|
+		|----nozip
+		|     |
+		|     ${LANG}.po
+		|
+		|----zip
+		|     |	
+		|     ${LANG}_all.txt
+		|     ${LANG}_unkn_wl.txt
+		|
+		graph.png
+		stats.txt
+
+	Optional word lists are expected to be found in the "wls" subdir
+
+check_all.sh
+	Usage: check_all.sh
+
+	this is the top-level scripts that loops through the languages and
+	creates a png graph and a table in text format containing statistics
+	for all the languages checked.
+
+lang2dict.txt
+	contains the language code to aspell-suffix conversion:
+	it is used for example in these cases
+	"pt_BR" --> "pt-br"
+	"uk" --> "ukr"
+	
+msgstr_extract.awk
+	Usage: find . -name ${LANG}.po |\
+	xargs awk -f ~/bin/msgstr_extract > [outputfile]
+
+	script originally sent to me by Frans Pop and slightly modified
+	in order to work with all languages
+
+More details about the ideas behind this scripts can be found
+here:
+
+https://d-i.debian.org/doc/i18n-guide/ch07.html
+
+Please send your comments to 
+
+Davide Viti (zinosat@tiscali.it) or Holger Wansing (hwansing@mailbox.org)

@@ -1,0 +1,564 @@
+'\" t
+.\" $Id: cdk_radio.3,v 1.35 2019/02/20 14:29:13 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_radio 3
+.SH NAME
+.XX activateCDKRadio
+.XX destroyCDKRadio
+.XX drawCDKRadio
+.XX eraseCDKRadio
+.XX getCDKRadioBox
+.XX getCDKRadioChoiceCharacter
+.XX getCDKRadioCurrentItem
+.XX getCDKRadioHighlight
+.XX getCDKRadioItems
+.XX getCDKRadioLeftBrace
+.XX getCDKRadioRightBrace
+.XX getCDKRadioSelectedItem
+.XX injectCDKRadio
+.XX moveCDKRadio
+.XX newCDKRadio
+.XX positionCDKRadio
+.XX setCDKRadio
+.XX setCDKRadioBackgroundAttrib
+.XX setCDKRadioBackgroundColor
+.XX setCDKRadioBox
+.XX setCDKRadioBoxAttribute
+.XX setCDKRadioChoiceCharacter
+.XX setCDKRadioCurrentItem
+.XX setCDKRadioHighlight
+.XX setCDKRadioHorizontalChar
+.XX setCDKRadioItems
+.XX setCDKRadioLLChar
+.XX setCDKRadioLRChar
+.XX setCDKRadioLeftBrace
+.XX setCDKRadioPostProcess
+.XX setCDKRadioPreProcess
+.XX setCDKRadioRightBrace
+.XX setCDKRadioSelectedItem
+.XX setCDKRadioULChar
+.XX setCDKRadioURChar
+.XX setCDKRadioVerticalChar
+cdk_radio \- curses radio list widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKRadio ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype *" "actions");
+.TP 15
+.B "void destroyCDKRadio ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "void drawCDKRadio ("
+.BI "CDKRADIO *" "radio",
+.BI "boolean " "box");
+.TP 15
+.B "void eraseCDKRadio ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "boolean getCDKRadioBox ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "chtype getCDKRadioChoiceCharacter ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "int getCDKRadioCurrentItem ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "chtype getCDKRadioHighlight ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "int getCDKRadioItems ("
+.BI "CDKRADIO *" "radio",
+.BI "char **" "list");
+.TP 15
+.B "chtype getCDKRadioLeftBrace ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "chtype getCDKRadioRightBrace ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "int getCDKRadioSelectedItem ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "int injectCDKRadio ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKRadio ("
+.BI "CDKRADIO *" "radio",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKRADIO *newCDKRadio ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "int " "spos",
+.BI "int " "height",
+.BI "int " "width",
+.BI "const char *" "title",
+.BI "CDK_CONST char **" "radioList",
+.BI "int " "radioListLength",
+.BI "chtype " "choiceCharacter",
+.BI "int " "defaultItem",
+.BI "chtype " "highlight",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKRadio ("
+.BI "CDKRADIO *" "radio");
+.TP 15
+.B "void setCDKRadio ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "highlight",
+.BI "chtype " "choiceCharacter",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKRadioBackgroundAttrib ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKRadioBackgroundColor ("
+.BI "CDKRADIO *" "radio",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKRadioBox ("
+.BI "CDKRADIO *" "radio",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKRadioBoxAttribute ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioChoiceCharacter ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioCurrentItem ("
+.BI "CDKRADIO *" "radio",
+.BI "int" "index");
+.TP 15
+.B "void setCDKRadioHighlight ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKRadioHorizontalChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioItems ("
+.BI "CDKRADIO *" "radio",
+.BI "CDK_CONST char **" "list",
+.BI "int " "listSize");
+.TP 15
+.B "void setCDKRadioLLChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioLRChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioLeftBrace ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioPostProcess ("
+.BI "CDKRADIO *" "radio",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKRadioPreProcess ("
+.BI "CDKRADIO *" "radio",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKRadioRightBrace ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioSelectedItem ("
+.BI "CDKRADIO *" "radio",
+.BI "int " "item");
+.TP 15
+.B "void setCDKRadioULChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioURChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKRadioVerticalChar ("
+.BI "CDKRADIO *" "radio",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk radio widget creates a radio list.
+The following are functions which
+create or manipulate the Cdk radio box widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKRadio
+activates the radio widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBradio\fR is a pointer to a non-NULL radio widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return a
+value from 0 to the number of items -1, representing the item selected.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the
+character entered into this widget was \fIESCAPE\fR then the widget will return
+a value of -1 and the widget data \fIexitType\fR will be set to
+\fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDKRadio
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKRadio
+draws the radio widget on the screen.
+.IP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B eraseCDKRadio
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKRadioBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKRadioChoiceCharacter
+returns the character being used to draw the selected element in the list.
+.TP 5
+.B getCDKRadioCurrentItem 
+returns the index of the current item.
+.TP 5
+.B getCDKRadioHighlight
+returns the attribute of the highlight bar.
+.TP 5
+.B getCDKRadioItems
+optionally copies the radio-box items into the caller's list,
+which must be large enough since this function does not allocate it.
+If the \fIlist\fP parameter is null, no copying is done.
+It returns the list size whether or not the \fIlist\fP parameter is null.
+.TP 5
+.B getCDKRadioLeftBrace
+returns the character being used to draw the left brace of the selection box.
+.TP 5
+.B getCDKRadioRightBrace
+returns the character being used to draw the right brace of the selection box.
+.TP 5
+.B getCDKRadioSelectedItem,
+returns the selected item of the widget.
+.TP 5
+.B injectCDKRadio
+function injects a single character into the widget.
+.RS
+.bP
+The parameter \fBradio\fR is a pointer to a non-NULL radio widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value ranging from zero to one less than the number of items,
+representing the items selected.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B moveCDKRadio
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.IP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.IP
+The parameter \fBypos\fR may be an integer
+or one of the pre-defined values \fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKRadio
+creates a radio widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBspos\fR
+tells where the scroll bar is to be placed.
+This may be one of three values:
+.RS
+.TP 5
+\fILEFT\fR
+puts the scroll bar on the left of the scrolling list.
+.TP 5
+\fIRIGHT\fR
+puts the scroll bar on the right side of the list, and
+.TP 5
+\fINONE\fR
+does not add a scroll bar.
+.RE
+.TP 5
+\fBheight\fR and
+\fBwidth\fR
+control the height and width of the widget.
+If you
+provide a value of zero for either of the height or the width, the widget will
+be created with the full width and height of the screen.
+If you provide a negative value,
+the widget will be created the full height or width minus the value provided.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBradioList\fR
+is the list of items to display in the radio list.
+.TP 5
+\fBradioListLength\fR
+is the number of elements in the given list.
+.TP 5
+\fBchoiceCharacter\fR
+is the character to use to highlight the current selection.
+.TP 5
+\fBhighlight\fR
+specifies the display attribute of the currently selected item.
+.TP 5
+\fBdefaultItem\fR
+is the index in the list of the default selection.
+.TP 5
+\fBbox\fR
+is true if widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKRadio
+allows the user to move the widget around the screen via the
+cursor/keypad keys.
+See \fRcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKRadio
+lets the programmer modify certain elements of an existing radio widget.
+.IP
+The parameter names correspond to the same parameter names listed
+in the \fBnewCDKRadio\fR function.
+.TP 5
+.B setCDKRadioBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKRadioBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKRadioBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKRadioBoxAttribute
+function sets the attribute of the box.
+.TP 5
+.B setCDKRadioChoiceCharacter
+sets the character to use to draw the selected element in the list.
+.TP 5
+.B setCDKRadioCurrentItem 
+sets the current item by its index in the list.
+.TP 5
+.B setCDKRadioHighlight
+sets the attribute of the highlight bar.
+.TP 5
+.B setCDKRadioHorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDKRadioItems
+set the radio list items and display the result.
+The current item is set to the beginning of the list.
+The previous radio list items stored in the widget are freed.
+.TP 5
+.B setCDKRadioLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKRadioLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKRadioLeftBrace
+sets the character to use to draw the left brace of the selection box.
+.TP 5
+.B setCDKRadioPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKRadioPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKRadioRightBrace
+sets the character to use to draw the right brace of the selection box.
+.TP 5
+.B setCDKRadioSelectedItem
+sets the selected item.
+.TP 5
+.B setCDKRadioULChar
+function sets the upper left hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKRadioURChar
+function sets the upper right hand corner of the widget's box to
+the given character.
+.TP 5
+.B setCDKRadioVerticalChar
+function sets the vertical drawing character for the box to
+the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) box;
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow/Shifts the whole list left one character.
+Right Arrow/Shifts the whole list right one character.
+Up Arrow/Selects the next item up in the list.
+Down Arrow/Selects the next item down in the list.
+_
+Prev Page
+Ctrl-B/Scroll one page backward.
+_
+Next Page
+Ctrl-F/Scroll one page forward.
+_
+1
+<
+g
+Home/Move to the first element in the list.
+_
+>
+G
+End/Move to the last element in the list.
+_
+$/Shifts the whole list to the far right.
+|/Shifts the whole list to the far left.
+_
+Space/Selects or deselects the current choice.
+Return/T{
+Exits the widget and returns the index of the selected item.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exit the widget and return the index of the selected item.
+Set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exit the widget and return -1.
+Set the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+_
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_screen (3)

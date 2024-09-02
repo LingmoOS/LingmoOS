@@ -1,0 +1,87 @@
+#!/bin/sh
+set -e
+
+# vlc-cache-gen uses readdir() which depends on the order in the filesystem
+
+# Don't run if vlc is not installed
+if [ ! -x /usr/lib/x86_64-linux-gnu/vlc/vlc-cache-gen ];
+then
+  exit 0
+fi
+
+# Don't run if the cache file does not exist
+if [ ! -e /usr/lib/x86_64-linux-gnu/vlc/plugins/plugins.dat ];
+then
+  exit 0
+fi
+
+# Install disorderfs when needed and mark for removal at the end
+_DISORDERFS_PREINSTALLED=yes
+if [ ! -x /usr/bin/disorderfs ];
+then
+  _DISORDERFS_PREINSTALLED=no
+  apt-get install --yes disorderfs
+fi
+
+# Install the fuse device (needed by disorderfs) and mark for removal at the end
+_FUSE_DEVICE_PRESENT=yes
+if [ ! -e /dev/fuse ];
+then
+  _FUSE_DEVICE_PRESENT=no
+  mknod /dev/fuse c 10 229
+fi
+
+# Check for changes in the cache file, for suppressing the output if no change was made
+_CHECK_FOR_CHANGES=yes
+if [ ! -x /usr/bin/sha256sum ];
+then
+  _CHECK_FOR_CHANGES=no
+fi
+
+
+# Prepare a directory with a stable sorting order
+_ORDERED_DIR=$(mktemp --directory)
+disorderfs /usr/lib/x86_64-linux-gnu/vlc/plugins ${_ORDERED_DIR} --reverse-dirents=no --sort-dirents=yes --quiet
+
+# The checksum of the original file
+if [ "${_CHECK_FOR_CHANGES}" = "yes" ];
+then
+  sha256sum /usr/lib/x86_64-linux-gnu/vlc/plugins/plugins.dat > ${_ORDERED_DIR}/before.sha256sum
+fi
+
+# Regenerate the cache file in a directory which guarantees the sorting order of the files
+/usr/lib/x86_64-linux-gnu/vlc/vlc-cache-gen ${_ORDERED_DIR}
+
+# Verify the checksum for changes
+if [ "${_CHECK_FOR_CHANGES}" = "yes" ];
+then
+  _HOOK_WAS_NEEDED=no
+  sha256sum --check ${_ORDERED_DIR}/before.sha256sum --status || _HOOK_WAS_NEEDED=yes
+  rm -f ${_ORDERED_DIR}/before.sha256sum
+fi
+
+# Cleanup
+fusermount -u ${_ORDERED_DIR}
+rmdir ${_ORDERED_DIR}
+
+if [ "${_DISORDERFS_PREINSTALLED}" = "no" ];
+then
+  apt-get remove --yes --purge disorderfs
+  apt-get autoremove --yes
+fi
+
+if [ "${_FUSE_DEVICE_PRESENT}" = "no" ];
+then
+  rm -f /dev/fuse
+fi
+
+# Report only when either a change was detected or not detectable (due to missing tools)
+if [ "${_CHECK_FOR_CHANGES}" = "yes" ];
+then
+  if [ "${_HOOK_WAS_NEEDED}" = "yes" ];
+  then
+    echo "P: $(basename $0) Reproducible hook has been applied"
+  fi
+else
+  echo "P: $(basename $0) Reproducible hook has been applied"
+fi

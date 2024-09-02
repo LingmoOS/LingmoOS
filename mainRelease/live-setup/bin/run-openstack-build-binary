@@ -1,0 +1,177 @@
+#!/bin/bash
+
+SCRIPTS_SOURCE="/home/debian-cd/live/available"
+. $SCRIPTS_SOURCE/common.sh
+
+if [ "$RELEASE_BUILD"x = ""x ] ; then
+    CONF=${SCRIPTS_SOURCE}/CONF.sh
+else
+    CONF=$SCRIPTS_SOURCE/CONF.sh.${RELEASE_BUILD}
+fi
+. $CONF
+
+while getopts ":c:a:t:b:B:l:n:" o; do
+    case "${o}" in
+	c)
+	    VMCONFIG=${OPTARG}
+	    ;;
+        a)
+            ARCH=${OPTARG}
+            ;;
+        b)
+            BUILD=${OPTARG}
+            ;;
+	l)
+	    BUILDS_LOG=${OPTARG}
+	    ;;
+	n)
+	    NUM_BUILDS=${OPTARG}
+	    ;;
+	B)
+	    # Easier to drive from the Makefile - accept the full
+	    # build name (e.g. "BO_amd64") and split it up
+	    # here
+	    LONG_NAME=${OPTARG}
+	    ARCH=$(echo $LONG_NAME | awk -F "_" '{print $2}')
+	    ;;
+        *)
+	    echo "Unrecognised arg ${o}"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+validate_arg ARCH "amd64:arm64"
+
+if [ "$DRYRUN"x != ""x ]; then
+    echo "Dry-run $0: ARCH $ARCH TYPE $TYPE BUILD $BUILD VMCONFIG $VMCONFIG"
+    # Add a small delay to help with testing Makefiles
+    if [ $DRYRUN != count ]; then
+	if [ $ARCH = source ]; then
+	    sleep 0.5
+	else
+	    sleep 2
+	fi
+    fi
+    exit 0
+fi
+
+if [ -f "$VMCONFIG" ]; then
+    . $VMCONFIG
+else
+    echo "$0: Can't load config from $VMCONFIG, aborting"
+    exit 1
+fi
+
+NAME="debian-${VERSION}-openstack-${ARCH}"
+lockfile -! -l 43200 -r-1 $BUILDS_LOG.lock
+echo $LONG_NAME >> $BUILDS_LOG
+BUILDNUM=$(wc -l < $BUILDS_LOG)
+rm -f $BUILDS_LOG.lock
+mkdir -p $OUTDIR
+OUT="$OUTDIR/out/openstack-$CODENAME/${ARCH}"
+
+# Run the binary build inside the VM
+BUILD_START=$(now)
+echo "$BUILDNUM/$NUM_BUILDS: $LONG_NAME: Starting $NAME build at $BUILD_START"
+ssh root@$VM_IP -p $SSH_PORT /w/openstack-wrapper-binary -a $ARCH
+
+CURRENT_ERROR=0
+ERROR=$?
+
+if [ $ERROR = 0 ]; then
+
+    # Do more I/O and CPU heavy work on the host:
+    # 1. Convert the .raw file to .qcow2
+    # 2. Generate the sources.tar.gz files
+    # etc.
+
+    cd $OUT
+
+    BASE="debian-$VERSION-openstack-$ARCH"
+    LOGFILE="openstack-$CODENAME-$ARCH.log"
+
+    # snippet of index for virt-builder
+    # convert the image to qcow
+    QEMU_VERSION=`qemu-img --help | head -n 1 | cut -d" " -f3 | cut -d"," -f1`
+    if dpkg --compare-versions ${QEMU_VERSION} gt 1.0 ; then
+        OTHER_QEMU_IMG_OPTIONS=" -o compat=0.10"
+    else
+        OTHER_QEMU_IMG_OPTIONS=""
+    fi
+    
+    qemu-img convert -c -f raw $BASE.raw ${OTHER_QEMU_IMG_OPTIONS} -O qcow2 $BASE.qcow2
+
+    checksum=$(sha512sum $BASE.qcow2 | awk '{print $1;}')
+    size=$(stat -c '%s' $BASE.qcow2)
+    revision=$(date +%Y%m%d)
+    case "${CODENAME}" in
+        testing|unstable) pretty_codename=${CODENAME} ;;
+        *) pretty_codename=$(echo ${CODENAME} | sed 's/./\U&/') ;;
+    esac
+    case "${VERSION}" in
+        testing|unstable)
+            version_major_minor=${VERSION}
+            osinfo=debian8 # XXX latest stable available
+            ;;
+        *)
+            version_major_minor=$(echo ${VERSION} | awk -F. '{print $1"."$2;}')
+            osinfo=debian$(echo ${VERSION} | awk -F. '{print $1;}')
+            ;;
+    esac
+
+    case "$ARCH" in
+	amd64)
+	    UNAME=x86_64;;
+	arm64)
+	    UNAME=aarch64;;
+    esac
+
+    cat <<EOF > $BASE.qcow2.index
+[debian-${version_major_minor}-cloud]
+name=Debian ${VERSION} (${pretty_codename}) Cloud
+osinfo=${osinfo}
+arch=${UNAME}
+file=$BASE.qcow2
+checksum[sha512]=${checksum}
+format=qcow2
+size=${size}
+revision=${revision}
+notes=Debian ${VERSION} (${pretty_codename}).
+ 
+ This is a Debian installation, suited for running as OpenStack guest.
+
+EOF
+
+    SOURCE_ERROR=0
+    SOURCES=$(ls -1 debian-*-openstack-${ARCH}-sources.list)
+    mkdir source
+    IFS="$NL"
+    if [ -f "$SOURCES" ] ; then
+	for line in $(cat ${SOURCES} | sed 's,deb.debian.org,local-mirror.cdbuilder.debian.org,g'); do
+	    IFS=$OLDIFS
+	    grab_file $line
+	    IFS="$NL"
+	done
+	IFS=$OLDIFS
+	tar czf debian-$VERSION-openstack-${ARCH}-source.tar.gz source
+	rm -rf source ${SOURCES}
+    else
+	run_log "No sources.list file"
+	CURRENT_ERROR=2
+    fi
+
+    if [ $SOURCE_ERROR -ne 0 ] ; then
+	run_log "FAILED to download sources"
+	CURRENT_ERROR=2
+    fi
+
+    ERROR=$CURRENT_ERROR
+fi
+
+BUILD_END=$(now)
+time_spent=$(calc_time $BUILD_START $BUILD_END)
+echo "  $LONG_NAME: $NAME build started at $BUILD_START, ended at $BUILD_END (took $time_spent), error $ERROR"
+
+exit $ERROR

@@ -1,0 +1,345 @@
+'\" t
+.\" $Id: cdk_menu.3,v 1.22 2019/02/15 00:51:07 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_menu 3
+.SH NAME
+.XX activateCDKMenu
+.XX destroyCDKMenu
+.XX drawCDKMenu
+.XX drawCDKMenuSubwin
+.XX eraseCDKMenu
+.XX eraseCDKMenuSubwin
+.XX getCDKMenuCurrentItem
+.XX getCDKMenuSubTitleHighlight
+.XX getCDKMenuTitleHighlight
+.XX injectCDKMenu
+.XX newCDKMenu
+.XX setCDKMenu
+.XX setCDKMenuBackgroundAttrib
+.XX setCDKMenuBackgroundColor
+.XX setCDKMenuCurrentItem
+.XX setCDKMenuPostProcess
+.XX setCDKMenuPreProcess
+.XX setCDKMenuSubTitleHighlight
+.XX setCDKMenuTitleHighlight
+cdk_menu \- curses menu widget
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKMenu ("
+.BI "CDKMENU *" "menu",
+.BI "chtype * " "actions");
+.TP 15
+.B "void destroyCDKMenu ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "void drawCDKMenu ("
+.BI "CDKMENU *" "menu",
+.BI "boolean " "box");
+.TP 15
+.B "void drawCDKMenuSubwin ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "void eraseCDKMenu ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "void eraseCDKMenuSubwin ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "void getCDKMenuCurrentItem ("
+.BI "CDKMENU *" "menu",
+.BI "int *" "menuItem",
+.BI "int *" "submenuItem");
+.TP 15
+.B "chtype getCDKMenuSubTitleHighlight ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "chtype getCDKMenuTitleHighlight ("
+.BI "CDKMENU *" "menu");
+.TP 15
+.B "int injectCDKMenu ("
+.BI "CDKMENU *" "menu",
+.BI "chtype " "input");
+.TP 15
+.B "CDKMENU *newCDKMenu ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "const char *" "menulist"[MAX_MENU_ITEMS][MAX_SUB_ITEMS],
+.BI "int " "menuListLength",
+.BI "int *" "submenuListLength",
+.BI "int *" "menuLocation",
+.BI "int " "menuPos",
+.BI "chtype " "titleAttribute",
+.BI "chtype " "subtitleAttribute");
+.TP 15
+.B "void setCDKMenu ("
+.BI "CDKMENU *" "menu",
+.BI "int " "menuItem",
+.BI "int " "submenuItem",
+.BI "chtype " "titleAttribute",
+.BI "chtype " "subtitleAttribute");
+.TP 15
+.B "void setCDKMenuBackgroundAttrib ("
+.BI "CDKMENU *" "menu",
+.BI "chtype " "attribute");
+.TP 15
+.B "void setCDKMenuBackgroundColor ("
+.BI "CDKMENU *" "menu",
+.BI "const char * " "color");
+.TP 15
+.B "void setCDKMenuCurrentItem ("
+.BI "CDKMENU *" "menu",
+.BI "int " "menuItem",
+.BI "int " "submenuItem");
+.TP 15
+.B "void setCDKMenuPostProcess ("
+.BI "CDKMENU *" "menu",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMenuPreProcess ("
+.BI "CDKMENU *" "menu",
+.BI "PROCESSFN " "callback",
+.BI "void * " "data");
+.TP 15
+.B "void setCDKMenuSubTitleHighlight ("
+.BI "CDKMENU *" "menu",
+.BI "chtype " "highlight");
+.TP 15
+.B "void setCDKMenuTitleHighlight ("
+.BI "CDKMENU *" "menu",
+.BI "chtype " "highlight");
+.fi
+.SH DESCRIPTION
+The Cdk menu widget creates a pull-down menu list.
+The following are functions
+which create or manipulate the Cdk menu widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKMenu
+activates the menu widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBmenu\fR is a pointer to a non-NULL menu widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.RE
+.IP
+If the character entered
+into this widget is \fIRETURN\fR then this then this function returns an
+integer which is a value of the current menu list * 100 + the sub-menu number.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this widget was \fIESCAPE\fR then the widget
+will return a value of -1 and the widget data \fIexitType\fR will be
+set to \fIvESCAPE_HIT\fR.
+.TP 5
+.B destroyCDKMenu
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKMenu
+draws the menu widget on the screen.
+.IP
+If the \fBbox\fR parameter is true, the widget is drawn with a box.
+.TP 5
+.B drawCDKMenuSubwin
+draws the menu item subwindow.
+.TP 5
+.B eraseCDKMenu
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B eraseCDKMenuSubwin
+erases the menu item subwindow.
+.TP 5
+.B getCDKMenuCurrentItem
+returns the values \fBmenuItem\fR and \fBsubmenuItem\fR to the current
+menu selection.
+.TP 5
+.B getCDKMenuSubTitleHighlight
+returns the highlight attribute of the sub-menu selection bar.
+.TP 5
+.B getCDKMenuTitleHighlight
+returns the highlight attributes of the menu title.
+.TP 5
+.B injectCDKMenu
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBmenu\fR is a pointer to a non-NULL menu widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+.RE
+.IP
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+the current menu list * 100 + the sub-menu number.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+to \fIvESCAPE_HIT\fR.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.TP 5
+.B newCDKMenu
+creates a menu widget and returns a pointer to it.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBmenuList\fR
+is a list of the menu list titles.
+.TP 5
+\fBmenuListLength\fR
+is the number of pull down menus.
+.TP 5
+\fBsubmenuListLength\fR
+is the number of menu items under each menu list.
+.TP 5
+\fBmenuLocation\fR
+tells where each menu is to be located.
+Valid values are \fILEFT\fR and \fIRIGHT\fR.
+.TP 5
+\fBmenuPos\fR
+tells whether the menu is to be on the top of the screen or the bottom.
+Valid values are \fITOP\fR and \fIBOTTOM\fR.
+.TP 5
+\fBtitleAttribute\fR and
+.TP 5
+\fBsubtitleAttribute\fR
+are the character attributes of the title and sub-titles respectively.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B setCDKMenu
+lets the programmer modify certain elements of an existing menu widget.
+.RS
+.bP
+The parameters \fBmenuItem\fR and \fBsubmenuItem\fR set which
+menu list and sub-menu item are going to be highlighted
+when the widget is activated.
+.bP
+The other parameter names correspond to the same parameter names
+listed in the \fBnewCDKMenu\fR function.
+.RE
+.TP 5
+.B setCDKMenuBackgroundAttrib
+sets the background attribute of the widget.
+.IP
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKMenuBackgroundColor
+sets the background color of the widget.
+.IP
+The parameter \fBcolor\fR
+is in the format of the Cdk format strings.
+.IP
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKMenuCurrentItem
+sets the current item in the menu widget.
+.TP 5
+.B setCDKMenuPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMenuPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.RE
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.TP 5
+.B setCDKMenuSubTitleHighlight
+sets the highlight attribute of the sub-menu selection bar.
+.TP 5
+.B setCDKMenuTitleHighlight
+sets the highlight attributes of the menu title.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) allbox;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+Left Arrow/T{
+Highlights the menu list to the left of the current menu.
+T}
+Right Arrow/T{
+Highlights the menu list to the right of the current menu.
+T}
+Up Arrow/T{
+Moves the current menu selection up one.
+T}
+Down Arrow/T{
+Moves the current menu selection down one.
+T}
+Space/T{
+Moves the current menu selection down one.
+T}
+Tab/T{
+Highlights the menu list to the right of the current menu.
+T}
+Return/T{
+Exits the widget and returns the index of the selected item.
+This also sets the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exits the widget and returns -1.
+This also sets the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_screen (3)

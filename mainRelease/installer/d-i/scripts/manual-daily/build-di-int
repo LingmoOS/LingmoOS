@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Build the D-I Internals and publish to www dir
+
+ROOT=$HOME/trunk/installer/doc/devel/internals/
+mainlog=$ROOT/build/logs/main.log
+www_destination=/srv/d-i.debian.org/www/doc/internals
+
+echo "Build process for d-i internals" >$mainlog
+
+
+usage() {
+    if [ "$@" ]; then
+        echo "Error: $@"
+        echo
+    fi
+    echo "Usage: $(basename $0)"
+    exit 1
+}
+
+## Function to check result of executed programs and exit on error
+checkfatal() {
+    if [ ! "$1" = "0" ]; then
+        echo "Unexpected error $1 while $2" >>$mainlog
+        touch $ROOT/build/do_not_build
+        echo "!!!! Autobuilding has been disabled !!!!" >>$mainlog
+        rm -f $ROOT/build/lockfile
+        exit 999
+    fi
+}
+
+update_from_git() {
+    echo >>$mainlog
+    echo "Performing GIT update..." >>$mainlog
+    cd $ROOT/
+    git pull >$ROOT/build/logs/git_pull.log 2>&1
+    RESULT=$?
+    if [ ! $RESULT = 0 ]; then
+        echo "GIT pull failed with code $RESULT" >>$mainlog
+        echo >>$mainlog
+        cat $ROOT/build/logs/git_pull.log >>$mainlog
+        rm -f $ROOT/build/lockfile
+        exit 1
+    fi
+    if [ -n "$(git status -s -uno .)" ] ; then
+        checkfatal "checking for conflicts after 'git pull'"
+    fi
+}
+
+# We want the d-i internals files group writable
+umask 0002
+
+RETRY=""
+while true; do
+    case $1 in
+        "")
+            break ;;
+        -*)
+            usage "unrecognized option '$1'" ;;
+        *)
+            usage "invalid parameter '$1'" ;;
+    esac
+    shift
+done
+
+[ -f $ROOT/build/lockfile ] && exit 1 || touch $ROOT/build/lockfile
+
+update_from_git
+
+# Build the d-i internals
+cd $ROOT
+echo "Building D-I Internals" >>$mainlog
+./build.sh
+
+# Move to www dir
+mv ./*.html $www_destination
+
+echo >>$mainlog
+echo "Done -- $(date -u)" >>$mainlog
+rm -f $ROOT/build/lockfile
+
+exit 0

@@ -1,0 +1,466 @@
+'\" t
+.\" $Id: cdk_itemlist.3,v 1.23 2019/02/15 00:49:26 tom Exp $
+.de bP
+.ie n  .IP \(bu 4
+.el    .IP \(bu 2
+..
+.de XX
+..
+.TH cdk_itemlist 3
+.SH NAME
+.XX activateCDKItemlist
+.XX destroyCDKItemlist
+.XX drawCDKItemlist
+.XX drawCDKItemlistField
+.XX eraseCDKItemlist
+.XX getCDKItemlistBox
+.XX getCDKItemlistCurrentItem
+.XX getCDKItemlistDefaultItem
+.XX getCDKItemlistValues
+.XX injectCDKItemlist
+.XX moveCDKItemlist
+.XX newCDKItemlist
+.XX positionCDKItemlist
+.XX setCDKItemlist
+.XX setCDKItemlistBackgroundAttrib
+.XX setCDKItemlistBackgroundColor
+.XX setCDKItemlistBox
+.XX setCDKItemlistBoxAttribute
+.XX setCDKItemlistCurrentItem
+.XX setCDKItemlistDefaultItem
+.XX setCDKItemlistHorizontalChar
+.XX setCDKItemlistLLChar
+.XX setCDKItemlistLRChar
+.XX setCDKItemlistPostProcess
+.XX setCDKItemlistPreProcess
+.XX setCDKItemlistULChar
+.XX setCDKItemlistURChar
+.XX setCDKItemlistValues
+.XX setCDKItemlistVerticalChar
+cdk_itemlist \- curses itemlist widget.
+.SH SYNOPSIS
+.LP
+.B cc
+.RI "[ " "flag" " \|.\|.\|. ] " "file" " \|.\|.\|."
+.B \-lcdk
+.RI "[ " "library" " \|.\|.\|. ]"
+.LP
+#include <cdk.h>
+.nf
+.TP 15
+.B "int activateCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype *" "actions");
+.TP 15
+.B "void destroyCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "void drawCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "boolean " "box");
+.TP 15
+.B "void drawCDKItemlistField ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "boolean " "highlight");
+.TP 15
+.B "void eraseCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "boolean getCDKItemlistBox ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "int getCDKItemlistCurrentItem ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "int getCDKItemlistDefaultItem ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "chtype **getCDKItemlistValues ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "int *" "listSize");
+.TP 15
+.B "int injectCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "input");
+.TP 15
+.B "void moveCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "boolean " "relative",
+.BI "boolean " "refresh");
+.TP 15
+.B "CDKITEMLIST *newCDKItemlist ("
+.BI "CDKSCREEN *" "cdkscreen",
+.BI "int " "xpos",
+.BI "int " "ypos",
+.BI "const char *" "title",
+.BI "const char *" "label",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "itemCount",
+.BI "int " "defaultItem",
+.BI "boolean " "box",
+.BI "boolean " "shadow");
+.TP 15
+.B "void positionCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist");
+.TP 15
+.B "void setCDKItemlist ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "itemCount",
+.BI "int " "currentSelection",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKItemlistBackgroundAttrib ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype" "attribute");
+.TP 15
+.B "void setCDKItemlistBackgroundColor ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "const char *" "color");
+.TP 15
+.B "void setCDKItemlistBox ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "boolean " "box");
+.TP 15
+.B "void setCDKItemlistBoxAttribute ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistCurrentItem ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "int " "currentItem");
+.TP 15
+.B "void setCDKItemlistDefaultItem ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "int " "defaultItem");
+.TP 15
+.B "void setCDKItemlistHorizontalChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistLLChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistLRChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistPostProcess ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "PROCESSFN " "callback",
+.BI "void *" "data");
+.TP 15
+.B "void setCDKItemlistPreProcess ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "PROCESSFN " "callback",
+.BI "void *" "data");
+.TP 15
+.B "void setCDKItemlistULChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistURChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.TP 15
+.B "void setCDKItemlistValues ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "CDK_CONST char **" "itemList",
+.BI "int " "itemCount");
+.TP 15
+.B "void setCDKItemlistVerticalChar ("
+.BI "CDKITEMLIST *" "itemlist",
+.BI "chtype " "character");
+.fi
+.SH DESCRIPTION
+The Cdk itemlist widget creates a widget which allows a user to select from a
+list of preset character strings such as
+the days of the week or the months of the year.
+The following functions create or manipulate the Cdk itemlist widget.
+.SH AVAILABLE FUNCTIONS
+.TP 5
+.B activateCDKItemlist
+activates the itemlist widget and lets the user interact with the widget.
+.RS
+.bP
+The parameter \fBitemlist\fR is a pointer to a non-NULL itemlist widget.
+.bP
+If the \fBactions\fR parameter is passed with a non-NULL value, the characters
+in the array will be injected into the widget.
+.IP
+To activate the widget
+interactively pass in a \fINULL\fR pointer for \fBactions\fR.
+.IP
+If the character entered
+into this widget is \fIRETURN\fR or \fITAB\fR then this function will return a
+value from 0 to the number of buttons -1, representing the button selected.
+It will also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+.IP
+If the character entered into this widget was \fIESCAPE\fR
+then the widget will return a -1
+and the widget data \fIexitType\fR will be set to
+\fIvESCAPE_HIT\fR.
+.RE
+.TP 5
+.B destroyCDKItemlist
+removes the widget from the screen and frees memory the object used.
+.TP 5
+.B drawCDKItemlist
+draws the itemlist widget on the screen.
+The \fBbox\fR option is true if the widget is drawn with a box.
+.TP 5
+.B drawCDKItemlistField
+draws the contents of the field.
+.TP 5
+.B eraseCDKItemlist
+removes the widget from the screen.
+This does \fINOT\fR destroy the widget.
+.TP 5
+.B getCDKItemlistBox
+returns true if the widget will be drawn with a box around it.
+.TP 5
+.B getCDKItemlistCurrentItem
+returns the index of the currently displayed item in the widget.
+.TP 5
+.B getCDKItemlistDefaultItem
+returns the index of the default item in the widget.
+.TP 5
+.B getCDKItemlistValues
+returns the list of pointers to the items.
+The parameter \fBsize\fR points to a location which receives the item count.
+.TP 5
+.B injectCDKItemlist
+injects a single character into the widget.
+.RS
+.bP
+The parameter \fBitemlist\fR is a pointer to a non-NULL itemlist widget.
+.bP
+The parameter \fBcharacter\fR is the character to inject into the widget.
+The return value and side-effect (setting the widget data \fIexitType\fP)
+depend upon the injected character:
+.RS
+.TP
+\fIRETURN\fP or \fITAB\fR
+the function returns
+a value ranging from zero to one less than the number of buttons,
+representing the button selected.
+The widget data \fIexitType\fR is set to \fIvNORMAL\fR.
+.TP
+\fIESCAPE\fP
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvESCAPE_HIT\fR.
+.TP
+Otherwise
+unless modified by preprocessing, postprocessing or key bindings,
+the function returns
+-1.
+The widget data \fIexitType\fR is set to \fIvEARLY_EXIT\fR.
+.RE
+.RE
+.TP 5
+.B moveCDKItemlist
+moves the given widget to the given position.
+.RS
+.bP
+The parameters \fBxpos\fR and \fBypos\fR are the new position of the widget.
+.bP
+The parameter \fBxpos\fR may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.bP
+The parameter \fBypos\fR may
+be an integer or one of the pre-defined values \fILEFT\fR,
+\fIRIGHT\fR, and \fICENTER\fR.
+.bP
+The parameter \fBrelative\fR states whether
+the \fBxpos\fR/\fBypos\fR pair is a relative move or an absolute move.
+.IP
+For example,
+if \fBxpos\fR = 1 and \fBypos\fR = 2 and \fBrelative\fR = \fBTRUE\fR,
+then the widget would move one row down and two columns right.
+If the value of \fBrelative\fR was \fBFALSE\fR,
+then the widget would move to the position (1,2).
+.IP
+Do not use the values \fITOP\fR, \fIBOTTOM\fR, \fILEFT\fR,
+\fIRIGHT\fR, or \fICENTER\fR when \fBrelative\fR = \fITRUE\fR.
+(weird things may happen).
+.bP
+The final parameter \fBrefresh\fR is a boolean value which
+states whether the widget will get refreshed after the move.
+.RE
+.TP 5
+.B newCDKItemlist
+creates a pointer to an itemlist widget.
+Parameters:
+.RS
+.TP 5
+\fBscreen\fR
+is the screen you wish this widget to be placed in.
+.TP 5
+\fBxpos\fR
+controls the placement of the object along the horizontal axis.
+It may be an integer or one of the pre-defined values
+\fILEFT\fR, \fIRIGHT\fR, and \fICENTER\fR.
+.TP 5
+\fBypos\fR
+controls the placement of the object along the vertical axis.
+It may be an integer or one of the pre-defined values
+\fITOP\fR, \fIBOTTOM\fR, and \fICENTER\fR.
+.TP 5
+\fBtitle\fR
+is the string which will be displayed at the top of the widget.
+The title can be more than one line; just provide a carriage return
+character at the line break.
+.TP 5
+\fBlabel\fR
+is the string to use as the label of the itemlist field.
+.TP 5
+\fBitemList\fR
+is the list of the strings which will be displayed in the widget.
+.TP 5
+\fBitemCount\fR
+is the number of elements in the list.
+.TP 5
+\fBdefaultItem\fR
+is the index of the default item for the list.
+.TP 5
+\fBbox\fR
+is true if widget should be drawn with a box around it.
+.TP 5
+\fBshadow\fR
+turns the shadow on or off around this widget.
+.RE
+.IP
+If the widget could not be created then a \fINULL\fR pointer is returned.
+.TP 5
+.B positionCDKItemlist
+allows the user to move the widget around the screen via the cursor/keypad keys.
+See \fBcdk_position (3)\fR for key bindings.
+.TP 5
+.B setCDKItemlist
+lets the programmer modify certain elements of an existing itemlist widget.
+The parameter names correspond to the same parameter names
+listed in the \fBnewCDKItemlist\fR function.
+.TP 5
+.B setCDKItemlistBackgroundAttrib
+the background color attribute the widget.
+The parameter \fBattribute\fR is a curses attribute, e.g., A_BOLD.
+.TP 5
+.B setCDKItemlistBackgroundColor
+sets the background color of the widget.
+The parameter \fBcolor\fR is in the format of the Cdk format strings.
+See \fBcdk_display (3)\fR.
+.TP 5
+.B setCDKItemlistBox
+sets whether the widget will be drawn with a box around it.
+.TP 5
+.B setCDKItemlistBoxAttribute
+sets the attribute of the box.
+.TP 5
+.B setCDKItemlistCurrentItem
+sets the currently displayed item in the widget.
+.TP 5
+.B setCDKItemlistDefaultItem
+sets the default item in the widget.
+.TP 5
+.B setCDKItemlistHorizontalChar
+sets the horizontal drawing character for the box to the given character.
+.TP 5
+.B setCDKItemlistLLChar
+sets the lower left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKItemlistLRChar
+sets the lower right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKItemlistPostProcess
+allows the user to have the widget call a function after the
+key has been applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.IP
+To learn more about post-processing see \fIcdk_process (3)\fR.
+.RE
+.TP 5
+.B setCDKItemlistPreProcess
+allows the user to have the widget call a function after a key
+is hit and before the key is applied to the widget.
+.RS
+.bP
+The parameter \fBfunction\fR is the callback function.
+.bP
+The parameter \fBdata\fR points to data passed to the callback function.
+.IP
+To learn more about pre-processing see \fIcdk_process (3)\fR.
+.RE
+.TP 5
+.B setCDKItemlistULChar
+sets the upper left hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKItemlistURChar
+sets the upper right hand corner of the widget's box to the given character.
+.TP 5
+.B setCDKItemlistValues
+sets the contents of the list from an array of string pointers \fBitem\fR
+whose final index is given by \fBcount\fR.
+If \fBdefaultItem\fR is in the range 0..\fBcount\fR, that sets the
+default item value for the list.
+.TP 5
+.B setCDKItemlistVerticalChar
+sets the vertical drawing character for the box to the given character.
+.SH KEY BINDINGS
+When the widget is activated there are several default key bindings which will
+help the user enter or manipulate the information quickly.
+The following table
+outlines the keys and their actions for this widget.
+.LP
+.TS
+center tab(/) box;
+l l
+l l
+lw15 lw35 .
+\fBKey/Action\fR
+=
+Left Arrow
+Down Arrow
+-
+p/Shift the list one column to the left.
+_
+Right Arrow
+Up Arrow
+Space
++
+n/Shift the list one column to the right.
+_
+d
+D/Display the default item.
+_
+0/Display the first item in the list.
+$/Display the last item in the list.
+_
+Return/T{
+Exit the widget and return an integer representing the current selection.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Tab/T{
+Exit the widget and return an integer representing the current selection.
+Also set the widget data \fIexitType\fR to \fIvNORMAL\fR.
+T}
+Escape/T{
+Exit the widget and return -1.
+Also set the widget data \fIexitType\fR to \fIvESCAPE_HIT\fR.
+T}
+Ctrl-L/Refreshes the screen.
+.TE
+.SH SEE ALSO
+.BR cdk (3),
+.BR cdk_binding (3),
+.BR cdk_display (3),
+.BR cdk_position (3),
+.BR cdk_process (3),
+.BR cdk_screen (3)

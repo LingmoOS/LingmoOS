@@ -1,0 +1,16 @@
+# (ab)use dpms=... to allow the user to either add '-dpms', or remove '-s 0'
+if grep -qs dpms=false /proc/cmdline; then
+	DPMS="-s 0 -dpms"
+elif grep -qs dpms=true /proc/cmdline; then
+	DPMS=
+else
+    # by default, disable the screen-saver
+    DPMS="-s 0"
+fi
+
+if [ "$DEBIAN_FRONTEND" = gtk ] && [ -z "$LIVE_INSTALLER_MODE" ]; then
+	trap : SIGUSR1
+	(trap '' SIGUSR1; exec Xorg $DPMS -noreset -nolisten tcp) &
+	wait
+	export DISPLAY=:0
+fi

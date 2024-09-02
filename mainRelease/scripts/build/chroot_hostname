@@ -1,0 +1,97 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /bin/hostname"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Create hostname file
+		Echo_message "Configuring file /etc/hostname"
+
+		echo "localhost.localdomain" > chroot/etc/hostname
+
+		# Create custom hostname
+		Echo_message "Configuring file /bin/hostname"
+
+		Chroot chroot dpkg-divert --rename --quiet --add /bin/hostname
+
+cat > chroot/bin/hostname << EOF
+#!/bin/sh
+
+echo "localhost.localdomain"
+EOF
+
+		chmod 755 chroot/bin/hostname
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /etc/hostname"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Copying hostname from includes, if existing
+		INCLUDE_DIR=$(select_includes_chroot)
+		# includes.chroot_before_packages takes the highest precedence
+		if [ -e config/includes.chroot_before_packages/etc/hostname ]
+		then
+			INCLUDE_DIR="includes.chroot_before_packages"
+		fi
+		if [ -n "${INCLUDE_DIR}" ] && [ -e config/"${INCLUDE_DIR}"/etc/hostname ]
+		then
+			cp config/"${INCLUDE_DIR}"/etc/hostname chroot/etc/hostname
+			chmod 644 chroot/etc/hostname
+			Chroot chroot "chown root:root /etc/hostname"
+		fi
+
+		Echo_message "Deconfiguring file /bin/hostname"
+
+		# Remove custom hostname
+		rm -f chroot/bin/hostname
+		Chroot chroot dpkg-divert --rename --quiet --remove /bin/hostname
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

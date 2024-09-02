@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+# Expect script to boot from a CD on a proloant.
+use strict;
+use Expect;
+
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot connect: $!\n";
+
+# This means that it's gotten to the boot menu.
+$exp->expect(360, "F12");
+
+# This means that the CD has, presumably, now booted and the logo is
+# showing.
+$exp->expect(360, "The Server is in Graphics Mode");
+
+sleep 1;
+
+# Send a F1, which will get it out of graphics mode.
+$exp->send("OP");
+
+sleep 2;
+
+if (length $ENV{BOOTCOMMAND}) {
+	$exp->send("$ENV{BOOTCOMMAND}\r");
+}
+
+$exp->soft_close();
+
+sleep 2;
+
+exit;

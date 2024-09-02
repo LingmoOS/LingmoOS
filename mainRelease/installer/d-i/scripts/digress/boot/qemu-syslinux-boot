@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+# Handles booting from qemu's console.
+use warnings;
+use strict;
+use Expect;
+use POSIX 'setsid';
+
+# This list is derived from monitor.c in qemu's source.
+my %keys = (
+	"=" => "equal",
+	"-" => "minus",
+	" " => "spc",
+	"/" => "kp_divide",
+	"." => "kp_decimal",
+	"+" => "kp_add",
+	"*" => "kp_multiply",
+	"\n" => "ret",
+	"\t" => "tab",
+);
+$keys{$_}=$_ foreach ('a'..'z', 0..9);
+$keys{$_}="shift-".lc($_) foreach ('A'..'Z');
+
+# This check is here because startqemu-cdrom runs after this program has
+# daemonised, and so test-harness won't see its nonzero exit if the iso is
+# missing.
+if (exists $ENV{ISO} && ! -e $ENV{ISO}) {
+	die "ISO $ENV{ISO} not found\n";
+}
+
+print "boot: $ENV{BOOTCOMMAND}\n";
+
+# Run in the background, because qemu won't begin accepting console input
+# until the connection is made to its serial port, by console-qemu.
+open STDIN, '/dev/null';
+defined(my $pid = fork) or die "Can'fork: $!";
+if ($pid) {
+	sleep 2;
+	exit;
+}
+setsid;
+
+my $exp = new Expect;
+#$exp->debug(2);
+$exp->raw_pty(1);
+$SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
+$SIG{CHLD}=sub { die "SIGCHLD; exiting\n" };
+$exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
+
+open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
+print OUT "$$\n";
+close OUT;
+$SIG{USR1}=sub {
+	if (! exists $ENV{QEMU_SAVE_STATE} || $ENV{QEMU_SAVE_STATE} ne 0) {
+		print STDERR "saving qemu state on SIGUSR1\n";
+		$exp->send("savevm 1\n");
+		$exp->expect(60, "(qemu)");
+	}
+	$exp->send("quit\n");
+	$exp->expect(undef, "eof");
+	exit;
+};
+
+$exp->expect(60, "(qemu)");
+sleep 10;
+$exp->send("sendkey num_lock\n"); # needed for the kp_ keys
+$exp->expect(60, "(qemu)");
+# tab is used to get to the menu entry editor when using vesamenu
+foreach my $letter ("\t", split('', $ENV{BOOTCOMMAND}), "\n") {
+	select(undef, undef, undef, 0.33);
+	if (! exists $keys{$letter}) {
+		die "Don't know how to send letter \"$letter\" from BOOTCOMMAND to qemu console";
+	}
+	$exp->send("sendkey $keys{$letter}\n");
+	$exp->expect(60, "(qemu)");
+}
+
+$exp->expect(undef, "eof");

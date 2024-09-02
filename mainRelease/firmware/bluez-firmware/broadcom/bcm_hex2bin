@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+#
+# This is a tool to convert three banked intel hex format files 
+# into a single intel hex format file. The common portion of the
+# code will be removed.
+#
+
+@Bank0;
+
+$BANK_LIMIT = "8000";
+
+$bcm2039 = "BCM2039";
+
+#@type;
+$count;
+
+$outFile="";
+$filename="";
+
+if(( @ARGV == 0 ) || ( @ARGV == 1 ))
+{
+    print "Usage: IHex2Bin.pl inputFile.hex outputFile.bin\n";
+
+}
+else
+{
+
+   $count=114688;
+
+   @Image[$count];
+
+    for( $i = 0 ; $i < $count; $i += 1 )
+    {
+        $Image[$i] = 0xff;
+    }
+
+    ParseOneFile( \@Bank0, shift ARGV );
+    
+    $outfile = shift ARGV;
+
+    open (hdl, ">", $outfile ) || die "Can't open $outfile\n"; 
+    binmode hdl, ':raw';
+
+    foreach $item (@Bank0)
+    {
+        $baseAddr = hex $item->{"addr"};
+
+        if($item->{"type"} == 2)
+        {   
+            $baseAddr += 0x8000;
+        }
+
+        if($item->{"type"} == 3)
+        {   
+            $baseAddr += 0x10000;
+        }
+
+        $str = $item->{"data"} ;
+        for($i = 0; $i < length($str ) ; $i +=2 )
+        {
+            # cut the whole ascii string into two
+            # characters each and convert them into 
+            # hex number.
+            $tmp = hex( substr( $str , $i, 2 ) );
+
+            # figure out the offset
+
+            $Image[$baseAddr ] = $tmp;
+
+            #increase the base address by one for next 
+            # byte
+            $baseAddr += 1;
+        }
+    }
+
+    for( $i = 0 ; $i < $count; $i += 1 )
+    {
+       $val = sprintf("%02X", $Image[$i]); 
+       $len = length($val);
+       $value = pack("H$len", $val);
+       print hdl $value;
+    }
+
+    close hdl;
+}
+
+exit 0;
+
+
+
+sub ParseOneFile()
+{
+    local ( $image ) = shift @_;
+    $filename        = shift @_;
+    local ($line);
+
+
+    open( file, $filename ) || die "Can't open $filename\n";
+
+    binmode($filename);
+
+    while( $line = <file> )
+    {
+        $record = {};
+
+        $line =~ /:(\w\w)(\w{4})(\w\w)(.*)(\w\w)/;
+
+        $record->{"len"} = $1;
+        $record->{"addr"} = $2;
+        $record->{"type"} = $3;
+        $record->{"data"} = $4;
+        $record->{"checksum"} = $5;
+
+        push @$image, $record;
+    }
+
+    close(file);
+
+
+}

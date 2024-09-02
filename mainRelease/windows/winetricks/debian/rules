@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+# Required for DEB_VERSION_UPSTREAM
+include  /usr/share/dpkg/pkg-info.mk
+
+CHANGELOG := debian/upstream/changelog
+
+# Run manually when package is updated (upstream git tag must be available)
+# and new upstream version is in d/changelog
+get-changelog:
+	git log --pretty=short $(DEB_VERSION_UPSTREAM) > $(CHANGELOG)
+
+override_dh_auto_test:
+	# Skip. These are internal tests.
+
+override_dh_installchangelogs:
+	dh_installchangelogs $(CHANGELOG)
+
+%:
+	dh $@
+
+# End of file

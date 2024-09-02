@@ -1,0 +1,277 @@
+#!/usr/bin/perl
+# This program downloads summary log files for the daily image builds, and
+# constructs a web page overview of the d-i builds. If you run a daily
+# build, add the info for your build to the list. 
+#
+# The url field points to the url your build can be downloaded from, the
+# email address is a contact address, the description is a brief
+# description of the build. The logurl points to wherever log files are.
+# The logext is an extension that is appended to the log filename.
+#
+# In the log directory you should have a summary$logext file, that contains
+# lines in the following format:
+#    arch (date) user@host ident status
+#    
+# Where ident describes what is being built, arch is the architecture that
+# it is being built for, date is the output of the date command at the end
+# of the build (in the C locale), user@host is who did the build, and
+# status describes how it went (usually "success" or "failed"). A log file
+# for the build should in in the file named ident$logext in the log directory.
+#
+# Example:
+# i386 (Thu Apr 22 21:08:03 EDT 2004) joey@kite build_floppy_boot success
+# i386 (Thu Apr 22 21:08:33 EDT 2004) joey@kite build_floppy_speakup success
+# i386 (Thu Apr 22 21:09:29 EDT 2004) joey@kite build_floppy_root success
+
+# Note: only add items to the end of the list, do not reorder items or it
+# will mess up the stats file used for the graph.
+
+# Note that any changes to the following list should also be reflected in
+# debian-cd and on the Debian website
+# (/english/devel/debian-installer/images.data).
+
+# Note that the i386 and amd64 netboot images are used by win32-loader to
+# permit install from daily builds. Any changes to those two arches should be
+# reflected in the d-i/trunk/win32-loader/main.nsi file (search for
+# "; Daily images URL" )
+
+use lib '.';
+
+my @buildlist = (
+#	{
+#		url => 'http://d-i.debian.org/daily-images/amd64/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/amd64/daily/',
+#		email => 'amd64@buildd.debian.org',
+#		description => 'daily amd64 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+#	{
+#		url => 'http://d-i.debian.org/daily-images/armel/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/armel/daily/',
+#		email => 'armel@buildd.debian.org',
+#		description => 'daily armel images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+#	{
+#		url => 'http://d-i.debian.org/daily-images/armhf/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/armhf/daily/',
+#		email => 'armhf@buildd.debian.org',
+#		description => 'daily armhf images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+# hppa builder powered down May 2011
+#	{
+#		url => 'http://d-i.debian.org/daily-images/hppa/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/hppa/daily/',
+#		email => 'hppa@buildd.debian.org',
+#		description => 'daily hppa images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+#	{
+#		url => 'http://d-i.debian.org/daily-images/i386/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/i386/daily/',
+#		email => 'i386@buildd.debian.org',
+#		description => 'daily i386 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+# ia64 removed from the archive in February 2014
+#	{
+#		url => 'http://d-i.debian.org/daily-images/ia64/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/ia64/daily/',
+#		email => 'ia64@buildd.debian.org',
+#		description => 'daily ia64 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+#	{
+#		url => 'http://d-i.debian.org/daily-images/kfreebsd-amd64/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/kfreebsd-amd64/daily/',
+#		email => 'kfreebsd-amd64@buildd.debian.org',
+#		description => 'daily kfreebsd-amd64 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+#	{
+#		url => 'http://d-i.debian.org/daily-images/kfreebsd-i386/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/kfreebsd-i386/daily/',
+#		email => 'kfreebsd-i386@buildd.debian.org',
+#		description => 'daily kfreebsd-i386 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+#	{
+#		url => 'http://d-i.debian.org/daily-images/mips/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/mips/daily/',
+#		email => 'mips@buildd.debian.org',
+#		description => 'daily mips images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+#	{
+#		url => 'http://d-i.debian.org/daily-images/mipsel/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/mipsel/daily/',
+#		email => 'mipsel@buildd.debian.org',
+#		description => 'daily mipsel images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#
+#	{
+#		url => 'http://d-i.debian.org/daily-images/powerpc/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/powerpc/daily/',
+#		email => 'powerpc@buildd.debian.org',
+#		description => 'daily powerpc images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+
+#	{
+#		url => 'http://d-i.debian.org/daily-images/s390x/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/s390x/daily/',
+#		email => 's390x@buildd.debian.org',
+#		description => 'daily s390x images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+
+#	{
+#		url => 'http://d-i.debian.org/daily-images/sparc/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/sparc/daily/',
+#		email => 'buildd@zee.debian.org',
+#		description => 'daily sparc images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+	{
+		url => 'http://cdimage.debian.org/cdimage/',
+		logurl => 'http://cdbuilder.debian.org/cdimage-log/',
+		email => '93sam@debian.org',
+		description => 'CD image builds',
+		logext => "",
+		frequency => 7, # some build only weekly
+		notes => '',
+	},
+	
+#	{
+#		url => 'http://d-i.debian.org/daily-images/hurd-i386/daily/',
+#		logurl => 'http://d-i.debian.org/daily-images/hurd-i386/daily/',
+#		email => 'hurd-i386@buildd.debian.org',
+#		description => 'daily hurd-i386 images build',
+#		logext => ".log",
+#		frequency => 1,
+#		notes => '',
+#	},
+#	
+#	{
+#		url => 'http://somehost/',
+#		logurl => 'http://somehost/',
+#		email => 'you@debian.org',
+#		description => 'put something informative here',
+#		logext => ".log",
+#		frequency => 1,
+#	},
+);
+
+use warnings;
+use strict;
+require "aggregator.pl";
+use Getopt::Long;
+
+my $no_mail = 1;
+GetOptions(
+  'no-mail' => \$no_mail,
+);
+
+my $basename=shift;
+if (! defined $basename) {
+	die "usage: $0 basename\n";
+}
+
+open (OUT, ">$basename.html.new") || die "$basename.html.new: $!";
+open (MAILOUT, ">$basename.mail") || die "$basename.mail: $!";
+
+print OUT <<EOS;
+<html>
+<head>
+<title>debian-installer build overview</title>
+<link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+<link rel="icon"       type="text/png" href="/static/favicon.png" />
+</head>
+<body>
+<ul>
+EOS
+
+print MAILOUT <<EOS;
+Debian installer build overview
+-------------------------------
+
+Failed or old builds:
+
+EOS
+
+my ($total, $failed, $success, $old) = aggregate(*OUT, *MAILOUT, $basename, @buildlist);
+
+my $date=`LANG=C TZ=GMT date`;
+chomp $date;
+print OUT <<"EOS";
+</ul>
+
+Totals: $total builds ($failed failed, $old old)
+
+<hr>
+
+For other images see: <a href="daily-build-overview.html">D-I daily build overview</a>.
+
+<hr>
+
+See also: <a href="http://buildd.debian.org/build.php?arch=&pkg=debian-installer">d-i autobuild logs</a>.
+
+<hr>
+$date
+</body>
+</html>
+EOS
+
+close OUT;
+rename("$basename.html.new", "$basename.html") || die "rename: $!";
+
+print MAILOUT <<EOS;
+
+Totals: $total builds ($failed failed, $old old)
+EOS
+
+close MAILOUT;
+
+if (($failed > 0 or $old > 0) and !$no_mail) {
+	system("mail -a 'X-Daily-Build-Aggregator: $failed failed, $old old' -a 'From: Daily build aggregator <debian-boot\@lists.debian.org>' -s 'Debian installer build: failed or old builds' debian-boot\@lists.debian.org < $basename.mail");
+}
+
+unlink("$basename.mail");

@@ -1,0 +1,196 @@
+#!/bin/sh
+# 
+# A script to find out which .po files has been updated since the last
+# update, according to the PO-Revision flag and the Debian changelog
+# 
+# Copyright (c) 2004 Nikolai Prokoschenko (nikolai@prokoschenko.de)
+#
+# This script is available under the GNU Public License
+# (http://www.gnu.org/licenses/gpl.txt) 
+
+CURDIR=`dirname $0`
+
+if [ "x$1" = "x" ]
+then
+  echo "Usage: $0 <package-directory> [-d]"
+  echo 
+  echo "-d: remove the .credits_log file after the output, please use while releasing"
+  echo
+  exit
+fi
+
+if [ "$1" = "-d" ]
+then 
+    P=$2;
+    DELETE="true";
+else
+    P=$1;
+    if [ "$2" = "-d" ]
+    then
+	DELETE="true";
+    fi
+
+fi
+
+
+PACKAGE=`echo $P | sed 's/\/$//g'` 
+
+if [ ! -d $PACKAGE ]
+then
+  echo "Cannot access the directory $PACKAGE!"
+  exit
+fi
+
+$CURDIR/log-changes $P
+
+if [ "`cat "$PACKAGE/debian/.credits_log"| wc -l`" -gt 0 ]
+then
+	OUTPUT=1
+	echo -n "  [ Updated translations"
+	if [ "$SCAN_TRANS" ]; then
+		echo -n " in $P"
+	fi
+	echo -n " ]"
+fi
+
+PREV=""
+
+while read line 
+do
+    L=`echo $line | cut -d ":" -f 1`
+    T=`echo $line | cut -d ":" -f 2`
+    CSN=`echo $L | sed 's/\.po$//g'`
+    TEMP=`echo $CSN | grep '[_@]'`
+    if [ ! "x$TEMP" = "x" ]
+    then
+	case $CSN in
+	    "pt_BR") R="Portuguese (Brazil)";;
+	    "sr@latin") R="Serbian Latin";;
+	    "zh_CN") R="Simplified Chinese";;
+	    "zh_TW") R="Traditional Chinese";;
+            *) R=$CSN;;
+	esac
+    elif [ -x "/usr/bin/isoquery" ]
+    then
+	# For Uyghur, the preferred way to spell it in English is the second one in ISO-639
+	case $CSN in
+	    "ug") R="Uyghur";;
+            *) 	R=`/usr/bin/isoquery -i 639-2 $CSN | cut -f 4 | cut -f1 -d";"`;;
+	 esac
+    else
+  
+    case $CSN in
+    "am") R="Amharic";;
+    "ar") R="Arabic";;
+    "ast") R="Asturian";;
+    "be") R="Belarusian";;
+    "bg") R="Bulgarian";;
+    "bn") R="Bengali";;
+    "bo") R="Tibetan";;
+    "bs") R="Bosnian";;
+    "ca") R="Catalan";;
+    "cs") R="Czech";;
+    "cy") R="Welsh";;
+    "da") R="Danish";;
+    "de") R="German";;
+    "dz") R="Dzongkha";;
+    "el") R="Greek";;
+    "en") R="English";;
+    "eo") R="Esperanto";;
+    "es") R="Spanish";;
+    "et") R="Estonian";;
+    "eu") R="Basque";;
+    "fa") R="Persian";;
+    "fi") R="Finnish";;
+    "fr") R="French";;
+    "ga") R="Irish";;
+    "gl") R="Galician";;
+    "gu") R="Gujarati";;
+    "he") R="Hebrew";;
+    "hi") R="Hindi";;
+    "hr") R="Croatian";;
+    "hu") R="Hungarian";;
+    "hy") R="Armenian";;
+    "id") R="Indonesian";;
+    "is") R="Icelandic";;
+    "it") R="Italian";;
+    "ja") R="Japanese";;
+    "ka") R="Georgian";;
+    "kab") R="Kabyle";;
+    "kk") R="Kazakh";;
+    "km") R="Khmer";;
+    "kn") R="Kannada";;
+    "ko") R="Korean";;
+    "ku") R="Kurdish";;
+    "lo") R="Lao";;
+    "lt") R="Lithuanian";;
+    "lv") R="Latvian";;
+    "mg") R="Malagasy";;
+    "mk") R="Macedonian";;
+    "ml") R="Malayalam";;
+    "mr") R="Marathi";;
+    "ms") R="Malay";;
+    "nb") R="Norwegian Bokmal";;
+    "ne") R="Nepali";;
+    "nl") R="Dutch";;
+    "nn") R="Norwegian Nynorsk";;
+    "oc") R="Occitan";;
+    "os") R="Ossetian";;
+    "pa") R="Punjabi (Gurmukhi)";;
+    "pl") R="Polish";;
+    "pt") R="Portuguese";;
+    "ro") R="Romanian";;
+    "ru") R="Russian";;
+    "sa") R="Sanskrit";;
+    "se") R="Northern Sami";;
+    "si") R="Sinhala";;
+    "sk") R="Slovak";;
+    "sl") R="Slovenian";;
+    "sq") R="Albanian";;
+    "sr") R="Serbian";;
+    "sv") R="Swedish";;
+    "ta") R="Tamil";;
+    "te") R="Telugu";;
+    "tg") R="Tajik";;
+    "th") R="Thai";;
+    "tl") R="Tagalog";;
+    "tr") R="Turkish";;
+    "ug") R="Uyghur";;
+    "uk") R="Ukrainian";;
+    "ur") R="Urdu";;
+    "vi") R="Vietnamese";;
+    "wo") R="Wolof";;
+    "xh") R="Xhosa";;
+    *) R=$CSN;;
+  esac
+
+  fi
+
+  if [ "$PREV" = "$L" ]
+  then
+	if [ "$T" ]
+	then
+		echo -n ", $T"
+	fi
+  else
+      echo
+      if [ "$T" ]
+      then
+	      echo -n "  * $R ($CSN.po) by $T"
+      else
+	      echo -n "  * $R ($CSN.po)"
+      fi
+  fi
+  PREV=$L
+done < $PACKAGE/debian/.credits_log
+if [ "x$DELETE" != "x" ]
+then
+    rm $PACKAGE/debian/.credits_log
+fi
+if [ -n "$OUTPUT" ]; then
+	echo
+else
+	if [ "$SCAN_TRANS" ]; then
+		exit 10
+	fi
+fi

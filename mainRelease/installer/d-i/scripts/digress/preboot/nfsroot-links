@@ -1,0 +1,14 @@
+#!/bin/sh
+# Use this as a PREBOOT command if you're switching between one of several
+# nfs root directories. This sets a symlink NFSROOT_LINK that points
+# to the nfs root to use, as set in NFSROOT_DIR.
+set -e
+
+# The cobalt nfsroot.tar.gz contains a nfsroot/ subdirectory, make things work
+# with it.
+if [ "$ARCH" = mipsel ] && [ -e "$NFSROOT_DIR/nfsroot" ] ; then
+	NFSROOT_DIR=$NFSROOT_DIR/nfsroot
+fi
+
+rm -f $NFSROOT_LINK
+ln -sf $NFSROOT_DIR $NFSROOT_LINK

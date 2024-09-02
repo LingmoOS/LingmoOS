@@ -1,0 +1,119 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build iso source image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_SOURCE}" != "true" ]
+then
+	exit 0
+fi
+
+case "${LINGMO_SYS_BUILD_SOURCE_IMAGES}" in
+	iso*)
+		;;
+
+	*)
+		exit 0
+		;;
+esac
+
+Echo_message "Begin building source iso image..."
+
+# Requiring stage file
+Require_stagefiles config source_debian
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /usr/bin/xorriso xorriso
+
+# Installing depends
+Install_packages
+
+# Remove old iso image
+if [ -f ${LINGMO_SYS_BUILD_IMAGE_NAME}-source.iso ]
+then
+	rm -f ${LINGMO_SYS_BUILD_IMAGE_NAME}-source.iso
+fi
+
+# Handle xorriso generic options
+XORRISO_OPTIONS="-as mkisofs -r -J -joliet-long -l -cache-inodes"
+
+# Handle xorriso lingmo-system-build specific options
+if [ "${_QUIET}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -quiet"
+fi
+
+if [ "${_VERBOSE}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -v"
+fi
+
+if [ -n "${LINGMO_SYS_BUILD_ISO_APPLICATION}" ] && [ "${LINGMO_SYS_BUILD_ISO_APPLICATION}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -A \"${LINGMO_SYS_BUILD_ISO_APPLICATION}\""
+fi
+
+if [ -n "${LINGMO_SYS_BUILD_ISO_PREPARER}" ] && [ "${LINGMO_SYS_BUILD_ISO_PREPARER}" != "none" ]
+then
+	LINGMO_SYS_BUILD_ISO_PREPARER="$(echo "${LINGMO_SYS_BUILD_ISO_PREPARER}" | sed "s|@LINGMO_SYS_BUILD_VERSION@|${VERSION}|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -p \"${LINGMO_SYS_BUILD_ISO_PREPARER}\""
+fi
+
+if [ -n "${LINGMO_SYS_BUILD_ISO_PUBLISHER}" ] && [ "${LINGMO_SYS_BUILD_ISO_PUBLISHER}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -publisher \"${LINGMO_SYS_BUILD_ISO_PUBLISHER}\""
+fi
+
+if [ -n "${LINGMO_SYS_BUILD_ISO_VOLUME}" ] && [ "${LINGMO_SYS_BUILD_ISO_VOLUME}" != "none" ]
+then
+	LINGMO_SYS_BUILD_ISO_VOLUME="$(echo "${LINGMO_SYS_BUILD_ISO_VOLUME}" | sed "s|@ISOVOLUME_TS@|$(date $DATE_UTC_OPTION -d@${SOURCE_DATE_EPOCH} +%Y%m%d-%H:%M)|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -V \"${LINGMO_SYS_BUILD_ISO_VOLUME}\""
+fi
+
+# Set an explicit modification date
+XORRISO_OPTIONS="${XORRISO_OPTIONS} --modification-date=$(date --utc -d@${SOURCE_DATE_EPOCH} +%Y%m%d%H%M%S00)"
+
+# Moving image
+mv source chroot
+
+cat > chroot/source.sh << EOF
+#!/bin/sh
+xorriso ${XORRISO_OPTIONS} -o source.iso source
+EOF
+
+Chroot chroot "sh source.sh"
+
+# Move image
+mv chroot/source ./
+mv chroot/source.iso ${LINGMO_SYS_BUILD_IMAGE_NAME}-source.iso
+rm -f chroot/source.sh
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

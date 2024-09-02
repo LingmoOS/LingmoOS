@@ -1,0 +1,66 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Customize the Debian system"
+USAGE="${PROGRAM} [--force]"
+
+# Automatically populating config tree
+Auto_build_config
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Setting up cleanup function
+Setup_clean_exit
+
+# Restoring cached live OS chroot from cache
+lingmo-sys-build chroot_cache restore "${@}"
+
+# Configuring chroot
+lingmo-sys-build chroot_prep install all mode-archives-chroot "${@}"
+
+# Customizing chroot
+lingmo-sys-build chroot_linux-image "${@}"
+lingmo-sys-build chroot_firmware "${@}"
+lingmo-sys-build chroot_preseed "${@}"
+lingmo-sys-build chroot_includes_before_packages "${@}"
+
+for _PASS in install live; do
+	lingmo-sys-build chroot_package-lists ${_PASS} "${@}"
+	lingmo-sys-build chroot_install-packages ${_PASS} "${@}"
+
+	if [ "${_PASS}" = install ]; then
+		Chroot chroot "dpkg-query -W" > chroot.packages.install
+	fi
+done
+
+lingmo-sys-build chroot_includes_after_packages "${@}"
+lingmo-sys-build chroot_hooks "${@}"
+lingmo-sys-build chroot_hacks "${@}"
+lingmo-sys-build chroot_interactive "${@}"
+
+Chroot chroot "dpkg-query -W" > chroot.packages.live
+
+# Deconfiguring chroot
+lingmo-sys-build chroot_prep remove all mode-archives-chroot "${@}"
+
+# Saving live OS chroot to cache
+lingmo-sys-build chroot_cache save "${@}"
+
+Chroot chroot "ls -lR" > chroot.files
+
+Echo_message "Chroot stage completed"
