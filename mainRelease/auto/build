@@ -8,9 +8,9 @@ lingmo-sys-build build noauto "${@}" 2>&1 | tee build.log
 
 # live-image-amd64.hybrid.iso 
 
-if [ -f "live-image-amd64.hybrid.iso" ];then
+if [ -f "LingmoOS-amd64.hybrid.iso" ];then
    # *.sum
-    mv live-image-amd64.hybrid.iso $NAME-$BASE_VERSION-$CODE_NAME-$DATE-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH$DISK
+    mv LingmoOS-amd64.hybrid.iso $NAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH$DISK
     md5sum ./*$DISK >> md5sum.README
     md5sum ./*$DISK >> md5sum.txt
     sha1sum ./*$DISK >> sha1sum.README
@@ -21,8 +21,12 @@ if [ -f "live-image-amd64.hybrid.iso" ];then
     sha384sum ./*$DISK >> sha384sum.txt
     sha512sum ./*$DISK >> sha512sum.README
     sha512sum ./*$DISK >> sha512sum.txt
+    mv LingmoOS-amd64.hybrid.iso.zsync >> $NAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH.zsync
+    mv LingmoOS-amd64.contents >> $NAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH.contents
     mkdir -p $OUT
     mv ./*$DISK $OUT 2>/dev/null || :
+    mv ./*.zsync $OUT 2>/dev/null || :
+    mv ./*.{files,packages,contents} $OUT 2>/dev/null || :
     mv ./*.README $OUT 2>/dev/null || :
     mv ./*.txt $OUT 2>/dev/null || :
     # mv ./*tar* $OUT 2>/dev/null || :
