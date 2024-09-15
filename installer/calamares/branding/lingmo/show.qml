@@ -33,20 +33,19 @@ Presentation
     Slide {
         Image {
             id: background1
-            source: "wallpaper.png"
-            width: 600; height: 338
+            source: "Installer.jpg"
+            // width: 600; height: 338
             fillMode: Image.PreserveAspectFit
             anchors.centerIn: parent
         }
-        Text {
-            anchors.horizontalCenter: background1.horizontalCenter
-            anchors.top: background1.bottom
-            text: qsTr("Welcome to Lingmo OS.<br/>"+
-                  "The rest of the installation is automated and should complete in a few minutes.")
-            wrapMode: Text.WordWrap
-            width: 600
-            horizontalAlignment: Text.Center
-        }
+        // Text {
+        //    anchors.horizontalCenter: background1.horizontalCenter
+        //    anchors.top: background1.bottom
+        //    text: qsTr("")
+        //    wrapMode: Text.WordWrap
+        //    width: 600
+        //    horizontalAlignment: Text.Center
+        //}
     }
 
 }

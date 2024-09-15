@@ -50,7 +50,7 @@ jobs:
 
       - name: Config Base Settings
         run: |
-            mkdir build-sys/ && mv auto/ build-sys/ && mv config/ build-sys/ && mv lingmo-config/ build-sys/ && cd build-sys/ && sudo chmod +x auto/*&& sudo lingmo-sys-build clean && sudo lingmo-sys-build config
+            mkdir build-sys/ && mv auto/ build-sys/ && mv config/ build-sys/ && mv lingmo-config/ build-sys/ && cd build-sys/ && sudo chmod +x auto/*&& sudo lingmo-sys-build clean && cp -v ../source config && sudo lingmo-sys-build config
 
       - name: Build System
         run: |
@@ -60,7 +60,7 @@ jobs:
         run: |
             mkdir artifact/
             # find build-sys -type f -name "*.iso" -exec mv {} artifact/ \;
-            sudo mv build-sys/out/* artifact/
+            sudo mv build-sys/output/iso/* artifact/
 
       - name: Artifact
         uses: actions/upload-artifact@v4
