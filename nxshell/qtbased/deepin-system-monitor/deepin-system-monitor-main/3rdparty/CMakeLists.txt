@@ -1,0 +1,121 @@
+cmake_minimum_required(VERSION 3.20)
+project(untitled C)
+message(${PROJECT_SOURCE_DIR})
+
+include_directories(${PROJECT_SOURCE_DIR}/libsmartcols/src)
+include_directories(${PROJECT_SOURCE_DIR}/include)
+set(MARTCOLS
+        libsmartcols/src/calculate.c
+        libsmartcols/src/cell.c
+        libsmartcols/src/column.c
+        libsmartcols/src/grouping.c
+        libsmartcols/src/init.c
+        libsmartcols/src/iter.c
+        libsmartcols/src/libsmartcols.h
+        libsmartcols/src/line.c
+        libsmartcols/src/print-api.c
+        libsmartcols/src/print.c
+        libsmartcols/src/smartcolsP.h
+        libsmartcols/src/symbols.c
+        libsmartcols/src/table.c
+        libsmartcols/src/version.c
+        libsmartcols/src/walk.c
+        )
+set(
+        CFILE
+        lscpu.h
+        lscpu-arm.c
+        lscpu-cpu.c
+        lscpu-cputype.c
+        lscpu-dmi.c
+        lscpu-topology.c
+        lscpu-virt.c
+        cpuset.c
+        path.c
+        strutils.c
+        buffer.c
+        mbsalign.c
+        color-names.c
+        jsonwrt.c
+        ttyutils.c
+        c_strtod.c
+        fileutils.c
+)
+set(HEADER
+        include/all-io.h
+        include/encode.h
+        include/minix.h
+        include/pty-session.h
+        include/bitops.h
+        include/env.h
+        include/monotonic.h
+        include/pwdutils.h
+        include/blkdev.h
+        include/exec_shell.h
+        include/namespace.h
+        include/randutils.h
+        include/buffer.h
+        include/exitcodes.h
+        include/nls.h
+        include/rpmatch.h
+        include/canonicalize.h
+        include/fileutils.h
+        include/optutils.h
+        include/selinux-utils.h
+        include/caputils.h
+        include/fuzz.h
+        include/pager.h
+        include/sha1.h
+        include/carefulputc.h
+        include/idcache.h
+        include/partx.h
+        include/signames.h
+        include/cctype.h
+        include/ismounted.h
+        include/path.h
+        include/statfs_magic.h
+        include/c.h
+        include/iso9660.h
+        include/pathnames.h
+        include/strutils.h
+        include/closestream.h
+        include/jsonwrt.h
+        include/pidfd-utils.h
+        include/strv.h
+        include/color-names.h
+        include/linux_version.h
+        include/plymouth-ctrl.h
+        include/swapheader.h
+        include/colors.h
+        include/list.h
+        include/procutils.h
+        include/swapprober.h
+        include/cpuset.h
+        include/loopdev.h
+        include/pt-bsd.h
+        include/sysfs.h
+        include/crc32c.h
+        include/mangle.h
+        include/pt-gpt-partnames.h
+        include/timer.h
+        include/crc32.h
+        include/match.h
+        include/pt-mbr.h
+        include/timeutils.h
+        include/c_strtod.h
+        include/mbsalign.h
+        include/pt-mbr-partnames.h
+        include/ttyutils.h
+        include/debug.h
+        include/mbsedit.h
+        include/pt-sgi.h
+        include/widechar.h
+        include/debugobj.h
+        include/md5.h
+        include/pt-sun.h
+        include/xalloc.h
+        )
+
+set(CMAKE_C_STANDARD 99)
+
+add_executable(untitled lscpu.c ${MARTCOLS} ${HEADER} ${CFILE})

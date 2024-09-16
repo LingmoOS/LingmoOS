@@ -1,0 +1,112 @@
+<node>
+  <interface name="com.deepin.defender.risantiav">
+    <method name="StartApp">
+    </method>
+    <method name="ExitApp">
+    </method>
+    <!-- 设置扫描文件大小 M -->
+    <method name="SetScanFileSize">
+        <arg name="nSize" type="i" direction="in"></arg>
+    </method>
+    <!-- 获得当前病毒版本 -->
+    <method name="GetRisingLocalVersion"></method>
+    <!-- 获得服务病毒版本 -->
+    <method name="GetRisingSrvVersion"></method>
+    <!-- 更新病毒库 -->
+    <method name="UpdateVersion"></method>
+    <!-- 设置当前的扫描状态  -->
+    <method name="SetScanStatus">
+        <arg name="status" type="i" direction="in"></arg>
+    </method>
+    <!-- 获得当前的扫描状态 -->
+    <method name="GetScanStatus">
+        <arg name="status" type="i" direction="out"></arg>
+    </method>
+    <!-- 扫描 -->
+    <method name="DoDissection">
+         <arg name="bAllDissection" type="b" direction="in"></arg>
+         <arg name="sDissectionPath" type="s" direction="in"></arg>
+   </method>
+   <!-- 修复问题文件 -->
+   <method name="RepairProblemFile">
+       <arg name="sPath" type="s" direction="in"></arg>
+   </method>
+   <!-- 信任问题文件 -->
+   <method name="TrustProblemFile">
+       <arg name="bFlag" type="b" direction="in"></arg>
+       <arg name="sPath" type="s" direction="in"></arg>
+   </method>
+   <!-- 隔离问题文件 -->
+   <method name="IsolationProblemFile">
+      <arg name="bFlag" type="b" direction="in"></arg>
+      <arg name="sPath" type="s" direction="in"></arg>
+   </method>
+   <!-- 查询信任文件 -->
+   <method name="QueryTrustFiles"></method>
+   <!-- 查询隔离文件 -->
+   <method name="QueryIsolationFiles"></method>
+   <!-- 查询信任区域的数量 -->
+   <method name="SelectTrustAreaSize"></method>
+   <!-- 查询隔离区域的数量 -->
+   <method name="SelectIsolationAreaSize"></method>
+   <!-- 设置病毒库地址 -->
+   <method name="SetVriusUpdateAddress">
+      <arg name="address" type="s" direction="in"></arg>
+   </method>
+
+    <!--- 发送本地病毒版本　-->
+    <signal name="SendLocalVersion">
+      <arg type="s" name="version"/>
+    </signal>
+    <!--- 发送服务病毒版本　-->
+    <signal name="SendSrvVersion">
+      <arg type="s" name="version"/>
+    </signal>
+    <!--- 发送病毒库更新结果　-->
+    <signal name="SendUpdateVersionResult">
+      <arg type="b" name="result"/>
+    </signal>
+    <!--- 发送扫描信号结束信号　-->
+    <signal name="DissectionFinished">
+    </signal>
+    <!--- 扫描回调函数对外信号　-->
+    <signal name="SendDissectionProgInfo">
+      <arg type="s" name="path"/>
+      <arg type="d" name="progress"/>
+      <arg type="i" name="type"/>
+      <arg type="s" name="sDetailInfo"/>
+    </signal>
+    <!--- 设置扫描状态完成　-->
+    <signal name="SetScanStatusFinished">
+      <arg type="i" name="status"/>
+    </signal>
+    <!--- 发送操作信任文件　-->
+    <signal name="SendOperationRepairFileResult">
+      <arg type="s" name="file"/>
+    </signal>
+    <!--- 发送操作信任文件　-->
+    <signal name="SendOperationTrustFileResult">
+      <arg type="s" name="file"/>
+    </signal>
+    <!--- 发送操作隔离文件　-->
+    <signal name="SendOperationIsolationFileResult">
+      <arg type="s" name="file"/>
+    </signal>
+    <!--- 发送查询信任文件　-->
+    <signal name="SendQueryTrustFiles">
+      <arg type="s" name="files"/>
+    </signal>
+    <!--- 发送查询隔离文件　-->
+    <signal name="SendQueryIsolationFiles">
+      <arg type="s" name="files"/>
+    </signal>
+    <!--- 发送查询信任区大小　-->
+    <signal name="SendTrustAreaSize">
+      <arg type="i" name="size"/>
+    </signal>
+    <!--- 发送查询隔离区大小　-->
+    <signal name="SendIsolationAreaSize">
+      <arg type="i" name="size"/>
+    </signal>
+  </interface>
+</node>

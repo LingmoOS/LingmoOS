@@ -1,0 +1,31 @@
+install(FILES deepin-kwin.upd
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.16-auto-bordersize.sh
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.18-move-animspeed.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.21-desktop-grid-click-behavior.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.21-no-swap-encourage.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.23-disable-translucency-effect.sh
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.23-remove-flip-switch.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.23-remove-cover-switch.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.23-remove-cubeslide.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.23-remove-xrender-backend.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.27-replace-cascaded-zerocornered.sh
+         DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+
+install(FILES deepin-kwinrules.upd
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwinrules-5.19-placement.pl
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwinrules-5.23-virtual-desktop-ids.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})
+install(PROGRAMS deepin-kwin-5.25-effect-pluginid-config-group.py
+        DESTINATION ${KDE_INSTALL_KCONFUPDATEDIR})

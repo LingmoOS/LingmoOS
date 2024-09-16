@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.0)
+
+project(dfmplugin_encrypt_manager)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt5 COMPONENTS Core REQUIRED)
+
+file(GLOB_RECURSE SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.json)
+
+add_library(${PROJECT_NAME} SHARED
+    ${SRC})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${DFM_BUILD_PLUGIN_DIR})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    Qt5::Core)
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${DFM_PLUGIN_FILEMANAGER_EDGE_DIR})

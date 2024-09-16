@@ -1,0 +1,65 @@
+#!/bin/bash
+
+export APTFILEPATH="/etc/apt/sources.list.d/driver.list"
+#kill UI process
+killall dde-printer
+
+#restart deamon process
+killall -USR1 dde-printer-helper
+
+REPO=$(cat /etc/os-version | awk -F '=' '{                                                  \
+if ( $1 == "ProductType" ) {                                                                \
+   ProductType=$2;                                                                          \
+}                                                                                           \
+else if ( $1 == "EditionName" ) {                                                           \
+   EditionName=$2;                                                                          \
+}
+else if ( $1 == "MajorVersion" ) {                                                           \
+   MajorVersion=$2;                                                                          \
+}}                                                                                          \
+END {                                                                                       \
+if ( ProductType == "Desktop" && EditionName == "Community") {                              \
+    if ( MajorVersion == "20" ) {                                                            \
+      print "deb https://community-packages.deepin.com/driver/ driver non-free";           \
+    } else if ( MajorVersion == "23" ) {                                                    \
+      print "deb https://community-packages.deepin.com/driver-23/ driver non-free";            \
+    }   
+} else if ( ProductType == "Desktop" && EditionName == "Professional" ) {                   \
+    print "deb https://pro-driver-packages.uniontech.com eagle non-free";                    \
+} else if ( ProductType == "Desktop" && EditionName == "Home" ) {                           \
+    print "deb https://pro-driver-packages.uniontech.com eagle non-free";                    \
+} else if ( ProductType == "Server" && (EditionName == "Enterprise" || EditionName == "d") ) {                      \
+    print "deb https://pro-driver-packages.uniontech.com eagle non-free";                    \
+} else {                                                                                     \
+    print "deb https://pro-driver-packages.uniontech.com eagle non-free";                    \
+}}')
+
+
+if [ -n "${REPO}" ]; then
+    mkdir -p /etc/apt/sources.list.d/
+    echo "# Written by dde-printer" > $APTFILEPATH
+    echo "${REPO}" >> $APTFILEPATH
+fi
+
+# add wins
+export CONFIGFILENAME=/etc/nsswitch.conf
+
+if [ ! -f $CONFIGFILENAME ]; then
+  exit 0;
+fi
+
+export HOSTSSUPPORTTYPE=`grep "^hosts" $CONFIGFILENAME | awk -F ':' '{print $2}'`
+insertstr=wins
+
+inserthosts()
+{
+   sed -i '/^hosts/{s/$/'" ${insertstr} "'/}' $CONFIGFILENAME
+}
+
+if [[ $HOSTSSUPPORTTYPE =~ $insertstr ]];then
+  exit 0;
+else
+  inserthosts
+fi
+
+exit 0;

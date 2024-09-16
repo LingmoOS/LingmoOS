@@ -1,0 +1,1 @@
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="zh_HK" version="2.1"><context><name>desktop</name><message><location filename="Desktop Entry]Name" line="0"/><source>Deepin Welcome</source><translation>deepin 歡迎</translation></message><message><location filename="Desktop Entry]GenericName" line="0"/><source>Welcome</source><translation>歡迎</translation></message></context></TS>

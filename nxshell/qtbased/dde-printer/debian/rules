@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+include /usr/share/dpkg/pkg-info.mk
+
+export QT_SELECT = qt5
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- DEFINES+="VERSION=$(DEB_VERSION_UPSTREAM)"
+
+override_dh_install:
+	dh_install

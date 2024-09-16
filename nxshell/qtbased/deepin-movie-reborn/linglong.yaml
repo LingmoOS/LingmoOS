@@ -1,0 +1,64 @@
+package:
+  id: org.deepin.movie
+  name: "deepin-movie"
+  version: 5.9.13
+  kind: app
+  description: |
+    movie player for deepin os
+
+variables: 
+  extra_args: |
+    -DVERSION=${VERSION}
+
+runtime:
+  id: org.deepin.Runtime
+  version: 23.0.0
+
+depends:
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: qtmpris
+    version: 0.1.0.1
+    type: runtime
+  - id: ffmpegthumbnailer
+    version: 2.1.1
+  - id: mpv
+    version: 0.34.1.2 
+  - id: qtdbusextended
+    version: 0.0.3
+    type: runtime
+  - id: ffmpeg
+    version: 4.1.8
+  - id: "gstreamer1.0"
+    version: 1.14.6
+  - id: "gst-plugins-base1.0" 
+    version: 1.14.5
+    type: runtime    
+  - id: libva 
+    version: 2.4.0
+  - id: libdvdnav 
+    version: 6.0.0
+  - id: libdvdread
+    version: 6.0.0
+  - id: orc
+    version: 0.4.28
+  - id: xcb-util
+    version: 0.3.8.1
+    type: runtime
+source:
+  kind: local
+  url: "http://gerrit.uniontech.com/deepin-movie-reborn"
+  version: 5.9.13
+  commit: a41347f6a932f647242e36d5b92f3e30538fb988
+  patch: patches/fix-build-failed.patch
+
+build:
+  kind: manual
+  manual:
+    configure: |
+      mkdir build
+      cd build
+      cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} ${extra_args} ..
+      make -j6
+      make -j install

@@ -1,0 +1,46 @@
+7z a chrome.tar /opt/google/chrome/
+
+测试压缩类型：zip
+
+测试文件包：
+	1）Google Chrome for linux  /opt/google/chrome文件夹
+	
+测试平台：arm
+
+
+准备测试的单文件：tar -cvf chrome.tar /opt/google/chrome
+
+测试软件：
+    1）7z （p7zip）
+	sudo apt-get install p7zip-full
+	
+	文件夹压缩测试：time 7z a chrome_7z.zip /opt/google/chrome
+
+	单文件压缩测试：time 7z a chrome_7z_tar.zip chrome.tar
+	
+	2）归档管理器
+	
+	3）ziptool（libzip）
+	sudo apt-get install ziptool
+	rm chrome_ziptool.zip
+	
+	文件夹压缩测试：time ./ziptool.sh /opt/google/chrome/ chrome_ziptool.zip
+
+	单文件压缩测试：time ziptool chrome_ziptool_tar.zip add_file chrome.tar chrome.tar 0 0
+	
+	4）ziptool (华为优化的libzip）
+	sudo apt-get install ziptool
+	安装华为优化后的libzip库
+	rm chrome_ziptool_huawei.zip
+	
+	文件夹压缩测试：time./ziptool.sh /opt/google/chrome/ chrome_ziptool_huawei.zip
+
+	单文件压缩测试：time ziptool chrome_ziptool_huawei_tar.zip add_file chrome.tar chrome.tar 0 0
+	
+测试结果：
+工具 文件名 文件大小 耗时 压缩率
+
+mimetype Avatar.zip 查看文件mimetype
+file -i Avatar.zip  查看文件类型
+
+7z l -slt 1.tar   7z获取文件列表

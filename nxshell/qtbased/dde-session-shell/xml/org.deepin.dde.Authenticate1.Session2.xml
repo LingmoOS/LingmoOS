@@ -1,0 +1,52 @@
+<interface name="org.deepin.dde.Authenticate1.Session">
+    <property name="IsFuzzyMFA" type="b" access="read"/>
+    <property name="IsMFA" type="b" access="read"/>
+    <property name="FactorsInfo" type="a(iiib)" access="read">
+        <annotation name="org.qtproject.QtDBus.QtTypeName" value="MFAInfoList"/>
+    </property>
+    <property name="Prompt" type="s" access="read"/>
+    <property name="Username" type="s" access="read"/>
+    <property name="PINLen" type="i" access="read"/>
+    <signal name="Status">
+        <arg name="flag" type="i" direction="out"/>
+        <arg name="status" type="i" direction="out"/>
+        <arg name="msg" type="s" direction="out"/>
+    </signal>
+    <method name="End">
+        <arg name="flag" type="i" direction="in"/>
+        <arg name="failNum" type="i" direction="out"/>
+    </method>
+    <method name="GetResult">
+        <arg name="result" type="i" direction="out"/>
+    </method>
+    <method name="Quit"/>
+    <method name="SetQuitFlag">
+        <arg name="flag" type="i" direction="in"/>
+    </method>
+    <method name="SetSymmetricKey">
+        <arg name="key" type="ay" direction="in"/>
+    </method>
+    <method name="SetToken">
+        <arg name="flag" type="i" direction="in"/>
+        <arg name="token" type="ay" direction="in"/>
+    </method>
+    <method name="Start">
+        <arg name="flag" type="i" direction="in"/>
+        <arg name="timeout" type="i" direction="in"/>
+        <arg name="state" type="i" direction="out"/>
+    </method>
+    <method name="EncryptKey">
+        <arg name="encryptType" type="i" direction="in"/>
+        <arg name="encryptMethod" type="ai" direction="in"/>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In1" value="ArrayInt"/>
+        <arg name="encryptType" type="i" direction="out"/>
+        <arg name="encryptMethod" type="ai" direction="out"/>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out1" value="ArrayInt"/>
+        <arg name="publicKey" type="s" direction="out"/>
+    </method>
+    <method name="PrivilegesEnable">
+        <arg name="path" type="s" direction="in"/>
+        <arg name="enabled" type="b" direction="out"/>
+    </method>
+    <method name="PrivilegesDisable"/>
+</interface>

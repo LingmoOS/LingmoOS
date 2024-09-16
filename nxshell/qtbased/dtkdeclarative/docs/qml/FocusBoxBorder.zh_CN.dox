@@ -1,0 +1,52 @@
+
+/**
+@~chinese
+@class FocusBoxBorder
+@ingroup Item
+
+@ingroup QML_TYPES
+@brief 提供一种通用的控件焦点边框.
+@details
+    FocusBoxBorder 控件主要用于绘制控件的焦点边框。当控件支持焦点策略时，使用 Tab 键或者使用鼠标点击，控件周围会环绕
+    高亮色的边框效果。FocusBoxBorder 用于提供该效果。目前 DTK 提供的一些支持焦点的控件都实现了焦点框的绘制。
+    FocusBoxBorder 效果如下图所示：
+@image html FocusBoxBorder.png
+    其使用方式如下代码所示:
+```qml
+    Control {
+        // 实现的自定义控件
+        id: control
+        focusPolicy: Qt.StrongFocus
+
+        contentItem: Text {
+            text: "A custom control."
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        background: Rectangle {
+            implicitWidth: 200
+            implicitHeight: 80
+            radius: 8
+
+            color: "darkGreen"
+
+            FocusBoxBorder {
+                anchors.fill: parent
+                radius: 8
+                color: control.palette.highlight
+                visible: control.visualFocus
+            }
+        }
+    }
+```
+
+@property color FocusBoxBorder::color
+@brief color 属性应用控制焦点边框的颜色。默认情况下，该颜色是 "transparent"。
+
+@property int FocusBoxBorder::borderWidth
+@brief borderWidth 属性表示焦点边框的宽度。默认情况下该值为 2
+
+@property int FocusBoxBorder::radius
+@brief radius 属性用于控制边框的圆角大小。
+
+*/

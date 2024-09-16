@@ -1,0 +1,44 @@
+[Unit]
+Description=deepin grub2 config service
+
+[Service]
+Type=dbus
+User=root
+BusName=org.deepin.dde.Grub2
+ExecStart=/usr/lib/deepin-daemon/grub2
+StandardOutput=null
+StandardError=journal
+
+ProtectSystem=strict
+InaccessiblePaths=/etc/shadow
+InaccessiblePaths=-/etc/NetworkManager/system-connections
+InaccessiblePaths=-/etc/pam.d
+InaccessiblePaths=-/usr/share/uadp/
+# 创建/etc/default/grub.d/11_dde.cfg
+ReadWritePaths=-/etc/default/grub.d
+# 创建/tmp/deepin-gfxmode-detect-ready // TODO分析该文件是否有被其他进程使用，该文件存放需要修改
+ReadWritePaths=-/tmp/
+# /var/cache/deepin/grub2.log
+ReadWritePaths=-/var/cache/deepin
+# /etc/grub.d/42_uos_menu_crypto
+ReadWritePaths=-/etc/grub.d
+ReadWritePaths=-/boot
+
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateMounts=yes
+#PrivateTmp=yes
+# /usr/sbin/grub-probe需要使用
+#PrivateDevices=yes
+PrivateNetwork=yes
+# 需要读取/proc的exe字段数据
+#PrivateUsers=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+# 和golang -pie参数冲突，导致进程无法启动
+#MemoryDenyWriteExecute=yes

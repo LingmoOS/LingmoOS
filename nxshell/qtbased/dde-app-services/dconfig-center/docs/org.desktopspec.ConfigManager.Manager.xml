@@ -1,0 +1,89 @@
+<interface name='org.desktopspec.ConfigManager.Manager'>
+    <property access="read" type="s" name="version"/>
+    <!-- 所有配置项的唯一标识，即key值 -->
+    <property access="read" type="as" name="keyList"/>
+
+    <!-- 获取配置项的值 -->
+    <method name='value'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- 配置项的当前值 -->
+      <arg type='v' name='value' direction='out'/>
+    </method>
+
+    <!-- 判断配置项的值是否是默认值 -->
+    <method name='isDefaultValue'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- `true`表示配置项的值是默认值 -->
+      <arg type='b' name='isDefaultValue' direction='out'/>
+    </method>
+
+    <!-- 设置配置项的值 -->
+    <method name='setValue'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- 配置项值 -->
+      <arg type='v' name='value' direction='in'/>
+    </method>
+
+    <!-- 清除配置项的缓存值 -->
+    <method name='reset'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+    </method>
+
+    <!-- 获取配置项的可显示名称 -->
+    <method name='name'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- 需要获取配置项的语言系统，空为默认，与应配置描述文件相对应 -->
+      <arg type='s' name='language' direction='in'/>
+      <!-- 配置项名称 -->
+      <arg type='s' name='name' direction='out'/>
+    </method>
+
+    <!-- 获取配置项的描述信息 -->
+    <method name='description'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- 需要获取配置项的语言系统，空为默认，与应配置描述文件相对应 -->
+      <arg type='s' name='language' direction='in'/>
+      <!-- 配置项描述信息 -->
+      <arg type='s' name='description' direction='out'/>
+    </method>
+
+    <!-- 获取配置项的可见性，public为共有，private为私有 -->
+    <method name='visibility'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+      <!-- 配置项的可见性 -->
+      <arg type='s' name='visibility' direction='out'/>
+    </method>
+
+    <!-- 获取配置项的权限，readonly为只读，readwrite为可读写 -->
+    <method name='permissions'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+    <!-- 配置项的权限 -->
+      <arg type='s' name='permissions' direction='out'/>
+    </method>
+
+    <!-- 获取配置项的标志，含0x01为不可覆盖，含0x10为系统级配置 -->
+    <method name='flags'>
+      <!-- 配置项的唯一标识 -->
+      <arg type='s' name='key' direction='in'/>
+    <!-- 获取配置项的标志 -->
+      <arg type='i' name='flags' direction='out'/>
+    </method>
+
+    <!--采用引用计数的方式，引用为 0 时才真正的销毁-->
+    <method name='release'>
+    </method>
+
+    <!-- 值发生改变的信号 -->
+    <signal name="valueChanged">
+      <!-- 值改变的配置项的唯一标识 -->
+      <arg name="key" type="s" direction="out"/>'
+    </signal>
+</interface>

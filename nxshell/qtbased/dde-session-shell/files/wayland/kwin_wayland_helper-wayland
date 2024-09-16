@@ -1,0 +1,21 @@
+#!/bin/bash
+
+export KWIN_COMPOSE=O2ES
+export GDK_BACKEND=x11
+export KWIN_USE_BUFFER_AGE=1
+
+if [ ! -f "$HOME/.config/kglobalshortcutsrc" ]; then
+    cp -n /etc/xdg/kglobalshortcutsrc $HOME/.config/kglobalshortcutsrc
+fi
+
+export QT_LOGGING_RULES="kwin*=true;kwin_libinput=false;"
+export QT_WAYLAND_FORCE_DPI=$(expr `gsettings get com.deepin.xsettings xft-dpi` / 1024)
+export QT_MESSAGE_PATTERN="[%{time yyyy-MM-dd hh:mm:ss.zzz}] %{function}:%{line} - %{message}"
+
+if [ -f "$HOME/.config/locale.conf" ]; then
+    source $HOME/.config/locale.conf
+fi
+
+#崩溃后重新登录会冲掉崩溃时候的kwin日志，此处加入一次拷贝，保证可以获取到kwin崩溃时候的那次日志
+cp $HOME/.kwin.log $HOME/.kwin-old.log
+exec /usr/bin/kwin_wayland -platform dde-kwin-wayland --xwayland --drm --no-lockscreen  startdde-wayland 1> $HOME/.kwin.log 2>&1

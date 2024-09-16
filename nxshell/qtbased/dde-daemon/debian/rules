@@ -1,0 +1,56 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+
+export GOCACHE = /tmp/gocache
+export GOPATH = /usr/share/gocode
+export GO111MODULE=off
+
+SYSTYPE=Desktop
+SYSTYPE=$(shell cat /etc/deepin-version | grep Type= | awk -F'=' '{print $$2}')
+
+ifeq ($(SYSTYPE), Desktop)
+override_dh_gencontrol:
+	dh_gencontrol -- -Vdist:Depends="fprintd, libpam-fprintd"
+endif
+
+%:
+	dh $@
+
+ifeq ($(DEB_BUILD_ARCH), sw_64)
+override_dh_strip:
+	true
+override_dh_auto_test:
+	true
+endif
+
+ifeq ($(DEB_BUILD_ARCH), mipsel)
+override_dh_auto_configure:
+	# mate-screenshot -a grab the area screen
+	sed -i 's|"deepin-screenshot"|"mate-screenshot -a"|g' misc/dde-daemon/keybinding/system_actions.json
+	# mate-screenshot grab the full screen
+	sed -i 's|"deepin-screenshot -f"|"mate-screenshot"|g' misc/dde-daemon/keybinding/system_actions.json
+	sed -i 's|deepin-screenshot|mate-screenshot|g' misc/dde-daemon/keybinding/system_actions.json
+
+	dh_auto_configure
+
+override_dh_auto_install:
+	dh_auto_install
+	rm debian/dde-daemon/etc/default/grub.d/10_deepin.cfg
+	rm debian/dde-daemon/etc/grub.d/35_deepin_gfxmode
+endif
+
+ifeq ($(DEB_BUILD_ARCH), mips64el)
+override_dh_auto_install:
+	dh_auto_install
+	rm debian/dde-daemon/etc/default/grub.d/10_deepin.cfg
+	install -d debian/dde-daemon/lib/systemd/system-sleep/
+	install misc/scripts/dde-system-daemon-power-refresh.sh debian/dde-daemon/lib/systemd/system-sleep/
+endif
+
+override_dh_installsystemd:
+	dh_installsystemd --no-start
+
+override_dh_auto_clean:
+	dh_auto_clean --
+	rm -fr obj-x86_64-linux-gnu

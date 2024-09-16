@@ -1,0 +1,307 @@
+/*!
+@~chinese
+@ingroup dglobal
+@file include/global/dsysinfo.h
+
+@class Dtk::Core::DSysInfo
+@brief dsysinfo 是一组用于查询系统信息的静态类
+@details
+## 概述
+
+dsysinfo是一组用于查询系统信息的静态类
+
+项目目录结构如下：
+
+```bash
+├── CMakeLists.txt
+└── main.cpp
+```
+
+## CMakeLists.txt
+
+```cmake
+cmake_minimum_required(VERSION 3.13) # cmake版本要求
+set (VERSION "1.0.0" CACHE STRING "define project version") # 定义项目版本
+set(BIN_NAME test) # 定义项目名称
+project(test) # 定义项目名称
+file(GLOB_RECURSE SRCS "*.h" "*.cpp")  # 定义项目源文件
+find_package(Qt5 REQUIRED COMPONENTS Core) # 寻找Qt5
+find_package(DtkCore REQUIRED) # 寻找DtkCore
+
+add_executable(test
+    main.cpp # 源文件
+)
+
+target_link_libraries(test PRIVATE
+    ${DtkCore_LIBRARIES} # 链接DtkCore
+    Qt5::Core # 链接Qt5
+)
+
+```
+
+## main.cpp
+
+```cpp
+#include <DSysInfo> // 引入DSysInfo
+#include <qdebug.h> // 引入qdebug.h
+DCORE_USE_NAMESPACE // 使用dtkcore命名空间
+
+int main(int argc, char **argv) {
+
+  qDebug() << DSysInfo::deepinType(); // 打印deepin类型
+  qDebug() << DSysInfo::ProductType(); // 打印产品类型
+  return 0;
+}
+```
+
+@enum Dtk::Core::DSysInfo::ProductType
+@brief 产品信息
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Deepin
+@brief 深度操作系统
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::ArchLinux
+@brief ArchLinux
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::CentOS
+@brief CentOS
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Debian
+@brief Debian
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Fedora
+@brief Fedora
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::LinuxMint
+@brief LinuxMint
+@var Dtj::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Manjaro
+@brief Manjaro
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::openSUSE
+@brief openSUSE
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::SailfishOS
+@brief SailfishOS
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Ubuntu
+@brief Ubuntu
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Uos
+@brief UOS
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::Gentoo
+@brief Gentoo
+@var Dtk::Core::DSysInfo::ProductType Dtk::Core::DSysInfo::NixOS
+@brief NixOS
+
+@enum Dtk::Core::DSysInfo::DeepinType
+@brief 深度操作系统版本
+@var Dtk::Core::DSysInfo::DeepinType Dtk::Core::DSysInfo::UnknownDeepin
+@brief 未知版本
+@var Dtk::Core::DSysInfo::DeepinType Dtk::Core::DSysInfo::DeepinDesktop
+@brief 桌面版
+@var Dtk::Core::DSysInfo::DeepinType Dtk::Core::DSysInfo::DeepinProfessional
+@brief deepin专业版, 现为uos专业版
+@var Dtk::Core::DSysInfo::DeepinType Dtk::Core::DSysInfo::DeepinServer
+@brief deepin服务器版本, 现为uos服务器版
+@var Dtk::Core::DSysInfo::DeepinType Dtk::Core::DSysInfo::DeepinPersonal
+@brief deepin个人版, 现为uos家庭版
+
+@enum Dtk::Core::DSysInfo::LogoType
+@brief 系统的logo类型
+@var Dtk::Core::DSysInfo::LogoType Dtk::Core::DSysInfo::Normal
+@brief 正常
+@var Dtk::Core::DSysInfo::LogoType Dtk::Core::DSysInfo::Light
+@brief 亮色
+@var Dtk::Core::DSysInfo::LogoType Dtk::Core::DSysInfo::Symbolic
+@brief 符号
+@var Dtk::Core::DSysInfo::LogoType Dtk::Core::DSysInfo::Transparent
+@brief 水印
+
+@enum Dtk::Core::DSysInfo::OrgType
+@brief 组织类型
+@var Dtk::Core::DSysInfo::OrgType Dtk::Core::DSysInfo::Distribution
+@brief 当前版本
+@var Dtk::Core::DSysInfo::OrgType Dtk::Core::DSysInfo::Distributor
+@brief 当前发行版
+@var Dtk::Core::DSysInfo::OrgType Dtk::Core::DSysInfo::Manufacturer
+@brief 当前发行版或设备的制造商
+
+@enum Dtk::Core::DSysInfo::UosType
+@brief UOS版本类型
+@var Dtk::Core::DSysInfo::UosType Dtk::Core::DSysInfo::UosTypeUnknown
+@brief 未知版本
+@var Dtk::Core::DSysInfo::UosType Dtk::Core::DSysInfo::UosDesktop
+@brief UOS桌面版
+@var Dtk::Core::DSysInfo::UosType Dtk::Core::DSysInfo::UosServer
+@brief UOS服务器版
+@var Dtk::Core::DSysInfo::UosType Dtk::Core::DSysInfo::UosDevice
+@brief UOS设备版
+@var Dtk::Core::DSysInfo::UosType Dtk::Core::DSysInfo::UosTypeCount
+@brief 记录枚举数量
+
+@enum Dtk::Core::DSysInfo::UosEdition
+@brief 详细uos版本
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEditionUnknown
+@brief 未知版本
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosProfessional
+@brief UOS专业版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosHome
+@brief UOS家庭版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosCommunity
+@brief 社区版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosMilitary
+@brief *
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEnterprise
+@brief UOS企业版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEnterpriseC
+@brief UOS行业版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEuler
+@brief UOS服务器欧拉版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosMilitaryS
+@brief *
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosDeviceEdition
+@brief UOS专用设备版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEducation
+@brief UOS教育版
+@var Dtk::Core::DSysInfo::UosEdition Dtk::Core::DSysInfo::UosEditionCount
+@brief 记录枚举数量
+
+@enum Dtk::Core::DSysInfo::UosArch
+@brief UOS使用的架构
+@var Dtk::Core::DSysInfo::UosArch Dtk::Core::DSysInfo::UosArchUnknown
+@brief 未知架构
+@var Dtk::Core::DSysInfo::UosArch Dtk::Core::DSysInfo::UosAMD64
+@brief x86_64
+@var Dtk::Core::DSysInfo::UosArch Dtk::Core::DSysInfo::UosARM64
+@brief arm64
+@var Dtk::Core::DSysInfo::UosArch Dtk::Core::DSysInfo::UosMIPS64
+@brief mips64
+@var Dtk::Core::DSysInfo::UosArch Dtk::Core::DSysInfo::UosSW64
+@brief sw_64
+
+
+@fn static bool Dtk::Core::DSysInfo::isDeepin() //FIXME: 显示错乱 无法修复
+@brief 是否为 deepin 或 uos 系统
+@return 0 不是 deepin 或 uos 系统
+@return 1 是 deepin 或 uos 系统
+
+@fn static bool Dtk::Core::DSysInfo::isDDE()
+@brief 是否使用 dde 桌面环境
+@note 此方法仅在 linux 平台下可用
+
+@fn static DeepinType  Dtk::Core::DSysInfo::deepinType()
+@brief deepin 系统类型
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::deepinTypeDisplayName (const QLocale &locale=QLocale::system())
+@brief 显示的 deepin 发行版类型名称
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString 	Dtk::Core::DSysInfo::deepinVersion()
+@brief deepin 版本
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString 	Dtk::Core::DSysInfo::deepinCopyright()
+@brief deepin 开源许可协议
+@note 此方法仅在 linux 平台下可用
+
+@fn static UosEdition Dtk::Core::DSysInfo::uosEditionType()
+@brief DSysInfo::osEditionType 版本类型 显示版本类型 专业版/个人版/社区版..
+@note 根据 osBuild.B && osBuild.D
+@note 此方法仅在 linux 平台下可用
+
+@fn static UosArch Dtk::Core::DSysInfo::uosArch()
+@brief DSysInfo::osArch 架构信息
+@details(使用一个字节的二进制位, 从低位到高位) 【0x8 sw64】【0x4 mips64】【0x2 arm64】【0x1 amd64】
+@note 此处架构是从 OsBuild 获取的系统版本的 Arch 信息, 并不是指硬件的 Arch 信息
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString 	uosProductTypeName(const QLocale &locale=QLocale::system())
+@brief DSysInfo::osProductTypeName 版本名称
+@details ProductType[xx] 项对应的值, 如果找不到对应语言的默认使用 ProductType 的值(Desktop/Server/Device) locale 当前系统语言
+
+@fn static QString Dtk::Core::DSysInfo::uosSystemName(const QLocale &locale=QLocale::system())
+@brief SystemName[xx] 项对应的值
+@details 如果找不到对应语言的默认使用 SystemName 的值 Uniontech OS locale 当前系统语言
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::function uosEditionName(const QLocale &locale=QLocale::system())
+@brief 版本名称 EditionName[xx] 项对应的值
+@details 如果找不到对应语言的默认使用 EditionName 的值(Professional/Home/Community...) locale 当前系统语言
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::spVersion()
+@brief 阶段版本名称
+@details 小版本号 A-BC-D 中 BC、 A.B.C 中的 B 返回 SP1-SPxx,  如果正式版返回空 X.Y.Z模式下暂不支持返回此版本号
+@note minVersion.BC == 00 正式版本, minVersion.BC | minVersion.B == 01-99 SP1….SP99
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::udpateVersion()
+@brief 更新版本名称 小版本号 A-BC-D 中 D、A.B.C 模式中的 C 返回 update1… update9,  如果正式版返回空 X.Y.Z 模式下暂不支持返回此版本号
+@note minVersion.D == 0;正式版本 minVersion.D | minVersion.C == 1-9;update1… update9, updateA...updateZ
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::majorVersion()
+@brief 主版本号 主版本号 【20】【23】【25】【26】【29】【30】
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::minorVersion()
+@brief 小版本号 【ABCD】 ·[0-9]{4} 【A.B.C】 或者【X.Y.Z】
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::buildVersion()
+@brief 小版本号 系统镜像批次号, 按时间顺序(不可回退)从100-999递增
+@note 此方法仅在 linux 平台下可用
+
+@fn static QString Dtk::Core::DSysInfo::distributionInfoPath ()
+@brief 返回 distribution 文件地址 一般在`/usr/share/deepin/`目录下
+
+@fn static QString Dtk::Core::DSysInfo::distributionInfoSectionName(OrgType type)
+@brief 返回 distribution.info 文件中 SectionName 字段的值
+
+@fn static Dtk::Core::DSysInfo::distributionOrgName(OrgType type=Distribution,  const QLocale &locale=QLocale::system())
+@brief 返回组织名称
+@details 使用类型为Distribution来获取当前deepin distribution本身的名称
+
+@fn static QPair<QString, QString>Dtk::Core::DSysInfo::distributionOrgWebsite(OrgType type=Distribution)
+@brief 发行版组织的网站名称和网址。使用 type 作为 Distribution 获取当前 deepin 发行版本身的名称。
+
+@fn static QString Dtk::Core::DSysInfo::distributionOrgLogo(OrgType orgType=Distribution,  LogoType type=Normal,  const QString &fallback=QString())
+@brief 获得的组织logo路径, 如果不存在, 则返回给定的其他路径
+@details 使用 type 作为 Distribution 获取当前 deepin 发行版本身的logo。
+
+@fn static QString Dtk::Core::DSysInfo::operatingSystemName()
+@brief 操作系统名
+
+@fn static ProductType Dtk::Core::DSysInfo::productType()
+@brief 产品类型
+
+@fn static QString Dtk::Core::DSysInfo::productVersion()
+@brief 产品版本
+
+@fn static bool Dtk::Core::DSysInfo::isCommunityEdition()
+@brief 检查当前版本是否是社区版 开发者可以使用这种方式来检查我们是否需要启用或禁用社区版或企业版的功能。
+@details 目前的规则:
+    专业版、服务器版、个人版(DeepinType)将被视为企业版。<br>
+    Uos(ProductType)将被视为企业版。
+
+@fn static QString Dtk::Core::DSysInfo::computerName()
+@brief 电脑名
+
+@fn static QString Dtk::Core::DSysInfo::cpuModelName()
+@brief cpu模式名
+
+@fn static qint64 Dtk::Core::DSysInfo::memoryInstalledSize()
+@brief 内存安装大小
+
+@fn static qint64 Dtk::Core::DSysInfo::memoryTotalSize()
+@brief 实际内存大小
+
+@fn static qint64 Dtk::Core::DSysInfo::systemDiskSize()
+@brief 系统磁盘大小
+
+@fn static QDateTime Dtk::Core::DSysInfo::bootTime ()
+@brief 系统启动时间点
+
+@fn static QDateTime Dtk::Core::DSysInfo::shutdownTime ()
+@brief 上一次正常关机时间点(重启也会被记录在内)
+
+@fn static qint64 Dtk::Core::DSysInfo::uptime()
+@brief 系统启动到现在时长
+@note 参见`cat /proc/uptime`命令
+
+@fn static Arch Dtk::Core::DSysInfo::arch
+@brief cpu架构信息
+@note 此处架构是从gcc编译器获取的
+
+*/

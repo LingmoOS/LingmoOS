@@ -1,0 +1,47 @@
+#! /bin/bash
+set -e
+
+quiet_boot="0"
+. "$pkgdatadir/grub-mkconfig_lib"
+
+export TEXTDOMAIN=grub
+export TEXTDOMAINDIR="${datarootdir}/locale"
+export BOOT_KIT_PREPARE=
+export LINUX_ROOT_DEVICE=
+
+prepare_root_cache=
+prepare_boot_cache=
+if [ x$dirname = x/ ]; then
+    if [ -z "${prepare_root_cache}" ]; then
+        prepare_root_cache="$(prepare_grub_to_access_device ${GRUB_DEVICE} | grub_add_tab)"
+    fi
+    prepare_root_cache="	${prepare_root_cache}" | sed "s/^/$submenu_indentation/"
+else
+    if [ -z "${prepare_boot_cache}" ]; then
+        prepare_boot_cache="$(prepare_grub_to_access_device ${GRUB_DEVICE_BOOT} | grub_add_tab)"
+    fi
+    prepare_boot_cache="	${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
+fi
+BOOT_KIT_PREPARE=$prepare_root_cache
+if [ x"$prepare_root_cache" = x ]; then
+	BOOT_KIT_PREPARE=$prepare_boot_cache
+fi
+
+if ( [ "x${GRUB_DEVICE_UUID}" = "x" ] && [ "x${GRUB_DEVICE_PARTUUID}" = "x" ] ) \
+    || ( [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
+	&& [ "x${GRUB_DISABLE_LINUX_PARTUUID}" = "xtrue" ] ) \
+    || ( ! test -e "/dev/disk/by-uuid/${GRUB_DEVICE_UUID}" \
+	&& ! test -e "/dev/disk/by-partuuid/${GRUB_DEVICE_PARTUUID}" ) \
+    || ( test -e "${GRUB_DEVICE}" && uses_abstraction "${GRUB_DEVICE}" lvm ); then
+  LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+elif [ "x${GRUB_DEVICE_UUID}" = "x" ] \
+    || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ]; then
+  LINUX_ROOT_DEVICE=PARTUUID=${GRUB_DEVICE_PARTUUID}
+else
+  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
+fi
+
+grub="$(/usr/sbin/deepin-boot-kit --action=mkgrubconfig)"
+echo "${grub}"
+BOOT_KIT_PREPARE=
+LINUX_ROOT_DEVICE=

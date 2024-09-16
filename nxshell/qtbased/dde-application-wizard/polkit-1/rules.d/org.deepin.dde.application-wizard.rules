@@ -1,0 +1,11 @@
+// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.packagekit.package-remove") &&
+        subject.active == true && subject.local == true &&
+        subject.isInGroup("sudo")) {
+            return polkit.Result.YES;
+    }
+});

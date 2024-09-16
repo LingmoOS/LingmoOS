@@ -1,0 +1,160 @@
+# % Options Settings: https://orgmode.org/manual/Export-Settings.html
+#+OPTIONS: timestamp:nil ^:nil <:nil p:t prop:t tags:t tasks:t todo:t
+#+LATEX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [a4paper,12pt]
+#+LATEX_HEADER: \usepackage{booktabs}
+# % to include pdf/eps/png files
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{graphicx}
+# % useful to add 'todo' markers
+#+LaTeX_HEADER: \usepackage{todonotes}
+#+LaTeX_HEADER: \setlength{\marginparwidth}{2cm} % fix todonotes warning
+# % hyperrefs
+#+LaTeX_HEADER: \usepackage{hyperref}
+# % ----------------- Code blocks ----------------
+# % Dependencies: pip install pygments
+# % nice source code formatting
+#+LaTeX_HEADER: \usepackage{xcolor}
+#+LaTeX_HEADER: \definecolor{bg}{rgb}{0.98,0.98,0.98}
+#+LaTeX_HEADER: \usepackage[cache=false]{minted}
+#+LaTeX_HEADER: \setminted{
+#+LaTeX_HEADER:   fontsize=\small,
+#+LaTeX_HEADER:   baselinestretch=1,
+#+LaTeX_HEADER:   xleftmargin=4em,
+#+LaTeX_HEADER:   breaklines,
+#+LaTeX_HEADER:   mathescape,
+#+LaTeX_HEADER:   linenos,
+#+LaTeX_HEADER:   numbersep=5pt,
+#+LaTeX_HEADER:   frame=leftline,
+#+LaTeX_HEADER:   framesep=2mm,
+#+LaTeX_HEADER:   autogobble,
+#+LaTeX_HEADER:   style=tango,
+#+LaTeX_HEADER:   bgcolor=bg
+#+LaTeX_HEADER: }
+# % change style of section headings
+#+LaTeX_HEADER: \usepackage{sectsty}
+#+LaTeX_HEADER: \allsectionsfont{\sffamily}
+# % only required for orgmode ticked TODO items, can remove
+#+LaTeX_HEADER: \usepackage{amssymb}
+# % only required for underlining text
+#+LaTeX_HEADER: \usepackage[normalem]{ulem}
+# % often use this in differential operators:
+#+LaTeX_HEADER: \renewcommand{\d}{\ensuremath{\mathrm{d}}}
+# % allow more reasonable text width for most documents than LaTeX default
+#+LaTeX_HEADER: \setlength{\textheight}{21cm}
+#+LaTeX_HEADER: \setlength{\textwidth}{16cm}
+# % reduce left and right margins accordingly
+#+LaTeX_HEADER: \setlength{\evensidemargin}{-0cm}
+#+LaTeX_HEADER: \setlength{\oddsidemargin}{-0cm}
+# % reduce top margin
+#+LaTeX_HEADER: \setlength{\topmargin}{0cm}
+# % references formats
+#+LaTeX_HEADER: \usepackage[round]{natbib}
+# % Chinese supported
+#+LATEX_HEADER: \usepackage{ctex}
+# % Increase default line spacing a little
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \renewcommand{\baselinestretch}{1.5}
+#+LATEX_HEADER: \setlength{\parskip}{0.8em}
+# % Line & paragraph space end
+# % item list margin
+#+LATEX_HEADER: \usepackage{enumitem}
+# % Breaking Page Between Title and Toc
+#+LATEX_HEADER: \makeatletter \def\@maketitle{\null \begin{center} {\vskip 5em \Huge \@title} \vskip 30em {\LARGE \@author} \vskip 3em {\LARGE \@date} \end{center} \newpage} \makeatother
+# % End of Breaking Page Between Title and Toc
+#+LATEX_HEADER: \renewcommand\contentsname{目录}
+# Generate Tex File: C-c C-e l l; then replace verbatim with minted, and must special the code language
+#+LATEX_HEADER: % Generate PDF: xelatex -shell-escape <tex file>
+#+AUTHOR: jouyouyun
+#+EMAIL: yanbowen717@gmail.com
+#+TITLE: 系统更新文件说明
+
+#+latex: \newpage
+系统的更新文件是一个压缩文件，压缩方式为 =tar --zstd= ，文件后缀为 =.tar.zst= 。
+压缩文件包含以下文件：
++ 更新数据
+
+  文件名为 =os_data.squashfs= ，通过 =mksquashfs <data dir> os_data.squashfs -comp zstd= 生成。
+
+  在增量数据时，若文件被删除，则将文件创建为字符文件，如 =mknod <filename> c 1 0= 。
++ 版本描述文件
+
+  文件名为 =os_desc.xml= ，描述此版本的主题、变更内容等信息。文件内容见后文。
++ 变更文件列表
+
+  文件名为 =os_file.diff= ，描述基于终端版本的变更文件列表。内容见后文。
++ 文件签名信息
+
+  文件名为 =manifest_sign.xml= ，包含上述文件的签名。内容见后文。
+
+** 文件格式
+*** os_desc.xml
+#+begin_src xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE deepin SYSTEM "deepin_upgrade_manager.dtd">
+<description>
+  <meta>
+    <version>1.0</version>
+    <builtBy>deepin</builtBy>
+    <createAt>2021/11/11 10:05:35 UTC +8</createAt>
+    <subject>Release 20211108</subject>
+    <osVersion>20211108.1</osVersion>
+    <annotation>
+      Features:
+      - feature1
+      - feature2
+      Bug:
+      - bug1
+      - bug1
+    </annotation>
+  </meta>
+  <changelog>
+    <subject>
+      <key>commit1</key>
+      <data>description1</data>
+    </subject>
+    <subject>
+      <key>commit2</key>
+      <data>description2</data>
+    </subject>
+  </changelog>
+</description>
+#+end_src
+
+*** os_file.diff
+#+begin_src xml
+M    /usr/share/zsh/vendor-completions/_the_silver_searcher
+D    /usr/bin/htop
+D    /usr/share/applications/htop.desktop
+D    /usr/share/doc/htop
+A    usr/bin/gawk
+A    usr/share/doc/gawk
+#+end_src
+
+*** manifest_sign.xml
+#+begin_src xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE deepin SYSTEM "deepin_upgrade_manager.dtd">
+<manifest>
+  <meta>
+    <version>1.0</version>
+    <builtBy>deepin</builtBy>
+    <createAt>2021/11/11 10:05:35 UTC +8</createAt>
+    <signVersion>1.0</signVersion>
+  </meta>
+  <signature>
+    <file>
+      <key>os_data.squashfs</key>
+      <data>YxeVJxFsARlsBtccPs3QApEkFUA=</data>
+    </file>
+    <file>
+      <key>os_desc.xml</key>
+      <data>1gZK0cjErjfQJ93fNOKk1XbnLq0=</data>
+    </file>
+    <file>
+      <key>os_file.diff</key>
+      <data>KiLDJxFsARlsBtccPsAs1pLkdsq=</data>
+    </file>
+  </signature>
+</manifest>
+#+end_src

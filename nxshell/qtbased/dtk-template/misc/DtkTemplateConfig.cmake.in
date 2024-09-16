@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core DBus Gui)
+find_dependency(Dtk COMPONENTS Core)
+
+find_package(PkgConfig)
+pkg_search_module(RSVG2 REQUIRED IMPORTED_TARGET librsvg-2.0)
+
+include(${CMAKE_CURRENT_LIST_DIR}/DtkTemplateTargets.cmake)
+get_target_property(DtkTemplate_INCLUDE_DIRS Dtk::Template INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(DtkTemplate_LIBRARY_DIRS Dtk::Template INTERFACE_LINK_DIRECTORIES)
+set(DtkTemplate_LIBRARIES Dtk::Template)
+
+set(DtkNetworkManager_FOUND true)

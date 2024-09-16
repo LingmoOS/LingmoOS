@@ -1,0 +1,88 @@
+name: Windows MSVC Release
+on: 
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build_and_release:
+    strategy:
+      matrix:
+        include:
+          - name: win64_msvc
+            os: windows-2019
+            build_type: Release
+            compiler_type: msvc2019_64
+            msvc_arch: x64
+            qt_arch: win64_msvc2019_64
+            qt_version: 5.15.2
+            qt_target: desktop
+    runs-on: ${{ matrix.os }}
+    env:
+      BUILD_TYPE: ${{ matrix.build_type }}
+      COMPILER_TYPE: ${{ matrix.compiler_type }}
+      QT_VERSION: ${{ matrix.qt_version }}
+      OPENSSL_ROOT_DIR: C:\Program Files\OpenSSL
+    steps:
+      - name: '⚙️ Cache Qt'
+        id: cache-qt
+        uses: actions/cache@v3
+        with:
+          path: ..\Qt
+          key: Windows-QtCache-${{ env.QT_VERSION }}
+
+      - name: Install Qt ${{ env.QT_VERSION }}
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: ${{ env.QT_VERSION }}
+          target: ${{ matrix.qt_target }}
+          arch: ${{ matrix.qt_arch }}
+          # cached: 'false'
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+
+      # 3.20.0 高版本无法找到OPENSSL和ZLIB
+      - name: Setup cmake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.20.0
+          ninjaVersion: 1.11.1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: source
+          fetch-depth: 0
+
+      - name: msvc-build
+        id: build
+        shell: cmd
+        env:
+          vc_arch: ${{ matrix.msvc_arch }}
+          cmake_gen: Visual Studio 16 2019
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %vc_arch%
+          mkdir build && cd build
+          cmake -G "%cmake_gen%" -A %vc_arch% -D CMAKE_BUILD_TYPE=%BUILD_TYPE% -D APP_VERSION="${{ github.ref_name }}" ../source/
+          cmake --build . --config %BUILD_TYPE%
+          cmake -G "%cmake_gen%" -A %vc_arch% -D CMAKE_BUILD_TYPE=%BUILD_TYPE% -D APP_VERSION="${{ github.ref_name }}" ../source/
+
+      - name: Inno Setup data-transfer
+        uses: nadeemjazmawe/inno-setup-action-cli@v6.0.5
+        with:
+          filepath: build/deepin-data-transfer-setup.iss
+
+      - name: Inno Setup cooperation
+        uses: nadeemjazmawe/inno-setup-action-cli@v6.0.5
+        with:
+          filepath: build/dde-cooperation-setup.iss
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: build/installer-inno/*.exe
+          generate_release_notes: true
+          draft: true

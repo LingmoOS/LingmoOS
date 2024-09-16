@@ -1,0 +1,125 @@
+/*!
+@~chinese
+@file dnetworkmanager.h
+
+@class Dtk::NetworkManager::DNetworkManager dnetworkmanager.h
+@brief 对于NetworkManager连接管理功能的封装
+
+@fn bool DNetworkManager::networkingEnabled() const
+@brief 当前是否启用了网络
+@return 一个代表当前是否启用了网络的布尔值
+
+@fn bool DNetworkManager::wirelessEnabled() const
+@brief 当前是否启用了无线网络
+@return 一个代表当前是否启用了无线网络的布尔值
+
+@fn void DNetworkManager::setWirelessEnabled(const bool enable) const
+@brief 设置是否启用无线网络
+@param [in] enable 是否启用
+
+@fn bool DNetworkManager::wirelessHardwareEnabled() const
+@brief 当前是否启用了无线硬件
+@return 一个代表当前是否启用了无线网络硬件的布尔值
+
+@fn QList<quint64> DNetworkManager::getActiveConnectionsIdList() const
+@brief 获取当前活动连接Id列表
+@return 当前活动连接Id的列表
+
+@fn quint64 DNetworkManager::primaryConnection() const
+@brief 获取用于访问网络的主要活动连接的对象Id
+@return 主要活动连接的对象Id
+
+@fn QByteArray DNetworkManager::primaryConnectionType() const
+@brief 获取主要连接的类型
+@return 主要连接的类型
+
+@fn NMState DNetworkManager::state() const
+@brief 获取NetworkManager进程的状态
+@return NetworkManager进程的状态
+
+@fn NMConnectivityState DNetworkManager::connectivity() const
+@brief 获取最后一次连通性检查的结果
+@return 代表连通性的枚举
+
+@fn DExpected<QList<quint64>> DNetworkManager::getDeviceIdList() const
+@brief 获取所有设备的Id
+@return 设备id组成的列表
+
+@fn DExpected<quint64> DNetworkManager::activateConnection(const quint64 connId, const quint64 deviceId, const qint64 objId = 0) const
+@brief 激活一个指定的连接
+@param [in] connId 特定连接的Id
+@param [in] deviceId 特定设备的Id
+@param [in] objId 与该连接关联的对象的id
+@note id默认为0,即默认寻找对象
+@return 激活连接对应的id
+
+@fn DExpected<NewConn> DNetworkManager::addAndActivateConnection(const SettingDesc &conn, const quint64 deviceId, const qint64 objId = 0) const
+@brief 添加并激活一个连接
+@param [in] conn 一个代表配置的map
+@param [in] deviceId 特定设备的Id
+@param [in] objId 与该连接关联的对象的id
+@return 一个自定义结构体
+@sa Dtk::NetworkManager::NewConn
+
+@fn DExpected<void> DNetworkManager::deactivateConnection(const quint64 activeConnId) const
+@brief 停用指定连接
+@param [in] activeConnId 已激活的连接对象的Id
+
+
+@fn DExpected<void> DNetworkManager::enable(const bool enabled) const
+@brief 设置NetworkManager是否启动
+@param [in] 是否启动
+
+@fn DExpected<QMap<QString, QString>> DNetworkManager::permissions() const
+@brief 返回调用者对NetworkManager提供的各种经过身份验证的操作的权限
+@return 一个由对应权限组成的map
+
+@fn DExpected<NMConnectivityState> DNetworkManager::checkConnectivity() const
+@brief 重新检查网络连接状态
+@return 一个代表网络连接状态的枚举
+
+@fn DExpected<QSharedPointer<DDevice>> DNetworkManager::getDeviceObject(const quint64 id) const
+@brief 通过指定的id获取对应的设备对象
+@param [in] 设备对象的id
+@return 一个指向设备对象的共享指针
+@note 通过判断该对象的类型然后再转换到对应对象上去
+
+@fn DExpected<QSharedPointer<DActiveConnection>> DNetworkManager::getActiveConnectionObject(const quint64 id) const
+@brief 通过指定的id获取活动连接的对象
+@param [in] 活动连接对象的Id
+@return 一个指向连接对象的共享指针
+
+@fn void DNetworkManager::networkingEnabledChanged(const bool enable)
+@brief 信号, 当networkingEnabled改变
+
+@fn void DNetworkManager::wirelessEnabledChanged(const bool enable)
+@brief 信号, 当wirelessEnabled改变
+
+@fn void DNetworkManager::wirelessHardwareEnabledChanged(const bool enable)
+@brief 信号, 当wirelessHardwareEnabled改变
+
+@fn void DNetworkManager::activeConnectionsChanged(const QList<quint64> &connIds)
+@brief 信号, 当activeConnections改变
+
+@fn void DNetworkManager::primaryConnectionChanged(const quint64 connId)
+@brief 信号, 当primaryConnection改变
+
+@fn void DNetworkManager::primaryConnectionTypeChanged(const QByteArray &type)
+@brief 信号, 当primaryConnectionType改变
+
+@fn void DNetworkManager::connectivityChanged(const NMConnectivityState connState)
+@brief 信号, 当connectivity改变
+
+@fn void DNetworkManager::DeviceAdded(const quint64 deviceId)
+@brief 信号, 有新设备加入时触发
+
+@fn void DNetworkManager::DeviceRemoved(const quint64 deviceId)
+@brief 信号, 设备被移除时触发
+
+@fn void DNetworkManager::CheckPermissions()
+@brief 信号, 当进行权限检查时触发
+
+@fn void DNetworkManager::StateChanged(const NMState state)
+@brief 信号, 当State改变时触发
+
+*/

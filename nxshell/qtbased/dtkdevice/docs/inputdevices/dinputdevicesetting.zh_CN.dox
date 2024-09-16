@@ -1,0 +1,257 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+/*!
+@~chinese
+@file dinputdevicesetting.h
+@ingroup inputdevices
+
+dinputdevicesetting.h定义了全局设置类DInputDeviceSetting
+
+@class Dtk::Device::DInputDeviceSetting dinputdevicesetting.h
+@brief 全局设置类
+
+@fn bool DInputDeviceSetting::disableTouchPadWhileMouse() const
+@brief 获取是否在连接鼠标时禁用触摸板
+@retval true 在连接鼠标时禁用触摸板
+@retval false 在连接鼠标时不禁用触摸板
+
+@fn quint32 DInputDeviceSetting::doubleClickInterval() const
+@brief 获取鼠标和触摸板双击时间间隔
+@sa [doubleClickInterval](@ref Dtk::InputDevices::DInputDeviceSetting::doubleClickInterval)
+
+@fn quint32 DInputDeviceSetting::dragThreshold() const
+@brief 获取鼠标和触摸板产生拖拽事件的最小移动距离
+@sa [dragThreshold](@ref Dtk::InputDevices::DInputDeviceSetting::dragThreshold)
+
+@fn bool DInputDeviceSetting::repeatEnabled() const
+@brief 获取键盘是否开启按键重复
+@retval true 键盘开启按键重复, 在长按某一按键时, 将定时触发按键事件
+@retval false 键盘不开启按键重复
+
+@fn quint32 DInputDeviceSetting::repeatDelay() const
+@brief 获取按键重复触发延迟
+@return 按键重复触发之前的延迟
+@sa [repeatDelay](@ref Dtk::InputDevices::DInputDeviceSetting::repeatDelay)
+
+
+@fn quint32 DInputDeviceSetting::repeatInterval() const
+@brief 获取按键重复触发间隔时间
+@return 触发重复按键事件之间的时间间隔
+
+@fn qint32 DInputDeviceSetting::cursorBlinkInterval() const
+@brief 获取光标闪烁间隔时间
+@return 光标闪烁的间隔时间
+@sa [cursorBlinkInterval](@ref Dtk::InputDevices::DInputDeviceSetting::cursorBlinkInterval)
+
+@fn quint32 DInputDeviceSetting::wheelSpeed() const
+@brief 获取滚轮速度
+@return 滚轮速度
+@sa [wheelSpeed](@ref Dtk::InputDevices::DInputDeviceSetting::wheelSpeed)
+
+
+@fn void DInputDeviceSetting::setDisableTouchPadWhileMouse(bool disabled)
+@brief 设置是否在连接鼠标时禁用触摸板
+@param[in] disabled 是否在连接鼠标时禁用触摸板
+
+@fn void DInputDeviceSetting::setDoubleClickInterval(quint32 interval)
+@brief 设置鼠标和触摸板双击事件的时间间隔
+@param[in] interval 双击事件的时间间隔
+
+@fn void DInputDeviceSetting::setDragThreshold(quint32 distance)
+@brief 设置拖拽事件的最小距离
+@param[in] distance 拖拽事件两坐标最小距离
+
+@fn void DInputDeviceSetting::setRepeatEnabled(bool enabled)
+@brief 设置是否开启按键重复
+@param[in] enabled 是否开启按键重复
+
+@fn void DInputDeviceSetting::setRepeatDelay(quint32 delay)
+@brief 设置按键重复触发延迟
+@param[in] delay 触发按键重复机制的延迟时间
+
+@fn void DInputDeviceSetting::setRepeatInterval(quint32 interval)
+@brief 设置按键重复事件触发时间间隔
+@param[in] interval 触发重复按键事件之间的时间间隔
+
+@fn void DInputDeviceSetting::setCursorBlinkInterval(qint32 interval)
+@brief 设置光标闪烁时间间隔
+@param[in] interval 光标闪烁的间隔时间
+
+@fn void DInputDeviceSetting::setWheelSpeed(quint32 speed)
+@brief 设置滚轮速度
+@param[in] speed 滚轮速度
+
+@fn DExpected<quint32> DInputDeviceSetting::pressureSensitivity(quint32 id)
+@brief 获取特定设备的压力感应级别
+@param[in] id 设备id
+@return 压力感应级别的DExpected对象
+
+只有数位板和数位笔才有压力感应级别相关的设置
+
+
+@fn DExpected<quint32> DInputDeviceSetting::rawSampleSize(quint32 id)
+@brief 获取特别设备的平滑窗口采样大小
+@param[in] id 设备id
+@return 平滑窗口采样大小的DExpected对象
+
+只有数位板和数位笔才有平滑窗口采样大小相关的设置
+
+@fn DExpected<quint32> DInputDeviceSetting::pressureThreshold(quint32 id)
+@brief 获取特定设备的压感事件阈值
+@param[in] id 设备id
+@return 压感事件阈值的DExpected对象
+
+只有数位板和数位笔才有压感事件阈值相关的设置
+
+@fn DExpected<bool> DInputDeviceSetting::forceProportions(quint32 id)
+@brief 获取特定设备是否强制调整为输出的比例
+@param[in] id 设备id
+@return 特定设备是否强制调整为输出的比例的DExpected对象
+
+数位板相关的设置
+
+@fn DExpected<QString> DInputDeviceSetting::mapOutput(quint32 id)
+@brief 获取特定设备的输出映射(显示)
+@param[in] id 设备id
+@return 设备输出映射的DExpected对象
+
+数位板相关的设置
+
+@fn DExpected<bool> DInputDeviceSetting::mouseEnterRemap(quint32 id)
+@brief 获取特定设备是否在进入新的显示时进行重新映射
+@param[in] id 设备id
+@return 是否重新映射的DExpected对象
+
+数位板相关的设置
+
+@fn DExpected<quint32> DInputDeviceSetting::suppress(quint32 id)
+@brief 获取特定设备坐标或者压感变化事件之间的最小间隔
+@param[in] id 设备id
+@return 最小间隔的DExpected对象
+
+数位板相关的设置
+
+@fn DExpected<DInputKeyAction> DInputDeviceSetting::keymap(quint32 id, DInputKey key)
+@brief 获取特定设备特定按键的行为
+@param[in] id 设备id
+@param[in] key [key](@ref Dtk::InputDevices::Key)的类型
+@return [KeyAction](@ref Dtk::InputDevices::KeyAction)的DExpected对象
+
+@fn DExpected<void> DInputDeviceSetting::setPressureSensitivity(quint32 id, quint32 sensitivity)
+@brief 设置特定设备的压感灵敏度
+@param[in] id 设备id
+@param[in] sensitivity 压感灵敏度
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setRawSampleSize(quint32 id, quint32 size)
+@brief 设置特定设备的平滑窗口取样大小
+@param[in] id 设备id
+@param[in] size 平滑取样窗口大小
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setPressureThreshold(quint32 id, quint32 threshold)
+@brief 设置特定设备的压感事件阈值
+@param[in] id 设备id
+@param[in] threshold 压感事件阈值
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setForceProportions(qint32 id, bool force)
+@brief 设置特定设备是否强制调整为输出的比例
+@param[in] id 设备id
+@param[in] force 是否强制
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setMouseEnterRemap(quint32 id, bool remap)
+@brief 设置特定设备是否在鼠标进入新的输出的时候重新映射
+@param[in] id 设备id
+@param[in] remap 是否重新映射
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setSuppress(quint32 id, quint32 suppress)
+@brief 设置特定设备坐标或者压感变化事件之间的最小间隔
+@param[in] id 设备id
+@param[in] suppress 设备坐标或者压感变化事件之间的最小间隔
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn DExpected<void> DInputDeviceSetting::setKeymap(quint32 id, DInputKey key, DInputKeyAction action)
+@brief 设置特定设备某个按键对应的行为
+@param[in] id 设备id
+@param[in] key 特定按键
+@param[in] action 按键对应的行为
+@return 空DExpected对象, 无效时表示操作失败
+
+@fn void DInputDeviceSetting::disableTouchPadWhileMouseChanged(bool disabled)
+@brief 属性[disableTouchPadWhileMouse](@ref Dtk::InputDevices::DInputDeviceSetting::disableTouchPadWhileMouse)改变时触发的信号
+@param[in] disabled 是否禁用触摸板
+
+@fn void DInputDeviceSetting::doubleClickIntervalChanged(quint32 interval)
+@brief 属性[doubleClickInterval](@ref Dtk::InputDevices::DInputDeviceSetting::doubleClickInterval)改变时触发的信号
+@param[in] interval 双击事件的时间间隔
+
+@fn void DInputDeviceSetting::dragThresholdChanged(quint32 distance)
+@brief 属性[dragThreshold](@ref Dtk::InputDevices::DInputDeviceSetting::dragThreshold)改变时触发的信号
+@param[in] distance 触发拖拽事件的最小间隔
+
+@fn void DInputDeviceSetting::repeatEnabledChanged(bool enabled)
+@brief 属性[repeatEnabled](@ref Dtk::InputDevices::DInputDeviceSetting::repeatEnabled)改变时触发的信号
+@param[in] enabled 是否开启按键重复
+
+@fn void DInputDeviceSetting::repeatDelayChanged(quint32 delay)
+@brief 属性[repeatDelay](@ref Dtk::InputDevices::DInputDeviceSetting::repeatDelay)改变时触发的信号
+@param[in] delay 按键重复触发之前的延迟
+
+@fn void DInputDeviceSetting::repeatIntervalChanged(quint32 interval)
+@brief 属性[repeatInterval](@ref Dtk::InputDevices::DInputDeviceSetting::repeatInterval)改变时触发的信号
+@param[in] interval 按键重复触发间隔时间
+
+@fn void DInputDeviceSetting::cursorBlinkIntervalChanged(quint32 interval)
+@brief 属性[cursorBlinkInterval](@ref Dtk::InputDevices::DInputDeviceSetting::cursorBlinkInterval)改变时触发的信号
+@param[in] interval 光标闪烁的间隔时间
+
+@fn void DInputDeviceSetting::wheelSpeedChanged(quint32 speed)
+@brief 属性[wheelSpeed](@ref Dtk::InputDevices::DInputDeviceSetting::wheelSpeed)改变时触发的信号
+@param[in] speed 滚轮速度
+
+@property Dtk::Device::DInputDeviceSetting::disableTouchPadWhileMouse
+@brief 是否在连接鼠标时禁用触摸板
+
+若设置为true, 在连接鼠标的时候, 所有鼠标设备的enabled属性会被设置为false.
+
+@property Dtk::Device::DInputDeviceSetting::doubleClickInterval
+@brief 鼠标和触摸板双击事件时间间隔
+
+该函数会返回全局设置的双击时间间隔, 该时间间隔对于鼠标和触摸板都适用.
+
+@property Dtk::Device::DInputDeviceSetting::dragThreshold
+@brief 鼠标和触摸板产生拖拽事件的最小移动距离
+
+该函数会返回触发拖拽事件的全局阈值，该阈值对于鼠标和触摸板都适用.
+
+@property Dtk::Device::DInputDeviceSetting::repeatEnabled
+@brief 键盘是否开启按键重复
+
+开启时, 长按按键将重复触发按键事件.
+
+@property Dtk::Device::DInputDeviceSetting::repeatDelay
+@brief 按键重复触发延迟
+
+短时间的保持不会触发按键重复, 只有在按键保持按下状态超过该函数的返回值时才会触发按键重复机制.
+
+@property Dtk::Device::DInputDeviceSetting::repeatInterval
+@brief 按键重复触发间隔时间
+
+定时触发按键重复事件的检测间隔时间.
+
+@property Dtk::Device::DInputDeviceSetting::cursorBlinkInterval
+@brief 光标闪烁间隔时间
+
+文本光标闪烁的间隔时间. 此设置项为Qt相关的全局设置.
+
+@property Dtk::Device::DInputDeviceSetting::wheelSpeed
+@brief 滚轮速度
+
+包括鼠标和触摸板滚动在内的滚轮速度.
+
+*/

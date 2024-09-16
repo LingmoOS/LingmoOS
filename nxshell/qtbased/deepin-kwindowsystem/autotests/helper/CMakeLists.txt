@@ -1,0 +1,4 @@
+add_executable(kwindowsystem_platform_wayland_helper wayland_platform.cpp)
+add_dependencies(kwindowsystem_platform_wayland_helper kwindowsystemplatformwaylandtest)
+target_link_libraries(kwindowsystem_platform_wayland_helper KF5::WindowSystem)
+ecm_mark_as_test(kwindowsystem_platform_wayland_helper)

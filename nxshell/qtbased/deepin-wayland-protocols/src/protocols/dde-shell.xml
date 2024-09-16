@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="dde_shell">
+  <copyright><![CDATA[
+        Copyright © 2020  wugang <wugang@uniontech.com>
+
+        Permission to use, copy, modify, distribute, and sell this
+        software and its documentation for any purpose is hereby granted
+        without fee, provided that the above copyright notice appear in
+        all copies and that both that copyright notice and this permission
+        notice appear in supporting documentation, and that the name of
+        the copyright holders not be used in advertising or publicity
+        pertaining to distribution of the software without specific,
+        written prior permission.  The copyright holders make no
+        representations about the suitability of this software for any
+        purpose.  It is provided "as is" without express or implied
+        warranty.
+
+        THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+        SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+        WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+        AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+        ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+        THIS SOFTWARE.
+        ]]></copyright>
+
+    <interface name="dde_shell" version="2">
+
+      <description summary="get window info">
+        Eg: window position.
+      </description>
+
+      <enum name="state">
+        <entry name="active" value="1 &lt;&lt; 0"/>
+        <entry name="minimized" value="1 &lt;&lt; 1"/>
+        <entry name="maximized" value="1 &lt;&lt; 2"/>
+        <entry name="fullscreen" value="1 &lt;&lt; 3"/>
+        <entry name="keep_above" value="1 &lt;&lt; 4"/>
+        <entry name="keep_below" value="1 &lt;&lt; 5"/>
+        <entry name="on_all_desktops" value="1 &lt;&lt; 6"/>
+        <entry name="demands_attention" value="1 &lt;&lt; 7"/>
+        <entry name="closeable" value="1 &lt;&lt; 8"/>
+        <entry name="minimizable" value="1 &lt;&lt; 9"/>
+        <entry name="maximizable" value="1 &lt;&lt; 10"/>
+        <entry name="fullscreenable" value="1 &lt;&lt; 11"/>
+        <entry name="skiptaskbar" value="1 &lt;&lt; 12"/>
+        <entry name="shadeable" value="1 &lt;&lt; 13"/>
+        <entry name="shaded" value="1 &lt;&lt; 14"/>
+        <entry name="movable" value="1 &lt;&lt; 15"/>
+        <entry name="resizable" value="1 &lt;&lt; 16"/>
+        <entry name="virtual_desktop_changeable" value="1 &lt;&lt; 17"/>
+        <entry name="skipswitcher" value="1 &lt;&lt; 18"/>
+        <entry name="accept_focus" value="1 &lt;&lt; 19"/>
+        <entry name="modality" value="1 &lt;&lt; 20"/>
+      </enum>
+
+      <enum name="property">
+        <entry name="NoTitleBar" value="1 &lt;&lt; 0"/>
+        <entry name="Theme" value="1 &lt;&lt; 1"/>
+        <entry name="WindowRadius" value="1 &lt;&lt; 2"/>
+        <entry name="BorderWidth" value="1 &lt;&lt; 3"/>
+        <entry name="BorderColor" value="1 &lt;&lt; 4"/>
+        <entry name="ShadowRadius" value="1 &lt;&lt; 5"/>
+        <entry name="ShadowOffset" value="1 &lt;&lt; 6"/>
+        <entry name="ShadowColor" value="1 &lt;&lt; 7"/>
+        <entry name="MouseInputAreaMargins" value="1 &lt;&lt; 8"/>
+        <entry name="WindowPixelRatio" value="1 &lt;&lt; 9"/>
+      </enum>
+
+      <enum name="split_type">
+        <entry name="left_split" value="1 &lt;&lt; 0"/>
+        <entry name="right_split" value="1 &lt;&lt; 1"/>
+      </enum>
+
+      <enum name="effectscene">
+        <entry name="effectNoRadius" value="1 &lt;&lt; 0"/>
+        <entry name="effectNoShadow" value="1 &lt;&lt; 1"/>
+        <entry name="effectNoBorder" value="1 &lt;&lt; 2"/>
+        <entry name="effectNoStart" value="1 &lt;&lt; 4"/>
+        <entry name="effectNoClose" value="1 &lt;&lt; 5"/>
+        <entry name="effectNoMaximize" value="1 &lt;&lt; 6"/>
+        <entry name="effectNoMinimize" value="1 &lt;&lt; 7"/>
+      </enum>
+
+      <enum name="effecttype">
+        <entry name="effectNormal" value="1 &lt;&lt; 0"/>
+        <entry name="effectCursor" value="1 &lt;&lt; 1"/>
+        <entry name="effectTop" value="1 &lt;&lt; 2"/>
+        <entry name="effectBottom" value="1 &lt;&lt; 3"/>
+      </enum>
+
+      <request name="get_shell_surface">
+        <description summary="get a dde shell surface bind to a wayland surface">
+        </description>
+
+        <arg name="id" type="new_id" interface="dde_shell_surface"/>
+        <arg name="surface" type="object" interface="wl_surface"/>
+      </request>
+
+    </interface>
+
+    <interface name="dde_shell_surface" version="2">
+
+      <description summary="dde shell surface">
+
+      </description>
+
+      <request name="get_geometry">
+        <description summary="request get the window geometry">
+          reques windo geometry, will notify by "geometry" event.
+        </description>
+      </request>
+
+      <request name="request_active">
+        <description summary="request to activate shell">
+            request to activate current shell if it's not active
+        </description>
+      </request>
+
+      <request name="set_state">
+        <description summary="set window state">
+          Set window state.
+
+          Values for state argument are described by dde_shell.state
+          and can be used together in a bitfield. The flags bitfield describes which flags are
+          supposed to be set, the state bitfield the value for the set flags
+        </description>
+        <arg name="flags" type="uint" summary="bitfield of set state flags"/>
+        <arg name="state" type="uint" summary="bitfield of state flags"/>
+      </request>
+
+      <event name="geometry">
+        <description summary="notify geometry changed">
+          Send geometry to client everytime the window geometry changed
+        </description>
+
+        <arg name="x" type="int" summary="x pos"/>
+        <arg name="y" type="int" summary="y pos"/>
+        <arg name="w" type="uint" summary="width"/>
+        <arg name="h" type="uint" summary="height"/>
+      </event>
+
+      <event name="state_changed">
+        <description summary="window state has been changed">
+          This event will be sent as soon as the window state changes.
+
+          Values for state argument are described by dde_shell.state.
+        </description>
+        <arg name="flags" type="uint" summary="bitfield of state flags"/>
+      </event>
+
+      <event name="splitable">
+        <description summary="window splitable">
+          This event will be sent as soon as the window splitable.
+        </description>
+        <arg name="flags" type="uint" summary="splitable value"/>
+      </event>
+
+      <request name="set_property" since="2">
+        <description summary="set window property">
+          Set window property.
+
+          Values for property argument are described by dde_shell.property
+          and can be used together in a bitfield. The flags bitfield describes which property are
+          supposed to be set.
+        </description>
+        <arg name="property" type="uint" enum="property" summary="property type"/>
+        <arg name="dataArr" type="array" summary="property value"/>
+      </request>
+
+      <request name="request_split_window">
+        <description summary="request split window">
+          Request split window.
+        </description>
+        <arg name="split_type" type="uint"/>
+      </request>
+
+      <event name="workarea" since="2">
+        <description summary="work area">
+            This event will send work area
+        </description>
+        <arg name="output" type="object" interface="wl_output" summary="output"/>
+        <arg name="x" type="uint" summary="x"/>
+        <arg name="y" type="uint" summary="y"/>
+        <arg name="width" type="uint" summary="width"/>
+        <arg name="height" type="uint" summary="height"/>
+      </event>
+
+      <request name="request_window_effect" since="2">
+        <description summary="custom window effect">
+          custom window effect.
+        </description>
+        <arg name="effectscene" type="uint"/>
+      </request>
+
+      <request name="request_window_startup_effect" since="2">
+        <description summary="custom window start up effect">
+          custom window start up effect.
+        </description>
+        <arg name="effecttype" type="uint"/>
+      </request>
+
+    </interface>
+
+</protocol>

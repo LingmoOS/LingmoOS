@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" lang="zh-cn">
+    <link href="style.css" rel="stylesheet">
+    <title>Authorization</title>
+</head>
+
+<body>
+<div id="auth_main">
+    <img id="cloud_offline" src="cloud_offline.svg" alt="offline">
+
+    <div class="auth_title" i18n-content="System not authorized">
+    </div>
+
+    <div class="auth_content" i18n-content="Please use after activating the system!">
+    </div>
+
+    <div class="submit_bt">
+        <button type="submit" id="submit_bt" i18n-content="Close"></button>
+    </div>
+</div>
+
+<script src="di18n.min.js"></script>
+<script>
+    var language;
+    if (window.navigator.languages) {
+        language = window.navigator.languages[0];
+    } else {
+        language = window.navigator.userLanguage || window.navigator.language;
+    }
+
+    var chineseList = ['zh', 'zh_CN', 'zh-CN'];
+    if (chineseList.includes(language)) {
+        language = 'zh-CN';
+    } else {
+        language = 'en';
+    }
+
+    const di18n = new DI18n({
+        locale: language,
+        isReplace: true,
+        messages: {
+            'en': {
+                "System not authorized": "System not authorized",
+                "Please use after activating the system!": "Please use after activating the system!",
+                "Close": "Close",
+            },
+            'zh-CN': {
+                "System not authorized": "系统未授权",
+                "Please use after activating the system!": "请在系统授权后使用！",
+                "Close": "关闭",
+            }
+        }
+    });
+
+    function nativeExec(handler, data) {
+        if (window['QWebChannel'] && window['qt']) {
+            window['QWebChannel'](window['qt'].webChannelTransport, channel => {
+                handler(channel, data);
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        console.log("DOM fully loaded and parsed");
+
+        var register = document.getElementById('submit_bt');
+        register.addEventListener('click', function (e) {
+            var targetWindow = window.opener || window.parent;
+            if (targetWindow) {
+                nativeExec(function (channel, data) {
+                    channel.objects.client.close();
+                }, "");
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+[Unit]
+Description=dde on X11
+# On X11, try to show the dde Session Failed screen
+OnFailure=dde-session-shutdown.target
+OnFailureJobMode=replace
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+PartOf=dde-session-pre.target
+Before=dde-session-pre.target
+
+# Limit startup frequency more than the default
+StartLimitIntervalSec=15s
+StartLimitBurst=3
+
+[Service]
+Slice=session.slice
+Type=notify
+# NOTE: This can be replaced with ConditionEnvironment=XDG_SESSION_TYPE=%I in
+#       the [Unit] section with systemd >= 246. Also, the current solution is
+#       kind of painful as systemd had a bug where it retries the condition.
+# Only start if the template instance matches the session type.
+ExecCondition=/bin/sh -c 'test "$XDG_SESSION_TYPE" = "%I" || exit 2'
+ExecStartPre=-/bin/sh -c 'cp -n /etc/xdg/kglobalshortcutsrc $HOME/.config/kglobalshortcutsrc'
+ExecStart=/usr/bin/deepin-kwin_x11 --replace
+# Exit code 1 means we are probably *not* dealing with an extension failure
+SuccessExitStatus=1
+
+# On X11 we do not need to unset any variables
+
+# On X11 we want to restart on-success (Alt+F2 + r) and on-failure.
+Restart=always
+# Do not wait before restarting the shell
+RestartSec=500ms
+# Kill any stubborn child processes after this long
+TimeoutStopSec=5

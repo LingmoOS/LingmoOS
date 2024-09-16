@@ -1,0 +1,29 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.desktopspec.MimeManager1">
+
+        <method name="queryDefaultApplication">
+            <arg type="s" name="content" direction="in"/>
+            <arg type="s" name="mimeType" direction="out"/>
+            <arg type="o" name="application" direction="out"/>
+            <annotation 
+                name="org.freedesktop.DBus.Description" 
+                value="content can be absolute path of a file or a mime type."/>
+        </method>
+
+        <method name="setDefaultApplication">
+            <arg type="a{ss}" name="defaultApps" direction="in"/>
+            <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QStringMap"/>
+        </method>
+
+        <method name="unsetDefaultApplication">
+            <arg type="as" name="mimeTypes" direction="in"/>
+        </method>
+
+        <method name="listApplications">
+            <arg type="s" name="mimeType" direction="in"/>
+            <arg name="applications_and_properties" type="a{oa{sa{sv}}}" direction="out"/>
+            <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="ObjectMap"/>
+        </method>
+    </interface>
+</node>

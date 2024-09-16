@@ -1,0 +1,26 @@
+[Unit]
+Description=dde-desktop service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+Requires=dbus.socket
+After=dbus.socket
+
+Wants=dde-appearance.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dde-desktop
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

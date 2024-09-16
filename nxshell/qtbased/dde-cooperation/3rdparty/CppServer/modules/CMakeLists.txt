@@ -1,0 +1,8 @@
+include("asio.cmake")
+include("CppCommon.cmake")
+include("CppLogging.cmake")
+if(NOT CPPSERVER_MODULE)
+    include("Catch2.cmake")
+    include("cpp-optparse.cmake")
+    include("CppBenchmark.cmake")
+endif()

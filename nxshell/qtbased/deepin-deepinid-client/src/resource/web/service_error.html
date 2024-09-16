@@ -1,0 +1,183 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" lang="zh-cn">
+    <link href="style.css" rel="stylesheet">
+    <title>ServiceConnection</title>
+</head>
+
+<body>
+<div id="service_connection_main" class="main_body">
+
+    <div class="service_connection_title" i18n-content="Network account login">
+    </div>
+
+    <img id="cloud_offline" src="cloud_offline.svg" alt="offline">
+    <div class="service_connection_content" i18n-content="Unable to connect to the remote server, please check your network and try again!">
+    </div>
+
+    <div class="submit_bt">
+        <button type="submit" id="submit_bt" i18n-content="Close"></button>
+    </div>
+</div>
+
+<script src="di18n.min.js"></script>
+<script>
+    var language;
+    var  channelObj = {
+        theme: 'light', // 主题
+        activateColor: '#0081FF' // 活动色
+    };
+    if (window.navigator.languages) {
+        language = window.navigator.languages[0];
+    } else {
+        language = window.navigator.userLanguage || window.navigator.language;
+    }
+
+    var chineseList = ['zh', 'zh_CN', 'zh-CN'];
+    var chineseHKList = ['HK','zh_HK', 'zh-HK'];
+    var chineseTWList = ['TW','zh_TW', 'zh-TW'];
+    var chineseBOList = ['bo','bo_CN', 'bo-CN'];
+    var chineseUGList = ['ug','ug_CN', 'ug-CN'];
+
+    if (chineseList.includes(language)) {
+        language = 'zh-CN';
+    }else if(chineseHKList.includes(language)){
+        language = 'zh-HK';
+    }else if(chineseTWList.includes(language)){
+        language = 'zh-TW';
+    }else if(chineseBOList.includes(language)){
+        language = 'bo-CN';
+    }else if(chineseUGList.includes(language)){
+        language = 'ug-CN';
+    } else {
+        language = 'en';
+    }
+
+    const di18n = new DI18n({
+        locale: language,
+        isReplace: true,
+        messages: {
+            'en': {
+                "Network account login": "deepin ID Sign In",
+                "Unable to connect to the remote server, please check your network and try again!": "Unable to connect to the remote server, please check your network and try again!",
+                "Close": "Close",
+            },
+            'zh-CN': {
+                "Network account login": "deepin ID登录",
+                "Unable to connect to the remote server, please check your network and try again!": "无法连接到远程服务器，请检查网络及相关配置后重试！",
+                "Close": "关闭",
+            },
+            'zh-HK': {
+                "Network account login": "deepin ID登錄",
+                "Unable to connect to the remote server, please check your network and try again!": "無法連接到遠程服務器，請檢查網絡及相關配置後重試！",
+                "Close": "關閉",
+            },
+            'zh-TW': {
+                "Network account login": "deepin ID登入",
+                "Unable to connect to the remote server, please check your network and try again!": "無法連接到遠程伺服器，請檢查網路及相關配置後重試！",
+                "Close": "關閉",
+            },
+            'bo-CN': {
+                "Network account login": "deepin IDཐོ་འཇུག",
+                "Unable to connect to the remote server, please check your network and try again!": "རྒྱང་རིང་གི་ཞབས་ཞུ་འཕྲུལ་ཆས་དང་འབྲེལ་མཐུད་བྱ་ཐབས་བྲལ་བས། དྲ་རྒྱ་དང་དེ་བཞིན་འབྲེལ་ཡོད་སྒྲིག་འགོད་ལ་ཞིབ་བཤེར་བྱས་རྗེས་ཡང་བསྐྱར་ཚོད་ལྟ་བྱོས།！",
+                "Close": "སྒོ་རྒྱག།",
+            },
+            'ug-CN': {
+                "Network account login": "deepin ID دا تىزىملىتىش",
+                "Unable to connect to the remote server, please check your network and try again!": "يىراق مۇساپىلىق مۇلازىمىتىرغا ئۇلىغىلى بولمايدۇ، تور ۋە مۇناسىۋەتلىك سەپلىمىلەرنى تەكشۈرۈپ قايتا سىناڭ！",
+                "Close": "تاقاش",
+            }
+        }
+    });
+    function nativeExec(handler, data) {
+        if (window['QWebChannel'] && window['qt']) {
+            window['QWebChannel'](window['qt'].webChannelTransport, channel => {
+                handler(channel, data);
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        console.log("DOM fully loaded and parsed");
+
+        var register = document.getElementById('submit_bt');
+        register.addEventListener('click', function (e) {
+            var targetWindow = window.opener || window.parent;
+            if (targetWindow) {
+                nativeExec(function (channel, data) {
+                    channel.objects.client.close();
+                }, "");
+                e.preventDefault();
+            }
+        });
+    });
+    
+    window.onload = function() {
+        if (document.documentElement.clientHeight > 500) {
+            console.log(document.getElementsByClassName('main_body')[0].classList);
+            document.getElementsByClassName('main_body')[0].classList.add('isOldPage');
+        }
+        nativeExec(function (channel, data) {
+            channel.objects.client.JSLoadState(true);
+        }, "");
+    }
+    window.onresize = function() {
+        if (document.documentElement.clientHeight > 500) {
+            console.log(document.getElementsByClassName('main_body')[0].classList);
+            document.getElementsByClassName('main_body')[0].classList.add('isOldPage');
+        }
+    }
+    switchTheme(channelObj.theme);
+    window.changeThemeType = function(theme) {
+        switchTheme(theme);
+    }
+    window.changeActiveColor = function(activateColor) {
+        switchActivateColor(activateColor);
+    }
+    var params = {};
+    params = GetRequest();
+    console.log(params);
+    if(params && params.display === 'tablet') {
+        document.getElementsByClassName('main_body')[0].classList.add('is_pod');
+    }
+    /**
+     * 切换主题
+     */
+     function switchTheme(theme) {
+        switch (theme) {
+        case 'light':
+            document.body.className = 'light';
+            break;
+        case 'dark':
+            document.body.className = 'dark';
+            break;
+        default:
+            break;
+        }
+    }
+    /**
+     * 切换活动色
+     */
+    function switchActivateColor(activateColor) {
+        document.getElementsByTagName('body')[0].style.setProperty('--activateColor', activateColor);
+    }
+    /**
+     * 获取url参数
+     */
+    function getRequest() {
+		var url = location.search; //获取url中"?"符后的字串
+		var theRequest = new Object();
+		if (url.indexOf("?") != -1) {
+			var str = url.substr(1);
+			strs = str.split("&");
+			for(var i = 0; i < strs.length; i ++) {
+				theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+			}
+		}
+		return theRequest;
+	}
+</script>
+</body>
+
+</html>

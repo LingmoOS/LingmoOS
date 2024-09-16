@@ -1,0 +1,19 @@
+{
+    "Monitor": {
+        "Type": "DBus",
+        "DBus": {
+            "BusType": "System",
+            "Sender": "org.deepin.oom1",
+            "Interface": "org.deepin.oom1",
+            "Path": "/org/deepin/oom1",
+            "Signal": "Killed"
+        }
+    },
+
+    "Name": "OOM Killed",
+    "Description": "",
+    "Exec": ["sh", "-c",
+        "msg=$(getfromqm deepin-service-manager/oom plugin-oom '%s process consuming too much memory has been terminated to ensure system stability and performance');msg=$(printf \"$msg\" $1);title=$(getfromqm deepin-service-manager/oom plugin-oom 'Process terminated');title=$(printf \"$title\" $1);gdbus call --session --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications --method org.freedesktop.Notifications.Notify dde-control-center 0 dialog-warning \"$title\" \"$msg\" '[]'  '{}' 5000" ,
+        "",
+        "%{arg2}"]
+}

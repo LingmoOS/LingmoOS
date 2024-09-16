@@ -1,0 +1,44 @@
+package:
+  id: org.deepin.draw
+  name: "deepin-draw"
+  version: 6.0.1
+  kind: app
+  description: |
+    draw for deepin os.
+
+variables: 
+  extra_args: |
+    -DVERSION=${VERSION}
+
+runtime:
+  id: org.deepin.Runtime
+  version: 23.0.0
+
+depends:
+  - id: "dde-qt-dbus-factory" 
+    version: 5.5.12
+  - id: qtmpris
+    version: 0.1.0.1
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: xcb-util
+    version: 0.3.8.1
+    type: runtime
+  - id: qtdbusextended
+    version: 0.0.3
+
+source:
+  kind: local
+  patch: patches/fix-linglong.patch
+
+build:
+  kind: manual
+  manual:
+    configure: |
+      mkdir build
+      cd build
+      cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} ${extra_args} ..
+      make -j6
+      #make test
+      make -j install

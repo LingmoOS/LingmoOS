@@ -1,0 +1,40 @@
+package:
+  id: org.deepin.calculator
+  name: deepin-calculator
+  version: 5.7.21
+  kind: app
+  description: |
+    calculator for deepin os
+
+variables:
+  extra_args: |
+    -DVERSION=${VERSION}
+
+runtime:
+  id: org.deepin.Runtime
+  version: 23.0.0
+
+depends:
+  - id: "dde-qt-dbus-factory"
+    version: 5.5.12
+  - id: googletest
+    version: 1.8.1
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: xcb-util
+    version: 0.3.8.1
+    type: runtime
+
+source:
+  kind: local
+
+variables:
+  extra_args: |
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_OFF" \
+    -DAPP_VERSION=5.7.21 \
+    -DVERSION=5.7.21
+
+build:
+  kind: cmake

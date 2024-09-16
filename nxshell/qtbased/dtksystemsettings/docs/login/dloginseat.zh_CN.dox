@@ -1,0 +1,62 @@
+/*!
+@~chinese
+@file dloginseat.h
+@ingroup dtklogin
+@brief dloginseat.h 中定义了管理用户seat的接口。
+
+@class Dtk::Login::DLoginSeat dloginseat.h
+@brief 定义了管理用户seat的接口。
+@note seat一般情况下只有seat0，seat由分配给特定工作场所的所有硬件设备组成。
+    它由至少一个图形设备组成，通常还包括键盘、鼠标。它还可以包括摄像机、声卡等。
+    seat由seat名称标识，这些字符串是字符串(<= 255 个字符），以四个字符 "seat" 开头，
+    后跟至少一个 [a-zA-Z0-9]、" _" 和 " -" 范围内的字符。它们适合用作文件名。seat名称可能稳定，
+    也可能不稳定，如果座位再次可用，则可能会复用。经过测试，在同一台主机上使用vnc启动两个用户桌面，也只有一个seat0
+
+@fn DLoginSeat::DLoginSeat()
+@brief 此函数为私有构造函数，应使用DLoginManager获取该对象，需要通过调用`DLoginManager::findSeatById()`或者`DLoginManager::currentSeat()`来获取
+
+@fn bool DLoginSeat::canGraphical() const
+@brief 判断是否适合图形会话
+    该属性无需传入值，若适合返回true不适合返回false
+@return 布尔值
+
+@fn bool DLoginSeat::canTTY() const
+@brief 判断是否适合文本登录
+    该属性无需传入值，若适合返回true不适合返回false
+@return 布尔值
+
+@fn bool DLoginSeat::idleHint() const
+@brief 判断会话的空闲状态
+    该属性无需传入值，若会话空闲返回true不空闲返回false
+@return 布尔值
+
+@fn QStringList DLoginSeat::sessions() const
+@brief 会话属性是这个Seat的所有当前会话的数组，由会话ID组成
+@note 注意，返回的是一个QList,需要使用[]来获取列表中某个元素
+@return 由会话ID组成的数组
+
+@fn QString DLoginSeat::id() const
+@brief 对seat的id进行编码
+@return seat的id（一般情况为seat0）
+
+@fn SessionPath DLoginSeat::activeSession() const
+@brief 如果存在，则对当前活动的会话进行编码
+    是*一个*由会话id和路径对象组成的结构
+@return Dtk::Login::SessionPath
+
+@fn QDateTime DLoginSeat::idleSinceHint() const
+@brief 对空闲状态进行编码
+@return 返回一个整型值
+
+@fn quint64 DLoginSeat::idleSinceHintMonotonic() const;
+@brief 对空闲状态进行编码
+@return 返回一个整型值
+
+@fn void DLoginSeat::activateSession(const QString &sessionId)
+@brief 将指定id的会话带到前台
+
+@fn void DLoginSeat::switchTo(const uint VTNr)
+@brief 切换到虚拟终端上的会话
+@param VTNr 虚拟终端号
+
+*/

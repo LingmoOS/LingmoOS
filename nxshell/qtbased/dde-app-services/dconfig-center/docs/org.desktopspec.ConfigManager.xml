@@ -1,0 +1,63 @@
+<interface name='org.desktopspec.ConfigManager'>
+    <!-- 获取需要管理的配置描述文件DBus path -->
+    <method name='acquireManager'>
+        <!-- 应用唯一标识-->
+      <arg type='s' name='appid' direction='in'/>
+        <!-- 配置id，配置描述文件标识-->
+      <arg type='s' name='name' direction='in'/>
+        <!-- 子目录 -->
+      <arg type='s' name='subpath' direction='in'/>
+        <!-- DBus path，配置描述文件的链接路径，通过此path来进行此配置描述文件的管理 -->
+      <arg type='o' name='path' direction='out'/>
+    </method>
+
+    <!-- 根据用户id获取需要管理的配置描述文件DBus path -->
+    <method name='acquireManagerV2'>
+        <!-- 用户唯一标识-->
+      <arg type='u' name='uid' direction='in'/>
+        <!-- 应用唯一标识-->
+      <arg type='s' name='appid' direction='in'/>
+        <!-- 配置id，配置描述文件标识-->
+      <arg type='s' name='name' direction='in'/>
+        <!-- 子目录 -->
+      <arg type='s' name='subpath' direction='in'/>
+        <!-- DBus path，配置描述文件的链接路径，通过此path来进行此配置描述文件的管理 -->
+      <arg type='o' name='path' direction='out'/>
+    </method>
+
+    <!-- 热更新配置描述文件，当配置描述文件内容发生改变时，并且配置中心存在此配置描述文件的链接时，需要调用此接口 -->
+    <method name='update'>
+        <!-- 配置描述文件完整路径 -->
+      <arg type='s' name='path' direction='in'/>
+    </method>
+
+    <!-- 主动将缓存同步到磁盘，默认情况下，写缓存会有一定的延迟，当调用此接口时，会立刻同步到磁盘 -->
+    <method name='sync'>
+        <!-- 配置描述文件的完整路径 -->
+      <arg type='s' name='path' direction='in'/>
+    </method>
+
+    <!-- 设置链接延迟释放的时间，当需要链接释放时，会进行延迟释放-->
+    <method name='setDelayReleaseTime'>
+      <!-- 链接延迟时间，单位为ms -->
+      <arg type='i' name='time' direction='in'/>
+    </method>
+
+    <!-- 当前链接延迟释放的时间 -->
+    <method name='delayReleaseTime'>
+      <arg type='i' name='time' direction='out'/>
+    </method>
+
+    <!-- 打开详细日志输出信息 -->
+    <method name='enableVerboseLogging'>
+    </method>
+
+    <!-- 关闭详细日志输出信息 -->
+    <method name='disableVerboseLogging'>
+    </method>
+
+    <!-- 设置日志输出等级，与QT_LOGGING_RULES类似 -->
+    <method name='setLogRules'>
+      <arg type='s' name='rules' direction='in'/>
+    </method>
+</interface>

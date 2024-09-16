@@ -1,0 +1,27 @@
+# Maintainer: Dingyuan Zhang <lxz@mkacg.com>
+
+pkgname=gio-qt-git
+pkgver=0.0.14
+pkgrel=1
+pkgdesc='Gio wrapper for Qt applications'
+arch=('x86_64')
+url="https://github.com/linuxdeepin/gio-qt"
+license=('LGPL3')
+depends=('glibmm' 'qt5-base' 'qt6-base')
+conflicts=('gio-qt')
+provides=('gio-qt')
+group=('deepin-git')
+makedepends=('cmake')
+source=('source.tar.gz')
+sha512sums=('SKIP')
+
+build() {
+  cd $deepin_source_name
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_DOCS=OFF .
+  make
+}
+
+package() {
+  cd $deepin_source_name
+  make DESTDIR="$pkgdir" install
+}

@@ -1,0 +1,190 @@
+// package chan
+object SendResult {
+    uint32 protocolType // 发送协议的type
+    int32 errorType // 错误类型
+    string data // 结果数据 如果错误类型 < 0 就是错误的原因
+}
+
+object UserLoginInfo {
+    string name // 用户名称
+    string auth // 鉴权
+    string my_uid // uid
+    string my_name // 自己的名称 hostname
+    string session_id // 自己的sessionid
+    string selfappName // 自己的appname
+    string appName // 目标的appname
+    string version // 版本
+    string ip // 自己的ip
+}
+
+object PeerInfo {
+  string username // 用户名称
+  string hostname // 主机名称
+  string platform // 平台
+  string version // 版本
+  bool privacy_mode
+}
+
+object UserLoginResultInfo {
+    PeerInfo peer // 主机信息
+    string token // 登陆成功就是token,失败就是error msg
+    string appName // 目标的appName
+    bool result
+}
+
+// normal json format message for external
+object MiscInfo {
+  string appName // 目标的appName
+  string json // 消息
+}
+
+object FileTransJob {
+  int32 job_id // job id
+  string path // 文件路径
+  string save_path //文件保存路径
+  bool include_hidden //是否包含着.开头隐藏文件
+  bool sub //是否迭代包含着子目录
+  bool write // push or pull
+  string app_who     //是哪个前端应用创建的传输任务
+  string targetAppname // 接收端是那个应用接受传输
+  string ip
+}
+
+object FileEntry {
+  int32 filetype // 文件类型FileType
+  string name // 名称
+  bool hidden // 是否隐藏
+  int64 size // 大小
+  int64 modified_time // 修改时间
+  string appName // 谁发送的
+  string rcvappName // 谁接收的
+}
+
+object FileTransCreate {
+  int32 job_id
+  int32 file_id
+  string sub_dir // 创建的子目录
+  FileEntry entry  // 文件信息
+}
+
+object FileTransResponse {
+  int32 id  // 创建作业任务的jobid或单个文件的id
+  string name //目录或文件名
+  int32 result // 请求结果FileTransRe
+}
+
+object FileTransBlock {
+  int32 job_id // job id
+  int32 file_id //
+  string rootdir // 文件的读取或保存路径
+  string filename // 相对于TransJob中path的相对路径
+  uint32 blk_id // 拷贝的块id
+  int32 flags // 文件操作标志
+  int64 data_size //文件的长度
+}
+
+object FileTransJobAction {
+  int32 job_id
+  string appname    //前端名称
+  uint32 type //操作类型：cancel; pause; resume
+}
+
+object FileTransJobReport {
+  int32 job_id
+  string path    //文件目录路径
+  string error
+  int32 result //结果FileTransRe
+}
+
+object ShareEvents {
+  uint32 eventType // 事件名称
+  string data // 事件数据
+}
+
+object ShareConnectApply {
+  string appName // 自己的app名称
+  string tarAppname // 目标app的名称
+  string ip // 自己的ip
+  string tarIp // 目标的ip
+  string data // 数据
+}
+
+object ShareDisConnect {
+  string appName // 自己的app名称
+  string tarAppname // 目标app的名称
+  string msg // 消息
+}
+
+object ShareConnectReply {
+  string appName // 自己的app名称
+  string tarAppname // 目标app的名称
+  string msg // 错误信息
+  string ip // 发送端的ip
+  int32 reply // 0是拒绝，1是同意
+}
+
+object ShareStop {
+    string appName // 自己的app名称
+    string tarAppname // 目标的app名称
+    int32 flags // 0是所有多关闭,1关闭服务器，2关闭客户端
+}
+
+object ShareServerConfig {
+    string server_screen // 服务器的屏幕名称
+    string client_screen // 客户端的屏幕名称
+    string screen_left // 屏幕的左边
+    string screen_right // 屏幕右边
+    bool left_halfDuplexCapsLock //
+    bool left_halfDuplexNumLock //
+    bool left_halfDuplexScrollLock //
+    bool left_xtestIsXineramaUnaware //
+    bool left_preserveFocus //
+    string left_switchCorners //
+    int32 left_switchCornerSize //
+    bool right_halfDuplexCapsLock //
+    bool right_halfDuplexNumLock //
+    bool right_halfDuplexScrollLock //
+    bool right_xtestIsXineramaUnaware //
+    bool right_preserveFocus //
+    string right_switchCorners //
+    int32 right_switchCornerSize //
+    bool relativeMouseMoves
+    bool screenSaverSync
+    bool win32KeepForeground
+    bool clipboardSharing
+    string switchCorners //
+    int32 switchCornerSize //
+}
+
+object ShareStart {
+    string appName // 自己的app名称
+    string tarAppname // 目标的app名称
+    ShareServerConfig config // 服务器配置信息
+    string ip // 自己的ip
+    int32 port // 端口号
+}
+object ShareStartReply {
+    bool result // 是否成功
+    bool isRemote // 是否是远端
+    string errorMsg // 错误消息
+}
+
+object ShareStartRmoteReply {
+    bool result // 是否成功
+    string appName // 自己的app名称
+    string tarAppname // 目标的app名称
+    string errorMsg // 错误消息
+}
+
+object ShareConnectDisApply { // 取消共享连接申请
+    string appName // 自己的app名称
+    string tarAppname // 目标app的名称
+    string ip // 取消的ip（自己的ip）
+    string msg // 取消消息
+}
+
+object PingPong { // PingPong请求响应结构
+  string appName // 自己的app名称
+  string tarAppname // 目标app的名称
+  string ip // 自己的ip
+}

@@ -1,0 +1,6 @@
+add_subdirectory(dde-file-manager)
+add_subdirectory(dde-file-manager-daemon)
+add_subdirectory(dde-desktop)
+# add_subdirectory(common)
+add_subdirectory(demo)
+add_subdirectory(service)

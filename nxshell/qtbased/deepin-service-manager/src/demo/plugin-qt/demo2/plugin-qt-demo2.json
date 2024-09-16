@@ -1,0 +1,60 @@
+{
+    "name": "org.deepin.service.demo2",
+    "group": "core",
+    "libPath": "libplugin-qt-demo2.so",
+    "policyVersion": "1.0",
+    "policyStartType": "Resident",
+    "pluginType": "qt",
+    "whitelists": [
+        {
+            "name": "w1",
+            "process": [
+                "/usr/bin/aaa",
+                "/usr/bin/bbb",
+                "/usr/bin/python3"
+            ]
+        },
+        {
+            "name": "w2",
+            "process": [
+                "/usr/bin/aaa",
+                "/usr/bin/ccc"
+            ]
+        }
+    ],
+    "policy": [
+        {
+            "path": "/org/deepin/service/demo2",
+            "pathhide": true,
+            "permission": true,
+            "whitelist": "w1",
+            "interfaces": [
+                {
+                    "interface": "org.deepin.service.demo2a",
+                    "whitelist": "w2",
+                    "methods": [
+                        {
+                            "method": "Register",
+                            "whitelist": "w1"
+                        },
+                        {
+                            "method": "Hello",
+                            "permission": false
+                        }
+                    ],
+                    "properties": [
+                        {
+                            "property": "Age",
+                            "permission": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/org/deepin/services/test1",
+            "pathhide": true,
+            "permission": false
+        }
+    ]
+}

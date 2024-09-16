@@ -1,0 +1,83 @@
+# This prf file is used to deploy files that dconfig's meta and override configure.
+#
+# get variable `$$DSG_DATA_DIR` 's value, it’s consistent with class DConfigFile code.
+isEmpty(DSG_DATA_DIR) {
+    isEmpty(PREFIX) {
+        DSG_DATA_DIR=/usr/share/dsg
+    } else {
+        DSG_DATA_DIR=$$PREFIX/share/dsg
+    }
+}
+
+# deploy some `meta` 's configure.
+#
+# files       - deployed files.
+# base        - used to get subpath, if it's empty, only copy files, and ignore it's subpath structure.
+# appid       - working for the app, if it's empty, depending on `TEMPLATE`.
+# commonid    - working for common, if it's empyt, depending on `TEMPLATE`.
+#
+# e.g:
+# dconfig_example.files += \
+#     $$PWD/configs/dconf-example.json \
+#     $$PWD/configs/a/dconf-example.json
+# dconfig_example.base = $$PWD/configs
+# dconfig_example.appid = $$TARGET
+#
+# dconfig_example2.files += $$PWD/configs/a/dconf-example.json
+#
+# DCONFIG_META_FILES += dconfig_example dconfig_example2
+#
+for(metaitem, DCONFIG_META_FILES) {
+    eval(dconfig_meta_$${metaitem}.files = $$eval($${metaitem}.files))
+    eval(dconfig_meta_$${metaitem}.base = $$eval($${metaitem}.base))
+    isEmpty($${metaitem}.appid) {
+        is_common_configuration=true
+        isEmpty($${metaitem}.commonid) {
+            equals(TEMPLATE, app) {
+                eval(dconfig_meta_$${metaitem}.path = $$DSG_DATA_DIR/configs/$$TARGET/)
+                is_common_configuration=false
+            }
+        }
+        if ($$is_common_configuration) {
+            eval(dconfig_meta_$${metaitem}.path = $$DSG_DATA_DIR/configs)
+        }
+    } else {
+        eval(dconfig_meta_$${metaitem}.path = $$DSG_DATA_DIR/configs/$$eval($${metaitem}.appid))
+    }
+    INSTALLS += dconfig_meta_$${metaitem}
+}
+
+
+# deploy some `meta` 's override configure.
+#
+# configuration for the `meta_name` 's  override configure.
+#
+# files       - deployed files.
+# base        - used to get subpath, if it's empty, only copy files, and ignore it's subpath structure.
+# appid       - working for the app, if it's empty, working for all app.
+# meta_name   - override for the meta configure.
+#
+# e.g :
+# dconfig_example.files += \
+#     $$PWD/configs/dconf-example.override.json \
+#     $$PWD/configs/a/dconf-example.override.a.json
+# dconfig_example.base = $$PWD/configs
+# dconfig_example.meta_name = example
+# dconfig_example.appid = $$TARGET
+#
+# dconfig_example2.files += $$PWD/configs/a/dconf-example.override.a.json
+# dconfig_example2.meta_name = example2
+#
+# DCONFIG_OVERRIDE_FILES += dconfig_example dconfig_example2
+#
+for(overrideitem, DCONFIG_OVERRIDE_FILES) {
+    eval(dconfig_override_$${overrideitem}.files = $$eval($${overrideitem}.files))
+    eval(dconfig_override_$${overrideitem}.base = $$eval($${overrideitem}.base))
+    isEmpty($${overrideitem}.meta_name) : error("Please set meta_name for the override configuration." $${overrideitem})
+    isEmpty($${overrideitem}.appid) {
+        eval(dconfig_override_$${overrideitem}.path = $$DSG_DATA_DIR/configs/overrides/$$eval($${overrideitem}.meta_name))
+    } else {
+        eval(dconfig_override_$${overrideitem}.path = $$DSG_DATA_DIR/configs/overrides/$$eval($${overrideitem}.appid)/$$eval($${overrideitem}.meta_name))
+    }
+    INSTALLS += dconfig_override_$${overrideitem}
+}

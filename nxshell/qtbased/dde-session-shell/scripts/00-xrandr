@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# xrandr 输出的主屏幕有可能是断开的
+# $ xrandr|egrep -o '^.* (connected|primary)'
+# DVI-I-0 disconnected primary
+# DVI-I-1 connected
+# VGA-1-1 connected
+
+xinfo(){
+    local IFS=$'\n'
+    XINFO=($(xrandr|egrep -o '^.* connected( primary)?'))
+}
+
+# 仅当连接两个屏幕时进行如下操作
+if xinfo && ((${#XINFO[@]} == 2)); then
+    # 假设第一行为主屏
+    primary=(${XINFO[0]})
+    second=(${XINFO[1]})
+    # 如果第二行输出含有 primary, 则交换
+    if ((${#second[@]} == 3)); then
+        primary=(${XINFO[1]})
+        second=(${XINFO[0]})
+    fi
+    xrandr --output ${second[0]} --right-of ${primary[0]} --auto
+fi

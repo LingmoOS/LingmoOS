@@ -1,0 +1,192 @@
+/*!
+@~chinese
+@ingroup dfilesystem
+@file include/filesystem/dcapfile.h
+
+@class Dtk::Core::DCapFile
+@brief 对于文件操作的安全封装, 提供了带有安全管控的文件读取, 相关漏洞见[CWE_22](https://cwe.mitre.org/data/definitions/22.html)
+
+@fn explicit Dtk::Core::DCapFile(QObject *parent = nullptr)
+@brief 默认构造函数, 创建一个文件默认文件对象
+
+@fn Dtk::Core::DCapFile::DCapFile(const QString &name,  QObject *parent)
+@brief 重载的构造函数, 接受传入一个文件名, 并创建一个文件对象
+@note 调用此构造函数相当于调用默认构造函数+`DCapFile::setFileName()`
+
+@fn void Dtk::Core::DCapFile::setFileName(const QString &name)
+@brief 传入需要操作的文件名
+
+@fn bool Dtk::Core::DCapFile::exists() const
+@brief 文件是否存在
+@note 此处的存在指当前由setFileName() 指定的文件或者是在构造时指定的文件是否可读可写
+@note 需要在构造时或者手动指定了文件名才可以使用此函数, 否则请调用其重载的函数
+
+@fn static bool Dtk::Core::DCapFile::exists(const QString &fileName)
+@brief 文件是否存在
+@param[in] fileName 文件名
+@note 此处的存在指的是此函数的传入的文件名指向的文件是否可读可写
+
+@fn QString Dtk::Core::DCapFile::readLink() const
+@brief 读取软连接, 如果软连接指向的文件不允许读写, 则返回空字符串
+@note 此方法在Qt版本>=5.13后**废弃**
+@return 返回软连接指向的文件或者目录的绝对路径
+@note 需要在构造时或者手动指定了文件名才可以使用此函数, 否则请调用其重载的函数
+@sa [readLink](https://doc.qt.io/qt-5/qfile-obsolete.html#readLink-1)
+
+@fn QString Dtk::Core::DCapFile::symLinkTarget() const
+@brief 这是一个重载函数<br>
+        返回符号链接, 或Windows上的快捷方式指向的文件或目录的绝对路径, 如果该对象不是符号链接, 则返回一个空字符串。
+
+@fn bool Dtk::Core::DCapFile::remove()
+@brief 如果文件存在则删除文件
+@note 此处的存在指当前由setFileName() 指定的文件或者是在构造时指定的文件是否可读可写
+@note 需要在构造时或者手动指定了文件名才可以使用此函数, 否则请调用其重载的函数
+@note 文件需要在删除前被关闭
+
+@fn static bool Dtk::Core::DCapFile::remove(const QString &fileName)
+@brief 如果文件存在则删除文件
+@param[in] fileName 文件名
+@note 此处的存在指的是此函数的传入的文件名指向的文件是否可读可写
+@note 文件需要在删除前被关闭
+@sa DCapFile::remove()
+
+@fn bool Dtk::Core::DCapFile::moveToTrash()
+@brief 如果文件存在则将文件移动至默认回收站(垃圾桶)
+@note 此处的存在指当前由setFileName() 指定的文件或者是在构造时指定的文件是否可读可写
+@note 需要在构造时或者手动指定了文件名才可以使用此函数, 否则请调用其重载的函数
+@note 此方法仅在Qt版本>=5.15.0后可用
+
+@fn bool Dtk::Core::DCapFile::moveToTrash(const QString &fileName,  QString *pathInTrash)
+@brief 如果传入文件名对应文件存在则将文件移动至指定回收站(垃圾桶)
+@note 此处的存在指的是此函数的传入的文件名指向的文件是否可读可写
+@note 此方法仅在Qt版本>=5.15.0后可用
+@param[in] fileName 文件名
+@param[in] pathInTrash 回收站路径
+
+@fn bool Dtk::Core::DCapFile::rename(const QString &newName)
+@brief 如果文件名存在则重命名文件
+@param[in] newName 新文件名
+@note 需要在构造时或者手动指定了文件名才可以使用此函数, 否则请调用其重载的函数
+
+@fn static bool Dtk::Core::DCapFile::rename(const QString &oldName,  const QString &newName)
+@brief 如果文件名存在则重命名文件
+@param[in] oldName 旧文件名
+@param[in] newName 新文件名
+
+@fn bool Dtk::Core::DCapFile::link(const QString &newName)
+@brief 创建一个名为newName的链接
+@details 该链接指向当前由`setFileName()`指定的文件或者是在构造时指定的文件。链接是什么取决于底层文件系统(无论是Windows上的快捷方式还是Unix上的符号链接)。如果成功, 则返回ture;否则返回false
+@note 如果是windows系统的newName参数必须有`.lnk`合法后缀才可用
+@param[in] newName 新文件名
+
+@fn static bool Dtk::Core::DCapFile::link(const QString &oldname,  const QString &newName)
+@brief 该函数是重载`DCapFile::link()`区别是需要手动传入原始文件名
+@sa DCapFile::link(const QString &newName)
+
+@fn bool Dtk::Core::DCapFile::copy(const QString &newName)
+@brief `setFileName()`指定的文件或者是在构造时指定的文件复制一份, 名为newName<br>
+        如果成功, 则返回ture;否则返回false
+@note 确保文件在复制之前是关闭的
+@note 如果复制的文件是一个符号链接(symlink), 它所指的文件被复制, 而不是链接本身。除了权限
+        会被复制外, 其他的文件元数据都不会被复制。
+@note 如果一个名称为 newName 的文件已经存在, `copy()`将会返回true但是并不会覆盖它
+
+@fn static bool Dtk::Core::DCapFile::copy(const QString &fileName,  const QString &newName)
+@brief 该函数是重载`DCapFile::copy(const QString &newName)`区别是需要手动传入原始文件名
+@sa DCapFile::copy(const QString &newName)
+
+@fn bool Dtk::Core::DCapFile::open(OpenMode flags)
+@brief 使用OpenMode模式打开文件, 如果成功返回true;否则返回false<br>
+@details 模式如下：<br>
+        NotOpen = 0x0000, <br>
+        ReadOnly = 0x0001, <br>
+        WriteOnly = 0x0002, <br>
+        ReadWrite = ReadOnly | WriteOnly, <br>
+        Append = 0x0004, <br>
+        Truncate = 0x0008, <br>
+        Text = 0x0010, <br>
+        Unbuffered = 0x0020, <br>
+        NewOnly = 0x0040, <br>
+        ExistingOnly = 0x0080<br>
+@note 在只写或读写模式下, 如果相关文件不存在, 该函数将在打开文件之前尝试创建一个新文件
+
+@fn bool Dtk::Core::DCapFile::resize(qint64 sz)
+@brief 设置文件大小sz(以字节为单位)。如果调整大小成功, 则返回true;否则为false。如果sz大于当前文件, 则新字节将设置为 0;如果sz较小, 则文件将被简单地截断
+@note 如果文件不存在, 此函数可能会无效
+
+@fn  static bool Dtk::Core::DCapFile::resize(const QString &filename,  qint64 sz)
+@brief 该函数是重载`DCapFile::resize(qint64 sz)`区别是手动指定文件名
+@sa DCapFile::resize(qint64 sz)
+
+*/
+
+/*!
+@class Dtk::Core::DCapFile
+@brief 对于文件夹操作的封装
+
+@fn Dtk::Core::DCapDir::DCapDir(const DCapDir &)
+@brief 拷贝构造函数 构造一个DCapDir对象, 该对象是目录目录的DCapDir对象的副本
+
+@fn Dtk::Core::DCapDir::DCapDir(const QString &path = QString())
+@brief 构造指向给定目录路径的DCapDir。如果 path 为空, 则使用程序的工作目录`.`
+
+@fn Dtk::Core::DCapDir::DCapDir(const QString &path,
+        const QString &nameFilter, SortFlags sort = SortFlags(Name | IgnoreCase),
+        Filters filter = AllEntries)
+@brief 构造具有路径路径的DCapDir对象
+@details 该 DCapDir 使用nameFilter按名称筛选其条目, 并使用筛选器 按属性筛选其条目。它还使用排序对名称进行排序。<br>
+    默认名称筛选器是一个空字符串, 它不排除任何内容;默认筛选器是“所有条目”, 这也意味着不排除任何内容。默认排序为“名称|忽略大小写, 即按名称排序, 不区分大小写。
+    如果path为空字符串, DCapDir 将使用 “.”(当前目录)<br>
+    如果nameFilter为空字符串, DCapDir 将使用名称筛选器“*”(所有文件)
+@note 路径不需要存在
+
+@fn void Dtk::Core::DCapDir::setPath(const QString &path)
+@brief 将目录的路径设置为path。该路径被清除了多余的"."、"... "和多个分隔符。没有检查这个路径的
+        目录是否真的存在；<br>
+        路径可以是绝对路径也可以是相对路径, 绝对路径以目录分隔符"/"开始(在Windows下可以选择在前面加一个驱动器号, 例如: C:\)<br>
+        相对路径以目录名开始, 并指定一个相对于当前目录的路径。一个绝对路径的例子是字符串"/etc/apt", 一个相对路径例子是 "src/1/"<br>
+
+@fn bool Dtk::Core::DCapDir::cd(const QString &dirName)
+@brief 将DCapDir的目录更改为dirName。
+        如果新目录存在, 则返回true;否则返回false
+        请注意, 如果新目录不存在, 则不执行逻辑`cd()`操作
+
+@fn QStringList Dtk::Core::DCapDir::entryList(Filters filters = NoFilter,  SortFlags sort = NoSort) const
+@brief 返回目录中所有文件和目录的名称列表
+@details 这些名称根据以前使用`setNameFilters()` 和`setFilter()`
+        设置的名称和属性筛选器排序, 并根据使用`setSorting() 设置的标志进行排序。<br>
+        可以使用过滤器和排序参数覆盖属性过滤器和排序规范。
+        如果目录不可读、不存在或与规范不匹配, 则返回空列表。
+
+@fn QString Dtk::Core::DCapDir::entryList(const QStringList &nameFilters,  Filters filters = NoFilter,
+                          SortFlags sort = NoSort)
+@brief 重载函数, 返回目录中所有文件和目录的名称列表
+@sa entryList(Filters filters = NoFilter,  SortFlags sort = NoSort)
+
+@fn bool Dtk::Core::DCapDir::mkdir(const QString &dirName) const
+@brief 创建文件夹
+
+@fn bool Dtk::Core::DCapDir::rmdir(const QString &dirName) const
+@brief 移除文件夹
+
+@fn bool Dtk::Core::DCapDir::mkpath(const QString &dirPath)
+@brief 创建目录
+
+@fn bool Dtk::Core::DCapDir::rmpath(const QString &dirPath)
+@brief 移除目录
+
+@fn bool Dtk::Core::DCapDir::exists() const
+@brief 文件夹是否存在(如果找到同名文件, 此函数将返回 false)
+
+@fn bool Dtk::Core::DCapDir::exists(const QString &name) const
+@brief 指定文件夹是否存在(如果找到同名文件, 此函数将返回 false)
+
+@fn bool Dtk::Core::DCapDir::remove(const QString &fileName)
+@brief 移除文件夹
+
+@fn bool Dtk::Core::DCapDir::rename(const QString &oldName,  const QString &newName)
+@brief 重命名文件夹
+@param[in] oldName 旧文件夹名
+@param[in] newName 新文件夹名
+
+*/

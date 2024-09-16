@@ -1,0 +1,45 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.desktopspec.JobManager1">
+        <annotation
+            name="org.freedesktop.DBus.Description"
+            value="All method might block will return a DBus object path,
+                   which implement org.desktopspec.JobManager1.Job.
+                   This interface is design to provide some DBus signals to help
+                   caller to watch the Jobs they invoked.
+                   Caller should not interst in all the Jobs, as there are some
+                   Jobs not created by them.
+                   So the method to list all exsiting Jobs is NOT provided.
+                   NOTE:
+                   Signal emitted by this interface MIGHT be peer-to-peer."
+        />
+
+        <signal name="JobNew">
+            <arg type="o" name="job" />
+            <arg type="o" name="source" />
+
+            <annotation
+                name="org.freedesktop.DBus.Description"
+                value="`source` is the DBus object produce this job."
+            />
+        </signal>
+        <signal name="JobRemoved">
+            <arg type="o" name="job" />
+            <arg type="s" name="status" />
+            <arg type="av" name="result" />
+
+            <annotation
+                name="org.freedesktop.DBus.Description"
+                value="This signal report the job remove event.
+                       `status` is the `status` porperty of that Job
+                       when it got removed.
+                       `result` is the result which produce by this job,
+                       and user needs to traverse the list to determine 
+                       if the values are valid or not.
+                       Method that return an object of Job
+                       should always have document
+                       about the type and meaning of the `result`."
+            />
+        </signal>
+    </interface>
+</node>

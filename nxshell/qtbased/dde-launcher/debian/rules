@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export QT_SELECT=5
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+		dh $@ --parallel
+
+include /usr/share/dpkg/default.mk
+SYSTYPE=Desktop
+SYSTYPE=$(shell cat /etc/deepin-version | grep Type= | awk -F'=' '{print $$2}')
+
+ifeq ($(DEB_BUILD_ARCH), sw_64)
+override_dh_auto_configure:
+		dh_auto_configure -- -DENABLE_MIEEE=YES -DDISABLE_DRAG_ANIMATION=YES
+endif
+
+

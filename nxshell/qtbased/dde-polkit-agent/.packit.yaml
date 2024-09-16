@@ -1,0 +1,20 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: rpm/deepin-polkit-agent.spec
+
+# add or remove files that should be synced
+synced_files:
+    - rpm/deepin-polkit-agent.spec
+    - .packit.yaml
+
+upstream_package_name: dde-polkit-agent
+# downstream (Fedora) RPM package name
+downstream_package_name: deepin-polkit-agent
+
+actions:
+  fix-spec-file: |
+    bash -c "sed -i -r \"0,/Version:/ s/Version:(\s*)\S*/Version:\1${PACKIT_PROJECT_VERSION}/\" rpm/deepin-polkit-agent.spec"
+  post-upstream-clone: |
+    cp rpm/dde-polkit-agent.spec rpm/deepin-polkit-agent.spec
+

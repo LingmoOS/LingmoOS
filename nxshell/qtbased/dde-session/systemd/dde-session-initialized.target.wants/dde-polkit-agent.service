@@ -1,0 +1,21 @@
+[Unit]
+Description=dde-polkit-agent service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/polkit-1-dde/dde-polkit-agent
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=500ms

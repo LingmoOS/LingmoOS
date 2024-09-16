@@ -1,0 +1,183 @@
+/*!
+@~chinese
+@file daudiodevice.h
+
+daudiodevice.h 中定义了音频端口管理对象的接口。
+
+@class Dtk::AudioManager::DAudioDevice daudiodevice.h
+@brief DAudioDevice音频设备管理类
+
+DAudioDevice 中定义了音频设备对象的接口。
+
+@fn DAudioDevice::DAudioDevice(DPlatformAudioDevice *d, DAudioCard *parent = nullptr)
+@brief 构造获取音频设备
+@param [in] d 为具体的音频设备实现类
+@param [in] parent 输入设备所属声卡对象
+
+@fn virtual bool DAudioDevice::mute() const
+@brief 是否静音
+@return 是否静音
+
+@fn virtual double DAudioDevice::fade() const
+@brief 前后声道平衡值
+@return 前后声道平衡值
+
+@fn virtual double DAudioDevice::volume() const
+@brief 当前音量
+@return 当前音量
+
+@fn virtual double DAudioDevice::balance() const
+@brief 左右声道平衡值
+@return 左右声道平衡值
+
+@fn virtual bool DAudioDevice::supportBalance() const
+@brief 是否支持左右声道调整
+@return 是否支持左右声道调整
+
+@fn virtual bool DAudioDevice::supportFade() const
+@brief 是否支持前后声道调整
+@return 是否支持前后声道调整
+
+@fn virtual double DAudioDevice::baseVolume() const
+@brief 默认音量值
+@return 默认音量值
+
+@fn virtual double DAudioDevice::meterVolume() const
+@brief 反馈音量值
+@return 反馈音量值
+
+@fn virtual QString DAudioDevice::activePort() const
+@brief 当前激活端口
+@return 端口名称
+
+@fn virtual void DAudioDevice::setActivePort(const QString &portName) const
+@brief 设定激活端口
+@param [in] portName 端口名称
+
+@fn virtual QList<DAudioPortPtr> DAudioDevice::ports() const
+@brief 返回音频设备的端口列表
+@return 端口对象列表
+
+@fn virtual QString DAudioDevice::name() const
+@brief 设备名称
+@return 设备名称
+
+@fn virtual QString DAudioDevice::description() const
+@brief 设备描述信息
+@return 设备描述信息
+
+@fn quint32 DAudioDevice::card() const
+@brief 设备对应的声卡
+@return 设备对应的声卡
+
+@fn QList<DAudioStreamPtr> DAudioDevice::streams() const
+@brief 音频设备对应的音频流列表
+@return 音频设备对应的音频流列表
+
+@fn DAudioStreamPtr DAudioDevice::stream(const QString &streamName) const
+@brief 指定音频设备名称对应的音频流
+@param [in] streamName 为音频流名称
+@return 音频流对象
+
+@fn QString DAudioDevice::isPlay() const
+@brief 调节音量或声道时，是否反馈调节效果
+@return 是否反馈
+
+@fn void DAudioDevice::setIsPlay(bool isPlay) const
+@brief 设置是否反馈调节效果
+@param [in] isPlay 是否反馈
+
+@fn virtual void DAudioDevice::setMute(bool mute)
+@brief 设置是否静音
+@param [in] mute 是否静音
+
+@fn virtual void DAudioDevice::setFade(double fade)
+@brief 设置前后声道平衡值
+@param [in] fade 前后声道平衡值
+
+@fn virtual void DAudioDevice::setVolume(double volume)
+@brief 设置当前音量
+@param [in] volume 音量值
+
+@fn virtual void DAudioDevice::setBalance(double balance)
+@brief 设置左右声道平衡值
+@param [in] balance 左右声道平衡值
+
+@fn void DAudioDevice::streamAdded(const QString &name)
+@brief 有音频流新增时触发
+@param [in] name 为输出流名称
+
+@fn void DAudioDevice::streamRemoved(const QString &name)
+@brief 有音频流删除时触发
+@param [in] name 为输出流名称
+
+@fn void DAudioDevice::muteChanged(bool mute)
+@brief 静音变化
+@param [in] mute 是否静音 
+
+@fn void DAudioDevice::fadeChanged(double fade)
+@brief 前后声道平衡值变化
+@param [in] fade 前后声道平衡值
+
+@fn void DAudioDevice::volumeChanged(double volume)
+@brief 当前音量变化
+@param [in] volume 当前音量值
+
+@fn void DAudioDevice::balanceChanged(double balance)
+@brief 左右声道平衡值变化
+@param [in] balance 左右声道平衡值
+
+@fn void DAudioDevice::supportBalanceChanged(bool supportBalance)
+@brief 是否支持左右声道调整变化
+@param [in] supportBalance 是否支持左右声道调整
+
+@fn void DAudioDevice::supportFadeChanged(bool supportFade)
+@brief 是否支持前后声道调整变化
+@param [in] supportFade 是否支持前后声道调整
+
+@fn void DAudioDevice::baseVolumeChanged(double baseVolume)
+@brief 默认音量值变化
+@param [in] baseVolume 默认音量值
+
+@fn void DAudioDevice::meterVolumeChanged(double meterVolume)
+@brief 反馈音量值变化
+@param [in] meterVolume 反馈音量值 
+
+@fn void DAudioDevice::nameChanged(QString name)
+@brief 音频设备名称变化
+@param [in] name 音频设备名称
+
+@fn void DAudioDevice::descriptionChanged(QString description)
+@brief 音频设备描述信息变化
+@param [in] description 音频设备描述信息
+
+@fn void DAudioDevice::isPlayChanged(bool isPlay)
+@brief 是否反馈设置变化
+@param [in] isPlay 是否反馈
+
+@fn void DAudioDevice::activePortChanged(QString portName)
+@brief 是否激活端口发生变化
+@param [in] portName 激活端口名称
+
+
+@class Dtk::AudioManager::DAudioInputDevice daudiodevice.h
+@brief DAudioInputDevice音频输入设备类
+
+DAudioInputDevice 中定义了音频输入设备对象的接口。
+
+@fn DAudioInputDevice::DAudioInputDevice(DPlatformAudioInputDevice *d, DAudioCard *parent = nullptr)
+@brief 构造音频输入设备类
+@param [in] d 音频输入设备具体实现类
+@param [in] parent 输入设备所属声卡对象
+
+@class Dtk::AudioManager::DAudioOutputDevice daudiodevice.h
+@brief DAudioOutputDevice音频输出设备类
+
+DAudioOutputDevice 中定义了音频输出设备对象的接口。
+
+@fn DAudioOutputDevice::DAudioOutputDevice(DPlatformAudioOutputDevice *d, DAudioCard *parent = nullptr)
+@brief 构造音频输出设备类
+@param [in] d 音频输出设备具体实现类
+@param [in] parent 输出设备所属声卡对象
+
+*/

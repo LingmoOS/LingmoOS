@@ -1,0 +1,59 @@
+###############################################################################
+#
+# Makefile for libxlsxwriter library.
+#
+# Copyright 2014-2020, John McNamara, jmcnamara@cpan.org
+#
+
+# Keep the output quiet by default.
+Q=@
+ifdef V
+Q=
+endif
+
+# Directory variables.
+INC_DIR        = ../../../include
+LIB_DIR        = ../../../src
+
+# Flags passed to the C compiler.
+CFLAGS += -DTESTING -DCOLOR_OK -g -Wall -Wextra -Wno-unused-parameter
+
+# Make targets and objects.
+SRCS  = $(wildcard test*.c)
+TESTS = $(patsubst %.c,%,$(SRCS))
+OBJS  = $(patsubst %.c,%.o,$(SRCS))
+
+# Libs to link.
+LIBS_A = $(LIB_DIR)/libxlsxwriter_test.a
+LIBS_O = -lz
+ifdef USE_SYSTEM_MINIZIP
+LIBS_O += -lminizip
+CFLAGS += -DUSE_SYSTEM_MINIZIP
+endif
+
+# Use a user-defined double number formatting function.
+ifdef USE_DOUBLE_FUNCTION
+CFLAGS += -DUSE_DOUBLE_FUNCTION
+endif
+
+# Make all the individual tests.
+all : $(TESTS)
+
+# Clean all the things!
+clean :
+	$(Q)rm -f $(TESTS) test_all *.o
+
+# Build the testscases.
+%.o: %.c
+	$(Q)$(CC) -I$(INC_DIR) $(CFLAGS) -c $<
+
+test_%: main.o test_%.o $(LIBS_A)
+	$(Q)$(CC) $(CFLAGS) -o $@ $^ $(LIBS_O)
+
+# Link all the tests into one test executable.
+test_all : main.o $(OBJS) $(LIBS_A)
+	$(Q)$(CC) $(CFLAGS) -o $@ $^ $(LIBS_O)
+
+# Run the tests.
+test : all test_all
+	$(Q)./test_all

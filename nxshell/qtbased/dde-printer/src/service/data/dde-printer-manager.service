@@ -1,0 +1,36 @@
+[Unit]
+Description=Deepin Printer Manager
+
+[Service]
+Type=dbus
+BusName=com.deepin.printer.manager
+User=root
+ExecStart=/usr/lib/deepin-daemon/dde-printer-manager
+CapabilityBoundingSet=CAP_SYS_PTRACE
+MemoryLimit=100M
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=-/tmp
+ReadWritePaths=-/etc
+InaccessiblePaths=/etc/shadow
+InaccessiblePaths=-/etc/NetworkManager/system-connections
+InaccessiblePaths=-/etc/pam.d
+InaccessiblePaths=-/usr/share/uadp
+InaccessiblePaths=-/etc/sudoers
+InaccessiblePaths=-/etc/passwd
+InaccessiblePaths=-/etc/group
+InaccessiblePaths=-/etc/ssh
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateMounts=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+# ARM模拟器运行需要分配内存有可写和可执行权限
+# MemoryDenyWriteExecute=yes

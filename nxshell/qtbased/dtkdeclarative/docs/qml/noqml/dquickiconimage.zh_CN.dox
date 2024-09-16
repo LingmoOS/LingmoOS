@@ -1,0 +1,98 @@
+
+/**
+@~chinese
+@class QtIcon
+@ingroup Item
+
+    \keyword DQuickIconImage
+@brief 提供一种使用 Qt 方式加载图标的控件
+
+    QtIcon 作为 DTK 程序访问和插件 Qt 图标的控件，虽然 DTK Quick 极力推荐
+    应用在大多数的场景下使用 Qt 图标，但是不乏存在应用能需要使用 Qt 图标的情况。
+    因此 DTK 提供 QtIcon 来访问和获取 Qt 图标（默认使用异步的方式加载）。
+    其使用方式（同步加载）如下所示代码：
+
+@
+    QtIcon {
+        name: "button-add"
+        sourceSize {
+            width: 128
+            height: 128
+        }
+
+        mode: QtIcon.Selected
+        color: "gray"
+        state: QtIcon.On
+        asynchronous: false
+    }
+```
+
+
+
+@property string QtIcon::name
+
+    name 属性用于设置 QtIcon 的图标名称，该名称通过图标主题的方式查找提供。
+    DTK环境下实现的图标主题在 dtkgui 中，通过 Built-in 图标隐藏和 Xdg 图标
+    引擎提供。
+
+    当 name 图标无法找到时，请先设置好 fallbackSource 属性，用于 fallback 到
+    该路径下的图标中。
+
+
+
+@property enumeration QtIcon::state
+    state 属性描述 QtIcon 中图标的当前状态。 state 属性于 QIcon 中的
+    State 枚举一致，不同的图标可能存在不同的状态。状态可以使用以下枚举：
+
+    \table
+    \header
+        \li 枚举值
+        \li 名称
+    \row
+        \li QtIcon.On
+        \li 类似于 QIcon::On 即图标的开启状态
+    \row
+        \li QtIcon.Off
+        \li 类似于 QIcon::Off 即图标的关闭状态
+    \endtable
+
+
+
+@property enumeration QtIcon::mode
+    mode 属性描述 QtIcon 中的模式，不同模式下的图标，可能展示的效果
+    不同，目前可以使用的模式枚举值为：
+
+    \table
+    \header
+        \li 枚举值
+        \li 名称
+    \row
+        \li QtIcon.Invalid
+        \li 无效状态
+    \row
+        \li QtIcon.Normal
+        \li normal 状态，图标的标准状态。
+    \row
+        \li QtIcon.Disabled
+        \li Disabled 状态，类似于控件的 Disabled 状态。
+    \row
+        \li QtIcon.Active
+        \li Active 状态，激活状态，类似于控件的 Hover 状态
+    \row
+        \li QtIcon.Selected
+        \li Selected 状态，选中状态，类似于 MenuItem 的选中状态
+    \endtable
+
+
+
+@property color QtIcon::color
+
+    color 属性描述图标填充的前景色颜色。与 Qt 提供的 Icon 控件效果一致，
+    当需要进行颜色填充时，请使用该属性。
+
+
+
+@property url QtIcon::fallbackSource
+
+    用于当 name 属性无法获取到图标时， fallbackSource 能够提供次选方案。
+    如果两种方式都无法找到图标，应用程序将出现一些警告信息。

@@ -1,0 +1,778 @@
+
+/**
+@~chinese
+@class Palette
+@ingroup QtObject
+
+    \keyword DQuickControlPalette
+@brief DTK 中用于取色器（ColorSelector）使用的统一调色板对象.
+@details
+    DTK 程序统一的调色板对象，其作为 ColorSelector 进行颜色选择的载体，通常情况下
+    具备“Normal”，“Hovered”，“Pressed”和“Disabled”四种不同的状态，但并所有的状
+    态都需要指定颜色，可根据控件情况自由选择需要的状态。其使用方式如下述代码所示：
+```qml
+    import org.deepin.dtk
+
+    Palette {
+        normal: "red"
+        hovered: "green"
+        pressed: "blue"
+        disabled: "black"
+    }
+```
+    当未找到对应控件调色板下的指定状态时，取色器（ColorSelector）会选择 “normal” 状态
+    的颜色进行代替。
+    调色板拥有一些其他的额外属性，下面按照分类的方式展示：
+    \section1 主题适配
+    调色板的状态颜色值并非一个固定值，有的时候控件的某种颜色在系统的不同主题下，存在不一致的情况，有的
+    能够使用公式进行关联，而有的差异千差万别，这样就无法关联在一起。Palette 控件通过不同属性值来控制
+    亮色和暗色主题的颜色。具体为在各个状态的名称中添加了 “Dark” 关键字，例如“normalDark”。通常情况
+    下，当控件的深浅主题调色版颜色一致时，不需要指定“Dark”状态的颜色，而在控件深浅主题颜色不通用时指定。
+    例如下述代码：
+```qml
+    import org.deepin.dtk
+
+    Palette {
+        normal: "red"
+        normalDark: "black"
+        hovered: "green"
+        hoveredDark: "yellow"
+    }
+```
+
+    \section1 禁用与启用
+    调色板可控制其状态属于禁用或者启用，这在需要动态调整调色板的使用时非常有用。取色器(ColorSelector)
+    会忽略禁用的属性并向上寻找其父类的该同名调色板。其使用方式如下所示：
+```qml
+    import org.deepin.dtk
+
+    Palette {
+        normal: "red"
+        enabled: false
+    }
+```
+
+    \section1 颜色族
+    \target Palette color family
+    颜色族(family)，默认的颜色族为“common”，当取色器(ColorSelector)修改其当前颜色族时，会将其使用
+    的所有调色板颜色进行重新选择，选择出对应的颜色族。目前可以使用的颜色族有两种，分别是"common"和"crystal"
+    颜色族。基础的控件颜色都需要定义在"common"颜色族中，而"crystal"颜色族用于指定类似“水晶”效果（即能够透过
+    控件本身颜色看透其背后控件的类似效果）的颜色值。如"TransparentButton"控件。
+
+    \table
+    \header
+        \li 颜色族
+        \li 描述
+    \row
+        \li \c common
+        \li 基础颜色族，未指定时默认初始化该数据，用于基础的控件颜色。
+    \row
+        \li \c crystal
+        \li 水晶颜色族，用于特殊情况下的控件需要出现类似“水晶”效果时，指定的颜色
+        例如，Dialog 中的内部控件，如按钮等，其背景和默认的按钮背景不一致。
+    \endtable
+
+    下述使用方式展示了如何在调色
+    版中使用颜色族：
+```qml
+    import org.deepin.dtk
+
+    Palette {
+        normal {
+            common: "#f0f0f0"
+            crystal: Qt.rgba(0.20, 0.2, 0.2, 0.1)
+        }
+        hovered: "#d2d2d2"  //  common family
+        pressed.crystal: "#cdd6e0"  //  crystal family
+    }
+```
+
+    \section1 QPalette 调色板适配
+    DTK 调色板能够适配 Qt 调色板的部分颜色属性，如高亮色和高亮文本色，具体使用方式如下：
+```qml
+    Palette {
+        normal: DTK.makeColor(Color.Highlight)
+        hovered: DTK.makeColor(Color.Highlight).lightness(+10)
+        pressed: DTK.makeColor(Color.Highlight).opacity(-10)
+    }
+```
+    QPalette 调色板属性进行颜色微调。如上述代码，调整其亮度和不透明度等属性。除此之外
+    可修改饱和度 (saturation) 和 色调 (hue),颜色的取值范围为[100， +100]
+
+@property bool Palette::enabled
+@brief 调色板对象是否启用
+@details 取色器会寻找其父类中最近一个同名的调色板对象，并取其颜色值。默认情况下，该属性为 true
+
+@propertygroup :Palette::normal
+@property Color Palette::normal.common
+@property Color Palette::normal.crystal
+
+    控件 “Normal” 状态下的颜色，“Normal”状态对应于控件最基本的状态，是每个控件都
+    存在的状态，取色器根据控件是否处于 normal 状态来控制其选择调色板颜色。
+
+@propertygroup Palette::normalDark
+@property Color Palette::normalDark.common
+@property Color Palette::normalDark.crystal
+
+    控件 “Normal” 状态下暗色主题下的颜色，该属性只在暗色主题下生效，当控件不对
+    主题色敏感时，取色器只会选取 normal 属性的颜色。
+
+@propertygroup Palette::hovered
+@property Color Palette::hovered.common
+@property Color Palette::hovered.crystal
+
+    控件 “Hovered” 状态下的调色板颜色，“Hovered” 属性表示控件被鼠标悬浮是的状态，
+    一些控件，如“Button”、“LineEdit”、“ComboBox”等都有这种状态。和 normal 状态
+    类似，当控件处于 hovered 状态时，取色器会自动选择该属性颜色。
+
+@propertygroup Palette::hoveredDark
+@property Color Palette::hoveredDark.common
+@property Color Palette::hoveredDark.crystal
+
+    控件 hovered 状态时的暗色主题颜色。
+
+@propertygroup Palette::pressed
+@property Color Palette::pressed.common
+@property Color Palette::pressed.crystal
+
+    控件 “Pressed” 状态时的调色板颜色， “Pressed” 状态对应于鼠标按压后的控件
+    状态，并非所有的控件都需要响应此状态，如“Button”、“CheckBox”存在该状态，
+    “Label”,“Edit”不存在该状态。
+
+@propertygroup Palette::pressedDark
+@property Color Palette::pressedDark.common
+@property Color Palette::pressedDark.crystal
+
+    控件 “Pressed” 状态暗色主题下对应的调色板颜色。
+
+@propertygroup Palette::disabled
+@property Color Palette::disabled.common
+@property Color Palette::disabled.crystal
+
+    控件 “disabled” 状态下的调色板颜色，控件的 “Disabled” 状态对应于控件的禁用
+    状态，每个控件都具备禁用状态，如未指定时，默认使用“Normal”状态下的颜色代替。
+
+@propertygroup Palette::disabledDark
+@property Color Palette::disabledDark.common
+@property Color Palette::disabledDark.crystal
+
+    控件 “disabled” 状态暗色主题下对应的调色板颜色
+
+/**
+@~chinese
+@class ColorSelector
+@ingroup QtObject
+
+    \keyword DQuickControlColorSelector
+@brief DTK 用于指定控件颜色的统一取色辅助器.
+
+    取色器作为一个能够自动获取控件不同状态，并根据该状态选择合适的颜色的角色而存在。目的是用于
+    简便控件状态的使用，自动并高效的指定控件颜色。使用取色器作用在控件上时，处理颜色的过程更加
+    简单，只需要在控件中指定对应属性的调色板信息，在需要使用的地方，使用取色器直接使用就能达到
+    跟随状态自动改变的效果。
+
+    由于需要在控件中指定不同的调色板颜色属性，因此外部可以通过更改该属性而达到修改取色器颜色值
+    进行颜色替换的效果，每个控件中都具备相同类型的属性，如 “backgroundColor” 背景颜色属性，
+    “textColor” 文字颜色属性等等。除此之外，取色器能够高级的只监听某一种控件状态，如
+    “Button” 的 “hovered” 或 “Pressed” 状态。同时取色器能够根据系统主题信息，自动选择
+    对应主题下的调色板属性。
+
+    颜色控制系统可以分为三个层次：调色板、控件属性和取色器。取色器作为监听者，能够监听这二者的变
+    化，除此之外，取色器会根据当前绑定的控件状态、控件对象等等信息自动更改颜色。下面给出一个简单
+    的示例代码：
+
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 500
+        height: 50
+
+        property Palette backgroundColor: Palette {
+            normal: "black"
+        }
+        property Palette textColor: Palette {
+            normal: "white"
+        }
+
+        contentItem: Text {
+            text: "Test......."
+            color: control.ColorSelector.textColor
+            horizontalAlignment: Qt.AlignHCenter
+            verticalAlignment: Qt.AlignVCenter
+        }
+
+        background: Rectangle {
+            width: 250
+            height: 50
+            color: control.ColorSelector.backgroundColor
+        }
+    }
+```
+
+    \note 当控件类型继承于 Control 或者控件存在调色板数据时，该控件的 ColorSelector 附加属性才会被创建。
+    \note 如果当前控件非继承于 Control类型，且具备创建 ColorSelector 的条件，该 ColorSelector 将寻找其最
+        上层父类的 Control 控件，并进行调色板和控件状态的更新绑定。
+    \note ColorSelector 仅会监听当前控件和离它最近的父类 Control控件的调色板属性。其中间父类不论是否存在
+        ColorSelector 对象，都不会读取和绑定。
+
+    ColorSelector 在下述变化的场景中，同样能够跟随控件发生变化。
+    \section2 ColorSelector 可跟随控件状态发生变化
+    当 Control 开启 hoverEnabled 属性后，ColorSelector 能够监听控件状态的变化过程，并跟随发生属性的颜色变化
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 50
+        height: 50
+        hoverEnabled: true
+        property Palette backgroundColor: Palette {
+            normal: "red"
+            hovered: "green"
+        }
+
+        background: Rectangle {
+            anchors.fill: parent
+            color: control.ColorSelector.backgroundColor
+        }
+    }
+```
+
+    \section1 ColorSelector 的颜色属性
+    \section2 ColorSelector 跟随手动修改后的调色板颜色而变化
+    可通过直接修改调色板的在某个状态额颜色值，而直接更新 ColorSelecotor 读取出来的调色板
+    属性颜色，如下述代码所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 50
+        height: 50
+        hoverEnabled: true
+
+        background: Rectangle {
+            id: rect
+            property Palette backgroundColor: Palette {
+                normal: "red"
+                hovered: "green"
+            }
+            color: ColorSelector.backgroundColor
+            anchors.fill: parent
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    rect.backgroundColor.hovered = "yellow"
+                }
+            }
+        }
+    }
+```
+    可通过直接赋值的方式，替换 ColorSelector 记录的整个调色板数据，如下述
+    代码所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 50
+        height: 50
+        hoverEnabled: true
+
+        background: Rectangle {
+            id: rect
+            property Palette backgroundColor: Palette {
+                normal: "red"
+                hovered: "green"
+            }
+            anchors.fill: parent
+            color: ColorSelector.backgroundColor
+
+            MouseArea {
+                Palette {
+                    id: otherPalette
+                    normal: "black"
+                    hovered: "gray"
+                }
+                anchors.fill: parent
+                onClicked: {
+                    rect.backgroundColor = otherPalette
+                }
+            }
+        }
+    }
+```
+
+    \section2 ColorSelector 响应自身属性值的变化
+    上述替换调色板属性，同样也可通过 ColorSelector 进行替换。如下述代码所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 50
+        height: 50
+        hoverEnabled: true
+
+        background: Rectangle {
+            id: rect
+            property Palette backgroundColor: Palette {
+                normal: "red"
+                hovered: "green"
+            }
+            anchors.fill: parent
+            color: ColorSelector.backgroundColor
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    Palette {
+                        id: otherOPalette
+                        normal: "black"
+                        hovered: "gray"
+                    }
+                    rect.ColorSelector.backgroundColor = otherPalette
+                }
+            }
+        }
+    }
+```
+    替换后的属性值，可通过赋值为 undefined 进行复原，如下述代码所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 50
+        height: 50
+        hoverEnabled: true
+
+        background: Rectangle {
+            id: rect
+            property Palette backgroundColor: Palette {
+                normal: "red"
+                hovered: "green"
+            }
+            anchors.fill: parent
+            color: ColorSelector.backgroundColor
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    Palette {
+                        id: otherPalette
+                        normal: "black"
+                        hovered: "gray"
+                    }
+                    rect.ColorSelector.backgroundColor = otherPalette
+                }
+                onDoubleClicked: {
+                    // 复原
+                    rect.ColorSelector.backgroundColor = undefined
+                }
+            }
+        }
+    }
+```
+
+    \section2 ColorSelector 对于自身没有的调色板属性，会从上层 Control 寻找
+    ColorSelector 属性能够获取其自身对象以及其最近的 Control 控件的调色板属性，并监听 Control 控件的状态变化，
+    进行颜色属性的自动更新。如下述代码所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 200
+        height: 200
+        hoverEnabled: true
+        property Palette backgroundColor: Palette {
+            normal: "red"
+            hovered: "green"
+        }
+
+        background: Rectangle {
+            property Palette borderColor: Palette {
+                normal: "blue"
+                hovered: "yellow"
+            }
+            // 获取 Control 类中的 backgroundColor 调色板属性
+            color: ColorSelector.backgroundColor
+            border.width: 2
+            // 获取自身的 borderColor 调色板属性
+            border.color: ColorSelector.borderColor
+        }
+    }
+```
+    \warning 需要注意的是， Control 控件的子控件，如果其自身不存在任何调色板属性，将不会
+    为它创建 ColorSelector 对象。因此上述方式只能作用于 子控件存在调色板属性的场景。
+
+    \section2 ColorSelector 能够监听控件的父类，当父类发生变化时，会跟随更新其使用父类的所有调色板颜色。
+
+    \section2 已封装好的控件使用颜色覆盖的形式
+    如想要替换 Button 中的文本颜色时，可用如下代码：
+```qml
+    Button {
+        text: "Push Button"
+        textColor: Palette {
+            normal: "red"
+            hovered: "blue"
+        }
+    }
+```
+    \section1 ColorSelctor 进行状态过滤
+    ColorSelector  可以进行控件单一状态（hovered、pressed、disabled、inactived）的设置。默认情况下，各
+    个状态都是处于未设置的状态，即不针对某一状态进行单独处理而默认接受所有状态的改变。
+
+    \list
+    \li 将控件的某个状态作为其标准状态
+    例如控件需要将其“Hovered”状态作为其标准状态时，可使用如下代码：
+```qml
+    Rectangle {
+        width: 200
+        height: 300
+
+        Button {
+            anchors.centerIn: parent
+            text: "Hovered state"
+            // 仅处理 hovered 状态
+            ColorSelector.hovered: true
+        }
+    }
+```
+    \li 控件禁用某一状态
+    例如当控件需要禁用“Hovered”状态时，可使用如下代码：
+```qml
+    Rectangle {
+        width: 200
+        height: 300
+
+        Button {
+            anchors.centerIn: parent
+            text: "Can't Hovered"
+            ColorSelector.hovered: false
+        }
+    }
+```
+    \li 多种状态的叠加
+    当禁用状态和启用状态同时使用时，例如除“Hovered”状态外，其他状态都处于禁用状态，可用如下代码：
+```qml
+    Rectangle {
+        width: 200
+        height: 300
+
+        Button {
+            anchors.centerIn: parent
+            text: "Only Hovered"
+            ColorSelector.hovered: true
+            ColorSelector.pressed: false
+            ColorSelector.disabled: false
+        }
+    }
+```
+    上述代码的效果为，仅展示 Hovered 状态，禁用其他所有状态。
+    \endlist
+
+    \note 状态控制仅接受真实bool值的设置，不针对属性绑定
+    \note 推荐控件只有一种状态被启用。当多个状态都处于启用状态时，标准状态将按照不同控件情况而定。
+
+    \section1 标准控件的 Palette 属性对照
+    下表列出基础控件可被替换修改的调色板颜色属性值（按字母顺序排序）：
+    \table
+    \header
+        \li 控件
+        \li 属性
+        \li 描述
+    \row
+        \li ActionButton
+        \li textColor
+        \li 按钮的文本和图标的颜色
+    \row
+        \li {1, 7} BoxPanel
+        \li color1
+        \li Box 或 Button 控件的背景渐变色1
+    \row
+        \li color2
+        \li Box 或 Button 控件的背景渐变色2
+    \row
+        \li insideBorderColor
+        \li Box 或 Button 控件的内描边颜色
+    \row
+        \li outsideBorderColor
+        \li Box 或 Button 控件的外描边颜色
+    \row
+        \li dropShadowColor
+        \li Box 或 Button 控件的外阴影颜色
+    \row
+        \li innerShadowColor1
+        \li Box 或 Button 控件的内阴影渐变颜色1
+    \row
+        \li innerShadowColor2
+        \li Box 或 Button 控件的内阴影颜色2
+    \row
+        \li BusyIndicator
+        \li fillColor
+        \li BusyIndicator 的填充色
+    \row
+        \li Button
+        \li textColor
+        \li 按钮控件中的文本和图标颜色
+    \row
+        \li ButtonIndicator
+        \li backgroundColor
+        \li ButtonIndicator 的背景颜色
+    \row
+        \li ButtonPanel
+        \li 继承于 BoxPanel
+        \li 能使用 BoxPanel 中的所有调色板颜色
+    \row
+        \li CheckDelegate
+        \li backgroundColor
+        \li \l CheckDelegate 控件的背景色
+    \row
+        \li ComboBox
+        \li separatorColor
+        \li ComboBox 在编辑状态下的分隔符颜色
+    \row
+        \li {1, 2} EditPanel
+        \li backgroundColor
+        \li 所有的编辑框背景色
+    \row
+        \li alertBackgroundColor
+        \li 所有编辑框在显示警告信息时的背景颜色
+    \row
+        \li {1, 2} EmbeddedProgressBar
+        \li backgroundColor
+        \li 嵌入式进度条的背景颜色
+    \row
+        \li progressBackgroundColor
+        \li 嵌入式进度条的进度背景色
+    \row
+        \li FloatingButton
+        \li 继承于 Button
+    \row
+        \li {1, 3} FloatingPanel
+        \li backgroundColor
+        \li FloatingPanel 控件的背景颜色
+    \row
+        \li dropShadowColor
+        \li FloatingPanel 的外阴影颜色
+    \row
+        \li borderColor
+        \li FloatingPanel 的边框颜色
+    \row
+        \li {1, 3} HighlightPanel
+        \li backgroundColor
+        \li HighlightPanel 的背景颜色
+    \row
+        \li outerShadowColor
+        \li HighlightPanel 的外阴影颜色
+    \row
+        \li innerShadowColor
+        \li HighlightPanel 的内阴影颜色
+    \row
+        \li IpV4LineEdit
+        \li backgroundColor
+        \li IpV4LineEdit 的背景框颜色
+    \row
+        \li ItemDelegate
+        \li checkedTextColor
+        \li ItemDelegate 在选中时的文本颜色
+    \row
+        \li {1, 2} KeySequenceEdit
+        \li backgroundColor
+        \li KeySequenceEdit 控件的背景颜色
+    \row
+        \li placeholderTextColor
+        \li KeySequenceEdit 的占位文本颜色
+    \row
+        \li {1, 2} MenuItem
+        \li subMenuBackgroundColor
+        \li 子菜单的背景色
+    \row
+        \li itemColor
+        \li 文字和图标 Hovered 状态下的颜色
+    \row
+        \li Slider
+        \li grooveColor
+        \li Slider 控件的滑槽背景颜色
+    \row
+        \li {1, 2} SliderTipItem
+        \li tickColor
+        \li Slider 控件标签的背景颜色
+    \row
+        \li textColor
+        \li Slider 控件标签的文本颜色
+    \row
+        \li SpinBoxIndicator
+        \li inactiveBackgroundColor
+        \li SpinBox 右侧指示按钮在未激活状态时的背景颜色
+    \row
+        \li {1, 2} Switch
+        \li backgroundColor
+        \li Switch 按钮的背景颜色
+    \row
+        \li handleColor
+        \li Switch 按钮的滑槽颜色
+    \row
+        \li TextField
+        \li backgroundColor
+        \li TextField 控件的背景颜色
+    \row
+        \li TitleBar
+        \li textColor
+        \li TitleBar 控件的文本和图标颜色
+    \row
+        \li ToolButton
+        \li textColor
+        \li ToolButton 控件的文本和图标颜色
+    \row
+        \li WarningButton
+        \li 继承于 Button
+        \li 能使用 Button 控件中的所有调色板颜色
+    \row
+        \li {1, 5} WaterProgressBar
+        \li backgroundColor1
+        \li WaterProgressBar 的背景渐变色1
+    \row
+        \li backgroundColor2
+        \li WaterProgressBar 的背景渐变色2
+    \row
+        \li dropShadowColor
+        \li WaterProgressBar 的外阴影颜色
+    \row
+        \li popBackgroundColor
+        \li WaterProgressBar 的内置小气泡背景颜色
+    \row
+        \li textColor
+        \li WaterProgressBar 的文本颜色
+    \row
+        \li WindowButton
+        \li textColor
+        \li WindowButton 控件的文本和图标颜色
+    \row
+        \li WindowButtonGroup
+        \li textColor
+        \li WindowButtonGroup 内所有 WindowButton 控件的文本和图标颜色
+    \endtable
+
+@property Item ColorSelector::control
+@note 该属性为只读属性
+@details
+    需要绑定的 Control 对象。绑定后 ColorSelector 会根据当前 control 的状态
+    选择对应的颜色值。通常情况下该属性不需要手动设置，当使用 ColorSelector 的
+    附加属性时，ColorSelector 会自动寻找最接近其的父类 Control 控件，并自动将
+    该控件当做需要监听的对象，因此一个父类 Control,其所有的子类的 ColorSelector
+    属性都将按照它的状态发生颜色变化。
+
+@property enumeration ColorSelector::controlTheme
+@note 该属性为只读属性
+@details
+    control 控件的当前主题，只读属性，通常情况下 ColorSelector 会监听控件的主题状态。
+    用于选择亮色或暗色的状态颜色。
+    枚举对应于 ApplicationHelper 中的主题色枚举，如下表所示：
+
+    \table
+    \header
+        \li 枚举值
+        \li 名称
+
+    \row
+        \li ApplicationHelper.LightType
+        \li 亮色主题类型
+    \row
+        \li ApplicationHelper.DarkType
+        \li 暗色主题类型
+    \row
+        \li ApplicationHelper.UnknowType
+        \li 未知主题类型
+    \endtable
+
+@property enumeration ColorSelector::controlState
+@note 该属性为只读属性
+@details
+    控件状态，只读属性。该属性是 ColorSelector 根据当前 control 的状态自动生成。
+    其枚举值如下表所示：
+
+    \table
+    \header
+        \li 枚举值
+        \li 名称
+    \row
+        \li DTK.NormalState
+        \li normal 状态
+    \row
+        \li DTK.HoveredState
+        \li Hovered 状态
+    \row
+        \li DTK.PressedState
+        \li Pressed 状态
+    \row
+        \li DTK.DisabledState
+        \li 控件被禁用状态
+    \row
+        \li DTK.InactiveState
+        \li 控件未激活状态
+    \endtable
+
+@property enumeration ColorSelector::family
+
+    调色板额颜色族，指定 ColorSelector 需要设置的颜色族。不同的颜色族提供的颜色
+    不一致，目前有两种颜色族可以定义：
+
+    \table
+    \header
+        \li 枚举值
+        \li 名称
+    \row
+        \li Palette.CommonColor
+        \li 基本颜色族。默认的颜色族，不额外指定时，控件为该颜色族。存储控件默认场景下的颜色。
+
+    \row
+        \li Palette.CrystalColor
+        \li 水晶颜色族。当控件的背景为透明模糊时，使用该颜色族。
+    \endtable
+
+    其使用方式如下代码所示：
+```qml
+    import org.deepin.dtk 1.0
+    FloatingPanel {
+        width: 200
+        height: 200
+        backgroundColor: Palette {
+            normal {
+                common: "#f0f0f0"
+                crystal: Qt.rgba(0.20, 0.2, 0.2, 0.1)
+            }
+            hovered: "#d2d2d2"  //  common family
+            pressed.crystal: "#cdd6e0"  //  crystal family
+        }
+
+        ColorSelector.family: Palette.CrystalColor
+        contentItem: ListView {
+            model: 6
+            delegate: MenuItem { text: "菜单项" + modelData }
+        }
+    }
+```
+
+@property bool ColorSelector::hovered
+@brief 启用或者禁用 hovered 状态。当处于禁用状态时，控件对鼠标的悬浮状态不敏感。
+
+@property bool ColorSelector::pressed
+@brief 启用或者禁用 pressed 状态。当处于禁用状态时，控件对鼠标的点击状态不敏感。
+
+@property bool ColorSelector::disabled
+@brief 启用或者禁用 disabled 状态。当处于禁用状态时，控件对其 disabled 状态不敏感。
+
+@property bool ColorSelector::inactived
+@brief 启用或者禁用 inactived 状态。当处于禁用状态时，控件对其 inactived 状态不敏感。
+
+@signal void ColorSelector::colorPropertyChanged(string name)
+@brief  ColorSelector 内存储的颜色属性发生变化时，触发该信号。 \a name 为发生改变的颜色属性名称
+
+FIXME:此文件存疑 后期处理
+*/

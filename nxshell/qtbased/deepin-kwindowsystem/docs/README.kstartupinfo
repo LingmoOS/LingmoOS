@@ -1,0 +1,279 @@
+Application startup notification
+Lubos Lunak <l.lunak@kde.org>
+--------------------------------
+--------------------------------
+
+
+ When a new application is started in KDE, together with it a startup
+notification is sent, which is used to show a startup entry in taskbar,
+the busy icon next to the cursor and put the window of the started app
+on correct desktop.
+ This application startup notification ( ASN for short in the following
+text ) usually works fine without problems, but some applications and
+some special cases may need special handling.
+ Right now, this is only an internal KDE standard, but since a toolkit
+support would improve the results a bit, I'll try to discuss this
+on http://www.freedesktop.org .
+
+
+Starting apps with ASN :
+-------------------------
+
+ When an application is started from the K-Menu or the minicli, and from other
+places, ASN is sent automatically for it, assuming a matching .desktop file
+is found for the starting application. Application without a .desktop file
+don't get ASN ( this may change, but it's unlikely as it creates too many
+ASNs which will stay too long until a timeout ). For improving the quality
+of ASN and reducing the number of ASNs that don't detect when the application
+has started, some .desktop file entries may be helpful ( see below ).
+ If you want to start an application in your code, prefer using KRun or
+KApplication::startServiceByXXX() calls. Classes like KProcess don't create
+ASN, so if you need to use it, you have to send it manually ( only in case
+ASN is useful in this case, it shouldn't be sent e.g. for system processes ).
+ 
+
+.desktop files :
+-----------------
+
+These following .desktop file entries affect ASN :
+
+X-KDE-StartupNotify=<bool>
+    - if true, this app/service will get app startup notify
+    - if false, this app/service will _not_ get app startup notify
+    - if not set
+        - if it's service, it will _not_ get app startup notify
+        - if it's app, it will get app startup notify, but
+            X-KDE-WMClass will be assumed to be "0" ( non-compliant )
+X-KDE-WMClass=<string>
+    - if set, and it's different from "0" ( without quotes ), this
+        is the WMClass value for startup notification
+    - if it's "0" ( without quotes ), such app is considered non-compliant,
+        and the startup notification will stop
+            - either if its windows is correctly detected using the default
+                WMClass value ( the name of the binary )
+            - or if a window is mapped that is not recognized ( doesn't have
+                neither _KDE_STARTUP_ID nor _NET_WM_PID property /*CHECKME*/),
+                it's assumed this window belongs to the started app;
+                the start-on-desktop feature won't work then too
+    - if not set, it defaults to the binary name of the app ( ok for most apps,
+        including KDE ones )
+    - to get the WMCLASS value for any app, run 'xprop' and click on the app's
+        window, WMCLASS value for this app should be any of the strings listed
+        in the WM_CLASS property ( it's usually the same as the name of the
+        app's binary file, in such case it doesn't need to be explicitly set )
+MapNotify=<bool>
+    - this key is obsolete
+    - true is equivalent to X-KDE-StartupNotify=true and no X-KDE-WMClass set
+    - false is equivalent to X-KDE-StartupNotify=true and X-KDE-WMClass=0
+        - many .desktop files in KDE ( especially in kdebase/kappfinder )
+            seem to have MapNotify=false even though it's not needed, this
+            needs to be checked and replaced by the needed X-KDE-* values,
+            often just X-KDE-StartupNotify=true should be enough
+        
+ The best way to check if the entries are set correctly is to start
+the application and switch to other desktop. If the startup notification
+disappears and the application appears on the desktop on which it was
+started, it's correct ( with X-KDE-WMClass=0, the start-on-desktop
+feature may not work ).
+
+ Ideally, every .desktop file should have X-KDE-StartupNotify set to the correct
+value, and for apps which need it also X-KDE-WMClass should be set. This
+sometimes gives slightly better behavior than when these entries are not set.
+
+
+The KStartupInfo classes : 
+--------------------------
+
+ In some cases, or if you are interested in getting the ASN information, you
+have to use the KStartupInfo classes in kdelibs/kdecore.
+
+Receiving the application startup notification information :
+------------------------------------------------------------
+
+ Create an instance of class KStartupInfo and connect to its slots, they
+will be emitted whenever a ASN info is received.
+ The clean_on_cantdetect argument to the constructor means whether all
+ASN info for non-compliant apps should be removed when a window is mapped
+which cannot be identified ( it's not possible to say if it belong to one
+of the starting applications or not ). If the argument is true, it is
+assumed that the window does belong to one of the starting applications,
+and all ASN info for non-compliant apps must be removed, otherwise the ASN
+info would timeout ( e.g. kdesktop sets it to true, otherwise the busy
+icon would sometimes stay for too long, which is oftern annoying ).
+On the other hand, KWin, which maps the first window of the starting apps
+to the given virtual desktop, sets it to false, because there's no visual
+representation and if a window for a starting non-compliant application is
+detected later, it still will be successfully places on the correct virtual
+desktop.
+ Note that the ASN info is often send in several messages, and the slots
+will be therefore emitted several times, with the updated info ( e.g. the
+binary name or PID is not know from the beginning ).
+
+Sending the application startup notification information :
+----------------------------------------------------------
+
+ Before an application is started, ASN info for it must be sent ( unless
+it's done by classes like KRun ). See e.g. KRun sources for details.
+ During the starting of the application, the info may need some updating
+( e.g. right after starting the app, the PID with hostname may be sent,
+or a PID change when KUniqueApplication forks into background ).
+ When it's detected that the started process exited, it an ASN info
+about the finished process should be sent. Since the application may
+have forked into background, the finish info should include the PID
+and hostname, and the notification will be stopped only if there's
+no other PID for it. On the other hand, if you simply really need
+to stop ASN, send only the identification ( KStartupInfo::sendFinish()
+with only KStartupInfoId argument ).
+
+
+
+Implementation details :
+------------------------
+
+ The ASN info data is sent using X ClientMessages as text ( see below ),
+this is mainly in hope also non-KDE people will start using it, and
+they wouldn't be very happy with DCOP.
+ Before starting an application, and environment variable called
+KDE_STARTUP_ENV is added to it's environment, and it's set to unique
+identifier of its startup notification, or "0" for disabled ASN.
+Ideally, the application should read it, and set a window property
+called _KDE_STARTUP_ID ( type XA_STRING ) at least on its first mapped
+toplevel window to this value. It should also unset it, so it doesn't get
+propagated to other applications started from it. It should also
+update the ASN info when necessary, e.g. when KUniqueApplication
+forks into background, it sends the PID change. That's how compliant
+applications should work, and this support for ASN should be provided
+by toolkits. All KDE application should be compliant by now, since
+kdelibs do all the necessary things. The KDE_STARTUP_ENV variable
+is read and unset in KApplication constructor, and _KDE_STARTUP_ID
+is set on every toplevel window in KApplication::setTopWidget().
+ However, majority of applications aren't compliant now, and even
+if I succeed making this thing a standard ( part of NETWM_SPEC
+or whatever ), there still will be old applications that won't behave
+this way. Not unsetting KDE_STARTUP_ENV is not a big problem, since
+the ASN for its value will usually timeout, and when the app starts
+a new application, this ASN identification value will get reused without
+problems. The other problem is detecting, which newly mapped windows
+belong to which starting application. If a newly mapped window doesn't
+have _KDE_STARTUP_ID property, the code tries to read its _NET_WM_PID
+property, and if it's set, it tries to match it ( together with
+WM_CLIENT_MACHINE ) with PIDs of all ASN infos. And if the window
+doesn't have even the _NET_WM_PID property, WM_CLASS property is used
+then. It's usually set to two strings, and at least one of them is
+usually the binary name of the application, so it's converted
+to lowercase and compared. For applications, where such comparison
+would fail, the X-KDE-WMClass .desktop file entry should be set
+to the correct WMClass value ( e.g. for XEmacs, the binary name
+is 'xemacs', but WM_CLASS is 'emacs', 'Emacs', so its X-KDE-WMClass
+in its .desktop file should be set to 'emacs' - the case doesn't
+matter ).
+ The ASN identification string must be a unique string for every ASN.
+In KStartupInfo class, it's created as 'hostname;tm.sec;tm.usec;pid',
+tm being the current time. If the identification string is set to "0",
+it means no ASN should be done ( e.g. for things like kio_uiserver,
+which shouldn't get ASN ). Empty identification string means the same
+like "0", except for the call to KStartupInfoId::initId(), where it means
+to create a new one.
+
+
+Format of the text messages :
+-----------------------------
+
+There are 3 types of messages :
+ - new: message
+    - this message announces that a new application is being started,
+      if there is not ASN info for this ASN identification, it should be
+      updated, otherwise it will be created
+    - the text of the message starts with 4 characters 'new:', followed
+      by the text entries ( see below )
+ - change: message
+    - this message is like new: message, but it's only for updating existing
+      ASN info, if there's no ASN info for the given identification, it won't
+      be created. This is used e.g. in KUniqueApplication when it forks
+      into background and sends info about the PID change - it should update
+      any existing ASN info, but mustn't create a new one, otherwise there
+      could appear ASN even for applications which shouldn't have ASN
+    - the text of the message starts with 4 characters 'change:', followed
+      by the text entries ( see below )
+ - remove: message
+    - this message is sent for stopping ASN with the given identification.
+      If the only item in the message is the identification string, the ASN
+      info should be removed. If there are also the PID and HOSTNAME entries
+      ( see below ), the matching ASN info should be only removed if this
+      given PID is the only PID for it ( in this case, the identification
+      string may be omitted ).
+    - the text of the message starts with 4 characters 'remove:', followed
+      by
+          - only ID entry
+	  - only ID, PID and HOSTNAME entries
+	  - only PID and HOSTNAME entries
+
+
+Text entries in the messages :
+------------------------------
+
+Every entry is of the form <name>=<value>. Value may be either a number
+or a string. If the string contains spaces, it must be quoted ("), all
+backslashes and quotes (") must be escaped by backslashes. If this ever
+becomes more than an internal KDE standard, non-standard entry names should
+start with an underscore.
+
+Entries :
+
+- ID        - string
+            - the identification string of the startup notification
+            - it must be present in all messages except for the remove:
+              message with only PID and HOSTNAME
+- BIN       - string
+            - the binary name of the starting application
+            - usually used as a fallback value if WMCLASS is not present
+            - e.g. 'kcontrol'
+- NAME      - string
+            - the name of the starting application
+            - usually used only for displaying it when indicating that
+              the application is starting
+            - e.g. 'Control Center'
+- ICON      - string
+            - the icon for this startup notification
+            - it should be handled like the Icon= entry in .desktop files
+            - e.g. 'kcontrol'
+- DESKTOP   - number
+            - the virtual desktop on which the application should appear
+            - if the application's first window has _NET_WM_DESKTOP already
+              set when the window is mapped, it shouldn't be changed
+- WMCLASS   - string
+            - the WMCLASS value used for matching newly mapped windows
+              of non-compliant applications
+            - useful only if it's different from the binary
+              name of the application
+- PID       - number
+            - the PID of a process that belongs to this startup notification
+            - there may be several PIDs for one notification
+            - value 0 is also valid, meaning that there's a process
+              with unknown PID for this notification ( is used e.g.
+              by kfmclient when it sends a DCOP message to already running
+              konqueror instance to create a new window and exits immediately,
+              without adding the zero PID to the notification, process
+              that started kfmclient could detect it exited and would send
+              a remove: message for the notification with kfmclient's PID,
+              which would cause the notification to stop if there wasn't also
+              PID=0 for it
+- HOSTNAME  - string
+            - the hostname of the machine on which the application is being
+              started
+            - this is used together with the PID entry
+
+--------------------
+
+ Well, I guess that's all. The KDE2.2 release will show if the users like it
+or not ( it's quite good IMHO, even though there are probably some minor
+details to fix or improve ). The only big thing remaining is to make also
+non-KDE people agree on using something like this. My first attempt
+https://listman.redhat.com/pipermail/xdg-list/2001-May/000083.html
+didn't get much attention, but now that there's a working implementation,
+I hope it will get better, when I try again sometime in the future.
+
+
+
+ Lubos Lunak <l.lunak@kde.org>
+

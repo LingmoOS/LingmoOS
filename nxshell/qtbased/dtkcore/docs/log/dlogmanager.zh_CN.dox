@@ -1,0 +1,41 @@
+/*!
+@~chinese
+
+@ingroup dlog
+@file include/log/LogManager.h
+@class Dtk::Core::DLogManager
+@brief DLogManager是dtk日志管理类,提供对日志的基础设置
+@details 使用此类可以很方便的为自己的dtk程序加上日志,一般情况下应用如果需要写入日志只需要调用此类
+调用相应的注册方法设置存储路径相关信息即可
+
+@fn static void Dtk::Core::DLogManager::registerConsoleAppender()
+@brief 注册默认的控制台记录器
+
+@fn static void Dtk::Core::DLogManager::registerFileAppender()
+@brief 注册默认的文件记录器，默认的文件记录器类型为RollingFileAppender.
+@note 输出日志默认文件位置为`~/.cache/<organizationName>/<applicationName>.log`如果获取 $HOME 环境变量失败将不写日志.
+如果在创建程序的时候没有指定这两个name,如果未设置organizationName,则是 `~/.cache/<applicationName>/<applicationName>.log`
+如果applicationName没有设置, 会fallback到进程二进制文件名
+@sa DLogManager::setlogFilePath()
+
+@fn static void Dtk::Core::DLogManager::registerJournaldAppender()
+@brief 注册默认的journald记录器
+@note 此方法只在linux下有效
+@detials 默认输出文件位置为`/var/log/journal/<machine-id>.journal`,前提是此目录存在且有写权限，
+如果目录不存在，systemd将不会自动创建此目录，并将日志写入到`/run/log/journal/<machine-id>.journal`中，此目录不支持持久化存储，
+将在下次重启后丢失。
+@note 查看日志可用`journalctl`命令，查看详细信息可用`journalctl -o verbose`命令，也可以使用deepin 日志查看器查看
+
+@fn static QString Dtk::Core::DLogManager::getlogFilePath()
+@brief 获取当前的日志存储路径,包括文件名
+
+@fn static void Dtk::Core::DLogManager::setlogFilePath(const QString &logFilePath)
+@brief 设置log文件路径。如果文件存在且不是log文件类型(比如文件夹)会导致设置无效并输出一条警告。
+@note 注意,此文件路径为包括具体文件名的绝对路径。需要此文件不存在或者存在且为有效类型(xxx.log),一般情况下无需手动指定路径。
+
+@fn static void Dtk::Core::DLogManager::setLogFormat(const QString &format)
+@brief 设置日志的格式,如果没有设置格式
+@details 默认的格式为:`"%{time}{yyyy-MM-dd, HH:mm:ss.zzz} [%{type:-7}] [%{file:-20} %{function:-35} %{line}] %{message}\n"`
+@sa Dtk::Core::AbstractStringAppender::format()
+
+*/

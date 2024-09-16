@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core DBus)
+find_dependency(Dtk@DTK_VERSION_MAJOR@ COMPONENTS Core)
+include(${CMAKE_CURRENT_LIST_DIR}/Dtk@DTK_VERSION_MAJOR@DeviceTargets.cmake)
+get_target_property(Dtk@DTK_VERSION_MAJOR@Device_INCLUDE_DIRS Dtk@DTK_VERSION_MAJOR@::Device INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(Dtk@DTK_VERSION_MAJOR@Device_LIBRARY_DIRS Dtk@DTK_VERSION_MAJOR@::Device INTERFACE_LINK_DIRECTORIES)
+set(Dtk@DTK_VERSION_MAJOR@Device_LIBRARIES Dtk@DTK_VERSION_MAJOR@::Device)
+check_required_components(Dtk@DTK_VERSION_MAJOR@Device)
+# Keep deprecated variables for compatibility
+set(DTK@DTK_VERSION_MAJOR@DEVICE_INCLUDE_DIR ${DtkDevice_INCLUDE_DIRS})

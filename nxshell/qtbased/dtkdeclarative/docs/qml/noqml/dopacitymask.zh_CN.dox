@@ -1,0 +1,74 @@
+
+/**
+@~chinese
+@class OpacityMask
+@ingroup Item
+
+    \keyword DOpacityMask
+@brief 一个同时支持软件和硬件渲染的不透明度遮罩控件.
+@details
+    能够同时支持软件渲染和硬件渲染，其能够为源材质提供一种不透明度遮罩。
+    使源材质能够作用做遮罩中。其硬件渲染（GPU渲染）模式和 Qt Graphical Effects
+    保持一致。软件模式下无法针对每个源材质的像素点进行遮罩处理，软件模式
+    使用 Qt 的混合模式实现。
+    其用法可用如下示例表示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Item {
+        width: 300
+        height: 300
+
+        Image {
+            id: bug
+            source: "html bug.jpg"
+            sourceSize: Qt.size(parent.width, parent.height)
+            smooth: true
+            visible: false
+        }
+
+        Image {
+            id: mask
+            source: "html butterfly.png"
+            sourceSize: Qt.size(parent.width, parent.height)
+            smooth: true
+            visible: false
+        }
+
+        OpacityMask {
+            anchors.fill: bug
+            source: bug
+            maskSource: mask
+        }
+    }
+```
+    其效果如下所示：
+    \table
+        \header
+            \li 源材质
+            \li 遮罩材质
+            \li 应用效果
+        \row
+            \li @image html opacityMask_sourceExample.jpg
+            \li @image html opacityMask_MaskExample.jpg
+            \li @image html opacityMask_effectExample.jpg
+    \endtable
+
+@property bool OpacityMask::cached
+@details
+    该属性用于提升性能，开启缓存后效果仅会在源材质和遮罩发生改变时修改，其他方式进行
+    的更新都无法更新应用效果。默认情况下该属性为 false.
+
+@property bool OpacityMask::invert
+@details
+    该属性用于控制应用效果的 alpha 值，当 \c invert 设置为true 时，效果的
+    alpha 值为源材质乘以遮罩的倒数，如 As * (1 - Am)，设置为 false 是，效果
+    为源材质乘以遮罩，如 As * Am。默认情况下，改值为 false。
+
+@property var OpacityMask::maskSource
+@details 该属性用于指定遮罩材质的数据，遮罩被渲染到目标中被用于确定形状和alpha值。
+
+@property var OpacityMask::source
+@details 该属性用于指定源材质的数据，源材质用于指定最终效果的内容，其alpha通道会和遮罩材质进行混合。
+
+*/

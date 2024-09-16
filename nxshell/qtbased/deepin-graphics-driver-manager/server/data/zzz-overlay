@@ -1,0 +1,23 @@
+#!/bin/sh
+
+case "$1" in
+        # no pre-reqs
+        prereqs) echo ""; exit 0;;
+esac
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+MYTAG="Deepin"
+
+ROOTMNT=${rootmnt}
+LOOP_DEV="/dev/loop0"
+ROOT_RO=${ROOTMNT}/media/root-ro
+OVERLAYROOT_CONF=${ROOT_RO}/etc/overlayroot.conf
+
+OVERLAY_DEVICE=$(cat /proc/mounts |grep ${ROOTMNT}/media/root-rw |awk '{print $1}')
+
+if [ "${OVERLAY_DEVICE}" = "${LOOP_DEV}" ]; then
+    mount -o remount,rw ${ROOT_RO}
+    sed -i 's:overlayroot=".*":overlayroot="":' ${OVERLAYROOT_CONF}
+    mount -o remount,ro ${ROOT_RO}
+fi
+exit 0

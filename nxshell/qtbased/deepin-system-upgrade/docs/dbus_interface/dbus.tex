@@ -1,0 +1,458 @@
+\documentclass{utart}
+
+\usepackage{plantuml}
+\usepackage{float}
+\usepackage{graphicx}
+\utUseMinted
+
+\title{升级工具DBus接口文档}
+\author{林欣}
+
+\begin{document}
+
+% 生成封面
+\utMakeTitle{}{1.0.0}{2022-09-20}
+
+% 生成修订记录
+\utMakeChangeLog{%
+    1.0.0 &      创建   &    林欣   &   2022-09-20      \\
+    1.0.1 &      增加plymouth主题设置与恢复接口   &    林欣   &   2022-11-17  \\
+    1.0.2 &      增加StopUpgrade接口   &    林欣   &   2022-11-18  \\
+    1.0.3 &      增加MigratePackages接口和几个状态信号   &    林欣   &   2022-11-26  \\
+    1.0.4 &      删除MigrateError信号，MigratePackages返回结构体   &    林欣   &   2023-01-03  \\
+    \hline
+}
+% 生成目录
+\utMakeTOC
+
+\newpage
+
+\section{org.deepin.SystemUpgrade1 接口}
+\subsection{服务名}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsection{对象路径}
+\begin{itemize}
+    \item /org/deepin/SystemUpgrade1
+\end{itemize}
+
+\subsection{接口名称}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+      StopUpgrade ();
+    \end{minted}
+    \item 功能描述
+  
+    中断升级过程，后端daemon自动退出
+    \item 参数
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{信号}
+\begin{itemize}
+    \item 信号名称
+    \item 参数
+\end{itemize}
+
+\section{org.deepin.SystemUpgrade1.Checker 接口}
+\subsection{服务名}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsection{对象路径}
+\begin{itemize}
+    \item /org/deepin/SystemUpgrade1/Checker
+\end{itemize}
+
+\subsection{接口名称}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1.Checker
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        Perform ( IN UINT64 phase);
+      \end{minted}
+    \item 功能描述
+    
+    升级过程前后的系统环境检查, 包括系统版本、系统激活状态、CPU 架构、磁盘剩余空间、
+    系统运行状态等。
+    \item 参数
+      \begin{itemize}
+          \item phase: [IN] 执行检查的阶段，如升级前的检查和升级后的检查。使用方法如下：
+            \begin{itemize}
+                \item 0: 升级前检查
+                \item 1: 升级后检查
+            \end{itemize}
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{信号}
+\begin{itemize}
+    \item 信号名称
+    
+    \begin{minted}{c}
+        CheckResult ( OUT Dict<String,Array<String>> checkResult
+                      OUT UINT64 percentage);
+      \end{minted}
+
+    \item 功能描述
+    
+    检查结束信号，携带检查结果以及检查阶段百分比值。
+    \item 参数
+        \begin{itemize}
+            \item checkResult: [OUT] 检查结果。键值信息如下：
+                \begin{itemize}
+                    \item active: 1代表已激活，0代表未激活。
+                    \item arch: 架构信息
+                    \item version: 系统版本
+                    \item datafree: 数据盘剩余空间
+                    \item database: 数据盘基线要求空间
+                    \item systemfree: 系统盘剩余空间
+                    \item systembase: 系统盘基线要求空间
+                \end{itemize}
+            \item percentage: [OUT] 检查阶段百分比值。
+        \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item 信号名称
+    
+    \begin{minted}{c}
+        CheckProgressValue ( IN INT64 value);
+      \end{minted}
+
+    \item 功能描述
+    
+    上报检查进度信息
+    \item 参数
+        \begin{itemize}
+            \item value: [IN] 检查进度百分比的值
+        \end{itemize}
+\end{itemize}
+
+\section{org.deepin.SystemUpgrade1.ConfigManager 接口}
+\subsection{服务名}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsection{对象路径}
+\begin{itemize}
+    \item /org/deepin/SystemUpgrade1/ConfigManager
+\end{itemize}
+
+\subsection{接口名称}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1.ConfigManager
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        GetSource ( OUT Struct of {String, String, Boolean} source);
+      \end{minted}
+    \item 功能描述
+    
+    获取Yaml配置文件中Source字段内容
+    \item 参数
+      \begin{itemize}
+          \item source: [out] 返回镜像源地址，镜像获取方式，镜像校验等信息。
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        GetIsBackupApps ( OUT Boolean backup);
+      \end{minted}
+    \item 功能描述
+    
+    获取Yaml配置文件中IsBackupApps字段内容
+    \item 参数
+      \begin{itemize}
+          \item backup: [out] 返回是否备份应用布尔值。
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+
+\section{org.deepin.SystemUpgrade1.AppManager 接口}
+\subsection{服务名}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsection{对象路径}
+\begin{itemize}
+    \item /org/deepin/SystemUpgrade1/AppManager
+\end{itemize}
+
+\subsection{接口名称}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1.AppManager
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        CancelBackupApp;
+      \end{minted}
+    \item 功能描述
+    
+    取消默认备份应用功能，主要针对/opt目录
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        MigratePackages;
+      \end{minted}
+    \item 功能描述
+    
+    迁移所有存在于V20但不存在于V23的包
+    \item 返回值
+      \begin{itemize}
+          \item 结构体:MigrateStatus 成员1:Code[错误码], 0:迁移成功, 1:网络错误, 2:其他错误   成员2:Description: [错误描述]
+          \item err == nil
+          \item 其他错误码
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{信号}
+\begin{itemize}
+    \item 信号名称
+    
+    \begin{minted}{c}
+        MigrateStatus ( IN String pkg 
+                        IN UINT64 status);
+      \end{minted}
+
+    \item 功能描述
+    
+    上报软件包安装状态
+    \item 参数
+        \begin{itemize}
+            \item pkg: [IN] 包名
+            \item status: [IN] 安装状态 0: 安装失败 1: 安装成功
+        \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item 信号名称
+  
+  \begin{minted}{c}
+      ProgressValue ( IN INT value);
+    \end{minted}
+
+  \item 功能描述
+  
+  上报软件安装进度
+  \item 参数
+      \begin{itemize}
+          \item value: [IN] 安装进度值，0 - 100
+      \end{itemize}
+\end{itemize}
+
+\section{org.deepin.SystemUpgrade1.VersionManager 接口}
+\subsection{服务名}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1
+\end{itemize}
+
+\subsection{对象路径}
+\begin{itemize}
+    \item /org/deepin/SystemUpgrade1/VersionManager
+\end{itemize}
+
+\subsection{接口名称}
+\begin{itemize}
+    \item org.deepin.SystemUpgrade1.VersionManager
+\end{itemize}
+
+\subsubsection{方法}
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        PrepareForUpgrade ( IN String path);
+      \end{minted}
+    \item 功能描述
+    
+    升级前的准备，包括新镜像根目录重构建和提交,需要开启异步调用，返回值error不为空时代表出错
+    \item 参数
+      \begin{itemize}
+          \item path: [IN] 输入镜像文件绝对路径
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        BackupSystem ();
+      \end{minted}
+    \item 功能描述
+    
+    备份当前系统用于升级后回滚，需要开启异步调用，返回值error不为空时代表出错
+    \item 参数
+      \begin{itemize}
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        RecoverSystem ();
+      \end{minted}
+    \item 功能描述
+    
+    用于升级失败后的系统还原，主要包括删除残留文件，恢复目录挂载等功能。
+    \item 参数
+      \begin{itemize}
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        SetPlymouthTheme (IN String theme);
+      \end{minted}
+    \item 功能描述
+    
+    用于设置系统在initrd阶段的动画显示
+    \item 参数
+      \begin{itemize}
+        \item theme: 主题名称
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+
+\begin{itemize}
+    \item 函数原型
+    
+    \begin{minted}{c}
+        RestorePlymouthTheme ();
+      \end{minted}
+    \item 功能描述
+    
+    恢复系统默认主题
+    \item 参数
+      \begin{itemize}
+      \end{itemize}
+    \item 返回值
+      \begin{itemize}
+          \item err == nil: 成功。
+          \item 其它： 错误码。
+      \end{itemize}
+\end{itemize}
+
+\subsubsection{信号}
+\begin{itemize}
+    \item 信号名称
+    
+    \begin{minted}{c}
+        ProgressValue ( IN INT64 value);
+      \end{minted}
+
+    \item 功能描述
+    
+    上报升级准备阶段进度信息
+    \item 参数
+        \begin{itemize}
+            \item value: [IN] 升级准备进度百分比的值
+        \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+  \item 函数原型
+  
+  \begin{minted}{c}
+      StartSystemUpgrade();
+    \end{minted}
+  \item 功能描述
+  
+  用于正式启动升级，包括修改默认启动项目并重启系统
+  \item 参数
+    \begin{itemize}
+    \end{itemize}
+  \item 返回值
+    \begin{itemize}
+        \item err == nil: 成功。
+        \item 其它： 错误码。
+    \end{itemize}
+\end{itemize}
+
+\end{document}
+
+
+% PrepareForUpgrade  func() `in:"isoPath"`
+% BackupSystem       func()
+% StartSystemUpgrade func()
+% RecoverSystem      func()

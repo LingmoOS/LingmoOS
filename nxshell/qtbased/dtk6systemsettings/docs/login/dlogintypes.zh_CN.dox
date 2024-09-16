@@ -1,0 +1,172 @@
+/*!
+@~chinese
+@ingroup dtklogin
+@file dlogintypes.h
+dlogintypes.h 中定义了login组件需要使用到的一些自定义数据结构。
+
+@enum Dtk::Login::ShutdownType dlogintypes.h
+@brief 定义关机类型
+@var ShutdownType ShutdownType::PowerOff
+关机
+@var ShutdownType ShutdownType::DryPowerOff
+实际并不执行关机
+@var ShutdownType ShutdownType::Reboot
+重启
+@var ShutdownType ShutdownType::DryReboot
+实际并不执行重启
+@var ShutdownType ShutdownType::Halt
+关机不关闭电源
+@var ShutdownType ShutdownType::DryHalt
+实际并不执行关机
+@var ShutdownType ShutdownType::Unknown
+未知操作
+
+@struct Dtk::Login::ScheduledShutdownValue dlogintypes.h
+@brief 定义定时关机所用数据结构
+@var ScheduledShutdownValue ScheduledShutdownValue::type
+关机类型
+@var ScheduledShutdownValue ScheduledShutdownValue::time
+执行时间
+
+@enum Dtk::Login::InhibitBehavior
+@brief 定义抑制锁行为
+@var InhibitBehavior::Shutdown
+关机
+@var InhibitBehavior::Sleep
+睡眠
+@var InhibitBehavior::Idle
+闲时
+@var InhibitBehavior::HandlePowerKey
+按下电源键
+@var InhibitBehavior::HandleSuspendKey
+按下待机键
+@var InhibitBehavior::HandleHibernateKey
+按下休眠键
+@var InhibitBehavior::HandleLidSwitch
+合上盖子
+
+@enum Dtk::Login::PowerAction
+@brief 定义关机键的动作
+@var PowerAction::PowerOff
+关机
+@var PowerAction::KExec
+加载新内核
+@var PowerAction::Reboot
+重启
+@var PowerAction::Halt
+关机不关闭电源
+@var PowerAction::Suspend
+待机
+@var PowerAction::Hibernate
+休眠
+@var PowerAction::HybridSleep
+混合睡眠
+@var PowerAction::SuspendThenHibernate
+先待机后休眠
+@var PowerAction::Lock
+锁屏
+@var PowerAction::FactoryReset
+还原设置
+@var PowerAction::Ignore
+忽略
+@var PowerAction::Unknown
+未知
+
+@enum Dtk::Login::ExecuteStatus
+@brief 是否可以执行当前动作
+@var ExecuteStatus::Yes
+可以
+@var ExecuteStatus::No
+硬件支持但用户不可以
+@var ExecuteStatus::Challenge
+鉴权后可以
+@var ExecuteStatus::Na
+硬件不支持
+@var ExecuteStatus::Unknown
+未知
+
+@enum Dtk::Login::SessionRole
+@brief 指定进程对象
+@var SessionRole::Leader
+父进程
+@var SessionRole::All
+所有进程
+@var SessionRole::Unknown
+未知
+
+@enum Dtk::Login::InhibitMode
+@brief 抑制锁的类型
+@var InhibitMode::Block
+完全禁止操作，直到锁被释放。
+@var InhibitMode::Delay
+只是暂时禁止操作, 直到锁被释放或达到一定的时间。DLoginManager::inhibitDelayMaxUSec获取超时时间。这旨在提供需要在系统挂起之前以同步方式执行操作但不允许无限期阻止挂起的应用程序使用。此模式仅适用于睡眠和关机的锁定。
+\sa DLoginManager::inhibitDelayMaxUSec
+@var InhibitMode::Unknown
+未知
+
+@enum Dtk::Login::SessionState
+@brief 会话状态
+@var SessionState::Online
+在线
+@var SessionState::Active
+已激活
+@var SessionState::Closing
+关闭中
+@var SessionState::Unknown
+未知
+
+@enum Dtk::Login::SessionType
+@brief 会话类型
+@var SessionType::TTY
+TTY环境
+@var SessionType::X11
+X11环境
+@var SessionType::Mir
+Mir环境
+@var SessionType::Wayland
+Wayland环境
+@var SessionType::Unspecified
+未知的环境
+
+@enum Dtk::Login::SessionClass
+@brief 会话类别
+@var SessionClass::User
+由用户创建
+@var SessionClass::Greeter
+由登录界面创建
+@var SessionClass::LockScreen
+由锁屏程序创建
+@var SessionClass::Unknown
+未知
+
+@enum Dtk::Login::UserState
+@brief 用户状态
+@var UserState::Offline
+离线
+@var UserState::Lingering
+滞留中
+@var UserState::Online
+在线
+@var UserState::Active
+已激活
+@var UserState::Closing
+关闭中
+@var UserState::Unknown
+未知
+
+@struct Dtk::Login::Inhibitor
+@brief 一个结构数组
+@var Inhibitor::what
+电源模式（关机，待机，休眠等）
+@var Inhibitor::who
+发出抑制器的对象
+@var Inhibitor::why
+为何发出抑制器
+@var Inhibitor::mode
+抑制器模式
+@var Inhibitor::UID
+用户id
+@var Inhibitor::PID
+进程id
+
+*/

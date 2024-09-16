@@ -1,0 +1,16 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core DBus Network)
+find_dependency(Dtk@DTK_VERSION_MAJOR@Core)
+
+find_dependency(PkgConfig)
+pkg_search_module(NetworkManager REQUIRED IMPORTED_TARGET libnm>=1.4.0)
+pkg_search_module(Gio REQUIRED IMPORTED_TARGET gio-2.0)
+
+include(${CMAKE_CURRENT_LIST_DIR}/Dtk@DTK_VERSION_MAJOR@NetworkManagerTargets.cmake)
+set(DtkNetworkManager_LIBRARIES Dtk@DTK_VERSION_MAJOR@::NetworkManager)
+get_target_property(DtkNetworkManager_INCLUDE_DIRS Dtk@DTK_VERSION_MAJOR@::NetworkManager INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(DtkNetworkManager_LIBRARY_DIRS Dtk@DTK_VERSION_MAJOR@::NetworkManager INTERFACE_LINK_DIRECTORIES)
+
+set(DtkNetworkManager_FOUND true)

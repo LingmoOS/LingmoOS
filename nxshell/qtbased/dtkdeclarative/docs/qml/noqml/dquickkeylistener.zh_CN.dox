@@ -1,0 +1,46 @@
+
+/**
+@~chinese
+@class KeySequenceListener
+@ingroup QObject
+
+    \keyword DQuickKeyListener
+@brief DTK 提供的一种快捷键监听器
+
+    KeySequenceListener 控件作为一个快捷键辅助监听器，其继承于 QObject 类型，而非
+    继承于 Item，因此它无法独立存在，需要跟随 Item 辅助存在。
+
+    KeySequenceListener 被用于 KeySequenceEdit 控件中进行快捷键的监听， KeySequenceEdit
+    控件为 DTK 封装的快捷键输入框。如对快捷键有监听需要，请优先使用 KeySequenceEdit 控件代替。
+
+    KeySequenceListener 仅作为辅助类存在，因此需要手动指定被监听的 Item 对象，并且 KeySequenceListener
+    的作用范围也仅会在其被监听的 Item 控件内。
+
+    \warning \b 请注意，该控件仅作为快捷键的输入管理，而非所有键位的监听。
+
+
+
+@property Item KeySequenceListener::target
+@brief target 属性表示被监听的目标控件。 KeySequenceListener 会在 \c target 的
+    范围内监听快捷键的输入
+
+
+
+@property list<string> KeySequenceListener::keys
+@brief keys 属性表示被监听的目标控件输入的快捷键文本，当用于在目标控件焦点状态下按下了特
+    定的快捷键时，其会跟随用户输入发生改变。同时，可以用过设置接口传递该属性的默认值。
+
+    当传入一个格式不正确的键位字符串时，其结果是未定义地。
+
+
+
+@property int KeySequenceListener::maxKeyCount
+@brief maxKeyCount 属性表示监听的最大键位数量。默认值为 4，即表示最大能监听四种不同的
+    快捷键键位，例如 "Ctrol" "Alt" "Shift" "A" 键位。
+
+
+
+@fn void KeySequenceListener::learKeys()
+
+    该函数用于清空 \c keys 属性存储的当前键位。例如当用户取消键入，或状态改变需要清空@brief keys 属性的值时，该函数能够发挥很大作用。
+

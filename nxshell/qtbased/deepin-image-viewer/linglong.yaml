@@ -1,0 +1,53 @@
+package:
+  id: org.deepin.image.viewer
+  name: "deepin-image-viewer"
+  version: 6.0.1
+  kind: app
+  description: |
+    view images for deepin os.
+
+variables:
+  extra_args: |
+    -DVERSION=${VERSION}
+
+runtime:
+  id: org.deepin.Runtime
+  version: 23.0.0
+
+depends:
+  - id: "dde-qt-dbus-factory" 
+    version: 5.5.12
+  - id: qtmpris
+    version: 0.1.0.1
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: xcb-util
+    version: 0.3.8.1
+    type: runtime
+  - id: qtdbusextended
+    version: 0.0.3
+  - id: freeimage
+    version: 3.18.0
+    type: runtime
+  - id: jxrlib
+    version: 1.1.1
+    type: runtime
+  - id: openexr
+    version: 2.2.1.4
+    type: runtime
+  - id: ilmbase
+    version: 2.2.1
+    type: runtime
+  - id: libraw
+    version: 0.19.2
+    type: runtime
+  - id: deepin-ocr-plugin-manager
+    version: 1.0.0.2
+    type: runtime
+
+source:
+  kind: local
+  patch: patches/fix-linglong.patch
+build:
+  kind: cmake

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="dde_security">
+  <copyright><![CDATA[
+    Copyright © 2022  luochaojiang <luochaojiang@uniontech.com>
+
+    Permission to use, copy, modify, distribute, and sell this
+    software and its documentation for any purpose is hereby granted
+    without fee, provided that the above copyright notice appear in
+    all copies and that both that copyright notice and this permission
+    notice appear in supporting documentation, and that the name of
+    the copyright holders not be used in advertising or publicity
+    pertaining to distribution of the software without specific,
+    written prior permission.  The copyright holders make no
+    representations about the suitability of this software for any
+    purpose.  It is provided "as is" without express or implied
+    warranty.
+
+    THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+    SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+    AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+    ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+    THIS SOFTWARE.
+    ]]></copyright>
+
+  <interface name="dde_security" version="1">
+    <description summary="protocol provide security protection">
+      A global protocol provide security protection.
+    </description>
+
+    <enum name="types">
+      <entry name="sec_clipboard_copy" value="1 &lt;&lt; 0"/>
+    </enum>
+
+    <enum name="permissions">
+      <entry name="permission_allow" value="1 &lt;&lt; 0"/>
+      <entry name="permission_deny" value="1 &lt;&lt; 1"/>
+    </enum>
+
+    <request name="get_session">
+      <description summary="create a security session">
+        Create a security session.
+        Values for types argument are described by dde_security.types.
+      </description>
+      <arg name="id" type="new_id" interface="security_session"/>
+      <arg name="types" type="uint" summary="bitfield of security types"/>
+    </request>
+
+    <request name="get_ace_clients">
+      <description summary="get all ace client pid">
+        get all ace client pid.
+        Values for pid argument is the pid of the client caller
+      </description>
+      <arg name="pid" type="uint" summary="pid of the caller"/>
+    </request>
+
+    <event name="ace_clients">
+      <description summary="create a security session">
+        The event will be sent after get the ace pids.
+      </description>
+      <arg name="count" type="uint"/>
+      <arg name="clients" type="array" summary="ace client pid"/>
+    </event>
+  </interface>
+
+  <interface name="security_session" version="1">
+    <description summary="security protection interface">
+      An interface that provide the security user interface.
+      It provides requests to report verify result.
+    </description>
+
+    <!-- Destructor -->
+    <request name="destroy" type="destructor">
+      <description summary="remove security_session interface">
+        The security_session interface is removed.
+      </description>
+    </request>
+
+    <request name="report_security">
+      <description summary="report security verify result">
+        Report security verify result.
+        Values for types argument are described by dde_security.types.
+        Values for result argument are described by dde_security.permissions.
+      </description>
+      <arg name="types" type="uint" summary="bitfield of security types"/>
+      <arg name="permission" type="uint" summary="bitfield of verify result"/>
+      <arg name="serial" type="uint" summary="serial of the verify event"/>
+    </request>
+
+    <event name="verify_security">
+      <description summary="window state has been changed">
+        This event will be sent to client verifing security.
+        Values for types argument are described by dde_security.types.
+      </description>
+      <arg name="types" type="uint" summary="bitfield of security types"/>
+      <arg name="client" type="uint" summary="pid of the source client"/>
+      <arg name="target" type="uint" summary="pid of the target client"/>
+      <arg name="serial" type="uint" summary="pass this to the report request"/>
+    </event>
+  </interface>
+</protocol>

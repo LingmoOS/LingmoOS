@@ -1,0 +1,12 @@
+#! /bin/sh
+set -e
+
+if [ "$1" = "upgrade" ]; then
+  # remove old deepin theme, version less than 15.12.71
+  if dpkg --compare-versions "$2" le "15.12.71-9999" ; then
+    update-alternatives --remove x-cursor-theme \
+        /usr/share/icons/deepin/cursor.theme
+  fi
+fi
+
+#DEBHELPER#

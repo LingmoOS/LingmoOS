@@ -1,0 +1,26 @@
+[Unit]
+Description=dde-session-shutdown target
+
+# Allow exit.target to start even if this unit is started with replace-irreversibly.
+# All (weak) dependencies need to do the same. Services also need to ensure they
+# are in the root slice by setting Slice=-.slice.
+DefaultDependencies=no
+
+Conflicts=graphical-session.target graphical-session-pre.target
+After=graphical-session.target graphical-session-pre.target
+
+Conflicts=dde-session.target dde-session-manager.target
+After=dde-session.target dde-session-manager.target
+
+Conflicts=dde-session-pre.target dde-session-initialized.target
+After=dde-session-pre.target dde-session-initialized.target
+
+# can not stop dbus here, use dde-session-exit-task.service
+# Conflicts=dbus.service
+# After=dbus.service
+
+# We need to make sure this unit is stopped; primarily so that the tree of
+# units that we created is completely cleaned.
+# Note that this can also be improved by reversing the conflicts above and
+# not listing them in the shutdown unit.
+StopWhenUnneeded=true

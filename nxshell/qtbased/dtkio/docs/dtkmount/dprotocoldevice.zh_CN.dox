@@ -1,0 +1,132 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file dprotocoldevice.h
+
+@enum Dtk::Mount::PasswdSaveMode
+    @brief 在需要保存密码时的枚举选项
+    @var Dtk::Mount::PasswdSaveMode::Never
+        永不保存密码
+    @var Dtk::Mount::PasswdSaveMode::SaveInSession
+        仅在当前登录会话中保存密码，注销后遗忘
+    @var Dtk::Mount::PasswdSaveMode::SaveForever
+        永久保存密码
+
+@var Dtk::Mount::OperateCallback
+    异步操作回调函数
+    @param[out] result  异步操作结果，True 表示操作成功
+
+@var Dtk::Mount::OperateCallbackWithInfo
+    异步操作回调函数
+    @param[out] result  异步操作结果，True 表示操作成功
+    @param[out] msg     异步操作结果，操作成功后的其他信息，如挂载的异步操作的时候告知挂载点结果
+
+@var Dtk::Mount::AskForPasswd
+    询问用户密码的回调函数
+    @param[out] msg     提示消息
+    @param[out] user    挂载所使用的默认用户
+    @param[out] domain  挂载所使用的默认域
+    @return             返回挂载所需的参数集合
+    @see Dtk::Mount::MountPasswdInfoParamKeys
+
+@var Dtk::Mount::AskForChoice
+    询问用户选择的回调函数
+    @param[out] msg     回调函数传出的提示消息
+    @param[out] choices 回调函数传出的用户选项列表
+    @return             返回用户选择的序号
+
+@namespace Dtk::Mount::MountPasswdInfoParamKeys
+    挂载网络设备时，请求用户秘钥时的参数名字空间。使用此种方式配合 QVariantMap 传参以保证较高的 ABI 兼容性。
+
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kName
+    @brief 挂载网络设备时，鉴权所使用的用户名的参数键名
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kPasswd
+    @brief 挂载网络设备时，鉴权所使用的用户密码的参数键名
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kDomain
+    @brief 挂载网络设备时，鉴权所使用的用户域的参数键名
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kAnonymous
+    @brief 挂载网络设备时，所使用的是否允许匿名访问的参数键名
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kCancel
+    @brief 挂载网络设备时，用于告知挂载流程用户取消挂载的参数键名
+@var constexpr char Dtk::Mount::MountPasswdInfoParamKeys::kSaveMode 
+    @brief 挂载网络设备时，鉴权所使用的用户密码保存模式的参数键名
+    @see Dtk::Mount::PasswdSaveMode
+
+
+@class Dtk::Mount::DProtocolDevice dprotocoldevice.h
+    @brief 用于操作如 smb/ftp/sftp/mpt/gphoto 等协议设备，处理设备的卸载、挂载以及获取设备属性。
+
+@fn DProtocolDevice::DProtocolDevice(const QString &devicePath, QObject *parent = nullptr)
+        @brief 构造函数
+        @param[in] devicePath 用于定位设备的必要信息，通常情况下是个 url 字符串，比如 smb://1.2.3.4
+        @param[in] parent 父指针
+        @see Dtk::Mount::DProtocolDevice::path() const
+
+@fn DProtocolDevice::~DProtocolDevice()
+@brief 析构函数
+
+@fn QString DProtocolDevice::path() const
+    @brief 获取在构造对象时指定的设备路径。
+    @return 返回设置的设备路径。
+
+@fn QString DProtocolDevice::mountPoint() const
+    @brief 获取设备挂载点。
+    @return 如果设备已挂载，则返回设备挂载点，否则返回空字符串。
+
+@fn QString DProtocolDevice::displayName() const
+    @brief 获取设备名称，通常用于帮助用户在界面中识别设备。
+    @return 当前设备的名称，如果是纯协议设备，并且没有挂载，返回空字符串（未挂载的纯协议设备完全未接入系统）；如果不是纯协议设备，则返回当前设备名称。
+    @note 纯协议设备通常存在于远端机器，并通过网络链接，例如 smb/ftp/webdav 等；而非纯协议设备通常通过线缆链接，例如手机、数码相机等；
+
+@fn QString DProtocolDevice::fileSystem() const
+    @brief 获取设备文件系统。
+    @return 返回设备文件系统，若未挂载，则返回空字符串。
+
+@fn quint64 DProtocolDevice::sizeTotal() const
+    @brief 获取设备总容量。
+    @return 若未挂载，返回 0。
+
+@fn quint64 DProtocolDevice::sizeFree() const
+    @brief 获取设备可用空间。
+    @return 若未挂载，返回 0。
+
+@fn quint64 DProtocolDevice::sizeUsage() const
+    @brief 获取设备已使用容量。
+    @return 若未挂载，返回 0。
+
+@fn quint64 DProtocolDevice::iconNames() const
+    @brief 获取设备图标。
+    @return 返回设备可用的图标，如果设备没挂载，则返回空列表。
+
+@fn QString DProtocolDevice::mount(const QVariantMap &opts)
+    @brief 挂载指定的设备。
+    @param[in] opts 暂未使用的参数。
+    @return 挂载成功则返回挂载点，否则返回空字符串。
+
+@fn void DProtocolDevice::mountAsync(const QVariantMap &opts, OperateCallbackWithInfo callback = nullptr)
+    @see QString DProtocolDevice::mount(const QVariantMap &opts) 的异步版本。
+    @param[in] opts 暂未使用的参数。
+    @param[in] callback 回调函数会在挂载完成后调用。挂载结果将传递给该函数以指示挂载是否成功。
+
+@fn bool DProtocolDevice::unmount(const QVariantMap &opts)
+    @brief 卸载设备的同步函数。
+    @param[in] opts 暂未使用的参数。
+    @return 若卸载成功，则返回 true，否则返回 false。
+
+@fn void DProtocolDevice::unmountAsync(const QVariantMap &opts = {}, OperateCallback callback = nullptr)
+    @brief  unmount 的异步版本
+    @param[in] opts 暂未使用的参数。
+    @param[in] callback 回调函数会在异步操作结束后调用，卸载结果会被传递到该函数。
+    @see bool DProtocolDevice::unmount(const QVariantMap &opts)
+
+@fn void DProtocolDevice::setOperateTimeout(int secs = 3)
+    @brief 设置操作超时时间。
+    @param[in] secs 0 表示所有操作永不超时，默认超时时间为3秒。
+
+@fn void DProtocolDevice::setAskForPasswd(AskForPasswd callback)
+    @brief 设置询问用户密码的回调函数。该函数通常在一些需要用户鉴权的设备挂载时使用，例如 smb/ftp/sftp 等。如果没有指定回调函数，默认的用户为本机登录用户，默认密码为空，默认域为 WORKGROUP。
+
+@fn void DProtocolDevice::setAskForChoice(AskForChoice callback)
+    @brief 设置询问用户选择的回调函数。该函数通常在一些需要用户抉择的设备挂载时使用。如果没有指定，默认的选择为0。
+
+*/

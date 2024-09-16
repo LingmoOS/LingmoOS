@@ -1,0 +1,390 @@
+/*!
+@~chinese
+@ingroup dtkio
+@file dtkiotypes.h
+
+@namespace Dtk::IO
+
+@enum Dtk::IO::OpenFlag dtkiotypes.h
+    @brief 打开文件时的标志
+    @var Dtk::IO::OpenFlag OpenFlag::NotOpen
+        不打开
+    @var Dtk::IO::OpenFlag::ReadOnly
+        只读模式
+    @var Dtk::IO::OpenFlag::WriteOnly
+        只写模式
+    @var Dtk::IO::OpenFlag::ReadWrite
+        读写模式
+    @var Dtk::IO::OpenFlag::Append
+        追加模式
+    @var Dtk::IO::OpenFlag::Truncate
+        截断模式
+    @var Dtk::IO::OpenFlag::Text
+        文本模式
+    @var Dtk::IO::OpenFlag::Unbuffered
+        无缓存模式
+    @var Dtk::IO::OpenFlag::NewOnly
+        仅新建
+    @var Dtk::IO::OpenFlag::ExistingOnly
+        仅处理存在的文件
+    @var Dtk::IO::OpenFlag::CustomStart
+        ？
+        
+@enum Dtk::IO::CopyFlag dtkiotypes.h
+    @brief 复制文件时的标志
+    @var Dtk::IO::CopyFlag::None
+        不设置标志
+    @var Dtk::IO::CopyFlag::Overwrite
+        覆盖存在的文件
+    @var Dtk::IO::CopyFlag::Backup
+        制作一个备份文件
+    @var Dtk::IO::CopyFlag::NoFollowSymlinks
+        不处理链接文件
+    @var Dtk::IO::CopyFlag::AllMetadata
+        复制所有元数据，而不仅仅是默认值
+    @var Dtk::IO::CopyFlag::NoFallbackForMove
+        不支持移动的情况下不使用回退
+    @var Dtk::IO::CopyFlag::TargetDefaultPerms
+        保留目标文件的默认权限，而不是设置源文件的权限
+    @var Dtk::IO::CopyFlag::UserFlag
+        用户标志
+        
+@enum Dtk::IO::AttributeID dtkiotypes.h
+    @brief 文件属性（ID）
+    @var Dtk::IO::AttributeID::StandardType
+        标准类型
+    @var Dtk::IO::AttributeID::StandardIsHidden
+        是否隐藏 bool
+    @var Dtk::IO::AttributeID::StandardIsBackup
+        是不是备份文件 bool
+    @var Dtk::IO::AttributeID::StandardIsSymlink
+        是不是链接文件 bool
+    @var Dtk::IO::AttributeID::StandardIsVirtual
+        是不是虚拟文件 bool
+    @var Dtk::IO::AttributeID::StandardIsVolatile
+        ？
+    @var Dtk::IO::AttributeID::StandardName
+        名称
+    @var Dtk::IO::AttributeID::StandardDisplayName
+        显示名称
+    @var Dtk::IO::AttributeID::StandardEditName
+        编辑名称
+    @var Dtk::IO::AttributeID::StandardCopyName
+        拷贝名称
+    @var Dtk::IO::AttributeID::StandardIcon
+        图标
+    @var Dtk::IO::AttributeID::StandardSymbolicIcon
+        符号图标
+    @var Dtk::IO::AttributeID::StandardContentType
+        内容类型
+    @var Dtk::IO::AttributeID::StandardFastContentType
+        快速内容类型
+    @var Dtk::IO::AttributeID::StandardSize
+        大小
+    @var Dtk::IO::AttributeID::StandardAllocatedSize
+        已分配的大小
+    @var Dtk::IO::AttributeID::StandardSymlinkTarget
+        链接目标
+    @var Dtk::IO::AttributeID::StandardTargetUri
+        目标uri
+    @var Dtk::IO::AttributeID::StandardSortOrder
+        顺序
+    @var Dtk::IO::AttributeID::StandardDescription
+        描述
+    
+    @var Dtk::IO::AttributeID::EtagValue
+        电子标签值
+    
+    @var Dtk::IO::AttributeID::IdFile
+        文件
+    @var Dtk::IO::AttributeID::IdFilesystem
+        文件系统
+
+    @var Dtk::IO::AttributeID::AccessCanRead
+        可读
+    @var Dtk::IO::AttributeID::AccessCanWrite
+        可写
+    @var Dtk::IO::AttributeID::AccessCanExecute
+        可执行
+    @var Dtk::IO::AttributeID::AccessCanDelete
+        可删除
+    @var Dtk::IO::AttributeID::AccessCanTrash
+        可删除到回收站
+    @var Dtk::IO::AttributeID::AccessCanRename
+        可重命名
+
+    @var Dtk::IO::AttributeID::MountableCanMount
+        可挂载
+    @var Dtk::IO::AttributeID::MountableCanUnmount
+        可卸载
+    @var Dtk::IO::AttributeID::MountableCanEject
+        可弹出
+    @var Dtk::IO::AttributeID::MountableUnixDevice
+        unix设备
+    @var Dtk::IO::AttributeID::MountableUnixDeviceFile
+        unix设备文件
+    @var Dtk::IO::AttributeID::MountableHalUdi
+        ？
+    @var Dtk::IO::AttributeID::MountableCanPoll
+        能否复用
+    @var Dtk::IO::AttributeID::MountableIsMediaCheckAutomatic
+        是否自动检查媒体
+    @var Dtk::IO::AttributeID::MountableCanStart
+        能否开启
+    @var Dtk::IO::AttributeID::MountableCanStartDegraded
+        能否启动降级
+    @var Dtk::IO::AttributeID::MountableCanStop
+        能否停止
+    @var Dtk::IO::AttributeID::MountableStartStopType
+        启动停止类型
+
+    @var Dtk::IO::AttributeID::TimeModified
+        文件修改时间
+    @var Dtk::IO::AttributeID::TimeModifiedUsec
+        文件修改时间 微妙表示 
+    @var Dtk::IO::AttributeID::TimeAccess
+        访问时间
+    @var Dtk::IO::AttributeID::TimeAccessUsec
+        访问时间 微妙表示
+    @var Dtk::IO::AttributeID::TimeChanged
+        改动时间
+    @var Dtk::IO::AttributeID::TimeChangedUsec
+        改动时间 微妙表示
+    @var Dtk::IO::AttributeID::TimeCreated
+        创建事件
+    @var Dtk::IO::AttributeID::TimeCreatedUsec
+        创建时间 微妙表示    
+            
+    @var Dtk::IO::AttributeID::UnixDevice
+        设备
+    @var Dtk::IO::AttributeID::UnixInode
+        Inode值
+    @var Dtk::IO::AttributeID::UnixMode
+        模式
+    @var Dtk::IO::AttributeID::UnixNlink
+        链接
+    @var Dtk::IO::AttributeID::UnixUID
+        用户ID
+    @var Dtk::IO::AttributeID::UnixGID
+        用户组ID
+    @var Dtk::IO::AttributeID::UnixRdev
+        根设备
+    @var Dtk::IO::AttributeID::UnixBlockSize
+        块大小
+    @var Dtk::IO::AttributeID::UnixBlocks
+        块
+    @var Dtk::IO::AttributeID::UnixIsMountPoint
+        是否是挂载点
+
+    @var Dtk::IO::AttributeID::DosIsArchive
+        ？
+    @var Dtk::IO::AttributeID::DosIsSystem
+        ？
+
+    @var Dtk::IO::AttributeID::OwnerUser
+        拥有者用户
+    @var Dtk::IO::AttributeID::OwnerUserReal
+        真实的拥有者用户
+    @var Dtk::IO::AttributeID::OwnerGroup
+        拥有者的组
+    
+    @var Dtk::IO::AttributeID::ThumbnailPath
+        缩略图路径
+    @var Dtk::IO::AttributeID::ThumbnailFailed
+        失败
+    @var Dtk::IO::AttributeID::ThumbnailIsValid
+        无效
+        
+    @var Dtk::IO::AttributeID::PreviewIcon
+        预览图标
+    
+    @var Dtk::IO::AttributeID::FileSystemSize
+        文件系统的大小
+    @var Dtk::IO::AttributeID::FileSystemFree
+        空闲容量
+    @var Dtk::IO::AttributeID::FileSystemUsed
+        使用的容量
+    @var Dtk::IO::AttributeID::FileSystemType
+        文件系统类型
+    @var Dtk::IO::AttributeID::FileSystemReadOnly
+        文件系统只读
+    @var Dtk::IO::AttributeID::FileSystemUsePreview
+        文件系统使用预览
+    @var Dtk::IO::AttributeID::FileSystemRemote
+        是否是远端
+
+    @var Dtk::IO::AttributeID::GvfsBackend
+        ？
+    @var Dtk::IO::AttributeID::SelinuxContext
+        操作系统中资源的内容
+
+    @var Dtk::IO::AttributeID::TrashItemCount
+        垃圾个数
+    @var Dtk::IO::AttributeID::TrashDeletionDate
+        被删除的日期
+    @var Dtk::IO::AttributeID::TrashOrigPath
+        删除文件的源路径
+
+    @var Dtk::IO::AttributeID::RecentModified
+        最近修改
+
+    @var Dtk::IO::AttributeID::CustomStart
+        ？
+
+    @var Dtk::IO::AttributeID::StandardIsFile
+        是否是文件
+    @var Dtk::IO::AttributeID::StandardIsDir
+        是否是目录
+    @var Dtk::IO::AttributeID::StandardIsRoot
+        是否根目录
+    @var Dtk::IO::AttributeID::StandardSuffix
+        后缀
+    @var Dtk::IO::AttributeID::StandardCompleteSuffix
+        完整后缀
+    @var Dtk::IO::AttributeID::StandardFilePath
+        文件路径
+    @var Dtk::IO::AttributeID::StandardParentPath
+        父路径
+    @var Dtk::IO::AttributeID::StandardBaseName
+        基本名称
+    @var Dtk::IO::AttributeID::StandardFileName
+        文件名称
+    @var Dtk::IO::AttributeID::StandardCompleteBaseName
+        完整的基本名称
+
+    @var Dtk::IO::AttributeID::AttributeIDMax
+        属性ID的最大值
+    
+@enum Dtk::IO::SeekType dtkiotypes.h
+    @brief 文件偏移类型
+    @var Dtk::IO::SeekType::Begin
+        从头开始计算
+    @var Dtk::IO::SeekType::Current
+        从当前位置开始计算
+    @var Dtk::IO::SeekType::End
+        从末尾开始计算
+    
+@enum Dtk::IO::Permission dtkiotypes.h
+    @brief 文件权限类型
+    @var Dtk::IO::SeekType::NoPermission
+        无权限
+
+    @var Dtk::IO::SeekType::ExeOther
+        其他用户可执行
+    @var Dtk::IO::SeekType::WriteOther
+        其他用户可写
+    @var Dtk::IO::SeekType::ReadOther
+        其他用户可读
+
+    @var Dtk::IO::SeekType::ExeGroup
+        组用户可执行
+    @var Dtk::IO::SeekType::WriteGroup
+        组用户可写
+    @var Dtk::IO::SeekType::ReadGroup
+        组用户可读
+
+    @var Dtk::IO::SeekType::ExeUser
+        用户可执行
+    @var Dtk::IO::SeekType::WriteUser
+        用户可写
+    @var Dtk::IO::SeekType::ReadUser
+        用户可读
+
+    @var Dtk::IO::SeekType::ExeOwner
+        文件拥有者可执行
+    @var Dtk::IO::SeekType::WriteOwner
+        文件拥有者可写
+    @var Dtk::IO::SeekType::ReadOwner
+        文件拥有者可读
+    
+@enum Dtk::IO::AttributeType dtkiotypes.h
+    @brief 文件属性类型
+    @var Dtk::IO::AttributeType::TypeInvalid
+        无效类型
+    @var Dtk::IO::AttributeType::TypeString
+        字符串类型
+    @var Dtk::IO::AttributeType::TypeByteString
+        字节串类型
+    @var Dtk::IO::AttributeType::TypeBool
+        布尔值类型
+    @var Dtk::IO::AttributeType::TypeUInt32
+        32位无符号整型
+    @var Dtk::IO::AttributeType::TypeInt32
+        32位有符号整型
+    @var Dtk::IO::AttributeType::TypeUInt64
+        64位无符号整型
+    @var Dtk::IO::AttributeType::TypeInt64
+        64位有符号整型
+    @var Dtk::IO::AttributeType::TypeObject
+        对象类型
+    @var Dtk::IO::AttributeType::TypeStringV
+        无效终止符的字符
+    
+@enum Dtk::IO::FileQueryInfoFlags dtkiotypes.h
+    @brief 查询文件信息的标志
+    @var Dtk::IO::FileQueryInfoFlags::TypeNone
+        不设置标志
+    @var Dtk::IO::FileQueryInfoFlags::TypeNoFollowSymlinks
+        不处理链接
+    
+@enum Dtk::IO::DirFilter dtkiotypes.h
+    @brief 过滤文件夹类型
+    @var Dtk::IO::DirFilter::NoFilter
+        不过滤
+    @var Dtk::IO::DirFilter::Dirs
+        列出目录
+    @var Dtk::IO::DirFilter::Files
+        列出文件
+    @var Dtk::IO::DirFilter::Drives
+        列出硬盘设备 unix下忽略
+    @var Dtk::IO::DirFilter::AllEntries
+        列出目录、文件、硬盘设备
+    @var Dtk::IO::DirFilter::NoSymLinks
+        不列出符号链接
+    
+    @var Dtk::IO::DirFilter::Readable
+        列出可读文件和目录
+    @var Dtk::IO::DirFilter::Writable
+        列出可写文件和目录
+    @var Dtk::IO::DirFilter::Executable
+        列出可执行文件和目录
+    @var Dtk::IO::DirFilter::Modified
+        列出被修改的文件
+        
+    @var Dtk::IO::DirFilter::Hidden
+        列出隐藏文件
+    @var Dtk::IO::DirFilter::System
+        列出系统文件
+    @var Dtk::IO::DirFilter::AllDirs
+        列出所有目录，即不对目录名称进行过滤
+    @var Dtk::IO::DirFilter::CaseSensitive
+        对大小写敏感
+
+    @var Dtk::IO::DirFilter::NoDot
+        不列出特殊目录 .
+    @var Dtk::IO::DirFilter::NoDotDot
+        不列出特殊目录 ..
+    @var Dtk::IO::DirFilter::NoDotAndDotDot
+        不列出特殊目录 .和..
+        
+@enum Dtk::IO::IteratorFlag dtkiotypes.h
+    @brief 迭代器标志
+    @var Dtk::IO::IteratorFlag::NoIteratorFlags
+        不设置标志，返回指定路径的条目
+    @var Dtk::IO::IteratorFlag::FollowSymlinks
+        处理链接
+    @var Dtk::IO::IteratorFlag::Subdirectories
+        列出所有子目录中的条目。
+    
+@enum Dtk::IO::WatchType dtkiotypes.h
+    @brief 监听器类型
+    @var Dtk::IO::IteratorFlag::Auto
+        自动选择
+    @var Dtk::IO::IteratorFlag::Dir
+        目录
+    @var Dtk::IO::IteratorFlag::File
+        文件
+    
+@struct Dtk::IO::AttributeDetails dtkiotypes.h
+    @brief 文件属性细节
+*/

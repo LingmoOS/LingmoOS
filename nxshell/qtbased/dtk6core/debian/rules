@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+export DEB_CXXFLAGS_MAINT_APPEND = -Ofast
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+VERSION = $(DEB_VERSION_UPSTREAM)
+PACK_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$1}')
+# Fix: invalid digit "8" in octal constant. e.g.  u008 ==> 008 ==> 8
+BUILD_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$2}' | sed 's/[^0-9]//g' | awk '{print int($$1)}')
+
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_EXAMPLES=OFF -DBUILD_DOCS=ON -DBUILD_VERSION=$(BUILD_VER) -DDTK_VERSION=$(PACK_VER) -DD_DSG_APP_DATA_FALLBACK=/var/dsg/appdata -DBUILD_WITH_SYSTEMD=ON
+
+override_dh_makeshlibs:
+	dh_makeshlibs -V "libdtk6core (>= $(shell echo $(VERSION) | cut -d '.' -f 1,2))"

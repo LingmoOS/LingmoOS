@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
+<interface name='org.desktopspec.ConfigManager.Manager'>
+    <property access="read" type="s" name="version"/>
+    <property access="read" type="as" name="keyList"/>
+    <method name='value'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='v' name='value' direction='out'/>
+    </method>
+    <method name='isDefaultValue'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='b' name='isDefaultValue' direction='out'/>
+    </method>
+    <method name='setValue'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='v' name='value' direction='in'/>
+    </method>
+    <method name='reset'>
+      <arg type='s' name='key' direction='in'/>
+    </method>
+    <method name='name'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='s' name='language' direction='in'/>
+      <arg type='s' name='name' direction='out'/>
+    </method>
+    <method name='description'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='s' name='language' direction='in'/>
+      <arg type='s' name='description' direction='out'/>
+    </method>
+    <method name='visibility'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='s' name='visibility' direction='out'/>
+    </method>
+    <method name='permissions'>
+      <arg type='s' name='key' direction='in'/>
+      <arg type='s' name='permissions' direction='out'/>
+    </method>
+    <!--采用引用计数的方式，引用为 0 时才真正的销毁-->
+    <method name='release'>
+    </method>
+    <signal name="valueChanged">
+      <arg name="key" type="s" direction="out"/>'
+    </signal>
+</interface>

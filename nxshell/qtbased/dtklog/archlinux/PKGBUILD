@@ -1,0 +1,36 @@
+pkgname=dtklog-git
+pkgver=0.0.1
+pkgrel=1
+sourcename=dtklog
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='DTK log modules'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/dtklog"
+license=('LGPL2.1')
+depends=('libsystemd' 'spdlog')
+makedepends=('git' 'qt5-tools' 'ninja' 'cmake')
+conflicts=('dtklog')
+provides=('dtklog')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  version=$(echo $pkgver | awk -F'[+_~-]' '{print $1}')
+  cmake \
+    -GNinja \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DMKSPECS_INSTALL_DIR=lib/qt/mkspecs/modules \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_WITH_SYSTEMD=ON \
+    -DDLOG_VERSION=$version
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

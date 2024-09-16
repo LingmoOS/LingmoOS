@@ -1,0 +1,53 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+
+pkgname=dde-tray-loader-git
+_pkgname=dde-tray-loader
+pkgver=0.0.1
+pkgrel=1
+pkgdesc='New DDE Tray'
+sourcename=dde-tray-loader
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/dde-tray-loader"
+license=('LGPL3')
+depends=('qt5-wayland'
+         'dtkgui-git'
+         'dtkwidget-git'
+         'libxtst'
+         'libxres'
+         'libxdamage'
+         'libxcursor'
+         'libxcb'
+         'networkmanager-qt5'
+         'libdbusmenu-qt5'
+)
+makedepends=('git'
+             'qt5-tools'
+             'qt5-wayland'
+             'dtkgui-git'
+             'dtkwidget-git'
+             'cmake'
+             'ninja'
+             'extra-cmake-modules'
+             'deepin-qt-dbus-factory'
+)
+conflicts=('dde-tray-loader')
+provides=('dde-tray-loader')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  cmake -B . -GNinja \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  cmake --build .
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

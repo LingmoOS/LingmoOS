@@ -1,0 +1,92 @@
+
+/**
+@~chinese
+@class ComboBox
+@ingroup ComboBox
+
+@ingroup QML_TYPES
+@brief 提供一种行云设计风格的 ComboBox 控件.
+@details
+    ComboBox 控件提供了行云设计风格的组合框控件，<br>
+    其背景使用跟按钮相似的背景，弹出框使用 Popup 控件实现，相比于默认的 ComboBox控件，<br>
+    行云设计风格的 ComboBox 实现了自定义图标，<br>
+    并且在编辑和非编辑状态下，能够不同的风格展现。<br>
+    ComboBox 的效果如下图所示：<br>
+| **状态** | **效果**                           |
+|--------|----------------------------------|
+| 编辑状态   | @image html ComboBoxEditable.png |
+| 非编辑状态  | @image html ComboBoxNotEdit.png  |
+| 弹出状态   | 弹出状态                             |
+
+    ComboBox默认的文字添加方式可以通过正常的 model 进行添加，<br>
+    如下代码所示：<br>
+```qml
+    ComboBox {
+        anchors.centerIn: parent
+        model: ["Banana", "Apple", "Coconut"]
+    }
+```
+    如果想要在每项上添加图标进行展示，可以通过 ListModel 实现，如下代码所示：
+```qml
+    ComboBox {
+        textRole: "text"
+        iconNameRole: "icon"
+
+        model: ListModel {
+            ListElement { text: "Banana"; icon: "action_setting" }
+            ListElement { text: "Apple"; icon: "action_newfolder" }
+            ListElement { text: "Coconut"; icon: "action_share" }
+        }
+    }
+```
+
+@property string ComboBox::iconNameRole
+@brief iconNameRole 属性用于控制图标名称。
+@details
+    由于默认的 ComboBox 只支持使用文字，而不支持添加图标，因此这里为了进行 ComboBox 的拓展，方便程序使用 ComboBox 时能够快速的添加图标。<br>
+@note 请注意，该属性需要配合 ListModel 中进行使用\l {CombobBox icon usage} {ComboBox Icon 的用法}
+
+@property string ComboBox::alertText
+@brief alertText 属性用于表示 ComboBox 提示的警告信息。用于提示用户输入的信息有误。
+@note请注意，当 ComboBox 的 editable 属性打开时， alertText 属性才能生效。而在非编辑状态下，该属性无效。
+@details
+    其用法如下所示：
+```qml
+    ComboBox {
+        anchors.centerIn: parent
+        textRole: "text"
+        iconNameRole: "icon"
+        alertText: "Only for strings."
+        showAlert: true
+        editable: true
+
+        model: ListModel {
+            ListElement { text: "Banana"; icon: "action_setting" }
+            ListElement { text: "Apple"; icon: "action_newfolder" }
+            ListElement { text: "Coconut"; icon: "action_share" }
+        }
+    }
+```
+效果如下图所示：
+@image html ComboBoxAlert.png
+
+@property int ComboBox::alertDuration
+@brief alertDuration 属性表示警告信息的提示时长。
+@details 默认情况下，如果不设置时长，将会一致显示。@brief alertDuration 的单位是 毫秒(ms)。
+
+@property bool ComboBox::showAlert
+@brief showAlert 属性用于决定是否显示警告信息。
+@details
+    一般情况下，显示警告信息的条件需要满足错误的输入情况。
+    当 `alertDuration` 属性的时间结束时， showAlert 将自动更改为 false否则，`showAlert` 属
+    性需要手动控制为 false。
+
+@property int ComboBox::maxVisibleItems
+@brief maxVisibleItems 属性用于控制 Popup 窗口显示的最大条目数。
+@details 默认情况下，该最大值为 16，当超过该值时，Popup 窗口开始变成滚动状态，访问其余项需要通过滚动完成。
+
+@property Palette ComboBox::separatorColor
+@brief separatorColor 属性用于控制ComboBox在编辑状态下，左侧输入框和
+    右侧下拉按钮中间分隔部分的颜色。
+
+*/

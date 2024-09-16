@@ -1,0 +1,117 @@
+# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+add_library(dde-osd-shared OBJECT
+    src/abstractosdprovider.cpp
+    src/abstractosdprovider.h
+    src/accessibledefine.h
+    src/accessible.h
+    src/audioprovider.cpp
+    src/audioprovider.h
+    src/brightnessprovider.cpp
+    src/brightnessprovider.h
+    src/CMakeLists.txt
+    src/common.cpp
+    src/common.h
+    src/container.cpp
+    src/container.h
+    src/delegate.cpp
+    src/delegate.h
+    src/displaymodeprovider.cpp
+    src/displaymodeprovider.h
+    src/kblayoutindicator.cpp
+    src/kblayoutindicator.h
+    src/kblayoutprovider.cpp
+    src/kblayoutprovider.h
+    src/light.qss
+    src/listview.cpp
+    src/listview.h
+    src/manager.cpp
+    src/manager.h
+    src/model.cpp
+    src/model.h
+    src/osdprovider.cpp
+    src/osdprovider.h
+    src/unittest.cpp
+    src/unittest.h
+    src/image.qrc
+    src/theme.qrc
+
+    src/notification/actionbutton.cpp
+    src/notification/actionbutton.h
+    src/notification/appbody.cpp
+    src/notification/appbody.h
+    src/notification/appbodylabel.cpp
+    src/notification/appbodylabel.h
+    src/notification/appicon.cpp
+    src/notification/appicon.h
+    src/notification/bubble.cpp
+    src/notification/bubble.h
+    src/notification/bubblemanager.cpp
+    src/notification/bubblemanager.h
+    src/notification/bubbletool.cpp
+    src/notification/bubbletool.h
+    src/notification/button.cpp
+    src/notification/button.h
+    src/notification/constants.h
+    src/notification/dbus_daemon_interface.cpp
+    src/notification/dbus_daemon_interface.h
+    src/notification/dbusdockinterface.cpp
+    src/notification/dbusdockinterface.h
+    src/notification/dbuslogin1manager.cpp
+    src/notification/dbuslogin1manager.h
+    src/notification/iconbutton.cpp
+    src/notification/iconbutton.h
+    src/notification/icondata.cpp
+    src/notification/icondata.h
+    src/notification/notificationentity.cpp
+    src/notification/notificationentity.h
+    src/notification/notifications_dbus_adaptor.cpp
+    src/notification/notifications_dbus_adaptor.h
+    src/notification/notifysettings.cpp
+    src/notification/notifysettings.h
+    src/notification/persistence.cpp
+    src/notification/persistence.h
+    src/notification/signalbridge.h
+
+    src/notification-center/bubbleitem.cpp
+    src/notification-center/bubbleitem.h
+    src/notification-center/bubbletitlewidget.cpp
+    src/notification-center/bubbletitlewidget.h
+    src/notification-center/itemdelegate.cpp
+    src/notification-center/itemdelegate.h
+    src/notification-center/notifycenterwidget.cpp
+    src/notification-center/notifycenterwidget.h
+    src/notification-center/notifylistview.cpp
+    src/notification-center/notifylistview.h
+    src/notification-center/notifymodel.cpp
+    src/notification-center/notifymodel.h
+    src/notification-center/notifywidget.cpp
+    src/notification-center/notifywidget.h
+    src/notification-center/overlapwidet.cpp
+    src/notification-center/overlapwidet.h
+)
+
+target_include_directories(dde-osd-shared
+PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/src
+)
+
+target_link_libraries(dde-osd-shared
+PUBLIC
+    session-ui-dbus-shared
+    Dtk::Widget
+    PkgConfig::GSETTINGS
+    PkgConfig::XCB_EWMH
+    Qt5::Concurrent
+    Qt5::X11Extras
+    Qt5::Widgets
+    Qt5::DBus
+    Qt5::Svg
+    Qt5::Sql
+    Qt5::Test
+)
+
+add_subdirectory("src")
+add_subdirectory("tests")

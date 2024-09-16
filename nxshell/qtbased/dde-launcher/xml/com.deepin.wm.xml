@@ -1,0 +1,187 @@
+<interface name="com.deepin.wm">
+    <property name="compositingEnabled" type="b" access="readwrite"/>
+    <property name="compositingPossible" type="b" access="read"/>
+    <property name="compositingAllowSwitch" type="b" access="read"/>
+    <property name="zoneEnabled" type="b" access="readwrite"/>
+    <property name="cursorTheme" type="s" access="readwrite"/>
+    <property name="cursorSize" type="i" access="readwrite"/>
+
+    <method name="SwitchApplication">
+        <arg type="b" name="backward" direction="in"/>
+    </method>
+
+    <method name="TileActiveWindow">
+        <arg type="u" name="side" direction="in"/>
+    </method>
+
+    <method name="BeginToMoveActiveWindow">
+    </method>
+
+    <method name="ToggleActiveWindowMaximize">
+    </method>
+    <method name="MinimizeActiveWindow">
+    </method>
+    <method name="ShowWorkspace">
+    </method>
+    <method name="ShowWindow">
+    </method>
+    <method name="ShowAllWindow">
+    </method>
+
+    <method name="PerformAction">
+        <arg type="i" name="type" direction="in"/>
+    </method>
+
+    <method name="PreviewWindow">
+        <arg type="u" name="xid" direction="in"/>
+    </method>
+    <method name="CancelPreviewWindow">
+    </method>
+
+    <method name="GetCurrentWorkspaceBackground">
+        <arg type="s" name="result" direction="out"/>
+    </method>
+    <method name="SetCurrentWorkspaceBackground">
+        <arg type="s" name="uri" direction="in"/>
+    </method>
+    <method name="GetWorkspaceBackground">
+        <arg type="i" name="index" direction="in"/>
+        <arg type="s" name="result" direction="out"/>
+    </method>
+    <method name="SetWorkspaceBackground">
+        <arg type="i" name="index" direction="in"/>
+        <arg type="s" name="uri" direction="in"/>
+    </method>
+    <method name="SetTransientBackground">
+        <arg type="s" direction="in"/>
+    </method>
+    <method name="GetCurrentWorkspaceBackgroundForMonitor">
+    <arg type="s" name="strMonitorName" direction="in"/>
+    <arg type="s" name="result" direction="out"/>
+    </method>
+    <method name="SetCurrentWorkspaceBackgroundForMonitor">
+    <arg type="s" name="uri" direction="in"/>
+    <arg type="s" name="strMonitorName" direction="in"/>
+    </method>
+    <method name="GetWorkspaceBackgroundForMonitor">
+    <arg type="i" name="index" direction="in"/>
+    <arg type="s" name="strMonitorName" direction="in"/>
+    <arg type="s" name="result" direction="out"/>
+    </method>
+    <method name="SetWorkspaceBackgroundForMonitor">
+    <arg type="i" name="index" direction="in"/>
+    <arg type="s" name="strMonitorName" direction="in"/>
+    <arg type="s" name="uri" direction="in"/>
+    </method>
+    <method name="SetTransientBackgroundForMonitor">
+    <arg type="s" name="uri" direction="in"/>
+    <arg type="s" name="strMonitorName" direction="in"/>
+    </method>
+    <method name="GetCurrentWorkspace">
+        <arg type="i" name="index" direction="out"/>
+    </method>
+    <method name="WorkspaceCount">
+        <arg type="i" name="count" direction="out"/>
+    </method>
+    <method name="SetCurrentWorkspace">
+        <arg type="i" name="index" direction="in"/>
+    </method>
+    <method name="PreviousWorkspace">
+    </method>
+    <method name="NextWorkspace">
+    </method>
+
+    <method name="GetAllAccels">
+        <arg type="s" name="data" direction="out"/>
+    </method>
+    <method name="GetAccel">
+        <arg type="s" name="id" direction="in"/>
+        <arg type="as" name="data" direction="out"/>
+    </method>
+    <method name="GetDefaultAccel">
+        <arg type="s" name="id" direction="in"/>
+        <arg type="as" name="data" direction="out"/>
+    </method>
+    <method name="SetAccel">
+        <arg type="s" name="data" direction="in"/>
+        <arg type="b" name="result" direction="out"/>
+    </method>
+    <method name="RemoveAccel">
+        <arg type="s" name="id" direction="in"/>
+    </method>
+
+    <method name="SetDecorationTheme">
+        <arg type="s" name="themeType" direction="in"/>
+        <arg type="s" name="themeName" direction="in"/>
+    </method>
+    <method name="SetDecorationDeepinTheme">
+        <arg type="s" name="deepinThemeName" direction="in"/>
+    </method>
+
+    <signal name="WorkspaceBackgroundChanged">
+        <arg type="i" name="index"/>
+        <arg type="s" name="newUri"/>
+    </signal>
+    <signal name="WorkspaceBackgroundChangedForMonitor">
+        <arg type="i" name="index"/>
+        <arg type="s" name="strMonitorName"/>
+        <arg type="s" name="uri"/>
+    </signal>
+
+    <signal name="compositingEnabledChanged">
+        <arg type="b" name="enabled"/>
+    </signal>
+    <signal name="wmCompositingEnabledChanged">
+        <arg type="b" name="enabled"/>
+    </signal>
+    <signal name="workspaceCountChanged">
+        <arg type="i" name="count"/>
+    </signal>
+
+    <method name="ChangeCurrentWorkspaceBackground">
+        <arg type="s" name="uri" direction="in"/>
+    </method>
+
+    <method name="SwitchToWorkspace">
+        <arg type="b" name="backward" direction="in"/>
+    </method>
+    <method name="PresentWindows">
+        <arg type="au" name="xids" direction="in"/>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QList&lt;uint&gt;"/>
+    </method>
+    <method name="EnableZoneDetected">
+        <arg type="b" name="enabled" direction="in"/>
+    </method>
+
+    <signal name="WorkspaceSwitched">
+        <arg type="i" name="from"/>
+        <arg type="i" name="to"/>
+    </signal>
+    <method name="GetMultiTaskingStatus">
+        <arg type="b" name="isActive" direction="out"/>
+    </method>
+    <method name="SetMultiTaskingStatus">
+        <arg type="b" name="isActive" direction="in"/>
+    </method>
+    <method name="GetCurrentDesktopStatus">
+        <arg type="b" name="isDesktop" direction="out"/>
+    </method>
+    <method name="GetTouchBorderInterval">
+        <arg type="d" name="interval" direction="out"/>
+    </method>
+    <method name="SetTouchBorderInterval">
+        <arg type="d" name="interval" direction="in"/>
+    </method>
+    <method name="GetIsShowDesktop">
+        <arg type="b" name="isShowDesktop" direction="out"/>
+    </method>
+    <method name="SetShowDesktop">
+        <arg type="b" name="isShowDesktop" direction="in"/>
+    </method>
+    <method name="TouchToMove">
+        <arg type="i" name="x" direction="in"/>
+        <arg type="i" name="y" direction="in"/>
+    </method>
+    <method name="ClearMoveStatus">
+    </method>
+</interface>

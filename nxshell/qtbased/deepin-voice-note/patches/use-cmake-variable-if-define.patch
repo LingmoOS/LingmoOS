@@ -1,0 +1,44 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2022-04-22 09:56:59.746659617 +0800
++++ b/CMakeLists.txt	2022-04-22 10:03:50.666638918 +0800
+@@ -167,7 +167,10 @@
+     ${Qt5Xml_LIBRARIES}
+ )
+ 
++if(CMAKE_INSTALL_PREFIX)
++else()
+ set(CMAKE_INSTALL_PREFIX /usr)
++endif()
+ 
+ # Install files
+ install(TARGETS deepin-voice-note DESTINATION bin)
+@@ -178,9 +181,9 @@
+ install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
+ install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
+ if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
+-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
++    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION share/deepin-manual/manual-assets/application/)
+ else()
+-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
++    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION share/deepin-manual/manual-assets/application/)
+ endif()
+ install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
+
+diff --git a/src/main.cpp b/src/main.cpp
+index 7898388..30c9592 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -42,6 +42,13 @@ DWIDGET_USE_NAMESPACE
+ 
+ int main(int argc, char *argv[])
+ {
++    qputenv("QTWEBENGINERESOURCE_PATH", "/opt/apps/org.deepin.voice.note/files/share/qt5/translations:/opt/apps/org.deepin.voice.note/files/share/qt5/resources");
++    QString evnValue = QString("/opt/apps/org.deepin.voice.note/files/lib") + QLibraryInfo::location(QLibraryInfo::LibrariesPath).mid(
++                        QLibraryInfo::location(QLibraryInfo::LibrariesPath).lastIndexOf("/")) + QString("/qt5/libexec/QtWebEngineProcess");
++    qputenv("QTWEBENGINEPROCESS_PATH", evnValue.toLocal8Bit());
++    printf("- %s\n", qgetenv("QTWEBENGINERESOURCE_PATH").data());
++    printf("- %s\n", qgetenv("QTWEBENGINEPROCESS_PATH").data());
++
+     PerformanceMonitor::initializeAppStart();
+     if (!QString(qgetenv("XDG_CURRENT_DESKTOP")).toLower().startsWith("deepin")) {
+         setenv("XDG_CURRENT_DESKTOP", "Deepin", 1);

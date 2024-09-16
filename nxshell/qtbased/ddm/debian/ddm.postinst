@@ -1,0 +1,90 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+THIS_PACKAGE=ddm
+DEFAULT_DISPLAY_MANAGER_FILE=/etc/X11/default-display-manager
+
+# creating dde group if he isn't already there
+if ! getent group dde >/dev/null; then
+    addgroup --system dde
+fi
+
+# creating dde user if he isn't already there
+if ! getent passwd dde >/dev/null; then
+    adduser --system --ingroup dde --home /var/lib/ddm dde
+    usermod -c "Simple Wayland Display Manager" dde
+    usermod -d "/var/lib/ddm"                   dde
+    usermod -g "dde"                            dde
+    usermod -s "/bin/false"                     dde
+fi
+
+if [ ! -e /var/lib/ddm ]; then
+    # If dde was purged while running, the home dir gets removed but the user
+    # remains (as deluser refuses to delete a user that's in use).
+    mkdir -p /var/lib/ddm
+fi
+
+if [ -d /var/lib/ddm ]; then
+    # There has been a -R in version prior to 0.19
+    # but this opens up symlink attacks. Remove it.
+    chown dde:dde /var/lib/ddm
+    chmod 0750 /var/lib/ddm
+fi
+
+# debconf is not a registry, so we only fiddle with the default file if it
+# does not exist
+if ! [ -e "$DEFAULT_DISPLAY_MANAGER_FILE" ]; then
+    if db_get shared/default-x-display-manager; then
+        if [ -z "$RET" ]; then
+            RET="$THIS_PACKAGE"
+        fi
+        if [ "$THIS_PACKAGE" != "$RET" ]; then
+            echo "Please be sure to run \"dpkg --configure $RET\"."
+        fi
+        if db_get "$RET"/daemon_name; then
+            echo "$RET" > "$DEFAULT_DISPLAY_MANAGER_FILE"
+        fi
+    fi
+fi
+
+# remove the displaced old default display manager file if it exists
+if [ -e "$DEFAULT_DISPLAY_MANAGER_FILE.dpkg-tmp" ]; then
+    rm "$DEFAULT_DISPLAY_MANAGER_FILE.dpkg-tmp"
+fi
+
+# debconf hangs if ddm gets started below without this
+db_stop || true
+
+if [ "$1" = "configure" ]; then
+    invoke-rc.d dbus reload || true
+fi
+
+DEFAULT_SERVICE=/etc/systemd/system/display-manager.service
+# set default-display-manager systemd service link according to our config
+if [ "$1" = configure ] && [ -d /etc/systemd/system/ ]; then
+    if [ -e "$DEFAULT_DISPLAY_MANAGER_FILE" ]; then
+        SERVICE=/lib/systemd/system/$(basename $(cat "$DEFAULT_DISPLAY_MANAGER_FILE")).service
+        if [ -h "$DEFAULT_SERVICE" ] && [ $(readlink "$DEFAULT_SERVICE") = /dev/null ]; then
+            echo "Display manager service is masked" >&2
+        elif [ -e "$SERVICE" ]; then
+            ln -sf "$SERVICE" "$DEFAULT_SERVICE"
+        else
+            echo "ERROR: $SERVICE is the selected default display manager but does not exist" >&2
+        fi
+    fi
+fi
+
+
+if [ -x /etc/init.d/ddm ]; then
+    update-rc.d ddm defaults >/dev/null 2>&1
+fi
+
+touch /var/log/ddm.log
+chown dde:dde /var/log/ddm.log
+
+#DEBHELPER#
+
+exit 0

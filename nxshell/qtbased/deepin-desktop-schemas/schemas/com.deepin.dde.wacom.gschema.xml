@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <enum id="com.deepin.dde.wacom.ButtonAction">
+        <value value="0" nick="LeftClick" />
+        <value value="1" nick="MiddleClick" />
+        <value value="2" nick="RightClick" />
+        <value value="3" nick="PageUp" />
+        <value value="4" nick="PageDown" />
+    </enum>
+    <schema path="/com/deepin/dde/wacom/" id="com.deepin.dde.wacom">
+        <key type="b" name="left-handed">
+            <default>false</default>
+            <summary>Wacom Rotate</summary>
+            <description></description>
+        </key>
+        <key type="b" name="cursor-mode">
+            <default>false</default>
+            <summary>Set Wacom Mode</summary>
+            <description>Set this to TRUE to enable wacom relative mode</description>
+        </key>
+        <key type="s" name="map-output">
+            <default>""</default>
+            <summary>Mapping to output</summary>
+            <description>Map the tablet's input area to a given output (e.g. "VGA1"). Output names may either be the name of a head available through the XRandR extension, or an X11 geometry string of the form WIDTHxHEIGHT+X+Y. The mapping may be reset to the entire desktop at any time with the output name "desktop". Users of the NVIDIA binary driver should use the output names "HEAD-0" and "HEAD-1" until the driver supports XRandR 1.2 or later. </description>
+        </key>
+        <key type="u" name="suppress">
+            <default>20</default>
+            <range min="0" max="100"></range>
+            <summary>Suppress</summary>
+            <description>Set the delta (difference) cutoff level for further processing of incoming input tool coordinate values. For example a X or Y coordinate event will be sent only if the change between the current X or Y coordinate and the previous one is greater than the Suppress value. The same applies to pressure level (Z coordinate) and Tilt rotation values. With a current absolute wheel (AbsWheel) or Tilt value the delta between it and the previous value must be equal to or greater than the Suppress value in order to be sent on.</description>
+        </key>
+        <key type="b" name="force-proportions">
+            <default>true</default>
+            <summary>Force Proportions</summary>
+            <description>Force the proportions of the drawing surface to match the aspect ratio of your screen</description>
+        </key>
+        <key type="b" name="mouse-enter-remap">
+            <default>true</default>
+            <summary>Mouse Enter Remap</summary>
+            <description>Remap when mouse enter new screen</description>
+        </key>
+    </schema>
+
+    <schema path="/com/deepin/dde/wacom/stylus/" id="com.deepin.dde.wacom.stylus">
+        <key type="u" name="pressure-sensitive">
+            <default>4</default>
+            <range min="1" max="7"></range>
+            <summary>Stylus Pressure Sensitive Level</summary>
+            <description>Stylus pressure curve, detail see: daemon/inputdevices/wacom.go</description>
+        </key>
+        <key enum="com.deepin.dde.wacom.ButtonAction" name="keyup-action">
+            <default>'RightClick'</default>
+            <summary>Set action mapping for up button</summary>
+            <description></description>
+        </key>
+        <key enum="com.deepin.dde.wacom.ButtonAction" name="keydown-action">
+            <default>'LeftClick'</default>
+            <summary>Set action mapping for down button</summary>
+            <description></description>
+        </key>
+        <key type="u" name="threshold">
+            <default>27</default>
+            <range min="1" max="2047"></range>
+            <summary>The minimum pressure to generate a Button event</summary>
+            <description>Set the minimum pressure necessary to generate a Button event for the stylus tip, eraser, or touch. The pressure levels of all tablets are normalized to 2048 levels irregardless of the actual hardware supported levels</description>
+        </key>
+        <key type="u" name="raw-sample">
+            <default>4</default>
+            <range min="1" max="20"></range>
+            <summary>sample window size</summary>
+            <description>Set the sample window size (a sliding average sampling window) for incoming input tool raw data points</description>
+        </key>
+    </schema>
+
+
+    <schema path="/com/deepin/dde/wacom/eraser/" id="com.deepin.dde.wacom.eraser">
+        <key type="u" name="pressure-sensitive">
+            <default>4</default>
+            <range min="1" max="7"></range>
+            <summary>Eraser Pressure Sensitive Level</summary>
+            <description>Eraser pressure curve, detail see: daemon/inputdevices/wacom.go</description>
+        </key>
+        <key type="u" name="threshold">
+            <default>27</default>
+            <range min="1" max="2047"></range>
+            <summary>The minimum pressure to generate a Button event</summary>
+            <description>Set the minimum pressure necessary to generate a Button event for the stylus tip, eraser, or touch. The pressure levels of all tablets are normalized to 2048 levels irregardless of the actual hardware supported levels</description>
+        </key>
+        <key type="u" name="raw-sample">
+            <default>4</default>
+            <range min="1" max="20"></range>
+            <summary>sample window size</summary>
+            <description>Set the sample window size (a sliding average sampling window) for incoming input tool raw data points</description>
+        </key>
+    </schema>
+
+</schemalist>

@@ -1,0 +1,317 @@
+// SPDX-FileCopyrightText: 2018 - 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package screensaver
+
+import (
+	"errors"
+	"os"
+	"strings"
+	"sync"
+
+	"github.com/godbus/dbus/v5"
+	ofdbus "github.com/linuxdeepin/go-dbus-factory/session/org.freedesktop.dbus"
+	"github.com/linuxdeepin/go-lib/dbusutil"
+	"github.com/linuxdeepin/go-lib/dbusutil/proxy"
+	"github.com/linuxdeepin/go-lib/log"
+	x "github.com/linuxdeepin/go-x11-client"
+	"github.com/linuxdeepin/go-x11-client/ext/dpms"
+	"github.com/linuxdeepin/go-x11-client/ext/screensaver"
+)
+
+//go:generate dbusutil-gen em -type ScreenSaver
+
+var logger = log.NewLogger("daemon/screensaver")
+
+type inhibitor struct {
+	sender dbus.Sender
+	cookie uint32
+	name   string
+	reason string
+}
+
+type ScreenSaver struct {
+	xConn      *x.Conn
+	service    *dbusutil.Service
+	sigLoop    *dbusutil.SignalLoop
+	dbusDaemon ofdbus.DBus
+
+	blank        byte
+	idleTime     uint32
+	idleInterval uint32
+
+	inhibitors map[uint32]inhibitor
+	counter    uint32
+	mu         sync.Mutex
+
+	//Inhibit state, we need save the SetTimeout value,
+	//so we can recover the correct state when enter UnInhibit state.
+	lastVals *timeoutVals
+	//nolint
+	signals *struct {
+		// Idle 定时器超时信号，当系统在给定时间内未被使用时发送
+		IdleOn struct{}
+
+		// Idle 超时时，如果设置了壁纸切换，则发送此信号
+		CycleActive struct{}
+
+		// Idle 超时后，如果系统被使用就发送此信号，重新开始 Idle 计时器
+		IdleOff struct{}
+	}
+}
+
+type timeoutVals struct {
+	seconds, interval uint32
+	blank             bool
+}
+
+// 抑制 Idle 计时器，不再检测系统是否空闲，然后返回一个 id，用来取消此操作。
+//
+// name: 抑制 Idle 计时器的程序名称
+//
+// reason: 抑制原因
+//
+// cookie: 此次操作对应的 id，用来取消抑制
+func (ss *ScreenSaver) Inhibit(sender dbus.Sender, name, reason string) (cookie uint32,
+	busErr *dbus.Error) {
+	ss.mu.Lock()
+	defer ss.mu.Unlock()
+
+	ss.counter++
+
+	ss.inhibitors[ss.counter] = inhibitor{
+		cookie: ss.counter,
+		name:   name,
+		reason: reason,
+		sender: sender,
+	}
+
+	if len(ss.inhibitors) == 1 {
+		ss.setTimeout(0, 0, false)
+	}
+	logger.Infof("sender %s %q want system enter inhibit, because: %q",
+		sender, name, reason)
+
+	return ss.counter, nil
+}
+
+// 模拟用户操作，让系统处于使用状态，重新开始 Idle 定时器
+func (ss *ScreenSaver) SimulateUserActivity() *dbus.Error {
+	err := x.ForceScreenSaverChecked(ss.xConn, x.ScreenSaverReset).Check(ss.xConn)
+	return dbusutil.ToError(err)
+}
+
+// 根据 id 取消对应的抑制操作
+func (ss *ScreenSaver) UnInhibit(sender dbus.Sender, cookie uint32) *dbus.Error {
+	ss.mu.Lock()
+	defer ss.mu.Unlock()
+
+	inhibitor, ok := ss.inhibitors[cookie]
+	if !ok {
+		logger.Warning("invalid cookie", cookie)
+		return dbusutil.ToError(errors.New("invalid cookie"))
+	}
+
+	if inhibitor.sender != sender {
+		return dbusutil.ToError(errors.New("sender not match"))
+	}
+
+	logger.Infof("%q no need inhibit.", inhibitor.name)
+	ss.unInhibit(cookie)
+
+	return nil
+}
+
+func (ss *ScreenSaver) unInhibit(cookie uint32) {
+	delete(ss.inhibitors, cookie)
+	if len(ss.inhibitors) == 0 {
+		logger.Info("Enter un-inhibit state")
+		if ss.lastVals != nil {
+			logger.Info("recover from ", ss.lastVals)
+			ss.setTimeout(ss.lastVals.seconds, ss.lastVals.interval, ss.lastVals.blank)
+			//同步最新的setTimeout 调用设置的值，避免在影院播放时，设置休眠值，播放完毕后，idleTime没有更新
+			ss.idleTime = ss.lastVals.seconds
+			ss.lastVals = nil
+		} else {
+			ss.setTimeout(ss.idleTime, ss.idleInterval, ss.blank == 1)
+		}
+	}
+}
+
+// 设置 Idle 的定时器超时时间
+//
+// seconds: 超时时间，以秒为单位
+//
+// interval: 屏保模式下，背景更换的间隔时间
+//
+// blank: 是否黑屏，此参数暂时无效
+func (ss *ScreenSaver) SetTimeout(seconds, interval uint32, blank bool) *dbus.Error {
+	ss.mu.Lock()
+	defer ss.mu.Unlock()
+
+	if len(ss.inhibitors) > 0 {
+		ss.lastVals = &timeoutVals{seconds, interval, blank}
+		logger.Info("Current is inhibit state, the value", ss.lastVals, "will apply when in unhibit state")
+	} else {
+		ss.setTimeout(seconds, interval, blank)
+
+		ss.idleTime = seconds
+		ss.idleInterval = interval
+		if blank {
+			ss.blank = 1
+		} else {
+			ss.blank = 0
+		}
+	}
+	return nil
+}
+
+func (ss *ScreenSaver) setTimeout(seconds, interval uint32, blank bool) {
+	if blank {
+		ss.blank = x.BlankingPreferred
+	} else {
+		ss.blank = x.BlankingNotPreferred
+	}
+
+	sessionType := os.Getenv("XDG_SESSION_TYPE")
+	if strings.Contains(sessionType, "wayland") {
+		sessionBus, err := dbus.SessionBus()
+		if err != nil {
+			logger.Warning(err)
+			return
+		}
+		err = sessionBus.Object("org.deepin.dde.KWayland1",
+			"/org/deepin/dde/KWayland1/Output").Call("org.deepin.dde.KWayland1.Idle.SetIdleTimeout", 0, seconds*1000).Err
+
+		if err != nil {
+			logger.Warning(err)
+			return
+		}
+
+	} else {
+		err := x.SetScreenSaverChecked(ss.xConn, int16(seconds), int16(interval), ss.blank,
+			x.ExposuresNotAllowed).Check(ss.xConn)
+		if err != nil {
+			logger.Warning(err)
+		}
+
+		err = dpms.SetTimeoutsChecked(ss.xConn, 0, 0,
+			0).Check(ss.xConn)
+		if err != nil {
+			logger.Warning(err)
+		}
+	}
+	logger.Info("SetTimeout to ", seconds, interval, blank)
+}
+
+const (
+	dbusServiceName = "org.freedesktop.ScreenSaver"
+	dbusPath        = "/org/freedesktop/ScreenSaver"
+	dbusInterface   = dbusServiceName
+)
+
+func (*ScreenSaver) GetInterfaceName() string {
+	return dbusInterface
+}
+
+func (ss *ScreenSaver) destroy() {
+	ss.sigLoop.Stop()
+	ss.dbusDaemon.RemoveHandler(proxy.RemoveAllHandlers)
+}
+
+func newScreenSaver(service *dbusutil.Service) (*ScreenSaver, error) {
+	s := &ScreenSaver{
+		service:    service,
+		inhibitors: make(map[uint32]inhibitor),
+	}
+
+	sessionBus := service.Conn()
+	s.dbusDaemon = ofdbus.NewDBus(sessionBus)
+	s.sigLoop = dbusutil.NewSignalLoop(sessionBus, 10)
+
+	var err error
+	s.xConn, err = x.NewConn()
+	if err != nil {
+		return nil, err
+	}
+
+	// query screensaver ext version
+	ssVersion, err := screensaver.QueryVersion(s.xConn, screensaver.MajorVersion, screensaver.MinorVersion).Reply(s.xConn)
+	if err != nil {
+		logger.Warning("failed to get screensaver ext version:", err)
+	} else {
+		logger.Debugf("screensaver ext version %d.%d", ssVersion.ServerMajorVersion,
+			ssVersion.ServerMinorVersion)
+		root := s.xConn.GetDefaultScreen().Root
+		err = screensaver.SelectInputChecked(s.xConn, x.Drawable(root), screensaver.EventNotifyMask|
+			screensaver.EventCycleMask).Check(s.xConn)
+		if err != nil {
+			logger.Warning(err)
+		}
+		go s.loop()
+	}
+
+	// query dpms ext version
+	dpmsVersion, err := dpms.GetVersion(s.xConn, 1, 1).Reply(s.xConn)
+	if err != nil {
+		logger.Warning("failed to get dpms ext version:", err)
+	} else {
+		logger.Debugf("dpms ext version %d.%d", dpmsVersion.ServerMajorVersion,
+			dpmsVersion.ServerMinorVersion)
+	}
+
+	s.listenDBusNameOwnerChanged()
+	s.sigLoop.Start()
+	return s, nil
+}
+
+func (ss *ScreenSaver) listenDBusNameOwnerChanged() {
+	ss.dbusDaemon.InitSignalExt(ss.sigLoop, true)
+	_, err := ss.dbusDaemon.ConnectNameOwnerChanged(func(name string, oldOwner string, newOwner string) {
+		if strings.HasPrefix(name, ":") &&
+			name == oldOwner && newOwner == "" {
+
+			ss.mu.Lock()
+			for cookie, inhibitor := range ss.inhibitors {
+				if string(inhibitor.sender) == name {
+					logger.Infof("app %s %q disconnect from DBus",
+						name, inhibitor.name)
+					ss.unInhibit(cookie)
+					break
+				}
+			}
+			ss.mu.Unlock()
+		}
+	})
+	if err != nil {
+		logger.Warning(err)
+	}
+}
+
+func (ss *ScreenSaver) loop() {
+	ssExtData := ss.xConn.GetExtensionData(screensaver.Ext())
+
+	eventChan := make(chan x.GenericEvent, 10)
+	ss.xConn.AddEventChan(eventChan)
+
+	for ev := range eventChan {
+		switch ev.GetEventCode() {
+		case screensaver.NotifyEventCode + ssExtData.FirstEvent:
+			event, _ := screensaver.NewNotifyEvent(ev)
+			s := ss.service
+			var err error
+			switch event.State {
+			case screensaver.StateCycle:
+				err = s.Emit(ss, "CycleActive")
+			case screensaver.StateOn:
+				err = s.Emit(ss, "IdleOn")
+			case screensaver.StateOff:
+				err = s.Emit(ss, "IdleOff")
+			}
+			if err != nil {
+				logger.Warning(err)
+			}
+		}
+	}
+}

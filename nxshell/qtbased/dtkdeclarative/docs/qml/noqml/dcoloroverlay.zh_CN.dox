@@ -1,0 +1,86 @@
+
+/**
+@~chinese
+@class ColorOverlay
+@ingroup Item
+@brief 一个同时支持软件和硬件渲染的颜色覆盖控件.
+@details
+    这是一种同时支持软件渲染和硬件渲染的颜色覆盖控件，其作用是为源控件覆盖用户想要的自定义颜色。
+    其同时支持软件渲染和硬件渲染两种模式，在硬件渲染下，其和 Qt Graphical Effects 模块的 ColorOverlay 用法
+    一致，软件渲染模式下，其只能做到对单一颜色的覆盖，无法做到 alpha 的像素点混合这种效果。
+
+    ColorOverlay 在 DTK 中被用在 BusyIndicator 的颜色覆盖上，如自定义
+    不同颜色的 BusyIndicator，应用使用该控件控制例如需要被高亮色进行颜色
+    覆盖的场景。
+@image html coloroverlay_Spinner.png
+    它可以对一般控件进行颜色覆盖，其使用方式如下所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Rectangle {
+        id: rect
+
+        width: 100
+        height: 100
+        color: "gray"
+        visible: false
+    }
+
+    ColorOverlay {
+        anchors.fill: rect
+        source: rect
+        color: "red"
+    }
+```
+    其效果如下：
+@image html renderRedRect.png
+    也可以对图片进行颜色覆盖，其使用方式如下所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Image {
+        id: img
+        sourceSize {
+            width: 100
+            height: 100
+        }
+        source: "/path/to/image.png"
+        visible: false
+    }
+
+    ColorOverlay {
+        anchors.fill: img
+        source: img
+        color: "red"
+    }
+```
+    其效果如下：
+    \table
+    \header
+        \li 原图
+        \li 对比图
+    \row
+        \li @image html coloroverlay_imageSouce.png
+        \li @image html coloroverlay_imageOverlay.png
+    \endtable
+
+@property bool ColorOverlay::cached
+@brief 该属性用于指定是否启用缓存
+@details
+    当源数据的状态不会发生动态改变时，开启缓存
+    能够大幅提高渲染性能。该属性在硬件渲染（GPU渲染）模式下默认为 false,
+    在软件渲染（CPU渲染）模式下为 true.
+
+@property color ColorOverlay::color
+@brief 该属性用于指定覆盖的颜色，未指定即表示不覆盖任何颜色。
+@details
+    在硬件渲染（GPU渲染）模式下，\c color 能够跟每个像素点的颜色进行
+    alpha通道混合，保证每个像素点在混合后的多样化。软件渲染模式下，该
+    颜色混合通常使用 Qt 的混合模式进行混合。
+
+@property color ColorOverlay::source
+@details
+    该属性用于指定颜色覆盖的源,它可以是一个一般控件,也可以是图片等资源数据.
+    但不支持将自身作为源进行眼哦色覆盖.
+
+*/

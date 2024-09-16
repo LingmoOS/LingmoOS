@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ];then
+    if [ "mips32" = `uname -m` ] || [ "mips64" = `uname -m` ] || [ "mips" = `uname -m` ];then
+        cat >/etc/xdg/autostart/dde-launcher_autostart.desktop <<EOF
+[Desktop Entry]
+Exec=/usr/bin/dde-launcher
+Name=Deepin Launcher
+OnlyShowIn=Deepin
+StartupNotify=false
+Terminal=false
+Type=Application
+X-GNOME-Autostart-Delay=5
+EOF
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

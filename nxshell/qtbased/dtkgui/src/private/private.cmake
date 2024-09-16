@@ -1,0 +1,10 @@
+set(private_SRC
+  ${CMAKE_CURRENT_LIST_DIR}/dnativesettings_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dguiapplicationhelper_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dplatformtheme_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dfiledragcommon_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dfiledragserver_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dregionmonitor_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dtaskbarcontrol_p.h 
+  ${CMAKE_CURRENT_LIST_DIR}/dfontmanager_p.h
+)

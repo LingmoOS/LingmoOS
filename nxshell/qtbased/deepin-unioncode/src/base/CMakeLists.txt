@@ -1,0 +1,19 @@
+project(base)
+
+FILE(GLOB_RECURSE PROJECT_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
+
+add_library(
+    ${PROJECT_NAME}
+    STATIC
+    ${PROJECT_SOURCES}
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    ${DtkWidget_LIBRARIES}
+)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${LIBRARY_INSTALL_PREFIX})

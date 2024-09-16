@@ -1,0 +1,111 @@
+/*!
+@~chinese
+@file dbluetoothadapter.h
+
+@class Dtk::Bluetooth::DAdapter dbluetoothadapter.h
+@brief 对于蓝牙适配器的封装
+
+@fn QString DAdapter::address() const
+@brief 获取当前适配器地址
+@return 代表地址的字符串, 形如"FF:FF:FF:FF:FF:FF"
+
+@fn DDevice::AddressType DAdapter::addressType() const
+@brief 获取当前地址的类型
+@return 代表类型的枚举
+
+@fn QString DAdapter::name() const
+@brief 获取当前适配器名字, 具体名称由外部控制
+@return 代表适配器名字的字符串
+
+@fn QString DAdapter::alias() const
+@brief 获取当前适配器别名
+@return 代表别名的字符串
+
+@fn void DAdapter::setAlias(const QString &alias)
+@brief 设置当前适配器别名
+@param [in] alias 新别名
+
+@fn bool DAdapter::powered() const
+@brief 获取当前适配器是否打开
+@return 代表开关的布尔值
+
+@fn void DAdapter::setPowered(bool powered)
+@brief 设置适配器是否打开
+@param [in] powered 是否打开
+@note 此属性设置的值不是持久的。重新启动或拔下适配器后, 它将重置回到false。
+
+@fn bool DAdapter::discoverable() const
+@brief 当前适配器是否能被发现
+@return 代表是否能被发现的布尔值
+
+@fn void DAdapter::setDiscoverable(bool discoverable)
+@brief 设置当前适配器是否能被发现
+@param [in] discoverable 是否能发现
+
+@fn quint32 DAdapter::discoverableTimeout() const
+@brief 发现超时时间
+@return 代表超时时间, 以秒为单位
+@note 当超时为0时代表禁用, 默认值180秒
+
+@fn void DAdapter::setDiscoverableTimeout(quint32 discoverableTimeout)
+@brief 设置发现超时时间
+@param [in] discoverableTimeout 超时时间
+
+@fn bool DAdapter::discovering() const
+@brief 是否正处于发现状态中
+@return 表示是否正在发现的布尔值
+
+@fn DExpected<QSharedPointer<DDevice>> DAdapter::deviceFromAddress(const QString &deviceAddress) const
+@brief 由设备地址来构造DDevice对象
+@param [in] deviceAddress 设备地址
+@return 由对应的设备地址构造的对应的DDevice对象
+@note 这是唯一获取设备对象的方法
+
+@fn DExpected<QStringList> DAdapter::devices() const
+@brief 列出当前适配器下的所有设备
+@return 由蓝牙设备组成的列表
+
+@fn DExpected<void> DAdapter::removeDevice(const QString &device) const
+@brief 移除设备
+@param [in] device 要移除的设备地址
+@return 调用结果
+
+@fn DExpected<void> DAdapter::startDiscovery() const
+@brief 开始发现设备
+@return 调用结果
+
+@fn DExpected<void> DAdapter::stopDiscovery() const
+@brief 停止发现设备
+@return 调用结果
+
+@fn void DAdapter::addressTypeChanged(DDevice::AddressType type)
+@brief 信号，当地址类型改变时发出信号
+
+@fn void DAdapter::nameChanged(const QString &name)
+@brief 信号，当名字改变时发出信号
+
+@fn void DAdapter::aliasChanged(const QString &alias)
+@brief 信号，当别称类型改变时发出信号
+
+@fn void DAdapter::poweredChanged(bool powered)
+@brief 信号，当适配器启用状态改变时发出信号
+
+@fn void DAdapter::discoverableChanged(bool discoverable)
+@brief 信号，当可发现属性改变时发出信号
+
+@fn void DAdapter::discoverableTimeoutChanged(quint32 discoverableTimeout)
+@brief 信号，当发现超时属性改变时发出信号
+
+@fn void DAdapter::discoveringChanged(bool discovering)
+@brief 信号，当发现状态改变时发出信号
+
+@fn void DAdapter::removed()
+@brief 信号，当本适配器被移除时发出信号
+
+@fn void DAdapter::deviceAdded(const QString &deviceAddress)
+@brief 信号，当本适配器下的由设备添加时发出信号
+
+@fn void DAdapter::deviceRemoved(const QString &deviceAddress)
+@brief 信号，当本适配器下的由设备移除时发出信号
+
+*/

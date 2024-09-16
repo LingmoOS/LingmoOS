@@ -1,0 +1,186 @@
+
+/**
+@~chinese
+@class ItemViewport
+@ingroup Item
+
+    \keyword DQuickItemViewport
+@brief 一种提供了操作其源对象 Item 的高级视图控件
+
+    ItemViewport 提供了能够操作其 sourceItem 对象的高级视图控件。
+    ItemViewport 的用法很广泛，能够对各种 Item 类型进行圆角化处理，
+    能够帮助 InWindowBlur 控件对背景进行窗口内模糊特效等等。
+
+    ItemViewport 不仅支持 GPU 渲染，其也适配了 CPU 模式。使用 DTK
+    环境时，在 ItemViewport 控件能够处理的控件范围内，请尽量使用它，而非
+    Qt 控件，因为 Qt 控件可能仅支持 CPU 或 GPU 两种中的一种。
+
+    对于 ItemViewport 的使用场景，可以使用如下示例代码：
+
+    \section3 特殊的圆角处理
+    某些特殊的场景下，当我们只需要 Button 控件四个角中的某一个圆角时，如下图所示，会发现
+    传统的控件无法达到要求，但可以使用 ItemViewport .
+@image html itemViewport_clip_radius.png
+    其实现代码如下图所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Item {
+        anchors.centerIn: parent
+        width: 100
+        height: 100
+        Item {
+            id: btnBackground
+            width: 120
+            height: 120
+
+            Button {
+                id: btn
+                anchors {
+                    right: parent.right
+                    top: parent.top
+                }
+                width: 64
+                height: 64
+                icon {
+                    name: "arrow_ordinary_up"
+                    width: 48
+                    height: 48
+                }
+                background: Rectangle {
+                    color: "#AA00FF"
+                    radius: 0
+                }
+            }
+        }
+
+        ItemViewport {
+            id: viewport
+            sourceItem: btnBackground
+            radius: 20
+            fixed: true
+            width: btnBackground.width
+            height: btnBackground.height
+            anchors {
+                right: parent.right
+                top: parent.top
+            }
+            hideSource: true
+        }
+    }
+```
+
+    \section3 配合 InWindowBlur 实现窗口内模糊
+
+    窗口内模糊指控件所处的窗口内，其背景颜色的模糊， DTK 中使用 InWindowBlur 控件
+    实现。当然仅通过该控件还无法达到最终效果，需要配合 ItemViewport 进行组合使用。
+
+@
+    import org.deepin.dtk
+
+    Item {
+        Image {
+            anchors.fill: parent
+            source: "file:///usr/share/wallpapers/deepin/desktop.jpg"
+        }
+
+        ListView {
+            id: testView
+
+            model: 10
+            spacing: 30
+            clip: true
+            anchors {
+                fill: parent
+                margins: 10
+            }
+
+            delegate: Item {
+                height: 50
+                width: 300
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                InWindowBlur {
+                    id: blur
+                    anchors.fill: parent
+                    radius: 20
+                    offscreen: true
+                }
+
+                ItemViewport {
+                    id: roundBlur
+                    anchors.fill: blur
+                    fixed: true
+                    sourceItem: blur
+                    radius: blur.radius
+                    hideSource: false
+                }
+
+                Rectangle {
+                    radius: roundBlur.radius
+                    anchors.fill: roundBlur
+                    color: Qt.rgba(1, 0, 0, 0.2)
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "InWindowBlur" + index
+                    color: "white"
+                    font.pixelSize: 22
+                }
+            }
+        }
+    }
+```
+
+    其效果展示如下：
+@image html inwindowblur.png
+
+    ItemViewport 的实现原理是将源控件的内容作为材质输出到 ItemViewport 中，通过
+    ItemViewport 设置的属性值和特定的功能，进行效果呈现并输出。当源控件更新状态时，
+    ItemViewport 会监测到这种状态更新，并进行实时同步更新。
+
+
+
+@property Item ItemViewport::sourceItem
+
+    sourceItem 用于指定源控件， sourceItem 不局限于 Item 控件，可以传入
+    任何继承自 Item 的控件。当 sourceItem 属性发生改变时，Itemviewport 会
+    进行实时更新。
+
+
+
+@property Item ItemViewport::sourceRect
+
+    sourceRect 用于指定源大小，当不指定时，源大小为 sourceItem 的大小。
+    大多数的使用场景下可以无需指定 sourceRect
+
+
+
+@property real ItemViewport::radius
+
+    radius 用于指定 Rect 的圆角大小，例如上述示例中，可通过指定 radius 属性
+    对某个边进行圆角处理。
+
+
+
+@property real ItemViewport::fixed
+
+    fixed 属性用于指定 ItemViewport 是否启用预加载， 当 fixed 为 true 时
+    将不起用任何预加载。fixed 默认为 false
+
+
+
+@property bool ItemViewport::hideSource
+
+    hideSource 属性用于指定是否决定隐藏源控件（sourceItem)，根据 ItemViewport
+    的实现原理，ItemViewport 已经将 sourceItem 画面和自身属性混合后输出。因此，
+    ItemViewport 在多数情况下已经实现了目标效果，将 hideSource 属性指定为 true 后
+    则表示隐藏 sourceItem 的内容，即隐藏源控件的样式，展示 ItemViewport 的内容，即加工
+    后的内容。默认情况下，该属性为 false.
+
+@property DTK::CompositionMode ItemViewport::compositionMode
+@brief 用于控制合成时所使用的混合模式。
+@details 此属性与 @sa QPainter::setCompositionMode 功能类似，请参考其文档介绍。
+
+*/

@@ -1,0 +1,86 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file ddiskjob.h
+
+@class Dtk::Mount::DDiskJob ddiskjob.h
+    @brief 提供对设备任务接口的操作
+
+@fn DDiskJob::DDiskJob(const QString &path, QObject *parent = nullptr)
+    @brief 构造函数
+    @param[in] path Job 对象路径，形如 /org/freedesktop/UDisks/jobs/...
+    @param[in] parent 父指针
+    @see QString DDiskJob::path() const
+
+@fn DDiskJob::~DDiskJob()
+    @brief 析构函数
+
+@fn QString DDiskJob::path() const
+    @brief 获取当前任务对应的任务接口路径
+    @return 任务接口路径
+
+@fn QStringList DDiskJob::objects() const
+    @brief 获取当前任务关联的对象列表
+    @return 关联对象列表，通常为块设备对象或驱动设备对象
+
+@fn bool DDiskJob::cancelable() const
+    @brief 获取当前任务是否可取消
+    @return 当前任务是否可取消
+    @retval True 当前任务可取消
+    @retval False 当前任务不可取消
+
+@fn bool DDiskJob::progressValid() const
+    @brief 获取当前进度数值是否有效
+    @return 当前进度是否有效
+    @retval True 当进度有效
+
+@fn double DDiskJob::progress() const
+    @brief 获取当前任务进度
+    @return 当前任务进度，数值范围 0~1
+
+@fn QString DDiskJob::operation() const
+    @brief 获取当前操作类型
+    @return 当前任务类型
+
+@fn quint32 DDiskJob::startedByUid() const
+    @brief 获取启动当前任务的用户 uid
+    @return 用户 uid
+
+@fn quint64 DDiskJob::bytes() const
+    @brief 获取当前任务需要处理的字节数
+    @return 如果当前任务涉及已知字节数量的操作，例如擦除磁盘，则返回任务需要处理的总字节数，否则返回 0
+
+@fn quint64 DDiskJob::expectedEndTime() const
+    @brief 获取当前任务预测的结束 unix 时间（毫秒）
+    @return 若结束时间不可预测，则返回 0
+
+@fn quint64 DDiskJob::rate() const
+    @brief 获取当前任务处理速率
+    @return 若任务总量已知，则返回估算的任务处理速率（字节/秒），否则返回 0
+
+@fn quint64 DDiskJob::startTime() const
+    @brief 获取当前任务开始时间（毫秒）
+    @return 任务开始时间
+
+@fn void DDiskJob::cancel(const QVariantMap &options)
+    @brief 槽函数，取消任务操作
+    @param[in] options 取消任务时的参数列表
+
+@fn void DDiskJob::completed(bool success, const QString &message)
+    @brief 信号，告知任务结束
+    @param[out] success 任务处理结果
+    @param[out] message 任务描述信息或错误信息
+
+@fn void DDiskJob::progressChanged(double progress)
+    @brief 信号，告知任务处理进度
+    @param[out] progress 任务处理进度
+
+@fn void DDiskJob::rateChanged(quint64 rate)
+    @brief 信号，告知任务处理速率改变
+    @param[out] rate 当前任务处理速率
+
+@fn void DDiskJob::expectedEndTimeChanged(quint64 expectedEndTime)
+    @brief 信号，告知任务预测结束时间改变
+    @param[out] expectedEndTime 当前预测的任务结束 unix 时间（毫秒）
+
+*/

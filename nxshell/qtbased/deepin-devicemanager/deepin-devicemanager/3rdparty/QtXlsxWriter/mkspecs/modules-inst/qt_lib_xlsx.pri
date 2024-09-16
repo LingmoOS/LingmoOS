@@ -1,0 +1,15 @@
+QT.xlsx.VERSION = 0.3.0
+QT.xlsx.name = QtXlsx
+QT.xlsx.module = Qt5Xlsx
+QT.xlsx.libs = $$QT_MODULE_LIB_BASE
+QT.xlsx.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtXlsx
+QT.xlsx.frameworks =
+QT.xlsx.bins = $$QT_MODULE_BIN_BASE
+QT.xlsx.depends = core gui
+QT.xlsx.uses =
+QT.xlsx.module_config = v2
+QT.xlsx.DEFINES = QT_XLSX_LIB
+QT.xlsx.enabled_features =
+QT.xlsx.disabled_features =
+QT_CONFIG +=
+QT_MODULES += xlsx

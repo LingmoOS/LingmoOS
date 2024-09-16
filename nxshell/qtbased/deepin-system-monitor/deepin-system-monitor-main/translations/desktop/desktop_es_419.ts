@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es_419"><context><name>desktop</name><message><location filename="Desktop Entry]Name" line="0"/><source>Deepin System Monitor</source><translation>Monitor del sistema Deepin</translation></message><message><location filename="Desktop Entry]Comment" line="0"/><source>Monitor system cpu, memory, network, process and service status</source><translation>Estado de proceso del monitor de sistema</translation></message><message><location filename="Desktop Entry]GenericName" line="0"/><source>System Monitor</source><translation>Monitor del sistema</translation></message></context></TS>

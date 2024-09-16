@@ -1,0 +1,14 @@
+name: doxygen-check
+on:
+  pull_request_target:
+    paths-ignore:
+      - ".github/workflows/**"
+
+concurrency:
+  group: ${{ github.workflow }}-pull/${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  check_job:
+    uses: linuxdeepin/.github/.github/workflows/doc-check.yml@master
+    secrets: inherit

@@ -1,0 +1,35 @@
+[Unit]
+Description=dde-shell for DDE service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+Requires=dbus.socket
+After=dbus.socket
+
+#FIXME: maybe AM is invalid
+# old AM
+Wants=org.deepin.dde.Application1.Manager.service
+After=org.deepin.dde.Application1.Manager.service
+# new AM
+Wants=org.desktopspec.ApplicationManager1.service
+After=org.desktopspec.ApplicationManager1.service
+
+Wants=org.dde.session.Daemon1.service
+After=org.dde.session.Daemon1.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dde-shell -C %I
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

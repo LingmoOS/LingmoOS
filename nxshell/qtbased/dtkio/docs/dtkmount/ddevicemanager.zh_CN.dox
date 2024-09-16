@@ -1,0 +1,137 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file ddevicemanager.h
+
+@namespace Dtk::Mount::DDeviceManager
+    名字空间，设备管理器。包含各种设备管理接口。
+
+@fn DBlockDeviceMonitor *Dtk::Mount::DDeviceManager::globalBlockDeviceMonitor()
+    @brief 获取全局唯一块设备监视器，你可以使用该监视器监听块设备的变化
+    @return 块设备监视器指针
+
+@fn DProtocolDeviceMonitor *Dtk::Mount::DDeviceManager::globalProtocolDeviceMonitor();
+    @brief 获取全局唯一协议设备监视器，你可以使用该监视器监听协议设备的变化
+    @return 协议设备监视器指针
+
+@fn QStringList Dtk::Mount::DDeviceManager::blockDevices(const QVariantMap &options = {});
+    @brief 获取当前系统中的块设备列表
+    @param[in] options
+    @return 块设备路径列表
+    
+@fn QStringList Dtk::Mount::DDeviceManager::protocolDevices();
+    @brief 获取当前系统中的协议设备列表
+    @return 协议设备列表
+    
+@fn QStringList Dtk::Mount::DDeviceManager::diskDrives();
+    @brief 获取当前系统中所有设备驱动器列表
+    @return 磁盘列表
+    
+@fn DBlockDevice *Dtk::Mount::DDeviceManager::createBlockDevice(const QString &path, QObject *parent = nullptr);
+    @brief 创建一个块设备对象
+    @param[in] path 创建的块设备路径
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 设备指针
+    
+@fn DBlockDevice *Dtk::Mount::DDeviceManager::createBlockDeviceByDevicePath(const QByteArray &path, QObject *parent = nullptr);
+    @brief 通过设备路径创建块设备对象
+    @param[in] path 设备描述符，如 /dev/sdb1
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 设备指针
+    
+@fn DBlockPartition *Dtk::Mount::DDeviceManager::createBlockPartition(const QString &path, QObject *parent = nullptr);
+    @brief 用于创建设备分区对象
+    @param[in] path 块设备对象路径
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 分区对象指针
+    
+@fn DBlockPartition *Dtk::Mount::DDeviceManager::createBlockPartitionByMountPoint(const QByteArray &path, QObject *parent = nullptr);
+    @brief 通过挂载点创建分区对象
+    @param[in] path 挂载点路径
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 分区对象指针
+    
+@fn DDiskDrive *Dtk::Mount::DDeviceManager::createDiskDrive(const QString &path, QObject *parent = nullptr);
+    @brief 通过驱动器路径创建驱动器对象
+    @param[in] path 驱动器对象路径，形如 /org/freedesktop/UDisks/drives/WDC_WD10....
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 驱动器对象
+    
+@fn DDiskJob *Dtk::Mount::DDeviceManager::createDiskJob(const QString &path, QObject *parent = nullptr);
+    @brief 通过任务路径，创建任务类型对象
+    @param[in] path 任务节点路径
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 任务对象指针
+    
+@fn DProtocolDevice *Dtk::Mount::DDeviceManager::createProtocolDevice(const QString &path, QObject *parent = nullptr);
+    @brief 通过协议设备的 url 字符串，创建协议设备对象
+    @param[in] path 协议设备 url 路径，例如 smb://1.2.3.4/helloworld
+    @param[in] parent 对象父指针，可用于管理内存
+    @return 协议设备对象
+    
+@fn QStringList Dtk::Mount::DDeviceManager::supportedFilesystems();
+    @brief 获取当前系统所支持的文件系统列表
+    @return 文件系统列表
+    
+@fn QStringList Dtk::Mount::DDeviceManager::supportedEncryptionTypes();
+    @brief 获取当前系统所支持的加密类型列表
+    @return 加密类型列表
+    
+@fn QStringList Dtk::Mount::DDeviceManager::resolveDevice(QVariantMap devspec, QVariantMap options);
+    @brief 根据所传入的设备描述，解析设备对象路径
+    @param[in] devspec 设备描述信息
+    @param[in] options
+    @return 可能的设备对象路径列表
+    @note 设备描述信息键值包括：
+    @note > path(string) 设备路径（如 /dev/sdb1），同样适用于 /dev/ 路径下的设备链接
+    @note > label(string) 设备卷标 idLabel
+    @note > uuid(string) 设备 uuid
+    @see QString DBlockDevice::idLabel() const
+    @see QString DBlockDevice::idUUID() const
+    
+@fn QStringList Dtk::Mount::DDeviceManager::resolveDeviceNode(QString devnode, QVariantMap options);
+    @brief 根据所传入的设备节点，解析设备对象路径
+    @param[in] devnode 设备描述符，形如 /dev/sdb1
+    @param[in] options
+    @return 可能的设备对象路径列表
+    @see QStringList Dtk::Mount::DDeviceManager::resolveDevice(QVariantMap devspec, QVariantMap options);
+    
+@fn bool Dtk::Mount::DDeviceManager::canCheck(const QString &type, QString *requiredUtil = nullptr);
+    @brief 获取文件系统是否可执行检查操作
+    @param[in] type 文件系统类型
+    @param[out] requiredUtil 可供检查文件系统的二进制可执行程序名称，可为空
+    @return 文件系统能否执行检查
+    
+@fn bool Dtk::Mount::DDeviceManager::canFormat(const QString &type, QString *requiredUtil = nullptr);
+    @brief 测试能否创建所指类型的文件系统，并返回可供创建的二进制工具
+    @param[in] type 文件系统类型
+    @param[out] requiredUtil 二进制工具名称
+    @return 能否创建所指文件系统
+    @see QStringList Dtk::Mount::DDeviceManager::supportedFilesystems();
+    
+@fn bool Dtk::Mount::DDeviceManager::canRepair(const QString &type, QString *requiredUtil = nullptr);
+    @brief 测试一个文件系统是否支持修复操作
+    @param[in] type 所测文件系统类型
+    @param[out] requiredUtil 可供修复的二进制路径或空
+    @return 能否支持修复操作
+    
+@fn bool Dtk::Mount::DDeviceManager::canResize(const QString &type, QString *requiredUtil = nullptr);
+    @brief 测试一个文件系统能否支持修改大小的操作
+    @param[in] type 所测文件系统类型
+    @param[out] requiredUtil 可供修改大小的二进制路径或空
+    @return 能否支持修改大小的操作
+    
+@fn QString Dtk::Mount::DDeviceManager::loopSetup(int fd, QVariantMap options);
+    @brief 创建一个由文件句柄 fd 指代的块设备
+    @param[in] fd 文件描述符
+    @param[in] options 参数列表
+    @return loop 设备的块设备对象路径，如 /org/freedesktop/UDisks2/block_devices/loop1
+    @note 参数列表：
+    @note > offset(uint64) 偏移量
+    @note > size(uint64) 大小
+    @note > read-only(bool) 是否只读
+    @note > no-part-scan(bool) 无分区扫描
+    
+
+
+*/

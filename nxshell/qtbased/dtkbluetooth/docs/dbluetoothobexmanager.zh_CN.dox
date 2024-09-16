@@ -1,0 +1,48 @@
+/*!
+@~chinese
+@file dbluetoothobexmanager.h
+
+@class Dtk::Bluetooth::DObexManager dbluetoothobexmanager.h
+@brief 蓝牙obex管理类
+
+@fn bool DObexManager::available() const
+@brief 蓝牙服务是否可用
+@return 表示是否可用的布尔值
+
+@fn DExpected<ObexSessionInfo> DObexManager::createSession(const QString &destination, const QVariantMap &args) const
+@brief 创建obex会话
+@param [in] destination 目标设备的地址
+@param [in] args 会话属性, 具体参见<a href="https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/obex-api.txt">这个文档</a>
+@return 创建的会话的信息
+
+@fn DExpected<void> DObexManager::removeSession(const QSharedPointer<DObexSession> session) const
+@brief 移除obex会话
+@param [in] session 要移除的obex会话对象
+@return 调用结果
+
+@fn DExpected<void> DObexManager::registerAgent(const QSharedPointer<DObexAgent> &agent) const
+@brief 注册自定义的obex蓝牙代理
+@param [in] agent 自定义的蓝牙obex代理对象
+@return 调用结果
+
+@fn DExpected<void> DObexManager::unregisterAgent(const QSharedPointer<DObexAgent> &agent) const
+@brief 注销自定义的obex蓝牙代理
+@param [in] agent 自定义的蓝牙obex代理对象
+@return 调用结果
+
+@fn DExpected<QList<ObexSessionInfo> > DObexManager::sessions() const
+@brief 获取当前存在的obex会话
+@return 由obex会话信息组成的列表
+
+@fn DExpected<QSharedPointer<DObexSession> > DObexManager::sessionFromInfo(const ObexSessionInfo &info)
+@brief 由obex会话信息创建对应的DObexSession对象
+@param [in] info obex会话的信息
+@return DObexSession对象
+
+@fn void DObexManager::sessionAdded(const ObexSessionInfo &info)
+@brief 信号, 当有新obex会话被创建时被触发
+
+@fn void DObexManager::sessionRemoved(const ObexSessionInfo &info)
+@brief 信号, 当有新obex会话被移除时被触发
+
+*/

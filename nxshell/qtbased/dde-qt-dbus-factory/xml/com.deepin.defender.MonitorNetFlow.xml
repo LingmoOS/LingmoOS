@@ -1,0 +1,146 @@
+<node>
+  <interface name="com.deepin.defender.MonitorNetFlow">
+  <!--  <property access="read" type="(sddiss)" name="singleFuncData"/>-->
+  <!--  <property access="read" type="d" name="globalRecv"/>-->
+    <method name="StartApp">
+    </method>
+    <method name="ExitApp">
+    </method>
+    <method name="getProExePath">
+        <arg name="sId" type="s" direction="in"></arg>
+        <arg name="value" type="s" direction="out"></arg>
+    </method>
+    <!-- 开启/关闭进程流量监控功能 -->
+    <method name="EnableNetFlowMonitor">
+        <arg name="enable" type="b" direction="in"></arg>
+    </method>
+    <signal name="NotifyDetailData">
+      <arg type="s" name="name"/>
+      <arg type="d" name="recv"/>
+      <arg type="d" name="send"/>
+      <arg type="i" name="pid"/>
+      <arg type="s" name="device"/>
+      <arg type="s" name="type"/>
+    </signal>
+    <signal name="NotifyGlobalData">
+      <arg type="d" name="recv"/>
+      <arg type="d" name="send"/>
+    </signal>
+    <signal name="NotifyHeartbeat">
+    </signal>
+    <!-- SendPocNetFlowInfos -->
+    <signal name="SendPocNetFlowInfos">
+        <arg type="(a(isbssssssllsddddsss))" direction="out"/>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="DefenderProcInfoList"/>
+    </signal>
+    <method name="GetPocNetFlowInfos">
+        <arg name="procInfos" type="a(isbssssssllsddddsss)" direction="out"></arg>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="DefenderProcInfoList"/>
+    </method>
+    <!-- 设置右键扫描是否可见 -->
+    <method name="SetRightScanVisable">
+        <arg name="flag" type="b" direction="in"></arg>
+    </method>
+    <!-- 设置ssh远程登陆端口状态 -->
+    <method name="setRemRegisterStatus">
+        <arg name="bStatus" type="b" direction="in"></arg>
+    </method>
+    <!-- 获取ssh远程登陆端口状态 -->
+    <method name="getRemRegisterStatus">
+        <arg name="bStatus" type="b" direction="out"></arg>
+    </method>
+    <!-- ssh远程登陆端口状态改变信号 -->
+    <signal name="SSHStatusChanged">
+        <arg name="status" type="b"/>
+    </signal>
+    <!-- usb connection -->
+    <!-- 将待发送设备信息整合成字符串 -->
+    <method name="MergeDevSavingInfoToStr">
+        <arg name="sName" type="s" direction="in"></arg>
+        <arg name="sStatus" type="s" direction="in"></arg>
+        <arg name="sSerial" type="s" direction="in"></arg>
+        <arg name="sVendorID" type="s" direction="in"></arg>
+        <arg name="sProductID" type="s" direction="in"></arg>
+        <arg name="sParentSize" type="s" direction="in"></arg>
+        <arg name="sSize" type="s" direction="in"></arg>
+        <arg name="str" type="s" direction="out"></arg>
+    </method>
+    <method name="WriteConnectionRecord">
+        <arg name="sName" type="s" direction="in"></arg>
+        <arg name="sDatetime" type="s" direction="in"></arg>
+        <arg name="sStatus" type="s" direction="in"></arg>
+        <arg name="sSerial" type="s" direction="in"></arg>
+        <arg name="sVendorID" type="s" direction="in"></arg>
+        <arg name="sProductID" type="s" direction="in"></arg>
+        <arg name="sParentSize" type="s" direction="in"></arg>
+        <arg name="sSize" type="s" direction="in"></arg>
+    </method>
+    <method name="ClearUsbConnectionLog">
+    </method>
+    <method name="WriteConnectionWhiteLst">
+        <arg name="sName" type="s" direction="in"></arg>
+        <arg name="sDatetime" type="s" direction="in"></arg>
+        <arg name="sStatus" type="s" direction="in"></arg>
+        <arg name="sSerial" type="s" direction="in"></arg>
+        <arg name="sVendorID" type="s" direction="in"></arg>
+        <arg name="sProductID" type="s" direction="in"></arg>
+        <arg name="sParentSize" type="s" direction="in"></arg>
+        <arg name="sSize" type="s" direction="in"></arg>
+    </method>
+    <method name="RemoveFromWhiteLst">
+        <arg name="sName" type="s" direction="in"></arg>
+        <arg name="sSerial" type="s" direction="in"></arg>
+        <arg name="sVendorID" type="s" direction="in"></arg>
+        <arg name="sProductID" type="s" direction="in"></arg>
+    </method>
+    <method name="ChangeIsbSaveRecord">
+        <arg name="change" type="b" direction="in"></arg>
+    </method>
+    <method name="SelectLimitationModel">
+        <arg name="sModel" type="s" direction="in"></arg>
+    </method>
+    <method name="GetRecordSaveSwitch">
+        <arg name="isbSave" type="b" direction="out"></arg>
+    </method>
+    <method name="GetLimitModel">
+        <arg name="sModel" type="s" direction="out"></arg>
+    </method>
+    <method name="GetUsbConnectionRecords">
+        <arg name="sRecords" type="s" direction="out"></arg>
+    </method>
+    <method name="GetWhiteList">
+        <arg name="list" type="s" direction="out"></arg>
+    </method>
+    <signal name="SendUsbConnectionInfo">
+      <arg type="s" name="sUsbInfos"/>
+    </signal>
+    <signal name="requestShowBlockAllSysNotify">
+    </signal>
+    <signal name="requestShowOnlyWhiteListSysNotify">
+    </signal>
+    <!-- 获取磁盘信息 -->
+    <!-- 获取磁盘设备路径列表 -->
+    <method name="GetDiskDevicePathList">
+        <arg name="pathList" type="as" direction="out"></arg>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QStringList"/>
+    </method>
+    <!-- 清理选中垃圾 -->
+    <method name="CleanSelectFile">
+        <arg name="pathList" type="as" direction="in"></arg>
+        <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QStringList"/>
+    </method>
+    <!-- journal垃圾清理 -->
+    <method name="CleanJournal">
+    </method>
+    <!-- 安全日志 -->
+    <method name="AddSecurityLog">
+        <arg name="nType" type="i" direction="in"></arg>
+        <arg name="sInfo" type="s" direction="in"></arg>
+    </method>
+    <method name="DeleteSecurityLog">
+        <arg name="nLastDate" type="i" direction="in"></arg>
+        <arg name="nType" type="i" direction="in"></arg>
+        <arg name="isbDelete" type="b" direction="out"></arg>
+    </method>
+  </interface>
+</node>

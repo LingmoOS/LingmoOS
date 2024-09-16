@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="dde_kvm">
+  <copyright><![CDATA[
+        Copyright © 2024  xinbo wang <wangxinbo@uniontech.com>
+
+        Permission to use, copy, modify, distribute, and sell this
+        software and its documentation for any purpose is hereby granted
+        without fee, provided that the above copyright notice appear in
+        all copies and that both that copyright notice and this permission
+        notice appear in supporting documentation, and that the name of
+        the copyright holders not be used in advertising or publicity
+        pertaining to distribution of the software without specific,
+        written prior permission.  The copyright holders make no
+        representations about the suitability of this software for any
+        purpose.  It is provided "as is" without express or implied
+        warranty.
+
+        THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+        SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+        WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+        AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+        ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+        THIS SOFTWARE.
+  ]]></copyright>
+    <interface name="dde_kvm" version="1">
+        <description summary="dde kvm"/>
+        <request name="get_dde_kvm_keyboard">
+            <description summary="get dde kvm keyboard"/>
+            <arg name="id" type="new_id" interface="dde_kvm_keyboard" summary="Requested dde kvm keyboard id"/>
+        </request>
+        <request name="get_dde_kvm_pointer">
+            <description summary="get dde kvm pointer"/>
+            <arg name="id" type="new_id" interface="dde_kvm_pointer" summary="Requested dde kvm pointer id"/>
+        </request>
+    </interface>
+
+    <interface name="dde_kvm_pointer" version="1">
+        <description summary="dde kvm pointer"/>
+        <enum name="button_state">
+            <description summary="the pointer click-button status of whether the pointer click-button be pressed or release"/>
+            <entry name="press" value="1" summary="feature click-button press"/>
+            <entry name="release" value="0" summary="feature click-button release"/>
+        </enum>
+        <enum name="scroll_type">
+            <description summary="the pointer scroll button status of whether the pointer scroll-button be vertical or horizontal"/>
+            <entry name="vertical" value="0" summary="feature scroll-button vertical"/>
+            <entry name="horizontal" value="1" summary="feature scroll-button horizontal"/>
+        </enum>
+
+        <request name="enable_pointer">
+            <description summary="enable pointer"/>
+            <arg name="is_enable" type="uint" summary="Requested enable pointer"/>
+        </request>
+        <request name="enable_cursor">
+            <description summary="enale cursor"/>
+            <arg name="is_enable" type="uint" summary="Requested enable cursor"/>
+        </request>
+        <request name="set_pos">
+            <description summary="set cursor pos"/>
+            <arg name="x" type="fixed" summary="Requested set cursor x"/>
+            <arg name="y" type="fixed" summary="Requested set cursor y"/>
+        </request>
+
+        <event name="motion">
+            <description summary="send pointer moved"/>
+            <arg name="time" type="uint" summary="the event occured time."/>
+            <arg name="x" type="fixed" summary="the event occured x."/>
+            <arg name="y" type="fixed" summary="the event occured y."/>
+        </event>
+        <event name="button">
+            <description summary="button that produced the event"/>
+            <arg name="serial" type="uint" summary="serial number of the enter event"/>
+            <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
+            <arg name="state" type="uint" summary="button state"/>
+        </event>
+        <event name="axis">
+            <description summary="axis event"/>
+            <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
+            <arg name="type" type="uint" summary="type"/>
+            <arg name="value" type="fixed" summary="length of vector in surface-local coordinate space"/>
+        </event>
+    </interface>
+
+    <interface name="dde_kvm_keyboard" version="1">
+        <description summary="dde kvm keyboard"/>
+         <enum name="key_state">
+            <description summary="the keyboard key status"/>
+            <entry name="press" value="1" summary="key is pressed"/>
+            <entry name="release" value="0" summary="key is released"/>
+        </enum>
+
+        <request name="enable_keyboard">
+            <description summary="enable keyboard"/>
+            <arg name="is_enable" type="uint" summary="Requested enable keyboard"/>
+        </request>
+
+        <event name="key">
+            <description summary="key event"/>
+            <arg name="serial" type="uint" summary="serial number of the key event"/>
+            <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
+            <arg name="key" type="uint" summary="key that produced the event"/>
+            <arg name="state" type="uint" summary="physical state of the key"/>
+        </event>
+        <event name="modifiers">
+            <description summary="modifiers event"/>
+            <arg name="serial" type="uint" summary="serial number of the key event"/>
+            <arg name="mods_depressed" type="uint" summary="depressed modifiers"/>
+            <arg name="mods_latched" type="uint" summary="latched modifiers"/>
+            <arg name="mods_locked" type="uint" summary="locked modifiers"/>
+            <arg name="group" type="uint" summary="keyboard layout"/>
+        </event>
+    </interface>
+</protocol>

@@ -1,0 +1,30 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=docparser-git
+pkgver=1.0.1.r0.g908a80a
+pkgrel=1
+sourcename=docparser
+sourcedir="$sourcename"
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+pkgdesc='A document parser library ported from document2html'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/docparser"
+license=('GPL3')
+depends=('poppler' 'libzip' 'pugixml' 'tinyxml2')
+makedepends=('qt5-tools')
+conflicts=('docparser')
+provides=('docparser')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+
+b2sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  qmake-qt5 PREFIX=/usr
+  make
+}
+
+package() {
+  cd $sourcedir
+  make INSTALL_ROOT="$pkgdir" install
+}

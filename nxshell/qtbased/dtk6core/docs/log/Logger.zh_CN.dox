@@ -1,0 +1,176 @@
+/*!
+@~chinese
+
+@ingroup dlog
+@file include/log/Logger.h
+
+@class Dtk::Core::Logger Logger.h
+@brief 非常简单但相当强大的组件，可用于记录你的应用程序活动。
+
+@enum Dtk::Core::Logger::LogLevel
+@brief 日志等级
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Trace
+追踪级别,可用于大部分不需要的记录,用于内部代码追踪
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Debug
+调试级别,用于软件的调试。
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Info
+信息级别,可用于信息记录,这可能不仅对开发者有意义
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Warning
+警告,可以用来记录你的应用程序检测到的一些非致命的警告
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Error
+错误,可能是一个较大问题,导致你的程序工作出错,但不至于崩溃
+@var Dtk::Core::Logger::LogLevel Dtk::Core::Logger::Fatal
+致命错误，用于不可恢复的错误，在写入日志记录后立即崩溃应用程序(终止)
+
+@fn Logger Dtk::Core::Logger::Logger()
+@brief 构建Logger的实例。
+@note 如果你只使用一个全局的logger实例,不需要手动使用这个构造函数,可以考虑使用logger宏来代替访问记录器实例
+
+@fn Logger Dtk::Core::Logger::Logger(const QString &defaultCategory)
+@brief 构建Logger的实例并设置Logger的默认类别
+@note 如果你只使用一个全局的logger实例,不需要手动使用这个构造函数,
+        可以考虑使用logger宏来访问logger实例并调用setDefaultCategory方法
+@sa Logger::Logger()
+@sa Logger::setDefaultCategory()
+
+@fn Logger Dtk::Core::Logger::~Logger()
+@brief 析构函数
+@note 你可能不需要直接使用这个函数。记录器的全局实例将在你的QCoreApplication执行结束后自动销毁
+
+@fn static Logger* Dtk::Core::Logger::globalInstance()
+@brief 返回Logger的全局对象
+@note 在大多数情况下，你不应该直接使用这个函数。可以考虑使用 [logger](@ref logger) 宏来代替
+@return Logger指针
+
+@fn static QString Dtk::Core::Logger::levelToString(Logger::LogLevel level)
+@brief 将LogLevel枚举值转换为其字符串表示
+@sa Logger::LogLevel
+
+@fn static LogLevel Dtk::Core::Logger::levelFromString(const QString &str)
+@brief 将LogLevel字符串表示转换为枚举值
+@note 字符串的比较是不分大小写的。如果提供的日志级别字符串不合法,则返回`Logger::Debug`的枚举值
+@sa Logger::LogLevel
+@sa Logger::levelToString()
+
+@fn void Dtk::Core::Logger::registerAppender(AbstractAppender *appender)
+@brief 注册appender来写入日志记录<br>
+        在写入日志的调用中(使用其中一个宏或`write()`函数),Logger遍历appender列表,并向每个appender写入日志记录。请查阅AbstractAppender文档以了解appenders的概念。
+        如果没有appender被添加到Logger中,它就会退回到记录到`std::cerr`流中。
+@param[in] appender 要在Logger中注册的Appender
+@note Logger对appender拥有所有权,它将在应用程序退出时删除它。因此,appender必须在堆上创建,以防止appender被重复销毁。
+@sa Logger::registerCategoryAppender()
+@sa Dtk::Core::AbstractAppender
+
+@fn void Dtk::Core::Logger::registerCategoryAppender(const QString &category, AbstractAppender *appender)
+@brief 注册appender,将日志记录写到特定的类别中<br>
+@details 调用这个方法,你可以将一些appender与命名的类别联系起来。
+        在调用特定类别的日志写入时(直接调用带有类别参数的`write()`,写入默认类别,或使用特殊的`dCDebug()`、`dCWarning()`等宏),
+        Logger只将日志信息写入注册的类别appender列表中。<br>
+        你可以调用`logToGlobalInstance()`将所有类别的日志信息传递给全局的Logger实例Appender(使用`registerAppender()`注册)。
+        如果没有特定名称的类别应用程序被注册到记录器上，它就会退回到记录到`std::cerr` STL流中,这两种方法都有简单的警告信息。
+@param[in] category 类别名称
+@param[in] appender 要在Logger中注册的Appender
+@note Logger对appender拥有所有权,它将在应用程序退出时删除它。根据这一点,appender必须在堆上创建,以防止appender被重复销毁。
+@sa Logger::registerAppender()
+@sa Logger::logToGlobalInstance()
+@sa Logger::setDefaultCategory()
+
+@fn void Dtk::Core::Logger::logToGlobalInstance(const QString &category, bool logToGlobal = false)
+@brief 将一些日志类别与全局日志实例应用者联系起来。
+        如果logToGlobal设置为 "true",所有到指定类别的Logger的日志消息也将被写入全局日志实例appenders(使用`registerAppender()`注册)<br>
+        默认情况下，所有到特定类别的消息都只写到特定的类别应用者
+        (使用 `registerCategoryAppender()` 注册)
+@param[in] category 类别名称
+@param[in] logToGlobal 是否将日志写入全局日志appenders
+@sa Logger::registerAppender()
+@sa Logger::globalInstance()
+@sa Logger::registerCategoryAppender()
+
+@fn void Dtk::Core::Logger::setDefaultCategory(const QString &category);
+    QString defaultCategory()
+@brief 设置默认的日志类别
+        所有到这个类别应用的日志信息也将被写入一般的日志实例应用(使用[registerAppender](@ref registerAppender)方法注册),反之亦然
+        特别是,任何对dDebug()宏的调用都将被视为类别日志
+        所以你不需要用dCDebug()宏来指定类别名称
+        要取消默认的类别，传递一个空字符串作为参数
+@param[in] category 类别名称
+@note "category "格式标记将被设置为所有这些消息的类别名称
+@sa Dtk::Core::AbstractStringAppender::setFormat()
+@sa Logger::defaultCategory()
+@sa Logger::registerCategoryAppender()
+@sa Logger::logToGlobalInstance()
+
+@fn QString Dtk::Core::Logger::defaultCategory()
+@brief 返回默认的日志类别名称
+@sa Logger::setDefaultCategory()
+
+@fn void Dtk::Core::Logger::write(const QDateTime &time, LogLevel level,
+                                const char *file, int line,const char *func,
+                                const char *category, const QString &msg)
+@brief 写入日志记录。
+        将带有所提供参数的日志记录写给所有注册的应用
+@param[in] time 时间戳
+@param[in] level 日志记录等级
+@param[in] file 目标文件名
+@param[in] line 要输出的行数
+@param[in] func 输出的函数名称
+@param[in] category 日志类别
+@param[in] msg 输出信息
+@note 使用`Logger::Fatal`日志级别记录日志记录将导致调用STL `abort()`函数,
+        这将中断你的软件的运行并Core dump
+@sa Logger::LogLevel
+@sa Dtk::Core::AbstractAppender
+
+@fn void Dtk::Core::Logger::write(LogLevel level, const char *file, int line,
+               const char *func, const char *category, const QString &msg)
+@brief 这是为方便而提供的重载函数。它的行为与同名函数类似,此函数无需传入time参数
+@note 这个函数使用了`QDateTime::currentDateTime()`用获得的当前时间戳
+@sa  Logger::write(const QDateTime &time, LogLevel level,
+                                const char *file, int line,const char *func,
+                                const char *category, const QString &msg)
+@param[in] level 日志记录等级
+@param[in] file 目标文件名
+@param[in] line 要输出的行数
+@param[in] func 输出的函数名称
+@param[in] category 日志类别
+@param[in] msg 输出信息
+
+@fn QDebug Dtk::Core::Logger::write(LogLevel level, const char *file,
+                int line,const char *func, const char *category)
+@brief 这是为方便而提供的重载函数。它的行为与同名函数类似,此函数无需传入message参数
+@details 这个函数不接受任何日志信息作为参数。它返回的是可以使用流函数写入的`QDebug`对象<br>
+        例如，你可能想写：
+    @code
+        dDebug() << "This is the size" << size << "of the element" << elementName;
+    @endcode
+    而不是写为：
+    @code
+      dDebug(QString(QLatin1String("This is the size %1x%2 of the element %3")).arg(size.x()).arg(size.y()).arg(elementName));
+    @endcode
+    这样会更优雅一些<br>
+    请考虑阅读Qt参考文档,了解QDebug类的使用语法
+@note 这个重载肯定是最好用的一个重载,但是代价是它会比其他的重载更为慢
+@sa  Logger::write(const QDateTime &time, LogLevel level,
+                                const char *file, int line,const char *func,
+                                const char *category, const QString &msg)
+@param[in] level 日志记录等级
+@param[in] file 目标文件名
+@param[in] line 要输出的行数
+@param[in] func 输出的函数名称
+@param[in] category 日志类别
+
+@fn void Dtk::Core::Logger:: writeAssert(const char *file, int line,
+                    const char *func, const char *condition)
+@brief 写入断言
+@details 这个函数使用write()函数来写断言记录<br>
+        断言记录总是使用`Logger::Fatal`日志级别来写,这将导致程序的中止和核心转储(core dump)的生成(如果支持)
+        写入appenders的信息与传入参数相同,前缀为 `ASSERT:`
+@param[in] file 目标文件名
+@param[in] line 要输出的行数
+@param[in] func 输出的函数名称
+@note 不建议直接调用这个函数,你可以直接调用`LOG_ASSERT`宏,它将为这个函数提供所有需要的信息
+@sa  Logger::write(const QDateTime &time, LogLevel level,
+                                const char *file, int line,const char *func,
+                                const char *category, const QString &msg)
+
+*/

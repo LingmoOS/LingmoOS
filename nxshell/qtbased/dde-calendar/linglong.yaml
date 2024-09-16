@@ -1,0 +1,204 @@
+# SPDX-FileCopyrightText: 2023-2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: "1"
+
+package:
+  id: org.dde.calendar
+  name: dde-calendar
+  version: 5.14.6.1
+  kind: app
+  description: |
+    calendar for deepin os.
+
+base: org.deepin.base/23.1.0
+runtime: org.deepin.runtime.dtk/23.1.0
+
+command:
+  - dde-calendar
+
+build: |
+  cat /var/lib/dpkg/status|grep "^Package: " > ${PREFIX}/packages.list
+  bash ./install_dep linglong/sources "${PREFIX}"
+
+  # 获取版本号
+  VERSION=$(head -1 debian/changelog | awk -F'[()]' '{print $2}')
+
+  cmake -B build ${conf_args} \
+        -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_OFF" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+        -DVERSION=${VERSION} \
+        -DEXEC_DDE_CALENDAR="/usr/bin/ll-cli run org.dde.calendar --exec dde-calendar" \
+        -DEXEC_DDE_CALENDAR_SERVICE="/usr/bin/ll-cli run org.dde.calendar --exec /opt/apps/org.dde.calendar/files/libexec/deepin-daemon/dde-calendar-service"
+
+  cmake --build build -j`nproc`
+  cmake --build build --target install
+
+sources:
+  # - kind: git
+  #   url: https://github.com/linuxdeepin/dde-calendar
+  #   commit: 2dd86328e0257f9833d405b49b8729302519c1c1
+
+  # linglong:gen_deb_source sources amd64 https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2 beige main community
+  # linglong:gen_deb_source install libical-dev, libgcrypt20-dev
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/d/debconf/debconf_1.5.79-deepin_all.deb
+    digest: ded6aaa7927ae27337ceb23d49391b4c7ec460a00ba692020e8f4e28388f345f
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/d/dpkg/dpkg_1.22.6deepin3_amd64.deb
+    digest: f9c758ed0204b1fe515c70b6419f80fdeb4773ac3f498a79ea1e6a6e6971157f
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/gcc-13/gcc-13-base_13.2.0-3deepin2_amd64.deb
+    digest: 934755185f12fa095cdb596552ed9c59151796f5fdc418f0c8342d0d7f338ee9
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/glib2.0/gir1.2-glib-2.0_2.80.1-1deepin1_amd64.deb
+    digest: 19242756d4cc8125e5b18e34319ba4f4445aeff9bc3c1560e9dc5a87fcacb0d2
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libi/libical3/gir1.2-ical-3.0_3.0.11-deepin+rb1_amd64.deb
+    digest: 1c7193e3d447d75e0353affe5793352b6989aadddef46912fdb0ca8bf2e43c07
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/i/icu/icu-devtools_74.2-1_amd64.deb
+    digest: 1f419ef9ef614ca7f3a6bacbb55adcb3220b45029ce81c2364c71b4c1c33de5d
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/a/acl/libacl1_2.3.1-1_amd64.deb
+    digest: f06e936eb913b8e9271c17e6d8b94d9e4f0aa558d7debdc324c9484908ee8dc8
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/u/util-linux/libblkid1_2.39.3-6deepin1_amd64.deb
+    digest: 1c0d4c5b5efec4a282652df9793083bdd4e7fc0ed634dc76f3bf6ee700dfa8c4
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/b/bzip2/libbz2-1.0_1.0.8-deepin_amd64.deb
+    digest: 7f5ce12761d6099a94205e330066656c96e759a6ab393730a6a91a1aa817beff
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/glibc/libc-dev-bin_2.38-6deepin4_amd64.deb
+    digest: 43c5c28acc40e44d45a9e6835f6dd7a3db79e1edb113e5e19cd1a302af46d112
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/glibc/libc6_2.38-6deepin4_amd64.deb
+    digest: 528cd175b88a701953e4271e0528afbc1f8e815b9710e4bf5d48d35a2723f92b
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/glibc/libc6-dev_2.38-6deepin4_amd64.deb
+    digest: ac82ee78fe600acc360ac2c448bf23eefdbc91ffe9de2366cf2c4737b75d17b1
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/e/e2fsprogs/libcom-err2_1.47.0-2_amd64.deb
+    digest: 81c9a2cd03a925f323e8021855825a535a259867652b5d35006ef468cb17417f
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libx/libxcrypt/libcrypt-dev_4.4.36-2_amd64.deb
+    digest: e6ce2314e3102e905172ac14aad0a9c71f491a8540030c34e13edbbed199091a
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libx/libxcrypt/libcrypt1_4.4.36-2_amd64.deb
+    digest: 3ebae5a5f27eff3c2b9598ba323b4b556d6cec915a78200e305fb6ecde3972cd
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/d/db-defaults/libdb-dev_5.3.3_amd64.deb
+    digest: dc1373c440558cfa9fabb20063fe9ec405248757b088dbfc541fac64c3f8a636
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/d/db5.3/libdb5.3_5.3.28+dfsg1-0.8_amd64.deb
+    digest: 289a3fce1a5b476bd2269ae66ac701835d1228614965cbda4134ee95f5a5deba
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/d/db5.3/libdb5.3-dev_5.3.28+dfsg1-0.8_amd64.deb
+    digest: 9b66e10eadc6c0e874bc7344c241c2c2e0a7b048c0cf3c14812cfe3c9d768088
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libf/libffi/libffi8_3.4.6-1_amd64.deb
+    digest: daa2aeb5a23c7dea09b2f16b94d15fa6f015ad5ff8c3db15bd0ab890fc920dd2
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/gcc-13/libgcc-s1_13.2.0-3deepin2_amd64.deb
+    digest: ff2d64158ae82f27ff107a3e2cc42e4b4986f048cadd4ce6cd97130cc3deacea
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libg/libgcrypt20/libgcrypt20_1.10.3-2_amd64.deb
+    digest: f377a741b54094b2b71a461878bf012c8d602d9af146be9826ce058767e396d5
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libg/libgcrypt20/libgcrypt20-dev_1.10.3-2_amd64.deb
+    digest: 97b7627a6850415f5c8c72bbf83dcce65cacf88c800676a02456f4a902bc8ea4
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-0_2.80.1-1deepin1_amd64.deb
+    digest: 33857078b63370d9edfbceec5a4f8d159db6f75da9f486dd12c97711598f43de
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libg/libgpg-error/libgpg-error-dev_1.47-3_amd64.deb
+    digest: 1ca737a33cb23aee5903ddafe201198357593bd015f5097c68fb99efced85458
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libg/libgpg-error/libgpg-error0_1.47-3_amd64.deb
+    digest: c7c00dbad22e7c549a25c147e3d471fae76d0c22d479c0de61aac4cf60e97f36
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/k/krb5/libgssapi-krb5-2_1.20.1-5_amd64.deb
+    digest: dfa250b0e4ecb5b3c359f49161b460b0139c38b1592b6d6538395855f6c952f1
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libi/libical3/libical-dev_3.0.11-deepin+rb1_amd64.deb
+    digest: 446b447b4d58419f38d76c41be214c012336ad724e24d1fbb6efb4d589ac954e
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libi/libical3/libical3_3.0.11-deepin+rb1_amd64.deb
+    digest: 88e1957f9c9cb49c5130f2fdf81d312cf5efd2dc338775a8b470c2bb76b40c87
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/i/icu/libicu-dev_74.2-1_amd64.deb
+    digest: 6785f8aa1c6f0a31f38ce9396faaa69de9b497cef76fd94ad00115a1519a171d
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/i/icu/libicu74_74.2-1_amd64.deb
+    digest: ad3f769fb52e996fad6d8dd369ab7a09f558b221ddc7647164ab8cc0bd8fa245
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/k/krb5/libk5crypto3_1.20.1-5_amd64.deb
+    digest: 203bda60f112a6eb51bfb431c1c9287ff1dbfd4f8bacb931b8ab5aacf52ed4e3
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/k/keyutils/libkeyutils1_1.6.1-3_amd64.deb
+    digest: 0c6c254e3c601388fde14c7e1816d00d9b810d61d22bb7fc11ffc0b133f43a04
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/k/krb5/libkrb5-3_1.20.1-5_amd64.deb
+    digest: ae4f1183b97f1f376f8caac13b739865aba4b4b77bcfec8d9dd86c85e6977411
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/k/krb5/libkrb5support0_1.20.1-5_amd64.deb
+    digest: bdc056efb59abe666c17a028924d456a5660c45b68259d2525b9a0d08a8524a2
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/x/xz-utils/liblzma5_5.4.5-0.3_amd64.deb
+    digest: e8051c2b44fa1cc020c12ef45f4918c1dd7595532af89df0c583b4b3f333fa56
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libm/libmd/libmd0_1.0.4-1_amd64.deb
+    digest: 755e2a59d76415999f46b0c307ade64df3788013286e902e2531e07ff58ca781
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/u/util-linux/libmount1_2.39.3-6deepin1_amd64.deb
+    digest: a6c22f3b3c30d72424a05ee1c8874674d4e69b5dd703aa7b8936c7c21ab8c009
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libn/libnsl/libnsl-dev_1.3.0-2_amd64.deb
+    digest: f17e04a96da2dcb260bf75ac750a63d238942ecd9550ce41cc3530774c3ae807
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libn/libnsl/libnsl2_1.3.0-2_amd64.deb
+    digest: 27219179fd316e3bdc7f9556d1852fcec175d13334b5aadf6274c19be98fb268
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/p/pcre2/libpcre2-8-0_10.39-2_amd64.deb
+    digest: 26ba66e349a9d46978d24e5b165c327e1ef51007770c43a3a49eb35b5fe0310e
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libs/libselinux/libselinux1_3.5-1_amd64.deb
+    digest: 8f2c1b196a486e83ba8513e8ffe6bcceb5208fd0f5682173bbb8dca49033817e
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/o/openssl/libssl3_3.2.0-2_amd64.deb
+    digest: df5390c0212f7bf86d51fc72a799d1bdd4be924babb0c10a5de4896664d6e5cc
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/g/gcc-13/libstdc++6_13.2.0-3deepin2_amd64.deb
+    digest: 8b8362c5c96e22487f2a3f96a41cd4ddb2d265bf8e991327f01b2c6c55f9a57b
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libt/libtirpc/libtirpc-common_1.3.2-2_all.deb
+    digest: 74bddc18e3289947b20653433e82025873f5679ccba52f258ca4912e435a09ee
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libt/libtirpc/libtirpc-dev_1.3.2-2_amd64.deb
+    digest: 801b243dc8b3ebecf2be9efc9ca69cd987f26830accede2e7142210c5640ee91
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libt/libtirpc/libtirpc3_1.3.2-2_amd64.deb
+    digest: 4ded57b843774f3c65449d6ad7bed6efb97bf94cdb4aadb8554fe5cc12210291
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/libz/libzstd/libzstd1_1.5.5+dfsg2-2_amd64.deb
+    digest: 92fff5b68d38bc369552561614e82b841fc29587f1c2315842691493c52a5818
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/l/linux-upstream/linux-libc-dev_23.01.00.32_amd64.deb
+    digest: 5185a634b094c2ff95e8b6c870714d84886ba0ce0a1179bf3a3a10bbbfd9e181
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/p/perl/perl-base_5.36.0-10_amd64.deb
+    digest: 50fa4a0bbefde86abf9ffd1fa092ee82af23ccc8f65b5b952526dc885c943169
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.2-4_amd64.deb
+    digest: 76a363bd052b40394f829486c820967c1386539c2fbdd7aa2e77430132fccab0
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/t/tar/tar_1.35+dfsg-3_amd64.deb
+    digest: ee27ac0010bb1525067edda7b6b86110a00550232fb154f87491dbc3a3a2c8ff
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/t/tzdata/tzdata_2023d-1deepin1_all.deb
+    digest: fe503c524801260208482a1dfc061e79c2a7450111dd90f88ed40d70ac935832
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/rc2/pool/main/z/zlib/zlib1g_1.3.dfsg-3_amd64.deb
+    digest: 96000bf9fabaf3da432e554ee8d1d07b54f35aa2ef825af714ccdba671e737fa

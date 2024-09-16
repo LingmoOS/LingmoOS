@@ -1,0 +1,30 @@
+package:
+  id: deepin-ocr-plugin-manager
+  name: "deepin-ocr-plugin-manager"
+  version: 1.0.0
+  kind: lib
+  description: |
+    OCR plugin manager for UOS.
+
+base:
+  id: org.deepin.base
+  version: 20.5.0
+
+depends:
+  - id: "ncnn" 
+    version: 1.0.20220729
+    type: runtime
+  - id: "opencv-mobile"
+    version: 14
+    type: runtime
+
+variables: 
+  conf_args: |
+    -DCMAKE_INSTALL_PREFIX=${PREFIX}
+    -DCMAKE_INSTALL_LIBDIR=lib/${TRIPLET}
+
+source:
+  kind: local
+
+build:
+  kind: cmake

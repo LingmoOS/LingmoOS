@@ -1,0 +1,72 @@
+/*!
+@~chinese
+@ingroup dutil
+@file include/util/dtextencoding.h
+@details 本文件包含文本编码识别和文本编码转换的公共接口。
+
+@class Dtk::Core::DTextEncoding
+@brief 文本编码信息类，提供文本编码识别和文本编码转换的公共接口。
+@details 提供文本编码识别和文本编码转换的公共接口，默认使用 QTextCodec 进行检测，
+    若系统环境中存在 libuchardet.so 及 libicuuc.so 库，可拓展支持的编码格式。
+
+@fn QByteArray Dtk::Core::DTextEncoding::detectTextEncoding(const QByteArray &content)
+@brief 检测给定文本的编码格式。
+@details 默认使用 QTextCodec 检测，若系统环境中存在 libuchardet.so 及 libicuuc.so 库，可拓展支持的编码格式。
+    检测会判断最接近的编码格式，未成功识别或为 ASCII 编码格式，将返回 UTF-8 编码格式。
+@param[in] content 待检测的文本内容
+@return 文本编码格式
+
+@fn QByteArray Dtk::Core::DTextEncoding::detectFileEncoding(const QString &fileName, bool *isOk)
+@brief 检测给定文件的文本编码格式，将读取文件头部最多 64KB 的文本用于检测。若文件访问失败，返回空编码格式。
+@param[in] fileName 文件路径
+@param[out] isOk 检测是否成功，主要判断文件内容能否正确读取
+@return 文本编码格式
+@sa DTextEncoding::detectTextEncoding
+
+@fn bool Dtk::Core::DTextEncoding::convertTextEncoding(QByteArray &content, QByteArray &outContent, const QByteArray &toEncoding, const QByteArray &fromEncoding, QString *errString)
+@brief 将输入的文本 `content` 从 `fromEncoding` 编码格式转换到 `toEncoding` 编码格式，转换后的文本保存到 `outContent` 。
+    若转换过程中出现错误，将返回 false , 并设置 `errString` 错误信息，已转换的文本仍会写入 `outContent` 。
+@note 当处理大量文本数据时，需考虑并行处理，防止阻塞线程。
+@param[in] content 传入的文本
+@param[out] outContent 编码转换后的文本 
+@param[in] toEncoding 转换的编码格式
+@param[in] fromEncoding 原始的编码格式，默认为空，会通过 `DTextEncoding::detectTextEncoding` 检测编码格式
+@param[out] errString 错误信息
+@return 是否转换成功
+@sa DTextEncoding::convertTextEncodingEx
+
+@fn bool Dtk::Core::DTextEncoding::convertTextEncodingEx(QByteArray &content, QByteArray &outContent, const QByteArray &toEncoding, const QByteArray &fromEncoding, QString *errString, int *convertedBytes)
+@brief 将输入的文本 `content` 从 `fromEncoding` 编码格式转换到 `toEncoding` 编码格式，转换后的文本保存到 `outContent` 。
+    若转换过程中出现错误，将返回 false , 并设置 `errString` 错误信息，已转换的文本仍会写入 `outContent` 。
+@note 当处理大量文本数据时，需考虑并行处理，防止阻塞线程。
+@note 返回 false 时，已转换的文本仍会写入 `outContent` ，同时 `convertedBytes` 会记录已转换数据长度，你可以决定保留或移除转换文本。
+@param[in] content 传入的文本
+@param[out] outContent 编码转换后的文本 
+@param[in] toEncoding 转换的编码格式
+@param[in] fromEncoding 原始的编码格式，默认为空，会通过 `DTextEncoding::detectTextEncoding` 检测编码格式
+@param[out] errString 错误信息
+@param[out] convertedBytes 已转换的 `content` 数据长度，若转换过程出现错误，这个值会指向异常字符出现的位置
+@return 是否转换成功
+
+@fn bool DTextEncoding::convertFileEncoding(const QString &fileName, const QByteArray &toEncoding, const QByteArray &fromEncoding, QString *errString)
+@brief 读取输入的 `fileName` 文件内容，将文件内容从 `fromEncoding` 编码格式转换到 `toEncoding` 编码格式，转换后的文本保存到 `fileName` 。
+    若转换过程中出现错误，将返回 false , 并设置 `errString` 错误信息，已转换的文本会被抛弃。
+@param[in] fileName 传入及保存的文件路径
+@param[in] toEncoding 转换的编码格式
+@param[in] fromEncoding 原始的编码格式，为空时会通过 `DTextEncoding::detectTextEncoding` 检测编码格式
+@param[out] errString 错误信息
+@return 是否转换成功
+@sa DTextEncoding::convertTextEncoding
+
+@fn bool DTextEncoding::convertFileEncodingTo(const QString &fromFile, const QString &toFile, const QByteArray &toEncoding, const QByteArray &fromEncoding, QString *errString)
+@brief 读取输入的 `fromFile` 文件内容，将文件内容从 `fromEncoding` 编码格式转换到 `toEncoding` 编码格式，转换后的文本保存到 `toFile` 。
+    若转换过程中出现错误，将返回 false , 并设置 `errString` 错误信息，已转换的文本会被抛弃。
+@param[in] fromFile 传入的文件路径
+@param[in] toFile 保存的文件路径
+@param[in] toEncoding 转换的编码格式
+@param[in] fromEncoding 原始的编码格式，为空时会通过 `DTextEncoding::detectTextEncoding` 检测编码格式
+@param[out] errString 错误信息
+@return 是否转换成功
+@sa DTextEncoding::convertTextEncoding
+
+ */

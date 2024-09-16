@@ -1,0 +1,75 @@
+/*!
+@~chinese
+@ingroup dtkpower
+@file dpowermanager.h
+@details dpowermanager.h 是对于dbus接口中关于电源设备(包括且不限于:dc电源, 笔记本电池, ups不间断电源, 使用干电池的鼠标键盘(其实即使不使用干电池也能被管理)等内部外部设备的管理接口。)
+
+@class Dtk::Power::DPowerManager dpowermanager.h
+@brief 电源设备管理类, 用于管理电源设备, 包括电源设备的创建, 电源设备的属性获取, 电源设备的状态获取等
+
+@fn bool DPowerManager::lidIsClosed() const
+@brief 笔记本盖子关闭(或者二合一设备关上皮套)通过霍尔传感器读取相关数值
+@return 布尔值, 如果为true则笔记本盖子是关上的
+
+@fn bool DPowerManager::lidIsPresent() const
+@brief 笔记本盖子传感器是否有效
+@return 布尔值, 如果为true则笔记本盖子上存在霍尔传感器
+
+@fn bool DPowerManager::hasBattery() const
+@brief 系统是否具有电池
+@return 布尔值
+
+@fn bool DPowerManager::onBattery() const
+@brief 系统是否使用电池电源运行
+@return 布尔值
+
+@fn QString DPowerManager::daemonVersion() const
+@brief 守护程序版本
+@return 返回upower守护程序版本
+
+@fn bool DPowerManager::supportKbdBacklight() const
+@brief 获取设备是否支持系统级调整键盘背光
+@note 有部分笔记本电脑厂商虽然提供了键盘背光功能, 但其相对于系统是不可见的, 而是又电脑硬件直接管理, 这样就无法通过软件调整键盘背光了。
+@return bool值, 如果为true则可以通过dkbdbacklight调整键盘背光
+
+@fn QSharedPointer<DPowerDevice> DPowerManager::displayDevice() const
+@brief 当前显示的电源设备(这是一个表示要在桌面环境中显示的状态图标的复合设备, docker栏显示的电源图标指向的电源设备)
+@return 返回一个device对象
+
+@fn QSharedPointer<DPowerDevice> DPowerManager::findDeviceByName(const QString &name) const
+@brief 通过设备名创建设备对象
+@param[in] name 传入设备名, 设备名获取见 DPowerManager::devices() const
+@note 注意, 请使用DPowerManager::devices() const 返回的电源设备名称, 若不符将会返回一个nullptr.
+@return 返回一个device对象
+
+@fn QSharedPointer<DKbdBacklight> DPowerManager::kbdBacklight() const
+@brief 创建键盘背光设备对象
+@note 注意, 请使用supportKbdBacklight()确定设备是否支持系统调节键盘背光
+\sa DPowerManager::supportKbdBacklight() const
+@return 返回一个device对象
+
+@fn QStringList DPowerManager::devices() const
+@brief 枚举电源设备, 将此计算机上的电源设备以QStringList的方式列举
+@return 将电源设备名称作为列表返回
+
+@fn QString DPowerManager::criticalAction() const
+@brief 获取当电源严重不足的情况下, 电脑采取的操作
+@return 返回一种电源状态
+
+@fn QString DPowerManager::refresh()
+@brief 刷新设备列表
+
+@fn void DPowerManager::deviceAdded(const QString &path);
+@brief 信号：有新的设备被接入
+
+
+@fn void DPowerManager::deviceRemoved(const QString &path)
+@brief 信号：设备被移除
+
+@fn void DPowerManager::lidIsClosedChanged(const bool &value)
+@brief 信号：笔记本盖子被关闭
+
+@fn void DPowerManager::lidIsPresentChanged(const bool &value)
+@brief 信号：笔记本盖子传感器启用状态发生改变
+
+*/

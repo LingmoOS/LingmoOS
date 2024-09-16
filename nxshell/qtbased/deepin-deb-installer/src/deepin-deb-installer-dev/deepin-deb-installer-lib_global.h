@@ -1,0 +1,16 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#ifndef DEEPINDEBINSTALLERLIB_GLOBAL_H
+#define DEEPINDEBINSTALLERLIB_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(DEEPINDEBINSTALLERLIB_LIBRARY)
+#define DEEPINDEBINSTALLERLIBSHARED_EXPORT Q_DECL_EXPORT
+#else
+#define DEEPINDEBINSTALLERLIBSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif  // DEEPINDEBINSTALLERLIB_GLOBAL_H

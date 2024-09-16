@@ -1,0 +1,1252 @@
+/**
+@page working_with_charts Working with Charts
+
+@tableofcontents
+
+This section explains how to work with some of the options and features of
+@ref chart.h "The Chart object".
+
+The majority of the examples in this section are based on a variation of the following program:
+
+@dontinclude chart_working_with_example.c
+@skip main
+@until }
+
+@image html chart_working.png
+
+
+
+@section ww_charts_axes Chart Value and Category Axes
+
+When working with charts it is important to understand how Excel
+differentiates between a chart axis that is used for series categories and a
+chart axis that is used for series values.
+
+In the majority of Excel charts the X axis is the **category** axis and each
+of the values is evenly spaced and sequential. The Y axis is the **value**
+axis and points are displayed according to their value:
+
+@image html chart_axes01.png
+
+Excel treats these two types of axis differently and exposes different
+properties for each. For example, here are the properties for a category axis:
+
+@image html chart_axes02.png
+
+Here are properties for a value axis:
+
+@image html chart_axes03.png
+
+As such, some of the `libxlsxwriter` axis properties can be set for a value
+axis, some can be set for a category axis and some properties can be set for
+both. The documentation calls out the type of axis to which functions apply
+and the API emits a warning if the wrong type is used.
+
+Some category axes, such as the one in the column chart example above, use
+numbers as the categories. However, these numbers can't be treated like value
+axes. In particular you can't use chart_axis_set_max() and
+chart_axis_set_min() for category axes, as you can see in the respective
+format dialogs above.
+
+For a Bar chart the Category and Value axes are reversed:
+
+@image html chart_axes04.png
+
+A Scatter chart (but not a Line chart) has 2 value axes:
+
+@image html chart_axes05.png
+
+@note Date axes aren't supported yet.
+
+
+@section chart_markers Working with Chart Markers
+
+In Excel a chart marker is used to distinguish data points in a plotted
+series. In general only Line and Scatter and Radar chart types use
+markers. The libxlsxwriter chart types that can have markers are:
+
+- #LXW_CHART_LINE
+- #LXW_CHART_SCATTER
+- #LXW_CHART_SCATTER_STRAIGHT
+- #LXW_CHART_SCATTER_STRAIGHT_WITH_MARKERS
+- #LXW_CHART_SCATTER_SMOOTH
+- #LXW_CHART_SCATTER_SMOOTH_WITH_MARKERS
+- #LXW_CHART_RADAR
+- #LXW_CHART_RADAR_WITH_MARKERS
+
+The chart types with `MARKERS` in the name have markers with default colors
+and shapes turned on by default but it is possible to change them using the
+functions shown below.
+
+The `chart_series_set_marker_type()` function is used to specify the type of
+the series marker:
+
+@code
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_DIAMOND);
+@endcode
+
+@image html chart_marker1.png
+
+The available marker types defined by #lxw_chart_marker_type are:
+
+- #LXW_CHART_MARKER_AUTOMATIC
+- #LXW_CHART_MARKER_NONE
+- #LXW_CHART_MARKER_SQUARE
+- #LXW_CHART_MARKER_DIAMOND
+- #LXW_CHART_MARKER_TRIANGLE
+- #LXW_CHART_MARKER_X
+- #LXW_CHART_MARKER_STAR
+- #LXW_CHART_MARKER_SHORT_DASH
+- #LXW_CHART_MARKER_LONG_DASH
+- #LXW_CHART_MARKER_CIRCLE
+- #LXW_CHART_MARKER_PLUS
+
+The `#LXW_CHART_MARKER_NONE` type can be used to turn off default markers:
+
+@code
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_NONE);
+@endcode
+
+@image html chart_series_set_marker_none.png
+
+The `#LXW_CHART_MARKER_AUTOMATIC` type is a special case which turns on a
+marker using the default marker style for the particular series. If
+automatic is on then other marker properties such as size, line or fill
+cannot be set.
+
+The `chart_series_set_marker_size()` function is used to specify the size of
+the series marker:
+
+@code
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_CIRCLE);
+    chart_series_set_marker_size(series, 10);
+@endcode
+
+@image html chart_series_set_marker_size.png
+
+
+The `chart_series_set_marker_line()` and `chart_series_set_marker_fill()`
+functions can be used to set the line/border and fill properties of a chart
+marker:
+
+@code
+    lxw_chart_line line = {.color = LXW_COLOR_BLACK};
+    lxw_chart_fill fill = {.color = LXW_COLOR_RED};
+
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_SQUARE);
+    chart_series_set_marker_size(series, 8);
+
+    chart_series_set_marker_line(series, &line);
+    chart_series_set_marker_fill(series, &fill);
+@endcode
+
+@image html chart_marker2.png
+
+For more information on line/border and fill formatting see @ref chart_lines
+and @ref chart_fills below.
+
+
+
+@section chart_trendlines Working with Chart Trendlines
+
+A trendline can be added to a chart series to indicate trends in the data
+such as a moving average or a polynomial fit. The trendlines types are
+shown in the following Excel dialog:
+
+@image html chart_trendline0.png
+
+The `chart_series_set_trendline()` function turns on these trendlines for
+a data series:
+
+@code
+    chart = workbook_add_chart(workbook, LXW_CHART_LINE);
+    series = chart_add_series(chart, NULL, "Sheet1!$A$1:$A$6");
+
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+@endcode
+
+@image html chart_trendline2.png
+
+The `value` parameter corresponds to *order* for a polynomial trendline
+and *period* for a Moving Average trendline. It both cases it must be >= 2.
+The `value` parameter  is ignored for all other trendlines:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_AVERAGE, 2);
+@endcode
+
+@image html chart_trendline3.png
+
+The allowable values for the the trendline `type` are:
+
+- #LXW_CHART_TRENDLINE_TYPE_LINEAR: Linear trendline.
+- #LXW_CHART_TRENDLINE_TYPE_LOG: Logarithm trendline.
+- #LXW_CHART_TRENDLINE_TYPE_POLY: Polynomial trendline. The `value`
+  parameter corresponds to *order*.
+- #LXW_CHART_TRENDLINE_TYPE_POWER: Power trendline.
+- #LXW_CHART_TRENDLINE_TYPE_EXP: Exponential trendline.
+- #LXW_CHART_TRENDLINE_TYPE_AVERAGE: Moving Average trendline. The `value`
+  parameter corresponds to *period*.
+
+Other trendline options, such as those shown in the following Excel
+dialog, can be set using the functions described below.
+
+@image html chart_trendline1.png
+
+The `chart_series_set_trendline_forecast()` function sets the forward
+and backward forecast periods for the trendline:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_forecast(series, 0.5, 0.5);
+@endcode
+
+@image html chart_trendline4.png
+
+@note This feature isn't available for Moving Average in Excel.
+
+The `chart_series_set_trendline_equation()` function displays the
+equation of the trendline on the chart:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_equation(series);
+@endcode
+
+@image html chart_trendline5.png
+
+@note This feature isn't available for Moving Average in Excel.
+
+The `chart_series_set_trendline_r_squared()` function displays the
+R-squared value for the trendline on the chart:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_r_squared(series);
+@endcode
+
+@image html chart_trendline6.png
+
+@note This feature isn't available for Moving Average in Excel.
+
+The `chart_series_set_trendline_intercept()` function sets the Y-axis
+intercept for the trendline:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_equation(series);
+    chart_series_set_trendline_intercept(series, 0.8);
+@endcode
+
+@image html chart_trendline7.png
+
+As can be seen from the equation on the chart the intercept point
+(when X=0) is the same as the value set in the equation.
+
+@note The intercept feature is only available in Excel for Exponential,
+      Linear and Polynomial trendline types.
+
+The `chart_series_set_trendline_name()` function sets the name of the
+trendline that is displayed in the chart legend. In the examples above
+the trendlines are displayed with default names like "Linear (Series 1)"
+and "2 per Mov. Avg. (Series 1)". If these names are too verbose or not
+descriptive enough you can set your own trendline name:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_name(series, "My trendline");
+@endcode
+
+@image html chart_trendline8.png
+
+It is often preferable to turn off the trendline caption in the legend.
+This is done in Excel by deleting the trendline name from the legend.
+In libxlsxwriter this is done using the `chart_legend_delete_series()`
+function to delete the zero based series numbers:
+
+@code
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+
+    // Delete the series name for the second series (=1 in zero base).
+    // The -1 value indicates the end of the array of values.
+    int16_t names[] = {1, -1};
+    chart_legend_delete_series(chart, names);
+@endcode
+
+@image html chart_trendline9.png
+
+The `chart_series_set_trendline_line()` function is used to set the line
+properties of a trendline:
+
+@code
+    lxw_chart_line line = {.color     = LXW_COLOR_RED,
+                           .dash_type = LXW_CHART_LINE_DASH_LONG_DASH};
+
+    chart_series_set_trendline(series, LXW_CHART_TRENDLINE_TYPE_LINEAR, 0);
+    chart_series_set_trendline_line(series, &line);
+@endcode
+
+@image html chart_trendline10.png
+
+@note Trendlines cannot be added to series in a stacked chart, pie chart,
+      doughnut chart or radar chart.
+
+@section chart_error_bars Working with Chart Error Bars
+
+Error bars can be added to a chart series to indicate error bounds in the
+data.
+
+The error bars can be vertical `y_error_bars` (the most common type) or
+horizontal `x_error_bars` (for Bar and Scatter charts only). For
+convenience these can be accessed from a series as follows:
+
+@code
+    chart_series_set_error_bars(series->y_error_bars, ...);
+
+    chart_series_set_error_bars(series->x_error_bars, ...);
+@endcode
+
+The error bar properties that can be set in Excel are show in the following
+dialog:
+
+@image html chart_error_bars0.png
+
+Some of these properties can be set using the functions discussed below.
+
+The `chart_series_set_error_bars()` function sets the error bar type
+and value associated with the type:
+
+@code
+    lxw_chart_series *series = chart_add_series(chart,
+                                                "=Sheet1!$A$1:$A$5",
+                                                "=Sheet1!$B$1:$B$5");
+
+    chart_series_set_error_bars(series->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_STD_ERROR, 0);
+@endcode
+
+@image html chart_error_bars1.png
+
+The error bar types that be used are:
+
+- #LXW_CHART_ERROR_BAR_TYPE_STD_ERROR: Standard error.
+- #LXW_CHART_ERROR_BAR_TYPE_FIXED: Fixed value.
+- #LXW_CHART_ERROR_BAR_TYPE_PERCENTAGE: Percentage.
+- #LXW_CHART_ERROR_BAR_TYPE_STD_DEV: Standard deviation(s).
+
+@note Custom error bars are not currently supported.
+
+All error bar types, apart from Standard error, should have a valid
+value to set the error range:
+
+@code
+    chart_series_set_error_bars(series1->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_FIXED, 2);
+
+    chart_series_set_error_bars(series2->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_PERCENTAGE, 5);
+
+    chart_series_set_error_bars(series3->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_STD_DEV, 1);
+@endcode
+
+For the Standard error type the value is ignored.
+
+The `chart_series_set_error_bars_direction()` function sets the
+direction of the error bars:
+
+@code
+    chart_series_set_error_bars(series->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_STD_ERROR, 0);
+
+    chart_series_set_error_bars_direction(series->y_error_bars,
+                                          LXW_CHART_ERROR_BAR_DIR_PLUS);
+@endcode
+
+@image html chart_error_bars2.png
+
+The valid directions are:
+
+- #LXW_CHART_ERROR_BAR_DIR_BOTH: Error bar extends in both directions.
+  The default.
+- #LXW_CHART_ERROR_BAR_DIR_PLUS: Error bar extends in positive direction.
+- #LXW_CHART_ERROR_BAR_DIR_MINUS: Error bar extends in negative direction.
+
+The `chart_series_set_error_bars_endcap()` function sets the end cap
+type for the error bars:
+
+@code
+    chart_series_set_error_bars(series->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_STD_ERROR, 0);
+
+    chart_series_set_error_bars_endcap(series->y_error_bars,
+                                       LXW_CHART_ERROR_BAR_NO_CAP);
+@endcode
+
+@image html chart_error_bars3.png
+
+The valid values are:
+
+- #LXW_CHART_ERROR_BAR_END_CAP: Flat end cap. The default.
+- #LXW_CHART_ERROR_BAR_NO_CAP: No end cap.
+
+The `chart_series_set_error_bars_line()` function sets the line
+properties for the error bars:
+
+@code
+    lxw_chart_line line = {.color     = LXW_COLOR_RED,
+                           .dash_type = LXW_CHART_LINE_DASH_ROUND_DOT};
+
+    chart_series_set_error_bars(series->y_error_bars,
+                                LXW_CHART_ERROR_BAR_TYPE_STD_ERROR, 0);
+
+    chart_series_set_error_bars_line(series->y_error_bars, &line);
+@endcode
+
+@image html chart_error_bars4.png
+
+
+
+@section chart_points Working with Chart Points
+
+In general formatting is applied to an entire series in a chart. However, it
+is occasionally required to format individual points within a series.
+
+In Excel charts "points" have a different meaning depending on the type of
+chart:
+
+- Line/Scatter chart: points are used to reference individual markers.
+- Bar/Column/Area charts: points are used to reference individual bars or areas.
+- Pie/Doughnut charts: points are used to reference each segment.
+
+The most common use case is to format segments of a pie chart like this
+example:
+
+@dontinclude chart_pie_colors.c
+@skip include
+@until close
+@until }
+
+@image html chart_points1.png
+
+The #lxw_chart_point objects can be used to set the following properties for a
+chart point:
+
+- Line/Border
+- Fill
+- Pattern
+
+These properties are explained in the Chart Formatting subsections below.
+
+The points should be passed as a NULL terminated array of pointers to
+#lxw_chart_point objects:
+
+@code
+    lxw_chart_point red_point   = {.fill = &red_fill  };
+    lxw_chart_point green_point = {.fill = &green_fill};
+
+    lxw_chart_point *points[] = {&green_point,
+                                 &red_point,
+                                 NULL}; // Indicates the end of the list.
+
+    chart_series_set_points(series, points);
+@endcode
+
+You can skip points in the series that you don't want to format by passing a
+zero-initialized #lxw_chart_point:
+
+@code
+    lxw_chart_point default_point = {0, 0, 0};
+
+
+    lxw_chart_line line         = {.color = LXW_COLOR_BLACK};
+    lxw_chart_fill red_fill     = {.color = LXW_COLOR_RED};
+    lxw_chart_fill green_fill   = {.color = LXW_COLOR_GREEN};
+
+    lxw_chart_point red_point   = {.fill = &red_fill,   .line = &line};
+    lxw_chart_point green_point = {.fill = &green_fill, .line = &line};
+
+    lxw_chart_point *points[] = {&red_point,
+                                 &default_point,
+                                 &green_point,
+                                 &default_point,
+                                 &red_point,
+                                 NULL};
+
+    chart_series_set_points(series, points);
+
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_SQUARE);
+    chart_series_set_marker_size(series, 10);
+@endcode
+
+@image html chart_points2.png
+
+The array of #lxw_chart_point objects pointers corresponds to the order of the
+points in the series starting from the first point. However, it does not have
+to extend to the entire range of the series. It can be NULL terminated at any
+point in the series, such as in the previous example.
+
+For Bar/Column/Area charts "points" refer to bars/areas within the chart:
+
+@code
+    lxw_chart_fill  red_fill      = {.color = LXW_COLOR_RED};
+    lxw_chart_point red_point     = {.fill = &red_fill};
+    lxw_chart_point default_point = {0, 0, 0};
+
+    lxw_chart_point *points[] = {&default_point, &default_point, &red_point, NULL};
+
+    chart_series_set_points(series2, points);
+@endcode
+
+@image html chart_points3.png
+
+
+@section chart_labels Working with Chart Data Labels
+
+Data labels can be added to a chart series to indicate the values of the
+plotted data points. The functions described below turn on and set data
+label properties.
+
+The `chart_series_set_labels()` function is used to turn on data labels
+for a chart series:
+
+@code
+    chart_series_set_labels(series);
+@endcode
+
+@image html chart_data_labels1.png
+
+By default data labels are displayed in Excel with only the values shown:
+
+@image html chart_data_labels2.png
+
+However, it is possible to configure other display options, as shown
+in the functions below.
+
+The `chart_series_set_labels_options()` function is used to set the
+parameters that are displayed in the series data label:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_options(series, LXW_TRUE, LXW_TRUE, LXW_TRUE);
+@endcode
+
+@image html chart_data_labels3.png
+
+The `chart_series_set_labels_separator()` function is used to change the
+separator between multiple data label items. The default options is a comma
+separator as shown in the previous example.
+
+The available options are:
+
+- #LXW_CHART_LABEL_SEPARATOR_SEMICOLON: semicolon separator.
+- #LXW_CHART_LABEL_SEPARATOR_PERIOD: a period (dot) separator.
+- #LXW_CHART_LABEL_SEPARATOR_NEWLINE: a newline separator.
+- #LXW_CHART_LABEL_SEPARATOR_SPACE: a space separator.
+
+For example:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_options(series, LXW_TRUE, LXW_TRUE, LXW_TRUE);
+    chart_series_set_labels_separator(series, LXW_CHART_LABEL_SEPARATOR_NEWLINE);
+@endcode
+
+@image html chart_data_labels4.png
+
+The `chart_series_set_labels_position()` function sets the position of
+the labels in the data series:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_position(series, LXW_CHART_LABEL_POSITION_ABOVE);
+@endcode
+
+@image html chart_data_labels5.png
+
+In Excel the allowable data label positions vary for different chart
+types. The allowable, and default, positions are:
+
+| Position                              | Line, Scatter | Bar, Column   | Pie, Doughnut | Area, Radar   |
+| :------------------------------------ | :------------ | :------------ | :------------ | :------------ |
+| #LXW_CHART_LABEL_POSITION_CENTER      | Yes           | Yes           | Yes           | Yes (default) |
+| #LXW_CHART_LABEL_POSITION_RIGHT       | Yes (default) |               |               |               |
+| #LXW_CHART_LABEL_POSITION_LEFT        | Yes           |               |               |               |
+| #LXW_CHART_LABEL_POSITION_ABOVE       | Yes           |               |               |               |
+| #LXW_CHART_LABEL_POSITION_BELOW       | Yes           |               |               |               |
+| #LXW_CHART_LABEL_POSITION_INSIDE_BASE |               | Yes           |               |               |
+| #LXW_CHART_LABEL_POSITION_INSIDE_END  |               | Yes           | Yes           |               |
+| #LXW_CHART_LABEL_POSITION_OUTSIDE_END |               | Yes (default) | Yes           |               |
+| #LXW_CHART_LABEL_POSITION_BEST_FIT    |               |               | Yes (default) |               |
+
+
+The `chart_series_set_labels_leader_line()` function  is used to turn on
+leader lines for the data label of a series. It is mainly used for pie
+or doughnut charts:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_leader_line(series);
+@endcode
+
+@note Even when leader lines are turned on they aren't automatically
+      visible in Excel or XlsxWriter. Due to an Excel limitation
+      (or design) leader lines only appear if the data label is moved
+      manually or if the data labels are very close and need to be
+      adjusted automatically.
+
+The `chart_series_set_labels_legend()` function is used to set the
+legend key for a data series:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_legend(series);
+@endcode
+
+@image html chart_data_labels6.png
+
+The `chart_series_set_labels_percentage()` function is used to turn on
+the display of data labels as a percentage for a series. It is mainly
+used for pie charts:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_options(series, LXW_FALSE, LXW_FALSE, LXW_FALSE);
+    chart_series_set_labels_percentage(series);
+@endcode
+
+@image html chart_data_labels7.png
+
+The `chart_series_set_labels_num_format()` function is used to set the
+number format for data labels:
+
+@code
+    chart_series_set_labels(series);
+    chart_series_set_labels_num_format(series, "$0.00");
+@endcode
+
+@image html chart_data_labels8.png
+
+The number format is similar to the Worksheet Cell Format num_format,
+see `format_set_num_format()`.
+
+The `chart_series_set_labels_font()` function is used to set the font
+for data labels:
+
+@code
+    lxw_chart_font font = {.name = "Consolas", .color = LXW_COLOR_RED};
+
+    chart_series_set_labels(series);
+    chart_series_set_labels_font(series, &font);
+@endcode
+
+@image html chart_data_labels9.png
+
+For more information see @ref chart_fonts below.
+
+The `chart_series_set_labels_line()`, `chart_series_set_labels_fill()` and
+`chart_series_set_labels_pattern()` functions can be used to set the
+formatting for a data series using standard chart formatting structs:
+
+@code
+    lxw_chart_line line = {.color = LXW_COLOR_RED};
+    lxw_chart_fill fill = {.color = LXW_COLOR_YELLOW};
+
+    chart_series_set_labels_line(series, &line);
+    chart_series_set_labels_fill(series, &fill);
+@endcode
+
+@image html chart_data_labels24.png
+
+
+@subsection chart_custom_labels Custom Chart Data Labels
+
+The `chart_series_set_labels_custom()` function is used to set the properties
+of individual data labels in a series. The most common use for this is to set
+custom text or number labels:
+
+@code
+    // Add the series data labels.
+    chart_series_set_labels(series);
+
+    // Create some custom labels.
+    lxw_chart_data_label data_label1 = {.value = "Jan"};
+    lxw_chart_data_label data_label2 = {.value = "Feb"};
+    lxw_chart_data_label data_label3 = {.value = "Mar"};
+    lxw_chart_data_label data_label4 = {.value = "Apr"};
+    lxw_chart_data_label data_label5 = {.value = "May"};
+    lxw_chart_data_label data_label6 = {.value = "Jun"};
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels[] = {
+        &data_label1,
+        &data_label2,
+        &data_label3,
+        &data_label4,
+        &data_label5,
+        &data_label6,
+        NULL
+    };
+
+    // Set the custom labels.
+    chart_series_set_labels_custom(series, data_labels);
+@endcode
+
+@image html chart_data_labels18.png
+
+As shown in the previous example the `chart_series_set_labels_custom()`
+function takes a pointer to an array of #lxw_chart_data_label pointers. The
+list should be `NULL` terminated. Any #lxw_chart_data_label items set to a
+default initialization or omitted from the list will be assigned the default
+data label value:
+
+@code
+    // Add the series data labels.
+    chart_series_set_labels(series);
+
+    // Create some custom labels.
+    lxw_chart_data_label default_label = {0};
+    lxw_chart_data_label data_label2   = {.value = "Feb"};
+    lxw_chart_data_label data_label3   = {.value = "Mar"};
+    lxw_chart_data_label data_label4   = {.value = "Apr"};
+
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels[] = {
+        &default_label,
+        &data_label2,
+        &data_label3,
+        &data_label4,
+        NULL
+    };
+
+    // Set the custom labels.
+    chart_series_set_labels_custom(series, data_labels);
+@endcode
+
+@image html chart_data_labels19.png
+
+The `value` element in the #lxw_chart_data_label struct should be a string, a
+number as a string, or formula string that refers to a cell from which the
+value will be taken:
+
+@code
+    // Add the series data labels.
+    chart_series_set_labels(series);
+
+    // Create some custom labels.
+    lxw_chart_data_label data_label1 = {.value = "=Sheet1!$C$1"};
+    lxw_chart_data_label data_label2 = {.value = "=Sheet1!$C$2"};
+    lxw_chart_data_label data_label3 = {.value = "=Sheet1!$C$3"};
+    lxw_chart_data_label data_label4 = {.value = "=Sheet1!$C$4"};
+    lxw_chart_data_label data_label5 = {.value = "=Sheet1!$C$5"};
+    lxw_chart_data_label data_label6 = {.value = "=Sheet1!$C$6"};
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels[] = {
+        &data_label1,
+        &data_label2,
+        &data_label3,
+        &data_label4,
+        &data_label5,
+        &data_label6,
+        NULL
+    };
+
+    // Set the custom labels.
+    chart_series_set_labels_custom(series, data_labels);
+@endcode
+
+The `font` element in the #lxw_chart_data_label struct can be used to set the
+font for the label in the data series (see @ref chart_fonts):
+
+@code
+    lxw_chart_font font = {.color = LXW_COLOR_RED};
+
+    // Add the series data labels.
+    chart_series_set_labels(series);
+
+    // Create some custom labels.
+    lxw_chart_data_label data_label1 = {.value = "=Sheet1!$C$1", .font = &font};
+    lxw_chart_data_label data_label2 = {.value = "=Sheet1!$C$2", .font = &font};
+    lxw_chart_data_label data_label3 = {.value = "=Sheet1!$C$3", .font = &font};
+    lxw_chart_data_label data_label4 = {.value = "=Sheet1!$C$4", .font = &font};
+    lxw_chart_data_label data_label5 = {.value = "=Sheet1!$C$5", .font = &font};
+    lxw_chart_data_label data_label6 = {.value = "=Sheet1!$C$6", .font = &font};
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels[] = {
+        &data_label1,
+        &data_label2,
+        &data_label3,
+        &data_label4,
+        &data_label5,
+        &data_label6,
+        NULL
+    };
+
+    // Set the custom labels.
+    chart_series_set_labels_custom(series, data_labels);
+@endcode
+
+@image html chart_data_labels20.png
+
+The `hide` element in the #lxw_chart_data_label struct can be used to
+hide/delete labels in a series. This can be useful if you want to highlight
+one or more cells in the series, for example the maximum and the minimum:
+
+@code
+    // Add the series data labels.
+    chart_series_set_labels(series);
+
+    // Create some custom labels.
+    lxw_chart_data_label hide = {.hide = LXW_TRUE};
+    lxw_chart_data_label keep = {.hide = LXW_FALSE};
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels[] = {
+        &hide,
+        &keep,
+        &hide,
+        &hide,
+        &keep,
+        &hide,
+        NULL
+    };
+
+    // Set the custom labels.
+    chart_series_set_labels_custom(series, data_labels);
+@endcode
+
+@image html chart_data_labels21.png
+
+
+Standard chart formatting such as #lxw_chart_line, #lxw_chart_fill and
+#lxw_chart_pattern can also be applied to custom data labels via
+#lxw_chart_data_label:
+
+@code
+    // Set the border/line and fill for the data labels.
+    lxw_chart_line line2 = {.color = LXW_COLOR_RED};
+    lxw_chart_fill fill2 = {.color = LXW_COLOR_YELLOW};
+    lxw_chart_line line3 = {.color = LXW_COLOR_BLUE};
+    lxw_chart_fill fill3 = {.color = LXW_COLOR_GREEN};
+
+    // Create some custom labels.
+    lxw_chart_data_label data_label9_1 = {.value = "Amy", .line = &line3};
+    lxw_chart_data_label data_label9_2 = {.value = "Bea"};
+    lxw_chart_data_label data_label9_3 = {.value = "Eva"};
+    lxw_chart_data_label data_label9_4 = {.value = "Fay"};
+    lxw_chart_data_label data_label9_5 = {.value = "Liv"};
+    lxw_chart_data_label data_label9_6 = {.value = "Una", .fill = &fill3};
+
+    // Set the default formatting for the data labels in the series.
+    chart_series_set_labels_line(series, &line2);
+    chart_series_set_labels_fill(series, &fill2);
+
+    // Create an array of label pointers. NULL indicates the end of the array.
+    lxw_chart_data_label *data_labels9[] = {
+        &data_label9_1,
+        &data_label9_2,
+        &data_label9_3,
+        &data_label9_4,
+        &data_label9_5,
+        &data_label9_6,
+        NULL
+    };
+
+    /* Set the custom labels. */
+    chart_series_set_labels_custom(series, data_labels9);
+@endcode
+
+@image html chart_data_labels25.png
+
+
+@section chart_formatting Chart Formatting
+
+The following chart formatting properties can be set for any chart object that
+they apply to (and that are supported by libxlsxwriter) such as chart lines,
+column fill areas and other chart elements:
+
+- Font
+- Line/Border
+- Fill
+- Pattern
+
+For example:
+
+@code
+    lxw_chart_line chart_line  = {.color = LXW_COLOR_BLUE};
+    lxw_chart_line marker_line = {.color = LXW_COLOR_RED};
+    lxw_chart_fill marker_fill = {.color = LXW_COLOR_YELLOW};
+
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_SQUARE);
+    chart_series_set_marker_size(series, 5);
+
+    chart_series_set_line(series, &chart_line);
+    chart_series_set_marker_line(series, &marker_line);
+    chart_series_set_marker_fill(series, &marker_fill);
+@endcode
+
+@image html chart_formatting2.png
+
+These properties are explained in the subsections below.
+
+@subsection chart_fonts Chart formatting: Fonts
+
+Font properties can be set for several chart objects such as chart titles,
+axis labels, and axis numbering.
+
+A chart font #lxw_chart_font struct with default properties is:
+
+@code
+    lxw_chart_font font = {.name      = "Calibri",
+                           .size      = 10,
+                           .bold      = LXW_FALSE,
+                           .italic    = LXW_FALSE,
+                           .underline = LXW_FALSE,
+                           .rotation  = 0,
+                           .color     = LXW_COLOR_BLACK};
+@endcode
+
+
+The font properties are:
+
+- `name`: Set the font name:
+
+@code
+    lxw_chart_font font = {.name = "Arial"};
+@endcode
+
+- `size`: Set the font size:
+
+@code
+    lxw_chart_font font = {.name = "Arial", .size = 11};
+@endcode
+
+- `bold`: Set the font bold property:
+
+@code
+    lxw_chart_font font = {.bold = LXW_TRUE};
+@endcode
+
+- `italic`: Set the font italic property:
+
+@code
+    lxw_chart_font font = {.italic = LXW_TRUE};
+@endcode
+
+- `underline`: Set the font underline property:
+
+@code
+    lxw_chart_font font = {.underline = LXW_TRUE};
+@endcode
+
+- `rotation`: Set the font rotation, angle, property in the range -90 to 90
+deg:
+
+@code
+    lxw_chart_font font = {.rotation = 45};
+@endcode
+
+  This is useful for displaying axis data such as dates in a more compact
+  format.
+
+- `color`: Set the font color property. It can be a HTML style RGB color or a
+  limited number of named colors (see @ref working_with_colors for more
+  information):
+
+@code
+    lxw_chart_font font = {.color = LXW_COLOR_BLUE};
+@endcode
+
+Here is a longer example with several chart formats:
+
+
+@dontinclude chart_fonts.c
+@skip lxw_chart_font
+@until chart_legend_set_font
+
+@image html chart_fonts.png
+
+
+@subsection chart_lines Chart formatting: Line
+
+The line format is used to specify properties of line objects that appear in a
+chart such as a plotted line on a chart or a border.
+
+A chart line #lxw_chart_line struct with default properties is:
+
+@code
+    lxw_chart_line line = {.none      = LXW_FALSE,
+                           .color     = LXW_COLOR_BLACK,
+                           .width     = 2.25,
+                           .dash_type = LXW_CHART_LINE_DASH_SOLID};
+@endcode
+
+The `none` member is uses to turn the line off (it is always on by default
+except in Scatter charts). This is useful if you wish to plot a series with
+markers without a line, or a column fill without a border:
+
+@code
+    lxw_chart_line line = {.none = LXW_TRUE};
+
+    chart_series_set_line(series, &line);
+    chart_series_set_marker_type(series, LXW_CHART_MARKER_AUTOMATIC);
+@endcode
+
+@image html chart_formatting3.png
+
+The `color` member sets the color of the line. It can be a HTML style RGB
+color or a limited number of named colors (see @ref working_with_colors for
+more information):
+
+@code
+    lxw_chart_line line = {.color = 0xFF9900};
+
+    chart_series_set_line(series, &line);
+@endcode
+
+@image html chart_formatting4.png
+
+
+The `width` member sets the width of the line. It should be specified in
+increments of 0.25 of a point as in Excel:
+
+@code
+    lxw_chart_line line = {.width = 4.25};
+
+    chart_series_set_line(series, &line);
+@endcode
+
+@image html chart_formatting_width.png
+
+
+The `dash_type` member sets the dash style of the line:
+
+@code
+    lxw_chart_line line = {.dash_type = LXW_CHART_LINE_DASH_DASH_DOT};
+
+    chart_series_set_line(series, &line);
+@endcode
+
+@image html chart_formatting5.png
+
+The following #lxw_chart_line_dash_type values are available. They are shown
+in the order that they appear in the Excel dialog:
+
+ Define                                | Excel name
+ ------------------------------------- | ------------------
+ LXW_CHART_LINE_DASH_SOLID             | Solid
+ LXW_CHART_LINE_DASH_ROUND_DOT         | Round Dot
+ LXW_CHART_LINE_DASH_SQUARE_DOT        | Square Dot
+ LXW_CHART_LINE_DASH_DASH              | Dash
+ LXW_CHART_LINE_DASH_DASH_DOT          | Dash Dot
+ LXW_CHART_LINE_DASH_LONG_DASH         | Long Dash
+ LXW_CHART_LINE_DASH_LONG_DASH_DOT     | Long Dash Dot
+ LXW_CHART_LINE_DASH_LONG_DASH_DOT_DOT | Long Dash Dot Dot
+
+The default line style is `#LXW_CHART_LINE_DASH_SOLID`.
+
+More than one line property can be specified at a time:
+
+@code
+    lxw_chart_line line = {.color     = LXW_COLOR_RED,
+                           .width     = 1.25,
+                           .dash_type = LXW_CHART_LINE_DASH_SQUARE_DOT};
+@endcode
+
+@image html chart_formatting_multiple.png
+
+
+@subsection chart_borders Chart formatting: Border
+
+In Excel chart formatting the `border` property is a synonym for `line` when
+the object being formatting also has a `fill` property.
+
+Anywhere you see `border` in an Excel chart dialog you can use the equivalent
+libxlsxwriter `line` function.
+
+
+@subsection chart_fills Chart formatting: Fill
+
+The fill format is used to specify properties of chart objects that internal
+boundaries such as a column chart.
+
+
+A chart fill #lxw_chart_fill struct with default properties is:
+
+@code
+    lxw_chart_fill fill = {.none         = LXW_FALSE,
+                           .color        = LXW_COLOR_BLACK,
+                           .transparency = 0};
+@endcode
+
+
+The none property is used to turn the fill property off (it is generally on by
+default):
+
+@code
+    lxw_chart_line line = {.color = LXW_COLOR_BLACK};
+    lxw_chart_fill fill = {.none  = LXW_TRUE};
+
+    chart_series_set_line(series, &line);
+    chart_series_set_fill(series, &fill);
+@endcode
+
+@image html chart_fill1.png
+
+The `color` member sets the color of the fill area. It can be a HTML style RGB
+color or a limited number of named colors (see @ref working_with_colors for
+more information):
+
+@code
+    lxw_chart_fill fill = {.color = 0xFF9900};
+
+    chart_series_set_fill(series, &fill);
+@endcode
+
+@image html chart_fill2.png
+
+The `transparency` member sets the transparency of the solid fill color in the
+integer range 1 - 100:
+
+@code
+    lxw_chart_fill fill = {.color        = LXW_COLOR_YELLOW,
+                           .transparency = 50};
+
+    chart_series_set_fill(series, &fill);
+@endcode
+
+@image html chart_fill3.png
+
+The `fill` format is generally used in conjunction with a border which can be
+set via the `line` format:
+
+@code
+    lxw_chart_line line = {.color = LXW_COLOR_BLACK};
+    lxw_chart_fill fill = {.color = LXW_COLOR_RED};
+
+    chart_series_set_line(series, &line);
+    chart_series_set_fill(series, &fill);
+@endcode
+
+@image html chart_fill4.png
+
+
+@subsection chart_patterns Chart formatting: Pattern
+
+The pattern fill is used to specify pattern filled areas of chart objects such
+as the interior of a column or the background of the chart itself.
+
+A chart pattern #lxw_chart_pattern struct with default properties is:
+
+@code
+    lxw_chart_pattern pattern = {.type      = LXW_CHART_PATTERN_NONE,
+                                 .fg_color  = LXW_COLOR_NONE,;
+                                 .bg_color  = LXW_COLOR_WHITE};
+@endcode
+
+Where the members are:
+
+- `pattern`: The pattern to be applied (required).
+- `fg_color`: The foreground color of the pattern (required).
+- `bg_color`: The background color (optional, defaults to white).
+
+
+The foreground color, `fg_color`, is a required parameter and can be HTML
+style RGB color or a limited number of named colors (see
+@ref working_with_colors for more information):
+
+The background color, `bg_color`, is optional and defaults to LXW_COLOR_WHITE.
+
+For example:
+
+@code
+    lxw_chart_pattern pattern1 = {.type = LXW_CHART_PATTERN_SHINGLE,
+                                  .fg_color = 0x804000,
+                                  .bg_color = 0XC68C53};
+
+    lxw_chart_pattern pattern2 = {.type = LXW_CHART_PATTERN_HORIZONTAL_BRICK,
+                                  .fg_color = 0XB30000,
+                                  .bg_color = 0XFF6666};
+
+    chart_series_set_pattern(series1, &pattern1);
+    chart_series_set_pattern(series2, &pattern2);
+
+@endcode
+
+@image html chart_pattern.png
+
+The following patterns #lxw_chart_pattern_type can be applied:
+
+- #LXW_CHART_PATTERN_PERCENT_5
+- #LXW_CHART_PATTERN_PERCENT_10
+- #LXW_CHART_PATTERN_PERCENT_20
+- #LXW_CHART_PATTERN_PERCENT_25
+- #LXW_CHART_PATTERN_PERCENT_30
+- #LXW_CHART_PATTERN_PERCENT_40
+- #LXW_CHART_PATTERN_PERCENT_50
+- #LXW_CHART_PATTERN_PERCENT_60
+- #LXW_CHART_PATTERN_PERCENT_70
+- #LXW_CHART_PATTERN_PERCENT_75
+- #LXW_CHART_PATTERN_PERCENT_80
+- #LXW_CHART_PATTERN_PERCENT_90
+- #LXW_CHART_PATTERN_LIGHT_DOWNWARD_DIAGONAL
+- #LXW_CHART_PATTERN_LIGHT_UPWARD_DIAGONAL
+- #LXW_CHART_PATTERN_DARK_DOWNWARD_DIAGONAL
+- #LXW_CHART_PATTERN_DARK_UPWARD_DIAGONAL
+- #LXW_CHART_PATTERN_WIDE_DOWNWARD_DIAGONAL
+- #LXW_CHART_PATTERN_WIDE_UPWARD_DIAGONAL
+- #LXW_CHART_PATTERN_LIGHT_VERTICAL
+- #LXW_CHART_PATTERN_LIGHT_HORIZONTAL
+- #LXW_CHART_PATTERN_NARROW_VERTICAL
+- #LXW_CHART_PATTERN_NARROW_HORIZONTAL
+- #LXW_CHART_PATTERN_DARK_VERTICAL
+- #LXW_CHART_PATTERN_DARK_HORIZONTAL
+- #LXW_CHART_PATTERN_DASHED_DOWNWARD_DIAGONAL
+- #LXW_CHART_PATTERN_DASHED_UPWARD_DIAGONAL
+- #LXW_CHART_PATTERN_DASHED_HORIZONTAL
+- #LXW_CHART_PATTERN_DASHED_VERTICAL
+- #LXW_CHART_PATTERN_SMALL_CONFETTI
+- #LXW_CHART_PATTERN_LARGE_CONFETTI
+- #LXW_CHART_PATTERN_ZIGZAG
+- #LXW_CHART_PATTERN_WAVE
+- #LXW_CHART_PATTERN_DIAGONAL_BRICK
+- #LXW_CHART_PATTERN_HORIZONTAL_BRICK
+- #LXW_CHART_PATTERN_WEAVE
+- #LXW_CHART_PATTERN_PLAID
+- #LXW_CHART_PATTERN_DIVOT
+- #LXW_CHART_PATTERN_DOTTED_GRID
+- #LXW_CHART_PATTERN_DOTTED_DIAMOND
+- #LXW_CHART_PATTERN_SHINGLE
+- #LXW_CHART_PATTERN_TRELLIS
+- #LXW_CHART_PATTERN_SPHERE
+- #LXW_CHART_PATTERN_SMALL_GRID
+- #LXW_CHART_PATTERN_LARGE_GRID
+- #LXW_CHART_PATTERN_SMALL_CHECK
+- #LXW_CHART_PATTERN_LARGE_CHECK
+- #LXW_CHART_PATTERN_OUTLINED_DIAMOND
+- #LXW_CHART_PATTERN_SOLID_DIAMOND
+
+@note If a pattern fill is used on a chart object it overrides the solid fill
+      properties of the object.
+
+@section ww_charts_limitations Chart Limitations
+
+The following chart features aren't currently supported in libxlsxwriter but
+will be in time. See the [GitHub Chart Feature Requests][1].
+
+[1]: https://github.com/jmcnamara/libxlsxwriter/issues
+
+- Secondary axis.
+- Combined charts.
+- Chartsheets.
+
+If required these features are all available in the Perl and Python versions
+of this library.
+
+
+Next: @ref working_with_object_positioning
+
+*/

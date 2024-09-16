@@ -1,0 +1,296 @@
+% SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+%
+% SPDX-License-Identifier: GPL-3.0-or-later
+
+\documentclass{utart}
+
+\utUseMinted
+\usepackage{outlines}
+
+\title{DIM 设计文档}
+\author{阙知勇}
+
+\setUTClassify{绝密}
+
+% 设置文档编号
+\setUTIndex{UT-A0001}
+
+% 设置拟制人信息
+\setUTFiction{lxz}{2022-03-22}
+
+% 设置审核人信息
+\setUTReview{lxz}{2022-03-22}
+
+% 设置批准人信息
+\setUTApprove{lxz}{2022-03-22}
+
+\begin{document}
+
+% 生成封面
+\utMakeTitle{}
+
+% 生成修订记录
+\utMakeChangeLog{%
+    1.0.0 &      创建   &    李鹤   &   2020-02-20      \\
+    \hline
+}
+
+% 生成目录
+\utMakeTOC
+
+% 文档内容
+\section{概述}
+
+概述。
+
+\section{系统设计}
+
+    \subsection{设计原则}
+
+        设计原则。
+
+    \subsection{模块结构设计}
+        \begin{plantuml}
+        @startuml
+        package "DIM core" {
+            class Dim {
+                list<InputContext> inputcontexts
+                list<FrontendAddon> frontendAddons
+                list<InputmethodAddon> inputmethodAddons
+                + postEvent()
+                - postInputContextCreated()
+                - postInputContextDestroyed()
+                - postInputContextFocused()
+                - postInputContextUnfocused()
+                - postInputContextKeyEvent()
+            }
+            class Addon {
+                + string key()
+            }
+            class FrontendAddon extends Addon {
+            }
+            class InputMethodAddon extends Addon {
+                + {abstract} list<InputMethodEntry> getInputMethods()
+                + {abstract} keyEvent(InputMethodEntry, InputContextKeyEvent)
+            }
+            class UIAddon extends Addon {
+                + {abstract} updatePreedit()
+                + {abstract} updateLookupTable()
+                + {abstract} setWindowPosition()
+                + {abstract} setCursorRect()
+            }
+            class InputState {
+            }
+            class InputContext {
+                InputState inputState
+                + destroy()
+                + focusIn()
+                + focusOut()
+                + processKeyEvent()
+            }
+        }
+
+        package "DBus Frontend" {
+            class DBusFrontend extends FrontendAddon {
+                + CreateInputContext()
+            }
+
+            class InputContext1 extends InputContext {
+                + Destroy()
+                + FocusIn()
+                + FocusOut()
+                + ProcessKeyEvent()
+            }
+        }
+
+        package "keybaord" {
+            class Keyboard extends InputMethodAddon {
+                + GetInputMethods()
+                + keyEvent()
+            }
+        }
+
+        package "panel" {
+            class Panel extends UIAddon {
+                + updatePreedit()
+                + updateLookupTable()
+                + setWindowPosition()
+                + setCursorRect()
+            }
+        }
+
+        package "Fcitx5proxy" {
+            class Fcitx5proxyAddon extends InputMethodAddon {
+                + GetInputMethods()
+                + keyEvent()
+            }
+        }
+
+        DBusFrontend::CreateInputContext --> InputContext1
+        InputContext::focusIn --> Dim::postEvent
+        InputContext::focusOut --> Dim::postEvent
+        InputContext::processKeyEvent --> Dim::postEvent
+        InputContext::inputState --> InputState
+
+        @enduml
+        \end{plantuml}
+
+        \pagebreak
+        \par 时序图（以使用 Qt 输入法插件来与 DIM 交互的 Qt 程序为例）：
+
+        \begin{plantuml}
+        @startuml
+
+        actor User
+        participant "程序" as Process
+        box Addons #LightBlue
+        participant "InputContext1"
+        participant "DBus Frontend" as DF
+        participant "InputMethod Addon" as IMA
+        participant "UI Addon" as UA
+        endbox
+        participant "DIM core" as Dimcore
+
+        autoactivate on
+        Dimcore -> UA ** : new
+        Dimcore -> DF ** : new
+        Dimcore -> IMA ** : new
+        Dimcore -> IMA : getInputMethods
+        return 返回插件提供的输入法列表
+        User -> Process ** : 打开
+        Process -> DF : CreateInputContext
+        DF -> InputContext1 ** : new InputContext1
+        DF -> Dimcore : 触发 InputContextCreated 信号
+        return
+        return 返回 InputContext ID
+
+        alt 程序得到焦点
+            User -> Process : 切换到应用
+                Process -> InputContext1 : FocusIn
+                    InputContext1 -> Dimcore : 触发 InputContextFocused 信号
+                        Dimcore -> Dimcore : 设置当前输入上下文 ID
+                        return
+                    return
+                return
+            return
+        else 程序失去焦点
+            User -> Process : 切出应用
+                Process -> InputContext1 : FocusOut
+                    InputContext1 -> Dimcore : 触发 InputContextUnfocused 信号
+                        Dimcore -> Dimcore : 将当前输入上下文 ID 设置为 0
+                        return
+                    return
+                return
+            return
+        else 用户按键
+            User -> Process : 按键
+                Process -> InputContext1 : ProcessKeyEvent
+                    InputContext1 -> Dimcore : 触发 InputContextKeyEvent 信号
+                        Dimcore -> Dimcore : 检查是不是当前 Context 发出的信号
+                        return
+                        alt 是快捷键
+                            Dimcore -> Dimcore : 处理快捷键
+                            return
+                            Dimcore -> UA : 设置提示内容
+                            return
+                        else 不是快捷键
+                            Dimcore -> IMA : keyEvent
+                                IMA -> IMA : 处理按键内容
+                                return
+                                IMA -> Dimcore : 触发 updatePreedit、commitString、updateLookupTable 信号
+                                    Dimcore -> UA : 更新显示内容
+                                    return
+                                return
+                            return
+                        end
+                    return
+                return
+                Process -> Process : 解析返回结果，\n处理 commitString、\nupdatePreedit、\nforwardKey
+                return
+                Process -> Process : 获取光标位置
+                    Process -> DF : SetCursorRect
+                        DF -> Dimcore : InputContextCursorRectChanged
+                            Dimcore -> UA : 设置光标位置
+                            return
+                        return
+                    return
+                return
+            return
+        end
+
+        @enduml
+        \end{plantuml}
+
+        \subsubsection{模块列表}
+        \begin{outline}[enumerate]
+            \1 DIM core：核心模块，负责处理输入法的核心逻辑，包括输入法的初始化、配置读取、插件管理、事件处理及分发、状态管理。
+            \1 插件：各种功能由插件来实现，DIM core 通过插件接口与插件交互。
+                \2 前端插件
+                \2 输入法插件
+                    \3 键盘布局插件：获取系统支持的键盘布局，当切换到键盘布局插件下的布局时，按键事件会被分发到此插件。插件获取当前布局的键盘映射表，并将对应的映射返回。
+                    \3 Fcitx5 代理插件：用于兼容 Fcitx5 的输入法，调用 Fcitx5 的接口获取输入法列表。当切换到插件下的输入法时，按键事件会被分发到此插件。插件将按键事件转发给 Fcitx5，并获取结果返回。
+                    \3 iBus 代理插件：用于兼容 iBus 的输入法，调用 iBus 的接口获取输入法列表。当切换到插件下的输入法时，按键事件会被分发到此插件。插件将按键事件转发给 iBus，并获取结果返回。
+                \2 前端插件：支持用于与程序交互的前端插件，包括 DBus 前端、XIM 前端、Wayland IM 前端，其中 DBus 前端同时供 Qt 与 GTK 程序使用。
+                    \3 DBus 前端插件：用于通过 DBus 与需要输入的程序交互，包括 Qt 程序与 GTK 程序。DBus 前端会监听 DBus 的消息，当收到消息时，将触发事件给 DIM core，DIM core 处理完后，将结果返回给 DBus 前端，DBus 前端再将结果返回给输入的程序。
+                    \3 XIM 前端插件：实现 X 输入法协议前端
+                    \3 Wayland 前端插件：实现支持 Wayland 的 inputmethod 协议的前端插件。
+                \3 UI 插件：用于显示输入法候选词、状态等
+                    \4 输入面板插件
+                    \4 KIM panel 插件
+            \1 配置文件模块
+            \1 Qt 输入法支持：在 Qt 程序中使用 DIM，通过 DBus 前端与 DIM 交互。
+            \1 GTK 输入法支持：在 GTK 程序中使用 DIM，通过 DBus 前端与 DIM 交互。
+            \1 im-config 配置文件：增加 im-config 的配置文件，在系统安装 DIM 后，自动选择 DIM 并导出环境变量。
+        \end{outline}
+
+        \subsubsection{事件类型}
+        \begin{outline}[enumerate]
+            \1 InputContextCreated，输入上下文创建事件，由前端插件触发。
+            \1 InputContextDestroyed，输入上下文销毁事件，由前端插件触发。
+            \1 InputContextFocused，输入上下文得到焦点，由前端插件触发。
+            \1 InputContextUnfocusd，输入上下文失去焦点，由前端插件触发。
+            \1 InputContextKeyEvent，按键事件，由前端插件触发，事件触发后，DIM core 先处理掉切换输入法等快捷键的事件，剩下的事件分发给当前选择的输入法插件。
+        \end{outline}
+
+    \subsection{接口设计}
+
+        \subsubsection{inputmethod 接口}
+            \par inputmethod 接口用于给程序提供输入法操作功能，包括创建输入上下文。
+            \paragraph{方法}
+                \begin{outline}[enumerate]
+                    \1 CreateInputContext 用于创建输入上下文，当程序需要输入时，需要调用此方法创建输入上下文。
+                \end{outline}
+
+        \subsubsection{inputcontext 接口}
+            \par inputcontext 接口用于操作上下文，包括处理按键事件、获取当前输入法的状态、获取当前输入法的候选词等。
+            \paragraph{方法}
+                \begin{outline}[enumerate]
+                    \1 Destroy 用于销毁上下文，当窗口关闭时，需要调用此方法销毁上下文。
+                    \1 FocusIn 用于在输入窗口获取焦点时，调用方法。
+                    \1 FocusOut 用于在输入窗口失去焦点时，调用方法。
+                    \1 ProcessKeyEvent 处理按键事件，并返回处理结果。签名：\mintinline[breaklines]{c++}{ProcessKeyEvent(uint keyval, uint keycode, uint state, bool isRelease, uint time) => []variant}
+                        \par 返回结果示例：
+                        \begin{minted}{c++}
+                            // 1
+                            [
+                                {
+                                    type: 1, // preedit string
+                                    data: "ce ui",
+                                },
+                            ]
+                            // 2
+                            [
+                                {
+                                    type: 1, // preedit string
+                                    data: "",
+                                },
+                                {
+                                    type: 2, // commit string
+                                    data: "测试",
+                                },
+                            ]
+                        \end{minted}
+                \end{outline}
+
+% 结束文档
+\end{document}

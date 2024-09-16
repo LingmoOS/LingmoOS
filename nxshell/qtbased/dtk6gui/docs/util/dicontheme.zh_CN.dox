@@ -1,0 +1,94 @@
+/*!
+@~chinese
+@file include/util/dicontheme.h
+@ingroup dci
+@brief Dtk 图标主题工具类
+
+@namespace Dtk::Gui::DIconTheme dicontheme.h
+@details 用于提供一些接口，包括查找图标（包括 QIcon 和 DCI 图标 ），图标搜索路径等。
+
+@enum Dtk::Gui::DIconTheme::Option
+@brief 查找图标时的选项
+@var Dtk::Gui::DIconTheme::DontFallbackToQIconFromTheme
+@brief 是否**不使用** QIcon::fromTheme 的方式去查找图标，当设置此 flag 时查找图标失败时直接返回空图标对象，否则回退到通过 QIcon::fromTheme 查找图标
+@var Dtk::Gui::DIconTheme::IgnoreBuiltinIcons
+@brief 是否忽略通过内置图标引擎方式查找图标资源，当设置此 flag 时查找图标会跳过内置图标引擎的方式查找图标资源，否则优先尝试内置图标引擎查找资源。
+
+@class Dtk::Gui::DIconTheme::Cached
+@details 图标查找缓存类，提供的查找图标接口，如果找到会加入缓存，下次查找会更快。
+
+@fn Dtk::Gui::DIconTheme::Cached::Cached()
+@details 图标缓存构造函数
+
+@fn Dtk::Gui::DIconTheme::Cached::~Cached()
+@details 图标缓存析构函数
+
+@fn Dtk::Gui::DIconTheme::Cached::maxCost() const
+@details 返回允许的最大缓存数量
+
+@fn Dtk::Gui::DIconTheme::Cached::setMaxCost(int cost)
+@details 将最大允许的缓存数量设置为 cost 。如果当前的缓存数量大于 cost ，则某些缓存对象会立即删除。
+
+@fn Dtk::Gui::DIconTheme::Cached::clear()
+@details 清理所有缓存
+
+@fn Dtk::Gui::DIconTheme::Cached::findQIcon(const QString &iconName, Options options, const QIcon &fallback)
+@details 通过 iconName 查找 QIcon 的接口，找到时会加入缓存
+@param[in] iconName 要查找的图标名称
+@param[in] options 要查找的选项
+@param[in] fallback 图标查找失败时可以返回用户指定的 fallback 对象，默认为空
+@sa DIconTheme::findQIcon
+
+@fn Dtk::Gui::DIconTheme::Cached::findDciIconFile(const QString &iconName, const QString &themeName, const QString &fallback)
+@details 通过指定图标名 iconName 和主题名 themeName 查找 DCI 图标文件路径的接口，找到时会加入缓存
+@param[in] iconName 要查找的图标名称
+@param[in] options 指定 DCI 图标主题
+@param[in] fallback 图标查找失败时可以返回用户指定的 fallback ，默认为空
+
+@fn Dtk::Gui::DIconTheme::cached()
+@details 获取（首次次调用时构造）缓存对象。
+
+@fn Dtk::Gui::DIconTheme::findQIcon(const QString &iconName, Options options)
+@details 返回 DIconTheme::createIconEngine 接口创建的图标引擎构造 QIcon，当没有设置 DontFallbackToQIconFromTheme 和 createIconEngine 失败时回退到 QIcon::fromTheme 
+@param[in] iconName 要查找的图标名称
+@param[in] options 要查找的选项, 选项默认为空
+@sa DIconTheme::Cached::findQIcon
+@sa DIconTheme::createIconEngine
+
+@fn Dtk::Gui::DIconTheme::findQIcon(const QString &iconName, const QIcon &fallback, Options options)
+@details 重载 DIconTheme::findQIcon, 当查找图标失败时返回调用者中提供的 fallback 图标
+@param[in] iconName 要查找的图标名称
+@param[in] options 要查找的选项, 选项默认为空
+@param[in] fallback 如果 iconName 无法找到, 返回此图标
+@sa DIconTheme::Cached::findQIcon
+@sa DIconTheme::createIconEngine
+
+@fn Dtk::Gui::DIconTheme::createIconEngine(const QString &iconName, Options options)
+@details 通过图标名构造图标引擎, 如果未设置 IgnoreBuiltinIcons 标志则优先尝试 qrc:/icons/deepin/builtin 目录查找图标来构造内置图标引擎，否则构造 XDG 图标引擎。
+@param[in] iconName 图标名称
+@param[in] options 选项, 选项默认为 DIconTheme::DontFallbackToQIconFromTheme
+@return QIconEngine 对象指针，注意图标查找失败时返回 nullptr。
+
+@fn Dtk::Gui::DIconTheme::findDciIconFile(const QString &iconName, const QString &themeName)
+@details 通过指定图标名 iconName 和主题名 themeName 查找 DCI 图标文件路径的接口
+@param[in] iconName 要查找的图标名称
+@param[in] options 指定 DCI 图标主题
+@return 返回找到的 DCI 图标文件路径
+@sa DDciIcon::fromTheme
+@sa DIconTheme::dciThemeSearchPaths()
+
+@fn Dtk::Gui::DIconTheme::dciThemeSearchPaths()
+@details 返回 DCI 图标的搜索路径。默认会从这些路径查找 /usr/share/dsg/icons/$theme_name, qrc:/dsg/icons/$theme_name, qrc:/dsg/built-in-icons
+@sa DIconTheme::findDciIconFile
+
+@fn Dtk::Gui::DIconTheme::setDciThemeSearchPaths(const QStringList &path)
+@details 设置查找 DCI 图标的搜索路径
+@sa DIconTheme::dciThemeSearchPaths
+
+@fn Dtk::Gui::DIconTheme::isBuiltinIcon(const QIcon &icon)
+@details 返回 QIcon 是否为内置图标，`内置图标` 是 DTK 中规定的一类集成在二进制内部的图标资源，其一般放置于 qrc:/icons/deepin/builtin 的路径下，在使用 findQIcon 或 createIconEngine 时，如找到此路径下对应的图标文件，则会为其使用一个自定义的 QIconEngine 进行渲染。此方法即通过判断 icon 所使用的 QIconEngine 确认其是否为内置图标。
+
+@fn Dtk::Gui::DIconTheme::isXdgIcon(const QIcon &icon)
+@details 返回 QIcon 是否为 XDG 图标， XDG 图标一般放置于系统图标主题目录（如：/usr/share/icons）。和 isBuiltinIcon 类似，此方法是通过判断 icon 所使用的 QIconEngine 确认其是否为 XDG 图标。
+
+*/

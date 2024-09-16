@@ -1,0 +1,219 @@
+\documentclass{utart}
+
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\utUseMinted
+
+\patchcmd{\thebibliography}{\section*}{\section}{}{}
+\renewcommand \refname{参考文献}
+
+\title{deepin 文件系统层次结构}
+\author{jouyouyun}
+
+\begin{document}
+\utMakeTitle{}{1.0}{2021-12-21}
+\utMakeChangeLog{
+  1.0 & 创建 &  & 2021-12-21 \\
+  \hline
+}
+\utMakeTOC
+
+\section{目的}
+本规范是基于 \texttt{Filesystem Hierarchy Standard}\cite{FHS} 进行编写，以达到以下目的：
+\begin{itemize}[leftmargin=4em]
+\item 软件可以预测已安装文件和文件夹的位置；
+\item 用户可以预测已安装文件和文件夹的位置。
+\end{itemize}
+
+本规范将明确：
+\begin{itemize}[leftmargin=4em]
+\item 指定文件系统各个区域的指导性原则；
+\item 指定最少应该包含的必须的文件和文件夹。
+\end{itemize}
+
+\section{根文件系统}
+根文件系统包含能够启动、还原、恢复或修复系统的内容，必须存在足以挂载其它分区的内容。
+这包括工具、配置、引导装载程序信息和其它启动必须的数据。
+
+要能够恢复或修复系统，用于诊断和重建损坏系统所需要的工具必须放置在根文件系统中。
+
+要还原系统，从系统备份还原的工具必须放置在根文件系统中。
+
+\textbf{应用程序任何时候都不能创建或要求在根文件夹下保存特殊文件或子文件夹，未经对改动后果包括应用程序可移植性的慎重考虑，发行版不应该在根层次结构下创建新目录。}
+
+根层次结构下必须存在的文件夹如下：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/persistent} 存储系统/数据的目录，整个设备的的持久化数据都会在这个地方进行存储，其他任何路径都是从该目录中的子目录映射/链接/构建而来；
+\item \texttt{/usr} 系统文件目录，由 \texttt{snapshot} 和 \texttt{/vendor} 组合生成；
+\item \texttt{/bin} 软连接，指向 \texttt{/usr/bin} ；
+\item \texttt{/sbin} 软连接，指向 \texttt{/usr/sbin} ；
+\item \texttt{/lib} 软连接，指向 \texttt{/usr/lib} ；
+\item \texttt{/lib<qual>} 软连接，指向 \texttt{/usr/lib<qual>} ；
+\item \texttt{/boot} 引导加载程序的静态文件；
+\item \texttt{/etc} 系统预置的配置文件，必须是静态文件而不是可执行的二进制文件，应只能在安装时修改或被管理员手动修改；
+\item \texttt{/srv} 本系统所提供服务的数据文件，计划用来存放服务的配置、数据和脚本等内容。但此目录暂未使用，禁止将数据存储在此文件夹；
+\item \texttt{/media} 可移动媒质的挂载点；
+\item \texttt{/mnt} 临时挂载文件系统用的挂载点；
+\item \texttt{/dev} 放置特殊或设备文件的地方；
+\item \texttt{/tmp} 临时文件，任意程序都有读写权限，重启后数据删除；
+\item \texttt{/vendor} mount bind to \texttt{/persistent/vendor} ，主机相关或管理员安装的系统软件，也可用于安装替换或升级系统软件，其目录层次树与 \texttt{/} 一致；
+\item \texttt{/opt} mount bind to \texttt{/persistent/opt} ；
+\item \texttt{/var} mount bind to \texttt{/persistent/var} ；
+\item \texttt{/home} mount bind to \texttt{/persistent/home} ；
+\item \texttt{/root} mount bind to \texttt{/persistent/roothome} 。
+\end{itemize}
+
+\section{/persistent 层次结构}
+新增的文件夹，数据分区挂载点，存储系统持久化数据、应用数据和用户数据。
+
+应有以下文件夹：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/persistent/osroot}
+
+  系统 repo、snapshot 的存储目录，包含以下子目录及文件：
+  \begin{itemize}
+  \item \texttt{/persistent/osroot/repo}
+
+    系统 repo 数据存储的地方，使用 ostree 构建；
+  \item \texttt{/persistent/osroot/snapshot}
+
+    系统 snapshot 数据存储的地方，通过 ostree checkout 检出；
+  \item \texttt{/persistent/osroot/config.json}
+
+    原子更新的配置文件，描述了远程仓库信息、本地仓库信息、当前版本、当前状态等信息；
+  \end{itemize}
+\item \texttt{/persistent/linglong}
+
+  独立包格式数据目录；
+\item \texttt{/persistent/opt}
+
+  应用程序的安装目录，软件包必须放置在 \texttt{opt/apps/<package>} 的文件夹树下，其中 \texttt{<package>} 是软件包的名称。
+  软件包中可变的文件必须安装在 \texttt{/var/opt/<package>} ，主机特定的配置文件必须安装在 \texttt{/var/etc/<package>} ；
+\item \texttt{/persistent/var}
+
+  应用程序数据和可变数据文件的存储目录；
+\item \texttt{/persistent/home}
+
+  用户主文件夹，存储用户的个人数据以及用户的私有应用程序；
+\item \texttt{/persistent/roothome}
+
+  root 用户的主文件夹。
+\end{itemize}
+
+\section{/usr 层次结构}
+\texttt{/usr} 是文件系统重要的组成部分，其内的内容是\textbf{可共享的只读数据} ，应在根分区中。
+即可以在满足此规范的主机之间共享并禁止写入，任何与主机特有的信息或随使用而变化的内容都应保存在其它地方。
+
+\texttt{/usr} 中的内容是由 \texttt{/persistent/osroot/snapshot/<version>} 和 \texttt{/vendor} 合并生成，从而构建完整的系统数据。
+
+\texttt{/usr} 中应有以下文件夹：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/usr/bin}
+
+  用户可用的二进制文件，可在未挂载其它文件的情况下能够使用的命令；
+\item \texttt{/usr/sbin}
+
+  系统二进制文件，存储管理员才可使用的命令，同时包含除 \texttt{/usr/bin} 之外其它的启动、还原、恢复或修复系统所必须的二进制文件；
+\item \texttt{/usr/lib}
+
+  必需的共享库和内核模块，包含了启动系统和运行根文件系统中命令所需的共享库；
+\item \texttt{/usr/lib<qual>}
+
+  替代特定架构的必需共享库，可选。如系统使用了 32 位程序，则其依赖的动态库应安装在 \texttt{/usr/lib32} ；
+\item \texttt{/usr/include}
+
+  系统包含的头文件；
+\item \texttt{/usr/share}
+
+  独立与系统架构的数据；
+\item \texttt{/usr/src}
+
+  源码数据；
+\item \texttt{/usr/doc}
+
+  系统的文档数据；
+\item \texttt{/usr/man}
+
+  系统的 man 数据；
+\item \texttt{/usr/local}
+
+  管理员手动安装的文件；
+\end{itemize}
+
+\section{/var 层次结构}
+规定 \texttt{/var} 文件夹的目的是可以用只读方式挂载 \texttt{/usr} ，其不可与 \texttt{/usr} 在同一分区。
+
+其下应存有以下文件夹：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/var/cache}
+
+  应用程序缓存数据，是本地计算机上耗时的 \texttt{I/O} 操作或计算生成的。应用程序必须能够重新生成或还原这些数据。；
+\item \texttt{/var/lib}
+
+  系统工具可变数据，是系统运行时会修改的和属于某个特定主机的信息。禁止用户修改其下的信息来配置软件包的操作方式；
+\item \texttt{/var/opt}
+
+  应用程序可变数据；
+\item \texttt{/var/log}
+
+  日志数据；
+\item \texttt{/var/tmp}
+
+  系统两次启动之间保留的临时文件；
+\item \texttt{/var/run}
+
+  有关在在运行进程的数据，描述系统启动以来系统信息的数据。此文件夹必须在启动过程初期清楚；
+\item \texttt{/var/lock}
+
+  锁文件，由多个应用程序共享的设备锁或其它资源锁文件。这些锁文件的内容格式必须为 \texttt{HDB UUCP} 锁文件格式，
+  \texttt{HDB} 格式将进程标识(PID) 以 10 字节的 ASCII 十进制数字形式保存，后面跟一个换行符；
+\item \texttt{/var/spool}
+
+  应用程序 \texttt{spool} 数据，包含正在等待某种后续处理的数据，在处理后这些数据经常会被删除；
+\item \texttt{/var/local}
+
+  \texttt{/usr/local} 的可变数据。
+\end{itemize}
+
+\section{特殊文件}
+因 \texttt{/} 挂载点对应分区的数据是只读的，但其中的 \texttt{/etc} 目录包含一些系统运行中可变的文件。
+为了保持兼容，需要在 \texttt{/etc} 上挂载一层 \texttt{overlayfs} ，即：
+
+\begin{minted}{shell}
+# 挂载命令
+mount -t overlay overlay -o lowerdir=/etc,upperdir=/var/etc,workdir=/var/overlay /etc
+
+# /etc/fstab 中添加
+overlay /etc overlay x-systemd.requires=/var,lowerdir=/etc,upperdir=/var/etc,workdir=/var/overlay 0 1
+\end{minted}
+
+\section{配置文件}
+配置文件根据其是否可在系统运行时被改变，分为：静态文件和可变文件。
+
+静态文件存储于以下地方：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/etc} 系统的静态文件；
+\item \texttt{/vendor/etc} OEM、厂家应用或自定义的静态文件；
+\end{itemize}
+
+可变配置文件存储于以下文件夹：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/var/etc} 系统的可变配置文件；
+\item \texttt{\$XDG\_CONFIG\_HOME} 用户级的可变文件。
+\end{itemize}
+
+可变数据存储于以下文件夹：
+\begin{itemize}[leftmargin=4em]
+\item \texttt{/var/lib} 系统的可变文件；
+\item \texttt{\$XDG\_DATA\_HOME} 用户级的可变文件。
+\end{itemize}
+
+配置文件之间的优先级关系如下：
+
+\texttt{\$XDG\_DATA\_HOME > /var/lib > /var/etc > /etc }
+
+\begin{thebibliography}{99}
+  \bibitem{FHS}\href{https://refspecs.linuxfoundation.org/FHS\_3.0/fhs/index.html}{Filesystem Hierarchy Standard.}
+\end{thebibliography}
+
+\end{document}

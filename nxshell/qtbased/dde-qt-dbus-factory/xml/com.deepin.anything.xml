@@ -1,0 +1,83 @@
+<interface name="com.deepin.anything">
+  <property access="readwrite" type="b" name="autoIndexInternal"/>
+  <property access="readwrite" type="b" name="autoIndexExternal"/>
+  <property access="readwrite" type="i" name="logLevel"/>
+  <method name="cacheDir">
+    <arg direction="out" type="s" name="path"/>
+  </method>
+  <method name="setCodecNameForLocale">
+    <arg direction="in" type="ay" name="name"/>
+    <arg direction="out" type="ay" name="oldCodecName"/>
+  </method>
+  <method name="allPath">
+    <arg direction="out" type="as" name="pathList"/>
+  </method>
+  <method name="addPath">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="b" name="success"/>
+  </method>
+  <method name="removePath">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="b" name="success"/>
+  </method>
+  <method name="hasLFT">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="b" name="success"/>
+  </method>
+  <method name="hasLFTSubdirectories">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="as" name="directories"/>
+  </method>
+  <method name="lftBuinding">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="b" name="success"/>
+  </method>
+  <method name="cancelBuild">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="out" type="b" name="success"/>
+  </method>
+  <method name="refresh">
+    <arg direction="in" type="ay" name="serialUriFilter"/>
+    <arg direction="out" type="as" name="rootPathList"/>
+  </method>
+  <method name="sync">
+    <arg direction="in" type="s" name="mountPoint"/>
+    <arg direction="out" type="as" name="rootPathList"/>
+  </method>
+  <method name="search">
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="in" type="s" name="keyword"/>
+    <arg direction="in" type="b" name="useRegExp"/>
+    <arg direction="out" type="as" name="results"/>
+  </method>
+  <method name="search">
+    <arg direction="in" type="i" name="maxCount"/>
+    <arg direction="in" type="x" name="maxTime"/>
+    <arg direction="in" type="u" name="startOffset"/>
+    <arg direction="in" type="u" name="endOffset"/>
+    <arg direction="in" type="s" name="path"/>
+    <arg direction="in" type="s" name="keyword"/>
+    <arg direction="in" type="b" name="useRegExp"/>
+    <arg direction="out" type="as" name="results"/>
+    <arg direction="out" type="u" name="startOffset"/>
+    <arg direction="out" type="u" name="endOffset"/>
+  </method>
+  <method name="insertFileToLFTBuf">
+    <arg direction="in" type="ay" name="filePath"/>
+    <arg direction="out" type="as" name="bufRootPathList"/>
+  </method>
+  <method name="removeFileFromLFTBuf">
+    <arg direction="in" type="ay" name="filePath"/>
+    <arg direction="out" type="as" name="bufRootPathList"/>
+  </method>
+  <method name="renameFileOfLFTBuf">
+    <arg direction="in" type="ay" name="fromFilePath"/>
+    <arg direction="in" type="ay" name="toFilePath"/>
+    <arg direction="out" type="as" name="bufRootPathList"/>
+  </method>
+  <method name="quit"/>
+  <signal name="addPathFinished">
+    <arg type="s" name="path"/>
+    <arg type="b" name="success"/>
+  </signal>
+</interface>

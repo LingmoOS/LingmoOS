@@ -1,0 +1,13 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+#define DTK_NAMESPACE Dtk
+#define DBLUETOOTH_NAMESPACE Bluetooth
+#define DTK_DBLUETOOTH_NAMESPACE DTK_NAMESPACE::DBLUETOOTH_NAMESPACE
+
+#define DBLUETOOTH_USE_NAMESPACE using namespace DTK_DBLUETOOTH_NAMESPACE;
+
+#define DBLUETOOTH_BEGIN_NAMESPACE namespace DTK_NAMESPACE { namespace DBLUETOOTH_NAMESPACE {
+
+#define DBLUETOOTH_END_NAMESPACE }}

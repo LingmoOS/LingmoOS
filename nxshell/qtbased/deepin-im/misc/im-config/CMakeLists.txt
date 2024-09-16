@@ -1,0 +1,7 @@
+set(INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIR}/im-config/data)
+set(DCONFIG_FILES
+    20_dim.conf
+    20_dim.rc
+)
+
+install(FILES ${DCONFIG_FILES} DESTINATION ${INSTALL_DESTINATION})

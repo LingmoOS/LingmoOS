@@ -1,0 +1,55 @@
+/*!
+@~chinese
+@file dguiapplicationhelper.h
+
+@class Dtk::Gui::DGuiApplicationHelper
+@ingroup dtkgui
+@brief DGuiApplicationHelper类提供了一个gui应用程序的应用帮助类，可提供widget和declarative的
+公共gui功能，例如调色板、字体、主题等功能。
+@details
+
+@enum Dtk::Gui::DGuiApplicationHelper::SizeMode
+@brief 控件大小模式枚举包含 dtk支持的控件大小模式种类.
+| **值**      | **含义**               |
+|:-----------:|:---------------------:|
+| NormalMode   | 普通模式，为默认模式 |
+| CompactMode  | 紧凑模式 |
+
+@fn void DGuiApplicationHelper::newProcessInstance(qint64 pid, const QStringList &arguments)
+@brief 通知新进程的信息。
+@details
+单例程序情况下，尝试启动新的程序实例将触发此信号，以便获取所传入的参数列表等信息，来进行进一步处理。
+
+@param pid 进程 ID.
+@param arguments 启动进程时所传入的参数列表.
+
+@fn DGuiApplicationHelper::SizeMode DGuiApplicationHelper::sizeMode() const
+@brief 当前应用的控件大小模式。
+@details
+- 若应用没有设置控件大小模式，则跟随系统的控件大小模式
+- 用户也可以设置环境变量 D_DTK_SIZEMODE 来影响应用的大小模式的支持，`D_DTK_SIZEMODE=1`为指定为普通模式，
+当应用没有显示设置控件大小模式，则会采用普通模式。
+- 优先级为 `DGuiApplicationHelper::setSizeMode` > `D_DTK_SIZEMODE` > `System's SizeMode`。
+
+@fn void DGuiApplicationHelper::setSizeMode(const DGuiApplicationHelper::SizeMode sizeMode)
+@brief 设置应用控件大小模式，应用使用的为此模式，不再响应系统的控件大小模式。
+@param sizeMode 需要设置的控件大小模式.
+
+@fn void DGuiApplicationHelper::resetSizeMode()
+@brief 重置设置应用控件大小模式，跟随系统的控件大小模式。
+
+@fn static inline bool DGuiApplicationHelper::isCompactMode()
+@brief 当前控件大小模式是否为紧凑模式。
+
+@fn void DGuiApplicationHelper::applicationPaletteChanged()
+@brief 通知调色板对象的改变。
+@sa windowPalette()
+
+@fn void DGuiApplicationHelper::sizeModeChanged(DGuiApplicationHelper::SizeMode sizeMode)
+@brief 通知控件大小模式发生改变。
+
+@fn static QStringList DGuiApplicationHelper::userManualPaths(const QString &appName)
+@brief 获取帮助手册已存在目录
+@param appName 目标应用名称
+@detail 目录深度具体到appName层级，例：一个典型的目录路径为:/usr/share/deepin-manual/manual-assets/application/appName
+*/

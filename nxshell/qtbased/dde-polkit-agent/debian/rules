@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+export QT_SELECT=5
+
+DISTRO = $(shell lsb_release -is)
+ifeq ($(DISTRO),Deepin)
+	USE_DEEPIN_POLKIT=ON
+else
+	USE_DEEPIN_POLKIT=OFF
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DUSE_DEEPIN_POLKIT=$(USE_DEEPIN_POLKIT)

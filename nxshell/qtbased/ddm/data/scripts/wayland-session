@@ -1,0 +1,49 @@
+#!/bin/sh
+# wayland-session - run as user
+# Copyright (C) 2015-2016 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+
+# This file is extracted from kde-workspace (kdm/kfrontend/genkdmconf.c)
+# Copyright (C) 2001-2005 Oswald Buddenhagen <ossi@kde.org>
+
+# Note that the respective logout scripts are not sourced.
+
+# Backup the user shell setting into DDM specific variable
+DDM_USER_SHELL=$SHELL
+
+case $SHELL in
+  */bash)
+    [ -z "$BASH" ] && exec $SHELL --login $0 "$@"
+    shopt -q login_shell || exec $SHELL --login $0 "$@"
+    set +o posix
+    ;;
+  */zsh)
+    [ -z "$ZSH_NAME" ] && exec $SHELL --login $0 "$@"
+    [[ -o login ]] || exec $SHELL --login $0 "$@"
+    emulate -R sh
+    ;;
+  */csh|*/tcsh)
+    # [t]cshrc is always sourced automatically.
+    # Note that sourcing csh.login after .cshrc is non-standard.
+    wlsess_tmp=`mktemp /tmp/wlsess-env-XXXXXX`
+    $SHELL -c "if (-f /etc/csh.login) source /etc/csh.login; if (-f ~/.login) source ~/.login; /bin/sh -c 'export -p' >! $wlsess_tmp"
+    . $wlsess_tmp
+    rm -f $wlsess_tmp
+    ;;
+  */fish)
+    [ -f /etc/profile ] && . /etc/profile
+    [ -f $HOME/.profile ] && . $HOME/.profile
+    xsess_tmp=`mktemp /tmp/xsess-env-XXXXXX`
+    $SHELL --login -c "/bin/sh -c 'export -p' > $xsess_tmp"
+    . $xsess_tmp
+    rm -f $xsess_tmp
+    ;;
+  *) # Plain sh, ksh, and anything we do not know.
+    [ -f /etc/profile ] && . /etc/profile
+    [ -f $HOME/.profile ] && . $HOME/.profile
+    ;;
+esac
+
+# Restore user shell setting that may have been clobbered by setting environment
+export SHELL=$DDM_USER_SHELL
+
+exec $@

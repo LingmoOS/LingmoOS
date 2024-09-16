@@ -1,0 +1,21 @@
+[Unit]
+Description=dde-display service
+
+Requires=dbus.socket
+After=dbus.socket
+
+Requisite=dde-session-pre.target
+PartOf=dde-session-pre.target
+Before=dde-session-pre.target
+
+Before=dde-session@x11.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+ExecCondition=/bin/sh -c 'test "$DISPLAY" != "" || exit 2'
+ExecStart=/usr/bin/startdde
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

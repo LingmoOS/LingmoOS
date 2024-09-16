@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# /etc/X11/Xsession.d/95dbus_update-activation-env
+if [ -n "$DBUS_SESSION_BUS_ADDRESS" ] && \
+       [ -x "/usr/bin/dbus-update-activation-environment" ]; then
+    # subshell so we can unset environment variables
+    (
+        # unset login-session-specifics
+        unset XDG_SEAT
+        unset XDG_SESSION_ID
+        unset XDG_VTNR
+
+        # tell dbus-daemon --session (and systemd --user, if running)
+        # to put the Xsession's environment in activated services'
+        # environments
+        dbus-update-activation-environment --verbose --systemd --all
+    )
+fi
+
+# /etc/X11/Xsession.d/20dbus_xdg-runtime
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] && [ -n "$XDG_RUNTIME_DIR" ] && \
+    [ "$XDG_RUNTIME_DIR" = "/run/user/`id -u`" ] && \
+    [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+  # We are under systemd-logind or something remarkably similar, and
+  # a user-session socket has already been set up.
+  #
+  # Be nice to non-libdbus, non-sd-bus implementations by using
+  # that as the session bus address in the environment. The check for
+  # XDG_RUNTIME_DIR = "/run/user/`id -u`" is because we know that
+  # form of the address, from systemd-logind, doesn't need escaping,
+  # whereas arbitrary addresses might.
+  DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+  export DBUS_SESSION_BUS_ADDRESS
+fi
+if [ -x "/usr/bin/dbus-update-activation-environment" ]; then
+  # tell dbus-daemon --session (and systemd --user, if running)
+  # to put a minimal subset of the Xsession's environment in activated
+  # services' environments
+  dbus-update-activation-environment --verbose --systemd --all
+fi

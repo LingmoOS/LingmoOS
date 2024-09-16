@@ -1,0 +1,61 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+/*!
+@~chinese
+@file dinputdevicemanager.h
+@ingroup inputdevices
+
+dinputdevicemanager.h定义了InputDevices的Manager类.
+
+@class Dtk::Device::DInputDeviceManager dinputdevicemanager.h
+@brief Manager类
+
+DInputDeviceManager提供InputDevices模块的管理功能, 获取设备信息和全局设置.
+
+@fn explicit DInputDeviceManager::DInputDeviceManager(QObject *parent = nullptr)
+@brief 构造函数
+@param[in] parent: 父对象, 可为空, 作用为管理Manager的生命周期
+
+@fn DInputDeviceManager::~DInputDeviceManager() override
+@brief 析构函数
+
+该函数进行默认析构
+
+@fn DInputDeviceInfoList DInputDeviceManager::deviceInfos() const
+@brief 获取所有设备信息
+@return QList<DeviceInfo>, 一个设备信息列表
+
+DInputDeviceManager在创建之后会维护设备信息列表, 该函数可获取所有的设备信息.
+
+@fn void DInputDeviceManager::deviceAdded(const DeviceInfo &device)
+@brief 设备新增信号
+@param[in] device: 新增的设备信息
+
+新设备插入的时候会触发该信号.
+
+@fn void DInputDeviceManager::deviceRemoved(const DeviceInfo &device)
+@brief 设备移除信号
+@param[in] device: 已经移除的设备的信息
+
+设备拔出的时候会触发该信号.
+
+@fn DExpected<DInputDevicePtr> DInputDeviceManager::createDevice(const DeviceInfo &info)
+@brief 创建设备
+@param[in] info: 需要创建的设备的信息, 该信息从Manager这里获取, 遍历deviceInfos的返回值, 或者在监听到设备新增时创建设备.
+@return QSharedPointer<DInputDevice>的DExpected对象, 指针实际指向的是各个设备的实例
+
+@fn DExpected<DInputSettingPtr> DInputDeviceManager::setting()
+@brief 获取全局设置
+@return QSharedPointer<DInputDeviceSetting>的DExpected对象
+
+该函数会在每次调用的时候重新创建一个DInputDeviceSetting的实例, 但是每一个setting同时能够访问到的设置的值是一致的. Manager并不会管理这些setting, 其生命周期由智能指针管理.
+
+
+@property Dtk::Device::DInputDeviceManager::deviceInfos
+@brief 设备信息列表
+
+该信息列表会在manager被创建的时候初始化, manager存在期间将一直维护最新状态
+
+*/

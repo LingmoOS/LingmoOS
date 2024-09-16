@@ -1,0 +1,35 @@
+pkgname=deepin-session-git
+_pkgname=deepin-session-git
+pkgver=1.1.4
+pkgrel=1
+sourcename=dde-session
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='deepin session'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/dde-session"
+license=('GPL3')
+depends=('dtkcore-git' 'libsystemd' 'doxygen' 'glib2'
+         'libxcursor' 'libx11' 'libxfixes'
+         'gsettings-qt' 'libsecret')
+makedepends=('git' 'cmake' 'ninja' 'pkgconf')
+conflicts=('deepin-session')
+provides=('deepin-session')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  cmake -GNinja \
+        -DCMAKE_INSTALL_PREFIX=/usr
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

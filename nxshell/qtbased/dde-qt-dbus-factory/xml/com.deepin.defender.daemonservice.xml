@@ -1,0 +1,75 @@
+<interface name="com.deepin.defender.daemonservice">
+  <property name="Safetygrade" type="i" access="readwrite"></property>
+  <property name="MaturityDay" type="i" access="readwrite"></property>
+  <!-- 当前正在扫描的u盘路径 -->
+  <property name="ScanningUsbPaths" type="as" access="read">
+    <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QStringList"/>
+  </property>
+  <method name="StartApp">
+  </method>
+  <method name="ExitApp">
+  </method>
+  <method name="ExitAllService">
+  </method>
+  <method name="ExitAnalysisService">
+  </method>
+  <method name="ExitAutoStartService">
+  </method>
+  <method name="ExitNetControlService">
+  </method>
+  <method name="ExitTrafficDetailService">
+  </method>
+  <method name="ExitMonitorNetFloService">
+  </method>
+  <method name="notifySendPassword">
+    <arg name="password" type="s" direction="in"></arg>
+    <arg name="result" type="s" direction="out"></arg>
+  </method>
+  <method name="GetPwdLen">
+      <arg name="value" type="i" direction="out"></arg>
+    </method>
+    <method name="GetPwdTypeLen">
+      <arg name="value" type="i" direction="out"></arg>
+    </method>
+    <method name="GetPwdError">
+      <arg name="error" type="s" direction="out"></arg>
+    </method>
+  <method name="SetGesttingMaturityDay">
+    <arg name="value" type="i" direction="in"></arg>
+  </method>
+  <method name="SetGsetting">
+    <arg name="value" type="i" direction="in"></arg>
+  </method>
+  <method name="PasswordUpdate">
+  </method>
+  <method name="JumpScreenSecurity">
+  </method>
+  <method name="JumpUpdatePolicy">
+  </method>
+  <method name="GetSystemUpdate">
+    <arg name="value" type="i" direction="out"></arg>
+  </method>
+
+  <!-- 停止U盘扫描 -->
+  <method name="RequestStopUsbScannig">
+    <arg name="path" type="s" direction="in"></arg>
+  </method>
+  <!-- U盘扫描停止完成信号 -->
+  <signal name="UsbScanningStopped">
+    <arg name="path" type="s"></arg>
+  </signal>
+  <!-- 当前正在扫描的u盘路径列表改变信号 -->
+  <signal name="ScanningUsbPathsChanged">
+    <arg name="paths" type="as"></arg>
+    <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QStringList"/>
+  </signal>
+
+  <signal name="UpdateUI">
+  </signal>
+  <signal name="NotifyHeartbeat">
+  </signal>
+  <signal name="GotoScreenSecurity">
+  </signal>
+  <signal name="GotoUpdatePolicy">
+  </signal>
+</interface>

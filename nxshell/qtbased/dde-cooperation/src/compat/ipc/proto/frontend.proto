@@ -1,0 +1,55 @@
+package ipc
+
+service Frontend {
+    ping, // ping frontend and check proto version
+    cbPeerInfo, // callback a remote information
+    cbConnect, // callback the connect result
+    cbMiscMessage, // any message by json format
+    cbTransStatus, // callback transfer job status: doing, done, breaked
+    cbFsPull, // callback remote FS, FileDirectory
+    cbFsAction, // callback result for remote FS action: create, delete, rename
+    notifyFileStatus, // notify file status
+    applyTransFiles, // callback remote apply or apply a reply
+    notifySendStatus, // notify client send appy trans files status
+    backendServerOnline, // server start ping client, and client is online, notify client ping server
+    shareEvents, // share events
+    cbDisConnect, // disconnect cb
+    searchDeviceRes, // search ip device result
+}
+
+// return {GenericResult}
+object PingFrontParam {
+    string session // session id string
+    string version
+}
+
+object FileEntry {
+    uint32 type
+    string name
+    bool hidden
+    uint64 size
+    uint64 modified_time
+}
+
+object FileDirectory {
+    int32 id
+    string path
+    [FileEntry] entries
+}
+
+object GenericResult {
+    int32 id
+    int32 result
+    string msg
+    bool isself
+}
+
+object FileStatus {
+    int32 job_id
+    int32 file_id
+    string name
+    int32 status
+    int64 total
+    int64 current
+    int64 millisec
+}

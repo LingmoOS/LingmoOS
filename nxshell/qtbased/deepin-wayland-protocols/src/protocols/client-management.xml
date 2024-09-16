@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="com_deepin_client_management">
+  <copyright><![CDATA[
+        Copyright © 2020  wugang <wugang@uniontech.com>
+
+        Permission to use, copy, modify, distribute, and sell this
+        software and its documentation for any purpose is hereby granted
+        without fee, provided that the above copyright notice appear in
+        all copies and that both that copyright notice and this permission
+        notice appear in supporting documentation, and that the name of
+        the copyright holders not be used in advertising or publicity
+        pertaining to distribution of the software without specific,
+        written prior permission.  The copyright holders make no
+        representations about the suitability of this software for any
+        purpose.  It is provided "as is" without express or implied
+        warranty.
+
+        THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+        SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+        WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+        AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+        ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+        THIS SOFTWARE.
+        ]]></copyright>
+
+
+<interface name="com_deepin_client_management" version="1">
+    <description summary="managemant client">
+    This interface enables clients to get properties of all windows shown on screen via the server.
+    The server registers one clientmanagement object as a global object.
+    </description>
+
+    <request name="get_window_states">
+        <description summary="request get the window state of all clients">
+            request window state of all clients, will notify by "windows_state" event.
+        </description>
+    </request>
+
+    <event name="window_states" since="1">
+        <description summary="get special window information for all clients">
+        windows information such as pid/window_id/property
+        </description>
+        <arg name="count" type="uint"/>
+        <arg name="states" type="array" summary="windows information"/>
+    </event>
+
+    <request name="get_window_from_point">
+        <description summary="request window id from point">
+            Request window id at the position where cursor pointed.
+        </description>
+    </request>
+
+    <event name="window_from_point">
+        <description summary="window id from point">
+            Window id at the position where cursor pointed.
+        </description>
+        <arg name="window_id" type="uint" summary="window id"/>
+    </event>
+
+    <request name="show_split_menu">
+        <description summary="show split menu">
+            Show split menu.
+        </description>
+        <arg name="x" type="int" summary="botton x pos"/>
+        <arg name="y" type="int" summary="botton y pos"/>
+        <arg name="width" type="int" summary="botton width"/>
+        <arg name="height" type="int" summary="botton height"/>
+        <arg name="wid" type="uint" summary="window id"/>
+    </request>
+
+    <request name="hide_split_menu">
+        <description summary="hide split menu">
+            Hide split menu.
+        </description>
+        <arg name="delay" type="int" summary="whether to delay hiding"/>
+    </request>
+
+    <request name="get_all_window_id">
+        <description summary="get all window id">
+            Request window id of all clients, will notify by "all_window_id" event.
+        </description>
+    </request>
+
+    <event name="all_window_id">
+        <description summary="all window id">
+            Window id of all clients.
+        </description>
+        <arg name="id_array" type="array" summary="window id array"/>
+    </event>
+
+    <request name="get_specific_window_state">
+        <description summary="Request state of specific window">
+            Request state of specific window.
+        </description>
+        <arg name="window_id" type="uint" summary="specific window id"/>
+    </request>
+
+    <event name="specific_window_state">
+        <description summary="specific window state">
+            Window infomation such as pid/window_id/property.
+        </description>
+        <arg name="pid" type="int" summary="process id"/>
+        <arg name="window_id" type="uint" summary="window id"/>
+        <arg name="resource_name" type="string" summary="resource name"/>
+        <arg name="x" type="int" summary="window position"/>
+        <arg name="y" type="int" summary="window position"/>
+        <arg name="width" type="int" summary="window size"/>
+        <arg name="height" type="int" summary="window size"/>
+        <arg name="is_minimized" type="int" summary="is minimized"/>
+        <arg name="is_fullscreen" type="int" summary="is fullscreen"/>
+        <arg name="is_active" type="int" summary="is_active"/>
+        <arg name="splitable" type="int" summary="splitable"/>
+        <arg name="uuid" type="string" summary="window uuid"/>
+    </event>
+
+</interface>
+</protocol>

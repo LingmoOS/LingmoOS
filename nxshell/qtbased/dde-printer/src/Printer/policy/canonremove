@@ -1,0 +1,20 @@
+#! /bin/bash
+
+#  此脚本用于删除LBP capt系列打印机,脚本自带参数为1个
+#  参数1[打印机名称](删除对应名称的打印机)
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage del printer: $0 printer_name"
+    echo "example:"
+    echo "    $0 LBP2900"
+    exit 0
+fi
+
+ccpdadmin | grep "invalid Spool Name" | awk '{print $3}' | while read -r name; do ccpdadmin -x $name; done
+
+ccpdadmin -x $1
+
+systemctl restart ccpd.service
+systemctl enable ccpd.service
+
+exit 0

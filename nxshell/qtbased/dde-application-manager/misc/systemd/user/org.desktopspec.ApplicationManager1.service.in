@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+[Unit]
+Description=Deepin Application Manager
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+[Service]
+Type=dbus
+BusName=org.desktopspec.ApplicationManager1
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/dde-application-manager
+Environment=QT_LOGGING_RULES="*.debug=false"
+# turn off PrivateUser to prevent AM can't access some directory. eg. "/persistent/linglong"
+PrivateUsers=false
+Slice=session.slice
+Restart=always
+RestartSec=500ms

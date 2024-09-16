@@ -1,0 +1,81 @@
+--> 使用root解压squash文件到指定目录
+--> 拷贝原系统相关配置文件到squash-root目录下（/etc:passwd/resolv.conf/group/shadow/gshadow/fstab/source.list, /var: lib/lightdm）
+--> 拷贝镜像中pool仓库到squash-root目录下
+--> 挂载（/proc、/sys、/dev/pts、/dev）目录到squash-r
+--> chroot到squash-root目录中 -->替换etc和var目录下的部分文件
+--> 使用dpkg 或者apt安装grub、os-prober、xsettingsd、libpci、pciutils、原子更新以及镜像仓库中的一些包
+--> 重命名 /etc /usr /var /boot 目录为.new
+--> 退出chroot使用 cp -rpf 拷贝new目录到系统根目录
+--> 使用rename替换系统目录
+--> 执行grub-install --target=i386-pc /dev/sda 命令安装grub功能模块
+--> 执行update-grub
+--> 使用原子更新做备份
+--> 将目录还原
+--> update-grub
+--> 将系统还原
+--> 重启在Grub选择引导V23系统
+--> 进入回滚流程
+
+// 不能在chroot环境下进行grub-install,grub-install
+// 不能在chroot环境下update-grub 下
+
+
+9-28
+grub-install 只允许在当前根目录下执行。 
+update-grub 尝试在chroot环境下进行
+1.拷贝新镜像根目录到系统根目录
+2.替换当前根目录boot后，执行grub-install
+3.还原boot
+4.回到当前根目录，执行grub-install 和update-grub
+5.chroot后执行update-grub,可以考虑利用原子更新的updategrub
+6.构建目录后提交，退出chroot环境，执行update-grub
+
+** chroot进入挂载根目录，然后进行grub安装和更新，完成后退出chroot再进行grub安装和更新，并且解除mount。
+
+1.准备根目录
+2.挂载必要的目录包括repo目录
+3.chroot到根目录
+4.挂载根分区到指定目录,如果boot分区单独挂载,需要挂载boot分区. 将boot分区文件替换成新系统boot文件,执行update grub.
+5.执行grub-install
+6.准备需要进行提交的目录
+7.必要时需要执行update-initramfs
+8.提交系统当前目录
+9.执行updat-grub
+10.退出chroot, 卸载刚挂载的目录
+11.执行grub-install
+12.执行update-grub
+13.重启进行回滚
+
+# 挂载根之后退出chroot，会使mount失效
+
+10-8
+准备阶段功能模块划分
+
+        #
+            1.镜像解压
+提交前       2.chroot前目录挂载(系统运行目录+repo仓库所在目录+系统根目录)
+            3.本地仓库构建 = 仓库目录拷贝 + /etc目录下构建源
+        #
+
+        #
+            5.chroot到指定目录
+            6.安装指定软件包
+提交         7.安装grub
+            8.判断boot分区是否单独挂载
+            9.boot单独挂载时update-grub
+            10.boot非单独挂载时update-grub
+            11.利用原子更新进行系统提交
+        #
+
+        #
+            12.目录卸载（系统运行目录+repo所在目录+系统根目录+boot目录）
+提交后       13.grub重装
+            14.利用 update-grub 生成快照branch
+        #
+
+
+
+
+
+# 镜像目录存储地址和仓库存储地址的关系
+最简单的办法是使用mv, mv到原来repouuid指定的分区挂载目录下

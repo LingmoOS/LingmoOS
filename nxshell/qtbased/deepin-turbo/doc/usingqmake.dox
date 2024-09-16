@@ -1,0 +1,62 @@
+/*! \page usingqmake  Using qmake
+
+  If you are using qmake, you can make your application boostable by 
+  adding a suitable configuration option.
+
+  For MeeGo Touch applications, install the libmeegotouch-dev package. If you
+  are creating Debian packages, your application must build-depend on
+  libmeegotouch-dev to build correctly. Add the following line to your .pro
+  file (the meegotouch-boostable configuration option includes the meegotouch
+  option so you do not need to specify it explicitly):
+
+\verbatim
+    CONFIG += meegotouch-boostable
+\endverbatim
+
+  For Qt Declarative (QML) applications and plain Qt applications, the configuration 
+  option is provided by the applauncherd-dev package. Note that a build dependency is 
+  required for the correct building of Debian packages. The configuration options are:
+
+\verbatim
+    CONFIG += qdeclarative-boostable
+\endverbatim
+\verbatim
+    CONFIG += qt-boostable
+\endverbatim
+
+  If you want to use pkg-config directly (for instance, to receive the 
+  error messages), you can add explicit pkg-config calls to the appropriate
+  flags. 
+
+  For MeeGo Touch, the flags are:
+
+\verbatim
+    QMAKE_CXXFLAGS += `pkg-config --cflags meegotouch-boostable`
+    QMAKE_LFLAGS += `pkg-config --libs meegotouch-boostable`
+\endverbatim
+
+  For Qt Declarative, the flags are:
+
+\verbatim
+    QMAKE_CXXFLAGS += `pkg-config --cflags qdeclarative-boostable`
+    QMAKE_LFLAGS += `pkg-config --libs qdeclarative-boostable`
+\endverbatim
+
+  For plain Qt, the flags are:
+
+\verbatim
+    QMAKE_CXXFLAGS += `pkg-config --cflags qt-boostable`
+    QMAKE_LFLAGS += `pkg-config --libs qt-boostable`
+\endverbatim
+
+  You can also manually set the options in your .pro file as follows:
+
+\verbatim
+    QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
+    QMAKE_LFLAGS += -pie -rdynamic
+\endverbatim
+
+  Note: You must update the flags manually if there are any
+  changes in the required flags.
+
+*/

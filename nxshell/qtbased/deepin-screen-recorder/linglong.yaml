@@ -1,0 +1,124 @@
+package:
+  id: org.deepin.screen-recorder
+  name: deepin-screen-recorder
+  version: 5.10.14
+  kind: app
+  description: |
+    screen recorder for deepin os.
+
+variables: 
+  extra_args: |
+    VERSION=${VERSION}
+
+runtime:
+  id: org.deepin.Runtime
+  version: 23.0.0
+
+#opencv ffmpeg libxcursor libxfixes libxrandr libxinerama mesa  
+depends:
+  - id: dde-qt-dbus-factory
+    version: 6.0.0.0
+    type: runtime
+  - id: ki18n
+    version: 5.54.0
+  - id: kconfig
+    version: 5.54.0
+  - id: kwindowsystem
+    version: 5.54.0
+  - id: googletest
+    version: 1.8.1
+  - id: libepoxy
+    version: 1.5.3
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: ffmpeg
+    version: 4.1.8
+    type: runtime
+  - id: dde-dock
+    version: 6.0.8.1
+  - id: kwindowsystem
+    version: 5.54.0
+  - id: libxcursor
+    version: 1.1.15
+  - id: icu
+    version: 63.1
+    type: runtime
+  - id: xcb-util
+    version: 0.3.8.1
+    type: runtime
+  - id: opencv
+    version: 3.2.0
+    type: runtime
+  - id: tbb
+    version: 2020.3.0
+    type: runtime
+  - id: qtmpris
+    version: 0.1.0.1
+    type: runtime
+  - id: qtdbusextended
+    version: 0.0.3
+    type: runtime
+  - id: libdc1394
+    version: 2.2.5
+    type: runtime
+  - id: libmysofa
+    version: 0.6
+    type: runtime
+  - id: libvpx
+    version: 1.7.0.1
+    type: runtime
+  - id: aom
+    version: 1.0.0.1
+    type: runtime
+  - id: codec2
+    version: 0.8.1
+    type: runtime
+  - id: x264
+    version: 0.155.2917
+    type: runtime
+  - id: x265
+    version: 2.9
+    type: runtime
+  - id: xavs2
+    version: 1.4.1
+    type: runtime
+  - id: davs2
+    version: 1.7.1
+    type: runtime
+  - id: crystalhd
+    version: 0.0.1
+    type: runtime
+  - id: ffmpegthumbnailer
+    version: 2.1.1
+    type: runtime
+  - id: portaudio19
+    version: 19.6.0
+    type: runtime
+  - id: image-editor
+    version: 1.0.9
+    type: runtime
+  - id: v4l-utils
+    version: 1.20.0
+    type: runtime
+  - id: dwayland
+    version: 5.24.3
+    
+source:
+  kind: local
+  url: "http://gerrit.uniontech.com/deepin-screen-recorder"
+  version: 5.10.14
+  commit:  I9b88b7b9db12854ff01037d13a986b3349e39387
+  patch: patches/fix-linglong.patch
+
+build:
+  kind: manual
+  manual:
+    configure: |
+      mkdir build
+      cd build
+      qmake PREFIX=${PREFIX} \
+            VERSION=5.10.14 \
+            LIB_INSTALL_DIR=${PREFIX}/lib  ${extra_args}  ..
+      make -j
+      make -j install

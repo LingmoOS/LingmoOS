@@ -1,0 +1,572 @@
+
+/**
+@~chinese
+@class SettingsContainer
+@ingroup QtObject
+.settings
+    \keyword DSettingsContainer
+@brief SettingDialog 中存放各个设置项的容器
+
+    SettingContainer 作为 SettingDialog 中放置设置信息的容器，其目的
+    是对配置项的数据展示和数据更新。该控件作为自定义 SettingDialog 的属
+    性存在，一般情况下无需自定义该类型。其内部存在多个用于控制 Config 设置
+    项的相关属性，能够对内部的控件样式进行调整。
+
+
+
+@property Config org.deepin.dtk.settings::SettingsContainer::config
+
+    配置信息实例，该配置信息中的属性会直接更新到 SettingContainer 中进行数据
+    展示。一般情况下，该属性会被赋值为 SettingDialog 中的 \c config 属性。
+
+    \sa SettingDialog Config
+
+
+
+@property list<SettingsGroup> org.deepin.dtk.settings::SettingsContainer::groups
+    \default
+
+    配置项设置组，在 SettingContainer 中，其内部的配置属性有多个不同的设置组组成，而
+    设置组内部又可以存放不同的设置项和设置组，组成了一个设置树。 SettingContainer 中
+    该属性用于存储默认的全局设置组，内部子组和子项会展示在其子类中，其作为根元素进行展示。
+
+
+
+@property Component org.deepin.dtk.settings::SettingsContainer::contentTitle
+
+    设置项的标题组件，即每个设置项中展示在内容区域的标题组件。默认的标题组件为 ContentTitle
+    其会设置项的级别，自动设置字号大小。可根据自定义场景，对该内容进行自定义样式控制。
+
+
+
+@property Component org.deepin.dtk.settings::SettingsContainer::navigationTitle
+
+    导航栏的标题组件，即 SettingDialog 中导航栏的标题组件。 默认的标题栏为 NavigationTitle 组件。
+    具有高亮背景和自动根据滚动区域的位置进行高亮等功能。
+
+
+
+@property Component org.deepin.dtk.settings::SettingsContainer::contentBackground
+
+    SettingDialog 中整体内容的背景组件，默认的背景组件为 ContentBackground 组件，该组件在默认的
+    SettingDialog 中没做背景和颜色的实现，应用可根据场景自行覆盖。需要注意的是，当 \c contentBackground
+    属性设置后，其内部的子 SettingOption 及其父类的所有 SettingOption 或 SettingsGroup 都未指定@brief background 属性时，会自动 fallBack 回该 \c contentBackground 属性。
+
+
+
+@fn void org.deepin.dtk.settings::SettingsContainer::setGroupVisible(string key, bool visible)
+
+    通过 \c key 设置 SettingsGroup 是否可见。 \c key 对应于 SettingsGroup 中的 \c key 属性。@brief visible 参数表示是否可见，true 为可见；false 为不可见。
+
+
+
+@fn bool org.deepin.dtk.settings::SettingsContainer::groupVisible(string key)
+
+    判断 \c key 对应的 SettingsGroup 是否可见.
+    \return 返回 true 表示可见， false 表示不可见。
+
+
+
+@fn void org.deepin.dtk.settings::SettingsContainer::resetSettings()
+
+    重置所有设置项。重置后设置项的值将对应于 Config 中的 \c resetValue 字段。
+
+
+
+/**
+@~chinese
+@class SettingsOption
+@ingroup QtObject
+.settings
+    \keyword DSettingsOption
+@brief SettingDialog 中存放的设置项对象
+
+    SettingDialog 存放每个设置项的对象，其内部有 delegate 属性用于添加设置
+    项的自定义控件。除此之外，其内部存储的 \c key 属性指定该设置项对应于 Config
+    中的属性信息，当配置文件中该 \c key 对应的 value 发生改变时，此设置项中的值
+    会根据配置文件发生改变。
+
+    每个 SettingsGroup 可以存储多个 SettingOption， SettingDialog 中的每个
+    设置项最终由 SettingOption 展示可控制。
+
+    存放在 SettingOption 内部的 Item 可以通过附加属性的方式获取当其最上层的
+    SettingOption 对象，如下代码所示：
+@
+    SettingOption {
+        key: "key1"
+        name: "Name"
+
+        CheckBox {
+            Component.onComplete {
+                console.log(SettingOption.name)
+            }
+        }
+    }
+```
+
+
+
+@property string org.deepin.dtk.settings::SettingsOption::key
+@brief key 将作为设置项的唯一标识，SettingDialog 中 config 对应的配置项的@brief key 应与该值保持一致。绑定后的属性其配置发生变化后， SettingOption 的
+    value 会自动发生变化。
+
+
+
+@property string org.deepin.dtk.settings::SettingsOption::name
+@brief name 为设置项的名称，默认情况下对应于设置项的左侧，用于指示该设置项的作用。
+
+
+
+@property string org.deepin.dtk.settings::SettingsOption::value
+@brief value 为设置项对应的 Config 中的属性值，其与配置文件中的值相对应。当配置文件中@brief key 对应的 \c value 发生变化后，该值会自动跟随发生变化。
+
+
+
+@property Component org.deepin.dtk.settings::SettingsOption::delegate
+    \default
+
+    默认属性， \c delegate 属性用于指定需要显示次配置项的控件。例如 ComboBox、LineEdit、
+    RadioButton等等。
+
+    SettingDialog 提供几种默认的可以根据 SettingOption 的值自动发生变化的控件。如下表
+    所示：
+    \table
+    \header
+        \li 控件名称
+        \li 控件描述
+
+    \row
+        \li \l {CheckBox(Settings)}{CheckBox}
+        \li 类似与 CheckBox 控件，自带名称，其值会根据配置项的值发生自动改变。
+        \li \l {ComboBox(Settings)}{ComboBox}
+        \li 类似与 ComboBox 控件，自带名称，其值会根据配置项的值发生自动改变。
+        \li \l {LineEdit(Settings)}{LineEdit}
+        \li 类似与 LineEdit 控件，自带名称，其值会根据配置项的值发生自动改变。
+    \endtable
+
+
+
+/**
+@~chinese
+@class SettingsGroup
+@ingroup QtObject
+.settings
+    \keyword DSettingsGroup
+@brief SettingDialog 中存放的多个设置项的设置组
+
+    SettingsGroup 用于存放多个 SettingOption 的设置组。每个SettingsGroup
+    都有在 SettingDialog 的导航栏中显示，根据 SettingsGroup 的层级关系，自
+    动为其设置 \c level ，其 \c level 值对应于每个 SettingsGroup 的 \c name
+    字号以及缩进的大小。而这些样式的设置都是在 NavigationTitle 中完成样式的自动
+    调整。当需要进行自定义样式时，可通过调整 NavigationTitle 来达到目标效果。
+
+    SettingsGroup 可自定义背景风格，默认情况下 SettingsGroup 未指定背景，
+    如以下代码：
+@
+    SettingsGroup {
+        key: "group1"
+        name: "group1"
+        visible: true
+        background: ContentBackground {
+            border.color: "red"
+            radius: 8
+        }
+        SettingsOption {
+            key: "key2"
+            name: "ComboBox"
+            ComboBox {
+                model: ["first", "second", "third"]
+            }
+        }
+    }
+```
+
+    SettingsGroup 存在附加属性，可在其子类中使用该附加属性获取到当前
+    的 SettingsGroup 对象，如下代码：
+@
+    SettingsGroup {
+        key: "group"
+        name: "group"
+        visible: true
+        SettingsOption {
+            key: "key1"
+            name: "CheckBox"
+            CheckBox {
+                text: "CheckBox"
+                Component.onComplete: {
+                    console.log(SettingsGroup.name)
+                }
+            }
+        }
+    }
+```
+
+    \sa NavigationTitle SettingsDialog SettingsOption
+
+
+
+@property string org.deepin.dtk.settings::SettingsGroup::key
+@brief key 属性用于标识每个 SettingsGroup，该属性与 SettingOption 中的不同，
+    仅作为控件的标识，可通过 SettingContainer 中的 \l {SettingsContainer::setGroupVisible}{setGroupVisible}
+    函数控制 \c key 对应的 SettingsGroup 是否可见。
+
+
+
+@property string org.deepin.dtk.settings::SettingsGroup::name
+@brief name 属性被充当 SettingDialog 中导航栏标题，以及内容区域用于标识每个
+    group 的标题。其标题字号和缩进根据 SettingsGroup 的层级关系自动调整。
+
+
+
+@property int org.deepin.dtk.settings::SettingsGroup::level
+    \readonly
+@brief level 属性为只读属性，当 SettingsGroup 的层级关系指定完成后，SettingContainer
+    会根据其层级自动指定 \c level 。通常情况下应用无需关心 \c level ， 其值将对
+    SettingsGroup 的标题字号和缩进产生影响。
+
+
+
+@property bool org.deepin.dtk.settings::SettingsGroup::visible
+@brief visible 属性表示 SettingsGroup 是否可见。当 \c visible 指定为 false
+    时，其下的所有子类都会隐藏。也可通过 SettingContainer 中的
+    \l {SettingsContainer::setGroupVisible}{setGroupVisible}
+    接口 通过 \c key 值指定是否可见。
+
+
+
+@property int org.deepin.dtk.settings::SettingsGroup::index
+    \readonly
+@brief index 属性作为 SettingsGroup 添加进 SettingDialog 中导航栏和内容
+    中 ListView 的索引，是一个只读属性。
+
+
+
+@property list<SettingOption> org.deepin.dtk.settings::SettingsGroup::options
+    \default
+@brief options 为默认属性，其用于存储其子类的所有 SettingOption 对象，并作为
+    统一层级进行显示。同一层级下的 SettingOption 将被 SettingsGroup 管理，如@brief level 将和其父类保持一致；当 SettingsGroup 隐藏时，其子类所有 SettingOption
+    将被隐藏。
+
+
+
+@property list<SettingsGroup> org.deepin.dtk.settings::SettingsGroup::children
+@brief children 属性保存 SettingsGroup 中的所有子 SettingsGroup，其子 SettingsGroup
+    的 level 会比当前 SettingsGroup 小一层级。 SettingsGroup 可通过指定 children 的
+    方式嵌套多个 SetingGroup。
+
+
+
+/**
+@~chinese
+@class ContentBackground
+@ingroup Rectangle
+.settings
+@brief SettingDialog 中通用的内容背景框.
+
+    ContentBackground 是 SettingDialog 中提供的专门用于控制 SettingContainer
+    或者 SettingsGroup 背景的控件。在设计中，SettingsGroup 默认未指定背景色，但为了
+    对 SettingDialog 配置项中的设置添加的更加灵活，可通过控制该对象的属性，来控制想
+    要实现的效果。
+
+    例如，自定义 SettingContainer 的背景颜色可通过如下代码：
+@
+    SettingDialog {
+        height: 400
+        width: 680
+        config: settingsConfig  // 特殊的 Config 对象
+
+        container.contentBackground: ContentBackground {
+            color: "red"
+        }
+    }
+```
+
+    自定义 SettingsGroup 的背景可用如下代码：
+@
+    SettingsGroup {
+        key: "group"
+        name: "group"
+        SettingsOption {
+            key: "key1"
+            name: "CheckBox"
+            CheckBox {
+                text: "CheckBox"
+            }
+        }
+
+        background: ContentBackground {
+            border.color: "red"
+            radius: 8
+        }
+    }
+```
+
+    \sa SettingDialog ContentTitle
+
+
+
+/**
+@~chinese
+@class ContentTitle
+@ingroup Label
+.settings
+@brief SettingDialog 中通用的设置项文字控件.
+
+    SettingDialog 被用于指定在 SettingContainer 中的内容标题控件。其会根据 SettingDialog 中
+    SettingsGroup 的层级关系，自动为每个 SettingsGroup 设置字体。默认情况下无需自定义，当存在对
+    字体有特殊需求时，可以通过继承 ContentTitle 类来实现。
+
+    SettingDialog 中控制 ContentTitle 样式可用如下代码：
+@
+    SettingDialog {
+        height: 400
+        width: 680
+        config: settingsConfig  // 特殊的 Config 对象
+
+        container.contentTitle: ContentTitle {
+            color: "blue"
+        }
+    }
+```
+
+
+
+/**
+@~chinese
+@class NavigationTitle
+@ingroup Control
+.settings
+@brief SettingDialog 中导航栏处的标题控件
+
+    NavigationTitle 在 SettingDialog 中被用于展示 SettingsGroup 的 \c name 属性。
+    其会根据 SettingsGroup 的层级关系自动选择合适字号和缩进的文本进行展示。除此之外，它
+    能够根据滚动窗口当前所显示的 SettingsGroup 高亮其对应的标题。除 Control 自带的属性
+    外， NavigationTitle 拓展了几种属性用于默认设置或进行自定义样式。例如可通过如下代码
+    自定义 NavigationTitle.
+
+@
+    import org.deepin.dtk 1.0
+    import org.deepin.dtk.settings 1.0 as Setting
+
+    Setting.SettingDialog {
+        height: 400
+        width: 680
+        config: settingsConfig  // 特殊的 Config 对象
+
+        container.navigationTitle: Setting.NavigationTitle {
+            backgroundColor: Palette {
+                normal: "red"
+            }
+
+            checkedTextColor: Palette {
+                normal: "green"
+            }
+        }
+    }
+```
+
+
+
+@property bool org.deepin.dtk.settings::NavigationTitle::checked
+@brief checked 状态指定 NavigationTitle 是否处于选中状态。一般情况下，其值会根据
+    当前 NavigationTitle 所处的 SettingsGroup 是否为当前可视状态而自动设置。
+    默认情况下，该值为 false.
+
+
+
+@property Palette org.deepin.dtk.settings::NavigationTitle::backgroundColor
+@brief backgroundColor 属性用于指定 NavigationTitle 的背景颜色，其类型为 Palette 类型，可
+    同时指定 light 和 dark 两种类型，以及 normal 和 hover 两种状态。 backgroundColor 颜色
+    仅会在 checked 为 true 是显示。默认情况下无颜色。
+
+
+
+@property Palette org.deepin.dtk.settings::NavigationTitle::checkedTextColor
+@brief checkedTextColor 属性当 NavigationTitle 被选中时，文本的调色板颜色。与 backgroundColor 类似
+    其存在 light 和 dark 两种类型。默认情况下，该颜色为白色。
+
+
+
+@signal void org.deepin.dtk.settings::NavigationTitle::clicked()
+@brief clicked 信号当 NavigationTitle 被点击时发出。
+
+
+
+/**
+@~chinese
+@class CheckBox(Settings)
+@ingroup OptionDelegate
+.settings
+@brief SettingDialog 中自定义实现的 CheckBox 控件
+
+    SettingDialog 中自定义实现的 CheckBox 控件，自带了文本标题区域和 CheckBox 控件区域，是 DTK 专门
+    用于封装给 SettingDialog 使用的控件。其效果如下图所示：
+
+@image html SettingCheckBox.png
+
+    其控件的添加必须在一个 SettingOption 内部，当 leftVisible 设置为 true 时，会将 SettingOption 中的
+    name 字段作为左侧标题描述进行显示。
+
+    其使用如下所示：
+@
+    import org.deepin.dtk as Settings
+
+    Settings.SettingsOption {
+        key: "canExit"
+        name: "CheckBox"
+        Settings.CheckBox {
+            leftVisible: true
+        }
+    }
+```
+
+
+
+/**
+@~chinese
+@class ComboBox(Settings)
+@ingroup OptionDelegate
+.settings
+@brief SettingDialog 中自定义实现的 ComboBox 控件
+
+    SettingDialog 中自定义实现的 ComboBox 控件，其自带左侧标题部分和右侧 ComboBox 控件部分，当开启 leftVisible 属性时，
+    左侧标题部分将显示。当手动切换 ComboBox 中的当前项时，其对应的 SettingOption 的属性值将跟随自动发生变化,不需要应用程序
+    管理这些情况。
+
+    ComboBox 能够接受外部提供的 model 数据，当提供的 model 存在自定义的 roleName 时，可通过定义 valueRole 来达到绑定
+    该 role 的行为。
+
+@image html SettingComboBox.png
+
+    其使用如下所示：
+
+@
+    import org.deepin.dtk as Settings
+
+    Settings.SettingsOption {
+        key: "key2"
+        name: "ComboBox"
+        Settings.ComboBox {
+            model: ["first", "second", "third"]
+        }
+    }
+```
+
+
+
+@property ComboBox org.deepin.dtk.settings::ComboBox(Settings)::impl
+@brief impl 属性为 \l {ComboBox(Settings)}{ComoBox} 控件真实的内部 ComboBox. 当需要手动设置 Combox 的属性时，\c impl
+    能够很好的解决该问题。
+
+
+
+@property string org.deepin.dtk.settings::ComboBox(Settings)::valueRole
+@brief valueRole 属性表示 \l {ComboBox(Settings)}{ComoBox} 中 model 的特殊 RoleName。 当 model 设置了特殊
+    的 RoleName 后（例如 model 是 ListModel 时），可通过该属性获取到绑定在该 RoleName 中的自定义属性，同样也能
+    跟随 SettingOption 的值自动发生变化。
+
+
+
+@property Model org.deepin.dtk.settings::ComboBox(Settings)::model
+@brief model 属性为 ComboBox 中对应的 model, 可通过该属性设置 impl 中的数据模型。
+
+
+
+/**
+@~chinese
+@class LineEdit(Settings)
+@ingroup OptionDelegate
+.settings
+@brief SettingDialog 中自定义实现的 LineEdit 控件
+
+    SettingDialog 中自定义实现的 LineEdit 控件，左侧自带标题部分，右侧 LineEdit 部分，可通过设置 leftVisible
+    属性来控制左侧标题区域的显示和隐藏。当 LineEdit 完成输入后（按回车键或离开焦点），其绑定的 SettingOption 的属性
+    将自动跟随 LineEdit 中的值发生自动变化。
+
+@image html SettingLineEdit.png
+
+    其使用如下所示：
+
+@
+    import org.deepin.dtk as Settings
+
+    Settings.SettingsOption {
+        key: "key3"
+        name: "LineEdit"
+        Settings.LineEdit {
+            text: "test"
+        }
+    }
+```
+
+
+
+/**
+@~chinese
+@class OptionDelegate
+@ingroup RowLayout
+.settings
+@brief SettingDialog 中用于添加自定义控件的委托控件
+
+    OptionDelegate 是用于包装自定义应用到 SettingDialog 中的委托控件。其包含两个部分，左侧标题部分和右侧控件
+    内容部分。标题部分会自动选择 SettingOption 中的 name 进行填充，其 leftVisible 属性控制标题部分是否显示。
+    右侧控件为自定义添加到 SettingDialog 中的控件，该控件的键值的响应需要自己实现，OptionDelegate 无法感知。
+
+    例如实现一个自定义的按钮:
+@
+    Settings.SettingsOption {
+        key: "Key2"
+        Settings.OptionDelegate {
+            leftVisible: false
+            Button {
+                Layout.fillWidth: true
+                text: "Custom Button"
+            }
+        }
+    }
+```
+
+    实现一个文本和 Switch 控件的组合控件:
+@
+    Settings.SettingsOption {
+        key: "Key3"
+        Settings.OptionDelegate {
+            leftVisible: false
+            Label {
+                text: "Switch Button"
+                horizontalAlignment: Qt.AlignLeft
+                Layout.fillWidth: true
+            }
+
+            Switch {
+
+            }
+        }
+    }
+```
+
+    实现一个带“加减”符号的输入框控件:
+@
+    Settings.SettingsOption {
+        key: "Key6"
+        name: "Font Size"
+        Settings.OptionDelegate {
+            PlusMinusSpinBox {
+                spinBox.value: 12
+                Layout.alignment: Qt.AlignRight
+                Layout.preferredWidth: 200
+            }
+        }
+    }
+```
+
+    预览效果如下图所示：
+@image html SettingOptionCustionWidget.png
+
+
+
+@property bool org.deepin.dtk.settings::OptionDelegate::leftVisible
+@brief leftVisible 属性用于表示左侧标题区域是否可见，当 \c leftVisible 为 false 时，表示仅显示右侧控件；当 \c leftVisible 为 true
+    时，标题区域和控件区域的间距为 20 px。
+
+

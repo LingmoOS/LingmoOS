@@ -1,0 +1,36 @@
+[Unit]
+Description=Authority
+
+[Service]
+Type=dbus
+User=deepin-daemon
+BusName=org.deepin.dde.Authority1
+ExecStart=/usr/lib/deepin-daemon/dde-authority
+StandardOutput=null
+StandardError=journal
+
+ProtectSystem=strict
+# pam 校验密码需要访问
+#InaccessiblePaths=/etc/shadow
+InaccessiblePaths=-/etc/NetworkManager/system-connections
+# pam认证需要该配置
+#InaccessiblePaths=-/etc/pam.d
+InaccessiblePaths=-/usr/share/uadp/
+
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateMounts=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+# 需要读取/proc的exe字段数据
+#PrivateUsers=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+# 和golang -pie参数冲突，导致进程无法启动
+#MemoryDenyWriteExecute=yes

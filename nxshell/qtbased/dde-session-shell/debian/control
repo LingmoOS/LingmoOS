@@ -1,0 +1,71 @@
+Source: dde-session-shell
+Section: devel
+Priority: optional
+Maintainer: Deepin Sysdev <sysdev@deepin.com>
+Build-Depends: debhelper-compat (=12), pkg-config,
+ cmake,
+ qtbase5-dev,
+ liblightdm-qt5-3-dev | liblightdm-qt-dev,
+ libxcb-ewmh-dev,
+ libqt5x11extras5-dev,
+ libgsettings-qt-dev,
+ libqt5svg5-dev,
+ libglib2.0-dev,
+ libdtkwidget-dev,
+ libdtkcore5-bin,
+ qtdeclarative5-dev,
+ qttools5-dev-tools,
+ libpam0g-dev,
+ libsystemd-dev,
+ deepin-gettext-tools,
+ libxtst-dev,
+ libxcursor-dev,
+ libxrandr-dev,
+ libdtkcore5-bin,
+ libgtest-dev,
+ libx11-xcb-dev,
+ libssl-dev,
+ libdtkcore-dev,
+ libdeepin-pw-check-dev,
+ libxcb-util0-dev|libxcb-util1-dev
+Standards-Version: 3.9.4
+Homepage: http://www.deepin.org/
+
+Package: dde-session-shell
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${dist:Depends},
+ deepin-desktop-schemas (>=5.9.14),
+ dde-daemon (>=5.13.12),
+ startdde (>=5.8.9),
+ x11-xserver-utils,
+ deepin-authenticate(>=1.2.27),
+ libssl3,
+ libxcb-util0|libxcb-util1,
+ xsettingsd,
+ onboard
+Provides: lightdm-greeter
+Recommends: dss-network-plugin,
+ dde-network-dialog
+Conflicts: dde-workspace,
+ deepin-notifications,
+ dde-session-ui (<< 5.0.0),
+ dde-preload
+Replaces: deepin-notifications
+Breaks: dde-workspace
+Description: deepin desktop-environment - dde-session-shell module
+ Deepin desktop environment 2015 - dde-session-shell module.
+ lightdm-deepin-greeter - login，the entry to the desktop
+ dde-lock - lock screen, to protect privacy
+ deepin-greeter - actual call the lightdm-deepin-greeter
+
+Package: dde-session-shell-dev
+Architecture: any
+Depends: dde-session-shell (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: deepin desktop-environment - dde-session-shell module development files
+ DDE Session Shell module development files of deepin desktop-environment
+
+Package: deepin-greeter-wayland
+Architecture: any
+Depends: dde-session-shell (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}, dde-wayland-config
+Description: deepin desktop-environment - dde-session-shell module config files
+ DDE Session Shell module configuration package adapted to the wayland environment for lightdm-deepin-greeter

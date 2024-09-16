@@ -1,0 +1,129 @@
+/*!
+@~chinese
+@ingroup dtkio
+@file dfileoperator.h
+
+@namespace Dtk::IO::DFileOperator
+
+@class Dtk::IO::DFileOperator dfileoperator.h
+@brief 用来对文件进行操作的类，封装了一系列文件有关的操作
+
+@fn DFileOperator::DFileOperator(const QUrl &url)
+@brief 构造函数, 通过 url 构造一个新的 DFileOperator 对象
+@param[in] url 文件url
+
+@fn DExpected<QUrl> DFileOperator::url() const
+@brief 获取当前文件的url
+@return 当前文件的url字符
+
+@fn DExpected<bool> DFileOperator::renameFile(const QString &newName)
+@brief 重命名文件
+@param[in] newName 文件的新名称
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::copyFile(const QUrl &destUrl, CopyFlag flag)
+@brief 拷贝文件
+@param[in] destUrl 拷贝文件的目标路径
+@param[in] flag 拷贝文件的标志
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::moveFile(const QUrl &destUrl, CopyFlag flag)
+@brief 移动文件
+@param[in] destUrl 移动文件的目标路径
+@param[in] flag 拷贝文件的标志
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::trashFile()
+@brief 删除文件到回收站
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::deleteFile()
+@brief 彻底删除文件
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::touchFile()
+@brief 新建文件
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::makeDirectory()
+@brief 新建目录
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::createLink(const QUrl &link)
+@brief 为文件创建一个链接
+@param[in] link 链接文件的url
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::restoreFile()
+@brief 恢复文件
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFileOperator::createLink(const QUrl &link)
+@brief 为文件创建一个链接
+@param[in] link 链接文件的url
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DError DFileOperator::lastError() const
+@brief 获取当前文件操作的错误码
+@return 当前文件操作的错误码
+
+@fn DFileFuture *DFileOperator::renameFileAsync(const QString &newName, int ioPriority, QObject *parent)
+@brief 以异步的方式重命名文件
+@param[in] newName 文件的新名称
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::copyFileAsync(const QUrl &destUrl, CopyFlag flag, int ioPriority, QObject *parent)
+@brief 以异步的方式拷贝文件
+@param[in] destUrl 拷贝文件的目标路径
+@param[in] flag 复制文件操作的选项
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::moveFileAsync(const QUrl &destUrl, CopyFlag flag, int ioPriority, QObject *parent)
+@brief 以异步的方式移动文件
+@param[in] destUrl 移动文件的目标路径
+@param[in] flag 移动文件操作的选项
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::trashFileAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式删除文件到回收站
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::deleteFileAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式彻底删除文件
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::restoreFileAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式恢复文件
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::touchFileAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式新建文件
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::makeDirectoryAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式新建目录
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileOperator::createLinkAsync(const QUrl &link, int ioPriority, QObject *parent)
+@brief 以异步的方式为文件创建链接
+@param[in] link 链接文件的url
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+*/

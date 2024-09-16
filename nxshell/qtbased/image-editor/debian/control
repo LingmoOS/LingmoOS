@@ -1,0 +1,68 @@
+Source: image-editor
+Section: utils
+Priority: optional
+Maintainer: Deepin Packages Builder <packages@deepin.com>
+Build-Depends: 
+ debhelper (>= 11), 
+ cmake, 
+ qtbase5-dev, 
+ pkg-config,
+ libexif-dev, 
+ libqt5svg5-dev, 
+ libqt5x11extras5-dev, 
+ libsqlite3-dev, 
+ qttools5-dev-tools,
+ qttools5-dev, 
+ libxcb-util0-dev, 
+ libstartup-notification0-dev,
+ libraw-dev,
+ libfreeimage-dev, 
+ libqt5opengl5-dev, 
+ qtbase5-private-dev,
+ qtmultimedia5-dev, 
+ x11proto-xext-dev, 
+ libmtdev-dev, 
+ libegl1-mesa-dev,
+ libudev-dev, 
+ libfontconfig1-dev, 
+ libfreetype6-dev, 
+ libxrender-dev, 
+ libdtkwidget-dev, 
+ libdtkwidget5-bin,
+ libdtkcore5-bin,
+ libgio-qt-dev,
+ libudisks2-qt5-dev,
+# Disable opencv, not used now.
+# libopencv-dev, 
+ libmediainfo-dev,
+ libffmpegthumbnailer-dev,
+ libtiff-dev,
+# Enable use dfm io to copy MTP mount file, Use `|`(or) relationship to 
+# compatible different environments, qttools5-private-dev will not be used.
+# WARNING: control file changes may cause qttools5-private-dev to be installed
+# instead of libdfm-io-dev.
+ libdfm-io-dev | qttools5-private-dev
+Standards-Version: 3.9.8
+Homepage: http://www.deepin.org
+
+Package: libimageeditor
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts:
+ libimage-viewer
+Replaces:
+ libimage-viewer
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr, ffmpegthumbnailer, ffmpeg
+Description: Image Viewer library.
+ Deepin Image Viewer library.
+
+Package: libimageeditor-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libimageeditor(=${binary:Version})
+Conflicts:
+ libimage-viewer-dev
+Replaces:
+ libimage-viewer-dev
+Recommends: libqt5libqgtk2, kimageformat-plugins, deepin-ocr
+Description: Image Viewer library development headers.
+ Deepin Image Viewer library development headers.

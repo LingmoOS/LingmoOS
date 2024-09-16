@@ -1,0 +1,105 @@
+package ipc
+
+service Backend {
+    ping, // ping backend and check proto version
+    getDiscovery, // return { PeerList } in comstruct
+    getPeerInfo, // get a remote information
+    getPassword, // return { "password" : "xx"}
+    setPassword, // { "password" : "xx"}
+    tryConnect,
+    setAppConfig, // ConfigParam
+    getAppConfig,
+    miscMessage, // any message by json format
+    tryTransFiles, // return a job id
+    resumeTransJob,
+    cancelTransJob,
+    fsCreate, // create file or directory
+    fsDelete, // delete files
+    fsRename, // rename file or directory
+    fsPull, // pull remote file or directory
+    registerDiscovery, // register own node json into discovery service
+    unregisterDiscovery, // unregister from discovery service
+    applyTransFiles, // apply trans files to target remote server
+    shareEvents, // share mouse and other evets
+    disconnectCb, // disconnect cb
+    searchDevice, // search target ip device
+    currentStatus, // current server status
+}
+
+// return {CallResult} msg is session id string
+object PingBackParam {
+    string who
+    string version
+    int32 cb_port  // the port listen on frontend side
+}
+
+object CallResult {
+    bool result
+    string msg
+}
+
+object ConnectParam {
+    string targetAppname
+    string appName
+    string host
+    string password
+}
+
+object PeerParam {
+    string session
+    string host
+}
+
+object ConfigParam {
+    string app
+    ao [{        // array of config values
+        string key
+        string value
+    }]
+}
+
+// send or receive files, return a job which have added
+object TransFilesParam {
+    string session
+    string targetSession
+    int32 id
+    [string] paths // arrary path of files will be transfer
+    bool sub // whether include the all files in sub if it's dir
+    string savedir // the file storage path, default config_save_dir
+}
+
+// resume or cancel a trans job
+object TransJobParam {
+    string session
+    int32 job_id
+    string appname
+}
+
+object FsCreateParam {
+    string session
+    int32 id
+    string path
+    bool is_dir
+}
+
+object FsRenameParam {
+    string session
+    string from
+    string to
+}
+
+object FsDeleteParam {
+    string session
+    int32 id
+    [string] paths // arrary path of files
+    bool recursive
+    bool trash
+}
+
+object FsPullParam {
+    string session
+    int32 id
+    string path
+    bool include_hidden
+    bool recursive
+}

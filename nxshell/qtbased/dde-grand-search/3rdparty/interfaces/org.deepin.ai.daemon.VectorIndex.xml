@@ -1,0 +1,45 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.deepin.ai.daemon.VectorIndex">
+    <signal name="IndexStatus">
+      <arg name="appID" type="s" direction="out"/>
+      <arg name="files" type="as" direction="out"/>
+      <arg name="status" type="i" direction="out"/>      
+    </signal>
+    <signal name="IndexDeleted">
+      <arg name="appID" type="s" direction="out"/>
+      <arg name="files" type="as" direction="out"/>
+    </signal>
+    <method name="Create">
+      <arg type="b" direction="out"/>
+      <arg name="appID" type="s" direction="in"/>
+      <arg name="files" type="as" direction="in"/>      
+    </method>
+    <method name="Delete">
+      <arg type="b" direction="out"/>
+      <arg name="appID" type="s" direction="in"/>
+      <arg name="files" type="as" direction="in"/>      
+    </method>
+    <method name="Search">
+      <arg type="s" direction="out"/>
+      <arg name="appID" type="s" direction="in"/>
+      <arg name="query" type="s" direction="in"/>      
+      <arg name="topK" type="i" direction="in"/>
+    </method>
+    <method name="DocFiles">
+      <arg name="appID" type="s" direction="in"/>
+      <arg type="as" direction="out"/>     
+    </method>
+    <method name="Enable">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="setAutoIndex">
+      <arg name="appID" type="s" direction="in"/>
+      <arg name="on" type="b" direction="in"/>
+    </method>
+    <method name="getAutoIndexStatus">
+      <arg name="appID" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

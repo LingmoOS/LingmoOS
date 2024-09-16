@@ -1,0 +1,153 @@
+/**
+
+@page bugs Known Issues and Bugs
+
+@tableofcontents
+
+This section lists known issues and bugs and gives some information on
+how to submit bug reports.
+
+@section bugs_unreadable Content is Unreadable. Open and Repair
+
+Very occasionally you may encounter a bug which generates an Excel
+warning when opening an `libxlsxwriter` file like:
+
+> Excel could not open file.xlsx because some content is unreadable. Do
+> you want to open and repair this workbook.
+
+This ominous sounding message is Excel's standard warning for any validation
+error in the XML used for the components of the XLSX file.
+
+If you encounter an issue like this you should open an issue on GitHub with a
+program to replicate the issue (see below).
+
+@section bugs_formula_name Formulas displayed as 'NAME?' until edited
+
+Excel 2010 and 2013 added functions which weren't defined in the original file
+specification. These functions are referred to as *future* functions. Examples
+of these functions are `ACOT`, `CHISQ.DIST.RT` , `CONFIDENCE.NORM`, `STDEV.P`,
+`STDEV.S` and `WORKDAY.INTL`. The full list is given in the
+[MS XLSX extensions documentation on future functions]
+(http://msdn.microsoft.com/en-us/library/dd907480%28v=office.12%29.aspx).
+
+When written using `write_formula()` these functions need to be fully
+qualified with the `_xlfn.` prefix as they are shown in the MS XLSX
+documentation link above. For example:
+
+@code
+    worksheet_write_formula(worksheet, 0, 0,"=_xlfn.STDEV.S(B1:B10)", NULL);
+@endcode
+
+See also @ref working_with_formulas.
+
+@section bugs_formula_zero Formula results displaying as zero in non-Excel applications
+
+Due to wide range of possible formulas and inter-dependencies between them,
+`xlsxwriter` doesn't, and realistically cannot, calculate the result of a
+formula when it is written to an XLSX file. Instead, it stores the value 0 as
+the formula result. It then sets a global flag in the XLSX file to say that
+all formulas and functions should be recalculated when the file is opened.
+
+This is the method recommended in the Excel documentation and in general it
+works fine with spreadsheet applications. However, applications that don't
+have a facility to calculate formulas, such as Excel Viewer, or several mobile
+applications, will only display the 0 results.
+
+If required, it is also possible to specify the calculated result of the
+formula using the `worksheet_write_formula_num()` function.
+
+See also @ref working_with_formulas.
+
+@section bugs_images Images not displayed correctly in Excel 2001 for Mac and non-Excel applications
+
+Images inserted into worksheets via `worksheet_insert_image()` may not display
+correctly in Excel 2011 for Mac and non-Excel applications such as OpenOffice
+and LibreOffice. Specifically the images may looked stretched or squashed.
+
+This is not an XlsxWriter issue. It also occurs with files created in Excel
+2007 and Excel 2010.
+
+
+@section bugs_reporting Reporting Bugs
+
+Here are some tips on reporting bugs in `libxlsxwriter`.
+
+@subsection bugs_upgrade Upgrade to the latest version of the library
+
+The bug you are reporting may already be fixed in the latest version of
+the module.
+
+Check the @ref changes section to see what has changed in the latest
+versions.
+
+You can check which version of `libxlsxwriter` that you are using by compiling
+and running the following program:
+
+@code
+#include <stdio.h>
+#include "xlsxwriter.h"
+
+int main() {
+
+    printf("Libxlsxwriter version = %s\n", lxw_version());
+
+    return 0;
+}
+@endcode
+
+
+@subsection bugs_docs Read the documentation
+
+Read or search the `libxlsxwriter` documentation to see if the issue you are
+encountering is already explained.
+
+
+@subsection bugs_examples Look at the example programs
+
+There are many @ref examples in the distribution. Try to identify an example
+program that corresponds to your query and adapt it to use as a bug report.
+
+@subsection bugs_issues Use the xlsxwriter Issue tracker
+
+The [libxlsxwriter issue tracker]
+(https://github.com/jmcnamara/libxlsxwriter/issues) is on GitHub.
+
+
+@subsection bugs_tips Tips for submitting a bug report
+
+1.  Describe the problem as clearly and as concisely as possible.
+2.  Include a sample program. This is probably the most important step.
+    It is generally easier to describe a problem in code than in written
+    prose.
+3.  The sample program should be as small as possible to demonstrate the
+    problem. Don't copy and paste large non-relevant sections of your
+    program.
+
+A sample bug report is shown below. This format helps analyze and respond to
+the bug report more quickly.
+
+    Issue with SOMETHING
+
+    I am using libxlsxwriter to do SOMETHING but it appears to do SOMETHING ELSE.
+
+    I am using CC version X.Y.Z, OS = uname and libxlsxwriter x.y.z.
+
+    Here is some code that demonstrates the problem:
+
+    #include "xlsxwriter.h"
+
+    int main() {
+
+        lxw_workbook  *workbook  = workbook_new("bug_report.xlsx");
+        lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+
+        worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+        worksheet_write_number(worksheet, 1, 0, 123, NULL);
+
+        return workbook_close(workbook);
+    }
+
+
+Next: @ref author "The library author"
+
+*/

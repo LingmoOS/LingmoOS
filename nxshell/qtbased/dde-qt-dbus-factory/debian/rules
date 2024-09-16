@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE=1
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+
+include /usr/share/dpkg/default.mk
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+export QT_SELECT = qt5
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+VERSION = $(DEB_VERSION_UPSTREAM)
+_PACK_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$1}')
+_BUILD_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$2}' | sed 's/[^0-9]//g')
+
+ifeq ($(_BUILD_VER),)
+	CONFIG_VERSION = $(_PACK_VER)
+else
+	CONFIG_VERSION = $(_PACK_VER).$(_BUILD_VER)
+endif
+
+%:
+	dh $@ --with pkgkde_symbolshelper --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- LIB_INSTALL_DIR=/usr/lib/$(DEB_HOST_MULTIARCH) VERSION=$(CONFIG_VERSION)
+
+override_dh_missing:
+	dh_missing --fail-missing
+
+override_dh_installchangelogs:
+	dh_installchangelogs -k CHANGELOG.md
+
+override_dh_makeshlibs:
+	dh_makeshlibs -V "libdframeworkdbus2 (>= $(shell echo $(VERSION) | cut -d '.' -f 1,2,3))"

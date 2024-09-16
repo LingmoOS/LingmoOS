@@ -1,0 +1,90 @@
+#define MyAppName "Barrier"
+#define MyAppVersion "@BARRIER_VERSION_MAJOR@.@BARRIER_VERSION_MINOR@.@BARRIER_VERSION_PATCH@.@BARRIER_BUILD_NUMBER@"
+#define MyAppTextVersion "@BARRIER_VERSION@"
+#define MyAppPublisher "Debauchee Open Source Group"
+#define MyAppURL "https://github.com/debauchee/barrier/wiki"
+#define MyAppCopyright "Copyright (C) 2018 Debauchee Open Source Group"
+#define MyAppExeName "barrier.exe"
+#define MyAppServiceName "Barrier"
+#define MyAppServiceExe "barrierd.exe"
+#define MyAppServiceDesc "Manages the Barrier background processes."
+#define MyAppListenerDesc "Barrier Listener"
+
+[Setup]
+AppId={{41036EA6-3F7A-4803-8AE0-469E5E91EFCC}
+AppName={#MyAppName}
+AppVersion={#MyAppTextVersion}
+AppVerName={#MyAppName} {#MyAppTextVersion}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+DefaultDirName={pf}\{#MyAppName}
+DisableProgramGroupPage=yes
+LicenseFile=@CMAKE_CURRENT_SOURCE_DIR@/res/License.rtf
+OutputDir=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/../installer-inno/bin
+OutputBaseFilename=BarrierSetup-{#MyAppTextVersion}
+SetupIconFile=@CMAKE_CURRENT_SOURCE_DIR@/res/barrier.ico
+VersionInfoProductTextVersion={#MyAppTextVersion}
+VersionInfoProductVersion={#MyAppVersion}
+VersionInfoTextVersion={#MyAppTextVersion}
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCopyright={#MyAppCopyright}
+
+Compression=lzma
+SolidCompression=yes
+ArchitecturesInstallIn64BitMode=x64 ia64
+UninstallDisplayIcon={app}\{#MyAppExeName}
+
+#include "scripts\lang\english.iss"
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+
+[Files]
+Source: "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@/Release/*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+
+[Icons]
+Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Run]
+; there's no "check if exists" or "insert if not exists" for netsh's firewall commands
+; to avoid duplicate entries remove the existing rule (fails if it doesn't exist) before adding
+Filename: {sys}\netsh.exe; Parameters: "advfirewall firewall delete rule name=""{#MyAppListenerDesc}"""; Flags: runhidden
+Filename: {sys}\netsh.exe; Parameters: "advfirewall firewall add rule name=""{#MyAppListenerDesc}"" protocol=TCP dir=in localport=24802 action=allow"; Flags: runhidden
+Filename: {sys}\sc.exe; Parameters: "create {#MyAppServiceName} start= auto binPath= ""\""{app}\{#MyAppServiceExe}\"""""; Flags: runhidden
+Filename: {sys}\sc.exe; Parameters: "description {#MyAppServiceName} ""{#MyAppServiceDesc}"""; Flags: runhidden
+Filename: {sys}\sc.exe; Parameters: "start {#MyAppServiceName}"; Flags: runhidden
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{commonappdata}\Barrier"
+
+[UninstallRun]
+Filename: {sys}\taskkill; Parameters: "/im {#MyAppExeName} /f /t"; Flags: runhidden
+Filename: {sys}\net.exe; Parameters: "stop {#MyAppServiceName}"; Flags: runhidden
+Filename: {sys}\sc.exe; Parameters: "delete {#MyAppServiceName}"; Flags: runhidden
+Filename: {sys}\netsh.exe; Parameters: "advfirewall firewall delete rule name=""{#MyAppListenerDesc}"""; Flags: runhidden
+
+[CustomMessages]
+DependenciesDir="redist"
+
+; shared code for installing the products
+#include "scripts\products.iss"
+#include "scripts\products\stringversion.iss"
+#include "scripts\products\winversion.iss"
+#include "scripts\products\msiproduct.iss"
+#include "scripts\products\vcredist2017.iss"
+
+[Code]
+function InitializeSetup(): boolean;
+begin
+	// initialize windows version
+	initwinversion();
+
+	vcredist2017('14'); // min allowed version is 14.0
+
+	Result := true;
+end;

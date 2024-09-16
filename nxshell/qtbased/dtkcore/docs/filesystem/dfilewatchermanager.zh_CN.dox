@@ -1,0 +1,92 @@
+/*!
+@~chinese
+@ingroup dfilesystem
+@file include/filesystem/dfilewatchermanager.h
+
+@class DFileWatcherManager
+@brief DFileWatcherManager 类可以帮助管理一系列 DFileWatcher 文件监视器，并在文件变动时发送信号通知.
+@details
+示例代码:
+```cpp
+
+#include "dfilewatchermanager"
+#include <QCoreApplication>
+#include <QTemporaryFile>
+#include <QDebug>
+#include <QTimer>
+DCORE_USE_NAMESPACE
+
+int main(int argc, char **argv)
+{
+    QCoreApplication app(argc, argv);
+    DFileWatcherManager manager;
+    QTemporaryFile tmpfile1; // 创建临时文件1
+    tmpfile1.open();
+    QFile file1( tmpfile1.fileName());
+    QTemporaryFile tmpfile2; // 创建临时文件2
+    tmpfile2.open();
+    QFile file2( tmpfile2.fileName());
+
+    manager.add(tmpfile1.fileName());// 监控临时文件1
+    manager.add(tmpfile2.fileName());// 监控临时文件2
+
+    QObject::connect(&manager, &Dtk::Core::DFileWatcherManager::fileModified, &app, [=](const QString value) {
+        qDebug() << "文件发生变动:" << value;
+    }); // 文件发生变动时打印文件路径
+
+    QObject::connect(&manager, &Dtk::Core::DFileWatcherManager::fileDeleted, &app, [=](const QString value) {
+        qDebug() << "文件被删除:" << value;
+    });
+
+
+    file1.open(QIODevice::WriteOnly|QIODevice::Text);// 修改临时文件1
+    file1.write("test");
+    file1.close();
+
+    file2.open(QIODevice::WriteOnly|QIODevice::Text);// 修改临时文件2
+    file2.write("test");
+    file2.close();
+
+    qDebug() << manager.watchedFiles();// 打印所有被监控的文件路径
+    qDebug() << "---------------------------";
+    app.processEvents();// 处理事件
+    manager.removeAll();// 移除所有的监控
+    qDebug() << manager.watchedFiles();// 打印所有被监控的文件路径
+    return app.exec();
+}
+```
+上面代码演示了如何使用 DFileWatcherManager 类来监控文件变动和清除文件变动的监控.
+具体可以参照源码中的example文件夹中的文件变动监控例子.
+
+@fn DFileWatcher* DFileWatcherManager::add(const QString &filePath)
+@brief 为路径`filePath`创建 DFileWatcher 并将其添加到 DFileWatcherManager 中.
+@return 被创建并添加到 DFileWatcherManager 的 DFileWatcher
+
+@fn void DFileWatcherManager::remove(const QString &filePath)
+@brief 从 DFileWatcherManager 中移除路径`filePath`对应的 DFileWatcher.
+
+@fn void DFileWatcherManager::removeAll()
+@brief 从 DFileWatcherManager 中移除所有的 DFileWatcher.
+
+@fn void DFileWatcherManager::watchedFiles()
+@brief 获取 DFileWatcherManager 中所有的 DFileWatcher.
+
+@var void DFileWatcherManager::fileDeleted(const QString &filePath)
+@brief 当路径`filePath`对应的文件被删除时发送此信号.
+
+@var void DFileWatcherManager::fileAttributeChanged(const QString &filePath)
+@brief 当路径`filePath`对应的文件属性发生变化时发送此信号.
+
+@var void DFileWatcherManager::fileMoved(const QString &fromFilePath, const QString &toFilePath)
+@brief 当路径`fromFilePath`对应的文件被移动到路径`toFilePath`时发送此信号.
+
+@var void DFileWatcherManager::fileClosed(const QString &filePath)
+@brief 当路径`filePath`对应的文件被关闭时发送此信号.
+
+@var void DFileWatcherManager::fileModified(const QString &filePath)
+@brief 当路径`filePath`对应的文件被修改时发送此信号.
+
+@var void DFileWatcherManager::subfileCreated(const QString &filePath)
+@brief 当路径`filePath`对应的文件夹中有新的子文件被创建时发送此信号.
+
+*/

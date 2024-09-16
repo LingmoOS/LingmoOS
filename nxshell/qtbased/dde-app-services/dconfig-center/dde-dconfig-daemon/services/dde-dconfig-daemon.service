@@ -1,0 +1,41 @@
+[Unit]
+Description=dde-dconfig-daemon service
+
+# Ask for the dbus socket.
+Wants=dbus.socket
+After=dbus.socket
+
+[Service]
+Type=dbus
+User=dde-dconfig-daemon
+BusName=org.desktopspec.ConfigManager
+ExecStart=/usr/bin/dde-dconfig-daemon
+Environment=DSG_DATA_DIRS=/usr/share/dsg:/persistent/linglong/entries/share/dsg
+
+ReadOnlyPaths=/usr/share/dsg -/persistent/linglong/entries/share/dsg
+
+StateDirectory=dde-dconfig-daemon
+StateDirectoryMode=0700
+
+DevicePolicy=closed
+
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+#PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+RemoveIPC=yes
+
+[Install]
+Alias=dbus-org.desktopspec.ConfigManager.service

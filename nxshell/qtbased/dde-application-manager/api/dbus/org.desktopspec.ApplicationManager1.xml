@@ -1,0 +1,49 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.desktopspec.ApplicationManager1">
+        <property type="ao" access="read" name="List" />
+        <method name="ReloadApplications">
+            <annotation
+                name="org.freedesktop.DBus.Description"
+                value="This method is used to update the desktop file cache when needed.
+                       You can pass a list of absolute paths to files or directories that you want to update.
+                       Note: Application Manager only supports directory paths in $XDG_DATA_DIRS."
+            />
+        </method>
+
+        <method name="Identify">
+            <arg type="h" name="pidfd" direction="in" />
+
+            <arg type="s" name="id" direction="out" />
+            <arg type="o" name="instance" direction="out"/>
+            <arg type="a{sa{sv}}" name="application_instance_info" direction="out" />
+            <annotation name="org.qtproject.QtDBus.QtTypeName.Out2" value="ObjectInterfaceMap"/>
+
+            <annotation
+                name="org.freedesktop.DBus.Description"
+                value="Given a pidfd,
+                       this method return a destkop file id,
+                       an application instance object path,
+                       as well as an application object path.
+
+                       NOTE:
+                       1. You should use pidfd_open(2) to get a pidfd."
+            />
+        </method>
+        <method name="addUserApplication">
+            <arg type="a{sv}" name="desktop_file" direction="in"/>
+            <arg type="s" name="name" direction="in"/>
+            <arg type="s" name="app_id" direction="out" />
+            <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap" />
+            <annotation
+                name="org.freedesktop.DBus.Description"
+                value="Desktop-entry-spec: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html,
+                       type of `v` is depends on the property which you want to set.
+                       examples:
+                       {'Name':{'en_US':'example','default':'测试'},{'custom':10}} : a{sa{sv}} // Name=测试 Name[en_US]=example custom=10
+                       {'custom':20,'Name':'example'} : a{sv} // custom=20 Name=example
+                      "
+            />
+        </method>
+    </interface>
+</node>

@@ -1,0 +1,57 @@
+{
+    "name": "org.deepin.service.sdk.demo",
+    "policyStartType": "OnDemand",
+    "idleTime": 1,
+    "whitelists": [
+        {
+            "name": "w1",
+            "process": [
+                "/usr/bin/aaa",
+                "/usr/bin/bbb",
+                "/usr/bin/python3"
+            ]
+        },
+        {
+            "name": "w2",
+            "process": [
+                "/usr/bin/aaa",
+                "/usr/bin/ccc"
+            ]
+        }
+    ],
+    "policy": [
+        {
+            "path": "/org/deepin/service/sdk/demo",
+            "pathhide": false,
+            "permission": true,
+            "whitelist": "w1",
+            "interfaces": [
+                {
+                    "interface": "org.deepin.service.sdk.demo",
+                    "whitelist": "w2",
+                    "methods": [
+                        {
+                            "method": "Register",
+                            "whitelist": "w1"
+                        },
+                        {
+                            "method": "Hello",
+                            "permission": false
+                        }
+                    ],
+                    "properties": [
+                        {
+                            "property": "Age",
+                            "permission": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/org/deepin/services/sdk/test1",
+            "pathhide": true,
+            "permission": false
+        }
+    ]
+}

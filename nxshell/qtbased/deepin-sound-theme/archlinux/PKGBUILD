@@ -1,0 +1,31 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=deepin-sound-theme-git
+pkgver=15.10.6.r3.g0c81150
+pkgrel=1
+sourcename=deepin-sound-theme
+sourcetars=("$sourcename"_"$pkgver".orig.tar.gz)
+sourcedir="$sourcename"-"$pkgver"
+useforobs=1
+pkgdesc="Deepin sound theme"
+arch=('any')
+url="https://github.com/linuxdeepin/deepin-sound-theme"
+makedepends=('git')
+license=('GPL3')
+groups=('deepin-git')
+conflicts=('deepin-artwork' 'deepin-sound-theme')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+  cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  make
+}
+
+package() {
+  cd $sourcedir
+  make PREFIX=/usr DESTDIR="$pkgdir" install
+}

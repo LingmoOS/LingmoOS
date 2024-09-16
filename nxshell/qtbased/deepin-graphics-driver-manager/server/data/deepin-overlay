@@ -1,0 +1,28 @@
+#!/bin/sh
+
+case "$1" in
+        # no pre-reqs
+        prereqs) echo ""; exit 0;;
+esac
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+MYTAG="Deepin"
+
+ROOTMNT=${rootmnt}
+LOOP_DEV="/dev/loop0"
+
+isEnableOverlayRoot=$(grep "^overlayroot=" ${ROOTMNT}/etc/overlayroot.conf |awk -F \" '{print $2}') || isEnableOverlayRoot=
+
+if [ -z "${isEnableOverlayRoot}" ]; then
+    echo "Overlayroot is not enable"
+else
+    overlayroot_device=$(echo $isEnableOverlayRoot |awk  -F \:  '{print $2}' |awk -F \, '{print $1}'  |awk -F \= '{print $2}')
+    if [ "$overlayroot_device" = "$LOOP_DEV" ]; then
+        mkdir /run/overlayroot
+        mount -t tmpfs -o size=2G tmpfs /run/overlayroot
+        cp ${ROOTMNT}/usr/lib/deepin-graphics-driver-manager/working-dir/overlayroot.img /run/overlayroot
+        [ -e "${LOOP_DEV}" ] || mknod ${LOOP_DEV} b 7 0
+        losetup ${LOOP_DEV} /run/overlayroot/overlayroot.img
+    fi
+fi
+exit 0

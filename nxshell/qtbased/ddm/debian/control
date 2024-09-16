@@ -1,0 +1,68 @@
+Source: ddm
+Priority: optional
+Maintainer: justforlxz <zhangdingyuan@deepin.org>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.4~),
+               pkg-config,
+               extra-cmake-modules (>= 1.4.0~),
+               libpam0g-dev,
+               libsystemd-dev [linux-any],
+               libupower-glib-dev,
+               libxau-dev,
+               libxcb-xkb-dev,
+               libxcb1-dev,
+               libxkbcommon-dev,
+               libxcb-ewmh-dev,
+               python3-docutils,
+               qt6-base-dev (>= 6.6.1~),
+               qt6-declarative-dev (>= 6.6.1~),
+               qt6-tools-dev,
+               qt6-tools-dev-tools (>= 6.6.1~),
+               qt6-wayland,
+               qt6-wayland-dev,
+               qt6-wayland-private-dev,
+               systemd [linux-any],
+Standards-Version: 4.6.0
+Section: libs
+Homepage: https://github.com/linuxdeepin/ddm.git
+Rules-Requires-Root: no
+
+Package: ddm
+Section: libdevel
+#Provides: x-display-manager
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         qml6-module-qtquick,
+         qml6-module-qtquick-controls,
+         qml6-module-qtquick-layouts,
+         qml6-module-qtqml-workerscript,
+         qml6-module-qtquick-templates,
+         qml6-module-qtquick-particles,
+         qml6-module-qtquick-dialogs,
+         qml6-module-qtquick-window,
+         qml6-module-qt5compat-graphicaleffects,
+         qml6-module-qtquick-effects,
+         qml6-module-qt-labs-folderlistmodel,
+         adduser,
+         seatd,
+         qt6-wayland,
+         libqt6svg6,
+Recommends: libpam-systemd, xwayland
+Description: a modern display manager for Wayland sessions aiming to be fast, simple and beautiful.
+
+Package: libddm
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Multi-Arch: same
+Description: DDM library
+  provide PAM libraries
+
+Package: libddm-dev
+Architecture: any
+Depends: ${misc:Depends},
+         libddm( =${binary:Version}),
+         qt6-base-dev
+Description: DDM devel library
+  provide PAM headers

@@ -1,0 +1,145 @@
+/*!
+@~chinese
+@file daudiomanager.h
+
+daudiomanager.h 中定义了登录管理对象的接口。
+
+@class Dtk::AudioManager::DAudioManager daudiomanager.h
+@brief DAudioManager音频管理类
+@note 返回管理的对象为共享指针类型，每次获取的对象都是重新构建的对象，但访问的数据相同
+
+DAudioManager 中定义了音频管理对象的接口。
+
+@fn explicit DAudioManager::DAudioManager(QObject *parent = nullptr)
+@brief 构造获取audio manager
+@param [in] parent 音频管理对象的父类
+
+@fn explicit DAudioManager::DAudioManager(const QString &backendType, QObject *parent=nullptr)
+@brief DAudioManager音频管理类
+@param [in] backendType 指定音频实现后端类型
+@param [in] parent 音频管理对象的父类
+
+@fn explicit DAudioManager::DAudioManager(DAudioManagerPrivate *d, QObject *parent = nullptr)
+@brief DAudioManager音频管理类
+@param [in] d 音频管理功能的具体实现类
+@param [in] parent 音频管理对象的父类
+
+@fn QList<DAudioCardPtr> DAudioManager::cards() const
+@brief 获取所有声卡对象
+@return 返回所有声卡对象
+
+@fn DAudioCardPtr DAudioManager::card(const quint32 cardId) const
+@brief 获取指定声卡Id的声卡对象
+@param [in] cardId 声卡索引，此id为内核分配
+@return 返回指定声卡对象共享指针
+
+@fn QList<DAudioCardPtr> DAudioManager::availableCards() const
+@brief 获取所有可用的声卡对象
+@return 返回所有可用的声卡对象共享指针
+
+@fn QList<DAudioInputDevicePtr> DAudioManager::inputDevices() const
+@brief 获取所有输入设备
+@return 所有输入设备的共享指针对象
+
+@fn QList<DAudioOutputDevicePtr> DAudioManager::outputDevices() const
+@brief 获取所有输出设备
+@return 所有输出设备的共享指针对象
+
+@fn DAudioInputDevicePtr DAudioManager::defaultInputDevice() const
+@brief 获取默认输入设备对象
+@return 默认输入设备的共享指针对象
+
+@fn DAudioOutputDevicePtr DAudioManager::defaultOutputDevice() const
+@brief 获取默认输出设备对象
+@return 默认输出设备的共享指针对象
+
+@fn DAudioInputDevicePtr DAudioManager::inputDevice(const QString &deviceName) const
+@brief 获取指定设备名称的输入设备
+@param [in] deviceName 输入设备名称
+@return 指定输入设备的共享指针对象
+
+@fn DAudioOutputDevicePtr DAudioManager::outputDevice(const QString &deviceName) const
+@brief 获取指定设备名称的输出设备
+@param [in] deviceName 输出设备名称
+@return 指定输入设备的共享指针对象
+
+@fn void DAudioManager::reset()
+@brief 重置所有音频配置，恢复到默认配置
+
+@fn void DAudioManager::setReConnectionEnabled(const bool enable)
+@brief 当出现错误时是否不再重新连接服务端，直接退出
+
+@fn void DAudioManager::setPort(const quint32 cardId, const QString &portName)
+@brief 激活指定端口，cardId为声卡索引，protName为端口名称
+@param [in] cardId 声卡索引
+@param [in] portName 端口名称
+
+@fn void DAudioManager::setPortEnabled(const quint32 cardId, const QString &portName, bool enabled)
+@brief 是否启用指定端口
+@param [in] cardId 声卡索引
+@param [in] portName 端口名称
+@param [in] enabled 是否启用
+
+@property DAudioManager::increaseVolume
+@brief 是否允许音量增强
+
+@property DAudioManager::reduceNoise
+@brief 是否降噪
+
+@property DAudioManager::maxVolume
+@brief 最大音量
+
+@fn bool DAudioManager::increaseVolume() const
+@brief 是否允许音量增强
+@return 是否允许音量增强
+
+@fn bool DAudioManager::reduceNoise() const
+@brief 是否降噪
+@return 是否降噪
+
+@fn double DAudioManager::maxVolume() const
+@brief 最大音量
+@return 最大音量
+
+@fn void DAudioManager::setIncreaseVolume(bool increaseVolume)
+@brief 设置是否允许音量增强
+@param [in] increaseVolume 是否音量增强
+
+@fn void DAudioManager::setReduceNoise(bool reduceNoise)
+@brief 设置是否降噪
+@param [in] reduceNoise 是否降噪
+
+@fn void DAudioManager::deviceAdded(const QString &name, const bool isInputDevice)
+@brief 音频设备新增时触发
+@param [in] name 设备名称
+@param [in] isInputDevice 是否是输入设备
+
+@fn void DAudioManager::deviceRemoved(const QString &name, const bool isInputDevice)
+@brief 音频设备删除是触发
+@param [in] name 设备名称
+@param [in] isInputDevice 是否是输入设备
+
+@fn void DAudioManager::cardsChanged()
+@brief 声卡变化时触发
+
+@fn void DAudioManager::defaultInputDeviceChanged(const QString &name)
+@brief 默认输入设备变化
+@param [in] name 设备名称
+
+@fn void DAudioManager::defaultOutputDeviceChanged(const QString &name)
+@brief 默认输出设备变化
+@param [in] name 设备名称
+
+@fn void DAudioManager::increaseVolumeChanged(bool increaseVolume)
+@brief 是否允许音量增加变化
+@param [in] increaseVolume 是否音量增加
+
+@fn void DAudioManager::reduceNoiseChanged(bool reduceNoise)
+@brief 是否降噪变化
+@param [in] reduceNoise 是否降噪
+
+@fn void DAudioManager::maxVolumeChanged(double maxVolume)
+@brief 最大音量是否变化
+@param [in] maxVolume 最大音量
+
+*/

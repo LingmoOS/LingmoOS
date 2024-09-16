@@ -1,0 +1,16 @@
+include_directories(.)
+
+set(DIM_DATA_DIR ${CMAKE_INSTALL_DATAROOTDIR}/deepin-im)
+set(DIM_ADDON_INFO_DIR ${DIM_DATA_DIR}/addon)
+set(DIM_ADDON_DIR ${CMAKE_INSTALL_LIBDIR}/deepin-im)
+
+add_subdirectory(common)
+add_subdirectory(wl)
+add_subdirectory(dimwl)
+add_subdirectory(dimcore)
+add_subdirectory(dim)
+add_subdirectory(addons)
+add_subdirectory(kimpanel)
+add_subdirectory(qtimmodule)
+add_subdirectory(gtkimmodule)
+add_subdirectory(wladdonsbase)

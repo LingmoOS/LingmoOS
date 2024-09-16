@@ -1,0 +1,27 @@
+#!/bin/bash
+
+PIDS=""
+check_pid() {
+    PIDS=`ps -ef |grep dde-grand-search-daemon |grep -v grep | awk '{print $2}'`
+}
+#查找后端进程
+check_pid
+if [ "$PIDS" != "" ]; then
+    echo "stop dde-grand-search-daemon $PIDS."
+    #安全退出
+    kill -3 $PIDS
+    var=6
+    #检查是否退出
+    while [ "$PIDS" != "" ] && [ $var -gt 0 ]
+    do
+        sleep 0.5
+        ((var=$var-1))
+        check_pid
+    done
+    #还未退出,强制退出
+    if [ "$PIDS" != "" ]; then
+        echo "kill dde-grand-search-daemon $PIDS."
+        kill -9 $PIDS
+        sleep 1
+    fi
+fi

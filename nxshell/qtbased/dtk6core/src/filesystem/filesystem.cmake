@@ -1,0 +1,57 @@
+if(APPLE)
+  set(FILESYSTEM_SOURCE 
+    ${CMAKE_CURRENT_LIST_DIR}/private/dbasefilewatcher_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dfilesystemwatcher_linux_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dcapfsfileengine_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/dbasefilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilesystemwatcher_dummy.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatchermanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dpathbuf.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dtrashmanager_dummy.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dstandardpaths.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfile.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapmanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfsfileengine.cpp
+  )
+elseif(WIN32)
+  set(FILESYSTEM_SOURCE 
+    ${CMAKE_CURRENT_LIST_DIR}/private/dbasefilewatcher_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dfilesystemwatcher_linux_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dcapfsfileengine_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/dbasefilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilesystemwatcher_win.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatchermanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dpathbuf.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dtrashmanager_dummy.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dstandardpaths.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfile.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapmanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfsfileengine.cpp
+  )
+else()
+  set(FILESYSTEM_SOURCE 
+    ${CMAKE_CURRENT_LIST_DIR}/private/dbasefilewatcher_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dfilesystemwatcher_linux_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/dcapfsfileengine_p.h
+    ${CMAKE_CURRENT_LIST_DIR}/dbasefilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilesystemwatcher_linux.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatcher.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dfilewatchermanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dpathbuf.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dtrashmanager_linux.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dstandardpaths.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfile.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapmanager.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dcapfsfileengine.cpp
+  )
+endif()
+file(GLOB FILESYSTEM_HEAD
+  ${CMAKE_CURRENT_LIST_DIR}/../../include/filesystem/*
+)
+set(filesystem_SRCS
+  ${FILESYSTEM_HEAD}
+  ${FILESYSTEM_SOURCE}
+)
+

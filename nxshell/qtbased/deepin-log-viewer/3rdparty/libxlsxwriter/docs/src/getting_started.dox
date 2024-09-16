@@ -1,0 +1,604 @@
+/**
+@page getting_started Getting Started with libxlsxwriter
+
+@tableofcontents
+
+Here are some instructions to get you up and running with the libxlsxwriter
+library on different OSes.
+
+
+@section gsg_linux Installation on Linux
+
+@subsection gsg_quick_start Quick-start on Linux
+
+If you prefer to assemble Ikea furniture first and only read the instructions
+when you have parts left over then the following minimal set of commands
+should get you up and running on a Debian like system:
+
+    sudo apt-get install -y zlib1g-dev
+    git clone https://github.com/jmcnamara/libxlsxwriter.git
+    cd libxlsxwriter
+    make
+    sudo make install
+
+If you read instructions first and then assemble the furniture you will know
+how to proceed.
+
+@subsection gsg_dependencies Install the dependencies
+
+The only dependency (apart from @ref running_the_tests "testing dependencies")
+is [Zlib](http://www.zlib.net) version >= 1.2.8.
+
+The easiest way to install `zlib` is from the source code:
+
+    curl -O -L  http://www.zlib.net/zlib-1.2.11.tar.gz
+    tar zxf zlib-1.2.11.tar.gz
+    cd zlib-1.2.11
+
+    ./configure
+    make
+
+    sudo make install
+
+Alternatively, you can use your OS packager to install the `zlib` development
+libraries. For example:
+
+    sudo apt-get install -y zlib1g-dev
+
+However, you need to ensure that the version installed is >= 1.2.8 or you will
+get zlib related compilation issues.
+
+
+@subsection gsg_git Get the source code via Git
+
+Clone the libxlsxwriter source code repository from GitHub as follows:
+
+    git clone https://github.com/jmcnamara/libxlsxwriter.git
+    # Or use your preferred protocol instead of https.
+
+
+@subsection gsg_tarball Get the source code as a tarball
+
+If you prefer you can get a tarball of the latest code as follows:
+
+    curl -O -L http://github.com/jmcnamara/libxlsxwriter/archive/master.tar.gz
+
+
+@subsection gsg_build Build the source code
+
+Build the source code as follows:
+
+    cd libxlsxwriter
+    make
+
+This will create a static and dynamic library in the local `./lib` directory:
+
+    ls lib
+    libxlsxwriter.a     libxlsxwriter.so
+
+To see a verbose summary of the compilation steps use `V=1`:
+
+    make V=1
+
+
+@subsection gsg_examples Try an example
+
+If there weren't any warnings or errors in the previous step (and there
+shouldn't have been) then you can build the programs in the `examples`
+directory and try one of them out:
+
+    make examples
+    ./examples/hello
+
+This will create a `hello_world.xlsx` file in your current directory. Open the
+file in a spreadsheet application. The output should look like this: @image
+html hello01.png
+
+There is a large range of tests that you can run but they have some additional
+dependencies. If you are interested see @ref running_the_tests.
+
+
+@subsection gsg_install Install the library
+
+Libxlsxwriter supports a simplified installation scheme for a static and
+dynamic/shared library and header files.
+
+    sudo make install
+
+The files are installed to `/usr/local` by default but this can be overridden
+by using the `PREFIX` environmental variable:
+
+    make install PREFIX=/usr/third_party
+
+A staging directory can be set with `DESTDIR` which is prepended to all
+install paths, a feature mostly useful for packaging:
+
+    make install PREFIX=/usr/third_party DESTDIR=./staging/
+
+This would build and link the code with `/usr/third_party` as the
+installation location but actually install to `./staging/usr/third_party`.
+
+This installation method isn't fool proof but if it fails on your system you
+will probably know exactly how to fix it or have no idea how to fix it. I'm
+hoping for the former.
+
+
+@subsection gsg_using Using the library
+
+Using you favourite editor create a file like the following called
+`myexcel.c`:
+
+@code
+    #include "xlsxwriter.h"
+
+    int main() {
+
+        lxw_workbook  *workbook  = workbook_new("myexcel.xlsx");
+        lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+        int row = 0;
+        int col = 0;
+
+        worksheet_write_string(worksheet, row, col, "Hello me!", NULL);
+
+        return workbook_close(workbook);
+    }
+    @endcode
+
+If you executed the `"make install"` command in the previous section then you
+should be able to compile the program as follows:
+
+    cc myexcel.c -o myexcel -lxlsxwriter
+
+In some environments, or if you changed the `PREFIX` location, you may
+have to provide explicit `include` and `lib` paths:
+
+    cc myexcel.c -o myexcel -I/usr/local/include -L/usr/local/lib -lxlsxwriter
+
+This will create an executable that you can run to generate an Excel
+spreadsheet:
+
+    ./myexcel
+    xdg-open myexcel.xlsx
+
+If the installation didn't work for you then you can link against the static
+library you created in the "Build the source code" step:
+
+    cc myexcel.c -o myexcel -I /path/to/libxlsxwriter/include \
+                               /path/to/libxlsxwriter/lib/libxlsxwriter.a -lz
+
+
+@section gsg_bsd Installation on FreeBSD and OpenBSD
+
+Installation on FreeBSD and OpenBSD is mainly the same as on Linux, see above,
+with the differences outlined below.
+
+Both FreeBSD and OpenBSD come with the zlib development libraries
+pre-installed so there are no additional dependencies. However, if you have
+any issues then follow the instructions
+@ref gsg_dependencies "to install zlib".
+
+
+@ref gsg_git or @ref gsg_tarball "get the source code as a tarball" as shown
+above then build the source code as follows using `gmake` (not make):
+
+    cd libxlsxwriter
+    gmake
+
+Then follow the instructions in the Linux section to
+@ref gsg_install "install the library" and
+@ref gsg_using "use the library".
+
+
+@section gsg_macos Installation on macOS and iOS
+
+The instructions for installing on Linux, shown above, will also work on
+macOS.
+
+To install for Xcode and iOS use the Cocoa Pods method shown in the next
+section.
+
+On macOS you can also use [brew/homebrew](https://brew.sh), see below.
+
+@subsection gsg_cocoapods Install using Cocoa Pods for Xcode
+
+For iOS and macOS projects in Xcode you can install libxlsxwriter using
+[CocoaPods](https://cocoapods.org).
+
+Add the following entry to your `Podfile`:
+
+    pod 'libxlsxwriter', '~> 0.9'
+
+if you are using Swift, you can now add an import:
+
+    import xlsxwriter
+
+And call its C functions like this:
+
+    let documentDirectory = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor:nil, create:false)
+    let fileURL = documentDirectory.appendingPathComponent("hello_world.xlsx")
+    
+    let workbook = workbook_new((fileURL.absoluteString.dropFirst(6) as NSString).fileSystemRepresentation)
+    let worksheet = workbook_add_worksheet(workbook, nil)
+    worksheet_write_string(worksheet, 0, 0, "Hello", nil)
+    worksheet_write_number(worksheet, 1, 0, 123, nil)
+    workbook_close(workbook)
+
+For a sample Xcode project that uses the libxlsxwriter cocoapod for iOS and
+macOS with Objective-C and Swift see [libxlsxwriter Cocoa
+Examples](https://github.com/lrossi/libxlsxwriterCocoaExamples) or
+[LibXlsxWriterSwiftSample](https://github.com/FrankenApps/LibXlsxWriterSwiftSample)
+for an updated example for Swift 5.
+
+@subsection gsg_brew Installation on macOS with homebrew
+
+On macOS you can also use [brew/homebrew](https://brew.sh):
+
+    brew install libxlsxwriter
+
+Once installed you can compile and run a libxlsxwriter program as follows:
+
+    cc myexcel.c -o myexcel -I/usr/local/include -L/usr/local/lib -lxlsxwriter
+    ./myexcel
+
+@section gsg_cmake Install using CMake
+
+Libxlsxwriter also supports [CMake](https://cmake.org) for building and
+installing the library, as follows:
+
+    cmake $SOURCE_DIR $FLAGS
+
+For example:
+
+    cd cmake
+    cmake ..
+    make
+    make install
+
+@subsection gsg_cmake_flags CMake Flags
+
+Certain build features can be controlled by passing flags to Cmake. For
+example:
+
+    cd cmake
+    cmake .. -DBUILD_TESTS=ON
+    make
+
+    # Run the unit tests.
+    ./xlsxwriter_unit
+
+Some of the Libxlsxwriter specific flags are:
+
+- `BUILD_STATIC`: Build static libraries (default on). To build shared
+   libraries, pass `-DBUILD_STATIC=OFF` during configuration.
+
+- `BUILD_EXAMPLES`: Build example files (default off). To build the examples,
+   pass `-DBUILD_EXAMPLES=ON` during configuration.
+
+- `BUILD_TESTS`: Build unittests (default off). To build the unittests, pass
+  `-DBUILD_TESTS=ON` during configuration.
+
+- `ZLIB_ROOT`: The ZLIB root directory can be specified either through an
+   environment variable (`export ZLIB_ROOT=/usr/include`) or using a flag with
+   CMake (`-DZLIB_ROOT:STRING=/usr/include`). This sets the preferred search
+   path for the ZLIB installation.
+
+@subsection gsg_cmake_options CMake Options
+
+CMake sets debug and release builds with the `CMAKE_BUILD_TYPE` option. To
+build in release mode, pass `-DCMAKE_BUILD_TYPE=Release` during configuration.
+
+@subsection gsg_cmake_generators CMake Generators
+
+CMake also supports custom build generators, such as Makefiles, Ninja, Visual
+Studio, and Xcode. For example, to generate a Visual Studio solution,
+configure with:
+
+    cmake .. -G "Visual Studio 14 2015 Win64"
+
+For more information on using generators see:
+[cmake-generators](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
+
+@subsection gsg_cmake_app Cmake for Microsoft Visual Studio
+
+You can also use Cmake to build a Microsoft Visual Studio (although see also
+the next section on using vcpkg which is less manual).
+
+Open a Windows CMD or Command Window and set up your MSVC environment, if
+required.
+
+Then create a work directory and and an install directory that the include and
+library files will be installed to. Set the follow variables to point to the
+directories:
+
+    set    WORK_DIR=C:/Users/Username/tmp
+    set INSTALL_DIR=C:/Users/Username/tmp/install_dir
+
+
+Build the Zlib library:
+
+    cd %WORK_DIR%
+
+    git clone https://github.com/madler/zlib.git
+    cd zlib
+    mkdir build
+    cd    build
+
+    cmake .. -G "Visual Studio 14 Win64" -DCMAKE_INSTALL_PREFIX:PATH="%INSTALL_DIR%/zlib"
+
+    cmake --build . --config Release --target install
+
+Build the libxlsxwriter library:
+
+    cd %WORK_DIR%
+
+    git clone https://github.com/jmcnamara/libxlsxwriter.git
+    cd libxlsxwriter
+    mkdir build
+    cd    build
+
+    cmake .. -G "Visual Studio 14 Win64" -DCMAKE_INSTALL_PREFIX:PATH="%INSTALL_DIR%/libxlsxwriter" -DZLIB_ROOT:STRING="%INSTALL_DIR%/zlib"
+
+    cmake --build . --config Release --target install
+
+
+Create a new Win32 Console (or other C/C++) application in Visual Studio:
+
+    File
+      -> New
+        -> Project
+
+    Visual C++
+      -> Win32
+        -> Win32 Console Application
+
+
+Change the ARCH in the main Dialog to "x64" and the Configuration to "Release"
+(or to match the parameter to cmake).
+
+Replace the empty main with a libxlsxwriter example from the distro. Make sure
+to include "stdafx.h" and "xlsxwriter.h":
+
+@code
+#include "stdafx.h"
+#include "xlsxwriter.h"
+
+int main() {
+
+    lxw_workbook  *workbook = workbook_new("hello_world.xlsx");
+    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+
+    worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+    worksheet_write_number(worksheet, 1, 0, 123, NULL);
+
+    workbook_close(workbook);
+
+    return 0;
+}
+@endcode
+
+Edit the application properties:
+
+    Project
+      -> ConsoleApplication Properties
+
+Set the libxlsxwriter include path to match the path used above:
+
+    Configuration Properties
+      -> C/C++
+        -> General
+          -> Additional Include Directories
+
+    Set it to the following (or similar path used above):
+
+    C:\Users\Username\tmp\install_dir\libxlsxwriter\include
+
+Set the linker directories to match the path created above:
+
+    Configuration Properties
+      -> Linker
+        -> General
+          -> Additional Library Directories
+
+    Add the following (or similar paths used above):
+
+    C:\Users\Username\tmp\install_dir\libxlsxwriter\lib\x64\Release
+    C:\Users\Username\tmp\install_dir\zlib\lib
+
+Set the linker additional libraries to match the zlib and xlsxwriter libs
+created above:
+
+    Configuration Properties
+      -> Linker
+         -> Input
+            -> Additional Dependencies
+
+    Add the following:
+
+    xlsxwriter.lib
+    zlib.lib
+
+Build the solution and run the output executable. It should create a
+hello_world.xlsx file in the same directory you ran it from.
+
+
+@section gsg_vcpkg Using libxlsxwriter in Microsoft Visual Studio via vcpkg
+
+A convenient way to get the latest release version of libxlsxwriter and
+integrate it into your Visual Studio build environment is to use the
+[vcpkg](https://docs.microsoft.com/en-us/cpp/build/vcpkg?view=vs-2019 )
+tool. This uses the CMake build system shown in the previous section but with
+less user interaction. From the vcpkg docs:
+
+> "vcpkg" is a command-line package manager that greatly simplifies the
+> acquisition and installation of third-party libraries on Windows, Linux and
+> MacOS. If your project uses third-party libraries, we recommend that you use
+> vcpkg to install them. vcpkg supports both open-source and proprietary
+> libraries. All libraries in the vcpkg Windows catalog have been tested for
+> compatibility with Visual Studio 2015, Visual Studio 2017, and Visual
+> Studio 2019.
+
+Install vcpkg and libxlsxwriter as follows in Windows CMD or Powershell:
+
+    > git clone https://github.com/microsoft/vcpkg.git
+    > bootstrap-vcpkg.bat
+    > vcpkg install libxlsxwriter
+
+You should then see libxlsxwriter installed as follows (note that the required
+zlib dependency has also been installed):
+
+    > vcpkg list
+    libxlsxwriter:x86-windows  0.8.6-1   Libxlsxwriter is a C library that ...
+    zlib:x86-windows           1.2.11-5  A compression library
+
+You can also install libxlsxwriter for other build targets like `x64`
+
+    > vcpkg install libxlsxwriter:x64-windows
+
+    > vcpkg list
+    libxlsxwriter:x64-windows  0.8.6-1   Libxlsxwriter is a C library that ...
+    libxlsxwriter:x86-windows  0.8.6-1   Libxlsxwriter is a C library that ...
+    zlib:x64-windows           1.2.11-5  A compression library
+    zlib:x86-windows           1.2.11-5  A compression library
+
+To use libxlsxwriter from within Visual Studio you can "integrate" it into
+your environment:
+
+    > vcpkg integrate install
+    Applied user-wide integration for this vcpkg root.
+
+All MSBuild C projects can now include libxlsxwriter directly. Linking will
+also be handled automatically. For example, create a new Win32 Console (or
+other C/C++) application in Visual Studio:
+
+    File
+      -> New
+        -> Project
+
+    Visual C++
+      -> Win32
+        -> Win32 Console Application
+
+Replace the empty main with a libxlsxwriter example from the distro. Make sure
+to include "stdafx.h" and "xlsxwriter.h":
+
+@code
+#include "stdafx.h"
+#include "xlsxwriter.h"
+
+int main() {
+
+    lxw_workbook  *workbook = workbook_new("hello_world.xlsx");
+    lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
+
+    worksheet_write_string(worksheet, 0, 0, "Hello", NULL);
+    worksheet_write_number(worksheet, 1, 0, 123, NULL);
+
+    workbook_close(workbook);
+
+    return 0;
+}
+@endcode
+
+Change the target to "Release" and the architecture to "x86" (or whatever you
+installed above). You can now "Build Solution". The resulting executable will
+be put in the output directory with the required "xlsxwriter.dll" and
+"zlib1.dll" files.
+
+
+@section gsg_tmpdir Specifying a TEMP directory for libxlsxwriter
+
+The libxlsxwriter library creates temporary files in the system `TEMP`
+directory during assembly of an xlsx file. On Windows this directory may not
+be writeable by a libxlsxwriter application (although it will try several
+`TEMP` locations before returning an error). To work around this you can set
+the `tmpdir` parameter of the #lxw_workbook_options struct and pass it to
+`workbook_new_opt()`:
+
+@code
+   lxw_workbook_options options = {.constant_memory = LXW_FALSE,
+                                   .tmpdir = "C:\\Temp"};
+
+   lxw_workbook  *workbook  = workbook_new_opt("filename.xlsx", &options);
+@endcode
+
+This can also be used on Unix systems where the `TEMP` directory isn't
+writeable.
+
+The TEMP file handling with optional temporary directory support is provided
+by the
+[Tmpfileplus](http://www.di-mgt.com.au/c_function_to_create_temp_file.html)
+library which is included in the source tree. If you wish to use the standard
+library `tmpfile()` function instead you can compile without `tmpfileplus` as
+follows:
+
+    make USE_STANDARD_TMPFILE=1
+
+@note When using the the standard library `tmpfile()` the `tmpdir` parameter,
+shown above, is ignored.
+
+@section gsg_ming Installation on Windows using Mingw-w64 and MSYS2
+
+The libxlsxwriter library can also be compiled on Windows using the
+[Mingw-w64](http://mingw-w64.org/doku.php) "Minimalist GNU for Windows"
+toolchain. These tools can be run from the Windows `cmd.exe` but it is
+recommended to use the [MSYS2](http://msys2.github.io) "Minimal System" Bourne
+Shell.
+
+Here are some instructions on how to compile libxlsxwriter with Mingw-w64 and
+MSYS2:
+
+    # Install MSYS2 64 or 32 bit from http://msys2.github.io/
+
+    # Install the dev tools for libxlsxwriter.
+    pacman -S git gcc make zlib-devel
+
+    # Clone and build libxlsxwriter.
+    git clone https://github.com/jmcnamara/libxlsxwriter.git
+    cd libxlsxwriter/
+    make
+
+After compilation you can follow the instructions in the @ref gsg_install and
+@ref gsg_using sections above. When using the library you may also need to
+link against the zlib library using `-lz`:
+
+    gcc myexcel.c -o myexcel -lxlsxwriter -lz
+
+It is also possible to use [Cygwin](https://cygwin.com) and the older [MinGW
+and MSYS](http://mingw.org). Libxlsxwriter has been confirmed to compile and
+work in all of these environments.
+
+See also @ref gsg_tmpdir.
+
+@section gsg_qt Installation in Qt-Creator for Windows
+
+The following external guide shows how to [Build libxlsxwriter inside
+Qt-Creator for Windows](https://github.com/jmcnamara/libxlsxwriter/issues/270)
+with step by step instructions.
+
+@section gsg_minizip Linking against system minizip
+
+Libxlsxwriter uses the `minizip` component of [Zlib](http://www.zlib.net) to
+create the xlsx zip file container. The source files for `minizip` are
+included in the src tree of libxlsxwriter and are statically linked by
+default.
+
+If you have a `lminizip` library already installed on your system and prefer
+to dynamically link against that you can use the following compilation option:
+
+    make USE_SYSTEM_MINIZIP=1
+
+@section gsg_endian Compiling on Big Endian Architecture
+
+Libxlsxwriter can be compiled on a big endian system as follows:
+
+    make USE_BIG_ENDIAN=1
+
+@section gsg_next Next steps
+
+If you got libxlsxwriter built and working successfully then the next sections
+will look at how to create some more in-depth examples.
+
+Next: @ref tutorial01
+
+
+*/

@@ -1,0 +1,131 @@
+/*!
+@~chinese
+@file dnotificationmanager.h
+
+dnotificationmanager.h是对于一组用于查询和管理系统通知和消息的D-BUS接口的封装。
+
+@class Dtk::Notifications::DNotificationManager dnotificationmanager.h
+@brief DNotificationManager类
+
+@fn DNotificationManager::DNotificationManager(QObject *parent = nullptr)
+@brief 构造manager对象,并且进行信号的连接
+@param[in] parent 父对象
+
+@fn QList<QString> DNotificationManager::recordIds() const
+@brief 获取所有消息记录的id
+@return 所有消息记录id的QList
+
+@fn QList<DNotificationData> allRecords() const
+@brief 获取所有消息的信息
+@return 所有消息信息DNotificationData的QList
+
+@fn QList<DNotificationData> getRecordsFromId(int rowCount, const QString &offsetId)
+@brief 获取offsetId消息记录后几行（rowCount）消息的信息
+@param[in] offsetId 要查找消息记录的行数
+@param[in] offsetId 要查找消息记录的id
+@return 消息信息DNotificationData的QList
+
+@fn DNotificationData DNotificationManager::getRecordById(const QString &offsetId)
+@brief 获取id为offsetId的消息记录
+@param[in] offsetId 要查找消息记录的id
+@return 消息信息DNotificationData
+
+@fn int DNotificationManager::recordCount() const
+@brief 获取消息记录的数量
+@return 消息记录的数量
+
+@fn void DNotificationManager::clearRecords() const
+@brief 清空消息记录
+
+@fn void DNotificationManager::removeRecord(const QString &id)
+@brief 移除消息记录id
+@param[in] 消息记录的id
+
+@fn ServerInformation DNotificationManager::serverInformation()
+@brief 获取服务端的信息
+@return 服务端的信息ServerInformation
+
+@fn QStringList DNotificationManager::capbilities()
+@brief 获取服务端的能力
+@return 服务端的能力QStringList
+
+@fn uint DNotificationManager::notify(const QString &appName, uint replacesId,
+                const QString &appIcon, const QString &summary,
+                const QString &body = QString(), const QStringList &actions = QStringList(),
+                const QVariantMap hints = QVariantMap(), int expireTimeout = 5000)
+@brief 判断密码是否合法
+@param[in] appName 应用id
+@param[in] replacesId 替换id
+@param[in] appIcon 应用图标
+@param[in] summary 通知概要
+@param[in] body 通知内容
+@param[in] actions 按钮
+@param[in] hints 额外数据
+@param[in] expireTimeout 通知超时时间
+@return 该通知的id
+
+@fn void DNotificationManager::closeNotification(uint id)
+@brief 关闭id的通知
+@param [in] id 通知id
+
+@fn QStringList DNotificationManager::appList()
+@brief 获取通知应用列表
+@return 应用列表的QStringList
+
+@fn DNotificationAppConfigPtr notificationAppConfig(const QString &id) const
+@brief 获取应用id的通知配置
+@param[in] id 应用id
+@return 应用配置的QSharedPointer
+
+@fn DNotificationDNDModeConfigPtr notificationDNDModeConfig() const
+@brief 获取勿扰模式通知系统配置
+@return 勿扰模式通知系统配置的QSharedPointer
+
+@fn QList<DAbstractNotificationModeConfigPtr> notificationModeConfigs() const
+@brief 获取通知模式系统配置列表
+@return 通知模式系统配置的列表
+
+@fn void toggleNotificationCenter()
+@brief 触发通知中心
+
+@fn void showNotificationCenter()
+@brief 显示通知中心
+
+@fn void hideNotificationCenter()
+@brief 隐藏通知中心
+
+
+@fn void actionInvoked(uint id, const QString &actionId)
+@brief 通知里的按钮触发后发出该信号
+@param[in] id 通知id
+@param[in] actionId 按钮id
+
+@fn void notificationClosed(uint id, ClosedReason closedReason)
+@brief 通知关闭后发出该信号
+@param[in] id 应用id
+@param[in] closedReason 关闭原因
+
+@fn void recordAdded(const QString &id)
+@brief 消息记录增加发出该信号
+@param[in] id 消息id
+
+@fn void appNotificationConfigChanged(const QString &id, AppNotificationConfigItem 
+item, QVariant var)
+@brief id应用的配置项item发生变化后发出该信号
+@param[in] id 应用id
+@param[in] item 配置项
+@param[in] var 变化后的值
+
+@fn void dndModeNotificationConfigChanged(DNDModeNotificaitonConfigItem item, QVariant var)
+@brief 勿扰模式通知系统配置发生变化后发出该信号
+@param[in] item 配置项
+@param[in] var 变化后的值
+
+@fn void appAdded(const QString &id)
+@brief 有新的通知应用增加后发出该信号
+@param[in] id 应用id
+
+@fn void appRemoved(const QString &id)
+@brief 有通知应用移除后发出该信号
+@param[in] id 应用id
+*/

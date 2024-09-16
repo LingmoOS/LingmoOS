@@ -1,0 +1,36 @@
+<interface name="org.deepin.service.demo2b">
+<method name="Hello">
+    <arg direction="out" type="s"/>
+</method>
+<method name="Register">
+     <arg type="s" direction="in" name="id"></arg>
+     <arg type="b" direction="out" name="result"></arg>
+     <arg type="s" direction="out" name="result2"></arg>
+</method>
+<!-- 复杂类型demo - method -->
+<method name="SetArea">
+     <arg type="s" direction="in" name="id"></arg>
+     <arg type="a(iiii)" direction="in" name="area"></arg>
+     <arg type="b" direction="out" name="result"></arg>
+     <annotation name="org.qtproject.QtDBus.QtTypeName.In1" value="AreaList"/>
+</method>
+
+<signal name="Tick" />
+<!-- 复杂类型demo - signal -->
+<signal name="AreaTestSig" type="a(iiii)">
+    <arg name="id" type="s"></arg>
+    <arg name="aaa" type="a(iiii)"></arg>
+    <annotation name="org.qtproject.QtDBus.QtTypeName.In1" value="AreaList"/>
+</signal>
+<property name="Locked" type="b" access="read"></property>
+<!--u - quint32, t - quint64-->
+<property name="Age" type="u" access="readwrite">
+    <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="const"/>
+</property>
+<!--<property name="CurrentSessionPath" type="o" access="read"></property>-->
+<property name="msg" type="s" access="readwrite"></property>
+
+<property name="areas" type="a(iiii)" access="readwrite">
+    <annotation name="org.qtproject.QtDBus.QtTypeName" value="AreaList"/>
+</property>
+</interface>

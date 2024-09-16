@@ -1,0 +1,31 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+
+pkgname=deepin-network-core-git
+pkgver=1.0.45
+pkgrel=1
+sourcename=dde-network-core
+sourcedir="$sourcename"
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+pkgdesc='the library of network libdde-network-core module'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/dde-network-core"
+license=('GPL3')
+depends=('deepin-qt-dbus-factory-git' 'gio-qt' 'gsettings-qt' 'networkmanager-qt5' 'deepin-session-shell-git' 'deepin-dock-git'
+	  'deepin-control-center-git')
+makedepends=('qt5-tools' 'cmake' 'ninja' 'gtest' 'dtkcommon-git')
+conflicts=('deepin-network-core' 'deepin-network-utils-git')
+provides=('deepin-network-core' 'deepin-network-utils-git')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  cmake -B build -GNinja -DCMAKE_INSTALL_PREFIX=/usr
+  cmake --build build
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja -C build install
+}

@@ -1,0 +1,43 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=deepin-desktop-base-git
+pkgver=2021.1.25.r0.g2388ac2
+pkgrel=1
+sourcename=deepin-desktop-base
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Base component for Deepin'
+arch=('any')
+url="https://github.com/linuxdeepin/deepin-desktop-base"
+license=('GPL3')
+groups=('deepin-git')
+conflicts=('deepin-desktop-base')
+provides=('deepin-desktop-base')
+groups=('deepin-git')
+makedepends=('git')
+source=("${sourcetars[@]}"
+        distribution.info)
+sha512sums=('SKIP'
+            'd0609a457c14b57070a8baa179bd3f514f6e16e6d6452e106e7095b45f8fad6ce03411420926e96d2d8f76c2d71d82bc19f87f4e0033557dc6f762b502722bb4')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  make
+}
+
+package() {
+  cd $sourcedir
+  make DESTDIR="$pkgdir" install
+  install -Dm644 "$srcdir"/distribution.info -t "$pkgdir"/usr/share/deepin/
+  # Remove Deepin distro's lsb-release
+  rm "$pkgdir"/etc/lsb-release
+  # Don't override systemd timeouts
+  rm -r "$pkgdir"/etc/systemd
+  # Make a symlink for deepin-version
+  ln -s ../usr/lib/deepin/desktop-version "$pkgdir"/etc/deepin-version
+  # Remove apt-specific templates
+  rm -r "$pkgdir"/usr/share/python-apt
+}

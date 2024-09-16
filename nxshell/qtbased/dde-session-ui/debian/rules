@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+export QT_SELECT=5
+
+include /usr/share/dpkg/default.mk
+SYSTYPE=Desktop
+SYSTYPE=$(shell cat /etc/deepin-version | grep Type= | awk -F'=' '{print $$2}')
+%:
+	dh $@ --parallel
+
+ifeq ($(DEB_BUILD_ARCH), mipsel)
+override_dh_auto_configure:
+	dh_auto_configure -- SHUTDOWN_NO_QUIT=YES LOCK_NO_QUIT=YES DISABLE_DEMO_VIDEO=YES DISABLE_TEXT_SHADOW=YES DISABLE_ANIMATIONS=YES USE_CURSOR_LOADING_ANI=YES
+endif
+
+ifeq ($(DEB_BUILD_ARCH), mips64el)
+override_dh_auto_configure:
+	dh_auto_configure -- SHUTDOWN_NO_QUIT=YES LOCK_NO_QUIT=YES DISABLE_DEMO_VIDEO=YES DISABLE_TEXT_SHADOW=YES DISABLE_ANIMATIONS=YES USE_CURSOR_LOADING_ANI=YES
+endif
+
+ifeq ($(DEB_BUILD_ARCH), sw_64)
+override_dh_auto_configure:
+	dh_auto_configure -- SHUTDOWN_NO_QUIT=YES LOCK_NO_QUIT=YES DISABLE_DEMO_VIDEO=YES DISABLE_TEXT_SHADOW=YES DISABLE_ANIMATIONS=YES USE_CURSOR_LOADING_ANI=YES
+endif
+
+ifeq ($(SYSTYPE), Professional)
+ifeq ($(DEB_BUILD_ARCH), amd64)
+override_dh_gencontrol:
+	dh_gencontrol -- -Vdist:Depends="pbis-open"
+endif
+endif

@@ -1,0 +1,22 @@
+[Unit]
+Description=Deepin Graphics Driver Manager - Installer
+Wants=network-online.target
+After=systemd-user-sessions.service getty@tty1.service plymouth-quit.service network.target network-online.target
+Before=lightdm.service
+ConditionPathExists=/usr/lib/deepin-graphics-driver-manager/working-dir/dgradvrmgr_gltest_flag
+
+[Service]
+Type=oneshot
+Environment=LC_ALL=C
+ExecStartPre=-/usr/sbin/overlayroot-chroot rm -f /usr/lib/deepin-graphics-driver-manager/working-dir/dgradvrmgr_gltest_flag
+ExecStartPre=-/usr/bin/xset s 0 0
+ExecStartPre=-/usr/bin/xset s off
+ExecStartPre=-/bin/dmesg --console-off
+ExecStartPre=-/bin/plymouth quit
+ExecStart=/usr/lib/deepin-graphics-driver-manager/dgradvrmgr-gltest.sh
+StandardInput=tty-force
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=getty.target

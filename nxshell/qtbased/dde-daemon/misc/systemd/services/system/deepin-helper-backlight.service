@@ -1,0 +1,37 @@
+[Unit]
+Description=deepin backlight helper service
+
+[Service]
+Type=dbus
+BusName=org.deepin.dde.BacklightHelper1
+User=root
+ExecStart=/usr/lib/deepin-daemon/backlight_helper
+StandardOutput=null
+StandardError=journal
+
+ProtectSystem=strict
+
+InaccessiblePaths=/etc/shadow
+InaccessiblePaths=-/etc/NetworkManager/system-connections
+InaccessiblePaths=-/etc/pam.d
+InaccessiblePaths=-/usr/share/uadp/
+#ReadOnlyPaths=/lib
+#ReadWritePaths=/sys/class
+
+NoNewPrivileges=yes
+ProtectHome=yes
+# 设置背光需要
+#ProtectKeirnelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateMounts=yes
+PrivateTmp=yes
+# 背光设置需要
+#PrivateDevices=yes
+PrivateNetwork=yes
+PrivateUsers=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+#MemoryDenyWriteExecute=yes

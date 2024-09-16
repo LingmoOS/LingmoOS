@@ -1,0 +1,340 @@
+/*!
+@~chinese
+@file include/util/ddciicon.h
+@ingroup dci
+@brief DCI图标类
+
+@class Dtk::Gui::DDciIconImage ddciicon.h
+@details 用于获取 dci 图标某种状态的图片资源（位图数据），同时支持静态图和动态图，接口的设计类似于 QImageReader，一般通过调用 DDciIcon::image 构造此对象。与 DDciIcon 配合使用，其所支持的图片格式与 DDciIcon::pixmap 接口一致，都取决于 Qt 图片插件系统（即 QImageReader）所提供的能力。
+@sa DDciIcon::image
+
+@fn Dtk::Gui::DDciIconImage::DDciIconImage()
+@details 构造一个空的对象。
+
+@fn Dtk::Gui::DDciIconImage::DDciIconImage(const DDciIconImage &other)
+@details 根据 other 对象构造一个新的 DDciIconImage 对象，这个新的对象将与 other 共享 DDciIconImagePrivate 对象。
+
+@fn Dtk::Gui::DDciIconImage::operator=(const DDciIconImage &other)
+@details 对当前对象进行赋值，这将导致此对象与 other 共享 DDciIconImagePrivate 对象。
+
+@fn Dtk::Gui::DDciIconImage::operator=(DDciIconImage &&other)
+@details 对当前对象进行赋值，这将导致此对象与 other 两者的 DDciIconImagePrivate 对象被交换。
+@sa DDciIconImage::swap
+
+@fn Dtk::Gui::DDciIconImage::swap(DDciIconImage &other)
+@details 交换两个对象的数据，这将导致两者的 DDciIconImagePrivate 对象被交换。
+
+@fn Dtk::Gui::DDciIconImage::operator ==(const DDciIconImage &other) const
+@details 如果两个对象引用了相同的 DDciIconImagePrivate 数据对象，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::operator !=(const DDciIconImage &other) const
+@details 如果两个对象引用了不同的 DDciIconImagePrivate 数据对象，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::isNull() const
+@details 如果此对象为空，则返回 true，否则返回 false。当对象为空时，调用其它成员函数将获得一个无效的结果。
+
+@fn Dtk::Gui::DDciIconImage::reset()
+@details 重置数据的状态，将清理所有的内部缓存数据，并且重置所有的状态记录，与重新调用 DDciIcon::image 获取一个新的对象后的状态相同。对于动画图片而言，这会导致 DDciIconImage::atBegin 变成 true，即动画将从第一帧重新开始。
+
+@fn Dtk::Gui::DDciIconImage::toImage(const DDciIconPalette &palette) const
+@details 对于静态图片，将读取图片数据，并加载为 QImage 对象返回。对于动态图片，将返回当前帧的位图数据，且多次调用时不会重新加载，将返回缓存的 QImage 对象，另外需要注意的时，与 QImageReader::read 的不同，在调用此函数读取当前帧后，并不会自动跳转到下一帧，即在未调用 DDciIconImage::jumpToNextImage 时，多次调用此函数将返回同一帧。
+@param[in] palette 如果此图片支持指定调色板，则将根据传入的 DDciIconPalette 中指定的颜色对图片进行加工。详情请参见 DSG 标准中的 DCI 图片格式设计。
+@sa DDciIconImage::hasPalette DDciIconImage::paint
+
+@fn Dtk::Gui::DDciIconImage::paint(QPainter *painter, const QRectF &rect, Qt::Alignment alignment, const DDciIconPalette &palette) const
+@details 将图片的位图数据通过传入的画笔进行绘制。
+@param[in] painter 指定画笔对象。
+@param[in] rect 指定绘制区域，此区域相对于画笔所对应的 QPainter::paintDevice()，如果此区域的宽度比图片的宽度小，则会在绘制时将图片缩小到此区域的大小，反之则保持图片自身大小，而不会知道图片被放大。
+@param[in] alignment 指定绘制时图片相对于 rect 所指定区域的位置，即当图片宽度小于 rect 所指定的宽度时，将根据此参数决定图片的显示位置。
+@param[in] palette 如果此图片支持指定调色板，则将根据传入的 DDciIconPalette 中指定的颜色对图片进行加工。详情请参见 DSG 标准中的 DCI 图片格式设计。
+@sa DDciIconImage::toImage
+
+@fn Dtk::Gui::DDciIconImage::hasPalette() const
+@details 如果此图片支持指定调色板，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::supportsAnimation() const
+@details 如果此图片支持动画，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::atBegin() const
+@details 如果此图片支持动画且动画处于第一帧，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::atEnd() const
+@details 如果此图片支持动画且动画处于最后一帧，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::jumpToNextImage()
+@details 将动画跳转到下一帧，如果此图片支持动画且当前不是最后一帧，则返回 true，否则返回 false。
+
+@fn Dtk::Gui::DDciIconImage::loopCount() const
+@details 返回动画的轮播次数，如果此图片不支持动画，则返回值无效。如果返回值为 -1，则表明此动画需要无限循环播放。
+
+@fn Dtk::Gui::DDciIconImage::maxImageCount() const
+@details 返回动画的最大帧数，如果当前图片有多层且每一层都支持动画，则是所有动画帧数的累加，因此多个动画的播放时间会可能会有重叠的帧，所以无法确保播放此图片时一定能显示这么多帧，动画是否结束需要以 DDciIconImage::atEnd 的返回结果为准。如果此图片不支持动画，则返回值无效。
+
+@fn Dtk::Gui::DDciIconImage::currentImageDuration() const
+@details 返回当前动画帧的持续时间，单位为毫秒。如果此图片不支持动画，则返回值无效。
+
+@fn Dtk::Gui::DDciIconImage::currentImageNumber() const
+@details 返回动画已经播放到的帧的序号，此值一定小于 DDciIconImage::maxImageCount - 1。如果此图片不支持动画，则返回值无效。
+
+@class Dtk::Gui::DDciIcon ddciicon.h
+@details 如果需要详细dci相关介绍以及规范文档, 可以参见[dci文件图标规范](https://github.com/linuxdeepin/deepin-specifications/blob/master/unstable/%E5%9B%BE%E6%A0%87%E6%96%87%E4%BB%B6%E8%A7%84%E8%8C%83.md)
+
+## DDciIcon示例
+项目目录结构在同一目录下
+
+## CMakeLists.txt
+```cmake
+cmake_minimum_required(VERSION 3.1.0)                # 指定cmake最低版本
+
+project(ddciicon-example VERSION 1.0.0 LANGUAGES CXX) # 指定项目名称, 版本, 语言 cxx就是c++
+
+set(CMAKE_CXX_STANDARD 11)                           # 指定c++标准
+set(CMAKE_CXX_STANDARD_REQUIRED ON)                  # 指定c++标准要求,至少为11以上
+
+set(CMAKE_AUTOMOC ON)                                # 支持qt moc
+set(CMAKE_AUTORCC ON)                                # support qt resource file # 支持qt资源文件
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)                # 支持 clangd
+
+if (CMAKE_VERSION VERSION_LESS "3.7.0")              # 如果cmake版本小于3.7.0
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)                # 设置包含当前目录
+endif()
+
+find_package(Qt5 REQUIRED COMPONENTS Core)           # 寻找Qt5组件Core
+find_package(Qt5 REQUIRED COMPONENTS Gui)            # 寻找Qt5组件Core
+find_package(Qt5 REQUIRED COMPONENTS Widgets)        # 寻找Qt5组件Widgets
+find_package(DtkCore REQUIRED)                       # 寻找Dtk组件Core
+find_package(Dtk REQUIRED COMPONENTS Gui)            # 寻找Dtk组件Gui
+find_package(Dtk REQUIRED COMPONENTS Widget)         # 寻找Dtk组件Widget
+
+add_executable(${PROJECT_NAME}                       # 生成可执行文件
+    main.cpp
+    qml.qrc
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE        # 添加需要链接的共享库
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Dtk::Core
+    dtkgui
+    dtkwidget
+)
+```
+
+## main.cpp
+```cpp
+#include <DApplication>
+#include <DWidgetUtil>
+#include <DIconButton>
+#include <DDciIcon>
+#include <QtDebug>
+#include <QFormLayout>
+#include <DMainWindow>
+#include <QWidget>
+#include <QLabel>
+#include <QHBoxLayout>
+
+DWIDGET_USE_NAMESPACE
+
+int main(int argc, char *argv[])
+{
+    DApplication a(argc, argv);
+    DMainWindow win;
+
+    QWidget w;
+    QFormLayout* layout = new QFormLayout(&w);
+
+    // fromTheme表示从图标主题中寻找资源。
+    DDciIcon dci = DDciIcon::fromTheme("select_indicator");
+
+    auto icon = dci.matchIcon(0, DDciIcon::Light, DDciIcon::Hover);
+    qDebug() << "DCI图标的实际大小" << dci.actualSize(icon);
+
+    // 定义一个函数，传入DIconButton，以及提示信息
+    auto addBtnRow = [&](DIconButton *iconBtn, const QString name){
+        iconBtn->setIconSize(QSize(32,32));
+        QHBoxLayout *hlayout = new QHBoxLayout();
+        hlayout->addWidget(iconBtn);
+        QLabel *btnLabel = new QLabel(name);
+        hlayout->addWidget(btnLabel);
+        return hlayout;
+    };
+
+    // 将DDciIcon传入DIconButton
+    DIconButton *iconBtn1 = new DIconButton(dci);
+    layout->addRow(addBtnRow(iconBtn1, "icon button"));
+
+    DIconButton *iconBtn2 = new DIconButton(dci);
+    iconBtn2->setDisabled(true);
+    layout->addRow(addBtnRow(iconBtn2, "disabled state"));
+
+    DIconButton *iconBtn3 = new DIconButton(dci);
+    iconBtn3->setDown(true);
+    layout->addRow(addBtnRow(iconBtn3, "pressed state"));
+
+    win.setCentralWidget(&w);
+    win.resize(200,100);
+    win.show();
+    Dtk::Widget::moveToCenter(&win);
+    return a.exec();
+}
+```
+
+## qml.qrc
+```xml
+<RCC>
+    <qresource prefix="/dsg/built-in-icons">
+        <file>select_indicator.dci</file>
+    </qresource>
+</RCC>
+```
+
+## select_indicator.dci
+下载dci-demo解压获取，这是个用qml编写的例子，使用DDciIcon更灵活
+[dci-demo](https://github.com/linuxdeepin/deepin-specifications/blob/master/unstable/dci-demo.zip)
+
+编译和运行程序
+```bash
+cmake -B build
+cmake --build build
+./build/ddciicon-example
+```
+
+程序运行效果如下：
+![ddciicon-example](/docs/images/ddciicon-example1.jpg)
+
+@enum Dtk::Gui::DDciIcon::Mode
+@brief DCI图标模式
+@details
+    | 键        | 值 |
+    |:--------:|:---:|
+    | Normal   | 0 |
+    | Disabled | 1 |
+    | Hover    | 2 |
+    | Pressed  | 3 |
+
+
+@enum Dtk::Gui::DDciIcon::Theme
+@brief DCI图标主题
+@details
+    | 键     | 值 |
+    |:-----:|:---:|
+    | Light | 0 |
+    | Dark  | 1 |
+
+@enum Dtk::Gui::DDciIcon::IconAttibute
+@brief DCI图标属性
+@details
+    | 键     | 值 |
+    |:-----:|:---:|
+    | HasPalette | 0x001 |
+    这个属性为了获取dci图标的图层是否包含调色板颜色调整, 比如某一个图层的图片的需要用高亮色的填充就是 HasPalette, 这个高亮色还可以调整亮度饱和度rgba等参数
+
+@enum Dtk::Gui::DDciIcon::IconMatchedFlag
+@brief DCI图标匹配参数
+@var DDciIcon::None
+@brief 空，无含义
+@var DDciIcon::DontFallbackMode
+@brief 在查找图片资源时，如果指定的 mode 不存在，则禁止回退，直接当作查找不到处理
+@var DDciIcon::RegardPaddingsAsSize
+@brief 将图层中携带的 paddings 属性算作图层大小的一部分，这会影响图片匹配时的大小判断
+
+@fn Dtk::Gui::DDciIcon::DDciIcon()
+@brief 构造函数
+
+@fn Dtk::Gui::DDciIcon::DDciIcon(const DCORE_NAMESPACE::DDciFile *dciFile)
+@brief 指定DCI文件的构造函数
+
+@fn Dtk::Gui::DDciIcon(const QString &fileName)
+@brief 指定DCI文件名的构造函数
+
+@fn Dtk::Gui::DDciIcon::DDciIcon(const QByteArray &data)
+@brief 指定DCI文件数据的构造函数
+
+@fn Dtk::Gui::DDciIcon::DDciIcon(const DDciIcon &other)
+@brief 拷贝构造函数,重载赋值运算符
+
+@fn Dtk::Gui::DDciIcon::swap(DDciIcon &other)
+@brief 交换两个DDciIcon对象
+
+@fn bool Dtk::Gui::DDciIcon::isNull() const
+@brief 判断DCI图标是否为空
+
+@fn DDciIconMatchResult Dtk::Gui::DDciIcon::matchIcon(int size, Theme theme, Mode mode, IconMatchedFlags flags = None) const
+@brief 获取DCI图标匹配元信息, 元信息仅能作为传入参数使用
+@param[in] size 图标大小
+@param[in] theme 图标主题
+@param[in] mode 图标模式
+@param[in] flags 图标匹配标志
+
+@fn int Dtk::Gui::DDciIcon::actualSize(DDciIconMatchResult result) const
+@brief 获取DCI图标实际大小
+@param[in] result DCI图标匹配结果
+
+@fn int Dtk::Gui::DDciIcon::actualSize(int size, Theme theme, Mode mode =Normal) const
+@brief 获取DCI图标实际大小
+@details 该函数会根据传入的参数获取DCI图标匹配结果,然后调用actualSize(DDciIconMatchResult result)函数获取DCI图标实际大小
+@sa DDciIcon::actualSize(DDciIconMatchResult result)
+
+@fn QList<int> Dtk::Gui::DDciIcon::availableSizes(Theme theme, Mode mode=Normal) const
+@brief 获取DCI图标可用大小列表
+@param[in] theme 图标主题
+@param[in] mode 图标模式，默认为Normal
+
+@fn bool Dtk::Gui::DDciIcon::isSupportedAttribute(DDciIconMatchResult result, IconAttibute attr)
+@brief 判断DCI图标是否支持指定属性
+@param[in] result DCI图标匹配结果
+@param[in] attr 图标属性
+
+@fn QPixmap Dtk::Gui::DDciIcon::pixmap(qreal devicePixelRatio, int iconSize, Theme theme, Mode mode = Normal,const DDciIconPalette &palette = DDciIconPalette()) const
+@brief 获取DCI图标的QPixmap
+@param[in] devicePixelRatio 设备像素比
+@param[in] iconSize 图标大小
+@param[in] theme 图标主题
+@param[in] mode 图标模式, 默认为Normal
+@param[in] palette 图标调色板,默认为无（空）调色板
+
+@fn QPixmap Dtk::Gui::DDciIcon::pixmap(qreal devicePixelRatio, int iconSize, DDciIconMatchResult result, const DDciIconPalette &palette = DDciIconPalette()) const
+@brief 获取DCI图标的QPixmap
+@param[in] devicePixelRatio 设备像素比
+@param[in] iconSize 图标大小
+@param[in] result DCI图标匹配结果
+@param[in] palette 图标调色板, 默认为无（空）调色板
+
+@fn void Dtk::Gui::DDciIcon::paint(QPainter *painter, const QRect &rect, qreal devicePixelRatio, Theme theme, Mode mode = Normal, Qt::Alignment alignment = Qt::AlignCenter, const DDciIconPalette &palette = DDciIconPalette()) const
+@brief 绘制DCI图标
+@param[in] painter QPainter对象
+@param[in] rect 绘制区域
+@param[in] devicePixelRatio 设备像素比
+@param[in] theme 图标主题
+@param[in] mode 图标模式, 默认为Normal
+@param[in] alignment 对齐方式, 默认为Qt::AlignCenter
+@param[in] palette 图标调色板, 默认为无（空）调色板
+
+@fn void Dtk::Gui::DDciIcon::paint(QPainter *painter, const QRect &rect, qreal devicePixelRatio, DDciIconMatchResult result, Qt::Alignment alignment = Qt::AlignCenter, const DDciIconPalette &palette = DDciIconPalette()) const
+@brief 绘制DCI图标
+@param[in] painter QPainter对象
+@param[in] rect 绘制区域
+@param[in] devicePixelRatio 设备像素比
+@param[in] result DCI图标匹配结果
+@param[in] alignment 对齐方式, 默认为Qt::AlignCenter
+@param[in] palette 图标调色板, 默认为无（空）调色板
+
+@fn Dtk::Gui::DDciIcon::image(DDciIconMatchResult result, int size, qreal devicePixelRatio) const
+@details 构造一个 DDciIconImage 对象
+@param[in] result 匹配到的图片结果，将根据此匹配结果查找对应的图片数据。
+@param[in] size 期望获取到的图片大小，将根据此大小寻找最为接近的图片资源，当图片大小与传入的大小不一致时，将优先返回一个稍大的图片。
+@param[in] devicePixelRatio 期望获取到的图片的缩放比例，将根据其寻找最为接近的图片资源，当无法找到指定比例的图片时，将优先返回一个稍大比例的图片。
+@sa DDciIcon::matchIcon
+
+@fn static DDciIcon Dtk::Gui::DDciIcon::fromTheme(const QString &name)
+@brief 从dci图标主题(包括内置dci图标资源)中获取图标名字为name的图标
+@param[in] name DCI图标名称
+
+@fn static DDciIcon Dtk::Gui::DDciIcon::fromTheme (const QString &name, const DDciIcon &fallback)
+@brief 从dci图标主题(包括内置dci图标资源)中获取图标名字为name的图标
+@param[in] name DCI图标名称
+@param[in] fallback 当图标名为 name 的图标找不到时, fallback 到 fallback 的这个dci图标
+
+*/

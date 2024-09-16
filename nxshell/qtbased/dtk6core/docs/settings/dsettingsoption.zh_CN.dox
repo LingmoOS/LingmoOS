@@ -1,0 +1,87 @@
+/*!
+@~chinese
+@file include/settings/dsettingsoption.h
+@ingroup dsettings
+
+@class Dtk::Core::DSettingsOption dsettingsoption.h
+@brief DSettingsOption是DSettings的基本单元,用于存放一对键-值数据。
+
+@fn Dtk::Core::DSettingsOption::DSettingsOption(QObject *parent = Q_NULLPTR)
+@brief DSettingsOption构造函数
+
+@fn QPointer<DSettingsGroup> Dtk::Core::DSettingsOption::parentGroup() const
+@brief 当前选项的直接上级组
+@return 返回当前选项的直接上级组
+
+@fn void Dtk::Core::DSettingsOption::setParentGroup(QPointer<DSettingsGroup> parentGroup)
+@brief 修改当前选项的上级组
+@param[in] parentGroup 上级组
+
+@fn QString Dtk::Core::DSettingsOption::key() const
+@brief 当前选项的键值
+@return 返回当前选项的键值
+
+@fn QString Dtk::Core::DSettingsOption::name() const
+@brief 当前选项的名称
+@return 返回当前选项的名称
+
+@fn bool Dtk::Core::DSettingsOption::canReset() const
+@brief 选项是否可以重置,如果可以重置,在调用reset方法后,选项的值会变成初始值。
+@return 如果可以重置则为true
+
+@fn QVariant Dtk::Core::DSettingsOption::defaultValue() const
+@brief 选项的默认值
+@return 返回选项的默认值
+
+@fn QVariant Dtk::Core::DSettingsOption::value() const
+@brief 选项的当前值
+@return 返回选项的当前值
+
+@fn QVariant Dtk::Core::DSettingsOption::data(const QString &dataType) const
+@param[in] dataType 数据类型
+@brief 选项的附件data,用于未选项设置一些额外的辅助属性。
+@return 数据类型对应的数据.
+@sa QObject::property
+@sa Dtk::Core::DSettingsOption::setData
+
+@fn QString Dtk::Core::DSettingsOption::viewType() const
+@brief 选项的控件类型
+@return 返回选项的控件类型
+@sa Dtk::Widget::DSettingsWidgetFactory
+
+@fn bool Dtk::Core::DSettingsOption::isHidden() const
+@brief 检查选项是否会在界面上显示
+@return 如果显示则返回true,否则返回false。
+
+@fn static QPointer<DSettingsOption> Dtk::Core::DSettingsOption::fromJson(const QString &prefixKey, const QJsonObject &json)
+@brief 从json对象中反序列化出一个选项对象
+@param[in] prefixKey 选项的前缀
+@param[in] json 待反序列化的json对象
+@return 返回解析完成后的 `option` 数据
+
+@fn void Dtk::Core::DSettingsOption::setValue(QVariant value)
+@brief 设置选项的当前值.
+@param[in] value 选项的当前值
+
+@fn void Dtk::Core::DSettingsOption::setData(const QString &dataType, QVariant value)
+@brief 为选项添加自定义属性
+@param[in] dataType 选项的扎属性数据id,对每个选项必须唯一
+@param[in] value 选项id对应的值
+@sa Dtk::Core::DSettingsOption::data
+
+@fn void Dtk::Core::DSettingsOption::parseJson(const QString &prefixKey, const QJsonObject &option)
+@brief 从json对象中反序列化,并设置自身的值。
+@param[in] prefixKey 选项的前缀
+@param[in] option 待反序列化的json对象
+@sa QPointer<DSettingsOption> Dtk::Core::DSettingsOption::fromJson(const QString &prefixKey, const QJsonObject &json)
+
+@fn void Dtk::Core::DSettingsOption::valueChanged(QVariant value)
+@brief 选项的数据变化时发出改信息
+@param[in] value 发生改变的数据
+
+@fn void Dtk::Core::DSettingsOption::dataChanged(const QString &dataType, QVariant value);
+@brief 选项的附件的额外数据变化时发出改信息，可以看作这个值的属性发生变化。
+@param[in] dataType 改变的数据类型
+@param[in] value 发生改变的数据
+
+*/

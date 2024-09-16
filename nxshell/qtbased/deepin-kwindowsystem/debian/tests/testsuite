@@ -1,0 +1,12 @@
+#!/bin/sh
+
+[ -e debian/tests.home ] || mkdir debian/tests.home
+export HOME="$(pwd)/debian/tests.home"
+mkdir "$HOME"/.config || true
+remove_home () {
+    rm -rf debian/tests.home
+}
+trap remove_home EXIT
+
+xvfb-run -a --server-args="-screen 0 1024x768x24" \
+    dbus-run-session -- debian/tests/testsuite.xsession

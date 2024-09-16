@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+include /usr/share/dpkg/architecture.mk
+
+DDM_CMAKE_ARGS = -DDBUS_CONFIG_FILENAME="ddm_org.freedesktop.DisplayManager.conf"
+
+ifneq ($(DEB_HOST_ARCH_OS),linux)
+  DDM_CMAKE_ARGS += -DNO_SYSTEMD=ON -DENABLE_JOURNALD=OFF
+endif
+
+%:
+	dh $@
+
+
+override_dh_auto_configure:
+	dh_auto_configure -- ${DDM_CMAKE_ARGS}
+
+override_dh_installsystemd:
+# 	dh_installsystemd -pddm --no-start -r ddm.service
+
+override_dh_installinit:
+	dh_installinit --noscripts
+
+# execute_after_dh_auto_install:
+# 	# not installed, as the Debian version is used instead
+# 	rm -f $(CURDIR)/debian/tmp/lib/systemd/system/ddm.service
+
+#execute_after_dh_fixperms-arch:
+	# ensure script is marked as executable
+	# chmod +x $(CURDIR)/debian/ddm/etc/ddm/Xsession
+
+execute_after_dh_installpam:
+	dh_installpam --name=ddm-autologin
+	dh_installpam --name=ddm-greeter
+

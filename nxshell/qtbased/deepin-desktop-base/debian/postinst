@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+echo "version,codename,series,created,release,eol" > /usr/share/distro-info/deepin.csv
+echo "15.2,Unstable,unstable,2016-06-01" >> /usr/share/distro-info/deepin.csv
+echo "15.3,Unstable,unstable,2016-09-13" >> /usr/share/distro-info/deepin.csv
+echo "15.4,Panda,panda,2017-04-19" >> /usr/share/distro-info/deepin.csv
+
+
+case "${1}" in
+	configure)
+	    update-alternatives --install /etc/deepin-version \
+		    deepin-version /usr/lib/deepin/desktop-version 50
+
+	    if [ -x /usr/sbin/update-initramfs ]
+	    then
+		    update-initramfs -u
+	    fi
+
+        if [ -x /usr/sbin/update-grub ]
+        then
+            /usr/sbin/update-grub || echo "update-grub failed! Ignore..." >&2
+        fi
+		;;
+
+	abort-upgrade|abort-remove|abort-deconfigure)
+
+		;;
+
+	*)
+		echo "postinst called with unknown argument \`${1}'" >&2
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

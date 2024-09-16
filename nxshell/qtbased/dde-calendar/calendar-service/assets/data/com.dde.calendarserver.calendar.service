@@ -1,0 +1,11 @@
+[Unit]
+Description = dde-calendar date service
+After=dbus.socket
+Requires=dbus.socket
+
+[Service]
+Type = simple
+ExecStart = /bin/bash -c "dbus-send --session --print-reply --dest=com.deepin.dataserver.Calendar /com/deepin/dataserver/Calendar/AccountManager com.deepin.dataserver.Calendar.AccountManager.updateRemindJob boolean:false"
+
+[Install]
+WantedBy=user-session.target

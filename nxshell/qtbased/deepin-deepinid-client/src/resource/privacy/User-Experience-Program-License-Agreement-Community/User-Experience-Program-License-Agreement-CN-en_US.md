@@ -1,0 +1,45 @@
+## User Experience Program License Agreement for Deepin OS
+
+Update Date：December 8th, 2020
+
+Welcome to the User Experience Program. The User Experience Program (hereinafter referred to as the “Program”) is a network service developed and operated by UnionTech Software Technology Co., Ltd. ("UnionTech Software") and its affiliated companies (especially Wuhan Deepin Technology Co., Ltd. ("Deepin Technology") ) to facilitate the improvement of user experiences of the Deepin OS.
+
+With this service, the hardware, application software and operation system information of the computers running with Deepin OS can be collected and analyzed to determine the further improvement for Deepin OS.
+
+Please read all rights and limitations stated in this User Experience Program License Agreement (hereinafter referred to as the “Agreement”) carefully before participating in the Program. This is a legal agreement between you (natural person, legal person or other organizations) and UnionTech Software Technology Co., Ltd. and its affiliated companies (especially Wuhan Deepin Technology Co., Ltd.). By participating in the Program, you signify your assent to and acceptance of the Agreement, and acknowledge that you have read and understood all the terms of the Agreement. If you represent an entity, by participating in the Program, you are deemed to accept these terms on behalf of the entity. If you DO NOT agree any term of this Agreement, please do not activate the Program. 
+
+Unless being replaced by a new version, the Agreement applies to any version of the User Experience Program and its related updates regardless the way how the software is delivered.
+
+**1. Privacy Policy. UnionTech Software has formulated strict privacy policies for protecting the user's personal data and attaches great importance on the protection of the user’s personal information. Only when you agree with both the License Agreement and Privacy Policy, can you participate in the Program. In participating in the Program, we will collect the data on your device in accordance with the Agreement and Privacy Policy. Please refer to the details of Privacy Policy on** [https://www.deepin.org/en/agreement/privacy](https://www.deepin.org/en/agreement/privacy).
+
+**2. Participating in the Program.** You can manually enable “User Experience Program” in the process of installing the Deepin OS or in “Control Center-General Settings-User Experience Program” in the Deepin OS. After enabling the Program, UnionTech Software will collect the data defined in the Agreement and Privacy Policy. You can close the “User Experience Program” at any time unconditionally. UnionTech Software will no longer collect your information after closing the Program.
+
+**3. Intellectual Property Rights.** The program owned by UnionTech Software in the Program is protected under Copyright Law and other applicable laws. **UnionTech Software and its affiliates have legal trademark rights to “统信” "深度" “UOS” “deepin”  “统信UOS” trademarks and logos.** trademarks and logos. (1) You shall not remove any copyright mark and trademark in the Program. (2) UnionTech Software owns the copyright and other intellectual property rights (including but not limited to any image, picture, flash, video, record, music, word and additional program, color, user interface-design, structure) and the attached printing material (except for trademarks and other rights owned by third parties), or UnionTech Software has the legitimate using rights. (3) The copyright of the Program and printing documents are protected under the Copyright Law, Patent Law, Trademark Law, Anti-injustice Competition Law of PRC and international laws and treaties. (4) You shall not remove or destroy any copyright mark regarding the software.
+
+**4. Specification.** Your participation in this Program is subject to the laws and this Agreement. You are not entitled to perform, including but not limited to, the following activities:
+
+(1)to publish, deliver, transmit or store any content that contravenes the laws and regulations belonging to the country where the user resides, or threatens the social security, social stability, or anything that is inappropriate, insulting, defamatory, obscene, violent and against the laws, regulations and policies belonging to the country where the user resides;
+
+(2)to publish, deliver, transmit or store content that infringes others intellectual property rights or trade secrets;
+
+(3)to issue, deliver or transmit bulk advertisements or spam;
+
+(4)to publish, transmit or distribute images, pictures, software or other materials (including but not limited to copyright, trademarks, patents, trade secrets, privacy and related personality rights) that infringe on third parties, unless you have obtained the necessary and effective authorization from the right holder in advance;
+
+(5)to take any actions to threaten the security of the network, including but not limited to, use data or enter server/account without permission; enter public networks or private computer and delete, copy, amend or add stored information without permission; without permission, attempt to detect, scan or test the weakness of the Software system or the network or attempt to conduct any other activities to damage the network security system; attempt to intervene with, affect the normal operation of, the Software or the network; intentionally spread malicious programs or viruses, and take other actions to damage or intervene with the normal information service of the network; forge part or all of the titles of TCP/IP packages.
+
+(6)to participate in the Program in any illegal way, for any illegal purpose, or in any inconsistent way with the Agreement.
+
+**If you fail to comply with the above provisions, UnionTech Software has the right, in its sole discretion, to terminate, completely or partially suspend, or limit your participation in the Program, and reserves all rights to pursue your actions.**
+
+**5. Disclaimer.** No any other form of after-sales warranty is applied to the Program. To the maximum extent permitted under the applicable law, UnionTech Software does not provide any express, implied or statutory warranties, guarantees or conditions including, but not limited to, any implied warranties of merchantability, non-infringement or fitness for a particular purpose.
+
+**You should always make a backup of your files, and solely be responsible for the risks of using the software. UnionTech Software does not take any liability for the damages and risks resulting from participating in the Program, including, but not limited to direct or indirect personal injuries,trade interruptions, commercial profit loss, data loss, or any other economic loss. UnionTech Software does not take any liability for damages caused by telecommunication systems or Internet network failures, or any other force majeure reasons (including hacking attack).**
+
+**6. License Termination.** (1) UnionTech Software is entitled to terminate the Agreement at any time, if any terms or conditions in the Agreement are violated. (2) Provided that UnionTech Software offers you any replaced, revised or upgraded Version of the software attached with a replacement of the Agreement, which stipulates that you can use the replaced, revised or upgraded Version of the software under the condition that you accept the replacement of the Agreement, UnionTech Software may terminate this Agreement.
+
+**7. Jurisdiction and Applicable Law.** The establishment, execution, interpretation and resolution of disputes with respect to the Agreement shall be governed by the laws of the P.R.C. **When any dispute arises between UnionTech Software and the user due to the content or the implement of the Agreement, the two parties shall resolve it through friendly negotiation; if the negotiation fails, the user hereby agrees that the dispute shall be resolved in the court located in the jurisdiction where UnionTech Software resides.**
+
+**8. Interpretation and Modification.** UnionTech Software has the right to interpret and modify this Agreement to the maximum extent without any violation of all the applicable laws and regulations. It also reserves the right to modify this Agreement at any time in accordance with the changes in relevant laws and regulations, as well as the company's conditions and business strategies. The modified Agreement will be shown in the new version of the software for acceptance before you use it. In the event of a dispute, the latest Agreement shall prevail. If you do not agree with the changes in the Agreement, you may not activate the Program. If you continue to participate in the Program, you are deemed to have accepted the modifications in the Agreement. 
+
+**9. Contact Us**. If you have any questions regarding this Agreement, or need any information, please contact Deepin Community at: support@deepin.com.

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="dde_restrict">
+  <copyright><![CDATA[
+        Copyright © 2020  pengwenhao <pengwenhao@uniontech.com>
+
+        Permission to use, copy, modify, distribute, and sell this
+        software and its documentation for any purpose is hereby granted
+        without fee, provided that the above copyright notice appear in
+        all copies and that both that copyright notice and this permission
+        notice appear in supporting documentation, and that the name of
+        the copyright holders not be used in advertising or publicity
+        pertaining to distribution of the software without specific,
+        written prior permission.  The copyright holders make no
+        representations about the suitability of this software for any
+        purpose.  It is provided "as is" without express or implied
+        warranty.
+
+        THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+        SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+        WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+        AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+        ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+        THIS SOFTWARE.
+  ]]></copyright>
+    <interface name="dde_restrict" version="1">
+        <description summary="dde restrict "/>
+        <enum name="switch_flag">
+            <description summary="the switch status of whether the feature can be used or not"/>
+            <entry name="on" value="1" summary="feature toggle on"/>
+            <entry name="off" value="2" summary="feature toggle off"/>
+        </enum>
+
+        <request name="switch_screencast">
+            <description summary="switch screencast feature flag"/>
+            <arg name="switch_flag" type="uint" summary="Requested screencast flag"/>
+        </request>
+
+        <request name="client_whitelist">
+            <description summary="this feature is enabled only when the feature is turned on and the whitelisted client displays"/>
+            <arg name="whitelists" type="string" summary="comma-separated window resource classes"/>
+        </request>
+
+        <event name="loged">
+            <description summary="send window out-of-bounds behavior"/>
+            <arg name="log" type="string" summary="A human readable translated error message."/>
+        </event>
+
+        <request name="set_protected_window">
+            <description summary="set protected window id which prohibit screenshot"/>
+            <arg name="window" type="int" summary="set protected window id"/>
+        </request>
+
+        <request name="remove_protected_window">
+            <description summary="remove protected window id which prohibit screenshot"/>
+            <arg name="window" type="int" summary="remove protected window id"/>
+        </request>
+    </interface>
+</protocol>

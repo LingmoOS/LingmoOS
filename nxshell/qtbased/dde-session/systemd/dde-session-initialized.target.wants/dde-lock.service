@@ -1,0 +1,24 @@
+[Unit]
+Description=dde-lock service
+RefuseManualStart=no
+RefuseManualStop=no
+CollectMode=inactive-or-failed
+StartLimitBurst=3
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+Wants=org.dde.session.Daemon1.service
+After=org.dde.session.Daemon1.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dde-lock
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=500ms

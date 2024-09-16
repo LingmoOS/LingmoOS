@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: MIT
+
+lanugage=locale.$LANGUAGE
+lanugage=${lanugage#*.}
+
+# 定义要提取的文本字符串
+source_text=$3
+
+# 定义.qm文件的路径
+qm_file="/usr/share/$1/translations/$2_$lanugage.qm"
+
+# 使用 lconvert 命令将 .qm 文件转换为临时 .ts 文件
+export QT_SELECT=qt5
+lconvert -i "$qm_file" -o /tmp/$2_$lanugage.ts
+tmptsfile=/tmp/$2_$lanugage.ts
+
+# 在临时 .ts 文件中查找并提取源文本的翻译
+translation=$(grep -A 1 "<source>$source_text</source>" $tmptsfile | grep '<translation>' | head -n 1)
+start="\<translation\>"
+end="</translation>"
+translation=$(echo "$translation" | grep -oP "(?<=$start).*?(?=$end)")
+
+# 删除临时 .ts 文件
+rm $tmptsfile
+
+# 输出翻译结果
+if [ -z "$translation" ]; then
+	echo $source_text
+else
+	echo $translation
+fi

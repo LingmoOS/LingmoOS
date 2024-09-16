@@ -1,0 +1,20 @@
+[Unit]
+Description=dde-session-daemon service
+RefuseManualStart=no
+RefuseManualStop=no
+CollectMode=inactive-or-failed
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+[Service]
+Type=dbus
+BusName=org.deepin.dde.Daemon1
+ExecStart=/usr/lib/deepin-daemon/dde-session-daemon
+Slice=app.slice
+Restart=on-failure
+NotifyAccess=main

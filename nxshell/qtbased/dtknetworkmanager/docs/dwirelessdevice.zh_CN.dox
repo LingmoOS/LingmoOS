@@ -1,0 +1,74 @@
+/*!
+@~chinese
+@file dwirelessdevice.h
+
+注意, 下面获取的ap对象有可能被NetwrokManager自动卸载, 请尽量使用新获取的Id
+
+@class Dtk::NetworkManager::DWirelessDevice dwirelessdevice.h
+@brief 对于Wireless设备属性的封装
+
+@fn QByteArray DWirelessDevice::HwAddress() const;
+@brief 获取设备的活动硬件地址
+@return 活动硬件地址
+
+@fn QByteArray DWirelessDevice::permHwAddress() const;
+@brief 获取设备的永久硬件地址
+@retunrn 永久硬件地址
+
+@fn QList<quint64> DWirelessDevice::accessPoints() const;
+@brief 获取设备上的接入点
+@return 由接入点对象id组成的列表
+
+@fn NM80211Mode DWirelessDevice::mode() const;
+@brief 获取该设备的操作模式
+@return 操作模式
+
+@fn quint32 DWirelessDevice::bitrate() const;
+@brief 获取当前设备的速率, 单位是KB/s
+@return 当前速率
+
+@fn quint64 DWirelessDevice::activeAccessPoint() const;
+@brief 获取该设备上激活的ap接入点
+@return 接入点对象的Id
+
+@fn NMWifiCap DWirelessDevice::wirelessCapabilities() const;
+@brief 获取无线设备的功能
+@return 代表功能的枚举
+
+@fnDExpected<void> DWirelessDevice::requestScan(const Config &options = {}) const;
+@brief 请求该设备进行扫描
+@param [in] options 扫描的一些可选项, 目前支持ssid属性
+@note 如果想要知道扫描结束可以监听lastScan的变化
+
+@fnDExpected<QList<quint64>> DWirelessDevice::getAllAccessPoints() const;
+@brief 获取所有的接入点对象id
+@retunrn 接入点对象id组成的列表
+
+@fn void DWirelessDevice::HwAddressChanged(const QByteArray &addr);
+@brief 信号, 当HwAddress属性发生改变时触发
+
+@fn void DWirelessDevice::permHwAddressChanged(const QByteArray &address);
+@brief 信号. 当permHwAddress属性发生变化时触发
+
+@fn void DWirelessDevice::accessPointsChanged(const QList<quint64> &aps);
+@brief 信号, 当accessPoints属性改变时触发
+
+@fn void DWirelessDevice::modeChanged(const NM80211Mode mode);
+@brief 信号, 当mode属性改变时触发
+
+@fn void DWirelessDevice::bitrateChanged(const quint32 bitrate);
+@brief 信号, 当bitrate属性改变时触发
+
+@fn void DWirelessDevice::activeAccessPointChanged(const quint64 &path);
+@brief 信号, 当activeAccessPoint属性改变时触发
+
+@fn void DWirelessDevice::wirelessCapabilitiesChanged(const NMWifiCap wirelessCapabilities);
+@brief 信号, 当wirelessCapabilities属性改变时触发
+
+@fn void DWirelessDevice::AccessPointAdded(const quint64 &ap);
+@brief 信号, 当有接入点加入时触发
+
+@fn void DWirelessDevice::AccessPointRemoved(const quint64 &ap);
+@brief 信号, 当有接入点被移除时触发
+
+*/

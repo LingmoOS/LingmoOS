@@ -1,0 +1,25 @@
+[Unit]
+Description=dde-osd service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requires=dde-osd.target
+Before=dde-osd.target
+
+Requisite=dde-session-pre.target
+After=dde-session-pre.target
+
+Requisite=dde-session-initialized.target
+PartOf=dde-session-initialized.target
+Before=dde-session-initialized.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.Notifications
+ExecStart=/usr/lib/deepin-daemon/dde-osd
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=500ms

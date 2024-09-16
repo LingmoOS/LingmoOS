@@ -1,0 +1,33 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=deepin-qt5integration-git
+pkgver=5.1.12.r54.g732a237
+pkgrel=1
+sourcename=qt5integration
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Qt platform theme integration plugins for DDE'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/qt5integration"
+license=('GPL3')
+depends=('dtkwidget-git' 'libqt5xdg' 'deepin-qt5platform-plugins-git')
+makedepends=('git' 'qt5-tools' 'xcb-util-renderutil' 'gtest' 'gmock' 'cmake' 'ninja')
+conflicts=('deepin-qt5integration')
+provides=('deepin-qt5integration')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+
+build() {
+	cd $sourcedir
+	cmake . -GNinja \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release
+	ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

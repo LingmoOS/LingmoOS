@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+export GOPATH := /usr/share/gocode
+export GOCACHE := /tmp/gocache
+
+ifneq ($(DEB_BUILD_ARCH), mips64el)
+	export GO_BUILD_FLAGS=-ldflags '-linkmode=external -extldflags "-pie"'
+endif
+
+%:
+	dh $@
+
+override_dh_dwz:
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+
+ifeq ($(DEB_BUILD_ARCH),sw_64)
+override_dh_strip:
+	true
+override_dh_auto_test:
+	true
+endif

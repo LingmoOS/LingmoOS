@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+export QT_SELECT = qt5
+
+PACK_VER = $(shell echo $(DEB_VERSION_UPSTREAM) | awk -F'[+_~-]' '{print $$1}')
+# Fix: invalid digit "8" in octal constant. e.g.  u008 ==> 008 ==> 8
+BUILD_VER = $(shell echo $(DEB_VERSION_UPSTREAM) | awk -F'[+_~-]' '{print $$2}' | sed 's/[^0-9]//g' | awk '{print int($$1)}')
+
+BUILD_EXAMPLES=OFF
+
+BUILD_DOCS=ON
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_VERSION=${BUILD_VER} -DBUILD_EXAMPLES=${BUILD_EXAMPLES} -DBUILD_DOCS=${BUILD_DOCS} -DVERSION=$(PACK_VER)
+

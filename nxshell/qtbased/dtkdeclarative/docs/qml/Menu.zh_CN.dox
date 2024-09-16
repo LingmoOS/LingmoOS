@@ -1,0 +1,106 @@
+
+/**
+@~chinese
+@class Menu
+@ingroup Menu
+
+@ingroup QML_TYPES
+@brief 提供一种行云设计风格的 Menu 控件.
+@details
+    Menu 控件大多被用于应用菜单，例如功能菜单、右键菜单等。 DTK 实现的菜单
+    比原有样式的菜单更流畅;更定制化，它能够兼容 Menu 的所有接口，并且能够做
+    到内部的 MenuItem 自动适配菜单的宽高。<br>
+    除此之外，Menu 还支持添加头部控件和尾部控件，当需要添加自定义搜索内容时，
+    头部控件可以添加 SearchEdit 来实现。<br>
+    Menu 的最大项目个数在 DTK 的设计中是 16，当超过该数值时，Menu 会出现
+    滚动选项，同时 菜单的上部和下部会出现上下移动的按钮，鼠标放置时可自动进行移动。<br>
+    Menu 的基本用于如下代码所示：<br>
+```qml
+    Menu {
+        MenuItem { text: qsTr("打开") }
+        MenuItem { text: qsTr("在新窗口打开") }
+        MenuItem { text: qsTr("在新标签中打开") }
+        MenuItem { text: qsTr("以管理员身份打开") }
+        MenuSeparator {}
+        MenuItem { text: qsTr("复制") }
+        MenuSeparator {}
+        MenuItem { text: qsTr("共享文件夹")}
+        MenuItem { text: qsTr("创建链接")}
+        MenuItem { text: qsTr("发送到桌面")}
+        MenuItem { text: qsTr("在终端中打开")}
+        Menu { title: qsTr("自定义")}
+        MenuItem { text: qsTr("压缩")}
+        MenuItem { text: qsTr("属性")}
+    }
+```
+    如上代码， Menu 内部控件需要使用 Menu、MenuItem 或者 MenuSeparator，其中 MenuItem 用
+    来显示实际的菜单项，包含图表和文本， MenuSeparator 用来显示菜单中的分隔符。在菜单中内部的
+    子菜单，可以使用 Menu 叠加的方式完成。<br>
+    对于自定义头部控件，这里使用一个 SearchEdit 的示例表示：<br>
+```qml
+    Menu {
+        id: searchAndArrowMenu
+        width: 160
+        header: SearchEdit {
+            placeholder: qsTr("搜索")
+            onTextChanged: {
+                proxyModel.filterText = text
+                proxyModel.update()
+            }
+        }
+        model: ObjectModelProxy {
+            id: proxyModel
+            property string filterText
+            filterAcceptsItem: function(item) {
+                return item.text.includes(filterText)
+            }
+            sourceModel: searchAndArrowMenu.contentModel
+        }
+
+        maxVisibleItems: 10
+        MenuItem { text: qsTr("Greek(cp869)") }
+        MenuItem { text: qsTr("Cyrillic (ISO 8859-5)") }
+        MenuItem { text: qsTr("Cyrillic(KOI8-R)") }
+        MenuItem { text: qsTr("Devanagari(x-mac-davanagari)") }
+        MenuItem { text: qsTr("Gurmukhi(x-mac-gurmukhi)") }
+        MenuItem { text: qsTr("Thai (ISO 8859-11)") }
+        MenuItem { text: qsTr("Simplified Chinese(x-mac-sim-chinese)") }
+        MenuItem { text: qsTr("Chinese(GBK)"); checked: true}
+        MenuItem { text: qsTr("Chinese(GB 18030)") }
+        MenuItem { text: qsTr("Chinese(ISO 2022-CN)") }
+        MenuItem { text: qsTr("Simplified Chinese (GB2312)") }
+        MenuItem { text: qsTr("Tibetan (x-mac-tibetan)") }
+        MenuItem { text: qsTr("Central European(ISO Latin 2)") }
+        MenuItem { text: qsTr("Central Eu 188 opx(ISO Latin 4)") }
+        MenuItem { text: qsTr("Baltic (ISO Latin 7)") }
+    }
+```
+
+@property int Menu::maxVisibleItems
+@brief maxVisibleItems 用于控制菜单中的最大项数
+@details 默认情况下，该值是 16。当 Menu中的项数超过最大可视项目数量，其他的菜单项会处于滚动显示的状态。<br>
+    并且在菜单的头部和尾部会添加向上和向下滚动的按钮，当鼠标放置在上面时，菜单自动滚动。
+
+@property Palette Menu::backgroundColor
+@brief backgroundColor 属性控制 Menu 的背景颜色。
+
+@property var Menu::model
+@brief `model` 属性是 Menu 的模型，`model`用于控制菜单的数据添加和删除，动态进行数据创建等等。
+@details
+    一般情况下， Menu 只需要手动添加 MenuItem 而不需要指定`model`，
+    当需要对`model`的数据进行过滤时，可以使用 ObjectModelProxy 包装该模型。
+    一般可用于控制 MenuItem 的显示和隐藏，创建和删除。手动控制 MenuItem 中 visible
+    属性会在 Menu 中留下一个视觉上的空位，因此不推荐直接使用 visible 属性控制 MenuItem
+    的隐藏。
+
+@property Component Menu::header
+@brief header 属性可指定 Menu 的自定义的头部组件。
+
+@property Component Menu::footer
+@brief footer 属性可指定 Menu 的自定义的底部组件。
+
+@property bool Menu::existsChecked
+@note 此属性为只读属性
+@brief existsChecked 属性可判断当前的 Menu 中是否存在已经选中的 MenuItem，如果存在则返回 true ， 否则返回 false。
+
+*/

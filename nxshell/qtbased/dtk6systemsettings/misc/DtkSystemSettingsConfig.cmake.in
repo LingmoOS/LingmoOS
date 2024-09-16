@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core DBus)
+find_dependency(Dtk@VERSION_SUFFIX@ COMPONENTS Core)
+include(${CMAKE_CURRENT_LIST_DIR}/@DtkSystemSettings@Targets.cmake)
+set(@DtkSystemSettings@_LIBRARIES Dtk@VERSION_SUFFIX@::SystemSettings)
+get_target_property(@DtkSystemSettings@_INCLUDE_DIRS Dtk@VERSION_SUFFIX@::SystemSettings INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(@DtkSystemSettings@_LIBRARY_DIRS Dtk@VERSION_SUFFIX@::SystemSettings INTERFACE_LINK_DIRECTORIES)
+
+set(@DtkSystemSettings@_FOUND true)

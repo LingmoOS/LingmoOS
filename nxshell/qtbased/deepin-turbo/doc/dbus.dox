@@ -1,0 +1,26 @@
+/*! \page dbus Using launcher with D-Bus
+
+\section dbuslaunching Launching with D-Bus
+
+If you are using D-Bus to launch your application, you can launch it
+directly in the .service-file, without any wrapper scripts slowing
+things down. The \c .desktop and D-Bus \c .service files can be modified so that 
+normal execution is replaced with the following:
+
+\code
+Exec=/usr/bin/invoker --type=d /usr/bin/myApp
+\endcode
+
+By default, invoker waits for the application to terminate and exits with
+the same exit code. Most Unix signals received by invoker are forwarded to the application.
+
+Note: Do not use --no-wait in D-Bus service files, otherwise D-Bus daemon may think that the application just died before registering its service. 
+
+Note: When .desktop file contains the X-Maemo-Service field, the application 
+is started by default through D-Bus. This can delay the
+application start-up. Therefore it is recommended not to have the 
+X-Maemo-Service field inside .desktop files with launched applications,
+unless it is really needed for some other reason.
+
+*/
+

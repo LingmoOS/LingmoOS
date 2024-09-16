@@ -1,0 +1,55 @@
+
+/**
+@~chinese
+@class BehindWindowBlur
+@ingroup Item
+
+    \keyword DQuickBehindWindowBlur
+@brief 提供一个能使窗口背景模糊的控件.
+@details
+    DTK 中窗口可以实现模糊特效，当设置该特效后，窗口的特定区域将会对窗口后面的背景进行模糊填充。使用模糊特效能够丰富窗口的视觉内容
+    ，使窗口更加具备层次感和立体感。 BehindWindowBlur 控件能够很容易的实现该效果，其效果与 dtkwidget 中 DBlurEffectWidget 类
+    的效果类似，但在实现方式上有很大不同，在 QML 中使用 BehindWindowBlur 将更加灵活可控，例如 BehindWindowBlur 可以指定特殊区域
+    模糊，而另外的区域不模糊， 且模糊背景的颜色能与特定的颜色进行混色显示。
+    BehindWindowBlur 在使用方式上非常简单，它能够直接用在 Window 控件上，例如下述代码，其属性的设置和添加都更加方便和简单：
+```qml
+    import QtQuick.Window 2.11
+    import org.deepin.dtk 1.0
+
+    Window {
+        id: root
+        DWindow.enabled: true  // 开启 DTK 中窗口的圆角和无边框等特殊属性
+        DWindow.alphaBufferSize: 8  // 设置 DTK 窗口 alpha 通道的缓冲区大小
+
+        BehindWindowBlur {
+            control: root
+            anchors.fill: parent
+            blendColor: Qt.rgba(1, 0, 0, 0.3)
+        }
+    }
+```
+    其最终的效果如下图所示：
+@image html behindwindowblur.png
+    模糊特效分为窗口内模糊和窗口外模糊，窗口内模糊即对窗口内部控件所使用到的背景进行模糊；窗口外模糊即对窗口外部背景进行模糊。当前类进行
+    的模糊操作为窗口外模糊，其大多数情况下使用在窗口控件，对窗口的背景进行模糊渲染，并填充到窗口中。 BehindWindowBlur 类对模糊进行了
+    基本封装，可用于更灵活的场景中，例如一些特殊的混合填充色， StyledBehindWindowBlur 类同样也能对窗口进行模糊，但不同的是该类针对
+    行云设计中的模糊背景色对混合填充色进行了具体设置。用户在使用 StyledBehindWindowBlur 类时无需关心需要混合那种颜色。
+
+@property real BehindWindowBlur::cornerRadius
+@brief 该属性表示模糊矩形的半径大小。
+@details 模糊区域作为一个矩形大小的控件进行展示，因此该属性被用于指定矩形的圆角大小。
+
+@property color BehindWindowBlur::blendColor
+@brief 该属性表示与目标区域混合的颜色
+@details 当不指定颜色时，该背景模糊后直接展示到控件上；当指定颜色时，会将颜色与模糊背景进行混合，使模糊背景的色调呈现出与混合颜色相似的色调。
+
+@property bool BehindWindowBlur::valid
+@note 该属性为只读属性
+@brief 用于判断当前窗口状态是否支持窗口外模糊。
+@details 如果支持窗口外模糊，返回 true，否则返回 false。该属性在窗口管理器层访问其是否支持模糊效果。
+
+@property bool BehindWindowBlur::blurEnabled
+@brief 用于控制是否开启模糊效果。
+@details 属性为 false 时，将禁用模糊效果，为 true 时则开启。便于在程序运行过程中临时开启或关闭模糊特效。
+
+*/

@@ -1,0 +1,133 @@
+/*!
+@~chinese
+@ingroup dtkio
+@file dfileinfo.h
+
+@namespace Dtk::IO::DFileInfo
+
+@class Dtk::IO::DFileInfo dfileinfo.h
+@brief 用以获取文件的信息
+
+@fn Dtk::IO::DFileInfo::DFileInfo(const QUrl &url, QObject *parent)
+@brief 构造函数，通过文件的 url 构造一个新的 DFileInfo 对象
+@param[in] url 文件的url
+@param[in] parent 父类对象，用于内存管理
+
+@fn DFileInfo::DFileInfo(const DFileInfo &other)
+@brief 复制构造函数, 通过 other 构造一个新的 DFileInfo 对象
+@param[in] other 原始对象
+
+@fn Dtk::IO::DFileInfo::DFileInfo(DFileInfo &&other) noexcept
+@brief 移动构造函数, 通过 other 构造一个新的 DFileInfo 对象
+@param[in] other 原始对象
+
+@fn DFileInfo &DFileInfo::operator=(const DFileInfo &other)
+@brief 重载赋值操作，创建一个相同的对象
+@param[in] other 原始对象
+
+@fn DFileInfo &Dtk::IO::DFileInfo::operator=(DFileInfo &&other) noexcept
+@brief 以右值引用的方式进行赋值操作
+@param[in] other 原始对象
+
+@fn DExpected<QUrl> DFileInfo::url() const
+@brief 获取当前对象管理的文件的url字符串
+@return 当前对象所管理的文件的url
+
+@fn void DFileInfo::setQueryAttributes(const QByteArray &attributes)
+@brief 设置查询属性
+@param[in] attributes 要设置的属性
+
+@fn void DFileInfo::setQueryInfoFlags(const FileQueryInfoFlags flags)
+@brief 设置查询文件信息时的标志
+@param[in] flags 标志（不进行额外操作 | 不处理链接文件）
+
+
+@fn DExpected<QByteArray> DFileInfo::queryAttributes() const
+@brief 获取已定义的查询属性
+@return 已定义的查询属性
+
+@fn DExpected<FileQueryInfoFlags> DFileInfo::queryInfoFlag() const
+@brief 获取已定义的查询信息的标志
+@return 查询信息的标志
+
+@fn DExpected<bool> DFileInfo::initQuerier()
+@brief 根据查询属性和标志对文件信息进行初始化
+@return 操作成功true，否则返回DError对象，包含错误信息
+
+@fn DExpected<QVariant> Dtk::IO::DFileInfo::attribute(AttributeID id, bool *success) const
+@brief 根据输入的id获取文件对应的属性
+@param[in] id 要查询的属性的id
+@param[out] success 查询操作是否成功
+@return 查询到的文件信息
+
+@fn DExpected<QVariant> DFileInfo::attribute(const QByteArray &key, const AttributeType type) const
+@brief 根据输入的键值获取对应的文件属性
+@param[in] key 文件属性对应的键值
+@param[out] type 文件属性的类型（字符、字节、布尔值等）
+@return 查询到的文件信息
+
+@fn DExpected<bool> DFileInfo::hasAttribute(AttributeID id) const
+@brief 查询是否含有某个id的属性
+@param[in] id 要查询的id
+@return 查询成功则返回true，失败则false
+
+@fn DExpected<bool> DFileInfo::hasAttribute(const QByteArray &key) const
+@brief 查询是否含有key对应的属性
+@param[in] key 要查询的key
+@return 查询成功则返回true，失败则false
+
+@fn DExpected<bool> DFileInfo::exists() const
+@brief 文件信息是否存在
+@return 存在则返回true，不存在则false
+
+@fn DExpected<bool> DFileInfo::refresh()
+@brief 重新根据查询属性来获取文件信息，应在queryAttributes发生变动后调用
+@return 成功则返回true，失败则false
+
+@fn DExpected<Permissions> DFileInfo::permissions() const
+@brief 获取当前文件的权限属性
+@return 当前文件的权限属性，以permisson对象返回
+
+@fn DFileFuture *DFileInfo::initQuerierAsync(int ioPriority, QObject *parent)
+@brief 异步的方式初始化查询
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *Dtk::IO::DFileInfo::attributeAsync(AttributeID id, int ioPriority, QObject *parent) const
+@brief 异步的方式获取文件属性
+@param[in] id 要查询的属性id
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *Dtk::IO::DFileInfo::attributeAsync(const QByteArray &key, const AttributeType type, int ioPriority, QObject *parent) const
+@brief 异步的方式获取文件属性
+@param[in] key 要查询的属性键值
+@param[in] type 查询的属性的类型（字符、字节、布尔值等）
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileInfo::existsAsync(int ioPriority, QObject *parent) const
+@brief 异步的方式查询文件是否存在
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileInfo::refreshAsync(int ioPriority, QObject *parent)
+@brief 异步的方式刷新文件信息
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFileInfo::permissionsAsync(int ioPriority, QObject *parent)
+@brief 异步的方式获取文件权限属性
+@param[in] ioPriority 优先级控制
+@param[in] parent 默认为空
+@return 操作成功返回DFileFutur对象表示异步计算的结果
+
+@fn DError DFileInfo::lastError() const
+@brief 获取当前文件操作的错误码
+@return 当前文件操作的错误码
+*/

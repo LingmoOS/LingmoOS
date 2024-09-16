@@ -1,0 +1,36 @@
+[Unit]
+Description=deepin greeter setter service
+
+[Service]
+Type=dbus
+User=root
+BusName=org.deepin.dde.Greeter1
+ExecStart=/usr/lib/deepin-daemon/dde-greeter-setter
+StandardOutput=null
+StandardError=journal
+
+ProtectSystem=strict
+InaccessiblePaths=-/etc/shadow
+InaccessiblePaths=-/etc/NetworkManager/system-connections
+InaccessiblePaths=-/etc/pam.d
+InaccessiblePaths=-/usr/share/uadp/
+# /etc/lightdm/deepin/qt-theme.ini文件为dde-session-shell安装
+ReadWritePaths=-/etc/lightdm/
+
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateMounts=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+# 需要读取/proc的exe字段数据
+#PrivateUsers=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+# 和golang -pie参数冲突，导致进程无法启动
+#MemoryDenyWriteExecute=yes

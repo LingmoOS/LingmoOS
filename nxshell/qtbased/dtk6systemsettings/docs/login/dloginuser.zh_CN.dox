@@ -1,0 +1,83 @@
+/*!
+@~chinese
+@ingroup dtklogin
+@file dloginuser.h
+
+dloginuser.h 中定义了会话管理的接口
+
+@class Dtk::Login::DLoginUser dloginuser.h
+@brief 定义了用户管理的接口
+
+@fn DLoginUser::DLoginUser()
+@brief 此函数为私有构造函数，应使用DLoginManager获取该对象，需要通过调用`DLoginManager::findUserById()`、`DLoginManager::findUserByPID()`或者`DLoginManager::currentUser()`函数获取
+
+@fn QStringList DLoginUser::sessions() const
+@brief 当前用户所有当前会话的结构数组
+@return 包含用户当前所有session的结构数组
+
+@fn bool DLoginUser::idleHint() const
+@brief 当前用户的空闲状态
+@return 用户空闲状态的布尔值
+
+@fn bool DLoginUser::linger() const
+@brief 用户滞留
+@return 用户滞留的状态
+
+@fn QString DLoginUser::name() const
+@brief name
+@return 用户名
+
+@fn QString DLoginUser::runtimePath() const
+@brief 返回用户runtime路径
+@return 用户运行时路径
+
+@fn QString DLoginUser::service() const
+@brief 包含该用户的systemd的服务单元名称
+@return 用户当前的systemd服务单元名称
+
+@fn QString DLoginUser::state() const
+@brief 用户当前状态名称
+@return 以字符串形式返回用户当前状态信息
+
+@fn QString DLoginUser::slice() const
+@brief 用户systemd切片的单元名称
+@return 以字符串形式返回用户当前单元切片单元名称
+
+@fn QString DLoginUser::display() const
+@brief User的session id
+@return 返回 User的 session id
+
+@fn QString DLoginUser::GID() const
+@brief 用户组id
+@return 用户组的id
+
+@fn QString DLoginUser::UID() const
+@brief 用户id
+@return 用户id
+
+@fn QDateTime DLoginUser::idleSinceHint() const
+@brief 从该User开始空闲后的时间点
+@return 从该User开始空闲后的时间点
+
+
+@fn quint64 DLoginUser::idleSinceHintMonotonic() const
+@brief 从该User开始空闲后到现在过去的时间
+@return 从该User开始空闲后到现在过去的时间
+
+@fn QDateTime DLoginUser::loginTime() const
+@brief 最后一次登陆的时间点
+@return 用户最后一次登陆的时间点
+
+@fn quint64 DLoginUser::loginTimeMonotonic() const
+@brief 用户自登陆到现在过去的时间
+@return 用户自登陆到现在过去的时间
+
+@fn void DLoginUser::kill(const qint32 signal_number);
+@brief 发送unix信号
+对应Dbus上的kill信号，功能同manager的的KillUser一样，向用户所有进程发送Unix信号，需要信号编号，杀死进程
+
+@fn void DLoginUser::terminate()
+@brief 强制终止用户所有进程
+对应DBus上对应的Terminate 信号，强制终止该用户的所有进程。
+
+*/

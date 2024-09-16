@@ -1,0 +1,47 @@
+#!/bin/sh
+set -e
+
+DEFAULT_DISPLAY_MANAGER_FILE=/etc/X11/default-display-manager
+DEFAULT_SERVICE=/etc/systemd/system/display-manager.service
+
+case "$1" in
+    purge)
+        update-rc.d ddm remove > /dev/null
+
+        if [ -d /var/cache/ddm ]; then rm -r /var/cache/ddm; fi
+        if [ -d /var/lib/ddm ]; then rm -r /var/lib/ddm; fi
+        if [ -d /var/run/ddm ]; then rm -r /var/run/ddm; fi
+        if [ -d /var/log/ddm ]; then rm -r /var/log/ddm; fi
+        if [ -d /run/ddm ]; then rm -r /run/ddm; fi
+        if [ -f /var/log/ddm.log ]; then rm /var/log/ddm.log; fi
+
+        if getent passwd dde >/dev/null; then
+            if which deluser > /dev/null; then
+                deluser --system dde >&2 ||
+                    echo "Could not remove dde user." >&2
+            fi
+        fi
+        if getent group dde >/dev/null; then
+            if which delgroup > /dev/null; then
+                delgroup --system dde >&2 ||
+                    echo "Could not remove dde group." >&2
+            fi
+        fi
+        if [ ! -e "$DEFAULT_DISPLAY_MANAGER_FILE" ] &&
+            [ -h "$DEFAULT_SERVICE" ] && [ ! -e "$DEFAULT_SERVICE" ]; then
+            # Dangling symlink, no other display-manager installed
+            rm "$DEFAULT_SERVICE"
+        fi
+
+        ;;
+    abort-install|abort-upgrade)
+        # roll back displacement of default display manager file
+        if [ -e "$DEFAULT_DISPLAY_MANAGER_FILE.dpkg-tmp" ]; then
+            # FIXME - redo this part uses shell-lib.sh from xfree86
+            #observe "rolling back change of default X display manager"
+            mv "$DEFAULT_DISPLAY_MANAGER_FILE.dpkg-tmp" "$DEFAULT_DISPLAY_MANAGER_FILE"
+        fi
+        ;;
+esac
+#DEBHELPER#
+exit 0

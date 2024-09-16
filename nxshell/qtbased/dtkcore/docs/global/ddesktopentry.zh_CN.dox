@@ -1,0 +1,361 @@
+/*!
+@~chinese
+@file include/global/ddesktopentry.h
+@ingroup dglobal
+
+@class Dtk::Core::DDesktopEntry ddesktopentry.h
+@brief 处理desktop文件的接口
+@details
+## 概述
+
+DDesktopEntry提供了处理XDG desktop读写的方法的接口,这个Class类似于QSettings。
+
+有关该规范本身的更多详细信息，请参阅:
+https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+
+
+项目目录结构在同一目录下
+
+## CMakeLists.txt
+
+```cmake
+cmake_minimum_required(VERSION 3.1.0)         # 指定cmake最低版本
+
+project(example1 VERSION 1.0.0 LANGUAGES CXX) # 指定项目名称, 版本, 语言 cxx就是c++
+
+set(CMAKE_CXX_STANDARD 11)                    # 指定c++标准
+set(CMAKE_CXX_STANDARD_REQUIRED ON)           # 指定c++标准要求,至少为11以上
+set(target example1)                          # 指定目标名称
+
+set(CMAKE_AUTOMOC ON)                         # support qt moc # 支持qt moc
+set(CMAKE_AUTORCC ON)                         # support qt resource file # 支持qt资源文件
+set(CMAKE_AUTOUIC ON)                         # support qt ui file # 支持qt ui文件(非必须)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)         # support clangd # 支持 clangd
+
+if (CMAKE_VERSION VERSION_LESS "3.7.0")       # 如果cmake版本小于3.7.0
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)         # 设置包含当前目录
+endif()
+find_package(Qt5 COMPONENTS Core REQUIRED)    # 寻找Qt5组件Core
+find_package(Dtk COMPONENTS Core REQUIRED)    # 寻找Dtk组件Core
+
+add_executable(${target}                      # 生成可执行文件
+    main.cpp
+)
+
+target_link_libraries(${target} PRIVATE       # 添加需要链接的共享库
+    Qt5::Core
+    dtkcore
+)
+```
+
+## main.cpp
+
+```cpp
+#include <QDebug>
+#include <QString>
+#include <DDesktopEntry>
+#include <QFile>
+
+DCORE_USE_NAMESPACE // 使用Dtk Core命名空间
+
+const QString fileContent = { QStringLiteral(R"desktop(# A. Example Desktop Entry File
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Foo Viewer
+Name[zh_CN]=福查看器
+Comment=The best viewer for Foo objects available!
+# Next line have an extra " character
+Comment[zh_CN]=最棒的 "福 查看器！
+TryExec=fooview
+Exec=fooview %F
+Icon=fooview
+MimeType=image/x-foo;
+Actions=Gallery;Create;
+
+[Desktop Action Gallery]
+Exec=fooview --gallery
+Name=Browse Gallery
+
+[Desktop Action Create]
+Exec=fooview --create-new
+Name=Create a new Foo!
+Icon=fooview-new
+)desktop") };
+
+int main(int argc, char *argv[])
+{
+    QFile file("example1.desktop");
+    // 尝试打开文件
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug()<<"文件打开失败";
+    }
+    const QString fileName = file.fileName();
+    QTextStream ts(&file);
+    ts << fileContent;
+    file.close();
+    QFile::exists(fileName);
+
+    // 打开一个fileName为example1.desktop的文件
+    QScopedPointer<DDesktopEntry> desktopFile(new DDesktopEntry(fileName));
+
+    // 获取desktop中所有组并返回列表，对应"Desktop Entry"、"Desktop Action Gallery"、"Desktop Action Create"三组
+    QStringList allGroups = desktopFile->allGroups();
+
+    qDebug() << QString("Desktop 文件共有%1组").arg(allGroups.count());
+
+    // 调用allGroups函数，传入true，保持读取desktop文件时的顺序不变，获取第0组
+    qDebug() << QString("Desktop 文件第0组为: %1").arg(desktopFile->allGroups(true)[0]);
+
+    // 获取key=Name，localeKey=zh_CN的值，即Name[zh_CN]=福查看器
+    qDebug() << QString("Name[zh_CN]=%1") \
+                .arg(desktopFile->localizedValue("Name", "zh_CN"));
+
+    // 获取key为Nam，,localeKey为empty的值，empty表示没有localeKey，即Name=Foo Viewer
+    qDebug() << QString("Name=%1") \
+                .arg(desktopFile->localizedValue("Name", "empty"));
+
+    // 获取Desktop Entry组下的所有key，即"Actions", "Comment", "Comment[zh_CN]", "Exec", "Icon", "MimeType", "Name", "Name[zh_CN]", "TryExec", "Type", "Version"
+    qDebug() << QString("Desktop Entry组下的所有key: ") \
+                << desktopFile->keys("Desktop Entry");
+
+    // 设置 key 为 Name的值为"Bar Viewer"，默认组是"Desktop Entry"
+    desktopFile->setRawValue("Bar Viewer", "Name");
+
+    // 设置 key 为 Name，localeKey为zh_CN的值为霸查看器，默认组是"Desktop Entry"
+    desktopFile->setLocalizedValue("霸查看器", "zh_CN", "Name");
+
+    // 检查 section 中是否包 key 为 Semicolon 的值，包含 key 返回true; 否则返回false，默认组是Desktop Entry
+    qDebug() << QString("Desktop Entry组是否包key是Semicolon: ") \
+                << desktopFile->contains("Semicolon", "Desktop Entry");
+
+    // 设置key为Semicolon的值为";grp\\;2;grp3;"，默认组是"Desktop Entry"
+    desktopFile->setRawValue(";grp\\;2;grp3;", "Semicolon");
+
+    // 返回给定 section 中与给定 key 关联的字符串的列表。如果destkop不包含为该键的项,则函数返回一个空字符串列表。 默认组是Desktop Entry
+    qDebug() << QString("Desktop Entry组中Semicolon对应值的字符串列表: ") \
+                << desktopFile->stringListValue("Semicolon");
+
+    // 再次检查 section 中是否包 key 为 Semicolon 的值，此时为true
+    qDebug() << QString("Desktop Entry组是否包key是Semicolon: ") \
+            << desktopFile->contains("Semicolon", "Desktop Entry");
+
+    // 删除desktop中 section 中 key 对应的值，默认组是"Desktop Entry"
+    desktopFile->removeEntry("Semicolon", "Desktop Entry");
+
+    // 再次检查 section 中是否包 key 为 Semicolon 的值，此时为false
+    qDebug() << QString("Desktop Entry组是否包key是Semicolon: ") \
+            << desktopFile->contains("Semicolon", "Desktop Entry");
+
+    // 将数据回写到desktop文件。 true表示写成功; 否则返回false
+    if (desktopFile->save())
+    {
+        qDebug() << "文件保存成功";
+    } else {
+        qDebug() << "文件保存失败";
+    }
+
+    return 0;
+}
+```
+
+结果如下图
+
+![example](/docs/src/ddesktopentry_example1.png)
+
+@enum Dtk::Core::DDesktopEntry::EntryType
+@brief 桌面入口文件的类型
+@var Dtk::Core::DDesktopEntry::Unknown
+@brief 未知的桌面文件类型。可能是无效的
+@var Dtk::Core::DDesktopEntry::Application
+@brief 该文件描述应用程序
+@var Dtk::Core::DDesktopEntry::Link
+@brief 该文件描述URL
+@var Dtk::Core::DDesktopEntry::Directory
+@brief 该文件描述目录设置
+@var Dtk::Core::DDesktopEntry::ServiceType
+@brief KDE特定类型。规范中提到过, 所以这里也列出了
+@var Dtk::Core::DDesktopEntry::Service
+@brief KDE特定类型。规范中提到过, 所以这里也列出了
+@var Dtk::Core::DDesktopEntry::FSDevice
+@brief KDE特定类型。规范中提到过, 所以这里也列出了
+
+@enum Dtk::Core::DDesktopEntry::ValueType
+@brief 值的类型
+@var Dtk::Core::DDesktopEntry::Unparsed
+@brief 未解析的值
+@var Dtk::Core::DDesktopEntry::String
+@brief 字符串
+@var Dtk::Core::DDesktopEntry::Strings
+@brief 字符串数组
+@var Dtk::Core::DDesktopEntry::Boolean
+@brief 布尔值
+@var Dtk::Core::DDesktopEntry::Numeric
+@brief 数字
+@var Dtk::Core::DDesktopEntry::NotExisted
+@brief 不存在
+
+@enum Dtk::Core::DDesktopEntry::Status
+@brief desktop文件的解析状态
+@var Dtk::Core::DDesktopEntry::NoError
+@brief 没有错误发生
+@var Dtk::Core::DDesktopEntry::AccessError
+@brief 发生访问错误(例如, 试图写入只读文件)
+@var Dtk::Core::DDesktopEntry::FormatError
+@brief 发生格式错误(例如, 加载格式错误的desktop文件)
+
+@fn Dtk::Core::DDesktopEntry::DDesktopEntry(const QString &filePath) noexcept
+@brief DDesktopEntry构造函数
+
+@fn bool Dtk::Core::DDesktopEntry::save() const
+@brief 将数据回写到desktop文件。
+@return true表示写成功; 否则返回false
+
+@fn Status Dtk::Core::DDesktopEntry::status() const
+@brief Get data parse status
+@return 返回一个状态码, 表示DDesktopEntry遇到的第一个错误, 如果没有错误发生, 则返回QSettings::NoError。请注意, DDesktopEntry会延迟执行某些操作。
+
+@fn QStringList Dtk::Core::DDesktopEntry::keys(const QString &section = "Desktop Entry") const
+@brief 根据 `section` 返回全部键值
+@return 返回所有的键值
+
+@fn QStringList Dtk::Core::DDesktopEntry::allGroups(bool sorted = false) const
+@brief 获取desktop中所有组的列表。如果 `sorted` 设置为true, 则返回结果将保持读取desktop文件时的顺序不变。
+@return 返回所有的组.
+
+@fn bool Dtk::Core::DDesktopEntry::contains(const QString &key, const QString &section = "Desktop Entry") const
+@brief 检查desktop文件是否有给定的 `section` 包含给定的 `key`
+@return 如果desktop在 `section` 包含 `key` 返回true; 否则返回false。
+
+@fn QString Dtk::Core::DDesktopEntry::name() const
+@brief 返回“Desktop Entry”部分下的“Name”键的本地化字符串值。这等价于调用localizedValue("Name")。
+@return 返回“Desktop Entry”部分下的“Name”键的本地化字符串值。
+@sa localizedValue(), genericName(), ddeDisplayName()
+
+@fn QString Dtk::Core::DDesktopEntry::genericName() const
+@brief 返回"Desktop Entry"部分下的"GenericName"键的本地化字符串值。它等价于调用localizedValue("GenericName")。如果是“GenericName”不存在。则不会回退到“Name”。
+@return 返回"Desktop Entry"部分下的"GenericName"键的本地化字符串值。
+@sa localizedValue(), name(), ddeDisplayName()
+
+@fn QString Dtk::Core::DDesktopEntry::ddeDisplayName() const
+@brief 为DDE应用程序专门显示名称
+@details 这将检查“X-Deepin-Vendor”,并将返回本地化的字符串值“GenericName”
+"X-Deepin-Vendor"是"deepin"，否则它将返回"Name"的本地化字符串值。
+@return 返回专门用于DDE应用程序的显示名称
+@sa localizedValue(), name(), genericName()
+
+@fn QString Dtk::Core::DDesktopEntry::comment() const
+@brief 返回“Desktop Entry”部分下的“Comment”键的本地化字符串值。这等价于调用localizedValue("Comment")。
+@return 返回“Desktop Entry”部分下的“Comment”键的本地化字符串值。
+@sa localizedValue()
+
+@fn QString Dtk::Core::DDesktopEntry::rawValue(const QString &key, const QString &section = "Desktop Entry", const QString &defaultValue = QString()) const
+@brief 返回 `section` 中与给定 `key` 关联的原始字符串值。如果desktop不包含具有该键的项, 则函数返回一个构造好的 `defaultValue`。
+@return 返回 `section` 中与给定 `key` 相关联的原始字符串值。
+@sa stringValue() localizedValue() stringListValue()
+
+@fn QString Dtk::Core::DDesktopEntry::stringValue(const QString &key, const QString &section = "Desktop Entry", const QString &defaultValue = QString()) const
+@brief 返回 `section` 与给定 `key` 关联的未转义字符串值。如果desktop不包含键值为0的项, 则函数返回一个构造好的 `defaultValue`。
+@return 返回 `section` 中与给定 `key` 相关联的未转义字符串值。
+@sa rawValue() localizedValue() stringListValue()
+
+@fn QString Dtk::Core::DDesktopEntry::localizedValue(const QString &key, const QString &localeKey = "default", const QString &section = "Desktop Entry", const QString& defaultValue = QString()) const
+@brief 返回与 `section` 中给定的 `key` 和 `localeKey` 相关联的本地化字符串值。
+@details
+如果找不到给定的 `localeKey` ,它将回退到"C",如果仍然找不到,将回退 `key` 没有`localeKey`部分。。
+如果destkop不包含 `key` 值为0的项,则函数返回一个构造好的 `defaultValue`。
+@return 返回 `section` 中与给定的 `key` 和 `localeKey` 关联的本地化字符串值。
+@sa rawValue() stringValue() stringListValue()
+
+@fn QString Dtk::Core::DDesktopEntry::localizedValue(const QString &key, const QLocale &locale, const QString &section = "Desktop Entry", const QString& defaultValue = QString()) const
+@brief 返回与给定的 `key` 和 `section` 中的区域设置相关联的本地化字符串值。
+@details
+如果找不到给定的 `localeKey` ,它将回退到"C",如果仍然找不到,将回退 `key` 没有`localeKey`部分。
+如果destkop不包含 `key` 值为0的项,则函数返回一个构造好的 `defaultValue`。
+@return 返回 `section`中 与给定的 `key` 和 `locale` 设置相关联的本地化字符串值。
+@sa rawValue() stringValue() stringListValue()
+
+@fn QStringList Dtk::Core::DDesktopEntry::stringListValue(const QString &key, const QString &section = "Desktop Entry") const
+@brief 返回给定 `section` 中与给定 `key` 关联的字符串的列表。如果destkop不包含为该键的项,则函数返回一个空字符串列表。
+@return 返回给定 `section` 中与给定 `key` 关联的字符串的列表。
+@sa rawValue() stringValue() localizedValue()
+
+@fn bool Dtk::Core::DDesktopEntry::setRawValue(const QString &value, const QString &key, const QString& section = "Desktop Entry")
+@brief 设置给定 `section` 中与给定 `key` 关联的原始字符串值。
+
+@fn bool Dtk::Core::DDesktopEntry::setStringValue(const QString &value, const QString &key, const QString& section = "Desktop Entry")
+@brief 设置给定 `section` 中与给定 `key` 关联的字符串
+
+@fn bool Dtk::Core::DDesktopEntry::setLocalizedValue(const QString &value, const QString& localeKey, const QString &key, const QString& section = "Desktop Entry")
+@brief 设置给定的 `key` 和 `section` 中的区域设置相关联的本地化字符串值。
+
+@fn bool Dtk::Core::DDesktopEntry::removeEntry(const QString &key, const QString &section = "Desktop Entry");
+@brief 删除desktop中 `section` 与 `key` 对应的值
+
+@fn static QString& Dtk::Core::DDesktopEntry::escape(QString &str)
+@brief 支持转义序列`\s`、`\n`、`\t`、`\r`和`\\`表示值
+@details string和localestring类型的值支持转义序列`\s`、`\n`、`\t`、`\r`和`\\`,分别表示ASCII空格、换行符、制表符、回车和反斜杠。
+
+@fn static QString& Dtk::Core::DDesktopEntry::escapeExec(QString &str)
+@brief 必须将参数括在双引号之间，并对双引号字符进行转义。
+@details
+| 原字符 | 转义后 |
+|------|---------|
+| \`    | "`" |
+| $    | "$" |
+| \    | "\" |
+在它前面加上一个额外的反斜杠字符。实现必须在扩展字段代码之前和之前撤销引用,将参数传递给可执行程序。
+@note 类型为string的值的通用转义规则规定,反斜杠字符也可以转义为("\\")和这个转义规则应用在引用规则之前。<br>
+因此,要明确地表示在desktop文件中,引号参数中的文字反斜杠字符 <br>
+要求使用四个连续的反斜杠字符("\\\\")。同样，在桌面入口文件中引用参数中的美元符号表示为("\\$")。
+
+@fn static QString& Dtk::Core::DDesktopEntry::unescape(QString &str, bool unescapeSemicolons = false)
+@brief 对于类型为string和localestring的值,支持转义序列`\s`、`\n`、`\t`、`\r`和`\\`,分别表示ASCII空格、换行符、制表符、回车符和反斜杠。
+@details 有些键可以有多个值。这种情况下，`key` 的值被指定为复数形式:
+例如，字符串。多个值应该用分号分隔，`key` 的值可以选择以分号结尾。空字符串必须以分号结尾。
+这些值中的分号需要使用`\;`转义。
+
+有关该规范本身的更多详细信息，请参阅:
+https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#value-types
+
+@fn static QString& Dtk::Core::DDesktopEntry::unescapeExec(QString &str)
+@brief 必须将参数括在双引号之间,并对双引号字符进行转义，
+@details
+| 原字符 | 转义后 |
+|------|---------|
+| \`    | "`" |
+| $    | "$" |
+| \    | "\" |
+在它前面加上一个额外的反斜杠字符。实现必须在扩展字段代码之前和之前撤销引用,将参数传递给可执行程序。
+
+保留字符：
+| 功能                  | 字符 |
+|---------------------|---------|
+| space               | " " |
+| tab                 |  |
+| newline             |  |
+| double quote        |  |
+| single quote        | "'" |
+| backslash character | "\" |
+| greater-than sign   | ">" |
+| less-than sign      | "<" |
+| tilde               | "~" |
+| vertical bar        | \| |
+| ampersand           | "&" |
+| semicolon           | ";" |
+| dollar sign         | "$" |
+| asterisk            | "*" |
+| question mark       | "?" |
+| hash mark           | "#" |
+| parenthesis         | "(" 和 ")" |
+| backtick character  | "`" |
+@note 类型为string的值的通用转义规则规定 <br>
+反斜杠字符也可以转义为("\\"),而且转义规则在引号规则之前应用。<br>
+因此,要在desktop文件的引号参数中明确表示字面上的反斜杠字符,需要使用四个连续的反斜杠字符(“\\\\”)。<br>
+同样,在desktop文件中,引号参数中的美元符号可以明确地表示为("\\$")。
+
+@fn bool Dtk::Core::DDesktopEntry::setStatus(const Status &status)
+@brief 设置desktop文件解析状态
+
+*/

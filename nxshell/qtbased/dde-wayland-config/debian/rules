@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+export GOPATH := /usr/share/gocode
+export GOCACHE=/tmp/
+
+ifneq ($(DEB_BUILD_ARCH), mips64el)
+	export GOBUILD_OPTIONS=-ldflags '-linkmode=external -extldflags "-pie"'
+endif
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	echo clean
+

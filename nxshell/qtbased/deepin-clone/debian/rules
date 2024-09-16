@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+export QT_SELECT=5
+
+VERSION=$(shell dpkg-parsechangelog -ldebian/changelog -SVersion | awk -F'-' '{print $$1}')
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- VERSION=$(VERSION) LIB_INSTALL_DIR=/usr/lib/$(DEB_HOST_MULTIARCH) DEFINES+="VERSION=$(VERSION)" -DDISABLE_DFM_PLUGIN=YES
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+

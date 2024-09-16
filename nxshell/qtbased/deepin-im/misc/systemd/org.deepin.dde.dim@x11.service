@@ -1,0 +1,25 @@
+[Unit]
+Description=deepin input method daemon service
+
+Requires=org.deepin.dde.dimwl@x11.service
+After=org.deepin.dde.dimwl@x11.service
+Wants=org.deepin.dde.dimwl@x11.service
+
+# Limit startup frequency more than the default
+StartLimitIntervalSec=15s
+StartLimitBurst=1
+
+[Service]
+Type=simple
+ExecCondition=/bin/sh -c 'test "$XDG_SESSION_TYPE" = "%I" || exit 2'
+ExecStart=/usr/bin/dim
+# Exit code 1 means we are probably *not* dealing with an extension failure
+SuccessExitStatus=1
+
+# On X11 we want to restart and on-failure.
+Restart=always
+# Do not wait before restarting the shell
+RestartSec=0ms
+
+[Install]
+WantedBy=dde-session.target

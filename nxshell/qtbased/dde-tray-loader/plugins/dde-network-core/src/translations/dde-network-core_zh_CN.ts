@@ -1,0 +1,241 @@
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
+<context>
+    <name>QObject</name>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>WEP 40/128-bit Key</source>
+        <translation>WEP40/128位密钥</translation>
+    </message>
+    <message>
+        <source>WPA/WPA2 Personal</source>
+        <translation>WPA/WPA2个人版</translation>
+    </message>
+    <message>
+        <source>WPA3 Personal</source>
+        <translation>WPA3个人版</translation>
+    </message>
+    <message>
+        <source>TLS</source>
+        <translation>TLS</translation>
+    </message>
+    <message>
+        <source>MD5</source>
+        <translation>MD5</translation>
+    </message>
+    <message>
+        <source>LEAP</source>
+        <translation>LEAP</translation>
+    </message>
+    <message>
+        <source>FAST</source>
+        <translation>FAST</translation>
+    </message>
+    <message>
+        <source>Tunneled TLS</source>
+        <translation>隧道TLS</translation>
+    </message>
+    <message>
+        <source>Protected EAP</source>
+        <translation>受保护的EAP</translation>
+    </message>
+</context>
+<context>
+    <name>dde::network::NetworkDetailInterRealize</name>
+    <message>
+        <source>Hotspot</source>
+        <translation>热点</translation>
+    </message>
+    <message>
+        <source>SSID</source>
+        <translation>SSID</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation>协议</translation>
+    </message>
+    <message>
+        <source>Security Type</source>
+        <translation>安全类型</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation>网络通道</translation>
+    </message>
+    <message>
+        <source>Band</source>
+        <translation>频段</translation>
+    </message>
+    <message>
+        <source>Interface</source>
+        <translation>接口</translation>
+    </message>
+    <message>
+        <source>MAC</source>
+        <translation>MAC</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>Netmask</source>
+        <translation>子网掩码</translation>
+    </message>
+    <message>
+        <source>Gateway</source>
+        <translation>网关</translation>
+    </message>
+    <message>
+        <source>Primary DNS</source>
+        <translation>首选DNS</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Prefix</source>
+        <translation>前缀</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>速率</translation>
+    </message>
+</context>
+<context>
+    <name>dde::network::NetworkDetailNMRealize</name>
+    <message>
+        <source>automatic</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>Hotspot</source>
+        <translation>热点</translation>
+    </message>
+    <message>
+        <source>SSID</source>
+        <translation>SSID</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation>协议</translation>
+    </message>
+    <message>
+        <source>Security Type</source>
+        <translation>安全类型</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation>网络通道</translation>
+    </message>
+    <message>
+        <source>Band</source>
+        <translation>频段</translation>
+    </message>
+    <message>
+        <source>Interface</source>
+        <translation>接口</translation>
+    </message>
+    <message>
+        <source>MAC</source>
+        <translation>MAC</translation>
+    </message>
+    <message>
+        <source>IPv4</source>
+        <translation>IPv4</translation>
+    </message>
+    <message>
+        <source>Netmask</source>
+        <translation>子网掩码</translation>
+    </message>
+    <message>
+        <source>Gateway</source>
+        <translation>网关</translation>
+    </message>
+    <message>
+        <source>Primary DNS</source>
+        <translation>首选DNS</translation>
+    </message>
+    <message>
+        <source>IPv6</source>
+        <translation>IPv6</translation>
+    </message>
+    <message>
+        <source>Prefix</source>
+        <translation>前缀</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>速率</translation>
+    </message>
+</context>
+<context>
+    <name>dde::network::NetworkDeviceRealize</name>
+    <message>
+        <source>Device disabled</source>
+        <translation>设备已禁用</translation>
+    </message>
+    <message>
+        <source>Not connected</source>
+        <translation>未连接</translation>
+    </message>
+    <message>
+        <source>Network cable unplugged</source>
+        <translation>未插入网线</translation>
+    </message>
+    <message>
+        <source>Connecting</source>
+        <translation>正在连接</translation>
+    </message>
+    <message>
+        <source>Authenticating</source>
+        <translation>认证中</translation>
+    </message>
+    <message>
+        <source>Obtaining IP address</source>
+        <translation>正在获取IP地址</translation>
+    </message>
+    <message>
+        <source>Connected</source>
+        <translation>已连接</translation>
+    </message>
+    <message>
+        <source>Disconnected</source>
+        <translation>已断开</translation>
+    </message>
+    <message>
+        <source>IP conflict</source>
+        <translation>IP地址冲突</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>失败</translation>
+    </message>
+    <message>
+        <source>Obtaining address</source>
+        <translation>获取地址中</translation>
+    </message>
+</context>
+<context>
+    <name>dde::network::NetworkProcesser</name>
+    <message>
+        <source>Wired Network</source>
+        <translation>有线网络</translation>
+    </message>
+    <message>
+        <source>Wired Network %1</source>
+        <translation>有线网络%1</translation>
+    </message>
+    <message>
+        <source>Wireless Network</source>
+        <translation>无线网络</translation>
+    </message>
+    <message>
+        <source>Wireless Network %1</source>
+        <translation>无线网络%1</translation>
+    </message>
+</context>
+</TS>

@@ -1,0 +1,47 @@
+/*! \page usingcmake Using CMake
+
+  You can utilise pkg-config in CMake by including FindPkgConfig in CMakeLists.txt:
+
+\verbatim
+  include(FindPkgConfig) 
+\endverbatim
+
+  To ensure that Debian packages are built correctly, make the package build-depend on libmeegotouch-dev 
+  for MeeGo Touch applications, and on applauncherd-dev for other cases. To obtain the 
+  compiler and linker flags, add the following lines in CMakeLists.txt.
+
+  For MeeGo Touch applications:
+
+\verbatim
+  pkg_check_modules(MEEGOTOUCH_BOOSTABLE REQUIRED meegotouch-boostable)
+  add_definitions(${MEEGOTOUCH_BOOSTABLE_CFLAGS})
+  link_libraries(${MEEGOTOUCH_BOOSTABLE_LDFLAGS})
+\endverbatim
+
+  For Qt Declarative applications:
+
+\verbatim
+  pkg_check_modules(QDECLARATIVE_BOOSTABLE REQUIRED qdeclarative-boostable)
+  add_definitions(${QDECLARATIVE_BOOSTABLE_CFLAGS})
+  link_libraries(${QDECLARATIVE_BOOSTABLE_LDFLAGS})
+\endverbatim
+
+  For plain Qt applications:
+
+\verbatim
+  pkg_check_modules(QT_BOOSTABLE REQUIRED qt-boostable)
+  add_definitions(${QT_BOOSTABLE_CFLAGS})
+  link_libraries(${QT_BOOSTABLE_LDFLAGS})
+\endverbatim
+  
+  If you do not want to use pkg-config, you can manually add the
+  compiler and linker flags as follows:
+
+\verbatim
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fvisibility=hidden -fvisibility-inlines-hidden")
+  set(CMAKE_EXE_LINKER_FLAGS "-pie -rdynamic")
+\endverbatim
+
+  Note: You must update the flags if something changes.
+
+*/

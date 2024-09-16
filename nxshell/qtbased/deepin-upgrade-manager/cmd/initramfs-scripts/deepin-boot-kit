@@ -1,0 +1,40 @@
+#!/bin/sh
+export ROLLBACK_VERSION=
+
+PREREQ=""
+
+prereqs()
+{
+    echo "${PREREQ}"
+}
+
+case "${1}" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+TOOL_SCRIPT=/usr/share/bootkit/scripts
+
+for x in $(cat /proc/cmdline); do
+	case $x in
+	back_version=*)
+		back_version=${x#back_version=}
+		;;
+	back_scheme=*)
+		back_scheme=${x#back_scheme=}
+		;;
+	esac
+done
+
+if [ "x${back_version}" != "x" ] && [ "x${back_scheme}" != "x" ] ; then
+	ROLLBACK_VERSION=${back_version}
+	list=$(ls $TOOL_SCRIPT/$back_scheme  | sort -n)
+	for run in ${list}; do
+		echo "$TOOL_SCRIPT/$back_scheme/${run}"
+		$TOOL_SCRIPT/$back_scheme/${run}
+	done
+fi
+
+unset ROLLBACK_VERSION

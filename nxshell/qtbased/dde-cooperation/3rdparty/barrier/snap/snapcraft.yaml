@@ -1,0 +1,89 @@
+name: barrier
+base: core18
+version: master
+version-script: git describe --tags | sed "s/^v//"
+adopt-info: appstream-flathub
+grade: stable # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+icon: res/barrier.svg
+license: GPL-2.0
+
+apps:
+  barrier:
+    command: desktop-launch barrier #first run might take longer
+    environment:
+      # Fallback to XWayland if running in a Wayland session.
+      DISABLE_WAYLAND: 1
+    desktop: usr/share/applications/barrier.desktop
+    common-id: com.github.debauchee.barrier
+    plugs: &plugs
+      - desktop
+      - desktop-legacy
+      - home
+      - joystick
+      - network
+      - opengl
+      - pulseaudio
+      - screen-inhibit-control
+      - unity7
+      - wayland
+      - x11
+  barrierc:
+    command: desktop-launch barrierc
+    plugs: *plugs
+  barriers:
+    command: desktop-launch barriers
+    plugs: *plugs
+
+parts:
+  desktop-qt5:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    plugin: make
+
+  barrier:
+    source: .
+    source-type: git
+    plugin: cmake
+    configflags:
+      - "-DCMAKE_INSTALL_PREFIX=/usr"
+      - "-DCMAKE_BUILD_TYPE=Release"
+    build-packages:
+      - build-essential
+      - xorg-dev
+      - libcurl4-openssl-dev
+      - libavahi-compat-libdnssd-dev
+      - libssl-dev
+      - libx11-dev
+      - qtbase5-dev
+      - qt5-style-plugins
+      - libxinerama-dev
+      - libxrandr-dev
+      - libxrender-dev
+      - libxtst-dev
+      - qtdeclarative5-dev
+      - libavahi-common-dev
+      - libqt5svg5-dev
+    stage-packages:
+      - libxinerama1
+      - libxrandr2
+      - libxrender1
+      - libqt5gui5
+      - libqt5x11extras5
+      - libqt5svg5
+      - libxtst6
+      - libavahi-client3
+      - libavahi-common3
+      - libavahi-compat-libdnssd1
+    after: [desktop-qt5]
+
+  fix-icon:
+    plugin: nil
+    override-build:
+      sed -i 's|Icon=barrier|Icon=/usr/share/icons/hicolor/scalable/apps/barrier.svg|' $SNAPCRAFT_STAGE/usr/share/applications/barrier.desktop
+    after: [barrier]
+
+  appstream-flathub:
+    plugin: dump
+    source: https://github.com/flathub/com.github.debauchee.barrier.git
+    parse-info: [com.github.debauchee.barrier.appdata.xml]

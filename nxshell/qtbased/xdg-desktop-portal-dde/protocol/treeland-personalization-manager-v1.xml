@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+License: SPDX-License-Identifier
+Copyright (C) 2024 Wenhao Peng <pengwenhao@uniontech.com>.
+SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+-->
+<protocol name="treeland_personalization_manager_v1">
+    <copyright>
+        Copyright © 2023 Uniontech
+
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files (the "Software"),
+        to deal in the Software without restriction, including without limitation
+        the rights to use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice (including the next
+        paragraph) shall be included in all copies or substantial portions of the
+        Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+        THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+        DEALINGS IN THE SOFTWARE.
+    </copyright>
+    <interface name="treeland_personalization_manager_v1" version="1">
+        <description summary="personalization manager">
+        This interface allows a client to customized display effects.
+
+        Warning! The protocol described in this file is currently in the testing
+        phase. Backward compatible changes may be added together with the
+        corresponding interface version bump. Backward incompatible changes can
+        only be done by creating a new major version of the extension.
+        </description>
+        <request name="get_window_context">
+            <description summary="get personalization window context">
+                set window background, shadow based on context
+            </description>
+            <arg name="id" type="new_id" interface="personalization_window_context_v1"/>
+            <arg name="surface" type="object" interface="wl_surface"/>
+        </request>
+        <request name="get_wallpaper_context">
+            <description summary="custom wallpaper context">
+                custom user wallpaper
+            </description>
+            <arg name="id" type="new_id" interface="personalization_wallpaper_context_v1"/>
+        </request>
+        <request name="get_cursor_context">
+            <description summary="custom wallpaper context">
+                custom user cursor
+            </description>
+            <arg name="id" type="new_id" interface="personalization_cursor_context_v1"/>
+        </request>
+    </interface>
+    <interface name="personalization_wallpaper_context_v1" version="1">
+        <description summary="client custom wallpaper context">
+        This interface allows a client personalization wallpaper.
+
+        Warning! The protocol described in this file is currently in the testing
+        phase. Backward compatible changes may be added together with the
+        corresponding interface version bump. Backward incompatible changes can
+        only be done by creating a new major version of the extension.
+        </description>
+        <request name="set_fd">
+            <description summary="set the current user's wallpaper fd"/>
+            <arg name="fd" type="fd" summary="wallpaper file fd"/>
+            <arg name="metadata" type="string" summary="file related metadata information"/>
+        </request>
+        <request name="set_identifier">
+            <description summary="identifier for the application window" />
+            <arg name="identifier" type="string" summary="Identifier for the application window"/>
+        </request>
+        <enum name="options">
+            <description summary="xdg desktop portal supported keys" />
+            <entry name="preview" value="1" summary="whether to show a preview of the picture"/>
+            <entry name="background" value="2" summary="configure screen background"/>
+            <entry name="lockscreen" value="4" summary="configure screen wallpaper"/>
+        </enum>
+        <request name="set_output">
+            <description summary="configure xdg desktop portal options"/>
+            <arg name="output" type="string" summary="system output name"/>
+        </request>
+        <request name="set_on">
+            <description summary="configure xdg desktop portal options"/>
+            <arg name="options" type="uint" enum="options" summary="xdg desktop portal options"/>
+        </request>
+        <request name="commit">
+            <description summary="commit configuration" />
+        </request>
+        <request name="get_metadata">
+            <description summary="get user save meta data">
+                get the current user's wallpaper
+            </description>
+        </request>
+        <request name="destroy" type="destructor">
+            <description summary="destroy the context object">
+                Destroy the context object.
+            </description>
+        </request>
+        <event name="metadata">
+            <description summary="get metadata event">
+                Send this signal after getting the user's wallpaper.
+            </description>
+            <arg name="metadata" type="string" summary="user meta data"/>
+        </event>
+    </interface>
+    <interface name="personalization_cursor_context_v1" version="1">
+        <description summary="client custom cursor context">
+        This interface allows a client personalization cursor.
+
+        Warning! The protocol described in this file is currently in the testing
+        phase. Backward compatible changes may be added together with the
+        corresponding interface version bump. Backward incompatible changes can
+        only be done by creating a new major version of the extension.
+        </description>
+        <request name="set_theme">
+            <description summary="set system cursor theme"/>
+            <arg name="name" type="string" summary="cursor theme name"/>
+        </request>
+        <request name="get_theme">
+            <description summary="get system cursor theme"/>
+        </request>
+        <request name="set_size">
+            <description summary="set system cursor size"/>
+            <arg name="size" type="uint" summary="cursor size"/>
+        </request>
+        <request name="get_size">
+            <description summary="get system cursor size"/>
+        </request>
+        <request name="commit">
+            <description summary="commit configure">
+            if only one commit fails validation, the commit will fail
+            </description>
+        </request>
+        <request name="destroy" type="destructor">
+            <description summary="destroy the context object">
+                Destroy the context object.
+            </description>
+        </request>
+        <event name="verfity">
+            <description summary="verfity event">
+                Send this signal after commit cursor configure.
+            </description>
+            <arg name="success" type="int" summary="check whether the configuration is successful"/>
+        </event>
+        <event name="theme">
+            <description summary="cursor theme changed event">
+                Send this signal after system cursor theme changed.
+            </description>
+            <arg name="name" type="string" summary="cursor theme name"/>
+        </event>
+        <event name="size">
+            <description summary="cursor size changed event">
+                Send this signal after system cursor size changed.
+            </description>
+            <arg name="size" type="uint" summary="cursor size"/>
+        </event>
+    </interface>
+    <interface name="personalization_window_context_v1" version="1">
+        <description summary="client custom window context">
+        This interface allows a client personalization window.
+
+        Warning! The protocol described in this file is currently in the testing
+        phase. Backward compatible changes may be added together with the
+        corresponding interface version bump. Backward incompatible changes can
+        only be done by creating a new major version of the extension.
+        </description>
+        <enum name="background_type">
+            <description summary="Windows will have different background effects">
+                This will instruct the compositor how to set the background
+                for the window, desktop.
+            </description>
+            <entry name="normal" value="0" summary="not draw the background image"/>
+            <entry name="wallpaper" value="1" summary="draw the background image"/>
+            <entry name="blend" value="2" summary="draw the blend background image"/>
+        </enum>
+        <request name="set_background_type">
+            <description summary="set window background type">
+                Destroy the context object.
+            </description>
+            <arg name="type" type="uint" summary="background enum"/>
+        </request>
+        <request name="destroy" type="destructor">
+            <description summary="destroy the context object">
+                Destroy the context object.
+            </description>
+        </request>
+    </interface>
+</protocol>

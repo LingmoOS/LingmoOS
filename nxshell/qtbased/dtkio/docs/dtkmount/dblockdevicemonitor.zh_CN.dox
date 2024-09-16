@@ -1,0 +1,66 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file dblockdevicemonitor.h
+
+@class Dtk::Mount::DBlockDeviceMonitor dblockdevicemonitor.h
+    @brief 提供块设备的监听操作
+
+@fn DBlockDeviceMonitor::DBlockDeviceMonitor(QObject *parent = nullptr)
+    @brief 构造函数
+
+@fn DBlockDeviceMonitor::~DBlockDeviceMonitor()
+    @brief 析构函数
+
+@fn void DBlockDeviceMonitor::setWatchChanges(bool watchChanges)
+    @brief 开启或关闭设备监听
+    @param[in] watchChanges 开关标记。
+
+@fn bool DBlockDeviceMonitor::watchChanges() const
+    @brief 获取当前监视器工作状态
+    @return 当前监视器工作状态
+    @retval False 表示当前未监听
+    @retval True 表示当前正在监听
+    @see void DBlockDeviceMonitor::setWatchChanges(bool watchChanges)
+
+@fn void DBlockDeviceMonitor::deviceAdded(const QString &devPath)
+    @brief 信号，告知块设备添加
+    @param[out] devPath 添加的块设备路径，形如 /org/freedesktop/UDisks2/block_devices/sda1 格式
+
+@fn void DBlockDeviceMonitor::deviceRemoved(const QString &devPath)
+    @brief 信号，告知块设备移除
+    @param[out] devPath 移除的块设备路径
+
+@fn void DBlockDeviceMonitor::mountAdded(const QString &devPath, const QString &mountPoint)
+    @brief 信号，告知块设备挂载
+    @param[out] devPath 挂载的块设备路径
+    @param[out] mountPoint 块设备的挂载点
+
+@fn void DBlockDeviceMonitor::mountRemoved(const QString &devPath)
+    @brief 信号，告知块设备卸载
+    @param[out] devPath 卸载的块设备路径
+
+@fn void DBlockDeviceMonitor::fileSystemAdded(const QString &devPath)
+    @brief 信号，告知块设备文件系统识别
+    @param[out] devPath 块设备路径
+    @note 该信号通常在格式化设备完成后发出
+
+@fn void DBlockDeviceMonitor::fileSystemRemoved(const QString &devPath)
+    @brief 信号，告知块设备文件系统移除
+    @param[out] devPath 块设备路径
+
+@fn void DBlockDeviceMonitor::driveAdded(const QString &drvPath)
+    @brief 信号，告知驱动（硬盘）设备添加
+    @param[out] drvPath 驱动设备路径，形如 /org/freedesktop/UDisks2/drives/ASUS_BW_16D1H_U_1234567
+
+@fn void DBlockDeviceMonitor::driveRemoved(const QString &drvPath)
+    @brief 信号，告知驱动设备移除
+    @param[out] drvPath 驱动设备路径
+
+@fn void DBlockDeviceMonitor::propertiesChanged(const QString &devPath, const QMap<Dtk::Mount::BlockDeviceProperty, QVariant> &changes)
+    @brief 信号，告知块设备/驱动设备属性变化
+    @param[out] devPath 块设备/驱动设备路径
+    @param[out] changes 变化的属性列表
+    @see Dtk::Mount::BlockDeviceProperty
+
+*/

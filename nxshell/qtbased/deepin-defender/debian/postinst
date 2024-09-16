@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = configure ]; then
+        if command -v setcap > /dev/null; then
+                if setcap cap_dac_read_search,cap_kill,cap_net_admin,cap_net_raw,cap_sys_ptrace+ep /usr/bin/deepin-MonitorNetFlow;then
+                        chmod u-s /usr/bin/deepin-MonitorNetFlow
+                else
+                        echo "Setcap for deepin-MonitorNetFlow failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/deepin-MonitorNetFlow
+                fi
+                if setcap cap_dac_read_search+ep /usr/bin/deepin-defender-antiav;then
+                        chmod u-s /usr/bin/deepin-defender-antiav
+                else
+                        echo "Setcap for deepin-defender-antiav failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/deepin-defender-antiav
+                fi
+                if setcap cap_dac_read_search+ep /usr/bin/deepin-defender-risantiav;then
+                        chmod u-s /usr/bin/deepin-defender-antiav
+                else
+                        echo "Setcap for deepin-defender-risantiav failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/deepin-defender-risantiav
+                fi
+	else
+		echo "Setcap is not installed, falling back to setuid" >&2
+                chmod u+s /usr/bin/deepin-MonitorNetFlow
+                chmod u+s /usr/bin/deepin-defender-antiav
+                chmod u+s /usr/bin/deepin-defender-risantiav
+	fi  
+fi
+
+#DEBHELPER#
+
+exit 0

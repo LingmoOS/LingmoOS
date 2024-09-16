@@ -1,0 +1,28 @@
+test_build:
+  steps:
+    - link_package:
+        source_project: vioken
+        source_package: %{SCM_REPOSITORY_NAME}
+        target_project: vioken:CI
+
+    - configure_repositories:
+        project: vioken:CI
+        repositories:
+          - name: deepin_ci
+            paths:
+              - target_project: vioken
+                target_repository: deepin_develop
+            architectures:
+              - x86_64
+              - aarch64
+
+  filters:
+    event: pull_request
+
+commit_build:
+  steps:
+    - trigger_services:
+        project: vioken
+        package: %{SCM_REPOSITORY_NAME}
+  filters:
+    event: push
