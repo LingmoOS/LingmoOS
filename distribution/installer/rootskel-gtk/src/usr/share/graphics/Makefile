@@ -1,26 +1,32 @@
 dir = usr/share/graphics
 
 files = \
-	logo_debian.png \
-	logo_debian_dark.png \
-	logo_debian.ini \
+	logo_lingmo.png \
+	logo_lingmo_dark.png \
+	logo_lingmo.ini \
 	note_icon.png \
 	warning_icon.png
 
 build-local:: $(files)
 
 clean-local::
-	rm -f logo_debian.png logo_debian_dark.png
+	rm -f logo_lingmo.png logo_lingmo_dark.png
 
 install-local:: $(outdir)
-	ln -fs logo_debian.png $(outdir)/logo_installer.png
-	ln -fs logo_debian_dark.png $(outdir)/logo_installer_dark.png
-	ln -fs logo_debian.ini $(outdir)/logo_installer.ini
+	ln -fs logo_lingmo.png $(outdir)/logo_installer.png
+	ln -fs logo_lingmo_dark.png $(outdir)/logo_installer_dark.png
+	ln -fs logo_lingmo.ini $(outdir)/logo_installer.ini
 
-logo_debian.png: logo_debian_emerald.svg
+logo_lingmo.png: logo_lingmo_hydrogen.svg
 	rsvg-convert $< > $@
 
-logo_debian_dark.png: logo_debian_emerald_dark.svg
+logo_lingmo_dark.png: logo_lingmo_hydrogen_dark.svg
+	rsvg-convert $< > $@
+
+note_icon.png: note_icon.svg
+	rsvg-convert $< > $@
+
+warning_icon.png: warning_icon.svg
 	rsvg-convert $< > $@
 
 include ../../../../Makefile.inc

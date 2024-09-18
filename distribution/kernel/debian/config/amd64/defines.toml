@@ -1,0 +1,37 @@
+[[flavour]]
+name = 'amd64'
+[flavour.defs]
+is_default = true
+[flavour.description]
+hardware = '64-bit PCs'
+hardware_long = 'PCs with AMD64, Intel 64 or VIA Nano processors'
+[flavour.packages]
+installer = true
+
+[[flavour]]
+name = 'cloud-amd64'
+[flavour.build]
+config = ['config.cloud']
+[flavour.defs]
+is_quick = true
+[flavour.description]
+hardware = 'x86-64 cloud'
+hardware_long = 'cloud platforms including Amazon EC2, Microsoft Azure, and Google Compute Engine'
+
+[[featureset]]
+name = 'none'
+
+[[featureset]]
+name = 'rt'
+# Override available flavours in rt featureset
+[[featureset.flavour]]
+name = 'amd64'
+
+[build]
+enable_signed = true
+enable_vdso = true
+kernel_file = 'arch/x86/boot/bzImage'
+kernel_stem = 'vmlinuz'
+
+[relations.image]
+suggests = ['grub-pc | grub-efi-amd64 | extlinux']

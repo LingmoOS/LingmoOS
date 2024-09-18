@@ -1,0 +1,43 @@
+label installstart
+	menu label ^Install Lingmo OS
+	linux @KERNEL_GI@
+	initrd @INITRD_GI@
+	append vga=788 @APPEND_INSTALL@ --- quiet
+
+label installstartspeech
+	menu label Install Lingmo OS with ^speech synthesis
+	linux @KERNEL_GI@
+	initrd @INITRD_GI@
+	append speakup.synth=soft vga=788 @APPEND_INSTALL@ --- quiet
+
+label live-@FLAVOUR@
+        menu label ^Try Lingmo OS (@FLAVOUR@)
+        menu default
+        linux @LINUX@
+        initrd @INITRD@
+        append @APPEND_LIVE@
+
+label live-@FLAVOUR@-failsafe
+        menu label Try Lingmo OS (@FLAVOUR@ fail-safe mode)
+        linux @LINUX@
+        initrd @INITRD@
+        append @APPEND_LIVE_FAILSAFE@
+
+label live-forensic
+        menu label Try Lingmo OS (@FLAVOUR@ ^forensic mode)
+        linux @LINUX@
+        initrd @INITRD@
+        append boot=live username=lingmo hostname=lingmo systemd.swap=no noautomount
+
+label live-persistence
+        menu label Try Lingmo OS with ^USB persistence  (check lingmo.org/prst)
+        linux @LINUX@
+        initrd @INITRD@
+        append boot=live username=lingmo hostname=lingmo persistence
+
+label live-encrypted-persistence
+	menu label Try Lingmo OS with USB ^Encrypted persistence
+        linux @LINUX@
+        initrd @INITRD@
+        append boot=live persistent=cryptsetup persistence-encryption=luks username=lingmo hostname=lingmo persistence
+

@@ -1,0 +1,22 @@
+Package: linux-image-@abiname@@localversion@
+Meta-Rules-Target: image
+Meta-Sign-Package: linux-image-@abiname@@localversion@-unsigned
+Meta-Sign-Files: boot/@image-stem@-@abiname@@localversion@:efi
+Build-Profiles: <!pkg.linux.nokernel>
+Build-Depends:
+ linux-image-@abiname@@localversion@-unsigned (= @signedtemplate_binaryversion@),
+# used by debian/rules.real to build udebs
+ kernel-wedge (>= 2.105~),
+# used by kernel-wedge (only on Linux, thus not declared as a dependency)
+ kmod,
+# Used by debian/signing_templates/rules.real
+ rsync,
+Built-Using: @source_basename@@source_suffix@ (= @version_complete@)
+Depends: kmod, linux-base (>= 4.3~), ${misc:Depends}
+Conflicts: linux-image-@abiname@@localversion@-unsigned
+Replaces: linux-image-@abiname@@localversion@-unsigned
+Suggests: firmware-linux-free, linux-doc-@version@, debian-kernel-handbook
+Description: Linux @upstreamversion@ for @class@ (signed)
+ The Linux kernel @upstreamversion@ and modules for use on @longclass@.
+ .
+ The kernel image is signed for use with Secure Boot.

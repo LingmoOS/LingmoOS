@@ -1,0 +1,32 @@
+# Kernel dbg packages contain a full image with debug data
+{{package}}: dbg-package-missing-depends
+
+# glibc doesn't seem to check for a PT_GNU_STACK section in vDSOs, so
+# it's OK that they don't have it
+{% if arch in ['arm64', 'armhf'] %}
+{{package}}: shared-library-lacks-stack-section *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdso.so*
+{% endif %}
+{% if arch in ['amd64', 'arm64', 'ppc64el', 's390x'] %}
+{{package}}: shared-library-lacks-stack-section *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdso32.so*
+{% endif %}
+{% if arch in ['amd64', 'ppc64el', 's390x'] %}
+{{package}}: shared-library-lacks-stack-section *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdso64.so*
+{% endif %}
+{% if arch in ['amd64'] %}
+{{package}}: shared-library-lacks-stack-section *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdsox32.so*
+{% endif %}
+
+# It is intended that 64-bit kernels provide vDSOs for 32-bit executables.
+# lintian currently allows i386 executables on amd64.
+{% if arch in ['arm64', 'ppc64el', 's390x'] %}
+{{package}}: binary-from-other-architecture *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdso32.so*
+{% endif %}
+{% if arch in ['amd64'] %}
+{{package}}: binary-from-other-architecture *usr/lib/debug/lib/modules/{{abiname}}{{localversion}}/vdso/vdsox32.so*
+{% endif %}
+
+# Some 32-bit architectures need 64-bit kernels and we still build
+# these as the "wrong" architecture rather than mandating multiarch.
+{% if arch in ['hppa', 'mips', 'mipsel', 'powerpc'] %}
+{{package}}: binary-from-other-architecture *usr/lib/debug/*
+{% endif %}
