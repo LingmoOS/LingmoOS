@@ -6,14 +6,23 @@ set -e
 
 mkdir -vp build/{bios,uefi}
 
-cp -rv {auto,config} build/{bios,uefi}
+cp -rv auto/ build/bios/
+cp -rv auto/ build/uefi/
+cp -rv config/ build/bios/
+cp -rv config/ build/uefi/
+
+mkdir -vp build/bios/tools
+mkdir -vp build/uefi/tools
+
+cp -v config/make-sum build/bios/tools
+cp -v config/make-sum build/uefi/tools
 
 echo "[CONFIG]config build-work for bios..."
 
-cp -rv release/bios/config build/bios/auto
-cp -rv release/bios/live.cfg build/bios/config/includes.binary/isolinux/
-cp -rv release/bios/grub.cfg build/bios/config/includes.binary/boot/grub/
-cp -rv release/bios/live.list.chroot build/bios/config/package-lists/
+cp -v release/bios/config build/bios/auto/
+cp -v release/bios/live.cfg build/bios/config/includes.binary/isolinux/
+cp -v release/bios/grub.cfg build/bios/config/includes.binary/boot/grub/
+cp -v release/bios/live.list.chroot build/bios/config/package-lists/
 
 echo "[BUILD] Start Build-work for bios"
 
@@ -30,8 +39,8 @@ echo "[BUILD] Build-work for bios Successful!"
 # Build ISO for UEFI
 #
 echo "[CONFIG]config build-work for uefi..."
-cp -rv release/uefi/live.cfg build/uefi/config/includes.binary/isolinux/
-cp -rv release/uefi/grub.cfg build/uefi/config/includes.binary/boot/grub/
+cp -v release/uefi/live.cfg build/uefi/config/includes.binary/isolinux/
+cp -v release/uefi/grub.cfg build/uefi/config/includes.binary/boot/grub/
 
 echo "[BUILD] Start Build-work for uefi"
 
