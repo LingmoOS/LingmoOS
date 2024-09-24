@@ -10,6 +10,7 @@ LINGMO_DIST="hydrogen"
 LINGMO_VERSION="2.0"
 LINGMO_VARIANT="default"
 IMAGE_TYPE="live"
+SOURCES_IMAGE="*sources*.iso"
 SYSTEM_TYPE="desktop"
 RELEASE_TYPE="release"
 TARGET_DIR="$(dirname $0)/images"
@@ -456,7 +457,17 @@ esac
 set -e
 
 debug "Moving files"
-run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $LINGMO_ARCH)
+run_and_log mkdir -p $TARGET_DIR/{iso,src}
+run_and_log mv -f $IMAGE_NAME $TARGET_DIR/iso/$(target_image_name $LINGMO_ARCH)
 # run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $LINGMO_ARCH)
+
+debug "Moving Sources"
+run_and_log mv -f $SOURCES_IMAGE $TARGET_DIR/src/
+debug "Make Checksums for IMAGE(iso)"
+run_and_log cp -v ../config/make-sums $TARGET_DIR/iso
+run_and_log cd $TARGET_DIR/iso/ && bash make-sums && rm make-sums && cd ../../
+debug "Make Checksums for IMAGE(src)"
+run_and_log cp -v ../config/make-sums $TARGET_DIR/src
+run_and_log cd $TARGET_DIR/src/ && bash make-sums && rm make-sums && cd ../../
 
 run_and_log echo -e "\n***\nGENERATED LINGMO IMAGE: $TARGET_DIR/$(target_image_name $LINGMO_ARCH)\n***"
