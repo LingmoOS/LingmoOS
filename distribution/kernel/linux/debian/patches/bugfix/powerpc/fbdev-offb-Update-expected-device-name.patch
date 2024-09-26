@@ -1,0 +1,46 @@
+From: Cyril Brulebois <cyril@debamax.com>
+Date: Wed, 12 Apr 2023 11:55:08 +0200
+Subject: fbdev/offb: Update expected device name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Origin: https://git.kernel.org/pub/scm/linux/kernel/git/deller/linux-fbdev.git/commit?id=27c74ea74be805ccba1bc1a0a03cc79c51dca6ea
+
+Since commit 241d2fb56a18 ("of: Make OF framebuffer device names unique"),
+as spotted by Frédéric Bonnard, the historical "of-display" device is
+gone: the updated logic creates "of-display.0" instead, then as many
+"of-display.N" as required.
+
+This means that offb no longer finds the expected device, which prevents
+the Debian Installer from setting up its interface, at least on ppc64el.
+
+It might be better to iterate on all possible nodes, but updating the
+hardcoded device from "of-display" to "of-display.0" is confirmed to fix
+the Debian Installer at the very least.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217328
+Link: https://bugs.debian.org/1033058
+Fixes: 241d2fb56a18 ("of: Make OF framebuffer device names unique")
+Cc: stable@vger.kernel.org
+Signed-off-by: Cyril Brulebois <cyril@debamax.com>
+Signed-off-by: Helge Deller <deller@gmx.de>
+---
+ drivers/video/fbdev/offb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/video/fbdev/offb.c b/drivers/video/fbdev/offb.c
+index 0065a77b6dbc8..b5fdef2b74359 100644
+--- a/drivers/video/fbdev/offb.c
++++ b/drivers/video/fbdev/offb.c
+@@ -696,7 +696,7 @@ MODULE_DEVICE_TABLE(of, offb_of_match_display);
+ 
+ static struct platform_driver offb_driver_display = {
+ 	.driver = {
+-		.name = "of-display",
++		.name = "of-display.0",
+ 		.of_match_table = offb_of_match_display,
+ 	},
+ 	.probe = offb_probe_display,
+-- 
+2.30.2
+

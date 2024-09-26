@@ -1,0 +1,65 @@
+Linux kernel for Debian
+-----------------------
+
+Patches
+-------
+Debian applies small changes to the kernel source. These are split up into
+separated patches addressing individual problems. Each of the patch files
+contains a description and mentions the author. The patches can be found
+in the source package or at
+https://sources.debian.org/src/linux/<version>/debian/patches/
+(with the package version substituted).
+
+Config Files
+------------
+The .config files used to build the various linux-image files are dynamically
+generated during the linux package build.  See the source package for
+details.  Each linux-image-* package provides the complete .config file that
+was used to generate it.  This file is installed in /boot.
+
+Scope of security support
+-------------------------
+Security support is provided not only for the binary builds, but also
+for the full source package, allowing for locally customized kernels.
+However, kernel options that are not enabled in official Debian builds are
+given a lower priority for security support. Options marked as BROKEN
+or EXPERIMENTAL are of very low priority, and should not be enabled in
+customized builds for a security-sensitive environment.
+
+Building custom kernel binary packages
+--------------------------------------
+We recommend using the 'make deb-pkg' target provided by the upstream
+kernel source.
+
+Rebuilding official binary packages
+-----------------------------------
+You can build specific kernel binary packages using the targets in
+debian/rules.gen, which have names of the form:
+    binary-arch_<architecture>_<featureset>_<flavour>
+
+Example:
+    make -f debian/rules.gen binary-arch_i386_none_686
+
+Rebuilding Adaptec AIC7xxx/79xx firmware
+----------------------------------------
+You can rebuild the firmware for the Adaptec AIC7xxx/79xx SCSI Adapters. To
+do so you need to set AIC7XXX_BUILD_FIRMWARE/AIC79XX_BUILD_FIRMWARE config
+options.  Note that this requires to have the development packages for
+Berkeley Database (libdb-dev) installed.
+
+Non-free bits removed
+---------------------
+See the Files-Excluded field in debian/copyright.
+
+Changelog
+---------
+Older Debian changelog entries are no longer included in binary
+packages, but can be found in debian/changelog.old in the source
+package.
+
+Further information
+-------------------
+Debian Linux Kernel Handbook:
+             https://kernel-team.pages.debian.net/kernel-handbook/
+             or debian-kernel-handbook package
+Debian Wiki: https://wiki.debian.org/DebianKernel

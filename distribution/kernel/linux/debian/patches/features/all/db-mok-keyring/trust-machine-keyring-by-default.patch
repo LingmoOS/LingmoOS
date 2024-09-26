@@ -1,0 +1,29 @@
+From 585cbcb982bffc4a8cee2f3d8d099fc64f9a74b9 Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <bluca@debian.org>
+Date: Fri, 14 Oct 2022 00:22:06 +0200
+Subject: [PATCH] trust machine keyring (MoK) by default
+Forwarded: not-needed
+
+Debian always trusted keys in MoK by default. Upstream made it
+conditional on a new EFI variable being set.
+To keep backward compatibility skip this check.
+---
+ security/integrity/platform_certs/machine_keyring.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/security/integrity/platform_certs/machine_keyring.c b/security/integrity/platform_certs/machine_keyring.c
+index a401640a63cd..0627f14eacbe 100644
+--- a/security/integrity/platform_certs/machine_keyring.c
++++ b/security/integrity/platform_certs/machine_keyring.c
+@@ -68,10 +68,7 @@ static bool __init trust_moklist(void)
+ 
+ 	if (!initialized) {
+ 		initialized = true;
+-		trust_mok = false;
+-
+-		if (uefi_check_trust_mok_keys())
+-			trust_mok = true;
++		trust_mok = true;
+ 	}
+ 
+ 	return trust_mok;

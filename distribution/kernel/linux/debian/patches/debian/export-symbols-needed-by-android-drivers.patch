@@ -1,0 +1,126 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Mon, 05 Aug 2024 03:26:48 +0200
+Subject: Export symbols needed by binder
+Bug-Debian: https://bugs.debian.org/901492
+
+We want to enable use of the Android binder driver to support
+Waydroid, but it should not be built-in as that would waste resources
+and increase security attack surface on systems that don't need it.
+
+Export the currently un-exported symbols it depends on.
+
+---
+ fs/file.c               | 1 +
+ ipc/msgutil.c           | 1 +
+ ipc/namespace.c         | 1 +
+ kernel/sched/syscalls.c | 1 +
+ kernel/sched/wait.c     | 1 +
+ kernel/task_work.c      | 1 +
+ mm/memory.c             | 1 +
+ security/security.c     | 4 ++++
+ 8 files changed, 11 insertions(+)
+
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -823,6 +823,7 @@ struct file *file_close_fd(unsigned int
+ 
+ 	return file;
+ }
++EXPORT_SYMBOL_GPL(file_close_fd);
+ 
+ void do_close_on_exec(struct files_struct *files)
+ {
+--- a/ipc/msgutil.c
++++ b/ipc/msgutil.c
+@@ -33,6 +33,7 @@ struct ipc_namespace init_ipc_ns = {
+ 	.ns.ops = &ipcns_operations,
+ #endif
+ };
++EXPORT_SYMBOL_GPL(init_ipc_ns);
+ 
+ struct msg_msgseg {
+ 	struct msg_msgseg *next;
+--- a/ipc/namespace.c
++++ b/ipc/namespace.c
+@@ -205,6 +205,7 @@ void put_ipc_ns(struct ipc_namespace *ns
+ 			schedule_work(&free_ipc_work);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(put_ipc_ns);
+ 
+ static inline struct ipc_namespace *to_ipc_ns(struct ns_common *ns)
+ {
+--- a/kernel/sched/syscalls.c
++++ b/kernel/sched/syscalls.c
+@@ -140,6 +140,7 @@ int can_nice(const struct task_struct *p
+ {
+ 	return is_nice_reduction(p, nice) || capable(CAP_SYS_NICE);
+ }
++EXPORT_SYMBOL_GPL(can_nice);
+ 
+ #ifdef __ARCH_WANT_SYS_NICE
+ 
+--- a/kernel/sched/wait.c
++++ b/kernel/sched/wait.c
+@@ -212,6 +212,7 @@ void __wake_up_pollfree(struct wait_queu
+ 	/* POLLFREE must have cleared the queue. */
+ 	WARN_ON_ONCE(waitqueue_active(wq_head));
+ }
++EXPORT_SYMBOL_GPL(__wake_up_pollfree);
+ 
+ /*
+  * Note: we use "set_current_state()" _after_ the wait-queue add,
+--- a/kernel/task_work.c
++++ b/kernel/task_work.c
+@@ -97,6 +97,7 @@ int task_work_add(struct task_struct *ta
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(task_work_add);
+ 
+ /**
+  * task_work_cancel_match - cancel a pending work added by task_work_add()
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -1934,6 +1934,7 @@ void zap_page_range_single(struct vm_are
+ 	tlb_finish_mmu(&tlb);
+ 	hugetlb_zap_end(vma, details);
+ }
++EXPORT_SYMBOL_GPL(zap_page_range_single);
+ 
+ /**
+  * zap_vma_ptes - remove ptes mapping the vma
+--- a/security/security.c
++++ b/security/security.c
+@@ -890,6 +890,7 @@ int security_binder_set_context_mgr(cons
+ {
+ 	return call_int_hook(binder_set_context_mgr, mgr);
+ }
++EXPORT_SYMBOL_GPL(security_binder_set_context_mgr);
+ 
+ /**
+  * security_binder_transaction() - Check if a binder transaction is allowed
+@@ -905,6 +906,7 @@ int security_binder_transaction(const st
+ {
+ 	return call_int_hook(binder_transaction, from, to);
+ }
++EXPORT_SYMBOL_GPL(security_binder_transaction);
+ 
+ /**
+  * security_binder_transfer_binder() - Check if a binder transfer is allowed
+@@ -920,6 +922,7 @@ int security_binder_transfer_binder(cons
+ {
+ 	return call_int_hook(binder_transfer_binder, from, to);
+ }
++EXPORT_SYMBOL_GPL(security_binder_transfer_binder);
+ 
+ /**
+  * security_binder_transfer_file() - Check if a binder file xfer is allowed
+@@ -936,6 +939,7 @@ int security_binder_transfer_file(const
+ {
+ 	return call_int_hook(binder_transfer_file, from, to, file);
+ }
++EXPORT_SYMBOL_GPL(security_binder_transfer_file);
+ 
+ /**
+  * security_ptrace_access_check() - Check if tracing is allowed
