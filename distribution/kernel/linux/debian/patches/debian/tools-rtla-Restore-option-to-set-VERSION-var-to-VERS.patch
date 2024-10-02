@@ -1,0 +1,36 @@
+From 6640548d40a85053cf065f4c66f298bb5253557f Mon Sep 17 00:00:00 2001
+From: Diederik de Haas <didi.debian@cknow.org>
+Date: Tue, 18 Jun 2024 09:46:18 +0200
+Subject: [PATCH] tools/rtla: Restore option to set VERSION var to VERSION file's contents
+Forwarded: not-needed
+
+In upstream commit 01474dc706ca ("tools/rtla: Use tools/build makefiles
+to build rtla") the ``Makefile`` was completely restructered to make
+use of the ``tools/build`` infrastructure.
+
+For some reason, the restructuring also caused the ``cat VERSION`` part
+to detect the kernel version to be dropped and only runs the
+``kernelversion`` (toplevel) Makefile target.
+Previously that was used as fallback when ``VERSION`` didn't exist.
+Re-add the ``cat VERSION`` part as that is used in the Debian build
+system.
+---
+ tools/tracing/rtla/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/tracing/rtla/Makefile b/tools/tracing/rtla/Makefile
+index b5878be36125..fec9e0a1086c 100644
+--- a/tools/tracing/rtla/Makefile
++++ b/tools/tracing/rtla/Makefile
+@@ -27,7 +27,7 @@ endif
+ RTLA		:= $(OUTPUT)rtla
+ RTLA_IN		:= $(RTLA)-in.o
+ 
+-VERSION		:= $(shell sh -c "make -sC ../../.. kernelversion | grep -v make")
++VERSION		:= $(shell cat VERSION 2> /dev/null || sh -c "make -sC ../../.. kernelversion | grep -v make")
+ DOCSRC		:= ../../../Documentation/tools/rtla/
+ 
+ FEATURE_TESTS	:= libtraceevent
+-- 
+2.45.2
+

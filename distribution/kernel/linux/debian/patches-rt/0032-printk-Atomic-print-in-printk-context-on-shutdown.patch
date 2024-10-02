@@ -1,0 +1,62 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Mon, 23 Oct 2023 17:43:48 +0000
+Subject: [PATCH 32/48] printk: Atomic print in printk context on shutdown
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+For nbcon consoles, normally the printing is handled by the
+dedicated console printing threads. However, on shutdown the
+printing threads may not get a chance to print the final
+messages.
+
+When shutting down or rebooting (system_state > SYSTEM_RUNNING),
+perform atomic printing from the printk() caller context.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/nbcon.c  |    5 +++--
+ kernel/printk/printk.c |    7 ++++++-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -1297,7 +1297,8 @@ static void nbcon_atomic_flush_pending_c
+ 	 * context must flush those remaining records if the printer thread
+ 	 * is not available do it.
+ 	 */
+-	if (!con->kthread && prb_read_valid(prb, nbcon_seq_read(con), NULL)) {
++	if ((!con->kthread || (system_state > SYSTEM_RUNNING)) &&
++	    prb_read_valid(prb, nbcon_seq_read(con), NULL)) {
+ 		stop_seq = prb_next_reserve_seq(prb);
+ 		goto again;
+ 	}
+@@ -1639,7 +1640,7 @@ void nbcon_device_release(struct console
+ 	 */
+ 	cookie = console_srcu_read_lock();
+ 	if (console_is_usable(con, console_srcu_read_flags(con)) &&
+-	    !con->kthread &&
++	    (!con->kthread || (system_state > SYSTEM_RUNNING)) &&
+ 	    prb_read_valid(prb, nbcon_seq_read(con), NULL)) {
+ 		__nbcon_atomic_flush_pending_con(con, prb_next_reserve_seq(prb), false);
+ 	}
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -2389,12 +2389,17 @@ asmlinkage int vprintk_emit(int facility
+ 		 *
+ 		 * - When this CPU is in panic.
+ 		 *
++		 * - During shutdown, since the printing threads may not get
++		 *   a chance to print the final messages.
++		 *
+ 		 * Note that if boot consoles are registered, the console
+ 		 * lock/unlock dance must be relied upon instead because nbcon
+ 		 * consoles cannot print simultaneously with boot consoles.
+ 		 */
+-		if (is_panic_context)
++		if (is_panic_context ||
++		    (system_state > SYSTEM_RUNNING)) {
+ 			nbcon_atomic_flush_pending();
++		}
+ 	}
+ 
+ 	if (do_trylock_unlock) {

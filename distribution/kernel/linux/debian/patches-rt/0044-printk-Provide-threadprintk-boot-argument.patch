@@ -1,0 +1,96 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 6 Feb 2024 14:19:34 +0000
+Subject: [PATCH 44/48] printk: Provide threadprintk boot argument
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+For PREEMPT_RT, legacy console printing is performed in a dedicated
+kthread. However, this behavior can also be interesting for other
+preemption models as it minimizes the duration of printk() calls by
+deferring all printing.
+
+Provide a new boot argument "threadprintk" that will create the
+dedicated kthread for legacy console printing for !PREEMPT_RT
+systems.
+
+The implementation is the same as the "threadirqs" boot argument.
+
+Users should be aware that if this option is enabled, the shutdown,
+reboot, and panic messages probably will not be visible on the
+legacy consoles.
+
+Non-legacy consoles (NBCON) already have their own dedicated kernel
+threads for printing and reliable shutdown, reboot, and panic
+printing. This option really only applies to legacy consoles.
+
+Users can view /proc/consoles to see if their console driver is
+legacy or not. NBCON console drivers are shown with 'N'.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ Documentation/admin-guide/kernel-parameters.txt |   12 ++++++++++++
+ kernel/printk/internal.h                        |    4 +++-
+ kernel/printk/printk.c                          |   11 +++++++++++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -6596,6 +6596,18 @@
+ 			Force threading of all interrupt handlers except those
+ 			marked explicitly IRQF_NO_THREAD.
+ 
++	threadprintk	[KNL]
++			Force threaded printing of all legacy consoles. Be
++			aware that with this option, the shutdown, reboot, and
++			panic messages may not be printed on the legacy
++			consoles. Also, earlycon/earlyprintk printing will be
++			delayed until a regular console or the kthread is
++			available.
++
++			Users can view /proc/consoles to see if their console
++			driver is legacy or not. Non-legacy (NBCON) console
++			drivers are already threaded and are shown with 'N'.
++
+ 	topology=	[S390,EARLY]
+ 			Format: {off | on}
+ 			Specify if the kernel should make use of the cpu
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -3,6 +3,7 @@
+  * internal.h - printk internal definitions
+  */
+ #include <linux/console.h>
++#include <linux/jump_label.h>
+ #include <linux/percpu.h>
+ #include <linux/types.h>
+ 
+@@ -24,7 +25,8 @@ int devkmsg_sysctl_set_loglvl(struct ctl
+ #ifdef CONFIG_PREEMPT_RT
+ # define force_printkthreads()		(true)
+ #else
+-# define force_printkthreads()		(false)
++DECLARE_STATIC_KEY_FALSE(force_printkthreads_key);
++# define force_printkthreads()		(static_branch_unlikely(&force_printkthreads_key))
+ #endif
+ 
+ #ifdef CONFIG_PRINTK
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -195,6 +195,17 @@ static int __init control_devkmsg(char *
+ }
+ __setup("printk.devkmsg=", control_devkmsg);
+ 
++#if !defined(CONFIG_PREEMPT_RT)
++DEFINE_STATIC_KEY_FALSE(force_printkthreads_key);
++
++static int __init setup_forced_printkthreads(char *arg)
++{
++	static_branch_enable(&force_printkthreads_key);
++	return 0;
++}
++early_param("threadprintk", setup_forced_printkthreads);
++#endif
++
+ char devkmsg_log_str[DEVKMSG_STR_MAX_SIZE] = "ratelimit";
+ #if defined(CONFIG_PRINTK) && defined(CONFIG_SYSCTL)
+ int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,

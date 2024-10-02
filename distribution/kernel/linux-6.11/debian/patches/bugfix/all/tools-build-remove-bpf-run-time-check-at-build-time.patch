@@ -1,0 +1,27 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sun, 21 Feb 2016 15:33:15 +0000
+Subject: tools/build: Remove bpf() run-time check at build time
+Forwarded: no
+
+It is not correct to test that a syscall works on the build system's
+kernel.  We might be building on an earlier kernel version or with
+security restrictions that block bpf().
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+--- a/tools/build/feature/test-bpf.c
++++ b/tools/build/feature/test-bpf.c
+@@ -35,8 +35,10 @@ int main(void)
+ 	attr.prog_flags = 0;
+ 
+ 	/*
+-	 * Test existence of __NR_bpf and BPF_PROG_LOAD.
+-	 * This call should fail if we run the testcase.
++	 * bwh: Don't use the bpf() syscall as we might be building on a
++	 * much older kernel.  Do "use" the attr structure here to avoid
++	 * a "set but not used" warning.
+ 	 */
+-	return syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
++	(void)&attr;
++	return 0;
+ }

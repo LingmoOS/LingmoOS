@@ -1,0 +1,34 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Thu, 2 May 2024 08:02:58 +0000
+Subject: [PATCH 41/48] proc: consoles: Add notation to c_start/c_stop
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+fs/proc/consoles.c:78:13: warning: context imbalance in 'c_start'
+	- wrong count at exit
+fs/proc/consoles.c:104:13: warning: context imbalance in 'c_stop'
+	- unexpected unlock
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ fs/proc/consoles.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/fs/proc/consoles.c
++++ b/fs/proc/consoles.c
+@@ -68,6 +68,7 @@ static int show_console_dev(struct seq_f
+ }
+ 
+ static void *c_start(struct seq_file *m, loff_t *pos)
++	__acquires(&console_mutex)
+ {
+ 	struct console *con;
+ 	loff_t off = 0;
+@@ -94,6 +95,7 @@ static void *c_next(struct seq_file *m,
+ }
+ 
+ static void c_stop(struct seq_file *m, void *v)
++	__releases(&console_mutex)
+ {
+ 	console_list_unlock();
+ }

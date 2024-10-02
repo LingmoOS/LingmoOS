@@ -1,0 +1,49 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 03 Nov 2016 15:25:26 -0600
+Subject: cpupower: Fix checks for CPU existence
+Forwarded: https://lore.kernel.org/all/20170418023118.GD4152@decadent.org.uk/
+
+Calls to cpufreq_cpu_exists(cpu) were converted to
+cpupower_is_cpu_online(cpu) when libcpupower was introduced and the
+former function was deleted.  However, cpupower_is_cpu_online() does
+not distinguish physically absent and offline CPUs, and does not set
+errno.
+
+cpufreq-set has already been fixed (commit c25badc9ceb6).
+
+In cpufreq-bench, which prints an error message for offline CPUs,
+properly distinguish and report the zero and negative cases.
+
+Fixes: ac5a181d065d ("cpupower: Add cpuidle parts into library")
+Fixes: 53d1cd6b125f ("cpupowerutils: bench - Fix cpu online check")
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+[carnil: Update/Refresh patch for 4.14.17: The issue with the
+incorrect check has been fixed with upstream commit 53d1cd6b125f.
+Keep in the patch the distinction and report for the zero and
+negative cases.]
+---
+--- a/tools/power/cpupower/bench/system.c
++++ b/tools/power/cpupower/bench/system.c
+@@ -58,12 +58,19 @@ long long int get_time()
+ 
+ int set_cpufreq_governor(char *governor, unsigned int cpu)
+ {
++	int rc;
+ 
+ 	dprintf("set %s as cpufreq governor\n", governor);
+ 
+-	if (cpupower_is_cpu_online(cpu) != 1) {
+-		perror("cpufreq_cpu_exists");
+-		fprintf(stderr, "error: cpu %u does not exist\n", cpu);
++	rc = cpupower_is_cpu_online(cpu);
++	if (rc != 1) {
++		if (rc < 0)
++			fprintf(stderr, "cpupower_is_cpu_online: %s\n",
++				strerror(-rc));
++		else
++			fprintf(stderr,
++				"error: cpu %u is offline or does not exist\n",
++				cpu);
+ 		return -1;
+ 	}
+ 

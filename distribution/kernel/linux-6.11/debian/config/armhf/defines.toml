@@ -1,0 +1,29 @@
+[[flavour]]
+name = "armmp"
+[flavour.defs]
+is_default = true
+[flavour.description]
+hardware = 'ARMv7 multiplatform compatible SoCs'
+hardware_long = 'ARMv7 multiplatform kernel. See https://wiki.debian.org/DebianKernel/ARMMP for details of supported platforms'
+[flavour.packages]
+installer = true
+
+[[flavour]]
+name = "armmp-lpae"
+[flavour.description]
+hardware = 'ARMv7 multiplatform compatible SoCs supporting LPAE'
+hardware_long = 'ARMv7 multiplatform kernel supporting LPAE. See https://wiki.debian.org/DebianKernel/ARMMP for details of supported platforms.'
+
+[[featureset]]
+name = 'none'
+
+[[featureset]]
+name = 'rt'
+# Override available flavours in rt featureset
+[[featureset.flavour]]
+name = 'armmp'
+
+[build]
+enable_vdso = true
+kernel_file = 'arch/arm/boot/zImage'
+kernel_stem = 'vmlinuz'

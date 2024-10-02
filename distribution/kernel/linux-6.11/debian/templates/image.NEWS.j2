@@ -1,0 +1,110 @@
+{% if arch in ('ppc64', 'ppc64el') %}
+linux (6.10-1~exp2) unstable; urgency=medium
+
+  * From Linux 6.10, the default kernel on ppc64 and ppc64el
+    architectures uses 4k page size.
+
+    After rebooting, you need to re-create all swap files or partitions.
+    They depend on the page size and will be not longer usable.  See
+    mkswap(8) on how to do that.
+
+    Some file systems might be incompatible with the smaller page size.
+    At least btrfs created with default settings is known to be affected
+    and they will not work with this kernel any more.
+
+    A btrfs file system can be checked with file(1) (use file -s).  It
+    will show:
+    BTRFS Filesystem sectorsize 65536
+    If this number is larger then 4096, the file system can not be
+    mounted with the default kernel anymore.
+
+    If you are affected and require the 64k page size of older kernels,
+    you can install linux-image-powerpc64-64k or
+    linux-image-powerpc64el-64k packages.
+
+ -- Bastian Blank <waldi@debian.org>  Thu, 11 Jul 2024 11:12:35 +0200
+
+{% endif %}
+linux (5.10.46-4) unstable; urgency=medium
+
+  * From Linux 5.10.46-4, unprivileged calls to bpf() are disabled by
+    default, mitigating several security issues. However, an admin can
+    still change this setting later on, if needed, by writing 0 or 1 to
+    the kernel.unprivileged_bpf_disabled sysctl.
+
+    If you prefer to keep unprivileged calls to bpf() enabled, set the
+    sysctl:
+
+    kernel.unprivileged_bpf_disabled = 0
+
+    which is the upstream default.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Mon, 02 Aug 2021 22:59:24 +0200
+
+linux (5.10~rc7-1~exp2) unstable; urgency=medium
+
+  * From Linux 5.10, all users are allowed to create user namespaces by
+    default.  This will allow programs such as web browsers and container
+    managers to create more restricted sandboxes for untrusted or
+    less-trusted code, without the need to run as root or to use a
+    setuid-root helper.
+
+    The previous Debian default was to restrict this feature to processes
+    running as root, because it exposed more security issues in the
+    kernel.  However, the security benefits of more widespread sandboxing
+    probably now outweigh this risk.
+
+    If you prefer to keep this feature restricted, set the sysctl:
+
+        kernel.unprivileged_userns_clone = 0
+
+ -- Ben Hutchings <benh@debian.org>  Sun, 13 Dec 2020 17:11:36 +0100
+
+linux-latest (86) unstable; urgency=medium
+
+  * From Linux 4.13.10-1, AppArmor is enabled by default.  This allows
+    defining a "profile" for each installed program that can mitigate
+    security vulnerabilities in it.  However, an incorrect profile might
+    disable some functionality of the program.
+
+    In case you suspect that an AppArmor profile is incorrect, see
+    <https://lists.debian.org/debian-devel/2017/11/msg00178.html> and
+    consider reporting a bug in the package providing the profile.  The
+    profile may be part of the program's package or apparmor-profiles.
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Thu, 30 Nov 2017 20:08:25 +0000
+
+linux-latest (81) unstable; urgency=medium
+
+  * From Linux 4.10, the old 'virtual syscall' interface on 64-bit PCs
+    (amd64) is disabled.  This breaks chroot environments and containers
+    that use (e)glibc 2.13 and earlier, including those based on Debian 7
+    or RHEL/CentOS 6.  To re-enable it, set the kernel parameter:
+    vsyscall=emulate
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Fri, 30 Jun 2017 23:50:03 +0100
+
+linux-latest (76) unstable; urgency=medium
+
+  * From Linux 4.8, several changes have been made in the kernel
+    configuration to 'harden' the system, i.e. to mitigate security bugs.
+    Some changes may cause legitimate applications to fail, and can be
+    reverted by run-time configuration:
+    - On most architectures, the /dev/mem device can no longer be used to
+      access devices that also have a kernel driver.  This breaks dosemu
+      and some old user-space graphics drivers.  To allow this, set the
+      kernel parameter: iomem=relaxed
+    - The kernel log is no longer readable by unprivileged users.  To
+      allow this, set the sysctl: kernel.dmesg_restrict=0
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 29 Oct 2016 02:05:32 +0100
+
+linux-latest (75) unstable; urgency=medium
+
+  * From Linux 4.7, the iptables connection tracking system will no longer
+    automatically load helper modules.  If your firewall configuration
+    depends on connection tracking helpers, you should explicitly load the
+    required modules.  For more information, see
+    <https://home.regit.org/netfilter-en/secure-use-of-helpers/>.
+
+ -- Ben Hutchings <ben@decadent.org.uk>  Sat, 29 Oct 2016 01:53:18 +0100

@@ -1,0 +1,77 @@
+From: Sreenath Vijayan <sreenath.vijayan@sony.com>
+Date: Thu, 30 May 2024 13:15:47 +0530
+Subject: [PATCH 30/48] printk: Rename console_replay_all() and update context
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+Rename console_replay_all() to console_try_replay_all() to make
+clear that the implementation is best effort. Also, the function
+should not be called in NMI context as it takes locks, so update
+the comment in code.
+
+Fixes: 693f75b91a91 ("printk: Add function to replay kernel log on consoles")
+Fixes: 1b743485e27f ("tty/sysrq: Replay kernel log messages on consoles via sysrq")
+Suggested-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Shimoyashiki Taichi <taichi.shimoyashiki@sony.com>
+Signed-off-by: Sreenath Vijayan <sreenath.vijayan@sony.com>
+Link: https://lore.kernel.org/r/Zlguq/wU21Z8MqI4@sreenath.vijayan@sony.com
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ drivers/tty/sysrq.c    |    2 +-
+ include/linux/printk.h |    4 ++--
+ kernel/printk/printk.c |    6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+--- a/drivers/tty/sysrq.c
++++ b/drivers/tty/sysrq.c
+@@ -452,7 +452,7 @@ static const struct sysrq_key_op sysrq_u
+ 
+ static void sysrq_handle_replay_logs(u8 key)
+ {
+-	console_replay_all();
++	console_try_replay_all();
+ }
+ static struct sysrq_key_op sysrq_replay_logs_op = {
+ 	.handler        = sysrq_handle_replay_logs,
+--- a/include/linux/printk.h
++++ b/include/linux/printk.h
+@@ -195,7 +195,7 @@ void show_regs_print_info(const char *lo
+ extern asmlinkage void dump_stack_lvl(const char *log_lvl) __cold;
+ extern asmlinkage void dump_stack(void) __cold;
+ void printk_trigger_flush(void);
+-void console_replay_all(void);
++void console_try_replay_all(void);
+ void printk_legacy_allow_panic_sync(void);
+ extern bool nbcon_device_try_acquire(struct console *con);
+ extern void nbcon_device_release(struct console *con);
+@@ -280,7 +280,7 @@ static inline void printk_trigger_flush(
+ {
+ }
+ 
+-static inline void console_replay_all(void)
++static inline void console_try_replay_all(void)
+ {
+ }
+ 
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -4460,15 +4460,15 @@ void kmsg_dump_rewind(struct kmsg_dump_i
+ EXPORT_SYMBOL_GPL(kmsg_dump_rewind);
+ 
+ /**
+- * console_replay_all - replay kernel log on consoles
++ * console_try_replay_all - try to replay kernel log on consoles
+  *
+  * Try to obtain lock on console subsystem and replay all
+  * available records in printk buffer on the consoles.
+  * Does nothing if lock is not obtained.
+  *
+- * Context: Any context.
++ * Context: Any, except for NMI.
+  */
+-void console_replay_all(void)
++void console_try_replay_all(void)
+ {
+ 	if (console_trylock()) {
+ 		__console_rewind_all();

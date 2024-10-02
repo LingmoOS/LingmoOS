@@ -1,0 +1,76 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Tue, 20 Aug 2024 08:35:30 +0206
+Subject: [PATCH 04/54] printk: Check printk_deferred_enter()/_exit() usage
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+Add validation that printk_deferred_enter()/_exit() are called in
+non-migration contexts.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240820063001.36405-5-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/printk.h      |    9 +++++----
+ kernel/printk/internal.h    |    3 +++
+ kernel/printk/printk_safe.c |   12 ++++++++++++
+ 3 files changed, 20 insertions(+), 4 deletions(-)
+
+--- a/include/linux/printk.h
++++ b/include/linux/printk.h
+@@ -161,15 +161,16 @@ int _printk(const char *fmt, ...);
+  */
+ __printf(1, 2) __cold int _printk_deferred(const char *fmt, ...);
+ 
+-extern void __printk_safe_enter(void);
+-extern void __printk_safe_exit(void);
++extern void __printk_deferred_enter(void);
++extern void __printk_deferred_exit(void);
++
+ /*
+  * The printk_deferred_enter/exit macros are available only as a hack for
+  * some code paths that need to defer all printk console printing. Interrupts
+  * must be disabled for the deferred duration.
+  */
+-#define printk_deferred_enter __printk_safe_enter
+-#define printk_deferred_exit __printk_safe_exit
++#define printk_deferred_enter() __printk_deferred_enter()
++#define printk_deferred_exit() __printk_deferred_exit()
+ 
+ /*
+  * Please don't use printk_ratelimit(), because it shares ratelimiting state
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -53,6 +53,9 @@ int vprintk_store(int facility, int leve
+ __printf(1, 0) int vprintk_default(const char *fmt, va_list args);
+ __printf(1, 0) int vprintk_deferred(const char *fmt, va_list args);
+ 
++void __printk_safe_enter(void);
++void __printk_safe_exit(void);
++
+ bool printk_percpu_data_ready(void);
+ 
+ #define printk_safe_enter_irqsave(flags)	\
+--- a/kernel/printk/printk_safe.c
++++ b/kernel/printk/printk_safe.c
+@@ -26,6 +26,18 @@ void __printk_safe_exit(void)
+ 	this_cpu_dec(printk_context);
+ }
+ 
++void __printk_deferred_enter(void)
++{
++	cant_migrate();
++	__printk_safe_enter();
++}
++
++void __printk_deferred_exit(void)
++{
++	cant_migrate();
++	__printk_safe_exit();
++}
++
+ asmlinkage int vprintk(const char *fmt, va_list args)
+ {
+ #ifdef CONFIG_KGDB_KDB

@@ -1,0 +1,172 @@
+#!/bin/bash
+
+set -e
+set -o pipefail # Bashism
+
+# You can put a local mirror here if you want (or you can set
+# it in .mirror)
+if [ -e .mirror ]; then
+    lingmo_mirror=$(cat .mirror)
+else
+    lingmo_mirror=http://packages.lingmo.org/lingmo
+fi
+
+### DO NOT EDIT THE REST OF THIS FILE ###
+
+public_lingmo_mirror=http://packages.lingmo.org/lingmo
+
+# Detect target architecture and filter args
+temp=""
+arch=$(dpkg --print-architecture)
+dist="hydrogen"
+lb_opts=""
+while [ $# -gt 0 ]; do
+   	arg="$1"
+	case "$arg" in
+        -a|--arch|--architecture|--architectures)
+		arch="$2"
+		temp="$temp "'"'"$arg"'"'
+		temp="$temp "'"'"$2"'"'
+		shift
+		;;
+	--distribution)
+		dist="$2"
+		shift
+		;;
+	--variant)
+		variant="$2"
+		shift
+		;;
+	-p|--proposed-updates)
+		enable_pu="1"
+		;;
+	--)
+		# Skip the separator, it was added so that "lb config"
+		# doesn't barf on our own options, but now we are
+		# filtering them away assuming that the remaining ones
+		# are intended for lb config !
+		;;
+	*)
+		temp="$temp "'"'"$arg"'"'
+		;;
+	esac
+	shift
+done
+eval set -- "$temp"
+
+# Resolve release name
+dist=$(wget -q -O- $lingmo_mirror/dists/$dist/Release | awk '/^Codename:/ {print $2}')
+if [ -z "$dist" ]; then
+	echo "ERROR: Build release could not be resolved"
+	exit 1
+fi
+
+# live-build doesn't work if --parent-debian-distribution is unknown of
+# debian-cd => we have to put a symlink so that it deals with lingmo like sid
+if [ ! -e ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd/$dist ]; then
+	if [ -w ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd ]; then
+		ln -sf sid ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd/$dist
+	else
+		echo "ERROR: Run this first:"
+		echo "ln -sf sid ${LIVE_BUILD:-/usr/share/live/build}/data/debian-cd/$dist"
+		exit 1
+	fi
+fi
+
+# Define options that vary across architectures
+case "$arch" in
+    amd64)
+	lb_opts="$lb_opts --debian-installer live"
+    ;;
+    i386)
+	# lb_opts="$lb_opts --debian-installer live --linux-flavours 686-pae"
+	lb_opts="$lb_opts --linux-flavours 686-pae"
+    ;;
+    arm64)
+	lb_opts="$lb_opts --bootloaders grub-efi --uefi-secure-boot disable"
+    ;;
+    armel|armhf)
+	lb_opts="$lb_opts --binary-images hdd --binary-filesystem ext4 --chroot-filesystem none"
+    ;;
+    *)
+	echo "WARNING: configuration not tested on arch $arch" >&2
+    ;;
+esac
+
+# Define options that vary across distributions
+case "$dist" in
+    lingmo-last-snapshot)
+	# We don't want lingmo-last-snapshot to end up in the image, it
+	# should be replaced with lingmo-rolling
+	lb_opts="$lb_opts --distribution-binary hydrogen"
+	lb_opts="$lb_opts --debootstrap-script /usr/share/debootstrap/scripts/hydrogen"
+    ;;
+esac
+
+# Setup configuration files from variant and options
+
+# Drop all files that a former run might have put into place
+for file in $(cd lingmo-config && find ./common ./variant-* -type f); do
+    file=${file#./*/}
+    rm -fv config/$file
+done
+# rm -fv config/archives/lingmo-proposed-updates.list.*
+
+# Copy over all files from official lingmo configuration
+cp -rT lingmo-config/common config
+[ ! -d lingmo-config/variant-$variant ] || cp -rTL lingmo-config/variant-$variant config
+
+if [ -n "$enable_pu" ]; then
+	echo "Actually no proposed-updates in Debian, the enable_pu has no effects"
+	# mkdir -p config/archives
+	# echo "deb $lingmo_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
+	# 	> config/archives/lingmo-proposed-updates.list.chroot
+	# echo "deb $public_lingmo_mirror $dist-proposed-updates main contrib non-free non-free-firmware" \
+	# 	> config/archives/lingmo-proposed-updates.list.binary
+fi
+
+lb config noauto \
+	--apt-indices=false \
+        --distribution "$dist" \
+        --archive-areas "main contrib non-free non-free-firmware" \
+        --keyring-packages "debian-keyring" \
+        --firmware-binary true \
+        --firmware-chroot true \
+        --uefi-secure-boot enable \
+        --initramfs live-boot \
+	--debian-installer none \
+        --debian-installer-gui false \
+        --linux-flavours "6.10.9-amd64-unsigned" \
+        --binary-images iso-hybrid \
+        --checksums md5 \
+        --initramfs live-boot \
+        --mirror-binary-security https://deb.debian.org/debian-security \
+        --mirror-chroot "$lingmo_mirror" \
+        --mirror-chroot-security https://deb.debian.org/debian-security \
+        --iso-application "Lingmo OS Hydrogen" \
+        --iso-publisher "Lingmo OS Project" \
+        --iso-volume "Lingmo OS Hydrogen" \
+	--apt-indices=false \
+	--distribution "$dist" \
+	--debian-installer-distribution "$dist" \
+	--debootstrap-options "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg" \
+	--apt-recommends true \
+	--updates false \
+	--backports false \
+	--source true \
+	--uefi-secure-boot enable \
+	--mirror-bootstrap "$lingmo_mirror" \
+	--mirror-debian-installer "$lingmo_mirror" \
+	--mirror-binary "$public_lingmo_mirror" \
+	--linux-packages "linux-image" \
+	--memtest memtest86+ \
+	--bootappend-live "boot=live components quiet splash noeject" \
+	--bootappend-live-failsafe "boot=live components noeject memtest noapic noapm nodma nomce nolapic nomodeset nosmp nosplash vga=normal" \
+	--bootappend-install "net.ifnames=0" \
+	--debootstrap-options "--include=apt-transport-https,ca-certificates,openssl" \
+	--security false \
+	--win32-loader false \
+	$lb_opts \
+	"$@"
+
+#cp lingmo-config/common/source config/

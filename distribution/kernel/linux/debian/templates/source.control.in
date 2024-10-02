@@ -11,15 +11,21 @@ Build-Depends:
  python3-jinja2:native,
 # used by debian/rules.real to prepare the source
  quilt,
+# used by debian/rules.real to build linux-doc and linux-headers
+ cpio <!pkg.linux.nokernel>,
+# used by upstream to compress kernel and by debian/rules.real to build linux-source
+ xz-utils <!pkg.linux.nokernel !pkg.linux.nosource>,
 # used by debian/rules.real to build linux-perf and linux-support
  dh-python <!pkg.linux.notools>,
+# used by upstream to build genksyms, kconfig, and perf
+ bison <!pkg.linux.nokernel>, flex (>= 2.6.1-1.1~) <!pkg.linux.nokernel>,
 Build-Depends-Arch:
 # used by upstream to build include/generated/timeconst.h
  bc <!pkg.linux.nokernel>,
 # used by upstream to build signing tools and to process certificates
  libssl-dev:native <!pkg.linux.nokernel>,
  libssl-dev <!pkg.linux.notools>,
- openssl <!pkg.linux.nokernel>,
+ openssl (>= 1.1.0-1~) <!pkg.linux.nokernel>,
 # used by upstream to build objtool (native for images; host arch for
 # linux-kbuild), perf (host arch)
  libelf-dev:native <!pkg.linux.nokernel>,
@@ -27,15 +33,6 @@ Build-Depends-Arch:
  lz4 [amd64 arm64] <!pkg.linux.nokernel>,
 # used for bft debug info
  pahole <!pkg.linux.nokernel> | dwarves:native (>= 1.16~) <!pkg.linux.nokernel>,
-# used by debian/rules.real to build linux-headers
- cpio <!pkg.linux.nokernel>,
-# used by upstream to compress kernel
- xz-utils <!pkg.linux.nokernel>,
-# used by upstream to build genksyms, kconfig, and perf
- bison <!pkg.linux.nokernel>,
- bison <!pkg.linux.notools>,
- flex <!pkg.linux.nokernel>,
- flex <!pkg.linux.notools>,
 Rules-Requires-Root: no
 Vcs-Git: https://github.com/LingmoOS/LingmoOS.git
 Vcs-Browser: https://github.com/LingmoOS/LingmoOS

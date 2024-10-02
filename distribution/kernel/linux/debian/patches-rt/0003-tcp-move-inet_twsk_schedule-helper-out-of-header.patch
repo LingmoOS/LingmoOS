@@ -1,0 +1,45 @@
+From: Florian Westphal <fw@strlen.de>
+Date: Tue, 4 Jun 2024 16:08:49 +0200
+Subject: [PATCH 3/3] tcp: move inet_twsk_schedule helper out of header
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+Its no longer used outside inet_timewait_sock.c, so move it there.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://lore.kernel.org/r/20240604140903.31939-4-fw@strlen.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/net/inet_timewait_sock.h |    5 -----
+ net/ipv4/inet_timewait_sock.c    |    5 +++++
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -101,11 +101,6 @@ void inet_twsk_hashdance_schedule(struct
+ void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo,
+ 			  bool rearm);
+ 
+-static inline void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
+-{
+-	__inet_twsk_schedule(tw, timeo, false);
+-}
+-
+ static inline void inet_twsk_reschedule(struct inet_timewait_sock *tw, int timeo)
+ {
+ 	__inet_twsk_schedule(tw, timeo, true);
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -92,6 +92,11 @@ static void inet_twsk_add_node_rcu(struc
+ 	hlist_nulls_add_head_rcu(&tw->tw_node, list);
+ }
+ 
++static void inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo)
++{
++	__inet_twsk_schedule(tw, timeo, false);
++}
++
+ /*
+  * Enter the time wait state. This is called with locally disabled BH.
+  * Essentially we whip up a timewait bucket, copy the relevant info into it

@@ -1,0 +1,32 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 28 Jun 2024 12:18:54 +0200
+Subject: [PATCH 1/3] net: Remove task_struct::bpf_net_context init on fork.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+There is no clone() invocation within a bpf_net_ctx_…() block. Therefore
+the task_struct::bpf_net_context has always to be NULL and an explicit
+initialisation is not required.
+
+Remove the NULL assignment in the clone() path.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Link: https://lore.kernel.org/r/20240628103020.1766241-2-bigeasy@linutronix.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/fork.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -2355,7 +2355,6 @@ static void rv_task_fork(struct task_str
+ 	RCU_INIT_POINTER(p->bpf_storage, NULL);
+ 	p->bpf_ctx = NULL;
+ #endif
+-	p->bpf_net_context =  NULL;
+ 
+ 	/* Perform scheduler related setup. Assign this task to a CPU. */
+ 	retval = sched_fork(clone_flags, p);

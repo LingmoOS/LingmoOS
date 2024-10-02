@@ -1,0 +1,42 @@
+#!/bin/bash -e
+
+# Instead of calling gpg, call gpgv and provide a local keyring
+
+debian_dir="$(readlink -f "$(dirname "$0")/..")"
+
+# Parse the expected options.  If the next two lines are combined, a
+# failure of getopt won't cause the script to exit.
+ordered_args="$(getopt -n "$0" -o "" -l "status-fd:" -l "keyid-format:" -l "verify" -- "$@")"
+eval "set -- $ordered_args"
+gpgv_opts=()
+while true; do
+    case "$1" in
+	--status-fd)
+	    gpgv_opts+=(--status-fd $2)
+	    shift 2
+	    ;;
+	--keyid-format)
+	    # ignore
+	    shift 2
+	    ;;
+	--verify)
+	    # ignore
+	    shift 1
+	    ;;
+	--)
+	    shift 1
+	    break
+	    ;;
+    esac
+done
+
+keyring="$debian_dir/upstream/${DEBIAN_KERNEL_KEYRING:-signing-key.asc}"
+case "$keyring" in
+    *.asc)
+	keyring_armored="$keyring"
+	keyring="$(mktemp)"
+	trap 'rm -f "$keyring"' EXIT
+	gpg  --dearmor <"$keyring_armored" > "$keyring"
+	;;
+esac
+gpgv "${gpgv_opts[@]}" --keyring "$keyring" -- "$@"

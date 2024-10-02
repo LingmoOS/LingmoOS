@@ -1,0 +1,98 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Mon, 21 Aug 2023 09:59:09 +0200
+Subject: [PATCH 07/15] netfilter: br_netfilter: Use nested-BH locking for
+ brnf_frag_data_storage.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+brnf_frag_data_storage is a per-CPU variable and relies on disabled BH
+for its locking. Without per-CPU locking in local_bh_disable() on
+PREEMPT_RT this data structure requires explicit locking.
+
+Add a local_lock_t to the data structure and use local_lock_nested_bh()
+for locking. This change adds only lockdep coverage and does not alter
+the functional behaviour for !PREEMPT_RT.
+
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Roopa Prabhu <roopa@nvidia.com>
+Cc: bridge@lists.linux.dev
+Cc: coreteam@netfilter.org
+Cc: netfilter-devel@vger.kernel.org
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/bridge/br_netfilter_hooks.c |   20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -137,6 +137,7 @@ static inline bool is_pppoe_ipv6(const s
+ #define NF_BRIDGE_MAX_MAC_HEADER_LENGTH (PPPOE_SES_HLEN + ETH_HLEN)
+ 
+ struct brnf_frag_data {
++	local_lock_t bh_lock;
+ 	char mac[NF_BRIDGE_MAX_MAC_HEADER_LENGTH];
+ 	u8 encap_size;
+ 	u8 size;
+@@ -144,7 +145,9 @@ struct brnf_frag_data {
+ 	__be16 vlan_proto;
+ };
+ 
+-static DEFINE_PER_CPU(struct brnf_frag_data, brnf_frag_data_storage);
++static DEFINE_PER_CPU(struct brnf_frag_data, brnf_frag_data_storage) = {
++	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
++};
+ 
+ static void nf_bridge_info_free(struct sk_buff *skb)
+ {
+@@ -850,6 +853,7 @@ static int br_nf_dev_queue_xmit(struct n
+ {
+ 	struct nf_bridge_info *nf_bridge = nf_bridge_info_get(skb);
+ 	unsigned int mtu, mtu_reserved;
++	int ret;
+ 
+ 	mtu_reserved = nf_bridge_mtu_reduction(skb);
+ 	mtu = skb->dev->mtu;
+@@ -882,6 +886,7 @@ static int br_nf_dev_queue_xmit(struct n
+ 
+ 		IPCB(skb)->frag_max_size = nf_bridge->frag_max_size;
+ 
++		local_lock_nested_bh(&brnf_frag_data_storage.bh_lock);
+ 		data = this_cpu_ptr(&brnf_frag_data_storage);
+ 
+ 		if (skb_vlan_tag_present(skb)) {
+@@ -897,7 +902,9 @@ static int br_nf_dev_queue_xmit(struct n
+ 		skb_copy_from_linear_data_offset(skb, -data->size, data->mac,
+ 						 data->size);
+ 
+-		return br_nf_ip_fragment(net, sk, skb, br_nf_push_frag_xmit);
++		ret = br_nf_ip_fragment(net, sk, skb, br_nf_push_frag_xmit);
++		local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
++		return ret;
+ 	}
+ 	if (IS_ENABLED(CONFIG_NF_DEFRAG_IPV6) &&
+ 	    skb->protocol == htons(ETH_P_IPV6)) {
+@@ -909,6 +916,7 @@ static int br_nf_dev_queue_xmit(struct n
+ 
+ 		IP6CB(skb)->frag_max_size = nf_bridge->frag_max_size;
+ 
++		local_lock_nested_bh(&brnf_frag_data_storage.bh_lock);
+ 		data = this_cpu_ptr(&brnf_frag_data_storage);
+ 		data->encap_size = nf_bridge_encap_header_len(skb);
+ 		data->size = ETH_HLEN + data->encap_size;
+@@ -916,8 +924,12 @@ static int br_nf_dev_queue_xmit(struct n
+ 		skb_copy_from_linear_data_offset(skb, -data->size, data->mac,
+ 						 data->size);
+ 
+-		if (v6ops)
+-			return v6ops->fragment(net, sk, skb, br_nf_push_frag_xmit);
++		if (v6ops) {
++			ret = v6ops->fragment(net, sk, skb, br_nf_push_frag_xmit);
++			local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
++			return ret;
++		}
++		local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
+ 
+ 		kfree_skb(skb);
+ 		return -EMSGSIZE;

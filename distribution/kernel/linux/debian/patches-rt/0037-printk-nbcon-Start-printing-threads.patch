@@ -1,0 +1,135 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 5 Dec 2023 14:09:31 +0000
+Subject: [PATCH 37/48] printk: nbcon: Start printing threads
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+If there are no boot consoles, the printing threads are started
+in early_initcall.
+
+If there are boot consoles, the printing threads are started
+after the last boot console has unregistered. The printing
+threads do not need to be concerned about boot consoles because
+boot consoles cannot register once a non-boot console has
+registered.
+
+Until a printing thread of a console has started, that console
+will print using atomic_write() in the printk() caller context.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/internal.h |    2 ++
+ kernel/printk/nbcon.c    |   18 +++++++++++++++++-
+ kernel/printk/printk.c   |   14 ++++++++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
+
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -48,6 +48,7 @@ struct printk_ringbuffer;
+ struct dev_printk_info;
+ 
+ extern struct printk_ringbuffer *prb;
++extern bool printk_threads_enabled;
+ 
+ __printf(4, 0)
+ int vprintk_store(int facility, int level,
+@@ -161,6 +162,7 @@ static inline void nbcon_kthread_wake(st
+ 
+ static inline void nbcon_kthread_wake(struct console *con) { }
+ static inline void nbcon_kthread_create(struct console *con) { }
++#define printk_threads_enabled (false)
+ 
+ /*
+  * In !PRINTK builds we still export console_sem
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -213,6 +213,8 @@ static void nbcon_seq_try_update(struct
+ 	}
+ }
+ 
++bool printk_threads_enabled __ro_after_init;
++
+ /**
+  * nbcon_context_try_acquire_direct - Try to acquire directly
+  * @ctxt:	The context of the caller
+@@ -1553,7 +1555,7 @@ void nbcon_kthread_create(struct console
+ 	if (!(con->flags & CON_NBCON) || !con->write_thread)
+ 		return;
+ 
+-	if (con->kthread)
++	if (!printk_threads_enabled || con->kthread)
+ 		return;
+ 
+ 	/*
+@@ -1579,6 +1581,19 @@ void nbcon_kthread_create(struct console
+ 	sched_set_normal(con->kthread, -20);
+ }
+ 
++static int __init printk_setup_threads(void)
++{
++	struct console *con;
++
++	console_list_lock();
++	printk_threads_enabled = true;
++	for_each_console(con)
++		nbcon_kthread_create(con);
++	console_list_unlock();
++	return 0;
++}
++early_initcall(printk_setup_threads);
++
+ /**
+  * nbcon_alloc - Allocate buffers needed by the nbcon console
+  * @con:	Console to allocate buffers for
+@@ -1628,6 +1643,7 @@ void nbcon_init(struct console *con, u64
+ 	init_irq_work(&con->irq_work, nbcon_irq_work);
+ 	nbcon_seq_force(con, init_seq);
+ 	nbcon_state_set(con, &state);
++	nbcon_kthread_create(con);
+ }
+ 
+ /**
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -2389,6 +2389,9 @@ asmlinkage int vprintk_emit(int facility
+ 		 *
+ 		 * - When this CPU is in panic.
+ 		 *
++		 * - When booting, before the printing threads have been
++		 *   started.
++		 *
+ 		 * - During shutdown, since the printing threads may not get
+ 		 *   a chance to print the final messages.
+ 		 *
+@@ -2397,6 +2400,7 @@ asmlinkage int vprintk_emit(int facility
+ 		 * consoles cannot print simultaneously with boot consoles.
+ 		 */
+ 		if (is_panic_context ||
++		    !printk_threads_enabled ||
+ 		    (system_state > SYSTEM_RUNNING)) {
+ 			nbcon_atomic_flush_pending();
+ 		}
+@@ -3742,6 +3746,7 @@ EXPORT_SYMBOL(register_console);
+ static int unregister_console_locked(struct console *console)
+ {
+ 	bool use_device_lock = (console->flags & CON_NBCON) && console->write_atomic;
++	bool is_boot_con = (console->flags & CON_BOOT);
+ 	bool found_legacy_con = false;
+ 	bool found_nbcon_con = false;
+ 	bool found_boot_con = false;
+@@ -3824,6 +3829,15 @@ static int unregister_console_locked(str
+ 	if (!found_nbcon_con)
+ 		have_nbcon_console = found_nbcon_con;
+ 
++	/*
++	 * When the last boot console unregisters, start up the
++	 * printing threads.
++	 */
++	if (is_boot_con && !have_boot_console) {
++		for_each_console(c)
++			nbcon_kthread_create(c);
++	}
++
+ 	return res;
+ }
+ 

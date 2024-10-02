@@ -52,18 +52,12 @@ class Templates(object):
 
         if context:
             if suffix == '.in':
-                try:
-                    def subst(match):
-                        return context[match.group(1)]
-                    return re.sub(r'@([-_a-z0-9]+)@', subst, str(value[0]))
-                except KeyError as e:
-                    raise RuntimeError(f'templates/{key}.in: {e} is undefined') from None
+                def subst(match):
+                    return context[match.group(1)]
+                return re.sub(r'@([-_a-z0-9]+)@', subst, str(value[0]))
 
             elif suffix == '.j2':
-                try:
-                    return self._jinja2.from_string(value[0]).render(context)
-                except jinja2.exceptions.UndefinedError as e:
-                    raise RuntimeError(f'templates/{key}.j2: {e}') from None
+                return self._jinja2.from_string(value[0]).render(context)
 
         return value[0]
 

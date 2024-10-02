@@ -1,0 +1,153 @@
+From: Linn Crosetto <linn@hpe.com>
+Date: Tue, 30 Aug 2016 11:54:38 -0600
+Subject: arm64: add kernel config option to lock down when in Secure Boot mode
+Bug-Debian: https://bugs.debian.org/831827
+Forwarded: no
+
+Add a kernel configuration option to lock down the kernel, to restrict
+userspace's ability to modify the running kernel when UEFI Secure Boot is
+enabled. Based on the x86 patch by Matthew Garrett.
+
+Determine the state of Secure Boot in the EFI stub and pass this to the
+kernel using the FDT.
+
+Signed-off-by: Linn Crosetto <linn@hpe.com>
+[bwh: Forward-ported to 4.10: adjust context]
+[Lukas Wunner: Forward-ported to 4.11: drop parts applied upstream]
+[bwh: Forward-ported to 4.15 and lockdown patch set:
+ - Pass result of efi_get_secureboot() in stub through to
+   efi_set_secure_boot() in main kernel
+ - Use lockdown API and naming]
+[bwh: Forward-ported to 4.19.3: adjust context in update_fdt()]
+[dannf: Moved init_lockdown() call after uefi_init(), fixing SB detection]
+[bwh: Drop call to init_lockdown(), as efi_set_secure_boot() now calls this]
+[bwh: Forward-ported to 5.6: efi_get_secureboot() no longer takes a
+ sys_table parameter]
+[bwh: Forward-ported to 5.7: EFI initialisation from FDT was rewritten, so:
+ - Add Secure Boot mode to the parameter enumeration in fdtparams.c
+ - Add a parameter to efi_get_fdt_params() to return the Secure Boot mode
+ - Since Xen does not have a property name defined for Secure Boot mode,
+   change efi_get_fdt_prop() to handle a missing property name by clearing
+   the output variable]
+[Salvatore Bonaccorso: Forward-ported to 5.10: f30f242fb131 ("efi: Rename
+arm-init to efi-init common for all arch") renamed arm-init.c to efi-init.c]
+---
+ drivers/firmware/efi/efi-init.c    |    5 ++++-
+ drivers/firmware/efi/fdtparams.c   |   12 +++++++++++-
+ drivers/firmware/efi/libstub/fdt.c |    6 ++++++
+ include/linux/efi.h                |    3 ++-
+ 4 files changed, 23 insertions(+), 3 deletions(-)
+
+--- a/drivers/firmware/efi/efi-init.c
++++ b/drivers/firmware/efi/efi-init.c
+@@ -210,9 +210,10 @@ void __init efi_init(void)
+ {
+ 	struct efi_memory_map_data data;
+ 	u64 efi_system_table;
++	u32 secure_boot;
+ 
+ 	/* Grab UEFI information placed in FDT by stub */
+-	efi_system_table = efi_get_fdt_params(&data);
++	efi_system_table = efi_get_fdt_params(&data, &secure_boot);
+ 	if (!efi_system_table)
+ 		return;
+ 
+@@ -234,6 +235,8 @@ void __init efi_init(void)
+ 		return;
+ 	}
+ 
++	efi_set_secure_boot(secure_boot);
++
+ 	reserve_regions();
+ 	/*
+ 	 * For memblock manipulation, the cap should come after the memblock_add().
+--- a/drivers/firmware/efi/fdtparams.c
++++ b/drivers/firmware/efi/fdtparams.c
+@@ -16,6 +16,7 @@ enum {
+ 	MMSIZE,
+ 	DCSIZE,
+ 	DCVERS,
++	SBMODE,
+ 
+ 	PARAMCOUNT
+ };
+@@ -26,6 +27,7 @@ static __initconst const char name[][22]
+ 	[MMSIZE] = "MemMap Size          ",
+ 	[DCSIZE] = "MemMap Desc. Size    ",
+ 	[DCVERS] = "MemMap Desc. Version ",
++	[SBMODE] = "Secure Boot Enabled  ",
+ };
+ 
+ static __initconst const struct {
+@@ -41,6 +43,7 @@ static __initconst const struct {
+ 			[MMSIZE] = "xen,uefi-mmap-size",
+ 			[DCSIZE] = "xen,uefi-mmap-desc-size",
+ 			[DCVERS] = "xen,uefi-mmap-desc-ver",
++			[SBMODE] = "",
+ 		}
+ 	}, {
+ #endif
+@@ -51,6 +54,7 @@ static __initconst const struct {
+ 			[MMSIZE] = "linux,uefi-mmap-size",
+ 			[DCSIZE] = "linux,uefi-mmap-desc-size",
+ 			[DCVERS] = "linux,uefi-mmap-desc-ver",
++			[SBMODE] = "linux,uefi-secure-boot",
+ 		}
+ 	}
+ };
+@@ -62,6 +66,11 @@ static int __init efi_get_fdt_prop(const
+ 	int len;
+ 	u64 val;
+ 
++	if (!pname[0]) {
++		memset(var, 0, size);
++		return 0;
++	}
++
+ 	prop = fdt_getprop(fdt, node, pname, &len);
+ 	if (!prop)
+ 		return 1;
+@@ -79,7 +88,7 @@ static int __init efi_get_fdt_prop(const
+ 	return 0;
+ }
+ 
+-u64 __init efi_get_fdt_params(struct efi_memory_map_data *mm)
++u64 __init efi_get_fdt_params(struct efi_memory_map_data *mm, u32 *secure_boot)
+ {
+ 	const void *fdt = initial_boot_params;
+ 	unsigned long systab;
+@@ -93,6 +102,7 @@ u64 __init efi_get_fdt_params(struct efi
+ 		[MMSIZE] = { &mm->size,		sizeof(mm->size) },
+ 		[DCSIZE] = { &mm->desc_size,	sizeof(mm->desc_size) },
+ 		[DCVERS] = { &mm->desc_version,	sizeof(mm->desc_version) },
++		[SBMODE] = { secure_boot,       sizeof(*secure_boot) },
+ 	};
+ 
+ 	BUILD_BUG_ON(ARRAY_SIZE(target) != ARRAY_SIZE(name));
+--- a/drivers/firmware/efi/libstub/fdt.c
++++ b/drivers/firmware/efi/libstub/fdt.c
+@@ -148,6 +148,12 @@ static efi_status_t update_fdt(void *ori
+ 		}
+ 	}
+ 
++	fdt_val32 = cpu_to_fdt32(efi_get_secureboot());
++	status = fdt_setprop(fdt, node, "linux,uefi-secure-boot",
++			     &fdt_val32, sizeof(fdt_val32));
++	if (status)
++		goto fdt_set_fail;
++
+ 	/* Shrink the FDT back to its minimum size: */
+ 	fdt_pack(fdt);
+ 
+--- a/include/linux/efi.h
++++ b/include/linux/efi.h
+@@ -662,7 +662,8 @@ extern void efi_mem_reserve(phys_addr_t
+ extern int efi_mem_reserve_persistent(phys_addr_t addr, u64 size);
+ extern void efi_initialize_iomem_resources(struct resource *code_resource,
+ 		struct resource *data_resource, struct resource *bss_resource);
+-extern u64 efi_get_fdt_params(struct efi_memory_map_data *data);
++extern u64 efi_get_fdt_params(struct efi_memory_map_data *data,
++			      u32 *secure_boot);
+ extern struct kobject *efi_kobj;
+ 
+ extern int efi_reboot_quirk_mode;

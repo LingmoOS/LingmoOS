@@ -1,0 +1,75 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 24 Nov 2023 10:11:03 +0100
+Subject: [PATCH 05/15] net/tcp_sigpool: Use nested-BH locking for
+ sigpool_scratch.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+sigpool_scratch is a per-CPU variable and relies on disabled BH for its
+locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+this data structure requires explicit locking.
+
+Make a struct with a pad member (original sigpool_scratch) and a
+local_lock_t and use local_lock_nested_bh() for locking. This change
+adds only lockdep coverage and does not alter the functional behaviour
+for !PREEMPT_RT.
+
+Cc: David Ahern <dsahern@kernel.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/ipv4/tcp_sigpool.c |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+--- a/net/ipv4/tcp_sigpool.c
++++ b/net/ipv4/tcp_sigpool.c
+@@ -10,7 +10,14 @@
+ #include <net/tcp.h>
+ 
+ static size_t __scratch_size;
+-static DEFINE_PER_CPU(void __rcu *, sigpool_scratch);
++struct sigpool_scratch {
++	local_lock_t bh_lock;
++	void __rcu *pad;
++};
++
++static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) = {
++	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
++};
+ 
+ struct sigpool_entry {
+ 	struct crypto_ahash	*hash;
+@@ -72,7 +79,7 @@ static int sigpool_reserve_scratch(size_
+ 			break;
+ 		}
+ 
+-		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch, cpu),
++		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+ 					scratch, lockdep_is_held(&cpool_mutex));
+ 		if (!cpu_online(cpu) || !old_scratch) {
+ 			kfree(old_scratch);
+@@ -93,7 +100,7 @@ static void sigpool_scratch_free(void)
+ 	int cpu;
+ 
+ 	for_each_possible_cpu(cpu)
+-		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch, cpu),
++		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
+ 					  NULL, lockdep_is_held(&cpool_mutex)));
+ 	__scratch_size = 0;
+ }
+@@ -277,7 +284,8 @@ int tcp_sigpool_start(unsigned int id, s
+ 	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
+ 	 * valid (allocated) until tcp_sigpool_end().
+ 	 */
+-	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch));
++	local_lock_nested_bh(&sigpool_scratch.bh_lock);
++	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(tcp_sigpool_start);
+@@ -286,6 +294,7 @@ void tcp_sigpool_end(struct tcp_sigpool
+ {
+ 	struct crypto_ahash *hash = crypto_ahash_reqtfm(c->req);
+ 
++	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
+ 	rcu_read_unlock_bh();
+ 	ahash_request_free(c->req);
+ 	crypto_free_ahash(hash);

@@ -1,0 +1,34 @@
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Fri, 26 Jul 2024 06:40:49 +0900
+Subject: [PATCH] tun: Add missing bpf_net_ctx_clear() in do_xdp_generic()
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+There are cases where do_xdp_generic returns bpf_net_context without
+clearing it. This causes various memory corruptions, so the missing
+bpf_net_ctx_clear must be added.
+
+Reported-by: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com
+Fixes: fecef4cd42c6 ("tun: Assign missing bpf_net_context.")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reported-by: syzbot+3c2b6d5d4bec3b904933@syzkaller.appspotmail.com
+Reported-by: syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com
+Reported-by: syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com
+Reported-by: syzbot+61a1cfc2b6632363d319@syzkaller.appspotmail.com
+Reported-by: syzbot+709e4c85c904bcd62735@syzkaller.appspotmail.com
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ net/core/dev.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5150,6 +5150,7 @@ int do_xdp_generic(struct bpf_prog *xdp_
+ 			bpf_net_ctx_clear(bpf_net_ctx);
+ 			return XDP_DROP;
+ 		}
++		bpf_net_ctx_clear(bpf_net_ctx);
+ 	}
+ 	return XDP_PASS;
+ out_redir:

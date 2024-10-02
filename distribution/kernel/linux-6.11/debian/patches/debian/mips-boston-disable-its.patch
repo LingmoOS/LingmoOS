@@ -1,0 +1,22 @@
+From: YunQiang Su <syq@debian.org>
+Date: Mon, 14 May 2018 16:16:18 +0800
+Subject: Disable uImage generation for mips generic 
+Forwarded: not-needed
+
+MIPS generic trys to generate uImage when build, which then ask for
+u-boot-tools.
+
+[bwh: Updated for 5.17:
+ - zload-y is no longer assigned here and appears to default to empty
+ - Adjust context]
+
+--- a/arch/mips/generic/Platform
++++ b/arch/mips/generic/Platform
+@@ -13,7 +13,6 @@ cflags-$(CONFIG_MACH_INGENIC_SOC)	+= -I$
+ cflags-$(CONFIG_MIPS_GENERIC)	+= -I$(srctree)/arch/mips/include/asm/mach-generic
+ 
+ load-$(CONFIG_MIPS_GENERIC)	+= 0xffffffff80100000
+-all-$(CONFIG_MIPS_GENERIC)	+= vmlinux.gz.itb
+ 
+ its-y					:= vmlinux.its.S
+ its-$(CONFIG_FIT_IMAGE_FDT_BOSTON)	+= board-boston.its.S

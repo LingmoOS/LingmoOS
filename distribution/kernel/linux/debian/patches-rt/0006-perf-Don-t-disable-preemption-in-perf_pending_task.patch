@@ -1,0 +1,60 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Thu, 4 Jul 2024 19:03:40 +0200
+Subject: [PATCH 6/7] perf: Don't disable preemption in perf_pending_task().
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+perf_pending_task() is invoked in task context and disables preemption
+because perf_swevent_get_recursion_context() used to access per-CPU
+variables. The other reason is to create a RCU read section while
+accessing the perf_event.
+
+The recursion counter is no longer a per-CPU accounter so disabling
+preemption is no longer required. The RCU section is needed and must be
+created explicit.
+
+Replace the preemption-disable section with a explicit RCU-read section.
+
+Tested-by: Marco Elver <elver@google.com>
+Link: https://lore.kernel.org/r/20240704170424.1466941-7-bigeasy@linutronix.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/events/core.c |   11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -5208,10 +5208,9 @@ static void perf_pending_task_sync(struc
+ 	}
+ 
+ 	/*
+-	 * All accesses related to the event are within the same
+-	 * non-preemptible section in perf_pending_task(). The RCU
+-	 * grace period before the event is freed will make sure all
+-	 * those accesses are complete by then.
++	 * All accesses related to the event are within the same RCU section in
++	 * perf_pending_task(). The RCU grace period before the event is freed
++	 * will make sure all those accesses are complete by then.
+ 	 */
+ 	rcuwait_wait_event(&event->pending_work_wait, !event->pending_work, TASK_UNINTERRUPTIBLE);
+ }
+@@ -6842,7 +6841,7 @@ static void perf_pending_task(struct cal
+ 	 * critical section as the ->pending_work reset. See comment in
+ 	 * perf_pending_task_sync().
+ 	 */
+-	preempt_disable_notrace();
++	rcu_read_lock();
+ 	/*
+ 	 * If we 'fail' here, that's OK, it means recursion is already disabled
+ 	 * and we won't recurse 'further'.
+@@ -6855,10 +6854,10 @@ static void perf_pending_task(struct cal
+ 		local_dec(&event->ctx->nr_pending);
+ 		rcuwait_wake_up(&event->pending_work_wait);
+ 	}
++	rcu_read_unlock();
+ 
+ 	if (rctx >= 0)
+ 		perf_swevent_put_recursion_context(rctx);
+-	preempt_enable_notrace();
+ }
+ 
+ #ifdef CONFIG_GUEST_PERF_EVENTS

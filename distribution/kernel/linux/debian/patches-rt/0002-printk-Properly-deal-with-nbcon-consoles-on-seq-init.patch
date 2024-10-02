@@ -1,0 +1,190 @@
+From: Petr Mladek <pmladek@suse.com>
+Date: Wed, 22 Nov 2023 11:23:43 +0000
+Subject: [PATCH 02/48] printk: Properly deal with nbcon consoles on seq init
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+If a non-boot console is registering and boot consoles exist,
+the consoles are flushed before being unregistered. This allows
+the non-boot console to continue where the boot console left
+off.
+
+If for whatever reason flushing fails, the lowest seq found from
+any of the enabled boot consoles is used. Until now con->seq was
+checked. However, if it is an nbcon boot console, the function
+nbcon_seq_read() must be used to read seq because con->seq is
+not updated for nbcon consoles.
+
+Check if it is an nbcon boot console and if so call
+nbcon_seq_read() to read seq.
+
+Also, avoid usage of con->seq as temporary storage of the
+starting record. Instead, rename console_init_seq() to
+get_init_console_seq() and just return the value. For nbcon
+consoles set the sequence via nbcon_init(), for legacy consoles
+set con->seq.
+
+The cleaned design should make sure that the value stays and is
+set before the printing kthread is created.
+
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Reviewed-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/internal.h |    4 ++--
+ kernel/printk/nbcon.c    |   10 +++-------
+ kernel/printk/printk.c   |   41 +++++++++++++++++++++++++++++------------
+ 3 files changed, 34 insertions(+), 21 deletions(-)
+
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -75,7 +75,7 @@ u16 printk_parse_prefix(const char *text
+ u64 nbcon_seq_read(struct console *con);
+ void nbcon_seq_force(struct console *con, u64 seq);
+ bool nbcon_alloc(struct console *con);
+-void nbcon_init(struct console *con);
++void nbcon_init(struct console *con, u64 init_seq);
+ void nbcon_free(struct console *con);
+ 
+ #else
+@@ -96,7 +96,7 @@ static inline bool printk_percpu_data_re
+ static inline u64 nbcon_seq_read(struct console *con) { return 0; }
+ static inline void nbcon_seq_force(struct console *con, u64 seq) { }
+ static inline bool nbcon_alloc(struct console *con) { return false; }
+-static inline void nbcon_init(struct console *con) { }
++static inline void nbcon_init(struct console *con, u64 init_seq) { }
+ static inline void nbcon_free(struct console *con) { }
+ 
+ #endif /* CONFIG_PRINTK */
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -172,9 +172,6 @@ void nbcon_seq_force(struct console *con
+ 	u64 valid_seq = max_t(u64, seq, prb_first_valid_seq(prb));
+ 
+ 	atomic_long_set(&ACCESS_PRIVATE(con, nbcon_seq), __u64seq_to_ulseq(valid_seq));
+-
+-	/* Clear con->seq since nbcon consoles use con->nbcon_seq instead. */
+-	con->seq = 0;
+ }
+ 
+ /**
+@@ -961,20 +958,19 @@ bool nbcon_alloc(struct console *con)
+ /**
+  * nbcon_init - Initialize the nbcon console specific data
+  * @con:	Console to initialize
++ * @init_seq:	Sequence number of the first record to be emitted
+  *
+  * nbcon_alloc() *must* be called and succeed before this function
+  * is called.
+- *
+- * This function expects that the legacy @con->seq has been set.
+  */
+-void nbcon_init(struct console *con)
++void nbcon_init(struct console *con, u64 init_seq)
+ {
+ 	struct nbcon_state state = { };
+ 
+ 	/* nbcon_alloc() must have been called and successful! */
+ 	BUG_ON(!con->pbufs);
+ 
+-	nbcon_seq_force(con, con->seq);
++	nbcon_seq_force(con, init_seq);
+ 	nbcon_state_set(con, &state);
+ }
+ 
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -3375,19 +3375,21 @@ static void try_enable_default_console(s
+ 		newcon->flags |= CON_CONSDEV;
+ }
+ 
+-static void console_init_seq(struct console *newcon, bool bootcon_registered)
++/* Return the starting sequence number for a newly registered console. */
++static u64 get_init_console_seq(struct console *newcon, bool bootcon_registered)
+ {
+ 	struct console *con;
+ 	bool handover;
++	u64 init_seq;
+ 
+ 	if (newcon->flags & (CON_PRINTBUFFER | CON_BOOT)) {
+ 		/* Get a consistent copy of @syslog_seq. */
+ 		mutex_lock(&syslog_lock);
+-		newcon->seq = syslog_seq;
++		init_seq = syslog_seq;
+ 		mutex_unlock(&syslog_lock);
+ 	} else {
+ 		/* Begin with next message added to ringbuffer. */
+-		newcon->seq = prb_next_seq(prb);
++		init_seq = prb_next_seq(prb);
+ 
+ 		/*
+ 		 * If any enabled boot consoles are due to be unregistered
+@@ -3408,7 +3410,7 @@ static void console_init_seq(struct cons
+ 			 * Flush all consoles and set the console to start at
+ 			 * the next unprinted sequence number.
+ 			 */
+-			if (!console_flush_all(true, &newcon->seq, &handover)) {
++			if (!console_flush_all(true, &init_seq, &handover)) {
+ 				/*
+ 				 * Flushing failed. Just choose the lowest
+ 				 * sequence of the enabled boot consoles.
+@@ -3421,19 +3423,30 @@ static void console_init_seq(struct cons
+ 				if (handover)
+ 					console_lock();
+ 
+-				newcon->seq = prb_next_seq(prb);
++				init_seq = prb_next_seq(prb);
+ 				for_each_console(con) {
+-					if ((con->flags & CON_BOOT) &&
+-					    (con->flags & CON_ENABLED) &&
+-					    con->seq < newcon->seq) {
+-						newcon->seq = con->seq;
++					u64 seq;
++
++					if (!(con->flags & CON_BOOT) ||
++					    !(con->flags & CON_ENABLED)) {
++						continue;
+ 					}
++
++					if (con->flags & CON_NBCON)
++						seq = nbcon_seq_read(con);
++					else
++						seq = con->seq;
++
++					if (seq < init_seq)
++						init_seq = seq;
+ 				}
+ 			}
+ 
+ 			console_unlock();
+ 		}
+ 	}
++
++	return init_seq;
+ }
+ 
+ #define console_first()				\
+@@ -3465,6 +3478,7 @@ void register_console(struct console *ne
+ 	struct console *con;
+ 	bool bootcon_registered = false;
+ 	bool realcon_registered = false;
++	u64 init_seq;
+ 	int err;
+ 
+ 	console_list_lock();
+@@ -3542,10 +3556,13 @@ void register_console(struct console *ne
+ 	}
+ 
+ 	newcon->dropped = 0;
+-	console_init_seq(newcon, bootcon_registered);
++	init_seq = get_init_console_seq(newcon, bootcon_registered);
+ 
+-	if (newcon->flags & CON_NBCON)
+-		nbcon_init(newcon);
++	if (newcon->flags & CON_NBCON) {
++		nbcon_init(newcon, init_seq);
++	} else {
++		newcon->seq = init_seq;
++	}
+ 
+ 	/*
+ 	 * Put this console in the list - keep the

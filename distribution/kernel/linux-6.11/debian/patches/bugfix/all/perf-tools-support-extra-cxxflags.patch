@@ -1,0 +1,30 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 15 May 2023 15:58:39 +0200
+Subject: perf tools: Support EXTRA_CXXFLAGS
+
+Add support for an EXTRA_CXXFLAGS variable, used similarly to
+EXTRA_CFLAGS.
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/tools/perf/Makefile.config
++++ b/tools/perf/Makefile.config
+@@ -18,6 +18,7 @@ detected_var = $(shell echo "$(1)=$($(1)
+ 
+ CFLAGS := $(EXTRA_CFLAGS) $(filter-out -Wnested-externs,$(EXTRA_WARNINGS))
+ HOSTCFLAGS := $(filter-out -Wnested-externs,$(EXTRA_WARNINGS))
++CXXFLAGS := $(EXTRA_CXXFLAGS)
+ 
+ # Enabled Wthread-safety analysis for clang builds.
+ ifeq ($(CC_NO_CLANG), 0)
+--- a/tools/perf/Makefile.perf
++++ b/tools/perf/Makefile.perf
+@@ -33,7 +33,7 @@ include ../scripts/utilities.mak
+ #
+ # Define LDFLAGS=-static to build a static binary.
+ #
+-# Define EXTRA_CFLAGS=-m64 or EXTRA_CFLAGS=-m32 as appropriate for cross-builds.
++# Define EXTRA_CFLAGS=-m64 or EXTRA_CFLAGS=-m32 as appropriate for cross-builds, and similarly EXTRA_CXXFLAGS.
+ #
+ # Define EXCLUDE_EXTLIBS=-lmylib to exclude libmylib from the auto-generated
+ # EXTLIBS.

@@ -1,0 +1,45 @@
+From: Adam Borowski <kilobyte@angband.pl>
+Date: Tue, 28 Mar 2017 16:55:05 +0200
+Subject: btrfs: warn about RAID5/6 being experimental at mount time
+Bug-Debian: https://bugs.debian.org/863290
+Origin: https://bugs.debian.org/863290#5
+Forwarded: https://lore.kernel.org/linux-btrfs/4105665.mVaztBssJx@bagend/
+
+Too many people come complaining about losing their data -- and indeed,
+there's no warning outside a wiki and the mailing list tribal knowledge.
+Message severity chosen for consistency with XFS -- "alert" makes dmesg
+produce nice red background which should get the point across.
+
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+[bwh: Also add_taint() so this is flagged in bug reports]
+[2023-01-10: still accurate according to btrfs-progs own manpage:
+https://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git/commit/?id=922797e15590b836e377d6dc47b828356cafc2a9]
+[2024-03-17: still accurate; manpage is now in Documentation/btrfs-man5.rst
+implementation went from disk-io.c to super.c; forwarded the issue]
+---
+ fs/btrfs/super.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 101f786963d4..2c409bce1bf5 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -731,6 +731,18 @@ static void set_device_specific_options(struct btrfs_fs_info *fs_info)
+ 	    !fs_info->fs_devices->rotating)
+ 		btrfs_set_opt(fs_info->mount_opt, SSD);
+ 
++	/*
++	 * Warn about RAID5/6 being experimental at mount time
++	 */
++	if ((fs_info->avail_data_alloc_bits |
++	     fs_info->avail_metadata_alloc_bits |
++	     fs_info->avail_system_alloc_bits) &
++	    BTRFS_BLOCK_GROUP_RAID56_MASK) {
++		btrfs_alert(fs_info,
++		"btrfs RAID5/6 is EXPERIMENTAL and has known data-loss bugs");
++		add_taint(TAINT_AUX, LOCKDEP_STILL_OK);
++	}
++
+ 	/*
+ 	 * For devices supporting discard turn on discard=async automatically,
+ 	 * unless it's already set or disabled. This could be turned off by

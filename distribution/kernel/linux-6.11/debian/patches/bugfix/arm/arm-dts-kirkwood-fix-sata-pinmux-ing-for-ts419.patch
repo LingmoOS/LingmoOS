@@ -1,0 +1,35 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 17 Feb 2017 01:30:30 +0000
+Subject: ARM: dts: kirkwood: Fix SATA pinmux-ing for TS419
+Forwarded: https://lore.kernel.org/all/20170218003251.GC4152@decadent.org.uk/
+Bug-Debian: https://bugs.debian.org/855017
+
+The old board code for the TS419 assigns MPP pins 15 and 16 as SATA
+activity signals (and none as SATA presence signals).  Currently the
+device tree assigns the SoC's default pinmux groups for SATA, which
+conflict with the second Ethernet port.
+
+Reported-by: gmbh@gazeta.pl
+Tested-by: gmbh@gazeta.pl
+References: https://bugs.debian.org/855017
+Cc: stable@vger.kernel.org # 3.15+
+Fixes: 934b524b3f49 ("ARM: Kirkwood: Add DT description of QNAP 419")
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ arch/arm/boot/dts/marvell/kirkwood-ts419.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+--- a/arch/arm/boot/dts/marvell/kirkwood-ts419.dtsi
++++ b/arch/arm/boot/dts/marvell/kirkwood-ts419.dtsi
+@@ -69,3 +69,11 @@
+ 		phy-handle = <&ethphy1>;
+ 	};
+ };
++
++&pmx_sata0 {
++	marvell,pins = "mpp15";
++};
++
++&pmx_sata1 {
++	marvell,pins = "mpp16";
++};
