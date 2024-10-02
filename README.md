@@ -6,7 +6,7 @@
 
 [![license](https://img.shields.io/github/license/LingmoOS/lingmo-core.svg)](https://github.com/LingmoOS/lingmo-core) [![linux](https://img.shields.io/badge/Linux-FCC624?style=&logo=linux&logoColor=black)](https://kernel.org/)  [![Build System](https://github.com/LingmoOS/LingmoOS/actions/workflows/build.yml/badge.svg)](https://github.com/LingmoOS/LingmoOS/actions/workflows/build.yml) [![GPL2.0](https://badges.frapsoft.com/os/gpl/gpl.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
 
-The next generation of Lingmo OS, not based on any existing distribution, The development code is next (Helium).
+The next generation of Lingmo OS, The development code is next (Helium).
 
 # Build Premise
 Your computer meets at least the following criteria：
