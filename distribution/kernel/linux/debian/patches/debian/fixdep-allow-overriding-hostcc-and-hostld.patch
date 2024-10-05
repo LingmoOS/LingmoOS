@@ -12,12 +12,15 @@ override HOSTCC and HOSTLD for fixdep only.
 ---
 --- a/tools/build/Makefile.include
 +++ b/tools/build/Makefile.include
-@@ -2,7 +2,7 @@
+@@ -2,7 +2,10 @@
  build := -f $(srctree)/tools/build/Makefile.build dir=. obj
  
  fixdep:
--	$(Q)$(MAKE) -C $(srctree)/tools/build CFLAGS= LDFLAGS= $(OUTPUT)fixdep
-+	$(Q)$(MAKE) -C $(srctree)/tools/build HOSTCC=$(or $(REALHOSTCC),$(HOSTCC)) HOSTLD=$(or $(REALHOSTLD),$(HOSTLD)) CFLAGS= LDFLAGS= $(OUTPUT)fixdep
+-	$(Q)$(MAKE) -C $(srctree)/tools/build $(OUTPUT)fixdep
++	$(Q)$(MAKE) -C $(srctree)/tools/build \
++		$(if $(REALHOSTCC),HOSTCC=$(REALHOSTCC) HOSTCFLAGS=) \
++		$(if $(REALHOSTLD),HOSTLD=$(REALHOSTLD) KBUILD_HOSTLDFLAGS=) \
++		$(OUTPUT)fixdep
  
  fixdep-clean:
  	$(Q)$(MAKE) -C $(srctree)/tools/build clean

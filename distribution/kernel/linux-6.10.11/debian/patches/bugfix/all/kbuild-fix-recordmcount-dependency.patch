@@ -1,0 +1,23 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Subject: kbuild: Fix recordmcount dependency for OOT modules
+Date: Mon, 08 Sep 2014 18:31:24 +0100
+Forwarded: no
+
+We never rebuild anything in-tree when building an out-of-tree
+modules, so external modules should not depend on the recordmcount
+sources.
+
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -210,6 +210,11 @@ cmd_record_mcount = $(if $(findstring $(
+ 	$(sub_cmd_record_mcount))
+ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
+ 
++# Don't require recordmcount source for an OOT build.
++ifdef KBUILD_EXTMOD
++recordmcount_source :=
++endif
++
+ # 'OBJECT_FILES_NON_STANDARD := y': skip objtool checking for a directory
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'y': skip objtool checking for a file
+ # 'OBJECT_FILES_NON_STANDARD_foo.o := 'n': override directory skip for a file

@@ -14,23 +14,27 @@ Signed-off-by: Serge Hallyn <serge.hallyn@ubuntu.com>
 [bwh: Remove unneeded binary sysctl bits]
 [bwh: Keep this sysctl, but change the default to enabled]
 ---
-Index: linux/kernel/fork.c
-===================================================================
---- linux.orig/kernel/fork.c
-+++ linux/kernel/fork.c
-@@ -110,6 +110,11 @@
+ kernel/fork.c           | 16 ++++++++++++++++
+ kernel/sysctl.c         | 13 +++++++++++++
+ kernel/user_namespace.c |  3 +++
+ 3 files changed, 32 insertions(+)
+
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -118,6 +118,12 @@
  
- #define CREATE_TRACE_POINTS
- #include <trace/events/task.h>
+ #include <kunit/visibility.h>
+ 
 +#ifdef CONFIG_USER_NS
 +extern int unprivileged_userns_clone;
 +#else
 +#define unprivileged_userns_clone 0
 +#endif
- 
++
  /*
   * Minimum number of threads to boot the kernel
-@@ -2265,6 +2270,10 @@ static __latent_entropy struct task_stru
+  */
+@@ -2138,6 +2144,10 @@ __latent_entropy struct task_struct *cop
  	if ((clone_flags & (CLONE_NEWUSER|CLONE_FS)) == (CLONE_NEWUSER|CLONE_FS))
  		return ERR_PTR(-EINVAL);
  
@@ -41,7 +45,7 @@ Index: linux/kernel/fork.c
  	/*
  	 * Thread groups must share signals as well, and detached threads
  	 * can only be started up within the thread group.
-@@ -3411,6 +3420,12 @@ int ksys_unshare(unsigned long unshare_f
+@@ -3287,6 +3297,12 @@ int ksys_unshare(unsigned long unshare_f
  	if (unshare_flags & CLONE_NEWNS)
  		unshare_flags |= CLONE_FS;
  
@@ -54,10 +58,8 @@ Index: linux/kernel/fork.c
  	err = check_unshare_flags(unshare_flags);
  	if (err)
  		goto bad_unshare_out;
-Index: linux/kernel/sysctl.c
-===================================================================
---- linux.orig/kernel/sysctl.c
-+++ linux/kernel/sysctl.c
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
 @@ -135,6 +135,10 @@ static enum sysctl_writes_mode sysctl_wr
  int sysctl_legacy_va_layout;
  #endif
@@ -69,7 +71,7 @@ Index: linux/kernel/sysctl.c
  #endif /* CONFIG_SYSCTL */
  
  /*
-@@ -1623,6 +1627,15 @@ static struct ctl_table kern_table[] = {
+@@ -1618,6 +1622,15 @@ static struct ctl_table kern_table[] = {
  		.mode		= 0644,
  		.proc_handler	= proc_dointvec,
  	},
@@ -85,10 +87,8 @@ Index: linux/kernel/sysctl.c
  #ifdef CONFIG_PROC_SYSCTL
  	{
  		.procname	= "tainted",
-Index: linux/kernel/user_namespace.c
-===================================================================
---- linux.orig/kernel/user_namespace.c
-+++ linux/kernel/user_namespace.c
+--- a/kernel/user_namespace.c
++++ b/kernel/user_namespace.c
 @@ -22,6 +22,9 @@
  #include <linux/bsearch.h>
  #include <linux/sort.h>

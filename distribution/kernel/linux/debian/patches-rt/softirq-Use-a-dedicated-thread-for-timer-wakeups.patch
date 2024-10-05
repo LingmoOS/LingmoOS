@@ -1,7 +1,7 @@
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 1 Dec 2021 17:41:09 +0100
 Subject: [PATCH] softirq: Use a dedicated thread for timer wakeups.
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 A timer/hrtimer softirq is raised in-IRQ context. With threaded
 interrupts enabled or on PREEMPT_RT this leads to waking the ksoftirqd
@@ -46,7 +46,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/include/linux/interrupt.h
 +++ b/include/linux/interrupt.h
-@@ -612,6 +612,22 @@ extern void __raise_softirq_irqoff(unsig
+@@ -616,6 +616,22 @@ extern void __raise_softirq_irqoff(unsig
  extern void raise_softirq_irqoff(unsigned int nr);
  extern void raise_softirq(unsigned int nr);
  
@@ -191,7 +191,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  early_initcall(spawn_ksoftirqd);
 --- a/kernel/time/hrtimer.c
 +++ b/kernel/time/hrtimer.c
-@@ -1809,7 +1809,7 @@ void hrtimer_interrupt(struct clock_even
+@@ -1811,7 +1811,7 @@ void hrtimer_interrupt(struct clock_even
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -200,7 +200,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	}
  
  	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_HARD);
-@@ -1904,7 +1904,7 @@ void hrtimer_run_queues(void)
+@@ -1906,7 +1906,7 @@ void hrtimer_run_queues(void)
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -211,7 +211,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_HARD);
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -2465,7 +2465,7 @@ static void run_local_timers(void)
+@@ -2467,7 +2467,7 @@ static void run_local_timers(void)
  		/* Raise the softirq only if required. */
  		if (time_after_eq(jiffies, base->next_expiry) ||
  		    (i == BASE_DEF && tmigr_requires_handle_remote())) {

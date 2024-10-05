@@ -434,7 +434,8 @@ class Gencontrol(object):
         makeflags: MakeFlags,
     ) -> None:
         for featureset in config.root_featuresets:
-            self.do_indep_featureset(featureset, vars.copy(), makeflags.copy())
+            if featureset.enable:
+                self.do_indep_featureset(featureset, vars.copy(), makeflags.copy())
 
         # Sort the output the same way as before
         for arch in sorted(
@@ -452,16 +453,13 @@ class Gencontrol(object):
         except KeyError:
             return
 
-        extra_arches: dict[str, Any] = {}
         for package in packages_extra:
-            arches = package['Architecture']
-            for arch in arches:
-                i = extra_arches.get(arch, [])
-                i.append(package)
-                extra_arches[arch] = i
-        for arch in sorted(extra_arches.keys()):
-            self.bundle.add_packages(packages_extra, (arch, ),
-                                     MakeFlags(), check_packages=False)
+            package.meta_rules_target = 'meta'
+            if not package.architecture:
+                raise RuntimeError('Require Architecture in debian/templates/extra.control')
+            for arch in package.architecture:
+                self.bundle.add_packages([package], (arch, ),
+                                         MakeFlags(), arch=arch, check_packages=False)
 
     def do_indep_featureset(
         self,

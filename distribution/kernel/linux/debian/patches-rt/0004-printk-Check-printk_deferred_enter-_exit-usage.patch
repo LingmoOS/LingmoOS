@@ -1,7 +1,7 @@
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Date: Fri, 22 Sep 2023 14:58:18 +0000
-Subject: [PATCH 04/48] printk: Check printk_deferred_enter()/_exit() usage
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Date: Tue, 20 Aug 2024 08:35:30 +0206
+Subject: [PATCH 04/54] printk: Check printk_deferred_enter()/_exit() usage
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 Add validation that printk_deferred_enter()/_exit() are called in
 non-migration contexts.
@@ -9,6 +9,8 @@ non-migration contexts.
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Signed-off-by: John Ogness <john.ogness@linutronix.de>
 Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240820063001.36405-5-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
  include/linux/printk.h      |    9 +++++----
@@ -18,7 +20,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/include/linux/printk.h
 +++ b/include/linux/printk.h
-@@ -157,15 +157,16 @@ int _printk(const char *fmt, ...);
+@@ -161,15 +161,16 @@ int _printk(const char *fmt, ...);
   */
  __printf(1, 2) __cold int _printk_deferred(const char *fmt, ...);
  

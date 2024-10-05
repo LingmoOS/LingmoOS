@@ -24,19 +24,26 @@ export CROSS_COMPILE := $(or $(KERNEL_GNU_TYPE),$(DEB_HOST_GNU_TYPE))-
 
 export DH_OPTIONS
 export DEB_HOST_ARCH DEB_HOST_GNU_TYPE DEB_BUILD_ARCH
-export DEB_BUILD_PATH = $(CURDIR)  # for dpkg-buildflags
+# for dpkg-buildflags
+export DEB_BUILD_PATH = $(CURDIR)
 export DEB_RULES_REQUIRES_ROOT ?= no
-export LC_ALL = C.UTF-8
-undefine LANGUAGE
+
+# Set LANG rather than LC_ALL because upstream wants to override
+# specific categories and may undefine LC_ALL.  To ensure that the
+# build environment does not affect our locale, undefine all other
+# locale variables.
+export LANG = C.UTF-8
+$(foreach var,LC_ALL LANGUAGE LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME,$(eval undefine $(var)))
 
 stamp = [ -d $(dir $@) ] || mkdir $(dir $@); touch $@
 
-setup_env := env -u ABINAME -u ARCH -u FEATURESET -u FLAVOUR -u VERSION -u LOCALERSION
-setup_env += DISTRIBUTION_OFFICIAL_BUILD=1 DISTRIBUTOR="Lingmo OS" DISTRIBUTION_VERSION="2.0-Hydrogen" KBUILD_BUILD_TIMESTAMP="@$(SOURCE_DATE_EPOCH)" KBUILD_BUILD_VERSION_TIMESTAMP="Lingmo OS 2.0 Hydrogen-Based on Linux $(SOURCEVERSION) ($(SOURCE_DATE_UTC_ISO))" KBUILD_BUILD_USER="$(word 1,$(subst @, ,$(MAINTAINER)))" KBUILD_BUILD_HOST="$(word 2,$(subst @, ,$(MAINTAINER)))"
+setup_env := env -u ABINAME -u ARCH -u FEATURESET -u FLAVOUR -u VERSION -u LOCALVERSION
+# XXX: All the tools leak flags between host and build all the time, just don't care.  See #1050991.
+setup_env += -u KBUILD_HOSTCFLAGS -u HOSTCFLAGS -u KBUILD_HOSTLDFLAGS
+setup_env += DISTRIBUTION_OFFICIAL_BUILD=1 DISTRIBUTOR="Lingmo OS" DISTRIBUTION_VERSION="3.0.0(Helium)" KBUILD_BUILD_TIMESTAMP="@$(SOURCE_DATE_EPOCH)" KBUILD_BUILD_VERSION_TIMESTAMP="Lingmo OS 3.0(Helium), Linux $(SOURCEVERSION) ($(SOURCE_DATE_UTC_ISO))" KBUILD_BUILD_USER="$(word 1,$(subst @, ,$(MAINTAINER)))" KBUILD_BUILD_HOST="$(word 2,$(subst @, ,$(MAINTAINER)))"
 setup_env += KBUILD_VERBOSE=$(if $(filter terse,$(DEB_BUILD_OPTIONS)),0,1)
 
-# XXX: All the tools leak flags between host and build all the time, just don't care.  See #1050991.
-MAKE_CLEAN = $(setup_env) $(MAKE) KCFLAGS=-fdebug-prefix-map=$(CURDIR)/= KBUILD_HOSTCFLAGS='' HOSTCFLAGS='' KBUILD_HOSTLDFLAGS=''
+MAKE_CLEAN = $(setup_env) $(MAKE) KCFLAGS=-fdebug-prefix-map=$(CURDIR)/= KAFLAGS=-fdebug-prefix-map=$(CURDIR)/=
 MAKE_SELF := $(MAKE) -f debian/rules.real $(MAKEOVERRIDES)
 MAKEOVERRIDES =
 
@@ -419,7 +426,7 @@ binary_image_bug:
 	dh_installdirs usr/share/bug/$(PACKAGE_NAME)
 	dh_install debian/templates/image.bug/* usr/share/bug/$(PACKAGE_NAME)
 	chmod 755 $(DESTDIR)/usr/share/bug/$(PACKAGE_NAME)/script
-	printf "RELEASE='$(REAL_VERSION)'\nDISTRIBUTOR='Lingmo OS'\nSOURCEVERSION='$(SOURCEVERSION)'\nPACKAGE_NAME='$(PACKAGE_NAME)'\nPACKAGE_VERSION='$(SOURCEVERSION)'" > $(DESTDIR)/usr/share/bug/$(PACKAGE_NAME)/info
+	printf "RELEASE='$(REAL_VERSION)'\nDISTRIBUTOR='Lingmo OS 3.0(Helium)'\nSOURCEVERSION='$(SOURCEVERSION)'\nPACKAGE_NAME='$(PACKAGE_NAME)'\nPACKAGE_VERSION='$(SOURCEVERSION)'" > $(DESTDIR)/usr/share/bug/$(PACKAGE_NAME)/info
 
 build_image-dbg: $(STAMPS_DIR)/build_$(ARCH)_$(FEATURESET)_$(FLAVOUR)
 
@@ -623,7 +630,11 @@ ifneq ($(filter i386 amd64 x32,$(DEB_HOST_ARCH)),)
 '$${Newline}'\
 'The x86_energy_perf_policy command sets a general policy on some Intel$${Newline}'\
 'CPU models for the relative importance of performance versus energy$${Newline}'\
-'savings.'
+'savings.$${Newline}'\
+'$${Newline}'\
+'The intel-speed-select command enumerates and controls Intel SST features.$${Newline}'\
+'It can change the power and performance profile of the system in a $${Newline}'\
+'variety of diverse workload requirements.'
 endif
 	$(dh_binary_post)
 
@@ -674,6 +685,14 @@ build_rtla: $(STAMPS_DIR)/build-tools-headers
 binary_rtla: build_rtla
 	$(dh_binary_pre)
 	$(call make-tools,tools/tracing/rtla) install
+	$(dh_binary_post)
+
+build_sdsi: $(STAMPS_DIR)/build-tools-headers
+	$(call make-tools,tools/arch/x86/intel_sdsi)
+
+binary_sdsi: build_sdsi
+	$(dh_binary_pre)
+	$(call make-tools,tools/arch/x86/intel_sdsi) install
 	$(dh_binary_post)
 
 setup_%:

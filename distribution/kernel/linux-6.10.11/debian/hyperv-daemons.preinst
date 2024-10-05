@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "upgrade" ]; then
+    services='kvp vss'
+    if dpkg --compare-versions "$2" lt 6.10~rc6-1~exp1; then
+	services="fcopy $services"
+    fi
+    for i in $services; do
+        if [ -d /run/systemd/system ]; then
+            systemctl stop hyperv-daemons.hv-$i-daemon.service 2>/dev/null || true
+        fi
+        deb-systemd-helper purge hyperv-daemons.hv-$i-daemon.service || true
+        invoke-rc.d --skip-systemd-native hyperv-daemons.hv-$i-daemon stop || true
+        update-rc.d hyperv-daemons.hv-$i-daemon remove || true
+    done
+fi
+
+#DEBHELPER#
+
+exit 0

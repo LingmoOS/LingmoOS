@@ -1,0 +1,41 @@
+[[flavour]]
+name = 'arm64'
+[flavour.defs]
+is_default = true
+[flavour.description]
+hardware = '64-bit ARMv8 machines'
+[flavour.packages]
+installer = true
+
+[[flavour]]
+name = 'cloud-arm64'
+[flavour.build]
+config = ['config.cloud']
+[flavour.defs]
+is_quick = true
+[flavour.description]
+hardware = 'arm64 cloud'
+hardware_long = 'cloud platforms supporting arm64 virtual machines'
+
+[[flavour]]
+name = 'arm64-16k'
+[flavour.build]
+config = ['arm64/config-page-16k']
+[flavour.description]
+hardware = '64-bit ARMv8 machines with 16k pages'
+
+[[featureset]]
+name = 'none'
+
+[[featureset]]
+name = 'rt'
+# Override available flavours in rt featureset
+[[featureset.flavour]]
+name = 'arm64'
+
+[build]
+compiler_gnutype_compat = 'arm-linux-gnueabihf'
+enable_signed = true
+enable_vdso = true
+kernel_file = 'arch/arm64/boot/Image'
+kernel_stem = 'vmlinuz'

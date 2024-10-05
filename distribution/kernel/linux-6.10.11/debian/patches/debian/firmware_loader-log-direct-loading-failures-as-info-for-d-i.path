@@ -1,0 +1,37 @@
+From: Ben Hutchings <benh@debian.org>
+Subject: firmware_loader: Log direct loading failures as info for d-i
+Date: Thu, 30 May 2024 13:14:32 +0100
+Forwarded: not-needed
+
+On an installed Debian system, firmware packages will normally be
+installed automatically based on a mapping of device IDs to firmware.
+Within the Debian installer this has not yet happened and we need a
+way to detect missing firmware.
+
+Although many/most drivers log firmware loading failures, they do so
+using many different formats.  This adds a single log message to the
+firmware loader, which the installer's hw-detect package will look
+for.  The log level is set to "info" because some failures are
+expected and we do not want to confuse users with bogus error messages
+(like in bug #966218).
+
+NOTE: The log message format must not be changed without coordinating
+this with the check-missing-firmware.sh in hw-detect.
+---
+ drivers/base/firmware_loader/fallback.c |  2 +-
+ drivers/base/firmware_loader/main.c     | 17 ++++++++---------
+ 2 files changed, 9 insertions(+), 10 deletions(-)
+
+--- a/drivers/base/firmware_loader/main.c
++++ b/drivers/base/firmware_loader/main.c
+@@ -586,6 +586,10 @@ fw_get_filesystem_firmware(struct device
+ 	}
+ 	__putname(path);
+ 
++	if (rc)
++		dev_info(device, "firmware: failed to load %s (%d)\n",
++			 fw_priv->fw_name, rc);
++
+ 	return rc;
+ }
+ 

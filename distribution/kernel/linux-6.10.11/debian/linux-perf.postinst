@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+old_version_suffix="$(echo "$2" | sed -rn 's/^([0-9]+\.[0-9]+).*/\1/p')"
+if [ "$old_version_suffix" ]; then
+    dpkg-maintscript-helper symlink_to_dir \
+	/usr/share/doc/linux-perf "linux-perf-${old_version_suffix}" 5.16\~rc8-1\~exp1 linux-perf -- "$@"
+fi
+
+#DEBHELPER#

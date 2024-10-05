@@ -12,6 +12,7 @@ CFLAGS := $(shell dpkg-buildflags --get CFLAGS) -Wall
 CPPFLAGS := $(shell dpkg-buildflags --get CPPFLAGS) \
 	-I$(top_srcdir)/$(OUTDIR) \
 	-I$(top_srcdir)/debian/build/build-tools/$(OUTDIR) \
+	-I$(top_srcdir)/scripts/include \
 	-isystem $(top_srcdir)/debian/build/build-tools/include
 CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS) -Wall
 LDFLAGS := $(shell dpkg-buildflags --get LDFLAGS)

@@ -1,7 +1,7 @@
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:39 +0200
 Subject: [PATCH 3/3] time: Allow to preempt after a callback.
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 The TIMER_SOFTIRQ handler invokes timer callbacks of the expired timers.
 Before each invocation the timer_base::lock is dropped. The only lock
@@ -27,9 +27,9 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1562,9 +1562,16 @@ static inline void timer_base_unlock_exp
-  */
- static void timer_sync_wait_running(struct timer_base *base)
+@@ -1564,9 +1564,16 @@ static void timer_sync_wait_running(stru
+ 	__releases(&base->lock) __releases(&base->expiry_lock)
+ 	__acquires(&base->expiry_lock) __acquires(&base->lock)
  {
 -	if (atomic_read(&base->timer_waiters)) {
 +	bool need_preempt;

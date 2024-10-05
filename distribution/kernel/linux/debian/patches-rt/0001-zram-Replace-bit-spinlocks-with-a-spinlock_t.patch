@@ -1,7 +1,7 @@
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Thu, 31 Mar 2016 04:08:28 +0200
 Subject: [PATCH 1/3] zram: Replace bit spinlocks with a spinlock_t.
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 The bit spinlock disables preemption. The spinlock_t lock becomes a sleeping
 lock on PREEMPT_RT and it can not be acquired in this context. In this locked
@@ -14,30 +14,18 @@ increases by 4 bytes due to lock and additional 4 bytes padding with
 CONFIG_ZRAM_TRACK_ENTRY_ACTIME enabled.
 
 Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
-Link: https://lore.kernel.org/r/20240620153556.777272-2-bigeasy@linutronix.de
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Link: https://lkml.kernel.org/r/YqIbMuHCPiQk+Ac2@linutronix.de
-Link: https://lore.kernel.org/20230323161830.jFbWCosd@linutronix.de
-Link: https://lore.kernel.org/20240619150814.BRAvaziM@linutronix.de
+Link: https://lore.kernel.org/20240906141520.730009-2-bigeasy@linutronix.de
 ---
- drivers/block/zram/zram_drv.c |   22 +++++++++++++++++++---
+ drivers/block/zram/zram_drv.c |   18 ++++++++++++++----
  drivers/block/zram/zram_drv.h |    1 +
- 2 files changed, 20 insertions(+), 3 deletions(-)
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -57,19 +57,34 @@ static void zram_free_page(struct zram *
- static int zram_read_page(struct zram *zram, struct page *page, u32 index,
- 			  struct bio *parent);
+@@ -59,17 +59,24 @@ static int zram_read_page(struct zram *z
  
-+static void zram_meta_init_table_locks(struct zram *zram, size_t num_pages)
-+{
-+	size_t index;
-+
-+	for (index = 0; index < num_pages; index++)
-+		spin_lock_init(&zram->table[index].lock);
-+}
-+
  static int zram_slot_trylock(struct zram *zram, u32 index)
  {
 -	return bit_spin_trylock(ZRAM_LOCK, &zram->table[index].flags);
@@ -64,11 +52,22 @@ Link: https://lore.kernel.org/20240619150814.BRAvaziM@linutronix.de
  }
  
  static inline bool init_done(struct zram *zram)
-@@ -1226,6 +1241,7 @@ static bool zram_meta_alloc(struct zram
+@@ -1211,7 +1218,7 @@ static void zram_meta_free(struct zram *
+ 
+ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ {
+-	size_t num_pages;
++	size_t num_pages, index;
+ 
+ 	num_pages = disksize >> PAGE_SHIFT;
+ 	zram->table = vzalloc(array_size(num_pages, sizeof(*zram->table)));
+@@ -1226,6 +1233,9 @@ static bool zram_meta_alloc(struct zram
  
  	if (!huge_class_size)
  		huge_class_size = zs_huge_class_size(zram->mem_pool);
-+	zram_meta_init_table_locks(zram, num_pages);
++
++	for (index = 0; index < num_pages; index++)
++		spin_lock_init(&zram->table[index].lock);
  	return true;
  }
  

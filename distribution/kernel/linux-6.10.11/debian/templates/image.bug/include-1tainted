@@ -1,0 +1,42 @@
+_check() {
+  if [ $(($tainted & 1<<$1)) -ne 0 ]; then
+    result_short="$result_short$2"
+    result_long="$result_long * $3\n"
+  fi
+}
+
+add_1tainted() {
+  tainted=$(cat /proc/sys/kernel/tainted)
+  if [ "$tainted" -gt 0 ]; then
+    local result_short result_long
+    # Use debian/bin/update-bug-taint-list to update this
+    _check 0 P 'proprietary module was loaded'
+    _check 1 F 'module was force loaded'
+    _check 2 S 'kernel running on an out of specification system'
+    _check 3 R 'module was force unloaded'
+    _check 4 M 'processor reported a Machine Check Exception (MCE)'
+    _check 5 B 'bad page referenced or some unexpected page flags'
+    _check 6 U 'taint requested by userspace application'
+    _check 7 D 'kernel died recently, i.e. there was an OOPS or BUG'
+    _check 8 A 'ACPI table overridden by user'
+    _check 9 W 'kernel issued warning'
+    _check 10 C 'staging driver was loaded'
+    _check 11 I 'workaround for bug in platform firmware applied'
+    _check 12 O 'externally-built ("out-of-tree") module was loaded'
+    _check 13 E 'unsigned module was loaded'
+    _check 14 L 'soft lockup occurred'
+    _check 15 K 'kernel has been live patched'
+    _check 16 X 'auxiliary taint, defined for and used by distros'
+    _check 17 T 'kernel was built with the struct randomization plugin'
+    _check 18 N 'an in-kernel test has been run'
+    echo "** Tainted: $result_short ($tainted)" >&3
+    printf "$result_long" >&3
+  else
+    echo '** Not tainted' >&3
+  fi
+  echo >&3
+}
+
+ask_1tainted() {
+  true
+}

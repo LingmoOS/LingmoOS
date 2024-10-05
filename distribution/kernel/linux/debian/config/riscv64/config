@@ -53,6 +53,7 @@ CONFIG_AHCI_DWC=m
 ## file: drivers/cache/Kconfig
 ##
 CONFIG_SIFIVE_CCACHE=y
+CONFIG_STARFIVE_STARLINK_CACHE=y
 
 ##
 ## file: drivers/char/hw_random/Kconfig
@@ -64,6 +65,9 @@ CONFIG_HW_RANDOM_JH7110=m
 ## file: drivers/clk/sophgo/Kconfig
 ##
 CONFIG_CLK_SOPHGO_CV1800=m
+CONFIG_CLK_SOPHGO_SG2042_PLL=m
+CONFIG_CLK_SOPHGO_SG2042_CLKGEN=m
+CONFIG_CLK_SOPHGO_SG2042_RPGATE=m
 
 ##
 ## file: drivers/cpufreq/Kconfig
@@ -135,6 +139,7 @@ CONFIG_I2C_MV64XXX=m
 ##
 ## file: drivers/input/misc/Kconfig
 ##
+CONFIG_INPUT_MISC=y
 CONFIG_INPUT_DA9063_ONKEY=m
 
 ##
@@ -211,7 +216,6 @@ CONFIG_PCI=y
 ## file: drivers/pci/controller/Kconfig
 ##
 CONFIG_PCI_HOST_GENERIC=y
-CONFIG_PCIE_MICROCHIP_HOST=y
 CONFIG_PCIE_XILINX=y
 
 ##
@@ -219,6 +223,12 @@ CONFIG_PCIE_XILINX=y
 ##
 CONFIG_PCIE_DW_PLAT_HOST=y
 CONFIG_PCIE_FU740=y
+
+##
+## file: drivers/pci/controller/plda/Kconfig
+##
+CONFIG_PCIE_MICROCHIP_HOST=y
+CONFIG_PCIE_STARFIVE_HOST=y
 
 ##
 ## file: drivers/perf/Kconfig
@@ -234,6 +244,7 @@ CONFIG_PHY_SUN4I_USB=m
 ## file: drivers/phy/starfive/Kconfig
 ##
 CONFIG_PHY_STARFIVE_JH7110_DPHY_RX=m
+CONFIG_PHY_STARFIVE_JH7110_DPHY_TX=m
 CONFIG_PHY_STARFIVE_JH7110_PCIE=m
 CONFIG_PHY_STARFIVE_JH7110_USB=m
 
@@ -351,6 +362,16 @@ CONFIG_NOP_USB_XCEIV=m
 CONFIG_DA9063_WATCHDOG=m
 CONFIG_SUNXI_WATCHDOG=m
 CONFIG_STARFIVE_WATCHDOG=m
+
+##
+## file: init/Kconfig
+##
+## choice: Kernel compression mode
+#. Decompression is done by the bootloader, so we need to be
+#. conservative here.
+CONFIG_KERNEL_GZIP=y
+# CONFIG_KERNEL_XZ is not set
+## end choice
 
 ##
 ## file: kernel/Kconfig.kexec

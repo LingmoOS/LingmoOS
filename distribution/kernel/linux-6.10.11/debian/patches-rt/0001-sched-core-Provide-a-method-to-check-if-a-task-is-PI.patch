@@ -1,0 +1,54 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 4 Aug 2023 13:30:37 +0200
+Subject: [PATCH 1/3] sched/core: Provide a method to check if a task is
+ PI-boosted.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+Provide a method to check if a task inherited the priority from another
+task. This happens if a task owns a lock which is requested by a task
+with higher priority. This can be used as a hint to add a preemption
+point to the critical section.
+
+Provide a function which reports true if the task is PI-boosted.
+
+Link: https://lore.kernel.org/r/20230804113039.419794-2-bigeasy@linutronix.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/sched.h |    1 +
+ kernel/sched/core.c   |   15 +++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1806,6 +1806,7 @@ static inline int dl_task_check_affinity
+ }
+ #endif
+ 
++extern bool task_is_pi_boosted(const struct task_struct *p);
+ extern int yield_to(struct task_struct *p, bool preempt);
+ extern void set_user_nice(struct task_struct *p, long nice);
+ extern int task_prio(const struct task_struct *p);
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -8910,6 +8910,21 @@ static inline void preempt_dynamic_init(
+ 
+ #endif /* #ifdef CONFIG_PREEMPT_DYNAMIC */
+ 
++/*
++ * task_is_pi_boosted - Check if task has been PI boosted.
++ * @p:	Task to check.
++ *
++ * Return true if task is subject to priority inheritance.
++ */
++bool task_is_pi_boosted(const struct task_struct *p)
++{
++	int prio = p->prio;
++
++	if (!rt_prio(prio))
++		return false;
++	return prio != p->normal_prio;
++}
++
+ /**
+  * yield - yield the current processor to other threads.
+  *

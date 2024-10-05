@@ -12,16 +12,19 @@ RELAXED mode.
 
 https://web.archive.org/web/20180830093617/https://dmz-portal.mips.com/wiki/MIPS_ABI_-_NaN_Interlinking
 
-diff --git a/arch/mips/kernel/fpu-probe.c b/arch/mips/kernel/fpu-probe.c
-index e689d6a83..667226f94 100644
+[bwh: Update for addition of EMULATED mode in 6.11]
+---
+ arch/mips/kernel/fpu-probe.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
 --- a/arch/mips/kernel/fpu-probe.c
 +++ b/arch/mips/kernel/fpu-probe.c
-@@ -144,7 +144,12 @@ static void cpu_set_fpu_2008(struct cpuinfo_mips *c)
+@@ -144,7 +144,12 @@ static void cpu_set_fpu_2008(struct cpui
   * IEEE 754 conformance mode to use.  Affects the NaN encoding and the
   * ABS.fmt/NEG.fmt execution mode.
   */
--static enum { STRICT, LEGACY, STD2008, RELAXED } ieee754 = STRICT;
-+enum ieee754_mode { STRICT, LEGACY, STD2008, RELAXED };
+-static enum { STRICT, EMULATED, LEGACY, STD2008, RELAXED } ieee754 = STRICT;
++enum ieee754_mode { STRICT, EMULATED, LEGACY, STD2008, RELAXED };
 +#ifdef CONFIG_CPU_LOONGSON64
 +static enum ieee754_mode ieee754 = RELAXED;
 +#else

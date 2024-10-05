@@ -1,5 +1,12 @@
 include $(top_rulesdir)/Makefile.inc
 
+# gas only understands the -fdebug-prefix-map option, and gcc doesn't
+# convert the -ffile-prefix-map option to that when invoking gas.  So
+# use both options.
+ifneq ($(filter -ffile-prefix-map=%,$(CFLAGS)),)
+CFLAGS += -fdebug-prefix-map=$(DEB_BUILD_PATH)=.
+endif
+
 MAKE_PERF := $(MAKE) O=$(CURDIR) prefix=/usr V=1 VF=1 ARCH=$(KERNEL_ARCH) WERROR=0 EXTRA_CFLAGS='$(CFLAGS) $(CPPFLAGS)' EXTRA_CXXFLAGS='$(CXXFLAGS) $(CPPFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 # Disable Gtk UI until it's more usable

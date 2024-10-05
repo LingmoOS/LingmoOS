@@ -1,0 +1,359 @@
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/salsa-ci.yml
+
+variables:
+  RELEASE: 'unstable'
+  # Make that build quicker
+  DEB_BUILD_PROFILES: pkg.linux.quick
+  # We have to bump the version in source preparation, not later
+  SALSA_CI_DISABLE_VERSION_BUMP: 'true'
+  # Currently broken in quick build
+  DEBIAN_KERNEL_DISABLE_INSTALLER: 'true'
+  # Output is limited to 4 MiB total, so use 'terse'.
+  # Current runners have 2 CPUs but have slow I/O so 'parallel=4' is
+  # a bit faster.
+  DEB_BUILD_OPTIONS: 'terse parallel=4'
+  DEBIAN_KERNEL_DISABLE_BUILD_PACKAGE_ARM64: 0
+
+# Add stages for signed packages
+stages:
+  - provisioning
+  - build
+  - publish
+  - sign-code
+  - build-signed
+  - test
+
+# The common Salsa CI pipeline relies on keeping the unpacked source
+# as an artifact, but in our case this is far too large for the
+# current limits on Salsa (salsa-ci-team/pipeline#195).  So we
+# redefine the source extraction and build steps to use packed source.
+
+# Our modified extract-source and build jobs
+
+extract-source:
+  stage: provisioning
+  image: $SALSA_CI_IMAGES_BASE
+  cache:
+    key: "orig-${RELEASE}"
+    paths:
+      - orig
+  extends:
+    - .artifacts-default-expire
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  script:
+    # Move cache to where genorig.py and orig target want it
+    - mkdir -p orig
+    - rm -rf ../orig
+    - mv orig ../orig
+
+    # Install dependencies of gencontrol.py, genorig.py, and debian/rules orig
+    - apt-get update
+    - |
+      eatmydata apt-get install --no-install-recommends -y \
+        debhelper \
+        git \
+        gpg \
+        gpgv \
+        kernel-wedge \
+        python3 \
+        python3-dacite \
+        python3-debian \
+        python3-jinja2 \
+        quilt \
+        rsync
+
+    - version=$(dpkg-parsechangelog -SVersion)
+    - upstream_version=$(echo $version | sed 's/-[^-]*$//')
+
+    # Merge upstream source.  We could use origtargz to download a
+    # tarball fom the archive if available or run uscan if not, but
+    # uscan is currently excessively slow for us (bug #1003251).
+    - |
+      if [ -f ../orig/linux_${upstream_version}.orig.tar.xz ]; then
+          ln -s orig/linux_${upstream_version}.orig.tar.xz ..
+      else
+          debian/bin/genorig.py https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+      fi
+    - debian/rules orig
+
+    # Fudge source version and distribution *before* gencontrol.py
+    - sed -i -e '1 s/) [^;]*/+salsaci) UNRELEASED/' debian/changelog
+    - version=${version}+salsaci
+
+    # Run gencontrol.py
+    # - create temporary log
+    - log="$(mktemp)"
+    # - invoke debian/control-real rule and log output
+    - |
+      rc=0; debian/rules debian/control-real >"$log" 2>&1 || rc=$?
+    - cat "$log"
+    # - check for success message and error code
+    - test $rc = 2
+    - grep -q 'been generated SUCCESSFULLY' "$log"
+
+    # Put packed source in artifacts
+    - dpkg-buildpackage -uc -us -S -sa -d
+    - mkdir -p ${WORKING_DIR}
+    - cp ../orig/linux_${upstream_version}.orig.tar.xz ${WORKING_DIR}
+    - mv ../linux_${version}.dsc ../linux_${version}.debian.tar.xz ${WORKING_DIR}
+
+    # Move cache back to where GitLab wants it.  Only include
+    # tarballs, not unpacked source.
+    - mkdir orig
+    - mv ../orig/*.tar.xz orig
+
+build:
+  stage: build
+  timeout: 3 hours
+  image: $SALSA_CI_IMAGES_BASE
+  cache:
+    key: "build-${BUILD_ARCH}_${HOST_ARCH}"
+    paths:
+      - .ccache
+  extends:
+    - .artifacts-default-expire
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  variables:
+    CCACHE_TMP_DIR: ${CI_PROJECT_DIR}/../.ccache
+    CCACHE_WORK_DIR: ${CI_PROJECT_DIR}/.ccache
+    DB_BUILD_PARAM: ${SALSA_CI_DPKG_BUILDPACKAGE_ARGS}
+    DB_BUILD_TYPE: full
+  artifacts:
+    exclude:
+      - ${WORKING_DIR}/${SOURCE_DIR}/**/*
+  script:
+    # Unpack the source
+    - |
+      apt-get update && eatmydata apt-get install --no-install-recommends -y \
+        dpkg-dev
+    - dpkg-source -x ${WORKING_DIR}/*.dsc ${WORKING_DIR}/${SOURCE_DIR}
+
+    # Do the same as the common .build-definition script
+    - !reference [.build-before-script]
+    - !reference [.build-script]
+    - mv ${CCACHE_TMP_DIR} ${CCACHE_WORK_DIR}
+  dependencies:
+    - extract-source
+
+build-arm64:
+  extends: build
+  image: $SALSA_CI_IMAGES_BASE_ARM64
+  variables:
+    BUILD_ARCH: 'arm64'
+  tags:
+    - arm64
+  rules:
+    - if: $DEBIAN_KERNEL_DISABLE_BUILD_PACKAGE_ARM64 =~ /^(1|yes|true)$/
+      when: never
+    # Make it possible to override the rules below. E.g. when a project fork
+    # has an ARM64 runner available.
+    - if: $DEBIAN_KERNEL_ENABLE_BUILD_PACKAGE_ARM64 =~ /^(1|yes|true)$/
+      when: always
+    # While there isn't an ARM shared runner avilable, let's run this job
+    # manually in forks of the kernel-team/linux project, and in branches other
+    # than the default branch, and allow it to fail in that case
+    - if: $CI_PROJECT_NAMESPACE != "kernel-team"
+      allow_failure: true
+      when: manual
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+      allow_failure: true
+      when: manual
+    - when: always
+
+# The folllowing jobs are the standard tests, excluding any that
+# require building again
+
+lintian:
+  extends: .test-lintian
+  script:
+  - lintian --suppress-tags "${SALSA_CI_LINTIAN_SUPPRESS_TAGS}" --display-info --pedantic --fail-on error --allow-root ${SALSA_CI_LINTIAN_SHOW_OVERRIDES_ARG} ${SALSA_CI_LINTIAN_ARGS} ${WORKING_DIR}/*.changes | tee lintian.output || ECODE=$?
+  - lintian2junit.py --lintian-file lintian.output > ${WORKING_DIR}/lintian.xml
+  - exit ${ECODE-0}
+  needs:
+  - job: build
+    artifacts: true
+  - job: build-signed
+    artifacts: true
+
+autopkgtest:
+    extends: .test-autopkgtest
+
+blhc:
+    extends: .test-blhc
+
+piuparts:
+  extends: .test-piuparts
+  needs:
+  - job: build
+    artifacts: true
+  - job: build-signed
+    artifacts: true
+
+missing-breaks:
+    extends: .test-missing-breaks
+
+rc-bugs:
+    extends: .test-rc-bugs
+
+# Python static checkers
+
+python-static:
+  stage: test
+  image: $SALSA_CI_IMAGES_BASE
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  script:
+    - |
+      apt-get update && eatmydata apt-get install --no-install-recommends -y \
+        flake8 python3 python3-dacite python3-jinja2 python3-pytest
+
+    # Check Python modules under debian/lib and Python scripts under
+    # debian/bin or debian/rules.d.
+    - sources="$(mktemp)"
+    - find debian/lib/python -name '*.py' > "$sources"
+    - |
+      find debian/bin debian/rules.d -type f -perm /111 |
+          while read script; do
+              if awk '/^#!.*python/ { exit 0 } { exit 1 }' "$script"; then
+                  echo "$script"
+              fi
+          done \
+          >> "$sources"
+
+    # Run both checkers and coalesce their results rather than exiting
+    # on first failure
+    - pass=true
+    - xargs flake8 --max-line-length=100 < "$sources" || pass=false
+    - py.test debian/lib/python || pass=false
+    - $pass
+  needs: []
+
+# kconfig static check
+
+kconfig-static:
+  stage: test
+  image: $SALSA_CI_IMAGES_BASE
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  script:
+    # Unpack source and apply featureset patches
+    - |
+      apt-get update && eatmydata apt-get install --no-install-recommends -y \
+        debhelper dpkg-dev git python3 python3-dacite quilt
+    - dpkg-source -x ${WORKING_DIR}/*.dsc ${WORKING_DIR}/${SOURCE_DIR}
+    - cd ${WORKING_DIR}/${SOURCE_DIR}
+    - debian/rules source
+
+    # Fetch kernel-team repository
+    - kernel_team_dir="$(mktemp -d)"
+    - |
+      git clone --depth=1 https://salsa.debian.org/kernel-team/kernel-team.git \
+        "$kernel_team_dir"
+
+    # Run process.py and treat any error output as a failure
+    - error_log="$(mktemp)"
+    - |
+      "$kernel_team_dir"/utils/kconfigeditor2/process.py . 2>"$error_log" \
+      || true
+    - |
+      if [ -s "$error_log" ]; then cat "$error_log"; false; fi
+  needs:
+    - job: extract-source
+      artifacts: true
+
+# Sign code with the test key and certificate, build and test that
+
+sign-code:
+  stage: sign-code
+  image: $SALSA_CI_IMAGES_BASE
+  extends:
+    - .artifacts-default-expire
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  script:
+    - |
+      apt-get update && eatmydata apt-get install --no-install-recommends -y \
+        dpkg-dev git openssl python3 python3-debian sbsigntool
+
+    # Fetch kernel-team repository
+    - kernel_team_dir="$(mktemp -d)"
+    - |
+      git clone --depth=1 https://salsa.debian.org/kernel-team/kernel-team.git \
+        "$kernel_team_dir"
+
+    # Sign the code and build a source package
+    - |
+      "$kernel_team_dir"/scripts/debian-test-sign \
+        ${WORKING_DIR}/linux_*_${BUILD_ARCH}.changes \
+        debian/certs/ci-test-sign/ci-test-sign-key.pem \
+        debian/certs/ci-test-sign/ci-test-sign.pem
+  artifacts:
+    paths:
+      - ${WORKING_DIR}/linux-signed-${BUILD_ARCH}_*
+  needs:
+    - job: build
+      artifacts: true
+
+build-signed:
+  stage: build-signed
+  image: $SALSA_CI_IMAGES_BASE
+  extends:
+    - .artifacts-default-expire
+  rules:
+    - if: $CI_COMMIT_TAG != null
+      when: never
+    - when: always
+  variables:
+    SALSA_CI_DPKG_BUILDPACKAGE_ARGS: ''
+    CCACHE_TMP_DIR: ${CI_PROJECT_DIR}/../.ccache
+    CCACHE_WORK_DIR: ${CI_PROJECT_DIR}/.ccache
+    DB_BUILD_PARAM: ${SALSA_CI_DPKG_BUILDPACKAGE_ARGS}
+    DB_BUILD_TYPE: full
+  script:
+    # Unpack the source
+    - |
+      apt-get update && eatmydata apt-get install --no-install-recommends -y \
+        dpkg-dev
+    - |
+      dpkg-source -x ${WORKING_DIR}/linux-signed-${BUILD_ARCH}_*.dsc \
+        ${WORKING_DIR}/${SOURCE_DIR}
+
+    # Install build-dependencies produced by build job
+    - |
+      apt-get install --no-install-recommends -y \
+        ${WORKING_DIR}/linux-image-*-unsigned_*_${BUILD_ARCH}.deb
+
+    # Do the same as the common .build-definition script
+    - !reference [.build-before-script]
+    - !reference [.build-script]
+    - mv ${CCACHE_TMP_DIR} ${CCACHE_WORK_DIR}
+  artifacts:
+    # This should include the linux-signed source package, its binary
+    # packages, and (for piuparts) the versioned dependencies produced
+    # by the build job
+    paths:
+      - ${WORKING_DIR}/linux-signed-${BUILD_ARCH}_*
+      - ${WORKING_DIR}/linux-headers-*_${BUILD_ARCH}.deb
+      - ${WORKING_DIR}/linux-headers-*-common_*_all.deb
+      - ${WORKING_DIR}/linux-image-*_${BUILD_ARCH}.deb
+      - ${WORKING_DIR}/linux-kbuild-*_${BUILD_ARCH}.deb
+    exclude:
+      - ${WORKING_DIR}/linux-image-*-unsigned_*_${BUILD_ARCH}.deb
+  needs:
+    - job: build
+      artifacts: true
+    - job: sign-code
+      artifacts: true

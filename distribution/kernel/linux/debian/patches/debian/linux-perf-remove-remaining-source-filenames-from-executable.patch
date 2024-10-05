@@ -1,0 +1,52 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Tue, 30 May 2023 00:16:39 +0200
+Subject: linux-perf: Remove remaining source filenames from executable
+
+When we build perf with -ffile-prefix-map, there are still 2
+source directory names embedded in the executable:
+
+1. The Documentation subdirectory, used as a fallback from the
+   installed location.
+2. The python subdirectory, used in the Python script test.
+
+Remove (1) since it is an unnecessary fallback.  Change (2)
+to the installed location.
+
+---
+--- a/tools/perf/builtin-report.c
++++ b/tools/perf/builtin-report.c
+@@ -654,10 +654,12 @@ static int report__browse_hists(struct r
+ 
+ 	path = system_path(TIPDIR);
+ 	if (perf_tip(&help, path) || help == NULL) {
++#if 0
+ 		/* fallback for people who don't install perf ;-) */
+ 		free(path);
+ 		path = system_path(DOCDIR);
+ 		if (perf_tip(&help, path) || help == NULL)
++#endif
+ 			help = strdup("Cannot load tips.txt file, please install perf!");
+ 	}
+ 	free(path);
+--- a/tools/perf/tests/Build
++++ b/tools/perf/tests/Build
+@@ -73,7 +73,7 @@ perf-test-$(CONFIG_DWARF_UNWIND) += dwar
+ endif
+ 
+ CFLAGS_attr.o         += -DBINDIR="BUILD_STR($(bindir_SQ))" -DPYTHON="BUILD_STR($(PYTHON_WORD))"
+-CFLAGS_python-use.o   += -DPYTHONPATH="BUILD_STR($(OUTPUT)python)" -DPYTHON="BUILD_STR($(PYTHON_WORD))"
++CFLAGS_python-use.o   += -DPYTHONPATH="BUILD_STR($(perfexec_instdir_SQ)/scripts/python)" -DPYTHON="BUILD_STR($(PYTHON_WORD))"
+ CFLAGS_dwarf-unwind.o += -fno-optimize-sibling-calls
+ 
+ perf-test-y += workloads/
+--- a/tools/perf/Build
++++ b/tools/perf/Build
+@@ -51,7 +51,7 @@ CFLAGS_perf.o              += -DPERF_HTM
+ 			      -DPREFIX="BUILD_STR($(prefix_SQ))"
+ CFLAGS_builtin-trace.o	   += -DSTRACE_GROUPS_DIR="BUILD_STR($(STRACE_GROUPS_DIR_SQ))"
+ CFLAGS_builtin-report.o	   += -DTIPDIR="BUILD_STR($(tipdir_SQ))"
+-CFLAGS_builtin-report.o	   += -DDOCDIR="BUILD_STR($(srcdir_SQ)/Documentation)"
++#CFLAGS_builtin-report.o	   += -DDOCDIR="BUILD_STR($(srcdir_SQ)/Documentation)"
+ 
+ perf-util-y += util/
+ perf-util-y += arch/

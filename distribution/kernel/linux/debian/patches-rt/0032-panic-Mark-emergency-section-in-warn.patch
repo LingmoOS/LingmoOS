@@ -1,0 +1,40 @@
+From: Thomas Gleixner <tglx@linutronix.de>
+Date: Tue, 20 Aug 2024 08:35:58 +0206
+Subject: [PATCH 32/54] panic: Mark emergency section in warn
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+Mark the full contents of __warn() as an emergency section. In
+this section, every printk() call will attempt to directly
+flush to the consoles using the EMERGENCY priority.
+
+Co-developed-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Thomas Gleixner (Intel) <tglx@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240820063001.36405-33-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/panic.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -718,6 +718,8 @@ struct warn_args {
+ void __warn(const char *file, int line, void *caller, unsigned taint,
+ 	    struct pt_regs *regs, struct warn_args *args)
+ {
++	nbcon_cpu_emergency_enter();
++
+ 	disable_trace_on_warning();
+ 
+ 	if (file)
+@@ -753,6 +755,8 @@ void __warn(const char *file, int line,
+ 
+ 	/* Just a warning, don't kill lockdep. */
+ 	add_taint(taint, LOCKDEP_STILL_OK);
++
++	nbcon_cpu_emergency_exit();
+ }
+ 
+ #ifdef CONFIG_BUG

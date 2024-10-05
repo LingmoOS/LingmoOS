@@ -1,7 +1,7 @@
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 23 Sep 2023 03:11:05 +0200
 Subject: [PATCH] sched: define TIF_ALLOW_RESCHED
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 On Fri, Sep 22 2023 at 00:55, Thomas Gleixner wrote:
 > On Thu, Sep 21 2023 at 09:00, Linus Torvalds wrote:
@@ -122,7 +122,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
-@@ -282,6 +282,7 @@
+@@ -282,6 +282,7 @@ config X86
  	select HAVE_STATIC_CALL
  	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL
  	select HAVE_PREEMPT_DYNAMIC_CALL
@@ -132,7 +132,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	select HAVE_SYSCALL_TRACEPOINTS
 --- a/arch/x86/include/asm/thread_info.h
 +++ b/arch/x86/include/asm/thread_info.h
-@@ -87,8 +87,9 @@
+@@ -87,8 +87,9 @@ struct thread_info {
  #define TIF_NOTIFY_RESUME	1	/* callback before returning to user */
  #define TIF_SIGPENDING		2	/* signal pending */
  #define TIF_NEED_RESCHED	3	/* rescheduling necessary */
@@ -144,7 +144,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  #define TIF_SPEC_IB		9	/* Indirect branch speculation mitigation */
  #define TIF_SPEC_L1D_FLUSH	10	/* Flush L1D on mm switches (processes) */
  #define TIF_USER_RETURN_NOTIFY	11	/* notify kernel of userspace return */
-@@ -110,6 +111,7 @@
+@@ -110,6 +111,7 @@ struct thread_info {
  #define _TIF_NOTIFY_RESUME	(1 << TIF_NOTIFY_RESUME)
  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
@@ -154,7 +154,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  #define _TIF_SPEC_IB		(1 << TIF_SPEC_IB)
 --- a/drivers/acpi/processor_idle.c
 +++ b/drivers/acpi/processor_idle.c
-@@ -107,7 +107,7 @@
+@@ -107,7 +107,7 @@ static const struct dmi_system_id proces
   */
  static void __cpuidle acpi_safe_halt(void)
  {
@@ -187,7 +187,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
-@@ -1949,17 +1949,17 @@
+@@ -1957,17 +1957,17 @@ static inline void update_tsk_thread_fla
  	update_ti_thread_flag(task_thread_info(tsk), flag, value);
  }
  
@@ -208,7 +208,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  {
  	return test_ti_thread_flag(task_thread_info(tsk), flag);
  }
-@@ -1972,9 +1972,11 @@
+@@ -1980,9 +1980,11 @@ static inline void set_tsk_need_resched(
  static inline void clear_tsk_need_resched(struct task_struct *tsk)
  {
  	clear_tsk_thread_flag(tsk,TIF_NEED_RESCHED);
@@ -221,7 +221,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  {
  	return unlikely(test_tsk_thread_flag(tsk,TIF_NEED_RESCHED));
  }
-@@ -2074,7 +2076,7 @@
+@@ -2082,7 +2084,7 @@ extern int __cond_resched_rwlock_write(r
  
  static __always_inline bool need_resched(void)
  {
@@ -232,7 +232,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  /*
 --- a/include/linux/sched/idle.h
 +++ b/include/linux/sched/idle.h
-@@ -63,7 +63,7 @@
+@@ -63,7 +63,7 @@ static __always_inline bool __must_check
  	 */
  	smp_mb__after_atomic();
  
@@ -241,7 +241,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  static __always_inline bool __must_check current_clr_polling_and_test(void)
-@@ -76,7 +76,7 @@
+@@ -76,7 +76,7 @@ static __always_inline bool __must_check
  	 */
  	smp_mb__after_atomic();
  
@@ -250,7 +250,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  #else
-@@ -85,11 +85,11 @@
+@@ -85,11 +85,11 @@ static inline void __current_clr_polling
  
  static inline bool __must_check current_set_polling_and_test(void)
  {
@@ -266,7 +266,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
 --- a/include/linux/thread_info.h
 +++ b/include/linux/thread_info.h
-@@ -59,6 +59,16 @@
+@@ -59,6 +59,16 @@ enum syscall_work_bit {
  
  #include <asm/thread_info.h>
  
@@ -283,7 +283,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  #ifdef __KERNEL__
  
  #ifndef arch_set_restart_data
-@@ -185,6 +195,13 @@
+@@ -185,6 +195,13 @@ static __always_inline bool tif_need_res
  			     (unsigned long *)(&current_thread_info()->flags));
  }
  
@@ -297,7 +297,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  #else
  
  static __always_inline bool tif_need_resched(void)
-@@ -193,6 +210,13 @@
+@@ -193,6 +210,13 @@ static __always_inline bool tif_need_res
  			(unsigned long *)(&current_thread_info()->flags));
  }
  
@@ -313,7 +313,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  #ifndef CONFIG_HAVE_ARCH_WITHIN_STACK_FRAMES
 --- a/include/linux/trace_events.h
 +++ b/include/linux/trace_events.h
-@@ -184,8 +184,8 @@
+@@ -184,8 +184,8 @@ unsigned int tracing_gen_ctx_irq_test(un
  
  enum trace_flag_type {
  	TRACE_FLAG_IRQS_OFF		= 0x01,
@@ -324,7 +324,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	TRACE_FLAG_HARDIRQ		= 0x08,
  	TRACE_FLAG_SOFTIRQ		= 0x10,
  	TRACE_FLAG_PREEMPT_RESCHED	= 0x20,
-@@ -211,11 +211,11 @@
+@@ -211,11 +211,11 @@ static inline unsigned int tracing_gen_c
  
  static inline unsigned int tracing_gen_ctx_flags(unsigned long irqflags)
  {
@@ -340,7 +340,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
 --- a/kernel/Kconfig.preempt
 +++ b/kernel/Kconfig.preempt
-@@ -11,6 +11,13 @@
+@@ -11,6 +11,13 @@ config PREEMPT_BUILD
  	select PREEMPTION
  	select UNINLINE_SPIN_UNLOCK if !ARCH_INLINE_SPIN_UNLOCK
  
@@ -354,7 +354,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  choice
  	prompt "Preemption Model"
  	default PREEMPT_NONE
-@@ -67,9 +74,17 @@
+@@ -67,9 +74,17 @@ config PREEMPT
  	  embedded system with latency requirements in the milliseconds
  	  range.
  
@@ -372,7 +372,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	select PREEMPTION
  	help
  	  This option turns the kernel into a real-time kernel by replacing
-@@ -95,7 +110,7 @@
+@@ -95,7 +110,7 @@ config PREEMPTION
  
  config PREEMPT_DYNAMIC
  	bool "Preemption behaviour defined on boot"
@@ -383,7 +383,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	default y if HAVE_PREEMPT_DYNAMIC_CALL
 --- a/kernel/entry/common.c
 +++ b/kernel/entry/common.c
-@@ -98,7 +98,7 @@
+@@ -98,7 +98,7 @@ void __weak arch_do_signal_or_restart(st
  
  		local_irq_enable_exit_to_user(ti_work);
  
@@ -392,7 +392,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  			schedule();
  
  		if (ti_work & _TIF_UPROBE)
-@@ -307,7 +307,7 @@
+@@ -307,7 +307,7 @@ void raw_irqentry_exit_cond_resched(void
  		rcu_irq_exit_check_preempt();
  		if (IS_ENABLED(CONFIG_DEBUG_ENTRY))
  			WARN_ON_ONCE(!on_thread_stack());
@@ -403,7 +403,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
 --- a/kernel/entry/kvm.c
 +++ b/kernel/entry/kvm.c
-@@ -13,7 +13,7 @@
+@@ -13,7 +13,7 @@ static int xfer_to_guest_mode_work(struc
  			return -EINTR;
  		}
  
@@ -414,7 +414,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  		if (ti_work & _TIF_NOTIFY_RESUME)
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -898,14 +898,15 @@
+@@ -899,14 +899,15 @@ static inline void hrtick_rq_init(struct
  
  #if defined(CONFIG_SMP) && defined(TIF_POLLING_NRFLAG)
  /*
@@ -433,7 +433,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  /*
-@@ -922,7 +923,7 @@
+@@ -923,7 +924,7 @@ static bool set_nr_if_polling(struct tas
  	do {
  		if (!(val & _TIF_POLLING_NRFLAG))
  			return false;
@@ -442,7 +442,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  			return true;
  	} while (!try_cmpxchg(&ti->flags, &val, val | _TIF_NEED_RESCHED));
  
-@@ -930,9 +931,9 @@
+@@ -931,9 +932,9 @@ static bool set_nr_if_polling(struct tas
  }
  
  #else
@@ -454,7 +454,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	return true;
  }
  
-@@ -1037,28 +1038,47 @@
+@@ -1038,28 +1039,47 @@ void wake_up_q(struct wake_q_head *head)
   * might also involve a cross-CPU call to trigger the scheduler on
   * the target CPU.
   */
@@ -510,7 +510,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  void resched_cpu(int cpu)
-@@ -1153,7 +1173,7 @@
+@@ -1154,7 +1174,7 @@ static void wake_up_idle_cpu(int cpu)
  	 * and testing of the above solutions didn't appear to report
  	 * much benefits.
  	 */
@@ -521,7 +521,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  		trace_sched_wake_idle_without_ipi(cpu);
 --- a/kernel/sched/debug.c
 +++ b/kernel/sched/debug.c
-@@ -333,6 +333,23 @@
+@@ -333,6 +333,23 @@ static const struct file_operations sche
  	.release	= seq_release,
  };
  
@@ -545,7 +545,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  static struct dentry *debugfs_sched;
  
  static __init int sched_init_debug(void)
-@@ -374,6 +391,8 @@
+@@ -374,6 +391,8 @@ static __init int sched_init_debug(void)
  
  	debugfs_create_file("debug", 0444, debugfs_sched, NULL, &sched_debug_fops);
  
@@ -556,7 +556,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  late_initcall(sched_init_debug);
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
-@@ -974,8 +974,10 @@
+@@ -974,8 +974,10 @@ static void clear_buddies(struct cfs_rq
   * XXX: strictly: vd_i += N*r_i/w_i such that: vd_i > ve_i
   * this is probably good enough.
   */
@@ -568,7 +568,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	if ((s64)(se->vruntime - se->deadline) < 0)
  		return;
  
-@@ -994,10 +996,19 @@
+@@ -994,10 +996,19 @@ static void update_deadline(struct cfs_r
  	/*
  	 * The task has consumed its request, reschedule.
  	 */
@@ -591,7 +591,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  #include "pelt.h"
-@@ -1153,7 +1164,7 @@
+@@ -1153,7 +1164,7 @@ s64 update_curr_common(struct rq *rq)
  /*
   * Update the current task's runtime statistics.
   */
@@ -600,7 +600,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  {
  	struct sched_entity *curr = cfs_rq->curr;
  	s64 delta_exec;
-@@ -1166,7 +1177,7 @@
+@@ -1166,7 +1177,7 @@ static void update_curr(struct cfs_rq *c
  		return;
  
  	curr->vruntime += calc_delta_fair(delta_exec, curr);
@@ -609,7 +609,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	update_min_vruntime(cfs_rq);
  
  	if (entity_is_task(curr))
-@@ -1175,6 +1186,11 @@
+@@ -1175,6 +1186,11 @@ static void update_curr(struct cfs_rq *c
  	account_cfs_rq_runtime(cfs_rq, delta_exec);
  }
  
@@ -621,7 +621,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  static void update_curr_fair(struct rq *rq)
  {
  	update_curr(cfs_rq_of(&rq->curr->se));
-@@ -5511,7 +5527,7 @@
+@@ -5511,7 +5527,7 @@ entity_tick(struct cfs_rq *cfs_rq, struc
  	/*
  	 * Update run-time statistics of the 'current'.
  	 */
@@ -630,7 +630,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
  	/*
  	 * Ensure that runnable average is periodically updated.
-@@ -5525,7 +5541,7 @@
+@@ -5525,7 +5541,7 @@ entity_tick(struct cfs_rq *cfs_rq, struc
  	 * validating it and just reschedule.
  	 */
  	if (queued) {
@@ -639,7 +639,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  		return;
  	}
  	/*
-@@ -5671,7 +5687,7 @@
+@@ -5671,7 +5687,7 @@ static void __account_cfs_rq_runtime(str
  	 * hierarchy can be throttled
  	 */
  	if (!assign_cfs_rq_runtime(cfs_rq) && likely(cfs_rq->curr))
@@ -648,7 +648,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  static __always_inline
-@@ -5931,7 +5947,7 @@
+@@ -5931,7 +5947,7 @@ void unthrottle_cfs_rq(struct cfs_rq *cf
  
  	/* Determine whether we need to wake up potentially idle CPU: */
  	if (rq->curr == rq->idle && rq->cfs.nr_running)
@@ -657,7 +657,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  #ifdef CONFIG_SMP
-@@ -6646,7 +6662,7 @@
+@@ -6646,7 +6662,7 @@ static void hrtick_start_fair(struct rq
  
  		if (delta < 0) {
  			if (task_current(rq, p))
@@ -666,7 +666,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  			return;
  		}
  		hrtick_start(rq, delta);
-@@ -8378,7 +8394,7 @@
+@@ -8378,7 +8394,7 @@ static void check_preempt_wakeup_fair(st
  	 * prevents us from potentially nominating it as a false LAST_BUDDY
  	 * below.
  	 */
@@ -675,7 +675,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  		return;
  
  	/* Idle tasks are by definition preempted by non-idle tasks. */
-@@ -8420,7 +8436,7 @@
+@@ -8420,7 +8436,7 @@ static void check_preempt_wakeup_fair(st
  	return;
  
  preempt:
@@ -684,7 +684,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  #ifdef CONFIG_SMP
-@@ -12566,7 +12582,7 @@
+@@ -12573,7 +12589,7 @@ static inline void task_tick_core(struct
  	 */
  	if (rq->core->core_forceidle_count && rq->cfs.nr_running == 1 &&
  	    __entity_slice_used(&curr->se, MIN_NR_TASKS_DURING_FORCEIDLE))
@@ -693,7 +693,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
  
  /*
-@@ -12733,7 +12749,7 @@
+@@ -12740,7 +12756,7 @@ prio_changed_fair(struct rq *rq, struct
  	 */
  	if (task_current(rq, p)) {
  		if (p->prio > oldprio)
@@ -704,7 +704,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  }
 --- a/kernel/sched/features.h
 +++ b/kernel/sched/features.h
-@@ -87,3 +87,5 @@
+@@ -87,3 +87,5 @@ SCHED_FEAT(UTIL_EST, true)
  SCHED_FEAT(LATENCY_WARN, false)
  
  SCHED_FEAT(HZ_BW, true)
@@ -712,7 +712,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 +SCHED_FEAT(FORCE_NEED_RESCHED, false)
 --- a/kernel/sched/idle.c
 +++ b/kernel/sched/idle.c
-@@ -57,8 +57,7 @@
+@@ -57,8 +57,7 @@ static noinline int __cpuidle cpu_idle_p
  	ct_cpuidle_enter();
  
  	raw_local_irq_enable();
@@ -724,7 +724,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
 --- a/kernel/sched/sched.h
 +++ b/kernel/sched/sched.h
-@@ -2467,6 +2467,7 @@
+@@ -2513,6 +2513,7 @@ extern void init_sched_fair_class(void);
  extern void reweight_task(struct task_struct *p, const struct load_weight *lw);
  
  extern void resched_curr(struct rq *rq);
@@ -734,7 +734,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  extern struct rt_bandwidth def_rt_bandwidth;
 --- a/kernel/trace/trace.c
 +++ b/kernel/trace/trace.c
-@@ -2519,6 +2519,8 @@
+@@ -2515,6 +2515,8 @@ unsigned int tracing_gen_ctx_irq_test(un
  
  	if (tif_need_resched())
  		trace_flags |= TRACE_FLAG_NEED_RESCHED;
@@ -745,7 +745,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  	return (trace_flags << 16) | (min_t(unsigned int, pc & 0xff, 0xf)) |
 --- a/kernel/trace/trace_output.c
 +++ b/kernel/trace/trace_output.c
-@@ -460,17 +460,29 @@
+@@ -460,17 +460,29 @@ int trace_print_lat_fmt(struct trace_seq
  		(entry->flags & TRACE_FLAG_IRQS_OFF && bh_off) ? 'D' :
  		(entry->flags & TRACE_FLAG_IRQS_OFF) ? 'd' :
  		bh_off ? 'b' :

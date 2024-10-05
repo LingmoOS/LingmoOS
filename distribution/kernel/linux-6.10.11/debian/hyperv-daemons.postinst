@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+    if [ -d /run/systemd/system ]; then
+        if [ -z "$2" ]; then
+            # On initial install make sure udev notifies systemd
+            udevadm trigger || true
+        else
+            # On upgrade make sure running daemons are restarted
+            systemctl try-restart hv-kvp-daemon.service hv-vss-daemon.service
+        fi
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,7 +1,7 @@
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:52 +0200
 Subject: [PATCH] tick: Fix timer storm since introduction of timersd
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 If timers are pending while the tick is reprogrammed on nohz_mode, the
 next expiry is not armed to fire now, it is delayed one jiffy forward
@@ -48,7 +48,7 @@ Link: https://lkml.kernel.org/r/20220405010752.1347437-2-frederic@kernel.org
 
 --- a/include/linux/interrupt.h
 +++ b/include/linux/interrupt.h
-@@ -614,9 +614,16 @@ extern void raise_softirq(unsigned int n
+@@ -618,9 +618,16 @@ extern void raise_softirq(unsigned int n
  
  #ifdef CONFIG_PREEMPT_RT
  DECLARE_PER_CPU(struct task_struct *, timersd);
@@ -65,7 +65,7 @@ Link: https://lkml.kernel.org/r/20220405010752.1347437-2-frederic@kernel.org
  #else
  static inline void raise_timer_softirq(void)
  {
-@@ -627,6 +634,11 @@ static inline void raise_hrtimer_softirq
+@@ -631,6 +638,11 @@ static inline void raise_hrtimer_softirq
  {
  	raise_softirq_irqoff(HRTIMER_SOFTIRQ);
  }

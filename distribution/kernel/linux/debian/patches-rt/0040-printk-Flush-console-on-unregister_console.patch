@@ -1,0 +1,39 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Wed, 4 Sep 2024 14:11:22 +0206
+Subject: [PATCH 40/54] printk: Flush console on unregister_console()
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+Ensure consoles have flushed pending records before
+unregistering. The console should print up to at least its
+related "console disabled" record.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240904120536.115780-4-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/printk.c |    9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -3772,11 +3772,16 @@ static int unregister_console_locked(str
+ 	if (res > 0)
+ 		return 0;
+ 
++	if (!console_is_registered_locked(console))
++		res = -ENODEV;
++	else if (console_is_usable(console, console->flags))
++		__pr_flush(console, 1000, true);
++
+ 	/* Disable it unconditionally */
+ 	console_srcu_write_flags(console, console->flags & ~CON_ENABLED);
+ 
+-	if (!console_is_registered_locked(console))
+-		return -ENODEV;
++	if (res < 0)
++		return res;
+ 
+ 	/*
+ 	 * Use the driver synchronization to ensure that the hardware is not

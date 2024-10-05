@@ -1,0 +1,32 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 16 Sep 2024 00:07:04 +0200
+Subject: Documentation: Use relative source filenames in ABI documentation
+
+Currently the ABI documentation files contain absolute source
+filenames, which makes them unreproducible if the build directory can
+vary.
+
+Remove the source base directory ($srctree) from the source filenames
+shown in the documentation.
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/Documentation/sphinx/kernel_abi.py
++++ b/Documentation/sphinx/kernel_abi.py
+@@ -103,6 +103,7 @@ class KernelCmd(Directive):
+             lines = code_block + "\n\n"
+ 
+         line_regex = re.compile(r"^\.\. LINENO (\S+)\#([0-9]+)$")
++        srctree = os.path.abspath(os.environ["srctree"])
+         ln = 0
+         n = 0
+         f = fname
+@@ -127,7 +128,7 @@ class KernelCmd(Directive):
+                 # sphinx counts lines from 0
+                 ln = int(match.group(2)) - 1
+             else:
+-                content.append(line, f, ln)
++                content.append(line, os.path.relpath(f, srctree), ln)
+ 
+         kernellog.info(self.state.document.settings.env.app, "%s: parsed %i lines" % (fname, n))
+ 

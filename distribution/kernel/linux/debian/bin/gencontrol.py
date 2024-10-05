@@ -132,13 +132,11 @@ class Gencontrol(Base):
                 self.bundle.add('sourcebin.meta', (), makeflags, vars)
 
         if config.packages.libc_dev:
-            libcdev_debianarches = set()
             libcdev_kernelarches = set()
             libcdev_multiarches = set()
             for kernelarch in self.config.kernelarchs:
                 libcdev_kernelarches.add(kernelarch.name)
                 for debianarch in kernelarch.debianarchs:
-                    libcdev_debianarches.add(debianarch.name)
                     libcdev_multiarches.add(
                         f'{debianarch.defs_debianarch.multiarch}:{kernelarch.name}'
                     )
@@ -147,13 +145,7 @@ class Gencontrol(Base):
             libcdev_makeflags['ALL_LIBCDEV_KERNELARCHES'] = ' '.join(sorted(libcdev_kernelarches))
             libcdev_makeflags['ALL_LIBCDEV_MULTIARCHES'] = ' '.join(sorted(libcdev_multiarches))
 
-            for package in self.bundle.add('libc-dev', (), libcdev_makeflags, vars):
-                package.provides.extend([
-                    PackageRelationGroup(
-                        f'{package.name}-{arch}-cross (= ${{binary:Version}})'
-                    )
-                    for arch in sorted(libcdev_debianarches)
-                ])
+            self.bundle.add('libc-dev', (), libcdev_makeflags, vars)
 
     def do_indep_featureset_setup(
         self,
@@ -294,7 +286,7 @@ linux-signed-{vars['arch']} (@signedtemplate_sourceversion@) {dist}; urgency={ur
         relation_compiler_header = PackageRelationGroup([relation_compiler])
 
         # Generate compiler build-depends for native:
-        # gcc-13 [arm64] <!cross !pkg.linux.nokernel>
+        # gcc-N [arm64] <!cross !pkg.linux.nokernel>
         self.bundle.source.build_depends_arch.merge([
             PackageRelationEntry(
                 relation_compiler,
@@ -304,7 +296,7 @@ linux-signed-{vars['arch']} (@signedtemplate_sourceversion@) {dist}; urgency={ur
         ])
 
         # Generate compiler build-depends for cross:
-        # gcc-13-aarch64-linux-gnu [arm64] <cross !pkg.linux.nokernel>
+        # gcc-N-aarch64-linux-gnu [arm64] <cross !pkg.linux.nokernel>
         self.bundle.source.build_depends_arch.merge([
             PackageRelationEntry(
                 relation_compiler,
@@ -315,7 +307,7 @@ linux-signed-{vars['arch']} (@signedtemplate_sourceversion@) {dist}; urgency={ur
         ])
 
         # Generate compiler build-depends for kernel:
-        # gcc-13-hppa64-linux-gnu [hppa] <!pkg.linux.nokernel>
+        # gcc-N-hppa64-linux-gnu [hppa] <!pkg.linux.nokernel>
         if gnutype := config.build.compiler_gnutype:
             if gnutype != config.defs_debianarch.gnutype:
                 self.bundle.source.build_depends_arch.merge([

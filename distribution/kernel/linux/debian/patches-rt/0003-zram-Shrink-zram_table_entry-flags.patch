@@ -1,21 +1,22 @@
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 20 Jun 2024 12:53:06 +0200
 Subject: [PATCH 3/3] zram: Shrink zram_table_entry::flags.
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 The zram_table_entry::flags member is of type long and uses 8 bytes on a
 64bit architecture. With a PAGE_SIZE of 256KiB we have PAGE_SHIFT of 18
 which in turn leads to __NR_ZRAM_PAGEFLAGS = 27. This still fits in an
 ordinary integer.
-By reducing it the size of `flags' to four bytes, the size of the struct
+By reducing the size of `flags' to four bytes, the size of the struct
 goes back to 16 bytes. The padding between the lock and ac_time (if
 enabled) is also gone.
 
 Make zram_table_entry::flags an unsigned int and update the build test
 to reflect the change.
 
-Link: https://lore.kernel.org/r/20240620153556.777272-4-bigeasy@linutronix.de
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://lore.kernel.org/20240906141520.730009-4-bigeasy@linutronix.de
 ---
  drivers/block/zram/zram_drv.c |    3 ++-
  drivers/block/zram/zram_drv.h |    2 +-
@@ -23,7 +24,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -2412,9 +2412,10 @@ static void destroy_devices(void)
+@@ -2404,9 +2404,10 @@ static void destroy_devices(void)
  
  static int __init zram_init(void)
  {

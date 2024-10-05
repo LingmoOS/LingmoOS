@@ -1,0 +1,23 @@
+# The copyright notice in the GFDL itself, mentioning invariant
+# sections, is just an example.  lintian seems to whitelist the
+# plain-text version but that doesn't cover this ReST version.
+linux source: license-problem-gfdl-invariants Documentation/userspace-api/media/fdl-appendix.rst invariant part is: with the :ref:`invariant sections <fdl-invariant>` being list their titles, with the :ref:`front-cover texts <fdl-cover-texts>` being list, and with the :ref:`back-cover texts <fdl-cover-texts>` being list
+linux source: license-problem-gfdl-invariants invariant part is: with the :ref:`invariant sections <fdl-invariant>` being list their titles, with the :ref:`front-cover texts <fdl-cover-texts>` being list, and with the :ref:`back-cover texts <fdl-cover-texts>` being list [Documentation/userspace-api/media/fdl-appendix.rst]
+
+# Kernel dbg packages contain a full image with debug data.
+linux source: dbg-package-missing-depends
+
+# We repack the orig tarball
+linux source: orig-tarball-missing-upstream-signature *
+
+# Not a bug, we're just big and complex
+linux source: field-too-long Binary *
+linux source: field-too-long Build-Depends-Arch *
+
+# These executables are test cases and source is provided
+linux source: source-contains-prebuilt-windows-binary *tools/perf/tests/pe-file.exe*
+linux source: source-contains-prebuilt-windows-binary *tools/perf/tests/pe-file.exe.debug*
+
+# Headers depends on the correct version of images, which might be
+# signed.
+linux source: version-substvar-for-external-package Depends ${binary:Version} linux-headers-*

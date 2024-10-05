@@ -2,7 +2,7 @@ From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:51 +0200
 Subject: [PATCH] rcutorture: Also force sched priority to timersd on
  boosting test.
-Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
 
 ksoftirqd is statically boosted to the priority level right above the
 one of rcu_torture_boost() so that timers, which torture readers rely on,
@@ -35,7 +35,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
 --- a/include/linux/interrupt.h
 +++ b/include/linux/interrupt.h
-@@ -613,6 +613,7 @@ extern void raise_softirq_irqoff(unsigne
+@@ -617,6 +617,7 @@ extern void raise_softirq_irqoff(unsigne
  extern void raise_softirq(unsigned int nr);
  
  #ifdef CONFIG_PREEMPT_RT
@@ -45,7 +45,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  
 --- a/kernel/rcu/rcutorture.c
 +++ b/kernel/rcu/rcutorture.c
-@@ -2420,6 +2420,12 @@ static int rcutorture_booster_init(unsig
+@@ -2425,6 +2425,12 @@ static int rcutorture_booster_init(unsig
  		WARN_ON_ONCE(!t);
  		sp.sched_priority = 2;
  		sched_setscheduler_nocheck(t, SCHED_FIFO, &sp);
