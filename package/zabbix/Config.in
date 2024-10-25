@@ -1,0 +1,83 @@
+config LINGMO_PACKAGE_ZABBIX
+	bool "zabbix"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_PCRE2
+	help
+	  Zabbix is an enterprise-class open source distributed
+	  monitoring solution. Zabbix is free of cost. Zabbix is
+	  written and distributed under the GPL General Public License
+	  version 2.
+
+	  https://zabbix.com
+
+comment "zabbix need glibc"
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC
+
+if LINGMO_PACKAGE_ZABBIX
+
+comment "zabbix server needs C++ and threads or wchar and dynamic libs"
+	depends on LINGMO_USE_MMU
+	depends on \
+		!(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_HAS_THREADS) && \
+		!(LINGMO_USE_WCHAR && !LINGMO_STATIC_LIBS)
+
+config LINGMO_PACKAGE_ZABBIX_SERVER
+	bool "zabbix server"
+	depends on LINGMO_USE_MMU # mysql, postgresql
+	depends on \
+		(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_HAS_THREADS) || \
+		(LINGMO_USE_WCHAR && !LINGMO_STATIC_LIBS && !LINGMO_OPTIMIZE_FAST)
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LIBEVENT
+
+if LINGMO_PACKAGE_ZABBIX_SERVER
+
+choice
+	prompt "server database backend"
+
+config LINGMO_PACKAGE_ZABBIX_SERVER_MYSQL
+	bool "mysql"
+	depends on LINGMO_INSTALL_LIBSTDCPP # mysql
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # mysql
+	select LINGMO_PACKAGE_MARIADB
+
+config LINGMO_PACKAGE_ZABBIX_SERVER_POSTGRESQL
+	bool "postgresql"
+	depends on LINGMO_USE_WCHAR # postgresql
+	depends on !LINGMO_STATIC_LIBS # postgresql
+	depends on !LINGMO_OPTIMIZE_FAST # postgresql
+	select LINGMO_PACKAGE_POSTGRESQL
+
+endchoice
+
+config LINGMO_PACKAGE_ZABBIX_SERVER_COPY_DUMPS
+	bool "install SQL dumps"
+	help
+	  Copy initial database dumps to /var/lib/zabbix/schema
+
+	  These still need to be imported into the database by hand.
+
+config LINGMO_PACKAGE_ZABBIX_SERVER_COPY_FRONTEND
+	bool "install web UI to target"
+	depends on LINGMO_PACKAGE_PHP # runtime
+	select LINGMO_PACKAGE_PHP_EXT_MYSQLI if LINGMO_PACKAGE_ZABBIX_SERVER_MYSQL
+	select LINGMO_PACKAGE_PHP_EXT_PGSQL if LINGMO_PACKAGE_ZABBIX_SERVER_POSTGRESQL
+	select LINGMO_PACKAGE_PHP_EXT_BCMATH
+	select LINGMO_PACKAGE_PHP_EXT_SOCKETS
+	select LINGMO_PACKAGE_PHP_EXT_MBSTRING
+	select LINGMO_PACKAGE_PHP_EXT_GD
+	select LINGMO_PACKAGE_PHP_EXT_LIBXML2
+	select LINGMO_PACKAGE_PHP_EXT_CTYPE
+	select LINGMO_PACKAGE_PHP_EXT_SESSION
+	select LINGMO_PACKAGE_PHP_EXT_XMLREADER
+	select LINGMO_PACKAGE_PHP_EXT_XMLWRITER
+	help
+	  Copy web-UI to /var/www/zabbix. You need to set up a web
+	  server to access it.
+
+comment "zabbix web UI requires PHP"
+	depends on !LINGMO_PACKAGE_PHP
+
+endif
+
+endif

@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_ACPITOOL
+	bool "acpitool"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  A small, convenient command-line ACPI client with a lot of
+	  features for Linux
+
+	  http://acpitool.sourceforge.net
+
+comment "acpitool needs a toolchain w/ threads, C++, dynamic library"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_INSTALL_LIBSTDCPP

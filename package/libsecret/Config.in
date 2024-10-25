@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBSECRET
+	bool "libsecret"
+	depends on LINGMO_USE_WCHAR # gettext dep in libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  libsecret is a library for storing and retrieving passwords
+	  and other secrets. It communicates with the "Secret Service"
+	  using DBus. gnome-keyring and ksecretservice are both
+	  implementations of a Secret Service.
+
+	  https://wiki.gnome.org/Projects/Libsecret
+
+comment "libsecret needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

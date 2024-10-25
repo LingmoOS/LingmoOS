@@ -1,0 +1,66 @@
+pkgname=pkgconf
+pkgver=2.1.1
+pkgrel=1
+pkgdesc="Package compiler and linker metadata toolkit"
+url="https://gitea.treehouse.systems/ariadne/pkgconf"
+license=(ISC)
+arch=(x86_64)
+depends=(
+  glibc
+  sh
+)
+makedepends=(
+  git
+  meson
+)
+provides=(
+  libpkgconf.so
+  pkg-config
+  pkgconfig
+)
+conflicts=(pkg-config)
+replaces=(pkg-config)
+_commit=b6e04e2d47b4ca093632b9efde6303a137ea0634  # tags/pkgconf-2.1.1
+source=(
+  "git+$url#commit=$_commit"
+  {x86_64,i686}-pc-linux-gnu.personality
+)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+pkgver() {
+  cd pkgconf
+  git describe --tags | sed 's/^pkgconf-//;s/[^-]*-g/r&/;s/-/+/g'
+}
+
+prepare() {
+  cd pkgconf
+}
+
+build() {
+  local meson_options=(
+    -D tests=disabled  # Tests need kyua
+  )
+
+  arch-meson pkgconf build "${meson_options[@]}"
+  meson compile -C build
+}
+
+check() {
+  meson test -C build --print-errorlogs
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+
+  local p
+  for p in {x86_64,i686}-pc-linux-gnu; do
+    install -Dt "$pkgdir/usr/share/pkgconfig/personality.d" -m644 $p.personality
+    ln -s pkgconf "$pkgdir/usr/bin/$p-pkg-config"
+  done
+
+  ln -s pkgconf "$pkgdir/usr/bin/pkg-config"
+  ln -s pkgconf.1 "$pkgdir/usr/share/man/man1/pkg-config.1"
+
+  install -Dt "$pkgdir/usr/share/licenses/$pkgname" -m644 pkgconf/COPYING
+}
+
+# vim:set sw=2 sts=-1 et:

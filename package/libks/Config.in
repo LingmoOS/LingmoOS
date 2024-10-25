@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_LIBKS
+	bool "libks"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # pthread_setname_np()
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Foundational support for signalwire C products
+
+	  https://github.com/signalwire/libks
+
+comment "libks needs a toolchain w/ C++, NPTL, dynamic library"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

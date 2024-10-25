@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_GETTEXT_TINY
+	bool
+	select LINGMO_PACKAGE_HAS_GETTEXT
+	help
+	  Stub and/or lightweight replacements of the gnu gettext
+	  suite; because the GNU one takes ages to compile.
+
+	  https://github.com/sabotage-linux/gettext-tiny
+
+if LINGMO_PACKAGE_GETTEXT_TINY
+
+config LINGMO_PACKAGE_PROVIDES_GETTEXT
+	default "gettext-tiny"
+
+endif
+
+config LINGMO_PACKAGE_PROVIDES_HOST_GETTEXT
+	default "host-gettext-tiny" if !LINGMO_SYSTEM_ENABLE_NLS

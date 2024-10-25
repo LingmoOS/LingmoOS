@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_ZYRE
+	bool "zyre"
+	depends on LINGMO_INSTALL_LIBSTDCPP # zeromq
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # zeromq
+	depends on LINGMO_USE_MMU # czmq
+	select LINGMO_PACKAGE_CZMQ
+	select LINGMO_PACKAGE_ZEROMQ
+	help
+	  An open-source framework for proximity-based peer-to-peer
+	  applications.
+
+	  http://zyre.org
+
+comment "zyre needs a toolchain w/ C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_HAS_THREADS)

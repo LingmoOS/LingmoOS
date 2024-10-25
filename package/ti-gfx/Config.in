@@ -1,0 +1,84 @@
+config LINGMO_PACKAGE_TI_GFX
+	bool "ti-gfx"
+	depends on LINGMO_LINUX_KERNEL && LINGMO_TOOLCHAIN_USES_GLIBC && LINGMO_arm
+	depends on LINGMO_HOSTARCH = "x86_64" || LINGMO_HOSTARCH = "x86"
+	select LINGMO_HOSTARCH_NEEDS_IA32_LIBS
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_HAS_POWERVR
+	select LINGMO_PACKAGE_FBSET if !LINGMO_PACKAGE_BUSYBOX # Runtime dependency only
+	select LINGMO_LINUX_NEEDS_MODULES # not using kernel-module infra
+	help
+	  Graphics libraries for TI boards using SGX acceleration.
+
+	  Supports OMAP35xx, DM37xx/AM37xx, DM816x, DM814x, AM335x and
+	  AM43xx.
+
+	  For newer CPUs or kernels use the ti-sgx-{km,um} packages.
+
+	  http://downloads.ti.com/dsps/dsps_public_sw/gfxsdk/
+
+if LINGMO_PACKAGE_TI_GFX
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "ti-gfx"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "ti-gfx"
+
+config LINGMO_PACKAGE_PROVIDES_POWERVR
+	default "ti-gfx"
+
+config LINGMO_PACKAGE_TI_GFX_DEBUG
+	bool "enable debug support"
+	help
+	  Turns on debugging in the kernel module, install libraries
+	  built with debugging enabled, installs various tests and
+	  installs esrev script.
+
+config LINGMO_PACKAGE_TI_GFX_DEMOS
+	bool "install demos"
+	default y
+	help
+	  Install the OGLES2ChameleonMan and OGLES2MagicLantern demos
+
+config LINGMO_PACKAGE_TI_GFX_EGLIMAGE
+	bool "install eglimage version of libraries"
+	help
+	  Installs OpenGL libraries which support the eglimage api.
+
+choice
+	prompt "Target"
+	default LINGMO_PACKAGE_TI_GFX_ES3
+	help
+	  Select the SOC for which you would like to install
+	  drivers. Please use the chart at
+	  http://processors.wiki.ti.com/index.php/OMAP35x_Graphics_SDK_Getting_Started_Guide
+
+config LINGMO_PACKAGE_TI_GFX_ES3
+	bool "es3.x (OMAP35xx, AM35xx Rev 3.1+)"
+	help
+	  OMAP35xx, AM35xx Rev 3.1+
+
+config LINGMO_PACKAGE_TI_GFX_ES5
+	bool "es5.x (AM37xx, DM37xx)"
+	help
+	  AM37xx, DM37xx
+
+config LINGMO_PACKAGE_TI_GFX_ES6
+	bool "es6.x (AM387x, DMA814x, AM389x, DM816x)"
+	help
+	  AM387x, DM814x, AM389x, DM816x
+
+config LINGMO_PACKAGE_TI_GFX_ES8
+	bool "es8.x (AM335x)"
+	help
+	  AM335x
+
+endchoice
+
+endif
+
+comment "ti-gfx needs a glibc toolchain and a Linux kernel to be built"
+	depends on LINGMO_arm
+	depends on !(LINGMO_LINUX_KERNEL && LINGMO_TOOLCHAIN_USES_GLIBC)

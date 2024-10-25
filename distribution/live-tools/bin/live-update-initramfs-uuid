@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+_OLD_INITRD="${1}"
+_NEW_INITRD="${2}"
+_NEW_UUID="${3}"
+
+if [ -z "${_OLD_INITRD}" ]
+then
+	echo "Usage: ${0} OLD_INITRD [NEW_INITRD] [NEW_UUID|NEW_UUID.conf]"
+	exit 1
+fi
+
+_TMPDIR="$(mktemp -d -t live-update-initramfs-uuid.XXXXXXXX)"
+
+trap "rm -rf ${_TMPDIR}" EXIT HUP INT QUIT TERM
+
+case "${_INITRD}" in
+	*.gz)
+		_COMPRESSION="gzip"
+		;;
+
+	*.bz2)
+		_COMPRESSION="bzip2"
+		;;
+
+	*.lzma)
+		_COMPRESSION="lzma"
+		;;
+
+	*.lz)
+		_COMPRESSION="lzip"
+		;;
+
+	*.xz)
+		_COMPRESSION="xz"
+		;;
+esac
+
+if [ ! -x "$(which ${_COMPRESSION} 2> /dev/null)" ]
+then
+	echo "E: ${_COMPRESSION} - no such program"
+	exit 1
+fi
+
+if [ -e "${_NEW_UUID}" ]
+then
+	# uuid from user specified file
+	_NEW_UUID="$(cat ${_NEW_UUID})"
+fi
+
+if [ -z "${_NEW_UUID}" ]
+then
+	# uuid neither from file (or file is empty),
+	# nor specified as argument
+	_NEW_UUID="$(uuidgen -r)"
+fi
+
+cd "${_TMPDIR}"
+
+${_COMPRESSION} -c -d "${_OLD_INITRD}" | cpio -id
+
+echo "${_NEW_UUID}" > conf/uuid.conf
+
+
+find . | cpio --quiet -R 0:0 -o -H newc | ${_COMPRESSION} -c > "/tmp/$(basename ${_OLD_INITRD})"
+
+cd "${OLDPWD}"
+
+if [ -n "${_NEW_UUID}" ]
+then
+	mv "/tmp/$(basename ${_OLD_INITRD})" "${_NEW_INITRD}"
+else
+	mv "/tmp/$(basename ${_OLD_INITRD})" ./
+fi

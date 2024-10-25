@@ -1,0 +1,10 @@
+config LINGMO_PACKAGE_TFTPD
+	bool "tftpd"
+	# linker issue with pre-6.x toolchains
+	depends on !(LINGMO_nios2 && !LINGMO_TOOLCHAIN_GCC_AT_LEAST_6)
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	help
+	  HPA's Trivial File Transfer Protocol (tftp) server.
+
+	  https://git.kernel.org/pub/scm/network/tftp/tftp-hpa.git

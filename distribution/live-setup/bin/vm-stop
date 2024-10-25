@@ -1,0 +1,66 @@
+#!/bin/bash
+
+SCRIPTS_SOURCE="$(dirname $(realpath ${BASH_SOURCE-$0}))/../available"
+. $SCRIPTS_SOURCE/common.sh
+
+while getopts ":c:" o; do
+    case "${o}" in
+	c)
+	    VMCONFIG=${OPTARG}
+	    ;;
+        *)
+	    echo "Unrecognised arg ${o}"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ "$DRYRUN"x != ""x ]; then
+    echo "Dry-run $0: VMCONFIG $VMCONFIG"
+    exit 0
+fi
+
+if [ -f "$VMCONFIG" ]; then
+    . $VMCONFIG
+else
+    echo "$0: Can't load config from $VMCONFIG, aborting"
+    exit 1
+fi
+
+LOGFILE=~/live-logs/$TUPLE.log
+
+if [ -r $PIDFILE ]; then
+    PID=$(cat $PIDFILE)
+else
+    echo "$0: Can't read pidfile $PIDFILE"
+    exit 1
+fi
+
+run_log "Stopping VM"
+
+ssh root@$VM_IP -p $SSH_PORT /w/run-50halt >> $LOGFILE 2>&1
+
+MAX_WAIT=180 # Maximum number of seconds to wait before killing
+TRY=0
+while [ $TRY -lt $MAX_WAIT ]; do
+    if [ -r $PIDFILE ]; then
+	run_log "$0: kvm / qemu still running as pid $PID after $TRY seconds"
+	sleep 1
+	TRY=$(($TRY + 1))
+    else
+	break
+    fi
+done
+
+if [ -r $PIDFILE ]; then
+    run_log "$0: kvm / qemu still running as pid $PID after $TRY seconds, killing it"
+    kill $PID
+fi
+
+run_log "-----------"
+
+# Remove the "running" flag file
+rm -f /home/debian-cd/publish/.live/mount/${TUPLE}/running
+exit 0
+

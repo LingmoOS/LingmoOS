@@ -1,0 +1,35 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 22 Jul 2017 17:37:33 +0100
+Subject: perf tools: Fix unwind build on i386
+Forwarded: no
+
+EINVAL may not be defined when building unwind-libunwind.c with
+REMOTE_UNWIND_LIBUNWIND, resulting in a compiler error in
+LIBUNWIND__ARCH_REG_ID().  Its only caller, access_reg(), only checks
+for a negative return value and doesn't care what it is.  So change
+-EINVAL to -1.
+
+Fixes: 52ffe0ff02fc ("Support x86(32-bit) cross platform callchain unwind.")
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+
+--- a/tools/perf/arch/x86/util/unwind-libunwind.c
++++ b/tools/perf/arch/x86/util/unwind-libunwind.c
+@@ -66,7 +66,7 @@ int LIBUNWIND__ARCH_REG_ID(int regnum)
+ 		break;
+ 	default:
+ 		pr_err("unwind: invalid reg id %d\n", regnum);
+-		return -EINVAL;
++		return -1;
+ 	}
+ 
+ 	return id;
+@@ -106,7 +106,7 @@ int LIBUNWIND__ARCH_REG_ID(int regnum)
+ 		break;
+ 	default:
+ 		pr_err("unwind: invalid reg id %d\n", regnum);
+-		return -EINVAL;
++		return -1;
+ 	}
+ 
+ 	return id;

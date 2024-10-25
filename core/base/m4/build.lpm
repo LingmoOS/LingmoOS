@@ -1,0 +1,26 @@
+pkgname=m4
+pkgver=1.4.19
+pkgrel=3
+pkgdesc="The GNU macro processor"
+arch=('x86_64')
+url="https://www.gnu.org/software/m4"
+license=('GPL3')
+depends=('glibc' 'bash')
+source=("https://ftp.gnu.org/gnu/m4/$pkgname-$pkgver.tar.xz")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+	cd "$pkgname-$pkgver"
+	./configure --prefix=/usr
+	make
+}
+
+check() {
+	cd "$pkgname-$pkgver"
+	make check
+}
+
+package() {
+	cd "$pkgname-$pkgver"
+	make prefix="${pkgdir}"/usr install
+}

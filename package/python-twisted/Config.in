@@ -1,0 +1,44 @@
+config LINGMO_PACKAGE_PYTHON_TWISTED
+	bool "python-twisted"
+	select LINGMO_PACKAGE_PYTHON_INCREMENTAL
+	select LINGMO_PACKAGE_PYTHON_ATTRS # runtime
+	select LINGMO_PACKAGE_PYTHON_AUTOMAT # runtime
+	select LINGMO_PACKAGE_PYTHON_CONSTANTLY # runtime
+	select LINGMO_PACKAGE_PYTHON_HYPERLINK # runtime
+	select LINGMO_PACKAGE_PYTHON_PYHAMCREST # runtime
+	select LINGMO_PACKAGE_PYTHON_ZOPE_INTERFACE # runtime
+	select LINGMO_PACKAGE_PYTHON_TYPING_EXTENSIONS # runtime
+	help
+	  Twisted is an event-driven networking engine written in
+	  Python.
+
+	  https://twistedmatrix.com/trac/
+
+if LINGMO_PACKAGE_PYTHON_TWISTED
+
+config LINGMO_PACKAGE_PYTHON_TWISTED_HTTP2
+	bool "HTTP2 support"
+	select LINGMO_PACKAGE_PYTHON_H2 # runtime
+	select LINGMO_PACKAGE_PYTHON_PRIORITY # runtime
+
+config LINGMO_PACKAGE_PYTHON_TWISTED_TLS
+	bool "TLS support"
+	# python-{pyopenssl,service-identity}
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_PYTHON_IDNA # runtime
+	select LINGMO_PACKAGE_PYTHON_PYOPENSSL # runtime
+	select LINGMO_PACKAGE_PYTHON_SERVICE_IDENTITY # runtime
+
+config LINGMO_PACKAGE_PYTHON_TWISTED_CONCH
+	bool "Conch support"
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS # python-cryptography, python-bcrypt
+	select LINGMO_PACKAGE_PYTHON_APPDIRS # runtime
+	select LINGMO_PACKAGE_PYTHON_BCRYPT # runtime
+	select LINGMO_PACKAGE_PYTHON_CRYPTOGRAPHY # runtime
+	select LINGMO_PACKAGE_PYTHON_PYASN1 # runtime
+
+config LINGMO_PACKAGE_PYTHON_TWISTED_SERIAL
+	bool "Serial support"
+	select LINGMO_PACKAGE_PYTHON_SERIAL # runtime
+
+endif

@@ -1,0 +1,98 @@
+config LINGMO_PACKAGE_LIBVIRT_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	depends on LINGMO_USE_MMU # fork()
+
+comment "libvirt needs udev /dev management, a toolchain w/ threads, dynamic library, wchar, kernel headers >= 3.12 (4.11 for AArch64)"
+	depends on LINGMO_PACKAGE_LIBVIRT_ARCH_SUPPORTS
+	depends on !LINGMO_PACKAGE_HAS_UDEV || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!(LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12 && \
+			(LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_11 || !LINGMO_aarch64))
+
+config LINGMO_PACKAGE_LIBVIRT
+	bool "libvirt"
+	depends on LINGMO_PACKAGE_LIBVIRT_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_11 || !LINGMO_aarch64
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_GNUTLS
+	# configure: You must install the pciaccess module to build with udev
+	select LINGMO_PACKAGE_LIBPCIACCESS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBTIRPC
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_ZLIB
+	# run-time dependencies
+	select LINGMO_PACKAGE_CGROUPFS_MOUNT if !LINGMO_INIT_SYSTEMD
+	help
+	  Libvirt is collection of software that provides a convenient
+	  way to manage virtual machines and other virtualization
+	  functionality, such as storage and network interface
+	  management. These software pieces include an API library, a
+	  daemon (libvirtd), and a command line utility (virsh).
+
+	  https://libvirt.org/
+
+if LINGMO_PACKAGE_LIBVIRT
+
+config LINGMO_PACKAGE_LIBVIRT_DAEMON
+	bool "libvirtd"
+	default y
+	depends on LINGMO_INSTALL_LIBSTDCPP # nmap
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_DNSMASQ
+	select LINGMO_PACKAGE_EBTABLES
+	select LINGMO_PACKAGE_IPTABLES
+	select LINGMO_PACKAGE_IPROUTE2
+	# These are required because there is no way to unequivocally select a modern netcat
+	select LINGMO_PACKAGE_NMAP      if !LINGMO_PACKAGE_NETCAT_OPENBSD
+	select LINGMO_PACKAGE_NMAP_NCAT if !LINGMO_PACKAGE_NETCAT_OPENBSD
+	select LINGMO_PACKAGE_RADVD
+	help
+	  Build the libvirt daemon (libvirtd) otherwise build only the
+	  utility programs.
+
+comment "libvirtd needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+# Stateful drivers are useful only when building the daemon.
+if LINGMO_PACKAGE_LIBVIRT_DAEMON
+
+config LINGMO_PACKAGE_LIBVIRT_QEMU
+	bool "qemu"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS # libseccomp
+	depends on LINGMO_PACKAGE_QEMU_ARCH_SUPPORTS_TARGET
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # qemu
+	select LINGMO_PACKAGE_HWDATA         # libpciaccess
+	select LINGMO_PACKAGE_HWDATA_PCI_IDS # libpciaccess
+	select LINGMO_PACKAGE_LIBSECCOMP
+	select LINGMO_PACKAGE_QEMU
+	select LINGMO_PACKAGE_QEMU_SYSTEM
+	select LINGMO_PACKAGE_YAJL
+	help
+	  QEMU/KVM support
+
+comment "qemu needs a toolchain with gcc >= 8"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_QEMU_ARCH_SUPPORTS_TARGET
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+
+config LINGMO_PACKAGE_LIBVIRT_LXC
+	bool "lxc"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7 # lxc
+	select LINGMO_PACKAGE_LXC
+	help
+	  Linux Container support
+
+comment "lxc needs a toolchain w/ gcc >= 4.7"
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_7
+
+endif
+
+endif

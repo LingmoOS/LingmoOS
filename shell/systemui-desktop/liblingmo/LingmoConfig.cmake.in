@@ -1,0 +1,23 @@
+@PACKAGE_INIT@
+
+# Any changes in this ".cmake" file will be overwritten by CMake, the source is the ".cmake.in" file.
+
+include("${CMAKE_CURRENT_LIST_DIR}/LingmoTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@
+
+set(Lingmo_INSTALL_PREFIX "@PACKAGE_CMAKE_INSTALL_PREFIX@")
+
+set(Lingmo_LIBRARIES Lingmo::Lingmo)
+
+set(LINGMO_PLASMOIDS_PLUGINDIR ${KDE_INSTALL_PLUGINDIR}/lingmo/applets)
+set(LINGMO_CONTAINMENTACTIONS_PLUGINDIR ${KDE_INSTALL_PLUGINDIR}/lingmo/containmentactions)
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt6Qml "@REQUIRED_QT_VERSION@")
+find_dependency(Qt6Gui "@REQUIRED_QT_VERSION@")
+find_dependency(KF6Package "@KF_DEP_VERSION@")
+find_dependency(KF6WindowSystem "@KF_DEP_VERSION@")
+
+@PACKAGE_SETUP_AUTOMOC_VARIABLES@
+
+include("${CMAKE_CURRENT_LIST_DIR}/LingmoMacros.cmake")

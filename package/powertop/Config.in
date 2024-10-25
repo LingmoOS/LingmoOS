@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_POWERTOP
+	bool "powertop"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnl
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  A tool to diagnose issues with power consumption and power
+	  management
+
+	  https://github.com/fenrus75/powertop/
+
+comment "powertop needs a toolchain w/ C++, threads, wchar"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_USE_WCHAR

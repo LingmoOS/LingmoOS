@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_CRYPTSETUP
+	bool "cryptsetup"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # lvm2
+	depends on LINGMO_USE_MMU # lvm2, libargon2
+	depends on !LINGMO_STATIC_LIBS # lvm2, libargon2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # json-c
+	select LINGMO_PACKAGE_ARGP_STANDALONE if LINGMO_PACKAGE_LIBSSH && \
+		(LINGMO_TOOLCHAIN_USES_UCLIBC || LINGMO_TOOLCHAIN_USES_MUSL)
+	select LINGMO_PACKAGE_POPT
+	select LINGMO_PACKAGE_LVM2
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_JSON_C
+	select LINGMO_PACKAGE_LIBARGON2
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  This tool helps manipulate dm-crypt and luks partitions for
+	  on-disk encryption.
+
+	  https://gitlab.com/cryptsetup/cryptsetup
+
+comment "cryptsetup needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

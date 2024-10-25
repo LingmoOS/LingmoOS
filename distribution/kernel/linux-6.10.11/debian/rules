@@ -1,0 +1,159 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/pkg-info.mk
+
+DEB_VERSION_SOURCE = $(shell echo '$(DEB_VERSION)' | sed -re 's/\+b([0-9]+)$$//')
+
+SHELL    := sh -e
+
+include debian/rules.defs
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  DEBIAN_KERNEL_JOBS := $(subst parallel=,,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+ifdef DEBIAN_KERNEL_JOBS
+  MAKEFLAGS += -j$(DEBIAN_KERNEL_JOBS)
+endif
+
+# dpkg-buildpackage passes the -s option if DEB_BUILD_OPTIONS contains
+# terse, but that triggers Kbuild to turn off progress messages
+# completely, which we don't want.
+override MAKEFLAGS := $(subst s,,$(filter-out -%,$(MAKEFLAGS))) $(filter -%,$(MAKEFLAGS))
+
+.NOTPARALLEL:
+
+source: debian/control
+	dh_testdir
+	$(MAKE) -f debian/rules.gen source
+
+setup: debian/control
+	dh_testdir
+	$(MAKE) -f debian/rules.gen setup_$(DEB_HOST_ARCH)
+
+build: build-arch build-indep
+
+build-arch: debian/control
+	dh_testdir
+
+# The perf-read-vdso* programs are built for different architectures,
+# without standard flags, but are not exposed to untrusted input.
+	@printf '%s\n' 'blhc: ignore-line-regexp: .* -o *[^ ]*/perf-read-vdso.*'
+
+# Kernel code needs different hardening options that blhc doesn't know
+# about.
+	@printf '%s\n' 'blhc: ignore-line-regexp: .* -D__KERNEL__ .*'
+
+# The tools/perf/tests/workloads/.* programs are deliberately compiled
+# without -O2, so instruct blhc to ignore those
+	@printf '%s\n' 'blhc: ignore-line-regexp: .* -o .*tools/perf/tests/workloads/.*'
+
+# Those tools conflict between flags used for host and build, so get none
+	@printf '%s\n' 'blhc: ignore-line-regexp: .* -o .*/tools/objtool/.*'
+	@printf '%s\n' 'blhc: ignore-line-regexp: .* -o .*/tools/.*/fixdep.*'
+
+# We need to use terse builds in CI due to the log size limit.  This
+# mostly affects the output for builds of kernel code, which need
+# different options for hardening anyway.
+ifneq ($(filter terse,$(DEB_BUILD_OPTIONS)),)
+	@printf '%s\n' 'blhc: ignore-line-regexp: \s*(CC(LD)?|LD|LINK)\b.*'
+endif
+
+	$(MAKE) -f debian/rules.gen build-arch_$(DEB_HOST_ARCH)
+
+build-indep: debian/control
+	dh_testdir
+	$(MAKE) -f debian/rules.gen build-indep
+
+binary:	binary-indep binary-arch
+
+binary-arch: build-arch
+	dh_testdir
+	$(MAKE) -f debian/rules.gen binary-arch_$(DEB_HOST_ARCH)
+
+binary-indep: build-indep
+	dh_testdir
+	$(MAKE) -f debian/rules.gen binary-indep
+
+DIR_ORIG = ../orig/$(DEB_SOURCE)-$(DEB_VERSION_EPOCH_UPSTREAM)
+TAR_ORIG_NAME = $(DEB_SOURCE)_$(DEB_VERSION_EPOCH_UPSTREAM).orig.tar.xz
+TAR_ORIG = $(firstword $(wildcard ../$(TAR_ORIG_NAME)) $(wildcard ../orig/$(TAR_ORIG_NAME)))
+
+orig: $(DIR_ORIG)
+	rsync --delete --exclude /debian --exclude .git --link-dest=$(DIR_ORIG)/ -a $(DIR_ORIG)/ .
+	QUILT_PATCHES='$(CURDIR)/debian/patches' QUILT_PC=.pc quilt push --quiltrc - -a -q --fuzz=0
+
+$(DIR_ORIG):
+ifeq ($(TAR_ORIG),)
+	$(error Cannot find orig tarball $(TAR_ORIG_NAME))
+else
+	mkdir -p ../orig
+	tar -C ../orig -xaf $(TAR_ORIG)
+endif
+
+CLEAN_PATTERNS := $(BUILD_DIR) $(STAMPS_DIR) debian/lib/python/debian_linux/*.pyc debian/lib/python/debian_linux/__pycache__ $$(find debian -maxdepth 1 -type d -name 'linux-*') debian/*-modules-*-di* debian/kernel-image-*-di* debian/*-tmp debian/*.substvars
+
+clean-generated:
+	rm -rf $(CLEAN_PATTERNS)
+# We cannot use dh_clean here because it requires debian/control to exist
+	rm -rf debian/.debhelper debian/*.debhelper* debian/files debian/generated.*
+	rm -f \
+		debian/control \
+		debian/control.md5sum \
+		debian/linux-doc.maintscript \
+		debian/linux-headers-*.maintscript \
+		debian/linux-headers-*.postinst \
+		debian/linux-image-*.NEWS \
+		debian/linux-image-*.bug-presubj \
+		debian/linux-image-*.lintian-overrides \
+		debian/linux-image-*.maintscript \
+		debian/linux-image-*.postinst \
+		debian/linux-image-*.postrm \
+		debian/linux-image-*.preinst \
+		debian/linux-image-*.prerm \
+		debian/linux-source.maintscript \
+		debian/rules.gen \
+		debian/tests/control
+
+maintainerclean: clean-generated
+	rm -rf $(filter-out debian .git, $(wildcard * .[^.]*))
+
+clean: debian/control
+	dh_testdir
+	rm -rf $(CLEAN_PATTERNS)
+	dh_clean
+
+CONTROL_FILES = $(BUILD_DIR)/version-info $(wildcard debian/templates/*.in)
+CONTROL_FILES += debian/config/defines.toml $(wildcard debian/config/*/defines.toml)
+CONTROL_FILES += debian/installer/package-list
+
+# debian/bin/gencontrol.py uses debian/changelog as input, but the
+# output only depends on the source name and version.  To avoid
+# frequent changes to debian/control.md5sum, include only those fields
+# in the checksum.
+$(BUILD_DIR)/version-info: debian/changelog
+	mkdir -p $(@D)
+# Use DEB_VERSION_SOURCE to allow binNMU
+	printf >$@ 'Source: %s\nVersion: %s\n' $(DEB_SOURCE) $(DEB_VERSION)
+
+debian/control debian/rules.gen: debian/bin/gencontrol.py $(CONTROL_FILES)
+ifeq ($(wildcard debian/control.md5sum),)
+	$(MAKE) -f debian/rules debian/control-real
+else
+	md5sum --check debian/control.md5sum --status || \
+		$(MAKE) -f debian/rules debian/control-real
+endif
+
+debian/control-real: debian/bin/gencontrol.py $(CONTROL_FILES)
+# Hash randomisation makes the pickled config unreproducible
+	PYTHONHASHSEED=0 $<
+	md5sum $(sort $^) > debian/control.md5sum
+	@echo
+	@echo This target is made to fail intentionally, to make sure
+	@echo that it is NEVER run during the automated build. Please
+	@echo ignore the following error, the debian/control file has
+	@echo been generated SUCCESSFULLY.
+	@echo
+	exit 1
+
+.PHONY: binary binary-% build build-% clean debian/control-real orig setup source clean-generated

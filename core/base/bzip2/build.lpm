@@ -1,0 +1,55 @@
+pkgname=bzip2
+pkgver=1.0.8
+pkgrel=6
+pkgdesc="A high-quality data compression program"
+arch=('x86_64')
+license=('BSD')
+url="https://sourceware.org/bzip2/"
+depends=('glibc' 'sh')
+provides=('libbz2.so')
+source=(https://sourceware.org/pub/bzip2/$pkgname-$pkgver.tar.gz
+        bzip2.pc)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd $pkgname-$pkgver
+  cp ../bzip2.pc bzip2.pc
+  sed "s|@VERSION@|$pkgver|" -i bzip2.pc
+}
+
+build() {
+  cd $pkgname-$pkgver
+
+  make -f Makefile-libbz2_so CC="gcc $CFLAGS $CPPFLAGS $LDFLAGS"
+  make bzip2 bzip2recover CC="gcc $CFLAGS $CPPFLAGS $LDFLAGS"
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make test
+}
+
+package() {
+  cd $pkgname-$pkgver
+
+  install -dm755 "$pkgdir"/usr/{bin,lib,include,share/man/man1}
+
+  install -m755 bzip2-shared "$pkgdir"/usr/bin/bzip2
+  install -m755 bzip2recover bzdiff bzgrep bzmore "$pkgdir"/usr/bin
+  ln -sf bzip2 "$pkgdir"/usr/bin/bunzip2
+  ln -sf bzip2 "$pkgdir"/usr/bin/bzcat
+
+  cp -a libbz2.so* "$pkgdir"/usr/lib
+  ln -s libbz2.so.$pkgver "$pkgdir"/usr/lib/libbz2.so
+  ln -s libbz2.so.$pkgver "$pkgdir"/usr/lib/libbz2.so.1 # For compatibility with some other distros
+
+  install -m644 bzlib.h "$pkgdir"/usr/include/
+
+  install -m644 bzip2.1 "$pkgdir"/usr/share/man/man1/
+  ln -sf bzip2.1 "$pkgdir"/usr/share/man/man1/bunzip2.1
+  ln -sf bzip2.1 "$pkgdir"/usr/share/man/man1/bzcat.1
+  ln -sf bzip2.1 "$pkgdir"/usr/share/man/man1/bzip2recover.1
+
+  install -Dm644 bzip2.pc -t "$pkgdir"/usr/lib/pkgconfig
+  install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE
+}

@@ -1,0 +1,8 @@
+#ifndef __HELPER_H_
+#define __HELPER_H_
+
+#include <QtCore/QtCore>
+
+#define KDECORATION_VERSION QT_VERSION_CHECK(KDECORATION_MAJOR, KDECORATION_MINOR, KDECORATION_PATCH)
+
+#endif /* __HELPER_H_ */

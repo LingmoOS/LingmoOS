@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -e
+
+lingmo_mirror=http://packages.lingmo.org/lingmo
+
+public_lingmo_mirror=http://packages.lingmo.org/lingmo
+
+# Detect target architecture and filter args
+temp=""
+arch=$(dpkg --print-architecture)
+dist="hydrogen"
+
+lingmo-sys-build config noauto \
+	--apt-indices=false \
+	--mode debian \
+	--distribution "$dist" \
+	--archive-areas "main contrib non-free non-free-firmware" \
+	--keyring-packages "debian-keyring" \
+	--apt-recommends true \
+	--cache-packages false \
+	--updates false \
+	--firmware-binary true \
+	--firmware-chroot true \
+	--uefi-secure-boot enable \
+	--initramfs live-boot \
+	--debian-installer none \
+    	--debian-installer-gui false \
+	--linux-packages "linux-image" \
+	--linux-flavours "6.10.9-amd64-unsigned" \
+	--binary-images iso-hybrid \
+	--checksums md5 \
+    	--initramfs live-boot \
+	--mirror-bootstrap "$lingmo_mirror" \
+	--mirror-binary "$public_lingmo_mirror" \
+	--mirror-binary-security https://deb.debian.org/debian-security \
+	--mirror-chroot "$lingmo_mirror" \
+	--mirror-chroot-security https://deb.debian.org/debian-security \
+	--security false \
+	--iso-application "Lingmo OS Hydrogen" \
+	--iso-publisher "Lingmo OS Project" \
+	--iso-volume "Lingmo OS Hydrogen" \
+	--memtest memtest86+ \
+	--bootappend-live "boot=live components quiet splash noeject" \
+	--bootappend-live-failsafe "boot=live components noeject memtest noapic noapm nodma nomce nolapic nomodeset nosmp nosplash vga=normal" \
+	--bootappend-install "net.ifnames=0" \
+	--debootstrap-options "--include=apt-transport-https,ca-certificates,openssl" \
+	--security false \
+	--win32-loader true \
+	"$@"

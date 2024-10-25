@@ -1,0 +1,25 @@
+#!/usr/bin/expect
+spawn -noecho "hp-gsp-prompt"
+
+set timeout 10
+
+send "\r"
+
+expect "GSP>"
+send "pc\r"
+expect {
+	"Do you wish to turn power Off" {
+		send "y\nr"
+		expect "Enter delay"
+		send "0\r"
+		expect "Confirm?"
+		send "y\r"
+		expect "Do you wish to turn the power on again?"
+		send "n\r"
+	} "Do you wish to turn power On" {
+		send "n\r"
+	}
+}
+
+expect "GSP>"
+exit

@@ -1,0 +1,35 @@
+config LINGMO_PACKAGE_RACEHOUND
+	bool "racehound"
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # elfutils
+	depends on !LINGMO_STATIC_LIBS # elfutils
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # elfutils
+	# only x86/x86_64 supported
+	depends on LINGMO_i386 || LINGMO_x86_64
+	select LINGMO_PACKAGE_ELFUTILS
+	select LINGMO_LINUX_NEEDS_MODULES # not using kernel-module infra
+	help
+	  RaceHound can be used to detect data races in the Linux
+	  kernel on x86.
+
+	  RaceHound needs the following kernel configurations enabled:
+	  - CONFIG_X86_32 or CONFIG_X86_64
+	  - CONFIG_MODULES
+	  - CONFIG_MODULE_UNLOAD
+	  - CONFIG_SYSFS
+	  - CONFIG_DEBUG_FS
+	  - CONFIG_KALLSYMS
+	  - CONFIG_KALLSYMS_ALL
+	  - CONFIG_KPROBES
+
+	  https://github.com/winnukem/racehound
+
+comment "racehound needs an Linux kernel >= 3.14 to be built"
+	depends on !LINGMO_LINUX_KERNEL
+	depends on LINGMO_i386 || LINGMO_x86_64
+
+comment "racehound needs a toolchain w/ C++, wchar, dynamic library, threads"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS

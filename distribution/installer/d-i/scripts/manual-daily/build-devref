@@ -1,0 +1,126 @@
+#!/bin/bash
+#
+# Old variant of build script for the D-I Internals.
+# Has been superseeded by build-di-int script in the same directory.
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+if [ "$DI_BUILDING_FROM_MAIN" ]; then
+    mainlog=$logdir/main.log
+else
+    mainlog=/dev/stdout
+fi
+
+### FIXME  fix ALIOTH_DEVREF_PATH
+#ALIOTH_DEVREF_PATH=/srv/alioth.debian.org/chroot/home/groups/d-i/htdocs/doc/internals
+
+usage() {
+    if [ "$@" ]; then
+        echo "Error: $@"
+        echo
+    fi
+    echo "Usage: $(basename $0)"
+    exit 1
+}
+
+## Function to check result of executed programs and exit on error
+checkfatal() {
+    if [ ! "$1" = "0" ]; then
+        echo "Unexpected error $1 while $2" >>$mainlog
+        touch $ROOT/do_not_build
+        echo "!!!! Autobuilding has been disabled !!!!" >>$mainlog
+        rm -f $ROOT/lockfile
+        exit 999
+    fi
+}
+
+is_updated() {
+    if egrep "^[UA].[[:space:]]" $logdir/git_pull_devref.log | \
+       grep -qv "^At revision"; then
+        return 0
+    fi
+    return 1
+}
+
+update_from_git() {
+    echo >>$mainlog
+    echo "Performing GIT update..." >>$mainlog
+    git pull >>$logdir/git_pull_devref.log 2>&1
+    RESULT=$?
+    if [ ! $RESULT = 0 ]; then
+        echo "GIT pull failed with code $RESULT" >>$mainlog
+        echo >>$mainlog
+        cat $logdir/git_pull_devref.log >>$mainlog
+        rm -f $ROOT/lockfile
+        exit 1
+    fi
+    if [ -n "$(git status -s -uno .)" ] ; then
+        checkfatal "checking for conflicts after 'git pull'"
+    fi
+}
+
+# We want the developer reference files group writable
+umask 0002
+
+RETRY=""
+while true; do
+    case $1 in
+        "")
+            break ;;
+        -*)
+            usage "unrecognized option '$1'" ;;
+        *)
+            usage "invalid parameter '$1'" ;;
+    esac
+    shift
+done
+
+[ -f $ROOT/lockfile ] && exit 1 || touch $ROOT/lockfile
+
+[ -e "$devref" ] && cd $devref || exit 1
+
+## Create directories
+[ -e "$logdir" ] || mkdir -p "$logdir"
+
+if [ "$DI_BUILDING_FROM_MAIN" ]; then
+    echo >>$mainlog
+    echo >>$mainlog
+fi
+if [ "$DI_BUILDING_FROM_MAIN" ] && [ "$DI_BUILD_DEVREF" != 1 ]; then
+    echo "Not building D-I Internals (as per configuration settings)" >>$mainlog
+    echo >>$mainlog
+    rm -f $ROOT/lockfile
+    exit 0
+else
+    : >$logdir/git_pull_devref.log
+    echo "Starting D-I Internals build -- $(date -u)" >>$mainlog
+fi
+
+update_from_git
+
+NR_BUILDS=0
+
+# Build the developers reference
+if is_updated; then
+    make >>$mainlog 2>&1
+    checkfatal "$?" "building D-I Internals"
+
+    if [ "$DI_LOCAL_BUILD" = 1 ]; then
+        echo "Local build! No changes have been uploaded." >>$mainlog
+### FIXME
+###    else
+###        ## Copy the created files to alioth.debian.org
+###        echo "rsyncing files to alioth..." >>$mainlog
+###        rsync -qzr --perms *.html *.css alioth.debian.org:$ALIOTH_DEVREF_PATH/ >>$mainlog 2>&1
+###        checkfatal "$?" "rsyncing D-I Internals"
+    fi
+else
+    echo "No changes." >>$mainlog
+fi
+
+echo >>$mainlog
+echo "Done -- $(date -u)" >>$mainlog
+rm -f $ROOT/lockfile
+
+exit 0

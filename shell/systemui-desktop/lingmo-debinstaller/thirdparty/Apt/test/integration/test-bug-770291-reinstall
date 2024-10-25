@@ -1,0 +1,98 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable,installed' 'libc6' 'i386' '1'
+insertpackage 'unstable,installed' 'libselinux1' 'i386' '1'
+
+cp rootdir/var/lib/dpkg/status dpkg.status
+
+insertpackage 'unstable,installed' 'init' 'i386' '1' 'Depends: systemd-sysv
+Essential: yes'
+insertpackage 'unstable,installed' 'systemd-sysv' 'i386' '215-5+b1' 'Depends: systemd (= 215-5+b1)
+Pre-Depends: systemd'
+# fun fact: we need these two pre-depends to get systemd ordered before systemd-sysv as
+# many pre-depends mean: do early (as they are a pain, so get them out of the way early)
+insertpackage 'unstable,installed' 'systemd' 'i386' '215-5+b1' 'Pre-Depends: libc6, libselinux1'
+
+# depends loop
+insertpackage 'unstable,installed' 'dependsa' 'i386' '1' 'Depends: dependsb
+Essential: yes'
+insertpackage 'unstable,installed' 'dependsb' 'i386' '1' 'Depends: dependsa
+Essential: yes'
+
+# pre-depends loop
+insertpackage 'unstable,installed' 'predependsa' 'i386' '1' 'Pre-Depends: predependsb
+Essential: yes'
+insertpackage 'unstable,installed' 'predependsb' 'i386' '1' 'Pre-Depends: predependsa
+Essential: yes'
+
+# pre-depends-to-depends loop
+insertpackage 'unstable,installed' 'predependsdependsa' 'i386' '1' 'Pre-Depends: predependsdependsb
+Essential: yes'
+insertpackage 'unstable,installed' 'predependsdependsb' 'i386' '1' 'Depends: predependsdependsa
+Essential: yes'
+
+setupaptarchive
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+0 upgraded, 0 newly installed, 2 reinstalled, 0 to remove and 0 not upgraded.
+Inst systemd [215-5+b1] (215-5+b1 unstable [i386])
+Conf systemd (215-5+b1 unstable [i386])
+Inst systemd-sysv [215-5+b1] (215-5+b1 unstable [i386])
+Conf systemd-sysv (215-5+b1 unstable [i386])' aptget install --reinstall systemd systemd-sysv -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+0 upgraded, 0 newly installed, 2 reinstalled, 0 to remove and 0 not upgraded.
+Inst dependsa [1] (1 unstable [i386])
+Inst dependsb [1] (1 unstable [i386])
+Conf dependsb (1 unstable [i386])
+Conf dependsa (1 unstable [i386])' aptget install --reinstall dependsa dependsb -s
+
+# there is a chance dpkg can actually do these, BUT this depends on the maintainerscripts (not) present
+# which is very risky to depend on (and apt doesn't know about that anyhow).
+testfailure aptget install --reinstall predependsa predependsb -s -o Debug::pkgPackageManager=1
+testsuccess grep "^E: Couldn't configure predependsa:i386, probably a dependency cycle.$" rootdir/tmp/testfailure.output
+
+# FIXME: the error message is a catch all here, not like the one above
+testfailure aptget install --reinstall predependsdependsa predependsdependsb -s -o Debug::pkgPackageManager=1
+testsuccess grep "^E: Could not configure 'predependsdependsb:i386'. $" rootdir/tmp/testfailure.output
+
+
+msgmsg 'While we are at it, lets try these loops without reinstall as well'
+cp dpkg.status rootdir/var/lib/dpkg/status
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  systemd systemd-sysv
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst systemd (215-5+b1 unstable [i386])
+Conf systemd (215-5+b1 unstable [i386])
+Inst systemd-sysv (215-5+b1 unstable [i386])
+Conf systemd-sysv (215-5+b1 unstable [i386])' aptget install systemd systemd-sysv -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  dependsa dependsb
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst dependsa (1 unstable [i386]) []
+Inst dependsb (1 unstable [i386])
+Conf dependsb (1 unstable [i386])
+Conf dependsa (1 unstable [i386])' aptget install dependsa dependsb -s
+
+# there is a chance dpkg can actually do these, BUT this depends on the maintainerscripts (not) present
+# which is very risky to depend on (and apt doesn't know about that anyhow).
+testfailure aptget install predependsa predependsb -s -o Debug::pkgPackageManager=1
+testsuccess grep "^E: Couldn't configure predependsa:i386, probably a dependency cycle.$" rootdir/tmp/testfailure.output
+
+# FIXME: the error message is a catch all here, not like the one above
+testfailure aptget install predependsdependsa predependsdependsb -s -o Debug::pkgPackageManager=1
+testsuccess grep "^E: Could not configure 'predependsdependsb:i386'. $" rootdir/tmp/testfailure.output

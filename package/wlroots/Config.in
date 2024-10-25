@@ -1,0 +1,69 @@
+comment "wlroots needs udev, EGL w/ Wayland backend and OpenGL ES support"
+	depends on !LINGMO_PACKAGE_HAS_LIBEGL || \
+		!LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND || \
+		!LINGMO_PACKAGE_HAS_LIBGLES || \
+		!LINGMO_PACKAGE_HAS_UDEV
+
+comment "wlroots needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_WLROOTS
+	bool "wlroots"
+	depends on !LINGMO_STATIC_LIBS # wayland
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm, wayland
+	depends on LINGMO_PACKAGE_HAS_UDEV # libinput
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	depends on LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+	depends on LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_HWDATA
+	select LINGMO_PACKAGE_HWDATA_PNP_IDS
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_LIBINPUT
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+	select LINGMO_PACKAGE_PIXMAN
+	select LINGMO_PACKAGE_SEATD
+	select LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+	help
+	  wlroots is a modular Wayland library for building compositors
+	  which implements many of their common features.
+
+	  https://gitlab.freedesktop.org/wlroots/wlroots
+
+if LINGMO_PACKAGE_WLROOTS
+
+config LINGMO_PACKAGE_WLROOTS_X11
+	bool "X11 backend"
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_LIBXCB
+	select LINGMO_PACKAGE_XCB_UTIL_RENDERUTIL
+	select LINGMO_PACKAGE_XCB_UTIL_WM
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	help
+	  Support Wayland sessions nested inside a X11 window
+
+config LINGMO_PACKAGE_WLROOTS_XWAYLAND
+	bool "XWayland support"
+	depends on LINGMO_PACKAGE_XORG7 # libxcb, xcb-util-wm, xwayland
+	depends on LINGMO_USE_MMU # xwayland
+	depends on !LINGMO_STATIC_LIBS # xwayland
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # xwayland
+	depends on !LINGMO_RISCV_32 # xwayland -> xlib_libxshmfence
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # xwayland -> xlib_libxshmfence
+	select LINGMO_PACKAGE_LIBXCB
+	select LINGMO_PACKAGE_XCB_UTIL_WM
+	select LINGMO_PACKAGE_XWAYLAND
+	help
+	  Support for running X11 applications under wayland
+
+comment "XWayland support needs X.org enabled"
+	depends on !LINGMO_PACKAGE_XORG7
+
+comment "XWayland support needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_RISCV_32
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+endif

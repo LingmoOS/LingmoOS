@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_VIM
+	bool "vim"
+	depends on LINGMO_USE_MMU # uses fork()
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  VIM Text editor
+
+	  http://www.vim.org/
+
+if LINGMO_PACKAGE_VIM
+
+config LINGMO_PACKAGE_VIM_RUNTIME
+	bool "install runtime"
+	default y
+	help
+	  Install VIM runtime (syntax highlighing + macros).
+	  This option adds about 11MB of data to /usr/share/
+
+endif
+
+comment "vim needs a toolchain w/ wchar"
+	depends on !LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS

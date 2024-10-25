@@ -1,0 +1,91 @@
+config LINGMO_PACKAGE_SWUPDATE
+	bool "swupdate"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # json-c
+	select LINGMO_PACKAGE_JSON_C
+	select LINGMO_PACKAGE_LIBUBOOTENV
+	help
+	  swupdate provides a reliable way to update the software on
+	  an embedded system.
+
+	  swupdate is highly configurable to fit the targets
+	  requirements and to minimize the footprint. The provided
+	  default configuration file LINGMO_PACKAGE_SWUPDATE_CONFIG will
+	  enable swupdate with an embedded webserver, a parser and a
+	  handler for raw NAND or NOR flash.
+
+	  The default configuration file builds a reasonable firmware
+	  update system with minimal external dependencies in mind.
+	  If you like to use your own modified configuration,
+	  you have to select the necessary packages manually:
+
+	  * Select LINGMO_PACKAGE_LUA or LINGMO_PACKAGE_LUAJIT if you want
+	    want to have Lua support.
+	  * Select LINGMO_PACKAGE_LIBCURL if you want to use the download
+	    feature.
+	  * Select LINGMO_PACKAGE_OPENSSL or LINGMO_PACKAGE_MBEDTLS if you
+	    want to add encryption support.
+	  * Select LINGMO_PACKAGE_MTD if you want to use swupdate with
+	    UBI partitions.
+	  * Select LINGMO_PACKAGE_ZLIB if you want to deal with gzip
+	    compressed archives.
+	  * Select LINGMO_PACKAGE_ZSTD if you want to deal with zstd
+	    compressed archives.
+	  * Select LINGMO_PACKAGE_ZEROMQ to add support for using a
+	    remote handler.
+	  * Select LINGMO_PACKAGE_LIBRSYNC to add support for using
+	    rdiff handler.
+	  * Select LINGMO_PACKAGE_LIBGPIOD to add support for
+	    microcontroller firmware update.
+	  * Select LINGMO_PACKAGE_EFIBOOTMGR to add support for EFI Boot
+	    Guard.
+	  * Select LINGMO_PACKAGE_LIBCURL, LINGMO_PACKAGE_LIBWEBSOCKETS,
+	    and LINGMO_PACKAGE_LIBURIPARSER
+	    to add support for the SWU forwarder.
+
+	  https://sbabic.github.io/swupdate
+
+if LINGMO_PACKAGE_SWUPDATE
+
+config LINGMO_PACKAGE_SWUPDATE_CONFIG
+	string "swupdate configuration file"
+	default "package/swupdate/swupdate.config"
+	help
+	  Path to the swupdate configuration file.
+
+	  I you wish to use your own modified swupdate configuration
+	  file specify the config file location with this option.
+
+config LINGMO_PACKAGE_SWUPDATE_USB
+	bool "swupdate usb"
+	depends on LINGMO_PACKAGE_SYSTEMD
+	help
+	  Enable update from USB disk.
+
+comment "swupdate usb needs systemd"
+	depends on !LINGMO_PACKAGE_SYSTEMD
+
+config LINGMO_PACKAGE_SWUPDATE_WEBSERVER
+	bool "swupdate webserver"
+	default y
+	help
+	  Enable update from remote using a web server on the target.
+
+config LINGMO_PACKAGE_SWUPDATE_INSTALL_WEBSITE
+	bool "install default website"
+	default y
+	depends on LINGMO_PACKAGE_SWUPDATE_WEBSERVER
+	help
+	  Install the provided website to /var/www/swupdate.
+
+	  This is necessary if you want to run swupdate with the
+	  embedded webserver and do not provide an own website to be
+	  installed to /var/www/swupdate.
+endif
+
+comment "swupdate needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

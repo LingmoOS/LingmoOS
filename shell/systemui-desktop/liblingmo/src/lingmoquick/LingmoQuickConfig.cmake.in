@@ -1,0 +1,16 @@
+@PACKAGE_INIT@
+
+# Any changes in this ".cmake" file will be overwritten by CMake, the source is the ".cmake.in" file.
+
+# do not use PACKAGE_CMAKE_INSTALL_PREFIX after calls to find_dependency, its content can change!
+set(LingmoQuick_INSTALL_PREFIX "@PACKAGE_CMAKE_INSTALL_PREFIX@")
+set_and_check(LingmoQuick_INCLUDE_DIR    "@PACKAGE_LINGMOQUICK_INSTALL_INCLUDEDIR@")
+
+include(CMakeFindDependencyMacro)
+find_dependency(Qt6Quick "@REQUIRED_QT_VERSION@")
+find_dependency(Lingmo "@KF_DEP_VERSION@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/LingmoQuickTargets.cmake")
+
+set(LingmoQuick_LIBRARIES Lingmo::LingmoQuick)
+

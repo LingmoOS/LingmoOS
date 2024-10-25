@@ -1,0 +1,28 @@
+# Architecture dependency from the bundled bdwgc.
+config LINGMO_PACKAGE_GAUCHE_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_arm || LINGMO_armeb || LINGMO_i386 || LINGMO_m68k || \
+		LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || \
+		LINGMO_mips64el || LINGMO_powerpc || LINGMO_powerpc64 || \
+		LINGMO_powerpc64le || LINGMO_sh || LINGMO_x86_64
+
+config LINGMO_PACKAGE_GAUCHE
+	bool "gauche"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_PACKAGE_GAUCHE_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Gauche is an R7RS Scheme implementation developed to be a
+	  handy script interpreter, which allows programmers and
+	  system administrators to write small to large scripts for
+	  their daily chores. Quick startup, built-in system
+	  interface, native multilingual support are some of its
+	  goals.
+
+	  http://practical-scheme.net/gauche/
+
+comment "gauche needs a toolchain w/ NPTL, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_GAUCHE_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS

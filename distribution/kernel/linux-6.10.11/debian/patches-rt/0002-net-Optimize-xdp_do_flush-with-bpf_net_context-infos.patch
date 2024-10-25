@@ -1,0 +1,291 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 28 Jun 2024 12:18:55 +0200
+Subject: [PATCH 2/3] net: Optimize xdp_do_flush() with bpf_net_context infos.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+Every NIC driver utilizing XDP should invoke xdp_do_flush() after
+processing all packages. With the introduction of the bpf_net_context
+logic the flush lists (for dev, CPU-map and xsk) are lazy initialized
+only if used. However xdp_do_flush() tries to flush all three of them so
+all three lists are always initialized and the likely empty lists are
+"iterated".
+Without the usage of XDP but with CONFIG_DEBUG_NET the lists are also
+initialized due to xdp_do_check_flushed().
+
+Jakub suggest to utilize the hints in bpf_net_context and avoid invoking
+the flush function. This will also avoiding initializing the lists which
+are otherwise unused.
+
+Introduce bpf_net_ctx_get_all_used_flush_lists() to return the
+individual list if not-empty. Use the logic in xdp_do_flush() and
+xdp_do_check_flushed(). Remove the not needed .*_check_flush().
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Link: https://lore.kernel.org/r/20240628103020.1766241-3-bigeasy@linutronix.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/bpf.h    |   10 ++++------
+ include/linux/filter.h |   27 +++++++++++++++++++++++++++
+ include/net/xdp_sock.h |   14 ++------------
+ kernel/bpf/cpumap.c    |   13 +------------
+ kernel/bpf/devmap.c    |   13 +------------
+ net/core/filter.c      |   33 +++++++++++++++++++++++++--------
+ net/xdp/xsk.c          |   13 +------------
+ 7 files changed, 61 insertions(+), 62 deletions(-)
+
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -2492,7 +2492,7 @@ struct sk_buff;
+ struct bpf_dtab_netdev;
+ struct bpf_cpu_map_entry;
+ 
+-void __dev_flush(void);
++void __dev_flush(struct list_head *flush_list);
+ int dev_xdp_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+ 		    struct net_device *dev_rx);
+ int dev_map_enqueue(struct bpf_dtab_netdev *dst, struct xdp_frame *xdpf,
+@@ -2505,7 +2505,7 @@ int dev_map_redirect_multi(struct net_de
+ 			   struct bpf_prog *xdp_prog, struct bpf_map *map,
+ 			   bool exclude_ingress);
+ 
+-void __cpu_map_flush(void);
++void __cpu_map_flush(struct list_head *flush_list);
+ int cpu_map_enqueue(struct bpf_cpu_map_entry *rcpu, struct xdp_frame *xdpf,
+ 		    struct net_device *dev_rx);
+ int cpu_map_generic_redirect(struct bpf_cpu_map_entry *rcpu,
+@@ -2642,8 +2642,6 @@ void bpf_dynptr_init(struct bpf_dynptr_k
+ void bpf_dynptr_set_null(struct bpf_dynptr_kern *ptr);
+ void bpf_dynptr_set_rdonly(struct bpf_dynptr_kern *ptr);
+ 
+-bool dev_check_flush(void);
+-bool cpu_map_check_flush(void);
+ #else /* !CONFIG_BPF_SYSCALL */
+ static inline struct bpf_prog *bpf_prog_get(u32 ufd)
+ {
+@@ -2731,7 +2729,7 @@ static inline struct bpf_token *bpf_toke
+ 	return ERR_PTR(-EOPNOTSUPP);
+ }
+ 
+-static inline void __dev_flush(void)
++static inline void __dev_flush(struct list_head *flush_list)
+ {
+ }
+ 
+@@ -2777,7 +2775,7 @@ int dev_map_redirect_multi(struct net_de
+ 	return 0;
+ }
+ 
+-static inline void __cpu_map_flush(void)
++static inline void __cpu_map_flush(struct list_head *flush_list)
+ {
+ }
+ 
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -829,6 +829,33 @@ static inline struct list_head *bpf_net_
+ 	return &bpf_net_ctx->xskmap_map_flush_list;
+ }
+ 
++static inline void bpf_net_ctx_get_all_used_flush_lists(struct list_head **lh_map,
++							struct list_head **lh_dev,
++							struct list_head **lh_xsk)
++{
++	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
++	u32 kern_flags = bpf_net_ctx->ri.kern_flags;
++	struct list_head *lh;
++
++	*lh_map = *lh_dev = *lh_xsk = NULL;
++
++	if (!IS_ENABLED(CONFIG_BPF_SYSCALL))
++		return;
++
++	lh = &bpf_net_ctx->dev_map_flush_list;
++	if (kern_flags & BPF_RI_F_DEV_MAP_INIT && !list_empty(lh))
++		*lh_dev = lh;
++
++	lh = &bpf_net_ctx->cpu_map_flush_list;
++	if (kern_flags & BPF_RI_F_CPU_MAP_INIT && !list_empty(lh))
++		*lh_map = lh;
++
++	lh = &bpf_net_ctx->xskmap_map_flush_list;
++	if (IS_ENABLED(CONFIG_XDP_SOCKETS) &&
++	    kern_flags & BPF_RI_F_XSK_MAP_INIT && !list_empty(lh))
++		*lh_xsk = lh;
++}
++
+ /* Compute the linear packet data range [data, data_end) which
+  * will be accessed by various program types (cls_bpf, act_bpf,
+  * lwt, ...). Subsystems allowing direct data access must (!)
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -121,7 +121,7 @@ struct xsk_tx_metadata_ops {
+ 
+ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
+ int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp);
+-void __xsk_map_flush(void);
++void __xsk_map_flush(struct list_head *flush_list);
+ 
+ /**
+  *  xsk_tx_metadata_to_compl - Save enough relevant metadata information
+@@ -206,7 +206,7 @@ static inline int __xsk_map_redirect(str
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline void __xsk_map_flush(void)
++static inline void __xsk_map_flush(struct list_head *flush_list)
+ {
+ }
+ 
+@@ -228,14 +228,4 @@ static inline void xsk_tx_metadata_compl
+ }
+ 
+ #endif /* CONFIG_XDP_SOCKETS */
+-
+-#if defined(CONFIG_XDP_SOCKETS) && defined(CONFIG_DEBUG_NET)
+-bool xsk_map_check_flush(void);
+-#else
+-static inline bool xsk_map_check_flush(void)
+-{
+-	return false;
+-}
+-#endif
+-
+ #endif /* _LINUX_XDP_SOCK_H */
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -757,9 +757,8 @@ int cpu_map_generic_redirect(struct bpf_
+ 	return ret;
+ }
+ 
+-void __cpu_map_flush(void)
++void __cpu_map_flush(struct list_head *flush_list)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_cpu_map_flush_list();
+ 	struct xdp_bulk_queue *bq, *tmp;
+ 
+ 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
+@@ -769,13 +768,3 @@ void __cpu_map_flush(void)
+ 		wake_up_process(bq->obj->kthread);
+ 	}
+ }
+-
+-#ifdef CONFIG_DEBUG_NET
+-bool cpu_map_check_flush(void)
+-{
+-	if (list_empty(bpf_net_ctx_get_cpu_map_flush_list()))
+-		return false;
+-	__cpu_map_flush();
+-	return true;
+-}
+-#endif
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -412,9 +412,8 @@ static void bq_xmit_all(struct xdp_dev_b
+  * driver before returning from its napi->poll() routine. See the comment above
+  * xdp_do_flush() in filter.c.
+  */
+-void __dev_flush(void)
++void __dev_flush(struct list_head *flush_list)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_dev_flush_list();
+ 	struct xdp_dev_bulk_queue *bq, *tmp;
+ 
+ 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
+@@ -425,16 +424,6 @@ void __dev_flush(void)
+ 	}
+ }
+ 
+-#ifdef CONFIG_DEBUG_NET
+-bool dev_check_flush(void)
+-{
+-	if (list_empty(bpf_net_ctx_get_dev_flush_list()))
+-		return false;
+-	__dev_flush();
+-	return true;
+-}
+-#endif
+-
+ /* Elements are kept alive by RCU; either by rcu_read_lock() (from syscall) or
+  * by local_bh_disable() (from XDP calls inside NAPI). The
+  * rcu_read_lock_bh_held() below makes lockdep accept both.
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -4277,22 +4277,39 @@ static const struct bpf_func_proto bpf_x
+  */
+ void xdp_do_flush(void)
+ {
+-	__dev_flush();
+-	__cpu_map_flush();
+-	__xsk_map_flush();
++	struct list_head *lh_map, *lh_dev, *lh_xsk;
++
++	bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
++	if (lh_dev)
++		__dev_flush(lh_dev);
++	if (lh_map)
++		__cpu_map_flush(lh_map);
++	if (lh_xsk)
++		__xsk_map_flush(lh_xsk);
+ }
+ EXPORT_SYMBOL_GPL(xdp_do_flush);
+ 
+ #if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
+ void xdp_do_check_flushed(struct napi_struct *napi)
+ {
+-	bool ret;
++	struct list_head *lh_map, *lh_dev, *lh_xsk;
++	bool missed = false;
+ 
+-	ret = dev_check_flush();
+-	ret |= cpu_map_check_flush();
+-	ret |= xsk_map_check_flush();
++	bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
++	if (lh_dev) {
++		__dev_flush(lh_dev);
++		missed = true;
++	}
++	if (lh_map) {
++		__cpu_map_flush(lh_map);
++		missed = true;
++	}
++	if (lh_xsk) {
++		__xsk_map_flush(lh_xsk);
++		missed = true;
++	}
+ 
+-	WARN_ONCE(ret, "Missing xdp_do_flush() invocation after NAPI by %ps\n",
++	WARN_ONCE(missed, "Missing xdp_do_flush() invocation after NAPI by %ps\n",
+ 		  napi->poll);
+ }
+ #endif
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -383,9 +383,8 @@ int __xsk_map_redirect(struct xdp_sock *
+ 	return 0;
+ }
+ 
+-void __xsk_map_flush(void)
++void __xsk_map_flush(struct list_head *flush_list)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_xskmap_flush_list();
+ 	struct xdp_sock *xs, *tmp;
+ 
+ 	list_for_each_entry_safe(xs, tmp, flush_list, flush_node) {
+@@ -394,16 +393,6 @@ void __xsk_map_flush(void)
+ 	}
+ }
+ 
+-#ifdef CONFIG_DEBUG_NET
+-bool xsk_map_check_flush(void)
+-{
+-	if (list_empty(bpf_net_ctx_get_xskmap_flush_list()))
+-		return false;
+-	__xsk_map_flush();
+-	return true;
+-}
+-#endif
+-
+ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
+ {
+ 	xskq_prod_submit_n(pool->cq, nb_entries);

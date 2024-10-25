@@ -1,0 +1,52 @@
+# based on src/corelib/global/qprocessordetection.h
+config LINGMO_PACKAGE_QT6_ARCH_SUPPORTS
+	bool
+	# no support for ARMv4
+	default y if LINGMO_ARM_CPU_ARMV5 || LINGMO_ARM_CPU_ARMV6 || LINGMO_ARM_CPU_ARMV7A || LINGMO_ARM_CPU_ARMV8A
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	# sparc 32-bit is supposedly supported, but has issues due to
+	# the need of libatomic
+	default y if LINGMO_sparc64
+	depends on LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_QT6_GL_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+
+comment "qt6 needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8, host gcc >= 8"
+	depends on !LINGMO_PACKAGE_QT5
+	depends on LINGMO_PACKAGE_QT6_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || \
+		!LINGMO_HOST_GCC_AT_LEAST_8 || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR
+
+menuconfig LINGMO_PACKAGE_QT6
+	bool "Qt6"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+	depends on LINGMO_HOST_GCC_AT_LEAST_8
+	depends on LINGMO_PACKAGE_QT6_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_PACKAGE_QT5
+	select LINGMO_PACKAGE_QT6BASE
+	help
+	  This option enables the Qt6 framework. Sub-options allow to
+	  select which modules should be built.
+
+	  http://qt.io
+
+if LINGMO_PACKAGE_QT6
+
+source "package/qt6/qt6base/Config.in"
+source "package/qt6/qt6core5compat/Config.in"
+source "package/qt6/qt6serialbus/Config.in"
+source "package/qt6/qt6serialport/Config.in"
+source "package/qt6/qt6svg/Config.in"
+
+endif

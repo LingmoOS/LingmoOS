@@ -1,0 +1,17 @@
+comment "ti-sgx-km needs a Linux kernel to be built"
+	depends on LINGMO_ARM_EABIHF
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_TI_SGX_KM
+	bool "ti-sgx-km"
+	depends on LINGMO_LINUX_KERNEL && LINGMO_ARM_EABIHF
+	select LINGMO_LINUX_NEEDS_MODULES
+	help
+	  Kernel modules for TI CPUs with SGX GPU.
+	  This package supports AM335x only.
+	  It builds the kernel module and the user space binaries.
+	  For older CPUs or kernels use the ti-gfx package.
+
+	  Note: it needs a TI specific kernel to build properly.
+
+	  https://git.ti.com/cgit/graphics/omap5-sgx-ddk-linux

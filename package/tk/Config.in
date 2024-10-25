@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_TK
+	bool "tk"
+	depends on LINGMO_USE_MMU # tcl
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # tcl
+	depends on !LINGMO_STATIC_LIBS # tcl
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_TCL
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXFT
+	help
+	  A windowing toolkit for use with tcl
+
+	  http://www.tcl.tk
+
+comment "tk needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_XORG7
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

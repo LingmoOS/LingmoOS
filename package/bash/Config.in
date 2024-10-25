@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_BASH
+	bool "bash"
+	# uses fork()
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_READLINE
+	help
+	  The standard GNU Bourne again shell.
+
+	  http://tiswww.case.edu/php/chet/bash/bashtop.html
+
+if LINGMO_PACKAGE_BASH
+
+config LINGMO_PACKAGE_BASH_LOADABLE_EXAMPLES
+	bool "loadable examples"
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  This option will enable the installation of the "loadable"
+	  examples, which are dynamically loadable extension providing
+	  additional built-ins commands to bash. There are typically
+	  not needed as they are provided as regular, external
+	  commands.
+
+endif

@@ -1,0 +1,498 @@
+menuconfig LINGMO_PACKAGE_UTIL_LINUX
+	bool "util-linux"
+	help
+	  Various useful/essential linux libraries and utilities.
+
+	  Things like mkfs, mkswap, swapon, fdisk, mount, dmesg, etc...
+
+	  http://www.kernel.org/pub/linux/utils/util-linux/
+
+if LINGMO_PACKAGE_UTIL_LINUX
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBS
+	bool
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	bool "libblkid"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Install libblkid.
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBFDISK
+	bool "libfdisk"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Install libfdisk.
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	bool "libmount"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	help
+	  Install libmount.
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	bool "libsmartcols"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Install libsmartcols.
+
+config LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	bool "libuuid"
+	help
+	  Install libuuid.
+
+config LINGMO_PACKAGE_UTIL_LINUX_BINARIES
+	bool "basic set"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBFDISK
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Install the basic set of util-linux binaries.
+
+	  blkdiscard, blkid, blockdev, chcpu, choom, col, colcrt, colrm,
+	  column, ctrlaltdel, dmesg, fdisk, fincore, findfs, findmnt,
+	  flock, fsfreeze, fstrim, getopt, hexdump, ipcmk, isosize,
+	  ldattach, look, lsblk, lscpu, lsipc, lslocks, lsns, mcookie,
+	  mkfs, mkswap, namei, prlimit, readprofile, renice, rev,
+	  rtcwake, script, scriptlive, scriptreplay, setarch, setsid,
+	  sfdisk, swaplabel, swapoff, swapon, uuidgen, uuidparse,
+	  whereis, wipefs
+
+	  The setarch utility also installs architecture-specific
+	  symlinks like linux32, linux64, uname26, i386 and x86_64.
+
+config LINGMO_PACKAGE_UTIL_LINUX_AGETTY
+	bool "agetty"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Alternative linux getty
+
+config LINGMO_PACKAGE_UTIL_LINUX_BFS
+	bool "bfs"
+	help
+	  SCO bfs filesystem support
+
+config LINGMO_PACKAGE_UTIL_LINUX_CAL
+	bool "cal"
+	help
+	  Display a calendar, or some part of it
+
+config LINGMO_PACKAGE_UTIL_LINUX_CHFN_CHSH
+	bool "chfn/chsh"
+	depends on (LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) # linux-pam
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # linux-pam
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # linux-pam
+	select LINGMO_PACKAGE_LINUX_PAM
+	help
+	  Change login shell, real user name and information
+
+comment "chfn/chsh needs a toolchain w/ wchar, locale, dynamic library, gcc >= 4.9"
+	depends on !(LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) \
+		|| LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_UTIL_LINUX_CHMEM
+	bool "chmem"
+	help
+	  Sets a particular size or range of memory online or offline
+
+config LINGMO_PACKAGE_UTIL_LINUX_CRAMFS
+	bool "cramfs utilities"
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Utilities for compressed ROM file system (fsck.cramfs,
+	  mkfs.cramfs)
+
+config LINGMO_PACKAGE_UTIL_LINUX_EJECT
+	bool "eject"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Eject removable media
+
+config LINGMO_PACKAGE_UTIL_LINUX_FALLOCATE
+	bool "fallocate"
+	help
+	  Preallocate space to a file
+
+config LINGMO_PACKAGE_UTIL_LINUX_FDFORMAT
+	bool "fdformat"
+	help
+	  Low-level format a floppy disk
+
+config LINGMO_PACKAGE_UTIL_LINUX_FSCK
+	bool "fsck"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Check and repair a linux filesystem
+
+config LINGMO_PACKAGE_UTIL_LINUX_HARDLINK
+	bool "hardlink"
+	help
+	  Consolidate duplicate files via hardlinks
+
+config LINGMO_PACKAGE_UTIL_LINUX_HWCLOCK
+	bool "hwclock"
+	help
+	  Query or set the hardware clock (RTC)
+
+config LINGMO_PACKAGE_UTIL_LINUX_IPCMK
+	bool "ipcmk"
+	help
+	  Make various IPC resources
+
+config LINGMO_PACKAGE_UTIL_LINUX_IPCRM
+	bool "ipcrm"
+	help
+	  Remove certain IPC resources
+
+config LINGMO_PACKAGE_UTIL_LINUX_IPCS
+	bool "ipcs"
+	help
+	  Show information on IPC facilities
+
+config LINGMO_PACKAGE_UTIL_LINUX_IRQTOP
+	bool "irqtop"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Show information on IRQs
+
+config LINGMO_PACKAGE_UTIL_LINUX_KILL
+	bool "kill"
+	help
+	  Send a signal to a process
+
+config LINGMO_PACKAGE_UTIL_LINUX_LAST
+	bool "last"
+	help
+	  Show a listing of last logged in users
+
+config LINGMO_PACKAGE_UTIL_LINUX_LINE
+	bool "line"
+	help
+	  Read one line
+
+config LINGMO_PACKAGE_UTIL_LINUX_LOGGER
+	bool "logger"
+	help
+	  Enter messages into the system log
+
+config LINGMO_PACKAGE_UTIL_LINUX_LOGIN
+	bool "login"
+	depends on LINGMO_ENABLE_LOCALE # linux-pam
+	depends on LINGMO_USE_WCHAR # linux-pam
+	depends on !LINGMO_STATIC_LIBS # linux-pam
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # linux-pam
+	depends on LINGMO_USE_MMU # fork(), linux-pam
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # linux-pam
+	select LINGMO_PACKAGE_LINUX_PAM
+	help
+	  Begin a session on the system
+
+comment "login needs a uClibc or glibc toolchain w/ wchar, locale, dynamic library, gcc >= 4.9"
+	depends on !(LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) \
+		|| LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_UTIL_LINUX_LOSETUP
+	bool "losetup"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Set up and control loop devices
+
+config LINGMO_PACKAGE_UTIL_LINUX_LSFD
+	bool "lsfd"
+	depends on LINGMO_USE_MMU # libsmartcols
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_19
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  List file descriptors (modern replacement for lsof)
+
+comment "lsfd needs a toolchain w/ headers >= 3.19"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_19
+
+config LINGMO_PACKAGE_UTIL_LINUX_LSLOGINS
+	bool "lslogins"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Display information about known users in the system
+
+config LINGMO_PACKAGE_UTIL_LINUX_LSMEM
+	bool "lsmem"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  List the ranges of available memory with their online status
+
+config LINGMO_PACKAGE_UTIL_LINUX_MESG
+	bool "mesg"
+	help
+	  Control write access to your terminal
+
+config LINGMO_PACKAGE_UTIL_LINUX_MINIX
+	bool "minix"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Minix filesystem support
+
+config LINGMO_PACKAGE_UTIL_LINUX_MORE
+	bool "more"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  File perusal filter for crt viewing
+
+config LINGMO_PACKAGE_UTIL_LINUX_MOUNT
+	bool "mount/umount"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Mount/unmount filesystems
+
+config LINGMO_PACKAGE_UTIL_LINUX_MOUNTPOINT
+	bool "mountpoint"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBMOUNT
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  See if a directory is a mountpoint
+
+config LINGMO_PACKAGE_UTIL_LINUX_NEWGRP
+	bool "newgrp"
+	help
+	  Log in to a new group
+
+config LINGMO_PACKAGE_UTIL_LINUX_NOLOGIN
+	bool "nologin"
+	help
+	  Politely refuse a login
+
+config LINGMO_PACKAGE_UTIL_LINUX_NSENTER
+	bool "nsenter"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_0
+	help
+	  Enter the namespaces of another process
+
+comment "nsenter needs a toolchain w/ headers >= 3.0"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_0
+
+config LINGMO_PACKAGE_UTIL_LINUX_PG
+	bool "pg"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Browse pagewise through text files
+
+config LINGMO_PACKAGE_UTIL_LINUX_PARTX
+	bool "partition utilities"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  Partition utilities (addpart, delpart, partx)
+
+config LINGMO_PACKAGE_UTIL_LINUX_PIVOT_ROOT
+	bool "pivot_root"
+	help
+	  Change the root filesystem
+
+config LINGMO_PACKAGE_UTIL_LINUX_RAW
+	bool "raw"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_14
+	help
+	  Build a linux raw character device
+
+comment "raw needs a toolchain w/ headers < 5.14"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_14
+
+config LINGMO_PACKAGE_UTIL_LINUX_RENAME
+	bool "rename"
+	help
+	  Rename files
+
+config LINGMO_PACKAGE_UTIL_LINUX_RFKILL
+	bool "rfkill"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Tool for enabling and disabling wireless devices. This new
+	  implementation is based upon, and backward compatible with,
+	  the original rfkill from Johannes Berg and Marcel Holtmann.
+
+config LINGMO_PACKAGE_UTIL_LINUX_RUNUSER
+	bool "runuser"
+	depends on (LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) # linux-pam
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # linux-pam
+	depends on LINGMO_USE_MMU # fork(), linux-pam
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # linux-pam
+	select LINGMO_PACKAGE_LINUX_PAM
+	help
+	  Run a command with substitute user and group ID (does not need
+	  to ask for a password, because it may be executed by the root
+	  user only)
+
+comment "runuser needs a uClibc or glibc toolchain w/ wchar, locale, dynamic library, gcc >= 4.9"
+	depends on !(LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) \
+		|| LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_UTIL_LINUX_SCHEDUTILS
+	bool "scheduling utilities"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_14
+	help
+	  Scheduling utilities (chrt, ionice, taskset, uclampset)
+
+comment "scheduling utilities need a toolchain w/ headers >= 3.14"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_14
+
+config LINGMO_PACKAGE_UTIL_LINUX_SETPRIV
+	bool "setpriv"
+	select LINGMO_PACKAGE_LIBCAP_NG
+	help
+	  Run a program with different Linux privilege settings
+
+config LINGMO_PACKAGE_UTIL_LINUX_SETTERM
+	bool "setterm"
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Set terminal attributes
+
+config LINGMO_PACKAGE_UTIL_LINUX_SU
+	bool "su"
+	depends on (LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) # linux-pam
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # linux-pam
+	depends on LINGMO_USE_MMU # fork(), linux-pam
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # linux-pam
+	select LINGMO_PACKAGE_LINUX_PAM
+	help
+	  Run a command with substitute user and group ID
+
+comment "su needs a uClibc or glibc toolchain w/ wchar, locale, dynamic library, gcc >= 4.9"
+	depends on !(LINGMO_ENABLE_LOCALE && LINGMO_USE_WCHAR) \
+		|| LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_UTIL_LINUX_SULOGIN
+	bool "sulogin"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Single-user login
+
+config LINGMO_PACKAGE_UTIL_LINUX_SWITCH_ROOT
+	bool "switch_root"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Switch to another filesystem as the root of the mount tree
+
+config LINGMO_PACKAGE_UTIL_LINUX_TUNELP
+	bool "tunelp"
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Set various parameters for the lp device
+
+config LINGMO_PACKAGE_UTIL_LINUX_UL
+	bool "ul"
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Do underlining
+
+config LINGMO_PACKAGE_UTIL_LINUX_UNSHARE
+	bool "unshare"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Run program with some namespaces unshared from parent
+
+config LINGMO_PACKAGE_UTIL_LINUX_UTMPDUMP
+	bool "utmpdump"
+	help
+	  Dump UTMP and WTMP files in raw format
+
+config LINGMO_PACKAGE_UTIL_LINUX_UUIDD
+	bool "uuidd"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	help
+	  UUID generation daemon
+
+config LINGMO_PACKAGE_UTIL_LINUX_VIPW
+	bool "vipw"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Edit the password, group, shadow-password or shadow-group file
+
+config LINGMO_PACKAGE_UTIL_LINUX_WAITPID
+	bool "waitpid"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_3 # pidfd_open
+	help
+	  Utility to wait for arbitrary processes
+
+comment "waitpid needs a toolchain w/ headers >= 5.3"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_3
+
+config LINGMO_PACKAGE_UTIL_LINUX_WALL
+	bool "wall"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Send a message to everybody's terminal
+
+config LINGMO_PACKAGE_UTIL_LINUX_WIPEFS
+	bool "wipefs"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  wipefs can erase filesystem, raid or partition-table
+	  signatures (magic strings) from the specified device
+	  to make the signatures invisible for libblkid. wipefs
+	  does not erase the filesystem itself nor any other data
+	  from the device.
+
+config LINGMO_PACKAGE_UTIL_LINUX_WDCTL
+	bool "wdctl"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Shows hardware watchdog status
+
+config LINGMO_PACKAGE_UTIL_LINUX_WRITE
+	bool "write"
+	help
+	  Send a message to another user
+
+config LINGMO_PACKAGE_UTIL_LINUX_ZRAMCTL
+	bool "zramctl"
+	depends on LINGMO_USE_MMU # libsmartcols
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBSMARTCOLS
+	help
+	  Set up and control zram devices
+
+endif

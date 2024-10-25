@@ -1,0 +1,76 @@
+config LINGMO_PACKAGE_QT5_GL_AVAILABLE
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+
+config LINGMO_PACKAGE_QT5_JSCORE_AVAILABLE
+	bool
+	default y
+	# Javascript engine is only available on certain architectures
+	depends on LINGMO_arm || LINGMO_aarch64 || LINGMO_i386 || LINGMO_x86_64 || LINGMO_mipsel || LINGMO_arc
+	# ARM needs BLX, so v5t+
+	depends on !LINGMO_ARM_CPU_ARMV4
+
+comment "Qt5 needs host g++ >= 5.0, and a toolchain w/ gcc >= 5.0, wchar, NPTL, C++, dynamic library"
+	depends on !LINGMO_ARM_CPU_ARMV4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS || \
+		!LINGMO_HOST_GCC_AT_LEAST_5 || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+
+menuconfig LINGMO_PACKAGE_QT5
+	bool "Qt5"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # Full C++11
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # C++11, GCC_BUG_57694
+	depends on !LINGMO_ARM_CPU_ARMV4 # needs ARMv5+
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_QT5BASE
+	help
+	  This option enables the Qt5 framework. Sub-options allow to
+	  select which modules should be built.
+
+	  http://qt.io
+
+if LINGMO_PACKAGE_QT5
+source "package/qt5/qt53d/Config.in"
+source "package/qt5/qt5base/Config.in"
+source "package/qt5/qt5charts/Config.in"
+source "package/qt5/qt5coap/Config.in"
+source "package/qt5/qt5connectivity/Config.in"
+source "package/qt5/qt5declarative/Config.in"
+source "package/qt5/qt5doc/Config.in"
+source "package/qt5/qt5enginio/Config.in"
+source "package/qt5/qt5graphicaleffects/Config.in"
+source "package/qt5/qt5imageformats/Config.in"
+source "package/qt5/qt5knx/Config.in"
+source "package/qt5/qt5location/Config.in"
+source "package/qt5/qt5lottie/Config.in"
+source "package/qt5/qt5mqtt/Config.in"
+source "package/qt5/qt5multimedia/Config.in"
+source "package/qt5/qt5opcua/Config.in"
+source "package/qt5/qt5quickcontrols/Config.in"
+source "package/qt5/qt5quickcontrols2/Config.in"
+source "package/qt5/qt5quicktimeline/Config.in"
+source "package/qt5/qt5remoteobjects/Config.in"
+source "package/qt5/qt5script/Config.in"
+source "package/qt5/qt5scxml/Config.in"
+source "package/qt5/qt5sensors/Config.in"
+source "package/qt5/qt5serialbus/Config.in"
+source "package/qt5/qt5serialport/Config.in"
+source "package/qt5/qt5speech/Config.in"
+source "package/qt5/qt5svg/Config.in"
+source "package/qt5/qt5tools/Config.in"
+source "package/qt5/qt5virtualkeyboard/Config.in"
+source "package/qt5/qt5wayland/Config.in"
+source "package/qt5/qt5webchannel/Config.in"
+source "package/qt5/qt5webkit/Config.in"
+source "package/qt5/qt5webengine/Config.in"
+source "package/qt5/qt5webengine-chromium/Config.in"
+source "package/qt5/qt5webengine-chromium-catapult/Config.in"
+source "package/qt5/qt5websockets/Config.in"
+source "package/qt5/qt5webview/Config.in"
+source "package/qt5/qt5x11extras/Config.in"
+source "package/qt5/qt5xmlpatterns/Config.in"
+endif

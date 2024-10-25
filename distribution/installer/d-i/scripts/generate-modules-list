@@ -1,0 +1,26 @@
+#!/bin/sh
+# Generates a list of all modules included in any of the d-i kernel udebs.
+# The parameter is the directory that contains the source for kernel-wedge
+# and all the packages. This is to be used in discover-data reduction.
+
+if [ -z "$1" ]; then
+	echo "Missing required parameter (kernel udebs base directory)"
+	exit 1
+fi
+
+(
+	for dir in $1/*; do
+		if [ -d "$dir" ]; then
+			for file in $(find $dir/modules -type f | grep -v .svn | grep -v .lnk); do
+				cat $file | \
+				grep -v \# | \
+				sed 's/^-//' | \
+				sed 's/ ?$//' | \
+				sed 's/ -$//' | \
+				grep -v '^$' | \
+				sed 's!.*/!!' | \
+				sed 's/\..*//'
+			done
+		fi
+	done
+) | sort | uniq

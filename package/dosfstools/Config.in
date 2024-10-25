@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_DOSFSTOOLS
+	bool "dosfstools"
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  Tools for creating and checking DOS FAT filesystems.
+
+	  https://github.com/dosfstools/dosfstools
+
+if LINGMO_PACKAGE_DOSFSTOOLS
+
+config LINGMO_PACKAGE_DOSFSTOOLS_FATLABEL
+	bool "fatlabel"
+	help
+	  Get or set the DOS FAT filesystem label.
+
+config LINGMO_PACKAGE_DOSFSTOOLS_FSCK_FAT
+	bool "fsck.fat"
+	help
+	  Check a DOS FAT filesystem.
+
+config LINGMO_PACKAGE_DOSFSTOOLS_MKFS_FAT
+	bool "mkfs.fat"
+	help
+	  Creates a DOS FAT filesystem on a device.
+
+endif
+
+comment "dosfstools needs a toolchain w/ wchar"
+	depends on !LINGMO_USE_WCHAR

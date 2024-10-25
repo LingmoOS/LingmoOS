@@ -1,0 +1,57 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Thu, 10 Dec 2020 17:31:39 +0100
+Subject: kbuild: Look for module.lds under arch directory too
+Forwarded: not-needed
+Bug-Debian: https://bugs.debian.org/975571
+
+The module.lds linker script is now built under the scripts directory,
+where previously it was under arch/$(SRCARCH).
+
+However, we package the scripts directory as linux-kbuild, which is
+meant to be able to do support native and cross-builds.  That means it
+shouldn't contain files for a specific target architecture without a
+wrapper to select between them, and it doesn't appear that linker
+scripts are powerful enough to implement such a wrapper.
+
+Building module.lds in a different location would require relatively
+large changes.  Moving it in the package build rules can work, but we
+need to support custom kernel builds from the same source so we can't
+assume it's moved.
+
+Therefore, we move module.lds under the arch build directory in
+rules.real and change Makefile.modfinal to look for it in both places.
+
+---
+ scripts/Makefile.modfinal | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.modfinal b/scripts/Makefile.modfinal
+index 8568d256d6fb..415cff66539b 100644
+--- a/scripts/Makefile.modfinal
++++ b/scripts/Makefile.modfinal
+@@ -28,11 +28,13 @@ quiet_cmd_cc_o_c = CC [M]  $@
+ %.mod.o: %.mod.c FORCE
+ 	$(call if_changed_dep,cc_o_c)
+ 
++ARCH_MODULE_LDS := $(word 1,$(wildcard scripts/module.lds arch/$(SRCARCH)/module.lds))
++
+ quiet_cmd_ld_ko_o = LD [M]  $@
+       cmd_ld_ko_o +=							\
+ 	$(LD) -r $(KBUILD_LDFLAGS)					\
+ 		$(KBUILD_LDFLAGS_MODULE) $(LDFLAGS_MODULE)		\
+-		-T scripts/module.lds -o $@ $(filter %.o, $^)
++		-T $(ARCH_MODULE_LDS) -o $@ $(filter %.o, $^)
+ 
+ quiet_cmd_btf_ko = BTF [M] $@
+       cmd_btf_ko = 							\
+@@ -52,7 +54,7 @@ if_changed_except = $(if $(call newer_prereqs_except,$(2))$(cmd-check),      \
+ 	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+ 
+ # Re-generate module BTFs if either module's .ko or vmlinux changed
+-%.ko: %.o %.mod.o scripts/module.lds $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
++%.ko: %.o %.mod.o $(ARCH_MODULE_LDS) $(and $(CONFIG_DEBUG_INFO_BTF_MODULES),$(KBUILD_BUILTIN),vmlinux) FORCE
+ 	+$(call if_changed_except,ld_ko_o,vmlinux)
+ ifdef CONFIG_DEBUG_INFO_BTF_MODULES
+ 	+$(if $(newer-prereqs),$(call cmd,btf_ko))
+-- 
+2.42.0

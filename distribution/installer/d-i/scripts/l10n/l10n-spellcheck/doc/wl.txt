@@ -1,0 +1,52 @@
+*** Wordlists
+
+Wordlists are simple text file containing a list of words not
+contained in aspell-lang dictionary.
+
+
+*** Creating language custom wordlists
+
+* Encoding
+
+Encoding is specified in the language.dat file contained in the
+aspell-lang source package.
+
+Every wordlist has to be encoded as specified in the lang.dat file,
+so for example "fr" and "it" use iso-8859-1, whereas "ro" uses
+iso-8859-2 and "el" uses iso8859-7. To find out the encoding utilised
+for a particular language, you can either look the lang.dat file
+contained in the source of aspell-lang, or run the following commands
+(aspell-lang has to be already installed on the system):
+
+# This should find out where dictionaries are stored
+DICT_DIR=$(aspell dump config | grep "actual-dict-dir")
+
+# This should show  the content of the dat file
+cat ${DICT_DIR}/lang.dat 
+
+As for aspell-0.5x, custom wordlists for a certain language, inherit
+their properties (not only the encoding) from the lang.dat file: this
+means that if you want to use words containing special characters (as
+"-" or ".") you should make sure it is possible to do so.
+The following command can be use to test it (the sed command is used
+to filter out comments starting with a '#' character):
+
+cat lang_wl.txt | sed "s:\(^#.*\)::" | aspell --lang=lang create master ./lang_wl
+
+
+*** common wordlist
+
+The common wordlist has to work with all languages, so it must be
+generic as not to break any local rule; every language-specific
+wordlist, before being compiled, is merged with the common wordlists:
+
+cat lang_wl.txt common_wl.txt > lang_prj_wl.txt
+
+*all* the language-specific lists (including those not configured as
+to use special chars)... that's why you cannot use special characters
+in it and you have to include them in the 
+
+> you cannot use special chars such as "-" or "." in the common wl all 
+> words containing such chars have to be in the language-specific wl
+> 
+

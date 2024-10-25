@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_GVFS
+	bool "gvfs"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_USE_MMU # dbus, glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus, glib2
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_GSETTINGS_DESKTOP_SCHEMAS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_SHARED_MIME_INFO
+	help
+	  gvfs is a userspace virtual filesystem where mount runs as a
+	  separate processes which you talk to via D-Bus. It also
+	  contains a gio module that seamlessly adds gvfs support to
+	  all applications using the gio API. It also supports exposing
+	  the gvfs mounts to non-gio applications using fuse.
+
+	  https://wiki.gnome.org/action/show/Projects/gvfs
+
+comment "gvfs needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

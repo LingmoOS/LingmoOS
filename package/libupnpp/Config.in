@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_LIBUPNPP
+	bool "libupnpp"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnpupnp
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBNPUPNP
+	help
+	  The libupnpp C++ library wraps libupnp for easier use by
+	  upmpdcli and upplay.
+
+	  http://www.lesbonscomptes.com/upmpdcli/
+
+comment "libupnpp needs a toolchain w/ C++, threads, gcc >= 4.9"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

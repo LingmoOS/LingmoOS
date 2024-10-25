@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_SDBUSPLUS
+	bool "sdbusplus"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_SYSTEMD
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	help
+	  A C++ library for sd-bus with a bindings and doc generator.
+
+	  This will build the target library.  See the host package for
+	  the bindings and documentation generation program.
+
+	  https://github.com/openbmc/sdbusplus
+
+comment "sdbusplus needs systemd and a toolchain w/ C++, gcc >= 7"
+	depends on !LINGMO_PACKAGE_SYSTEMD || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

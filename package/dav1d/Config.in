@@ -1,0 +1,12 @@
+config LINGMO_PACKAGE_DAV1D
+	bool "dav1d"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # pthread
+	help
+	  dav1d is a new AV1 cross-platform decoder, open-source, and
+	  focused on speed and correctness.
+
+	  https://code.videolan.org/videolan/dav1d
+
+comment "dav1d needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

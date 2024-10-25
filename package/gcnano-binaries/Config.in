@@ -1,0 +1,39 @@
+comment "gcnano-binaries needs a Linux kernel to be built"
+	depends on LINGMO_arm
+	depends on !LINGMO_LINUX_KERNEL
+
+comment "gcnano-binaries needs a glibc toolchain w/ threads, dynamic library"
+	depends on LINGMO_arm
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_GCNANO_BINARIES
+	bool "gcnano-binaries"
+	depends on LINGMO_arm
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm, wayland
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBGBM
+	select LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_FORMAT_MODIFIER_PLANE_COUNT
+	select LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF
+	select LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_WAYLAND
+	help
+	  Driver and libraries for stm vivante gcnano gpu.
+	  https://github.com/STMicroelectronics/gcnano-binaries/
+
+if LINGMO_PACKAGE_GCNANO_BINARIES
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "gcnano-binaries"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGBM
+	default "gcnano-binaries"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "gcnano-binaries"
+
+endif

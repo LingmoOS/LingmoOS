@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_KYUA
+	bool "kyua"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_HAS_LUAINTERPRETER # lutok
+	depends on !LINGMO_PACKAGE_LUAJIT # lutok
+	depends on !LINGMO_STATIC_LIBS # lutok
+	depends on LINGMO_USE_MMU # atf
+	select LINGMO_PACKAGE_ATF
+	select LINGMO_PACKAGE_LUTOK
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  Kyua is a testing framework for infrastructure software,
+	  originally designed to equip BSD-based operating systems
+	  with a test suite. This means that Kyua is lightweight
+	  and simple, and that Kyua integrates well with various build
+	  systems and continuous integration frameworks.
+
+	  https://github.com/jmmv/kyua
+
+comment "kyua needs a toolchain w/ C++, dynamic library and full Lua"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_PACKAGE_LUAJIT || LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_HAS_LUAINTERPRETER
+	depends on LINGMO_USE_MMU

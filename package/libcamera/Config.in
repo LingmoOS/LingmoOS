@@ -1,0 +1,105 @@
+config LINGMO_PACKAGE_LIBCAMERA_ARCH_SUPPORTS
+	bool
+	default y
+	# Invalid packing size of ControlValue struct on m68k
+	depends on !LINGMO_m68k
+	depends on !LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_27597
+
+menuconfig LINGMO_PACKAGE_LIBCAMERA
+	bool "libcamera"
+	depends on LINGMO_PACKAGE_LIBCAMERA_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17
+	depends on !LINGMO_STATIC_LIBS # gnutls
+	depends on LINGMO_USE_WCHAR # gnutls
+	select LINGMO_PACKAGE_GNUTLS
+	select LINGMO_PACKAGE_LIBYAML
+	select LINGMO_PACKAGE_LIBCAMERA_PIPELINE_UVCVIDEO if !LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  libcamera provides a software stack to support
+	  complex devices that need heavy hardware image
+	  processing operations.
+
+	  http://www.libcamera.org/
+
+if LINGMO_PACKAGE_LIBCAMERA
+
+config LINGMO_PACKAGE_LIBCAMERA_V4L2
+	bool "libcamera v4l2 compatibility layer"
+	help
+	  libcamera v4l2 compatibility layer
+
+config LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	bool
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_IMX8_ISI
+	bool "imx8-isi pipeline"
+	depends on LINGMO_arm || LINGMO_aarch64
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for i.MX8 SoC ISI capture interface.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_IPU3
+	bool "ipu3 pipeline"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for Intel IPU3.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_RKISP1
+	bool "rkisp1 pipeline"
+	depends on LINGMO_arm || LINGMO_aarch64
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for Rockchip ISP1.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_RPI_VC4
+	bool "rpi/vc4 pipeline"
+	depends on LINGMO_arm || LINGMO_aarch64
+	depends on LINGMO_USE_WCHAR # boost (already enforced for gnutls)
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for Raspberry Pi devices.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_SIMPLE
+	bool "simple pipeline"
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for simple pipelines.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_UVCVIDEO
+	bool "uvcvideo pipeline"
+	help
+	  Pipeline for uvcvideo devices.
+
+config LINGMO_PACKAGE_LIBCAMERA_PIPELINE_VIMC
+	bool "vimc pipeline"
+	select LINGMO_PACKAGE_LIBCAMERA_HAS_PIPELINE
+	help
+	  Pipeline for the vimc device.
+
+config LINGMO_PACKAGE_LIBCAMERA_COMPLIANCE
+	bool "lc-compliance test application"
+	depends on LINGMO_USE_WCHAR # gtest
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # gtest
+	depends on LINGMO_INSTALL_LIBSTDCPP # gtest
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # gtest
+	depends on LINGMO_USE_MMU # gtest
+	select LINGMO_PACKAGE_GTEST
+	select LINGMO_PACKAGE_LIBEVENT
+	help
+	  lc-compliance test application
+
+comment "lc-compliance test application needs a toolchain w/ C++, wchar, threads, gcc >= 5"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+
+endif # LINGMO_PACKAGE_LIBCAMERA
+
+comment "libcamera needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8"
+	depends on LINGMO_PACKAGE_LIBCAMERA_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR

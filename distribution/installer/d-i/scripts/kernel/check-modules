@@ -1,0 +1,47 @@
+#! /bin/sh
+
+# This script does a rough check to see if any modules listed for udebs
+# are still provided by current kernels.
+
+# The script currently only works for Linux kernels, not for kfreebsd.
+
+# IMPORTANT - IMPORTANT - IMPORTANT
+# Make sure that kernels for *all* architectures are extracted before running
+# the script. This can be done by running './massbuild kbuild -k'.
+
+# IMPORTANT - IMPORTANT - IMPORTANT
+# The output of this script should be used as an indication only.
+# Always double-check before removing any modules, ideally also by looking
+# if a driver is still available in upstream kernel source.
+# Also keep in mind backwards compatibility with recent kernel versions.
+
+for mfile in kernel-wedge/modules/*; do
+	echo "Processing $mfile"
+	modules=$(grep -v "^#" $mfile | sed -r "s/[[:space:]]+[?-].*//")
+	for module in $modules; do
+		m=$(echo $module | sed "s/[-_]/[-_]/g")
+		if [ -z "$(find */lib/modules/ -name $m.ko)" ]; then
+			echo "$module"
+		fi
+	done
+done
+
+for dir in linux-kernel-di-*; do
+	echo
+	arch=$(echo $dir | cut -d- -f4)
+	echo "Architecture $arch"
+	if [ ! -d $arch/lib/modules ]; then
+		echo "FATAL: no extracted kernels for $arch"
+		continue
+	fi
+	for mfile in linux-kernel-di-$arch-2.6/modules/*/*; do
+		echo "Processing $mfile"
+		modules=$(grep -v "^#" $mfile | sed -r "s/[[:space:]]+[?-].*//")
+		for module in $modules; do
+			m=$(echo $module | sed "s/[-_]/[-_]/g")
+			if [ -z "$(find $arch/lib/modules/ -name $m.ko)" ]; then
+				echo "$module"
+			fi
+		done
+	done
+done

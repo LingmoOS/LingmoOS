@@ -1,0 +1,46 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Wed, 5 Jun 2024 09:25:30 +0000
+Subject: [PATCH 33/48] printk: nbcon: Fix nbcon_cpu_emergency_flush() when
+ preemptible
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+nbcon_cpu_emergency_flush() can be called in a preemptible
+context. In that case the CPU is not in an emergency state.
+However, in order to see that the CPU is not in an emergency
+state (accessing the per-cpu variable), preemption must be
+disabled.
+
+Disable preemption when checking the CPU state.
+
+Reported-by: Juri Lelli <juri.lelli@redhat.com>
+Closes: https://lore.kernel.org/aqkcpca4vgadxc3yzcu74xwq3grslj5m43f3eb5fcs23yo2gy4@gcsnqcts5tos
+Fixes: 46a1379208b7 ("printk: nbcon: Implement emergency sections")
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/nbcon.c |   13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -1443,8 +1443,19 @@ void nbcon_cpu_emergency_exit(void)
+  */
+ void nbcon_cpu_emergency_flush(void)
+ {
++	bool is_emergency;
++
++	/*
++	 * If this context is not an emergency context, preemption might be
++	 * enabled. To be sure, disable preemption when checking if this is
++	 * an emergency context.
++	 */
++	preempt_disable();
++	is_emergency = (*nbcon_get_cpu_emergency_nesting() != 0);
++	preempt_enable();
++
+ 	/* The explicit flush is needed only in the emergency context. */
+-	if (*(nbcon_get_cpu_emergency_nesting()) == 0)
++	if (!is_emergency)
+ 		return;
+ 
+ 	nbcon_atomic_flush_pending();

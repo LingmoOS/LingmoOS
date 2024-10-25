@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+# Exit if system is not a live system
+if ! grep -qs "boot=live" /proc/cmdline || \
+# Exit if system is toram
+   grep -qs "toram" /proc/cmdline
+then
+	exit 0
+fi
+
+# Try to cache everything we're likely to need after ejecting.  This
+# is fragile and simple-minded, but our options are limited.
+cache_path()
+{
+	path="${1}"
+
+	if [ -d "${path}" ]
+	then
+		find "${path}" -type f | xargs cat > /dev/null 2>&1
+	elif [ -f "${path}" ]
+	then
+		if [ -x /usr/bin/file ] && file -L "${path}" | grep -q 'dynamically linked'
+		then
+			# ldd output can be of three forms:
+			# 1. linux-vdso.so.1 =>  (0x00007fffe3fb4000)
+			#    This is a virtual, kernel shared library and we want to skip it
+			# 2. libc.so.6 => /lib/libc.so.6 (0x00007f5e9dc0c000)
+			#    We want to cache the third word.
+			# 3. /lib64/ld-linux-x86-64.so.2 (0x00007f5e9df8b000)
+			#    We want to cache the first word.
+			ldd "${path}" | while read line
+			do
+				if echo "$line" | grep -qs ' =>  '
+				then
+					continue
+				elif echo "$line" | grep -qs ' => '
+				then
+					lib=$(echo "${line}" | awk '{ print $3 }')
+				else
+					lib=$(echo "${line}" | awk '{ print $1 }')
+				fi
+				cache_path "${lib}"
+			done
+		fi
+
+		cat "${path}" >/dev/null 2>&1
+	fi
+}
+
+echo "live-tools: caching reboot files..."
+
+prompt=1
+
+case "${NOPROMPT}" in
+	yes)
+		prompt=
+		;;
+esac
+
+for path in $(which halt) $(which reboot) /etc/rc?.d /etc/default $(which stty) /bin/plymouth
+do
+	cache_path "${path}"
+done
+
+mount -o remount,ro /run/live/overlay > /dev/null 2>&1
+
+# Remounting any persistence devices read-only
+for _MOUNT in $(awk '/\/run\/live\/persistence/ { print $2 }' /proc/mounts)
+do
+	mount -o remount,ro ${_MOUNT} > /dev/null 2>&1
+done
+
+# Flush filesystem buffers
+sync

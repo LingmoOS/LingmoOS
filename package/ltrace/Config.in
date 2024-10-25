@@ -1,0 +1,31 @@
+config LINGMO_PACKAGE_LTRACE_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm
+	default y if LINGMO_i386
+	default y if LINGMO_mips
+	default y if LINGMO_mipsel
+	default y if LINGMO_powerpc
+	default y if LINGMO_sparc
+	default y if LINGMO_x86_64
+	default y if LINGMO_xtensa
+
+config LINGMO_PACKAGE_LTRACE
+	bool "ltrace"
+	depends on LINGMO_USE_WCHAR # elfutils
+	depends on !LINGMO_STATIC_LIBS # elfutils
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # elfutils
+	depends on LINGMO_PACKAGE_LTRACE_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_ELFUTILS
+	help
+	  Debugging program which runs a specified command until it
+	  exits. While the command is executing, ltrace intercepts and
+	  records the dynamic library calls which are called by the
+	  executed process and the signals received by that process.
+
+	  http://ltrace.org
+
+comment "ltrace needs a toolchain w/ wchar, dynamic library, threads"
+	depends on LINGMO_PACKAGE_LTRACE_ARCH_SUPPORTS
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS

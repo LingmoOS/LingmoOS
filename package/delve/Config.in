@@ -1,0 +1,22 @@
+# Supported architectures are listed in
+# pkg/proc/native/support_sentinel.go
+config LINGMO_PACKAGE_DELVE_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+
+config LINGMO_PACKAGE_DELVE
+	bool "delve"
+	depends on LINGMO_PACKAGE_DELVE_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  Delve is a debugger for the Go programming language.
+
+	  https://github.com/go-delve/delve
+
+comment "delve needs a toolchain w/ threads"
+	depends on LINGMO_PACKAGE_DELVE_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,39 @@
+#!/bin/sh
+# Sets up a preseed/t/$MACHINE file based on some environment variables.
+# This is mostly useful if you're netbooting and out of kernel command line
+# space, and need to vary some options on a per scheme basis. It also is
+# used for preseeding passwords.
+f=$DI_TESTDIR/preseed/t/$MACHINE
+rm -f $f
+echo "# Automatically generated for $SCHEME digress test" >> $f
+
+if [ -n "$TASK" ]; then
+	echo "d-i preseed/include string ../task/$TASK.cfg" >> $f
+fi
+
+if [ -n "$SUITE" ]; then
+	echo "d-i mirror/suite string $SUITE" >> $f
+fi
+
+if [ -n "$USER" ]; then
+	echo "passwd passwd/username string $USER" >> $f
+	echo "passwd passwd/user-fullname string $USER" >> $f
+fi
+
+if [ -n "$ROOT_PASSWORD" ]; then
+	echo "passwd passwd/root-password-crypted password $(echo "$ROOT_PASSWORD" | mkpasswd -s -H MD5)" >> $f
+fi
+
+if [ -n "$USER_PASSWORD" ]; then
+	echo "passwd passwd/user-password-crypted password $(echo "$USER_PASSWORD" | mkpasswd -s -H MD5)" >> $f
+fi
+
+if [ -n "$HP_ILO_STAGE2_CD_HACK" ]; then
+	echo "base-config base-config/early_command string wget $HP_ILO_ISO_URL -O /var/tmp/install.iso; mount -o loop /var/tmp/install.iso /cdrom" >> $f
+	echo "apt-setup apt-setup/uri_type select filesystem" >> $f
+	echo "apt-setup apt-setup/directory string /cdrom" >> $f
+fi
+
+if [ -n "$PRIORITY" ]; then
+	echo "debconf debconf/priority string $PRIORITY" >> $f
+fi

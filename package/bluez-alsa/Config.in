@@ -1,0 +1,47 @@
+config LINGMO_PACKAGE_BLUEZ_ALSA
+	bool "bluez-alsa"
+	depends on !LINGMO_STATIC_LIBS # bluez5
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C11/stdatomic.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 # bluez5
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # bluez5
+	depends on LINGMO_USE_MMU # bluez5 -> dbus
+	depends on LINGMO_USE_WCHAR # libglib2
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+	select LINGMO_PACKAGE_BLUEZ5_UTILS
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_AUDIO
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_SBC
+	# samplerate ALSA plugin is needed for proper sample rate
+	# conversion with Bluetooth devices
+	select LINGMO_PACKAGE_LIBSAMPLERATE if LINGMO_PACKAGE_ALSA_PLUGINS
+	help
+	  Bluetooth Audio ALSA Backend.
+
+	  https://github.com/Arkq/bluez-alsa
+
+if LINGMO_PACKAGE_BLUEZ_ALSA
+
+config LINGMO_PACKAGE_BLUEZ_ALSA_HCITOP
+	bool "hcitop"
+	depends on LINGMO_PACKAGE_LIBBSD_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_LIBBSD
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Enable top-like monitoring tool for HCI.
+
+config LINGMO_PACKAGE_BLUEZ_ALSA_RFCOMM
+	bool "rfcomm"
+	select LINGMO_PACKAGE_READLINE
+	help
+	  Simple tool for sending RFCOMM commands.
+
+endif
+
+comment "bluez-alsa needs a toolchain w/ wchar, NPTL, headers >= 3.4, dynamic library, gcc >= 4.9"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU

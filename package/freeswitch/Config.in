@@ -1,0 +1,38 @@
+config LINGMO_PACKAGE_FREESWITCH
+	bool "freeswitch"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # apr, included in freeswitch source
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # apr, included in freeswitch source
+	depends on LINGMO_USE_WCHAR # uses wchar_t
+	select LINGMO_PACKAGE_FFMPEG_SWSCALE if LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_JPEG
+	# src/mod/applications/mod_cv/mod_cv.cpp includes
+	# highgui.h, imgproc.hpp & objdetect.hpp
+	select LINGMO_PACKAGE_OPENCV3_LIB_HIGHGUI if LINGMO_PACKAGE_OPENCV3
+	select LINGMO_PACKAGE_OPENCV3_LIB_IMGPROC if LINGMO_PACKAGE_OPENCV3
+	select LINGMO_PACKAGE_OPENCV3_LIB_OBJDETECT if LINGMO_PACKAGE_OPENCV3
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PCRE
+	select LINGMO_PACKAGE_SOFIA_SIP
+	select LINGMO_PACKAGE_SPANDSP
+	select LINGMO_PACKAGE_SPEEX
+	select LINGMO_PACKAGE_SPEEXDSP
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_TIFF
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  FreeSWITCH is a scalable open source cross-platform
+	  telephony platform designed to route and interconnect
+	  popular communication protocols using audio, video, text or
+	  any other form of media.
+
+	  https://www.freeswitch.org
+
+comment "freeswitch needs a toolchain w/ C++, dynamic library, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR

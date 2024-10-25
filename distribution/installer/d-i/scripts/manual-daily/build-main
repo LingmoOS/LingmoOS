@@ -1,0 +1,25 @@
+#!/bin/bash
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+RET=0
+export DI_BUILDING_FROM_MAIN=1
+
+# First build the manual
+# Pass all parameters to actual build script
+$ROOT/bin/build-manual $@ || RET=$?
+
+# Next build the developers reference
+# Errors in this build do not affect the overall build result
+if [ $RET = 0 ] || [ $RET = 999 ]; then
+	$ROOT/bin/build-devref
+fi
+
+if [ $RET = 0 ] || [ $RET = 999 ]; then
+	$ROOT/bin/mail-logs
+else
+	echo "Build failed, not sending logs"
+fi
+
+exit 0

@@ -1,0 +1,22 @@
+[Unit]
+Description=Hyper-V key-value pair (KVP) daemon
+DefaultDependencies=no
+Before=sysinit.target shutdown.target
+Conflicts=hyperv-daemons.hv-kvp-daemon.service shutdown.target
+BindsTo=sys-devices-virtual-misc-vmbus\x21hv_kvp.device
+IgnoreOnIsolate=1
+
+[Service]
+ExecStart=/usr/sbin/hv_kvp_daemon -n
+CapabilityBoundingSet=
+DeviceAllow=/dev/vmbus/hv_kvp
+NoNewPrivileges=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+StateDirectory=hyperv
+
+[Install]
+WantedBy=multi-user.target

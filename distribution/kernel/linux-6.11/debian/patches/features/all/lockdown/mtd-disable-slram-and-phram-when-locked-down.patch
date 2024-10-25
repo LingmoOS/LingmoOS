@@ -1,0 +1,75 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 30 Aug 2019 15:54:24 +0100
+Subject: mtd: phram,slram: Disable when the kernel is locked down
+Forwarded: https://lore.kernel.org/linux-security-module/20190830154720.eekfjt6c4jzvlbfz@decadent.org.uk/
+
+These drivers allow mapping arbitrary memory ranges as MTD devices.
+This should be disabled to preserve the kernel's integrity when it is
+locked down.
+
+* Add the HWPARAM flag to the module parameters
+* When slram is built-in, it uses __setup() to read kernel parameters,
+  so add an explicit check security_locked_down() check
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Cc: Matthew Garrett <mjg59@google.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: Joern Engel <joern@lazybastard.org>
+Cc: linux-mtd@lists.infradead.org
+---
+ drivers/mtd/devices/phram.c | 6 +++++-
+ drivers/mtd/devices/slram.c | 9 ++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+--- a/drivers/mtd/devices/phram.c
++++ b/drivers/mtd/devices/phram.c
+@@ -364,7 +364,11 @@ static int phram_param_call(const char *
+ #endif
+ }
+ 
+-module_param_call(phram, phram_param_call, NULL, NULL, 0200);
++static const struct kernel_param_ops phram_param_ops = {
++	.set = phram_param_call
++};
++__module_param_call(MODULE_PARAM_PREFIX, phram, &phram_param_ops, NULL,
++		    0200, -1, KERNEL_PARAM_FL_HWPARAM | hwparam_iomem);
+ MODULE_PARM_DESC(phram, "Memory region to map. \"phram=<name>,<start>,<length>[,<erasesize>]\"");
+ 
+ #ifdef CONFIG_OF
+--- a/drivers/mtd/devices/slram.c
++++ b/drivers/mtd/devices/slram.c
+@@ -43,6 +43,7 @@
+ #include <linux/ioctl.h>
+ #include <linux/init.h>
+ #include <linux/io.h>
++#include <linux/security.h>
+ 
+ #include <linux/mtd/mtd.h>
+ 
+@@ -65,7 +66,7 @@ typedef struct slram_mtd_list {
+ #ifdef MODULE
+ static char *map[SLRAM_MAX_DEVICES_PARAMS];
+ 
+-module_param_array(map, charp, NULL, 0);
++module_param_hw_array(map, charp, iomem, NULL, 0);
+ MODULE_PARM_DESC(map, "List of memory regions to map. \"map=<name>, <start>, <length / end>\"");
+ #else
+ static char *map;
+@@ -281,11 +282,17 @@ static int __init init_slram(void)
+ #ifndef MODULE
+ 	char *devstart;
+ 	char *devlength;
++	int ret;
+ 
+ 	if (!map) {
+ 		E("slram: not enough parameters.\n");
+ 		return(-EINVAL);
+ 	}
++
++	ret = security_locked_down(LOCKDOWN_MODULE_PARAMETERS);
++	if (ret)
++		return ret;
++
+ 	while (map) {
+ 		devname = devstart = devlength = NULL;
+ 

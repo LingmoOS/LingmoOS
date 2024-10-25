@@ -1,0 +1,26 @@
+comment "spice server needs a toolchain w/ wchar, threads, C++"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_SPICE
+	bool "spice server"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PIXMAN
+	select LINGMO_PACKAGE_SPICE_PROTOCOL
+	help
+	  The Spice project aims to provide a complete open source
+	  solution for interaction with virtualized desktop devices.
+	  The Spice project deals with both the virtualized devices
+	  and the front-end. Interaction between front-end and
+	  back-end is done using VD-Interfaces.
+
+	  This package implements the server-part of Spice.
+
+	  http://www.spice-space.org/

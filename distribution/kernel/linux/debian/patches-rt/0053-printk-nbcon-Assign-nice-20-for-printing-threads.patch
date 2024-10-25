@@ -1,0 +1,48 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Wed, 4 Sep 2024 14:11:35 +0206
+Subject: [PATCH 53/54] printk: nbcon: Assign nice -20 for printing threads
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+It is important that console printing threads are scheduled
+shortly after a printk call and with generous runtime budgets.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240904120536.115780-17-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/nbcon.c  |    6 ++++++
+ kernel/printk/printk.c |    6 ++++++
+ 2 files changed, 12 insertions(+)
+
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -1321,6 +1321,12 @@ bool nbcon_kthread_create(struct console
+ 
+ 	con->kthread = kt;
+ 
++	/*
++	 * It is important that console printing threads are scheduled
++	 * shortly after a printk call and with generous runtime budgets.
++	 */
++	sched_set_normal(con->kthread, -20);
++
+ 	return true;
+ }
+ 
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -3556,6 +3556,12 @@ static bool legacy_kthread_create(void)
+ 
+ 	printk_legacy_kthread = kt;
+ 
++	/*
++	 * It is important that console printing threads are scheduled
++	 * shortly after a printk call and with generous runtime budgets.
++	 */
++	sched_set_normal(printk_legacy_kthread, -20);
++
+ 	return true;
+ }
+ 

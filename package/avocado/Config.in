@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_AVOCADO
+	bool "avocado"
+	depends on LINGMO_USE_WCHAR # python3
+	depends on LINGMO_USE_MMU # python3
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # python3
+	depends on !LINGMO_STATIC_LIBS # python3
+	select LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_PYTHON3_BZIP2
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT
+	select LINGMO_PACKAGE_PYTHON3_SQLITE
+	select LINGMO_PACKAGE_PYTHON3_XZ
+	select LINGMO_PACKAGE_PYTHON_SETUPTOOLS # runtime, pkg_resources
+	help
+	  Avocado is an automated testing suite containing
+	  tests for various subsystems.
+
+	  https://avocado-framework.readthedocs.io/
+
+comment "avocado needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

@@ -1,0 +1,34 @@
+commit 14b06f5be2dfe9c9be72df04af1542618d5d6b24
+Author: Joey Hess <joey@kitenet.net>
+Date:   Wed Oct 20 21:51:34 2010 -0400
+
+    hack: strip paths for fast-import
+    
+    Newer versions of git don't like to fast-import "M /path/file" ,
+    and that happens when d-i.conf matches w/o a trailing slash. hack a fix
+
+diff --git a/src/repository.cpp b/src/repository.cpp
+index a0e5f4c..f24dd98 100644
+--- a/src/repository.cpp
++++ b/src/repository.cpp
+@@ -305,6 +305,7 @@ void Repository::Transaction::deleteFile(const QString &path)
+ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint64 length)
+ {
+     int mark = ++repository->lastmark;
++    char *p;
+ 
+     if (modifiedFiles.capacity() == 0)
+         modifiedFiles.reserve(2048);
+@@ -313,7 +314,11 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
+     modifiedFiles.append(" :");
+     modifiedFiles.append(QByteArray::number(mark));
+     modifiedFiles.append(' ');
+-    modifiedFiles.append(path.toUtf8());
++    QByteArray ba = path.toUtf8();
++    p = ba.data();
++    if (p[0] == '/') p++; /* git does not like paths starting with a /, this hack allows d-i.conf to leave off
++			     trailing slashes to catch deleted directories w/o git blowing up JEH */
++    modifiedFiles.append(p);
+     modifiedFiles.append("\n");
+ 
+ #ifndef DRY_RUN

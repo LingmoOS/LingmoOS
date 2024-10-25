@@ -1,0 +1,21 @@
+#!/bin/sh
+# Use this as a PREBOOT command if you're netbooting something else
+# along with d-i. This sets a symlink to point to the thing to boot.
+# In dhcpd.conf you might put:
+#   filename "/ia64-boot/elilo.efi";
+# Then set NETBOOT_IMAGE_DIR to point to the directory containing the elilo.efi
+# that you want to boot, and the ia64-boot link will be pointed to that
+# directory by this script.
+set -e
+cd $TFTP_DIR
+if [ -e $ARCH-boot ]; then
+	rm $ARCH-boot
+fi
+ln -sf $NETBOOT_IMAGE_DIR $ARCH-boot
+
+# Also update pxelinux links to use the $ARCH-boot dir, the d-i tarball
+# sets up links that do not.
+if [ "$ARCH" = i386 ]; then
+	ln -sf $ARCH-boot/pxelinux.0
+	ln -sf $ARCH-boot/pxelinux.cfg
+fi

@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_HEIRLOOM_MAILX
+	bool "heirloom-mailx"
+	# uses fork()
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC2 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  Heirloom mailx (previously known as nail) is a mail user
+	  agent for Unix systems.
+
+	  It can be used as a command-line mail reader, but also more
+	  importantly on embedded systems, as a mail composition
+	  program and SMTP client, in order to send e-mail from shell
+	  scripts. It supports SMTP authentication (login, plain,
+	  cram-md5), SMTPS, MIME encoding of attachements, and more.
+
+	  http://heirloom.sourceforge.net/mailx.html
+
+comment "heirloom-mailx needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU

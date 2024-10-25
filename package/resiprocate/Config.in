@@ -1,0 +1,50 @@
+comment "resiprocate needs a toolchain w/ C++, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_RESIPROCATE
+	bool "resiprocate"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_C_ARES
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  reSIProcate is a framework that aims to fully implement the
+	  SIP protocol in first class C++. It is intended for use in
+	  other applications, such as the repro SIP proxy.
+
+	  By default this package provides the core libraries: librutil
+	  (utilities), libresip (SIP stack/RFC compliant message
+	  parsing) and libdum (SIP Dialog Usage Manager, a state
+	  machine for SIP dialogs).
+
+	  https://www.resiprocate.org/
+
+if LINGMO_PACKAGE_RESIPROCATE
+
+config LINGMO_PACKAGE_RESIPROCATE_DTLS_SUPPORT
+	bool "DTLS support"
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  Enable DTLS support (requires OpenSSL)
+
+config LINGMO_PACKAGE_RESIPROCATE_REND
+	bool "resiprocate-rend"
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_POPT
+	help
+	  Rend is tool that is was created specifically to load test
+	  gtSIP based presence servers.
+
+config LINGMO_PACKAGE_RESIPROCATE_APPS
+	bool "resiprocate-apps"
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PCRE
+	help
+	  Build apps clicktocall and sipdial
+
+endif # LINGMO_PACKAGE_RESIPROCATE

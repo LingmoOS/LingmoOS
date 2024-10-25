@@ -1,0 +1,35 @@
+#!/bin/sh
+# Configures git repositories at or below the pwd, to have an "ubuntu"
+# remote that uses cjwatson's git exports of from ubuntu's d-i bzr repos.
+# Also pulls from each. Can be re-run when new repos are added, or just to
+# update.
+# 
+# Depends: mr (>= 1.02)
+
+case "$1" in
+"")
+	mr run $(perl -e 'use Cwd; print Cwd::abs_path(shift)' $0) setup
+;;
+setup)
+	if [ ! -d .git ]; then
+		exit 0
+	fi
+
+	repo=$(basename "$MR_REPO")
+	  
+	if ! git remote | grep -q '^ubuntu$'; then
+		git remote add ubuntu --no-tags \
+			"git://alioth.debian.org/~cjwatson/d-i-ubuntu/$repo"
+	fi
+
+	if ! git fetch ubuntu; then
+		echo "Failed to fetch from ubuntu -- probably this repo is not modified by them. Removing remote."
+		git remote rm ubuntu
+		exit 1
+	fi
+;;
+*)
+	echo "error: bad parameter $1" >&2
+	exit 1
+;;
+esac

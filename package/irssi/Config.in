@@ -1,0 +1,31 @@
+config LINGMO_PACKAGE_IRSSI
+	bool "irssi"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  Irssi is a terminal based IRC client for UNIX systems.
+
+	  http://irssi.org/
+
+if LINGMO_PACKAGE_IRSSI
+
+config LINGMO_PACKAGE_IRSSI_PROXY
+	bool "proxy module"
+	help
+	  Build the irssi proxy module, which allows an IRC connection
+	  to be shared among multiple clients.
+
+config LINGMO_PACKAGE_IRSSI_TRUE_COLOR
+	bool "true color support"
+	help
+	  Build with true color support in terminal.
+
+endif
+
+comment "irssi needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

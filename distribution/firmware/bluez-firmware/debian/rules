@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+DEB_DESTDIR := debian/bluez-firmware
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- --libdir=/usr/lib
+
+override_dh_auto_install:
+	dh_auto_install
+	mkdir -p $(DEB_DESTDIR)/usr/share/doc/bluez-firmware
+	mv $(DEB_DESTDIR)/usr/lib/firmware/BCM-LEGAL.txt  \
+		$(DEB_DESTDIR)/usr/share/doc/bluez-firmware/
+	# Copy firmware of Raspberry Pi
+	mkdir -p $(DEB_DESTDIR)/usr/lib/firmware/brcm
+	cp $(CURDIR)/debian/firmware/broadcom/*.hcd \
+		$(DEB_DESTDIR)/usr/lib/firmware/brcm/.

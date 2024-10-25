@@ -1,0 +1,129 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Execute hacks in chroot"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin executing hacks..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+case "${LINGMO_SYS_BUILD_IMAGE_TYPE}" in
+	netboot)
+		if [ ! -f chroot/sbin/mount.cifs ]
+		then
+			Apt chroot install cifs-utils
+		fi
+
+		if [ ! -d chroot/etc/initramfs-tools ]
+		then
+			mkdir chroot/etc/initramfs-tools
+		fi
+
+		# Configuring initramfs for NFS
+		if ! grep -qs "BOOT=nfs" chroot/etc/initramfs-tools/initramfs.conf
+		then
+			echo "BOOT=nfs" >> chroot/etc/initramfs-tools/initramfs.conf
+		fi
+
+		if ! grep -qs "NFSROOT=auto" chroot/etc/initramfs-tools/initramfs.conf
+		then
+			echo "NFSROOT=auto" >> chroot/etc/initramfs-tools/initramfs.conf
+		fi
+		# initrd.img must be regenerated with the settings above
+		rm -f chroot/initrd.img_has_already_been_regenerated
+		;;
+esac
+
+# Update initramfs (always, because of udev rules in initrd)
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		#UPDATE_INITRAMFS_OPTIONS="LIVE_GENERATE_UUID=1"
+		;;
+esac
+
+if [ "${LINGMO_SYS_BUILD_INITRAMFS}" != "none" ]
+then
+	if [ ! -e chroot/initrd.img_has_already_been_regenerated ]; then
+		Chroot chroot "${UPDATE_INITRAMFS_OPTIONS} update-initramfs -k all -t -u"
+	fi
+	rm -f chroot/vmlinuz.old
+	rm -f chroot/initrd.img.old
+fi
+rm -f chroot/initrd.img_has_already_been_regenerated
+
+# We probably ought to use COMPRESS= in a temporary file in
+# /etc/initramfs-tools/conf.d/ instead, but it's hard to pass options that
+# way.
+case "${LINGMO_SYS_BUILD_INITRAMFS_COMPRESSION}" in
+	gzip)
+		;;
+
+	bzip2)
+		for INITRAMFS in $(find chroot/boot -name 'initrd*'); do
+			zcat "${INITRAMFS}" | bzip2 -c ${BZIP2_OPTIONS} > "${INITRAMFS}.new"
+			mv "${INITRAMFS}.new" "${INITRAMFS}"
+			echo "$(sha1sum ${INITRAMFS} | awk '{ print $1 }')  /boot/$(basename ${INITRAMFS})" > chroot/var/lib/initramfs-tools/$(basename ${INITRAMFS} | sed -e 's|initrd.img-||')
+		done
+		;;
+
+	lzma)
+		for INITRAMFS in $(find chroot/boot -name 'initrd*'); do
+			zcat "${INITRAMFS}" | lzma -c ${LZMA_OPTIONS} > "${INITRAMFS}.new"
+			mv "${INITRAMFS}.new" "${INITRAMFS}"
+			echo "$(sha1sum ${INITRAMFS} | awk '{ print $1 }')  /boot/$(basename ${INITRAMFS})" > chroot/var/lib/initramfs-tools/$(basename ${INITRAMFS} | sed -e 's|initrd.img-||')
+		done
+		;;
+esac
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		ID="1000"
+		;;
+
+	*)
+		ID=""
+		;;
+esac
+
+rm -f chroot/etc/hosts
+
+if [ "${LINGMO_SYS_BUILD_DEBIAN_INSTALLER}" = "live" ]
+then
+	# This is a temporary hack to get rid of fstab;
+	# needs cleanup in live-boot first to proper fix.
+	rm -f chroot/etc/fstab
+	touch chroot/etc/fstab
+fi
+
+if [ "${LINGMO_SYS_BUILD_SWAP_FILE_PATH}" ]; then
+	dd if=/dev/zero of="chroot/${LINGMO_SYS_BUILD_SWAP_FILE_PATH}" bs=1024k count="${LINGMO_SYS_BUILD_SWAP_FILE_SIZE}"
+	mkswap "chroot/${LINGMO_SYS_BUILD_SWAP_FILE_PATH}"
+fi
+
+# Creating stage file
+Create_stagefile

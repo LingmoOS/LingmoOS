@@ -1,0 +1,87 @@
+#!/bin/sh
+#     Copyright (C) 2005 Eddy Petrisor <eddy.petrisor@gmail.com>
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public
+#     License along with this program; if not, write to the Free
+#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+#     MA 02111-1307 USA
+#
+
+SUITE='sid'
+CHROOT="chroot/${SUITE}-root"
+BOOTSTRAP="cdebootstrap -f build ${SUITE} ${CHROOT}"
+
+if [ ! -f /usr/bin/cdebootstrap ]
+then
+        BOOTSTRAP="debootstrap --variant=buildd ${SUITE} ${CHROOT}"
+        [ ! -f /usr/bin/debootstrap ] &&
+        echo 'You need debootstrap or cdebootstrap to create the chroot' &&
+        exit 1
+fi
+
+# create the directories, if needed
+[ ! -d ${CHROOT} ] && mkdir -p $CHROOT
+[ ! -d ${CHROOT}/proc ] && mkdir -p $CHROOT/proc
+[ ! -d ${CHROOT}/sys ] && mkdir -p $CHROOT/sys
+[ ! -d ${CHROOT}/etc ] && mkdir -p $CHROOT/etc
+
+# install the chroot environment
+$BOOTSTRAP
+
+# post chroot install
+mount -t proc proc ${CHROOT}/proc/
+mount -t sysfs sysfs ${CHROOT}/sys/
+
+touch ${CHROOT}/etc/resolv.conf
+cat /etc/resolv.conf > ${CHROOT}/etc/resolv.conf
+touch ${CHROOT}/etc/apt/sources.list
+echo 'deb ftp://ftp.ro.debian.org/debian unstable main' > ${CHROOT}/etc/apt/sources.list
+#cp /etc/apt/trusted.gpg ${CHROOT}/etc/apt/
+
+echo 'APT { Get { AllowUnauthenticated "yes"; }; };' > ${CHROOT}/etc/apt/apt.conf
+
+chroot ${CHROOT} <<END_OF_COMMANDS
+export LANG='C'
+echo '************************************'
+echo '****** Switched to the chroot ******'
+echo '************************************'
+apt-get -y --allow-unauthenticated update
+echo 'Installing gnupg to allow authentication'
+apt-get -y --allow-unauthenticated install gnupg
+echo 'importing the Debian Archive Automatic signing key (2006)'
+gpg --keyserver pgpkeys.mit.edu --recv-key 2D230C5F
+gpg -a --export 2D230C5F | apt-key add -
+apt-get -y --allow-unauthenticated update
+apt-get -y install git
+mkdir /build-di
+cd /build-di
+echo '************************************'
+echo 'checking out a copy of debian installer'
+git clone git://git.debian.org/d-i/debian-installer
+apt-get -y install \
+    debconf dpkg-dev libdebconfclient0 libdebconfclient0-dev \
+    libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
+echo '************************************'
+apt-get -y install \
+    autoconf gcc make libtool automake1.7 gtk-doc-tools \
+    autoconf-archive libglib2.0-dev libpixman-dev libdirectfb-dev \
+    libfontconfig1-dev libfreetype6-dev libatk1.0-dev libglib2.0-dev
+apt-get -y install libpango1.0-dev
+apt-get -y install \
+    libglib2.0-dev libatk1.0-dev libtiff4-dev libdebian-installer-dev
+exit
+END_OF_COMMANDS
+
+echo "You should have now installed a chroot ready for di gtk build."
+echo "Look in ${CHROOT}/build-di directory."
+

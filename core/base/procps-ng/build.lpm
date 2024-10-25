@@ -1,0 +1,47 @@
+pkgname=procps-ng
+pkgver=4.0.4
+pkgrel=3
+pkgdesc='Utilities for monitoring your system and its processes'
+url='https://gitlab.com/procps-ng/procps'
+license=(GPL LGPL)
+arch=(x86_64)
+depends=(glibc ncurses libncursesw.so systemd-libs)
+makedepends=(systemd)
+conflicts=(procps sysvinit-tools)
+provides=(procps sysvinit-tools libproc2.so)
+replaces=(procps sysvinit-tools)
+options=('!emptydirs')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=(https://downloads.sourceforge.net/project/$pkgname/Production/${pkgname}-${pkgver}.tar.xz{,.asc}
+        0001-build-sys-Add-systemd-elogind-to-w.patch
+        0002-ps-Don-t-crash-when-using-short-option.patch)
+
+prepare() {
+  cd procps-ng-$pkgver
+  sed 's:<ncursesw/:<:g' -i src/watch.c
+  patch -Np1 < ../0001-build-sys-Add-systemd-elogind-to-w.patch
+  patch -Np1 < ../0002-ps-Don-t-crash-when-using-short-option.patch
+  autoreconf -fi
+}
+
+build() {
+  cd procps-ng-$pkgver
+  ./configure \
+    --prefix=/usr \
+    --exec-prefix=/ \
+    --sysconfdir=/etc \
+    --libdir=/usr/lib \
+    --bindir=/usr/bin \
+    --sbindir=/usr/bin \
+    --enable-watch8bit \
+    --with-systemd \
+    --disable-modern-top \
+    --disable-kill
+
+  make
+}
+
+package() {
+  cd procps-ng-$pkgver
+  make DESTDIR="$pkgdir" install
+}

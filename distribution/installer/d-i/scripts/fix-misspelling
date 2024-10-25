@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+for file in `find -name \*.templates`; do
+    sed "/^\\( \\|_Description: \\)/s/$1/$2/g" $file > $file.new
+    if cmp -s $file $file.new; then
+	rm $file.new
+    else
+	mv $file.new $file
+	dir=`dirname $file`
+	for file in $dir/po/*.po; do
+	    sed "/^[^#]/s/$1/$2/g" $file > $file.new
+	    mv $file.new $file
+	done
+	(cd $dir && debconf-updatepo)
+    fi
+done
+
+for file in po/*.po; do
+    sed "/^[^#]/s/$1/$2/g" $file > $file.new
+    mv $file.new $file
+done

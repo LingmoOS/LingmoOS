@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_THRIFT
+	bool "thrift"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_LIBEVENT
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  The Apache Thrift software framework, for scalable
+	  cross-language services development, combines a software
+	  stack with a code generation engine to build services that
+	  work efficiently and seamlessly between C++, Java, Python,
+	  PHP, Ruby, Erlang, Perl, Haskell, C#, Cocoa, JavaScript,
+	  Node.js, Smalltalk, OCaml and Delphi and other languages.
+
+	  http://thrift.apache.org/
+
+comment "thrift needs a toolchain w/ C++, wchar, threads"
+	depends on !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP

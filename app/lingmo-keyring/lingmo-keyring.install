@@ -1,0 +1,13 @@
+#!/bin/sh
+
+post_upgrade() {
+	if usr/bin/lpm-key -l >/dev/null 2>&1; then
+		usr/bin/lpm-key --populate lingmo
+	fi
+}
+
+post_install() {
+	if [ -x usr/bin/lpm-key ]; then
+		post_upgrade
+	fi
+}

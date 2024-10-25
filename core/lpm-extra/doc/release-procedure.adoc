@@ -1,0 +1,40 @@
+Release Procedure
+=================
+
+Preparations
+------------
+
+--
+Before tagging the release, ensure that:
+
+* `CHANGES.md` has been updated with all changes that will go into the new release.
+
+--
+
+Procedure
+---------
+
+--
+Assuming `$VERSION` is the version number in `X.Y.Z` format and `$REMOTE` is the Git remote for the `lpm-contrib` repository on `gitlab.archlinux.org`:
+
+* Update the version in `configure.ac`.
+* In `CHANGES.md`:
+  - Rename the `Unreleased` section to `[$VERSION] - YYYY-MM-DD`.
+  - Populate new `Unreleased` section.
+  - Add the Git log URL for the new tag to the bottom of the file.
+  - Bump the version in the `Unreleased` Git log URL.
+* `git add configure.ac CHANGES.md`
+* `git commit -sm "Release v$VERSION"`
+* `git tag -s v$VERSION -m v$VERSION`
+* {blank}
++
+----
+git notes --ref=refs/notes/signatures/tar add -C "$(
+  git archive --format tar --prefix "lpm-contrib-$VERSION/" v$VERSION |
+  gpg --output - --armor --detach-sign |
+  git hash-object -w --stdin
+)" v$VERSION
+----
+* `git push $REMOTE master $VERSION refs/notes/signatures/tar`
+
+--

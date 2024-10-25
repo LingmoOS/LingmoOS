@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Raise the maximum number of open files we're allowed, so we can do
+# lots of network access in parallel
+ulimit -n 4096
+
+DIR=/srv/cdbuilder.debian.org/dst/debian-live
+
+CORE_IMAGE=stretch-debian-live-maker-amd64.img
+WORKSPACE_IMAGE=workspace.img
+RSYNC_PORT=10873
+SSH_PORT=10022
+VM_IP=127.16.2.1
+
+if [ "$1"x != ""x ] ; then
+    CORE_IMAGE=$1
+fi
+
+case $(hostname) in
+    pettersson)
+	MEM=16G
+	CPUS=8
+	VNC=":1"
+	;;
+    casulana)
+	MEM=64G
+	CPUS=40
+	VNC=":4"
+	;;
+    *)
+	echo "Unknown host machine, abort"
+	exit 1
+	;;
+esac
+
+cd $DIR
+
+/usr/bin/kvm \
+        -name debian-live-maker \
+        -m $MEM \
+        -smp $CPUS \
+        -pidfile /home/debian-cd/debian-live-vm.pid \
+        -boot order=c \
+	-drive file=$CORE_IMAGE,format=raw,if=virtio \
+        -daemonize \
+        -netdev user,id=usernet,hostfwd=tcp:${VM_IP}:${SSH_PORT}-10.0.2.15:22,hostfwd=tcp:${VM_IP}:${RSYNC_PORT}-10.0.2.15:873 \
+        -device virtio-net-pci,netdev=usernet \
+	-k en-gb \
+	-drive file=$WORKSPACE_IMAGE,format=raw,if=virtio \
+	-vnc ${VNC} \
+#	-nographic \
+#        -curses \
+#	-cdrom /mnt/nfs-cdimage/release/6.0.5/amd64/iso-cd/debian-6.0.5-amd64-netinst.iso \

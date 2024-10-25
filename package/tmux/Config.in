@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_TMUX
+	bool "tmux"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR # mbtowc()
+	depends on LINGMO_ENABLE_LOCALE # runtime
+	select LINGMO_PACKAGE_LIBEVENT
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  tmux is a terminal multiplexer, it enables a number of
+	  terminals (or windows) to be accessed and controlled from a
+	  single terminal.
+
+	  NOTE: tmux needs a working UTF-8 locale (LINGMO_GENERATE_LOCALE)
+
+	  https://tmux.github.io/
+
+comment "tmux needs a toolchain w/ wchar, locale"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_ENABLE_LOCALE

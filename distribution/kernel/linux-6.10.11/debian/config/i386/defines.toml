@@ -1,0 +1,44 @@
+[[flavour]]
+name = '686'
+[flavour.description]
+hardware = 'older PCs'
+hardware_long = 'PCs with one or more processors not supporting PAE'
+[flavour.packages]
+installer = true
+
+[[flavour]]
+name = '686-pae'
+[flavour.defs]
+is_default = true
+[flavour.description]
+hardware = 'modern PCs'
+hardware_long = 'PCs with one or more processors supporting PAE'
+parts = ['pae']
+[flavour.packages]
+installer = true
+
+[[featureset]]
+name = 'none'
+
+[[featureset]]
+name = 'rt'
+# Override available flavours in rt featureset
+[[featureset.flavour]]
+name = '686-pae'
+
+[build]
+enable_vdso = true
+kernel_file = 'arch/x86/boot/bzImage'
+kernel_stem = 'vmlinuz'
+
+[description.short]
+pae = ''
+
+[description.long]
+pae = '''This kernel requires PAE (Physical Address Extension).
+This feature is supported by the Intel Pentium Pro/II/III/4/4M/D, Xeon,
+Core and Atom; AMD Geode NX, Athlon (K7), Duron, Opteron, Sempron,
+Turion or Phenom; Transmeta Efficeon; VIA C7; and some other processors.'''
+
+[relations.image]
+suggests = ['grub-pc | grub-efi-ia32 | extlinux']

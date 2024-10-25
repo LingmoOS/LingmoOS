@@ -1,0 +1,94 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Tue, 24 Oct 2023 09:38:48 +0200
+Subject: [PATCH 06/15] net/ipv4: Use nested-BH locking for ipv4_tcp_sk.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+ipv4_tcp_sk is a per-CPU variable and relies on disabled BH for its
+locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+this data structure requires explicit locking.
+
+Make a struct with a sock member (original ipv4_tcp_sk) and a
+local_lock_t and use local_lock_nested_bh() for locking. This change
+adds only lockdep coverage and does not alter the functional behaviour
+for !PREEMPT_RT.
+
+Cc: David Ahern <dsahern@kernel.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/net/sock.h  |    5 +++++
+ net/ipv4/tcp_ipv4.c |   15 +++++++++++----
+ 2 files changed, 16 insertions(+), 4 deletions(-)
+
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -544,6 +544,11 @@
+ 	netns_tracker		ns_tracker;
+ };
+ 
++struct sock_bh_locked {
++	struct sock *sock;
++	local_lock_t bh_lock;
++};
++
+ enum sk_pacing {
+ 	SK_PACING_NONE		= 0,
+ 	SK_PACING_NEEDED	= 1,
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -93,7 +93,9 @@
+ struct inet_hashinfo tcp_hashinfo;
+ EXPORT_SYMBOL(tcp_hashinfo);
+ 
+-static DEFINE_PER_CPU(struct sock *, ipv4_tcp_sk);
++static DEFINE_PER_CPU(struct sock_bh_locked, ipv4_tcp_sk) = {
++	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
++};
+ 
+ static DEFINE_MUTEX(tcp_exit_batch_mutex);
+ 
+@@ -882,7 +884,9 @@
+ 	arg.tos = ip_hdr(skb)->tos;
+ 	arg.uid = sock_net_uid(net, sk && sk_fullsock(sk) ? sk : NULL);
+ 	local_bh_disable();
+-	ctl_sk = this_cpu_read(ipv4_tcp_sk);
++	local_lock_nested_bh(&ipv4_tcp_sk.bh_lock);
++	ctl_sk = this_cpu_read(ipv4_tcp_sk.sock);
++
+ 	sock_net_set(ctl_sk, net);
+ 	if (sk) {
+ 		ctl_sk->sk_mark = (sk->sk_state == TCP_TIME_WAIT) ?
+@@ -907,6 +911,7 @@
+ 	sock_net_set(ctl_sk, &init_net);
+ 	__TCP_INC_STATS(net, TCP_MIB_OUTSEGS);
+ 	__TCP_INC_STATS(net, TCP_MIB_OUTRSTS);
++	local_unlock_nested_bh(&ipv4_tcp_sk.bh_lock);
+ 	local_bh_enable();
+ 
+ #ifdef CONFIG_TCP_MD5SIG
+@@ -1002,7 +1007,8 @@
+ 	arg.tos = tos;
+ 	arg.uid = sock_net_uid(net, sk_fullsock(sk) ? sk : NULL);
+ 	local_bh_disable();
+-	ctl_sk = this_cpu_read(ipv4_tcp_sk);
++	local_lock_nested_bh(&ipv4_tcp_sk.bh_lock);
++	ctl_sk = this_cpu_read(ipv4_tcp_sk.sock);
+ 	sock_net_set(ctl_sk, net);
+ 	ctl_sk->sk_mark = (sk->sk_state == TCP_TIME_WAIT) ?
+ 			   inet_twsk(sk)->tw_mark : READ_ONCE(sk->sk_mark);
+@@ -1017,6 +1023,7 @@
+ 
+ 	sock_net_set(ctl_sk, &init_net);
+ 	__TCP_INC_STATS(net, TCP_MIB_OUTSEGS);
++	local_unlock_nested_bh(&ipv4_tcp_sk.bh_lock);
+ 	local_bh_enable();
+ }
+ 
+@@ -3629,7 +3636,7 @@
+ 		 */
+ 		inet_sk(sk)->pmtudisc = IP_PMTUDISC_DO;
+ 
+-		per_cpu(ipv4_tcp_sk, cpu) = sk;
++		per_cpu(ipv4_tcp_sk.sock, cpu) = sk;
+ 	}
+ 	if (register_pernet_subsys(&tcp_sk_ops))
+ 		panic("Failed to create the TCP control socket.\n");

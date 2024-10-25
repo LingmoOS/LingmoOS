@@ -1,0 +1,65 @@
+comment "cog needs wpewebkit and a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_PACKAGE_WPEWEBKIT || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_COG
+	bool "cog"
+	depends on LINGMO_PACKAGE_WPEWEBKIT
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus
+	depends on LINGMO_USE_MMU # dbus
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_WAYLAND
+	help
+	  Single "window" launcher for the WebKit WPE port, and
+	  helper library for implementing WPE launcher. It does
+	  not provide any chrome, and is suitable to be used
+	  as a Web application container.
+
+	  https://github.com/Igalia/cog
+
+if LINGMO_PACKAGE_COG
+
+config LINGMO_PACKAGE_COG_PROGRAMS_HOME_URI
+	string "home uri"
+	default "https://wpewebkit.org"
+	help
+	  Default URI to open when "cog" is launched. If an empty
+	  string is used, there is no default and the URI to open
+	  must be always specified in the command line.
+
+config LINGMO_PACKAGE_COG_PLATFORM_FDO
+	bool "Wayland backend"
+	default y
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+	help
+	  Enable the Wayland backend. Cog will interface with
+	  a compositor over the Wayland protocol.
+
+config LINGMO_PACKAGE_COG_PLATFORM_DRM
+	bool "DRM backend"
+	depends on LINGMO_PACKAGE_HAS_UDEV # libinput
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	depends on LINGMO_PACKAGE_HAS_LIBGBM
+	depends on LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF
+	depends on LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_FORMAT_MODIFIER_PLANE_COUNT
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_LIBINPUT
+	help
+	  Enable the DRM platform backend. Cog will interface directly
+	  with video drivers that support kernel mode-setting (KMS)
+	  via the DRM user-space API.
+
+config LINGMO_PACKAGE_COG_USE_SYSTEM_DBUS
+	bool "expose system D-Bus control interface"
+	help
+	  Expose remote control interface on system bus
+
+comment "DRM platform needs EGL and GBM"
+	depends on \
+		!LINGMO_PACKAGE_HAS_LIBEGL || \
+		!LINGMO_PACKAGE_HAS_LIBGBM || \
+		!LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF || \
+		!LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_FORMAT_MODIFIER_PLANE_COUNT
+
+endif

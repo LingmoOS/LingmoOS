@@ -1,0 +1,10 @@
+#! /usr/bin/make -f
+%:
+	dh $@
+
+build-arch: debian/templates
+
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+debian/templates: debian/templates-arch
+	debian/templates-build.pl $(DEB_HOST_ARCH) < $< > $@

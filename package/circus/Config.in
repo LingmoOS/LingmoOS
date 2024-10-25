@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_CIRCUS
+	bool "circus"
+	depends on LINGMO_PACKAGE_PYTHON3 # python-tornado
+	depends on LINGMO_INSTALL_LIBSTDCPP # pyzmq -> zeromq
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # pyzmq -> zeromq
+	select LINGMO_PACKAGE_PYTHON_IOWAIT # runtime
+	select LINGMO_PACKAGE_PYTHON_PSUTIL # runtime
+	select LINGMO_PACKAGE_PYTHON_PYZMQ # runtime
+	select LINGMO_PACKAGE_PYTHON_TORNADO # runtime
+	select LINGMO_PACKAGE_PYTHON_SETUPTOOLS # runtime
+	help
+	  Circus is a program that will let you run and watch multiple
+	  processes and sockets.
+
+	  https://circus.readthedocs.org/en/latest/
+
+comment "circus needs Python 3 and a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_PACKAGE_PYTHON3

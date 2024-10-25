@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_C_CAPNPROTO
+	bool "c-capnproto"
+	depends on LINGMO_USE_MMU # capnproto
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # capnproto
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # capnproto
+	depends on LINGMO_INSTALL_LIBSTDCPP # capnproto
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # capnproto
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC # capnproto
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # capnproto
+	depends on LINGMO_TOOLCHAIN_HAS_UCONTEXT # capnproto
+	select LINGMO_PACKAGE_CAPNPROTO
+	help
+	  A C plugin for Cap'n Proto. Generates the code generator
+	  plugin for C. Requires regular Cap'n Proto and only
+	  provides serialization (no RPC).
+
+	  https://github.com/opensourcerouting/c-capnproto
+
+comment "c-capnproto needs host and target gcc >= 5 w/ C++14, threads, atomic, ucontext and not gcc bug 64735"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_HOST_GCC_AT_LEAST_5 || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_HAS_ATOMIC || \
+		LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 || \
+		!LINGMO_TOOLCHAIN_HAS_UCONTEXT

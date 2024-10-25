@@ -1,0 +1,55 @@
+comment "gqrx needs a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 8"
+	depends on LINGMO_USE_MMU # gnuradio
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 || LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+
+comment "gqrx needs qt5"
+	depends on !LINGMO_PACKAGE_QT5
+
+comment "gqrx needs a toolchain not affected by GCC bug 43744"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_43744
+
+config LINGMO_PACKAGE_GQRX
+	bool "gqrx"
+	depends on LINGMO_USE_MMU # gnuradio
+	depends on !LINGMO_STATIC_LIBS # gnuradio
+	depends on LINGMO_INSTALL_LIBSTDCPP # boost
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # boost
+	depends on LINGMO_USE_WCHAR # boost
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 || LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_PACKAGE_QT5
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # gnuradio -> boost-atomic
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # gnuradio
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_43744 # gnuradio
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_GNURADIO
+	select LINGMO_PACKAGE_GNURADIO_ANALOG
+	select LINGMO_PACKAGE_GNURADIO_AUDIO
+	select LINGMO_PACKAGE_GNURADIO_BLOCKS
+	select LINGMO_PACKAGE_GNURADIO_DIGITAL
+	select LINGMO_PACKAGE_GNURADIO_FFT
+	select LINGMO_PACKAGE_GNURADIO_FILTER
+	select LINGMO_PACKAGE_GNURADIO_NETWORK
+	select LINGMO_PACKAGE_GR_OSMOSDR
+	select LINGMO_PACKAGE_LIBSNDFILE
+	select LINGMO_PACKAGE_QT5BASE_GUI
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS
+	select LINGMO_PACKAGE_QT5SVG
+	help
+	  Gqrx is an open source software defined radio (SDR) receiver
+	  implemented using GNU Radio and the Qt GUI
+	  toolkit. Currently it works on Linux and Mac with hardware
+	  supported by gr-osmosdr, including Funcube Dongle, RTL-SDR,
+	  Airspy, HackRF, BladeRF, RFSpace, USRP and SoapySDR.
+
+	  Gqrx can operate as an AM/FM/SSB receiver with audio output
+	  or as an FFT-only instrument. There are also various hooks
+	  for interacting with external application using network
+	  sockets.
+
+	  http://gqrx.dk/

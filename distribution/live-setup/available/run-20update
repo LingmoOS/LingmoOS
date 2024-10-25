@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#set -x
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+sed -i '/cdbuilder/d' /etc/hosts
+sed -i '/salsa.debian.org/d' /etc/hosts
+sed -i '/d-i.debian.org/d' /etc/hosts
+
+echo "$BUILDHOST  debian.map.fastlydns.net local-mirror.cdbuilder.debian.org  deb.debian.org security.debian.org" >> /etc/hosts
+echo "$SALSA_ADDR  salsa.debian.org" >> /etc/hosts
+echo "$DI_ADDR  d-i.debian.org" >> /etc/hosts
+chattr -i /etc/resolv.conf
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+# Stop dhcp from overwriting this
+chattr +i /etc/resolv.conf
+
+# Now copy our dnsmasq.conf into place and restart
+cp /w/dnsmasq.conf /etc
+service dnsmasq restart
+
+APT_OPTS="-o Dpkg::Options::=--force-confold"
+
+log "Updating VM environment"
+export DEBIAN_FRONTEND=noninteractive
+apt-get $APT_OPTS update
+apt-get $APT_OPTS -y dist-upgrade
+apt-get $APT_OPTS -y clean
+log "done, error $?"
+
+BUILD_PACKAGES="dctrl-tools eatmydata live-build"
+
+DEBIAN_FRONTEND=noninteractive apt-get $APT_OPTS install -y $BUILD_PACKAGES

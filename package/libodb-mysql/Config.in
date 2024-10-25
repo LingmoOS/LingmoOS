@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_LIBODB_MYSQL
+	bool "libodb-mysql"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_MARIADB
+	select LINGMO_PACKAGE_LIBODB
+	help
+	  This package contains the MySQL ODB runtime library. Every
+	  application that includes code generated for the MySQL
+	  database will need to link to this library.
+
+	  https://www.codesynthesis.com/products/odb/
+
+comment "libodb-mysql needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_MARIADB

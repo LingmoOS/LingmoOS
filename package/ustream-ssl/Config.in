@@ -1,0 +1,12 @@
+config LINGMO_PACKAGE_USTREAM_SSL
+	bool "ustream-ssl"
+	depends on !LINGMO_STATIC_LIBS #libubox
+	select LINGMO_PACKAGE_LIBUBOX
+	select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_MBEDTLS
+	help
+	  ustream SSL wrapper
+
+	  https://git.openwrt.org/?p=project/ustream-ssl.git;a=summary
+
+comment "ustream-ssl needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS

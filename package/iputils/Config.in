@@ -1,0 +1,40 @@
+config LINGMO_PACKAGE_IPUTILS
+	bool "iputils"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  This package is set of small useful utilities for Linux
+	  networking. It includes complete versions of ping, arping,
+	  etc.
+
+	  https://github.com/iputils/iputils
+
+if LINGMO_PACKAGE_IPUTILS
+
+config LINGMO_PACKAGE_IPUTILS_ARPING
+	bool "arping"
+	default y
+	help
+	  Installs arping.
+
+config LINGMO_PACKAGE_IPUTILS_CLOCKDIFF
+	bool "clockdiff"
+	default y
+	help
+	  Installs clockdiff.
+
+config LINGMO_PACKAGE_IPUTILS_PING
+	bool "ping"
+	default y
+	help
+	  Installs ping.
+
+config LINGMO_PACKAGE_IPUTILS_TRACEPATH
+	bool "tracepath"
+	default y
+	help
+	  Installs tracepath.
+
+comment "ninfod needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif

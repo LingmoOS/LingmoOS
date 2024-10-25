@@ -1,0 +1,299 @@
+#! /bin/bash
+#
+# Build debian-installer packages.
+#
+# *WARNING*
+# This script is only intended for debian-installer development.
+# It will not create a debian installer suitable for production use.
+# *WARNING*
+#
+
+set -e
+#set -x
+
+# First, some shell functions.
+
+# build debs and udebs
+build ()
+{
+	local _dir=$1
+	local _pkg=$(grep -sh "^Package: " ${_dir}/debian/control |sed -e 's/^Package: //' |xargs echo -n)
+	[ -n "$ROOTCMD" ] && local _rootcmd="-r$ROOTCMD"
+
+	pushd $_dir >/dev/null
+	RECURSE_EXTRA=1 dpkg-buildpackage -b -us -uc $_rootcmd #-nc
+	popd >/dev/null
+	return 0
+}
+
+# install debs
+install_deb ()
+{
+	local _dir=$1
+
+	shift
+	pushd $_dir >/dev/null
+	while [ ${#} -ne 0 ]; do
+		local _files=$(find . -maxdepth 1 -regex "\./${1}_.*_\(${ARCH}\|all\)\.deb")
+		local _file=""
+		local _ver=0
+
+		for i in ${_files}; do
+			local v=$(dpkg-deb -f $i Version)
+
+			if $(dpkg --compare-versions $v ge $_ver); then
+				_ver=$v
+				_file=$i
+			fi
+		done
+
+		[ -z "${_file}" ] || $REALROOTCMD dpkg -i ${_file}
+		shift
+	done
+	popd >/dev/null
+	return 0
+}
+
+# copy successfully built udebs into installer/build/localudebs
+supply_udeb ()
+{
+	local _dir=$1
+	local _pkg=$(grep -sh "^Package: " ${_dir}/debian/control |sed -e 's/^Package: //' |xargs echo -n)
+	for i in ${_pkg}; do
+		local _files=$(find ${_dir}/.. -maxdepth 1 -regex "${_dir}/\.\./${i}_.*_\(${ARCH}\|all\)\.udeb")
+		local _file=""
+		local _ver=0
+
+		for j in ${_files}; do
+			local v=$(dpkg-deb -f $j Version)
+
+			if $(dpkg --compare-versions $v ge $_ver); then
+				_ver=$v
+				_file=$j
+			fi
+		done
+
+		[ -z "${_file}" ] || {
+			rm -f installer/build/localudebs/${i}_*_${ARCH}.udeb
+			rm -f installer/build/localudebs/${i}_*_all.udeb
+			cp -f ${_file} installer/build/localudebs/
+		}
+	done
+	return 0
+}
+
+# Iterate over subdirs.
+do_subdir ()
+{
+	while [ $# -ge 1 ]; do
+		[ -d $1 ] && {
+			build $1
+			supply_udeb $1
+		}
+		shift
+	done
+	return 0
+}
+
+# Build kernel packages.
+do_kernel ()
+{
+	while [ $# -ge 1 ]; do
+		[ -d $1 ] && {
+			(cd $1 && debian/rules debian/control)
+			do_subdir $1
+		}
+		shift
+	done
+	return 0
+}
+
+# Guess what.
+usage ()
+{
+	echo "Usage: $0 [-r root_command] [-rr real_root_command]"
+	exit 1
+}
+
+# Here we go.
+MAKETARGET=all_images
+
+while [ ${#} -ge 1 ]; do
+	case "$1" in
+		-r)
+			ROOTCMD=$2
+			shift
+		;;
+		-rr)
+			REALROOTCMD=$2
+			shift
+		;;
+	esac
+	shift
+done
+
+# directory sanity check
+[ -d installer/build/pkg-lists ] || { echo "Not in source dir"; exit 1; }
+
+[ -z "$REALROOTCMD" ] && REALROOTCMD=$ROOTCMD
+
+ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
+ARCH_OS="$(dpkg-architecture -qDEB_BUILD_ARCH_OS 2>/dev/null || dpkg-architecture -qDEB_HOST_GNU_SYSTEM)"
+
+# Build and install packages with debs first, others build-depend on it.
+
+# d-i library needs special preparation when building directly from revision
+# control
+pushd packages/libdebian-installer >/dev/null
+debian/rules configure || true
+popd >/dev/null
+
+# build d-i library
+build packages/libdebian-installer
+install_deb packages libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
+supply_udeb packages/libdebian-installer
+
+# build cdebconf
+build packages/cdebconf
+install_deb packages libdebconfclient0 libdebconfclient0-dev
+supply_udeb packages/cdebconf
+
+# build kernel-wedge
+build packages/kernel-wedge
+install_deb packages kernel-wedge
+
+# Build all other udebs.
+if [ "$ARCH_OS" = linux ]; then
+	do_kernel packages/linux-kernel-di-$ARCH \
+		packages/linux-kernel-di-$ARCH-2.6
+fi
+
+do_subdir packages/partman-base \
+	packages/partman-auto \
+	packages/partman-auto-lvm \
+	packages/partman-basicfilesystems \
+	packages/partman-basicmethods \
+	packages/partman-ext3 \
+	packages/partman-jfs \
+	packages/partman-lvm \
+	packages/partman-md \
+	packages/partman-reiserfs \
+	packages/partman-partitioning \
+	packages/partman-target \
+	packages/partman-xfs
+
+# Arch-specific partman partitioning.
+case $ARCH in
+    arm|mipsel)
+	do_subdir packages/partman-ext2r0
+	;;
+    hppa)
+	do_subdir packages/partman-palo
+	;;
+    i386|ia64)
+	do_subdir packages/partman-efi
+	;;
+    powerpc)
+	do_subdir packages/partman-newworld \
+	    packages/partman-prep
+	;;
+esac
+
+do_subdir packages/cdrom-retriever \
+	packages/media-retriever \
+	packages/net-retriever
+
+do_subdir packages/anna \
+	packages/apt-setup \
+	packages/auto-install \
+	packages/base-installer \
+	packages/bterm-unifont \
+	packages/cdebconf-entropy \
+	packages/cdebconf-terminal \
+	packages/cdrom-checker \
+	packages/cdrom-detect \
+	packages/choose-mirror \
+	packages/clock-setup \
+	packages/debian-installer-utils \
+	packages/hw-detect \
+	packages/installation-locale \
+	packages/installation-report \
+	packages/iso-scan \
+	packages/kbd-chooser \
+	packages/localechooser \
+	packages/lowmem \
+	packages/lvmcfg \
+	packages/main-menu \
+	packages/mountexternal \
+	packages/netcfg \
+	packages/nobootloader \
+	packages/os-prober \
+	packages/partconf \
+	packages/pkgsel \
+	packages/preseed \
+	packages/finish-install \
+	packages/rescue \
+	packages/rootskel \
+	packages/tzsetup \
+	packages/udpkg \
+	packages/usb-discover \
+	packages/userdevfs \
+	packages/user-setup
+
+# Partitioning special for architectures that don't yet use partman.
+case $ARCH in
+    m68k|mips|s390)
+	do_subdir packages/partitioner
+	;;
+esac
+
+# Arch dependent udebs, which may not build cleanly elsewhere.
+case $ARCH in
+    hurd-amd64)
+	do_subdir packages/grub-installer
+	;;
+    amd64)
+	do_subdir packages/grub-installer
+	;;
+    alpha)
+	do_subdir packages/aboot-installer \
+	    packages/srm-reader
+	;;
+    hppa)
+	do_subdir packages/palo-installer
+	;;
+    hurd-i386)
+	do_subdir packages/grub-installer
+	;;
+    i386)
+	do_subdir packages/grub-installer
+	;;
+    ia64)
+	do_subdir packages/grub-installer \
+	    packages/efi-reader
+	;;
+    mips)
+	do_subdir packages/arcboot-installer
+	;;
+    mipsel)
+	do_subdir packages/colo-installer
+	;;
+    powerpc)
+	do_subdir packages/yaboot-installer \
+	    packages/quik-installer \
+	    packages/prep-installer
+	;;
+    s390)
+	do_subdir packages/s390-dasd \
+	    packages/s390-netdevice \
+	    packages/zipl-installer
+	;;
+    sparc)
+	do_subdir packages/silo-installer
+	;;
+esac
+
+# Build the installer boot image.
+build installer
+
+exit 0

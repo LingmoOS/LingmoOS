@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_ZNC
+	bool "znc"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_BLOWFISH if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  Advanced IRC bouncer
+
+	  http://www.znc.in
+
+comment "znc needs a toolchain w/ C++, dynamic library, gcc >= 8, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU

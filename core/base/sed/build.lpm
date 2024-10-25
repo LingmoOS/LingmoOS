@@ -1,0 +1,42 @@
+pkgname=sed
+pkgver=4.9
+pkgrel=3
+pkgdesc='GNU stream editor'
+arch=('x86_64')
+url='https://www.gnu.org/software/sed/'
+license=('GPL3')
+depends=('glibc' 'acl')
+makedepends=('gettext')
+source=("https://ftp.gnu.org/pub/gnu/sed/$pkgname-$pkgver.tar.xz")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd $pkgname-$pkgver
+  # apply patch from the source array (should be a pacman feature)
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.patch ]] || continue
+    msg2 "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
+}
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:

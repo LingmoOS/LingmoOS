@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable' 'foobar' 'all' '1'
+
+setupaptarchive --no-update
+
+for i in $(seq 1 50); do
+	touch rootdir/etc/apt/trusted.gpg.d/emptykey-${i}.gpg
+done
+testaptkeys 'Joe Sixpack'
+
+testsuccess aptget update
+msgtest 'Test for no gpg errors/warnings in' 'apt-get update'
+sed -i -e "s#${TMPWORKINGDIRECTORY}#/tmp/tmp.XXXXXX#g" rootdir/tmp/testsuccess.output
+if grep -iq 'GPG' rootdir/tmp/testsuccess.output; then
+	cat rootdir/tmp/testsuccess.output
+	msgfail
+else
+	msgpass
+fi

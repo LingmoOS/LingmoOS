@@ -1,0 +1,139 @@
+config LINGMO_PACKAGE_WPEWEBKIT_ARCH_SUPPORTS
+	bool
+	# ARM needs BLX, so v5t+, BE completely untested so disabled
+	default y if LINGMO_arm && !LINGMO_ARM_CPU_ARMV4
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_i386 || LINGMO_x86_64
+	# Disabled on MIPS big endian due to sigbus
+	default y if LINGMO_mipsel || LINGMO_mips64el
+	# Disabled on PowerPC pending runtime testing
+	# RISC-V needs the g/imafd ISA.
+	default y if LINGMO_riscv && LINGMO_RISCV_ISA_RVI \
+		&& LINGMO_RISCV_ISA_RVM && LINGMO_RISCV_ISA_RVA \
+		&& LINGMO_RISCV_ISA_RVF && LINGMO_RISCV_ISA_RVD
+	# Disabled on SuperH because of segfault
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt
+
+comment "wpewebkit needs a toolchain w/ C++, wchar, threads, dynamic library, gcc >= 10, host gcc >= 4.9"
+	depends on LINGMO_PACKAGE_WPEWEBKIT_ARCH_SUPPORTS
+	depends on !LINGMO_BINFMT_FLAT
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_10 \
+		|| !LINGMO_HOST_GCC_AT_LEAST_4_9
+
+comment "wpewebkit needs an OpenGL ES w/ EGL-capable Wayland backend"
+	depends on LINGMO_PACKAGE_WPEWEBKIT_ARCH_SUPPORTS
+	depends on !LINGMO_BINFMT_FLAT
+	depends on !LINGMO_PACKAGE_HAS_LIBGLES || !LINGMO_PACKAGE_HAS_LIBEGL \
+		|| !LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+
+config LINGMO_PACKAGE_WPEWEBKIT
+	bool "wpewebkit"
+	depends on !LINGMO_STATIC_LIBS # wayland
+	depends on !LINGMO_BINFMT_FLAT # icu
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9 # icu, host-ruby
+	depends on LINGMO_INSTALL_LIBSTDCPP # harfbuzz, icu
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # wayland, icu, libsoup3
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_10
+	depends on LINGMO_USE_WCHAR # icu, libsoup3
+	depends on LINGMO_PACKAGE_HAS_LIBGLES # libepoxy
+	depends on LINGMO_PACKAGE_HAS_LIBEGL # libepoxy
+	depends on LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND # wpebackend-fdo
+	depends on LINGMO_PACKAGE_WPEWEBKIT_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_CAIRO
+	select LINGMO_PACKAGE_CAIRO_PNG
+	select LINGMO_PACKAGE_HARFBUZZ
+	select LINGMO_PACKAGE_ICU
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBEPOXY
+	select LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_LIBPNG
+	select LINGMO_PACKAGE_LIBSOUP3
+	select LINGMO_PACKAGE_LIBTASN1
+	select LINGMO_PACKAGE_LIBXSLT
+	select LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+	select LINGMO_PACKAGE_WEBP
+	select LINGMO_PACKAGE_WEBP_DEMUX
+	select LINGMO_PACKAGE_WPEBACKEND_FDO
+	help
+	  WPE (Web Platform for Embedded) port of the WebKit engine,
+	  to allow embedders to create simple and performant systems
+	  based on Web platform technologies.
+
+	  https://wpewebkit.org/
+
+if LINGMO_PACKAGE_WPEWEBKIT
+
+config LINGMO_PACKAGE_WPEWEBKIT_SANDBOX
+	bool "sandboxing support"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS # libseccomp
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12 # libseccomp
+	select LINGMO_PACKAGE_BUBBLEWRAP # runtime
+	select LINGMO_PACKAGE_XDG_DBUS_PROXY # runtime
+	select LINGMO_PACKAGE_LIBSECCOMP
+	help
+	  Enable sandboxing of the processes used for network operation,
+	  disk asccess, and Web content rendering.
+
+comment "sandboxing supports needs a toolchain w/ headers >= 3.12"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+
+config LINGMO_PACKAGE_WPEWEBKIT_MULTIMEDIA
+	bool "multimedia support"
+	select LINGMO_PACKAGE_GSTREAMER1
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DEBUGUTILS
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_MPEGTSDEMUX
+	select LINGMO_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_SUBENC
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_ALSA
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_APP
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIOCONVERT
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIORESAMPLE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_PLAYBACK
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERTSCALE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VOLUME
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_AUDIOFX
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_AUTODETECT
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_ISOMP4
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_MATROSKA
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_RTSP
+	select LINGMO_PACKAGE_GST1_PLUGINS_GOOD_PLUGIN_VPX
+	select LINGMO_PACKAGE_GST1_LIBAV
+	help
+	  This option pulls in all of the required dependencies
+	  to enable multimedia (video/audio) support.
+
+if LINGMO_PACKAGE_WPEWEBKIT_MULTIMEDIA
+
+config LINGMO_PACKAGE_WPEWEBKIT_MEDIA_STREAM
+	bool "media-stream support"
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEORATE
+	help
+	  This option enables media-stream support.
+
+config LINGMO_PACKAGE_WPEWEBKIT_USE_GSTREAMER_GL
+	bool "use gstreamer-gl"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+	help
+	  Use the GStreamer GL elements for handling video content.
+	  This is recommended as it improves performance of video
+	  playback. In some target configurations incorrect rendering
+	  might be produced, and disabling this option may help.
+
+endif
+
+config LINGMO_PACKAGE_WPEWEBKIT_WEBDRIVER
+	bool "WebDriver support"
+	help
+	  Enable support for WebDriver. This will build and install the
+	  WebKitWebDriver program in the target.
+
+endif

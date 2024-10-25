@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_CNI_PLUGINS
+	bool "cni-plugins"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC # no fexecve
+	depends on LINGMO_USE_MMU
+	help
+	  Container Networking Interface plugins.
+
+	  https://github.com/containernetworking/plugins
+
+comment "cni-plugins needs a glibc or musl toolchain w/ threads"
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS && \
+		LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_USES_UCLIBC

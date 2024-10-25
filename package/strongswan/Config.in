@@ -1,0 +1,212 @@
+comment "strongswan needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+menuconfig LINGMO_PACKAGE_STRONGSWAN
+	bool "strongswan"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  strongSwan is an OpenSource IPsec implementation for the
+	  Linux operating system. It is based on the discontinued
+	  FreeS/WAN project and the X.509 patch.
+
+	  The focus is on:
+	   - simplicity of configuration
+	   - strong encryption and authentication methods
+	   - powerful IPsec policies supporting large and complex
+	     VPN networks
+
+	  strongSwan provide many plugins. Only a few are presented
+	  here.
+
+	  http://www.strongswan.org/
+
+if LINGMO_PACKAGE_STRONGSWAN
+
+choice
+	prompt "Cryptographic backend"
+	default LINGMO_PACKAGE_STRONGSWAN_GMP
+
+config LINGMO_PACKAGE_STRONGSWAN_BOTAN
+	bool "botan"
+	depends on LINGMO_PACKAGE_BOTAN_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_10 # botan
+	select LINGMO_PACKAGE_BOTAN
+
+comment "botan backend needs a toolchain w/ C++, gcc >= 10"
+	depends on !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_10
+	depends on LINGMO_PACKAGE_BOTAN_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_STRONGSWAN_OPENSSL
+	bool "OpenSSL"
+	select LINGMO_PACKAGE_OPENSSL
+
+config LINGMO_PACKAGE_STRONGSWAN_GCRYPT
+	bool "libgcrypt"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt
+	select LINGMO_PACKAGE_LIBGCRYPT
+
+config LINGMO_PACKAGE_STRONGSWAN_GMP
+	bool "GNU MP (libgmp)"
+	select LINGMO_PACKAGE_GMP
+
+config LINGMO_PACKAGE_STRONGSWAN_WOLFSSL
+	bool "wolfssl"
+	select LINGMO_PACKAGE_WOLFSSL
+
+endchoice
+
+config LINGMO_PACKAGE_STRONGSWAN_AF_ALG
+	bool "Enable AF_ALG crypto interface to Linux Crypto API"
+
+config LINGMO_PACKAGE_STRONGSWAN_CURL
+	bool "Enable CURL fetcher plugin to fetch files via libcurl"
+	select LINGMO_PACKAGE_LIBCURL
+
+config LINGMO_PACKAGE_STRONGSWAN_MD4
+	bool "Enable MD4 hash algorithm"
+
+config LINGMO_PACKAGE_STRONGSWAN_CHARON
+	bool "Enable the IKEv1/IKEv2 keying daemon charon"
+	default y
+
+if LINGMO_PACKAGE_STRONGSWAN_CHARON
+
+config LINGMO_PACKAGE_STRONGSWAN_TNCCS_11
+	bool "Enable TNCCS 1.1 protocol module"
+	select LINGMO_PACKAGE_LIBXML2
+
+config LINGMO_PACKAGE_STRONGSWAN_TNCCS_20
+	bool "Enable TNCCS 2.0 protocol module"
+
+config LINGMO_PACKAGE_STRONGSWAN_TNCCS_DYNAMIC
+	bool "Enable dynamic TNCCS protocol discovery module"
+
+config LINGMO_PACKAGE_STRONGSWAN_SYSTIME_FIX
+	bool "Enable systime-fix plugin"
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+	bool "Enable EAP-SIM"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIM_FILE
+	bool "Enable EAP-SIM file backend"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIM_PCSC
+	bool "Enable EAP-SIM smart card backend"
+	depends on !LINGMO_STATIC_LIBS # pcsc-lite
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # pcsc-lite
+	select LINGMO_PACKAGE_PCSC_LITE
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+
+comment "EAP-SIM smart backend needs a toolchain w/ dynamic library, gcc >= 4.9"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_AKA
+	bool "Enable EAP-AKA"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_AKA_3GPP2
+	bool "Enable EAP-AKA 3GPP2 algorithms"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_GMP
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_AKA
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIMAKA_SQL
+	bool "Enable EAP-SIM/AKA backend based on a triplet/quintuplet SQL database"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_AKA
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIMAKA_PSEUDONYM
+	bool "Enable EAP-SIM/AKA pseudonym storage"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_AKA
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_SIMAKA_REAUTH
+	bool "Enable EAP-SIM/AKA reauthentication data storage"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_AKA
+	select LINGMO_PACKAGE_STRONGSWAN_EAP_SIM
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_IDENTITY
+	bool "Enable EAP-Identity"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_MD5
+	bool "Enable EAP-MD5"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_GTC
+	bool "Enable EAP-GDC"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_MSCHAPV2
+	bool "Enable EAP-MSCHAPv2"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+	select LINGMO_PACKAGE_STRONGSWAN_MD4
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_PEAP
+	bool "Enable EAP-PEAP"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_RADIUS
+	bool "Enable EAP-RADIUS"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_TLS
+	bool "Enable EAP-TLS"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_TTLS
+	bool "Enable EAP-TTLS"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_DYNAMIC
+	bool "Enable EAP-DYNAMIC"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_EAP_TNC
+	bool "Enable EAP-TNC"
+	default y if LINGMO_PACKAGE_STRONGSWAN_EAP # legacy
+
+config LINGMO_PACKAGE_STRONGSWAN_UNITY
+	bool "Enables Cisco Unity extension plugin"
+
+config LINGMO_PACKAGE_STRONGSWAN_STROKE
+	bool "Enable charons stroke configuration backend"
+	default y
+
+config LINGMO_PACKAGE_STRONGSWAN_SQL
+	bool "Enable SQL database configuration backend"
+	depends on LINGMO_PACKAGE_SQLITE || LINGMO_PACKAGE_MARIADB
+
+config LINGMO_PACKAGE_STRONGSWAN_BYPASS_LAN
+	bool "Enable BYPASS-LAN plugin"
+
+endif
+
+config LINGMO_PACKAGE_STRONGSWAN_PKI
+	bool "Enable pki certificate utility"
+	default y
+
+config LINGMO_PACKAGE_STRONGSWAN_SCRIPTS
+	bool "Enable additional utilities (found in scripts directory)"
+	default y
+	depends on LINGMO_PACKAGE_STRONGSWAN_CHARON
+
+config LINGMO_PACKAGE_STRONGSWAN_VICI
+	bool "Enable vici/swanctl"
+	default y
+	depends on LINGMO_PACKAGE_STRONGSWAN_CHARON
+
+endif

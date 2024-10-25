@@ -1,0 +1,141 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 18 Aug 2023 15:17:44 +0200
+Subject: [PATCH 02/15] locking/local_lock: Add local nested BH locking
+ infrastructure.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+Add local_lock_nested_bh() locking. It is based on local_lock_t and the
+naming follows the preempt_disable_nested() example.
+
+For !PREEMPT_RT + !LOCKDEP it is a per-CPU annotation for locking
+assumptions based on local_bh_disable(). The macro is optimized away
+during compilation.
+For !PREEMPT_RT + LOCKDEP the local_lock_nested_bh() is reduced to
+the usual lock-acquire plus lockdep_assert_in_softirq() - ensuring that
+BH is disabled.
+
+For PREEMPT_RT local_lock_nested_bh() acquires the specified per-CPU
+lock. It does not disable CPU migration because it relies on
+local_bh_disable() disabling CPU migration.
+With LOCKDEP it performans the usual lockdep checks as with !PREEMPT_RT.
+Due to include hell the softirq check has been moved spinlock.c.
+
+The intention is to use this locking in places where locking of a per-CPU
+variable relies on BH being disabled. Instead of treating disabled
+bottom halves as a big per-CPU lock, PREEMPT_RT can use this to reduce
+the locking scope to what actually needs protecting.
+A side effect is that it also documents the protection scope of the
+per-CPU variables.
+
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/local_lock.h          |   10 ++++++++++
+ include/linux/local_lock_internal.h |   31 +++++++++++++++++++++++++++++++
+ include/linux/lockdep.h             |    3 +++
+ kernel/locking/spinlock.c           |    8 ++++++++
+ 4 files changed, 52 insertions(+)
+
+--- a/include/linux/local_lock.h
++++ b/include/linux/local_lock.h
+@@ -62,4 +62,14 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave,
+ 		    local_unlock_irqrestore(_T->lock, _T->flags),
+ 		    unsigned long flags)
+ 
++#define local_lock_nested_bh(_lock)				\
++	__local_lock_nested_bh(_lock)
++
++#define local_unlock_nested_bh(_lock)				\
++	__local_unlock_nested_bh(_lock)
++
++DEFINE_GUARD(local_lock_nested_bh, local_lock_t __percpu*,
++	     local_lock_nested_bh(_T),
++	     local_unlock_nested_bh(_T))
++
+ #endif
+--- a/include/linux/local_lock_internal.h
++++ b/include/linux/local_lock_internal.h
+@@ -62,6 +62,17 @@ do {								\
+ 	local_lock_debug_init(lock);				\
+ } while (0)
+ 
++#define __spinlock_nested_bh_init(lock)				\
++do {								\
++	static struct lock_class_key __key;			\
++								\
++	debug_check_no_locks_freed((void *)lock, sizeof(*lock));\
++	lockdep_init_map_type(&(lock)->dep_map, #lock, &__key,  \
++			      0, LD_WAIT_CONFIG, LD_WAIT_INV,	\
++			      LD_LOCK_NORMAL);			\
++	local_lock_debug_init(lock);				\
++} while (0)
++
+ #define __local_lock(lock)					\
+ 	do {							\
+ 		preempt_disable();				\
+@@ -98,6 +109,15 @@ do {								\
+ 		local_irq_restore(flags);			\
+ 	} while (0)
+ 
++#define __local_lock_nested_bh(lock)				\
++	do {							\
++		lockdep_assert_in_softirq();			\
++		local_lock_acquire(this_cpu_ptr(lock));	\
++	} while (0)
++
++#define __local_unlock_nested_bh(lock)				\
++	local_lock_release(this_cpu_ptr(lock))
++
+ #else /* !CONFIG_PREEMPT_RT */
+ 
+ /*
+@@ -138,4 +158,15 @@ typedef spinlock_t local_lock_t;
+ 
+ #define __local_unlock_irqrestore(lock, flags)	__local_unlock(lock)
+ 
++#define __local_lock_nested_bh(lock)				\
++do {								\
++	lockdep_assert_in_softirq_func();			\
++	spin_lock(this_cpu_ptr(lock));				\
++} while (0)
++
++#define __local_unlock_nested_bh(lock)				\
++do {								\
++	spin_unlock(this_cpu_ptr((lock)));			\
++} while (0)
++
+ #endif /* CONFIG_PREEMPT_RT */
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -600,6 +600,8 @@ do {									\
+ 		     (!in_softirq() || in_irq() || in_nmi()));		\
+ } while (0)
+ 
++extern void lockdep_assert_in_softirq_func(void);
++
+ #else
+ # define might_lock(lock) do { } while (0)
+ # define might_lock_read(lock) do { } while (0)
+@@ -613,6 +615,7 @@ do {									\
+ # define lockdep_assert_preemption_enabled() do { } while (0)
+ # define lockdep_assert_preemption_disabled() do { } while (0)
+ # define lockdep_assert_in_softirq() do { } while (0)
++# define lockdep_assert_in_softirq_func() do { } while (0)
+ #endif
+ 
+ #ifdef CONFIG_PROVE_RAW_LOCK_NESTING
+--- a/kernel/locking/spinlock.c
++++ b/kernel/locking/spinlock.c
+@@ -413,3 +413,11 @@ notrace int in_lock_functions(unsigned l
+ 	&& addr < (unsigned long)__lock_text_end;
+ }
+ EXPORT_SYMBOL(in_lock_functions);
++
++#if defined(CONFIG_PROVE_LOCKING) && defined(CONFIG_PREEMPT_RT)
++void notrace lockdep_assert_in_softirq_func(void)
++{
++	lockdep_assert_in_softirq();
++}
++EXPORT_SYMBOL(lockdep_assert_in_softirq_func);
++#endif

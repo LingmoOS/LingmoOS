@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+
+config LINGMO_PACKAGE_KEXEC_LITE
+	bool "kexec-lite"
+	depends on LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS # dtc, elfutils
+	depends on LINGMO_USE_WCHAR # elfutils
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # elfutils
+	select LINGMO_PACKAGE_ELFUTILS
+	select LINGMO_PACKAGE_DTC
+	select LINGMO_PACKAGE_DTC_PROGRAMS
+	help
+	  Kexec is a user space utiltity for loading another kernel
+	  and asking the currently running kernel to do something with
+	  it.
+
+	  This package is a tiny implementation of the kexec userspace
+	  components, for devicetree-based platforms.
+
+	  https://github.com/antonblanchard/kexec-lite
+
+comment "kexec-lite needs a toolchain w/ wchar, dynamic library, threads"
+	depends on LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS

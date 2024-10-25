@@ -1,0 +1,12 @@
+#!/bin/sh
+# List packages that has only l10n changes
+
+set -e
+
+if [ -z "$1" ]; then
+	echo "You need to call it with the path to be used"
+	echo "e.g.: $0 ."
+	exit 1
+fi
+
+`dirname $0`/scan-trans $1 l10n-only | grep Updated | sed 's,.*\[ Updated translations in \(.*\) .*,\1,g;s,^\./,,g'

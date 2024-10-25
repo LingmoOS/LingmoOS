@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+# Make an alpha boot the installed system over serial console.
+# Assumes we were already at the prompt or posting. Sending break does not
+# work, so you need to have arranged this beforehand, perhaps by remotely
+# cycling the alpha's power.
+use Expect;
+my $exp = new Expect;
+#$exp->debug(2);
+#$exp->raw_pty(1);
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "failed to run CONSOLECOMMAND";
+
+sub getprompt {
+	$exp->send("\r\r\r\r\r");
+}
+
+getprompt;
+
+$exp->expect(60,
+	[ "OpenVMS PALcode" => sub { sleep 10; getprompt; exp_continue; } ],
+	[ "Console" => sub { sleep 5; getprompt; exp_continue; } ],
+	[ ">>>" => sub { 1 } ],
+) || die "didn't get to OF";
+print "(Sending: $ENV{ALPHA_REBOOT_COMMAND})\n";
+$exp->send("$ENV{ALPHA_REBOOT_COMMAND}\r");
+$exp->expect(60, "jumping to bootstrap code") || die "did not boot";
+
+exit;

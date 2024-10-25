@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+
+FILE="/etc/default/grub"
+DISTRIBUTOR_LINE='GRUB_DISTRIBUTOR="Lingmo OS"'
+THEME_LINE='GRUB_THEME="/boot/grub/themes/lingmo/theme.txt"'
+DEFAULT_LINE='GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=0"'
+
+# 如果文件中没有找到 GRUB_DISTRIBUTOR 或 #GRUB_DISTRIBUTOR，就添加它
+if ! grep -qE '^#?GRUB_DISTRIBUTOR=' "$FILE"; then
+  echo "$DISTRIBUTOR_LINE" >> "$FILE"
+else
+  # 否则，替换已有的值
+  sed -i 's/^#\?GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="Lingmo OS"/' "$FILE"
+fi
+
+# 如果文件中没有找到 GRUB_THEME 或 #GRUB_THEME，就添加它
+if ! grep -qE '^#?GRUB_THEME=' "$FILE"; then
+  echo "$THEME_LINE" >> "$FILE"
+else
+  # 否则，替换已有的值
+  sed -i 's/^#\?GRUB_THEME=.*/GRUB_THEME="\/boot\/grub\/themes\/lingmo\/theme.txt"/' "$FILE"
+fi
+
+# 如果文件中没有找到 GRUB_THEME 或 #GRUB_THEME，就添加它
+if ! grep -qE '^#?GRUB_CMDLINE_LINUX_DEFAULT=' "$FILE"; then
+  echo "$DEFAULT_LINE" >> "$FILE"
+else
+  # 否则，替换已有的值
+  sed -i 's/^#\?GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=0"/' "$FILE"
+fi
+
+# Try to update GRUB config, it is okay to fail
+/usr/sbin/update-grub | true

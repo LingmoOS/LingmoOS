@@ -1,0 +1,45 @@
+comment "esp-hosted needs a Linux kernel to be built"
+	depends on !LINGMO_s390x
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_ESP_HOSTED
+	bool "esp-hosted"
+	depends on !LINGMO_s390x
+	depends on LINGMO_LINUX_KERNEL
+	help
+	  This package builds and installs the Linux kernel driver for
+	  the Esp32-* Linux Wi-Fi driver. It supports both SDIO and SPI
+	  busses that is selectable. It is compatible with recent Linux
+	  kernels (>= 5.4).
+
+if LINGMO_PACKAGE_ESP_HOSTED
+
+choice
+	prompt "HW interface"
+	default LINGMO_PACKAGE_ESP_HOSTED_SDIO
+	help
+	  Select which bus type esp is attached to
+
+config LINGMO_PACKAGE_ESP_HOSTED_SDIO
+	bool "SDIO"
+
+config LINGMO_PACKAGE_ESP_HOSTED_SPI
+	bool "SPI"
+
+endchoice
+
+choice
+	prompt "Target"
+	default LINGMO_PACKAGE_ESP_HOSTED_TARGET_ESP32
+	help
+	  Select which SoC Target driver is used for
+
+config LINGMO_PACKAGE_ESP_HOSTED_TARGET_ESP32
+	bool "ESP32"
+
+config LINGMO_PACKAGE_ESP_HOSTED_TARGET_ESP32C6
+	bool "ESP32C6"
+
+endchoice
+
+endif

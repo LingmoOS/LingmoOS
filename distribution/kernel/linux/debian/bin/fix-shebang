@@ -1,0 +1,12 @@
+#!/usr/bin/perl -pi
+
+# Change "#!/usr/bin/env perl" to "#!/usr/bin/perl" (policy §10.4).
+# Other uses of /usr/bin/env should probably be converted as well, but
+# policy doesn't specify what to do.
+if ($. == 1 && m|^\#!\s*/usr/bin/env\s+(.+)|) {
+    if ($1 eq "perl") {
+	$_ = "#!/usr/bin/perl\n";
+    } else {
+	print STDERR "W: Found #!/usr/bin/env $1 and don't know what to substitute\n";
+    }
+}

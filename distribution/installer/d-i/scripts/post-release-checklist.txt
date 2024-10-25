@@ -1,0 +1,43 @@
+website: see 0b37197faa
+--------
+ - english/devel/debian-installer/images.data
+    - unset testing-installer-released
+ - english/devel/debian-installer/index.wml
+    - replace new stable by next stable
+    - replace old stable by new stable
+ - english/template/debian/installer.wml
+    - define-tag NEXT-images-arches
+    - update stable-images-arches with a test on NEXT
+
+scripts:
+--------
+  git-summary:
+  - update %branches mapping
+
+installation-guide:
+-------------------
+  Some time after release:
+  - To switch the installation-guide to the next release, change:
+	- build/build.sh
+	- build/buildone.sh 
+	- build/buildone_ng.sh 
+	- build/buildweb.sh 
+	- build/entities/common.ent
+
+preseed:
+--------
+ - update auto-install/defaultroot
+
+debian-installer-netboot-images:
+-------------------------------
+ - update DISTRIBUTION and MAJOR_VERSION in debian/rules
+ - remember the first upload goes through NEW
+
+debian-installer:
+-----------------
+ - stable:
+    - bootstrap branch from the last tag, see ccd61ba80f
+    - clear CHECK_MINIMAL_VERSION if needed
+ - master:
+    - bump codename and major version, see cfae97b932
+    - clear CHECK_MINIMAL_VERSION if needed

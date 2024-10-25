@@ -1,0 +1,40 @@
+config LINGMO_PACKAGE_POSTGRESQL
+	bool "postgresql"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR
+	# fails to build in a pure static linking scenario, and
+	# postgresql is unlikely to be used in a pure statically
+	# linked environment.
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_OPTIMIZE_FAST
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_BLOWFISH if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_CAST if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  PostgreSQL is a powerful, open source object-relational
+	  database system.
+
+	  Enable the readline package to gain readline support in
+	  psql (the command line interpreter), which offers
+	  command history and edit functions.
+
+	  Enable the zlib package to gain builtin compression for
+	  archives with pg_dump and pg_restore.
+
+	  http://www.postgresql.org
+
+if LINGMO_PACKAGE_POSTGRESQL
+
+config LINGMO_PACKAGE_POSTGRESQL_FULL
+	bool "postgresql-full"
+	help
+	  Build PostgreSQL, contrib, and documentation.
+
+endif
+
+comment "postgresql needs a toolchain w/ dynamic library, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR
+
+comment "postgresql can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST

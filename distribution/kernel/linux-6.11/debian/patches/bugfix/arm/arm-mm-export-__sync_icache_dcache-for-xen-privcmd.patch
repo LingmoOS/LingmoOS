@@ -1,0 +1,31 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Wed, 11 Jul 2018 23:40:55 +0100
+Subject: ARM: mm: Export __sync_icache_dcache() for xen-privcmd
+Forwarded: https://lore.kernel.org/all/20180711225013.GF14131@decadent.org.uk/
+
+The xen-privcmd driver, which can be modular, calls set_pte_at()
+which in turn may call __sync_icache_dcache().
+
+The call to __sync_icache_dcache() may be optimised out because it is
+conditional on !pte_special(), and xen-privcmd calls pte_mkspecial().
+However, in a non-LPAE configuration there is no "special" bit and the
+call is really unconditional.
+
+Fixes: 3ad0876554ca ("xen/privcmd: add IOCTL_PRIVCMD_MMAP_RESOURCE")
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ arch/arm/mm/flush.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: debian-kernel/arch/arm/mm/flush.c
+===================================================================
+--- debian-kernel.orig/arch/arm/mm/flush.c
++++ debian-kernel/arch/arm/mm/flush.c
+@@ -292,6 +292,7 @@ void __sync_icache_dcache(pte_t pteval)
+ 	if (pte_exec(pteval))
+ 		__flush_icache_all();
+ }
++EXPORT_SYMBOL_GPL(__sync_icache_dcache);
+ #endif
+ 
+ /*

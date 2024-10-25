@@ -1,0 +1,31 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Thu, 15 Sep 2022 02:14:03 +0200
+Subject: Makefile: Make compiler version comparison optional
+Forwarded: not-needed
+Bug-Debian: https://bugs.debian.org/1019749
+
+The top-level Makefile warns if the compiler version string changes at
+all between the kernel build and an out-of-tree module build.
+
+We expect that major compiler version changes could introduce ABI
+changes, and override the CC variable in out-of-tree module builds to
+ensure that the same major compiler version is used.  But minor
+version changes should not make a difference, so this exact version
+comparison produces false warnings.
+
+Since custom kernel packages don't have that, don't remove the version
+comparison.  Instead, skip it if $(DEBIAN_KERNEL_NO_CC_VERSION_CHECK)
+is non-empty.
+
+---
+--- a/Makefile
++++ b/Makefile
+@@ -1753,7 +1753,7 @@ PHONY += prepare
+ # now expand this into a simple variable to reduce the cost of shell evaluations
+ prepare: CC_VERSION_TEXT := $(CC_VERSION_TEXT)
+ prepare:
+-	@if [ "$(CC_VERSION_TEXT)" != "$(CONFIG_CC_VERSION_TEXT)" ]; then \
++	@if [ -z "$(DEBIAN_KERNEL_NO_CC_VERSION_CHECK)" ] && [ "$(CC_VERSION_TEXT)" != "$(CONFIG_CC_VERSION_TEXT)" ]; then \
+ 		echo >&2 "warning: the compiler differs from the one used to build the kernel"; \
+ 		echo >&2 "  The kernel was built by: $(CONFIG_CC_VERSION_TEXT)"; \
+ 		echo >&2 "  You are using:           $(CC_VERSION_TEXT)"; \

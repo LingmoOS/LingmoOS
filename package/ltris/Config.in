@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_LTRIS
+	bool "LTris"
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_SDL
+	help
+	  LTris is a tetris clone, using SDL. It optionally requires
+	  SDL_mixer for audio support. A display with minimum 640x480
+	  resolution and a keyboard are recommended.
+
+	  http://lgames.sourceforge.net/index.php?project=LTris
+
+if LINGMO_PACKAGE_LTRIS
+
+config LINGMO_PACKAGE_LTRIS_AUDIO
+	bool "audio support"
+	default y
+	select LINGMO_PACKAGE_SDL_MIXER
+	help
+	  Activates audio support in LTris. Will add SDL_mixer.
+
+endif

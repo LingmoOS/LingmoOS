@@ -1,0 +1,41 @@
+#! /usr/bin/make -f
+%:
+	dh $@
+
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+
+ifeq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+CROSS :=
+else
+CROSS := CC=$(DEB_HOST_GNU_TYPE)-gcc STRIP=$(DEB_HOST_GNU_TYPE)-strip
+endif
+
+override_dh_auto_build: debian/templates.gen
+ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	$(MAKE) small $(CROSS)
+else
+	$(MAKE) DEBUG=1 $(CROSS)
+endif
+
+debian/templates.gen: debian/templates-arch
+	debian/templates-build.pl $(DEB_HOST_ARCH) < $< > $@
+	# give the new templates file the same mtime as the input file, so
+	# that po2debconf doesn't decide that it needs to run
+	# debconf-updatepo
+	touch -mr $< $@
+
+test:
+	dh_auto_test
+
+override_dh_install-arch:
+	dh_install
+	if [ -e "kernel/$(DEB_HOST_ARCH).sh" ]; then \
+		install -D -m644 "kernel/$(DEB_HOST_ARCH).sh" \
+		                 debian/bootstrap-base/usr/lib/base-installer/kernel.sh; \
+	fi
+
+override_dh_installdebconf-arch:
+	dh_installdebconf
+	(echo ; cat debian/templates.gen) >> debian/bootstrap-base/DEBIAN/templates

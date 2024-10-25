@@ -1,0 +1,33 @@
+config LINGMO_PACKAGE_CIFS_UTILS
+	bool "cifs-utils"
+	# uses fork()
+	depends on LINGMO_USE_MMU
+	help
+	  The in-kernel CIFS filesystem is generally the preferred
+	  method for mounting SMB/CIFS shares on Linux. The in-kernel
+	  CIFS filesystem relies on a set of user-space tools. That
+	  package of tools is called cifs-utils. Although not really
+	  part of Samba proper, these tools were originally part of
+	  the Samba package. For several reasons, shipping these tools
+	  as part of Samba was problematic and it was deemed better to
+	  split them off into their own package.
+
+	  http://wiki.samba.org/index.php/LinuxCIFS_utils
+
+if LINGMO_PACKAGE_CIFS_UTILS
+
+config LINGMO_PACKAGE_CIFS_UTILS_SMBTOOLS
+	bool "smbtools"
+	depends on LINGMO_USE_WCHAR # python3
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # python3
+	depends on !LINGMO_STATIC_LIBS # python3
+	select LINGMO_PACKAGE_PYTHON3 # runtime
+	help
+	  Install the smb tools smbinfo and smb2-quota (python
+	  implementations).
+
+comment "smbtools needs a toolchain w/ wchar, threads, dynamic library"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS
+
+endif

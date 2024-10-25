@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_EASYDBUS
+	bool "easydbus"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on !LINGMO_PACKAGE_LUA_5_4
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Easy to use DBus library for Lua.
+
+	  https://github.com/mniestroj/easydbus
+
+comment "easydbus needs a toolchain w/ wchar, threads, Lua <= 5.3"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_PACKAGE_LUA_5_4

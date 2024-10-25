@@ -1,0 +1,34 @@
+config LINGMO_PACKAGE_PYTHON_WEB2PY
+	bool "python-web2py"
+	select LINGMO_PACKAGE_PYTHON_PYDAL # runtime
+	select LINGMO_PACKAGE_PYTHON3_ZLIB # runtime
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT # runtime
+	select LINGMO_PACKAGE_PYTHON3_SQLITE # runtime
+	select LINGMO_PACKAGE_PYTHON_YATL # runtime
+	help
+	  web2py is a free open source full-stack framework for rapid
+	  development of fast, scalable, secure and portable
+	  database-driven web-based applications.
+
+	  http://web2py.com
+
+if LINGMO_PACKAGE_PYTHON_WEB2PY
+
+config LINGMO_PACKAGE_PYTHON_WEB2PY_INSTALL_ADMIN
+	bool "install admin panel application"
+	default y
+	help
+	  This option install web2py admin panel application.
+	  It can be removed to save space on embedded systems.
+
+if LINGMO_PACKAGE_PYTHON_WEB2PY_INSTALL_ADMIN
+
+config LINGMO_PACKAGE_PYTHON_WEB2PY_PASSWORD
+	string "admin panel password"
+	default web2py
+	help
+	  Set the admin panel password.
+
+endif
+
+endif

@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_AZMQ
+	bool "azmq"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # boost, zeromq
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on LINGMO_USE_WCHAR # boost
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-thread
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_ZEROMQ
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_CHRONO
+	select LINGMO_PACKAGE_BOOST_DATE_TIME
+	select LINGMO_PACKAGE_BOOST_RANDOM
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_BOOST_THREAD
+	help
+	  This library provides Boost Asio style bindings for ZeroMQ.
+
+	  https://github.com/zeromq/azmq
+
+comment "azmq needs a toolchain w/ C++11, wchar and threads"
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 \
+		&& LINGMO_USE_WCHAR && LINGMO_TOOLCHAIN_HAS_THREADS)
+
+comment "azmq needs exception_ptr"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

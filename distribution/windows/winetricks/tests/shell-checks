@@ -1,0 +1,145 @@
+#!/bin/sh
+# Wrapper around shellcheck/whatever other shell checkers I can find
+#
+# Copyright (C) 2016-2021 Austin English
+#
+# This software comes with ABSOLUTELY NO WARRANTY.
+#
+# This is free software, placed under the terms of the GNU Lesser
+# Public License version 2.1 (or later), as published by the Free
+# Software Foundation. Please see the file COPYING for details.
+
+set -e
+set -x
+
+###################################################################################################
+# Helpers
+###################################################################################################
+
+w_die() {
+    echo "$* failed"
+    exit 1
+}
+
+w_try() {
+    "$@"
+    status=$?
+    if test ${status} -ne 0; then
+        w_die "Note: command $* returned status ${status}.  Aborting."
+    fi
+}
+
+###################################################################################################
+# Setup
+###################################################################################################
+
+if [ ! -f Makefile ] ; then
+    w_die "$0 should be run from the top of the source tree"
+fi
+
+temp="$(mktemp -d)"
+
+trap 'rm -fr "$temp"' EXIT
+
+###################################################################################################
+# Test functions
+###################################################################################################
+
+# tests using bashate
+test_bashate() {
+    bashate="$(command -v bashate)"
+
+    #echo "======================== Begin bashate version info ==========================="
+    "${bashate}" --help > /dev/null || w_die "bashate must be installed!"
+    ## bashate doesn't have a --version option (as of bashate-0.3.1)
+    #"$bashate" --version
+    #echo "======================== End bashate version info ==========================="
+
+    # Can't ignore individual things for now, filed bug:
+    # https://bugs.launchpad.net/bash8/+bug/1698088
+    # E006=line length check
+    # E044=Use [[ for non-POSIX comparisons
+    echo "Checking ${shellscript} with bashate:"
+    w_try "${bashate}" -i E006,E044 "${shellscript}"
+}
+
+# check formatting, (no trailing whitespace, no tabs)
+test_formatting() {
+    # check for trailing spaces
+    # git diff misses some stuff? (2.18.0 / 2.22.0)
+    #w_try git diff --check --exit-code "${shellscript}"
+    if grep -n -r '[[:blank:]]$' "${shellscript}"; then
+        w_die "${shellscript} contains trailing spaces, remove them."
+    fi
+
+    # check for tabs
+    if grep -n "$(printf '\t')" "${shellscript}"; then
+        w_die "${shellscript} contains tabs, please use spaces instead."
+    fi
+
+    # make sure `do` isn't on its own line:
+    if grep -n -w -e '  do$' -e '^do$' "${shellscript}"; then
+        w_die "Put 'do' on the same line as 'for/while'"
+    fi
+
+    # make sure `then` isn't on its own line:
+    if grep -n -w -e '  then$' -e '^then$' "${shellscript}"; then
+        w_die "Put 'then' on the same line as 'if'"
+    fi
+}
+
+# tests using shellcheck
+test_shellcheck() {
+    shellcheck="$(command -v shellcheck)"
+
+    echo "======================== Begin shellcheck version info ==========================="
+    "${shellcheck}" --version > /dev/null || w_die "shellcheck must be installed!"
+    "${shellcheck}" --version
+    echo "======================== End shellcheck version info ==========================="
+
+    echo "Checking ${shellscript} with shellcheck:"
+    w_try "${shellcheck}" -s sh "${shellscript}"
+}
+
+# tests for linkcheck
+test_linkcheck() {
+    # Check for uses of variables in w_download when w_linkcheck_ignore isn't set
+    # Using w_download https://example.com/${file1} breaks src/linkcheck.sh
+    # FIXME: technically '$' is valid in a URL, if there's actually a URL using it this will need a tweak
+    if grep "^ *w_download " src/winetricks | grep -E "ftp|http" | grep -v "w_linkcheck_ignore=1" | sed "s/^ *//"  | tr -d "\\\\" | grep "\\$"; then
+        w_die "Do not use variables in these URLs, it breaks src/linkcheck.sh"
+    else
+        echo "linkcheck checks passed"
+    fi
+}
+
+###################################################################################################
+
+# Test wrapper
+main() {
+    # Use git ls-files if available, this prevents 'finding' scripts that aren't checked into git.
+    # E.g., if patching foo fails, then foo.orig would also be 'found'.
+    # The find fallback is for non git users, e.g., distros packaging winetricks or end users
+    # running shell-checks from a tarball download.
+    if [ -d .git ] ; then
+        files_to_check="$(git ls-files | xargs file | grep -e 'POSIX shell script' | cut -d : -f1)"
+    else
+        files_to_check="$(find . -type f -exec file {} \; | grep -e 'POSIX shell script' | cut -d : -f1)"
+    fi
+
+    # Run once tests:
+
+    # really, this checks winetricks, to make sure it doesn't break linkcheck.sh:
+    test_linkcheck
+
+    # Generic shellscript checks:
+    for shellscript in ${files_to_check}; do
+        test_formatting
+        test_bashate
+        test_shellcheck
+    done
+}
+
+main
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_LIBVA_INTEL_DRIVER
+	bool "libva-intel-driver"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm/libpthread-stubs
+	depends on !LINGMO_STATIC_LIBS # libva
+	select LINGMO_PACKAGE_LIBVA
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_LIBDRM_INTEL
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBXEXT if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBXFIXES if LINGMO_PACKAGE_XORG7
+	help
+	  VA-API back-end driver for Intel graphics chips
+
+	  https://01.org/vaapi
+
+comment "libva intel driver needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+	depends on LINGMO_i386 || LINGMO_x86_64

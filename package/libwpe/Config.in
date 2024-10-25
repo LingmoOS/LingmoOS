@@ -1,0 +1,13 @@
+comment "libwpe needs a toolchain w/ C++, dynamic library and an OpenEGL-capable backend"
+	depends on !LINGMO_PACKAGE_HAS_LIBEGL || !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_LIBWPE
+	bool "libwpe"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+	help
+	  Base library for the WPE WebKit port.
+
+	  https://wpewebkit.org/

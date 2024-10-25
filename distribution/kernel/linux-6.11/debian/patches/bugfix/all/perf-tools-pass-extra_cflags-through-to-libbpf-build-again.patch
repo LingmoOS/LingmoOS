@@ -1,0 +1,27 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Fri, 16 Aug 2024 15:58:04 +0200
+Subject: perf tools: Pass EXTRA_CFLAGS through to libbpf build again
+
+When perf was statically linked to libbpf, any definition of
+EXTRA_CFLAGS passed to Makefile.perf propagated to the sub-make of
+libbpf.  Since commit 9dabf4003423 ("perf python: Switch module to
+linking libraries from building source"), EXTRA_CFLAGS is overridden
+to "-fPIC" for the sub-make.
+
+Change to include any user-provided EXTRA_CFLAGS before the "-fPIC"
+option.
+
+Fixes: 9dabf4003423 ("perf python: Switch module to linking libraries ...")
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/tools/perf/Makefile.perf
++++ b/tools/perf/Makefile.perf
+@@ -951,7 +951,7 @@ $(LIBAPI)-clean:
+ $(LIBBPF): FORCE | $(LIBBPF_OUTPUT)
+ 	$(Q)$(MAKE) -C $(LIBBPF_DIR) FEATURES_DUMP=$(FEATURE_DUMP_EXPORT) \
+ 		O= OUTPUT=$(LIBBPF_OUTPUT)/ DESTDIR=$(LIBBPF_DESTDIR) prefix= subdir= \
+-		EXTRA_CFLAGS="-fPIC" $@ install_headers
++		EXTRA_CFLAGS="$(EXTRA_CFLAGS) -fPIC" $@ install_headers
+ 
+ $(LIBBPF)-clean:
+ 	$(call QUIET_CLEAN, libbpf)

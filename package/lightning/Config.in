@@ -1,0 +1,35 @@
+comment "lightning needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_sparc || LINGMO_i386 || LINGMO_x86_64 || LINGMO_mips || \
+		LINGMO_mipsel || LINGMO_arm || LINGMO_powerpc || LINGMO_RISCV_64 || \
+		LINGMO_mips64 || LINGMO_mips64el
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_LIGHTNING
+	bool "lightning"
+	depends on LINGMO_sparc || LINGMO_i386 || LINGMO_x86_64 || LINGMO_mips || \
+		LINGMO_mipsel || LINGMO_arm || LINGMO_powerpc || LINGMO_RISCV_64 || \
+		LINGMO_mips64 || LINGMO_mips64el
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  GNU lightning is a library that generates
+	  assembly language code at run-time.
+
+	  https://www.gnu.org/software/lightning/
+
+if LINGMO_PACKAGE_LIGHTNING
+
+config LINGMO_PACKAGE_LIGHTNING_DISASSEMBLER
+	bool "enable disassembler"
+	depends on !LINGMO_nios2 # binutils
+	depends on LINGMO_USE_WCHAR # binutils
+	select LINGMO_PACKAGE_BINUTILS
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Enable the GNU lightning disassembler.
+
+comment "lightning disassembler needs a toolchain w/ wchar"
+	depends on !LINGMO_nios2
+	depends on !LINGMO_USE_WCHAR
+
+endif

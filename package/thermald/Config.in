@@ -1,0 +1,33 @@
+config LINGMO_PACKAGE_THERMALD
+	bool "thermald"
+	depends on LINGMO_i386 || LINGMO_x86_64 # needs <cpuid.h>
+	depends on LINGMO_USE_MMU # uses fork()
+	depends on LINGMO_USE_WCHAR # upower -> libgudev
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus-glib -> glib2, dbus, upower
+	depends on LINGMO_USE_WCHAR # dbus-glib -> glib2
+	depends on LINGMO_PACKAGE_HAS_UDEV # upower
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_DBUS_GLIB
+	select LINGMO_PACKAGE_LIBEVDEV
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_UPOWER
+	select LINGMO_PACKAGE_XZ
+	help
+	  Thermal Daemon is a Linux daemon for monitoring and
+	  controlling platform temperatures. Once the system temperature
+	  reaches a certain threshold, the Linux daemon activates
+	  various cooling methods to try to cool the system.
+
+	  https://github.com/intel/thermal_daemon
+
+comment "thermald needs a toolchain w/ C++, wchar, threads"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP
+
+comment "thermald needs udev /dev management"
+	depends on LINGMO_i386 || LINGMO_x86_64
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_PACKAGE_HAS_UDEV

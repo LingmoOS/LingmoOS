@@ -1,0 +1,369 @@
+#!/usr/bin/perl
+# © 2012-2021 Cyril Brulebois <kibi@debian.org>
+#
+# Help the release manager prepare a release announcement for the
+# Debian Installer. Compare the state of the Debian archive between
+# old and new debian-installer uploads (and debian-cd builds), and
+# extract interesting changelog entries, to be massaged into a
+# possibly comprehensive release announcement.
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Dpkg::Control;
+use File::Slurp;
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use Storable;
+
+use Dpkg::Changelog::Debian;
+use HTML::Escape qw/escape_html/;
+use LWP::UserAgent;
+use Text::TabularDisplay;
+my $workdir = 'release-announce.tmp';
+my $report_filename = 'report.txt';
+my $changelogs_filename = 'changelogs.html';
+my $mirror = 'http://ftp.fr.debian.org/debian';
+
+
+sub get_sources {
+    my $path = shift;
+    my $udeb_list = shift;
+    my @results;
+    my %sources;
+
+    if (! -f $udeb_list) {
+        # The following command (cargo-culted for years) seems to do
+        # the trick:
+        #
+        #     psql service=projectb -t -c "SELECT DISTINCT src.source FROM binaries AS b LEFT JOIN source AS src ON b.source=src.id LEFT JOIN bin_associations AS ba ON b.id=ba.bin LEFT JOIN suite AS s ON ba.suite=s.id WHERE type='udeb' AND s.suite_name IN ('testing','unstable');" > udebs
+        print "E: use psql service=projectb on respighi to get the most recent list of udebs (see comments)\n";
+        exit 1;
+    }
+
+    # Drop all whitespaces:
+    my @udebs = map { my $a = $_; $a =~ s/\s*//g; $a } read_file($udeb_list);
+
+    my ($p, $v, $s);
+    my $sources_file = $path;
+    my $buf_out = '';
+    open my $buf_fh, '+<', \$buf_out or die $!;
+    my $status = gunzip $sources_file => \$buf_out
+        or die "gunzip failed: $GunzipError";
+    while (not $buf_fh->eof()) {
+        my $c = Dpkg::Control->new( type => CTRL_INDEX_SRC );
+        my $item = $c->parse($buf_fh, $sources_file);
+        my ($p, $v, $eso) = ($c->{Package}, $c->{Version}, $c->{'Extra-Source-Only'});
+        next
+            if $eso;
+        if (grep { $p eq $_ } @udebs) {
+            push @results, "$p/$v";
+            $sources{$p}{binaries} = [sort split /, /, $c->{Binary}];
+        }
+    }
+    return (\@results, \%sources);
+}
+
+# Remember those triplets as that information can be reused in other
+# contexts:
+my @VERSIONS = (
+  # Snapshot TS        D-I vers.   D-I release name
+  ['20190411T084713Z', '20190410', 'Buster RC 1'     ],
+  ['20190624T091546Z', '20190623', 'Buster RC 2'     ],
+  ['20190702T085226Z', '20190702', 'Buster RC 3'     ],
+  ['20191130T031031Z', '20191129', 'Bullseye Alpha 1'],
+  ['20200315T090339Z', '20200314', 'Bullseye Alpha 2'],
+  ['20201203T092240Z', '20201202', 'Bullseye Alpha 3'],
+  ['20210415T151642Z', '20210415', 'Bullseye RC 1'   ],
+  ['20210607T150724Z', '20210606', 'Bullseye RC 2'   ],
+  ['20210731T143510Z', '20210731', 'Bullseye RC 3'   ],
+  ['20220920T122342Z', '20220917', 'Bookworm Alpha 1'],
+  ['bookworm-a2',      '20230217', 'Bookworm Alpha 2'],
+  ['20230402T030651Z', '20230401', 'Bookworm RC 1'   ],
+  ['bookworm-rc2',     '20230427', 'Bookworm RC 2'   ],
+  ['bookworm-rc3',     '20230515', 'Bookworm RC 3'   ],
+  ['bookworm-rc4',     '20230526', 'Bookworm RC 4'   ],
+);
+
+# Compare the last two:
+my ($ts1, $old_di, $old) = @{$VERSIONS[-2]};
+my ($ts2, $new_di, $new) = @{$VERSIONS[-1]};
+
+mkdir $workdir;
+chdir $workdir;
+
+`wget http://snapshot.debian.org/archive/debian/${ts1}/dists/testing/main/source/Sources.gz -O ${ts1}_Sources.gz`
+    if ! -f "${ts1}_Sources.gz";
+`wget http://snapshot.debian.org/archive/debian/${ts2}/dists/testing/main/source/Sources.gz -O ${ts2}_Sources.gz`
+    if ! -f "${ts2}_Sources.gz";
+
+if (! -f "${ts1}_udebs.db") {
+    my ($x_ref, $y_ref) = get_sources "${ts1}_Sources.gz", '../udebs';
+    my @a = @{$x_ref};
+    store \@a, "${ts1}_udebs.db";
+}
+# XXX: storing sources only once
+if (! -f "${ts2}_udebs.db") {
+    my ($x_ref, $y_ref) = get_sources "${ts2}_Sources.gz", '../udebs';
+    my @b = @{$x_ref};
+    my %sources = %{$y_ref};
+    store \@b, "${ts2}_udebs.db";
+    store \%sources, "sources.db";
+}
+
+### Compatibility layer
+
+my %versions;
+my @a = @{ retrieve "${ts1}_udebs.db" };
+my @b = @{ retrieve "${ts2}_udebs.db" };
+my %sources = %{ retrieve "sources.db" };
+
+foreach my $pkg (@a) {
+    my ($source, $version) = $pkg =~ m{(.+)/(.+)};
+    print "(a) found $source :: $version\n";
+    $versions{$source}{old} = $version;
+    $sources{$source}{min} = $version;
+}
+foreach my $pkg (@b) {
+    my ($source, $version) = $pkg =~ m{(.+)/(.+)};
+    print "(b) found $source :: $version\n";
+    $versions{$source}{new} = $version;
+    $sources{$source}{max} = $version;
+}
+
+print "Versions:\n", Dumper(\%versions);
+print "Sources:\n", Dumper(\%sources);
+
+
+
+### Start of the old script
+
+# Diff old/new to build updated/removed/added lists:
+my $vtb = Text::TabularDisplay->new('Updated package', 'Old version', 'New version');
+my (@added, @removed);
+my @modified;
+foreach my $package (sort keys %versions) {
+  if ($versions{$package}{'old'} &&
+      $versions{$package}{'new'} &&
+      $versions{$package}{'old'} ne $versions{$package}{'new'}) {
+    $vtb->add( $package, $versions{$package}{'old'}, $versions{$package}{'new'} );
+    push @modified, [$package, $versions{$package}{'old'}, $versions{$package}{'new'}];
+  }
+  if ($versions{$package}{'old'} &&
+      not $versions{$package}{'new'}) {
+    push @removed, $package;
+  }
+  if ($versions{$package}{'new'} &&
+      not $versions{$package}{'old'}) {
+    push @added, $package;
+  }
+}
+
+
+### Display modified, then removed, then added packages:
+
+open my $report, '>', $report_filename
+    or die "Unable to write to $report_filename";
+
+print $report $vtb->render, "\n\n";
+
+my $removed_tb = Text::TabularDisplay->new("Removed package", "Version");
+foreach my $p (@removed) {$removed_tb->add($p, $versions{$p}{old});}
+print $report $removed_tb->render, "\n\n";
+
+my $added_tb = Text::TabularDisplay->new("Added package", "Version");
+foreach my $p (@added) {$added_tb->add($p, $versions{$p}{new});}
+print $report $added_tb->render, "\n\n";
+
+### Grab needed changelogs from https://metadata.ftp-master.debian.org:
+open my $changelogs, '>', $changelogs_filename
+    or die "Unable to write to $changelogs_filename";
+
+my $header = << "EOF";
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+         "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Changelogs between $old ($old_di) and $new ($new_di)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style>
+pre { margin: 0; }
+
+.important { font-weight: bold; color: magenta; }
+  </style>
+</head>
+
+<body>
+<h1>Changelogs between $old ($old_di) and $new ($new_di)</h1>
+
+<table border="1" style="border-collapse: collapse; border: 1px solid;" summary="">
+<tr>
+<th>Source package</th>
+<th>Binary packages</th>
+<th>Old version</th>
+<th>New version</th>
+</tr>
+EOF
+print $changelogs $header;
+
+my $ua = LWP::UserAgent->new();
+foreach my $source (sort keys %sources) {
+  if (not exists $sources{$source}{max}) {
+    print "$source vanished\n";
+    next;
+  }
+
+  if ($sources{$source}{min} eq $sources{$source}{max}) {
+      print "$source didn't change, skipping\n";
+      next;
+  }
+
+  my $href = ($source =~ /^linux-signed-/) ? 'linux' : $source;
+  my $name = $source ne '__error__' ? "<a href=\"#$href\">$source</a>" : "No source/changelog match";
+
+  my $binaries = join(", ", @{$sources{$source}{binaries}});
+  # This list is awful and likely not very interesting anyway:
+  $binaries = '[redacted, long list]'
+    if $source eq 'linux' or $source =~ /^linux-signed-/;
+
+  my $entry = << "EOF";
+  <tr>
+  <td style="white-space: nowrap">$name</td>
+  <td>$binaries</td>
+  <td>$sources{$source}{min}</td>
+  <td>$sources{$source}{max}</td>
+  </tr>
+EOF
+  print $changelogs $entry;
+
+  # Skip error'd packages:
+  next if $source eq '__error__';
+
+  my $source_filename = "$source.txt";
+  if (not -f $source_filename) {
+    # FIXME: This is assuming everything comes from main:
+    my $location;
+    if ($source =~ /^lib/) {
+      $location = substr($source, 0, 4) . "/" . $source;
+    }
+    else {
+      $location = substr($source, 0, 1) . "/" . $source;
+    }
+    # Strip the epoch:
+    my $version = $sources{$source}{max};
+    $version =~ s/^\d+://;
+    # The 'current' symlink seems to point to the highest version
+    # available, meaning experimental in a bunch of cases, so use the
+    # 'max' version for each package:
+    my $url = "https://metadata.ftp-master.debian.org/changelogs/main/$location/unstable_changelog";
+    my $response = $ua->get($url);
+    if ($response->is_success) {
+      print STDERR "DEBUG: downloaded changelog: $source ($url)\n";
+      open my $file, '>', $source_filename
+          or die "Unable to open $source_filename";
+      print $file $response->content;
+      close $file
+        or die "Unable to close $source_filename";
+    }
+    elsif ($mirror) {
+      # FIXME: This is very ugly, but wheezy rc2 has been lagging
+      # behind for a while already, so let's tolerate that for now.
+      print STDERR "DEBUG: falling back to downloading source package to extract changelog\n";
+      my $dsc = "$mirror/pool/main/$location/${source}_${version}.dsc";
+      `dget -x $dsc`;
+      `cp $source-*/debian/changelog $source_filename`;
+      `rm -rf $source-*`;
+      if (! -f $source_filename) {
+        die "missing changelog after dget workaround: ${source}_${version} ($url -- $$dsc)";
+      }
+    }
+    else {
+      # FIXME: Would a fallback to the 'current' symlink help? One is
+      # supposed to prepare the announce right after a build, so the
+      # proper versions should be available, right?
+      print STDERR "DEBUG: unable to download changelog: ${source}_${version}\n";
+      print STDERR "DEBUG: try fetching the source package and copying its Debian changelog as $workdir/${source}_${version}\n";
+      die "missing changelog: ${source}_${version} ($url)";
+    }
+  }
+}
+
+print $changelogs "</table>\n";
+
+
+### Detect wanted changelogs excerpts:
+foreach my $source (sort keys %sources) {
+  # Skip error'd packages and signed packages for linux:
+  next if $source eq '__error__';
+  next if $source =~ /^linux-signed-/;
+
+  if (not exists $sources{$source}{max}) {
+      print "$source vanished\n";
+      next;
+  }
+  if ($sources{$source}{min} eq $sources{$source}{max}) {
+      print "$source didn't change, skipping\n";
+      next;
+  }
+
+  # "since foo to bar" means "foo is excluded, bar is included":
+  my $source_filename = "$source.txt";
+  my $chglog = Dpkg::Changelog::Debian->new();
+  $chglog->load($source_filename)
+    or die "failed to parse $source_filename";
+  my $selection = $chglog->get_range({
+    'since' => $sources{$source}{min},
+    'to'    => $sources{$source}{max},
+  });
+
+  # There are various reasons for having no entries: binaries moving
+  # between source packages; uploads to experimental getting in the
+  # way and shadowing unstable's changelogs; maybe others. Warn in
+  # those cases.
+  print $changelogs "<h2><a name=\"$source\">Changes for $source ($sources{$source}{min} → $sources{$source}{max})</a></h2>\n";
+  if (@$selection) {
+    print $changelogs "<hr>\n";
+    foreach my $entry (@${selection}) {
+      foreach my $line (split /\n/, $entry) {
+        my $opacity = 100;
+        if ($line =~ /^\S/ or $line =~ /^\ -- /) {
+          $opacity = 50;
+        }
+        elsif ($line =~ /Team [Uu]pload|Updated translations/) {
+          $opacity = 50;
+        }
+        elsif ($line =~ /^  [*] .* \(.*\.po\)($| by)/) {
+          $opacity = 50;
+        }
+
+        my $class = 'normal';
+        if ($line =~ /^  .*(udeb|installer|d-i)/i && $line !~ /hurd-i386/ && $line !~ /hurd-amd64/) {
+          $class = 'important';
+        }
+
+        $line = escape_html($line);
+        $line =~ s{#(\d{6,7})}{<a href="https://bugs.debian.org/$1">#$1</a>}g;
+
+        $line = '&nbsp;' if $line eq '';
+        print $changelogs ("<pre style=\"opacity: $opacity%\" class=\"$class\">$line</pre>\n");
+      }
+      print $changelogs "<br>\n";
+    }
+  }
+  else {
+    print $changelogs ("<hr>\n" . "<b>warning:</b> no changelog available for $source (since $sources{$source}{min}, to $sources{$source}{max})". "\n");
+  }
+
+}
+
+print $changelogs "</body></html>\n";
+
+close $changelogs
+    or die "Unable to close $changelogs_filename";
+
+close $report
+    or die "Unable to close $report_filename";
+
+print STDERR "Report saved as: $report_filename\n";
+print STDERR "Changelogs saved as: $changelogs_filename\n";

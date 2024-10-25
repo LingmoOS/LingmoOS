@@ -1,0 +1,41 @@
+config LINGMO_PACKAGE_DOVECOT
+	bool "dovecot"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Dovecot is an open source IMAP and POP3 email server for
+	  Linux/UNIX- like systems, written with security primarily in
+	  mind. Dovecot is an excellent choice for both small and large
+	  installations. It's fast, simple to set up, requires no
+	  special administration and it uses very little memory.
+
+	  http://www.dovecot.org
+
+if LINGMO_PACKAGE_DOVECOT
+
+config LINGMO_PACKAGE_DOVECOT_MYSQL
+	bool "mysql support"
+	depends on LINGMO_INSTALL_LIBSTDCPP # mariadb
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # mariadb
+	select LINGMO_PACKAGE_MARIADB
+	help
+	  Enable MySQL support.
+
+comment "mysql support needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_DOVECOT_SQLITE
+	bool "sqlite support"
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  Enable SQLite support.
+
+source "package/dovecot-pigeonhole/Config.in"
+
+endif # LINGMO_PACKAGE_DOVECOT
+
+comment "dovecot needs a toolchain w/ dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

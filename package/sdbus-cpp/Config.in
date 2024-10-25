@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_SDBUS_CPP
+	bool "sdbus-c++"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_SYSTEMD
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	help
+	  sdbus-c++ is a high-level C++ D-Bus library for Linux
+	  designed to provide expressive, easy-to-use API in modern C++.
+
+	  This will build the target library.
+
+	  https://github.com/Kistler-Group/sdbus-cpp
+
+comment "sdbus-c++ needs systemd and a toolchain w/ C++, gcc >= 7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_PACKAGE_SYSTEMD || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

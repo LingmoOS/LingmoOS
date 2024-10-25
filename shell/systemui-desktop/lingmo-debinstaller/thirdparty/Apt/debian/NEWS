@@ -1,0 +1,279 @@
+apt (2.5.2) unstable; urgency=medium
+
+  Installing or upgrading a binary package now upgrades other binaries from
+  the same source package if they have the same candidate version. You can
+  disable this by setting `APT::Get::Upgrade-By-Source-Package` to `false`.
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Sun, 24 Jul 2022 15:45:15 +0200
+
+apt (2.4.0) unstable; urgency=medium
+
+  GPG verification now first tries only the trusted.gpg.d keys, before
+  then falling back to the legacy trusted.gpg keyring and issuing a
+  warning to migrate keys if verification succeeded in the fallback.
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 22 Feb 2022 20:01:00 +0100
+
+apt (2.3.12) unstable; urgency=medium
+
+  The solver will no longer try to remove Essential or Protected packages,
+  any dependency problem that would need such a solution will have to be
+  resolved manually.
+
+  The "Yes, do as I say" prompt for removing essential packages has been
+  replaced by an error message. The appropriate command-line option needs
+  to be used instead.
+
+  Thank you to Linus Tech Tips and System76 for bringing this issue
+  to our attention.
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 17 Nov 2021 18:26:40 +0100
+
+apt (2.1.16) unstable; urgency=medium
+
+  Automatically remove unused kernels on apt {dist,full}-upgrade. To revert
+  to previous behavior, set APT::Get::AutomaticRemove::Kernels to false or
+  pass --no-auto-remove to the command. apt-get remains unchanged.
+
+  Packages files can now set the Phased-Update-Percentage field to restrict
+  update rollout to a specified percentage of machines. Previously, this has
+  only been available to users of Ubuntu's update-manager tool. See
+  apt_preferences(5) for details and how to configure multiple systems to get
+  the same updates. Phased updates are disabled in chroots for now to not
+  break buildd-style setups.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 08 Jan 2021 22:01:50 +0100
+
+apt (1.9.11) experimental; urgency=medium
+
+  apt(8) now waits for the lock indefinitely if connected to a tty, or
+  for 120 seconds if not.
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 26 Feb 2020 20:30:33 +0100
+
+apt (1.9.6) experimental; urgency=medium
+
+  apt(8) no longer treats package names passed as regular expressions or fnmatch
+  expressions, requiring the use of patterns (apt-patterns(7)) to perform complex
+  searches. For ease of use, regular expressions starting with ^ or ending with
+  $ continue to work.
+
+  This fixes the problem where e.g. g++ could mean either "the package g++"
+  or, if there is no g++ package, "all packages containing g". This change
+  will propagate to apt-* after the release of Debian bullseye.
+
+ -- Julian Andres Klode <jak@debian.org>  Wed, 15 Jan 2020 21:45:18 +0100
+
+apt (1.9.5) unstable; urgency=medium
+
+  Credentials in apt_auth.conf(5) now only apply to https and tor+https
+  sources to avoid them being leaked over plaintext (Closes: #945911). To
+  opt-in to http, add http:// before the hostname. Note that this will transmit
+  credentials in plain text, which you do not want on devices that could be
+  operating in an untrusted network.
+
+ -- Julian Andres Klode <juliank@ubuntu.com>  Mon, 02 Dec 2019 11:45:52 +0100
+
+apt (1.8.0~alpha3) unstable; urgency=medium
+
+  The PATH for running dpkg is now configured by the option DPkg::Path,
+  and defaults to "/usr/sbin:/usr/bin:/sbin:/bin". Previous behavior of
+  not changing PATH may be restored by setting the option to an empty string.
+
+  Support for /etc/apt/auth.conf.d/ has been added, see apt_auth.conf(5).
+
+ -- Julian Andres Klode <jak@debian.org>  Tue, 18 Dec 2018 15:02:11 +0100
+
+apt (1.6~rc1) unstable; urgency=medium
+
+  Seccomp sandboxing has been turned off by default for now. If it works
+  for you, you are encouraged to re-enable it by setting APT::Sandbox::Seccomp
+  to true.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 06 Apr 2018 14:14:29 +0200
+
+apt (1.6~beta1) unstable; urgency=medium
+
+  APT now verifies that the date of Release files is not in the future. By
+  default, it may be 10 seconds in the future to allow for some clock drift.
+
+  Two new configuration options can be used to tweak the behavior:
+    Acquire::Check-Date
+    Acquire::Max-DateFuture
+
+  These can be overridden in sources.list entries using the check-date
+  and date-future-max options. Note that disabling check-date also
+  disables checks on valid-until: It is considered to mean that your
+  machine's time is not reliable.
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 26 Feb 2018 13:14:13 +0100
+
+apt (1.6~alpha1) unstable; urgency=medium
+
+  All methods provided by apt except for cdrom, gpgv, and rsh now
+  use seccomp-BPF sandboxing to restrict the list of allowed system
+  calls, and trap all others with a SIGSYS signal. Three options
+  can be used to configure this further:
+
+    APT::Sandbox::Seccomp is a boolean to turn it on/off
+    APT::Sandbox::Seccomp::Trap is a list of names of more syscalls to trap
+    APT::Sandbox::Seccomp::Allow is a list of names of more syscalls to allow
+
+  Also, sandboxing is now enabled for the mirror method.
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 23 Oct 2017 01:58:18 +0200
+
+apt (1.5~beta1) unstable; urgency=medium
+
+  [ New HTTPS method ]
+  The default http method now supports HTTPS itself, including encrypted proxies
+  and connecting to HTTPS sites via HTTPS proxies; and the apt-transport-https
+  package only provides a "curl+https" method now as a fallback, but will be
+  removed shortly. If TLS support is unwanted, it can be disabled overall by
+  setting the option Acquire::AllowTLS to "false".
+
+  As for backwards compatibility, the options IssuerCert and SslForceVersion
+  are not supported anymore, and any specified certificate files must be in the
+  PEM format (curl might have allowed DER files as well).
+
+  [ Changes to unauthenticated repositories ]
+  The security exception for apt-get to only raise warnings if it encounters
+  unauthenticated repositories in the "update" command is gone now, so that it
+  will raise errors just like apt and all other apt-based front-ends do since
+  at least apt version 1.3.
+
+  It is possible (but STRONGLY ADVISED AGAINST) to revert to the previous
+  behaviour of apt-get by setting the option
+    Binary::apt-get::Acquire::AllowInsecureRepositories "true";
+  See apt-secure(8) manpage for configuration details.
+
+  [ Release Info Changes ]
+  If values like Origin, Label, and Codename change in a Release file,
+  update fails, or asks a user (if interactive). Various
+  --allow-releaseinfo-change are provided for non-interactive use.
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 03 Jul 2017 15:09:23 +0200
+
+apt (1.4.2) unstable; urgency=medium
+
+  If periodic updates and unattended upgrades are enabled, the start of
+  periodic updates are now distributed over 24 hour intervals (as in 1.2
+  to 1.4), whereas starting unattended-upgrade has been restricted to a
+  time between 6 and 7 am. This only affects systems using systemd, other
+  systems still use the classical hourly cron job.
+
+ -- Julian Andres Klode <jak@debian.org>  Thu, 04 May 2017 22:54:02 +0200
+
+apt (1.4~beta1) unstable; urgency=medium
+
+  Support for GPG signatures using the SHA1 or RIPE-MD/160 hash
+  algorithms has been disabled. Repositories using Release files
+  signed in such a way will stop working. This change has been made
+  due to security considerations, especially with regards to possible
+  further breakthroughs in SHA1 breaking during the lifetime
+  of this APT release series.
+
+  It is possible (but STRONGLY ADVISED AGAINST) to revert to the previous
+  behaviour by setting the options
+    APT::Hashes::SHA1::Weak "yes";
+    APT::Hashes::RIPE-MD/160::Weak "yes";
+  Note that setting these options only affects the verification of the overall
+  repository signature.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 25 Nov 2016 13:19:32 +0100
+
+apt (1.2~exp1) experimental; urgency=medium
+
+  [ Automatic removal of debs after install ]
+  After packages are successfully installed by apt(8),
+  the corresponding .deb package files will be
+  removed from the /var/cache/apt/archives cache directory.
+
+  This can be changed by setting the apt configuration option
+    "Binary::apt::APT::Keep-Downloaded-Packages" to "true". E.g:
+
+  # echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' \
+      > /etc/apt/apt.conf.d/01keep-debs
+
+  Please note that the behavior of apt-get is unchanged. The
+  downloaded debs will be kept in the cache directory after they
+  are installed. To enable the behavior for other tools, you can set
+  "APT::Keep-Downloaded-Packages" to false.
+
+  [ Compressed indices ]
+  If you use Acquire::gzipIndexes, or any other compressed index targets,
+  those will now be compressed with the fastest supported algorithm,
+  currently lz4.
+
+ -- Michael Vogt <mvo@debian.org>  Tue, 05 Jan 2016 19:22:16 +0100
+
+apt (1.1~exp9) experimental; urgency=medium
+
+  A new algorithm for pinning has been implemented, it now assigns a
+  pin priority to a version instead of assigning a pin to a package.
+
+  This might break existing corner cases of pinning, if they use multiple
+  pins involving the same package name or patterns matching the same
+  package name, but should overall lead to pinning that actually works
+  as intended and documented.
+
+ -- Julian Andres Klode <jak@debian.org>  Mon, 17 Aug 2015 14:45:17 +0200
+
+apt (0.8.11) unstable; urgency=low
+
+  * apt-get install pkg/experimental will now not only switch the
+    candidate of package pkg to the version from the release experimental
+    but also of all dependencies of pkg if the current candidate can't
+    satisfy a versioned dependency.
+
+ -- David Kalnischkies <kalnischkies@gmail.com>  Fri, 03 Dec 2010 14:09:12 +0100
+
+apt (0.7.26~exp3) experimental; urgency=low
+
+  * apt-ftparchive now reads the standard configuration files in
+    /etc/apt/apt.conf and /etc/apt/apt.conf.d.
+
+ -- Julian Andres Klode <jak@debian.org>  Fri, 26 Mar 2010 15:34:16 +0100
+
+apt (0.7.24) unstable; urgency=low
+
+  * Already included in the last version but now with better documentation
+    is the possibility to add/prefer different compression types while
+    downloading archive information, which can decrease the time needed for
+    update on slow machines. See apt.conf (5) manpage for details.
+  * APT manages his manpage translations now with po4a, thanks to Nicolas
+    François and Kurasawa Nozomu, who also provide the ja translation.
+    Thanks to Christian Perrier we have already a fr translation and
+    a few more are hopefully added in the near future.
+  * This version also introduces some _experimental_ configuration options
+    to make more aggressive use of dpkg's triggers. If you want to help
+    testing these _experimental_ options see apt.conf (5) manpage.
+
+ -- David Kalnischkies <kalnischkies@gmail.com>  Thu, 24 Sep 2009 15:13:16 +0200
+
+apt (0.7.23) unstable; urgency=low
+
+  * Code that determines which proxy to use was changed. Now
+    'Acquire::{http,ftp}::Proxy[::<host>]' options have the highest priority,
+    and '{http,ftp}_proxy' environment variables are used only if options
+    mentioned above are not specified.
+
+ -- Eugene V. Lyubimkin <jackyf.devel@gmail.com>  Thu, 19 Aug 2009 11:26:16 +0200
+
+apt (0.6.44) unstable; urgency=low
+
+  * apt-ftparchive --db now uses Berkeley DB_BTREE instead of DB_HASH. 
+    If you use a database created by an older version of apt, delete 
+    it and allow it to be recreated the next time.
+
+ -- Michael Vogt <mvo@debian.org>  Wed, 26 Apr 2006 12:57:53 +0200
+
+apt (0.5.25) unstable; urgency=low
+
+  * apt-ftparchive --db now uses Berkeley DB version 4.2.  If used with a
+    database created by an older version of apt, an attempt will be made
+    to upgrade the database, but this may not work in all cases.  If your
+    database is not automatically upgraded, delete it and allow it to be
+    recreated the next time.
+
+ -- Matt Zimmerman <mdz@debian.org>  Sat,  8 May 2004 12:38:07 -0700

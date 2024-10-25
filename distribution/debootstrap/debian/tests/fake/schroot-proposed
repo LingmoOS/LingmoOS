@@ -1,0 +1,87 @@
+#!/bin/sh
+# fake/schroot-proposed -- emulate proposed mount behaviour for schroot
+#
+# This version emulates the behaviour proposed on #856877. If it needs
+# changing, please update the proposed patch on #856877 too.
+#
+# Copyright © 2017-2023 Simon McVittie
+# SPDX-License-Identifier: MIT
+# (see debian/copyright)
+
+set -e
+
+# Reference: /etc/schroot/default/fstab
+# (in schroot source tree: etc/profile-templates/default/linux/fstab)
+bind_dev=yes
+
+while true; do
+	case "$1" in
+		(--sbuild)
+			shift
+			# Reference: /etc/schroot/sbuild/fstab
+			# (source: etc/profile-templates/sbuild/linux/fstab)
+			bind_dev=no
+			;;
+		(*)
+			break
+	esac
+done
+
+CHROOT_PATH="$1"
+shift
+if test -z "$CHROOT_PATH" || test -z "$1"; then
+	echo "Usage: $0 CHROOT COMMAND...">&2
+	exit 2
+fi
+
+[ "$bind_dev" = no ] || mount --bind /dev "$CHROOT_PATH/dev"
+mount -t devpts -o rw,newinstance,ptmxmode=666,mode=620,gid=5 /dev/pts "$CHROOT_PATH/dev/pts"
+
+ls -l "/dev/ptmx" | sed -e 's/^/# fake-schroot: outside chroot: /' >&2
+ls -l "/dev/pts/ptmx" | sed -e 's/^/# fake-schroot: outside chroot: /' >&2
+
+ls -l "$CHROOT_PATH/dev/ptmx" | sed -e 's/^/# fake-schroot: after first step: /' >&2
+ls -l "$CHROOT_PATH/dev/pts/ptmx" | sed -e 's/^/# fake-schroot: after first step: /' >&2
+
+mounted_ptmx=no
+
+# Depending on how /dev was set up, /dev/ptmx might either be
+# character device (5,2), or a symbolic link to pts/ptmx.
+# Either way we want it to be equivalent to /dev/pts/ptmx, assuming
+# both exist.
+if [ -e "$CHROOT_PATH/dev/pts/ptmx" ] && \
+        [ -e "$CHROOT_PATH/dev/ptmx" ] && \
+        ! [ "$CHROOT_PATH/dev/pts/ptmx" -ef "$CHROOT_PATH/dev/ptmx" ]; then
+    mount --bind "$CHROOT_PATH/dev/pts/ptmx" "$CHROOT_PATH/dev/ptmx"
+    mounted_ptmx=yes
+fi
+
+mounted_console=no
+
+# If schroot was invoked from a terminal, we still want to be able to
+# access that terminal. lxc and systemd-nspawn achieve this by
+# binding it onto /dev/console; so can we.
+if stdin_tty="$(tty)"; then
+    if [ ! -e "$CHROOT_PATH/dev/console" ]; then
+        # We need something to mount onto, and it might as well be
+        # the correctly-numbered device node.
+        mknod -m700 "$CHROOT_PATH/dev/console" c 5 1
+    fi
+
+    mount --bind "$stdin_tty" "$CHROOT_PATH/dev/console"
+    mounted_console=yes
+fi
+
+ls -l "$CHROOT_PATH/dev/console" | sed -e 's/^/# fake-schroot: after fixing mounts: /' >&2
+ls -l "$CHROOT_PATH/dev/ptmx" | sed -e 's/^/# fake-schroot: after fixing mounts: /' >&2
+ls -l "$CHROOT_PATH/dev/pts/ptmx" | sed -e 's/^/# fake-schroot: after fixing mounts: /' >&2
+
+e=0
+chroot "$CHROOT_PATH" "$@" || e=$?
+
+[ "$mounted_console" = no ] || umount "$CHROOT_PATH/dev/console"
+[ "$mounted_ptmx" = no ] || umount "$CHROOT_PATH/dev/ptmx"
+umount "$CHROOT_PATH/dev/pts"
+[ "$bind_dev" = no ] || umount "$CHROOT_PATH/dev"
+
+exit "$e"

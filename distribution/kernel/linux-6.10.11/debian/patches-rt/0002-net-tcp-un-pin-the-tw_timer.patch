@@ -1,0 +1,29 @@
+From: Florian Westphal <fw@strlen.de>
+Date: Tue, 4 Jun 2024 16:08:48 +0200
+Subject: [PATCH 2/3] net: tcp: un-pin the tw_timer
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+After previous patch, even if timer fires immediately on another CPU,
+context that schedules the timer now holds the ehash spinlock, so timer
+cannot reap tw socket until ehash lock is released.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://lore.kernel.org/r/20240604140903.31939-3-fw@strlen.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/ipv4/inet_timewait_sock.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -203,7 +203,7 @@ struct inet_timewait_sock *inet_twsk_all
+ 		tw->tw_prot	    = sk->sk_prot_creator;
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+-		timer_setup(&tw->tw_timer, tw_timer_handler, TIMER_PINNED);
++		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
+ 		/*
+ 		 * Because we use RCU lookups, we should not set tw_refcnt
+ 		 * to a non null value before everything is setup for this

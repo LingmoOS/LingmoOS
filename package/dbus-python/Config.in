@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_DBUS_PYTHON
+	bool "dbus-python"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_PACKAGE_DBUS
+	depends on LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT # runtime
+	help
+	  Python bindings for D-Bus
+
+	  http://dbus.freedesktop.org/doc/dbus-python/
+
+comment "dbus-python needs a toolchain w/ wchar, threads"
+	depends on LINGMO_PACKAGE_DBUS && LINGMO_PACKAGE_PYTHON3
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,124 @@
+* Introduction
+  ------------
+
+the spellchecker is a set of scripts which manipulate po files and
+produce statistics usually displayed on a web page. Spotting typos is
+the most obvious feature, but translators can use it to improve the
+overall quality of their translations.
+
+Translations are often spread over a bunch on po files translated by
+different people with different styles even if belonging to the same
+language-team; the spellchecker gathers all of its output in a "per
+language" rather than "per po file" basis, so that each translator
+using it, will check not only his/her own translations.
+
+
+* Understanding the output
+  ------------------------
+The statistics page contains the following columns for every language
+supported:
+
+"Language" - extended English name of the language and corresponding
+ISO code
+
+"Unknown words" - is the number of unique words not found in the
+dictionary of a particular language. "-" , means that the spellchecker
+is not configured as to check translations for this language (usually
+because an aspell dictionary for the language is not available)
+
+"Messages" - contains all the strings for lang extracted from the po
+files: you can use any spellchecker against this file to look for
+typos. This file is very useful also when improving consistency: when
+translations are spread over many po files, is difficult to make sure
+that certain rules are applied to all files, so here you can check for
+example that "CD-ROM" is written always the same way.
+
+"List of unknown words" - is a sorted list of words not found in the 
+aspell dictionary along with the number of occurrences.
+
+"suspect variables" - po files often contain variables ${LIKE_THIS}; a
+script checks that the name of the variable in the msgid is matched in
+the msgstr. It's also checked that the number of variables in the
+msgstr is the same in the msgid.
+
+"custom wordlist" - translators can write a list of custom words not
+found in the aspell dictionary for their language. More details about
+wordlists can be found here (FIXME).
+
+"all files" - is a tarball containing all the above files. translators
+can download this and work off-line.
+
+Sometimes columns are followed by a "(*)": it means that the
+associated file has changed since the last time the spellchecker was
+run. By clicking on the "(*)" it's possible to see what changed.
+
+
+* Spotting typos
+  --------------
+
+First of all you should look for errors: typically typos or wrong
+variables. The list of unknown words contains words not in the aspell
+dictionary and "out of their context"; once one has been found, you
+need to locate where the error is in the po file.
+
+Since "Messages" contains all the (translated) strings for all the po files,
+you can look for the wrong word there; the structure of the text file
+is the following:
+
+*** path1/lang.po
+- "strings for this file"
+
+*** path2/lang.po
+- "strings for this file"
+
+...
+
+*** pathN/lang.po
+- "strings for this file"
+
+
+if the word is easy to find you won't need any help from me to locate
+it and you just need to see which po file it belongs to. Emacs has a
+very handy function "forward-paragraph" (ctrl-up on my system) that
+takes you directly to the line containing the path. Otherwise you can
+search backward for "*** " to find it.
+
+Things can be more complicated if the unknown word is very short and
+so it's matched too many times inside the file because is "sub-word" of
+longer words; in that case you should use regexps to restrict your
+search. Here follow a few practical examples that can help you; refer
+to some documentation about regexp to find out more.
+
+If you use emacs you can match an exact word by using
+isearch-forward-regexp and "\<word\>"
+
+From the shell you can run 'grep -nw "word" lang_all.txt'
+("n" parameter will tell grep to print the line number where match
+occurs)
+
+Sometimes you may have to look for something like "a word composed
+by two letters: the first is "p" the second is not a printable char";
+in that case "word" in the previous examples can be replaced with
+"p."
+
+
+* Suspect variables
+  -----------------
+
+Variables in po files are of the form ${VARIABLE}; the spellchecker
+is able to catch the following common mistakes:
+
+- misspelled variable names
+- wrong braces
+- missing "$" character
+- different number of variables in the msgid and the msgstr
+
+the variable name should not be translated in the msgstr and braces
+should not be changed. The variable name is replaced with something
+more useful at run-time; if the translator manipulates it, the results
+will be rather ugly. When original msgid contains multiple occurrences
+of a particular variable, sometimes translators translate the string
+as to use the variable just once; the script will report such strings
+as wrong and it's up to the translator to check if it's a mistake or
+not (this is the main reason for calling them "suspect variables").
+

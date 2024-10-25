@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_LENSFUN
+	bool "lensfun"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Lensfun itself is only a library for correcting several
+	  artefacts and a database for storing lens profiles. To
+	  actually use Lensfun to process your images you need an
+	  image editing application with Lensfun support.
+
+	  https://lensfun.github.io
+
+if LINGMO_PACKAGE_LENSFUN
+
+config LINGMO_PACKAGE_LENSFUN_TOOLS
+	bool "lensfun tools"
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  Build 'lenstool'.
+
+endif
+
+comment "lensfun needs a toolchain w/ C++, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR

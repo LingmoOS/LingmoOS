@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_LIBSPDM_CPU_FAMILY
+	string
+	# OpenSSL doesn't support "arc" (LINGMO_arcle || LINGMO_arceb), "arm"
+	# (if LINGMO_arm || LINGMO_armeb) or "riscv32"/"riscv6"
+	# (LINGMO_riscv && LINGMO_RISCV_32/LINGMO_RISCV_64). So we don't
+	# support those here
+	default "aarch64"	if LINGMO_aarch64 || LINGMO_aarch64_be
+	default "ia32"		if LINGMO_i386
+	default "x64"		if LINGMO_x86_64
+
+config LINGMO_PACKAGE_LIBSPDM_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_LIBSPDM_CPU_FAMILY != ""
+
+config LINGMO_PACKAGE_LIBSPDM
+	bool "libspdm"
+	depends on LINGMO_PACKAGE_LIBSPDM_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	help
+	  libspdm is a sample implementation that follows
+	  the DMTF SPDM specifications
+
+	  https://github.com/DMTF/libspdm

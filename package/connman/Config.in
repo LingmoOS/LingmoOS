@@ -1,0 +1,115 @@
+config LINGMO_PACKAGE_CONNMAN
+	bool "connman"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus, libglib2
+	depends on LINGMO_USE_MMU # dbus, libglib2
+	depends on !LINGMO_STATIC_LIBS # needs dlopen()
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # missing res_ninit()
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  The Connection Manager (ConnMan) project provides a daemon
+	  for managing internet connections within embedded devices
+	  running the Linux operating system.
+
+	  https://01.org/connman
+
+if LINGMO_PACKAGE_CONNMAN
+
+choice
+	prompt "Firewall type"
+	default LINGMO_PACKAGE_CONNMAN_IPTABLES
+	help
+	  Select which firewall type is used.
+
+config LINGMO_PACKAGE_CONNMAN_IPTABLES
+	bool "iptables"
+	select LINGMO_PACKAGE_IPTABLES
+	help
+	  Use iptables as firewall.
+
+config LINGMO_PACKAGE_CONNMAN_NFTABLES
+	bool "nftables"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+	select LINGMO_PACKAGE_LIBMNL
+	select LINGMO_PACKAGE_NFTABLES
+	help
+	  Use nftables as firewall.
+endchoice
+
+config LINGMO_PACKAGE_CONNMAN_ETHERNET
+	bool "enable Ethernet support"
+	default y
+
+config LINGMO_PACKAGE_CONNMAN_WIFI
+	bool "enable WiFi support"
+	select LINGMO_PACKAGE_WPA_SUPPLICANT # runtime
+	select LINGMO_PACKAGE_WPA_SUPPLICANT_DBUS # runtime
+	help
+	  Enable WiFi support (scan and static/dhcp interface
+	  setup). ConnMan detects the start of wpa_supplicant
+	  automatically.
+
+config LINGMO_PACKAGE_CONNMAN_WIREGUARD
+	bool "enable wireguard support"
+	select LINGMO_PACKAGE_LIBMNL
+
+config LINGMO_PACKAGE_CONNMAN_WISPR
+	bool "enable WISPr support"
+	depends on !LINGMO_STATIC_LIBS # gnutls
+	select LINGMO_PACKAGE_GNUTLS
+	help
+	  Enable support for Wireless Internet Service Provider
+	  roaming (WISPr). A RADIUS server is used to authenticate the
+	  subscriber's credentials.
+
+comment "connman WISPr needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_CONNMAN_BLUETOOTH
+	bool "enable Bluetooth support"
+	help
+	  Enable Bluetooth support. The start of bluetoothd is
+	  automatically detected and only a runtime dependency.
+
+config LINGMO_PACKAGE_CONNMAN_LOOPBACK
+	bool "enable loopback support"
+
+config LINGMO_PACKAGE_CONNMAN_NEARD
+	bool "enable neard support"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # neard
+	select LINGMO_PACKAGE_NEARD
+
+config LINGMO_PACKAGE_CONNMAN_OFONO
+	bool "enable ofono support"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # ofono
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12 # ofono
+	select LINGMO_PACKAGE_OFONO
+
+comment "ofono support needs a toolchain w/ headers >= 4.12"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12
+
+config LINGMO_PACKAGE_CONNMAN_DEBUG
+	bool "enable compiling with debugging information"
+
+config LINGMO_PACKAGE_CONNMAN_STATS
+	bool "enable statistics round robin file generation"
+	help
+	  Enable generation of statistics in a round robin file.
+
+	  This is enabled by default upstream but is marked as
+	  experimental.
+
+config LINGMO_PACKAGE_CONNMAN_CLIENT
+	bool "enable command line client"
+	select LINGMO_PACKAGE_READLINE
+
+endif # LINGMO_PACKAGE_CONNMAN
+
+comment "connman needs a glibc or uClibc toolchain w/ wchar, threads, resolver, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS \
+		|| LINGMO_TOOLCHAIN_USES_MUSL

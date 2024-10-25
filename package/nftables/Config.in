@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_NFTABLES
+	bool "nftables"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+	select LINGMO_PACKAGE_LIBMNL
+	select LINGMO_PACKAGE_LIBNFTNL
+	help
+	  nftables is the project that aims to replace the existing
+	  {ip,ip6,arp,eb}tables framework.
+	  Basically, this project provides a new packet filtering
+	  framework, a new userspace utility and also a compatibility
+	  layer for {ip,ip6}tables.
+
+	  http://www.netfilter.org/projects/nftables/index.html
+
+# Legacy: this used to be handled in nftables.mk
+if LINGMO_PACKAGE_NFTABLES
+source "package/nftables/nftables-python/Config.in"
+endif
+
+comment "nftables needs a toolchain w/ wchar, headers >= 3.12"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12

@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_E2TOOLS
+	bool "e2tools"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR # uses wchar_t
+	depends on LINGMO_USE_MMU # e2fsprogs
+	select LINGMO_PACKAGE_E2FSPROGS
+	help
+	  E2tools is a simple set of GPL'ed utilities to read, write,
+	  and manipulate files in an ext2/ext3 filesystem. These
+	  utilities access a filesystem directly using the ext2fs
+	  library.
+
+	  https://github.com/ndim/e2tools
+
+comment "e2tools needs a toolchain w/ threads, wchar"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU

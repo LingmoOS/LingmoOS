@@ -1,0 +1,367 @@
+config LINGMO_PACKAGE_KODI_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	# i386: needs sse (see upstream PR 10351)
+	depends on !(LINGMO_i386 && !LINGMO_X86_CPU_HAS_SSE)
+	depends on LINGMO_USE_MMU # libcdio, and others
+
+comment "kodi needs python3 w/ .py modules, a uClibc or glibc toolchain w/ C++, threads, wchar, dynamic library, gcc >= 9.x"
+	depends on LINGMO_PACKAGE_KODI_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 \
+		|| LINGMO_TOOLCHAIN_USES_MUSL \
+		|| !LINGMO_PACKAGE_PYTHON3 \
+		|| LINGMO_PACKAGE_PYTHON3_PYC_ONLY
+
+config LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+	bool
+
+config LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_GBM
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+	depends on LINGMO_PACKAGE_HAS_LIBGBM
+	depends on LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF
+	depends on LINGMO_PACKAGE_HAS_UDEV # libinput
+	select LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+
+comment "kodi needs udev support for gbm"
+	depends on !LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+
+config LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_WAYLAND
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+	depends on LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND # waylandpp
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9 # waylandpp
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # waylandpp
+	depends on LINGMO_INSTALL_LIBSTDCPP # waylandpp
+	depends on LINGMO_PACKAGE_WAYLAND # waylandpp
+	select LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+
+config LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_X11
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+
+comment "kodi needs an OpenGL EGL backend with OpenGL or GLES support"
+	depends on !LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+
+menuconfig LINGMO_PACKAGE_KODI
+	bool "kodi"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libass -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9 # C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_STATIC_LIBS # gnutls, python3 and others
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	depends on LINGMO_PACKAGE_KODI_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS
+	depends on LINGMO_PACKAGE_PYTHON3
+	depends on !LINGMO_PACKAGE_PYTHON3_PYC_ONLY
+	select LINGMO_NEEDS_HOST_JAVA
+	select LINGMO_HOST_CMAKE_AT_LEAST_3_24
+	select LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_FFMPEG_GPL
+	select LINGMO_PACKAGE_FFMPEG_POSTPROC
+	select LINGMO_PACKAGE_FFMPEG_SWSCALE
+	select LINGMO_PACKAGE_FLATBUFFERS
+	select LINGMO_PACKAGE_FMT
+	select LINGMO_PACKAGE_FONTCONFIG # needed for libass
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_FSTRCMP
+	select LINGMO_PACKAGE_GIFLIB
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBASS
+	select LINGMO_PACKAGE_LIBCDIO
+	select LINGMO_PACKAGE_LIBCROSSGUID
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBDRM
+	select LINGMO_PACKAGE_LIBFRIBIDI
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBICONV_EXTRA_ENCODINGS if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBPLIST
+	select LINGMO_PACKAGE_LIBPNG
+	select LINGMO_PACKAGE_LZO
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PCRE
+	select LINGMO_PACKAGE_PCRE_UCP
+	select LINGMO_PACKAGE_PYTHON3_2TO3
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT
+	select LINGMO_PACKAGE_PYTHON3_SQLITE
+	select LINGMO_PACKAGE_PYTHON3_SSL
+	select LINGMO_PACKAGE_PYTHON3_UNICODEDATA
+	select LINGMO_PACKAGE_PYTHON3_ZLIB
+	select LINGMO_PACKAGE_RAPIDJSON
+	select LINGMO_PACKAGE_SPDLOG
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_TAGLIB
+	select LINGMO_PACKAGE_TINYXML
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_TOOLCHAIN_GLIBC_GCONV_LIBS_COPY if LINGMO_TOOLCHAIN_USES_GLIBC # runtime UTF conversion support
+	select LINGMO_PACKAGE_LIBINPUT if LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_GBM
+	select LINGMO_PACKAGE_LIBXKBCOMMON if LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_GBM
+	select LINGMO_PACKAGE_LIBXKBCOMMON if LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_WAYLAND
+	select LINGMO_PACKAGE_WAYLANDPP if LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_WAYLAND
+	select LINGMO_PACKAGE_XLIB_LIBXRANDR if LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_X11
+	help
+	  Kodi is an award-winning free and open source (GPL) software
+	  media player and entertainment hub for digital media.
+
+	  http://kodi.tv
+
+if LINGMO_PACKAGE_KODI
+
+config LINGMO_PACKAGE_KODI_ALSA_LIB
+	bool "alsa"
+	select LINGMO_PACKAGE_ALSA_LIB
+	help
+	  Enable alsa support.
+
+config LINGMO_PACKAGE_KODI_AVAHI
+	bool "avahi"
+	select LINGMO_PACKAGE_AVAHI
+	select LINGMO_PACKAGE_AVAHI_DAEMON
+	help
+	  Enable Avahi support.
+	  Select this if you want Kodi to support Bonjour protocol.
+
+config LINGMO_PACKAGE_KODI_BLUEZ
+	bool "bluetooth"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18 # bluez5_utils hid plugin
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # bluez5_utils
+	select LINGMO_PACKAGE_BLUEZ5_UTILS
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_AUDIO
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HID
+	help
+	    Enable bluetooth support
+
+comment "bluetooth support needs a toolchain w/ headers >= 3.18"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+config LINGMO_PACKAGE_KODI_DBUS
+	bool "dbus"
+	select LINGMO_PACKAGE_DBUS
+	help
+	  Enable D-Bus support
+
+config LINGMO_PACKAGE_KODI_EVENTCLIENTS
+	bool "eventclients"
+	help
+	  Enable event clients support
+
+	  https://github.com/xbmc/xbmc/blob/master/tools/EventClients/README.txt
+
+config LINGMO_PACKAGE_KODI_LIBBLURAY
+	bool "blu-ray"
+	select LINGMO_PACKAGE_LIBBLURAY
+	help
+	  Enable Blu-ray input support.
+	  Select this if you want to play back Blu-ray content.
+
+config LINGMO_PACKAGE_KODI_LIBCEC
+	bool "hdmi cec"
+	select LINGMO_PACKAGE_LIBCEC
+	help
+	  Enable CEC (Consumer Electronics Control) support.
+	  Select this if you want Kodi to support HDMI CEC.
+
+config LINGMO_PACKAGE_KODI_LCMS2
+	bool "lcms2"
+	select LINGMO_PACKAGE_LCMS2
+	help
+	  Enable color management support.
+
+config LINGMO_PACKAGE_KODI_LIBMICROHTTPD
+	bool "web server"
+	select LINGMO_PACKAGE_LIBMICROHTTPD
+	help
+	  Enable webserver feature
+
+config LINGMO_PACKAGE_KODI_LIBNFS
+	bool "nfs"
+	# libnfs -> libtirpc
+	depends on LINGMO_TOOLCHAIN_HAS_NATIVE_RPC || LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBNFS
+	help
+	  Enable NFS server support.
+
+comment "nfs support needs a toolchain w/ threads support"
+	depends on !(LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_HAS_NATIVE_RPC)
+
+config LINGMO_PACKAGE_KODI_MYSQL
+	bool "mysql"
+	select LINGMO_PACKAGE_MARIADB
+	help
+	  Enable MySQL support
+
+choice
+	prompt "render system"
+	default LINGMO_PACKAGE_KODI_RENDER_SYSTEM_GL
+
+config LINGMO_PACKAGE_KODI_RENDER_SYSTEM_GL
+	bool "OpenGL"
+	depends on LINGMO_PACKAGE_HAS_LIBGL
+	select LINGMO_PACKAGE_LIBGLU
+
+config LINGMO_PACKAGE_KODI_RENDER_SYSTEM_GLES
+	bool "GLES"
+	depends on LINGMO_PACKAGE_HAS_LIBGLES
+
+endchoice
+
+config LINGMO_PACKAGE_KODI_PULSEAUDIO
+	bool "pulseaudio"
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	# Pulseaudio support in kodi needs glib support in Pulseaudio,
+	# see FindPulseAudio.cmake. Kodi meets all dependencies of
+	# libglib2, so there is no need to propagate them here.
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_PULSEAUDIO
+	help
+	  Enable Pulseaudio support.
+
+config LINGMO_PACKAGE_KODI_LIBSHAIRPLAY
+	bool "shairport"
+	select LINGMO_PACKAGE_LIBSHAIRPLAY
+	help
+	  Enable Shairport support.
+	  Select this if you want to stream content from an Apple
+	  device.
+
+config LINGMO_PACKAGE_KODI_LIBSMBCLIENT
+	bool "samba"
+	depends on LINGMO_PACKAGE_SAMBA4
+	help
+	  Enable Samba support
+
+config LINGMO_PACKAGE_KODI_LIBUSB
+	bool "usb"
+	# https://github.com/xbmc/xbmc/blob/Jarvis/configure.ac#L1554
+	# "if libudev is available, we don't need libusb"
+	depends on !LINGMO_PACKAGE_HAS_UDEV
+	select LINGMO_PACKAGE_LIBUSB
+	select LINGMO_PACKAGE_LIBUSB_COMPAT
+	help
+	  Enable libusb support.
+
+config LINGMO_PACKAGE_KODI_LIBVDPAU
+	bool "vdpau"
+	depends on LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_X11 && \
+		LINGMO_PACKAGE_KODI_RENDER_SYSTEM_GL
+	select LINGMO_PACKAGE_LIBVDPAU
+	help
+	  Enable libvdpau support.
+
+comment "libvdpau support needs platform 'X11/OpenGL'"
+	depends on !LINGMO_PACKAGE_KODI_PLATFORM_SUPPORTS_X11 || \
+		!LINGMO_PACKAGE_KODI_RENDER_SYSTEM_GL
+
+config LINGMO_PACKAGE_KODI_UPNP
+	bool "upnp"
+	help
+	  Enable UPnP support
+
+config LINGMO_PACKAGE_KODI_OPTICALDRIVE
+	bool "optical drives"
+	help
+	  Add support for optical drives, to read e.g. DVDs...
+
+menu "Audio decoder addons"
+	source "package/kodi-audiodecoder-modplug/Config.in"
+	source "package/kodi-audiodecoder-nosefart/Config.in"
+	source "package/kodi-audiodecoder-sidplay/Config.in"
+	source "package/kodi-audiodecoder-snesapu/Config.in"
+	source "package/kodi-audiodecoder-stsound/Config.in"
+	source "package/kodi-audiodecoder-timidity/Config.in"
+	source "package/kodi-audiodecoder-vgmstream/Config.in"
+endmenu
+
+menu "Audio encoder addons"
+	source "package/kodi-audioencoder-flac/Config.in"
+	source "package/kodi-audioencoder-lame/Config.in"
+	source "package/kodi-audioencoder-vorbis/Config.in"
+	source "package/kodi-audioencoder-wav/Config.in"
+endmenu
+
+menu "Image decoder addons"
+	source "package/kodi-imagedecoder-heif/Config.in"
+	source "package/kodi-imagedecoder-raw/Config.in"
+endmenu
+
+menu "Peripheral addons"
+	source "package/kodi-peripheral-joystick/Config.in"
+	source "package/kodi-peripheral-xarcade/Config.in"
+endmenu
+
+menu "Inputstream addons"
+	source "package/kodi-inputstream-adaptive/Config.in"
+	source "package/kodi-inputstream-ffmpegdirect/Config.in"
+	source "package/kodi-inputstream-rtmp/Config.in"
+endmenu
+
+menu "PVR addons"
+	source "package/kodi-pvr-argustv/Config.in"
+	source "package/kodi-pvr-dvblink/Config.in"
+	source "package/kodi-pvr-dvbviewer/Config.in"
+	source "package/kodi-pvr-filmon/Config.in"
+	source "package/kodi-pvr-hdhomerun/Config.in"
+	source "package/kodi-pvr-hts/Config.in"
+	source "package/kodi-pvr-iptvsimple/Config.in"
+	source "package/kodi-pvr-mediaportal-tvserver/Config.in"
+	source "package/kodi-pvr-mythtv/Config.in"
+	source "package/kodi-pvr-nextpvr/Config.in"
+	source "package/kodi-pvr-njoy/Config.in"
+	source "package/kodi-pvr-octonet/Config.in"
+	source "package/kodi-pvr-pctv/Config.in"
+	source "package/kodi-pvr-plutotv/Config.in"
+	source "package/kodi-pvr-stalker/Config.in"
+	source "package/kodi-pvr-vbox/Config.in"
+	source "package/kodi-pvr-vdr-vnsi/Config.in"
+	source "package/kodi-pvr-vuplus/Config.in"
+	source "package/kodi-pvr-waipu/Config.in"
+	source "package/kodi-pvr-wmc/Config.in"
+	source "package/kodi-pvr-zattoo/Config.in"
+endmenu
+
+menu "Screensavers"
+	source "package/kodi-screensaver-asteroids/Config.in"
+	source "package/kodi-screensaver-asterwave/Config.in"
+	source "package/kodi-screensaver-biogenesis/Config.in"
+	source "package/kodi-screensaver-cpblobs/Config.in"
+	source "package/kodi-screensaver-greynetic/Config.in"
+	source "package/kodi-screensaver-matrixtrails/Config.in"
+	source "package/kodi-screensaver-pingpong/Config.in"
+	source "package/kodi-screensaver-pyro/Config.in"
+	source "package/kodi-screensaver-rsxs/Config.in"
+	source "package/kodi-screensaver-stars/Config.in"
+endmenu
+
+menu "Skins"
+	source "package/kodi-skin-confluence/Config.in"
+endmenu
+
+menu "Virtual file systems"
+	source "package/kodi-vfs-libarchive/Config.in"
+	source "package/kodi-vfs-rar/Config.in"
+	source "package/kodi-vfs-sftp/Config.in"
+endmenu
+
+menu "Visualisations"
+	source "package/kodi-visualisation-fishbmc/Config.in"
+	source "package/kodi-visualisation-goom/Config.in"
+	source "package/kodi-visualisation-matrix/Config.in"
+	source "package/kodi-visualisation-shadertoy/Config.in"
+	source "package/kodi-visualisation-spectrum/Config.in"
+	source "package/kodi-visualisation-starburst/Config.in"
+	source "package/kodi-visualisation-waveform/Config.in"
+endmenu
+
+endif # LINGMO_PACKAGE_KODI

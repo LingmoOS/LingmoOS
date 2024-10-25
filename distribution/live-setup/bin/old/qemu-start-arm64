@@ -1,0 +1,85 @@
+#!/bin/sh
+
+#CDROM_IMG=debian-8.6.0-arm64-netinst.iso
+#HDA_IMG=jessie-debian-live-maker-arm64.img
+#HDA_IMG=stretch-debian-live-maker-arm64.img
+WORKSPACE_IMAGE="workspace.img"
+#QEMU=/home/93sam/qemu/qemu/aarch64-softmmu/qemu-system-aarch64
+QEMU=qemu-system-aarch64
+DIR=/srv/cdbuilder.debian.org/dst/debian-live
+RSYNC_PORT=10873
+SSH_PORT=10022
+VM_IP=127.16.2.1
+
+HDA_IMG=$1
+if [ "$HDA_IMG"x = ""x ]; then
+    HDA_IMG=${DIR}/stretch-debian-openstack-maker-arm64.img
+fi
+
+make_cdrom_arg()
+{
+        echo "-drive file=$1,id=cdrom,if=none,media=cdrom,format=raw " \
+             "-device virtio-scsi-device -device scsi-cd,drive=cdrom"
+}
+
+make_hd_arg()
+{
+        echo "-drive if=none,file=$1,id=$2,format=raw" \
+             "-device virtio-blk-device,drive=$2"
+}
+
+make_pflash_arg()
+{
+    echo -drive file=$1,if=pflash,format=raw
+}
+
+case $HDA_IMG in
+    *stretch*) RELEASE=stretch;;
+    *buster*) RELEASE=buster;;
+    *bullseye*) RELEASE=bullseye;;
+esac
+
+HD0_ARGS=$(make_hd_arg $HDA_IMG hd0)
+HD1_ARGS=$(make_hd_arg $WORKSPACE_IMAGE hd1)
+PF0_ARGS=$(make_pflash_arg ${DIR}/arm64-${RELEASE}-pflash0.img)
+PF1_ARGS=$(make_pflash_arg ${DIR}/arm64-${RELEASE}-pflash1.img)
+
+if [ $# -eq 1 ]; then
+        case $1 in
+            install)
+                CDROM_ARGS=`make_cdrom_arg $CDROM_IMG`
+            ;;
+            *)
+                CDROM_ARGS=""
+            ;;
+        esac
+fi
+
+cd $DIR
+
+case $(hostname) in
+    pettersson)
+       VNC=":1"
+       ;;
+    casulana)
+       VNC=":4"
+       ;;
+    *)
+       echo "Unknown host machine, abort"
+       exit 1
+       ;;
+esac
+
+$QEMU -m 16G -cpu cortex-a57 -M virt -smp 8 \
+      -daemonize \
+      -vnc ${VNC} \
+      ${PF0_ARGS} ${PF1_ARGS} \
+      -pidfile /home/debian-cd/debian-live-qemu.pid \
+      $CDROM_ARGS $HD0_ARGS $HD1_ARGS \
+      -k en-gb \
+      -netdev user,id=eth0,hostfwd=tcp:${VM_IP}:${SSH_PORT}-10.0.2.15:22,hostfwd=tcp:${VM_IP}:${RSYNC_PORT}-10.0.2.15:873 \
+      -device virtio-net-device,netdev=eth0
+
+#      -nographic \
+#      -daemonize \
+#      -vnc :1 \

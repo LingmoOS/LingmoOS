@@ -1,0 +1,34 @@
+comment "mosh needs a toolchain w/ C++, threads, dynamic library, wchar, gcc >= 4.8"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP \
+		|| LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_MOSH
+	bool "mosh"
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_INSTALL_LIBSTDCPP # protobuf
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # protobuf
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # protobuf
+	depends on !LINGMO_STATIC_LIBS # protobuf
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_PROTOBUF
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_NETTLE if !LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	# runtime dependency
+	select LINGMO_PACKAGE_OPENSSH if !LINGMO_PACKAGE_DROPBEAR_CLIENT
+	help
+	  Remote terminal application that supports intermittent
+	  connectivity, allows roaming, and provides speculative local
+	  echo and line editing of user keystrokes.
+
+	  Mosh requires that the remote machine has a locale setting
+	  matching the one on the client.
+
+	  When using mosh with dropbear on a remote machine, the
+	  client needs mosh with a version above 1.3.0 and the
+	  --no-ssh-pty option needs to be passed when starting the
+	  connection.
+
+	  https://mosh.org

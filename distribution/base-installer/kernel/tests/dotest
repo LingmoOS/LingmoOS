@@ -1,0 +1,99 @@
+#! /bin/sh
+set -e
+
+if [ "$TEST_VERBOSE" -ge 3 ]; then
+	set -x
+fi
+
+. "$(dirname "$0")/../$ARCH.sh"
+
+ok () {
+	echo "PASS $testname"
+}
+
+notok () {
+	echo "FAIL $testname"
+}
+
+log () {
+	echo "$*" >&2
+}
+
+warning () {
+	echo "warning: $*" >&2
+}
+
+for KERNEL_MAJOR in $MAJORS; do
+	WANT_FLAVOUR="$FLAVOUR"
+	KERNEL_LIST_NAME="KERNEL_$(echo "$KERNEL_MAJOR" | tr '.-' '__')"
+	WANT_KERNELS="$(eval echo "\$$KERNEL_LIST_NAME" | tr '\n' ' ' | tr -s ' ' | sed 's/ *$//')"
+	WANT_KERNEL_STEM="${WANT_KERNELS%% *}"
+	WANT_KERNEL_STEM="${WANT_KERNEL_STEM#kernel-image-}"
+	WANT_KERNEL_STEM="${WANT_KERNEL_STEM#linux-image-}"
+	export KERNEL_MAJOR
+	export KERNEL_VERSION="$(echo "$WANT_KERNEL_STEM" | cut -d - -f 1)"
+
+	# Is the correct kernel flavour selected?
+
+	testname="arch_get_kernel_flavour $KERNEL_MAJOR exit code"
+	if GOT_FLAVOUR="$(arch_get_kernel_flavour)" && [ "$GOT_FLAVOUR" ] ; then
+		ok
+	else
+		notok
+		continue # nothing else will work
+	fi
+
+	testname="arch_get_kernel_flavour want $WANT_FLAVOUR, got $GOT_FLAVOUR"
+	if [ "$WANT_FLAVOUR" = "$GOT_FLAVOUR" ]; then
+		ok
+	else
+		notok
+	fi
+
+	# Are the correct kernels treated as usable?
+
+	for kernel in $USABLE; do
+		testname="arch_check_usable_kernel $KERNEL_MAJOR $kernel should be usable"
+		if arch_check_usable_kernel "$kernel" "$GOT_FLAVOUR"; then
+			ok
+		else
+			notok
+		fi
+	done
+
+	# By default any postfix should be allowed
+	for kernel in $USABLE; do
+		testname="arch_check_usable_kernel $KERNEL_MAJOR ${kernel}-<postfix> should be usable"
+		if arch_check_usable_kernel "${kernel}-postfix" "$GOT_FLAVOUR"; then
+			ok
+		else
+			notok
+		fi
+	done
+
+	for kernel in $UNUSABLE; do
+		testname="arch_check_usable_kernel $KERNEL_MAJOR $kernel should be unusable"
+		if arch_check_usable_kernel "$kernel" "$GOT_FLAVOUR"; then
+			notok
+		else
+			ok
+		fi
+	done
+
+	# Is the correct preference order of default kernels selected?
+
+	testname="arch_get_kernel $KERNEL_MAJOR exit code"
+	if GOT_KERNELS="$(arch_get_kernel "$GOT_FLAVOUR" | tr '\n' ' ' | sed 's/ *$//')"; then
+		ok
+	else
+		notok
+		continue # the rest won't work
+	fi
+
+	testname="arch_get_kernel want '$WANT_KERNELS', got '$GOT_KERNELS'"
+	if [ "$WANT_KERNELS" = "$GOT_KERNELS" ]; then
+		ok
+	else
+		notok
+	fi
+done

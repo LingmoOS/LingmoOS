@@ -1,0 +1,20 @@
+image: debian:testing
+stages: 
+  - build
+
+build-worker:
+  stage: build
+  script:
+    - apt update && apt -y upgrade
+    - apt install -y build-essential fakeroot devscripts sudo
+    - cp -rv distribution/current .
+    - cd utils/live-build
+    - apt -y build-dep .
+    - dpkg-buildpackage -j8
+    - make install
+    - cd .. 
+    - apt install -y ./*.deb
+    - cd ..
+    - cd current
+    - chmod +x ./build.sh
+    - sudo ./build.sh

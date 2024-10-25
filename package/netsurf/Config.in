@@ -1,0 +1,57 @@
+# netsurf mixes up host and target CFLAGS, so it isn't compatible with
+# architectures where we pass ABI specific compiler flags (TARGET_ABI)
+config LINGMO_PACKAGE_NETSURF_ARCH_SUPPORTS
+	bool
+	default y if !((LINGMO_arc && LINGMO_ARC_ATOMIC_EXT) || \
+		LINGMO_powerpc_8540 || LINGMO_powerpc_8548 || LINGMO_powerpc_e500mc || \
+		LINGMO_xtensa)
+
+comment "netsurf needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_NETSURF_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_NETSURF
+	bool "netsurf"
+	# static linking support is broken beyond repair
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_NETSURF_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_EXPAT
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_LIBPNG
+	select LINGMO_PACKAGE_OPENSSL if LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL if LINGMO_PACKAGE_LIBCURL
+	help
+	  NetSurf is a compact graphical web browser which aims for
+	  HTML5, CSS and JavaScript support.
+	  Frontends: GTK (X11), SDL 1.2 (framebuffer)
+
+	  http://www.netsurf-browser.org/
+
+if LINGMO_PACKAGE_NETSURF
+
+choice
+	prompt "Netsurf frontend"
+	default LINGMO_PACKAGE_NETSURF_SDL
+
+config LINGMO_PACKAGE_NETSURF_SDL
+	bool "sdl frontend"
+	select LINGMO_PACKAGE_SDL
+	help
+	  Select SDL 1.2 frontend.
+
+config LINGMO_PACKAGE_NETSURF_GTK
+	bool "gtk2 frontend"
+	depends on LINGMO_PACKAGE_LIBGTK2
+	help
+	  Select GTK+ 2 frontend.
+
+config LINGMO_PACKAGE_NETSURF_GTK3
+	bool "gtk3 frontend"
+	depends on LINGMO_PACKAGE_LIBGTK3
+	help
+	  Select GTK+ 3 frontend.
+
+endchoice
+
+endif

@@ -1,0 +1,44 @@
+config LINGMO_PACKAGE_NTPSEC
+	bool "ntpsec"
+	depends on LINGMO_USE_MMU # python3
+	depends on LINGMO_USE_WCHAR # python3
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # python3
+	depends on !LINGMO_STATIC_LIBS # python3
+	select LINGMO_PACKAGE_LIBCAP
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_PYTHON3
+	help
+	  NTPsec project - a secure, hardened, and improved
+	  implementation of Network Time Protocol derived
+	  from NTP Classic, Dave Mills’s original.
+
+	  Provides things like ntpd, ntpdate, ntpq, etc...
+
+	  https://www.ntpsec.org/
+
+if LINGMO_PACKAGE_NTPSEC
+
+config LINGMO_PACKAGE_NTPSEC_CLASSIC_MODE
+	bool "classic-mode"
+	help
+	  Enable strict configuration and log-format compatibility
+	  with NTP Classic.
+
+config LINGMO_PACKAGE_NTPSEC_NTS
+	bool "NTS support"
+	help
+	  Enable Network Time Security (NTS) support.
+
+config LINGMO_PACKAGE_NTPSEC_REFCLOCK_ALL
+	bool "refclock-all"
+	select LINGMO_PACKAGE_PPS_TOOLS
+	help
+	  Enable all refclocks (hardware, sync source and discplined
+	  clocks)
+
+endif
+
+comment "ntpsec needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

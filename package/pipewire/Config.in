@@ -1,0 +1,67 @@
+config LINGMO_PACKAGE_PIPEWIRE
+	bool "pipewire"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # pthread_setname_np()
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+	select LINGMO_PACKAGE_ALSA_LIB_UCM if LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ if LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_AUDIO if LINGMO_PACKAGE_BLUEZ5_UTILS # runtime
+	help
+	  PipeWire is a server and user space API to deal with
+	  multimedia pipelines.
+
+	  https://pipewire.org/
+
+if LINGMO_PACKAGE_PIPEWIRE
+
+config LINGMO_PACKAGE_PIPEWIRE_COMPRESS_OFFLOAD
+	bool "pipewire Compress-Offload"
+	depends on !LINGMO_STATIC_LIBS # tinycompress
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_7
+	select LINGMO_PACKAGE_TINYCOMPRESS
+	help
+	  Enable ALSA Compress-Offload support
+
+comment "pipewire Compress-Offload needs a toolchain w/ dynamic library, headers >= 5.7"
+	depends on LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_7
+
+config LINGMO_PACKAGE_PIPEWIRE_EXAMPLES
+	bool "pipewire examples"
+	help
+	  Build pipewire examples
+
+config LINGMO_PACKAGE_PIPEWIRE_GSTREAMER
+	bool "pipewire gstreamer plugins"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_GSTREAMER1
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	help
+	  Build GStreamer plugins
+
+comment "pipewire gstreamer support needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_PIPEWIRE_V4L2
+	bool "pipewire v4l2 plugin"
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+	help
+	  Build v4l2 plugin
+
+comment "pipewire v4l2 support needs udev and a toolchain w/ headers >= 3.18"
+	depends on !LINGMO_PACKAGE_HAS_UDEV || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+endif
+
+comment "pipewire needs a toolchain w/ dynamic library, NPTL, gcc >= 5"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5

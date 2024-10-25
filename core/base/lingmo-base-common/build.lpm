@@ -1,0 +1,212 @@
+pkgname=lingmo-base-common
+pkgver=2.9.0
+pkgrel=1
+pkgdesc='Base Lingmo OS files'
+arch=('any')
+license=('GPL-3.0-or-later')
+url='https://lingmo.org'
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+depends=('iana-etc')
+backup=(
+  'etc/crypttab'
+  'etc/fstab'
+  'etc/group'
+  'etc/gshadow'
+  'etc/host.conf'
+  'etc/hosts'
+  'etc/issue'
+  'etc/ld.so.conf'
+  'etc/nsswitch.conf'
+  'etc/passwd'
+  'etc/profile'
+  'etc/resolv.conf'
+  'etc/securetty'
+  'etc/shadow'
+  'etc/shells'
+  'etc/subgid'
+  'etc/subuid'
+)
+source=(
+  'lingmo-release'
+  'lingmo-logo.png'
+  'lingmo-logo-text.svg'
+  'crypttab'
+  'env-generator'
+  'fstab'
+  'group'
+  'gshadow'
+  'host.conf'
+  'hosts'
+  'issue'
+  'ld.so.conf'
+  'locale.sh'
+  'nsswitch.conf'
+  'os-release'
+  'passwd'
+  'profile'
+  'resolv.conf'
+  'securetty'
+  'shadow'
+  'shells'
+  'sysctl'
+  'sysusers'
+  'tmpfiles'
+  'subgid'
+  'subuid'
+)
+
+package() {
+  local group link mode source_file user
+  declare -A directories
+  declare -A files
+  declare -A symlinks
+
+  # associative array with directories and their assigned mode, user and group
+  # all paths are relative to the root directory /
+  directories=(
+    ["boot"]="755:0:0"
+    ["dev"]="755:0:0"
+    ["etc"]="755:0:0"
+    ["etc/ld.so.conf.d"]="755:0:0"
+    ["etc/profile.d"]="755:0:0"
+    ["etc/skel"]="755:0:0"
+    ["home"]="755:0:0"
+    ["mnt"]="755:0:0"
+    ["opt"]="755:0:0"
+    ["proc"]="555:0:0"
+    ["root"]="0750:0:0"
+    ["run"]="755:0:0"
+    ["srv/http"]="755:0:0"
+    ["srv/ftp"]="555:0:11"  # vsftpd won't run with write perms on /srv/ftp
+    ["sys"]="555:0:0"
+    ["tmp"]="1777:0:0"
+    ["usr"]="755:0:0"
+    ["usr/bin"]="755:0:0"
+    ["usr/include"]="755:0:0"
+    ["usr/lib"]="755:0:0"
+    ["usr/lib/ld.so.conf.d"]="755:0:0"
+    ["usr/local/bin"]="755:0:0"
+    ["usr/local/etc"]="755:0:0"
+    ["usr/local/games"]="755:0:0"
+    ["usr/local/include"]="755:0:0"
+    ["usr/local/lib"]="755:0:0"
+    ["usr/local/man"]="755:0:0"
+    ["usr/local/sbin"]="755:0:0"
+    ["usr/local/share"]="755:0:0"
+    ["usr/local/src"]="755:0:0"
+    ["usr/share/factory/etc"]="755:0:0"
+    ["usr/share/man/man1"]="755:0:0"
+    ["usr/share/man/man2"]="755:0:0"
+    ["usr/share/man/man3"]="755:0:0"
+    ["usr/share/man/man4"]="755:0:0"
+    ["usr/share/man/man5"]="755:0:0"
+    ["usr/share/man/man6"]="755:0:0"
+    ["usr/share/man/man7"]="755:0:0"
+    ["usr/share/man/man8"]="755:0:0"
+    ["usr/share/misc"]="755:0:0"
+    ["usr/share/pixmaps"]="755:0:0"
+    ["usr/src"]="755:0:0"
+    ["var"]="755:0:0"
+    ["var/cache"]="755:0:0"
+    ["var/empty"]="755:0:0"
+    ["var/games"]="775:0:50"  # allow setgid games (gid 50) to write scores
+    ["var/lib/misc"]="755:0:0"
+    ["var/local"]="755:0:0"
+    ["var/log/old"]="755:0:0"
+    ["var/opt"]="755:0:0"
+    ["var/spool/mail"]="1777:0:0"
+    ["var/tmp"]="1777:0:0"
+  )
+
+  # associative array with symlink names and their respective targets
+  # all paths are relative to the root directory /
+  symlinks=(
+    ["bin"]="usr/bin"
+    ["etc/mtab"]="../proc/self/mounts"
+    ["lib"]="usr/lib"
+    ["sbin"]="usr/bin"
+    ["usr/local/share/man"]="../man"
+    ["usr/sbin"]="bin"
+    ["var/lock"]="../run/lock"
+    ["var/mail"]="spool/mail"
+    ["var/run"]="../run"
+  )
+  [[ $CARCH = 'x86_64' ]] && {
+    symlinks["lib64"]="usr/lib"
+    symlinks["usr/lib64"]="lib"
+  }
+
+  # associative array of target files, their source file, file mode, user and group ownership
+  files=(
+    ["etc/lingmo-release"]="lingmo-release:644:0:0"
+    ["etc/crypttab"]="crypttab:600:0:0"
+    ["etc/fstab"]="fstab:644:0:0"
+    ["etc/group"]="group:644:0:0"
+    ["etc/gshadow"]="gshadow:600:0:0"
+    ["etc/host.conf"]="host.conf:644:0:0"
+    ["etc/hosts"]="hosts:644:0:0"
+    ["etc/issue"]="issue:644:0:0"
+    ["etc/ld.so.conf"]="ld.so.conf:644:0:0"
+    ["etc/nsswitch.conf"]="nsswitch.conf:644:0:0"
+    ["etc/passwd"]="passwd:644:0:0"
+    ["etc/profile"]="profile:644:0:0"
+    ["etc/profile.d/locale.sh"]="locale.sh:644:0:0"
+    ["etc/resolv.conf"]="resolv.conf:644:0:0"
+    ["etc/securetty"]="securetty:644:0:0"
+    ["etc/shells"]="shells:644:0:0"
+    ["etc/shadow"]="shadow:600:0:0"
+    ["etc/subgid"]="subgid:644:0:0"
+    ["etc/subuid"]="subuid:644:0:0"
+    ["usr/lib/os-release"]="os-release:644:0:0"
+    ["usr/lib/sysctl.d/10-arch.conf"]="sysctl:644:0:0"
+    ["usr/lib/sysusers.d/arch.conf"]="sysusers:644:0:0"
+    ["usr/lib/tmpfiles.d/arch.conf"]="tmpfiles:644:0:0"
+    ["usr/lib/systemd/system-environment-generators/10-arch"]="env-generator:755:0:0"
+    ["usr/share/factory/etc/lingmo-release"]="lingmo-release:644:0:0"
+    ["usr/share/factory/etc/crypttab"]="crypttab:600:0:0"
+    ["usr/share/factory/etc/fstab"]="fstab:644:0:0"
+    ["usr/share/factory/etc/group"]="group:644:0:0"
+    ["usr/share/factory/etc/gshadow"]="gshadow:600:0:0"
+    ["usr/share/factory/etc/host.conf"]="host.conf:644:0:0"
+    ["usr/share/factory/etc/hosts"]="hosts:644:0:0"
+    ["usr/share/factory/etc/issue"]="issue:644:0:0"
+    ["usr/share/factory/etc/ld.so.conf"]="ld.so.conf:644:0:0"
+    ["usr/share/factory/etc/nsswitch.conf"]="nsswitch.conf:644:0:0"
+    ["usr/share/factory/etc/passwd"]="passwd:644:0:0"
+    ["usr/share/factory/etc/profile"]="profile:644:0:0"
+    ["usr/share/factory/etc/profile.d/locale.sh"]="locale.sh:644:0:0"
+    ["usr/share/factory/etc/resolv.conf"]="resolv.conf:644:0:0"
+    ["usr/share/factory/etc/securetty"]="securetty:644:0:0"
+    ["usr/share/factory/etc/shadow"]="shadow:600:0:0"
+    ["usr/share/factory/etc/shells"]="shells:644:0:0"
+    ["usr/share/factory/etc/subgid"]="subgid:644:0:0"
+    ["usr/share/factory/etc/subuid"]="subuid:644:0:0"
+    ["usr/share/pixmaps/lingmo-logo.png"]="lingmo-logo.png:644:0:0"
+    ["usr/share/pixmaps/lingmo-logo-text.svg"]="lingmo-logo-text.svg:644:0:0"
+  )
+
+  cd "$pkgdir"
+
+  for dir in "${!directories[@]}"; do
+    mode="$(cut -f 1 -d ':' <<< "${directories[$dir]}")"
+    user="$(cut -f 2 -d ':' <<< "${directories[$dir]}")"
+    group="$(cut -f 3 -d ':' <<< "${directories[$dir]}")"
+
+    install -vdm "$mode" -o "$user" -g "$group" "$dir"
+  done
+
+  for link in "${!symlinks[@]}"; do
+    ln -sv "${symlinks[$link]}" "$link"
+  done
+
+  for target_file in "${!files[@]}"; do
+    source_file="$(cut -f 1 -d ':' <<< "${files[$target_file]}")"
+    mode="$(cut -f 2 -d ':' <<< "${files[$target_file]}")"
+    user="$(cut -f 3 -d ':' <<< "${files[$target_file]}")"
+    group="$(cut -f 4 -d ':' <<< "${files[$target_file]}")"
+
+    install -vDm "$mode" -o "$user" -g "$group" "$srcdir/$source_file" "$target_file"
+  done
+}
+
+# vim:set ts=2 sw=2 et:

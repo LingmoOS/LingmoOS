@@ -1,0 +1,175 @@
+config LINGMO_PACKAGE_BLUEZ5_UTILS
+	bool "bluez-utils"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # dbus, libglib2
+	depends on LINGMO_USE_MMU # dbus
+	depends on !LINGMO_STATIC_LIBS # uses dlfcn
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  BlueZ utils
+
+	  Provides Stack, Library and Tooling for Bluetooth Classic
+	  and Bluetooth LE.
+
+	  BlueZ utils will use systemd and/or udev if enabled.
+
+	  http://www.bluez.org
+	  http://www.kernel.org/pub/linux/bluetooth
+
+if LINGMO_PACKAGE_BLUEZ5_UTILS
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_OBEX
+	bool "build OBEX support"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_LIBICAL
+	help
+	  Enable OBEX support.
+
+comment "OBEX support needs a toolchain w/ C++"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_CLIENT
+	bool "build CLI client"
+	select LINGMO_PACKAGE_READLINE
+	help
+	  Build the command line client "bluetoothctl".
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_MONITOR
+	bool "build monitor utility"
+	help
+	  Build monitor utility btmon.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_TOOLS
+	bool "build tools"
+	help
+	  Build tools like bluemoon, btattach, hex2hcd, l2test,
+	  l2ping, mpris-proxy, rctest.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_DEPRECATED
+	bool "install deprecated tools"
+	depends on LINGMO_PACKAGE_BLUEZ5_UTILS_CLIENT || LINGMO_PACKAGE_BLUEZ5_UTILS_TOOLS
+	help
+	  Build deprecated tools.
+
+	  When "build tools" is selected these tools are installed:
+	  hciattach, hciconfig, hcitool, hcidump, rfcomm, sdptool,
+	  ciptool.
+
+	  When CLI client is enabled "gatttool" is installed.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_EXPERIMENTAL
+	bool "build experimental tools"
+	help
+	  Build experimental tools. This is currently only the
+	  "Nokia OBEX PC Suite tool". So, only if OBEX support is
+	  enabled this option has an effect.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_AUDIO
+	bool "build audio plugins (a2dp and avrcp)"
+	help
+	  Build plugins for audio profiles (for A2DP and AVRCP).
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HEALTH
+	bool "build health plugin"
+	help
+	  Build plugin for health profiles.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HID
+	bool "build hid plugin"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HOG
+	help
+	  Build plugin for HID (input) profiles.
+
+comment "hid plugin needs a toolchain w/ headers >= 3.18"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HOG
+	bool "build hog plugin"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+	help
+	  Build plugin for HoG (input) profiles.
+
+comment "hog plugin needs a toolchain w/ headers >= 3.18"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_MESH
+	bool "build mesh plugin"
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12 # ell
+	select LINGMO_PACKAGE_ELL
+	select LINGMO_PACKAGE_JSON_C
+	select LINGMO_PACKAGE_READLINE
+	help
+	  Build plugin for Mesh support.
+
+comment "mesh profile needs a toolchain w/ headers >= 4.12"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_12
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_MIDI
+	bool "build midi plugin"
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+	help
+	  Build MIDI support via ALSA sequencer.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_NETWORK
+	bool "build network plugin"
+	default y
+	help
+	  Build plugin for PANU, NAP, GN profiles.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_NFC
+	bool "build nfc plugin"
+	help
+	  Build plugin for NFC pairing.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_SAP
+	bool "build sap plugin"
+	help
+	  Build plugin for SAP profile.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_SIXAXIS
+	bool "build sixaxis plugin"
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18 # hid plugin
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HID # runtime
+	help
+	  Build sixaxis plugin (support Sony Dualshock
+	  controller)
+
+comment "sixaxis plugin needs a toolchain w/ headers >= 3.18"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+comment "sixaxis plugin needs udev /dev management"
+	depends on !LINGMO_PACKAGE_HAS_UDEV
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_TEST
+	bool "install test scripts"
+	help
+	  Install the python test scripts from the "test" directory.
+
+config LINGMO_PACKAGE_BLUEZ5_UTILS_TOOLS_HID2HCI
+	bool "build hid2hci tool"
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18 # hid plugin
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_HID # runtime
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_TOOLS
+	help
+	  Build hid2hci tool
+
+comment "hid2hci tool needs a toolchain w/ headers >= 3.18"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_18
+
+comment "hid2hci tool needs udev /dev management"
+	depends on !LINGMO_PACKAGE_HAS_UDEV
+
+endif
+
+comment "bluez5-utils needs a toolchain w/ wchar, threads, headers >= 3.4, dynamic library"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_4 || LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU

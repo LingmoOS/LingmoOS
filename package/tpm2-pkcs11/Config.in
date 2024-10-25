@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_TPM2_PKCS11
+	bool "tpm2-pkcs11"
+	depends on !LINGMO_STATIC_LIBS # tpm2-tss
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBYAML
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_TPM2_TSS
+	help
+	  A PKCS#11 interface for TPM2 hardware
+
+	  https://github.com/tpm2-software/tpm2-pkcs11
+
+comment "tpm2-pkcs11 needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

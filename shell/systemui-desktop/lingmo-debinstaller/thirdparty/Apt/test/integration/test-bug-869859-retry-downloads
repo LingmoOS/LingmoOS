@@ -1,0 +1,82 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+testsecondsgreaterequal() {
+    seconds="$1"
+    shift
+    before=$(date +%s)
+    "$@"
+    after=$(date +%s)
+    msggroup 'testsecondsgreaterequal'
+    msgtest "Checking that previous test took more than $secondss"
+    if [ $((after - before)) -lt $seconds ]; then
+        msgfail "Took $((after - before)) second"
+    else
+        msgpass
+    fi
+    msggroup
+}
+
+setupenvironment
+configarchitecture 'amd64'
+
+buildsimplenativepackage 'testpkg' 'all' '1' 'stable'
+
+setupaptarchive --no-update
+changetowebserver
+testsuccess apt update
+
+cd downloaded
+testsuccess apt download testpkg
+testsuccess test -f testpkg_1_all.deb
+rm -f testpkg_1_all.deb
+
+msgmsg 'Fail after too many retries'
+webserverconfig 'aptwebserver::failrequest' '429'
+webserverconfig 'aptwebserver::failrequest::pool/testpkg_1_all.deb' '99'
+testsecondsgreaterequal 5 testfailureequal "Delaying http://localhost:${APTHTTPPORT} stable/main all testpkg all 1 by 1 seconds
+Ign:1 http://localhost:${APTHTTPPORT} stable/main all testpkg all 1
+  429  Unknown HTTP code
+Delaying http://localhost:${APTHTTPPORT} stable/main all testpkg all 1 by 2 seconds
+Ign:1 http://localhost:${APTHTTPPORT} stable/main all testpkg all 1
+  429  Unknown HTTP code
+Delaying http://localhost:${APTHTTPPORT} stable/main all testpkg all 1 by 4 seconds
+Ign:1 http://localhost:${APTHTTPPORT} stable/main all testpkg all 1
+  429  Unknown HTTP code
+Err:1 http://localhost:${APTHTTPPORT} stable/main all testpkg all 1
+  429  Unknown HTTP code
+E: Failed to fetch http://localhost:${APTHTTPPORT}/pool/testpkg_1_all.deb  429  Unknown HTTP code" apt download testpkg -o acquire::retries=3 -o debug::acquire::retries=true -q
+testfailure test -f testpkg_1_all.deb
+
+msgmsg 'Success in the third try'
+webserverconfig 'aptwebserver::failrequest::pool/testpkg_1_all.deb' '2'
+testsuccess apt download testpkg -o acquire::retries=3 -o acquire::retries::delay=false
+testsuccess test -f testpkg_1_all.deb
+rm -f testpkg_1_all.deb
+
+msgmsg 'Do not try everything again, hard failures keep hard failures'
+webserverconfig 'aptwebserver::failrequest' '404'
+webserverconfig 'aptwebserver::failrequest::pool/testpkg_1_all.deb' '2'
+testfailure apt download testpkg -o acquire::retries=3
+testfailure test -f testpkg_1_all.deb
+
+cat ../rootdir/etc/apt/sources.list.d/apt-test-*.list > ../rootdir/etc/apt/sources.list.d/00http-source.list
+changetohttpswebserver
+
+msgmsg 'Check download from alternative sources if first failed'
+webserverconfig 'aptwebserver::failrequest::pool/testpkg_1_all.deb' '0'
+testsuccess apt update
+testsuccess apt download testpkg -o acquire::retries=0
+testsuccess test -f testpkg_1_all.deb
+rm -f testpkg_1_all.deb
+
+# we make the first source fail by disabling http support
+webserverconfig 'aptwebserver::support::http' 'false'
+testsuccess apt download testpkg -o acquire::retries=0
+cp ../rootdir/tmp/testsuccess.output alt.output
+testsuccess grep '^  400  Bad Request' alt.output
+testsuccess test -f testpkg_1_all.deb
+rm -f testpkg_1_all.deb

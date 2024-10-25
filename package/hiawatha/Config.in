@@ -1,0 +1,36 @@
+comment "hiawatha needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_HIAWATHA
+	bool "hiawatha"
+	# needs fork()
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # __sync_*_4 intrisics
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Hiawatha is a webserver for Unix and has been built with
+	  security in mind. This resulted in a highly secure
+	  webserver, in both code and features.
+
+	  This webserver runs on Linux, BSD, MacOS X and
+	  Windows. Although it can run any kind of CGI / FastCGI
+	  application, it has been optimized for usage with PHP. Most
+	  well known PHP frameworks and CMS applications have been
+	  tested with Hiawatha and ran without a problem. Hiawatha
+	  supports many web and HTTP features such as CGI/FastCGI,
+	  HTTP authentication, virtual host support, request
+	  pipelining, keep alive connections, URL rewriting and many
+	  more.
+
+	  http://www.hiawatha-webserver.org/
+
+if LINGMO_PACKAGE_HIAWATHA
+
+config LINGMO_PACKAGE_HIAWATHA_SSL
+	bool "hiawatha TLS support"
+
+endif

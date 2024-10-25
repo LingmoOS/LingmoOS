@@ -1,0 +1,97 @@
+#!/bin/bash
+# Copyright (C) 2010, 2011 Otavio Salvador <otavio@ossystems.com.br>
+# This file is licensed on GPLv3
+
+CROSSBUILD_BLACKLIST="s390-netdevice partitioner"
+
+source=`grep Source debian/control | sed 's,.*: ,,g'`
+
+# Set the architecture to use for the build
+pkg_arch=`grep Architecture debian/control | head -n 1 | sed 's,.*: ,,g'`
+sys_arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+if echo "$pkg_arch" | grep -q "$sys_arch"; then
+	pkg_arch="$sys_arch"
+else
+	pkg_arch=`echo $pkg_arch | cut -f 1 -d\  | sed "s,-any$,-$sys_arch,g"`
+	if [ "$pkg_arch" = "any" ] || [ "$pkg_arch" = "all" ] || [ "$pkg_arch" = "linux-$sys_arch" ]; then
+		pkg_arch="$sys_arch"
+	fi
+
+	if [ "$pkg_arch" != "$sys_arch" ] &&
+		echo "$CROSSBUILD_BLACKLIST" | grep -q "$source"; then
+		echo "ERROR: '$source' package is unsafe for crossbuilding."
+		exit 1
+	fi
+fi
+
+# Check build-depends
+if ! dpkg-checkbuilddeps; then
+	exit 1
+fi
+
+# Handle translations
+l10n_changes="$(mktemp --tmpdir l10n-changes.XXXXXX)"
+cleanup () {
+	rm -f "$l10n_changes"
+}
+trap cleanup EXIT HUP INT QUIT TERM
+
+`dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > "$l10n_changes"
+if [ "`cat "$l10n_changes"`" = "Cannot find the PO directory!" ]; then
+	> "$l10n_changes"
+fi
+
+while read line; do
+	if [ "$line" = "[ Updated translations ]" ]; then
+		continue
+	fi
+
+	log=`echo "$line" | cut -c 3-`
+
+	DEBFULLNAME="Updated translations" dch -t --release-heuristic changelog "$log"
+done < "$l10n_changes"
+
+# "release" the version
+dch -r ""
+
+# build, check and upload
+version="$(dpkg-parsechangelog | awk '/^Version:/ { print $2 }')"
+debuild -a$pkg_arch -I
+if [ "$?" = "0" ]; then
+	if grep -q "E: .* udeb: binary-from-other-architecture .*" "../${source}_${version#*:}_${pkg_arch}.build"; then
+		echo "ERROR: this package is unsafe for crossbuilding."
+	else
+		read -n 1 -s -p "Are you sure you want to commit, upload and push the package [yN]? " reply
+		echo
+		if [ "$reply" = y ] || [ "$reply" = Y ]; then
+			if debsign -a$pkg_arch; then
+				git add debian/changelog
+				if debcommit --release; then
+					if git push origin && git push origin $version; then
+						if debrelease -a$pkg_arch; then
+							exit 0
+						else
+							echo "Failed to upload the package."
+							exit 1
+						fi
+					else
+						echo "Failed to push changes to origin. Package won't be uploaded. Exiting..."
+						exit 1
+					fi
+				else
+					echo "Failed to run debcommit --release, exiting..."
+					exit 1
+				fi
+			else
+				echo "Failed to sign the package, exiting..."
+				exit 1
+			fi
+		else
+			echo "Nothing has been committed or pushed. Package built fine though."
+			exit 0
+		fi
+	fi
+fi
+
+git checkout debian/changelog
+exit 1

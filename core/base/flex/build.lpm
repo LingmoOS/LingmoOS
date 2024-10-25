@@ -1,0 +1,41 @@
+pkgname=flex
+pkgver=2.6.4
+pkgrel=5
+pkgdesc="A tool for generating text-scanning programs"
+arch=('x86_64')
+url="https://github.com/westes/flex"
+license=('custom')
+depends=('glibc' 'm4' 'sh')
+makedepends=('help2man')
+source=(
+  "https://github.com/westes/flex/releases/download/v$pkgver/flex-$pkgver.tar.gz"
+  "flex-pie.patch"
+)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  patch -p1 -i "$srcdir"/flex-pie.patch
+  autoreconf -fiv
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  ./configure --prefix=/usr
+  # prevent excessive overlinking due to libtool
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
+}
+
+check() {
+  make -k check -C $pkgname-$pkgver
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+  ln -s flex "${pkgdir}/usr/bin/lex"
+
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/license.txt"
+}

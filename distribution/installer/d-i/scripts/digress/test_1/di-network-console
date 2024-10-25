@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+# First stage install using network console for systems where
+# network-console is used by default.
+use Expect;
+
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+	$ENV{TERM}="vt100";
+}
+
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+#$exp->debug(2);
+#$exp->exp_internal(1);
+$exp->expect($ENV{STAGE_1_MAX_TIME},
+	[ "-re", "step.*failed" => sub { exit 1 } ],
+	[ "English" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
+	[ "To continue the installation, please use an SSH client" => sub { } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
+) || die "failed";
+
+# Now use ssh to log in to d-i and finish the installation.
+my $ssh_exp = Expect->spawn("ssh -t -v -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{MACHINE}") or die "failed to start ssh: $!";
+#$ssh_exp->debug(2);
+#$ssh_exp->exp_internal(1);
+
+sub ssh_question {
+	my $question=shift;
+	my $response=shift;
+	
+	$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, $question) or die "failed to find \"$question\"";
+	sleep 1;
+	$ssh_exp->send($response."\r");
+}
+
+ssh_question("password:", $ENV{NETWORK_CONSOLE_PASSWORD});
+
+# Complete the install.
+$ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
+	[ "-re", "step.*failed" => sub { exit 1 } ],
+	[ "English" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "rebooting.*the.*system." => sub { } ],
+	[ "-re", "down.*NOW" => sub { } ],
+	[ "-re", "Sending.*SIGTERM" => sub { } ],
+) || die "failed";
+
+exit

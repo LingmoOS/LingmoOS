@@ -1,0 +1,13 @@
+# Some 32-bit architectures need 64-bit kernels and we still build
+# these as the "wrong" architecture rather than mandating multiarch.
+{% if arch in ['mips', 'mipsel'] %}
+{{package}}: binary-from-other-architecture *boot/vmlinu*
+{% endif %}
+{% if arch in ['hppa', 'mips', 'mipsel', 'powerpc'] %}
+{{package}}: binary-from-other-architecture *lib/modules/*
+{% endif %}
+
+# vmlinux needs extra sections that would normally be stripped.
+{% if arch in ['mips64el', 'mipsel', 'ppc64el'] %}
+{{package}}: unstripped-binary-or-object *boot/vmlinu*
+{% endif %}

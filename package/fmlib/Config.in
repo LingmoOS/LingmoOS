@@ -1,0 +1,56 @@
+comment "fmlib needs a Linux kernel to be built"
+	depends on LINGMO_powerpc_e500mc || LINGMO_powerpc_e6500 || LINGMO_aarch64
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_FMLIB
+	bool "fmlib"
+	depends on LINGMO_powerpc_e500mc || LINGMO_powerpc_e6500 || LINGMO_aarch64
+	depends on LINGMO_LINUX_KERNEL
+	help
+	  The Frame Manager library provides Freescale PowerPC platforms
+	  an API on top of the Frame Manager driver ioctl calls, that
+	  provides a user space application with a simple way to
+	  configure driver parameters and PCD (parse - classify -
+	  distribute) rules.
+
+	  https://github.com/nxp-qoriq/fmlib
+
+if LINGMO_PACKAGE_FMLIB
+choice
+	prompt "QorIQ Target Family"
+	help
+	  Select the family of QorIQ processor.
+
+config LINGMO_FMLIB_QORIQ_FAMILY_P4080
+	bool "p40xx"
+	depends on LINGMO_powerpc_e500mc
+
+config LINGMO_FMLIB_QORIQ_FAMILY_T4240
+	bool "t42xx"
+	depends on LINGMO_powerpc_e500mc
+
+config LINGMO_FMLIB_QORIQ_FAMILY_T2080
+	bool "t208x"
+	depends on LINGMO_powerpc_e6500
+
+config LINGMO_FMLIB_QORIQ_FAMILY_ARM
+	bool "arm"
+	depends on LINGMO_aarch64
+
+endchoice
+
+config LINGMO_PACKAGE_FMLIB_ARCHTYPE
+	string
+	default "ppce500mc" if LINGMO_powerpc_e500mc
+	default "ppc64e6500" if LINGMO_powerpc_e6500 && LINGMO_powerpc64
+	default "ppc32e6500" if LINGMO_powerpc_e6500 && LINGMO_powerpc
+	default "arm" if LINGMO_aarch64
+
+config LINGMO_PACKAGE_FMLIB_PLATFORM
+	string
+	default "P4080" if LINGMO_FMLIB_QORIQ_FAMILY_P4080
+	default "T4240" if LINGMO_FMLIB_QORIQ_FAMILY_T4240
+	default "FMAN_V3H" if LINGMO_FMLIB_QORIQ_FAMILY_T2080
+	default "arm" if LINGMO_aarch64
+
+endif

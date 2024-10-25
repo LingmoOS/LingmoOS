@@ -1,0 +1,52 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 20 Aug 2024 08:35:36 +0206
+Subject: [PATCH 10/54] serial: core: Provide low-level functions to lock port
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+It will be necessary at times for the uart nbcon console
+drivers to acquire the port lock directly (without the
+additional nbcon functionality of the port lock wrappers).
+These are special cases such as the implementation of the
+device_lock()/device_unlock() callbacks or for internal
+port lock wrapper synchronization.
+
+Provide low-level variants __uart_port_lock_irqsave() and
+__uart_port_unlock_irqrestore() for this purpose.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Link: https://lore.kernel.org/r/20240820063001.36405-11-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/serial_core.h |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+--- a/include/linux/serial_core.h
++++ b/include/linux/serial_core.h
+@@ -590,6 +590,24 @@ struct uart_port {
+ 	void			*private_data;		/* generic platform data pointer */
+ };
+ 
++/*
++ * Only for console->device_lock()/_unlock() callbacks and internal
++ * port lock wrapper synchronization.
++ */
++static inline void __uart_port_lock_irqsave(struct uart_port *up, unsigned long *flags)
++{
++	spin_lock_irqsave(&up->lock, *flags);
++}
++
++/*
++ * Only for console->device_lock()/_unlock() callbacks and internal
++ * port lock wrapper synchronization.
++ */
++static inline void __uart_port_unlock_irqrestore(struct uart_port *up, unsigned long flags)
++{
++	spin_unlock_irqrestore(&up->lock, flags);
++}
++
+ /**
+  * uart_port_lock - Lock the UART port
+  * @up:		Pointer to UART port structure

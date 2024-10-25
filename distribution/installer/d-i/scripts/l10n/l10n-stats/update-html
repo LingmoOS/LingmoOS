@@ -1,0 +1,159 @@
+#!/bin/bash
+# Copyright (c) 2004-2006 Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2006 Christian Perrier <bubulle@debian.org>
+# Licensed under the GNU General Public License
+#
+# Build an HTML file from the D-I l10n stats results
+# produced by gen-stats 
+#
+# Files:
+#   o update_html.conf
+#     Config file with values for files locations and levels to handle
+
+
+create_dir() {
+  if [ ! -d "$1" ] ; then
+    if [ ! -e "$1" ] ; then
+      mkdir -p "$1"
+    else
+      echo "$1" already exists and is not a directory
+    fi
+  fi
+}
+
+usage(){
+  echo Usage: $0 [config]
+  echo 
+  echo  "               config: optional config file"
+}
+
+########################### Defaults ##########################################
+WD="."
+RESULTS="."
+TARGET="translation-status.html"
+LEVELS="1 2 3 4 5"
+TEMPLATE="$WD/config/translation-status.template"
+DIST="unstable"
+########################### End of Defaults ###################################
+
+##########################  Command line parsing ##############################
+if [ "$1" ] ; then
+  CONFIG=$1
+fi
+
+if [ "$CONFIG" ] ; then
+  if [ -r "$CONFIG" ] ; then
+    . "$CONFIG"
+  else
+    echo $CONFIG does not exist or unreadable
+    exit 1
+  fi
+fi
+########################## End of command line parsing ###################
+
+########################## Definitions, which depend on command-line #####
+# Directory with config files
+CONFIG_DIR=$WD/config
+# Directory for lock files and other temporary stuff
+RUN_DIR=$WD/run
+
+TEMPDIR="${RUN_DIR}/update_html-temp-$RANDOM"
+########################## End of definitions ############################
+
+########################## Sanity and consistency checks #################
+# Create all the needed directories (safely)
+create_dir $CONFIG_DIR
+create_dir $RUN_DIR
+create_dir $TEMPDIR
+
+if ! touch $TARGET ; then
+  echo $TARGET file cannot be created
+  exit 1
+fi
+
+if [ "$DIST" = "vcs" ] ; then
+	ext=""
+else
+	ext=".$DIST"
+fi
+
+
+if [ -d $RESULTS ] ; then
+  for i in $LEVELS ; do
+    if [ ! -f $RESULTS/level$i/rank$ext.txt ] ; then
+      echo $RESULTS/level$i does not seem to contain information about level $i
+      echo Run gen-stats for that level before running $0
+      exit 1
+    fi
+  done
+else
+  echo $RESULTS directory does not exist
+  exit 1
+fi
+
+if [ ! -f "${TEMPLATE}" ] ; then
+  echo "No template file ($TEMPLATE) found"
+  exit 1
+fi
+
+############### End of sanity and consistency checks #############
+
+
+function doit() { 
+	RANK=$1
+	#how many?
+	LANGUAGES=`grep "%" $RANK | wc --lines | sed "s/^ *//g"`
+	#echo "$LANGUAGES languages at all." 
+
+	COUNT=0
+	#I am happy that this works for seppy's stats and for barbier's stats:
+	#for I in `grep "%" $RANK | cut  -f 2|cut -d " " -f 1|sed 's/%//g'`; do
+	#for I in `grep "%" $RANK | cut  -f 2|sed 's/%.*//g'`; do
+	for I in `grep "%" $RANK | sed 's/%.*//g' | sed 's/.. //g'`; do
+	  COUNT=`expr $COUNT + $I`
+	done
+
+	#AVERAGE=`expr $COUNT / $LANGUAGES`
+	#echo "$COUNT percent together. makes an average of $AVERAGE" 
+	AVERAGE=`echo "scale=2;$COUNT / $LANGUAGES" | bc -l`
+
+	echo "<b>$AVERAGE% in total<br>$LANGUAGES+1(en) languages</b>"
+	echo -n "$AVERAGE + " >> $TEMPDIR/avg
+#	test "$AVERAGE" = "0" && exit
+}
+
+echo -n "(" > $TEMPDIR/avg
+
+
+for level in $LEVELS; do
+	cp $RESULTS/level$level/rank$ext.txt $TEMPDIR/tmp.txt
+	grep "%" $TEMPDIR/tmp.txt \
+	  | LC_ALL=C sed -e "s:%[[:space:]]*\([_a-zA-Z]*\):% <a href=\"level$level/\1$ext.txt\">\1</a>:" \
+	  > $TEMPDIR/$level.txt
+	doit $TEMPDIR/$level.txt >> $TEMPDIR/$level.txt
+	rm -f $TEMPDIR/tmp.txt
+done
+
+nb_levels=0
+for i in $LEVELS ; do
+  nb_levels=`expr ${nb_levels} + 1`
+done
+
+D=`date -u "+%d-%m-%Y %H:%M:%S"`
+echo "0)/${nb_levels}" >> $TEMPDIR/avg
+TOTAL=`cat $TEMPDIR/avg | bc`
+rm $TEMPDIR/avg
+
+
+cp $TEMPLATE $TEMPDIR/template
+for i in $LEVELS ; do
+  sed "/<L$i>/r $TEMPDIR/$i.txt" $TEMPDIR/template >$TEMPDIR/template.tmp
+  mv $TEMPDIR/template.tmp $TEMPDIR/template
+done
+cat $TEMPDIR/template | sed "s/<DATE>/$D/g" | sed "s/<TOTAL>/$TOTAL/g" | sed 's/<MANUAL>//g' > $TARGET
+
+for i in $LEVELS ; do
+  rm $TEMPDIR/$i.txt
+done
+
+rm -fr $TEMPDIR || true

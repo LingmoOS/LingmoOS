@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_OPENBOX
+	bool "openbox"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # pango -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # pango -> harfbuzz
+	depends on LINGMO_INSTALL_LIBSTDCPP # pango -> freetype
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_PANGO
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	# libxft and libxrender are needed to get xft support in pango
+	select LINGMO_PACKAGE_XLIB_LIBXFT
+	select LINGMO_PACKAGE_XLIB_LIBXRENDER
+	help
+	  Openbox is a highly configurable, next generation window
+	  manager with extensive standards support.
+
+	  http://openbox.org
+
+comment "openbox needs a toolchain w/ C++, threads, wchar, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_XORG7

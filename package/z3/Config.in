@@ -1,0 +1,45 @@
+# z3 supports arch for which libc fenv.h provides all four macros:
+# FE_DOWNWARD, FE_TONEAREST, FE_TOWARDZERO, FE_UPWARD
+# See for example in glibc https://sourceware.org/git/glibc.git
+# git grep -E '^[[:space:]]*#[[:space:]]*define[[:space:]]+FE_(TONEAREST|UPWARD|DOWNWARD|TOWARDZERO)' sysdeps/
+config LINGMO_PACKAGE_Z3_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_arceb || LINGMO_arcle
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386
+	default y if LINGMO_m68k
+	# LINGMO_microblaze has only FE_TONEAREST
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	# LINGMO_nios2 has only FE_TONEAREST
+	default y if LINGMO_or1k
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	default y if LINGMO_riscv
+	default y if LINGMO_s390x
+	# LINGMO_sh has only FE_{TONEAREST,TOWARDZERO}
+	default y if LINGMO_sparc || LINGMO_sparc64
+	default y if LINGMO_x86_64
+	# LINGMO_xtensa supports only uclibc which does not have fenv.h
+
+config LINGMO_PACKAGE_Z3
+	bool "z3"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # c++17
+	# z3 needs fenv.h which is not provided by uclibc
+	depends on !LINGMO_TOOLCHAIN_USES_UCLIBC
+	depends on LINGMO_PACKAGE_Z3_ARCH_SUPPORTS
+	help
+	  Z3, also known as the Z3 Theorem Prover, is a cross-platform
+	  satisfiability modulo theories (SMT) solver.
+
+	  https://github.com/Z3Prover/z3
+
+if LINGMO_PACKAGE_Z3
+
+config LINGMO_PACKAGE_Z3_PYTHON
+	bool "Python bindings"
+	depends on LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_PYTHON3_PYEXPAT # runtime
+	select LINGMO_PACKAGE_PYTHON_SETUPTOOLS # runtime
+
+endif

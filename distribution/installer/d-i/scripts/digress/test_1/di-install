@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+# Expect script to run for partially interactive first stage installs using
+# the dialog frontend. At least partitioning must be preseeded.
+use Expect;
+
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+        $ENV{TERM}="vt100";
+}
+
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+
+my $timeout;
+my $timeout_reason;
+if ($ENV{STAGE_1_MAX_INACTIVITY}) {
+	$timeout=$ENV{STAGE_1_MAX_INACTIVITY};
+	$timeout_reason="timeout on inactivity";
+}
+else {
+	$timeout=$ENV{STAGE_1_MAX_TIME};
+	$timeout_reason="timeout";
+}
+
+#$exp->debug(2);
+#$exp->exp_internal(1);
+my $start_time=time;
+my $old_time=time;
+my $max_interval=0;
+while (1) {
+	$exp->expect($timeout,
+		[ timeout => sub { die "install failed ($timeout_reason)" } ],
+		[ "-re", "step.*failed" => sub { exit 1 } ],
+		[ "English" => sub { sleep 2; $exp->send("\r") } ],
+		[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r") } ],
+		[ "<Continue>" => sub { sleep 2; $exp->send("\r") } ],
+		[ "-re", "rebooting.*the.*system." => \&done ],
+		[ "-re", "down.*NOW" => \&done ],
+		[ "-re", "Sending.*SIGTERM" => \&done ],
+		[ "-re", "\e\\[" => sub { } ], # screen draw indicates general activity
+	) || die "install failed";
+	
+	if (time - $start_time > $ENV{STAGE_1_MAX_TIME}) {
+		die "install failed (timeout)";
+	}
+
+	if (time - $old_time > $max_interval) {
+		$max_interval = time - $old_time;
+	}
+	$old_time=time;
+}
+
+sub done {
+	print "installation finished\n";
+	print "longest inactive interval: $max_interval\n";
+	print "total time: ".(time - $start_time)."\n";
+	exit;
+}

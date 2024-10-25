@@ -1,0 +1,597 @@
+#!/usr/bin/perl
+# Summary of udebs in testing vs those in unstable.
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Path;
+use URI::Escape;
+
+my $mirror=shift || "/srv/mirrors/debian/";
+# Die now if a local mirror can't be found:
+if ($mirror =~ m{^/} and ! -d $mirror) {
+	print STDERR "The local mirror $mirror can't be found, please specify another mirror.\n";
+	print STDERR "Example for a remote mirror: $0 http://deb.debian.org/debian\n";
+	print STDERR "Example for a local  mirror: $0 /srv/mirrors/debian/\n";
+	exit 1;
+}
+
+# debian.org machines have a specific setup for SSL:
+my $wget = 'wget';
+my $debianorg_ca_dir = '/etc/ssl/ca-debian';
+if (-d $debianorg_ca_dir) {
+  $wget = "wget --ca-directory=$debianorg_ca_dir";
+}
+
+# only the arches we care about
+my @arches=qw(amd64 arm64 armel armhf i386 mips64el ppc64el s390x);
+my @dists=qw(testing unstable);
+
+my %packageversions;
+my %seenpackages;
+my %pooldirs;
+my %poolfiles;
+my %lastbinfromsource;
+my %inconsistent;
+my %bin_nmu;
+my %frozen;
+my %has_debs;
+my @annotations;
+my %ages;
+my %sourceversions;
+my %sourcebinaries;
+my @di_bdeps;
+
+sub markup {
+	my $text=shift;
+	$text=~s/\#(\d\d\d\d+)/<a href="http:\/\/bugs.debian.org\/$1">#$1<\/a>/g;
+	return $text;
+}
+
+sub between_versions {
+	my $version=shift;
+	my $low=shift;
+	my $high=shift;
+	if ((! length $low || system('dpkg','--compare-versions', $low, '<<', $version) == 0) &&
+	    (! length $high || system('dpkg','--compare-versions', $high, '>=', $version) == 0)) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub older_version {
+	my $version=shift;
+	my $high=shift;
+	if (length $high && system('dpkg','--compare-versions', $high, '>>', $version) == 0) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub archname {
+	my %arch=map { $_ => 1 } @_;
+	my %seen;
+	my %unseen=map { $_ => 1 } @arches;
+	foreach my $arch (@arches) {
+		if (exists $arch{$arch}) {
+			$seen{$arch}=1;
+			delete $unseen{$arch}
+		}
+	}
+	if (! %unseen) {
+		return "all";
+	}
+	elsif (keys %unseen > keys %seen) {
+		return join(",", sort keys %seen);
+	}
+	else {
+		return join(",", sort map { "!$_" } keys %unseen);
+	}
+}
+
+if (!$ENV{NOSYNC}) {
+	# Sync files from release.debian.org:
+	# - dates
+	unlink 'age-policy-dates';
+	`$wget -q -O age-policy-dates https://release.debian.org/britney/state/age-policy-dates`;
+	# - hints
+	rmtree "hints";	
+	mkdir "hints";
+	my $hints_url = 'https://release.debian.org/britney/hints/';
+	`$wget -q -O hints/index.html $hints_url`;
+	open my $hints_file, '<', 'hints/index.html'
+		or die "Unable to open hints file";
+	while (<$hints_file>) {
+		if (m{<li><a href="(.*)">\1</a></li>}) {
+			next if $1 eq 'README' or $1 eq 'satbritney';
+			`$wget -q -O hints/$1 $hints_url/$1`;
+		}
+	}
+	close $hints_file
+		or die "Unable to close hints file";
+}
+
+
+foreach my $dist (@dists) {
+	### Architecture-independent Sources file:
+	my $srcdir  = "dists/$dist/main/source";
+	my $srcfile = "$srcdir/Sources.gz";
+	# If not a local mirror, remove a (possible) file from a
+	# previous run and download again:
+	if ($mirror !~ m{^/}) {
+		if (!$ENV{NOSYNC}) {
+			unlink $srcfile;
+			`$wget -q -P $srcdir $mirror/$srcfile`;
+		}
+	}
+	else {
+		$srcfile = "$mirror/$srcfile";
+	}
+
+	open(SRC, "zcat $srcfile |") || die "cannot read $srcfile: $!";
+	local $/="\n\n";
+	while (<SRC>) {
+		my ($package) = m/Package: (.*)\n/;
+		my ($binary)  = m/Binary: (.*)\n/;
+		my ($version) = m/Version: (.*)\n/;
+		my ($bdeps)   = m/Build-Depends: (.*)\n/;
+		if (m/Extra-Source-Only: yes\n/) {
+			#print STDERR "Skipping $package/$version (extra-source-only)\n";
+			next;
+		}
+		for my $binary_item (split /, /, $binary) {
+			$sourceversions{$dist}{$binary_item}{source} = $package;
+			push @{$sourceversions{$dist}{$binary_item}{version}}, $version;
+			$sourcebinaries{$dist}{$package}{$binary_item} = 0;
+		}
+		if ($package eq 'debian-installer' and $dist eq 'unstable') {
+			@di_bdeps = split /, /, $bdeps;
+		}
+	}
+
+	### Per-architecture Packages files:
+	foreach my $arch (@arches) {
+		my $pkgdir  = "dists/$dist/main/debian-installer/binary-$arch";
+		my $pkgfile = "$pkgdir/Packages.gz";
+		# If not a local mirror, remove a (possible) file from
+		# a previous run and download again:
+		if ($mirror !~ m{^/}) {
+			if (!$ENV{NOSYNC}) {
+				unlink $pkgfile;
+				`$wget -q -P $pkgdir $mirror/$pkgfile`;
+			}
+		}
+		else {
+			$pkgfile = "$mirror/$pkgfile";
+		}
+		open(PKG, "zcat $pkgfile |") || die "cannot read $pkgfile: $!";
+		local $/="\n\n";
+		while (<PKG>) {
+			my ($package)=m/Package: (.*)\n/;
+			my ($version)=m/Version: (.*)\n/;
+			if (! length $package || ! length $version) {
+				print STDERR "Parse failure. Stanza: $_";
+			}
+			else {
+				my ($source)=m/Source: (.*)\n/;
+				my $source_version;
+				if (! defined $source) {
+					$source=$package;
+				}
+				else {
+					# Source line can include a version if binNMU'ed
+					($source_version=$source)=~s/^.* [(](.+)[)]$/$1/;
+					$source=~s/ .*$//;
+				}
+
+				# Register that binary package as seen (seeing
+				# some udeb on one arch is sufficient):
+				$sourcebinaries{$dist}{$source}{$package} = 1;
+
+				# Check for binNMUs; correct version to source version
+				if ($version =~ /\+b[1-9]$/) {
+					if (! $bin_nmu{$source}) {
+						$bin_nmu{$source}=1;
+						push @annotations, {arch => $arch, package => $source, annotation => "has binary NMU in $dist" };
+					}
+					$version =~ s/\+b[1-9]$//
+				}
+				# Signed packages:
+				if ($source_version and $source_version =~ /[+]\d+$/) {
+				    $version = $source_version;
+				}
+				if ($dist eq 'testing' &&
+				    exists $packageversions{$source}{$dist}{$arch} &&
+				    $packageversions{$source}{$dist}{$arch} ne $version) {
+					if (! $inconsistent{$source}) {
+						$inconsistent{$source}=1;
+						push @annotations, {arch => $arch, package => $source, annotation => "inconsistent binary versions in testing" };
+					}
+					push @annotations, {arch => $arch, detail => 1, package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
+				}
+				else {
+					$packageversions{$source}{$dist}{$arch} = $version;
+					$lastbinfromsource{$source}=$package;
+					$seenpackages{$source}=1;
+					my ($filename)=m/Filename: (.*)\n/;
+					push @{$poolfiles{$source}{$arch}}, $filename;
+					my ($pooldir)=m/Filename: (.*)\/.*?\n/;
+					$pooldirs{$source}=$pooldir;
+				}
+			}
+		}
+	}
+	close PKG;
+}
+
+# Collate transitions for multiple arches
+my %transitions;
+foreach my $package (keys %seenpackages) {
+	foreach my $arch (@arches) {
+		my $key="$package";
+		my %seen;
+		foreach my $dist (@dists) {
+			if (exists $packageversions{$package}{$dist}{$arch}) {
+				my $version=$packageversions{$package}{$dist}{$arch};
+				$key.=" $version";
+				$seen{$version}++;
+			}
+		}
+		my $dup=0;
+		foreach my $key (keys %seen) {
+			$dup=1 if $seen{$key} > 1;
+		}
+
+		push @{$transitions{$package}{$key}}, $arch if ! $dup && %seen;
+	}
+}
+
+if (open (ANN, "annotations")) {
+	while (<ANN>) {
+		chomp;
+		next if /^#/;
+		next unless length;
+
+		my ($user, $package, $version, $annotation) = split(' ', $_, 4);
+		next unless defined $annotation && length $annotation;
+		push @annotations, {user => $user, package => $package,
+			version => $version, annotation => markup($annotation)};
+	}
+	close ANN;
+} else {
+	print STDERR "failed to read annotations: $!\n";
+}
+
+# Read packages in freeze file
+if (open (FREEZE, "hints/freeze")) {
+	while (<FREEZE>) {
+		last if /^finished/;
+		next if /^#/;
+		next unless length;
+
+		my ($package)=m/block-udeb (.*)\n/;
+		if (defined $package) {
+			$frozen{$package}=1;
+		}
+	}
+	close FREEZE;
+} else {
+	print STDERR "failed to read frozen packages file: $!\n";
+}
+
+# Read ages, mimicking britney's computation:
+#   # britney's "day" begins at 3pm
+#   self.date_now = int(((time.time() / (60*60)) - 15) / 24)
+# Beware, there might be several versions in unstable, so track the
+# version the age is specific to. The old version will be 'unknown'
+# until it's built everywhere, only the latest version appears in
+# Dates:
+if (open (DATES, "age-policy-dates")) {
+	my $now = int(((time / (60*60)) - 15 ) / 24);
+	while (<DATES>) {
+		if (/^(\S+) (\S+) (\S+)$/) {
+			my ($package, $version, $days) = ($1, $2, $3);
+			$ages{$package}{$version} = $now-$days;
+		}
+	}
+	close DATES;
+} else {
+	print STDERR "failed to read age-policy-dates file: $!\n";
+}
+
+my %normal_unblocks;
+my %udeb_unblocks;
+my %age_days;
+for my $hint_file (<hints/*>) {
+	open my $fh, '<', "$hint_file"
+		or die "Unable to open $hint_file";
+	my $hinter = basename($hint_file);
+	while (my $line = <$fh>) {
+		# Skip a bunch of things we don't care about:
+		next if $line =~ /^\s*#/;
+		next if $line =~ /^\s*$/;
+		# End here:
+		last if $line =~ /^finished/;
+		# Interesting things start here:
+		if ($line =~ /^unblock\s+(.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$normal_unblocks{$p}}, $hinter;
+			}
+			next;
+		}
+		if ($line =~ /^unblock-udeb\s+(.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$udeb_unblocks{$p}}, $hinter;
+			}
+			next;
+		}
+		if ($line =~ /^age-days (\d+) (.*)/) {
+			for my $p (split /\s+/, $2) {
+				push @{$age_days{$p}}, "$hinter: $1";
+			}
+			next;
+		}
+		if ($line =~ /^urgent (.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$age_days{$p}}, "$hinter: U";
+			}
+			next;
+		}
+		#print "Unused: [$h] $line";
+	}
+	close $fh
+		or die "Unable to close $hint_file";
+}
+
+my %unwanted;
+my $unwanted_file = 'unwanted-packages';
+if (open (UNWANTED, $unwanted_file)) {
+	while (my $line = <UNWANTED>) {
+		# Discard comments:
+		next
+			if $line =~ /^\s*#/;
+		# Format is: package version some_reason_for_that
+		if ($line =~ /^(\S+)\s+(\S+)\s+(.*)$/) {
+			my ($package, $version, $reason) = ($1, $2, $3);
+			# Expand Message-IDs:
+			$reason =~ s{<MID:([^>]+)>}{<a href="https://lists.debian.org/$1">&lt;$1&gt;</a>}g;
+			$unwanted{$package}{version} = $version;
+			$unwanted{$package}{reason} = $reason;
+		}
+		else {
+			print STDERR "failed to parse line from $unwanted_file\n";
+		}
+	}
+	close UNWANTED;
+}
+else {
+	print STDERR "unable to read unwanted file ($unwanted_file): $!\n";
+}
+
+
+print <<"HEADER";
+<html>
+  <head>
+    <title>udeb testing summary</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+    <link rel="icon"       type="text/png" href="/static/favicon.png" />
+    <style>
+      table, tr, th, td, hr {
+        border: solid 1px black;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      tr.unblocked {
+        background-color: #80ff80;
+      }
+      tr.unwanted {
+        background-color: dimgrey;
+      }
+      tr.needsreview {
+        background-color: slategrey;
+      }
+      tr.just-migrated {
+        background-color: plum;
+      }
+      th, td {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      .noborder {
+        border: 0;
+      }
+      a {
+        text-decoration: none;
+      }
+    </style>
+    <script src="/static/jquery.min.js"></script>
+    <script>
+      \$(document).ready(function(){
+        \$(".uninteresting").hide();
+
+        \$('#bdep-toggle').change(function () {
+          if (this.checked) {
+            \$(".uninteresting").show();
+          } else {
+            \$(".uninteresting").hide();
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>udeb testing summary</h1>
+HEADER
+
+print "<h2><a name=\"build-deps\">d-i build-deps</a></h2>\n";
+print "<p>(taken from unstable's <code>debian-installer</code> source package) — ";
+print "<input id=\"bdep-toggle\" type=\"checkbox\"><label for=\"bdep-toggle\">show all build-deps</label></input></p>\n";
+
+print "<table>\n";
+print "<tr><th>Package</th><th>Version</th><th>Architecture</th><th>Source</th><th>Testing</th><th>Unstable</th></tr>\n";
+foreach my $bdep (sort @di_bdeps) {
+	my $package = $bdep;
+	my ($version, $arch, $source, $tdstyle, $class) = ('', '', '', '', 'uninteresting');
+	$package =~ s/ .*//;
+	$version = $1 if $bdep =~ /\((.+)\)/;
+	$arch = $1 if $bdep =~ /\[(.+)\]/;
+	$source = $sourceversions{unstable}{$package}{source} || '';
+	my $tv = join '<br/>', sort @{$sourceversions{testing}{$package}{version} || []};
+	my $uv = join '<br/>', sort @{$sourceversions{unstable}{$package}{version} || []};
+	# Common problem: Built-Using on grub2 or grub-efi-*-signed
+	my $color = $package !~ /^grub/ ? "skyblue" : "crimson";
+	if ($tv ne $uv) {
+		$tdstyle = "style=\"color: black; background-color: $color;\"";
+		$class = 'interesting';
+	}
+	print "<tr class=\"$class\"><td>$package</td><td>$version</td><td>$arch</td><td>$source</td><td $tdstyle>$tv</td><td $tdstyle>$uv</td></tr>\n";
+}
+print "</table>\n";
+
+print "<h2><a name=\"udebs\">udebs</a></h2>\n";
+
+print "<table><tr align=left><th>source package</th><th>debs</th><th>udebs</th><th>arches</th>";
+foreach my $dist (@dists) {
+	print "<th>$dist</th>";
+}
+print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>unblock-udeb</th><th>age-days</th><th>links</th><th>commits in git</th></tr>\n";
+my $numcols=9 + @dists;
+
+foreach my $package (sort keys %seenpackages) {
+	my $row='';
+	my $class='';
+	my $uri_pkg = uri_escape($package);
+	foreach my $transition (keys %{$transitions{$package}}) {
+		# Not sure how relevant debs/udebs presence (and count) is, but
+		# let's just look at unstable:
+		my %binaries = %{$sourcebinaries{unstable}{$package}};
+		my $debs = grep { $binaries{$_} == 0 } keys %binaries;
+		my $udebs = grep { $binaries{$_} == 1 } keys %binaries;
+
+		$row .= "<tr class=##CLASS##><td><a href=\"https://tracker.debian.org/pkg/$uri_pkg\">$package</a></td>";
+		$row .= "<td align=\"center\">$debs</td>";
+		$row .= "<td align=\"center\">$udebs</td>";
+		$row .= "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
+		my $some_arch=@{$transitions{$package}{$transition}}[0];
+		my @vers;
+		my $unstable_version;
+		foreach my $dist (@dists) {
+			my $version=$packageversions{$package}{$dist}{$some_arch};
+			if (! defined $version) {
+				$version="-";
+				push @vers, '';
+				$row .= "<td>-</td>";
+			}
+			else {
+				push @vers, $version;
+				if ($dist eq 'testing') {
+					$row .= "<td>$version</td>";
+				}
+				else {
+					my $unwanted_bits='';
+					if ($unwanted{$package} && $unwanted{$package}{version} ne $version) {
+						$unwanted_bits = '<br>' . $unwanted{$package}{version} . ': ' . $unwanted{$package}{reason};
+					}
+					$row .= "<td>$version$unwanted_bits</td>";
+					$unstable_version = $version;
+				}
+			}
+		}
+		my $minage = defined($unstable_version)&&defined($ages{$package}{$unstable_version}) ? $ages{$package}{$unstable_version} : 'unknown';
+		$row .= "<td>".$minage."</td>";
+		if (exists $frozen{$package}) {
+			$row .= "<td align=\"center\" style=\"font-weight: bold\">yes</td>";
+		} else {
+			$row .= "<td align=\"center\" style=\"color: crimson\">no</td>";
+		}
+
+		$row .= "<td>" . (join('<br>', @{$unstable_version ? $normal_unblocks{"$package/$unstable_version"}||[] : []})) . "</td>";
+		$row .= "<td>" . (join('<br>', @{$unstable_version ? $udeb_unblocks{"$package/$unstable_version"}  ||[] : []})) . "</td>";
+		$row .= "<td>" . (join('<br>', @{$unstable_version ? $age_days{"$package/$unstable_version"}       ||[] : []})) . "</td>";
+
+		if ((@{$unstable_version ? $normal_unblocks{"$package/$unstable_version"}||[] : []}) &&
+		    @{$unstable_version ? $udeb_unblocks{"$package/$unstable_version"}  ||[] : []}) {
+			$class = 'unblocked';
+		} else {
+			# hints might have gone away after a britney run and hint clean, without
+			# packages being dinstalled just yet; check the DB:
+			my $testing_version = `rmadison -s testing -a source $package`;
+			$testing_version = (split /\s+\|\s+/, $testing_version)[1] || '';
+			# and exclude lvm2 with its usual version discrepancy:
+			if (defined($unstable_version) and $testing_version eq $unstable_version and $package ne 'lvm2') {
+				$class = 'just-migrated';
+			}
+		}
+
+		$row .= "<td><a href=\"https://packages.debian.org/changelog:$uri_pkg\">changelog</a> - <a href=\"https://tracker.debian.org/pkg/$uri_pkg\">tracker</a></td>";
+
+		my $commits = '?';
+		my $gitdir = "../../packages/$package";
+		if (-d $gitdir) {
+			my $desc = `cd $gitdir && git describe --tags`;
+			$commits = $desc =~ /-(\d+)-g/ ? $1 : 0;
+		}
+		$row .= "<td>" . $commits . "</td>";
+		$row .= "</tr>\n";
+
+		foreach my $ann (@annotations) {
+			if ($package eq $ann->{package} &&
+			    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
+			    (! exists $ann->{arch} || grep $ann->{arch}, @{$transitions{$package}{$transition}}[0])) {
+				$row .= "<tr class='noborder ##CLASS##'><td class=noborder>$package</td><td class=noborder colspan=".($numcols)."><span>$ann->{annotation}</span>";
+				if (exists $ann->{user}) {
+				$row .= " <i>-- $ann->{user}</i>";
+				}
+				if (exists $ann->{version} && older_version($ann->{version}, $vers[1])) {
+					$row .= " (re an older version)";
+				}
+				$row .= "</td></tr>\n";
+			}
+		}
+
+		if ($unwanted{$package} && $class ne 'unblocked') {
+			if (($unwanted{$package}{'version'}||'') eq $unstable_version) {
+				$class = 'unwanted';
+			}
+			else {
+				$class = 'needsreview';
+			}
+		}
+
+		$row =~ s/##CLASS##/$class/g;
+		print $row;
+	}
+}
+
+print "</table><hr>\n";
+
+my $date=`LC_ALL=C TZ=GMT date`;
+chomp $date;
+
+print <<"EOS"
+This page is built using:
+<ul>
+  <li><code>annotations</code>: file historically used to follow
+  testing migration status.</li>
+  <li><code>unwanted-packages</code>: file listing packages we don't
+  consider during deep freezes, usually because of new upstream
+  releases.</li>
+</ul>
+
+Those files live in the same directory as this <code>gen-summary</code> script.
+<p>
+See also:
+<ul>
+  <li><a href="https://release.debian.org/britney/hints/">britney hint files (release managers)</a></li>
+  <li><a href="https://ftp-master.debian.org/d-i">consistency check of sources of udebs</a></li>
+</ul>
+<hr>
+$date
+</html>
+EOS

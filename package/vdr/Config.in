@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_VDR
+	bool "vdr"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_9
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_FONTCONFIG
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_LIBCAP
+	select LINGMO_PACKAGE_LIBEXECINFO if !LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  This project describes how to build your own digital
+	  satellite receiver and Video Disk Recorder.
+
+	  http://www.tvdr.de
+
+comment "vdr needs a toolchain w/ C++, dynamic library, NPTL, wchar, headers >= 3.9"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || \
+		!LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_9

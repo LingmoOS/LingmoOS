@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_TEALDEER
+	bool "tealdeer"
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	# Crypto dependency (ring) not available for mips, PowerPC, Sparc, s390x
+	depends on !(LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el)
+	depends on !(LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le)
+	depends on !(LINGMO_sparc || LINGMO_sparc64)
+	depends on !LINGMO_s390x
+	select LINGMO_PACKAGE_HOST_RUSTC
+	help
+	  A fast and full-featured tldr client. tldr pages are
+	  simplified and community-driven man pages, see
+	  https://tldr.sh/ for more information.
+
+	  https://github.com/dbrgn/tealdeer/

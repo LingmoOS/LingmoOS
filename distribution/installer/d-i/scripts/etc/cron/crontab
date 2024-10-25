@@ -1,0 +1,42 @@
+# Never change d-i's crontab with `crontab -e`. Instead, edit
+# ~d-i/trunk/scripts/etc/cron/crontab, and run `make`
+# in that directory (or install that file by hand). Also, please
+# `git commit` + `git push` any non-temporary changes you make.
+
+MAILTO=kibi,holgerw
+DI=/home/d-i/trunk
+
+WWW=/srv/d-i.debian.org/www
+DI_MANUAL_DAILY=/home/d-i/d-i_manual.daily/
+DAILY_IMAGES_DIR=/srv/d-i.debian.org/www/daily-images
+DAILY_LOGS_DIR=/home/d-i/daily-build-logs.git
+
+#00 1 * * * cd $DI/scripts; git pull; ./daily-build-aggregator $WWW/daily-images/build-logs ; ~/bin/push-www
+05 * * * * cd $DI/scripts; git pull -q; ./daily-build-manager sync-logs $DAILY_IMAGES_DIR $DAILY_LOGS_DIR; cd $DAILY_LOGS_DIR
+10 0 */10 * * cd $DI/scripts; git pull -q; ./daily-build-manager clean-old-logs   $DAILY_LOGS_DIR
+40 0 *    * * cd $DI/scripts; git pull -q; ./daily-build-manager clean-old-images $DAILY_IMAGES_DIR
+45 * *    * * cd $DI/scripts; git pull -q; ./daily-build-overview $DAILY_LOGS_DIR $DAILY_IMAGES_DIR
+
+18 1 * * * nice -n 19 $HOME/bin/generate_l10n-stats ; ~/bin/push-www
+
+18 3 * * * $HOME/bin/d-i_spellcheck ; ~/bin/push-www
+
+#55 3 * * * for i in `cat $HOME/.websec-txt/lang-mail-cvs.cfg|grep -E -v "^\#" | grep -E -v "^$" | awk '{print $1}' `; do $DI/scripts/l10n/websec/websec-txt-all $i ; done
+
+0 20 * * * cd $DI; mr -q up ; nice -n 19 $DI/scripts/l10n/l10n-sync --levels=5 --online --commit $DI
+
+# d-i Installation guide
+0 23 * * * cd $DI_MANUAL_DAILY ; nice -n 19 bin/build-manual ; ~/bin/push-www
+
+# d-i Internal and i18n-l10n-guide - to be activated as needed.
+#55 2 * * * cd $DI_MANUAL_DAILY ; bin/build-di-int >/dev/null
+#58 2 * * * cd $DI_MANUAL_DAILY ; bin/build-di-i18n >/dev/null ; ~/bin/push-www
+
+# Let the last */4 entry call push-www:
+10 */4 * * * cd $DI; mr -q up; cd scripts; ./git-summary > $WWW/git-summary.html
+15 */4 * * * cd $DI; ./scripts/l10n/scan-trans           > $WWW/translations.txt
+30 */4 * * * cd $DI/scripts; mr -q up; ./kernel-summary    $WWW/kernel-summary.html
+45 */4 * * * cd $DI/scripts; ./www-static.sh             > /dev/null 2>&1
+55 */4 * * * cd $DI; mr -q up ; cd $DI/scripts/testing-summary; ./gen-summary http://deb.debian.org/debian > $WWW/testing-summary.html ; ~/bin/push-www
+
+0 5,11,17,23 * * * cd $DI/scripts; mr -q up; ./dose4udebs-wrapper /srv/mirrors/ftp.debian.org/ftp/ dose.tmp $WWW/dose ; ~/bin/push-www

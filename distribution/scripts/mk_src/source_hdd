@@ -1,0 +1,151 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build source image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_SOURCE}" != "true" ]
+then
+	exit 0
+fi
+
+if ! In_list hdd ${LB_SOURCE_IMAGES}; then
+	exit 0
+fi
+
+Echo_message "Begin building source hdd image..."
+
+# Requiring stage file
+Require_stagefiles config source_debian
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /sbin/mkdosfs dosfstools
+Check_package chroot /sbin/parted parted
+Check_package host /sbin/fdisk fdisk
+Check_package host /sbin/losetup mount
+
+# Installing depends
+Install_packages
+
+# Remove old source
+if [ -f ${LB_IMAGE_NAME}-source.img ]
+then
+	rm -f ${LB_IMAGE_NAME}-source.img
+fi
+
+# Everything which comes here needs to be cleaned up,
+DU_DIM="$(du -ms source | cut -f1)"
+REAL_DIM="$(Calculate_partition_size ${DU_DIM} ${LB_BINARY_FILESYSTEM})"
+dd if=/dev/zero of=${LB_IMAGE_NAME}-source.img bs=1024k count=0 seek=${REAL_DIM}
+MAKEDEV=false
+FREELO="$(losetup -f)"
+if [ ! -b chroot/${FREELO} ]
+then
+	MAKEDEV=true
+
+	mv chroot/dev chroot/dev.tmp
+	# Don't copy mount points (e.g. /dev/shm)
+	find /dev -xdev| cpio -dmpu chroot
+fi
+
+case "${LB_BINARY_FILESYSTEM}" in
+	ext2|ext3|ext4)
+		PARTITION_TYPE="ext2"
+		;;
+
+	fat16|fat32)
+		PARTITION_TYPE="${LB_BINARY_FILESYSTEM}"
+		;;
+
+	ntfs)
+		PARTITION_TYPE="NTFS"
+		;;
+
+	*)
+		Echo_error "Unsupported binary filesystem %s" "${LB_BINARY_FILESYSTEM}"
+		exit 1
+		;;
+esac
+
+Echo_warning "!!! The following error/warning messages can be ignored !!!"
+Losetup $FREELO ${LB_IMAGE_NAME}-source.img 0
+Chroot chroot "parted -s ${FREELO} mklabel msdos" || true
+Chroot chroot "parted -a optimal -s ${FREELO} mkpart primary ${PARTITION_TYPE} 0.0 100%" || true
+Lodetach ${FREELO}
+
+Losetup $FREELO ${LB_IMAGE_NAME}-source.img 1
+
+case "${LB_BINARY_FILESYSTEM}" in
+	ext2|ext3|ext4)
+		MKFS="${LB_BINARY_FILESYSTEM}"
+		MKFS_OPTIONS="-L ${LB_HDD_LABEL} -m 0 -O ^64bit"
+		MOUNT_OPTIONS=""
+		;;
+
+	fat16)
+		MKFS="vfat"
+		MKFS_OPTIONS="-F 16 -n ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS=""
+		;;
+
+	fat32)
+		MKFS="vfat"
+		MKFS_OPTIONS="-F 32 -n ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS=""
+		;;
+
+	ntfs)
+		MKFS="ntfs"
+		MKFS_OPTIONS="-L ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS="-t ntfs-3g"
+		;;
+esac
+
+Chroot chroot "mkfs.${MKFS} ${MKFS_OPTIONS} ${FREELO}"
+
+mkdir -p source.tmp
+mount ${MOUNT_OPTIONS} ${FREELO} source.tmp
+cp -r source/* source.tmp
+umount source.tmp
+rmdir source.tmp
+Lodetach ${FREELO}
+Echo_warning "!!! The above error/warning messages can be ignored !!!"
+
+FREELO="$(losetup -f)"
+Losetup "$FREELO" ${LB_IMAGE_NAME}-source.img 0
+Chroot chroot "parted -s ${FREELO} set 1 lba off" || true
+Lodetach ${FREELO}
+
+if $MAKEDEV; then
+	rm -rf chroot/dev
+	mv chroot/dev.tmp chroot/dev
+fi
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

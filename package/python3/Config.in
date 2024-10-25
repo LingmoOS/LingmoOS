@@ -1,0 +1,131 @@
+comment "python3 needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_PYTHON3
+	bool "python3"
+	depends on LINGMO_USE_WCHAR
+	# uses fork()
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libffi
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBFFI
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_HEADERS if LINGMO_PACKAGE_BLUEZ5_UTILS
+	help
+	  The python language interpreter.
+
+	  http://www.python.org/
+
+if LINGMO_PACKAGE_PYTHON3
+
+choice
+	prompt "python3 module format to install"
+	default LINGMO_PACKAGE_PYTHON3_PYC_ONLY
+	help
+	  Select Python module format to install on target (py, pyc or
+	  both)
+
+config LINGMO_PACKAGE_PYTHON3_PY_ONLY
+	bool ".py sources only"
+
+config LINGMO_PACKAGE_PYTHON3_PYC_ONLY
+	bool ".pyc compiled sources only"
+
+config LINGMO_PACKAGE_PYTHON3_PY_PYC
+	bool ".py sources and .pyc compiled"
+
+endchoice
+
+menu "core python3 modules"
+
+comment "The following modules are unusual or require extra libraries"
+
+config LINGMO_PACKAGE_PYTHON3_2TO3
+	bool "2to3 module"
+	help
+	  code translation from python 2 to 3
+
+config LINGMO_PACKAGE_PYTHON3_BERKELEYDB
+	bool "berkeleydb"
+	select LINGMO_PACKAGE_BERKELEYDB
+	select LINGMO_PACKAGE_BERKELEYDB_DBM
+	help
+	  berkeleydb module for Python3
+
+config LINGMO_PACKAGE_PYTHON3_BZIP2
+	bool "bz2 module"
+	select LINGMO_PACKAGE_BZIP2
+	help
+	  bzip2 module for Python3
+
+config LINGMO_PACKAGE_PYTHON3_CODECSCJK
+	bool "codecscjk module"
+	help
+	  Chinese/Japanese/Korean codecs module for Python (large).
+
+config LINGMO_PACKAGE_PYTHON3_CURSES
+	bool "curses module"
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  curses module for Python3.
+
+config LINGMO_PACKAGE_PYTHON3_DECIMAL
+	bool "decimal module"
+	select LINGMO_PACKAGE_MPDECIMAL
+	help
+	  decimal module for Python3.
+
+config LINGMO_PACKAGE_PYTHON3_OSSAUDIODEV
+	bool "ossaudiodev module"
+	help
+	  ossaudiodev module for Python3.
+
+config LINGMO_PACKAGE_PYTHON3_READLINE
+	bool "readline"
+	select LINGMO_PACKAGE_READLINE
+	help
+	  readline module for Python3 (required for command-line
+	  editing in the Python shell).
+
+config LINGMO_PACKAGE_PYTHON3_SSL
+	bool "ssl"
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_BLAKE2
+	help
+	  _ssl module for Python3 (required for https in urllib etc).
+
+config LINGMO_PACKAGE_PYTHON3_UNICODEDATA
+	bool "unicodedata module"
+	default y
+	help
+	  Unicode character database (used by stringprep module)
+	  (large).
+
+config LINGMO_PACKAGE_PYTHON3_SQLITE
+	bool "sqlite module"
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  SQLite database support
+
+config LINGMO_PACKAGE_PYTHON3_PYEXPAT
+	bool "xml module"
+	select LINGMO_PACKAGE_EXPAT
+	help
+	  pyexpat and xml libraries for Python3.
+
+config LINGMO_PACKAGE_PYTHON3_XZ
+	bool "xz module"
+	select LINGMO_PACKAGE_XZ
+	help
+	  xz (a.k.a lzma) module for Python3
+
+config LINGMO_PACKAGE_PYTHON3_ZLIB
+	bool "zlib module"
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  zlib support in Python3
+
+endmenu
+
+endif

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+source config/System/system.conf
+
+set -e
+
+ISONAME=lingmo-os
+OUT=output
+
+lingmo-sys-build build noauto "${@}" 2>&1 | tee build.log
+
+# live-image-amd64.hybrid.iso 
+
+if [ -f "live-image-amd64.hybrid.iso" ];then
+   # *.sum
+    mv live-image-amd64.hybrid.iso $ISONAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH$DISK
+    mkdir -p $OUT/{iso,src}
+    mv ./$ISONAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH* $OUT/iso/ 2>/dev/null || :
+    mv ./live-image-source*.iso $OUT/src/$ISONAME-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-src.iso 2>/dev/null || :
+    mv live-image-amd64.packages $OUT/iso/$ISONAME-$BASE_VERSION-$CODE_NAME-$SYS_TYPE-$SYSTEM_TYPE-$SYSTEM_ARCH.packages 2>/dev/null || :
+    cp -v tools/make-sum $OUT/iso
+#    cd $OUT/iso
+#    ./make-sum
+#    rm make-sum && cd ../..
+#    cp -v tools/make-sum $OUT/src
+    cd $OUT/src
+    ./make-sum
+    rm make-sum && cd ../..
+
+    echo "[Successful]All build is done"
+    
+else
+    echo -e "\033[34mError!"
+fi

@@ -1,0 +1,66 @@
+config LINGMO_PACKAGE_RYGEL
+	bool "rygel"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_USE_WCHAR # gupnp-av
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # gupnp-av
+	depends on LINGMO_USE_MMU # gupnp-av, gobject-introspection
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS # gobject-introspection
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # gobject-introspection
+	depends on LINGMO_HOST_GCC_AT_LEAST_8 # gobject-introspection -> host-qemu
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # gobject-introspection
+	depends on LINGMO_PACKAGE_PYTHON3 # gobject-introspection
+	select LINGMO_PACKAGE_GDK_PIXBUF
+	select LINGMO_PACKAGE_GOBJECT_INTROSPECTION
+	select LINGMO_PACKAGE_GUPNP_AV
+	select LINGMO_PACKAGE_GUPNP_DLNA
+	select LINGMO_PACKAGE_LIBGEE
+	select LINGMO_PACKAGE_LIBMEDIAART
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	help
+	  Rygel is a home media solution (UPnP AV MediaServer) that
+	  allows you to easily share audio, video and pictures to other
+	  devices.
+
+	  Additionally, media player software may use Rygel to become a
+	  MediaRenderer that may be controlled remotely by a UPnP or
+	  DLNA Controller.
+
+	  Rygel achieves interoperability with other devices in the
+	  market by trying to conform to the very strict requirements of
+	  DLNA and by converting media on-the-fly to formats that client
+	  devices can handle.
+
+	  Most Rygel functionality is implemented through a plug-in
+	  mechanism.
+
+	  https://wiki.gnome.org/Projects/Rygel
+
+if LINGMO_PACKAGE_RYGEL
+
+choice
+	prompt "media engine"
+	default LINGMO_PACKAGE_RYGEL_MEDIA_ENGINE_SIMPLE
+
+config LINGMO_PACKAGE_RYGEL_MEDIA_ENGINE_SIMPLE
+	bool "simple"
+
+config LINGMO_PACKAGE_RYGEL_MEDIA_ENGINE_GSTREAMER1
+	bool "gstreamer1"
+	depends on LINGMO_PACKAGE_GSTREAMER1_EDITING_SERVICES
+
+comment "gstreamer1 needs gst1-editing-services"
+	depends on !LINGMO_PACKAGE_GSTREAMER1_EDITING_SERVICES
+
+endchoice
+
+endif # LINGMO_PACKAGE_RYGEL
+
+comment "rygel needs python3 and a glibc toolchain w/ wchar, threads, gcc >= 4.9, host gcc >= 8"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_GOBJECT_INTROSPECTION_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_XORG7
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_USES_GLIBC || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_HOST_GCC_AT_LEAST_8 || !LINGMO_PACKAGE_PYTHON3

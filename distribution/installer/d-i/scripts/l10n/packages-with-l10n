@@ -1,0 +1,12 @@
+#!/bin/sh
+# Displays the list of packages which actually have debconf
+# templates needing translation
+#
+# This is a very crude script, meant to be run in packages/
+# (or one of its subdirectories)
+for i in `find . -name templates.pot` ; do 
+  grep -e "^Source:" \
+      `echo $i | sed 's:/po/templates.pot:/control:'` |\
+   cut -f2 -d:  |\
+  sed '/^ /s/ *//g'
+done

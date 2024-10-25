@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+# © 2016 Cyril Brulebois <kibi@debian.org>
+#
+# Transform a release announce draft into the corresponding wml form,
+# to be committed under debian-www's repository for the website.
+use strict;
+use warnings;
+
+use File::Slurp;
+
+my $source = shift @ARGV
+  or die "Usage: $0 release-draft.txt";
+
+sub debug {
+    my ($label, $line) = @_;
+    printf STDERR "%-8s %s", $label, $line;
+}
+
+sub emit {
+    my ($line) = @_;
+    printf STDOUT "$line";
+}
+
+my $previous;
+foreach my $line (read_file($source)) {
+    my $this;
+    if ($line =~ /^$/) {
+        emit "</li>\n</ul>\n</li>\n</ul>\n"
+          if $previous eq 'LEVEL2' or $previous eq 'LEVEL2+';
+        $this = 'EMPTY';
+        emit "\n";
+    }
+    elsif ($line =~ /^\S+/) {
+        $this = "TEXT";
+    }
+    elsif ($line =~ /^ [*] (.+:)$/) {
+        my $content = $1;
+        $this = "LEVEL1";
+        emit "<ul>\n"
+          if $previous eq 'EMPTY';
+        emit "</li>\n</ul>\n</li>\n"
+          if $previous eq 'LEVEL2' or $previous eq 'LEVEL2+';
+        emit "<li>$content\n<ul>\n";
+    }
+    elsif ($line =~ /^    - (.+)$/) {
+        my $content = $1;
+        $this = "LEVEL2";
+        emit "</li>\n"
+          if $previous eq 'LEVEL2' or $previous eq 'LEVEL2+';
+        emit "<li>$content\n";
+    }
+    elsif ($line =~ /^      (.+)$/) {
+        my $content = $1;
+        $this = "LEVEL2+";
+        emit "$content\n";
+    }
+    else {
+        $this = "UNKNOWN";
+    }
+    debug $this, $line;
+    $previous = $this;
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/perl -T
+use warnings;
+use strict;
+
+if ($> != 0) {
+	die "$0 must run as root. This script is designed to be made suid and run with perl-suid.\n";
+}
+$<=$>;
+
+$ENV{PATH}="/usr/bin:/bin:/sbin/:/usr/sbin:/usr/local/bin:/usr/local/sbin";
+sub possibly_foolish_untaint ($) {
+        my $tainted=shift;
+        my ($untainted)=$tainted=~/(.*)/;
+        return $untainted;
+}
+
+my $disk_image=possibly_foolish_untaint(shift);
+my $mount_point=possibly_foolish_untaint("$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.mnt");
+my $iso=possibly_foolish_untaint($ENV{ISO});
+
+if (! -e "$ENV{QEMU_HD_MEDIA}" ) {
+	die "QEMU_HD_MEDIA $ENV{QEMU_HD_MEDIA} does not exist";
+}
+if (! -e "$ENV{ISO}" ) {
+	die "ISO $ENV{ISO} does not exist";
+}
+
+if (system("zcat ".possibly_foolish_untaint($ENV{QEMU_HD_MEDIA})." > $disk_image") != 0) {
+	die "zcat failed";
+}
+mkdir($mount_point) || die "mkdir $mount_point: $!";
+if (system("mount -o loop $disk_image $mount_point") != 0) {
+	die "mount failed";
+}
+if (system("cp $iso $mount_point") != 0) {
+	die "iso copy failed";
+}
+system("df $mount_point");
+if (system("umount $mount_point") != 0) {
+	die "umount failed";
+}
+rmdir($mount_point) || die "rmdir $mount_point: $!";

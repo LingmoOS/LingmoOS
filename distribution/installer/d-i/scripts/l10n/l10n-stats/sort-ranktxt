@@ -1,0 +1,54 @@
+#!/bin/bash
+# Copyright (c) 2004-2006 Dennis Stampfer <seppy@debian.org>
+# Licensed under the GNU General Public License
+#
+# Sort then results of D-I translations and rework the rank file
+
+# This is cryptic undocumented shell code. Documentation welcome
+
+#F=`cat /dev/stdin | sed 's/^00/XX/g' | sed 's/^0/X/g' | sort | sed 's/^XX/  /g' | sed 's/^X/ /g'`
+F=`cat $1 | sort -r`
+TEMP=$RANDOM
+
+X=0
+C=0
+IFS="
+"
+for I in $F; do
+        N=`echo "$I" | sed "s/%.*//g"`
+        if [ "$N" = "$O" ]; then
+                STR[$X]="${STR[$X]}\n$I"
+        else
+                O=$N
+                C=`expr $C + 1`
+                #R=$R\n`echo  "${STR[$X]}" |sort`
+                echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
+                X=`expr $X + 1`
+                STR[$X]="${STR[$X]}$I"
+        fi
+done
+echo -e "${STR[$X]}" |sort >> /tmp/$TEMP
+C=0
+T=0
+O=""
+SAME=""
+for I in `cat /tmp/$TEMP`; do
+        N=`echo "$I" | sed "s/%.*//g"`
+        if [ "$N" = "$O" ]; then
+                echo -ne "\n   $I"
+		SAME=`expr $SAME + 1`
+        else
+                O=$N
+                C=`expr $C + 1`
+                test "${#C}" = 1 && WHITE=" "
+                test "${#C}" = 2 && WHITE=""
+		echo -ne "\t$SAME"
+                echo -ne "\n$WHITE$C $I"
+		SAME=1
+        fi
+        T=`expr $T + 1`
+done
+echo -ne "\t$SAME"
+
+echo -e "\n\t\t=$T"
+rm /tmp/$TEMP

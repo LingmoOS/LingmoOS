@@ -1,0 +1,37 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 26 Apr 2021 18:27:16 +0200
+Subject: kbuild: Abort build if SUBDIRS used
+Forwarded: not-needed
+Bug-Debian: https://bugs.debian.org/987575
+
+DKMS and module-assistant both build OOT modules as root.  If they
+build an old OOT module that still use SUBDIRS this causes Kbuild
+to try building a full kernel, which obviously fails but not before
+deleting files from the installed headers package.
+
+To avoid such mishaps, detect this situation and abort the build.
+
+The error message is based on that used in commit 0126be38d988
+"kbuild: announce removal of SUBDIRS if used".
+---
+--- a/Makefile
++++ b/Makefile
+@@ -218,6 +218,18 @@ ifeq ("$(origin M)", "command line")
+   KBUILD_EXTMOD := $(M)
+ endif
+ 
++# Old syntax make ... SUBDIRS=$PWD should be rejected to avoid mishaps
++# (see Debian bugs #982334, #987575)
++ifndef KBUILD_EXTMOD
++  ifdef SUBDIRS
++    $(warning =============== ERROR ==============)
++    $(warning 'SUBDIRS' was removed in Linux 5.3)
++    $(warning Use 'M=' or 'KBUILD_EXTMOD=' instead)
++    $(warning ====================================)
++    $(error .)
++  endif
++endif
++
+ $(if $(word 2, $(KBUILD_EXTMOD)), \
+ 	$(error building multiple external modules is not supported))
+ 

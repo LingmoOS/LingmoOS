@@ -1,0 +1,103 @@
+#!/bin/sh
+# 
+# A script to find out which .po files has been updated since the last
+# update, according to the PO-Revision flag and the Debian changelog
+# 
+# Copyright (c) 2004 Nikolai Prokoschenko (nikolai@prokoschenko.de)
+#
+# This script is available under the GNU Public License
+# (http://www.gnu.org/licenses/gpl.txt) 
+
+CURDIR=`dirname $0`
+
+if [ "x$1" = "x" ]
+then
+  echo "Usage: $0 <package-directory>"
+  exit
+fi
+
+P=$1;
+PACKAGE=`echo $P | sed 's/\/$//g'` 
+
+if [ ! -d $PACKAGE ]
+then
+  echo "Cannot access the directory $PACKAGE!"
+  exit
+fi
+
+
+CHANGELOG="$PACKAGE/debian/changelog"
+POS="`for i in $PACKAGE/debian/po $PACKAGE/*/po $PACKAGE/po ; do \
+        if test -d $i ; then echo $i ; break ; fi ; \
+      done`"
+RELEASE="sid|unstable|experimental"
+
+if [ ! -e $CHANGELOG ]
+then
+  echo "Cannot find the changelog file!"
+  exit
+fi
+
+if [ ! -d "$POS" ]
+then
+  echo "Cannot find the PO directory!"
+  exit
+fi
+
+# Line number of the changelog's old date
+LINE=`grep -a "; urgency=" "$CHANGELOG" | egrep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
+
+if [ ! -z "$LINE" ]; then
+	# Date of the last release
+	DATE=`grep -a "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
+	OLD_DATE=`date -d "$DATE" +%s`
+else
+	OLD_DATE=0
+fi
+
+touch $PACKAGE/debian/.credits_log
+
+for i in $POS/*.po
+do
+  if [ -f "$i" ]
+  then
+    DATE=`grep PO-Revision "$i" | cut -d ":" -f 2,3 | sed 's/^ //g' | cut -d '\\' -f 1`
+
+    # Workaround for some weird date formatting
+    if [ ! "`echo "$DATE" | sed 's/GMT+//g'`" = "$DATE" ]
+    then
+	DATE="`echo "$DATE" | sed 's/GMT//g'`"
+    fi
+
+    if date --date "$DATE" 2>/dev/null 1>&2 
+    then
+	NEW_DATE=`date -d "$DATE" +%s`
+	if [ $NEW_DATE -ge $OLD_DATE ]
+	then
+	    
+	    CSN=`basename $i | sed 's/\.po//g'`
+
+	    # Get the translator's name
+
+	    # [\\] needed because otherwise sed seems to treat \\n as
+	    # backslash+newline?
+	    translator=`grep '^"Last-Translator:' $i | sed 's/\"//g' | sed 's/Last-Translator: //g' | sed 's/<.*$//g' | sed 's/ *[\\]n$//'`
+	    
+	    # Convert to UTF-8 -- the changelogs should be UTF-8, the
+	    # translations need not.
+
+	    encoding=`grep "charset=" $i | sed 's/\"//g' | sed 's/^.*charset=//g' | sed 's/n//g'`
+	    if [ -n "$encoding" ]; then
+		    trans=`echo $translator | iconv -f $encoding -t utf-8`
+	    fi	    
+
+	    # And output the changelog line
+	    
+	    echo "$CSN.po:$trans" >> $PACKAGE/debian/.credits_log
+	    sort $PACKAGE/debian/.credits_log | uniq > t
+	    mv t $PACKAGE/debian/.credits_log
+        
+	fi
+    fi
+  fi
+done

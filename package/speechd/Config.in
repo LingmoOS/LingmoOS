@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_SPEECHD
+	bool "speechd"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_DOTCONF
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBSNDFILE
+	help
+	  Speech Dispatcher project provides a high-level device
+	  independent layer for access to speech synthesis through
+	  a simple, stable and well documented interface.
+
+	  https://freebsoft.org/speechd
+
+comment "speechd needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

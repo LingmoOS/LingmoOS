@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+# Exit if system is not a live system
+if ! grep -qs "boot=live" /proc/cmdline || \
+# Exit if system is netboot
+   grep -qs "netboot" /proc/cmdline || \
+   grep -qs "root=/dev/nfs" /proc/cmdline || \
+   grep -qs "root=/dev/cifs" /proc/cmdline || \
+# Exit if system is findiso
+   grep -qs "find_iso" /proc/cmdline || \
+# Exit if system is toram
+   grep -qs "toram" /proc/cmdline || \
+# Exit if user disabled medium eject
+   grep -qs "cdrom-detect/eject=false" /proc/cmdline || \
+   grep -qs "noeject" /proc/cmdline
+then
+	exit 0
+fi
+
+# Reading configuration files from filesystem and live-medium
+for _FILE in /etc/live/tools.conf /etc/live/tools/* \
+	     /run/live/medium/live/tools.conf /run/live/medium/live/tools/*
+do
+	if [ -e "${_FILE}" ]
+	then
+		. "${_FILE}"
+	fi
+done
+
+# Setting defaults
+LIVE_MEDIUM_EJECT_VERBOSE="${LIVE_MEDIUM_EJECT_VERBOSE:-true}"
+
+# Ejecting live-medium
+_DEVICE="$(findmnt -Un -o source /run/live/medium | sed -e 's|^/dev/||')"
+
+if [ ! -b "/dev/${_DEVICE}" ]
+then
+	exit 0
+fi
+
+case "${_DEVICE}" in
+	sd*)
+		_DEVICE=$(echo $_DEVICE | sed -e 's/[0-9]*$//')
+		if readlink "/sys/block/${_DEVICE}" | grep -q usb
+		then
+			# ignoring usb mass storage devices
+			# (they need coldreboot to recover)
+			exit 0
+		fi
+		;;
+esac
+
+if [ -x "$(which eject 2> /dev/null)" ]
+then
+	# Give some time for the code afterwards to execute itself before
+	# we remove the medium used by the root filesystem...
+	(sleep 1; eject -p -m /dev/${_DEVICE}) >/dev/null 2>&1 &
+	WAIT_EJECT=1
+fi
+
+case "${LIVE_MEDIUM_EJECT_VERBOSE}" in
+	true)
+		if [ -x /bin/plymouth ] && plymouth --ping
+		then
+			plymouth message --text="Please remove the live-medium, close the tray (if any) and press ENTER to continue:"
+			plymouth watch-keystroke > /dev/null
+		else
+			stty sane < /dev/console
+
+			printf "\n\nPlease remove the live-medium, close the tray (if any) and press ENTER to continue:" > /dev/console
+
+			read x < /dev/console
+		fi
+		;;
+esac
+
+if [ -n "$WAIT_EJECT" ]; then
+	wait
+fi

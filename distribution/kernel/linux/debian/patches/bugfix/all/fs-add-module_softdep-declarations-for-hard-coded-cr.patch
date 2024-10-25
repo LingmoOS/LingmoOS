@@ -1,0 +1,60 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Wed, 13 Apr 2016 21:48:06 +0100
+Subject: fs: Add MODULE_SOFTDEP declarations for hard-coded crypto drivers
+Bug-Debian: https://bugs.debian.org/819725
+Forwarded: https://lore.kernel.org/all/20160517133631.GF7555@decadent.org.uk/
+
+This helps initramfs builders and other tools to find the full
+dependencies of a module.
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+[Lukas Wunner: Forward-ported to 4.11: drop parts applied upstream]
+---
+ fs/btrfs/super.c  | 2 +-
+ fs/ext4/super.c   | 2 +-
+ fs/jbd2/journal.c | 1 +
+ fs/nfsd/nfsctl.c  | 3 +++
+ 4 files changed, 6 insertions(+), 2 deletions(-)
+
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -2619,7 +2619,7 @@ module_exit(exit_btrfs_fs)
+ 
+ MODULE_DESCRIPTION("B-Tree File System (BTRFS)");
+ MODULE_LICENSE("GPL");
+-MODULE_SOFTDEP("pre: crc32c");
++MODULE_SOFTDEP("pre: crypto-crc32c");
+ MODULE_SOFTDEP("pre: xxhash64");
+ MODULE_SOFTDEP("pre: sha256");
+ MODULE_SOFTDEP("pre: blake2b-256");
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -7404,6 +7404,6 @@ static void __exit ext4_exit_fs(void)
+ MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
+ MODULE_DESCRIPTION("Fourth Extended Filesystem");
+ MODULE_LICENSE("GPL");
+-MODULE_SOFTDEP("pre: crc32c");
++MODULE_SOFTDEP("pre: crypto-crc32c");
+ module_init(ext4_init_fs)
+ module_exit(ext4_exit_fs)
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -3194,6 +3194,7 @@ static void __exit journal_exit(void)
+ 
+ MODULE_DESCRIPTION("Generic filesystem journal-writing module");
+ MODULE_LICENSE("GPL");
++MODULE_SOFTDEP("pre: crypto-crc32c");
+ module_init(journal_init);
+ module_exit(journal_exit);
+ 
+--- a/fs/nfsd/nfsctl.c
++++ b/fs/nfsd/nfsctl.c
+@@ -2353,5 +2353,8 @@ static void __exit exit_nfsd(void)
+ MODULE_AUTHOR("Olaf Kirch <okir@monad.swb.de>");
+ MODULE_DESCRIPTION("In-kernel NFS server");
+ MODULE_LICENSE("GPL");
++#ifdef CONFIG_NFSD_V4
++MODULE_SOFTDEP("pre: crypto-md5");
++#endif
+ module_init(init_nfsd)
+ module_exit(exit_nfsd)

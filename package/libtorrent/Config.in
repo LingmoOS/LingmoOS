@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LIBTORRENT
+	bool "libtorrent"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 && LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC4 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  BitTorrent library written in C++ for *nix
+
+	  https://github.com/rakshasa/libtorrent
+
+comment "libtorrent needs a toolchain w/ C++, threads"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 && LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_ASSIMP
+	bool "assimp"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_ZLIB_FORCE_LIBZLIB
+	help
+	  Open Asset Import Library (assimp) is a portable Open Source
+	  library to import various well-known 3D model formats in a
+	  uniform manner. The most recent version also knows how to
+	  export 3d files and is therefore suitable as a general-purpose
+	  3D model converter.
+
+	  http://www.assimp.org
+
+comment "assimp needs a toolchain w/ C++, wchar, gcc >= 7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

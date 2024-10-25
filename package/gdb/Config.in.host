@@ -1,0 +1,71 @@
+config LINGMO_PACKAGE_HOST_GDB_ARCH_SUPPORTS
+	bool
+	default y
+	depends on !((LINGMO_arm || LINGMO_armeb) && LINGMO_BINFMT_FLAT)
+	depends on !LINGMO_microblaze
+
+comment "Host GDB Options"
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY
+	depends on LINGMO_PACKAGE_HOST_GDB_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_HOST_GDB
+	bool "Build cross gdb for the host"
+	# When the external toolchain gdbserver is used, we shouldn't
+	# allow to build a cross-gdb, as the one of the external
+	# toolchain should be used.
+	depends on !LINGMO_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY
+	depends on LINGMO_PACKAGE_HOST_GDB_ARCH_SUPPORTS
+	help
+	  Build a cross gdb that runs on the host machine and debugs
+	  programs running on the target. It requires 'gdbserver'
+	  installed on the target, see LINGMO_PACKAGE_GDB_SERVER to
+	  enable it.
+
+if LINGMO_PACKAGE_HOST_GDB
+
+config LINGMO_PACKAGE_HOST_GDB_TUI
+	bool "TUI support"
+	help
+	  This option enables terminal user interface (TUI) for gdb
+
+config LINGMO_PACKAGE_HOST_GDB_PYTHON3
+	bool "Python support"
+	help
+	  This option enables the Python 3 support in the cross gdb.
+
+config LINGMO_PACKAGE_HOST_GDB_SIM
+	bool "Simulator support"
+	depends on !LINGMO_arc
+	help
+	  This option enables the simulator support in the cross gdb.
+
+choice
+	prompt "GDB debugger Version"
+	default LINGMO_GDB_VERSION_13
+	depends on !LINGMO_arc
+	help
+	  Select the version of gdb you wish to use.
+
+config LINGMO_GDB_VERSION_12
+	bool "gdb 12.x"
+
+config LINGMO_GDB_VERSION_13
+	bool "gdb 13.x"
+
+config LINGMO_GDB_VERSION_14
+	bool "gdb 14.x"
+
+endchoice
+
+endif
+
+# If cross-gdb is not enabled, the latest stable version is chosen.
+config LINGMO_GDB_VERSION
+	string
+	default "arc-2023.09-release" if LINGMO_arc
+	default "12.1"     if LINGMO_GDB_VERSION_12
+	default "13.2"     if LINGMO_GDB_VERSION_13 || !LINGMO_PACKAGE_HOST_GDB
+	# When making 14.x the default, or 14.x becomes the oldest version,
+	# be sure to update the target variant to properly select mpfr.
+	default "14.2"     if LINGMO_GDB_VERSION_14
+	depends on LINGMO_PACKAGE_GDB || LINGMO_PACKAGE_HOST_GDB

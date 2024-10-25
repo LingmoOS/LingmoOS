@@ -1,0 +1,37 @@
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+Date: Tue, 3 Sep 2024 11:53:58 +0800
+Subject: [PATCH 36/54] printk: Use the BITS_PER_LONG macro
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+sizeof(unsigned long) * 8 is the number of bits in an unsigned long
+variable, replace it with BITS_PER_LONG macro to make it simpler.
+
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Reviewed-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240903035358.308482-1-ruanjinjie@huawei.com
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/printk_ringbuffer.h |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/kernel/printk/printk_ringbuffer.h
++++ b/kernel/printk/printk_ringbuffer.h
+@@ -4,6 +4,7 @@
+ #define _KERNEL_PRINTK_RINGBUFFER_H
+ 
+ #include <linux/atomic.h>
++#include <linux/bits.h>
+ #include <linux/dev_printk.h>
+ #include <linux/stddef.h>
+ #include <linux/types.h>
+@@ -122,7 +123,7 @@ enum desc_state {
+ 
+ #define _DATA_SIZE(sz_bits)	(1UL << (sz_bits))
+ #define _DESCS_COUNT(ct_bits)	(1U << (ct_bits))
+-#define DESC_SV_BITS		(sizeof(unsigned long) * 8)
++#define DESC_SV_BITS		BITS_PER_LONG
+ #define DESC_FLAGS_SHIFT	(DESC_SV_BITS - 2)
+ #define DESC_FLAGS_MASK		(3UL << DESC_FLAGS_SHIFT)
+ #define DESC_STATE(sv)		(3UL & (sv >> DESC_FLAGS_SHIFT))

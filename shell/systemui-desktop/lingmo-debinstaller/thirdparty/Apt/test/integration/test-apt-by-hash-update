@@ -1,0 +1,107 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+confighashes 'SHA512'
+configcompression '.' 'gz'
+
+insertpackage 'unstable' 'foo' 'all' '1.0'
+insertpackage 'unstable' 'bar' 'i386' '1.0'
+
+setupaptarchive --no-update
+
+# make Packages *only* accessible by-hash for this test
+makebyhashonly() {
+	local NORMAL="$(readlink -f "./aptarchive/dists/unstable/main/${1}")"
+	local BYHASH="${NORMAL}/by-hash/SHA512"
+	mkdir -p "${BYHASH}"
+	find "${NORMAL}/" -maxdepth 1 -name "${2}*" -exec mv '{}' "$BYHASH" \;
+	ln -s "${BYHASH}/${2}.gz" "${BYHASH}/$(sha512sum "${BYHASH}/${2}.gz" | cut -f1 -d' ')"
+}
+makebyhashonly 'binary-i386' 'Packages'
+makebyhashonly 'binary-all' 'Packages'
+makebyhashonly 'source' 'Sources'
+
+ensureitsbroken() {
+	rm -rf rootdir/var/lib/apt/lists
+	# we moved the Packages file away, normal update won't work
+	testfailure aptget update "$@"
+	# ensure we do not know about "foo"
+	testfailureequal "Reading package lists...
+Building dependency tree...
+E: Unable to locate package foo" aptget install -q -s foo
+}
+ensureitsbroken
+ensureitsbroken -o Acquire::By-Hash=1
+
+ensureitworks() {
+	rm -rf rootdir/var/lib/apt/lists
+	testsuccess aptget update "$@" -o Acquire::Languages=none
+	testfailure grep '^Ign' rootdir/tmp/testsuccess.output
+	rm -rf rootdir/var/lib/apt/lists
+	testsuccess aptget update "$@"
+	cp -f rootdir/tmp/testsuccess.output rootdir/tmp/aptupdate.output
+	testsuccess grep '^Ign' rootdir/tmp/aptupdate.output
+	testsuccessequal "Inst foo (1.0 unstable [all])
+Conf foo (1.0 unstable [all])" aptget install -qq -s foo
+	testsuccessequal "Inst bar (1.0 unstable [i386])
+Conf bar (1.0 unstable [i386])" aptget install -qq -s bar
+}
+msgmsg 'Test by-hash via' 'config option'
+ensureitworks -o Acquire::By-Hash=force
+
+msgmsg 'Test by-hash via' 'release option'
+cp -a aptarchive/dists aptarchive/dists.bak
+# add magic string to Release file ...
+sed -i '/^Suite: / a \
+Acquire-By-Hash: yes' aptarchive/dists/unstable/Release
+signreleasefiles
+ensureitworks
+ensureitsbroken -o Acquire::By-Hash=0
+
+msgmsg 'Test by-hash via' 'sources option'
+sed -i "s#^\(deb\(-src\)\?\) #\1 [by-hash=yes] #" rootdir/etc/apt/sources.list.d/*
+ensureitworks
+#ensureitsbroken -o Acquire::By-Hash=0
+
+rm -rf aptarchive/dists
+cp -a aptarchive/dists.bak aptarchive/dists
+#ensureitworks -o Acquire::By-Hash=force
+ensureitsbroken -o Acquire::By-Hash=1
+ensureitsbroken -o Acquire::By-Hash=0
+
+sed -i "s#^\(deb\(-src\)\?\) \[by-hash=yes\] #\1 [by-hash=force] #" rootdir/etc/apt/sources.list.d/*
+ensureitworks
+#ensureitsbroken -o Acquire::By-Hash=0
+
+
+
+msgmsg 'Test InRelease by-hash via' 'sources option'
+
+rm -rf aptarchive/dists
+cp -a aptarchive/dists.bak aptarchive/dists
+mkdir -p aptarchive/dists/unstable/by-hash/SHA256
+inrelease_hash=$(sha256sum aptarchive/dists/unstable/InRelease | awk '{print $1}')
+mv aptarchive/dists/unstable/InRelease aptarchive/dists/unstable/by-hash/SHA256/$inrelease_hash
+#ensureitworks -o Acquire::By-Hash=force
+ensureitsbroken -o Acquire::By-Hash=1
+ensureitsbroken -o Acquire::By-Hash=0
+
+sed -i "s#^\(deb\(-src\)\?\) \[by-hash=force\] #\1 [by-hash=force inrelease-path=by-hash/SHA256/$inrelease_hash] #" rootdir/etc/apt/sources.list.d/*
+ensureitworks
+#ensureitsbroken -o Acquire::By-Hash=0
+
+msgmsg 'Test InRelease by-hash with' 'no fallback'
+
+rm -rf aptarchive/dists
+cp -a aptarchive/dists.bak aptarchive/dists
+
+testfailureequal "Get:1 file:${TMPWORKINGDIRECTORY}/aptarchive unstable InRelease
+Err:1 file:${TMPWORKINGDIRECTORY}/aptarchive unstable InRelease
+  File not found - ${TMPWORKINGDIRECTORY}/aptarchive/dists/unstable/by-hash/SHA256/${inrelease_hash} (2: No such file or directory)
+Reading package lists...
+E: Failed to fetch file:${TMPWORKINGDIRECTORY}/aptarchive/dists/unstable/InRelease  File not found - ${TMPWORKINGDIRECTORY}/aptarchive/dists/unstable/by-hash/SHA256/${inrelease_hash} (2: No such file or directory)" aptget update

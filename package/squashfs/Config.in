@@ -1,0 +1,60 @@
+config LINGMO_PACKAGE_SQUASHFS
+	bool "squashfs"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	# ensure at least on compression backend (defaults to gzip)
+	select LINGMO_PACKAGE_SQUASHFS_GZIP if !( \
+	       LINGMO_PACKAGE_SQUASHFS_LZ4 || \
+	       LINGMO_PACKAGE_SQUASHFS_LZMA || \
+	       LINGMO_PACKAGE_SQUASHFS_LZO || \
+	       LINGMO_PACKAGE_SQUASHFS_XZ || \
+	       LINGMO_PACKAGE_SQUASHFS_ZSTD)
+	help
+	  Tools to generate SquashFS filesystems.
+
+	  https://github.com/plougher/squashfs-tools
+
+if LINGMO_PACKAGE_SQUASHFS
+
+config LINGMO_PACKAGE_SQUASHFS_GZIP
+	bool "gzip support"
+	default y
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Support GZIP compression algorithm
+
+config LINGMO_PACKAGE_SQUASHFS_LZ4
+	bool "lz4 support"
+	select LINGMO_PACKAGE_LZ4
+	help
+	  Support LZ4 compression algorithm
+
+config LINGMO_PACKAGE_SQUASHFS_LZMA
+	bool "lzma support"
+	select LINGMO_PACKAGE_XZ
+	help
+	  Support LZMA compression algorithm
+
+config LINGMO_PACKAGE_SQUASHFS_LZO
+	bool "lzo support"
+	select LINGMO_PACKAGE_LZO
+	help
+	  Support LZO compression algorithm
+
+config LINGMO_PACKAGE_SQUASHFS_XZ
+	bool "xz support"
+	select LINGMO_PACKAGE_XZ
+	help
+	  Support XZ compression algorithm
+
+config LINGMO_PACKAGE_SQUASHFS_ZSTD
+	bool "zstd support"
+	select LINGMO_PACKAGE_ZSTD
+	help
+	  Support ZSTD compression algorithm
+
+endif
+
+comment "squashfs needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU

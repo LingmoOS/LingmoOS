@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_LIBTIRPC
+	bool "libtirpc"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  Libtirpc is a port of Sun's Transport-Independent RPC
+	  library to Linux.
+
+	  http://sourceforge.net/projects/libtirpc/
+
+config LINGMO_PACKAGE_LIBTIRPC_GSS
+	bool "gss"
+	depends on LINGMO_USE_MMU # libkrb5
+	depends on !LINGMO_STATIC_LIBS # libkrb5
+	depends on LINGMO_PACKAGE_LIBTIRPC
+	select LINGMO_PACKAGE_LIBKRB5
+	help
+	  Enable GSSAPI support
+
+comment "libtirpc needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "libtirpc gss support needs a toolchain w/ dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_LIBTIRPC

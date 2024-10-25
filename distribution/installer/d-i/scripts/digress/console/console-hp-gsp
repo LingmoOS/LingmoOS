@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+# For console on a HP GSP.
+use strict;
+use Expect;
+
+# Takes it a secto reset between connections.
+sleep 3;
+
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn($ENV{HP_GSP_CONNECTCOMMAND}) or die "cannot connect: $!\n";
+$exp->expect(60, "Service Processor login:") or die "no login\n";
+$exp->send($ENV{HP_GSP_USER}."\r");
+
+$exp->expect(10, "Service Processor password:");
+$exp->send($ENV{HP_GSP_PASSWORD}."\r");
+
+$exp->expect(10, "Hewlett-Packard Guardian Service Processor") or die "login failed\n";
+
+# Bump any other user.
+$exp->send("\rcf");
+
+$exp->interact;

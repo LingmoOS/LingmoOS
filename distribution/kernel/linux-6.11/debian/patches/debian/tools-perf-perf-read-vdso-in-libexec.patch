@@ -1,0 +1,32 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 11 May 2015 02:51:07 +0000
+Subject: linux-tools: Install perf-read-vdso{,x}32 in directory under /usr/lib
+
+--- a/tools/perf/Makefile.perf
++++ b/tools/perf/Makefile.perf
+@@ -943,21 +943,21 @@ install-tools: all install-gtk
+ 		$(LN) '$(DESTDIR_SQ)$(bindir_SQ)/perf' '$(DESTDIR_SQ)$(bindir_SQ)/trace'; \
+ 		$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(includedir_SQ)/perf'; \
+ 		$(INSTALL) -m 644 include/perf/perf_dlfilter.h -t '$(DESTDIR_SQ)$(includedir_SQ)/perf'
++	$(call QUIET_INSTALL, libexec) \
++		$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(perfexec_instdir_SQ)'
+ ifndef NO_PERF_READ_VDSO32
+ 	$(call QUIET_INSTALL, perf-read-vdso32) \
+-		$(INSTALL) $(OUTPUT)perf-read-vdso32 '$(DESTDIR_SQ)$(bindir_SQ)';
++		$(INSTALL) $(OUTPUT)perf-read-vdso32 '$(DESTDIR_SQ)$(perfexec_instdir_SQ)';
+ endif
+ ifndef NO_PERF_READ_VDSOX32
+ 	$(call QUIET_INSTALL, perf-read-vdsox32) \
+-		$(INSTALL) $(OUTPUT)perf-read-vdsox32 '$(DESTDIR_SQ)$(bindir_SQ)';
++		$(INSTALL) $(OUTPUT)perf-read-vdsox32 '$(DESTDIR_SQ)$(perfexec_instdir_SQ)';
+ endif
+ ifndef NO_JVMTI
+ 	$(call QUIET_INSTALL, $(LIBJVMTI)) \
+ 		$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(libdir_SQ)'; \
+ 		$(INSTALL) $(OUTPUT)$(LIBJVMTI) '$(DESTDIR_SQ)$(libdir_SQ)';
+ endif
+-	$(call QUIET_INSTALL, libexec) \
+-		$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(perfexec_instdir_SQ)'
+ 	$(call QUIET_INSTALL, perf-archive) \
+ 		$(INSTALL) $(OUTPUT)perf-archive -t '$(DESTDIR_SQ)$(perfexec_instdir_SQ)'
+ 	$(call QUIET_INSTALL, perf-iostat) \

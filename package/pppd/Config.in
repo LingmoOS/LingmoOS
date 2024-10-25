@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_PPPD
+	bool "pppd"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_OPENSSL if LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  An implementation of the Point-to-point protocol.
+
+	  http://www.samba.org/ppp/
+
+if LINGMO_PACKAGE_PPPD
+
+config LINGMO_PACKAGE_PPPD_FILTER
+	bool "filtering"
+	select LINGMO_PACKAGE_LIBPCAP
+	help
+	  Packet filtering abilities for pppd. If enabled,
+	  the pppd active-filter and pass-filter options
+	  are available.
+
+endif
+
+comment "pppd needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU

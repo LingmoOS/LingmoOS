@@ -1,0 +1,33 @@
+# Target go packages should depend on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+config LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HOST_GO_BOOTSTRAP_STAGE2_ARCH_SUPPORTS
+	# See https://go.dev/doc/install/source#environment
+	# See src/go/build/syslist.go for the list of supported architectures
+	depends on (LINGMO_arm && LINGMO_TOOLCHAIN_SUPPORTS_PIE) || LINGMO_aarch64 \
+		|| LINGMO_i386 || LINGMO_x86_64 || LINGMO_powerpc64le \
+		|| LINGMO_mips64 || LINGMO_mips64el || LINGMO_riscv || LINGMO_s390x
+	depends on !LINGMO_ARM_CPU_ARMV4
+	# MIPS R6 support in Go has not yet been developed.
+	depends on !LINGMO_MIPS_CPU_MIPS64R6
+	# Go doesn't support Risc-v 32-bit.
+	depends on !LINGMO_RISCV_32
+	# Go requires the following Risc-v General (G) features:
+	depends on !LINGMO_riscv || (LINGMO_RISCV_ISA_RVI && \
+		LINGMO_RISCV_ISA_RVM && LINGMO_RISCV_ISA_RVA && \
+		LINGMO_RISCV_ISA_RVF && LINGMO_RISCV_ISA_RVD)
+
+config LINGMO_PACKAGE_HOST_GO_TARGET_CGO_LINKING_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	# Go doesn't support CGO linking on MIPS64x platforms
+	# See: https://github.com/karalabe/xgo/issues/46
+	depends on !LINGMO_mips64 && !LINGMO_mips64el
+
+# Host go packages should depend on LINGMO_PACKAGE_HOST_GO_HOST_ARCH_SUPPORTS
+config LINGMO_PACKAGE_HOST_GO_HOST_ARCH_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_PACKAGE_HOST_GO_BOOTSTRAP_STAGE2_ARCH_SUPPORTS

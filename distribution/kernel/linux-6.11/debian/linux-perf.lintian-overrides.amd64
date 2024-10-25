@@ -1,0 +1,9 @@
+# These executables are needed to handle processes running in compat mode
+linux-perf: binary-from-other-architecture *usr/lib/perf-core/perf-read-vdsox32*
+
+# Some of these plugins only need symbols from libtraceevent, which
+# loads them and should not have a NEEDED entry
+linux-perf: shared-library-lacks-prerequisites *usr/lib/traceevent/plugins/plugin_*.so*
+
+# This transition was too complex for dh_installdeb to handle
+linux-perf: maintainer-script-should-not-use-dpkg-maintscript-helper "dpkg-maintscript-helper" *

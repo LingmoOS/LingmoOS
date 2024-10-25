@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_STELLA
+	bool "stella"
+	depends on !LINGMO_STATIC_LIBS # sdl2
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # exception_ptr
+	select LINGMO_PACKAGE_SDL2
+	help
+	  Stella is a multi-platform Atari 2600 VCS emulator.
+
+	  https://stella-emu.github.io/
+
+comment "stella needs a toolchain w/ dynamic library, C++, threads, gcc >= 7"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+
+comment "stella needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

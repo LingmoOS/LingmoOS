@@ -1,0 +1,43 @@
+#!/bin/bash
+
+TOP="/w"
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+UNAME=$(uname -m)
+case "$UNAME" in
+    x86_64)
+	ARCH=amd64
+	;;
+    aarch64)
+	ARCH=arm64
+	;;
+    *)
+	exit 2;;
+esac
+
+BUILDNAME="openstack-${CODENAME}-${ARCH}"
+WORK="${TOP}/work/${BUILDNAME}"
+
+cat > $BODI_CHROOT_PATH/list-sources <<EOF
+#!/bin/sh
+for PKG in \$(COLUMNS=500 dpkg -l | awk '/^ii/ {printf "%s ",\$2}'); do
+    apt-get source -qq --print-uris \$PKG
+done
+EOF
+
+chmod +x $BODI_CHROOT_PATH/list-sources
+chroot $BODI_CHROOT_PATH /list-sources > $WORK/sources
+rm -f $BODI_CHROOT_PATH/list-sources
+
+cat > $BODI_CHROOT_PATH/list-packages <<EOF
+#!/bin/sh
+COLUMNS=500 dpkg -l | awk '/^ii/ {printf "%s %s\n",\$2,\$3}'
+EOF
+
+chmod +x $BODI_CHROOT_PATH/list-packages
+chroot $BODI_CHROOT_PATH /list-packages > $WORK/packages.list
+rm -f $BODI_CHROOT_PATH/list-packages
+

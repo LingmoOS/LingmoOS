@@ -1,0 +1,74 @@
+config LINGMO_PACKAGE_FREERDP
+	bool "freerdp"
+	# FreeRDP does not have a single C++ source file, however it
+	# insists on having a C++ compiler. Removing that requirement
+	# is a bit too much involving, so we just depend on it...
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_STATIC_LIBS # uses dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC4 if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  FreeRDP is a free implementation of the Remote Desktop
+	  Protocol (RDP), released under the Apache license
+
+	  This only installs the freerdp libraries.
+
+	  http://www.freerdp.com/
+
+	  Note: this also installs a key and certificate in
+	  /etc/freerdp/keys/ . These are publicly-known, as they
+	  are present in FreeRDP's source tree. It is strongly
+	  suggested that you overwrite them with your own set,
+	  either in an overlay rootfs or in a post-build script.
+
+if LINGMO_PACKAGE_FREERDP
+
+config LINGMO_PACKAGE_FREERDP_GSTREAMER1
+	bool "gstreamer support"
+	depends on LINGMO_PACKAGE_GSTREAMER1
+	depends on LINGMO_PACKAGE_XORG7 # xlib-libxrandr
+	# gstreamer-1.x dependencies already dependencies of FreeRDP
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_APP
+	select LINGMO_PACKAGE_XLIB_LIBXRANDR
+
+comment "gstreamer support needs X.Org"
+	depends on !LINGMO_PACKAGE_XORG7
+	depends on LINGMO_PACKAGE_GSTREAMER1
+
+config LINGMO_PACKAGE_FREERDP_SERVER
+	bool "server"
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXDAMAGE
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	select LINGMO_PACKAGE_XLIB_LIBXFIXES
+
+config LINGMO_PACKAGE_FREERDP_CLIENT_X11
+	bool "X11 client"
+	default y
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+
+comment "server and X11 client need X.Org"
+	depends on !LINGMO_PACKAGE_XORG7
+
+config LINGMO_PACKAGE_FREERDP_CLIENT_WL
+	bool "wayland client"
+	default y
+	depends on LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+
+endif
+
+comment "freerdp needs a toolchain w/ wchar, dynamic library, threads, C++"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP

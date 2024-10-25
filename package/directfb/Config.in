@@ -1,0 +1,169 @@
+config LINGMO_PACKAGE_DIRECTFB
+	bool "directfb"
+	depends on !LINGMO_RISCV_32
+	depends on !LINGMO_STATIC_LIBS # static link issues
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_5
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL # sigval_t issue
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  DirectFB (Direct Frame Buffer) is a set of graphics APIs
+	  implemented on top of the Linux Frame Buffer (fbdev)
+	  abstraction layer. It is an alternative to X11 with a smaller
+	  memory footprint that still has an integrated windowing
+	  system. As of 4 October 2015, DirectFB's website
+	  http://www.directfb.org/ is down. See alternative site listed
+	  below.
+
+	  http://elinux.org/DirectFB
+
+if LINGMO_PACKAGE_DIRECTFB
+
+config LINGMO_PACKAGE_DIRECTFB_MULTI
+	bool "directfb multi application"
+	depends on LINGMO_USE_MMU # madvise()
+	depends on LINGMO_LINUX_KERNEL
+	select LINGMO_PACKAGE_LINUX_FUSION
+	help
+	  Enable use of multiple concurrent DirectFB applications
+
+comment "directfb multi application needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+config LINGMO_PACKAGE_DIRECTFB_DEBUG_SUPPORT
+	bool "directfb debugging support"
+	default y
+	help
+	  Compile DirectFB with debugging support. It provides
+	  functions to print debug information, for DirectFB as well as
+	  external DirectFB drivers.
+
+	  When disabled, DirectFB does not print any debug information.
+	  The drivers will be installed to and loaded from
+	  /usr/lib/directfb-<version>-pure instead of
+	  /usr/lib/directfb-<version>.
+
+config LINGMO_PACKAGE_DIRECTFB_DEBUG
+	bool "directfb debugging"
+	depends on LINGMO_PACKAGE_DIRECTFB_DEBUG_SUPPORT
+	help
+	  Compile DirectFB with lots of debug output
+
+config LINGMO_PACKAGE_DIRECTFB_TRACE
+	bool "directfb call trace support"
+	help
+	  Enable call tracing for DirectFB applications
+
+config LINGMO_PACKAGE_DIRECTFB_DIVINE
+	bool "divine"
+	help
+	  Enable the DiVine feature (virtual input)
+
+config LINGMO_PACKAGE_DIRECTFB_SAWMAN
+	bool "sawman"
+	help
+	  Enable the SawMan feature (window manager)
+
+config LINGMO_PACKAGE_DIRECTFB_ATI128
+	bool "compile ati128 graphics driver"
+	depends on LINGMO_i386 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_DIRECTFB_MATROX
+	bool "compile matrox graphics driver"
+	depends on LINGMO_i386 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_DIRECTFB_PXA3XX
+	bool "compile pxa3xx graphics driver"
+	depends on LINGMO_arm
+	help
+	  The Marvell PXA3xx Processor Family is a system-on-chip based
+	  on XScale® microarchitecture. This option enables the graphic
+	  driver support for the PXA3xx processor family.
+
+	  http://www.marvell.com/application-processors/pxa-family/
+
+config LINGMO_PACKAGE_DIRECTFB_EP9X
+	bool "compile ep9x graphics driver"
+	depends on LINGMO_arm
+	help
+	  Enable the graphic driver support for the EP93xx ARMv9 based
+	  processors from Cirrus Logic.
+
+	  http://cirrus.com/en/products/arm9.html
+
+config LINGMO_PACKAGE_DIRECTFB_I830
+	bool "compile i830 graphics driver"
+	depends on LINGMO_i386 || LINGMO_x86_64
+
+config LINGMO_PACKAGE_DIRECTFB_LINUXINPUT
+	bool "compile /dev/input/eventX input driver"
+	default y
+
+config LINGMO_PACKAGE_DIRECTFB_KEYBOARD
+	bool "compile keyboard input driver"
+	default y
+
+config LINGMO_PACKAGE_DIRECTFB_PS2MOUSE
+	bool "compile PS2 mouse input driver"
+	default y
+
+config LINGMO_PACKAGE_DIRECTFB_SERIALMOUSE
+	bool "compile serial mouse input driver"
+	default y
+
+config LINGMO_PACKAGE_DIRECTFB_TSLIB
+	bool "enable touchscreen support"
+	default y
+	select LINGMO_PACKAGE_TSLIB
+
+config LINGMO_PACKAGE_DIRECTFB_GIF
+	bool "enable GIF support"
+	default y
+
+config LINGMO_PACKAGE_DIRECTFB_TIFF
+	bool "enable TIFF support"
+	select LINGMO_PACKAGE_TIFF
+
+config LINGMO_PACKAGE_DIRECTFB_IMLIB2
+	bool "enable IMLIB2 support"
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_IMLIB2
+
+comment "imlib2 support needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_DIRECTFB_JPEG
+	bool "enable JPEG support"
+	default y
+	select LINGMO_PACKAGE_JPEG
+
+config LINGMO_PACKAGE_DIRECTFB_PNG
+	bool "enable PNG support"
+	default y
+	select LINGMO_PACKAGE_LIBPNG
+
+config LINGMO_PACKAGE_DIRECTFB_SVG
+	bool "enable SVG support"
+	default y
+	select LINGMO_PACKAGE_LIBSVG_CAIRO
+
+config LINGMO_PACKAGE_DIRECTFB_DITHER_RGB16
+	bool "enable advanced dithering of RGB16 surfaces"
+	help
+	  Enable dithering when loading images to RGB16 surfaces.
+	  This increases the data section by 64 KBytes.
+
+config LINGMO_PACKAGE_DIRECTFB_TESTS
+	bool "build directfb tests"
+
+endif # LINGMO_PACKAGE_DIRECTFB
+
+comment "directfb needs a glibc or uClibc toolchain w/ C++, NPTL, gcc >= 4.5, dynamic library"
+	depends on !LINGMO_RISCV_32
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_5 || LINGMO_TOOLCHAIN_USES_MUSL || \
+		LINGMO_STATIC_LIBS

@@ -1,0 +1,39 @@
+#!/bin/sh
+# serialize x10 requests
+set -e
+
+if [ "$1" = on ]; then
+	switch=-n
+else
+	switch=-f
+fi
+
+LOCK=$STATE_DIR/x10
+
+if [ -z "$X10_HOUSE" ] || [ -z "$X10_DEVICE" ]; then
+	echo "X10_HOUSE and X10_DEVICE required for x10 control" >&2
+	exit 1
+fi
+
+sigout () {
+	lockfile-remove $LOCK
+}
+
+trap sigout INT QUIT
+
+lockfile-create $LOCK
+lockfile-touch --oneshot $LOCK
+
+if [ -n "$X10_PORT" ]; then
+	PORT="-x$X10_PORT"
+fi
+
+if ! br "$PORT" -r 4 -c "$X10_HOUSE" "$switch" "$X10_DEVICE"; then
+	lockfile-remove $LOCK
+	echo "br failed!" >&2
+	exit 1
+fi
+
+lockfile-remove $LOCK
+
+sleep $X10_DELAY

@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_LIBBPF
+	bool "libbpf"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_WCHAR # elfutils
+	depends on !LINGMO_STATIC_LIBS # elfutils
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # elfutils
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_13
+	select LINGMO_PACKAGE_ELFUTILS
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  libbpf library.
+	  A mirror of bpf-next linux tree bpf-next/tools/lib/bpf
+	  directory plus its supporting header files. The version
+	  of the package reflects the version of ABI.
+
+	  https://github.com/libbpf/libbpf
+
+comment "libbpf needs a toolchain w/ wchar, dynamic library, threads, headers >= 4.13"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_13

@@ -1,0 +1,23 @@
+menuconfig LINGMO_PACKAGE_SEATD
+	bool "seatd"
+	select LINGMO_PACKAGE_SEATD_BUILTIN \
+		if !LINGMO_PACKAGE_SYSTEMD_LOGIND && !LINGMO_PACKAGE_SEATD_DAEMON
+	help
+	  Seat management daemon and support library.
+
+	  https://git.sr.ht/~kennylevinsen/seatd
+
+if LINGMO_PACKAGE_SEATD
+
+config LINGMO_PACKAGE_SEATD_BUILTIN
+	bool "builtin backend"
+	help
+	  Builtin in-process seatd implementation inside libseat.
+
+config LINGMO_PACKAGE_SEATD_DAEMON
+	bool "seatd daemon"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Build the seatd daemon and support for it inside libseat.
+
+endif

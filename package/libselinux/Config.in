@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_LIBSELINUX
+	bool "libselinux"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # libsepol
+	select LINGMO_PACKAGE_LIBSEPOL
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_MUSL_FTS if !LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_PYTHON_SETUPTOOLS if LINGMO_PACKAGE_PYTHON3
+	help
+	  libselinux is the runtime SELinux library that provides
+	  interfaces (e.g. library functions for the SELinux kernel
+	  APIs like getcon(), other support functions like
+	  getseuserbyname()) to SELinux-aware applications. libselinux
+	  may use the shared libsepol to manipulate the binary policy
+	  if necessary (e.g. to downgrade the policy format to an
+	  older version supported by the kernel) when loading policy.
+
+	  http://selinuxproject.org/page/Main_Page
+
+comment "libselinux needs a toolchain w/ threads, dynamic library, gcc >= 5"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5

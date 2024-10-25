@@ -1,0 +1,50 @@
+config LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	bool
+	default y if LINGMO_PACKAGE_LIBATOMIC_OPS_ARCH_SUPPORTS || \
+		LINGMO_TOOLCHAIN_HAS_SYNC_4
+
+config LINGMO_PACKAGE_PULSEAUDIO_ENABLE_ATOMIC
+	bool
+	select LINGMO_PACKAGE_LIBATOMIC_OPS if !LINGMO_TOOLCHAIN_HAS_SYNC_4
+
+config LINGMO_PACKAGE_PULSEAUDIO
+	bool "pulseaudio"
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_ALSA_LIB_PCM if LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER if LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_UCM if LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_BLUEZ5_UTILS_PLUGINS_AUDIO if LINGMO_PACKAGE_BLUEZ5_UTILS # runtime
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBTOOL
+	select LINGMO_PACKAGE_LIBSNDFILE
+	select LINGMO_PACKAGE_PULSEAUDIO_ENABLE_ATOMIC
+	help
+	  PulseAudio is a sound system for POSIX OSes, meaning that it
+	  is a proxy for your sound applications. It allows you to do
+	  advanced operations on your sound data as it passes between
+	  your application and your hardware. Things like transferring
+	  the audio to a different machine, changing the sample format
+	  or channel count and mixing several sounds into one are
+	  easily achieved using a sound server.
+
+	  http://pulseaudio.org
+
+if LINGMO_PACKAGE_PULSEAUDIO
+
+config LINGMO_PACKAGE_PULSEAUDIO_DAEMON
+	bool "start as a system daemon"
+	help
+	  PulseAudio can be started as a system daemon. This is not the
+	  recommended way of using PulseAudio unless you are building a
+	  headless system.
+
+endif
+
+comment "pulseaudio needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_PULSEAUDIO_HAS_ATOMIC
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

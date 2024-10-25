@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_LIBUSB
+	bool "libusb"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # _Thread_local
+	help
+	  Userspace library for accessing USB devices
+
+	  http://libusb.info/
+
+if LINGMO_PACKAGE_LIBUSB
+
+config LINGMO_PACKAGE_LIBUSB_EXAMPLES
+	bool "build libusb examples"
+
+endif
+
+comment "libusb needs a toolchain w/ threads, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

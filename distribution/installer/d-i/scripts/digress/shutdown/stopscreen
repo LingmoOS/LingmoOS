@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+session=digress-$MACHINE-$SCHEME
+
+# Check to see if this session is still running
+existing=$(screen -ls $session | grep "$session	(") || true
+if [ -n "$existing" ]; then
+	kill -9 $(echo "$existing" | cut -d . -f 1) || true
+fi
+
+rm -f $STATE_DIR/$MACHINE-$SCHEME.screenrc
+rm -f $STATE_DIR/$MACHINE-$SCHEME.screenlog

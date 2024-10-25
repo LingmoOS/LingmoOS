@@ -1,0 +1,305 @@
+Checklist for uploaders
+=======================
+
+There is a checklist in the kernel-team.git repository; see
+<https://salsa.debian.org/kernel-team/kernel-team/-/blob/master/docs/kernel-upload-checklist.md>.
+
+Updating the upstream source
+============================
+
+In addition to the build-dependencies, you will need the rsync package
+installed.
+
+1) Run: ./debian/bin/genorig.py <repository>
+
+   where <repository> is a local or remote git repository with the
+   upstream release tag in it.
+
+   If you do not have a local repository, use the appropriate one of:
+
+   * https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+   * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+   * git://kernel.ubuntu.com/ubuntu/linux.git
+
+   This will produce ../orig/linux_<version>.orig.tar.xz
+   (e.g. linux_3.5~rc1.orig.tar.xz).
+
+   It involves deleting files for DFSG compliance, as listed in the
+   Files-Excluded field in debian/copyright.
+
+2) Run: make -f debian/rules orig
+
+   This will apply the main quilt series to the upstream source, which
+   will usually fail due to conflicts with upstream changes.  You need
+   to resolve those by dropping or refreshing patches.
+
+Recording updates in the changelog
+----------------------------------
+
+Upstream commits that we already cherry-picked and included in a
+previous package upload should not be mentioned, since they don't make
+any difference to the package.  Any other commits that fix a Debian
+bug report and/or a security issue with a CVE ID should always be
+listed, along with the (Closes: #nnnnnn) and/or (CVE-yyyy-nnnn)
+reference.
+
+Aside from those general rules:
+
+* For an upstream release candidate, don't attempt to list the changes
+
+* For a stable release by Linus, refer to the summary at
+  kernelnewbies.org, e.g. https://kernelnewbies.org/Linux_4.5
+
+* For a stable update, refer to the changelog on kernel.org, e.g.
+  https://www.kernel.org/pub/linux/kernel/v4.x/ChangeLog-4.5.1, and
+  list all changes that are relevant to our package and that fix bugs
+  that we would consider 'important' or higher severity
+
+  - The script debian/bin/stable-update updates the changelog
+    version and inserts the list of changes.  It doesn't attempt to
+    filter out irrelevant or unimportant changes.
+
+  - If you have time, please delete irrelevant changes such as:
+    + Fixes for architectures not supported by the package
+    + Fixes for drivers that aren't enabled in any of our configurations
+    + Build fixes for configurations that we don't use
+    + Fixes for lockdep false positives
+
+If you have time, please add bracketted prefixes to the upstream
+change list as described below under "Changelog conventions".
+
+Applying patches to the Debian kernel tree
+==========================================
+
+The Debian kernel packaging uses the quilt patch system, but with
+multiple series to allow for featuresets.
+
+Patches are stored below debian/patches, loosely sorted in bugfix/,
+features/ and debian/. Patches are in the standard kernel patch
+format (unified diff to be applied with patch -p1) and generally have
+DEP-3 headers.
+
+For each optional featureset there is an additional patch directory
+debian/patches-<featureset>.
+
+If you want to generate a source tree with all patches applied, run
+make -f debian/rules source
+
+The resulting source can be found below debian/build.
+
+Changelog conventions
+=====================
+
+If a change only affects some architectures, flavours or featuresets,
+this should be noted with a bracketted prefix on the changelog line:
+
+* [<fset>] Change to featureset <fset>
+* [<arch>] Change that affects Debian architecture <arch>
+* [<arch1>,<arch2>...] Change that affects Debian architectures
+  <arch1>, <arch2>, ...
+* [<arch>/<flavour>] Change that affects kernel flavour <flavour>
+  on Debian architecture <arch>
+* [<arch>/{<flavour1>,<flavour2>...}] Change that affects kernel
+  flavours <flavour1>, <flavour2>, ... on Debian architecture <arch>
+
+You can use wildcards to cover multiple values, e.g. 'arm*' for armel,
+armhf and arm64 architectures.  Also 'x86' is used to cover the Debian
+architectures amd64, i386 and x32.
+
+Kernel config files
+===================
+
+Each kernel configuration file is constructed dynamically from a
+number of files under debian/config and (if it exists)
+debian/config.local.  They are read in the following order, such that
+files later on the list can override settings from earlier files.
+Files in debian/config.local can also override settings from the
+corresponding file in debian/config.
+
+1. Common:
+   - Default filename: config
+   - Filename list: [build.config]
+2. Per kernel architecture:
+   - Default filename: kernelarch-<karch>/config
+   - Filename list: [kernelarch.build.config]
+3. Per Debian architecture:
+   - Default filename: <arch>/config
+   - Filename list: [kernelarch.debianarch.build.config]
+4. Per Debian architecture and flavour:
+   - Default filename: <arch>/config.<flavour>
+   - Filename list: [kernelarch.debianarch.flavour.build.config]
+5. Per featureset:
+   - Default filename: featureset-<fset>/config
+   - Filename list: [featureset.build.config]
+6. Per Debian architecture and featureset:
+   - Default filename: <arch>/<fset>/config
+   - Filename list: [kernelarch.debianarch.featureset.build.config]
+7. Per Debian architecture, featureset, and flavour:
+   - Default filename: <arch>/<fset>/config.<flavour>
+   - Filename list:
+     [kernelarch.debianarch.featureset.flavour.build.config]
+
+You can check the final list of configuration files by reading
+debian/rules.gen.  Each binary-arch_<arch>_<fset>_<flavour>_image
+rule passes the list to debian/rules.real as the KCONFIG variable.
+
+These files should be kept in order using the kconfigeditor2
+utility from <https://salsa.debian.org/kernel-team/kernel-team>.
+With this source package as your working directory, run:
+
+    debian/rules source
+    .../kernel-team/utils/kconfigeditor2/process.py .
+
+This will also warn about any symbols that no longer exist, or
+cannot be explicitly configured.
+
+Control file
+============
+The master control file debian/control must be generated before the package is
+uploaded. debian/rules contains various targets to facilitate this task:
+
+debian/control  Generates the control file by invoking the
+                debian/bin/gencontrol.py script, which combines the templates
+                from the templates directory and architecture-specific
+                defines.toml file to produce the debian/control file. Note that
+                this target is intentionally made to fail with a non-zero exit
+                code to make sure that it is never run during an automatic
+                build.
+
+orig            Populate the current directory with all files from the unpacked
+                upstream tarball in ../orig/linux_${ver} and apply the Debian
+                quilt patch stack.
+
+clean-generated Clean up all auto-generated files inside the ./debian directory
+
+maintainerclean What clean-generated does and additionally also cleans up all
+                files other than the ./debian and ./.git directories.
+
+The following variables are substituted into the templates:
+
+@version@      Upstream kernel version, for example 2.6.11.
+@arch@         The Debian arch name, such as powerpc or i386.
+@flavour@      The build flavour, such as 686 or k7-smp.
+@class@        The CPU/architecture class; displayed in synopsis.  It should
+               be fairly short, as the synopsis is supposed to be <80 chars.
+               It should be in the form "foo class", and will show up in the
+	       description as "foo class machines".
+@longclass@    The CPU/architecture class; displayed in the extended
+               description.  The same rules apply as in @class@.  If
+	       this is unset, it will default to @class@.
+@desc@         (Potentially) multi-line verbiage that's appended to
+               -image descriptions.
+
+Normally, the arch-specific contents should be controlled by
+adjusting the corresponding defines.toml file.
+
+Build-dependencies that relate to specific binary packages can be
+specified in a Build-Depends field in the template for that binary
+package.  gencontrol.py will append the value to the source package's
+Build-Depends-Arch or Build-Depends-Indep field, as appropriate.  It
+will also use the binary package's Architecture and Build-Profile as
+the architecture-qualification and/or restriction for each build-
+dependency that doesn't already have them.
+
+TODO:
+- Patches applied to the upstream source
+- How to define a flavour
+- More detail on generation of debian/control and configs
+
+Running tests
+=============
+
+linux supports autopkgtest and should be able to run most of the
+kernel's self-tests on any architecture where kexec is supported,
+but it has higher resource requirements than most packages:
+
+- A VM with plenty of disk space (10GB is enough), RAM (1GB is
+  probably enough) and at least 2 CPUs
+- The temporary directory for adt-virt-qemu (-o option) will need
+  several GB of space, so a tmpfs may not be suitable
+
+Note that if you tell adt-run to use an 'unbuilt tree' (i.e. an
+unpacked source package) it does not exclude VCS directories such as
+.git.  Either use a packed source package or copy the working tree
+elsewhere excluding .git.
+
+Example invocation:
+
+    adt-run -B ../linux-image-4.2.0-rc6-amd64_4.2~rc6-1~exp2_amd64.deb \
+        ../linux_4.2~rc6-1~exp2.dsc \
+	--timeout-test=1200 \
+        --- adt-virt-qemu /var/cache/autopkgtest/adt-sid.img -o /var/tmp -c 2
+
+Build profiles
+==============
+
+Several build profiles are understood and supported:
+
+- nodoc: Exclude most documentation
+- noudeb: Exclude installer udeb packages
+- pkg.linux.notools: Exclude userland tool packages (linux-kbuild-<version>,
+  linux-perf, etc.)
+- pkg.linux.mintools: Build minimal set of userland tool packages
+  (linux-kbuild-<version>)
+- pkg.linux.nokernel: Exclude kernel image and header packages
+- pkg.linux.nokerneldbg: Exclude kernel debug packages
+- pkg.linux.nokerneldbginfo: Build kernel without debug symbols (also disables
+  BTF)
+- pkg.linux.nosource: Exclude source binary package (linux-source-<version>)
+- cross: Needed when cross-building.
+- nopython: Disable Python bindings.  This currently disables building the
+  linux-perf-<version> package, as the perf program embeds Python.
+- pkg.linux.nometa: Exclude most meta-packages.  The linux-headers-*-all*
+  packages can still be built.
+- pkg.linux.quick: Perform a limited build that should provide good
+  coverage yet be quick enough for use in CI.
+
+Build rules
+===========
+
+The Debian build rules are split across multiple makefiles:
+
+- debian/rules: Standard top-level makefile for Debian package build.
+- debian/rules.gen: Intermediate makefile between debian/rules and
+  debian/rules.real.  This is generated by gencontrol.py based on
+  the configuration under debian/config.
+- debian/rules.real: Makefile for building a single kernel flavour
+  or other group of binary packages.
+- debian/rules.d: Makefiles for building userland code from specific
+  source directories.  The directory structure mirrors the kernel
+  source directories.  debian/rules.real uses the "make-tools" to
+  invoke these makefiles.
+
+All builds *must* be done out-of-tree in a subdirectory of
+debian/build, so that the output files do not end up in the
+linux-source-<version> binary package.  Currently kernel builds use
+debian/build/build_<arch>_<featureset>_<flavour>, userland code uses
+debian/build/build-tools/<source-dir> and documentation uses
+debian/build/build-doc.
+
+Code signing
+============
+
+The kernel image and modules may be signed after building, to support
+a Secure Boot or Trusted Boot policy.  In Debian, this is performed by
+a "code signing service" that is separate from the normal package
+build process.
+
+The initial package build generates binary packages named
+linux-image-<arch>-signed-template, that contain a source package
+template and metadata about the files to be signed.  The code signing
+service will download this and the linux-image packages to be signed.
+It will add detached signatures to the source package, then upload it
+(without ever running debian/rules).
+
+The source package template is generated by
+debian/bin/gencontrol_signed.py and debian/rules.real with files from
+debian/signing_templates and debian/templates.  To test changes to
+these:
+
+1. Build the linux source package.
+2. Generate the signed source package by running the script
+   "debian-test-sign" from the kernel-team.git repository.  It is
+   also possible to set up a development configuration of the
+   official code signing service, but this is more complicated.
+3. Build the signed source package.

@@ -1,0 +1,45 @@
+config LINGMO_PACKAGE_RPI_USERLAND
+	bool "rpi-userland"
+	depends on LINGMO_arm || LINGMO_aarch64
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_HAS_LIBEGL if LINGMO_arm
+	select LINGMO_PACKAGE_HAS_LIBGLES if LINGMO_arm
+	select LINGMO_PACKAGE_HAS_LIBOPENVG if LINGMO_arm
+	select LINGMO_PACKAGE_HAS_LIBOPENMAX if LINGMO_arm
+	help
+	  Raspberry Pi Userland contains the necessary library to use
+	  the VideoCore driver.
+
+	  Includes source for the ARM side code to interface to: EGL,
+	  mmal, GLESv2, vcos, openmaxil, vchiq_arm, bcm_host, WFC,
+	  OpenVG.
+
+	  https://github.com/raspberrypi/userland/
+
+if LINGMO_PACKAGE_RPI_USERLAND && LINGMO_arm
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "rpi-userland"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "rpi-userland"
+
+config LINGMO_PACKAGE_PROVIDES_LIBOPENVG
+	default "rpi-userland"
+
+config LINGMO_PACKAGE_PROVIDES_LIBOPENMAX
+	default "rpi-userland"
+
+config LINGMO_PACKAGE_RPI_USERLAND_HELLO
+	bool "hello_pi examples"
+	help
+	  Install the hello-pi examples to test the HW (GPU, camera...)
+
+endif
+
+comment "rpi-userland needs a toolchain w/ C++, threads, dynamic library"
+	depends on LINGMO_arm || LINGMO_aarch64
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

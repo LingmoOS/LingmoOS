@@ -1,0 +1,93 @@
+#!/bin/sh
+# Copyright Eddy PetriÂ§or <eddy.petrisor @ gmail.com>, 2006
+#
+# In order to generate all fonts according to the language ranges, one could use
+# a sequence like the one below (all_langs file is needed):
+#
+#for LG in `cat all_langs`
+#do
+#	echo "Language = $LG"
+#	DSTTTFDIR=stripped ./stripbylang $LG
+#done
+#
+# TODO list for stripbylang
+# - look for the font in the place specified by the package
+# done - check if the font package is installed before unpacking
+# notest - add a custom suffix and do not regenerate an existing font (cyrillic for bg, ru, uk)
+# notest - add support for common code ranges
+# - look for the files lang2range and lang2font in some special places (?)
+# done - generate stripped fonts in a certain directory, not in the current one
+# - test all the changes
+ 
+
+# Input files are customizable through environment variables
+LANG2RANGE=lang2range
+LANG2FONT=lang2font
+LANGCODE=$1
+[ -z "$SRCTTFDIR" ] && SRCTTFDIR='.'
+[ -z "$DSTTTFDIR" ] && DSTTTFDIR='strippedfonts'
+
+
+help () {
+	echo " $0 <lang_code>"
+	echo '    Strips the font(s) found in the third column of ./lang2font'
+	echo '    of the line containing the given language code, so that'
+	echo '    it(they) will contain only the ranges specified on'
+	echo "    <lang_code>'s line in lang2range"
+}
+
+# strips font $1 for language $2
+stripfont4lang () {
+	# extract the lines which contain only the ranges for the current language
+	# if no suffix is specified, use the langauge code as a suffix
+	LINES=`cat $LANG2RANGE | grep -E "^lang=[^,]*:$2:[^,]*," | sed "s/:,,/:,$2,/g"`
+
+	# make a sorted list of all the suffixes (no duplicates)
+	SUFFIXES=`echo $LINES | sed "s/lang=/\nlang=/g" | cut -f2 -d ',' | sort -u`
+	
+	for SUFFIX in $SUFFIXES
+	do
+		STRIPPED_F_NAME=`echo "$1" | sed "s:^\(.*\)\.ttf$:\1_$SUFFIX.ttf:" | sed 's:^.*/\(.*\)$:\1:g'`
+		[ ! -d "$DSTTTFDIR" ] && mkdir -p "$DSTTTFDIR" && echo "Created missing destination directory: $DSTTTFDIR"
+		STRIPPED_F_NAME="$DSTTTFDIR/$STRIPPED_F_NAME"
+
+		if [ -f "$STRIPPED_F_NAME" ]
+		then
+			echo "$STRIPPED_F_NAME was already created. Skipping..."
+		else
+			echo "Creating $STRIPPED_F_NAME for $2 ... starting from $1"
+			RANGES=`echo "$LINES" | sed "s/lang=/\nlang=/g" | grep -E ":,$SUFFIX," | cut -f4 -d ','`
+			./strip_glyphs.pe --include "$1" "$STRIPPED_F_NAME" $RANGES
+		fi
+	done
+}
+
+[ -z "$LANGCODE" ] && help "$0" && exit 1
+
+## Check if the needed font package is installed
+PACK=`grep -e "^$LANGCODE:.*" $LANG2FONT | cut -f2 -d ':'`
+#
+#INSTVER=`LANG=C apt-cache policy "$PACK" | sed s/.*Installed:\ \(.*\)/\1`
+#[ "$INSTVER" = '(none)' ] && echo "$PACK font package is not installed.Quitting." && exit 1
+
+
+FONTFILES=`grep -e "^$LANGCODE:.*" $LANG2FONT | cut -f3 -d ':'`
+
+# if no font is explicitly specified, then all the fonts of the package should be stripped
+if [ -z "$FONTFILES" ]
+then
+	echo "No special font file specified in $LANG2FONT. Will try to strip all fonts from the font package."
+	[ -z $PACK ] && echo "No default package was defined for $LANGCODE! Quitting!" && exit 1
+
+	#TODO: test if $PACK is installed
+	ISINSTALLED=`dpkg --get-selections | tr -s '\t' ' ' | grep "^$PACK install$"`
+	[ ! -z "$ISINSTALLED" ] && FONTFILES=`dpkg -L $PACK | grep -e "\.ttf$"`
+fi
+
+[ -z "$FONTFILES" ] && echo 'No font files nor font package was specified. There is no input font. Quitting!' && exit 1
+
+for FONT in $FONTFILES
+do
+	stripfont4lang $FONT $LANGCODE
+done
+

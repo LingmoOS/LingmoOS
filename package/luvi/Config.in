@@ -1,0 +1,36 @@
+config LINGMO_PACKAGE_LUVI
+	bool "luvi"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # libuv
+	depends on LINGMO_USE_MMU # libuv
+	depends on !LINGMO_STATIC_LIBS # libuv
+	depends on LINGMO_PACKAGE_LUAJIT
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libuv
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libuv
+	select LINGMO_PACKAGE_LIBUV
+	select LINGMO_PACKAGE_LUV
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_DES if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  A project in-between luv and luvit. The goal of this is to
+	  make building luvit and derivatives much easier.
+
+	  luvi extends LuaJIT with asynchronous I/O and several optional
+	  modules to run Lua applications and build self-contained
+	  binaries on systems that don't have a compiler.
+
+	  The luvi core can be extended with several Lua modules by
+	  adding its bundled Lua binding libraries.
+	  To get the Lua module...
+	    * 'rex' select PCRE (LINGMO_PACKAGE_PCRE)
+	    * 'ssl' select OpenSSL (LINGMO_PACKAGE_OPENSSL)
+	    * 'zlib' select zlib (LINGMO_PACKAGE_ZLIB)
+
+	  https://github.com/luvit/luvi
+
+comment "luvi needs a toolchain w/ NPTL, dynamic library, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+
+comment "luvi needs LuaJIT"
+	depends on !LINGMO_PACKAGE_LUAJIT

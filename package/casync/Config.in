@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_CASYNC
+	bool "casync"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # scandirat() is not implemented by musl and uclibc-ng
+	select LINGMO_PACKAGE_ACL
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  Content-Addressable Data Synchronization Tool
+
+	  https://github.com/systemd/casync
+
+comment "casync needs a glibc toolchain"
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC

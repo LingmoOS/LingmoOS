@@ -1,0 +1,93 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build binary images"
+USAGE="${PROGRAM} [--force]"
+
+# Automatically populating config tree
+Auto_build_config
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Setting up cleanup function
+Setup_clean_exit
+
+# Preparing root filesystem
+lingmo-sys-build binary_chroot "${@}"
+
+# Chroot preparation component lists
+# We deliberately exclude 'debianchroot'
+CHROOT_PREP_MOUNTS="devpts proc selinuxfs sysfs"
+CHROOT_PREP_OTHER="dpkg tmpfs sysv-rc hosts resolv hostname apt"
+
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" = "true" ]; then
+	# Configuring chroot
+	# FIXME: cannot run in 'all' mode while excluding 'debianchroot', do we really need to exclude it?
+	#lingmo-sys-build chroot_prep install all mode-apt-install-binary mode-archives-chroot "${@}"
+	lingmo-sys-build chroot_prep install "${CHROOT_PREP_MOUNTS}" "${@}"
+	lingmo-sys-build chroot_prep install "${CHROOT_PREP_OTHER}" mode-apt-install-binary mode-archives-chroot "${@}"
+	lingmo-sys-build chroot_archives chroot install "${@}"
+fi
+
+# Building root filesystem
+lingmo-sys-build binary_rootfs "${@}"
+lingmo-sys-build binary_dm-verity "${@}"
+lingmo-sys-build binary_manifest "${@}"
+
+# Prepare images
+lingmo-sys-build binary_package-lists "${@}"
+lingmo-sys-build binary_linux-image "${@}"
+lingmo-sys-build binary_memtest "${@}"
+lingmo-sys-build binary_grub-legacy "${@}"
+lingmo-sys-build binary_grub-pc "${@}"
+lingmo-sys-build binary_grub_cfg "${@}"
+lingmo-sys-build binary_syslinux "${@}"
+lingmo-sys-build binary_disk "${@}"
+lingmo-sys-build binary_loadlin "${@}"
+lingmo-sys-build binary_win32-loader "${@}"
+lingmo-sys-build binary_includes "${@}"
+lingmo-sys-build binary_grub-efi "${@}"
+lingmo-sys-build binary_hooks "${@}"
+lingmo-sys-build binary_checksums "${@}"
+
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" != "true" ]; then
+	lingmo-sys-build chroot_prep install "${CHROOT_PREP_MOUNTS}" "${@}"
+fi
+
+# Apply SOURCE_DATE_EPOCH to all modified and created files
+find binary -newermt "$(date -d@${SOURCE_DATE_EPOCH} '+%Y-%m-%d %H:%M:%S')" -printf "%y %p\n" -exec touch '{}' -d@${SOURCE_DATE_EPOCH} --no-dereference ';' > binary.modified_timestamps
+
+# Building images
+lingmo-sys-build binary_iso "${@}"
+lingmo-sys-build binary_onie "${@}"
+lingmo-sys-build binary_netboot "${@}"
+lingmo-sys-build binary_tar "${@}"
+lingmo-sys-build binary_hdd "${@}"
+
+lingmo-sys-build binary_zsync "${@}"
+
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" = "true" ]; then
+	# Deconfiguring chroot
+	Remove_stagefile chroot_archives
+
+	lingmo-sys-build chroot_prep remove "${CHROOT_PREP_OTHER}" "${@}"
+fi
+
+lingmo-sys-build chroot_prep remove "${CHROOT_PREP_MOUNTS}" "${@}"
+
+Echo_message "Binary stage completed"

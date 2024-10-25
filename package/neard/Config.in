@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_NEARD
+	bool "neard"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnl, dbus, libglib2
+	depends on LINGMO_USE_MMU # dbus, libglib2
+	depends on !LINGMO_STATIC_LIBS # dlopen
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  Near Field Communication (NFC) manager. This userspace
+	  daemon is a part of the NFC stack provided by the Linux NFC
+	  project.
+
+	  https://git.kernel.org/pub/scm/network/nfc/neard.git
+
+if LINGMO_PACKAGE_NEARD
+
+config LINGMO_PACKAGE_NEARD_TOOLS
+	bool "neard tools"
+	help
+	  Build and install neard tools.
+
+endif
+
+comment "neard needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

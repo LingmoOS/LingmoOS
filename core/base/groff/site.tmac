@@ -1,0 +1,36 @@
+.
+.if n \{\
+.  \" Strictly, "-" is a hyphen while "\-" is a minus sign, and the
+.  \" former may not always be rendered in the form expected for things like
+.  \" command-line options.  Uncomment this if you want to make sure that
+.  \" manual pages you're writing are clear of this problem.
+.  \" if '\*[.T]'utf8' \
+.  \"   char - \[hy]
+.
+.  \" Character translations for non-keyboard
+.  \" characters - to make them searchable
+.  if '\*[.T]'utf8' \{\
+.  char \- \N'45'
+.  char - \N'45'
+.  char ' \N'39'
+.  \}
+.
+.  \" groff 1.23.0 changed the "utf8" device to render "^" and "~"
+.  \" as U+02C6 and U+02DC respectively.  This is likely to cause
+.  \" considerable disruption in manual pages, so preserve the old
+.  \" behaviour, at least for now.
+.  if '\*[.T]'utf8' \{\
+.    char ^ \[ha]
+.    char ~ \[ti]
+.  \}
+.
+.  \" "\-" is more commonly used for option dashes than for minus
+.  \" signs in manual pages, so map it to plain "-" for HTML/XHTML output
+.  \" rather than letting it be rendered as "&minus;".
+.  ie '\*[.T]'html' \
+.    char \- \N'45'
+.  el \{\
+.    if '\*[.T]'xhtml' \
+.      char \- \N'45'
+.  \}
+.\}

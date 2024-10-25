@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_MICROPYTHON
+	bool "micropython"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Micro Python is a lean and fast implementation of the Python
+	  3 programming language that is optimised to run on a
+	  microcontroller.
+
+	  http://micropython.org
+
+if LINGMO_PACKAGE_MICROPYTHON
+
+config LINGMO_PACKAGE_MICROPYTHON_LIB
+	bool "micropython-lib"
+	select LINGMO_PACKAGE_PCRE2 # runtime
+	help
+	  Core Python libraries ported to MicroPython.
+
+endif # LINGMO_PACKAGE_MICROPYTHON
+
+comment "micropython needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

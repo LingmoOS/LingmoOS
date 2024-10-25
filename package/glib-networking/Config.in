@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_GLIB_NETWORKING
+	bool "glib-networking"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_GNUTLS
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL if !LINGMO_PACKAGE_GNUTLS
+	select LINGMO_PACKAGE_P11_KIT if LINGMO_PACKAGE_GNUTLS
+	help
+	  Network-related GIO modules for glib.
+
+	  https://gitlab.gnome.org/GNOME/glib-networking
+
+comment "glib-networking needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

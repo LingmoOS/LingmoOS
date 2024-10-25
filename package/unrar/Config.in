@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_UNRAR
+	bool "unrar"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	help
+	  RAR file uncompressor.
+
+	  http://www.rarlab.com/rar_add.htm
+
+comment "unrar needs a toolchain w/ C++, wchar, threads, gcc >= 4.8"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS

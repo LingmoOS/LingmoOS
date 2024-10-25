@@ -1,0 +1,55 @@
+pkgname=groff
+pkgver=1.23.0
+pkgrel=6
+pkgdesc='GNU troff text-formatting system'
+arch=('x86_64')
+url='https://www.gnu.org/software/groff/groff.html'
+license=('GPL-3.0-or-later')
+depends=('perl' 'gcc-libs')
+makedepends=('netpbm' 'psutils'  'libxaw' 'perl-file-homedir')
+optdepends=('netpbm: for use together with man -H command interaction in browsers'
+            'psutils: for use together with man -H command interaction in browsers'
+            'libxaw: for gxditview'
+            'perl-file-homedir: for use with glilypond')
+options=('!docs' '!emptydirs' '!makeflags')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz"
+        display-utc-times.patch
+	site.tmac)
+
+prepare() {
+  cd $pkgname-$pkgver
+  # always use UTC times for display - using localtime is problematic for reproducible builds
+  # fixes FS#69123 - patch taken from Debian
+  patch -Np1 -i ../display-utc-times.patch
+}  
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure \
+    --prefix=/usr \
+    --with-x \
+    --with-appresdir=/usr/share/X11/app-defaults
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  
+  # add compatibility symlinks
+  ln -s eqn "$pkgdir"/usr/bin/geqn
+  ln -s tbl "$pkgdir"/usr/bin/gtbl
+  ln -s soelim "$pkgdir"/usr/bin/zsoelim
+
+  cat "$srcdir"/site.tmac >> \
+  "$pkgdir"/usr/share/groff/site-tmac/man.local
+  cat "$srcdir"/site.tmac >> \
+  "$pkgdir"/usr/share/groff/site-tmac/mdoc.local
+}

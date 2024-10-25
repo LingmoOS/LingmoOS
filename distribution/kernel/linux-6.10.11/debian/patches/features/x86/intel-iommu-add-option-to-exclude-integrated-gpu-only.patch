@@ -1,0 +1,90 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Wed, 21 Aug 2019 00:05:30 +0100
+Subject: intel-iommu: Add option to exclude integrated GPU only
+Bug-Debian: https://bugs.debian.org/935270
+Bug-Kali: https://bugs.kali.org/view.php?id=5644
+
+There is still laptop firmware that touches the integrated GPU behind
+the operating system's back, and doesn't say so in the RMRR table.
+Enabling the IOMMU for all devices causes breakage, but turning it off
+for all graphics devices seems like a major weakness.
+
+Add an option, intel_iommu=intgpu_off, to exclude only integrated GPUs
+from remapping.  This is a narrower exclusion than igfx_off: it only
+affects Intel devices on the root bus.  Devices attached through an
+external port (Thunderbolt or ExpressCard) won't be on the root bus.
+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ Documentation/admin-guide/kernel-parameters.txt |  2 ++
+ drivers/iommu/intel/iommu.c                     | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2174,6 +2174,8 @@
+ 			bypassed by not enabling DMAR with this option. In
+ 			this case, gfx device will use physical address for
+ 			DMA.
++		intgpu_off [Default Off]
++			Bypass the DMAR unit for an integrated GPU only.
+ 		strict [Default Off]
+ 			Deprecated, equivalent to iommu.strict=1.
+ 		sp_off [Default Off]
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -35,6 +35,9 @@
+ #define CONTEXT_SIZE		VTD_PAGE_SIZE
+ 
+ #define IS_GFX_DEVICE(pdev) ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY)
++#define IS_INTGPU_DEVICE(pdev) (IS_GFX_DEVICE(pdev) &&		\
++				(pdev)->vendor == 0x8086 &&	\
++				pci_is_root_bus((pdev)->bus))
+ #define IS_USB_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_SERIAL_USB)
+ #define IS_ISA_DEVICE(pdev) ((pdev->class >> 8) == PCI_CLASS_BRIDGE_ISA)
+ #define IS_AZALIA(pdev) ((pdev)->vendor == 0x8086 && (pdev)->device == 0x3a3e)
+@@ -221,12 +224,14 @@ int intel_iommu_sm = IS_ENABLED(CONFIG_I
+ int intel_iommu_enabled = 0;
+ EXPORT_SYMBOL_GPL(intel_iommu_enabled);
+ 
++static int dmar_map_intgpu = 1;
+ static int intel_iommu_superpage = 1;
+ static int iommu_identity_mapping;
+ static int iommu_skip_te_disable;
+ static int disable_igfx_iommu;
+ 
+ #define IDENTMAP_AZALIA		4
++#define IDENTMAP_INTGPU		8
+ 
+ const struct iommu_ops intel_iommu_ops;
+ static const struct iommu_dirty_ops intel_dirty_ops;
+@@ -266,6 +271,9 @@ static int __init intel_iommu_setup(char
+ 		} else if (!strncmp(str, "igfx_off", 8)) {
+ 			disable_igfx_iommu = 1;
+ 			pr_info("Disable GFX device mapping\n");
++		} else if (!strncmp(str, "intgpu_off", 10)) {
++			dmar_map_intgpu = 0;
++			pr_info("Disable integrated GPU device mapping\n");
+ 		} else if (!strncmp(str, "forcedac", 8)) {
+ 			pr_warn("intel_iommu=forcedac deprecated; use iommu.forcedac instead\n");
+ 			iommu_dma_forcedac = true;
+@@ -2401,6 +2409,9 @@ static int device_def_domain_type(struct
+ 
+ 		if ((iommu_identity_mapping & IDENTMAP_AZALIA) && IS_AZALIA(pdev))
+ 			return IOMMU_DOMAIN_IDENTITY;
++
++		if ((iommu_identity_mapping & IDENTMAP_INTGPU) && IS_INTGPU_DEVICE(pdev))
++			return IOMMU_DOMAIN_IDENTITY;
+ 	}
+ 
+ 	return 0;
+@@ -2701,6 +2712,9 @@ static int __init init_dmars(void)
+ 		iommu_set_root_entry(iommu);
+ 	}
+ 
++	if (!dmar_map_intgpu)
++		iommu_identity_mapping |= IDENTMAP_INTGPU;
++
+ 	check_tylersburg_isoch();
+ 
+ 	ret = si_domain_init(hw_pass_through);

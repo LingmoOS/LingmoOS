@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBMANETTE
+	bool "libmanette"
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_USE_WCHAR # libglib2 -> gettext
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_16
+	select LINGMO_PACKAGE_LIBEVDEV
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  GObject library which provides access to game controllers.
+
+	  https://gitlab.gnome.org/GNOME/libmanette
+
+comment "libmanette needs a toolchain w/ wchar, threads, headers >= 4.16"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_16

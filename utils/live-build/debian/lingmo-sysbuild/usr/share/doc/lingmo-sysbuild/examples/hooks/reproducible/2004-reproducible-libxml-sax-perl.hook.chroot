@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+# update-perl-sax-parsers of libxml-sax-perl creates a file with a random order of its lines
+# A bug report with patch is available at https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=993444
+# This script duplicates that patch
+
+# Don't run if libxml-sax-perl is not installed
+if [ ! -e /usr/bin/update-perl-sax-parsers ];
+then
+  exit 0
+fi
+
+# If Debian.pm already contains a sort line, there is no need to patch the file
+if grep -q sort /usr/share/perl5/XML/SAX/Debian.pm;
+then
+  exit 0
+fi
+
+# Patch the Perl script
+sed -i -e '/foreach my $key/s/keys/sort keys/' /usr/share/perl5/XML/SAX/Debian.pm
+
+# Regenerate the file that has more than one key-value pair
+update-perl-sax-parsers --remove XML::SAX::Expat
+update-perl-sax-parsers --add XML::SAX::Expat --priority 50
+update-perl-sax-parsers --update
+
+echo "P: $(basename $0) Reproducible hook has been applied"

@@ -1,0 +1,16 @@
+#!/usr/bin/expect
+# Expect script to boot from syslinux.
+
+spawn -noecho $env(CONSOLECOMMAND)
+sleep 1
+# Note: do not look for boot: prompt as it may not be visible.
+# (Epecially with new images using the vesamenu.)
+
+puts "Sending $env(BOOTCOMMAND)"
+set send_slow {1 0.2}
+send -s "$env(BOOTCOMMAND)\r"
+
+set timeout 60
+expect "booting the kernel"
+
+exit

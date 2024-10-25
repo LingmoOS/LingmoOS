@@ -1,0 +1,56 @@
+# Maintainer:  Lingmo OS Team <team@lingmo.org>
+
+pkgname=fakeroot
+pkgver=1.35.1
+pkgrel=1
+pkgdesc='Tool for simulating superuser privileges'
+arch=('x86_64')
+license=('GPL')
+url='https://tracker.debian.org/pkg/fakeroot'
+install=fakeroot.install
+depends=('glibc' 'lingmo-base-common' 'sed' 'util-linux' 'sh')
+makedepends=('systemd' 'po4a')
+checkdepends=('sharutils')
+source=("https://deb.debian.org/debian/pool/main/f/${pkgname}/${pkgname}_${pkgver}.orig.tar.gz"
+        '0001-Cast-uint8_t-pointers.patch')
+sha256sums=('6a0de53b2de05277d4e6d4a884eb0de7a8ad467b82c07a6f8f2f6a629e655fdc'
+            'a4afc930e4ee49925a31373f1d4f4d986e7554353e9429b64f9423575f4fbbc8')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd "${pkgname}-${pkgver}"
+
+  patch -Np1 < ../0001-Cast-uint8_t-pointers.patch
+}
+
+build() {
+  cd "${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr \
+    --libdir=/usr/lib/libfakeroot \
+    --disable-static \
+    --with-ipc=sysv
+
+  make
+
+  cd doc
+  po4a -k 0 --rm-backups --variable 'srcdir=../doc/' po4a/po4a.cfg
+}
+
+check() {
+  cd "${pkgname}-${pkgver}"
+
+  make check
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  install -dm0755 "${pkgdir}/usr/lib/ld.so.conf.d/"
+  echo '/usr/lib/libfakeroot' > "${pkgdir}/usr/lib/ld.so.conf.d/fakeroot.conf"
+
+  # install README for sysv/tcp usage
+  install -Dm0644 README "${pkgdir}/usr/share/doc/${pkgname}/README"
+}

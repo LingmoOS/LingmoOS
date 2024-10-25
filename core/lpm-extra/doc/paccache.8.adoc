@@ -1,0 +1,93 @@
+paccache(8)
+===========
+
+Name
+----
+paccache - flexible lpm cache cleaning utility
+
+
+Synopsis
+--------
+'paccache' <operation> [options] [target ...]
+
+
+Description
+-----------
+'paccache' removes old packages from the lpm cache directory.
+By default the last three versions of a package are kept.
+
+
+Operations
+----------
+*-d, \--dryrun*::
+	Perform a dry run, only finding candidate packages.
+
+*-m, \--move <dir>*::
+	Move candidate packages from the cache directory to 'dir'.
+
+*-r, \--remove*::
+	Remove candidate packages from the cache directory.
+
+
+Options
+-------
+*-a, \--arch <arch>*::
+	Scan for packages for a specific architecture. Default is to scan for all
+	architectures.
+
+*-c, \--cachedir <dir>*::
+	Specify a different cache directory. This option can be used more than once.
+	Default is to use the cache directory configured in 'lpm.conf'.
+
+*-f, \--force*::
+	Apply force to 'mv' and 'rm' operations.
+
+*-h, \--help*::
+	Display syntax and command-line options.
+
+*-i, \--ignore <pkgs>*::
+	Specify packages to ignore, comma-separated. Alternatively "-" can be used
+	to read the package names from stdin, newline-delimited.
+
+*-k, \--keep <num>*::
+	Specify how many versions of each package are kept in the cache directory,
+	default is 3.
+
+*\--min-atime <time>*::
+*\--min-mtime <time>*::
+	Keep packages with an atime/mtime that is not older than the time given,
+	even if this means keeping more than specified through the '--keep' option.
+	Accepts arguments according to 'info "Date input formats"', e.g. '30 days
+	ago'.
+
+*\--nocolor*::
+	Do not colorize output.
+
+*-z, \--null*::
+	Use null delimiters for candidate names (only with -v and -vv).
+
+*-q, \--quiet*::
+	Minimize the output.
+
+*-u, \--uninstalled*::
+	Target uninstalled packages.
+
+*-v, \--verbose*::
+	Increase verbosity, can be specified up to 3 times.
+
+*-V, \--version*::
+	Display version information.
+
+
+Systemd Timer
+-------------
+The package cache can be cleaned periodically using the systemd timer
+'paccache.timer'. If the timer is enabled the cache will be cleaned weekly with
+paccache's default options.
+
+
+See Also
+--------
+linkman:lpm[8], linkman:lpm.conf[5], linkman:systemctl[1]
+
+include::footer.adoc[]

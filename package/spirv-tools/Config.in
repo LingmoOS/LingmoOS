@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_SPIRV_TOOLS
+	bool "spirv-tools"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17 filesystem
+	select LINGMO_PACKAGE_SPIRV_HEADERS
+	help
+	  The SPIR-V Tools project provides an API and commands for
+	  processing SPIR-V modules.
+
+	  https://github.com/KhronosGroup/SPIRV-Tools
+
+comment "spirv-tools needs a toolchain w/ C++, dynamic library, gcc >= 8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8

@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_LIBMBIM
+	bool "libmbim"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  libmbim is a glib-based library for talking to WWAN modems and
+	  devices which speak the Mobile Interface Broadband Model
+	  (MBIM) protocol.
+
+	  http://www.freedesktop.org/wiki/Software/libmbim/
+
+comment "libmbim needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

@@ -1,0 +1,32 @@
+config LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	bool
+	default y
+	depends on LINGMO_arm || LINGMO_armeb || LINGMO_aarch64 || LINGMO_aarch64_be || \
+		LINGMO_i386 || LINGMO_mips || LINGMO_mips64 || LINGMO_mipsel || \
+		LINGMO_mips64el || LINGMO_nios2 || LINGMO_powerpc || LINGMO_powerpc64 || \
+		LINGMO_powerpc64le || LINGMO_riscv || LINGMO_sparc64 || LINGMO_s390x || LINGMO_x86_64
+	depends on LINGMO_USE_MMU # fork() in test
+
+config LINGMO_PACKAGE_LIBURCU
+	bool "liburcu"
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  Userspace implementation of the Read-Copy-Update (RCU)
+	  synchronization mechanism. This library is mainly used by
+	  the LTTng tracing infrastructure, but can be used for other
+	  purposes as well.
+
+	  On ARM, because of bug:
+	    http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58854
+	  liburcu cannot be built using gcc 4.8.0, 4.8.1 or 4.8.2
+	  without the following bug fix:
+	    http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=204665
+
+	  http://lttng.org/urcu
+
+comment "liburcu needs a toolchain w/ threads, C++"
+	depends on LINGMO_PACKAGE_LIBURCU_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP

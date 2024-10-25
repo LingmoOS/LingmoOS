@@ -1,0 +1,54 @@
+config LINGMO_PACKAGE_BITCOIN_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_TOOLCHAIN_HAS_ATOMIC
+	# bitcoin uses 8-byte __atomic intrinsics, which are not
+	# available on ARM noMMU platforms that we
+	# support. LINGMO_TOOLCHAIN_HAS_ATOMIC does not provide a
+	# size-level granularity to express this dependency.
+	depends on !(LINGMO_arm || LINGMO_armeb) || LINGMO_USE_MMU
+
+config LINGMO_PACKAGE_BITCOIN
+	bool "bitcoin"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-thread, boost-filesystem
+	depends on LINGMO_PACKAGE_BITCOIN_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_9
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # boost
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_BOOST_FILESYSTEM
+	select LINGMO_PACKAGE_BOOST_THREAD
+	select LINGMO_PACKAGE_LIBEVENT
+	help
+	  Bitcoin Core is an open source project which maintains and
+	  releases Bitcoin client software called “Bitcoin Core”.
+
+	  It is a direct descendant of the original Bitcoin software
+	  client released by Satoshi Nakamoto after he published the
+	  famous Bitcoin whitepaper.
+
+	  Bitcoin Core consists of both "full-node" software for fully
+	  validating the blockchain as well as a bitcoin wallet. The
+	  project also currently maintains related software such as
+	  the cryptography library libsecp256k1 and others located at
+	  GitHub.
+
+	  https://bitcoincore.org
+
+if LINGMO_PACKAGE_BITCOIN
+
+config LINGMO_PACKAGE_BITCOIN_WALLET
+	bool "wallet support"
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  Enable bitcoin wallet support.
+
+endif
+
+comment "bitcoin needs a toolchain w/ C++, threads, wchar, gcc >= 9"
+	depends on LINGMO_PACKAGE_BITCOIN_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_9

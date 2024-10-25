@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+# Uses the GSP to reset the system. The system may be powered off, it will
+# be turned on if so. After reset, gets to the boot menu and sends the
+# defined boot command.
+use strict;
+use Expect;
+
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn("hp-gsp-prompt") or die "cannot connect: $!\n";
+
+$exp->send("\r");
+$exp->expect(10, "GSP>");
+
+$exp->send("rs\r");
+$exp->expect(60,
+	["SPU power is down" => sub {
+		$exp->send("pc\r");
+		$exp->expect(60, "Do you wish to turn power On");
+		$exp->send("y\r");
+		$exp->expect(60, "Enter delay");
+		$exp->send("0\r");
+		$exp->expect(60, "Confirm?");
+		$exp->send("y\r");
+		$exp->expect(60, "System has been powered On");
+	}],
+	["Type Y to confirm your intention to restart the system" => sub {
+		$exp->send("y\r");
+	}],
+);
+
+$exp->expect(120, "System Boot detected");
+$exp->expect(600, "End of early boot detected");
+$exp->expect(120, "Processor is booting from first available device");
+$exp->send("\r");
+$exp->expect(120, "Main Menu:");
+$exp->send($ENV{HP_GSP_BOOTCOMMAND}."\r");
+$exp->expect(120, "Interact with IPL");
+$exp->send("y\r");
+$exp->expect(120, "Booting...");
+
+$exp->expect(120, "? 0");
+if (length $ENV{BOOT_OPTIONS}) {
+	# Add BOOT_OPTIONS to boot line
+	$exp->send("\r");
+	$exp->send(" ".$ENV{BOOT_OPTIONS}."\r");
+	$exp->expect(120, "? 0");
+}
+$exp->send("");
+$exp->send("b\r");
+$exp->expect(120, "Loading ramdisk");
+
+exit;

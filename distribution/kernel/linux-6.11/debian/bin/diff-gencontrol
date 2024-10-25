@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euE
+
+REF_BASE=${1:-master}
+
+REPO=$(git rev-parse --show-toplevel)
+COMMIT_BASE=$(git merge-base --fork-point "$REF_BASE")
+COMMIT_NEW=$(git stash create)
+
+TMP=$(mktemp -d)
+trap "rm -rf '$TMP'" EXIT
+
+function git {
+  command git -c advice.detachedHead=false -c init.defaultBranch=main -C "$TMP" "$@"
+}
+
+git init -q
+git remote add origin "$REPO"
+git fetch -q --depth 1 origin $COMMIT_BASE:base $COMMIT_NEW:new
+
+git checkout -q base
+echo "Running gencontrol on ${COMMIT_BASE}"
+( cd "$TMP"; ./debian/bin/gencontrol.py )
+git stash push -q --all
+
+git checkout -q new
+echo "Running gencontrol on uncommited changes"
+( cd "$TMP"; ./debian/bin/gencontrol.py )
+git stash push -q --all
+
+# ^3 is the commit with untracked files
+git diff stash@{1}^3 stash@{0}^3

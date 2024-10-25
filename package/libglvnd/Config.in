@@ -1,0 +1,51 @@
+config LINGMO_PACKAGE_LIBGLVND
+	bool "libglvnd"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # __sync_*_4 intrisics
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  The GL Vendor-Neutral Dispatch library
+
+	  libglvnd is a vendor-neutral dispatch layer for arbitrating
+	  OpenGL API calls between multiple vendors. It allows multiple
+	  drivers from different vendors to coexist on the same
+	  filesystem, and determines which vendor to dispatch each API
+	  call to at runtime.
+
+	  Both GLX and EGL are supported, in any combination with OpenGL
+	  and OpenGL ES.
+
+if LINGMO_PACKAGE_LIBGLVND
+
+# The following symbols should be selected by the libglvnd-aware
+# GL/EGL/GLES providers.
+config LINGMO_PACKAGE_LIBGLVND_DISPATCH_GL
+	bool
+	depends on LINGMO_PACKAGE_XORG7 # libx11, libXext, xorgproto
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	select LINGMO_PACKAGE_XORGPROTO
+	select LINGMO_PACKAGE_HAS_LIBGL
+
+config LINGMO_PACKAGE_LIBGLVND_DISPATCH_EGL
+	bool
+	select LINGMO_PACKAGE_HAS_LIBEGL
+
+config LINGMO_PACKAGE_LIBGLVND_DISPATCH_GLES
+	bool
+	select LINGMO_PACKAGE_HAS_LIBGLES
+
+config LINGMO_PACKAGE_PROVIDES_LIBGL
+	default "libglvnd" if LINGMO_PACKAGE_LIBGLVND_DISPATCH_GL
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "libglvnd" if LINGMO_PACKAGE_LIBGLVND_DISPATCH_EGL
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "libglvnd" if LINGMO_PACKAGE_LIBGLVND_DISPATCH_GLES
+
+endif
+
+comment "libglvnd needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

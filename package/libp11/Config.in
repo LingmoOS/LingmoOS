@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_LIBP11
+	bool "libp11"
+	depends on !LINGMO_STATIC_LIBS # dlopen
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	help
+	  OpenSSL engine for PKCS#11 modules. Part of the OpenSC
+	  project.
+
+	  https://github.com/OpenSC/OpenSC/wiki
+
+comment "libp11 needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

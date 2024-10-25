@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    install|upgrade)
+	# Hide upstream calamares icon when this package is installed
+        dpkg-divert --quiet --package calamares-settings-lingmo \
+                    --divert /usr/share/applications/calamares.desktop.orig \
+		    --rename /usr/share/applications/calamares.desktop
+    ;;
+esac
+
+#DEBHELPER#

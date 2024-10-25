@@ -1,0 +1,119 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Schedule firmware packages for installation"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_FIRMWARE_CHROOT}" != "true" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin scheduling firmware installation..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package host /usr/bin/wget wget
+
+# Diverting update-initramfs
+#case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+#	live-boot)
+#		mv chroot/usr/sbin/update-initramfs chroot/usr/sbin/update-initramfs.lingmo-system-build
+#		;;
+#esac
+
+# Include firmware packages
+
+# Get all firmware packages names
+
+FIRMWARE_PACKAGES=""
+
+# Manually add firmware-linux meta package if available
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" = "true" ]
+then
+	if [ $(Chroot chroot apt-cache show "^firmware-linux$" 2> /dev/null | grep "^Package:" | wc -l) -eq 1 ]
+	then
+		FIRMWARE_PACKAGES="${FIRMWARE_PACKAGES} firmware-linux"
+	fi
+else
+	if [ $(apt-cache show "^firmware-linux$" 2> /dev/null | grep "^Package:" | wc -l) -eq 1 ]
+	then
+		FIRMWARE_PACKAGES="${FIRMWARE_PACKAGES} firmware-linux"
+	fi
+fi
+
+Firmware_List_From_Contents "${LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT}" "${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}" "${LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS}"
+
+if [ "${LINGMO_SYS_BUILD_DERIVATIVE}" = "true" ]
+then
+	# Avoid downloading things twice if distributions are identical
+	DERIVATIVE_ARCHIVE_AREAS=""
+	if [ "${LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT}" != "${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}" ]
+	then
+		DERIVATIVE_ARCHIVE_AREAS="${LINGMO_SYS_BUILD_ARCHIVE_AREAS}"
+	else
+		for _ARCHIVE_AREA in ${LINGMO_SYS_BUILD_ARCHIVE_AREAS}
+		do
+			if ! In_list ${_ARCHIVE_AREA} ${LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS}
+			then
+				DERIVATIVE_ARCHIVE_AREAS="${DERIVATIVE_ARCHIVE_AREAS} ${_ARCHIVE_AREA}"
+			fi
+		done
+	fi
+
+	if [ ! -z "${DERIVATIVE_ARCHIVE_AREAS}" ]
+	then
+		Firmware_List_From_Contents "${LINGMO_SYS_BUILD_MIRROR_CHROOT}" "${LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT}" "${DERIVATIVE_ARCHIVE_AREAS}"
+	fi
+fi
+
+# Ensure that the package file exists before it is manipulated
+touch chroot/root/packages.chroot
+
+# Drop section and keep package names only
+for _PACKAGE in ${FIRMWARE_PACKAGES}
+do
+	echo $(echo ${_PACKAGE} | awk -F/ '{ print $NF }') >> chroot/root/packages.chroot
+done
+
+# Some known licenses required to be accepted
+if grep --silent "^firmware-ivtv$" chroot/root/packages.chroot
+then
+cat >> chroot/root/packages.chroot.cfg << EOF
+firmware-ivtv firmware-ivtv/license/accepted boolean true
+EOF
+fi
+if grep --silent "^firmware-ipw2x00$" chroot/root/packages.chroot
+then
+cat >> chroot/root/packages.chroot.cfg << EOF
+firmware-ipw2x00 firmware-ipw2x00/license/accepted boolean true
+EOF
+fi
+
+# Creating stage file
+Create_stagefile

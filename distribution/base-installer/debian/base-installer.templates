@@ -1,0 +1,71 @@
+Template: base-installer/use_unclean_target
+Type: boolean
+Default: true
+# :sl2:
+_Description: Proceed with installation to unclean target?
+ The target file system contains files from a past installation. These files
+ could cause problems with the installation process, and if you proceed,
+ some of the existing files may be overwritten.
+
+Template: base-installer/no_target_mounted
+Type: error
+# :sl2:
+_Description: No file system mounted on /target
+ Before the installation can proceed, a root file system must be mounted on
+ /target. The partitioner and formatter should have done this for you.
+
+Template: base-installer/unclean_target_cancel
+Type: error
+# :sl2:
+_Description: Not installing to unclean target
+ The installation to the target file system has been canceled. You should go
+ back and erase or format the target file system before proceeding with the
+ install.
+
+Template: base-installer/progress/preparing
+Type: text
+# :sl1:
+_Description: Preparing to install the base system...
+
+Template: base-installer/progress/installing-base
+Type: text
+# :sl1:
+_Description: Installing the base system
+
+Template: base-installer/progress/fallback
+Type: text
+# :sl1:
+_Description: Running ${SCRIPT}...
+
+Template: base-installer/section/setup_dev
+Type: text
+# :sl1:
+_Description: Setting up the base system...
+
+Template: base-installer/section/configure_apt
+Type: text
+# :sl1:
+_Description: Configuring APT sources...
+
+Template: base-installer/section/apt_update
+Type: text
+# :sl1:
+_Description: Updating the list of available packages...
+
+Template: base-installer/section/install_extra
+Type: text
+# :sl1:
+_Description: Installing extra packages...
+
+Template: base-installer/section/install_extra_package
+Type: text
+# SUBST0 is a package name
+# :sl1:
+_Description: Installing extra packages - retrieving and installing ${SUBST0}...
+
+Template: base-installer/install-recommends
+Type: boolean
+Default: true
+Description: for internal use; can be preseeded
+ Will configure APT in the target system not to install recommened
+ packages by default. For experienced users only.

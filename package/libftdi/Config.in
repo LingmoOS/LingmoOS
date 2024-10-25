@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_LIBFTDI
+	bool "libftdi"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libusb
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	select LINGMO_PACKAGE_LIBUSB
+	select LINGMO_PACKAGE_LIBUSB_COMPAT
+	help
+	  Userspace access to FTDI USB interface chips
+
+	  http://www.intra2net.com/en/developer/libftdi/index.php
+
+if LINGMO_PACKAGE_LIBFTDI
+
+config LINGMO_PACKAGE_LIBFTDI_CPP
+	bool "C++ bindings"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_BOOST
+	help
+	  C++ bindings for libftdi
+
+comment "libftdi C++ bindings need a toolchain w/ wchar, C++"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_INSTALL_LIBSTDCPP
+
+endif # LINGMO_PACKAGE_LIBFTDI
+
+comment "libftdi needs a toolchain w/ threads, gcc >= 4.9"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

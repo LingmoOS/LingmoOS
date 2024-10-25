@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_MIRACLECAST
+	bool "miraclecast"
+	depends on LINGMO_PACKAGE_SYSTEMD
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_GSTREAMER1
+	select LINGMO_PACKAGE_READLINE
+	help
+	  The MiracleCast project provides software to connect external
+	  monitors to your system via Wifi. It is compatible to the
+	  Wifi-Display specification also known as Miracast. MiracleCast
+	  implements the Display-Source as well as Display-Sink side.
+
+	  https://github.com/albfan/miraclecast
+
+comment "miraclecast needs systemd and a glibc toolchain w/ threads and wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_PACKAGE_SYSTEMD

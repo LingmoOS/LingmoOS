@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_WAYLANDPP
+	bool "waylandpp"
+	depends on LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_WAYLAND
+	help
+	  Wayland C++ bindings
+
+	  https://github.com/NilsBrause/waylandpp
+
+comment "waylandpp needs an OpenGL-EGL/wayland backend, a toolchain w/ gcc >= 4.9, host gcc >= 4.9, C++ support"
+	depends on LINGMO_PACKAGE_WAYLAND
+	depends on !LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND || \
+		!LINGMO_HOST_GCC_AT_LEAST_4_9 || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_INSTALL_LIBSTDCPP

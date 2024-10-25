@@ -1,0 +1,3156 @@
+live-boot (1:20230131) unstable; urgency=medium
+
+  [ Thore Sommer ]
+  * set redirect=on for overlayfs unions
+  * fix dm-verity installation for non merged /bin and /usr/bin (Closes:
+    #1010951)
+
+ -- Luca Boccassi <bluca@debian.org>  Tue, 31 Jan 2023 16:30:52 +0000
+
+live-boot (1:20220505) unstable; urgency=medium
+
+  [ Thore Sommer ]
+  * Remove encryption support for live-media via losetup.
+  * Fix blacklisting for devices that contain the live rootfs for
+    persistence. (Closes: #934701)
+  * Adding support for dm-verity rootfs
+  * docs: document dm-verity support
+
+ -- Luca Boccassi <bluca@debian.org>  Thu, 05 May 2022 11:16:56 +0100
+
+live-boot (1:20210208) unstable; urgency=high
+
+  [ Steven Shiau ]
+  * Revert commit that forced usage of the last ethernet device making it
+    impossible to boot when the working connection was on another
+    ethernet device
+  * Cleanup the leading space that was causing issues and that resulted
+    in the former wrong change with a sed.
+
+ -- Raphaël Hertzog <raphael@offensive-security.com>  Mon, 08 Feb 2021 12:18:07 +0100
+
+live-boot (1:20210122) unstable; urgency=medium
+
+  [ Steven Shiau ]
+  * A workaround to make sure /dev/mtd0 can be created
+  * Use ntfs-3g instead of kernel module ntfs.ko (Closes: #939034)
+
+  [ Benjamin Drung ]
+  * components/9990-networking.sh: Add shellcheck override
+  * Fix DNS search entry in /etc/resolv.conf
+  * Fix shellcheck in components/9990-main.sh
+  * Simplify empty check for /etc/resolv.conf
+  * Create /etc/hostname in initramfs
+  * Copy /etc/hostname and /etc/hosts into target
+  * Fix flipped logic for handling memdiskfind
+  * components/9990-main.sh: Fix shellcheck issue SC2236
+  * Fix leading space in DEVICE setting
+
+  [ Marcel Partap ]
+  * Accept multiple overlay names from persistence-label parameter
+  * Fix spurious error msgs from live-boot about failed mounts…
+  * Document the fact that persistence-label now accepts a list
+  * Set sticky bit on /var/tmp as well (matching perms in base-files)
+
+  [ Debian Janitor ]
+  * Update standards version to 4.4.1, no changes needed.
+  * Bump debhelper from old 10 to 12. + debian/rules: Move --fail-missing
+    argument to dh_missing.
+  * Set debhelper-compat version in Build-Depends.
+
+  [ Lyndon Brown ]
+  * amend copyright
+  * "Live Systems" -> "Debian Live"
+
+  [ Raphaël Hertzog ]
+  * Drop Iain R. Learmonth from Uploaders on his request (Closes: #970288)
+  * Update standards version to 4.5.0, no changes needed.
+  * Update my maintainer email
+
+ -- Raphaël Hertzog <raphael@offensive-security.com>  Fri, 22 Jan 2021 15:18:23 +0100
+
+live-boot (1:20190614) unstable; urgency=medium
+
+  [ Roland Clobus ]
+  * The homepage is https://wiki.debian.org/DebianLive
+  * Used the same text for po4a as in live-manual.
+  * Updated URL to the homepage and manual.
+  * Fixed Lintian warning: manpage-section-mismatch
+  * Always rebuild po4a.cfg This is needed to ensure that new languages
+    will automatically be found
+  * New Build-Depends: po4a for the translation files
+  * Updated the translation files. The translators can now update their
+    translations.
+
+  [ Benjamin Drung ]
+  * Also search for libnss_*.so files in /usr/lib (Closes: #930419)
+
+  [ Luca Boccassi ]
+  * Set Rules-Requires-Root: no
+  * Set Standards-Version to 4.3.0
+
+ -- Luca Boccassi <bluca@debian.org>  Fri, 14 Jun 2019 10:55:07 +0100
+
+live-boot (1:20180603) unstable; urgency=medium
+
+  [ Luca Boccassi ]
+  * Mark live-boot-doc as Multi-Arch: foreign
+  * Remove --parallel from dh to fix Lintian Warning.
+
+  [ Benjamin Drung ]
+  * Fix resolving FQDN given by DHCP
+  * Double quote to prevent globbing and word splitting
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Sun, 03 Jun 2018 23:00:11 +0200
+
+live-boot (1:20180328) unstable; urgency=low
+
+  [ Raphaël Hertzog ]
+  * Fix read-only persistence mode with overlayfs. Closes: #877776
+    Thanks to Ronny Standtke <ronny.standtke@fhnw.ch> for the patch.
+  * Add a small warning in the long description that the
+    package must not be installed on a regular system, but only in
+    a live image. Closes: #884886
+  * Strip comments from checksums files passed to "shaXsum -c"
+    Thanks to Andreas Heinlein for the report (Closes: #856482)
+
+  [ Steve McIntyre ]
+  * Repo moved to salsa
+
+  [ Benjamin Drung ]
+  * Don't replace busybox's wget by the true wget.
+    It was likely done for https support but since buster the busybox
+    provided wget has https support too. We save a lot of space by
+    doing so (8 Mb). (Closes: #885455)
+  * Avoid double slashes in some paths (Closes: #885453)
+  * Support setting upperdir tmpfs size with overlay-size boot parameter
+    (Closes: #885466)
+  * Simplify mount point handling by using /run/live instead of /lib/live/mount
+    (Closes: #886328)
+  * Add configuration variables to build a stripped down initrd
+    (Closes: #886337)
+
+  [ Daniel Reichelt ]
+  * Use klibc's mount again for fuse mounts (Closes: #868559)
+
+  [ raizo62 ]
+  * Update DNSFILE even if DNSFILE contains only commented or empty lines
+
+  [ Sameer Agrawal ]
+  * Fix ifconfig parsing (Closes: #892772)
+
+  [ Chas Williams ]
+  * Add back persistence fsck option
+  * Remove workaround for ipconfig issues
+
+  [ Benjamin Drung ]
+  * Remove sourcing /scripts/functions in components
+  * Support live-{top,premount,bottom} hooks (Closes: #884355)
+
+  [ Luca Boccassi ]
+  * Add backward compatibility rbind mount /lib/live/mount -> /run/live.
+    The paths used in the current released versions of live-boot are a
+    form of public API, and existing applications and scripts might rely
+    on them. Do a recursive bind mount of the new path on the previous one
+    so that they do not break on upgrade (see #886328).
+    This backward-compatible mount point will be deprecated and removed
+    before the Bullseye (Debian 11) release. Users are recommended to start
+    migrating to the new /run/live path as soon as possible.
+
+  [ Erik Ziegenbalg ]
+  * fromiso: add support for local ISO (ONIE)
+
+  [ Luca Boccassi ]
+  * Clarify FROMISO documentation in live-boot manpage
+  * Use HTTPS in debian/copyright (policy 4.0.0).
+  * Remove dead link to live-systems.org from debian/copyright.
+  * Bump Standards-Version to 4.1.3, no changes.
+  * Add myself to Uploaders.
+
+ -- Luca Boccassi <bluca@debian.org>  Wed, 28 Mar 2018 20:07:39 +0100
+
+live-boot (1:20170623) unstable; urgency=medium
+
+  * Do not duplicate files in /lib/live/boot/ and /bin/boot/ in the initrd.
+    Closes: #864385 Thanks to Daniel Reichelt <debian@nachtgeist.net> for the
+    patch.
+  * Take into account the fact that udevadm is now in /bin and no longer in
+    /sbin. Closes: #852570
+  * Add myself to Uploaders.
+  * Bump debhelper compat to 10.
+  * Bump Standards-Version to 4.0.0.
+  * Fix spelling errors in live-boot(7).
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Fri, 23 Jun 2017 14:41:06 +0200
+
+live-boot (1:20170112) unstable; urgency=medium
+
+  [ Raphaël Hertzog ]
+  * Team upload.
+  * Fix nodhcp option to actually force DHCP off. Closes: #785345
+    Thanks to Frank Lillo for the report and Evgeni Golov for the patch.
+  * Improve 9990-misc-helpers.sh when /sys/block/ is empty.
+    Closes: #847802
+  * Multiple cleanups to appease lintian.
+
+  [ Kristian Klausen ]
+  * Add "nls_ascii" module in the initrd so that we can access FAT
+    partitions. Closes: #850532
+  * Copy /etc/live/boot.conf and /etc/live/boot to the initrd.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Thu, 12 Jan 2017 16:59:49 +0100
+
+live-boot (1:20160511) unstable; urgency=medium
+
+  * Team upload.
+  * Update build system to rely on "dpkg-parsechangelog -S Version" instead
+    of outdated VERSION file.
+  * No longer modify PATH to point to /root and thus stop using executables
+    from /root. Closes: #823069
+  * Drop debian/source/local-options as the only option it contained was
+    not applicable to 3.0 (native) source format.
+  * Drop debian/source/options and dh_builddeb override as XZ compression is
+    the default now.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Wed, 11 May 2016 11:40:37 +0200
+
+live-boot (1:20151213) unstable; urgency=medium
+
+  [ Iain R. Learmonth ]
+  * Change to native package.
+  * debian/control:
+   - Added myself to uploaders.
+   - Updated Vcs-* and Homepage fields.
+
+  [ trebmuh ]
+  * Adding French translation for live-boot manpage and prep for
+    persistence.conf.
+
+  [ Carlos Zuferri ]
+  * Using 'Live Systems Project' as default project in .pot files.
+
+ -- Iain R. Learmonth <irl@debian.org>  Sun, 13 Dec 2015 16:12:07 +0000
+
+live-boot (5.0~a5-2) unstable; urgency=low
+
+  * Removing myself from uploaders, lost trust in Debian (#804315).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 20 Nov 2015 13:04:24 +0100
+
+live-boot (5.0~a5-1) unstable; urgency=low
+
+  [ Richard Nelson ]
+  * Adjusting whitespace to tabs on components/9990-overlay.sh
+  * Adjusting whitespace to tabs on components/9990-misc-helpers.sh
+  * Adjusting whitespace to tabs on components/9990-mount-http.sh
+
+  [ Daniel Baumann ]
+  * Wrap and sort debian control file.
+
+  [ Steven Shiau ]
+  * Support predictable network interface names.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 23 Aug 2015 10:55:32 +0200
+
+live-boot (5.0~a4-1) unstable; urgency=low
+
+  [ Tails developers ]
+  * Logging a warning when an expected image file is missing.
+  * Patch by Steven Shiau <steven@nchc.org.tw>. The only changes so far
+    are:
+  * Removing attempt to mount overlayfs in an obsolete way.
+  * Cleaning up comment to keep only the part that's relevant here.
+  * Adding missing quotes.
+  * Removing obsolete code.
+  * Refactoring duplicate identical call to mount.
+
+  [ Daniel Baumann ]
+  * Switching default union filesystem to overlay, wheezy systems can use
+    union=aufs for the time being.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 17 May 2015 21:04:01 +0200
+
+live-boot (5.0~a3-1) unstable; urgency=low
+
+  [ Tails developers ]
+  * Patch by Steven Shiau <steven@nchc.org.tw>. The only changes so far
+    are:
+  * Removing attempt to mount overlayfs in an obsolete way.
+  * Cleaning up comment to keep only the part that's relevant here.
+  * Adding missing quotes.
+  * Removing obsolete code.
+  * Removing unused variables.
+  * Refactoring duplicate identical call to mount.
+
+  [ Daniel Baumann ]
+  * Waiting until all ethernet devices are up on multi-nic machines,
+    thanks to Chris Read <chris.read@gmail.com> (Closes: #744777).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 28 Apr 2015 07:19:16 +0200
+
+live-boot (5.0~a2-1) unstable; urgency=low
+
+  [ Tom Jampen ]
+  * Adding command line parameter to remove persistence.
+
+  [ Gaudenz Steinlin ]
+  * Modprobe filesystem modules before checking support.
+
+  [ victory ]
+  * Unfuzzy Japanese translation.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 26 Apr 2015 20:11:46 +0200
+
+live-boot (5.0~a1-1) experimental; urgency=low
+
+  [ Tails developers ]
+  * Fixing name of overlayfs kernel module for inclusion in the initramfs
+    (Closes: #773868).
+
+  [ Daniel Baumann ]
+  * Using 'overlay' instead of 'overlayfs' everywhere, without backwards
+    compatibility (Closes: #773881).
+  * Dropping unionfs-fuse support:
+  * Dropping unionfs support, long superseeded with aufs.
+  * Dropping unionmount support, superseeded with overlay in mainline
+    kernel.
+  * Updating manpages for union= boot parameter.
+  * Simplifying code a bit after removal of no longer supported overlay
+    alternatives.
+  * Updating year in copyright notices to 2015.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 04 Jan 2015 21:50:28 +0100
+
+live-boot (4.0.2-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Dropping usage of /etc/fstab.d since util-linux removed it, thanks to
+    Evgeni Golov <evgeni+git@golov.de> for reporting it.
+
+  [ Jan Blunck ]
+  * Fix spelling of unknown
+  * Suppress annoying but harmless warning about unknown module
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 10 Dec 2014 10:36:04 +0100
+
+live-boot (4.0.1-1) unstable; urgency=low
+
+  [ victory ]
+  * Change a wording and fix a typo in the po header, in Japanese
+    translation.
+
+  [ Daniel Baumann ]
+  * Updating to standards version 3.9.6.
+
+  [ Carlos Zuferri ]
+  * Fixing typo in warning message.
+
+  [ Daniel Baumann ]
+  * Dropping empty German manpage translations.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 25 Oct 2014 14:26:22 +0200
+
+live-boot (4.0.0-1) unstable; urgency=low
+
+  [ Carlos Zuferri ]
+  * Removing obsolete flag '--no-backups' from po4a options.
+  * Adding '--package-version' to po4a options.
+  * Adding .po integrity check target to manpages/Makefile.
+
+  [ Daniel Baumann ]
+  * Adding plymouth support for LUKS passwort prompt based on a patch from
+    Gaudenz Steinlin <gaudenz@debian.org> (Closes: #754166).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Aug 2014 19:52:09 +0200
+
+live-boot (4.0~alpha21-1) unstable; urgency=low
+
+  * Building with dh --parallel.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 31 Mar 2014 21:55:30 +0200
+
+live-boot (4.0~alpha20-1) unstable; urgency=low
+
+  [ Trent W. Buck ]
+  * Fix cut-and-paste typo verify-checksums -> panic.
+
+  [ Evgeni Golov ]
+  * Properly check if $rc_server1 is not "0.0.0.0".
+  * Supporting resolvconf in the squashfs.
+  * Do not throw warnings when /tmp/custom_mounts.list does not exist.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 31 Mar 2014 21:38:22 +0200
+
+live-boot (4.0~alpha19-1) experimental; urgency=low
+
+  * Updating copyright notices for 2014.
+  * Updating swap bootparameter in manpage to match code (Closes:
+    #738146).
+  * Adjusting internal file of the swap component to match its own boot
+    parameter.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 08 Feb 2014 17:32:16 +0100
+
+live-boot (4.0~alpha18-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding initial Japanese live-boot manpage translation from victory
+    <victory.deb@gmail.com>.
+
+  [ chals ]
+  * Applying patch revising grammar and spelling in live-boot.7 manpage,
+    thanks to victory <victory.deb@gmail.com>.
+  * Updating live-boot translation files from the original English text.
+  * Updating Spanish translation of live-boot.7 manpage.
+
+  [ victory ]
+  * Change plurals to singular: from "a ... media" to "a ... medium".
+  * Update/sync translations.
+
+  [ Daniel Baumann ]
+  * Reading in panic boot parameter when overloading initramfs-tools
+    panic() (Closes: #729041).
+
+  [ victory ]
+  * Translated persistence.conf.5.
+  * [man-ja] Fix a typo on the translation.
+  * Fix a typo: coma -> comma.
+  * Sync translations (0af845c).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 20 Nov 2013 11:03:46 +0100
+
+live-boot (4.0~alpha17-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Rewrapping control file.
+
+  [ Michael Prokop ]
+  * Properly boot from mdadm via findiso boot option.
+
+  [ Daniel Baumann ]
+  * Updating to standards version 3.9.5.
+  * Correcting spelling typo in overlay component breaking booting from
+    uncompressed filesystems, thanks to John Bazik <jsb@cs.brown.edu>
+    (Closes: #728250).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 30 Oct 2013 02:44:22 +0100
+
+live-boot (4.0~alpha16-1) experimental; urgency=low
+
+  * Updating package descriptions.
+  * Applying patch from Michael Prokop <mika@grml.org> to update udev
+    usage in is_nice_device() for newer udev versions.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 15 Oct 2013 09:17:35 +0200
+
+live-boot (4.0~a15-1) experimental; urgency=low
+
+  [ Jan Blunck ]
+  * Install components into /lib/live/boot folder.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 13 Sep 2013 17:21:50 +0200
+
+live-boot (4.0~a14-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating note about overlay file image names in live-boot manpage,
+    thanks to Peter Schaefer <peter.schaefer@physik.hu-berlin.de> (Closes:
+    #701615).
+  * Correcting debug variables through out the code to use the same one.
+  * Allowing to superseed live-boot cmdline through configuration files.
+
+  [ chals ]
+  * Updating Spanish translation of live-boot man page.
+
+  [ Steven Shiau ]
+  * Calculating size for the whole media "/live/image/", not only the dir
+    "/live/image/live/" when using toram.
+
+  [ Daniel Baumann ]
+  * Reorganizing backend in source tree.
+  * Reorganizing frontend in source tree.
+  * Reorganizing components in source tree.
+  * Replace various mentionings of scripts with components.
+  * Updating code to current coding style in a some locations.
+  * Dropping old pre-wheezy udevadm handling.
+  * Dropping old pre-wheezy persistence list handling.
+  * Replacing variable used in one place only with explicit directory for
+    simplicity.
+  * Shortening /etc/mtab conditional creation.
+  * Dropping helper function used in one place only which can be replaced
+    with a simple ls call anyway.
+  * Dropping really_export dead code.
+  * Simplifying /etc/resolv.conf generation a bit.
+  * Updating indenting in network component.
+
+  [ chals ]
+  * Updating the dates in man pages.
+  * Updating Spanish translation of man pages.
+
+  [ Jan Blunck ]
+  * Use PERSISTENCE_PATH with a trailing "/".
+  * Move check for block device to mount_persistence_media().
+  * Remount writable when moving the mountpoint of the persistence device.
+  * Blacklist devices used for /live/rootfs/* insted of /live/medium.
+  * Add support for persistence-storage type "directory".
+
+  [ Daniel Baumann ]
+  * Updating debhelper install file to include additional scripts in new
+    location.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 13 Sep 2013 14:17:30 +0200
+
+live-boot (4.0~a13-1) experimental; urgency=low
+
+  * Increasing tftp blocksize to maximum value per RFC 2348, thanks to
+    Vincent Smeets <Vincent.VSmeets@gmail.com> (Closes: #709887).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 27 May 2013 16:45:49 +0200
+
+live-boot (4.0~a12-1) experimental; urgency=low
+
+  * Updating manpage wrt/ quickreboot (Closes: #706686).
+  * Moving overwriting of /bin/mount with /bin/mount.util-linux for httpfs
+    to make it active (Closes: #707116).
+  * Further guarding overwriting of /bin/mount by making it dependent on
+    the existence of /bin/mount.util-linux.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 08 May 2013 08:42:54 +0200
+
+live-boot (4.0~a11-1) experimental; urgency=low
+
+  [ chals ]
+  * Updating dates in man pages.
+  * Updating the Spanish translation of live-boot man page.
+  * Updating the Spanish translation of persistence.conf man page.
+  * Fixing the use of one preposition in the Spanish translation of the
+    man pages.
+
+  [ Daniel Baumann ]
+  * Renumbering the first three early scripts.
+  * Renaming main function to live for consistent namespace.
+  * Correcting leftovers from old variable handling for BOOTIF, thanks to
+    Andrew Jeffery <andrewj@avalon.com.au> (Closes: #703743).
+
+  [ Andrew Jeffery ]
+  * Select BOOTIF device if defined for netboot (Closes: #703744).
+  * Don't quote $CIFSOPTS for mount.cifs (Closes: #703746).
+
+  [ Peter Schaefer ]
+  * Adding support for luks persistence with persistence files (Closes:
+    #701614).
+
+  [ David Hare ]
+  * Also blacklisting findiso and fromiso devices for luks file
+    persistence.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 May 2013 14:28:00 +0200
+
+live-boot (4.0~a10-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Debranding package for derivatives.
+
+  [ Evgeni Golov ]
+  * Fixing condition for setting rootfs_dest_backing.
+
+  [ Michael Stummvoll ]
+  * Simplifying if statement in is_live_system function.
+  * Fixing a bug with multiple files in is_live_path after the last
+    commit.
+  * Using is_live_path() in mount_images_in_directory() to avoid redundant
+    logic.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 01 Apr 2013 08:20:50 +0200
+
+live-boot (4.0~a9-1) experimental; urgency=low
+
+  * Removing all references to my old email address.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 10 Mar 2013 22:13:18 +0100
+
+live-boot (4.0~a8-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Moving initramfs-tools entry-point to backends.
+  * Moving dracut entry-point stub to backends.
+  * Dropping pre-squeeze udev conditionals in initramfs-tools hook.
+  * Dropping conditionals in backend, stuff is either there or not but not
+    nothing in between.
+  * Correcting spelling typos, thanks to Adam D. Barratt <adam@adam-
+    barratt.org.uk>.
+
+  [ Evgeni Golov ]
+  * Fixing invalid syntax in test for opt_link.
+  * Checking for ${overlay}, not ${device} when trying to close
+    ${overlay}.
+  * Transforming link targets so they work after the mount was moved
+    (Closes: #702421).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 10 Mar 2013 19:02:23 +0100
+
+live-boot (4.0~a7-1) experimental; urgency=low
+
+  * Silencing unmounting of potentially stray tmpfs on /live/overlay.
+  * Making loadkeys call quiet in order to not mess-up persistence, thanks
+    to stack <stack@inventati.org> (Closes: #700902).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 19 Feb 2013 05:49:37 +0100
+
+live-boot (4.0~a6-1) experimental; urgency=low
+
+  [ chals ]
+  * Updating Spanish translation of live-boot man page, persistence-label.
+
+  [ Daniel Baumann ]
+  * Adding 3.0.1-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 15 Feb 2013 08:57:13 +0100
+
+live-boot (4.0~a5-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating manpage year handling for 2013.
+
+  [ Richard Nelson ]
+  * Replace noprompt with noeject on manpage.
+
+  [ Daniel Baumann ]
+  * Updating noeject description in manpage.
+
+  [ chals ]
+  * Updating Spanish translation in respect to noeject.
+
+  [ Daniel Baumann ]
+  * Dropping dpkg compression level.
+  * Calling df with -P to avoid line wraps with overly long mountpoints.
+  * Removing some dead code in netbase parts.
+
+  [ Gaudenz Steinlin ]
+  * Fixing support for multiple squashfs images (Closes: #696494).
+  * Fixing mounting of rootfs, cow and medium filesystems (Closes:
+    #696495).
+
+  [ Daniel Baumann ]
+  * Adding 3.0.0-1 changelog entries.
+  * Updating manpage for persistence-label, thanks to Mike Gach
+    <gach.mqt@gmail.com> (Closes: #697873).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 12 Feb 2013 08:29:27 +0100
+
+live-boot (4.0~a4-1) experimental; urgency=low
+
+  * Updating year in copyright file.
+  * Supporting legacy filenames for checksums in debian within verify-
+    checksums.
+  * Correcting legacy filename for checksum files.
+  * By default including sha256sum only in progress-linux, keep md5sum
+    legacy for debian.
+  * Adding 3.0~b11-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jan 2013 11:37:12 +0100
+
+live-boot (4.0~a3-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding live-tools to recommends.
+
+  [ Michal Suchanek ]
+  * Including util-linux mount in initramfs.
+
+  [ Daniel Baumann ]
+  * Making overwriting of /bin/mount within initramfs with mount.util-
+    linux dependent on fuse usage, not on some additional boot parameter.
+  * Correcting spelling typo in bug script.
+
+  [ Richard Nelson ]
+  * Update manpage information of ip= param to correctly reflect what
+    9990-netbase.sh expects.
+
+  [ Daniel Baumann ]
+  * Cleaning up manpage po files.
+  * Adding 3.0~b10-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Dec 2012 20:27:46 +0100
+
+live-boot (4.0~a2-1) experimental; urgency=low
+
+  [ Tails developers ]
+  * Making the /live to /lib/live move for the persistence code.
+  * Handling already mounted persistence backing media correctly.
+  * Fixing persistence-media option when no devices are attached.
+  * Using 'local' in a safe way.
+
+  [ Daniel Baumann ]
+  * Adding 3.0~b9-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 10 Dec 2012 20:06:28 +0100
+
+live-boot (4.0~a1-1) experimental; urgency=low
+
+  * Dropping specifics for squeeze based distributions.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Nov 2012 14:58:46 +0100
+
+live-boot (3.0.1-1) unstable; urgency=low
+
+  [ chals ]
+  * Updating Spanish translation of live-boot man page, persistence-label.
+
+  [ Daniel Baumann ]
+  * Dropping German manpage translations stubs for the release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 14 Feb 2013 19:33:17 +0100
+
+live-boot (3.0.0-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating manpage year handling for 2013.
+
+  [ Richard Nelson ]
+  * Replace noprompt with noeject on manpage.
+
+  [ Daniel Baumann ]
+  * Updating noeject description in manpage.
+
+  [ chals ]
+  * Updating Spanish translation in respect to noeject.
+
+  [ Daniel Baumann ]
+  * Dropping dpkg compression level.
+  * Calling df with -P to avoid line wraps with overly long mountpoints.
+
+  [ Tails developers ]
+  * Improving test for /etc/fstab.d support by testing for its existence
+    instead of /run's one.
+
+  [ Daniel Baumann ]
+  * Removing some dead code in netbase parts.
+
+  [ Gaudenz Steinlin ]
+  * Fixing support for multiple squashfs images (Closes: #696494).
+  * Fixing mounting of rootfs, cow and medium filesystems (Closes:
+    #696495).
+
+  [ Daniel Baumann ]
+  * Correcting persistence-label handling fwrt/ legacy live-boot 2.x
+    support, thanks to Mike Gach <gach.mqt@gmail.com> (Closes: #697873).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 12 Feb 2013 08:23:17 +0100
+
+live-boot (3.0~b11-1) unstable; urgency=low
+
+  * Updating year in copyright file.
+  * Supporting legacy filenames for checksums in debian within verify-
+    checksums.
+  * Correcting legacy filename for checksum files.
+  * By default including sha256sum only in progress-linux, keep md5sum
+    legacy for debian.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jan 2013 11:32:21 +0100
+
+live-boot (3.0~b10-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding live-tools to recommends.
+
+  [ Michal Suchanek ]
+  * Including util-linux mount in initramfs.
+
+  [ Daniel Baumann ]
+  * Making overwriting of /bin/mount within initramfs with mount.util-
+    linux dependent on fuse usage, not on some additional boot parameter.
+  * Correcting spelling typo in bug script.
+
+  [ Richard Nelson ]
+  * Update manpage information of ip= param to correctly reflect what
+    9990-netbase.sh expects.
+
+  [ Daniel Baumann ]
+  * Cleaning up manpage po files.
+
+  [ Evgeni Golov ]
+  * Do not fix mountpoints with live-persistence.conf as home-rw/live-rw.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Dec 2012 20:22:50 +0100
+
+live-boot (3.0~b9-1) unstable; urgency=low
+
+  [ Tails developers ]
+  * Making the /live to /lib/live move for the persistence code.
+  * Handling already mounted persistence backing media correctly.
+  * Fixing persistence-media option when no devices are attached.
+  * Using 'local' in a safe way.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 10 Dec 2012 20:01:21 +0100
+
+live-boot (3.0~b8-1) unstable; urgency=low
+
+  * Removing eject from recommends, the script that ejects the live medium
+    is in live-config these days.
+  * Removing file from recommends, no usage of file in live-boot anymore.
+  * Updating package lists in bug script to match current implementations.
+  * Adding dpkg-source local options.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Nov 2012 14:48:16 +0100
+
+live-boot (3.0~b7-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating file paths for /lib/live/mount. See
+    http://lists.debian.org/debian-live/2012/10/msg00021.html for more
+    information.
+  * Renaming /lib/live/mount/image to /lib/live/mount/medium. See
+    http://lists.debian.org/debian-live/2012/10/msg00023.html for more
+    information.
+  * Updating package descriptions.
+  * Properly wrap package descriptions to 80 characters per line.
+
+  [ Tails developers ]
+  * Adding support for the previous persistence configuration file name,
+    for compatibility with systems that have been deployed with live-
+    persistence.conf already.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 07 Nov 2012 15:04:32 +0100
+
+live-boot (3.0~b6-1) unstable; urgency=low
+
+  * Including hfs and hfsplus modules in initrd to access filesystems on
+    apple systems.
+  * Stopping to put a tmpfs on /root/lib/live from within initramfs, it
+    over-'layered' most prominently the live systems /lib/live/config,
+    making the runtime configuration impossible and the tmpfs is not
+    used or needed in the first place anyway.
+  * Renaming rofs to more intuitive rootfs.
+  * Removing source-only readme file about boot scripts from the binary
+    package.
+  * Renaming the boot scripts readme file to fixme to make it even more
+    obvious.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 02 Oct 2012 10:32:44 +0200
+
+live-boot (3.0~b5-1) unstable; urgency=low
+
+  * Updating to standards version 3.9.4.
+  * Removing showmounts option as it's enable always anyway.
+  * Applying slightly modified patch from Reinhard Tartler
+    <siretart@tauware.de> to ensure that a potentially stray tmpfs on
+    /live/overlay gets removed to fix netboot failures (Closes:
+    #685375).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 30 Sep 2012 10:07:09 +0200
+
+live-boot (3.0~b4-1) unstable; urgency=low
+
+  * Switching to final name for the persistence configuration file
+    'persistence.conf' in line with boot parameter.
+  * Moving remaining stuff from /live to /lib/live to avoid further
+    namespace pollution.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 Sep 2012 13:23:33 +0200
+
+live-boot (3.0~b3-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Always move live filesystem mounts to /root within initramfs,
+    regardless if mountpoint already exists or not (Closes: #688782).
+
+  [ Gaudenz Steinlin ]
+  * Removing mountpoint if no persistence layer is found on a device.
+
+  [ Daniel Baumann ]
+  * Exposing rofs and persistence mounts under /live in the live
+    systems, not just initramfs only (Closes: #687099).
+  * Updating code for exposing of overlay mounts under /live too.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 26 Sep 2012 14:40:32 +0200
+
+live-boot (3.0~b2-1) unstable; urgency=low
+
+  * Recreating /etc/live/boot in postinst.
+  * Removing /etc/live/boot if empty on purge in postrm.
+  * Regenerating initramfs on remove.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 24 Aug 2012 12:37:23 +0200
+
+live-boot (3.0~b1-1) unstable; urgency=low
+
+  [ chals ]
+  * Fixing build error in 'es' man pages caused by a newline conflict.
+
+  [ Daniel Baumann ]
+  * Removing live-new-uuid, a rewritten one goes to live-tools.
+  * Adding slightly modified patch from Steven Shiau
+    <steven@nchc.org.tw> to transition to /run for network interface
+    definition files which fixes resolv.conf creation for netboot.
+
+  [ Steven Shiau ]
+  * Reading /conf/param.conf after Select_eth_device in main function to
+    fix network booting (Closes: #683240).
+
+  [ Daniel Baumann ]
+  * Moving reading of initramfs-tools functions to initramfs-tools
+    script.
+  * Consistently using case instead of if for conditionals in script
+    boilerplate.
+  * Laying tmpfs on /live/overlay only during initramfs stage, fixes
+    boot failure with plain filesystems (Closes: #681579).
+  * Correcting DNS inclusion in initramfs-tools hook, thanks to Steven
+    Shiau <steven@nchc.org.tw> for reporting.
+  * Simplifying usage of copy_exec function from hooks-function in
+    initramfs-tools hook.
+  * Using /etc/live/boot/*.conf instead of /etc/live/boot.d/*.conf and
+    /live/image/live/boot/*.conf instead of
+    /live/image/live/boot.d/*.conf for consistency reasons.
+  * Reading configuration file from filesystem and live-media at runtime
+    too.
+  * Reading configuration files in initramfs-tools hook too.
+
+  [ Steven Shiau ]
+  * Adding support for nameserver in ip= boot parameter.
+
+  [ Daniel Baumann ]
+  * Making nameserver assignment from ip= bootparameter work with
+    persistence.
+  * Correcting permissions of /tmp which apparently somehow get mixed up
+    along the way.
+  * Updating scripts readme about transition to plugin based
+    architecture.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 16 Aug 2012 12:21:04 +0200
+
+live-boot (3.0~a38-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Extending verify-checksums parameters to allow specifying custom
+    list of digests.
+  * Harmonizing GPL boilerplate texts.
+
+  [ Richard Nelson ]
+  * Correct left over references to old initramfs-tools.sh (Closes:
+    #682504).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 27 Jul 2012 00:20:39 +0200
+
+live-boot (3.0~a37-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Cleaning up initramfs-tools hook.
+
+  [ Tails developers ]
+  * Fixing persistence backward-compatibility mode (Closes: #681176).
+
+  [ Daniel Baumann ]
+  * Making swap function self contained.
+  * Making read-only function self contained.
+  * Making verify-checksums function self contained.
+  * Factoring out debug into an own function.
+  * Extending read-only parameters to allow specifying custom list of
+    devices.
+  * Avoid re-access /proc/cmdline in select-eth-device function and use
+    internal variable instead.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 25 Jul 2012 17:18:06 +0200
+
+live-boot (3.0~a36-1) unstable; urgency=low
+
+  * Adding temporary notes in a readme file.
+  * Renaming boot scripts for refactoring them into numbered plugins.
+  * Renaming mountroot function to main to provide a generic live-boot
+    entry point for initramfs generators.
+  * Adding temporary redirection layer for dracut initramfs generator.
+  * Adding redirection layer for initramfs-tools initramfs generator.
+  * Splitting out already reviewed cmdline parsing script.
+  * Splitting out already reviewed read-only script.
+  * Splitting out already reviewed swapon script.
+  * Splitting out already reviewed verify-checksums script.
+  * Adding support for defining one or more explicit swap partitions to
+    be used.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 18 Jul 2012 23:56:06 +0200
+
+live-boot (3.0~a35-1) unstable; urgency=low
+
+  * Correcting typo in fstab function call in mountroot, thanks to
+    Baurzhan Muftakhidinov <baurthefirst@gmail.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 28 Jun 2012 14:30:46 +0200
+
+live-boot (3.0~a34-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Renaming persistent-subtext option into persistent-label and making
+    it define the complete label instead of a custom suffix only.
+  * Updating coding style in a first bunch of locations.
+  * Updating location for live-boot files in initramfs-tools hook,
+    thanks to Baurzhan Muftakhidinov <baurthefirst@gmail.com>.
+  * Making live-boot-initramfs-tools.postinst more error safe.
+  * Removing pre-wheezy dpkg trigger for update-initramfs.
+  * Removing superfluous directory in initramfs-tools hook.
+  * Sourcing individual live-boot scripts rather than executing them.
+
+  [ Ben Armstrong ]
+  * Fix creation of /var/log/live in correct location.
+
+  [ Daniel Baumann ]
+  * Switching to xz compression in source and binary packages.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Jun 2012 14:14:19 +0200
+
+live-boot (3.0~a33-1) unstable; urgency=low
+
+  [ chals ]
+  * Updating Spanish translation of man pages.
+
+  [ Daniel Baumann ]
+  * Removing some more dead parameters from cmdline function.
+  * Removing double author entries in Spanish po files.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 13 Jun 2012 13:26:49 +0200
+
+live-boot (3.0~a32-1) experimental; urgency=low
+
+  * Dropping snapshot functionality, superseeded by awesome custom mount
+    persistence.
+  * Setting persistence label for live-* 3.x persistency to
+    'persistence', we're not making any difference between full-ov and
+    custom-ov anymore on the filesystem and partition label (it's
+    determined by the contents of live-persistence.conf).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 06 Jun 2012 19:04:01 +0200
+
+live-boot (3.0~a31-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Renaming etc directory to their actual name, examples, within source
+    tree.
+  * Simplyfing scripts declaration in Makefile.
+
+  [ chals ]
+  * Fixing fuzzy strings in Spanish translation of man pages.
+
+  [ Daniel Baumann ]
+  * Removing live-reconfigure, not used anymore.
+  * Removing live-preseed, not used anymore.
+  * Unbreaking cmdline parsing after variable rename.
+  * Moving off remaining functions from main boot script to subscript
+    for later cleanup.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 05 Jun 2012 21:44:44 +0200
+
+live-boot (3.0~a30-1) experimental; urgency=low
+
+  * Removing dead lang2locale function and associated files, not used
+    anywhere.
+  * Converting select_eth_device initramfs-tools pre-mount script into
+    regular live-boot script.
+  * Consistenly using 'true' instead of 'Yes' or 'yes' when using
+    booleans.
+  * Removing some dead boot parameters.
+  * Splitting out integrity-check function to subscript.
+  * Rewriting live-media checksum verification to work with any SHA and
+    MD5 digests.
+  * Updating read-only handling to new parameter handling.
+  * Updating internal cmdline handling.
+  * Updating swapon handling to new parameter handling.
+  * Also allowing /dev/vd* to be used as swap devices and drop /dev/hd*.
+  * Splitting out swap handling and rewriting to a live-boot subscript.
+  * Moving validateroot bottom script into main boot script itself.
+  * Removing exporting of variables for reviewed options in the cmdline
+    function, not required.
+  * Removing fastboot handling, the normal system handles this via
+    'fastboot' bootparameter already.
+  * Transforming persistence_excludes bottom script into normal live-
+    boot script.
+  * Transforming fstab bottom script into normal live-boot script.
+  * Transforming networking bottom script into normal live-boot script.
+  * Simplyfing initramfs-tools specific files within the source tree.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 05 Jun 2012 19:37:54 +0200
+
+live-boot (3.0~a29-1) experimental; urgency=low
+
+  * Automatically translate date formats in po files.
+  * Starting initramfs-tools specific subdirectory within the source-
+    tree.
+  * Replacing live initramfs-tools script with empty stub that calls the
+    real, in future being initramfs-tools independent, script from
+    /lib/live.
+  * Splitting out a first bunch of functions out to /live/live/boot/.
+  * Moving out live-helpers from initramfs-tools specifics.
+  * Adding commented 'set -e' explicitly in all subscripts to avoid
+    running it with 'set -e' until we've made sure it's properly
+    working.
+  * Moving out live-functions from initramfs-tools specifics.
+  * Removing live-premount modules script, not needed anymore.
+  * Converting read-only initramfs-tools pre-mount script into regular
+    live-boot script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 05 Jun 2012 16:00:59 +0200
+
+live-boot (3.0~a28-1) experimental; urgency=low
+
+  [ Tails developers ]
+  * Improving robustness of findiso cleanup process.
+  * Using fromiso in most places where isofrom was used, thanks to
+    adrian15 <adrian15sgd@gmail.com>.
+  * Mounting fromiso filesystem on /live/fromiso instead of /fromiso,
+    thanks to adrian15 <adrian15sgd@gmail.com>.
+  * Improving robustness of fromiso cleanup process with is_mountpoint
+    (Closes: #668100).
+
+  [ Daniel Baumann ]
+  * Using boot.log and /var/log/live/boot.log respectively for overall
+    consistency within all debian-live tools.
+
+  [ Ian Reinhart Geiser ]
+  * Fix to allow for multiple rof when exposed roots is disabled.
+
+  [ Tails developers ]
+  * Implement and make use of robust list functions.
+
+  [ chals ]
+  * Fixing several typos in man pages.
+  * Adding initial Spanish translation of man pages.
+
+  [ Evgeni Golov ]
+  * Fixing two typos and a wrong word in comments.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 04 Jun 2012 17:31:32 +0200
+
+live-boot (3.0~a27-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Only looking at boot.d files if they have the .conf suffix to allow
+    putting other files into these places that do not necessarily need
+    to be used by live-boot (e.g. documentation).
+  * Removing preseed bottom-script, a newly written one is now in live-
+    config where this sort of things belong.
+  * Removing header in fstab, not required.
+  * Removing outdated and broken accessibility script, this will be
+    redone in live-config properly.
+  * Replacing 'illegal' with better fitting 'invalid' for wrongly
+    crafted input examples in live.persist manpage.
+  * Consistently using ext4 in all examples, not a mix of ext2 and ext3.
+  * Removing user and userfullname variables in scripts/live, they are
+    not used here sind live-config anymore.
+  * Renaming /live/cow to /live/overlay in anticipation of overlayfs.
+  * Using 'persistence' (noun) rather than 'persistent'
+    (adjective/adverb) everywhere.
+  * Making extraction of the manpage section in manpages/Makefile work
+    with multiple dots in the filename.
+  * Renaming live.persist to live-persistence.conf.
+
+  [ Tails developers ]
+  * Adding support for the findiso boot parameter (Closes: #656135).
+  * Fixing findiso argument parsing place to match the existing
+    ordering.
+  * Removing overkill double-checking of return code in is_mountpoint
+    predicate.
+  * Fixing brace alignment to follow common code style.
+  * Removing leftover directory after unmounting.
+
+  [ Daniel Baumann ]
+  * Removing old docs.
+  * Merging old changelog into current changelog.
+  * Updating toplevel Makefile to work with manpages having multiple
+    dots in its filename.
+  * Renamling linkfiles option when using persistence to simply link.
+
+  [ Tails developers ]
+  * Allow using / as destination in custom mounts.
+  * Supress warnings when probing media for persistence.
+  * Do not probe the device mounted on /live/image for persistence.
+  * Fix typo to make home-sn snapshots work again.
+  * Only try copying snapshots if we actually found any.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 09 Apr 2012 18:58:06 +0200
+
+live-boot (3.0~a26-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating year in copyright.
+  * Updating copyright file machine-readable format version 1.0.
+  * Updating to standards version 3.9.3.
+  * Quoting noprompt variable in initscript to avoid syntax errors,
+    thanks to Philip Newborough <corenominal@corenominal.org>.
+  * Correcting log_end_msg usages in connection with verbosity checks in
+    live-boot initscript, thanks to Pablo Barbachano
+    <pablobarbachano@yahoo.es> (Closes: #665689).
+  * Replacing live-boot initscript with a stub and moving the actual
+    code to /lib/live/boot.sh to allow different initsystem support in
+    future.
+  * Removing some of the now useless sysvinit specifics from
+    bin/boot.sh.
+
+  [ Tails developers ]
+  * Adding initial work on a custom mounts system.
+
+  [ Daniel Baumann ]
+  * Correcting indenting initial work on a custom mounts system to
+    ensure consistency.
+  * Avoid calling rm without -f in initial work on a custom mounts
+    system to ensure non-interactivity.
+  * Avoid '==' bashism in initial work on a custom mounts system to
+    ensure posix compatiblity.
+
+  [ Tails developers ]
+  * Prevent custom mounting in /live.
+  * Optionally symlink files from persistent source instead of mount it.
+  * Separate overlay labels for full and custom persistence.
+  * Remove some temporary custom mount related files after they're used.
+
+  [ Daniel Baumann ]
+  * Calling rm without -f when removing some temporary custom mount
+    related files to ensure non-interactivity.
+
+  [ Tails developers ]
+  * Handle custom mounts options a bit more beautifully.
+  * Continue the correct for-loop so incorrect custom mount is skipped.
+  * Refactor union mounting into its own function.
+  * Workaround busybox's inability to detect symlinks with [ -e ].
+  * Make union mounting more sensible and robust.
+  * Ignore empty lines in live.persist.
+  * Remove the correct file.
+  * Optionally mount custom mounts as unions.
+  * Fix mask usage in links_files().
+
+  [ Daniel Baumann ]
+  * Correcting syntax when using if constructs in links_files().
+
+  [ Tails developers ]
+  * Refactor persistent custom mounting from live into live-helpers.
+  * Accept using several persistent media with custom-ov label.
+  * Use same device backing path as used in other places.
+  * Close unused LUKS devices in all cases.
+
+  [ Daniel Baumann ]
+  * Adjusting mount calls when using nfs options (Closes: #667435).
+
+  [ Tails developers ]
+  * Refactor live-boot argument parser from live into live-helpers.
+  * Refactor some global variables from live into live-helpers.
+  * Refactor find_persistent_media().
+  * Add support for probing partitions' GPT name just like filesystem
+    labels.
+  * Some minor cleanups.
+  * Handle already mounted devices and closing of unused luks devices
+    better.
+  * Add backwards compatibility for old labels: live-{rw,sn} and home-
+    rw.
+  * We don't black list storage devices any more.
+  * Check if luks device is already open before trying to open it.
+  * Fixup some style issues.
+  * Refactor mounting of persistent storage media.
+  * Cleanup.
+  * Remove two FIXME:s that are not really relevant.
+  * Don't allow . or .. in live.persist paths.
+  * Use trim_path when we compare paths.
+  * Make handling of LUKS encrypted GPT partitions more sane.
+  * Handle list arguments better in get_custom_mounts().
+  * Copy ownership/perms from source to rw-branch in read-only mode.
+  * Change live.persist syntax to "SOURCE [DEST [OPTIONS...]]".
+  * Refactor closing of persistent devices upon failure.
+  * Create the source dir for custom mounts using the 'linkfiles'
+    option.
+  * Fix ownership/perms for created union/linkfiles source dirs.
+  * Do not allow mutually exclusive custom mount options.
+  * Add a note about a potential, future code simplification.
+  * Greatly simplify live.persist syntax to "DIR [OPTIONS...]".
+  * Make trim_path() handle "/", and arbitrarily many consecutive /:es.
+  * Make two custom mounts with nested source directories illegal.
+  * Improve error message.
+  * Remove cow dir contents that are in the way for custom mounts.
+  * Also create parents when creating union/linkfiles source
+    directories.
+  * Update live-boot(7) man page and add new one for live.persist(5).
+  * Delete existing files in the destination's path when creating it.
+  * Adding functions equivalent to chmod/chown --reference.
+  * Fix ownership for links created for linkfiles custom mounts.
+  * Add 'bind' option for the default behaviour of custom mounts (bind-
+    mount).
+  * Use trim_path() instead of custom sed stanza to trim /:es from
+    paths.
+  * Copy perms/ownership from source when creating linkfiles dest dirs.
+  * Make cases for all different custom mounting situations more
+    explicit.
+
+  [ Daniel Baumann ]
+  * Correcting left-over in author section of live.persist manpage.
+  * Moving initscript to live-config.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 05 Apr 2012 08:14:51 +0200
+
+live-boot (3.0~a25-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating to debhelper version 9.
+
+  [ Michal Suchanek ]
+  * Add overlayfs support (Closes: #658265).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Feb 2012 23:27:38 +0100
+
+live-boot (3.0~a24-1) unstable; urgency=low
+
+  * Removing quotes from udev path_id command to actually execute the
+    command.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 04 Dec 2011 09:58:23 +0100
+
+live-boot (3.0~a23-1) unstable; urgency=low
+
+  [ Tails developers ]
+  * Enabling whiteouts support for aufs.
+
+  [ Daniel Baumann ]
+  * Update udevs path_id changes as of version 174, thanks to Baurzhan
+    Muftakhidinov <baurthefirst@gmail.com> for spotting it.
+
+  [ Tails developers ]
+  * Adding persistent-encryption={none|luks}.
+  * Making persistent-encryption=luks strict.
+  * Making sure dm-crypt is loaded when dealing with LUKS devices.
+  * Adding persistent-storage=TYPE...
+  * Removing now obsolete persistent=* arguments.
+  * Adding persistent-method=METHOD...
+  * Fixing an incorrectly redirected newline.
+  * Clarifying what happens when you don't retry decrypting a device.
+  * Refactoring device scanning in find_{cow_device,files}.
+  * Making use of is_supported_fs in find_cow_devices (like in
+    find_files).
+  * Refactoring overlay and snapshot scanning code.
+  * Fixing a "sh: bad number" when $offset is not passed to
+    setup_loop().
+  * Disabling persistent-encryption=luks if dependencies are
+    unavailable.
+  * Adding persistent-read-only boot parameter.
+  * Changing persistent-encryption to accept a list TYPE... instead.
+  * Updating live-boot man page for persistent-encryption.
+  * Updating live-boot man page for persistent-storage.
+  * Updating live-boot man page for persistent-method.
+  * Updating and rewording live-boot man page for the persistent option.
+  * Making persistent-read-only work for home-rw overlays.
+  * Making persistent-read-only work for live-rw overlays.
+  * Updating live-boot man page for persistent-read-only.
+  * Adding workaround for a busybox bug with grep -w.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 28 Nov 2011 18:26:11 +0100
+
+live-boot (3.0~a22-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Using compression level 9 also for binary packages.
+  * Updating matching in is_nice_device to, amongst others, match for
+    virtio devices.
+  * Include overlayfs modules in initramfs if existing.
+
+  [ Marco Amadori ]
+  * Fix live-snapshot exclude.list handling (Closes: #610337)
+
+  [ Daniel Baumann ]
+  * Sorting overrides in rules alphabetically.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 04 Nov 2011 11:37:28 +0100
+
+live-boot (3.0~a21-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Silencing rmdir calls in makefile.
+  * Printing out a warning message in initramfs-tools hook if backend is
+    installed but no live-boot package, exiting early and not breaking
+    update-initramfs (Closes: #639884).
+
+  [ Tails developers ]
+  * Fixing cache_path: cache non-executable libs dependencies as well.
+  * Fixing cache_path: taking into account the three forms of ldd output
+    lines.
+  * Adding a white_listed_devices parameter to find_cow_device and
+    find_files.
+  * Factorizing loops on removable/non-removable devices.
+  * Adding support for persistent-media={removable,removable-usb}.
+  * Silencing umount in case live/image was unmounted already, extracted
+    from a patch by Michael Schierl <schierlm@gmx.de>.
+  * Erroring out in case a "wrong" filesystem was chosen.
+
+  [ Daniel Baumann ]
+  * Using /usr/share/live-boot instead of unreliable
+    /usr/share/doc/live-boot in validateroot bootscript, stripped live
+    systems may or may not carry /usr/share/doc.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 08 Sep 2011 21:06:28 +0200
+
+live-boot (3.0~a20-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating section for live-boot-doc.
+
+  [ Ben Armstrong ]
+  * Cross-referencing lb_config --bootappend-live.
+
+  [ Daniel Baumann ]
+  * Correcting bootappend-live reference in live-boot manpage.
+  * Applying patch from grml to update forgotten use of live.log with
+    live-boot.log.
+  * Applying reformated patch from Ulrich Dangel <mru@grml.org> to add
+    support for lvm and md devices.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 04 Aug 2011 21:20:47 +0200
+
+live-boot (3.0~a19-1) unstable; urgency=low
+
+  * Correct rmdir call in top-level Makefiles uninstall target to not
+    fail if there was no prior live-boot installation.
+  * Making references to debian more distribution neutral.
+  * Replacing reference to old alioth page in live-snapshot.
+  * Splitting out documentation so that it can be accesses separately
+    from the initramfs code.
+  * Adding conflicts/replaces for live-boot to live-boot-doc to not
+    break upgrades.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 13 Jul 2011 10:28:33 +0200
+
+live-boot (3.0~a18-1) unstable; urgency=low
+
+  * Updating and correcting sendsigs.omit support for /run (Closes:
+    #628188).
+  * Removing accidentally twice included English files when installing
+    manpages.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 11 Jun 2011 11:24:15 +0200
+
+live-boot (3.0~a17-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating to standards version 3.9.2.
+  * Using /run/initramfs instead of /dev/.initramfs/varrun for unionfs-
+    fuse sendsigs (Closes: #621908).
+  * Updating manpage wrt/ ip parameter squence (Closes: #616197).
+  * Making copyright file distribution neutral.
+  * Correcting top-level makefile to automatically get all the supported
+    languages, rather than defining a static list.
+
+  [ Michal Suchanek ]
+  * Copy resolv.conf to live system root (Closes: #627178).
+  * Tidy up resolv.conf a bit.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 18 May 2011 19:31:27 +0200
+
+live-boot (3.0~a16-1) unstable; urgency=low
+
+  * Adding old 2.x changelog entries in debian changelog.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 14 Mar 2011 06:27:17 +0100
+
+live-boot (3.0~a15-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating year in copyright.
+
+  [ Marco Amadori ]
+  * Adjust copyright entry in live-snapshot.
+  * Protect NOPROMPT (Closes: #610941).
+
+  [ Michal Suchanek ]
+  * Simplify union mounting.
+  * Really set limit on open files for unionfs-fuse
+  * Add verbose messages to initramfs hook.
+
+  [ T(A)ILS developers ]
+  * Fixing remaining fromiso= bug.
+  * Fixing syntax error.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 09 Mar 2011 18:01:07 +0100
+
+live-boot (3.0~a14-1) experimental; urgency=low
+
+  [ Richard Nelson ]
+  * Populate adapters in /etc/network/interfaces when ethdevice= on
+    cmdline.
+
+  [ Daniel Baumann ]
+  * Removing header in copyright file.
+  * Don't hard-depend on test target in Makefile.
+  * Using dh auto magic in override, rather than manual make call.
+
+  [ Steven Shiau ]
+  * Removing the duplicated "the" in the live-boot.init script.
+
+  [ Daniel Baumann ]
+  * Updating auto_install overrides in rules.
+  * Correcting live hook to include mtdblock for syslinux memdisk usage,
+    thanks to Michael Prokop <mika@grml.org>.
+  * Supporting /dev/mtdblock0 as valid device name (for memdisk boot),
+    thanks to Michael Prokop <mika@grml.org>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 11 Jan 2011 13:38:56 +0100
+
+live-boot (3.0~a13-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Removing legacy code for detecting removable usb sticks on kernels
+    prior 2.6.29.
+  * Logging to /var/log/live-boot.log instead of /var/log/live.log for
+    future consistency with live-config.
+  * Adding support for custom ramdisk size (Closes: #544583).
+
+  [ Ronny Standtke ]
+  * Remounting cow read-only before prompting user to remove usb flash
+    drive.
+
+  [ Richard Nelson ]
+  * Clean some leading whitespaces.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Dec 2010 11:27:07 +0100
+
+live-boot (3.0~a12-1) experimental; urgency=low
+
+  [ T(A)ILS developers ]
+  * Fixing fromiso= on Squeeze.
+
+  [ Daniel Baumann ]
+  * Adding dpkg source options file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Nov 2010 23:29:48 +0100
+
+live-boot (3.0~a11-1) experimental; urgency=low
+
+  [ T(A)ILS developers ]
+  * Adding noprompt={usb,cd} feature.
+  * Enhancing devices search ordering.
+
+  [ Daniel Baumann ]
+  * Removing deep link to bug page in the manual, since we don't have
+    stable references yet.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 28 Oct 2010 09:28:43 +0200
+
+live-boot (3.0~a10-1) experimental; urgency=low
+
+  * Don't do anything in initscript when using toram (Closes: #601575).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Oct 2010 14:58:03 +0200
+
+live-boot (3.0~a9-1) experimental; urgency=low
+
+  [ amnesia ]
+  * Adding live-snapshot.list documentation to manpage.
+
+  [ Richard Nelson ]
+  * Removed whitespace for tabs on the skipunion option.
+
+  [ T(A)ILS developers ]
+  * Fixing overzealous blacklist usage.
+  * Adding documentation for persistent=cryptsetup in the manpage.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 26 Oct 2010 09:24:51 +0200
+
+live-boot (3.0~a8-1) experimental; urgency=low
+
+  [ Michal Suchanek ]
+  * Adding initial support for unionmount.
+
+  [ Marco Amadori ]
+  * Included a note about persistent-subtext (Helps: #536728).
+
+  [ Daniel Baumann ]
+  * Running manpage rebuild after manpage updates.
+  * Updating to debhelper version 8.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 02 Oct 2010 10:15:03 +0200
+
+live-boot (3.0~a7-1) experimental; urgency=low
+
+  [ intrigeri ]
+  * Fixing find_snap to take its second argument into account.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 25 Sep 2010 22:46:54 +0200
+
+live-boot (3.0~a6-1) experimental; urgency=low
+
+  [ Marco Amadori ]
+  * Fix snapshots' sync-strings usage (Closes: #591330).
+  * Fixed some snapshot related debug messages.
+  * Added support for empty (initial) snapshots.
+
+  [ Daniel Baumann ]
+  * Adding patch from Colin Watson <cjwatson@ubuntu.com> to follow
+    symlinks when checking for dynamically linked files at reboot in
+    initscript.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 14 Sep 2010 08:51:59 +0200
+
+live-boot (3.0~a5-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Applying patch from Luke Yelavich <themuso@ubuntu.com> to instead of
+    mangling the main sudoers file in accessibility bottom script,
+    create a new file in /etc/sudoers.d and set permissions
+    appropriately.
+  * Applying patch from Michael Casadevall <mcasadevall@ubuntu.com> to
+    add platform-sata_mv to is_nice_device() to allow Marvell Dove A0
+    and AVD1 to properly boot live media.
+  * Updating uinstall targets in makefile.
+
+  [ Steven Shiau ]
+  * Allowing to assign no gateway in networking bottom script.
+
+  [ Daniel Baumann ]
+  * Removing usplash support from initscript, usplash is dead.
+  * Removing lenny legacy stuff from initscript.
+  * Removing usplash support in initramfs, usplash is dead.
+  * Adding plymouth in bug script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Sep 2010 15:17:15 +0200
+
+live-boot (3.0~a4-1) experimental; urgency=low
+
+  * Exiting with 0 in live-boot bug script (Closes: #595262).
+  * Using boot.d instead of boot.conf.d as directory name for custom
+    configuration files.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 22:46:45 +0200
+
+live-boot (3.0~a3-1) experimental; urgency=low
+
+  * Updating seperators in networking bottom script to fix ip parameter
+    parsing (Closes: #590494).
+  * Updating live-build reference in manpages.
+  * Adding reference to live-tools in manpages.
+  * Checking for file existence in initramfs hook (Closes: #595264).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 18:28:40 +0200
+
+live-boot (3.0~a2-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Removing old and unmaintained po files.
+  * Adding reformated patch from Stephan Hermann <sh@sourcecode.de>
+    based on the work of Holger Fischer <hoo.mb@web.de> to add support
+    for BOOTIF in cases where pxelinux is being used with IPAPPEND
+    (Closes: #593284).
+
+  [ Steven Shiau ]
+  * Making multiple connected NICs work.
+
+  [ Michael Prokop ]
+  * Adding workaround for aufs issue in kernel versions around 2.6.33.
+
+  [ Daniel Baumann ]
+  * Using allow-hotplug instead of auto in automatically created
+    /etc/network/interfaces file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 01 Sep 2010 18:27:33 +0200
+
+live-boot (3.0~a1-1) experimental; urgency=low
+
+  * Switching to source format 3.0 (quilt).
+  * Removing live-initramfs transitional package.
+  * Removing lenny support.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 10 Aug 2010 02:02:39 +0200
+
+live-boot (2.0.15-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding live-system script from live-tools.
+  * Updating year in copyright.
+
+  [ Marco Amadori ]
+  * Adjust copyright entry in live-snapshot.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 01 Feb 2011 22:49:03 +0100
+
+live-boot (2.0.14-1) unstable; urgency=low
+
+  [ Steven Shiau ]
+  * Removing the duplicated "the" in the live-boot.init script.
+
+  [ Daniel Baumann ]
+  * Correcting live hook to include mtdblock for syslinux memdisk usage,
+    thanks to Michael Prokop <mika@grml.org>.
+  * Supporting /dev/mtdblock0 as valid device name (for memdisk boot),
+    thanks to Michael Prokop <mika@grml.org>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 24 Dec 2010 18:51:57 +0100
+
+live-boot (2.0.13-1) unstable; urgency=medium
+
+  [ Ronny Standtke ]
+  * Remounting cow read-only before prompting user to remove usb flash
+    drive.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Dec 2010 11:18:32 +0100
+
+live-boot (2.0.12-1) unstable; urgency=medium
+
+  [ T(A)ILS developers ]
+  * Fixing fromiso= on Squeeze.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Nov 2010 23:27:01 +0100
+
+live-boot (2.0.11-1) unstable; urgency=medium
+
+  * Removing deep link to bug page in the manual, since we don't have
+    stable references yet.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 28 Oct 2010 09:22:02 +0200
+
+live-boot (2.0.10-1) unstable; urgency=medium
+
+  * Don't do anything in initscript when using toram (Closes: #601575).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Oct 2010 14:54:58 +0200
+
+live-boot (2.0.9-1) unstable; urgency=low
+
+  [ T(A)ILS developers ]
+  * Fixing overzealous blacklist usage.
+  * Adding documentation for persistent=cryptsetup in the manpage.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 26 Oct 2010 09:15:54 +0200
+
+live-boot (2.0.8-1) unstable; urgency=medium
+
+  [ amnesia ]
+  * Adding live-snapshot.list documentation to manpage.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 12 Oct 2010 11:20:12 +0200
+
+live-boot (2.0.7-1) unstable; urgency=medium
+
+  [ Michal Suchanek ]
+  * Adding initial support for unionmount.
+
+  [ Marco Amadori ]
+  * Included a note about persistent-subtext (Helps: #536728).
+
+  [ Daniel Baumann ]
+  * Running manpage rebuild after manpage updates.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 02 Oct 2010 10:06:41 +0200
+
+live-boot (2.0.6-1) unstable; urgency=medium
+
+  [ intrigeri ]
+  * Fixing find_snap to take its second argument into account.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 25 Sep 2010 22:48:35 +0200
+
+live-boot (2.0.5-1) unstable; urgency=low
+
+  [ Marco Amadori ]
+  * Fix snapshots' sync-strings usage (Closes: #591330).
+  * Fixed some snapshot related debug messages.
+  * Added support for empty (initial) snapshots.
+
+  [ Daniel Baumann ]
+  * Adding patch from Colin Watson <cjwatson@ubuntu.com> to follow
+    symlinks when checking for dynamically linked files at reboot in
+    initscript.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 14 Sep 2010 08:55:02 +0200
+
+live-boot (2.0.4-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Applying patch from Luke Yelavich <themuso@ubuntu.com> to instead of
+    mangling the main sudoers file in accessibility bottom script,
+    create a new file in /etc/sudoers.d and set permissions
+    appropriately.
+  * Applying patch from Michael Casadevall <mcasadevall@ubuntu.com> to
+    add platform-sata_mv to is_nice_device() to allow Marvell Dove A0
+    and AVD1 to properly boot live media.
+  * Updating uinstall targets in makefile.
+
+  [ Steven Shiau ]
+  * Allowing to assign no gateway in networking bottom script.
+
+  [ Daniel Baumann ]
+  * Removing usplash support from initscript, usplash is dead.
+  * Removing usplash support in initramfs, usplash is dead.
+  * Adding plymouth in bug script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Sep 2010 15:21:24 +0200
+
+live-boot (2.0.3-1) unstable; urgency=low
+
+  * Exiting with 0 in live-boot bug script (Closes: #595262).
+  * Using boot.d instead of boot.conf.d as directory name for custom
+    configuration files.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 22:43:03 +0200
+
+live-boot (2.0.2-1) unstable; urgency=low
+
+  * Updating seperators in networking bottom script to fix ip parameter
+    parsing (Closes: #590494).
+  * Updating live-build reference in manpages.
+  * Checking for file existence in initramfs hook (Closes: #595264).
+  * Adding live-toram script to copy the running live system to ram and
+    eject the live media.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 18:25:12 +0200
+
+live-boot (2.0.1-1) unstable; urgency=low
+
+  [ Michael Prokop ]
+  * Adding workaround for aufs issue in kernel versions around 2.6.33.
+
+  [ Daniel Baumann ]
+  * Using allow-hotplug instead of auto in automatically created
+    /etc/network/interfaces file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 01 Sep 2010 18:25:08 +0200
+
+live-boot (2.0.0-1) unstable; urgency=low
+
+  * Updating debian-installer languagelist.
+  * Moving configs to etc directory within the source tree.
+  * Removing old docs.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 10 Aug 2010 01:48:01 +0200
+
+live-boot (2.0~a16-1) unstable; urgency=high
+
+  [ Daniel Baumann ]
+  * Adding support for resolving DNS names from initramfs, thanks to
+    Michal Suchanek <hramrach@centrum.cz> for initial patch which this
+    is based on (Closes: #589659).
+  * Don't fail in Makefile when there's no checkbashism.
+  * Updating package to standards version 3.9.1.
+
+  [ Michal Suchanek ]
+  * Fix omitpids to work with readonly images.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 28 Jul 2010 20:17:11 +0200
+
+live-boot (2.0~a15-1) unstable; urgency=low
+
+  * Making inclusion of languagelist conditional in live hook.
+  * Updating depends of live-initramfs transitional package to reflect
+    relaxed backend depends.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 17 Jul 2010 17:19:16 +0200
+
+live-boot (2.0~a14-1) unstable; urgency=low
+
+  * Improving backend dependencies (Closes: #589326).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 17 Jul 2010 00:37:33 +0200
+
+live-boot (2.0~a13-1) unstable; urgency=low
+
+  * Listing fromiso parameter in manpage (Closes: #588667).
+  * Improving test targets in Makefile a bit.
+  * Improving clean target in manpages Makefile a bit.
+  * Adding Chris in copyright file (for live-snapshot that is).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 15 Jul 2010 19:31:03 +0200
+
+live-boot (2.0~a12-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding preparations for booting through syslinux memdisk.
+
+  [ Marco Amadori ]
+  * Avoiding using busybox cpio applet, this should fix snapshot
+    restore.
+  * Do not print misleading debug message if the snapshot was found
+    correctly.
+  * Removing unreachable code in ethdevice argument handling (Closes:
+    #588307).
+
+  [ Daniel Baumann ]
+  * Adding btrfs support.
+  * Updating package to standards version 3.9.0.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 07 Jul 2010 20:13:54 +0200
+
+live-boot (2.0~a11-1) unstable; urgency=low
+
+  * Updating lintian overrides.
+  * Adding missing depends in live-boot on its backend package.
+  * Removing noautologin parameter from live script, this functionallity
+    was moved to live-config.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 20 Jun 2010 19:14:05 +0200
+
+live-boot (2.0~a10-1) unstable; urgency=low
+
+  * Removing depends on live-config in live-boot.
+  * Adding live-config-sysvinit to depends of live-initramfs.
+  * Alternatively depend on busybox or busybox-initramfs on live-boot-
+    initramfs-tools.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 17 Jun 2010 21:52:57 +0200
+
+live-boot (2.0~a9-1) unstable; urgency=low
+
+  [ Michal Suchanek ]
+  * Fix missing log_end_msg in live-boot.init.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 11 Jun 2010 18:42:23 +0200
+
+live-boot (2.0~a8-1) unstable; urgency=low
+
+  * Removing serialtty bottom script.
+  * Removing compcache configuration file.
+  * Removing options that are now in live-config from parameters.txt.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 10 Jun 2010 12:38:52 +0200
+
+live-boot (2.0~a7-1) unstable; urgency=low
+
+  [ Michal Suchanek ]
+  * Adding initial iSCSI boot support.
+  * Really set NETBOOT with iSCSI.
+  * Document iscsi in the man page.
+
+  [ Daniel Baumann ]
+  * Removing xconfig, xdriver, and xvideomode scripts, live-config takes
+    care about that now.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 08 Jun 2010 20:22:33 +0200
+
+live-boot (2.0~a6-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating update-version script.
+  * Updating update-version script.
+  * Removing keyboard bottom script, live-config takes care about that
+    now.
+  * Removing getty and login wrappers, live-config takes care about that
+    now.
+  * Removing configure_init bottom script, live-config takes care about
+    that now.
+
+  [ Michal Suchanek ]
+  * Moving check for iso image in initscript from the start to the end
+    before ejecting media.
+  * Using sendsigs.omit to avoid killing / (Closes: #584690).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 08 Jun 2010 06:03:21 +0200
+
+live-boot (2.0~a5-1) unstable; urgency=low
+
+  [ Michal Suchanek ]
+  * Fixing http boot:
+
+  [ Daniel Baumann ]
+  * Ammending 2.0~a3-1 changelog entry with bug number.
+
+  [ Michal Suchanek ]
+  * Adding support for booting iso images over http or wget.
+
+  [ Daniel Baumann ]
+  * Renaming internal ext_mountpoint variable to alt_mountpoint for
+    clarity.
+
+  [ Michal Suchanek ]
+  * Removing leftover url= option, this ain't gonna work this way, see
+    fetch=.
+  * Adding DHCP debugging option.
+  * Updating docs wrt/ httpfs.
+
+  [ Daniel Baumann ]
+  * Dropping /etc/live.conf, replaced mostly by /etc/live/config.conf of
+    live-config.
+  * Removing apt_cdrom bottom script, not used anyway.
+  * Removing some boot parameters obsoleted by live-config.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 05 Jun 2010 14:13:10 +0200
+
+live-boot (2.0~a4-1) unstable; urgency=low
+
+  * Removing obsolete boot parameter from manpages.
+  * Running checkbashisms with -f and -x in Makefile.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jun 2010 22:47:20 +0200
+
+live-boot (2.0~a3-1) unstable; urgency=low
+
+  * Removing umountfs bottom script, not needed anymore (see #518463).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 30 May 2010 09:28:32 +0200
+
+live-boot (2.0~a2-1) unstable; urgency=low
+
+  * Removing locales  bottom script, now handled by live-config.
+  * Simplyfing makefile a bit.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 May 2010 22:42:36 +0200
+
+live-boot (2.0~a1-1) experimental; urgency=low
+
+  * Initial release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 May 2010 10:46:39 +0200
+
+live-initramfs (1.236.2-1) unstable; urgency=medium
+
+  * Removing spurious '+' when making debconf db read-only (Closes:
+    #581808).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 18 May 2010 06:51:31 +0200
+
+live-initramfs (1.236.1-1) unstable; urgency=low
+
+  * Merging casper 1.216.
+  * Merging casper 1.217.
+  * Merging casper 1.218.
+  * Merging casper 1.219.
+  * Merging casper 1.220.
+  * Merging casper 1.221.
+  * Merging casper 1.222.
+  * Merging casper 1.223.
+  * Merging casper 1.224.
+  * Merging casper 1.225.
+  * Merging casper 1.226.
+  * Merging casper 1.227.
+  * Merging casper 1.228.
+  * Merging casper 1.229.
+  * Merging casper 1.230.
+  * Merging casper 1.231.
+  * Merging casper 1.232.
+  * Merging casper 1.233.
+  * Merging casper 1.234.
+  * Merging casper 1.235.
+  * Merging casper 1.236.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 16 May 2010 06:03:01 +0200
+
+live-initramfs (1.215.1-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Merging casper 1.200.
+  * Merging casper 1.201.
+  * Merging casper 1.202.
+  * Merging casper 1.203.
+  * Merging casper 1.204.
+  * Merging casper 1.205.
+  * Merging casper 1.206.
+  * Merging casper 1.207.
+  * Merging casper 1.208.
+  * Merging casper 1.209.
+  * Merging casper 1.210.
+  * Merging casper 1.211.
+  * Merging casper 1.212.
+  * Merging casper 1.213.
+  * Merging casper 1.214.
+  * Merging casper 1.215.
+
+  [ Steven Shiau ]
+  * No timeout as running ipconfig for network booting.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 02 May 2010 15:52:01 +0200
+
+live-initramfs (1.199.1-1) unstable; urgency=low
+
+  * Updating maintainer field.
+  * Merging casper 1.178.
+  * Merging casper 1.179.
+  * Merging casper 1.180.
+  * Merging casper 1.181.
+  * Merging casper 1.182.
+  * Merging casper 1.183.
+  * Merging casper 1.184.
+  * Merging casper 1.185.
+  * Merging casper 1.186.
+  * Merging casper 1.187.
+  * Merging casper 1.188.
+  * Merging casper 1.189.
+  * Merging casper 1.190.
+  * Merging casper 1.191.
+  * Merging casper 1.192.
+  * Merging casper 1.193.
+  * Move dummy start target in initscript.
+  * Merging casper 1.194.
+  * Merging casper 1.195.
+  * Merging casper 1.196.
+  * Merging casper 1.197.
+  * Merging casper 1.198.
+  * Merging casper 1.199.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Apr 2010 19:19:23 +0200
+
+live-initramfs (1.177.2-1) unstable; urgency=low
+
+  [ Marco Amadori ]
+  * Do not specify 'noxino' between directories.
+
+  [ Michael Prokop ]
+  * Support bootoptions ethdevice and ethdevice-timeout for specifying
+    from which device you want to boot from and using which timeout
+    (being 30 seconds if unconfigured), if ethdevice is not specified
+    try to get a working network configuration for each existing network
+    device.
+  * Prefer removable devices over non-removable devices, so scan them
+    first.
+  * Support unusual device names like /dev/cciss/c0d0p1 in isofrom
+    bootoption.
+  * Do not leak modprobe options to avoid booting errors with kernel
+    options like libata.dma=0.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 05 Apr 2010 10:07:12 +0200
+
+live-initramfs (1.177.1-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Removing etch compatibility.
+  * Merging casper 1.174.
+  * Adding proper code comments about vol_id removal.
+  * Merging casper 1.175.
+
+  [ Steven Shiau ]
+  * Making select_eth_device work with 2nd NIC linked only and FETCH
+    assigned.
+  * Moving select_eth_device from init-premount to live-premount where
+    "udevadm" commands are not required.
+
+  [ Daniel Baumann ]
+  * Merging casper 1.176.
+  * Merging casper 1.177.
+  * Adding message to notify users when live-initramfs is falling back
+    to unionfs-fuse.
+  * Manually loading fuse when required.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 17 Mar 2010 20:29:01 +0100
+
+live-initramfs (1.173.5-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating contact information in copyright file.
+  * Simplyfing initramfs triggers (Closes: #521129, #545842).
+  * Wrapping fields in control file.
+  * Using minimized rules file.
+  * Simplifying wording in bug-presubj file.
+
+  [ Andreas Teuchert ]
+  * Calling udevadm settle in scripts/init-premount/select_eth_device
+    (Closes: #570100).
+
+  [ Tanguy Ortolo ]
+  * Also respecting persistent-path parameter for snapshots (Closes:
+    #570162).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 14 Mar 2010 23:27:57 +0100
+
+live-initramfs (1.173.4-1) unstable; urgency=low
+
+  * Only disabling kpersonalizer when using kde3, kde4 doesn't need that
+    hack.
+  * Correcting path in previous commit.
+  * Disabling kaboom (Closes: #556368).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>11.localhost>  Fri, 12 Mar 2010 18:21:00 +0100
+
+live-initramfs (1.173.3-1) unstable; urgency=low
+
+  * Using noxino instead of xino, as the latter is not supported by
+    aufs2 as we need to use it.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 20 Feb 2010 16:16:46 +0100
+
+live-initramfs (1.173.2-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Updating homepage field in control.
+
+  [ amnesia ]
+  * Correcting live-media=removeable{,-usb} behaviour to match the
+    documented one.
+
+  [ Daniel Baumann ]
+  * Removing unionfs workaround for kernel versions << 2.6.22, not
+    usefull anymore.
+  * Mounting aufs layer with detached inode index, this solves the
+    'leaving unclean filesystem when using persistency' problem.
+  * Removing unused syncs in initscript.
+
+  [ Luigi Capriotti ]
+  * Skip loading usb modules when quickusbmodules parameter is
+    specified.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 20 Feb 2010 11:55:41 +0100
+
+live-initramfs (1.173.1-1) unstable; urgency=medium
+
+  [ intrigeri ]
+  * Taking noprompt into account for USB flash drives as well.
+  * Restoring opt-in behavior for local swap partitions.
+
+  [ Daniel Baumann ]
+  * Updating package to debhelper 7.
+  * Updating package to standards 3.8.3.
+  * Don't use dh_clean in favour of dh_prep.
+
+  [ Luigi Capriotti ]
+  * Also allowing hook= to specify files inside the image through
+    file:// prefix.
+
+  [ Daniel Baumann ]
+  * Forwardporting and extending usage of rsync when booting with toram
+    based on a patch from Michael Prokop <mika@grml.org>.
+
+  [ Michael Prokop ]
+  * Adding support for isofrom/fromiso bootoption.
+
+  [ Daniel Baumann ]
+  * Adapting a patch from Michael Prokop <mika@grml.org> to set all
+    harddisk devices to read-only mode for forensics investigations.
+
+  [ Michael Prokop ]
+  * Adding support for ethdevice bootoption.
+
+  [ Daniel Baumann ]
+  * Merging casper 1.158.
+  * Merging casper 1.159.
+  * Merging casper 1.160.
+  * Merging casper 1.161.
+  * Merging casper 1.162.
+  * Merging casper 1.163.
+  * Merging casper 1.164.
+  * Merging casper 1.165.
+  * Merging casper 1.166.
+  * Merging casper 1.167.
+  * Merging casper 1.168.
+  * Merging casper 1.169.
+  * Merging casper 1.170.
+  * Merging casper 1.171.
+  * Merging casper 1.172.
+  * Merging casper 1.173.
+  * Adding skipconfig parameter to disable most customization.
+
+  [ Marco Amadori ]
+  * cpio snapshots: eval commands fix.
+
+  [ Daniel Baumann ]
+  * Updating defaults file of console-setup for squeeze, thanks to Jun
+    NOGATA <nogajun@gmail.com> (Closes: #560187).
+  * Adding explicit debian source version 1.0 until switch to 3.0.
+  * Adding select_eth_device script from Frederic Boiteux
+    <fboiteux@calistel.com>.
+  * Including rsync conditionally.
+  * Updating year in copyright file.
+  * Don't panic with persistency when we can't correctly mount the
+    filesystem (Closes: #565456).
+
+  [ Ben Armstrong ]
+  * Correcting keyboard handling for squeeze.
+  * Only edit usplash init script if it exists.
+  * Use klayout= for layout instead of kbd=.
+
+  [ Daniel Baumann ]
+  * Updating to standards version 3.8.4.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 31 Jan 2010 16:44:08 +0100
+
+live-initramfs (1.157.4-2) unstable; urgency=high
+
+  [ Michael Prokop ]
+  * Avoid the use of fstype in a running live system, as it's
+    a executable and not a shell function and causes problems
+    for example within live-snapshot.
+  * Switch from vol_id to blkid if using udev >=146-1 (Closes: #555529).
+
+  [ Tzafrir Cohen ]
+  * Adjusting grep call in is_nice_device to match new output of vol_id.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 21 Nov 2009 19:07:41 +0100
+
+live-initramfs (1.157.4-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Forcing run of dexconf when booting with xdriver=dexconf.
+  * Adding (experimental) forcepersistentfsck bootoption to force fsck
+    on root persistency device.
+  * Adding presubj for reportbug.
+  * Removing unused sed call in update target of Makefile.
+  * Updating included languagelist from d-i.
+  * Correcting install calls for reportbug files in rules.
+  * Including d-i languagelist in initrd in order evaluate l10n
+    settings.
+  * Updating lang2locale(); to match new d-i langualgelist format.
+  * Adding additional two sync calls before powerof happens in order to
+    deal with 'does not cleanly unmount' problem when using root
+    persistency.
+  * Updating vcs fields.
+  * Adding auto value for xvideomode where we ensure that no
+    configuration from the persistency layer is respected.
+
+  [ Marco Amadori ]
+  * Fixed FIXME sections in manpages.
+
+  [ Daniel Baumann ]
+  * Including udev binaries in initramfs manually for squeeze and newer
+    (Closes: #547149).
+  * Applying patch from Holger Brunn <holger.brunn@web.de> to live-
+    media-path when toram is used (Closes: #534878).
+  * Simplyfing and correcting udev inclusion in initramfs hook.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 18 Oct 2009 20:29:31 +0200
+
+live-initramfs (1.157.3-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Initial commit for having support for swapfiles.
+  * Initial commit for having support for persistency on luks.
+
+  [ Marco Amadori ]
+  * Partition snapshots works again.
+  * Added "whole partition" snapshot resync type.
+  * Two return code consistency fix.
+  * Improved an useful debug string.
+  * Cleaned a bit the snapshot feature.
+
+  [ Steven Shiau ]
+  * Making fetch to work with file on sub dir on tftp server.
+
+  [ Daniel Baumann ]
+  * Avoiding echo bashism in live-initramfs.init by using printf instead
+    (Closes: #530128).
+  * Correcting wrong path when disabling anacron in 25configure_init,
+    thanks to Rui Bernardo <rui.bernardo.pt@gmail.com> (Closes:
+    #533046).
+  * Removing disabling of postfix in 25configure_init, it's not
+    appropriate for debian to do this by default. Thanks to Rui Bernardo
+    <rui.bernardo.pt@gmail.com>.
+  * Correcting typo in description of the ip boot parameter in live-
+    initramfs manpage, thanks to Philippe Leledy <debian@leledy.fr>
+    (Closes: #532471).
+
+  [ Marco Amadori ]
+  * Removed two bashisms on live-snapshot.
+
+  [ Daniel Baumann ]
+  * Correcting wrong abort logic in 21xdriver, thanks to Luigi Capriotti
+    <l.capriotti@xbmc.org>.
+
+  [ Luigi Capriotti ]
+  * Fixing possible invalid results from function where_is_mounted by
+    returning more than one line inwhere_is_mounted();.
+  * Fixing relaxed permissions of / in the live filesystem.
+  * Fixing invalid mangling of /etc/event.d/tty.
+  * Fixing typo in snapshot file list.
+
+  [ Daniel Baumann ]
+  * Correcting cryptsetup calls for persistency on luks.
+  * Copy live-installer-launcher desktop icon on users desktop.
+  * Also updating USB device detection in initramfs script for linux
+    2.6.29 and newer.
+  * Adding missing pipe in cryptsetup call for persistency on luks
+    partitions.
+  * Making plainroot work (Closes: #523120).
+
+  [ Marco Amadori ]
+  * persistent=nofiles fix (Closes: 522383).
+
+  [ Daniel Baumann ]
+  * Looking for persistency partitions on luks devices only if we boot
+    with persistent=cryptsetup.
+  * Fail early in gnome-panel-data bottom script if gnome-panel-data is
+    not installed.
+  * Optimizing gnome-panel-data bottom script by leaving out the stupid
+    things.
+
+  [ Richard Nelson ]
+  * Allow for multiple but unique persistent media.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 04 Sep 2009 13:37:57 +0200
+
+live-initramfs (1.157.2-1) unstable; urgency=medium
+
+  * Correcting fstab handling to not always append entries forever when using
+    persistency.
+  * Correcting kdm live-autologin handling to not always append entries forever
+    when using persistency.
+  * Correcting handling of locale default and environment handling to not always
+    append entries forever when using persistency.
+  * Correcting swap partition handling in fstab to not always append entries
+    forever when using persistency.
+  * Applying patch from Michael Prokop <mika@grml.org> to support udev >= 0.140.
+  * Merging swap live-bottom script into fstab script; there is no other sane
+    possibility to prevent appending again and again in persistent mode.
+  * Making sure that old swap entries are removed before new ones are added.
+  * Adding cryptsetup to recommends, it's used for encrypted persistent
+    partitions.
+  * Restoring previous behaviour of ejecting the cd when being in non-persistent
+    mode, thanks to Julien Cristau <jcristau@debian.org>.
+  * Updating eject prevention for USB devices in initscripts for linux 2.6.29
+    and newer.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 14 May 2009 10:00:00 +0200
+
+live-initramfs (1.157.1-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Only snapshotting in initscript when we actually run with persistence.
+
+  [ Rene Mayrhofer ]
+  * Checking if /var/log is writable before trying to copy live.log to the newly
+    mounted root filesystem (Closes: #516914).
+
+  [ Daniel Baumann ]
+  * Improving check in 21xdriver when we don't do anything.
+  * Adding hack to remove live specific filesystems from umounfs initscript
+    (Closes: #506410, #515718).
+  * Adding comsetic line wrapping for output of local-gen messages during boot.
+  * Merging casper 1.157.
+  * Only calling install-keymap if it's actually installed, which is always but
+    in minimal images the case though (Closes: #517153).
+  * Adding silent boot parameter.
+  * Respecting media timeout even when specificing media device manually.
+  * Also allowing to use the removable keyword for specifying a live media.
+  * Correcting accidental syntax error in one of the previous commits in
+    19keyboard bottom script.
+  * Adding removable-usb keyword to further restrict live media selection.
+  * Correcting check for usb when using removable-usb keyword.
+  * Correcting typo in locale bottom script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 21 Mar 2009 14:00:00 +0100
+
+live-initramfs (1.156.1-1) unstable; urgency=high
+
+  [ Daniel Baumann ]
+  * Revert using debhelper 7 command in rules.
+  * Updating copyright file.
+  * Prefixing debhelper files with package name.
+  * Updating bug script.
+  * Removing bashism in initscript.
+  * Usage of dialog in initscript is not actually a todo.
+  * Correcting medium eject message in initscript.
+  * Making medium removal message working again with usplash.
+  * Rewrapping init script.
+  * Reordering rules file.
+  * Merging casper 1.155.
+  * Adding ext4 support.
+  * Merging casper 1.156.
+  * Correct eject login in initscript.
+  * Updating parameters.txt.
+
+  [ Ronny Standtke ]
+  * Do not eject USB flash drives (Closes: #457070).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun,  8 Feb 2009 15:00:00 +0100
+
+live-initramfs (1.154.8-1) unstable; urgency=high
+
+  [ Kai Hendry ]
+  * Adding basic xrandr support for lenny to enforce a particular
+    resolution through bootparameter.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Jan 2009 00:00:00 +0100
+
+live-initramfs (1.154.7-1) unstable; urgency=medium
+
+  * Adding note about URL limitations in live-initramfs manpage when
+    using fetch parameter.
+  * Removing wc from hook again, that's an ubuntu only problem they have
+    to care about.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 27 Jan 2009 18:00:00 +0100
+
+live-initramfs (1.154.6-1) unstable; urgency=medium
+
+  * Replacing casper with live in live-new-uuid.
+  * Including wc in initramfs (Closes: #512413).
+  * Added missing variable quoting that lead to broken root persistence, thanks
+    to Thierry Walrant <debian.tgc@walrant.net> (Closes: #512656).
+  * Adding patch from Thierry Walrant <debian.tgc@walrant.net> to allow setting
+    a path for the persistence files through persistent-path boot parameter
+    (Closes: #512661).
+  * Adding persistent-path to parameter list and manpage.
+  * Actually building/cleaning manpages through targets in Makefile.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 26 Jan 2009 02:00:00 +0100
+
+live-initramfs (1.154.5-1) unstable; urgency=low
+
+  * Also checking for wicd in 23networking, thanks to Ben Armstrong
+    <synrg@debian.org>.
+  * Don't redirect output of fstype detection to standard out, thanks to Ronny
+    Standtke <Ronny.Standtke@gmx.net>.
+  * Silencing grep call on /etc/passwd.
+  * Silencing xorg reconfiguration, thanks to Ronny Standtke
+    <Ronny.Standtke@gmx.net>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 12 Jan 2009 13:00:00 -0500
+
+live-initramfs (1.154.4-1) unstable; urgency=low
+
+  [ Rene Mayrhofer ]
+  * Support further checks on loopback image and support skipping union
+    mounts (Closes: #509446).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 26 Dec 2008 09:00:00 +0100
+
+live-initramfs (1.154.3-1) unstable; urgency=medium
+
+  * Sourcing live.vars in 21xdriver and 21xvidemode in order to be able
+    to set variables in previous bottom scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 20 Dec 2008 15:00:00 +0100
+
+live-initramfs (1.154.2-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Updating authors file.
+
+  [ Marco Amadori ]
+  * Reworked integrity-check (Closes: #507477).
+  * Cleaned the boot log a bit.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 11 Dec 2008 06:00:00 +0100
+
+live-initramfs (1.154.1-1) unstable; urgency=low
+
+  * Merging casper 1.140-1.154.
+  * Add a warning message when no image can be found.
+  * Adding a panic message when we netboot and have no supported network
+    device (Closes: #496684).
+  * Turning 'no supported filesystem images found' into a panic message,
+    rather than a warning.
+  * Also adding ralink to network device check.
+  * Removing spurious 'livefs_root' in copy_live_to();.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 25 Nov 2008 12:00:00 +0100
+
+live-initramfs (1.139.1-4) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Remove (accidental?) debian/changelog entry.
+  * Use "grep -qs" over "grep -q" for compatibility (see grep(1))
+  * Use "test -s" instead of testing file availability and size.
+  * Be consistent in using 0/1 for True/False values instead of English
+    representations.
+  * Reflow some grammar in comments and in live-initramfs(7).
+  * Reflow long 'tr'-based pipelines for readability.
+  * Don't "cat |" to grep.
+
+  [ Daniel Baumann ]
+  * Replacing obsolete dh_clean -k with dh_prep.
+
+  [ Marco Amadori ]
+  * Changed HOSTNAME and /etc/hosts handling.
+  * Conditional creation of /etc/fstab.
+  * live-snapshot: fixed include-list handling.
+  * Reordered persistence lookups and boundaries (Closes: #500672).
+  * Search for partition labels only (Closes: #486469).
+  * Implemented a snapshot exclude list.
+  * Implemented a persistence exclude list.
+  * Manpage clarifications on "nofiles".
+  * Do not pollute the logs when looking for swap partitions.
+  * Removed all "cat | grep", with grep, awk and sed.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 11 Nov 2008 13:00:00 +0100
+
+live-initramfs (1.139.1-3) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Remove local overiddes of log_*_msg - #494257 is now fixed in testing.
+
+  [ Daniel Baumann ]
+  * Removing currently unused Upstream-Depends field in control.
+  * Updating vcs fields in control file.
+  * Sourcing live.vars in 15autologin directly, rather than to inherit
+    from live-functions.
+
+  [ Marco Amadori ]
+  * Removed some useless spaces.
+  * Fix default user handling.
+  * Added a pretty vital mount debug string.
+  * Create /etc/mtab on the initramfs ASAP.
+  * Removed mount -n option, since mtab is there.
+  * Re-enable "break=live-premount" debug.
+  * Skipped some runtime duplicated execution.
+  * Add real cpio to initramfs for snapshot's uses.
+  * Fixed try_snap() umounting on error.
+  * Override maybe_break from initramfs-tools.
+  * Forces use of initramfs cpio over busybox's one.
+  * Fixed a wrong trial to copy an unexistant snapshot.
+  * Check for files and umount only if you can mount it first.
+  * Included more debug and comments on persistence code.
+  * Set -u in live-snapshot only in debug mode.
+
+  [ Michael Prokop ]
+  * Ignore errors from fstype.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 19 Sep 2008 14:00:00 +0200
+
+live-initramfs (1.139.1-2) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * If the filesystem type of the rootfs cannot be automatically detected, we
+    try to assume it from the extension of the imagefile we have found. Thanks
+    to Jordi Pujol <jordi_pujol@telefonica.net> (Closes: #460456).
+  * Setting project email address to the new debian-live@lists.debian.org.
+  * Disabling default usage of local swap partitions. Can be enabled with the
+    'swapon' boot parameter. Thanks to Joseph Rawson <umeboshi3@gmail.com> for
+    bringing it up.
+
+  [ Michal Suchanek ]
+  * Enabling the "remove CD" prompt in splashy.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  1 Sep 2008 00:00:00 +0200
+
+live-initramfs (1.139.1-1) unstable; urgency=medium
+
+  [ Ben Voui ]
+  * Adding support for Virtio vd[a-z] drives.
+
+  [ Chris Lamb ]
+  * Move loop-aes-tools to Suggests; live-helper should install them if
+    required.
+  * Remove unnecessary indentation level.
+  * Modify hiding of harmless X.org reconfiguring messages.
+  * Revert to using uid 1000 as PAM bug seems to have disappeared
+    (Closes: #433076)
+  * Hide error from attempting to "mount --move"
+  * Rework ugly `echo "debug:..` message to use log_{begin,end}_msg.
+  * Don't configure X.org if it's not installed.
+  * Fix check for X.org.
+  * Add an /etc/fstab to the initramfs to silence harmless "empty fstab"
+    warnings.
+  * Silence another "script-not-executable" message for a sourced library.
+  * Add missing pipe. Thanks to Andreas Bombe.
+  * Shamefully adding myself to CREDITS
+  * Tidy "Disabling update-initramfs" message.
+  * Re-order some commands so we don't call log_begin_msg without calling
+    log_end_msg.
+  * Don't configure X when /usr/bin/X does not exist.
+  * Silence 'script-not-executable' lintian warning - live-functions script is
+    always sourced.
+  * Fix spacing in swirl.
+  * Override log_*_msg to print nicer status text (until #494257 is merged).
+  * Hide "overwriting possibly-customised configuration file" in X.org setup
+    output.
+  * Hide "Shadow passwords are now on" status message on bootup.
+  * Remove a number of "${quiet}" checks - they are repeated in the log_*_msg
+    functions.
+  * Rework locale handling
+  * Print friendly error message on live-initramfs panic.
+  * Fix path issue with live-preseed causing noisy errors when booting.
+  * Silence a number of annoying and distracting bootup messages.
+  * Add missing "log_end_msg" to live-bottom/21xdriver.
+  * Set different log messages for live-bottom/21{xdriver,xvidemode}.
+  * Remove trailing "..." from calls to log_begin_msg - they get added anyway.
+  * Move some arch-indep helper utilities to Build-Depends-Indep.
+  * Set default cow_mountopt where the other defaults are used.
+  * Don't use /sbin/losetup to test for '-r' option when the scripts just use
+    "lostup"
+
+  [ Daniel Baumann ]
+  * Updating authors file.
+  * Merging casper 1.139.
+  * Not going over the top with exclamation marks in the panic message.
+  * Updating credits file.
+  * Slightely adjusting to the more widespread used ascii swirl.
+  * Merging casper 1.138.
+  * Merging casper 1.137.
+
+  [ Marco Amadori ]
+  * Added "-n" option to all mount commands, thanks to Peter Holik
+    <peter@holik.at> for pointing this out.
+  * Be sure that the discovered filesystem is not null.
+  * The list of supported filesytems goes dynamic.
+  * Added ntfs filesystem to the initramfs.
+
+  [ Michael Prokop ]
+  * Move sourcing of live-functions in 38disable_restricted_manager to correct
+    place.
+
+  [ Steven Shiau ]
+  * Adding support for using tftp in fetch= parameter.
+  * Another fix about using udevsettle or "udevadm settle".
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 24 Aug 2008 00:00:00 +0200
+
+live-initramfs (1.136.3-1) unstable; urgency=medium
+
+  [ Michael Prokop ]
+  * Make sure mounting /cow-tmpfs provides mount options.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 18 Jul 2008 00:00:00 +0200
+
+live-initramfs (1.136.2-1) unstable; urgency=medium
+
+  * Replacing previous imperfect changes for udevadm with check for
+    udevadm and using old commands when beeing on etch. Also handling
+    udevtrigger with udevadm if available.
+  * Correcting httpfs2 inclusion in hook.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 16 Jul 2008 00:00:00 +0200
+
+live-initramfs (1.136.1-1) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Fix call to log_warning_msg. Thanks to Bradley Smith
+    <brad@brad-smith.co.uk>.
+  * Expand glob for kernels in post{inst,rm} to include "vmlinux"-prefixed
+    kernels on powerpc.
+  * Check losetup capabilities before specifying to mount as read-only.
+  * Modprobe 'esp' SCSI driver for the benefit of sparc.
+  * Quieten call to modprobe ide-generic.
+  * Move local-top/live to live-premount/modules so it gets called before
+    find_livefs.
+  * Sync bug script "dpkg -l" calls with debian/control
+
+  [ Daniel Baumann ]
+  * Defaulting now to aufs if no union= parameter is given.
+  * Merging casper version 1.136.
+  * Merging casper version 1.135.
+  * Merging casper version 1.134.
+  * Merging casper version 1.133.
+  * Converting udev depends into a versioned depends in order to reflect udevadm
+    introduction.
+  * Updating live-snapshot to GPL-3+.
+  * Updating to standards 3.8.0.
+  * Renaming forgotton uuid file to live-uuid.
+
+  [ Marco Amadori ]
+  * udevtrigger replacement.
+  * live-snapshot: fixed the remount helper.
+  * live-snapshot: now supports a static keep file list.
+  * Try to bind /cow to /live/cow if unable to move.
+  * live-snapshot: cleaned some wordings.
+  * live-snapshot: included vital informations on exit.
+  * live-snapshot: new "--refresh" option.
+  * live-snapshot: cleaned and sorted used command line defaults.
+  * live-snapshot: nicer default auto unmount logic.
+  * live-snapshot: honour "-o|--output FILE".
+  * live-snapshot: removed a useless mkdir.
+  * live-snapshot: removed an unused and useless function.
+  * live-snapshot: fixes snapshotting from resync string.
+
+  [ Michal Suchanek ]
+  * Add support for httpfs= and ftpfs= parameters.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 14 Jul 2008 00:00:00 +0200
+
+live-initramfs (1.132.1-1) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Don't escape asterisks in languagelist update code
+
+  [ Daniel Baumann ]
+  * Updating copyright header in live-snapshot.
+  * Removing useless whitespaces and empty lines.
+  * Correcting grammatical errors in live-snapshot description.
+  * Removing live-snapshot version as this component is always released
+    within live-initramfs itself.
+  * Adding Michal Suchanek <hramrach@centrum.cz> to credits file.
+  * Merging casper 1.132.
+  * Merging casper 1.131.
+  * Ignoring floppy devices for live filesystem as well as live
+    persistency.
+  * Adding patch from Michal Suchanek <hramrach@centrum.cz> to tail
+    live.log and show its messages during boot (Closes: #440238).
+  * Updating vcs fields in control file.
+  * Handling conflicting klibc includes with initramfs-hooks of other
+    packages (Closes: 475783).
+
+  [ Marco Amadori ]
+  * Fixes "live-snapshot on reboot could not find a writable '/tmp' or
+    '/mnt'" bug.
+  * Calling live-snapshot now produces an output file.
+
+  [ Michal Suchanek ]
+  * Workaround loop-aes-utils losetup incompatibility
+  * Fix toram (change mount --move to mount -o move)
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 02 Jun 2008 00:00:00 +0200
+
+live-initramfs (1.130.1-3) unstable; urgency=high
+
+  * Handle non-existing klibc includes in live hook (Closes: #475783).
+  * Adding loop-aes-utils to recommends.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 26 Apr 2008 16:00:00 +0200
+
+live-initramfs (1.130.1-2) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Remove bogus dependency on Ubuntu "localechooser-data" package
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 17 Apr 2008 06:00:00 +0200
+
+live-initramfs (1.130.1-1) unstable; urgency=medium
+
+  [ Chris Lamb ]
+  * Use triggers when calling update-initramfs in postinst and postrm
+
+  [ Daniel Baumann ]
+  * Sorting some lines in live hook.
+  * Merging casper 1.130.
+  * Merging casper 1.129.
+  * Adjusting code formating in maintainer scripts.
+  * Restricting counting of installed kernels based on /boot/vmlinuz-*
+    instead of /boot/vmlinuz*.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 14 Apr 2008 00:00:00 +0200
+
+live-initramfs (1.128.1-1) unstable; urgency=medium
+
+  [ Marco Amadori ]
+  * Fixed a misleading debug message.
+  * Added /cow mounting debug messages.
+  * Fixed /cow mounting.
+  * Klibc: added some libraries to the intramfs.
+
+  [ Daniel Baumann ]
+  * Merging casper 1.128.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  7 Apr 2008 00:00:00 +0200
+
+live-initramfs (1.127.1-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Merging casper 1.127.
+  * Merging casper 1.126.
+  * Removing too early recommends to live-initscripts in control to make
+    some people happy (Closes: #431000).
+
+  [ Chris Lamb ]
+  * hooks/live, scripts/live: Add USB modules, workaround udevtrigger
+    (?) bug
+  * scripts/live-helpers: Don't search ram block devices
+  * scripts/live-helpers: Search / use case
+  * scripts/live-helpers: Fixes for set -e
+  * bin/live-snapshot: Vastly rework script
+  * bin/live-snapshot: Fix argument handling (Closes: #461595)
+  * scripts/live: Make 'nopersistent' parameter actually disable
+    persistence
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 31 Mar 2008 00:00:00 +0200
+
+live-initramfs (1.125.1-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Merging casper 1.125.
+
+  [ Chris Lamb ]
+  * scripts/live-helpers: Cosmetic changes to loop-aes passphrase prompt
+  * Rename 18hostname -> 06hostname
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 Mar 2008 00:00:00 +0100
+
+live-initramfs (1.124.1-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Adjusting live-snapshot to live-initramfs.
+  * Merging casper 1.124.
+  * Adjusting 44pk_allow to live-initramfs.
+  * Merging casper 1.123.
+  * Merging casper 1.122.
+  * Merging casper 1.121.
+  * Merging casper 1.120.
+
+  [ Chris Lamb ]
+  * 99hook: Download hook script from inside target filesystem
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Mar 2008 00:00:00 +0100
+
+live-initramfs (1.119.1-1) unstable; urgency=medium
+
+  * Creating resolv.conf when netbooting not just when there's no
+    resolv.conf, but also when it is empty.
+  * Making hooks executable after fetching them.
+  * Removing disabling of kwallet.
+  * Merging casper 1.119.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 10 Mar 2008 00:00:00 +0100
+
+live-initramfs (1.118.2-1) unstable; urgency=medium
+
+  [ Andrey Asadchev ]
+  * Explicitly set Xorg video driver.
+  * Patch to use cryptsetup volumes for persistent storage.
+
+  [ Daniel Baumann ]
+  * New upstream release.
+  * Fixing wrong email address in changelog (was bug in git-dch config).
+  * Bumping package to policy 3.7.3.
+  * Rewriting copyright in machine-interpretable format.
+  * Adding hook parameter to execute custom scripts.
+  * Adding plainroot.
+
+  [ Marco Amadori ]
+  * Now it includes lzma kernel module dependencies.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  3 Mar 2008 00:00:00 +0100
+
+live-initramfs (1.118.1-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * New upstream release.
+  * Adding direct depends to udev, thanks to Anton Lundin
+    <glance@acc.umu.se> (Closes: #452448).
+  * Merging casper 1.111.
+  * Bumping version to 1.110.1-1.
+  * Merging casper 1.112.
+  * Merging casper 1.113.
+  * Adjusting to live-initramfs.
+  * Bumping version to 1.113.1-1.
+  * Merging casper 1.114.
+  * Merging casper 1.115.
+  * Merging casper 1.116.
+  * Merging casper 1.117.
+  * Merging casper 1.118.
+  * Bumping version to 1.118.1-1.
+
+  [ Otavio Salvador ]
+  * debian: add mtd-tools as suggestion since it's required for jffs2
+    support
+  * hooks: include jffs2 kernel module on initramfs image
+  * live-snapshot: add support to use jffs2 images
+  * live: add support for jffs2 images and snapshots
+  * live-helpers: add jffs2 as a valid image
+  * live-snapshot.en.1: add ext3 and jffs2 images as valid options
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 26 Feb 2008 13:35:00 +0100
+
+live-initramfs (1.110.7-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Fixing fstab handling.
+  * Fixing regression from mounting the ow device on a nfs volume,
+    thanks to An-Cheng Huang <ancheng@vyatta.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 19 Nov 2007 00:00:00 +0100
+
+live-initramfs (1.110.6-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Preparing live-initramfs 1.110.6-1.
+  * Adding custom reportbug script.
+  * Fixed a few bashisms, thanks to Trent W. Buck <trentbuck@gmail.com>.
+  * Adding checkbashsms call to test target of the Makefile as suggested
+    by Trent W. Buck <trentbuck@gmail.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 12 Nov 2007 00:00:00 +0100
+
+live-initramfs (1.110.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Preparing live-initramfs 1.110.5-1.
+  * Using kdm initscript autologin overrides, thanks to Kel Modderman
+    <kel@otaku42.de>.
+  * Setting the kdm language, thanks to Jordi Pujol
+    <jordi_pujol@telefonica.net>.
+  * Adding files to the live filesystem according to the MAC number,
+    thanks to Jordi Pujol <jordi_pujol@telefonica.net>.
+  * Fixing some coding style issues.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  5 Nov 2007 00:00:00 +0100
+
+live-initramfs (1.110.4-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * New upstream release.
+  * Preparing live-initramfs 1.110.3-1.
+  * Correcting homepage field.
+  * Correcting vcs fields.
+
+  [ Jesse Hathaway ]
+  * add support for mounting the cow device on an nfs volume
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 29 Oct 2007 00:00:00 +0100
+
+live-initramfs (1.110.3-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * New upstream release.
+  * Preparing live-initramfs 1.110.3-1.
+  * Removing ubuntu support.
+
+  [ Alex Owen ]
+  * Fix typo to get serial console to work
+
+  [ Jesse Hathaway ]
+  * add support for exposedroot option for live-helper
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Oct 2007 00:00:00 +0200
+
+live-initramfs (1.110.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Preparing live-initramfs 1.110.2-1.
+  * Fixing typing error.
+  * Removing nodiratime as it is already included in noatime, thanks to Kel
+    Modderman <kel@otaku42.de>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 15 Oct 2007 00:00:00 +0200
+
+live-initramfs (1.110.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Preparing live-initramfs 1.107.2-1.
+  * Also using nodiratime, not just noatime.
+  * Merging casper 1.108.
+  * Adjusting to live-initramfs.
+  * Merging casper 1.109.
+  * Adjusting to live-initramfs.
+  * Merging casper 1.110.
+  * Adjusting to live-initramfs.
+  * Bumping version to 1.110.1-1.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  8 Oct 2007 00:00:00 +0200
+
+live-initramfs (1.107.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Preparing live-initramfs 1.102.4-2.
+  * Replacing backticks with POSIX expression.
+  * Consistently using curly brackets for variables.
+  * Fixing bashism.
+  * Merging casper 1.105.
+  * Adjusting to live-initramfs.
+  * Bumping version to 1.105.1-1.
+  * Applied patch from Jesse W. Hathaway <jesse@mbuki-mvuki.org> to move
+    cow mount rather than binding it on /live/cow. This prevents the
+    /cow mount showing up in /proc/mounts.
+  * Merging casper 1.106.
+  * Adjusting to live-initramfs.
+  * Bumping version to 1.106.1-1.
+  * Fixing wrong homepage field.
+  * Fixing typing error.
+  * Merging casper 1.107.
+  * Bumping version to 1.107.1-1.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  1 Oct 2007 00:00:00 +0200
+
+live-initramfs (1.104.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 Sep 2007 00:00:00 +0200
+
+live-initramfs (1.102.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Sep 2007 00:00:00 +0200
+
+live-initramfs (1.99.2-1) unstable; urgency=medium
+
+  * New upstream release:
+    - Contains patch from Jim Paris <jim@jtan.com> to fix wrong ipconfig usage
+      (Closes: #440235).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 10 Sep 2007 00:00:00 +0200
+
+live-initramfs (1.99.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  3 Sep 2007 00:00:00 +0200
+
+live-initramfs (1.96.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 27 Aug 2007 00:00:00 +0200
+
+live-initramfs (1.96.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 20 Aug 2007 00:00:00 +0200
+
+live-initramfs (1.95.3-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 13 Aug 2007 00:00:00 +0200
+
+live-initramfs (1.95.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  6 Aug 2007 00:00:00 +0200
+
+live-initramfs (1.95.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 30 Jul 2007 00:00:00 +0200
+
+live-initramfs (1.91.6-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 23 Jul 2007 00:00:00 +0200
+
+live-initramfs (1.91.5-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 16 Jul 2007 00:00:00 +0200
+
+live-initramfs (1.91.4-1) unstable; urgency=medium
+
+  * New upstream release:
+    - Dropping transitional package, not needed anymore.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  9 Jul 2007 00:00:00 +0200
+
+live-initramfs (1.91.3-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  2 Jul 2007 00:00:00 +0200
+
+live-initramfs (1.91.2-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 25 Jun 2007 00:00:00 +0200
+
+live-initramfs (1.91.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 18 Jun 2007 00:00:00 +0200
+
+live-initramfs (1.90.1-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 11 Jun 2007 00:00:00 +0200
+
+live-initramfs (1.87.6-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  4 Jun 2007 00:00:00 +0200
+
+live-initramfs (1.87.5-1) unstable; urgency=medium
+
+  * New upstream release, replacing casper.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 28 May 2007 00:00:00 +0200
+
+live-initramfs (1.87.4-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 21 May 2007 00:00:00 +0200
+
+live-initramfs (1.87.3-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 14 May 2007 00:00:00 +0200
+
+live-initramfs (1.87.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon,  7 May 2007 00:00:00 +0200
+
+live-initramfs (1.87.1-1) unstable; urgency=low
+
+  * Initial release, forking casper.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 30 Apr 2007 00:00:00 +0200

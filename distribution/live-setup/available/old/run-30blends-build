@@ -1,0 +1,251 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+STATE="${TOP}/state"
+
+. ${LOCALCONF}/common.sh
+. ${LOCALCONF}/CONF.sh
+
+export CODENAME VERSION
+
+NAME="debian-live-$VERSION"
+
+if [ "$ARCHES"x = ""x ] ; then
+    ARCHES="amd64 i386"
+fi
+if [ "$TYPES"x = ""x ] ; then
+    TYPES="free non-free"
+fi
+if [ "$BUILDS"x = ""x ] ; then
+    case $CODENAME in
+	*)
+	    BUILDS="hamradio gis"
+	    ;;
+    esac
+fi
+
+build_started () {
+    export BUILDNAME=$1
+    BUILDS_RUNNING="$BUILDS_RUNNING $BUILDNAME"
+    DATE=`now`
+    export ${BUILDNAME}START=$DATE
+    echo "  Starting ${BUILDNAME} build: $DATE"
+}
+
+build_finished () {
+    BUILDNAME="$1"
+    BUILDNAMESTART="${BUILDNAME}START"
+    start=${!BUILDNAMESTART}
+
+    . ${STATE}/$BUILDNAME-trace
+
+    time_spent=`calc_time $start $end`
+    log "  $BUILDNAME build started at $start, ended at $end (took $time_spent), error $error"    
+}
+
+catch_parallel_builds () {
+    # Catch parallel builds here                                                                                               
+    while [ "$BUILDS_RUNNING"x != ""x  ] ; do
+	BUILDS_STILL_RUNNING=""
+	for BUILDNAME in $BUILDS_RUNNING; do
+            if [ -e $STATE/$BUILDNAME-trace ] ; then
+		build_finished $BUILDNAME
+            else
+		BUILDS_STILL_RUNNING="$BUILDS_STILL_RUNNING $BUILDNAME"
+            fi
+	done
+	BUILDS_RUNNING=$BUILDS_STILL_RUNNING
+	if [ "$BUILDS_RUNNING"x != ""x  ] ; then
+            sleep 1
+	fi
+    done
+}
+
+rename_zsync () {
+    for file in *.zsync; do
+	BASE=$(basename $file .zsync)
+	sed -i "s/^Filename:.*$/Filename: $BASE/g;s/^URL:.*$/URL: $BASE/g" $file
+    done
+}
+
+mkdir -p ${STATE}
+rm -rf ${STATE}/*
+
+BUILD_START=`now`
+log "Starting full live build (codename $CODENAME, version $VERSION) at $BUILD_START"
+
+for TYPE in $TYPES; do
+
+    TYPESTART=`now`
+
+    if [ ${TYPE} = "free" ] ; then
+	typestem=""
+	export DEBIAN_BUILD_WITH_NONFREE=0
+    else
+	typestem="+nonfree"
+	export DEBIAN_BUILD_WITH_NONFREE=1
+    fi	
+
+    WORK="${TOP}/work/${TYPE}"
+    OUT="${TOP}/out/${TYPE}"
+
+    mkdir -p ${WORK}
+    mkdir -p ${OUT}/source/tar
+
+    for ARCH in $ARCHES; do
+
+	ARCHSTART=`now`
+	
+	cd ${WORK}
+
+	DEBIAN_BUILD_ARCH=${ARCH}
+	export DEBIAN_BUILD_ARCH
+
+	mkdir live-images.${ARCH}.${TYPE}
+	cd live-images.${ARCH}.${TYPE}
+
+	mkdir -p ${OUT}/${ARCH}
+
+	case $CODENAME in
+	    jessie)
+		lb config --config https://anonscm.debian.org/git/blends/blends-images.git::68de26d50980a5d88f48f841d45b39aa1d4a923f
+		# Fix up breakage in live-build *sigh*
+		find . -name *.chroot -type f | xargs sed -i 's/task-printer-server//g'
+
+		# And make sure we're using the right graphics for Jessie...
+		find . -name 0001-plymouth-theme.hook.chroot | xargs sed -i 's/joy/lines/g'
+		if [ -f ${LOCALCONF}/splash.png ] ; then
+		    for DIR in $(find . -type f -name splash.svg | grep isolinux/ | xargs -n1 dirname); do
+			rm -vf $DIR/splash.svg
+			cp ${LOCALCONF}/splash.png $DIR
+		    done
+		fi
+		;;
+	
+	    stretch)
+		lb config --config https://anonscm.debian.org/git/blends/blends-images.git
+		# Fix up breakage in live-build *sigh*
+		find . -name *.chroot -type f | xargs sed -i 's/task-printer-server//g'
+
+		# And make sure we're using the right graphics for Jessie...
+		find . -name 0001-plymouth-theme.hook.chroot | xargs sed -i 's/joy/lines/g'
+		if [ -f ${LOCALCONF}/splash.png ] ; then
+		    for DIR in $(find . -type f -name splash.svg | grep isolinux/ | xargs -n1 dirname); do
+			rm -vf $DIR/splash.svg
+			cp ${LOCALCONF}/splash.png $DIR
+		    done
+		fi
+		;;
+	esac
+
+	# Make the images (in parallel)
+	cd images
+
+	# Start the different builds
+	for dir in ${BUILDS}; do
+	    cd $dir
+	    cp ${LOCALCONF}/auto-config auto/config
+	    lb clean
+
+	    BUILDNAME=$(echo ${TYPE}${ARCH}${dir} | sed 's,-,,g')
+	    build_started $BUILDNAME
+	    export BUILDNAME STATE
+
+	    # Wrapper to run lb build in parallel
+	    ${LOCALCONF}/lb-buildparallel &
+	    cd ..
+	done
+
+	catch_parallel_builds
+
+	end=`now`
+	time_spent=`calc_time $ARCHSTART $end`
+	log "  $ARCH $TYPE build started at $ARCHSTART, ended at $end (took $time_spent), moving files now"
+
+	MOVESTART=`now`
+	# Put the images into our tree
+	for dir in *; do
+	    echo "    $dir:"
+
+	    # Move into place in our tree
+	    cd $dir
+	    OD="${OUT}/${ARCH}/iso-hybrid"
+	    mkdir -p ${OD}
+	    BIN_BASE=$(ls -1 *.iso)
+	    NUM=$(echo $BIN_BASE | wc -l)
+	    if [ $NUM -ne 1 ] ; then
+		echo "Unexpected build results - did not get one binary ISO"
+		ls -l
+	    else
+		BIN_BASE=$(basename $BIN_BASE .hybrid.iso)
+		BIN_STEM="${OD}/${NAME}-${ARCH}-${dir}${typestem}"
+		mv ${BIN_BASE}.hybrid.iso ${BIN_STEM}.iso
+		mv ${BIN_BASE}.contents ${BIN_STEM}.iso.contents
+		mv ${BIN_BASE}.packages ${BIN_STEM}.iso.packages
+		mv ${BIN_BASE}.hybrid.iso.zsync ${BIN_STEM}.iso.zsync
+		mv build.log ${BIN_STEM}.iso.log
+	    fi
+
+	    OD="${OUT}/${ARCH}/webboot"
+	    mkdir -p ${OD}
+	    BIN_STEM="${OD}/${NAME}-${ARCH}-${dir}${typestem}"
+
+	    mv binary/live/filesystem.squashfs ${BIN_STEM}.squashfs
+	    mv binary/live/filesystem.packages ${BIN_STEM}.squashfs.packages
+	    if [ -f binary/live/initrd.img ] ; then
+		mv binary/live/initrd.img ${BIN_STEM}.initrd.img
+		mv binary/live/vmlinuz ${BIN_STEM}.vmlinuz
+	    fi
+	    for i in 1 2 3 4 5 ; do
+		if [ -f binary/live/initrd${i}.img ] ; then
+		    mv binary/live/initrd${i}.img ${BIN_STEM}.initrd${i}.img
+		    mv binary/live/vmlinuz${i} ${BIN_STEM}.vmlinuz${i}
+		fi
+	    done
+
+	    SRC_BASE=$(ls -1 *.live.tar)
+	    NUM=$(echo $SRC_BASE | wc -l)
+	    if [ $NUM -ne 1 ] ; then
+		echo "Unexpected build results - did not get source build"
+		ls -l
+	    else
+		SRC_BASE=$(basename $SRC_BASE .live.tar)
+		SRC_STEM=${OUT}/source/tar/${NAME}-source-${dir}${typestem}
+		for s in debian.contents debian.tar debian-live.contents debian-live.tar ; do
+		    if [ -f ${SRC_BASE}.${s} ] ; then
+			mv ${SRC_BASE}.${s} ${SRC_STEM}.${s}
+		    fi
+		done
+	    fi
+	    cd ..
+	done
+
+	end=`now`
+	time_spent=`calc_time $MOVESTART $end`
+	log "  $ARCH $TYPE move started at $MOVESTART, ended at $end (took $time_spent)"
+
+    done # for ARCH in $ARCHES ... build
+
+    CKSUMSTART=`now`
+    for ARCH in $ARCHES; do   
+	cd ${OUT}/${ARCH}/iso-hybrid && rename_zsync && checksum_files
+	cd ${OUT}/${ARCH}/webboot && checksum_files
+    done
+    
+    cd ${OUT}/source/tar && checksum_files
+
+    end=`now`
+    time_spent=`calc_time $CKSUMSTART $end`
+    log "  $TYPE checksums started at $CKSUMSTART, ended at $end (took $time_spent)"
+
+    time_spent=`calc_time $TYPESTART $end`
+    log "  $TYPE run started at $TYPESTART, ended at $end (took $time_spent)"
+
+done # for TYPE in $TYPES ... build
+
+BUILD_END=`now`
+time_spent=`calc_time $BUILD_START $BUILD_END`
+log "DONE. Full build started at $BUILD_START, ended at $BUILD_END (took $time_spent)"

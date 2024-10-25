@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+# This is a wrapper around the locfg.pl from HP. It's pretty silly to do
+# this as a wrapper, but that program is not licensed and I didn't feel
+# like doing a clean room reimplementation of it.
+# 
+# This wrapper knows how to do different simple actions, controlled by the
+# first parameter. It generates the XML commands and feeds them to
+# locfg.pl. See the top-level README for documentation of the environment
+# variables it expects to be set.
+#
+# GPL Copyright 2004 by Joey Hess.
+
+use strict;
+use IPC::Open2;
+use Expect;
+
+my $action=shift;
+if ($action eq 'reset') {
+	print "Resetting..\n";
+	send_command('server_info', qq{<RESET_SERVER/>});
+	exit process_result();
+}
+elsif ($action eq 'poweron') {
+	print "Powering on..\n";
+	send_command('server_info', qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	exit process_result();
+}
+elsif ($action eq 'poweroff') {
+	# Do a warm boot before turning off since iLO may not allow turning
+	# the power off if certain kernels (2.6) are running.
+	
+	# This is done using the telnet interface and expect because
+	# I do not know how to accomplish a warm boot using the xml
+	# interface. it requires iLO 1.60.
+	my $exp = new Expect;
+	$exp->raw_pty(1);
+	#$exp->debug(2);
+	#$exp->exp_internal(1);
+
+	$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
+
+	$exp->expect(60, "Login Name:");
+	$exp->send(getuser()."\r");
+
+	$exp->expect(10, "Password:");
+	$exp->send(getpassword()."\r");
+
+	$exp->expect(10, "iLO>");
+	$exp->send("power\r");
+
+	my $power;
+	$exp->expect(10, 
+		[ "Off" => sub { $power=0 } ],
+		[ "On" => sub { $power=1 } ],
+	);
+	$exp->expect(10, "iLO>");
+	if ($power) {
+		$exp->send("power warm\r");
+	}
+	$exp->soft_close;
+
+	sleep 2;
+	
+	print "Powering off..\n";
+	send_command('server_info', qq{<SET_HOST_POWER HOST_POWER="No"/>});
+	exit process_result();
+}
+elsif ($action eq 'force_restart') {
+	# This is done using the telnet interface and expect because
+	# I do not know how to accomplish a warm boot using the xml
+	# interface. it requires iLO 1.60.
+	my $exp = new Expect;
+	$exp->raw_pty(1);
+	#$exp->debug(2);
+	#$exp->exp_internal(1);
+
+	$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
+
+	$exp->expect(60, "Login Name:");
+	$exp->send(getuser()."\r");
+
+	$exp->expect(10, "Password:");
+	$exp->send(getpassword()."\r");
+
+	$exp->expect(10, "iLO>");
+	$exp->send("power\r");
+
+	my $power;
+	$exp->expect(10, 
+		[ "Off" => sub { $power=0 } ],
+		[ "On" => sub { $power=1 } ],
+	);
+	$exp->expect(10, "iLO>");
+	if ($power) {
+		$exp->send("power warm\r");
+	}
+	else {
+		$exp->send("power on\r");
+	}
+	$exp->expect(10, "iLO>");
+	sleep 1;
+	$exp->send("exit\r");
+	sleep 1;
+	$exp->interact;
+}
+elsif ($action eq 'get_host_power') {
+	send_command('server_info', qq{<GET_HOST_POWER_STATUS/>});
+	print "Power: ".scan_result("HOST_POWER")."\n";
+}
+elsif ($action eq 'connect_cd') {
+	send_command('rib_info', qq{<EJECT_VIRTUAL_MEDIA DEVICE="CDROM"/>});
+	process_result();
+	send_command('rib_info', qq{<INSERT_VIRTUAL_MEDIA DEVICE="CDROM" IMAGE_URL="$ENV{HP_ILO_ISO_URL}"/>});
+	process_result();
+	send_command('rib_info', qq{<SET_VM_STATUS DEVICE="CDROM">
+		<VM_BOOT_OPTION VALUE="CONNECT"/>
+	</SET_VM_STATUS>});
+	exit process_result();
+}
+elsif ($action eq 'boot_cd') {
+	send_command('rib_info', qq{<SET_VM_STATUS DEVICE="CDROM">
+		<VM_BOOT_OPTION VALUE="BOOT_ONCE"/>
+	</SET_VM_STATUS>});
+	exit process_result();
+}
+else {
+	print STDERR "unknown action $action\n";
+}
+
+sub send_command {
+	my $command=gen_command(@_);
+
+	if (! defined $ENV{HP_ILO_HOST}) {
+		die "Please set HP_ILO_HOST\n";
+	}
+
+	my $pid = open2 (\*RDRFH, \*WTRFH, "locfg.pl", "-s", $ENV{HP_ILO_HOST}, "-f", "-");
+	if (! $pid) {
+		die "failed to run locfg.pl: $!\n";
+	}
+
+	print WTRFH $command;
+	close WTRFH;
+}
+
+sub scan_result {
+	my $token=shift;
+	my $ret;
+	while (<RDRFH>) {
+		if (/$token="(.*?)"/) {
+			$ret=$1;
+		}
+	}
+	return $ret;
+}
+
+sub process_result {
+	my $error;
+	while (<RDRFH>) {
+		if (/MESSAGE='(.*?)'/) {
+			my $msg=$1;
+			if ($msg=~/error/i && lc($msg) ne "no error") {
+				$error=1;
+			}
+			elsif (lc($msg) eq 'no error') {
+				$error=0 unless defined $error;
+			}
+			else {
+				print "Message: $msg\n";
+			}
+		}
+	}
+	close RDRFH;
+
+	if (! defined $error) {
+		print STDERR "Parse failure or locfg run failed.\n";
+	}
+	
+	if (! defined $error || $error) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub gen_command {
+	my $type=uc(shift);
+	my $password=getpassword();
+	my $user=getuser();
+	return <<"EOF"
+<RIBCL VERSION="2.0">
+	<LOGIN USER_LOGIN="$user" PASSWORD="$password">
+		<$type MODE="write">
+			@_
+		</$type>
+	</LOGIN>
+</RIBCL>
+EOF
+}
+
+sub getpassword {
+	if (exists $ENV{HP_ILO_PASSWORD}) {
+		return $ENV{HP_ILO_PASSWORD};
+	}
+	die "Please set HP_ILO_PASSWORD\n";
+}
+
+sub getuser {
+	if (exists $ENV{HP_ILO_USER}) {
+		return $ENV{HP_ILO_USER}
+	}
+	die "Please set HP_ILO_USER\n";
+}

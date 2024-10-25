@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LIBVA_UTILS
+	bool "libva-utils"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # libva
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libva
+	select LINGMO_PACKAGE_LIBVA
+	help
+	  Libva-utils is a collection of tests for VA-API (Video
+	  Acceleration API)
+
+	  https://01.org/vaapi
+
+comment "libva-utils needs a toolchain w/ C++, threads, dynamic library"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS

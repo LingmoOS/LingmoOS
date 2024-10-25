@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_NCMPC
+	bool "ncmpc"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_10 # C++20
+	select LINGMO_PACKAGE_LIBMPDCLIENT
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  ncmpc is a fully featured MPD client, which runs in a terminal
+	  (using ncurses). Its goal is to provide a keyboard oriented
+	  and consistent interface to MPD, without wasting resources.
+
+	  http://www.musicpd.org/clients/ncmpc/
+
+comment "ncmpc needs a toolchain w/ C++, wchar, threads, gcc >= 10"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_10

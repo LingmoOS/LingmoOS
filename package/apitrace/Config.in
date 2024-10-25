@@ -1,0 +1,22 @@
+comment "apitrace needs a toolchain w/ C++, wchar, dynamic library, threads, gcc >= 7"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+
+config LINGMO_PACKAGE_APITRACE
+	bool "apitrace"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  Trace and replay OpenGL and OpenGL ES APIs calls to/from a
+	  file. You may install apitrace GUI from your distribution to
+	  inspect generated traces.
+
+	  http://apitrace.github.io/

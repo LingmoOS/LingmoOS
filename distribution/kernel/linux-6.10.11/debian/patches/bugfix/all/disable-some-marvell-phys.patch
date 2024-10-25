@@ -1,0 +1,91 @@
+From: Ian Campbell <ijc@hellion.org.uk>
+Subject: phy/marvell: disable 4-port phys
+Date: Wed, 20 Nov 2013 08:30:14 +0000
+Bug-Debian: https://bugs.debian.org/723177
+Forwarded: https://lore.kernel.org/netdev/1386932764.20787.85.camel@dagon.hellion.org.uk/
+
+The Marvell PHY was originally disabled because it can cause networking
+failures on some systems. According to Lennert Buytenhek this is because some
+of the variants added did not share the same register layout. Since the known
+cases are all 4-ports disable those variants (indicated by a 4 in the
+penultimate position of the model name) until they can be audited for
+correctness.
+
+[bwh: Also #if-out the init functions for these PHYs to avoid
+ compiler warnings]
+
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -1366,6 +1366,7 @@ static int m88e1118_config_init(struct p
+ 	return genphy_soft_reset(phydev);
+ }
+ 
++#if 0
+ static int m88e1149_config_init(struct phy_device *phydev)
+ {
+ 	int err;
+@@ -1391,7 +1392,9 @@ static int m88e1149_config_init(struct p
+ 
+ 	return genphy_soft_reset(phydev);
+ }
++#endif
+ 
++#if 0
+ static int m88e1145_config_init_rgmii(struct phy_device *phydev)
+ {
+ 	int err;
+@@ -1469,6 +1472,7 @@ static int m88e1145_config_init(struct p
+ 
+ 	return 0;
+ }
++#endif
+ 
+ static int m88e1540_get_fld(struct phy_device *phydev, u8 *msecs)
+ {
+@@ -3790,6 +3794,7 @@ static struct phy_driver marvell_drivers
+ 		.led_hw_control_set = m88e1318_led_hw_control_set,
+ 		.led_hw_control_get = m88e1318_led_hw_control_get,
+ 	},
++#if 0
+ 	{
+ 		.phy_id = MARVELL_PHY_ID_88E1145,
+ 		.phy_id_mask = MARVELL_PHY_ID_MASK,
+@@ -3813,6 +3818,8 @@ static struct phy_driver marvell_drivers
+ 		.cable_test_start = m88e1111_vct_cable_test_start,
+ 		.cable_test_get_status = m88e1111_vct_cable_test_get_status,
+ 	},
++#endif
++#if 0
+ 	{
+ 		.phy_id = MARVELL_PHY_ID_88E1149R,
+ 		.phy_id_mask = MARVELL_PHY_ID_MASK,
+@@ -3831,6 +3838,8 @@ static struct phy_driver marvell_drivers
+ 		.get_strings = marvell_get_strings,
+ 		.get_stats = marvell_get_stats,
+ 	},
++#endif
++#if 0
+ 	{
+ 		.phy_id = MARVELL_PHY_ID_88E1240,
+ 		.phy_id_mask = MARVELL_PHY_ID_MASK,
+@@ -3851,6 +3860,7 @@ static struct phy_driver marvell_drivers
+ 		.get_tunable = m88e1011_get_tunable,
+ 		.set_tunable = m88e1011_set_tunable,
+ 	},
++#endif
+ 	{
+ 		.phy_id = MARVELL_PHY_ID_88E1116R,
+ 		.phy_id_mask = MARVELL_PHY_ID_MASK,
+@@ -4139,9 +4149,9 @@ static struct mdio_device_id __maybe_unu
+ 	{ MARVELL_PHY_ID_88E1111_FINISAR, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1118, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1121R, MARVELL_PHY_ID_MASK },
+-	{ MARVELL_PHY_ID_88E1145, MARVELL_PHY_ID_MASK },
+-	{ MARVELL_PHY_ID_88E1149R, MARVELL_PHY_ID_MASK },
+-	{ MARVELL_PHY_ID_88E1240, MARVELL_PHY_ID_MASK },
++/*	{ MARVELL_PHY_ID_88E1145, MARVELL_PHY_ID_MASK }, */
++/*	{ MARVELL_PHY_ID_88E1149R, MARVELL_PHY_ID_MASK }, */
++/*	{ MARVELL_PHY_ID_88E1240, MARVELL_PHY_ID_MASK }, */
+ 	{ MARVELL_PHY_ID_88E1318S, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1116R, MARVELL_PHY_ID_MASK },
+ 	{ MARVELL_PHY_ID_88E1510, MARVELL_PHY_ID_MASK },

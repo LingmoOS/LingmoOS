@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_MINICOM
+	bool "minicom"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # fork
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  Minicom is a menu driven communications program. It emulates
+	  ANSI and VT102 terminals. It has a dialing directory and auto
+	  zmodem download.
+
+	  https://salsa.debian.org/minicom-team/minicom
+
+comment "minicom needs a toolchain w/ wchar"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR

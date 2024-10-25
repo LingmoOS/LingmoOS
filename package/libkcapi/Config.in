@@ -1,0 +1,48 @@
+config LINGMO_PACKAGE_LIBKCAPI
+	bool "libkcapi"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	help
+	  Linux Kernel Crypto API userspace interface library
+
+	  http://www.chronox.de/libkcapi.html
+
+if LINGMO_PACKAGE_LIBKCAPI
+
+config LINGMO_PACKAGE_LIBKCAPI_ASYM
+	bool "build asymmetric ciphers library"
+	help
+	  Using this library requires the Linux kernel to be patched
+	  with libkcapi Linux kernel patches found in libkcapi
+	  kernel-patches/ directory.
+
+config LINGMO_PACKAGE_LIBKCAPI_DGSTAPP
+	bool "build dgst application"
+
+config LINGMO_PACKAGE_LIBKCAPI_ENCAPP
+	bool "build enc application"
+
+config LINGMO_PACKAGE_LIBKCAPI_HASHER
+	bool "build hasher application"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+
+comment "hasher application needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_LIBKCAPI_KPP
+	bool "build KPP library"
+	help
+	  Using this library requires the Linux kernel to be patched
+	  with libkcapi Linux kernel patches found in libkcapi
+	  kernel-patches/ directory.
+
+config LINGMO_PACKAGE_LIBKCAPI_RNGAPP
+	bool "build rng read application"
+
+config LINGMO_PACKAGE_LIBKCAPI_SPEED
+	bool "build speed-test program"
+
+config LINGMO_PACKAGE_LIBKCAPI_TEST
+	bool "build test program"
+	depends on LINGMO_USE_MMU # fork()
+
+endif

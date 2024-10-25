@@ -1,0 +1,93 @@
+menuconfig LINGMO_PACKAGE_PINENTRY
+	bool "pinentry"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgpg-error
+	depends on LINGMO_USE_MMU # libassuan
+	select LINGMO_PACKAGE_LIBASSUAN
+	select LINGMO_PACKAGE_LIBGPG_ERROR
+	# At least one backend is needed to avoid build breakage
+	select LINGMO_PACKAGE_PINENTRY_NCURSES if \
+		!LINGMO_PACKAGE_PINENTRY_GTK2 && \
+		!LINGMO_PACKAGE_PINENTRY_QT5
+	help
+	  A collection of simple PIN or pass-phrase entry dialogs
+
+	  https://www.gnupg.org/related_software/pinentry/
+
+if LINGMO_PACKAGE_PINENTRY
+
+config LINGMO_PACKAGE_PINENTRY_EFL
+	bool "pinentry-efl"
+	depends on LINGMO_PACKAGE_EFL
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_EFL_X_XLIB
+	help
+	  The pinentry-efl tool
+
+comment "pinentry-efl needs efl and X"
+	depends on !LINGMO_PACKAGE_EFL || !LINGMO_PACKAGE_XORG7
+
+config LINGMO_PACKAGE_PINENTRY_FLTK
+	bool "pinentry-fltk"
+	depends on LINGMO_USE_MMU # fltk
+	depends on LINGMO_INSTALL_LIBSTDCPP # fltk
+	depends on LINGMO_PACKAGE_XORG7 # fltk
+	select LINGMO_PACKAGE_FLTK
+	help
+	  The pinentry-fltk tool
+
+comment "pinentry-fltk needs X and a toolchain w/ C++"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_PACKAGE_XORG7 || !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_PINENTRY_NCURSES
+	bool "pinentry-ncurses"
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  The pinentry-ncurses tool
+
+config LINGMO_PACKAGE_PINENTRY_GTK2
+	bool "pinentry-gtk2"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libgtk2 -> pango -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libgtk2 -> pango -> harfbuzz
+	select LINGMO_PACKAGE_LIBGTK2
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  The pinentry-gtk2 tool
+
+comment "pinentry-gtk2 needs X and a toolchain w/ wchar, threads, C++, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_PACKAGE_XORG7 || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_PINENTRY_QT5
+	bool "pinentry-qt5"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_HOST_GCC_AT_LEAST_5
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+	depends on !LINGMO_ARM_CPU_ARMV4
+	depends on !LINGMO_arc
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_QT5
+	select LINGMO_PACKAGE_QT5BASE_GUI
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS
+	help
+	  The pinentry-qt5 tool
+
+comment "pinentry-qt5 needs a host gcc >= 5.0, and a toolchain w/ wchar, NPTL, gcc >= 5.0, C++, dynamic library"
+	depends on !LINGMO_arc
+	depends on !LINGMO_ARM_CPU_ARMV4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || \
+		LINGMO_STATIC_LIBS || !LINGMO_HOST_GCC_AT_LEAST_5
+
+endif

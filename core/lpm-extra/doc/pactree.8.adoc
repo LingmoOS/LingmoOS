@@ -1,0 +1,79 @@
+pactree(8)
+==========
+
+Name
+----
+pactree - package dependency tree viewer
+
+
+Synopsis
+--------
+'pactree' [options] <package>
+
+
+Description
+-----------
+'pactree' produces a dependency tree for a package.
+
+By default, a tree-like output is generated, but with the '\--graph' option, a
+Graphviz description is generated.
+
+
+Options
+-------
+*-a, \--ascii*::
+	Use ASCII characters for tree formatting. By default, pactree will use
+	Unicode line drawing characters if it is able to detect that the locale
+	supports them.
+
+*-c, \--color*::
+	Colorize output.
+
+*\--config <file>*::
+	Specify an alternate lpm configuration file.
+
+*-b, \--dbpath*::
+	Specify an alternative database location.
+
+*\--debug*::
+	Print log messages produced by libalpm.
+
+*-d, \--depth <num>*::
+	Limits the number of levels of dependency to show. A zero means show the
+	named package only, one shows the packages that are directly required.
+
+*\--gpgdir <dir>*::
+	Specify an alternate GnuPG directory for verifying database signatures
+	(default is /etc/lpm.d/gnupg).
+
+*-g, \--graph*::
+	Generate a Graphviz description. If this option is given, the '\--color' and
+	'\--linear' options are ignored.
+
+*-h, \--help*::
+	Display syntax and command-line options.
+
+*-l, \--linear*::
+	Prints package names at the start of each line, one per line.
+
+*-o, \--optional[=depth]*::
+	Additionally prints optional dependencies up to a certain depth, default 1
+	for immediate optional dependencies. When used in conjunction with '-r' it
+	shows which packages it is optional for. In Graphviz mode, produce dotted
+	lines. Negative values mean infinite depth.
+
+*-r, \--reverse*::
+	Show packages that depend on the named package.
+
+*-s, \--sync*::
+	Read package data from sync databases instead of local database.
+
+*-u, \--unique*::
+	List dependent packages once. Implies '\--linear'.
+
+
+See Also
+--------
+linkman:lpm[8], linkman:lpm.conf[5], linkman:makepkg[8]
+
+include::footer.adoc[]

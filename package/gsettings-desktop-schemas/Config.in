@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_GSETTINGS_DESKTOP_SCHEMAS
+	bool "gsettings-desktop-schemas"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  gsettings-desktop-schemas contains a collection of GSettings
+	  schemas for settings shared by various components of a
+	  desktop.
+
+	  https://github.com/GNOME/gsettings-desktop-schemas
+
+comment "gsettings-desktop-schemas needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

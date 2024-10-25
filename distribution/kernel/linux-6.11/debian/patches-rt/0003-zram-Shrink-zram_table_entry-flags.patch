@@ -1,0 +1,49 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Thu, 20 Jun 2024 12:53:06 +0200
+Subject: [PATCH 3/3] zram: Shrink zram_table_entry::flags.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+The zram_table_entry::flags member is of type long and uses 8 bytes on a
+64bit architecture. With a PAGE_SIZE of 256KiB we have PAGE_SHIFT of 18
+which in turn leads to __NR_ZRAM_PAGEFLAGS = 27. This still fits in an
+ordinary integer.
+By reducing the size of `flags' to four bytes, the size of the struct
+goes back to 16 bytes. The padding between the lock and ac_time (if
+enabled) is also gone.
+
+Make zram_table_entry::flags an unsigned int and update the build test
+to reflect the change.
+
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://lore.kernel.org/20240906141520.730009-4-bigeasy@linutronix.de
+---
+ drivers/block/zram/zram_drv.c |    3 ++-
+ drivers/block/zram/zram_drv.h |    2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2404,9 +2404,10 @@ static void destroy_devices(void)
+ 
+ static int __init zram_init(void)
+ {
++	struct zram_table_entry zram_te;
+ 	int ret;
+ 
+-	BUILD_BUG_ON(__NR_ZRAM_PAGEFLAGS > BITS_PER_LONG);
++	BUILD_BUG_ON(__NR_ZRAM_PAGEFLAGS > sizeof(zram_te.flags) * 8);
+ 
+ 	ret = cpuhp_setup_state_multi(CPUHP_ZCOMP_PREPARE, "block/zram:prepare",
+ 				      zcomp_cpu_up_prepare, zcomp_cpu_dead);
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -66,7 +66,7 @@ struct zram_table_entry {
+ 		unsigned long handle;
+ 		unsigned long element;
+ 	};
+-	unsigned long flags;
++	unsigned int flags;
+ 	spinlock_t lock;
+ #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+ 	ktime_t ac_time;

@@ -1,0 +1,836 @@
+# i386/x86_64 cpu features
+config LINGMO_X86_CPU_HAS_MMX
+	bool
+config LINGMO_X86_CPU_HAS_3DNOW
+	bool
+config LINGMO_X86_CPU_HAS_SSE
+	bool
+config LINGMO_X86_CPU_HAS_SSE2
+	bool
+config LINGMO_X86_CPU_HAS_SSE3
+	bool
+config LINGMO_X86_CPU_HAS_SSSE3
+	bool
+config LINGMO_X86_CPU_HAS_SSE4
+	bool
+config LINGMO_X86_CPU_HAS_SSE42
+	bool
+config LINGMO_X86_CPU_HAS_AVX
+	bool
+config LINGMO_X86_CPU_HAS_AVX2
+	bool
+
+# LINGMO_X86_CPU_HAS_AVX512 implies the following AVX512 extensions:
+#   AVX512F, AVX512BW, AVX512CD, AVX512DQ, AVX512VL
+# This subset is common to Intel Xeon (excl Xeon Phi), AMD Zen 4, and
+# the x86-64-v4 psABI.
+#
+# Only select LINGMO_X86_CPU_HAS_AVX512 if the CPU supports this entire
+# subset of extensions.
+config LINGMO_X86_CPU_HAS_AVX512
+	bool
+
+# This list of CPU architecture variant is (loosely) ordered according
+# to the gcc documentation at
+# https://gcc.gnu.org/onlinedocs/gcc-13.2.0/gcc/x86-Options.html
+choice
+	prompt "Target Architecture Variant"
+	default LINGMO_x86_i586 if LINGMO_i386
+	depends on LINGMO_i386 || LINGMO_x86_64
+	help
+	  Specific CPU variant to use
+
+config LINGMO_x86_i486
+	bool "i486"
+	depends on !LINGMO_x86_64
+config LINGMO_x86_i586
+	bool "i586"
+	depends on !LINGMO_x86_64
+config LINGMO_x86_x1000
+	bool "x1000"
+	depends on !LINGMO_x86_64
+	help
+	  The Intel X1000 is a Pentium class microprocessor in the
+	  Quark (sub-Atom) Product Line. The X1000 has a bug on the
+	  lock prefix requiring that prefix must be stripped at build
+	  time.
+
+	  See https://en.wikipedia.org/wiki/Intel_Quark
+
+config LINGMO_x86_i686
+	bool "i686"
+	depends on !LINGMO_x86_64
+config LINGMO_x86_pentiumpro
+	bool "pentium pro"
+	depends on !LINGMO_x86_64
+config LINGMO_x86_pentium_mmx
+	bool "pentium MMX"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+config LINGMO_x86_pentium_m
+	bool "pentium mobile"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+config LINGMO_x86_pentium2
+	bool "pentium2"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+config LINGMO_x86_pentium3
+	bool "pentium3"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+config LINGMO_x86_pentium4
+	bool "pentium4"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+config LINGMO_x86_prescott
+	bool "prescott"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+config LINGMO_x86_x86_64
+	bool "x86-64 (amd64)"
+	depends on LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	help
+	  This option corresponds to -march=x86-64, documented as a
+	  "Generic CPU with 64-bit extensions" by the GCC
+	  documentation. It is a 64-bit CPU with MMX, SSE and SSE2
+	  support.
+config LINGMO_x86_x86_64_v2
+	bool "x86-64-v2"
+	depends on LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+	help
+	  This option corresponds to the x86-64-v2 micro-architecture
+	  level, as defined by the x86-64 psABI document, see
+	  https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex.
+
+	  It is close to the Nehalem CPU architecture, and is
+	  applicable for CPUs that support CMPXCHG16B, LAHF-SAHF,
+	  POPCNT, SSE3, SSE4.1, SSE4.2, SSSE3.
+config LINGMO_x86_x86_64_v3
+	bool "x86-64-v3"
+	depends on LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+	help
+	  This option corresponds to the x86-64-v3 micro-architecture
+	  level, as defined by the x86-64 psABI document, see
+	  https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex.
+
+	  It is close to the Haswell CPU architecture, and is
+	  applicable for CPUs that support all of x86-64-v2 plus AVX,
+	  AVX2, BMI1, BMI2, F16C, FMA, LZCNT, MOVBE, XSAVE.
+config LINGMO_x86_x86_64_v4
+	bool "x86-64-v4"
+	depends on LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+	help
+	  This option corresponds to the x86-64-v4 micro-architecture
+	  level, as defined by the x86-64 psABI document, see
+	  https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex.
+
+	  It is applicable for CPUs that support all of x86-64-v3 plus
+	  AVX512F, AVX512BW, AVX512CD, AVX512DQ, AVX512VL.
+config LINGMO_x86_nocona
+	bool "nocona"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+config LINGMO_x86_core2
+	bool "core2"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+config LINGMO_x86_corei7
+	bool "corei7"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	help
+	  This option is deprecated. Since gcc 4.9, the gcc option
+	  "nehalem" is preferred. Use LINGMO_x86_nehalem instead.
+config LINGMO_x86_nehalem
+	bool "nehalem"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_westmere
+	bool "westmere"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_corei7_avx
+	bool "corei7-avx"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	help
+	  This option is deprecated. Since gcc 4.9, the gcc option
+	  "sandybridge" is preferred. Use LINGMO_x86_sandybridge instead.
+config LINGMO_x86_sandybridge
+	bool "sandybridge"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_ivybridge
+	bool "ivybridge"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_core_avx2
+	bool "core-avx2"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	help
+	  This option is deprecated. Since gcc 4.9, the gcc option
+	  "haswell" is preferred. Use LINGMO_x86_haswell instead.
+config LINGMO_x86_haswell
+	bool "haswell"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_broadwell
+	bool "broadwell"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_skylake
+	bool "skylake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_6
+config LINGMO_x86_atom
+	bool "atom"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	help
+	  This option is deprecated. Since gcc 4.9, the gcc option
+	  "bonnell" is preferred. Use LINGMO_x86_bonnell instead.
+config LINGMO_x86_bonnell
+	bool "bonnell"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_silvermont
+	bool "silvermont"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_goldmont
+	bool "goldmont"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_goldmont_plus
+	bool "goldmont-plus"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_tremont
+	bool "tremont"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_sierraforest
+	bool "sierraforest"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_13
+config LINGMO_x86_grandridge
+	bool "grandridge"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_13
+config LINGMO_x86_knightslanding
+	bool "knightslanding"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_5
+config LINGMO_x86_knightsmill
+	bool "knightsmill"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_8
+config LINGMO_x86_skylake_avx512
+	bool "skylake-avx512"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_6
+config LINGMO_x86_cannonlake
+	bool "cannonlake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_8
+config LINGMO_x86_icelake_client
+	bool "icelake-client"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_8
+config LINGMO_x86_icelake_server
+	bool "icelake-server"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_8
+config LINGMO_x86_cascadelake
+	bool "cascadelake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_cooperlake
+	bool "cooperlake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_10
+config LINGMO_x86_tigerlake
+	bool "tigerlake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_sapphirerapids
+	bool "sapphirerapids"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+	help
+	  Use for Sapphire Rapids, Emerald Rapids
+config LINGMO_x86_alderlake
+	bool "alderlake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+	help
+	  Use for Alder Lake, Raptor Lake, Meteor Lake
+config LINGMO_x86_rocketlake
+	bool "rocketlake"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+config LINGMO_x86_graniterapids
+	bool "graniterapids"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_13
+config LINGMO_x86_graniterapids_d
+	bool "graniterapids-d"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_13
+config LINGMO_x86_k6
+	bool "k6"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+config LINGMO_x86_k6_2
+	bool "k6-2"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_3DNOW
+config LINGMO_x86_athlon
+	bool "athlon"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_3DNOW
+config LINGMO_x86_athlon_4
+	bool "athlon-4"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_3DNOW
+config LINGMO_x86_opteron
+	bool "opteron"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+config LINGMO_x86_opteron_sse3
+	bool "opteron w/ SSE3"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+config LINGMO_x86_barcelona
+	bool "barcelona"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+config LINGMO_x86_bobcat
+	bool "bobcat"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+config LINGMO_x86_jaguar
+	bool "jaguar"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_8
+config LINGMO_x86_bulldozer
+	bool "bulldozer"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+config LINGMO_x86_piledriver
+	bool "piledriver"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+config LINGMO_x86_steamroller
+	bool "steamroller"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_8
+config LINGMO_x86_excavator
+	bool "excavator"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_4_9
+config LINGMO_x86_zen
+	bool "zen"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_6
+config LINGMO_x86_zen2
+	bool "zen 2"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_9
+config LINGMO_x86_zen3
+	bool "zen 3"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_11
+config LINGMO_x86_zen4
+	bool "zen 4"
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+	select LINGMO_X86_CPU_HAS_SSE2
+	select LINGMO_X86_CPU_HAS_SSE3
+	select LINGMO_X86_CPU_HAS_SSSE3
+	select LINGMO_X86_CPU_HAS_SSE4
+	select LINGMO_X86_CPU_HAS_SSE42
+	select LINGMO_X86_CPU_HAS_AVX
+	select LINGMO_X86_CPU_HAS_AVX2
+	select LINGMO_X86_CPU_HAS_AVX512
+	select LINGMO_ARCH_NEEDS_GCC_AT_LEAST_13
+config LINGMO_x86_geode
+	bool "AMD Geode"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_3DNOW
+config LINGMO_x86_c3
+	bool "Via/Cyrix C3 (Samuel/Ezra cores)"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_3DNOW
+config LINGMO_x86_c32
+	bool "Via C3-2 (Nehemiah cores)"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+	select LINGMO_X86_CPU_HAS_SSE
+config LINGMO_x86_winchip_c6
+	bool "IDT Winchip C6"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+config LINGMO_x86_winchip2
+	bool "IDT Winchip 2"
+	depends on !LINGMO_x86_64
+	select LINGMO_X86_CPU_HAS_MMX
+endchoice
+
+config LINGMO_ARCH
+	default "i486"		if LINGMO_x86_i486
+	default "i586"		if LINGMO_x86_i586
+	default "i586"		if LINGMO_x86_x1000
+	default "i586"		if LINGMO_x86_pentium_mmx
+	default "i586"		if LINGMO_x86_geode
+	default "i586"		if LINGMO_x86_c3
+	default "i686"		if LINGMO_x86_c32
+	default "i586"		if LINGMO_x86_winchip_c6
+	default "i586"		if LINGMO_x86_winchip2
+	# We use the property of Kconfig that the first match of a
+	# list of default will be chosen. So the following entry will
+	# not match for all LINGMO_i386=y configurations, but only the
+	# ones that didn't match any of the previous cases (i486,
+	# i586).
+	default "i686"		if LINGMO_i386
+	default "x86_64"	if LINGMO_x86_64
+
+config LINGMO_NORMALIZED_ARCH
+	default "i386"		if !LINGMO_x86_64
+	default "x86_64"	if LINGMO_x86_64
+
+config LINGMO_ENDIAN
+	default "LITTLE"
+
+config LINGMO_GCC_TARGET_ARCH
+	default "i486"		if LINGMO_x86_i486
+	default "i586"		if LINGMO_x86_i586
+	default "i586"		if LINGMO_x86_x1000
+	default "pentium-mmx"	if LINGMO_x86_pentium_mmx
+	default "i686"		if LINGMO_x86_i686
+	default "pentiumpro"	if LINGMO_x86_pentiumpro
+	default "pentium-m"	if LINGMO_x86_pentium_m
+	default "pentium2"	if LINGMO_x86_pentium2
+	default "pentium3"	if LINGMO_x86_pentium3
+	default "pentium4"	if LINGMO_x86_pentium4
+	default "prescott"	if LINGMO_x86_prescott
+	default "x86-64"	if LINGMO_x86_x86_64
+	default "x86-64-v2"	if LINGMO_x86_x86_64_v2
+	default "x86-64-v3"	if LINGMO_x86_x86_64_v3
+	default "x86-64-v4"	if LINGMO_x86_x86_64_v4
+	default "nocona"	if LINGMO_x86_nocona
+	default "core2"		if LINGMO_x86_core2
+	default "corei7"	if LINGMO_x86_corei7
+	default "nehalem"	if LINGMO_x86_nehalem
+	default "corei7-avx"	if LINGMO_x86_corei7_avx
+	default "sandybridge"	if LINGMO_x86_sandybridge
+	default "ivybridge"	if LINGMO_x86_ivybridge
+	default "core-avx2"	if LINGMO_x86_core_avx2
+	default "haswell"	if LINGMO_x86_haswell
+	default "broadwell"	if LINGMO_x86_broadwell
+	default "skylake"	if LINGMO_x86_skylake
+	default "atom"		if LINGMO_x86_atom
+	default "bonnell"	if LINGMO_x86_bonnell
+	default "westmere"	if LINGMO_x86_westmere
+	default "silvermont"	if LINGMO_x86_silvermont
+	default "goldmont"	if LINGMO_x86_goldmont
+	default "goldmont-plus"	if LINGMO_x86_goldmont_plus
+	default "tremont"	if LINGMO_x86_tremont
+	default "sierraforest"	if LINGMO_x86_sierraforest
+	default "grandridge"	if LINGMO_x86_grandridge
+	default "knl"		if LINGMO_x86_knightslanding
+	default "knm"		if LINGMO_x86_knightsmill
+	default "skylake-avx512" if LINGMO_x86_skylake_avx512
+	default "cannonlake"	if LINGMO_x86_cannonlake
+	default "icelake-client" if LINGMO_x86_icelake_client
+	default "icelake-server" if LINGMO_x86_icelake_server
+	default "cascadelake"	if LINGMO_x86_cascadelake
+	default "cooperlake"	if LINGMO_x86_cooperlake
+	default "tigerlake"	if LINGMO_x86_tigerlake
+	default "sapphirerapids" if LINGMO_x86_sapphirerapids
+	default "alderlake"	if LINGMO_x86_alderlake
+	default "rocketlake"	if LINGMO_x86_rocketlake
+	default "graniterapids"	if LINGMO_x86_graniterapids
+	default "graniterapids-d"	if LINGMO_x86_graniterapids_d
+	default "k8"		if LINGMO_x86_opteron
+	default "k8-sse3"	if LINGMO_x86_opteron_sse3
+	default "barcelona"	if LINGMO_x86_barcelona
+	default "btver1"	if LINGMO_x86_bobcat
+	default "btver2"	if LINGMO_x86_jaguar
+	default "bdver1"	if LINGMO_x86_bulldozer
+	default "bdver2"	if LINGMO_x86_piledriver
+	default "bdver3"	if LINGMO_x86_steamroller
+	default "bdver4"	if LINGMO_x86_excavator
+	default "znver1"	if LINGMO_x86_zen
+	default "znver2"	if LINGMO_x86_zen2
+	default "znver3"	if LINGMO_x86_zen3
+	default "znver4"	if LINGMO_x86_zen4
+	default "k6"		if LINGMO_x86_k6
+	default "k6-2"		if LINGMO_x86_k6_2
+	default "athlon"	if LINGMO_x86_athlon
+	default "athlon-4"	if LINGMO_x86_athlon_4
+	default "winchip-c6"	if LINGMO_x86_winchip_c6
+	default "winchip2"	if LINGMO_x86_winchip2
+	default "c3"		if LINGMO_x86_c3
+	default "c3-2"		if LINGMO_x86_c32
+	default "geode"		if LINGMO_x86_geode
+
+config LINGMO_READELF_ARCH_NAME
+	default "Intel 80386"			if LINGMO_i386
+	default "Advanced Micro Devices X86-64" if LINGMO_x86_64
+
+# vim: ft=kconfig
+# -*- mode:kconfig; -*-

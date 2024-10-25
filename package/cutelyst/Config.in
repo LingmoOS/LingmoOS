@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_CUTELYST
+	bool "cutelyst"
+	depends on LINGMO_PACKAGE_QT5
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_3
+	select LINGMO_PACKAGE_QT5BASE_GUI
+	help
+	  A C++ Web Framework built on top of Qt, using
+	  the simple approach of Catalyst (Perl) framework.
+
+	  https://cutelyst.org
+
+comment "cutelyst needs a toolchain w/ C++, gcc >= 4.8, headers >= 3.3"
+	depends on LINGMO_PACKAGE_QT5
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_3

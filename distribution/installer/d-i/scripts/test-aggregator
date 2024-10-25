@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+# This program downloads summary log files for the automatic d-i install
+# tests, and constructs a web page overview. If you run an automatic test,
+# add the info for your build to the list. 
+#
+# The url field points to the url info about your test can be downloaded
+# from, the email address is a contact address, the description is a brief
+# description of the test. The logurl points to wherever log files are.
+# The logext is an extension that is appended to the log filename.
+#
+# In the log directory you should have a summary$logext file, that contains
+# lines in the following format:
+#    arch (date) user@host ident status [notes]
+#    
+# Where ident describes the test, arch is the architecture that is being 
+# tested, date is the output of the date command at the end of the test
+# (in the C locale), user@host is who did the test, and status describes
+# how it went (usually "success" or "failed"). A log file for the test
+# should in in the file named ident$logext in the log directory.
+#
+# Example:
+# i386 (Thu Apr 22 21:08:03 EDT 2004) joey@home elephant-d-i success
+
+# Note: only add items to the end of the list, do not reorder items or it
+# will mess up the stats file used for the graph.
+my @buildlist = (
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/alpha/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/alpha/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily alpha tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/amd64/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/amd64/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily amd64 tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/hppa/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/hppa/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily hppa tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 7,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/i386/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/i386/',
+		email => 'joeyh@debian.org',
+		description => 'joey\'s daily i386 tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/ia64/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/ia64/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily ia64 tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/mips/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/mips/',
+		email => 'joeyh@debian.org',
+		description => 'joey\'s daily mips tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/mipsel/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/mipsel/',
+		email => 'joeyh@debian.org',
+		description => 'joey\'s daily mipsel tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/s390/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/s390/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily s390 tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+	{
+		url => 'http://hydra.kitenet.net/~joey/d-i/logs/sparc/',
+		logurl => 'http://hydra.kitenet.net/~joey/d-i/logs/sparc/',
+		email => 'joeyh@debian.org',
+		description => 'Joey\'s daily sparc tests',
+		logext => ".html",
+		overviewext => ".log",
+		frequency => 1,
+		notes => '',
+	},
+
+#	{
+#		url => 'http://somehost/',
+#		logurl => 'http://somehost/',
+#		email => 'you@debian.org',
+#		description => 'put something informative here',
+#		logext => ".html",
+#		overviewext => ".log",
+#		frequency => 1,
+#	},
+);
+
+use warnings;
+use strict;
+require "aggregator.pl";
+
+my $basename=shift;
+if (! defined $basename) {
+	die "usage: $0 basename\n";
+}
+
+open (OUT, ">$basename.html.new") || die "$basename.html.new: $!";
+
+print OUT <<EOS;
+<html>
+<head>
+<title>debian-installer test overview</title>
+</head>
+<body>
+<ul>
+EOS
+
+my ($total, $failed, $success, $old) = aggregate(*OUT, undef, $basename, @buildlist);
+
+my $date=`LANG=C TZ=GMT date`;
+chomp $date;
+my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
+print OUT <<"EOS";
+</ul>
+
+Totals: $total tests ($failed failed, $old old)
+
+<hr>
+$date
+</body>
+</html>
+EOS
+
+close OUT;
+rename("$basename.html.new", "$basename.html") || die "rename: $!";

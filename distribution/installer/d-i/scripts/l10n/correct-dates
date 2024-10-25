@@ -1,0 +1,93 @@
+#!/bin/bash
+
+usage() {
+echo  "Usage:"
+echo  "$0 <lang> <D-I repository path> <packages_to_ignore>"
+}
+
+if [ -z "$3" ]
+then
+  usage
+  exit 1
+fi
+
+LANG=$1
+DI_COPY=$2
+
+# A few checks about the D-I copy directory
+if [ ! -d $DI_COPY ] ; then
+  echo $DI_COPY does not exist
+  exit 1
+fi
+
+if [ ! -d $DI_COPY/.git ] ; then
+  echo No $DI_COPY/.git directory found
+  echo $DI_COPY may not be a copy of Debian Installer GIT repository
+  exit 1
+fi
+
+if [ ! -f $DI_COPY/packages/languagechooser/debian/po/$LANG.po ] ; then
+  echo No translation found for languagechooser in $LANG
+  echo Are you sure that $LANG is an existing D-I translation?
+  exit 1
+fi
+
+DI_COPY=$2
+
+IGNORE=$3
+
+LANG=$1
+
+cd $DI_COPY
+cd packages
+echo -n Building a list of all packages with i18n material...
+pots=$(find . -mindepth 3 -name templates.pot |\
+          grep /debian/po/templates.pot\$)
+packages=$(echo $pots |\
+          sed 's/\.\///g'|\
+          sed 's/\/debian\/po\/templates\.pot//g')
+echo Done.
+
+CHANGELOG=debian/changelog
+RELEASE="unstable"
+
+for i in $packages ; do
+  if ! (echo $IGNORE | grep $i >/dev/null 2>&1) ; then
+     cd $DI_COPY/packages/$i
+    # Line number of the changelog's old date
+    LINE=`grep -a "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
+
+     # Date of the last release
+     DATE=`grep -a "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
+    OLD_DATE=`date -d "$DATE" +%s`
+
+    DATE2=`grep PO-Revision debian/po/$LANG.po | cut -d ":" -f 2,3 | sed 's/^ //g' | cut -d '\' -f 1`
+
+
+
+    # Workaround for some weird date formatting
+    if [ ! "`echo "$DATE2" | sed 's/GMT+//g'`" = "$DAT2" ]
+    then
+	DATE2="`echo "$DATE2" | sed 's/GMT//g'`"
+    fi
+
+    if date --date "$DATE2" 2>/dev/null 1>&2 
+    then
+	NEW_DATE=`date -d "$DATE" +%s`
+    fi
+
+    NEW2_DATE=`expr $OLD_DATE - 86400`
+
+    NEW3_DATE=`date -d "$DATE" "+%Y-%m-%d %H:%M+0000"`
+
+    echo $i:
+    echo "  Changelog: $DATE == $OLD_DATE"
+    echo "     $LANG.po: $DATE2 == $NEW_DATE"
+    echo " New $LANG.po: $NEW3_DATE"
+
+    cat debian/po/$LANG.po | sed "s/\"PO-Revision-Date:.*/\"PO-Revision-Date: $NEW3_DATE\\\\n\"/g" >debian/po/$LANG.po.new
+    
+    mv debian/po/$LANG.po.new debian/po/$LANG.po
+
+  fi
+done

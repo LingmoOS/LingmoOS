@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_USBGUARD
+	bool "usbguard"
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS # protobuf
+	depends on LINGMO_INSTALL_LIBSTDCPP # protobuf
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libqb, protobuf
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # C++17 filesystem
+	depends on !LINGMO_STATIC_LIBS # libqb, protobuf
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # std::future
+	select LINGMO_PACKAGE_PROTOBUF
+	select LINGMO_PACKAGE_LIBQB
+	select LINGMO_PACKAGE_LIBSODIUM if !LINGMO_PACKAGE_LIBGCRYPT && !LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  The USBGuard software framework
+
+	  Install a custom accept/deny list in /etc/usbguard/rules.conf
+	  (e.g. using an overlay). This file can be generated on the
+	  target using "usbguard generate-policy".
+
+	  https://usbguard.github.io/
+
+comment "usbguard needs a toolchain w/ C++, threads, dynamic library, gcc >= 8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+
+comment "usbguard needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

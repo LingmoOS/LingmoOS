@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# This test runs the out-of-order-mitm.py Flask app which debootstrap is then
+# pointed at.
+# out-of-order-mitm.py will return a Packages file which has an additional
+# `apt` stanza prepended, with the Version and Filename adjusted to point at
+# a lower, non-existent version.  Versions of debootstrap which process
+# _all_ Packages files entries will find the original stanza later in the file
+# (and succesfully fetch the corresponding package file): versions that don't
+# will find the prepended stanza and fail (with a 404 of the nonexistent
+# package file).
+
+export FLASK_ARCH="$(dpkg --print-architecture)"
+export FLASK_DIST=testing
+export FLASK_DISTRO=debian
+export FLASK_MIRROR=http://deb.debian.org
+export PATH=$PATH:/usr/sbin
+
+# Launch our MitM "mirror" server, ensure that request logging is sent to stdout
+PYTHONDONTWRITEBYTECODE=true FLASK_APP=debian/tests/out-of-order-mitm.py flask run 2>&1 &
+flask_pid=$!
+
+# Give Flask time to come up
+sleep 2
+
+tempdir=$(mktemp -d)
+# Run debootstrap against our MitM "mirror", ignoring the inevitable GPG errors
+debootstrap --download-only --variant minbase --no-check-gpg ${FLASK_DIST} $tempdir http://127.0.0.1:5000/${FLASK_DISTRO}/
+rc=$?
+
+rm -rf $tempdir
+kill $flask_pid
+
+exit $rc

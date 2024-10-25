@@ -1,0 +1,27 @@
+pkgname=gawk
+pkgver=5.3.0
+pkgrel=1
+pkgdesc="GNU version of awk"
+arch=('x86_64')
+url="https://www.gnu.org/software/gawk/"
+license=('GPL')
+depends=('sh' 'glibc' 'mpfr')
+provides=('awk')
+source=(https://ftp.gnu.org/pub/gnu/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+  cd ${pkgname}-${pkgver}
+  ./configure --prefix=/usr --libexecdir=/usr/lib --sysconfdir=/etc --without-libsigsegv
+  make
+}
+
+check() {
+  cd ${pkgname}-${pkgver}
+  make check
+}
+
+package() {
+  cd ${pkgname}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_HTOP
+	bool "htop"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	select LINGMO_PACKAGE_NCURSES
+	help
+	  htop is an interactive text-mode process viewer for Linux.
+	  It aims to be a better top.
+
+	  https://htop.dev/
+
+comment "htop needs a toolchain w/ dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS

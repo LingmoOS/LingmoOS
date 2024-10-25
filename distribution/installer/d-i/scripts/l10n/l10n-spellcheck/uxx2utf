@@ -1,0 +1,41 @@
+#! /usr/bin/perl -C1
+
+use encoding 'utf8';
+
+sub c {
+	my $text = shift;
+	my $ret = '';
+	my $lastpos = 0;
+	while ($text =~ m/\G(.*?)<U(....)>/g) {
+		$lastpos = pos($text);
+		$ret .= $1;
+		my $n = hex($2);
+		if ($n < 0x80) {
+			$ret .= pack("U", $n);
+		} elsif ($n < 0xc0) {
+			$ret .= pack("UU", 0xc2, $n);
+		} elsif ($n < 0x100) {
+			$ret .= pack("UU", 0xc3, $n & 0xbf);
+		} else {
+			$ret .= pack("U", $n);
+		}
+	}
+	return $ret.substr($text, $lastpos);
+}
+
+my $last = '';
+while (<>) {
+	if ($last ne '') {
+		$_ = $last . $_;
+		$last = '';
+	}
+	if (m/\/\s*$/s) {
+		s/\/\s*$//s;
+		$last = $_;
+		next;
+	}
+	s/"([^"]*)"/'"'.c($1).'"'/eg;
+	s/";\s*"/";"/g;
+	print;
+}
+

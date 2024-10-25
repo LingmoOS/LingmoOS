@@ -1,0 +1,73 @@
+#! /bin/bash
+
+# written to allow to rsync installer daily builds to d-i.d.o with proper forced commands
+# (c) Andi Barth 2010
+# GPLv2
+
+LOG=/srv/d-i.debian.org/home/logs/buildd-forced-command.log
+WWW=/srv/d-i.debian.org/www/daily-images
+
+set -e
+[ -n "$1" ] || exit 1
+arch=$1
+mkdir -p $WWW/${arch}
+cd $WWW/${arch}
+[ -n "$SSH_ORIGINAL_COMMAND" ] || exit 1
+
+set -- $SSH_ORIGINAL_COMMAND
+
+if echo "$*" | egrep -q '^rsync --server -logDtpre.iL(s)?(f)?(x)?(C)?(I)?(v)?(u)? . [0-9:-]*$'; then
+    echo "EXEC: rsync --server -logDtpre.iL . $WWW/${arch}/.$5" >> $LOG
+    rsync --server -logDtpre.iL . $WWW/${arch}/.$5
+    exit 0
+fi
+
+if echo "$*" | egrep -q '^unhide [0-9:-]*$'; then
+    echo "EXEC: unhide $2" >> $LOG
+    mv $WWW/${arch}/.$2 $WWW/${arch}/$2
+    ln -snf $2 $WWW/${arch}/daily
+    exit 0
+fi
+
+if echo "$*" | egrep -q '^mkdir -p /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    mkdir -p $3
+    exit $?
+fi
+if echo "$*" | egrep -q '^rsync --server -vlre.iLsf --delete --safe-links . /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    rsync --server -vlre.iLsf --delete --safe-links . $7
+    exit $?
+fi
+if echo "$*" | egrep -q '^test ! -d /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    test ! -d $4
+    exit $?
+fi
+if echo "$*" | egrep -q '^cp -a /srv/d-i.debian.org/www/daily-images/[a-z]'; then
+    echo "IGNORING: $*" >> $LOG
+    exit 0
+fi
+if echo "$*" | egrep -q '^rm -rf /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    rm -rf $3
+    exit $?
+fi
+if echo "$*" | egrep -q '^mv /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]* /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    mv $2 $3
+    exit $?
+fi
+if echo "$*" | egrep -q '^ln -sf [a-zA-Z_0-9:/-]* /srv/d-i.debian.org/www/daily-images/[a-zA-Z_0-9:/-]*$'; then
+    echo "EXEC: $*" >> $LOG
+    set +e
+    ln -sf $3 $4
+    exit $?
+fi
+
+echo "UNKNOWN: $*" >> $LOG

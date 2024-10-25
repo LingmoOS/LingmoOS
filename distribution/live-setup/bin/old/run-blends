@@ -1,0 +1,115 @@
+#!/bin/bash
+
+. ~/build/settings.sh
+
+SCRIPTS_SOURCE="/home/debian-cd/live/available"
+SCRIPTS_INPUT="/home/debian-cd/live/input"
+RSYNC_PORT=10873
+VM_IP=127.16.2.1
+CLOG=${OUT_BASE}/.live/new/log/current
+CURRENT_ERROR=0
+LOGFILE="/home/debian-cd/run-blends.log"
+
+. ${SCRIPTS_SOURCE}/common.sh
+
+rm -f $SCRIPTS_INPUT/*
+
+cd $SCRIPTS_INPUT
+if [ $? -ne 0 ] ; then
+    echo "Can't cd to $SCRIPTS_INPUT; error $?"
+    exit 1
+fi
+
+PID=$(check_running)
+if [ "$PID"x != ""x ] ; then
+    run_log "Abort: kvm / qemu already running as pid $PID"
+    exit 1
+fi
+
+if [ "$RELEASE_BUILD"x = ""x ] ; then
+    CONF=${SCRIPTS_SOURCE}/CONF.sh
+else
+    CONF=$SCRIPTS_SOURCE/CONF.sh.${RELEASE_BUILD}
+fi
+
+. $CONF
+
+~/live/bin/kvm-start ${CODENAME}-debian-live-maker.img
+sleep 30
+wait_ready "KVM builder up and running"
+
+cp $SCRIPTS_SOURCE/auto-config $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/common.sh $SCRIPTS_INPUT
+cp $CONF $SCRIPTS_INPUT/CONF.sh
+if [ "$ARCHES"x != ""x ] ; then
+    echo "ARCHES=\"$ARCHES\"" >> $SCRIPTS_INPUT/CONF.sh
+fi
+if [ "$TYPES"x != ""x ] ; then
+    echo "TYPES=\"$TYPES\"" >> $SCRIPTS_INPUT/CONF.sh
+fi
+if [ "$BUILDS"x != ""x ] ; then
+    echo "BUILDS=\"$BUILDS\"" >> $SCRIPTS_INPUT/CONF.sh
+fi
+
+IP=$(host -t a local-mirror.cdbuilder.debian.org | awk '{print $4}')
+echo "BUILDHOST=\"$IP\"" >> $SCRIPTS_INPUT/CONF.sh
+
+cp $SCRIPTS_SOURCE/lb-buildparallel $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-10clean $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-20update $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-30blends-build $SCRIPTS_INPUT
+
+if [ -f $SCRIPTS_SOURCE/splash-${CODENAME}.png ] ; then
+    cp $SCRIPTS_SOURCE/splash-${CODENAME}.png $SCRIPTS_INPUT/splash.png
+fi
+
+# Wait for the build to finish
+wait_ready "run-30.*build.*DONE"
+
+# Remove the older scripts so they don't get re-run by mistake
+rm $SCRIPTS_INPUT/run-*
+
+# Sync the output across
+rsync -a --delete --port=${RSYNC_PORT} ${VM_IP}::live-out/ ${OUT_BASE}/.live/new/
+
+# Now shut down the build VM
+cp $SCRIPTS_SOURCE/run-50halt $SCRIPTS_INPUT
+sleep 5
+# Wait for shutdown to start
+wait_ready "run-50halt"
+
+# Finally, list all the output files so we can see what we've got
+ls -alR ${OUT_BASE}/.live/new/*free
+
+if [ "$RELEASE_BUILD"x != ""x ] ; then
+    # And create torrent files
+    cd ${OUT_BASE}/.live/new/free
+    find amd64 i386 -name '*.iso' | xargs ~/build/mktorrent
+fi
+
+TRY=0
+MAX_WAIT=180 # Maximum number of seconds to wait before killing
+while [ $TRY -lt $MAX_WAIT ]; do
+    PID=$(check_running)
+    if [ "$PID"x != ""x ] ; then
+	run_log "kvm / qemu still running as pid $PID after $TRY seconds"
+	sleep 1
+	TRY=$(($TRY + 1))
+    else
+	break
+    fi
+done
+
+PID=$(check_running)
+if [ "$PID"x != ""x ] ; then
+    run_log "kvm / qemu still running as pid $PID"
+    run_log "Killing with prejudice"
+    kill -9 $PID
+fi
+
+# Done!
+
+# Remove the scripts from the input area - let's not block things
+rm -f $SCRIPTS_INPUT/*
+
+exit 0

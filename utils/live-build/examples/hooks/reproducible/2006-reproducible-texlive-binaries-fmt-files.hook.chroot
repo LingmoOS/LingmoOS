@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+# This script fixes several issues:
+# 1. The fmt files contain timestamps
+# 2. The fmt files randomly select the path to language.dat.lua and language.def
+#     (/var/lib/texmf/tex/generic/config vs /usr/share/texlive/texmf-dist/tex/generic/config)
+# 3. The fmt files have a random order due to the way iterators work in lua
+#      The function 'exception_strings' uses these iterators
+#      https://sources.debian.org/src/texlive-bin/2021.20210626.59705-1/texk/web2c/luatexdir/lang/texlang.c/?hl=501#L501
+#    See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1009196
+# 4. The 'tex' executable intentionally ignores SOURCE_DATE_EPOCH
+#    See https://sources.debian.org/src/texlive-bin/2021.20210626.59705-1/debian/patches/debian-SDE-docs-in-tex-etex-manpage/?hl=36#L36
+
+# Note: This hook must run before 0140-remove-log-files.hook.chroot and 0190-remove-temporary-files.hook.chroot
+
+# Don't run if texlive-binaries is not installed
+if [ ! -e /usr/bin/luahbtex ];
+then
+  exit 0
+fi
+
+# This is TeX: set FORCE_SOURCE_DATE to enable SOURCE_DATE_EPOCH -> fixes 1 and 2
+export FORCE_SOURCE_DATE=1
+
+# Generate the .fmt file 10 times. If the content differs, a fix for 3 is required
+for i in $(seq 1 10); do luahbtex -ini -jobname=luahbtex -progname=luabhtex luatex.ini > /dev/null; md5sum luahbtex.fmt >> md5sum.luahbtex; done
+rm -f luahbtex.fmt
+rm -f luahbtex.log
+if [ $(sort -u < md5sum.luahbtex | wc -l) -ne 1 ];
+then
+  # Ugly hack: remove the hyphenation exceptions -> fixes 3
+  #            This results in incorrect hyphenation, but it is a work-around until the function 'exception_strings' has been adjusted
+  sed -i -e '/as-so-ciate/d;/as-so-ciates/d;/dec-li-na-tion/d;/oblig-a-tory/d;/phil-an-thropic/d;/present/d;/presents/d;/project/d;/projects/d;/reci-procity/d;/re-cog-ni-zance/d;/ref-or-ma-tion/d;/ret-ri-bu-tion/d;/ta-ble/d' /usr/share/texlive/texmf-dist/tex/generic/hyphen/hyphen.tex
+  echo "P: $(basename $0) Reproducible hack has been applied: hyphenation of some words will be incorrect"
+fi
+rm -f md5sum.luahbtex
+
+# Rebuild all .fmt and .log files in /var/lib/texmf/web2c
+fmtutil --sys --all
+
+# Use faketime to enforce a timestamp -> fixes 4
+# NB: hooks don't know about the apt/aptitude selection, so use 'apt-get'
+export FAKETIME_ALREADY_INSTALLED=1
+if [ ! -e /usr/bin/faketime ];
+then
+  FAKETIME_ALREADY_INSTALLED=0
+  apt-get install faketime --yes -o Acquire::Check-Valid-Until=false
+fi
+OLD_PWD=$(pwd)
+cd /var/lib/texmf/web2c/tex
+faketime $(date --utc -d@$SOURCE_DATE_EPOCH --iso-8601=seconds) tex -ini -jobname=tex -progname=tex tex.ini
+cd ${OLD_PWD}
+if [ ${FAKETIME_ALREADY_INSTALLED} -eq 0 ];
+then
+  apt-get remove --purge --yes faketime
+  apt-get autoremove --yes
+fi
+
+echo "P: $(basename $0) Reproducible hook has been applied"

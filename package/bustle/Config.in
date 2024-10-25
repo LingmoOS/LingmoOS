@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_BUSTLE
+	bool "bustle"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_PACKAGE_DBUS # runtime
+	select LINGMO_PACKAGE_LIBPCAP
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Bustle is a better dbus-monitor! It records and draws
+	  sequence diagrams of D-Bus activity, showing signal
+	  emissions, method calls and their corresponding returns,
+	  with timestamps for each individual event and the duration
+	  of each method call. This can help you check for unwanted
+	  D-Bus traffic, and pinpoint why your D-Bus-based application
+	  isn't performing as well as you like.
+
+	  This only installs the command line bustle-pcap tool, not
+	  the graphical viewer.
+
+	  https://gitlab.freedesktop.org/bustle/bustle/
+
+comment "bustle needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_DBUS
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

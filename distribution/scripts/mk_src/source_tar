@@ -1,0 +1,78 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build source tarball"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_SOURCE}" != "true" ]
+then
+	exit 0
+fi
+
+if ! In_list tar ${LB_SOURCE_IMAGES}; then
+	exit 0
+fi
+
+Echo_message "Begin building source tarball..."
+Echo_message "This may take a while."
+
+# Requiring stage file
+Require_stagefiles config source_debian
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Remove old source
+rm -f ${LB_IMAGE_NAME}-source.debian.tar.bz2 ${LB_IMAGE_NAME}-source.debian.tar.gz ${LB_IMAGE_NAME}-source.debian.tar.lz ${LB_IMAGE_NAME}-source.debian.tar
+rm -f ${LB_IMAGE_NAME}-source.live.tar.bz2 ${LB_IMAGE_NAME}-source.live.tar.gz ${LB_IMAGE_NAME}-source.live.tar.lz ${LB_IMAGE_NAME}-source.live.tar
+
+tar cf ${LB_IMAGE_NAME}-source.debian.tar source/debian
+tar cf ${LB_IMAGE_NAME}-source.live.tar source/live
+
+case "${LB_COMPRESSION}" in
+	bzip2)
+		bzip2 ${BZIP2_OPTIONS} ${LB_IMAGE_NAME}-source.debian.tar
+		bzip2 ${BZIP2_OPTIONS} ${LB_IMAGE_NAME}-source.live.tar
+		;;
+
+	gzip)
+		gzip ${GZIP_OPTIONS} ${LB_IMAGE_NAME}-source.debian.tar
+		gzip ${GZIP_OPTIONS} ${LB_IMAGE_NAME}-source.live.tar
+		;;
+
+	lzip)
+		lzip ${LZIP_OPTIONS} ${LB_IMAGE_NAME}-source.debian.tar
+		lzip ${LZIP_OPTIONS} ${LB_IMAGE_NAME}-source.live.tar
+		;;
+
+	xz)
+		xz ${XZ_OPTIONS} ${LB_IMAGE_NAME}-source.debian.tar
+		xz ${XZ_OPTIONS} ${LB_IMAGE_NAME}-source.live.tar
+		;;
+
+	none)
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

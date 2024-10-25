@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_UVW
+	bool "uvw"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # libuv
+	depends on LINGMO_USE_MMU # libuv
+	depends on !LINGMO_STATIC_LIBS # libuv
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libuv
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # C++17
+	select LINGMO_PACKAGE_LIBUV
+	help
+	  Header-only, event based, tiny and easy to use
+	  libuv wrapper in modern C++.
+
+	  https://github.com/skypjack/uvw
+
+comment "uvw needs a toolchain w/ NPTL, dynamic library, C++, gcc >= 7"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS || \
+		!LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4

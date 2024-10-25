@@ -1,0 +1,44 @@
+config LINGMO_PACKAGE_KVM_UNIT_TESTS_ARCH_SUPPORTS
+	bool
+	# On ARM, it needs virtualization extensions and little endian CPUs
+	default y if (LINGMO_arm || LINGMO_aarch64) && \
+		(LINGMO_cortex_a7 || LINGMO_cortex_a12 || \
+		LINGMO_cortex_a15 || LINGMO_cortex_a15_a7 || \
+		LINGMO_cortex_a17 || LINGMO_cortex_a17_a7 || \
+		LINGMO_cortex_a55 || LINGMO_cortex_a75 || \
+		LINGMO_cortex_a75_a55 || LINGMO_cortex_a76 || \
+		LINGMO_cortex_a76_a55)
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_powerpc64 || LINGMO_powerpc64le
+	default y if LINGMO_s390x
+
+config LINGMO_PACKAGE_KVM_UNIT_TESTS
+	bool "kvm-unit-tests"
+	depends on LINGMO_PACKAGE_KVM_UNIT_TESTS_ARCH_SUPPORTS
+	# on i386 and x86-64, __builtin_reachable is used, so we need
+	# gcc 4.5 at least. on i386, we use the target gcc, while on
+	# x86-64 we use the host gcc (see .mk file for details)
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_5 || !LINGMO_i386
+	depends on LINGMO_HOSTARCH = "x86_64" || !LINGMO_x86_64
+	select LINGMO_HOSTARCH_NEEDS_IA32_COMPILER if LINGMO_x86_64
+	help
+	  kvm-unit-tests is a project as old as KVM. As its name
+	  suggests, it's purpose is to provide unit tests for KVM. The
+	  unit tests are tiny guest operating systems that generally
+	  execute only tens of lines of C and assembler test code in
+	  order to obtain its PASS/FAIL result. Unit tests provide KVM
+	  and virt hardware functional testing by targeting the
+	  features through minimal implementations of their use per
+	  the hardware specification. The simplicity of unit tests
+	  make them easy to verify they are correct, easy to maintain,
+	  and easy to use in timing measurements. Unit tests are also
+	  often used for quick and dirty bug reproducers. The
+	  reproducers may then be kept as regression tests.  It's
+	  strongly encouraged that patches implementing new KVM
+	  features are submitted with accompanying unit tests.
+
+	  http://www.linux-kvm.org/page/KVM-unit-tests
+
+comment "kvm-unit-tests needs a toolchain w/ gcc >= 4.5"
+	depends on LINGMO_i386
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_5

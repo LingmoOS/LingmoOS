@@ -1,0 +1,208 @@
+#!/usr/bin/perl
+
+#
+# This is a tool to change the usb product id and vendor id. It won't
+# work on older version of firmware
+# 
+# Usage:
+#      pidvidpatch.pl firmware.hex mapfile.m51 xxXXyyYY
+#
+# firmware.hex is the intel hex file of the firmware that need be changed.
+# 
+# xxXXyyYY is the pidvid, e.g. a5c & 2039 become 0a5c2039
+#
+# The firmware.hex will be modified.
+
+
+@FirmwareImage;
+
+
+$address = 0;
+$length  = 0;
+
+$C_INITSEG_START=0;
+$C_INITSEG_END  =0;
+
+
+$pidvid_start_addr = "";
+
+$pidvid="";
+
+$outFileName = "";
+
+if( $#ARGV != 2 )
+{
+    print "Usage: change_id firmware.hex mapfile.m51 xxXXyyYY\n";
+}
+else
+{
+    # get the in file name, we are going to use it as out file too
+    $outFileName = shift ARGV ;
+
+    ParseOneFile( \@FirmwareImage, $outFileName );
+
+    ($C_INITSEG_START, $C_INITSEG_END, $pidvid_start_addr) = ParseMapFile( shift ARGV );
+
+
+    print "start_address is " , $pidvid_start_addr,"\n";
+
+
+    $pidvid = "01" . uc(shift ARGV);
+
+    print "pidvid = $pidvid\n";
+
+    open( outFileHndl, ">$outFileName") || 
+                die "Can't open $outFileName for output\n";
+
+    # look for the target address, 
+
+    foreach $item (@FirmwareImage )
+    {
+        $address = hex $item->{"addr"};
+        $length  = hex $item->{"len"};
+
+        if(( $address > $C_INITSEG_START  ) &&
+           ( $address  < $C_INITSEG_END) )
+        {
+#            print $item->{"addr"},"-->", $item->{"data"},"\n";
+
+            # So we found something that is in C_INITSEG
+            if( $item->{"data"} =~ /(\w*?)($pidvid_start_addr)(.{10})(.*)/)
+            {
+                # we find the starting address
+                #
+#                print $item->{"data"},"\n";
+
+#                print "$1--$2--$3--$4\n";
+
+                $item->{"data"} = "$1$2$pidvid$4";
+
+#                print "before calc. ", $item->{"data"},":\n";
+
+                CalcChecksum( $item );
+#                print $item->{"data"}, $item->{"checksum"};
+            }
+        }
+
+        #generate intel hex file output
+
+       print outFileHndl  ":",$item->{"len"},
+                          $item->{"addr"},
+                          $item->{"type"},
+                          $item->{"data"},
+                          $item->{"checksum"},
+                          "\n";
+    }
+
+
+    
+
+}
+
+sub ParseMapFile()
+{
+    local($filename) = shift @_;
+
+    open( file, $filename ) || die "Can't open $filename\n";
+
+    while( $line = <file> )
+    {
+        # look for C_INITSEG
+        if( $line =~ /C_INITSEG/ )
+        {
+            $line =~ /^(\W*)CODE(\W*)([\d|A-F]*)H(\W*)([\d|A-F]*)/;
+            $C_INITSEG_START = hex $3;
+            $C_INITSEG_END  = $C_INITSEG_START + hex $5;
+            if( $3 == 0 )
+            {
+                # this could be a multi-bank code
+                $line =~ /^(\W*)BANK1(\W*)([\d|A-F]*)H(\W*)([\d|A-F]*)/;
+                $C_INITSEG_START = hex $3;
+                $C_INITSEG_END  = $C_INITSEG_START + hex $5;
+            }
+
+#            print "C_INITSEG_START = $C_INITSEG_START: $C_INITSEG_END\n";
+        }
+
+        # look for bbinit_pid_vid
+        if( $line =~ /bbinit_pid_vid/ )
+        {
+            $line =~ /^(\W)*(X:)([\d|A-F]*)/;
+            $start_address = $3;
+#            print "start_address = :$start_address:\n";
+#            print "$line";
+            return( $C_INITSEG_START, $C_INITSEG_END, $start_address);
+        }
+    }
+    return ();
+}
+
+sub ParseOneFile()
+{
+    local ( $image ) = shift @_;
+    local($filename) = shift @_;
+    local ($line);
+
+
+    open( file, $filename ) || die "Can't open $filename\n";
+
+    while( $line = <file> )
+    {
+        $record = {};
+
+        $line =~ /:(\w\w)(\w{4})(\w\w)(.*)(\w\w)/;
+
+        $record->{"len"} = $1;
+        $record->{"addr"} = $2;
+        $record->{"type"} = $3;
+        $record->{"data"} = $4;
+        $record->{"checksum"} = $5;
+
+        push @$image, $record;
+    }
+
+    close(file);
+
+}
+
+sub CalcChecksum()
+{
+    local ($record) = @_;
+    local ($tmp = 0 ); 
+    local ($i = 0);
+    local ($str = "");
+
+
+
+    $tmp = hex $record->{"len"};
+
+
+    $record->{"addr"} =~ /(\w\w)(\w\w)/;
+
+    $tmp += hex $1;
+
+
+    $tmp +=  hex $2;
+
+
+    $tmp += hex $record->{"type"};
+
+
+    # now let's work on the data part
+    $str = $record->{"data"} ;
+    for($i = 0; $i < length($str ) ; $i +=2 )
+    {
+        $tmp += hex( substr( $str , $i, 2 ) );
+
+    }
+
+    # take the modulo
+    $tmp = $tmp % 256 ;
+
+    $tmp = 0x100 - $tmp;
+
+    # handle case when checksum is zero
+    $tmp = $tmp % 256 ;
+
+    $record->{"checksum"} = sprintf("%02X",$tmp);
+}

@@ -1,0 +1,36 @@
+config LINGMO_PACKAGE_OMXPLAYER
+	bool "omxplayer"
+	depends on LINGMO_arm
+	depends on LINGMO_USE_MMU # dbus
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS # ffmpeg
+	depends on LINGMO_INSTALL_LIBSTDCPP # boost
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # alsa-lib, boost, libusb
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	depends on LINGMO_USE_WCHAR # boost
+	depends on LINGMO_PACKAGE_RPI_USERLAND
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_FFMPEG_AVRESAMPLE
+	select LINGMO_PACKAGE_FFMPEG_SWSCALE
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_LIBIDN
+	select LINGMO_PACKAGE_LIBUSB
+	select LINGMO_PACKAGE_PCRE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  OMXPlayer is a commandline OMX player for the Raspberry
+	  Pi. It was developed as a testbed for the XBMC Raspberry PI
+	  implementation and is quite handy to use standalone.
+
+	  https://github.com/popcornmix/omxplayer
+
+comment "omxplayer needs rpi-userland and a toolchain w/ C++, threads, wchar, dynamic library, gcc >= 4.9"
+	depends on LINGMO_arm
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	depends on !LINGMO_PACKAGE_RPI_USERLAND
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

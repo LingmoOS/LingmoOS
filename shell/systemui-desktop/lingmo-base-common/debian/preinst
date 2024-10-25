@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+rm /etc/apt/sources.list
+
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+  for d in bin lib lib32 lib64 libo32 lib64 sbin; do
+    if [ -d "$DPKG_ROOT/$d" ] && [ ! -L "$DPKG_ROOT/$d" ]; then
+      cat <<EOF
+
+
+******************************************************************************
+*
+* The base-files package cannot be installed because this system has a
+* split /usr.
+*
+* Please install the usrmerge package to convert this system to merged-/usr.
+*
+* For more information please read https://wiki.debian.org/UsrMerge.
+*
+******************************************************************************
+
+
+EOF
+      exit 1
+    fi
+  done
+  for d in #USR_MERGE_MULTILIB#; do
+    # Install DEP17 M4 protective diversions
+    dpkg-divert --quiet --package base-files --add --no-rename --divert "/.$d.usr-is-merged" "/$d"
+  done
+fi
+
+#DEBHELPER#

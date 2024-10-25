@@ -1,0 +1,78 @@
+# Flutter includes a vender copy of clang which is mandatory to use for
+# compiling. These are the supported architectures.
+config LINGMO_PACKAGE_FLUTTER_ENGINE_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm && !LINGMO_ARM_CPU_ARMV4 && !LINGMO_ARM_CPU_ARMV5
+	default y if LINGMO_x86_64
+
+config LINGMO_PACKAGE_FLUTTER_ENGINE
+	bool "flutter-engine"
+	depends on LINGMO_PACKAGE_FLUTTER_ENGINE_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # std::wstring
+	depends on LINGMO_HOST_GCC_AT_LEAST_5
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_HOST_DEPOT_TOOLS
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Flutter is Google's SDK for crafting beautiful, fast user
+	  experience for mobile, web, and desktop from a single
+	  codebase. Flutter works with existing code, is used by
+	  developers and organizations around the world, and is
+	  free and open source.
+
+	  The Flutter Engine is a portable runtime for hosting
+	  Flutter applications. It implements Flutter's core
+	  libraries, including animation and graphics, file and
+	  network I/O, accessibility support, plugin architecture,
+	  and a Dart runtime and compile toolchain. Most developers
+	  will interact with Flutter via the Flutter Framework,
+	  which provides a modern, reactive framework, and a rich
+	  set of platform, layout and foundation widgets.
+
+	  https://github.com/flutter/engine
+
+if LINGMO_PACKAGE_FLUTTER_ENGINE
+
+config FLUTTER_ENGINE_RUNTIME_MODE_PROFILE
+	bool "enable profiling"
+	help
+	  Some debugging ability is maintained—enough to profile your
+	  apps performance. Profile mode is disabled on the emulator
+	  and simulator, because their behavior is not representative
+	  of real performance. Profile mode is similar to release mode,
+	  with the following differences:
+
+	  - Some service extensions, such as the one that enables the
+	    performance overlay, are enabled.
+
+	  - Tracing is enabled, and tools supporting source-level
+	    debugging (such as DevTools) can connect to the process.
+
+	  If this option is left unselected, the global option
+	  LINGMO_ENABLE_RUNTIME_DEBUG determines whether to build Flutter
+	  in release or debug mode.
+
+	  https://docs.flutter.dev/testing/build-modes#profile
+
+endif
+
+comment "flutter-engine needs an OpenGL or OpenGLES backend"
+	depends on LINGMO_PACKAGE_FLUTTER_ENGINE_ARCH_SUPPORTS
+	depends on !LINGMO_PACKAGE_HAS_LIBGL && !LINGMO_PACKAGE_HAS_LIBGLES
+
+comment "flutter-engine needs a glibc toolchain w/ wchar, C++, gcc >= 5, dynamic library, host gcc >= 5"
+	depends on LINGMO_PACKAGE_FLUTTER_ENGINE_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || LINGMO_STATIC_LIBS \
+		|| !LINGMO_USE_WCHAR || !LINGMO_HOST_GCC_AT_LEAST_5
+
+comment "flutter-engine needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_PACKAGE_FLUTTER_ENGINE_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

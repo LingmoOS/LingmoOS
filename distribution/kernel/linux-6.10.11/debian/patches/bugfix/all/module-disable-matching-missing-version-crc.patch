@@ -1,0 +1,23 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 02 Dec 2016 23:06:18 +0000
+Subject: module: Disable matching missing version CRC
+Forwarded: not-needed
+
+This partly reverts commit cd3caefb4663e3811d37cc2afad3cce642d60061.
+We want to fail closed if a symbol version CRC is missing, as the
+alternative may allow subverting module signing.
+---
+--- a/kernel/module/version.c
++++ b/kernel/module/version.c
+@@ -46,9 +46,8 @@ int check_version(const struct load_info
+ 		goto bad_version;
+ 	}
+ 
+-	/* Broken toolchain. Warn once, then let it go.. */
+-	pr_warn_once("%s: no symbol version for %s\n", info->name, symname);
+-	return 1;
++	pr_warn("%s: no symbol version for %s\n", info->name, symname);
++	return 0;
+ 
+ bad_version:
+ 	pr_warn("%s: disagrees about version of symbol %s\n", info->name, symname);

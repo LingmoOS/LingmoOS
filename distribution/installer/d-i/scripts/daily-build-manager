@@ -1,0 +1,240 @@
+#!/usr/bin/perl
+# © 2014 Cyril Brulebois <kibi@debian.org>
+
+use strict;
+use warnings;
+
+use Date::Manip qw(ParseDate UnixDate);
+use Date::Manip::Date;
+use File::Basename;
+use File::Path;
+use List::MoreUtils qw(uniq);
+
+# Our own limits:
+my $log_max_days = 90;
+my $image_max_days = 15;
+
+# Output usage:
+sub usage {
+  print "Usage:\n";
+  print "  $0 sync-logs        image-dir build-log-dir\n";
+  print "  $0 clean-old-logs   build-log-dir\n";
+  print "  $0 clean-old-images image-dir\n";
+}
+
+
+# Sync logs:
+#  - iterate over architectures
+#  - look at interesting timestamps
+#  - rsync over
+#  - git add/git commit
+sub sync_logs {
+  my $image_dir = shift;
+  my $log_dir = shift;
+
+  # Check directories exist:
+  die "Specified image-dir ($image_dir) isn't a directory"
+    if ! -d $image_dir;
+  die "Specified build-log-dir ($log_dir) isn't a directory"
+    if ! -d $log_dir;
+
+  # Check yesterday and today:
+  my @dates;
+  my $date = new Date::Manip::Date;
+  for my $age (1, 0) {
+    $date->parse("$age days ago");
+    my $ts = $date->printf("%Y%m%d");
+    push @dates, $ts;
+  }
+  for my $arch_dir (<$image_dir/*/>) {
+    my $arch = basename($arch_dir);
+
+    # Make sure the target arch directory exists, rsync could yell otherwise:
+    if (not -d "$log_dir/$arch") {
+      File::Path::mkpath("$log_dir/$arch")
+        or die "Unable to create log directory for architecture $arch";
+    }
+
+    # Iterate over the interesting timestamps:
+    for my $date (@dates) {
+      for my $ts_dir (<$arch_dir$date*/>) {
+        my $ts = basename($ts_dir);
+        # First pick what we want then exclude all other files:
+        my @includes = map { "--include \'/$_\'" } qw(*.log *SUMS MANIFEST* *.txt *.list);
+        `rsync -av @includes --exclude '/*' $ts_dir $log_dir/$arch/$ts/`;
+      }
+    }
+    #print "rsync -avn $arch_dir/$dates[0] $log_dir/$arch\n";
+  }
+
+  # Working there should be better for git add/git commit:
+  chdir $log_dir
+    or die "Unable to chdir($log_dir)";
+
+  # Commit everything:
+  `git add . && git commit -am 'Sync.'`;
+}
+
+
+# Clean old logs:
+#  - switch to the log directory
+#  - walk through architectures
+#  - compare each build's timestamp against the limit
+#    - remove if too old
+#    - switch to next arch if recent enough
+sub clean_old_logs {
+  my $log_dir = shift;
+  my $age = shift;
+
+  # Check directory exists:
+  die "Specified build-log-dir ($log_dir) isn't a directory"
+    if ! -d $log_dir;
+
+  # Compute timestamp for the last date we're interested in:
+  my $date = new Date::Manip::Date;
+  $date->parse("$age days ago");
+  my $limit_ts = $date->printf("%Y%m%d");
+
+  # Working there should be better for git rm/git commit:
+  chdir $log_dir
+    or die "Unable to chdir($log_dir)";
+
+  # Let's do some work:
+  for my $arch_dir (<*/>) {
+    for my $build_dir (<$arch_dir/*/>) {
+      if (basename($build_dir) lt $limit_ts) {
+        # Too old: remove and keep on
+        my $cmd = "git rm -r $build_dir 2>&1 >/dev/null";
+        my @output = `$cmd`;
+        if (@output) {
+          print "Failure to remove $build_dir:\n";
+          print join '', @output;
+        }
+      }
+      else {
+        # Recent enough, done with this arch:
+        last;
+      }
+    }
+  }
+
+  # Commit everything:
+  `git commit -am 'Clean old logs.'`;
+}
+
+
+# Clean old images:
+#  - switch to the images directory
+#  - walk through architectures
+#  - compare each build's timestamp against the limit
+#    - plan removal if too old
+#    - switch to next arch if recent enough
+sub clean_old_images {
+  my $image_dir = shift;
+  my $age = shift;
+
+  # Check directory exists:
+  die "Specified image-dir ($image_dir) isn't a directory"
+    if ! -d $image_dir;
+
+  # Compute timestamp for the last date we're interested in:
+  my $date = new Date::Manip::Date;
+  $date->parse("$age days ago");
+  my $limit_ts = $date->printf("%Y%m%d");
+
+  # Working there should be better for git rm/git commit:
+  chdir $image_dir
+    or die "Unable to chdir($image_dir)";
+
+  # Let's prepare some work:
+  my @to_remove;
+  my %sizes;
+  my $canary;
+  for my $arch_dir (<*/>) {
+    my $arch = basename($arch_dir);
+    $canary ||= $arch;
+    for my $build_dir (<$arch_dir/*/>) {
+      if (basename($build_dir) lt $limit_ts) {
+        # Too old: remove and keep on
+        push @to_remove, $build_dir;
+        my ($size) = split /\s+/, `du -scm $build_dir`;
+        $sizes{$arch} += $size;
+      }
+      else {
+        # Recent enough, done with this arch:
+        last;
+      }
+    }
+  }
+
+  # Make sure to bail out early if that doesn't seem to be a proper directory:
+  my $expected_canary = 'amd64';
+  if ($canary ne $expected_canary) {
+    print "E: strange first subdirectory (got: $canary, expected: $expected_canary), not deleting anything!\n";
+    die "Probable wrong image directory parameter";
+  }
+
+  # Proceed to removal:
+  for my $dir (@to_remove) {
+    File::Path::rmtree($dir)
+      or die "Unable to remove tree: $dir";
+  }
+
+  # Stats:
+  print "Removed " . scalar @to_remove . " directories\n\n";
+  print "Per-arch space savings:\n";
+  my $total = 0;
+  for my $arch (sort keys %sizes) {
+    printf "  %-20s : %6s MB\n", $arch, $sizes{$arch};
+    $total += $sizes{$arch};
+  }
+
+  my ($remaining) = split /\s+/, `du -scm $image_dir`;
+  printf "\n";
+  printf "  %-20s : %6s MB\n", 'Total reclaimed', $total;
+  printf "  %-20s : %6s MB\n", 'Total remaining', $remaining;
+}
+
+
+### Action starts below:
+
+# Check action:
+my $action = shift @ARGV;
+my @actions = qw(sync-logs clean-old-logs clean-old-images);
+if (not defined $action or not grep { $_ eq $action } @actions) {
+  usage();
+  die "E: action not specified or not in the following list: @actions";
+}
+
+# Check per-action arguments, and run the right bits:
+if ($action eq 'sync-logs') {
+  my $image_dir = shift @ARGV;
+  my $log_dir = shift @ARGV;
+  if (not defined $image_dir or not defined $log_dir) {
+    usage();
+    die "E: missing image-dir or build-log-dir";
+  }
+  sync_logs($image_dir, $log_dir);
+}
+elsif ($action eq 'clean-old-logs') {
+  my $log_dir = shift @ARGV;
+  if (not defined $log_dir) {
+    usage();
+    die "E: no directory specified";
+  }
+  clean_old_logs($log_dir, $log_max_days);
+}
+elsif ($action eq 'clean-old-images') {
+  my $image_dir = shift @ARGV;
+  if (not defined $image_dir) {
+    usage();
+    die "E: missing image-dir";
+  }
+  clean_old_images($image_dir, $image_max_days);
+}
+else {
+  die "oops, time to update \@actions?";
+}
+
+# All done, hopefully:
+exit 0;

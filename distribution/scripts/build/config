@@ -1,0 +1,1405 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Create configuration for lingmo-system-build(7)"
+USAGE="${PROGRAM} [--apt apt|apt-get|aptitude]\n\
+\t    [--apt-http-proxy URL]\n\
+\t    [--apt-indices true|false]\n\
+\t    [--apt-options OPTION|\"OPTIONS\"]\n\
+\t    [--apt-pipeline DEPTH]\n\
+\t    [--apt-recommends true|false]\n\
+\t    [--apt-secure true|false]\n\
+\t    [--apt-source-archives true|false]\n\
+\t    [--aptitude-options OPTION|\"OPTIONS\"]\n\
+\t    [-a|--architecture ARCHITECTURE]\n\
+\t    [--archive-areas ARCHIVE_AREA|\"ARCHIVE_AREAS\"]\n\
+\t    [--backports true|false]\n\
+\t    [--binary-filesystem fat16|fat32|ext2|ext3|ext4|ntfs]\n\
+\t    [-b|--binary-image iso|iso-hybrid|netboot|tar|hdd]\n\
+\t    [--bootappend-install PARAMETER|\"PARAMETERS\"]\n\
+\t    [--bootappend-live PARAMETER|\"PARAMETERS\"]\n\
+\t    [--bootappend-live-failsafe PARAMETER|\"PARAMETERS\"]\n\
+\t    [--bootloaders grub-legacy|grub-pc|syslinux|grub-efi|\"BOOTLOADERS\"]\n\
+\t    [--bootstrap-qemu-arch ARCH]\n\
+\t    [--bootstrap-qemu-exclude PACKAGE|\"PACKAGES\"]\n\
+\t    [--bootstrap-qemu-static PATH]\n\
+\t    [--breakpoints]\n\
+\t    [--build-with-chroot true|false]\n\
+\t    [--cache true|false]\n\
+\t    [--cache-indices true|false]\n\
+\t    [--cache-packages true|false]\n\
+\t    [--cache-stages STAGE|\"STAGES\"]\n\
+\t    [--checksums md5|sha1|sha224|sha256|sha384|sha512|none]\n\
+\t    [--chroot-filesystem ext2|ext3|ext4|squashfs|jffs2|none]\n\
+\t    [--chroot-squashfs-compression-level LEVEL]\n\
+\t    [--chroot-squashfs-compression-type gzip|lzma|lzo|lz4|xz|zstd]\n\
+\t    [--clean]\n\
+\t    [--color]\n\
+\t    [--compression bzip2|gzip|lzip|xz|none]\n\
+\t    [-c|--conffile FILE]\n\
+\t    [--config GIT_URL::GIT_BRANCH]\n\
+\t    [--debconf-frontend dialog|editor|noninteractive|readline]\n\
+\t    [--debconf-priority low|medium|high|critical]\n\
+\t    [--debian-installer cdrom|netinst|netboot|businesscard|live|none]\n\
+\t    [--debian-installer-distribution daily|CODENAME]\n\
+\t    [--debian-installer-gui true|false]\n\
+\t    [--debian-installer-preseedfile FILE|URL]\n\
+\t    [--debootstrap-options OPTION|\"OPTIONS\"]\n\
+\t    [--debootstrap-script SCRIPT]\n\
+\t    [--debug]\n\
+\t    [-d|--distribution CODENAME]\n\
+\t    [--distribution-binary CODENAME]\n\
+\t    [--distribution-chroot CODENAME]\n\
+\t    [--dm-verity]\n\
+\t    [--dm-verity-fec NB_ROOTS]\n\
+\t    [--dm-verity-sign SIGN_SCRIPT]\n\
+\t    [--dump]\n\
+\t    [--firmware-binary true|false]\n\
+\t    [--firmware-chroot true|false]\n\
+\t    [--force]\n\
+\t    [--gzip-options OPTION|\"OPTIONS\"]\n\
+\t    [--hdd-label LABEL]\n\
+\t    [--hdd-partition-start START]\n\
+\t    [--hdd-size SIZE]\n\
+\t    [--ignore-system-defaults]\n\
+\t    [--image-name NAME]\n\
+\t    [--initramfs none|live-boot]\n\
+\t    [--initramfs-compression bzip2|gzip|lzma]\n\
+\t    [--initsystem sysvinit|systemd|none]\n\
+\t    [--interactive true|shell|x11|xnest|false]\n\
+\t    [--iso-application NAME]\n\
+\t    [--iso-preparer NAME]\n\
+\t    [--iso-publisher NAME]\n\
+\t    [--iso-volume NAME]\n\
+\t    [--jffs2-eraseblock SIZE]\n\
+\t    [--keyring-packages PACKAGE|\"PACKAGES\"]\n\
+\t    [-k|--linux-flavours FLAVOUR|\"FLAVOURS\"]\n\
+\t    [--linux-packages PACKAGE|\"PACKAGES\"]\n\
+\t    [--loadlin true|false]\n\
+\t    [--memtest memtest86+|memtest86|none]\n\
+\t    [--mirror-binary URL]\n\
+\t    [--mirror-binary-security URL]\n\
+\t    [--mirror-bootstrap URL]\n\
+\t    [--mirror-chroot URL]\n\
+\t    [--mirror-chroot-security URL]\n\
+\t    [--mirror-debian-installer URL]\n\
+\t    [--mode debian]\n\
+\t    [--net-root-path PATH]\n\
+\t    [--net-tarball true|false]\n\
+\t    [--no-color]\n\
+\t    [--onie true|false]\n\
+\t    [--onie-kernel-cmdline OPTION|\"OPTIONS\"]\n\
+\t    [--parent-archive-areas ARCHIVE_AREA|\"ARCHIVE_AREAS\"]\n\
+\t    [--parent-debian-installer-distribution CODENAME]\n\
+\t    [--parent-distribution CODENAME]\n\
+\t    [--parent-distribution-binary CODENAME]\n\
+\t    [--parent-distribution-chroot CODENAME]\n\
+\t    [--parent-mirror-binary URL]\n\
+\t    [--parent-mirror-binary-security URL]\n\
+\t    [-m|--parent-mirror-bootstrap URL]\n\
+\t    [--parent-mirror-chroot URL]\n\
+\t    [--parent-mirror-chroot-security URL]\n\
+\t    [--parent-mirror-debian-installer URL]\n\
+\t    [--quiet]\n\
+\t    [--security true|false]\n\
+\t    [--source true|false]\n\
+\t    [-s|--source-images iso|netboot|tar|hdd]\n\
+\t    [--swap-file-path PATH]\n\
+\t    [--swap-file-size MB]\n\
+\t    [--system live|normal]\n\
+\t    [--uefi-secure-boot auto|enable|disable]\n\
+\t    [--updates true|false]\n\
+\t    [--utc-time true|false]\n\
+\t    [--validate]\n\
+\t    [--verbose]\n\
+\t    [--win32-loader true|false]\n\
+\t    [--zsync true|false]"
+
+
+Local_arguments ()
+{
+	local LONG_OPTIONS
+	LONG_OPTIONS="
+		apt:,apt-http-proxy:,apt-indices:,aptitude-options:,
+		apt-options:,apt-pipeline:,apt-recommends:,apt-secure:,
+		apt-source-archives:,architecture:,architectures:,archive-areas:,
+		backports:,binary-filesystem:,binary-image:,binary-images:,
+		bootappend-install:,bootappend-live:,bootappend-live-failsafe:,
+		bootloader:,bootloaders:,bootstrap-qemu-arch:,bootstrap-qemu-exclude:,
+		bootstrap-qemu-static:,breakpoints,build-with-chroot:,
+		cache:,cache-indices:,cache-packages:,cache-stages:,checksums:,
+		chroot-filesystem:,chroot-squashfs-compression-level:,
+		chroot-squashfs-compression-type:,clean,color,compression:,conffile:,
+		config:,debconf-frontend:,debconf-priority:,debian-installer:,
+		debian-installer-distribution:,debian-installer-gui:,
+		debian-installer-preseedfile:,debootstrap-options:,debootstrap-script:,
+		debug,dm-verity,dm-verity-fec:,dm-verity-sign:,
+		distribution:,distribution-binary:,distribution-chroot:,dump,
+		fdisk:,firmware-binary:,firmware-chroot:,force,
+		grub-splash:,gzip-options:,
+		hdd-label:,hdd-partition-start:,hdd-size:,help,
+		ignore-system-defaults,image-name:,initramfs:,initramfs-compression:,
+		initsystem:,interactive:,iso-application:,isohybrid-options:,
+		iso-preparer:,iso-publisher:,iso-volume:,
+		jffs2-eraseblock:,
+		keyring-packages:,
+		linux-flavours:,linux-packages:,loadlin:,losetup:,
+		memtest:,mirror-binary:,mirror-binary-security:,mirror-bootstrap:,
+		mirror-chroot:,mirror-chroot-security:,mirror-debian-installer:,mode:,
+		net-cow-filesystem:,net-cow-mountoptions:,net-cow-path:,
+		net-cow-server:,net-root-filesystem:,net-root-mountoptions:,
+		net-root-path:,net-root-server:,net-tarball:,no-color,
+		onie:,onie-kernel-cmdline:,
+		parent-archive-areas:,parent-debian-installer-distribution:,
+		parent-distribution:,parent-distribution-binary:,
+		parent-distribution-chroot:,parent-mirror-binary:,
+		parent-mirror-binary-security:,parent-mirror-bootstrap:,
+		parent-mirror-chroot:,parent-mirror-chroot-security:,
+		parent-mirror-debian-installer:,
+		quiet,
+		security:,source:,source-images:,swap-file-path:,swap-file-size:,system:,
+		tasksel:,
+		uefi-secure-boot:,updates:,utc-time:,usage,
+		validate,verbose,version,
+		win32-loader:,
+		zsync:"
+	# Remove spaces added by indentation
+	LONG_OPTIONS="$(echo ${LONG_OPTIONS} | tr -d ' ')"
+
+	local ARGUMENTS
+	local ERR=0
+	ARGUMENTS="$(getopt --longoptions ${LONG_OPTIONS} --name="${PROGRAM}" --options a:d:m:k:b:s:c:huv --shell sh -- "${@}")" || ERR=$?
+
+	if [ $ERR -eq 1 ]; then
+		Echo_error "invalid arguments"
+		exit 1
+	elif [ $ERR -ne 0 ]; then
+		Echo_error "getopt failure"
+		exit 1
+	fi
+
+	eval set -- "${ARGUMENTS}"
+
+	while true
+	do
+		case "${1}" in
+
+			# Config script specific options
+
+			--clean)
+				_CLEAN="true"
+				shift
+				;;
+
+			--config)
+				_CONFIG="${2}"
+				shift 2
+				;;
+
+			-c|--conffile)
+				_CONFFILE="${2}"
+				shift 2
+				;;
+
+			--dump)
+				# Dump version
+				Echo "This is lingmo-system-build version %s" "${VERSION}"
+				if command -v dpkg-query >/dev/null; then
+					Echo "Installed version reported by dpkg is %s" "$(dpkg-query -f='${Version}' --show lingmo-system-build)"
+				fi
+
+				# Dump conffile contents
+				Print_conffiles $(Common_conffiles)
+
+				# Dump contents of directories that contain text files
+				local DIRECTORY
+				for DIRECTORY in config/package-lists config/apt config/preseed config/rootfs
+				do
+					if Find_files "${DIRECTORY}"
+					then
+						Echo_file "${DIRECTORY}"/*
+					fi
+				done
+
+				# Dump directory listings of all directories under config/
+				for DIRECTORY in $(find config/ -mindepth 1 -maxdepth 1 -type d)
+				do
+					if Find_files "${DIRECTORY}"
+					then
+						ls -lR "${DIRECTORY}" | while read LINE
+						do
+							echo "${DIRECTORY}: ${LINE}"
+						done
+					fi
+				done
+
+				exit 0
+				;;
+
+			--ignore-system-defaults)
+				_IGNORE_SYSTEM_DEFAULTS="true"
+				shift
+				;;
+
+			--validate)
+				_VALIDATE_MODE="true"
+				shift
+				;;
+
+			# General options
+
+			--breakpoints|--debug|--force|-h|--help|--quiet|-u|--usage|--verbose|-v|--version)
+				Handle_common_option "${1}"
+				shift
+				;;
+
+			--color)
+				_COLOR="true"
+				shift
+				;;
+
+			--no-color)
+				_COLOR="false"
+				shift
+				;;
+
+			# Build config options
+
+			--apt)
+				LINGMO_SYS_BUILD_APT="${2}"
+				shift 2
+				;;
+
+			--apt-http-proxy)
+				LINGMO_SYS_BUILD_APT_HTTP_PROXY="${2}"
+				shift 2
+				;;
+
+			--apt-indices)
+				LINGMO_SYS_BUILD_APT_INDICES="${2}"
+				shift 2
+				;;
+
+			--apt-options)
+				APT_OPTIONS="${2}"
+				shift 2
+				;;
+
+			--apt-pipeline)
+				LINGMO_SYS_BUILD_APT_PIPELINE="${2}"
+				shift 2
+				;;
+
+			--apt-recommends)
+				LINGMO_SYS_BUILD_APT_RECOMMENDS="${2}"
+				shift 2
+				;;
+
+			--apt-secure)
+				LINGMO_SYS_BUILD_APT_SECURE="${2}"
+				shift 2
+				;;
+
+			--apt-source-archives)
+				LINGMO_SYS_BUILD_APT_SOURCE_ARCHIVES="${2}"
+				shift 2
+				;;
+
+			--aptitude-options)
+				APTITUDE_OPTIONS="${2}"
+				shift 2
+				;;
+
+			-a|--architecture|--architectures)
+				LINGMO_SYS_BUILD_ARCHITECTURE="${2}"
+				shift 2
+				;;
+
+			--archive-areas)
+				LINGMO_SYS_BUILD_ARCHIVE_AREAS="${2}"
+				shift 2
+				;;
+
+			--backports)
+				LINGMO_SYS_BUILD_BACKPORTS="${2}"
+				shift 2
+				;;
+
+			--binary-filesystem)
+				LINGMO_SYS_BUILD_BINARY_FILESYSTEM="${2}"
+				shift 2
+				;;
+
+			-b|--binary-image|--binary-images)
+				LINGMO_SYS_BUILD_IMAGE_TYPE="${2}"
+				shift 2
+				;;
+
+			--bootappend-install)
+				LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL="${2}"
+				shift 2
+				;;
+
+			--bootappend-live)
+				LINGMO_SYS_BUILD_BOOTAPPEND_LIVE="${2}"
+				shift 2
+				;;
+
+			--bootappend-live-failsafe)
+				LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE="${2}"
+				shift 2
+				;;
+
+			--bootloaders|--bootloader)
+				# This will be split up into BIOS and EFI selections by `Prepare_config()`
+				LINGMO_SYS_BUILD_BOOTLOADERS="${2}"
+				shift 2
+				;;
+
+			--bootstrap-qemu-arch)
+				LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_ARCHITECTURE="${2}"
+				shift 2
+				;;
+
+			--bootstrap-qemu-exclude)
+				LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_EXCLUDE="${2}"
+				shift 2
+				;;
+
+			--bootstrap-qemu-static)
+				LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_STATIC="${2}"
+				shift 2
+				;;
+
+			--build-with-chroot)
+				LINGMO_SYS_BUILD_BUILD_WITH_CHROOT="${2}"
+				shift 2
+				;;
+
+			--cache)
+				LINGMO_SYS_BUILD_CACHE="${2}"
+				shift 2
+				;;
+
+			--cache-indices)
+				LINGMO_SYS_BUILD_CACHE_INDICES="${2}"
+				shift 2
+				;;
+
+			--cache-packages)
+				LINGMO_SYS_BUILD_CACHE_PACKAGES="${2}"
+				shift 2
+				;;
+
+			--cache-stages)
+				LINGMO_SYS_BUILD_CACHE_STAGES="${2}"
+				shift 2
+				;;
+
+			--checksums)
+				LINGMO_SYS_BUILD_CHECKSUMS="${2}"
+				shift 2
+				;;
+
+			--chroot-filesystem)
+				LINGMO_SYS_BUILD_CHROOT_FILESYSTEM="${2}"
+				shift 2
+				;;
+
+			--chroot-squashfs-compression-level)
+				LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_LEVEL="${2}"
+				shift 2
+				;;
+
+			--chroot-squashfs-compression-type)
+				LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_TYPE="${2}"
+				shift 2
+				;;
+
+			--compression)
+				LINGMO_SYS_BUILD_COMPRESSION="${2}"
+				shift 2
+				;;
+
+			--debconf-frontend)
+				LINGMO_SYS_BUILD_DEBCONF_FRONTEND="${2}"
+				shift 2
+				;;
+
+			--debconf-priority)
+				LINGMO_SYS_BUILD_DEBCONF_PRIORITY="${2}"
+				shift 2
+				;;
+
+			--debian-installer)
+				LINGMO_SYS_BUILD_DEBIAN_INSTALLER="${2}"
+				shift 2
+				;;
+
+			--debian-installer-distribution)
+				LINGMO_SYS_BUILD_DEBIAN_INSTALLER_DISTRIBUTION="${2}"
+				shift 2
+				;;
+
+			--debian-installer-gui)
+				LINGMO_SYS_BUILD_DEBIAN_INSTALLER_GUI="${2}"
+				shift 2
+				;;
+
+			--debian-installer-preseedfile)
+				LINGMO_SYS_BUILD_DEBIAN_INSTALLER_PRESEEDFILE="${2}"
+				shift 2
+				;;
+
+			--debootstrap-options)
+				DEBOOTSTRAP_OPTIONS="${2}"
+				shift 2
+				;;
+
+			--debootstrap-script)
+				DEBOOTSTRAP_SCRIPT="${2}"
+				shift 2
+				;;
+
+			-d|--distribution)
+				LINGMO_SYS_BUILD_DISTRIBUTION="${2}"
+				shift 2
+				;;
+
+			--distribution-binary)
+				LINGMO_SYS_BUILD_DISTRIBUTION_BINARY="${2}"
+				shift 2
+				;;
+
+			--distribution-chroot)
+				LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT="${2}"
+				shift 2
+				;;
+
+			--dm-verity)
+				LINGMO_SYS_BUILD_DM_VERITY="true"
+				shift
+				;;
+
+			--dm-verity-fec)
+				LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS="${2}"
+				shift 2
+				;;
+
+			--dm-verity-sign)
+				LINGMO_SYS_BUILD_DM_VERITY_SIGN="${2}"
+				shift 2
+				;;
+
+			--fdisk)
+				Echo_warning "--fdisk is an obsolete option"
+				shift 2
+				;;
+
+			--firmware-binary)
+				LINGMO_SYS_BUILD_FIRMWARE_BINARY="${2}"
+				shift 2
+				;;
+
+			--firmware-chroot)
+				LINGMO_SYS_BUILD_FIRMWARE_CHROOT="${2}"
+				shift 2
+				;;
+
+			--grub-splash)
+				Echo_warning "--grub-splash is an obsolete option"
+				shift 2
+				;;
+
+			--gzip-options)
+				GZIP_OPTIONS="${2}"
+				shift 2
+				;;
+
+			--hdd-label)
+				LINGMO_SYS_BUILD_HDD_LABEL="${2}"
+				shift 2
+				;;
+
+			--hdd-partition-start)
+				LINGMO_SYS_BUILD_HDD_PARTITION_START="${2}"
+				shift 2
+				;;
+
+			--hdd-size)
+				LINGMO_SYS_BUILD_HDD_SIZE="${2}"
+				shift 2
+				;;
+
+			--image-name)
+				LINGMO_SYS_BUILD_IMAGE_NAME="${2}"
+				shift 2
+				;;
+
+			--initramfs)
+				LINGMO_SYS_BUILD_INITRAMFS="${2}"
+				shift 2
+				;;
+
+			--initramfs-compression)
+				LINGMO_SYS_BUILD_INITRAMFS_COMPRESSION="${2}"
+				shift 2
+				;;
+
+			--initsystem)
+				LINGMO_SYS_BUILD_INITSYSTEM="${2}"
+				shift 2
+				;;
+
+			--interactive)
+				LINGMO_SYS_BUILD_INTERACTIVE="${2}"
+				shift 2
+				;;
+
+			--iso-application)
+				LINGMO_SYS_BUILD_ISO_APPLICATION="${2}"
+				shift 2
+				;;
+
+			--iso-preparer)
+				LINGMO_SYS_BUILD_ISO_PREPARER="${2}"
+				shift 2
+				;;
+
+			--iso-publisher)
+				LINGMO_SYS_BUILD_ISO_PUBLISHER="${2}"
+				shift 2
+				;;
+
+			--iso-volume)
+				LINGMO_SYS_BUILD_ISO_VOLUME="${2}"
+				shift 2
+				;;
+
+			--isohybrid-options)
+				Echo_warning "--isohybrid-options is an obsolete option"
+				shift 2
+				;;
+
+			--jffs2-eraseblock)
+				LINGMO_SYS_BUILD_JFFS2_ERASEBLOCK="${2}"
+				shift 2
+				;;
+
+			--keyring-packages)
+				LINGMO_SYS_BUILD_KEYRING_PACKAGES="${2}"
+				shift 2
+				;;
+
+			-k|--linux-flavours)
+				LINGMO_SYS_BUILD_LINUX_FLAVOURS_WITH_ARCH="${2}"
+				shift 2
+				;;
+
+			--linux-packages)
+				LINGMO_SYS_BUILD_LINUX_PACKAGES="${2}"
+				shift 2
+				;;
+
+			--loadlin)
+				LINGMO_SYS_BUILD_LOADLIN="${2}"
+				shift 2
+				;;
+
+			--losetup)
+				Echo_warning "--losetup is an obsolete option"
+				shift 2
+				;;
+
+			--memtest)
+				LINGMO_SYS_BUILD_MEMTEST="${2}"
+				shift 2
+				;;
+
+			--mirror-binary)
+				LINGMO_SYS_BUILD_MIRROR_BINARY="${2}"
+				shift 2
+				;;
+
+			--mirror-binary-security)
+				LINGMO_SYS_BUILD_MIRROR_BINARY_SECURITY="${2}"
+				shift 2
+				;;
+
+			--mirror-bootstrap)
+				LINGMO_SYS_BUILD_MIRROR_BOOTSTRAP="${2}"
+				shift 2
+				;;
+
+			--mirror-chroot)
+				LINGMO_SYS_BUILD_MIRROR_CHROOT="${2}"
+				shift 2
+				;;
+
+			--mirror-chroot-security)
+				LINGMO_SYS_BUILD_MIRROR_CHROOT_SECURITY="${2}"
+				shift 2
+				;;
+
+			--mirror-debian-installer)
+				LINGMO_SYS_BUILD_MIRROR_DEBIAN_INSTALLER="${2}"
+				shift 2
+				;;
+
+			--mode)
+				LINGMO_SYS_BUILD_MODE="${2}"
+				shift 2
+				;;
+
+			--net-cow-filesystem)
+				Echo_warning "--net-cow-filesystem is an obsolete option"
+				shift 2
+				;;
+
+			--net-cow-mountoptions)
+				Echo_warning "--net-cow-mountoptions is an obsolete option"
+				shift 2
+				;;
+
+			--net-cow-path)
+				Echo_warning "--net-cow-path is an obsolete option"
+				shift 2
+				;;
+
+			--net-cow-server)
+				Echo_warning "--net-cow-server is an obsolete option"
+				shift 2
+				;;
+
+			--net-root-filesystem)
+				Echo_warning "--net-root-filesystem is an obsolete option"
+				shift 2
+				;;
+
+			--net-root-mountoptions)
+				Echo_warning "--net-root-mountoptions is an obsolete option"
+				shift 2
+				;;
+
+			--net-root-path)
+				Echo_warning "--net-root-path is an obsolete option"
+				shift 2
+				;;
+
+			--net-root-server)
+				Echo_warning "--net-root-server is an obsolete option"
+				shift 2
+				;;
+
+			--net-tarball)
+				LINGMO_SYS_BUILD_NET_TARBALL="${2}"
+				shift 2
+				;;
+
+			--onie)
+				LINGMO_SYS_BUILD_ONIE="${2}"
+				shift 2
+				;;
+
+			--onie-kernel-cmdline)
+				LINGMO_SYS_BUILD_ONIE_KERNEL_CMDLINE="${2}"
+				shift 2
+				;;
+
+			--parent-archive-areas)
+				LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS="${2}"
+				shift 2
+				;;
+
+			--parent-debian-installer-distribution)
+				LINGMO_SYS_BUILD_PARENT_DEBIAN_INSTALLER_DISTRIBUTION="${2}"
+				shift 2
+				;;
+
+			--parent-distribution)
+				LINGMO_SYS_BUILD_PARENT_DISTRIBUTION="${2}"
+				shift 2
+				;;
+
+			--parent-distribution-binary)
+				LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_BINARY="${2}"
+				shift 2
+				;;
+
+			--parent-distribution-chroot)
+				LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT="${2}"
+				shift 2
+				;;
+
+			--parent-mirror-binary)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY="${2}"
+				shift 2
+				;;
+
+			--parent-mirror-binary-security)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY_SECURITY="${2}"
+				shift 2
+				;;
+
+			-m|--parent-mirror-bootstrap)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP="${2}"
+				shift 2
+				;;
+
+			--parent-mirror-chroot)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT="${2}"
+				shift 2
+				;;
+
+			--parent-mirror-chroot-security)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT_SECURITY="${2}"
+				shift 2
+				;;
+
+			--parent-mirror-debian-installer)
+				LINGMO_SYS_BUILD_PARENT_MIRROR_DEBIAN_INSTALLER="${2}"
+				shift 2
+				;;
+
+			--security)
+				LINGMO_SYS_BUILD_SECURITY="${2}"
+				shift 2
+				;;
+
+			--source)
+				LINGMO_SYS_BUILD_SOURCE="${2}"
+				shift 2
+				;;
+
+			-s|--source-images)
+				LINGMO_SYS_BUILD_SOURCE_IMAGES="${2}"
+				shift 2
+				;;
+
+			--swap-file-path)
+				LINGMO_SYS_BUILD_SWAP_FILE_PATH="${2}"
+				shift 2
+				;;
+
+			--swap-file-size)
+				LINGMO_SYS_BUILD_SWAP_FILE_SIZE="${2}"
+				shift 2
+				;;
+
+			--system)
+				LINGMO_SYS_BUILD_SYSTEM="${2}"
+				shift 2
+				;;
+
+			--tasksel)
+				Echo_warning "--tasksel is an obsolete option"
+				shift 2
+				;;
+
+			--uefi-secure-boot)
+				LINGMO_SYS_BUILD_UEFI_SECURE_BOOT="${2}"
+				shift 2
+				;;
+
+			--updates)
+				LINGMO_SYS_BUILD_UPDATES="${2}"
+				shift 2
+				;;
+
+			--utc-time)
+				LINGMO_SYS_BUILD_UTC_TIME="${2}"
+				shift 2
+				;;
+
+			--win32-loader)
+				LINGMO_SYS_BUILD_WIN32_LOADER="${2}"
+				shift 2
+				;;
+
+			--zsync)
+				LINGMO_SYS_BUILD_ZSYNC="${2}"
+				shift 2
+				;;
+
+			# Other
+
+			--)
+				shift
+				break
+				;;
+
+			*)
+				Echo_error "Internal error, unhandled option: %s" "${1}"
+				exit 1
+				;;
+		esac
+	done
+}
+
+# Processing args such that we have a value for --config if given
+# We can thus momentarily print an appropriate message that we are ignoring it under certain circumstances
+Local_arguments "${@}"
+
+# Ignoring --config if CWD is already a git repo
+# Only print warning from direct execution, not when run from auto script redirection, to avoid repetition
+if [ -e .git ] && [ -n "${_CONFIG}" ]
+then
+	if [ "${1}" != "noauto" ]
+	then
+		Echo_message "Ignoring --config ${_CONFIG}: ${PWD} is already a git repository"
+	fi
+
+	_CONFIG=""
+fi
+
+# Ignoring --config if CWD already has a config
+# Only print warning from direct execution, not when run from auto script redirection, to avoid repetition
+if Stagefile_exists && [ -n "${_CONFIG}" ]
+then
+	if [ "${1}" != "noauto" ]
+	then
+		Echo_message "Ignoring --config ${_CONFIG}: ${PWD} is already a lingmo-system-build configuration tree"
+	fi
+
+	_CONFIG=""
+fi
+
+# Otherwise, handling --config request, copying specified config
+if [ -n "${_CONFIG}" ]
+then
+	if [ -e "${_CONFIG}" ] || [ -e "/usr/share/live/images/${_CONFIG}" ]
+	then
+		if [ ! -e "${_CONFIG}" ] && [ -e "/usr/share/live/images/${_CONFIG}" ]
+		then
+			_CONFIG="/usr/share/live/images/${_CONFIG}"
+		fi
+
+		Echo_message "Copying ${_CONFIG}"
+		tar -C "${_CONFIG}" -c . | tar -C ./ -x
+	else
+		_GIT_REPOSITORY="$(echo ${_CONFIG} | sed -e 's|::.*$||')"
+
+		Echo_message "Cloning ${_GIT_REPOSITORY}"
+		git clone ${_GIT_REPOSITORY} ./
+
+		if [ "${_GIT_REPOSITORY}" != "${_CONFIG}" ]
+		then
+			_GIT_BRANCH="$(echo ${_CONFIG} | awk -F\:\: '{ print $NF }')"
+
+			Echo_message "Checking out ${_GIT_BRANCH}"
+			git checkout ${_GIT_BRANCH}
+		fi
+	fi
+
+	if [ -e auto/config ]
+	then
+		_EXTRA_OPTIONS="$(echo ${@} | sed -e "s|--config ${_GIT_REPOSITORY}::${_GIT_BRANCH}||g" -e "s|--config ${_GIT_REPOSITORY}||g")"
+
+		Echo_message "The following extra options specified to lingmo-sys-build config are going to be added to auto/config: ${_EXTRA_OPTIONS}"
+		sed -i -e "s|\"\${@}\"|${_EXTRA_OPTIONS} \"\${@}\"|" auto/config
+	fi
+fi
+
+# "Auto" script redirection.
+# Re-run via "auto" script to pick up saved command-line arguments, if not already redirected.
+# See the documentation of the Maybe_auto_redirect function for more details.
+if [ "${1}" = "noauto" ]; then
+	shift
+else
+	Maybe_auto_redirect config "${@}"
+fi
+
+# Reading config defaults configured at system level
+if ls /etc/live/build.conf > /dev/null 2>&1 || ls /etc/live/build/* > /dev/null 2>&1
+then
+	if [ "${_IGNORE_SYSTEM_DEFAULTS}" = "true" ]; then
+		Echo_message "Ignoring defaults in %s" "/etc/live/build.conf"
+	else
+		Echo_message "Using defaults in %s" "/etc/live/build.conf"
+
+		Read_conffiles /etc/live/build.conf /etc/live/build/*
+	fi
+fi
+
+# Reading existing saved configuration
+Read_conffiles $(Common_conffiles)
+
+# Processing arguments again to overwrite just-read previously saved settings as necessary
+Local_arguments "${@}"
+
+# Loading user specified saved config file if specified
+if [ -n "${_CONFFILE}" ]
+then
+	Read_conffiles "${_CONFFILE}"
+fi
+
+# Setting and validating config
+Prepare_config
+Validate_config
+
+if [ "${_VALIDATE_MODE}" = "true" ]; then
+	Echo_message "Validation check complete! Please address any problem notices given above."
+	exit 0
+fi
+
+# Creating or updating saved config
+
+if [ ! -e config ]
+then
+	Echo_message "Creating config tree for a ${LINGMO_SYS_BUILD_MODE}/${LINGMO_SYS_BUILD_DISTRIBUTION_BINARY}/${LINGMO_SYS_BUILD_ARCHITECTURE} system"
+	mkdir config
+else
+	Echo_message "Updating config tree for a ${LINGMO_SYS_BUILD_MODE}/${LINGMO_SYS_BUILD_DISTRIBUTION_BINARY}/${LINGMO_SYS_BUILD_ARCHITECTURE} system"
+fi
+
+# Creating lingmo-system-build configuration
+cat > config/common << EOF
+# config/common - common options for lingmo-system-build(7)
+
+# Version of lingmo-system-build used to build config (config format version)
+LINGMO_SYS_BUILD_CONFIGURATION_VERSION="${LINGMO_SYS_BUILD_CONFIGURATION_VERSION}"
+
+# Set package manager
+LINGMO_SYS_BUILD_APT="${LINGMO_SYS_BUILD_APT}"
+
+# Set proxy for HTTP connections
+LINGMO_SYS_BUILD_APT_HTTP_PROXY="${LINGMO_SYS_BUILD_APT_HTTP_PROXY}"
+
+# Set apt/aptitude pipeline depth
+LINGMO_SYS_BUILD_APT_PIPELINE="${LINGMO_SYS_BUILD_APT_PIPELINE}"
+
+# Set apt/aptitude recommends
+LINGMO_SYS_BUILD_APT_RECOMMENDS="${LINGMO_SYS_BUILD_APT_RECOMMENDS}"
+
+# Set apt/aptitude security
+LINGMO_SYS_BUILD_APT_SECURE="${LINGMO_SYS_BUILD_APT_SECURE}"
+
+# Set apt/aptitude source entries in sources.list
+LINGMO_SYS_BUILD_APT_SOURCE_ARCHIVES="${LINGMO_SYS_BUILD_APT_SOURCE_ARCHIVES}"
+
+# Control cache
+LINGMO_SYS_BUILD_CACHE="${LINGMO_SYS_BUILD_CACHE}"
+
+# Control if downloaded package indices should be cached
+LINGMO_SYS_BUILD_CACHE_INDICES="${LINGMO_SYS_BUILD_CACHE_INDICES}"
+
+# Control if downloaded packages files should be cached
+LINGMO_SYS_BUILD_CACHE_PACKAGES="${LINGMO_SYS_BUILD_CACHE_PACKAGES}"
+
+# Control if completed stages should be cached
+LINGMO_SYS_BUILD_CACHE_STAGES="${LINGMO_SYS_BUILD_CACHE_STAGES}"
+
+# Set debconf(1) frontend to use
+LINGMO_SYS_BUILD_DEBCONF_FRONTEND="${LINGMO_SYS_BUILD_DEBCONF_FRONTEND}"
+
+# Set debconf(1) priority to use
+LINGMO_SYS_BUILD_DEBCONF_PRIORITY="${LINGMO_SYS_BUILD_DEBCONF_PRIORITY}"
+
+# Set initramfs hook
+LINGMO_SYS_BUILD_INITRAMFS="${LINGMO_SYS_BUILD_INITRAMFS}"
+
+# Set initramfs compression
+LINGMO_SYS_BUILD_INITRAMFS_COMPRESSION="${LINGMO_SYS_BUILD_INITRAMFS_COMPRESSION}"
+
+# Set init system
+LINGMO_SYS_BUILD_INITSYSTEM="${LINGMO_SYS_BUILD_INITSYSTEM}"
+
+# Set distribution mode
+LINGMO_SYS_BUILD_MODE="${LINGMO_SYS_BUILD_MODE}"
+
+# Set system type
+LINGMO_SYS_BUILD_SYSTEM="${LINGMO_SYS_BUILD_SYSTEM}"
+
+# Set base name of the image
+LINGMO_SYS_BUILD_IMAGE_NAME="${LINGMO_SYS_BUILD_IMAGE_NAME}"
+
+# Set options to use with apt
+APT_OPTIONS="${APT_OPTIONS}"
+
+# Set options to use with aptitude
+APTITUDE_OPTIONS="${APTITUDE_OPTIONS}"
+
+# Set options to use with debootstrap
+DEBOOTSTRAP_OPTIONS="${DEBOOTSTRAP_OPTIONS}"
+
+# Set script to use with debootstrap
+DEBOOTSTRAP_SCRIPT="${DEBOOTSTRAP_SCRIPT}"
+
+# Set options to use with gzip
+GZIP_OPTIONS="${GZIP_OPTIONS}"
+
+# Enable UTC timestamps
+LINGMO_SYS_BUILD_UTC_TIME="${LINGMO_SYS_BUILD_UTC_TIME}"
+
+# lingmo-system-build options
+
+# Enable breakpoints
+# If set here, overrides the command line option
+#_BREAKPOINTS="${_BREAKPOINTS}"
+
+# Enable debug
+# If set here, overrides the command line option
+#_DEBUG="${_DEBUG}"
+
+# Enable color
+# If set here, overrides the command line option
+#_COLOR="${_COLOR}"
+
+# Enable force
+# If set here, overrides the command line option
+#_FORCE="${_FORCE}"
+
+# Enable quiet
+# If set here, overrides the command line option
+#_QUIET="${_QUIET}"
+
+# Enable verbose
+# If set here, overrides the command line option
+#_VERBOSE="${_VERBOSE}"
+EOF
+
+# Creating lingmo-sys-build_bootstrap_* configuration
+cat > config/bootstrap << EOF
+# config/bootstrap - options for lingmo-system-build(7), bootstrap stage
+
+# Select architecture to use
+LINGMO_SYS_BUILD_ARCHITECTURE="${LINGMO_SYS_BUILD_ARCHITECTURE}"
+
+# Select distribution to use
+LINGMO_SYS_BUILD_DISTRIBUTION="${LINGMO_SYS_BUILD_DISTRIBUTION}"
+
+# Select parent distribution to use
+LINGMO_SYS_BUILD_PARENT_DISTRIBUTION="${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION}"
+
+# Select distribution to use in the chroot
+LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT="${LINGMO_SYS_BUILD_DISTRIBUTION_CHROOT}"
+
+# Select parent distribution to use in the chroot
+LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT="${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_CHROOT}"
+
+# Select distribution to use in the final image
+LINGMO_SYS_BUILD_DISTRIBUTION_BINARY="${LINGMO_SYS_BUILD_DISTRIBUTION_BINARY}"
+
+# Select parent distribution to use in the final image
+LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_BINARY="${LINGMO_SYS_BUILD_PARENT_DISTRIBUTION_BINARY}"
+
+# Select parent distribution for debian-installer to use
+LINGMO_SYS_BUILD_PARENT_DEBIAN_INSTALLER_DISTRIBUTION="${LINGMO_SYS_BUILD_PARENT_DEBIAN_INSTALLER_DISTRIBUTION}"
+
+# Select archive areas to use
+LINGMO_SYS_BUILD_ARCHIVE_AREAS="${LINGMO_SYS_BUILD_ARCHIVE_AREAS}"
+
+# Select parent archive areas to use
+LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS="${LINGMO_SYS_BUILD_PARENT_ARCHIVE_AREAS}"
+
+# Set parent mirror to bootstrap from
+LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP="${LINGMO_SYS_BUILD_PARENT_MIRROR_BOOTSTRAP}"
+
+# Set parent mirror to fetch packages from
+LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT="${LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT}"
+
+# Set security parent mirror to fetch packages from
+LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT_SECURITY="${LINGMO_SYS_BUILD_PARENT_MIRROR_CHROOT_SECURITY}"
+
+# Set parent mirror which ends up in the image
+LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY="${LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY}"
+
+# Set security parent mirror which ends up in the image
+LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY_SECURITY="${LINGMO_SYS_BUILD_PARENT_MIRROR_BINARY_SECURITY}"
+
+# Set debian-installer parent mirror
+LINGMO_SYS_BUILD_PARENT_MIRROR_DEBIAN_INSTALLER="${LINGMO_SYS_BUILD_PARENT_MIRROR_DEBIAN_INSTALLER}"
+
+# Set mirror to bootstrap from
+LINGMO_SYS_BUILD_MIRROR_BOOTSTRAP="${LINGMO_SYS_BUILD_MIRROR_BOOTSTRAP}"
+
+# Set mirror to fetch packages from
+LINGMO_SYS_BUILD_MIRROR_CHROOT="${LINGMO_SYS_BUILD_MIRROR_CHROOT}"
+
+# Set security mirror to fetch packages from
+LINGMO_SYS_BUILD_MIRROR_CHROOT_SECURITY="${LINGMO_SYS_BUILD_MIRROR_CHROOT_SECURITY}"
+
+# Set mirror which ends up in the image
+LINGMO_SYS_BUILD_MIRROR_BINARY="${LINGMO_SYS_BUILD_MIRROR_BINARY}"
+
+# Set security mirror which ends up in the image
+LINGMO_SYS_BUILD_MIRROR_BINARY_SECURITY="${LINGMO_SYS_BUILD_MIRROR_BINARY_SECURITY}"
+
+# Set debian-installer mirror
+LINGMO_SYS_BUILD_MIRROR_DEBIAN_INSTALLER="${LINGMO_SYS_BUILD_MIRROR_DEBIAN_INSTALLER}"
+
+# Set architectures to use foreign bootstrap
+LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_ARCHITECTURE="${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_ARCHITECTURE}"
+
+# Set packages to exclude during foreign bootstrap
+LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_EXCLUDE="${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_EXCLUDE}"
+
+# Set static qemu binary for foreign bootstrap
+LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_STATIC="${LINGMO_SYS_BUILD_BOOTSTRAP_QEMU_STATIC}"
+EOF
+
+# Creating lingmo-sys-build_chroot_* configuration
+cat > config/chroot << EOF
+# config/chroot - options for lingmo-system-build(7), chroot stage
+
+# Set chroot filesystem
+LINGMO_SYS_BUILD_CHROOT_FILESYSTEM="${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}"
+
+# Set chroot squashfs compression level
+LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_LEVEL="${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_LEVEL}"
+
+# Set chroot squashfs compression type
+LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_TYPE="${LINGMO_SYS_BUILD_CHROOT_SQUASHFS_COMPRESSION_TYPE}"
+
+# Set union filesystem
+LINGMO_SYS_BUILD_UNION_FILESYSTEM="${LINGMO_SYS_BUILD_UNION_FILESYSTEM}"
+
+# Set interactive build
+LINGMO_SYS_BUILD_INTERACTIVE="${LINGMO_SYS_BUILD_INTERACTIVE}"
+
+# Set keyring packages
+LINGMO_SYS_BUILD_KEYRING_PACKAGES="${LINGMO_SYS_BUILD_KEYRING_PACKAGES}"
+
+# Set kernel flavour to use (with arch)
+LINGMO_SYS_BUILD_LINUX_FLAVOURS_WITH_ARCH="${LINGMO_SYS_BUILD_LINUX_FLAVOURS_WITH_ARCH}"
+
+# Set kernel packages to use
+LINGMO_SYS_BUILD_LINUX_PACKAGES="${LINGMO_SYS_BUILD_LINUX_PACKAGES}"
+
+# Enable security updates
+LINGMO_SYS_BUILD_SECURITY="${LINGMO_SYS_BUILD_SECURITY}"
+
+# Enable updates updates
+LINGMO_SYS_BUILD_UPDATES="${LINGMO_SYS_BUILD_UPDATES}"
+
+# Enable backports updates
+LINGMO_SYS_BUILD_BACKPORTS="${LINGMO_SYS_BUILD_BACKPORTS}"
+EOF
+
+# Creating lingmo-sys-build_binary_* configuration
+cat > config/binary << EOF
+# config/binary - options for lingmo-system-build(7), binary stage
+
+# Set image type
+LINGMO_SYS_BUILD_IMAGE_TYPE="${LINGMO_SYS_BUILD_IMAGE_TYPE}"
+
+# Set image filesystem
+LINGMO_SYS_BUILD_BINARY_FILESYSTEM="${LINGMO_SYS_BUILD_BINARY_FILESYSTEM}"
+
+# Set apt/aptitude generic indices
+LINGMO_SYS_BUILD_APT_INDICES="${LINGMO_SYS_BUILD_APT_INDICES}"
+
+# Set boot parameters
+LINGMO_SYS_BUILD_BOOTAPPEND_LIVE="${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE}"
+
+# Set boot parameters
+LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL="${LINGMO_SYS_BUILD_BOOTAPPEND_INSTALL}"
+
+# Set boot parameters
+LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE="${LINGMO_SYS_BUILD_BOOTAPPEND_LIVE_FAILSAFE}"
+
+# Set BIOS bootloader
+LINGMO_SYS_BUILD_BOOTLOADER_BIOS="${LINGMO_SYS_BUILD_BOOTLOADER_BIOS}"
+
+# Set EFI bootloader
+LINGMO_SYS_BUILD_BOOTLOADER_EFI="${LINGMO_SYS_BUILD_BOOTLOADER_EFI}"
+
+# Set bootloaders
+LINGMO_SYS_BUILD_BOOTLOADERS="${LINGMO_SYS_BUILD_BOOTLOADERS}"
+
+# Set checksums
+LINGMO_SYS_BUILD_CHECKSUMS="${LINGMO_SYS_BUILD_CHECKSUMS}"
+
+# Set compression
+LINGMO_SYS_BUILD_COMPRESSION="${LINGMO_SYS_BUILD_COMPRESSION}"
+
+# Support dm-verity on rootfs
+LINGMO_SYS_BUILD_DM_VERITY="${LINGMO_SYS_BUILD_DM_VERITY}"
+
+# Support FEC on dm-verity rootfs
+LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS="${LINGMO_SYS_BUILD_DM_VERITY_FEC_ROOTS}"
+
+# Set sign script for roothash for dm-verity rootfs
+LINGMO_SYS_BUILD_DM_VERITY_SIGN="${LINGMO_SYS_BUILD_DM_VERITY_SIGN}"
+
+# Set zsync
+LINGMO_SYS_BUILD_ZSYNC="${LINGMO_SYS_BUILD_ZSYNC}"
+
+# Control if we build binary images chrooted
+# NEVER, *EVER*, *E*V*E*R* SET THIS OPTION to false.
+LINGMO_SYS_BUILD_BUILD_WITH_CHROOT="${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}"
+
+# Set debian-installer
+LINGMO_SYS_BUILD_DEBIAN_INSTALLER="${LINGMO_SYS_BUILD_DEBIAN_INSTALLER}"
+
+# Set debian-installer suite
+LINGMO_SYS_BUILD_DEBIAN_INSTALLER_DISTRIBUTION="${LINGMO_SYS_BUILD_DEBIAN_INSTALLER_DISTRIBUTION}"
+
+# Set debian-installer preseed filename/url
+LINGMO_SYS_BUILD_DEBIAN_INSTALLER_PRESEEDFILE="${LINGMO_SYS_BUILD_DEBIAN_INSTALLER_PRESEEDFILE}"
+
+# Toggle use of GUI debian-installer
+LINGMO_SYS_BUILD_DEBIAN_INSTALLER_GUI="${LINGMO_SYS_BUILD_DEBIAN_INSTALLER_GUI}"
+
+# Set hdd label
+LINGMO_SYS_BUILD_HDD_LABEL="${LINGMO_SYS_BUILD_HDD_LABEL}"
+
+# Set hdd filesystem size
+LINGMO_SYS_BUILD_HDD_SIZE="${LINGMO_SYS_BUILD_HDD_SIZE}"
+
+# Set start of partition for the hdd target for BIOSes that expect a specific boot partition start (e.g. "63s"). If empty, use optimal layout.
+LINGMO_SYS_BUILD_HDD_PARTITION_START="${LINGMO_SYS_BUILD_HDD_PARTITION_START}"
+
+# Set iso author
+LINGMO_SYS_BUILD_ISO_APPLICATION="${LINGMO_SYS_BUILD_ISO_APPLICATION}"
+
+# Set iso preparer
+LINGMO_SYS_BUILD_ISO_PREPARER="${LINGMO_SYS_BUILD_ISO_PREPARER}"
+
+# Set iso publisher
+LINGMO_SYS_BUILD_ISO_PUBLISHER="${LINGMO_SYS_BUILD_ISO_PUBLISHER}"
+
+# Set iso volume (max 32 chars)
+LINGMO_SYS_BUILD_ISO_VOLUME="${LINGMO_SYS_BUILD_ISO_VOLUME}"
+
+# Set jffs2 eraseblock size
+LINGMO_SYS_BUILD_JFFS2_ERASEBLOCK="${LINGMO_SYS_BUILD_JFFS2_ERASEBLOCK}"
+
+# Set memtest
+LINGMO_SYS_BUILD_MEMTEST="${LINGMO_SYS_BUILD_MEMTEST}"
+
+# Set loadlin
+LINGMO_SYS_BUILD_LOADLIN="${LINGMO_SYS_BUILD_LOADLIN}"
+
+# Set win32-loader
+LINGMO_SYS_BUILD_WIN32_LOADER="${LINGMO_SYS_BUILD_WIN32_LOADER}"
+
+# Set net tarball
+LINGMO_SYS_BUILD_NET_TARBALL="${LINGMO_SYS_BUILD_NET_TARBALL}"
+
+# Set onie
+LINGMO_SYS_BUILD_ONIE="${LINGMO_SYS_BUILD_ONIE}"
+
+# Set onie additional kernel cmdline options
+LINGMO_SYS_BUILD_ONIE_KERNEL_CMDLINE="${LINGMO_SYS_BUILD_ONIE_KERNEL_CMDLINE}"
+
+# Set inclusion of firmware packages in debian-installer
+LINGMO_SYS_BUILD_FIRMWARE_BINARY="${LINGMO_SYS_BUILD_FIRMWARE_BINARY}"
+
+# Set inclusion of firmware packages in the live image
+LINGMO_SYS_BUILD_FIRMWARE_CHROOT="${LINGMO_SYS_BUILD_FIRMWARE_CHROOT}"
+
+# Set swap file path
+LINGMO_SYS_BUILD_SWAP_FILE_PATH="${LINGMO_SYS_BUILD_SWAP_FILE_PATH}"
+
+# Set swap file size
+LINGMO_SYS_BUILD_SWAP_FILE_SIZE="${LINGMO_SYS_BUILD_SWAP_FILE_SIZE}"
+
+# Enable/disable UEFI secure boot support
+LINGMO_SYS_BUILD_UEFI_SECURE_BOOT="${LINGMO_SYS_BUILD_UEFI_SECURE_BOOT}"
+EOF
+
+# Creating lingmo-sys-build_source_* configuration
+cat > config/source << EOF
+# config/source - options for lingmo-system-build(7), source stage
+
+# Set source option
+LINGMO_SYS_BUILD_SOURCE="${LINGMO_SYS_BUILD_SOURCE}"
+
+# Set image type
+LINGMO_SYS_BUILD_SOURCE_IMAGES="${LINGMO_SYS_BUILD_SOURCE_IMAGES}"
+EOF
+
+mkdir -p auto
+mkdir -p config/apt
+mkdir -p config/archives
+mkdir -p config/bootloaders
+mkdir -p config/debian-installer
+mkdir -p config/hooks/live
+mkdir -p config/hooks/normal
+mkdir -p config/includes
+mkdir -p config/includes.binary
+mkdir -p config/includes.bootstrap
+mkdir -p config/includes.chroot_after_packages
+mkdir -p config/includes.chroot_before_packages
+mkdir -p config/includes.installer
+mkdir -p config/includes.source
+mkdir -p config/package-lists
+mkdir -p config/packages
+mkdir -p config/packages.binary
+mkdir -p config/packages.chroot
+mkdir -p config/preseed
+mkdir -p config/rootfs
+mkdir -p local/bin
+
+Echo_message "Symlinking hooks..."
+if [ -n "${LIVE_BUILD}" ] && [ -d "${LIVE_BUILD}/share/hooks" ]
+then
+	LOCATION="${LIVE_BUILD}/share/hooks"
+else
+	LOCATION=/usr/share/live/build/hooks
+fi
+
+for _HOOK in "${LOCATION}"/normal/*.hook*
+do
+	if [ -e "${_HOOK}" ] && [ ! -e "config/hooks/normal/$(basename ${_HOOK})" ]
+	then
+		ln -s "${_HOOK}" "config/hooks/normal/$(basename ${_HOOK})"
+	fi
+done
+
+for _HOOK in "${LOCATION}"/live/*.hook*
+do
+	if [ -e "${_HOOK}" ] && [ ! -e "config/hooks/live/$(basename ${_HOOK})" ]
+	then
+		ln -s "${_HOOK}" "config/hooks/live/$(basename ${_HOOK})"
+	fi
+done
+
+LIVE_PKG_LIST="config/package-lists/live.list.chroot"
+if [ ! -e "${LIVE_PKG_LIST}" ]; then
+	NEEDED_PACKAGES=""
+	if [ "${LINGMO_SYS_BUILD_INITRAMFS}" = "live-boot" ]; then
+		NEEDED_PACKAGES="live-boot live-config"
+		case "${LINGMO_SYS_BUILD_INITSYSTEM}" in
+			systemd)
+				NEEDED_PACKAGES="${NEEDED_PACKAGES} live-config-systemd systemd-sysv"
+				;;
+
+			sysvinit)
+				NEEDED_PACKAGES="${NEEDED_PACKAGES} live-config-sysvinit sysvinit-core"
+				;;
+		esac
+	fi
+	for PKG in $NEEDED_PACKAGES; do
+		echo "${PKG}" >> "${LIVE_PKG_LIST}"
+	done
+fi
+
+# Remove empty directories (if user has requested via --clean)
+if [ "${_CLEAN}" = "true" ]; then
+	# Note, the point of the error handling here is for avoiding failure and messy output
+	# should a permissions failure block deletion.
+	rmdir --ignore-fail-on-non-empty auto >/dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty config/*/ >/dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty config >/dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty local/*/ >/dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty local >/dev/null 2>&1 || true
+fi
+
+# Creating stage file
+Create_stagefile

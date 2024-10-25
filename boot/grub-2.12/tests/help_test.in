@@ -1,0 +1,19 @@
+#! @BUILD_SHEBANG@
+set -e
+
+. "@builddir@/grub-core/modinfo.sh"
+
+template="Usage: help [PATTERN ...]
+Show a help message.
+
+-h, --help              Display this help and exit.
+-u, --usage             Display the usage of this command and exit.
+
+
+To enable less(1)-like paging, \"set pager=1\".
+Hello World"
+output="$(echo 'help help; hello' | @builddir@/grub-shell)"
+
+if [ "$template" != "$output" ]; then
+    exit 1
+fi

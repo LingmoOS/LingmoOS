@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_LRZIP
+	bool "lrzip"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LZ4
+	select LINGMO_PACKAGE_LZO
+	select LINGMO_PACKAGE_BZIP2
+	help
+	  A compression utility that excels at compressing large files
+	  (usually > 10-50 MB). Larger files and/or more free RAM means
+	  that the utility will be able to more effectively compress
+	  your files (ie: faster / smaller size), especially if the
+	  filesize(s) exceed 100 MB. You can either choose to optimise
+	  for speed (fast compression / decompression) or size,
+	  but not both.
+
+	  https://github.com/ckolivas/lrzip
+
+comment "lrzip needs a toolchain w/ wchar, threads, C++"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP

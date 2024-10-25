@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+
+import io
+import os
+import os.path
+import re
+import subprocess
+import sys
+
+
+def main(repo, range='torvalds/master..dhowells/efi-lock-down'):
+    patch_dir = 'debian/patches'
+    lockdown_patch_dir = 'features/all/lockdown'
+    series_name = 'series'
+
+    # Only replace patches in this subdirectory and starting with a digit
+    # - the others are presumably Debian-specific for now
+    lockdown_patch_name_re = re.compile(
+        r'^' + re.escape(lockdown_patch_dir) + r'/\d')
+    series_before = []
+    series_after = []
+
+    old_series = set()
+    new_series = set()
+
+    try:
+        with open(os.path.join(patch_dir, series_name), 'r') as series_fh:
+            for line in series_fh:
+                name = line.strip()
+                if lockdown_patch_name_re.match(name):
+                    old_series.add(name)
+                elif len(old_series) == 0:
+                    series_before.append(line)
+                else:
+                    series_after.append(line)
+    except FileNotFoundError:
+        pass
+
+    with open(os.path.join(patch_dir, series_name), 'w') as series_fh:
+        for line in series_before:
+            series_fh.write(line)
+
+        # Add directory prefix to all filenames.
+        # Add Origin to all patch headers.
+        def add_patch(name, source_patch, origin):
+            name = os.path.join(lockdown_patch_dir, name)
+            path = os.path.join(patch_dir, name)
+            try:
+                os.unlink(path)
+            except FileNotFoundError:
+                pass
+            with open(path, 'w') as patch:
+                in_header = True
+                for line in source_patch:
+                    if in_header and re.match(r'^(\n|[^\w\s]|Index:)', line):
+                        patch.write('Origin: %s\n' % origin)
+                        if line != '\n':
+                            patch.write('\n')
+                        in_header = False
+                    patch.write(line)
+            series_fh.write(name)
+            series_fh.write('\n')
+            new_series.add(name)
+
+        # XXX No signature to verify
+
+        env = os.environ.copy()
+        env['GIT_DIR'] = os.path.join(repo, '.git')
+        args = ['git', 'format-patch', '--subject-prefix=', range]
+        format_proc = subprocess.Popen(args,
+                                       cwd=os.path.join(patch_dir,
+                                                        lockdown_patch_dir),
+                                       env=env, stdout=subprocess.PIPE)
+        with io.open(format_proc.stdout.fileno(), encoding='utf-8') as pipe:
+            for line in pipe:
+                name = line.strip('\n')
+                with open(os.path.join(patch_dir, lockdown_patch_dir, name)) \
+                     as source_patch:
+                    patch_from = source_patch.readline()
+                    match = re.match(r'From ([0-9a-f]{40}) ', patch_from)
+                    assert match
+                    origin = ('https://git.kernel.org/pub/scm/linux/kernel/'
+                              'git/dhowells/linux-fs.git/commit?id=%s' %
+                              match.group(1))
+                    add_patch(name, source_patch, origin)
+
+        for line in series_after:
+            series_fh.write(line)
+
+    for name in new_series:
+        if name in old_series:
+            old_series.remove(name)
+        else:
+            print('Added patch', os.path.join(patch_dir, name))
+
+    for name in old_series:
+        print('Obsoleted patch', os.path.join(patch_dir, name))
+
+
+if __name__ == '__main__':
+    if not (2 <= len(sys.argv) <= 3):
+        sys.stderr.write('''\
+Usage: %s REPO [REVISION-RANGE]
+REPO is a git repo containing the REVISION-RANGE.  The default range is
+torvalds/master..dhowells/efi-lock-down.
+''' % sys.argv[0])
+        print('BASE is the base branch (default: torvalds/master).')
+        sys.exit(2)
+    main(*sys.argv[1:])

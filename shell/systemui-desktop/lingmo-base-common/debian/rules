@@ -1,0 +1,87 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+
+OSNAME = "GNU/`uname | sed -e 's/GNU\///'`"
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+  OSNAME=GNU/Linux
+endif
+ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
+  OSNAME=GNU/Hurd
+endif
+
+VENDORFILE = debian
+DESTDIR = debian/base-files
+
+ifneq (,$(filter $(DEB_HOST_ARCH),amd64 loong64 mips64el ppc64 ppc64el sparc64))
+  USR_MERGE_RTLDLIB = lib64
+else ifneq (,$(filter $(DEB_HOST_ARCH),x32))
+  USR_MERGE_RTLDLIB = libx32
+endif
+USR_MERGE = bin lib sbin $(USR_MERGE_RTLDLIB)
+USR_MERGE_MULTILIB = $(filter-out $(USR_MERGE),lib32 lib64 libo32 libx32)
+
+%:
+	dh $@
+
+execute_after_dh_clean:
+	sh debian/timestamps
+
+override_dh_auto_build:
+	sh debian/check-md5sum-etc profile
+	set -e; { \
+	  echo "# Triggers for creating multilib aliasing symlinks on demand"; \
+	  for d in $(USR_MERGE_MULTILIB); do \
+	    echo "interest-noawait /usr/$$d"; \
+	  done; \
+	} > debian/triggers
+
+execute_after_dh_installdirs:
+	dh_installdirs $(foreach d,$(USR_MERGE),usr/$(d))
+
+override_dh_auto_install:
+	mkdir -p $(DESTDIR)/etc/apt/sources.list.d
+	install -p -m 644 etc/*      $(DESTDIR)/etc
+	install -p -m 755 motd/*     $(DESTDIR)/etc/update-motd.d
+	install -p -m 644 licenses/* $(DESTDIR)/usr/share/common-licenses
+	install -p -m 644 origins/*  $(DESTDIR)/etc/dpkg/origins
+	install -p -m 644 share/*    $(DESTDIR)/usr/share/base-files
+	install -p -m 644 extra/apt/sources.list $(DESTDIR)/etc/apt/
+	install -p -m 644 extra/apt/sources.list.d/* $(DESTDIR)/etc/apt/sources.list.d/
+ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
+	rmdir $(DESTDIR)/sys
+endif
+	sed -e "s&#OSNAME#&$(OSNAME)&g" share/motd     > $(DESTDIR)/usr/share/base-files/motd
+	sed -e "s&#OSNAME#&$(OSNAME)&g" share/info.dir > $(DESTDIR)/usr/share/base-files/info.dir
+	sed -e "s&#OSNAME#&$(OSNAME)&g" etc/issue      > $(DESTDIR)/etc/issue
+	sed -e "s&#OSNAME#&$(OSNAME)&g" etc/issue.net  > $(DESTDIR)/etc/issue.net
+	sed -e "s&#OSNAME#&$(OSNAME)&g" etc/os-release > $(DESTDIR)/etc/os-release
+	mv $(DESTDIR)/etc/os-release $(DESTDIR)/usr/lib/os-release
+	ln -s ../usr/lib/os-release $(DESTDIR)/etc/os-release
+
+override_dh_installchangelogs:
+	dh_installchangelogs --no-trim
+
+override_dh_link:
+	dh_link -X os-release
+	# We want these links to be relative, so we cannot use dh_link.
+	set -e; for d in $(USR_MERGE); do \
+	  ln -s usr/$$d debian/base-files/$$d; \
+	done
+
+override_dh_compress:
+	dh_compress -X README
+
+override_dh_fixperms:
+	dh_fixperms
+	cd debian/base-files && chown root:staff   var/local
+	cd debian/base-files && chmod 755  `find . -type d`
+	cd debian/base-files && chmod 1777 `cat ../1777-dirs`
+	cd debian/base-files && chmod 2775 `cat ../2775-dirs`
+	cd debian/base-files && chmod 700 root
+
+override_dh_installdeb:
+	dh_installdeb \
+	  '-DVENDORFILE=$(VENDORFILE)' \
+	  '-DUSR_MERGE_MULTILIB=$(USR_MERGE_MULTILIB)' \
+	  '-DUSR_MERGE_RTLDLIB=$(USR_MERGE_RTLDLIB)'

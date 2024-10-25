@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+export CODENAME VERSION
+
+MIRROR=http://local-mirror.cdbuilder.debian.org/debian/
+APT_MIRROR=http://deb.debian.org/debian/
+
+while getopts ":a:t:b:" o; do
+    case "${o}" in
+        a)
+            ARCH=${OPTARG}
+            ;;
+        *)
+	    echo "Unrecognised arg ${o}"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+validate_arg ARCH "amd64:arm64"
+
+case $ARCH in
+    amd64)
+	BOOT_TYPE=mbr
+	;;
+    arm64)
+	BOOT_TYPE=uefi
+	;;
+esac
+
+# Rename the output files to something more appropriate for our use
+RENAME="s,debian-$CODENAME-(.*)-$ARCH,debian-$VERSION-openstack-$ARCH,"
+
+BUILDNAME="openstack-$CODENAME-$ARCH"
+WORK="${TOP}/work/${BUILDNAME}"
+OUT="/external/out/openstack-$CODENAME/${ARCH}"
+rm -rf ${OUT} ${WORK}
+mkdir -p ${WORK} ${OUT}
+cd ${WORK}
+
+BUILDSTART=$(now)
+# log "Starting full $ARCH OpenStack image build (codename $CODENAME, version $VERSION) at $BUILDSTART"
+
+START=$(now)
+
+build-openstack-debian-image \
+    -hs $TOP/openstack-hook \
+    -u $MIRROR \
+    -s $APT_MIRROR \
+    -r $CODENAME \
+    --boot-type $BOOT_TYPE \
+    --architecture $ARCH \
+    -is 2 >> ${OUT}/${BUILDNAME}.log 2>&1 
+
+ERROR=$?
+END=$(now)
+time_spent=$(calc_time $START $END)
+
+if [ $ERROR -eq 0 ] ; then
+#    log "successful build started at $START, ended at $END (took $time_spent)"
+    if [ "$RENAME"x != ""x ] ; then
+	apt-get install rename >> ${OUT}/${BUILDNAME}.log
+	rename -v "$RENAME" * >> ${OUT}/${BUILDNAME}.log 2>&1
+    fi
+
+    # Don't touch qcow etc. here, will be done on the host
+
+    cd ${WORK}
+    mv packages.list debian-$VERSION-openstack-${ARCH}-packages.list
+    mv sources debian-$VERSION-openstack-${ARCH}-sources.list
+    cp * ${OUT}
+    rm -f *
+fi
+
+exit $ERROR

@@ -1,0 +1,55 @@
+config LINGMO_PACKAGE_LIBUNWIND_MUSL_CONTEXT_REQUIRED
+	bool
+	default y
+	depends on !LINGMO_ARM_CPU_HAS_ARM
+	depends on !LINGMO_aarch64
+	depends on !LINGMO_aarch64_be
+	depends on !LINGMO_mips
+	depends on !LINGMO_mipsel
+	depends on !LINGMO_mips64
+	depends on !LINGMO_mips64el
+	depends on !LINGMO_riscv
+	depends on !LINGMO_x86_64
+	depends on LINGMO_TOOLCHAIN_USES_MUSL
+
+# libunwind is only available for a certain subset of the
+# architectures (as visible in the list of architectures supported
+# with the glibc C library below).
+#
+# In addition to this, on some architectures libunwind requires the
+# *context() function from the C library, which are only available on
+# certain architectures in uClibc, and not available at all on
+# musl. But on some other architectures, libunwind works without using
+# the *context() functions, which allows it to be built with musl.
+config LINGMO_PACKAGE_LIBUNWIND_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_TOOLCHAIN_USES_GLIBC && \
+		(LINGMO_ARM_CPU_HAS_ARM || LINGMO_aarch64 || LINGMO_mips || LINGMO_mipsel || \
+		 LINGMO_mips64 || LINGMO_mips64el || LINGMO_powerpc || LINGMO_sh || \
+		 LINGMO_i386 || LINGMO_x86_64)
+	default y if LINGMO_TOOLCHAIN_USES_UCLIBC && \
+		(LINGMO_ARM_CPU_HAS_ARM || LINGMO_mips || LINGMO_mipsel || \
+		 LINGMO_mips64 || LINGMO_mips64el || LINGMO_x86_64)
+	default y if LINGMO_TOOLCHAIN_USES_MUSL && \
+		(!LINGMO_PACKAGE_LIBUNWIND_MUSL_CONTEXT_REQUIRED || \
+		 LINGMO_PACKAGE_LIBUCONTEXT_ARCH_SUPPORTS)
+
+config LINGMO_PACKAGE_LIBUNWIND
+	bool "libunwind"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_LIBUNWIND_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C11 atomics
+	# forcefully links against libgcc_s, only available in dynamic
+	# linking configurations
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBUCONTEXT if LINGMO_TOOLCHAIN_USES_MUSL && \
+		LINGMO_PACKAGE_LIBUNWIND_MUSL_CONTEXT_REQUIRED
+	help
+	  C API to determine the call-chain of a program.
+
+	  http://www.nongnu.org/libunwind/index.html
+
+comment "libunwind needs a toolchain w/ threads, dynamic library, gcc >= 4.9"
+	depends on LINGMO_PACKAGE_LIBUNWIND_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

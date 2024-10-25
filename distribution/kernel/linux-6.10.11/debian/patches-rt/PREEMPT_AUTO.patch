@@ -1,0 +1,779 @@
+From: Thomas Gleixner <tglx@linutronix.de>
+Date: Sat, 23 Sep 2023 03:11:05 +0200
+Subject: [PATCH] sched: define TIF_ALLOW_RESCHED
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+On Fri, Sep 22 2023 at 00:55, Thomas Gleixner wrote:
+> On Thu, Sep 21 2023 at 09:00, Linus Torvalds wrote:
+>> That said - I think as a proof of concept and "look, with this we get
+>> the expected scheduling event counts", that patch is perfect. I think
+>> you more than proved the concept.
+>
+> There is certainly quite some analyis work to do to make this a one to
+> one replacement.
+>
+> With a handful of benchmarks the PoC (tweaked with some obvious fixes)
+> is pretty much on par with the current mainline variants (NONE/FULL),
+> but the memtier benchmark makes a massive dent.
+>
+> It sports a whopping 10% regression with the LAZY mode versus the mainline
+> NONE model. Non-LAZY and FULL behave unsurprisingly in the same way.
+>
+> That benchmark is really sensitive to the preemption model. With current
+> mainline (DYNAMIC_PREEMPT enabled) the preempt=FULL model has ~20%
+> performance drop versus preempt=NONE.
+
+That 20% was a tired pilot error. The real number is in the 5% ballpark.
+
+> I have no clue what's going on there yet, but that shows that there is
+> obviously quite some work ahead to get this sorted.
+
+It took some head scratching to figure that out. The initial fix broke
+the handling of the hog issue, i.e. the problem that Ankur tried to
+solve, but I hacked up a "solution" for that too.
+
+With that the memtier benchmark is roughly back to the mainline numbers,
+but my throughput benchmark know how is pretty close to zero, so that
+should be looked at by people who actually understand these things.
+
+Likewise the hog prevention is just at the PoC level and clearly beyond
+my knowledge of scheduler details: It unconditionally forces a
+reschedule when the looping task is not responding to a lazy reschedule
+request before the next tick. IOW it forces a reschedule on the second
+tick, which is obviously different from the cond_resched()/might_sleep()
+behaviour.
+
+The changes vs. the original PoC aside of the bug and thinko fixes:
+
+    1) A hack to utilize the TRACE_FLAG_IRQS_NOSUPPORT flag to trace the
+       lazy preempt bit as the trace_entry::flags field is full already.
+
+       That obviously breaks the tracer ABI, but if we go there then
+       this needs to be fixed. Steven?
+
+    2) debugfs file to validate that loops can be force preempted w/o
+       cond_resched()
+
+       The usage is:
+
+       # taskset -c 1 bash
+       # echo 1 > /sys/kernel/debug/sched/hog &
+       # echo 1 > /sys/kernel/debug/sched/hog &
+       # echo 1 > /sys/kernel/debug/sched/hog &
+
+       top shows ~33% CPU for each of the hogs and tracing confirms that
+       the crude hack in the scheduler tick works:
+
+            bash-4559    [001] dlh2.  2253.331202: resched_curr <-__update_curr
+            bash-4560    [001] dlh2.  2253.340199: resched_curr <-__update_curr
+            bash-4561    [001] dlh2.  2253.346199: resched_curr <-__update_curr
+            bash-4559    [001] dlh2.  2253.353199: resched_curr <-__update_curr
+            bash-4561    [001] dlh2.  2253.358199: resched_curr <-__update_curr
+            bash-4560    [001] dlh2.  2253.370202: resched_curr <-__update_curr
+            bash-4559    [001] dlh2.  2253.378198: resched_curr <-__update_curr
+            bash-4561    [001] dlh2.  2253.389199: resched_curr <-__update_curr
+
+       The 'l' instead of the usual 'N' reflects that the lazy resched
+       bit is set. That makes __update_curr() invoke resched_curr()
+       instead of the lazy variant. resched_curr() sets TIF_NEED_RESCHED
+       and folds it into preempt_count so that preemption happens at the
+       next possible point, i.e. either in return from interrupt or at
+       the next preempt_enable().
+
+That's as much as I wanted to demonstrate and I'm not going to spend
+more cycles on it as I have already too many other things on flight and
+the resulting scheduler woes are clearly outside of my expertice.
+
+Though definitely I'm putting a permanent NAK in place for any attempts
+to duct tape the preempt=NONE model any further by sprinkling more
+cond*() and whatever warts around.
+
+Thanks,
+
+        tglx
+
+[tglx: s@CONFIG_PREEMPT_AUTO@CONFIG_PREEMPT_BUILD_AUTO@ ]
+
+Link: https://lore.kernel.org/all/87jzshhexi.ffs@tglx/
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ arch/x86/Kconfig                   |    1 
+ arch/x86/include/asm/thread_info.h |    6 ++--
+ drivers/acpi/processor_idle.c      |    2 -
+ include/linux/entry-common.h       |    2 -
+ include/linux/entry-kvm.h          |    2 -
+ include/linux/sched.h              |   12 +++++---
+ include/linux/sched/idle.h         |    8 ++---
+ include/linux/thread_info.h        |   24 +++++++++++++++++
+ include/linux/trace_events.h       |    8 ++---
+ kernel/Kconfig.preempt             |   17 +++++++++++-
+ kernel/entry/common.c              |    4 +-
+ kernel/entry/kvm.c                 |    2 -
+ kernel/sched/core.c                |   50 +++++++++++++++++++++++++------------
+ kernel/sched/debug.c               |   19 ++++++++++++++
+ kernel/sched/fair.c                |   46 ++++++++++++++++++++++------------
+ kernel/sched/features.h            |    2 +
+ kernel/sched/idle.c                |    3 --
+ kernel/sched/sched.h               |    1 
+ kernel/trace/trace.c               |    2 +
+ kernel/trace/trace_output.c        |   16 ++++++++++-
+ 20 files changed, 171 insertions(+), 56 deletions(-)
+
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -282,6 +282,7 @@
+ 	select HAVE_STATIC_CALL
+ 	select HAVE_STATIC_CALL_INLINE		if HAVE_OBJTOOL
+ 	select HAVE_PREEMPT_DYNAMIC_CALL
++	select HAVE_PREEMPT_AUTO
+ 	select HAVE_RSEQ
+ 	select HAVE_RUST			if X86_64
+ 	select HAVE_SYSCALL_TRACEPOINTS
+--- a/arch/x86/include/asm/thread_info.h
++++ b/arch/x86/include/asm/thread_info.h
+@@ -87,8 +87,9 @@
+ #define TIF_NOTIFY_RESUME	1	/* callback before returning to user */
+ #define TIF_SIGPENDING		2	/* signal pending */
+ #define TIF_NEED_RESCHED	3	/* rescheduling necessary */
+-#define TIF_SINGLESTEP		4	/* reenable singlestep on user return*/
+-#define TIF_SSBD		5	/* Speculative store bypass disable */
++#define TIF_ARCH_RESCHED_LAZY	4	/* Lazy rescheduling */
++#define TIF_SINGLESTEP		5	/* reenable singlestep on user return*/
++#define TIF_SSBD		6	/* Speculative store bypass disable */
+ #define TIF_SPEC_IB		9	/* Indirect branch speculation mitigation */
+ #define TIF_SPEC_L1D_FLUSH	10	/* Flush L1D on mm switches (processes) */
+ #define TIF_USER_RETURN_NOTIFY	11	/* notify kernel of userspace return */
+@@ -110,6 +111,7 @@
+ #define _TIF_NOTIFY_RESUME	(1 << TIF_NOTIFY_RESUME)
+ #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
+ #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
++#define _TIF_ARCH_RESCHED_LAZY	(1 << TIF_ARCH_RESCHED_LAZY)
+ #define _TIF_SINGLESTEP		(1 << TIF_SINGLESTEP)
+ #define _TIF_SSBD		(1 << TIF_SSBD)
+ #define _TIF_SPEC_IB		(1 << TIF_SPEC_IB)
+--- a/drivers/acpi/processor_idle.c
++++ b/drivers/acpi/processor_idle.c
+@@ -107,7 +107,7 @@
+  */
+ static void __cpuidle acpi_safe_halt(void)
+ {
+-	if (!tif_need_resched()) {
++	if (!need_resched()) {
+ 		raw_safe_halt();
+ 		raw_local_irq_disable();
+ 	}
+--- a/include/linux/entry-common.h
++++ b/include/linux/entry-common.h
+@@ -65,7 +65,7 @@
+ #define EXIT_TO_USER_MODE_WORK						\
+ 	(_TIF_SIGPENDING | _TIF_NOTIFY_RESUME | _TIF_UPROBE |		\
+ 	 _TIF_NEED_RESCHED | _TIF_PATCH_PENDING | _TIF_NOTIFY_SIGNAL |	\
+-	 ARCH_EXIT_TO_USER_MODE_WORK)
++	 _TIF_NEED_RESCHED_LAZY | ARCH_EXIT_TO_USER_MODE_WORK)
+ 
+ /**
+  * arch_enter_from_user_mode - Architecture specific sanity check for user mode regs
+--- a/include/linux/entry-kvm.h
++++ b/include/linux/entry-kvm.h
+@@ -18,7 +18,7 @@
+ 
+ #define XFER_TO_GUEST_MODE_WORK						\
+ 	(_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL |	\
+-	 _TIF_NOTIFY_RESUME | ARCH_XFER_TO_GUEST_MODE_WORK)
++	 _TIF_NOTIFY_RESUME | _TIF_NEED_RESCHED_LAZY | ARCH_XFER_TO_GUEST_MODE_WORK)
+ 
+ struct kvm_vcpu;
+ 
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1949,17 +1949,17 @@
+ 	update_ti_thread_flag(task_thread_info(tsk), flag, value);
+ }
+ 
+-static inline int test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
++static inline bool test_and_set_tsk_thread_flag(struct task_struct *tsk, int flag)
+ {
+ 	return test_and_set_ti_thread_flag(task_thread_info(tsk), flag);
+ }
+ 
+-static inline int test_and_clear_tsk_thread_flag(struct task_struct *tsk, int flag)
++static inline bool test_and_clear_tsk_thread_flag(struct task_struct *tsk, int flag)
+ {
+ 	return test_and_clear_ti_thread_flag(task_thread_info(tsk), flag);
+ }
+ 
+-static inline int test_tsk_thread_flag(struct task_struct *tsk, int flag)
++static inline bool test_tsk_thread_flag(struct task_struct *tsk, int flag)
+ {
+ 	return test_ti_thread_flag(task_thread_info(tsk), flag);
+ }
+@@ -1972,9 +1972,11 @@
+ static inline void clear_tsk_need_resched(struct task_struct *tsk)
+ {
+ 	clear_tsk_thread_flag(tsk,TIF_NEED_RESCHED);
++	if (IS_ENABLED(CONFIG_PREEMPT_BUILD_AUTO))
++		clear_tsk_thread_flag(tsk, TIF_NEED_RESCHED_LAZY);
+ }
+ 
+-static inline int test_tsk_need_resched(struct task_struct *tsk)
++static inline bool test_tsk_need_resched(struct task_struct *tsk)
+ {
+ 	return unlikely(test_tsk_thread_flag(tsk,TIF_NEED_RESCHED));
+ }
+@@ -2074,7 +2076,7 @@
+ 
+ static __always_inline bool need_resched(void)
+ {
+-	return unlikely(tif_need_resched());
++	return unlikely(tif_need_resched_lazy() || tif_need_resched());
+ }
+ 
+ /*
+--- a/include/linux/sched/idle.h
++++ b/include/linux/sched/idle.h
+@@ -63,7 +63,7 @@
+ 	 */
+ 	smp_mb__after_atomic();
+ 
+-	return unlikely(tif_need_resched());
++	return unlikely(need_resched());
+ }
+ 
+ static __always_inline bool __must_check current_clr_polling_and_test(void)
+@@ -76,7 +76,7 @@
+ 	 */
+ 	smp_mb__after_atomic();
+ 
+-	return unlikely(tif_need_resched());
++	return unlikely(need_resched());
+ }
+ 
+ #else
+@@ -85,11 +85,11 @@
+ 
+ static inline bool __must_check current_set_polling_and_test(void)
+ {
+-	return unlikely(tif_need_resched());
++	return unlikely(need_resched());
+ }
+ static inline bool __must_check current_clr_polling_and_test(void)
+ {
+-	return unlikely(tif_need_resched());
++	return unlikely(need_resched());
+ }
+ #endif
+ 
+--- a/include/linux/thread_info.h
++++ b/include/linux/thread_info.h
+@@ -59,6 +59,16 @@
+ 
+ #include <asm/thread_info.h>
+ 
++#ifdef CONFIG_PREEMPT_BUILD_AUTO
++# define TIF_NEED_RESCHED_LAZY		TIF_ARCH_RESCHED_LAZY
++# define _TIF_NEED_RESCHED_LAZY		_TIF_ARCH_RESCHED_LAZY
++# define TIF_NEED_RESCHED_LAZY_OFFSET	(TIF_NEED_RESCHED_LAZY - TIF_NEED_RESCHED)
++#else
++# define TIF_NEED_RESCHED_LAZY		TIF_NEED_RESCHED
++# define _TIF_NEED_RESCHED_LAZY		_TIF_NEED_RESCHED
++# define TIF_NEED_RESCHED_LAZY_OFFSET	0
++#endif
++
+ #ifdef __KERNEL__
+ 
+ #ifndef arch_set_restart_data
+@@ -185,6 +195,13 @@
+ 			     (unsigned long *)(&current_thread_info()->flags));
+ }
+ 
++static __always_inline bool tif_need_resched_lazy(void)
++{
++	return IS_ENABLED(CONFIG_PREEMPT_BUILD_AUTO) &&
++		arch_test_bit(TIF_NEED_RESCHED_LAZY,
++			      (unsigned long *)(&current_thread_info()->flags));
++}
++
+ #else
+ 
+ static __always_inline bool tif_need_resched(void)
+@@ -193,6 +210,13 @@
+ 			(unsigned long *)(&current_thread_info()->flags));
+ }
+ 
++static __always_inline bool tif_need_resched_lazy(void)
++{
++	return IS_ENABLED(CONFIG_PREEMPT_BUILD_AUTO) &&
++		test_bit(TIF_NEED_RESCHED_LAZY,
++			 (unsigned long *)(&current_thread_info()->flags));
++}
++
+ #endif /* _ASM_GENERIC_BITOPS_INSTRUMENTED_NON_ATOMIC_H */
+ 
+ #ifndef CONFIG_HAVE_ARCH_WITHIN_STACK_FRAMES
+--- a/include/linux/trace_events.h
++++ b/include/linux/trace_events.h
+@@ -184,8 +184,8 @@
+ 
+ enum trace_flag_type {
+ 	TRACE_FLAG_IRQS_OFF		= 0x01,
+-	TRACE_FLAG_IRQS_NOSUPPORT	= 0x02,
+-	TRACE_FLAG_NEED_RESCHED		= 0x04,
++	TRACE_FLAG_NEED_RESCHED		= 0x02,
++	TRACE_FLAG_NEED_RESCHED_LAZY	= 0x04,
+ 	TRACE_FLAG_HARDIRQ		= 0x08,
+ 	TRACE_FLAG_SOFTIRQ		= 0x10,
+ 	TRACE_FLAG_PREEMPT_RESCHED	= 0x20,
+@@ -211,11 +211,11 @@
+ 
+ static inline unsigned int tracing_gen_ctx_flags(unsigned long irqflags)
+ {
+-	return tracing_gen_ctx_irq_test(TRACE_FLAG_IRQS_NOSUPPORT);
++	return tracing_gen_ctx_irq_test(0);
+ }
+ static inline unsigned int tracing_gen_ctx(void)
+ {
+-	return tracing_gen_ctx_irq_test(TRACE_FLAG_IRQS_NOSUPPORT);
++	return tracing_gen_ctx_irq_test(0);
+ }
+ #endif
+ 
+--- a/kernel/Kconfig.preempt
++++ b/kernel/Kconfig.preempt
+@@ -11,6 +11,13 @@
+ 	select PREEMPTION
+ 	select UNINLINE_SPIN_UNLOCK if !ARCH_INLINE_SPIN_UNLOCK
+ 
++config PREEMPT_BUILD_AUTO
++	bool
++	select PREEMPT_BUILD
++
++config HAVE_PREEMPT_AUTO
++	bool
++
+ choice
+ 	prompt "Preemption Model"
+ 	default PREEMPT_NONE
+@@ -67,9 +74,17 @@
+ 	  embedded system with latency requirements in the milliseconds
+ 	  range.
+ 
++config PREEMPT_AUTO
++	bool "Automagic preemption mode with runtime tweaking support"
++	depends on HAVE_PREEMPT_AUTO
++	select PREEMPT_BUILD_AUTO
++	help
++	  Add some sensible blurb here
++
+ config PREEMPT_RT
+ 	bool "Fully Preemptible Kernel (Real-Time)"
+ 	depends on EXPERT && ARCH_SUPPORTS_RT
++	select PREEMPT_BUILD_AUTO if HAVE_PREEMPT_AUTO
+ 	select PREEMPTION
+ 	help
+ 	  This option turns the kernel into a real-time kernel by replacing
+@@ -95,7 +110,7 @@
+ 
+ config PREEMPT_DYNAMIC
+ 	bool "Preemption behaviour defined on boot"
+-	depends on HAVE_PREEMPT_DYNAMIC && !PREEMPT_RT
++	depends on HAVE_PREEMPT_DYNAMIC && !PREEMPT_RT && !PREEMPT_AUTO
+ 	select JUMP_LABEL if HAVE_PREEMPT_DYNAMIC_KEY
+ 	select PREEMPT_BUILD
+ 	default y if HAVE_PREEMPT_DYNAMIC_CALL
+--- a/kernel/entry/common.c
++++ b/kernel/entry/common.c
+@@ -98,7 +98,7 @@
+ 
+ 		local_irq_enable_exit_to_user(ti_work);
+ 
+-		if (ti_work & _TIF_NEED_RESCHED)
++		if (ti_work & (_TIF_NEED_RESCHED | _TIF_NEED_RESCHED_LAZY))
+ 			schedule();
+ 
+ 		if (ti_work & _TIF_UPROBE)
+@@ -307,7 +307,7 @@
+ 		rcu_irq_exit_check_preempt();
+ 		if (IS_ENABLED(CONFIG_DEBUG_ENTRY))
+ 			WARN_ON_ONCE(!on_thread_stack());
+-		if (need_resched())
++		if (test_tsk_need_resched(current))
+ 			preempt_schedule_irq();
+ 	}
+ }
+--- a/kernel/entry/kvm.c
++++ b/kernel/entry/kvm.c
+@@ -13,7 +13,7 @@
+ 			return -EINTR;
+ 		}
+ 
+-		if (ti_work & _TIF_NEED_RESCHED)
++		if (ti_work & (_TIF_NEED_RESCHED | TIF_NEED_RESCHED_LAZY))
+ 			schedule();
+ 
+ 		if (ti_work & _TIF_NOTIFY_RESUME)
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -898,14 +898,15 @@
+ 
+ #if defined(CONFIG_SMP) && defined(TIF_POLLING_NRFLAG)
+ /*
+- * Atomically set TIF_NEED_RESCHED and test for TIF_POLLING_NRFLAG,
++ * Atomically set TIF_NEED_RESCHED[_LAZY] and test for TIF_POLLING_NRFLAG,
+  * this avoids any races wrt polling state changes and thereby avoids
+  * spurious IPIs.
+  */
+-static inline bool set_nr_and_not_polling(struct task_struct *p)
++static inline bool set_nr_and_not_polling(struct task_struct *p, int tif_bit)
+ {
+ 	struct thread_info *ti = task_thread_info(p);
+-	return !(fetch_or(&ti->flags, _TIF_NEED_RESCHED) & _TIF_POLLING_NRFLAG);
++
++	return !(fetch_or(&ti->flags, 1 << tif_bit) & _TIF_POLLING_NRFLAG);
+ }
+ 
+ /*
+@@ -922,7 +923,7 @@
+ 	do {
+ 		if (!(val & _TIF_POLLING_NRFLAG))
+ 			return false;
+-		if (val & _TIF_NEED_RESCHED)
++		if (val & (_TIF_NEED_RESCHED | _TIF_NEED_RESCHED_LAZY))
+ 			return true;
+ 	} while (!try_cmpxchg(&ti->flags, &val, val | _TIF_NEED_RESCHED));
+ 
+@@ -930,9 +931,9 @@
+ }
+ 
+ #else
+-static inline bool set_nr_and_not_polling(struct task_struct *p)
++static inline bool set_nr_and_not_polling(struct task_struct *p, int tif_bit)
+ {
+-	set_tsk_need_resched(p);
++	set_tsk_thread_flag(p, tif_bit);
+ 	return true;
+ }
+ 
+@@ -1037,28 +1038,47 @@
+  * might also involve a cross-CPU call to trigger the scheduler on
+  * the target CPU.
+  */
+-void resched_curr(struct rq *rq)
++static void __resched_curr(struct rq *rq, int lazy)
+ {
++	int cpu, tif_bit = TIF_NEED_RESCHED + lazy;
+ 	struct task_struct *curr = rq->curr;
+-	int cpu;
+ 
+ 	lockdep_assert_rq_held(rq);
+ 
+-	if (test_tsk_need_resched(curr))
++	if (unlikely(test_tsk_thread_flag(curr, tif_bit)))
+ 		return;
+ 
+ 	cpu = cpu_of(rq);
+ 
+ 	if (cpu == smp_processor_id()) {
+-		set_tsk_need_resched(curr);
+-		set_preempt_need_resched();
++		set_tsk_thread_flag(curr, tif_bit);
++		if (!lazy)
++			set_preempt_need_resched();
+ 		return;
+ 	}
+ 
+-	if (set_nr_and_not_polling(curr))
+-		smp_send_reschedule(cpu);
+-	else
++	if (set_nr_and_not_polling(curr, tif_bit)) {
++		if (!lazy)
++			smp_send_reschedule(cpu);
++	} else {
+ 		trace_sched_wake_idle_without_ipi(cpu);
++	}
++}
++
++void resched_curr(struct rq *rq)
++{
++	__resched_curr(rq, 0);
++}
++
++void resched_curr_lazy(struct rq *rq)
++{
++	int lazy = IS_ENABLED(CONFIG_PREEMPT_BUILD_AUTO) && !sched_feat(FORCE_NEED_RESCHED) ?
++		TIF_NEED_RESCHED_LAZY_OFFSET : 0;
++
++	if (lazy && unlikely(test_tsk_thread_flag(rq->curr, TIF_NEED_RESCHED)))
++		return;
++
++	__resched_curr(rq, lazy);
+ }
+ 
+ void resched_cpu(int cpu)
+@@ -1153,7 +1173,7 @@
+ 	 * and testing of the above solutions didn't appear to report
+ 	 * much benefits.
+ 	 */
+-	if (set_nr_and_not_polling(rq->idle))
++	if (set_nr_and_not_polling(rq->idle, TIF_NEED_RESCHED))
+ 		smp_send_reschedule(cpu);
+ 	else
+ 		trace_sched_wake_idle_without_ipi(cpu);
+--- a/kernel/sched/debug.c
++++ b/kernel/sched/debug.c
+@@ -333,6 +333,23 @@
+ 	.release	= seq_release,
+ };
+ 
++static ssize_t sched_hog_write(struct file *filp, const char __user *ubuf,
++			       size_t cnt, loff_t *ppos)
++{
++	unsigned long end = jiffies + 60 * HZ;
++
++	for (; time_before(jiffies, end) && !signal_pending(current);)
++		cpu_relax();
++
++	return cnt;
++}
++
++static const struct file_operations sched_hog_fops = {
++	.write		= sched_hog_write,
++	.open		= simple_open,
++	.llseek		= default_llseek,
++};
++
+ static struct dentry *debugfs_sched;
+ 
+ static __init int sched_init_debug(void)
+@@ -374,6 +391,8 @@
+ 
+ 	debugfs_create_file("debug", 0444, debugfs_sched, NULL, &sched_debug_fops);
+ 
++	debugfs_create_file("hog", 0200, debugfs_sched, NULL, &sched_hog_fops);
++
+ 	return 0;
+ }
+ late_initcall(sched_init_debug);
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -974,8 +974,10 @@
+  * XXX: strictly: vd_i += N*r_i/w_i such that: vd_i > ve_i
+  * this is probably good enough.
+  */
+-static void update_deadline(struct cfs_rq *cfs_rq, struct sched_entity *se)
++static void update_deadline(struct cfs_rq *cfs_rq, struct sched_entity *se, bool tick)
+ {
++	struct rq *rq = rq_of(cfs_rq);
++
+ 	if ((s64)(se->vruntime - se->deadline) < 0)
+ 		return;
+ 
+@@ -994,10 +996,19 @@
+ 	/*
+ 	 * The task has consumed its request, reschedule.
+ 	 */
+-	if (cfs_rq->nr_running > 1) {
+-		resched_curr(rq_of(cfs_rq));
+-		clear_buddies(cfs_rq, se);
++	if (cfs_rq->nr_running < 2)
++		return;
++
++	if (!IS_ENABLED(CONFIG_PREEMPT_BUILD_AUTO) || sched_feat(FORCE_NEED_RESCHED)) {
++		resched_curr(rq);
++	} else {
++		/* Did the task ignore the lazy reschedule request? */
++		if (tick && test_tsk_thread_flag(rq->curr, TIF_NEED_RESCHED_LAZY))
++			resched_curr(rq);
++		else
++			resched_curr_lazy(rq);
+ 	}
++	clear_buddies(cfs_rq, se);
+ }
+ 
+ #include "pelt.h"
+@@ -1153,7 +1164,7 @@
+ /*
+  * Update the current task's runtime statistics.
+  */
+-static void update_curr(struct cfs_rq *cfs_rq)
++static void __update_curr(struct cfs_rq *cfs_rq, bool tick)
+ {
+ 	struct sched_entity *curr = cfs_rq->curr;
+ 	s64 delta_exec;
+@@ -1166,7 +1177,7 @@
+ 		return;
+ 
+ 	curr->vruntime += calc_delta_fair(delta_exec, curr);
+-	update_deadline(cfs_rq, curr);
++	update_deadline(cfs_rq, curr, tick);
+ 	update_min_vruntime(cfs_rq);
+ 
+ 	if (entity_is_task(curr))
+@@ -1175,6 +1186,11 @@
+ 	account_cfs_rq_runtime(cfs_rq, delta_exec);
+ }
+ 
++static inline void update_curr(struct cfs_rq *cfs_rq)
++{
++	__update_curr(cfs_rq, false);
++}
++
+ static void update_curr_fair(struct rq *rq)
+ {
+ 	update_curr(cfs_rq_of(&rq->curr->se));
+@@ -5511,7 +5527,7 @@
+ 	/*
+ 	 * Update run-time statistics of the 'current'.
+ 	 */
+-	update_curr(cfs_rq);
++	__update_curr(cfs_rq, true);
+ 
+ 	/*
+ 	 * Ensure that runnable average is periodically updated.
+@@ -5525,7 +5541,7 @@
+ 	 * validating it and just reschedule.
+ 	 */
+ 	if (queued) {
+-		resched_curr(rq_of(cfs_rq));
++		resched_curr_lazy(rq_of(cfs_rq));
+ 		return;
+ 	}
+ 	/*
+@@ -5671,7 +5687,7 @@
+ 	 * hierarchy can be throttled
+ 	 */
+ 	if (!assign_cfs_rq_runtime(cfs_rq) && likely(cfs_rq->curr))
+-		resched_curr(rq_of(cfs_rq));
++		resched_curr_lazy(rq_of(cfs_rq));
+ }
+ 
+ static __always_inline
+@@ -5931,7 +5947,7 @@
+ 
+ 	/* Determine whether we need to wake up potentially idle CPU: */
+ 	if (rq->curr == rq->idle && rq->cfs.nr_running)
+-		resched_curr(rq);
++		resched_curr_lazy(rq);
+ }
+ 
+ #ifdef CONFIG_SMP
+@@ -6646,7 +6662,7 @@
+ 
+ 		if (delta < 0) {
+ 			if (task_current(rq, p))
+-				resched_curr(rq);
++				resched_curr_lazy(rq);
+ 			return;
+ 		}
+ 		hrtick_start(rq, delta);
+@@ -8378,7 +8394,7 @@
+ 	 * prevents us from potentially nominating it as a false LAST_BUDDY
+ 	 * below.
+ 	 */
+-	if (test_tsk_need_resched(curr))
++	if (need_resched())
+ 		return;
+ 
+ 	/* Idle tasks are by definition preempted by non-idle tasks. */
+@@ -8420,7 +8436,7 @@
+ 	return;
+ 
+ preempt:
+-	resched_curr(rq);
++	resched_curr_lazy(rq);
+ }
+ 
+ #ifdef CONFIG_SMP
+@@ -12566,7 +12582,7 @@
+ 	 */
+ 	if (rq->core->core_forceidle_count && rq->cfs.nr_running == 1 &&
+ 	    __entity_slice_used(&curr->se, MIN_NR_TASKS_DURING_FORCEIDLE))
+-		resched_curr(rq);
++		resched_curr_lazy(rq);
+ }
+ 
+ /*
+@@ -12733,7 +12749,7 @@
+ 	 */
+ 	if (task_current(rq, p)) {
+ 		if (p->prio > oldprio)
+-			resched_curr(rq);
++			resched_curr_lazy(rq);
+ 	} else
+ 		wakeup_preempt(rq, p, 0);
+ }
+--- a/kernel/sched/features.h
++++ b/kernel/sched/features.h
+@@ -87,3 +87,5 @@
+ SCHED_FEAT(LATENCY_WARN, false)
+ 
+ SCHED_FEAT(HZ_BW, true)
++
++SCHED_FEAT(FORCE_NEED_RESCHED, false)
+--- a/kernel/sched/idle.c
++++ b/kernel/sched/idle.c
+@@ -57,8 +57,7 @@
+ 	ct_cpuidle_enter();
+ 
+ 	raw_local_irq_enable();
+-	while (!tif_need_resched() &&
+-	       (cpu_idle_force_poll || tick_check_broadcast_expired()))
++	while (!need_resched() && (cpu_idle_force_poll || tick_check_broadcast_expired()))
+ 		cpu_relax();
+ 	raw_local_irq_disable();
+ 
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -2467,6 +2467,7 @@
+ extern void reweight_task(struct task_struct *p, const struct load_weight *lw);
+ 
+ extern void resched_curr(struct rq *rq);
++extern void resched_curr_lazy(struct rq *rq);
+ extern void resched_cpu(int cpu);
+ 
+ extern struct rt_bandwidth def_rt_bandwidth;
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -2519,6 +2519,8 @@
+ 
+ 	if (tif_need_resched())
+ 		trace_flags |= TRACE_FLAG_NEED_RESCHED;
++	if (tif_need_resched_lazy())
++		trace_flags |= TRACE_FLAG_NEED_RESCHED_LAZY;
+ 	if (test_preempt_need_resched())
+ 		trace_flags |= TRACE_FLAG_PREEMPT_RESCHED;
+ 	return (trace_flags << 16) | (min_t(unsigned int, pc & 0xff, 0xf)) |
+--- a/kernel/trace/trace_output.c
++++ b/kernel/trace/trace_output.c
+@@ -460,17 +460,29 @@
+ 		(entry->flags & TRACE_FLAG_IRQS_OFF && bh_off) ? 'D' :
+ 		(entry->flags & TRACE_FLAG_IRQS_OFF) ? 'd' :
+ 		bh_off ? 'b' :
+-		(entry->flags & TRACE_FLAG_IRQS_NOSUPPORT) ? 'X' :
++		!IS_ENABLED(CONFIG_TRACE_IRQFLAGS_SUPPORT) ? 'X' :
+ 		'.';
+ 
+-	switch (entry->flags & (TRACE_FLAG_NEED_RESCHED |
++	switch (entry->flags & (TRACE_FLAG_NEED_RESCHED | TRACE_FLAG_NEED_RESCHED_LAZY |
+ 				TRACE_FLAG_PREEMPT_RESCHED)) {
++	case TRACE_FLAG_NEED_RESCHED | TRACE_FLAG_NEED_RESCHED_LAZY | TRACE_FLAG_PREEMPT_RESCHED:
++		need_resched = 'B';
++		break;
+ 	case TRACE_FLAG_NEED_RESCHED | TRACE_FLAG_PREEMPT_RESCHED:
+ 		need_resched = 'N';
+ 		break;
++	case TRACE_FLAG_NEED_RESCHED_LAZY | TRACE_FLAG_PREEMPT_RESCHED:
++		need_resched = 'L';
++		break;
++	case TRACE_FLAG_NEED_RESCHED | TRACE_FLAG_NEED_RESCHED_LAZY:
++		need_resched = 'b';
++		break;
+ 	case TRACE_FLAG_NEED_RESCHED:
+ 		need_resched = 'n';
+ 		break;
++	case TRACE_FLAG_NEED_RESCHED_LAZY:
++		need_resched = 'l';
++		break;
+ 	case TRACE_FLAG_PREEMPT_RESCHED:
+ 		need_resched = 'p';
+ 		break;

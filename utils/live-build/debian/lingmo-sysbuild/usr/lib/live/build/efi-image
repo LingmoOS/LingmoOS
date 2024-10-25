@@ -1,0 +1,99 @@
+#! /bin/sh
+set -e
+
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2010, 2011 Canonical Ltd.
+# Author: Colin Watson <cjwatson@ubuntu.com>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+
+# Make an EFI boot image.
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+	echo "usage: $0 OUTPUT-DIRECTORY GRUB-PLATFORM EFI-NAME NETBOOT-PREFIX"
+	exit 1
+fi
+
+outdir="$1"
+platform="$2"
+efi_name="$3"
+netboot_prefix="$4"
+
+memdisk_img=
+workdir=
+
+cleanup () {
+	[ -z "$memdisk_img" ] || rm -f "$memdisk_img"
+	[ -z "$workdir" ] || rm -rf "$workdir"
+}
+trap cleanup EXIT HUP INT QUIT TERM
+
+rm -rf "$outdir"
+mkdir -p "$outdir"
+
+memdisk_img="$(mktemp efi-image.XXXXXX)"
+workdir="$(mktemp -d efi-image.XXXXXX)"
+
+# Skeleton configuration file which finds the real boot disk.
+mkdir -p "$workdir/boot/grub"
+cat >"$workdir/boot/grub/grub.cfg" <<EOF
+search --file --set=root /.disk/info
+set prefix=(\$root)/boot/grub
+source \$prefix/$platform/grub.cfg
+EOF
+# Set the timestamps
+find $workdir -newermt "$(date -d@${SOURCE_DATE_EPOCH} '+%Y-%m-%d %H:%M:%S')" -exec touch '{}' -d@${SOURCE_DATE_EPOCH} ';'
+
+# All partition modules will be activated, unless UEFI secure boot is active (they are not signed)
+PARTITIONLIST=""
+for i in /usr/lib/grub/$platform/part_*.mod; do
+	i=$(echo $i | sed 's?^.*/??g;s?\.mod$??g;')
+	PARTITIONLIST="$PARTITIONLIST $i"
+done
+mkdir -p "$outdir/boot/grub/$platform"
+cat >"$outdir/boot/grub/$platform/grub.cfg" <<EOF
+if [ x\$grub_platform == xefi -a x\$lockdown != xy ] ; then
+$(printf "    insmod %s\n" $PARTITIONLIST)
+fi
+source /boot/grub/grub.cfg
+EOF
+
+# Build the core image.
+(cd "$workdir"; tar -cf - boot) >"$memdisk_img"
+grub-mkimage -O "$platform" -m "$memdisk_img" \
+	-o "$workdir/boot$efi_name.efi" -p '(memdisk)/boot/grub' \
+	search iso9660 configfile normal memdisk tar ${PARTITIONLIST} fat
+
+grub-mkimage -O "$platform" \
+	-o "$outdir/bootnet$efi_name.efi" -p "$netboot_prefix/grub" \
+	search configfile normal efinet tftp net
+
+# Stuff it into a FAT filesystem, making it as small as possible.  24KiB
+# headroom seems to be enough; (x+31)/32*32 rounds up to multiple of 32.
+# The VOLID must be (truncated to) a 32bit hexadecimal number
+mkfs.msdos -C "$outdir/efi.img" \
+	$(( ($(stat -c %s "$workdir/boot$efi_name.efi") / 1024 + 55) \
+	    / 32 * 32 )) -i $(printf "%08x" $((${SOURCE_DATE_EPOCH}%4294967296)))
+mmd -i "$outdir/efi.img" ::efi
+mmd -i "$outdir/efi.img" ::efi/boot
+# Set the timestamp of the .efi file
+touch "$workdir/boot$efi_name.efi" -d@${SOURCE_DATE_EPOCH}
+mcopy -m -i "$outdir/efi.img" "$workdir/boot$efi_name.efi" \
+	"::efi/boot/boot$efi_name.efi"
+
+grub-cpmodules "$outdir" "$platform"
+cp -a /usr/share/grub/unicode.pf2 "$outdir/boot/grub/"
+
+exit 0

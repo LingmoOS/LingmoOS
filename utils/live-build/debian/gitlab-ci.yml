@@ -1,0 +1,53 @@
+---
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/salsa-ci.yml
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/pipeline-jobs.yml
+
+variables:
+  SALSA_CI_DISABLE_BUILD_PACKAGE_ANY: 1
+  SALSA_CI_DISABLE_BUILD_PACKAGE_I386: 1
+
+.lb-build:
+  stage: test
+  script:
+    - apt-get update
+    - apt-get install -y "$(find . -type f -name '*.deb')"
+    - lb --version
+    # We need to stay within the maximum limit for artifacts on Salsa (250M),
+    # so disable a few things
+    - lb config --apt-indices false --apt-recommends false --firmware-chroot false --source false --distribution sid --updates false --debootstrap-options "--variant=minbase" --bootloaders grub-efi
+    # But do install user-setup and sudo to have a usable image
+    - echo "user-setup sudo" > config/package-lists/recommends.list.chroot
+    # xz compresses initrds much better than zstd
+    - echo xz-utils >> config/package-lists/live.list.chroot
+    - mkdir -p config/includes.chroot_after_packages/etc/initramfs-tools/conf.d/
+    - printf 'COMPRESS=xz\nCOMPRESSLEVEL=9\n' > config/includes.chroot_after_packages/etc/initramfs-tools/conf.d/compress
+    # Remove stuff not really needed to boot
+    - echo 'rm -rf /usr/share/doc/* /usr/share/i18n/* /usr/share/man/* /usr/share/locale/*' >> config/hooks/normal/9020-remove-man-cache.hook.chroot
+    # Build the ISO
+    - lb build
+    - ls -lh
+    - cp live-image-${BUILD_ARCH}.contents ${WORKING_DIR}
+    - cp live-image-${BUILD_ARCH}.hybrid.iso ${WORKING_DIR}
+  artifacts:
+    when: always
+    paths:
+      - ${WORKING_DIR}/live-image-${BUILD_ARCH}.contents
+      - ${WORKING_DIR}/live-image-${BUILD_ARCH}.hybrid.iso
+  needs:
+    - job: build
+      artifacts: true
+
+ISO amd64:
+  extends:
+    - .lb-build
+  variables:
+    BUILD_ARCH: 'amd64'
+
+ISO arm64:
+  extends:
+    - .lb-build
+  variables:
+    BUILD_ARCH: 'arm64'
+  tags:
+    - $SALSA_CI_ARM_RUNNER_TAG

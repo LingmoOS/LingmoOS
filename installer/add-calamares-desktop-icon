@@ -1,0 +1,36 @@
+#!/bin/sh
+# Creates an "Install Lingmo" icon on the live session tested with:
+# Xfce, LXDE, LXqt, Gnome, KDE, Mate, Cinnamon
+
+# We query xdg-user-dir because the Desktop directory has different
+# names for different languages
+# DESKTOP=$(xdg-user-dir DESKTOP)
+DESKTOP="/home/lingmo/Desktop"
+
+# Create ~/Desktop just in case this runs before the xdg folder
+# creation script.
+mkdir -p $DESKTOP
+
+# Among the Lingmo desktop environments, LXDE is the only one
+# that behaves completely different.
+if [ -f /usr/bin/lxsession ]; then
+    echo "[Desktop Entry]" > $DESKTOP/calamares-install-lingmo.desktop
+    echo "Type=Link" >> $DESKTOP/calamares-install-lingmo.desktop
+    echo "Name=Install Lingmo" >> $DESKTOP/calamares-install-lingmo.desktop
+    echo "Icon=install-lingmo" >> $DESKTOP/calamares-install-lingmo.desktop
+    echo "URL=/usr/share/applications/calamares-install-lingmo.desktop" \
+          >> $DESKTOP/calamares-install-lingmo.desktop
+else
+    cp /usr/share/applications/calamares-install-lingmo.desktop $DESKTOP
+    # Xfce needs this executable otherwise it complains, everything
+    # else doesn't seem to care either way.
+    chmod +x $DESKTOP/calamares-install-lingmo.desktop
+fi
+
+# Set desktop launcher as trusted under gnome/xfce (See: #1037299)
+    gio set --type=string ~/Desktop/calamares-install-lingmo.desktop \
+        metadata::trusted true
+    gio set --type=string ~/Desktop/calamares-install-lingmo.desktop \
+        metadata::xfce-exe-checksum \
+        "$(sha256sum ~/Desktop/calamares-install-lingmo.desktop | cut -f1 -d' ')"
+    touch ~/Desktop/calamares-install-lingmo.desktop

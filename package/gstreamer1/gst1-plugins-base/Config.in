@@ -1,0 +1,317 @@
+menuconfig LINGMO_PACKAGE_GST1_PLUGINS_BASE
+	bool "gst1-plugins-base"
+	select LINGMO_PACKAGE_XLIB_LIBX11 if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBXEXT if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBXV if LINGMO_PACKAGE_XORG7
+	help
+	  A basic set of well-supported plug-ins for GStreamer.
+
+	  https://gstreamer.freedesktop.org/
+
+if LINGMO_PACKAGE_GST1_PLUGINS_BASE
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_INSTALL_TOOLS
+	bool "install tools"
+	help
+	  Install the gst-discoverer, gst-device-monitor and gst-play
+	  tools.
+
+comment "dependency-less plugins"
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_ADDER
+	bool "adder"
+	help
+	  Adds multiple streams
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_APP
+	bool "app"
+	help
+	  Elements used to communicate with applications
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIOCONVERT
+	bool "audioconvert (mandatory for audio playback)"
+	default y
+	help
+	  Convert audio to different formats
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIOMIXER
+	bool "audiomixer"
+	help
+	  Audio mixer plugin
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIORATE
+	bool "audiorate"
+	help
+	  Adjusts audio frames
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIOTESTSRC
+	bool "audiotestsrc"
+	help
+	  Creates audio test signals of given frequency and volume
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_COMPOSITOR
+	bool "compositor"
+	help
+	  Video compositor plugin
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_ENCODING
+	bool "encoding"
+	help
+	  various encoding-related elements
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOCONVERTSCALE
+	bool "videoconvertscale (mandatory for video playback)"
+	default y
+	help
+	  Colorspace conversion, resizes video
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_GIO
+	bool "gio"
+	help
+	  GIO elements
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_GIO_TYPEFINDER
+	bool "gio-typefinder"
+	help
+	  GIO typefinder elements
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_OVERLAYCOMPOSITION
+	bool "overlaycomposition"
+	help
+	  Overlaycomposition plugin.
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_PLAYBACK
+	bool "playback"
+	default y
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_TYPEFIND
+	help
+	  various playback elements
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_AUDIORESAMPLE
+	bool "audioresample (mandatory for audio playback)"
+	default y
+	help
+	  Resamples audio
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_RAWPARSE
+	bool "rawparse"
+	help
+	  Parses byte streams into raw frames
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_SUBPARSE
+	bool "subparse"
+	help
+	  Subtitle parsing
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_TCP
+	bool "tcp"
+	help
+	  transfer data over the network via TCP
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_TYPEFIND
+	bool "typefind"
+	default y
+	help
+	  default typefind functions
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEOTESTSRC
+	bool "videotestsrc"
+	help
+	  Creates a test video stream
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VIDEORATE
+	bool "videorate"
+	help
+	  Adjusts video frames
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VOLUME
+	bool "volume (mandatory for audio playback)"
+	default y
+	help
+	  plugin for controlling audio volume
+
+comment "plugins with external dependencies"
+
+menuconfig LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL
+	bool "opengl"
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+
+if LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_HAS_LIB_OPENGL
+	def_bool LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_WINDOW
+
+comment "The opengl library needs an API, a platform and a window system"
+	depends on !LINGMO_PACKAGE_GST1_PLUGINS_BASE_HAS_LIB_OPENGL
+
+comment "APIs"
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_API
+	bool
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_OPENGL
+	bool "opengl"
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGL
+	select LINGMO_PACKAGE_LIBGLU
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_API
+
+comment "opengl needs an OpenGL backend"
+	depends on !LINGMO_PACKAGE_HAS_LIBGL
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_GLES2
+	bool "gles2"
+	default y
+	depends on LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_API
+
+comment "gles2 needs an OpenGL ES backend"
+	depends on !LINGMO_PACKAGE_HAS_LIBGLES
+
+comment "Platforms"
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+	bool
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_GLX
+	bool "glx"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_OPENGL
+	depends on LINGMO_PACKAGE_XSERVER_XORG_SERVER_MODULAR # mesa needs big X
+	depends on !LINGMO_PACKAGE_RPI_USERLAND # x11
+	select LINGMO_PACKAGE_XLIB_LIBXRENDER
+	select LINGMO_PACKAGE_XORGPROTO
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_X11
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+	help
+	  OpenGL Extension to the X Window System
+
+comment "glx not supported with rpi-userland"
+	depends on LINGMO_PACKAGE_RPI_USERLAND
+
+comment "glx needs the opengl API and modular X.org"
+	depends on !LINGMO_PACKAGE_RPI_USERLAND && \
+		(!LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_OPENGL || \
+		!LINGMO_PACKAGE_XSERVER_XORG_SERVER_MODULAR)
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_EGL
+	bool "egl"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_API
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+
+comment "egl needs an API and an EGL backend"
+	depends on !LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_API || \
+		!LINGMO_PACKAGE_HAS_LIBEGL
+
+comment "Window systems"
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_WINDOW
+	bool
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_X11
+	bool "x11"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM
+	depends on !LINGMO_PACKAGE_RPI_USERLAND
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_WINDOW
+
+comment "x11 not supported with rpi-userland"
+	depends on LINGMO_PACKAGE_RPI_USERLAND
+
+comment "x11 needs a platform and X.org"
+	depends on !LINGMO_PACKAGE_RPI_USERLAND && \
+		(!LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_PLATFORM || \
+		!LINGMO_PACKAGE_XORG7)
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_WAYLAND
+	bool "wayland"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_EGL
+	depends on LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_WAYLAND_PROTOCOLS
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_WINDOW
+
+comment "wayland needs the egl platform and the wayland package"
+	depends on !LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_EGL || \
+		!LINGMO_PACKAGE_WAYLAND
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_DISPMANX
+	bool "dispmanx"
+	default y
+	depends on LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_EGL
+	depends on LINGMO_PACKAGE_RPI_USERLAND
+	select LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_HAS_WINDOW
+	help
+	  Raspberry Pi's Dispmanx windowing system
+
+comment "dispmanx needs the egl platform and rpi-userland"
+	depends on !LINGMO_PACKAGE_GST1_PLUGINS_BASE_LIB_OPENGL_EGL || \
+		!LINGMO_PACKAGE_RPI_USERLAND
+endif
+
+comment "opengl needs an OpenGL or OpenGL ES backend"
+	depends on !LINGMO_PACKAGE_HAS_LIBGL && !LINGMO_PACKAGE_HAS_LIBGLES
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_ALSA
+	bool "alsa (mandatory for audio playback)"
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+	select LINGMO_PACKAGE_ALSA_LIB_PCM
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+	help
+	  ALSA plugin library
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_TREMOR
+	bool "tremor"
+	select LINGMO_PACKAGE_TREMOR
+	help
+	  Vorbis Tremor decoder
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_OGG
+	bool "ogg (*.ogg audio/video)"
+	select LINGMO_PACKAGE_LIBOGG
+	help
+	  ogg stream manipulation (info about ogg: http://xiph.org)
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_OPUS
+	bool "opus"
+	select LINGMO_PACKAGE_OPUS
+	help
+	  Opus codec for speech and audio.
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_PANGO
+	bool "pango font renderer"
+	depends on LINGMO_USE_WCHAR # pango -> glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # pango -> glib2
+	depends on LINGMO_USE_MMU # pango -> glib2
+	depends on LINGMO_INSTALL_LIBSTDCPP # pango -> freetype
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # pango -> harfbuzz
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # pango -> harfbuzz
+	select LINGMO_PACKAGE_PANGO
+	help
+	  Pango-based text rendering and overlay
+
+comment "pango plugin needs a toolchain w/ C++, wchar, threads, gcc >= 4.9"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_THEORA
+	bool "theora (*.ogg video)"
+	select LINGMO_PACKAGE_LIBTHEORA
+	help
+	  Theora plugin library
+
+config LINGMO_PACKAGE_GST1_PLUGINS_BASE_PLUGIN_VORBIS
+	bool "vorbis (*.ogg audio)"
+	select LINGMO_PACKAGE_LIBVORBIS
+	help
+	  Vorbis plugin library
+
+endif

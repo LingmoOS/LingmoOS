@@ -1,0 +1,125 @@
+#!/bin/bash
+
+source /usr/share/lingmo-settings/tools/bashimport/transhell.amber
+load_transhell_debug
+
+#case $(arch) in
+#   x86_64)
+#	STORE_URL="store"
+#	;;
+#   aarch64)
+#	STORE_URL="aarch64-store"
+#	;;
+#esac
+
+echo "LingmoOS Install script. LingmoOS安装脚本"
+
+function pkexec_as_current_user() {
+    local user=$(who | awk '{print $1}' | head -n 1)
+    local uid=$(id -u "$user")
+    sudo -u "$user" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$uid"/bus pkexec "$@"
+}
+
+function zenity() {
+    local user=$(who | awk '{print $1}' | head -n 1)
+    local uid=$(id -u "$user")
+    sudo -u "$user" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/"$uid"/bus zenity "$@"
+}
+
+function hash_check() {
+    echo "接收星火仓库软件信息中..."
+    bash /usr/share/lingmo-settings/tools/aptlm/aptlm lmupdate``
+
+    echo "正在运行包验证..."
+    echo "Running Spark Package Verify..."
+
+    DEB_SHA512SUM=$(sha512sum "$1" | cut -d ' ' -f 1)
+    IS_SHA512SUM_CHECKED=$(cat "$(find /var/lib/aptlm/lists/mirrors* -maxdepth 1 -type f)"| grep "$DEB_SHA512SUM")
+}
+
+####################################
+
+if [ $# -eq 0 ]; then
+    echo "没有接收到参数，退出"
+    echo "用法：$0 deb路径"
+    echo "OMG-IT-GOES-WRONG"
+    exit
+fi
+
+if [ ! -f "$1" ]; then
+    echo "${TRANSHELL_CONTENT_FILE_NOT_EXIST}"
+    echo "OMG-IT-GOES-WRONG"
+    exit 1
+fi
+
+if [ "$(id -u)" != "0" ]; then
+    echo "${TRANSHELL_CONTENT_PLEASE_RUN_AS_ROOT}"
+    echo "OMG-IT-GOES-WRONG"
+    exit 1
+fi
+
+DEBPATH=$(realpath "$1")
+
+# 暂时不做hash检查
+hash_check "$DEBPATH"
+IS_SHA512SUM_CHECKED="true"
+
+if [ -z "$IS_SHA512SUM_CHECKED" ]; then
+    echo "尝试更新仓库信息重新校验"
+    /usr/share/lingmo-settings/tools/aptlm/aptlm lmupdate
+    hash_check "$DEBPATH"
+	if [ -z "$IS_SHA512SUM_CHECKED" ]; then
+	echo -e "$TRANSHELL_CONTENT_HASH_CHECK_FAILED"
+	zenity --info --icon-name=preferences-system --height 270 --width 500 --text "$TRANSHELL_CONTENT_HASH_CHECK_FAILED"
+	echo  "OMG-IT-GOES-WRONG"
+	exit 1
+	fi
+fi
+
+if [ ! -z "$IS_SHA512SUM_CHECKED" ]; then
+    echo "校验成功，开始安装"
+    echo "----------------------------------------------------------------------------------"
+    package_name=$(dpkg-deb -f "$DEBPATH" Package)
+    echo "Package name is $package_name"
+    try_run_output=$(/usr/share/lingmo-settings/tools/update-upgrade/lm-do-upgrade-worker.sh test-install-app "$DEBPATH")
+    try_run_ret="$?"
+    try_run_ret="$?"
+
+    if [ "$try_run_ret" -ne 0 ]; then
+    /usr/share/lingmo-settings/tools/aptlm/aptlm update
+    try_run_output=$(/usr/share/lingmo-settings/tools/update-upgrade/lm-do-upgrade-worker.sh test-install-app "$DEBPATH")
+    try_run_ret="$?"
+    fi
+    
+     if [ "$try_run_ret" -ne 0 ]; then
+        echo "OMG-IT-GOES-WRONG"
+        echo -e "${try_run_output}"
+        exit "$try_run_ret"
+    fi
+
+    dpkg -i "$DEBPATH" || /usr/share/lingmo-settings/tools/aptlm/aptlm install -yf
+
+    if [ "$?" = "0" ] && [ "$2" = "--delete-after-install" ]; then
+        if dpkg -s "$package_name" >/dev/null 2>&1; then
+            echo "软件包已安装：$package_name"
+            # create_desktop_file
+            rm "$DEBPATH"
+            echo "${TRANSHELL_CONTENT_DEB_IS_DELETED}"
+        else
+            echo "软件包未安装：$package_name"
+            echo "安装异常！抛出错误"
+            echo "OMG-IT-GOES-WRONG"
+        fi
+    else
+        echo "${TRANSHELL_CONTENT_WILL_NOT_DELETE_DEB}"
+        if dpkg -s "$package_name" >/dev/null 2>&1; then
+            echo "软件包已安装：$package_name"
+            # create_desktop_file
+        else
+            echo "软件包未安装：$package_name"
+            echo "安装异常！抛出错误"
+            echo "OMG-IT-GOES-WRONG"
+        fi
+    fi
+fi
+

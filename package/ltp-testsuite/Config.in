@@ -1,0 +1,43 @@
+config LINGMO_PACKAGE_LTP_TESTSUITE_ARCH_SUPPORTS
+	bool
+	# Needs __sync*() built-ins for 4-byte data, except on a few
+	# architectures for which a specific implementation is
+	# provided in ltp-testsuite
+	default y if LINGMO_TOOLCHAIN_HAS_SYNC_4
+	default y if LINGMO_arc
+	# does not build on nios2, cachectl.h issue
+	depends on !LINGMO_nios2
+
+config LINGMO_PACKAGE_LTP_TESTSUITE
+	bool "ltp-testsuite"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !LINGMO_TOOLCHAIN_USES_MUSL || LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_5_11
+	depends on LINGMO_PACKAGE_LTP_TESTSUITE_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_LIBTIRPC if !LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	select LINGMO_PACKAGE_MUSL_FTS if !LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  The Linux Test Project provides a huge testsuite for Linux.
+
+	  http://linux-test-project.github.io
+
+if LINGMO_PACKAGE_LTP_TESTSUITE
+
+config LINGMO_PACKAGE_LTP_TESTSUITE_OPEN_POSIX
+	bool "Open POSIX testsuite"
+	default y
+	help
+	  Test suite for POSIX compliance. Included with the LTP.
+
+config LINGMO_PACKAGE_LTP_TESTSUITE_REALTIME
+	bool "Realtime testsuite"
+	default y
+	help
+	  Test suite for realtime kernels. Included with the LTP.
+
+endif
+
+comment "ltp-testsuite needs a toolchain w/ NPTL"
+	depends on LINGMO_PACKAGE_LTP_TESTSUITE_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

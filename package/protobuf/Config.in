@@ -1,0 +1,59 @@
+# See src/google/protobuf/stubs/platform_macros.h for supported archs.
+#
+# On PowerPC, the __atomic_*() built-ins for 1-byte, 2-byte and 4-byte
+# types are available built-in. However, the __atomic_*() built-ins for
+# 8-byte types is implemented via libatomic, so only available since gcc
+# 4.8.
+#
+# In Buildroot, to simplify things, we've decided to simply require gcc
+# 4.8 as soon as the architectures has at least one __atomic_*() built-in
+# variant that requires libatomic.
+#
+# Since protobuf most likely only uses the 1, 2 and 4-byte variants, it
+# *could* technically build with gcc 4.7. This is probably not a big deal,
+# and we can live with requiring gcc 4.8 on PowerPC to build protobuf.
+#
+# host-protobuf only builds on certain architectures
+config LINGMO_PACKAGE_HOST_PROTOBUF_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_HOSTARCH = "aarch64"
+	default y if LINGMO_HOSTARCH = "arm"
+	default y if LINGMO_HOSTARCH = "mips"
+	default y if LINGMO_HOSTARCH = "mipsel"
+	default y if LINGMO_HOSTARCH = "powerpc"
+	default y if LINGMO_HOSTARCH = "powerpc64"
+	default y if LINGMO_HOSTARCH = "powerpc64le"
+	default y if LINGMO_HOSTARCH = "sparc"
+	default y if LINGMO_HOSTARCH = "sparc64"
+	default y if LINGMO_HOSTARCH = "x86"
+	default y if LINGMO_HOSTARCH = "x86_64"
+
+config LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_arm
+	default y if LINGMO_i386
+	default y if LINGMO_mipsel
+	default y if LINGMO_x86_64
+	default y if LINGMO_sparc64
+	default y if LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_PACKAGE_HOST_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU # fork()
+
+config LINGMO_PACKAGE_PROTOBUF
+	bool "protobuf"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	depends on !LINGMO_STATIC_LIBS
+	help
+	  Protocol buffers are Google's language-neutral,
+	  platform-neutral, extensible mechanism for serializing
+	  structured data.
+
+	  https://developers.google.com/protocol-buffers
+
+comment "protobuf needs a toolchain w/ C++, threads, dynamic library, gcc >= 4.8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS

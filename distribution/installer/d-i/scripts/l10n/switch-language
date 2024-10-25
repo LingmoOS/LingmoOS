@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# Script for switching a given language to the "single file" model
+# (using only one file in packages/po)
+#
+# This should only be used ONCE for a given language
+#
+# Switching to multipld files omdel only need to remove the file
+# in packages/po
+
+usage() {
+echo  "Usage:"
+echo  "$0 <lang> <D-I repository path>"
+}
+
+if [ -z "$2" ]
+then
+  usage
+  exit 1
+fi
+
+LANG=$1
+DI_COPY=$2
+
+# A few checks about the D-I copy directory
+if [ ! -d $DI_COPY ] ; then
+  echo $DI_COPY does not exist
+  exit 1
+fi
+
+if [ ! -d $DI_COPY/.git ] ; then
+  echo No $DI_COPY/.git directory found
+  echo $DI_COPY may not be a copy of Debian Installer GIT repository
+  exit 1
+fi
+
+if [ ! -f $DI_COPY/packages/languagechooser/debian/po/$LANG.po ] ; then
+  echo No translation found for languagechooser in $LANG
+  echo Are you sure that $LANG is an existing D-I translation?
+  exit 1
+fi
+
+cd $DI_COPY/packages
+if [ ! -x $DI_COPY/scripts/l10n/gettext-helper ] ; then
+  echo $DI_COPY/scripts/l10n/gettext-helper not found
+  echo Please check your repository or report this as a bug
+  exit 1
+fi
+
+echo Synchronising repository
+git pull
+
+if [ ! -f $DI_COPY/packages/po/$LANG.po ] ; then
+  echo Running gettext-helper:
+  $DI_COPY/scripts/l10n/gettext-helper export $LANG
+fi
+
+if [ ! -f po/$LANG.po ] ; then
+  echo No po/$LANG.po generated
+  echo Please read the above messages and check the $LANG translations
+  echo If everything is OK, please report as a bug
+  exit 1
+fi
+
+echo Getting Last-Translator for languagechooser
+TSL=`grep "Last-Translator:" $DI_COPY/packages/languagechooser/debian/po/$LANG.po |cut -f2 -d: |sed 's/\\\\n\\"//g'`
+echo $TSL
+echo Fixing Last-Translator
+cat po/$LANG.po | sed "s/Last-Translator:.*/Last-Translator: $TSL\\\\n\"/g" >po/$LANG.po.new
+mv po/$LANG.po.new po/$LANG.po
+
+echo Getting Language-Team for languagechooser
+TEAM=`grep "Language-Team:" $DI_COPY/packages/languagechooser/debian/po/$LANG.po |cut -f2 -d: |sed 's/\\\\n\\"//g; s,/,\\\\/,g'`
+echo $TEAM
+echo Fixing Language-Team
+cat po/$LANG.po | sed "s/Language-Team:.*/Language-Team: $TEAM\\\\n\"/g" >po/$LANG.po.new
+mv po/$LANG.po.new po/$LANG.po
+
+echo Committing new file
+git add po/$LANG.po
+git commit -m"[switch-language] Added master file for $LANG" po/$LANG.po
+
+echo Launching l10n-sync with the keep-revision switch
+$DI_COPY/scripts/l10n/l10n-sync --keep-revision=$LANG --commit $DI_COPY
+

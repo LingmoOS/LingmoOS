@@ -1,0 +1,30 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 20 Aug 2024 08:35:51 +0206
+Subject: [PATCH 25/54] printk: Flush nbcon consoles first on panic
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+In console_flush_on_panic(), flush the nbcon consoles before
+flushing legacy consoles. The legacy write() callbacks are not
+fully safe when oops_in_progress is set.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240820063001.36405-26-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/printk.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -3270,6 +3270,9 @@ void console_flush_on_panic(enum con_flu
+ 	if (mode == CONSOLE_REPLAY_ALL)
+ 		__console_rewind_all();
+ 
++	if (!have_boot_console)
++		nbcon_atomic_flush_pending();
++
+ 	console_flush_all(false, &next_seq, &handover);
+ }
+ 

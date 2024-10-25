@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_AIRCRACK_NG
+	bool "aircrack-ng"
+	depends on LINGMO_USE_MMU # uses fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_RC4 if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  A set of tools for auditing wireless networks
+
+	  For complete functionality, also select ethtool, iw,
+	  util-linux (utilities and rfkill), and wireless_tools.
+
+	  http://www.aircrack-ng.org/
+
+comment "aircrack-ng needs a toolchain w/ dynamic library, threads, C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_INSTALL_LIBSTDCPP

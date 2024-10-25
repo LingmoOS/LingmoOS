@@ -1,0 +1,69 @@
+#! /bin/bash
+
+# Script checks whether the versions of build dependencies of D-I in testing
+# and unstable match.
+# If files from a build dependency are embedded in D-I images, the version
+# that is used to build it must be included in the release.
+#
+# If called with 'all' the script will list all build dependencies, if not it
+# will only list those for which the versions do not match.
+#
+# The script should be run from the installer directory in D-I SVN.
+
+# !!! WARNING !!!
+# The output of the script is only really reliable if done at the same time
+# as an upload of d-i. Later uploads of build dependencies to unstable are
+# after all not relevant.
+# Do keep in mind that differences between architectures are possible, both
+# regarding which versions of packages are in unstable and at which exact
+# time d-i is built on the various buildds.
+
+# TODO
+# - convert list to unique source packages and check those instead
+
+ignore_m68k="amiboot atari-bootstrap emile emile-bootblocks m68k-vme-tftplilo vmelilo"
+safe="apt apt-utils bc cpio cramfsprogs debhelper docbook-xsl dosfstools e2fsprogs \
+      upx-ucl tofrodos wget dctrl-tools"
+
+get_version() {
+	local ver
+
+	# IIRC packages are listed in ascending order on version, so take last
+	ver=$(rmadison -s $2 $1 | tail -n1 | awk '{print $3}')
+	[ "$ver" ] && echo "$ver" || echo "N/A"
+}
+
+PRINT_ALL=
+if [ "$1" = all ]; then
+	PRINT_ALL=1
+fi
+
+build_deps="$(sed -nr '/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p' debian/control | sort -u)"
+
+for p in $build_deps; do
+	# m68k is not a release arch, so ignore m68k-only dependencies
+	if echo " $ignore_m68k " | grep -q " $p "; then
+		continue
+	fi
+
+	# glibc-pic is a pseudo-package, check the source package instead
+	if [ "$p" = glibc-pic ]; then
+		p=glibc
+	fi
+
+	tver=$(get_version $p testing)
+	uver=$(get_version $p unstable)
+
+	mark=
+	if [ "$tver" != "$uver" ]; then
+		if echo " $safe " | grep -q " $p "; then
+			mark="-"
+		else
+			mark="*"
+		fi
+	else
+		[ "$PRINT_ALL" ] || continue
+	fi
+
+	printf "%-25s %20s %20s   %s\n" "$p" "$tver" "$uver" "$mark"
+done

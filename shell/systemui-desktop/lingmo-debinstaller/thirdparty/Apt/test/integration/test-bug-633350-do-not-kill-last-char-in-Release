@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+
+insertpackage 'unstable' 'cool' 'amd64' '1.0'
+
+export APT_DONT_SIGN='InRelease'
+setupaptarchive --no-update
+
+echo 'NotAutomatic: yes' >> aptarchive/dists/unstable/Release
+signreleasefiles
+testsuccess aptget update

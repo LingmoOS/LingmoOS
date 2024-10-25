@@ -1,0 +1,46 @@
+config LINGMO_PACKAGE_EUDEV
+	bool "eudev"
+	depends on LINGMO_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
+	depends on LINGMO_USE_MMU # uses fork()
+	depends on LINGMO_USE_WCHAR # needs C99 compiler
+	depends on !LINGMO_STATIC_LIBS # kmod
+	select LINGMO_PACKAGE_HAS_UDEV
+	select LINGMO_PACKAGE_UDEV_GENTOO_SCRIPTS if LINGMO_INIT_OPENRC
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBS
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_KMOD
+	help
+	  eudev is a fork of systemd-udev with the goal of obtaining
+	  better compatibility with existing software such as OpenRC and
+	  Upstart, older kernels, various toolchains and anything else
+	  required by users and various distributions.
+
+	  https://github.com/eudev-project/eudev
+
+if LINGMO_PACKAGE_EUDEV
+
+config LINGMO_PACKAGE_PROVIDES_UDEV
+	default "eudev"
+
+config LINGMO_PACKAGE_EUDEV_RULES_GEN
+	bool "enable rules generator"
+	help
+	  Enable persistent rules generator
+
+config LINGMO_PACKAGE_EUDEV_ENABLE_HWDB
+	bool "enable hwdb installation"
+	default y
+	select LINGMO_PACKAGE_HOST_EUDEV # for udevadm, during target-finalize
+	help
+	  Enables hardware database installation to /etc/udev/hwdb.bin
+
+endif
+
+comment "eudev needs eudev /dev management"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
+
+comment "eudev needs a toolchain w/ wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS

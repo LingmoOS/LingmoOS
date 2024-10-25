@@ -1,0 +1,33 @@
+config LINGMO_PACKAGE_SOLARUS
+	bool "solarus"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_1
+	depends on LINGMO_PACKAGE_OPENAL_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # openal
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # openal
+	depends on !LINGMO_STATIC_LIBS # SDL2
+	depends on LINGMO_PACKAGE_HAS_LIBGL || LINGMO_PACKAGE_HAS_LIBGLES
+	select LINGMO_PACKAGE_GLM
+	select LINGMO_PACKAGE_LIBMODPLUG
+	select LINGMO_PACKAGE_LIBOGG
+	select LINGMO_PACKAGE_LIBPNG # runtime
+	select LINGMO_PACKAGE_LIBVORBIS
+	select LINGMO_PACKAGE_OPENAL
+	select LINGMO_PACKAGE_PHYSFS
+	select LINGMO_PACKAGE_SDL2
+	select LINGMO_PACKAGE_SDL2_IMAGE
+	select LINGMO_PACKAGE_SDL2_TTF
+	help
+	  Solarus is an open-source Zelda-like 2D game engine written
+	  in C++. It can run games scripted in Lua. This engine is used
+	  by our Zelda fangames. Solarus is licensed under GPL v3.
+
+	  http://www.solarus-games.org
+	  https://github.com/solarus-games/solarus
+
+comment "solarus needs OpenGL and a toolchain w/ C++, gcc >= 4.9, NPTL, dynamic library, and luajit or lua 5.1"
+	depends on !LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_1
+	depends on LINGMO_PACKAGE_OPENAL_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL || LINGMO_STATIC_LIBS \
+		|| !LINGMO_PACKAGE_HAS_LIBGL

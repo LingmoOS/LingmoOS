@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_PROTOBUF_C
+	bool "protobuf-c"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	# host-protobuf only builds on certain architectures
+	depends on LINGMO_PACKAGE_HOST_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_HOST_GCC_AT_LEAST_7 # c++17 for host variant
+	help
+	  Code generator and runtime libraries to use Protocol Buffers
+	  from pure C (not C++).
+
+	  https://github.com/protobuf-c/protobuf-c
+
+comment "protobuf-c needs a toolchain w/ C++, threads, host gcc >= 7"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_HOST_GCC_AT_LEAST_7
+	depends on LINGMO_PACKAGE_HOST_PROTOBUF_ARCH_SUPPORTS

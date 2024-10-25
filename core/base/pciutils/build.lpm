@@ -1,0 +1,30 @@
+pkgname=pciutils
+pkgver=3.13.0
+pkgrel=1
+pkgdesc="PCI bus configuration space access library and tools"
+arch=(x86_64)
+license=('GPL-2.0-only')
+url="https://mj.ucw.cz/sw/pciutils/"
+depends=('glibc' 'hwdata' 'kmod')
+makedepends=('git')
+optdepends=('which: for update-pciids'
+            'grep: for update-pciids'
+	    'curl: for update-pciids')	
+source=(
+        git+https://git.kernel.org/pub/scm/utils/pciutils/pciutils.git#tag=v$pkgver?signed
+	)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+  cd $pkgname
+  make OPT="${CFLAGS} -fPIC -DPIC" ZLIB=no SHARED=no PREFIX=/usr SHAREDIR=/usr/share/hwdata MANDIR=/usr/share/man SBINDIR=/usr/bin lib/libpci.a 
+  cp lib/libpci.a "${srcdir}/"
+  make clean
+  make OPT="${CFLAGS}" ZLIB=no SHARED=yes PREFIX=/usr SBINDIR=/usr/bin SHAREDIR=/usr/share/hwdata MANDIR=/usr/share/man all
+}
+
+package() {
+  cd $pkgname
+  make SHARED=yes PREFIX=/usr SBINDIR=/usr/bin SHAREDIR=/usr/share/hwdata MANDIR=/usr/share/man DESTDIR="${pkgdir}" install install-lib
+  rm -rf "$pkgdir"/usr/share/hwdata
+}

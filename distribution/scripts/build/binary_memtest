@@ -1,0 +1,126 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Installs a memtest into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_MEMTEST}" = "none" ] || [ "${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}" = "none" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin installing memtest..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+if [ "${LINGMO_SYS_BUILD_ARCHITECTURE}" != "amd64" ] && [ "${LINGMO_SYS_BUILD_ARCHITECTURE}" != "i386" ]
+then
+	Echo_warning "Skipping binary_memtest, foreign architecture."
+	exit 0
+fi
+
+_PREFIX=""
+if [ "${LINGMO_SYS_BUILD_BUILD_WITH_CHROOT}" = "true" ]
+then
+
+	_PREFIX="chroot"
+	if [ -f chroot/usr/sbin/grub ] && [ ! -f chroot/boot/grub/menu.lst ]
+	then
+		GRUB="yes"
+
+		mkdir -p chroot/boot/grub
+		touch chroot/boot/grub/menu.lst
+	fi
+fi
+
+# Checking depends
+_MEMTEST_BIN="${LINGMO_SYS_BUILD_MEMTEST}"
+_MEMTEST_BIOS_FN="memtest"
+case "${LINGMO_SYS_BUILD_MEMTEST}" in
+	memtest86)
+		Check_package chroot /boot/memtest86.bin memtest86
+		;;
+
+	memtest86+)
+		Check_package chroot /usr/share/doc/memtest86+/copyright memtest86+
+		;;
+esac
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+case "${LINGMO_SYS_BUILD_MEMTEST}" in
+	memtest86+)
+		case "${LINGMO_SYS_BUILD_ARCHITECTURE}" in
+			amd64)
+				_MEMTEST_ARCH=x64
+				;;
+			i386)
+				_MEMTEST_ARCH=ia32
+				;;
+		esac
+		if [ -e "${_PREFIX}/boot/${LINGMO_SYS_BUILD_MEMTEST}${_MEMTEST_ARCH}.bin" ]
+		then
+			_MEMTEST_BIN="${LINGMO_SYS_BUILD_MEMTEST}${_MEMTEST_ARCH}"
+			_MEMTEST_BIOS_FN="memtest.bin"
+		fi
+esac
+
+# Setting destination directory
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		DESTDIR="binary/live"
+		;;
+
+	*)
+		DESTDIR="binary/boot"
+		;;
+esac
+
+# Creating directory
+mkdir -p "${DESTDIR}"
+
+# Installing memtest
+cp -a "${_PREFIX}/boot/${_MEMTEST_BIN}.bin" "${DESTDIR}/${_MEMTEST_BIOS_FN}"
+[ -e "${_PREFIX}/boot/${_MEMTEST_BIN}.efi" ] && cp -a "${_PREFIX}/boot/${_MEMTEST_BIN}.efi" "${DESTDIR}/memtest.efi"
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+if [ "${GRUB}" ]
+then
+	rm -rf chroot/boot/grub
+fi
+
+# Creating stage file
+Create_stagefile

@@ -1,0 +1,65 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+
+# we need this construct here as it isn't really possible to fake native arch for dpkg-* tools
+NATIVE="$(command dpkg --print-architecture)"
+configarchitecture $NATIVE
+
+insertinstalledpackage 'build-essential' 'all' '11.5' 'Multi-Arch: foreign'
+insertinstalledpackage 'pkga' 'all' '1'
+buildsimplenativepackage 'pkgb' "$NATIVE" '1' 'stable' 'Conflicts: pkga'
+buildsimplenativepackage 'pkgc' "$NATIVE" '1' 'stable' 'Build-Depends: pkgb'
+
+setupaptarchive
+
+testsuccessequal "Reading package lists...
+Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkga
+The following NEW packages will be installed:
+  pkgb
+0 upgraded, 1 newly installed, 1 to remove and 0 not upgraded.
+Remv pkga [1]
+Inst pkgb (1 stable [$NATIVE])
+Conf pkgb (1 stable [$NATIVE])" aptget build-dep pkgc -s
+
+testsuccessequal "Reading package lists...
+Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkga*
+The following NEW packages will be installed:
+  pkgb
+0 upgraded, 1 newly installed, 1 to remove and 0 not upgraded.
+Purg pkga [1]
+Inst pkgb (1 stable [$NATIVE])
+Conf pkgb (1 stable [$NATIVE])" aptget build-dep pkgc -s --purge
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' apt autoremove -s
+testdpkgnotinstalled pkgb
+testsuccess apt build-dep pkgc -y -o Debug::pkgDepCache::AutoInstall=1 -o Debug::pkgDepCache::Marker=1
+testdpkginstalled pkgb
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' apt autoremove -s
+testsuccess apt purge pkgb pkgc -y
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' apt autoremove -s
+testsuccess apt build-dep pkgc -y -o APT::Get::Build-Dep-Automatic=true
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  pkgb
+0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded.
+Remv pkgb [1]' apt autoremove -s

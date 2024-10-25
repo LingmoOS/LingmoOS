@@ -1,0 +1,184 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+export CODENAME VERSION
+
+# Work around an mtools issue
+export MTOOLS_SKIP_CHECK=1
+
+if [ "$VERSION"x = "testing"x ]; then
+    INSTALLER_VERSION="--di-daily"
+fi
+
+MIRROR=http://local-mirror.cdbuilder.debian.org/debian/
+APT_MIRROR=http://deb.debian.org/debian/
+OPTS="-m $MIRROR --apt-mirror $APT_MIRROR --customise ${BASEDIR}/live-customise.sh"
+
+case "$CODENAME" in
+    stretch)
+	BUILDS="cinnamon:gnome:kde:lxde:mate:xfce"
+	;;
+    buster|bullseye)
+	BUILDS="cinnamon:gnome:kde:lxde:lxqt:mate:standard:xfce"
+	;;
+    *)
+	log "  ABORTING: Don't know what to build for \"$CODENAME\""
+	exit 1
+	;;
+esac
+
+while getopts ":a:t:b:" o; do
+    case "${o}" in
+        a)
+            ARCH=${OPTARG}
+            ;;
+        t)
+            TYPE=${OPTARG}
+            ;;
+        b)
+            BUILD=${OPTARG}
+            ;;
+        *)
+	    echo "Unrecognised arg ${o}"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+validate_arg ARCH "amd64:i386"
+validate_arg TYPE "free:non-free"
+validate_arg BUILD "$BUILDS"
+
+TUPLE="$ARCH-$TYPE-$BUILD"
+
+# Merge the vmdebootstrap log into the main log, for easy use afterwards
+merge_logs () {
+    MAINLOG=$1
+    VMDBLOG=$2
+    NUM=$(grep -n 'vmdebootstrap completed' $MAINLOG | awk -F: '{print $1}')
+    head -n $(($NUM-1)) $MAINLOG > $MAINLOG.1
+    cat $VMDBLOG >> $MAINLOG.1
+    tail -n +$NUM $MAINLOG >> $MAINLOG.1
+    cat $MAINLOG.1 > $MAINLOG
+    rm $VMDBLOG $MAINLOG.1
+}
+
+# Work out which packages to add for non-free firmware
+select_firmware_packages () {
+    ARCH=$1
+    SECTIONS="main non-free"
+    PKGS=""
+    for SECTION in ${SECTIONS}; do
+	PKGS="$PKGS "$(wget -q $MIRROR/dists/${CODENAME}/${SECTION}/binary-${ARCH}/Packages.gz -O- | gzip -cd - | \
+	      grep-dctrl -Pe '.*(firmware|microcode).*' -s Package -n | sort -u)
+    done
+    echo $PKGS
+}
+
+BUILD_START=`now`
+
+FIRMWARE_PKGS=""
+if [ ${TYPE} = "free" ] ; then
+    typestem=""
+    NFVOL=""
+else
+    typestem="+nonfree"
+    NFVOL=" nf"
+fi
+
+WORK="${TOP}/work/$TUPLE"
+rm -rf $WORK
+mkdir $WORK
+OUT="/external/out/${TYPE}/${ARCH}/iso-hybrid.tmp"
+mkdir -p $OUT
+
+if [ ${TYPE} != "free" ] ; then
+    export FIRMWARE_PKGS=$(select_firmware_packages ${ARCH})
+fi
+
+# Set up the list of base debs that *must* be available as *packages*
+# on the live media alongside the squashfs. These will be needed by
+# the live-installer in various places: core utilities, block device
+# and filesystem tools, bootloaders
+
+# First, the common core set
+BASE_DEBS="eject pciutils usbutils keyutils \
+           keyboard-configuration console-setup \
+           lvm2 mdadm dmsetup cryptsetup dmraid \
+           e2fsprogs btrfs-progs xfsprogs jfsutils"
+
+# Now the arch-specific ones
+case $ARCH in
+    amd64)
+	BASE_DEBS="$BASE_DEBS \
+                   grub-efi-amd64 grub-efi-amd64-bin grub-pc"
+        case $CODENAME in
+            buster|bullseye)
+                BASE_DEBS="$BASE_DEBS \
+                           grub-efi-amd64-signed shim-signed"
+                ;;
+        esac
+	;;
+    i386)
+	BASE_DEBS="$BASE_DEBS \
+                   grub-efi-ia32 grub-efi-ia32-bin grub-pc"
+        case $CODENAME in
+            buster|bullseye)
+                BASE_DEBS="$BASE_DEBS \
+                           grub-efi-ia32-signed shim-signed"
+                ;;
+        esac
+	;;
+esac
+
+# Can't use TMPDIR here, that gets propagated into the
+# chroot and breaks installations!
+export TMP=${WORK}/tmp
+export NAME="debian-live-${VERSION}-${ARCH}-${BUILD}${typestem}"
+# Shorten the build name so it will fit in the volume ID
+BUILD_SHORT=$(echo ${BUILD} | cut -c1-2)
+export VOLID="d-live${NFVOL} $VERSION ${BUILD_SHORT} ${ARCH}"
+
+mkdir ${TMP}
+
+if [ "$VERSION"x = "testing"x ]; then
+    DESCRIPTION="Official Debian GNU/Linux Live $VERSION snapshot $BUILD"
+else
+    DESCRIPTION="Official Debian GNU/Linux Live $VERSION $BUILD"
+fi
+
+cd ${WORK}
+eatmydata -- lwr $OPTS --architecture $ARCH \
+    -d $CODENAME \
+    --isolinux \
+    --grub \
+    --log stderr \
+    --installer ${INSTALLER_VERSION} \
+    -t live-task-${BUILD} -f "${FIRMWARE_PKGS}" \
+    --base_debs "${BASE_DEBS}" \
+    --description "${DESCRIPTION}" \
+    --volume_id "${VOLID}" \
+    --image_output ${OUT}/${NAME}.iso >${OUT}/${NAME}.log 2>&1
+
+ERROR=$?
+if [ $ERROR != 0 ]; then
+    exit $ERROR
+fi
+
+for dir in ${TMP}/tmp*; do
+    find $dir | sed "s,^$dir,,g" > ${OUT}/${NAME}.contents
+done
+cp packages.list ${OUT}/${NAME}.packages
+cp sources.list ${OUT}/${NAME}.sources
+merge_logs ${OUT}/${NAME}.log vmdebootstrap.log
+
+# Done for this build. Checksumming etc. will be done outside the VM

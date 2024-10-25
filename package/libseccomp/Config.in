@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_powerpc64 || LINGMO_powerpc
+	default y if LINGMO_RISCV_64
+	default y if LINGMO_s390x
+
+config LINGMO_PACKAGE_LIBSECCOMP
+	bool "libseccomp"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17
+	help
+	  High level interface to the Linux Kernel's seccomp filter
+
+	  The libseccomp library provides an easy to use, platform
+	  independent, interface to the Linux Kernel's syscall filtering
+	  mechanism: seccomp. The libseccomp API is designed to abstract
+	  away the underlying BPF based syscall filter language and
+	  present a more conventional function-call based filtering
+	  interface that should be familiar to, and easily adopted by
+	  application developers.
+
+	  https://github.com/seccomp/libseccomp
+
+comment "libseccomp needs a toolchain w/ headers >= 3.17"
+	depends on LINGMO_PACKAGE_LIBSECCOMP_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17

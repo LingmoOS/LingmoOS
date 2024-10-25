@@ -1,0 +1,70 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Thu, 26 Oct 2023 15:17:32 +0200
+Subject: [PATCH 13/15] net: Use nested-BH locking for bpf_scratchpad.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+bpf_scratchpad is a per-CPU variable and relies on disabled BH for its
+locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+this data structure requires explicit locking.
+
+Add a local_lock_t to the data structure and use local_lock_nested_bh()
+for locking. This change adds only lockdep coverage and does not alter
+the functional behaviour for !PREEMPT_RT.
+
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>
+Cc: Hao Luo <haoluo@google.com>
+Cc: Jiri Olsa <jolsa@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Cc: KP Singh <kpsingh@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Song Liu <song@kernel.org>
+Cc: Stanislav Fomichev <sdf@google.com>
+Cc: Yonghong Song <yonghong.song@linux.dev>
+Cc: bpf@vger.kernel.org
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/core/filter.c |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -1658,9 +1658,12 @@ struct bpf_scratchpad {
+ 		__be32 diff[MAX_BPF_STACK / sizeof(__be32)];
+ 		u8     buff[MAX_BPF_STACK];
+ 	};
++	local_lock_t	bh_lock;
+ };
+ 
+-static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_sp);
++static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_sp) = {
++	.bh_lock	= INIT_LOCAL_LOCK(bh_lock),
++};
+ 
+ static inline int __bpf_try_make_writable(struct sk_buff *skb,
+ 					  unsigned int write_len)
+@@ -2021,6 +2024,7 @@ BPF_CALL_5(bpf_csum_diff, __be32 *, from
+ 	struct bpf_scratchpad *sp = this_cpu_ptr(&bpf_sp);
+ 	u32 diff_size = from_size + to_size;
+ 	int i, j = 0;
++	__wsum ret;
+ 
+ 	/* This is quite flexible, some examples:
+ 	 *
+@@ -2034,12 +2038,15 @@ BPF_CALL_5(bpf_csum_diff, __be32 *, from
+ 		     diff_size > sizeof(sp->diff)))
+ 		return -EINVAL;
+ 
++	local_lock_nested_bh(&bpf_sp.bh_lock);
+ 	for (i = 0; i < from_size / sizeof(__be32); i++, j++)
+ 		sp->diff[j] = ~from[i];
+ 	for (i = 0; i <   to_size / sizeof(__be32); i++, j++)
+ 		sp->diff[j] = to[i];
+ 
+-	return csum_partial(sp->diff, diff_size, seed);
++	ret = csum_partial(sp->diff, diff_size, seed);
++	local_unlock_nested_bh(&bpf_sp.bh_lock);
++	return ret;
+ }
+ 
+ static const struct bpf_func_proto bpf_csum_diff_proto = {

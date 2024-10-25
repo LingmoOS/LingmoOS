@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_FLUXBOX
+	bool "fluxbox"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	# Runtime dependency, needed by startup script
+	select LINGMO_PACKAGE_XAPP_XMODMAP
+	help
+	  The Fluxbox lightweight window manager for X
+
+	  http://fluxbox.org
+
+comment "fluxbox needs a toolchain w/ C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_XORG7 && !LINGMO_INSTALL_LIBSTDCPP

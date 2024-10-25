@@ -1,0 +1,33 @@
+From: Robert Holmes <robeholmes@gmail.com>
+Date: Tue, 23 Apr 2019 07:39:29 +0000
+Subject: [PATCH] KEYS: Make use of platform keyring for module signature
+ verify
+Bug-Debian: https://bugs.debian.org/935945
+Bug-Debian: https://bugs.debian.org/1030200
+Origin: https://src.fedoraproject.org/rpms/kernel/raw/master/f/KEYS-Make-use-of-platform-keyring-for-module-signature.patch
+Forwarded: https://lore.kernel.org/linux-modules/qvgp2il2co4iyxkzxvcs4p2bpyilqsbfgcprtpfrsajwae2etc@3z2s2o52i3xg/t/#u
+
+This allows a cert in DB to be used to sign modules,
+in addition to certs in the MoK and built-in keyrings.
+
+Signed-off-by: Robert Holmes <robeholmes@gmail.com>
+Signed-off-by: Jeremy Cline <jcline@redhat.com>
+[bwh: Forward-ported to 5.19: adjust filename]
+[наб: reinstate for 6.1, re-write description]
+---
+--- a/kernel/module/signing.c
++++ b/kernel/module/signing.c
+@@ -116,6 +116,13 @@ int mod_verify_sig(const void *mod, stru
+ 				      VERIFYING_MODULE_SIGNATURE,
+ 				      NULL, NULL);
+ 	pr_devel("verify_pkcs7_signature() = %d\n", ret);
++	if (ret == -ENOKEY && IS_ENABLED(CONFIG_INTEGRITY_PLATFORM_KEYRING)) {
++		ret = verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
++					      VERIFY_USE_PLATFORM_KEYRING,
++					      VERIFYING_MODULE_SIGNATURE,
++					      NULL, NULL);
++		pr_devel("verify_pkcs7_signature() = %d\n", ret);
++	}
+ 
+ 	/* checking hash of module is in blacklist */
+ 	if (!ret)

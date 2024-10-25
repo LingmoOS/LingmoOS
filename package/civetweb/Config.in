@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_CIVETWEB
+	bool "civetweb"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_CIVETWEB_SERVER if !LINGMO_PACKAGE_CIVETWEB_LIB
+	help
+	  Full featured embedded web server with Lua support.
+
+	  https://sourceforge.net/projects/civetweb
+
+if LINGMO_PACKAGE_CIVETWEB
+
+config LINGMO_PACKAGE_CIVETWEB_SERVER
+	bool "enable the web server application"
+	help
+	  Include the web server and its config files.
+
+config LINGMO_PACKAGE_CIVETWEB_LIB
+	bool "enable library for embedding"
+	help
+	  Enable the civetweb library for embedding in another
+	  application.
+
+endif
+
+comment "civetweb needs a toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS

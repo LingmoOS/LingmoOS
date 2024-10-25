@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_CAPNPROTO
+	bool "capnproto"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_HOST_GCC_AT_LEAST_5 # C++14
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 # C++14
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735
+	depends on LINGMO_TOOLCHAIN_HAS_UCONTEXT
+	help
+	  Cap'n Proto is an insanely fast data interchange format
+	  and capability-based RPC system. Think JSON, except
+	  binary. Or think Protocol Buffers, except faster. In
+	  fact, in benchmarks, Cap'n Proto is INFINITY TIMES
+	  faster than Protocol Buffers.
+
+	  https://capnproto.org/index.html
+
+comment "capnproto needs host and target gcc >= 5 w/ C++14, threads, atomic, ucontext and not gcc bug 64735"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_HOST_GCC_AT_LEAST_5 || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || \
+		!LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_HAS_ATOMIC || \
+		LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 || \
+		!LINGMO_TOOLCHAIN_HAS_UCONTEXT

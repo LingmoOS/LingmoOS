@@ -1,0 +1,22 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 16 Sep 2024 00:34:39 +0200
+Subject: tools/rtla: Fix installation from out-of-tree build
+
+rtla now supports out-of-tree builds, but installation fails as it
+still tries to install the rtla binary from the source tree.  Use the
+existing macro $(RTLA) to refer to the binary.
+
+Fixes: 01474dc706ca ("tools/rtla: Use tools/build makefiles to build rtla")
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/tools/tracing/rtla/Makefile.rtla
++++ b/tools/tracing/rtla/Makefile.rtla
+@@ -38,7 +38,7 @@ BINDIR		:= /usr/bin
+ .PHONY: install
+ install: doc_install
+ 	@$(MKDIR) -p $(DESTDIR)$(BINDIR)
+-	$(call QUIET_INSTALL,rtla)$(INSTALL) rtla -m 755 $(DESTDIR)$(BINDIR)
++	$(call QUIET_INSTALL,rtla)$(INSTALL) $(RTLA) -m 755 $(DESTDIR)$(BINDIR)
+ 	@$(STRIP) $(DESTDIR)$(BINDIR)/rtla
+ 	@test ! -f $(DESTDIR)$(BINDIR)/osnoise || $(RM) $(DESTDIR)$(BINDIR)/osnoise
+ 	@$(LN) rtla $(DESTDIR)$(BINDIR)/osnoise

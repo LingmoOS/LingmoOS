@@ -1,0 +1,58 @@
+#!/bin/sh
+# fake/schroot-1.6.10-3 -- emulate how schroot/1.6.10-3 would chroot.
+#
+# Please do not modify this script without verifying that its behaviour
+# is still equivalent to the stated versions of schroot. If a future
+# version of schroot changes its behaviour, please copy this script and
+# modify the copy instead.
+#
+# This version has #856877 unfixed. It bind-mounts /dev/pts and maybe
+# /dev from the host system, rather than creating a new instance of /dev/pts.
+# (There is of course a lot more that it does, but these are the parts that
+# affect pty users like script(1).)
+#
+# Copyright © 2017-2023 Simon McVittie
+# SPDX-License-Identifier: MIT
+# (see debian/copyright)
+
+set -e
+
+# Reference: /etc/schroot/default/fstab
+# (in schroot source tree: etc/profile-templates/default/linux/fstab)
+bind_dev=yes
+
+while true; do
+	case "$1" in
+		(--sbuild)
+			shift
+			# Reference: /etc/schroot/sbuild/fstab
+			# (source: etc/profile-templates/sbuild/linux/fstab)
+			bind_dev=no
+			;;
+		(*)
+			break
+	esac
+done
+
+chroot="$1"
+shift
+if test -z "$chroot" || test -z "$1"; then
+	echo "Usage: $0 CHROOT COMMAND...">&2
+	exit 2
+fi
+
+[ "$bind_dev" = no ] || mount --bind /dev "$chroot/dev"
+mount --bind /dev/pts "$chroot/dev/pts"
+
+ls -l "/dev/ptmx" | sed -e 's/^/# fake-schroot: outside chroot: /' >&2
+ls -l "/dev/pts/ptmx" | sed -e 's/^/# fake-schroot: outside chroot: /' >&2
+ls -l "$chroot/dev/ptmx" | sed -e 's/^/# fake-schroot: /' >&2
+ls -l "$chroot/dev/pts/ptmx" | sed -e 's/^/# fake-schroot: /' >&2
+
+e=0
+chroot "$chroot" "$@" || e=$?
+
+umount "$chroot/dev/pts"
+[ "$bind_dev" = no ] || umount "$chroot/dev"
+
+exit "$e"

@@ -1,0 +1,33 @@
+pkgname=automake
+pkgver=1.17
+pkgrel=1
+pkgdesc="A GNU tool for automatically creating Makefiles"
+arch=('any')
+license=('GPL')
+url="https://www.gnu.org/software/automake"
+depends=('perl' 'bash')
+makedepends=('autoconf')
+checkdepends=('dejagnu' 'gcc-fortran' 'java-environment' 'vala' 'emacs' 'cscope'
+              'expect' 'ncompress' 'gettext' 'lzip' 'zip' 'sharutils' 'help2man'
+              # disable TeX tests for now, lots of them fail and need upstream
+              # fixes for current texlive release
+              #'texlive-bin' 'texinfo'
+              'python' 'python-virtualenv')
+source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+	cd "${pkgname}-${pkgver}"
+	./configure --build=$CHOST --prefix=/usr
+	make
+}
+
+check() {
+	cd "${pkgname}-${pkgver}"
+	make check
+}
+
+package() {
+	cd "${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
+}

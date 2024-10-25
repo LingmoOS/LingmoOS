@@ -1,0 +1,51 @@
+#!/bin/sh
+# This PREBOOT command is used to modify a boot loader config file for an
+# automatic install.
+case "$ARCH" in
+ia64)
+	# TODO: per-host elilo.conf?
+	sed -i \
+	    -e "s!--.*!-- $BOOT_OPTS\"!" \
+	    -e "s/default=.*/default=$BOOT_SELECTION/i" \
+	    -e "s/chooser=textmenu/timeout=10/i" \
+	    $TFTP_DIR/debian-installer/ia64/elilo.conf
+;;
+i386)
+	# Create a pxelinux config file specifically for this host.
+	CFG=$TFTP_DIR/debian-installer/i386/pxelinux.cfg/$(gethostip $MACHINE | cut -d ' ' -f 3)
+	cp -f $TFTP_DIR/debian-installer/i386/pxelinux.cfg/default $CFG
+	sed -i \
+	    -e "s!--.*!-- $BOOT_OPTS!" \
+	    -e 's/vga=normal //i' \
+	    -e 's/devfs=mount,dall //i' \
+           $CFG
+	
+	if [ -n "$BOOT_SELECTION" ]; then
+		sed -i \
+			-e "s/default .*/default $BOOT_SELECTION/i" \
+	            	-e "s/timeout .*/timeout 10/i" \
+			$CFG
+	fi
+	
+	if [ -n "$GRAPHICS_DISABLE" ]; then
+		sed -i -e 's/display .*//i' $CFG
+	fi
+
+	if [ -n "$SERIAL_CONSOLE_PXELINUX" ]; then
+	        sed -i -e "1,1iserial $SERIAL_CONSOLE_PXELINUX" $CFG
+		sed -i -e "/^label linux$/ilabel local\n\tLOCALBOOT 0\n" $CFG
+	fi
+;;
+mipsel)
+	cfg="$NFSROOT_DIR/nfsroot/default.colo"
+	if [ ! -e "$cfg" ]; then
+		echo "cannot find $cfg" >&2
+		exit 1
+	fi
+	perl -i -pe 's/(^execute.*)/$1 $ENV{BOOT_OPTS}/i' $cfg
+;;
+*)
+	echo "$0 does not support $ARCH" >&2
+	exit 1
+;;
+esac

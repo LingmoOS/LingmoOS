@@ -1,0 +1,21 @@
+#!/bin/sh -e
+# Configure iLO to use a virtual media image.
+
+if [ -n "$ISO" ]; then
+	if [ ! -e "$ISO" ]; then
+		echo "$ISO not found" >&2
+		exit 1
+	fi
+	
+	if [ -e "$ISO_ALT" ] && [ "$ISO_ALT" -nt "$ISO" ]; then
+	        echo "Using cd image: alternate"
+		ISO="$ISO_ALT"
+	else
+		echo "Using cd image: primary"
+	fi
+
+	cp -f $ISO $HP_ILO_ISO_PATH
+
+	echo "Using CD image $(basename $ISO) as virtual CD"
+	hp-ilo connect_cd
+fi

@@ -1,0 +1,40 @@
+[Unit]
+After=network-online.target nss-lookup.target
+ConditionPathIsDirectory=/etc/pacman.d/gnupg/
+ConditionPathIsReadWrite=/etc/pacman.d/gnupg/
+ConditionFileIsExecutable=SCRIPT_TARGET_DIR/archlinux-keyring-wkd-sync
+Description=Refresh existing keys of archlinux-keyring
+Wants=network-online.target
+StartLimitIntervalSec=1hour
+StartLimitBurst=3
+
+[Service]
+ExecStart=SCRIPT_TARGET_DIR/archlinux-keyring-wkd-sync
+Restart=on-failure
+RestartSec=5minutes
+
+CapabilityBoundingSet=
+DeviceAllow=
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=noaccess
+ProtectSystem=strict
+ReadWritePaths=/etc/pacman.d/gnupg
+RemoveIPC=true
+RestrictAddressFamilies=~AF_PACKET AF_NETLINK
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@resources

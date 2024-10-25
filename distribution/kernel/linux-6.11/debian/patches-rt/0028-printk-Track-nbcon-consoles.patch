@@ -1,0 +1,68 @@
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 20 Aug 2024 08:35:54 +0206
+Subject: [PATCH 28/54] printk: Track nbcon consoles
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.11/older/patches-6.11-rt7.tar.xz
+
+Add a global flag @have_nbcon_console to identify if any nbcon
+consoles are registered. This will be used in follow-up commits
+to preserve legacy behavior when no nbcon consoles are registered.
+
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
+Link: https://lore.kernel.org/r/20240820063001.36405-29-john.ogness@linutronix.de
+Signed-off-by: Petr Mladek <pmladek@suse.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/printk/printk.c |   14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -471,6 +471,11 @@ static DEFINE_MUTEX(syslog_lock);
+ static bool have_legacy_console;
+ 
+ /*
++ * Specifies if an nbcon console is registered.
++ */
++static bool have_nbcon_console;
++
++/*
+  * Specifies if a boot console is registered. If boot consoles are present,
+  * nbcon consoles cannot print simultaneously and must be synchronized by
+  * the console lock. This is because boot consoles and nbcon consoles may
+@@ -3639,6 +3644,7 @@ void register_console(struct console *ne
+ 	init_seq = get_init_console_seq(newcon, bootcon_registered);
+ 
+ 	if (newcon->flags & CON_NBCON) {
++		have_nbcon_console = true;
+ 		nbcon_seq_force(newcon, init_seq);
+ 	} else {
+ 		have_legacy_console = true;
+@@ -3719,6 +3725,7 @@ static int unregister_console_locked(str
+ {
+ 	bool use_device_lock = (console->flags & CON_NBCON) && console->write_atomic;
+ 	bool found_legacy_con = false;
++	bool found_nbcon_con = false;
+ 	bool found_boot_con = false;
+ 	unsigned long flags;
+ 	struct console *c;
+@@ -3786,13 +3793,18 @@ static int unregister_console_locked(str
+ 	for_each_console(c) {
+ 		if (c->flags & CON_BOOT)
+ 			found_boot_con = true;
+-		if (!(c->flags & CON_NBCON))
++
++		if (c->flags & CON_NBCON)
++			found_nbcon_con = true;
++		else
+ 			found_legacy_con = true;
+ 	}
+ 	if (!found_boot_con)
+ 		have_boot_console = found_boot_con;
+ 	if (!found_legacy_con)
+ 		have_legacy_console = found_legacy_con;
++	if (!found_nbcon_con)
++		have_nbcon_console = found_nbcon_con;
+ 
+ 	return res;
+ }

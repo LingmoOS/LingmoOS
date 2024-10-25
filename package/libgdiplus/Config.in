@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_LIBGDIPLUS
+	bool "libgdiplus"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on LINGMO_USE_WCHAR # libglib2 -> gettext
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_XLIB_LIBXFT
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_CAIRO
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  An Open Source implementation of the GDI+ API.
+
+	  https://github.com/mono/libgdiplus
+
+comment "libgdiplus needs a toolchain w/ wchar, threads, C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_XORG7
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_INSTALL_LIBSTDCPP

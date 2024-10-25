@@ -1,0 +1,23 @@
+#!/bin/sh
+# © 2013 Cyril Brulebois <kibi@debian.org>
+set -e
+
+mail=kibi@debian.org
+mirror=${1:-/srv/ftp.debian.org/ftp}
+workdir=${2:-dose.tmp}
+www=$3
+
+# Generate report and dot files:
+index=index.html
+diff=diff.txt
+./dose4udebs --workdir $workdir --mail $mail --index $index --diff $diff --mirror $mirror
+
+# Generate graphs:
+for i in $workdir/*.dot; do
+  dot -Tpng $i -o ${i%%.dot}.png
+done
+
+# Publish:
+if [ ! -z "$www" ]; then
+  rsync -a $workdir/$index $workdir/$diff $workdir/*.png $www/
+fi

@@ -1,0 +1,178 @@
+# All host rust packages should depend on this option
+config LINGMO_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_HOSTARCH = "aarch64"
+	default y if LINGMO_HOSTARCH = "powerpc"
+	default y if LINGMO_HOSTARCH = "powerpc64"
+	default y if LINGMO_HOSTARCH = "powerpc64le"
+	default y if LINGMO_HOSTARCH = "riscv64"
+	default y if LINGMO_HOSTARCH = "s390x"
+	default y if LINGMO_HOSTARCH = "x86"
+	default y if LINGMO_HOSTARCH = "x86_64"
+
+# The pre-built Rust standard library is only available for a number
+# of architectures/C libraries combinations, with different levels of
+# support: Tier 1 platforms, Tier 2 platforms with host tools, Tier 2
+# platforms, Tier 3 platforms. Below, we support Tier 1, Tier 2 with
+# host tools and Tier 2 platforms.
+
+# The below entries match Tier 1 platforms as described at
+# https://doc.rust-lang.org/nightly/rustc/platform-support.html.
+config LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER1_PLATFORMS
+	bool
+	# aarch64-unknown-linux-gnu
+	default y if LINGMO_aarch64 && LINGMO_TOOLCHAIN_USES_GLIBC
+	# i686-unknown-linux-gnu
+	default y if (LINGMO_x86_i686 || LINGMO_x86_pentiumpro || LINGMO_X86_CPU_HAS_MMX) && LINGMO_TOOLCHAIN_USES_GLIBC
+	# x86_64-unknown-linux-gnu
+	default y if LINGMO_x86_64 && LINGMO_TOOLCHAIN_USES_GLIBC
+
+# The below entries match Tier 2 platforms with host tools as
+# described at
+# https://doc.rust-lang.org/nightly/rustc/platform-support.html.
+config LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER2_HOST_TOOLS_PLATFORMS
+	bool
+	# aarch64-unknown-linux-musl
+	default y if LINGMO_aarch64 && LINGMO_TOOLCHAIN_USES_MUSL
+	# arm-unknown-linux-gnueabi
+	default y if LINGMO_ARM_CPU_ARMV6 && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_GLIBC
+	# arm-unknown-linux-gnueabihf
+	default y if LINGMO_ARM_CPU_ARMV6 && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_GLIBC
+	# armv7-unknown-linux-gnueabihf
+	default y if LINGMO_ARM_CPU_ARMV7A && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_GLIBC
+	# armv7-unknown-linux-gnueabihf for armv8 hardware with 32-bit
+	# userspace
+	default y if LINGMO_arm && LINGMO_ARM_CPU_ARMV8A && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_GLIBC
+	# powerpc-unknown-linux-gnu
+	default y if LINGMO_powerpc && LINGMO_TOOLCHAIN_USES_GLIBC
+	# powerpc64-unknown-linux-gnu
+	default y if LINGMO_powerpc64 && LINGMO_TOOLCHAIN_USES_GLIBC
+	# powerpc64le-unknown-linux-gnu
+	default y if LINGMO_powerpc64le && LINGMO_TOOLCHAIN_USES_GLIBC
+	# riscv64gc-unknown-linux-gnu
+	# "g" stands for imafd, and we also need "c".
+	default y if LINGMO_RISCV_64 && LINGMO_RISCV_ISA_RVI && LINGMO_RISCV_ISA_RVM && \
+			LINGMO_RISCV_ISA_RVA && LINGMO_RISCV_ISA_RVF && \
+			LINGMO_RISCV_ISA_RVD && LINGMO_RISCV_ISA_RVC && \
+			LINGMO_TOOLCHAIN_USES_GLIBC
+	# s390x-unknown-linux-gnu
+	default y if LINGMO_s390x && LINGMO_TOOLCHAIN_USES_GLIBC
+	# x86_64-unknown-linux-musl
+	default y if LINGMO_x86_64 && LINGMO_TOOLCHAIN_USES_MUSL
+
+# The below entries match Tier 2 platforms without host tools as
+# described at
+# https://doc.rust-lang.org/nightly/rustc/platform-support.html.
+config LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER2_PLATFORMS
+	bool
+	# arm-unknown-linux-musleabi
+	default y if LINGMO_ARM_CPU_ARMV6 && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_MUSL
+	# arm-unknown-linux-musleabihf
+	default y if LINGMO_ARM_CPU_ARMV6 && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_MUSL
+	# armv5te-unknown-linux-gnueabi
+	default y if LINGMO_ARM_CPU_ARMV5 && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_GLIBC
+	# armv5te-unknown-linux-musleabi
+	default y if LINGMO_ARM_CPU_ARMV5 && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_MUSL
+	# armv7-unknown-linux-gnueabi
+	default y if LINGMO_ARM_CPU_ARMV7A && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_GLIBC
+	# armv7-unknown-linux-musleabi
+	default y if LINGMO_ARM_CPU_ARMV7A && LINGMO_ARM_EABI && LINGMO_TOOLCHAIN_USES_MUSL
+	# armv7-unknown-linux-musleabihf
+	default y if LINGMO_ARM_CPU_ARMV7A && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_MUSL
+	# armv7-unknown-linux-musleabihf for armv8 hardware with 32-bit
+	# userspace
+	default y if LINGMO_arm && LINGMO_ARM_CPU_ARMV8A && LINGMO_ARM_EABIHF && LINGMO_TOOLCHAIN_USES_MUSL
+	# i586-unknown-linux-gnu
+	default y if LINGMO_x86_i586 && LINGMO_TOOLCHAIN_USES_GLIBC
+	# i586-unknown-linux-musl
+	default y if LINGMO_x86_i586 && LINGMO_TOOLCHAIN_USES_MUSL
+	# i686-unknown-linux-musl
+	default y if (LINGMO_x86_i686 || LINGMO_x86_pentiumpro || LINGMO_X86_CPU_HAS_MMX) && LINGMO_TOOLCHAIN_USES_MUSL
+	# mips-unknown-linux-musl
+	default y if LINGMO_mips && LINGMO_TOOLCHAIN_USES_MUSL && !LINGMO_MIPS_CPU_MIPS32R6
+	# mips64-unknown-linux-muslabi64
+	default y if LINGMO_mips64 && LINGMO_TOOLCHAIN_USES_MUSL && LINGMO_MIPS_NABI64 && !LINGMO_MIPS_CPU_MIPS64R6
+	# mips64el-unknown-linux-muslabi64
+	default y if LINGMO_mips64el && LINGMO_TOOLCHAIN_USES_MUSL && LINGMO_MIPS_NABI64 && !LINGMO_MIPS_CPU_MIPS64R6
+	# mipsel-unknown-linux-musl
+	default y if LINGMO_mipsel && LINGMO_TOOLCHAIN_USES_MUSL && !LINGMO_MIPS_CPU_MIPS32R6
+	# sparc64-unknown-linux-gnu
+	default y if LINGMO_sparc64 && LINGMO_TOOLCHAIN_USES_GLIBC
+
+# All target rust packages should depend on this option
+# Note: With musl based toolchain, we need a C++ cross compiler to
+# build host-rust some target libraries (libunwind) from llvm source
+# code bundled in rust sources.
+config LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER1_PLATFORMS
+	default y if LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER2_HOST_TOOLS_PLATFORMS
+	default y if LINGMO_PACKAGE_HOST_RUSTC_TARGET_TIER2_PLATFORMS
+	depends on LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_USES_MUSL
+	depends on LINGMO_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS
+
+config LINGMO_PACKAGE_HOST_RUSTC_ARCH
+	string
+	default "armv5te" if LINGMO_ARM_CPU_ARMV5
+	default "arm" if LINGMO_ARM_CPU_ARMV6
+	default "armv7"  if LINGMO_ARM_CPU_ARMV7A
+	default "armv7"  if LINGMO_ARM_CPU_ARMV7A || (LINGMO_arm && LINGMO_ARM_CPU_ARMV8A)
+	default "riscv64gc" if LINGMO_RISCV_64
+	default LINGMO_ARCH
+
+config LINGMO_PACKAGE_HOST_RUSTC_ABI
+	string
+	default "eabi"   if LINGMO_ARM_EABI
+	default "eabihf" if LINGMO_ARM_EABIHF
+	default "abi64"  if LINGMO_MIPS_NABI64
+
+config LINGMO_PACKAGE_HOST_RUSTC
+	bool "host rustc"
+	depends on LINGMO_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS
+	help
+	  Compiler for the Rust language
+
+	  http://www.rust-lang.org
+
+if LINGMO_PACKAGE_HOST_RUSTC
+
+choice
+	prompt "Rust compiler variant"
+	default LINGMO_PACKAGE_HOST_RUST_BIN
+	help
+	  Select a Rust compiler
+
+config LINGMO_PACKAGE_HOST_RUST
+	bool "host rust"
+	# RUSTC_TARGET_NAME must be set for building host-rust
+	# otherwise config.toml is broken.
+	depends on LINGMO_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+	# triggers ICE on trunc_int_for_mode, at explow.c:56
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_5 || !LINGMO_aarch64
+	# rust uses llvm >= 17 since 1.73.0
+	select LINGMO_HOST_CMAKE_AT_LEAST_3_20
+	help
+	  This package will build the compiler for the host as well as
+	  two flavors of the standard library: one for the host, another
+	  for the target. Both are installed in the host directory.
+
+comment "host-rust needs a toolchain w/ gcc >= 5"
+	depends on LINGMO_aarch64
+	depends on !LINGMO_TOOLCHAIN_GCC_AT_LEAST_5
+
+config LINGMO_PACKAGE_HOST_RUST_BIN
+	bool "host rust (pre-built)"
+	help
+	  This package will install pre-built versions of the compiler
+	  for the host and the Rust standard library for the target.
+
+endchoice
+
+endif
+
+config LINGMO_PACKAGE_PROVIDES_HOST_RUSTC
+	string
+	default "host-rust" if LINGMO_PACKAGE_HOST_RUST
+	# Default to host-rust-bin as long as host arch supports it
+	default "host-rust-bin" if !LINGMO_PACKAGE_HOST_RUST
+	depends on LINGMO_PACKAGE_HOST_RUSTC_ARCH_SUPPORTS

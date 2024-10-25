@@ -1,0 +1,77 @@
+config LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_i386
+	default y if LINGMO_x86_64
+	default y if LINGMO_aarch64
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_riscv
+
+config LINGMO_PACKAGE_LLVM_TARGET_ARCH
+	string
+	default "AArch64" if LINGMO_aarch64
+	default "ARM" if LINGMO_arm || LINGMO_armeb
+	default "X86" if LINGMO_i386 || LINGMO_x86_64
+	default "riscv32" if LINGMO_riscv && !LINGMO_ARCH_IS_64
+	default "riscv64" if LINGMO_riscv && LINGMO_ARCH_IS_64
+
+config LINGMO_PACKAGE_LLVM
+	bool "llvm"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735 # std::shared_future
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # std::wstring
+	depends on LINGMO_HOST_GCC_AT_LEAST_7 # host-llvm
+	help
+	  The LLVM Project is a collection of modular and reusable
+	  compiler and toolchain technologies.
+
+	  http://llvm.org
+
+if LINGMO_PACKAGE_LLVM
+
+config LINGMO_PACKAGE_LLVM_AMDGPU
+	bool "AMDGPU backend"
+	help
+	  Build AMDGPU target. Select this option if you are going
+	  to install mesa3d with llvm and use Gallium Radeon driver.
+
+config LINGMO_PACKAGE_LLVM_RTTI
+	bool "enable rtti"
+	help
+	  Build LLVM with run-time type information. LLVM can be built
+	  without rtti, but turning it off changes the ABI of C++
+	  programs.
+
+	  This features is needed to build the Gallium Nouveau driver
+	  or the Clover OpenCL state tracker when llvm support is
+	  enabled.
+
+	  https://llvm.org/docs/HowToSetUpLLVMStyleRTTI.html
+
+config LINGMO_PACKAGE_LLVM_BPF
+	bool "BPF backend"
+	help
+	  Build BPF target. Select this option if you are going
+	  to install bcc on the target.
+
+config LINGMO_PACKAGE_LLVM_DUMP
+	bool "enable dump"
+	help
+	  Build LLVM with dump functions even when assertions are
+	  disabled.
+
+endif
+
+comment "llvm needs a toolchain w/ wchar, threads, C++, gcc >= 7, dynamic library, host gcc >= 7"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 \
+		|| LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR \
+		|| !LINGMO_HOST_GCC_AT_LEAST_7
+
+comment "llvm needs a toolchain not affected by GCC bug 64735"
+	depends on LINGMO_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_GCC_BUG_64735

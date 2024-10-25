@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_XDG_DBUS_PROXY
+	bool "xdg-dbus-proxy"
+	depends on LINGMO_USE_WCHAR # libglib2 -> gettext
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Filtering proxy for D-Bus connections.
+
+	  https://github.com/flatpak/xdg-dbus-proxy
+
+comment "xdg-dbus-proxy needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

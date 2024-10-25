@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+# Redirect stdout to stderr
+exec 1>&2
+
+case "${1}" in
+	-h|--help|-u|--usage)
+		echo "live-system - determine if running system is a live system"
+		echo
+		echo "Usage: ${0} [-v|--verbose]"
+
+		exit 2
+		;;
+
+	-v|--verbose)
+		_VERBOSE="true"
+		;;
+esac
+
+[ "${_VERBOSE}" ] && echo -n "Checking for live system..."
+
+if [ ! -e /proc/cmdline ]
+then
+	[ "${_VERBOSE}" ] && echo
+	echo "E: /proc/cmdline - No such file."
+
+	exit 2
+fi
+
+if grep -qs "boot=live" /proc/cmdline
+then
+	[ "${_VERBOSE}" ] && echo -n " yes, this is a live system"
+
+	if [ -d /run/live/medium/install ]
+	then
+		if ls /run/live/medium/install/pool/main/l/live-installer/live-installer_*.udeb > /dev/null 2>&1
+		then
+			[ "${_VERBOSE}" ] && echo " with debian-installer (live) support."
+		else
+			[ "${_VERBOSE}" ] && echo " with debian-installer (normal) support."
+		fi
+	else
+		[ "${_VERBOSE}" ] && echo "without debian-installer support."
+	fi
+
+	exit 0
+else
+	[ "${_VERBOSE}" ] && echo " no, this is not a live system."
+
+	exit 1
+fi

@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LIBFUTILS
+	bool "libfutils"
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_INSTALL_LIBSTDCPP # ulog
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # ulog
+	select LINGMO_PACKAGE_ULOG
+	help
+	  This library contains some common useful functions (list,
+	  hash, time)
+
+	  https://github.com/Parrot-Developers/libfutils
+
+comment "libfutils needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC

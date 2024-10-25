@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+# Gathers data about an installed systen over ssh. The point behind ssh is
+# to avoid issues with some crummy management consoles that make it hard to
+# reliably gather a *lot* of data.
+use Expect;
+
+my $timeout=600;
+
+my $machine=$ENV{MACHINE};
+if (exists $ENV{TEST_HOSTNAME}) {
+	$machine=$ENV{TEST_HOSTNAME};
+}
+my $port=22;
+if (exists $ENV{SSHPORT}) {
+	$port=$ENV{SSHPORT};
+}
+
+my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p $port $ENV{USER}\@$machine");
+#$exp->debug(2);
+#$exp->exp_internal(1);
+$exp->expect($timeout, "assword:");
+$exp->send("$ENV{USER_PASSWORD}\r");
+sleep 3;
+foreach my $log (qw{status hardware-summary syslog partman}) {
+	$exp->send("cat /var/log/installer/$log\r");
+}
+$exp->send("dmesg; dpkg -l; uname -a; mount; df -h; free; tasksel --list-tasks; locale\r");
+# Strings output by locale indicate end of output.
+$exp->expect($timeout, "LC_MEASUREMENT=");
+$exp->expect($timeout, "LC_IDENTIFICATION=");
+$exp->send("exit\r");
+$exp->interact;

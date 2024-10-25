@@ -1,0 +1,45 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 16 Sep 2024 01:54:24 +0200
+Subject: kbuild, bpf: Fix BTF reproducibility
+
+pahole 1.22 introduced the -j option for parallel processing, and
+kbuild uses it, but this makes its output unreproducible.
+
+pahole 1.27 introduced --btf_features=+reproducible_build which makes
+the output reproducible even when -j is used.
+
+Assume that if KBUILD_BUILD_TIMESTAMP is set then a reproducible build
+is required, and use both options if available or neither if not.
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/scripts/Makefile.btf
++++ b/scripts/Makefile.btf
+@@ -12,8 +12,6 @@ endif
+ 
+ pahole-flags-$(call test-ge, $(pahole-ver), 121)	+= --btf_gen_floats
+ 
+-pahole-flags-$(call test-ge, $(pahole-ver), 122)	+= -j
+-
+ pahole-flags-$(call test-ge, $(pahole-ver), 125)	+= --skip_encoding_btf_inconsistent_proto --btf_gen_optimized
+ 
+ else
+@@ -27,6 +25,18 @@ endif
+ 
+ endif
+ 
++# pahole 1.22 introduced the -j option for parallel processing, but
++# this makes its output unreproducible.
++# pahole 1.27 introduced --btf_features=+reproducible_build which
++# makes the output reproducible even when -j is used.
++# Assume that if KBUILD_BUILD_TIMESTAMP is set then a reproducible
++# build is required and we must not use -j alone.
++ifeq ($(KBUILD_BUILD_TIMESTAMP),)
++pahole-flags-$(call test-ge, $(pahole-ver), 122)	+= -j
++else
++pahole-flags-$(call test-ge, $(pahole-ver), 127)	+= -j --btf_features=+reproducible_build
++endif
++
+ pahole-flags-$(CONFIG_PAHOLE_HAS_LANG_EXCLUDE)		+= --lang_exclude=rust
+ 
+ export PAHOLE_FLAGS := $(pahole-flags-y)

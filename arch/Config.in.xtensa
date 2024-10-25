@@ -1,0 +1,66 @@
+choice
+	prompt "Target Architecture Variant"
+	default LINGMO_xtensa_fsf
+	depends on LINGMO_xtensa
+
+config LINGMO_XTENSA_CUSTOM
+	bool "Custom Xtensa processor configuration"
+
+config LINGMO_xtensa_fsf
+	bool "fsf - Default configuration"
+	select LINGMO_USE_MMU
+
+endchoice
+
+config LINGMO_XTENSA_OVERLAY_FILE
+	string "Overlay file for custom configuration"
+	depends on LINGMO_XTENSA_CUSTOM
+	help
+	  Enter the path to the overlay tarball for a custom processor
+	  configuration.
+
+	  These overlay files are tar packages with updated
+	  configuration files for various toolchain packages and Xtensa
+	  processor configurations. They are provided by the processor
+	  vendor or directly from Tensilica.
+
+	  The path can be either absolute, or relative to the top
+	  directory of buildroot.
+
+choice
+	prompt "Target Architecture Endianness"
+	default LINGMO_XTENSA_LITTLE_ENDIAN
+	depends on LINGMO_XTENSA_CUSTOM
+
+config LINGMO_XTENSA_LITTLE_ENDIAN
+	bool "Little endian"
+
+config LINGMO_XTENSA_BIG_ENDIAN
+	bool "Big endian"
+
+endchoice
+
+config LINGMO_XTENSA_USE_MMU
+	bool "MMU support"
+	default y
+	depends on LINGMO_XTENSA_CUSTOM
+	select LINGMO_USE_MMU
+	help
+	  Enable this option if your Xtensa core has a MMU (Memory
+	  Management Unit).
+
+config LINGMO_ENDIAN
+	default "LITTLE"	if LINGMO_XTENSA_LITTLE_ENDIAN
+	default "BIG"		if LINGMO_xtensa_fsf || LINGMO_XTENSA_BIG_ENDIAN
+
+config LINGMO_ARCH
+	default "xtensa"	if LINGMO_xtensa
+
+config LINGMO_NORMALIZED_ARCH
+	default "xtensa"
+
+config LINGMO_READELF_ARCH_NAME
+	default "Tensilica Xtensa Processor"
+
+# vim: ft=kconfig
+# -*- mode:kconfig; -*-

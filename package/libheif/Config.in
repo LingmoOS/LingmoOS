@@ -1,0 +1,13 @@
+config LINGMO_PACKAGE_LIBHEIF
+	bool "libheif"
+	depends on !LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_30730
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	help
+	  libheif is an HEIF and AVIF file format decoder and encoder.
+
+	  https://github.com/strukturag/libheif
+
+comment "libheif needs a toolchain w/ C++, gcc >= 4.8"
+	depends on !LINGMO_TOOLCHAIN_HAS_BINUTILS_BUG_30730
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8

@@ -1,0 +1,31 @@
+comment "elfutils needs a toolchain w/ wchar, dynamic library, threads"
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_ELFUTILS
+	bool "elfutils"
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_ARGP_STANDALONE if !LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_MUSL_FTS if !LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  Libraries/utilities to handle ELF objects (drop in
+	  replacement for libelf).
+
+	  Note that this option only installs the libraries, and not
+	  the programs.
+
+	  https://sourceware.org/elfutils/
+
+if LINGMO_PACKAGE_ELFUTILS
+
+config LINGMO_PACKAGE_ELFUTILS_PROGS
+	bool "Install programs"
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	help
+	  This option tells elfutils to not only install the libelf
+	  libraries, but also the elfutils programs.
+
+endif

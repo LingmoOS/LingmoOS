@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euE
+
+REF_BASE=${1:-master}
+
+REPO=$(git rev-parse --show-toplevel)
+COMMIT_BASE=$(git merge-base --fork-point "$REF_BASE")
+
+TMP=$(mktemp -d)
+trap "rm -rf '$TMP'" EXIT
+
+function git {
+  command git -c advice.detachedHead=false -c init.defaultBranch=main -C "$TMP" "$@"
+}
+
+git init -q
+git remote add origin "$REPO"
+git fetch -q --depth 1 origin "$COMMIT_BASE"
+git checkout -q FETCH_HEAD
+
+for i in "$TMP" "$REPO"; do
+  pushd "$i" > /dev/null
+  echo "Running gencontrol in '$i'"
+  ./debian/bin/gencontrol.py
+  popd > /dev/null
+done
+
+for i in control rules.gen generated.signed-amd64 generated.signed-arm64; do
+  diff -ruN "$TMP"/debian/$i "$REPO"/debian/$i | wdiff -dn | colordiff
+done

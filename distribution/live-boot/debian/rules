@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+%:
+	dh ${@}
+
+override_dh_auto_install:
+	dh_auto_install -- DESTDIR=debian/tmp
+
+	# Removing useless files
+	rm -f debian/tmp/usr/share/doc/live-boot/COPYING
+
+	# live-boot-initramfs-tools
+	mkdir -p debian/live-boot-initramfs-tools/usr/share
+	mv debian/tmp/usr/share/initramfs-tools debian/live-boot-initramfs-tools/usr/share
+
+override_dh_missing:
+	dh_missing --fail-missing

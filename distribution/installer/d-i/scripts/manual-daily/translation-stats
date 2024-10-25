@@ -1,0 +1,86 @@
+#!/bin/bash
+
+[ -f ~/.d-i_manual_daily ] || exit 1
+. ~/.d-i_manual_daily
+
+[ -f "$ROOT/bin/langlist" ] || exit 1
+
+# Order of languages is order in list.
+languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | cut -f 1)
+
+[ -e "$source" ] && cd $source || exit 1
+
+[ -f "$ROOT/do_not_build" ] && exit 1
+
+## Create directories
+[ -e "$logdir" ] || mkdir -p "$logdir"
+
+# Ignore the following type of lines:
+# - empty
+# - containing only reference variable (e.g. to .xml file)
+# - containing an encoding setting
+# - containing a (one-line) comment
+# - containing only tags
+grepexp="^[[:space:]]*(|&[-_.[:alnum:]]+;|<\?.+\?>|<!--.*-->|<[^<>]+>([[:space:]]*(<[^<>]+>))*)[[:space:]]*$"
+
+lines_tot=0
+files_tot=0
+for lang in $languages; do
+    lines_en=0
+    lines_tr=0
+    lines_not_tr=0
+    lines_missing=0
+    files_tr=0
+    files_not_tr=0
+    files_missing=0
+
+    # Skip languages that do not have XML files
+    [ -d $source/$lang/ ] || continue
+
+    if [ $lang = "en" ] ; then
+        for file_en in $(find en/ -name "*.xml"); do
+            egrep -v "$grepexp" $file_en >/tmp/file_en.$$
+            lines_en=$(wc -l /tmp/file_en.$$ | cut -d " " -f 1)
+            [ $lines_en -eq 0 ] && continue
+
+            lines_tot=$((lines_tot + $lines_en))
+            files_tot=$((files_tot + 1))
+        done
+        echo -e "$lang\t\t$lines_tot\t$files_tot"
+        continue
+    fi
+
+    for file_en in $(find en/ -name "*.xml"); do
+        egrep -v "$grepexp" $file_en >/tmp/file_en.$$
+        lines_en=$(wc -l /tmp/file_en.$$ | cut -d " " -f 1)
+        [ $lines_en -eq 0 ] && continue
+
+        file_tr=$(echo "$file_en" | sed "s/en\//$lang\//")
+        if [ -f $file_tr ] ; then
+            egrep -v "$grepexp" $file_tr >/tmp/file_tr.$$
+            if diff -w -q /tmp/file_en.$$ /tmp/file_tr.$$ >/dev/null || \
+               egrep -q "^<\!--[[:space:]]*original version.*untranslated[[:space:]]*-->" $file_tr ; then
+                lines_not_tr=$(($lines_not_tr + $lines_en))
+                files_not_tr=$(($files_not_tr + 1))
+		# echo $file_en
+            else
+                lines_tr=$(($lines_tr + $lines_en))
+                files_tr=$(($files_tr + 1))
+            fi
+        else
+            lines_missing=$(($lines_missing + $lines_en))
+            files_missing=$(($files_missing + 1))
+            # echo "$lang missing: $file_en"
+        fi
+
+    done
+    pct_trans=$(($lines_tr * 100 / $lines_tot))
+
+    files_need_update=$(./scripts/doc-check $lang 2>/dev/null | \
+        egrep "^en/.*[[:digit:]]* -> [[:digit:]]*" | wc -l)
+
+    echo -e "$lang\t$pct_trans\t$lines_tr\t$files_tr\t$lines_not_tr\t$files_not_tr\t$lines_missing\t$files_missing\t$files_need_update"
+done
+
+rm /tmp/*.$$
+exit 0

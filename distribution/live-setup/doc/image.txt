@@ -1,0 +1,67 @@
+How to set up VM images for live/cloud build
+
+20GB image
+
+install basic Debian and set it up as a usable machine - booting, etc.
+
+Enable serial console etc. - we might use it for debug.
+
+apt-get install rsync openssh-server git dnsmasq \
+ openstack-debian-images live-wrapper emacs-nox \
+ strace eatmydata
+
+Set hostname to make it obvious what the machine is.
+
+Configure the mirror to point to the local mirror on the host - just
+use deb.debian.org for everything, as we'll remap that.
+
+cd /root
+git clone https://salsa.debian.org/images-team/live-setup.git
+git clone https://salsa.debian.org/live-team/live-wrapper.git
+
+Install bits from live-setup/inside_vm:
+=======================================
+
+cp live-setup/inside_vm/flag_external /usr/local/bin
+cp live-setup/inside_vm/flag_external.service /etc/systemd/system/flag_external.service
+systemctl enable flag_external.service
+
+add the host's ssh pubkey into /root/.ssh/authorized_keys
+
+Add fstab entry for the host-exported p9 fs:
+
+host0           /external    9p      version=9p2000.L,nofail,noauto   0 0
+
+Set up the external_flag service - this mounts the p9 fs and writes a
+flag file into it when the ssh service is ready to use.
+
+For the live image builders, add an fstab entry for the /w workspace
+drive (300G or so):
+
+UUID=<> /w              ext4     errors=remount-ro    0       0
+
+(automatically) Configure dnsmasq - see the included dnsmasq.conf
+
+Tweaks for openstack VMs
+========================
+
+Edit /usr/sbin/build-openstack-debian-image:
+
+ * fix up the sources for security.debian.org if on stretch (sigh)
+ * don't run qemu-img convert at the end - we run this on the host, faster
+
+Tweaks for live VMs
+===================
+
+Bullseye is difficult. live-wrapper and vmdebootstrap are both
+python2, so have to install buster, hold packages, upgrade. Ugh. :-/
+
+In all cases, the live-wrapper package is missing some late
+bugfixes. The quickest way to fix things is to replace the core
+contents of the package with symlinks into the git clone in /root:
+
+cd /usr/lib/python2.7/dist-packages/lwr/
+rm *.pyc
+for file in *; do
+    ln -sfv /root/live-wrapper/lwr/$file .
+done

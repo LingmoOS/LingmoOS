@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture "i386"
+
+buildaptarchive
+touch aptarchive/Packages
+setupflataptarchive
+
+failureupdate() {
+	rm -rf rootdir/var/lib/apt
+	testfailure aptget update --allow-insecure-repositories
+	testsuccess grep "^E: Failed to fetch store:${1}  Empty files can't be valid archives$" rootdir/tmp/testfailure.output
+}
+successupdate() {
+	rm -rf rootdir/var/lib/apt
+	testwarning aptget update --allow-insecure-repositories
+}
+
+createemptyarchive() {
+	find aptarchive/ \( -name "Packages*" -o -name "en*" \) -type f -delete
+	touch aptarchive/Packages
+	echo -n "" | $COMPRESSOR_CMD > aptarchive/${1}.$COMPRESS
+	find aptarchive -name '*Release*' -delete
+	rm -f aptarchive/Packages
+}
+
+createemptyfile() {
+	find aptarchive/ \( -name "Packages*" -o -name "en*" \) -type f -delete
+	touch aptarchive/Packages aptarchive/${1}.$COMPRESS
+	find aptarchive -name '*Release*' -delete
+	rm -f aptarchive/Packages
+}
+
+testoverfile() {
+	local APTARCHIVE="$(readlink -f ./aptarchive)"
+	forcecompressor "$1"
+
+	msgmsg 'archive over file' "Packages.$COMPRESS"
+	createemptyarchive 'Packages'
+	successupdate
+	createemptyfile 'Packages'
+	failureupdate "$(readlink -f rootdir/var/lib/apt/lists/partial/$(echo "$APTARCHIVE" | sed -e 's#/#_#g')_Packages.${COMPRESS})"
+}
+
+testoverhttp() {
+	forcecompressor "$1"
+
+	msgmsg 'archive over http' "Packages.$COMPRESS"
+	createemptyarchive 'Packages'
+	successupdate
+	createemptyfile 'Packages'
+	failureupdate "$(readlink -f rootdir/var/lib/apt/lists/partial/localhost:${APTHTTPPORT}_Packages.${COMPRESS})"
+}
+
+forallsupportedcompressors testoverfile
+
+# do the same again with http instead of file
+changetowebserver
+
+forallsupportedcompressors testoverhttp

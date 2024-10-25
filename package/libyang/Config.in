@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_LIBYANG
+	bool "libyang"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # __sync_*_4 intrinsics
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_PCRE2
+	help
+	  Libyang is YANG data modeling language parser and toolkit
+	  written (and providing API) in C.
+
+	  https://github.com/CESNET/libyang
+
+comment "libyang needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

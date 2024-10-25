@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_MRAA_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64 || LINGMO_aarch64_be
+	default y if LINGMO_arm || LINGMO_armeb
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+
+config LINGMO_PACKAGE_MRAA
+	bool "mraa"
+	depends on LINGMO_PACKAGE_MRAA_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  mraa is a C/C++ library with bindings to javascript & python
+	  to interface with the IO on Galileo, Edison & other
+	  platforms, with a structured and sane API where port
+	  names/numbering matches the board that you are on.
+
+	  http://iotdk.intel.com/docs/master/mraa
+
+comment "mraa needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_PACKAGE_MRAA_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

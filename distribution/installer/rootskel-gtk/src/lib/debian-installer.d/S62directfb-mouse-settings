@@ -1,0 +1,13 @@
+#! /bin/sh
+
+proto=$(debconf-get mouse/protocol)
+if [ "$proto" ]; then
+	echo "mouse-protocol=$proto" >>/etc/directfbrc
+fi
+dev=$(debconf-get mouse/device)
+if [ "$dev" ]; then
+	echo "mouse-source=$dev" >>/etc/directfbrc
+fi
+if [ "$(debconf-get mouse/left)" = true ]; then
+	echo "lefty" >>/etc/directfbrc
+fi

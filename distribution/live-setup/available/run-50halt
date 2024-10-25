@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#set -x
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+
+log "Shutting down"
+sleep 10
+
+# Delete myself so we can't get stuck in a reboot loop!
+rm -f $0
+
+shutdown
+poweroff
+log "DONE"
+
+exit 0

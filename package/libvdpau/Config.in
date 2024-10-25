@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBVDPAU
+	bool "libvdpau"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_XLIB_LIBXEXT
+	help
+	  VDPAU is the Video Decode and Presentation API for UNIX.
+	  It provides an interface to video decode acceleration and
+	  presentation hardware present in modern GPUs.
+
+	  http://freedesktop.org/wiki/Software/VDPAU
+
+comment "libvdpau needs a toolchain w/ threads, C++"
+	depends on LINGMO_PACKAGE_XORG7
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP

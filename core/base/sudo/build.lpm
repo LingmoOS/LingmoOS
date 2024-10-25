@@ -1,0 +1,78 @@
+pkgname=sudo
+_sudover=1.9.15p5
+pkgrel=2
+pkgver=${_sudover/p/.p}
+pkgdesc="Give certain users the ability to run some commands as root"
+arch=('x86_64')
+url="https://www.sudo.ws/sudo/"
+license=('custom')
+depends=('glibc' 'openssl' 'pam' 'libldap' 'zlib')
+backup=('etc/pam.d/sudo'
+        'etc/sudo.conf'
+        'etc/sudo_logsrvd.conf'
+        'etc/sudoers')
+install=$pkgname.install
+source=(https://www.sudo.ws/sudo/dist/$pkgname-$_sudover.tar.gz
+        $pkgname-preserve-editor-for-visudo.patch::https://github.com/sudo-project/sudo/commit/1db1453556e1.patch
+        $pkgname-enable-secure_path-by-default.patch::https://github.com/sudo-project/sudo/commit/e0e24456bc3f.patch
+        $pkgname-add-with-secure-path-value-option.patch::https://github.com/sudo-project/sudo/commit/e24737eac90f.patch
+        sudo_logsrvd.service
+        sudo.pam)
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd $pkgname-$_sudover
+  patch -Np1 -i ../$pkgname-preserve-editor-for-visudo.patch
+  patch -Np1 -F3 -i ../$pkgname-enable-secure_path-by-default.patch
+  patch -Np1 -i ../$pkgname-add-with-secure-path-value-option.patch
+}
+
+build() {
+  cd $pkgname-$_sudover
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib \
+    --with-rundir=/run/sudo \
+    --with-vardir=/var/db/sudo \
+    --with-logfac=auth \
+    --enable-tmpfiles.d \
+    --with-pam \
+    --with-sssd \
+    --with-ldap \
+    --with-ldap-conf-file=/etc/openldap/ldap.conf \
+    --with-env-editor \
+    --with-passprompt="[sudo] password for %p: " \
+    --with-secure-path-value=/usr/local/sbin:/usr/local/bin:/usr/bin \
+    --with-all-insults
+  make
+}
+
+check() {
+  cd $pkgname-$_sudover
+  make check
+}
+
+package() {
+  depends+=('libcrypto.so' 'libssl.so')
+
+  cd $pkgname-$_sudover
+  make DESTDIR="$pkgdir" install
+
+  # sudo_logsrvd service file (taken from sudo-logsrvd-1.9.0-1.el8.x86_64.rpm)
+  install -Dm644 -t "$pkgdir/usr/lib/systemd/system" ../sudo_logsrvd.service
+
+  # Remove sudoers.dist; not needed since pacman manages updates to sudoers
+  rm "$pkgdir/etc/sudoers.dist"
+
+  # Remove /run/sudo directory; we create it using systemd-tmpfiles
+  rmdir "$pkgdir/run/sudo"
+  rmdir "$pkgdir/run"
+
+  install -Dm644 "$srcdir/sudo.pam" "$pkgdir/etc/pam.d/sudo"
+
+  install -Dm644 LICENSE.md -t "$pkgdir/usr/share/licenses/sudo"
+}
+
+# vim:set ts=2 sw=2 et:

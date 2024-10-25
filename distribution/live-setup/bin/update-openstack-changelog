@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# Try and automate more of the openstack image release process
+#
+
+if [ ! -d openstack ]; then
+    echo "$0: Can't see an openstack directory in $PWD"
+    echo "Abort"
+    exit 1
+fi
+
+if [ -r openstack/.user ]; then
+    ME=$(cat openstack/.user)
+fi
+if [ "$ME"x = ""x ]; then
+    ME="$SUDO_USER"
+fi
+if [ "$ME"x = ""x ]; then
+    echo "I can't work out who you are via ME or SUDO_USER, abort"
+    exit 1
+fi
+DETAILS_COUNT=$(getent passwd $ME | wc -l)
+if [ $DETAILS_COUNT != 1 ]; then
+    echo "$0: Can't reliably determine details for $ME, abort"
+    exit 1
+fi
+DETAILS=$(getent passwd $ME)
+NAME=$(echo $DETAILS | awk -F : '{gsub(",","");print $5}')
+EMAIL="$ME@debian.org"
+DATE=$(date --rfc-email)
+CHANGE_DATE="-- $NAME <$EMAIL>  $DATE"
+
+cd openstack
+rm -f .user
+
+VERSION=$(ls -1 debian-*openstack* | \
+	      awk '{gsub("^debian-","");gsub("-openstack.*$",""); if(NR==1) {print $0}}')
+
+case "$VERSION" in
+    9.*)
+	RELEASE=stretch
+	MAJOR=9
+	;;
+    10.*)
+	RELEASE=buster
+	MAJOR=10
+	;;
+    *)
+	echo "$0: Unsupported version string $VERSION: looks broken, abort"
+	exit 1
+	;;
+esac
+
+echo "Debian $RELEASE Openstack images changelog" > CHANGELOG
+echo >> CHANGELOG
+echo "$VERSION" >> CHANGELOG
+
+case "$VERSION" in
+    *-20*)
+	# Dated point release update
+	# Add the details of the changes here
+	~/live/bin/check-openstack-updates -r $RELEASE \
+	    -d /mnt/nfs-cdimage/openstack/current-$MAJOR \
+	    >> CHANGELOG
+	echo "$CHANGE_DATE" >> CHANGELOG	
+
+	# Now append the body of the previous point release
+	awk '{if(NR > 1){print $0}}' \
+	    /mnt/nfs-cdimage/openstack/current-$MAJOR/CHANGELOG \
+	    >> CHANGELOG
+	echo "Created incremental CHANGELOG for version $VERSION"
+	echo "Diff for package lists: amd64"
+	diff -u /mnt/nfs-cdimage/openstack/current-$MAJOR/*amd64*list *amd64*list | grep -e ^[-+]
+	echo
+	echo "Diff for package lists: arm64"
+	diff -u /mnt/nfs-cdimage/openstack/current-$MAJOR/*arm64*list *arm64*list | grep -e ^[-+]
+	echo
+	;;
+    *)
+	echo >> CHANGELOG
+	echo "  First build for $VERSION release" >> CHANGELOG
+	echo >> CHANGELOG
+	echo "$CHANGE_DATE" >> CHANGELOG
+	echo "Created new blank CHANGELOG for version $VERSION"
+	;;
+esac
+
+cd ..
+mv openstack $VERSION
+~/live/bin/openstack-links $VERSION

@@ -1,0 +1,27 @@
+config LINGMO_PACKAGE_XDRIVER_XF86_VIDEO_IMX
+	bool "xf86-video-imx"
+	depends on LINGMO_ARM_EABI # libz160
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # libz160
+	depends on LINGMO_LINUX_KERNEL # linux/mxcfb.h
+	depends on LINGMO_PACKAGE_GPU_AMD_BIN_MX51_OUTPUT_X11
+	select LINGMO_PACKAGE_LIBZ160
+	select LINGMO_PACKAGE_XORGPROTO
+	help
+	  X.Org driver for iMX5 GPU
+
+	  To use this driver, add the correct configuration to your
+	  /etc/X11/xorg.conf, as follows:
+
+	  Section "Device"
+	    [...]
+	    Driver "imx"
+	    Option "fbdev" "/dev/fb0"
+	  EndSection
+
+comment "xf86-video-imx needs an EABI toolchain w/ glibc"
+	depends on LINGMO_arm
+	depends on !LINGMO_ARM_EABI || !LINGMO_TOOLCHAIN_USES_GLIBC
+
+comment "xf86-video-imx needs gpu-amd-bin-mx51 with X11 output and a Linux kernel to be built"
+	depends on LINGMO_arm
+	depends on !LINGMO_LINUX_KERNEL || !LINGMO_PACKAGE_GPU_AMD_BIN_MX51_OUTPUT_X11

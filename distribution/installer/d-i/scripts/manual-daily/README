@@ -1,0 +1,46 @@
+The scripts and other files in this directory are used for the daily builds
+of the Installation Guide that are published on alioth.
+As it is convenient to use the same infrastructure, the scripts also build
+the developers reference for the installer (D-I Internals).
+
+Some documentation on how to set up and manage the builds is available at:
+http://lists.debian.org/debian-boot/2007/06/msg00625.html
+There was supposed to be a part II about release management, but that never
+happened...
+
+The builds are currently run by Holger Wansing <linux@wansing-online.de>.
+
+The scripts may be considered published under the GPL.
+
+Frans Pop <elendil@planet.nl>
+
+----------------
+
+The build scripts source a configuration file in the user's home directory.
+Below is an example of a possible configuration file.
+
+<example ~/.d-i_manual_daily>
+# Configuration settings for "daily" builds of the Installation Guide
+# and the developers reference (D-I Internals)
+
+# By default the manual is built and the developer reference is not
+#DI_BUILD_MANUAL=0
+#DI_BUILD_DEVREF=1
+
+# The next setting forces a local build only:
+# - built documents are not uploaded to alioth
+# - changes to PO files are not committed
+# - no mails are sent to translators, but the build overview mail is sent
+#DI_LOCAL_BUILD=1
+
+ROOT=/srv/d-i.debian.org/home/d-i_manual.daily/
+source=$ROOT/manual
+### devref=$ROOT/internals
+### destination=$ROOT/build
+destination=/srv/d-i.debian.org/home/tmp-daily
+### logdir=$ROOT/log
+logdir=$ROOT/logs
+
+NAME_FROM="D.I. Developer"
+MAIL_FROM="developer@debian.org"
+</example>

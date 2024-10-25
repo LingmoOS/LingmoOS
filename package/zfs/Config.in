@@ -1,0 +1,34 @@
+comment "zfs needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+comment "zfs needs udev /dev management"
+	depends on LINGMO_LINUX_KERNEL
+	depends on !LINGMO_PACKAGE_HAS_UDEV
+
+config LINGMO_PACKAGE_ZFS
+	bool "zfs"
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_USE_MMU  # util-linux (libblkid)
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS  # libtirpc
+	select LINGMO_LINUX_NEEDS_MODULES
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBBLKID
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBUUID
+	select LINGMO_PACKAGE_LIBTIRPC if !LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	select LINGMO_PACKAGE_LIBAIO
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_LIBCURL
+	help
+	  OpenZFS on Linux and FreeBSD
+
+	  OpenZFS is an advanced file system and volume manager which
+	  was originally developed for Solaris and is now maintained by
+	  the OpenZFS community. This repository contains the code for
+	  running OpenZFS on Linux and FreeBSD.
+
+	  This package builds the kernel modules and userland utils
+	  required to operates with ZFS volumes.
+
+	  http://zfsonlinux.org/

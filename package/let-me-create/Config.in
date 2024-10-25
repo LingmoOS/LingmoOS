@@ -1,0 +1,27 @@
+comment "let-me-create needs a toolchain w/ C++, threads, dynamic library"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_LET_ME_CREATE
+	bool "let-me-create"
+	# build issues in static libs configuration
+	# see https://github.com/CreatorDev/LetMeCreate/issues/28
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  This library is collection of small wrappers for some
+	  interfaces on the Creator Ci40 board. It aims at making
+	  easier to develop on this platform. It also provides
+	  wrappers for a few clicks.
+
+	  https://github.com/CreatorDev/LetMeCreate
+
+if LINGMO_PACKAGE_LET_ME_CREATE
+
+config LINGMO_PACKAGE_LET_ME_CREATE_EXAMPLES
+	bool "Build and install examples"
+	help
+	  Build and install examples
+
+endif

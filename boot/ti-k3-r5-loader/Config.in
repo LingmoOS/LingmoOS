@@ -1,0 +1,96 @@
+config LINGMO_TARGET_TI_K3_R5_LOADER
+	bool "ti-k3-r5-loader"
+	depends on LINGMO_aarch64
+	help
+	  Separate U-Boot SPL build for R5 core on TI's K3 processors.
+	  Usually used to build tiboot3.bin with k3-image-gen.
+
+if LINGMO_TARGET_TI_K3_R5_LOADER
+
+choice
+	prompt "U-Boot Version"
+	help
+	  Select the specific U-Boot version you want to use to build
+	  the initial SPL running on the R5 core. Note that for most
+	  use cases you will want to use the exact same version/source
+	  here as it is used to build the main U-Boot package.
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_LATEST_VERSION
+	bool "2022.10"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_VERSION
+	bool "Custom version"
+	help
+	  This option allows to use a specific official versions
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_TARBALL
+	bool "Custom tarball"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_GIT
+	bool "Custom Git repository"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_HG
+	bool "Custom Mercurial repository"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_SVN
+	bool "Custom Subversion repository"
+
+endchoice
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_VERSION_VALUE
+	string "U-Boot version"
+	depends on LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_VERSION
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_TARBALL_LOCATION
+	string "URL of custom U-Boot tarball"
+	depends on LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_TARBALL
+
+if LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_GIT || LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_HG || LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_SVN
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_REPO_URL
+	string "URL of custom repository"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_REPO_VERSION
+	string "Custom repository version"
+	help
+	  Revision to use in the typical format used by
+	  Git/Mercurial/Subversion E.G. a sha id, a tag, branch, ..
+
+endif
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_VERSION
+	string
+	default "2022.10"	if LINGMO_TARGET_TI_K3_R5_LOADER_LATEST_VERSION
+	default LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_VERSION_VALUE \
+		if LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_VERSION
+	default "custom"	if LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_TARBALL
+	default LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_REPO_VERSION \
+		if LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_GIT || \
+		   LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_HG  || \
+		   LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_SVN
+choice
+	prompt "U-Boot Configuration"
+	default LINGMO_TARGET_TI_K3_R5_LOADER_USE_DEFCONFIG
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_USE_DEFCONFIG
+	bool "Using an in-tree board defconfig file"
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_USE_CUSTOM_CONFIG
+	bool "Using a custom board (def)config file"
+
+endchoice
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_BOARD_DEFCONFIG
+	string "Board defconfig"
+	depends on LINGMO_TARGET_TI_K3_R5_LOADER_USE_DEFCONFIG
+	help
+	  Name of the board for which TI K3 R5 Loader should be
+	  built, without the _defconfig suffix.
+
+config LINGMO_TARGET_TI_K3_R5_LOADER_CUSTOM_CONFIG_FILE
+	string "Configuration file path"
+	depends on LINGMO_TARGET_TI_K3_R5_LOADER_USE_CUSTOM_CONFIG
+	help
+	  Path to the TI K3 R5 Loader configuration file.
+
+endif

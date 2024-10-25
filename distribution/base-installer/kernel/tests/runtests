@@ -1,0 +1,128 @@
+#! /bin/sh
+set -e
+
+if [ -z "$1" ]; then
+	echo "Usage: runtests <architecture>" >&2
+	exit 1
+fi
+
+ARCH="$1"
+PASSES=0
+FAILURES=0
+
+[ "$TEST_VERBOSE" ] || export TEST_VERBOSE=1
+
+verbose () {
+	if [ "$TEST_VERBOSE" -ge 2 ]; then
+		echo "$@"
+	fi
+	eval "$@"
+}
+
+# Run a test based on a test file.
+run_test () {
+	TEST="$1"
+
+	unset SUBARCH CPUINFO OFCPUS MACHINE FLAVOUR USABLE UNUSABLE \
+		|| true
+	unset $(set | sed -n 's/^\(KERNEL_.*\)=.*/\1/p')
+	NUMCPUS=1
+	MAJORS=2.6
+
+	while read name value; do
+		case $name in
+			subarch)
+				SUBARCH="$value"
+				;;
+			cpuinfo)
+				CPUINFO="${TEST%/*}/$value"
+				;;
+			ofcpus)
+				OFCPUS="${TEST%/*}/$value"
+				;;
+			numcpus)
+				NUMCPUS="$value"
+				;;
+			machine)
+				MACHINE="$value"
+				;;
+			majors)
+				MAJORS="$value"
+				;;
+			flavour)
+				FLAVOUR="$value"
+				;;
+			kernel-*)
+				KERNEL_LIST_NAME="$(echo "$name" | tr '[a-z].-' '[A-Z]__')"
+				eval $KERNEL_LIST_NAME="\$value"
+				export $KERNEL_LIST_NAME
+				;;
+			usable)
+				USABLE="$value"
+				;;
+			unusable)
+				UNUSABLE="$value"
+				;;
+			env)
+				# TODO: is there any quote-safe way to do
+				# this?
+				eval "export ${value%% *}='${value#* }'"
+				;;
+		esac
+	done < "$TEST"
+
+	export ARCH SUBARCH CPUINFO OFCPUS NUMCPUS MACHINE
+	export MAJORS FLAVOUR
+	export USABLE UNUSABLE
+
+	TMP="$(mktemp -t base-installer-tests.XXXXXX)"
+	trap 'rm -f "$TMP"' 0 HUP INT QUIT TERM
+
+	# Run the actual testset.
+	verbose ./dotest >"$TMP"
+
+	# Massage testset output into a more useful form.
+	while read state message; do
+		case "$state" in
+			PASS)
+				PASSES="$(($PASSES + 1))"
+				;;
+			FAIL)
+				FAILURES="$(($FAILURES + 1))"
+				;;
+		esac
+		if [ "$state" != PASS ] || [ "$TEST_VERBOSE" -ge 2 ]; then
+			echo "$state $TEST $message"
+		fi
+	done <"$TMP"
+	rm -f "$TMP"
+	trap 0 HUP INT QUIT TERM
+}
+
+if [ "$2" ]; then
+	ONETEST="$2"
+	run_test "$ONETEST"
+else
+	for test in "$ARCH"/*.test; do
+		# Sanity check: check test file for incorrect line continuations
+		if ! awk 'BEGIN {lc=0}
+			  /\\[[:space:]]*$/ {if (lc==1 && substr($0,1,1)!=" ") {exit 1}; lc=1}
+			  /[^\\][[:space:]]*$/ {lc=0}
+			  END {if (lc==1) {exit 1}}' $test
+		then
+			echo "Incorrect line continuation in test file '$test'"
+			exit 1
+		fi
+		run_test "$test"
+	done
+fi
+
+if [ "$TEST_VERBOSE" -ge 1 ]; then
+	echo "$ARCH: $PASSES passes, $FAILURES failures."
+fi
+
+if [ "$FAILURES" -eq 0 ]; then
+	exit 0
+else
+	exit 1
+fi

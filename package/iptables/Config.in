@@ -1,0 +1,31 @@
+config LINGMO_PACKAGE_IPTABLES
+	bool "iptables"
+	help
+	  Linux kernel firewall, NAT, and packet mangling tools.
+
+	  http://www.netfilter.org/projects/iptables/index.html
+
+if LINGMO_PACKAGE_IPTABLES
+
+config LINGMO_PACKAGE_IPTABLES_BPF_NFSYNPROXY
+	bool "bpfc and nfsynproxy"
+	select LINGMO_PACKAGE_LIBPCAP
+	help
+	  Build bpf compiler and nfsynproxy configuration tool.
+
+config LINGMO_PACKAGE_IPTABLES_NFTABLES
+	bool "nftables compat"
+	# uses dlfcn
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12
+	select LINGMO_PACKAGE_LIBMNL
+	select LINGMO_PACKAGE_LIBNFTNL
+	help
+	  Build nftables compat utilities.
+
+comment "nftables compat needs a toolchain w/ wchar, dynamic library, headers >= 3.12"
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_12 || \
+		!LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS
+
+endif

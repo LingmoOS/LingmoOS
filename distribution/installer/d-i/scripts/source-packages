@@ -1,0 +1,32 @@
+#!/bin/sh
+# Outputs a list of source packages in the given tree. Optionally, can
+# filter out source packages that generate debs; this is useful to get a
+# list of udeb only source packages for manual syncing to testing (packages
+# with debs are propigated automatically).
+tree=$1
+onlyudeb=$2
+
+# Generate control files for kernel-wedged packages.
+for c in $(find $tree -name control.stub); do
+	if [ ! -e "$(dirname $c)/control" ]; then
+		(cd $(dirname $(dirname $c)) ; debian/rules debian/control >/dev/null)
+	fi
+done
+
+for c in $(find $tree -name control); do
+	perl -ne '
+		BEGIN {
+			$onlyudeb=shift;
+			$/="\n\n";
+		}
+		if (/Source: (.*)/) {
+			$source=$1;
+		}
+		elsif (!/X?-Package-Type: udeb/ && !/^\s*$/) {
+			$deb=1;
+		}
+		END {
+			print "$source\n" if ! $onlyudeb || ! $deb;
+		}
+	' "$onlyudeb" $c
+done

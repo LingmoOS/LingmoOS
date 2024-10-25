@@ -1,0 +1,42 @@
+Section: kernel
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Uploaders: Lingmo OS Team <team@lingmo.org>
+Standards-Version: 4.2.0
+Build-Depends:
+ debhelper-compat (= 13),
+# used to run debian/bin/*.py
+ python3:native,
+ python3-dacite:native,
+ python3-jinja2:native,
+# used by debian/rules.real to prepare the source
+ quilt,
+# used by debian/rules.real to build linux-perf and linux-support
+ dh-python <!pkg.linux.notools>,
+Build-Depends-Arch:
+# used by upstream to build include/generated/timeconst.h
+ bc <!pkg.linux.nokernel>,
+# used by upstream to build signing tools and to process certificates
+ libssl-dev:native <!pkg.linux.nokernel>,
+ libssl-dev <!pkg.linux.notools>,
+ openssl <!pkg.linux.nokernel>,
+# used by upstream to build objtool (native for images; host arch for
+# linux-kbuild), perf (host arch)
+ libelf-dev:native <!pkg.linux.nokernel>,
+ libelf-dev <!pkg.linux.notools>,
+ lz4 [amd64 arm64] <!pkg.linux.nokernel>,
+# used for bft debug info
+ pahole <!pkg.linux.nokernel> | dwarves:native (>= 1.16~) <!pkg.linux.nokernel>,
+# used by debian/rules.real to build linux-headers
+ cpio <!pkg.linux.nokernel>,
+# used by upstream to compress kernel
+ xz-utils <!pkg.linux.nokernel>,
+# used by upstream to build genksyms, kconfig, and perf
+ bison <!pkg.linux.nokernel>,
+ bison <!pkg.linux.notools>,
+ flex <!pkg.linux.nokernel>,
+ flex <!pkg.linux.notools>,
+Rules-Requires-Root: no
+Vcs-Git: https://github.com/LingmoOS/lingmo-kernel.git
+Vcs-Browser: https://github.com/LingmoOS/lingmo-kernel
+Homepage: https://www.kernel.org/

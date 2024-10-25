@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "remove" ]; then
+  for d in #USR_MERGE_MULTILIB#; do
+    # Remove DEP17 M4 protective diversions
+    dpkg-divert --quiet --package base-files --remove --no-rename --divert "/.$d.usr-is-merged" "/$d"
+  done
+fi
+
+#DEBHELPER#

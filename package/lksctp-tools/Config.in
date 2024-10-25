@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LKSCTP_TOOLS
+	bool "lksctp-tools"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	help
+	  The lksctp-tools project provides a Linux user space library
+	  for SCTP (libsctp) including C language header files
+	  (netinet/sctp.h) for accessing SCTP specific application
+	  programming interfaces not provided by the standard sockets,
+	  and also some helper utilities around SCTP.
+
+	  http://lksctp.sourceforge.net/
+
+comment "lksctp-tools needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

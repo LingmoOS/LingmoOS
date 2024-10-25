@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+# mktexlsr and mktexlsr.pl generate different output
+# Whichever of both scripts is run last, determines the output of /var/lib/texmf/ls-R
+# See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1003449
+
+# Don't run if texlive-base is not installed
+if [ ! -e /usr/share/texlive/texmf-dist/scripts/texlive/mktexlsr ];
+then
+  exit 0
+fi
+
+# Don't run if the version of mktexlsr is sufficiently new
+if grep -q "Also remove double empty" /usr/share/texlive/texmf-dist/scripts/texlive/mktexlsr;
+then
+  exit 0
+fi
+
+# Apply only the functional part of the patch in #1003449 (removes double empty lines)
+sed -i -e "/vc_dirs'\./s/[\\]/| cat -s \\\\/" /usr/share/texlive/texmf-dist/scripts/texlive/mktexlsr
+
+# Run the shell script, this hook is the last invoker.
+# The output in /var/lib/texmf/ls-R will be sorted
+mktexlsr
+
+echo "P: $(basename $0) Reproducible hook has been applied"

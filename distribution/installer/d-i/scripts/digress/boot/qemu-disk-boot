@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+# Just wait for qemu to get ready.
+use warnings;
+use strict;
+use Expect;
+use POSIX 'setsid';
+
+# Run in the background, because qemu won't begin accepting console input
+# until the connection is made to its serial port, by console-qemu.
+open STDIN, '/dev/null';
+defined(my $pid = fork) or die "Can'fork: $!";
+if ($pid) {
+	sleep 2;
+	exit;
+}
+setsid;
+
+my $exp = new Expect;
+#$exp->debug(2);
+$exp->raw_pty(1);
+$SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
+$exp->spawn($ENV{DISK_START_COMMAND}) or die "running \"$ENV{DISK_START_COMMAND}\": $!";
+
+$exp->expect(undef, "eof");

@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_SENTRY_NATIVE
+	bool "sentry-native"
+	depends on LINGMO_INSTALL_LIBSTDCPP # google-breakpad
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_7 # google-breakpad
+	depends on LINGMO_USE_WCHAR # google-breakpad
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # google-breakpad
+	# google-breakpad is restricted to glibc or uClibc, but
+	# sentry-native needs <execinfo.h>, so it restricts further to
+	# just glibc.
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	depends on LINGMO_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS # google-breakpad
+	depends on LINGMO_PACKAGE_HOST_GOOGLE_BREAKPAD_ARCH_SUPPORTS # google-breakpad
+	select LINGMO_PACKAGE_GOOGLE_BREAKPAD
+	select LINGMO_PACKAGE_LIBCURL
+	help
+	  The Sentry Native SDK is an error and crash
+	  reporting client for native applications,
+	  optimized for C and C++.
+
+	  https://github.com/getsentry/sentry-native
+
+comment "sentry-native needs a glibc toolchain with w/ wchar, threads, C++, gcc >= 7"
+	depends on LINGMO_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_HOST_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_USES_GLIBC || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_7

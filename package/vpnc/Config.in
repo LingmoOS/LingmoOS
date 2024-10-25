@@ -1,0 +1,21 @@
+config LINGMO_PACKAGE_VPNC
+	bool "vpnc"
+	depends on LINGMO_PACKAGE_LIBGPG_ERROR_ARCH_SUPPORTS # libgcrypt
+	depends on !LINGMO_STATIC_LIBS # gnutls
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR # gnutls
+	select LINGMO_PACKAGE_LIBGCRYPT
+	select LINGMO_PACKAGE_LIBGPG_ERROR
+	select LINGMO_PACKAGE_GNUTLS
+	help
+	  Client for Cisco VPN concentrator
+	  3000 Series VPN Concentrator
+	  IOS Routers
+	  PIX/ASA Zecurity Appliances
+	  Juniper/Netscreen
+
+	  http://www.unix-ag.uni-kl.de/~massar/vpnc
+
+comment "vpnc needs a toolchain w/ wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS

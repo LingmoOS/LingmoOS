@@ -1,0 +1,222 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'stable' 'debhelper' 'i386' '7'
+insertpackage 'stable' 'build-essential' 'i386' '1'
+insertpackage 'stable' 'build-depends' 'i386' '1'
+insertsource 'stable' 'unrelated' 'any' '1'
+insertinstalledpackage 'build-conflict' 'i386' '1'
+
+setupaptarchive
+
+msgmsg 'Test with' 'unsigned dsc'
+cat > 2vcard_0.5-3.dsc <<EOF
+Format: 1.0
+Source: 2vcard
+Binary: 2vcard
+Architecture: all
+Version: 0.5-3
+Maintainer: Martin Albisetti <argentina@gmail.com>
+Uploaders: Marcela Tiznado <mlt@debian.org>
+Standards-Version: 3.8.0
+Build-Depends: debhelper (>= 5.0.37)
+Build-Conflicts: build-conflict (<< 2)
+Checksums-Sha1: 
+ b7f1ce31ec856414a3f0f1090689f91aa7456d56 9398 2vcard_0.5.orig.tar.gz
+ 5f9acd07ebda6ab00fa6b4fe3198c13e94090862 2036 2vcard_0.5-3.diff.gz
+Checksums-Sha256: 
+ efdc22859ac2f8f030d038dc4faa9020082ebae34212498c288968ffd45c9764 9398 2vcard_0.5.orig.tar.gz
+ 82673ff3456af571094066c89bcea87b25c23c87cf1d0050b731e5222563626b 2036 2vcard_0.5-3.diff.gz
+Files: 
+ f73a69c170f772f3f6e75f2d11bbb792 9398 2vcard_0.5.orig.tar.gz
+ 1e806d32233af87437258d86b1561f57 2036 2vcard_0.5-3.diff.gz
+EOF
+
+test2vcardbuilddep() {
+  local name="$1"
+	testsuccessequal "Note, using file './$name' to get the build dependencies
+Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  build-conflict
+The following NEW packages will be installed:
+  build-essential debhelper
+0 upgraded, 2 newly installed, 1 to remove and 0 not upgraded.
+Remv build-conflict [1]
+Inst build-essential (1 stable [i386])
+Inst debhelper (7 stable [i386])
+Conf build-essential (1 stable [i386])
+Conf debhelper (7 stable [i386])" aptget build-dep -s ./$name
+testfailure aptget build-dep --simulate $name
+cd downloaded
+testsuccess aptget build-dep --simulate ../$name
+testsuccess aptget build-dep --simulate "$(readlink -f ../$name)"
+cd ..
+}
+test2vcardbuilddep "2vcard_0.5-3.dsc"
+cp "2vcard_0.5-3.dsc" "2VCard_0.5-3.dsc"
+test2vcardbuilddep "2VCard_0.5-3.dsc"
+
+msgmsg 'Test with' 'signed dsc'
+cat > 2vcard_0.5-3.dsc <<EOF
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.0
+Source: 2vcard
+Binary: 2vcard
+Architecture: all
+Version: 0.5-3
+Maintainer: Martin Albisetti <argentina@gmail.com>
+Uploaders: Marcela Tiznado <mlt@debian.org>
+Standards-Version: 3.8.0
+Build-Depends: debhelper (>= 5.0.37)
+Build-Conflicts: build-conflict (<< 2)
+Checksums-Sha1: 
+ b7f1ce31ec856414a3f0f1090689f91aa7456d56 9398 2vcard_0.5.orig.tar.gz
+ 5f9acd07ebda6ab00fa6b4fe3198c13e94090862 2036 2vcard_0.5-3.diff.gz
+Checksums-Sha256: 
+ efdc22859ac2f8f030d038dc4faa9020082ebae34212498c288968ffd45c9764 9398 2vcard_0.5.orig.tar.gz
+ 82673ff3456af571094066c89bcea87b25c23c87cf1d0050b731e5222563626b 2036 2vcard_0.5-3.diff.gz
+Files: 
+ f73a69c170f772f3f6e75f2d11bbb792 9398 2vcard_0.5.orig.tar.gz
+ 1e806d32233af87437258d86b1561f57 2036 2vcard_0.5-3.diff.gz
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkijKhsACgkQsrBfRdYmq7aA2gCfaOW9riTYVQMx5ajKQVAcctlC
+z2UAn1oXgTai6opwhVfkxrlmJ+iRxzuc
+=4eRd
+-----END PGP SIGNATURE-----
+EOF
+test2vcardbuilddep "2vcard_0.5-3.dsc"
+cp "2vcard_0.5-3.dsc" "2VCard_0.5-3.dsc"
+test2vcardbuilddep "2VCard_0.5-3.dsc"
+
+
+msgmsg 'Test with' 'unpacked source dir'
+mkdir -p foo-1.0/debian
+cat > foo-1.0/debian/control <<'EOF'
+Source: apturl
+Section: admin
+Priority: optional
+Maintainer: Michael Vogt <mvo@ubuntu.com>
+Build-Depends: ,debhelper (>= 7),
+Build-Conflicts: ,,,
+Build-Depends-Indep:
+X-Python3-Version: >= 3.2
+Standards-Version: 3.9.3
+
+Package: apturl-common
+Architecture: any
+Depends: ${python3:Depends},
+ ${shlibs:Depends},
+ ${misc:Depends},
+ python3-apt,
+ python3-update-manager
+Replaces: apturl (<< 0.3.6ubuntu2)
+Description: install packages using the apt protocol - common data
+ AptUrl is a simple graphical application that takes an URL (which follows the
+ apt-protocol) as a command line option, parses it and carries out the
+ operations that the URL describes (that is, it asks the user if he wants the
+ indicated packages to be installed and if the answer is positive does so for
+ him).
+ .
+ This package contains the common data shared between the frontends.
+
+EOF
+
+testsuccessequal "Note, using directory './foo-1.0' to get the build dependencies
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  build-essential debhelper
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst build-essential (1 stable [i386])
+Inst debhelper (7 stable [i386])
+Conf build-essential (1 stable [i386])
+Conf debhelper (7 stable [i386])" aptget build-dep --simulate ./foo-1.0
+testfailure aptget build-dep --simulate foo-1.0
+cd downloaded
+testsuccess aptget build-dep --simulate ../foo-1.0
+testsuccess aptget build-dep --simulate "$(readlink -f ../foo-1.0)"
+cd ..
+cd foo-1.0
+testsuccess aptget build-dep --simulate './'
+testsuccess aptget build-dep --simulate '.'
+cd debian
+testsuccess aptget build-dep --simulate './../'
+testsuccess aptget build-dep --simulate '../'
+testsuccess aptget build-dep --simulate '..'
+cd ../..
+
+testfailureequal 'E: Must specify at least one package to check builddeps for' aptget build-dep
+testfailureequal "Note, using directory './foo-1.0' to get the build dependencies
+Reading package lists...
+Building dependency tree...
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ builddeps:./foo-1.0:armel : Depends: debhelper:armel (>= 7) but it is not installable
+W: No architecture information available for armel. See apt.conf(5) APT::Architectures for setup
+E: Unable to correct problems, you have held broken packages." aptget build-dep --simulate ./foo-1.0 -a armel
+testfailureequal 'Reading package lists...
+E: Unable to find a source package for foo' aptget build-dep --simulate foo
+
+msgmsg 'Test with a dsc' 'with comments'
+cat > comments.dsc <<EOF
+# I love comments
+# I love them so much, I give them their own paragraph
+
+#This is my first package
+Format: 3.0 (native)
+Source: comments
+Binary: comments
+Architecture: all
+Version: 1
+#Version: 2
+Maintainer: Joe Sixpack <joe@example.org>
+Build-Depends: debhelper (>= 5),
+# TODO: add more
+      build-depends (= 1),
+Standards-Version: 3.9.6
+# This is the end…
+
+# or this?
+EOF
+testsuccessequal "Note, using file './comments.dsc' to get the build dependencies
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  build-depends build-essential debhelper
+0 upgraded, 3 newly installed, 0 to remove and 0 not upgraded.
+Inst build-depends (1 stable [i386])
+Inst build-essential (1 stable [i386])
+Inst debhelper (7 stable [i386])
+Conf build-depends (1 stable [i386])
+Conf build-essential (1 stable [i386])
+Conf debhelper (7 stable [i386])" aptget build-dep --simulate ./comments.dsc
+testsuccessequal "Note, using file './comments.dsc' to get the build dependencies
+Reading package lists...
+Building dependency tree...
+Execute external solver...
+The following NEW packages will be installed:
+  build-depends build-essential debhelper
+0 upgraded, 3 newly installed, 0 to remove and 0 not upgraded.
+Inst build-depends (1 stable [i386])
+Inst build-essential (1 stable [i386])
+Inst debhelper (7 stable [i386])
+Conf build-depends (1 stable [i386])
+Conf build-essential (1 stable [i386])
+Conf debhelper (7 stable [i386])" aptget build-dep --simulate ./comments.dsc --solver apt

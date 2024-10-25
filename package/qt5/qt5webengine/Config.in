@@ -1,0 +1,114 @@
+config LINGMO_PACKAGE_QT5WEBENGINE_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64 || LINGMO_arm || \
+		LINGMO_i386 || LINGMO_x86_64 || \
+		LINGMO_mips || LINGMO_mips64
+	# -m32 flag is used for 32bit builds and host tools have
+	# limited architecture support
+	depends on LINGMO_HOSTARCH = "x86_64" || LINGMO_HOSTARCH = "x86"
+	depends on LINGMO_PACKAGE_QT5_JSCORE_AVAILABLE # qt5declarative
+	depends on !LINGMO_BINFMT_FLAT # qt5base-icu
+	depends on LINGMO_USE_MMU # libglib2, qt5base-dbus
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS # re2
+
+comment "qt5webengine needs udev /dev management and a glibc toolchain w/ gcc >= 8, host gcc >= 4.9, dynamic library, threads, wchar"
+	depends on LINGMO_PACKAGE_QT5WEBENGINE_ARCH_SUPPORTS
+	depends on !LINGMO_PACKAGE_HAS_UDEV || !LINGMO_TOOLCHAIN_USES_GLIBC || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || \
+		!LINGMO_HOST_GCC_AT_LEAST_4_9 || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR
+
+comment "qt5webengine needs an OpenGL and EGL-capable backend"
+	depends on LINGMO_PACKAGE_QT5WEBENGINE_ARCH_SUPPORTS
+	depends on !LINGMO_PACKAGE_QT5_GL_AVAILABLE || !LINGMO_PACKAGE_HAS_LIBEGL
+
+config LINGMO_PACKAGE_QT5WEBENGINE
+	bool "qt5webengine"
+	depends on LINGMO_PACKAGE_QT5WEBENGINE_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS # re2
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # execinfo.h, mallinfo
+	depends on LINGMO_HOST_GCC_AT_LEAST_4_9 # qt5base-icu
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # re2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2, libvpx, qt5base-dbus
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_PACKAGE_QT5_GL_AVAILABLE # qt5declarative, qt5base-eglfs
+	depends on LINGMO_PACKAGE_HAS_LIBEGL # qt5base-eglfs
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	select LINGMO_PACKAGE_HOST_NODEJS
+	# v8 (a chromium 3rd-party) compiles its internal host-tools with the
+	# same word size as the target. For 32-bits targets, it adds the -m32
+	# flag (for 64-bits, it adds the -m64 flag).
+	# https://github.com/v8/v8/blob/5.6.326.55/gypfiles/toolchain.gypi#L1036-L1037
+	select LINGMO_HOSTARCH_NEEDS_IA32_COMPILER if !LINGMO_ARCH_IS_64 # v8/chromium
+	select LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_LCMS2
+	select LINGMO_PACKAGE_LIBEVENT
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBNSS
+	select LINGMO_PACKAGE_LIBVPX
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+	select LINGMO_PACKAGE_LIBXML2
+	select LINGMO_PACKAGE_LIBXSLT
+	select LINGMO_PACKAGE_MINIZIP
+	select LINGMO_PACKAGE_OPUS
+	select LINGMO_PACKAGE_RE2
+	select LINGMO_PACKAGE_SNAPPY
+	select LINGMO_PACKAGE_WEBP
+	select LINGMO_PACKAGE_WEBP_DEMUX
+	select LINGMO_PACKAGE_WEBP_MUX
+	select LINGMO_PACKAGE_QT5BASE_DBUS
+	select LINGMO_PACKAGE_QT5BASE_EGLFS
+	select LINGMO_PACKAGE_QT5BASE_FONTCONFIG
+	select LINGMO_PACKAGE_QT5BASE_HARFBUZZ
+	select LINGMO_PACKAGE_QT5BASE_JPEG
+	select LINGMO_PACKAGE_QT5BASE_ICU
+	select LINGMO_PACKAGE_QT5BASE_GUI
+	select LINGMO_PACKAGE_QT5BASE_PNG
+	select LINGMO_PACKAGE_QT5BASE_WIDGETS
+	select LINGMO_PACKAGE_QT5DECLARATIVE
+	select LINGMO_PACKAGE_QT5DECLARATIVE_QUICK
+	select LINGMO_PACKAGE_QT5QUICKCONTROLS
+	select LINGMO_PACKAGE_QT5QUICKCONTROLS2
+	select LINGMO_PACKAGE_QT5SVG if LINGMO_PACKAGE_QT5BASE_EXAMPLES
+	select LINGMO_PACKAGE_QT5WEBCHANNEL
+	select LINGMO_PACKAGE_QT5WEBENGINE_CHROMIUM
+	select LINGMO_PACKAGE_XLIB_LIBXCOMPOSITE if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXCURSOR if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXI if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXKBFILE if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXRANDR if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXSCRNSAVER if LINGMO_PACKAGE_QT5BASE_XCB
+	select LINGMO_PACKAGE_XLIB_LIBXTST if LINGMO_PACKAGE_QT5BASE_XCB
+	help
+	  The Qt WebEngine module provides a web browser engine that
+	  makes it easy to embed content from the World Wide Web into
+	  your Qt application.
+
+	  Qt WebEngine provides C++ classes and QML types for rendering
+	  HTML, XHTML, and SVG documents, styled using Cascading Style
+	  Sheets (CSS) and scripted with JavaScript. HTML documents can
+	  be made fully editable by the user through the use of the
+	  contenteditable attribute on HTML elements.
+
+	  https://doc.qt.io/qt-5/qtwebengine-index.html
+
+if LINGMO_PACKAGE_QT5WEBENGINE
+
+config LINGMO_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS
+	bool "proprietary codecs"
+	help
+	  Qt WebEngine supports the MPEG-4 Part 14 (MP4) file format,
+	  which includes required proprietary audio and video codecs,
+	  such as H.264 and MPEG layer-3 (MP3).
+
+config LINGMO_PACKAGE_QT5WEBENGINE_ALSA
+	bool "alsa"
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+	select LINGMO_PACKAGE_ALSA_LIB_RAWMIDI
+	select LINGMO_PACKAGE_ALSA_LIB_HWDEP
+	select LINGMO_PACKAGE_ALSA_LIB_SEQ
+	help
+	  Enable ALSA support.
+
+endif

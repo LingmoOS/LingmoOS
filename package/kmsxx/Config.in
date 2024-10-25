@@ -1,0 +1,29 @@
+config LINGMO_PACKAGE_KMSXX
+	bool "kms++"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_11 # linux/dma-buf.h
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libdrm
+	depends on LINGMO_USE_WCHAR # fmt
+	select LINGMO_PACKAGE_FMT
+	select LINGMO_PACKAGE_LIBDRM
+	help
+	  libkms++ is a C++11 library for kernel mode setting.
+
+	  Also included are simple test tools for KMS.
+
+	  https://github.com/tomba/kmsxx
+
+if LINGMO_PACKAGE_KMSXX
+
+config LINGMO_PACKAGE_KMSXX_INSTALL_TESTS
+	bool "Install test programs"
+	help
+	  This option allows to install the kmsxx test programs.
+
+endif
+
+comment "kms++ needs a toolchain w/ threads, C++, gcc >= 4.8, headers >= 4.11, wchar"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 || !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_11 \
+		|| !LINGMO_USE_WCHAR

@@ -1,0 +1,394 @@
+#!/usr/bin/perl
+# Verify that debootstrap'ing Debian testing produces a usable chroot,
+# and in particular that using it with early 2017 versions of schroot and
+# pbuilder results in working pseudo-terminals (#817236)
+#
+# Copyright © 2017 Simon McVittie
+# SPDX-License-Identifier: MIT
+# (see debian/copyright)
+
+use strict;
+use warnings;
+
+use Cwd qw(getcwd);
+use Debian::DistroInfo;
+use Dpkg::Version;
+use IPC::Run qw(run);
+use Test::More;
+
+my $srcdir = getcwd;
+
+sub verbose_run {
+    my $argv = shift;
+    diag("Running: @{$argv}");
+    return run($argv, @_);
+}
+
+sub capture {
+    my $output;
+    my $argv = shift;
+    ok(verbose_run($argv, '>', \$output), "@{$argv}");
+    chomp $output;
+    return $output;
+}
+
+my $check_non_docker_env;
+if (run([qw(grep docker.*cgroup /proc/1/mountinfo)], '&>', '/dev/null')) {
+    diag("it seems docker environment");
+    $check_non_docker_env = 0;
+}
+else {
+    diag("okay, it's not docker environment");
+    $check_non_docker_env = 1;
+}
+
+my @maybe_unshare_mount_ns;
+
+if (verbose_run(['unshare', '-m', 'true'])) {
+    diag('can unshare mount namespace');
+    @maybe_unshare_mount_ns = ('unshare', '-m');
+}
+else {
+    diag('cannot unshare mount namespace, are we in a container?');
+}
+
+sub check_fake_schroot {
+    my %params = @_;
+    my $reference = $params{reference};
+    my $version = $params{version} || '1.6.10-3';
+    my $extra_argv = $params{extra_argv} || [];
+
+    # Use unshare -m to make sure the /dev mount gets cleaned up on exit, even
+    # on failures
+    my $response = capture([@maybe_unshare_mount_ns,
+        "$srcdir/debian/tests/fake/schroot-$version", @{$extra_argv},
+            $params{chroot},
+        qw(runuser -u nobody --),
+        qw(script -q -c), 'cat /etc/debian_version', '/dev/null']);
+    $response =~ s/\r//g;
+    is($response, $reference, 'script(1) should work under (fake) schroot');
+}
+
+sub check_fake_pbuilder {
+    my %params = @_;
+    my $reference = $params{reference};
+    my $version = $params{version} || '0.228.4-1';
+
+    my $response = capture([@maybe_unshare_mount_ns,
+        "$srcdir/debian/tests/fake/pbuilder-$version", $params{chroot},
+        qw(runuser -u nobody --),
+        qw(script -q -c), 'cat /etc/debian_version', '/dev/null']);
+    $response =~ s/\r//g;
+    is($response, $reference,
+        'script(1) should work under (fake) pbuilder');
+}
+
+sub check_chroot {
+    my %params = @_;
+    my $chroot = $params{chroot};
+    my $response;
+
+    ok(-f "$chroot/etc/debian_version",
+        'chroot should have /etc/debian_version');
+    ok(-x "$chroot/usr/bin/env",
+        'chroot should have /usr/bin/env which is Essential');
+
+    if ($params{has_systemd}) {
+        for my $p (
+            "root/.ssh",                "run/lock/subsys",
+            "var/cache/private",        "var/lib/private",
+            "var/lib/systemd/coredump", "var/lib/systemd/pstore",
+            "var/log/README",           "var/log/private"
+          )
+        {
+            ok( -e "$chroot/$p",
+                "chroot should have /$p created by systemd-tmpfiles" );
+        }
+    }
+
+    ok(-x "$chroot/usr/bin/hello", 'chroot should have /usr/bin/hello due to --include');
+    ok(-d "$chroot/usr/share/doc", 'chroot should have /usr/share/doc');
+
+    if (!defined $ENV{container} || $ENV{container} ne "mmdebstrap-unshare") {
+        diag("not running with container=mmdebstrap-unshare");
+        ok(-c "$chroot/dev/full", '/dev/full should be a character device');
+        is(capture(['/usr/bin/stat', '--printf=%t %T %a', "$chroot/dev/full"]),
+            '1 7 666', '/dev/full should be device 1,7 with 0666 permissions');
+        ok(-c "$chroot/dev/null");
+        is(capture(['/usr/bin/stat', '--printf=%t %T %a', "$chroot/dev/null"]),
+            '1 3 666', '/dev/null should be device 1,3 with 0666 permissions');
+    }
+
+    my $did_mknod_ptmx;
+    my $output;
+
+    if (verbose_run([qw(ls -l), "$chroot/dev/ptmx"], '>', \$output)) {
+        diag("$chroot/dev/ptmx: $output");
+    }
+    else {
+        diag("Unable to list $chroot/dev/ptmx");
+    }
+    if (verbose_run([qw(ls -l), "$chroot/dev/pts/ptmx"], '>', \$output)) {
+        diag("$chroot/dev/pts/ptmx: $output");
+    }
+    else {
+        diag("Unable to list $chroot/dev/pts/ptmx");
+    }
+
+    if (-l "$chroot/dev/ptmx") {
+        # Necessary if debootstrap is run inside some containers, see
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=817236#77
+        diag("/dev/ptmx is a symbolic link");
+        like(readlink("$chroot/dev/ptmx"), qr{(?:/dev/)?pts/ptmx},
+            'if /dev/ptmx is a symlink it should be to /dev/pts/ptmx');
+        $did_mknod_ptmx = 0;
+    }
+    else {
+        diag("/dev/ptmx is not a symbolic link");
+        ok(-c "$chroot/dev/ptmx",
+            'if /dev/ptmx is not a symlink it should be a character device');
+        is(capture(['/usr/bin/stat', '--printf=%t %T %a',
+                    "$chroot/dev/ptmx"]), '5 2 666',
+            'if /dev/ptmx is a device node it should be 5,2 with 0666 permissions');
+        $did_mknod_ptmx = 1;
+    }
+
+    if ($params{can_mknod_ptmx}) {
+        ok($did_mknod_ptmx, 'able to mknod ptmx so should have done so');
+    }
+
+    my $reference = capture(['cat', "$chroot/etc/debian_version"]);
+
+    is(capture([qw(chroot chroot.d runuser -u nobody --
+                cat /etc/debian_version)]),
+        $reference);
+
+    # The remaining tests rely on device nodes to either exist or already
+    # being bind-mounted. Their setups are not prepared to deal with the
+    # conditions in an environment with an unshared user namespace as
+    # used in mmdebstrap.
+    if (defined $ENV{container} && $ENV{container} eq "mmdebstrap-unshare") {
+        return;
+    }
+
+    # The schroot behaviour proposed to fix #856877 and #983423 works,
+    # even inside (privileged) lxc.
+    check_fake_schroot(%params, reference => $reference, version => 'proposed');
+    check_fake_schroot(%params, reference => $reference, version => 'proposed',
+        extra_argv => ['--sbuild']);
+
+    # As of 1.6.10-3, or equivalently 1.6.10-11, the default profile
+    # certainly doesn't work in lxc >= 3 or in Docker:
+    # https://bugs.debian.org/983423
+    # It probably won't work in other container managers either, for
+    # similar reasons.
+    if (defined $params{container}) {
+        TODO: {
+            local $TODO = "schroot default profile doesn't work in lxc >= 3 or Docker";
+            check_fake_schroot(%params, reference => $reference,
+                version => '1.6.10-3');
+        }
+    }
+    else {
+        check_fake_schroot(%params, reference => $reference,
+            version => '1.6.10-3');
+    }
+
+    # schroot 1.6.10-3's sbuild profile does work in lxc, but only on newer
+    # kernels: https://bugs.debian.org/856877
+    if (Dpkg::Version->new($params{kernel}) < Dpkg::Version->new('4.7') &&
+            defined $params{container} && $params{container} eq 'lxc') {
+        TODO: {
+            local $TODO = "schroot --sbuild doesn't work in lxc on older ".
+                "kernels";
+            check_fake_schroot(%params, reference => $reference,
+                extra_argv => ['--sbuild']);
+        }
+    }
+    elsif (! $params{can_mknod_ptmx}) {
+        TODO: {
+            local $TODO = "schroot --sbuild doesn't work when /dev/ptmx is ".
+                "a symlink to /dev/pts/ptmx";
+            check_fake_schroot(%params, reference => $reference,
+                extra_argv => ['--sbuild']);
+        }
+    }
+    else {
+        check_fake_schroot(%params, reference => $reference,
+            extra_argv => ['--sbuild']);
+    }
+
+    # pbuilder >= 0.228.6 works fine
+    check_fake_pbuilder(%params, reference => $reference,
+        version => '0.231');
+
+    # Older pbuilder doesn't work if we are in a container where we can't
+    # create the /dev/ptmx device node: https://bugs.debian.org/841935
+    if (! $params{can_mknod_ptmx}) {
+        TODO: {
+            local $TODO = "pbuilder 0.228.4-1 doesn't work when /dev/ptmx is ".
+                "a symlink to /dev/pts/ptmx";
+            check_fake_pbuilder(%params, reference => $reference,
+                version => '0.228.4-1');
+        }
+    }
+    else {
+        check_fake_pbuilder(%params, reference => $reference,
+            version => '0.228.4-1');
+    }
+}
+
+# Specify https mirror to check https mirror specific problem
+# https://bugs.debian.org/896071
+my $mirror = 'https://deb.debian.org/debian';
+my $tmp = $ENV{AUTOPKGTEST_TMP};
+die "no autopkgtest temporary directory specified" unless $tmp;
+chdir $tmp or die "chdir $tmp: $!";
+
+$ENV{LC_ALL} = 'C.UTF-8';
+
+# Try to inherit a Debian mirror from the host
+foreach my $file ('/etc/apt/sources.list',
+        glob('/etc/apt/sources.list.d/*.list')) {
+    open(my $fh, '<', $file);
+    while (<$fh>) {
+        if (m{^deb\s+(http://[-a-zA-Z0-9.:]+/debian)\s}) {
+            $mirror = $1;
+            last;
+        }
+    }
+    close $fh;
+}
+
+if (run(['ischroot'], '>&2')) {
+    diag("In a chroot according to ischroot(1)");
+}
+else {
+    diag("Not in a chroot according to ischroot(1)");
+}
+
+my $virtualization;
+if ($^O ne 'linux') {
+    diag("Cannot use systemd-detect-virt on non-Linux");
+}
+elsif (run(['systemd-detect-virt', '--vm'], '>', \$virtualization)) {
+    chomp $virtualization;
+    diag("Virtualization: $virtualization");
+}
+else {
+    $virtualization = undef;
+    diag("Virtualization: (not in a virtual machine)");
+}
+
+my $in_container = 0;
+my $container;
+if ($^O ne 'linux') {
+    diag("Cannot use systemd-detect-virt on non-Linux");
+}
+elsif (run(['systemd-detect-virt', '--container'], '>', \$container)) {
+    $in_container = 1;
+    chomp $container;
+    diag("Container: $container");
+}
+else {
+    $container = undef;
+    diag("Container: (not in a container)");
+}
+
+my $kernel = capture([qw(uname -r)]);
+chomp $kernel;
+
+open(my $fh, '<', '/proc/self/mountinfo');
+while (<$fh>) {
+    chomp;
+    diag("mountinfo: $_");
+}
+close $fh;
+
+my $output;
+if (verbose_run([qw(ls -l /dev/ptmx)], '>', \$output)) {
+    diag("/dev/ptmx: $output");
+}
+else {
+    diag("Unable to list /dev/ptmx");
+}
+if (verbose_run([qw(ls -l /dev/pts/ptmx)], '>', \$output)) {
+    diag("/dev/pts/ptmx: $output");
+}
+else {
+    diag("Unable to list /dev/pts/ptmx");
+}
+
+my $can_mknod_ptmx;
+if (run([qw(mknod -m000 ptmx c 5 2)], '&>', '/dev/null')) {
+    diag("mknod ptmx succeeded");
+    $can_mknod_ptmx = 1;
+}
+else {
+    diag("mknod ptmx failed, are we in a container?");
+    $can_mknod_ptmx = 0;
+}
+
+my $distro_info = DebianDistroInfo->new;
+my $testing = $distro_info->testing;
+
+# Should specify multiple components for checking (see Bug#898738)
+if (!verbose_run([length($ENV{DEBOOTSTRAP_SCRIPT}) ? $ENV{DEBOOTSTRAP_SCRIPT} : 'debootstrap',
+            '--include=debootstrap,debian-archive-keyring,gnupg,hello,systemd',
+            '--variant=minbase',
+            '--components=main,contrib,non-free',
+            $testing, 'chroot.d', $mirror], '>&2')) {
+    BAIL_OUT("debootstrap failed: $?");
+}
+
+if (!verbose_run([qw(find chroot.d/dev -ls)], '>&2')) {
+    BAIL_OUT("Unable to list contents of chroot's /dev: $?");
+}
+
+if ($check_non_docker_env) {
+    check_chroot(chroot => 'chroot.d', can_mknod_ptmx => $can_mknod_ptmx,
+        kernel => $kernel, container => $container, has_systemd => 1);
+}
+
+if ($^O ne 'linux') {
+    diag("Cannot use systemd-nspawn on non-Linux");
+}
+elsif ($in_container) {
+    diag('in a container according to systemd-detect-virt, not trying to '.
+        'use systemd-nspawn');
+}
+elsif (defined $ENV{container} && length $ENV{container}) {
+    diag('in a container according to $container, not trying to '.
+        'use systemd-nspawn');
+}
+elsif (! -d '/run/systemd/system') {
+    diag('systemd not booted, not trying to use systemd-nspawn');
+}
+else {
+    if (!verbose_run(['systemd-nspawn', '-D', 'chroot.d',
+            "--bind=$ENV{AUTOPKGTEST_TMP}:/mnt",
+            '--bind-ro=/usr/sbin/debootstrap',
+            '--bind-ro=/usr/share/debootstrap',
+            '--',
+            'debootstrap', '--include=hello', '--variant=minbase',
+            $testing, '/mnt/from-nspawn.d', $mirror], '>&2')) {
+        BAIL_OUT("debootstrap wrapped in systemd-nspawn failed: $?");
+    }
+
+    check_chroot(chroot => "$ENV{AUTOPKGTEST_TMP}/from-nspawn.d", can_mknod_ptmx => 0,
+        kernel => $kernel, container => "nspawn");
+}
+
+if (!defined $ENV{container} || $ENV{container} ne "mmdebstrap-unshare") {
+    if (!run([qw(rm -fr --one-file-system chroot.d)], '>&2')) {
+        BAIL_OUT('Unable to remove chroot.d');
+    }
+} else {
+    if (!run([qw(env --chdir=chroot.d find . -mount -mindepth 1 -delete)], '>&2')) {
+        BAIL_OUT('Unable to remove contents of chroot.d');
+    }
+}
+
+done_testing;
+
+# vim:set sw=4 sts=4 et:

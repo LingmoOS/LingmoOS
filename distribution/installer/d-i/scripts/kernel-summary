@@ -1,0 +1,223 @@
+#!/usr/bin/perl -w
+# Keep track of Linux kernel versions and ABI bumps
+use strict;
+
+use File::Slurp;
+use Email::MIME;
+use Email::Sender::Simple qw(sendmail);
+use List::MoreUtils qw(uniq);
+use Sort::Versions;
+use LWP::UserAgent;
+use XML::LibXML;
+
+
+sub colorize_flavours {
+  my ($arch, $abi, $lastabi, %v) = @_;
+  my $cell;
+  if ($v{$arch}{$abi}) {
+    foreach my $flavour (@{$v{$arch}{$abi}}) {
+      my $color;
+      if (($abi ne $lastabi) && $v{$arch}{$lastabi}) {
+        if (grep { $_ eq $flavour } @{$v{$arch}{$lastabi}}) {
+          # Available in a newer ABI, can be decrufted:
+          $color='darkorange';
+        }
+        else {
+          # Not available in newer ABI, possibly dropped:
+          $color='purple';
+        }
+      }
+      if (($abi ne $lastabi) && !$v{$arch}{$lastabi}) {
+        # Not built yet:
+        $color='red';
+      }
+      if ($color) {
+        $cell .= "<span style=\"color: $color;\">$flavour</span><br/>";
+      }
+      else {
+        $cell .= "$flavour<br/>";
+      }
+    }
+  }
+  $cell ||= "&nbsp;";
+  return "<td>$cell</td>\n";
+}
+
+sub compare_and_mail {
+  my ($dist, $lastabi, $summary, $url) = @_;
+  if (-f $summary) {
+    foreach my $line (read_file($summary)) {
+      if ($line =~ /<!-- ABI: (.*) in (.*) -->/) {
+        my $previous_lastabi = $1;
+        my $previous_dist = $2;
+        if (($dist eq $previous_dist) and ($lastabi ne $previous_lastabi)) {
+          my $subject = "Linux kernel ABI bump in $dist: from $previous_lastabi to $lastabi";
+          my $body = "Linux kernel ABI bump in $dist: from $previous_lastabi to $lastabi\n\nFull summary: $url#$dist\n";
+          my $message = Email::MIME->create(
+            header_str => [
+              From    => 'Linux kernel watcher <debian-boot@lists.debian.org>',
+              To      => 'kibi@debian.org',
+              Subject => $subject,
+            ],
+            attributes => {
+              encoding => "quoted-printable",
+              charset  => "UTF-8",
+            },
+            body_str => $body,
+          );
+          sendmail($message);
+          print STDERR "Sending a notification: $subject\n";
+        }
+      }
+    }
+  }
+  # Beware: keep in sync with the match above
+  return "<!-- ABI: $lastabi in $dist -->";
+}
+
+sub build_status {
+  my ($dist, @allarchs) = @_;
+  my $buildurl = "https://buildd.debian.org/status/package.php?p=linux&suite=$dist";
+
+  # Only look at build logs for those distributions:
+  return ''
+    if ! grep { $dist eq $_ } qw(unstable experimental);
+
+  my $html;
+  my $ua = LWP::UserAgent->new;
+  my $response = $ua->get($buildurl);
+  my %builds;
+  if ($response->is_success) {
+    # Avoid hardcoding column id:
+    my $xml = XML::LibXML->load_html(
+      string          => $response->content,
+      # Gross hack since LibXML is suddenly unhappy about some links
+      # (February 2021):
+      recover         => 1,
+      suppress_errors => 1,
+    );
+    my @columns = $xml->findnodes('//table[@class="data"]/tr/th/text()');
+    my %col_lookup;
+    foreach my $i (0 .. $#columns) {
+        $col_lookup{$columns[$i]} = $i;
+    }
+
+    foreach my $line ($xml->findnodes('//table[@class="data"]/tr')) {
+        my @cells = $line->findnodes('./td');
+        next if ! @cells;
+        next if $#cells < 2;
+
+        my $arch   = $cells[ $col_lookup{Architecture} ]->textContent();
+        my $status = $cells[ $col_lookup{Status}       ]->textContent();
+        my $time   = $cells[ $col_lookup{For}          ]->textContent();
+
+        $arch =~ s/^\s+|\s+$//g;
+        $time =~ s/\s+\d+m$//;
+        my %color = ( Installed => 'darkgreen', Building => 'darkorange', 'Needs-Build' => 'darkorange',  'Failed' => 'red', 'Build-Attempted' => 'red' );
+        my $c = $color{$status} || 'black';
+        $builds{$arch} = "<span style=\"color: $c\">$status ($time)</span>";
+    }
+    $html .= "<tr>\n";
+    $html .= "<th>Build</th>\n";
+    foreach my $arch (@allarchs) {
+      $html .= "<td>" . ($builds{$arch} || "no entry") . "</td>\n";
+    }
+    $html .= "</tr>\n";
+  }
+  else {
+    my $colspan = 1+scalar(@allarchs);
+    $html .= "<tr><td colspan=\"$colspan\">Failed to retrieve build status: " . $response->status_line . "</td></tr>";
+  }
+  return $html;
+}
+
+
+my $summary = shift @ARGV || "kernel-summary.html";
+my $url = "http://d-i.debian.org/kernel-summary.html";
+
+my $html = << 'EOS';
+<html>
+  <head>
+    <title>Linux kernel status across distributions</title>
+    <link rel="stylesheet" type="text/css" href="/static/d-i.css" />
+    <link rel="icon"       type="text/png" href="/static/favicon.png" />
+  </head>
+  <body>
+EOS
+
+# Make this cumulative across dists as builds can be disappearing from
+# experimental (decruft), and we would miss Build-Attempted/Failed
+# cases:
+my @allarchs;
+foreach my $dist (qw(testing unstable experimental)) {
+  # FIXME: A few hours can happen until a built package can be seen
+  # here. Another option would be ssh {ftp-master,release}.d.o dak ls
+  my @lines = `rmadison -S linux -s $dist 2>/dev/null`;
+  # Abort if rmadison fails (e.g. qa.debian.org fails to reply):
+  exit 1
+    if $? != 0;
+  my @allabis;
+  my %v;
+  foreach my $line (@lines) {
+    next
+      if $line !~ /linux-image-\d+\.\d+\.\d+-/;
+    next
+      if $line =~ /-dbg\s+/;
+    chomp $line;
+    my ($package, $version, $dist, $archs) = split /\s*[|]\s*/, $line;
+    $package =~ s/\s*linux-image-//;
+    (my $abi = $package) =~ s/^(\d+\.\d+\.\d+)-.*/$1/;
+
+    my $flavour = substr $package, 1+length($abi);
+    #print STDERR "$abi; $package; $version; $dist; $archs\n";
+    foreach my $arch (split /,\s*/, $archs) {
+      push @{$v{$arch}{$abi}}, $flavour;
+      push @allarchs, $arch;
+    }
+    push @allabis, $abi;
+  }
+
+  ### Sort and uniquify:
+  @allarchs = uniq sort @allarchs;
+  @allabis = uniq sort { versioncmp($a,$b) } @allabis;
+  my $none = "(none)";
+  my $lastabi = $allabis[-1] || $none;
+
+  ### Compare with previous ABI if relevant:
+  my $abi_comment = compare_and_mail($dist, $lastabi, $summary, $url);
+
+  ### Output:
+  $html .= "<a name=\"$dist\"><h1>Linux kernel status in $dist</h1></a>\n";
+  $html .= "$abi_comment\n";
+  $html .= "<p>Top-most ABI: $lastabi</p>\n";
+  if ($lastabi ne $none) {
+    $html .= "<table border=1 cellpadding=3 style=\"border-collapse: collapse;\">\n";
+    # First row, with archs:
+    $html .= "<tr>\n";
+    $html .= "<th></th>\n";
+    foreach my $arch (@allarchs) {
+      $html .= "<th>$arch</th>\n";
+    }
+    $html .= "</tr>\n";
+    # Actual contents:
+    foreach my $abi (@allabis) {
+      $html .= "<tr>\n";
+      $html .= "<th>$abi</th>\n";
+      foreach my $arch (@allarchs) {
+        $html .= colorize_flavours($arch, $abi, $lastabi, %v);
+      }
+      $html .= "</tr>\n";
+    }
+    $html .= build_status($dist, @allarchs);
+    $html .= "</table>\n";
+  }
+}
+
+
+my $date = `LC_ALL=C TZ=UTC date`;
+chomp $date;
+$html .= "<hr/>\n";
+$html .= "Last update: $date\n";
+$html .= "</body></html>\n";
+
+write_file($summary, $html);

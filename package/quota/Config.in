@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_QUOTA
+	bool "quota"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_NATIVE_RPC || LINGMO_TOOLCHAIN_HAS_THREADS # libtirpc
+	select LINGMO_PACKAGE_LIBTIRPC if !LINGMO_TOOLCHAIN_HAS_NATIVE_RPC
+	help
+	  Implementation of the disk quota system.
+
+	  http://sourceforge.net/projects/linuxquota/
+
+comment "quota needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || \
+		!(LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_TOOLCHAIN_HAS_NATIVE_RPC)

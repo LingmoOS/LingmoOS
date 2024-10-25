@@ -1,0 +1,18 @@
+config LINGMO_PACKAGE_TROUSERS
+	bool "trousers"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	# doesn't build properly in static only configurations
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	help
+	  The open-source TCG Software Stack (TSS).
+
+	  This library enables the use of a Trusted Platform Module
+	  that complies with the TPM specification, version 1.2. It
+	  implements the TSS specification, version 1.2.
+
+	  http://trousers.sourceforge.net/
+
+comment "trousers needs a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

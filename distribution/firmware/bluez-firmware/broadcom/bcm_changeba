@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+
+#
+# This is a tool to change the firmware bluetooth address. This tool will 
+# not work on older version of firmware. This tool will look for 
+# hcifw_bd_address[], once it finds it, it applies the bd address.
+#
+# Usage:
+#      bdaddrpatch.pl firmware.hex mapfile.m51 xxXXyyYYzzZZ 
+#
+# firmware.hex is the intel hex file of the firmware
+#    that need be changed.
+# 
+# xxXXyyYYzzZZ is the bluetooth address to be written into the firmware
+#
+#
+#   The output file will be FW5001_xxXXyyYYzzZZ.hex in the current directory
+
+
+@FirmwareImage;
+
+
+$address = 0;
+$length  = 0;
+
+$C_INITSEG_START=0;
+$C_INITSEG_END  =0;
+
+
+$bd_start_addr = "";
+
+$outFileName = "";
+
+$inFileName = "";
+
+if( $#ARGV != 2 )
+{
+    print "Usage: change_ba firmware.hex mapfile.m51 xxXXyyYYzzZZ > outputFile\n";
+
+}
+else
+{
+    $inFileName  = shift ARGV;
+    ParseOneFile( \@FirmwareImage, $inFileName);
+
+    ($C_INITSEG_START, $C_INITSEG_END, $bd_start_addr) = 
+                                               ParseMapFile( shift ARGV );
+
+
+    # extract the desired bd address
+    $DesiredBDAddr = shift ARGV;
+
+
+    if( $inFileName =~ /(.*?)(\.hex)/ )
+    {
+        $inFileName = $1;
+    }
+
+    @result = split( /\\/, $inFileName);
+
+    $outFileBase = $result[$#result];
+
+    $outFileName = $outFileBase. "_$DesiredBDAddr.hex";
+
+#    print "out file name " , $outFileName,"\n";
+
+    $DesiredBDAddr =~ /(\w\w)(\w\w)(\w\w)(\w\w)(\w\w)(\w\w)/;
+
+    $DesiredBDAddr = uc("$6$5$4$3$2$1");
+
+    if( length($DesiredBDAddr) != 12)
+    {
+        print "BD address should be six bytes, xxXXyyYYzzZZ\n";
+        exit 1;
+    }
+
+    open( outFileHndl, ">$outFileName") || 
+                die "Can't open $outFileName for output\n";
+
+    # look for the target address, 0xc8a0
+
+    foreach $item (@FirmwareImage )
+    {
+        $address = hex $item->{"addr"};
+        $length  = hex $item->{"len"};
+
+        if(( $address > $C_INITSEG_START  ) &&
+           ( $address  < $C_INITSEG_END) )
+        {
+#            print $item->{"addr"},"-->", $item->{"data"},"\n";
+
+            # So we found something that is in C_INITSEG
+            if( $item->{"data"} =~ /(\w*?)($bd_start_addr)(.{12})(.*)/)
+            {
+                # we find the starting address
+                #
+#                print $item->{"data"},"\n";
+
+#                print "$1--$2--$3--$4\n";
+
+                $item->{"data"} = "$1$2$DesiredBDAddr$4";
+
+#                print "before calc. ", $item->{"data"},":\n";
+
+                CalcChecksum( $item );
+#                print $item->{"data"}, $item->{"checksum"};
+                print "Change made\n";
+            }
+        }
+
+        #generate intel hex file output
+
+       print outFileHndl  ":",$item->{"len"},
+                          $item->{"addr"},
+                          $item->{"type"},
+                          $item->{"data"},
+                          $item->{"checksum"},
+                          "\n";
+    }
+
+
+    
+
+}
+
+sub ParseMapFile()
+{
+    local($filename) = shift @_;
+
+    open( file, $filename ) || die "Can't open $filename\n";
+
+    while( $line = <file> )
+    {
+        # look for C_INITSEG
+        if( $line =~ /C_INITSEG$/ )
+        {
+            $line =~ /^(\W*)CODE(\W*)([\d|A-F]*)H(\W*)([\d|A-F]*)/;
+            $C_INITSEG_START = hex $3;
+            $C_INITSEG_END  = $C_INITSEG_START + hex $5;
+            if( $3 == 0 )
+            {
+                # this could be a multi-bank code
+                $line =~ /^(\W*)BANK1(\W*)([\d|A-F]*)H(\W*)([\d|A-F]*)/;
+                $C_INITSEG_START = hex $3;
+                $C_INITSEG_END  = $C_INITSEG_START + hex $5;
+            }
+
+#            print "C_INITSEG_START = $C_INITSEG_START: $C_INITSEG_END\n";
+        }
+
+        # look for periph_bd_address
+        if( $line =~ /periph_bd_address/ )
+        {
+            $line =~ /^(\W)*(X:)([\d|A-F]*)/;
+            $bd_start_address = $3;
+#            print "bd_start_address = :$bd_start_address:\n";
+#            print "$line";
+            return( $C_INITSEG_START, $C_INITSEG_END, $bd_start_address);
+        }
+    }
+    return ();
+}
+
+sub ParseOneFile()
+{
+    local ( $image ) = shift @_;
+    local($filename) = shift @_;
+    local ($line);
+
+
+    open( file, $filename ) || die "Can't open $filename\n";
+
+    while( $line = <file> )
+    {
+        $record = {};
+
+        $line =~ /:(\w\w)(\w{4})(\w\w)(.*)(\w\w)/;
+
+        $record->{"len"} = $1;
+        $record->{"addr"} = $2;
+        $record->{"type"} = $3;
+        $record->{"data"} = $4;
+        $record->{"checksum"} = $5;
+
+        push @$image, $record;
+    }
+
+    close(file);
+
+}
+
+sub CalcChecksum()
+{
+    local ($record) = @_;
+    local ($tmp = 0 ); 
+    local ($i = 0);
+    local ($str = "");
+
+
+
+    $tmp = hex $record->{"len"};
+
+
+    $record->{"addr"} =~ /(\w\w)(\w\w)/;
+
+    $tmp += hex $1;
+
+
+    $tmp +=  hex $2;
+
+
+    $tmp += hex $record->{"type"};
+
+
+    # now let's work on the data part
+    $str = $record->{"data"} ;
+    for($i = 0; $i < length($str ) ; $i +=2 )
+    {
+        $tmp += hex( substr( $str , $i, 2 ) );
+
+    }
+
+    # take the modulo
+    $tmp = $tmp % 256 ;
+
+    $tmp = 0x100 - $tmp;
+
+    # handle case when checksum is zero
+    $tmp = $tmp % 256 ;
+
+    $record->{"checksum"} = sprintf("%02X",$tmp);
+}

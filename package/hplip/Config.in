@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_HPLIP
+	bool "hplip"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_PACKAGE_CUPS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libusb
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	depends on !LINGMO_STATIC_LIBS # libdl
+	select LINGMO_PACKAGE_LIBUSB
+	select LINGMO_PACKAGE_JPEG
+	help
+	  HP Linux Imaging and Printing (HPLIP)
+	  HPLIP is an HP-developed solution for printing, scanning, and
+	  faxing with HP inkjet and laser based printers in Linux. The
+	  HPLIP project provides printing support for 2,211 printer
+	  models, including Deskjet, Officejet, Photosmart, PSC
+	  (Print Scan Copy), Business Inkjet, LaserJet, Edgeline MFP,
+	  and LaserJet MFP.
+
+	  http://hplipopensource.com/
+
+comment "hplip needs a toolchain w/ C++, threads, dynamic library, gcc >= 4.9"
+	depends on LINGMO_PACKAGE_CUPS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

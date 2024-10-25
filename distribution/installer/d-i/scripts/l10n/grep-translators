@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# Usage: grep-translators [LANGUAGECODE]
+#
+# This script looks in the working directory for po-files and collects
+# all translators together, sorted by language.
+#
+# If LANGUAGECODE is given, only translators for LANGUAGEGODE are grepped,
+# otherwise all po-files.
+#
+# Dennis Stampfer <seppy@debian.org> 2004, for the Debian Project
+#
+
+LANG_LIST="ar: Arabic\nbg: Bulgarian\nbs: Bosnian\nca: Catalan\ncs: Czech\ncy: Welsh\nda: Danish\nde: German\nel: Greek\nen: English\nes: Spanish\neu: Basque\nfi: Finnish\nfr: French\ngl: Gallegan\nhe: Hebrew\nhu: Hungarian\nid: Indonesian\nit: Italian\nja: Japanese\nko: Korean\nlt: Lithuanian\nnb: Norwegian Bokmal\nnl: Dutch\nnn: Norwegian Nynorsk\npl: Polish\npt: Portuguese\npt_BR:Portuguese (Brazil)\nro: Romanian\nru: Russian\nsk: Slovakian\nsl: Slovenian\nsq: Albanese\nsv: Swedish\ntr: Turkish\nuk: Ukrainian\nzh_CN: Chinese (Simplified)\nzh_TW: Chinese (Traditional)\nvi: Vietnamese\nsr: Serbian\nhi: Hindi\nfa: Farsi\nhr: Croatian\nse: Sami\nlv: Latvian"
+C_FILES=0
+
+test -z $1 && LANGUAGECODE="*" || LANGUAGECODE=$1
+for I in `find ./ -name "$LANGUAGECODE.po"`; do
+	# Get translator and language
+	LAST=`grep "Last-Translator" $I | sed "s/^\"Last-Translator: //g" | sed 's/>.*$/>/g' | iconv -t utf8`
+	CURR_LANG=`basename $I .po`
+
+	# Add them to the list, remove people listed twice and count the files
+	LIST="$CURR_LANG:$LAST\n$LIST"
+	LANGUAGES=`echo -e "$CURR_LANG\n$LANGUAGES" | sort -u`
+	C_FILES=`expr $C_FILES + 1`
+	#echo -n . > /dev/stderr
+done
+
+
+# The following lines below are not really needed, but make the output
+# look *much* better. You can uncomment the following line:
+#echo -e $LIST | sort -u | grep -v "^$"; exit
+
+# count translators and languages
+C_TRANSLATORS=`echo -e $LIST | sort -u | grep -v "^$" | wc -l`
+C_LANGUAGES=`echo $LANGUAGES | wc -w`
+
+echo "grep'ed $C_FILES Files, found $C_TRANSLATORS translators in $C_LANGUAGES languages:"
+for I in $LANGUAGES; do
+	echo -e $LANG_LIST | grep "$I: "
+	echo -e $LIST | grep "^$I:" | sed "s/$I:/  /g" | sort -u
+	echo
+done
+
+#eof

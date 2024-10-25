@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_PHP_MEMCACHED
+	bool "php-memcached"
+	depends on LINGMO_INSTALL_LIBSTDCPP # libmemcached
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libmemcached
+	select LINGMO_PACKAGE_PHP_EXT_SESSION
+	select LINGMO_PACKAGE_LIBMEMCACHED
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  PHP extension for interfacing with memcached via
+	  libmemcached library.
+
+	  http://pecl.php.net/package/memcached
+
+comment "php-memcached needs a toolchain w/ C++, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS

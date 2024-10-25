@@ -1,0 +1,108 @@
+comment "imx-gpu-viv needs a glibc toolchain with armhf enabled"
+	depends on LINGMO_arm
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC || !LINGMO_ARM_EABIHF
+
+comment "imx-gpu-viv needs a glibc toolchain"
+	depends on LINGMO_aarch64
+	depends on !LINGMO_TOOLCHAIN_USES_GLIBC
+
+config LINGMO_PACKAGE_IMX_GPU_VIV
+	bool "imx-gpu-viv"
+	# Pre-built binaries only available for ARM EABIhf
+	depends on (LINGMO_arm && LINGMO_ARM_EABIHF) || LINGMO_aarch64
+	# Library binaries are linked against libc.so.6
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	# Library binaries are linked against libdrm.so.2, except framebuffer
+	# output on ARM
+	select LINGMO_PACKAGE_LIBDRM if !(LINGMO_arm && LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_FB)
+	select LINGMO_PACKAGE_HAS_LIBEGL
+	select LINGMO_PACKAGE_HAS_LIBGLES
+	# gbm is only available in the aarch64 blobs
+	select LINGMO_PACKAGE_HAS_LIBGBM if LINGMO_aarch64
+	select LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_DMA_BUF if LINGMO_aarch64
+	select LINGMO_PACKAGE_LIBGBM_HAS_FEATURE_FORMAT_MODIFIER_PLANE_COUNT if LINGMO_aarch64
+	select LINGMO_PACKAGE_HAS_LIBOPENCL
+	select LINGMO_PACKAGE_HAS_LIBOPENVG
+	help
+	  Userspace libraries for Vivante GPU on i.MX platforms
+
+	  It contains libraries and headers for GLES, OpenCL, and
+	  OpenVG. It also contains a plugin for DirectFB-1.4.0, but
+	  that doesn't work together with buildroot's DirectFB
+	  version.
+
+	  This library is provided by Freescale as-is and doesn't have
+	  an upstream.
+
+if LINGMO_PACKAGE_IMX_GPU_VIV
+
+choice
+	prompt "Output option"
+	help
+	  There are two versions of this library: one for
+	  direct framebuffer access, one for wayland rendering.
+	  Choose here which version to install.
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_FB
+	bool "Framebuffer"
+	# The i.MX8 aarch64 blob doesn't support FB output
+	depends on LINGMO_arm
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_WL
+	bool "Wayland"
+	select LINGMO_PACKAGE_WAYLAND
+	select LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+
+endchoice
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT
+	string
+	default "fb" if LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_FB
+	default "wayland" if LINGMO_PACKAGE_IMX_GPU_VIV_OUTPUT_WL
+
+config LINGMO_PACKAGE_PROVIDES_LIBEGL
+	default "imx-gpu-viv"
+
+config LINGMO_PACKAGE_PROVIDES_LIBGLES
+	default "imx-gpu-viv"
+
+config LINGMO_PACKAGE_PROVIDES_LIBOPENCL
+	default "imx-gpu-viv"
+
+config LINGMO_PACKAGE_PROVIDES_LIBOPENVG
+	default "imx-gpu-viv"
+
+if LINGMO_aarch64
+
+config LINGMO_PACKAGE_PROVIDES_LIBGBM
+	default "imx-gpu-viv"
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_PLATFORM
+	string
+	default "mx8mn" if LINGMO_PACKAGE_FREESCALE_IMX_PLATFORM_IMX8MN
+	default "mx8mp" if LINGMO_PACKAGE_FREESCALE_IMX_PLATFORM_IMX8MP
+	default "mx8mq" if LINGMO_PACKAGE_FREESCALE_IMX_PLATFORM_IMX8M
+	default "mx8qm" if LINGMO_PACKAGE_FREESCALE_IMX_PLATFORM_IMX8
+	default "mx8qxp" if LINGMO_PACKAGE_FREESCALE_IMX_PLATFORM_IMX8X
+
+endif
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_EXAMPLES
+	bool "install examples"
+	# example binaries are linked against libstdc++.so.6
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  Copy the Vivante examples to the target.
+
+	  Warning: examples take approximately 150 MB of disk space.
+
+comment "imx-gpu-viv-examples need a toolchain w/ C++ support"
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_IMX_GPU_VIV_GMEM_INFO
+	bool "install gmem_info tool"
+	help
+	  Copy the gmem_info tool to the target which provides
+	  information about GPU memory consumption.
+
+endif

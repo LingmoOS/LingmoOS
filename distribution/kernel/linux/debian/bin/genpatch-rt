@@ -1,0 +1,160 @@
+#!/usr/bin/python3
+
+import argparse
+import io
+import os
+import os.path
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+
+
+def main(source, version, verify_signature):
+    patch_dir = 'debian/patches-rt'
+    series_name = 'series'
+    old_series = set()
+    new_series = set()
+
+    try:
+        with open(os.path.join(patch_dir, series_name), 'r') as series_fh:
+            for line in series_fh:
+                name = line.strip()
+                if name != '' and name[0] != '#':
+                    old_series.add(name)
+    except FileNotFoundError:
+        pass
+
+    with open(os.path.join(patch_dir, series_name), 'w') as series_fh:
+        # Add Origin to all patch headers.
+        def add_patch(name, source_patch, origin):
+            path = os.path.join(patch_dir, name)
+            try:
+                os.unlink(path)
+            except FileNotFoundError:
+                pass
+            with open(path, 'w') as patch:
+                in_header = True
+                for line in source_patch:
+                    if in_header and re.match(r'^(\n|[^\w\s]|Index:)', line):
+                        patch.write('Origin: %s\n' % origin)
+                        if line != '\n':
+                            patch.write('\n')
+                        in_header = False
+                    patch.write(line)
+            new_series.add(name)
+
+        if os.path.isdir(os.path.join(source, '.git')):
+            # Export rebased branch from stable-rt git as patch series
+            up_ver = re.sub(r'-rt\d+$', '', version)
+            env = os.environ.copy()
+            env['GIT_DIR'] = os.path.join(source, '.git')
+            env['DEBIAN_KERNEL_KEYRING'] = 'rt-signing-key.pgp'
+
+            if verify_signature:
+                # Validate tag signature
+                gpg_wrapper = os.path.join(os.getcwd(),
+                                           "debian/bin/git-tag-gpg-wrapper")
+                verify_proc = subprocess.Popen(
+                    ['git', '-c', 'gpg.program=%s' % gpg_wrapper,
+                     'tag', '-v', 'v%s-rebase' % version],
+                    env=env)
+                if verify_proc.wait():
+                    raise RuntimeError("GPG tag verification failed")
+
+            args = ['git', 'format-patch',
+                    'v%s..v%s-rebase' % (up_ver, version)]
+            format_proc = subprocess.Popen(args,
+                                           cwd=patch_dir,
+                                           env=env, stdout=subprocess.PIPE)
+            with io.open(format_proc.stdout.fileno(), encoding='utf-8') \
+                 as pipe:
+                for line in pipe:
+                    name = line.strip('\n')
+                    with open(os.path.join(patch_dir, name)) as source_patch:
+                        patch_from = source_patch.readline()
+                        match = re.match(r'From ([0-9a-f]{40}) ', patch_from)
+                        assert match
+                        origin = ('https://git.kernel.org/cgit/linux/kernel/'
+                                  'git/rt/linux-stable-rt.git/commit?id=%s' %
+                                  match.group(1))
+                        add_patch(name, source_patch, origin)
+                        series_fh.write(line)
+
+        else:
+            # Get version and upstream version
+            if version is None:
+                match = re.search(r'(?:^|/)patches-(.+)\.tar\.[gx]z$', source)
+                assert match, 'no version specified or found in filename'
+                version = match.group(1)
+            match = re.match(r'^(\d+\.\d+)(?:\.\d+|-rc\d+)?-rt\d+$', version)
+            assert match, 'could not parse version string'
+            up_ver = match.group(1)
+
+            if verify_signature:
+                # Expect an accompanying signature, and validate it
+                source_sig = re.sub(r'.[gx]z$', '.sign', source)
+                unxz_proc = subprocess.Popen(['xzcat', source],
+                                             stdout=subprocess.PIPE)
+                verify_output = subprocess.check_output(
+                    ['gpgv', '--status-fd', '1',
+                     '--keyring', 'debian/upstream/rt-signing-key.pgp',
+                     '--ignore-time-conflict', source_sig, '-'],
+                    stdin=unxz_proc.stdout,
+                    text=True)
+                if unxz_proc.wait() or \
+                   not re.search(r'^\[GNUPG:\]\s+VALIDSIG\s',
+                                 verify_output, re.MULTILINE):
+                    sys.stderr.write(verify_output)
+                    raise RuntimeError("GPG signature verification failed")
+
+            temp_dir = tempfile.mkdtemp(prefix='rt-genpatch', dir='debian')
+            try:
+                # Unpack tarball
+                subprocess.check_call(['tar', '-C', temp_dir, '-xaf', source])
+                source_dir = os.path.join(temp_dir, 'patches')
+                assert os.path.isdir(source_dir), \
+                    'tarball does not contain patches directory'
+
+                # Copy patch series
+                origin = ('https://www.kernel.org/pub/linux/kernel/projects/'
+                          'rt/%s/older/patches-%s.tar.xz' %
+                          (up_ver, version))
+                with open(os.path.join(source_dir, 'series'), 'r') \
+                     as source_series_fh:
+                    for line in source_series_fh:
+                        name = line.strip()
+                        if name != '' and name[0] != '#':
+                            with open(os.path.join(source_dir, name)) \
+                                 as source_patch:
+                                add_patch(name, source_patch, origin)
+                        series_fh.write(line)
+            finally:
+                shutil.rmtree(temp_dir)
+
+    for name in new_series:
+        if name in old_series:
+            old_series.remove(name)
+        else:
+            print('Added patch', os.path.join(patch_dir, name))
+
+    for name in old_series:
+        print('Obsoleted patch', os.path.join(patch_dir, name))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate or update the rt featureset patch series')
+    parser.add_argument(
+        'source', metavar='SOURCE', type=str,
+        help='tarball of patches or git repo containing the given RT-VERSION')
+    parser.add_argument(
+        'version', metavar='RT-VERSION', type=str, nargs='?',
+        help='rt kernel version (optional for tarballs)')
+    parser.add_argument(
+        '--verify-signature', action=argparse.BooleanOptionalAction,
+        default=True,
+        help='verify signature on tarball (detached in .sign file) or git tag')
+    args = parser.parse_args()
+    main(args.source, args.version, args.verify_signature)

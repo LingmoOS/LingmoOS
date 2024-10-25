@@ -1,0 +1,118 @@
+config LINGMO_TARGET_ROOTFS_SQUASHFS
+	bool "squashfs root filesystem"
+	help
+	  Build a squashfs root filesystem
+
+if LINGMO_TARGET_ROOTFS_SQUASHFS
+
+choice
+	prompt "block size"
+	default LINGMO_TARGET_ROOTFS_SQUASHFS_BS_128K
+	help
+	  Data block size. Bigger values can improve
+	  compression ratio.
+
+	  If unsure, leave at 128k (default).
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_4K
+	bool "4k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_8K
+	bool "8k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_16K
+	bool "16k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_32K
+	bool "32k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_64K
+	bool "64k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_128K
+	bool "128k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_256K
+	bool "256k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_512K
+	bool "512k"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS_1024K
+	bool "1024k"
+
+endchoice
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_BS
+	string
+	default "4K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_4K
+	default "8K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_8K
+	default "16K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_16K
+	default "32K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_32K
+	default "64K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_64K
+	default "128K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_128K
+	default "256K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_256K
+	default "512K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_512K
+	default "1024K" if LINGMO_TARGET_ROOTFS_SQUASHFS_BS_1024K
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_PAD
+	bool "pad to a 4K boundary"
+	default y # legacy was always ON
+	help
+	  Say 'y' here (the default) to pad the the filesystem image
+	  to a 4K boundary. Say 'n' to disable padding.
+
+choice
+	prompt "Compression algorithm"
+	default LINGMO_TARGET_ROOTFS_SQUASHFS4_GZIP
+	help
+	  Select the squashfs compression algorithm to use when
+	  generating the filesystem.
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_GZIP
+	bool "gzip"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_LZ4
+	bool "lz4"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_LZMA
+	bool "lzma"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_LZO
+	bool "lzo"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_XZ
+	bool "xz"
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS4_ZSTD
+	bool "zstd"
+
+endchoice
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_EXTREME_COMP
+	bool "extreme compression when available"
+	default y if LINGMO_TARGET_ROOTFS_SQUASHFS4_LZ4  # legacy
+	help
+	  Use options to increase compression ration as much as
+	  possible, like using architecture-specific options, at
+	  the cost of time when assembling the filesystem image.
+
+	  For example:
+	   - with gzip and lzo, use -Xcompression-level 9
+	   - with xz use arch-specific bcj (branch-call-jump) filters
+	   - with zstd use -Xcompression-level 22
+	   - and more
+
+config LINGMO_TARGET_ROOTFS_SQUASHFS_COMP_OPTS
+	string
+	default "-Xcompression-level 9" if LINGMO_TARGET_ROOTFS_SQUASHFS4_GZIP
+	default "-Xcompression-level 9" if LINGMO_TARGET_ROOTFS_SQUASHFS4_LZO
+	default "-Xhc" if LINGMO_TARGET_ROOTFS_SQUASHFS4_LZ4
+	default "-Xbcj arm,armthumb" if LINGMO_TARGET_ROOTFS_SQUASHFS4_XZ && (LINGMO_arm || BR_aarch64)
+	default "-Xbcj powerpc" if LINGMO_TARGET_ROOTFS_SQUASHFS4_XZ && (LINGMO_powerpc || LINGMO_powerpc64)
+	default "-Xbcj sparc" if LINGMO_TARGET_ROOTFS_SQUASHFS4_XZ && (LINGMO_sparc || LINGMO_sparc64)
+	default "-Xbcj x86" if LINGMO_TARGET_ROOTFS_SQUASHFS4_XZ && (LINGMO_i386 || LINGMO_x86_64)
+	default "-Xcompression-level 22" if LINGMO_TARGET_ROOTFS_SQUASHFS4_ZSTD
+	depends on LINGMO_TARGET_ROOTFS_SQUASHFS_EXTREME_COMP
+
+endif

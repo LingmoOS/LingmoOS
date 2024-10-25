@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_IRQBALANCE
+	bool "irqbalance"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Irqbalance is a daemon to help balance the cpu load generated
+	  by interrupts across all of a systems cpus.
+	  Irqbalance identifies the highest volume interrupt sources,
+	  and isolates them to a single unique cpu, so that load is
+	  spread as much as possible over an entire processor set, while
+	  minimizing cache hit rates for irq handlers.
+
+	  https://github.com/Irqbalance/irqbalance
+
+comment "irqbalance needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

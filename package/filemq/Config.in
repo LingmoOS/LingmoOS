@@ -1,0 +1,16 @@
+config LINGMO_PACKAGE_FILEMQ
+	bool "filemq"
+	depends on LINGMO_INSTALL_LIBSTDCPP # zeromq
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # zeromq
+	depends on LINGMO_USE_MMU # czmq
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_CZMQ
+	select LINGMO_PACKAGE_ZEROMQ
+	help
+	  FileMQ is a publish-subscribe file service based on 0MQ.
+
+	  http://github.com/zeromq/filemq
+
+comment "filemq needs a toolchain w/ C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_HAS_THREADS)

@@ -1,0 +1,17 @@
+config LINGMO_PACKAGE_LIBQRTR_GLIB
+	bool "libqrtr-glib"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_15 # da7653f0faab
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Qualcomm IPC Router protocol helper library.
+	  Optional dependency for libqmi >= 1.28.0.
+
+	  https://www.freedesktop.org/software/libqmi/libqrtr-glib/latest/
+
+comment "libqrtr-glib needs a toolchain w/ wchar, threads, headers >= 4.15"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_4_15

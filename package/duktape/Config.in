@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_DUKTAPE
+	bool "duktape"
+	depends on !LINGMO_STATIC_LIBS
+	depends on !LINGMO_OPTIMIZE_FAST
+	help
+	  Duktape is an embeddable Javascript engine, with a focus on
+	  portability and compact footprint.
+
+	  Duktape is easy to integrate into a C/C++ project: add
+	  duktape.c, duktape.h, and duk_config.h to your build, and use
+	  the Duktape API to call Ecmascript functions from C code and
+	  vice versa.
+
+	  http://www.duktape.org
+
+comment "duktape needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+
+comment "duktape can't be built with Optimize for fast"
+	depends on LINGMO_OPTIMIZE_FAST

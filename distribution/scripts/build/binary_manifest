@@ -1,0 +1,66 @@
+#!/bin/sh
+
+## lingmo-system-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Create manifest"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LINGMO_SYS_BUILD_CHROOT_FILESYSTEM}" = "none" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin creating manifest..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+case "${LINGMO_SYS_BUILD_INITRAMFS}" in
+	live-boot)
+		INITFS="live"
+		SUFFIX="packages"
+		;;
+
+	*)
+		INITFS="boot"
+		SUFFIX="packages"
+		;;
+esac
+
+# Add filesystem.packages
+cp -a chroot.packages.live "binary/${INITFS}/filesystem.${SUFFIX}"
+diff chroot.packages.live chroot.packages.install | awk '/^< / { print $2 }' \
+	> "binary/${INITFS}/filesystem.${SUFFIX}-remove"
+if [ ! -s "binary/${INITFS}/filesystem.${SUFFIX}-remove" ]
+then
+	rm "binary/${INITFS}/filesystem.${SUFFIX}-remove"
+fi
+
+cp -a chroot.packages.live ${LINGMO_SYS_BUILD_IMAGE_NAME}-${LINGMO_SYS_BUILD_ARCHITECTURE}.packages
+
+cp -a chroot.files ${LINGMO_SYS_BUILD_IMAGE_NAME}-${LINGMO_SYS_BUILD_ARCHITECTURE}.files
+
+# Creating stage file
+Create_stagefile

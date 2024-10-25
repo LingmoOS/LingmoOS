@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# Writes the final sources.list file
+#
+
+CHROOT=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g")
+RELEASE="hydrogen"
+
+cat << EOF > $CHROOT/etc/apt/sources.list
+# Lingmo OS apt Sources list
+deb http://packages.lingmo.org/lingmo $RELEASE main non-free non-free-firmware
+# deb-src http://packages.lingmo.org/lingmo $RELEASE main non-free non-free-firmware
+
+# Lingmo OS Team
+EOF
+
+
+#
+# Reconfigure GRUB for theming
+#
+
+chroot ${CHROOT} /bin/bash -c "dpkg-reconfigure lingmo-grub-config"
+
+exit 0

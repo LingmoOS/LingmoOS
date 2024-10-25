@@ -1,0 +1,42 @@
+#! /bin/bash
+
+exepath=$(dirname $0)
+strip=$exepath/strip_glyphs.pe
+
+if [ $# -ne 2 ] ; then
+	echo "Usage: $(basename $0) fontfile_in fontfile_out"
+	exit 0
+fi
+
+if [ ! -x "$strip" ] ; then
+	echo "Script not found: $strip"
+	exit 1
+fi
+
+if [ ! -f "$1" ] ; then
+	echo "File does not exist: $1"
+	exit 1
+fi
+if [ -z "$2" ] ; then
+	echo "You need to specify the output file"
+	exit 1
+fi
+
+ranges=""
+ranges="$ranges u0400:u052F" # Cyrilic
+ranges="$ranges u0530:u058F" # Armenian
+ranges="$ranges u0600:u06FF" # Arabic
+ranges="$ranges u0700:u077F" # Syriac
+ranges="$ranges u0900:u097F" # Hindi
+ranges="$ranges u0980:u099F" # Bengali
+ranges="$ranges u0A00:u0CFF" # Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada
+ranges="$ranges u0D00:u0FFF" # Malayalam, Sinhala, Thai, Lao, Tibetan
+ranges="$ranges u2100:u21FF" # Letterlike, Number forms, Arrows
+ranges="$ranges u2200:u24FF" # Mathematical, Techical, Control, OCR
+ranges="$ranges u2580:u259F" # Block elements
+ranges="$ranges u3000:u30FF" # CJK Symbols and Punctuation
+if ! echo $1 | grep -q Bold; then
+	ranges="$ranges 65536:66002"   # bn_* stuff ???
+fi
+
+$strip $1 $2 $ranges

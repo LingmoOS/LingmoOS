@@ -1,0 +1,34 @@
+config LINGMO_PACKAGE_SYSDIG
+	bool "sysdig"
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS # falcosecurity-libs
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS # falcosecurity-libs
+	depends on LINGMO_LINUX_KERNEL # falcosecurity-libs
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 # falcosecurity-libs -> grpc -> libabseil-cpp
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # falcosecurity-libs
+	depends on !LINGMO_STATIC_LIBS # falcosecurity-libs
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC # falcosecurity-libs
+	depends on LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_1 # falcosecurity-libs
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 || LINGMO_TOOLCHAIN_HAS_ATOMIC # falcosecurity-libs
+	select LINGMO_PACKAGE_FALCOSECURITY_LIBS
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_JSON_FOR_MODERN_CPP
+	select LINGMO_PACKAGE_YAML_CPP
+	help
+	  Sysdig is open source, system-level exploration:
+	  capture system state and activity from a running Linux
+	  instance, then save, filter and analyze.
+	  Think of it as strace + tcpdump + lsof + awesome sauce.
+	  With a little Lua cherry on top.
+
+	  https://github.com/draios/sysdig/wiki
+
+comment "sysdig needs a glibc toolchain w/ C++, threads, gcc >= 8, dynamic library, a Linux kernel, and luajit or lua 5.1 to be built"
+	depends on LINGMO_PACKAGE_LIBABSEIL_CPP_ARCH_SUPPORTS
+	depends on LINGMO_PACKAGE_PROTOBUF_ARCH_SUPPORTS
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 || LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on !LINGMO_LINUX_KERNEL || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_8 || LINGMO_STATIC_LIBS \
+		|| !LINGMO_TOOLCHAIN_USES_GLIBC \
+		|| !LINGMO_PACKAGE_LUAINTERPRETER_ABI_VERSION_5_1

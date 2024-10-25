@@ -1,0 +1,30 @@
+config LINGMO_PACKAGE_SYSREPO
+	bool "sysrepo"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libyang
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	select LINGMO_PACKAGE_LIBYANG
+	select LINGMO_PACKAGE_PCRE2
+	help
+	  Sysrepo is an YANG-based configuration and operational state
+	  data store for Unix/Linux applications.
+
+	  https://github.com/sysrepo
+
+if LINGMO_PACKAGE_SYSREPO
+
+config LINGMO_PACKAGE_SYSREPO_EXAMPLES
+	bool "enable examples"
+	help
+	  Enable sysrepo examples.
+
+endif
+
+comment "sysrepo needs a toolchain w/ C++, NPTL, dynamic library, gcc >= 4.8"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on LINGMO_STATIC_LIBS || !LINGMO_INSTALL_LIBSTDCPP \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

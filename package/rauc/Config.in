@@ -1,0 +1,64 @@
+config LINGMO_PACKAGE_RAUC
+	bool "rauc"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	depends on LINGMO_USE_WCHAR # glib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_SQUASHFS # run-time dependency
+	select LINGMO_PACKAGE_UBOOT_TOOLS if LINGMO_TARGET_UBOOT # run-time dependency
+	select LINGMO_PACKAGE_UBOOT_TOOLS_FWPRINTENV if LINGMO_TARGET_UBOOT
+	help
+	  RAUC is the Robust Auto-Update Controller developed by
+	  Pengutronix. It supports updating embedded Linux
+	  systems over the network or from disks and provides a
+	  d-bus interface.
+
+	  http://rauc.io/
+
+if LINGMO_PACKAGE_RAUC
+
+config LINGMO_PACKAGE_RAUC_DBUS
+	bool "dbus support"
+	select LINGMO_PACKAGE_DBUS
+	help
+	  This option enables support for controlling rauc through
+	  D-Bus.
+
+config LINGMO_PACKAGE_RAUC_GPT
+	bool "GPT support"
+	select LINGMO_PACKAGE_UTIL_LINUX
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBS
+	select LINGMO_PACKAGE_UTIL_LINUX_LIBFDISK
+	help
+	    This option enables support for GPT partition tables.
+
+config LINGMO_PACKAGE_RAUC_NETWORK
+	bool "network support"
+	select LINGMO_PACKAGE_LIBCURL
+	help
+	  This option enables support for updating firmware over
+	  the network using libcurl.
+
+if LINGMO_PACKAGE_RAUC_NETWORK
+
+config LINGMO_PACKAGE_RAUC_STREAMING
+	bool "streaming update support"
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  This option enables support for streaming update mode.
+
+endif
+
+config LINGMO_PACKAGE_RAUC_JSON
+	bool "JSON output support"
+	select LINGMO_PACKAGE_JSON_GLIB
+	help
+	  This option enables support for providing output in
+	  JSON format.
+
+endif
+
+comment "rauc needs a toolchain w/ wchar, threads"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU

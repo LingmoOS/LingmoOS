@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable' 'coolstuff' 'all' '1.0'
+
+setupaptarchive
+changetowebserver
+
+msgtest 'Test apt-get update with incorrect' 'TMPDIR'
+
+export TMPDIR=/does-not-exists
+testsuccess aptget update -o Debug::Acquire::gpg=1
+unset TMPDIR
+
+testsuccessequal 'coolstuff' aptcache pkgnames
+testsuccess ls rootdir/var/lib/apt/lists/*InRelease

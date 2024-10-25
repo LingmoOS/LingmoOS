@@ -1,0 +1,88 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Fri, 28 Jun 2024 12:18:56 +0200
+Subject: [PATCH 3/3] net: Move flush list retrieval to where it is used.
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+The bpf_net_ctx_get_.*_flush_list() are used at the top of the function.
+This means the variable is always assigned even if unused. By moving the
+function to where it is used, it is possible to delay the initialisation
+until it is unavoidable.
+Not sure how much this gains in reality but by looking at bq_enqueue()
+(in devmap.c) gcc pushes one register less to the stack. \o/.
+
+ Move flush list retrieval to where it is used.
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Link: https://lore.kernel.org/r/20240628103020.1766241-4-bigeasy@linutronix.de
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ kernel/bpf/cpumap.c |    6 ++++--
+ kernel/bpf/devmap.c |    3 ++-
+ net/xdp/xsk.c       |    6 ++++--
+ 3 files changed, 10 insertions(+), 5 deletions(-)
+
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -707,7 +707,6 @@ static void bq_flush_to_queue(struct xdp
+  */
+ static void bq_enqueue(struct bpf_cpu_map_entry *rcpu, struct xdp_frame *xdpf)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_cpu_map_flush_list();
+ 	struct xdp_bulk_queue *bq = this_cpu_ptr(rcpu->bulkq);
+ 
+ 	if (unlikely(bq->count == CPU_MAP_BULK_SIZE))
+@@ -724,8 +723,11 @@ static void bq_enqueue(struct bpf_cpu_ma
+ 	 */
+ 	bq->q[bq->count++] = xdpf;
+ 
+-	if (!bq->flush_node.prev)
++	if (!bq->flush_node.prev) {
++		struct list_head *flush_list = bpf_net_ctx_get_cpu_map_flush_list();
++
+ 		list_add(&bq->flush_node, flush_list);
++	}
+ }
+ 
+ int cpu_map_enqueue(struct bpf_cpu_map_entry *rcpu, struct xdp_frame *xdpf,
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -448,7 +448,6 @@ static void *__dev_map_lookup_elem(struc
+ static void bq_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+ 		       struct net_device *dev_rx, struct bpf_prog *xdp_prog)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_dev_flush_list();
+ 	struct xdp_dev_bulk_queue *bq = this_cpu_ptr(dev->xdp_bulkq);
+ 
+ 	if (unlikely(bq->count == DEV_MAP_BULK_SIZE))
+@@ -462,6 +461,8 @@ static void bq_enqueue(struct net_device
+ 	 * are only ever modified together.
+ 	 */
+ 	if (!bq->dev_rx) {
++		struct list_head *flush_list = bpf_net_ctx_get_dev_flush_list();
++
+ 		bq->dev_rx = dev_rx;
+ 		bq->xdp_prog = xdp_prog;
+ 		list_add(&bq->flush_node, flush_list);
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -370,15 +370,17 @@ static int xsk_rcv(struct xdp_sock *xs,
+ 
+ int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp)
+ {
+-	struct list_head *flush_list = bpf_net_ctx_get_xskmap_flush_list();
+ 	int err;
+ 
+ 	err = xsk_rcv(xs, xdp);
+ 	if (err)
+ 		return err;
+ 
+-	if (!xs->flush_node.prev)
++	if (!xs->flush_node.prev) {
++		struct list_head *flush_list = bpf_net_ctx_get_xskmap_flush_list();
++
+ 		list_add(&xs->flush_node, flush_list);
++	}
+ 
+ 	return 0;
+ }

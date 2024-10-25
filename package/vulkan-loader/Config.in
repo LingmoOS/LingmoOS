@@ -1,0 +1,14 @@
+config LINGMO_PACKAGE_VULKAN_LOADER
+	bool "vulkan-loader"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_VULKAN_HEADERS
+	help
+	  The Khronos official Vulkan ICD desktop loader.
+
+	  https://github.com/KhronosGroup/Vulkan-Loader
+
+comment "vulkan-loader needs a toolchain w/ C++, dynamic library, threads"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS

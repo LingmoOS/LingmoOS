@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_FREERADIUS_SERVER
+	bool "freeradius-server"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # libtalloc
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_USES_GLIBC
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_MD4 if LINGMO_PACKAGE_LIBOPENSSL
+	select LINGMO_PACKAGE_LIBTALLOC
+	help
+	  FreeRADIUS is an open source server which implements
+	  a protocol for remote user Authorization, Authentication
+	  and Accounting.
+
+	  http://wiki.freeradius.org/
+
+comment "freeradius-server needs a glibc toolchain w/ threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_TOOLCHAIN_USES_GLIBC

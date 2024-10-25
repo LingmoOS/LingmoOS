@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+# Remove temporary files
+for _DIRECTORY in /tmp /var/tmp
+do
+	rm -rf ${_DIRECTORY}
+
+	mkdir -p ${_DIRECTORY}
+	chmod 1777 ${_DIRECTORY}
+done
+
+# Remove the old lock file which will be generated when needed
+rm -f /etc/.pwd.lock
+
+# Remove /run/mount/utab of util-linux libmount (and its directory)
+# The file and directory will be generated when needed
+if [ -d /run/mount ]; then
+	rm -f /run/mount/utab
+	rmdir --ignore-fail-on-non-empty /run/mount
+fi

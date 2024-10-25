@@ -1,0 +1,249 @@
+config LINGMO_PACKAGE_QT6BASE
+	bool "qt6base"
+	select LINGMO_PACKAGE_DOUBLE_CONVERSION
+	select LINGMO_PACKAGE_LIBB2
+	select LINGMO_PACKAGE_PCRE2
+	select LINGMO_PACKAGE_PCRE2_16
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Qt is a cross-platform application and UI framework for
+	  developers using C++.
+
+	  This package corresponds to the qt6base module, which
+	  contains the base Qt libraries: QtCore, QtNetwork, QtGui,
+	  QtWidgets, etc.
+
+	  http://qt.io
+
+if LINGMO_PACKAGE_QT6BASE
+
+config LINGMO_PACKAGE_QT6BASE_CONCURRENT
+	bool "concurrent module"
+	help
+	  This options enables the Qt6Concurrent library.
+
+config LINGMO_PACKAGE_QT6BASE_DBUS
+	bool "DBus module"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU
+	select LINGMO_PACKAGE_DBUS
+	help
+	  This option enables the D-Bus module.
+
+config LINGMO_PACKAGE_QT6BASE_GUI
+	bool "gui module"
+	select LINGMO_PACKAGE_FREETYPE
+	# At least one graphic backend must be enabled, so enable
+	# linuxfb if nothing is enabled.
+	select LINGMO_PACKAGE_QT6BASE_LINUXFB if \
+	       !LINGMO_PACKAGE_QT6BASE_XCB && \
+	       !LINGMO_PACKAGE_QT6BASE_EGLFS
+	help
+	  This option enables the Qt6Gui library.
+
+if LINGMO_PACKAGE_QT6BASE_GUI
+
+config LINGMO_PACKAGE_QT6BASE_VULKAN
+	bool "Vulkan support"
+	depends on LINGMO_INSTALL_LIBSTDCPP # vulkan-loader
+	depends on !LINGMO_STATIC_LIBS # vulkan-loader
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # vulkan-loader
+	select LINGMO_PACKAGE_VULKAN_HEADERS
+	select LINGMO_PACKAGE_VULKAN_LOADER
+	help
+	  This option enables Vulkan support.
+
+config LINGMO_PACKAGE_QT6BASE_LINUXFB
+	bool "linuxfb support"
+
+config LINGMO_PACKAGE_QT6BASE_XCB
+	bool "X.org XCB support"
+	depends on LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBX11
+	select LINGMO_PACKAGE_LIBXCB
+	select LINGMO_PACKAGE_XCB_UTIL_IMAGE
+	select LINGMO_PACKAGE_XCB_UTIL_KEYSYMS
+	select LINGMO_PACKAGE_XCB_UTIL_RENDERUTIL
+	select LINGMO_PACKAGE_XCB_UTIL_WM
+	select LINGMO_PACKAGE_LIBXKBCOMMON
+
+comment "X.org XCB backend available if X.org is enabled"
+	depends on !LINGMO_PACKAGE_XORG7
+
+config LINGMO_PACKAGE_QT6BASE_EGLFS
+	bool "eglfs support"
+	depends on LINGMO_PACKAGE_HAS_LIBEGL
+	depends on LINGMO_PACKAGE_HAS_LIBGBM
+	depends on LINGMO_PACKAGE_QT6_GL_SUPPORTS
+	select LINGMO_PACKAGE_QT6BASE_OPENGL
+
+config LINGMO_PACKAGE_QT6BASE_DEFAULT_QPA
+	string "Default graphical platform"
+	help
+	  Choose the default platform abstraction to use for graphical
+	  applications (e.g xcb, linuxfb, eglfs, ...). If this is
+	  empty, the default for your architecture will be used
+	  (usually this is eglfs).
+
+	  You can get a list of supported platforms by running a Qt
+	  application with the option "-platform help" on your
+	  target. You can choose a different platform at runtime with
+	  the -platform option.
+
+config LINGMO_PACKAGE_QT6BASE_OPENGL
+	bool "OpenGL support"
+	depends on LINGMO_PACKAGE_QT6_GL_SUPPORTS
+	help
+	  This option enables OpenGL support.
+
+comment "OpenGL support needs an OpenGL-capable backend"
+	depends on !LINGMO_PACKAGE_QT6_GL_SUPPORTS
+
+if LINGMO_PACKAGE_QT6BASE_OPENGL
+
+choice
+	prompt "OpenGL API"
+	help
+	  Select OpenGL API.
+
+config LINGMO_PACKAGE_QT6BASE_OPENGL_DESKTOP
+	bool "Desktop OpenGL"
+	depends on LINGMO_PACKAGE_HAS_LIBGL
+	help
+	  Use desktop OpenGL.
+
+config LINGMO_PACKAGE_QT6BASE_OPENGL_ES2
+	bool "OpenGL ES 2.0+"
+	depends on LINGMO_PACKAGE_HAS_LIBGLES
+	help
+	  Use OpenGL ES 2.0 and later versions.
+
+endchoice
+
+endif
+
+config LINGMO_PACKAGE_QT6BASE_FONTCONFIG
+	bool "fontconfig support"
+	select LINGMO_PACKAGE_FONTCONFIG
+	help
+	  This option enables Fontconfig support using the system
+	  fontconfig library.
+
+config LINGMO_PACKAGE_QT6BASE_HARFBUZZ
+	bool "harfbuzz support"
+	select LINGMO_PACKAGE_HARFBUZZ if \
+		LINGMO_TOOLCHAIN_HAS_SYNC_4 && \
+		LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8
+	help
+	  This option enables HarfBuzz support (either system harfbuzz
+	  if the toolchain supports __sync for 4 bytes, or the qt
+	  provided one which avoids this dependency by using QAtomic).
+
+config LINGMO_PACKAGE_QT6BASE_GIF
+	bool "GIF support"
+	help
+	  This compiles and installs the plugin for GIF reading support.
+
+config LINGMO_PACKAGE_QT6BASE_JPEG
+	bool "JPEG support"
+	select LINGMO_PACKAGE_JPEG
+	help
+	  This option enables JPEG support using the system libjpeg
+	  library.
+
+config LINGMO_PACKAGE_QT6BASE_PNG
+	bool "PNG support"
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  This option enables PNG support using the system libpng
+	  library.
+
+config LINGMO_PACKAGE_QT6BASE_WIDGETS
+	bool "widgets module"
+	help
+	  This option enables the Qt6Widgets library.
+
+config LINGMO_PACKAGE_QT6BASE_PRINTSUPPORT
+	bool "printing support"
+	# yes, print support needs widgets
+	depends on LINGMO_PACKAGE_QT6BASE_WIDGETS
+	help
+	  This option enables printing support, optionally using CUPS
+	  if available.
+
+endif
+
+config LINGMO_PACKAGE_QT6BASE_NETWORK
+	bool "network module"
+	select LINGMO_PACKAGE_LIBOPENSSL_ENABLE_PSK if LINGMO_PACKAGE_LIBOPENSSL
+	help
+	  This options enables the Qt6Network library.
+
+config LINGMO_PACKAGE_QT6BASE_SQL
+	bool "sql module"
+	help
+	  This options enables the Qt6Sql library.
+
+if LINGMO_PACKAGE_QT6BASE_SQL
+config LINGMO_PACKAGE_QT6BASE_MYSQL
+	bool "MySQL Plugin"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_MARIADB
+	help
+	  Build MySQL plugin
+
+comment "MySQL plugin needs a toolchain w/ C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_QT6BASE_PSQL
+	bool "PostgreSQL Plugin"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	depends on !LINGMO_OPTIMIZE_FAST
+	select LINGMO_PACKAGE_POSTGRESQL
+	help
+	  Build PostgreSQL plugin
+
+comment "PostgreSQL plugin needs a toolchain w/ wchar, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_USE_WCHAR
+
+comment "PostgreSQL plugin can't be built with optimize for fast"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_OPTIMIZE_FAST
+
+config LINGMO_PACKAGE_QT6BASE_SQLITE
+	bool "SQLite plugin"
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_SQLITE_ENABLE_COLUMN_METADATA
+	help
+	  Build SQLite plugin
+
+endif
+
+config LINGMO_PACKAGE_QT6BASE_SYSLOG
+	bool "syslog support"
+	help
+	  Logs to the standard UNIX logging mechanism.
+
+config LINGMO_PACKAGE_QT6BASE_TEST
+	bool "test module"
+	help
+	  This options enables the Qt6Test library.
+
+config LINGMO_PACKAGE_QT6BASE_TSLIB
+	bool "Enable Tslib support"
+	select LINGMO_PACKAGE_TSLIB
+	help
+	  This options enables the Tslib plugin
+
+config LINGMO_PACKAGE_QT6BASE_XML
+	bool "XML module"
+	help
+	  This options enables the Qt6Xml library.
+
+endif

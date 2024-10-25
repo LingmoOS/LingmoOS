@@ -1,0 +1,15 @@
+Package: linux-headers-@abiname@@localversion@
+Meta-Rules-Target: headers
+Build-Profiles: <!pkg.linux.nokernel>
+Depends:
+ linux-headers-@abiname@-common@localversion_headers@ (= ${source:Version}),
+ linux-image-@abiname@@localversion@ (= ${binary:Version}) | linux-image-@abiname@@localversion@-unsigned (= ${binary:Version}),
+ linux-kbuild-@abiname@,
+ ${misc:Depends}
+Description: Header files for Linux @abiname@@localversion@
+ This package provides the architecture-specific kernel header files
+ for Linux kernel @abiname@@localversion@, generally
+ used for building out-of-tree kernel modules. These files are going to be
+ installed into /usr/src/linux-headers-@abiname@@localversion@, and can
+ be used for building modules that load into the kernel provided by the
+ linux-image-@abiname@@localversion@ package.

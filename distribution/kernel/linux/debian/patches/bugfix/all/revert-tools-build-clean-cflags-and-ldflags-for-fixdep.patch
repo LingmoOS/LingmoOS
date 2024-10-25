@@ -1,0 +1,21 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Mon, 16 Sep 2024 19:14:19 +0200
+Subject: Revert "tools build: Clean CFLAGS and LDFLAGS for fixdep"
+
+This reverts commit 5725dd8fa888b4dcdff58241f9d3d3ac42a048e2.  That
+was a workaround for the bug fixed by commit 6b3db6f9b970 "tools
+build: Make fixdep a hostprog" and is no longer needed.
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/tools/build/Makefile.include
++++ b/tools/build/Makefile.include
+@@ -2,7 +2,7 @@
+ build := -f $(srctree)/tools/build/Makefile.build dir=. obj
+ 
+ fixdep:
+-	$(Q)$(MAKE) -C $(srctree)/tools/build CFLAGS= LDFLAGS= $(OUTPUT)fixdep
++	$(Q)$(MAKE) -C $(srctree)/tools/build $(OUTPUT)fixdep
+ 
+ fixdep-clean:
+ 	$(Q)$(MAKE) -C $(srctree)/tools/build clean

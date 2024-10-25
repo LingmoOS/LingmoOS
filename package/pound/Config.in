@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_POUND
+	bool "pound"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_OPENSSL_FORCE_LIBOPENSSL
+	help
+	  The Pound program is a reverse proxy, load balancer and HTTPS
+	  front-end for Web server(s). Pound was developed to enable
+	  distributing the load among several Web-servers and to allow
+	  for a convenient SSL wrapper for those Web servers that do not
+	  offer it natively.
+
+	  https://github.com/graygnuorg/pound
+
+comment "pound needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU

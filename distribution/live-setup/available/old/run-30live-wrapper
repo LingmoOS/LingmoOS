@@ -1,0 +1,360 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+STATE="${TOP}/state"
+
+. ${LOCALCONF}/common.sh
+. ${LOCALCONF}/CONF.sh
+
+export CODENAME VERSION
+
+if [ "$VERSION"x = "testing"x ]; then
+    INSTALLER_VERSION="--di-daily"
+fi
+
+MIRROR=http://local-mirror.cdbuilder.debian.org/debian/
+APT_MIRROR=http://deb.debian.org/debian/
+OPTS="-m $MIRROR --apt-mirror $APT_MIRROR --customise ${LOCALCONF}/live-customise.sh"
+
+NAME="debian-live-$VERSION"
+
+if [ "$LIVE_ARCHES"x = ""x ] ; then
+    LIVE_ARCHES="amd64 i386"
+fi
+if [ "$TYPES"x = ""x ] ; then
+    TYPES="free nonfree"
+fi
+
+if [ "$BUILDS"x = ""x ] ; then
+    case "$CODENAME" in
+	stretch)
+	    BUILDS="cinnamon gnome kde lxde mate xfce"
+	    ;;
+	buster|bullseye)
+	    BUILDS="cinnamon gnome kde lxde lxqt mate standard xfce"
+	    ;;
+	*)
+	    log "  ABORTING: Don't know what to build for \"$CODENAME\""
+	    exit 1
+	    ;;
+    esac
+fi
+
+build_started () {
+    export BUILDNAME=$1
+    BUILDS_RUNNING="$BUILDS_RUNNING $BUILDNAME"
+    DATE=`now`
+    export ${BUILDNAME}START=$DATE
+    echo "  Starting ${BUILDNAME} build: $DATE"
+}
+
+build_finished () {
+    BUILDNAME="$1"
+    BUILDNAMESTART="${BUILDNAME}START"
+    start=${!BUILDNAMESTART}
+
+    . ${STATE}/$BUILDNAME-trace
+
+    time_spent=`calc_time $start $end`
+    log "  $BUILDNAME build started at $start, ended at $end (took $time_spent), error $error"
+    if [ $error != 0 ]; then
+	ERROR="$ERROR; $BUILDNAME FAILED $error"
+    fi
+}
+
+catch_parallel_builds () {
+    # Catch parallel builds here
+    while [ "$BUILDS_RUNNING"x != ""x  ] ; do
+	BUILDS_STILL_RUNNING=""
+	for BUILDNAME in $BUILDS_RUNNING; do
+            if [ -e $STATE/$BUILDNAME-trace ] ; then
+		build_finished $BUILDNAME
+            else
+		BUILDS_STILL_RUNNING="$BUILDS_STILL_RUNNING $BUILDNAME"
+            fi
+	done
+	BUILDS_RUNNING=$BUILDS_STILL_RUNNING
+	if [ "$BUILDS_RUNNING"x != ""x  ] ; then
+            sleep 1
+	fi
+    done
+}
+
+# Merge the vmdebootstrap log into the main log, for easy use afterwards
+merge_logs () {
+    MAINLOG=$1
+    VMDBLOG=$2
+    NUM=$(grep -n 'vmdebootstrap completed' $MAINLOG | awk -F: '{print $1}')
+    head -n $(($NUM-1)) $MAINLOG > $MAINLOG.1
+    cat $VMDBLOG >> $MAINLOG.1
+    tail -n +$NUM $MAINLOG >> $MAINLOG.1
+    cat $MAINLOG.1 > $MAINLOG
+    rm $VMDBLOG $MAINLOG.1
+}
+
+# Work out which packages to add for non-free firmware
+select_firmware_packages () {
+    ARCH=$1
+    SECTIONS="main non-free"
+    PKGS=""
+    for SECTION in ${SECTIONS}; do
+	PKGS="$PKGS "$(wget -q $MIRROR/dists/${CODENAME}/${SECTION}/binary-${ARCH}/Packages.gz -O- | gzip -cd - | \
+	      grep-dctrl -Pe '.*(firmware|microcode).*' -s Package -n | sort -u)
+    done
+    echo $PKGS
+}
+
+mkdir -p ${STATE}
+rm -rf ${STATE}/*
+
+log "Updating the live-wrapper clone"
+cd /root/live-wrapper && git pull
+
+BUILD_START=`now`
+log "Starting full live build (codename $CODENAME, version $VERSION) at $BUILD_START"
+
+for TYPE in $TYPES; do
+
+    TYPESTART=`now`
+
+    FIRMWARE_PKGS=""
+    if [ ${TYPE} = "free" ] ; then
+	typestem=""
+	NFVOL=""
+    else
+	typestem="+nonfree"
+	NFVOL=" nf"
+    fi
+
+    WORK="${TOP}/work/${TYPE}"
+    OUT="${TOP}/out/${TYPE}"
+
+    # Make sure we start clean
+    rm -rf ${OUT} ${WORK}
+    mkdir -p ${OUT} ${WORK}
+
+    for ARCH in $LIVE_ARCHES; do
+
+	if [ ${TYPE} != "free" ] ; then
+	    FIRMWARE_PKGS=$(select_firmware_packages ${ARCH})
+	fi
+
+	# Set up the list of base debs that *must* be available as
+	# *packages* on the live media alongside the squashfs. These
+	# will be needed by the live-installer in various places: core
+	# utilities, block device and filesystem tools, bootloaders
+
+	# First, the common core set
+	BASE_DEBS="eject pciutils usbutils keyutils \
+                   keyboard-configuration console-setup \
+                   lvm2 mdadm dmsetup cryptsetup dmraid \
+                   e2fsprogs btrfs-progs xfsprogs jfsutils"
+
+	# Now the arch-specific ones
+	case $ARCH in
+	    amd64)
+		BASE_DEBS="$BASE_DEBS \
+                           grub-efi-amd64 grub-efi-amd64-bin grub-pc"
+                case $CODENAME in
+                    buster|bullseye)
+                        BASE_DEBS="$BASE_DEBS \
+                                   grub-efi-amd64-signed shim-signed"
+                        ;;
+                esac
+		;;
+	    i386)
+		BASE_DEBS="$BASE_DEBS \
+                           grub-efi-ia32 grub-efi-ia32-bin grub-pc"
+                case $CODENAME in
+                    buster|bullseye)
+                        BASE_DEBS="$BASE_DEBS \
+                                   grub-efi-ia32-signed shim-signed"
+                        ;;
+                esac
+		;;
+	esac
+
+	ARCHSTART=`now`
+	ERROR=""
+
+	cd ${WORK}
+	mkdir ${BUILDS}
+
+	# Make the images (in parallel)
+	for BUILD in ${BUILDS}; do
+
+	    # Can't use TMPDIR here, that gets propagated into the
+	    # chroot and breaks installations!
+	    export TMP=${WORK}/${BUILD}/tmp
+	    export NAME="debian-live-${VERSION}-${ARCH}-${BUILD}${typestem}"
+	    # Shorten the build name so it will fit in the volume ID
+	    BUILD_SHORT=$(echo ${BUILD} | cut -c1-2)
+	    export VOLID="d-live${NFVOL} $VERSION ${BUILD_SHORT} ${ARCH}"
+
+	    mkdir ${TMP}
+
+	    case $CODENAME in
+		stretch|buster|bullseye)
+
+		    if [ "$VERSION"x = "testing"x ]; then
+			DESCRIPTION="Official Debian GNU/Linux Live $VERSION snapshot $BUILD"
+		    else
+			DESCRIPTION="Official Debian GNU/Linux Live $VERSION $BUILD"
+		    fi
+		    cat >> ${WORK}/${BUILD}/run.sh <<EOF
+#!/bin/bash
+export TMP=${TMP}
+export FIRMWARE_PKGS="${FIRMWARE_PKGS}"
+export MTOOLS_SKIP_CHECK=1
+
+now () {
+    date -u +%F:%H:%M:%S
+}
+
+START=\`now\`
+
+lwr $OPTS --architecture $ARCH \
+    -d $CODENAME \
+    --isolinux \
+    --grub \
+    --log stderr \
+    --installer ${INSTALLER_VERSION} \
+    -t live-task-${BUILD} -f "${FIRMWARE_PKGS}" \
+    --base_debs "${BASE_DEBS}" \
+    --description "${DESCRIPTION}" \
+    --volume_id "${VOLID}" \
+    --image_output ${NAME}.iso
+
+ERROR=\$?
+
+END=\`now\`
+echo -e "start=\$START\nend=\$END\nerror=\$ERROR\nlogfile=\${BUILDNAME}-log\n" > ${STATE}/\${BUILDNAME}-trace
+EOF
+		    ;;
+		*)
+		    log "  ABORTING: Don't know how to build for CODENAME \"$CODENAME\""
+		    exit 1
+	    esac
+	done
+
+	# Start the different builds
+	cd ${WORK}
+	for BUILD in ${BUILDS}; do
+	    cd ${BUILD}
+	    BUILDNAME="${TYPE}${ARCH}${BUILD}"
+	    build_started $BUILDNAME
+	    export BUILDNAME STATE
+	    NAME="debian-live-${VERSION}-${ARCH}-${BUILD}${typestem}"
+	    bash run.sh > ${NAME}.log 2>&1 &
+	    cd ..
+	done
+
+	catch_parallel_builds
+
+	# Make sure outstanding log messages get through
+	sleep 1
+	end=`now`
+	time_spent=`calc_time $ARCHSTART $end`
+	log "  $ARCH $TYPE build started at $ARCHSTART, ended at $end (took $time_spent)"
+	if [ "$ERROR"x != ""x ]; then
+	    log "  $ERROR"
+	fi
+
+	# Make sure outstanding log messages get through
+	sleep 1
+	log "  Post-processing and moving $ARCH $TYPE builds:"
+	MOVESTART=`now`
+	# Put the images into our tree
+	for BUILD in ${BUILDS}; do
+	    NAME="debian-live-${VERSION}-${ARCH}-${BUILD}${typestem}"
+	    echo "    $BUILD:"
+	    for dir in ${BUILD}/tmp/tmp*; do
+		find $dir | sed "s,^$dir,,g" > ${BUILD}/${NAME}.contents
+	    done
+	    mv ${BUILD}/packages.list ${BUILD}/${NAME}.packages
+	    mv ${BUILD}/sources.list ${BUILD}/${NAME}.sources
+	    rm -rf ${BUILD}/run.sh ${BUILD}/tmp
+	    merge_logs ${BUILD}/${NAME}.log ${BUILD}/vmdebootstrap.log
+
+	    OD="${OUT}/${ARCH}/iso-hybrid"
+	    mkdir -p ${OD}
+	    mv -f ${BUILD}/* ${OD}
+	    rmdir ${BUILD}
+	done
+
+	end=`now`
+	time_spent=`calc_time $MOVESTART $end`
+	log "  $ARCH $TYPE move started at $MOVESTART, ended at $end (took $time_spent)"
+
+    done # for ARCH in $LIVE_ARCHES ... build
+
+    # Now make the source tarballs
+    log "  Generating source tarballs:"
+    SRCSTART=`now`
+    mkdir -p ${OUT}/source/tar
+    mv ${OUT}/*/iso-hybrid/debian-*.sources ${OUT}/source/tar
+    cd ${OUT}/source/tar
+    for BUILD in ${BUILDS}; do
+	echo "    $BUILD:"
+	mkdir ${BUILD}
+	NAME="debian-live-${VERSION}-source-${BUILD}${typestem}"
+	sort -u debian*${BUILD}*.sources > ${BUILD}/sources.list
+	rm debian*${BUILD}*.sources
+	cd ${BUILD}
+	touch ${NAME}.log
+
+	SOURCE_ERROR=0
+	mkdir source
+	IFS="$NL"
+	if [ -f sources.list ] ; then
+	    for line in $(cat sources.list); do
+		IFS=$OLDIFS
+		grab_file $line
+		IFS="$NL"
+	    done
+	    IFS=$OLDIFS
+	    tar cf ../${NAME}.tar source
+	    find source | sed 's,^source,,g' > ../${NAME}.contents
+	    rm -rf source sources.list
+	else
+	    log "  ABORTING: No sources.list file in $PWD"
+	    exit 1
+	fi
+
+	if [ $SOURCE_ERROR -ne 0 ] ; then
+	    log "  ABORTING: Failed to download sources correctly"
+	    exit 1
+	fi
+	mv ${NAME}.log ..
+	cd ..
+	rmdir ${BUILD}
+    done
+    end=`now`
+    time_spent=`calc_time $SRCSTART $end`
+    log "    Source tarballs started at $MOVESTART, ended at $end (took $time_spent)"
+
+    log "  Checksumming:"
+    CKSUMSTART=`now`
+    for ARCH in $LIVE_ARCHES; do
+	cd ${OUT}/${ARCH}/iso-hybrid && checksum_files
+    done
+
+    cd ${OUT}/source/tar && checksum_files
+
+    end=`now`
+    time_spent=`calc_time $CKSUMSTART $end`
+    log "  $TYPE checksums started at $CKSUMSTART, ended at $end (took $time_spent)"
+
+    time_spent=`calc_time $TYPESTART $end`
+    log "  $TYPE run started at $TYPESTART, ended at $end (took $time_spent)"
+
+done # for TYPE in $TYPES ... build
+
+mv /w/out/nonfree/ /w/out/non-free/
+
+BUILD_END=`now`
+time_spent=`calc_time $BUILD_START $BUILD_END`
+log "DONE. Full build started at $BUILD_START, ended at $BUILD_END (took $time_spent)"

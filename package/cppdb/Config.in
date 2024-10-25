@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_CPPDB
+	bool "cppdb"
+	# dlfcn.h
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	# Can be built without them but it's useless
+	depends on LINGMO_PACKAGE_MARIADB || LINGMO_PACKAGE_POSTGRESQL || LINGMO_PACKAGE_SQLITE
+	help
+	  CppDB is an SQL connectivity library that is designed to
+	  provide platform and Database independent connectivity API
+	  similarly to what JDBC, ODBC and other connectivity libraries
+	  do.
+
+	  http://cppcms.com/sql/cppdb/
+
+comment "cppdb needs a toolchain w/ C++, threads, dynamic library"
+	depends on LINGMO_PACKAGE_MARIADB || LINGMO_PACKAGE_POSTGRESQL || LINGMO_PACKAGE_SQLITE
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

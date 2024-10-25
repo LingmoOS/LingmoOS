@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_HAWKTRACER
+	bool "hawktracer"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8 # C++11
+	help
+	  HawkTracer is a highly portable, low-overhead, configurable
+	  profiling tool built in Amazon Video for getting performance
+	  metrics from low-end devices.
+
+	  https://hawktracer.github.io/
+
+if LINGMO_PACKAGE_HAWKTRACER
+
+config LINGMO_PACKAGE_HAWKTRACER_TCP_LISTENER
+	bool "TCP listener"
+	default y
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+
+comment "TCP listener needs a toolchain w/ threads"
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif
+
+comment "hawktracer needs a toolchain w/ C++, gcc >= 4.8"
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_8

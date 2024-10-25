@@ -1,0 +1,47 @@
+config LINGMO_PACKAGE_PETITBOOT
+	bool "petitboot"
+	depends on LINGMO_PACKAGE_KEXEC_ARCH_SUPPORTS || LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU # lvm2
+	depends on LINGMO_USE_WCHAR # elfutils, kexec-lite
+	depends on !LINGMO_STATIC_LIBS # elfutils, kexec-lite, lvm2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # elfutils, kexec-lite, lvm2
+	depends on LINGMO_PACKAGE_HAS_UDEV
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17 || !LINGMO_PACKAGE_KEXEC_ARCH_SUPPORTS # kexec
+	select LINGMO_PACKAGE_ELFUTILS
+	select LINGMO_PACKAGE_LVM2 # devmapper
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_NCURSES_WCHAR
+	# run-time dependencies
+	select LINGMO_PACKAGE_KEXEC if !LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_KEXEC_LITE if LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS && !LINGMO_PACKAGE_KEXEC
+	select LINGMO_PACKAGE_NVME if ( LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le )
+	select LINGMO_PACKAGE_POWERPC_UTILS if ( LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le )
+	help
+	  Petitboot is a small kexec-based bootloader
+
+	  NOTE: petitboot looks best in a UTF-8 locale; be sure there
+	  is one listed in LINGMO_GENERATE_LOCALE.
+
+	  http://www.kernel.org/pub/linux/kernel/people/geoff/petitboot/petitboot.html
+
+if LINGMO_PACKAGE_PETITBOOT
+
+config LINGMO_PACKAGE_PETITBOOT_GETTY_PORT
+	string "TTY port(s)"
+	default "console"
+	help
+	  Specify a space-separated list of ports to run the petitboot
+	  UI on. Wildcards are allowed. Example: "hvc* ttys0 ttyS*"
+
+endif # LINGMO_PACKAGE_PETITBOOT
+
+comment "petitboot needs a toolchain w/ wchar, dynamic library, threads, udev /dev management"
+	depends on LINGMO_PACKAGE_KEXEC_ARCH_SUPPORTS
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || LINGMO_STATIC_LIBS || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_PACKAGE_HAS_UDEV
+
+comment "petitboot w/ kexec needs a toolchain w/ headers >= 3.17"
+	depends on LINGMO_PACKAGE_KEXEC_ARCH_SUPPORTS && !LINGMO_PACKAGE_KEXEC_LITE_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_17

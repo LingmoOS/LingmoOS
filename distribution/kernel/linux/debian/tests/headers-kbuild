@@ -1,0 +1,46 @@
+#!/bin/sh -eu
+
+KERNEL_RELEASE="$1"
+
+mkdir "$AUTOPKGTEST_TMP"/foo
+cat >"$AUTOPKGTEST_TMP"/foo/foo.c <<EOF
+#include <linux/kernel.h>
+#include <linux/module.h>
+
+static int __init foo_init(void)
+{
+	pr_info("foo initialised\n");
+	return 0;
+}
+module_init(foo_init);
+
+static void __exit foo_exit(void)
+{
+}
+module_exit(foo_exit);
+
+MODULE_LICENSE("GPL");
+EOF
+cat >"$AUTOPKGTEST_TMP"/foo/Kbuild <<EOF
+obj-m += foo.o
+EOF
+
+echo "I: Build for $KERNEL_RELEASE"
+# There are some warnings sent to stderr that we need to suppress,
+# but any other output to stderr should be treated as a failure.
+# We also want all stdout/stderr to appear in order in the log.
+# First, duplicate stdout to fd 3
+exec 3>&1
+# Next, run the build with stdout sent to the original stdout and
+# stderr sent through tee to both the original stdout and a file
+make -C /lib/modules/"$KERNEL_RELEASE"/build M="$AUTOPKGTEST_TMP"/foo V=1 \
+     2>&1 1>&3 | tee "$AUTOPKGTEST_TMP"/foo/make.stderr
+# Close fd 3
+exec 3>&-
+# Check for any stderr output that doesn't match the suppressions
+if grep -q -v -E 'Skipping BTF generation .* due to unavailability of vmlinux' "$AUTOPKGTEST_TMP"/foo/make.stderr; then
+    echo >&2 "E: Unexpected warning/error messages"
+fi
+
+echo "I: Clean"
+make -C /lib/modules/"$KERNEL_RELEASE"/build M="$AUTOPKGTEST_TMP"/foo V=1 clean

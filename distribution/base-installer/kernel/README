@@ -1,0 +1,79 @@
+Each architecture must define the following functions in kernel/$ARCH.sh:
+
+  arch_get_kernel_flavour ()
+
+    Prints a string describing the flavour of kernel to install. This can be
+    in whatever scheme you like; it just has to be in sync with the other
+    architecture-specific functions, where it's used.
+
+    May expect $ARCH and $SUBARCH to be set to the architecture and
+    subarchitecture (if applicable) respectively.
+
+    This function should describe the kernel flavour in sufficiently general
+    terms as to be able to test the usability of kernels of any major
+    version. As such, it is not a good idea to make this function
+    conditional on $KERNEL_MAJOR. If you need radically different kernel
+    names depending on the kernel major version, you should handle that in
+    the other architecture-specific functions.
+
+    Returns zero if successful, or non-zero otherwise. If non-zero, it
+    should print some kind of warning to syslog explaining why.
+
+  arch_check_usable_kernel (kernel, flavour)
+
+    Test whether a kernel is usable at all. For the purposes of this test,
+    we assume that SMP is usable on UP and vice versa (is this safe?). Some
+    architectures just have a hierarchy of optimized kernels, whereas some
+    have subarchitectures that are incompatible at the kernel level. This
+    function should cope with both cases.
+
+    Note that by default any postfix (starting with a hyphen) is allowed
+    after the flavor. This allows for custom kernels and also, for example,
+    for kernel meta packages for stable kernel updates that have a postfix
+    to distinguish them from the regular kernel meta packages.
+    This means that if a specific postfix (such as -smp, or -bigmem) is not
+    allowed, this should be tested explicitly.
+
+    The same goes for prefixes: any prefix before the flavor is allowed by
+    default.
+
+    Returns zero if the kernel is usable on this flavour, or non-zero
+    otherwise.
+
+  arch_get_kernel (flavour)
+
+    Print the preferred kernels for this flavour, one per line, in order of
+    preference.
+
+    No return value; must not fail. (If there's a problem, one of the two
+    functions above should already have failed.)
+
+Shell variables all functions may expect:
+
+  ARCH
+    The architecture (as returned by udpkg --print-architecture).
+  SUBARCH
+    The subarchitecture (as returned by archdetect).
+  CPUINFO
+    The location of /proc/cpuinfo, parameterised for the benefit of the test
+    suite.
+  OFCPUS
+    Open Firmware /cpus directory. Useful on OF platforms when CPUINFO grepping
+    won't work.
+  KERNEL_MAJOR
+    The major version of the running kernel, e.g. 2.6.
+  KERNEL_VERSION
+    The full version of the running kernel, e.g. 2.6.8.
+  KERNEL_FLAVOUR
+    The flavour of the running kernel, e.g. 486, 686-bigmem.
+  MACHINE
+    The machine hardware name (as returned by uname -m).
+  NUMCPUS
+    The number of CPUs in the machine. Will only be set if /var/numcpus
+    exists, and may not be very accurate (ie, 2 for any SMP machine).
+    Only of use when grepping CPUINFO won't work.
+
+Please update the regression tests in the tests/ directory when making
+changes here. In particular, calls to inspect the kernel version or
+files in /proc need support in the test suite so that the full test
+suite can be run for all architectures on any architecture.

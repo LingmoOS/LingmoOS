@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_RANGER
+	bool "ranger"
+	depends on LINGMO_USE_MMU # python3
+	depends on LINGMO_USE_WCHAR # python3
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # python3
+	depends on !LINGMO_STATIC_LIBS # python3
+	select LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_PYTHON3_CURSES
+	help
+	  ranger is a console file manager with VI key bindings. It
+	  provides a minimalistic and nice curses interface with a
+	  view on the directory hierarchy.  It ships with "rifle", a
+	  file launcher that is good at automatically finding out
+	  which program to use for what file type.
+
+	  https://ranger.github.io
+
+comment "ranger needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

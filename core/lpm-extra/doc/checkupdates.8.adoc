@@ -1,0 +1,80 @@
+checkupdates(8)
+===============
+
+Name
+----
+checkupdates - safely print a list of pending updates
+
+
+Synopsis
+--------
+'checkupdates' [options]
+
+
+Description
+-----------
+'checkupdates' checks for pending updates using a separate lpm database
+located in *`TMPDIR`* if *`CHECKUPDATES_DB`* is not set and outputs a list of
+updates with the old and new version.
+
+
+Options
+-------
+*-c, \--change*::
+	Check for new available updates only, prints the list of available updates
+	only if it differs from the last time checkupdates was run with that option.
+
+*-d, \--download*::
+	Download any pending updates to the lpm cache.
+
+*-h, \--help*::
+	Display syntax and command-line options.
+
+*\--nocolor*::
+	Do not colorize output. `Color` must be enabled in `lpm.conf` for the
+	listing to be colored to begin with.
+
+*-n, \--nosync*::
+	Do not sync the temporary database, works best when the temporary database
+	is updated regularly through some other means such as a cronjob or systemd
+	timer.
+
+*-V, \--version*::
+	Display version information.
+
+
+Environment
+-----------
+*CHECKUPDATES_DB*::
+	Override the default '$\{TMPDIR:-/tmp}/checkup-db-$\{UID}' temporary
+	database location.
+
+*CHECKUPDATES_CHANGE*::
+	Override the default '\${XDG_STATE_HOME:-$HOME/.local/state}/checkupdates'
+	state file location for the -c/--change option.
+
+*TMPDIR*::
+	Override the default '/tmp' temporary directory.
+
+*XDG_STATE_HOME*::
+	Override the default '$HOME/.local/state' state directory
+
+Errors
+------
+On exit, checkupdates will return one of the following error codes.
+
+0::
+	Normal exit condition.
+
+1::
+	Unknown cause of failure.
+
+2::
+	No updates are available.
+
+
+See Also
+--------
+linkman:lpm[8], linkman:lpm.conf[5]
+
+include::footer.adoc[]

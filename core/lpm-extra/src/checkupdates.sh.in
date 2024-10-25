@@ -1,0 +1,187 @@
+#!/bin/bash
+#
+#   checkupdates: Safely print a list of pending updates.
+#
+#   Copyright (c) 2013 Kyle Keen <keenerd@gmail.com>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+declare -r myname='checkupdates'
+declare -r myver='@PACKAGE_VERSION@'
+
+LIBRARY=${LIBRARY:-'@libmakepkgdir@'}
+
+DOWNLOAD_CACHE=0
+SYNC=1
+USE_COLOR=1
+
+# Import libmakepkg
+# shellcheck source=/dev/null
+source "$LIBRARY"/util/message.sh
+# shellcheck source=/dev/null
+source "$LIBRARY"/util/parseopts.sh
+
+die() {
+	error "$@"
+	exit 1
+}
+
+runcmd() {
+	if (( EUID != 0 )); then
+		msg 'Escalating privileges using sudo'
+		if sudo -v &>/dev/null && sudo -l &>/dev/null; then
+			sudo "$@"
+		else
+			die 'Failed to escalate'
+		fi
+	else
+		"$@"
+	fi
+}
+
+usage() {
+	cat <<EOF
+${myname} v${myver}
+
+Safely print a list of pending updates.
+
+Usage: ${myname} [options]
+
+Options:
+  -c, --change    print only when available updates differ from the last --change run
+  -d, --download  download pending updates to the lpm cache
+      --nocolor   do not colorize output (listing color also dependent on Color
+                  option in lpm.conf)
+  -n, --nosync    do not sync the temporary database
+  -h, --help      display this help message and exit
+  -V, --version   display version information and exit
+
+Environment Variables:
+  CHECKUPDATES_DB      override the path of the temporary database
+                       (default: "\${TMPDIR:-/tmp}/checkup-db-\${UID}")
+  CHECKUPDATES_CHANGE  override the path of the temporary files for the "change" option
+                       (default: "\${XDG_STATE_HOME:-\$HOME/.local/state}/${myname}")
+  TMPDIR               override the temporary directory (default: '/tmp')
+  XDG_STATE_HOME       override the state directory (default: '\$HOME/.local/state')
+EOF
+}
+
+version() {
+	printf "%s %s\n" "$myname" "$myver"
+}
+
+OPT_SHORT='dnchV'
+OPT_LONG=('download' 'nocolor' 'nosync' 'change' 'help' 'version')
+
+if ! parseopts "$OPT_SHORT" "${OPT_LONG[@]}" -- "$@"; then
+	exit 1
+fi
+set -- "${OPTRET[@]}"
+unset OPT_SHORT OPT_LONG OPTRET
+
+while :; do
+	case $1 in
+		-d|--download)
+			DOWNLOAD_CACHE=1 ;;
+		--nocolor)
+			USE_COLOR=0 ;;
+		-n|--nosync)
+			SYNC=0 ;;
+		-c|--change)
+			CHANGE=1 ;;
+		-h|--help)
+			usage
+			exit 0 ;;
+		-V|--version)
+			version
+			exit 0 ;;
+		--)
+			shift
+			break ;;
+	esac
+	shift
+done
+
+# check if messages are to be printed using color
+if [[ -t 2 ]] && (( USE_COLOR )); then
+	colorize
+
+	# check if lpm colors are to be kept in the updates array
+	if lpm-conf | grep -q Color; then
+		LPM_COLOR=1
+	fi
+else
+	unset ALL_OFF BOLD BLUE GREEN RED YELLOW
+fi
+
+if ! type -p fakeroot >/dev/null; then
+	die 'Cannot find the fakeroot binary'
+fi
+
+if [[ -z $CHECKUPDATES_DB ]]; then
+	CHECKUPDATES_DB="${TMPDIR:-/tmp}/checkup-db-${UID}/"
+fi
+
+trap 'rm -f $CHECKUPDATES_DB/db.lck' INT TERM EXIT
+
+if [[ -z $CHECKUPDATES_CHANGE ]]; then
+	CHECKUPDATES_CHANGE="${XDG_STATE_HOME:-$HOME/.local/state}/${myname}/"
+fi
+
+DBPath="$(lpm-conf DBPath)"
+if [[ -z "$DBPath" ]] || [[ ! -d "$DBPath" ]]; then
+	DBPath="@localstatedir@/lib/lpm/"
+fi
+
+if (( SYNC )); then
+	mkdir -p "$CHECKUPDATES_DB"
+	ln -s "${DBPath}/local" "$CHECKUPDATES_DB" &> /dev/null
+	if ! fakeroot -- lpm -Sy --dbpath "$CHECKUPDATES_DB" --logfile /dev/null &> /dev/null; then
+		die 'Cannot fetch updates'
+	fi
+fi
+
+if (( LPM_COLOR )); then
+	mapfile -t updates < <(lpm --color always -Qu --dbpath "$CHECKUPDATES_DB" 2> /dev/null | grep -v '\[.*\]')
+else
+	mapfile -t updates < <(lpm -Qu --dbpath "$CHECKUPDATES_DB" 2> /dev/null | grep -v '\[.*\]')
+fi
+
+if (( ${#updates[@]} )); then
+	if (( CHANGE )); then
+		mkdir -p "$CHECKUPDATES_CHANGE"
+		printf '%s\n' "${updates[@]}" > "$CHECKUPDATES_CHANGE/current_check"
+
+		if ! diff "$CHECKUPDATES_CHANGE/current_check" "$CHECKUPDATES_CHANGE/last_check" &>/dev/null; then
+			cat "$CHECKUPDATES_CHANGE/current_check"
+		fi
+
+		mv -f "$CHECKUPDATES_CHANGE/current_check" "$CHECKUPDATES_CHANGE/last_check"
+	else
+		printf '%s\n' "${updates[@]}"
+		if (( DOWNLOAD_CACHE )); then
+			if (( LPM_COLOR )); then
+				updates=("${updates[@]#*m}")
+			fi
+			runcmd lpm -Sw --noconfirm "${updates[@]%% *}" --dbpath "$CHECKUPDATES_DB" --logfile /dev/null
+		fi
+	fi
+else
+	if (( CHANGE )); then
+		mkdir -p "$CHECKUPDATES_CHANGE"
+		true > "$CHECKUPDATES_CHANGE/last_check"
+	fi
+	exit 2
+fi

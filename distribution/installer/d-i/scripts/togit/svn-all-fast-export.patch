@@ -1,0 +1,145 @@
+commit e8121e7c82fcf95f9028624c80f6e82d3d94a4a2
+Author: Joey Hess <joey@kitenet.net>
+Date:   Wed Oct 20 18:16:12 2010 -0400
+
+    patch1
+
+diff --git a/src/main.cpp b/src/main.cpp
+index 35535c9..dd7c447 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -66,6 +66,8 @@ int main(int argc, char **argv)
+ 
+     int min_rev = options.options.value("resume-from").toInt();
+     int max_rev = options.options.value("max-rev").toInt();
++
++    printf("resume: %i\n", min_rev);
+     if (min_rev < 1)
+         min_rev = 1;
+ 
+@@ -85,8 +87,10 @@ int main(int argc, char **argv)
+     if (max_rev < 1)
+         max_rev = svn.youngestRevision();
+     for (int i = min_rev; i <= max_rev; ++i)
+-        if (!svn.exportRevision(i))
++        if (!svn.exportRevision(i)) {
++    	    printf("svn.exportRevision(%i) failed\n", i);
+             break;
++	}
+ 
+     foreach (Repository *repo, repositories) {
+         repo->finalizeTags();
+@@ -94,5 +98,6 @@ int main(int argc, char **argv)
+     }
+ 
+     // success
++    printf("successful end of svn-all-fast-import\n");
+     return 0;
+ }
+diff --git a/src/options.cpp b/src/options.cpp
+index 892b6e1..d8c48e5 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -53,6 +53,8 @@ void Options::parseArguments(const QStringList &argumentList)
+         QString arg = arguments.takeFirst();
+         QString complement;
+ 
++        printf("arg: %s\n", qPrintable(arg));
++
+         if (arg == "--")
+             break;
+ 
+@@ -73,6 +75,7 @@ void Options::parseArguments(const QStringList &argumentList)
+         if (arg.contains('=') && complement.isEmpty()) {
+             int pos = arg.indexOf('=');
+             complement = arg.mid(pos + 1);
++	    printf("complement: %s\n", qPrintable(complement));
+             arg.truncate(pos);
+         }
+ 
+diff --git a/src/repository.cpp b/src/repository.cpp
+index 182309c..b7faaa7 100644
+--- a/src/repository.cpp
++++ b/src/repository.cpp
+@@ -31,8 +31,9 @@ public:
+         remove(repo);
+ 
+         // if the cache is too big, remove from the front
+-        while (size() >= maxSimultaneousProcesses)
+-            takeFirst()->closeFastImport();
++	// disabled to see if it's causing commit lossage JEH
++        //while (size() >= maxSimultaneousProcesses)
++        //    takeFirst()->closeFastImport();
+ 
+         // append to the end
+         append(repo);
+@@ -210,7 +211,7 @@ void Repository::finalizeTags()
+         if (!message.endsWith('\n'))
+             message += '\n';
+         if (Options::globalOptions->switches.value("metadata", true))
+-            message += "\nsvn path=" + tag.svnprefix + "; revision=" + QByteArray::number(tag.revnum) + "\n";
++            message += "\nr" + QByteArray::number(tag.revnum) + "\n";
+ 
+         {
+             QByteArray branchRef = tag.supportingRef.toUtf8();
+@@ -259,6 +260,7 @@ void Repository::startFastImport()
+ #else
+         fastImport.start("/bin/cat", QStringList());
+ #endif
++	//printf("started git fast-import for %s\n", name->data);
+ 
+         reloadBranches();
+     }
+@@ -323,7 +325,7 @@ void Repository::Transaction::commit()
+     if (!message.endsWith('\n'))
+         message += '\n';
+     if (Options::globalOptions->switches.value("metadata", true))
+-        message += "\nsvn path=" + svnprefix + "; revision=" + QByteArray::number(revnum) + "\n";
++        message += "\nr" + QByteArray::number(revnum) + "\n";
+ 
+     {
+         QByteArray branchRef = branch;
+@@ -364,6 +366,9 @@ void Repository::Transaction::commit()
+     printf(" %d modifications to \"%s\"",
+            deletedFiles.count() + modifiedFiles.count(),
+            qPrintable(repository->name));
++    printf(" (Commit #%i = SVN r%i) ",
++		    repository->commitCount,
++		    revnum);
+ 
+     while (repository->fastImport.bytesToWrite())
+         if (!repository->fastImport.waitForBytesWritten(-1))
+diff --git a/src/svn.cpp b/src/svn.cpp
+index aff7191..04cf6bf 100644
+--- a/src/svn.cpp
++++ b/src/svn.cpp
+@@ -454,6 +454,13 @@ int SvnRevision::fetchRevProps()
+     svn_string_t *svndate = (svn_string_t*)apr_hash_get(revprops, "svn:date", APR_HASH_KEY_STRING);
+     svn_string_t *svnlog = (svn_string_t*)apr_hash_get(revprops, "svn:log", APR_HASH_KEY_STRING);
+ 
++    /* Hack to remove newline in author, for broken rev in d-i svn -- JEH */
++    char *nl=strchr((char *)svnauthor->data, '\n');
++    if (nl) {
++	    nl[0]='\0';
++	    fprintf(stderr, "author newline removal hack alert on %s!\n", (char *)svnauthor->data);
++    }
++
+     log = (char *)svnlog->data;
+     authorident = svnauthor ? identities.value((char *)svnauthor->data) : QByteArray();
+     epoch = get_epoch((char*)svndate->data);
+@@ -593,12 +600,13 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
+                          << "is an SVN rename from"
+                          << qPrintable(previous) << "rev" << rev_from;
+                 return EXIT_SUCCESS;
+-            } else {
++            } else if (0) { /* XXX HACH REMOVE JEH */
+                 // same repository but not same branch
+                 // this means this is a plain branch
+                 qDebug() << qPrintable(repository) << ": branch"
+                          << qPrintable(branch) << "is branching from"
+-                         << qPrintable(prevbranch);
++                         << qPrintable(prevbranch)
++			 << "rev" << rev_from;
+ 
+                 Repository *repo = repositories.value(repository, 0);
+                 if (!repo) {

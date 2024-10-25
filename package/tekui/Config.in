@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_TEKUI
+	bool "tekui"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_PACKAGE_HAS_LUAINTERPRETER
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_FREETYPE
+	select LINGMO_PACKAGE_LUAFILESYSTEM	# runtime only
+	select LINGMO_PACKAGE_LUAEXPAT		# runtime only
+	select LINGMO_PACKAGE_LUASOCKET		# runtime only
+	select LINGMO_PACKAGE_LUAPOSIX		# runtime only
+	help
+	  TekUI is a small, freestanding and portable graphical user
+	  interface (GUI) toolkit written in Lua and C. It was
+	  initially developed for the X Window System and has been
+	  ported to DirectFB, Windows, Nano-X and a raw framebuffer
+	  since
+
+	  http://tekui.neoscientists.org/
+
+comment "tekui needs a Lua interpreter and a toolchain w/ threads, dynamic library"
+	depends on !LINGMO_PACKAGE_HAS_LUAINTERPRETER || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS

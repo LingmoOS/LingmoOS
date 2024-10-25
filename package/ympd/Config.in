@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_YMPD
+	bool "ympd"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBMPDCLIENT
+	help
+	  ympd, a standalone MPD Web GUI written in C, utilizing
+	  Websockets and Bootstrap/JS
+
+	  https://www.ympd.org/
+
+comment "ympd needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

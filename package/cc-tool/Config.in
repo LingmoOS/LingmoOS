@@ -1,0 +1,25 @@
+config LINGMO_PACKAGE_CC_TOOL
+	bool "cc-tool"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS # boost-filesystem
+	depends on LINGMO_USE_WCHAR # boost-filesystem
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # libusb
+	select LINGMO_PACKAGE_LIBUSB
+	select LINGMO_PACKAGE_BOOST
+	select LINGMO_PACKAGE_BOOST_PROGRAM_OPTIONS
+	select LINGMO_PACKAGE_BOOST_SYSTEM
+	select LINGMO_PACKAGE_BOOST_REGEX
+	select LINGMO_PACKAGE_BOOST_FILESYSTEM
+	help
+	  cc-tool provides support for Texas Instruments CC Debugger
+	  for Linux OS in order to program 8051-based System-On-Chip
+	  devices: CC254x CC253x CC243x CC251x CC111x
+
+	  https://github.com/dashesy/cc-tool/
+
+comment "cc-tool needs a toolchain w/ C++, threads, wchar, gcc >= 4.9 "
+	depends on LINGMO_TOOLCHAIN_SUPPORTS_ALWAYS_LOCKFREE_ATOMIC_INTS
+	depends on !LINGMO_INSTALL_LIBSTDCPP || \
+		!LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		!LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

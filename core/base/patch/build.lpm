@@ -1,0 +1,54 @@
+pkgname=patch
+pkgver=2.7.6
+pkgrel=10
+pkgdesc='A utility to apply patch files to original sources'
+arch=('x86_64')
+url='https://www.gnu.org/software/patch/'
+license=('GPL')
+depends=('glibc' 'attr')
+makedepends=('ed')
+optdepends=('ed: for patch -e functionality')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=("https://ftp.gnu.org/gnu/$pkgname/$pkgname-$pkgver.tar.xz"
+        'https://github.com/mirror/patch/commit/f290f48a621867084884bfff87f8093c15195e6a.patch' # CVE-2018-6951
+        'https://github.com/mirror/patch/commit/b5a91a01e5d0897facdd0f49d64b76b0f02b43e1.patch'
+        'https://github.com/mirror/patch/commit/123eaff0d5d1aebe128295959435b9ca5909c26d.patch' # CVE-2018-1000156
+        'https://github.com/mirror/patch/commit/3fcd042d26d70856e826a42b5f93dc4854d80bf0.patch'
+        '19599883ffb6a450d2884f081f8ecf68edbed7ee.patch' # Fix memory leaks introduced in CVE-2018-1000165
+        'https://github.com/mirror/patch/commit/369dcccdfa6336e5a873d6d63705cfbe04c55727.patch'
+        'https://github.com/mirror/patch/commit/9c986353e420ead6e706262bf204d6e03322c300.patch' # CVE-2018-6952
+        'test-read-only.patch'
+        'https://github.com/mirror/patch/commit/61d7788b83b302207a67b82786f4fd79e3538f30.patch' # FS#78539
+        )
+
+prepare() {
+  cd $pkgname-$pkgver
+  # apply patch from the source array (should be a pacman feature)
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.patch ]] || continue
+    msg2 "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
+  autoreconf -fiv
+}
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:

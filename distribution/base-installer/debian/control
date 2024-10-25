@@ -1,0 +1,22 @@
+Source: base-installer
+Section: debian-installer
+Priority: required
+Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+Uploaders: Petter Reinholdtsen <pere@debian.org>, Colin Watson <cjwatson@debian.org>, dann frazier <dannf@debian.org>, Steve Langasek <vorlon@debian.org>, Steve McIntyre <93sam@debian.org>
+Build-Depends: debhelper-compat (= 13), libdebconfclient0-dev, libdebian-installer4-dev
+Vcs-Browser: https://salsa.debian.org/installer-team/base-installer
+Vcs-Git: https://salsa.debian.org/installer-team/base-installer.git
+
+Package: base-installer
+Package-Type: udeb
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, di-utils-mapdevfs, di-utils, rootskel
+Description: base system installation framework
+
+Package: bootstrap-base
+Package-Type: udeb
+Architecture: any
+Depends: ${shlibs:Depends}, mounted-partitions, created-fstab, base-installer, debootstrap-udeb, gpgv-udeb, debian-archive-keyring-udeb, archdetect, ${misc:Depends}
+Provides: kernel-installer, installed-base
+XB-Installer-Menu-Item: 6500
+Description: Install the base system

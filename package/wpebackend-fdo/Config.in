@@ -1,0 +1,20 @@
+comment "wpebackend-fdo needs a toolchain w/ C++, wchar, threads, dynamic library and an OpenEGL-capable Wayland backend"
+	depends on !LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND || !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_USE_WCHAR \
+		|| !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_WPEBACKEND_FDO
+	bool "wpebackend-fdo"
+	depends on !LINGMO_STATIC_LIBS # wayland
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # wayland, libglib2
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	depends on LINGMO_PACKAGE_HAS_LIBEGL_WAYLAND
+	select LINGMO_PACKAGE_LIBEPOXY
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBWPE
+	select LINGMO_PACKAGE_WAYLAND
+	help
+	  WPEBackend interface using freedesktop.org API.
+
+	  https://wpewebkit.org/

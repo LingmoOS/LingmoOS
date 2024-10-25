@@ -1,0 +1,76 @@
+config LINGMO_PACKAGE_SHAIRPORT_SYNC
+	bool "shairport-sync"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	select LINGMO_PACKAGE_ALSA_LIB
+	select LINGMO_PACKAGE_ALSA_LIB_MIXER
+	select LINGMO_PACKAGE_LIBCONFIG
+	select LINGMO_PACKAGE_OPENSSL if !LINGMO_PACKAGE_MBEDTLS
+	select LINGMO_PACKAGE_POPT
+	help
+	  Shairport Sync emulates an AirPort Express for the purpose
+	  of streaming audio from iTunes, iPods, iPhones, iPads and
+	  AppleTVs.  Audio played by a Shairport Sync-powered device
+	  stays in synchrony with the source and thus with other
+	  devices that are playing the same source
+	  synchronously. Thus, for example, synchronised multi-room
+	  audio is possible without difficulty.
+
+	  https://github.com/mikebrady/shairport-sync
+
+if LINGMO_PACKAGE_SHAIRPORT_SYNC
+
+config LINGMO_PACKAGE_SHAIRPORT_SYNC_CONVOLUTION
+	bool "convolution support"
+	select LINGMO_PACKAGE_LIBSNDFILE
+	help
+	  Enable audio DSP convolution support.
+
+config LINGMO_PACKAGE_SHAIRPORT_SYNC_DBUS
+	bool "dbus support"
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2
+	depends on LINGMO_USE_MMU # libglib2
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Enable support for support for the MPRIS and native
+	  Shairport Sync D-Bus interface.
+
+comment "shairport-sync dbus support needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_SHAIRPORT_SYNC_LIBSOXR
+	bool "libsoxr support"
+	select LINGMO_PACKAGE_LIBSOXR
+	help
+	  Enable support for libsoxr, the SoX Resampler library.
+
+	  Briefly, Shairport Sync keeps in step with the audio source
+	  by deleting or inserting frames of audio into the stream as
+	  needed. This "interpolation" is normally inaudible, but it
+	  can be heard in some circumstances. Libsoxr allows this
+	  interpolation to be done much more smoothly and subtly.
+
+config LINGMO_PACKAGE_SHAIRPORT_SYNC_MQTT
+	bool "mqtt support"
+	depends on LINGMO_USE_MMU # avahi
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # avahi
+	depends on !LINGMO_STATIC_LIBS # avahi
+	select LINGMO_PACKAGE_AVAHI
+	select LINGMO_PACKAGE_AVAHI_DAEMON
+	select LINGMO_PACKAGE_DBUS
+	select LINGMO_PACKAGE_MOSQUITTO
+	help
+	  Enable support for the MQTT, the Message Queuing Telemetry
+	  Transport protocol.
+
+comment "shairport-sync mqtt support needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+endif
+
+comment "shairport-sync needs a toolchain w/ C++, NPTL"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

@@ -1,0 +1,296 @@
+#! /bin/sh
+
+#   This script is debian-installer/scripts/gen_stats
+#     DI_HOME is an absolute path to debian-installer
+#     webwmldir is an absolute path to webwml checkout 
+#               ($webwmldir/Perl is needed).
+
+DI_HOME=$HOME/debian-installer
+cd $DI_HOME
+webwmldir=$HOME/webwml
+
+LOCKFILE=$DI_HOME/lock
+
+if test -f "$LOCKFILE"; then
+    echo "Lock file $LOCKFILE does exist... aborting" 1>&2
+    exit 1
+fi
+:> $LOCKFILE
+
+remove_pot ()
+{
+    oldcwd=`pwd`
+    find $DI_HOME \( -name \*.po -o -name templates.pot \) | xargs -n 20 rm -f
+    cd $DI_HOME/base-config
+    cvs -z3 update -P -d -A >/dev/null 2>&1
+    cd $DI_HOME/debian-installer
+    cvs -z3 update -P -d -A >/dev/null 2>&1
+    cd $DI_HOME/tasksel
+    svn update >/dev/null 2>&1
+    cd $oldcwd
+}
+
+remove_pot
+finaldestdir=$HOME/public_html/debian-installer/l10n
+destdir=$finaldestdir.new
+rm -rf $destdir 2>/dev/null
+mkdir -p $destdir
+mkdir $destdir/POT
+for f in `find * -name templates.pot | sort`
+do
+    dir=`echo $f | sed -e 's,/debian/po/templates.pot,,'`
+    test "$dir" = "$f" && continue
+    for p in $dir/debian/po/*.po
+    do
+        [ -r $p ] || continue
+        l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
+        test -d $destdir/$l || mkdir $destdir/$l
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
+        eval "x1$l=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`"
+    done
+    ( cd $dir; debconf-updatepo 2>/dev/null )
+    cp $f $destdir/POT/`echo $dir | sed -e 's,.*/,,'`.pot
+    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
+    totstr=`expr ${totstr:-0} + $nstr`
+    for p in $dir/debian/po/*.po
+    do
+        [ -r $p ] || continue
+        l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || {
+            eval "tot_u_$l=\`expr \${tot_u_${l}:-0} + $nstr\`"
+            echo "! $dir: Invalid PO file" >> $destdir/$l/STATUS.utf8.txt
+            continue
+        }
+        x2=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`
+        str_t=`echo $x2 | sed -e 's/[0-9]*f//' -e 's/[0-9]*u//' -e 's/t//'`
+        str_f=`echo $x2 | sed -e 's/[0-9]*t//' -e 's/[0-9]*u//' -e 's/f//'`
+        str_u=`echo $x2 | sed -e 's/[0-9]*t//' -e 's/[0-9]*f//' -e 's/u//'`
+        eval "xx=\${tot_t_${l}:-0}; tot_t_$l=\`expr \$xx + ${str_t:-0}\`"
+        eval "xx=\${tot_f_${l}:-0}; tot_f_$l=\`expr \$xx + ${str_f:-0}\`"
+        eval "xx=\${tot_u_${l}:-0}; tot_u_$l=\`expr \$xx + ${str_u:-0}\`"
+
+        t=`msgconv -t UTF-8 $p | grep '^"Last-Translator:' 2>/dev/null | sed -e 's/[^:]*: *//' -e 's/ *<.*//'`
+        u=' '
+        echo $x2 | grep '[fu]' >/dev/null 2>&1 || continue
+        eval "test \"\$x1$l\" = \"\$x2\" || u='*'"
+        echo "$u $dir: $x2  [$t]" >> $destdir/$l/STATUS.utf8.txt
+        cp $p $destdir/$l/`echo $dir | sed -e 's,/,_,g'`_$l.po
+    done
+done
+
+#  Special cases
+for dir in base-config tasksel tasksel/tasks
+do
+    case $dir in
+      tasksel/tasks ) f=$dir/po/debian-tasks.pot ;;
+      * ) f=$dir/po/$dir.pot ;;
+    esac
+    for p in $dir/po/*.po
+    do
+        [ -r $p ] || continue
+        l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
+        test -d $destdir/$l || mkdir $destdir/$l
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
+        eval "x1$l=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`"
+    done
+    case "$dir" in
+      base-config )
+        ( cd $dir/po; rm -f base-config.pot >/dev/null 2>&1; make *.po >/dev/null 2>&1 )
+        ;;
+      tasksel )
+        ( cd $dir; make updatepo >/dev/null 2>&1 )
+        ;;
+      tasksel/tasks )
+        ( cd $dir; make updatetaskspo >/dev/null 2>&1 )
+        ;;
+    esac
+    cp $f $destdir/POT/`echo $dir | sed -e 's,/,_,g'`.pot
+    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
+    totstr=`expr ${totstr:-0} + $nstr`
+    for p in $dir/po/*.po
+    do
+        [ -r $p ] || continue
+        l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || {
+            eval "tot_u_$l=\`expr \${tot_u_${l}:-0} + $nstr\`"
+            echo "! $dir/po: Invalid PO file" >> $destdir/$l/STATUS.utf8.txt
+            continue
+        }
+        x2=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`
+        str_t=`echo $x2 | sed -e 's/[0-9]*f//' -e 's/[0-9]*u//' -e 's/t//'`
+        str_f=`echo $x2 | sed -e 's/[0-9]*t//' -e 's/[0-9]*u//' -e 's/f//'`
+        str_u=`echo $x2 | sed -e 's/[0-9]*t//' -e 's/[0-9]*f//' -e 's/u//'`
+        eval "xx=\${tot_t_${l}:-0}; tot_t_$l=\`expr \$xx + ${str_t:-0}\`"
+        eval "xx=\${tot_f_${l}:-0}; tot_f_$l=\`expr \$xx + ${str_f:-0}\`"
+        eval "xx=\${tot_u_${l}:-0}; tot_u_$l=\`expr \$xx + ${str_u:-0}\`"
+
+        t=`msgconv -t UTF-8 $p | grep '^"Last-Translator:' 2>/dev/null | sed -e 's/[^:]*: *//' -e 's/ *<.*//'`
+        u=' '
+        echo $x2 | grep '[fu]' >/dev/null 2>&1 || continue
+        eval "test \"\$x1$l\" = \"\$x2\" || u='*'"
+        echo "$u $dir/po: $x2  [$t]" >> $destdir/$l/STATUS.utf8.txt
+        cp $p $destdir/$l/`echo ${dir} | sed -e 's,/,_,g'`_po_$l.po
+    done
+done
+
+langs=`( cd $destdir && echo [a-z][a-z]* )`
+for l in $langs
+do
+    echo >> $destdir/$l/STATUS.utf8.txt
+done
+
+cat >$destdir/README.txt <<'EOT'
+Here are daily reports about l10n status in the debian-installer.
+
+Each subdirectory contains a STATUS.utf8.txt file (which is UTF-8 encoded);
+this file gives statistics on the current CVS status for this language.
+Report contains
+  a. An optional list of outdated translations with the current translator, 
+  b. An optional list of missing translations
+  c. The global statistics when all PO files are concatenated.
+
+Files listed under (a) are also available in these subdirectories.  Unlike
+PO files stored in CVS, these files are always up-to-date with respect to
+English messages because debconf-updatepo was run before copying them.
+
+The <lang>/<lang>.po file is a concatenation of all PO files for this
+language.  It is very useful to track down inconsistencies between
+translations.
+
+Example:
+    * debian-installer/tools/lilo-installer: 2t1f7u  [Foo Bar]
+      debian-installer/tools/netcfg: 9t19f33u  [Foo Bar]
+    ! debian-installer/tools/partconf: Invalid PO file
+  On the first line, an asterisk tells that the file in the CVS
+  repository is outdated, debconf-updatepo must be run first.  This file
+  is translated by Foo Bar, and there are 2 translated strings, 1 fuzzy
+  and 7 not yet translated.
+  On the 2nd line, the PO file stored in CVS is up-to-date, but many
+  strings are fuzzy (19) or not translated at all (33).
+  The exclamation mark on the 3rd line tells that PO file is invalid, so
+  statistics cannot be provided and global PO file containing strings
+  from all PO files is not generated.
+
+If you want to update a translation, please always contact the previous
+translator in order to prevent duplication of work.  His mail address can
+be found in the PO file.
+
+Any general text editor can be used to work on PO files, and there are
+some specific tools like gtranslator or kbabel which can be helpful if
+you are not familiar with PO files.  Gettext documentation contains
+explanations about the PO file format, and you must read at least the
+'Filling in the Header Entry' and 'The Format of PO Files' sections.
+
+When you have finished your translation, always re-read your file at
+least once to correct all meaning-, spelling-, grammar-, typo-, etc-
+mistakes (maybe your po-editor does include a spellchecker or a
+translation helper like acheck).  Running
+  msgfmt --check --statistics <YOUR LANGUAGE CODE>.po
+(from the gettext package) before committing is also a good idea to
+check that your file is valid and will be integrated without trouble.
+
+You could also run podebconf-display-po (from po-debconf >= 0.8.3)
+on your file:
+  podebconf-display-po -fdialog debian/po/<YOUR LANGUAGE CODE>.po
+to have a rough idea on how your translation will look like.  But
+as cdebconf and debconf displays slightly differ, and as some scripts
+do heavy use of text substitution, do not fully rely on this program.
+Running debian-installer is the only solution to test translations.
+
+And don't forget to update the changelog when committing files to CVS,
+this is important to keep track of changes between releases.  If the
+distribution in the first line of debian/changelog is UNRELEASED, this
+means that it has been patched since the last upload.  In this case all
+you have to do is to add an entry at the end of this revision.
+Otherwise distribution is unstable, and you have then to bump version
+number.  You can do it by hand, or by running
+  dch -i
+but in any case remember to replace unstable by UNRELEASED in the
+distribution field.  Then add a comment about your contribution.
+
+If you need further assistance, do not hesitate to ask for help on
+debian-boot (for debian-installer related stuff) or debian-i18n (for
+l10n related questions) Debian mailing lists.
+EOT
+
+#  Find untranslated files
+for f in `find * -name templates.pot`
+do
+    dir=`echo $f | sed -e 's,/debian/po/templates.pot,,'`
+    test "$dir" = "$f" && continue
+    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
+    for l in $langs
+    do
+        if test -f "$dir/debian/po/$l.po"; then
+	    :
+	else
+            eval "xx=\${tot_u_${l}:-0}; tot_u_$l=\`expr \$xx + $nstr\`"
+	    echo "Missing file: $dir/debian/po/$l.po" >> $destdir/$l/STATUS.utf8.txt
+	fi
+    done
+done
+
+#  Special cases
+for dir in base-config tasksel tasksel/tasks
+do
+    for l in $langs
+    do
+        if test -f "$dir/po/$l.po"; then
+	    :
+	else
+            eval "xx=\${tot_u_${l}:-0}; tot_u_$l=\`expr \$xx + $nstr\`"
+	    echo "Missing file: $dir/po/$l.po" >> $destdir/$l/STATUS.utf8.txt
+	fi
+    done
+done
+
+#  Now merge all files into a single PO file
+cd $DI_HOME/debian-installer
+test -d po || mkdir po
+for l in $langs
+do
+    perl -I $webwmldir/Perl scripts/gettext-helper export $l >/dev/null 2>&1
+    echo >> $destdir/$l/STATUS.utf8.txt
+    eval "stats=\`expr \${tot_t_$l}00 / $totstr\`"
+    po_merged=
+    if grep '^"Content-Type: \\n"$' po/$l.po >/dev/null 2>&1; then
+        echo "Some PO files are invalid, $l.po cannot be generated" >> $destdir/$l/STATUS.utf8.txt
+        po_merged='(Some PO files are invalid)'
+    else
+        x2=`msgfmt -o /dev/null --statistics po/$l.po 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`
+        echo "All debian-installer PO files merged together: $l.po  $x2" >> $destdir/$l/STATUS.utf8.txt
+        cp po/$l.po $destdir/$l/$l.po
+        if echo $x2 | grep '[fu]' >/dev/null 2>&1; then
+            [ "$stats" = 100 ] && po_merged="(Merged PO file: $x2)"
+        fi
+    fi
+    echo >> $destdir/$l/STATUS.utf8.txt
+    eval "echo Global statistics: \${tot_t_$l}t\${tot_f_$l}f\${tot_u_$l}u'   '\(${stats}%\) >> $destdir/$l/STATUS.utf8.txt"
+    echo >> $destdir/$l/STATUS.utf8.txt
+    echo "PO files are available at http://people.debian.org/~barbier/d-i/l10n/$l/" >> $destdir/$l/STATUS.utf8.txt
+    echo >> $destdir/$l/STATUS.utf8.txt
+    echo "Files fetched and report generated on: "`date -u` >> $destdir/$l/STATUS.utf8.txt
+    echo "${stats}% $l  $po_merged" >> $destdir/rank
+    ln -s ../README.txt $destdir/$l/README.txt
+    cat >> $destdir/$l/STATUS.utf8.txt <<'EOT'
+
+If you want to update a translation, please *always* contact the previous
+translator in order to prevent duplication of work.  His mail address can
+be found in the PO file.  Other informations are also available at
+  http://people.debian.org/~barbier/d-i/l10n/README.txt
+please read these instructions before updating PO files.
+EOT
+done
+
+remove_pot
+
+sort -n $destdir/rank | tac > $destdir/rank.txt
+rm -f $destdir/rank
+
+test -d "$finaldestdir.old" && rm -rf "$finaldestdir.old"
+test -d "$finaldestdir" && mv "$finaldestdir" "$finaldestdir.old"
+mv "$destdir" "$finaldestdir"
+test -d "$finaldestdir.old" && rm -rf "$finaldestdir.old"
+rm -f "$LOCKFILE"
+
+exit 0

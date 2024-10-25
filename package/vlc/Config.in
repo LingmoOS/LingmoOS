@@ -1,0 +1,32 @@
+config LINGMO_PACKAGE_VLC
+	bool "vlc"
+	depends on !LINGMO_RISCV_32
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # C++11
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_7
+	select LINGMO_PACKAGE_LIBVORBIS if LINGMO_PACKAGE_OPUS
+	select LINGMO_PACKAGE_VLC_OPENCV3_BACKEND if LINGMO_PACKAGE_OPENCV3
+	select LINGMO_PACKAGE_ZLIB if LINGMO_PACKAGE_TAGLIB
+	help
+	  VLC is a free and open source cross-platform multimedia player
+	  and framework that plays most multimedia files as well as DVD,
+	  Audio CD, VCD, and various streaming protocols.
+
+	  http://www.videolan.org/vlc/
+
+config LINGMO_PACKAGE_VLC_OPENCV3_BACKEND
+	bool
+	select LINGMO_PACKAGE_OPENCV3_LIB_IMGPROC
+	select LINGMO_PACKAGE_OPENCV3_LIB_OBJDETECT
+
+comment "vlc needs a toolchain w/ C++, dynamic library, wchar, threads, gcc >= 4.9, headers >= 3.7"
+	depends on !LINGMO_RISCV_32
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP || LINGMO_STATIC_LIBS \
+		|| !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 \
+		|| !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_7

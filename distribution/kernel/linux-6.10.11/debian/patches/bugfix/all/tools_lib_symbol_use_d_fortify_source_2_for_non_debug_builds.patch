@@ -1,0 +1,31 @@
+From: Uwe Kleine-König <ukleinek@debian.org>
+Subject: tools lib symbol: Use -D_FORTIFY_SOURCE=2 for non-debug builds
+Date: Mon, 24 Apr 2023 12:28:27 +0200
+Forwarded: https://lore.kernel.org/all/20230424102827.58707-1-ukleinek@debian.org/
+
+Commit 160be157eaba ("tool lib symbol: Add Makefile/Build") failed to
+define _FORTIFY_SOURCE to 2, probabaly this was cut&pasted from other
+Makefiles with the same problem.
+
+Fixes: 160be157eaba ("tool lib symbol: Add Makefile/Build")
+Signed-off-by: Uwe Kleine-König <ukleinek@debian.org>
+Acked-by: Ian Rogers <irogers@google.com>
+---
+ tools/lib/symbol/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/lib/symbol/Makefile b/tools/lib/symbol/Makefile
+index 13d43c6f92b4..4a08cc4e19f2 100644
+--- a/tools/lib/symbol/Makefile
++++ b/tools/lib/symbol/Makefile
+@@ -39,7 +39,7 @@ endif
+ endif
+ 
+ ifeq ($(DEBUG),0)
+-  CFLAGS += -D_FORTIFY_SOURCE
++  CFLAGS += -D_FORTIFY_SOURCE=2
+ endif
+ 
+ # Treat warnings as errors unless directed not to
+-- 
+2.39.2

@@ -1,0 +1,88 @@
+config LINGMO_PACKAGE_VALGRIND_ARCH_SUPPORTS
+	bool
+	default y if LINGMO_aarch64
+	default y if LINGMO_ARM_CPU_ARMV7A
+	default y if LINGMO_mips || LINGMO_mipsel || LINGMO_mips64 || LINGMO_mips64el
+	default y if LINGMO_i386 || LINGMO_x86_64
+	default y if LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	depends on !LINGMO_MIPS_SOFT_FLOAT
+
+comment "valgrind needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_PACKAGE_VALGRIND_ARCH_SUPPORTS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_VALGRIND
+	bool "valgrind"
+	depends on LINGMO_PACKAGE_VALGRIND_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	help
+	  Tool for debugging and profiling Linux programs.
+
+	  http://valgrind.org/
+
+if LINGMO_PACKAGE_VALGRIND
+
+config LINGMO_PACKAGE_VALGRIND_MEMCHECK
+	bool "Memcheck: a memory error detector"
+	default y
+	help
+	  This option allows to install the Memcheck tool
+
+config LINGMO_PACKAGE_VALGRIND_CACHEGRIND
+	bool "Cachegrind: a cache and branch-prediction profiler"
+	default y
+	help
+	  This option allows to install the Cachegrind tool
+
+config LINGMO_PACKAGE_VALGRIND_CALLGRIND
+	bool "Callgrind: a call-graph generating cache and branch prediction profiler"
+	default y
+	help
+	  This option allows to install the Callgrind tool
+
+config LINGMO_PACKAGE_VALGRIND_HELGRIND
+	bool "Helgrind: a thread error detector"
+	default y
+	help
+	  This option allows to install the Helgrind tool
+
+config LINGMO_PACKAGE_VALGRIND_DRD
+	bool "DRD: a thread error detector"
+	default y
+	help
+	  This option allows to install the DRD tool
+
+config LINGMO_PACKAGE_VALGRIND_MASSIF
+	bool "Massif: a heap profiler"
+	default y
+	help
+	  This option allows to install the Massif tool
+
+config LINGMO_PACKAGE_VALGRIND_DHAT
+	bool "DHAT: a dynamic heap analysis tool"
+	default y
+	help
+	  This option allows to install the DHAT tool
+
+config LINGMO_PACKAGE_VALGRIND_SGCHECK
+	bool "SGCheck: an experimental stack and global array overrun detector"
+	help
+	  This option allows to install the SGCheck tool
+
+config LINGMO_PACKAGE_VALGRIND_BBV
+	bool "BBV: an experimental basic block vector generation tool"
+	help
+	  This option allows to install the BBV tool
+
+config LINGMO_PACKAGE_VALGRIND_LACKEY
+	bool "Lackey: an example tool"
+	help
+	  This option allows to install the Lackey tool
+
+config LINGMO_PACKAGE_VALGRIND_NULGRIND
+	bool "Nulgrind: the minimal Valgrind tool"
+	help
+	  This option allows to install the Nulgrind tool
+
+endif

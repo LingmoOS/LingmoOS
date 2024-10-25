@@ -1,0 +1,32 @@
+config LINGMO_PACKAGE_LIBNSS
+	bool "libnss"
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libnspr
+	depends on LINGMO_PACKAGE_LIBNSPR_ARCH_SUPPORT # libnspr
+	depends on !LINGMO_STATIC_LIBS
+	select LINGMO_PACKAGE_LIBNSPR
+	select LINGMO_PACKAGE_SQLITE
+	select LINGMO_PACKAGE_ZLIB
+	help
+	  Network Security Services (NSS) is a set of libraries designed
+	  to support development of security-enabled client and server
+	  applications. Applications built with NSS can support SSL v2
+	  and v3, TLS, PKCS #5, PKCS #7, PKCS #11, PKCS #12, S/MIME,
+	  and X.509 v3 certificates.
+
+	  http://www.mozilla.org/projects/security/pki/nss/
+
+if LINGMO_PACKAGE_LIBNSS
+
+config LINGMO_PACKAGE_LIBNSS_ARCH
+	string
+	default "aarch64" if LINGMO_aarch64_be
+	default "ppc"     if LINGMO_powerpc
+	default "ppc64"   if LINGMO_powerpc64
+	default "ppc64le" if LINGMO_powerpc64le
+	default LINGMO_ARCH
+
+endif
+
+comment "libnss needs a toolchain w/ threads, dynamic library"
+	depends on LINGMO_PACKAGE_LIBNSPR_ARCH_SUPPORT
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

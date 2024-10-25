@@ -1,0 +1,93 @@
+#!/bin/bash
+
+source /usr/share/lingmo-settings/tools/bashimport/transhell.amber
+load_transhell
+
+case $(arch) in
+x86_64)
+    STORE_URL="store"
+    STORE_LIST_URL=""
+    ;;
+aarch64)
+    STORE_URL="aarch64-store"
+    STORE_LIST_URL="-aarch64"
+    ;;
+esac
+
+LM_APT_FAST="/usr/share/lingmo-settings/tools/apt-fast/lm-apt-fast"
+
+is_empty_dir() {
+    return "$(ls -A $1 | wc -w)"
+}
+
+update_server_and_mirror_config() {
+    mkdir -p /tmp/aptlm-conf/
+    echo -e "\e[1;32m$TRANSHELL_CONTENT_GETTING_SERVER_CONFIG_AND_MIRROR_LIST\e[0m"
+    echo
+    curl --silent -o /tmp/aptlm-conf/apt-fast.conf "https://dev-mirror.300c.top/devrepo/apt-fast.conf"
+    chmod -R 755 /tmp/aptlm-conf
+    curl --silent -o /usr/share/lingmo-settings/tools/apt-fast-conf/sources.list.d/lingmoos.list "https://dev-mirror.300c.top/devrepo/lingmoos.list"
+    apt update -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0" -o Dir::Etc::sourcelist="/usr/share/lingmo-settings/tools/apt-fast-conf/sources.list.d/lingmoos.list"
+}
+
+if [ "$(id -u)" != "0" ]; then
+    # 无 root 权限
+    echo -e "\e[1;32m$TRANSHELL_CONTENT_RUNNING_IN_NOT_ROOT_USER\e[0m"
+else
+    # 创建链接和系统同步，随后清除无效链接
+    ln -sf /etc/apt/sources.list.d/* /usr/share/lingmo-settings/tools/apt-fast-conf/sources.list.d
+    find /usr/share/lingmo-settings/tools/apt-fast-conf/sources.list.d -xtype l -delete
+fi
+
+# 刷新apt-fast配置
+if [ ! -e "/tmp/aptlm-conf/apt-fast.conf" ]; then
+    mkdir -p /tmp/aptlm-conf/
+    echo -e "\e[1;32m$TRANSHELL_CONTENT_GETTING_SERVER_CONFIG_AND_MIRROR_LIST\e[0m"
+    echo
+    curl --progress-bar -o /tmp/aptlm-conf/apt-fast.conf "https://dev-mirror.300c.top/devrepo/apt-fast.conf"
+    chmod -R 755 /tmp/aptlm-conf
+fi
+
+# 更新源地址并进行apt catch 更新
+# ToDo: 此处需要按需修改
+if [ ! -e "/var/lib/aptlm/lists/d.spark-app.store_${STORE_URL}_Packages" ] && [ ! -e "/var/lib/aptlm/lists/d.store.deepinos.org.cn_${STORE_URL}_Packages" ] && [ ! -e "/var/lib/aptlm/lists/mirrors.sdu.edu.cn_spark-store-repository_${STORE_URL}_Packages" ]; then
+    update_server_and_mirror_config
+fi
+
+# 判断操作
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ] || [ "$1" = "full-upgrade" ]; then
+
+    $LM_APT_FAST "$@" --allow-downgrades -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf
+    ret="$?"
+    if [ "$ret" -ne 0 ]; then
+        echo -e "\e[1;33m$TRANSHELL_CONTENT_PLEASE_USE_APTSS_INSTEAD_OF_APT\e[0m"
+        exit $ret
+    fi
+
+elif [ "$1" = "download" ]; then
+
+    $LM_APT_FAST "$@" --allow-downgrades -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf
+
+elif [ "$1" = "policy" ] || [ "$1" = "search" ]; then
+
+    apt "$@" -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf
+
+elif [ "$1" = "lmupdate" ]; then
+
+    update_server_and_mirror_config
+
+elif [ "$1" = "update" ]; then
+
+    echo -e "\e[1;32m$TRANSHELL_CONTENT_GETTING_SERVER_CONFIG_AND_MIRROR_LIST\e[0m"
+    echo
+    curl --progress-bar -o /usr/share/lingmo-settings/tools/apt-fast-conf/sources.list.d/lingmoos.list "https://dev-mirror.300c.top/devrepo/lingmoos.list"
+    mkdir -p /tmp/aptlm-conf/
+    curl --progress-bar -o /tmp/aptlm-conf/apt-fast.conf "https://dev-mirror.300c.top/devrepo/apt-fast.conf"
+    chmod -R 755 /tmp/aptlm-conf
+    apt "$@" -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf
+
+else
+
+    apt "$@" -c /usr/share/lingmo-settings/tools/apt-fast-conf/aptlm-apt.conf
+
+fi

@@ -1,0 +1,41 @@
+Lingmo Wallpaper Template
+----------------------
+
+-- Namespace adaption --
+
+Each Lingmo plugin has a unique identifier, which is also used to find related
+resources (like the translation catalogs).
+To avoid naming collisions, Lingmo plugins use a reverse domain name notation
+for that identifier:
+
+* org.kde.lingmo.* - plugins coming from Lingmo modules
+* org.kde.*        - plugins coming from other software from KDE
+* $(my.domain).*   - plugins of your 3rd-party
+
+The generated code uses the "org.kde.lingmo" namespace for the plugin identifier.
+As this namespace is reserved for use by plugins part of Lingmo modules, you will
+need to adapt this namespace if you are writing a plugin which is not intended to
+end up in the Lingmo modules.
+
+
+-- Build instructions --
+
+cd /where/your/wallpaper/is/generated
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=MYPREFIX ..
+make
+make install
+
+(MYPREFIX is where you install your Lingmo setup, replace it accordingly)
+
+Restart lingmo to load the wallpaper
+(in a terminal or in krunner type:
+kquitapp lingmoshell
+and then
+lingmoshell)
+then go to wallpaper settings and select it
+
+-- Tutorials and resources --
+Lingmo QML API explained
+https://techbase.kde.org/Development/Tutorials/Lingmo2/QML2/API

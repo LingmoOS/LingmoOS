@@ -1,0 +1,27 @@
+comment "nut needs a toolchain w/ C++"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_INSTALL_LIBSTDCPP
+
+config LINGMO_PACKAGE_NUT
+	bool "nut"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	help
+	  Network UPS tools
+
+	  The primary goal of the Network UPS Tools (NUT) project is
+	  to provide support for Power Devices, such as
+	  Uninterruptible Power Supplies, Power Distribution Units and
+	  Solar Controllers.
+
+	  http://www.networkupstools.org/
+
+if LINGMO_PACKAGE_NUT
+
+config LINGMO_PACKAGE_NUT_DRIVERS
+	string "drivers"
+	help
+	  Select the individual drivers to enable, in a
+	  comma-separated list. Leave empty for all.
+
+endif # LINGMO_PACKAGE_NUT

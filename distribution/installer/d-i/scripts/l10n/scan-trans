@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Get a list of all D-I packages with i18n material, generated
+# from the "packages_list" file maintained in packages/po.
+# Then call output-l10n-changes for those packages, to list
+# l10n related changings.
+listfile=./packages/po/packages_list
+packages=$(grep -v -E "^\#|^[[:space:]]*$" ${listfile} | sed -r "s/[[:space:]]+-//")
+
+for package in $packages ; do
+
+	dir="./packages/${package}"
+	if [ -d "$dir" ] &&
+	   ( [ -e "$dir/po" ] || [ -e "$dir/../po" ] || [ -n "$(ls $dir/../*/po -d 2>/dev/null)" ] )
+	then
+		base=$(echo $dir | sed 's/\/debian$//');
+		if head -n 1 $dir/debian/changelog | grep -q UNRELEASED; then
+			unreleased=true
+
+			if [ "$2" = "l10n-only" ]; then
+				continue
+			fi
+		else
+			unreleased=false
+
+			if [ "$2" = "unreleased-only" ]; then
+				continue
+			fi
+		fi
+		if SCAN_TRANS=1 `dirname $0`/output-l10n-changes -d $base; then
+			if [ "$unreleased" = "true" ]; then
+				echo "   (Plus other UNRELEASED changes.)"
+			fi
+		echo ""
+		fi
+	fi
+done
+
+echo ""
+printf "Generated "
+date -R

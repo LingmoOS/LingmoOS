@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Author: Peter Mann <Peter.Mann@tuke.sk>
+# Date:   2006-02-11
+#
+# script for monitoring changes of translation status txt files
+#
+# Usage: websec-txt
+#
+# this script is named 'websec-txt' because of missing txt support
+# in 'websec' - package for monitoring html changes with webdiff
+
+ACTUAL_DATE=`date +%Y.%m.%d__%H.%M.%S`
+LOCAL_PATH=$HOME/.websec-txt
+LOCAL_PATH_FILES=${LOCAL_PATH}/files
+URL_SOURCES=${LOCAL_PATH}/sources.url
+MAIL_ADDRESS="your@address"
+
+test -d ${LOCAL_PATH} || { echo "Initializing ${LOCAL_PATH} ..."; install --directory --mode=0700 ${LOCAL_PATH}; exit 0; }
+test -d ${LOCAL_PATH_FILES} || { mkdir ${LOCAL_PATH_FILES}; exit 0; }
+test -f ${URL_SOURCES} || { echo "Missing ${URL_SOURCES} ..."; exit 0; }
+
+for i in `cat ${URL_SOURCES} | grep "^http://"`; do
+
+	URL_SOURCE0=$i
+	LOCAL_FILE=`echo ${URL_SOURCE0} | sed 's/\//_/g' | tr "~:" "__"`
+
+	test -f ${LOCAL_PATH_FILES}/$LOCAL_FILE.old || touch ${LOCAL_PATH_FILES}/$LOCAL_FILE.old
+	test -f ${LOCAL_PATH_FILES}/$LOCAL_FILE || touch ${LOCAL_PATH_FILES}/$LOCAL_FILE
+
+	mv ${LOCAL_PATH_FILES}/$LOCAL_FILE ${LOCAL_PATH_FILES}/$LOCAL_FILE.old
+	wget --quiet $URL_SOURCE0 -O - | grep -v "Files fetched and report generated" > ${LOCAL_PATH_FILES}/$LOCAL_FILE
+
+	diff -u ${LOCAL_PATH_FILES}/$LOCAL_FILE.old ${LOCAL_PATH_FILES}/$LOCAL_FILE > ${LOCAL_PATH_FILES}/$LOCAL_FILE.diff
+	if test $? -ne 0;
+	then
+		cat ${LOCAL_PATH_FILES}/$LOCAL_FILE.diff | mutt -s "[WebSec-txt] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
+#	else
+#		echo "$URL_SOURCE0 - no changes"
+	fi
+
+done
+
+exit 0
+
+#
+# file ${LOCAL_PATH}/sources.url contains following lines:
+#
+
+http://people.debian.org/~seppy/d-i/level1/sk.txt
+http://people.debian.org/~seppy/d-i/level2/sk.txt
+http://people.debian.org/~seppy/d-i/level3/sk.txt
+http://people.debian.org/~seppy/d-i/level4/sk.txt
+http://people.debian.org/~seppy/d-i/level5/sk.txt
+
+#
+# you must change sk.txt to xx.txt, where xx is your language
+#
+

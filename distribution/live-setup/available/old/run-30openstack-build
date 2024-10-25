@@ -1,0 +1,109 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+STATE="${TOP}/state"
+
+. ${LOCALCONF}/common.sh
+. ${LOCALCONF}/CONF.sh
+
+UNAME=$(uname -m)
+case "$UNAME" in
+    x86_64)
+	ARCH=amd64
+	BOOT_TYPE=mbr
+	;;
+    aarch64)
+	ARCH=arm64
+	BOOT_TYPE=uefi
+	;;
+    *)
+	log "FAILED at startup - don't recognise uname $UNAME"
+	ERROR=2
+	exit;;
+esac	
+
+# Rename the output files to something more appropriate for our use
+RENAME="s,debian-$CODENAME-(.*)-$ARCH,debian-$VERSION-openstack-$ARCH,"
+
+mkdir -p ${STATE}
+rm -rf ${STATE}/*
+BUILDNAME="openstack-$CODENAME-$ARCH"
+WORK="${TOP}/work/${BUILDNAME}"
+OUT="${TOP}/out/${BUILDNAME}"
+mkdir -p ${WORK} ${OUT}
+
+cd ${WORK}
+
+BUILDSTART=$(now)
+log "Starting full $ARCH OpenStack image build (codename $CODENAME, version $VERSION) at $BUILDSTART"
+
+START=$(now)
+
+build-openstack-debian-image \
+    -hs $LOCALCONF/openstack-hook \
+    -u http://local-mirror.cdbuilder.debian.org/debian/ \
+    -s http://deb.debian.org/debian/ \
+    -r $CODENAME \
+    --boot-type $BOOT_TYPE \
+    --architecture $ARCH \
+    -is 2 2>&1 >> ${OUT}/${BUILDNAME}.log
+
+ERROR=$?
+END=$(now)
+time_spent=$(calc_time $START $END)
+
+if [ $ERROR -eq 0 ] ; then
+    log "successful build started at $START, ended at $END (took $time_spent)"
+    if [ "$RENAME"x != ""x ] ; then
+	apt-get install rename
+	rename -v "$RENAME" * >> ${OUT}/${BUILDNAME}.log 2>&1
+    fi
+
+    # snippet of index for virt-builder
+    qcow=debian-${VERSION}-openstack-${ARCH}.qcow2
+    checksum=$(sha512sum ${qcow} | awk '{print $1;}')
+    size=$(stat -c '%s' ${qcow})
+    revision=$(date +%Y%m%d)
+    case "${CODENAME}" in
+        testing|unstable) pretty_codename=${CODENAME} ;;
+        *) pretty_codename=$(echo ${CODENAME} | sed 's/./\U&/') ;;
+    esac
+    case "${VERSION}" in
+        testing|unstable)
+            version_major_minor=${VERSION}
+            osinfo=debian8 # XXX latest stable available
+            ;;
+        *)
+            version_major_minor=$(echo ${VERSION} | awk -F. '{print $1"."$2;}')
+            osinfo=debian$(echo ${VERSION} | awk -F. '{print $1;}')
+            ;;
+    esac
+    cat <<EOF > ${qcow}.index
+[debian-${version_major_minor}-cloud]
+name=Debian ${VERSION} (${pretty_codename}) Cloud
+osinfo=${osinfo}
+arch=${UNAME}
+file=${qcow}
+checksum[sha512]=${checksum}
+format=qcow2
+size=${size}
+revision=${revision}
+notes=Debian ${VERSION} (${pretty_codename}).
+ 
+ This is a Debian installation, suited for running as OpenStack guest.
+
+EOF
+
+    cd ${WORK}
+    mv -v packages.list debian-$VERSION-openstack-${ARCH}-packages.list
+    mv -v sources debian-$VERSION-openstack-${ARCH}-sources.list
+    mv -v * ${OUT}
+else
+    log "FAILED with error $ERROR, build started at $START, ended at $END (took $time_spent)"
+fi
+
+time_spent=$(calc_time $BUILDSTART $END)
+log "DONE. ERROR=$ERROR $BUILDNAME run started at $BUILDSTART, ended at $END (took $time_spent)"

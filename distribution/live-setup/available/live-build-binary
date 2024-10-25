@@ -1,0 +1,189 @@
+#!/bin/bash
+
+#set -x
+
+TOP="/w"
+LOCALCONF="${TOP}/in"
+
+BASEDIR=$(dirname $0)
+. ${BASEDIR}/common.sh
+. ${BASEDIR}/CONF.sh
+
+mkdir -p /w/out/log
+rm -f /w/out/log/current
+
+export CODENAME VERSION
+
+# Work around an mtools issue
+export MTOOLS_SKIP_CHECK=1
+
+if [ "$VERSION"x = "testing"x ]; then
+    INSTALLER_VERSION="--di-daily"
+fi
+
+MIRROR=http://local-mirror.cdbuilder.debian.org/debian/
+APT_MIRROR=http://deb.debian.org/debian/
+OPTS="-m $MIRROR --apt-mirror $APT_MIRROR --customise ${BASEDIR}/live-customise.sh"
+RETRY_ON_UPDATE=0
+
+case "$CODENAME" in
+    bookworm|trixie)
+	BUILDS="cinnamon:gnome:kde:lxde:lxqt:mate:standard:xfce:smallest-build"
+	;;
+    *)
+	log "  ABORTING: Don't know what to build for \"$CODENAME\""
+	exit 1
+	;;
+esac
+
+while getopts ":a:t:b:" o; do
+    case "${o}" in
+        a)
+            ARCH=${OPTARG}
+            ;;
+        t)
+            TYPE=${OPTARG}
+            ;;
+        b)
+            BUILD=${OPTARG}
+            ;;
+        *)
+	    echo "Unrecognised arg ${o}"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+validate_arg ARCH "amd64:i386"
+validate_arg TYPE "free:non-free"
+validate_arg BUILD "$BUILDS"
+
+TUPLE="$ARCH-$TYPE-$BUILD"
+
+FIRMWARE_PKGS=""
+if [ ${TYPE} = "free" ] ; then
+    TYPESTEM=""
+    NFVOL=""
+else
+    TYPESTEM="+nonfree"
+    NFVOL=" nf"
+fi
+
+WORK="${TOP}/work/$TUPLE"
+rm -rf $WORK
+mkdir -p $WORK
+OUT="/external/out/${TYPE}/${ARCH}/iso-hybrid.tmp"
+SRC_OUT="/external/out/${TYPE}/source/tar.tmp"
+mkdir -p $OUT $SRC_OUT
+# Can't use TMPDIR here, that gets propagated into the
+# chroot and breaks installations!
+export TMP=${WORK}/tmp
+export NAME="debian-live-${VERSION}-${ARCH}-${BUILD}${TYPESTEM}"
+export SRC_NAME="debian-live-${VERSION}-source-${BUILD}${TYPESTEM}"
+
+BIN_STEM="${OUT}/${NAME}"
+SRC_STEM="${SRC_OUT}/${SRC_NAME}"
+
+#if [ ${TYPE} != "free" ] ; then
+#    export FIRMWARE_PKGS=$(select_firmware_packages ${ARCH})
+#fi
+
+# See https://wiki.debian.org/ReproducibleInstalls/LiveImages
+# And https://salsa.debian.org/qa/jenkins.debian.net/-/blob/master/bin/reproducible_debian_live_build.sh
+export BUILDDIR="$WORK"
+cd ${BUILDDIR}
+
+# Always use the Debian archive, not a specific timestamp from the snapshot server
+export SNAPSHOT_TIMESTAMP=archive
+
+# Grab the rebuild_script script; log what version we have
+RS_DIR=/w/rebuild_script
+rsync -a --delete $RS_DIR/ rebuild_script/
+cd rebuild_script/
+echo "rebuild_script version:" >> ${BIN_STEM}.log
+git show --stat >> ${BIN_STEM}.log
+cd ..
+
+LB_DIR=/w/live-build
+rsync -a --delete $LB_DIR/ live-build/
+cd live-build/
+echo "live-build version:" >> ${BIN_STEM}.log
+git show --stat >> ${BIN_STEM}.log
+cd ..
+
+BUILD_START=`now`
+
+mkdir -p ${TMP}
+
+if [ "$VERSION"x = "testing"x ]; then
+    # Use the default default description from rebuild.sh
+    DESCRIPTION=""
+else
+    # Use a description with the word 'Official'
+    # The timestamp will be added by the rebuild.sh script
+    DESCRIPTION="Official Debian GNU/Linux Live $VERSION $BUILD"
+fi
+
+log "  Building Live: ${CODENAME}/${ARCH}/${BUILD}. Installer origin: ${INSTALLER_ORIGIN}"
+rebuild_script/test/rebuild.sh --configuration ${BUILD} --debian-version ${CODENAME} --debian-version-number ${VERSION} --timestamp ${SNAPSHOT_TIMESTAMP} --installer-origin ${INSTALLER_ORIGIN} --disk-info "${DESCRIPTION}" --generate-source >> ${BIN_STEM}.log 2>&1
+RETURNVALUE=$?
+grep --quiet --no-messages "Build result: 0" summary.txt
+BUILD_OK_FOUND=$?
+
+if [ ${RETURNVALUE} -eq 99 -a "${SNAPSHOT_TIMESTAMP}" == "archive" ]; then
+    # The archive was updated while building. Maybe retry
+    if [ $RETRY_ON_UPDATE -eq 0 ]; then
+	echo "  Warning: Live ${CODENAME}/${ARCH}/${BUILD} detected archive update during build"
+	RETURNVALUE=0
+    else
+	log "  Info: Live ${CODENAME}/${ARCH}/${BUILD} detected archive update during build, trying again."
+	rebuild_script/test/rebuild.sh --configuration ${BUILD} --debian-version ${CODENAME} --debian-version-number ${VERSION} --timestamp ${SNAPSHOT_TIMESTAMP} --installer-origin ${INSTALLER_ORIGIN} --disk-info "${DESCRIPTION}" --generate-source >> ${BIN_STEM}.log 2>&1
+    fi
+elif [ ${RETURNVALUE} -ne 0 -o ${BUILD_OK_FOUND} -ne 0 ]; then
+    # Something went wrong. Perhaps an alternative timestamp is proposed
+    SNAPSHOT_TIMESTAMP=$(grep --no-messages "Alternative timestamp:" summary.txt | cut -f 3 -d " ")
+    echo "error on first pass; summary.txt says:" >> ${BIN_STEM}.log
+    cat summary.txt >> ${BIN_STEM}.log
+    if [ -z ${SNAPSHOT_TIMESTAMP} ]; then
+        log "$BUILD Error: the image could not be built, no alternative was proposed."
+    else
+        log "$BUILD Warning: the build failed with ${RETURNVALUE}. The latest snapshot might not be complete (yet). Now trying again using the previous snapshot instead."
+        rebuild_script/test/rebuild.sh --configuration ${BUILD} --debian-version ${CODENAME} --debian-version-number ${VERSION} --timestamp ${SNAPSHOT_TIMESTAMP} --installer-origin ${INSTALLER_ORIGIN} --disk-info "${DESCRIPTION}" --generate-source >> ${BIN_STEM}.log 2>&1
+        RETURNVALUE=$?
+    fi
+fi
+
+# Log but remove noise we don't care about
+rs_log () {
+    grep -v "failed to preserve ownership for" >> ${BIN_STEM}.log
+}
+
+if [ ${RETURNVALUE} -eq 0 ]; then
+    # Move the image away
+    mv live-image-amd64.hybrid.iso ${BIN_STEM}.iso 2>&1 | rs_log
+    mv live-image-amd64.contents ${BIN_STEM}.iso.contents 2>&1 | rs_log
+    mv live-image-amd64.packages ${BIN_STEM}.iso.packages 2>&1 | rs_log
+    # zsync was orphaned 2021-09-19 #994648
+    #mv live-image-amd64.hybrid.iso.zsync ${BIN_STEM}.iso.zsync 2>&1 | rs_log
+    mv live-image-source.debian.tar ${SRC_STEM}.tar 2>&1 | rs_log
+    mv live-image-source.debian.contents ${SRC_STEM}.contents 2>&1 | rs_log
+else
+    # Remove the previous, stale image
+    log "  Error: Live ${CODENAME}/${ARCH}/${BUILD} failed with ${RETURNVALUE}"
+    rm -f ${BIN_STEM}.iso
+    rm -f ${BIN_STEM}.iso.contents
+    rm -f ${BIN_STEM}.iso.packages
+    rm -f ${BIN_STEM}.iso.zsync
+fi
+mv summary.txt ${BIN_STEMP}.iso.summary.txt
+mv lb_output.txt ${BIN_STEM}.iso.log 2>&1 | rs_log
+
+# Clean up the local files
+lb clean --purge >> ${BIN_STEM}.iso.log
+rm -f wget-log*
+rm -f but_latest
+rm -fr config
+
+# Done for this build
+exit ${RETURNVALUE}

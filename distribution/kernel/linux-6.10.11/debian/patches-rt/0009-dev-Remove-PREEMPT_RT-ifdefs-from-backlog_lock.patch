@@ -1,0 +1,60 @@
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Tue, 22 Aug 2023 18:14:44 +0200
+Subject: [PATCH 09/15] dev: Remove PREEMPT_RT ifdefs from backlog_lock.*().
+Origin: https://www.kernel.org/pub/linux/kernel/projects/rt/6.10/older/patches-6.10.2-rt14.tar.xz
+
+The backlog_napi locking (previously RPS) relies on explicit locking if
+either RPS or backlog NAPI is enabled. If both are disabled then locking
+was achieved by disabling interrupts except on PREEMPT_RT. PREEMPT_RT
+was excluded because the needed synchronisation was already provided
+local_bh_disable().
+
+Since the introduction of backlog NAPI and making it mandatory for
+PREEMPT_RT the ifdef within backlog_lock.*() is obsolete and can be
+removed.
+
+Remove the ifdefs in backlog_lock.*().
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/core/dev.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -229,7 +229,7 @@ static inline void backlog_lock_irq_save
+ {
+ 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
+ 		spin_lock_irqsave(&sd->input_pkt_queue.lock, *flags);
+-	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
++	else
+ 		local_irq_save(*flags);
+ }
+ 
+@@ -237,7 +237,7 @@ static inline void backlog_lock_irq_disa
+ {
+ 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
+ 		spin_lock_irq(&sd->input_pkt_queue.lock);
+-	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
++	else
+ 		local_irq_disable();
+ }
+ 
+@@ -246,7 +246,7 @@ static inline void backlog_unlock_irq_re
+ {
+ 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
+ 		spin_unlock_irqrestore(&sd->input_pkt_queue.lock, *flags);
+-	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
++	else
+ 		local_irq_restore(*flags);
+ }
+ 
+@@ -254,7 +254,7 @@ static inline void backlog_unlock_irq_en
+ {
+ 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
+ 		spin_unlock_irq(&sd->input_pkt_queue.lock);
+-	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
++	else
+ 		local_irq_enable();
+ }
+ 

@@ -1,0 +1,20 @@
+config LINGMO_PACKAGE_CURLFTPFS
+	bool "curlftpfs (FUSE)"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libfuse, glib2
+	depends on LINGMO_USE_MMU # libfuse, glib2
+	depends on !LINGMO_STATIC_LIBS # libfuse
+	select LINGMO_PACKAGE_LIBFUSE
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBICONV if !LINGMO_ENABLE_LOCALE
+	select LINGMO_PACKAGE_OPENSSL
+	select LINGMO_PACKAGE_LIBCURL
+	help
+	  CurlFtpFS is a filesystem for accessing FTP hosts based on
+	  FUSE and libcurl.
+
+	  http://curlftpfs.sourceforge.net/
+
+comment "curlftpfs needs a toolchain w/ wchar, threads, dynamic library"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || LINGMO_STATIC_LIBS

@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/pkg-info.mk
+
+BUILD_DIR := build
+
+# Install the win32-loader-standalone.exe as debian/tools/win32-loader/$(SUITE)/win32-loader.exe on the mirrors
+BYHAND ?= yes
+
+W32_BYHAND_NAME := win32-loader_$(DEB_VERSION)_all
+
+B_D_PACKAGES := grub-pc-bin gpgv-win32 debian-archive-keyring loadlin ipxe nsis
+
+PACKAGES_LIST := $(shell set -e; \
+	for p in ${B_D_PACKAGES}; \
+	do \
+		dpkg-query --showformat='$${source:Package;-25} $${source:Version;-25} http://deb.debian.org/debian/pool/main/$${source:Package;1}/$${source:Package}\\n' --show $$p; \
+	done)
+
+BUILT_USING_LIST := $(shell set -e; \
+	for p in ${B_D_PACKAGES}; \
+	do \
+		dpkg-query --showformat='$${source:Package} (= $${source:Version}), ' --show $$p; \
+	done)
+
+NSIS_VERSION  := $(shell dpkg-query -f='$${Version}' -W nsis )
+
+%:
+	dh $@
+
+override_dh_auto_build:
+ifeq ($(BYHAND),yes)
+	# Build the standalone+pxe version
+	# Don't allow non-Linux kernels, as their download is currently broken (see #819092)
+	dh_auto_build -- STANDALONE=yes \
+		PXE=yes \
+		NOT_ALLKERNELS=yes \
+		OUTFILE_NAME="$(BUILD_DIR)/$(W32_BYHAND_NAME).exe" \
+		BUILD_DIR="$(BUILD_DIR)"
+	
+	# Prepare the README file
+	gawk '{sub(/@PACKAGES_LIST@/,"$(PACKAGES_LIST)")}1 \
+	      {sub(/@NSIS_VERSION@/,"$(NSIS_VERSION)")}1 \
+	      {sub(/@W32_VERSION@/,"$(DEB_VERSION)")}1' \
+		debian/win32-loader_doc.txt \
+		> "$(BUILD_DIR)/$(W32_BYHAND_NAME).txt"
+	cat debian/copyright >> "$(BUILD_DIR)/$(W32_BYHAND_NAME).txt"
+endif
+	# Build the cdrom version
+	dh_auto_build -- OUTFILE_NAME="$(BUILD_DIR)/win32-loader.exe" \
+		BUILD_DIR="$(BUILD_DIR)"
+
+override_dh_install:
+	dh_install --sourcedir="$(BUILD_DIR)"
+
+override_dh_auto_clean:
+	rm -f "$(BUILD_DIR)/$(W32_BYHAND_NAME).exe" \
+		"$(BUILD_DIR)/$(W32_BYHAND_NAME).txt"
+	dh_auto_clean -- BUILD_DIR="$(BUILD_DIR)"
+
+override_dh_builddeb:
+	dh_builddeb
+ifeq ($(BYHAND),yes)
+	cp "$(BUILD_DIR)/$(W32_BYHAND_NAME).exe" ../
+	dpkg-distaddfile "$(W32_BYHAND_NAME).exe" byhand -
+
+	cp "$(BUILD_DIR)/$(W32_BYHAND_NAME).txt" ../
+	dpkg-distaddfile "$(W32_BYHAND_NAME).txt" byhand -
+endif
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vw32-loader:built-using="$(BUILT_USING_LIST)"

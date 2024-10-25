@@ -1,0 +1,150 @@
+#!/bin/bash
+
+. ~/build/settings.sh
+
+SCRIPTS_SOURCE="/home/debian-cd/live/available"
+SCRIPTS_INPUT="/home/debian-cd/live/input"
+RSYNC_PORT=10873
+VM_IP=127.16.2.1
+CLOG=${OUT_BASE}/.live/new/log/current
+CURRENT_ERROR=0
+LOGFILE="/home/debian-cd/run-openstack.log"
+
+. ${SCRIPTS_SOURCE}/common.sh
+
+ARCH=$1
+if [ "$ARCH"x = ""x ]; then
+    ARCH=amd64
+fi
+
+rm -f $SCRIPTS_INPUT/*
+
+cd $SCRIPTS_INPUT
+if [ $? -ne 0 ] ; then
+    run_log "Can't cd to $SCRIPTS_INPUT; error $?"
+    exit 1
+fi
+
+PID=$(check_running)
+if [ "$PID"x != ""x ] ; then
+    run_log "Abort: kvm / qemu already running as pid $PID"
+    exit 1
+fi
+
+if [ "$RELEASE_BUILD"x = ""x ] ; then
+    CONF=${SCRIPTS_SOURCE}/CONF.sh
+else
+    CONF=$SCRIPTS_SOURCE/CONF.sh.${RELEASE_BUILD}
+fi
+
+. $CONF
+
+if [ "$ARCH" = "amd64" ]; then
+    ~/live/bin/kvm-start ${CODENAME}-debian-openstack-maker-amd64.img
+    sleep_loop 60 "kvm startup"
+elif [ "$ARCH" = "arm64" ]; then
+    ~/live/bin/qemu-start-arm64 ${CODENAME}-debian-openstack-maker-arm64.img
+    sleep_loop 300 "qemu startup"
+else
+    run_log "Don't know how to build for ARCH $ARCH. Abort"
+    exit 1
+fi
+wait_ready "KVM builder up and running"
+
+cp $SCRIPTS_SOURCE/common.sh $SCRIPTS_INPUT
+cp $CONF $SCRIPTS_INPUT/CONF.sh
+
+IP=$(host -t a local-mirror.cdbuilder.debian.org | awk '{print $4}')
+echo "BUILDHOST=\"$IP\"" >> $SCRIPTS_INPUT/CONF.sh
+
+cp $SCRIPTS_SOURCE/lb-buildparallel $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/openstack-hook $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-10clean $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-20update $SCRIPTS_INPUT
+cp $SCRIPTS_SOURCE/run-30openstack-build $SCRIPTS_INPUT
+
+# Wait for the build to finish
+wait_ready "run-30.*build.*DONE"
+
+# Remove the older scripts so they don't get re-run by mistake
+rm $SCRIPTS_INPUT/run-*
+
+# Sync the output across
+run_log "Syncing openstack build out of the VM"
+sync_start=$(now)
+rsync -a --delete --port=${RSYNC_PORT} ${VM_IP}::live-out/openstack-${CODENAME}-${ARCH}/ ${OUT_BASE}/.live/new/openstack-${CODENAME}-${ARCH}/
+sync_end=$(now)
+taken=$(calc_time $sync_start $sync_end)
+size=$(du -BM ${OUT_BASE}/.live/new/openstack-${CODENAME}-${ARCH}/ | awk '{gsub("M","",$1); print $1}')
+run_log "Sync done: $size MB took $taken"
+
+# Now shut down the build VM
+cp $SCRIPTS_SOURCE/run-50halt $SCRIPTS_INPUT
+sleep 5
+# Wait for shutdown to start
+wait_ready "run-50halt"
+echo
+
+# Do more I/O and CPU heavy work on the output:
+# 1. Generate the sources.tar.gz files
+# 2.
+cd ${OUT_BASE}/.live/new/openstack-${CODENAME}-${ARCH}
+
+SOURCE_ERROR=0
+SOURCES=$(ls -1 debian-*-openstack-${ARCH}-sources.list)
+mkdir source
+IFS="$NL"
+if [ -f "$SOURCES" ] ; then
+    for line in $(cat ${SOURCES} | sed 's,deb.debian.org,local-mirror.cdbuilder.debian.org,g'); do
+	IFS=$OLDIFS
+	grab_file $line
+	IFS="$NL"
+    done
+    IFS=$OLDIFS
+    tar czf debian-$VERSION-openstack-${ARCH}-source.tar.gz source
+    rm -rf source ${SOURCES}
+else
+    run_log "No sources.list file"
+    CURRENT_ERROR=2
+fi
+
+if [ $SOURCE_ERROR -ne 0 ] ; then
+    run_log "FAILED to download sources"
+    CURRENT_ERROR=2
+fi
+
+# Finally, list all the output files so we can see what we've got
+if [ $CURRENT_ERROR -eq 0 ] ; then
+    checksum_files
+    ls -alR ${OUT_BASE}/.live/new/openstack-${CODENAME}-${ARCH}
+fi
+
+run_log "Build finished with error $CURRENT_ERROR"
+run_log
+
+TRY=0
+MAX_WAIT=180 # Maximum number of seconds to wait before killing
+while [ $TRY -lt $MAX_WAIT ]; do
+    PID=$(check_running)
+    if [ "$PID"x != ""x ] ; then
+	run_log "kvm / qemu still running as pid $PID after $TRY seconds"
+	sleep 1
+	TRY=$(($TRY + 1))
+    else
+	break
+    fi
+done
+
+PID=$(check_running)
+if [ "$PID"x != ""x ] ; then
+    run_log "kvm / qemu still running as pid $PID"
+    run_log "Killing with prejudice"
+    kill -9 $PID
+fi
+
+# Done!
+
+# Remove the scripts from the input area - let's not block things
+rm -f $SCRIPTS_INPUT/*
+
+exit $CURRENT_ERROR

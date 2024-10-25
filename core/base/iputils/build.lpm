@@ -1,0 +1,31 @@
+pkgname=iputils
+# Commit date + git rev-parse --short origin/master
+_rev=84cdf26
+pkgver=20240117
+pkgrel=1
+pkgdesc="Network monitoring tools, including ping"
+arch=('x86_64')
+license=('BSD-3-Clause' 'GPL-2.0-or-later')
+url="https://github.com/iputils/iputils"
+depends=('libcap' 'libidn2')
+makedepends=('perl-sgmls' 'git' 'docbook-xsl' 'meson' 'systemd' 'iproute')
+conflicts=('netkit-base' 'arping')
+replaces=('netkit-base')
+source=("git+https://github.com/iputils/iputils.git#tag=${pkgver}?signed")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+sha256sums=('SKIP')
+
+build() {
+  mkdir -p build
+  cd build
+
+  arch-meson ../$pkgname 
+  ninja
+}
+
+package() {
+  cd build
+
+  DESTDIR="$pkgdir" ninja install
+  install -vDm 644 "../$pkgname/Documentation/LICENSE.BSD3" -t "$pkgdir/usr/share/licenses/$pkgname"
+}

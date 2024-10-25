@@ -1,0 +1,24 @@
+config LINGMO_PACKAGE_LINKS
+	bool "links"
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  Graphics and text mode WWW browser (kind of like lynx).
+
+	  http://links.twibright.com/
+
+if LINGMO_PACKAGE_LINKS
+
+config LINGMO_PACKAGE_LINKS_GRAPHICS
+	bool "use graphics"
+	depends on LINGMO_PACKAGE_GPM || LINGMO_PACKAGE_DIRECTFB || LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_XLIB_LIBXT if LINGMO_PACKAGE_XORG7
+	select LINGMO_PACKAGE_LIBPNG
+	help
+	  Enable graphics output for framebuffer, DirectFB or X11.
+	  Framebuffer output requires GPM (console mouse).
+	  Otherwise links will be text-mode only.
+
+comment "links graphics needs GPM, DirectFB or X11"
+	depends on !LINGMO_PACKAGE_GPM && !LINGMO_PACKAGE_DIRECTFB && !LINGMO_PACKAGE_XORG7
+
+endif

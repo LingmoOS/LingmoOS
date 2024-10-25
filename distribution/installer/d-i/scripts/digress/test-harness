@@ -1,0 +1,255 @@
+#!/bin/sh
+set -e
+
+# To allow a group of users to share a system using digress, make files
+# group writable. TODO: parameterise
+umask 002
+
+# Some of the expect scripts in digress don't work in unicode locales.
+# C seems like a good idea anyway.
+export LANG=C
+
+MACHINE="$1"
+export MACHINE
+SCHEME="$2"
+export SCHEME
+
+started=""
+inheader=""
+
+divider () {
+	echo "============================================================================"
+}
+
+header () {
+	if [ -z "$inheader" ]; then
+		inheader=1
+		divider
+		LANG=C echo "Date: $(date)"
+		echo "$@"
+	fi
+}
+
+endheader () {
+	if [ "$inheader" ]; then
+		inheader=
+		divider
+	fi
+}
+
+do_shutdown () {
+	if [ -n "$SHUTDOWN" ]; then
+		for t in $SHUTDOWN; do
+			if ! $t; then
+				echo "SHUTDOWN $t failed"
+			fi
+		done
+	fi
+}
+
+error () {
+	unlock
+	category="$1"
+	shift 1
+	if [ -n "$FAILURE_STATUS_FILE" ]; then
+		echo "$category" > "$FAILURE_STATUS_FILE"
+	fi
+	if [ "$started" ]; then
+		echo
+		header "Unsuccessful finish: $SCHEME"
+		echo "$@"
+		endheader
+	else
+		echo "$@" >&2
+	fi
+	
+	do_shutdown
+	
+	exit 1
+}
+
+sigout () {
+	error SIGNAL "Exiting on signal."
+}
+
+config () {
+	var="$1"
+	shift 1
+#	echo "$var=\"$@\""
+	eval "export $var='$@'"
+}
+
+use () {
+	. $DI_TESTDIR/schemes/$MACHINE/$1
+}
+
+lock () {
+	if [ ! -e "$(which lockfile-create)" ]; then
+		error lockfile-create not found
+	fi
+	while ! lockfile-create --retry 1 "$lockfile"; do
+		echo "$MACHINE is in use:"
+		ls -l $lockfile.lock || true
+		echo "Retrying.."
+	done
+	lockfile-touch "$lockfile" &
+	lockpid="$!"
+}
+
+unlock () {
+	if [ -n "$lockpid" ]; then
+		kill "$lockpid"
+	fi
+	lockfile-remove "$lockfile"
+}
+
+export DIGRESSDIR=$(dirname $0)
+
+if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
+	export DI_TESTDIR=$DIGRESSDIR
+	if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
+		error CONF "Cannot determine DI_TESTDIR"
+	fi
+fi
+
+PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2:$DIGRESSDIR/shutdown:$DIGRESSDIR/utils
+export PATH
+
+. $DI_TESTDIR/config
+
+if [ -z "$STATE_DIR" ]; then
+	error CONF "STATE_DIR not set"
+fi
+mkdir -p "$STATE_DIR"
+
+if [ -z "$SCHEME" ]; then
+	if [ -z "$MACHINE" ]; then
+		printf "Machines: "
+		for machine in $(ls $DI_TESTDIR/schemes/$MACHINE); do
+			SERVER=""
+			use $machine/common
+			if [ -z "$SERVER" ] || 
+			   ( [ -n "$SERVER" ] && [ "$SERVER" = "$(hostname -f)" ] ); then
+				printf "$machine "
+			fi
+		done
+		echo
+	else
+		echo "Available schemes for $MACHINE:"
+		for s in $DI_TESTDIR/schemes/$MACHINE/*; do
+			if [ ! -d $s ]; then
+				DESCRIPTION=""
+				echo $s | grep -q '~' && continue
+				use $(basename $s)
+				[ -z "$DESCRIPTION" ] && continue
+				echo " - $(basename $s) -- $DESCRIPTION"
+			fi
+		done
+	fi
+	if [ -z "$MACHINE" ] && [ -n "$(find $STATE_DIR -maxdepth 1 -name '*-test.lock')" ]; then
+		echo
+		echo "Machines in use:"
+		printf "user\tdate                     \tmachine\n"
+		find $STATE_DIR -maxdepth 1 -name '*-test.lock' -printf "%u\t%t\t%f\n" | sed 's/-test.lock//'
+	fi
+	exit
+fi
+
+if [ ! -e "$DI_TESTDIR/schemes/$MACHINE" ]; then
+	error CONF "Unknown machine $MACHINE"
+fi
+
+use common
+use $SCHEME
+
+trap sigout INT QUIT
+
+lockfile="$STATE_DIR/$MACHINE-test"
+lock
+
+if [ -n "$ROOT_PASSWORD_FILE" ]; then
+	ROOT_PASSWORD=$(cat $ROOT_PASSWORD_FILE) || true
+	if [ -z "$ROOT_PASSWORD" ]; then
+		error CONF "ROOT_PASSWORD_FILE contains no password"
+	fi
+	export ROOT_PASSWORD # yikes!
+fi
+
+if [ -n "$USER_PASSWORD_FILE" ]; then
+	USER_PASSWORD=$(cat $USER_PASSWORD_FILE) || true
+	if [ -z "$USER_PASSWORD" ]; then
+		error CONF "USER_PASSWORD_FILE contains no password"
+	fi
+	export USER_PASSWORD
+fi
+
+if [ -n "$HP_ILO_PASSWORD_FILE" ]; then
+	HP_ILO_PASSWORD=$(cat $HP_ILO_PASSWORD_FILE) || true
+	if [ -z "$HP_ILO_PASSWORD" ]; then
+		error CONF "HP_ILO_PASSWORD contains no password"
+	fi
+	export HP_ILO_PASSWORD
+fi
+
+if [ -n "$HP_GSP_PASSWORD_FILE" ]; then
+	HP_GSP_PASSWORD=$(cat $HP_GSP_PASSWORD_FILE) || true
+	export HP_GSP_PASSWORD
+	if [ -z "$HP_GSP_PASSWORD" ]; then
+		error CONF "HP_GSP_PASSWORD contains no password"
+	fi
+fi
+
+started=1
+header "Booting: $MACHINE"
+echo "Scheme: $SCHEME -- $DESCRIPTION"
+
+if [ -n "$PREBOOT" ]; then
+	echo "Setting up..."
+	for p in $PREBOOT; do
+		if ! $p; then
+			error PREBOOT "PREBOOT $p failed"
+		fi
+	done
+fi
+	
+endheader
+
+if [ -n "$BOOT" ]; then
+	echo
+	header "Booting..."
+	endheader
+	for t in $BOOT; do
+		if ! $t; then
+			error BOOT "BOOT $t failed"
+		fi
+	done
+fi
+
+if [ -n "$TEST_1" ]; then
+	echo
+	header "Testing the first stage..."
+	endheader
+	for t in $TEST_1; do
+		if ! $t; then
+			error TEST_1 "TEST_1 $t failed"
+		fi
+	done
+fi
+
+if [ -n "$TEST_2" ]; then
+	echo
+	header "Testing the second stage..."
+	endheader
+	for t in $TEST_2; do
+		if ! $t; then
+			error TEST_2 "TEST_2 $t failed"
+		fi
+	done
+fi
+
+echo
+header "Successful finish: $SCHEME"
+endheader
+do_shutdown
+unlock
+exit 0

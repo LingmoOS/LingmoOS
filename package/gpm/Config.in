@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_GPM
+	bool "gpm"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU # fork()
+	help
+	  "gpm" means general purpose mouse (server) and provides mouse
+	  support for Linux virtual consoles.
+	  gpm-root (to draw menus in current virtual console; config
+	  file in /etc/gpm-root.conf) and disable-paste (to disable
+	  paste buffer for security reasons), will also be installed.
+
+	  http://www.nico.schottelius.org/software/gpm/
+
+if LINGMO_PACKAGE_GPM
+
+config LINGMO_PACKAGE_GPM_INSTALL_TEST_TOOLS
+	bool "install test tools"
+	help
+	  Install gpm test tools (get-versions, mev, hltest, mouse-test,
+	  display-buttons & display-coords).
+
+endif
+
+comment "gpm mouse server needs a toolchain w/ dynamic library"
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU

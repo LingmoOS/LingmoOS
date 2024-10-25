@@ -1,0 +1,28 @@
+#!/bin/bash
+source /usr/share/lingmo-settings/tools/bashimport/transhell.amber
+load_transhell
+# 检查是否传入了路径参数
+if [ -z "$1" ]; then
+  echo "${TRANSHELL_CONTENT_PLEASE_PROVIDE_FILE_PATH}"
+  exit 1
+fi
+DESKTOP_FILE_PATH=$1
+if [[ $DESKTOP_FILE_PATH == file://* ]]; then
+    # 如果是，移除 'file://' 部分并输出结果
+    DESKTOP_FILE_PATH="${DESKTOP_FILE_PATH#file://}"
+fi
+
+# 获取文件内容中Exec=后的命令
+exec_command=$(grep -oP "(?<=Exec=).*" "$DESKTOP_FILE_PATH")
+
+# 打印提取的命令
+echo "$exec_command"
+
+# 在默认终端执行命令
+eval "$exec_command"
+
+echo --------------------------------------
+echo "${TRANSHELL_CONTENT_ABOVE_IS_TERMINAL_OUTPUT}"
+echo "${TRANSHELL_CONTENT_PRESS_ENTER_TO_FINISH}"
+read
+

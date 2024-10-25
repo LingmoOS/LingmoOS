@@ -1,0 +1,22 @@
+config LINGMO_PACKAGE_REDIS
+	bool "redis"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9 # _Atomic keyword
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL # pthread_setname_np()
+	help
+	  Redis is an open source (BSD licensed), in-memory data
+	  structure store, used as a database, cache and message
+	  broker. It supports data structures such as strings,
+	  hashes, lists, sets, sorted sets with range queries,
+	  bitmaps, hyperloglogs, geospatial indexes with radius
+	  queries and streams.
+
+	  http://www.redis.io
+
+comment "redis needs a toolchain w/ gcc>=4.9, dynamic library, nptl"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL \
+		|| !LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9

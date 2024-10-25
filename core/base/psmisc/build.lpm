@@ -1,0 +1,31 @@
+pkgname=psmisc
+pkgver=23.7
+pkgrel=1
+pkgdesc='Miscellaneous procfs tools'
+arch=('x86_64')
+url='https://gitlab.com/psmisc/psmisc'
+license=('GPL')
+depends=('ncurses')
+makedepends=('git' 'po4a')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+source=("git+https://gitlab.com/psmisc/psmisc.git#tag=v${pkgver}?signed")
+
+prepare() {
+  cd ${pkgname}
+
+  ./autogen.sh
+}
+
+build() {
+  cd ${pkgname}
+
+  ./configure \
+    --prefix=/usr
+  make
+}
+
+package() {
+  cd ${pkgname}
+
+  make DESTDIR="${pkgdir}" install
+}

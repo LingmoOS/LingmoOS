@@ -1,0 +1,150 @@
+l10n scripts README, debian-installer GIT repository
+
+The following files may be useful regarding the handling of
+internationalisation and localisation in debian-installer.
+
+
+grep-translators
+  Usage: grep-translators [LANGUAGECODE]
+ 
+  This script looks in the working directory for po-files and collects
+  all translators together, sorted by language.
+  
+  If LANGUAGECODE is given, only translators for LANGUAGECODE are grepped,
+  otherwise all po-files.
+
+l10n-sync
+  Usage: l10n-sync <D-I_copy>
+
+  This script synchronises the translations in all D-I packages with
+  the translators work in packages/po.
+
+  Define DEBUG=Y for more output
+  Define ONLINE="YES_I_KNOW_WHAT_I_DO" if GIT commits/updates can be made
+
+  The use of this script is VERY DANGEROUS when used with the
+  ONLINE variable properly defined. The script will then COMMIT the
+  changes it makes.
+
+  The only use for this script is for periodical synchronisations made
+  by the D-I i18n coordinator.
+
+output-l10n-changes
+  Usage: output-l10n-changes <package-directory> [-d]
+         -d: remove the .credits_log file after the output, 
+             please use while releasing
+
+  This script takes the debian/.credits_log (if it does not exist,
+  log-changes is run to create it), outputs the changes in the
+  translations since the last release in a form suitable for
+  copy&pasting into the package's changelog. The script doesn't modify
+  any files apart from .credits_log.
+
+log-changes
+  Usage: log-changes <package-directory>
+
+  This script is intended to be run just after the debconf-updatepo
+  run, to log the changed translations with the names of the
+  translators. Logging is done to the debian/.credits_log file. This
+  file is used by output-l10n-changes.
+
+  You should generally use 'output-l10n-changes -d .' rather than using this
+  script directly.
+
+scan-trans
+  Usage: scan-trans <directory>
+
+  This script gets a list of all D-I packages with i18n material from the
+  'packages_list' file maintained in packages/po and calls output-l10n-changes
+  for those packages, to list l10n related changings.
+
+gettext-helper
+  Usage gettext-helper export|import <language_code>
+
+  This script combines several .po files into on large file, or spread
+  the translations from the large file into the small files.
+
+  It will operate on all PO files contained in current directory
+  subdirectories, no matter whether they are debconf translations or not.
+
+correct-dates
+  Usage correct-dates <lang> <di_repository_copy> <packages_to_ignore>
+  
+  THIS SCRIPT IS A HACK
+  
+  It is meant for restoring the PO-Revision-Date for all PO files of
+  a given language. Its only use has been when the first few languages
+  have been switched to the single file model without using
+  l10n-sync --keep-revision switch
+  
+  It should be now useless but is kept for the record
+  
+  All PO-Revision-Date fileds will be restored to be the date of the last
+  non-UNRELEASED changelog entry, except for packages given as third argument.
+  The packages to be ignored should be given their full path relatively
+  to packages/, e.g. arch/i386/grub-installer
+  
+switch-language
+  Usage switch-language <lang> <di_repository_copy>
+  
+  Switches a language to the single file system
+  
+  Should be used only once for a given language
+
+check_var.pl
+  Has been integrated in l10n-spellcheck framework  
+
+l10n-spellcheck
+  This set of scripts allows for spellchecking the D-I translations.
+  See the README file in the l10n-spellcheck directory
+
+  Author: Davide Viti
+
+l10n-stats
+  This set of scripts creates the translation status pages.
+
+  Authors: Dennis Stampfer, Christian Perrier
+
+choices-check.pl
+  This script checks the PO file in stdin and outputs all Choices-type
+  entries for Select or Multiselect templates which have over 65
+  characters for one of their components
+ 
+  Author: Eugeniy Meshcheryakov 
+
+websec/websec-txt
+  This script downloads latest txt file with debian-installer translation
+  status and send mail with difference with previous version, so only changes
+  are mailed. This helps translators for monitoring changes of status.
+
+  Author: Peter Mann
+
+websec/websec-txt-all
+  Evolution of websec-txt. It is aimed to be used by the i18n coordinators
+  to run a "survey robot" which mails translators when one of their files
+  needs an update. Must be configured by a file named "lang-mail.cfg". See
+  example in the websec/ directory
+
+  Author: Peter Mann
+
+Changelog
+
+  Dennis Stampfer, Sat Jul 24 16:36:12 CEST 2004
+    * begin
+  Christian Perrier, Wed Aug 11 08:34:26 CEST 2004
+    * remove reference to obsoleted merge-translations and update-translations
+    * move l10n-changes scripts to this directory
+    * add reference to l10n-sync and l10n-release
+    * add reference to gettext-helper
+  Christian Perrier, Wed Aug 23 14:08:26 CEST 2004
+    * add correct-dates
+    * add switch-language
+  Christian Perrier, Sun Jan 30 08:52:36 CEST 2005
+    * add check_var.pl
+    * add l10n-spellcheck
+  Christian Perrier, Sun Mar 20 10:22:00 CEST 2005
+    * add choices-check.pl
+  Peter Mann, Sat Feb 11 16:12:28 CET 2006
+    * add websec-txt
+  Christian Perrier, Fri Apr 14 10:00:00 CEST 2006
+    * add websec-txt-all and move scripts in "websec"

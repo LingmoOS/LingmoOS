@@ -1,0 +1,33 @@
+pkgname=debugedit
+pkgver=5.0
+pkgrel=6
+pkgdesc='Tool to mangle source locations in .debug files'
+arch=('x86_64')
+url='https://sourceware.org/debugedit/'
+license=('GPL-3.0-or-later' 'GPL-2.0-or-later' 'LGPL-2.0-or-later')
+depends=('glibc' 'libelf')
+source=("https://sourceware.org/ftp/debugedit/${pkgver}/debugedit-${pkgver}.tar.xz"
+        "debugedit-use-elfstrptr.patch::https://sourceware.org/git/?p=debugedit.git;a=patch;h=7497274aed00c459a0d74bf171e1b11358b0210c"
+        "debugedit-support-debugstr.patch::https://sourceware.org/git/?p=debugedit.git;a=patch;h=3e7aeeab4f744ad15108775685db68d3a35b0735"
+        "debugedit-limit-write.patch::https://sourceware.org/git/?p=debugedit.git;a=patch;h=6dd28bb30320e5236b3b5f79b6b2b41d2b2317bd")
+        
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+    cd "debugedit-${pkgver}"
+    patch -Np1 < "$srcdir/debugedit-use-elfstrptr.patch"
+    patch -Np1 < "$srcdir/debugedit-support-debugstr.patch"
+    patch -Np1 < "$srcdir/debugedit-limit-write.patch"
+    autoreconf -fiv
+}
+
+build() {
+    cd "debugedit-${pkgver}"
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "debugedit-${pkgver}"
+    make DESTDIR="${pkgdir}" install
+}

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+now () {
+    date -u +%F:%H:%M:%S
+}
+
+START=`now`
+
+lb build 2>&1 >> ${STATE}/${BUILDNAME}-log
+ERROR=$?
+
+END=`now`
+echo -e "start=$START\nend=$END\nerror=$ERROR\nlogfile=${BUILDNAME}-log\n" > ${STATE}/${BUILDNAME}-trace
+
+

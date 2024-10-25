@@ -1,0 +1,69 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture "i386"
+setupaptarchive
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  g++
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst g++ (4:4.4.5-1 localhost [i386])
+Conf g++ (4:4.4.5-1 localhost [i386])' aptget install g++ -s
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+Package 'g++' is not installed, so not removed
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget remove g++ -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  g++
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst g++ (4:4.4.5-1 localhost [i386])
+Conf g++ (4:4.4.5-1 localhost [i386])' aptget install g+++ -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  g++
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst g++ (4:4.4.5-1 localhost [i386])
+Conf g++ (4:4.4.5-1 localhost [i386])' aptget purge g+++ -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  apt
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst apt (0.8.8 localhost [all])
+Conf apt (0.8.8 localhost [all])' aptget install apt -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  apt+
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst apt+ (0.8.8 localhost [all])
+Conf apt+ (0.8.8 localhost [all])' aptget install apt+ -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  apt+
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst apt+ (0.8.8 localhost [all])
+Conf apt+ (0.8.8 localhost [all])' aptget install apt++ -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  apt+
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst apt+ (0.8.8 localhost [all])
+Conf apt+ (0.8.8 localhost [all])' aptget purge apt++ -s

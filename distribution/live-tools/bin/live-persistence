@@ -1,0 +1,482 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+# We're gonna mess with stderr's file descriptor below, so we save a
+# reference to it in fd 3 if we want to print to stderr
+exec 3>&2
+
+error ()
+{
+	echo "error: ${@}" >&3
+	exit 1
+}
+
+# Exit if user is unprivileged
+if [ "$(id -u)" -ne 0 ]
+then
+	echo "E: need root privileges" >&3
+
+	exit 1
+fi
+
+# Exit if live-boot is not installed
+if [ ! -e /lib/live/boot ]
+then
+	echo "E: live-boot not installed" >&3
+
+	exit 1
+fi
+
+# import Cmdline_old()
+. /lib/live/boot/9990-cmdline-old || error 'Could not source /lib/live/boot/9990-cmdline-old'
+
+# Set variable names needed by get_custom_mounts() etc.,
+# and now initialized by live-boot in a file that we certainly
+# don't want to source.
+persistence_list="persistence.conf"
+custom_overlay_label="persistence"
+export persistence_list custom_overlay_label
+
+# This will import the following functions and variables used below:
+#   activate_custom_mounts()
+#   get_custom_mounts()
+#   open_luks_device()
+#   probe_for_gpt_name()
+#   removable_dev()
+#   removable_usb_dev()
+#   storage_devices()
+#   where_is_mounted()
+. /lib/live/boot/9990-misc-helpers.sh || error 'Could not source /lib/live/boot/9990-misc-helpers.sh'
+
+usage ()
+{
+	echo "Usage: live-persistence [OPTION]... list [LABEL]...
+List (on stdout) all partitions with names among LABEL(s) that are compatible
+with live-boot's overlay persistence, and that are adhering to live-boot's
+persistence filters (e.g. persistence-media). If no LABEL is given the default
+in live-boot is used ('${custom_overlay_label}').
+   or: live-persistence [OPTION]... activate VOLUME...
+Activates persistence on the given VOLUME(s) (specified via block device).
+Successes and failures are written to stdout. There are no checks for whether
+the given volumes adhere to live-boot's options.
+   or: live-persistence [OPTION]... close VOLUME...
+Deactivates persistence on the given VOLUME(s) (specified via block device).
+
+Note: The 'activate' and 'stop' actions only support partition-backed volumes
+(e.g. /dev/sda2), not file-backed persistent volumes.
+
+Kernel command-line options are parsed just like in live-boot and have the same
+effect (see live-boot(7) for more information).
+
+Most options correspond to the persistence-* options of live-boot, and will
+override the corresponding options parsed from the kernel command-line.
+
+General options:
+  -h, --help            display this help and exit
+  -l, --log-file=FILE   log the execution trace to FILE
+
+Options affecting the 'list' action:
+  -e, --encryption=LIST override 'persistence-encryption'
+  -m, --media=VALUE     override 'persistence-media'
+  -g, --gpt-only        only list GPT partitions
+
+Options affecting the 'activate' action:
+  -r, --read-only       enable 'persistence-read-only'
+  -w, --read-write      disable 'persistence-read-only'
+  -u, --union=VALUE     override 'union'"
+}
+
+warning ()
+{
+	echo "warning: ${@}" >&3
+}
+
+dbus_udisks_get_attribute ()
+{
+	dev="${1}"
+	attribute="${2}"
+	re='^[[:space:]]*variant[[:space:]]\+string[[:space:]]\+"\(.*\)"$'
+
+	dbus-send --system --print-reply --dest=org.freedesktop.UDisks \
+		/org/freedesktop/UDisks/devices/$(basename ${dev}) \
+		org.freedesktop.DBus.Properties.Get \
+		string:org.freedesktop.UDisks.Device \
+		string:"${attribute}" | \
+		grep -e "${re}" | sed "s|${re}|\1|"
+}
+
+# We override the following two functions from live-helpers since old
+# blkid (i.e. util-linux and libblkid1) doesn't support GPT. We use dbus
+# instead (which should be available in user-space).
+get_gpt_name ()
+{
+	dev="${1}"
+
+	dbus_udisks_get_attribute ${dev} partition-label
+}
+
+is_gpt_device ()
+{
+	dev="${1}"
+
+	[ "$(dbus_udisks_get_attribute ${dev} partition-scheme)" = "gpt" ]
+}
+
+# We override live-boot's logging facilities to get more useful error messages
+log_warning_msg ()
+{
+	warning ${@}
+}
+
+# We override live-boot's panic() since it does a lot of crazy stuff
+panic ()
+{
+	error ${@}
+}
+
+# Fix persistent ~/.gconf sub-dirs; activate_custom_mounts() creates
+# empty dirs up to its mountpoint, but the file %gconf.xml has to be
+# present in each of ~/.gconf's subdirs to make them valid. Hence we
+# have a problem with a persistent ~/.gconf/X/Y if ~/.gconf/X was
+# created by activate_custom_mounts() since it would lack its
+# %gconf.xml file, making ~/.gconf/X/Y invalid. This functions makes
+# sure that all subdirs of ~/.gconf contain %gconf.xml.
+fix_gconf_dirs ()
+{
+	for home in /home/*
+	do
+		if [ ! -e "${home}/.gconf" ]
+		then
+			continue
+		fi
+
+		ownership=$(stat -c "%u:%g" "${home}")
+
+		find "${home}/.gconf" -type d | while IFS="" read -r dir
+		do
+			conf="${dir}/%gconf.xml"
+
+			if [ ! -e "${conf}" ]
+			then
+				touch "${conf}"
+				chown ${ownership} "${conf}"
+			fi
+		done
+	done
+}
+
+list_volumes ()
+{
+	labels=${@}
+	whitelistdev=""
+
+	case "${PERSISTENCE_MEDIA}" in
+		removable)
+			whitelistdev="$(removable_dev)"
+
+			[ -z "${whitelistdev}" ] && return
+			;;
+		removable-usb)
+			whitelistdev="$(removable_usb_dev)"
+
+			[ -z "${whitelistdev}" ] && return
+			;;
+		*)
+			whitelistdev=""
+			;;
+	esac
+
+	volumes=$(find_persistence_media "${labels}" "${whitelistdev}")
+
+	for vol in $volumes
+	do
+		# drop the "$label=" prefix
+		vol=${vol#*=}
+
+		if [ -n "${GPT_PARTITIONS_ONLY}" ] && ! is_gpt_device ${vol}
+		then
+			continue
+		fi
+
+		echo $vol
+	done
+
+	exit 0
+}
+
+activate_volumes ()
+{
+	volumes=${@}
+	ret=0
+	open_volumes=""
+	successes=""
+	failures=""
+
+	# required by open_luks_device()
+	exec 6>&1
+
+	for vol in ${volumes}
+	do
+		if [ ! -b "${vol}" ]
+		then
+			warning "${vol} is not a block device"
+
+			failures="${failures} ${vol}"
+			ret=1
+
+			continue
+		fi
+
+		luks_vol=""
+
+		if /sbin/cryptsetup isLuks ${vol} >/dev/null
+		then
+			if luks_vol=$(open_luks_device "${vol}")
+			then
+				open_volumes="${open_volumes} ${luks_vol}"
+			else
+				failures="${failures} ${vol}"
+			fi
+		else
+			open_volumes="${open_volumes} ${vol}"
+		fi
+	done
+
+	custom_mounts="$(mktemp /tmp/custom_mounts-XXXXXX.list)"
+
+	get_custom_mounts ${custom_mounts} ${open_volumes}
+
+	if [ -s "${custom_mounts}" ]
+	then
+		activate_custom_mounts ${custom_mounts} >/dev/null
+		fix_gconf_dirs
+	fi
+
+	rm -f ${custom_mounts}
+
+	for vol in ${open_volumes}
+	do
+		if grep -qe "^${vol}\>" /proc/mounts
+		then
+			successes="${successes} ${vol}"
+		else
+			failures="${failures} ${vol}"
+			ret=1
+		fi
+	done
+
+	if [ -n "${successes}" ]
+	then
+		echo "Successes:"
+
+		for vol in ${successes}
+		do
+			echo "  - ${vol}"
+		done
+	fi
+
+	if [ -n "${failures}" ]
+	then
+		echo "Failures:"
+
+		for vol in ${failures}
+		do
+			echo "  - ${vol}"
+		done
+	fi
+
+	exit ${ret}
+}
+
+is_mounted_readonly ()
+{
+	grep -q "${1} [^ ]* [^ ]* \([^ ]*,\)\?ro\(,[^ ]*\)\?" /proc/mounts
+}
+
+get_readonly_link_dir ()
+{
+	# XXX: Probably only supports UNIONTYPE=aufs
+	mount | grep ":${1}=" | cut -d' ' -f3
+}
+
+close_volumes ()
+{
+	volumes=${@}
+	custom_mounts="$(mktemp /tmp/custom_mounts-XXXXXX.list)"
+
+	get_custom_mounts ${custom_mounts} ${volumes}
+
+	while read device source dest options # < ${custom_mounts}
+	do
+		if is_in_comma_sep_list link ${options}
+		then
+			# 'link' type persistence isn't mounted on
+			# $dest but in read-only mode it has a special
+			# mount we need to take care of. However, in
+			# both cases we just leave all created links
+			# in a broken state.
+			# We can't just check PERSISTENCE_READONLY
+			# since that's something one can change with
+			# the activate action, so we check if $device
+			# is mounted read-only instead.
+			if is_mounted_readonly ${device}
+			then
+				umount "$(get_readonly_link_dir "${source}")"
+			fi
+		else
+			umount ${dest}
+		fi
+	done < ${custom_mounts}
+
+	rm -f ${custom_mounts}
+
+	for vol in ${volumes}
+	do
+		backing=$(where_is_mounted ${vol})
+
+		umount ${backing}
+	done
+}
+
+Main ()
+{
+	# tracing get's activated by Cmdline_old() if "debug" is in
+	# /proc/cmdline which will flood stderr, which we don't want
+	exec 2>"/dev/null"
+
+	# parse the kernel cmdline for live-boot's configuration as defaults
+	Cmdline_old
+
+	# disable tracing if enabled by Cmdline_old()
+	set +x
+	exec 2>&3
+
+	PERSISTENCE="true"
+	NOPERSISTENCE=""
+	export PERSISTENCE NOPERSISTENCE
+
+	# FIXME: we don't yet support file-backed custom persistence
+	PERSISTENCE_STORAGE="filesystem"
+	export PERSISTENCE_STORAGE
+
+	# Should be set empty since live-boot already changed root for us
+	rootmnt=""
+	export rootmnt
+
+	SHORTOPTS="e:,g,h,l:,m:,r,w,u:"
+	LONGOPTS="encryption:,gpt-only,help,log-file:,media:,read-only,read-write,union:"
+	OPTS=$(getopt -o ${SHORTOPTS} --longoptions ${LONGOPTS} -n "live-persistence" -- "$@")
+
+	if [ "$?" -ne 0 ]
+	then
+		echo "Try 'live-persistence --help' for more information."
+		exit 1
+	fi
+
+	eval set -- "$OPTS"
+
+	while [ $# -gt 0 ]
+	do
+		case $1 in
+			-e|--encryption)
+				shift
+				export PERSISTENCE_ENCRYPTION="${1}"
+				;;
+
+			-g|--gpt-only)
+				GPT_PARTITIONS_ONLY="true"
+				;;
+
+			-h|--help)
+				usage
+				exit 0
+				;;
+
+			-l|--log-file)
+				shift
+				DEBUG_LOG_FILE="${1}"
+				;;
+
+			-m|--media)
+				shift
+				export PERSISTENCE_MEDIA="${1}"
+				;;
+
+			-r|--read-only)
+				export PERSISTENCE_READONLY="true"
+				;;
+
+			-w|--read-write)
+				export PERSISTENCE_READONLY=""
+				;;
+
+			-u|--union)
+				shift
+				export UNIONTYPE="${1}"
+				;;
+
+			--)
+				shift
+				break
+				;;
+
+			*)
+				error "unrecognized option: ${1}"
+				;;
+		esac
+		shift
+	done
+
+	if [ -n "${DEBUG_LOG_FILE}" ]
+	then
+		exec 2>"${DEBUG_LOG_FILE}"
+		set -x
+	fi
+
+	action="${1}"
+	shift
+
+	case "${action}" in
+		list)
+			labels=${@}
+
+			if [ -z "${labels}" ]
+			then
+				# use default label in live-boot
+				labels=${custom_overlay_label}
+			fi
+
+			list_volumes ${labels}
+			;;
+
+		activate|close)
+			volumes=${@}
+
+			if [ -z "${volumes}" ]
+			then
+				error "you must specify at least one volume"
+			fi
+
+			${action}_volumes "${volumes}"
+			;;
+
+		"")
+			error "no action specified"
+			;;
+
+		*)
+			error "unrecognized action: ${action}"
+			;;
+	esac
+}
+
+Main ${@}

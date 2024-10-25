@@ -1,0 +1,45 @@
+pkgname=coreutils
+pkgver=9.5
+pkgrel=1
+pkgdesc='The basic file, shell and text manipulation utilities of the GNU operating system'
+arch=('x86_64')
+license=('GPL-3.0-or-later' 'GFDL-1.3-or-later')
+url='https://www.gnu.org/software/coreutils/'
+depends=('glibc' 'acl' 'attr' 'gmp' 'libcap' 'openssl')
+source=("https://ftp.gnu.org/gnu/$pkgname/$pkgname-$pkgver.tar.xz")
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+prepare() {
+  cd $pkgname-$pkgver
+
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.patch ]] || continue
+    echo "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
+}
+
+build() {
+  cd $pkgname-$pkgver
+  ./configure \
+      --prefix=/usr \
+      --libexecdir=/usr/lib \
+      --with-openssl \
+      --enable-no-install-program=groups,hostname,kill,uptime
+  make
+}
+
+check() {
+  cd $pkgname-$pkgver
+  make check
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
+
+# vim:set ts=2 sw=2 et:

@@ -1,0 +1,239 @@
+.TH LIVE\-BOOT 7 2015\-09\-22 5.0~a5-1 "Debian Live Project"
+
+.SH NAME
+\fBlive\-boot\fR \- System Boot Components
+
+.SH DESCRIPTION
+\fBlive\-boot\fR contains the components that configure a live system during the boot process (early userspace).
+.PP
+.\" FIXME
+live\-boot is a hook for the initramfs\-tools, used to generate a initramfs capable to boot live systems, such as those created by \fIlive\-helper\fR(7). This includes the Live systems ISOs, netboot tarballs, and usb stick images.
+.PP
+At boot time it will look for a (read\-only) medium containing a "/live" directory where a root filesystems (often a compressed filesystem image like squashfs) is stored. If found, it will create a writable environment, using aufs, to boot the system from.
+.\" FIXME
+
+.SH CONFIGURATION
+\fBlive\-boot\fR can be configured through a boot parameter or a configuration file.
+.PP
+To configure the live\-boot parameters used by default in a live image, see the \-\-bootappend\-live option in the \fIlb_config\fR(1) manual page.
+
+.SS Kernel Parameters
+\fBlive\-boot\fR is only activated if 'boot=live' was used as a kernel parameter.
+.PP
+In addition, there are some more boot parameters to influence the behaviour, see below.
+
+.SS Configuration Files
+\fBlive\-boot\fR can be configured (but not activated) through configuration files. Those files can be placed either in the root filesystem itself (/etc/live/boot.conf, /etc/live/boot/*), or on the live media (live/boot.conf, live/boot/*).
+These environment variables can only be set in the configuration files:
+
+.TP
+\fBDISABLE_CDROM\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for booting from CD-ROMs.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without the kernel modules for reading CD-ROMs.
+
+.TP
+\fBDISABLE_DM_VERITY\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for dm-verity. If set to true \fItrue\fR' mkinitramfs will build an initramfs without the kernel module dm-verity and some other dm modules. Also the default mount binary is used instead of the util-linux one.
+
+.TP
+\fBDISABLE_FAT\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for booting from FAT file systems.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without the kernel module vfat and some nls_* modules.
+
+.TP
+\fBDISABLE_FUSE\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for booting from FUSE-based file systems.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without the kernel module fuse and file systems that depend on it (like curlftpfs and httpfs2).
+
+.TP
+\fBDISABLE_NTFS\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for booting from NTFS file systems.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without the kernel module ntfs.
+
+.TP
+\fBDISABLE_USB\fR=[\fItrue\fR|\fIfalse\fR]
+Disable support for booting from USB devices.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without the kernel module sd_mod.
+
+.TP
+\fBMINIMAL\fR=[\fItrue\fR|\fIfalse\fR]
+Build a minimal initramfs.  If set to '\fItrue\fR' mkinitramfs will build an initramfs without some udev scripts and without rsync.
+
+.TP
+\fBPERSISTENCE_FSCK\fR=[\fItrue\fR|\fIfalse\fR]
+Run fsck on persistence filesystem on boot. Will attempt to repair errors. The execution log will be saved in /var/log/live/fsck.log.
+
+.TP
+\fBFSCKFIX\fR=[\fItrue\fR|\fIfalse\fR]
+If PERSISTENCE_FSCK or forcefsck are set, will pass -y to fsck to stop it from asking questions interactively and assume yes to all queries.
+
+.SH OPTIONS
+\fBlive\-boot\fR currently features the following parameters.
+.\" FIXME
+.IP "\fBaccess\fR=\fIACCESS\fR" 4
+Set the accessibility level for physically or visually impaired users. ACCESS must be one of v1, v2, v3, m1, or m2. v1=lesser visual impairment, v2=moderate visual impairment, v3=blindness, m1=minor motor difficulties, m2=moderate motor difficulties.
+.IP "\fBconsole\fR=\fITTY,SPEED\fR" 4
+Set the default console to be used with the "live\-getty" option. Example: "console=ttyS0,115200"
+.IP "\fBdebug\fR" 4
+Makes initramfs boot process more verbose.
+.br
+Use: debug=1
+.br
+Without setting debug to a value the messages may not be shown.
+.IP "\fBfetch\fR=\fIURL\fR" 4
+.IP "\fBhttpfs\fR=\fIURL\fR" 4
+Another form of netboot by downloading a squashfs image from a given URL.
+The fetch method copies the image to RAM and the httpfs method uses FUSE and
+httpfs2 to mount the image in place. Copying to RAM requires more memory and
+might take a long time for large images. However, it is more likely to work
+correctly because it does not require networking afterwards and the system
+operates faster once booted because it does not require to contact the server
+anymore.
+.br
+Due to current limitations in busybox's wget and DNS resolution, an URL can not contain a hostname but an IP address only.
+.br
+Not working: http://example.com/path/to/your_filesystem.squashfs
+.br
+Working: http://1.2.3.4/path/to/your_filesystem.squashfs
+.br
+Also note that therefore it's currently not possible to fetch an image from a name-based virtualhost of an httpd if it is sharing the IP address with the main httpd instance.
+.br
+You may also use the live ISO image in place of the squashfs image.
+.IP "\fBiscsi\fR=\fIserver-ip[,server-port];target-name\fR" 4
+Boot from an iSCSI target that has an ISO or disk live image as one of its LUNs. The specified target is searched for a LUN which looks like a live medium. If you use the \fBiscsitarget\fR software iSCSI target solution your ietd.conf might look like this:
+.br
+# The target-name you specify in the iscsi= parameter
+.br
+Target <target-name>
+  Lun 0 Path=<path-to-your-live-image.iso>,Type=fileio,IOMode=ro
+  # If you want to boot multiple machines you might want to look at tuning some parameters like
+  # Wthreads or MaxConnections
+.IP "\fBfindiso\fR=\fI/PATH/TO/IMAGE\fI" 4
+Look for the specified ISO file on all disks where it usually looks for the .squashfs file (so you don't have to know the device name as in fromiso=....).
+.IP "\fBforcefsck\fR" 4
+Run fsck on persistence filesystem on boot. Will attempt to repair errors. The execution log will be saved in /var/log/live/fsck.log.
+.IP "\fBfromiso\fR=\fI/PATH/TO/IMAGE\fI" 4
+Use a filesystem from within an ISO image that's available on live-media. The first part of the argument should be the block device where the image is stored, followed by the path and filename (e.g. fromiso=/dev/sda1/live/image.iso).
+.br
+Alternatively, it can be used to boot from an ISO embedded into an initrd (e.g. fromiso=/live/image.iso).
+.IP "\fBignore_uuid\fR" 4
+Do not check that any UUID embedded in the initramfs matches the discovered medium. live\-boot may be told to generate a UUID by setting LIVE_GENERATE_UUID=1 when building the initramfs.
+.IP "\fBverify\-checksums\fR" 4
+If specified, an MD5 sum is calculated on the live media during boot and compared to the value found in md5sum.txt found in the root directory of the live media.
+.IP "\fBip\fR=[\fIDEVICE\fR]:[\fICLIENT_IP\fR]:[\fINETMASK\fR]:[\fIGATEWAY_IP\fR]:[\fINAMESERVER\fR] [,[\fIDEVICE\fR]:[\fICLIENT_IP\fR]:[\fINETMASK\fR]:[\fIGATEWAY_IP\fR]:[\fINAMESERVER\fR]]" 4
+Let you specify the name(s) and the options of the interface(s) that should be configured at boot time. Do not specify this if you want to use dhcp (default). It will be changed in a future release to mimic official kernel boot param specification (e.g. ip=10.0.0.1::10.0.0.254:255.255.255.0::eth0,:::::eth1:dhcp).
+.IP "\fBip\fR=[\fIfrommedia\fR]" 4
+If this variable is set, dhcp and static configuration are just skipped and the system will use the (must be) media\-preconfigured /etc/network/interfaces instead.
+.IP "{\fBlive\-media\fR|\fBbootfrom\fR}=\fIDEVICE\fR" 4
+If you specify one of this two equivalent forms, live\-boot will first try to find this device for the "/live" directory where the read\-only root filesystem should reside. If it did not find something usable, the normal scan for block devices is performed.
+.br
+Instead of specifying an actual device name, the keyword 'removable' can be used to limit the search of acceptable live media to removable type only. Note that if you want to further restrict the media to usb mass storage only, you can use the 'removable\-usb' keyword.
+.IP "\fBlive\-media\-offset\fR=\fIBYTES\fR" 4
+This way you could tell live\-boot that your image starts at offset BYTES in the above specified or autodiscovered device, this could be useful to hide the live system ISO or image inside another ISO or image, to create "clean" images.
+.IP "\fBlive\-media\-path\fR=\fIPATH\fR" 4
+Sets the path to the live filesystem on the medium. By default, it is set to '/live' and you should not change that unless you have customized your media accordingly.
+.IP "\fBlive\-media\-timeout\fR=\fISECONDS\fI" 4
+Set the timeout in seconds for the device specified by "live\-media=" to become ready before giving up.
+.IP "\fBmodule\fR=\fINAME\fR" 4
+Instead of using the default optional file "filesystem.module" (see below) another file could be specified without the extension ".module"; it should be placed on "/live" directory of the live medium.
+.IP "\fBnetboot\fR[=nfs|cifs]" 4
+This tells live\-boot to perform a network mount. The parameter "nfsroot=" (with optional "nfsopts="), should specify where is the location of the root filesystem.  With no args, will try cifs first, and if it fails nfs.
+.IP "\fBnfsopts\fR=" 4
+This lets you specify custom nfs options.
+.IP "\fBnofastboot\fR" 4
+This parameter disables the default disabling of filesystem checks in /etc/fstab. If you have static filesystems on your harddisk and you want them to be checked at boot time, use this parameter, otherwise they are skipped.
+.IP "\fBnopersistence\fR" 4
+disables the "persistence" feature, useful if the bootloader (like syslinux) has been installed with persistence enabled.
+.IP "\fBnoeject\fR" 4
+Do not prompt to eject the live medium.
+.IP "\fBramdisk\-size\fR" 4
+This parameter defines a custom ramdisk size (it's the '\-o size' option of tmpfs mount). By default, there is no ramdisk size set, so the default of mount applies (currently 50% of available RAM). Note that this option has currently no effect when booting with toram.
+.IP "\fBoverlay\-size\fR=\fISIZE\fR" 4
+The size of the tmpfs mount (used for the upperdir union root mount) in bytes, and rounded up to entire pages. This option accepts a suffix % to limit the instance to that percentage of your physical RAM or a suffix k, m or g for Ki, Mi, Gi (binary kilo (kibi), binary mega (mebi) and binary giga (gibi)). By default, 50% of available RAM will be used.
+.IP "\fBswap=true\fR" 4
+This parameter enables usage of local swap partitions.
+.IP "\fBpersistence\fR" 4
+live\-boot will probe devices for persistence media. These can be partitions (with the correct GPT name), filesystems (with the correct label) or image files (with the correct file name). Overlays are labeled/named "persistence" (see \fIpersistence.conf\fR(5)). Overlay image files are named "persistence".
+.IP "\fBpersistence\-encryption\fR=\fITYPE1\fR,\fITYPE2\fR ... \fITYPEn\fR" 4
+This option determines which types of encryption that are allowed to be used when probing devices for persistence media. If "none" is in the list, we allow unencrypted media; if "luks" is in the list, we allow LUKS\-encrypted media and if "lukslabel" is in the list we check if the container contains the label "persistence" before trying to open it. Whenever a device containing encrypted media is probed the user will be prompted for the passphrase. The default value is "none".
+.IP "\fBpersistence\-media\fR={\fIremovable\fR|\fIremovable\-usb\fR}" 4
+If you specify the keyword 'removable', live\-boot will try to find persistence partitions on removable media only. Note that if you want to further restrict the media to usb mass storage only, you can use the 'removable\-usb' keyword.
+.IP "\fBpersistence\-method\fR=\fITYPE1\fR,\fITYPE2\fR ... \fITYPEn\fR" 4
+This option determines which types of persistence media we allow. If "overlay" is in the list, we consider overlays (i.e. "live\-rw" and "home\-rw"). The default is "overlay".
+.IP "\fBpersistence\-path\fR=\fIPATH\fR" 4
+live\-boot will look for persistency files in the root directory of a partition, with this parameter, the path can be configured so that you can have multiple directories on the same partition to store persistency files.
+.IP "\fBpersistence\-read\-only\fR" 4
+Filesystem changes are not saved back to persistence media. In particular, overlays and netboot NFS mounts are mounted read-only.
+.IP "\fBpersistence\-storage\fR=\fITYPE1\fR,\fITYPE2\fR ... \fITYPEn\fR" 4
+This option determines which types of persistence storage to consider when probing for persistence media. If "filesystem" is in the list, filesystems with matching labels will be used; if "file" is in the list, all filesystems will be probed for archives and image files with matching filenames. The default is "file,filesystem".
+.IP "\fBpersistence\-label\fR=\fILABEL1\fR,\fILABEL2\fR ... \fILABELn\fR" 4
+live-boot will use the names in this list (instead of "persistence") when searching for persistent storage. Each LABEL can be a valid filename, partition label, or GPT name. The default is "persistence".
+.IP "\fBnoeject\fR" 4
+This option causes live\-boot to reboot without attempting to eject the media and without asking the user to remove the boot media.
+.IP "\fBshowmounts\fR" 4
+This parameter will make live\-boot to show on "/" the ro filesystems (mostly compressed) on "/lib/live". This is not enabled by default because could lead to problems by applications like "mono" which store binary paths on installation.
+.IP "\fBsilent\fR" 4
+If you boot with the normal quiet parameter, live\-boot hides most messages of its own. When adding silent, it hides all.
+.IP "\fBtodisk\fR=\fIDEVICE\fR" 4
+Adding this parameter, live\-boot will try to copy the entire read\-only media to the specified device before mounting the root filesystem. It probably needs a lot of free space. Subsequent boots should then skip this step and just specify the "live\-media=DEVICE" boot parameter with the same DEVICE used this time.
+.IP "\fBtoram\fR" 4
+Adding this parameter, live\-boot will try to copy the whole read\-only media to the computer's RAM before mounting the root filesystem. This could need a lot of ram, according to the space used by the read\-only media.
+.IP "\fBunion\fR=overlay|aufs\fR" 4
+By default, live\-boot uses overlay. With this parameter, you can switch to aufs.
+.IP "\fBdm\-verity\-root\-hash\fR=\fIIMAGE:ROOTHASH\fR,\fIIMAGE2:ROOTHASH2\fR ... \fIIMAGEn:ROOTHASHn\fR" 4
+Explicitly specify a dm\-verity root hash for a \fIIMAGE\fR. Full path needs to be specified. Hashes for multiple images can be comma separated specified.
+.IP "\fBdm\-verity\-enforce\-roothash\-signature\fR" 4
+Enforces that the root hash has to be checked against a signature.
+.IP "\fBdm\-verity\-oncorruption\fR=ignore|panic|restart\fR" 4
+Sets the regarding action for the kernel if corruption occurs on a dm-verity device.
+.\" FIXME
+
+.SH dm\-verity Support
+live\-boot has support for dm\-verity backed root file systems. Which allows for error detection (and correction) in the underlying image. 
+.br
+If for an image a file ending with \fI.verity\fR in the same directory as the image is found live\-boot attempts to mount that image with dm\-vertiy support.
+For a given device with dm\-vertiy support a root hash must be specified. Either in a file ending with \fI.roothash\fR or with the kernel command-line option \fBdm\-verity\-root\-hash\fR.
+If a file ending with \fI.roothash.p7s\fR is found it is used for signature checking in dm\-verity. If signature checking should be enforced the kernel command-line option \fBdm\-verity\-enforce\-roothash\-signature\fR must be set.
+.br
+Forward error detection gets enabled if a file ending with \fI.fec\fR and one with \fI.fec.roots\fR containing the number of roots are found.
+.IP "Example file structure:" 4
+/live/filesystem.squashfs
+.br
+/live/filesystem.squashfs.verity
+.br
+/live/filesystem.squashfs.fec
+.br
+/live/filesystem.squashfs.fec.roots
+.br
+/live/filesystem.squashfs.roothash
+.br
+/live/filesystem.squashfs.roothash.p7s
+
+
+.\" FIXME
+.SH FILES (old)
+.IP "\fB/etc/live.conf\fR" 4
+Some variables can be configured via this config file (inside the live system).
+.IP "\fBlive/filesystem.module\fR" 4
+This optional file (inside the live media) contains a list of white\-space or carriage\-return\-separated file names corresponding to disk images in the "/live" directory. If this file exists, only images listed here will be merged into the root aufs, and they will be loaded in the order listed here. The first entry in this file will be the "lowest" point in the aufs, and the last file in this list will be on the "top" of the aufs, directly below /overlay.  Without this file, any images in the "/live" directory are loaded in alphanumeric order.
+.\" FIXME
+
+.SH FILES
+.IP "\fB/etc/live/boot.conf\fR" 4
+.IP "\fB/etc/live/boot/*\fR" 4
+.IP "\fBlive/boot.conf\fR" 4
+.IP "\fBlive/boot/*\fR" 4
+.IP "\fBpersistence.conf\fR" 4
+
+.SH SEE ALSO
+\fIpersistence.conf\fR(5)
+.PP
+\fIlive\-build\fR(7)
+.PP
+\fIlive\-config\fR(7)
+.PP
+\fIlive\-tools\fR(7)
+
+.SH HOMEPAGE
+More information about live\-boot and the Debian Live project can be found on the homepage at <\fIhttps://wiki.debian.org/DebianLive\fR> and in the manual at <\fIhttps://live-team.pages.debian.net/live-manual/\fR>.
+
+.SH BUGS
+Bugs can be reported by submitting a bugreport for the live\-boot package in the Bug Tracking System at <\fIhttp://bugs.debian.org/\fR> or by writing a mail to the Debian Live mailing list at <\fIdebian-live@lists.debian.org\fR>.
+
+.SH AUTHOR
+live\-boot was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

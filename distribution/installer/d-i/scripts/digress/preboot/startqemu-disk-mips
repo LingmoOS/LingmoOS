@@ -1,0 +1,42 @@
+#!/bin/sh
+# Runs qemu, booting from disk on mips(el).
+set -e
+
+if [ -z "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
+# Qemu needs a dummy bios file for mips.
+mkdir -p $STATE_DIR/qemu-$MACHINE-$SCHEME.files
+dd if=/dev/zero of=$STATE_DIR/qemu-$MACHINE-$SCHEME.files/${ARCH}_bios.bin bs=1024 count=128
+
+# Support either of these names, both make some sense..
+if [ -z "$NETBOOT_KERNEL" ]; then
+	NETBOOT_KERNEL="$QEMU_KERNEL"
+fi
+if [ -z "$NETBOOT_IMAGE" ]; then
+	NETBOOT_IMAGE="$QEMU_INITRD"
+fi
+
+if [ -z "$QEMU_DISK" ]; then
+	QEMU_DISK=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
+fi
+
+if [ ! -e "$NETBOOT_KERNEL" ]; then
+	echo "$NETBOOT_KERNEL does not exist" >&2
+	exit 1
+fi
+
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec $QEMU_COMMAND \
+	-kernel $NETBOOT_KERNEL \
+	-hda $QEMU_DISK \
+	-boot c \
+	-append "root=$ROOTDEV $CONSOLEPARAMS" \
+	-nographic \
+	-L $STATE_DIR/qemu-$MACHINE-$SCHEME.files \
+	-net nic -net user,hostname=$MACHINE \
+	-no-reboot \
+	$QEMU_EXTRA_PARAMS \
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 

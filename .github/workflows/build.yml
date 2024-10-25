@@ -1,0 +1,110 @@
+name: Build System
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+jobs:
+  build:
+    name: Building System
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          swap-size-mb: 512
+          remove-dotnet: 'true'
+          remove-android: 'true'
+
+      - uses: actions/checkout@v4
+
+      - name: Update source
+        run: sudo apt update
+
+      - name: Install base packages
+        run: sudo apt install -y sudo tree arch-install-scripts dctrl-tools devscripts wget isolinux syslinux debian-cd simple-cdd mtools binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils make sed python3 cvs git mercurial subversion libncurses5 asciidoc w3m dblatex python3-aiohttp python3-matplotlib graphviz dpkg-dev
+
+      - name: Config Dir
+        run: rm -rf boot/ installer/ && mv distribution/* ./
+
+      - name: Install Lingmo Debootstrap
+        run: |
+            wget https://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.137_all.deb
+            sudo apt -y install ./*.deb
+            cd debootstrap/ && sudo apt-get build-dep ./ && debuild -us -uc -b && sudo apt -y install ../*.deb
+
+      - name: Install Lingmo System Build
+        run: |
+            sudo apt-get build-dep ./
+            sudo make install
+            sudo apt-key add keying/lingmo.gpg
+      # - name: Build GRUB EFI
+      #  run: |
+      #      cd boot/grub/ && sudo apt build-dep ./ && debuild -us -uc -b && cd ../ && mv ./*.deb ../config/packages.chroot/ && cd ..
+
+      - name: Config Base Settings
+        run: |
+            mkdir build-sys/ && mv auto/ build-sys/ && mv config/ build-sys/ && mv lingmo-config/ build-sys/ && cd build-sys/ && sudo chmod +x auto/* && sudo lingmo-sys-build clean && sudo lingmo-sys-build config && mkdir tools && cp config/make-sum tools/
+
+      - name: Build System
+        run: |
+            cp -v buildem/action/build auto/
+            chmod +x auto/*
+            cd build-sys/ && sudo lingmo-sys-build build
+
+      - name: Read Upload
+        run: |
+            mkdir artifact/
+            # find build-sys -type f -name "*.iso" -exec mv {} artifact/ \;
+            sudo mv build-sys/output/iso/* artifact/
+
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact
+          path: ${{ github.workspace }}/artifact/*
+          compression-level: 9 # maximum compression
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+
+        #      - name: Init build
+      #        run: cp -v configs/lingmo_pc_config .config
+
+        #      - name: Get Core Sources Code
+        #        run: |
+        #            rm -r core/lpm
+        #            git clone https://github.com/LingmoOS/lpm
+        #            tar -Jcvf lpm.tar.xz lpm/
+        #            mv lpm.tar.xz core/
+        #            rm -r lpm/
+      
+            #      - name: Build System
+            #        run: make -j4
+      
+            #      - name: Check output
+            #        run: |
+            #            ls output/
+            #            tree output/
+      
+            #      - name: Make release
+            #        run: |
+            #            tar -Jcvf build_output.tar.xz output/images/
+            #
+            #      - name: Read Upload
+            #        run: |
+            #            mkdir artifact/
+            # find build-sys -type f -name "*.iso" -exec mv {} artifact/ \;
+            #            sudo mv build_output.tar.xz artifact/
+
+          #      - name: Artifact - Release
+          #        uses: actions/upload-artifact@v4
+          #        with:
+          #          name: artifact
+          #          path: ${{ github.workspace }}/artifact/*
+          #          compression-level: 9 # maximum compression
+          #          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`s

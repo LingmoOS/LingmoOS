@@ -1,0 +1,35 @@
+comment "powerpc-utils tools needs a toolchain w/ dynamic library"
+	depends on LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	depends on LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC
+
+config LINGMO_PACKAGE_POWERPC_UTILS
+	bool "powerpc-utils"
+	depends on !LINGMO_STATIC_LIBS # dlfcn.h
+	depends on LINGMO_powerpc || LINGMO_powerpc64 || LINGMO_powerpc64le
+	depends on LINGMO_USE_MMU # numactl
+	depends on LINGMO_TOOLCHAIN_HAS_ATOMIC # numactl
+	select LINGMO_PACKAGE_ZLIB
+	select LINGMO_PACKAGE_NUMACTL
+	help
+	  System utilities for PowerPC machines.
+
+	  https://github.com/ibm-power-utilities/powerpc-utils.git
+
+if LINGMO_PACKAGE_POWERPC_UTILS
+
+config LINGMO_PACKAGE_POWERPC_UTILS_RTAS
+	bool "RTAS support"
+	select LINGMO_PACKAGE_LIBRTAS
+	help
+	  Enable support for functions that require RTAS.
+
+	  This adds a dependency on librtas and provides the following
+	  additional features at the cost of increasing the installed
+	  package size from about 0.5MB to about 2MB:
+	  ppc64_cpu --run-mode, uesensor, set_poweron_time, drmgr,
+	  lsslot, activate_firmware, rtas_ibm_get_vpd, serv_config,
+	  rtas_event_decode, sys_ident.
+
+endif

@@ -1,0 +1,50 @@
+config LINGMO_PACKAGE_NMAP
+	bool "nmap"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	select LINGMO_PACKAGE_LIBLINEAR
+	select LINGMO_PACKAGE_LIBPCAP
+	select LINGMO_PACKAGE_NMAP_NMAP \
+	       if !LINGMO_PACKAGE_NMAP_NCAT && !LINGMO_PACKAGE_NMAP_NPING
+	help
+	  Nmap ("Network Mapper") is a free and open source (license)
+	  utility for network discovery and security auditing.
+
+	  http://nmap.org
+
+if  LINGMO_PACKAGE_NMAP
+
+config LINGMO_PACKAGE_NMAP_NCAT
+	bool "install ncat"
+	depends on LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS
+	help
+	  Ncat is a feature-packed networking utility which reads and
+	  writes data across networks from the command line. Ncat was
+	  written for the Nmap Project as a much-improved
+	  reimplementation of the venerable Netcat.
+
+	  A symlink to "nc" is installed if neither netcat or
+	  netcat-openbsd is selected.
+
+comment "a symlink from ncat to 'nc' will be installed"
+	depends on LINGMO_PACKAGE_NMAP_NCAT
+	depends on !LINGMO_PACKAGE_NETCAT
+	depends on !LINGMO_PACKAGE_NETCAT_OPENBSD
+
+config LINGMO_PACKAGE_NMAP_NMAP
+	bool "install nmap"
+	select LINGMO_PACKAGE_PCRE
+	help
+	  This option installs 'nmap' itself.
+
+config LINGMO_PACKAGE_NMAP_NPING
+	bool "install nping"
+	help
+	  This option installs the 'nping' tool.
+
+endif
+
+comment "nmap-nmap needs a toolchain w/ C++, threads"
+	depends on LINGMO_USE_MMU
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_TOOLCHAIN_HAS_THREADS)

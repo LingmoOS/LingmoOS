@@ -1,0 +1,334 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use File::Temp qw(tempdir);
+use File::Path qw(remove_tree);
+use Dpkg::Version;
+
+my $release_dir = "/mnt/nfs-cdimage/openstack/current";
+if (`hostname` =~ /tack/) {
+    # Local testing of changes
+    $release_dir = "/home/steve/openstack/current";
+}
+my $mirror = "http://deb.debian.org/debian";
+my $sec_mirror = "http://deb.debian.org/debian-security";
+my $gpg_opts = "--keyring /usr/share/keyrings/debian-archive-keyring.gpg --keyring /usr/share/keyrings/debian-archive-removed-keys.gpg";
+my $dir = tempdir() or die "Unable to tempdir: $!\n";
+my %avail;
+my $num_binaries = 0;
+my $verbose = 0;
+my $release = "stable";
+my %sources_updated;
+
+GetOptions ("verbose=i"  => \$verbose,
+            "release=s"  => \$release,
+            "dir=s"      => \$release_dir) or die("Error in command line arguments\n");
+
+# Trivial print wrapper - only print if we're running in very verbose mode
+sub vvlog {
+    my $txt = shift;
+    if ($verbose > 1) {
+	print "$txt\n";
+    }
+}
+
+# Trivial print wrapper - only print if we're running in verbose mode
+sub vlog {
+    my $txt = shift;
+    if ($verbose) {
+	print "$txt\n";
+    }
+}
+
+# Trivial print wrapper - simply print what we're given
+sub _log {
+    my $txt = shift;
+    print "$txt\n";
+}
+
+# Log a command line then run it
+sub log_and_run {
+    my $cmd = shift;
+
+    vlog("  $cmd");
+    system($cmd) == 0 or die "$cmd failed\n";
+}
+
+# Check the Release file signature, and the checksum on Packages.gz
+sub verify_metadata {
+    my $arch = shift;
+    my $expected_sum;
+    my $calc_sum;
+
+    log_and_run("gpg $gpg_opts --verify Release.gpg Release >/dev/null 2>&1");
+    open(RELEASE, "< Release") or die "Can't read Release file: $!\n";
+    while (<RELEASE>) {
+	if (m/^ ([[:xdigit:]]{64})\s+\d+ main\/binary-$arch\/Packages.gz/sg) {
+	    $expected_sum = $1;
+	}
+    }
+    close RELEASE;
+    open(SHA, "sha256sum Packages.gz |") or die "Can't read sha256sum output: $!\n";
+    while (<SHA>) {
+	if (m/^([[:xdigit:]]{64})  Packages.gz/sg) {
+	    $calc_sum = $1;
+	}
+    }
+    close SHA;
+    if (! ($calc_sum eq $expected_sum)) {
+	die "Wrong checksum for Packages.gz!\n";
+    }
+}
+
+# Add a binary package to the *unique* list of binaries known about
+# from a given source package
+sub add_bin_to_source {
+    my $src = shift;
+    my $bin = shift;
+
+    my @list = ();
+    if (defined $sources_updated{$src}) {
+	my $tmp = $sources_updated{$src}{"binaries"};
+	@list = @$tmp;
+    }
+    push(@list, $bin) unless grep{$_ eq $bin} @list;
+    $sources_updated{$src}{"binaries"} = \@list;
+}
+
+# Parse a Packages file and pull out relevant information for us to
+# use into the %avail hash
+sub parse_packages {
+    my $pkgfile = shift; # This file should already be verified before we see it
+    my $mirror = shift;  # The base URL for the mirror it came from
+    my $type = shift;    # main, updates or security?
+    my $arch = shift;
+
+    vlog("Parsing $pkgfile");
+    # Now parse the two Packages.gz files to get (Package, version) tuples
+    open (PACKAGES, "zcat $pkgfile |") or die "Can't open Packages file $pkgfile";
+    my $count = 0;
+    my $binary;
+    my $version;
+    my $source;
+    my $filename;
+    my $sha256;
+    while (<PACKAGES>) {
+	chomp;
+	m/^Package: (\S+)/ and $binary = $1;
+	m/^Version: (\S+)/ and $version = $1;
+	m/^Source: (\S+)/ and $source = $1;
+	m/^Filename: (\S+)/ and $filename = $1;
+	m/^SHA256: (\S+)/ and $sha256 = $1;
+	if (m/^$/) {
+	    $count++;
+	    my $update = 0;
+	    if ($avail{$arch}{$binary}) {
+		# Compare versions, only replace an entry if the new
+		# version is higher
+		my $v_new = Dpkg::Version->new($version);
+		my $v_avail = Dpkg::Version->new($avail{$arch}{$binary}{"version"});
+		if ($v_new > $v_avail) {
+		    $update = 1;
+		}
+	    } else {
+		$update = 1;
+	    }
+	    if ($update) {
+		$avail{$arch}{$binary}{"version"} = $version;
+		$avail{$arch}{$binary}{"url"} = "$mirror/$filename";
+		$avail{$arch}{$binary}{"sha256"} = $sha256;
+		$avail{$arch}{$binary}{"type"} = $type;
+		if (defined $source) {
+		    $avail{$arch}{$binary}{"source"} = $source;
+		} else {
+		    $avail{$arch}{$binary}{"source"} = $binary;
+		}
+	    }
+	    vvlog("Found binary $binary, source $avail{$arch}{$binary}{'source'}, version $version, update $update");
+	    undef $binary;
+	    undef $version;
+	    undef $source;
+	    undef $filename;
+	    undef $sha256;
+	}
+    }
+    close PACKAGES;
+    return $count;
+}
+
+# Download a .deb file and verify it is correct via checksum
+sub download_deb {
+    my $url = shift;
+    my $expected_sum = shift;
+    my $calc_sum;
+    log_and_run("wget -q $url -O pkg.deb");
+
+    open(SHA, "sha256sum pkg.deb |") or die "Can't read sha256sum output: $!\n";
+    while (<SHA>) {
+	if (m/^([[:xdigit:]]{64})  pkg.deb/sg) {
+	    $calc_sum = $1;
+	}
+    }
+    close SHA;
+    if (! ($calc_sum eq $expected_sum)) {
+	die "Wrong checksum for $url!\n";
+    }
+    return "$dir/pkg.deb";
+}
+
+# Grab the changelog entry/entries for a binary package since a
+# specified version
+sub grab_changelog {
+    my $binpkg = shift;
+    my $arch = shift;
+    my $since = shift;
+    my $filename = download_deb($avail{$arch}{$binpkg}{"url"}, $avail{$arch}{$binpkg}{"sha256"});
+    my $chg_text = "";
+    # Check for both non-native and native package changelogs, in that order
+    my @changelogs = ("changelog.Debian.gz","changelog.gz");
+
+    vvlog("  Extracting $binpkg:$arch\n");
+    
+    mkdir "tmppkg";
+    `dpkg-deb --fsys-tarfile $filename | tar -x --wildcards -C tmppkg ./usr/share/doc/*/changelog\* >/dev/null 2>&1`;
+
+    my $done = 0;
+    foreach my $changelog (@changelogs) {
+	if (!$done) {
+	    foreach my $dir (glob "tmppkg/usr/share/doc/*") {
+		vvlog("  Looking for $changelog in $dir\n");
+		if (-d $dir && -f "$dir/$changelog") {
+		    vvlog("  Comparing changelog against $binpkg version $since");	    
+		    open (CHG, "zcat $dir/$changelog | dpkg-parsechangelog -l- -S Changes --since $since 2>/dev/null|")
+			or die "Can't open changelog: $!\n";
+		    while (<CHG>) {
+			chomp;
+			$chg_text .= "  $_\n";
+		    }
+		    close CHG;
+		    $done = 1;
+		    last;
+		}
+	    }
+	}
+    }
+    remove_tree("tmppkg");
+    return $chg_text;
+}
+
+
+vlog("Working in $dir");
+chdir $dir;
+
+my @files = glob("$release_dir/debian*openstack*.list");
+if (scalar @files == 0) {
+    die "No list files found in $release_dir, abort\n";
+}
+
+foreach my $listfile (@files) {
+    my $arch;
+    my $count = 0;
+    # debian-8.6.1-openstack-amd64-packages.list
+    $listfile =~ m/$release_dir\/debian.*-openstack-(\S+)-packages.list/ and $arch = $1;
+
+    foreach my $d ("$dir/$arch", "$dir/$arch/main", "$dir/$arch/updates", "$dir/$arch/security") {
+	mkdir "$d" or die "Unable to create dir: $!\n";
+    }
+
+    # Grab metadata files, and verify the sigs etc.
+    vlog("Getting main metadata");
+    chdir "$dir/$arch/main";
+    foreach my $file ("Release", "Release.gpg", "main/binary-$arch/Packages.gz") {
+	log_and_run("wget -q $mirror/dists/$release/$file");
+    }
+    verify_metadata($arch);
+
+    vlog("Getting updates metadata");
+    chdir "$dir/$arch/updates";
+    foreach my $file ("Release", "Release.gpg", "main/binary-$arch/Packages.gz") {
+	log_and_run("wget -q $mirror/dists/$release-updates/$file");
+    }
+    verify_metadata($arch);
+
+    vlog("Getting security metadata");
+    chdir "$dir/$arch/security";
+    foreach my $file ("Release", "Release.gpg", "main/binary-$arch/Packages.gz") {
+	log_and_run("wget -q $sec_mirror/dists/$release/updates/$file");
+    }
+    verify_metadata($arch);
+
+    # Now parse the metadata. Order should not matter here - we'll
+    # first load the (older) packages from the $release list, then
+    # overload with potentially newer ones from $release-updates and
+    # $release-security, but we'll compare versions at each stage so we
+    # only remember the highest version
+    $count += parse_packages("$dir/$arch/main/Packages.gz", "$mirror", "main", "$arch");
+    $count += parse_packages("$dir/$arch/updates/Packages.gz", "$mirror", "updates", "$arch");
+    $count += parse_packages("$dir/$arch/security/Packages.gz", "$sec_mirror", "security", "$arch");
+    vlog("Found metadata for $count packages");
+
+    vlog("Checking for any updates needed for $listfile");
+    open (LIST, "< $listfile");
+    while (<LIST>) {
+	chomp;
+	if (m/^(\S+) (\S+)$/) {
+	    my $binary = $1;
+	    my $version = $2;
+	    # Strip trailing architecture definition, if any
+	    $binary =~ s/\:.*$//g;
+	    vvlog("  Do we have anything newer than $version for $binary?");
+	    if ($avail{$arch}{$binary}) {
+		my $v_current = Dpkg::Version->new($version);
+		my $v_avail = Dpkg::Version->new($avail{$arch}{$binary}{"version"});
+		if ($v_avail > $v_current) {
+		    my $src = $avail{$arch}{$binary}{"source"};
+		    $avail{$arch}{$binary}{"oldversion"} = $version;
+		    vlog("    $binary: old $version new $avail{$arch}{$binary}{'version'}, source $src in $avail{$arch}{$binary}{'type'}, ");
+		    $num_binaries++;
+		    add_bin_to_source($src, "$binary:$arch");
+		} else {
+		    vvlog("    No, most recent is $avail{$arch}{$binary}{'version'} in $avail{$arch}{$binary}{'type'}");
+		}
+	    }
+	}
+    }
+    close LIST;
+}
+
+chdir "$dir";
+
+my $num_sources = scalar(keys %sources_updated);
+if ($num_binaries > 0) {
+    _log("\nUpdates in $num_sources source package(s), $num_binaries binary package(s):\n");
+
+    # Grab the changelog entry/entries from all the binary packages
+    # built from each source package, until we find one which includes
+    # a changelog.
+    foreach my $source (sort (keys %sources_updated)) {
+	my $tmp = $sources_updated{$source}{"binaries"};
+	my @binlist = @$tmp;
+	my $changelog;
+	foreach my $bin_arch (@binlist) {
+	    my ($bin,$arch) = split /:/,$bin_arch;
+	    $changelog = grab_changelog($bin, $arch, $avail{$arch}{$bin}{"oldversion"});
+	    if (length($changelog) > 2) {
+		last;
+	    }
+	}
+	print "  Source $source, binaries:";
+	foreach my $bin (@binlist) {
+	    print(" $bin");
+	}
+	print "$changelog\n";
+    }
+    exit 0;
+} else {
+    exit 1;
+}
+
+END {
+    chdir "/";
+    vlog("Cleaning up $dir");
+    remove_tree($dir);
+}

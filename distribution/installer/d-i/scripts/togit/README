@@ -1,0 +1,98 @@
+This is a work in progress. Plan:
+
+* Checkout svn-all-fast-export into a svn-all-fast-export subdir of
+   this "togit" directory and build it:
+
+	git clone git://repo.or.cz/svn-all-fast-export.git
+
+	(Apply svn-all-fast-export.patch* to it first.)
+
+	Hints for building svn-all-fast-export:
+	
+	- Install qt4-qmake libqt4-dev libsvn-dev
+	- Run qmake to generate Makefile
+	- Run make
+  DONE
+
+* for final conversion: lock svn repo for conversion; disable l10n-sync
+  DONE
+
+* Get a copy of d-i's svn repo from alioth, and put it in svn/d-i under
+  this "togit" directory.
+  DONE
+
+* Run ./convert.sh (it can be restarted as problems are fixed by passing -r)
+   Output is to ./git/
+  DONE
+
+* Run ./find-missing-authors.sh to find committers not listed in authors-file;
+  if found add and redo conversion.
+  DONE
+
+* Run ./finalize.sh
+  DONE
+
+* Transfer git/* to /git/d-i/ on alioth, make live.
+  (chmod -R g+rw on git repos; should all be in svn_d-i group)
+  DONE
+
+* Verifying the conversion:
+
+  ./verify.sh init
+  DONE
+  ./verify.sh all
+  DONE
+
+* Run ./hooksetup.sh (this expects to find the repos in /git/d-i,
+   and so should probably be run on alioth, after the conversion.)
+  DONE
+
+* Unlock svn repo.
+  DONE
+
+* Remove from the svn trunk packages that have been moved to git.
+  DONE
+
+* Add .mrconfig files to svn trunk; add svn ignores for directories
+  checked out by mr
+  DONE
+
+* Check everything out into a d-i tree with mr.
+  DONE
+
+* Finally, create .gitignore files by running ignores.sh
+  DONE
+
+* Remove $Id$ keywords from files where the git equivalent (a hash id)
+  doesn't make sense, and/or turn on the ident attribute in git for
+  files to enable git doing the expansion.
+  DONE
+
+* l10n-sync needs to be made git aware
+  DONE
+
+* Add support for SILENT_COMMIT and [l10n] to git hook scripts.
+  This will require some coding to get right.
+  NOT DONE, but CIA has been confgiured to skip the SILENT_COMMIT messages
+
+* Update the Vcs fields in control files.
+  DONE
+
+* Update docs in wiki, website, svn, etc.
+  DONE
+
+* All daily build operators will update their build trees to
+  use the debian-installer git repository (which is what
+  provides the installer/build/ directory).
+  DONE ** except sparc **
+
+* Everyone with an existing svn checkout will see 'svn update'
+  delete most of d-i. (If they have uncommitted changes still in
+  svn, svn will complain about conflicts.) They will run
+  'mr -p checkout' to check out the git repos, and start using git.
+
+* Encourage anyone who maintains patches on top of d-i (Ubuntu, etc)
+  to publish them to git repos, or possibly to branches in our git
+  repos.
+
+* Update Ohloh enlistments

@@ -1,0 +1,15 @@
+config LINGMO_PACKAGE_KSMBD_TOOLS
+	bool "ksmbd-tools"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_USE_WCHAR # libglib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libglib2, libnl
+	select LINGMO_PACKAGE_LIBGLIB2
+	select LINGMO_PACKAGE_LIBNL
+	help
+	  ksmbd kernel server userspace utilities.
+
+	  https://github.com/cifsd-team/ksmbd-tools
+
+comment "ksmbd-tools needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

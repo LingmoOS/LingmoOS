@@ -1,0 +1,28 @@
+config LINGMO_PACKAGE_LIBBSD_ARCH_SUPPORTS
+	bool
+	default y
+	# libbsd does not support those architectures (see src/local-elf.h)
+	depends on !LINGMO_microblaze
+	depends on !LINGMO_arc
+	depends on !LINGMO_xtensa
+
+config LINGMO_PACKAGE_LIBBSD
+	bool "libbsd"
+	depends on LINGMO_PACKAGE_LIBBSD_ARCH_SUPPORTS
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_WCHAR
+	select LINGMO_PACKAGE_LIBMD
+	help
+	  This library provides useful functions commonly found on BSD
+	  systems, and lacking on others like GNU systems, thus making
+	  it easier to port projects with strong BSD origins, without
+	  needing to embed the same code over and over again on each
+	  project.
+
+	  http://libbsd.freedesktop.org/
+
+comment "libbsd needs a toolchain w/ dynamic library, threads, wchar"
+	depends on LINGMO_PACKAGE_LIBBSD_ARCH_SUPPORTS
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		!LINGMO_USE_WCHAR

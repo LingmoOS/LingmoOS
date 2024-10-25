@@ -1,0 +1,23 @@
+config LINGMO_PACKAGE_RTORRENT
+	bool "rtorrent"
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_USE_MMU # fork()
+	# gcc < 4.9 cause an "internal compiler error"
+	depends on LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 && LINGMO_TOOLCHAIN_HAS_SYNC_4
+	select LINGMO_PACKAGE_LIBCURL
+	select LINGMO_PACKAGE_LIBTORRENT
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_OPENSSL
+	help
+	  BitTorrent Client using libtorrent
+
+	  https://github.com/rakshasa/rtorrent
+
+comment "rtorrent needs a toolchain w/ C++, threads, wchar, gcc >= 4.9"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_1 && LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !(LINGMO_INSTALL_LIBSTDCPP && LINGMO_USE_WCHAR && \
+		LINGMO_TOOLCHAIN_HAS_THREADS && LINGMO_TOOLCHAIN_GCC_AT_LEAST_4_9)

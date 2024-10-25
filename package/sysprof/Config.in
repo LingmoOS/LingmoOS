@@ -1,0 +1,31 @@
+config LINGMO_PACKAGE_SYSPROF
+	bool "sysprof"
+	depends on LINGMO_USE_WCHAR # glib2
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # glib2
+	depends on LINGMO_USE_MMU # glib2
+	# In its util.h file, sysprof contains architecture-specific
+	# code
+	depends on LINGMO_i386 || LINGMO_x86_64 || LINGMO_powerpc || LINGMO_sh4a || LINGMO_sh4aeb
+	select LINGMO_PACKAGE_LIBGLIB2
+	help
+	  Sysprof is a statistical, system-wide profiler that can
+	  profile user and kernel code using the perf API.
+
+	  http://sysprof.com
+
+if LINGMO_PACKAGE_SYSPROF
+
+config LINGMO_PACKAGE_SYSPROF_GUI
+	bool "sysprof GUI"
+	depends on LINGMO_PACKAGE_LIBGTK2
+	select LINGMO_PACKAGE_LIBGLADE
+	select LINGMO_PACKAGE_GDK_PIXBUF
+	help
+	  GUI for the sysprof system-wide statistical profiler.
+
+endif
+
+comment "sysprof needs a toolchain w/ wchar, threads"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_i386 || LINGMO_x86_64 || LINGMO_powerpc || LINGMO_sh4a || LINGMO_sh4aeb
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS

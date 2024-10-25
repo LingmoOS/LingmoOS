@@ -1,0 +1,21 @@
+comment "libcanberra needs a toolchain w/ wchar, threads, dynamic library"
+	depends on !LINGMO_USE_WCHAR || !LINGMO_TOOLCHAIN_HAS_THREADS || \
+		LINGMO_STATIC_LIBS
+
+config LINGMO_PACKAGE_LIBCANBERRA
+	bool "libcanberra"
+	depends on LINGMO_USE_WCHAR
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS
+	# We need at least one audio backend
+	select LINGMO_PACKAGE_ALSA_LIB if \
+	       !LINGMO_PACKAGE_PULSEAUDIO && \
+	       !LINGMO_PACKAGE_GSTREAMER1
+	# We need libltdl
+	select LINGMO_PACKAGE_LIBTOOL
+	select LINGMO_PACKAGE_LIBVORBIS
+	help
+	  libcanberra defines a simple abstract interface for playing
+	  event sounds.
+
+	  http://0pointer.de/lennart/projects/libcanberra/

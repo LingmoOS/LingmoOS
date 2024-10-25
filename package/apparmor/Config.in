@@ -1,0 +1,77 @@
+config LINGMO_PACKAGE_APPARMOR
+	bool "apparmor"
+	depends on LINGMO_USE_MMU # fork()
+	depends on LINGMO_INSTALL_LIBSTDCPP
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4 # libapparmor
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS # libapparmor
+	depends on LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_16 # libapparmor
+	select LINGMO_PACKAGE_LIBAPPARMOR
+	help
+	  AppArmor is an effective and easy-to-use Linux application
+	  security system. AppArmor proactively protects the operating
+	  system and applications from external or internal threats,
+	  even zero-day attacks, by enforcing good behavior and
+	  preventing even unknown application flaws from being
+	  exploited.
+
+	  This package builds the parser (which can load profiles).
+
+	  http://wiki.apparmor.net
+
+if LINGMO_PACKAGE_APPARMOR
+
+config LINGMO_PACKAGE_APPARMOR_BINUTILS
+	bool "binutils"
+	help
+	  A set of utilities (written in C):
+	    aa-enabled    aa-exec
+
+comment "utils need python3"
+	depends on !LINGMO_PACKAGE_PYTHON3
+
+config LINGMO_PACKAGE_APPARMOR_UTILS
+	bool "utils"
+	depends on LINGMO_PACKAGE_PYTHON3
+	select LINGMO_PACKAGE_BUSYBOX_SHOW_OTHERS # net-tools
+	select LINGMO_PACKAGE_NET_TOOLS # runtime (aa-unconfined)
+	select LINGMO_PACKAGE_PYTHON3_READLINE
+	help
+	  A set of utilities (written in python):
+	    aa-audit          aa-disable      aa-logprof
+	    aa-autodep        aa-easyprof     aa-mergeprof
+	    aa-cleanprof      aa-enforce      aa-status
+	    aa-complain       aa-genprof      aa-unconfined
+
+if LINGMO_PACKAGE_APPARMOR_UTILS
+
+comment "utils (extras) need bash and perl, and busybox or gawk"
+	depends on !LINGMO_PACKAGE_BASH || !LINGMO_PACKAGE_PERL \
+		|| !(LINGMO_PACKAGE_BUSYBOX || LINGMO_PACKAGE_GAWK)
+
+config LINGMO_PACKAGE_APPARMOR_UTILS_EXTRA
+	bool "utils (extras)"
+	depends on LINGMO_PACKAGE_BASH
+	depends on LINGMO_PACKAGE_PERL
+	depends on LINGMO_PACKAGE_BUSYBOX || LINGMO_PACKAGE_GAWK
+	help
+	  An extra set of utilities (written in a mixture of sh,
+	  bash, perl, and awk):
+	    aa-decode          (bash + perl)
+	    aa-notify          (perl)
+	    aa-remove-unknown  (sh + awk)
+
+endif # LINGMO_PACKAGE_APPARMOR_UTILS
+
+config LINGMO_PACKAGE_APPARMOR_PROFILES
+	bool "profiles"
+	help
+	  Installs server-class profiles for a wide range of
+	  usual programs and daemons.
+
+endif # LINGMO_PACKAGE_APPARMOR
+
+comment "apparmor needs a toolchain w/ headers >= 3.16, threads, C++"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_TOOLCHAIN_HAS_SYNC_4
+	depends on !LINGMO_INSTALL_LIBSTDCPP || !LINGMO_TOOLCHAIN_HAS_THREADS \
+		|| !LINGMO_TOOLCHAIN_HEADERS_AT_LEAST_3_16

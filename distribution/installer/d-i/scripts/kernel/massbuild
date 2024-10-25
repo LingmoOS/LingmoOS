@@ -1,0 +1,684 @@
+#! /bin/bash
+set -e
+
+# Copyright: Frans Pop <elendil@planet.nl>, 2007, 2009
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+
+### INITIALIZATION
+
+NL="
+"
+
+OPERATION=""
+BDEP_SVERSION=""
+ARCHES=""
+USE_INCOMING=""
+NO_CLEAN=""
+DO_DCH=""
+DO_P_U=""
+CHANGELOG_EXTRA=""
+DISTRIBUTION=""
+URGENCY=""
+LMIRROR=""
+MIRROR=""
+INCOMING=""
+
+# Source user configuration file
+# Can contain values for LMIRROR, MIRROR and INCOMING
+# A local mirror is only used if defined in this file
+if [ -f ~/.d-i_massbuildrc ]; then
+	. ~/.d-i_massbuildrc
+fi
+
+MIRROR=${MIRROR:-"http://ftp.nl.debian.org/debian"}
+INCOMING=${INCOMING:-"http://incoming.debian.org"}
+
+# Architectures listed here are not built unless specifically requested
+UNOFFICIAL="arm armhf m68k alpha sh4 sparc64 hppa"
+
+usage() {
+	if [ "$@" ]; then
+		echo "Error: $@"
+		echo
+	fi
+	cat <<EOF
+Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]
+       $(basename $0) krelease|mrelease [<architecture> ...]
+       $(basename $0) kclean|mclean [<architecture> ...]
+
+Operations starting with 'k' act on {linux,kfreebsd}-kernel-* source
+packages; those starting with 'm' on {linux,kfreebsd}-module-* packages:
+ - build:   retrieve dependencies and build the udebs
+ - release: show changes; after confirmation call 'debcommit --release'
+ - clean:   remove built and temporary files
+
+If no architecture is specified, an operation will be performed for all
+official architectures. For kfreebsd arches can be specified both with
+and without the kfreebsd- prefix.
+
+General options:
+ --bsd         act on kfreebsd instead of linux architectures
+
+Options for 'kbuild' and 'mbuild' operations:
+ -k            keep the temporary files (incl. downloaded dependencies) used
+               during the build; useful for repeated builds when making
+               changes to udeb contents or solving build errors
+ --dch         update changelog; automatically adds new entry (if needed)
+               and a line describing updates in dependencies used
+ --p-u         use version in the form <version>+<distribution>1 (if needed)
+               this implies --dch and required -d option
+ -m <extra changelog entry>
+               add additional lines in changelog; implies --dch
+ -d <distribution>
+               set named target distribution in changelog
+ --incoming    also check 'incoming' for dependencies
+EOF
+	exit 1
+}
+
+list_arches() {
+	local uarch=$1 udir
+	udir=$UBASE-$uarch$PF
+	echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
+		awk '{print $1}' | sort | uniq)
+}
+
+[ "$1" ] || usage "operation not specified"
+
+## Parse command line arguments
+OPERATION="$1"
+shift
+case "$OPERATION" in
+    kbuild|krelease|kclean)
+	TYPE=kernel
+	;;
+    mbuild|mrelease|mclean)
+	TYPE=modules
+	;;
+    *)
+	usage "unrecognized operation" ;;
+esac
+
+KTYPE=linux
+PF=-2.6
+
+while true; do
+	case "$1" in
+	    "")
+		break ;;
+	    --bsd)
+		KTYPE=kfreebsd
+		PF=
+		;;
+	    -k)
+		NO_CLEAN=1
+		;;
+	    --dch)
+		DO_DCH=1
+		;;
+	    --p-u)
+		DO_DCH=1
+		DO_P_U=1
+		;;
+	    -m)
+		DO_DCH=1
+		shift
+		CHANGELOG_EXTRA="$1"
+		;;
+	    -d)
+		shift
+		DISTRIBUTION="$1"
+		;;
+	    -u)
+		shift
+		URGENCY="$1"
+		;;
+	    --incoming)
+		USE_INCOMING=1
+		;;
+	    -*)
+		usage "unrecognized argument '$1'" ;;
+	    *)
+		# Strip trailing slash
+		ARCHES="${ARCHES:+$ARCHES }$1"
+		;;
+	esac
+	shift
+done
+
+UBASE=$KTYPE-$TYPE-di
+OUTDIR=massbuild.out.$TYPE
+
+if [ "$KTYPE" = kfreebsd ]; then
+	# Ensure all arches have kfreebsd- prefix
+	for arch in $ARCHES; do
+		arch=${arch#kfreebsd-}
+		ARCHES="${ARCHES:+$ARCHES }kfreebsd-$arch"
+	done
+fi
+
+# Default to all possible architectures
+REQUESTED=$ARCHES
+if [ -z "$ARCHES" ]; then
+	for udir in $(ls -d $UBASE-*$PF); do
+		[ -d $udir ] || continue
+		uarch=$(echo $udir | cut -d- -f4)
+		ARCHES=${ARCHES:+$ARCHES }$(list_arches $uarch)
+	done
+fi
+
+# Some architectures are combined in the same source 
+UARCHES=""
+for arch in $ARCHES; do
+	case $arch in
+	    # ppc64 is no longer supported, but kept here as example
+	    #ppc64)	uarch=powerpc ;;
+	    *)		uarch=$arch ;;
+	esac
+	# For kfreebsd, remove the prefix
+	uarch=${uarch#kfreebsd-}
+
+	if ([ "$KTYPE" = linux ] && expr $arch : kfreebsd >/dev/null) ||
+	   ! [ -f $UBASE-$uarch$PF/kernel-versions ]; then
+		usage "unsupported architecture '$arch'"
+	fi
+	if ! echo " $UARCHES " | grep -q " $uarch "; then
+		UARCHES="${UARCHES:+$UARCHES }$uarch"
+	fi
+done
+
+# Check that needed commands are available
+for cmd in kernel-wedge fakeroot dch mergechanges; do
+	if ! type "$cmd" >/dev/null; then
+		echo "Error: command '$cmd' is not available"
+		exit 1
+	fi
+done
+
+CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
+trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
+
+
+### FUNCTION DEFINITIONS FOR MAINLINE
+
+log() {
+	echo "$@"
+	echo "$@" >>$LOGFILE
+}
+
+clean_arch_tmp() {
+	[ "$NO_CLEAN" ] || rm -rf $ARCH_TDIR
+}
+
+clean_arch() {
+	# Remove from both dirs to also clean manual or failed builds
+	local uarch=${1#kfreebsd-}
+	rm -f ./$UBASE-$uarch${PF}_*.*
+	rm -f ./*_$1.udeb
+	rm -f ./$OUTDIR/$UBASE-$uarch${PF}_*.*
+	rm -f ./$OUTDIR/*_$1.udeb
+}
+
+init_changelog() {
+	[ "$DO_DCH" ] || return 0
+
+	>"$CL_TEMP"
+	if [ "$CHANGELOG_EXTRA" ]; then
+		echo "$CHANGELOG_EXTRA" >"$CL_TEMP"
+	fi
+}
+
+add_changelog() {
+	[ "$DO_DCH" ] || return 0
+
+	echo "$1" >>"$CL_TEMP"
+}
+
+
+do_dch() {
+	[ "$DO_DCH" ] || return 0
+
+	# Sanity check
+	if [ "$DO_P_U" ] && [ -z "$DISTRIBUTION" ]; then
+		cat <<EOF
+
+Error: to use --p-u you need to specify the -d option and the desired
+distribution.
+EOF
+		clean_arch_tmp
+		exit 1
+	fi
+
+	local new_entry=""
+
+	local version=""
+	if [ "$DO_P_U" ]; then
+		if ! head -n 1 debian/changelog | grep -q "\+${DISTRIBUTION}[0-9]*)"; then
+			version="-v $(head -n 1 debian/changelog | sed 's,.*(\(.*\)).*,\1,g')+${DISTRIBUTION}1"
+		fi
+	fi
+
+	# Use dch's default logic to determine if we need a new changelog
+	# entry or not.
+	cat $CL_TEMP | while read CL; do
+		# Avoid duplicate entries in the changelog, but limit scope
+		if ! head -n 25 debian/changelog | grep -q "\* $CL"; then
+			dch --release-heuristic=changelog $version "$CL"
+			new_entry=1
+		fi
+        done
+	# Sanity check
+	if ! head -n 1 debian/changelog | grep -q UNRELEASED && [ -z "$new_entry" ]; then
+		cat <<EOF
+
+Error: no new changelog entries were added, which most likely means there
+has been an earlier build against the same version of the packages this
+component depends on. Not having a new changelog entry cannot be correct
+as the previous version is already marked as released.
+Did you want to do a rebuild without the --dch option or did you forget to
+provide a reason for the rebuild using the -m option?
+EOF
+		clean_arch_tmp
+		exit 1
+	fi
+
+	local dist=""
+	if [ "$DISTRIBUTION" ]; then
+		dist="--distribution $DISTRIBUTION"
+	fi
+	local urgency=""
+	if [ "$URGENCY" ]; then
+		urgency="--urgency $URGENCY"
+	fi
+	dch $dist $urgency -r "dummy"
+}
+
+# dpkg-source --before-build fails if there's no control file
+generate_control() {
+	kernel-wedge gen-control > debian/control
+}
+
+has_recent_upload() {
+	local chlog="$USOURCE/debian/changelog"
+	if ! head -n 1 $chlog | grep -q UNRELEASED; then
+		sig="$(grep "^ --" $chlog | head -n 1)"
+		sigdate="${sig#*  }"
+		sigsec="$(date -d "$sigdate" +%s 2>/dev/null)" || true
+		if [ "$sigsec" ]; then
+			if [ $((($(date +%s) - $sigsec) / 86400)) -lt 5 ]; then
+				return 0
+			fi
+		else
+			echo "* Error parsing date from '$sig'"
+		fi
+	fi
+	return 1
+}
+
+check_kernel_wedge() {
+	KWDEP=$(grep "Depends:.*kernel-wedge" $USOURCE/debian/control.stub | 
+		sed "s/.*kernel-wedge *(>= \([^)]*\)).*/\1/")
+	KWINST=$(dpkg -l kernel-wedge | grep ^ii | awk '{print $3}')
+	if [ -z "$KWDEP" ]; then
+		log "* Error: could not determine kernel-wedge dependency"
+	elif [ -z "$KWDEP" ]; then
+		log "* Error: could not determine installed kernel-wedge version"
+	elif dpkg --compare-versions $KWINST lt $KWDEP; then
+		log "* Error: kernel-wedge version $KWDEP needed (have $KWINST)"
+	else
+		return 0
+	fi
+	return 1
+}
+
+select_source() {
+	local bdep=$1 v
+	case $bdep in
+	    # Kernel images
+	    linux-image-2.6*)
+		# Used with Debian packages
+		BDEP_SOURCE=linux-2.6
+		BDEP_BINARY_BASE=linux-image-2.6
+		;;
+	    linux-image-3.0*)
+		# Used with Debian packages
+		BDEP_SOURCE=linux-2.6
+		BDEP_BINARY_BASE=linux-image-3.0
+		;;
+	    linux-2.6*)
+		# Used with kernel packages built from upstream source
+		# (using 'make deb-pkg')
+		BDEP_SOURCE=linux-upstream
+		BDEP_BINARY_BASE=linux-2.6
+		;;
+	    # Out of tree modules (Debian packages)
+	    atl2-modules-2.6*)
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BINARY_BASE=atl2-modules-2.6
+		;;
+	    squashfs-modules-2.6*)
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BINARY_BASE=squashfs-modules-2.6
+		;;
+	    speakup-modules-2.6*)
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BINARY_BASE=speakup-modules-2.6
+		;;
+	    loop-aes-modules-2.6*)
+		#BDEP_SOURCE=loop-aes # for kernels < 2.6.24
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BINARY_BASE=loop-aes-modules-2.6
+		;;
+	    kfreebsd-image-*)
+		v=$(echo $bdep | sed -r "s/.*image-([0-9.]+)-.*/\1/")
+		BDEP_SOURCE=kfreebsd-${v%%.*}
+		BDEP_BINARY_BASE=kfreebsd-image-$v
+		;;
+	    *)
+		echo "Unsupported build-dependency '$1'"
+		clean_arch_tmp
+		exit 1
+		;;
+	esac
+
+	BDEP_SVERSION=$(grep "^$BDEP_SOURCE[[:space:]]" ../$(dirname $0)/massbuild.versions | awk '{print $2}')
+	if [ -z "$BDEP_SVERSION" ]; then
+		echo "Could not determine desired version for $bdep"
+		clean_arch_tmp
+		exit 1
+	fi
+
+        _TMP=${BDEP_SOURCE#?} # everything but the first character
+	BDEP_SOURCE_PREFIX=${BDEP_SOURCE%$_TMP}
+}
+
+retrieve_package() {
+	local mirror_type=$1
+	local package_list
+	local url
+
+	# HACK ALERT
+	# The binary packages for linux-modules-extra have a different
+	# version than their source package.
+	# The version of the module's source package is inserted between the
+	# "upstream" part of the version and the "Debian" revision.
+	if expr "$BDEP_SVERSION" : ".*-" >/dev/null; then
+		local sv_base=${BDEP_SVERSION%-*}
+		local sv_rev=$(echo ${BDEP_SVERSION##*-} | sed 's/+/%2[Bb]/g')
+
+		local sv_regexp="_${sv_base}([^_]*)?-${sv_rev}_"
+	else
+		# Non-Debian style package version (custom built kernel?)
+		local sv_regexp="_${BDEP_SVERSION}_"
+	fi
+
+	case $mirror_type in
+	    disk)
+		PACKAGE="$(ls -1 $ARCH_TDIR/ | \
+			   egrep "${build_dep}${sv_regexp}${kv_arch}\.deb")"
+		if [ "$PACKAGE" ]; then
+			log "  Using already available $PACKAGE"
+			return 0
+		else
+			return 1
+		fi
+		;;
+	    local)
+		url="$LMIRROR/pool/main/${BDEP_SOURCE_PREFIX}/$BDEP_SOURCE"
+		;;
+	    pool)
+		url="$MIRROR/pool/main/${BDEP_SOURCE_PREFIX}/$BDEP_SOURCE"
+		;;
+	    incoming)
+		url="$INCOMING"
+		;;
+	    *)
+		echo "Internal error: undefined mirror type"
+		clean_arch_tmp
+		exit 1
+		;;
+	esac
+
+	package_list="$(wget -q $url -O - | \
+		   sed "s:</tr><:</tr>\n<:g" | \
+		   grep "$BDEP_BINARY_BASE.*\.deb" | \
+		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" | \
+		   sed "s/+/%2B/g")"
+
+	package_list="$(echo "$package_list" | grep "${build_dep}_.*$kv_arch\.")"
+	if [ -z "$package_list" ]; then
+		log "  * no packages available matching $build_dep from $mirror_type"
+		return 1
+	fi
+
+	PACKAGE="$(echo "$package_list" | egrep "$sv_regexp")"
+	if [ -z "$PACKAGE" ]; then
+		log "  * version $BDEP_SVERSION of $BDEP_SOURCE for $kv_arch seems unavailable in $mirror_type"
+		return 1
+	fi
+
+	log "  Retrieving $PACKAGE from $mirror_type..."
+	if ! wget -q $url/$PACKAGE -O $ARCH_TDIR/$PACKAGE; then
+		log "  * failed to retrieve $PACKAGE for $USOURCE from $mirror_type"
+		return 1
+	fi
+}
+
+get_depends() {
+	rm -rf $ARCH_TDIR/lib $ARCH_TDIR/usr
+
+	cat kernel-versions | egrep "^$1[[:space:]]" | \
+	    while read kv_arch version flavour installedname suffix build_deps; do
+		build_deps="$(echo $build_deps | sed "s/ ([^)]*)//" | \
+			      sed "s/,[[:space:]]*/ /g")"
+		for build_dep in $build_deps; do
+			select_source $build_dep
+
+			# exit on errors as we're in a subshell!
+			if retrieve_package disk; then
+				:
+			elif [ "$LMIRROR" ] && retrieve_package local; then
+				:
+			elif retrieve_package pool; then
+				:
+			elif [ "$USE_INCOMING" ] && retrieve_package incoming; then
+				:
+			else
+				echo "Failed to retrieve available build dependencies"
+				clean_arch_tmp
+				exit 1
+			fi
+
+			add_changelog "Built against version $BDEP_SVERSION of $BDEP_SOURCE."
+			dpkg -x $ARCH_TDIR/$PACKAGE $ARCH_TDIR/
+		done
+		if [ "$KTYPE" = linux ] &&
+		   [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
+			/sbin/depmod -b $ARCH_TDIR/ $installedname
+		fi
+	done
+	return $?
+}
+
+merge_changes() {
+	local bchanges schanges hostarch
+
+	cd ..
+	bchanges="$(ls -1 $UBASE-*_$arch.changes)"
+	case $(echo "$bchanges" | wc -l) in
+	   0)
+		log "* Error: no changes file found"
+		clean_arch $arch
+		;;
+	   1)
+		hostarch=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
+		schanges=$(echo $bchanges | sed "s/_$arch/_source/")
+		if [ $arch = $hostarch ]; then
+			# Delete redundant source changes file
+			rm -f $schanges
+		else
+			# Cross build: merge binary and source changes files
+			if [ -f $schanges ]; then
+				log "  Merging changes files..."
+				mergechanges -f $bchanges $schanges
+				rm $bchanges $schanges
+			else
+				log "* Error: cross build, but no source changes files found"
+				clean_arch $arch
+			fi
+		fi
+		;;
+	   *)
+		log "* Error: too many changes files found"
+		clean_arch $arch
+		;;
+	esac
+	cd $USOURCE
+}
+
+
+### MAINLINE
+
+LOGFILE="$(pwd -P)/massbuild.$OPERATION.log"
+: >$LOGFILE
+
+case $OPERATION in
+    krelease|mrelease)
+	for uarch in $UARCHES; do
+		cd $UBASE-$uarch$PF
+		log "Committing changes for $uarch..."
+		GIT_ST="$(git status --porcelain)"
+		# These status codes indicate untracked or unmerged files.
+		if [ "$(echo "$GIT_ST" | egrep -q "^(\?|AA|DD|U|.U)")" ]; then
+			log "* Working copy is not clean; skipping"
+			cd ..; log ""; continue
+		fi
+		if ! echo "$GIT_ST" | egrep "^.. debian/changelog"; then
+			log "* No changes to commit; skipping"
+			cd ..; log ""; continue
+		fi
+		git diff HEAD
+		read -n 1 -s -p "Are you sure you want to commit these changes [yN]? " reply
+		echo
+		if [ "$reply" != y ] && [ "$reply" != Y ]; then
+			log "* Aborted by user"
+			cd ..; log ""; continue
+		fi
+		debcommit --all --release 2>&1 | tee -a $LOGFILE
+		cd ..; log ""
+	done
+	;;
+    kclean|mclean)
+	for arch in $ARCHES; do
+		log "Cleaning files for $arch..."
+		rm -rf ./$arch
+		clean_arch $arch
+	done
+	rmdir ./$OUTDIR 2>/dev/null || true
+	;;
+esac
+
+
+## Rest of processing is for builds
+if [ $OPERATION != kbuild ] && [ $OPERATION != mbuild ]; then
+	exit 0
+fi
+
+
+cat <<EOF
+This script will build kernel udebs from source packages of a specific
+version either for all architectures or a specific architecture.
+Make sure you have updated 'massbuild.versions' before continuing.
+EOF
+if [ "$no_cross" ]; then
+	cat <<EOF
+NOTE: Uploads of kernel/module udebs should only be done by a porter
+      for that architecture, or after checking with the D-I release
+      manager.
+EOF
+else
+	cat <<EOF
+NOTE: This script should only be used to build and upload kernel/module
+      udebs for multiple architectures after checking with the D-I
+      release manager.
+EOF
+fi
+read -n 1 -s -p "Do you wish to continue [yN]? " reply
+echo
+if [ "$reply" != y ] && [ "$reply" != Y ]; then
+	exit 0
+fi
+
+
+for uarch in $UARCHES; do
+	echo
+	init_changelog
+
+	USOURCE=$UBASE-$uarch$PF
+	for arch in $(list_arches $uarch); do
+		if ! echo " $ARCHES " | grep -q " $arch "; then
+			continue
+		fi
+
+		# Skip unofficial arches unless specifically requested
+		if echo " $UNOFFICIAL " | grep -q " $arch " && \
+		   ! echo " $REQUESTED " | grep -q " $arch "; then
+			echo "! Skipping architecture $arch (unofficial)"
+			continue
+		fi
+		log "Processing $arch..."
+
+		if has_recent_upload; then
+			echo "There already has been a recent upload for this architecture."
+			read -n 1 -s -p "Skip this architecture [Yn]? " reply
+			echo
+			if [ "$reply" != n ] && [ "$reply" != N ]; then
+				continue
+			fi
+		fi
+
+		clean_arch $arch
+		rm -f massbuild.$arch.log
+
+		if ! check_kernel_wedge; then
+			continue
+		fi
+
+		cd $USOURCE
+		ARCH_TDIR=../$arch
+		mkdir -p $ARCH_TDIR
+
+		log "  Retrieving and extracting dependencies..."
+		if get_depends $arch; then
+			do_dch
+			generate_control
+			log "  Building udebs, please wait..."
+			if ! kernel-wedge build-arch "$arch" >../massbuild.$TYPE.$arch.log 2>&1; then
+				log "* There were errors building udebs for $arch"
+				clean_arch $arch
+			else
+				# Merge binary and source changes files if needed
+				merge_changes
+
+				mkdir -p ../$OUTDIR
+				mv ../$UBASE-$uarch${PF}_*.* ../$OUTDIR
+				mv ../*_$arch.udeb ../$OUTDIR
+			fi
+		else
+			log "* Skipping architecture $arch"
+		fi
+
+		clean_arch_tmp
+		cd ..
+	done
+done
+
+echo
+if grep -q "^\*" $LOGFILE; then
+	echo "There were errors processing some architectures!"
+	echo "See the logfiles for details"
+	echo
+fi

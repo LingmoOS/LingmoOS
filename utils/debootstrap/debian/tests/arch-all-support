@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# This test runs the arch-all-mitm.py Flask app which debootstrap is then
+# pointed at.
+# It is used to pretend an archive in legacy-compatibility mode is only
+# supporting the split-arch-all mode, to test if debootstrap will handle
+# that situation correctly.
+
+export FLASK_ARCH="$(dpkg --print-architecture)"
+export FLASK_DIST=testing
+export FLASK_DISTRO=debian
+export FLASK_MIRROR=http://deb.debian.org
+export PATH=$PATH:/usr/sbin
+
+# Launch our MitM "mirror" server, ensure that request logging is sent to stdout
+PYTHONDONTWRITEBYTECODE=true FLASK_APP=debian/tests/arch-all-mitm.py flask run 2>&1 &
+flask_pid=$!
+
+# Give Flask time to come up
+sleep 2
+
+tempdir=$(mktemp -d)
+# Run debootstrap against our MitM "mirror", ignoring the inevitable GPG errors
+./debootstrap --download-only --variant minbase --no-check-gpg ${FLASK_DIST} $tempdir http://127.0.0.1:5000/${FLASK_DISTRO}/
+rc=$?
+
+rm -rf $tempdir
+kill $flask_pid
+
+exit $rc

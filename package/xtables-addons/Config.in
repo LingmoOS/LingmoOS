@@ -1,0 +1,19 @@
+comment "xtables-addons needs a Linux kernel to be built"
+	depends on !LINGMO_LINUX_KERNEL
+
+comment "xtables-addons needs a toolchain w/ dynamic library, threads"
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS
+
+config LINGMO_PACKAGE_XTABLES_ADDONS
+	bool "xtables-addons"
+	depends on LINGMO_LINUX_KERNEL
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on !LINGMO_STATIC_LIBS # extensions are .so
+	select LINGMO_PACKAGE_IPTABLES
+	select LINGMO_LINUX_NEEDS_MODULES # not using kernel-module infra
+	help
+	  Xtables-addons is the successor to patch-o-matic(-ng).
+	  Likewise, it contains extensions that were not, or are not
+	  yet, accepted in the main kernel/iptables packages.
+
+	  https://inai.de/projects/xtables-addons/

@@ -1,0 +1,19 @@
+config LINGMO_PACKAGE_OPENIPMI
+	bool "openipmi"
+	depends on LINGMO_USE_MMU # fork()
+	depends on !LINGMO_STATIC_LIBS # dlopen()
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS_NPTL
+	select LINGMO_PACKAGE_POPT
+	select LINGMO_PACKAGE_NCURSES
+	select LINGMO_PACKAGE_READLINE
+	help
+	  IPMI allows remote monitoring and remote management of
+	  devices. OpenIPMI provides a library and command line tools
+	  to interact with IPMI enabled devices. OpenIPMI also provides
+	  an IPMI BMC simulator.
+
+	  http://openipmi.sourceforge.net
+
+comment "openipmi needs a toolchain w/ dynamic library, NPTL"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_STATIC_LIBS || !LINGMO_TOOLCHAIN_HAS_THREADS_NPTL

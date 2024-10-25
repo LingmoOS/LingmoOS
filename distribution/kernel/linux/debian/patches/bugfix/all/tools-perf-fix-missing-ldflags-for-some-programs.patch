@@ -1,0 +1,17 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Sat, 15 Jan 2022 22:59:11 +0100
+Subject: tools/perf: Fix missing LDFLAGS for some programs
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
+---
+--- a/tools/perf/Makefile.perf
++++ b/tools/perf/Makefile.perf
+@@ -785,7 +785,7 @@ $(OUTPUT)dlfilters/%.o: dlfilters/%.c in
+ .SECONDARY: $(DLFILTERS:.so=.o)
+ 
+ $(OUTPUT)dlfilters/%.so: $(OUTPUT)dlfilters/%.o
+-	$(QUIET_LINK)$(CC) $(EXTRA_CFLAGS) -shared -o $@ $<
++	$(QUIET_LINK)$(CC) $(EXTRA_CFLAGS) $(LDFLAGS) -shared -o $@ $<
+ 
+ ifndef NO_JVMTI
+ LIBJVMTI_IN := $(OUTPUT)jvmti/jvmti-in.o

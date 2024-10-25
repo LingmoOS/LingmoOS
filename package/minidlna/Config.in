@@ -1,0 +1,26 @@
+config LINGMO_PACKAGE_MINIDLNA
+	bool "minidlna"
+	depends on !LINGMO_STATIC_LIBS
+	depends on LINGMO_USE_WCHAR # flac
+	depends on LINGMO_USE_MMU # fork
+	depends on LINGMO_TOOLCHAIN_HAS_THREADS
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	select LINGMO_PACKAGE_FFMPEG
+	select LINGMO_PACKAGE_FLAC
+	select LINGMO_PACKAGE_LIBVORBIS # selects libogg
+	select LINGMO_PACKAGE_LIBOGG
+	select LINGMO_PACKAGE_LIBID3TAG # selects zlib
+	select LINGMO_PACKAGE_LIBEXIF
+	select LINGMO_PACKAGE_JPEG
+	select LINGMO_PACKAGE_SQLITE
+	help
+	  MiniDLNA (aka ReadyDLNA) is server software with the aim of
+	  being fully compliant with DLNA/UPnP-AV clients.
+
+	  http://minidlna.sourceforge.net/
+
+comment "minidlna needs a toolchain w/ dynamic library, threads, wchar"
+	depends on LINGMO_USE_MMU
+	depends on LINGMO_PACKAGE_FFMPEG_ARCH_SUPPORTS
+	depends on !LINGMO_TOOLCHAIN_HAS_THREADS || !LINGMO_USE_WCHAR || \
+		LINGMO_STATIC_LIBS
