@@ -28,41 +28,31 @@ jobs:
         run: sudo apt update
 
       - name: Install base packages
-        run: sudo apt install -y sudo tree arch-install-scripts dctrl-tools devscripts wget isolinux syslinux debian-cd simple-cdd mtools binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils make sed python3 cvs git mercurial subversion libncurses5 asciidoc w3m dblatex python3-aiohttp python3-matplotlib graphviz dpkg-dev
+        run: sudo apt install -y sudo tree arch-install-scripts dctrl-tools devscripts wget isolinux syslinux debian-cd simple-cdd mtools binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils make sed python3 cvs git mercurial subversion libncurses5 asciidoc w3m dblatex python3-aiohttp python3-matplotlib graphviz dpkg-dev debootstrap live-build
 
       - name: Config Dir
-        run: rm -rf boot/ installer/ && mv distribution/* ./
-
-      - name: Install Lingmo Debootstrap
-        run: |
-            wget https://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.137_all.deb
-            sudo apt -y install ./*.deb
-            cd debootstrap/ && sudo apt-get build-dep ./ && debuild -us -uc -b && sudo apt -y install ../*.deb
+        run: rm -rf boot/ installer/ && mv distribution/current/* ./
 
       - name: Install Lingmo System Build
         run: |
-            sudo apt-get build-dep ./
+            cd utils/live-build
             sudo make install
-            sudo apt-key add keying/lingmo.gpg
+            cd ../../
       # - name: Build GRUB EFI
       #  run: |
       #      cd boot/grub/ && sudo apt build-dep ./ && debuild -us -uc -b && cd ../ && mv ./*.deb ../config/packages.chroot/ && cd ..
 
-      - name: Config Base Settings
-        run: |
-            mkdir build-sys/ && mv auto/ build-sys/ && mv config/ build-sys/ && mv lingmo-config/ build-sys/ && cd build-sys/ && sudo chmod +x auto/* && sudo lingmo-sys-build clean && sudo lingmo-sys-build config && mkdir tools && cp config/make-sum tools/
-
       - name: Build System
         run: |
-            cp -v buildem/action/build auto/
-            chmod +x auto/*
-            cd build-sys/ && sudo lingmo-sys-build build
+            chmod +x build.sh
+            ./build.sh
 
       - name: Read Upload
         run: |
             mkdir artifact/
-            # find build-sys -type f -name "*.iso" -exec mv {} artifact/ \;
-            sudo mv build-sys/output/iso/* artifact/
+            # find ./ -type f -name "*.iso" -exec mv {} artifact/ \;
+            sudo mv -v ./*.iso artifact/
+            sudo mv -v ./build.log artifact/
 
       - name: Artifact
         uses: actions/upload-artifact@v4
