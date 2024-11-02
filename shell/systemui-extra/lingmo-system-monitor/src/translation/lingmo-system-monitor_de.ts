@@ -2836,7 +2836,7 @@ Sind Sie sicher, dass Sie weitermachen werden?</translation>
     </message>
     <message>
         <source>YHLingmo community</source>
-        <translation type="vanished">银河灵墨社区版</translation>
+        <translation type="vanished">灵墨社区版</translation>
     </message>
     <message>
         <source>Memory reference voltage</source>

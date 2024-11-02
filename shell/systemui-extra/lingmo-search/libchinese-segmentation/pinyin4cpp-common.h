@@ -41,8 +41,8 @@ enum class PinyinDataStyle {
 
 /**
  * @brief The SegType enum
- * Segmentation 默认带分词 #“银河灵墨”->“银河”“灵墨”
- * NoSegmentation 无分词模式 #“银河灵墨”
+ * Segmentation 默认带分词 #“灵墨”->“银河”“灵墨”
+ * NoSegmentation 无分词模式 #“灵墨”
  */
 enum class SegType {
     Segmentation    = 1u << 0,

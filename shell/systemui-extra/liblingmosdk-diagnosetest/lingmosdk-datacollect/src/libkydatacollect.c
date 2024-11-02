@@ -40,6 +40,10 @@
 #include <openssl/hmac.h>
 #include "libkydatacollect.h"
 #include <libkylog.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define MACHINE_ID_FILE "/etc/machine-id"
 

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ Copyright 2024 KylinSoft Co., Ltd.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later
+ version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.lingmo.aisdk.SpeechProcessor">
+
+        <method name="init">
+            <arg name="engine_name" type="s" direction="in" />
+            <arg name="config" type="s" direction="in" />
+            <arg name="session_Id" type="i" direction="out" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief convert audio to text
+          @param [in] audio properties
+        -->
+        <method name="startRecognizingAudio">
+            <arg name="audioProperties" type="s" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief input continuous audio data
+          @param [in] audio data
+          @param [in] audio data length
+          @param [out] text data returned
+          @param [out] text data length returned
+          @param [out] error message returned
+        -->
+        <method name="inputAudioData">
+            <arg name="audioData" type="ay" direction="in" />
+            <arg name="audioDataLength" type="i" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="textData" type="s" direction="out" />
+            <arg name="textDataLength" type="i" direction="out" />
+            <arg name="speakerId" type="i" direction="out" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief stop recognizing audio
+        -->
+        <method name="stopRecognizingAudio">
+            <arg name="session_Id" type="i" direction="in" />
+        </method>
+
+        <!--
+          @brief recognizing a complete audio
+          @param [in] audio properties
+          @param [in] audio data
+          @param [in] audio data length
+          @param [out] text data returned
+          @param [out] text data length returned
+          @param [out] error message returned
+        -->
+        <method name="recognizingCompleteAudio">
+            <arg name="audioProperties" type="s" direction="in" />
+            <arg name="audioData" type="s" direction="in" />
+            <arg name="audioDataLength" type="i" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="textData" type="s" direction="out" />
+            <arg name="textDataLength" type="i" direction="out" />
+            <arg name="speakerId" type="i" direction="out" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief convert text to audio
+          @param [in] voice properties
+          @param [out] error message returned
+        -->
+        <method name="startSynthesizingAudio">
+            <arg name="voiceProperties" type="s" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief input continuously synthesized text
+          @param [in] text
+          @param [out] audio format returned
+          @param [out] audio rate returned
+          @param [out] audio channel returned
+          @param [out] audio data returned
+          @param [out] audio data length returned
+          @param [out] error message returned
+        -->
+        <method name="inputContinuousText">
+            <arg name="text" type="s" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="audioFormat" type="s" direction="out" />
+            <arg name="audioRate" type="i" direction="out" />
+            <arg name="audioChannel" type="i" direction="out" />
+            <arg name="audioData" type="s" direction="out" />
+            <arg name="audioDataLength" type="i" direction="out" />
+            <arg name="errorCode" type="i" direction="out" />
+        </method>
+
+        <!--
+          @brief stop synthesizing audio
+        -->
+        <method name="stopSynthesizingAudio">
+            <arg name="session_Id" type="i" direction="in" />
+        </method>
+
+        <!--
+          @brief recognizing complete text
+          @param [in] voice Properties
+          @param [in] text
+          @param [out] audio format returned
+          @param [out] audio rate returned
+          @param [out] audio channel returned
+          @param [out] audio data returned
+          @param [out] audio data length returned
+          @param [out] error message returned
+        -->
+        <method name="recognizingCompleteText">
+            <arg name="voiceProperties" type="s" direction="in" />
+            <arg name="text" type="s" direction="in" />
+            <arg name="session_Id" type="i" direction="in" />
+            <arg name="audioFormat" type="s" direction="out" />
+            <arg name="audioRate" type="i" direction="out" />
+            <arg name="audioChannel" type="i" direction="out" />
+            <arg name="audioData" type="s" direction="out" />
+            <arg name="audioDataLength" type="i" direction="out" />
+            <arg name="errorMsg" type="i" direction="out" />
+        </method>
+
+    </interface>
+</node>

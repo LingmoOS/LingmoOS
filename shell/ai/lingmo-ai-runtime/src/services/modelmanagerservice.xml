@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ Copyright 2024 KylinSoft Co., Ltd.
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later
+ version.
+ 
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.lingmo.aisdk.ModelManagerService">
+        <!--
+          @brief get the length of remote model vendor list
+          @param [out] the length
+        -->
+        <method name="getRemoteModelVendorListLength">
+            <arg name="length" type="u" direction="out" />
+        </method>
+
+        <!--
+          @brief get the list of remote model vendor
+          @param [out] the list
+        -->
+        <method name="getRemoteModelVendorList">
+            <arg name="list" type="ai" direction="out" />
+        </method>
+        
+        <!--
+          @brief get the length of remote model by vendor
+          @param [in] the vendor enum
+          @param [out] the length
+        -->
+        <method name="getRemoteModelListLength">
+            <arg name="vendor" type="i" direction="in" />
+            <arg name="length" type="u" direction="out" />
+        </method>
+
+        <!--
+            @brief get the list of remote model by vendor
+            @param [in] the vendor enum
+            @param [out] the list
+        -->
+        <method name="getRemoteModelList">
+            <arg name="vendor" type="i" direction="in" />
+            <arg name="list" type="ai" direction="out" />
+        </method>
+
+        <!--
+            @brief set remote model config by vendor and model
+            @param [in] the vendor enum
+            @param [in] the remote model id
+            @param [in] the config json
+            @param [out] the success result
+        -->
+        <method name="setRemoteModelConfig">
+            <arg name="vendor" type="i" direction="in" />
+            <arg name="modelId" type="i" direction="in" />
+            <arg name="json" type="s" direction="in" />
+            <arg name="success" type="b" direction="out" />
+        </method>
+
+        <!--
+            @brief remove remote model config by vendor and model
+            @param [in] the vendor enum
+            @param [in] the remote model id
+            @param [out] the success result
+        -->
+        <method name="removeRemoteModelConfig">
+            <arg name="vendor" type="i" direction="in" />
+            <arg name="modelId" type="i" direction="in" />
+            <arg name="success" type="b" direction="out" />
+        </method>
+
+        <!--
+          @brief get the length of remote model config
+          @param [out] the length
+        -->
+        <method name="getRemoteModelConfigLength">
+            <arg name="length" type="u" direction="out" />
+        </method>
+
+        <!--
+          @brief get the remote model config
+          @param [out] the json
+        -->
+        <method name="getRemoteModelConfig">
+            <arg name="json" type="s" direction="out" />
+        </method>
+
+       <!--
+          @brief get the default remote model vendor
+          @param [out] the vendor enum
+        -->
+        <method name="getDefaultRemoteModelVendor">
+            <arg name="vendor" type="i" direction="out" />
+        </method>
+
+       <!--
+          @brief set the default remote model vendor
+          @param [in] the vendor enum
+        -->
+        <method name="setDefaultRemoteModelVendor">
+            <arg name="vendor" type="i" direction="in" />
+        </method>
+    </interface>
+</node>
