@@ -1,0 +1,67 @@
+<HTML>
+    <HEAD>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>网络测试页面</title>
+  <script type="text/javascript" src="./js/service.js"></script>
+  <script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
+      <TITLE>网络测试页面</TITLE>
+      <SCRIPT language=JavaScript>
+              function getPortState(){
+                  pid = $("#pid").val()
+                  console.log(pid);
+                  var test = serviceT.getPortState(pid);
+                  document.getElementById("res").value = test;
+              }
+              function getGatewayInfo(){
+                  var test = serviceT.getGatewayInfo();
+                  document.getElementById("res").value = test;
+              }
+              function getFirewallState(){
+                  var test = serviceT.getFirewallState();
+                  document.getElementById("res").value = test;
+              }
+              function getMultiplePortStat(){
+                  pid = $("#pid").val()
+                  vid = $("#vid").val()
+                  console.log(pid);
+                  var test = serviceT.getMultiplePortStat(pid,vid);
+                  document.getElementById("res").value = test;
+              }
+              
+        //-->
+      </SCRIPT>
+      <META content="MSHTML 6.00.2900.6287" name=GENERATOR>
+      <style>
+        table tr td{padding: 5px;}
+      </style>
+  
+    </HEAD>
+    <BODY>
+      <div style="margin:30 5 20 5">
+        <div>
+          <input onclick="getGatewayInfo()" type="button" value="网关信息"  style="width: 100px; height: 50px">
+          <input onclick="getFirewallState()" type="button" value="防火墙信息"  style="width: 100px; height: 50px">
+          <br>
+          <input onclick="getPortState()" type="button" value="端口状态"  style="width: 100px; height: 50px">    
+          <input onclick="getMultiplePortStat()" type="button" value="接受端口状态"  style="width: 100px; height: 50px">
+        </div>
+        <div id="input_box2">
+            <h3>端口号:</h3>
+            <label>
+              <input type="text" id="pid" style="height: 30px; width: 200px;" placeholder="输入端口号">
+            </label>
+            <h3>结束端口号:</h3>
+            <label>
+              <input type="text" id="vid" style="height: 30px; width: 200px;" placeholder="输入结束端口号">
+            </label>
+          </div>
+        <div style="margin-top:20">
+          <div align=left style="margin:5 0 5 0">回复：</div>
+          <div>
+          <textarea id="res" style="width:1000px;height:500px" ></textarea>
+          </div>
+        </div>
+      </div>
+    </BODY>
+  </HTML>
+  

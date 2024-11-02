@@ -1,0 +1,78 @@
+.TH "LIBKYDISKINFO" 3 "Thu Aug 10 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_get_disklist, kdk_free_disklist, kdk_get_diskinfo, kdk_get_hard_disk, kdk_get_hard_disk_size, kdk_get_hard_fwrev, kdk_get_hard_type, kdk_get_hard_model, kdk_get_hard_serial, kdk_get_hard_vendor, kdk_free_diskinfo - 获取磁盘信息
+.SH SYNOPSIS
+.nf
+.B #include <libkydiskinfo.h>
+.sp
+.BI "extern char** kdk_get_disklist();" 
+.sp
+.BI "extern void kdk_free_disklist(char** "disklist ");"
+.sp
+.BI "extern kdk_diskinfo *kdk_get_diskinfo(const char *"diskname ");"
+.sp
+.BI "extern char** kdk_get_hard_disk();"
+.sp
+.BI "extern char* kdk_get_hard_disk_size(const char *"hardname ");"
+.sp
+.BI "extern char* kdk_get_hard_fwrev(const char *"hardname ");"
+.sp
+.BI "extern char* kdk_get_hard_type(const char "*hardname ");"
+.sp
+.BI "extern char* kdk_get_hard_model(const char *"hardname ");"
+.sp
+.BI "extern char* kdk_get_hard_serial(const char *"hardname ");"
+.sp
+.BI "extern char* kdk_get_hard_vendor(const char *"hardname ");"
+.sp
+.BI "extern void kdk_free_diskinfo(kdk_diskinfo *"disk ");"
+.sp
+Link with \fI\-lkydiskinfo\fP.
+.SH "Detailed Description"
+This library contains disk information.
+.SH DATA STRUCTURES
+
+Structure \fBkdk_diskinfo\fR contains information related to a disk:
+
+\fBtypedef struct _kdk_diskinfo {
+.br
+	char *name;     // 绝对路径
+    char *vendor;   // 制造商
+    char *model;    // 型号
+    char *serial;   // 序列号
+
+    kdk_disk_type disk_type;  // 磁盘类型，固态 or 机械 or 混合
+    kdk_disk_interface_type inter_type;   // 接口类型
+    unsigned int rpm;  // 转速，注意固态是没有转速概念的
+
+    unsigned long long sectors_num;   // 扇区数量
+    unsigned int sector_size;   // 每个扇区的字节数
+    float total_size_MiB;  // 磁盘容量，MiB为单位
+    
+    unsigned int partition_nums; // 该磁盘/分区下的子分区数量
+    char *uuid;     // UUID
+    short mounted;   // 是否已挂载
+    char *mount_path;   // 挂载路径
+    kdk_disk_format format; // 格式化类型
+    kdk_disk_partition_type part_type;  // 分区类型
+    char *fwrev;    //固件版本信息
+.br
+}kdk_diskinfo;\fP
+
+There are other members not documented here, which are only meant for
+libkydiskinfo internal use.
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_get_disklist (),
+.BR kdk_get_diskinfo (),
+.BR kdk_get_hard_disk (),
+and
+.BR kdk_get_hard_disk_size ().
+.SH "SEE ALSO"
+.BR kdk_free_disklist (3),
+.BR kdk_get_diskinfo (3),
+.BR kdk_free_diskinfo (3)
+.BR kdk_get_disklist (3)

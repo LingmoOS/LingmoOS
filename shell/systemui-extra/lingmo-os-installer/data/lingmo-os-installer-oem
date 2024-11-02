@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+if [[ -f /usr/share/glib-2.0/schemas/org.lingmo.flash-disk.autoload.gschema.xml ]]; then
+    gsettings set org.lingmo.flash-disk.autoload ifautoload false
+fi
+
+#防止锁屏
+gsettings set org.lingmo.power-manager sleep-computer-ac -1 || true
+gsettings set org.lingmo.power-manager sleep-computer-battery -1 || true
+
+gsettings set org.lingmo.screensaver idle-lock -1 || true
+gsettings set org.lingmo.screensaver idle-delay -1 || true
+gsettings set org.lingmo.screensaver idle-activation-enabled false || true
+
+gsettings set org.lingmo.power-manager sleep-display-ac -1 || true
+gsettings set org.lingmo.power-manager sleep-display-battery -1 || true
+
+
+
+
+# 卸载可能由于自动挂载的目录
+if grep -q media.oem /proc/mounts; then
+    echo 'Lingmo123.' | sudo -S umount /media/oem/*
+fi
+
+# 990,9A0 wayland 需要此设置
+if egrep -qi 'kirin.?9[09]0' /proc/cpuinfo; then
+    xhost +SI:localuser:root
+fi
+
+sudo /usr/lib/udisks2/udisks2-inhibit /usr/bin/lingmo-os-installer oem

@@ -1,0 +1,11 @@
+#!/bin/bash
+# The input method requires the use of the xcb platform environment in the wayland environment
+# However, it cannot affect the entire system environment
+# QT_QPA_PLATFORM=xcb
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+	export QT_QPA_PLATFORM=xcb
+	exec /usr/bin/lingmo-virtual-keyboard 
+	unset QT_QPA_PLATFORM
+else
+	exec /usr/bin/lingmo-virtual-keyboard 
+fi

@@ -1,0 +1,145 @@
+.TH "KDK_DATE_FREEALL" 3 "Tue Sep 19 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_date_freeall - 用于回收字符串列表
+.SH SYNOPSIS
+.nf
+.B #include <libkydate.h>
+.sp
+.BI "extern inline void kdk_date_freeall(char **"ptr ");" 
+.sp
+Link with \fI\-lkydate\fP.
+.SH "Detailed Description"
+The main function of this interface is to release string lists.
+.PP
+The argument
+.I ptr
+is a pointer of type char**, such as the return value of
+.I kdk_system_get_dateformat. 
+The return value of the dateformat.
+.SH "RETURN VALUE"
+No return value
+.SH EXAMPLES
+.EX
+#include "libkydate.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <stdlib.h>
+#include <glib.h>
+#include <glib-object.h>
+
+int main()
+{
+	int ret = kdk_system_set_long_dateformat("2230年3月4日");
+	ret = kdk_system_set_short_dateformat("22/5/3");
+
+	char *ld = kdk_system_get_longformat_date();
+	printf("long res = %s\n", ld);
+	free(ld);
+	
+	char *sd = kdk_system_get_shortformat_date();
+	printf("short res = %s\n", sd);
+	free(sd);
+
+	char *ll = kdk_system_get_longformat();
+	printf("longformat = %s\n", ll);
+	free(ll);
+
+	char *ss = kdk_system_get_shortformat();
+	printf("shortformat = %s\n", ss);
+	free(ss);
+
+	struct tm ptr;
+	
+	ptr.tm_year = 2322;
+	ptr.tm_mon = 9;
+	ptr.tm_mday = 3;
+
+	char *lt = kdk_system_longformat_transform(&ptr);
+	printf("longformat_transform = %s\n", lt);
+	free(lt);
+
+	ptr.tm_year = 2022;
+	ptr.tm_mon = 3;
+	ptr.tm_mday = 2;
+
+	char *st = kdk_system_shortformat_transform(&ptr);
+	printf("shortformat_transform = %s\n", st);
+	free(st);
+
+	kdk_logn_dateinfo *info = kdk_system_login_lock_dateinfo("szm");
+	printf("date = %s,time = %s,week = %s\n",info->date,info->time,info->week);
+	kdk_free_logn_dateinfo(info);
+
+	ptr.tm_hour = 19;
+	ptr.tm_min = 3;
+	ptr.tm_sec = 2;
+	kdk_timeinfo *ti = kdk_system_timeformat_transform(&ptr);
+	printf("time = %s, timesec = %s\n", ti->time, ti->timesec);
+	kdk_free_timeinfo(ti);
+
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_system_get_dateformat (),
+.BR kdk_system_set_dateformat (),
+.BR kdk_system_set_24_timeformat (),
+.BR kdk_system_set_12_timeformat (),
+.BR kdk_system_get_now_dateformat (),
+.BR kdk_system_get_now_timeformat (),
+.BR kdk_system_tran_dateformat (),
+.BR kdk_system_nowtime (),
+.BR kdk_system_nowdate (),
+.BR kdk_system_shortweek (),
+.BR kdk_system_longweek (),
+.BR kdk_system_second (),
+.BR kdk_system_logn_dateinfo (),
+.BR kdk_system_gjx_time (),
+.BR kdk_free_dateinfo (),
+.BR kdk_free_logn_dateinfo (),
+.BR kdk_system_set_long_dateformat (),
+.BR kdk_system_set_short_dateformat (),
+.BR kdk_system_get_longformat_date (),
+.BR kdk_system_get_shortformat_date (),
+.BR kdk_system_get_longformat (),
+.BR kdk_system_get_shortformat (),
+.BR kdk_system_longformat_transform (),
+.BR kdk_system_shortformat_transform (),
+.BR kdk_system_login_lock_dateinfo (),
+.BR kdk_system_timeformat_transform ()
+and
+.BR kdk_free_timeinfo ().
+
+.SH "SEE ALSO"
+.BR kdk_system_get_dateformat (3),
+.BR kdk_system_set_dateformat (3),
+.BR kdk_system_set_24_timeformat (3),
+.BR kdk_system_set_12_timeformat (3),
+.BR kdk_system_get_now_dateformat (3),
+.BR kdk_system_get_now_timeformat (3),
+.BR kdk_system_tran_dateformat (3),
+.BR kdk_system_nowtime (3),
+.BR kdk_system_nowdate (3),
+.BR kdk_system_shortweek (3),
+.BR kdk_system_longweek (3),
+.BR kdk_system_second (3),
+.BR kdk_system_logn_dateinfo (3),
+.BR kdk_system_gjx_time (3),
+.BR kdk_free_dateinfo (3),
+.BR kdk_free_logn_dateinfo (3),
+.BR kdk_system_set_long_dateformat (3),
+.BR kdk_system_set_short_dateformat (3),
+.BR kdk_system_get_longformat_date (3),
+.BR kdk_system_get_shortformat_date (3),
+.BR kdk_system_get_longformat (3),
+.BR kdk_system_get_shortformat (3),
+.BR kdk_system_longformat_transform (3),
+.BR kdk_system_shortformat_transform (3),
+.BR kdk_system_login_lock_dateinfo (3),
+.BR kdk_system_timeformat_transform (3)
+and
+.BR kdk_free_timeinfo (3).

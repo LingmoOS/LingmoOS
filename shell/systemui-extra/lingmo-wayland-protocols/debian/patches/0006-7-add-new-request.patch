@@ -1,0 +1,38 @@
+From: "wangteng@lingmoos.cn" <wangteng@lingmoos.cn>
+Date: Sat, 18 May 2024 07:48:37 +0000
+Subject: !7 add new request Merge pull request !7 from
+ lingmo0061/lingmo/nile
+
+---
+ src/protocols/lingmo-shell.xml | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/protocols/lingmo-shell.xml b/src/protocols/lingmo-shell.xml
+index 42e3e8e..017f8cb 100644
+--- a/src/protocols/lingmo-shell.xml
++++ b/src/protocols/lingmo-shell.xml
+@@ -132,7 +132,7 @@
+       <entry name="inputpanel" value="11"/>
+       <entry name="logout" value="12"/>
+       <entry name="screenlocknotification" value="13"/>
+-      <entry name="switchwindow" value="14"/>
++      <entry name="switcher" value="14"/>
+     </enum>
+ 
+     <request name="set_role">
+@@ -169,5 +169,15 @@
+       <arg name="takes_focus" type="uint" summary="Boolean value that sets whether the panel takes focus"/>
+     </request>
+ 
++    <request name="grab_keyboard">
++      <description summary="make the surface take keyboard grab">
++        This request makes the created surface take an explicit keyboard grab.
++        This keyboard grab will be dismissed when the client destroys the surface.
++        Grab all keyboard when seat is set to null.
++      </description>
++      <arg name="seat" type="object" interface="wl_seat" allow-null="true"
++           summary="the seat for which the keyboard should be grabbed"/>
++    </request>
++
+   </interface>
+ </protocol>

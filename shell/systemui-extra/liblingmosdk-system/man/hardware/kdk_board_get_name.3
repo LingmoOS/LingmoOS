@@ -1,0 +1,55 @@
+.TH "KDK_BOARD_GET_NAME" 3 "Thu Aug 24 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_board_get_name - 获取主板型号
+.SH SYNOPSIS
+.nf
+.B #include <libkyboard.h>
+.sp
+.BI "extern const char* kdk_board_get_name();"
+.sp
+Link with \fI\-lkyhw\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain mainboard model
+.SH "RETURN VALUE"
+On success, returns the mainboard model of type char*; The returned string needs to be released by 
+.I free
+.PP
+On error, return
+.BR NULL.
+.SH EXAMPLES
+.EX
+#include "stdio.h"
+#include "libkyboard.h"
+
+int main()
+{
+    
+    char *name = kdk_board_get_name();
+    char *vendor = kdk_board_get_vendor();
+    char *date = kdk_board_get_date();
+    char *serial = kdk_board_get_serial();
+    printf("name : %s", name);
+    printf("vendor : %s", vendor);
+    printf("date : %s", date);
+    printf("serial : %s", serial);
+    free(name);
+    free(vendor);
+    free(date);
+    free(serial);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_board_get_vendor (),
+.BR kdk_board_get_date (),
+.BR kdk_board_get_serial ()
+and
+.BR kdk_board_free ().
+.SH "SEE ALSO"
+.BR kdk_board_get_vendor (3),
+.BR kdk_board_get_date (3),
+.BR kdk_board_get_serial (3)
+and
+.BR kdk_board_free (3).

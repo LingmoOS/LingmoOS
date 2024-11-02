@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" == "true" ]]; then
+  return 0
+elif [[ "${is_ghost}" == "true" ]]; then
+  return 0
+fi
+
+TIMEZONE=$(get_value timezone)
+
+echo "${TIMEZONE}"  >/etc/.kytimezone
+
+if echo "${TIMEZONE}" | grep -q Beijing; then
+    TIMEZONE=Asia/Shanghai
+fi
+if echo "${TIMEZONE}" | grep -q Urumqi; then
+    TIMEZONE=Asia/Shanghai
+fi
+
+echo "${TIMEZONE}"  >/etc/timezone
+
+msg "设置时区为 ${TIMEZONE}"
+ln -sf /usr/share/zoneinfo/"${TIMEZONE}" /etc/localtime
+
+# 写入硬件时间
+hwclock -w || true

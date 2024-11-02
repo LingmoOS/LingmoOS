@@ -1,0 +1,172 @@
+.TH "LIBKYSYSINFO" 3 "Tue Sep 19 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_system_get_architecture, kdk_system_get_systemName, kdk_system_get_version, kdk_system_get_activationStatus,
+kdk_system_get_serialNumber, kdk_system_get_kernelVersion, kdk_system_get_eUser, kdk_system_get_eUser_login_time,
+kdk_system_get_projectName, kdk_system_get_projectSubName, kdk_system_get_productFeatures, kdk_system_get_hostVirtType,
+kdk_system_get_hostCloudPlatform, kdk_system_is_zyj, kdk_system_get_version_detaile, kdk_system_get_resolving_power,
+kdk_system_get_systemCategory, kdk_system_get_startup_time, kdk_system_get_shutdown_time, kdk_get_host_vendor, kdk_get_host_product, 
+kdk_get_host_serial, kdk_system_get_hostName, kdk_system_get_word, kdk_system_get_buildTime, kdk_resolving_freeall, kdk_hw_get_pci_info,
+kdk_hw_free_pci_info, kdk_system_get_appScene - 获取操作系统基础信息
+.SH SYNOPSIS
+.nf
+.B #include <libkysysinfo.h>
+.sp
+.BI "extern char* kdk_system_get_architecture();" 
+.sp
+.BI "extern char* kdk_system_get_systemName();" 
+.sp
+.BI "extern char* kdk_system_get_version(bool "verbose ");" 
+.sp
+.BI "extern int kdk_system_get_activationStatus(int *"status_error_num ", int *"date_error_num ");" 
+.sp
+.BI "extern char* kdk_system_get_serialNumber();" 
+.sp
+.BI "extern char* kdk_system_get_kernelVersion();" 
+.sp
+.BI "extern char* kdk_system_get_eUser();" 
+.sp
+.BI "extern char* kdk_system_get_eUser_login_time();" 
+.sp
+.BI "extern char* kdk_system_get_projectName();" 
+.sp
+.BI "extern char* kdk_system_get_projectSubName();" 
+.sp
+.BI "extern unsigned int kdk_system_get_productFeatures();" 
+.sp
+.BI "extern char* kdk_system_get_hostVirtType();" 
+.sp
+.BI "extern char* kdk_system_get_hostCloudPlatform();" 
+.sp
+.BI "extern bool kdk_system_is_zyj(void);" 
+.sp
+.BI "extern version_t kdk_system_get_version_detaile();" 
+.sp
+.BI "extern char** kdk_system_get_resolving_power();" 
+.sp
+.BI "extern char* kdk_system_get_systemCategory();" 
+.sp
+.BI "extern char** kdk_system_get_startup_time();" 
+.sp
+.BI "extern char** kdk_system_get_shutdown_time();" 
+.sp
+.BI "extern char *kdk_get_host_vendor();" 
+.sp
+.BI "extern char *kdk_get_host_product();" 
+.sp
+.BI "extern char *kdk_get_host_serial();" 
+.sp
+.BI "extern char *kdk_system_get_hostName();" 
+.sp
+.BI "extern int kdk_system_get_word();" 
+.sp
+.BI "extern char *kdk_system_get_buildTime();" 
+.sp
+.BI "extern inline void kdk_resolving_freeall(char **"ptr ");" 
+.sp
+.BI "extern struct KPci *kdk_hw_get_pci_info();" 
+.sp
+.BI "extern void kdk_hw_free_pci_info(struct KPci *"info ");" 
+.sp
+.BI "extern char *kdk_system_get_appScene();" 
+.sp
+Link with \fI\-lkysysinfo\fP.
+.SH "Detailed Description"
+This library contains instantaneous information about the current system.
+.SH DATA STRUCTURES
+
+Structure \fBversion_t\fR contains information related to a system version number and patch version number information:
+
+\fBtypedef struct {
+.br
+	char    *os_version;            //系统版本
+    char    *update_version;        //补丁版本
+.br
+} version_t;\fP
+
+There are other members not documented here, which are only meant for
+libkysysinfo internal use.
+
+Structure \fBKPci\fR contains information related to a pci bus information:
+
+\fBstruct KPci {
+.br
+	char slot_path[16];
+    char class_name[128];
+    char product_name[128];
+    unsigned char rev;
+    char ss_name[256];
+    char driver_use[1024];
+    char **modules;
+    int module_count;
+    struct KPci *next;
+.br
+};\fP
+
+There are other members not documented here, which are only meant for
+libkysysinfo internal use.
+
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_system_get_architecture (),
+.BR kdk_system_get_systemName (),
+.BR kdk_system_get_version (),
+.BR kdk_system_get_serialNumber (),
+.BR kdk_system_get_kernelVersion (),
+.BR kdk_system_get_eUser (),
+.BR kdk_system_get_eUser_login_time (),
+.BR kdk_system_get_projectName (),
+.BR kdk_system_get_projectSubName (),
+.BR kdk_system_get_productFeatures (),
+.BR kdk_system_get_hostVirtType (),
+.BR kdk_system_get_hostCloudPlatform (),
+.BR kdk_system_is_zyj (),
+.BR kdk_system_get_version_detaile (),
+.BR kdk_system_get_resolving_power (),
+.BR kdk_system_get_systemCategory (),
+.BR kdk_system_get_startup_time (),
+.BR kdk_system_get_shutdown_time (),
+.BR kdk_get_host_vendor (),
+.BR kdk_get_host_product (),
+.BR kdk_get_host_serial (),
+.BR kdk_system_get_hostName (),
+.BR kdk_system_get_word (),
+.BR kdk_system_get_buildTime (),
+.BR kdk_resolving_freeall (),
+.BR kdk_hw_get_pci_info (),
+.BR kdk_hw_free_pci_info (),
+and
+.BR kdk_system_get_appScene ().
+.SH "SEE ALSO"
+.BR kdk_system_get_architecture (3),
+.BR kdk_system_get_systemName (3),
+.BR kdk_system_get_version (3),
+.BR kdk_system_get_activationStatus (3),
+.BR kdk_system_get_serialNumber (3),
+.BR kdk_system_get_kernelVersion (3),
+.BR kdk_system_get_eUser (3),
+.BR kdk_system_get_eUser_login_time (3),
+.BR kdk_system_get_projectName (3),
+.BR kdk_system_get_projectSubName (3),
+.BR kdk_system_get_productFeatures (3),
+.BR kdk_system_get_hostVirtType (3),
+.BR kdk_system_get_hostCloudPlatform (3),
+.BR kdk_system_is_zyj (3),
+.BR kdk_system_get_version_detaile (3),
+.BR kdk_system_get_resolving_power (3),
+.BR kdk_system_get_systemCategory (3),
+.BR kdk_system_get_startup_time (3),
+.BR kdk_system_get_shutdown_time (3),
+.BR kdk_get_host_vendor (3),
+.BR kdk_get_host_product (3),
+.BR kdk_get_host_serial (3),
+.BR kdk_system_get_hostName (3),
+.BR kdk_system_get_word (3),
+.BR kdk_system_get_buildTime (3),
+.BR kdk_resolving_freeall (3),
+.BR kdk_hw_get_pci_info (3),
+.BR kdk_hw_free_pci_info (3),
+and
+.BR kdk_system_get_appScene (3).

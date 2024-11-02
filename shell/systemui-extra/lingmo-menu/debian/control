@@ -1,0 +1,59 @@
+Source: lingmo-menu
+Section: x11
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Uploaders: Lingmo OS Team <team@lingmo.org>
+Build-Depends: debhelper-compat (=12),
+               cmake,
+               pkgconf,
+               qtchooser,
+               qtbase5-dev,
+               qtdeclarative5-dev,
+               qttools5-dev,
+               libqt5x11extras5-dev,
+               libkf5windowsystem-dev (>= 5.92.0-ok5),
+               libkf5wayland-dev,
+               libqt5xdg-dev,
+               liblingmo-search-dev(>=4.0.0.0-ok0~0412build1),
+               libgsettings-qt-dev,
+               liblingmosdk-datacollect-dev,
+               liblingmo-quick-dev(>=4.10.4.0-ok0),
+               libglib2.0-dev
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
+Homepage: https://github.com/LingmoOS
+
+Package: lingmo-menu
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         liblingmo-menu1,
+         qml-module-org-lingmo-quick-items,
+         qml-module-org-lingmo-quick-platform,
+         lingmo-menu-recent-file
+Description: Application launcher for lingmo desktop environment
+ lingmo-menu is a convenient application launcher which includes
+ normal and full-screen modes, it also has a plugin page which can be used
+ to load extra plugins like favourite apps page, recent files page, etc.
+
+Package: liblingmo-menu1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends},${misc:Depends}
+Replaces: liblingmo-menu-interface1
+Conflicts: liblingmo-menu-interface1
+Description: Libraries for lingmo-menu and it's plugins
+ This package contains a run time library for lingmo-menu
+ and it's extensions which defines a plugin interface for
+ extensions, lingmo-menu will load this extensions while startup.
+
+Package: liblingmo-menu-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         liblingmo-menu1 (= ${binary:Version})
+Replaces: liblingmo-menu-interface-dev
+Conflicts: liblingmo-menu-interface-dev
+Description: Libraries for lingmo-menu and it's plugins(development files)
+ This package contains development files for liblingmo-menu1,
+ may be used to develop plugins for lingmo-menu, lingmo-menu
+ will load this extensions while startup.

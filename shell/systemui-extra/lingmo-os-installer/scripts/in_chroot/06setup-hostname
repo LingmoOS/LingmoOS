@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" = "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" = "true" ]]; then
+    return 0
+fi
+
+HOSTNAME=$(get_value hostname)
+# oem mode
+if [[ "${is_oem_mode}" = "true" ]]; then
+    HOSTNAME=oem-PC
+fi
+
+echo "${HOSTNAME}" >/etc/hostname
+#hostnamectl set-hostname "${HOSTNAME}"
+
+echo -e "127.0.0.1\tlocalhost
+127.0.1.1\t${HOSTNAME}
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+" >/etc/hosts

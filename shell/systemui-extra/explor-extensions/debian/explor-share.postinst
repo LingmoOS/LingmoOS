@@ -1,0 +1,21 @@
+#!/bin/bash
+#DEBHELPER#
+
+SHARED_DIRECTORY=/var/lib/samba/usershares
+if [ "`ls -A $SHARED_DIRECTORY`" = "" ]; then
+        echo "No share folders in current host, disable smbd and nmbd..."
+        sudo systemctl stop smbd.service
+        sudo systemctl disable smbd.service
+        sudo systemctl stop nmbd.service
+        sudo systemctl disable nmbd.service
+        sudo systemctl daemon-reload
+else
+        echo "Exists share folders, enable smbd and nmbd..."
+        sudo systemctl enable smbd.service
+        sudo systemctl start smbd.service
+        sudo systemctl enable nmbd.service
+        sudo systemctl start nmbd.service
+        sudo systemctl daemon-reload
+fi
+
+exit 0

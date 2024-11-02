@@ -1,0 +1,176 @@
+.TH "LIBKYDATE" 3 "Tue Sep 19 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_system_get_dateformat, kdk_system_set_dateformat, kdk_system_set_24_timeformat,
+kdk_system_set_12_timeformat, kdk_system_get_now_dateformat,kdk_system_get_now_timeformat, 
+kdk_system_tran_dateformat,kdk_system_nowtime,kdk_system_nowdate,kdk_system_shortweek,
+kdk_system_longweek,kdk_system_second,kdk_system_logn_dateinfo,kdk_system_gjx_time,
+kdk_date_freeall,kdk_free_dateinfo,kdk_free_logn_dateinfo,kdk_system_set_long_dateformat,
+kdk_system_set_short_dateformat,kdk_system_get_longformat_date,kdk_system_get_shortformat_date,
+kdk_system_get_longformat,kdk_system_get_shortformat,kdk_system_longformat_transform,
+kdk_system_shortformat_transform,kdk_system_login_lock_dateinfo,kdk_system_timeformat_transform,
+kdk_free_timeinfo - 日期和时间格式信息
+.SH SYNOPSIS
+.nf
+.B #include <libkydate.h>
+.sp
+.BI "extern char** kdk_system_get_dateformat();" 
+.sp
+.BI "extern int kdk_system_set_dateformat(char *"date ");" 
+.sp
+.BI "extern int kdk_system_set_24_timeformat();" 
+.sp
+.BI "extern int kdk_system_set_12_timeformat();" 
+.sp
+.BI "extern char* kdk_system_get_now_dateformat();" 
+.sp
+.BI "extern char* kdk_system_get_now_timeformat();" 
+.sp
+.BI "extern kdk_dateinfo *kdk_system_tran_dateformat(struct tm *"ptr ");" 
+.sp
+.BI "extern char* kdk_system_nowtime();" 
+.sp
+.BI "extern char* kdk_system_nowdate();" 
+.sp
+.BI "extern char* kdk_system_shortweek();" 
+.sp
+.BI "extern char* kdk_system_longweek();"
+.sp
+.BI "extern char* kdk_system_second();"
+.sp
+.BI "extern kdk_logn_dateinfo *kdk_system_logn_dateinfo(char *"user ");"
+.sp
+.BI "extern char* kdk_system_gjx_time(char *"date ");"
+.sp
+.BI "extern inline void kdk_date_freeall(char **"ptr ");"
+.sp
+.BI "extern void kdk_free_dateinfo(kdk_dateinfo *"date ");"
+.sp
+.BI "extern void kdk_free_logn_dateinfo(kdk_logn_dateinfo *"date ");"
+.sp
+.BI "extern int kdk_system_set_long_dateformat(char *"format ");"
+.sp
+.BI "extern int kdk_system_set_short_dateformat(char *"format ");"
+.sp
+.BI "extern char* kdk_system_get_longformat_date();"
+.sp
+.BI "extern char* kdk_system_get_shortformat_date();"
+.sp
+.BI "extern char* kdk_system_get_longformat();"
+.sp
+.BI "extern char* kdk_system_get_shortformat();"
+.sp
+.BI "extern char* kdk_system_longformat_transform(struct tm *"ptr ");"
+.sp
+.BI "extern char* kdk_system_shortformat_transform(struct tm *"ptr ");"
+.sp
+.BI "extern kdk_logn_dateinfo *kdk_system_login_lock_dateinfo(char *"user ");"
+.sp
+.BI "extern kdk_timeinfo *kdk_system_timeformat_transform(struct tm *"ptr ");"
+.sp
+.BI "extern void kdk_free_timeinfo(kdk_timeinfo *"time ");"
+Link with \fI\-lkydate\fP.
+.SH DATA STRUCTURES
+
+Structure \fBkdk_dateinfo\fR contains information related to a date:
+
+\fBtypedef struct _kdk_dateinfo{ {
+.br
+	char *date;     // 日期
+    char *time;   // 时间
+    char *timesec;  //带秒钟数时间
+.br
+}kdk_dateinfo;\fP
+
+There are other members not documented here, which are only meant for
+libkydate internal use.
+
+Structure \fBkdk_logn_dateinfo\fR contains information related to a login date:
+
+\fBtypedef struct _kdk_logn_dateinfo {
+.br
+	char *date;     // 日期
+    char *time;   // 时间
+    char *week;
+.br
+}kdk_logn_dateinfo;\fP
+
+There are other members not documented here, which are only meant for
+libkydate internal use.
+
+Structure \fBkdk_timeinfo\fR contains information related to a time:
+
+\fBtypedef struct _kdk_timeinfo {
+.br
+	char *time;   // 时间
+    char *timesec;  //带秒钟数时间
+.br
+}kdk_timeinfo;\fP
+
+There are other members not documented here, which are only meant for libkynetinfo internal use.
+.SH "Detailed Description"
+This library obtains or sets date and time formats.
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_system_get_dateformat (),
+.BR kdk_system_set_dateformat (),
+.BR kdk_system_set_24_timeformat (),
+.BR kdk_system_set_12_timeformat (),
+.BR kdk_system_get_now_dateformat (),
+.BR kdk_system_get_now_timeformat (),
+.BR kdk_system_tran_dateformat (),
+.BR kdk_system_nowtime (),
+.BR kdk_system_nowdate (),
+.BR kdk_system_shortweek (),
+.BR kdk_system_longweek (),
+.BR kdk_system_second (),
+.BR kdk_system_logn_dateinfo (),
+.BR kdk_system_gjx_time (),
+.BR kdk_date_freeall (),
+.BR kdk_free_dateinfo (),
+.BR kdk_free_logn_dateinfo (),
+.BR kdk_system_set_long_dateformat (),
+.BR kdk_system_set_short_dateformat (),
+.BR kdk_system_get_longformat_date (),
+.BR kdk_system_get_shortformat_date (),
+.BR kdk_system_get_longformat (),
+.BR kdk_system_get_shortformat (),
+.BR kdk_system_longformat_transform (),
+.BR kdk_system_shortformat_transform (),
+.BR kdk_system_login_lock_dateinfo (),
+.BR kdk_system_timeformat_transform ()
+and
+.BR kdk_free_timeinfo ().
+
+.SH "SEE ALSO"
+.BR kdk_system_get_dateformat (3),
+.BR kdk_system_set_dateformat (3),
+.BR kdk_system_set_24_timeformat (3),
+.BR kdk_system_set_12_timeformat (3),
+.BR kdk_system_get_now_dateformat (3),
+.BR kdk_system_get_now_timeformat (3),
+.BR kdk_system_tran_dateformat (3),
+.BR kdk_system_nowtime (3),
+.BR kdk_system_nowdate (3),
+.BR kdk_system_shortweek (3),
+.BR kdk_system_longweek (3),
+.BR kdk_system_second (3),
+.BR kdk_system_logn_dateinfo (3),
+.BR kdk_system_gjx_time (3),
+.BR kdk_date_freeall (3),
+.BR kdk_free_dateinfo (3),
+.BR kdk_free_logn_dateinfo (3),
+.BR kdk_system_set_long_dateformat (3),
+.BR kdk_system_set_short_dateformat (3),
+.BR kdk_system_get_longformat_date (3),
+.BR kdk_system_get_shortformat_date (3),
+.BR kdk_system_get_longformat (3),
+.BR kdk_system_get_shortformat (3),
+.BR kdk_system_longformat_transform (3),
+.BR kdk_system_shortformat_transform (3),
+.BR kdk_system_login_lock_dateinfo (3),
+.BR kdk_system_timeformat_transform (3)
+and
+.BR kdk_free_timeinfo (3).

@@ -1,0 +1,124 @@
+.TH "libkyfilewatcher" 3 "Wed Sep 20 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libkyfilewatcher - 文件管理功能
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBLINGMOSDK_FILEWATCHER::FileWatcher\fP"
+.br
+.RI "文件管理类 主要用来增加需要监听的文件路径，增加需要监听的文件列表，从监听列表中移除指定的文件，清空监听列表，暂停文件监听，恢复文件监听 "
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBFileWatcherType\fP { \fBONESHOT\fP = 0, \fBPERIODIC\fP, \fBNEVER\fP }"
+.br
+.ti -1c
+.RI "enum \fBFileWatcherAttribute\fP { \fBACCESS\fP = IN_ACCESS, \fBCREATE\fP = IN_CREATE, \fBMODIFY\fP = IN_MODIFY, \fBDELETE\fP = IN_DELETE | IN_DELETE_SELF, \fBATTRIB\fP = IN_ATTRIB, \fBMOVE\fP = IN_MOVE | IN_MOVE_SELF, \fBOPEN\fP = IN_OPEN, \fBCLOSE\fP = IN_CLOSE, \fBALL\fP = IN_ALL_EVENTS }"
+.br
+.ti -1c
+.RI "enum \fBRecursiveType\fP { \fBDIR\fP = 1 << 0, \fBREGULAR\fP = 1 << 1, \fBHIDDEN\fP = 1 << 2, \fBTMPFILE\fP = 1 << 3, \fBALLFILE\fP = HIDDEN | TMPFILE | DIR | REGULAR }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "QStringList \fBLINGMOSDK_FILEWATCHER::FileWatcher::addWatchTargetRecursive\fP (QString url, FileWatcherType type=PERIODIC, int attr=OPEN|CLOSE|MODIFY|DELETE, int maxdepth=5, int recurType=DIR|REGULAR)"
+.br
+.RI "增加需要监听的文件路径，对于目录，默认启用递归监听子目录 "
+.ti -1c
+.RI "QStringList \fBLINGMOSDK_FILEWATCHER::FileWatcher::addWatchTargetListRecursive\fP (QStringList urlList, FileWatcherType type=PERIODIC, int attr=OPEN|CLOSE|MODIFY|DELETE, int maxdepth=5, int recurType=DIR|REGULAR)"
+.br
+.RI "增加需要监听的文件列表 "
+.ti -1c
+.RI "QStringList \fBLINGMOSDK_FILEWATCHER::FileWatcher::removeWatchTargetRecursive\fP (QString url, int maxdepth=5, int recurType=ALLFILE)"
+.br
+.RI "从监听列表中移除指定的文件 "
+.ti -1c
+.RI "void \fBLINGMOSDK_FILEWATCHER::FileWatcher::clearWatchList\fP ()"
+.br
+.RI "清空监听列表 "
+.ti -1c
+.RI "void \fBLINGMOSDK_FILEWATCHER::FileWatcher::pauseWatcher\fP ()"
+.br
+.RI "暂停文件监听 "
+.ti -1c
+.RI "void \fBLINGMOSDK_FILEWATCHER::FileWatcher::restartWatcher\fP ()"
+.br
+.RI "恢复文件监听 "
+.ti -1c
+.in -1c
+.SH "Detailed Description"
+此库的主要功能是提供文件管理接口和类
+.PP 
+
+.SH "Function Documentation"
+.PP 
+.SS "QStringList LINGMOSDK_FILEWATCHER::FileWatcher::addWatchTargetListRecursive (QStringList urlList, FileWatcherType type = \fCPERIODIC\fP, int attr = \fCOPEN|CLOSE|MODIFY|DELETE\fP, int maxdepth = \fC5\fP, int recurType = \fCDIR|REGULAR\fP)"
+
+.PP
+增加需要监听的文件列表 
+.PP
+\fBParameters\fP
+.RS 4
+\fIurlList\fP 需要监听的文件列表 
+.br
+\fItype\fP 文件监听类型 
+.br
+\fIattr\fP 文件监听属性 
+.br
+\fImaxdepth\fP 指定遍历搜索的最大深度 
+.br
+\fIrecurType\fP 递归类型 
+.RE
+.PP
+
+.SS "QStringList LINGMOSDK_FILEWATCHER::FileWatcher::addWatchTargetRecursive (QString url, FileWatcherType type = \fCPERIODIC\fP, int attr = \fCOPEN|CLOSE|MODIFY|DELETE\fP, int maxdepth = \fC5\fP, int recurType = \fCDIR|REGULAR\fP)"
+
+.PP
+增加需要监听的文件路径，对于目录，默认启用递归监听子目录 
+.PP
+\fBParameters\fP
+.RS 4
+\fIurl\fP 文件路径 
+.br
+\fItype\fP 文件监听类型 
+.br
+\fIattr\fP 文件监听属性 
+.br
+\fImaxdepth\fP 指定遍历搜索的最大深度 
+.br
+\fIrecurType\fP 递归类型 
+.RE
+.PP
+
+.PP
+\fBExamples\fP
+.in +1c
+\fBlingmosdk\-system/src/filesystem/filewatcher/test/kyfilewatcher\-test\&.cpp\fP\&.
+.SS "QStringList LINGMOSDK_FILEWATCHER::FileWatcher::removeWatchTargetRecursive (QString url, int maxdepth = \fC5\fP, int recurType = \fCALLFILE\fP)"
+
+.PP
+从监听列表中移除指定的文件 
+.PP
+\fBParameters\fP
+.RS 4
+\fIurl\fP 指定的文件的路径 
+.br
+\fImaxdepth\fP 指定遍历搜索的最大深度 
+.br
+\fIrecurType\fP 递归类型 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkyfilewatcher.hpp from the source code\&.

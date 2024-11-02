@@ -1,0 +1,12 @@
+#ifndef KYLICENSE_GLOBAL_H
+#define KYLICENSE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(KYLICENSE_LIBRARY)
+#  define KYLICENSESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define KYLICENSESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // KYLICENSE_GLOBAL_H

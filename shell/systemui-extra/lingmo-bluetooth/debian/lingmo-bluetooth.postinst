@@ -1,0 +1,29 @@
+#!/bin/sh
+
+#set -e
+
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+version=`dpkg -l lingmo-bluetooth |grep lingmo-bluetooth |awk '{ print $3}'`
+echo "upgrade  version: "$version
+
+#判断命令是否存在
+if [ -x /usr/share/lingmo-system-updater/lingmo-reboot-required ]; then
+    #执行请求重启提示
+    /usr/share/lingmo-system-updater/lingmo-reboot-required
+fi
+
+start_server(){
+    echo "start_server"
+    #启动activeuser.service, 且开机自启动
+    systemctl enable activeuser.service
+    systemctl start activeuser.service
+
+    #启动lingmo-bluetooth.service, 且开机自启动
+    systemctl enable lingmo-bluetooth.service
+    systemctl start lingmo-bluetooth.service
+}
+
+start_server
+
+#DEBHELPER#

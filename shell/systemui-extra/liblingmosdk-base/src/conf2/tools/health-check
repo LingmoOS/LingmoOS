@@ -1,0 +1,210 @@
+#!/usr/bin/python3
+import os
+import re
+import sys
+import yaml
+
+override_dirs = ['/etc/lingmo-config/industry']
+output_file = ''
+
+# 每个问题类型声明一个列表存储对应的问题类型
+# 键值类型改变
+type_list = []
+# 键值权限改变
+permission_list = []
+# 取值范围改变
+range_list = []
+# 版本不在应用支持范围
+version_list = []
+
+# 打印报告
+def print_err():
+    with open(output_file, 'w') as file:
+        if type_list:
+            file.write('键值类型改变\n')
+            file.write(' ' * 4 + '描述\n')
+            file.write(' ' * 8 + '键值类型变化会导致应用读取数据是读不到数据或读到错误数据，导致应用运行结果异常\n')
+            file.write(' ' * 4 + '如何修复\n')
+            file.write(' ' * 8 + '联系应用调查原因，商讨修改方案\n')
+            file.write(' ' * 4 + '问题上下文\n')
+            for basic_file, override_file, path in type_list:
+                file.write(' ' * 8 + f'应用文件:{basic_file} 目标文件:{override_file} 位置:{path}\n')
+        if permission_list:
+            file.write('键值权限改变\n')
+            file.write(' ' * 4 + '描述\n')
+            file.write(' ' * 8 + '键值权限改变可能会导致定制文件的内容无法覆盖应用文件的内容，导致定制内容不生效\n')
+            file.write(' ' * 4 + '如何修复\n')
+            file.write(' ' * 8 + '联系应用调查原因，商讨修改方案\n')
+            file.write(' ' * 4 + '问题上下文\n')
+            for basic_file, override_file, path in permission_list:
+                file.write(' ' * 8 + f'应用文件:{basic_file} 目标文件:{override_file} 位置:{path}\n')
+        if range_list:
+            file.write('取值范围改变改变\n')
+            file.write(' ' * 4 + '描述\n')
+            file.write(' ' * 8 + '取值范围改变，可能会导致应用在读/写数据是读到/写入无意义的数据，导致应用运行出错或设置数据失败\n')
+            file.write(' ' * 4 + '如何修复\n')
+            file.write(' ' * 8 + '联系应用调查原因，商讨修改方案\n')
+            file.write(' ' * 4 + '问题上下文\n')
+            for basic_file, override_file, path in range_list:
+                file.write(' ' * 8 + f'应用文件:{basic_file} 目标文件:{override_file} 位置:{path}\n')
+        if version_list:
+            file.write('版本不在应用规定范围\n')
+            file.write(' ' * 4 + '描述\n')
+            file.write(' ' * 8 + '如果版本不在应用指定支持的版本范围内无法确定配置应用读取的配置是否存在与该版本的配置内容中，可能会导致应用运行错误\n')
+            file.write(' ' * 4 + '如何修复\n')
+            file.write(' ' * 8 + '调查文件来源，如果可以删除建议删除，不能删除的话联系应用与定制包的负责人，商讨修改方案\n')
+            file.write(' ' * 4 + '问题上下文\n')
+            for basic_file, override_file, path in version_list:
+                file.write(' ' * 8 + f'应用文件:{basic_file} 目标文件:{override_file} 位置:{path}\n')
+
+# 查询枚举类型数据的枚举定义
+def _recursive_search(dictionary, key):
+    if key in dictionary:
+        return dictionary[key]
+    else:
+        for value in dictionary.values():
+            if isinstance(value, dict):
+                result = _recursive_search(value, key)
+                if result is not None:
+                    return result
+    return None
+
+def _compare_versions(src, dest):
+    src_nums = re.findall(r'\d+', src)
+    dest_nums = re.findall(r'\d+', dest)
+    lengh = len(src_nums) if len(src_nums) > len(dest_nums) else len(dest_nums)
+    ret = -1 if len(src_nums) > len(dest_nums) else 1 if len(src_nums) < len(dest_nums) else 0
+    for i in range(0, lengh):
+        if dest_nums[i] > src_nums[i]:
+            return 1
+        if dest_nums[i] < src_nums[i]:
+            return -1
+    return ret
+
+def _calculate_default_version(data:dict):
+    versions = list(data.keys())
+    if '_default_version' in versions:
+        return data.get('_default_version')
+    default_version = ''
+    for version in versions:
+        if default_version == '':
+            default_version = version
+            continue
+        if 1 == _compare_versions(default_version, version):
+            default_version = version
+    return default_version
+
+def check_value_type(basic_data:dict, override_data:dict, path:str, app, version, basic_file, override_file):
+    basic_group = basic_data
+    override_group = override_data
+    for group in path.split('.'):
+        basic_group = basic_group[group]
+        override_group = override_group[group]
+    result = []
+    for key, value in override_group.items():
+        if key in basic_group:
+            if not isinstance(value, dict):
+                continue
+            basic_key_is_group = True if '_default' in next(iter(value.values())) else False
+            override_key_is_group = True if '_default' in next(iter(value.values())) else False
+            # 同名但是一个是组，一个是键
+            if basic_key_is_group != override_key_is_group:
+                result.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+            else:
+                # 组
+                if basic_key_is_group and override_key_is_group:
+                    check_value_type(basic_data, override_data, f'{path}.{key}', app, version, basic_file, override_file)
+                else:
+                    basic_key_type = basic_group[key]['_type']
+                    override_key_type = override_group[key]['_type']
+                    if basic_key_type != override_key_type:
+                        type_list.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+                    # 获取组的权限，未声明默认'public'
+                    basic_key_permission = basic_group.get('_permission', 'public')
+                    override_key_permission = override_group.get('_permission', 'public')
+                    # 读取键的权限，未声明则使用组权限
+                    basic_key_permission = basic_group[key].get('_permission', basic_key_permission)
+                    override_key_permission = override_group[key].get('_permission', override_key_permission)
+                    if basic_key_permission != override_key_permission:
+                        permission_list.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+                        
+                    basic_key_range = basic_group[key].get('_range', '')
+                    override_key_range = override_group[key].get('_range', '')
+                    if basic_key_range and override_key_range:
+                        if basic_key_type == 'enum':
+                            basic_key_range = _recursive_search(basic_data, basic_key_range[1:])
+                            override_key_range = _recursive_search(override_data, override_key_range[1:])
+                    if basic_key_range != override_key_range:
+                        range_list.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+                    # elif basic_key_range == '' and override_key_range != '':
+                    #     range_list.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+                    # elif basic_key_range != '' and override_key_range == '':
+                    #     range_list.append((basic_file, override_file, f'{app}/{version}/{path}/{key}'))
+    return result
+
+# 检查组配置文件
+def check_group_config(basic_data, override_data, basic_file, override_file):
+    for app, app_data in basic_data.items():
+        for version, version_data in app_data.items():
+            groups = set(override_data.keys())
+            for group in groups:
+                if group in version_data:
+                    if not isinstance(version_data[group], dict):
+                        continue
+                    check_value_type(version_data, override_data, group, app, version, basic_file, override_file)
+
+# 检查应用配置文件
+def check_app_config(basic_data, override_data, basic_file, override_file):
+    version_err = []
+    for app, app_data in override_data.items():
+        if app in basic_data:
+            # 读取应用支持版本号区间
+            min_version = ''
+            max_version = ''
+            if os.path.exists(f'/etc/lingmo-config/compatibility/{app}-compatibility-settings.yaml'):
+                    with open(f'/etc/lingmo-config/compatibility/{app}-compatibility-settings.yaml', 'r') as f:
+                        version_range = yaml.safe_load(f)
+                        min_version = version_range[app]['compatibility']['min_version']
+                        max_version = version_range[app]['compatibility']['max_version']
+            versions = set(basic_data[app].keys()) | set(override_data[app].keys())
+            for version in versions:
+                if (version == '_default_version'):
+                    continue
+                if min_version and max_version:
+                    if -1 == _compare_versions(version, min_version) or 1 == _compare_versions(version, max_version):
+                        version_list.append((basic_file, override_file, f'{app}/{version}'))
+                else:
+                    # 定制文件版本是否比应用文件版本高 待定？
+                    pass
+                if version in basic_data[app] and version in override_data[app]:
+                    for group in override_data[app][version]:
+                        if not isinstance(override_data[app][version][group], dict):
+                            continue
+                        check_value_type(basic_data[app][version], override_data[app][version], group, app, version, basic_file, override_file)
+
+def check_one_app(basic_data, basic_file):
+    for dir in override_dirs:
+        for root, dirs, files in os.walk(dir):
+            for file in files:
+                override_file = f'{root}/{file}'
+                with open(override_file, 'r') as f:
+                    override_data = yaml.safe_load(f)
+                    for value in override_data.values():
+                        is_group_file = True if '_default' in next(iter(value.values())) else False
+                        if is_group_file:
+                            check_group_config(basic_data, override_data, basic_file, override_file)
+                        else:
+                            check_app_config(basic_data, override_data, basic_file, override_file)
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("example: 111.py /home/xxx/output.txt")
+        sys.exit()
+    output_file = sys.argv[1]
+    for root, dirs, files in os.walk('/etc/lingmo-config/basic'):
+        for file in files:
+            basic_file = f'{root}/{file}'
+            with open(basic_file, 'r') as f:
+                basic_data = yaml.safe_load(f)
+            check_one_app(basic_data, basic_file)
+    print_err()

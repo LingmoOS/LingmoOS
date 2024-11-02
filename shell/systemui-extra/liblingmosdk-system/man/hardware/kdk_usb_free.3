@@ -1,0 +1,53 @@
+.TH "KDK_USB_FREE" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_usb_free - 释放kdk_usb_get_list返回的usb信息结构体
+.SH SYNOPSIS
+.nf
+.B #include <libkyusb.h>
+.sp
+.BI "extern void kdk_usb_free(pDriverInfoList "list ");" 
+.sp
+Link with \fI\-lkyusb\fP.
+.SH "Detailed Description"
+The main function of the interface is to release the usb information structure returned by the 
+.I kdk_usb_get_list.
+.PP
+The argument
+.I list
+is the return value of the 
+.I kdk_usb_get_list.
+.SH "RETURN VALUE"
+No return value
+.SH EXAMPLES
+.EX
+#include "stdio.h"
+#include "libkyusb.h"
+
+int main()
+{
+    pDriverInfoList list = kdk_usb_get_list();
+    if(list)
+    {
+        pDriverInfoList tmp = list;
+        while (tmp)
+        {
+            printf("Name: %s\t",tmp->data->name);
+            printf("Class: %s\t",tmp->data->type);
+            printf("PID: %s\t",tmp->data->pid);
+            printf("VID: %s\t",tmp->data->vid);
+            printf("Serial: %s\t",tmp->data->serialNo);
+            printf("DevNode: %s\n",tmp->data->devNode);
+            tmp = tmp->next;
+        }
+        
+    }
+    kdk_usb_free(list);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_usb_get_list ().
+.SH "SEE ALSO"
+.BR kdk_usb_get_list (3).

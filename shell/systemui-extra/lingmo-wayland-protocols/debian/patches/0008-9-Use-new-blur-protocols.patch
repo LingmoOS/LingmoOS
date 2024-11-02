@@ -1,0 +1,142 @@
+From: "wangteng@lingmoos.cn" <wangteng@lingmoos.cn>
+Date: Thu, 30 May 2024 02:08:59 +0000
+Subject: !9 Use new blur protocols Merge pull request !9 from
+ lingmo0061/new-blur
+
+---
+ src/protocols/lingmo-blur-manager.xml | 32 --------------
+ src/protocols/lingmo-blur.xml         | 86 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+), 32 deletions(-)
+ delete mode 100644 src/protocols/lingmo-blur-manager.xml
+ create mode 100644 src/protocols/lingmo-blur.xml
+
+diff --git a/src/protocols/lingmo-blur-manager.xml b/src/protocols/lingmo-blur-manager.xml
+deleted file mode 100644
+index 6e917a7..0000000
+--- a/src/protocols/lingmo-blur-manager.xml
++++ /dev/null
+@@ -1,32 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="lingmo_blur_manager">
+-  <copyright><![CDATA[
+-      SPDX-FileCopyrightText: 2024 LingmoSoft Co., Ltd.
+-      SPDX-FileCopyrightText: 2024 Jie Liu
+-
+-      SPDX-License-Identifier: MulanPSL-2.0
+-    ]]>
+-  </copyright>
+-  <interface name="lingmo_blur_manager" version="1">
+-      <request name="create">
+-          <arg name="id" type="new_id" interface="lingmo_blur"/>
+-          <arg name="surface" type="object" interface="wl_surface"/>
+-      </request>
+-      <request name="unset">
+-          <arg name="surface" type="object" interface="wl_surface"/>
+-      </request>
+-  </interface>
+-  <interface name="lingmo_blur" version="1">
+-      <request name="commit">
+-      </request>
+-      <request name="set_region">
+-        <arg name="region" type="object" interface="wl_region" allow-null="true"/>
+-      </request>
+-      <request name="release" type="destructor">
+-        <description summary="release the blur object"/>
+-      </request>
+-      <request name="set_strength">
+-          <arg name="strength" type="uint"/>
+-      </request>
+-  </interface>
+-</protocol>
+diff --git a/src/protocols/lingmo-blur.xml b/src/protocols/lingmo-blur.xml
+new file mode 100644
+index 0000000..8d0167b
+--- /dev/null
++++ b/src/protocols/lingmo-blur.xml
+@@ -0,0 +1,86 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="lingmo_blur">
++  <copyright><![CDATA[
++      SPDX-FileCopyrightText: 2024 LingmoSoft Co., Ltd.
++      SPDX-License-Identifier: MulanPSL-2.0
++    ]]>
++  </copyright>
++
++  <interface name="lingmo_blur_manager_v1" version="1">
++    <description summary="blur object factory">
++      This protocol provides a way to improve visuals of translucent surfaces
++      by blurring background behind them.
++    </description>
++
++    <request name="destroy" type="destructor">
++      <description summary="destroy the blur manager object">
++        Informs the server that the client will no longer be using this
++        protocol object. Existing objects created by this object are not
++        affected.
++      </description>
++    </request>
++
++    <enum name="error">
++      <entry name="blur_exists" value="0"
++             summary="the surface has already a blur object associated"/>
++    </enum>
++
++    <request name="get_blur">
++      <description summary="get a blur object">
++        Instantiate an interface extension for the given wl_surface to
++        blur background behind it. If the given wl_surface already has
++        a lingmo_blur_surface_v1 object associated, the blur_exists protocol
++        error will be raised.
++      </description>
++      <arg name="id" type="new_id" interface="lingmo_blur_surface_v1"
++           summary="the new lingmo_blur_surface_v1 object"/>
++      <arg name="surface" type="object" interface="wl_surface"
++           summary="the surface"/>
++    </request>
++  </interface>
++
++  <interface name="lingmo_blur_surface_v1" version="1">
++    <description summary="blur object for a surface">
++      The blur object provides a way to specify a region behind a surface
++      that should be blurred by the compositor.
++
++      If the wl_surface associated with the lingmo_blur_surface_v1 object has been
++      destroyed, this object becomes inert.
++    </description>
++
++    <request name="destroy" type="destructor">
++      <description summary="release the blur object">
++        Informs the server that the client will no longer be using this
++        protocol object. The blur region will be unset on the next commit.
++      </description>
++    </request>
++
++    <request name="set_region">
++      <description summary="set blur region">
++        This request sets the region of the surface that will have its
++        background blurred.
++
++        The blur region is specified in the surface-local coordinates.
++        The initial value for the blur region is empty. Setting the pending
++        blur region has copy semantics, and the wl_region object can be
++        destroyed immediately. A NULL wl_region causes the blur region to be
++        set to infinite.
++
++        The blur region is double-buffered state, and will be applied on
++        the next wl_surface.commit.
++
++        The blur algorithm is subject to compositor policies.
++      </description>
++      <arg name="region" type="object" interface="wl_region" allow-null="true"
++           summary="blur region of the surface"/>
++    </request>
++
++    <request name="set_level">
++      <description summary="set blur algorithm level">
++        Change blur algorithm level in compositor.
++        The range of level is 1 to 15.
++      </description>
++      <arg name="level" type="uint" summary="level of the blur algorithm"/>
++    </request>
++  </interface>
++</protocol>

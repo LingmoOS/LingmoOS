@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -e
+
+karch=$(uname -m)
+# 字符串包含
+if [[ ${karch} =~ "mips" ]] || [[ ${karch} =~ "loongarch" ]]; then
+    do_mips_bootloader
+    return 0
+elif [[ ${karch} =~ "sw_64" ]]; then
+    do_sw64_bootloader
+    return 0
+fi
+
+# TODO, IS_UEFI
+
+#TODO, -f lsb-release
+#DISTRO_ID=$(lsb_release -is)
+automatic=$(get_value automatic-installation)
+disk=
+if [[ "${automatic}" = "1" ]]; then
+    disk=$(get_value devpath)
+else
+    disktmp1=$(get_value bootloader | sed 's/\"//g')
+    disk="${disktmp1%% *}"
+fi
+
+BOOT_METHOD="UEFI"
+if [[ "${is_efi}" = "false" ]]; then
+    BOOT_METHOD="legacy"
+fi
+
+case ${BOOT_METHOD} in
+  "UEFI")
+    # TODO, 统一安装
+    if ! dpkg -l | grep -q grub-efi; then
+        apt install -y grub-efi efibootmgr
+    fi
+    grub-install || \
+        msg "grub-install for uefi failed!!!"
+#TODO, copy to boot
+#TODO, fix boot order
+
+    ;;
+  "legacy")
+    if [[ $(uname -m) != "aarch64" ]]; then
+        apt install -y grub-pc
+    fi
+    grub-install --no-floppy --force "${disk}" || \
+        msg "grub-install for legacy failed!!!"
+
+    ;;
+esac
+
+instaler_ostree_update=$(get_value ostree_value)
+if [ "${instaler_ostree_update}" = "true" ]; then
+	#apt remove -y lingmo-update-notify lingmo-system-updater lingmo-update-frontend
+	apt install -y lingmo-update-notify-immutable lingmo-system-updater-immutable lingmo-update-frontend-immutable
+fi
+
+
+# 兼容性考虑
+copy_efi() {
+    if [[ $(uname -m) = "aarch64" ]]; then
+        if [[ -f /boot/efi/EFI/lingmo/grubaa64.efi ]]; then
+            mkdir -p /boot/efi/EFI/neolingmo
+            cp /boot/efi/EFI/lingmo/grubaa64.efi /boot/efi/EFI/neolingmo/grubaa64.efi
+            mkdir -p /boot/efi/EFI/boot
+            cp /boot/efi/EFI/lingmo/grubaa64.efi /boot/efi/EFI/boot/grubaa64.efi
+	fi
+    fi
+}
+
+copy_efi

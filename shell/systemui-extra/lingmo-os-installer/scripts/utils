@@ -1,0 +1,420 @@
+#!/bin/bash
+#
+# 工具
+
+CONFIGFILE=/tmp/ky-installer.cfg
+LOG_FILE=/var/log/installer/lingmo-os-installer.log
+IN_TARGET=/tmp/k-i/
+
+DISK_MINSIZE=32799
+
+msg() {
+    echo "$(date +'%Y-%m-%d %H:%M:%S') $*" >&2
+}
+
+get_value() {
+    local key=$1
+    local value
+    value=$(grep "^$key=" "$CONFIGFILE")
+    echo "${value#*=}"
+}
+
+get_value_bytearray() {
+    local key=$1
+    local value
+    value=$(grep "^$key=" "$CONFIGFILE")
+
+    if ! egrep -q "^$key=.?@ByteArray" $CONFIGFILE; then
+        echo "${value#*=}"
+        return 0
+    fi
+
+    value1=$(echo "${value#*\(}")
+    echo "${value1%)*}"
+}
+
+set_backup() {
+    backup_dev=$1
+    backup_uuid=$(blkid -o value -s UUID $backup_dev)
+    mkdir -p /target/etc
+    echo "RECOVERY_DEV_UUID=$backup_uuid
+SNAPSHOT_ENABLED=1" >/target/etc/.bootinfo
+    mkdir -p /target/backup/current
+    mkdir -p /target/backup/snapshots
+    msg "设置备份还原分区完成"
+}
+
+# 卸载文件系统
+umount_all() {
+    msg "正在卸载文件系统..."
+    sync
+    umount -l /target || true
+    if mount | grep -q /backup; then
+        umount -l /backup || true
+    fi
+    msg "卸载完成"
+}
+
+do_mipsel_loongson_2f() {
+    ROOT=
+    ARCH=$(archdetect)
+    case $ARCH in
+        mipsel/loongson-2f)
+        # Configure PMON to load GRUB by default.
+        if [ ! -e $ROOT/boot.cfg ] && [ ! -e $ROOT/boot/boot.cfg ]; then
+            pmon_partition="$(grub_probe -d -t drive "$bootfs" | \
+                      sed 's/.*,//; s/[^0-9]//g')"
+            if [ "$pmon_partition" ]; then
+                pmon_partition=$(($pmon_partition - 1))
+            else
+                pmon_partition=0 # fallback guess
+            fi
+            if [[ "$rootfs" == "$bootfs" ]]; then
+                pmon_grub_path=/boot/grub.elf
+                pmon_boot_cfg_path=$ROOT/boot.cfg
+            else
+                pmon_grub_path=/grub.elf
+                pmon_boot_cfg_path=$ROOT/boot/boot.cfg
+            fi
+            cat > $pmon_boot_cfg_path <<EOF
+default 0
+timeout 0
+showmenu 0
+
+title Boot with GRUB
+    kernel (wd0,$pmon_partition)$pmon_grub_path
+    args nil
+EOF
+        fi
+        ;;
+    esac
+}
+
+do_mips_bootloader() {
+    if [[ -f /usr/sbin/update-grub ]]; then
+        update-grub
+    fi
+
+    rsync -r /cdrom/boot/ /boot
+
+    pushd /boot
+    ln -fs . boot || true
+    popd
+
+    # 其他设置
+    do_mipsel_loongson_2f
+
+    # bug 32789, 创建 esp 时无法引导
+    if [[ -d /boot/efi ]] && [[ -d /boot/EFI ]]; then
+        rsync -a /boot/{EFI/,efi}
+    fi
+}
+
+do_sw64_bootloader() {
+    grub_opts="root=UUID=$(blkid -o value -s UUID $(findmnt / -no source))"
+    swap_dev=$(grep /dev /proc/swaps | head -1 | awk '{print $1}')
+    swap_opts=""
+    if [[ ! -z "${swap_dev}" ]]; then
+        swap_opts="resume=UUID=$(blkid -o value -s UUID ${swap_dev})"
+    fi
+    rsync -r /cdrom/boot/ /boot
+    sed -i "s|boot=casper|${grub_opts} ${swap_opts}|g" /boot/grub/grub.cfg
+
+    pushd /boot
+    ln -fs . boot || true
+    popd
+}
+
+# 根据磁盘大小自动选择磁盘
+auto_select_disk() {
+    DiskList=`LANG=en_US; sudo fdisk -l | awk '{if($1=="Disk" && $2!="identifier:" && $2!="model:") print $2$5}'`
+    MAX=$[$(get_value max)]
+    MIN=$[$(get_value min)]
+    Size_0=1024
+    Size_1=1024
+    Ret=
+
+    for i in $DiskList
+    do
+        Val=`LANG=en_US; echo $i | cut -d ':' -f 2`
+        Val=$[$Val / 1024 / 1024 / 1024]
+        Disk=`LANG=en_US; echo $i | cut -d ':' -f 1`
+            if [[ `echo "$Val < 35" | bc` -eq 1 ]]; then
+            continue
+        fi
+        if [[ `echo "$Val < $Size_0" | bc` -eq 1 ]]; then
+            Size_0=$Val
+            Ret_back=$Disk
+        fi
+            if [[ `echo "$Val >= $MIN" | bc` -eq 1 ]] &&
+               [[ `echo "$Val <= $MAX" | bc` -eq 1 ]] &&
+               [[ `echo "$Val < $Size_1" | bc` -eq 1 ]]; then
+        Size_1=$Val
+        Ret=$Disk
+        fi
+    done
+
+    if [ -z $Ret ]; then
+        Ret=$Ret_back
+    fi
+
+    echo $Ret
+}
+
+auto_disk() {
+    DiskList=`LANG=en_US; sudo fdisk -l | awk '{if($1=="Disk" && $2!="identifier:" && $2!="model:") print $2$5}'`
+    MAX=2050
+    MIN=80
+    Size_0=80
+    Size_1=80
+    Size_2=80
+
+    Ret=
+
+    if echo $DiskList | grep -q 'nvme'; then
+        DiskList=`LANG=en_US; sudo fdisk -l | awk '{if($1=="Disk" && $2!="identifier:" && $2!="model:") print $2$5}' | grep "nvme"`
+    elif echo $DiskList | grep -q 'sd'; then
+        DiskList=`LANG=en_US; sudo fdisk -l | awk '{if($1=="Disk" && $2!="identifier:" && $2!="model:") print $2$5}' | grep "sd"`
+    else
+            DiskList=$DiskList
+    fi
+
+    num=1
+    fdd=1
+    for i in $DiskList
+    do
+        Val=`LANG=en_US; echo $i | cut -d ':' -f 2`
+        Val=$[$Val / 1024 / 1024 / 1024]
+
+        Disk=`LANG=en_US; echo $i | cut -d ':' -f 1`
+
+        if [[ `echo "$Val < 35" | bc` -eq 1 ]]; then
+            continue
+        fi
+
+        Sd=${Disk##*/}
+        fdd=$( cat /sys/block/${Sd}/queue/rotational )
+        if [[ $fdd == 0 || $num == 0 ]];then
+                num=0
+                if [[ $fdd == 1 ]];then
+                        continue
+                fi
+                if [[ `echo "$Val > $Size_0" | bc` -eq 1 ]]; then
+                         Size_0=$Val
+                        Ret_back=$Disk
+                fi
+
+                 if [[ `echo "$Val >= $MIN" | bc` -eq 1 ]] &&
+                   [[ `echo "$Val <= $MAX" | bc` -eq 1 ]] &&
+                   [[ `echo "$Val > $Size_2" | bc` -eq 1 ]]; then
+                        Size_2=$Val
+                        Ret=$Disk
+                 fi
+                 continue
+        fi
+        
+	if [[ `echo "$Val > $Size_0" | bc` -eq 1 ]]; then
+                 Size_0=$Val
+                 Ret_back=$Disk
+        fi
+
+        if [[ `echo "$Val >= $MIN" | bc` -eq 1 ]] &&
+           [[ `echo "$Val <= $MAX" | bc` -eq 1 ]] &&
+           [[ `echo "$Val > $Size_1" | bc` -eq 1 ]]; then
+                Size_1=$Val
+                Ret=$Disk
+        fi
+    done
+
+
+
+    if [ -z $Ret ]; then
+        Ret=$Ret_back
+    fi
+
+    echo $Ret
+    sed -i "/devpath/d" /tmp/ky-installer.cfg
+    echo "devpath=$Ret" >>/tmp/ky-installer.cfg
+}
+
+get_disk() {
+    disk_num=0
+    disk_menu=$(lsblk -d | grep -v NAME | grep -v loop | awk '{print $1}')
+    for i in ${disk_menu}
+    do
+        disk_remove=$(cat /sys/block/$i/removable)|| disk_remove=1
+        if [[ ${disk_remove} == 0 ]]; then
+                disk_num=`expr ${disk_num} + 1`
+        fi
+    done
+    echo ${disk_num}
+    if [[ ${disk_num} -ge 2 ]]; then
+        echo " DISK  more than 1"
+    else
+        auto_disk
+    fi
+}
+
+
+
+
+get_is_efi() {
+    if type archdetect >/dev/null 2>&1; then
+        archdetect=$(archdetect)
+    else
+        archdetect=unknown/generic
+    fi
+    arch=${archdetect%/*}
+    sub=${archdetect#*/}
+    ret=true
+    case "$arch" in
+        alpha|sw64)
+            ret=false;;
+        amd64|i386)
+            case "$sub" in
+                mac|efi)
+                ret=true;;
+                *)
+                ret=false;;
+            esac;;
+        arm|armhf|armel)
+            ret=false;;
+        arm64)
+            ret=true;;
+        mips64el)
+            case "$sub" in
+                efi)
+                ret=true;;
+                *)
+                ret=false;;
+            esac;;
+        mips|mipsel)
+            ret=false;;
+        *)
+            ret=true;;
+    esac
+
+    # 华为 990 设置为 efi
+    if egrep -qi 'kirin.?9[09]0' /proc/cpuinfo; then
+        ret=true
+    fi
+
+    echo $ret
+}
+
+readonly is_efi=$(get_is_efi)
+
+# 优先使用引导参数中设置
+set_swap_mode() {
+    if grep -q kyswapfile /proc/cmdline; then
+        readonly is_swapfile=true
+        return 0
+    fi
+    readonly is_swapfile=$(get_value enable-swapfile)
+}
+set_swap_mode
+
+get_oem_mode() {
+    ret=false
+    if grep -qi 'oem-config/enable=true' /proc/cmdline; then
+        ret=true
+    fi
+    echo $ret
+}
+
+readonly is_oem_mode=$(get_oem_mode)
+
+# 审核模式，工厂安装
+get_audit_mode() {
+    ret=false
+    if grep -qiE 'auditmode|ple-mode' /proc/cmdline; then
+        ret=true
+    fi
+    echo $ret
+}
+
+readonly is_audit_mode=$(get_audit_mode)
+
+
+get_is_990_9a0() {
+    ret=false
+    # 匹配 kirin 990 5g, kirin990, kirin 9006c
+    if egrep -qi 'kirin.?9[09]0' /proc/cpuinfo; then
+        ret=true
+    fi
+    echo $ret
+}
+readonly is_990_9a0=$(get_is_990_9a0)
+
+readonly swap_file=swap_file
+
+get_is_minimal() {
+    ret=false
+    if egrep -qi lingmo-minimal /proc/cmdline; then
+        ret=true
+    fi
+    echo $ret
+}
+readonly is_minimal=$(get_is_minimal)
+
+readonly is_ghost=$(get_value ghost)
+
+readonly isluks_lvm=$(get_value encrypty)
+
+run_scripts_dir() {
+    name=$1
+    for i in ${name}/*; do
+        if [ -x "$i" ]; then
+            filename=$(basename $i)
+            echo "$(date +'%b %d %H:%M:%S') ${filename}"
+            . "$i"
+        else
+            msg "跳过 $i"
+        fi
+    done
+}
+
+get_hw_typedata() {
+    typedata=$(dmidecode -s system-product-name)
+    ret="${typedata#* }"
+    if [[ "${typedata}" =~ "PGUV" ]]; then
+        ret=pguv
+    elif [[ "${typedata}" =~ "KLVU" ]]; then
+        ret=klvu
+    elif [[ "${typedata}" =~ "KLVV" ]]; then
+        ret=klvv
+    fi
+    echo $ret
+}
+readonly hw_typedata=$(get_hw_typedata)
+
+# 华为更改启动项
+hw_next_boot() {
+    next_boot=$1
+    boot_order_file="/boot/efi/EFI/BOOT/HwBootOrder.ini"
+    case $next_boot in
+    hd|HD)
+          echo HwBootOrder=0123 > ${boot_order_file}
+          ;;
+    pxe|PXE)
+          echo HwBootOrder=2013 > ${boot_order_file}
+          ;;
+    *)
+          echo "Error argument $next_boot, only hd or pxe is supported"
+          exit 1
+          ;;
+    esac
+
+    msg "set next order to $next_boot is done"
+}
+
+do_bind_data() {
+    mkdir -p /target/{home,root}
+    mkdir -p /target/data/{home,root,usershare}
+
+    mount --bind /target/data/home /target/home
+    mount --bind /target/data/root /target/root
+
+    chmod -R 1777 /target/data/usershare >/dev/null
+}
+

@@ -1,0 +1,140 @@
+.TH "KDK_GET_DISKINFO" 3 "Thu Aug 10 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_get_diskinfo - 获取指定磁盘的磁盘信息
+.SH SYNOPSIS
+.nf
+.B #include <libkydiskinfo.h>
+.sp
+.BI "extern kdk_diskinfo *kdk_get_diskinfo(const char *"diskname ");" 
+.sp
+Link with \fI\-lkydiskinfo\fP.
+.SH "Detailed Description"
+Based on the specified disk name 
+.I diskname,
+such as absolute path such as 
+.I /dev/sda,
+or 
+.BR kdk_get_disklist()
+function returns an element from a value to obtain disk information.
+.SH "RETURN VALUE"
+kdk_diskinfo is a structure that stores disk information, as follows:
+
+typedef struct _kdk_diskinfo{
+    char *name;     // 绝对路径
+    char *vendor;   // 制造商
+    char *model;    // 型号
+    char *serial;   // 序列号
+
+    kdk_disk_type disk_type;  // 磁盘类型，固态 or 机械 or 混合
+    kdk_disk_interface_type inter_type;   // 接口类型
+    unsigned int rpm;  // 转速，注意固态是没有转速概念的
+
+    unsigned long long sectors_num;   // 扇区数量
+    unsigned int sector_size;   // 每个扇区的字节数
+    float total_size_MiB;  // 磁盘容量，MiB为单位
+    
+    unsigned int partition_nums; // 该磁盘/分区下的子分区数量
+    char *uuid;     // UUID
+    short mounted;   // 是否已挂载
+    char *mount_path;   // 挂载路径
+    kdk_disk_format format; // 格式化类型
+    kdk_disk_partition_type part_type;  // 分区类型
+    char *fwrev;    //固件版本信息
+
+}kdk_diskinfo;
+.SH EXAMPLES
+.EX
+#include "libkydiskinfo.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+static void display_disk_info(kdk_diskinfo *di)
+{
+    printf("---------------%s------------------\n", di->name);
+    printf("Disk Sectors:\t%llu\n", di->sectors_num);
+    printf("Disk Sector Size:\t%u\n", di->sector_size);
+    printf("Disk Size:\t%f MiB\n", di->total_size_MiB);
+    printf("Disk Model:\t%s\n", di->model ? di->model : "None");
+    printf("Disk Serial:\t%s\n", di->serial ? di->serial : "None");
+    printf("Disk Partition Number:\t%u\n", di->partition_nums);
+    printf("Disk Type:\t%d\n", di->disk_type);
+    printf("Disk fwrev:\t%s\n", di->fwrev);
+}
+
+static void display_disk_list(char **disklist)
+{
+    int count = 0;
+    while (disklist[count])
+    {
+        printf("No. %d\t %s\n", count + 1, disklist[count]);
+        count ++;
+    }
+}
+
+int main()
+{
+    char **disklist = kdk_get_disklist();
+    // display_disk_list(disklist);
+    for (int i = 0; disklist[i]; i++)
+    {
+        kdk_diskinfo *sdainfo = kdk_get_diskinfo(disklist[i]);
+        if (!sdainfo)
+        {
+            printf("[%s]Get disk info error.\n", disklist[i]);
+            continue;
+        }
+
+        display_disk_info(sdainfo);
+
+        kdk_free_diskinfo(sdainfo);
+    }
+    kdk_free_disklist(disklist);
+
+
+    char **di = kdk_get_hard_disk();
+    size_t num = 0;
+    while (di[num])
+    {
+        printf("No. %ld\t %s\n", num + 1, di[num]);
+        char *res = kdk_get_hard_disk_size(di[num]);
+        printf("容量 = %s\n", res);
+        free(res);
+
+        res = kdk_get_hard_fwrev(di[num]);
+        printf("固态版本 = %s\n", res);
+        free(res);
+
+        res = kdk_get_hard_vendor(di[num]);
+        printf("厂商 = %s\n", res);
+        free(res);
+
+        res = kdk_get_hard_type(di[num]);
+        printf("类型 = %s\n", res);
+        free(res);
+
+        res = kdk_get_hard_model(di[num]);
+        printf("型号 = %s\n", res);
+        free(res);
+
+        res =kdk_get_hard_serial(di[num]);
+        printf("序列号 = %s\n", res);
+        free(res);
+
+        num ++;
+    }
+    kdk_free_disklist(di);
+
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_get_disklist (),
+.BR kdk_get_hard_disk (),
+and
+.BR kdk_get_hard_disk_size ().
+.SH "SEE ALSO"
+.BR kdk_get_disklist (3),
+.BR kdk_free_disklist (3),
+.BR kdk_free_diskinfo (3)

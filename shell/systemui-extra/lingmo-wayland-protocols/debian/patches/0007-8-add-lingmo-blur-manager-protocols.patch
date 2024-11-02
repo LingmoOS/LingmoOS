@@ -1,0 +1,61 @@
+From: =?utf-8?b?5YiY5p2w?= <liujie01@lingmoos.cn>
+Date: Mon, 27 May 2024 08:02:42 +0000
+Subject: =?utf-8?q?!8_add_lingmo-blur-manager_protocols_Merge_pull_request_!8?=
+ =?utf-8?q?_from_=E5=88=98=E6=9D=B0/lingmo/nile?=
+
+---
+ src/CMakeLists.txt                  |  1 +
+ src/protocols/lingmo-blur-manager.xml | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+ create mode 100644 src/protocols/lingmo-blur-manager.xml
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e3ad82c..b932f83 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -6,6 +6,7 @@
+ install(FILES
+     protocols/lingmo-shell.xml
+     protocols/lingmo-window-management.xml
++    protocols/lingmo-blur-manager.xml
+ 
+     DESTINATION ${CMAKE_INSTALL_DATADIR}/lingmo-wayland-protocols
+ )
+diff --git a/src/protocols/lingmo-blur-manager.xml b/src/protocols/lingmo-blur-manager.xml
+new file mode 100644
+index 0000000..6e917a7
+--- /dev/null
++++ b/src/protocols/lingmo-blur-manager.xml
+@@ -0,0 +1,32 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="lingmo_blur_manager">
++  <copyright><![CDATA[
++      SPDX-FileCopyrightText: 2024 LingmoSoft Co., Ltd.
++      SPDX-FileCopyrightText: 2024 Jie Liu
++
++      SPDX-License-Identifier: MulanPSL-2.0
++    ]]>
++  </copyright>
++  <interface name="lingmo_blur_manager" version="1">
++      <request name="create">
++          <arg name="id" type="new_id" interface="lingmo_blur"/>
++          <arg name="surface" type="object" interface="wl_surface"/>
++      </request>
++      <request name="unset">
++          <arg name="surface" type="object" interface="wl_surface"/>
++      </request>
++  </interface>
++  <interface name="lingmo_blur" version="1">
++      <request name="commit">
++      </request>
++      <request name="set_region">
++        <arg name="region" type="object" interface="wl_region" allow-null="true"/>
++      </request>
++      <request name="release" type="destructor">
++        <description summary="release the blur object"/>
++      </request>
++      <request name="set_strength">
++          <arg name="strength" type="uint"/>
++      </request>
++  </interface>
++</protocol>

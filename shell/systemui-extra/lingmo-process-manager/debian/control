@@ -1,0 +1,48 @@
+Source: lingmo-process-manager
+Section: x11
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Build-Depends: debhelper-compat (= 12),
+               cmake,
+               libglib2.0-dev,
+               qtbase5-dev,
+               qttools5-dev,
+               libkf5config-dev,
+               libkf5windowsystem-dev,
+               libkf5kio-dev,
+               libjsoncpp-dev,
+               pkg-config,
+			   libgsettings-qt-dev,
+               libprocps-dev,
+               libcgroup-dev,
+               libkf5wayland-dev,
+               liblingmosdk-waylandhelper-dev,
+               liblingmosdk-datacollect-dev,
+               libx11-dev
+
+Standards-Version: 4.4.1
+Homepage: https://github.com/LingmoOS
+Package: lingmo-app-manager
+Architecture: all
+Priority: optional
+Section: oldlibs
+Depends: lingmo-process-manager, ${misc:Depends}
+Description: transitional package
+ This is a transitional package. It can safely be removed.
+
+Package: lingmo-process-manager
+Replaces: lingmo-app-manager(<< 3.2.1.0~)
+Conflicts: lingmo-app-manager(<< 3.2.1.0~)
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, lingmo-process-manager-daemon
+Description: Application and process group Management
+ lingmo-process-manager groups and manages applications and processes,
+ allocating different system resources based on their status or importance level.
+
+Package: lingmo-process-manager-daemon
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: lingmo process manager daemon
+  lingmo-process-manager-daemon is the backend service of lingmo-process-manager,
+  for managing the cgroups of application or process. It provides D-Bus APIs
+  for lingmo-process-manager.

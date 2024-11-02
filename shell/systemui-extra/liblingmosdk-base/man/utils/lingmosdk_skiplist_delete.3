@@ -1,0 +1,134 @@
+.TH "LINGMOSDK_SKIPLIST_DELETE" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lingmosdk_skiplist_delete \- 删除key值对应的节点  
+
+.SH SYNOPSIS
+br
+.PP
+\fC#include <skip_linklist\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "int lingmosdk_skiplist_delete (\fBlingmosdk_skiplist\fP * list, int key)"
+
+.PP
+删除key值对应的节点 
+.PP
+\fBParameters\fP
+.RS 4
+\fIlist\fP 需要操作的链表 
+.br
+\fIkey\fP 键 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int, 成功删除返回0，失败返回-1 
+.RE
+.PP
+Link with \fI\-lkydatastruct\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是删除key值对应的节点
+.SH EXAMPLES
+.EX
+#include <skip_linklist.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#define ARRAY_SIZE    20
+
+int array[ARRAY_SIZE];
+int del_flag[ARRAY_SIZE] = {0};
+
+void print_list(lingmosdk_skiplist *list)
+{
+    for (int i = list->max_levels - 1; i >= 0; i --)
+    {
+        lingmosdk_skiplist_node *curnode = list->children[i];
+        printf("Level[%d]: ", i);
+        while (curnode)
+        {
+            printf("%d->", curnode->key);
+            curnode = curnode->next[i];
+        }
+        printf("NULL\n");
+    }
+}
+
+int test_list_delete(lingmosdk_skiplist *list)
+{
+    for (int i = 0; i < ARRAY_SIZE; i ++)
+    {
+        if (random() % 2)
+        {
+            del_flag[i] = 1;
+            lingmosdk_skiplist_delete(list, array[i]);
+            printf("Deleted %d\n", array[i]);
+        }
+    }
+
+    for (int i = 0; i < ARRAY_SIZE; i ++)
+    {
+        if (del_flag[i] && lingmosdk_skiplist_search(list, array[i]).num != -1)
+        {
+            printf("Skiplist delete test failed.\n");
+            return -1;
+        }
+    }
+
+    printf("Skiplist order test pass.\n");
+
+    return 0;
+}
+
+int main()
+{
+    lingmosdk_skiplist *list = lingmosdk_create_skiplist();
+
+    lingmosdk_skiplist_setmaxlevels(list, 5);
+    
+    srand(time(NULL));
+
+    for (int i = 0; i < ARRAY_SIZE; i ++)
+    {
+        array[i] = i;
+        lingmosdk_skiplist_insert(list, i, (lingmosdk_listdata)i);
+        printf("%d has been insert.\n", i);
+        sleep(1);
+    }
+    
+    print_list(list);
+
+    int res = test_list_delete(list);
+
+    print_list(list);
+
+    lingmosdk_destroy_skiplist(list);
+
+    return res;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR lingmosdk_create_skiplist (),
+.BR lingmosdk_destroy_skiplist (),
+.BR lingmosdk_skiplist_setmaxlevels (),
+.BR lingmosdk_skiplist_insert ()
+and
+.BR lingmosdk_skiplist_search ().
+.SH "SEE ALSO"
+.BR lingmosdk_create_skiplist (3),
+.BR lingmosdk_destroy_skiplist (3),
+.BR lingmosdk_skiplist_setmaxlevels (3),
+.BR lingmosdk_skiplist_insert (3)
+and
+.BR lingmosdk_skiplist_search (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for skip_linklist.h  from the source code\&.

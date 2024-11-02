@@ -1,0 +1,87 @@
+.TH "KDK_DISPLAY_GET_PHYSICAL_ID" 3 "Thu Aug 24 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_display_get_physical_id - 获取显卡的物理id
+.SH SYNOPSIS
+.nf
+.B #include <libkydisplay.h>
+.sp
+.BI "extern char* kdk_display_get_physical_id();"
+.sp
+Link with \fI\-lkyhw\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the physical ID of the Video card
+.SH "RETURN VALUE"
+On success, returns the physical ID of the Video card of type char*; The returned string needs to be released by
+.I free
+.PP
+On error, return
+.BR NULL.
+.SH EXAMPLES
+.EX
+#include "libkydisplay.h"
+#include <stdio.h>
+
+int main()
+{
+    char *vendor = kdk_display_get_vendor();
+    printf("生产厂商：%s\en", vendor);
+    free(vendor);
+    char *product = kdk_display_get_product();
+    printf("型号：%s\en", product);
+    free(product);
+    char *description = kdk_display_get_description();
+    printf("设备类型：%s\en", description);
+    free(description);
+    char *id = kdk_display_get_physical_id();
+    printf("物理id：%s\en", id);
+    free(id);
+    char *bus = kdk_display_get_bus_info();
+    printf("总线地址：%s\en", bus);
+    free(bus);
+    char *version = kdk_display_get_version();
+    printf("设备版本：%s\en", version);
+    free(version);
+    char *width = kdk_display_get_width();
+    printf("数据宽度：%s\en", width);
+    free(width);
+    char *clock = kdk_display_get_clock();
+    printf("频率：%s\en", clock);
+    free(clock);
+    char *capabilities = kdk_display_get_capabilities();
+    printf("功能：%s\en", capabilities);
+    free(capabilities);
+    char *configuration = kdk_display_get_configuration();
+    printf("配置：%s\en", configuration);
+    free(configuration);
+    char *resources = kdk_display_get_resources();
+    printf("资源：%s\en", resources);
+    free(resources);
+    return 0;
+} 
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_display_get_vendor (),
+.BR kdk_display_get_product (),
+.BR kdk_display_get_description (),
+.BR kdk_display_get_bus_info (),
+.BR kdk_display_get_version (),
+.BR kdk_display_get_width (),
+.BR kdk_display_get_clock (),
+.BR kdk_display_get_capabilities (),
+.BR kdk_display_get_configuration ()
+and
+.BR kdk_display_get_resources ().
+.SH "SEE ALSO"
+.BR kdk_display_get_vendor (3),
+.BR kdk_display_get_product (3),
+.BR kdk_display_get_description (3),
+.BR kdk_display_get_bus_info (3),
+.BR kdk_display_get_version (3),
+.BR kdk_display_get_width (3),
+.BR kdk_display_get_clock (3),
+.BR kdk_display_get_capabilities (3),
+.BR kdk_display_get_configuration (3)
+and
+.BR kdk_display_get_resources (3).

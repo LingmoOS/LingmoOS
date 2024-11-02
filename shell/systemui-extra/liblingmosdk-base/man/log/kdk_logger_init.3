@@ -1,0 +1,68 @@
+.TH "KDK_LOGGER_INIT" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_logger_init \- 初始化日志记录  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkylog\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "int kdk_logger_init (const char * ini)"
+
+.PP
+初始化日志记录，也可以不调用该函数直接使用上方日志记录的宏，若以此方式运行，则程序会使用默认的日志配置文件 
+.PP
+\fBParameters\fP
+.RS 4
+\fIini：日志配置文件路径，若传入NULL则会使用默认的日志配置文件\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int，0表示成功，非0表示失败 
+.RE
+.PP
+Link with \fI\-lkylog\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是初始化日志记录，也可以不调用该函数直接使用上方日志记录的宏，若以此方式运行，则程序会使用默认的日志配置文件
+.SH EXAMPLES
+.EX
+#include <libkylog.h>
+#include <assert.h>
+
+int main(int argc , char** argv)
+{
+	assert(kdk_logger_init("/home/szm/szm_bak/lingmoos-src/base/liblingmosdk-base/src/log/test/logtest.conf") == 0);
+
+	klog_calltrace();
+	klog_debug("Debug\n");
+	klog_info("Info\n");
+	klog_notice("Notice\n");
+	klog_warning("Warning\n");
+	klog_err("Error\n");
+	klog_crit("Crit\n");
+	klog_alert("Alert\n");
+	klog_emerg("Emerg\n");
+
+	return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_logger_flush (),
+.BR kdk_logger_setdir ()
+and
+.BR kdk_logger_set_autowrap ().
+.SH "SEE ALSO"
+.BR kdk_logger_flush (3),
+.BR kdk_logger_setdir (3)
+and
+.BR kdk_logger_set_autowrap (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkylog.h from the source code\&.

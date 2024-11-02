@@ -1,0 +1,74 @@
+.TH "KDK_USB_GET_LIST" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_usb_get_list - 获取外接usb设备信息
+.SH SYNOPSIS
+.nf
+.B #include <libkyusb.h>
+.sp
+.BI "extern pDriverInfoList kdk_usb_get_list();" 
+.sp
+Link with \fI\-lkyusb\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the external usb device information.
+.SH "RETURN VALUE"
+On success, returns a pointer to a 
+.I pDriverInfoList
+structure containing usb information.
+.PP
+The 
+.I pDriverInfoList
+structure is defined in
+.I <libkyusb.h>
+as follows:
+
+            typedef struct driver_list
+            {
+                struct driver_info *data;
+                struct driver_list *next;
+            } DriverInfoList, *pDriverInfoList;
+
+            typedef struct driver_info
+            {
+                char name[32]; //名称
+                char type[2 + 1]; //类型
+                char pid[4 + 1];
+                char vid[4 + 1];
+                char serialNo[32]; //序列号
+                char devNode[32]; //路径
+            } DriverInfo, *pDriverInfo;
+.PP
+On error, return
+.BR NULL.
+.SH EXAMPLES
+.EX
+#include "stdio.h"
+#include "libkyusb.h"
+
+int main()
+{
+    pDriverInfoList list = kdk_usb_get_list();
+    if(list)
+    {
+        pDriverInfoList tmp = list;
+        while (tmp)
+        {
+            printf("Name: %s\t",tmp->data->name);
+            printf("Class: %s\t",tmp->data->type);
+            printf("PID: %s\t",tmp->data->pid);
+            printf("VID: %s\t",tmp->data->vid);
+            printf("Serial: %s\t",tmp->data->serialNo);
+            printf("DevNode: %s\n",tmp->data->devNode);
+            tmp = tmp->next;
+        }
+        
+    }
+    kdk_usb_free(list);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_usb_free ().
+.SH "SEE ALSO"
+.BR kdk_usb_free (3).

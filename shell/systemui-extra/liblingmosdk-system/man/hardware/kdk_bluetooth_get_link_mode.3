@@ -1,0 +1,103 @@
+.TH "KDK_BLUETOOTH_GET_LINK_MODE" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_bluetooth_get_link_mode - 获取蓝牙的链接模式
+.SH SYNOPSIS
+.nf
+.B #include <libkybluetooth.h>
+.sp
+.BI "extern char* kdk_bluetooth_get_link_mode(int "id ");"
+.sp
+Link with \fI\-lkybluetooth\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the link mode of Bluetooth.
+.PP
+The argument
+.I id
+is the device ID of Bluetooth.
+.SH "RETURN VALUE"
+On success, returns the Bluetooth link mode of type char*; The returned string needs to be released by
+.I free
+.PP
+On error, return
+.BR NULL.
+.SH EXAMPLES
+.EX
+#include "libkybluetooth.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int i = 0;
+    char *manufacturer = "\0";
+    char *version = "\0";
+    char *name = "\0";
+    char *address = "\0";
+    char *link_mode  ="\0"; 
+    char *link_policy ="\0";
+    char *scomtu = "\0";
+    char *alcmtu = "\0";
+    char *packettype = "\0";
+    char *features = "\0";
+    char *bus = "\0";
+    int **id = kdk_bluetooth_get_device_id();
+    do
+    { 
+        printf("id = %d\n",id[i]);
+        manufacturer = kdk_bluetooth_get_manufacturer(i);
+        printf("manufacturer: %s\n", manufacturer);
+        free(manufacturer);
+        version = kdk_bluetooth_get_dev_version(i);
+        printf("version: %s\n", version);
+        free(version);
+        name = kdk_bluetooth_get_name(id[i]);
+        printf("name: %s\n", name);
+        address = kdk_bluetooth_get_address(id[i]);
+        printf("address: %s\n", address);
+        link_mode = kdk_bluetooth_get_link_mode(id[i]);
+        printf("link_mode: %s\n", link_mode);
+        link_policy = kdk_bluetooth_get_link_policy(id[i]);
+        printf("link_policy: %s\n", link_policy);
+        scomtu = kdk_bluetooth_get_scomtu(id[i]);
+        printf("scomtu: %s\n", scomtu);
+        alcmtu = kdk_bluetooth_get_alcmtu(id[i]);
+        printf("alcmtu: %s\n", alcmtu);
+        packettype = kdk_bluetooth_get_packettype(id[i]);
+        printf("packettype: %s\n", packettype);
+        features = kdk_bluetooth_get_features(id[i]);
+        printf("features: %s\n", features);
+        bus = kdk_bluetooth_get_bus(id[i]);
+        printf("bus: %s\n", bus);
+        i++;
+    }while(id[i]);
+    return 0;
+} 
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_bluetooth_get_device_id (),
+.BR kdk_bluetooth_get_manufacturer (),
+.BR kdk_bluetooth_get_dev_version (),
+.BR kdk_bluetooth_get_name (),
+.BR kdk_bluetooth_get_address (),
+.BR kdk_bluetooth_get_link_policy (),
+.BR kdk_bluetooth_get_bus (),
+.BR kdk_bluetooth_get_scomtu (),
+.BR kdk_bluetooth_get_alcmtu (),
+.BR kdk_bluetooth_get_packettype ()
+and
+.BR kdk_bluetooth_get_features ().
+.SH "SEE ALSO"
+.BR kdk_bluetooth_get_device_id (3),
+.BR kdk_bluetooth_get_manufacturer (3),
+.BR kdk_bluetooth_get_dev_version (3),
+.BR kdk_bluetooth_get_name (3),
+.BR kdk_bluetooth_get_address (3),
+.BR kdk_bluetooth_get_link_policy (3),
+.BR kdk_bluetooth_get_bus (3),
+.BR kdk_bluetooth_get_scomtu (3),
+.BR kdk_bluetooth_get_alcmtu (3),
+.BR kdk_bluetooth_get_packettype (3)
+and
+.BR kdk_bluetooth_get_features (3).

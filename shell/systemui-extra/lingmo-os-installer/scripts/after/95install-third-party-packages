@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" == "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" == "true" ]]; then
+    return 0
+fi
+
+# TODO, repeat code
+### Install third-party software packages for local
+do_third_party() {
+    dirname=$1
+    rsync -aHA ${dirname}/third-party /target/tmp
+    chroot /target /bin/sh -c 'find /tmp/third-party -name "*.deb" >/tmp/third-party/packages.list'
+    count=$(cat /target/tmp/third-party/packages.list | wc -l)
+    if [ $count -ne 0 ]; then
+        chroot /target /bin/sh -c 'unset DEBIAN_HAS_FRONTEND && UCF_FORCE_CONFFNEW=YES dpkg -i $(cat /tmp/third-party/packages.list | xargs)'
+    fi
+    rm -rf /target/tmp/third-party
+}
+
+install_package() {
+    pkgdir=$1
+    if [[ ! -d /target/tmp/third-party/${pkgdir} ]]; then
+        return
+    fi
+
+    count=$(find /target/tmp/third-party/${pkgdir} -name "*.deb" | wc -l)
+
+    if [ $count -ne 0 ]; then
+        chroot /target /bin/sh -c "unset DEBIAN_HAS_FRONTEND && UCF_FORCE_CONFFNEW=YES dpkg -i /tmp/third-party/${pkgdir}/*.deb"
+    fi
+}
+
+do_990third_party() {
+    dirname=$1
+    rsync -aHA ${dirname}/third-party /target/tmp
+    install_package "common"
+
+    if [[ "${hw_typedata}" =~ "pguv" ]]; then
+        install_package "pguv"
+    elif [[ "${hw_typedata}" =~ "klvu" ]]; then
+        install_package "klvu"
+    elif [[ "${hw_typedata}" =~ "klvv" ]]; then
+        install_package "klvv"
+    fi
+
+    rm -rf /target/tmp/third-party
+}
+
+if [[ -d /home/lingmo/third-party ]]; then
+    do_third_party "/home/lingmo"
+fi
+
+### Install third-party software packages
+if [[ -d /cdrom/third-party ]]; then
+    if [[ "${is_990_9a0}" == true ]]; then
+        do_990third_party "/cdrom"
+    else
+        do_third_party "/cdrom"
+    fi
+fi

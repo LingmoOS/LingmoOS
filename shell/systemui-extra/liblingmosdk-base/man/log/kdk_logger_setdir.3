@@ -1,0 +1,71 @@
+.TH "KDK_LOGGER_SETDIR" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_logger_setdir \- 设置日志的存储目录  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkylog\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "int int kdk_logger_setdir (const char * dpath)"
+
+.PP
+设置日志的存储目录，若不设置，非root程序会被记录在~/\&.log下，root程序会被记录在/var/log下 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdpath\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int 
+.RE
+.PP
+Link with \fI\-lkylog\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是设置日志的存储目录，若不设置，非root程序会被记录在~/.log下，root程序会被记录在/var/log下
+.SH EXAMPLES
+.EX
+#include <libkylog.h>
+#include <assert.h>
+
+int main(int argc , char** argv)
+{
+	assert(kdk_logger_init("/home/szm/szm_bak/lingmoos-src/base/liblingmosdk-base/src/log/test/logtest.conf") == 0);
+
+    assert(kdk_logger_setdir("/tmp") == 0);
+
+	klog_calltrace();
+	klog_debug("Debug\n");
+	klog_info("Info\n");
+	klog_notice("Notice\n");
+	klog_warning("Warning\n");
+	klog_err("Error\n");
+	klog_crit("Crit\n");
+	klog_alert("Alert\n");
+	klog_emerg("Emerg\n");
+
+	return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_logger_init (),
+.BR kdk_logger_flush ()
+and
+.BR kdk_logger_set_autowrap ().
+.SH "SEE ALSO"
+.BR kdk_logger_init (3),
+.BR kdk_logger_flush (3)
+and
+.BR kdk_logger_set_autowrap (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkylog.h from the source code\&.

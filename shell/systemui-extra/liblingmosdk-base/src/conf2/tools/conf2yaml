@@ -1,0 +1,68 @@
+#!/usr/bin/python3
+# 
+#  liblingmosdk-system's Library
+#  
+#  Copyright (C) 2023, KylinSoft Co., Ltd.
+# 
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 3 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this library.  If not, see <https://www.gnu.org/licenses/>.
+# 
+#  Authors: tianshaoshuai <tianshaoshuai@kylinos.cn>
+# 
+# 
+
+import configparser
+import yaml
+import sys, os
+
+def convert_one_file(file):
+    # 读取.ini或.conf配置文件
+    config = configparser.ConfigParser()
+    config.read(file)
+
+    # 将配置文件数据转换为字典
+    data = {'app':{'2.0.0.0-0k0.0':{}}}
+    version = data['app']['2.0.0.0-0k0.0']
+    for section in config.sections():
+        version[section] = {}
+        for option in config.options(section):
+            value = config.get(section, option)
+            value = value.strip()
+            value = value.strip("'")
+            value = value.strip('"')
+            version[section][option] = {}
+            version[section][option]["_default"] = value
+            version[section][option]["_type"] = 's'
+
+    if not os.path.exists('yaml'):
+        os.makedirs('yaml')
+    # 将字典转换为YAML格式并写入文件
+    home = os.getenv('HOME')
+    with open(f'{home}/yaml/{file.rsplit("/",maxsplit=1)[1].rsplit(".", maxsplit = 1)[0]}.yaml', 'w') as yaml_file:
+        yaml.dump(data, yaml_file, allow_unicode = True)
+
+# 参数传入.conf或.ini结尾的ini格式配置文件或目录路径
+# 将传入的所有配置文件或目录下的所有配置文件转换为yaml格式，生成在~/yaml路径下
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    for arg in args:
+        if os.path.isdir(arg):
+            for root, dirs, files in os.walk(arg):
+                for file in files:
+                    if file.endswith('.conf') or file.endswith('.ini'):
+                        convert_one_file(file)
+        else:
+            if arg.endswith('.conf') or arg.endswith('.ini'):
+                convert_one_file(arg)
+            else:
+                print(f'argument{arg} is not a conf file')

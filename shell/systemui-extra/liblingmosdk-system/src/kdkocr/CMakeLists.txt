@@ -1,0 +1,246 @@
+cmake_minimum_required(VERSION 3.16)
+project(kyocr)
+
+set(CMAKE_CXX_STANDARD 11)
+
+#find_package(Tesseract 4)
+#if (NOT Tesseract_FOUND)
+#    find_package(PkgConfig REQUIRED)
+#    pkg_check_modules(Tesseract REQUIRED IMPORTED_TARGET tesseract lept)
+#    add_library(Tesseract::libtesseract ALIAS PkgConfig::Tesseract)
+#endif ()
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+
+#add_executable(test test.cpp)
+
+# project(ppocr CXX C)
+# cmake_minimum_required(VERSION 3.14)
+
+message(${CMAKE_HOST_SYSTEM_PROCESSOR})
+
+option(WITH_MKL        "Compile demo with MKL/OpenBlas support, default use MKL."       OFF)
+option(WITH_GPU        "Compile demo with GPU/CPU, default use CPU."                    OFF)
+option(WITH_STATIC_LIB "Compile demo with static/shared library, default use static."   OFF)
+option(WITH_TENSORRT "Compile demo with TensorRT."   OFF)
+
+SET(PADDLE_LIB "" CACHE PATH "Location of libraries")
+SET(OPENCV_DIR "" CACHE PATH "Location of libraries")
+SET(CUDA_LIB "" CACHE PATH "Location of libraries")
+SET(CUDNN_LIB "" CACHE PATH "Location of libraries")
+SET(TENSORRT_DIR "" CACHE PATH "Compile demo with TensorRT")
+
+set(DEMO_NAME "ppocr")
+
+
+macro(safe_set_static_flag)
+    foreach(flag_var
+            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if(${flag_var} MATCHES "/MD")
+            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+        endif(${flag_var} MATCHES "/MD")
+    endforeach(flag_var)
+endmacro()
+
+if (WITH_MKL)
+    ADD_DEFINITIONS(-DUSE_MKL)
+endif()
+
+if(NOT DEFINED PADDLE_LIB)
+    message(FATAL_ERROR "please set PADDLE_LIB with -DPADDLE_LIB=/path/paddle/lib")
+endif()
+
+if(NOT DEFINED OPENCV_DIR)
+    message(FATAL_ERROR "please set OPENCV_DIR with -DOPENCV_DIR=/path/opencv")
+endif()
+
+
+pkg_check_modules(TESSERACT_PKG tesseract)
+link_directories(${TESSERACT_PKG_LIBRARY_DIRS})
+include_directories(${TESSERACT_PKG_INCLUDE_DIRS}) 
+message("kyocr_cflags is ${TESSERACT_PKG_LIBRARIES}")
+list(APPEND kyocr_libraries ${TESSERACT_PKG_LIBRARIES})
+list(APPEND kyocr_libraries -llept)
+message("kyocr_cflags is ${kyocr_libraries}")
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/amd64/paddle_inference/paddle/lib/libpaddle_inference.so")
+    add_definitions(-DLOONGARCH64)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "loongarch64") 
+    add_definitions(-DLOONGARCH64)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "riscv64") 
+    add_definitions(-DLOONGARCH64)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "sw_64") 
+    add_definitions(-DLOONGARCH64)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "armv8l") 
+    add_definitions(-DLOONGARCH64)
+else()
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i386")
+	message(STATUS "i386 architecture detected")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+	message(STATUS "x86_64 architecture detected")
+    set(PADDLE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/amd64/paddle_inference")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64")
+	message(STATUS "x64 architecture detected")
+    set(PADDLE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/amd64/paddle_inference")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
+    message(STATUS "x64 architecture detected")
+    set(PADDLE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/arm64/paddle_inference")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
+    message(STATUS "mips64 architecture detected")
+    set(PADDLE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/mips64el/paddle_inference")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "loongarch64") 
+    add_definitions(-DLOONGARCH64)
+    set(PADDLE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/libs/mips64el/paddle_inference")
+    message(STATUS "loongarch64 architecture detected")
+else()
+	message(STATUS "host processor architecture is unknown")
+endif()
+
+include_directories("${PADDLE_LIB}/third_party/install/protobuf/include")
+include_directories("${PADDLE_LIB}/third_party/install/glog/include")
+include_directories("${PADDLE_LIB}/third_party/install/gflags/include")
+include_directories("${PADDLE_LIB}/third_party/install/xxhash/include")
+include_directories("${PADDLE_LIB}/third_party/install/zlib/include")
+include_directories("${PADDLE_LIB}/third_party/boost")
+include_directories("${PADDLE_LIB}/third_party/eigen3")
+
+include_directories("${CMAKE_SOURCE_DIR}/src/kdkocr")
+if (NOT WIN32)
+    if (WITH_TENSORRT AND WITH_GPU)
+        include_directories("${TENSORRT_DIR}/include")
+        link_directories("${TENSORRT_DIR}/lib")
+    endif()
+endif(NOT WIN32)
+
+link_directories("${PADDLE_LIB}/third_party/install/zlib/lib")
+
+link_directories("${PADDLE_LIB}/third_party/install/protobuf/lib")
+link_directories("${PADDLE_LIB}/third_party/install/glog/lib")
+link_directories("${PADDLE_LIB}/third_party/install/gflags/lib")
+link_directories("${PADDLE_LIB}/third_party/install/xxhash/lib")
+link_directories("${PADDLE_LIB}/paddle/lib")
+
+
+set(MATH_LIB ${PADDLE_LIB}/third_party/install/openblas/lib/libopenblas${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(DEPS
+        ${PADDLE_LIB}/paddle/lib/libpaddle_inference${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+
+if (NOT WIN32)
+    set(DEPS ${DEPS}
+            ${MATH_LIB} ${MKLDNN_LIB}
+            glog gflags protobuf z xxhash
+            )
+    if(EXISTS "${PADDLE_LIB}/third_party/install/snappystream/lib")
+        set(DEPS ${DEPS} snappystream)
+    endif()
+    if (EXISTS "${PADDLE_LIB}/third_party/install/snappy/lib")
+        set(DEPS ${DEPS} snappy)
+    endif()
+else()
+    set(DEPS ${DEPS}
+            ${MATH_LIB} ${MKLDNN_LIB}
+            glog gflags_static libprotobuf xxhash)
+    set(DEPS ${DEPS} libcmt shlwapi)
+    if (EXISTS "${PADDLE_LIB}/third_party/install/snappy/lib")
+        set(DEPS ${DEPS} snappy)
+    endif()
+    if(EXISTS "${PADDLE_LIB}/third_party/install/snappystream/lib")
+        set(DEPS ${DEPS} snappystream)
+    endif()
+endif(NOT WIN32)
+
+
+
+if (NOT WIN32)
+    set(EXTERNAL_LIB "-ldl -lrt -lgomp -lz -lm -lpthread")
+    set(DEPS ${DEPS} ${EXTERNAL_LIB})
+endif()
+
+set(DEPS ${DEPS} ${OpenCV_LIBS})
+
+include(FetchContent)
+#include(external-cmake/auto-log.cmake)
+include_directories(${FETCHCONTENT_BASE_DIR}/extern_autolog-src)
+
+#AUX_SOURCE_DIRECTORY(./src SRCS)
+#add_executable(${DEMO_NAME} ${SRCS})
+#target_link_libraries(${DEMO_NAME} ${DEPS})
+
+endif()
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/amd64/paddle_inference/paddle/lib/libpaddle_inference.so")
+    message("no paddle lib")
+    add_library(kyocr SHARED libkyocr.cpp)
+    target_link_libraries(kyocr ${kyocr_libraries})
+    target_compile_options(kyocr PUBLIC ${kyocr_cflags})
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "loongarch64") 
+    message(loongarch64)
+    add_library(kyocr SHARED libkyocr.cpp)
+    target_link_libraries(kyocr ${kyocr_libraries})
+    target_compile_options(kyocr PUBLIC ${kyocr_cflags})
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "sw_64") 
+    message(loongarch64)
+    add_library(kyocr SHARED libkyocr.cpp)
+    target_link_libraries(kyocr ${kyocr_libraries})
+    target_compile_options(kyocr PUBLIC ${kyocr_cflags})
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "riscv64") 
+    message(loongarch64)
+    add_library(kyocr SHARED libkyocr.cpp)
+    target_link_libraries(kyocr ${kyocr_libraries})
+    target_compile_options(kyocr PUBLIC ${kyocr_cflags})
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "armv8l") 
+    message(loongarch64)
+    add_library(kyocr SHARED libkyocr.cpp)
+    target_link_libraries(kyocr ${kyocr_libraries})
+    target_compile_options(kyocr PUBLIC ${kyocr_cflags})
+else()
+    add_library(kyocr SHARED libkyocr.cpp ocr_main.cpp utility.cpp preprocess_op.cpp postprocess_op.cpp)
+    target_link_libraries(kyocr ${OpenCV_LIBS} ${DEPS})
+endif()
+set_target_properties(kyocr PROPERTIES VERSION 2.5.1 SOVERSION 1)
+#target_link_libraries(kdkOCR  -lleptonica)
+
+
+# 包含 GNU 安装目录设置  
+include(GNUInstallDirs)
+
+# 设置 CMAKE_INSTALL_LIBDIR 变量  
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "armv8l")
+        set(CMAKE_INSTALL_LIBDIR "/usr/lib/arm-linux-gnueabihf")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
+        set(CMAKE_INSTALL_LIBDIR "/usr/lib/mips64el-linux-gnuabi64")
+    elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i686")
+        set(CMAKE_INSTALL_LIBDIR "/usr/lib/i386-linux-gnu")
+else()
+        set(CMAKE_INSTALL_LIBDIR "/usr/lib/${CMAKE_HOST_SYSTEM_PROCESSOR}-linux-gnu")
+endif()
+# 安装库文件  
+install(TARGETS kyocr
+        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# install(TARGETS kyocr LIBRARY DESTINATION lib/lingmosdk/lingmosdk-system)
+install(FILES ${PROJECT_SOURCE_DIR}/libkyocr.hpp DESTINATION include/lingmosdk/lingmosdk-system)
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/amd64/paddle_inference/paddle/lib/libpaddle_inference.so")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/libpaddle_inference DESTINATION lib/libpaddle_inference.so)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/amd64/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/amd64/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/arm64/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/mips64el/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "loongarch64") 
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/libpaddle_inference DESTINATION lib/libpaddle_inference.so)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "riscv64")
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/libpaddle_inference DESTINATION lib/libpaddle_inference.so)
+#     install(FILES ${PROJECT_SOURCE_DIR}/libs/loongarch64/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "sw_64") 
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/libpaddle_inference DESTINATION lib/libpaddle_inference.so)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "armv8l") 
+    install(FILES ${PROJECT_SOURCE_DIR}/libs/libpaddle_inference DESTINATION lib/libpaddle_inference.so)
+#     install(FILES ${PROJECT_SOURCE_DIR}/libs/sw64/paddle_inference/paddle/lib/libpaddle_inference.so DESTINATION lib/)
+endif()
+#target_link_libraries(test libkdkOCR.so)

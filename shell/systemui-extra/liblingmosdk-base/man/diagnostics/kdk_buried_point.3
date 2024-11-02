@@ -1,0 +1,82 @@
+.TH "KDK_BURIED_POINT" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_buried_point \- 上传埋点数据  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkydiagnostics\&.h>\fP
+.br
+
+.SS "Functions"
+.PP 
+.SS "int kdk_buried_point (char * appName, char * messageType, \fBKBuriedPoint\fP * data, int length)"
+
+.PP
+上传埋点数据 
+.PP
+\fBParameters\fP
+.RS 4
+\fIappName\fP : 包名 
+.br
+\fImessageType\fP : 消息类型 
+.br
+\fIdata\fP : 埋点数据数组
+.br
+typedef struct {
+.br
+    const char *key;
+    const char *value;
+.br
+} KBuriedPoint;
+.br
+\fIlength\fP : 数组长度
+.RE
+.PP
+\fBReturn values\fP
+.RS 4
+\fI0\fP : 成功 
+.br
+\fI-1\fP : 失败 
+.RE
+.PP
+Link with \fI\-lkydiagnostics\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是上传埋点数据 
+.SH EXAMPLES
+.EX
+#include <stdio.h>
+
+#include "libkydiagnostics.h"
+
+int main(void)
+{
+    char appName[] = "lingmo-font-viewer";
+    char messageType[] = "FunctionType";
+
+    KBuriedPoint pt[2];
+    pt[0].key = "testkey";
+    pt[0].value = "testvalue";
+    pt[1].key = "testkey1";
+    pt[1].value = "testvalue1";
+
+    if (kdk_buried_point(appName , messageType , pt , 2)) {
+        printf("buried point fail !\n");
+        return -1;
+    }
+
+    printf("buried point success !\n");
+
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+.SH "SEE ALSO"
+.BR libkydiagnostics (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkydiagnostics.h from the source code\&.

@@ -1,0 +1,193 @@
+Source: liblingmosdk-base
+Section: utils
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Build-Depends: debhelper-compat (= 12),
+				libc6-dev,
+				cmake,
+				libsystemd-dev,
+				libdbus-1-dev,
+				libssl-dev,
+				libgtk-3-dev,
+				libglib2.0-dev,
+				libsqlite3-dev
+Standards-Version: 4.4.1
+Homepage: http://github.com/LingmoOS/lingmosdk-base
+
+Package: liblingmosdk-base
+Architecture: any
+Section: utils
+Depends: liblingmosdk-timer (= ${binary:Version}),
+		 liblingmosdk-log (= ${binary:Version}),
+		 liblingmosdk-config (= ${binary:Version}),
+		 liblingmosdk-utils (= ${binary:Version}),
+		 liblingmosdk-diagnostics (= ${binary:Version}),
+		 liblingmosdk-basecommon (= ${binary:Version}),
+		 liblingmosdk-gsetting (= ${binary:Version})
+Multi-Arch: same
+Description: 灵墨开发者套件 - 基础层套件，提供日志管理、消息通信、进程守护、线程管理、定时器、调试与埋点、配置文件、utils
+
+Package: liblingmosdk-base-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-base (= ${binary:Version}),
+		 liblingmosdk-timer-dev (= ${binary:Version}),
+		 liblingmosdk-log-dev (= ${binary:Version}),
+		 liblingmosdk-config-dev (= ${binary:Version}),
+		 liblingmosdk-utils-dev (= ${binary:Version}),
+		 liblingmosdk-diagnostics-dev (= ${binary:Version}),
+		 liblingmosdk-gsetting-dev (= ${binary:Version})
+Multi-Arch: foreign
+Description: 灵墨开发者套件 - 基础层套件 - 开发库，提供日志管理、消息通信、进程守护、线程管理、定时器、调试与埋点、配置文件、utils
+
+Package: liblingmosdk-timer
+Architecture: any
+Section: utils
+Depends: liblingmosdk-basecommon (>=1.2.0),
+		 liblingmosdk-utils(>=1.2.0),
+		 libc6
+Multi-Arch: same
+Description: 定制器模块库
+
+Package: liblingmosdk-timer-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-utils-dev(>=1.2.0),
+		 liblingmosdk-timer (= ${binary:Version}),
+		 liblingmosdk-basecommon(>=1.2.0),
+		 libc6
+Multi-Arch: foreign
+Description: 定时器模块 - 开发库
+
+Package: liblingmosdk-log
+Architecture: any
+Section: utils
+Depends: liblingmosdk-config(>=1.2.0),
+		 logrotate,
+		 liblingmosdk-basecommon(>=1.2.0),
+		 liblingmosdk-utils(>=1.2.0),
+		 dbus,
+		 libc6,
+		 libdbus-1-3,
+		 libsystemd0
+Multi-Arch: same
+Description: 日志库
+
+Package: liblingmosdk-basecommon
+Architecture: any
+Section: utils
+Depends: 
+Multi-Arch: same
+Description: lingmosdk-base层公用数据包
+
+Package: liblingmosdk-log-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-log (= ${binary:Version}),
+		 liblingmosdk-config-dev(>=1.2.0),
+		 liblingmosdk-utils-dev(>=1.2.0),
+		 libsystemd-dev
+Multi-Arch: foreign
+Description: 日志库 - 开发库
+
+Package: liblingmosdk-config
+Architecture: any
+Section: utils
+Depends: liblingmosdk-basecommon(>=1.2.0),
+		 liblingmosdk-utils(>=1.2.0),
+		 libc6
+Multi-Arch: same
+Description: 配置文件库
+
+Package: liblingmosdk-config-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-utils-dev(>=1.2.0),
+		 liblingmosdk-config (= ${binary:Version})
+Multi-Arch: foreign
+Description: 配置文件库 - 开发库
+
+Package: liblingmosdk-utils
+Architecture: any
+Section: utils
+Depends: liblingmosdk-basecommon(>=1.2.0),
+		 libc6
+Multi-Arch: same
+Description: 开发者utils
+
+Package: liblingmosdk-utils-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-utils (= ${binary:Version})
+Multi-Arch: foreign
+Description:  开发者utils - 开发库
+
+Package: liblingmosdk-diagnostics
+Architecture: any
+Section: utils
+Depends: liblingmosdk-basecommon(>=1.2.0),
+		 liblingmosdk-utils(>=1.2.0),
+		 ${misc:Depends},
+		 ${shlibs:Depends}
+Multi-Arch: same
+Description: 开发者diagnostics
+
+Package: liblingmosdk-diagnostics-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-diagnostics (= ${binary:Version})
+Multi-Arch: foreign
+Description: 开发者diagnostics - 开发库
+
+Package: liblingmosdk-gsetting
+Architecture: any
+Section: utils
+Depends: libgtk-3-0,
+		 libglib2.0-0,
+		 liblingmosdk-basecommon(>=1.2.0),
+		 libatk1.0-0,
+		 libc6,
+		 libcairo-gobject2,
+		 libcairo2,
+		 libgdk-pixbuf2.0-0,
+		 libharfbuzz0b,
+		 libpango-1.0-0,
+		 libpangocairo-1.0-0
+Multi-Arch: same
+Description: 开发者gsetting
+
+Package: liblingmosdk-gsetting-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-gsetting (= ${binary:Version})
+Multi-Arch: foreign
+Description: 开发者gsetting - 开发库
+
+Package: liblingmosdk-conf2
+Architecture: any
+Section: utils
+Depends: liblingmosdk-basecommon(>=2.2.0),
+		 python3(>=3.8),
+		 python3-dbus,
+		 python3-watchdog,
+		 ${misc:Depends},
+		 ${shlibs:Depends}
+Multi-Arch: same
+Description: 统一配置模块
+
+Package: liblingmosdk-conf2-dev
+Architecture: all
+Section: utils
+Depends: liblingmosdk-conf2 (= ${binary:Version})
+Multi-Arch: foreign
+Description: 统一配置模块 - 开发库
+
+Package: liblingmosdk-conf2-tools
+Architecture: any
+Section: utils
+Depends: liblingmosdk-conf2 (= ${binary:Version}),
+		 python3-tk,
+		 ${misc:Depends},
+		 ${shlibs:Depends}
+Multi-Arch: same
+Description: 统一配置模块 - 工具包

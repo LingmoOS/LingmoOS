@@ -1,0 +1,55 @@
+.TH "KDK_SET_INHIBIT_LOCKSCREEN" 3 "Mon Sep 18 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_set_inhibit_lockscreen - 设置禁止锁屏
+.SH SYNOPSIS
+.nf
+.B #include <libkylockscreen.h>
+.sp
+.BI "extern uint32_t kdk_set_inhibit_lockscreen(const char *"appName ", const char *"reason ");" 
+.sp
+Link with \fI\-lkypowermanagement\fP.
+.SH "Detailed Description"
+The main function of the interface is to set the lock screen to suppress.
+.PP
+The argument
+.I appName
+is the application name.
+.PP
+The argument
+.I reason
+is the reason for disabling the lock screen.
+.SH "RETURN VALUE"
+On success, return
+.BR 0.
+.PP
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include <libkylockscreen.h>
+#include <stdio.h>
+
+int main(void)
+{
+    char appName[] = "test-package";
+    char reason[] = "test-reason";
+
+    uint32_t flag;
+    if ((flag = kdk_set_inhibit_lockscreen(appName , reason)) == 0) {
+        printf("set inhibit lock screen fail !\n");
+        return -1;
+    }
+
+    if (kdk_un_inhibit_lockscreen(flag)) {
+        printf("un inhibit lock screen fail !\n");
+        return -1;
+    }
+
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_un_inhibit_lockscreen ().
+.SH "SEE ALSO"
+.BR kdk_un_inhibit_lockscreen (3).

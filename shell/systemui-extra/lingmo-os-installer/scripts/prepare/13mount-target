@@ -1,0 +1,176 @@
+#!/bin/bash
+
+set -e
+
+automatic=$(get_value automatic-installation)
+if [[ "$automatic" == "0" ]]; then
+  return 0
+fi
+
+disk=$(get_value devpath)
+data_device=$(get_value data-device)
+
+
+partprobe "${disk}" && sync
+if echo "${disk}" | grep -q nvme; then
+  disk=${disk}p
+fi
+
+
+sleep 1
+
+has_backup=0
+
+do_mkfs_efi(){
+  #if egrep -qi 'kirin.?990' /proc/cpuinfo; then
+  if [[ "${is_990_9a0}" == "true" ]]; then
+    sudo mkfs.vfat -s1 -n ESP "${disk}1"
+  else
+    sudo mkfs.vfat -n ESP "${disk}1"
+  fi
+}
+
+do_prepare_sw() {
+  umount -l /media/*/* || true
+  dmsetup remove_all -f
+  #gsettings set org.lingmo.flash-disk.autoload ifautoload false
+}
+
+do_mkfs_boot() {
+  boot_part=$1
+  if [[ "$(archdetect)" == "sw64/generic" ]]; then
+    do_prepare_sw
+    mkfs.ext3 -Fq -L SYSBOOT "${boot_part}"
+  else
+    mkfs.ext4 -Fq -L SYSBOOT "${boot_part}"
+  fi
+}
+
+if [[ "${is_efi}" == "true" ]]; then
+  do_mkfs_efi
+
+  do_mkfs_boot "${disk}2"
+
+  part_root="${disk}3"
+  part_backup="${disk}4"
+  if [[ -n ${data_device} ]]; then
+	if echo "${data_device}" | grep -q nvme; then
+ 	       data_device=${data_device}p
+	fi
+        part_data="${data_device}1"
+        part_swap="${disk}5"
+  else 
+  	part_data="${disk}5"
+  	part_swap="${disk}6"
+  fi 
+  if [[ "${isluks_lvm}" == "true" ]]; then
+    part_root="/dev/mapper/lingmo--vg-root"
+    part_backup="/dev/mapper/lingmo--vg-backup"
+    part_data="/dev/mapper/lingmo--vg-data"
+    part_swap="/dev/mapper/lingmo--vg-swap"
+  fi
+
+  if [ $real_size -lt ${DISK_MINSIZE} ]; then
+  	
+	mkfs.ext4 -Fq -L SYSROOT "${part_root}"
+  	
+	mkdir -p /target
+  	mount "${part_root}" /target
+  	mkdir -p /target/boot
+  	mount "${disk}2" /target/boot
+  	mkdir -p /target/boot/efi
+  	mount "${disk}1" /target/boot/efi
+       
+       	return 0
+  fi
+
+  mkfs.ext4 -Fq -L SYSROOT "${part_root}"
+  mkfs.ext4 -Fq -L LINGMO-BACKUP "${part_backup}"
+  mkfs.ext4 -Fq -L DATA "${part_data}"
+
+  if [[ "${is_swapfile}" == "false" ]]; then
+    mkswap -L SWAP "${part_swap}"
+    swapon "${part_swap}"
+  fi
+
+  mkdir -p /target
+  mount "${part_root}" /target
+  mkdir -p /target/boot
+  mount "${disk}2" /target/boot
+  mkdir -p /target/boot/efi
+  mount "${disk}1" /target/boot/efi
+  mkdir -p /target/data
+  mount "${part_data}" /target/data
+  chmod 1777 /target/data
+  mkdir -p /target/backup
+  mount "${part_backup}" /target/backup
+  set_backup "${part_backup}"
+
+  echo "part-data=${part_data}" >>/tmp/ky-installer.cfg
+  echo "part-root=${part_root}" >>/tmp/ky-installer.cfg
+  echo "part-efi=${disk}1" >>/tmp/ky-installer.cfg
+  echo "part-boot=${disk}2" >>/tmp/ky-installer.cfg
+
+
+  do_bind_data
+
+else
+  do_mkfs_boot "${disk}1"
+
+  part_root="${disk}5"
+  part_backup="${disk}6"
+  if [[ -n ${data_device} ]]; then
+        if echo "${data_device}" | grep -q nvme; then
+               data_device=${data_device}p
+        fi
+        part_data="${data_device}1"
+        part_swap="${disk}7"
+  else
+        part_data="${disk}7"
+  	part_swap="${disk}8"
+  fi
+
+  if [[ "${isluks_lvm}" == "true" ]]; then
+    part_root="/dev/mapper/lingmo--vg-root"
+    part_backup="/dev/mapper/lingmo--vg-backup"
+    part_data="/dev/mapper/lingmo--vg-data"
+    part_swap="/dev/mapper/lingmo--vg-swap"
+  fi
+  
+  if [ $real_size -lt ${DISK_MINSIZE} ]; then
+
+  	mkfs.ext4 -Fq -L SYSROOT "${part_root}"
+  	mkdir -p /target
+  	mount "${part_root}" /target
+  	mkdir -p /target/boot
+  	mount "${disk}1" /target/boot
+
+        return 0
+  fi
+
+  mkfs.ext4 -Fq -L SYSROOT "${part_root}"
+  mkfs.ext4 -Fq -L LINGMO-BACKUP "${part_backup}"
+  mkfs.ext4 -Fq -L DATA "${part_data}"
+
+  if [[ "${is_swapfile}" == "false" ]]; then
+    mkswap -L SWAP "${part_swap}"
+    swapon "${part_swap}"
+  fi
+
+  mkdir -p /target
+  mount "${part_root}" /target
+  mkdir -p /target/boot
+  mount "${disk}1" /target/boot
+  mkdir -p /target/data
+  mount "${part_data}" /target/data
+  chmod 1777 /target/data
+  mkdir -p /target/backup
+  mount "${part_backup}" /target/backup
+  set_backup "${part_backup}"
+  
+  echo "part-data=${part_data}" >>/tmp/ky-installer.cfg
+  echo "part-root=${part_root}" >>/tmp/ky-installer.cfg
+  echo "part-boot=${disk}1" >>/tmp/ky-installer.cfg
+
+  do_bind_data
+fi

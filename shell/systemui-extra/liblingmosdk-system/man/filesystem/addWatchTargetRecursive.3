@@ -1,0 +1,128 @@
+.TH "addWatchTargetRecursive" 3 "Wed Sep 20 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+addWatchTargetRecursive - 增加需要监听的文件路径，对于目录，默认启用递归监听子目录
+.SH SYNOPSIS
+.nf
+.B #include <libkyfilewatcher.hpp>
+.sp
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBLINGMOSDK_FILEWATCHER::FileWatcher\fP"
+.in -1c
+.sp
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "QStringList addWatchTargetRecursive(QString url, FileWatcherType type = PERIODIC, int attr = OPEN|CLOSE|MODIFY|DELETE, int maxdepth = 5, int recurType = DIR|REGULAR);" 
+.in -1c
+.sp
+Link with \fI\-lkyfilewatcher\fP.
+.SH "Detailed Description"
+The main function of the interface is to add file paths that need to be listened to, and for directories, recursive listening subdirectories are enabled by default.
+.PP
+The argument
+.I url
+is the file path.
+.PP
+The argument
+.I type
+is the file watcher type，which is an enumeration type. The content is as follows:
+.PP
+    enum FileWatcherType{
+        ONESHOT = 0,    // 仅报送一次事件。请注意事件发生后，监听符号会从监听列表中移除，下次再用需要重新add
+        PERIODIC,
+        NEVER
+    };
+.PP
+The argument
+.I attr
+is the file watcher attribute，which is an enumeration type. The content is as follows:
+.PP
+    enum FileWatcherAttribute{
+        ACCESS = IN_ACCESS,
+        CREATE = IN_CREATE,
+        MODIFY = IN_MODIFY,
+        DELETE = IN_DELETE | IN_DELETE_SELF,
+        ATTRIB = IN_ATTRIB,
+        MOVE   = IN_MOVE | IN_MOVE_SELF,
+        OPEN   = IN_OPEN,
+        CLOSE  = IN_CLOSE,
+        ALL = IN_ALL_EVENTS
+    };
+.PP
+The argument
+.I maxdepth
+is the maximum depth specified for traversal search.
+.PP
+The argument
+.I recurType
+is the recursive type，which is an enumeration type. The content is as follows:
+.PP
+    enum RecursiveType{
+        DIR = 1 << 0,
+        REGULAR = 1 << 1,
+        HIDDEN = 1 << 2,
+        TMPFILE = 1 << 3,    //认为那些以~开头的是临时文件
+        ALLFILE = HIDDEN | TMPFILE | DIR | REGULAR
+    };
+.SH "RETURN VALUE"
+
+.SH EXAMPLES
+.EX
+#include <QCoreApplication>
+#include <QDebug>
+#include "libkyfilewatcher.hpp"
+
+using namespace LINGMOSDK_FILEWATCHER;
+
+int main(int argc, char *argv[])
+{
+    LINGMOSDK_FILEWATCHER::FileWatcher watcher;
+    watcher.addWatchTargetRecursive("/home/lingmo/", PERIODIC, ALL, 3, REGULAR);
+
+    getchar();
+
+//    qDebug() << "update attr test";
+//    watcher.updateWatchTargetAttribute("/data/testcode/test.c", DELETE);
+
+//    getchar();
+
+//    qDebug() << "re-add test";
+//    watcher.addWatchTarget("/data/testcode/test.c", PERIODIC, ALL);
+
+//    getchar();
+
+//    qDebug() << "update oneshot test";
+//    watcher.updateWatchTargetType("/data/testcode/test.c", ONESHOT);
+
+//    getchar();
+
+//    qDebug() << "remove target test";
+//    watcher.removeWatchTarget("/data/testcode/test.c");
+
+//    getchar();
+
+    watcher.clearWatchList();
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR addWatchTargetListRecursive (),
+.BR removeWatchTargetRecursive (),
+.BR clearWatchList (),
+.BR pauseWatcher ()
+and
+.BR restartWatcher ().
+.SH "SEE ALSO"
+.BR addWatchTargetListRecursive (3),
+.BR removeWatchTargetRecursive (3),
+.BR clearWatchList (3),
+.BR pauseWatcher (3)
+and
+.BR restartWatcher (3).

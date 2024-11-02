@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+# 删除链接，重新拷贝授权文件
+if [[ -L /etc/.kyinfo ]]; then
+    rm -f /etc/.kyinfo
+    if [[ -f /cdrom/.kyinfo ]]; then
+        rsync -a /cdrom/.kyinfo /etc
+    fi
+fi
+
+if [[ -L /etc/LICENSE ]]; then
+    rm -f /etc/LICENSE
+    if [[ -f /cdrom/LICENSE ]]; then
+        rsync -a /cdrom/LICENSE /etc
+    fi
+fi

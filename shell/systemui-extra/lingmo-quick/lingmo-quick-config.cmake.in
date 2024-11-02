@@ -1,0 +1,48 @@
+
+if (NOT lingmo-quick_FIND_COMPONENTS)
+    set(lingmo-quick_NOT_FOUND_MESSAGE "The lingmo-quick package requires at least one component")
+    set(lingmo-quick_FOUND False)
+    return()
+endif()
+
+set(_lingmo-quick_FIND_PARTS_REQUIRED)
+if (lingmo-quick_FIND_REQUIRED)
+    set(_lingmo-quick_FIND_PARTS_REQUIRED REQUIRED)
+endif()
+set(_lingmo-quick_FIND_PARTS_QUIET)
+if (lingmo-quick_FIND_QUIETLY)
+    set(_lingmo-quick_FIND_PARTS_QUIET QUIET)
+endif()
+
+get_filename_component(_lingmo-quick_install_prefix "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+
+set(_lingmo-quick_root_dir ${_lingmo-quick_install_prefix})
+set(_lingmo-quick_module_paths ${_lingmo-quick_install_prefix})
+
+set(_at @)
+set(_lingmo-quick_module_location_template ${_lingmo-quick_install_prefix}/lingmo-quick-${_at}module${_at}/lingmo-quick-${_at}module${_at}-config.cmake)
+unset(_at)
+set(_lingmo-quick_NOTFOUND_MESSAGE)
+
+foreach(module ${lingmo-quick_FIND_COMPONENTS})
+    find_package(lingmo-quick-${module}
+        ${_lingmo-quick_FIND_PARTS_QUIET}
+        ${_lingmo-quick_FIND_PARTS_REQUIRED}
+        PATHS ${_lingmo-quick_module_paths} NO_DEFAULT_PATH
+    )
+    if (NOT lingmo-quick-${module}_FOUND)
+        string(CONFIGURE ${_lingmo-quick_module_location_template} _expected_module_location @ONLY)
+
+        if (lingmo-quick_FIND_REQUIRED_${module})
+            set(_lingmo-quick_NOTFOUND_MESSAGE "${_lingmo-quick_NOTFOUND_MESSAGE}Failed to find lingmo-quick component \"${module}\" config file at \"${_expected_module_location}\"\n")
+        elseif(NOT lingmo-quick_FIND_QUIETLY)
+            message(WARNING "Failed to find lingmo-quick component \"${module}\" config file at \"${_expected_module_location}\"")
+        endif()
+
+        unset(_expected_module_location)
+    endif()
+endforeach()
+if (_lingmo-quick_NOTFOUND_MESSAGE)
+    set(lingmo-quick_NOT_FOUND_MESSAGE "${_lingmo-quick_NOTFOUND_MESSAGE}")
+    set(lingmo-quick_FOUND False)
+endif()

@@ -1,0 +1,115 @@
+.TH "LIBKYLOG" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libkylog \- LINGMOSDK日志模块  
+
+.SH SYNOPSIS
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBKLOG_TRACE\fP   8"
+.br
+.ti -1c
+.RI "#define \fBKLOG_DEBUG\fP   7"
+.br
+.ti -1c
+.RI "#define \fBKLOG_INFO\fP   6"
+.br
+.ti -1c
+.RI "#define \fBKLOG_NOTICE\fP   5"
+.br
+.ti -1c
+.RI "#define \fBKLOG_WARNING\fP   4"
+.br
+.ti -1c
+.RI "#define \fBKLOG_ERROR\fP   3"
+.br
+.ti -1c
+.RI "#define \fBKLOG_CRIT\fP   2"
+.br
+.ti -1c
+.RI "#define \fBKLOG_ALERT\fP   1"
+.br
+.ti -1c
+.RI "#define \fBKLOG_EMERG\fP   0"
+.br
+.ti -1c
+.RI "#define \fBklog_trace\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_TRACE , fmt , ##__VA_ARGS__))"
+.br
+.RI "在调用的位置自动输出一串日志，表明主调方函数被调用 "
+.ti -1c
+.RI "#define \fBklog_debug\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_DEBUG , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出debug级别日志，不会自动添加换行符 "
+.ti -1c
+.RI "#define \fBklog_info\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_INFO , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出info级别日志，不会自动添加换行符 "
+.ti -1c
+.RI "#define \fBklog_notice\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_NOTICE , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出notice级别日志，不会自动添加换行符 "
+.ti -1c
+.RI "#define \fBklog_warning\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_WARNING , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出warning级别日志，不会自动添加换行符 "
+.ti -1c
+.RI "#define \fBklog_err\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_ERROR , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出error级别日志，不会自动添加换行符。 "
+.ti -1c
+.RI "#define \fBklog_crit\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_CRIT , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出crit级别日志，不会自动添加换行符。该等级日志说明程序发生了重大问题，需要立即修复。 "
+.ti -1c
+.RI "#define \fBklog_alert\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_ALERT , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出alert级别日志，不会自动添加换行符。该等级日志说明系统发生了极为严重的错误，需要立即修复。 "
+.ti -1c
+.RI "#define \fBklog_emerg\fP(fmt, \&.\&.\&.)   (\fBklog\fP(KLOG_EMERG , fmt , ##__VA_ARGS__))"
+.br
+.RI "输出emerg级别日志，不会自动添加换行符。该等级日志说明系统发生了无法挽回的故障，必须立即停止。 "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBkdk_logger_init\fP (const char *ini)"
+.br
+.RI "初始化日志记录，也可以不调用该函数直接使用上方日志记录的宏，若以此方式运行，则程序会使用默认的日志配置文件 "
+.ti -1c
+.RI "void \fBkdk_logger_flush\fP () DESTRUCTOR"
+.br
+.RI "在异步写入的方式下，可以调用该函数手动将缓存区中的日志写入文件中 "
+.ti -1c
+.RI "int int \fBkdk_logger_setdir\fP (const char *dpath)"
+.br
+.RI "设置日志的存储目录，若不设置，非root程序会被记录在~/\&.log下，root程序会被记录在/var/log下 "
+.ti -1c
+.RI "void \fBkdk_logger_set_autowrap\fP (int autowarp)"
+.br
+.RI "设置日志输出自动换行 "
+.in -1c
+.SH "Detailed Description"
+.PP 
+LINGMOSDK日志模块 
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_logger_init (),
+.BR kdk_logger_flush (),
+.BR kdk_logger_setdir ()
+and
+.BR kdk_logger_set_autowrap ().
+.SH "SEE ALSO"
+.BR kdk_logger_init (3),
+.BR kdk_logger_flush (3),
+.BR kdk_logger_setdir (3)
+and
+.BR kdk_logger_set_autowrap (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkylog.h from the source code\&.

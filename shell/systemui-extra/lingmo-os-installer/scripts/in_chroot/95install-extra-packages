@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" = "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" = "true" ]]; then
+    return 0
+fi
+
+### automatically install the packages listed in the /cdrom/.lingmo-post-packages
+if [[ -f /cdrom/.lingmo-post-packages ]]; then
+    msg "安装光盘源列表包"
+    /bin/sh -c "unset DEBIAN_HAS_FRONTEND && apt-get install -y $(cat /cdrom/.lingmo-post-packages | grep -v ^\# | xargs)"
+fi

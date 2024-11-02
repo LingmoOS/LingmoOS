@@ -1,0 +1,602 @@
+From: wang teng <wangteng@lingmoos.cn>
+Date: Mon, 6 May 2024 11:39:06 +0800
+Subject: adjust for protocols
+
+---
+ LICENSE                                  | 127 ++++++++++++++++++++++++++++++
+ src/protocols/README.md                  |  20 -----
+ src/protocols/lingmo-shell.xml             | 131 +++++--------------------------
+ src/protocols/lingmo-touch-calibration.xml |  70 +++++++++++++++++
+ src/protocols/lingmo-window-management.xml |  50 +++++++-----
+ 5 files changed, 245 insertions(+), 153 deletions(-)
+ create mode 100644 LICENSE
+ delete mode 100644 src/protocols/README.md
+ create mode 100644 src/protocols/lingmo-touch-calibration.xml
+
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..ee58399
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,127 @@
++                     木兰宽松许可证, 第2版
++
++   木兰宽松许可证， 第2版 
++   2020年1月 http://license.coscl.org.cn/MulanPSL2
++
++
++   您对“软件”的复制、使用、修改及分发受木兰宽松许可证，第2版（“本许可证”）的如下条款的约束：
++
++   0. 定义
++
++      “软件”是指由“贡献”构成的许可在“本许可证”下的程序和相关文档的集合。
++
++      “贡献”是指由任一“贡献者”许可在“本许可证”下的受版权法保护的作品。
++
++      “贡献者”是指将受版权法保护的作品许可在“本许可证”下的自然人或“法人实体”。
++
++      “法人实体”是指提交贡献的机构及其“关联实体”。
++
++      “关联实体”是指，对“本许可证”下的行为方而言，控制、受控制或与其共同受控制的机构，此处的控制是指有受控方或共同受控方至少50%直接或间接的投票权、资金或其他有价证券。
++
++   1. 授予版权许可
++
++      每个“贡献者”根据“本许可证”授予您永久性的、全球性的、免费的、非独占的、不可撤销的版权许可，您可以复制、使用、修改、分发其“贡献”，不论修改与否。
++
++   2. 授予专利许可
++
++      每个“贡献者”根据“本许可证”授予您永久性的、全球性的、免费的、非独占的、不可撤销的（根据本条规定撤销除外）专利许可，供您制造、委托制造、使用、许诺销售、销售、进口其“贡献”或以其他方式转移其“贡献”。前述专利许可仅限于“贡献者”现在或将来拥有或控制的其“贡献”本身或其“贡献”与许可“贡献”时的“软件”结合而将必然会侵犯的专利权利要求，不包括对“贡献”的修改或包含“贡献”的其他结合。如果您或您的“关联实体”直接或间接地，就“软件”或其中的“贡献”对任何人发起专利侵权诉讼（包括反诉或交叉诉讼）或其他专利维权行动，指控其侵犯专利权，则“本许可证”授予您对“软件”的专利许可自您提起诉讼或发起维权行动之日终止。
++
++   3. 无商标许可
++
++      “本许可证”不提供对“贡献者”的商品名称、商标、服务标志或产品名称的商标许可，但您为满足第4条规定的声明义务而必须使用除外。
++
++   4. 分发限制
++
++      您可以在任何媒介中将“软件”以源程序形式或可执行形式重新分发，不论修改与否，但您必须向接收者提供“本许可证”的副本，并保留“软件”中的版权、商标、专利及免责声明。
++
++   5. 免责声明与责任限制
++
++      “软件”及其中的“贡献”在提供时不带任何明示或默示的担保。在任何情况下，“贡献者”或版权所有者不对任何人因使用“软件”或其中的“贡献”而引发的任何直接或间接损失承担责任，不论因何种原因导致或者基于何种法律理论，即使其曾被建议有此种损失的可能性。 
++
++   6. 语言
++      “本许可证”以中英文双语表述，中英文版本具有同等法律效力。如果中英文版本存在任何冲突不一致，以中文版为准。
++
++   条款结束 
++
++   如何将木兰宽松许可证，第2版，应用到您的软件
++   
++   如果您希望将木兰宽松许可证，第2版，应用到您的新软件，为了方便接收者查阅，建议您完成如下三步：
++
++      1， 请您补充如下声明中的空白，包括软件名、软件的首次发表年份以及您作为版权人的名字；
++
++      2， 请您在软件包的一级目录下创建以“LICENSE”为名的文件，将整个许可证文本放入该文件中；
++
++      3， 请将如下声明文本放入每个源文件的头部注释中。
++
++   Copyright (c) [Year] [name of copyright holder]
++   [Software Name] is licensed under Mulan PSL v2.
++   You can use this software according to the terms and conditions of the Mulan PSL v2. 
++   You may obtain a copy of Mulan PSL v2 at:
++            http://license.coscl.org.cn/MulanPSL2 
++   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.  
++   See the Mulan PSL v2 for more details.  
++
++
++                     Mulan Permissive Software License，Version 2
++
++   Mulan Permissive Software License，Version 2 (Mulan PSL v2)
++   January 2020 http://license.coscl.org.cn/MulanPSL2
++
++   Your reproduction, use, modification and distribution of the Software shall be subject to Mulan PSL v2 (this License) with the following terms and conditions: 
++   
++   0. Definition
++   
++      Software means the program and related documents which are licensed under this License and comprise all Contribution(s). 
++   
++      Contribution means the copyrightable work licensed by a particular Contributor under this License.
++   
++      Contributor means the Individual or Legal Entity who licenses its copyrightable work under this License.
++   
++      Legal Entity means the entity making a Contribution and all its Affiliates.
++   
++      Affiliates means entities that control, are controlled by, or are under common control with the acting entity under this License, ‘control’ means direct or indirect ownership of at least fifty percent (50%) of the voting power, capital or other securities of controlled or commonly controlled entity.
++
++   1. Grant of Copyright License
++
++      Subject to the terms and conditions of this License, each Contributor hereby grants to you a perpetual, worldwide, royalty-free, non-exclusive, irrevocable copyright license to reproduce, use, modify, or distribute its Contribution, with modification or not.
++
++   2. Grant of Patent License 
++
++      Subject to the terms and conditions of this License, each Contributor hereby grants to you a perpetual, worldwide, royalty-free, non-exclusive, irrevocable (except for revocation under this Section) patent license to make, have made, use, offer for sale, sell, import or otherwise transfer its Contribution, where such patent license is only limited to the patent claims owned or controlled by such Contributor now or in future which will be necessarily infringed by its Contribution alone, or by combination of the Contribution with the Software to which the Contribution was contributed. The patent license shall not apply to any modification of the Contribution, and any other combination which includes the Contribution. If you or your Affiliates directly or indirectly institute patent litigation (including a cross claim or counterclaim in a litigation) or other patent enforcement activities against any individual or entity by alleging that the Software or any Contribution in it infringes patents, then any patent license granted to you under this License for the Software shall terminate as of the date such litigation or activity is filed or taken.
++
++   3. No Trademark License
++
++      No trademark license is granted to use the trade names, trademarks, service marks, or product names of Contributor, except as required to fulfill notice requirements in Section 4.
++
++   4. Distribution Restriction
++
++      You may distribute the Software in any medium with or without modification, whether in source or executable forms, provided that you provide recipients with a copy of this License and retain copyright, patent, trademark and disclaimer statements in the Software.
++
++   5. Disclaimer of Warranty and Limitation of Liability
++
++      THE SOFTWARE AND CONTRIBUTION IN IT ARE PROVIDED WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. IN NO EVENT SHALL ANY CONTRIBUTOR OR COPYRIGHT HOLDER BE LIABLE TO YOU FOR ANY DAMAGES, INCLUDING, BUT NOT LIMITED TO ANY DIRECT, OR INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING FROM YOUR USE OR INABILITY TO USE THE SOFTWARE OR THE CONTRIBUTION IN IT, NO MATTER HOW IT’S CAUSED OR BASED ON WHICH LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
++
++   6. Language
++
++      THIS LICENSE IS WRITTEN IN BOTH CHINESE AND ENGLISH, AND THE CHINESE VERSION AND ENGLISH VERSION SHALL HAVE THE SAME LEGAL EFFECT. IN THE CASE OF DIVERGENCE BETWEEN THE CHINESE AND ENGLISH VERSIONS, THE CHINESE VERSION SHALL PREVAIL.
++
++   END OF THE TERMS AND CONDITIONS
++
++   How to Apply the Mulan Permissive Software License，Version 2 (Mulan PSL v2) to Your Software
++
++      To apply the Mulan PSL v2 to your work, for easy identification by recipients, you are suggested to complete following three steps:
++
++      i Fill in the blanks in following statement, including insert your software name, the year of the first publication of your software, and your name identified as the copyright owner; 
++
++      ii Create a file named “LICENSE” which contains the whole context of this License in the first directory of your software package;
++
++      iii Attach the statement to the appropriate annotated syntax at the beginning of each source file.
++
++
++   Copyright (c) [Year] [name of copyright holder]
++   [Software Name] is licensed under Mulan PSL v2.
++   You can use this software according to the terms and conditions of the Mulan PSL v2. 
++   You may obtain a copy of Mulan PSL v2 at:
++               http://license.coscl.org.cn/MulanPSL2 
++   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.  
++   See the Mulan PSL v2 for more details.  
+diff --git a/src/protocols/README.md b/src/protocols/README.md
+deleted file mode 100644
+index 6e2e086..0000000
+--- a/src/protocols/README.md
++++ /dev/null
+@@ -1,20 +0,0 @@
+-lingmo-shell.xml
+-
+-
+-
+-去标题栏(保留边框、阴影等其他装饰)
+-模态窗口协议		
+-触摸映射协议
+-
+-
+-
+-圆角    圆角半径
+-主题	深浅色等各种参数，图标，平板模式是否考虑	与主题，usd同步后，整理出
+-水印	水印接口、参数等
+-
+-最小化动画终点位置信息
+-锁屏快捷键支持和屏蔽
+-
+-
+-屏幕亮度
+-
+diff --git a/src/protocols/lingmo-shell.xml b/src/protocols/lingmo-shell.xml
+index 63359c1..b20c91a 100644
+--- a/src/protocols/lingmo-shell.xml
++++ b/src/protocols/lingmo-shell.xml
+@@ -8,7 +8,7 @@
+     ]]>
+   </copyright>
+ 
+-  <interface name="org_lingmo_shell" version="1">
++  <interface name="lingmo_shell" version="1">
+     <description summary="create lingmo shell windows and helpers">
+       This interface is used by lingmo powered Wayland shells to communicate with the compositor and
+       can only be bound one time.
+@@ -22,13 +22,13 @@
+ 
+         Only one shell surface can be associated with a given surface.
+       </description>
+-      <arg name="id" type="new_id" interface="org_lingmo_surface"/>
++      <arg name="id" type="new_id" interface="lingmo_surface"/>
+       <arg name="surface" type="object" interface="wl_surface"/>
+     </request>
+ 
+   </interface>
+ 
+-  <interface name="org_lingmo_surface" version="1">
++  <interface name="lingmo_surface" version="1">
+     <description summary="metadata interface">
+       An interface that may be implemented by a wl_surface, for implementations that provide the
+       shell user interface.
+@@ -37,16 +37,16 @@
+       coordinates.
+ 
+       On the server side the object is automatically destroyed when the related wl_surface is
+-      destroyed. On client side, org_lingmo_surface.destroy() must be called before destroying the
++      destroyed. On client side, lingmo_surface.destroy() must be called before destroying the
+       wl_surface object.
+     </description>
+ 
+     <!-- Destructor -->
+ 
+     <request name="destroy" type="destructor">
+-      <description summary="remove org_lingmo_surface interface">
+-        The org_lingmo_surface interface is removed from the wl_surface object that was turned into a
+-        shell surface with the org_lingmo_shell.get_surface request. The shell surface role is lost
++      <description summary="remove lingmo_surface interface">
++        The lingmo_surface interface is removed from the wl_surface object that was turned into a
++        shell surface with the lingmo_shell.get_surface request. The shell surface role is lost
+         and wl_surface is unmapped.
+       </description>
+     </request>
+@@ -56,7 +56,7 @@
+     <request name="set_output">
+       <description summary="assign an output to this shell surface">
+         Assign an output to this shell surface. The compositor will use this information to set the
+-        position when org_lingmo_surface.set_position request is called.
++        position when lingmo_surface.set_position request is called.
+       </description>
+       <arg name="output" type="object" interface="wl_output"/>
+     </request>
+@@ -67,19 +67,11 @@
+ 
+         Coordinates are global, for example 50,50 for a 1920,0+1920x1080 output is 1970,50 in global
+         coordinates space.
+-
+-        Use org_lingmo_surface.set_output to assign an output to this surface.
+       </description>
+       <arg name="x" type="int" summary="x coordinate in global space"/>
+       <arg name="y" type="int" summary="y coordinate in global space"/>
+     </request>
+ 
+-    <request name="active">
+-      <description summary="request to activate shell">
+-        request to activate current shell if it's not active
+-      </description>
+-    </request>
+-
+     <!-- Skip taskbar-->
+ 
+     <request name="set_skip_taskbar" since="1">
+@@ -100,13 +92,10 @@
+         summary="Boolean value that sets whether to skip the window switcher."/>
+     </request>
+ 
+-
+-    <!-- 窗口属性 -->
+-
+     <enum name="property">
+-      <entry name="no_header" value="0"/>
++      <entry name="no_titlebar" value="0"/>
+       <entry name="theme" value="1"/>
+-      <entry name="window_radius" value="1"/>
++      <entry name="window_radius" value="2"/>
+       <entry name="border_width" value="3"/>
+       <entry name="border_color" value="4"/>
+       <entry name="shadow_radius" value="5"/>
+@@ -137,6 +126,8 @@
+       <entry name="tooltip" value="5"/>
+       <entry name="criticalnotification" value="6"/>
+       <entry name="appletpopup" value="7"/>
++      <entry name="screenlock" value="8"/>
++      <entry name="watermark" value="9"/>
+     </enum>
+ 
+     <request name="set_role">
+@@ -147,99 +138,10 @@
+ 
+         This request fails if the surface already has a role, this means the surface role may be
+         assigned only once.
+-
+-        == Surfaces with splash role ==
+-
+-        Splash surfaces are placed above every other surface during the shell startup phase.
+-
+-        The surfaces are placed according to the output coordinates. No size is imposed to those
+-        surfaces, the shell has to resize them according to output size.
+-
+-        These surfaces are meant to hide the desktop during the startup phase so that the user will
+-        always see a ready to work desktop.
+-
+-        A shell might not create splash surfaces if the compositor reveals the desktop in an
+-        alternative fashion, for example with a fade in effect.
+-
+-        That depends on how much time the desktop usually need to prepare the workspace or specific
+-        design decisions. This specification doesn't impose any particular design.
+-
+-        When the startup phase is finished, the shell will send the org_lingmo.desktop_ready request
+-        to the compositor.
+-
+-        == Surfaces with desktop role ==
+-
+-        Desktop surfaces are placed below all other surfaces and are used to show the actual desktop
+-        view with icons, search results or controls the user will interact with. What to show
+-        depends on the shell implementation.
+-
+-        The surfaces are placed according to the output coordinates. No size is imposed to those
+-        surfaces, the shell has to resize them according to output size.
+-
+-        Only one surface per output can have the desktop role.
+-
+-        == Surfaces with dashboard role ==
+-
+-        Dashboard surfaces are placed above desktop surfaces and are used to show additional widgets
+-        and controls.
+-
+-        The surfaces are placed according to the output coordinates. No size is imposed to those
+-        surfaces, the shell has to resize them according to output size.
+-
+-        Only one surface per output can have the dashboard role.
+-
+-        == Surfaces with config role ==
+-
+-        A configuration surface is shown when the user wants to configure panel or desktop views.
+-        Only one surface per output can have the config role.
+-
+-        TODO: This should grab the input like popup menus, right?
+-
+-        == Surfaces with overlay role ==
+-
+-        Overlays are special surfaces that shows for a limited amount of time. Such surfaces are
+-        useful to display things like volume, brightness and status changes.
+-
+-        Compositors may decide to show those surfaces in a layer above all surfaces, even full
+-        screen ones if so is desired.
+-
+-        == Surfaces with notification role ==
+-
+-        Notification surfaces display informative content for a limited amount of time. The
+-        compositor may decide to show them in a corner depending on the configuration.
+-
+-        These surfaces are shown in a layer above all other surfaces except for full screen ones.
+-
+-        == Surfaces with lock role ==
+-
+-        The lock surface is shown by the compositor when the session is locked, users interact with
+-        it to unlock the session.
+-
+-        Compositors should move lock surfaces to 0,0 in output coordinates space and hide all other
+-        surfaces for security sake. For the same reason it is recommended that clients make the lock
+-        surface as big as the screen.
+-
+-        Only one surface per output can have the lock role.
+       </description>
+       <arg name="role" type="uint"/>
+     </request>
+ 
+-    <!-- 触发窗口打开时的位置信息 -->
+-
+-    <request name="set_startup_geometry">
+-      <description summary="set the geometry for a taskbar/desktop entry">
+-        Sets the geometry of the taskbar/desktop entry for this window. The geometry is relative to
+-        a panel/desktop in particular.
+-      </description>
+-      <arg name="entry" type="object" interface="wl_surface"/>
+-      <arg name="x" type="uint"/>
+-      <arg name="y" type="uint"/>
+-      <arg name="width" type="uint"/>
+-      <arg name="height" type="uint"/>
+-    </request>
+-
+-    <!-- 窗口打开后在鼠标位置显示 -->
+-
+     <request name="open_under_cursor" since="1">
+       <description summary="open under cursor">
+         Request the initial position of this surface to be under the current cursor position. Has to
+@@ -247,8 +149,13 @@
+       </description>
+     </request>
+ 
+-    <!-- 任务栏相关，有必要否 -->
+-
++    <request name="set_panel_takes_focus" since="1">
++      <description summary="Whether a panel takes focus">
++          By default various lingmo_surface roles do not take focus and cannot be activated.
++          With this request the compositor can be instructed to pass focus also to this lingmo_surface.
++      </description>
++      <arg name="takes_focus" type="uint" summary="Boolean value that sets whether the panel takes focus"/>
++    </request>
+ 
+   </interface>
+ </protocol>
+diff --git a/src/protocols/lingmo-touch-calibration.xml b/src/protocols/lingmo-touch-calibration.xml
+new file mode 100644
+index 0000000..0ff75a2
+--- /dev/null
++++ b/src/protocols/lingmo-touch-calibration.xml
+@@ -0,0 +1,70 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<protocol name="lingmo_shell">
++    <copyright><![CDATA[
++      SPDX-FileCopyrightText: 2024 LingmoSoft Co., Ltd.
++      SPDX-FileCopyrightText: 2024 Hongfei Shang
++
++      SPDX-License-Identifier: MulanPSL-2.0
++    ]]>
++  </copyright>
++
++    <description summary="Protocol for implement touchscreen mapping">
++        A protocol added to implement touch screen mapping in the wayland
++        environment.
++    </description>
++
++    <interface name="zwp_screen_map_manager_v1" version="1">
++        <description summary="Protocol for implement touchscreen mapping">
++            A global interface used for manage screen map status.
++        </description>
++
++        <request name="get_screen_names">
++            <description summary="Protocol for implement touchscreen mapping">
++                Get all screen name.
++            </description>
++        </request>
++
++        <request name="get_touch_ids">
++            <description summary="Protocol for implement touchscreen mapping">
++                Get all touch screen id.
++            </description>
++        </request>
++
++        <request name="get_touch_product_vendor">
++            <description summary="Protocol for implement touchscreen mapping">
++                Get the pid and vid of the touch screen with the specified id.
++            </description>
++            <arg name="touchId" type="uint"/>
++        </request>
++
++        <request name="set_screen_map_status">
++            <description summary="Protocol for implement touchscreen mapping">
++                Set screen map status.
++            </description>
++            <arg name="touchId" type="int"/>
++            <arg name="screenName" type="string"/>
++        </request>
++
++        <event name="screen_names">
++            <description summary="Protocol for implement touchscreen mapping">
++                Returns all screen names separated by colons.
++            </description>
++            <arg name="screenNames" type="string"/>
++        </event>
++
++        <event name="touch_ids">
++            <description summary="Protocol for implement touchscreen mapping">
++                Returns all touch screen id separated by colons.
++            </description>
++            <arg name="touchIds" type="string"/>
++        </event>
++
++        <event name="touch_product_vendor">
++            <description summary="Protocol for implement touchscreen mapping">
++                Returns the pid and vid of the touch screen with the specified id.
++            </description>
++            <arg name="touchProductVendor" type="string"/>
++        </event>
++    </interface>
++
++</protocol>
+diff --git a/src/protocols/lingmo-window-management.xml b/src/protocols/lingmo-window-management.xml
+index b677c4d..e6c5c3a 100644
+--- a/src/protocols/lingmo-window-management.xml
++++ b/src/protocols/lingmo-window-management.xml
+@@ -8,13 +8,11 @@
+   ]]>
+ </copyright>
+ 
+-  <interface name="org_lingmo_window_management" version="1">
++  <interface name="lingmo_window_management" version="1">
+     <description summary="application windows management">
+       This interface manages application windows. It provides requests to show and hide the desktop
+       and emits an event every time a window is created so that the client can use it to manage the
+       window.
+-
+-      Only one client can bind this interface at a time.
+     </description>
+ 
+     <enum name="show_desktop">
+@@ -30,7 +28,7 @@
+     </request>
+ 
+     <request name="create_window">
+-      <arg name="id" type="new_id" interface="org_lingmo_window"/>
++      <arg name="id" type="new_id" interface="lingmo_window"/>
+       <arg name="internal_window_uuid" type="string"
+         summary="The internal window uuiid of the window to create"/>
+     </request>
+@@ -49,7 +47,7 @@
+       <description summary="notify the client when stacking order changed">
+         This event will be sent when stacking order changed and on bind
+       </description>
+-      <arg name="uuids" type="string" summary="internal windows id, use ';' separated"/>
++      <arg name="uuids" type="string" summary="internal windows uuid, use ';' separated"/>
+     </event>
+ 
+     <event name="window_created">
+@@ -60,11 +58,9 @@
+     </event>
+   </interface>
+ 
+-  <interface name="org_lingmo_window" version="1">
++  <interface name="lingmo_window" version="1">
+     <description summary="interface to control application windows">
+       Manages and control an application window.
+-
+-      Only one client can bind this interface at a time.
+     </description>
+ 
+     <enum name="state">
+@@ -95,7 +91,7 @@
+       <description summary="set window state">
+         Set window state. Can set multiple states at once.
+ 
+-        Values for state argument are described by org_lingmo_window_management.state and can be used
++        Values for state argument are described by lingmo_window_management.state and can be used
+         together in a bitfield.
+         The flags bitfield describes which flags are supposed to be set, the
+         state bitfield the value for the set flags.
+@@ -115,6 +111,18 @@
+       <arg name="state" type="uint" summary="bitfield of state flags"/>
+     </request>
+ 
++    <request name="set_startup_geometry">
++      <description summary="set the geometry for a taskbar/desktop entry">
++        Sets the geometry of the taskbar/desktop entry for this window. The geometry is relative to
++        a panel/desktop in particular.
++      </description>
++      <arg name="entry" type="object" interface="wl_surface" summary="the taskbar/desktop entry for the window"/>
++      <arg name="x" type="uint"/>
++      <arg name="y" type="uint"/>
++      <arg name="width" type="uint"/>
++      <arg name="height" type="uint"/>
++    </request>
++
+     <request name="set_minimized_geometry">
+       <description summary="set the geometry for a taskbar entry">
+         Sets the geometry of the taskbar entry for this window. The geometry is relative to a panel
+@@ -159,8 +167,8 @@
+     </request>
+ 
+     <request name="destroy" type="destructor">
+-      <description summary="remove resource for the org_lingmo_window">
+-        Removes the resource bound for this org_lingmo_window.
++      <description summary="remove resource for the lingmo_window">
++        Removes the resource bound for this lingmo_window.
+       </description>
+     </request>
+ 
+@@ -190,7 +198,7 @@
+       <description summary="window state has been changed">
+         This event will be sent as soon as the window state changes.
+ 
+-        Values for state argument are described by org_lingmo_window_management.state. It contains
++        Values for state argument are described by lingmo_window_management.state. It contains
+         the whole new state of the window.
+       </description>
+       <arg name="flags" type="uint" summary="bitfield of state flags"/>
+@@ -220,24 +228,24 @@
+ 
+     <event name="parent_window" since="1">
+       <description summary="The parent window changed">
+-        This event will be sent whenever the parent window of this org_lingmo_window changes. The
+-        passed parent is another org_lingmo_window and this org_lingmo_window is a transient window to
+-        the parent window. If the parent argument is null, this org_lingmo_window does not have a
++        This event will be sent whenever the parent window of this lingmo_window changes. The
++        passed parent is another lingmo_window and this lingmo_window is a transient window to
++        the parent window. If the parent argument is null, this lingmo_window does not have a
+         parent window.
+       </description>
+-      <arg name="parent" type="object" interface="org_lingmo_window" summary="The parent window"
++      <arg name="parent" type="object" interface="lingmo_window" summary="The parent window"
+         allow-null="true"/>
+     </event>
+ 
+     <event name="geometry" since="1">
+       <description summary="The geometry of this window in absolute coordinates">
+-        This event will be sent whenever the window geometry of this org_lingmo_window changes. The
++        This event will be sent whenever the window geometry of this lingmo_window changes. The
+         coordinates are in absolute coordinates of the windowing system.
+       </description>
+-      <arg name="x" type="int" summary="x position of the org_lingmo_window"/>
+-      <arg name="y" type="int" summary="y position of the org_lingmo_window"/>
+-      <arg name="width" type="uint" summary="width of the org_lingmo_window"/>
+-      <arg name="height" type="uint" summary="height of the org_lingmo_window"/>
++      <arg name="x" type="int" summary="x position of the lingmo_window"/>
++      <arg name="y" type="int" summary="y position of the lingmo_window"/>
++      <arg name="width" type="uint" summary="width of the lingmo_window"/>
++      <arg name="height" type="uint" summary="height of the lingmo_window"/>
+     </event>
+ 
+     <event name="icon_changed" since="1">

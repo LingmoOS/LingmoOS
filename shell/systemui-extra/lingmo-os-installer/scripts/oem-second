@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+oem_mode=
+if grep -q 'test-mode' /proc/cmdline; then
+    oem_mode="oem-automatic"
+else
+    oem_mode="oem"
+fi
+
+cp -a /usr/share/applications/lingmo-os-installer.desktop /etc/xdg/autostart || echo "lingmo-os-installer.desktop is unexit" >>/var/log/installer/lingmo-os-installer.log
+sed -i "/Exec/d" /etc/xdg/autostart/lingmo-os-installer.desktop
+echo "Exec=/usr/bin/lingmo-os-installer-${oem_mode}" >>/etc/xdg/autostart/lingmo-os-installer.desktop
+
+if [[ -f /etc/xdg/autostart/oem-qc.desktop ]]; then
+      rm -f /etc/xdg/autostart/oem-qc.desktop
+fi
+
+if [[ -f /etc/xdg/autostart/oem-unlock.desktop ]]; then
+        rm -f /etc/xdg/autostart/oem-unlock.desktop
+fi
+if [[ -f /usr/sbin/oem-unlock ]]; then
+        rm -f /usr/sbin/oem-unlock
+fi
+

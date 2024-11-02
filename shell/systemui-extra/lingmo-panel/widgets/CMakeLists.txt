@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(widgets VERSION 4.1)
+add_subdirectory(lingmo-task-manager)
+add_subdirectory(lingmo-menu-starter)
+add_subdirectory(lingmo-panel-showDesktop)
+add_subdirectory(lingmo-panel-widget-test)
+add_subdirectory(lingmo-panel-calendar)
+add_subdirectory(lingmo-panel-separator)
+add_subdirectory(lingmo-panel-search)
+add_subdirectory(lingmo-panel-taskView)

@@ -1,0 +1,628 @@
+.TH "kdk::KMessageBox" 3 "Thu Oct 12 2023" "Version version:2.3" "LIBLINGMOSDK-APPLICATIONS" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk::KMessageBox \- 继承自KDialog，提供一个可自定义设置按钮和图标的对话框，类似QMessageBox  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <kmessagebox\&.h>\fP
+.PP
+Inherits \fBkdk::KDialog\fP\&.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBIcon\fP { \fBNoIcon\fP = 0, \fBInformation\fP = 1, \fBWarning\fP = 2, \fBCritical\fP = 3, \fBQuestion\fP = 4 }"
+.br
+.RI "The Icon enum，icon的五种类型，与 QMessageDialogOptions::Icon 保持同步 "
+.ti -1c
+.RI "enum \fBButtonRole\fP { \fBInvalidRole\fP = -1, \fBAcceptRole\fP, \fBRejectRole\fP, \fBDestructiveRole\fP, \fBActionRole\fP, \fBHelpRole\fP, \fBYesRole\fP, \fBNoRole\fP, \fBResetRole\fP, \fBApplyRole\fP, \fBNRoles\fP }"
+.br
+.RI "The ButtonRole enum，可供设置的按钮role\&. "
+.ti -1c
+.RI "enum \fBStandardButton\fP { \fBNoButton\fP = 0x00000000, \fBOk\fP = 0x00000400, \fBSave\fP = 0x00000800, \fBSaveAll\fP = 0x00001000, \fBOpen\fP = 0x00002000, \fBYes\fP = 0x00004000, \fBYesToAll\fP = 0x00008000, \fBNo\fP = 0x00010000, \fBNoToAll\fP = 0x00020000, \fBAbort\fP = 0x00040000, \fBRetry\fP = 0x00080000, \fBIgnore\fP = 0x00100000, \fBClose\fP = 0x00200000, \fBCancel\fP = 0x00400000, \fBDiscard\fP = 0x00800000, \fBHelp\fP = 0x01000000, \fBApply\fP = 0x02000000, \fBReset\fP = 0x04000000, \fBRestoreDefaults\fP = 0x08000000, \fBFirstButton\fP = Ok, \fBLastButton\fP = RestoreDefaults, \fBYesAll\fP = YesToAll, \fBNoAll\fP = NoToAll, \fBDefault\fP = 0x00000100, \fBEscape\fP = 0x00000200, \fBFlagMask\fP = 0x00000300, \fBButtonMask\fP = ~FlagMask }"
+.br
+.RI "The StandardButton enum，可供添加的按钮类型,与 QDialogButtonBox::StandardButton 和 QPlatformDialogHelper::StandardButton 保持同步 "
+.ti -1c
+.RI "typedef \fBStandardButton\fP \fBButton\fP"
+.br
+.in -1c
+.SS "Signals"
+
+.in +1c
+.ti -1c
+.RI "void \fBbuttonClicked\fP (QAbstractButton *\fBbutton\fP)"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBKMessageBox\fP (QWidget *parent=nullptr)"
+.br
+.ti -1c
+.RI "void \fBsetCustomIcon\fP (const QIcon &\fBicon\fP)"
+.br
+.RI "自定义KMessageBox的提示图标 "
+.ti -1c
+.RI "void \fBaddButton\fP (QAbstractButton *\fBbutton\fP, \fBButtonRole\fP role)"
+.br
+.RI "添加一个自定义按钮 "
+.ti -1c
+.RI "QPushButton * \fBaddButton\fP (const QString &\fBtext\fP, \fBButtonRole\fP role)"
+.br
+.RI "添加设置好文本的按钮 "
+.ti -1c
+.RI "QPushButton * \fBaddButton\fP (\fBStandardButton\fP \fBbutton\fP)"
+.br
+.RI "添加一个标准按钮并且返回这个按钮 "
+.ti -1c
+.RI "void \fBremoveButton\fP (QAbstractButton *\fBbutton\fP)"
+.br
+.RI "移除一个按钮 "
+.ti -1c
+.RI "QAbstractButton * \fBbutton\fP (\fBStandardButton\fP which) const"
+.br
+.RI "返回与标准按钮对应的指针，如果此消息框中不存在标准按钮，则返回0。 "
+.ti -1c
+.RI "QList< QAbstractButton * > \fBbuttons\fP () const"
+.br
+.RI "返回已添加到消息框中的所有按钮的列表 "
+.ti -1c
+.RI "\fBKMessageBox::ButtonRole\fP \fBbuttonRole\fP (QAbstractButton *\fBbutton\fP) const"
+.br
+.RI "返回指定按钮的按钮角色，如果按钮为0或尚未添加到消息框中，此函数将返回InvalidRole "
+.ti -1c
+.RI "QCheckBox * \fBcheckBox\fP () const"
+.br
+.RI "返回KMessageBox中显示的复选框 "
+.ti -1c
+.RI "void \fBsetCheckBox\fP (QCheckBox *cb)"
+.br
+.RI "设置KMessageBox显示的复选框，未设置则为0 "
+.ti -1c
+.RI "QString \fBtext\fP () const"
+.br
+.RI "获取KMessageBox的文本 "
+.ti -1c
+.RI "void \fBsetText\fP (const QString &\fBtext\fP)"
+.br
+.RI "设置KMessageBox的文本 "
+.ti -1c
+.RI "QString \fBinformativeText\fP () const"
+.br
+.RI "获取KMessageBox信息性文本的描述 "
+.ti -1c
+.RI "void \fBsetInformativeText\fP (const QString &\fBtext\fP)"
+.br
+.RI "设置KMessageBox信息性文本的描述 "
+.ti -1c
+.RI "\fBIcon\fP \fBicon\fP () const"
+.br
+.RI "获取KMessageBox的图标 "
+.ti -1c
+.RI "void \fBsetIcon\fP (\fBIcon\fP \fBicon\fP)"
+.br
+.RI "设置KMessageBox的图标 "
+.ti -1c
+.RI "QPixmap \fBiconPixmap\fP () const"
+.br
+.RI "返回当前KMessageBox的icon "
+.ti -1c
+.RI "void \fBsetIconPixmap\fP (const QPixmap &pixmap)"
+.br
+.RI "设置当前KMessageBox的icon "
+.ti -1c
+.RI "KMessageBox::StandardButtons \fBstandardButtons\fP () const"
+.br
+.RI "KMessageBox中标准按钮的集合 "
+.ti -1c
+.RI "void \fBsetStandardButtons\fP (KMessageBox::StandardButtons \fBbuttons\fP)"
+.br
+.RI "设置多个标准按钮 "
+.ti -1c
+.RI "\fBKMessageBox::StandardButton\fP \fBstandardButton\fP (QAbstractButton *\fBbutton\fP) const"
+.br
+.RI "返回与给定按钮对应的标准按钮枚举值，如果给定按钮不是标准按钮，则返回NoButton "
+.ti -1c
+.RI "QPushButton * \fBdefaultButton\fP () const"
+.br
+.RI "返回KMessageBox的默认按钮 "
+.ti -1c
+.RI "void \fBsetDefaultButton\fP (QPushButton *\fBbutton\fP)"
+.br
+.RI "设置KMessageBox的默认按钮 "
+.ti -1c
+.RI "void \fBsetDefaultButton\fP (\fBKMessageBox::StandardButton\fP \fBbutton\fP)"
+.br
+.RI "设置KMessageBox的默认按钮 "
+.ti -1c
+.RI "QAbstractButton * \fBclickedButton\fP () const"
+.br
+.RI "返回被点击的按钮 "
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static QPixmap \fBstandardIcon\fP (\fBIcon\fP \fBicon\fP)"
+.br
+.RI "返回用于标准图标的pixmap。 "
+.ti -1c
+.RI "static \fBStandardButton\fP \fBinformation\fP (QWidget *parent, const QString &title, const QString &\fBtext\fP, StandardButtons \fBbuttons\fP=Ok, \fBStandardButton\fP \fBdefaultButton\fP=NoButton)"
+.br
+.RI "打开带有给定标题和文本的信息消息框。对话框最多可以有三个按钮 "
+.ti -1c
+.RI "static \fBStandardButton\fP \fBquestion\fP (QWidget *parent, const QString &title, const QString &\fBtext\fP, StandardButtons \fBbuttons\fP=StandardButtons(Yes|No), \fBStandardButton\fP \fBdefaultButton\fP=NoButton)"
+.br
+.RI "打开一个带有给定标题和文本的问题消息框 "
+.ti -1c
+.RI "static \fBStandardButton\fP \fBwarning\fP (QWidget *parent, const QString &title, const QString &\fBtext\fP, StandardButtons \fBbuttons\fP=Ok, \fBStandardButton\fP \fBdefaultButton\fP=NoButton)"
+.br
+.RI "打开一个带有给定标题和文本的警告消息框 "
+.ti -1c
+.RI "static \fBStandardButton\fP \fBcritical\fP (QWidget *parent, const QString &title, const QString &\fBtext\fP, StandardButtons \fBbuttons\fP=Ok, \fBStandardButton\fP \fBdefaultButton\fP=NoButton)"
+.br
+.RI "用给定的标题和文本打开一个关键信息框 "
+.ti -1c
+.RI "static \fBStandardButton\fP \fBsuccess\fP (QWidget *parent, const QString &title, const QString &\fBtext\fP, StandardButtons \fBbuttons\fP=Ok, \fBStandardButton\fP \fBdefaultButton\fP=NoButton)"
+.br
+.RI "用给定的标题和文本打开一个成功消息框 "
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBevent\fP (QEvent *e) override"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+继承自KDialog，提供一个可自定义设置按钮和图标的对话框，类似QMessageBox 
+
+
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "QPushButton* kdk::KMessageBox::addButton (const QString & text, \fBButtonRole\fP role)"
+
+.PP
+添加设置好文本的按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fItext\fP 
+.br
+\fIrole\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::addButton (QAbstractButton * button, \fBButtonRole\fP role)"
+
+.PP
+添加一个自定义按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.br
+\fIrole\fP 
+.RE
+.PP
+
+.SS "QPushButton* kdk::KMessageBox::addButton (\fBStandardButton\fP button)"
+
+.PP
+添加一个标准按钮并且返回这个按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "QAbstractButton* kdk::KMessageBox::button (\fBStandardButton\fP which) const"
+
+.PP
+返回与标准按钮对应的指针，如果此消息框中不存在标准按钮，则返回0。 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwhich\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "\fBKMessageBox::ButtonRole\fP kdk::KMessageBox::buttonRole (QAbstractButton * button) const"
+
+.PP
+返回指定按钮的按钮角色，如果按钮为0或尚未添加到消息框中，此函数将返回InvalidRole 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "QList<QAbstractButton*> kdk::KMessageBox::buttons () const"
+
+.PP
+返回已添加到消息框中的所有按钮的列表 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "QCheckBox* kdk::KMessageBox::checkBox () const"
+
+.PP
+返回KMessageBox中显示的复选框 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "QAbstractButton* kdk::KMessageBox::clickedButton () const"
+
+.PP
+返回被点击的按钮 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static \fBStandardButton\fP kdk::KMessageBox::critical (QWidget * parent, const QString & title, const QString & text, StandardButtons buttons = \fCOk\fP, \fBStandardButton\fP defaultButton = \fCNoButton\fP)\fC [static]\fP"
+
+.PP
+用给定的标题和文本打开一个关键信息框 
+.PP
+\fBParameters\fP
+.RS 4
+\fIparent\fP 
+.br
+\fItitle\fP 
+.br
+\fItext\fP 
+.br
+\fIbuttons\fP 
+.br
+\fIdefaultButton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "QPushButton* kdk::KMessageBox::defaultButton () const"
+
+.PP
+返回KMessageBox的默认按钮 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "\fBIcon\fP kdk::KMessageBox::icon () const"
+
+.PP
+获取KMessageBox的图标 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "QPixmap kdk::KMessageBox::iconPixmap () const"
+
+.PP
+返回当前KMessageBox的icon 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static \fBStandardButton\fP kdk::KMessageBox::information (QWidget * parent, const QString & title, const QString & text, StandardButtons buttons = \fCOk\fP, \fBStandardButton\fP defaultButton = \fCNoButton\fP)\fC [static]\fP"
+
+.PP
+打开带有给定标题和文本的信息消息框。对话框最多可以有三个按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIparent\fP 
+.br
+\fItitle\fP 
+.br
+\fItext\fP 
+.br
+\fIbuttons\fP 
+.br
+\fIdefaultButton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "QString kdk::KMessageBox::informativeText () const"
+
+.PP
+获取KMessageBox信息性文本的描述 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static \fBStandardButton\fP kdk::KMessageBox::question (QWidget * parent, const QString & title, const QString & text, StandardButtons buttons = \fCStandardButtons(Yes|No)\fP, \fBStandardButton\fP defaultButton = \fCNoButton\fP)\fC [static]\fP"
+
+.PP
+打开一个带有给定标题和文本的问题消息框 
+.PP
+\fBParameters\fP
+.RS 4
+\fIparent\fP 
+.br
+\fItitle\fP 
+.br
+\fItext\fP 
+.br
+\fIbuttons\fP 
+.br
+\fIdefaultButton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::removeButton (QAbstractButton * button)"
+
+.PP
+移除一个按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setCheckBox (QCheckBox * cb)"
+
+.PP
+设置KMessageBox显示的复选框，未设置则为0 
+.PP
+\fBParameters\fP
+.RS 4
+\fIcb\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setCustomIcon (const QIcon & icon)"
+
+.PP
+自定义KMessageBox的提示图标 
+.PP
+\fBParameters\fP
+.RS 4
+\fIicon\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setDefaultButton (\fBKMessageBox::StandardButton\fP button)"
+
+.PP
+设置KMessageBox的默认按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setDefaultButton (QPushButton * button)"
+
+.PP
+设置KMessageBox的默认按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setIcon (\fBIcon\fP icon)"
+
+.PP
+设置KMessageBox的图标 
+.PP
+\fBParameters\fP
+.RS 4
+\fIicon\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setIconPixmap (const QPixmap & pixmap)"
+
+.PP
+设置当前KMessageBox的icon 
+.PP
+\fBParameters\fP
+.RS 4
+\fIpixmap\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setInformativeText (const QString & text)"
+
+.PP
+设置KMessageBox信息性文本的描述 
+.PP
+\fBParameters\fP
+.RS 4
+\fItext\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setStandardButtons (KMessageBox::StandardButtons buttons)"
+
+.PP
+设置多个标准按钮 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbuttons\fP 
+.RE
+.PP
+
+.SS "void kdk::KMessageBox::setText (const QString & text)"
+
+.PP
+设置KMessageBox的文本 
+.PP
+\fBParameters\fP
+.RS 4
+\fItext\fP 
+.RE
+.PP
+
+.SS "\fBKMessageBox::StandardButton\fP kdk::KMessageBox::standardButton (QAbstractButton * button) const"
+
+.PP
+返回与给定按钮对应的标准按钮枚举值，如果给定按钮不是标准按钮，则返回NoButton 
+.PP
+\fBParameters\fP
+.RS 4
+\fIbutton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "KMessageBox::StandardButtons kdk::KMessageBox::standardButtons () const"
+
+.PP
+KMessageBox中标准按钮的集合 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static QPixmap kdk::KMessageBox::standardIcon (\fBIcon\fP icon)\fC [static]\fP"
+
+.PP
+返回用于标准图标的pixmap。 
+.PP
+\fBParameters\fP
+.RS 4
+\fIicon\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static \fBStandardButton\fP kdk::KMessageBox::success (QWidget * parent, const QString & title, const QString & text, StandardButtons buttons = \fCOk\fP, \fBStandardButton\fP defaultButton = \fCNoButton\fP)\fC [static]\fP"
+
+.PP
+用给定的标题和文本打开一个成功消息框 
+.PP
+\fBParameters\fP
+.RS 4
+\fIparent\fP 
+.br
+\fItitle\fP 
+.br
+\fItext\fP 
+.br
+\fIbuttons\fP 
+.br
+\fIdefaultButton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "QString kdk::KMessageBox::text () const"
+
+.PP
+获取KMessageBox的文本 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static \fBStandardButton\fP kdk::KMessageBox::warning (QWidget * parent, const QString & title, const QString & text, StandardButtons buttons = \fCOk\fP, \fBStandardButton\fP defaultButton = \fCNoButton\fP)\fC [static]\fP"
+
+.PP
+打开一个带有给定标题和文本的警告消息框 
+.PP
+\fBParameters\fP
+.RS 4
+\fIparent\fP 
+.br
+\fItitle\fP 
+.br
+\fItext\fP 
+.br
+\fIbuttons\fP 
+.br
+\fIdefaultButton\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for LIBLINGMOSDK-APPLICATIONS from the source code\&.

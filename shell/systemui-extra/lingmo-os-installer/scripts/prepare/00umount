@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+#
+# 卸载设备
+
+TARGET=/target
+
+# 由于systemd253版本占用了997 998 999uid,因此调整安装uid同casper为899
+USER=$(id -un 899)
+
+if [[ -f /usr/share/glib-2.0/schemas/org.lingmo.flash-disk.autoload.gschema.xml ]]; then
+  # 取消自动挂载设置
+  sudo -u ${USER:-lingmo} gsettings set org.lingmo.flash-disk.autoload ifautoload false
+fi
+
+swapoff -a || true
+
+umount /media/*/* || true
+umount /media/* || true
+
+# 卸载 target 及虚拟文件系统
+if grep -q '/target' /proc/mounts; then
+    umount -l /target || true
+fi

@@ -1,0 +1,43 @@
+.TH "KDK_FAN_FREEALL" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_fan_freeall - 用于回收字符串列表
+.SH SYNOPSIS
+.nf
+.B #include <libkyfan.h>
+.sp
+.BI "extern inline void kdk_fan_freeall(char **"ptr ");"
+.sp
+Link with \fI\-lkyfan\fP.
+.SH "Detailed Description"
+The main function of the interface is to recycle a list of strings of type char **.
+.PP
+The argument
+.I ptr
+is a list of strings of type char **.
+.SH "RETURN VALUE"
+No return value
+.SH EXAMPLES
+.EX
+#include "libkyfan.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char **fan = kdk_fan_get_information();
+    int index = 0;
+    while (fan[index])
+    {
+        printf("%s\n", fan[index]);
+        index++;
+    }
+    kdk_fan_freeall(fan);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_fan_get_information ().
+.SH "SEE ALSO"
+.BR kdk_fan_get_information (3).

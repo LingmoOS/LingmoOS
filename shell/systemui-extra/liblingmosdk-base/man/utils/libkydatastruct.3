@@ -1,0 +1,89 @@
+.TH "LIBKYDATASTRUCT" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libkydatastruct \- 时间复杂度: 插入（平均）: O(log(n)) 删除（平均）: O(log(n)) 查找（平均）: O(log(n)) 空间复杂度: O(n)  
+
+.SH SYNOPSIS
+
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fB_lingmosdk_skiplist_node\fP \fBlingmosdk_skiplist_node\fP"
+
+\fBtypedef struct _lingmosdk_skiplist_node {
+.br
+    int key;
+    lingmosdk_listdata data;
+
+    struct _lingmosdk_skiplist_node **next;
+.br
+} lingmosdk_skiplist_node;\fP
+.br
+.ti -1c
+.RI "typedef struct \fB_lingmosdk_skiplist\fP \fBlingmosdk_skiplist\fP"
+
+\fBtypedef struct _lingmosdk_skiplist {
+.br
+    unsigned int counts;    // 节点个数
+    unsigned int max_levels;    // 最高层数
+
+    lingmosdk_skiplist_node **children;
+.br
+} lingmosdk_skiplist;\fP
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBlingmosdk_skiplist\fP * \fBlingmosdk_create_skiplist\fP ()"
+.br
+.RI "创建跳表 "
+.ti -1c
+.RI "void \fBlingmosdk_destroy_skiplist\fP (\fBlingmosdk_skiplist\fP *list)"
+.br
+.RI "销毁跳表，并回收所有分配的内存；注意data\&.ptr指向的内存（若存在）不会被释放 "
+.ti -1c
+.RI "int \fBlingmosdk_skiplist_setmaxlevels\fP (\fBlingmosdk_skiplist\fP *list, unsigned int maxlevels)"
+.br
+.RI "设置跳表最高层数，该选项必须在跳表为空时使用 "
+.ti -1c
+.RI "int \fBlingmosdk_skiplist_insert\fP (\fBlingmosdk_skiplist\fP *list, int key, lingmosdk_listdata data)"
+.br
+.RI "插入节点 "
+.ti -1c
+.RI "int \fBlingmosdk_skiplist_delete\fP (\fBlingmosdk_skiplist\fP *list, int key)"
+.br
+.RI "删除key值对应的节点 "
+.ti -1c
+.RI "lingmosdk_listdata \fBlingmosdk_skiplist_search\fP (\fBlingmosdk_skiplist\fP *list, int key)"
+.br
+.RI "根据给定的key搜索data内容 "
+.in -1c
+.SH "Detailed Description"
+.PP 
+时间复杂度: 插入（平均）: O(log(n)) 删除（平均）: O(log(n)) 查找（平均）: O(log(n)) 空间复杂度: O(n) 
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR lingmosdk_create_skiplist (),
+.BR lingmosdk_destroy_skiplist (),
+.BR lingmosdk_skiplist_setmaxlevels (),
+.BR lingmosdk_skiplist_insert (),
+.BR lingmosdk_skiplist_delete ()
+and
+.BR lingmosdk_skiplist_search ().
+.SH "SEE ALSO"
+.BR lingmosdk_create_skiplist (3),
+.BR lingmosdk_destroy_skiplist (3),
+.BR lingmosdk_skiplist_setmaxlevels (3),
+.BR lingmosdk_skiplist_insert (3),
+.BR lingmosdk_skiplist_delete (3)
+and
+.BR lingmosdk_skiplist_search (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for skip_linklist.h from the source code\&.

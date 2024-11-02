@@ -1,0 +1,124 @@
+#!/bin/bash
+umount /target/proc
+umount /target/sys
+umount /target/dev/pts
+umount /target/dev
+umount /target/run
+
+# 删除dev下的空设备节点，会导致commit失败
+rm /target/dev/console /target/dev/full /target/dev/null /target/dev/ptmx /target/dev/random /target/dev/tty /target/dev/urandom /target/dev/zero
+
+# 将etc目录复制到usr目录下
+cp -a /target/etc /target/usr/
+
+# 删除etc目录
+rm -r /target/etc
+
+echo "---------->>>>>>>>>000000 1" >>${LOG_FILE} 2>&1
+
+# 复制内核文件
+kernel_vesion=`uname -r`
+initrd_real_name=`readlink -f /target/boot/initrd.img`
+cp -a "/target/boot/vmlinuz-$kernel_vesion" "/target/usr/lib/modules/$kernel_vesion/vmlinuz"
+cp -a "$initrd_real_name" "/target/usr/lib/modules/$kernel_vesion/initramfs.img"
+
+echo "---------->>>>>>>>>000000 2" >>${LOG_FILE} 2>&1
+
+mkdir /target/sysroot
+# 卸载其余分区，只保留根分区文件
+# 目前卸载data、boot、efi、backup、home、root，后续需要根据分区进行卸载
+umount /target/data
+umount /target/boot/efi
+umount /target/boot
+umount /target/home
+umount /target/backup
+umount /target/root
+umount /target/cdrom
+echo "---------->>>>>>>>>000000 3" >>${LOG_FILE} 2>&1
+
+# 将根分区底下的home、root、opt、mnt、media、tmp、srv移至var目录，然后将根分区下做成软连接
+mv /target/home /target/var/
+ln -s /var/home /target/home
+
+mv /target/root /target/var/
+ln -s /var/root /target/root
+
+mv /target/opt /target/var/
+ln -s /var/opt /target/opt
+
+mv /target/mnt /target/var/
+ln -s /var/mnt /target/mnt
+
+mv /target/media /target/var/
+ln -s /var/media /target/media
+
+mv /target/tmp /target/var/
+ln -s /var/tmp /target/tmp
+
+mv /target/srv /target/var/
+ln -s /var/srv /target/srv
+
+
+#部署ostree
+[ -d /tmp/ostree ] || mkdir /tmp/ostree
+
+data_part=$(get_value part-data)
+efi_part=$(get_value part-efi)
+boot_part=$(get_value part-boot)
+root_part=$(getvalue part-root)
+
+echo "data_part=${data_part}" >>${LOG_FILE} 2>&1
+mount "${data_part}" /tmp/ostree
+
+[ -d /tmp/ostree/sysroot ] || mkdir /tmp/ostree/sysroot
+echo "---------->>>>>>>>>000000 4" >>${LOG_FILE} 2>&1
+ostree admin init-fs /tmp/ostree/sysroot
+echo "---------->>>>>>>>>000000 5" >>${LOG_FILE} 2>&1
+ln -s /sysroot/ostree /target/ostree
+echo "---------->>>>>>>>>000000 6" >>${LOG_FILE} 2>&1
+ostree admin os-init lingmo --sysroot=/tmp/ostree/sysroot
+echo "---------->>>>>>>>>000000 7" >>${LOG_FILE} 2>&1
+ostree commit --repo=/tmp/ostree/sysroot/ostree/repo -b "lingmo/2303/system-init-rc1" -s "lingmo 2303 system init rc1" /target/
+echo "---------->>>>>>>>>000000 8" >>${LOG_FILE} 2>&1
+
+mount "${boot_part}" /mnt
+rm -rf /mnt/*
+echo "11111111111111111111---------------->>>>>>>>>>>> " >> ${LOG_FILE} 2>&1
+umount /mnt
+
+mount "${boot_part}" "/tmp/ostree/sysroot/boot"
+
+# 获取根分区的UUID
+root_uuid=`lsblk -o UUID ${part_root} | grep -v "UUID"`
+cmdline_opention_argr="$root_uuid ro quiet splash security="
+ostree admin deploy "lingmo/2303/system-init-rc1" --os=lingmo --sysroot=/tmp/ostree/sysroot --karg=root="UUID=$cmdline_opention_argr"
+echo "---------->>>>>>>>>000000 9" >>${LOG_FILE} 2>&1
+#删除根文件系统/target 目录
+echo "---------->>>>>>>>>000000 10" >>${LOG_FILE} 2>&1
+deploy_hashvalue=`ostree admin status --sysroot=/tmp/ostree/sysroot | head -n 1 | awk -F " " '{print $2}'`
+echo "$deploy_hashvalue" >>${LOG_FILE} 2>&1
+
+umount /tmp/ostree/sysroot/boot
+rm -r /target/*
+echo "---------->>>>>>>>>000000 11" >>${LOG_FILE} 2>&1
+# 后续考虑找到对应的deploy节点，修改其权限，使用mv操作
+#rsync -a /tmp/ostree/sysroot/* /target/
+chattr -i "/tmp/ostree/sysroot/ostree/deploy/lingmo/deploy/$deploy_hashvalue"
+mv /tmp/ostree/sysroot/* /target/
+rm -r /tmp/ostree/sysroot/
+chattr +i "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue"
+echo "---------->>>>>>>>>000000 12" >>${LOG_FILE} 2>&1
+
+mount --bind "/target" "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sysroot"
+mount "${boot_part}" "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sysroot/boot"
+[ -d /target/boot/efi ] || mkdir /target/boot/efi
+mount "${efi_part}" "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sysroot/boot/efi"
+mount --bind "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sysroot/boot" "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/boot"
+mount --bind "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sysroot/boot/efi" "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/boot/efi"
+mount --bind /dev "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/dev"
+mount --bind /dev/pts "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/dev/pts"
+mount --bind /proc "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/proc"
+mount --bind /sys "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sys"
+mount --bind /sys/firmware/efi/efivars "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue/sys/firmware/efi/efivars"
+chroot "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue" grub-install >>${LOG_FILE} 2>&1
+chroot "/target/ostree/deploy/lingmo/deploy/$deploy_hashvalue" update-grub -v -u >>${LOG_FILE} 2>&1

@@ -1,0 +1,104 @@
+name: Check build
+
+on:
+  push:
+    branches:
+      - master
+    
+  pull_request:
+    branches:
+      - master
+
+  schedule:
+    - cron: '0 0 * * *'
+  
+jobs:
+  archlinux-latest:
+    name: on Archlinux Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/archlinux:latest
+    steps:
+      - name: Checkout qt5-lingmo-platformtheme source code
+        uses: actions/checkout@v2
+      - name: Refresh pacman repository
+        run: pacman -Sy
+      - name: Install build dependencies
+        run: pacman -S --noconfirm base-devel qt5-base gsettings-qt kwindowsystem qt5-tools dconf glibc
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+
+  debian-sid:
+    name: on Debian Sid
+    runs-on: ubuntu-20.04
+    container: docker.io/library/debian:sid
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Checkout qt5-lingmo-platformtheme source code
+        uses: actions/checkout@v2
+      - name: Update apt repository
+        run: apt-get update -y
+      - name: Install build dependcies
+        run: apt-get install -y build-essential qttools5-dev-tools debhelper-compat pkg-kde-tools libglib2.0-dev libqt5x11extras5-dev libkf5windowsystem-dev libgsettings-qt-dev pkg-config qt5-qmake qtbase5-dev qtbase5-dev-tools qtbase5-private-dev qtchooser qttools5-dev-tools
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake ..;
+          make -j$(nproc);
+  
+  fedora-latest:
+    name: on Fedora Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:latest
+    steps:
+      - name: Checkout qt5-lingmo-platformtheme source code
+        uses: actions/checkout@v2
+      - name: Install build dependencies
+        run: dnf install -y which gcc gcc-c++ make cmake cmake-rpm-macros autoconf automake intltool rpm-build qt5-rpm-macros  glib2-devel qt5-qtx11extras-devel kf5-kwindowsystem-devel gsettings-desktop-schemas-devel qt5-qtbase-devel qt5-qtbase-private-devel qt5-qtbase-static qt5-qttools-devel gsettings-qt-devel
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+  
+  fedora-rawhide:
+    name: on Fedora Rawhide
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:rawhide
+    steps: 
+      - name: Checkout explor source code
+        uses: actions/checkout@v2
+      - name: Install build dependencies
+        run: dnf install --refresh --nogpg -y make gcc gcc-c++ which cmake cmake-rpm-macros autoconf automake intltool rpm-build qt5-rpm-macros glib2-devel qt5-qtx11extras-devel kf5-kwindowsystem-devel gsettings-desktop-schemas-devel qt5-qtbase-devel qt5-qtbase-private-devel qt5-qtbase-static qt5-qttools-devel gsettings-qt-devel
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+
+  ubuntu-latest:
+    name: on Ubuntu Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:latest
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Checkout qt5-lingmo-platformtheme source code
+        uses: actions/checkout@v2
+      - name: Update apt repository
+        run: apt-get update -y
+      - name: Install build dependcies
+        run: apt-get install -y build-essential qt5-default qttools5-dev-tools qtmultimedia5-dev debhelper-compat pkg-kde-tools libglib2.0-dev libqt5x11extras5-dev libkf5windowsystem-dev libgsettings-qt-dev pkg-config qt5-qmake qtbase5-dev qtbase5-dev-tools qtbase5-private-dev  qtchooser qttools5-dev-tools
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake ..;
+          make -j$(nproc);

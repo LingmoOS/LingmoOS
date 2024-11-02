@@ -1,0 +1,55 @@
+.TH "LIBKYHWINFO" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_usb_get_list, kdk_usb_free - 获取usb信息
+.SH SYNOPSIS
+.nf
+.B #include <libkyusb.h>
+.sp
+.BI "extern pDriverInfoList kdk_usb_get_list();" 
+.sp
+.BI "extern void kdk_usb_free(pDriverInfoList "list ");" 
+.sp
+Link with \fI\-lkyusb\fP.
+.SH "Detailed Description"
+This library contains usb information.
+.SH DATA STRUCTURES
+
+Structure \fBpDriverInfoList\fR contains information related to a usb information:
+
+\fBtypedef struct driver_list {
+.br
+	struct driver_info *data;
+    struct driver_list *next;
+.br
+}  DriverInfoList, *pDriverInfoList;\fP
+
+There are other members not documented here, which are only meant for
+libkyusb internal use.
+
+Structure \fBdriver_info\fR contains information related to a usb information:
+
+\fBtypedef struct driver_info {
+.br
+	char name[32]; //名称
+    char type[2 + 1]; //类型
+    char pid[4 + 1];
+    char vid[4 + 1];
+    char serialNo[32]; //序列号
+    char devNode[32]; //路径
+.br
+} DriverInfo, *pDriverInfo;\fP
+
+There are other members not documented here, which are only meant for
+libkyusb internal use.
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_usb_get_list ()
+and
+.BR kdk_usb_free ().
+.SH "SEE ALSO"
+.BR kdk_usb_get_list (3)
+and
+.BR kdk_usb_free (3).

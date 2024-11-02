@@ -1,0 +1,102 @@
+<HTML>
+    <HEAD>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>主板信息测试页面</title>
+  <script type="text/javascript" src="./js/service.js"></script>
+  <script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
+  <script src="./js/qwebchannel.js"></script>
+      <TITLE>主板信息测试页面</TITLE>
+      <SCRIPT language=JavaScript>
+              var websocket_url = 'ws://localhost:12345';
+              var websocket = null;
+
+              if (websocket === null) {
+                  websocket = new WebSocket(websocket_url);
+                  websocket.onopen = function () {
+                      console.log("connect websocketserver success");
+                  }
+              } else {
+                  websocket.close();
+                  websocket = null;
+              }
+
+              function getMainboardName() {
+                  console.log("getMainboardName")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          var mainboard = channel.objects.mainboard;
+                          mainboard.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              res.innerHTML = message;
+                          });
+                          mainboard.getMainboardName();
+                          }
+                      );
+              }
+              function getMainboardDate() {
+                  console.log("getMainboardDate")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          var mainboard = channel.objects.mainboard;
+                          mainboard.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              res.innerHTML = message;
+                          });
+                          mainboard.getMainboardDate();
+                          }
+                      );
+              }
+              function getMainboardSerial() {
+                  console.log("getMainboardSerial")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          var mainboard = channel.objects.mainboard;
+                          mainboard.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              res.innerHTML = message;
+                          });
+                          mainboard.getMainboardSerial();
+                          }
+                      );
+              }
+              function getMainboardVendor() {
+                  console.log("getMainboardVendor")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          var mainboard = channel.objects.mainboard;
+                          mainboard.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              res.innerHTML = message;
+                          });
+                          mainboard.getMainboardVendor();
+                          }
+                      );
+              }
+              
+        //-->
+      </SCRIPT>
+      <META content="MSHTML 6.00.2900.6287" name=GENERATOR>
+      <style>
+        table tr td{padding: 5px;}
+      </style>
+  
+    </HEAD>
+    <BODY>
+      <div style="margin:30 5 20 5">
+        <div>
+          <input onclick="getMainboardName()" type="button" value="主板型号"  style="width: 100px; height: 50px">
+          <input onclick="getMainboardDate()" type="button" value="发布日期"  style="width: 100px; height: 50px">
+          <input onclick="getMainboardSerial()" type="button" value="主板序列号"  style="width: 100px; height: 50px">
+          <input onclick="getMainboardVendor()" type="button" value="主板厂商"  style="width: 100px; height: 50px">
+        
+        </div>
+        <div style="margin-top:20">
+          <div align=left style="margin:5 0 5 0">回复：</div>
+          <div>
+          <textarea id="res" style="width:1000px;height:500px" ></textarea>
+          </div>
+        </div>
+      </div>
+    </BODY>
+  </HTML>
+  

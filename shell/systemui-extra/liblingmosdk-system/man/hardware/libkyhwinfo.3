@@ -1,0 +1,105 @@
+.TH "LIBKYHWINFO" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_hw_get_hwinfo, kdk_hw_free_hw, kdk_hw_get_powerinfo, kdk_hw_free_power_info - 获取键盘，鼠标，声卡，光驱，usb和电源硬件信息
+.SH SYNOPSIS
+.nf
+.B #include <libkyhw.h>
+.sp
+.BI "extern struct HWInfo *kdk_hw_get_hwinfo(int "type ");" 
+.sp
+.BI "extern void kdk_hw_free_hw(struct HWInfo *"list ");" 
+.sp
+.BI "extern struct Power *kdk_hw_get_powerinfo();" 
+.sp
+.BI "extern void kdk_hw_free_power_info(struct Power *"info ");" 
+.sp
+Link with \fI\-lkyhwinfo\fP.
+.SH "Detailed Description"
+This library contains keyboard, mouse, sound card, optical drive, USB and power supply hardware information.
+.SH DATA STRUCTURES
+
+Structure \fBHWInfo\fR contains information related to a keyboard, mouse, sound card, optical drive, USB hardware information:
+
+\fBstruct HWInfo {
+.br
+	char model[ATTRSIZE];
+    char vendor[ATTRSIZE];
+    char device[ATTRSIZE];
+    char driver[ATTRSIZE];
+    char revision[ATTRSIZE];
+    char busid[ATTRSIZE];
+    char devicenum[ATTRSIZE];
+    char width[8];
+    char clock[8];
+    struct HWInfo *next;
+.br
+};\fP
+
+There are other members not documented here, which are only meant for
+libkyhwinfo internal use.
+
+Structure \fBPower\fR contains information related to a power supply information:
+
+\fBstruct Power {
+.br
+	char daemon_version[32];
+    bool on_battery;
+    bool lid_is_closed;
+    bool lid_is_present;
+    char critical_action[32];
+    struct power_device *devices;
+.br
+};\fP
+
+There are other members not documented here, which are only meant for
+libkyhwinfo internal use.
+
+Structure \fBpower_device\fR contains information related to a power supply specific information:
+
+\fBstruct power_device {
+.br
+	char name[256];
+    char native_path[32];
+    bool power_supply;
+    char updated[64];
+    bool has_history;
+    bool has_statistics;
+    bool is_persent;
+    bool is_rechargeable;
+    char state[32];
+    char warning_level[32];
+    double energy;
+    double energy_empty;
+    double energy_full;
+    double energy_full_design;
+    double energy_rate;
+    double voltage;
+    long time_to_empty;
+    long time_to_full;
+    double percentage;
+    double temperature;
+    double capacity;
+    char technology[32];
+    bool online;
+    char icon_name[64];
+    struct power_device *next;
+.br
+};\fP
+
+There are other members not documented here, which are only meant for libkyhwinfo internal use.
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_hw_get_hwinfo (),
+.BR kdk_hw_free_hw (),
+.BR kdk_hw_get_powerinfo ()
+and
+.BR kdk_hw_free_power_info ().
+.SH "SEE ALSO"
+.BR kdk_hw_get_hwinfo (3),
+.BR kdk_hw_free_hw (3),
+.BR kdk_hw_get_powerinfo (3)
+and
+.BR kdk_hw_free_power_info (3).

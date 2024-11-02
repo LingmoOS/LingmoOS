@@ -1,0 +1,146 @@
+Source: lingmo-search
+Section: utils
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Build-Depends: debhelper-compat (=12),
+               pkgconf,
+               libgsettings-qt-dev,
+               qtbase5-dev,
+               qt5-qmake,
+               qtchooser,
+               qtscript5-dev,
+               qttools5-dev,
+               libxapian-dev,
+               libquazip5-dev(>=0.7.6-6build1),
+               libglib2.0-dev,
+               libkf5windowsystem-dev,
+               libqt5x11extras5-dev,
+               libuchardet-dev,
+               libpoppler-qt5-dev,
+               liblingmo-log4qt-dev,
+               libqt5xdg-dev,
+               libukcc-dev,
+               libtesseract-dev,
+               libleptonica-dev,
+               liblingmosdk-waylandhelper-dev,
+               liblingmosdk-qtwidgets-dev,
+               liblingmo-appwidget-manager-dev,
+               liblingmo-appwidget-provider-dev,
+               liblingmo-appwidget-qmlplugin0,
+               qtdeclarative5-dev,
+               cmake,
+               libgoogle-perftools-dev,
+               libqt5remoteobjects5-dev,
+               liblingmosdk-systime-dev,
+               liblingmosdk-datacollect-dev,
+               liblingmo-file-metadata-dev,
+               liblingmo-ai-base-dev,
+               liblingmo-quick-dev,
+               libkf5wayland-dev
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
+Homepage: https://www.lingmo.org/
+
+Package: lingmo-search
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         liblingmo-search2 (= ${binary:Version}),
+         lingmo-search-service (= ${binary:Version}),
+Description: A user-wide desktop search application
+ This package contains a user interface that
+ includes global search functions such as
+ applications, settings, files, etc.
+
+Package: lingmo-search-service
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+Replaces: liblingmo-search0,liblingmo-search2 (<=4.0.1.1-ok0~0419)
+Breaks: liblingmo-search0,liblingmo-search2 (<=4.0.1.1-ok0~0419)
+Description: Data service for search function in LINGMO desktop environment.
+ This package contains a backend service of
+ file indexing and applications data collection,
+ which based on xapian and sqlite.
+
+Package: libchinese-segmentation1
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libchinese-segmentation-common (= ${source:Version}),
+Description: Libraries for natural language processing
+ A runtime library implements multiple word processing functions,
+ such as Chinese keyword extraction,Conversion of Chinese
+ characters to Pinyin, etc.
+ .
+ This package contains a runtime library needed by 
+ file index function in lingmo-search-service.
+
+Package: libchinese-segmentation-common
+Architecture: any
+Depends: ${misc:Depends},
+Replaces: libchinese-segmentation0,libchinese-segmentation1 (<=4.0.1.1-ok0~0419)
+Breaks: libchinese-segmentation0,libchinese-segmentation1 (<=4.0.1.1-ok0~0419)
+Description: Extra files for libchinese-segmentation1
+ This package contains multiple dict files for
+ Chinese keyword extraction and Conversion of
+ Chinese characters to Pinyin
+ .
+ This package contains dicts used by libchinese-segmentation1.
+
+Package: libchinese-segmentation-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libchinese-segmentation1 (= ${binary:Version}),
+Description: Libraries for natural language processing(development files).
+ The package libchinese-segmentation1 implements multiple word processing functions,
+ such as Chinese keyword extraction,Conversion of Chinese
+ characters to Pinyin, etc.
+
+Package: liblingmo-search2
+Section: libs
+Architecture: any
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         libchinese-segmentation1 (= ${binary:Version}),
+         liblingmo-search-common (= ${source:Version}),
+         lingmo-search-systemdbus (= ${binary:Version})
+Provides: liblingmo-search,
+Description: Libraries for lingmo-search.
+  Run time library for lingmo-search and lingmo-search-service,
+  also provide some extension modules, such as
+  some search plugins.
+ .
+ This package contains a runtime library needed by
+ lingmo-search and it's extensions.
+
+Package: liblingmo-search-common
+Architecture: any
+Depends: ${misc:Depends},
+Replaces: lingmo-search (<= 3.14.0.6-ok2~0720),liblingmo-search0,liblingmo-search2 (<=4.0.1.1-ok0~0419)
+Breaks: lingmo-search (<= 3.14.0.6-ok2~0720),liblingmo-search0,liblingmo-search2 (<=4.0.1.1-ok0~0419)
+Description: Extra files for liblingmo-search
+ This package contains some extra files for
+ liblingmo-search2, like translation files,
+ configs, etc.
+
+Package: liblingmo-search-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         liblingmo-search2 (= ${binary:Version}),
+Description: Libraries for lingmo-search(development files).
+ This package contains development files for liblingmo-search2,
+ may be used to develop plugins for lingmo-search, and used to
+ get applications data currently installed.
+
+Package: lingmo-search-systemdbus
+Architecture: any
+Depends: ${shlibs:Depends}, 
+         ${misc:Depends},
+Description: Systembus interface for lingmo-search-service.
+ This package providing a system dbus service for
+ lingmo-search-service, used to modify some system config(about inotify)
+ as root user.

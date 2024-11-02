@@ -1,0 +1,12 @@
+#ifndef KCHOICEIMG_GLOBAL_H
+#define KCHOICEIMG_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(KCHOICEIMG_LIBRARY)
+#  define KCHOICEIMGSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define KCHOICEIMGSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // KCHOICEIMG_GLOBAL_H

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" == "true" ]]; then
+  return 0
+elif [[ "${is_ghost}" == "true" ]]; then
+  return 0
+fi
+
+[ -d /cdrom/pool ] || \
+  return 0
+
+#sed -i "s/^/#/g" /etc/apt/sources.list
+
+#TODO, 优化获取方式
+CODENAME=$(ls -l /cdrom/dists | awk '/^d/{print $NF}')
+
+mv /target/etc/apt/sources.list{,.bak}
+echo "deb file:/cdrom ${CODENAME} main" >>/target/etc/apt/sources.list
+
+# todo, set timeout
+chroot /target apt-get update --allow-insecure-repositories -y

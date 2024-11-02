@@ -1,0 +1,48 @@
+.TH "KDK_GET_DISKLISK" 3 "Thu Aug 10 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_get_disklist - 获取磁盘列表信息
+.SH SYNOPSIS
+.nf
+.B #include <libkydiskinfo.h>
+.sp
+.BI "extern char** kdk_get_disklist();" 
+.sp
+Link with \fI\-lkydiskinfo\fP.
+.SH "Detailed Description"
+The
+.BR kdk_get_disklist()
+function obtains disk list information during the call process.
+.SH "RETURN VALUE"
+The return value is a char** type, with each string representing the absolute path of a disk and ending with a NULL character.
+.PP 
+After completion,
+.BR kdk_free_disklist()
+function releases a list of disk information.
+.SH EXAMPLES
+.EX
+#include "libkydiskinfo.h"
+#include <stdio.h>
+
+int main()
+{
+    char **disklist = kdk_get_disklist();
+    for (int i = 0; disklist[i]; i ++)
+    {
+        printf("%s\n", disklist[i]);
+    }
+
+    kdk_free_disklist(disklist);
+
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_get_diskinfo (),
+.BR kdk_get_hard_disk (),
+and
+.BR kdk_get_hard_disk_size ().
+.SH "SEE ALSO"
+.BR kdk_free_disklist (3),
+.BR kdk_get_diskinfo (3),
+.BR kdk_free_diskinfo (3)

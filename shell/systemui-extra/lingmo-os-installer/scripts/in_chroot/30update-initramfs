@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+if [[ $(uname -m) =~ 'sw_64' ]]; then
+    return 0
+fi
+
+if grep -q 'zh_CN' /etc/default/locale; then
+    touch /usr/share/initramfs-tools/scripts/lang_is_zh
+else
+    rm -f /usr/share/initramfs-tools/scripts/lang_is_zh || true
+fi
+
+if [[ -f /usr/sbin/update-initramfs ]]; then
+    msg "更新 initramfs"
+    update-initramfs -u
+    sync
+fi
+
+if [[ -f /usr/sbin/update-grub ]]; then
+    update-grub
+fi
+
+#
+if [[ "x`archdetect`" = "xloongarch64/generic" ]] && [[ -f /usr/sbin/grub-install ]]; then
+    grub-install || true
+fi
+
+if [[ "x`archdetect`" = "xloong64/generic" ]] && [[ -f /usr/sbin/grub-install ]]; then
+    grub-install || true
+fi

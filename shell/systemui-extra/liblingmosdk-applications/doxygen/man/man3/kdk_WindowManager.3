@@ -1,0 +1,899 @@
+.TH "kdk::WindowManager" 3 "Thu Oct 12 2023" "Version version:2.3" "LIBLINGMOSDK-APPLICATIONS" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk::WindowManager \- 通常用于对窗口的一些操作  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <windowmanager\&.h>\fP
+.PP
+Inherits QObject\&.
+.SS "Signals"
+
+.in +1c
+.ti -1c
+.RI "void \fBwindowAdded\fP (const WindowId &windowId)"
+.br
+.RI "窗口添加信号 "
+.ti -1c
+.RI "void \fBwindowRemoved\fP (const WindowId &windowId)"
+.br
+.RI "窗口删除信号 "
+.ti -1c
+.RI "void \fBactiveWindowChanged\fP (const WindowId &wid)"
+.br
+.RI "活动窗口改变信号 "
+.ti -1c
+.RI "void \fBwindowChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口改变信号 "
+.ti -1c
+.RI "void \fBcurrentDesktopChanged\fP ()"
+.br
+.RI "当前桌面改变信号 "
+.ti -1c
+.RI "void \fBisShowingDesktopChanged\fP ()"
+.br
+.RI "桌面显示状态变化信号 "
+.ti -1c
+.RI "void \fBtitleChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口标题改变信号 "
+.ti -1c
+.RI "void \fBiconChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口图标改变信号 "
+.ti -1c
+.RI "void \fBactiveChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口活动状态改变信号 "
+.ti -1c
+.RI "void \fBfullscreenChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口全屏状态改变信号 "
+.ti -1c
+.RI "void \fBkeepAboveChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口置顶状态改变信号 "
+.ti -1c
+.RI "void \fBminimizedChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口最小化状态改变信号 "
+.ti -1c
+.RI "void \fBmaximizedChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口最大化状态改变信号 "
+.ti -1c
+.RI "void \fBonAllDesktopsChanged\fP (const WindowId &wid)"
+.br
+.RI "onAllDesktopsChanged "
+.ti -1c
+.RI "void \fBdemandsAttentionChanged\fP (const WindowId &wid)"
+.br
+.RI "demandsAttention状态改变信号 "
+.ti -1c
+.RI "void \fBskipTaskbarChanged\fP (const WindowId &wid)"
+.br
+.RI "跳过任务栏状态改变信号 "
+.ti -1c
+.RI "void \fBskipSwitcherChanged\fP (const WindowId &wid)"
+.br
+.RI "跳过窗口选择器状态改变信号 "
+.ti -1c
+.RI "void \fBgeometryChanged\fP (const WindowId &wid)"
+.br
+.RI "窗口位置改变信号 "
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static \fBWindowManager\fP * \fBself\fP ()"
+.br
+.RI "self "
+.ti -1c
+.RI "static WindowInfo \fBgetwindowInfo\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口信息 "
+.ti -1c
+.RI "static WindowId \fBcurrentActiveWindow\fP ()"
+.br
+.RI "获取当前活动窗口 "
+.ti -1c
+.RI "static void \fBkeepWindowAbove\fP (const WindowId &windowId)"
+.br
+.RI "置顶窗口 "
+.ti -1c
+.RI "static QString \fBgetWindowTitle\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口标题 "
+.ti -1c
+.RI "static QIcon \fBgetWindowIcon\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口图标 "
+.ti -1c
+.RI "static QString \fBgetWindowGroup\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口所在组的组名 "
+.ti -1c
+.RI "static void \fBcloseWindow\fP (const WindowId &windowId)"
+.br
+.RI "关闭窗口 "
+.ti -1c
+.RI "static void \fBactivateWindow\fP (const WindowId &windowId)"
+.br
+.RI "激活窗口 "
+.ti -1c
+.RI "static void \fBmaximizeWindow\fP (const WindowId &windowId)"
+.br
+.RI "最大化窗口 "
+.ti -1c
+.RI "static void \fBminimizeWindow\fP (const WindowId &windowId)"
+.br
+.RI "最小化窗口 "
+.ti -1c
+.RI "static quint32 \fBgetPid\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口进程pid "
+.ti -1c
+.RI "static void \fBshowDesktop\fP ()"
+.br
+.RI "显示当前桌面 "
+.ti -1c
+.RI "static void \fBhideDesktop\fP ()"
+.br
+.RI "取消显示当前桌面 "
+.ti -1c
+.RI "static QString \fBcurrentDesktop\fP ()"
+.br
+.RI "获取当前桌面的名称 "
+.ti -1c
+.RI "static QList< WindowId > \fBwindows\fP ()"
+.br
+.RI "获取当前窗口列表 "
+.ti -1c
+.RI "static NET::WindowType \fBgetWindowType\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口类型，仅适用于X环境下，wayland下统一返回normal "
+.ti -1c
+.RI "static void \fBsetGeometry\fP (QWindow *window, const QRect &rect)"
+.br
+.RI "设置窗口位置 "
+.ti -1c
+.RI "static void \fBsetSkipTaskBar\fP (QWindow *window, bool skip)"
+.br
+.RI "设置是否跳过任务栏 "
+.ti -1c
+.RI "static void \fBsetSkipSwitcher\fP (QWindow *window, bool skip)"
+.br
+.RI "设置是否跳过窗口选择 "
+.ti -1c
+.RI "static bool \fBskipTaskBar\fP (const WindowId &windowId)"
+.br
+.RI "判断窗体是否跳过任务栏 "
+.ti -1c
+.RI "static bool \fBskipSwitcher\fP (const WindowId &windowId)"
+.br
+.RI "判断窗体是否跳过窗口选择 "
+.ti -1c
+.RI "static bool \fBisShowingDesktop\fP ()"
+.br
+.RI "判断桌面是否处于显示状态 "
+.ti -1c
+.RI "static void \fBsetOnAllDesktops\fP (const WindowId &windowId)"
+.br
+.RI "设置窗口在所有桌面中显示 "
+.ti -1c
+.RI "static bool \fBisOnAllDesktops\fP (const WindowId &windowId)"
+.br
+.RI "判断窗口在所有桌面中显示 "
+.ti -1c
+.RI "static bool \fBisOnCurrentDesktop\fP (const WindowId &id)"
+.br
+.RI "判断窗口是否在当前桌面 "
+.ti -1c
+.RI "static bool \fBisOnDesktop\fP (const WindowId &id, int desktop)"
+.br
+.RI "判断窗口是否在指定桌面 "
+.ti -1c
+.RI "static void \fBsetPanelTakefocus\fP (QWindow *window, bool flag)"
+.br
+.RI "设置panel属性窗体是否获取焦点，仅wayland环境下生效 "
+.ti -1c
+.RI "static void \fBdemandAttention\fP (const WindowId &wid)"
+.br
+.RI "发送demandAttention状态 "
+.ti -1c
+.RI "static QString \fBgetProcessName\fP (const WindowId &windowId)"
+.br
+.RI "获取窗口所属的进程名称 "
+.in -1c
+.SH "Detailed Description"
+.PP 
+通常用于对窗口的一些操作 
+
+
+.PP
+\fBSince\fP
+.RS 4
+1\&.2 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "static void kdk::WindowManager::activateWindow (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+激活窗口 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::activeChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口活动状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::activeWindowChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+活动窗口改变信号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::closeWindow (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+关闭窗口 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "static WindowId kdk::WindowManager::currentActiveWindow ()\fC [static]\fP"
+
+.PP
+获取当前活动窗口 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static QString kdk::WindowManager::currentDesktop ()\fC [static]\fP"
+
+.PP
+获取当前桌面的名称 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "void kdk::WindowManager::currentDesktopChanged ()\fC [signal]\fP"
+
+.PP
+当前桌面改变信号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::demandAttention (const WindowId & wid)\fC [static]\fP"
+
+.PP
+发送demandAttention状态 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::demandsAttentionChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+demandsAttention状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::fullscreenChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口全屏状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::geometryChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口位置改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static quint32 kdk::WindowManager::getPid (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口进程pid 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static QString kdk::WindowManager::getProcessName (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口所属的进程名称 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static QString kdk::WindowManager::getWindowGroup (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口所在组的组名 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static QIcon kdk::WindowManager::getWindowIcon (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口图标 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static WindowInfo kdk::WindowManager::getwindowInfo (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口信息 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static QString kdk::WindowManager::getWindowTitle (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口标题 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static NET::WindowType kdk::WindowManager::getWindowType (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+获取窗口类型，仅适用于X环境下，wayland下统一返回normal 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::WindowManager::iconChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口图标改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::isOnAllDesktops (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+判断窗口在所有桌面中显示 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::isOnCurrentDesktop (const WindowId & id)\fC [static]\fP"
+
+.PP
+判断窗口是否在当前桌面 
+.PP
+\fBParameters\fP
+.RS 4
+\fI窗口id\fP 
+.RE
+.PP
+\fBSince\fP
+.RS 4
+2\&.1 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::isOnDesktop (const WindowId & id, int desktop)\fC [static]\fP"
+
+.PP
+判断窗口是否在指定桌面 
+.PP
+\fBParameters\fP
+.RS 4
+\fI窗口id\fP 
+.br
+\fI桌面id\fP 
+.RE
+.PP
+\fBSince\fP
+.RS 4
+2\&.1 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::isShowingDesktop ()\fC [static]\fP"
+
+.PP
+判断桌面是否处于显示状态 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::WindowManager::keepAboveChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口置顶状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::keepWindowAbove (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+置顶窗口 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::maximizedChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口最大化状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::maximizeWindow (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+最大化窗口 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::minimizedChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口最小化状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::minimizeWindow (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+最小化窗口 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::onAllDesktopsChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+onAllDesktopsChanged 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static \fBWindowManager\fP* kdk::WindowManager::self ()\fC [static]\fP"
+
+.PP
+self 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::setGeometry (QWindow * window, const QRect & rect)\fC [static]\fP"
+
+.PP
+设置窗口位置 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindow\fP 
+.br
+\fIrect\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::setOnAllDesktops (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+设置窗口在所有桌面中显示 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::setPanelTakefocus (QWindow * window, bool flag)\fC [static]\fP"
+
+.PP
+设置panel属性窗体是否获取焦点，仅wayland环境下生效 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindow\fP 
+.br
+\fIflag\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::setSkipSwitcher (QWindow * window, bool skip)\fC [static]\fP"
+
+.PP
+设置是否跳过窗口选择 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindow\fP 
+.br
+\fIskip\fP 
+.RE
+.PP
+
+.SS "static void kdk::WindowManager::setSkipTaskBar (QWindow * window, bool skip)\fC [static]\fP"
+
+.PP
+设置是否跳过任务栏 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindow\fP 
+.br
+\fIskip\fP 
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::skipSwitcher (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+判断窗体是否跳过窗口选择 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::WindowManager::skipSwitcherChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+跳过窗口选择器状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "static bool kdk::WindowManager::skipTaskBar (const WindowId & windowId)\fC [static]\fP"
+
+.PP
+判断窗体是否跳过任务栏 
+.PP
+\fBSince\fP
+.RS 4
+2\&.0 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+.RE
+.PP
+
+.SS "void kdk::WindowManager::skipTaskbarChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+跳过任务栏状态改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::titleChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口标题改变信号 
+.PP
+\fBSince\fP
+.RS 4
+2\&.3 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::windowAdded (const WindowId & windowId)\fC [signal]\fP"
+
+.PP
+窗口添加信号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::windowChanged (const WindowId & wid)\fC [signal]\fP"
+
+.PP
+窗口改变信号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwid\fP 
+.RE
+.PP
+
+.SS "void kdk::WindowManager::windowRemoved (const WindowId & windowId)\fC [signal]\fP"
+
+.PP
+窗口删除信号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIwindowId\fP 
+.RE
+.PP
+
+.SS "static QList<WindowId> kdk::WindowManager::windows ()\fC [static]\fP"
+
+.PP
+获取当前窗口列表 
+.PP
+\fBReturns\fP
+.RS 4
+
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for LIBLINGMOSDK-APPLICATIONS from the source code\&.

@@ -1,0 +1,107 @@
+.TH "KDK_EDID_GET_PRIMARY" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_edid_get_primary - 获取是否是主显示器（是/否）
+.SH SYNOPSIS
+.nf
+.B #include <libkyedid.h>
+.sp
+.BI "extern int kdk_edid_get_primary(char *"name ");"
+.sp
+Link with \fI\-lkyedid\fP.
+.SH "Detailed Description"
+The main function of the interface is to determine whether it is the main screen.
+.PP
+The argument
+.I name
+is the current interface of the screen.
+.SH "RETURN VALUE"
+On success, returns 1, which is the primary screen; Returns 0, not the primary screen.
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include "libkyedid.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char** name = kdk_edid_get_interface();
+    size_t count = 0;
+    while (name[count])
+    {
+        printf("当前接口 = %s\n", name[count]);
+        float gamma = kdk_edid_get_gamma(name[count]);
+        printf("gamma = %0.2f\n", gamma);
+        float size = kdk_edid_get_size(name[count]);
+        printf("size = %0.1f\n", size);
+        char *max_resolution = kdk_edid_get_max_resolution(name[count]);
+        printf("max_resolution = %s\n", max_resolution);
+        free(max_resolution);
+        char *model = kdk_edid_get_model(name[count]);
+        printf("model = %s\n", model);
+        free(model);
+        char *area = kdk_edid_get_visible_area(name[count]);
+        printf("area = %s\n", area);
+        free(area);
+        char *manufacturer = kdk_edid_get_manufacturer(name[count]);
+        printf("manufacturer = %s\n", manufacturer);
+        free(manufacturer);
+        int week = kdk_edid_get_week(name[count]);
+        printf("week = %d\n", week);
+        int year = kdk_edid_get_year(name[count]);
+        printf("year = %d\n", year);
+        int primary = kdk_edid_get_primary(name[count]);
+        printf("%s\n", primary == 1 ? "是" : "否");
+
+        char *resolution = kdk_edid_get_resolution(name[count]);
+        printf("resolution = %s\n", resolution);
+        free(resolution);
+
+        char *ratio = kdk_edid_get_ratio(name[count]);
+        printf("ratio = %s\n", ratio);
+        free(ratio);
+
+        char *character = kdk_edid_get_character(name[count]);
+        printf("character = %s\n", character);
+        free(character);
+
+        printf("---------------------------------------\n");
+        count ++;
+    }
+    kdk_edid_freeall(name);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_edid_get_interface (),
+.BR kdk_edid_get_gamma (),
+.BR kdk_edid_get_size (),
+.BR kdk_edid_get_max_resolution (),
+.BR kdk_edid_get_model (),
+.BR kdk_edid_get_visible_area (),
+.BR kdk_edid_get_manufacturer (),
+.BR kdk_edid_get_week (),
+.BR kdk_edid_get_year (),
+.BR kdk_edid_get_resolution (),
+.BR kdk_edid_get_ratio (),
+.BR kdk_edid_get_character ()
+and
+.BR kdk_edid_freeall ().
+.SH "SEE ALSO"
+.BR kdk_edid_get_interface (3),
+.BR kdk_edid_get_gamma (3),
+.BR kdk_edid_get_size (3),
+.BR kdk_edid_get_max_resolution (3),
+.BR kdk_edid_get_model (3),
+.BR kdk_edid_get_visible_area (3),
+.BR kdk_edid_get_manufacturer (3),
+.BR kdk_edid_get_week (3),
+.BR kdk_edid_get_year (3),
+.BR kdk_edid_get_resolution (3),
+.BR kdk_edid_get_ratio (3),
+.BR kdk_edid_get_character (3)
+and
+.BR kdk_edid_freeall (3).

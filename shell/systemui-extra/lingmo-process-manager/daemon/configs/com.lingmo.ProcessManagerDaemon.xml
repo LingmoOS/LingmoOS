@@ -1,0 +1,52 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+         "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+        <node name="/com/lingmo/ProcessManagerDaemon">
+          <interface name="com.lingmo.ProcessManagerDaemon">
+            <method name="CreateProcessGroup">
+                <arg name="groupPath" type="s" direction="in"/>
+                <arg name="controllers" type="as" direction="in"/>
+                <arg name="pids" type="ai" direction="in"/>
+                    <annotation name="org.qtproject.QtDBus.QtTypeName.In2" value="QList&lt;int>"/>
+                <arg name="succeed" type="b" direction="out"/>
+            </method>
+            <method name="SetProcessGroupResourceLimit">
+                <arg name="groupPath" type="s" direction="in"/>
+                <arg name="controller" type="s" direction="in"/>
+                <arg name="attrFile" type="s" direction="in"/>
+                <arg name="value" type="s" direction="in"/>
+                <arg name="succeed" type="b" direction="out"/>
+            </method>
+            <method name="MoveProcessToGroup">
+                <arg name="groupPath" type="s" direction="in"/>
+                <arg name="controllers" type="as" direction="in"/>
+                <arg name="pids" type="ai" direction="in"/>
+                    <annotation name="org.qtproject.QtDBus.QtTypeName.In2" value="QList&lt;int>"/>
+                <arg name="succeed" type="b" direction="out"/>
+            </method>
+            <method name="SetSystemdUnitPropertyEnabled">
+                <arg name="unitName" type="s" direction="in"/>
+                <arg name="propertyName" type="s" direction="in"/>
+                <arg name="enable" type="b" direction="in"/>
+            </method>
+            <signal name="ResourceThresholdWarning">
+                <arg name="resource" type="s"/>
+		<arg name="level" type="i"/>
+            </signal>
+            <method name="ReclaimProcesses">
+                <arg name="pids" type="ai" direction="in"/>
+                    <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QList&lt;int>"/>
+            </method>
+            <method name="ReclaimProcessGroups">
+                <arg name="groupNames" type="as" direction="in"/>
+            </method>
+            <method name="GetCpuEnergyConsumption">
+                <arg name="energyConsumption" type="d" direction="out"/>
+            </method>
+            <method name="GetGroupPids">
+                <arg name="groupName" type="s" direction="in"/>
+                <arg name="pids" type="ai" direction="out"/>
+                    <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QList&lt;int>"/>
+            </method>
+          </interface>
+          <node name="process manager daemon"/>
+       </node>

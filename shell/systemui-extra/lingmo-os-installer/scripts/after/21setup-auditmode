@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" == "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" == "true" ]]; then
+    return 0
+# audit mode
+elif [[ "${is_audit_mode}" == "false" ]]; then
+    return 0
+fi
+
+USERNAME=test
+PASSWORD=qwe123
+AUTO_LOGIN=1
+KUID=11111
+# sudo 免密
+echo "test ALL=(ALL) NOPASSWD: ALL" >/target/etc/sudoers.d/test
+
+### TODO, 重复代码
+# groups zz adm cdrom sudo dip plugdev lpadmin sambashare
+msg "设置用户 ${USERNAME}"
+chroot /target useradd -u ${KUID} -m -s /bin/bash "${USERNAME}"
+chroot /target sh -c "echo ${USERNAME}:${PASSWORD} | chpasswd"
+
+add_groups() {
+    user_default_groups=(adm cdrom sudo dip plugdev lpadmin sambashare debian-tor libvirtd lxd)
+    for group in ${user_default_groups[*]}; do
+        chroot /target sh -c 'adduser ${USERNAME} $group || true'
+    done
+}
+
+set_autologin() {
+    if [[ "${AUTO_LOGIN}" == "1" ]]; then
+        if [[ -d /target/etc/lightdm ]]; then
+            # Configure LightDM autologin
+            LightDMCustomFile=/target/etc/lightdm/lightdm.conf
+            AutologinParameters="autologin-guest=false\n\
+autologin-user=${USERNAME}\n\
+autologin-user-timeout=0"
+        if ! grep -qs '^autologin-user' ${LightDMCustomFile}; then
+                if ! grep -qs '^\[Seat:\*\]' ${LightDMCustomFile}; then
+                    echo '[Seat:*]' >>${LightDMCustomFile}
+                fi
+                sed -i "s/\[Seat:\*\]/\[SeatDefaults]\n${AutologinParameters}/" ${LightDMCustomFile}
+            # 设置 test 自动登录
+            else
+                sed -i "s/^autologin-user=.*$/autologin-user=${USERNAME}/g" ${LightDMCustomFile}
+            fi
+        fi
+    fi
+}
+
+add_groups
+
+set_autologin
+
+if [[ "${is_audit_mode}" == "true" ]]; then
+    chroot /target /bin/sh -c "unset DEBIAN_HAS_FRONTEND && apt-get install -y lingmo-audit-mode"
+fi

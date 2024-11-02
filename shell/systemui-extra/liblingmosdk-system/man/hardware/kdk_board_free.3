@@ -1,0 +1,59 @@
+.TH "KDK_BOARD_FREE" 3 "Thu Aug 14 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_board_free - 释放内存
+.SH SYNOPSIS
+.nf
+.B #include <libkybios.h>
+.sp
+.BI "extern void kdk_board_free(char *info);"
+.sp
+Link with \fI\-lkyhw\fP.
+.SH "Detailed Description"
+The main function of this interface is to release the string returned by the mainboard module interface.
+.PP
+The argument
+.I info
+is the return value of the 
+.BI kdk_board_get_name,
+.BI kdk_board_get_vendor,
+.BI kdk_board_get_serial,
+or 
+.BI kdk_board_get_date
+of the functions
+.SH "RETURN VALUE"
+No return value
+.SH EXAMPLES
+.EX
+#include "stdio.h"
+#include "libkyboard.h"
+
+int main()
+{
+    char *name = kdk_board_get_name();
+    char *vendor = kdk_board_get_vendor();
+    char *date = kdk_board_get_date();
+    char *serial = kdk_board_get_serial();
+    printf("name : %s", name);
+    printf("vendor : %s", vendor);
+    printf("date : %s", date);
+    printf("serial : %s", serial);
+    kdk_board_free(name);
+    kdk_board_free(vendor);
+    kdk_board_free(date);
+    kdk_board_free(serial);
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_board_get_serial (),
+.BR kdk_board_get_date (),
+.BR kdk_board_get_name ()
+and
+.BR kdk_board_get_vendor ().
+.SH "SEE ALSO"
+.BR kdk_board_get_serial (3),
+.BR kdk_board_get_date (3),
+.BR kdk_board_get_name (3)
+and
+.BR kdk_board_get_vendor (3).

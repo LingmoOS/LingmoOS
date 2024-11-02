@@ -1,0 +1,54 @@
+#应用名 
+#元素类型 defualt_version/version
+#应用名应唯一，且仅包含数字、字母、下划线和横线
+control-center:
+  #defualt_version： 默认版本。此配置可缺省,指定默认版本号
+  default_version: 2.0.0-0k0.0
+  #version ： 应用版本号，可存在不同版本号
+  #元素类型： enum/Component/key/compatible
+  2.0.0-0k0.0:
+    #compatible：版本兼容性。此配置可缺省，存储此版本可兼容的其他版本，兼容多个版本以'|'分割
+    compatible: 1.2.0-0k0.0
+    #children：标识组内元素为Component或enum
+    #元素类型： enum/Component
+    #children分组在实际使用中没有意义，仅用于在配置文件中区分Component和key。
+    #例如，需要查询子组件"noticeorigin"的配置，可以直接通过路径"control-center.noticeorigin"查询，而不是"control-center.children.noticeorigin"
+    children:
+      #enum：xml中的enum和flags合并为以enum表示
+      #枚举以enum_开头，后接枚举名，枚举名应唯一，同一版本号中不可存在同名枚举
+      enum_org.lingmo.control-center.noticeorigin.Type:
+      #nick代表枚举名，value代表枚举的值
+      - nick: none
+        value: '0'
+      - nick: corner
+        value: '1'
+      - nick: all
+        value: '2'
+      #Component 子组件名
+      #元素类型 enum/Component/key 
+      #子组件名仅包含数字、字母、下划线和横线
+      noticeorigin:
+        #keys：标识组内元素为key
+        #元素类型：key 
+        #keys分组在实际使用中没有意义，仅用于在配置文件中区分Component和key。
+        #例如，需要读取"type"的值，取得"control-center.noticeorigin"的配置句柄直接读取"type"，而不是取得"control-center.noticeorigin.keys"的句柄
+        keys:
+          #key： 键名
+          #在一个组件下不可存在同名的键
+          type:
+            #键的数据类型标签
+            #枚举类型为"enum"，其他数据类型同gsettings
+            _type: enum
+            #键的默认值
+            #符合类型标签格式的字符串，枚举类型为nick的数据
+            default: corner
+            #键的取值范围，不存在取值范围可缺省
+            #枚举类型使用@[枚举名],存在取值范围以[min,max]的形式写入
+            range: '@enum_org.lingmo.control-center.noticeorigin.Type'
+            #键的写入权限
+            #缺省或public为所有应用可写，private为不可写
+            permission: public
+            #键的说明 可以是空字符串
+            description: the type of notice in system.
+            #键的摘要 可以是空字符串
+            summary: type of notice message

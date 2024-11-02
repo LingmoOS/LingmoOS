@@ -1,0 +1,66 @@
+.TH "getCls" 3 "Wed Sep 20 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+getCls - 获取文字内容
+.SH SYNOPSIS
+.nf
+.B #include <libkyocr.hpp>
+.sp
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBkdk::kdkOCR\fP"
+.in -1c
+.sp
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "std::vector<std::string> getCls(const std::string &imagePath, int nums);" 
+.in -1c
+.sp
+Link with \fI\-lkyocr\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain text content.
+.PP
+The argument
+.I imagePath
+is the image file path.
+.PP
+The argument
+.I nums
+is the number of text stacks processed simultaneously.
+.SH "RETURN VALUE"
+Returns the text string in the image of type
+.BR std::vector<std::string>.
+.SH EXAMPLES
+.EX
+#include "libkyocr.hpp"
+#include "iostream"
+
+using namespace kdk;
+
+int main(){
+
+    std::string path = "./222.png";
+    std::string path2 = "./sdsd.png";
+    std::string path3 = "./222.jpg";
+    kdkOCR kd1;
+    //std::cout<<"aaaaaaaa";
+    std::vector<std::string> result;
+    result=kd1.getCls(path3,4);
+    std::cout<<result.size()<<std::endl;
+    for(int i=0; i<result.size();i++){
+        std::cout<<result[i]<<std::endl;//打印容器的内容
+    }
+    //kd1.getText(path);
+    return 0;
+};
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR getRect ().
+.SH "SEE ALSO"
+.BR getRect (3).

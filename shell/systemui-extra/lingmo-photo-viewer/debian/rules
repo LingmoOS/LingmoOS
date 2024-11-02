@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+
+export QT_SELECT=5
+
+QMAKE_OPTS = DEFINES+=NO_DEBUG_ON_CONSOLE
+MAKE_OPTS  = PREFIX=/usr QMAKE=qmake LRELEASE=lrelease QMAKE_OPTS="$(QMAKE_OPTS)"
+
+override_dh_auto_configure:
+	QT_SELECT=qt5 dh_auto_configure \
+                -- "QMAKE_CXXFLAGS=$(CFLAGS)" \
+                lingmo-photo-viewer.pro
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+
+%:
+	dh $@
+
+
+override_dh_missing:
+	dh_missing --fail-missing
+
+override_dh_auto_clean:
+	[ ! -d .moc ] || $(RM) -r .moc
+	[ ! -d .obj ] || $(RM) -r .obj
+	[ ! -d .ui ] || $(RM) -r .ui
+	[ ! -f Makefile ] || dh_auto_clean
+
+override_dh_auto_build:
+	dh_auto_build -- $(MAKE_OPTS)

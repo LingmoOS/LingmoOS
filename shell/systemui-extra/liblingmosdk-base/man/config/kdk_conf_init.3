@@ -1,0 +1,96 @@
+.TH "KDK_CONF_INIT" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_conf_init \- 初始化配置文件  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkyconf\&.h>\fP
+.br
+
+.SS "Functions"
+.PP 
+.SS "int kdk_conf_init (const char * confpath)"
+
+.PP
+初始化配置文件 
+.PP
+\fBParameters\fP
+.RS 4
+\fIconfpath\fP 配置文件的路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int 成功返回句柄号（非负值），失败返回错误码（负值） 
+.RE
+.PP
+Link with \fI\-lkyconf\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是初始化配置文件
+.SH EXAMPLES
+.EX
+#include <libkyconf.h>
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char **keylist = NULL;
+    int id = kdk_conf_init("struct.conf");
+    ASSERT_NOT_NULL(id, -1);
+
+    char **grouplist = kdk_conf_list_group(id);
+    ASSERT_NOT_NULL(grouplist, -1);
+
+    char *tmpgroup;
+    int index = 0;
+    while ((tmpgroup = grouplist[index]))
+    {
+        printf("Group: %s\n", tmpgroup);
+        keylist = kdk_conf_list_key(id, tmpgroup);
+        ASSERT_NOT_NULL(keylist, -1);
+        char *tmpkey;
+        int k_index = 0;
+        while ((tmpkey = keylist[k_index]))
+        {
+            const char *tmpval = kdk_conf_get_value(id, tmpgroup, tmpkey);
+            printf("%s = %s\n", tmpkey , tmpval);
+            k_index ++;
+        }
+        kdk_config_freeall(keylist);
+
+        index ++;
+    }
+
+    kdk_conf_destroy(id);
+    kdk_config_freeall(grouplist);
+
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_conf_destroy (),
+.BR kdk_conf_reload (),
+.BR kdk_conf_get_value (),
+.BR kdk_conf_list_key (),
+.BR kdk_conf_list_group ()
+and
+.BR kdk_config_freeall ().
+.SH "SEE ALSO"
+.BR kdk_conf_destroy (3),
+.BR kdk_conf_reload (3),
+.BR kdk_conf_get_value (3),
+.BR kdk_conf_list_key (3),
+.BR kdk_conf_list_group (3)
+and
+.BR kdk_config_freeall (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkyconf.h from the source code\&.

@@ -1,0 +1,74 @@
+.TH "KDKVOLUMEBASECHARACTERCONVERT" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdkVolumeBaseCharacterConvert \- 字符格式单位进制转换
+.SH SYNOPSIS
+br
+.PP
+\fC#include <kyutils\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "int kdkVolumeBaseCharacterConvert (const char * origin_data, \fBKDKVolumeBaseType\fP result_base, char * result_data)"
+
+.PP
+字符格式单位进制转换 
+.PP
+\fBParameters\fP
+.RS 4
+\fIorigin_data\fP 原始字符类型的数据，以具体进制单位结束，如果没有，缺省为‘B’ 
+.br
+\fIresult_base\fP 期望的结果进制单位 
+.br
+\fIresult_data\fP 转化进制后的字符数据，带进制单位 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int 
+.RE
+.PP
+Link with \fI\-lkyutils\fP.
+.SH "Detailed Description"
+接口的主要功能是单位进制转换组件
+.SH EXAMPLES
+.EX
+#include "kyutils.h"
+
+#include <stdio.h>
+#include <string.h>
+
+
+int main()
+{
+
+
+    int ret = 0;
+
+    // 调用字符型数据单位转换接口
+    char  origin_data [20] = "10000.24MB";
+    char result_data [50] = {0};
+    ret = kdkVolumeBaseCharacterConvert(origin_data, KDK_GIGABYTE, result_data);
+    printf("%s\n", result_data);
+
+
+    // 调用数字型数据单位转换接口
+    // 此例亦可说明，在低进制不足以向高进制转换时，进制保持不变
+    double origin_numberical = 100.24;
+    double result_numberical;
+    ret = kdkVolumeBaseNumericalConvert(origin_numberical, KDK_MEGABYTE, KDK_GIGABYTE, &result_numberical);
+    printf("%.2f\n", result_numberical);
+
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdkVolumeBaseNumericalConvert ().
+.SH "SEE ALSO"
+.BR kdkVolumeBaseNumericalConvert (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for kyutils.h from the source code\&.

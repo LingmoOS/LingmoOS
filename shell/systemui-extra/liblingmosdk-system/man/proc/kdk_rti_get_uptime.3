@@ -1,0 +1,81 @@
+.TH "KDK_RTI_GET_UPTIME" 3 "Mon Sep 18 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_rti_get_uptime - 获取操作系统开机时长
+.SH SYNOPSIS
+.nf
+.B #include <libkyrtinfo.h>
+.sp
+.BI "extern int kdk_rti_get_uptime(unsigned int *"day ", unsigned int *"hour ", unsigned int *"min ", unsigned int *"sec ");" 
+.sp
+Link with \fI\-lkyrtinfo\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the operating system boot time.
+.PP
+The argument
+.I day
+is the number of days.
+The argument
+.I hour
+is the number of hours.
+The argument
+.I min
+is the number of minutes.
+The argument
+.I sec
+is the number of seconds.
+.SH "RETURN VALUE"
+On success, return
+.BR 0.
+.PP
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include "libkyrtinfo.h"
+#include <stdio.h>
+
+int main()
+{
+    printf("内存总大小：%lu KiB\n", kdk_rti_get_mem_res_total_KiB());
+    printf("当前已用内存：%lu KiB，%f\n", kdk_rti_get_mem_res_usage_KiB(), kdk_rti_get_mem_res_usage_percent());
+    printf("当前空闲内存：%lu KiB\n", kdk_rti_get_mem_res_free_KiB());
+    printf("可用内存大小：%lu KiB\n", kdk_rti_get_mem_res_available_KiB());
+    printf("应用总申请虚拟内存大小：%lu KiB\n", kdk_rti_get_mem_virt_alloc_KiB());
+    printf("交换分区总量：%lu KiB\n", kdk_rti_get_mem_swap_total_KiB());
+    printf("交换分区已用量：%lu KiB, %f\n", kdk_rti_get_mem_swap_usage_KiB(), kdk_rti_get_mem_swap_usage_percent());
+    printf("交换分区剩余大小：%lu KiB\n", kdk_rti_get_mem_swap_free_KiB());
+    printf("当前CPU使用率：%f\n", kdk_rti_get_cpu_current_usage());
+    unsigned int day, hour, min, sec;
+    kdk_rti_get_uptime(&day, &hour, &min, &sec);
+    printf("开机时长：%u天%u小时%u分钟%u秒\n", day, hour, min, sec);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_rti_get_mem_res_total_KiB (),
+.BR kdk_rti_get_mem_res_usage_percent (),
+.BR kdk_rti_get_mem_res_usage_KiB (),
+.BR kdk_rti_get_mem_res_available_KiB (),
+.BR kdk_rti_get_mem_res_free_KiB (),
+.BR kdk_rti_get_mem_virt_alloc_KiB (),
+.BR kdk_rti_get_mem_swap_total_KiB (),
+.BR kdk_rti_get_mem_swap_usage_percent (),
+.BR kdk_rti_get_mem_swap_usage_KiB (),
+.BR kdk_rti_get_mem_swap_free_KiB ()
+and
+.BR kdk_rti_get_cpu_current_usage ().
+.SH "SEE ALSO"
+.BR kdk_rti_get_mem_res_total_KiB (3),
+.BR kdk_rti_get_mem_res_usage_percent (3),
+.BR kdk_rti_get_mem_res_usage_KiB (3),
+.BR kdk_rti_get_mem_res_available_KiB (3),
+.BR kdk_rti_get_mem_res_free_KiB (3),
+.BR kdk_rti_get_mem_virt_alloc_KiB (),
+.BR kdk_rti_get_mem_swap_total_KiB (3),
+.BR kdk_rti_get_mem_swap_usage_percent (3),
+.BR kdk_rti_get_mem_swap_usage_KiB (3),
+.BR kdk_rti_get_mem_swap_free_KiB (3)
+and
+.BR kdk_rti_get_cpu_current_usage (3).

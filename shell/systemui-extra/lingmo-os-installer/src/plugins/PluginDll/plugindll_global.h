@@ -1,0 +1,12 @@
+#ifndef PLUGINDLL_GLOBAL_H
+#define PLUGINDLL_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(PLUGINDLL_LIBRARY)
+#  define PLUGINDLLSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define PLUGINDLLSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // PLUGINDLL_GLOBAL_H

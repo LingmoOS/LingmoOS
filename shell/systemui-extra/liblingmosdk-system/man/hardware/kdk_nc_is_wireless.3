@@ -1,0 +1,115 @@
+.TH "KDK_NC_IS_WIRELESS" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_nc_is_wireless - 获取指定网卡的有线/无线类型
+.SH SYNOPSIS
+.nf
+.B #include <libkync.h>
+.sp
+.BI "extern int kdk_nc_is_wireless(const char *"nc ");"
+.sp
+Link with \fI\-lkyhw\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the wired/wireless type of the specified NIC
+.I nc
+.
+.PP
+The argument
+.I nc
+is the name of the NIC, such as "eno1".
+.SH "RETURN VALUE"
+On success, the wireless returns 
+.BR 1
+and the wired returns
+.BR 0.
+.PP
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include "libkync.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char **cards = kdk_nc_get_cardlist();
+    size_t index = 0;
+    printf("所有网卡：\en");
+    while (cards[index])
+    {
+        char *mac = kdk_nc_get_phymac(cards[index]);
+        char *ipv4 = kdk_nc_get_private_ipv4(cards[index]);
+        char *ipv6 = kdk_nc_get_private_ipv6(cards[index]);
+        char *driver = kdk_nc_get_driver(cards[index]);
+        char vendor[256] = "\0", product[256] = "\0";
+        kdk_nc_get_vendor_and_product(cards[index], vendor, product);
+        printf("Card %zd: %s\tStatus: %s\tMac: %s\tIPv4: %s\tIPv6: %s\t Vendor: %s\t Product: %s\t Type: %s\t driver: %s\en",
+               index + 1, cards[index], kdk_nc_is_up(cards[index]) == 1 ? "Up" : "Down",
+               mac, ipv4, ipv6, vendor, product,
+               kdk_nc_is_wireless(cards[index]) ? "wireless" : "ethernet", driver);
+
+        char **list4 = kdk_nc_get_ipv4(cards[index]);
+        int i = 0;
+        printf("AllIpV4: ");
+        while (list4 && list4[i])
+        {
+            printf("%s\t", list4[i++]);
+        }
+        printf("\en");
+        char **list6 = kdk_nc_get_ipv6(cards[index]);
+        printf("AllIpV6: ");
+        i = 0;
+        while (list6 && list6[i])
+        {
+            printf("%s\t", list6[i++]);
+        }
+        printf("\en");
+        free(mac);
+        free(ipv4);
+        free(ipv6);
+        free(list4);
+        free(list6);
+        free(driver);
+        index++;
+    }
+    kdk_nc_freeall(cards);
+    char **upcards = kdk_nc_get_upcards();
+    index = 0;
+    printf("工作网卡：\en");
+    while (upcards[index])
+    {
+        printf("Card %zd: %s\en", index + 1, upcards[index]);
+        index++;
+    }
+    kdk_nc_freeall(upcards);
+    return 0;
+} 
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_nc_get_cardlist (),
+.BR kdk_nc_get_upcards (),
+.BR kdk_nc_get_phymac (),
+.BR kdk_nc_get_private_ipv4 (),
+.BR kdk_nc_get_ipv4 (),
+.BR kdk_nc_get_private_ipv6 (),
+.BR kdk_nc_get_ipv6 (),
+.BR kdk_nc_is_up (),
+.BR kdk_nc_get_vendor_and_product (),
+.BR kdk_nc_get_driver (),
+and
+.BR kdk_nc_freeall ().
+.SH "SEE ALSO"
+.BR kdk_nc_get_cardlist (3),
+.BR kdk_nc_get_upcards (3),
+.BR kdk_nc_get_phymac (3),
+.BR kdk_nc_get_private_ipv4 (3),
+.BR kdk_nc_get_ipv4 (3),
+.BR kdk_nc_get_private_ipv6 (3),
+.BR kdk_nc_get_ipv6 (3),
+.BR kdk_nc_is_up (3),
+.BR kdk_nc_get_vendor_and_product (3),
+.BR kdk_nc_get_driver (3),
+and
+.BR kdk_nc_freeall (3).

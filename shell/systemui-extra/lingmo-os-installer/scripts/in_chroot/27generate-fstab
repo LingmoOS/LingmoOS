@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -e
+
+# TODO, 多次重复
+disk=$(get_value devpath)
+if echo "${disk}" | grep -q nvme; then
+    disk=${disk}p
+fi
+
+readonly GENFSTAB="${IN_TARGET}"/in_chroot/genfstab
+if [[ -f "${GENFSTAB}" ]]; then
+    if [[ "${is_990_9a0}" = "true" ]]; then
+        bash "${GENFSTAB}" -p / >/etc/fstab
+        # 990, 9a0 不自动挂载 swapfile
+        sed -i "/${swap_file}/d" /etc/fstab
+        sed -i '/\/boot/s/rw,/ro,/g' /etc/fstab
+    else
+        bash "${GENFSTAB}" -p -U / >/etc/fstab
+    fi
+fi
+
+# 删除安装介质
+tac /etc/fstab | sed -n '/cdrom/,+1!p' | tac >/etc/fstab.new
+mv /etc/fstab.new /etc/fstab
+
+# 修改 /data, /backup 的 options
+#sed -n '/\/data /p' /etc/fstab |
+#    while read dev mp fs options; do
+#        sed -i "s/\\$mp .*/\\$mp     \t$fs     \trw,user,x-gvfs-show,nosuid,nofail     \t0 0/" /etc/fstab
+#    done
+
+sed -n '/\/backup /p' /etc/fstab |
+    while read dev mp fs options; do
+        sed -i "s/\\$mp .*/\\$mp     \t$fs     \tnoauto     \t0 0/" /etc/fstab
+    done
+
+# add bind
+if grep -q '/home' /proc/mounts; then
+    echo -e "/data/home     \t/home     \tnone     \tdefaults,bind     \t0 0" >>/etc/fstab
+fi
+if grep -q '/root' /proc/mounts; then
+    echo -e "/data/root     \t/root     \tnone     \tdefaults,bind     \t0 0" >>/etc/fstab
+fi

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+is_automatic=$(get_value automatic-installation)
+if [[ "${is_swapfile}" = "false" ]] || [[ "${is_990_9a0}" = "false" ]]; then
+    return 0
+fi
+
+ram=$(cat < /proc/meminfo  | grep ^MemTotal: | awk '{print $2}')
+
+
+### swapfile size
+swapfile=$(( ram * 12 / 1024 / 10 ))
+if [ $swapfile -gt 64000 ]; then
+    swapfile=64000
+fi
+
+do_setup_swapfile() {
+    dd if=/dev/zero of=/target/${swap_file} bs=1M count=${swapfile:-1}
+    chmod 0600 /target/${swap_file}
+    mkswap /target/${swap_file}
+    swapon /target/${swap_file}
+
+    offset=$(filefrag -v /target/${swap_file} | awk '{if($1=="0:"){print $4}}')
+    root=$(findmnt -rno SOURCE /target)
+
+    if [[ -f /target/etc/default/grub ]]; then
+        sed -ri "s@quiet splash@resume=${root} systemd.lingmo_force_hibernate=true resume_offset=${offset:0:-2} quiet splash@" /target/etc/default/grub
+    fi
+}
+
+do_setup_swapfile
+
+
+

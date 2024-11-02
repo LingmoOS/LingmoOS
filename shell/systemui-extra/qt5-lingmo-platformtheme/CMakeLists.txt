@@ -1,0 +1,8 @@
+project(qt5-lingmo)
+add_subdirectory(lingmo-styles)
+add_subdirectory(libqt5-lingmo-style)
+add_subdirectory(qt5-lingmo-filedialog)
+add_subdirectory(qt5-lingmo-platformtheme)
+add_subdirectory(lingmo-qqc2-style)
+add_subdirectory(lingmo-qml-style-helper)
+add_subdirectory(test)

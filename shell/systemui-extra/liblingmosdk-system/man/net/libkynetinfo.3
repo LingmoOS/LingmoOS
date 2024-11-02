@@ -1,0 +1,116 @@
+.TH "LIBKYHW" 3 "Thu Sep 14 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_net_get_port_stat, kdk_net_get_multiple_port_stat, kdk_net_get_route, kdk_net_free_route, kdk_net_get_iptable_rules,
+kdk_net_free_chain, kdk_net_get_netmask, kdk_net_get_proc_port, kdk_net_get_up_port, kdk_net_get_hosts, kdk_net_get_hosts_domain,
+kdk_net_get_resolv_conf, kdk_net_freeal  - 获取网络信息
+.SH SYNOPSIS
+.nf
+.B #include <libkynetinfo.h>
+.sp
+.BI "extern int kdk_net_get_port_stat(int "port ");" 
+.sp
+.BI "extern int kdk_net_get_multiple_port_stat(int "start ", int "end ", int *"result ");" 
+.sp
+.BI "extern prouteMapList kdk_net_get_route();" 
+.sp
+.BI "extern void kdk_net_free_route(prouteMapList "list ");" 
+.sp
+.BI "extern pChain kdk_net_get_iptable_rules();"
+.sp
+.BI "extern void kdk_net_free_chain(pChain "list ");"
+.sp
+.BI "extern void kdk_net_get_netmask(IN const char *"nc ", OUT char *"mask ");"
+.sp
+.BI "extern char **kdk_net_get_proc_port();"
+.sp
+.BI "extern char **kdk_net_get_up_port();"
+.sp
+.BI "extern char* kdk_net_get_hosts();"
+.sp
+.BI "extern char* kdk_net_get_hosts_domain();"
+.sp
+.BI "extern char** kdk_net_get_resolv_conf();"
+.sp
+.BI "extern inline void kdk_net_freeall(char **"ptr ");"
+.sp
+Link with \fI\-lkynetinfo\fP.
+.SH "Detailed Description"
+This library contains network information.
+.SH DATA STRUCTURES
+
+Structure \fBroute\fR contains information related to a Firewall:
+
+\fBtypedef struct route {
+.br
+	char name[32]; //网卡名
+    char addr[16]; //网关地址
+    struct route *next;
+.br
+} routeMapList, *prouteMapList;\fP
+
+There are other members not documented here, which are only meant for
+libkynetinfo internal use.
+
+Structure \fBchain\fR contains information related to a Gateway:
+
+\fBtypedef struct chain {
+.br
+	char total[16]; //链名
+    char policy[32]; //链的规则
+    pChainData data;
+    struct chain *next;
+.br
+} Chain, *pChain;\fP
+
+There are other members not documented here, which are only meant for
+libkynetinfo internal use.
+
+Structure \fBchain_data\fR contains information related to a Gateway specific information:
+
+\fBtypedef struct chain_data {
+.br
+	char target[8]; 
+    char prot[4 + 1];
+    char opt[4 + 1];
+    char source[32];
+    char destination[64];
+    char option[128];
+    struct chain_data *next;
+.br
+} chainData, *pChainData;\fP
+
+There are other members not documented here, which are only meant for libkynetinfo internal use.
+.SH "RETURN VALUE"
+The return value is generally specific to the individual function called.
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_net_get_multiple_port_stat (),
+.BR kdk_net_get_port_stat (),
+.BR kdk_net_get_route (),
+.BR kdk_net_get_iptable_rules (),
+.BR kdk_net_free_route (),
+.BR kdk_net_get_netmask (),
+.BR kdk_net_free_chain (),
+.BR kdk_net_get_up_port (),
+.BR kdk_net_get_hosts (),
+.BR kdk_net_get_hosts_domain (),
+.BR kdk_net_freeall (),
+.BR kdk_net_get_proc_port ()
+and
+.BR kdk_net_get_resolv_conf ().
+.SH "SEE ALSO"
+.BR kdk_net_get_multiple_port_stat (3),
+.BR kdk_net_get_port_stat (3),
+.BR kdk_net_get_route (3),
+.BR kdk_net_get_iptable_rules (3),
+.BR kdk_net_free_route (3),
+.BR kdk_net_get_netmask (3),
+.BR kdk_net_free_chain (3),
+.BR kdk_net_get_up_port (3),
+.BR kdk_net_get_hosts (3),
+.BR kdk_net_get_hosts_domain (3),
+.BR kdk_net_freeall (3),
+.BR kdk_net_get_proc_port (3)
+and
+.BR kdk_net_get_resolv_conf (3).

@@ -1,0 +1,100 @@
+.TH "KDK_PRINTER_CANCEL_ALL_JOBS" 3 "Fri Aug 25 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_printer_cancel_all_jobs - 清除某个打印机的所有打印队列
+.SH SYNOPSIS
+.nf
+.B #include <libkyprinter.h>
+.sp
+.BI "extern int kdk_printer_cancel_all_jobs(const char *"printername ");"
+.sp
+Link with \fI\-lkyprinter\fP.
+.SH "Detailed Description"
+The main function of the interface is to clears all print queues for a printer.
+.PP
+The argument
+.I printername
+is printer name,
+.I kdk_printer_get_list
+returned value.
+.SH "RETURN VALUE"
+On success, return 
+.BR 0.
+.PP
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include "libkyprinter.h"
+#include <stdio.h>
+
+int main()
+{
+    int index = 0;
+    //获取打印机列表
+    char **printers = kdk_printer_get_available_list();
+    while (printers[index])
+    {
+        printf("%zd: %s\n", index + 1, printers[index]);
+
+        //取消当前打印机所有打印任务
+        kdk_printer_cancel_all_jobs(printers[index]);
+
+        //获取url对应的文件名
+        char *url = "http://www.cztouch.com/upfiles/soft/testpdf.pdf";
+        int res = -1;
+        char *filename = kdk_printer_get_filename(url); //从完整路径名中解析出文件名称，例如：/home/test/abc.txt,解析完成后为abc.txt
+        printf("filename = %s\n", filename);
+
+        //设置打印参数
+        kdk_printer_set_options(2, "A4", "lrtb", "two-sided-long-edge");
+
+        //下载
+        res = kdk_printer_print_download_remote_file(url, filename);
+        printf("[%s] res = %d\n", __FUNCTION__, res);
+        printf("[%s] filepath = %s\n", __FUNCTION__, filename);
+
+        //打印
+        int job_id = kdk_printer_print_local_file(printers[index], filename);
+        if (job_id == 0)
+        {   
+            //打印失败
+            printf("[%s] create print job fail\n", __FUNCTION__);
+        }
+        else
+        {
+            //打印成功，等待一会获取任务状态
+            sleep(10);
+            int status = kdk_printer_get_job_status(printers[index], job_id);
+        }
+
+        index++;
+        free(filename);
+    }
+    kdk_printer_freeall(printers);
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_printer_get_list (),
+.BR kdk_printer_get_available_list (),
+.BR kdk_printer_set_options (),
+.BR kdk_printer_print_download_remote_file (),
+.BR kdk_printer_print_local_file (),
+.BR kdk_printer_get_status (),
+.BR kdk_printer_get_job_status (),
+.BR kdk_printer_get_filename ()
+and
+.BR kdk_printer_freeall ().
+.SH "SEE ALSO"
+.BR kdk_printer_get_list (3),
+.BR kdk_printer_get_available_list (3),
+.BR kdk_printer_set_options (3),
+.BR kdk_printer_print_download_remote_file (3),
+.BR kdk_printer_print_local_file (3),
+.BR kdk_printer_get_status (3),
+.BR kdk_printer_get_job_status (3),
+.BR kdk_printer_get_filename (3)
+and
+.BR kdk_printer_freeall (3).

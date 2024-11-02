@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" = "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" = "true" ]]; then
+    return 0
+fi
+
+LANGUAGE=$(get_value language)
+
+echo "zh_CN.UTF-8 UTF-8
+en_US.UTF-8 UTF-8
+zh_HK.UTF-8 UTF-8
+mn_MN.UTF-8 UTF-8
+bo_CN.UTF-8 UTF-8
+kk_KZ.UTF-8 UTF-8
+ug_CN.UTF-8 UTF-8
+ky_KG.UTF-8 UTF-8" >> /etc/locale.gen
+
+msg "设置语言为 ${LANGUAGE}"
+echo "LANG=${LANGUAGE}.UTF-8" >/etc/default/locale
+if [[ "${LANGUAGE}" = "zh_CN" ]]; then
+    echo "LANGUAGE=\"zh_CN:zh\"" >> /etc/default/locale
+elif [[ "${LANGUAGE}" = "bo_CN" ]]; then
+    echo "LANGUAGE=\"bo_CN:zh_CN:zh\"" >>/etc/default/locale
+elif [[ "${LANGUAGE}" = "zh_HK" ]]; then
+    echo "LANGUAGE=\"zh_HK:zh_CN:zh\"" >>/etc/default/locale
+elif [[ "${LANGUAGE}" = "mn_MN" ]]; then
+    echo "LANGUAGE=\"mn_MN\"" >>/etc/default/locale
+elif [[ "${LANGUAGE}" = "kk_KZ" ]]; then
+    echo "LANGUAGE=\"kk_KZ\"" >>/etc/default/locale
+elif [[ "${LANGUAGE}" = "ug_CN" ]]; then
+    echo "LANGUAGE=\"ug_CN\"" >>/etc/default/locale
+elif [[ "${LANGUAGE}" = "ky_KG" ]]; then
+    echo "LANGUAGE=\"ky_KG\"" >>/etc/default/locale
+fi
+
+locale-gen

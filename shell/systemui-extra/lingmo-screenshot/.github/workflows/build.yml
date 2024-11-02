@@ -1,0 +1,194 @@
+name: Check build
+
+on:
+  push:
+    branches:
+      - master
+    
+  pull_request:
+    branches:
+      - master
+
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  archlinux-latest:
+    name: on Archlinux Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/archlinux:latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Refresh Pacman repository
+        run: pacman -Sy
+      - name: Install basic dependencies
+        run: pacman -S --noconfirm base-devel cmake pkgconf
+      - name: Install latest basic Qt5 in repository
+        run: pacman -S --noconfirm qt5-base qt5-tools glibc
+      - name: Install project denpendencies
+        run: pacman -S --noconfirm qt5-svg ffmpeg libpulse qt5-x11extras libxfixes libx11 libxinerama
+      - name: QMake configure & Make
+        run: |
+          qmake-qt5 .;
+          make -j$(nproc);
+
+  debian-unstable:
+    name: on Debian Unstable
+    runs-on: ubuntu-20.04
+    container: docker.io/library/debian:sid
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Update APT repository
+        run:  apt-get update -y
+      - name: Install basic dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive            
+        run: apt-get -y install build-essential pkg-kde-tools pkg-config cmake
+      - name: Install latest basic Qt5 in repository
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install qt5-default qttools5-dev-tools qt5-qmake qtbase5-dev qtbase5-private-dev
+      - name: Install project denpendencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install libqt5svg5-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libpulse-dev libqt5x11extras5 libqt5x11extras5-dev libxfixes3 libxfixes-dev libx11-dev libxinerama1 libxinerama-dev
+      - name: QMake configure & Make
+        run: |
+          qmake .;
+          make -j$(nproc);
+
+  fedora-latest:
+    name: on Fedora Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Install basic debpendencies
+        run: dnf groupinstall -y "Development Tools"
+      - name: Install latest basic Qt5 in repository
+        run: dnf install -y qt5-devel qt5-qttools-devel qt5-qtbase-private-devel
+      - name: Add RPM Fusion repository
+        run: |
+          dnf -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+          dnf -y install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+      - name: Install project dependencies
+        run: dnf -y install ffmpeg-devel ffmpeg-libs pulseaudio-libs-devel qt5-qtx11extras-devel libXfixes-devel libX11-devel libXinerama-devel
+      - name: Apply patch
+        run: |
+          dnf -y install curl;
+          curl -O https://gist.githubusercontent.com/brsvh/fdc678b4528a5808f150ecb1dbf6d096/raw/3105d0460a23552a4fadc88e277ae13b12d812b9/ffmpeg.diff;
+          git apply ffmpeg.diff;
+          rm ffmpeg.diff;
+      - name: QMake configure & make
+        run: |
+          qmake-qt5 .;
+          make -j$(nproc);
+
+  fedora-rawhide:
+    name: on Fedora Rawhide
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:rawhide
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Install basic debpendencies
+        run: dnf groupinstall --nogpg -y "Development Tools"
+      - name: Install latest basic Qt5 in repository
+        run: dnf --nogpg install -y qt5-qttools-devel qt5-qtbase-private-devel
+      - name: Add RPM Fusion repository
+        run: |
+          dnf --nogpg -y install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+          dnf --nogpg -y install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+      - name: Install project dependencies
+        run: dnf --nogpg -y install ffmpeg-devel ffmpeg-libs pulseaudio-libs-devel qt5-qtsvg-devel qt5-qtx11extras-devel libXfixes-devel libX11-devel libXinerama-devel
+      - name: Apply patch
+        run: |
+          dnf -y install curl;
+          curl -O https://gist.githubusercontent.com/brsvh/fdc678b4528a5808f150ecb1dbf6d096/raw/3105d0460a23552a4fadc88e277ae13b12d812b9/ffmpeg.diff;
+          git apply ffmpeg.diff;
+          rm ffmpeg.diff;
+      - name: QMake configure & make
+        run: |
+          qmake-qt5 .;
+          make -j$(nproc);
+
+  ubuntu-focal:
+    name: on Ubuntu Focal
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:focal
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Update APT repository
+        run:  apt-get update -y
+      - name: Install basic dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive            
+        run: apt-get -y install build-essential pkg-kde-tools pkg-config cmake
+      - name: Install latest basic Qt5 in repository
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install qt5-default qttools5-dev-tools qt5-qmake qtbase5-dev qtbase5-private-dev
+      - name: Install project denpendencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install libqt5svg5-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libpulse-dev libqt5x11extras5 libqt5x11extras5-dev libxfixes3 libxfixes-dev libx11-dev libxinerama1 libxinerama-dev
+      - name: QMake configure & Make
+        run: |
+          qmake .;
+          make -j$(nproc);
+
+  ubuntu-devel:
+    name: on Ubuntu Devel
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:devel
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Update APT repository
+        run:  apt-get update -y
+      - name: Install basic dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive            
+        run: apt-get -y install build-essential pkg-kde-tools pkg-config cmake
+      - name: Install latest basic Qt5 in repository
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install qt5-default qttools5-dev-tools qt5-qmake qtbase5-dev qtbase5-private-dev
+      - name: Install project denpendencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install libqt5svg5-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libpulse-dev libqt5x11extras5 libqt5x11extras5-dev libxfixes3 libxfixes-dev libx11-dev libxinerama1 libxinerama-dev
+      - name: QMake configure & Make
+        run: |
+          qmake .;
+          make -j$(nproc);
+
+  ubuntu-latest:
+    name: on Ubuntu Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Update APT repository
+        run:  apt-get update -y
+      - name: Install basic dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive            
+        run: apt-get -y install build-essential pkg-kde-tools pkg-config cmake
+      - name: Install latest basic Qt5 in repository
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install qt5-default qttools5-dev-tools qt5-qmake qtbase5-dev qtbase5-private-dev
+      - name: Install project denpendencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: apt-get -y install libqt5svg5-dev libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libpulse-dev libqt5x11extras5 libqt5x11extras5-dev libxfixes3 libxfixes-dev libx11-dev libxinerama1 libxinerama-dev
+      - name: QMake configure & Make
+        run: |
+          qmake .;
+          make -j$(nproc);

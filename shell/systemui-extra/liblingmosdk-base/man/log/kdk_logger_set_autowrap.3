@@ -1,0 +1,64 @@
+.TH "KDK_LOGGER_SET_AUTOWRAP" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_logger_set_autowrap \- 设置日志输出自动换行  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkylog\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "void kdk_logger_set_autowrap (int autowarp)"
+
+.PP
+设置日志输出自动换行 
+.PP
+\fBParameters\fP
+.RS 4
+\fIautowarp\fP 1表示启用启动换行，0表示禁止自动换行 
+.RE
+.PP
+Link with \fI\-lkylog\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是设置日志输出自动换行
+.SH EXAMPLES
+.EX
+#include <libkylog.h>
+#include <assert.h>
+
+int main(int argc , char** argv)
+{
+	assert(kdk_logger_init("./logtest.conf") == 0);
+    kdk_logger_set_autowrap(1);
+	klog_calltrace();
+	klog_debug("Debug");
+	klog_info("Info");
+	klog_notice("Notice");
+	klog_warning("Warning");
+	klog_err("Error");
+	klog_crit("Crit");
+	klog_alert("Alert");
+	klog_emerg("Emerg");
+
+	return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_logger_init (),
+.BR kdk_logger_flush ()
+and
+.BR kdk_logger_setdir ().
+.SH "SEE ALSO"
+.BR kdk_logger_init (3),
+.BR kdk_logger_flush (3)
+and
+.BR kdk_logger_setdir (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkylog.h from the source code\&.

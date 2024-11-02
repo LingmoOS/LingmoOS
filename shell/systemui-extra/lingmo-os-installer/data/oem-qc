@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+run_qc_dir() {
+    name=$1
+    for i in ${name}/*; do
+        if [ -x "$i" ]; then
+            filename=$(basename $i)
+            echo "$(date +'%b %d %H:%M:%S') ${filename}"
+            . "$i"
+        else
+            echo "跳过 $i"
+        fi
+    done
+}
+
+if [[ -d /usr/share/oem-test ]]; then
+    run_qc_dir /usr/share/oem-test
+fi
+
+
+

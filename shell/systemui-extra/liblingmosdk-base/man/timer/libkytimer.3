@@ -1,0 +1,94 @@
+.TH "LIBKYTIMER" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+libkytimer \- LINGMOSDK C语言定时器模块  
+
+.SH SYNOPSIS
+
+.SS "Classes"
+
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef void *(* \fBtime_handler\fP) (void *user_data)"
+.br
+.ti -1c
+.RI "typedef struct \fB_KTimerNode\fP \fBKTimerNode\fP"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBKTimerAttribute\fP { \fBKTIMER_SINGLESHOT\fP = 0, \fBKTIMER_PERIODIC\fP = 1, \fBKTIMER_NEVER\fP = 2 }"
+.br
+.ti -1c
+.RI "enum \fBKTimerType\fP { \fBKTIMER_ABSOLUTE\fP = 0, \fBKTIMER_RELATIVE\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBkdk_timer_init\fP ()"
+.br
+.RI "初始化定时器核心组件 "
+.ti -1c
+.RI "size_t \fBkdk_timer_start\fP (unsigned int intervalms, time_handler callback, KTimerAttribute attr, KTimerType type, void *userdata, int freeOnDelete)"
+.br
+.RI "启动一个定时器 "
+.ti -1c
+.RI "void \fBkdk_timer_stop\fP (size_t timerfd)"
+.br
+.RI "停止给定的定时器 "
+.ti -1c
+.RI "void \fBkdk_timer_reset\fP (size_t timerfd, unsigned int intervalms)"
+.br
+.RI "重置定时器时间至intervalms，以毫秒为单位 "
+.ti -1c
+.RI "void \fBkdk_timer_destroy\fP ()"
+.br
+.RI "销毁定时器核心 "
+.in -1c
+.SH DATA STRUCTURES
+
+\fBtypedef struct _KTimerNode {
+.br
+    pthread_mutex_t	lock;
+	size_t			fd;			//序列号
+	time_handler	callback;	//到期后执行的函数
+	int				freeOnDelete;	//删除定时器时自动释放userdata
+	void*			userdata;	//callback使用的参数，外部使用alloc分配内存，在delete定时器的时候会根据配置自动释放
+	unsigned int	intervalms;	//定时器间隔时间，单位毫秒
+	KTimerAttribute	attr;		//触发类型，单次触发或多次触发
+	KTimerType		type;		//时钟类型，绝对时间还是相对时间
+	struct _KTimerNode*	next;
+.br
+} KTimerNode;\fP
+
+There are other members not documented here, which are only meant for
+libkytimer internal use.
+.SH "Detailed Description"
+.PP 
+LINGMOSDK C语言定时器模块 
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_timer_init (),
+.BR kdk_timer_start (),
+.BR kdk_timer_stop (),
+.BR kdk_timer_reset ()
+and
+.BR kdk_timer_destroy ().
+.SH "SEE ALSO"
+.BR kdk_timer_init (3),
+.BR kdk_timer_start (3),
+.BR kdk_timer_stop (3),
+.BR kdk_timer_reset (3)
+and
+.BR kdk_timer_destroy (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkytimer.h from the source code\&.

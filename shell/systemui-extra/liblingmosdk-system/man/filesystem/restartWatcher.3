@@ -1,0 +1,82 @@
+.TH "restartWatcher" 3 "Wed Sep 20 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+restartWatcher - 恢复文件监听
+.SH SYNOPSIS
+.nf
+.B #include <libkyfilewatcher.hpp>
+.sp
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBLINGMOSDK_FILEWATCHER::FileWatcher\fP"
+.in -1c
+.sp
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void restartWatcher();" 
+.in -1c
+.sp
+Link with \fI\-lkyfilewatcher\fP.
+.SH "Detailed Description"
+The main function of the interface is to recover file listening.
+.SH "RETURN VALUE"
+No return value
+.SH EXAMPLES
+.EX
+#include <QCoreApplication>
+#include <QDebug>
+#include "libkyfilewatcher.hpp"
+
+using namespace LINGMOSDK_FILEWATCHER;
+
+int main(int argc, char *argv[])
+{
+    LINGMOSDK_FILEWATCHER::FileWatcher watcher;
+    watcher.addWatchTargetRecursive("/home/lingmo/", PERIODIC, ALL, 3, REGULAR);
+
+    getchar();
+
+//    qDebug() << "update attr test";
+//    watcher.updateWatchTargetAttribute("/data/testcode/test.c", DELETE);
+
+//    getchar();
+
+//    qDebug() << "re-add test";
+//    watcher.addWatchTarget("/data/testcode/test.c", PERIODIC, ALL);
+
+//    getchar();
+
+//    qDebug() << "update oneshot test";
+//    watcher.updateWatchTargetType("/data/testcode/test.c", ONESHOT);
+
+//    getchar();
+
+//    qDebug() << "remove target test";
+//    watcher.removeWatchTarget("/data/testcode/test.c");
+
+//    getchar();
+
+    watcher.clearWatchList();
+    return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR addWatchTargetRecursive (),
+.BR addWatchTargetListRecursive (),
+.BR removeWatchTargetRecursive (),
+.BR clearWatchList ()
+and
+.BR pauseWatcher ().
+.SH "SEE ALSO"
+.BR addWatchTargetRecursive (3),
+.BR addWatchTargetListRecursive (3),
+.BR removeWatchTargetRecursive (3),
+.BR clearWatchList (3)
+and
+.BR pauseWatcher (3).

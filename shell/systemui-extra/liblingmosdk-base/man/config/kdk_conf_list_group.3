@@ -1,0 +1,96 @@
+.TH "KDK_CONF_LIST_GROUP" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_conf_list_group \- 列举id对应配置文件的所有Group  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkyconf\&.h>\fP
+.br
+
+.SS "Functions"
+.PP 
+.SS "char** const kdk_conf_list_group (int id)"
+
+.PP
+列举id对应配置文件的所有Group，结尾以NULL指针表示 
+.PP
+\fBParameters\fP
+.RS 4
+\fIid\fP 由kdk_conf_init返回的句柄值 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+const char** const 以NULL结尾的字符串列表，每个字符串都是一个组名称，字符串列表本身是由alloc分配的内存，需要被free释放；字符串不需要释放 
+.RE
+.PP
+Link with \fI\-lkyconf\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是列举id对应配置文件的所有Group 
+.SH EXAMPLES
+.EX
+#include <libkyconf.h>
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char **keylist = NULL;
+    int id = kdk_conf_init("struct.conf");
+    ASSERT_NOT_NULL(id, -1);
+
+    char **grouplist = kdk_conf_list_group(id);
+    ASSERT_NOT_NULL(grouplist, -1);
+
+    char *tmpgroup;
+    int index = 0;
+    while ((tmpgroup = grouplist[index]))
+    {
+        printf("Group: %s\n", tmpgroup);
+        keylist = kdk_conf_list_key(id, tmpgroup);
+        ASSERT_NOT_NULL(keylist, -1);
+        char *tmpkey;
+        int k_index = 0;
+        while ((tmpkey = keylist[k_index]))
+        {
+            const char *tmpval = kdk_conf_get_value(id, tmpgroup, tmpkey);
+            printf("%s = %s\n", tmpkey , tmpval);
+            k_index ++;
+        }
+        kdk_config_freeall(keylist);
+
+        index ++;
+    }
+
+    kdk_conf_destroy(id);
+    kdk_config_freeall(grouplist);
+
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_conf_init (),
+.BR kdk_conf_destroy (),
+.BR kdk_conf_reload (),
+.BR kdk_conf_get_value (),
+.BR kdk_conf_list_key ()
+and
+.BR kdk_config_freeall ().
+.SH "SEE ALSO"
+.BR kdk_conf_init (3),
+.BR kdk_conf_destroy (3),
+.BR kdk_conf_reload (3),
+.BR kdk_conf_get_value (3),
+.BR kdk_conf_list_key (3)
+and
+.BR kdk_config_freeall (3).
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkyconf.h from the source code\&.

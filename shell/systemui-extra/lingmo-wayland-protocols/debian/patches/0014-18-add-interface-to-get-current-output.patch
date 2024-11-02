@@ -1,0 +1,58 @@
+From: "wangteng@lingmoos.cn" <wangteng@lingmoos.cn>
+Date: Mon, 22 Jul 2024 06:18:52 +0000
+Subject: !18 add interface to get current output Merge pull request !18 from
+ lingmo0061/lingmo/nile
+
+---
+ src/protocols/lingmo-shell.xml | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/src/protocols/lingmo-shell.xml b/src/protocols/lingmo-shell.xml
+index 3082ffe..ee9d4e6 100644
+--- a/src/protocols/lingmo-shell.xml
++++ b/src/protocols/lingmo-shell.xml
+@@ -8,7 +8,7 @@
+     ]]>
+   </copyright>
+ 
+-  <interface name="lingmo_shell" version="1">
++  <interface name="lingmo_shell" version="2">
+     <description summary="create lingmo shell windows and helpers">
+       This interface is used by lingmo powered Wayland shells to communicate with the compositor and
+       can only be bound one time.
+@@ -26,9 +26,34 @@
+       <arg name="surface" type="object" interface="wl_surface"/>
+     </request>
+ 
++    <!-- Outputs -->
++
++    <request name="get_current_output" since="2">
++      <description summary="get output under cursor">
++        Request get the output under cursor.
++
++        Send current_output and done event after this request.
++      </description>
++    </request>
++
++    <event name="current_output" since="2">
++      <description summary="send the output name under cursor">
++        Emitted after bind lingmo_shell or recieve get_current_output request.
++      </description>
++      <arg name="output_name" type="string" summary="name of current output"/>
++      <arg name="seat_name" type="string" summary="seat name of cursor under output"/>
++    </event>
++
++    <event name="done" since="2">
++      <description summary="sent all output and seat info completely">
++        This event is sent after all information has been sent after binding to
++        the lingmo shell object.
++      </description>
++    </event>
++
+   </interface>
+ 
+-  <interface name="lingmo_surface" version="1">
++  <interface name="lingmo_surface" version="2">
+     <description summary="metadata interface">
+       An interface that may be implemented by a wl_surface, for implementations that provide the
+       shell user interface.

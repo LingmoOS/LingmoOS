@@ -1,0 +1,123 @@
+.TH "KDK_TIMER_START" 3 "Fri Sep 22 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+kdk_timer_start \- 启动一个定时器  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <libkytimer\&.h>\fP
+.br
+
+.SS "Functions"
+.SS "size_t kdk_timer_start (unsigned int intervalms, time_handler callback, KTimerAttribute attr, KTimerType type, void * userdata, int freeOnDelete)"
+
+.PP
+启动一个定时器 
+.PP
+\fBParameters\fP
+.RS 4
+\fIintervalms\fP 定时器时间，以毫秒为单位 
+.br
+\fIcallback\fP 定时器到期后触发的回调函数指针 
+.br
+\fIattr\fP 定时器属性，KTIMER_SINGLESHOT表示一次性定时器；KTIMER_PERIODIC表示周期性定时器；KTIMER_NEVER表示不会被触发的定时器 
+.br
+\fItype\fP 定时器类型，KTIMER_ABSOLUTE表示绝对时间定时器，修改系统时间不会影响定时器的时间；KTIMER_RELATIVE表示相对时间定时器，修改系统时间会影响定时器时间 
+.br
+\fIuserdata\fP 指向用户数据的指针 
+.br
+\fIfreeOnDelete\fP [未启用] 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+size_t 定时器的ID 
+.RE
+.PP
+Link with \fI\-lkytimer\fP.
+.SH "Detailed Description"
+.PP 
+接口的主要功能是启动一个定时器
+.SH EXAMPLES
+.EX
+#include <libkytimer.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <unistd.h>
+#include <time.h>
+#include <string.h>
+
+void func(char* comment)
+{
+	char date[32]	= {0};
+	time_t now;
+	time(&now);
+	if (ctime_r(&now , date))
+		date[strlen(date) - 1]	= '\0';
+	printf("[%s]这是%s\n" , date , comment);
+}
+
+void stop(size_t* fdpoll)
+{
+	printf("开始停止定时器\n");
+	for (int i = 0 ; i < 10 ; i ++)
+	{
+		kdk_timer_stop(fdpoll[i]);
+	}
+}
+
+int main()
+{
+	assert(kdk_timer_init() == 0);
+
+	//测试1 -- 基本功能
+	size_t fdpoll[10]	= {0};
+	// for (int i = 1 ; i <= 10 ; i ++)
+	// {
+	// 	char* data	= (char*)malloc(10);
+	// 	assert(data);
+	// 	sprintf(data , "%d号" , i);
+	// 	fdpoll[i - 1]	= kdk_timer_start(i * 1000 , (time_handler)func , KTIMER_PERIODIC , KTIMER_ABSOLUTE, (void*)data , 1);
+	// 	assert(fdpoll[i - 1]);
+	// }
+	kdk_timer_start(10000 , (time_handler)stop , KTIMER_SINGLESHOT , KTIMER_ABSOLUTE, (void*)fdpoll , 0);
+	sleep(11);
+
+	//测试3 -- 单次触发
+	printf("单次触发测试：\n");
+	kdk_timer_start(2000 , (time_handler)func , KTIMER_SINGLESHOT , KTIMER_ABSOLUTE, "2号" , 0);
+	sleep(5);
+
+	//测试2 -- 重置定时器时间
+	printf("修改时间测试：\n");
+	int persec	= kdk_timer_start(1000 , (time_handler)func , KTIMER_PERIODIC , KTIMER_ABSOLUTE, "1号" , 0);
+	int sec3	= kdk_timer_start(3000 , (time_handler)func , KTIMER_SINGLESHOT , KTIMER_ABSOLUTE, "3号" , 0);
+	sleep(2);
+	kdk_timer_reset(sec3 , 4000);
+	printf("sec3 时钟已被重置为4000ms\n");
+	sleep(10);
+
+	printf("正在销毁定时器核心...\n");
+	kdk_timer_destroy();
+	return 0;
+}
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_timer_init (),
+.BR kdk_timer_stop (),
+.BR kdk_timer_reset ()
+and
+.BR kdk_timer_destroy ().
+.SH "SEE ALSO"
+.BR kdk_timer_init (3),
+.BR kdk_timer_stop (3),
+.BR kdk_timer_reset (3)
+and
+.BR kdk_timer_destroy (3).
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libkytimer.h from the source code\&.

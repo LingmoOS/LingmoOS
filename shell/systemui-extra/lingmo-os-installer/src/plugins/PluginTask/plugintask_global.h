@@ -1,0 +1,12 @@
+#ifndef PLUGINTASK_GLOBAL_H
+#define PLUGINTASK_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(PLUGINTASK_LIBRARY)
+#  define PLUGINTASKSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define PLUGINTASKSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // PLUGINTASK_GLOBAL_H

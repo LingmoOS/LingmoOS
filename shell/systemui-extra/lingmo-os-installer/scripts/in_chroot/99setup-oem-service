@@ -1,0 +1,71 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" = "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" = "true" ]]; then
+    return 0
+elif [[ "${is_oem_mode}" = "false" ]]; then
+    return 0
+fi
+
+oem_mode=
+if grep -q 'test-mode' /proc/cmdline; then
+    oem_mode="oem-automatic"
+    # 拷贝自定义的配置
+    if [[ -f /cdrom/kyple-installer.cfg ]]; then
+        cp /cdrom/kyple-installer.cfg /usr/share/lingmo-os-installer/ky-installer.cfg
+        echo 'test-mode=true' >>/usr/share/lingmo-os-installer/ky-installer.cfg
+    fi
+else
+    oem_mode="oem"
+fi
+
+if grep -q 'auti-mode' /proc/cmdline; then
+    	if [[ -f /usr/share/lingmo-os-installer/data/oem-qc.desktop ]]; then
+        	cp -a /usr/share/lingmo-os-installer/data/oem-qc.desktop /etc/xdg/autostart
+        	cp -a /usr/share/lingmo-os-installer/data/oem-qc /usr/sbin/oem-qc 
+	       
+	       	if grep -q 'auti-only' /proc/cmdline; then
+                	cp -a /usr/share/lingmo-os-installer/scripts/oem.sh /usr/sbin/oem-second
+			if [[ -f /cdrom/ky-installer.cfg ]]; then
+        			cp /cdrom/ky-installer.cfg /usr/share/lingmo-os-installer/ky-installer.cfg
+	    		fi
+    		else
+        		cp -a /usr/share/lingmo-os-installer/scripts/oem-second /usr/sbin/
+    		fi
+        fi
+    	if [[ -f /usr/share/lingmo-os-installer/data/oem-unlock.desktop ]]; then
+        	cp -a /usr/share/lingmo-os-installer/data/oem-unlock.desktop /etc/xdg/autostart
+        	cp -a /usr/share/lingmo-os-installer/data/oem-unlock /usr/sbin/oem-unlock 
+	fi
+else
+#    if [[ -f /usr/share/lingmo-os-installer/data/oem-qc.service ]]; then
+#        cp -a /usr/share/lingmo-os-installer/data/oem-qc.service /lib/systemd/system	
+#        cp -a /usr/share/lingmo-os-installer/scripts/oem-second /usr/sbin/
+#        /bin/systemctl enable oem-qc.service
+#    fi
+
+    cp -a /usr/share/applications/lingmo-os-installer.desktop /etc/xdg/autostart
+    sed -i "/Exec/d" /etc/xdg/autostart/lingmo-os-installer.desktop
+    echo "Exec=/usr/bin/lingmo-os-installer-${oem_mode}" >>/etc/xdg/autostart/lingmo-os-installer.desktop
+fi
+
+
+
+if [[ "${is_990_9a0}" = "true" ]]; then
+    sed -i "s/lingmo-os-installer/lingmo-os-installer-${oem_mode}/" /usr/bin/start-installer
+else
+#    cp -a /usr/share/applications/lingmo-os-installer.desktop /etc/xdg/autostart
+#    sed -i "/Exec/d" /etc/xdg/autostart/lingmo-os-installer.desktop
+#    echo "Exec=/usr/bin/lingmo-os-installer-${oem_mode}" >>/etc/xdg/autostart/lingmo-os-installer.desktop
+
+    /bin/systemctl disable lingmo-os-installer
+fi
+
+# 删除用户与重启 lightdm
+if [[ -f /usr/share/lingmo-os-installer/data/delete-oem-user.service ]]; then
+    cp -a /usr/share/lingmo-os-installer/data/delete-oem-user.service /lib/systemd/system
+    /bin/systemctl disable delete-oem-user.service
+fi

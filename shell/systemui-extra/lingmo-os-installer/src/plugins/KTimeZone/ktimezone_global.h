@@ -1,0 +1,12 @@
+#ifndef KTIMEZONE_GLOBAL_H
+#define KTIMEZONE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(KTIMEZONE_LIBRARY)
+#  define KTIMEZONESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define KTIMEZONESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // KTIMEZONE_GLOBAL_H

@@ -1,0 +1,226 @@
+From: "wangteng@lingmoos.cn" <wangteng@lingmoos.cn>
+Date: Fri, 10 May 2024 07:16:03 +0000
+Subject: !1 No need use since for version 1 Merge pull request !1 from
+ lingmo0061/lingmo/nile
+
+---
+ src/CMakeLists.txt                       |  6 ++++++
+ src/pkgconfig/lingmo-wayland-protocols.pc |  7 +++++++
+ src/protocols/lingmo-shell.xml             |  8 ++++----
+ src/protocols/lingmo-window-management.xml | 32 ++++++++++++++++----------------
+ 4 files changed, 33 insertions(+), 20 deletions(-)
+ create mode 100644 src/pkgconfig/lingmo-wayland-protocols.pc
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 1b46c37..e3ad82c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -9,3 +9,9 @@ install(FILES
+ 
+     DESTINATION ${CMAKE_INSTALL_DATADIR}/lingmo-wayland-protocols
+ )
++
++install(FILES
++    pkgconfig/lingmo-wayland-protocols.pc
++
++    DESTINATION ${CMAKE_INSTALL_DATADIR}/pkgconfig
++)
+diff --git a/src/pkgconfig/lingmo-wayland-protocols.pc b/src/pkgconfig/lingmo-wayland-protocols.pc
+new file mode 100644
+index 0000000..71d15cd
+--- /dev/null
++++ b/src/pkgconfig/lingmo-wayland-protocols.pc
+@@ -0,0 +1,7 @@
++prefix=/usr
++datarootdir=${prefix}/share
++pkgdatadir=${pc_sysrootdir}${datarootdir}/lingmo-wayland-protocols
++
++Name: Lingmo Wayland Protocols
++Description: Lingmo Wayland protocol files
++Version: 1.0.0
+diff --git a/src/protocols/lingmo-shell.xml b/src/protocols/lingmo-shell.xml
+index b20c91a..f3f1360 100644
+--- a/src/protocols/lingmo-shell.xml
++++ b/src/protocols/lingmo-shell.xml
+@@ -74,7 +74,7 @@
+ 
+     <!-- Skip taskbar-->
+ 
+-    <request name="set_skip_taskbar" since="1">
++    <request name="set_skip_taskbar">
+       <description summary="make the window skip the taskbar">
+         Setting this bit to the window, will make it say it prefers to not be listed in the taskbar.
+         Taskbar implementations may or may not follow this hint.
+@@ -84,7 +84,7 @@
+ 
+     <!-- Skip switcher -->
+ 
+-    <request name="set_skip_switcher" since="1">
++    <request name="set_skip_switcher">
+       <description summary="make the window not appear in a switcher">
+         Setting this bit will indicate that the window prefers not to be listed in a switcher.
+       </description>
+@@ -142,14 +142,14 @@
+       <arg name="role" type="uint"/>
+     </request>
+ 
+-    <request name="open_under_cursor" since="1">
++    <request name="open_under_cursor">
+       <description summary="open under cursor">
+         Request the initial position of this surface to be under the current cursor position. Has to
+         be called before attaching any buffer to this surface.
+       </description>
+     </request>
+ 
+-    <request name="set_panel_takes_focus" since="1">
++    <request name="set_panel_takes_focus">
+       <description summary="Whether a panel takes focus">
+           By default various lingmo_surface roles do not take focus and cannot be activated.
+           With this request the compositor can be instructed to pass focus also to this lingmo_surface.
+diff --git a/src/protocols/lingmo-window-management.xml b/src/protocols/lingmo-window-management.xml
+index e6c5c3a..46c6c80 100644
+--- a/src/protocols/lingmo-window-management.xml
++++ b/src/protocols/lingmo-window-management.xml
+@@ -218,7 +218,7 @@
+       </description>
+     </event>
+ 
+-    <event name="initial_state" since="1">
++    <event name="initial_state">
+       <description summary="All initial known state is submitted">
+         This event will be sent immediately after all initial state been sent to the client. If the
+         Plasma window is already unmapped, the unmapped event will be sent before the initial_state
+@@ -226,7 +226,7 @@
+       </description>
+     </event>
+ 
+-    <event name="parent_window" since="1">
++    <event name="parent_window">
+       <description summary="The parent window changed">
+         This event will be sent whenever the parent window of this lingmo_window changes. The
+         passed parent is another lingmo_window and this lingmo_window is a transient window to
+@@ -237,7 +237,7 @@
+         allow-null="true"/>
+     </event>
+ 
+-    <event name="geometry" since="1">
++    <event name="geometry">
+       <description summary="The geometry of this window in absolute coordinates">
+         This event will be sent whenever the window geometry of this lingmo_window changes. The
+         coordinates are in absolute coordinates of the windowing system.
+@@ -248,7 +248,7 @@
+       <arg name="height" type="uint" summary="height of the lingmo_window"/>
+     </event>
+ 
+-    <event name="icon_changed" since="1">
++    <event name="icon_changed">
+       <description summary="The icon of the window changed">
+         This event will be sent whenever the icon of the window changes, but there is no themed icon
+         name. Common examples are Xwayland windows which have a pixmap based icon.
+@@ -266,7 +266,7 @@
+     </event>
+ 
+ 
+-    <request name="request_enter_virtual_desktop" since="1">
++    <request name="request_enter_virtual_desktop">
+       <description summary="map window on a virtual desktop">
+         Make the window enter a virtual desktop. A window can enter more than one virtual desktop.
+         if the id is empty or invalid, no action will be performed.
+@@ -274,7 +274,7 @@
+       <arg name="id" type="string" summary="desktop id"/>
+     </request>
+ 
+-    <request name="request_enter_new_virtual_desktop" since="1">
++    <request name="request_enter_new_virtual_desktop">
+       <description summary="map window on a virtual desktop">RFC: do this with an empty id to
+         request_enter_virtual_desktop?
+         Make the window enter a new virtual desktop. If the server consents the request, it will
+@@ -282,7 +282,7 @@
+       </description>
+     </request>
+ 
+-    <request name="request_leave_virtual_desktop" since="1">
++    <request name="request_leave_virtual_desktop">
+       <description summary="remove a window from a virtual desktop">
+         Make the window exit a virtual desktop. If it exits all desktops it will be considered on
+         all of them.
+@@ -290,7 +290,7 @@
+       <arg name="id" type="string" summary="desktop id"/>
+     </request>
+ 
+-    <event name="virtual_desktop_entered" since="1">
++    <event name="virtual_desktop_entered">
+       <description summary="the window entered a new virtual desktop">
+         This event will be sent when the window has entered a new virtual desktop. The window can be
+         on more than one desktop, or none: then is considered on all of them.
+@@ -298,7 +298,7 @@
+       <arg name="id" type="string" summary="desktop id"/>
+     </event>
+ 
+-    <event name="virtual_desktop_left" since="1">
++    <event name="virtual_desktop_left">
+       <description summary="the window left a virtual desktop">
+         This event will be sent when the window left a virtual desktop. If the window leaves all
+         desktops, it can be considered on all. If the window gets manually added on all desktops,
+@@ -308,7 +308,7 @@
+       <arg name="is" type="string" summary="desktop id"/>
+     </event>
+ 
+-    <event name="application_menu" since="1">
++    <event name="application_menu">
+       <description summary="notify the client that the current appmenu changed">
+         This event will be sent after the application menu for the window has changed.
+       </description>
+@@ -316,7 +316,7 @@
+       <arg name="object_path" type="string"/>
+     </event>
+ 
+-    <request name="request_enter_activity" since="1">
++    <request name="request_enter_activity">
+       <description summary="map window on an activity">
+         Make the window enter an activity. A window can enter more activity. If the id is empty or
+         invalid, no action will be performed.
+@@ -324,7 +324,7 @@
+       <arg name="id" type="string" summary="activity id"/>
+     </request>
+ 
+-    <request name="request_leave_activity" since="1">
++    <request name="request_leave_activity">
+       <description summary="remove a window from an activity">
+         Make the window exit a an activity. If it exits all activities it will be considered on all
+         of them.
+@@ -332,7 +332,7 @@
+       <arg name="id" type="string" summary="activity id"/>
+     </request>
+ 
+-    <event name="activity_entered" since="1">
++    <event name="activity_entered">
+       <description summary="the window entered an activity">
+         This event will be sent when the window has entered an activity. The window can be on more
+         than one activity, or none: then is considered on all of them.
+@@ -340,7 +340,7 @@
+       <arg name="id" type="string" summary="activity id"/>
+     </event>
+ 
+-    <event name="activity_left" since="1">
++    <event name="activity_left">
+       <description summary="the window left an activity">
+         This event will be sent when the window left an activity. If the window leaves all
+         activities, it will be considered on all. If the window gets manually added on all
+@@ -350,14 +350,14 @@
+       <arg name="id" type="string" summary="activity id"/>
+     </event>
+ 
+-    <request name="send_to_output" since="1">
++    <request name="send_to_output">
+       <description summary="send window to specified output">
+         Requests this window to be displayed in a specific output.
+       </description>
+       <arg name="output" type="object" interface="wl_output"/>
+     </request>
+ 
+-    <event name="resource_name_changed" since="1">
++    <event name="resource_name_changed">
+       <description summary="X11 resource name has changed">
+         This event will be sent when the X11 resource name of the window has changed. This is only
+         set for XWayland windows.

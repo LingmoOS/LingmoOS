@@ -1,0 +1,252 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title></title>
+<!-- <script src="js/jquery.flash.js" type="text/javascript"></script> -->
+<script src="./js/jquery-3.2.1.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="./js/qwebchannel.js"></script>
+<!-- <script src="js/kydevmonit.js" type="text/javascript"></script> -->
+<script type="text/javascript" src="./js/shieldshortcut.js"></script>
+<script src="js/qwebchannel.js"></script>
+
+<link rel="stylesheet" type="text/css" href="./css/select.css">
+<!--<script src="js/PrinterB.js" type="text/javascript"></script>-->
+
+<script> 
+        var websocket_url = 'ws://localhost:12345';
+        var websocket = null;
+        var printer_number_up="1";
+        var printer_media;
+        var printer_number_up_layout="lrtb";
+        var printer_sides;
+        var printer_type;
+        var file_path;
+
+       
+        if (websocket === null) {
+            websocket = new WebSocket(websocket_url);
+            websocket.onopen = function () {
+                console.log("connect websocketserver success");
+            }
+        } else {
+            websocket.close();
+            websocket = null;
+        }
+
+
+        function getPrinterList() {
+            console.log("getPrinterList")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    //var command;
+                    printer.getPrinterList();
+                    }
+                );
+        }
+
+        function getPrinterAvailableList() {
+            console.log("getPrinterAvailableList")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    //var command;
+                    printer.getPrinterAvailableList();
+                    }
+                );
+        }
+
+        function setPrinterOptions() {
+            console.log("setPrinterOptions")
+            new QWebChannel(websocket,function(channel){
+                    var myselect1=document.getElementById("media");
+                    var index1=myselect1.selectedIndex;
+                    var val1=myselect1.options[index1].value;
+                    printer_media=val1;
+                    
+                    var myselect2=document.getElementById("sides");
+                    var index2=myselect2.selectedIndex;
+                    var val2=myselect2.options[index2].value;
+                    printer_sides=val2;
+                    var command = String(printer_number_up) + "," + String(printer_media) + "," + String(printer_number_up_layout) + "," + String(printer_sides)
+                    var printer = channel.objects.print;
+                    printer.setPrinterOptions(command);
+                    }
+                );
+        }
+
+        function getPrinterPrintLocalFile() {
+            console.log("getPrinterPrintLocalFile")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    printer_type = $("#printer_type").val();
+                    file_path = $("#file_path").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML = String(message);
+                    });
+                    var command = String(printer_type) + "," + String(file_path);
+                    printer.getPrinterPrintLocalFile(command);
+                    }
+                );
+        }
+
+        function getPrinterCancelAllJobs() {
+            console.log("getPrinterCancelAllJobs")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    printer_type = $("#printer_type").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    //var command;
+                    printer.getPrinterCancelAllJobs(printer_type);
+                    }
+                );
+        }
+
+        function getPrinterStatus() {
+            console.log("getPrinterStatus")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    printer_type = $("#printer_type").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    //var command;
+                    printer.getPrinterStatus(printer_type);
+                    }
+                );
+        }
+
+        function getPrinterFilename() {
+            console.log("getPrinterFilename")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    download_link = $("#file_path").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    //var command;
+                    printer.getPrinterFilename(download_link);
+                    }
+                );
+        }
+
+        function getPrinterJobStatus() {
+            console.log("getPrinterJobStatus")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    printer_type = $("#printer_path").val();
+                    printer_id = $("#printer_id").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    var command = printer_type + "," + printer_id
+                    printer.getPrinterJobStatus(command);
+                    }
+                );
+        }
+
+        function getPrinterDownloadRemoteFile() {
+            console.log("getPrinterDownloadRemoteFile")
+            new QWebChannel(websocket,function(channel){
+                    var edit_recv = document.getElementById("edit_recv");
+                    network_file = $("#network_file").val();
+                    save_path = $("#save_path").val();
+                    var printer = channel.objects.print;
+                    printer.sendText.connect(function(message) {
+                        console.log("Received message: " + message);
+                        edit_recv.innerHTML= String(message);
+                    });
+                    var command = String(network_file) + "," + String(save_path);
+                    printer.getPrinterDownloadRemoteFile(command);
+                    }
+                );
+        }
+
+
+</script>  
+
+</head>
+
+<body >
+    <br>
+	说明：本示例为打印机
+    <br />
+    <br />
+    <input type="button" value="获取打印机列表" onclick="getPrinterList()"/>
+    <br />
+    <br />
+    <input type="button" value="获取可用打印机列表" onclick="getPrinterAvailableList()"/>
+    <br />
+    <br />
+    <input type="button" value="设置打印参数" onclick="setPrinterOptions()"/>
+    <select name="" id="media">
+        <option >a4</option>
+        <option >letter</option>
+        <option >legal</option>
+    </select>
+    <select name="" id="sides">
+        <option >one-sided</option>
+        <option >two-sided-long-edge</option>
+        <option >teo-sided-short-edge</option>
+    </select>
+    请选择完纸张类型和单双面后点击设置打印参数按钮
+    <br />
+    <br />
+    <input type="button" value="打印本地文件" onclick="getPrinterPrintLocalFile()"/>
+    <br />
+    <br />
+    <input type="button" value="取消所有作业" onclick="getPrinterCancelAllJobs()"/>
+    <br />
+    <br />
+    <input type="button" value="获取打印机状态" onclick="getPrinterStatus()"/>
+    <br />
+    <br />
+    <input type="button" value="打印文件名" onclick="getPrinterFilename()"/>
+    <br />
+    <br />
+    <input type="button" value="获取打印机作业状态" onclick="getPrinterJobStatus()"/>
+    <br />
+    <br />
+    <input type="button" value="下载远程文件" onclick="getPrinterDownloadRemoteFile()"/>
+    <br />
+    <br />
+    打印机类型<input type="text" id="printer_type">
+    <br />
+    文件路径<input type="text" id="file_path">请选择完打印机类型和文件路径后再点击打印文件按钮
+    <br />
+    下载链接<input type="text" id="download_link">
+    <br />
+    打印作业id<input type="text" id="printer_id">
+    <br />
+    网络文件<input type="text" id="network_file">
+    <br />
+    保存文件路径<input type="text" id="save_path">
+    <br />
+    <p>接收：</p>
+    <br />
+    <textarea id="edit_recv" cols="50" rows="5"></textarea>
+    <br />
+</body>
+
+</html>

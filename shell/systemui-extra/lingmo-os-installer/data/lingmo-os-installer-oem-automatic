@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+if [[ -f /usr/share/glib-2.0/schemas/org.lingmo.flash-disk.autoload.gschema.xml ]]; then
+    gsettings set org.lingmo.flash-disk.autoload ifautoload false
+fi
+
+# 卸载可能由于自动挂载的目录
+if grep -q media.oem /proc/mounts; then
+    echo 'qwe123' | sudo -S umount /media/oem/*
+fi
+
+# 990,9A0 wayland 需要此设置
+if egrep -qi 'kirin.?9[09]0' /proc/cpuinfo; then
+    xhost +SI:localuser:root
+fi
+
+sudo /usr/lib/udisks2/udisks2-inhibit /usr/bin/lingmo-os-installer oem automatic

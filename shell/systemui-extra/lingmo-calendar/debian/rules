@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# export DH_VERBOSE=1
+
+export LC_ALL=C.UTF-8
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+WHICH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
+
+ifeq ($(WHICH_OS), kfreebsd)
+    NOT_LINUX := -DCPULOAD_PLUGIN=NO -DNETWORKMONITOR_PLUGIN=NO -DVOLUME_PLUGIN=NO
+endif
+
+ifeq ($(WHICH_OS), hurd)
+    NOT_LINUX := -DCPULOAD_PLUGIN=NO -DNETWORKMONITOR_PLUGIN=NO -DVOLUME_PLUGIN=NO -DSENSORS_PLUGIN=NO
+endif
+
+%:
+	dh ${@}	--buildsystem cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- -D_FORTIFY_SOURCE=2\
+        -DPULL_TRANSLATIONS=OFF \
+        -DUPDATE_TRANSLATIONS=OFF \
+        -DDOM_PLUGIN=OFF \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_SYSCONFDIR=/etc \
+        "-GUnix Makefiles" \
+        $(NOT_LINUX)

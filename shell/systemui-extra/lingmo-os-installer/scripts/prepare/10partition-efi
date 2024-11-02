@@ -1,0 +1,130 @@
+#!/bin/bash
+
+set -e
+
+automatic=$(get_value automatic-installation)
+if [[ "$automatic" == "0" ]]; then
+  return 0
+elif [[ "${is_efi}" == "false" ]]; then
+  return 0
+fi
+
+. /usr/share/lingmo-os-installer/scripts/autopart-efi.sh
+disk=$(get_value devpath)
+disk_custom=$(get_value disk-custom)
+data_device=$(get_value data-device)
+
+
+parted -s "${disk}" mktable gpt
+
+### efi
+start=1
+end=$((efi + 1))
+parted -s "${disk}" mkpart "EFI" fat32 1MiB "${end}"MiB
+
+### boot
+start=${end}
+end=$((end + boot))
+parted -s "${disk}" mkpart "boot" ext4 "${start}"MiB "${end}"MiB
+
+### root
+start=${end}
+end=$((end + root_size))
+
+if [[ "${isluks_lvm}" == "true" ]]; then
+  parted -s "${disk}" mkpart "SYSROOT" ext4 "${start}"MiB 100%
+else
+  if [ $real_size -lt ${DISK_MINSIZE} ]; then
+	parted -s "${disk}" mkpart "SYSROOT" ext4 "${start}"MiB 100%
+	parted -s "${disk}" set 1 esp on
+	partprobe "${disk}"
+	sync
+	return 0
+  fi
+  parted -s "${disk}" mkpart "SYSROOT" ext4 "${start}"MiB "${end}"MiB
+fi
+
+
+if [[ "${isluks_lvm}" == "true" ]]; then
+  PASSWORD="$(get_value_bytearray encryptyPWD)"
+  parted -s "${disk}" set 1 esp on
+  partprobe "${disk}"
+  sync
+  if echo "${disk}" | grep -q nvme; then
+    disk=${disk}p
+  fi
+  sleep 1
+  modprobe sm4_generic || true
+  if grep -q sm4 /proc/crypto; then
+    echo "${PASSWORD}" | cryptsetup -c sm4-xts-plain64 -h sha256 -s 256 luksFormat "${disk}"3 -q
+  else
+    echo "${PASSWORD}" | cryptsetup -c aes-xts-plain64 -h sha256 -s 512 luksFormat "${disk}"3 -q
+  fi
+  echo "${PASSWORD}" | cryptsetup luksOpen "${disk}"3 "${disk##*/}"3_crypt
+  root_uuid=$(lsblk -ro name,uuid | grep "${disk##*/}3 " | awk '{print $2}')
+  echo "${disk##*/}3_crypt UUID=${root_uuid} none luks" >/etc/crypttab
+  pvcreate -ffy /dev/mapper/"${disk##*/}"3_crypt
+  vgcreate lingmo-vg /dev/mapper/"${disk##*/}"3_crypt
+  
+  if [ $real_size -lt ${DISK_MINSIZE} ]; then
+	lvcreate --wipesignatures n -l 100%free -n root lingmo-vg
+	return 0
+  fi
+
+  lvcreate --wipesignatures n -L "${root_size}" -n root lingmo-vg
+  lvcreate --wipesignatures n -L "${backup_size}" -n backup lingmo-vg
+  lvcreate --wipesignatures n -L "${data_size}" -n data lingmo-vg
+
+  if [[ "${disk_custom}" == "true" ]]; then
+        lvcreate --wipesignatures n -l "${data_size}" -n swap lingmo-vg
+  else
+        lvcreate --wipesignatures n -l 100%free -n swap lingmo-vg
+  fi
+  return 0
+fi
+
+
+### backup
+start=${end}
+end=$((end + backup_size))
+parted -s "${disk}" mkpart "backup" ext4 "${start}"MiB "${end}"MiB
+
+### data
+start=${end}
+end=$((end + data_size))
+if [[ "${is_swapfile}" == "true" ]]; then
+  parted -s "${disk}" mkpart "data" ext4 "${start}"MiB 100%
+elif [[ -n ${data_device} ]]; then
+  umount -l "${data_device}" || true
+  parted -s "${data_device}" mktable gpt
+  parted -s "${data_device}" mkpart "data" ext4 1MiB 100%
+
+  ### swap partition
+  start=${end}
+  end=$((end + swap))
+
+  if [[ "${disk_custom}" == "true" ]]; then
+        parted -s "${disk}" mkpart logical linux-swap "${start}"MiB "${end}"MiB
+  else
+        parted -s "${disk}" mkpart logical linux-swap "${start}"MiB 100%
+  fi
+
+else
+  parted -s "${disk}" mkpart "data" ext4 "${start}"MiB "${end}"MiB
+
+  ### swap partition
+  start=${end}
+  end=$((end + swap))
+
+  if [[ "${disk_custom}" == "true" ]]; then
+        parted -s "${disk}" mkpart logical linux-swap "${start}"MiB "${end}"MiB
+  else
+        parted -s "${disk}" mkpart logical linux-swap "${start}"MiB 100%
+  fi
+
+
+fi
+
+parted -s "${disk}" set 1 esp on
+partprobe "${disk}"
+sync

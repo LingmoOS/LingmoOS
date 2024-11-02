@@ -1,0 +1,202 @@
+.TH "KySdkDisk" 3 "Wed Sep 20 2023" "My Project" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+KySdkDisk \- 生成磁盘信息dbus信号类 主要用来生成磁盘的列表，磁盘的扇区数量，每个扇区的字节数，容量，型号、序列号、子分区数量，类型和固件版本信息的dbus信号  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <lingmosdkdbus\&.h>\fP
+.PP
+Inherits QObject\&.
+.SS "Public Slots"
+
+.in +1c
+.ti -1c
+.RI "QStringList \fBgetDiskList\fP () const"
+.br
+.RI "获取所有磁盘的列表 "
+.ti -1c
+.RI "unsigned int \fBgetDiskSectorSize\fP (const QString diskname) const"
+.br
+.RI "获取磁盘的每个扇区的字节数 "
+.ti -1c
+.RI "double \fBgetDiskTotalSizeMiB\fP (const QString diskname) const"
+.br
+.RI "获取磁盘容量 "
+.ti -1c
+.RI "QString \fBgetDiskModel\fP (const QString diskname) const"
+.br
+.RI "获取磁盘型号 "
+.ti -1c
+.RI "QString \fBgetDiskSerial\fP (const QString diskname) const"
+.br
+.RI "获取磁盘序列号 "
+.ti -1c
+.RI "unsigned int \fBgetDiskPartitionNums\fP (const QString diskname) const"
+.br
+.RI "获取磁盘/分区下的子分区数量 "
+.ti -1c
+.RI "QString \fBgetDiskType\fP (const QString diskname) const"
+.br
+.RI "获取磁盘类型 "
+.ti -1c
+.RI "QString \fBgetDiskVersion\fP (const QString diskname) const"
+.br
+.RI "获取磁盘固件版本信息 "
+.ti -1c
+.RI "unsigned long long \fBgetDiskSectorNum\fP (const QString diskname) const"
+.br
+.RI "获取磁盘扇区数量 "
+.in -1c
+.SH "Detailed Description"
+.PP 
+生成磁盘信息dbus信号类 主要用来生成磁盘的列表，磁盘的扇区数量，每个扇区的字节数，容量，型号、序列号、子分区数量，类型和固件版本信息的dbus信号 
+.PP 
+
+.SH "Public Slots"
+.PP
+.SS "QStringList KySdkDisk::getDiskList () const\fC [slot]\fP"
+
+.PP
+获取所有磁盘的列表 
+.PP
+\fBReturns\fP
+.RS 4
+QStringList 磁盘的列表，每个字符串表示一个磁盘的绝对路径 
+.RE
+.PP
+
+.SS "QString KySdkDisk::getDiskModel (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘型号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+QString 磁盘型号 
+.RE
+.PP
+
+.SS "unsigned int KySdkDisk::getDiskPartitionNums (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘/分区下的子分区数量 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+unsigned int 该磁盘/分区下的子分区数量 
+.RE
+.PP
+
+.SS "unsigned long long KySdkDisk::getDiskSectorNum (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘扇区数量 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+unsigned long long 扇区数量 
+.RE
+.PP
+
+.SS "unsigned int KySdkDisk::getDiskSectorSize (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘的每个扇区的字节数 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+int 每个扇区的字节数 
+.RE
+.PP
+
+.SS "QString KySdkDisk::getDiskSerial (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘序列号 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+QString 磁盘序列号 
+.RE
+.PP
+
+.SS "double KySdkDisk::getDiskTotalSizeMiB (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘容量 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+double 磁盘容量，MiB为单位 
+.RE
+.PP
+
+.SS "QString KySdkDisk::getDiskType (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘类型 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+QString 磁盘类型，固态 or 机械 or 混合 
+.RE
+.PP
+
+.SS "QString KySdkDisk::getDiskVersion (const QString diskname) const\fC [slot]\fP"
+
+.PP
+获取磁盘固件版本信息 
+.PP
+\fBParameters\fP
+.RS 4
+\fIdiskname\fP 指定磁盘名称，应当是例如/dev/sda这种绝对路径 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+QString 固件版本信息 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for lingmosdkdbus.h from the source code\&.

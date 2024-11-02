@@ -1,0 +1,186 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.lingmo.network">
+    <signal name="lanAdd">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="info" type="as" direction="out"/>
+    </signal>
+    <signal name="lanRemove">
+      <arg name="dbusPath" type="s" direction="out"/>
+    </signal>
+    <signal name="lanUpdate">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="info" type="as" direction="out"/>
+    </signal>
+    <signal name="wlanAdd">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="info" type="as" direction="out"/>
+    </signal>
+    <signal name="wlanRemove">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+    </signal>
+    <signal name="wlanactiveConnectionStateChanged">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+      <arg name="uuid" type="s" direction="out"/>
+      <arg name="status" type="i" direction="out"/>
+    </signal>
+    <signal name="lanActiveConnectionStateChanged">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="uuid" type="s" direction="out"/>
+      <arg name="status" type="i" direction="out"/>
+    </signal>
+    <signal name="activateFailed">
+      <arg name="errorMessage" type="s" direction="out"/>
+    </signal>
+    <signal name="deactivateFailed">
+      <arg name="errorMessage" type="s" direction="out"/>
+    </signal>
+    <signal name="deviceStatusChanged">
+    </signal>
+    <signal name="wirelessDeviceStatusChanged">
+    </signal>
+    <signal name="deviceNameChanged">
+      <arg name="oldName" type="s" direction="out"/>
+      <arg name="newName" type="s" direction="out"/>
+      <arg name="type" type="i" direction="out"/>
+    </signal>
+    <signal name="wirelessSwitchBtnChanged">
+      <arg name="state" type="b" direction="out"/>
+    </signal>
+    <signal name="hotspotDeactivated">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+    </signal>
+    <signal name="hotspotActivated">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+      <arg name="uuid" type="s" direction="out"/>
+      <arg name="activePath" type="s" direction="out"/>
+      <arg name="settingPath" type="s" direction="out"/>
+    </signal>
+    <signal name="signalStrengthChange">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+      <arg name="strength" type="i" direction="out"/>
+    </signal>
+    <signal name="secuTypeChange">
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+      <arg name="secuType" type="s" direction="out"/>
+    </signal>
+    <signal name="timeToUpdate">
+    </signal>
+    <signal name="showLingmoNMSignal">
+      <arg name="display" type="s" direction="out"/>
+      <arg name="type" type="i" direction="out"/>
+    </signal>
+    <signal name="showPropertyWidgetSignal">
+      <arg name="display" type="s" direction="out"/>
+      <arg name="devName" type="s" direction="out"/>
+      <arg name="ssid" type="s" direction="out"/>
+    </signal>
+    <signal name="showCreateWiredConnectWidgetSignal">
+      <arg name="display" type="s" direction="out"/>
+      <arg name="devName" type="s" direction="out"/>
+    </signal>
+    <signal name="showAddOtherWlanWidgetSignal">
+      <arg name="display" type="s" direction="out"/>
+      <arg name="devName" type="s" direction="out"/>
+    </signal>
+    <method name="getWirelessList">
+      <arg type="av" direction="out"/>
+      <arg name="devName" type="s" direction="in"/>
+    </method>
+    <method name="getWiredList">
+      <arg type="av" direction="out"/>
+      <arg name="devName" type="s" direction="in"/>
+    </method>
+    <method name="setWiredSwitchEnable">
+      <arg name="enable" type="b" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="setWirelessSwitchEnable">
+      <arg name="enable" type="b" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="setDeviceEnable">
+      <arg name="devName" type="s" direction="in"/>
+      <arg name="enable" type="b" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="activateConnect">
+      <arg name="type" type="i" direction="in"/>
+      <arg name="devName" type="s" direction="in"/>
+      <arg name="ssid" type="s" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="deActivateConnect">
+      <arg name="type" type="i" direction="in"/>
+      <arg name="devName" type="s" direction="in"/>
+      <arg name="ssid" type="s" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="getDeviceListAndEnabled">
+      <arg type="a{sv}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
+      <arg name="devType" type="i" direction="in"/>
+    </method>
+    <method name="getWirelessDeviceCap">
+      <arg type="a{sv}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
+    </method>
+    <method name="showPropertyWidget">
+      <arg name="devName" type="s" direction="in"/>
+      <arg name="ssid" type="s" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="showCreateWiredConnectWidget">
+      <arg name="devName" type="s" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="showAddOtherWlanWidget">
+      <arg name="devName" type="s" direction="in"/>
+      <annotation name="org.freedesktop.DBus.Method.NoReply" value="true"/>
+    </method>
+    <method name="activeWirelessAp">
+      <arg name="apName" type="s" direction="in"/>
+      <arg name="apPassword" type="s" direction="in"/>
+      <arg name="band" type="s" direction="in"/>
+      <arg name="apDevice" type="s" direction="in"/>
+    </method>
+    <method name="deactiveWirelessAp">
+      <arg name="apName" type="s" direction="in"/>
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="getStoredApInfo">
+      <arg type="as" direction="out"/>
+    </method>
+    <method name="getApInfoBySsid">
+      <arg type="as" direction="out"/>
+      <arg name="devName" type="s" direction="in"/>
+      <arg name="ssid" type="s" direction="in"/>
+    </method>
+    <method name="getApConnectionPath">
+      <arg type="s" direction="out"/>
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="getActiveConnectionPath">
+      <arg type="s" direction="out"/>
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="reScan">
+    </method>
+    <method name="keyRingInit">
+    </method>
+    <method name="keyRingClear">
+    </method>
+    <method name="showLingmoNM">
+      <arg name="type" type="i" direction="in"/>
+    </method>
+    <method name="getWirelessSwitchBtnState">
+      <arg type="b" direction="out"/>
+    </method>
+  </interface>
+</node>

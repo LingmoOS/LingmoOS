@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -e
+
+if [[ "${is_minimal}" = "true" ]]; then
+    return 0
+elif [[ "${is_ghost}" = "true" ]]; then
+    return 0
+fi
+
+USERNAME=$(get_value username)
+PASSWORD=$(get_value_bytearray password)
+AUTO_LOGIN=$(get_value autologin)
+KUID=1000
+
+# oem mode
+if [[ "${is_oem_mode}" = "true" ]]; then
+    USERNAME=oem
+    PASSWORD=Lingmo123.
+    AUTO_LOGIN=1
+    KUID=29999
+    # sudo 免密
+    echo "oem ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/oem
+fi
+
+### TODO
+# groups zz adm cdrom sudo dip plugdev lpadmin sambashare
+msg "设置用户 ${USERNAME}"
+useradd -m -s /bin/bash -u ${KUID} "${USERNAME}"
+usermod -c "${USERNAME}" "${USERNAME}"
+echo "${USERNAME}:${PASSWORD}" | chpasswd
+# /etc/sudoers
+
+add_groups() {
+    user_default_groups=(adm cdrom sudo dip plugdev lpadmin sambashare debian-tor libvirtd lxd)
+    for group in ${user_default_groups[*]}; do
+        adduser ${USERNAME} $group || true
+    done
+}
+
+set_autologin() {
+    if [[ "${AUTO_LOGIN}" = "1" ]]; then
+        if [[ -d /etc/lightdm ]]; then
+            # Configure LightDM autologin
+            LightDMCustomFile=/etc/lightdm/lightdm.conf
+            AutologinParameters="autologin-guest=false\n\
+autologin-user=${USERNAME}\n\
+autologin-user-timeout=0"
+        if ! grep -qs '^autologin-user' ${LightDMCustomFile}; then
+                if ! grep -qs '^\[Seat:\*\]' ${LightDMCustomFile}; then
+                    echo '[Seat:*]' >>${LightDMCustomFile}
+                fi
+                sed -i "s/\[Seat:\*\]/\[SeatDefaults]\n${AutologinParameters}/" ${LightDMCustomFile}
+            # oem config scenario
+            else
+                #sed -i "s/^\(\(str  *\)\?autologin-user\)=.*$/\1=${USERNAME}/g;" /etc/lightdm/lightdm.conf
+                sed -i "s/^autologin-user=.*$/autologin-user=${USERNAME}/g" ${LightDMCustomFile}
+            fi
+        fi
+    fi
+}
+
+add_groups
+
+set_autologin

@@ -1,0 +1,209 @@
+<HTML>
+    <HEAD>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>磁盘测试页面</title>
+  <script type="text/javascript" src="./js/service.js"></script>
+  <script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
+  <script src="./js/qwebchannel.js"></script>
+      <TITLE>磁盘测试页面</TITLE>
+      <SCRIPT language=JavaScript>
+              var websocket_url = 'ws://localhost:12345';
+              var websocket = null;
+
+              if (websocket === null) {
+                  websocket = new WebSocket(websocket_url);
+                  websocket.onopen = function () {
+                      console.log("connect websocketserver success");
+                  }
+              } else {
+                  websocket.close();
+                  websocket = null;
+              }
+
+              function getDiskList() {
+                  console.log("getDiskList")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskList();
+                          }
+                      );
+              }
+
+              function getDiskSectorSize() {
+                  console.log("getDiskSectorSize")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskSectorSize(pid);
+                          }
+                      );
+              }
+
+              function getDiskTotalSizeMiB() {
+                  console.log("getDiskTotalSizeMiB")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskTotalSizeMiB(pid);
+                          }
+                      );
+              }
+
+              function getDiskModel() {
+                  console.log("getDiskModel")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskModel(pid);
+                          }
+                      );
+              }
+
+              function getDiskSerial() {
+                  console.log("getDiskSerial")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskSerial(pid);
+                          }
+                      );
+              }
+
+              function getDiskPartitionNums() {
+                  console.log("getDiskPartitionNums")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskPartitionNums(pid);
+                          }
+                      );
+              }
+
+              function getDiskType() {
+                  console.log("getDiskType")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskType(pid);
+                          }
+                      );
+              }
+
+              function getDiskVersion() {
+                  console.log("getDiskVersion")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskVersion(pid);
+                          }
+                      );
+              }
+
+              // function getDiskSpeed() {
+              //     console.log("getDiskSpeed")
+              //     new QWebChannel(websocket,function(channel){
+              //             var res = document.getElementById("res");
+              //             pid = $("#pid").val()
+              //             var disk = channel.objects.disk;
+              //             disk.sendText.connect(function(message) {
+              //                 console.log("Received message: " + message);
+              //                 document.getElementById("res").value = message;
+              //             });
+              //             disk.getDiskSpeed(pid);
+              //             }
+              //         );
+              // }
+
+              function getDiskSectorNum() {
+                  console.log("getDiskSectorNum")
+                  new QWebChannel(websocket,function(channel){
+                          var res = document.getElementById("res");
+                          pid = $("#pid").val()
+                          var disk = channel.objects.disk;
+                          disk.sendText.connect(function(message) {
+                              console.log("Received message: " + message);
+                              document.getElementById("res").value = message;
+                          });
+                          disk.getDiskSectorNum(pid);
+                          }
+                      );
+              }
+              
+        //-->
+      </SCRIPT>
+      <META content="MSHTML 6.00.2900.6287" name=GENERATOR>
+      <style>
+        table tr td{padding: 5px;}
+      </style>
+  
+    </HEAD>
+    <BODY>
+      <div style="margin:30 5 20 5">
+        <div>
+          <input onclick="getDiskList()" type="button" value="磁盘列表"  style="width: 100px; height: 50px">
+          <input onclick="getDiskSectorSize()" type="button" value="扇区字节数"  style="width: 100px; height: 50px">
+          <input onclick="getDiskTotalSizeMiB()" type="button" value="磁盘容量"  style="width: 100px; height: 50px">
+          <input onclick="getDiskModel()" type="button" value="磁盘型号"  style="width: 100px; height: 50px">
+          <input onclick="getDiskSerial()" type="button" value="磁盘序列号"  style="width: 100px; height: 50px">
+          <input onclick="getDiskPartitionNums()" type="button" value="子分区数量"  style="width: 100px; height: 50px">
+          <input onclick="getDiskType()" type="button" value="磁盘类型"  style="width: 100px; height: 50px">
+          <input onclick="getDiskVersion()" type="button" value="固件版本信息"  style="width: 100px; height: 50px">
+          <!-- <input onclick="getDiskSpeed()" type="button" value="磁盘转速"  style="width: 100px; height: 50px"> -->
+          <input onclick="getDiskSectorNum()" type="button" value="磁盘扇区数量"  style="width: 100px; height: 50px">
+        </div>
+        <div id="input_box2">
+            <h3>磁盘名称:</h3>
+            <label>
+              <input type="text" id="pid" style="height: 30px; width: 200px;" placeholder="输入磁盘名称">
+            </label>
+          </div>
+        <div style="margin-top:20">
+          <div align=left style="margin:5 0 5 0">回复：</div>
+          <div>
+          <textarea id="res" style="width:1000px;height:500px" ></textarea>
+          </div>
+        </div>
+      </div>
+    </BODY>
+  </HTML>
+  

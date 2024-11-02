@@ -1,0 +1,74 @@
+#!/usr/bin/python3
+# 
+#  liblingmosdk-system's Library
+#  
+#  Copyright (C) 2023, KylinSoft Co., Ltd.
+# 
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 3 of the License, or (at your option) any later version.
+# 
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this library.  If not, see <https://www.gnu.org/licenses/>.
+# 
+#  Authors: tianshaoshuai <tianshaoshuai@kylinos.cn>
+# 
+# 
+
+import yaml, json
+import sys, os
+
+def retrofit_the_structure(src:dict, dest:dict):
+    if not isinstance(src, dict):
+        # dest.update({'value':str(src)})
+        print(f"{src}'s root node not a dict")
+        return
+    for key, value in src.items():
+        if isinstance(value, dict):
+            dest[key] = {}
+            retrofit_the_structure(src[key], dest[key])
+        else:
+            dest[key] = {}
+            if isinstance(value, list):
+                dest[key]['_type'] = 'as'
+                dest[key]['_default'] = str(src[key])
+            else:
+                dest[key]['_type'] = 's'
+                dest[key]['_default'] = src[key]
+
+def convert_one_file(src:str):
+    with open(src, 'r') as file:
+        data = json.loads(file.read())
+    base_name = os.path.basename(src)
+    name = os.path.splitext(base_name)[0]
+    result = {name : {'2.0.0.0-0k0.0': {}}}
+    retrofit_the_structure(data, result[name]['2.0.0.0-0k0.0'])
+
+    home = os.getenv('HOME')
+    if not os.path.exists(f'{home}/yaml'):
+        os.mkdir(f'{home}/yaml')
+    with open(f'{home}/yaml/{base_name[:-5]}.yaml', 'w') as yaml_file:
+        yaml_file.write(yaml.safe_dump(result, allow_unicode = True))
+
+# 参数传入.json结尾的json格式配置文件或目录路径
+# 将传入的所有配置文件或目录下的所有配置文件转换为yaml格式，生成在~/yaml路径下
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    for arg in args:
+        if os.path.isdir(arg):
+            for root, dirs, files in os.walk(arg):
+                for file in files:
+                    if file.endswith('.json'):
+
+                        convert_one_file(f'{root}/{file}')
+        else:
+            if arg.endswith('.json'):
+                convert_one_file(arg)
+            else:
+                print(f'argument{arg} is not a json file')

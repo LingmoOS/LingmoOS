@@ -1,0 +1,92 @@
+#!/bin/bash
+
+set -ex
+
+set_swap() {
+  while (true); do
+    if ! echo ${array} | grep -q linux-swap; then
+        break
+    fi
+    swaptmp=${array#*linux-swap:}
+    swapdev=$(echo ${swaptmp%%|*})
+    #mkswap ${swapdev}
+    swapon ${swapdev}
+
+    array=$(echo ${swaptmp} | cut -d'\' -f2-)
+  done
+}
+
+
+automatic=$(get_value automatic-installation)
+if [[ $automatic -eq 0 ]]; then
+
+  partlists=$(get_value partitions | sed 's/\"//g')
+  array_space=${partlists//;/ }
+  array=${partlists//;/|}
+
+  list=
+  for i in ${array_space[@]}; do
+    list="$list $(echo $i | cut -d: -f1)"
+  done
+  sort_list=$(echo $list | tr ' ' '\n' | sort)
+
+  for mountpoint in $sort_list; do
+    dev0=$(echo ${array#*$mountpoint:})
+    dev=$(echo ${dev0%%|*})
+
+    if [[ $mountpoint == "linux-swap" ]]; then
+      continue
+    fi
+
+    if [[ $mountpoint == "lingmo-data" ]]; then
+      mkdir -p /target/data
+      mount $dev /target/data
+      do_bind_data
+      continue
+    fi
+
+    mkdir -p /target$mountpoint
+    mount $dev /target$mountpoint
+    
+    if [[ $mountpoint == "/backup" ]]; then
+      set_backup $dev
+    fi
+
+    if [[ $mountpoint == "/data" ]]; then
+      chmod 1777 /target$mountpoint >/dev/null
+    fi
+  done
+
+  set_swap
+fi
+
+deal_squashfs() {
+  if [[ "${is_minimal}" == "true" ]]; then
+    minimal_squashfs=$(find /cdrom/casper -name '*img' | head -1)
+    # 挂载最小系统镜像
+    if [[ $minimal_squashfs =~ 'img' ]]; then
+      mount -r $minimal_squashfs /rofs
+    fi
+  elif [[ "${is_ghost}" == "true" ]]; then
+    ghost_img=$(get_value ghost-path)
+    # 挂载 ghost 镜像
+    if [[ ${ghost_img} =~ 'img' ]]; then
+      mount -r $ghost_img /rofs || true
+    fi
+  fi
+}
+
+msg "正在拷贝基础文件系统..."
+# 判断使用最小系统镜像或 ghost
+deal_squashfs
+rsync -aHAX /rofs/ /target
+msg "文件系统拷贝完成"
+sync
+cp /var/cache/lingmo-daq/lingmoDaqConf.json /target/var/cache/lingmo-daq/
+
+# 加密
+if [[ "${isluks_lvm}" == "true" ]]; then
+  rsync /etc/crypttab /target/etc
+  rm -f /target/etc/grub.d/05* || true
+  rm -f /target/etc/grub.d/06* || true
+fi

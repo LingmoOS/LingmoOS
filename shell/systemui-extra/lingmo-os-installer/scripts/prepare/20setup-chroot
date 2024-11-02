@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+do_mountfs() {
+    mkdir -p /target/{dev,run,dev/pts,proc,sys}
+    mount --bind /dev /target/dev
+    mount --bind /run /target/run
+    mount -vt devpts devpts /target/dev/pts -o gid=5,mode=620
+    mount -vt proc proc /target/proc
+    mount -vt sysfs sysfs /target/sys
+}
+
+do_mount_cdrom() {
+    mkdir -p /target/cdrom
+    mount --bind /cdrom /target/cdrom
+}
+
+do_mountfs
+
+do_mount_cdrom
+
+if [[ "${is_efi}" == "true" ]]; then
+    mkdir -p /target/sys/firmware/efi/efivars || true
+    mount --bind /sys/firmware/efi/efivars /target/sys/firmware/efi/efivars || true
+fi
+

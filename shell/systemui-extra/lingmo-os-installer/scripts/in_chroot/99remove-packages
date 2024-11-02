@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+# remove package list
+packages_list_remove=(
+    lingmo-os-installer
+    casper
+    lingmo-installer-wayland
+    ubiquity
+)
+
+# oem mode 不删除安装包
+if [[ "${is_oem_mode}" = "true" ]]; then
+    packages_list_remove=(
+        lingmo-installer-wayland
+    )
+    if [[ "${is_990_9a0}" = "true" ]]; then
+    packages_list_remove=(
+        casper
+    )
+    fi
+
+    if egrep -qi '3A5000' /proc/cpuinfo; then
+        packages_list_remove=(
+	    lingmo-installer-wayland
+	    casper
+        )
+    fi
+
+fi
+
+if [[ "${is_ghost}" == "true" ]]; then
+  packages_list_remove=(
+    lingmo-os-installer
+    casper
+  )
+
+fi
+
+
+for i in ${packages_list_remove[*]}; do
+    if dpkg -l | grep -q $i; then
+        msg "移除 $i"
+        apt purge -y $i
+    fi
+done

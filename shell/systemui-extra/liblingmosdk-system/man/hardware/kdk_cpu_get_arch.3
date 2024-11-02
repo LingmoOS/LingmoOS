@@ -1,0 +1,53 @@
+.TH "KDK_CPU_GET_ARCH" 3 "Thu Aug 24 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_cpu_get_arch - 获取CPU架构
+.SH SYNOPSIS
+.nf
+.B #include <libkycpu.h>
+.sp
+.BI "extern const char* kdk_cpu_get_arch();"
+.sp
+Link with \fI\-lkyhw\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain CPU architecture
+.SH "RETURN VALUE"
+On success, returns the CPU architecture of type char*, such as "x86_64"; The return is const char*, do not
+.I free
+.PP
+On error, return
+.BR NULL.
+.SH EXAMPLES
+.EX
+#include "libkycpu.h"
+#include <stdio.h>
+
+int main()
+{
+    printf("架构：%s\en", kdk_cpu_get_arch());
+    printf("生产厂商：%s\en", kdk_cpu_get_vendor());
+    printf("CPU 型号：%s\en", kdk_cpu_get_model());
+    printf("CPU 主频：%s MHz\en", kdk_cpu_get_freq_MHz());
+    printf("CPU 单核核心数量：%u\en", kdk_cpu_get_corenums());
+    printf("CPU 虚拟化支持：%s\en", kdk_cpu_get_virt());
+    printf("CPU 线程数：%u\en", kdk_cpu_get_process());
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_cpu_get_vendor (),
+.BR kdk_cpu_get_model (),
+.BR kdk_cpu_get_freq_MHz (),
+.BR kdk_cpu_get_corenums (),
+.BR kdk_cpu_get_virt ()
+and
+.BR kdk_cpu_get_process ().
+.SH "SEE ALSO"
+.BR kdk_cpu_get_vendor (3),
+.BR kdk_cpu_get_model (3),
+.BR kdk_cpu_get_freq_MHz (3),
+.BR kdk_cpu_get_corenums (3),
+.BR kdk_cpu_get_virt (3)
+and
+.BR kdk_cpu_get_process (3).

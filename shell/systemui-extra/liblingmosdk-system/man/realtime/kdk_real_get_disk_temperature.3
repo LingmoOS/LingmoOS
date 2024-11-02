@@ -1,0 +1,56 @@
+.TH "KDK_REAL_GET_DISK_TEMPERATURE" 3 "Tue Sep 19 2023" "Linux Programmer's Manual" \"
+.SH NAME
+kdk_real_get_disk_temperature - 获取磁盘温度
+.SH SYNOPSIS
+.nf
+.B #include <libkyrealtimeinfo.h>
+.sp
+.BI "extern int kdk_real_get_disk_temperature(const char *"name ");" 
+.sp
+Link with \fI\-lkyrealtime\fP.
+.SH "Detailed Description"
+The main function of the interface is to obtain the disk temperature.
+.PP
+The argument
+.I name
+is the name of the disk, such as absolute path such as 
+.I /dev/sda.
+.SH "RETURN VALUE"
+On success, returns the disk temperature of type int.
+.PP
+On error, return
+.BR -1.
+.SH EXAMPLES
+.EX
+#include "stdio.h"
+#include "libkyrealtimeinfo.h"
+
+int main()
+{
+    // if(argc < 3)
+    // {
+    //     printf("./kyrealtime-test <网卡名> <磁盘名>\n");
+    //     return 0;
+    // }
+    printf("netSpeed : %f\n", kdk_real_get_net_speed("enaftgm1i0"));
+    printf("cpuTemp: %f\n", kdk_real_get_cpu_temperature());
+    printf("diskTemp : %d\n", kdk_real_get_disk_temperature("/dev/nvme0n1"));
+    printf("diskRate : %d\n", kdk_real_get_disk_rate("/dev/nvme0n1"));
+    printf("ifnetSpeed : %f\n", kdk_real_get_if_speed("enaftgm1i0"));
+    return 0;
+}
+
+.SH "CONFORMING TO"
+These functions are as per the withdrawn POSIX.1e draft specification.
+The following functions are Linux extensions:
+.BR kdk_real_get_net_speed (),
+.BR kdk_real_get_cpu_temperature (),
+.BR kdk_real_get_disk_rate ()
+and
+.BR kdk_real_get_if_speed ().
+.SH "SEE ALSO"
+.BR kdk_real_get_net_speed (3),
+.BR kdk_real_get_cpu_temperature (3),
+.BR kdk_real_get_disk_rate (3)
+and
+.BR kdk_real_get_if_speed (3).

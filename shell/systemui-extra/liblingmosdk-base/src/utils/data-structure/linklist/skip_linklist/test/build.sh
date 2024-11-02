@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gcc -o search_test search_test.c ../skip_linklist.c -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/ -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/skip_linklist -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/ -g -O0
+gcc -o insert_test insert_test.c ../skip_linklist.c -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/ -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/skip_linklist -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/ -g -O0
+gcc -o delete_test delete_test.c ../skip_linklist.c -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/ -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/skip_linklist -I/data/git-local-storage/lingmosdk/lingmosdk-base/src/utils/data-structure/linklist/ -g -O0

@@ -1,0 +1,56 @@
+#!/bin/sh
+
+#set -e
+
+path="/usr/lib/`/usr/bin/dpkg-architecture -qDEB_TARGET_MULTIARCH`/lingmo-control-center/libukcc-bluetooth.so"
+dpkg-divert --package lingmo-bluetooth --rename --divert "$path"".old" --add $path
+
+
+bluetooth_open(){
+    if [ -d "/etc/bluetooth/lingmo-bluetooth.conf" ]
+    then
+        echo "/etc/bluetooth/lingmo-bluetooth.conf exist"
+    else
+        echo "create conf"
+        echo "[conf]" >> /etc/bluetooth/lingmo-bluetooth.conf
+        echo "switch=true" >> /etc/bluetooth/lingmo-bluetooth.conf
+    fi
+}
+
+
+stop_server(){
+    echo "stop_server"
+    systemctl stop activeuser.service
+    systemctl stop lingmo-bluetooth.service
+}
+
+stop_server
+echo "stop_server suc"
+
+version=`dpkg -l lingmo-bluetooth |grep lingmo-bluetooth |awk '{ print $3}'`
+echo "pre bersion: "$version
+
+#2107需要使用1.0.0-1 ，由于1.0.0可以和1-0k0匹配
+result2107=$(echo $version | grep "1.0.0-1")
+result2203=$(echo $version | grep "1.0.3")
+echo "result2107: "$result2107 
+echo "result2203:" $result2203 
+
+if [ -z $result2107 ]
+then
+    echo "not include version-1.0.0"
+else
+    echo "include version-1.0.0"
+    bluetooth_open
+fi
+
+if [ -z $result2203 ]
+then
+    echo "not include version-1.0.3"
+else
+    echo "include version-1.0.3"
+    bluetooth_open
+fi
+
+
+#DEBHELPER#
