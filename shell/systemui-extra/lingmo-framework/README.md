@@ -3,8 +3,8 @@
 lingmo-framework is a ....
 
 ## Components
-* explor
-* explor-extensions
+* explorer
+* explorer-extensions
 * lingmo-menu
 * lingmo-panel
 * lingmo-sidebar

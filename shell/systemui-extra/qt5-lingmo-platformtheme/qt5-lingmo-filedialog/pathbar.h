@@ -26,7 +26,7 @@
 #define PATHBAR_H
 #include <QLineEdit>
 #include <QResizeEvent>
-#include <explor-qt/controls/navigation-bar/advanced-location-bar.h>
+#include <explorer-qt/controls/navigation-bar/advanced-location-bar.h>
 
 namespace LINGMOFileDialog {
 class FileDialogPathBar : public QWidget//public QLineEdit//

@@ -53,7 +53,7 @@ protected:
     /*!
      * \brief confirmBlurEnableDelay
      * \note
-     * some application start before kwin, such as explor-qt-desktop.
+     * some application start before kwin, such as explorer-qt-desktop.
      * we have to ensure that the blurEnable protocol not effected by
      * the case. Delay a while and check it again is a normally way to
      * confirm.

@@ -52,7 +52,7 @@ find_package(X11)
 
 find_package(PkgConfig)
 pkg_check_modules(QGSETTINGS REQUIRED gsettings-qt)
-pkg_check_modules(PEONY REQUIRED explor)
+pkg_check_modules(PEONY REQUIRED explorer)
 pkg_check_modules(REQUIRED lingmosdk-waylandhelper)
 pkg_check_modules(GLIB2 REQUIRED glib-2.0 gio-2.0 )
 pkg_check_modules(LINGMOSDKWAYLANDHELPER REQUIRED lingmosdk-waylandhelper)
@@ -182,12 +182,12 @@ endif()
 set(test_libs
     Qt5::Widgets
     glib-2.0
-    explor
+    explorer
     )
 
 SET(_code "
     #include <glib-object.h>
-    #include <explor-qt/search-vfs-uri-parser.h>
+    #include <explorer-qt/search-vfs-uri-parser.h>
 
     int main()
     {

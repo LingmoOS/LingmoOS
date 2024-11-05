@@ -29,7 +29,7 @@
 #include <QObject>
 #include <QDBusInterface>
 #include <QDBusMessage>
-#include <explor-qt/file-utils.h>
+#include <explorer-qt/file-utils.h>
 #include "debug.h"
 #include "settings/lingmo-style-settings.h"
 using namespace LINGMOFileDialog;

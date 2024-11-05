@@ -131,7 +131,7 @@ WidgetItem {
             text: qsTr("File Manager")
             onTriggered: function () {
                 // TODO: 使用标准协议打开文件管理器，保持不同桌面环境的兼容性
-                AppLauncher.launchApp("/usr/share/applications/explor.desktop");
+                AppLauncher.launchApp("/usr/share/applications/explorer.desktop");
             }
         },
         Action {

@@ -36,12 +36,12 @@
 #include <QScreen>
 #include <QDBusInterface>
 #include "kyfiledialog.h"
-#include "explor-qt/controls/menu/side-bar-menu/side-bar-menu.h"
-#include "explor-qt/side-bar-abstract-item.h"
-#include "explor-qt/volume-manager.h"
-#include "explor-qt/file-enumerator.h"
-#include "explor-qt/file-utils.h"
-#include "explor-qt/file-info.h"
+#include "explorer-qt/controls/menu/side-bar-menu/side-bar-menu.h"
+#include "explorer-qt/side-bar-abstract-item.h"
+#include "explorer-qt/volume-manager.h"
+#include "explorer-qt/file-enumerator.h"
+#include "explorer-qt/file-utils.h"
+#include "explorer-qt/file-info.h"
 #include "settings/lingmo-style-settings.h"
 #include "debug.h"
 using namespace LINGMOFileDialog;

@@ -110,7 +110,7 @@ void AppLauncher::openUri(const QString &uri, const QString &parentWindow)
         return;
     }
     //这个接口调用了org.freedesktop.portal.OpenURI，当uri为本地文件时会调用后端org.freedesktop.impl.portal.AppChooser，
-    // 会显示explor的应用选择窗
+    // 会显示explorer的应用选择窗
     if(!QDesktopServices::openUrl(QUrl(uri))) {
         qWarning() << "Fail to open" << uri;
     }

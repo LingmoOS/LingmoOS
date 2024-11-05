@@ -75,7 +75,7 @@ private:
      * \note
      * insert a tmp tab page into tab widget directly is dangerous,
      * because a custom tab widget's page may be desgined different
-     * with normal tab page, such as explor-qt's directory view.
+     * with normal tab page, such as explorer-qt's directory view.
      * In that case, it might lead program crashed when
      * application call a custom page but get a tmp page.
      *

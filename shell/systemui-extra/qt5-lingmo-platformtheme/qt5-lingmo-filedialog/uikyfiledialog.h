@@ -41,8 +41,8 @@
 #include "sidebar.h"
 #include <QSizePolicy>
 #include "kyfiledialog.h"
-#include <explor-qt/controls/directory-view/directory-view-container.h>
-#include <explor-qt/controls/navigation-bar/advanced-location-bar.h>
+#include <explorer-qt/controls/directory-view/directory-view-container.h>
+#include <explorer-qt/controls/navigation-bar/advanced-location-bar.h>
 #include "pathbar.h"
 #include <QPushButton>
 #include <QToolBar>

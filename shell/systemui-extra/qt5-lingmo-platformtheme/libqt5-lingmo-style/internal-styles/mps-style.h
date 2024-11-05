@@ -34,7 +34,7 @@
  * Usually, applications use the styles which have been installed as qstyle plugin in
  * LINGMO desktop environment, such as lingmo-white and lingmo-black. However one style may
  * be not enough for LINGMO3.0 desgin. The menu, panel and sidebar desgin is Noticeably
- * different from the common style which we used in explor or other qt's applications.
+ * different from the common style which we used in explorer or other qt's applications.
  * To integrate the unique style into the theme, I came up the idea of internal styles,
  * and combine them with current platform theme's frameworks. So it will Looks like a
  * whole style.

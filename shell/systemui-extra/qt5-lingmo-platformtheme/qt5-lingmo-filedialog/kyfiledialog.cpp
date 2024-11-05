@@ -28,11 +28,11 @@
 #include "sidebar.h"
 #include "pathbar.h"
 #include "lingmostylehelper/lingmostylehelper.h"
-#include <explor-qt/controls/directory-view/directory-view-container.h>
-#include <explor-qt/controls/menu/directory-view-menu/directory-view-menu.h>
-#include <explor-qt/controls/directory-view/directory-view-widget.h>
-#include <explor-qt/controls/directory-view/directory-view-factory/directory-view-factory-manager.h>
-#include <explor-qt/file-operation-utils.h>
+#include <explorer-qt/controls/directory-view/directory-view-container.h>
+#include <explorer-qt/controls/menu/directory-view-menu/directory-view-menu.h>
+#include <explorer-qt/controls/directory-view/directory-view-widget.h>
+#include <explorer-qt/controls/directory-view/directory-view-factory/directory-view-factory-manager.h>
+#include <explorer-qt/file-operation-utils.h>
 #include <QDesktopServices>
 #include <QUrl>
 #include <PeonyFileInfo>
@@ -57,12 +57,12 @@
 #include <QDBusMessage>
 #include <qpa/qplatformdialoghelper.h>
 #include "../qt5-lingmo-platformtheme/xatom-helper.h"
-#include <explor-qt/file-utils.h>
-#include <explor-qt/create-template-operation.h>
-#include <explor-qt/global-settings.h>
-#include <explor-qt/search-vfs-uri-parser.h>
-#include <explor-qt/file-meta-info.h>
-#include <explor-qt/clipboard-utils.h>
+#include <explorer-qt/file-utils.h>
+#include <explorer-qt/create-template-operation.h>
+#include <explorer-qt/global-settings.h>
+#include <explorer-qt/search-vfs-uri-parser.h>
+#include <explorer-qt/file-meta-info.h>
+#include <explorer-qt/clipboard-utils.h>
 #include "debug.h"
 #include "settings/lingmo-style-settings.h"
 
@@ -2571,10 +2571,10 @@ void KyNativeFileDialog::installTranslate(QString locale)
     }
 
     m_translator1 = new QTranslator(this);
-    pDebug << "QTranslator t load" << m_translator1->load("/usr/share/libexplor-qt/libexplor-qt_" + locale);
+    pDebug << "QTranslator t load" << m_translator1->load("/usr/share/libexplorer-qt/libexplorer-qt_" + locale);
     QApplication::installTranslator(m_translator1);
     m_translator2 = new QTranslator(this);
-    pDebug << "QTranslator t2 load" << m_translator2->load("/usr/share/explor-qt-desktop/explor-qt-desktop_" + locale);
+    pDebug << "QTranslator t2 load" << m_translator2->load("/usr/share/explorer-qt-desktop/explorer-qt-desktop_" + locale);
     QApplication::installTranslator(m_translator2);
     m_translator3 = new QTranslator(this);
     pDebug << "QTranslator t3 load" << m_translator3->load("/usr/share/qt5/translations/qt_" + locale);

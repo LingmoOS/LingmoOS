@@ -32,7 +32,7 @@
 #include <QStringListModel>
 #include <QTranslator>
 #include "qpa/qplatformdialoghelper.h"
-#include <explor-qt/FMWindowIface.h>
+#include <explorer-qt/FMWindowIface.h>
 
 #define OPEN_ACTIONS_SEPARATOR "open-actions-seperator"
 #define CREATE_ACTIONS_SEPARATOR "create-actions-seperator"

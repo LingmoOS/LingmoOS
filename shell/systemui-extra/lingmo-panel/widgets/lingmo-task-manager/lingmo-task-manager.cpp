@@ -48,7 +48,7 @@ static const QString QUICK_LAUNCHERS_KEY("quickLaunchers");
 static const QString NOTIFICATION_SERVICE = QStringLiteral("org.freedesktop.Notifications");
 static const QString NOTIFICATION_PATH = QStringLiteral("/org/freedesktop/Notifications");
 static const QString NOTIFICATION_INTERFACE = QStringLiteral("org.lingmo.NotificationServer");
-static const QStringList DEFAULT_QUICK_LAUNCHERS = {"/usr/share/applications/explor.desktop",
+static const QStringList DEFAULT_QUICK_LAUNCHERS = {"/usr/share/applications/explorer.desktop",
                                                     "/usr/share/applications/firefox.desktop",
                                                     "/usr/share/applications/lingmo-software-center.desktop",
                                                     "/usr/share/applications/lingmo-screenshot.desktop",
@@ -114,7 +114,7 @@ void LingmoUITaskManager::Private::loadSettings()
         m_quickLaunchersOrder = m_config->getValue(QUICK_LAUNCHERS_KEY).toStringList();
     } else {
         m_quickLaunchersOrder = QStringList {
-            "/usr/share/applications/explor.desktop",
+            "/usr/share/applications/explorer.desktop",
             "/usr/share/applications/firefox.desktop",
             "/usr/share/applications/lingmo-software-center.desktop",
             "/usr/share/applications/lingmo-screenshot.desktop",

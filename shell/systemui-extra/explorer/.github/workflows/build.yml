@@ -1,0 +1,101 @@
+name: Check build
+
+on:
+  push:
+    branches:
+      - master
+    
+  pull_request:
+    branches:
+      - master
+  
+jobs:
+  archlinux-latest:
+    name: on Archlinux
+    runs-on: ubuntu-20.04
+    container: docker.io/library/archlinux:latest
+    steps:
+      - name: Checkout explorer source code
+        uses: actions/checkout@v2
+      - name: Refresh pacman repository and force upgrade
+        run: pacman -Syyu --noconfirm
+      - name: Install build dependencies
+        run: pacman -S --noconfirm base-devel qt5-base gsettings-qt kwindowsystem poppler-qt5 qt5-x11extras glib2 qt5-tools udisks2 gtk2 libnotify glibc
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+
+  debian-sid:
+    name: on Debian Sid
+    runs-on: ubuntu-20.04
+    container: docker.io/library/debian:sid
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Checkout explorer source code
+        uses: actions/checkout@v2
+      - name: Update apt repository
+        run: apt-get update -y
+      - name: Install build dependcies
+        run: apt-get install -y build-essential qt5-default qttools5-dev-tools debhelper-compat pkg-kde-tools pkg-config libglib2.0-dev libqt5x11extras5-dev  libgsettings-qt-dev libpoppler-dev libpoppler-qt5-dev libkf5windowsystem-dev qtbase5-private-dev libudisks2-dev libgtk2.0-dev libnotify-dev libcanberra-dev
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake ..;
+          make -j$(nproc);
+  
+  fedora-latest:
+    name: on Fedora Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:latest
+    steps:
+      - name: Checkout explorer source code
+        uses: actions/checkout@v2
+      - name: Install build dependencies
+        run: dnf install --refresh -y make gcc gcc-c++ which cmake cmake-rpm-macros autoconf automake intltool rpm-build qt5-devel qt5-rpm-macros qt5-qtbase-devel qt5-qttools-devel glib2-devel qt5-qtbase-devel gsettings-qt-devel kf5-kwindowsystem-devel poppler-qt5-devel qt5-qtx11extras-devel qt5-qtbase-private-devel libudisks2-devel  gtk2-devel libnotify-devel
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+
+  fedora-rawhide:
+    name: on Fedora Rawhide
+    runs-on: ubuntu-20.04
+    container: docker.io/library/fedora:rawhide
+    steps: 
+      - name: Checkout explorer source code
+        uses: actions/checkout@v2
+      - name: Install build dependencies
+        run: dnf install --refresh --nogpg -y make gcc gcc-c++ which cmake cmake-rpm-macros autoconf automake intltool rpm-build qt5-rpm-macros qt5-qtbase-devel qt5-qttools-devel glib2-devel qt5-qtbase-devel gsettings-qt-devel kf5-kwindowsystem-devel poppler-qt5-devel qt5-qtx11extras-devel qt5-qtbase-private-devel libudisks2-devel  gtk2-devel libnotify-devel
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake-qt5 ..;
+          make -j$(nproc);
+
+  ubuntu-latest:
+    name: on Ubuntu Latest
+    runs-on: ubuntu-20.04
+    container: docker.io/library/ubuntu:latest
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Checkout explorer source code
+        uses: actions/checkout@v2
+      - name: Update apt repository
+        run: apt-get update -y
+      - name: Install build dependcies
+        run: apt-get install -y build-essential qt5-default qttools5-dev-tools debhelper-compat pkg-kde-tools pkg-config libglib2.0-dev libqt5x11extras5-dev  libgsettings-qt-dev libpoppler-dev libpoppler-qt5-dev libkf5windowsystem-dev qtbase5-private-dev libudisks2-dev  libgtk2.0-dev libnotify-dev
+      - name: QMake configure & Make
+        run: |
+          mkdir build;
+          cd build;
+          qmake ..;
+          make -j$(nproc);

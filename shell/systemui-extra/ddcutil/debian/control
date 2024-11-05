@@ -1,0 +1,62 @@
+Source: ddcutil
+Priority: optional
+Section: utils
+Maintainer: Lingmo OS Team <team@lingmo.org>
+XSBC-Original-Maintainer: Sanford Rockowitz <rockowitz@minsoft.com>
+Build-Depends: debhelper (>= 13),
+               libdrm-dev,
+               libglib2.0-dev (>= 2.64),
+               libi2c-dev (>= 4.0),
+               libkmod-dev,
+               libudev-dev,
+               libusb-1.0-0-dev,
+               libxrandr-dev,
+               pkg-config
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://www.ddcutil.com
+
+Package: ddcutil
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         pci.ids,
+         usb.ids,
+         usbutils,
+         i2c-tools (>= 4.0)
+Description: Control monitor settings - Standalone command line application
+ ddcutil is used to query and change monitor settings.
+ .
+ ddcutil communicates with monitors implementing MCCS (Monitor Control Command
+ Set). Normally, communication is performed using the DDC/CI protocol on the
+ I2C bus.  Alternatively, communication can be performed over USB as per the
+ USB Monitor Control Class Specification.
+
+Package: libddcutil4
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         pci.ids,
+         usb.ids,
+         usbutils
+Description: Control monitor settings - shared library
+ This is the shared library version of ddcutil.
+ .
+ ddcutil communicates with monitors implementing MCCS (Monitor Control Command
+ Set). Normally, communication is performed using the DDC/CI protocol on the
+ I2C bus.  Alternatively, communication can be performed over USB as per the
+ USB Monitor Control Class Specification.
+
+Package: libddcutil-dev
+Architecture: any
+Section: libdevel
+Depends: ${misc:Depends},
+         libddcutil4 (=${binary:Version})
+Description: Control monitor settings - development files
+ These are the C development files for libddcutil.
+ .
+ ddcutil communicates with monitors implementing MCCS (Monitor Control Command
+ Set). Normally, communication is performed using the DDC/CI protocol on the
+ I2C bus.  Alternatively, communication can be performed over USB as per the
+ USB Monitor Control Class Specification.

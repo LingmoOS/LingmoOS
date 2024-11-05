@@ -69,7 +69,7 @@ void SidebarButtonUtils::openUserCenter()
 
 void SidebarButtonUtils::openPeonyComputer()
 {
-    LingmoUIMenu::AppManager::instance()->launchAppWithArguments("/usr/share/applications/explor-computer.desktop", QStringList(), "/usr/bin/explor computer:///");
+    LingmoUIMenu::AppManager::instance()->launchAppWithArguments("/usr/share/applications/explorer-computer.desktop", QStringList(), "/usr/bin/explorer computer:///");
 }
 
 void SidebarButtonUtils::openControlCenter()
