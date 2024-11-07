@@ -58,11 +58,11 @@ void LevelScrollDiskView::initUI()
 //    m_prev->setIconSize(QSize(16, 16));
     leftBtn->setStyleSheet(QLatin1String("QPushButton{border: none;outline: none;color: white;padding:16px 16px 16px 16px;background:transparent;border:none;}"
                                         "QPushButton:hover{"
-                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 6px;}"
+                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 13px;}"
                                         " QPushButton:checked{ "
-                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"));
+                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"));
 
     rightBtn = new QPushButton();
     rightBtn->setMinimumWidth(50);
@@ -74,11 +74,11 @@ void LevelScrollDiskView::initUI()
 //    m_next->setIconSize(QSize(16, 16));
     rightBtn->setStyleSheet(QLatin1String("QPushButton{border: none;outline: none;color: white;padding:16px 16px 16px 16px;background:transparent;border:none;}"
                                         "QPushButton:hover{"
-                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 6px;}"
+                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 13px;}"
                                         " QPushButton:checked{ "
-                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"));
+                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"));
     layout->addWidget(leftBtn, Qt::AlignLeft);
     layout->addWidget(listWidget, Qt::AlignHCenter);
 

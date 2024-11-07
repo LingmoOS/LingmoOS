@@ -15,22 +15,69 @@ DISTRIB_RELEASE=$(grep -r PRETTY_NAME= /etc/os-release)
 DISTRIB_RELEASE=${DISTRIB_RELEASE#*=}
 
 case ${DISTRIB_RELEASE} in
-    '"Lingmo V10 SP1"')
+    '"Lingmo OS 3.0.0-rc.1 (Helium)"')
         echo "
-deb http://archive.kylinos.cn/lingmo/LINGMO-ALL 10.1 main restricted universe multiverse
-deb http://archive.kylinos.cn/lingmo/partner 10.1 main" >/etc/apt/sources.list
-        ;;
-    '"Lingmo V10"')
+# Lingmo OS official software repository
+deb https://packages.lingmo.org/lingmo helium main
+# deb-src http://packages.lingmo.org/lingmo helium main
+
+# Lingmo OS Team <team@lingmo.org>" >/etc/apt/sources.list
         echo "
-deb http://archive.kylinos.cn/lingmo/LINGMO-ALL 10.0 main restricted universe multiverse
-" >/etc/apt/sources.list
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: http://debian-archive.trafficmanager.net/debian
+# Suites: testing testing-updates testing-backports
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: http://debian-archive.trafficmanager.net/debian-security
+# Suites: testing-security
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg" >/etc/apt/sources.list.d/debian.sources
         ;;
+#     '"Lingmo V10"')
+#         echo "
+# deb http://archive.kylinos.cn/lingmo/LINGMO-ALL 10.0 main restricted universe multiverse
+# " >/etc/apt/sources.list
+#         ;;
     *)
-	rm -f /etc/apt/sources.list.d/lingmo.list ||true
+	rm -f /etc/apt/sources.list.d/debian.sources ||true
         echo "
-deb http://archive.build.lingmo.top/lingmo/ nile main cross pty
-deb http://archive.build.lingmo.top/lingmo/ nile-security main cross pty
-deb http://archive.build.lingmo.top/lingmo/ nile-updates main cross pty
-" >/etc/apt/sources.list
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: http://debian-archive.trafficmanager.net/debian
+# Suites: testing testing-updates testing-backports
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: http://debian-archive.trafficmanager.net/debian-security
+# Suites: testing-security
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+" >/etc/apt/sources.list.d/debian.sources
         ;;
 esac

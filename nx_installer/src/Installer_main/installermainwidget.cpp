@@ -181,7 +181,7 @@ void InstallerMainWidget::initBackground()
 
     //设置背景blue色
     QRect rect = KServer::GetScreenRect();
-    QPixmap pixmap = QPixmap(":/data/png/sp2-bk@1x.png").scaled(rect.width(), rect.height(), Qt::KeepAspectRatioByExpanding);
+    QPixmap pixmap = QPixmap(":/data/png/lmbg.png").scaled(rect.width(), rect.height(), Qt::KeepAspectRatioByExpanding);
     QPalette pal(this->palette());
     pal.setBrush(backgroundRole(), QBrush(pixmap));
     this->setAutoFillBackground(true);

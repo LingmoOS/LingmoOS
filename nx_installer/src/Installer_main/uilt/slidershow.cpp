@@ -116,11 +116,11 @@ void SlideShow::initUI()
 //    m_prev->setIconSize(QSize(16, 16));
     m_prev->setStyleSheet(QLatin1String("QPushButton{border: none;outline: none;color: white;padding:16px 16px 16px 16px;background:transparent;border:none;}"
                                         "QPushButton:hover{"
-                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 6px;}"
+                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 13px;}"
                                         " QPushButton:checked{ "
-                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"));
+                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"));
     hlayout->addWidget(m_prev, Qt::AlignCenter);
     loadSlides();
 
@@ -132,11 +132,11 @@ void SlideShow::initUI()
 //    m_next->setIconSize(QSize(16, 16));
     m_next->setStyleSheet(QLatin1String("QPushButton{border: none;outline: none;color: white;padding:16px 16px 16px 16px;background:transparent;border:none;}"
                                         "QPushButton:hover{"
-                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 6px;}"
+                                        "width: 48px;height: 48px;background: rgba(255, 255, 255, 0.35);border-radius: 13px;}"
                                         " QPushButton:checked{ "
-                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"
-                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 6px;}"));
+                                        " height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:pressed{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"
+                                        "QPushButton:foucs{height: 48px;background: rgba(255, 255, 255, 0.25); border-radius: 13px;}"));
     hlayout->addWidget(m_next, Qt::AlignCenter);
 
 

@@ -17,7 +17,7 @@ const QStringList colorNameStr = { QString("#EA5504"),QString("#00A0DA"),QString
 DiskPartitionColorProgress::DiskPartitionColorProgress(QFrame *parent) : QFrame(parent)
 {
     this->setObjectName("DiskPartitionColorProgress");
-    this->setStyleSheet("QWidget#DiskPartitionColorProgress{border: 1px ;border-color: rgba(255,255,255,0.5);border-radius: 4px;}");
+    this->setStyleSheet("QWidget#DiskPartitionColorProgress{border: 1px ;border-color: rgba(255,255,255,0.5);border-radius: 12px;}");
     initUI();
 }
 

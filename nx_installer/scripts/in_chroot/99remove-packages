@@ -5,35 +5,61 @@ set -e
 # remove package list
 packages_list_remove=(
     lingmo-os-installer
-    casper
-    lingmo-installer-wayland
-    ubiquity
+    live-boot
+    live-boot-doc
+    live-config
+    live-config-doc
+    live-config-systemd
+    live-tools
+    live-task-localisation
+    live-task-recommended
 )
 
 # oem mode 不删除安装包
 if [[ "${is_oem_mode}" = "true" ]]; then
     packages_list_remove=(
-        lingmo-installer-wayland
+        live-boot
+        live-boot-doc
+        live-config
+        live-config-doc
+        live-config-systemd
+        live-tools
+        live-task-localisation
+        live-task-recommended
     )
     if [[ "${is_990_9a0}" = "true" ]]; then
     packages_list_remove=(
-        casper
+        live-boot
+        live-boot-doc
+        live-config
+        live-config-doc
+        live-config-systemd
+        live-tools
+        live-task-localisation
+        live-task-recommended
     )
     fi
 
-    if egrep -qi '3A5000' /proc/cpuinfo; then
-        packages_list_remove=(
-	    lingmo-installer-wayland
-	    casper
-        )
-    fi
+    # if egrep -qi '3A5000' /proc/cpuinfo; then
+    #     packages_list_remove=(
+	#     lingmo-installer-wayland
+	#     casper
+    #     )
+    # fi
 
 fi
 
 if [[ "${is_ghost}" == "true" ]]; then
   packages_list_remove=(
     lingmo-os-installer
-    casper
+    live-boot
+    live-boot-doc
+    live-config
+    live-config-doc
+    live-config-systemd
+    live-tools
+    live-task-localisation
+    live-task-recommended
   )
 
 fi

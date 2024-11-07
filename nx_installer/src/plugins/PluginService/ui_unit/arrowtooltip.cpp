@@ -24,7 +24,7 @@ ArrowWidget::ArrowWidget(bool flag, QWidget *parent):
     setWindowFlags(Qt::ToolTip);
     setAttribute(Qt::WA_TranslucentBackground);
     //    setWindowModality(Qt::NonModal);
-//    this->setStyleSheet("QWidget{border-radius: 6px;background:#FFFFFF;font-size:14px;padding: 6px 6px 6px 6px;}");
+//    this->setStyleSheet("QWidget{border-radius: 13px;background:#FFFFFF;font-size:14px;padding: 6px 6px 6px 6px;}");
 
     QHBoxLayout* hMainLayout = new QHBoxLayout;
     hMainLayout->setContentsMargins(0,0,0,0);
@@ -38,9 +38,9 @@ ArrowWidget::ArrowWidget(bool flag, QWidget *parent):
     tooltip_text->setAlignment(Qt::AlignLeft);
     if(m_flag) {
 
-       tooltip_text->setStyleSheet("QWidget{border-radius: 4px;background:#FFFFFF;padding: 5px 5px 5px 5px;color:#000000;font-size:14px;}");
+       tooltip_text->setStyleSheet("QWidget{border-radius: 12px;background:#FFFFFF;padding: 5px 5px 5px 5px;color:#000000;font-size:14px;}");
     } else
-        tooltip_text->setStyleSheet("QWidget{border-radius: 4px;padding: 6px 6px 6px 6px;color:#FFFFFF;font-size:14px;}");
+        tooltip_text->setStyleSheet("QWidget{border-radius: 12px;padding: 6px 6px 6px 6px;color:#FFFFFF;font-size:14px;}");
 
     hMainLayout->addWidget(tooltip_text);
 }
@@ -198,7 +198,7 @@ void ArrowWidget::mousePressEvent(QMouseEvent *)
 ////    shadowEffect->setBlurRadius(SHADOW_WIDTH);
 ////    this->setGraphicsEffect(shadowEffect);
 
-//    this->setStyleSheet("QWidget{background: rgba(60, 90, 90, 0.5);border-radius: 6px;color:#FFFFFF;font-size:18;}");
+//    this->setStyleSheet("QWidget{background: rgba(60, 90, 90, 0.5);border-radius: 13px;color:#FFFFFF;font-size:18;}");
 
 
 //}
