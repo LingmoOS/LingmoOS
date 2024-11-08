@@ -32,7 +32,7 @@ remove_packages()
     # remove package list
     packages_list_remove=(
         lingmo-os-installer
-        casper
+        # casper
         lingmo-installer-wayland
     )
 

@@ -174,13 +174,13 @@ QString getInstallerDevicePath()
     const MountItemList list(parseMountItems());
     // /cdrom
     // /lib/live/mount/medium
-    QString casperPath("/cdrom");
-    QFileInfo casperInfo("/cdrom");
+    QString casperPath("/usr/lib/live/mount/medium");
+    QFileInfo casperInfo("/usr/lib/live/mount/medium");
     if(casperInfo.exists()) {
         casperPath = casperInfo.canonicalFilePath();
     }
-//    QString livePath("/lib/live/mount/medium");
-//    QFileInfo liveInfo("/lib/live/mount/medium");
+//    QString livePath("/usr/lib/live/mount/medium");
+//    QFileInfo liveInfo("/usr/lib/live/mount/medium);
 //    if(liveInfo.exists()) {
 //        livePath = liveInfo.canonicalFilePath();
 //    }
