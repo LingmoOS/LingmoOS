@@ -278,8 +278,8 @@ live)
 		echo "ERROR: Unknown variant of Lingmo live configuration: $LINGMO_VARIANT" >&2
 	fi
 
-	ver_live_build=$(dpkg-query -f '${Version}' -W lingmo-system-build)
-	if dpkg --compare-versions "$ver_live_build" lt "1:20241000"; then
+	ver_live_build=$(dpkg-query -f '${Version}' -W live-build)
+	if dpkg --compare-versions "$ver_live_build" lt "1:20230100"; then
 		echo "ERROR: You need lingmo-sysbuild (>= 1:20230502), you have $ver_live_build" >&2
 		exit 1
 	fi
