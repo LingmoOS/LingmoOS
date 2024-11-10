@@ -14,7 +14,7 @@ Your computer meets at least the following criteria：
  - At least 60 GB of disk space
  - Multi-core CPU
  - Memory greater than 8GB
- - Debian GNU/Linix 12 Bookworm version or later
+ - Debian GNU/Linux 12 Bookworm version or later
 
 # LICENSE
 
