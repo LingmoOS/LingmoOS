@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Window 2.3
 import QtGraphicalEffects 1.0
 import LingmoUI 1.0 as LingmoUI
+import Lingmo.Logger 1.0
 
 LingmoUI.Window {
     id: rootWindow
@@ -42,6 +43,8 @@ LingmoUI.Window {
 
     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
+
+    LingmoLogger {id: logger}
 
     LingmoUI.WindowBlur {
         view: rootWindow
@@ -115,7 +118,7 @@ LingmoUI.Window {
 
         close.accepted = true
         // close.accepted = false;
-        console.log("Close clicked!");
+        logger.lInfoTag("main.qml", "Close clicked!");
         Qt.callLater(Qt.quit);
     }
 }

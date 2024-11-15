@@ -1,0 +1,42 @@
+name: Build
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian:
+    name: Debian
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:trixie
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v4
+
+    - name: Update Lingmo repo
+      run: |
+        apt-get update -y && apt-get upgrade -y && apt-get install -y apt-transport-https ca-certificates
+        echo "deb [trusted=yes] https://raw.githubusercontent.com/LingmoOS/lingmo-nightly-build/refs/heads/main nightly experimental" >> /etc/apt/sources.list.d/lingmo-rolling.list
+        apt-get update
+
+    - name: Update repository
+      run: apt-get update -y
+
+    - name: Install the basic dev packages
+      run: apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
+
+    - name: Install build dependencies
+      run: mk-build-deps -i -t "apt-get --yes" -r
+
+
+    - name: Build Package
+      run: |
+        chmod -x debian/lingmo-*
+        dpkg-buildpackage -b -uc -us -j$(nproc)
+  

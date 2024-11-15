@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2023 LingmoOS Team.
+ * Copyright (C) 2024 Lingmo OS Team.
  *
- * Author:     revenmartin <revenmartin@gmail.com>
+ * Author:     Lingmo OS Team <team@lingmo.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ Item {
             page: "qrc:/qml/Touchpad/Main.qml"
             // source: "touchpad.svg"
             iconSource: "touchpad.svg"
-            iconColor: "#2277FF"
+            // iconColor: "#2277FF"
             category: qsTr("System")
         }
 
@@ -296,10 +296,7 @@ Item {
             highlightResizeDuration : 0
             highlight: Rectangle {
                 radius: LingmoUI.Theme.mediumRadius
-                color: Qt.rgba(LingmoUI.Theme.textColor.r,
-                               LingmoUI.Theme.textColor.g,
-                               LingmoUI.Theme.textColor.b, 0.05)
-                // color: "#4DA4ED"
+                color: LingmoUI.Theme.highlightColor
                 smooth: true
             }
 
@@ -309,17 +306,45 @@ Item {
                 height: LingmoUI.Units.fontMetrics.height + LingmoUI.Units.largeSpacing + LingmoUI.Units.smallSpacing
 
                 Text {
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.leftMargin: Qt.application.layoutDirection === Qt.RightToLeft ? 0 : LingmoUI.Units.smallSpacing
-                    anchors.rightMargin: LingmoUI.Units.smallSpacing
+                    anchors.fill: parent
+                    anchors.leftMargin: LingmoUI.Units.smallSpacing
+                    anchors.rightMargin: LingmoUI.Units.largeSpacing
                     anchors.topMargin: LingmoUI.Units.largeSpacing
                     anchors.bottomMargin: LingmoUI.Units.smallSpacing
                     color: LingmoUI.Theme.disabledTextColor
-                    font.pointSize: 8
                     text: section
                 }
             }
+
+            // highlightFollowsCurrentItem: true
+            // highlightMoveDuration: 0
+            // highlightResizeDuration : 0
+            // highlight: Rectangle {
+            //     radius: LingmoUI.Theme.mediumRadius
+            //     color: Qt.rgba(LingmoUI.Theme.textColor.r,
+            //                    LingmoUI.Theme.textColor.g,
+            //                    LingmoUI.Theme.textColor.b, 0.05)
+            //     // color: "#4DA4ED"
+            //     smooth: true
+            // }
+
+            // section.property: "category"
+            // section.delegate: Item {
+            //     width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
+            //     height: LingmoUI.Units.fontMetrics.height + LingmoUI.Units.largeSpacing + LingmoUI.Units.smallSpacing
+
+            //     Text {
+            //         anchors.left: parent.left
+            //         anchors.top: parent.top
+            //         anchors.leftMargin: Qt.application.layoutDirection === Qt.RightToLeft ? 0 : LingmoUI.Units.smallSpacing
+            //         anchors.rightMargin: LingmoUI.Units.smallSpacing
+            //         anchors.topMargin: LingmoUI.Units.largeSpacing
+            //         anchors.bottomMargin: LingmoUI.Units.smallSpacing
+            //         color: LingmoUI.Theme.disabledTextColor
+            //         font.pointSize: 8
+            //         text: section
+            //     }
+            // }
 
             LingmoUI.WheelHandler {
                 target: listView
@@ -328,21 +353,12 @@ Item {
             delegate: Item {
                 id: item
                 width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
-                height: 35
+                height: LingmoUI.Units.fontMetrics.height + LingmoUI.Units.largeSpacing * 1.5
 
                 property bool isCurrent: listView.currentIndex === index
 
                 Rectangle {
                     anchors.fill: parent
-
-                    // DropShadow{
-                    //     anchors.fill: parent
-                    //     radius: 10
-                    //     samples: 10
-                    //     horizontalOffset: 5
-                    //     verticalOffset: 5
-                    //     color: LingmoUI.Theme.darkMode ? LingmoUI.Theme.textColor : "#363636"                        
-                    // }
 
                     MouseArea {
                         id: mouseArea
@@ -353,26 +369,28 @@ Item {
                     }
 
                     radius: LingmoUI.Theme.mediumRadius
-                    // color: mouseArea.pressed ? Qt.rgba(LingmoUI.Theme.textColor.r,
-                    //                                     LingmoUI.Theme.textColor.g,
-                    //                                     LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.05 : 0.1) :
-                    //        mouseArea.containsMouse || isCurrent ? "#2277FF" :
-                    //                                               "transparent"
-                    color: mouseArea.pressed ? Qt.rgba(LingmoUI.Theme.textColor.r,
-                                                       LingmoUI.Theme.textColor.g,
-                                                       LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.05 : 0.1) :
-                           mouseArea.containsMouse || isCurrent ? Qt.rgba(LingmoUI.Theme.textColor.r,
-                                                                          LingmoUI.Theme.textColor.g,
-                                                                          LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.1 : 0.05) :
-                                                                  "transparent"
+                    color: mouseArea.containsMouse && !isCurrent ? Qt.rgba(LingmoUI.Theme.textColor.r,
+                                                                           LingmoUI.Theme.textColor.g,
+                                                                           LingmoUI.Theme.textColor.b,
+                                                                   0.1) : "transparent"
 
                     smooth: true
                 }
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: LingmoUI.Units.smallSpacing
-                    spacing: LingmoUI.Units.smallSpacing
+                    anchors.leftMargin: LingmoUI.Units.largeSpacing
+                    spacing: LingmoUI.Units.smallSpacing * 1.5
+
+                    // Image {
+                    //     id: icon
+                    //     width: 16
+                    //     height: width
+                    //     source: LingmoUI.Theme.darkMode || isCurrent ? "qrc:/images/sidebar/dark/" + model.iconSource
+                    //                                                : "qrc:/images/sidebar/light/" + model.iconSource
+                    //     sourceSize: Qt.size(width, height)
+                    //     Layout.alignment: Qt.AlignVCenter
+                    // }
 
                     Rectangle {
                         id: iconRect
@@ -380,7 +398,9 @@ Item {
                         height: 24
                         Layout.alignment: Qt.AlignVCenter
                         radius: 20
-                        color: model.iconColor
+                        color: LingmoUI.Theme.highlightColor
+                        // color: model.iconColor
+                        // color: "transparent"
 
                         // gradient: Gradient {
                         //     GradientStop { position: 0.0; color: Qt.lighter(model.iconColor, 1.15) }
@@ -390,7 +410,7 @@ Item {
                         Image {
                             id: icon
                             anchors.centerIn: parent
-                            width: 12
+                            width: 16
                             height: width
                             source: "qrc:/images/sidebar/all/" + model.iconSource
                             sourceSize: Qt.size(width, height)
@@ -400,11 +420,36 @@ Item {
                         }
                     }
 
+                    // Rectangle {
+                    //     id: iconRect
+                    //     width: 24
+                    //     height: 24
+                    //     Layout.alignment: Qt.AlignVCenter
+                    //     radius: 20
+                    //     color: model.iconColor
+
+                    //     // gradient: Gradient {
+                    //     //     GradientStop { position: 0.0; color: Qt.lighter(model.iconColor, 1.15) }
+                    //     //     GradientStop { position: 1.0; color: model.iconColor }
+                    //     // }
+
+                    //     Image {
+                    //         id: icon
+                    //         anchors.centerIn: parent
+                    //         width: 12
+                    //         height: width
+                    //         source: "qrc:/images/sidebar/all/" + model.iconSource
+                    //         sourceSize: Qt.size(width, height)
+                    //         Layout.alignment: Qt.AlignVCenter
+                    //         antialiasing: false
+                    //         smooth: false
+                    //     }
+                    // }
+
                     Label {
                         id: itemTitle
                         text: model.title
-                        color: LingmoUI.Theme.darkMode ? LingmoUI.Theme.textColor : "#363636"
-                        font.pointSize: 9
+                        color: isCurrent ? LingmoUI.Theme.highlightedTextColor : LingmoUI.Theme.textColor
                     }
 
                     Item {
@@ -412,6 +457,96 @@ Item {
                     }
                 }
             }
+
+
+
+            // delegate: Item {
+            //     id: item
+            //     width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
+            //     height: 35
+
+            //     property bool isCurrent: listView.currentIndex === index
+
+            //     Rectangle {
+            //         anchors.fill: parent
+
+            //         // DropShadow{
+            //         //     anchors.fill: parent
+            //         //     radius: 10
+            //         //     samples: 10
+            //         //     horizontalOffset: 5
+            //         //     verticalOffset: 5
+            //         //     color: LingmoUI.Theme.darkMode ? LingmoUI.Theme.textColor : "#363636"                        
+            //         // }
+
+            //         MouseArea {
+            //             id: mouseArea
+            //             anchors.fill: parent
+            //             hoverEnabled: true
+            //             acceptedButtons: Qt.LeftButton
+            //             onClicked: listView.currentIndex = index
+            //         }
+
+            //         radius: LingmoUI.Theme.mediumRadius
+            //         // color: mouseArea.pressed ? Qt.rgba(LingmoUI.Theme.textColor.r,
+            //         //                                     LingmoUI.Theme.textColor.g,
+            //         //                                     LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.05 : 0.1) :
+            //         //        mouseArea.containsMouse || isCurrent ? "#2277FF" :
+            //         //                                               "transparent"
+            //         color: mouseArea.pressed ? Qt.rgba(LingmoUI.Theme.textColor.r,
+            //                                            LingmoUI.Theme.textColor.g,
+            //                                            LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.05 : 0.1) :
+            //                mouseArea.containsMouse || isCurrent ? Qt.rgba(LingmoUI.Theme.textColor.r,
+            //                                                               LingmoUI.Theme.textColor.g,
+            //                                                               LingmoUI.Theme.textColor.b, LingmoUI.Theme.darkMode ? 0.1 : 0.05) :
+            //                                                       "transparent"
+
+            //         smooth: true
+            //     }
+
+            //     RowLayout {
+            //         anchors.fill: parent
+            //         anchors.leftMargin: LingmoUI.Units.smallSpacing
+            //         spacing: LingmoUI.Units.smallSpacing
+
+            //         Rectangle {
+            //             id: iconRect
+            //             width: 24
+            //             height: 24
+            //             Layout.alignment: Qt.AlignVCenter
+            //             radius: 20
+            //             color: model.iconColor
+
+            //             // gradient: Gradient {
+            //             //     GradientStop { position: 0.0; color: Qt.lighter(model.iconColor, 1.15) }
+            //             //     GradientStop { position: 1.0; color: model.iconColor }
+            //             // }
+
+            //             Image {
+            //                 id: icon
+            //                 anchors.centerIn: parent
+            //                 width: 12
+            //                 height: width
+            //                 source: "qrc:/images/sidebar/all/" + model.iconSource
+            //                 sourceSize: Qt.size(width, height)
+            //                 Layout.alignment: Qt.AlignVCenter
+            //                 antialiasing: false
+            //                 smooth: false
+            //             }
+            //         }
+
+            //         Label {
+            //             id: itemTitle
+            //             text: model.title
+            //             color: LingmoUI.Theme.darkMode ? LingmoUI.Theme.textColor : "#363636"
+            //             font.pointSize: 9
+            //         }
+
+            //         Item {
+            //             Layout.fillWidth: true
+            //         }
+            //     }
+            // }
         }
     }
 

@@ -51,7 +51,7 @@ foreach(_ts_file ${TS_FILES})
     execute_process(COMMAND lrelease ${_ts_file})
 endforeach()
 
-install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/translations)
+install(FILES ${QM_FILES} DESTINATION /usr/share/${PROJECT_NAME}/translations)
 install(TARGETS lingmo-updator RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 # install(FILES ${QM_FILES} DESTINATION /usr/share/lingmo-updator/translations)
 

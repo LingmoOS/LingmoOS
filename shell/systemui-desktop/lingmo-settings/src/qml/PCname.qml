@@ -12,6 +12,8 @@ Item {
     property alias key: keyLabel.text
     property alias value: valueLabel.text
 
+    signal deviceNameChanged(string newDeviceName)
+
     Layout.fillWidth: true
 
     ChangeDialog {

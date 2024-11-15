@@ -36,6 +36,9 @@ jobs:
       - name: Install Lingmo System Build
         run: |
             cd utils/live-build
+            apt build-dep . -y
+            dpkg-buildpackage -us -nc 
+            sudo apt install ../*.deb
             sudo make install
             cd ../../
       # - name: Build GRUB EFI
@@ -44,16 +47,18 @@ jobs:
 
       - name: Build System
         run: |
-            chmod +x build.sh
-            cp distribution/current/.getopt.sh .
-            ./build.sh
+            cd distribution/current/.getopt.sh .
+            mkdir buildsys/
+            cp -r distribution/system/ buildsys/
+            cd buildsys
+            bash ./build.sh
 
       - name: Read Upload
         run: |
             mkdir artifact/
             # find ./ -type f -name "*.iso" -exec mv {} artifact/ \;
-            sudo mv -v ./*.iso artifact/
-            sudo mv -v ./build.log artifact/
+            sudo mv -v ./buildsys/system/images/iso/* artifact/
+            sudo mv -v ./buildsys/system/build.log artifact/
 
       - name: Artifact
         uses: actions/upload-artifact@v4

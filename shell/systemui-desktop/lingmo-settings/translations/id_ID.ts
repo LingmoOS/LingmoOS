@@ -52,24 +52,24 @@
 <context>
     <name>ChangeDialog</name>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="22"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="23"/>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Perangkat</translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="150"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="161"/>
         <source>Enter your new device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Masukkan nama perangkat baru Anda</translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="160"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="171"/>
         <source>New device name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nama perangkat baru</translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="177"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="188"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Oke</translation>
     </message>
 </context>
 <context>
@@ -77,27 +77,27 @@
     <message>
         <location filename="../src/qml/WLAN/ConnectDialog.qml" line="63"/>
         <source>Enter Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Masukkan Kata Sandi</translation>
     </message>
     <message>
         <location filename="../src/qml/WLAN/ConnectDialog.qml" line="75"/>
         <source>Enter the password for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Masukkan kata sandi untuk %1</translation>
     </message>
     <message>
         <location filename="../src/qml/WLAN/ConnectDialog.qml" line="85"/>
         <source>Password</source>
-        <translation type="unfinished">Kata sandi</translation>
+        <translation>Kata sandi</translation>
     </message>
     <message>
         <location filename="../src/qml/WLAN/ConnectDialog.qml" line="110"/>
         <source>Cancel</source>
-        <translation type="unfinished">Batal</translation>
+        <translation>Batal</translation>
     </message>
     <message>
         <location filename="../src/qml/WLAN/ConnectDialog.qml" line="116"/>
         <source>Connect</source>
-        <translation type="unfinished">Hubungkan</translation>
+        <translation>Hubungkan</translation>
     </message>
 </context>
 <context>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../src/qml/SystemUpdate/FinishedPage.qml" line="51"/>
         <source>The update is complete and we recommend that you restart your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pembaruan telah selesai dan kami sarankan agar Anda menghidupkan ulang komputer Anda.</translation>
     </message>
     <message>
         <location filename="../src/qml/SystemUpdate/FinishedPage.qml" line="58"/>
@@ -191,52 +191,52 @@
         <translation>Tentang</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="154"/>
+        <location filename="../src/qml/About/Main.qml" line="163"/>
         <source>OS Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="276"/>
+        <location filename="../src/qml/About/Main.qml" line="285"/>
         <source>CPU</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="265"/>
+        <location filename="../src/qml/About/Main.qml" line="274"/>
         <source>Disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="197"/>
+        <location filename="../src/qml/About/Main.qml" line="206"/>
         <source>Debian Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="198"/>
+        <location filename="../src/qml/About/Main.qml" line="207"/>
         <source>13 Trixie</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="207"/>
+        <location filename="../src/qml/About/Main.qml" line="216"/>
         <source>Linux Kernel Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="208"/>
+        <location filename="../src/qml/About/Main.qml" line="217"/>
         <source>Linux </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="217"/>
+        <location filename="../src/qml/About/Main.qml" line="226"/>
         <source>Lingmo UI Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="313"/>
+        <location filename="../src/qml/About/Main.qml" line="322"/>
         <source>System Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="329"/>
+        <location filename="../src/qml/About/Main.qml" line="338"/>
         <source>Open Source Software Statement</source>
         <translation type="unfinished"></translation>
     </message>
@@ -249,12 +249,12 @@
         <translation type="vanished">Versi Sistem</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="147"/>
+        <location filename="../src/qml/About/Main.qml" line="148"/>
         <source>PC Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="228"/>
+        <location filename="../src/qml/About/Main.qml" line="237"/>
         <source>System Type</source>
         <translation>Tipe Sistem</translation>
     </message>
@@ -267,7 +267,7 @@
         <translation type="vanished">Prosesor</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="255"/>
+        <location filename="../src/qml/About/Main.qml" line="264"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>
@@ -724,7 +724,7 @@
         <translation>Tambah pengguna</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="321"/>
+        <location filename="../src/qml/About/Main.qml" line="330"/>
         <location filename="../src/qml/User/Main.qml" line="219"/>
         <location filename="../src/qml/WLAN/Main.qml" line="99"/>
         <source>→</source>
@@ -1572,7 +1572,7 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/qml/main.qml" line="29"/>
+        <location filename="../src/qml/main.qml" line="30"/>
         <source>Settings</source>
         <translation>Pengaturan</translation>
     </message>

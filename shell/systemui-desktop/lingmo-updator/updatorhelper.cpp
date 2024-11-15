@@ -115,7 +115,7 @@ void UpdatorHelper::checkUpdates()
                         continue;
 
                     // 检查是否是lingmo包
-                    if (QString::compare(package->name(), "nano", Qt::CaseInsensitive) == 0) {
+                    if (QString::compare(package->name(), "system-core", Qt::CaseInsensitive) == 0) {
                         lingmo_found = true;
                         // 添加lingmo包
                         UpgradeableModel::self()->addPackage(package->name(),

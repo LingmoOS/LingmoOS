@@ -52,22 +52,22 @@
 <context>
     <name>ChangeDialog</name>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="22"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="23"/>
         <source>Device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="150"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="161"/>
         <source>Enter your new device name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="160"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="171"/>
         <source>New device name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/ChangeDialog.qml" line="177"/>
+        <location filename="../src/qml/ChangeDialog.qml" line="188"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -191,52 +191,52 @@
         <translation>Acerca de</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="154"/>
+        <location filename="../src/qml/About/Main.qml" line="163"/>
         <source>OS Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="276"/>
+        <location filename="../src/qml/About/Main.qml" line="285"/>
         <source>CPU</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="265"/>
+        <location filename="../src/qml/About/Main.qml" line="274"/>
         <source>Disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="197"/>
+        <location filename="../src/qml/About/Main.qml" line="206"/>
         <source>Debian Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="198"/>
+        <location filename="../src/qml/About/Main.qml" line="207"/>
         <source>13 Trixie</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="207"/>
+        <location filename="../src/qml/About/Main.qml" line="216"/>
         <source>Linux Kernel Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="208"/>
+        <location filename="../src/qml/About/Main.qml" line="217"/>
         <source>Linux </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="217"/>
+        <location filename="../src/qml/About/Main.qml" line="226"/>
         <source>Lingmo UI Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="313"/>
+        <location filename="../src/qml/About/Main.qml" line="322"/>
         <source>System Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="329"/>
+        <location filename="../src/qml/About/Main.qml" line="338"/>
         <source>Open Source Software Statement</source>
         <translation type="unfinished"></translation>
     </message>
@@ -245,12 +245,12 @@
         <translation type="vanished">Versión del sistema</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="147"/>
+        <location filename="../src/qml/About/Main.qml" line="148"/>
         <source>PC Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="228"/>
+        <location filename="../src/qml/About/Main.qml" line="237"/>
         <source>System Type</source>
         <translation>Tipo de sistema</translation>
     </message>
@@ -263,7 +263,7 @@
         <translation type="vanished">Procesador</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="255"/>
+        <location filename="../src/qml/About/Main.qml" line="264"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>
@@ -720,7 +720,7 @@
         <translation>Añadir usuario</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="321"/>
+        <location filename="../src/qml/About/Main.qml" line="330"/>
         <location filename="../src/qml/User/Main.qml" line="219"/>
         <location filename="../src/qml/WLAN/Main.qml" line="99"/>
         <source>→</source>
@@ -1560,7 +1560,7 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../src/qml/main.qml" line="29"/>
+        <location filename="../src/qml/main.qml" line="30"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>

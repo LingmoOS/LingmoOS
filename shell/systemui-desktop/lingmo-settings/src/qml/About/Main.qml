@@ -13,6 +13,7 @@ ItemPage {
 
     About {
         id: about
+        signal hostNameChanged(string newHostName)
     }
 
     System.Wallpaper {
