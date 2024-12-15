@@ -1,0 +1,34 @@
+@PACKAGE_INIT@
+
+# 导入 CommonTargets 文件
+include("${CMAKE_CURRENT_LIST_DIR}/CommonTargets.cmake")
+
+# 如果定义了 COMPONENTS 选项，则导出相应的信息
+if(DEFINED COMPONENTS)
+    foreach(comp ${COMPONENTS})
+        if(comp STREQUAL "Common")
+            set(Common_FOUND TRUE)
+            set(Common_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/ddm")
+            set(Common_LIBRARIES Common)
+        else()
+            message(FATAL_ERROR "Unknown component: ${comp}")
+        endif()
+    endforeach()
+endif()
+
+# 如果没有定义 COMPONENTS 选项，则默认导出所有信息
+if(NOT DEFINED COMPONENTS OR "${COMPONENTS}" STREQUAL "Common")
+    set(Common_FOUND TRUE)
+    set(Common_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/ddm")
+    set(Common_LIBRARIES Common)
+endif()
+
+# 检查是否找到了相应的组件
+if(NOT Common_FOUND)
+    message(FATAL_ERROR "Common component not found.")
+endif()
+
+# 导出 Common 的头文件路径和库文件
+set(Common_INCLUDE_DIRS ${Common_INCLUDE_DIRS} ${Common_INCLUDE_DIRS} PARENT_SCOPE)
+set(Common_LIBRARIES ${Common_LIBRARIES} ${Common_LIBRARIES} PARENT_SCOPE)
+

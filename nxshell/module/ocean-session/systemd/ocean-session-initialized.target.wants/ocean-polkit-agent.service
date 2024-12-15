@@ -1,0 +1,21 @@
+[Unit]
+Description=ocean-polkit-agent service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=ocean-session-pre.target
+After=ocean-session-pre.target
+
+Requisite=ocean-session-initialized.target
+PartOf=ocean-session-initialized.target
+Before=ocean-session-initialized.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/polkit-1-ocean/ocean-polkit-agent
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=500ms

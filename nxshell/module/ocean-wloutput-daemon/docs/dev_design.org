@@ -1,0 +1,92 @@
+#+OPTIONS: toc:nil num:nil timestamp:nil ^:{} <:{}
+#+TITLE: KWayland Output 接口规范
+
+目前 =startocean= 中使用的是 =kwin= 的 =wayland= 协议实现的，目前存在如下问题：
+
++ 应用双屏配置无响应
++ 事件监听偶尔无消息
++ 没有实现 =output removed= 事件
++ 接口不稳定，会引发崩溃
+
+上面的问题中，有些已经不是修改现有代码可以解决的了，因此需要使用一种新的方式来实现双屏功能。
+经过测试和当前使用的 =kwin= 方案，所以决定使用 =kwayland= 的 =api= 来实现一个中间层的接口，接口通过 =dbus= 与其它进程交互。
+
+
+** 接口规范
+
+基于上面的原因，这里定义了一套接口规范，如下：
+
+*** 通用结构
+
+这里定义基本的结构体，如下：
+
+#+INCLUDE: ./common.h src c
+
+--------
+
+*** DBus 接口
+
+**** 基本信息
+
++ *Service*
+
+  =org.lingmo.ocean.KWayland1=
+
++ *Path*
+
+  =/org/lingmo/ocean/KWayland1/Output=
+
++ *Interface*
+
+  =org.lingmo.ocean.KWayland1.Output=
+
+--------
+
+**** Method
+
++ =ListOutput() (string)=
+
+  列出并返回当前的 =output= 列表，返回的数据是 =OutputInfo= 数组的 =json= 编码后的数据
+
+  没有 =output= 就返回空字符串
+
++ =GetOutput(string uuid) (string)=
+
+  获取指定 =uuid= 的 =output= 信息，返回的数据 =OutputInfo= 的 =json= 编码后的数据
+
+  没有 =output= 就返回空字符串并通过 =dbus error= 设置错误信息
+
++ =Apply(string outputs)=
+
+  应用 =output= 配置， =outputs= 是 =json= 编码后的 =OutputInfo= 数组数据
+
+  配置失败后通过 =dbus error= 设置错误
+
+
+以上方法都是同步实现，即执行完对应操作才返回。
+
+
+--------
+
+**** Signal
+
++ =OutputAoceand(string output)=
+
+  添加新 =output= 时发出此信号， =output= 是 =json= 编码后的 =OutputInfo= 数据
+
++ =OutputRemoved(string output)=
+
+  =output= 删除时发出此信号， =output= 是 =json= 编码后的 =OutputInfo= 数据
+
++ =OutputChanged(string output)=
+
+  =output= 数据改变时发出此信号， =output= 是 =json= 编码后的 =OutputInfo= 数据
+
+  =output= 的改变包括 =enabled, uuid= 等数据的改变
+
+
+** 参考资料
+
++ [[https://gitlab.lingmo.io/longqi_cm/kvu-display][kvu-display]]
++ [[https://docsin.lingmo.com/?p=2775][在Qt中使用DBus]]
++ [[http://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html][The new sd-bus API of systemd]]

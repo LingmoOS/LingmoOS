@@ -1,0 +1,57 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(ocean-filemanager-sharecontrol)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(ShareControl_XML ${DFM_DBUS_XML_DIR}/org.lingmo.Filemanager.ShareControl.xml)
+
+FILE(GLOB FILEOPERATIONS_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.xml"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.policy"
+    )
+
+find_package(PkgConfig REQUIRED)
+find_package(Qt5 COMPONENTS DBus REQUIRED)
+pkg_check_modules(PolkitAgent REQUIRED polkit-agent-1)
+pkg_check_modules(PolkitQt5 REQUIRED polkit-qt5-1)
+
+# qt5_generate_dbus_interface(
+#    sharecontroldbus.h
+#    ${ShareControl_XML}
+#    OPTIONS -M -S
+# )
+
+qt5_add_dbus_adaptor(FILEOPERATIONS_FILES ${ShareControl_XML}
+    sharecontroldbus.h ShareControlDBus)
+
+add_library(${PROJECT_NAME}
+    SHARED
+    ${FILEOPERATIONS_FILES}
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ../../)
+
+target_link_libraries(${PROJECT_NAME}
+    DFM::base
+    Qt5::DBus
+    ${PolkitAgent_LIBRARIES}
+    ${PolkitQt5_LIBRARIES}
+)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/lingmo-service-manager/)
+install(FILES ${PROJECT_NAME}.json DESTINATION share/lingmo-service-manager/system/)
+install(FILES org.lingmo.filemanager.usersharemanager.conf DESTINATION share/dbus-1/system.d/)
+INSTALL_DBUS_SERVICE(org.lingmo.Filemanager.UserShareManager root)
+
+set(PolicyDir "${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions")
+install(FILES polkit/org.lingmo.filemanager.usersharemanager.policy DESTINATION ${PolicyDir})
+
+#execute_process(COMMAND qdbuscpp2xml sharecontroldbus.h -o ./sharecontroldbus.xml
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+#execute_process(COMMAND qdbusxml2cpp -i ../sharecontroldbus.h -c ShareControlAdapter -l ShareControlDBus -a dbusadapter/sharecontrol_adapter sharecontroldbus.xml
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

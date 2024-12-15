@@ -1,0 +1,102 @@
+// Copyright (C) 2020 ~ 2021, Lingmo Technology Co., Ltd. <support@lingmo.org>
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "platform_dbus_adpator.h"
+#include "utils.h"
+
+Platform_ApplicationAdaptor::Platform_ApplicationAdaptor(Platform_MainWindow *pMainWid)
+    : QDBusAbstractAdaptor(pMainWid)
+{
+    initMember();
+
+    m_pMainWindow = pMainWid;
+
+    m_oldTime = QTime::currentTime();
+}
+
+//cppcheck 单元测试 wayland下再用
+void Platform_ApplicationAdaptor::openFiles(const QStringList &listFiles)
+{
+    // 快速点击，播放不正常问题
+    QTime current = QTime::currentTime();
+    if (abs(m_oldTime.msecsTo(current)) > 800) {
+        m_oldTime = current;
+        m_pMainWindow->play(listFiles);
+    }
+}
+
+//cppcheck 单元测试在用
+void Platform_ApplicationAdaptor::openFile(const QString &sFile)
+{
+    QRegExp url_re("\\w+://");
+
+    QUrl url;
+    if (url_re.indexIn(sFile) == 0) {
+        url = QUrl(sFile);
+    } else {
+        url = QUrl::fromLocalFile(sFile);
+    }
+
+    QTime current = QTime::currentTime();
+    if (abs(m_oldTime.msecsTo(current)) > 800) {
+        m_oldTime = current;
+        m_pMainWindow->play({url.toString()});
+    }
+    Raise();//激活窗口
+}
+
+void Platform_ApplicationAdaptor::Raise()
+{
+    qInfo() << "raise window from dbus";
+    m_pMainWindow->showNormal();
+    m_pMainWindow->raise();
+    m_pMainWindow->activateWindow();
+}
+
+void Platform_ApplicationAdaptor::initMember()
+{
+    m_pMainWindow = nullptr;
+}
+
+QVariant Platform_ApplicationAdaptor::redDBusProperty(const QString &sService, const QString &sPath, const QString &sInterface, const char *pPropert)
+{
+    // 创建QDBusInterface接口
+    QDBusInterface ainterface(sService, sPath,
+                              sInterface,
+                              QDBusConnection::sessionBus());
+    if (!ainterface.isValid()) {
+        qInfo() << qPrintable(QDBusConnection::sessionBus().lastError().message());
+        QVariant v(0) ;
+        return  v;
+    }
+    // 调用远程的value方法
+    QList<QByteArray> q = ainterface.dynamicPropertyNames();
+    QVariant v = ainterface.property(pPropert);
+    return  v;
+}
+
+//cppcheck 单元测试在使用
+QVariant Platform_ApplicationAdaptor::redDBusMethod(const QString &sService, const QString &sPath, const QString &sInterface, const char *pMethod)
+{
+    // 创建QDBusInterface接口
+    QDBusInterface ainterface(sService, sPath,
+                              sInterface,
+                              QDBusConnection::sessionBus());
+    if (!ainterface.isValid()) {
+        qInfo() <<  "error:" << qPrintable(QDBusConnection::sessionBus().lastError().message());
+        QVariant v(0) ;
+        return  v;
+    }
+    // 调用远程的value方法
+    QDBusReply<QDBusVariant> reply = ainterface.call(pMethod);
+    if (reply.isValid()) {
+        QVariant v(0) ;
+        return  v;
+    } else {
+        qInfo() << "error1:" << qPrintable(QDBusConnection::sessionBus().lastError().message());
+        QVariant v(0) ;
+        return  v;
+    }
+}

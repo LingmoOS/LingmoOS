@@ -1,0 +1,73 @@
+/*!
+@~chinese
+@ingroup dfilesystem
+@file include/filesystem/dfilesystemwatcher.h
+
+@class DFileSystemWatcher
+@brief 监听文件系统变化的类
+@details 
+    DFileSystemWatcher监视文件系统对文件的更改和目录，通过观察指定的path列表。<br>
+    调用addPath()来监视特定的文件或目录。多个path可以使用addPaths()函数添加。现有path可以使用removePath()和removePaths()函数删除。<br>
+    DFileSystemWatcher检查添加到其中的每个path。具有以下特性的文件添加到DFileSystemWatcher可以使用函数Files()和使用函数directories()创建的目录。<br>
+    fileChanged()信号在文件被修改时发出，重命名或从磁盘中删除。类似地，directoryChanged()在目录或其内容被修改或移除。<br>
+    请注意，DFileSystemWatcher只停止监视一次文件，它们被重命名或从磁盘和目录中删除一次，它们已从磁盘中移除。
+@note 在运行不支持inotify的Linux内核的系统上，包含被监视路径的文件系统不能被卸载。<br>
+    默认情况下，Windows CE不支持目录监控，这取决于安装的文件系统驱动程序。<br>
+    监视文件和目录的行为修改操作会消耗系统资源。这意味着有一个限制进程可以使用的文件和目录的数量同时监控。
+
+@fn DFileSystemWatcher::DFileSystemWatcher(QObject *parent)
+@brief 构造函数，构造一个新的文件系统监视器对象。
+
+@fn DFileSystemWatcher::DFileSystemWatcher(const QStringList &paths, QObject *parent = Q_NULLPTR)
+@brief 构造函数，构造一个新的文件系统监视器对象，监控指定路径列表。
+@param paths 要监听的路径列表
+
+@fn bool DFileSystemWatcher::addPath(const QString &file)
+@brief 添加要监听的路径
+@details 如果path存在，则将path添加到文件系统监视器。如果path不存在或已经存在，则不添加它由文件系统监视程序监视。<br>
+    如果path指定了一个目录，则调用directoryChanged()信号将在path被修改或从磁盘中删除时发出。否则，当path被修改、重命名或删除。，就会触发fileChanged()信号<br>
+    如果监视成功，则返回true。<br>
+    监视故障的原因通常与系统有关，但是可能包括资源不存在、访问失败或总监视数量限制，如果平台有一个。
+@note 可能有一个系统依赖的数量限制可以同时监控的文件和目录。<br>
+    如果达到了这个限制，path将不会被监控，返回false。
+@param[in] file 要监听的路径
+@sa DFileSystemWatcher::addPaths()
+@sa DFileSystemWatcher::removePath()
+
+@fn QStringList DFileSystemWatcher::addPaths(const QStringList &files)
+@brief 添加要监听的路径列表
+@details 将path中的每个path添加到文件系统监视程序。path如果不存在，或者已经存在，则不添加由文件系统监视程序监视。<br>
+    如果path指定了一个目录，则调用directoryChanged()信号将在path被修改或从磁盘中删除时触发。否则，当path被修改、重命名或删除。，就会触发fileChanged()信号<br>
+    返回值是一个无法被监视的路径列表。<br>
+    监视故障的原因通常与系统有关，但是可能包括资源不存在、访问失败或总监视数量限制，如果平台有一个。<br>
+@note 可能有一个系统依赖的数量限制可以同时监控的文件和目录。<br>
+    如果达到了这个限制，多余的path就不会达到，它们将被添加到返回的QStringList中。
+@param[in] files 要监听的路径列表
+@sa DFileSystemWatcher::addPath()
+@sa DFileSystemWatcher::removePaths()
+
+@fn bool DFileSystemWatcher::removePath(const QString &file)
+@brief 移除监听的路径
+@details 从文件系统监视程序中删除指定的path。<br>
+    如果监视成功删除，则返回true。<br>
+    监视删除失败的原因通常与系统有关，但可能是因为path已经被删除了。
+@sa DFileSystemWatcher::removePaths()
+@sa DFileSystemWatcher::addPath() 
+
+@fn QStringList DFileSystemWatcher::removePaths(const QStringList &files)
+@brief 移除监听的路径列表
+@details 从文件系统监视程序中删除指定的path。<br>
+    返回值是一个无法被监视的路径列表。<br>
+    监视删除失败的原因通常与系统有关，但可能是因为path已经被删除了。
+@sa DFileSystemWatcher::removePath()
+@sa DFileSystemWatcher::addPaths()
+
+@fn QStringList DFileSystemWatcher::directories() const
+@brief 获取监听的目录列表
+@sa DFileSystemWatcher::files()
+
+@fn QStringList DFileSystemWatcher::files() const
+@brief 获取监听的文件列表
+@sa DFileSystemWatcher::directories()
+
+*/

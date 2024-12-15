@@ -1,0 +1,6 @@
+add_subdirectory(ocean-application-manager)
+add_subdirectory(app-launch-helper)
+add_subdirectory(app-update-notifier)
+add_subdirectory(app-identifier)
+add_subdirectory(ocean-am)
+add_subdirectory(ocean-am-compatibility)

@@ -1,0 +1,5 @@
+add_subdirectory(lingmo-gui-settings)
+add_subdirectory(dci-image-converter)
+add_subdirectory(dci-icon-theme)
+add_subdirectory(ocean-kwin-debug)
+add_subdirectory(image-handler)

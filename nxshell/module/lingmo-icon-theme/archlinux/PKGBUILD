@@ -1,0 +1,32 @@
+pkgname=lingmo-icon-theme-git
+pkgver=2021.11.24.r0.g572b049d
+pkgrel=1
+pkgdesc="Lingmo GTK Theme"
+sourcename=lingmo-icon-theme
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+arch=('any')
+url="https://github.com/lingmoos/lingmo-icon-theme"
+makedepends=('git')
+license=('GPL3')
+optdepends=('gtk-engine-murrine: for gtk2 themes')
+provides=('lingmo-icon-theme')
+conflicts=('lingmo-icon-theme')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  make hicolor-links
+}
+
+package() {
+  cd $sourcedir
+  make DESTDIR="$pkgdir" install
+  cp -a ./Sea ./usr/share/icons/hicolor "$pkgdir"/usr/share/icons/
+}

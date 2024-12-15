@@ -1,0 +1,10 @@
+file(GLOB FILEDRAG_HEADER
+  ${CMAKE_CURRENT_LIST_DIR}/../../include/filedrag/*.h
+)
+file(GLOB FILEDRAG_SOURCE
+  ${CMAKE_CURRENT_LIST_DIR}/*.cpp
+)
+set(filedrag_SRC
+  ${FILEDRAG_HEADER}
+  ${FILEDRAG_SOURCE}
+)

@@ -1,0 +1,20 @@
+[Unit]
+Description=ocean-session-daemon service
+RefuseManualStart=no
+RefuseManualStop=no
+CollectMode=inactive-or-failed
+
+Requisite=ocean-session-pre.target
+After=ocean-session-pre.target
+
+Requisite=ocean-session-initialized.target
+PartOf=ocean-session-initialized.target
+Before=ocean-session-initialized.target
+
+[Service]
+Type=dbus
+BusName=org.lingmo.ocean.Daemon1
+ExecStart=/usr/lib/lingmo-daemon/ocean-session-daemon
+Slice=app.slice
+Restart=on-failure
+NotifyAccess=main

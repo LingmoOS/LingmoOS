@@ -1,0 +1,21 @@
+[Unit]
+Description=ocean-display service
+
+Requires=dbus.socket
+After=dbus.socket
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+Before=ocean-session@x11.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+ExecCondition=/bin/sh -c 'test "$DISPLAY" != "" || exit 2'
+ExecStart=/usr/bin/startocean
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

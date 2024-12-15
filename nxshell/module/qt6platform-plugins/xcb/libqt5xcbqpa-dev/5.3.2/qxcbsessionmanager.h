@@ -1,0 +1,56 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+
+#ifndef QXCBSESSIONMANAGER_H
+#define QXCBSESSIONMANAGER_H
+
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is part of the QPA API and is not meant to be used
+// in applications. Usage of this API may make your code
+// source and binary incompatible with future versions of Qt.
+//
+
+#include <qpa/qplatformsessionmanager.h>
+
+QT_BEGIN_NAMESPACE
+
+class QEventLoop;
+
+class QXcbSessionManager : public QPlatformSessionManager
+{
+public:
+    QXcbSessionManager(const QString &id, const QString &key);
+    virtual ~QXcbSessionManager();
+
+    void *handle() const;
+
+    void setSessionId(const QString &id) { m_sessionId = id; }
+    void setSessionKey(const QString &key) { m_sessionKey = key; }
+
+    bool allowsInteraction() Q_DECL_OVERRIDE;
+    bool allowsErrorInteraction() Q_DECL_OVERRIDE;
+    void release() Q_DECL_OVERRIDE;
+
+    void cancel() Q_DECL_OVERRIDE;
+
+    void setManagerProperty(const QString &name, const QString &value) Q_DECL_OVERRIDE;
+    void setManagerProperty(const QString &name, const QStringList &value) Q_DECL_OVERRIDE;
+
+    bool isPhase2() const Q_DECL_OVERRIDE;
+    void requestPhase2() Q_DECL_OVERRIDE;
+
+    void exitEventLoop();
+
+private:
+    QEventLoop *m_eventLoop;
+
+    Q_DISABLE_COPY(QXcbSessionManager)
+};
+
+QT_END_NAMESPACE
+
+#endif //QXCBSESSIONMANAGER_H

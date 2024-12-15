@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_LDFLAGS_MAINT_APPEND := -Wl,--as-needed
+
+%:
+	dh $@ --with kf5,pkgkde_symbolshelper --buildsystem kf5 --without build_stamp
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_QCH=ON
+
+override_dh_strip:
+	dh_strip --dbgsym-migration='libkf5globalaccel5-dbg (<= 5.19.0-1~~)'
+
+override_dh_auto_test:
+	# Disable auto tests at build time
+	:

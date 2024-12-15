@@ -1,0 +1,14 @@
+[Unit]
+Description=lingmo-service-manager
+After=dbus.service lingmo-service-manager.service
+PartOf=lingmo-service-manager.service
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+[Service]
+ExecStart=/usr/bin/lingmo-service-manager -g %i
+Restart=on-failure
+RestartSec=3
+@SYSTEMD_SLICE@
+
+@SYSTEMD_INSTALL@

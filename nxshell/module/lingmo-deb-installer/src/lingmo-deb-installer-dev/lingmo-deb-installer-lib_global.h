@@ -1,0 +1,16 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#ifndef LINGMODEBINSTALLERLIB_GLOBAL_H
+#define LINGMODEBINSTALLERLIB_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(LINGMODEBINSTALLERLIB_LIBRARY)
+#define LINGMODEBINSTALLERLIBSHARED_EXPORT Q_DECL_EXPORT
+#else
+#define LINGMODEBINSTALLERLIBSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif  // LINGMODEBINSTALLERLIB_GLOBAL_H

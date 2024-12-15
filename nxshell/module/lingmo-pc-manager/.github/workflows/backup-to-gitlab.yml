@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: backup to gitlab
+on: [push]
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  backup-to-gitlabwh:
+    uses: lingmoos/.github/.github/workflows/backup-to-gitlabwh.yml@master
+    secrets: inherit
+
+  backup-to-gitee:
+    uses: lingmoos/.github/.github/workflows/backup-to-gitee.yml@master
+    secrets: inherit

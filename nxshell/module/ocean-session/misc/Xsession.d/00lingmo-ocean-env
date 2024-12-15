@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# vim:set ft=sh sw=2 sts=2 et:
+
+# export systemd environment to avoid environment be replaced by ocean-session
+# fix https://github.com/lingmoos/developer-center/issues/6225
+# the following environment variables need to be excluded, otherwise it will affect the startup of some applications
+EXCLUDED_ENV="XDG_VTNR\|XDG_SESSION_ID\|XDG_SEAT\|XDG_SESSION_TYPE\|XMODIFIERS\|GTK_IM_MODULE\|QT_IM_MODULE\|CLUTTER_IM_MODULE\|SDL_IM_MODULE"
+
+eval "$(
+	busctl --json=short --user get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager Environment |
+		jq .data\[\] --raw-output |
+		grep -v "$EXCLUDED_ENV" | # handle special character in environment
+		sed -r 's/\\/\\\\/' |
+		sed -r 's/'\''/\\'\''/' |
+		sed -r 's/"/\\"/' |
+		sed -r 's/\$/\\$/' |
+		sed -r 's/^([^=]+)=(.*)$/export \1="\2"/'
+)"
+
+if [ "$1" = "/usr/bin/ocean-session" ]; then
+    if [ -f "$HOME/.ocean_env" ]; then
+        . "$HOME/.ocean_env"
+        # Handling configuration migration issues
+        if [ -n "$QT_SCALE_FACTOR" ]; then
+            unset QT_SCALE_FACTOR
+            unset QT_SCREEN_SCALE_FACTORS
+            unset QT_AUTO_SCREEN_SCALE_FACTOR
+            unset QT_FONT_DPI
+            export STARTOCEAN_MIGRATE_SCALE_FACTOR=1
+        fi
+    elif [ -f "$HOME/.pam_environment" -a -n "$QT_SCALE_FACTOR" ]; then
+        # Handling configuration migration issues for earlier version
+        unset QT_SCALE_FACTOR
+        export STARTOCEAN_MIGRATE_SCALE_FACTOR=1
+    fi
+    # control qt program infos level, set it only on uos
+    if [ -f "/etc/os-version" ];then
+        if ! grep -q Community /etc/os-version;then
+            export QT_LOGGING_RULES="*.debug=false"
+        fi
+    fi
+    # set qt qpa platform type
+    export QT_QPA_PLATFORM="dxcb;xcb"
+    # control qml softwarecontext in loongson-drm
+    lshw -c display | grep "driver=loongson-drm"
+    if [ $? -eq 0 ];then
+        export QMLSCENE_DEVICE=softwarecontext
+    fi
+fi

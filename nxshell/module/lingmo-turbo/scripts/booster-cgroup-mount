@@ -1,0 +1,31 @@
+#!/bin/sh
+
+CGDIR="/sys/fs/cgroup"
+
+# precondition: cgroup mount must exist
+mountpoint -q $CGDIR || exit 1
+
+# create booster directory
+if [ ! -d $CGDIR/booster ]; then
+  FAIL=1
+  if mount -o remount,rw $CGDIR; then
+    if mkdir $CGDIR/booster; then
+      FAIL=0
+    fi
+    if ! mount -o remount,ro $CGDIR; then
+      FAIL=1
+    fi
+  fi
+  [ $FAIL = 0 ] || exit 1
+fi
+
+# mount booster directory
+if ! mountpoint -q $CGDIR/booster; then
+  mount -t cgroup -o none,name=booster cgroup $CGDIR/booster || exit 1
+fi
+
+# adjust booster directory permissions
+FAIL=0
+chown -R root:privileged $CGDIR/booster || FAIL=1
+chmod 0774 $CGDIR/booster || FAIL=1
+exit $FAIL

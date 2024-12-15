@@ -1,0 +1,160 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file ddiskdrive.h
+
+@class Dtk::Mount::DDiskDrive ddiskdrive.h
+    @brief 该类用于访问及操作设备驱动器（磁盘驱动器）
+
+@fn DDiskDrive::~DDiskDrive()
+    @brief 析构函数
+
+@fn QString DDiskDrive::path() const
+    @brief 获取驱动设备的对象路径，形如 /org/freedesktop/UDisks/Drives/...
+    @return 驱动设备对象路径
+
+@fn bool DDiskDrive::canPowerOff() const
+    @brief 查询驱动设备能否执行断电操作
+    @return 是否可断电
+    @retval True 可以断电
+    @retval False 不可断电
+
+@fn QVariantMap DDiskDrive::configuration() const
+    @brief 查询驱动设备配置信息
+    @return 驱动设备配置信息表
+
+@fn QString DDiskDrive::connectionBus() const
+    @brief 查询驱动设备所连接的总线类型
+    @return 总线类型
+
+@fn bool DDiskDrive::ejectable() const
+    @brief 查询驱动设备是否可执行弹出操作，例如光驱是可弹出托盘的
+    @return 是否可弹出
+
+@fn QString DDiskDrive::id() const
+    @brief 获取驱动设备唯一标识符，通常情况下，驱动设备对象路径最后一段数据即为它
+    @return 驱动设备唯一标识
+    @see QString DDiskDrive::path() const
+
+@fn QString DDiskDrive::media() const
+    @brief 获取驱动设备当前存储媒介类型，在查询光驱当前光盘类型时十分有用
+    @return 存储媒介类型
+
+@fn bool DDiskDrive::mediaAvailable() const
+    @brief 查询当前驱动设备内是否有存储媒介存在，通常用于查询光驱内是否有光盘
+    @return 是否有存储媒介存在
+
+@fn bool DDiskDrive::mediaChangeDetected() const
+    @brief 查询是否检测到媒介变更
+    @return 是否检测到媒介变更
+
+@fn QStringList DDiskDrive::mediaCompatibility() const
+    @brief 查询驱动设备所支持的物理存储介质的类型列表
+    @return 驱动设备支持的存储媒介类型列表
+
+@fn bool DDiskDrive::mediaRemovable() const
+    @brief 查询驱动设备存储介质是否为可移动设备
+    @return 存储介质是否为可移动设备
+
+@fn QString DDiskDrive::model() const
+    @brief 查询驱动设备型号名称
+    @return 驱动设备型号名称或空字符串
+
+@fn bool DDiskDrive::optical() const
+    @brief 查询驱动设备是否为光驱设备
+    @return 是否为光驱设备
+
+@fn bool DDiskDrive::opticalBlank() const
+    @brief 查询光驱设备中光盘是否为空白光盘，该方法仅在 optical() 为 True 时有效
+    @return 是否为空白光盘
+    @see bool DDiskDrive::optical() const
+
+@fn uint DDiskDrive::opticalNumAudioTracks() const
+    @brief 查询光盘中的音频轨道数量，该方法仅在 optical() 为 True 时有效
+    @return 音轨数量
+    @see bool DDiskDrive::optical() const
+
+@fn uint DDiskDrive::opticalNumDataTracks() const
+    @brief 查询光盘中数据轨道数量，该方法仅在 optical() 为 True 时有效
+    @return 数据轨道数量
+    @see bool DDiskDrive::optical() const
+
+@fn uint DDiskDrive::opticalNumSessions() const
+    @brief 查询光盘中会话数量，该方法仅在 optical() 为 True 时有效
+    @return 光盘中会话数量
+    @see bool DDiskDrive::optical() const
+
+@fn uint DDiskDrive::opticalNumTracks() const
+    @brief 查询光盘中轨道数量，该方法仅在 optical() 为 True 时有效
+    @return 光盘中轨道数量
+    @see bool DDiskDrive::optical() const
+
+@fn bool DDiskDrive::removable() const
+    @brief 提示驱动设备或者其存储介质是否可移动
+    @return 是否为可移动设备
+    @see bool DDiskDrive::mediaRemovable() const
+
+@fn QString DDiskDrive::revision() const
+    @brief 查询驱动设备硬件版本
+    @return 驱动设备硬件版本或空字符串
+
+@fn int DDiskDrive::rotationRate() const
+    @brief 查询设备转速
+    @return 设备转速
+    @retval -1 是旋转设备但转速未知
+    @retval 0 非旋转设备
+    @retval rate 转速，单位为圈/分钟
+
+@fn QString DDiskDrive::seat() const
+    @brief 查询驱动设备插入的插槽标识符
+    @return 插槽标识符
+
+@fn QString DDiskDrive::serial() const
+    @brief 查询驱动设备序列号
+    @return 序列号或空字符串
+
+@fn QString DDiskDrive::siblingId() const
+    @brief 一个标识符，非空情况下可用于判定一组设备是否是同一个驱动器
+    @return 标识符或空字符串
+
+@fn quint64 DDiskDrive::size() const
+    @brief 获取驱动器或驱动器当前存储介质的容量大小
+    @return 容量大小
+    @retval 0 当 MediaChangeDetected 为 False 时
+
+@fn QString DDiskDrive::sortKey() const
+    @brief 用于对驱动设备排序的键值
+    @return 排序标识
+
+@fn quint64 DDiskDrive::timeDetected() const
+    @brief 获取第一次检测到驱动器的时间
+    @return 驱动器检测到的时间，单位毫秒（197001010000）
+
+@fn quint64 DDiskDrive::timeMediaDetected() const
+    @brief 存储媒介检测到的时间
+    @return 媒介检测时间
+    @retval 0 当无媒介存在的情况下
+
+@fn QString DDiskDrive::vendor() const
+    @brief 获取驱动器生产厂商名称
+    @return 生产厂商名称或空字符串
+
+@fn QString DDiskDrive::WWN() const
+    @brief 获取驱动器全局名称（World wide name）
+    @return WWM 或空字符串
+
+@fn void DDiskDrive::eject(const QVariantMap &options)
+    @brief 从驱动器中弹出存储介质，仅对“具有可移动存储介质的驱动器”有意义，例如光驱
+    @param[in] options 除标准参数外暂未使用
+
+@fn void DDiskDrive::powerOff(const QVariantMap &options)
+    @brief 对驱动器进行断电操作以便其可以从计算机中安全移除。若能操作陈宫，则说明没有任何进程在使用驱动器
+    @param[in] options 除标准参数外暂未使用
+
+@fn void DDiskDrive::setConfiguration(const QVariantMap &value, const QVariantMap &options)
+    @brief 设置驱动器配置列表。会同时将配置信息存储到文件系统和驱动设备中
+    @param[in] value 要设置的配置列表
+    @param[in] options 除标准参数外暂未使用
+    @see QVariantMap DDiskDrive::configuration() const
+
+*/

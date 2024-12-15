@@ -1,0 +1,25 @@
+[Unit]
+Description=ocean-lock service
+RefuseManualStart=no
+RefuseManualStop=no
+CollectMode=inactive-or-failed
+StartLimitBurst=3
+
+Requisite=ocean-session-pre.target
+After=ocean-session-pre.target
+
+Requisite=ocean-session-initialized.target
+PartOf=ocean-session-initialized.target
+Before=ocean-session-initialized.target
+
+Wants=org.ocean.session.Daemon1.service
+After=org.ocean.session.Daemon1.service
+
+[Service]
+Type=simple
+ExecCondition=/bin/sh -c 'test "$XDG_SESSION_TYPE" != "wayland" || exit 2'
+ExecStart=/usr/bin/ocean-lock
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=500ms

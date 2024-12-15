@@ -1,0 +1,39 @@
+/*!
+@~chinese
+@ingroup dtkpower
+@file dkbdbacklight.h
+@details dkbdbacklight.h 是对于dbus接口中控制键盘背光部分功能的封装, 注意：此键盘背光仅仅指部分笔记本电脑键盘背光
+通常情况下外接的键盘背光并不受到此接口控制, 部分笔记本电脑背光因为是纯硬件控制, 所以有可能不存在此接口。
+
+@class Dtk::Power::DKbdBacklight dkbdbacklight.h
+@brief 对于背光键盘的一些接口的封装(部分设备硬件不支持)
+
+DKbdBacklight类
+@fn DKbdBacklight::DKbdBacklight
+@brief DKbdBacklight class的构造函数
+@note 注意, 此函数为私有, 需要通过调用`DPowerManager::supportKbdBacklight() const`确定当前设备是否支持软件调整笔记本键盘背光, 然后使用`DPowerManager::kbdBacklight() const`创建一个对象进行设置和管理
+
+@fn uint DKbdBacklight::brightness()
+@brief 获取当前键盘背光亮度
+@return 1或者0(如果只有开关两种状态)或者其他数字
+
+@fn uint DKbdBacklight::maxBrightness()
+@brief 获取最大键盘背光亮度
+@return 1(如果只有开关两种状态)或者其他数字
+
+@fn void DKbdBacklight::setBrightness(uint value)
+@brief 设置键盘背光的亮度级别
+@param[in] value 亮度级别
+
+@fn void DKbdBacklight::brightnessChanged(const uint value)
+@brief 信号：键盘背光亮度发生改变
+@param[in] value 亮度级别
+
+
+@fn void DKbdBacklight::brightnessChangedWithSource(const uint value,const KbdSource &source)
+@brief 信号： 键盘背光亮度级别已更改, 包括有关更改来源的信息
+@param[in] value 键盘背光的新亮度值。
+@param[in] source 枚举类型, 键盘背光亮度变化的来源, 如果调用了`SetBrightness`,则为`exernal`。如果硬件更改了键盘亮度本身(自动或通过按下固件处理的热键), 则为`internal`.
+@note 固件处理的热键：这个概念是指的是键盘上调整键盘背光亮度按键, 或者是别的快捷键调整方式, 总之这些个调整方式与硬件有关, 与操作系统无关。
+
+*/

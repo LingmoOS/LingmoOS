@@ -1,0 +1,36 @@
+#! /bin/bash
+
+#  此脚本用于添加LBP capt系列打印机,脚本自带参数为3个
+#  参数1[打印机名称];参数2[打印机驱动文件路径];参数3[usb:打印机serial | net:ipaddr]
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage add printer: $0 printer_name ppdfile usb:serialnumber [net:ipaddr]"
+    echo "example:"
+    echo "    $0 LBP2900 CNCUPSLBP2900CAPTK.ppd [usb:0000XXXX | net:192.168.0.1]"
+    exit 0
+fi
+
+# 如果已经添加不再添加
+devinfo=${3:4}
+ccpdadmin | grep -q $devinfo && exit 2
+
+model_path=/usr/share/cups/model/
+
+serial=""
+if [[ $3 == "usb"* ]]; then
+    serial=/$devinfo
+fi
+
+lpadmin -p $1 -v ccp://localhost:59687$serial -P "$model_path$2" -E || exit 1
+ccpdadmin | grep "invalid Spool Name" | awk '{print $3}' | while read -r name; do ccpdadmin -x $name; done
+
+if [[ $3 == "usb"* ]]; then
+    ccpdadmin -p $1 -o /dev/capt/$devinfo | grep -q $1 || exit 1
+else
+    ccpdadmin -p $1 -o $3 | grep -q $1 || exit 1
+fi
+
+systemctl restart ccpd.service
+systemctl enable ccpd.service
+
+exit 0

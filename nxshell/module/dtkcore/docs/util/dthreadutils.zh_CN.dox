@@ -1,0 +1,55 @@
+/*!
+@~chinese
+@ingroup dutil
+@file include/util/dthreadutils.h
+
+本文件定义了线程相关的帮助类
+
+@class DThreadUtils
+@brief 线程帮助类
+@details 本类主要用来进行异步线程调用, 此外本类所有的public接口都是线程安全的 
+
+@fn static DThreadUtils& DThreadUtils::gui()
+@brief 获取以GUI线程初始化的静态对象
+@return DThreadUtils& 静态对象的引用
+
+@fn QThread* DThreadUtils::thread() const noexcept
+@brief 获取DThreadUtils对应的线程
+@return QThread* 对应线程的QThread对象的指针
+
+@fn template <typename Func, typename... Args> inline auto run(QObject *context,typename QtPrivate::FunctionPointer<Func>::Object *obj, Func fun, Args &&...args)
+@brief 在对应的线程执行传入的成员函数, 非阻塞
+@param[in] context 对象上下文, 用来在执行调用时判断对象是否存在
+@param[in] obj 对象指针
+@param[in] fun 成员函数指针
+@param[in] args 对应函数的参数
+@return 以成员函数返回值类型实例化的QFuture对象
+
+@fn template <typename Func, typename... Args> inline auto run(typename QtPrivate::FunctionPointer<Func>::Object *obj, Func fun, Args &&...args)
+@brief 在对应的线程执行传入的成员函数, 非阻塞
+@param[in] obj 对象指针
+@param[in] fun 成员函数指针
+@param[in] args 对应函数的参数
+@return 以成员函数返回值类型实例化的QFuture对象
+
+@fn template <typename Func, typename... Args> inline QFuture<std::invoke_result_t<std::decay_t<Func>, Args...>> run(QObject *context, Func fun, Args &&...args)
+@brief 在对应的线程执行传入的成员函数, 非阻塞
+@param[in] context 对象上下文, 用来在执行调用时判断对象是否存在
+@param[in] fun 成员函数指针
+@param[in] args 对应函数的参数
+@return 以成员函数返回值类型实例化的QFuture对象
+
+@fn template <typename Func, typename... Args> inline QFuture<std::invoke_result_t<std::decay_t<Func>, Args...>> run(Func fun, Args &&...args)
+@brief 在对应的线程执行传入的成员函数, 非阻塞
+@param[in] fun 可调用对象
+@param[in] args 调用对应的参数
+@return 以函数返回值类型实例化的QFuture对象
+
+@fn template <typename... T> inline decltype(auto) exec(T &&...args)
+@brief 在对应的线程执行传入的成员函数, 阻塞
+@details 本函数是run函数的包装
+@note 调用此函数的一方需要确保对应线程有事件循环, 否则会无限等待
+@param[in] args 参数包, 具体含义参考run函数
+@return 传入函数的返回值
+
+*/

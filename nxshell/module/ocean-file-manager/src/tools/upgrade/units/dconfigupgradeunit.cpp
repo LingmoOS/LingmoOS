@@ -1,0 +1,272 @@
+// SPDX-FileCopyrightText: 2022 - 2023 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "dconfigupgradeunit.h"
+#include "utils/upgradeutils.h"
+
+#include <dfm-base/base/configs/dconfig/dconfigmanager.h>
+
+#include <QJsonObject>
+#include <QJsonArray>
+
+Q_DECLARE_LOGGING_CATEGORY(logToolUpgrade)
+
+DFMBASE_USE_NAMESPACE
+using namespace dfm_upgrade;
+using namespace GlobalDConfDefines::ConfigPath;
+
+namespace DConfigKeys {
+static constexpr char kDFMMenuHioceann[] { "dfm.menu.hioceann" };
+static constexpr char kFileManagerActionHioceann[] { "dfm.menu.action.hioceann" };
+static constexpr char kFileDialogActionHioceann[] { "dfd.menu.action.hioceann" };
+static constexpr char kDesktopActionHioceann[] { "dd.menu.action.hioceann" };
+
+static constexpr char kSambaPermanent[] { "dfm.samba.permanent" };
+static constexpr char kDiskHioceann[] { "dfm.disk.hioceann" };
+}   // namespace DConfigKeys
+
+DConfigUpgradeUnit::DConfigUpgradeUnit()
+    : UpgradeUnit()
+{
+}
+
+QString DConfigUpgradeUnit::name()
+{
+    return "DConfigUpgradeUnit";
+}
+
+bool DConfigUpgradeUnit::initialize(const QMap<QString, QString> &args)
+{
+    Q_UNUSED(args);
+    return true;
+}
+
+bool DConfigUpgradeUnit::upgrade()
+{
+    bool ret = true;
+    ret &= upgradeMenuConfigs();
+    ret &= upgradeSmbConfigs();
+    ret &= upgradeRecentConfigs();
+    ret &= upgradeSearchConfigs();
+    clearDiskHioceann();
+    addOldGenericSettings();
+
+    return ret;
+}
+
+const QMap<QString, QString> &DConfigUpgradeUnit::mappedActions()
+{
+    static const QMap<QString, QString> mapped {
+        { "Compress", "" },   // TODO(xust): this need to be completed. // TODO(liqiang)
+        { "Decompress", "" },
+        { "DecompressHere", "" },
+        { "BookmarkRename", "" },
+        { "NewWindow", "" },
+        { "ClearRecent", "" },
+        { "AutoMerge", "" },
+
+        { "OpenDisk", "computer-open" },
+        { "OpenDiskInNewWindow", "computer-open-in-win" },
+        { "OpenDiskInNewTab", "computer-open-in-tab" },
+        { "Mount", "computer-mount" },
+        { "Unmount", "computer-unmount" },
+        { "Eject", "computer-eject" },
+        { "SafelyRemoveDrive", "computer-safely-remove" },
+
+        { "AutoSort", "auto-arrange" },
+        { "SortBy", "sort-by" },
+        { "Name", "sort-by-name" },
+        { "Size", "sort-by-size" },
+        { "Type", "sort-by-type" },
+
+        { "DisplayAs", "display-as" },
+        { "IconSize", "icon-size" },
+
+        { "DisplaySettings", "display-settings" },
+        { "WallpaperSettings", "wallpaper-settings" },
+        { "SetAsWallpaper", "set-as-wallpaper" },
+
+        { "Property", "property" },
+
+        { "Open", "open" },
+        { "OpenFileLocation", "open-file-location" },
+        { "OpenInNewWindow", "open-in-new-window" },
+        { "OpenInNewTab", "open-in-new-tab" },
+        { "OpenAsAdmin", "open-as-administrator" },
+        { "OpenWith", "open-with" },
+        { "OpenWithCustom", "open-with-custom" },
+        { "OpenInTerminal", "open-in-terminal" },
+
+        { "Cut", "cut" },
+        { "Copy", "copy" },
+        { "Paste", "paste" },
+        { "Rename", "rename" },
+        { "Delete", "delete" },
+        { "CompleteDeletion", "delete" },
+        { "SelectAll", "select-all" },
+
+        { "AddToBookMark", "add-bookmark" },
+        { "BookmarkRemove", "remove-bookmark" },
+
+        { "CreateSymlink", "create-system-link" },
+        { "SendToDesktop", "send-to-desktop" },
+        { "SendToRemovableDisk", "send-to" },
+        { "SendToBluetooth", "share-to-bluetooth" },
+
+        { "NewFolder", "new-folder" },
+        { "NewDocument", "new-document" },
+        { "NewText", "new-plain-text" },
+
+        { "Restore", "restore" },
+        { "RestoreAll", "restore-all" },
+        { "ClearTrash", "empty-trash" },
+    };
+
+    return mapped;
+}
+
+bool DConfigUpgradeUnit::upgradeMenuConfigs()
+{
+    auto upgradeActions = [](QStringList &actions) {
+        for (auto &action : actions) {
+            const auto &newVal = mappedActions().value(action, action);
+            action = newVal.isEmpty() ? action : newVal;   // if no mapped keys, use old version.
+            if (newVal.isEmpty())
+                qCInfo(logToolUpgrade) << "upgrade: no mapped key, keep old value: " << action;
+        }
+    };
+
+    using namespace DConfigKeys;
+    auto fileManagerActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kFileManagerActionHioceann).toStringList();
+    auto desktopActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kDesktopActionHioceann).toStringList();
+    auto fileDialogActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kFileDialogActionHioceann).toStringList();
+
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileManagerHioceannActions: " << fileManagerActionHioceann;
+    upgradeActions(fileManagerActionHioceann);
+    qCInfo(logToolUpgrade) << "upgrade: [new] fileManagerHioceannActions: " << fileManagerActionHioceann;
+
+    qCInfo(logToolUpgrade) << "upgrade: [old] desktopActionHioceann: " << desktopActionHioceann;
+    upgradeActions(desktopActionHioceann);
+    qCInfo(logToolUpgrade) << "upgrade: [new] desktopActionHioceann: " << desktopActionHioceann;
+
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHioceann: " << fileDialogActionHioceann;
+    upgradeActions(fileDialogActionHioceann);
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHioceann: " << fileDialogActionHioceann;
+
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kDesktopActionHioceann, desktopActionHioceann);
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileManagerActionHioceann, fileManagerActionHioceann);
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileDialogActionHioceann, fileDialogActionHioceann);
+
+    return true;
+}
+
+bool DConfigUpgradeUnit::upgradeSmbConfigs()
+{
+    static constexpr auto kOldKey { "AlwaysShowOfflineRemoteConnections" };
+    // 0. check old
+    if (checkOldGeneric(kOldKey))
+        return true;
+
+    // 1. read main config value
+    auto oldVal = UpgradeUtils::genericAttribute(kOldKey);
+    if (!oldVal.isValid())
+        return true;
+
+    auto alwaysShowSamba = oldVal.toBool();
+    // 2. write to dconfig
+    DConfigManager::instance()->setValue(kDefaultCfgPath, DConfigKeys::kSambaPermanent, alwaysShowSamba);
+    qCInfo(logToolUpgrade) << "upgrade: set samba permanent to dconfig, value:" << alwaysShowSamba;
+
+    // 3. remove old config
+    oldGenericSettings.append(kOldKey);
+
+    return true;
+}
+
+/*!
+ * \brief DConfigUpgradeUnit::upgradeRecentConfigs
+ * the Recent hioceann key in dconfig in V5 is deprecated. after upgraded, the old value
+ * should be synced to the new dconfig item.
+ * read the old data from GenericAttribute and saved to
+ * org.lingmo.ocean.file-manager.sidebar::itemVisiable
+ * \return
+ */
+bool DConfigUpgradeUnit::upgradeRecentConfigs()
+{
+    static constexpr auto kOldKey { "ShowRecentFileEntry" };
+
+    // 0. check old
+    if (checkOldGeneric(kOldKey))
+        return true;
+
+    // 1. read main config value
+    auto oldValue = UpgradeUtils::genericAttribute(kOldKey);
+    if (!oldValue.isValid())
+        return true;
+
+    const QString &configFile { "org.lingmo.ocean.file-manager.sidebar" };
+    if (!DConfigManager::instance()->addConfig(configFile))
+        return false;
+
+    // 2. write to dconfig
+    bool showRecent = oldValue.toBool();
+    qCInfo(logToolUpgrade) << "upgrade: the old `showRecent` is" << showRecent;
+    auto theSidebarVisiableList = DConfigManager::instance()->value(configFile, "itemVisiable").toMap();
+    qCInfo(logToolUpgrade) << "upgrade: the new dconfig sidebar visiable list:" << theSidebarVisiableList;
+    theSidebarVisiableList["recent"] = showRecent;
+    DConfigManager::instance()->setValue(configFile, "itemVisiable", theSidebarVisiableList);
+
+    // 3. remove old config
+    oldGenericSettings.append(kOldKey);
+
+    return true;
+}
+
+bool DConfigUpgradeUnit::upgradeSearchConfigs()
+{
+    static constexpr auto kOldKey { "IndexFullTextSearch" };
+
+    // 0. check old
+    if (checkOldGeneric(kOldKey))
+        return true;
+
+    // 1. read main config value
+    auto oldValue = UpgradeUtils::genericAttribute(kOldKey);
+    if (!oldValue.isValid())
+        return true;
+
+    const QString &configFile { "org.lingmo.ocean.file-manager.search" };
+    if (!DConfigManager::instance()->addConfig(configFile))
+        return false;
+
+    bool ftsEnabled = oldValue.toBool();
+    // 2. write to dconfig
+    DConfigManager::instance()->setValue(configFile, "enableFullTextSearch", ftsEnabled);
+    qCInfo(logToolUpgrade) << "upgrade: set search permanent to dconfig, value:" << ftsEnabled;
+
+    // 3. remove old config
+    oldGenericSettings.append(kOldKey);
+
+    return true;
+}
+
+void DConfigUpgradeUnit::clearDiskHioceann()
+{
+    DConfigManager::instance()->setValue(kDefaultCfgPath, DConfigKeys::kDiskHioceann, QStringList());
+}
+
+void DConfigUpgradeUnit::addOldGenericSettings()
+{
+    if (!oldGenericSettings.isEmpty())
+        UpgradeUtils::addOldGenericAttribute(QJsonArray::fromStringList(oldGenericSettings));
+}
+
+bool DConfigUpgradeUnit::checkOldGeneric(const QString &key)
+{
+    auto oldGeneric = UpgradeUtils::genericAttribute("OldAttributes");
+    if (oldGeneric.isValid() && oldGeneric.toStringList().contains(key))
+        return true;
+
+    return false;
+}

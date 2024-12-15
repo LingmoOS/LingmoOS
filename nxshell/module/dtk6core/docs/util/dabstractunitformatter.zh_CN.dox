@@ -1,0 +1,70 @@
+/*!
+@~chinese
+@file include/util/dabstractunitformatter.h
+
+dabstractunitformatter.h文件提供了DAbstractUnitFormatter类, DAbstractUnitFormatter是抽象的单位格式化工具, 提供统一的单位格式化接口
+
+@class Dtk::Core::DAbstractUnitFormatter include/util/dabstractunitformatter.h
+@brief 抽象格式化工具基类
+@details
+    DAbstractUnitFormatter提供统一的单位格式化接口. 在DAbstractUnitFormatter的设计理念中, 不同大小的单位被编号成不同级别的单位id. <br>
+    id从小到大, 单位从低级到高级. 各相邻单位之间的进率可以是不均匀的, 实现者只需实现unitConvertRate, 返回当前单位到下一高级单位(从id为x的单位到id为x+1的单位)的进率是正确的. <br>
+    事实上, 实现者如果保证unitConvertRate对于任一id为x的单位, 其到id为x+1的单位的换算比率(允许小于1)是正确的, 不需满足id递增, 单位级别递增的约束(即unitConvertRate总是大于1的约束) <br>
+    注意, 实现者此时需重写其他接口以同时保证正确性.
+
+@fn DAbstractUnitFormatter::DAbstractUnitFormatter()
+@brief 空参构造函数
+@note 注意, 该类为抽象类, 不可直接实例化, 该构造函数仅供实现子类使用.
+
+@fn @pure virtual int DAbstractUnitFormatter::unitMax() const = 0
+@brief 获取最大的单位id
+@return 最大的单位id
+
+@fn @pure virtual int DAbstractUnitFormatter::unitMin() const = 0
+@brief 获取最小的单位id
+@return 最小的单位id
+
+@fn @pure virtual uint DAbstractUnitFormatter::unitConvertRate(int unitId) const = 0
+@brief 获取当前单位到下一高级单位的进率
+@param[in] unitId 当前单位id
+@return 进率, 正常情况下, 大于1
+@note 下一高级单位指id为unitId + 1的单位.
+
+@fn virtual qreal DAbstractUnitFormatter::unitValueMax(int unitId) const
+@brief 获取当前单位的最大值
+@param[in] unitId 当前单位id
+@return 单位最大值
+
+@fn virtual qreal DAbstractUnitFormatter::unitValueMin(int unitId) const
+@brief 获取当前单位的最小值
+@param[in] unitId 当前单位id
+@return 单位最小值
+
+@fn virtual QString DAbstractUnitFormatter::unitStr(int unitId) const = 0
+@brief 获取当前单位的字符串表示
+@param[in] unitId 当前单位id
+@return 单位字符串表示
+
+@fn qreal DAbstractUnitFormatter::formatAs(qreal value, int currentUnit, const int targetUnit) const
+@brief 格式化数值到指定单位
+@param[in] value 当前单位下表示的数值
+@param[in] currentUnit 当前单位id
+@param[in] targetUnit 目标单位id
+@return 格式化后以目标单位表示的数值
+
+@fn QPair<qreal, int> DAbstractUnitFormatter::format(const qreal value, const int unit) const
+@brief 格式化数值到合适的单位
+@param[in] value 当前单位下表示的数值
+@param[in] unit 当前单位
+@return 格式化后的合适的数值和单位
+
+合适是指: 如果单位大于unitMin()或者小于unitMax(), 会尽量保证值被转换到接近最小值的合适单位上.
+
+@fn QList<QPair<qreal, int> > DAbstractUnitFormatter::formatAsUnitList(const qreal value, int unit) const
+@brief 包括完整转换数据版本的format()
+@param[in] value 当前单位下表示的数值
+@param[in] unit 当前单位
+@return 格式化产生的所有的数值和单位
+
+
+*/

@@ -1,0 +1,33 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-qt5platform-plugins-git
+pkgver=5.0.40.r14.gf817781
+pkgrel=1
+sourcename=ocean-qt5platform-plugins
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="qt5platform-plugins"
+pkgdesc='Qt platform plugins for OCEAN'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/qt5platform-plugins"
+license=('GPL3')
+provides=('lingmo-qt5platform-plugins')
+conflicts=('lingmo-qt5platform-plugins')
+depends=('cairo' 'qt5-wayland' 'qt5-x11extras' 'qt5-base' 'dwayland')
+makedepends=('git' 'expac' 'qt5-xcb-private-headers' 'libglvnd' 'ninja' 'cmake' 'libxcb' 'gtest' 'gmock' 'extra-cmake-modules')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+	cd $sourcedir
+	cmake . -GNinja \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DQT_XCB_PRIVATE_HEADERS=/usr/include/qtxcb-private
+	ninja
+}
+
+package() {
+	cd $sourcedir
+        DESTDIR="$pkgdir" ninja install
+}

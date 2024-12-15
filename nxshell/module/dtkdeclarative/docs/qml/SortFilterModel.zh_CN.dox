@@ -1,0 +1,108 @@
+/**
+@~chinese
+@class SortFilterModel
+@ingroup DelegateModel
+
+@ingroup QML_TYPES
+@brief 提供一种自带过滤和排序的 DelegateModel.
+@details
+    SortFilterModel 提供自带过滤和排序的 DelegateModel，SortFilterModel 中的特定函数控制了<br>
+    其中列表中每个项的显示和隐藏，通常和控件中的搜索功能绑定。<br>
+    一般的 SortFilterModel 用法如下：<br>
+```qml
+    Rectangle {
+        width: 200; height: 100
+
+        SortFilterModel {
+            id: visualModel
+            model: ListModel {
+                ListElement { name: "Apple" }
+                ListElement { name: "Orange" }
+            }
+            delegate: Rectangle {
+                height: 25
+                width: 100
+                Text { text: "Name: " + name}
+            }
+        }
+
+        ListView {
+            anchors.fill: parent
+            model: visualModel
+        }
+    }
+```
+
+    上述示例不带任何排序和过滤，对上述代码修改可实现特定情况的过滤，例如下述代码过滤 type 1 类型的元素。
+```qml
+    Rectangle {
+        width: 200; height: 100
+
+        SortFilterModel {
+            id: visualModel
+            model: ListModel {
+                ListElement { type: 1; name: "Apple" }
+                ListElement { type: 2; name: "Orange" }
+            }
+            delegate: Rectangle {
+                height: 25
+                width: 100
+                Text { text: "Name: " + name}
+            }
+
+            filterAcceptsItem: function(item) {
+                return item.type === 1
+            }
+        }
+
+        ListView {
+            anchors.fill: parent
+            model: visualModel
+        }
+    }
+```
+    对于多个 type == 1 的元素时，可以通过 lessThan 函数对过滤出的元素进行排序，如下代码：
+```qml
+    Rectangle {
+        width: 200; height: 100
+
+        SortFilterModel {
+            id: visualModel
+            model: ListModel {
+                ListElement { type: 1; prior: 2; name: "Apple" }
+                ListElement { type: 2; prior: 1; name: "Coconut" }
+                ListElement { type: 2; prior: 1; name: "Orange" }
+            }
+            delegate: Rectangle {
+                height: 25
+                width: 100
+                Text { text: "Name: " + name}
+            }
+
+            filterAcceptsItem: function(item) {
+                return item.type === 1
+            }
+
+            lessThan: function(item1, item2) {
+                return item1.prior < item2.prior
+            }
+        }
+
+        ListView {
+            anchors.fill: parent
+            model: visualModel
+        }
+    }
+```
+
+@property var SortFilterModel::lessThan
+@brief lessThan 函数用于排序。
+
+@property var SortFilterModel::filterAcceptsItem
+@brief filterAcceptsItem 函数用于进行视图项的过滤。
+
+@property var SortFilterModel::visibleGroup
+@brief visibleGroup 为当前可视的 DelegateModelGroup 。
+@sa DelegateModelGroup
+
+*/

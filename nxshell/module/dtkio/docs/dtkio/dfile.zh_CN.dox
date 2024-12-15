@@ -1,0 +1,184 @@
+/*!
+@~chinese
+@ingroup dtkio
+@file dfile.h
+
+    
+@class Dtk::IO::DFile dfile.h
+@brief 用以管理文件的类，对文件进行打开、关闭、写入等操作，以及获取其状态等
+
+@namespace Dtk::IO::DFile
+
+@fn DFile::DFile(const QUrl &url)
+@brief 构造函数, 通过 传入的url字符串 创建一个Dfile对象管理该url指向的文件
+@param[in] url 目标文件的url字符串
+
+
+@fn DExpected<QUrl> DFile::url() const
+@brief 返回构造当前文件的url参数
+@return 构造当前文件的url参数
+
+@fn DExpected<bool> DFile::open(OpenFlags mode)
+@brief 以指定模式来打开目标文件
+@param[in] mode 文件打开的模式（只写、只读、读写、追加等）
+@return 打开成功返回ture,错误则为DError对象，包含错误信息
+
+@fn DExpected<bool> DFile::close()
+@brief 关闭文件，同时清理掉DFile对象中的输入输出流信息
+@return true
+
+@fn bool DFile::isOpen() const
+@brief 返回文件是否打开
+@return 文件是否打开
+@retval true 文件已打开
+@retval false 文件没有打开
+
+@fn DExpected<size_t> DFile::read(QByteArray *data, size_t maxSize)
+@brief 从文件中读取数据
+@param[out] data 用以存放读取到的数据
+@param[in] maxSize 从文件中读取数据的最大长度
+@return 读取成功返回读取到的数据长度，否则返回DError对象，包含错误信息
+
+@fn DExpected<QByteArray> DFile::readAll()
+@brief 将文件中数据全部读出
+@return 成功则返回读取到的数据，否则返回DError对象，包含错误信息
+
+@fn DExpected<size_t> DFile::write(const QByteArray &data, size_t len)
+@brief 向文件中写入指定长度的数据
+@param[in] data 要写入文件的数据
+@param[in] len 写入数据的长度
+@return 读取成功返回写入的数据长度，否则返回DError对象，包含错误信息
+
+@fn DExpected<size_t> DFile::write(const QByteArray &data)
+@brief 向文件中写入数据
+@param[in] data 要写入文件的数据
+@return 读取成功返回写入的数据长度，否则返回DError对象，包含错误信息
+
+
+@fn DExpected<bool> DFile::seek(ssize_t pos, SeekType type) const
+@brief 设置文件当前的位置
+@param[in] pos 要设置的偏移量
+@param[in] type 设置偏移量的类型（从开始位置、当前位置、末尾位置）
+@return 设置成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<ssize_t> DFile::pos() const
+@brief 获取文件当前位置的偏移量
+@return 读取成功返回文件当前位置的偏移量，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFile::flush()
+@brief 刷新文件当前输出流，并强制写出缓冲的输出字节
+@return 操作成功返回true，否则返回DError对象，包含错误信息
+
+@fn DExpected<size_t> DFile::size() const
+@brief 获取文件的大小
+@return 操作成功返回文件大小，否则返回DError对象，包含错误信息
+
+@fn bool DFile::exists() const
+@brief 查看文件是否存在
+@return 文件是否存在的Bool值
+
+@fn DExpected<Permissions> DFile::permissions() const
+@brief 获取文件的权限状态
+@return 操作成功返回文件权限对象，否则返回DError对象，包含错误信息
+
+@fn DExpected<bool> DFile::setPermissions(Permissions permission)
+@brief 设置文件的权限状态
+@return 操作的结果
+@retval true 操作成功
+@retval DError对象 包含错误信息
+
+@fn DExpected<bool> DFile::setAttribute(AttributeID id, const QVariant &value)
+@brief 设置文件属性
+@param[in] id 要设置的属性的id值
+@param[in] value 要设置的属性
+@return 操作的结果
+@retval true 操作成功
+@retval DError对象 包含错误信息
+
+@fn DExpected<bool> Dtk::IO::DFile::setAttribute(const QByteArray &key, const QVariant &value, const AttributeType type, const FileQueryInfoFlags flag)
+@brief 设置文件属性
+@param[in] key 要设置的属性的键值
+@param[in] value 要设置的属性
+@param[in] type 设置属性的类型（字符、字节、布尔值等）
+@param[in] flag 查询文件信息时是否查询链接文件
+@return 操作的结果
+@retval true 操作成功
+@retval DError对象 包含错误信息
+
+@fn DFileFuture *DFile::openAsync(OpenFlags mode, int ioPriority, QObject *parent)
+@brief 以异步的方式打开文件
+@param[in] mode 打开文件的模式（只写、只读、读写、追加等）
+@param[in] ioPriority 暂未使用到的参数
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::closeAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式关闭文件
+@param[in] ioPriority 暂未使用到的参数
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::readAsync(size_t maxSize, int ioPriority, QObject *parent)
+@brief 以异步的方式读取文件数据
+@param[in] maxSize 要读取数据的最大长度
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::readAllAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式读取文件数据
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *Dtk::IO::DFile::writeAsync(const QByteArray &data, size_t len, int ioPriority, QObject *parent)
+@brief 以异步的方式写入文件数据
+@param[in] data 要写入的数据
+@param[in] len 写入数据的长度
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *Dtk::IO::DFile::writeAsync(const QByteArray &data, int ioPriority, QObject *parent)
+@brief 以异步的方式写入文件数据
+@param[in] data 要写入的数据
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::flushAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式刷新文件输出流并强制输出
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::sizeAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式获取文件的大小
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::existsAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式获取文件是否存在
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::permissionsAsync(int ioPriority, QObject *parent)
+@brief 以异步的方式获取文件的权限属性
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DFileFuture *DFile::setPermissionsAsync(Permissions permission, int ioPriority, QObject *parent)
+@brief 以异步的方式设置文件的权限属性
+@param[in] permission 要设置的权限属性
+@param[in] ioPriority 优先级控制
+@param[in] parent 父对象，默认为nullptr
+@return 操作成功DFileFutur对象表示异步计算的结果
+
+@fn DError DFile::lastError() const
+@brief 获取当前文件操作的错误码
+@return 当前文件操作的错误码
+
+*/

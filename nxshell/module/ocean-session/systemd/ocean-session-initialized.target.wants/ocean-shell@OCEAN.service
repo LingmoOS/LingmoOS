@@ -1,0 +1,36 @@
+[Unit]
+Description=ocean-shell for OCEAN service
+RefuseManualStart=no
+RefuseManualStop=no
+StartLimitBurst=3
+CollectMode=inactive-or-failed
+
+Requisite=ocean-session-pre.target
+After=ocean-session-pre.target
+
+Requisite=ocean-session-initialized.target
+PartOf=ocean-session-initialized.target
+Before=ocean-session-initialized.target
+
+Requires=dbus.socket
+After=dbus.socket
+
+#FIXME: maybe AM is invalid
+# old AM
+Wants=org.lingmo.ocean.Application1.Manager.service
+After=org.lingmo.ocean.Application1.Manager.service
+# new AM
+Wants=org.desktopspec.ApplicationManager1.service
+After=org.desktopspec.ApplicationManager1.service
+
+# No longer needed. Just a dependency of some of ocean-shell's plugins.
+# Wants=org.ocean.session.Daemon1.service
+# After=org.ocean.session.Daemon1.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ocean-shell -C %I --serviceName=org.lingmo.ocean.shell
+TimeoutStartSec=infinity
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

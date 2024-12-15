@@ -1,0 +1,585 @@
+// SPDX-FileCopyrightText: 2024 - 2027 UnionTech Software Technology Co., Ltd.
+// SPDX-License-Identifier: GPL-3.0-or-later
+import QtQuick 2.11
+import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
+import org.lingmo.dtk 1.0
+
+import Qt5Compat.GraphicalEffects
+
+import org.lingmo.oceanui 1.0
+
+OceanUIObject {
+
+    OceanUIObject {
+        name: "grubSettingText"
+        parentName: "bootMenu"
+        displayName: qsTr("Startup Settings")
+        weight: 10
+        pageType: OceanUIObject.Item
+        page: Label {
+            leftPadding: 5
+            bottomPadding: 5
+            font: DTK.fontManager.t4
+            text: oceanuiObj.displayName
+        }
+    }
+
+    OceanUIObject {
+        name: "grubSettingList"
+        parentName: "bootMenu"
+        weight: 20
+        pageType: OceanUIObject.Item
+        page: Rectangle {
+
+            readonly property int itemDelegateMinWidth: parent.width
+            readonly property int itemDelegateMaxWidth: 600
+            readonly property int itemDelegateHeight: 40
+
+            id: grublist
+            implicitWidth: parent.width
+            implicitHeight: menuViewList.height + 20
+            color: "transparent"
+            Layout.fillWidth: true
+
+            ItemViewport {
+                id: viewport
+                anchors.fill: image
+                sourceItem: image
+                radius: 10
+                fixed: true
+                hideSource: true
+                antialiasing: true
+            }
+
+            Image {
+                id: image
+                source: "file://" + oceanuiData.mode().grubThemePath
+                asynchronous: true
+                anchors.fill: parent
+                width: parent.width
+                height: menuViewList.height
+                fillMode: Image.PreserveAspectCrop
+                clip: true
+            }
+
+            Column {
+                spacing: 5
+                leftPadding: 20
+                id: menuViewList
+                Layout.fillWidth: true
+                clip: true
+
+                Label {
+                    width: grublist.implicitWidth
+                    topPadding: 10
+                    bottomPadding: 10
+                    leftPadding: 5
+                    text: qsTr("You can click the menu to change the default startup items, or drag the image to the window to change the background image.")
+                    font: DTK.fontManager.t8
+                    color: "white"
+                    opacity: 0.7
+                }
+
+                // 在图片背景上使用Repeater
+                Repeater {
+                    id: grubMenuList
+                    model: oceanuiData.mode().grubMenuListModel()
+
+                    delegate: Rectangle {
+                        width: grublist.width - 30
+                        height: 30
+                        color: "transparent"
+                        Rectangle {
+                            id: backgru
+                            width: grublist.width - 30
+                            height: 30
+                            radius: 8
+                            color: "#2A000000"
+                            visible: true
+
+                            RowLayout {
+                                Layout.alignment: Qt.AlignVCenter
+                                width: parent.width
+                                height: 30
+
+                                Label {
+                                    height: 20
+                                    Layout.alignment: Qt.AlignLeft
+                                    horizontalAlignment: Text.AlignLeft
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: model.text
+                                    font: DTK.fontManager.t6
+                                    color: "white"
+                                }
+
+                                OceanUICheckIcon {
+                                    Layout.alignment: Qt.AlignRight
+                                    Layout.rightMargin: 10
+                                    checked: model.checkStatus
+                                    visible: model.checkStatus
+                                    size: 16
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    oceanuiData.work().setDefaultEntry(model.text)
+                                }
+                            }
+                        }
+
+                        GaussianBlur {
+                            visible: true
+                            anchors.fill: parent
+                            source: backgru
+                            radius: 50
+                            samples: 30
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    OceanUIObject {
+        name: "startDelay"
+        parentName: "bootMenu"
+        displayName: qsTr("grub start delay")
+        weight: 30
+        pageType: OceanUIObject.Editor
+        backgroundType: OceanUIObject.Normal
+        page: Switch {
+            Layout.alignment: Qt.AlignRight
+            checked: oceanuiData.mode().bootDelay
+
+            onCheckedChanged: {
+                if (oceanuiData.mode().bootDelay != checked) {
+                    oceanuiData.work().setBootDelay(checked)
+                }
+            }
+        }
+    }
+
+    OceanUIObject {
+        name: "grubTheme"
+        parentName: "bootMenu"
+        displayName: qsTr("theme")
+        description: qsTr("After turning on the theme, you can see the theme background when you turn on the computer")
+        weight: 40
+        pageType: OceanUIObject.Editor
+        backgroundType: OceanUIObject.Normal
+        page: Switch {
+            Layout.alignment: Qt.AlignRight
+            checked: oceanuiData.mode().themeEnabled
+
+            onCheckedChanged: {
+                if (checked != oceanuiData.mode().themeEnabled) {
+                    oceanuiData.work().setEnableTheme(checked)
+                }
+            }
+        }
+    }
+
+    OceanUIObject {
+        name: "bootMenuVerification"
+        parentName: "bootMenu"
+        visible: !oceanuiData.mode().isCommunitySystem()
+        displayName: qsTr("Boot menu verification")
+        description: qsTr("After opening, entering the menu editing requires a password.")
+        weight: 50
+        backgroundType: OceanUIObject.Normal
+        pageType: OceanUIObject.Item
+
+        page: RowLayout {
+            property var passwordDlgStatus: {"Init" : 0, "Cancel" : 1, "Sure" : 2}
+            property int dlgStatus: passwordDlgStatus.Init
+            Column {
+                spacing: 0
+                Label {
+                    height: 20
+                    text: oceanuiObj.displayName
+                    font: DTK.fontManager.t6
+                    horizontalAlignment: Qt.AlignLeft
+                    verticalAlignment: Qt.AlignVCenter
+                    leftPadding: 0
+                }
+
+                Row {
+                    spacing: 0
+                    Label {
+                        height: 20
+                        text: oceanuiObj.description
+                        font: DTK.fontManager.t8
+                        horizontalAlignment: Qt.AlignLeft
+                        verticalAlignment: Qt.AlignVCenter
+                        leftPadding: 0
+                        opacity: 0.5
+                    }
+
+                    Label {
+                        height: 20
+                        text: "<a href=\"Change Password\">" + qsTr("Change Password") +"</a>"
+                        visible: oceanuiData.mode().grubEditAuthEnabled
+                        horizontalAlignment: Qt.AlignLeft
+                        verticalAlignment: Qt.AlignVCenter
+                        font.pointSize: 8
+                        color:"#5A000000"
+                        // 超链接点击事件
+                        onLinkActivated: function(url) {
+                            console.log("点击的链接是: " + url)
+                            dlgStatus = passwordDlgStatus.Init
+                            passwordDlg.show()
+                        }
+                    }
+                }
+            }
+
+            Row {
+                Layout.alignment: Qt.AlignRight
+                Switch {
+                    id: verificationSwitch
+
+                    checked: oceanuiData.mode().grubEditAuthEnabled
+                    onCheckedChanged: {
+                        if (checked && !oceanuiData.mode().grubEditAuthEnabled) {
+                            passwordDlg.show()
+                            return
+                        }
+                        if (!checked && oceanuiData.mode().grubEditAuthEnabled) {
+                            oceanuiData.work().disableGrubEditAuth()
+                            return
+                        }
+                    }
+                }
+
+                DialogWindow {
+                    id: passwordDlg
+                    width: 360
+                    height: 350
+
+                    icon: "preferences-system"
+                    flags: Qt.Dialog | Qt.WindowCloseButtonHint
+                    modality: Qt.ApplicationModal
+
+                    // 弹窗关闭时触发的事件
+                    onClosing: function(close) {
+
+                        close.accepted = true
+                        if (dlgStatus !== passwordDlgStatus.Sure) {
+                            dlgStatus = passwordDlgStatus.Init
+                            oceanuiData.work().resetEditAuthEnabled()
+                        }
+                    }
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 0
+
+                        Label {
+                            id: passwdTitle
+                            Layout.topMargin: 10
+                            Layout.bottomMargin: 10
+                            height: 20
+                            Layout.alignment: Qt.AlignHCenter
+                            font: DTK.fontManager.t5
+                            text: oceanuiData.mode().grubEditAuthEnabled ? qsTr("Change boot menu verification password") : qsTr("Set the boot menu authentication password")
+                        }
+
+                        Label {
+                            Layout.alignment: Qt.AlignLeft
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                            Layout.leftMargin: 5
+                            font: DTK.fontManager.t6
+                            text: qsTr("User Name :")
+                            Layout.preferredWidth: 50
+                        }
+
+                        LineEdit {
+                            id: userEdit
+                            text: qsTr("roots")
+                            readOnly: true
+                            clearButton.visible: false
+                            Layout.preferredWidth: parent.width
+                        }
+
+                        Label {
+                            height: 20
+                            topPadding: 10
+                            Layout.preferredWidth: 60
+                            Layout.alignment: Qt.AlignLeft
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                            Layout.leftMargin: 5
+                            font: DTK.fontManager.t6
+                            text: qsTr("New Password :")
+                        }
+
+                        PasswordEdit {
+                            id: newPasswordEdit
+                            placeholderText: qsTr("Required")
+                            Layout.preferredWidth: parent.width
+                            height: 30
+                            showAlert: false
+
+                            onTextChanged: {
+                                console.log(" newPasswordEdit text changed ", newPasswordEdit.text)
+                                if (newPasswordEdit.text.length === 0) {
+                                    if (repeatPasswordEdit.text.length !== 0) {
+                                        newPasswordEdit.alertText = qsTr("Password cannot be empty")
+                                        newPasswordEdit.showAlert = true
+                                    }
+                                    return
+                                }
+
+                                var errorText = oceanuiData.work().verifyPassword(newPasswordEdit.text)
+                                console.log(" newPasswordEdit text changed ", errorText)
+                                if (errorText.length !== 0) {
+                                    newPasswordEdit.alertText = errorText
+                                    newPasswordEdit.showAlert = true
+                                    submitbtn.enabled = false
+                                } else {
+                                    if (repeatPasswordEdit.text !== newPasswordEdit.text) {
+                                        newPasswordEdit.alertText = qsTr("Passwords do not match")
+                                    }
+                                    var isAlert = (repeatPasswordEdit.text.length !== 0 && repeatPasswordEdit.text === newPasswordEdit.text)
+
+                                    if (isAlert) {
+                                        repeatPasswordEdit.showAlert = false
+                                    }
+                                    newPasswordEdit.showAlert = isAlert
+                                    submitbtn.enabled = isAlert
+                                }
+                            }
+                        }
+
+                        Label {
+                            height: 20
+                            topPadding: 10
+                            Layout.preferredWidth: 60
+                            Layout.alignment: Qt.AlignLeft
+                            horizontalAlignment: Text.AlignLeft
+                            verticalAlignment: Text.AlignVCenter
+                            Layout.leftMargin: 5
+                            font: DTK.fontManager.t6
+                            text: qsTr("Repeat password:")
+                        }
+
+                        PasswordEdit {
+                            id: repeatPasswordEdit
+                            Layout.preferredWidth: parent.width
+                            placeholderText: qsTr("Required")
+                            height: 30
+
+                            onTextChanged: {
+                                console.log(" repeatPasswordEdit text changed ",
+                                    repeatPasswordEdit.text)
+                                if (repeatPasswordEdit.text.length === 0) {
+                                    if (newPasswordEdit.text.length !== 0) {
+                                        repeatPasswordEdit.alertText = qsTr("Password cannot be empty")
+                                        repeatPasswordEdit.showAlert = true
+                                    }
+                                    return
+                                }
+
+                                var errorText = oceanuiData.work().verifyPassword(repeatPasswordEdit.text)
+                                console.log(" repeatPasswordEdit text changed ", errorText)
+                                if (errorText.length !== 0) {
+                                    repeatPasswordEdit.alertText = errorText
+                                    repeatPasswordEdit.showAlert = true
+                                    submitbtn.enabled = false
+                                } else {
+                                    if (repeatPasswordEdit.text !== newPasswordEdit.text) {
+                                        repeatPasswordEdit.alertText = qsTr("Passwords do not match")
+                                    }
+
+                                    var isAlert = (repeatPasswordEdit.text.length !== 0 && repeatPasswordEdit.text === newPasswordEdit.text)
+
+                                    if (isAlert) {
+                                        newPasswordEdit.showAlert = false
+                                    }
+                                    repeatPasswordEdit.showAlert = !isAlert
+                                    submitbtn.enabled = isAlert
+                                }
+                            }
+                        }
+
+                        RowLayout {
+                            Layout.topMargin: 15
+                            Layout.preferredWidth: parent.width
+                            Layout.fillWidth: true
+
+                            Button {
+                                Layout.alignment: Qt.AlignLeft
+                                text: qsTr("Cancel")
+                                Layout.preferredWidth: 170
+                                onClicked: {
+                                    dlgStatus = passwordDlgStatus.Cancel
+                                    passwordDlg.close()
+                                }
+                            }
+
+                            RecommandButton {
+                                id: submitbtn
+                                text: qsTr("Sure")
+                                enabled: false
+                                Layout.preferredWidth: 170
+                                Layout.alignment: Qt.AlignRight
+                                onClicked: {
+                                    dlgStatus = passwordDlgStatus.Sure
+                                    oceanuiData.work().onSetGrubEditPasswd(newPasswordEdit.text, true)
+                                    passwordDlg.close()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    OceanUIObject {
+        name: "startAnimation"
+        parentName: "bootMenu"
+        displayName: qsTr("Start animation")
+        description: qsTr("Adjust the size of the logo animation on the system startup interface")
+        weight: 60
+        pageType: OceanUIObject.Item
+        page: ColumnLayout {
+            spacing: 0
+            Label {
+                leftPadding: 5
+                topPadding: 20
+                font: DTK.fontManager.t4
+                text: oceanuiObj.displayName
+            }
+            Label {
+                leftPadding: 5
+                bottomPadding: 5
+                font: DTK.fontManager.t6
+                text: oceanuiObj.description
+                opacity: 0.7
+            }
+        }
+    }
+
+    OceanUIObject {
+        name: "checkAnimation"
+        parentName: "bootMenu"
+        weight: 70
+        backgroundType: OceanUIObject.Normal
+        pageType: OceanUIObject.Item
+        page: Rectangle {
+            implicitHeight: aniRoot.height
+            Layout.fillWidth: true
+            width: parent.width
+            radius: 8
+
+            Row {
+                id: aniRoot
+                width: parent.width
+                topPadding: 20
+                spacing: 15
+                leftPadding: 5
+                bottomPadding: 20
+
+                Repeater {
+                    model: oceanuiData.mode().grubAnimationModel()
+                    delegate: Column {
+                        spacing: 5
+                        Rectangle {
+                            id: externalRect
+                            width: 228
+                            height: 148
+                            border.width: model.checkStatus ? 2 : 0
+                            border.color: "#6A005BFF"
+                            radius: 8
+
+                            Rectangle {
+                                id: imgRect
+                                anchors.centerIn: parent
+                                width: 220
+                                height: 140
+                                border.width: 1
+                                border.color: "#1A000000"
+                                color: "#1A0065FF"
+                                radius: 6
+
+                                Image {
+                                    id: backgroundImage
+                                    anchors.centerIn: parent
+                                    source: model.imagePath
+                                    width: 300 * model.scale
+                                    height: 100 * model.scale
+                                    visible: !(model.startAnimation
+                                        && model.checkStatus)
+                                    fillMode: Image.PreserveAspectCrop
+                                    opacity: model.startAnimation ? 0.4 : 1
+                                }
+
+                                //模糊效果容器
+                                Rectangle {
+                                    width: 220
+                                    height: 140
+                                    anchors.centerIn: parent
+                                    radius: 6 // 设置圆角半径
+                                    visible: model.startAnimation
+                                        && model.checkStatus
+                                    color: "#1A0065FF"
+
+                                    // GaussianBlur 模糊效果
+                                    ShaderEffectSource {
+                                        id: blurSource
+                                        sourceItem: backgroundImage
+                                        sourceRect: Qt.rect(0, 0, width,
+                                            height) // 将背景图作为模糊源
+                                    }
+
+                                    GaussianBlur {
+                                        anchors.fill: parent
+                                        source: blurSource
+                                        radius: 20 // 模糊半径，值越大，模糊越强
+                                        samples: 16
+                                    }
+
+                                    BusyIndicator {
+                                        anchors.centerIn: parent
+                                        running: model.startAnimation
+                                            && model.checkStatus
+                                        visible: model.startAnimation
+                                            && model.checkStatus
+                                        implicitWidth: 32
+                                        implicitHeight: 32
+                                    }
+                                }
+                            }
+
+                            // 使用 MouseArea 来捕捉点击事件
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    oceanuiData.work().setPlymouthFactor(
+                                        model.plymouthScale)
+                                }
+                            }
+                        }
+
+                        RadioButton {
+                            height: 18
+                            autoExclusive: false
+                            text: model.text
+                            checked: model.checkStatus
+                            enabled: !model.startAnimation
+                            onClicked: {
+                                oceanuiData.work().setPlymouthFactor(
+                                    model.plymouthScale)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

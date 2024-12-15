@@ -1,0 +1,60 @@
+/*!
+@~chinese
+@ingroup dlog
+@file include/log/AbstractStringAppender.h
+
+@class Dtk::Core::AbstractStringAppender
+@brief AbstractStringAppender类为处理纯文本格式的Appender提供了一个方便的基础日志
+@details AbstractStringAppender是AbstractAppender类的简单扩展,
+        它提供了一种方便的方式来创建自定义日志应用程序, 该程序使用纯文本格式的日志.
+        它有`formattedString()`保护类型(不可直接被调用)函数, 可以根据`setFormat()`设置的格式来格式化日志参数。
+@note 这个类不能直接实例化, 因为它包含从AbstractAppender类继承的纯虚函数。
+@brief 关于自定义日志输出格式的更详细描述, 请参见setFormat()函数的文档
+@sa AbstractStringAppender::setFormat()
+
+@fn AbstractStringAppender Dtk::Core::AbstractStringAppender::AbstractStringAppender()
+@brief 构建一个新的字符串appender对象
+
+@fn QString Dtk::Core::AbstractStringAppender::format()
+@brief 返回当前使用的format字符串
+@details 默认记录格式为:`"%{time}{yyyy-MM-ddTHH:mm:ss.zzz} [%{type:-7}] <%{function}> %{message}\n"`
+        你可以使用setFormat()函数来设置不同的日志记录格式。
+@sa AbstractStringAppender::setFormat()
+@return 返回当前使用的format字符串
+
+@fn void Dtk::Core::AbstractStringAppender::setFormat(const QString &format)
+@brief 设置日志格式, 以便用这个appender向日志目标写入字符串。
+@details
+        对于那些使用过标准sprintf函数的开发者来说, 字符串格式非常常见。
+        日志输出格式是一个简单的QString, 带有特殊的标记(以%符号开始), 在写日志记录时将被替换成它的内部含义。
+        控制标记以百分号(%)开始, 后面是{}括号内的命令(该命令描述了将被放入日志记录而不是标记的内容)。
+        可选的字段宽度参数可以在命令后直接指定（通过括号内的冒号）, 有些命令需要一个额外的格式化参数(在第二个{}括号内)
+        字段宽度参数的工作原理与`QString::arg()`fieldWidth参数几乎相同(并在内部使用它),
+        例如, "%{type:-7}"将被替换为消息的左边填充的调试级别("Debug")或其他东西。更详细的描述请参考Qt文档。
+@details 支持的标记：
+| **标记**      | **含义**                                                | **备注**                                                              |
+|:-----------:|:-----------------------------------------------------:|:-------------------------------------------------------------------:|
+| %{time}     | 时间戳。你可以使用标记后的第二个{}括号来指定你的自定义时间戳格式。默认格式:"HH:mm:ss.zzz" | "%{time}{dd-MM-yyyy,  HH:mm}"可能被替换为 "20-9-2022,  21:24", 这取决于当前的日期和时间。 |
+| %{type}     | 日志级别。可能的日志级别在Logger::LogLevel枚举中显示。                   |                                                                     |
+| %{Type}     | 大写的日志级别                                               |                                                                     |
+| %{typeOne}  | 一个字母的日志级别                                             |                                                                     |
+| %{TypeOne}  | 一个大写字母的日志级别                                           |                                                                     |
+| %{File}     | 记录日志的文件的完整源文件名(含路径), 使用 `__FILE__`预处理程序宏               |                                                                     |
+| %{file}     | 简短的文件名(去除路径后的文件名)                                        |                                                                     |
+| %{line}     | 源文件中的行数。使用`__LINE__`预处理程序宏。                           |                                                                     |
+| %{Function} | 调用`LOG_*`宏的函数的名称。使用Qt提供的`Q_FUNC_INFO`宏。               |                                                                     |
+| %{function} |  类似于%{Function}, 但使用 stripFunctionName 剥离了函数名。         |                                                                     |
+| %{message}  | 日志内容                                            |                                                                     |
+| %{category} | 日志类别                                                  |                                                                     |
+| %{appname}  | 应用程序名称(由`QCoreApplication::applicationName()`函数返回）    |                                                                     |
+| %{pid}      | 应用程序的pid(由`QCoreApplication::applicationPid()`函数返回)   |                                                                     |
+| %{threadid} | 线程ID                                                  |                                                                     |
+| %%          | 转译为单`%`标记                                             |                                                                     |
+
+@fn static QString Dtk::Core::AbstractStringAppender::stripFunctionName(const char *name)
+@brief 剥离长函数签名(由Q_FUNC_INFO宏添加)
+@details 字符串处理掉了函数的返回类型、参数和模板参数, 这对于提高日志输出的可读性是非常有用的
+@param[in] name 函数名称
+@return 剥离的函数名称
+
+*/

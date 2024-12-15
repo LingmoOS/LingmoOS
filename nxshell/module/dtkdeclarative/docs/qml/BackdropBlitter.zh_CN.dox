@@ -1,0 +1,28 @@
+/**@~chinese
+@class BackdropBlitter
+@ingroup Item
+@ingroup QML_TYPES
+@brief 用于获取窗口中已渲染的背景结果，可以将此结果用于特效加工类的控件，如用于实现高斯模糊效果。
+@details BackdropBlitter 可以将自身所在区域的背后内容捕获到一个单独的 QSGTexture 中，在 RHI 后端是 QRhiTexture，在 software 后端是 QImage。此捕获动作是在每一帧渲染中实时进行，按 BackdropBlitter 对象所在的层叠顺序进行捕获，多个 BackdropBlitter 可叠加使用，它们相互之间没有影响。
+
+BackdropBlitter 底层基于 QSGRenderNode 实现，通过在 QSGRenderNode::render 中调用 glBlitFramebuffer 捕获内容，因此其当前不支持非 QRhi::OpenGLES2 的渲染后端。此外，由于 QtQuick和 QtRHI 渲染系统的设计限制，无法在 QSGRenderNode::render 阶段再 QSGNode 所使用的 QRhiTexture 资源，因此，对于需要使用 BackdropBlitter 捕获的内容的对象（如 MultiEffect），需要将其作为 BackdropBlitter 的子对象使用。
+
+BackdropBlitter 会自动创建一个新的 QRhi 对象，并且将自身的子对象在当前的 QRhi 所渲染的图形数中隐藏，在 QSGRenderNode::render 中使用自己新建的 QRhi 对象将自身的子对象渲染到窗口中。基于此方式，BackdropBlitter 可实现在 QSGRenderNode::render 中准备好其子对象所使用的 QRhiTexture 资源，在此资源更新后，再使用新的 QRhi 对象渲染子对象，以模拟需要在渲染过程中动态更新 QRhiTexture 的功能。
+
+支持为 BackdropBlitter 应用 clip opacity rotaion transform scale 等属性。
+
+\warning 仅在 Qt6 版本中提供，Qt5 的版本请使用 @sa BlitFramebuffer 代替。
+
+@property bool BackdropBlitter::offscreen
+@brief offscreen 属性表示是否将捕获到的结果再次渲染到窗口中
+@details 其将决定 @sa BackdropBlitter::content 对象的 @sa QQuickItem::ItemHasContents 标志，如果为 false，则表示希望将捕获到的内容渲染到屏幕上，否则表示不渲染（通过 @sa QQuickItem::textureProvider 使用）。
+
+@property Item BackdropBlitter::content
+\readonly
+@brief content 属性是捕获到的资源的所有对象
+@details 可以将此对象用于 @sa MultiEffect::source 等可以把一个 Item 作为输入源的地方。其通过 QQuickItem::textureProvider 和 QQuickItem::updatePaintNode（需要将 @sa BackdropBlitter::offscreen 指定为 false）两种方式提供捕获到的资源。
+
+@property bool BackdropBlitter::blitterEnabled
+@brief blitterEnabled 属性用于控制是否开启背景内容捕获行为
+@details 当为 true 时将开启背景捕获，否则不开启，在不开启时，可以将 BackdropBlitter 当作一个 Item 对象看待。此属性默认为 true。
+*/

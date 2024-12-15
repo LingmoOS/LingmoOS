@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export KWIN_COMPOSE=O2ES
+export GDK_BACKEND=x11
+export KWIN_USE_BUFFER_AGE=1
+
+if [ ! -f "$HOME/.config/kglobalshortcutsrc" ]; then
+    cp -n /etc/xdg/kglobalshortcutsrc $HOME/.config/kglobalshortcutsrc
+fi
+
+export QT_LOGGING_RULES="kwin*=true;kwin_libinput=false;"
+export QT_WAYLAND_FORCE_DPI=$(expr `gsettings get com.lingmo.xsettings xft-dpi` / 1024)
+
+if [ -f "$HOME/.config/locale.conf" ]; then
+    source $HOME/.config/locale.conf
+fi
+
+exec /usr/bin/kwin_wayland -platform ocean-kwin-wayland --xwayland --drm --no-lockscreen  ocean-session-x11 1> $HOME/.kwin.log 2>&1

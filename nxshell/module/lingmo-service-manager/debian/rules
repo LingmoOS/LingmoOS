@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+
+export QT_SELECT = qt5
+
+PACK_VER = $(shell echo $(DEB_VERSION_UPSTREAM) | awk -F'[+_~-]' '{print $$1}')
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DVERSION=$(PACK_VER) -DCMAKE_CXX_FLAGS="-Wl,--as-needed"

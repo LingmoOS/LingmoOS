@@ -1,0 +1,26 @@
+# Maintainer: DingYuan Zhang <justforlxz@gmail.com>
+pkgname=lingmo-turbo-git
+pkgver=0.0.5.r13.g8c85d2c
+pkgrel=1
+pkgdesc='A daemon that helps to launch applications faster'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/lingmo-turbo"
+license=('GPL3')
+depends=('qt5-base' 'dtkgui-git' 'dtkdeclarative-git')
+makedepends=('cmake' 'git' 'dtkcommon-git' 'dtkcore-git' 'dtkwidget-git' 'dtkgui-git' 'dtkdeclarative-git')
+groups=('lingmo')
+provides=('lingmo-turbo')
+conflicts=('lingmo-turbo')
+source=('source.tar.gz')
+sha512sums=('SKIP')
+
+build() {
+  cd $lingmo_source_name
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release .
+  make
+}
+
+package() {
+  cd $lingmo_source_name
+  make DESTDIR="$pkgdir" install
+}

@@ -1,0 +1,1 @@
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" version="2.1"><context><name>desktop</name><message><location filename="Desktop Entry]Name" line="0"/><source>Virus scan</source><translation>Análisis de virus</translation></message></context></TS>

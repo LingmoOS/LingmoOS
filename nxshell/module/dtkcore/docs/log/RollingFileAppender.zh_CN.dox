@@ -1,0 +1,64 @@
+/*!
+@~chinese
+@ingroup dlog
+@file include/log/RollingFileAppender.h
+
+@class Dtk::Core::RollingFileAppender
+@brief RollingFileAppender类扩展了FileAppender,使日志文件在按照用户指定的频率进行滚动
+@details
+        该类是基于`Log4Qt.DailyRollingFileAppender`类[Log4Qt](http://log4qt.sourceforge.net/)
+        并具有相同的日期模式格式<br>
+        例如,如果fileName设置为`/foo/bar`,DatePattern设置为每日滚动('.yyy-MM-dd'.log'),在2022-05-28的午夜。
+        日志文件`/foo/bar.log`将被复制到`/foo/bar.2022-05-28.log`,2022-05-29的日志将在`/foo/bar`中继续,直到第二天滚动<br>
+        logFilesLimit参数用于在滚动期间自动删除目录中最旧的日志文件。
+        (所以在任何时候,目录中都不会有超过logFilesLimit的最新日志文件存在)
+
+@enum Dtk::Core::RollingFileAppender::DatePattern
+@brief 日志频率
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::MinutelyRollover
+@brief 每分钟的日期模式字符串是`.yyyy-MM-dd-hh-mm`
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::HourlyRollover
+@brief 每小时的日期模式字符串是 `.yyyy-MM-dd-hh`
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::HalfDailyRollover
+@brief 每半天的日期模式字符串是`.yyyy-MM-dd-a`
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::DailyRollover
+@brief 每天的日期模式字符串是`.yyyy-MM-dd`
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::WeeklyRollover
+@brief 每周的日期模式字符串是`.'yyyy-ww`
+@var Dtk::Core::RollingFileAppender::DatePattern Dtk::Core::RollingFileAppender::MonthlyRollover
+@brief 每月的日期模式字符串是`.yyyy-MM`
+
+@fn RollingFileAppender Dtk::Core::RollingFileAppender::RollingFileAppender()
+@brief 构造函数,默认限制日志文件个数是0,默认日志文件大小是1024*1024*20=20m
+
+@fn DatePattern Dtk::Core::RollingFileAppender::datePattern()
+@brief 返回当前的滚动更新频率
+@sa RollingFileAppender::DatePattern
+
+@fn void Dtk::Core::RollingFileAppender::setDatePattern(DatePattern datePattern)
+@brief 设置日志滚动频率
+@sa RollingFileAppender::DatePattern
+
+@fn void Dtk::Core::RollingFileAppender::setDatePattern(const QString &datePattern)
+@brief 此重载是为了方便使用，可以传入一个滚动频率字符串
+@sa RollingFileAppender::DatePattern
+@sa RollingFileAppender::setDatePattern(DatePattern datePattern)
+
+@fn QString Dtk::Core::RollingFileAppender::datePatternString()
+@brief 以字符串形式,返回当前滚动频率
+
+@fn void Dtk::Core::RollingFileAppender::setLogFilesLimit(int limit)
+@brief 设置日志文件数量上限,最旧的文件会被滚动覆盖
+
+@fn int Dtk::Core::RollingFileAppender::logFilesLimit()
+@brief 返回设置的日志文件数量上限
+@sa RollingFileAppender::setLogFilesLimit()
+
+@fn int Dtk::Core::RollingFileAppender::setLogSizeLimit(int qint64)
+@brief 设置日志文件单个文件大小上限
+
+@fn qint64 Dtk::Core::RollingFileAppender::logSizeLimit()
+@brief 返回设置的日志文件单个文件大小上限
+@sa RollingFileAppender::setLogSizeLimit(int qint64)
+
+*/

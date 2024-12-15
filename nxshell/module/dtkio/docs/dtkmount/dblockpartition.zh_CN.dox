@@ -1,0 +1,267 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file dblockpartition.h
+
+@class Dtk::Mount::DBlockPartition dblockpartition.h
+    @brief 用于管理块设备上的分区
+
+@fn quint64 DBlockPartition::flags() const
+    @brief 描述分区的标识
+    @return 分区标识
+    @note 对于 mbr 分区：
+    @note > Bit 7 标识分区是可引导分区
+    @note 对于 gpt 分区：
+    @note > Bit 0 标识是系统分区；
+    @note > Bit 2 标识为传统（legacy）可引导 BIOS 分区；
+    @note > Bit 60 标识是只读分区；
+    @note > Bit 62 标识是隐藏分区；
+    @note > Bit 63 标识是不执行自动挂载的分区
+    @see void DBlockPartition::setFlags(quint64 flags, const QVariantMap &options)
+    @see void DBlockPartition::flagsChanged(quint64 flags)
+
+@fn bool DBlockPartition::isContained() const
+    @brief 用于判定当前分区是否包含于其他分区
+    @return 当前分区是否包含于其他分区
+    @see void DBlockPartition::isContainedChanged(bool isContained)
+
+@fn bool DBlockPartition::isContainer() const
+    @brief 用于判定当前分区是否是其他分区的容器
+    @return 当前分区是否包含其他分区
+    @see void DBlockPartition::isContainerChanged(bool isContainer)
+
+@fn QString DBlockPartition::name() const
+    @brief 获取分区名称
+    @return 分区名称或空字符串
+    @see void DBlockPartition::setName(const QString &name, const QVariantMap &options)
+    @see void DBlockPartition::nameChanged(const QString &name)
+
+@fn uint DBlockPartition::number() const
+    @brief 获取当前分区在分区表中的序号
+    @return 分区序号
+    @see void DBlockPartition::numberChanged(uint number)
+
+@fn quint64 DBlockPartition::offset() const
+    @brief 获取当前分区的偏移位置（字节）
+    @return 偏移量
+    @see void DBlockPartition::offsetChanged(quint64 offset)
+
+@fn quint64 DBlockPartition::size() const
+    @brief 获取当前分区大小（字节）
+    @return 分区大小
+    @see void DBlockPartition::sizeChanged(quint64 size)
+    @see void DBlockPartition::resize(quint64 size, const QVariantMap &options)
+
+@fn QString DBlockPartition::table() const
+    @brief 获取当前分区对应的分区表路径
+    @return 分区表路径
+
+@fn QString DBlockPartition::type() const
+    @brief 当前分区类型
+    @return 分区类型
+    @note 对于 mbr 分区表，返回十六进制数，或 0xfd
+    @note 对于 gpt 分区表，返回一个 UUID，例如 “ebd0a0a2-b9e5-4433-87c0-68b6b72699c7”
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn MbrPartitionType DBlockPartition::mbrType() const
+    @brief 获取当前 Mbr 分区的枚举类型
+    @return 当前 Mbr 分区枚举类型
+    @retval MbrPartitionType 类型枚举值
+    @retval MbrPartitionType::EmptyMbrType 无分区
+    @retval MbrPartitionType::UnknownMbrType 非 Mbr 分区或未知 Mrb 分区类型
+    @see Dtk::Mount::DBlockPartition::MbrPartitionType
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn GptPartitionType DBlockPartition::gptType() const
+    @brief 获取当前 Gpt 分区的枚举类型
+    @return Gpt 分区枚举类型
+    @retval GptPartitionType 枚举值
+    @retval GptPartitionType::EmptyGptType 无分区
+    @retval GptPartitionType::UnknownGptType 非 Gpt 分区或未知 Gpt 分区类型
+    @see Dtk::Mount::DBlockPartition::GptPartitionType
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+
+@fn QString DBlockPartition::UUID() const
+    @brief 获取当前分区的 UUID
+    @return 分区 UUID 或空字符串
+
+@fn static QString DBlockPartition::mbrTypeDescription(MbrPartitionType type)
+    @brief 获取当前分区类型描述信息
+    @param[in] type 分区类型
+    @return 分区描述信息
+    @see QString DBlockPartition::gptTypeDescription(GptPartitionType type)
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn static QString DBlockPartition::gptTypeDescription(GptPartitionType type)
+    @brief 获取当前分区类型描述信息
+    @param[in] type 分区类型
+    @return 分区描述信息
+    @see QString DBlockPartition::mbrTypeDescription(MbrPartitionType type)
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn void DBlockPartition::deletePartition(const QVariantMap &options)
+    @brief 用于删除当前分区
+    @param[in] options
+    @note 如果设置了 tear-down 选项，将会在格式化之前清理块设备及其所有子设备。清理过程包括从 /etc/fstab 和 /etc/crypttab 表中清理入口，并且对加密设备上锁。
+    @note 通过 AddConfigurationItem 的 "track-parents" 选项创建的 /etc/fstab 和 /etc/crypttab 入口将被移除，即便它们对应的块设备当前不可用
+
+@fn void DBlockPartition::resize(quint64 size, const QVariantMap &options)
+    @brief 重新设置当前分区大小
+    @param[in] size 新分区大小，若传入 0 则以可能的最大值配置新分区大小
+    @param[in] options
+    @note 该操作不会改变分区的位置，但可能因为扇区数量以及对齐方式，新的大小会比所请求的略大一些
+    @see quint64 DBlockPartition::size() const
+    @see void DBlockPartition::sizeChanged(quint64 size)
+
+
+@fn void DBlockPartition::setFlags(quint64 flags, const QVariantMap &options)
+    @brief 设置分区的标识
+    @param[in] flags
+    @param[in] options
+    @see quint64 DBlockPartition::flags() const
+
+@fn void DBlockPartition::setName(const QString &name, const QVariantMap &options)
+    @brief 设置分区名称
+    @param[in] name 分区名称
+    @param[in] options 
+    @see QString DBlockPartition::name() const
+
+@fn void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @brief 设置分区类型
+    @param[in] type 新的分区类型
+    @param[in] options
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @brief 设置分区类型
+    @param[in] type 枚举类型
+    @param[in] options
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn void DBlockPartition::flagsChanged(quint64 flags)
+    @brief 告知分区标识改变
+    @param[out] flags 新的分区标识
+    @see void DBlockPartition::setFlags(quint64 flags, const QVariantMap &options)
+    @see quint64 DBlockPartition::flags() const
+
+@fn void DBlockPartition::isContainedChanged(bool isContained)
+    @brief 告知包含关系改变
+    @param[out] isContained 新的状态
+    @see bool DBlockPartition::isContained() const
+
+@fn void DBlockPartition::isContainerChanged(bool isContainer)
+    @brief 告知容器状态改变
+    @param[out] isContainer 新的状态
+    @see bool DBlockPartition::isContainer() const
+
+@fn void DBlockPartition::nameChanged(const QString &name)
+    @brief 告知分区名称改变
+    @param[name] 新分区名称
+    @see void DBlockPartition::setName(const QString &name, const QVariantMap &options)
+    @see QString DBlockPartition::name() const
+
+@fn void DBlockPartition::numberChanged(uint number)
+    @brief 告知分区序号改变
+    @param[out] number 新的序号
+    @see uint DBlockPartition::number() const
+
+@fn void DBlockPartition::offsetChanged(quint64 offset)
+    @brief 告知分区位置改变（偏移量改变）
+    @param[out] offset 新的偏移量
+    @see quint64 DBlockPartition::offset() const
+
+@fn void DBlockPartition::sizeChanged(quint64 size)
+    @brief 告知分区大小改变
+    @param[out] size 新大小
+    @see void DBlockPartition::resize(quint64 size, const QVariantMap &options)
+    @see quint64 DBlockPartition::size() const
+
+@fn void DBlockPartition::typeChanged(const QString &type)
+    @brief 告知分区类型改变（字符串型，十六进制数或 UUID）
+    @param[out] type 新的分区类型
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @brief 告知 MBR 分区类型改变
+    @param[out] type 新的分区类型
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+@fn void DBlockPartition::gptPartitionTypeChanged(GptPartitionType type)
+    @brief 告知 GPT 分区类型改变
+    @param[out] type 新的分区类型
+    @see QString DBlockPartition::type() const
+    @see void DBlockPartition::setType(Dtk::Mount::DBlockPartition::MbrPartitionType type, const QVariantMap &options)
+    @see void DBlockPartition::setType(const QString &type, const QVariantMap &options)
+    @see void DBlockPartition::typeChanged(const QString &type)
+    @see void DBlockPartition::mbrPartitionTypeChanged(MbrPartitionType type)
+    @see MbrPartitionType DBlockPartition::mbrType() const
+    @see GptPartitionType DBlockPartition::gptType() const
+
+
+@fn void DBlockPartition::UUIDChanged(const QString &UUID)
+    @brief 告知分区 UUID 改变
+    @param[out]
+    @see QString DBlockPartition::UUID() const
+
+
+@enum Dtk::Mount::DBlockPartition::MbrPartitionType
+    @brief Mbr 分区所涵盖的分区类型
+    @see https://en.wikipedia.org/wiki/Partition_type
+
+@enum Dtk::Mount::DBlockPartition::GptPartitionType
+    @brief Gpt 分区所涵盖的分区类型
+    @see https://en.wikipedia.org/wiki/GUID_Partition_Table
+
+*/

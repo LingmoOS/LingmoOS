@@ -1,0 +1,35 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-session-shell-git
+pkgver=5.5.9.r123.gd52f772
+pkgrel=1
+sourcename=ocean-session-shell
+sourcetar="$sourcename"_"$pkgver".tar.xz
+sourcedir="$sourcename"
+pkgdesc='Lingmo desktop-environment - session-shell module'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-session-shell"
+license=('GPL3')
+depends=('lingmo-daemon-git' 'lingmo-wallpapers-git' 'gsettings-qt' 'liblightdm-qt5' 'startocean-git' 'kwayland5' 'qt5-wayland' 'dtkcore-git' 'dtkwidget-git' 'lingmo-pw-check-git')
+makedepends=('git' 'cmake' 'ninja' 'qt5-tools' 'gtest' 'gmock' 'dtkcommon-git')
+conflicts=('lingmo-session-ui<5' 'lingmo-session-shell')
+provides=('lightdm-lingmo-greeter' 'lingmo-session-shell')
+groups=('lingmo-git')
+source=($sourcetar)
+sha512sums=('SKIP')
+
+prepare() {
+  cd $sourcedir
+  sed -i 's/5\.5//g' CMakeLists.txt tests/lightdm-lingmo-greeter/CMakeLists.txt tests/ocean-lock/CMakeLists.txt
+}
+
+build() {
+  cd $sourcedir
+  cmake . -GNinja -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+  chmod +x "$pkgdir"/usr/bin/lingmo-greeter
+}

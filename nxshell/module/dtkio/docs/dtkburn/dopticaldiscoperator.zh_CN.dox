@@ -1,0 +1,65 @@
+/*!
+@~chinese
+@ingroup dtkburn
+@file dopticaldiscoperator.h
+
+@class Dtk::Burn::DOpticalDiscOperator dopticaldiscoperator.h
+@brief 用于光盘操作的类, 负责操作光盘的数据刻录、镜像刻录、镜像导出、数据校验等
+
+@fn void DOpticalDiscOperator::setSpeed(int speed);
+@param[in] speed 刻录的速度
+@brief 设置刻录的速度, 通常不用设置
+
+@fn void DOpticalDiscOperator::setVolumeName(const QString &name);
+@param[in] name 光盘卷标名称
+@brief 设置光盘卷标名称, 光盘刻录后生效, 卷标名称可以为空 
+
+@fn void DOpticalDiscOperator::setCheckPrecision(double checkPrecision);
+@param[in] checkPrecision 光盘校验的精度
+@brief 设置光盘校验的精度, 通常不用设置
+
+@fn int DOpticalDiscOperator::speed() const;
+@brief 获取 `DOpticalDiscOperator::setSpeed` 设置的刻录速度
+@return 刻录速度
+
+@fn QString DOpticalDiscOperator::volumeName() const;
+@brief 获取 `DOpticalDiscOperator::setVolumeName` 设置的光盘卷标名称
+@return 光盘卷标名称
+
+@fn double DOpticalDiscOperator::checkPrecision() const;
+@brief 获取 `DOpticalDiscOperator::setCheckPrecision` 设置的光盘校验的精度
+@return 光盘校验的精度
+
+@fn DExpected<bool> DOpticalDiscOperator::burn(const QString &stagePath, const BurnOptions &opts);
+@param[in] stagePath 待刻录的目录路径, 目录中的所有文件将会被刻录（不包含目录本身）
+@param[in] opts 刻录选项, 可以设置刻录的文件系统等信息
+@brief 开始光盘数据刻录, 刻录期间的过程信息将通过信号 `DOpticalDiscOperator::jobStatusChanged` 被发出
+@return 成功返回 true, 反之为 `DError` 对象, 可获取失败原因
+
+@fn DExpected<bool> DOpticalDiscOperator::erase();
+@brief 开始擦除光盘（需要光盘介质支持被擦除的物理特性）, 擦除期间的过程信息将通过信号 `DOpticalDiscOperator::jobStatusChanged` 被发出
+@return 成功返回 true, 反之为 `DError` 对象, 可获取失败原因
+
+@fn DExpected<bool> DOpticalDiscOperator::checkmedia();
+@brief 开始校验光盘数据, 校验期间的过程信息将通过信号 `DOpticalDiscOperator::jobStatusChanged` 被发出
+@return 成功返回 true, 反之为 `DError` 对象, 可获取失败原因
+
+@fn DExpected<bool> DOpticalDiscOperator::writeISO(const QString &isoPath);
+@param[in] isoPath 待写入的 iso 镜像文件的绝对路径
+@brief 开始将 iso 镜像文件写入到光盘中， 写入的过程信息将通过信号 `DOpticalDiscOperator::jobStatusChanged` 被发出
+@return 成功返回 true, 反之为 `DError` 对象, 可获取失败原因
+
+@fn DExpected<bool> DOpticalDiscOperator::dumpISO(const QString &isoPath);
+@param[in] isoPath 导出的 iso 镜像文件的存储绝对路径
+@brief 开始将光盘已刻录的数据导出为 iso 镜像文件， 导出的过程信息将通过信号 `DOpticalDiscOperator::jobStatusChanged` 被发出
+@return 成功返回 true, 反之为 `DError` 对象, 可获取失败原因
+@note 对于数据刻录的光盘, 导出的文件数据只包含第一次刻录的文件
+
+@fn void DOpticalDiscOperator::jobStatusChanged(JobStatus status, int progress, QString speed, QStringList message);
+@brief 光盘的数据刻录、镜像刻录、镜像导出、数据校验任务的状态信息信号
+@param[out] status 当前任务的状态（失败、未工作、正在工作、暂停、结束）
+@param[out] progress 当前任务的进度, 最小值为 0, 最大值为 100
+@param[out] speed 当前任务的光盘转速
+@param[out] message 当任务出现错误时的失败信息
+
+*/

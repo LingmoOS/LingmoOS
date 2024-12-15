@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: '1'
+
+package:
+  id: org.lingmo.calculator
+  name: lingmo-calculator
+  version: 6.5.2.1
+  kind: app
+  description: |
+    Calculator for UOS
+
+command:
+  - lingmo-calculator
+
+base: org.lingmo.base/23.1.0/arm64
+runtime: org.lingmo.runtime.dtk/23.2.0/arm64
+
+build: |
+  VERSION=$(head -1 debian/changelog | awk -F'[()]' '{print $2}')
+  cmake -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+        -DCMAKE_INSTALL_LIBDIR=${PREFIX}/lib/${TRIPLET} \
+        -DVERSION=${VERSION}
+  cmake --build build -j`nproc`
+  cmake --build build --target install

@@ -1,0 +1,17 @@
+#!/bin/bash
+export APTFILEPATH="/etc/apt/sources.list.d/devicemanager.list"
+OS_VERSION=/etc/os-version
+if [[ ! -e $OS_VERSION ]]
+then
+        echo "Not Support System! /etc/os-version NOT FOUND!!" && exit 
+fi
+
+if [ -f $APTFILEPATH ]; then
+        Edition=`grep "EditionName" $OS_VERSION |head -n 1 |cut -d '=' -f 2`
+        if [ $Edition == "Community" ]; then
+                echo "del devicemanager.list"
+                rm $APTFILEPATH 
+        fi
+
+fi
+

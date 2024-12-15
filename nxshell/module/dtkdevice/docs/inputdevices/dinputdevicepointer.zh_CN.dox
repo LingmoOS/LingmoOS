@@ -1,0 +1,108 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+/*!
+@~chinese
+@file dinputdevicepointer.h
+@ingroup inputdevices
+
+dinputdevicepointer.h 中定义了抽象指针设备类DInputDevicePointer, 该类是鼠标、触摸板、数位笔、数位板、指针杆和触摸屏(未来可能支持)等设备的基类
+
+@class Dtk::Device::DInputDevicePointer dinputdevicepointer.h
+@brief 抽象指针设备类
+
+@fn DInputDevicePointer::DInputDevicePointer(QObject *parent = nullptr)
+@brief 空参构造函数与指定父对象的构造函数
+
+该函数仅开放给子类使用
+
+
+@fn DInputDevicePointer::DInputDevicePointer(const DeviceInfo &info, bool enabled = true)
+@brief 设备信息初始化构造函数
+@param[in] info 设备信息
+@param[in] enabled 设备是否开启
+
+该函数仅开放给子类使用
+
+@fn @pure virtual bool DInputDevicePointer::leftHanded() const = 0
+@brief 获取是否是左手模式
+@return 是否开启左手模式
+@sa [leftHanded](@ref Dtk::InputDevices::DInputDevicePointer::leftHanded)
+
+@fn @pure virtual ScrollMethod DInputDevicePointer::scrollMethod() const =0
+@brief 获取当前滚动模式
+@return 当前的滚动模式
+@sa [scrollMethod](@ref Dtk::InputDevices::DInputDevicePointer::scrollMethod)
+
+@fn @pure virtual AccelerationProfile DInputDevicePointer::accelerationProfile() const = 0
+@brief 获取当前的指针加速方式
+@return 当前的指针加速方式
+@sa [accelerationProfile](@ref Dtk::InputDevices::DInputDevicePointer::accelerationProfile)
+
+@fn @pure virtual double DInputDevicePointer::accelerationSpeed() const = 0
+@brief 获取指针加速度
+@return 当前的指针加速度
+@sa [accelerationSpeed](@ref Dtk::InputDevices::DInputDevicePointer::accelerationSpeed)
+
+@fn @pure virtual void DInputDevicePointer::setLeftHanded(bool leftHanded) = 0
+@brief 设置是否是左手模式
+@sa [leftHanded](@ref Dtk::InputDevices::DInputDevicePointer::leftHanded)
+
+
+@fn @pure virtual void DInputDevicePointer::setScrollMethod(ScrollMethod scrollMethod) = 0
+@brief 设置滚动模式
+@sa [scrollMethod](@ref Dtk::InputDevices::DInputDevicePointer::scrollMethod)
+
+
+@fn @pure virtual void DInputDevicePointer::setAccelerationProfile(AccelerationProfile accelerationProfile) = 0
+@brief 设置指针加速方式
+@sa [accelerationProfile](@ref Dtk::InputDevices::DInputDevicePointer::accelerationProfile)
+
+
+@fn @pure virtual void DInputDevicePointer::setAccelerationSpeed(double accelerationSpeed) = 0
+@brief 设置指针加速度
+@sa [accelerationSpeed](@ref Dtk::InputDevices::DInputDevicePointer::accelerationSpeed)
+
+
+@fn void DInputDevicePointer::leftHandedChanged(bool leftHanded)
+@brief 左手模式切换信号
+@param[in] leftHanded 是否开启左手模式
+
+
+@fn void DInputDevicePointer::scrollMethodChanged(ScrollMethod method)
+@brief 滚动模式切换信号
+@param[in] method 切换后的滚动模式
+
+
+@fn void DInputDevicePointer::accelerationProfileChanged(AccelerationProfile profile)
+@brief 指针加速方式切换信号
+@param[in] profile 切换后的指针加速方式
+
+
+@fn void DInputDevicePointer::accelerationSpeedChanged(double speed)
+@brief 指针加速度修改信号
+@param[in] speed 修改后的指针加速度
+
+
+@property Dtk::Device::DInputDevicePointer::leftHanded
+@brief 是否开启左手模式
+
+true表示开启左手模式, false表示关闭左手模式.
+
+@property Dtk::Device::DInputDevicePointer::scrollMethod
+@brief 当前的滚动模式
+
+滚动模式一共有三种, 对于不同的指针类型设备, 支持的滚动模式不一样.
+
+@property Dtk::Device::DInputDevicePointer::accelerationProfile
+@brief 当前的加速方式
+
+加速模式一共有两种, 对于不同的指针类型设备, 支持的加速方式不一样.
+
+@property Dtk::Device::DInputDevicePointer::accelerationSpeed
+@brief 当前加速度
+
+对于无加速的指针类型设备, 加速度总为0.
+
+*/

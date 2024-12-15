@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# qurl::toPercentEncoding的加密规则
+# When Chinese special characters are mixed, only the ascall character set is used for encoding. 
+# When Chinese characters and special characters are mixed, encoding errors occur, 
+# resulting in the inability to open some directories with special characters. 
+# Here, utf-8 multi-byte encoding is used.
+urlencode() {
+    local input="${1}"
+    local output=""
+    local char
+
+   
+    while IFS= read -r -n1 char; do
+        # Convert the character into bytes
+        if [[ "$char" =~ [a-zA-Z0-9\-\_\.\~] ]]; then
+            # If the character is unreserved, append as is
+            output+="$char"
+        else
+            # Handle multi-byte characters
+            local bytes
+            bytes=$(printf "%s" "$char" | od -An -tx1 | tr -d ' \n')
+            while [[ "$bytes" != "" ]]; do
+                output+="%${bytes:0:2}"  # Take the first byte
+                bytes="${bytes:2}"      # Remove the first byte
+            done
+        fi
+    done < <(printf "%s" "$input")
+
+    echo "$output"
+}
+
+args=""
+argsOrigin=""
+current_path=$(pwd)
+isDbus="true"
+for arg in "$@"; do
+    # .\ ./ \ .. \ ../ 这几个符号在传入dbus后丢失路径，在这里进行转换
+    if [[ $arg == "." ]] || [[ $arg == ".." ]] || [[ $arg == *"/." ]] || [[ $arg == *"/.." ]] || [[ $arg =~ "./" ]] || [[ $arg =~ "../" ]] || [[ $arg =~ "~/" ]]; then
+        name=${arg##*/}
+        path=${arg%/*}"/"
+        if [[ $name == "." ]] || [[ $name == ".." ]]; then
+            name=""
+            path=$path$name
+        fi
+        if [[ $path =~ "~/" ]]; then
+            cd ~/
+            home_path=$(pwd)
+            path=$(echo "$path" | sed "s|~/|$home_path/|g")
+            cd $current_path
+        fi
+        cd "$path"
+        path=$(pwd)"/"
+        cd $current_path
+        absolute_path=$path$name
+        arg=$absolute_path
+    fi
+
+    # 对不是-开头的参数进行qurl::toPercentEncoding加密
+    if [[ "$arg:0:1" =~ "-" ]]; then
+        tmpArg=$(urlencode "$arg")
+        # 对于\n加密为了%5cn，替换为正确的%0A
+        tmpArg=$(echo "$tmpArg" | sed 's/%5cn/%0A/g')
+        argsOrigin+="$tmpArg "
+    else
+        argsOrigin+="$arg "
+    fi
+
+    # array:string:"$args"中','是切分符号，所以传入dbus是要被切分
+    if [[ $arg == "-h" ]] || [[ $arg == "--help" ]] || [[ $arg == "--help-all" ]] || [[ $arg == "-v" ]] || [[ $arg == "--version" ]] || [[ $arg == *","* ]]; then
+        isDbus="false"
+    fi
+
+    args+="$arg,"
+done
+args=${args%,}
+
+if [[ $isDbus == "false" ]]; then
+    exec file-manager.sh "$argsOrigin"
+    return;
+fi
+
+dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.Open array:string:"$args"
+
+if [ $? -ne 0 ]; then
+    echo "dbus call failed"
+    exec file-manager.sh "$argsOrigin"
+fi

@@ -1,0 +1,325 @@
+/*!
+@~chinese
+@ingroup dtkcompressor
+@file darchivemanager.h
+
+@class Dtk::Compressor::DArchiveManager darchivemanager.h
+    @brief DArchiveManager类提供文档压缩解压功能
+
+@enum Dtk::Compressor::DArchiveManager::ArchivePluginType
+    @brief 插件类型
+    @var Dtk::Compressor::DArchiveManager::APT_Auto
+        自动
+    @var Dtk::Compressor::DArchiveManager::APT_Cli7z
+        7z插件
+    @var Dtk::Compressor::DArchiveManager::APT_Libarchive
+        archive插件
+    @var Dtk::Compressor::DArchiveManager::APT_Libzip
+        zip插件
+    @var Dtk::Compressor::DArchiveManager::APT_Libpigz
+        pigz插件
+
+@enum Dtk::Compressor::DArchiveManager::ArchiveJobType
+    @brief 操作类型
+    @var Dtk::Compressor::DArchiveManager::JT_NoJob
+        初始类型
+    @var Dtk::Compressor::DArchiveManager::JT_Create
+        创建压缩包
+    @var Dtk::Compressor::DArchiveManager::JT_Add
+        添加压缩文件
+    @var Dtk::Compressor::DArchiveManager::JT_Load
+        加载压缩包
+    @var Dtk::Compressor::DArchiveManager::JT_Extract
+        解压
+    @var Dtk::Compressor::DArchiveManager::JT_Delete
+        删除
+    @var Dtk::Compressor::DArchiveManager::JT_Rename
+        重命名
+    @var Dtk::Compressor::DArchiveManager::JT_BatchExtract
+        批量解压
+    @var Dtk::Compressor::DArchiveManager::JT_Open
+        打开
+    @var Dtk::Compressor::DArchiveManager::JT_Update
+        更新
+    @var Dtk::Compressor::DArchiveManager::JT_Comment
+        注释
+    @var Dtk::Compressor::DArchiveManager::JT_Convert
+        转换
+    @var Dtk::Compressor::DArchiveManager::JT_StepExtract
+        分步解压
+
+@enum Dtk::Compressor::DArchiveManager::MgrPluginFinishType
+    @brief 插件结束类型
+    @var Dtk::Compressor::DArchiveManager::PFT_Nomral
+        正常退出
+    @var Dtk::Compressor::DArchiveManager::PFT_Cancel
+        取消
+    @var Dtk::Compressor::DArchiveManager::PFT_Error
+        错误
+
+@enum Dtk::Compressor::DArchiveManager::MgrErrorType
+    @brief 错误类型    
+    @var Dtk::Compressor::DArchiveManager::ET_NoError
+        无错误
+    @var Dtk::Compressor::DArchiveManager::ET_PluginError
+        插件错误
+    @var Dtk::Compressor::DArchiveManager::ET_WrongPassword
+        输入的密码错误    
+    @var Dtk::Compressor::DArchiveManager::ET_NeedPassword
+        需要密码    
+    @var Dtk::Compressor::DArchiveManager::ET_LongNameError
+        文件名过长错误   
+    @var Dtk::Compressor::DArchiveManager::ET_ArchiveDamaged
+        压缩包损坏    
+    @var Dtk::Compressor::DArchiveManager::ET_FileOpenError
+        文件打开错误    
+    @var Dtk::Compressor::DArchiveManager::ET_FileReadError
+        文件读取错误    
+    @var Dtk::Compressor::DArchiveManager::ET_FileWriteError
+        文件写错误    
+    @var Dtk::Compressor::DArchiveManager::ET_DeleteError
+        文件删除错误    
+    @var Dtk::Compressor::DArchiveManager::ET_RenameError
+        文件重命名错误    
+    @var Dtk::Compressor::DArchiveManager::ET_MissingVolume
+        分卷缺失    
+    @var Dtk::Compressor::DArchiveManager::ET_InsufficientDiskSpace
+        磁盘空间不足    
+    @var Dtk::Compressor::DArchiveManager::ET_UserCancelOpertion
+        用户取消操作    
+    @var Dtk::Compressor::DArchiveManager::ET_ExistVolume
+        分卷已存在    
+
+@struct Dtk::Compressor::DArchiveManager::MgrFileEntry
+    @brief 文件数据
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::strFullPath
+        文件全路径
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::strFileName
+        文件名
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::strAlias
+        别名
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::isDirectory
+        是否为文件夹
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::qSize
+        文件真实大小
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::uLastModifiedTime
+        文件最后修改时间
+    @var Dtk::Compressor::DArchiveManager::MgrFileEntry::iIndex
+        文件在压缩包中的索引位置
+
+@struct Dtk::Compressor::DArchiveManager::MgrArchiveData
+    @brief 压缩包数据
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::qSize
+        原始总大小
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::qComressSize
+        压缩包大小
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::strComment
+        压缩包注释信息
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::mapFileEntry
+        压缩包内所有文件
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::listRootEntry
+        压缩包第一层数据
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::isListEncrypted
+        压缩包是否为列表加密
+    @var Dtk::Compressor::DArchiveManager::MgrArchiveData::strPassword
+        压缩包密码
+
+@struct Dtk::Compressor::DArchiveManager::MgrCompressOptions
+    @brief 压缩选项
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::strPassword
+        密码
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::strEncryptionMethod
+        加密算法
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::strCompressionMethod
+        压缩算法
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::iVolumeSize
+        分卷大小（kb）
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::iCompressionLevel
+        压缩等级
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::qTotalSize
+        源文件总大小
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::strDestination
+        压缩上级目录（若为空，代表在根目录压缩文件）
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::bEncryption
+        是否加密
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::bHeaderEncryption
+        是否列表加密
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::bSplit
+        是否分卷
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::bTar_7z
+        是否是tar.7z格式
+    @var Dtk::Compressor::DArchiveManager::MgrCompressOptions::iCPUTheadNum
+        CPU线程数
+
+@struct Dtk::Compressor::DArchiveManager::MgrExtractionOptions
+    @brief 解压选项
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::strTargetPath
+        解压目标路径
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::strDestination
+        提取时的上级目录（若为空，代表提取的是根目录下的文件）
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::password
+        解压密码
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::qSize
+        解压:原始大小; 提取:待提取的总大小
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::qComressSize
+        压缩包大小
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::bExistList
+        是否有list过程
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::bAllExtract
+        是否全部解压（true：全部解压 false：提取）
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::bBatchExtract
+        是否批量解压
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::bTar_7z
+        是否是tar.7z格式（补充）
+    @var Dtk::Compressor::DArchiveManager::MgrExtractionOptions::bOpen
+        是否是用来打开
+
+@struct Dtk::Compressor::DArchiveManager::MgrUpdateOptions
+    @brief 更新选项
+    @var Dtk::Compressor::DArchiveManager::MgrUpdateOptions::eType
+        更新类型
+    @var Dtk::Compressor::DArchiveManager::MgrUpdateOptions::strParentPath
+        父目录（若为空，代表操作的是压缩包首层目录下的文件）
+    @var Dtk::Compressor::DArchiveManager::MgrUpdateOptions::listEntry
+        操作的文件（删除：存储选中的文件     追加：存储本地所有文件）
+    @var Dtk::Compressor::DArchiveManager::MgrUpdateOptions::qSize
+        操作的文件大小
+
+@fn static DArchiveManager *DArchiveManager::get_instance(void)
+    @brief 获取单例实例对象
+    @return 单例实例对象
+
+@fn void DArchiveManager::destory_instance();
+    @brief 获取单例实例对象
+
+@fn bool DArchiveManager::createArchive(const QList<MgrFileEntry> &files, const QString &strDestination, const MgrCompressOptions &stOptions, ArchivePluginType eType)
+    @brief 创建压缩包
+    @param[in] files 待压缩文件
+    @param[in] strDestination 文件存储在压缩包的路径（为空时，处于根目录）
+    @param[in] stOptions 压缩参数
+    @param[in] eType 插件选择
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::loadArchive(const QString &strArchiveFullPath, ArchivePluginType eType = ArchivePluginType::APT_Auto)
+    @brief 加载压缩包数据
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] eType 插件选择
+    @return 是否调用成功,true为成功
+
+@fn MgrArchiveData *DArchiveManager::archiveData()
+    @brief 获取压缩包数据
+    @return 压缩包数据
+
+@fn bool DArchiveManager::addFiles(const QString &strArchiveFullPath, const QList<MgrFileEntry> &listAddEntry, const MgrCompressOptions &stOptions)
+    @brief 向压缩包中添加文件
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] listAddEntry 添加的文件(夹)
+    @param[in] stOptions 压缩参数
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::extractFiles(const QString &strArchiveFullPath, const QList<MgrFileEntry> &files, const MgrExtractionOptions &stOptions, ArchivePluginType eType = ArchivePluginType::APT_Auto)
+    @brief 解压文件
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] files 待解压的文件（若数目为空，属于全部解压，否则为提取）
+    @param[in] options 解压参数
+    @param[in] eType 插件选择
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::extractFiles2Path(const QString &strArchiveFullPath, const QList<MgrFileEntry> &listSelEntry, const MgrExtractionOptions &stOptions)
+    @brief 提取文件至指定目录
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] listSelEntry 选中的提取文件
+    @param[in] stOptions 提取参数
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::deleteFiles(const QString &strArchiveFullPath, const QList<MgrFileEntry> &listSelEntry)
+    @brief 删除压缩包中的文件
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] listSelEntry 当前选中的文件
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::renameFiles(const QString &strArchiveFullPath, const QList<MgrFileEntry> &listSelEntry)
+    @brief 重命名压缩包中的文件
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] listSelEntry 当前选中的文件
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::batchExtractFiles(const QStringList &listFiles, const QString &strTargetPath)
+    @brief 批量解压
+    @param[in] listFiles 解压文件
+    @param[in] strTargetPath 解压路径
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::openFile(const QString &strArchiveFullPath, const MgrFileEntry &stEntry, const QString &strTempExtractPath, const QString &strProgram)
+    @brief 打开压缩包中文件
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] stEntry 待打开文件数据
+    @param[in] strTempExtractPath 临时解压路径
+    @param[in] strProgram 应用程序名
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::updateArchiveCacheData(const MgrUpdateOptions &stOptions)
+    @brief 更新本地压缩包缓存数据
+    @param[in] stOptions 更新选项
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::updateArchiveComment(const QString &strArchiveFullPath, const QString &strComment)
+    @brief 更新压缩包注释信息
+    @param[in] strArchiveFullPath 压缩包全路径
+    @param[in] strComment 注释
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::convertArchive(const QString &strOriginalArchiveFullPath, const QString &strTargetFullPath, const QString &strNewArchiveFullPath)
+    @brief 压缩包格式转换
+    @param[in] strOriginalArchiveFullPath 原始压缩包全路径
+    @param[in] strTargetFullPath 压缩包解压的临时路径
+    @param[in] strNewArchiveFullPath 转换之后的压缩包全路径
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::pauseOperation()
+    @brief 暂停操作
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::continueOperation()
+    @brief 继续操作
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::cancelOperation()
+    @brief 取消操作
+    @return 是否调用成功,true为成功
+
+@fn QString DArchiveManager::getCurFilePassword()
+    @brief 获取当前文件密码
+    @return 是否调用成功,true为成功
+
+@fn bool DArchiveManager::currentStatus()
+    @brief 当前任务状态
+    @return 是否调用成功,true为成功
+
+@fn void DArchiveManager::signalError(MgrErrorType eErrorType)
+    @brief 信号-错误信号
+    @param eErrorType 错误类型
+
+@fn void DArchiveManager::signalJobFinished(ArchiveJobType eJobType, MgrPluginFinishType eFinishType, MgrErrorType eErrorType)
+    @brief 信号-操作结束信号
+    @param eJobType job类型
+    @param eFinishType 结束类型
+    @param eErrorType 错误类型
+
+@fn void DArchiveManager::signalprogress(double dPercentage)
+    @brief 信号-进度信号
+    @param dPercentage 进度值
+
+@fn void DArchiveManager::signalCurFileName(const QString &strName)
+    @brief 信号-发送当前正在操作的文件名
+    @param strName 当前文件名
+
+@fn void DArchiveManager::signalFileWriteErrorName(const QString &strName)
+    @brief 信号-发送创建失败的文件名
+    @param strName 当前文件名
+
+@fn void DArchiveManager::signalCurArchiveName(const QString &strArchiveName)
+    @brief 信号-当前正在操作的压缩包信号
+    @param strArchiveName 压缩包名称
+
+*/

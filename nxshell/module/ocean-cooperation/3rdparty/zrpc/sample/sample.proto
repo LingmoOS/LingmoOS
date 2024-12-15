@@ -1,0 +1,38 @@
+syntax = "proto3";
+option cc_generic_services = true;
+
+message queryAgeReq {
+  int32 req_no = 1;
+  int32 id = 2;
+}
+
+message queryAgeRes {
+  int32 ret_code = 1;
+  string res_info = 2;
+  int32 req_no = 3;
+  int32 id = 4;
+  int32 age = 5;
+}
+
+message queryNameReq {
+  int32 req_no = 1;
+  int32 id = 2;
+  int32 type = 3;
+}
+
+message queryNameRes {
+  int32 ret_code = 1;
+  string res_info = 2;
+  int32 req_no = 3;
+  int32 id = 4;
+  string name = 5;
+}
+
+
+service QueryService {
+  // rpc method name
+  rpc query_name(queryNameReq) returns (queryNameRes);
+
+  // rpc method name
+  rpc query_age(queryAgeReq) returns (queryAgeRes);
+}

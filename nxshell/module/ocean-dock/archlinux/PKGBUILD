@@ -1,0 +1,37 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-dock-git
+pkgver=5.5.9.r54.g49d37a6c0
+pkgrel=1
+sourcename=ocean-dock
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Lingmo desktop-environment - dock module'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-dock"
+license=('LGPL-3.0-or-later')
+depends=('qt5-svg' 'lingmo-daemon-git' 'lingmo-qt5integration-git'
+         'lingmo-qt-dbus-factory-git' 'libdbusmenu-qt5' 'dtkcommon-git'
+         'dtkcore-git' 'lingmo-qt5integration-git'
+         'libdbusmenu-qt5' 'lingmo-control-center-git' 'dwayland-git')
+makedepends=('git' 'cmake' 'ninja' 'qt5-tools' 'gtest' 'gmock' 'extra-cmake-modules')
+conflicts=('lingmo-dock')
+provides=('lingmo-dock')
+optdepends=('lingmo-network-core-git')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  cmake . -GNinja -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib -DDOCK_TRAY_USE_NATIVE_POPUP=YES
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

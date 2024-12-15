@@ -1,0 +1,32 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=disomaster-git
+pkgver=5.0.7.r2.g157dd8f
+pkgrel=1
+pkgdesc='Library to manipulate DISC burning.'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/disomaster"
+license=('GPL3')
+depends=('libisoburn')
+makedepends=('git' 'qt5-tools')
+groups=('lingmo-git')
+provides=('disomaster')
+conflicts=('disomaster')
+source=('source.tar.gz')
+sha512sums=('SKIP')
+
+prepare() {
+    cd $lingmo_source_name
+}
+
+build() {
+  cd $lingmo_source_name
+
+  qmake-qt5 PREFIX=/usr
+  make
+}
+
+package() {
+  cd $lingmo_source_name
+
+  make INSTALL_ROOT="$pkgdir" install
+}

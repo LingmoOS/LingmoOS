@@ -1,0 +1,53 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+
+pkgname=ocean-tray-loader-git
+_pkgname=ocean-tray-loader
+pkgver=0.0.1
+pkgrel=1
+pkgdesc='New OCEAN Tray'
+sourcename=ocean-tray-loader
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-tray-loader"
+license=('LGPL3')
+depends=('qt5-wayland'
+         'dtkgui-git'
+         'dtkwidget-git'
+         'libxtst'
+         'libxres'
+         'libxdamage'
+         'libxcursor'
+         'libxcb'
+         'networkmanager-qt5'
+         'libdbusmenu-qt5'
+)
+makedepends=('git'
+             'qt5-tools'
+             'qt5-wayland'
+             'dtkgui-git'
+             'dtkwidget-git'
+             'cmake'
+             'ninja'
+             'extra-cmake-modules'
+             'lingmo-qt-dbus-factory'
+)
+conflicts=('ocean-tray-loader')
+provides=('ocean-tray-loader')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  cmake -B . -GNinja \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  cmake --build .
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

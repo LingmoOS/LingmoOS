@@ -1,0 +1,88 @@
+/*!
+@~chinese
+@ingroup dtkrfmanager
+@file drfmanager.h
+@brief 无线设备管理类
+@details `dtkrfmanager` 是对于 `lingmo/UOS` 系统上的 `rfkill` 的封装，其目的是在于方便第三方开发者轻松且快速的调用接口管理无线设备。
+
+@class Dtk::RfMgr::DRfmanager drfmanager.h
+@brief 无线设备管理类
+
+@fn DRfmanager::DRfmanager(QObject *parent = nullptr)
+@brief 构造函数
+@param [in] parent 父对象，默认为空
+
+@fn DRfmanager::~DRfmanager()
+@brief 析构函数
+
+@fn void DRfmanager::block(RfType type, bool blocked = true)
+@brief 禁用或者启用类型为 `type` 的无线设备
+@param [in] type  需要操作的设备类型
+@param [in] blocked 禁用或者启用, 默认禁用
+
+@fn void DRfmanager::block(quint32 id, bool blocked = true)
+@brief 禁用或者启用设备编号为 `id` 的无线设备
+@param [in] id  需要操作的设备编号
+@param [in] blocked 禁用或者启用, 默认禁用
+
+
+@fn bool DRfmanager::isBluetoothBlocked() const
+@brief 蓝牙设备是否禁用
+@return true 蓝牙设备被禁用
+@note 如果有多个蓝牙设备，需要所有的蓝牙设备都被禁用才会返回 `true`，否则返回 `false`
+
+@fn bool DRfmanager::isWifiBlocked() const
+@brief 无线网络设备是否禁用
+@return true 无线网络设备被禁用
+@note 如果有多个无线网络设备，需要所有的无线网络设备都被禁用才会返回 `true`，否则返回 `false`
+
+@fn bool DRfmanager::isAllBlocked() const
+@brief 支持的设备是否都被禁用
+@return true 所有的支持的设备均被禁用
+@note 如果有多个无线设备，需要所有的无线设备都被禁用才会返回 `true`，否则返回 `false`
+
+@fn int DRfmanager::count() const
+@brief 获取支持的设备数量
+@return 支持的设备数量
+
+@fn QList<RfDevice> DRfmanager::deviceList() const
+@brief 获取支持的设备列表
+@return 支持的设备信息列表
+@see RfDevice DRfmanager::count
+
+@fn void DRfmanager::blockBluetooth(bool bluetoothBlocked = true)
+@brief 禁用或者启用蓝牙设备
+@param [in] bluetoothBlocked 禁用或者启用, 默认禁用
+
+@fn void DRfmanager::blockWifi(bool wifiBlocked = true)
+@brief 禁用或者启用无线网络设备
+@param [in] wifiBlocked 禁用或者启用, 默认禁用
+
+@fn void DRfmanager::blockAll(bool blockAll = true)
+@brief 禁用或者启用所有无线设备
+@param [in] blockAll 禁用或者启用, 默认禁用
+
+@fn void DRfmanager::bluetoothBlockedChanged(bool bluetoothBlocked)
+@brief 蓝牙设备禁用或者启用状态发生变化信号
+@param [out] bluetoothBlocked 变化后的状态，禁用或者启用
+@note 有多个蓝牙设备时，所有的蓝牙设备是否都被禁用发生变化时才触发信号
+
+@fn void DRfmanager::wifiBlockedChanged(bool wifiBlocked)
+@brief 无线网络设备禁用或者启用状态发生变化信号
+@param [out] wifiBlocked 变化后的状态，禁用或者启用
+@note 有多个无线网络设备时，所有的无线网络设备是否都被禁用发生变化时才触发信号
+
+@fn void DRfmanager::countChanged(int count)
+@brief 无线设备拔插时即设备数量变化的信号
+@param [out] count 变化后的设备数量
+
+@fn void DRfmanager::allBlockedChanged(bool blockAll)
+@brief 支持的所有社别设备全部禁用或者非全部状态发生变化信号
+@param [out] blockAll 变化后的状态，禁用或者启用
+@note 有多个无线网络设备时，所有的无线设备是否都被禁用发生变化时才触发信号
+
+@fn void DRfmanager::blockedChanged(quint32 idx)
+@brief 设备禁用或者启用状态发生变化信号
+@param [out] idx 禁用状态变化后的设备编号
+
+*/

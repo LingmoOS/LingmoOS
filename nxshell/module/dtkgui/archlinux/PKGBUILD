@@ -1,0 +1,40 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=dtkgui-git
+pkgver=5.5.22.r8.g6ef1509
+pkgrel=1
+sourcename=dtkgui
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Lingmo Toolkit, gui module for OCEAN look and feel'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/dtkgui"
+license=('LGPL3')
+depends=('dtkcore-git' 'dtkcommon-git' 'qt5-svg' 'libqtxdg' 'freeimage' 'librsvg' 'qt5-wayland')
+# INFO: you can disable freeimage not to support RAW images
+# Then set DTK_DISABLE_EX_IMAGE_FORMAT=OFF
+makedepends=('git' 'qt5-tools' 'gtest' 'gmock' 'ninja' 'cmake' 'doxygen' 'extra-cmake-modules')
+conflicts=('dtkgui')
+provides=('dtkgui')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+
+build() {
+    cd $sourcedir
+    cmake -GNinja \
+    -DMKSPECS_INSTALL_DIR=lib/qt/mkspecs/modules/ \
+    -DBUILD_DOCS=ON \
+    -DQCH_INSTALL_DESTINATION=share/doc/qt \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+    ninja
+    # INFO: Another cmake option is DTK_DISABLE_EX_IMAGE_FORMAT
+    # If you not want to support RAW images, set it to off
+}
+
+package() {
+    cd $sourcedir
+    DESTDIR="$pkgdir" ninja install
+}

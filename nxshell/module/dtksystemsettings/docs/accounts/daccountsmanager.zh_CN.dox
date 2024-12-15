@@ -1,0 +1,71 @@
+/*!
+@~chinese
+@file daccountsmanager.h
+@ingroup dtkaccounts
+@brief daccountsmanager.h是对于一组用于查询和管理用户帐户信息的D-BUS接口的封装。
+
+@class Dtk::Accounts::DAccountsManager daccountsmanager.h
+@brief 管理用户账户信息
+
+@fn DAccountsManager::DAccountsManager(QObject *parent = nullptr)
+@brief 构造manager对象,并且进行信号的连接
+@param[in] parent 父对象
+
+@fn QSharedPointer<DAccountsUser> DAccountsManager::createUser(const QString &name, const QString &fullName, const AccountType &type)
+@brief 创建一个新用户
+@param[in] name 新用户的用户名
+@param[in] fullName 新用户的全名
+@param[in] type 用户类型
+@return 一个指向由该用户实例化的DAccountsUser的QSharedPointer
+
+@fn void DAccountsManager::deleteUser(const QString &name, const bool rmFiles)
+@brief 删除一个用户
+@param[in] name 要删除的用户的用户名
+@param[in] rmFiles 是否要删除用户的文件
+
+@fn QSharedPointer<DAccountsUser> DAccountsManager::findUserById(const qint64 id)
+@brief 使用uid来寻找用户
+@param[in] id 要查找的用户的uid
+@return 一个指向由该用户实例化的DAccountsUser的QSharedPointer
+
+@fn QSharedPointer<DAccountsUser> DAccountsManager::findUserByName(const QString &name)
+@brief 使用用户名来寻找用户
+@param[in] name 要查找的用户的用户名
+@return 一个指向由该用户实例化的DAccountsUser的QSharedPointer
+
+@fn QList<quint64> DAccountsManager::userList() const
+@brief 列出之前在本地系统中登录过的用户
+@return 一个由用户的uid组成的列表
+
+@fn QStringList DAccountsManager::groups()
+@brief 列出系统中的所有用户组
+@return 由用户组名组成的列表
+
+@fn QStringList DAccountsManager::presetGroups(const AccountTypes &type)
+@brief 根据用户类型获取用户的预定义用户组
+@param[in] type 用户类型
+@return 由用户组名组成的列表
+
+@fn ValidMsg DAccountsManager::isPasswordValid(const QString &password)
+@brief 判断密码是否合法
+@param[in] password 用户密码
+@return 一个表示判断信息的结构体
+
+@fn ValidMsg DAccountsManager::isUsernameValid(const QString &name)
+@brief 判断用户名是否合法
+@param [in] name 用户名
+@return 一个表示判断信息的结构体
+
+@fn void DAccountsManager::UserAoceand(const quint64 uid)
+@brief 当添加用户时发送信号
+@param[in] uid 新加入用户的uid
+
+@fn void DAccountsManager::UserDeleted(const quint64 uid)
+@brief 当用户被删除时发送信号
+@param[in] uid 被删除用户的uid
+
+@fn QList<quint64> DAccountsManager::userList() const
+@brief 所有用户的uid组成的列表
+@return 由uid组成的列表
+
+*/

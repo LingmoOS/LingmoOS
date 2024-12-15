@@ -1,0 +1,223 @@
+# % Options Settings: https://orgmode.org/manual/Export-Settings.html
+#+OPTIONS: timestamp:nil ^:nil <:nil p:t prop:t tags:t tasks:t todo:t
+#+LATEX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [a4paper,12pt]
+#+LATEX_HEADER: \usepackage{booktabs}
+# % to include pdf/eps/png files
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{graphicx}
+# % useful to add 'todo' markers
+#+LaTeX_HEADER: \usepackage{todonotes}
+#+LaTeX_HEADER: \setlength{\marginparwidth}{2cm} % fix todonotes warning
+# % hyperrefs
+#+LaTeX_HEADER: \usepackage{hyperref}
+# % ----------------- Code blocks ----------------
+# % Dependencies: pip install pygments
+# % nice source code formatting
+#+LaTeX_HEADER: \usepackage{xcolor}
+#+LaTeX_HEADER: \definecolor{bg}{rgb}{0.98,0.98,0.98}
+#+LaTeX_HEADER: \usepackage[cache=false]{minted}
+#+LaTeX_HEADER: \setminted{
+#+LaTeX_HEADER:   fontsize=\small,
+#+LaTeX_HEADER:   baselinestretch=1,
+#+LaTeX_HEADER:   xleftmargin=4em,
+#+LaTeX_HEADER:   breaklines,
+#+LaTeX_HEADER:   mathescape,
+#+LaTeX_HEADER:   linenos,
+#+LaTeX_HEADER:   numbersep=5pt,
+#+LaTeX_HEADER:   frame=leftline,
+#+LaTeX_HEADER:   framesep=2mm,
+#+LaTeX_HEADER:   autogobble,
+#+LaTeX_HEADER:   style=tango,
+#+LaTeX_HEADER:   bgcolor=bg
+#+LaTeX_HEADER: }
+# % change style of section headings
+#+LaTeX_HEADER: \usepackage{sectsty}
+#+LaTeX_HEADER: \allsectionsfont{\sffamily}
+# % only required for orgmode ticked TODO items, can remove
+#+LaTeX_HEADER: \usepackage{amssymb}
+# % only required for underlining text
+#+LaTeX_HEADER: \usepackage[normalem]{ulem}
+# % often use this in differential operators:
+#+LaTeX_HEADER: \renewcommand{\d}{\ensuremath{\mathrm{d}}}
+# % allow more reasonable text width for most documents than LaTeX default
+#+LaTeX_HEADER: \setlength{\textheight}{21cm}
+#+LaTeX_HEADER: \setlength{\textwidth}{16cm}
+# % reduce left and right margins accordingly
+#+LaTeX_HEADER: \setlength{\evensidemargin}{-0cm}
+#+LaTeX_HEADER: \setlength{\oddsidemargin}{-0cm}
+# % reduce top margin
+#+LaTeX_HEADER: \setlength{\topmargin}{0cm}
+# % references formats
+#+LaTeX_HEADER: \usepackage[round]{natbib}
+# % Chinese supported
+#+LATEX_HEADER: \usepackage{ctex}
+# % Increase default line spacing a little
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \renewcommand{\baselinestretch}{1.5}
+#+LATEX_HEADER: \setlength{\parskip}{0.8em}
+# % Line & paragraph space end
+# % item list margin
+#+LATEX_HEADER: \usepackage{enumitem}
+# % Breaking Page Between Title and Toc
+#+LATEX_HEADER: \makeatletter \def\@maketitle{\null \begin{center} {\vskip 5em \Huge \@title} \vskip 30em {\LARGE \@author} \vskip 3em {\LARGE \@date} \end{center} \newpage} \makeatother
+# % End of Breaking Page Between Title and Toc
+#+LATEX_HEADER: \renewcommand\contentsname{目录}
+# Generate Tex File: C-c C-e l l; then replace verbatim with minted, and must special the code language
+#+LATEX_HEADER: % Generate PDF: xelatex -shell-escape <tex file>
+#+AUTHOR: jouyouyun
+#+EMAIL: yanbowen717@gmail.com
+#+TITLE: HTTP API
+
+#+latex: \newpage
+
+** 认证
+
+TODO
+
+** 更新检查
+此接口用于检查是否存在新版本。
+
+*** 路由
+=[GET] /v0/upgrade=
+
+*** 请求数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+c.Header("Authorization", "Bearer 0b79bab50daca910b000d4f1a2b675d604257e42")
+#+end_src
+
+**** Body
+#+begin_src json
+{
+  "distribution":"v23",
+  "offset": 0,
+  "limit": 2,
+  "version":"20211207.0"
+}
+#+end_src
+
+*** 响应数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+#+end_src
+
+**** Body
+#+begin_src json
+{
+  "total": 10,
+  "offset": 0,
+  "limit": 2,
+  "available_version_list": [
+    {
+      "version": "20211208.0",
+      "create_at": "",
+      "built-by": "",
+      "subject": "Release 20211208.0",
+      "annotation": "",
+      "changelog": ""
+    },
+    {
+      "version": "20211208.1",
+      "create_at": "",
+      "built-by": "",
+      "subject": "Release 20211208.1",
+      "annotation": "",
+      "changelog": ""
+    }
+  ]
+}
+#+end_src
+
+** 更新文件生成
+此接口用于生成更新文件，返回更新文件的路径。
+
+*** 路由
+=[POST] /v0/upgrade=
+
+*** 请求数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+c.Header("Authorization", "Bearer 0b79bab50daca910b000d4f1a2b675d604257e42")
+#+end_src
+
+**** Body
+#+begin_src json
+{
+  "distribution":"v23",
+  "mode": "full",
+  "base_version":"20211207.0",
+  "target_version": "20211208.1"
+}
+#+end_src
+
+mode 为更新模式，必填，可用值为：
+- full：全量更新，给出目标版本的所有文件
+- incremental：增量更新，给出目标版本与基线版本之间的增量数据
+
+*** 响应数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+#+end_src
+
+**** Body
++ Code: 200
+
+#+begin_src json
+{
+  "upgrade_file": "/files/<file sha256>.tar.zst"
+}
+#+end_src
+
++ Code：202
+
+#+begin_src json
+{
+  "retry_seconds": 50
+}
+#+end_src
+
+表示服务端接受了处理，但未处理完成，需要客户端等待一段时间后重试(retry_seconds) 。
+
+retry_seconds 由服务端根据更新内容动态计算。
+
+** 版本信息查询
+*** 路由
+=[GET] /v0/version=
+
+*** 请求数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+c.Header("Authorization", "Bearer 0b79bab50daca910b000d4f1a2b675d604257e42")
+#+end_src
+
+**** Body
+#+begin_src json
+{
+  "distribution":"v23",
+  "version":"20211207.0"
+}
+#+end_src
+
+*** 响应数据
+**** Header
+#+begin_src go
+c.Header("Content-Type", "application/json")
+#+end_src
+
+**** Body
+#+begin_src json
+{
+  "version":"20211207.0",
+  "create_at": "",
+  "built-by": "",
+  "subject": "",
+  "annotation": "",
+  "changelog": ""
+}
+#+end_src

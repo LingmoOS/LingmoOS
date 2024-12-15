@@ -1,0 +1,27 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-gtk-theme-git
+pkgver=2020.06.10.r12.g3cd9a6d
+pkgrel=1
+sourcename=lingmo-gtk-theme
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc="Lingmo GTK Theme"
+arch=('any')
+url="https://github.com/lingmoos/lingmo-gtk-theme"
+makedepends=('git')
+license=('LGPL3')
+optdepends=('gtk-engine-murrine: for gtk2 themes')
+groups=('lingmo-git')
+conflicts=(lingmo-gtk-theme)
+provides=(lingmo-gtk-theme)
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+package() {
+  cd $sourcedir
+  make DESTDIR="$pkgdir" install
+}

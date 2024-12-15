@@ -1,0 +1,15 @@
+[Unit]
+Description=Lingmo Boot Maker
+
+[Service]
+Type=dbus
+BusName=com.lingmo.bootmaker
+ExecStart=/usr/lib/lingmo-daemon/lingmo-boot-maker-service
+StandardOutput=syslog
+# Needs CAP_SYS_ADMIN umount u-disk.
+CapabilityBoundingSet=~CAP_SYS_BPF CAP_NET_ADMIN
+MemoryLimit=10G
+IOWeight=200
+
+[Install]
+WantedBy=multi-user.target

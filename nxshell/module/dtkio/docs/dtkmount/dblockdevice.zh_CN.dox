@@ -1,0 +1,479 @@
+/*!
+@~chinese
+@ingroup dtkmount
+@file dblockdevice.h
+
+@class Dtk::Mount::DBlockDevice dblockdevice.h
+    @brief 用于管理系统中块设备的类，对设备进行挂载、卸载等操作，以及获取其基本属性
+
+@enum Dtk::Mount::DBlockDevice::PartitionTableType
+    @brief 磁盘分区类型
+    @var Dtk::Mount::DBlockDevice::InvalidPT
+        未初始化的值
+    @var Dtk::Mount::DBlockDevice::MBR
+        MBR 分区类型
+    @var Dtk::Mount::DBlockDevice::GPT
+        GPT 分区类型
+    @var Dtk::Mount::DBlockDevice::UnknownPT
+        未知分区类型
+
+@fn bool DBlockDevice::isValid() const
+    @brief 判断设备是否为有效设备，若构造时传入了无效的路径，则返回 False
+    @return 设备是否有效
+
+@fn void DBlockDevice::setWatchChanges(bool watchChanges)
+    @brief 设置是否监听设备属性变化
+    @param[in] watchChanges 开关标识
+    @see bool DBlockDevice::watchChanges() const
+
+@fn bool DBlockDevice::watchChanges() const
+    @brief 获取当前设备监听状态
+    @return 设备监听状态
+    @see void DBlockDevice::setWatchChanges(bool watchChanges)
+
+@fn QString DBlockDevice::path() const
+    @brief 获取设备路径，该路径在构造对象时传入
+    @return 设备路径
+
+@fn QList< QPair<QString, QVariantMap> > DBlockDevice::configuration() const
+    @brief 获取设备配置列表
+    @return 设备配置列表
+    @see void DBlockDevice::addConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see DBlockDevice::removeConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see void DBlockDevice::updateConfigurationItem(const QPair<QString, QVariantMap> &oldItem, const QPair<QString, QVariantMap> &newItem, const QVariantMap &options)
+
+@fn QString DBlockDevice::cryptoBackingDevice() const
+    @brief 获取设备的加密块设备
+    @return 设备加密块设备路径
+    @retval 非空字符串 具体路径
+    @retval "/" 未知或者非加密设备
+    @see bool DBlockDevice::isEncrypted() const
+
+@fn QByteArray DBlockDevice::device() const
+    @brief 获取块设备在系统中的设备描述符
+    @return 设备描述符
+    @see QByteArray DBlockDevice::preferredDevice() const
+
+@fn quint64 DBlockDevice::deviceNumber() const
+    @brief 获取设备对应的 dev_t 设备号
+    @return 设备号
+
+@fn QString DBlockDevice::drive() const
+    @brief 获取设备对应的磁盘驱动器路径
+    @return 驱动设备路径
+    @see Dtk::Mount::DDiskDrive
+
+@fn bool DBlockDevice::hintAuto() const
+    @brief 获取设备是否应自动启动
+    @return 设备是否应自动启动
+
+@fn QString DBlockDevice::hintIconName() const
+    @brief 获取用于展示设备的图标名称
+    @return 图标名称或空
+
+@fn bool DBlockDevice::hintIgnore() const
+    @brief 获取设备是否应被忽略
+    @return 设备是否应被忽略
+    @note 一般的，磁盘管理器类应用（深度磁盘管理器或分区编辑器）在打开的状态下，所有的块设备的该标识都返回 True，此时期望磁盘不被上层应用显示，以免影响磁盘管理操作。
+    @note 深度文件管理器监听该字段，当变为 False 时，从用户界面中移除该磁盘显示；并且，若磁盘接入时，该磁盘字段为 True，则不执行自动挂载。
+
+@fn QString DBlockDevice::hintName() const
+    @brief 用于展示设备的磁盘名称
+    @return 磁盘名称或空
+
+@fn bool DBlockDevice::hintPartitionable() const
+    @brief 获取设备是否可分区，软盘、光驱和 LVM 逻辑卷除外
+    @return 设备是否可分区
+
+@fn QString DBlockDevice::hintSymbolicIconName() const
+    @brief 获取用于展示设备的符号图标
+    @return 设备符号图标或空字符串
+
+@fn bool DBlockDevice::hintSystem() const
+    @brief 获取设备是否为系统内置磁盘
+    @return 是否为系统内置磁盘
+    @note 通常情况下，该字段与 removable 互斥，一般来说，通过主板内置接口如 sata、pcie 接入的设备，该字段为 True
+
+@fn QString DBlockDevice::id() const
+    @brief 获取设备唯一标识符
+    @return 设备唯一标识符
+
+@fn QString DBlockDevice::idLabel() const
+    @brief 获取磁盘卷标，通常用于显示磁盘名称
+    @return 磁盘卷标
+    @see QString DBlockDevice::hintName() const
+    @see void DBlockDevice::setLabel(const QString &label, const QVariantMap &options)
+
+@fn QString DBlockDevice::idType() const
+    @brief 通常情况下，用于获取设备文件系统，但在 idUsage 为非 fileSystem 时，有其他表意
+    @return 设备文件系统
+    @see QString DBlockDevice::idUsage() const
+ 
+@fn QString DBlockDevice::idUUID() const
+    @brief 获取设备 UUID
+    @return 设备 UUID
+
+@fn QString DBlockDevice::idUsage() const
+    @brief 获取设备 ID 用途
+    @return 设备签名用途
+    @retval filesystem 可变的文件系统
+    @retval crypto LUKS 类设备
+    @retval raid RAID 类设备
+    @retval other 其他类型设备
+    @see QString DBlockDevice::idType() const
+
+@fn QString DBlockDevice::idVersion() const
+    @brief 设备文件系统版本或其他结构属性
+    @return 版本信息或空
+
+@fn QString DBlockDevice::mDRaid() const
+    @brief 如果是阵列设备，该函数返回设备的阵列对象路径
+    @return 阵列设备路径或 “/”
+
+@fn QString DBlockDevice::mDRaidMember() const
+    @brief 如果设备是阵列成员，则返回阵列对象路径
+    @return 阵列对象路径或 “/”
+
+@fn QByteArray DBlockDevice::preferredDevice() const
+    @brief 获取最佳设备路径，例如，对于设备 /dev/mapper/mpathk，对应的路径为 /dev/dm-9
+    @return 最佳设备路径
+    @see QByteArray DBlockDevice::device() const
+
+@fn bool DBlockDevice::readOnly() const
+    @brief 获取是否为只读设备
+    @return 是否为只读设备
+
+@fn quint64 DBlockDevice::size() const
+    @brief 获取块设备大小
+    @return 块设备大小
+
+@fn QByteArrayList DBlockDevice::symlinks() const
+    @brief 获取设备对应的链接列表
+    @return 设备链接列表
+    @see QByteArray DBlockDevice::device() const
+
+@fn QStringList DBlockDevice::userspaceMountOptions() const
+    @brief 获取挂载时的参数列表
+    @return 挂载参数列表
+
+@fn bool DBlockDevice::hasFileSystem() const
+    @brief 获取设备是否有文件系统
+    @return 是否有文件系统
+    @see static bool DBlockDevice::hasFileSystem(const QString &path)
+
+@fn bool DBlockDevice::hasPartition() const
+    @brief 获取设备是否有分区
+    @return 设备是否有分区
+    @see static bool DBlockDevice::hasPartition(const QString &path)
+
+@fn bool DBlockDevice::isEncrypted() const
+    @brief 获取设备是否是加密设备
+    @return 是否是加密设备
+    @see QString DBlockDevice::cryptoBackingDevice() const
+    @see static bool DBlockDevice::isEncrypted(const QString &path)
+
+@fn bool DBlockDevice::isLoopDevice() const
+    @brief 获取设备是否是回环设备
+    @return 是否是回环设备
+    @see static bool DBlockDevice::isLoopDevice(const QString &path)
+
+@fn static bool DBlockDevice::hasFileSystem(const QString &path)
+    @brief 获取设备是否有文件系统
+    @param[in] path 设备路径
+    @return 是否有文件系统
+    @see bool DBlockDevice::hasFileSystem() const
+
+@fn static bool DBlockDevice::hasPartition(const QString &path)
+    @brief 获取设备是否有分区
+    @param[in] path 设备路径
+    @return 设备是否有分区
+    @see bool DBlockDevice::hasPartition() const
+
+@fn static bool DBlockDevice::isEncrypted(const QString &path)
+    @brief 获取设备是否是加密
+    @param[in] path 设备路径
+    @return 设备是否加密
+    @see QString DBlockDevice::cryptoBackingDevice() const
+    @see bool DBlockDevice::isEncrypted(const QString &path)
+
+@fn static bool DBlockDevice::isLoopDevice(const QString &path)
+    @brief 获取是否为回环设备
+    @param[in] path 设备路径
+    @return 是否为回环设备
+    @see bool DBlockDevice::isLoopDevice() const
+    
+@fn QByteArrayList DBlockDevice::mountPoints() const
+    @brief 获取设备挂载点列表
+    @return 设备挂载点列表
+
+@fn PartitionTableType DBlockDevice::partitionTableType() const
+    @brief 获取设备分区表类型
+    @return 设备分区表类型
+    @see Dtk::Mount::DBlockDevice::PartitionTableType
+
+@fn QList<QPair<QString, QVariantMap> > DBlockDevice::childConfiguration() const
+    @brief 获取设备子配置列表
+    @return 设备子配置列表
+
+@fn void DBlockDevice::format(const QString &type, const QVariantMap &options)
+    @brief 格式化设备
+    @param[in] type 期望格式化的文件系统类型
+    @param[in] options 格式化参数
+    @note 参数包括：
+    @note > label(string) 卷标
+    @note > take-ownership(bool) 获取所有权
+    @note > encrypt.passphrase(string/stringlist) 密码
+    @note > encrypt.type(string) 加密类型
+    @note > erase(string) 擦除内容
+    @note > no-block(bool)
+    @note > update-partition-type(bool) 更新分区
+
+@fn QList<QPair<QString, QVariantMap> > DBlockDevice::getSecretConfiguration(const QVariantMap &options)
+    @brief 获取包含加密信息的配置信息
+    @param[in] options 除标准参数外暂未使用
+    @return 配置列表
+    @see QList< QPair<QString, QVariantMap> > DBlockDevice::configuration() const
+    @see void DBlockDevice::addConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see DBlockDevice::removeConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see void DBlockDevice::updateConfigurationItem(const QPair<QString, QVariantMap> &oldItem, const QPair<QString, QVariantMap> &newItem, const QVariantMap &options)
+
+@fn void DBlockDevice::addConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @brief 添加新的配置项
+    @param[in] item 添加的配置项
+    @param[in] options 除标准参数外暂未使用
+    @see QList<QPair<QString, QVariantMap> > DBlockDevice::getSecretConfiguration(const QVariantMap &options)
+    @see QList< QPair<QString, QVariantMap> > DBlockDevice::configuration() const
+    @see DBlockDevice::removeConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see void DBlockDevice::updateConfigurationItem(const QPair<QString, QVariantMap> &oldItem, const QPair<QString, QVariantMap> &newItem, const QVariantMap &options)
+
+    
+@fn void DBlockDevice::removeConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @brief 移除配置项
+    @param[in] item 要移除的配置项
+    @param[in] options 除标准参数外暂未使用
+    @see QList<QPair<QString, QVariantMap> > DBlockDevice::getSecretConfiguration(const QVariantMap &options)
+    @see QList< QPair<QString, QVariantMap> > DBlockDevice::configuration() const
+    @see void DBlockDevice::addConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see void DBlockDevice::updateConfigurationItem(const QPair<QString, QVariantMap> &oldItem, const QPair<QString, QVariantMap> &newItem, const QVariantMap &options)
+
+@fn void DBlockDevice::updateConfigurationItem(const QPair<QString, QVariantMap> &oldItem, const QPair<QString, QVariantMap> &newItem, const QVariantMap &options)
+    @brief 更新配置项
+    @param[in] oldItem 要移除的配置项
+    @param[in] newItem 添加的配置项
+    @param[in] options 除标准参数外暂未使用
+    @see QList<QPair<QString, QVariantMap> > DBlockDevice::getSecretConfiguration(const QVariantMap &options)
+    @see QList< QPair<QString, QVariantMap> > DBlockDevice::configuration() const
+    @see void DBlockDevice::addConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+    @see DBlockDevice::removeConfigurationItem(const QPair<QString, QVariantMap> &item, const QVariantMap &options)
+
+@fn int DBlockDevice::openDevice(const QString &mode, const QVariantMap &options)
+    @brief 打开设备
+    @param[in] mode “r” 只读，“w” 只写，“rw” 读写
+    @param[in] options 参数列表
+    @return 打开的文件描述符
+    @see int DBlockDevice::openForBackup(const QVariantMap &options)
+    @see int DBlockDevice::openDevice(const QString &mode, const QVariantMap &options)
+    @see int DBlockDevice::openForBenchmark(const QVariantMap &options)
+    @see int DBlockDevice::openForRestore(const QVariantMap &options)
+
+@fn int DBlockDevice::openForBackup(const QVariantMap &options)
+    @brief 以只读方式打开设备以便可以按字节镜像设备内容，仅在设备未使用时该方法操作有效
+    @param[in] options 除标准参数外暂未使用
+    @return 打开的文件描述符
+    @see int DBlockDevice::openDevice(const QString &mode, const QVariantMap &options)
+    @see int DBlockDevice::openForBenchmark(const QVariantMap &options)
+    @see int DBlockDevice::openForRestore(const QVariantMap &options)
+
+@fn int DBlockDevice::openForBenchmark(const QVariantMap &options)
+    @brief 打开设备以便可以对设备进行跑分操作
+    @param[in] options 除标准参数外暂未使用
+    @return 打开的文件描述符
+    @see int DBlockDevice::openForBackup(const QVariantMap &options)
+    @see int DBlockDevice::openDevice(const QString &mode, const QVariantMap &options)
+    @see int DBlockDevice::openForRestore(const QVariantMap &options)
+
+@fn int DBlockDevice::openForRestore(const QVariantMap &options)
+    @brief 打开一个可写设备，用于还原设备数据，仅在设备未使用是该方法有效
+    @param[in] options 除标准参数外暂未使用
+    @return 打开的文件描述符
+    @see int DBlockDevice::openForBackup(const QVariantMap &options)
+    @see int DBlockDevice::openDevice(const QString &mode, const QVariantMap &options)
+    @see int DBlockDevice::openForBenchmark(const QVariantMap &options)
+
+@fn void DBlockDevice::rescan(const QVariantMap &options)
+    @brief 重新扫描设备
+    @param[in] options 除标准参数外暂未使用
+
+@fn QString DBlockDevice::mount(const QVariantMap &options)
+    @brief 挂载设备
+    @param[in] options 挂载参数
+    @return 挂载成功返回挂载点否则返回空字符串
+    @note 参数包括：
+    @note > fstype(string) 文件系统类型
+    @note > options(string) 其他选项（通用 mount 挂载选项）
+    @see void DBlockDevice::unmount(const QVariantMap &options)
+    @see QByteArrayList DBlockDevice::mountPoints() const
+    @see void DBlockDevice::mountPointsChanged(const QByteArrayList &mountPoints)
+
+@fn void DBlockDevice::unmount(const QVariantMap &options)
+    @brief 卸载设备
+    @param[in] options 卸载参数
+    @note 参数包括：
+    @note > force(bool) 强制卸载
+    @see QString DBlockDevice::mount(const QVariantMap &options)
+
+@fn bool DBlockDevice::canSetLabel() const
+    @brief 获取磁盘能否设置卷标
+    @return 能否设置卷标
+    @see void DBlockDevice::setLabel(const QString &label, const QVariantMap &options)
+
+@fn void DBlockDevice::setLabel(const QString &label, const QVariantMap &options)
+    @brief 设置磁盘卷标
+    @param[in] label 新的磁盘卷标
+    @param[in] options 参数
+    @see bool DBlockDevice::canSetLabel() const
+    @see void DBlockDevice::idLabelChanged(QString idLabel)
+    @see QString DBlockDevice::idLabel() const
+
+@fn void DBlockDevice::changePassphrase(const QString &passphrase, const QString &newPassphrase, const QVariantMap &options)
+    @brief 修改磁盘密码
+    @param[in] passphrase 旧密码
+    @param[in] newPassphrase 新密码
+    @param[in] options 设置选项
+    @note 参数包括：
+    @note > old_keyfile_contents(string/stringlist)
+    @note > new_keyfile_contents(string/stringlist)
+    
+@fn void DBlockDevice::lock(const QVariantMap &options)
+    @brief 给加密设备上锁
+    @param[in] options 除标准参数外暂未使用
+    @see QString DBlockDevice::unlock(const QString &passphrase, const QVariantMap &options)
+
+@fn QString DBlockDevice::unlock(const QString &passphrase, const QVariantMap &options)
+    @brief 给加密设备解锁
+    @param[in] passphrase 解锁密码
+    @param[in] options 参数列表
+    @return 解锁成功后返回明文设备的对象路径否则返回空
+    @see void DBlockDevice::lock(const QVariantMap &options)
+    @note 参数列表：
+    @note > keyfile_contents(stringlist) 秘钥文件内容
+    @note > read-only(bool) 只读
+    @see QString DBlockDevice::cleartextDevice()
+
+@fn QString DBlockDevice::cleartextDevice()
+    @brief 获取加密设备对应的明文设备对象路径
+    @return 明文设备路径
+    @see QString DBlockDevice::unlock(const QString &passphrase, const QVariantMap &options)
+
+@fn void DBlockDevice::hasFileSystemChanged(bool hasFileSystem)
+    @brief 通知文件系统的有无发生变化
+    @param[out] hasFileSystem 新的文件系统存在状态
+
+@fn void DBlockDevice::hasPartitionChanged(bool hasPartition)
+    @brief 通知分区有无状态发生变化
+    @param[out] hasPartition 新的分区存在状态
+
+@fn void DBlockDevice::isEncryptedChanged(bool isEncrypted)
+    @brief 通知加密状态发生变化
+    @param[out] isEncrypted 新的加密状态
+
+@fn void DBlockDevice::configurationChanged(QList<QPair<QString, QVariantMap>> configuration)
+    @brief 通知配置列表发生变化
+    @param[out] configuration 新的配置列表
+
+@fn void DBlockDevice::cryptoBackingDeviceChanged(QString cryptoBackingDevice)
+    @brief 通知加密设备路径发生变化
+    @param[out] cryptoBackingDevice 新的加密设备路径
+
+@fn void DBlockDevice::hintAutoChanged(bool hintAuto)
+    @brief 通知自动开启属性变化
+    @param[out] hintAuto 新的自动开启属性值
+
+@fn void DBlockDevice::hintIconNameChanged(QString hintIconName)
+    @brief 通知磁盘建议图标名称变化 
+    @param[out] hintIconName 新的建议图标名称
+    
+@fn void DBlockDevice::hintIgnoreChanged(bool hintIgnore)
+    @brief 通知磁盘忽略属性变化
+    @param[out] hintIgnore 新的忽略属性
+
+@fn void DBlockDevice::hintNameChanged(QString hintName)
+    @brief 通知磁盘建议名称发生变化
+    @param[out] hintName 新的建议名称
+
+@fn void DBlockDevice::hintPartitionableChanged(bool hintPartitionable)
+    @brief 通知磁盘可分区属性发生变化
+    @param[out] hintPartitionable 新的可分区属性
+
+@fn void DBlockDevice::hintSymbolicIconNameChanged(QString hintSymbolicIconName)
+    @brief 通知磁盘建议符号图标名称发生变化
+    @param[out] hintSymbolicIconName 新的符号图标名称
+
+@fn void DBlockDevice::idLabelChanged(QString idLabel)
+    @brief 通知磁盘卷标发生变化
+    @param[out] idLabel 新的卷标名称
+
+@fn void DBlockDevice::idTypeChanged(QString idType)
+    @brief 通知磁盘 idType 发生变化
+    @param[out] idType 新的 idType 名称
+
+@fn void DBlockDevice::fsTypeChanged(QString fsType)
+    @brief 通知磁盘文件系统类型发生变化
+    @param[out] fsType 新的文件系统类型
+
+@fn void DBlockDevice::idUUIDChanged(QString idUUID)
+    @brief 通知磁盘 UUID 发生变化
+    @param[out] idUUID 新的 UUID
+
+@fn void DBlockDevice::idUsageChanged(QString idUsage)
+    @brief 通知磁盘 idUsage 发生变化
+    @param[out] idUsage 新的类型
+
+@fn void DBlockDevice::idVersionChanged(QString idVersion)
+    @brief 通知磁盘文件系统版本发生变化
+    @param[out] idVersion 新的文件系统版本
+
+@fn void DBlockDevice::mDRaidChanged(QString mDRaid)
+    @brief 通知磁盘阵列属性发生变化
+    @param[out] mDRaid 新的阵列属性
+
+@fn void DBlockDevice::mDRaidMemberChanged(QString mDRaidMember)
+    @brief 通知磁盘阵列成员发生变化
+    @param[out] mDRaidMember 新的阵列成员
+
+@fn void DBlockDevice::preferredDeviceChanged(QByteArray preferredDevice)
+    @brief 通知磁盘最佳设备描述符发生变化
+    @param[out] preferredDevice 新的最佳设备描述符
+    
+@fn void DBlockDevice::readOnlyChanged(bool readOnly)
+    @brief 通知磁盘只读属性发生变化
+    @param[out] readOnly 新的只读属性
+
+@fn void DBlockDevice::sizeChanged(quint64 size)
+    @brief 通知磁盘大小发生变化
+    @param[out] size 新的磁盘大小
+
+@fn void DBlockDevice::symlinksChanged(QByteArrayList symlinks)
+    @brief 通知磁盘设备链接发生变化
+    @param[out] symlinks 新的设备链接列表
+
+@fn void DBlockDevice::userspaceMountOptionsChanged(QStringList userspaceMountOptions)
+    @brief 通知磁盘用户态挂载选项发生变化
+    @param[out] userspaceMoutnOptions 新的用户态挂载参数列表
+
+@fn void DBlockDevice::ptTypeChanged()
+    @brief 通知磁盘分区类型发生变化
+
+@fn void DBlockDevice::mountPointsChanged(const QByteArrayList &mountPoints)
+    @brief 通知磁盘设备挂载点发生变化
+    @param[out] mountPoints 新的挂载点列表
+
+@fn void DBlockDevice::childConfigurationChanged(QList<QPair<QString, QVariantMap> > childConfiguration)
+    @brief 通知磁盘子配置列表发生变化
+    @param[out] childConfiguration 新的子配置列表
+    
+@fn void DBlockDevice::cleartextDeviceChanged(const QString &cleartextDevice)
+    @brief 通知磁盘明文设备内容发生变化
+    @param[out] cleartextDevice 新的明文设备路径
+
+*/

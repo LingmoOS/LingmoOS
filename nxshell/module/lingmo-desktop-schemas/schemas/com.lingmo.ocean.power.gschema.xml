@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<enum id="com.lingmo.ocean.power.PowerPressAction">
+		<value value="0" nick="shutdown" />
+		<value value="1" nick="suspend" />
+		<value value="2" nick="hibernate" />
+		<value value="3" nick="turnOffScreen" />
+		<value value="4" nick="showSessionUI" />
+		<value value="5" nick="doNothing" />
+	</enum>
+	<enum id="com.lingmo.ocean.power.LidCloseAction">
+		<value value="0" nick="shutdown" />
+		<value value="1" nick="suspend" />
+		<value value="2" nick="hibernate" />
+		<value value="3" nick="turnOffScreen" />
+		<value value="4" nick="showSessionUI" />
+		<value value="5" nick="doNothing" />
+	</enum>
+	<enum id="com.lingmo.ocean.power.LowPowerAction">
+		<value value="0" nick="suspend" />
+		<value value="1" nick="hibernate" />
+	</enum>
+	<schema path="/com/lingmo/ocean/power/" id="com.lingmo.ocean.power">
+		<key type="i" name="line-power-screensaver-delay">
+			<default>0</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+		<key type="i" name="battery-screensaver-delay">
+			<default>0</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+		<key type="i" name="battery-screen-black-delay">
+			<default>300</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+		<key type="i" name="battery-sleep-delay">
+			<default>900</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+		<key type="i" name="line-power-screen-black-delay">
+			<default>900</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+		<key type="i" name="line-power-sleep-delay">
+			<default>1800</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+		</key>
+
+        <key type="i" name="line-power-lock-delay">
+			<default>900</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+        </key>
+
+        <key type="i" name="battery-lock-delay">
+			<default>300</default>
+			<range min="0"/>
+			<summary/>
+			<description></description>
+        </key>
+
+		<key type="b" name="adjust-brightness-enabled">
+			<default>false</default>
+			<summary>adjust display brigtness enabled</summary>
+			<description/>
+		</key>
+		<key type="b" name="ambient-light-adjust-brightness">
+			<default>true</default>
+			<summary>auto adjust backlight brightness according to ambient light intensity</summary>
+		</key>
+		<key type="b" name="screen-black-lock">
+			<default>true</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="b" name="sleep-lock">
+			<default>true</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="b" name="lid-closed-sleep">
+			<default>true</default>
+			<summary>Sleep when close the lid if use line power</summary>
+			<description/>
+		</key>
+		<key type="b" name="battery-lid-closed-sleep">
+			<default>true</default>
+			<summary>Sleep when close the lid if use battery</summary>
+			<description/>
+		</key>
+		<key type="s" name="power-button-pressed-exec">
+			<default>'ocean-shutdown'</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="b" name="fullscreen-workaround-enabled">
+			<default>true</default>
+			<summary>for debug purposes</summary>
+			<description>for debug purposes, set this key to false to disable fullscreen-workaround.</description>
+		</key>
+		<key type="as" name="fullscreen-workaround-app-list">
+			<default>['libflash','chrome','firefox','mplayer','operaplugin','soffice','wpp','evince','vlc','totem']</default>
+			<summary>fullscreen workground app list</summary>
+			<description>app in list fullscreen inhbit screensaver</description>
+		</key>
+		<key type="b" name="use-percentage-for-policy">
+			<default>true</default>
+			<summary>Policy for warning and action based on battery levels</summary>
+			<description>Whether battery percentage based policy should be used. It should work around broken firmwares. It is also more reliable than the time left.</description>
+		</key>
+		<key type="b" name="power-module-initialized">
+			<default>false</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="i" name="low-power-notify-threshold">
+			<range min="0" max="100"/>
+			<default>20</default>
+			<summary/>
+			<description/>
+		</key>
+		<key enum="com.lingmo.ocean.power.LowPowerAction" name="low-power-action">
+			<default>'hibernate'</default>
+			<summary>system action when battery low</summary>
+		</key>
+		<key type="i" name="percentage-low">
+			<range min="0" max="100"/>
+			<default>20</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="i" name="percentage-danger">
+			<range min="0" max="100"/>
+			<default>15</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="i" name="percentage-critical">
+			<range min="0" max="100"/>
+			<default>10</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="i" name="percentage-action">
+			<range min="0" max="100"/>
+			<default>5</default>
+			<summary/>
+			<description/>
+		</key>
+		<key type="i" name="time-to-empty-low">
+			<range min="0"/>
+			<default>1200</default>
+			<summary>20 mins</summary>
+			<description/>
+		</key>
+		<key type="i" name="time-to-empty-danger">
+			<range min="0"/>
+			<default>900</default>
+			<summary>15 mins</summary>
+			<description/>
+		</key>
+		<key type="i" name="time-to-empty-critical">
+			<range min="0"/>
+			<default>600</default>
+			<summary>10 mins</summary>
+			<description/>
+		</key>
+		<key type="i" name="time-to-empty-action">
+			<range min="0"/>
+			<default>300</default>
+			<summary>5 mins</summary>
+			<description/>
+		</key>
+		<key enum="com.lingmo.ocean.power.LidCloseAction" name="line-power-lid-closed-action">
+			<default>'suspend'</default>
+			<summary>system action when laptop close lid with linePower</summary>
+		</key>
+		<key enum="com.lingmo.ocean.power.PowerPressAction" name="line-power-press-power-button">
+			<default>'showSessionUI'</default>
+			<summary>system action when pc press power button with linePower</summary>
+		</key>
+		<key enum="com.lingmo.ocean.power.LidCloseAction" name="battery-lid-closed-action">
+			<default>'suspend'</default>
+			<summary>system action when laptop close lid with battery</summary>
+		</key>
+		<key enum="com.lingmo.ocean.power.PowerPressAction" name="battery-press-power-button">
+			<default>'showSessionUI'</default>
+			<summary>system action when pc press power button with battery</summary>
+		</key>
+		<key type="b" name="low-power-notify-enable">
+			<default>true</default>
+			<summary>enable system notify when low power</summary>
+		</key>
+		<key type="i" name="brightness-drop-percent">
+			<default>20</default>
+			<summary>saving mode lower brightness</summary>
+		</key>
+		<key type="b" name="power-saving-mode-enabled">
+			<default>false</default>
+			<summary>power saving mode enabled</summary>
+		</key>
+		<key type="s" name="mode">
+			<default>'balance'</default>
+			<summary>power governor mode</summary>
+		</key>
+		<key type="s" name="save-brightness-while-psm">
+			<default>""</default>
+			<summary>brightness saved while power saving mode enabled</summary>
+		</key>
+		<key type="b" name="light-sensor-enabled">
+			<default>false</default>
+			<summary>light sensor enabled</summary>
+		</key>
+		<key type="d" name="low-power-percent-in-updating-notify">
+			<range min="0" max="100"/>
+			<default>50.0</default>
+			<summary>Low battery banner alerts when updated</summary>
+		</key>
+		<key type="b" name="high-performance-enabled">
+			<default>true</default>
+			<summary/>
+		</key>
+	</schema>
+</schemalist>

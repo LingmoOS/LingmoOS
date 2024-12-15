@@ -1,0 +1,90 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-daemon-git
+pkgver=6.0.0.r85.gf8733f93
+pkgrel=1
+pkgdesc='Daemon handling the OCEAN session settings'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-daemon"
+license=('GPL3')
+depends=('lingmo-desktop-schemas-git' 'ddcutil' 'lingmo-api-git' 'gvfs' 'iso-codes' 'lsb-release'
+         'mobile-broadband-provider-info' 'lingmo-polkit-agent-git'
+         'lingmo-polkit-agent-ext-gnomekeyring-git' 'udisks2' 'upower'
+         'libxkbfile' 'accountsservice' 'lingmo-desktop-base-git' 'bamf' 'pulseaudio'
+         'org.freedesktop.secrets' 'noto-fonts' 'imwheel' 'ddcutil')
+makedepends=('golang-github-lingmoos-go-dbus-factory-git' 'golang-lingmo-gir-git' 'golang-lingmo-lib-git'
+             'lingmo-api-git' 'golang-github-nfnt-resize' 'sqlite' 'lingmo-gettext-tools-git'
+             'git' 'mercurial' 'python-gobject' 'networkmanager' 'bluez' 'go' 'ddcutil')
+optdepends=('networkmanager: for network management support'
+            'bluez: for bluetooth support'
+            'iw: for miracast module'
+            'proxychains-ng: for proxy configuration module')
+conflicts=('lingmo-daemon')
+provides=('lingmo-daemon')
+groups=('lingmo-git')
+install="$pkgname.install"
+source=("source.tar.gz"
+        ocean-daemon.patch
+        remove-tc.patch
+        'lingmo-daemon.sysusers')
+sha512sums=('SKIP'
+            'SKIP'
+            'SKIP'
+            '808c02d4fec4cbbb01119bbb10499090199e738b7dd72c28a57ocean098eef6132723f3434c151f79e21d9f788c7f7bae8046573ac93ba917afe0e803fbffa6d5a')
+
+prepare() {
+ cd $lingmo_source_name
+  patch -p1 -i ../remove-tc.patch
+  patch -p1 -i ../ocean-daemon.patch
+  rm -rf system/uadp
+  rm -rf session/uadpagent
+  export GOPATH="$srcdir/build:/usr/share/gocode"
+  export GO111MODULE=off
+  # golang-lingmo-lib's dependency, remove when go packaging resumes
+  go get -v github.com/cryptix/wav
+  go get -v github.com/axgle/mahonia
+  go get -v github.com/msteinert/pam
+  go get -v github.com/gosexy/gettext
+  go get -v github.com/rickb777/date
+  go get -v github.com/jinzhu/gorm
+  go get -v github.com/kelvins/sunrisesunset
+  go get -v github.com/mozillazg/go-pinyin
+  go get -v github.com/teambition/rrule-go
+  go get -v golang.org/x/xerrors
+  go get -v github.com/mattn/go-sqlite3
+  go get -v github.com/fsnotify/fsnotify
+  go get -v github.com/godbus/dbus
+  go get -v github.com/godbus/dbus/introspect
+  go get -v github.com/godbus/dbus/prop
+  go get -v github.com/Lofanmi/pinyin-golang/pinyin
+  go get -v gopkg.in/yaml.v3
+  go get -v gopkg.in/yaml.v2
+  go get -v github.com/youpy/go-wav
+  env GOPATH="$srcdir/build" go get -v golang.org/x/sys/unix
+  go get -v github.com/mdlayher/netlink
+  go get -v github.com/golang/protobuf/proto
+  go get -v github.com/stretchr/testify
+  go get -v github.com/jouyouyun/hardware
+  sed -i 's#/usr/share/backgrounds/default_background.jpg#/usr/share/backgrounds/lingmo/desktop.jpg#' accounts/user.go
+}
+
+build() {
+  export CGO_CPPFLAGS="${CPPFLAGS}"
+  export CGO_CFLAGS="${CFLAGS}"
+  export CGO_CXXFLAGS="${CXXFLAGS}"
+  export CGO_LDFLAGS="${LDFLAGS}"
+  export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+  cd $lingmo_source_name
+#  make -C network/nm_generator gen-nm-code
+  make
+}
+
+package() {
+  cd $lingmo_source_name
+  make DESTDIR="$pkgdir" PAM_MODULE_DIR=usr/lib/security install
+
+  mv "$pkgdir"{,/usr}/lib/systemd
+  mv "$pkgdir"{,/usr}/lib/udev
+  rmdir "$pkgdir"/lib
+
+  install -Dm644 ../lingmo-daemon.sysusers "$pkgdir/usr/lib/sysusers.d/lingmo-daemon.conf"
+}

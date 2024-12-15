@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+include /usr/share/dpkg/default.mk
+
+export QT_SELECT = qt5
+
+DISTRO = $(shell lsb_release -is)
+ifeq ($(DISTRO),Lingmo)
+	ENABLE_LINGMO_NMQT=ON
+else
+	ENABLE_LINGMO_NMQT=OFF
+endif
+
+VERSION = $(DEB_VERSION_UPSTREAM)
+PACK_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$1}')
+%:
+	dh $@ --parallel
+override_dh_auto_configure:
+	dh_auto_configure -- -DVERSION=$(PACK_VER) -DENABLE_LINGMO_NMQT=${ENABLE_LINGMO_NMQT}

@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+export QT_SELECT=5
+include /usr/share/dpkg/default.mk
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+VERSION = $(DEB_VERSION_UPSTREAM)
+PACK_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$1}')
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	  -DCMAKE_BUILD_TYPE=Release \
+	  -DCMAKE_INSTALL_PREFIX=/usr \
+	  -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_OFF" \
+	  -DVERSION=$(PACK_VER)

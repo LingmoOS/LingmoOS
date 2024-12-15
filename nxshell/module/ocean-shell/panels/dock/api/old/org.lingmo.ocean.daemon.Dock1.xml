@@ -1,0 +1,50 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.lingmo.ocean.daemon.Dock1">
+        <method name="RequestDock">
+            <arg name="desktopFile" type="s" direction="in"/>
+            <arg name="index" type="i" direction="in"/>
+            <arg name="docked" type="b" direction="out"/>
+        </method>
+        <method name="IsDocked">
+            <arg name="desktopFile" type="s" direction="in"/>
+            <arg name="docked" type="b" direction="out"/>
+        </method>
+        <method name="RequestUndock">
+            <arg name="desktopFile" type="s" direction="in"/>
+            <arg name="docked" type="b" direction="out"/>
+        </method>
+        <property access="readwrite" type="u" name="WindowSizeEfficient"/>
+        <property access="readwrite" type="u" name="WindowSizeFashion"/>
+        <!-- <property access="readwrite" type="u" name="ShowTimeout"/>
+        <property access="readwrite" type="u" name="HideTimeout"/>
+        <property access="readwrite" type="u" name="IconSize"/> -->
+        <property access="readwrite" type="i" name="DisplayMode"/>
+        <property access="readwrite" type="i" name="HideMode"/>
+        <property access="readwrite" type="i" name="Position"/>
+        <property access="read" type="i" name="HideState"/>
+        <property access="read" type="(iiii)" name="FrontendWindowRect">
+            <annotation name="org.qtproject.QtDBus.QtTypeName" value="QRect"/>
+        </property>
+        <signal name="FrontendWindowRectChanged">
+            <arg name="FrontendWindowRect" type="(iiii)" direction="out"/>
+            <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QRect"/>
+        </signal>
+        <signal name="PositionChanged">
+            <arg name="Position" type="i" direction="out"/>
+        </signal>
+        <signal name="WindowSizeEfficientChanged">
+            <arg name="size" type="u" direction="out"/>
+        </signal>
+        <signal name="WindowSizeFashionChanged">
+            <arg name="size" type="u" direction="out"/>
+        </signal>
+        <signal name="DisplayModeChanged">
+            <arg name="displaymode" type="i" direction="out"/>
+        </signal>
+        <signal name="HideModeChanged">
+            <arg name="hideMode" type="i" direction="out"/>
+        </signal>
+    </interface>
+</node>

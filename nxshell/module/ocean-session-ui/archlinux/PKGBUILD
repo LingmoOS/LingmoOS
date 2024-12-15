@@ -1,0 +1,36 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-session-ui-git
+pkgver=5.5.6.r19.g9cf5bae1
+pkgrel=1
+sourcename=ocean-session-ui
+sourcetar="$sourcename"_"$pkgver".tar.xz
+pkgdesc='Lingmo desktop-environment - Session UI module'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-session-ui"
+license=('GPL3')
+groups=('lingmo')
+depends=('gsettings-qt' 'startocean-git' 'liblightdm-qt5' 'qt5-svg' 'lingmo-daemon-git' 'lingmo-dock-git' 'lingmo-wallpapers-git' 'lingmo-pw-check-git')
+makedepends=('git' 'lingmo-gettext-tools-git' 'cmake' 'ninja' 'qt5-tools' 'lingmo-dock-git' 'gtest' 'gcovr'
+             'dtkcommon-git' 'dtkcore-git')
+provides=('lingmo-notifications' 'lingmo-session-ui')
+conflicts=('ocean-workspace' 'lingmo-session-ui' 'lingmo-notifications')
+groups=('lingmo-git')
+source=($sourcetar)
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcename
+
+  sed -i 's|/usr/share/backgrounds/default_background.jpg|/usr/share/backgrounds/lingmo/desktop.jpg|' widgets/*.cpp
+}
+
+build() {
+  cd $sourcename
+  cmake -B build -GNinja -DCMAKE_INSTALL_PREFIX=$pkgdir/usr
+  cmake --build build
+}
+
+package() {
+  cd $sourcename
+  cmake --install build
+}

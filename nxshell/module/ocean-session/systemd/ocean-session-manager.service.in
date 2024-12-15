@@ -1,0 +1,22 @@
+[Unit]
+Description=ocean-session-manager service
+RefuseManualStart=yes
+RefuseManualStop=yes
+OnFailure=ocean-session-shutdown.target
+OnFailureJobMode=replace-irreversibly
+CollectMode=inactive-or-failed
+
+Requisite=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+Requires=ocean-session-manager.target
+PartOf=ocean-session-manager.target
+Before=ocean-session-manager.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/ocean-session --systemd-service
+ExecStopPost=@CMAKE_INSTALL_FULL_LIBEXECDIR@/ocean-session-ctl --shutdown
+ExecStopPost=-/bin/sh -c 'test "$SERVICE_RESULT" != "exec-condition" && systemctl --user unset-environment XDG_CURRENT_DESKTOP'
+Slice=session.slice

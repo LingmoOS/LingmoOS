@@ -1,0 +1,148 @@
+/*! \mainpage Optimising application startup
+
+\section introduction Introduction
+
+The \c invoker program and the \c applauncherd daemon help
+applications launch faster and save memory through shared resources and
+application type specific initialisations. The \c invoker uses a
+socket connection to request application launch, and applications are
+forked from the daemon process so that they can share memory with the
+daemon (and each other) using copy-on-write.  The invoker also provides
+a single instance facility that allows only one instance of an
+application to be running at a time.
+
+The following table shows what services are available for different kinds
+of applications.
+
+<table>
+<tr><th></th>		<th>boosting</th>	<th>single instance</th></tr>
+<tr><td>QML</td>	<td>x</td>		<td>x</td></tr>
+<tr><td>Qt</td>		<td>x(1)</td>		<td>x</td></tr>
+<tr><td>other</td>	<td>-</td>		<td>x</td></tr>
+</table>
+
+(1) Only library preloading.
+
+All functionality of the launcher daemon is accessed using the \c
+invoker program. The daemon is usually started automatically as part
+of the UI session (for example, \c upstart in MeeGo 1.2 Harmattan).
+
+The \c applauncherd daemon process links in a set of libraries so that
+the launched applications do not need to do linking and symbol
+resolution for the libraries at startup. In addition, startup latency
+is reduced by doing some initialisations before application launch.
+
+When \c applauncherd is started, it forks off a number of \a booster
+processes, one for each application type supported by the
+launcher. The boosters first do some application type specific but
+application independent initialisation if applicable. For example, the
+QML booster instantiates a \c QApplication and a \c QDeclarativeView,
+and stores the instances in MDeclarativeCache. Each booster then
+starts listening on its dedicated socket.
+
+Applications are launched by using the \c invoker program. The invoker
+sends the path of the application binary to the desired booster
+process, along with data on its running environment (for example, command line
+arguments and environment variables). The booster process loads the
+binary, initialises its environment, and finally calls the \c main()
+function in the binary. If the booster process had instantiated some
+objects, they can be picked up from the cache instead of constructing
+them at startup. For example, a QML application runner written in C++
+can pick up the \c QApplication and \c QDeclarativeView instances from
+MDeclarativeCache.
+
+\section gettingstarted Getting started
+
+This section gives a quick introduction on \c invoker usage and
+boosting applications. 
+
+Note: The QML booster and single instance
+support are currently included in the Qt Quick application template
+provided by the Qt SDK. To enable these features in your application,
+select Make application boostable checkbox when creating a new project
+with the template.
+
+\subsection boostingqtquick Boosting Qt Quick applications
+
+In order to boost Qt Quick applications with \c invoker, some changes
+in the application and the way it is built are needed. The process is
+similar for plain Qt applications, for details see appropriate documentation
+below. The \c applauncherd-dev package needs to be installed to get the necessary
+headers and libraries.
+
+In the following example a QML application uses a simple C++ based runner. The
+first step is to modify the application so that it picks up instances
+of \c QApplication and \c QDeclarativeView from MDeclarativeCache. To
+do this, the include directive for MDeclarativeCache is needed, and
+the lines where the classes are instantiated need to be modified:
+
+\code
+    #include <MDeclarativeCache>
+\endcode
+
+\code
+     QApplication *app = MDeclarativeCache::qApplication(argc, argv);
+     QDeclarativeView *window = MDeclarativeCache::qDeclarativeView();
+\endcode
+
+All the boosters except the exec booster need the application binary
+to be compiled as Position Independent Executable (PIE). This is
+achieved by using \c -fPIC when compiling and \c -rdynamic \c -pie
+when linking. A minimal QML helloworld could be compiled as linked as
+follows.
+
+\code
+c++ -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/include/qt4 -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtCore -fPIC -I/usr/include/applauncherd -o main.o -c main.cpp
+c++ main.o  -o qml-helloworld -rdynamic -pie -lmdeclarativecache -lQtCore -lQtDeclarative 
+\endcode
+
+The resulting binary can now be launched using the invoker as follows.
+The \c --type=d command parameter specifies that this is a QML application.
+
+\code
+invoker --type=d ./qml-helloworld
+\endcode
+
+Normally the compiler and linker flags are provided automatically
+either by using \ref usingpkgconfig "pkg-config" directly, or using it
+via \ref usingcmake "CMake" or \ref usingqmake "qmake".
+
+It is also a good idea to hide any unnecessary symbols in the
+application binary to speed up opening it in the booster. For instructions,
+see \ref qmlboost "Using the QML booster"
+
+\subsection gettingstartedebooster Single instance
+
+The \c invoker can be used to implement single instance behaviour.
+If the \a exec \a booster is used, no modifications to the application
+are needed. For more details, see \ref eboost "Using the exec booster".
+Note that the \a exec booster facilitates single instance launching.
+If you need to reduce application startup time significantly, use
+other boosters instead.
+
+\code 
+invoker --type=e /usr/bin/myApp
+\endcode
+
+This causes \c invoker to look for a running instance of the application using a 
+simple lock file based mechanism. If an already running instance is found, 
+it is brought to the foreground instead of launching a new instance of the 
+application. See \ref singleinstance 
+"Enabling single instance support for an application" for more information.
+
+\section reference Further information
+
+- How to enable boosted startup for different types of applications: 
+  - \subpage qmlboost "Using the QML booster"
+  - \subpage qtboost "Using the Qt booster"
+  - \subpage eboost "Using the exec booster"
+
+- \subpage singleinstance "Enabling single instance support for an application"
+
+\section tipsntricks Tips and tricks
+
+See \subpage tipsandtricks.
+
+*/
+
+

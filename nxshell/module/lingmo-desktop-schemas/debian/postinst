@@ -1,0 +1,58 @@
+#!/bin/sh
+# postinst script for lingmo-desktop-schemas
+
+set -e
+data_dir=/usr/share/lingmo-desktop-schemas
+gschemas_dir=/usr/share/glib-2.0/schemas
+app_store_dir=/usr/share/lingmo-app-store
+app_store_ini_file=$app_store_dir/settings.ini
+app_store_ini_file_pro=$app_store_dir/settings-pro.ini
+app_store_ini_file_community=$app_store_dir/settings-community.ini
+app_store_ini_file_personal=$app_store_dir/settings-personal.ini
+
+case "$1" in
+    configure)
+        SYSTYPE=$(grep Type= /etc/lingmo-version|cut -d= -f 2)
+        product_override_file=$gschemas_dir/91_lingmo_product.gschema.override
+        if [ -e $app_store_ini_file -a -L $app_store_ini_file ]; then
+            # delete it if it is symbol link
+            rm $app_store_ini_file 
+        fi
+        case "$SYSTYPE" in
+            Professional)
+                ln -sf $data_dir/pro-override $product_override_file
+                if [ ! -f $app_store_ini_file ]; then
+                    ln -sf $app_store_ini_file_pro $app_store_ini_file
+                fi
+            ;;
+
+            Server)
+                ln -sf $data_dir/server-override $product_override_file
+                if [ ! -f $app_store_ini_file ]; then
+                    ln -sf $app_store_ini_file_pro $app_store_ini_file
+                fi
+            ;;
+
+            Desktop)
+                ln -sf $data_dir/desktop-override $product_override_file
+                if [ ! -f $app_store_ini_file ]; then
+                    ln -sf $app_store_ini_file_community $app_store_ini_file
+                fi
+            ;;
+
+           Personal)
+                ln -sf $data_dir/personal-override $product_override_file
+                if [ ! -f $app_store_ini_file ]; then
+                    ln -sf $app_store_ini_file_personal $app_store_ini_file
+                fi
+            ;;
+        esac
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac

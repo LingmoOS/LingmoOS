@@ -1,0 +1,550 @@
+diff --git a/com.lingmo.ScreenRecorder.service b/com.lingmo.ScreenRecorder.service
+index 55fadab..bf8775e 100644
+--- a/com.lingmo.ScreenRecorder.service
++++ b/com.lingmo.ScreenRecorder.service
+@@ -1,3 +1,4 @@
+ [D-BUS Service]
+ Name=com.lingmo.ScreenRecorder
+-Exec=/usr/bin/dbus-send --session --type=method_call --print-reply --dest=com.lingmo.SessionManager /com/lingmo/StartManager com.lingmo.StartManager.LaunchApp string:"/usr/share/applications/lingmo-screen-recorder.desktop" uint32:0 array:string:"--screenRecord"
++# Exec=/usr/bin/dbus-send --session --type=method_call --print-reply --dest=com.lingmo.SessionManager /com/lingmo/StartManager com.lingmo.StartManager.LaunchApp string:"/usr/share/applications/lingmo-screen-recorder.desktop" uint32:0 array:string:"--screenRecord"
++Exec=/usr/bin/ll-cli run org.lingmo.screen-recorder --exec 'lingmo-screen-recorder --screenRecord'
+\ No newline at end of file
+diff --git a/com.lingmo.Screenshot.service b/com.lingmo.Screenshot.service
+index 3a64d0c..88b2511 100644
+--- a/com.lingmo.Screenshot.service
++++ b/com.lingmo.Screenshot.service
+@@ -1,3 +1,4 @@
+ [D-BUS Service]
+ Name=com.lingmo.Screenshot
+-Exec=/usr/bin/dbus-send --session --type=method_call --print-reply --dest=com.lingmo.SessionManager /com/lingmo/StartManager com.lingmo.StartManager.LaunchApp string:"/usr/share/applications/lingmo-screen-recorder.desktop" uint32:0 array:string:"--dbus"
++# Exec=/usr/bin/dbus-send --session --type=method_call --print-reply --dest=com.lingmo.SessionManager /com/lingmo/StartManager com.lingmo.StartManager.LaunchApp string:"/usr/share/applications/lingmo-screen-recorder.desktop" uint32:0 array:string:"--dbus"
++Exec=/usr/bin/ll-cli run org.lingmo.screen-recorder --exec 'lingmo-screen-recorder --dbus'
+\ No newline at end of file
+diff --git a/screen_shot_recorder.pro b/screen_shot_recorder.pro
+index c99ad0a..3ee120b 100644
+--- a/screen_shot_recorder.pro
++++ b/screen_shot_recorder.pro
+@@ -6,7 +6,7 @@ SUBDIRS  += \
+     src/pin_screenshots
+ 
+ 
+-translations.path = /usr/share/lingmo-screen-recorder/translations
++translations.path = $$PREFIX/share/lingmo-screen-recorder/translations
+ 
+ isEmpty(TRANSLATIONS) {
+      include(./translations.pri)
+diff --git a/src/ocean-dock-plugins/ocean-dock-plugins.pro b/src/ocean-dock-plugins/ocean-dock-plugins.pro
+index e2d3c1b..3ca268c 100644
+--- a/src/ocean-dock-plugins/ocean-dock-plugins.pro
++++ b/src/ocean-dock-plugins/ocean-dock-plugins.pro
+@@ -1,4 +1,6 @@
+ TEMPLATE = subdirs
+ 
++INCLUDEPATH += /runtime/include
++
+ SUBDIRS += recordtime \
+             shotstart
+diff --git a/src/ocean-dock-plugins/recordtime/recordtime.pro b/src/ocean-dock-plugins/recordtime/recordtime.pro
+index 84ad2ac..0265643 100644
+--- a/src/ocean-dock-plugins/recordtime/recordtime.pro
++++ b/src/ocean-dock-plugins/recordtime/recordtime.pro
+@@ -9,6 +9,8 @@ PKGCONFIG += dframeworkdbus
+ TARGET          = $$qtLibraryTarget(lingmo-screen-recorder-plugin)
+ DISTFILES       += recordtime.json
+ 
++INCLUDEPATH += /runtime/include
++
+ HEADERS += \
+     recordtimeplugin.h \
+     timewidget.h \
+@@ -19,7 +21,7 @@ SOURCES += \
+     timewidget.cpp \
+     dbusservice.cpp
+ 
+-target.path = /usr/lib/ocean-dock/plugins/
++target.path = $$PREFIX/lib/ocean-dock/plugins/
+ 
+ INSTALLS += target
+ 
+diff --git a/src/ocean-dock-plugins/shotstart/shotstart.pro b/src/ocean-dock-plugins/shotstart/shotstart.pro
+index 7ad0cef..cb3c1c9 100644
+--- a/src/ocean-dock-plugins/shotstart/shotstart.pro
++++ b/src/ocean-dock-plugins/shotstart/shotstart.pro
+@@ -4,7 +4,7 @@ CONFIG          += c++11 plugin link_pkgconfig
+ QT              += dtkgui
+ QT              += dtkwidget
+ PKGCONFIG += dframeworkdbus
+-
++INCLUDEPATH += /runtime/include
+ TARGET          = $$qtLibraryTarget(shot-start-plugin)
+ DISTFILES       += shotstart.json
+ 
+@@ -19,9 +19,9 @@ SOURCES += \
+     tipswidget.cpp
+ 
+ 
+-target.path = /usr/lib/ocean-dock/plugins/
++target.path = $$PREFIX/lib/ocean-dock/plugins/
+ file.files += $$PWD/com.lingmo.ocean.dock.module.shot-start-plugin.gschema.xml
+-file.path += /usr/share/glib-2.0/schemas/
++file.path += $$PREFIX/share/glib-2.0/schemas/
+ 
+ INSTALLS += target file
+ RESOURCES += res.qrc
+diff --git a/src/gstrecord/gstinterface.cpp b/src/gstrecord/gstinterface.cpp
+index 165a7ce..c1ee2c3 100644
+--- a/src/gstrecord/gstinterface.cpp
++++ b/src/gstrecord/gstinterface.cpp
+@@ -8,7 +8,7 @@
+ #include <QDebug>
+ #include <QLibraryInfo>
+ #include <QDir>
+-
++#include <QProcess>
+ gstInterface::p_gst_message_parse_error gstInterface::m_gst_message_parse_error = nullptr;
+ gstInterface::p_g_free gstInterface::m_g_free = nullptr;
+ gstInterface::p_g_error_copy gstInterface::m_g_error_copy = nullptr;
+@@ -51,20 +51,32 @@ QString gstInterface::libPath(const QString &sLib)
+ {
+     qInfo() << "gstreamer lib name is " << sLib;
+     QDir dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+-    if (list.isEmpty()) {
+-        qWarning() << "list is empty!";
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str;
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
+     }
+-    if (list.contains(sLib)) {
+-        return sLib;
+-    } else {
+-        list.sort();
++    if (t_str.isEmpty()) {
++        return QString();
+     }
+-
+-    //Q_ASSERT(list.size() > 0);
+-    return list.last();
++    qDebug() << "lib:" << sLib << ",LD_LIBRARY_PATH:" << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        qDebug() <<  "where is libs? that is " << dir ;
++        QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
++        if (!list.isEmpty()) {
++            t_libPath = path + "/" + list.first();
++            break;
++        }
++    }
++    qDebug() << "lib path is " << t_libPath;
++    return t_libPath;
+ }
+ void gstInterface::initFunctions()
+ {
+diff --git a/src/main.cpp b/src/main.cpp
+index 6f6da7a..ab2b272 100755
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -40,22 +40,35 @@ static bool CheckFFmpegEnv()
+ {
+     bool flag = false;
+     QDir dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    qDebug() <<  "where is libs? where is " << dir ;
+-    QStringList list = dir.entryList(QStringList() << (QString("libavcodec") + "*"), QDir::NoDotAndDotDot | QDir::Files);
+-    qDebug()  << "Is libavcodec in there?  there is :" << list ;
+-
+-    if (list.contains("libavcodec.so.58")) {
+-        qInfo()  << "list contains libavcodec.so.58" ;
+-        flag = true;
+-    }
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str, strlib = "libavcodec.so.58";
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
++     }
+ 
+-    //x11下需要检测ffmpeg应用是否存在
+-    if (!isWaylandProtocol()) {
+-        flag = !QStandardPaths::findExecutable("ffmpeg").isEmpty();
+-        qInfo() << "Is exists ffmpeg in PATH(" << qgetenv("PATH") << "):" << flag;
++    if (t_str.isEmpty()) {
++        return flag;
+     }
++    qDebug() << "lib:" << strlib << ",LD_LIBRARY_PATH:" << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        qDebug() <<  "where is libs? " << dir ;
++        QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
++        if (!list.isEmpty()) {
++            if (list.contains("libavcodec.so.58")) {
++                qInfo()  << "list contains libavcodec.so.58" ;
++                flag = true;
++            }
++            break;
++         }
++     }
++
+     return flag;
+ }
+ 
+diff --git a/src/main_window.cpp b/src/main_window.cpp
+old mode 100755
+new mode 100644
+index 2a28d36..137539d
+--- a/src/main_window.cpp
++++ b/src/main_window.cpp
+@@ -52,6 +52,11 @@ extern "C" {
+ #include <fcntl.h>
+ #include <unistd.h>
+ #define EPSILON 1e-10
++
++#ifndef LINGLONG_PREFIX
++#define LINGLONG_PREFIX "/usr/"
++#endif
++
+ //const int MainWindow::CURSOR_BOUND = 5;
+ const int MainWindow::RECORD_MIN_SIZE = 580;
+ const int MainWindow::RECORD_MIN_HEIGHT = 280;
+@@ -561,23 +566,34 @@ void MainWindow::initDynamicLibPath()
+ }
+ QString MainWindow::libPath(const QString &strlib)
+ {
++    qInfo() << "lib name is " << strlib;
+     QDir  dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    qDebug() <<  " where is libs? where is " << dir ;
+-    QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+-
+-    qDebug() <<  strlib << " Is it in there?  there is " << list ;
+-
+-    if (list.isEmpty()) {
+-        qWarning() << dir <<  "has not any lib with " << (strlib + "*") << ",so the list is empty!";
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str;
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
+     }
+-    if (list.contains(strlib))
+-        return strlib;
+-
+-    list.sort();
+-    Q_ASSERT(list.size() > 0);
+-    return list.last();
++    if (t_str.isEmpty()) {
++        return QString();
++    }
++    qDebug() << "lib:" << strlib << ",LD_LIBRARY_PATH:" << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        qDebug() <<  "where is libs? that is " << dir ;
++        QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
++        if (!list.isEmpty()) {
++            t_libPath = path + "/" + list.first();
++            break;
++        }
++    }
++    qDebug() << "lib path is " << t_libPath;
++    return t_libPath;
+ }
+ void MainWindow::sendSavingNotify()
+ {
+@@ -2689,9 +2705,7 @@ void MainWindow::sendNotify(SaveAction saveAction, QString saveFilePath, const b
+         QString command, savepathcommand;
+ 
+         tips = QString(tr("Saved to %1")).arg(saveFilePath);
+-        if (!QStandardPaths::findExecutable("ocean-file-manager").isEmpty()) {
+-            savepathcommand = QString("ocean-file-manager,--show-item,%1").arg(saveFilePath);
+-        }
++        savepathcommand = QString("ocean-file-manager,--show-item,%1").arg(saveFilePath);
+         command = QString("xdg-open,%1").arg(saveFilePath);
+         qDebug() << "command:" << command;
+ 
+diff --git a/src/pin_screenshots/com.lingmo.PinScreenShots.service b/src/pin_screenshots/com.lingmo.PinScreenShots.service
+index c9e7068..88e0f94 100644
+--- a/src/pin_screenshots/com.lingmo.PinScreenShots.service
++++ b/src/pin_screenshots/com.lingmo.PinScreenShots.service
+@@ -1,3 +1,4 @@
+ [D-BUS Service]
+ Name=com.lingmo.PinScreenShots
+-Exec=/usr/bin/lingmo-pin-screenshots --dbus
++# Exec=/usr/bin/lingmo-pin-screenshots --dbus
++Exec=/usr/bin/ll-cli run org.lingmo.screen-recorder --exec 'lingmo-pin-screenshots --dbus'
+\ No newline at end of file
+diff --git a/src/pin_screenshots/mainwindow.cpp b/src/pin_screenshots/mainwindow.cpp
+index 86e153d..16d4ae3 100755
+--- a/src/pin_screenshots/mainwindow.cpp
++++ b/src/pin_screenshots/mainwindow.cpp
+@@ -16,6 +16,10 @@
+ #define MOVENUM 1
+ 
+ #define WHEELNUM 10
++
++#ifndef LINGLONG_PREFIX
++#define LINGLONG_PREFIX "/usr/"
++#endif
+ namespace {
+ const int TOOLBAR_Y_SPACING = 12;
+ }
+@@ -632,7 +636,7 @@ void MainWindow::sendNotify(QString savePath, bool bSaveState)
+     // 如果保存路径为剪切板，不做打开view操作
+     if (!savePath.isEmpty()) {
+         actions << "_open" << tr("View");
+-        if (!QStandardPaths::findExecutable("ocean-file-manager").isEmpty()) {
++        if (QFile("${LINGLONG_PREFIX}/bin/ocean-file-manager").exists()) {
+             qDebug() << QFileInfo(savePath).path();
+             hints["x-lingmo-action-_open"] = QString("ocean-file-manager,--show-item,%1").arg(savePath);
+         } else {
+diff --git a/src/pin_screenshots/pin_screenshots.pro b/src/pin_screenshots/pin_screenshots.pro
+index 58d2046..04460ca 100755
+--- a/src/pin_screenshots/pin_screenshots.pro
++++ b/src/pin_screenshots/pin_screenshots.pro
+@@ -46,11 +46,11 @@ HEADERS += \
+ QMAKE_CXXFLAGS += -g
+ QMAKE_CXXFLAGS += -Wno-error=deprecated-declarations -Wno-deprecated-declarations
+ ##安装路径
+-target.path=/usr/bin
+-isEmpty(DSRDIR):DSRDIR=/usr/share/lingmo-pin-screenshots
++target.path=$$PREFIX/bin
++isEmpty(DSRDIR):DSRDIR=$$PREFIX/share/lingmo-pin-screenshots
+ 
+ #Dbus文件
+-dbus_service.path=/usr/share/dbus-1/services
++dbus_service.path=$$PREFIX/share/dbus-1/services
+ dbus_service.files=./com.lingmo.PinScreenShots.service
+ include(accessibility/accessible.pri)
+ #安装
+diff --git a/src/recordertablet.cpp b/src/recordertablet.cpp
+index 8024cc9..28f75f9 100644
+--- a/src/recordertablet.cpp
++++ b/src/recordertablet.cpp
+@@ -13,7 +13,11 @@
+ #include <QDir>
+ #include <QFile>
+ 
+-const QString RecorderTablet::RESOURCES_PATH = "/usr/share/lingmo-screen-recorder/tablet_resources";
++#ifndef LINGLONG_PREFIX
++#define LINGLONG_PREFIX "/usr/"
++#endif 
++
++const QString RecorderTablet::RESOURCES_PATH = "/${LINGLONG_PREFIX}/share/lingmo-screen-recorder/tablet_resources";
+ 
+ RecorderTablet::RecorderTablet(QObject *parent) : QObject(parent)
+ {
+diff --git a/src/src.pro b/src/src.pro
+index f2a6b31..b0db2d7 100644
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -29,25 +29,21 @@ if (!equals(SYS_EDITION, "")) {
+ } else {
+     message("not Community")
+ 
+-    #1030 支持startocean加速
+-    greaterThan(SYS_VERSION, 1029) {
+-        DEFINES += OCEAN_START_FLAGE_ON
+-        message("startocean support: OK!!!")
+-    }
++    DEFINES += OCEAN_START_FLAGE_ON
++    message("startocean support: OK!!!")
+ 
+-    #1040 兼容支持ocr和滚动截图
+-    greaterThan(SYS_VERSION, 1039) {
+-        DEFINES += OCR_SCROLL_FLAGE_ON
+-        message("ocr and scroll support: OK!!!")
+-    }
++    DEFINES += OCR_SCROLL_FLAGE_ON
++    message("ocr and scroll support: OK!!!")
+ 
+-    #1050支持Wayland
+-    greaterThan(SYS_VERSION, 1049) {
+-        DEFINES += KF5_WAYLAND_FLAGE_ON
+-        message("wayland support: OK!!!")
+-    }
++    DEFINES += KF5_WAYLAND_FLAGE_ON
++    message("wayland support: OK!!!")
+ }
+ 
++SYS_VERSION = 1051
++LINGLONG_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"
++DEFINES +=LINGLONG_PREFIX
++
++message("LINGLONG_PREFIX: =" $$LINGLONG_PREFIX)
+ 
+ 
+ QT += dtkgui dtkwidget svg
+@@ -58,7 +54,11 @@ contains( DEFINES, KF5_WAYLAND_FLAGE_ON ) {
+ TEMPLATE = app
+ TARGET = lingmo-screen-recorder
+ INCLUDEPATH += .
+-INCLUDEPATH += /usr/include/opencv_mobile
++#INCLUDEPATH += ${CMAKE_INSTALL_PREFIX}/include/opencv_mobile
++INCLUDEPATH += /runtime/include/opencv2
++INCLUDEPATH += /runtime/include
++INCLUDEPATH += /runtime/include/KF5
++INCLUDEPATH += /runtime/include/ocean-dock
+ INCLUDEPATH += ../3rdparty/libcam/libcam/ \
+                ../3rdparty/libcam/libcam_v4l2core/ \
+                ../3rdparty/libcam/libcam_render/ \
+@@ -240,16 +240,16 @@ QMAKE_CXXFLAGS += -g
+ QMAKE_CXXFLAGS += -Wno-error=deprecated-declarations -Wno-deprecated-declarations
+ 
+ isEmpty(PREFIX){
+-    PREFIX = /usr
++    PREFIX = ${CMAKE_INSTALL_PREFIX}  #/usr
+ }
+ 
+-isEmpty(BINDIR):BINDIR=/usr/bin
+-isEmpty(ICONDIR):ICONDIR=/usr/share/icons/hicolor/scalable/apps
+-isEmpty(APPDIR):APPDIR=/usr/share/applications
+-isEmpty(DSRDIR):DSRDIR=/usr/share/lingmo-screen-recorder
+-isEmpty(DOCDIR):DOCDIR=/usr/share/dman/lingmo-screen-recorder
+-isEmpty(ETCDIR):ETCDIR=/etc
+-isEmpty(TABCONDIR):TABCONDIR=/etc/due-shell/json
++isEmpty(BINDIR):BINDIR=$$PREFIX/bin
++isEmpty(ICONDIR):ICONDIR=$$PREFIX/share/icons/hicolor/scalable/apps
++isEmpty(APPDIR):APPDIR=$$PREFIX/share/applications
++isEmpty(DSRDIR):DSRDIR=$$PREFIX/share/lingmo-screen-recorder
++isEmpty(DOCDIR):DOCDIR=$$PREFIX/share/dman/lingmo-screen-recorder
++isEmpty(ETCDIR):ETCDIR=$$PREFIX/etc
++isEmpty(TABCONDIR):TABCONDIR=$$PREFIX/etc/due-shell/json
+ 
+ target.path = $$INSTROOT$$BINDIR
+ icon.path = $$INSTROOT$$ICONDIR
+@@ -260,14 +260,12 @@ icon.files = ../assets/image/lingmo-screen-recorder.svg ../assets/image/lingmo-s
+ desktop.files = ../lingmo-screen-recorder.desktop
+ 
+ 
+-dbus_service.files = $$PWD/../assets/com.lingmo.ScreenRecorder.service $$PWD/../assets/com.lingmo.Screenshot.service
+-contains(DEFINES, OCEAN_START_FLAGE_ON ) {
+-    dbus_service.files = $$PWD/../com.lingmo.ScreenRecorder.service $$PWD/../com.lingmo.Screenshot.service
+-}
++dbus_service.files = $$PWD/../com.lingmo.ScreenRecorder.service $$PWD/../com.lingmo.Screenshot.service
++
+ dbus_service.path = $$PREFIX/share/dbus-1/services
+ 
+ manual_dir.files = $$PWD/../assets/lingmo-screen-recorder
+-manual_dir.path= /usr/share/lingmo-manual/manual-assets/application/
++manual_dir.path= $$PREFIX/share/lingmo-manual/manual-assets/application/
+ 
+ INSTALLS += target icon desktop dbus_service manual_dir
+ 
+diff --git a/src/utils/waylandmousesimulator.cpp b/src/utils/waylandmousesimulator.cpp
+index a7d8b27..2a1073a 100644
+--- a/src/utils/waylandmousesimulator.cpp
++++ b/src/utils/waylandmousesimulator.cpp
+@@ -3,6 +3,8 @@
+ //
+ // SPDX-License-Identifier: GPL-3.0-or-later
+ 
++#ifdef KF5_WAYLAND_FLAGE_ON
++
+ #include "waylandmousesimulator.h"
+ 
+ #define SCROLL_DOWN 15.0
+@@ -135,4 +137,4 @@ void WaylandMouseSimulator::releaseWaylandScrollThread()
+         m_connection = nullptr;
+     }
+ }
+-
++#endif
+diff --git a/src/utils/waylandmousesimulator.h b/src/utils/waylandmousesimulator.h
+index 6e8d471..9b98aae 100644
+--- a/src/utils/waylandmousesimulator.h
++++ b/src/utils/waylandmousesimulator.h
+@@ -3,6 +3,8 @@
+ //
+ // SPDX-License-Identifier: GPL-3.0-or-later
+ 
++#ifdef KF5_WAYLAND_FLAGE_ON
++
+ #ifndef WAYLANDMOUSESIMULATOR_H
+ #define WAYLANDMOUSESIMULATOR_H
+ 
+@@ -82,3 +84,4 @@ private:
+ };
+ 
+ #endif // WAYLANDMOUSESIMULATOR_H
++#endif
+diff --git a/src/waylandrecord/avlibinterface.cpp b/src/waylandrecord/avlibinterface.cpp
+index b4145fa..cbd6aff 100644
+--- a/src/waylandrecord/avlibinterface.cpp
++++ b/src/waylandrecord/avlibinterface.cpp
+@@ -6,7 +6,7 @@
+ #include <QDebug>
+ #include <QLibraryInfo>
+ #include <QDir>
+-
++#include <QProcess>
+ avlibInterface::p_av_gettime avlibInterface::m_av_gettime = nullptr; // libavutil
+ avlibInterface::p_av_frame_alloc avlibInterface::m_av_frame_alloc = nullptr;
+ avlibInterface::p_av_frame_free avlibInterface::m_av_frame_free = nullptr;
+@@ -105,22 +105,34 @@ avlibInterface::avlibInterface()
+ 
+ QString avlibInterface::libPath(const QString &sLib)
+ {
++    qDebug() << "lib name is " << sLib;
+     QDir dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    qDebug() <<  " where is libs? that is " << dir ;
+-    QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+-    if (list.isEmpty()) {
+-        qWarning() << dir <<  "has not any lib with " << (sLib + "*") << ",so the list is empty!";
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str;
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
+     }
+-    if (list.contains(sLib)) {
+-        return sLib;
+-    } else {
+-        list.sort();
++    if (t_str.isEmpty()) {
++        return QString();
+     }
+-
+-    //Q_ASSERT(list.size() > 0);
+-    return list.last();
++    qDebug() << "lib:" << sLib << ",LD_LIBRARY_PATH:" << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        qDebug() <<  "where is libs? that is " << dir ;
++        QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
++        if (!list.isEmpty()) {
++            t_libPath = path + "/" + list.first();
++            break;
++        }
++    }
++    qDebug() << "lib path is " << t_libPath;
++    return t_libPath;
+ }
+ 
+ void avlibInterface::initFunctions()

@@ -1,0 +1,39 @@
+# Maintainer: ComixHe <heyuming@lingmo.org>
+pkgname=dtksystemsettings-git
+pkgver=5.6.20
+pkgrel=1
+sourcename=dtksystemsettings
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Qt-based development library for system settings on Lingmo.'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/dtksystemsettings"
+license=('LGPL3')
+depends=('lingmo-desktop-base-git' 'dtkcore-git' 'dtkcommon-git')
+makedepends=('git' 'qt5-tools' 'qt5-base' 'ninja' 'cmake' 'doxygen' 'graphviz')
+conflicts=('dtksystemsettings')
+provides=('dtksystemsettings')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  version=$(echo $pkgver | awk -F'[+_~-]' '{print $1}')
+  cmake \
+    -GNinja \
+    -DMKSPECS_INSTALL_DIR=lib/qt/mkspecs/modules \
+    -DBUILD_DOCS=ON \
+    -DBUILD_EXAMPLES=OFF \
+    -DQCH_INSTALL_DESTINATION=share/doc/qt \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DDTK_VERSION=$version
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

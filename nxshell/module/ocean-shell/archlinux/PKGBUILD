@@ -1,0 +1,66 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+
+pkgname=ocean-shell-git
+_pkgname=ocean-shell
+pkgver=0.0.4.r4.gd73711c
+pkgrel=1
+pkgdesc='New OCEAN shell'
+sourcename=ocean-shell
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-shell"
+license=('LGPL3')
+depends=('dtk6declarative-git'
+         'qt5-wayland'
+         'qt6-wayland'
+         'qt6-declarative'
+         'dtkgui-git'
+         'dtkwidget-git'
+         'yaml-cpp'
+         'dtk6gui-git'
+         'dtk6widget-git'
+         'libxtst'
+         'libxres'
+         'libxdamage'
+         'libxcursor'
+         'libxcb'
+         'qt6-tools'
+         'qt6-svg'
+         'lingmo-qt-dbus-factory'
+         'ocean-tray-loader'
+)
+makedepends=('git'
+             'qt6-tools'
+             'qt5-tools'
+             'dtk6declarative-git'
+             'qt5-wayland'
+             'qt6-wayland'
+             'dtkgui-git'
+             'dtkwidget-git'
+             'cmake'
+             'ninja'
+             'extra-cmake-modules'
+             'wayland-protocols'
+             'libnm'
+             'networkmanager-qt'
+)
+conflicts=('ocean-shell')
+provides=('ocean-shell')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  cmake -B . -GNinja \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  cmake --build .
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

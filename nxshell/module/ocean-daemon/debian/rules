@@ -1,0 +1,62 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+
+export GOCACHE = /tmp/gocache
+export GOPATH = /usr/share/gocode
+export GO111MODULE=off
+
+SYSTYPE=Desktop
+SYSTYPE=$(shell cat /etc/lingmo-version | grep Type= | awk -F'=' '{print $$2}')
+
+ifeq ($(SYSTYPE), Desktop)
+override_dh_gencontrol:
+	dh_gencontrol -- -Vdist:Depends="fprintd, libpam-fprintd"
+endif
+
+%:
+	dh $@
+
+ifeq ($(DEB_BUILD_ARCH), sw_64)
+override_dh_strip:
+	true
+override_dh_auto_test:
+	true
+endif
+
+override_dh_auto_install:
+	dh_auto_install
+	dh_installsysusers  ocean-daemon.sysusers
+
+ifeq ($(DEB_BUILD_ARCH), mipsel)
+override_dh_auto_configure:
+	# mate-screenshot -a grab the area screen
+	sed -i 's|"lingmo-screenshot"|"mate-screenshot -a"|g' misc/ocean-daemon/keybinding/system_actions.json
+	# mate-screenshot grab the full screen
+	sed -i 's|"lingmo-screenshot -f"|"mate-screenshot"|g' misc/ocean-daemon/keybinding/system_actions.json
+	sed -i 's|lingmo-screenshot|mate-screenshot|g' misc/ocean-daemon/keybinding/system_actions.json
+
+	dh_auto_configure
+
+override_dh_auto_install:
+	dh_auto_install
+	rm debian/ocean-daemon/etc/default/grub.d/10_lingmo.cfg
+	rm debian/ocean-daemon/etc/grub.d/35_lingmo_gfxmode
+	dh_installsysusers  ocean-daemon.sysusers
+endif
+
+ifeq ($(DEB_BUILD_ARCH), mips64el)
+override_dh_auto_install:
+	dh_auto_install
+	rm debian/ocean-daemon/etc/default/grub.d/10_lingmo.cfg
+	install -d debian/ocean-daemon/lib/systemd/system-sleep/
+	install misc/scripts/ocean-system-daemon-power-refresh.sh debian/ocean-daemon/lib/systemd/system-sleep/
+	dh_installsysusers  ocean-daemon.sysusers
+endif
+
+override_dh_installsystemd:
+	dh_installsystemd --no-start
+
+override_dh_auto_clean:
+	dh_auto_clean --
+	rm -fr obj-x86_64-linux-gnu

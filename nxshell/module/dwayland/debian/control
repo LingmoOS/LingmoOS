@@ -1,0 +1,94 @@
+Source: dwayland
+Section: libs
+Priority: optional
+Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
+Uploaders: Aurélien COUDERC <coucouf@debian.org>,
+           Norbert Preining <norbert@preining.info>,
+           Patrick Franz <deltaone@debian.org>,
+           Pino Toscano <pino@debian.org>,
+           Scarlett Moore <sgmoore@kde.org>,
+Build-Depends: cmake (>= 3.16~),
+               debhelper-compat (= 13),
+               doxygen (>= 1.8.13~),
+               extra-cmake-modules (>= 5.90.0~),
+               libegl-dev,
+               libqt5sql5-sqlite,
+               libqt5waylandclient5-dev (>= 5.15.0~),
+               libwayland-dev (>= 1.18~),
+               pkg-config,
+               pkg-kde-tools (>= 0.15.18~),
+               lingmo-wayland-protocols (>= 1.6.0~),
+               qtbase5-dev (>= 5.15.0~),
+               qtbase5-private-dev (>= 5.4.0~),
+               qttools5-dev,
+               qttools5-dev-tools (>= 5.4),
+               qtwayland5-dev-tools (>= 5.15.0~),
+               wayland-protocols (>= 1.24~),
+Standards-Version: 4.6.0
+Rules-Requires-Root: no
+Homepage: https://invent.kde.org/plasma/kwayland-server
+Vcs-Browser: https://salsa.debian.org/qt-kde-team/kde/kwayland-server
+Vcs-Git: https://salsa.debian.org/qt-kde-team/kde/kwayland-server.git
+
+Package: dwayland-data
+Architecture: any
+Multi-Arch: same
+Depends: ${misc:Depends}
+Description: Qt library wrapper for Wayland libraries - data files
+ DWayland provides a Qt-style Server library wrapper for
+ the Wayland libraries.
+
+Package: libdwayland-dev
+Section: libdevel
+Architecture: any
+Depends: libdwaylandclient5 (= ${binary:Version}),
+         libdwaylandserver5 (= ${binary:Version}),
+         libwayland-dev (>= 1.13~),
+         qtbase5-dev (>= 5.15.0~),
+         extra-cmake-modules (>= 5.90.0~),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Replaces: dwayland-dev (<< 4:5.23.0-2~)
+Breaks: dwayland-dev (<< 4:5.23.0-2~)
+Recommends: libdwayland-doc (= ${source:Version})
+Description: development files for dwayland
+ DWayland provides a Qt-style Client and Server library wrapper for
+ the Wayland libraries.
+ .
+ Contains development files for dwayland.
+
+Package: libdwayland-doc
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: Qt library wrapper for Wayland libraries (documentation)
+ DWayland provides a Qt-style Client and Server library wrapper for
+ the Wayland libraries.
+ .
+ This package contains the qch documentation files.
+Section: doc
+
+Package: libdwaylandclient5
+Architecture: any
+Multi-Arch: same
+Depends: dwayland-data (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Description: Qt library wrapper for Wayland libraries
+ DWayland provides a Qt-style Client library wrapper for
+ the Wayland libraries.
+Breaks: libkf5plasmaquick5 (<< 5.54)
+
+Package: libdwaylandserver5
+Architecture: any
+Multi-Arch: same
+Depends: dwayland-data (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends},
+Breaks: libkwin4-effect-builtins1
+Description: Qt library wrapper for Wayland libraries
+ DWaylandServier provides a Qt-style Server library wrapper for
+ the Wayland libraries.
+ .
+ This package contains the shared library.
+Provides: ${ABI:VirtualPackage}

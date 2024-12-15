@@ -1,0 +1,25 @@
+From: Maximiliano Curia <maxy@gnuservers.com.ar>
+Date: Tue, 15 May 2018 20:31:18 +0200
+Subject: kwindowinfox11test: Skip SkipSwitcher test
+
+Openbox won't keep unknown states and SkipSwitcher is kde specific
+---
+ autotests/kwindowinfox11test.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/autotests/kwindowinfox11test.cpp b/autotests/kwindowinfox11test.cpp
+index 180e05a..c5a231b 100644
+--- a/autotests/kwindowinfox11test.cpp
++++ b/autotests/kwindowinfox11test.cpp
+@@ -227,6 +227,11 @@ void KWindowInfoX11Test::testState()
+ 
+     KWindowInfo info3(window->winId(), NET::WMState);
+     QVERIFY(info3.valid());
++
++    NETRootInfo rootInfo(QX11Info::connection(), NET::Supported | NET::SupportingWMCheck);
++    if (state == NET::States(NET::SkipSwitcher) && qstrcmp(rootInfo.wmName(), "Openbox") == 0) {
++        QSKIP("Openbox won't keep unknown states, SkipSwitcher is kde specific");
++    }
+     QCOMPARE(info3.state(), state);
+     QVERIFY(info3.hasState(state));
+ }

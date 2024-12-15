@@ -1,0 +1,140 @@
+[Unit]
+Description=Accounts1 Service
+
+# In order to avoid races with identity-providing services like SSSD or
+# winbind, we need to ensure that Accounts Service starts after
+# nss-user-lookup.target
+After=nss-user-lookup.target lightdm.service
+Wants=nss-user-lookup.target fprintd.service
+
+[Service]
+User=root
+ExecStart=/usr/lib/lingmo-daemon/ocean-system-daemon
+StandardOutput=null
+StandardError=journal
+Environment=GVFS_DISABLE_FUSE=1
+Environment=GIO_USE_VFS=local
+Environment=GVFS_REMOTE_VOLUME_MONITOR_IGNORE=1
+
+ProtectSystem=strict
+
+NoNewPrivileges=yes
+# 部分数据需要写到home下
+# ProtectHome=yes
+# TODO 判断udev事件是否需要该配置
+# ProtectKernelTunables=yes
+ProtectKernelModules=yes
+# SwapSchedHelper需要设置cgroup
+# ProtectControlGroups=yes
+PrivateMounts=yes
+# 部分数据写在tmp，待整改tmp完成后考虑设置该项
+# PrivateTmp=yes
+# libinput库需要用；clear tty需要；
+# PrivateDevices=yes
+# TODO
+# PrivateNetwork=yes
+# 重置密码需要runusr -u 以及需要获取proc下相关信息
+# PrivateUsers=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RemoveIPC=yes
+# 和golang -pie参数冲突，导致进程无法启动
+# MemoryDenyWriteExecute=yes
+# 内存占用待定
+# MemoryLimit=100M
+
+# com.lingmo.daemon.Gesture
+ReadWritePaths=-/usr/share/ocean-daemon/gesture
+ReadWritePaths=-/etc/ocean-daemon/gesture
+
+# com.lingmo.daemon.Fprintd
+ReadWritePaths=-/var/lib/fprint
+ReadWritePaths=-/var/lib/ocean-daemon/fingerprint/huawei
+
+# com.lingmo.daemon.Timedated
+# /etc/systemd/timesyncd.conf.d/lingmo.conf如果conf.d文件夹不存在，需要创建
+# ReadWritePaths=-/etc/systemd
+# /var/lib/systemd/timesync/clock 删除该文件，需要上一层的rw权限
+ReadWritePaths=-/var/lib/systemd/timesync
+
+# com.lingmo.daemon.AirplaneMode
+ReadWritePaths=-/var/lib/ocean-daemon/airplane_mode
+# com.lingmo.daemon.ImageEffect
+ReadWritePaths=-/var/cache/lingmo/ocean-daemon/image-effect
+ReadWritePaths=-/var/cache/image-blur
+# com.lingmo.daemon.Uadp
+ReadWritePaths=-/usr/share/uadp/
+# com.lingmo.system.Network
+ReadWritePaths=-/var/lib/ocean-daemon/network/
+# com.lingmo.system.Bluetooth
+ReadWritePaths=-/var/lib/ocean-daemon/bluetooth
+
+# com.lingmo.daemon.Accounts
+# ReadWritePaths=-/etc/lightdm/lightdm.conf
+# 需要修改使用usermod改密码的方案
+# useradd会创建/etc/.pwd.lock文件，需要/etc/文件夹权限
+ReadWritePaths=-/etc/
+# ReadWritePaths=-/etc/passwd
+# ReadWritePaths=-/etc/shadow
+# ReadWritePaths=-/etc/group
+# ReadWritePaths=-/etc/group-
+ReadWritePaths=-/var/lib/AccountsService
+ReadWritePaths=-/usr/share/ocean-daemon/accounts
+ReadWritePaths=-/var/cache/lingmo/ocean-daemon
+ReadWritePaths=-/var/lib/ocean-daemon/
+# ReadWritePaths=-/etc/default/locale
+# ReadWritePaths=-/etc/locale.conf
+# ReadWritePaths=-/etc/default/keyboard
+ReadWritePaths=-/usr/share/config/kdm/kdmrc
+# ReadWritePaths=-/etc/gdm/custom.conf
+# ReadWritePaths=-/etc/sddm.conf
+# ReadWritePaths=-/etc/lxdm/lxdm.conf
+# 需要创建/var/lib/lightdm/lightdm-lingmo-greeter文件夹
+ReadWritePaths=-/var/lib/lightdm
+ReadWritePaths=-/run/user
+# ReadWritePaths=-/var/lib/ocean-daemon/secret-question/
+# com.lingmo.system.Display
+ReadWritePaths=-/var/lib/ocean-daemon/display/
+# com.lingmo.system.Power
+ReadWritePaths=-/var/lib/ocean-daemon/power/
+# ReadWritePaths=-/etc/tlp.d
+# com.lingmo.daemon.SwapSchedHelper
+# 需要操作cgroup
+# com.lingmo.daemon.PowerManager
+# 无读写文件
+# com.lingmo.daemon.Daemon
+# ReadWritePaths=-/etc/NetworkManager/system-connections
+# ReadWritePaths=-/etc/systemd/logind.conf.d
+ReadWritePaths=-/usr/share/wallpapers/custom-wallpapers/
+ReadWritePaths=-/usr/share/wallpapers/custom-solidwallpapers/
+# 执行plymouth-set-default-theme
+ReadWritePaths=-/usr/share/plymouth/
+# ReadWritePaths=-/etc/plymouth/
+# 执行update-initramfs -u -k kernel
+ReadWritePaths=-/var/tmp
+ReadWritePaths=-/boot
+# com.lingmo.daemon.KeyEvent
+# 写/proc/uos/touchpad_switch
+# com.lingmo.daemon.PowerManager
+# 无读写文件
+# com.lingmo.system.InputDevices
+# 写/proc/uos/touchpad_switch
+# 写/sys/bus/usb/devices
+# com.lingmo.system.SystemInfo
+# 需要调用命令获取信息
+# com.lingmo.daemon.Apps
+ReadWritePaths=-/var/lib/ocean-daemon/apps
+ReadWritePaths=-/tmp
+ReadWritePaths=-/home
+
+# TLP
+ReadWritePaths=-/usr/share/tlp/lingmo-system-power-control/
+ReadWritePaths=-/etc/tlp.d/
+
+[Install]
+# We pull this in by graphical.target instead of waiting for the bus
+# activation, to speed things up a little: gdm uses this anyway so it is nice
+# if it is already around when gdm wants to use it and doesn't have to wait for
+# it.
+WantedBy=graphical.target

@@ -1,0 +1,169 @@
+Source: ocean-file-manager
+Section: libdevel
+Priority: optional
+Maintainer: Lingmo Packages Builder <packages@lingmoos.com>
+Build-Depends:
+ cmake,
+ doxygen,
+ debhelper (>=9),
+ pkg-config,
+ qtbase5-dev,
+ qtbase5-private-dev,
+ qtmultimedia5-dev,
+ libffmpegthumbnailer-dev,
+ libqt5svg5-dev,
+ libpolkit-agent-1-dev, 
+ libpolkit-qt5-1-dev,
+ libdtkwidget-dev,
+ libdtkgui-dev,
+ libdtkcore-dev,
+ libdtkcore5-bin,
+ qttools5-dev-tools,
+ qttools5-dev,
+ ocean-dock-dev (>=4.8.4.1),
+ libdframeworkdbus-dev,
+ libtag1-dev,
+ libdmr-dev,
+ libicu-dev,
+ libxcb-ewmh-dev,
+ liblingmo-pdfium-dev,
+ libqt5xdg-dev,
+ libgio-qt-dev,
+ libdfm-io-dev,
+ libdfm-mount-dev,
+ libdfm-burn-dev,
+ libssl-dev,
+ libgtest-dev,
+ libgmock-dev,
+ libgsettings-qt-dev,
+ liblucene++-dev,
+ libdocparser-dev,
+ libboost-filesystem-dev,
+ libsecret-1-dev,
+ libkf5codecs-dev,
+ libpoppler-cpp-dev,
+ libcryptsetup-dev,
+ libpcre3-dev,
+ libocean-shell-dev (>= 0.0.10),
+ lingmo-desktop-base | lingmo-desktop-server | lingmo-desktop-device,
+ qt6-base-dev,
+ qt6-base-private-dev,
+ qt6-svg-dev,
+ qt6-multimedia-dev,
+ qt6-tools-dev,
+ qt6-tools-dev-tools,
+ qt6-declarative-dev,
+ qt6-5compat-dev,
+ libdtk6widget-dev,
+ libdtk6gui-dev,
+ libdtk6core-dev,
+ libdtk6core-bin,
+ libdtk6declarative-dev,
+ libdfm6-io-dev,
+ libdfm6-mount-dev,
+ libdfm6-burn-dev,
+ libxcb-xfixes0-dev (>= 1.10~),
+ liblingmo-service-framework-dev
+Standards-Version: 3.9.8
+Homepage: http://www.lingmo.org
+
+Package: ocean-desktop
+Architecture: any
+Depends: 
+ ${shlibs:Depends}, 
+ ${misc:Depends}, 
+ libocean-file-manager (=${binary:Version}),
+ libqt6sql6-sqlite,
+ qt6-translations-l10n,
+ libimageeditor6 | hello
+Conflicts: ocean-workspace (<< 2.90.5), ocean-file-manager-oem, ocean-desktop-plugins
+Replaces: ocean-file-manager-oem, ocean-file-manager (<< 6.0.1), ocean-desktop-plugins
+Recommends: qt5dxcb-plugin, lingmo-screensaver, oceanui-wallpapersetting-plugin
+Description: lingmo desktop-environment - desktop module
+ Lingmo Desktop Environment (OCEAN) - desktop module.
+
+Package: ocean-file-manager
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ libocean-file-manager (=${binary:Version}),
+ libgio-qt,
+ libqt5xdg3,
+ libqt5sql5-sqlite,
+ socat,
+ cryfs,
+ ocean-device-formatter,
+ libblockdev-crypto2 | libblockdev-crypto3,
+ ocean-file-manager-services-plugins (=${binary:Version}),
+ qml6-module-qtquick-controls,
+ qml6-module-qtquick-layouts,
+ qml6-module-qtquick-window,
+ tpm2-abrmd,
+ libtss2-tcti-pcap0,
+ libtss2-tcti-tabrmd0,
+ libusec-recoverykey | hello
+Replaces: ocean-file-manager-oem, ocean-desktop (<< 6.0.1),
+ ocean-file-manager-preview,
+ ocean-file-manager-preview-plugins,
+ ocean-file-manager-plugins,
+ ocean-file-manager-daemon-plugins,
+ ocean-file-manager-common-plugins
+Conflicts: ocean-file-manager-preview,
+ ocean-file-manager-preview-plugins,
+ ocean-file-manager-plugins,
+ ocean-file-manager-daemon-plugins,
+ ocean-file-manager-common-plugins
+Recommends: ocean-qt5integration, avfs, samba, lingmo-anything-server
+Description: File manager front end
+ File manager front-end of Lingmo OS
+
+Package: libocean-file-manager
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ libpoppler-cpp0v5 (>= 0.48.0),
+ gvfs-backends (>=1.27.3),
+ cryptsetup,
+ libdfm-extension (=${binary:Version}),
+ dlnfs | hello
+Multi-Arch: same
+Description: OCEAN File Manager core librarys
+ This package contains the shared libraries.
+Replaces: dfmplugin-disk-encrypt
+Conflicts: dfmplugin-disk-encrypt
+
+Package: ocean-disk-mount-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: plugin of ocean-dock
+ Disk mount plugin of ocean-dock which is created by ocean-file-manager
+
+Package: libdfm-extension
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: extension library of ocean-file-manager
+ Extension library of ocean-file-manager which is provided for third parties
+
+Package: ocean-file-manager-services-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: lingmo desktop-environment - lingmo-service-manager plugins module
+ Lingmo Desktop Environment (OCEAN) - lingmo-service-manager plugins module.
+ 
+Package: libdfm-extension-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdfm-extension (=${binary:Version})
+Description: Development package for libdfm-extension
+ This package contains the header files and pkgconfig
+ of libdfm-extension
+
+Package: ocean-file-manager-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ocean-file-manager (=${binary:Version}),
+ libdfm-io-dev, libdfm-mount-dev, libdfm-burn-dev
+Description: OCEAN File Manager Devel library
+ This package contains the header files and static libraries
+ of ocean-file-manager
+

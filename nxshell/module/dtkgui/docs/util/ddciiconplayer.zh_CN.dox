@@ -1,0 +1,196 @@
+/*!
+@~chinese
+@file include/util/ddciiconplayer.h
+@ingroup dci
+@brief DCI 图标播放工具
+
+@class Dtk::Gui::DDciIconImagePlayer ddciiconplayer.h
+@details 用于 DDciIconImage 的动画播放，功能设计类似于 QMovie。支持无缝顺序播放播放多个图片、倒序播放等高级功能。
+
+@enum Dtk::Gui::DDciIconImagePlayer::State
+@brief 播放状态
+@var DDciIconImagePlayer::NotRunning
+@brief 未播放动画
+@var DDciIconImagePlayer::WaitingRead
+@brief 正在播放动画，且等待读取当前帧
+@var DDciIconImagePlayer::Running
+@brief 正在播放动画，此时处于等待下一帧到来的状态
+
+@enum Dtk::Gui::DDciIconImagePlayer::Flag
+@brief 播放参数
+@details 缓存的帧被判断为无效时将会被自动清理，如调用 DDciIconImagePlayer::setImage 改变了要播放的图片资源。
+@var DDciIconImagePlayer::Continue
+@brief 接着上一次动画停止时的状态继续播放，一般会配合 InvertedOrder 同时使用
+@var DDciIconImagePlayer::CacheAll
+@brief 缓存本次播放中的所有动画帧
+@var DDciIconImagePlayer::InvertedOrder
+@brief 倒序播放
+@var DDciIconImagePlayer::IgnoreLastImageLoop
+@brief 忽略最后一个图片的动画循环次数，即无论 DDciIconImage::loopCount 的值是什么，动画都只播放一次
+@var DDciIconImagePlayer::AllowNonLastImageLoop
+@brief 允许非最后一个图片循环播放，默认时不允许，以确保所有图片都有机会被播放，避免动画在前面的图片中无限循环进行播放
+@var DDciIconImagePlayer::ClearCacheOnStop
+@brief 在动画停止时清理缓存的帧，无论动画是播放完成时的自动停止还是被动停止
+
+@fn Dtk::Gui::DDciIconImagePlayer::DDciIconImagePlayer(QObject *parent)
+@details 构造此对象。
+@param[in] parent 指定此 QObject 对象的父对象
+
+@fn Dtk::Gui::DDciIconImagePlayer::setImages(const QVector<DDciIconImage> &images)
+@details 指定待播放的图片序列，如果当前的状态不是 NotRunning，并且与上一次指定的图片序列不同，则停止动画。
+@param[in] images 图片序列，当为多个时，将无缝顺序播放所有图片。
+
+@fn Dtk::Gui::DDciIconImagePlayer::images() const
+@details 返回当前已指定的图片序列。
+
+@fn Dtk::Gui::DDciIconImagePlayer::currentImage() const
+@details 返回当前正在播放的图片对象，如果当前的状态是 NotRunning，则会返回一个空的 DDciIconImage。
+
+@fn Dtk::Gui::DDciIconImagePlayer::currentLoopForever() const
+@details 如果当前正在播放的图片陷入了无限循环，则返回 true，否则返回 false。
+@sa DDciIconImagePlayer::Flag::IgnoreLastImageLoop DDciIconImagePlayer::Flag::AllowNonLastImageLoop
+
+@fn Dtk::Gui::DDciIconImagePlayer::setPalette(const DDciIconPalette &palette)
+@details 指定读取动画帧时所使用的调色板，如果图片支持此功能，则能控制获取到的图片的某些颜色。如果设置成功，并且当前的状态是 NotRunning，则会立即清理缓存帧，否则会在动画停止时清理缓存帧。
+@param[out] 如果新的 DDciIconPalette 与当前的 DDciIconPalette 相同，则返回 false，否则返回 true。
+@sa DDciIconImagePlayer::palette
+
+@fn Dtk::Gui::DDciIconImagePlayer::palette() const
+@details 返回当前已指定的调色板，如果未设置过调色板，则返回一个空的 DDciIconPalette。
+@sa DDciIconImagePlayer::setPalette
+
+@fn Dtk::Gui::DDciIconImagePlayer::setLoopCount(int count)
+@details 指定动画的循环次数，当从调用 DDciIconImagePlayer::start 到收到 DDciIconImagePlayer::finished 信号为一次循环，除非调用 DDciIconImagePlayer::stop，否则不会终止此循环。另外，需要注意的是，此循环与 DDciIconImage::loopCount 无关，他们相互独立，且会叠加生效。
+@sa DDciIconImagePlayer::loopCount
+
+@fn Dtk::Gui::DDciIconImagePlayer::loopCount() const
+@details 返回动画循环次数。
+@sa DDciIconImagePlayer::setLoopCount
+
+@fn Dtk::Gui::DDciIconImagePlayer::abortLoop() const
+@details 终止本次播放中的所有动画循环，即后续的动画都仅播放一遍，这会导致忽略 DDciIconImage::loopCount 和 DDciIconImagePlayer::loopCount。
+
+@fn Dtk::Gui::DDciIconImagePlayer::readImage()
+@details 读取当前动画帧，这是一个“生产者-消费者”模型，只有当状态为 WaitingRead 时才能读取，且每一帧只能读取一次。
+@sa DDciIconImagePlayer::updated
+
+@fn Dtk::Gui::DDciIconImagePlayer::state() const
+@details 返回当前的状态。
+@sa DDciIconImagePlayer::stateChanged
+
+@fn Dtk::Gui::DDciIconImagePlayer::clearCache()
+@details 立即清理所有的缓存帧。
+
+@fn Dtk::Gui::DDciIconImagePlayer::start(float speed, DDciIconImagePlayer::Flags flags)
+@details 立即启动动画，应当在此之前调用 DDciIconImagePlayer::setImages。如果启动成功，将发送 started 信号。在启动后，会根据每一帧的间隔自动触发 updated 信号，以通知使用方在合适的时候显示新的帧。在动画播放完成后，将发送 finished 信号，在动画未播放结束前调用了 stop 主动结束动画则不会发送信号。
+@param[in] speed 本次动画的播放速度，其表示的是倍速，值越大动画播放的越快。设置为 0 时与设置为 1.0 等价。
+@param[in] flags 控制本次动画播放时的一些行为。
+@param[out] 如果动画启动成功则返回 true，否则返回 false。动画启动失败的原因一般是因为此时已经在播放动画、没有设置任何图片或所有图片都不支持动画。
+@sa DDciIconImagePlayer::started DDciIconImagePlayer::updated DDciIconImagePlayer::readImage DDciIconImagePlayer::finished DDciIconImagePlayer::stateChanged
+
+@fn Dtk::Gui::DDciIconImagePlayer::stop()
+@details 立即停止当前动画的播放。这不会发送 finished 信号。
+
+@fn Dtk::Gui::DDciIconImagePlayer::started()
+@details 通知动画已开始播放。
+
+@fn Dtk::Gui::DDciIconImagePlayer::updated()
+@details 通知动画的当前帧已经发生变化，在收到此信号后需要立即调用 readImage，否则动画会被暂停，不会自动到下一帧。
+@sa DDciIconImagePlayer::readImage
+
+@fn Dtk::Gui::DDciIconImagePlayer::finished()
+@details 在本次动画播放结束时发送信号通知。因为调用 DDciIconImagePlayer::stop 导致的动画停止不会触发此信号。
+@sa DDciIconImagePlayer::start
+
+@fn Dtk::Gui::DDciIconImagePlayer::stateChanged()
+@details 在状态改变时发送信号通知。
+@sa DDciIconImagePlayer::state
+
+@class Dtk::Gui::DDciIconPlayer ddciiconplayer.h
+@details 实现根据 DDciIcon::Mode 的变化，自动化计算要显示的图标内容，支持动态图标，在 DDciIcon::Mode 被设置时通过 updated 信号通知控件绘制新的内容。对于动态图标的动画播放先后顺序、播放速度等规则遵守 DSG 规范中所提出的 DCI 图标文件标准。有几条特性：
+
+1. 支持动画的倒序播放，如从 Hover 状态变为 Normal 时，可以倒序播放 Hover 状态所对应的 DDciIconImage。此功能依赖于 DDciIconImagePlayer 的实现。
+2. 支持动画无缝衔接播放，如从 Normal 状态变化为 Hover 时，在播放 Hover 动画的途中又变为 Pressed 状态，则不会立即将 Hover 的动画打断，将把 Pressed 动画在当前动画播放接受后自动播放。
+3. 支持动画记忆播放，如从 Normal 状态变化为 Hover 时，在播放 Hover 动画的途中变回了 Normal 状态，则会从当前已经播放到的这一帧开始倒序播放 Hover 动画。
+
+@enum Dtk::Gui::DDciIconPlayer::State
+@brief 工作状态
+@var DDciIconPlayer::Idle
+@brief 处于空闲状态，一般表示此时未播放动画
+@var DDciIconPlayer::Busy
+@brief 处于忙碌状态，此时可能正在播放动画
+
+@fn Dtk::Gui::DDciIconPlayer::DDciIconPlayer
+@details 构造此对象。
+@param[in] parent 指定此 QObject 对象的父对象
+
+@fn Dtk::Gui::DDciIconPlayer::state() const
+@details 返回当前的状态。
+@sa DDciIconPlayer::State
+
+@fn Dtk::Gui::DDciIconPlayer::setIcon(const DDciIcon &icon)
+@details 设置要处理的图标对象，这会导致当前动画停止播放，并且释放上一个 icon 相关的所有资源。会触发 updated 信号。
+
+@fn Dtk::Gui::DDciIconPlayer::icon() const
+@details 返回已设置的图标对象。
+
+@fn Dtk::Gui::DDciIconPlayer::setTheme(DDciIcon::Theme theme)
+@details 为图标指定要使用的主题，如果值发生变化，会导致当前动画停止播放，并且释放图标相关的所有资源。会触发 updated 信号。
+
+@fn Dtk::Gui::DDciIconPlayer::theme() const
+@details 返回已设置的图标主题。
+
+@fn Dtk::Gui::DDciIconPlayer::setMode(DDciIcon::Mode mode)
+@details 指定图标当前要使用的模式，如果值发生变化，会根据新旧模式的过渡规则计算接下来是否需要播放动画，以及当动画不存在或动画停止后所停留的内容。动画播放规则遵守 DSG 中 DCI 图标格式规范中的定义。
+@sa DDciIconPlayer::modeChanged DDciIconPlayer::updated
+
+@fn Dtk::Gui::DDciIconPlayer::mode() const
+@details 返回已设置的图标模式。
+
+@fn Dtk::Gui::DDciIconPlayer::setIconSize(int size)
+@details 为图标指定要渲染的大小，如果值发生变化，会导致当前动画停止播放，并且释放图标相关的所有资源。会触发 updated 信号。
+
+@fn Dtk::Gui::DDciIconPlayer::iconSize() const
+@details 返回已设置的图标大小。
+
+@fn Dtk::Gui::DDciIconPlayer::setDevicePixelRatio(qreal devicePixelRatio)
+@details 为图标指定渲染时的缩放比例，如果值发生变化，会导致当前动画停止播放，并且释放图标相关的所有资源。会触发 updated 信号。
+
+@fn Dtk::Gui::DDciIconPlayer::devicePixelRatio() const
+@details 返回已设置的图标缩放比例。
+
+@fn Dtk::Gui::DDciIconPlayer::setPalette(const DDciIconPalette &palette)
+@details 为图标指定渲染时所使用的调色板，如果值发生变化，并且当前模式所对应的图片支持指定调色板，在 Busy 状态下，会导致接下来新的动画帧的颜色发生变化，在 Idle 状态下，则会重新为当前模式计算应该显示的内容，这可能会触发 updated 信号。
+@sa DDciIconImage::hasPalette DDciIconImage::toImage DDciIconImage::paint
+
+@fn Dtk::Gui::DDciIconPlayer::currentImage() const
+@details 返回当前图标在当前时刻应该显示的位图数据。当此数据变化时会发送 updated 信号。
+@sa DDciIconPlayer::setIcon DDciIconPlayer::updated
+
+@fn Dtk::Gui::DDciIconPlayer::play(DDciIcon::Mode mode)
+@details 为指定的图标模式计算要显示的内容，这可能会导致 currentImage 发生变化。这是个一次性行为，不会影响下一次调用 setMode 后的结果。
+@param[in] mode 指定要播放的图标模式，如果此模式支持动画，会触发此模式自身的动画播放（与 setMode 导致的动画不同的是，此动画不涉及两种模式变化时的过渡规则），否则将修改 currentImage 为此模式对应的静态图片资源。
+
+@fn Dtk::Gui::DDciIconPlayer::stop()
+@details 如果当前正在播放动画，则停止当前动画的播放，但不会影响队列中下一个动画的播放。可能会导致 DDciIconPlayer::state 发生变化。
+@sa DDciIconPlayer::abort
+
+@fn Dtk::Gui::DDciIconPlayer::abort()
+@details 如果当前正在播放动画，则停止当前动画的播放，并取消队列中所有计划播放的动画。可能会导致 DDciIconPlayer::state 发生变化。
+@sa DDciIconPlayer::stop
+
+@fn Dtk::Gui::DDciIconPlayer::stateChanged()
+@details 通知状态发生变化。
+@sa DDciIconPlayer::state
+
+@fn Dtk::Gui::DDciIconPlayer::updated()
+@details 通知 DDciIconPlayer::currentImage 发生变化。
+@sa DDciIconPlayer::currentImage
+
+@fn Dtk::Gui::DDciIconPlayer::modeChanged(DDciIcon::Mode oldMode, DDciIcon::Mode newMode)
+@details 通知图标的模式发生变化。
+@param[in] oldMode 变化之前的 mode
+@param[in] newMode 变化之后的 mode
+@sa DDciIconPlayer::setMode DDciIconPlayer::setMode
+
+*/

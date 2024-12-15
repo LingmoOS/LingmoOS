@@ -1,0 +1,102 @@
+# SPDX-FileCopyrightText: 2023-2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: "1"
+
+package:
+  id: org.ocean.calendar
+  name: ocean-calendar
+  version: 5.14.11.1
+  kind: app
+  description: |
+    calendar for lingmo os.
+
+base: org.lingmo.base/23.1.0
+runtime: org.lingmo.runtime.dtk/23.2.0
+
+command:
+  - ocean-calendar
+
+build: |
+  cat /var/lib/dpkg/status|grep "^Package: " > ${PREFIX}/packages.list
+  bash ./install_dep linglong/sources "${PREFIX}"
+
+  # 获取版本号
+  VERSION=$(head -1 debian/changelog | awk -F'[()]' '{print $2}')
+
+  cmake -B build ${conf_args} \
+        -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_OFF" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+        -DVERSION=${VERSION} \
+        -DEXEC_OCEAN_CALENDAR="ocean-calendar" \
+        -DEXEC_OCEAN_CALENDAR_SERVICE="/opt/apps/org.ocean.calendar/files/libexec/lingmo-daemon/ocean-calendar-service"
+
+  cmake --build build -j`nproc`
+  cmake --build build --target install >app.install 2>&1
+
+sources:
+  # - kind: git
+  #   url: https://github.com/lingmoos/ocean-calendar
+  #   commit: 2dd86328e0257f9833d405b49b8729302519c1c1
+
+  # linglong:gen_deb_source sources amd64 https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2 beige main community
+  # linglong:gen_deb_source install lingmo-gettext-tools, gir1.2-ical-3.0, install-info, libconfig-tiny-perl, libdb5.3-dev, libdb-dev, libfile-basedir-perl, libfile-desktopentry-perl, libfile-mimeinfo-perl, libgcrypt20-dev, libgpg-error-dev, libical-dev, libipc-system-simple-perl, libmng1, libxml-libxml-perl, libxml-namespacesupport-perl, libxml-sax-base-perl, libxml-sax-perl, lshw
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/lingmo-gettext-tools/lingmo-gettext-tools_1.0.6-1_all.deb
+    digest: 732eb3781699b6fe8134a06fdb4e779279014751075ea67eb72b03015f9eae4e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libical3/gir1.2-ical-3.0_3.0.11-lingmo+rb1_amd64.deb
+    digest: 1c7193e3d447d75e0353affe5793352b6989aadoceanf46912fdb0ca8bf2e43c07
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/texinfo/install-info_7.1-2_amd64.deb
+    digest: 3a88543cddbca0ece1403a37f3a210e903c9c3b2317623d40d15827e5acc8565
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libconfig-tiny-perl/libconfig-tiny-perl_2.27-1_all.deb
+    digest: 30d01706b0063d0b4aaef7cffd79a6b70d8365ad887ada4c8cc1f8a5df8eb84a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/db5.3/libdb5.3-dev_5.3.28+dfsg1-0.8_amd64.deb
+    digest: 9b66e10eadc6c0e874bc7344c241c2c2e0a7b048c0cf3c14812cfe3c9d768088
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/db-defaults/libdb-dev_5.3.3_amd64.deb
+    digest: dc1373c440558cfa9fabb20063fe9ec405248757b088dbfc541fac64c3f8a636
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-basedir-perl/libfile-basedir-perl_0.09-1_all.deb
+    digest: 79f5ef747c15be92e24a1adeea98e3d4c01b1b90b730a184a8ca4959a1aa4684
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-desktopentry-perl/libfile-desktopentry-perl_0.22-2_all.deb
+    digest: 19ed7f791a824bd6525c02cc6011bbd614880f3408e78eff5e16e1e9990334a8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-mimeinfo-perl/libfile-mimeinfo-perl_0.30-1_all.deb
+    digest: 4d9cecdc4b82cee837e74512293b8c84a554d3cdf6c760627cd9c42d6c752b92
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgcrypt20/libgcrypt20-dev_1.10.3-2_amd64.deb
+    digest: 97b7627a6850415f5c8c72bbf83oceanuie65cacf88c800676a02456f4a902bc8ea4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgpg-error/libgpg-error-dev_1.47-3_amd64.deb
+    digest: 1ca737a33cb23aee5903ddafe201198357593bd015f5097c68fb99efced85458
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libical3/libical-dev_3.0.11-lingmo+rb1_amd64.deb
+    digest: 446b447b4d58419f38d76c41be214c012336ad724e24d1fbb6efb4d589ac954e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libipc-system-simple-perl/libipc-system-simple-perl_1.30-1_all.deb
+    digest: a528ecfa70fd8f3b4cc024947ff264e3952b0245be9a7147e556d8e1a037007c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmng/libmng1_1.0.10+dfsg-3.1-lingmo1_amd64.deb
+    digest: 256423c8e3c4afcbdf72973db84b1e919187b65955c685ee16f9a5635d436943
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-libxml-perl/libxml-libxml-perl_2.0207+dfsg+really+2.0134-1_amd64.deb
+    digest: 12c7f4b47735232c9d084ca94d0da8fe6b7e564c1cdd7e348943b286f78f3ad4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-namespacesupport-perl/libxml-namespacesupport-perl_1.12-1.1_all.deb
+    digest: 9588edfba6a50bf6702eac9ec3aca6f19a8b14a4260dc86615a93181040bd040
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-sax-base-perl/libxml-sax-base-perl_1.09-1.1_all.deb
+    digest: 8271fec055eb0dabdfef211ce005a2b0ac78feaa5c31ebf35c7c8fe6bbf1482a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-sax-perl/libxml-sax-perl_1.02+dfsg-3_all.deb
+    digest: 4751449b0ce407282bf5ea9a721fa3ae1cd4d488ea3f21c6a40e6e4889d9fd6d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lshw/lshw_02.19.git.2021.06.19.996aaad9c7-2_amd64.deb
+    digest: 3b773a5d680074868c46ef1a8712b98b8614a2a1749430946061db3a8a21c073

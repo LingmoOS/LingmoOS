@@ -1,0 +1,51 @@
+/**
+@~chinese
+@class DMessageManager
+@ingroup QtObject
+
+@ingroup QML_TYPES
+@brief 一种控制 FloatingMessage 的附加对象.
+
+    MessageManager 是一个附加对象，它无法独立的创建。它有多种用于控制 FloatingMessage 的全局效果的属性。
+    通常情况下，再构造 Window 时就可指定全局的 FloatingMessage 属性。例如以下代码：
+
+```qml
+    MessageManager.layout: Column {
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+        }
+    }
+    MessageManager.capacity: 6
+    MessageManager.delegate: FloatingMessage {
+        id: floatingMsg
+        contentItem: Label {
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+            text: floatingMsg.message.content
+            elide: Text.ElideRight
+            maximumLineCount: 1
+            wrapMode: Text.Wrap
+        }
+
+        duration: 3000
+    }
+```
+
+@attachedproperty Component MessageManager::delegate
+@brief delegate 属性控制全局情况下的 FloatingMessage 样式风格。
+@details 默认情况下无需重新实现该风格，当需要添加自定义内容时，可修改其内容达到目标效果。
+
+@attachedproperty Item MessageManager::layout
+@brief layout 属性控制不同消息之间的排列方式。
+@details 默认情况下，多个消息使用纵向布局的方式进行排列。例如，还能自定义为横向布局、流布局等等。
+
+@attachedproperty int MessageManager::capacity
+@brief capacity 属性用于控制消息最大存储的容量。
+@details 默认情况下，`capacity`的值为 3，即最大能同时容纳 3 条消息进行显示。
+
+@attachedproperty int MessageManager::count
+@note 该属性只读
+@brief count 属性表示当前消息的个数。
+
+*/

@@ -1,0 +1,31 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-sound-theme-git
+pkgver=15.10.6.r3.g0c81150
+pkgrel=1
+sourcename=lingmo-sound-theme
+sourcetars=("$sourcename"_"$pkgver".orig.tar.gz)
+sourcedir="$sourcename"-"$pkgver"
+useforobs=1
+pkgdesc="Lingmo sound theme"
+arch=('any')
+url="https://github.com/lingmoos/lingmo-sound-theme"
+makedepends=('git')
+license=('GPL3')
+groups=('lingmo-git')
+conflicts=('lingmo-artwork' 'lingmo-sound-theme')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+  cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  make
+}
+
+package() {
+  cd $sourcedir
+  make PREFIX=/usr DESTDIR="$pkgdir" install
+}

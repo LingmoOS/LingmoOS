@@ -1,0 +1,17 @@
+[Unit]
+Description=OCEAN File Manager Daemon
+
+Wants=ocean-session-pre.target
+After=ocean-session-pre.target
+
+Wants=ocean-session-initialized.target
+PartOf=ocean-session-initialized.target
+Before=ocean-session-initialized.target
+
+[Service]
+Type=dbus
+BusName=org.lingmo.Filemanager.Daemon
+ExecStart=/usr/bin/ocean-file-manager-daemon
+
+[Install]
+WantedBy=graphical-session.target

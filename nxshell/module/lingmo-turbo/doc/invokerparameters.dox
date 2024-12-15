@@ -1,0 +1,49 @@
+/*! \page invokerparameters Advanced invoker command line parameters
+
+This section describes some of the invoker command line parameters. For a full list, use \c invoker \c --help.
+
+\section type --type TYPE
+
+TYPE chooses the type of booster used. Qt booster may be used to     
+launch anything. Possible values for TYPE:
+- q = Launch a Qt application.
+- d = Launch a Qt Declarative (QML) application.
+- e = Launch any application even if it is not a library.
+
+\section delay -d, --delay SECS
+
+After invoking, sleep for SECS seconds (default 0). 
+
+\section respawn -r, --respawn SECS
+
+After invoking, respawn new booster after SECS seconds (default 3, max 10).
+This can be used if the application is very slow to start up, and respawning the booster interferes.
+
+\section waitterm -w, --wait-term
+
+Wait for launched process to terminate (default). The invoker is not
+really needed after the application process has been started, but some
+processes can get confused if the invoker exits immediately. For
+example, Upstart reacts to invoker exit by trying to launch the same
+application again.
+
+\section nowait -n, --no-wait
+
+Do not wait for the launched process to terminate.
+
+\section globalsyms -G, --global-syms
+
+Place symbols in the application binary and its libraries to the global scope. See RTLD_GLOBAL in the dlopen manual page.
+
+If your application loads a plugin that needs to access symbols
+defined in the main application, you need this parameter. You also
+need to explicitly export the symbols using \c M_EXPORT or \c Q_DECL_EXPORT.
+
+\section daemonmode -o, --daemon-mode
+
+Notify invoker that the launched process is a daemon. This resets the
+oom_adj of the process. The flag is not needed if something like
+Upstart already takes care of daemonisation.
+
+*/
+

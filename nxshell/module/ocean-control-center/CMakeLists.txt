@@ -1,0 +1,220 @@
+cmake_minimum_required(VERSION 3.18)
+
+set(DVERSION "6.0.44" CACHE STRING "define project version")
+set(BUILD_DOCS OFF CACHE BOOL "Generate doxygen-based documentation")
+
+set(PROJECT_NAME ocean-control-center)
+project(${PROJECT_NAME}
+    VERSION ${DVERSION}
+    DESCRIPTION "Lingmo Control Center"
+    HOMEPAGE_URL "https://github.com/lingmoos/ocean-control-center"
+    LANGUAGES CXX C
+)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(ENABLE_ASAN "Enable asan" OFF)
+option(BUILD_TESTING "UNIT test" OFF)
+set(BUILE_EXAMPLES OFF)
+
+# oceanui-v23
+set(BUILD_DCC_OLD ON)
+if (BUILD_DCC_OLD)
+    add_subdirectory(oceanui-old)
+endif()
+
+set(QT_NS Qt6)
+set(DTK_NS Dtk6)
+set(ASQT_NS AppStreamQt)
+
+# 设置静态库文件目录
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# 动态库文件目录
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# 可执行文件目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+
+# INFO:
+# plugins can be disabled and their options
+# plugin-authentication : DISABLE_AUTHENTICATION
+# plugin-update : DISABLE_UPDATE
+# plugin-keyboard: DISABLE_LANGUAGE to disable language panel
+
+option(DISABLE_AUTHENTICATION "disable build authentication plugins" OFF)
+option(DISABLE_UPDATE "disable build update plugins" OFF)
+option(DISABLE_LANGUAGE "disable lanugage settings in control center" OFF)
+option(USE_LINGMO_ZONE "enable special timezone file on lingmo" OFF)
+option(DISABLE_SOUND_ADVANCED "disable sound advanced settings" OFF)
+set(LINGMO_TIME_ZONE_PATH "/usr/share/ocean/zoneinfo/zone1970.tab" CACHE STRING "lingmo timezone path")
+set(LOCALE_I18N_PATH "/usr/share/i18n/SUPPORTED" CACHE STRING "Supported locale path")
+
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/misc;${CMAKE_MODULE_PATH};${ECM_MODULE_PATH};${PROJECT_SOURCE_DIR}/misc")
+include(DdeControlCenterPluginMacros)
+
+# asan 自己有内存泄露，暂不使用
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(UNITTEST ON)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror=return-type -fno-omit-frame-pointer -Wextra")
+    if(ENABLE_ASAN)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+        add_definitions(-DUSE_ASAN)
+    endif()
+else()
+    # generate qm
+    execute_process(COMMAND bash "misc/translate_generation.sh" "${CMAKE_CURRENT_BINARY_DIR}/src/ocean-control-center"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    # generate desktop translate
+    execute_process(COMMAND bash "misc/translate_ts2desktop.sh"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+
+if (BUILD_TESTING)
+    set(UNITTEST ON)
+endif()
+
+set(BUILD_PLUGIN ON)
+
+if (NOT BUILD_PLUGIN)
+    set(UNITTEST OFF)
+endif()
+# GNU 默认
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(UT_COMPILER -fprofile-arcs -ftest-coverage)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(UT_COMPILER -fprofile-instr-generate -ftest-coverage)
+endif()
+
+if (USE_LINGMO_ZONE)
+    add_definitions(-DUSE_LINGMO_ZONE)
+    add_definitions(-OCEANEPIN_TIME_ZONE_PATH="${LINGMO_TIME_ZONE_PATH}")
+endif ()
+
+add_definitions(-DLOCALE_I18N_PATH="${LOCALE_I18N_PATH}")
+
+# 增加安全编译参数
+ADD_DEFINITIONS(${SAFE_COMPILER})
+
+# Install settings
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX /usr)
+endif ()
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+include(GoogleTest)
+
+if(BUILD_DOCS)
+    add_subdirectory(docs)
+endif()
+
+set(DCC_TRANSLATION_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/translations/v1.0" CACHE STRING "Install dir for ocean-control-center translate files")
+
+# 输出目录
+set(DCC_LIBDIR ${PROJECT_BINARY_DIR}/lib)
+# 插件目录
+set(DCC_PLUGINS_DIR plugins_v1.0)
+# 安装目录
+set(DCC_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/ocean-control-center)
+set(DCC_DEBUG_LIBDIR ${DCC_INSTALL_DIR})
+set(DCC_TRANSLATE_READ_DIR ${CMAKE_INSTALL_PREFIX}/${DCC_TRANSLATION_INSTALL_DIR})
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DCC_DEBUG_LIBDIR ${DCC_LIBDIR})
+    set(DCC_TRANSLATE_READ_DIR ${PROJECT_BINARY_DIR}/src/ocean-control-center)
+endif()
+
+add_definitions(-DTRANSLATE_READ_DIR="${DCC_TRANSLATE_READ_DIR}")
+# 插件安装目录
+set(DCC_PLUGINS_INSTALL_DIR ${DCC_DEBUG_LIBDIR}/${DCC_PLUGINS_DIR} CACHE STRING "Install dir for ocean-control-center plugins")
+# 插件读取目录
+set(MODULE_READ_DIR "${DCC_DEBUG_LIBDIR}" CACHE STRING "Dir to find ocean-control-center modules")
+set(PLUGINS_READ_DIR "${DCC_PLUGINS_INSTALL_DIR}" CACHE STRING "Dir to find ocean-control-center plugins")
+
+GNUInstallDirs_get_absolute_install_dir(
+    MODULE_READ_FULL_DIR
+    MODULE_READ_DIR
+    LIBDIR
+)
+
+GNUInstallDirs_get_absolute_install_dir(
+    PLUGINS_READ_FULL_DIR
+    PLUGINS_READ_DIR
+    LIBDIR
+)
+
+message(STATUS ${MODULE_READ_FULL_DIR})
+message(STATUS ${PLUGINS_READ_FULL_DIR})
+message(STATUS ${DCC_PLUGINS_INSTALL_DIR})
+
+add_definitions(-DDefaultModuleDirectory="${MODULE_READ_FULL_DIR}")
+add_definitions(-DDefaultPluginsDirectory="${PLUGINS_READ_FULL_DIR}")
+
+# DdeControlCenterPluginMacros.cmake 使用
+set(OCEAN_CONTROL_CENTER_PLUGIN_DIR ${DCC_PLUGINS_DIR})
+set(OCEAN_CONTROL_CENTER_TRANSLATION_INSTALL_DIR ${DCC_TRANSLATION_INSTALL_DIR})
+set(OCEAN_CONTROL_CENTER_PLUGIN_INSTALL_DIR ${DCC_PLUGINS_INSTALL_DIR})
+
+set(LOCALSTATE_READ_DIR "${CMAKE_INSTALL_FULL_LOCALSTATEDIR}" CACHE STRING "Dir to find modifiable single-machine data")
+set(DCC_PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+add_definitions(-DVARDIRECTORY="${LOCALSTATE_READ_DIR}")
+# Find the library
+find_package(PkgConfig REQUIRED)
+find_package(${DTK_NS} REQUIRED COMPONENTS Core Gui  )
+find_package(${QT_NS} COMPONENTS Core Quick Gui Network DBus Concurrent Test LinguistTools Multimedia REQUIRED)
+find_package(GTest REQUIRED)
+find_package(Threads REQUIRED)
+
+if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "sw_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mieee")
+endif()
+
+# dconfig
+file(GLOB DCONFIG_FILES "misc/configs/*.json")
+dtk_add_config_meta_files(APPID org.lingmo.ocean.control-center BASE misc/configs FILES ${DCONFIG_FILES})
+file(GLOB DCONFIG_FILE_REGION_FORMAT "misc/configs/common/org.lingmo.region-format.json")
+dtk_add_config_meta_files(COMMONID true FILES ${DCONFIG_FILE_REGION_FORMAT})
+
+include_directories(
+    include
+)
+
+set(Test_Libraries
+    -lgcov
+    Threads::Threads
+    GTest::gtest
+    ${QT_NS}::Test
+)
+
+set(DCC_FRAME_Library ocean-control-center_frame)
+
+add_subdirectory(src/ocean-control-center)
+#--------------------------plugins--------------------------
+add_subdirectory(src/plugin-accounts)
+add_subdirectory(src/plugin-sound)
+add_subdirectory(src/plugin-defaultapp)
+add_subdirectory(src/plugin-power)
+add_subdirectory(src/plugin-mouse)
+add_subdirectory(src/plugin-personalization)
+add_subdirectory(src/plugin-keyboard)
+add_subdirectory(src/plugin-systeminfo)
+add_subdirectory(src/plugin-commoninfo)
+add_subdirectory(src/plugin-touchscreen)
+add_subdirectory(src/plugin-datetime)
+add_subdirectory(src/plugin-wacom)
+add_subdirectory(src/plugin-bluetooth)
+add_subdirectory(src/plugin-update)
+add_subdirectory(src/plugin-notification)
+add_subdirectory(src/plugin-lingmoid)
+add_subdirectory(src/plugin-display)
+
+if(BUILE_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
+if(UNITTEST)
+    add_subdirectory(tests)
+endif()

@@ -1,0 +1,141 @@
+diff --git a/examples/test/CMakeLists.txt b/examples/test/CMakeLists.txt
+index f2a2e76b..dee00f57 100644
+--- a/examples/test/CMakeLists.txt
++++ b/examples/test/CMakeLists.txt
+@@ -10,7 +10,7 @@ set(CMD_NAME dmr_test)
+ set(CMAKE_CXX_FLAGS "-std=c++1y -fpermissive -Wno-error")
+ 
+ include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
+-
++include_directories(/runtime/include)
+ find_package(Qt5Widgets)
+ find_package(Qt5Concurrent)
+ find_package(Qt5Network)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 10783d3b..2b12ab9b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -14,7 +14,7 @@ add_definitions(-D_MOVIE_USE_)
+ 
+ include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
+-
++include_directories(/runtime/include)
+ find_package(Qt5Widgets)
+ find_package(Qt5DBus)
+ find_package(Qt5X11Extras)
+diff --git a/src/backends/mpv/mpv_proxy.h b/src/backends/mpv/mpv_proxy.h
+index 1256a069..30b4bd89 100644
+--- a/src/backends/mpv/mpv_proxy.h
++++ b/src/backends/mpv/mpv_proxy.h
+@@ -38,20 +38,33 @@ typedef void (*mpv_terminateDestroy)(mpv_handle *ctx);
+ 
+ static QString libPath(const QString &sLib)
+ {
+-    QDir dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+-    if (list.contains(sLib)) {
+-        return sLib;
+-    } else {
+-        list.sort();
++    QDir  dir;
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str;
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
+     }
+-
+-    if(list.size() > 0)
+-        return list.last();
+-    else
++    if (t_str.isEmpty()) {
+         return QString();
++    }
++    qDebug() << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QStringList t_list;
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with sLib
++        if (!list.isEmpty()) {
++            t_libPath = path + "/" + list.first();
++            break;
++        }
++    }
++    qDebug() << t_libPath;
++    return t_libPath;
+ }
+ 
+ class MpvHandle
+diff --git a/src/libdmr/CMakeLists.txt b/src/libdmr/CMakeLists.txt
+index c264f7e8..13babb3a 100644
+--- a/src/libdmr/CMakeLists.txt
++++ b/src/libdmr/CMakeLists.txt
+@@ -13,7 +13,6 @@ remove_definitions(-D_MOVIE_USE_)
+ pkg_check_modules(Gst REQUIRED IMPORTED_TARGET gstreamer-1.0 glib-2.0)
+ 
+ include_directories(${CMAKE_INCLUDE_CURRENT_DIR})
+-
+ file(GLOB_RECURSE SRCS LIST_DIRECTORIES false *.cpp)
+ file(GLOB_RECURSE MPV_SRCS LIST_DIRECTORIES false ../backends/mpv/*.cpp)
+ file(GLOB_RECURSE MEDIAPLAYER_SRCS LIST_DIRECTORIES false ../backends/mediaplayer/*.cpp)
+diff --git a/src/libdmr/compositing_manager.cpp b/src/libdmr/compositing_manager.cpp
+index 9b117fcf..52ade8f7 100644
+--- a/src/libdmr/compositing_manager.cpp
++++ b/src/libdmr/compositing_manager.cpp
+@@ -235,22 +235,35 @@ bool CompositingManager::isCanHwdec()
+     return m_bCanHwdec;
+ }
+ 
+-QString  CompositingManager::libPath(const QString &sLib)
++QString  CompositingManager::libPath(const QString &strlib)
+ {
+-    QDir dir;
+-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+-    dir.setPath(path);
+-    QStringList list = dir.entryList(QStringList() << (sLib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+-    if (list.contains(sLib)) {
+-        return (path+ QDir::separator() + sLib);
+-    } else {
+-        list.sort();
++    QDir  dir;
++    QStringList environment = QProcess::systemEnvironment();
++    QString str, t_str;
++    foreach (str, environment) {
++        if (str.startsWith("LD_LIBRARY_PATH=")) {
++            t_str = str;
++            break;
++        }
+     }
+-
+-    if(list.size() > 0)
+-        return (path + QDir::separator() + list.last());
+-    else
++    if (t_str.isEmpty()) {
+         return QString();
++    }
++    qDebug() << t_str;
++    QStringList liststr = t_str.split("=").at(1).split(":");
++    QStringList t_list;
++    QString t_libPath;
++    for (size_t i = 0; i < liststr.count() ; i++) {
++        QString path  = liststr.at(i);
++        dir.setPath(path);
++        QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
++        if (!list.isEmpty()) {
++            t_libPath = path + "/" + list.first();
++            break;
++        }
++    }
++    qDebug() << t_libPath;
++    return t_libPath;
+ }
+ 
+ void CompositingManager::setCanHwdec(bool bCanHwdec)

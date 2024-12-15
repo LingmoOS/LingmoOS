@@ -1,0 +1,32 @@
+name: macOS
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      - name: Tests
+        run: |
+          xmake f -k shared
+          xmake -a
+          xmake -b unitest
+          xmake r unitest -co_sched_num=4
+          xmake f -m debug
+          xmake

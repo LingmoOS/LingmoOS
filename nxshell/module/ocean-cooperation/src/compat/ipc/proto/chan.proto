@@ -1,0 +1,71 @@
+// package chan
+
+object UserLoginResult {
+    string appname  //应用名
+    string uuid //请求主机的uuid
+    string ip // 请求主机的ip
+    bool result
+}
+
+object LoginConfirm {
+    string user_name  //用户名
+    string session_id //会话应用id
+    string host_ip //请求主机的IP
+}
+
+object ConfirmResult {
+    int32 session_id  //会话应用id
+    bool result //请求结果
+    string reason //原因
+}
+
+
+object FSResult {
+    int32 job_id  //请求的id
+    bool result //请求结果
+    string reason //原因
+}
+
+object FSDataBlock {
+    int32 job_id
+    int32 file_id
+    string rootdir // 文件的读取或保存路径
+    string filename // 相对于TransJob中path的相对路径
+    int64 blk_id
+    int32 flags // 标志位，所有文件读取完成1（data_size 也是0）
+    int64 data_size // 数据块长度
+    string data // 块数据
+}
+
+object FileInfo {
+    int32 job_id
+    int32 file_id
+    string name
+    int64 total_size
+    int64 current_size
+    int64 time_spended
+}
+
+object FSJobCancel {
+    int32 job_id
+    string path     //文件目录路径
+}
+
+object FSReport {
+    int32 job_id
+    string path     //文件目录路径
+    int32 result //请求结果
+    string error //原因
+}
+
+object SendStatus {
+    int32 type // 服务器发送都对方服务器的类型, 0表示自己监听到发送端断开连接
+    int32 status // 0 发送成功，-1发送失败，-2参数错误, 1表示远端下线
+    int32 curstatus // 当前所在阶段
+    string msg
+}
+
+object LoginResultStruct {
+    bool result // 登陆结果
+    string appName // app名称
+}

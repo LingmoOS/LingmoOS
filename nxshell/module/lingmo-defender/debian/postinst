@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = configure ]; then
+        if command -v setcap > /dev/null; then
+                if setcap cap_dac_read_search,cap_kill,cap_net_admin,cap_net_raw,cap_sys_ptrace+ep /usr/bin/lingmo-MonitorNetFlow;then
+                        chmod u-s /usr/bin/lingmo-MonitorNetFlow
+                else
+                        echo "Setcap for lingmo-MonitorNetFlow failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/lingmo-MonitorNetFlow
+                fi
+                if setcap cap_dac_read_search+ep /usr/bin/lingmo-defender-antiav;then
+                        chmod u-s /usr/bin/lingmo-defender-antiav
+                else
+                        echo "Setcap for lingmo-defender-antiav failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/lingmo-defender-antiav
+                fi
+                if setcap cap_dac_read_search+ep /usr/bin/lingmo-defender-risantiav;then
+                        chmod u-s /usr/bin/lingmo-defender-antiav
+                else
+                        echo "Setcap for lingmo-defender-risantiav failed, falling back to setuid" >&2
+                        chmod u+s /usr/bin/lingmo-defender-risantiav
+                fi
+	else
+		echo "Setcap is not installed, falling back to setuid" >&2
+                chmod u+s /usr/bin/lingmo-MonitorNetFlow
+                chmod u+s /usr/bin/lingmo-defender-antiav
+                chmod u+s /usr/bin/lingmo-defender-risantiav
+	fi  
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# 功能: 生成links文件，将 bloom 图标主题中的指定图标软链到hicolor-icon-theme
+# 参数:
+#   from: bloom 图标生成目录           (build/bloom)
+#   list: 需要安装到hicolor的图标列表  (hicolor.list)
+set -e
+
+FROM="$1"
+LIST="$2"
+DESTDIR="$3"
+ICON_DIR=/usr/share/icons
+
+
+get_sizes()
+(
+    category="$1"
+    ls $FROM/$category
+)
+
+get_hicolor_icon()
+(
+    category="$1"
+    size="$2"
+    base="$3"
+	ext="$4"
+
+    if [ "$size" = "scalable" ]; then
+        echo ${DESTDIR}/$ICON_DIR/hicolor/$size/$category/$base.$ext
+    else
+        echo ${DESTDIR}/$ICON_DIR/hicolor/"$size"x"$size"/$category/$base.$ext
+    fi
+)
+
+get_bloom_icon()
+(
+    category="$1"
+    size="$2"
+    base="$3"
+    
+	if [ -f $FROM/$category/$size/$base.svg ];then
+        echo $ICON_DIR/bloom/$category/$size/$base.svg
+	elif [ -f $FROM/$category/$size/$base.png ];then
+        echo $ICON_DIR/bloom/$category/$size/$base.png
+	else
+		echo 
+	fi
+)
+
+link_file()
+{
+	from="$1"
+	dest="$2"
+	dest_dir=`dirname $dest`
+	[ -d ${dest_dir} ] || mkdir -p ${dest_dir}
+	echo "create link $from to $dest"
+	ln -sf $from $dest
+}
+
+for i in `cat $LIST`; do
+    category=`dirname $i`
+    base=`basename $i`
+
+    for s in $(get_sizes $category); do
+		bloom_icon=$(get_bloom_icon $category $s $base)
+		if [ -z ${bloom_icon} ];then continue; fi
+		icon_name=`basename ${bloom_icon}`
+		ext="${icon_name##*.}"
+		hicolor_icon=$(get_hicolor_icon $category $s $base $ext)
+		link_file ${bloom_icon} ${hicolor_icon}
+    done
+done

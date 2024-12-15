@@ -1,0 +1,45 @@
+@PACKAGE_INIT@
+
+# 导入 Auth 和 Common 模块的配置文件
+include("${CMAKE_CURRENT_LIST_DIR}/AuthConfig.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/CommonConfig.cmake")
+
+# 导出 DDM 相关的信息
+set(DDM_FOUND TRUE)
+set(DDM_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include/ddm")
+set(DDM_LIBRARIES Auth Common)
+
+# 如果定义了 COMPONENTS 选项，则导出相应的信息
+if(DEFINED COMPONENTS)
+    foreach(comp ${COMPONENTS})
+        if(comp STREQUAL "Auth")
+            set(DDM_FOUND TRUE)
+            set(DDM_AUTH_FOUND TRUE)
+            set(DDM_INCLUDE_DIRS ${DDM_INCLUDE_DIRS} ${Auth_INCLUDE_DIRS})
+            set(DDM_LIBRARIES ${DDM_LIBRARIES} ${Auth_LIBRARIES})
+        elseif(comp STREQUAL "Common")
+            set(DDM_FOUND TRUE)
+            set(DDM_COMMON_FOUND TRUE)
+            set(DDM_INCLUDE_DIRS ${DDM_INCLUDE_DIRS} ${Common_INCLUDE_DIRS})
+            set(DDM_LIBRARIES ${DDM_LIBRARIES} ${Common_LIBRARIES})
+        else()
+            message(FATAL_ERROR "Unknown component: ${comp}")
+        endif()
+    endforeach()
+endif()
+
+# 如果没有定义 COMPONENTS 选项，则默认导出所有信息
+if(NOT DEFINED COMPONENTS OR "${COMPONENTS}" STREQUAL "Auth;Common")
+    set(DDM_FOUND TRUE)
+    set(DDM_INCLUDE_DIRS ${DDM_INCLUDE_DIRS} PARENT_SCOPE)
+    set(DDM_LIBRARIES ${DDM_LIBRARIES} PARENT_SCOPE)
+endif()
+
+# 检查是否至少找到了一个组件
+if(NOT DDM_FOUND)
+    message(FATAL_ERROR "None of the requested components were found.")
+endif()
+
+# 导出 DDM 的头文件路径和库文件
+set(DDM_INCLUDE_DIRS ${DDM_INCLUDE_DIRS} PARENT_SCOPE)
+set(DDM_LIBRARIES ${DDM_LIBRARIES} PARENT_SCOPE)

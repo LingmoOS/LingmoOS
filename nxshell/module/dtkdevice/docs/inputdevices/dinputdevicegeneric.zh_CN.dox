@@ -1,0 +1,114 @@
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
+/*!
+@~chinese
+@file dinputdevicegeneric.h
+@ingroup inputdevices
+
+dinputdevicegeneric.h定义了InputDevices的基本设备类DInputDeviceGeneric
+
+@class Dtk::Device::DInputDeviceGeneric dinputdevicegeneric.h
+@brief 基本设备类
+
+DInputDeviceGeneric类是所有设备类的基类.
+
+@fn explicit DInputDeviceGeneric::DInputDeviceGeneric(QObject *parent = nullptr)
+@brief 无参构造函数
+@param[in] parent: 父对象, 可为空, 主要作用为管理设备的生命周期
+
+可指定父对象, 该函数受到保护, 只能由友元或者子类调用.
+
+@fn DInputDeviceGeneric::DInputDeviceGeneric(const DeviceInfo &info, bool enabled = true)
+@brief 初始化设备信息的构造函数
+@param[in] info: 设备信息
+@param[in] enabled: 设备是否启用
+
+该函数受到保护, 只能由友元或者子类调用.
+
+@fn DInputDeviceGeneric::~DInputDeviceGeneric()
+@brief 析构函数
+
+该函数进行默认析构.
+
+@fn virtual quint32 DInputDeviceGeneric::id() const
+@brief 获取设备id
+
+获取id属性, 该函数可被子类重写.
+
+@fn virtual QString DInputDeviceGeneric::name() const
+@brief 获取设备名
+
+获取name属性, 该函数可被子类重写.
+
+@fn virtual DeviceType DInputDeviceGeneric::type() const
+@brief 获取设备类型
+
+获取type属性, 该函数可被子类重写.
+
+@fn virtual bool DInputDeviceGeneric::enabled() const
+@brief 获取设备是否启用
+
+获取enabled属性, 该函数可被子类重写.
+
+@fn virtual void DInputDeviceGeneric::setId(quint32 id)
+@brief 设置设备的id
+@param[in] id: 设备id
+
+设置设备的id属性, 该函数受到保护, 可被子类重写.
+
+@fn virtual void DInputDeviceGeneric::setName(const QString &name)
+@brief 设置设备名
+@param[in] name: 设备名
+
+设置设备的name属性, 该函数受到保护, 可被子类重写
+
+@fn virtual void DInputDeviceGeneric::setType(DeviceType type)
+@brief 设置设备类型
+@param[in] type: 设备类型
+
+设置设备的type属性, 该函数受到保护, 可被子类重写.
+
+@fn virtual void DInputDeviceGeneric::setEnabled(bool enabled)
+@brief 设置设备是否启用
+@param[in] enabled: 设备是否启用
+
+设置设备的enabled属性, 该函数受到保护, 可被子类重写.
+
+@fn virtual void DInputDeviceGeneric::setDeviceInfo(const DeviceInfo &info)
+@brief 设置设备信息
+@param[in] info: 即将设置的设备信息
+
+设置设备的id, name和type, 该函数受到保护, 可被子类重写.
+
+@fn virtual DExpected<void> DInputDeviceGeneric::reset()
+@brief 重置设备的设置
+
+该函数为DInputDeviceGeneric提供的统一重置设置接口, 不同的输入设备有不同的设置, 需要重写该接口, 以实现特定的功能. 该函数的默认实现(Generic device)为空, 不应该直接调用Generic device的reset接口.
+
+@fn void DInputDeviceGeneric::enabledChanged(bool enabled)
+@brief 设备启用状态改变信号
+@sa [enabled](@ref Dtk::InputDevices::DInputDeviceGeneric::enabled)
+
+@property Dtk::Device::DInputDeviceGeneric::id
+@brief 设备id
+
+每一个设备都有一个独一无二的id, 在设备存在期间, id不会发生改变
+
+@property Dtk::Device::DInputDeviceGeneric::name
+@brief 设备名
+
+在设备存在期间, 设备名不会发生改变
+
+@property Dtk::Device::DInputDeviceGeneric::type
+@brief 设备类型
+
+在设备存在期间, 设备类型不会发生改变
+
+@property Dtk::Device::DInputDeviceGeneric::enabled
+@brief 设备启用状态
+
+enabled在整个生命周期中属于可变属性, 部分设备(比如DInputDeviceGenericTouchPad)提供了修改它的方法, 该信号可由该操作触发.
+
+*/

@@ -1,0 +1,41 @@
+version: "1.0.0" # 配置文件版本
+transfer: # 系统升级控制
+ - minversion: # 最小版本要求
+   - distro: "v20"
+     subversion: "1060"
+source:
+ - url: "https://cdimage.lingmo.com/releases/23/amd64/lingmo-desktop-community-23-amd64.iso" # 数据源地址
+   type: "http" # 源数据获取方式
+   integrity: true # 是否进行完整性检查
+target:
+ - merge_dirs: "/etc"
+   filter:
+    - "/etc/pam.d"
+    - "/etc/os-version"
+    - "/etc/os-release"
+    - "/etc/passwd"
+    - "/etc/group"
+    - "/etc/shadow"
+    - "/etc/libreoffice"
+    - "/etc/fstab"
+    - "/etc/lingmo-upgrade-manager"
+    - "/etc/product-info"
+    - "/etc/ld.so.conf.d/libc.conf"
+    - "/etc/ld.so.cache"
+    - "/etc/plymouth/plymouthd.conf"
+    - "/etc/xdg/kwinrc"
+    - "/etc/apt"
+    - "/etc/ssh"
+    - "/etc/default/ssh"
+    - "/etc/init.d/ssh"
+    - "/etc/ssh/moduli"
+    - "/etc/ufw/applications.d/openssh-server"
+    - "/etc/grub.d/15_lingmo-boot-kit"
+debinstall:
+- "grub2-common"
+- "grub-pc"
+- "grub-efi-amd64"
+- "lingmo-system-upgrade"
+backupapps: false # 是否备份应用
+fullmigrate: false # 是否迁移全部软件包
+

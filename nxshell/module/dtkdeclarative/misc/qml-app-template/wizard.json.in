@@ -1,0 +1,194 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject"],
+    "id": "A.Dtk@DTK_VERSION_MAJOR@ QtQuick Application",
+    "category": "F.Project",
+    "trDescription": "Creates a Dtk@DTK_VERSION_MAJOR@ QtQuick Application for UOS.",
+    "trDisplayName": "Dtk@DTK_VERSION_MAJOR@ QtQuick Application",
+    "trDisplayCategory": "Dtk QML Application",
+    "featuresRequired": [ "QtSupport.Wizards.FeatureQt.5.6" ],
+    "options":
+    [
+        { "key": "DtkQmlAppMake", "value": "make" },
+        { "key": "ProjectFile", "value": "%{CMakeFile}" },
+        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" },
+        { "key": "QT_VERSION_MAJOR", "value": "%{JS: %{QtVersion}.QT_VERSION_MAJOR}" },
+	{ "key": "QtQuickVersion", "value": "%{JS: %{QtVersion}.QtQuickVersion}" },
+        { "key": "QtQuickWindowVersion", "value": "%{JS: %{QtVersion}.QtQuickWindowVersion}" },
+        { "key": "QtQuickVirtualKeyboardImport", "value": "%{JS: %{QtVersion}.QtQuickVirtualKeyboardImport}" },
+        { "key": "QtQuickFeature", "value": "QtSupport.Wizards.FeatureQtQuick.%{QtQuickVersion}" },
+        { "key": "UseVirtualKeyboardByDefault", "value": "%{JS: [ %{Plugins} ].indexOf('Boot2Qt') >= 0 || [ %{Plugins} ].indexOf('Boot2QtQdb') >= 0}" },
+        { "key": "SetQPAPhysicalSize", "value": "%{UseVirtualKeyboardByDefault}" }
+    ],
+    "pages":
+    [
+        {
+            "trDisplayName": "Project Location",
+            "trShortTitle": "Location",
+            "typeId": "Project"
+        },
+	{
+            "trDisplayName": "Define Project Details",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data":
+            [
+                {
+                    "name": "QtVersion",
+                    "trDisplayName": "Minimal required Qt version:",
+                    "type": "ComboBox",
+                    "data":
+                    {
+                        "index": @QML_TEMPLATE_QTVERSION_INDEX@,
+                        "items":
+                        [
+                            {
+                                "trKey": "Qt 6.2",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '',
+                                    'QtQuickWindowVersion': '',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard',
+                                    'QT_VERSION_MAJOR': '6'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.12",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.12',
+                                    'QtQuickWindowVersion': '2.12',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.4',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.11",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.11',
+                                    'QtQuickWindowVersion': '2.11',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.3',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.10",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.10',
+                                    'QtQuickWindowVersion': '2.10',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.3',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.9",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.9',
+                                    'QtQuickWindowVersion': '2.2',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.2',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.8",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.8',
+                                    'QtQuickWindowVersion': '2.2',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.1',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.7",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.7',
+                                    'QtQuickWindowVersion': '2.2',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.VirtualKeyboard 2.1',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            },
+                            {
+                                "trKey": "Qt 5.6",
+                                "value":
+                                "({
+                                    'QtQuickVersion': '2.6',
+                                    'QtQuickWindowVersion': '2.2',
+                                    'QtQuickVirtualKeyboardImport': 'QtQuick.Enterprise.VirtualKeyboard 2.0',
+                                    'QT_VERSION_MAJOR': '5'
+                                })"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "UseVirtualKeyboard",
+                    "trDisplayName": "Use Qt Virtual Keyboard",
+                    "type": "CheckBox",
+                    "data":
+                    {
+                        "checked": "false"
+                    }
+                }
+            ]
+        },
+       	{
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "enabled": "%{JS: ! %{IsSubproject}}",
+            "data": { "projectFilePath": "%{ProjectFile}" },
+	    "requiredFeatures": [ "QtSupport.Wizards.FeatureQt", "%{QtQuickFeature}" ]
+	},
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "./CMakeLists.txt",
+                    "target": "CMakeLists.txt",
+                    "openAsProject": true
+                },
+                {
+                    "source": "./src"
+                },
+                {
+                    "source": "./src/main"
+                },
+                {
+                    "source": "./src/maincomponentplugin"
+                },
+                {
+                    "source": "./src/preloadplugin"
+                },
+                {
+                    "source": "./template.desktop",
+                    "target": "./%{ProjectName}.desktop"
+                },
+                {
+                    "source": "./debian"
+                },
+                {
+                    "source": "./debian/source"
+                },
+                {
+                    "source": "../../git.ignore",
+                    "target": ".gitignore",
+                    "condition": "%{JS: !%{IsSubproject} && '%{VersionControl}' === 'G.Git'}"
+                }
+            ]
+        }
+    ]
+}

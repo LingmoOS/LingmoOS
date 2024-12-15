@@ -1,0 +1,11 @@
+[Unit]
+Description=ocean-session-exit-task service
+CollectMode=inactive-or-failed
+# Allow exit.target to start even if this unit is started with replace-irreversibly.
+# For this to work, we also need to be in the root slice.
+DefaultDependencies=no
+
+[Service]
+Type=simple
+ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/ocean-session-ctl --session-exit
+Slice=-.slice

@@ -1,0 +1,71 @@
+Source: ocean-session-shell
+Section: devel
+Priority: optional
+Maintainer: Lingmo Sysdev <sysdev@lingmo.com>
+Build-Depends: debhelper-compat (=12), pkg-config,
+ cmake,
+ qtbase5-dev,
+ liblightdm-qt5-3-dev | liblightdm-qt-dev,
+ libxcb-ewmh-dev,
+ libqt5x11extras5-dev,
+ libgsettings-qt-dev,
+ libqt5svg5-dev,
+ libglib2.0-dev,
+ libdtkwidget-dev,
+ libdtkcore5-bin,
+ qtdeclarative5-dev,
+ qttools5-dev-tools,
+ libpam0g-dev,
+ libsystemd-dev,
+ lingmo-gettext-tools,
+ libxtst-dev,
+ libxcursor-dev,
+ libxrandr-dev,
+ libdtkcore5-bin,
+ libgtest-dev,
+ libx11-xcb-dev,
+ libssl-dev,
+ libdtkcore-dev,
+ liblingmo-pw-check-dev,
+ libxcb-util0-dev|libxcb-util1-dev
+Standards-Version: 3.9.4
+Homepage: http://www.lingmo.org/
+
+Package: ocean-session-shell
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${dist:Depends},
+ lingmo-desktop-schemas (>=5.9.14),
+ ocean-daemon (>=5.13.12),
+ startocean (>=5.8.9),
+ x11-xserver-utils,
+ lingmo-authenticate(>=1.2.27),
+ libssl3,
+ libxcb-util0|libxcb-util1,
+ xsettingsd,
+ onboard
+Provides: lightdm-greeter
+Recommends: dss-network-plugin,
+ ocean-network-dialog
+Conflicts: ocean-workspace,
+ lingmo-notifications,
+ ocean-session-ui (<< 5.0.0),
+ ocean-preload
+Replaces: lingmo-notifications
+Breaks: ocean-workspace
+Description: lingmo desktop-environment - ocean-session-shell module
+ Lingmo desktop environment 2015 - ocean-session-shell module.
+ lightdm-lingmo-greeter - login，the entry to the desktop
+ ocean-lock - lock screen, to protect privacy
+ lingmo-greeter - actual call the lightdm-lingmo-greeter
+
+Package: ocean-session-shell-dev
+Architecture: any
+Depends: ocean-session-shell (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: lingmo desktop-environment - ocean-session-shell module development files
+ OCEAN Session Shell module development files of lingmo desktop-environment
+
+Package: lingmo-greeter-wayland
+Architecture: any
+Depends: ocean-session-shell (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}, ocean-wayland-config
+Description: lingmo desktop-environment - ocean-session-shell module config files
+ OCEAN Session Shell module configuration package adapted to the wayland environment for lightdm-lingmo-greeter

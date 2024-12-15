@@ -1,0 +1,250 @@
+/*!
+@~chinese
+@ingroup dtkpower
+@file dpowerdevice.h
+@details dpowerdevice.h 是对于dbus接口中关于电源设备(包括且不限于:dc电源, 笔记本电池, ups不间断电源, 使用干电池的鼠标键盘
+(其实即使不使用干电池也能被管理)等内部外部设备的数据和属性功能读取的详细管理接口。)
+@class Dtk::Power::DPowerDevice dpowerdevice.h
+@brief 电源设备类，用于管理电源设备的数据和属性
+
+@fn DPowerDevice::DPowerDevice(const QString &path, QObject *parent = nullptr)
+@brief DPowerDevice类的构造函数
+@details 此构造函数为私有, 需要传入设备的地址进行构造, 获取设备地址需要使用`DPowerManager::devices`方法然后使用`DPowerManager::findDeviceByName`进行构建,或者使用`DPowerManager::displayDevice`方法获取dispaly对象
+@pragma[in] path:设备地址
+\sa Dtk::Power::DPowerManager::findDeviceByName() const
+
+@fn bool DPowerDevice::hasHistory() const
+@brief 电源设备是否有历史记录
+@return 布尔值
+
+@fn bool DPowerDevice::hasStatistics() const
+@brief 电源设备是否有电源设备具有统计信息
+@return 布尔值
+
+@fn bool DPowerDevice::isPresent() const
+@brief 电源设备是否有电源设备具有统计信息
+@return 布尔值
+
+@fn bool DPowerDevice::isRechargeable() const
+@brief 电源设备是否可充电
+@return 布尔值
+
+@fn bool DPowerDevice::online() const
+@brief 电源设备当前是否通过线路电源提供电源。仅当属性类型具有值 `line-power` 时, 此属性才有效。
+@return 布尔值
+
+@fn bool DPowerDevice::powerSupply() const
+@brief 如果电源设备用于为系统供电。对于笔记本电脑电池和UPS设备, 这将设置为`TRUE`, 但对于无线鼠标或掌上电脑设置为`FALSE`。
+@return 布尔值
+
+@fn double DPowerDevice::capacity() const
+@brief 电源的容量表示为0和100之间的百分比。
+@details 电池的容量会随着使用的增长而减少。
+    小于75%的容量值通常表示您应该更新电池。通常, 此值与 (full-design / full) * 100相同。
+    但是, 某些原始电源无法报告容量, 在这种情况下, 容量属性将被取消。
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::energy() const
+@brief 电源中当前可用的能量 (以Wh为单位)
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::energyEmpty() const
+@brief 当电源被认为是空的时, 电源中的能量 (以Wh为单位)
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::energyFull() const
+@brief 当电源被认为充满时, 电源中的能量 (以Wh为单位)
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::energyFullDesign() const
+@brief电池设计的最大容量, 以Wh作为单位
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::energyRate() const
+@brief 电源消耗的能量, 以W为单位。如果是正数, 电源正在放电, 如果是负数, 电源正在充电
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::luminosity() const
+@brief 仪表记录的光度
+@details(我也不能理解光度是什么意思, 大概也许可能是屏幕亮度或者环境亮度？
+    使用d-feet软件也无法获取其值)
+@return 双精度浮点数
+
+@fn double DPowerDevice::percentage() const
+@brief 功率源中剩余的能量表示为0和100之间的百分比。
+@details 通常这与 (energy - energy-empty) / (energy-full - energy-empty)相同。
+        但是, 某些原始电源只能报告百分比, 在这种情况下, 在设置此属性时, 将取消设置energy* 属性。
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@note 如果battery level被设置为无以外的东西, 百分比将是一个近似值。
+    百分比的保留是出于兼容性的考虑
+@return 双精度浮点数
+
+@fn double DPowerDevice::temperature() const
+@brief 设备的温度, 以摄氏度为单位。
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return 双精度浮点数
+
+@fn double DPowerDevice::voltage() const
+@brief 电池中的电压或被仪表记录的值。
+@return 双精度浮点数
+
+@fn int DPowerDevice::chargeCycles() const
+@brief TCO认证定义的充电周期数, 如果该值未知或不适用, 则为-1。(systemd>=251)
+@return 整数
+
+@fn qint64 DPowerDevice::timeToEmpty() const
+@brief 直到电源被认为是空的秒数。如果未知, 则设置为0
+@return 长整数
+
+@fn qint64 DPowerDevice::timeToFull() const
+@brief 电池充电达到被认为充满所需的秒数。如果未知, 则设置为0
+@return 长整数
+
+@fn QString DPowerDevice::iconName() const
+@brief 图标名称, 遵循图标命名规范
+@note 相对于剩余或感知到的剩余电量, 图标在呈现方面可能与最终用户的期望不匹配。
+    建议前端首先使用BatteryLevel属性 (如果可用), 然后使用百分比, 以向用户呈现更真实的电池电量
+@return 字符串
+
+@fn QString DPowerDevice::model() const
+@brief 这种电池型号的名称
+@return 字符串
+
+@fn QString DPowerDevice::nativePath() const
+@brief 操作系统特定的电源本机路径。在Linux上, 这是sysfs路径, 例如`/sys/devices/LNXSYSTM:00/device:00/PNP0C0A:00/power_supply/BAT0`. 如果设备由用户空间驱动程序驱动, 则为空白
+@return 字符串
+
+@fn QString DPowerDevice::serial() const
+@brief 电池的唯一序列号
+@return 字符串
+
+@fn QString DPowerDevice::vendor() const
+@brief 电池供应商的名称
+@return 字符串
+
+@fn uint DPowerDevice::batteryLevel() const
+@brief 不报告百分比而是报告粗略电池电量的设备的电池电量。如果该值为None,
+    则该设备不支持粗略的电池报告, 应改用百分比
+@return
+    - **0:** 未知
+    - **1:** 无(电池不使用粗略级别的电池报告)
+    - **3:** 低
+    - **4:** 临界
+    - **6:** 正常
+    - **7:** 高
+    - **8:** 满
+
+@fn uint DPowerDevice::state() const
+@brief 电池电量状态
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return
+    - **0:** 未知
+    - **1:** 充电
+    - **2:** 未充电
+    - **3:** 空
+    - **4:** 充满电
+    - **5:** 待充电
+    - **6:** 待放电
+
+@fn uint DPowerDevice::technology() const
+@brief 电池使用技术
+@note 仅当type属性类型具有值`battery`时, 此属性才有效
+@return
+    - **0:** 未知
+    - **1:** 锂离子
+    - **2:** 锂聚合物电池
+    - **3:** 磷酸铁锂电池
+    - **4:** 铅酸电池
+    - **5:** 镍铬电池
+    - **6:** 镍氢电池
+
+@fn uint DPowerDevice::type() const
+@brief 电源类型
+@note power-supply 如果该值设置为“电池”, 则在将其视为笔记本电脑电池之前 , 您需要验证该属性的值是否为“真”。否则, 它很可能是未知类型设备的电池。
+@return
+    - **0:** Unknown
+    - **1:** 线路电源
+    - **2:** 电池
+    - **3:** Ups不间断电源
+    - **4:** 监控
+    - **5:** 鼠标
+    - **6:** 键盘
+    - **7:** 掌上电脑
+    - **8:** 手机
+
+@fn uint DPowerDevice::warningLevel() const
+@brief 电池警告级别
+@return
+    - **0:** 未知
+    - **1:** 无
+    - **2:** 放电(仅适用于UPS不间断电源)
+    - **3:** 低
+    - **4:** 临界
+    - **5:** Action
+
+@fn QDateTime DPowerDevice::updateTime() const
+@brief 从电源读取数据的时间点 (从世界协调时1970年1月1日开始的0:00秒)。(本质还是unix时间戳)
+@return 返回为一个qdatetime对象
+\sa [QDateTime使用方法](https://doc.qt.io/qt-5/qdatetime.html)
+@note 返回的时间并不直接可用, 返回是是世界标准时间GMT, 需要根据实际情况调整时区增减
+
+@fn QList<History> DPowerDevice::history(const QString &type, const uint timespan, const uint resolution)
+@brief 获取在重新引导期间持续存在的电源设备的历史记录
+@param[in] type history的类型。有效类型是rateor或者 charge。
+@param[in] timespan 以秒为单位返回的数据量, 或者全部为0
+@param[in] resolution 要返回的近似点数。更高的分辨率更准确, 但以牺牲绘图速度为代价
+@return data:电源设备的历史数据(如果设备支持历史)。数据从最早的时间到最新的数据点进行排序。每个元素包含以下成员：
+    -* time: 以秒为单位的时间值, 从 gettimeofday() 方法获取
+    -* value: 数据值, 比如以W为单位的增长速率或者以百分比为单位的充电百分比
+    -* state: 设备的状态, 例如charging或 discharging。
+
+@fn QList<Statistics> DPowerDevice::statistics(const QString &type)
+@brief 获取功率设备的统计信息, 这些统计信息可能会在会话中的图形界面上显示
+@param[in] type 统计模式。有效类型是 charging 或者 discharging
+@return 电源设备的统计数据。每个元素包含以下成员：
+    -* value: 百分比的值, 通常以秒为单位
+    -* accuracy: 预测的准确性, 以百分比表示
+
+@fn void DPowerDevice::refresh() const
+@brief 刷新信息
+
+@fn QString DPowerDevice::deviceName () const
+@brief 获取当前device名称(唯一id)
+
+// signal
+
+@fn void DPowerDevice::updateTimeChanged(const QDateTime& value)
+@brief 从电源读取数据的时间点发生改变
+@param[in] value QDateTime对象
+
+@fn void DPowerDevice::percentageChanged(const double value)
+@brief 电源百分比发生改变
+@param[in] value 电源百分比
+
+@fn void DPowerDevice::timeToEmptyChanged(const quint64 value)
+@brief 电源消耗到空的时间发生改变
+@param[in] value 时间段
+
+@fn void DPowerDevice::timeToFullChanged(const quint64 value)
+@brief 电源充满时间发生改变
+@param[in] value 时间段
+
+@fn void DPowerDevice::energyRateChanged(const double value)
+@brief 电源消耗的能量发生改变, 以W为单位
+@param[in] value 消耗的能量正数是放电负数是充电
+
+@fn void DPowerDevice::energyChanged(const double value)
+@brief 电源中当前可用的能量发生改变
+@param[in] value 电源中可用能量
+
+@fn void DPowerDevice::iconNameChanged(const QString &value)
+@brief 电源图标发生改变
+@param[in] value 电源图标名
+
+*/

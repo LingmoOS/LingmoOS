@@ -1,0 +1,61 @@
+// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include <dfm-base/base/schemefactory.h>
+#include "models/filters/hioceannfilefilter.h"
+
+#include "stubext.h"
+
+#include <gtest/gtest.h>
+
+#include <QList>
+#include <QUrl>
+
+DFMBASE_USE_NAMESPACE
+using namespace ddplugin_organizer;
+
+class UT_HioceannFileFilter : public testing::Test
+{
+public:
+    virtual void SetUp() override {
+        hid = new HioceannFileFilter;
+    }
+    virtual void TearDown() override {
+        stub.clear();
+        delete hid;
+        hid = nullptr;
+    }
+    stub_ext::StubExt stub;
+    HioceannFileFilter *hid;
+
+};
+
+TEST_F(UT_HioceannFileFilter, acceptInsert)
+{
+    QUrl url("temp_url");
+    EXPECT_TRUE(hid->acceptInsert(url));
+}
+
+TEST_F(UT_HioceannFileFilter, acceptReset)
+{
+    QList<QUrl> list{QUrl("temp_url")};
+    QList<QUrl> res = hid->acceptReset(list);
+    EXPECT_EQ(res,list);
+}
+
+TEST_F(UT_HioceannFileFilter, acceptUpdate)
+{
+    QUrl url(".hioceann");
+
+    QVector<int> roles{Global::kItemCreateFileInfoRole};
+    EXPECT_FALSE(hid->acceptUpdate(url,roles));
+}
+
+TEST_F(UT_HioceannFileFilter, flag)
+{
+    bool call = true;
+    hid->updateFlag();
+    hid->hioceannFlagChanged(true);
+    EXPECT_TRUE(call);
+}

@@ -1,0 +1,51 @@
+#!/bin/bash -e
+# 从dtk菜单启动会附带应用名
+from_app=$1
+# 如果从dtk菜单启动，使用dbus调用自己，避免处于玲珑容器中无法提权搜集日志
+from_dbus=$2
+if [[ -n "$from_app" && ! -n "$from_dbus" ]]; then
+  echo "not form dbus"
+  gdbus call --session --dest=org.desktopspec.ApplicationManager1 --object-path /org/desktopspec/ApplicationManager1/lingmo_2dfeedback --method org.desktopspec.ApplicationManager1.Application.Launch "" "['$1', 'dbus']" {}
+  exit
+fi
+export TEXTDOMAIN=lingmo-feedback
+# 应用名
+app_name=$(gettext "Lingmo User Feedback")
+# 应用图标
+app_icon="lingmo-feedback"
+# 授权前提示
+approvePrompt=$(gettext "Please give permission to collect logs")
+# 授权后提示
+startPrompt=$(gettext "Collecting logs...")
+progressPrompt=$(gettext "It may take several minutes")
+# 日志采集完成的提示
+finishPrompt=$(gettext "Logs collected")
+locationPrompt=$(gettext "File path: %s")
+# 日志采集发生错误的提示
+failedPrompt=$(gettext "Log collection failed")
+
+# 日志文件名
+result_tag="lingmo-feedback-all-$(date "+%Y%m%d-%H%M%S")"
+# 日志路径
+output_path=${HOME}/Desktop/${result_tag}.tar.gz
+# 提示追加路径
+locationPrompt=$(printf "$locationPrompt" ${output_path})
+# 显示授权前提示
+notify-send -a "$app_name" -i $app_icon -t 2000 "$approvePrompt"
+# 切换用户的命令，用于在提权后给用户显示提示
+switchUserCommand="sudo -u \#$UID DISPLAY=$DISPLAY DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+# 在提权后给用户发通知，提示开始采集日志
+notifyCommand="notify-send -a \"$app_name\" -i $app_icon -t 10000 \"$startPrompt\" \"$progressPrompt\""
+# 调用lingmo-feedback-cli采集日志，由于网站上传文件限制大小，按100M切片。ps：日志一般不会大于100M
+cliCommand="lingmo-feedback-cli -m 104857600 -o ${output_path}"
+# 提权并执行上面的三个命令
+pkexec bash -c "$switchUserCommand $notifyCommand && $cliCommand" &&
+# 日志采集完成后，显示一个成功提示
+notify-send -a "$app_name" -i $app_icon -t 5000 "$finishPrompt" "$locationPrompt" ||
+# 日志采集失败后，显示一个错误提示
+notify-send -a "$app_name" -i $app_icon -t 5000 "$failedPrompt"
+# 打开用户反馈网站
+
+version=`cat /etc/os-version | grep 'MinorVersion' | cut -d '=' -f2`
+osbuild=`cat /etc/os-version | grep 'OsBuild' | cut -d '=' -f2`
+xdg-open "https://bbs.lingmo.org/feedback?name=$1&version=$version&osbuild=$osbuild&args=$*"

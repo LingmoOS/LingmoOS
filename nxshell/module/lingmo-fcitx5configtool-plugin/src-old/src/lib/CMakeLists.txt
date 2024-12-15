@@ -1,0 +1,2 @@
+add_subdirectory(configlib)
+add_subdirectory(configwidgetslib)

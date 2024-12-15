@@ -1,0 +1,44 @@
+test_build:
+  steps:
+    - link_package:
+        source_project: lingmo:Develop:ocean
+        source_package: %{SCM_REPOSITORY_NAME}
+        target_project: lingmo:CI
+
+    - configure_repositories:
+        project: lingmo:CI
+        repositories:
+          - name: lingmo_develop
+            paths:
+              - target_project: lingmo:CI
+                target_repository: lingmo_develop
+            architectures:
+              - x86_64
+              - aarch64
+
+          - name: archlinux
+            paths:
+              - target_project: lingmo:CI
+                target_repository: archlinux
+            architectures:
+              - x86_64
+
+  filters:
+    event: pull_request
+
+tag_build:
+  steps:
+    - branch_package:
+        source_project: lingmo:Develop:ocean
+        source_package: %{SCM_REPOSITORY_NAME}
+        target_project: lingmo:Unstable:ocean
+  filters:
+    event: tag_push
+
+commit_build:
+  steps:
+    - trigger_services:
+        project: lingmo:Develop:ocean
+        package: %{SCM_REPOSITORY_NAME}
+  filters:
+    event: push

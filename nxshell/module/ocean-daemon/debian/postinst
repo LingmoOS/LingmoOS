@@ -1,0 +1,53 @@
+#!/bin/sh
+
+set -e
+
+fallbackFont=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+fallbackFontDir=/lib/fonts/fallback
+jvmDir=/usr/lib/jvm
+arch=$(dpkg --print-architecture)
+
+linkJavaFallbackFont () {
+    if [ -f $fallbackFont -a -d $jvmDir ];then
+        for javaHome in $jvmDir/*
+        do
+            if [ -d "$javaHome" -a ! -L "$javaHome" ];then
+                mkdir -p "$javaHome$fallbackFontDir"
+                ln -sf $fallbackFont "$javaHome$fallbackFontDir"
+            fi
+        done
+    fi
+}
+
+prepareGfxmodeDetect () {
+    [ -f /etc/grub.d/35_lingmo_gfxmode ] && rm /etc/grub.d/35_lingmo_gfxmode
+    if echo $arch | grep -q ^mips; then
+        [ -f /etc/default/grub.d/10_lingmo.cfg ] && rm /etc/default/grub.d/10_lingmo.cfg
+        return 0
+    fi
+
+    if [ -f /etc/default/grub.d/11_ocean.cfg ]; then
+        . /etc/default/grub.d/11_ocean.cfg
+        if [ "$LINGMO_GFXMODE_ADJUSTED" = 1 -o -n "$LINGMO_GFXMODE_DETECT" ]; then
+            return
+        fi
+    fi
+    /usr/lib/lingmo-daemon/grub2 -prepare-gfxmode-detect && update-grub || true
+}
+
+case "$1" in
+    configure)
+    if [ -x /usr/lib/lingmo-daemon/default-terminal ];then
+        update-alternatives --install /usr/bin/x-terminal-emulator \
+            x-terminal-emulator /usr/lib/lingmo-daemon/default-terminal 60
+    fi
+    linkJavaFallbackFont
+    prepareGfxmodeDetect
+    ;;
+    triggered)
+    linkJavaFallbackFont
+    ;;
+esac
+
+
+#DEBHELPER#

@@ -1,0 +1,1405 @@
+<?xml version="1.0" ?>
+<!DOCTYPE article PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+<!ENTITY % addindex "IGNORE">
+<!ENTITY % Italian "INCLUDE"
+> <!-- change language only here -->
+]>
+
+<!--copy from r308626 Tue May 4 17:11:51 2004 UTC -->
+
+<article id="windowbehaviour" lang="&language;">
+<articleinfo>
+<title
+>Comportamento delle finestre</title>
+<authorgroup>
+<author
+>&Mike.McBride; &Mike.McBride.mail;</author>
+<author
+>&Jost.Schenck; &Jost.Schenck.mail;</author>
+<author
+><firstname
+>Natalie</firstname
+><surname
+>Clarius</surname
+><email
+>natalie_clarius@yahoo.de</email
+></author>
+<othercredit role="translator"
+> <firstname
+>Vincenzo</firstname
+><surname
+>Reale</surname
+><affiliation
+><address
+><email
+>smart2128vr@gmail.com</email
+> </address
+></affiliation
+><contrib
+>Traduzione della documentazione</contrib
+></othercredit
+><othercredit role="translator"
+><firstname
+>Marco</firstname
+><surname
+>Poletti</surname
+><affiliation
+><address
+><email
+>poletti.marco@gmail.com</email
+></address
+></affiliation
+><contrib
+>Traduzione della documentazione</contrib
+></othercredit
+> 
+</authorgroup>
+
+<date
+>31/8/2022</date>
+<releaseinfo
+>Plasma 5.26</releaseinfo>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KControl</keyword>
+<keyword
+>impostazioni di sistema</keyword>
+<keyword
+>azioni</keyword>
+<keyword
+>finestra</keyword>
+<keyword
+>posizionamento delle finestre</keyword>
+<keyword
+>dimensione delle finestre</keyword>
+<keyword
+>gestione delle finestre</keyword>
+<keyword
+>comportamento delle finestre</keyword>
+<keyword
+>fuoco</keyword>
+<keyword
+>alza</keyword>
+<keyword
+>barra del titolo</keyword>
+<keyword
+>schermo</keyword>
+<keyword
+>aggancio</keyword>
+</keywordset>
+</articleinfo>
+
+<sect1 id="window-behavior">
+<title
+>Comportamento delle finestre</title>
+
+<para
+>Nella parte alta di questo modulo di controllo ci sono diverse schede: <guilabel
+>Fuoco</guilabel
+>, <guilabel
+>Azioni sulla barra del titolo</guilabel
+>, <guilabel
+>Azioni finestra</guilabel
+>, <guilabel
+>Spostamento</guilabel
+> e <guilabel
+>Avanzate</guilabel
+>. Nel pannello <guilabel
+>Fuoco</guilabel
+> si può configurare il modo in cui le finestre acquistano o perdono il fuoco, &ie; diventano attive o inattive. Utilizzando <guilabel
+>Azioni sulla barra del titolo</guilabel
+> e <guilabel
+>Azioni finestra</guilabel
+> si può configurare il modo in cui le barre del titolo e le finestre reagiscono ai clic del mouse. <guilabel
+>Spostamento</guilabel
+> consente di configurare come si spostano le finestre e dove vengono posizionate all'apertura. Le opzioni <guilabel
+>Avanzate</guilabel
+> contengono alcune opzioni specializzate come <quote
+>arrotolamento delle finestre</quote
+>. </para>
+
+<note>
+<para
+>Notare che la configurazione di questo modulo non avrà effetto se non si utilizza &kwin;, il gestore delle finestre nativo di &plasma;. Se si usa un altro gestore delle finestre, riferirsi alla sua documentazione per sapere come personalizzare il comportamento delle finestre. </para>
+</note>
+
+<sect2 id="focus">
+<title
+>Fuoco</title>
+
+<para
+>Il <quote
+>fuoco</quote
+> dell'area di lavoro si riferisce alla finestra su cui l'utente sta lavorando. La finestra con il fuoco è spesso chiamata la <quote
+>finestra attiva</quote
+>. </para>
+
+<para
+>Il fuoco non indica necessariamente che la finestra è sopra alle altre &mdash; quella viene detta finestra <quote
+>sollevata</quote
+>. Nonostante anche quello venga configurato qui, il fuoco e il sollevamento delle finestre vengono configurati indipendentemente. </para>
+
+<sect3 id="focus-focuspolicy">
+<title
+>Criterio di attivazione delle finestre</title>
+
+<para
+>Ci sono sei metodi che &kwin; può usare per determinare il fuoco attuale: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Clic per il fuoco</guilabel
+></term>
+<listitem>
+<para
+>Una finestra diventa attiva quando si fa clic su di essa. Questo comportamento è comune ad altri sistemi operativi e probabilmente ciò che si desidera.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Clic per il fuoco (precedenza del mouse)</guilabel
+></term>
+<listitem>
+<para
+>Simile a <guilabel
+>Clic per il fuoco</guilabel
+>. Se una finestra attiva deve essere scelta dal sistema (&eg;, perché quella attualmente attiva è stata chiusa) la finestra sotto il puntatore è la candidata preferita. Insolita, ma una possibile variante di <guilabel
+>Clic per il fuoco</guilabel
+>. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Il fuoco segue il mouse</guilabel
+></term>
+<listitem>
+<para
+>Quando si sposta il puntatore del mouse su una finestra, questa diventa attiva. Le nuove finestre, come la mini riga di comando attivata con <keycombo action="simul"
+>&Alt;<keycap
+>F2</keycap
+></keycombo
+> riceveranno automaticamente il fuoco, senza dover spostare il puntatore del mouse. &eg;, le finestre che appaiono casualmente sotto il puntatore non riceveranno il fuoco. La prevenzione della sottrazione del fuoco funzionerà normalmente. Si può pensare come <guilabel
+>Clic per il fuoco</guilabel
+>, ma senza dover fare clic. </para>
+<para
+>In altri gestori di finestre, a volte questa modalità viene chiamata <quote
+>fuoco disordinato segue il mouse</quote
+>. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Il fuoco segue il mouse (precedenza del mouse)</guilabel
+></term>
+<listitem>
+<para
+>Simile al <guilabel
+>Il fuoco segue il mouse</guilabel
+>. Se una finestra attiva deve essere scelta dal sistema (&eg;, perché quella attualmente attiva è stata chiusa) la finestra sotto il puntatore è la candidata preferita. Scegliere questa opzione, se si desidera che il fuoco sia controllato dal passaggio del puntatore. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Fuoco sotto il mouse</guilabel
+></term>
+<listitem>
+<para
+>La finestra che si trova sotto il puntatore del mouse diventa attiva. Se il mouse non è sopra una finestra (ad esempio, è sopra lo sfondo del desktop) l'ultima finestra che era sotto il puntatore del mouse è attiva. Nuove finestre come la mini riga di comando invocata con <keycombo action="simul"
+>&Alt;<keycap
+>F2</keycap
+></keycombo
+> non riceveranno il fuoco, devi spostarci sopra il mouse per digitare. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Fuoco strettamente sotto il mouse</guilabel
+></term>
+<listitem>
+<para
+>Simile a <guilabel
+>Fuoco sotto il mouse</guilabel
+>, ma con un'interpretazione ancora più stretta. Solo la finestra sotto il puntatore del mouse è attiva. Se il puntatore del mouse non è su nessuna finestra, nessuna finestra ha il fuoco. Le nuove finestre, come la mini riga di comando attivata con <keycombo action="simul"
+>&Alt;<keycap
+>F2</keycap
+></keycombo
+> non riceveranno automaticamente il fuoco, bisogna spostare il puntatore del mouse sopra di esse per poter digitare. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<note>
+<para
+>Notare che <guilabel
+>Fuoco sotto il mouse</guilabel
+> e <guilabel
+>Fuoco strettamente sotto il puntatore del mouse</guilabel
+> impediscono a certe funzioni, come la <guilabel
+>Prevenzione della sottrazione del fuoco</guilabel
+> e lo scorrimento tra le finestre con <keycombo action="simul"
+>&Alt;&Tab;</keycombo
+>, di funzionare correttamente. </para>
+</note>
+
+</sect3>
+
+<sect3 id="focus-focusdelay">
+<title
+>Ritarda il fuoco di</title>
+
+<para
+>Questo è il tempo dopo il quale la finestra che ha sopra il mouse riceverà il fuoco. </para>
+
+</sect3>
+
+<sect3 id="focus-focusstealing">
+<title
+>Prevenzione della sottrazione del fuoco</title>
+
+<para
+>Questa opzione di KWin specifica come prevenire i cambiamenti non desiderati del fuoco causati dall'attivazione inaspettata di nuove finestre. </para
+> 
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Nessuna</guilabel
+></term>
+<listitem
+><para
+>La prevenzione è disabilitata, e le nuove finestre vengono sempre attivate.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Basso</guilabel
+></term>
+<listitem
+><para
+>La prevenzione è abilitata; quando qualche finestra non supporta il meccanismo relativo e KWin non è in grado di decidere quando attivarla, sarà attivata. Questa impostazione può essere migliore o peggiore del livello medio, in base alle applicazioni coinvolte.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Medio</guilabel
+></term>
+<listitem
+><para
+>La prevenzione è abilitata.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Alto</guilabel
+></term>
+<listitem
+><para
+>Le nuove finestra vengono attivate solo se nessuna finestra è attiva o se appartengono all'applicazione attualmente attiva. Questa impostazione probabilmente non è davvero usabile senza la politica di fuoco in base al mouse.</para
+></listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Estrema</guilabel
+></term>
+<listitem
+><para
+>Tutte le finestre devono essere attivate esplicitamente dall'utente.</para
+></listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>Le finestre a cui è impedito di sottrarre il fuoco vengono segnalate come finestre che richiedono attenzione, che con le impostazioni predefinite causa l'evidenziazione della voce corrispondente nella barra delle applicazioni. Questo comportamento può essere modificato nel modulo di configurazione delle notifiche. </para>
+
+</sect3>
+
+<sect3 id="focus-raisingwindow">
+<title
+>Alzare le finestre</title>
+
+<para
+>Oltre a ricevere il fuoco, puoi anche controllare in quali condizioni le finestre vengono alzate, &ie; portate in primo piano. </para>
+
+<para
+>Dovresti assicurarti che almeno una delle opzioni di innalzamento sia abilitata, altrimenti le finestre non saranno affatto alzate. </para>
+
+<para
+><guilabel
+>Clic alza la finestra attiva</guilabel
+> porta una finestra in primo piano quando riceve un clic. Questa è abilitata per impostazione predefinita con una regola di clic per messa a fuoco. </para>
+
+<para
+>Attivando <guilabel
+>Alza al passaggio, con ritardo di</guilabel
+>, puoi portare una finestra in primo piano se il puntatore del mouse rimane sopra di essa per un certo periodo di tempo. È possibile determinare il ritardo per questa opzione utilizzando la casella numerica. Questa opzione di aumento automatico è disponibile solo con una regolare di fuoco al passaggio del mouse. </para>
+
+<tip>
+<para
+>Se il ritardo impostato è troppo corto, la finestra verrà cambiata troppo velocemente, cosa che può distrarre l'utente. Molte persone usano un ritardo di 100-300ms. Questo è abbastanza reattivo, ma permette di passare sugli spigoli di una finestra per andare alla destinazione senza portare quella finestra in primo piano. </para>
+</tip>
+
+</sect3>
+
+<sect3 id="focus-multiscreen">
+<title
+>Comportamento con più schermi</title>
+
+<para
+>Controlla il comportamento dello stato attivo della finestra con più schermate. Nota che queste opzioni sono visualizzate solo quando più di uno schermo è attualmente connesso. </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Lo schermo attivo segue il mouse</guilabel
+></term>
+<listitem>
+<para
+>Quando questa opzione è abilitata, lo schermo attivo (dove, ad esempio, appaiono le nuove finestre) è lo schermo contenente il puntatore del mouse. Quando è disabilitata, lo schermo attivo è quello contenente la finestra attiva. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Fuoco degli schermi separati</guilabel
+></term>
+<listitem>
+<para
+>Quando questa opzione è abilitata, le operazioni di messa a fuoco sono limitate solo allo schermo attivo. Ad esempio, quando chiudi una finestra, la finestra successiva a cui è stato assegnato lo stato attivo sarà una finestra sullo schermo attivo, anche se è presente una finestra utilizzata più di recente su uno schermo diverso. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+</sect2>
+
+<sect2 id="titlebar-actions">
+<title
+>Azioni sulla barra del titolo</title>
+
+<para
+>In questa scheda si può configurare cosa succede ad una finestra quando si fa clic sulla sua barra del titolo. </para>
+
+<sect3 id="actions-titlebar">
+<title
+><guilabel
+>Azioni sulla barra del titolo</guilabel
+></title>
+
+<para
+>Questa sezione consente di determinare cosa succede quando fai doppio clic o scorri la rotella del mouse sulla barra del titolo di una finestra. </para>
+
+<para
+>Le seguenti azioni sono disponibili per <guilabel
+>Doppio clic</guilabel
+>. </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra per riempire l'altezza e la larghezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza verticalmente</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra all'altezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza orizzontalmente</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra alla larghezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Minimizza</guilabel
+></term>
+<listitem>
+<para
+>Nasconde la finestra nel suo stato ridotto a icona, da cui può essere ripristinata &eg; tramite il gestore dei processi o il selettore delle attività. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Arrotola</guilabel
+></term>
+<listitem>
+<para
+>Riduce la finestra alla semplice barra del titolo. Facendo nuovamente doppio clic sulla barra del titolo, la finestra viene ripristinata alla sua dimensione normale. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Chiudi</guilabel
+></term>
+<listitem>
+<para
+>Chiude la finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Mostra su tutti i desktop</guilabel
+></term>
+<listitem>
+<para
+>Rende la finestra visibile su tutti i desktop virtuali. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Non fare nulla</guilabel
+></term>
+<listitem>
+<para
+>Non succede nulla con il doppio clic. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>La <guilabel
+>rotella del mouse</guilabel
+> può essere utilizzata per attivare un'azione a seconda che venga fatta scorrere verso l'alto o verso il basso: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Alza/Abbassa</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto sposterà la finestra sopra le altre finestre. </para>
+<para
+>Lo scorrimento verso l'alto sposterà la finestra sopra le altre finestre. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Arrotola/Srotola</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto ridurrà la finestra alla sola barra del titolo. </para>
+<para
+>Lo scorrimento verso il basso ripristinerà la finestra alle sue dimensioni normali. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza/Ripristina</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto ingrandirà la finestra per riempire l'intero schermo. </para>
+<para
+>Lo scorrimento verso il basso ripristinerà la sua dimensione precedente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Tieni sopra/sotto</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto farà rimanere la finestra in primo piano, coprendo le altre finestre. </para>
+<para
+>Lo scorrimento verso il basso farà rimanere la finestra coperta sotto le altre finestre. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Sposta al desktop precedente/successivo</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso il basso sposterà la finestra sul desktop virtuale precedente. </para>
+<para
+>Lo scorrimento verso il basso sposterà la finestra sul desktop virtuale successivo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Cambia opacità</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto renderà la finestra meno trasparente. </para>
+<para
+>Lo scorrimento verso il basso renderà la finestra più trasparente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Non fare nulla</guilabel
+></term>
+<listitem>
+<para
+>Non succede nulla scorrendo verso l'alto o verso il basso sulla barra del titolo della finestra. </para>
+</listitem>
+</varlistentry>
+  
+</variablelist>
+
+<tip>
+<para
+>Puoi fare in modo che le finestre vengano automaticamente srotolate quando posizioni semplicemente il puntatore del mouse sulla barra del titolo ombreggiata. Basta selezionare la casella di selezione <link linkend="advanced-unshading"
+><guilabel
+>Srotolamento della finestra</guilabel
+></link
+> nella scheda <guilabel
+>Avanzate</guilabel
+> di questo modulo. Questo è un ottimo modo per recuperare spazio sullo schermo quando tagli e incolli tra molte finestre, ad esempio. </para>
+</tip>
+
+</sect3>
+
+<sect3 id="actions-titlebar-frame">
+<title
+><guilabel
+>Azioni per barra del titolo e cornice</guilabel
+></title>
+
+<para
+>Queste impostazioni permettono di decidere cosa succede quando si fa clic sulla barra del titolo o sulla cornice di una finestra. È bene notare che si possono avere azioni diverse associate allo stesso clic, una attivata se la finestra è attiva e l'altra se è inattiva. </para>
+
+<para
+>Per ogni combinazione di tasti del mouse, finestra attiva o inattiva, si può scegliere l'opzione più appropriata. Le azioni sono le seguenti: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Alza</guilabel
+></term>
+<listitem>
+<para
+>Porterà la finestra in cima alla pila delle finestre. Tutte le altre finestre che si sovrappongono a questa saranno nascoste <quote
+>sotto</quote
+> di essa. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Abbassa</guilabel
+></term>
+<listitem>
+<para
+>Sposterà questa finestra in fondo alla pila di finestre. Toglierà di mezzo la finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Commuta alza e abbassa</guilabel
+></term>
+<listitem>
+<para
+>Porta in primo piano la finestra, se non la è già; altrimenti la abbassa. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Minimizza</guilabel
+></term>
+<listitem>
+<para
+>Nasconde la finestra nel suo stato ridotto a icona, da cui può essere ripristinata &eg; tramite il gestore dei processi o il selettore delle attività. </para>
+</listitem>
+</varlistentry>
+<varlistentry>
+
+<term
+><guilabel
+>Arrotola</guilabel
+></term>
+<listitem>
+<para
+>Riduce la finestra alla semplice barra del titolo. Facendo nuovamente doppio clic sulla barra del titolo, la finestra viene ripristinata alla sua dimensione normale. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Chiudi</guilabel
+></term>
+<listitem>
+<para
+>Chiude la finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Mostra menu delle azioni</guilabel
+></term>
+<listitem>
+<para
+>Apre un piccolo sotto-menu, dove puoi scegliere i comandi relativi alla finestra (&ie; sposta al desktop, sposta allo schermo, massimizza, minimizza, chiudi, &etc;). </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Non fare nulla</guilabel
+></term>
+<listitem>
+<para
+>Non succede nulla al clic. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+<sect3 id="actions-maximize-button">
+<title
+><guilabel
+>Azioni per il pulsante Massimizza</guilabel
+></title>
+
+<para
+>Questa sezione consente di determinare il comportamento dei tre pulsanti del mouse sul pulsante di ingrandimento. </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra all'altezza e alla larghezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza verticalmente</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra all'altezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza orizzontalmente</guilabel
+></term>
+<listitem>
+<para
+>Ridimensiona la finestra alla larghezza dello schermo. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+</sect2>
+
+<sect2 id="window-actions">
+<title
+>Azioni finestra</title>
+
+<sect3 id="actions-inactive-inner-window">
+<title
+><guilabel
+>Interno finestra inattiva</guilabel
+></title>
+
+<para
+>Questa sezione del modulo permette di configurare cosa succede quando si fa clic su una finestra inattiva, con ognuno dei tre pulsanti o con la rotella del mouse. </para>
+
+<para
+>Si può scegliere tra: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva, alza e passa il clic</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra, la alza e invia il clic all'applicazione nella finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva e passa il clic</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra e invia il clic all'applicazione nella finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra e non fa altro. Il clic del mouse non è inviato all'applicazione nella finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva e alza</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra e la porta in primo piano. Il clic del mouse non è inviato all'applicazione nella finestra. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>Le scelte per <guilabel
+>Rotella del mouse</guilabel
+> sono le seguenti: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Scorrimento</guilabel
+></term>
+<listitem>
+<para
+>Scorre semplicemente il contenuto all'interno della finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva e scorri</guilabel
+></term>
+<listitem>
+<para
+>Questo rende attiva la finestra che ha ricevuto il clic e scorre il contenuto. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva, alza e scorri</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra che ha ricevuto il clic, la alza nella parte alta dello schermo e scorre il contenuto. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+<sect3 id="actions-inner-window-titlebar-frame">
+<title
+><guilabel
+>Interno finestra, barra del titolo e cornice</guilabel
+></title>
+
+<para
+>Questa sezione inferiore consente di configurare azioni aggiuntive quando fai clic su una finestra con un tasto modificatore premuto. </para>
+
+<para
+>Come <guilabel
+>Tasto modificatore</guilabel
+>, puoi selezionare tra <guilabel
+>Meta</guilabel
+> (predefinito) o <guilabel
+>Alt</guilabel
+>. </para>
+
+<para
+>Anche qui è possibile associare azioni diverse per i vari clic del mouse e per la rotellina del mouse. </para>
+
+<para
+>Le tue scelte per i pulsanti del mouse sono: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Sposta</guilabel
+></term>
+<listitem>
+<para
+>Consente di trascinare la finestra selezionata nell'area di lavoro. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attiva, alza e sposta</guilabel
+></term>
+<listitem>
+<para
+>Rende attiva la finestra su cui si è fatto clic, la alza in cima alla pila di finestre e trascina la finestra nell'area di lavoro. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Commuta alza e abbassa</guilabel
+></term>
+<listitem>
+<para
+>Porta in primo piano la finestra, se non la è già; altrimenti la abbassa. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Ridimensiona</guilabel
+></term>
+<listitem>
+<para
+>Permette di cambiare la dimensione della finestra selezionata. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Alza</guilabel
+></term>
+<listitem>
+<para
+>Porterà la finestra in cima alla pila delle finestre. Tutte le altre finestre che si sovrappongono a questa saranno nascoste <quote
+>sotto</quote
+> di essa. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Abbassa</guilabel
+></term>
+<listitem>
+<para
+>Sposterà questa finestra in fondo alla pila di finestre. Toglierà di mezzo la finestra. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Minimizza</guilabel
+></term>
+<listitem>
+<para
+>Nasconde la finestra nel suo stato ridotto a icona, da cui può essere ripristinata &eg; tramite il gestore dei processi o il selettore delle attività. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Diminuisci l'opacità</guilabel
+></term>
+<listitem>
+<para
+>Rende la finestra più trasparente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Aumenta l'opacità</guilabel
+></term>
+<listitem>
+<para
+>Rende la finestra meno trasparente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Non fare nulla</guilabel
+></term>
+<listitem>
+<para
+>Non succede nulla al clic. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<para
+>Le tue scelte per la rotella del mouse sono: </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Alza/Abbassa</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto sposterà la finestra sopra le altre finestre. </para>
+<para
+>Lo scorrimento verso l'alto sposterà la finestra sopra le altre finestre. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Arrotola/Srotola</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto ridurrà la finestra alla sola barra del titolo. </para>
+<para
+>Lo scorrimento verso il basso ripristinerà la finestra alle sue dimensioni normali. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizza/Ripristina</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto ingrandirà la finestra per riempire l'intero schermo. </para>
+<para
+>Lo scorrimento verso il basso ripristinerà la sua dimensione precedente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Tieni sopra/sotto</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto farà rimanere la finestra in primo piano, coprendo le altre finestre. </para>
+<para
+>Lo scorrimento verso il basso farà rimanere la finestra coperta sotto le altre finestre. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Sposta al desktop precedente/successivo</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso il basso sposterà la finestra sul desktop virtuale precedente. </para>
+<para
+>Lo scorrimento verso il basso sposterà la finestra sul desktop virtuale successivo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Cambia opacità</guilabel
+></term>
+<listitem>
+<para
+>Lo scorrimento verso l'alto renderà la finestra meno trasparente. </para>
+<para
+>Lo scorrimento verso il basso renderà la finestra più trasparente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Non fare nulla</guilabel
+></term>
+<listitem>
+<para
+>Non succede nulla durante lo scorrimento verso l'alto o verso il basso della barra del titolo della finestra. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+</sect2>
+
+<sect2 id="movement">
+<title
+>Movimento</title>
+
+<para
+>Questa pagina ti consente di configurare le <guilabel
+>Zone di aggancio</guilabel
+>. Queste si comportano come un campo magnetico lungo il lato dello schermo e ogni finestra, che farà agganciare le finestre una volta avvicinate. </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Zona di aggancio dei bordi dello schermo</guilabel
+></term>
+<listitem>
+<para
+>Qui puoi impostare la zona di aggancio per i bordi dello schermo. Lo spostamento di una finestra entro la distanza configurata la farà agganciare al bordo dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Zone di aggancio delle finestre</guilabel
+></term>
+<listitem>
+<para
+>Qui si possono configurare le zone di aggancio delle finestre. Come per i bordi dello schermo, lo spostamento di una finestra vicino ad un'altra la aggancerà al bordo, come se le finestre fossero magnetizzate. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Zona di aggancio del centro</guilabel
+></term>
+<listitem>
+<para
+>Qui si può configurare la zona di aggancio del centro dello schermo, cioè la <quote
+>forza</quote
+> del campo magnetico che aggancerà le finestre al centro dello schermo quando gli vengono avvicinate. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Attrai le finestre: solo quando sovrapposte</guilabel
+></term>
+<listitem>
+<para
+>Se questa opzione è selezionata, le finestre non verranno agganciate solo perché vicine, devono anche sovrapporsi (al massimo del numero di pixel impostato). </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+<tip>
+<para
+>Nel modulo delle impostazioni di <guilabel
+>Bordi dello schermo</guilabel
+> nella sezione <guilabel
+>Comportamento dell'area di lavoro</guilabel
+> delle impostazioni di sistema, puoi configurare le finestre in modo che vengano affiancate rapidamente all'intero, metà o un quarto dello schermo se trascinate vicino ai bordi dello schermo. </para>
+</tip>
+
+</sect2>
+
+<sect2 id="advanced">
+<title
+>Avanzate</title>
+
+<para
+>Nella scheda <guilabel
+>Avanzate</guilabel
+> si può configurare in modo ancora più preciso il funzionamento delle finestre. </para>
+
+<sect3 id="advanced-unshading">
+<title
+>Srotolamento delle finestre</title>
+
+<variablelist>
+<varlistentry>
+<term
+><guilabel
+>Al passaggio del mouse sulla barra del titolo dopo</guilabel
+></term>
+<listitem>
+<para
+>Se questa opzione è marcata, le finestre arrotolate si srotoleranno automaticamente quando il puntatore del mouse rimane sulla loro barra del titolo per un certo tempo. Il campo seguente serve a configurare questo tempo. </para>
+</listitem>
+</varlistentry>
+</variablelist>
+</sect3>
+
+<sect3 id="advanced-placement">
+<title
+>Posizionamento delle finestre</title>
+
+<para
+>La politica di posizionamento determina dove apparirà una nuova finestra sullo schermo. </para>
+
+<para
+>In una configurazione con più monitor, lo schermo su cui visualizzare le finestre è sempre lo schermo attivo (ovvero lo schermo con il puntatore del mouse o la finestra attiva; vedi <link linkend="focus-multiscreen"
+>Comportamento multischermo</link
+>), ad eccezione delle finestre che ricordano la loro posizione precedente (vedi <link linkend="advanced-remember-positions"
+>sotto</link
+>). </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Sovrapposizione minima</guilabel
+></term>
+<listitem>
+<para
+>Posiziona tutte le nuove finestre in modo tale da sovrapporsi il meno possibile alle finestre esistenti. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Massimizzate</guilabel
+></term>
+<listitem>
+<para
+>Cercherà di massimizzare tutte le nuove finestre per riempire l'intero schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Casuali</guilabel
+></term>
+<listitem>
+<para
+>Posizionerà tutte le nuove finestre in punti casuali. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Centrate</guilabel
+></term>
+<listitem>
+<para
+>Posizionerà tutte le nuove finestre al centro dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Nell'angolo in alto a sinistra</guilabel
+></term>
+<listitem>
+<para
+>Posizionerà tutte le nuove finestre con il loro angolo in alto a sinistra nell'angolo in alto a sinistra dello schermo. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Sotto il mouse</guilabel
+></term>
+<listitem>
+<para
+>Posiziona tutte le nuove finestre centrate sotto il puntatore del mouse. </para>
+</listitem>
+</varlistentry>
+  
+</variablelist>
+
+<para id="advanced-remember-positions"
+>Seleziona l'elemento <guilabel
+>Consenti alle applicazioni di ricordare le posizioni delle proprie finestre</guilabel
+> per aprire le finestre dove si trovavano in precedenza, piuttosto che con il metodo di posizionamento scelto sopra. Nota che questa posizione ricordata include l'assegnazione dello schermo, quindi le finestre potrebbero aprirsi su uno schermo diverso da quello attivo se questo è il punto in cui si trovavano l'ultima volta. Nota anche che questa opzione è disponibile solo su X11, non su Wayland, ed è supportata solo da alcune applicazioni KDE. </para>
+
+<tip>
+<para
+>Se desideri che alcune finestre appaiano su posizioni, schermi o desktop virtuali specifici, puoi impostare <guilabel
+>Regole delle finestre</guilabel
+> per configurare finestre speciali o impostazioni dell'applicazione. Puoi trovarla facendo clic con il pulsante destro del mouse sulla barra del titolo di una finestra e scegliendo <guimenu
+>Altre azioni</guimenu
+>, o nel modulo <guilabel
+>Regole delle finestre</guilabel
+> nella sezione delle impostazioni di sistema <guilabel
+>Gestione delle finestre</guilabel
+>. </para>
+</tip>
+
+
+</sect3>
+
+<sect3 id="advanced-special-windows">
+<title
+>Finestre speciali</title>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Nascondi le finestre accessorie delle applicazioni inattive</guilabel
+></term>
+<listitem>
+<para
+>Quando questa opzione è marcata, saranno nascoste le finestre accessorie (finestre degli strumenti, menu staccati, ecc.) delle applicazioni inattive, e saranno visualizzate solo quando l'applicazione diventa attiva. Nota che le applicazioni devono contrassegnare le finestre con il tipo di finestra appropriato affinché funzioni. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+<sect3 id="advanced-virtual-desktop-behavior">
+<title
+>Comportamento del desktop virtuale</title>
+
+<para
+>A volte l'invocazione di un'applicazione attiverà una finestra esistente anziché aprire una nuova finestra. Questa impostazione controlla cosa dovrebbe accadere se la finestra attivata si trova su un desktop virtuale diverso da quello attuale. </para>
+
+<variablelist>
+
+<varlistentry>
+<term
+><guilabel
+>Passa a quel desktop virtuale</guilabel
+></term>
+<listitem>
+<para
+>Passerà al desktop virtuale in cui si trova attualmente la finestra. </para>
+<para
+>Scegli questa opzione se desideri che il desktop virtuale attivo segua automaticamente le finestre al desktop virtuale assegnato. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><guilabel
+>Porta la finestra sul desktop virtuale attuale</guilabel
+></term>
+<listitem>
+<para
+>Farà passare la finestra al desktop virtuale attivo. </para>
+<para
+>Scegli questa opzione se desideri che le finestre si aprano sempre sul desktop virtuale attuale e che il desktop virtuale attivo cambi solo durante la navigazione manuale. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</sect3>
+
+</sect2>
+
+</sect1>
+
+</article>

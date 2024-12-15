@@ -1,0 +1,29 @@
+pkgname=xdg-desktop-portal-ocean
+pkgver=1.0
+pkgrel=1.0
+sourcename=xdg-desktop-portal-ocean
+sourcetars=("$sourcename"_"$pkgver".tar.gz)
+sourcedir="$sourcename"
+pkgdesc='xdg-desktop-portal backend for lingmo'
+arch=('x86_64' 'aarch64')
+url='https://github.com/lingmoos/xdg-desktop-portal-ocean'
+license=('LGPL3')
+depends=('qt6-base' 'qt6-wayland' 'wayland')
+makedepends=('git' 'ninja' 'cmake' 'qt6-tools' 'wlr-protocols')
+provides=('xdg-desktop-portal-impl')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+build() {
+  cd $sourcedir
+  cmake -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_LIBEXECDIR=/usr/lib
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

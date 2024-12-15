@@ -1,0 +1,243 @@
+/*!
+@~chinese
+@file dimagehandler.h
+
+dimagehandler.h 提供图像处理类 DImageHandler 
+
+@class Dtk::Gui::DImageHandler
+@brief DImageHandler 提供图像处理，读取、保存、旋转、滤镜等。
+@details 
+## 概述
+提供多种格式图片的读取、保存，允许对部分格式进行旋转。提供多种滤镜、锐化、二值化等图像处理算法。
+通过 `DImageHandler::setFileName` 设置当前处理的图片文件路径，通过 `DImageHandler::readImage`
+取得图片数据，通过 `DImageHandler::thumbnail` 取得图片缩略图。设置文件路径将不会立即加载图片，
+将在需要图片数据时读取，当不需要缓存数据时，可通过 `DImageHandler::clearCache` 清除缓存数据。
+
+@note 拓展的图片格式依赖 FreeImage 和 LibRaw 公共库，DImageHandler 通过动态加载的方式解析公共库接口。
+可通过 DImageHandler::supportFormats() 获取当前支持的图片格式类型。
+
+## 编译
+支持拓展的图片格式，编译时会判断环境是否存在依赖包，安装 libfreeimage-dev 及 libraw-dev ，
+设置编译选项 DTK_DISABLE_EX_IMAGE_FORMAT=OFF 后将开启拓展图片格式支持。
+
+不同包构建环境默认策略不同，在 **debian** 和 **linglong** 构建环境默认依赖 libfreeimage-dev 及 libraw-dev ，
+支持拓展图片格式，其它环境需手动安装。
+
+## image-handler 工具示例
+可在程序根目录 ./tools/image-handler 中查看 image-handler 工具项目。
+image-handler 工具可用于提取图像信息、旋转图像、设置图像滤镜等。
+```shell
+image-handler [options] [file...]
+```
+
+### image-handler 选项
+| **选项** | **描述** |
+|---|---|
+| -h, --help | 显示工具帮助信息 |
+| -r, --rotate <degresses> | 根据设置角度旋转图片，旋转角度需为 **90度** 的倍数 |
+| -o, --output <file> | 保存处理后的文件到指定路径 |
+| -f <filter> | 为图片设置滤镜，可选图片滤镜包括 old, warm, cool, gray, anticolor, metal |
+| -l, --list | 列出所有图片的格式 |
+| -e | 列出所有图片的详细信息，结合 **-l** 使用 | 
+
+
+@fn Dtk::Gui::DImageHandler::DImageHandler(QObject *parent)
+@brief 构造 DImageHandler 实例，并指定父控件
+@param[in] parent 作为实例的父控件
+
+@fn Dtk::Gui::DImageHandler::~DImageHandler()
+@brief 销毁 DImageHandler 实例
+
+@fn void Dtk::Gui::DImageHandler::setFileName(const QString &fileName)
+@brief 设置当前处理的图片文件路径
+@param[in] fileName 图片文件路径
+
+@fn QString Dtk::Gui::DImageHandler::fileName() const
+@brief 返回当前处理的图片文件路径
+@return 图片文件路径
+
+@fn QImage Dtk::Gui::DImageHandler::readImage()
+@brief 从设置的图片文件路径中读取图片
+@details 从 fileName() 设置的图片文件中读取图片，若读取失败，将返回空图片实例，
+    错误信息通过 lastError() 获取
+@return 图片实例
+
+@fn QImage Dtk::Gui::DImageHandler::thumbnail(const QSize &size, Qt::AspectRatioMode mode)
+@brief 获取当前处理图片指定大小的缩略图，可调整宽高比适配模式
+@param[in] 缩略图大小
+@return 缩略图实例
+
+@fn QString Dtk::Gui::DImageHandler::imageFormat() const
+@brief 返回当前设置图片文件的格式，若未设置文件路径，返回空字符串
+@return 图片格式
+
+@fn QSize Dtk::Gui::DImageHandler::imageSize()
+@brief 返回当前处理的图片尺寸，若未设置图片文件或加载失败，返回空图片尺寸 (-1, -1)
+@return 图片大小
+
+@fn QHash<QString, QString> Dtk::Gui::DImageHandler::findAllMetaData()
+@brief 查询图片包含的所有元数据，在动态加载 FreeImage 库后有效
+@return 图片信息表
+
+@fn void Dtk::Gui::DImageHandler::clearCache()
+@brief 清空缓存数据，释放缓存的图片和错误信息
+
+@fn bool Dtk::Gui::DImageHandler::saveImage(const QString &fileName, const QString &format = QString())
+@brief 保存当前处理的图片至文件，可指定保存的图片格式， 若存在错误，将返回 false ，错误信息通过 lastError() 获取
+@param[in] fileName 保存的文件路径
+@param[in] format 指定保存图片格式，默认为空，表示保持原格式
+@return 是否成功保存图片
+
+@fn bool Dtk::Gui::DImageHandler::saveImage(const QImage &image, const QString &fileName, const QString &format)
+@brief 保存图片至文件，可指定保存的图片格式， 若存在错误，将返回 false ，错误信息通过 lastError() 获取
+@param[in] image 图片实例
+@param[in] fileName 保存的文件路径
+@param[in] format 指定保存图片格式，默认为空，表示保持原格式
+@return 是否成功保存图片
+
+@fn bool Dtk::Gui::DImageHandler::rotateImage(QImage &image, int angle)
+@brief 顺时针旋转图片，若存在错误，将返回 false ，错误信息通过 lastError() 获取
+@param[in,out] image 图片实例
+@param[in] angle 图片旋转角度，必须以90度为倍数
+@return 是否成功旋转图片
+
+@fn bool Dtk::Gui::DImageHandler::rotateImageFile(const QString &fileName, int angle)
+@brief 顺时针旋转图片文件中的图片
+@details 读取 fileName 图片文件，顺时针旋转图片 angle 度，并将图片数据写回文件，
+    若存在错误，将返回 false ，错误信息通过 lastError() 获取
+@param[in] fileName 图片文件路径
+@param[in] angle 图片旋转角度，必须以90度为倍数
+@return 是否成功旋转并保存图片文件
+
+@fn bool Dtk::Gui::DImageHandler::isReadable() const
+@brief 返回当前设置的图片文件是否可读取，判断基于图片格式，fileName() 为空时返回 false
+@return 是否可读取
+
+@fn bool Dtk::Gui::DImageHandler::isWriteable() const
+@brief 返回当前设置的图片文件是否可写入，判断基于图片格式，fileName() 为空时返回 false
+@return 是否可写入
+
+@fn bool Dtk::Gui::DImageHandler::isRotatable() const
+@brief 返回当前设置的图片文件是否可旋转，判断基于图片格式，fileName() 为空时返回 false
+@return 是否可旋转
+
+@fn static QStringList Dtk::Gui::DImageHandler::supportFormats()
+@brief 返回当前环境下 DImageHandler 可支持的图片格式，可动态加载 FreeImage 库以支持更多图片格式
+@return 支持的图片格式
+
+@fn static QString Dtk::Gui::DImageHandler::detectImageFormat(const QString &fileName)
+@brief 根据文件名称及文件内容检测图片格式
+@param[in] fileName 图片文件路径
+@return 图片格式
+
+@fn QString Dtk::Gui::DImageHandler::lastError() const;
+@brief 返回最近一次错误的详细信息
+@return 错误信息
+
+@fn static QImage Dtk::Gui::DImageHandler::oldColorFilter(const QImage &img)
+@brief 为图片设置老照片滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::warmColorFilter(const QImage &img, int intensity = 30)
+@brief 为图片设置暖色滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@param[in] intensity 滤镜处理强度，取值范围 -255 ~ 255 ，默认30
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::coolColorFilter(const QImage &img,  int intensity = 30)
+@brief 为图片设置冷色滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@param[in] intensity 滤镜处理强度，取值范围 -255 ~ 255 ，默认30
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::grayScaleColorFilter(const QImage &img)
+@brief 为图片设置灰色滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::antiColorFilter(const QImage &img)
+@brief 为图片设置反色滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::metalColorFilter(const QImage &img)
+@brief 为图片设置金属风格滤镜并返回处理图片实例
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::bilateralFilter(const QImage &img, double spatialDecay, double photometricStandardDeviation)
+@brief 对图片进行双边滤波处理，可保持边界并去除噪点，可用于磨皮等处理
+@param[in] img 待处理的图片实例
+@param[in] spatialDecay 空间衰减值，用于双边滤波的空域信息，默认 0.02
+@param[in] photometricStandardDeviation 光度标准差值，用于双边滤波的值域信息, 默认 10
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::contourExtraction(const QImage &img)
+@brief 提取图片轮廓
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::binaryzation(const QImage &img)
+@brief 对图片进行二值化处理
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::grayScale(const QImage &img)
+@brief 取得灰阶图片
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::laplaceSharpen(const QImage &img)
+@brief 拉普拉斯锐化处理
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::sobelEdgeDetector(const QImage &img)
+@brief sobel边缘检测处理，用于图片锐化
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::changeLightAndContrast(const QImage &img, int light = 100, int contrast = 150)
+@brief 变更图片的亮度和对比度并返回处理图片实例
+@param[in] img 待处理的图片实例
+@param[in] light 调整图片亮度，取值范围 0 ~ 300 
+@param[in] constrase 调整图片对比度，取值范围 0 ~ 300 
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::changeBrightness(const QImage &img, int brightness)
+@brief 调整图片亮度并返回处理图片实例，取值范围 -255 ~ 255 
+@param[in] img 待处理的图片实例
+@param[in] brightness 图片亮度
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::changeTransparency(const QImage &img, int transparency)
+@brief 调整图片透明度并返回处理图片实例，取值范围 0 ~ 255 
+@param[in] img 待处理的图片实例
+@param[in] transparency 图片透明度
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::changeStauration(const QImage &img, int saturation)
+@brief 调整图片饱和度并返回处理图片实例，取值范围 -100 ~ 100 
+@param[in] img 待处理的图片实例
+@param[in] saturation 图片饱和度
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::replacePointColor(const QImage &img, QColor oldColor, QColor newColor)
+@brief 遍历图片所有像素点，替换图片像素点颜色
+@param[in] img 待处理的图片实例
+@param[in] oldColor 旧像素颜色
+@param[in] newColor 新像素颜色
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::flipHorizontal(const QImage &img)
+@brief 水平翻转图片
+@param[in] img 待处理的图片实例
+@return 处理完成的图片实例
+
+@fn static QImage Dtk::Gui::DImageHandler::flipVertical(const QImage &img)
+@brief 垂直翻转图片
+@param[in] img 待处理的图片
+@return 处理完成的图片实例
+
+*/

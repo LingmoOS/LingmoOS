@@ -1,0 +1,33 @@
+#!/bin/sh
+
+PREREQ="mdadm mdrun multipath"
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+# get pre-requisites
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+if [ ! -e /sbin/lvm ]; then
+	exit 0
+fi
+
+lvchange_activate() {
+	lvm vgchange -ay
+}
+
+atomic_upgrade_records=${rootmnt}/etc/lingmo-upgrade-manager/state.records
+
+if [[ "x${back_version}" != "x" ]] || test -e ${atomic_upgrade_records};then
+		lvchange_activate
+fi
+
+
+

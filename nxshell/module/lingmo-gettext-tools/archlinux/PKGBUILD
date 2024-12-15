@@ -1,0 +1,36 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-gettext-tools-git
+pkgver=1.0.8.r5.gc913e2d
+pkgrel=1
+sourcename=lingmo-gettext-tools
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Lingmo Gettext Tools'
+arch=('any')
+url="https://github.com/lingmoos/lingmo-gettext-tools"
+license=('GPL3')
+depends=('gettext' 'python' 'perl-config-tiny' 'perl-xml-libxml')
+makedepends=('git')
+conflicts=('lingmo-gettext-tools')
+provides=('lingmo-gettext-tools')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+  cd $sourcedir
+  sed -e 's/sudo cp/cp/' -i src/generate_mo.py
+  sed -e 's/qmake/qmake-qt5/' -e '/lupdate/d' -i Makefile
+}
+
+check() {
+  cd $sourcedir
+  perl src/desktop_ts_convert.pl --help
+  python src/generate_mo.py --help
+  python src/update_pot.py --help
+}
+
+package() {
+  cd $sourcedir
+  make DESTDIR="$pkgdir" install
+}

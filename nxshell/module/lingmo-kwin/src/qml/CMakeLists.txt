@@ -1,0 +1,5 @@
+install(DIRECTORY outline/plasma DESTINATION ${KDE_INSTALL_DATADIR}/lingmo-kwin/outline)
+install(DIRECTORY onscreennotification/plasma DESTINATION ${KDE_INSTALL_DATADIR}/lingmo-kwin/onscreennotification)
+install(DIRECTORY frames/plasma DESTINATION ${KDE_INSTALL_DATADIR}/lingmo-kwin/frames)
+install(DIRECTORY tabbox/thumbnail_grid DESTINATION ${CMAKE_INSTALL_PREFIX}/share/lingmo-kwin/tabbox)
+install(DIRECTORY tabbox/thumbnail_list DESTINATION ${CMAKE_INSTALL_PREFIX}/share/lingmo-kwin/tabbox)

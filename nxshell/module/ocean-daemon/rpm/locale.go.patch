@@ -1,0 +1,52 @@
+diff --git a/langselector/locale.go b/langselector/locale.go
+index eaa8d402..b08da2e9 100644
+--- a/langselector/locale.go
++++ b/langselector/locale.go
+@@ -407,29 +407,7 @@ func (lang *LangSelector) setLocale(locale string) {
+ 	lang.setPropCurrentLocale(locale)
+ 	lang.PropsMu.Unlock()
+ 
+-	// send notification
+-	networkEnabled, err := isNetworkEnable()
+-	if err != nil {
+-		logger.Warning(err)
+-	}
+-
+-	if networkEnabled {
+-		sendNotify(localeIconStart, "", notifyTxtStartWithInstall)
+-	} else {
+-		sendNotify(localeIconStart, "", notifyTxtStart)
+-	}
+-
+-	// generate locale
+-	err = lang.generateLocale(locale)
+-	if err != nil {
+-		logger.Warning("failed to generate locale:", err)
+-		lang.setLocaleFailed(oldLocale)
+-		return
+-	} else {
+-		logger.Debug("generate locale success")
+-	}
+-
+-	err = writeUserLocale(locale)
++	err := writeUserLocale(locale)
+ 	if err != nil {
+ 		logger.Warning("failed to write user locale:", err)
+ 		lang.setLocaleFailed(oldLocale)
+@@ -453,16 +431,6 @@ func (lang *LangSelector) setLocale(locale string) {
+ 		}
+ 	}
+ 
+-	// install language support packages
+-	if networkEnabled {
+-		err = lang.installLangSupportPackages(locale)
+-		if err != nil {
+-			logger.Warning("failed to install packages:", err)
+-		} else {
+-			logger.Debug("install packages success")
+-		}
+-	}
+-
+ 	sendNotify(localeIconFinished, "", notifyTxtDone)
+ 
+ 	// end

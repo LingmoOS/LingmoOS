@@ -1,0 +1,11 @@
+ecm_install_icons(
+    ICONS
+        16-apps-lingmo-kwin.png
+        32-apps-lingmo-kwin.png
+        48-apps-lingmo-kwin.png
+        sc-apps-lingmo-kwin.svgz
+    DESTINATION
+        ${KDE_INSTALL_ICONDIR}
+    THEME
+        hicolor
+)

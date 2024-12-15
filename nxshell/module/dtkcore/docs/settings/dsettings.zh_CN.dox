@@ -1,0 +1,230 @@
+/*!
+@~chinese
+@file include/settings/dsettings.h
+@ingroup dsettings
+@class Dtk::Core::DSettingsBackend dsettings.h
+@brief DSettingsBackend是一个配置存储类的接口
+@details 简单的例子:
+@code
+{
+    "groups": [{
+        "key": "base",
+        "name": "Basic settings",
+        "groups": [{
+                "key": "open_action",
+                "name": "Open Action",
+                "options": [{
+                        "key": "alway_open_on_new",
+                        "type": "checkbox",
+                        "text": "Always Open On New Windows",
+                        "default": true
+                    },
+                    {
+                        "key": "open_file_action",
+                        "name": "Open File:",
+                        "type": "combobox",
+                        "default": ""
+                    }
+                ]
+            },
+            {
+                "key": "new_tab_windows",
+                "name": "New Tab & Window",
+                "options": [{
+                        "key": "new_window_path",
+                        "name": "New Window Open:",
+                        "type": "combobox",
+                        "default": ""
+                    },
+                    {
+                        "key": "new_tab_path",
+                        "name": "New Tab Open:",
+                        "type": "combobox",
+                        "default": ""
+                    }
+                ]
+            }
+        ]
+    }]
+}
+@endcode
+
+读取/设置其值的示例如下:
+@code
+    // 初始化一个存储后端
+    QTemporaryFile tmpFile;
+    tmpFile.open();
+    auto backend = new Dtk::Core::QSettingBackend(tmpFile.fileName());
+
+    // 从json中初始化配置
+    auto settings = Dtk::Core::DSettings::fromJsonFile(":/resources/data/dfm-settings.json");
+    settings->setBackend(backend);
+
+    // 读取配置
+    auto opt = settings->option("base.new_tab_windows.new_window_path");
+    qDebug() << opt->value();
+
+    // 修改配置
+    opt->setValue("Test")
+    qDebug() << opt->value();
+@endcode
+@sa Dtk::Core::DSettingsOption
+@sa Dtk::Core::DSettingsGroup
+@sa Dtk::Core::DSettingsBackend
+@sa Dtk::Widget::DSettingsWidgetFactory
+@sa Dtk::Widget::DSettingsDialog
+
+@fn Dtk::Core::DSettingsBackend::DSettingsBackend(QObject *parent = Q_NULLPTR)
+@brief DSettingsBackend构造函数
+
+@fn virtual QStringList DSettingsBackend::keys() const = 0;
+@brief 返回全部键值
+
+@fn virtual QVariant DSettingsBackend::getOption(const QString &key) const = 0;
+@brief 获取 `key` 对应的值
+
+@fn virtual void DSettingsBackend::doSync() = 0;
+@brief 开始进行同步
+
+@fn virtual void DSettingsBackend::doSetOption(const QString &key, const QVariant &value) = 0;
+@brief 设置`key`对应的值,并使用存储后端进行存储。
+
+@fn void DSettingsBackend::optionChanged(const QString &key, const QVariant &value);
+@brief DSettingsOption的值发生变化时发出的信号。
+@details `key` 发生改变的 option 键,`value`对应键的值。
+
+@fn void DSettingsBackend::sync();
+@brief 私有信号,请勿使用。
+
+@fn void DSettingsBackend::setOption(const QString &key, const QVariant &value);
+@brief 私有信号,请勿使用。
+
+@class Dtk::Core::DSettings dsettings.h
+@brief DSettings是设计上为Dtk的应用程序提供统一的配置存储以及界面生成工具的基础库。
+@details DSetting使用json作为应用配置程序的描述文件。简单来说,应用查询的配置分为组/键值二个基础层级，
+对于一个标准的Dtk配置控件,一般只包含组/子组/键值三个层级，对于超过三个层级的键值，可以通过
+DSettings的API接口进行读取和写入,但是不能在标准的DSettingsDialogs上显示出来。
+
+一个简单的配置文件如下：
+@code
+{
+    "groups": [{
+        "key": "base",
+        "name": "Basic settings",
+        "groups": [{
+                "key": "open_action",
+                "name": "Open Action",
+                "options": [{
+                        "key": "alway_open_on_new",
+                        "type": "checkbox",
+                        "text": "Always Open On New Windows",
+                        "default": true
+                    },
+                    {
+                        "key": "open_file_action",
+                        "name": "Open File:",
+                        "type": "combobox",
+                        "default": ""
+                    }
+                ]
+            },
+            {
+                "key": "new_tab_windows",
+                "name": "New Tab & Window",
+                "options": [{
+                        "key": "new_window_path",
+                        "name": "New Window Open:",
+                        "type": "combobox",
+                        "default": ""
+                    },
+                    {
+                        "key": "new_tab_path",
+                        "name": "New Tab Open:",
+                        "type": "combobox",
+                        "default": ""
+                    }
+                ]
+            }
+        ]
+    }]
+}
+@endcode
+
+该组中包含一个base的root组,两个子组: open_action/new_tab_windows,每个子组有包含若干选项。
+对于"New Window Open:"这个配置,其完整的访问id为base.new_tab_windows.new_window_path。
+
+读取/设置其值的示例如下:
+@code
+    // 初始化一个存储后端
+    QTemporaryFile tmpFile;
+    tmpFile.open();
+    auto backend = new Dtk::Core::QSettingBackend(tmpFile.fileName());
+
+    // 从json中初始化配置
+    auto settings = Dtk::Core::DSettings::fromJsonFile(":/resources/data/dfm-settings.json");
+    settings->setBackend(backend);
+
+    // 读取配置
+    auto opt = settings->option("base.new_tab_windows.new_window_path");
+    qDebug() << opt->value();
+
+    // 修改配置
+    opt->setValue("Test")
+    qDebug() << opt->value();
+@endcode
+@sa Dtk::Core::DSettingsOption
+@sa Dtk::Core::DSettingsGroup
+@sa Dtk::Core::DSettingsBackend
+@sa Dtk::Widget::DSettingsWidgetFactory
+@sa Dtk::Widget::DSettingsDialog
+
+@fn Dtk::Core::DSettings::DSettings(QObject *parent = Q_NULLPTR)
+@brief DSettings构造函数
+
+@fn void Dtk::Core::DSettings::setBackend(DSettingsBackend *backend = nullptr)
+@brief 设置存储后端
+
+@fn static QPointer<DSettings> Dtk::Core::DSettings::fromJson(const QByteArray &json)
+@brief 从 json 中获取 DSettings,返回的数据使用之后需要自己手动释放。
+
+@fn static QPointer<DSettings> Dtk::Core::DSettings::fromJsonFile(const QString &filepath)
+@brief 从 json 文件中获取 DSetting。
+
+@fn QJsonObject Dtk::Core::DSettings::meta() const
+@brief 返回JSON对象
+
+@fn QStringList Dtk::Core::DSettings::keys() const
+@brief 返回全部键值
+
+@fn QList<QPointer<DSettingsOption> > Dtk::Core::DSettings::options() const
+@brief 返回全部 `key` 的值
+
+@fn QPointer<DSettingsOption> Dtk::Core::DSettings::option(const QString &key) const
+@brief 获取 `key` 对应的值
+
+@fn QVariant Dtk::Core::DSettings::value(const QString &key) const
+@brief 获取 `key` 对应的值
+
+@fn QStringList Dtk::Core::DSettings::groupKeys() const
+@brief 返回子组全部键值
+
+@fn QList<QPointer<DSettingsGroup> > Dtk::Core::DSettings::groups() const
+@brief 返回子组全部 `key` 的值
+
+@fn QPointer<DSettingsGroup> Dtk::Core::DSettings::group(const QString &key) const
+@brief DSettings::group将递归找到子组
+@return
+
+@fn QVariant Dtk::Core::DSettings::getOption(const QString &key) const
+@brief 获取 `key` 对应的值
+
+@fn void Dtk::Core::DSettings::sync()
+@brief 开始进行同步
+
+@fn void Dtk::Core::DSettings::setOption(const QString &key, const QVariant &value)
+@brief 设置键值
+
+@fn void Dtk::Core::DSettings::reset()
+@brief 重置键值
+
+*/

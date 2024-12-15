@@ -1,0 +1,35 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-launcher-git
+pkgver=5.4.11.r30.g6570c818
+pkgrel=1
+sourcename=ocean-launcher
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Lingmo desktop-environment - Launcher module'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-launcher"
+license=('GPL3')
+depends=('gsettings-qt' 'qt5-svg' 'qt5-x11extras' 'startocean-git' 'lingmo-daemon-git'
+         'lingmo-qt-dbus-factory-git' 'xdg-user-dirs' 'dtkwidget-git' 'dtkcore-git'
+         'qt5-base' 'qt5-x11extras' 'qt5-svg')
+makedepends=('git' 'cmake' 'ninja' 'gtest' 'qt5-tools' 'gmock' 'dtkcommon-git' )
+conflicts=('lingmo-launcher')
+provides=('lingmo-launcher')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  cmake . -GNinja -DCMAKE_INSTALL_PREFIX=/usr -DWITHOUT_UNINSTALL_APP=
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

@@ -1,0 +1,35 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-polkit-agent-git
+pkgver=5.5.19.r1.gc3af637
+pkgrel=1
+sourcename=ocean-polkit-agent
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Lingmo Polkit Agent'
+arch=('x86_64' 'aarch64')
+url="https://github.com/lingmoos/ocean-polkit-agent"
+license=('GPL3')
+depends=('lingmo-qt-dbus-factory-git' 'startocean-git' 'polkit-qt6' 'dtkcommon-git' 'dtkwidget-git' 'dtkwidget-git')
+makedepends=('git' 'polkit-qt6' 'cmake' 'ninja')
+conflicts=('lingmo-polkit-agent')
+provides=('lingmo-polkit-agent')
+groups=('lingmo-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  cmake . -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DUSE_LINGMO_POLKIT=OFF
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

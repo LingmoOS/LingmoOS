@@ -1,0 +1,172 @@
+/*!
+@~chinese
+@file include/dtkdevice/lsdevice/dlsdevice.h
+@ingroup lsdevice
+
+这里是 dlsdevice.h 的描述
+
+@class Dtk::Device::DlsDevice dlsdevice.h
+@brief 解析获取硬件信息.
+
+@enum Dtk::Device::DlsDevice::DevClass dlsdevice.h
+@brief 设备类型分类
+| 值                 | 序号  | 含义 |
+|--------------------|------|-----|
+| DtkUnkown          | 0    | 未知类型 |
+| DtkBridge          | 1    | DtkBridge 类型 |
+| DtkController      | 2    | DtkController 类型 |
+| DtkHub             | 3    | DtkHub 类型 |
+| DtkBios            | 4    | DtkBios 类型 |
+| DtkBus             | 5    | DtkBus 类型 |
+| DtkAddress         | 6    | DtkAddress 类型 |
+| DtkVolume          | 7    | DtkVolume 类型 |
+| DtkVirtual         | 8    | DtkVirtual 类型 |
+| DtkGeneric         | 9    | DtkGeneric 类型 |
+| DtkProductSystem   | 10   | DtkProductSystem 类型 |
+| DtkMainboard       | 11   | DtkMainboard 类型 |
+| DtkCpu             | 12   | DtkCpu 类型 |
+| DtkMemory          | 13   | DtkMemory 类型 |
+| DtkStorage         | 14   | DtkStorage 类型 |
+| DtkDisk            | 15   | DtkDisk 类型 |
+| DtkDvd             | 16   | DtkDvd 类型 |
+| DtkTape            | 17   | DtkTape 类型 |
+| DtkNetwork         | 18   | DtkNetwork 类型 |
+| Dtkwlan            | 19   | Dtkwlan 类型 |
+| DtkCommunication   | 20   | DtkCommunication 类型 |
+| DtkDisplayGPU      | 21   | DtkDisplayGPU 类型 |
+| DtkMonitor         | 22   | DtkMonitor 类型 |
+| DtkInput           | 23   | DtkInput 类型 |
+| DtkMouse           | 24   | DtkMouse 类型 |
+| DtkKeyboard        | 25   | DtkKeyboard 类型 |
+| DtkFingerprint     | 26   | DtkFingerprint 类型 |
+| DtkCamera          | 27   | DtkCamera 类型 |
+| DtkSoundAudio      | 28   | DtkSoundAudio 类型 |
+| DtkTouchscreen     | 29   | DtkTouchscreen 类型 |
+| DtkTouchpad        | 30   | DtkTouchpad 类型 |
+| DtkBluetooth       | 31   | DtkBluetooth 类型 |
+| DtkPrinter         | 32   | DtkPrinter 类型 |
+| DtkPower           | 33   | DtkPower 类型 |
+| DtkBattery         | 34   | DtkBattery 类型 |
+| DtkSensor          | 35   | DtkSensor 类型 |
+| DtkLed             | 36   | DtkLed 类型 |
+| DtkSwitchbuttion   | 37   | DtkSwitchbuttion 类型 |
+| DtkScanner         | 38   | DtkScanner 类型 |
+| DtkChipcard        | 39   | DtkChipcard 类型 |
+| DtkOther           | 40   | DtkOther 类型 |
+| DtkRevers1         | 41   | 预留类型 |
+| DtkRevers2         | 42   | 预留类型 |
+| DtkMax             | 100  | 取大类型 |
+
+@struct Dtk::Device::DlsDevice::DDeviceInfo dlsdevice.h
+@brief 存储设备相关信息
+@var QMap< QString, QString > DDeviceInfo::deviceInfoLstMap
+存储单个所有设备信息，以key作关键字存储检索字，后跟信息值
+@var QString DDeviceInfo::vendorName
+存储设备的信息，供应或生产商名
+@var QString DDeviceInfo::productName
+存储设备的信息，产品名或模组名
+@var QString DDeviceInfo::modalias
+存储设备的信息，Modalias值
+@var QString DDeviceInfo::vendorID
+存储设备的信息，供应或生产商编号
+@var QString DDeviceInfo::productID
+存储设备的信息，产品或模组编号
+@var QString DDeviceInfo::sysFsPath
+存储设备的信息，系统内核sys路径 
+@var QString DDeviceInfo::baseClassName
+存储设备的信息，基本大类名称
+@var QString DDeviceInfo::subClassName
+存储设备的信息，子类名称
+@var QStringList DDeviceInfo::deviceBaseAttrisLst
+存储设备的基本信息
+@var QStringList DDeviceInfo::deviceOtherAttrisLst
+存储设备的其它信息
+@var DevClass DDeviceInfo::eDevClass
+存储设备的基本大类值
+
+@fn  QList< device_info >  DlsDevice::devicesInfosAll();
+@brief 获取的所有设备信息
+@return 所有设备信息
+    
+@fn QStringList  DlsDevice::deviceAttris(DevClass etype) 
+@brief 获取的相关类别设备属性名称
+@param[in] etype 枚举值,想获取的相关设备类别
+@return 该相关类别设备属性名称
+
+@fn QList< device_info > DlsDevice::deviceInfo(DevClass etype)
+@brief 获取的相关类别设备信息
+@param[in] etype 枚举值,想获取的相关设备类别
+@return 该类别设备信息
+
+@fn QList< device_info > DlsDevice::deviceInfo(DevClass etype, const int idex)
+@brief 获取的相关类别设备信息
+@param[in] etype 枚举值,想获取的相关设备类别
+@param[in] idex 设备索引 0,1,2...
+@return 该类别设备信息
+
+@fn int DlsDevice::devicesCount() 
+@brief 获取的所有设备个数
+@return 所有设备个数
+
+@fn int DlsDevice::devicesCount(DevClass devclass) 
+@brief 获取的相关类别设备个数
+@param[in] etype 枚举值,想获取的相关设备类别
+@return 该类别设备个数
+
+@fn double DlsDevice::updateSystemCpuUsage()
+@brief 更新CPU信息
+@return 当前CPU利用率
+
+@fn QMap<QString, int> DlsDevice::cpuStat() 
+@brief 获取CPU状态
+@return CPU状态
+
+@fn double DlsDevice::getCpuUsage() 
+@brief 获取CPU利用率
+@return CPU利用率
+
+@fn  QList< device_info >  DlsDevice::deviceCPU();
+@brief 获取CPU设备信息
+@return CPU设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceStorage();
+@brief 获取存储设备信息
+@return 存储设备所有信息        
+
+@fn  QList< device_info >  DlsDevice::deviceGPU();
+@brief 获取GPU设备信息
+@return GPU设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceMemory();
+@brief 获取内存设备信息
+@return 内存设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceMonitor()
+@brief 获取显示器设备信息
+@return 显示器设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceAudio();
+@brief 获取声音设备信息
+@return 声音设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceNetwork();
+@brief 获取网络设备信息
+@return 网络设备所有信息
+
+@fn   QList< device_info >  DlsDevice::deviceCamera();
+@brief 获取相机设备信息
+@return 相机设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceKeyboard()
+@brief 获取键盘设备信息
+@return 键盘设备所有信息
+
+ @fn  QList< device_info >  DlsDevice::deviceMouse()
+@brief 获取鼠标设备信息
+@return 鼠标设备所有信息
+
+@fn  QList< device_info >  DlsDevice::deviceComputer()
+@brief 获取系统设备信息
+@return 系统设备所有信息
+
+*/

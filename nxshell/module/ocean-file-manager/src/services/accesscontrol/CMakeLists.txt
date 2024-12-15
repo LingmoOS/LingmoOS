@@ -1,0 +1,80 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(ocean-filemanager-accesscontrol)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(AccessControl_XML ${DFM_DBUS_XML_DIR}/org.lingmo.Filemanager.AccessControl.xml)
+
+find_package(PkgConfig REQUIRED)
+find_package(Qt5 COMPONENTS DBus REQUIRED)
+
+FILE(GLOB FILEOPERATIONS_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*/*.policy"
+    )
+
+# qt5_generate_dbus_interface(
+#    accesscontroldbus.h
+#    ${AccessControl_XML}
+#    OPTIONS -M -S
+# )
+
+qt5_add_dbus_adaptor(FILEOPERATIONS_FILES ${AccessControl_XML}
+    accesscontroldbus.h AccessControlDBus)
+
+add_library(${PROJECT_NAME}
+    SHARED
+    ${FILEOPERATIONS_FILES}
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ../../)
+
+
+pkg_search_module(dfm-io
+    REQUIRED
+    dfm-io
+    IMPORTED_TARGET
+)
+pkg_search_module(dfm-mount
+    REQUIRED
+    dfm-mount
+    IMPORTED_TARGET
+)
+
+pkg_search_module(crypt
+    REQUIRED
+    libcryptsetup
+    IMPORTED_TARGET
+)
+pkg_check_modules(PolkitAgent
+    REQUIRED
+    polkit-agent-1
+    IMPORTED_TARGET
+)
+pkg_check_modules(PolkitQt5
+    REQUIRED
+    polkit-qt5-1
+    IMPORTED_TARGET
+)
+
+target_link_libraries(${PROJECT_NAME}
+    DFM::base
+    PkgConfig::dfm-io
+    PkgConfig::dfm-mount
+    PkgConfig::crypt
+    PkgConfig::PolkitAgent
+    PkgConfig::PolkitQt5
+    Qt5::DBus
+    ${DtkWidget_LIBRARIES}
+)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/lingmo-service-manager/)
+install(FILES ${PROJECT_NAME}.json DESTINATION share/lingmo-service-manager/system/)
+install(FILES org.lingmo.filemanager.accesscontrol.conf DESTINATION share/dbus-1/system.d/)
+
+set(PolicyDir "${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions")
+install(FILES polkit/org.lingmo.filemanager.accesscontrol.policy DESTINATION ${PolicyDir})

@@ -1,0 +1,89 @@
+/*!
+@~chinese
+@ingroup dutil
+@file include/util/ddbussender.h
+
+本文件包含了DDBusSender类和相对应的工具类
+
+@class DDBusData
+@brief DBus数据存储类
+@details 该类用来存储DBus连接的相关信息
+
+@var DDBusData::service
+@brief 请求调用服务名
+
+@var DDBusData::path
+@brief 请求调用对象路径
+
+@var DDBusData::interface
+@brief 请求调用接口名
+
+@var DDBusData::queryName
+@brief 请求调用函数名
+
+@var DDBusData::connection
+@brief 进行调用的维护的DBus连接
+
+@class DDBusCaller
+@brief DBus接口调用工具类
+@details 该类用于完成实际的DBus接口调用
+
+@fn template <typename T> DDBusCaller DDBusCaller::arg(const T &argument)
+@brief 添加调用参数
+@details 改接口符合链式编程规则
+@param[in] argument 调用参数
+@return DDBusCaller 添加参数之后的caller
+
+@fn QDBusPendingCall DDBusCaller::call()
+@brief 发起实际调用
+@return QDBusPendingCall 异步调用对象
+
+@class DDBusProperty
+@brief DBus属性操作对象
+@details 该类的作用和DDBusCaller类似, 用于完成实际的调用, 其封装了org.freedesktop.DBus.Properties的接口, 提供方便快捷地属性访问方法set和get
+
+@fn QDBusPendingCall DDBusProperty::get()
+@brief 获取属性值
+@return QDBusPendingCall 异步调用对象, 在完成之后可用于获取属性值
+
+@fn template <typename T> QDBusPendingCall DDBusProperty::set(const T &value)
+@brief 设置属性值
+@param[in] value 需要设置的值
+@return QDBusPendingCall 异步调用对象, 在完成之后可用于判断设置操作是否成功
+
+@class DDBusSender
+@brief DBus请求工具类
+@details 通过该类的方法可以方便地调用某个服务的某个方法. 该类的设计采用链式编程, 多个api都会返回操作之后的对象, 这使得原本需要使用QDBusMessage多行代码完成的调用只需要一行代码即可完成.
+
+@fn DDBusSender DDBusSender::service(const QString &service)
+@brief 设置请求服务名
+@param[in] service 请求服务名
+@return DDBusSender 设置之后的sender
+
+@fn DDBusSender DDBusSender::interface(const QString &interface)
+@brief 设置请求接口名
+@param[in] interface 请求接口名
+@return DDBusSender 设置之后的sender
+
+@fn DDBusSender DDBusSender::path(const QString &path)
+@brief 设置请求对象路径
+@param[in] path 请求对象路径
+@return DDBusSender 设置之后的sender
+
+@fn DDBusCaller DDBusSender::method(const QString &method)
+@brief 设置请求方法名并获取请求调用对象
+@details 确保在调用该方法之前, service, path和interface都已经被正确设置
+@param[in] method 请求方法名
+@return DDBusCaller 方法调用工具对象, 调用该对象的call函数即可完成最终调用
+
+@fn DDBusProperty DDBusSender::property(const QString &property)
+@brief 设置访问的属性名并获得属性操作对象
+@details 确保在调用该方法之前, service, path和interface都已经被正确设置
+@param[in] property 访问属性名
+@return DDBusProperty 属性操作对象
+
+@fn static DDBusSender DDBusSender::system()
+@brief 获取 systembus 访问的能力
+@details DDBusSender 默认使用 sessionbus ，此接口提供 systembus 的访问能力
+@return DDBusSender 可以访问 systembus 的 sender 对象
+*/

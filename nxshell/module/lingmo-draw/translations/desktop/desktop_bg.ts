@@ -1,0 +1,1 @@
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="bg" version="2.1"><context><name>desktop</name><message><location filename="Desktop Entry]Comment" line="0"/><location filename="Desktop Entry]Name" line="0"/><source>Lingmo Draw</source><translation>Lingmo Draw</translation></message></context></TS>

@@ -1,0 +1,71 @@
+/*!
+@~chinese
+@file dbluetoothagent.h
+
+@class Dtk::Bluetooth::DAgent dbluetoothagent.h
+@brief 对于自定义蓝牙代理的封装
+
+@enum Dtk::Bluetooth::DAgent::Capability dbluetoothagent.h
+@brief 蓝牙代理输入输出的能力
+@var Dtk::Bluetooth::DAgent::Capability Dtk::Bluetooth::DAgent::DisplayOnly
+仅显示
+@var Dtk::Bluetooth::DAgent::Capability Dtk::Bluetooth::DAgent::DisplayYesNo
+显示是或否
+@var Dtk::Bluetooth::DAgent::Capability Dtk::Bluetooth::DAgent::KeyboardOnly
+仅接受键盘输入
+@var Dtk::Bluetooth::DAgent::Capability Dtk::Bluetooth::DAgent::NoInputNoOutput
+无键盘输入输出
+
+@fn virtual QDBusObjectPath DAgent::agentPath() const = 0
+@brief 获取自定义蓝牙代理的DBus对象路径
+@return DBus对象路径
+
+@fn virtual Capability DAgent::capability() const
+@brief 自定义蓝牙代理拥有的能力
+@return 能力枚举
+
+@fn virtual void DAgent::requestPinCode(QSharedPointer<DDevice> device, const DRequest<QString> &request)
+@brief 获取认证用的pin码
+@param [in] device 需要交互的设备的对象
+@param [in] request 用于发送答复的请求
+
+@fn virtual void DAgent::displayPinCode(QSharedPointer<DDevice> device, const QString &pinCode)
+@brief 要求显示pin码
+@param [in] device 需要交互的设备的对象
+@param [in] pinCode pin码
+
+@fn virtual void DAgent::requestPasskey(QSharedPointer<DDevice> device, const DRequest<quint32> &request)
+@brief 获取认证用的密钥
+@param [in] device 需要交互的设备的对象
+@param [in] request 用于发送答复的请求
+
+@fn virtual void DAgent::displayPasskey(QSharedPointer<DDevice> device, const QString &passkey, const QString &entered)
+@brief 要求显示密钥
+@param [in] device 需要交互的设备的对象
+@param [in] passkey 密钥
+@param [in] entered 指示远端已输入的键的数量
+
+@fn virtual void DAgent::requestConfirmation(QSharedPointer<DDevice> device, const QString &passkey, const DRequest<> &request)
+@brief 请求确认密钥
+@param [in] device 需要交互的设备的对象
+@param [in] passkey 密钥
+@param [in] request 用于发送答复的请求
+
+@fn virtual void DAgent::requestAuthorization(QSharedPointer<DDevice> device, const DRequest<> &request)
+@brief 调用该方法以要求用户授权一个传入的配对尝试
+@param [in] device 需要交互的设备的对象
+@param [in] request 用于发送答复的请求
+
+@fn virtual void DAgent::authorizeService(QSharedPointer<DDevice> device, const QString &uuid, const DRequest<> &request)
+@brief 当服务守护程序需要授权一个连接/服务请求时，这个方法被调用
+@param [in] device 需要交互的设备的对象
+@param [in] uuid 服务的uuid
+@param [in] request 用于发送答复的请求
+
+@fn virtual void DAgent::cancel()
+@brief 在返回应答前调用此接口来指示代理请求失败
+
+@fn virtual void DAgent::release()
+@brief 注销自定义代理时使用, 用来释放资源
+
+*/

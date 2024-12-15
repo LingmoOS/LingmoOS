@@ -1,0 +1,1541 @@
+# SPDX-FileCopyrightText: 2023-2024 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+version: "1"
+
+package:
+  id: org.lingmo.fontmanager
+  name: "lingmo-font-manager"
+  version: 6.5.5.1
+  kind: app
+  description: |
+    font manager for lingmo os.
+
+base: org.lingmo.base/23.1.0/loong64
+runtime: org.lingmo.runtime.dtk/23.2.0/loong64
+
+command:
+  - lingmo-font-manager
+
+build: |
+  cat /var/lib/dpkg/status|grep "^Package: " > ${PREFIX}/packages.list
+  bash ./install_dep linglong/sources "${PREFIX}"
+  sed -i "s|/usr|$(echo ${PREFIX})|g" ${PREFIX}/lib/${TRIPLET}/cmake/dfm-base/dfm-baseConfig.cmake
+
+  # 获取版本号
+  VERSION=$(head -1 debian/changelog | awk -F'[()]' '{print $2}')
+  # 使用sed命令替换version的值
+  # sed -i "s/^  version: .*/  version: ${VERSION}.1/" linglong.yaml
+
+  cmake -B build ${conf_args} \
+        -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_OFF" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+        -DLIB_INSTALL_DIR="${PREFIX}/lib/${TRIPLET}" \
+        -DVERSION=${VERSION}
+
+  cmake --build build -j`nproc`
+  cmake --build build --target install > install.log 2>&1
+
+  # 项目生成应用名和动态隐式加载的依赖库，ldd无法找到的其他库
+  LDD_FILES=(
+    lingmo-font-manager
+  )
+
+  # 生成.install 文件
+  bash ./deploy_dep "${LDD_FILES[@]}"
+
+  # fix: Error:couldn't find dependency "libgvfscommon.so" "libreplace-samba4.so.0"
+  export LD_LIBRARY_PATH=$PREFIX/lib/loongarch64-linux-gnu/gvfs:$PREFIX/lib/loongarch64-linux-gnu/samba
+
+sources:
+  # - kind: git
+  #   url: https://github.com/lingmoos/lingmo-font-manager
+  #   commit: fe3ec9b82edf35378a2db7f831bf2e5de85f5af8
+
+  # linglong:gen_deb_source sources loong64 https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2 beige main community
+  # 运行环境已包含dtk和Qt通用库
+  # linglong:gen_deb_source install libfontconfig1-dev, libfreetype6-dev, ocean-file-manager-dev, lingmo-gettext-tools
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/adduser/adduser_3.131-1lingmo2_all.deb
+    digest: 7165c1918cafcb0e026649217b0ae58a77a143a6b39650313cdfc29fd1087492
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/busybox/busybox-static_1.30.1-lingmo1_loong64.deb
+    digest: 985f9f5b1fc49e82b3f8981b6bad40f4f6e5f7bc37cc9e39da83a7b247d2d8c5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/busybox/busybox_1.30.1-lingmo1_loong64.deb
+    digest: 786257a18d4d32d4a4970202a19c9b38af9bb31e936d300e020d4c0ef8f1d5c4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/coreutils/coreutils_9.4-2_loong64.deb
+    digest: 7d38eb3f86f982f681a61312c4cb4892cae4097c5cd50e54004928888b61708c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cpio/cpio_2.13+dfsg-7_loong64.deb
+    digest: 502ad8db8fb4d8df44848eaacddfd406e5c3e3b11f82f9b0bf2f9cd5cdfef818
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cryfs/cryfs_0.11.4-1+rb1_loong64.deb
+    digest: 6bface8bc94c5da84250e58d56df4bd774a6e3eb7360edd6155416cd44938ffc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cryptsetup/cryptsetup-bin_2.6.1-5lingmo_loong64.deb
+    digest: 18bf2a38d8f7540fec53ff321ca4760a7e1f1020774faca6306c22effc8d0f64
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cryptsetup/cryptsetup-initramfs_2.6.1-5lingmo_all.deb
+    digest: da9465b2f3b67688ca5faf82d3a60153916b5c4efd7b028e6066194fefb79c2b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cryptsetup/cryptsetup_2.6.1-5lingmo_loong64.deb
+    digest: 169300981df79c136096c6d429e0b3a15e0284196a6b138ffd4c88cdcb2975d0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus-bin_1.14.10-3_loong64.deb
+    digest: ce3e9d3d45cdbf7b95c18d4a5f897ee5394e658b06f2f2f489b1305d675b0781
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus-broker/dbus-broker_29-3_loong64.deb
+    digest: c32fa99bec894b1be78e1a8a8c5ac0206a3962b750aa9338387297e240b9db71
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus-daemon_1.14.10-3_loong64.deb
+    digest: d45f96544cf9704e415fed35a36c1ed4ba2693f76ab464f71e8ef0370b5ca749
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus-session-bus-common_1.14.10-3_all.deb
+    digest: 2f9dc2fb500df63edb46c3121e6540d838047e3a9e9c5ec0cbe05649b7da3f30
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus-system-bus-common_1.14.10-3_all.deb
+    digest: 2768fa6a52a3a0162988d735bd2cc7af849d3984fa9567c50092176ca36f9aa8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus-user-session_1.14.10-3_loong64.deb
+    digest: 4c9515d14bdb22c1064e839e35c5235b56ca0c06253e95fbd36032e361e7f841
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/dbus_1.14.10-3_loong64.deb
+    digest: 2a81149da00e8ae1e49ec0eca2cd8d9b14518c44a80f3441a8a9ec682770ee58
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dconf/dconf-gsettings-backend_0.40.0-2_loong64.deb
+    digest: 9a60bb442283f963ee7067aabd5591d7a100003ca4b01f19130509d4e4b1145f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dconf/dconf-service_0.40.0-2_loong64.deb
+    digest: b363f4660223cc03a32118194cb895f40bf489d20bbfe2cf165cf44fff0f9240
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-device-formatter/ocean-device-formatter_0.0.1.16_loong64.deb
+    digest: 19fb0bdf1c042bac06516442352a4191c0159369a8df8ee6eb23950de7bc0efa
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-common-plugins_6.0.52_loong64.deb
+    digest: 05df4c7ed0041006837315b520d439a0d787c47c5388ac68df8ed5f7c120b5ad
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-daemon-plugins_6.0.52_loong64.deb
+    digest: c659ca26614064b762f62b0b342b8dc6f091d9885f156c6041ff9bf7c115cec4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-dev_6.0.52_loong64.deb
+    digest: 6ce8bafa1e6034c857ec1ebe83bedbf0218adeb471863be70167d7bc916fef28
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-plugins_6.0.52_loong64.deb
+    digest: de0608237b49b4bf5b6e70f2fd1897bd20d89298b35734f83580a5017f9f204a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-preview-plugins_6.0.52_loong64.deb
+    digest: 5c34b7f23fd2311708b726b002df72353a265f3a66c4c6369161034dfe9fdb71
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager-server-plugins_6.0.52_loong64.deb
+    digest: 17f9a8d3324227288841b22bf157ec736cf660558b0d60d2970dacea77abd67a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/ocean-file-manager_6.0.52_loong64.deb
+    digest: ae43d0be45ffe0cc07a4ed82199c1c27e9ccd0b273d657b9baae78442dda5394
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/debconf/debconf_1.5.79-lingmo_all.deb
+    digest: ded6aaa7927ae27337ceb23d49391b4c7ec460a00ba692020e8f4e28388f345f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/lingmo-gettext-tools/lingmo-gettext-tools_1.0.6-1_all.deb
+    digest: 732eb3781699b6fe8134a06fdb4e779279014751075ea67eb72b03015f9eae4e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/desktop-file-utils/desktop-file-utils_0.26-lingmo_loong64.deb
+    digest: 1ab06af75ac5357fe59742b9411f909c2be9b112027a9b2c46f7bad36023d4c2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/dirmngr_2.2.43-6_loong64.deb
+    digest: 70ba5bebc61f7d39a52943874cc4a2291ba8a5d402cf82879b69ca3a44199068
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lvm2/dmsetup_1.02.185-2_loong64.deb
+    digest: dbe7ca509bd630ee4e4e277f18e9b1401c3a760fd982cb991acfcbc73b92d9b4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dpkg/dpkg_1.22.6lingmo3_loong64.deb
+    digest: eea7a8587865789ec9f40ae9c3e5310f82a5c8c295b27d65e91627c86c107951
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/e2fsprogs/e2fsprogs_1.47.0-2_loong64.deb
+    digest: 0ff011c5591c8371df3fbbae7e60895d1f3a65dbc5e4656c0b3eb1d039b072e0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/fdisk_2.39.3-6lingmo1_loong64.deb
+    digest: fd51c36bd8d14eb7b76eeb438f9069c506a9711b0e15d2abed7cddca1fa6e8dd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/file/file_5.45-2_loong64.deb
+    digest: 95839f8cfef56aaccf66681c5d22df201d383ac66e3e91aaafd836bf654dbec3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fontconfig/fontconfig-config_2.14.2-6_loong64.deb
+    digest: 17c510572e0a51ecc5a4eba486a1cfcb55d2ac297c84f35bc7c58cbc31e6471b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fontconfig/fontconfig_2.14.2-6_loong64.deb
+    digest: 85fed3d569a4fc895efd890e842e276016aa92848ddc3419c6fdaabc02280c7f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-noto/fonts-croscore_20201225-lingmo_all.deb
+    digest: afbaf120869a08aa7dd14da9ad014de48a751aa4330534b531410bb86c411b55
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.37-lingmo_all.deb
+    digest: 5982963d05dbf4efa009c3ab6db3576a03f680199d75d7d5edda89c55def912c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-freefont/fonts-freefont-otf_20120503-10_all.deb
+    digest: c66666da94b9a0477351ee9d6d7a247a0a3c842e428da770991b45f03be2ee72
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-freefont/fonts-freefont-ttf_20120503-10_all.deb
+    digest: 79b23c3945d4628463672a804a0e81bc4c262ef87cb6316afb40167a50bc3145
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb
+    digest: 9285213fd8d6515bc6c1be5b810bf39918a668a17024a9fd3541879ce7fb5344
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-noto/fonts-noto-core_20201225-lingmo_all.deb
+    digest: fa09d95f516c498d55e516d549b8ee41d9a7b6f17cdf0bb4b43744d672ce1366
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tex-gyre/fonts-texgyre_20180621-3.1_all.deb
+    digest: f66d6f798c4b99d8490558cc8209c069b0fe5577c11378c0e01f9e87ddf10824
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fonts-urw-base35/fonts-urw-base35_20200910-7_all.deb
+    digest: 4800c0b08fbeac0335f1e23df2d41528a242383324c256ebece00c8f438eefbd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fuse/fuse_2.9.9.1-1_loong64.deb
+    digest: ba3b0fac0fa44a35c24679252380470cdd54c8d1676b5bc6e7539ec9ac5630d4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcc-13/gcc-13-base_13.2.0-3lingmo2_loong64.deb
+    digest: d7d905efe22363e2bfc62368280e79f5c7130a72bab7da57afff396c2c039a41
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gdisk/gdisk_1.0.9-2_loong64.deb
+    digest: 9b34f3dfae753d41c7cecb24e9ed254ef7454c2dc9c064bd2c88bca2cd143fd2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gettext/gettext-base_0.21-4_loong64.deb
+    digest: 9b163fa69f15f7308c067de04e3e3d2d4208e1d0f2489033543bdd29cd0545d9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gettext/gettext_0.21-4_loong64.deb
+    digest: b399bc489086eafd0e24c4f491ef869d561a3ba26de0d39a96a08dd21b16a577
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/gir1.2-glib-2.0_2.80.1-1lingmo1_loong64.deb
+    digest: 9adbd030273cfacb0eb6223bfdce65e0106f5c811d96caa66978598bb40f3309
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsecret/gir1.2-secret-1_0.20.4-2_loong64.deb
+    digest: f6df344e97477b552051154d0edc6288a7bd76986da101b398596da3391384be
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/udisks2/gir1.2-udisks-2.0_2.9.4.1-lingmo2_loong64.deb
+    digest: b3860fc85a4cdbbcf6a28dc17bc6f31e01282ece7c9ff8d19b35e5436d7dda45
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib-networking/glib-networking-common_2.78.0-1_all.deb
+    digest: 94bfaef9228159f8a2f366b9962e5bd82c9ddb53228b161d62c6f5d48ecf1c3c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib-networking/glib-networking-services_2.78.0-1_loong64.deb
+    digest: cac2038581c8e79e1d77222b2bc658572c5bda68ec2a84f2850928534d7a899c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib-networking/glib-networking_2.78.0-1_loong64.deb
+    digest: 388e3237a15d2e4b1e7a685f569dcbc4583f0f271650262ecae55508308ee0f6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gnupg-l10n_2.2.43-6_all.deb
+    digest: cabe5716e134bb1d799ded6f786ad639e2e680d66d5d270fd14be2bf3b7b8600
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gnupg-utils_2.2.43-6_loong64.deb
+    digest: 8dbb8875aef167ae00dd68fa4f8916800f10cda3328b2f2daae95ccd156d410b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gnupg_2.2.43-6_all.deb
+    digest: 045455f3147b7d417a4e6460f39eeae83bdb04d8a864846977bb65d184ae91ee
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpg-agent_2.2.43-6_loong64.deb
+    digest: 86ba8b6ce5fbf0d2c64e77dc46004130d9b09e74ac90d9812bb7dfb0fca159cb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpg-wks-client_2.2.43-6_loong64.deb
+    digest: 7b4f7593cea7fac84f2e123f4c0aa54fca47397aa141567c21b5431bcf210727
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpg_2.2.43-6_loong64.deb
+    digest: 41aaca8fbe3621699acabc8ba96dbdb1d7a6b9a720a4b4bc04c39fb3bfbef93a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpgconf_2.2.43-6_loong64.deb
+    digest: 16709fdaef894a272855a43bd3bfa2b5b845ec798911e6c9f1468baa608cf266
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpgsm_2.2.43-6_loong64.deb
+    digest: d5251dda327a3511746b7677db9f1a8f99b5f704ea1ef5272a7a2a0a8067e157
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnupg2/gpgv_2.2.43-6_loong64.deb
+    digest: 335e58639e48662dd43bb7c7644eb7aca0574f1ace3055eb2ef46b3905655d30
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gsettings-desktop-schemas/gsettings-desktop-schemas_41.0-2_all.deb
+    digest: 1956f25690518448725f44d1d6632cdb38332765f308f9547db7a56c309ed9ae
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gvfs/gvfs-backends_1.48.1.4-lingmo5_loong64.deb
+    digest: e46d7c01d6c689b213cea820af6f5a730ee4d8511e3e0f83185224b0fe8e71a4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gvfs/gvfs-common_1.48.1.4-lingmo5_all.deb
+    digest: 14b1f3617aa7a97067681e74b6d74dfcd94ec61ade8d13833e6fbf064f627c00
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gvfs/gvfs-daemons_1.48.1.4-lingmo5_loong64.deb
+    digest: 26be020c6e8bb99267da25c382065ef5d2f6a7e8769f7eed3aa3af9c2a95c874
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gvfs/gvfs-libs_1.48.1.4-lingmo5_loong64.deb
+    digest: 349ae2be4c48de4ea058a78845eba11cecbd994ef44e6eff106f62742fa73d80
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gvfs/gvfs_1.48.1.4-lingmo5_loong64.deb
+    digest: 7cc020785278eaf5dbb93fde6e0f99fdb5b4d1b3bd89601c6e86267fda791bd2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/i/init-system-helpers/init-system-helpers_1.66_all.deb
+    digest: 60bb52a4118d514e4d480707329a798ae21d135a96ddb9811d7e6bd0e7f2101f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/i/initramfs-tools/initramfs-tools-core_0.142_all.deb
+    digest: 91a4ccc49baf19eaed0b6ed25f664241fc2dd5efd93461b0e9eb646f6c2284d6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/i/initramfs-tools/initramfs-tools_0.142_all.deb
+    digest: 9431eee96e14adfa2be3880a4d5a670153bdaaf017ad0eabea92bcfe7fd3de5c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/texinfo/install-info_7.1-2_loong64.deb
+    digest: edf05ac76cc76880a80eae93834710fad57b2fd1bfd62fffda64e62abd6a70f6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/klibc/klibc-utils_2.0.13-4_loong64.deb
+    digest: 41984ca00aeaf5e0621c1156667b6fe03a9cc0f1f1437c12554ae39eed4ba047
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/kmod/kmod_30+20230601-2.1_loong64.deb
+    digest: 4161e3563ba357411626deef6b32082ee5b6ba2eb6e6c065db97de1ac847d75c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/acl/libacl1_2.3.1-1_loong64.deb
+    digest: 6a5d883c7ca1fb96e88290e5f80f2310b83e190d02133676ef19fcce44b5fc39
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/apparmor/libapparmor1_3.0.8-3_loong64.deb
+    digest: d192d85757001b58625e99b640872f1153a157da6f4456ba4d03e2360f23cd06
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/liba/libarchive/libarchive13_3.7.2-1_loong64.deb
+    digest: 2637b30ed6314afe87fbd71ea4f9935fb90bd6a3c3d818b2f4c1f2422f85edd6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/argon2/libargon2-1_0~20190702+dfsg-3_loong64.deb
+    digest: efb52e8025592be015f6eb51c1a32e6944e2f7941bcf5378c4a5ce46dba37ec0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/liba/libassuan/libassuan0_2.5.6-1_loong64.deb
+    digest: 95b433d42ba640f756ac19697ca55c2ae43f3bf264b5712c0b0bb3cf175e0367
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/liba/libasyncns/libasyncns0_0.8-lingmo1_loong64.deb
+    digest: c03afc00dd771536dbd99801a6745de20f479304b3a81367e3056e1db43e0ba2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/liba/libatasmart/libatasmart4_0.19-5_loong64.deb
+    digest: 553bec6f40a705a86dc5ad8e7b24ca73125908db518817d321cd14c13aca74c4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/attr/libattr1_2.5.1-1_loong64.deb
+    digest: 405e34b981984b1e6d04b5093fdaa36013459af4687c62c3a7dbdd0b42766ecb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/audit/libaudit-common_3.1.2-1_all.deb
+    digest: 6b32922d699d99bfcb0d6dc76f2857e0a73d884ffb1f41dca3ff6affb9ad636a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/audit/libaudit1_3.1.2-1_loong64.deb
+    digest: 550031a5206752f6fdbf035ef387880eb5b6f6add5f643a0d7cd4ae5b6add1cc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/avahi/libavahi-client3_0.8-5_loong64.deb
+    digest: 9ccbd93fc9d06c9ddf2b4fa7a399f4695576f80624ce1742ecce86de1b31006e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/avahi/libavahi-common-data_0.8-5_loong64.deb
+    digest: 24752d796aa2f23c09e8bff308bffea8e605b818e77cd6af06e6fc2678e80396
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/avahi/libavahi-common3_0.8-5_loong64.deb
+    digest: 38d7141a270890e7a5e6dbbf668436061d17b6ec81abae9277b5171cc0677698
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/a/avahi/libavahi-glib1_0.8-5_loong64.deb
+    digest: ebc3e9878fe6e898f3dad29206f6ed138a6d4fd3bf3137313ddf1f3dd14c6f26
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libblkid-dev_2.39.3-6lingmo1_loong64.deb
+    digest: 1ae31bcf267da44344974386315edea5a613a9fe7242cba4b1749e90e18c50e7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libblkid1_2.39.3-6lingmo1_loong64.deb
+    digest: 461e40f1f9e1aac09b577de585d654725476ee1d355d0ef508fb4ec0ee5e21c1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-crypto2_2.26-1lingmo_loong64.deb
+    digest: 000fbf384164b48eeeb7a0f70dd512fd2bd473cfdcffedd841a3038f60b9e0f1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-fs2_2.26-1lingmo_loong64.deb
+    digest: ca5dd7b26eda0e127f2023ccf9156928b2e936ad62c42565f6d090a182615492
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-loop2_2.26-1lingmo_loong64.deb
+    digest: cbda5f3ef9b6acabf8de15d6c6c5d1b7d3e2eb4fca0ef8940841f6801c325303
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-part-err2_2.26-1lingmo_loong64.deb
+    digest: 4b116fd2cc17adfc32dc274c77335e1b2f26dd2f24f0c951ce7d9cd13cda1c16
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-part2_2.26-1lingmo_loong64.deb
+    digest: 4d9da5d9a7d5c8379383fdb55fc77a3e4bc256d9d6a962b58020613210210da6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-swap2_2.26-1lingmo_loong64.deb
+    digest: 83d59f7f1764075a3e4b730a2d7fda7b3f946ef2b752a8779967bfa78f10e6e8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev-utils2_2.26-1lingmo_loong64.deb
+    digest: ef52f11025b52370deb6418d0431bedf9262d0bef31f66057666fb8648e2a172
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libblockdev/libblockdev2_2.26-1lingmo_loong64.deb
+    digest: 46c711f3596eb15d4346aba976870ff185b67eac40a105453f24e0301e1b4e62
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libbluray/libbluray2_1.3.4-1+rb2_loong64.deb
+    digest: b28910a92aece870792abb3b969c20947e0a9dfeed0957b8207c49ef97766b8e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-atomic1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: bcd36af8cf0fc216b8fd6d7a550edf9c2f934edce8d21df6c973331c6976fb7c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-chrono1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: 0aae77f8550952ca8d60ebb5e809820e4c8714cc51e47af2c9ff163b7fb65463
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-date-time1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: e2cbbf45ebfcb68045c67beadf7b57e5a754191f78a943696467459a546a5659
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-filesystem1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: ef4101ac267e7c87492ce294ba055f0dba1021b7d451cd54c5c57b53b9b51fec
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-iostreams1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: b6e40ad0d389276a9ocean1deed5a261de268c4965a9c6f813735d507a589379ff
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-program-options1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: f87b1545ef3f28714359c2c513e686d6f0406fb536302ce7046025b986d1c8d5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-regex1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: 2e2b70b50af81a30d3435c4698f219edbec1279537b634a2a63df4f5e6a006f1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-system1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: dca02507c0d07c00308fa76225e36ecbcbbd95944a4e83c08a53fba9eecfb481
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/boost1.83/libboost-thread1.83.0_1.83.0-2+rb1_loong64.deb
+    digest: 26ba6f970e0e3fc21eb4463ea58f040d4f3f6dfef9175c979d9cdf97a80abc5a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/brotli/libbrotli-dev_1.1.0-1_loong64.deb
+    digest: 862dbd8ec9b468e10f0e0102b2a9ed745059dd8a0a8468f7c8f31d12becc7918
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/brotli/libbrotli1_1.1.0-1_loong64.deb
+    digest: 9cfd7d00edf2602ea1f11404ba784d49b275b795579a816a72eea91901683857
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libbsd/libbsd0_0.11.7-4_loong64.deb
+    digest: 1a2e574f4385b39b0e1597f0220fb743d8f2cc4ed0a19047e97d361151d30c6b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libburn/libburn-dev_1.5.4-1_loong64.deb
+    digest: fd64d34f0770703bf76532a0704f270c39bd66e371c42a4ee020e8e745c014a4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libb/libburn/libburn4_1.5.4-1_loong64.deb
+    digest: b52a35bcdae7979af283d057933564e71dc70010f8dfc3bba1e2694c7c8fe979
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/bzip2/libbz2-1.0_1.0.8-lingmo_loong64.deb
+    digest: fbff5be770b27924c853df94418156b53ab04d9f4a63e0420c5dce310257ae06
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/b/bzip2/libbz2-dev_1.0.8-lingmo_loong64.deb
+    digest: df0de29c790b5644b97df4cac2e47aa5665e5b9cocean16af00d682e7342c7d955
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glibc/libc-dev-bin_2.38-6lingmo4_loong64.deb
+    digest: 23a576bed03d1cd629430d7a3b2f6377e362f40e35569ffa5d9564b91830b9dd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glibc/libc6-dev_2.38-6lingmo4_loong64.deb
+    digest: 95d9856edfce43a9763e1bd38729af73d092fbee1e68318995adf854d0c5e99e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glibc/libc6_2.38-6lingmo4_loong64.deb
+    digest: a8768ac8d6388feec089cd054f7ddb367e9738b950419eoceand0b2ead1bfb0631
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libcap-ng/libcap-ng0_0.8.4-2_loong64.deb
+    digest: e1641f16f9810b911be94712de4bd8628475c842616dd51b8d2f6544a3a2a9d7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libcap2/libcap2_2.44-1_loong64.deb
+    digest: 131a163374910ffb65d940aefc7c550cefad19a8097bb07e2c86a71b34848435
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libcdio-paranoia/libcdio-cdda2_10.2+2.0.0-lingmo1_loong64.deb
+    digest: e923449ca68b30d0f3d3c2b1f15b7bf1b3fe82c963e4aec7d3be1cd25ba9654d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libcdio-paranoia/libcdio-paranoia2_10.2+2.0.0-lingmo1_loong64.deb
+    digest: 6463036cb20ee98c878992fa3cd3a45c2b2b3ef6c564a4895b90e874455b2119
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libcdio/libcdio19_2.1.0-4_loong64.deb
+    digest: 4f1824f239de11b4c4cdf184fcb467f4d6ab34acea25d26a92c79a9b26a4e873
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libchardet/libchardet1_1.0.4-2lingmo_loong64.deb
+    digest: 6ea3ddf926ae9c78f550cc2a90add669d402bbc7fb930f80288ad85be6e215ff
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/e2fsprogs/libcom-err2_1.47.0-2_loong64.deb
+    digest: 904627fe0f99d6b2737ee575b7f6bf326f23a31d41603f273a3ba6d355b57486
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libc/libconfig-tiny-perl/libconfig-tiny-perl_2.27-1_all.deb
+    digest: 30d01706b0063d0b4aaef7cffd79a6b70d8365ad887ada4c8cc1f8a5df8eb84a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcrypt/libcrypt-dev_4.4.36-2_loong64.deb
+    digest: e8c7fdffa40cea0cecc7e796761f853443a7c115f1e4cbbedcedffebecc61bb1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcrypt/libcrypt1_4.4.36-2_loong64.deb
+    digest: ce691599b6a55a92bfbd4696cd9825a712bc5d9573b4e2b62287b40a5d114197
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cryptsetup/libcryptsetup12_2.6.1-5lingmo_loong64.deb
+    digest: 928e51483bc8dd2148fc05d3978155f621c5f2cb7d5b6c94faf971913b985826
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cups/libcups2_2.4.2-5_loong64.deb
+    digest: 28cb90ce8e1ecfe8d2c2780decc637bd6f92acd6868a74a880e44ae4a3165dc1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/curl/libcurl3-gnutls_8.5.0-2_loong64.deb
+    digest: 52e88749091f1ad731fd43c0f118fa59e1d835c97f2d48e3295d1c3d3a4a80f6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/curl/libcurl4_8.5.0-2_loong64.deb
+    digest: 2de2e839ed50c6054fae7fce6d7f730240be293482fd6f36719cd46f79eeb4af
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/db5.3/libdb5.3_5.3.28+dfsg1-0.8_loong64.deb
+    digest: 2e670599b511c2f01e1740a1daee678ce1d797f917dac37c4047553dc29b4281
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dbus/libdbus-1-3_1.14.10-3_loong64.deb
+    digest: 78833b3973000dd505cd32d2301a8d5a9bdc5070360c2de5bebc9e9cc5289b17
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dconf/libdconf1_0.40.0-2_loong64.deb
+    digest: cc045f5e127c57d0e051177ce11347f3c46f20c345786f2082f6cf11ec00ff31
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/libocean-file-manager_6.0.52_loong64.deb
+    digest: 4d33f793d2c4af32456676274c602e8a35464b62014e92e02009db979335a290
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/lingmo-pdfium/liblingmo-pdfium_1.0.2+rb1_loong64.deb
+    digest: 00cb9cddfca53cc6c7a1b00480c1f5f4b9aa7342f75116c71c790555a1060ee2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdeflate/libdeflate0_1.18-1_loong64.deb
+    digest: 1b60dc1dbbef61987759b5254d408edbd7d653e28b94f857de22578b0ca62dae
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lvm2/libdevmapper1.02.1_1.02.185-2_loong64.deb
+    digest: 9692e85c7bd469a57f1a6b3dcfcec058a7fa2bd4673f6fa54c435102eb36378f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-burn-dev_1.2.24_loong64.deb
+    digest: 75ca63348ad7013f64747cb9bc9d976408b1502f91d83ba1ee55d282c5f0036b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-burn_1.2.24_loong64.deb
+    digest: 2c9dd67039d883ee1104632ec3420eb04b9a3eb354e21ec8a711dacb39ffb402
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/ocean-file-manager/libdfm-extension_6.0.52_loong64.deb
+    digest: 83cbf44a341d1e7b3c0185c1e0656f45f328a6a40a32e229155a646298d37f7a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-io-dev_1.2.24_loong64.deb
+    digest: be61b7901ade433de9eabd33bbcef575158bd390f2d251ecefc8f053360053b7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-io_1.2.24_loong64.deb
+    digest: 3ed166b85e095de6c11930f86cf019c29cac632bf3c54464ef4035279d156b95
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-mount-dev_1.2.24_loong64.deb
+    digest: 988936aef80b4c6b1b92693b6f007c2ce275f91f3adcd59220c622ff26ef9132
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-dfm/libdfm-mount_1.2.24_loong64.deb
+    digest: a2e80d14c4c002d592855f7fd58dbc57faeef0a1815b08351437f48aa867c5b4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/docparser/libdocparser_1.0.10_loong64.deb
+    digest: f2beb1da0ae184a67feb67b7e86a49d48d453469a044bc12f27320aa35e71975
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/double-conversion/libdouble-conversion3_3.3.0-1_loong64.deb
+    digest: 1cb1deef108f4163f884f564e9fcfd429adc315e9509c30ff3bcf936824ac543
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdrm/libdrm-amdgpu1_2.4.119-1lingmo1_loong64.deb
+    digest: 13115d6aca6ca58b042404db9a1879fc0bcf45ad686e847ff947bd564c00c108
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdrm/libdrm-common_2.4.119-1lingmo1_all.deb
+    digest: c32b39f2496833a38f1c5c0c61f9f08d3c5b88da018a7b923367831d488a7061
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdrm/libdrm-nouveau2_2.4.119-1lingmo1_loong64.deb
+    digest: 340ca9e8a1e5ed52beae9c01e585755c40250452a65b09f03ed8cfdd49da129b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdrm/libdrm-radeon1_2.4.119-1lingmo1_loong64.deb
+    digest: f9b8764e4a5a91961102f6334841f7173d3a073b09e247664390a062b5752653
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libd/libdrm/libdrm2_2.4.119-1lingmo1_loong64.deb
+    digest: 511dfa9b735007be20cc316892fa861214b87e513b8fe09278fe96a5f3d1b4eb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dtkcore/libdtkcore5_5.6.30_loong64.deb
+    digest: c16e868d954fca790f9a36dd58fc85266b3471c0102db0a3eabc4513587abb47
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dtkcommon/libdtkdata_5.6.30_loong64.deb
+    digest: f6e330fcdd1f62af11cb2f302d960806d04ccce993dec20633fab5c60823e06a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dtkgui/libdtkgui5_5.6.30_loong64.deb
+    digest: 4fce7f02fe2cd1a56ff6ae398bc4b6c62dec0f5c4e2547be3c7df131387b9302
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/d/dtkwidget/libdtkwidget5_5.6.30_loong64.deb
+    digest: 21179a5e6754d7baa64637d623a1d3899ca8d2c28d573329e4597bdfb153b3b3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libe/libedit/libedit2_3.1-20230828-1_loong64.deb
+    digest: 851c5523af03e9dc081aa14afbeade7eeb1a21de5597226f13e0dcbed4a6ade7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mesa/libegl-mesa0_24.0.1-1lingmo3_loong64.deb
+    digest: b485f9dcf4b8bf5571e55e7fb33ebaa3bf244379a4b2aa03be13be1b72eab053
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libglvnd/libegl1_1.7.0-1_loong64.deb
+    digest: bbc7f8773ad9b2cfa4a27a26d6ad4c276eada2db9b680d54bdf7eb59ee9e5012
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/elfutils/libelf1_0.188-2.1lingmo1_loong64.deb
+    digest: 4895603b3429efa0e044d4c728c095763c37e63fb0d89afe5e924bd514e5df58
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libe/libencode-locale-perl/libencode-locale-perl_1.05-1.1_all.deb
+    digest: ef71d5b44ceef8015dbe954f6007f7d7fb32ceeafa49c8afc28ea8a79d4e9ad9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libe/libevdev/libevdev2_1.12.0+dfsg-1_loong64.deb
+    digest: f2f047f2363dda33826f748756c5b1c8a2bf809c981a66509876eb150583b278
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libe/libexif/libexif12_0.6.23-1_loong64.deb
+    digest: f5365c63e491f48204faef20665b2b513c10338425d3e9b68c88ca999c087f24
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/expat/libexpat1-dev_2.5.0-2_loong64.deb
+    digest: 0e5c956c6ba2967eb8e61479c2bf56189c8bee0077ded44015b9240ab11ae4f6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/expat/libexpat1_2.5.0-2_loong64.deb
+    digest: 845317fb7d0fdc029f3aa98c870826391b9bdb530c6aee296fd1671ed5dd8429
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/e2fsprogs/libext2fs2_1.47.0-2_loong64.deb
+    digest: 800fcd295698683fbdf682aa6434f808f94d45f5794d2872b90228c902c98287
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libfdisk1_2.39.3-6lingmo1_loong64.deb
+    digest: 90cdc402705bd60eceee7c4f3063f5e962ce62732f2e980f71767c6b6d55ad0d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libffi/libffi-dev_3.4.6-1_loong64.deb
+    digest: 864ef36cd80bc0a9fadbdafca5a5ef05ff92458f945bc1c20753d7635d8f17b7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libffi/libffi8_3.4.6-1_loong64.deb
+    digest: e1d9a61065aea68e96e14f496d7bfd63e024f8874e1d320cb607efd82dd96910
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-basedir-perl/libfile-basedir-perl_0.09-1_all.deb
+    digest: 79f5ef747c15be92e24a1adeea98e3d4c01b1b90b730a184a8ca4959a1aa4684
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-desktopentry-perl/libfile-desktopentry-perl_0.22-2_all.deb
+    digest: 19ed7f791a824bd6525c02cc6011bbd614880f3408e78eff5e16e1e9990334a8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-find-rule-perl/libfile-find-rule-perl_0.34-1_all.deb
+    digest: 8ebc94473bf3381e34408415da523e390c2fb3be418f3c298deb6bc82373ded5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfile-mimeinfo-perl/libfile-mimeinfo-perl_0.30-1_all.deb
+    digest: 4d9cecdc4b82cee837e74512293b8c84a554d3cdf6c760627cd9c42d6c752b92
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/flac/libflac8_1.3.3-2_loong64.deb
+    digest: 88b83d3414a7170f0e4ed2ba671b9cc45e5b376f3481a8154b094148a75f2fb3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fmtlib/libfmt10_10.1.0+ds1-1_loong64.deb
+    digest: b74cb51cabf302cf3a5c3f67def081b9ec2da494b2340c8bc03e72cd8dea6a81
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fontconfig/libfontconfig-dev_2.14.2-6_loong64.deb
+    digest: 353ec48905f9c8553b1e46a60124deb598ff3a1c07ca6a0aff62b0c5ba5bae77
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fontconfig/libfontconfig1-dev_2.14.2-6_loong64.deb
+    digest: fb7dc50d5c6f70b425b95cad47a9b57633b41fb814d06fb42c9a9022c2bf0ee2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fontconfig/libfontconfig1_2.14.2-6_loong64.deb
+    digest: db05b74e370f34d39ff896e5070fee3351a4cb938e86bc6dc852c624cc9534cb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libf/libfontenc/libfontenc1_1.1.4-1_loong64.deb
+    digest: 36450772f287a243ed0ff6c3b5e491021c7d63f6f68a9e71711fbb6e5884c868
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/freetype/libfreetype-dev_2.13.2+dfsg-1_loong64.deb
+    digest: acb0c01cf1db9cd8abf2ba2fb1deea3f6c52e90a471d0cba26e403d9fca7c292
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/freetype/libfreetype6_2.13.2+dfsg-1_loong64.deb
+    digest: ad56d47b6131633a5cd1f2a0e651c4bad65c92c35faf41e664ff79d9ca0df2c4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/fuse/libfuse2_2.9.9.1-1_loong64.deb
+    digest: 43e592f28f31cb7ccbdac7e371e6421922894680f17cb01590ac1f2f89b09782
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mesa/libgbm1_24.0.1-1lingmo3_loong64.deb
+    digest: 5a5f13deabd9697e5fa74f51531d4ecfddb4a651bb67d12b4596a84901ba55d1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcc-13/libgcc-s1_13.2.0-3lingmo2_loong64.deb
+    digest: fdd63f9f4b4661d9222d57cb5115c85de4b5055ca90f86ba56a948996252d78c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcr/libgck-1-0_3.41.1-3_loong64.deb
+    digest: 8fba4d2c3125f9b8c249b72f05791e42b2253b3315803257f3cb2f21d3d474d5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcr/libgcr-base-3-1_3.41.1-3_loong64.deb
+    digest: b41ce8bfaa3f0a15907cf3bc2bd0bac5bff44fdf5a6fb460994e725dcbb183b6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgcrypt20/libgcrypt20_1.10.3-2_loong64.deb
+    digest: 5bdd589218c3c04dd4c23f14e1815e007f56c84bd45cd497a1bf4e720bdbb6cb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgd2/libgd3_2.3.0-2_loong64.deb
+    digest: c3d391cf3611626a9ac9fa68279ce1b863d3f847d4ac6bab9ccb07dd8676156b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgdata/libgdata-common_0.18.1-2_all.deb
+    digest: a973346f27db8f31b1efa156d8f841dcacbbf335496cb87dfd69ee681f1e2a7e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgdata/libgdata22_0.18.1-2_loong64.deb
+    digest: 56f04090a3892817936b96146a43f4f2f16bfe417b1ef62ebf5df99b6a58514b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gdbm/libgdbm-compat4_1.22-1_loong64.deb
+    digest: bc7c3017145d403f6935e564bbcf6ee8904dbff103b96ecd876a3a66cebb6ae1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gdbm/libgdbm6_1.22-1_loong64.deb
+    digest: 2d965b1e2624d262111a5a767278f4f4ad51eb1c073096ce2dbc42e0c02f3fcf
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gio-qt/libgio-qt_0.0.12_loong64.deb
+    digest: 003930138054d1140c0327a4a4ed0a27b66bd4796e1c71aa9ff2f68ab8939c68
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libgirepository-2.0-0_2.80.1-1lingmo1_loong64.deb
+    digest: 02f892b6d38643410cd753637657b9803eb718268927eec5232e68045e81d13c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mesa/libgl1-mesa-dri_24.0.1-1lingmo3_loong64.deb
+    digest: bab851767c84b627dba9ff5c9b2c0c66093615e4a1e9953a22523123a2700193
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libglvnd/libgl1_1.7.0-1_loong64.deb
+    digest: 623a88c159a1e9eafc6316e91d3c55179c692fa950ecdd06f1955144813eb6b6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mesa/libglapi-mesa_24.0.1-1lingmo3_loong64.deb
+    digest: 2a5ecf58733e88327293001f6d34e91cff1608f02e3c15d914b38623b28accbe
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-0_2.80.1-1lingmo1_loong64.deb
+    digest: 796a8a4bfcc14d204bc23914f524a0dcb3b0545611060b3056547eb281e277f4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-bin_2.80.1-1lingmo1_loong64.deb
+    digest: eb81bcc49501d0e04514a0fa968beb0a0b81d4d4a35199c0d5c660e7ea6a1575
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-data_2.80.1-1lingmo1_all.deb
+    digest: 4e75a1c9e56c81ed2c1737e3e6fe590163a77ff45179101a4fcfb90b4c0d135d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-dev-bin_2.80.1-1lingmo1_loong64.deb
+    digest: c7351415720634d89b5ddf7e809d78b458be23d09cf32365e14a72141d6d20c1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glib2.0/libglib2.0-dev_2.80.1-1lingmo1_loong64.deb
+    digest: 1828aa1e6fe842d0713e1ae545f874d2335ab0c683638eb5bb594dd76037cd87
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/glibmm2.4/libglibmm-2.4-1v5_2.66.6-1lingmo1_loong64.deb
+    digest: 3203fb19b45d5f1e2ab10606bb19dc6ededee35b2c7738fa163189f420ec82c1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libglvnd/libglvnd0_1.7.0-1_loong64.deb
+    digest: 4ac20b2ddbc5d3985d95befa3db331ebcf6bf9d8b9c13df462018e2e6fd91218
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mesa/libglx-mesa0_24.0.1-1lingmo3_loong64.deb
+    digest: d4e90700c4b3a4f9452797224a757258d366e219d32dbb0c21c34c5206423884
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libglvnd/libglx0_1.7.0-1_loong64.deb
+    digest: 51e7ebb3d6b78cc5f420d864eb898e91a1ab386fea5c51548439231aa66d8232
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gmp/libgmp10_6.3.0+dfsg-2_loong64.deb
+    digest: 756156cdfe255865308c635fb6ad1e5a7b27aae32c43e74eba334920c3ce23b9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnutls28/libgnutls30_3.7.9-2_loong64.deb
+    digest: 2b68ea50a264b00dfae6f6b003939b618eb9b4a206e8f3c4e5f6601428d7711a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnome-online-accounts/libgoa-1.0-0b_3.40.1-2_loong64.deb
+    digest: 853644e364f343b17e38fdfeea8a099f69117f156e1d8e0af04df1b0bf799cb4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gnome-online-accounts/libgoa-1.0-common_3.40.1-2_all.deb
+    digest: eb91d785237fd0a190fb7d65545530f40fef24ad4ded106c52f1f84af1988dc8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcc-13/libgomp1_13.2.0-3lingmo2_loong64.deb
+    digest: d3c3f799ef5878222cfb3150d17318cb1318094a2051ab9dd8a2f2bfb524ccc7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgpg-error/libgpg-error0_1.47-3_loong64.deb
+    digest: 432b4819ad1edb46e6d8116596212dbc3a82d0d34c93c3574ded8db352188c8c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gpgme1.0/libgpgme11_1.18.0-4_loong64.deb
+    digest: 62d864247c03f8a467e44cb7c58f256a6d8fa143433ab3ce8bf98f4dc05c2084
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgphoto2/libgphoto2-6_2.5.27-1_loong64.deb
+    digest: b2bbf76f4884e499c6665d3d5784cd183e31c87d2f9236738f1107b687f7defe
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgphoto2/libgphoto2-port12_2.5.27-1_loong64.deb
+    digest: 7ed3746358fbcc399651f1a3d37a2c1883e73f890cb6b1b816289ec2432d254a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/graphite2/libgraphite2-3_1.3.14-1lingmo1_loong64.deb
+    digest: 4557b1165b2f166436b1f0d38467ffce003c71ec0bccba1909bf845b7bf02d5c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gsettings-qt/libgsettings-qt1_0.2-4_loong64.deb
+    digest: 4a5aa6e4989db5d4632e7e26cc9393dae8c4973796d4e377bf077d529615afa1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/krb5/libgssapi-krb5-2_1.20.1-5_loong64.deb
+    digest: a74abdb1e7ddf88624513747e6591d1c799bc8774187470bd05d8d489834d596
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libg/libgudev/libgudev-1.0-0_238-2lingmo1_loong64.deb
+    digest: 5930cfa21617d8103fad46534ba6d07b3930e28a3606600755a076d3eb95319b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/h/harfbuzz/libharfbuzz0b_8.0.1-1+rb1_loong64.deb
+    digest: 23f39df88cbc47f74e5a77408b2cdbc4fc47e41fdae3e5fb319a9cbe552c12a3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/nettle/libhogweed6_3.7.3-1_loong64.deb
+    digest: fca8fa6138c16bfb7f8d8fb78f55799c24b9a01bbac0202816b22624cdd0da6a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libice/libice6_1.0.10-1_loong64.deb
+    digest: 71f07175fac63f8a51f001299a9329a38c4320df6b46e6bdda20768aa90a3456
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/i/icu/libicu74_74.2-1_loong64.deb
+    digest: ad3068aee2d3b3d2b9cf42497cb4e82626cf272202d0736b349a649116ed557c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libidn2/libidn2-0_2.3.2-2_loong64.deb
+    digest: b235fca3fd81c2e6918d54b8d71f79757d6b818cf897fde7cb3826dc23ce85b3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libimobiledevice/libimobiledevice6_1.3.0-7.1_loong64.deb
+    digest: 072be379574b4da38bebdb2ae976bf5432927e0bea7566d6930ff0694b3c91db
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libinput/libinput-bin_1.23.0-2_loong64.deb
+    digest: b70aaf6a6849c1df2f2c1edbe494b47f8ed689cdb1b4c385214e6bc6e0d6f209
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libinput/libinput10_1.23.0-2_loong64.deb
+    digest: 1ab65a2c007b014f0a6oceanui3c1a4faf21b4acf365b3dc44a8d85dbf00d3a9eb46
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libipc-system-simple-perl/libipc-system-simple-perl_1.30-1_all.deb
+    digest: a528ecfa70fd8f3b4cc024947ff264e3952b0245be9a7147e556d8e1a037007c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libisoburn/libisoburn-dev_1.5.4-2_loong64.deb
+    digest: 67c9f8a3e99fe87526fabc5eb425d8ec586e4e0cee152648fe32ac1e066b6f0d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libisoburn/libisoburn1_1.5.4-2_loong64.deb
+    digest: 6ac73300b8acc1f381de1a67fe500cc4be2663c12053bde39ab6266ee79aa707
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libisofs/libisofs-dev_1.5.4-1_loong64.deb
+    digest: 6a4438ea0dac750307oceanea0fd71a8268eb0e0356967fbbc9c5ef068001423b4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libi/libisofs/libisofs6_1.5.4-1_loong64.deb
+    digest: 6f6b382b81b5548d9d9247fcc43e97f170cad99d847d13109b106b54a4e9f245
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/jansson/libjansson4_2.14-2_loong64.deb
+    digest: 4a8662b90c807a6afaf7ac4d89ae42e33725c60f5a0a26230366cd487425faec
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/jbigkit/libjbig0_2.1-3.1-lingmo1_loong64.deb
+    digest: 8940e6f4dce77f526bc32b5211d850389bc0875cf944520e9f0a4d85a170e9a9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libj/libjpeg-turbo/libjpeg62-turbo_2.1.5-2_loong64.deb
+    digest: 47df0f4474b4722b6a741b7c8b33057f38f58245efa92c176abd489665e92c1f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/json-c/libjson-c5_0.15-2_loong64.deb
+    digest: 9b9bbbc7b37c903dc9fdf39e1c68badb09d4b048c9f55fd05332504eeaf64f5a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/json-glib/libjson-glib-1.0-0_1.6.6-1_loong64.deb
+    digest: 1f11bc5e20ecd07bf97856156a2fb279259444effe4e2da4ff90dc881ccd19c9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/json-glib/libjson-glib-1.0-common_1.6.6-1_all.deb
+    digest: 0e4b31c3245dc32fd01ad884d44de08ef1fe524103b844de6433bead5e5ec4bc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/j/jigit/libjte2_1.22-3_loong64.deb
+    digest: bfd1511b2382ac1448b1e03e4712e09be85eb8f7e3c09696590dbe6d78a176cc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/krb5/libk5crypto3_1.20.1-5_loong64.deb
+    digest: 4a83826bbb0da645b6f48c1de0682bd7ba1d61a2b903fed7738ec7c88f559b8b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/keyutils/libkeyutils1_1.6.1-3_loong64.deb
+    digest: 8992cafa99b2adbcc73f3ce195b68eec72a1f777cb5cebea825c1848f35a7a1a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/kcodecs/libkf5codecs-data_5.103.0-1_all.deb
+    digest: 9a4efc7adbf62245db05fbc186a2bbda3e38346b129c5b70e4364e2ba90772e0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/kcodecs/libkf5codecs5_5.103.0-1_loong64.deb
+    digest: 301a0deaedd34933d510e79386aa045114da616c46105a094b00b8df313bcdf3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/klibc/libklibc_2.0.13-4_loong64.deb
+    digest: 65b39b94de5f4a1634f507b1de4409c1431d24032c73ef759628f08c83e7c432
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/kmod/libkmod2_30+20230601-2.1_loong64.deb
+    digest: 500ef5f0d6bfa0ee386b8300bf8f4daf6ca984e2d3866e16c91affc006d82f31
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/krb5/libkrb5-3_1.20.1-5_loong64.deb
+    digest: 071d32ffb73b3feca3d9135ec6109730728b20f40dc194abb24d3f4506c964ef
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/k/krb5/libkrb5support0_1.20.1-5_loong64.deb
+    digest: 7ec7dcba628cbededb02866a71961599d1fc501303c2797f756381ce2026845c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libk/libksba/libksba8_1.6.6-1_loong64.deb
+    digest: 5eb82bdd0a9e7de740142ef11b888d52675b26b333f4c371764a9d186f507b31
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lcms2/liblcms2-2_2.14-2_loong64.deb
+    digest: 0d4c7d34f69d56cc287e478af83d7cfddcf44a5ba77b6c4bf8a8afa7864c9f7d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/o/openldap/libldap-2.5-0_2.5.13+dfsg-5_loong64.deb
+    digest: 07c9253e9b743f0bc0f696c091a84d08a18f172e600311e0aadf508c494659a5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/samba/libldb2_2.8.0+samba4.19.5+dfsg-1_loong64.deb
+    digest: 3448ab2e470b78b2f19c5648cd5d9649fdbf64df5f912d5b5811a45c5c0f0e67
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lerc/liblerc4_4.0.0+ds-3_loong64.deb
+    digest: 04d2a5b464a65ed87d48e331080c46b39c6b2e088c5b4d251f06a46355dc905a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/llvm-toolchain-17/libllvm17_17.0.6-5lingmo1_loong64.deb
+    digest: 5c9213ccc3947aabf072e07304e80f9e7b41a9265af5d32d0bde32c1c282ff6f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lmdb/liblmdb0_0.9.31-1_loong64.deb
+    digest: 5835887392a617f55c873907418ff5d1724d29f1df9db0e042ac333500e88bab
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtool/libltdl7_2.4.7-7lingmo1_loong64.deb
+    digest: 784f3bc14c028381795abac2f06af4dc8f18aca57638bcc6d9624b34efc0fc4a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lucene++/liblucene++-contrib0v5_3.0.8-lingmo1+rb1_loong64.deb
+    digest: 7aedca77fc3699c05573ae9bd8562cc8e4d620e3c1f5ee6a2b82ca9311f67605
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lucene++/liblucene++0v5_3.0.8-lingmo1+rb1_loong64.deb
+    digest: f83187dc0c13f385a9f8901a770566bc0cdf16894b34b917d4fd047bdd4691c0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lz4/liblz4-1_1.9.3-lingmo_loong64.deb
+    digest: 223608f8e5ab70c862665634392467d8cdb27b39d749f8367ecf8f709ffd0044
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xz-utils/liblzma5_5.4.5-0.3_loong64.deb
+    digest: 8922429eeb2d802e40eaba8567afb65504a70988e500d4d7a455f1ea6c79f20f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/file/libmagic-mgc_5.45-2_loong64.deb
+    digest: 27e1567dc6bfe516415c9094115904ae1b53971c89ef080c722bfff493c3ca3a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/f/file/libmagic1_5.45-2_loong64.deb
+    digest: 56329f9b8dcb4983a96465b3d78fd4ab2191da4b7c88caa47d59ed0ab3a8fba8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmd/libmd0_1.0.4-1_loong64.deb
+    digest: f54d26b7c46c848e15a460cd03140e8a436ea2f5b6b7e287e47994d1c627dbc8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/md4c/libmd4c0_0.4.8-1_loong64.deb
+    digest: 38b04a9c6431d337342ef954a98ddc75b6ea0da7b17d321cf5f4ba17e73d9dea
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmediainfo/libmediainfo0v5_23.10+dfsg-1_loong64.deb
+    digest: 5f907c1277706746c94e9d0bffeabdf77b7a5819831c4bd12a5265338ae63a58
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmms/libmms0_0.6.4-3_loong64.deb
+    digest: 94525b6f2e0864c4b0f0a780dca08948d09c54610217581ad54ffa1d74bc6267
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmng/libmng1_1.0.10+dfsg-3.1-lingmo1_loong64.deb
+    digest: 501c91fa0ba7cc9f6bceff658ffdba2323039a590719a2030f2dd37266d296aa
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libmount-dev_2.39.3-6lingmo1_loong64.deb
+    digest: 73941c73eb241e1f14e1437904f999a5281cd7f9ab011c4fe07bc7bcda5de9cc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libmount1_2.39.3-6lingmo1_loong64.deb
+    digest: 09d325477885d70857f69af079ae718949684f01e4ef75de78bc39a08ba3c25d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mtdev/libmtdev1_1.1.6-1_loong64.deb
+    digest: 4a5019080a0454a1380d3353dbc52b5bfebd3ad8f4c210425beeef8b6e5113e8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmtp/libmtp-common_1.1.19-1_all.deb
+    digest: 44a0e89ade6db5cd592eae3e2cf60db0e802aa794738c573ba65313016ad5993
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libm/libmtp/libmtp9_1.1.19-1_loong64.deb
+    digest: a5113ce56fc62983ad9395c4e2c7773181cb5a640006490a1a5ecfdae61a3e72
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/ncurses/libncursesw6_6.4-4_loong64.deb
+    digest: 4db1ea7ab75ab8e38d6ea0e9c408766dd8328c84ded9e53aae7f6bba29e8e7e7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/nettle/libnettle8_3.7.3-1_loong64.deb
+    digest: b49e593029d91c73f2240ffb5f129e3a47f613aadbf8ab5f50d592b2a5abdc98
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libn/libnfs/libnfs13_4.0.0-1_loong64.deb
+    digest: d4bc28fe1c56f617c212f2ebb6bd2dbbbadca7b137807296a489f4bd9ef74454
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/nghttp2/libnghttp2-14_1.59.0-1_loong64.deb
+    digest: f6ef00e648bb4f2e191b91ad77fc0849f59c7abe0578608f4347fd23f02c72a7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/npth/libnpth0_1.6-3_loong64.deb
+    digest: 65cc76d2ce6fc32760d615dae94978c76979ac5754d888a5366eff81de454157
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libn/libnsl/libnsl-dev_1.3.0-2_loong64.deb
+    digest: 20dfccabfb63024f4d18c0dddf6271436dd6b423643d8140ab157055c006b31c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libn/libnsl/libnsl2_1.3.0-2_loong64.deb
+    digest: 295c4fdb7405a01bac01bc50e542232014a5225cac5f675bfbe33ea41d1acd67
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/nspr/libnspr4_4.35-1lingmo1_loong64.deb
+    digest: f0440afdc0c144acc9819af4b1af77b60d1ef722ae8410cdef6d6a77b9233ae4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/nss/libnss3_3.100-1_loong64.deb
+    digest: 110ac50abdae637cc76e153444e9b17cbef5a12ba1be68c15c28d3542793c7db
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libn/libnumber-compare-perl/libnumber-compare-perl_0.03-2_all.deb
+    digest: c37a63d53d982b9596a8e498e9ef95cf07cc245eaa2a8df8fc8546e82511fa7c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libo/libogg/libogg0_1.3.5-3_loong64.deb
+    digest: 45f908be81e813e6326426acd4c5675adac085383a93bf5b87bee2942a2152bd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/o/openjpeg2/libopenjp2-7_2.5.0-2_loong64.deb
+    digest: 575da3427fe1632f4ocean973fd2cf3b4a15dac1a77d612bedebeae18d1968095e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/o/opus/libopus0_1.3.1-3_loong64.deb
+    digest: 49e4f3ab950054084d1cbdfe848f0dfa73c4ae0f8ceabe0a6987c522a26e3765
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/p11-kit/libp11-kit0_0.24.0-5_loong64.deb
+    digest: 7a8a243c2696702456bd5975c37d223f908812c8562321ce9d59e1fb4d40616a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pam/libpam-modules-bin_1.5.3-7_loong64.deb
+    digest: 5dc50dd145785e30648e42fb91db3f31b806735e7b10a968c48d7d7375847715
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pam/libpam-modules_1.5.3-7_loong64.deb
+    digest: cf7355e65a3df43639cdbed9d796ad620f979f24e6050fab418d48e604a91f76
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pam/libpam-runtime_1.5.3-7_all.deb
+    digest: 28a2789917401d06fff5c31991bf27fc808626c5c086219df63cfe1acf978b97
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/libpam-systemd_255.2-4_loong64.deb
+    digest: 8a0434a3c498454087492158b7f3973c297c8fc030319eede85e0c1e21a4f044
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pam/libpam0g_1.5.3-7_loong64.deb
+    digest: 2bd2b109cdeda454a9d61ee61d06e9c39a1ef0296d891f40549c44dfcb0573ca
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/parted/libparted-fs-resize0_3.4-lingmo_loong64.deb
+    digest: d0b467fb434dfe4798e533be91f3c1837a71f0d964a7baf527659b64161e4fb0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/parted/libparted2_3.4-lingmo_loong64.deb
+    digest: 0ccd99080a96bc93aae816322c088225c409d1cbfad298ba82bca0a2298278c5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre2/libpcre2-16-0_10.39-2_loong64.deb
+    digest: c8062fb10212742a2ee3206282e185e1072fb891c17ae8bbb73777d7f4ebd93b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre2/libpcre2-32-0_10.39-2_loong64.deb
+    digest: c5694b615e555a112c2ec14ecd8002cf48bbeaefaa8a83c4c81f5bcb80825e31
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre2/libpcre2-8-0_10.39-2_loong64.deb
+    digest: ecc34edbd930aae24bd00654a682592d396e5f0b3d94ad3c40baa300e2cdd0c1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre2/libpcre2-dev_10.39-2_loong64.deb
+    digest: 165eb3c1854d96d79f71a381b0ce8c04cdc8984d36587f15e77fa36e78320fd9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre2/libpcre2-posix3_10.39-2_loong64.deb
+    digest: efb78bfaecc447039df6ceaf21a40055d692ceea4a38e700e280dfd05c521881
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pcre3/libpcre3_8.39-13_loong64.deb
+    digest: b4d3529a623ec663098f3a20568fd6c16da4bb9cec52fb45cb0d8767d1d1877f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/perl/libperl5.36_5.36.0-10_loong64.deb
+    digest: 04a865c6db98c65a2a540eb254174d4c012db34fc3b333ed5649fecedbfd0fbc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pkgconf/libpkgconf3_1.8.1-1_loong64.deb
+    digest: ea2a5c6752184aacd8e8999cf08acb7b94b353256f55d00494dc237856215ae9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libp/libplist/libplist3_2.2.0-6+rb1_loong64.deb
+    digest: 3103b7b44f6ba00e085ae14fa341455e23214d4452c6f16242993e296695342b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libp/libpng1.6/libpng-dev_1.6.40-2_loong64.deb
+    digest: b264603a1bf9d98f62b3a2372c640f37c77a8eb45d7cef5fd450115c2cf8e2ce
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libp/libpng1.6/libpng16-16_1.6.40-2_loong64.deb
+    digest: f865dc5b460fcb0d70dc87894a98da21ebde6149302056fe9a15a3687d388b9d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/policykit-1/libpolkit-agent-1-0_123-3lingmo4_loong64.deb
+    digest: d4adf2b70b7829690864c704c40b93b090efc29eb1a569e22974d302a9b6a181
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/policykit-1/libpolkit-gobject-1-0_123-3lingmo4_loong64.deb
+    digest: c71d07f58feb7c347ff8bc80ca4cc64117ff508697ad5d02f7479667872b6a4b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/polkit-qt-1/libpolkit-qt5-1-1_0.114.0.1-lingmo_loong64.deb
+    digest: 71aeeecd135d8ab8d5a6c91e6e450437a6f801cfa718621a461a1f5efa41bf84
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/poppler/libpoppler-cpp0v5_22.02.0-3_loong64.deb
+    digest: a6ab49d25614cc10ccfd63ca8d6f9823ff360d4414179d978213433c9bef2ecb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/poppler/libpoppler118_22.02.0-3_loong64.deb
+    digest: 52802efbb09b2cdc3048e6847a8f8946b131841c5c44da026c740298e71e925d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/popt/libpopt0_1.18-3_loong64.deb
+    digest: a14418f1d0093f495a76c279cc86351c481d28fb2b6c920a217622c2ea6a6a4e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libp/libproxy/libproxy1v5_0.4.18-1.2_loong64.deb
+    digest: 05c5e5923230ec071dcf9cae3223f6121c8f43992f3089606bf704464f395255
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libp/libpsl/libpsl5_0.21.0-1.2_loong64.deb
+    digest: 48076d0b45bdee001ab7b435296ab05853ab64402092af005e07437oceanui838640
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pugixml/libpugixml1v5_1.12.1-1_loong64.deb
+    digest: c0b1583229b0598d53f538621d5664f544240877b106c0236906a51089bfbdb8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pulseaudio/libpulse-mainloop-glib0_15.0.3-5lingmo10_loong64.deb
+    digest: fcc14b8805b17862f7dcae796a8f77c6d6b47191034d89ce4f34290a425d9d38
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pulseaudio/libpulse0_15.0.3-5lingmo10_loong64.deb
+    digest: f74896fa65b4a32815c6b4b6c9e9723cf5e483fbc7189cf67c6788e7f7ec0c8b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3-defaults/libpython3-stdlib_3.11.4-5_loong64.deb
+    digest: 708cf806ce99b6cb899dbf08e190301ecfc5e98ea1877f8a92bfa0be8b22f58b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3.11/libpython3.11-minimal_3.11.6-3_loong64.deb
+    digest: b9580b84a0fb035fbc1e09ef5cee5fbcd08ece6fb1a9eea1dc545e4e254051c3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3.11/libpython3.11-stdlib_3.11.6-3_loong64.deb
+    digest: fd48d8c7167ca6505591193c1d2d28936b01cb38313ea57feaae3e48e858d8ec
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5concurrent5_5.15.8-1+lingmo9_loong64.deb
+    digest: 71fd49d223eba33407a068cd8313ef97f652528f290f023e66ab7f84c9ccabb9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5core5a_5.15.8-1+lingmo9_loong64.deb
+    digest: 13438d4edf8af245fa13e4dbddb3db8ca600dabe195353387287e8bcd835ead1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5dbus5_5.15.8-1+lingmo9_loong64.deb
+    digest: d9d974c1916206ab779fbe614aedb3131eadb88218818567d77b423f2b30bf52
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5gui5_5.15.8-1+lingmo9_loong64.deb
+    digest: 2ce40b2670f19cfa073230c408161f163271b17c01f6d189367750358894da18
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtmultimedia-opensource-src/libqt5multimedia5_5.15.8-1+ocean_loong64.deb
+    digest: 6f20e01acd7c8c38dbf2ebcc7c26be839b388f905089d10b3532f2b15ad719cd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5network5_5.15.8-1+lingmo9_loong64.deb
+    digest: c72b1d6eeac8d4f02be868e7155a132e02a5562333a4472e79a1fefac1a4823a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5printsupport5_5.15.8-1+lingmo9_loong64.deb
+    digest: e69240cd898eccb3e82cfa6592499a5d69ac0be38659375bc1c3217c5f8ab9a7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5sql5_5.15.8-1+lingmo9_loong64.deb
+    digest: 838fa914835843ccb589b800f96de558f1226b654cc42cd4c34cb37fceb7c519
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtsvg-opensource-src/libqt5svg5_5.15.8-1+ocean_loong64.deb
+    digest: a8c31a39d839b2e539f9c5d4afc1868da75e4feb23ede59a6eabad86aafb2d8d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5widgets5_5.15.8-1+lingmo9_loong64.deb
+    digest: 370522143cd2741edcbabd746f9dc760cfcf9368642933026bb98b777d3a3c96
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtx11extras-opensource-src/libqt5x11extras5_5.15.8-1+ocean_loong64.deb
+    digest: 47c680c27f798d0a752a38f567f6b7150ce55dd187438c07b1dcd8ca1b6c6969
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libq/libqtxdg/libqt5xdg3_3.12.0-1lingmo1_loong64.deb
+    digest: 6369595a0827bb39ff121112c7678cb4b7a2d677e4f05ee8804a5b7fb843393f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libq/libqtxdg/libqt5xdgiconloader3_3.12.0-1lingmo1_loong64.deb
+    digest: 1a292bd2e65f4f086ebb2f79143d724e3ad596387141bd348df4ab1633b415a3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtbase-opensource-src/libqt5xml5_5.15.8-1+lingmo9_loong64.deb
+    digest: a8c3e88147928311f2b7b652bab1e2c60d1d690a4e615637cb1db2b42580e665
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/r/readline/libreadline8_8.2-3_loong64.deb
+    digest: a1c114f0856366970ce731783250b16f1a600a917ac54eb45b3fc765a7dc5e8d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/r/rtmpdump/librtmp1_2.4+20151223.gitfa8646d.1-lingmo1_loong64.deb
+    digest: 8809a7bd4cd047bccc1e7198bfb8e154716a647cc619ac7d49cbde13b7ebcb1b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cyrus-sasl2/libsasl2-2_2.1.28+dfsg1-4_loong64.deb
+    digest: 330cc540349e985f4837e68c0c021dede1939f25516cbbb1dc7016ca0595ce4f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/c/cyrus-sasl2/libsasl2-modules-db_2.1.28+dfsg1-4_loong64.deb
+    digest: 5a7bd78f37915ec3255c7a90b6abff4e0ae332f3555ebcb3cf8fe78c6545de7d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsecret/libsecret-1-0_0.20.4-2_loong64.deb
+    digest: 30c4b478ad75448be4d33093b2e59561c59fb67bce862957933562d6aa1d8250
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsecret/libsecret-1-dev_0.20.4-2_loong64.deb
+    digest: bd2bf503c24288ee1f2a6f2eb9af6936c861cbab623bc675311e41a11f03174c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsecret/libsecret-common_0.20.4-2_all.deb
+    digest: 492889d84ddb780b33e4845b15abc35d4945ec330d4790f71621276bf4881bfa
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libselinux/libselinux1-dev_3.5-1_loong64.deb
+    digest: a84f44a2038623063260320604fa884138627507e9aace50e4ef9cfb81637ef8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libselinux/libselinux1_3.5-1_loong64.deb
+    digest: bc86b98fb1945359eb0959b07bba6c40c71668255342bc3bfba3cca9841437ff
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsemanage/libsemanage-common_3.5-1_all.deb
+    digest: 39ec161cb8dcb637421e5e5d16e41312f220393656553fa2802892af2895ade5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsemanage/libsemanage2_3.5-1_loong64.deb
+    digest: 1da787de9d0bd8fe5569a0840f4bb9e0d6057ca633d91261d55e6505af34282c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lm-sensors/libsensors-config_3.6.0-7_all.deb
+    digest: 164115506dfd335f26101e76cb49e2162b0440398ccf2d0c969ebc465dfd7867
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lm-sensors/libsensors5_3.6.0-7_loong64.deb
+    digest: 654049e53be85d4dab717bbfeb848f579c19d0cafd926a845357c62813263cb2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsepol/libsepol-dev_3.5-2_loong64.deb
+    digest: cd6de58ec8972c1be0f4028a31b7b94d8079bd1c0bb6af78c21ab1c1a0b245a2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsepol/libsepol2_3.5-2_loong64.deb
+    digest: ffe0ab79dca28bc304448ab0b91016fdd679746ce0d4395abbf9c38cf0c9774d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwebp/libsharpyuv0_1.3.2-0.2_loong64.deb
+    digest: ee12b9b2406d779965c510510bd32f01ab931f62eea583bc206c1d41f4a0711c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsigc++-2.0/libsigc++-2.0-0v5_2.10.8-1_loong64.deb
+    digest: 7cb27db102077bd3d37b2e74a3f35b485a183c47a71141c9e0bf2add7a519488
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsm/libsm6_1.2.3-1_loong64.deb
+    digest: 9af2780f0816a5e2c10bbbe3abb974ba236ecf0beef15a49040433889c678847
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libsmartcols1_2.39.3-6lingmo1_loong64.deb
+    digest: 969dc944c0756c7947ed13d8e8f658d3fc2fb7d98e4120f871a0oceanuifbead211d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/samba/libsmbclient_4.19.5+dfsg-1_loong64.deb
+    digest: 00a8f01627a3d113f91a9efaef78ec09e2ae150c0acec2131af4764e02fee1b0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsndfile/libsndfile1_1.0.31-2_loong64.deb
+    digest: 1724af768ad3f06d2bd8533b94e1327ef2ebe725405744cd510620afaec64a7f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsoup2.4/libsoup2.4-1_2.74.2-3_loong64.deb
+    digest: 51b25b1a72b04430a39b95d366ed01a67dd658d95dc08a5ba84145b57dda9692
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libsoup2.4/libsoup2.4-common_2.74.2-3_all.deb
+    digest: fc72410b0df9a55ad859968f420c15380eb1c5b1a02e2ce71a541a28765f6a14
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/spdlog/libspdlog1.12_1.12.0+ds-2_loong64.deb
+    digest: 760ec85164e31b757b0e46274b5a1eafe5a6ce53ccd0e1c4c1d7e5338e93c31e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/sqlite3/libsqlite3-0_3.45.1-1_loong64.deb
+    digest: 9096791c4741b549a2280283116218ea21d66bc9dd6aeaff94b66111c1a8c172
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/e2fsprogs/libss2_1.47.0-2_loong64.deb
+    digest: f2bb190701fa9247ab6aca0bb273b606e72eb970e513867603b09f148f5b174c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libs/libssh2/libssh2-1_1.10.0-2_loong64.deb
+    digest: ce3f0c9a9533ec1f20259fb9e851dcaf3bd4ff8788e68b3f7a3da378814b0f30
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/o/openssl/libssl3_3.2.0-2_loong64.deb
+    digest: e21f7969e4644aabf313684b15a10d85f9c8cd69603b190540dca90f921cdd5a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/startup-notification/libstartup-notification0_0.12-lingmo1_loong64.deb
+    digest: d5528cf8ef1dcf19b1b3245d894851bbddc35132ef3fd22e8c399fd5af91a514
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/g/gcc-13/libstdc++6_13.2.0-3lingmo2_loong64.deb
+    digest: 52ba4932e00c32af5bad96b41d875718e835a0f607669149ccf22dfe71e19045
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/libsystemd-shared_255.2-4_loong64.deb
+    digest: b2b0e9027d5e64e4d4e12515c5b0610077f3bea062fb1dec78269a926d95f1d6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/libsystemd0_255.2-4_loong64.deb
+    digest: 232d13cf5d2a2d1def70ab4d0cf072be3ae5f4da08089c86bfe6d5c80b127744
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/taglib/libtag1v5-vanilla_1.12-1_loong64.deb
+    digest: 06bda24943a33f129b966490c57bc9e9f1c135dcde9eb2458995b3815758aa2a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/taglib/libtag1v5_1.12-1_loong64.deb
+    digest: ba59e4b6ea2e83def0a22df5f5317517a7033d7369480bc4e3f752e91eac25da
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/talloc/libtalloc2_2.4.2-1_loong64.deb
+    digest: 2e8285222e91bea95ea6ea8374690d37d9c1026252f238c066bca55e8612212f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtasn1-6/libtasn1-6_4.18.0-4_loong64.deb
+    digest: 75ocean4d8be25c4d18dcf4e27dffff588fabf9c2b365b3c22b2cbd12af97d90b3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tdb/libtdb1_1.4.10-1_loong64.deb
+    digest: bb73f5ca287159f1e1ff29a65eab366cd1ebb7aa85b929d7a888886d41cb0f5e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tevent/libtevent0_0.16.1-1_loong64.deb
+    digest: 113113b0040bc211adef2d2caa2abc446627bb41b0c1d192e62a6f89b4e62f2f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtext-glob-perl/libtext-glob-perl_0.11-2_all.deb
+    digest: 2e8cf563b486b56b4c875db16a37e5e24168085510b8bfd167efc8367cdcad1f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tiff/libtiff6_4.5.1+git230720-1_loong64.deb
+    digest: ef8e7f405ffd2369cca89949320fa3a491212a097f202bcaffb28be0bf239e63
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/n/ncurses/libtinfo6_6.4-4_loong64.deb
+    digest: e4acb568f126357a2ab0d6cccee72d797ec67d0a05dd39193d03ea3260a550b7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tinyxml2/libtinyxml2-9_9.0.0+dfsg-3_loong64.deb
+    digest: 091593f024edff6c0579ec3ba4a866e41040ddc5e05af1309e4a936e4190f315
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtirpc/libtirpc-common_1.3.2-2_all.deb
+    digest: 74bddc18e3289947b20653433e82025873f5679ccba52f258ca4912e435a09ee
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtirpc/libtirpc-dev_1.3.2-2_loong64.deb
+    digest: 398023207ec9cd9852423ff943a2471c9e413273d3d6e654251d3a9d66820b34
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libt/libtirpc/libtirpc3_1.3.2-2_loong64.deb
+    digest: 9af8a36a1e38bb90c2cf99639596b5368ecdf03c5a51721bd723735eb3e7cfb8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/libudev1_255.2-4_loong64.deb
+    digest: 522208edcd7615012206c8f741446e34885ef84d84e150aa9058d21ec70cb887
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libu/libudfread/libudfread0_1.1.2-1_loong64.deb
+    digest: 52fe8c374d5b0f18d538139bb314839f707a1ee6da3090d411fb9c2aa9c93e49
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/udisks2/libudisks2-0_2.9.4.1-lingmo2_loong64.deb
+    digest: a7f18a79e000e31c450feef4be31faa0734a3edfab85e462ecebf5c10378c837
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/udisks2/libudisks2-dev_2.9.4.1-lingmo2_loong64.deb
+    digest: 125d027e9ac4ed1808668f900ebed285736e019236b2a32d3a536abec8d7c095
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/udisks2-qt5/libudisks2-qt5-0_5.0.6-1lingmo_loong64.deb
+    digest: 4e16415b94708072da530835678134baoceanui0276e785d0ecbdb68f10062f20c4a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libu/libunistring/libunistring2_0.9.10-6_loong64.deb
+    digest: 100d2bd250eff9cdc1ce0492cb7fffc306e620aef5886e1b12245f3f020d569c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libu/liburi-perl/liburi-perl_5.10-1_all.deb
+    digest: 485904ff807b96c4d1d18d248a40b01915d37274df732235119ecd2af01f872f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libu/libusb-1.0/libusb-1.0-0_1.0.24-3_loong64.deb
+    digest: c95ca8c43cd4b273d9ed19470371acf2167aa90a9d276fd57e9caab50c4df95f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libu/libusbmuxd/libusbmuxd6_2.0.2-3_loong64.deb
+    digest: 93f38cee54950f407ed2734ad0758fa438e1751e43e8ec6467be021fa28fcee0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/libuuid1_2.39.3-6lingmo1_loong64.deb
+    digest: 48c616dfb3a357311ea0507bf7c43740e66a2eb1f85027c116a3f7f20067f4e8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/v/volume-key/libvolume-key1_0.3.12-3.1-lingmo1_loong64.deb
+    digest: 49d6752c26177e2e3bb5cbdb1e4bd0072cc82f69ba1a02a357387b08d2478fec
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libv/libvorbis/libvorbis0a_1.3.7-1_loong64.deb
+    digest: eb315ca7dd23b9be47670ac80776ad4945deeab95fbb6d5116a236d47acfd4ef
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libv/libvorbis/libvorbisenc2_1.3.7-1_loong64.deb
+    digest: 5cdb7cf3b7e5750527c1eb4a33e3907865783979f1e554b97b0a83cbc3bc7939
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/v/vulkan-loader/libvulkan1_1.3.268.0-1_loong64.deb
+    digest: 6d09f8d682a373ad28cdee87a1b7c0857d759688554d5b3ae751e5d7054c2ed8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwacom/libwacom-common_1.12-1_all.deb
+    digest: ae18d0c6d1b68084756ae6a5ca4d4d680659ad6a9e5384bdbb49de48ffb75bd8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwacom/libwacom2_1.12-1_loong64.deb
+    digest: 87c13b7db15b7c19111c5af081825d48550cd48c351e3c5ddfac976939bd67b1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/w/wayland/libwayland-client0_1.22.0-1_loong64.deb
+    digest: 76fe449044f59767874d52b971fb8022adbcf748a55295f048fb34856f9e10f1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/w/wayland/libwayland-server0_1.22.0-1_loong64.deb
+    digest: 6bc8237c06b4192e92f28bddbb55834241de3062eb5508746d91c2f7a3989dc2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/samba/libwbclient0_4.19.5+dfsg-1_loong64.deb
+    digest: ae40780d38a75dbb06387b024622febc5ead1ed27dd20604ac09c6f33ab958a0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwebp/libwebp7_1.3.2-0.2_loong64.deb
+    digest: 2a7085499257d278cebe95b0cdc5e9f61c0375319a8683959155a6b7fa57dc78
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwebp/libwebpdemux2_1.3.2-0.2_loong64.deb
+    digest: 09f59a459dbd3ee2c0d7adebaccaa0fb9ce46598f13257bcbdfc6dd4a61dac1c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libw/libwebp/libwebpmux3_1.3.2-0.2_loong64.deb
+    digest: d52b6cde771aadcec6f49bfa11bcd2b8780f308f9640215fd30c2881d0dcf0a7
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tcp-wrappers/libwrap0_7.6.q-31_loong64.deb
+    digest: 88b9805e5da0827ebc53e33906fd09ffbede998cada79379261033f073e03537
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libx11/libx11-6_1.8.7-1_loong64.deb
+    digest: 0e818e4cdefbcf50c1f4c632eb4f0a45ff5b7582d4072a4c64620dc684b49ccd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libx11/libx11-data_1.8.7-1_all.deb
+    digest: 400aaa7eaab268850d8c2c512474228204d47774f2aac79cef29d1c125e0c656
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libx11/libx11-xcb1_1.8.7-1_loong64.deb
+    digest: 727ef7465319b0edc7070f9b440a76a29ac1437608a23d98e5679f06d94f6fd5
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxau/libxau6_1.0.9-1_loong64.deb
+    digest: 13a646d0cdb63a9a5025ab6f5f692e077b51b5735fb06a1300f6fd544d6496bc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-dri2-0_1.15-1_loong64.deb
+    digest: 25459f6ecf5eadd32fa1d076d9bb086c3b6d78720615d3f45280b135c002931c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-dri3-0_1.15-1_loong64.deb
+    digest: 7bcaa840cef1cb99090ae88b987047b83388b4d2b7aef06b8063a211a8418fea
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-glx0_1.15-1_loong64.deb
+    digest: 19924e487af19c6fbe893bdf9cec301cf3225013122dbd9b40afce27b9cc3694
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xcb-util-wm/libxcb-icccm4_0.4.1-1.1_loong64.deb
+    digest: 812dc26f817bf6c032d5301a99fc395df44ad95306f8d6cd9f2aa74cbf547d1f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xcb-util-image/libxcb-image0_0.4.0-lingmo1_loong64.deb
+    digest: 5573f2fe0db5d1ba31fee4ac95e63f7c29f05dfc1bd932cf702fe1e6b33461f4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xcb-util-keysyms/libxcb-keysyms1_0.4.0-lingmo1_loong64.deb
+    digest: a0fbc54aaff67469c3acf51904c2013621636668bf28b6918a207fd7f819acb1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-present0_1.15-1_loong64.deb
+    digest: a47fb8a989a5a6844449830afe9a7234458acb96014de72cf64a18dc78a4707f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-randr0_1.15-1_loong64.deb
+    digest: bbc5a60430c0641edbdc2736cf3108d35bcb30388ef769e830646b8f4fc01b4f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xcb-util-renderutil/libxcb-render-util0_0.3.9-lingmo1_loong64.deb
+    digest: fb2143791db0e7dee5969bd2b5459439a0d59052000bf26be30e023e2cff77ce
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-render0_1.15-1_loong64.deb
+    digest: f43e74d65d509258147ed6230046648a92fdc906733abf3445373b311032a2a3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-shape0_1.15-1_loong64.deb
+    digest: 6bd302fe80140947738703a1d3a00fde8036d7b423ab9a591f7bad1b34c09606
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-shm0_1.15-1_loong64.deb
+    digest: f75b6dab7eea8f98e0264c63cbb31b5b21df9679c8b309ce7893d7a4866cb845
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-sync1_1.15-1_loong64.deb
+    digest: 6646259959aa296666facf3d598730c7789d51338cd2a81bf9aab79ea9a986cd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xcb-util/libxcb-util1_0.4.0-lingmo1_loong64.deb
+    digest: 09d6ff65d108b01df3a41e6ce112545c05e8d246bd441fa41e8c365a8f606272
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-xfixes0_1.15-1_loong64.deb
+    digest: 604e97953f434b25d0f23f6eed233ed6a797612c2de320262fbb1dff394f9075
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-xinerama0_1.15-1_loong64.deb
+    digest: b77443ecd34f97d68467689a5d7247170fa1fc06910c19cfbf8d160a8e901d49
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-xinput0_1.15-1_loong64.deb
+    digest: 4fe01e9c81e5b0f199645e25d5ee57837a035f46e50db39193cdb58655bc45da
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb-xkb1_1.15-1_loong64.deb
+    digest: d00aabdea0d36cb2980759bc6a56de64b6f74810aa8c25a31dc674ffe40c5f2b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxcb/libxcb1_1.15-1_loong64.deb
+    digest: 6977bdf22da615ab81df4414e047090a560e73cffa04acc6f2ed27bf2c77e5fb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxdmcp/libxdmcp6_1.1.2-3_loong64.deb
+    digest: ce4dc98b358a67e1b9653e4492845673a1f6d75512298389758bfb5f1ca2a463
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxext/libxext6_1.3.4-1_loong64.deb
+    digest: 151ada3ad16057453b554909ae0ae403c46b8d5560643043a92f4a18ca069de0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxfixes/libxfixes3_6.0.0-1_loong64.deb
+    digest: 12c47fb6cbb173e015a075830b727791bf872ec2491e789658172f714566d297
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxi/libxi6_1.8-1_loong64.deb
+    digest: 5f71fc81ce2d0cf706df5a6e968832b748e02b2ed83742ceaa2567de7bfaaabc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxkbcommon/libxkbcommon-x11-0_1.6.0-1_loong64.deb
+    digest: 0373a8af7f464e5daf826bb10a59fbb7e353b52447842d18555f79a9eff2eee9
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxkbcommon/libxkbcommon0_1.6.0-1_loong64.deb
+    digest: a4e72ca7887958f24270607f6d7897af906a345aa470bdd4a644fa5b66189538
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-libxml-perl/libxml-libxml-perl_2.0207+dfsg+really+2.0134-1_loong64.deb
+    digest: 2368358f81c8262c0b9daf60d40bde0209a34c432dce7f1d254e387e6d71f1be
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-namespacesupport-perl/libxml-namespacesupport-perl_1.12-1.1_all.deb
+    digest: 9588edfba6a50bf6702eac9ec3aca6f19a8b14a4260dc86615a93181040bd040
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-sax-base-perl/libxml-sax-base-perl_1.09-1.1_all.deb
+    digest: 8271fec055eb0dabdfef211ce005a2b0ac78feaa5c31ebf35c7c8fe6bbf1482a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml-sax-perl/libxml-sax-perl_1.02+dfsg-3_all.deb
+    digest: 4751449b0ce407282bf5ea9a721fa3ae1cd4d488ea3f21c6a40e6e4889d9fd6d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxml2/libxml2_2.9.14+dfsg-1.3+rb1_loong64.deb
+    digest: 2bff227d0698e3f85bf45ef08de45ebfd5394c2c5f13d26a047a01cf4666006d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxpm/libxpm4_3.5.12-1_loong64.deb
+    digest: 465927f78462af2593d735c65131239399ee219acfd7c9192f2b63af14f5a922
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxrender/libxrender1_0.9.10-1_loong64.deb
+    digest: 8b25a070d6897778e58585524e411ce4591bcc37a642e0a202e064486906e8a3
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxshmfence/libxshmfence1_1.3-1_loong64.deb
+    digest: 0d235925c3c0d5ff0a3be29607a3800e616b58fcb46b0eafb7a9e3ba70d7d0fb
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libx/libxxf86vm/libxxf86vm1_1.1.4-lingmo1_loong64.deb
+    digest: 8bf8c69d8210c9e7ca528ec7bb43bb8c39c9493cbe05aca024926e68602b83cd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/z/z3/libz3-4_4.8.12-lingmo2_loong64.deb
+    digest: b212d93ce7d5637cbbc6d8e1c86a15bafb0871c580eccff0eaa7768480d05d8f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libz/libzen/libzen0v5_0.4.41-2_loong64.deb
+    digest: 60eedf2fd7384c5deeb56a79bf7315d21bd1f3dcaadd8159ec1f1b6999f83e39
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libz/libzip/libzip4_1.7.3-1_loong64.deb
+    digest: 2211ba7bf374deb1ed8bfccff9ec6078735d9b141bf9oceanuid1150e922a9d97420
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/libz/libzstd/libzstd1_1.5.5+dfsg2-2_loong64.deb
+    digest: d058fce76522747153757cbfe5eec9bac7f0077906775f8f232c100bbd0d3e56
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/linux-base/linux-base_4.6-lingmo_all.deb
+    digest: 48b8c12dbd8c4f8bab0b8a2c82beb4fde6e5f5df7c0f919ee746d9a9814cdf0f
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/linux-upstream/linux-libc-dev_23.01.00.32_loong64.deb
+    digest: 9e72480d626cea281e59d32c4f5e7bb30de6b648caedc97a19e29c8060dffa03
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/e/e2fsprogs/logsave_1.47.0-2_loong64.deb
+    digest: 489591ac261ccd9e6390e9c2cb6a15642ef0e3f0308aff129c3727f63a34836e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lshw/lshw_02.19.git.2021.06.19.996aaad9c7-2_loong64.deb
+    digest: afb878e2661aa04cb0de2a844ac33f95e5ff8faa1924016cddd0207af36d266b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/l/lsof/lsof_4.95.0-1lingmo1_loong64.deb
+    digest: 9bbab1be4913e720fb6da92f65cdb0c115fb869112343543b461fc41ba0e2993
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mailcap/mailcap_3.70_all.deb
+    digest: 7ca67d118c03eaf58346eb1e676ff16f4d1aa5252a8cc6b5b3b1ed44556180f1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/media-types/media-types_4.0.0_all.deb
+    digest: cd124053950ab8b0373203bceb7eab841791017daf1d50db2ece09e4da52406a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/m/mime-support/mime-support_3.66_all.deb
+    digest: 20294deda4378616c2b48614ee226731ec09663c3497c35a467e8ea5fa03f16a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/mount_2.39.3-6lingmo1_loong64.deb
+    digest: 6f3233bf2f3c875d3b13a34fcd085bb3841267cba0454b98a259a23ocean204a27
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/parted/parted_3.4-lingmo_loong64.deb
+    digest: 32e8c2d16d323e6f03b2b6ab0f011663593d583fe91f1d46a8f3f50640a72a8b
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/shadow/passwd_4.14+dfsg1-0lingmo3_loong64.deb
+    digest: 7348da0495373624e52d89b34089cd7606f8bdb17dcb1c53a2c92509cf4eff1e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/perl/perl-base_5.36.0-10_loong64.deb
+    digest: 2c2ff9c3322f33ec19ed0c0170001fde2d9ff60937d323f154aac0a1a660fe82
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/perl/perl-modules-5.36_5.36.0-10_all.deb
+    digest: 907542b9a413bd0276d5ef94fef77083715a692fd33c52ece44d11fff847bab0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/perl/perl_5.36.0-10_loong64.deb
+    digest: dc3b0b73a582471f146be8f35e39d61ef9046a2a4f3ee2a29684f8ed12d2a598
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pinentry/pinentry-curses_1.2.0-2_loong64.deb
+    digest: 455cb8b3a11ea0caadec238ba0981204a4da2ccc12ca1235becbaf7ca21c935d
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pkgconf/pkg-config_1.8.1-1_loong64.deb
+    digest: 423b2905ab5e9ae4e284c533bf1ea48ba9602af2c172f565a6512f69502775f2
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pkgconf/pkgconf-bin_1.8.1-1_loong64.deb
+    digest: e1ee964a895c5ff8b59a51bf1f4da480b1d588f189433a046f2406d5d6a8906a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/pkgconf/pkgconf_1.8.1-1_loong64.deb
+    digest: 1db6ffb2335e4eb4b787988d9e4f201408c96fdfdc6353ad2c31e96fefd44676
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/psmisc/psmisc_23.7-1_loong64.deb
+    digest: 61eea067b8a249979c0f9e1fd232c5dd24778a88cd350a42d67fcfb4b0dd5140
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3-defaults/python3-minimal_3.11.4-5_loong64.deb
+    digest: 782ede1b3217aae8d353247cd5ddb81ad816abc57843932b8fd602a1f14fc4f1
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python-packaging/python3-packaging_23.2-1_all.deb
+    digest: 23df868981c665493f1859e974697088549ec5ff69ec56ea06ee864f36100a3a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3.11/python3.11-minimal_3.11.6-3_loong64.deb
+    digest: 239b527721b38eeee404f3322cc05a9cb996cf8b8859eb57a02abcf46127oceanui0
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3.11/python3.11_3.11.6-3_loong64.deb
+    digest: e72ae042f1784400da6a357f649f5cfc0e80e17ddff8234a8aa0593ccff1502e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/p/python3-defaults/python3_3.11.4-5_loong64.deb
+    digest: 443a749cbae916c080e4da43fed7caa26aae60fbe873a09c251ded4bffd8f2e4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/q/qtimageformats-opensource-src/qt5-image-formats-plugins_5.15.8-1+ocean_loong64.deb
+    digest: acad29301a55d860cb5f300422fbf0600f20d39dea780e9bce507f0a05c18f18
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/r/readline/readline-common_8.2-3_all.deb
+    digest: 35fe59faceb8d9def8b6aa664e091eac8444887bc1f33ba2cf22099c3646e7bd
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/r/rpcsvc-proto/rpcsvc-proto_1.4.2-4_loong64.deb
+    digest: 5a68197175ff3bf8f57fdd1066b62efcb547e877ae2c3b057f5b5a9c8add94c4
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/samba/samba-libs_4.19.5+dfsg-1_loong64.deb
+    digest: 49639cfd8591e9e9c8b418b4ad2ffa22fd976b6999bf18d30f6c15ab84b3e79e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/sed/sed_4.8-1_loong64.deb
+    digest: 24a13a75ba49f551a64a1afce385ca01c49c8795f18419019eb75aa575bcc21c
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/sensible-utils/sensible-utils_0.0.17_all.deb
+    digest: e99b46d528ef00f091a48cfcf91318539f75f71f8dd2122571fcf9c3e1e499ab
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/shared-mime-info/shared-mime-info_2.2-1_loong64.deb
+    digest: a0cd2345f1c869975ba98b8ead9048f32746d72966162472ce531ae48ecb0e9e
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/socat/socat_1.7.4.1-3_loong64.deb
+    digest: c83714ed02623e57bd66c1c8ec9d09a492fd1f7c8040a8a5f368a0cf207c8f29
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/systemd-dev_255.2-4_all.deb
+    digest: 9a82369b13b5a86762cfc4b08591f6ddb38bbb338eafe503317129d41e863cf8
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/systemd-sysv_255.2-4_loong64.deb
+    digest: 8b8969c1a51d474cf5162b287292431add2db445d4ec361d873a2f6bf0d7e2ba
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/systemd_255.2-4_loong64.deb
+    digest: fbbd67509427495d8dd9f9313275f6834e7a16c0f84f81b11279727a764ad4f6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tar/tar_1.35+dfsg-3_loong64.deb
+    digest: 48cc0cc32829c68c7b58e74f141fe552f9a3f5c9e6da77ad54184530debc0cff
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/t/tzdata/tzdata_2023d-1lingmo1_all.deb
+    digest: fe503c524801260208482a1dfc061e79c2a7450111dd90f88ed40d70ac935832
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/ucf/ucf_3.0043_all.deb
+    digest: 798643dc75a19ab6e0067fcd63a89c28f711c3e4769435e262dc36bba18f9a2a
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/s/systemd/udev_255.2-4_loong64.deb
+    digest: dbfff5ec9b03d245c492e4fc7528280e9d68205b0a3d476d0b2582ac9469d8fc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/udisks2/udisks2_2.9.4.1-lingmo2_loong64.deb
+    digest: 605de0fedc4458604ae0d06e298cbcc151c2a0f96b8de4b773479cbe06b23b77
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/usrmerge/usr-is-merged_38_all.deb
+    digest: a955d8f015290e7447210d049a362e3f04afcb82fcf1f0b4403d13df7b4f5fd6
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/usrmerge/usrmerge_38_all.deb
+    digest: fdc636985788b18a04cd15941a111fb2a73d3b56cf58c689b918345e6f003161
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/u/util-linux/uuid-dev_2.39.3-6lingmo1_loong64.deb
+    digest: 54727a76b166231d74f5116fc6732bf97ac9aa2ee8f8b49bbf0ee5b8358c5483
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xorg/x11-common_7.7+23-lingmo1_all.deb
+    digest: 9a7643db11023a8bec126312edec4b1b7357b93416bdfbaf9b0cb8bc04506d49
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xfonts-encodings/xfonts-encodings_1.0.4-2.1lingmo1_all.deb
+    digest: 07d68c68eeeca62cea0558b4f0bc25896bd82fddfa6c4b02693ee0adc4bde224
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xfonts-utils/xfonts-utils_7.7+6-lingmo_loong64.deb
+    digest: 7022910932f96b7af8fa6e5ffe31a20515e47e9ae3dbab9781012f132e4e3198
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/x/xkeyboard-config/xkb-data_2.38-2lingmo1_all.deb
+    digest: 6fdc32f08737735128e20a10f9a8425bde19855e3917d8f26a62ea3a12a9a720
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/z/zlib/zlib1g-dev_1.3.dfsg-3_loong64.deb
+    digest: 94c80947f4e9eb9abb53622ebc45728f1ed6387b84789d38d17e619f38c549fc
+  - kind: file
+    url: https://ci.lingmo.com/repo/lingmo/lingmo-community/backup/rc2/pool/main/z/zlib/zlib1g_1.3.dfsg-3_loong64.deb
+    digest: 68757110c7a6fb352dd791ad5cc0ed157fc642313a83131c1e480a4c9efa58d0

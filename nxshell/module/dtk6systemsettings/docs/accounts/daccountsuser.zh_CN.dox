@@ -1,0 +1,307 @@
+/*!
+@~chinese
+@file daccountsuser.h
+@ingroup dtkaccounts
+@brief daccountsuser.h是对于一组用于管理用户账户属性和相关信息的D-BUS接口的封装。
+
+@class Dtk::Accounts::DAccountsUser daccountsuser.h
+@brief 用户属性相关信息的封装类
+
+@fn AccountType DAccountsUser::accountType() const
+@brief 获取当前用户的用户类型
+@return 表示用户类型的枚举值
+
+@fn bool DAccountsUser::automaticLogin() const
+@brief 判断当前用户是否启用了自动登录
+@return 自动登录是否激活
+@retval true 已激活
+@retval false 没有激活
+
+@fn QString DAccountsUser::fullName() const
+@brief 获取当前用户的全名
+@return 表示用户全名的字符串
+
+@fn quint64 DAccountsUser::GID() const
+@brief 获取DAccountsUser指向用户的组id
+@return 组id
+
+@fn quint64 DAccountsUser::UID() const
+@brief 获取DAccountsUser指向用户的用户id
+@return 用户id
+
+@fn QStringList DAccountsUser::groups() const
+@brief 获取DAccountsUser指向用户所在的组
+@return 由组名组成的列表
+
+@fn QList<QByteArray> DAccountsUser::layoutList() const
+@brief 获取DAccountsUser指向用户的用户布局信息
+@return 由布局信息组成的列表
+
+@fn QString DAccountsUser::homeDir() const
+@brief 获取DAccountsUser指向用户的家目录
+@return 表示家目录路径的字符串
+
+@fn QList<QByteArray> DAccountsUser::iconFileList() const
+@brief 获取DAccountsUser指向用户的图标列表
+@return 由该用户所有的图标的路径组成的列表
+
+@fn QString DAccountsUser::iconFile() const
+@brief 获取DAccountsUser指向用户的当前的图标
+@return 表示图标路径的字符串
+
+@fn QByteArray DAccountsUser::layout() const
+@brief 获取DAccountsUser指向用户的当前布局
+@return 表示布局的字符串
+
+@fn QByteArray DAccountsUser::locale() const
+@brief 获取DAccountsUser指向用户的本地化信息
+@return 表示本地化信息的字符串
+
+@fn bool DAccountsUser::locked() const
+@brief 判断当前用户账户是否锁定
+@return 用户账户是否被锁定
+@retval true 已被锁定
+@retval false 没有被锁定
+
+@fn qint32 DAccountsUser::maxPasswordAge() const
+@brief 获取DAccountsUser指向用户的最大密码过期时间
+@return 表示表示天数的32位整数
+
+@fn QString DAccountsUser::passwordHint() const
+@brief 获取DAccountsUser指向用户的密码提示
+@return 表示密码提示的字符串
+
+@fn QDateTime DAccountsUser::passwordLastChange() const
+@brief 获取DAccountsUser指向用户的最后一次更改密码的时间
+@return 表示日期的QDateTime变量
+
+@fn PasswdStatus DAccountsUser::passwordStatus() const
+@brief 获取DAccountsUser指向用户的密码状态
+@return 表示密码状态的枚举值
+
+@fn QString DAccountsUser::shell() const
+@brief 获取DAccountsUser指向用户的shell
+@return 表示shell路径的字符串
+
+@fn QByteArray DAccountsUser::UUID() const
+@brief 获取DAccountsUser指向用户的UUID
+@return 表示UUID的字符串
+
+@fn QByteArray DAccountsUser::userName() const
+@brief 获取DAccountsUser指向用户的用户名
+@return 表示用户名的字符串
+
+@fn bool DAccountsUser::noPasswdLogin() const
+@brief 获取DAccountsUser指向用户是否设置了无密码登录
+@return 布尔值
+@retval true 可以无密码登录
+@retval false 不能无密码登录
+
+@fn QDateTime DAccountsUser::loginTime() const
+@brief 最近一次的登录时间
+@return 表示登录时间的QDateTime变量
+
+@fn QDateTime DAccountsUser::createdTime() const
+@brief ~/.bash_logout或配置文件的ctime
+@return 表示时间的QDateTime变量
+
+@fn void DAccountsUser::setAutomaticLogin(bool enabled)
+@brief 设置当前用户是否使用自动登录
+@param[in] enabled 代表是否开启自动登录的布尔值
+
+@fn void DAccountsUser::setFullName(const QString &newfullname)
+@brief 设置DAccountsUser指向的用户的全名
+@param[in] newfullname 表示用户全名的字符串
+
+@fn void DAccountsUser::setGroups(const QStringList &newgroups)
+@brief 设置DAccountsUser指向的用户所属的组
+@attention 调用此方法会把之前的组全部清空
+@param[in] newgroups 由用户组组名组成的列表
+
+@fn void DAccountsUser::setLayoutList(const QList<QByteArray> &newlayouts)
+@brief 设置DAccountsUser指向的用户的布局列表
+@attention 调用此方法会把之前的布局信息全部清空
+@param[in] newlayouts 由布局信息组成的列表
+
+@fn void DAccountsUser::setHomeDir(const QString &newhomedir)
+@brief 设置DAccountsUser指向的用户的家目录
+@param[in] newhomedir 代表家目录路径的字符串
+
+@fn void DAccountsUser::setIconFile(const QUrl &newiconURL)
+@brief 设置DAccountsUser指向的用户的图标
+@param[in] newiconURL 代表用户想要当做图标的png文件的QUrl对象
+
+@fn void DAccountsUser::setLayout(const QByteArray &newlayout)
+@brief 设置DAccountsUser指向的用户的布局信息
+@param[in] newlayout 代表新的布局信息的字符串
+
+@fn void DAccountsUser::setLocale(const QByteArray &newlocale)
+@brief 设置DAccountsUser指向的用户的本地化信息
+@param[in] newlocale 代表新的本地化信息的字符串
+
+@fn void DAccountsUser::setLocked(const bool locked)
+@brief 设置是否锁定当前用户
+@note 锁定后可以阻止该用户登录
+@param[in] locked 代表是否锁定用户的布尔值
+
+@fn void DAccountsUser::setMaxPasswordAge(const int newndays)
+@brief 设置DAccountsUser指向的用户的最大密码过期时间
+@param[in] newndays 代表新的最大过期时间
+
+@fn void DAccountsUser::setPassword(const QByteArray &newpassword)
+@brief 设置DAccountsUser指向的用户的密码
+@param[in] newpassword 代表用户新密码的字符串
+
+@fn void DAccountsUser::setPasswordHint(const QString &newpasswordhint)
+@brief 设置DAccountsUser指向的用户的密码提示
+@param[in] newpasswordhint 代表密码提示的字符串
+
+@fn void DAccountsUser::setShell(const QString &newshellpath)
+@brief 设置DAccountsUser指向的用户的shell
+@note 设置shell为不允许的程序可能会阻止用户登录
+@param[in] newshellpath 代表shell路径的字符串
+
+@fn void DAccountsUser::setNopasswdLogin(const bool enabled)
+@brief 设置DAccountsUser指向的用户是否能无密码登录
+@param[in] enabled 代表是否激活的布尔值
+
+@fn void DAccountsUser::addGroup(const QString &group)
+@brief 把DAccountsUser指向的用户加入某个用户组
+@param[in] group 用户组的组名
+
+@fn void DAccountsUser::deleteGroup(const QString &group)
+@brief 把DAccountsUser指向的用户从某个用户组中移除
+@param[in] group 用户组的组名
+
+@fn void DAccountsUser::deleteIconFile(const QUrl &iconURL)
+@brief 将DAccountsUser指向的用户的某个图标删除
+@param[in] iconURL 代表待删除图标路径的QUrl对象
+
+@fn bool DAccountsUser::isPasswordExpired() const
+@brief 判断DAccountsUser指向的用户的密码是否过期
+@retval true 密码已过期
+@retval false 密码没有过期
+
+@fn ReminderInfo DAccountsUser::getReminderInfo() const
+@brief 获取DAccountsUser指向的用户的一些信息
+@return 由信息组成的结构体
+
+@fn PasswdExpirInfo DAccountsUser::passwordExpirationInfo(qint64 &dayLeft) const
+@brief 获取DAccountsUser指向的用户的密码过期信息
+@param[out] dayLeft 还剩多少天密码过期
+@return 一个代表密码过期信息的枚举值
+
+@fn void DAccountsUser::automaticLoginChanged(const bool enabled)
+@brief 属性automaticLogin发生变化时触发该信号
+@param[in] enabled 是否启用
+
+@fn void DAccountsUser::groupsChanged(const QStringList &list)
+@brief 属性groups发生变化时触发该信号
+@param[in] list 变更的列表
+
+@fn void DAccountsUser::layoutListChanged(const QList<QByteArray> &list)
+@brief 属性layoutList发生变化时触发该信号
+@param[in] list 变更的列表
+
+@fn void DAccountsUser::iconFileListChanged(const QList<QByteArray> &list)
+@brief 属性iconFileList发生变化时触发该信号
+@param[in] list 变更的列表
+
+@fn void DAccountsUser::iconFileChanged(const QUrl &url)
+@brief 属性iconFile发生变化时触发该信号
+@param[in] url 变更的路径
+
+@fn void DAccountsUser::layoutChanged(const QByteArray &layout)
+@brief 属性layout发生变化时触发该信号
+@param[in] layout 变更的布局
+
+@fn void DAccountsUser::localeChanged(const QByteArray &locale)
+@brief 属性locale发生变化时触发该信号
+@param[in] locale 变更的本地化
+
+@fn void DAccountsUser::lockedChanged(const bool locked)
+@brief 属性locked发生变化时触发该信号
+@param[in] locked 是否锁定
+
+@fn void DAccountsUser::maxPasswordAgeChanged(const qint32 age)
+@brief 属性maxPasswordAge发生变化时触发该信号
+@param[in] age 变更的密码最大过期时间
+
+@fn void DAccountsUser::passwordHintChanged(const QString &hint)
+@brief 属性passwordHint发生变化时触发该信号
+@param[in] hint 变更的密码提示
+
+@fn void DAccountsUser::noPasswdLoginChanged(const bool enabled)
+@brief 属性noPasswdLogin发生变化时触发该信号
+@param[in] enabled 是否启用
+
+@property DAccountsUser::accountType
+@brief 用户类型
+
+@property DAccountsUser::automaticLogin
+@brief 是否可以自动登录
+
+@property DAccountsUser::fullName
+@brief 用户的全名
+
+@property DAccountsUser::GID
+@brief 用户的组id
+
+@property DAccountsUser::UID
+@brief 用户的用户id
+
+@property DAccountsUser::groups
+@brief 用户所在的组
+
+@property DAccountsUser::layoutList
+@brief 用户的键盘布局列表
+
+@property DAccountsUser::homeDir
+@brief 用户的家目录
+
+@property DAccountsUser::iconFileList
+@brief 用户的图标文件路径的列表
+
+@property DAccountsUser::iconFile
+@brief 用户当前的图标的路径
+
+@property DAccountsUser::layout
+@brief 用户的当前的键盘布局
+
+@property DAccountsUser::locale
+@brief 用户当前的本地化选项
+
+@property DAccountsUser::locked
+@brief 是否锁定用户
+
+@property DAccountsUser::maxPasswordAge
+@brief 密码最大的过期时间时间
+
+@property DAccountsUser::passwordHint
+@brief 密码提示
+
+@property DAccountsUser::passwordLastChange
+@brief 密码最后一次更改的时间
+
+@property DAccountsUser::passwordStatus
+@brief 密码的状态
+
+@property DAccountsUser::shell
+@brief 用户的shell路径
+
+@property DAccountsUser::UUID
+@brief 用户唯一的UUID
+
+@property DAccountsUser::userName
+@brief 用户名
+
+@property DAccountsUser::noPasswdLogin
+@brief 是否可以无密码登录
+
+@property DAccountsUser::loginTime
+@brief 用户的登录时间
+
+@property DAccountsUser::createdTime
+@brief 用户的~/.bash_logout或配置文件的ctime
+
+*/
