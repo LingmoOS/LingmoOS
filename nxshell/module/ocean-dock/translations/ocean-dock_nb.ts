@@ -277,7 +277,7 @@
         <translation>Hold Vist</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Hold Skjult</translation>
     </message>
     <message>

@@ -640,7 +640,7 @@ void InfoShowWidget::onLeaveWidget()
 
 void InfoShowWidget::onEnterVGInfoWidget(QRect rect, const QList<QMap<QString, QVariant> > &lstInfo)
 {
-    if (!m_vgInfoShowWidget->isHioceann()) {
+    if (!m_vgInfoShowWidget->isHidden()) {
         return;
     }
 

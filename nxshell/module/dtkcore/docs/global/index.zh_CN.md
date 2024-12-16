@@ -28,14 +28,14 @@ target_link_libraries(test PRIVATE
 ```
 cpp:
 ```cpp
-#include <DSysInfo> // 引入DSysInfo
+#include <LSysInfo> // 引入LSysInfo
 #include <qdebug.h> // 引入qdebug.h
 DCORE_USE_NAMESPACE // 使用dtkcore命名空间
 
 int main(int argc, char **argv) {
 
-  qDebug() << DSysInfo::lingmoType(); // 打印lingmo类型
-  qDebug() << DSysInfo::ProductType(); // 打印产品类型
+  qDebug() << LSysInfo::lingmoType(); // 打印lingmo类型
+  qDebug() << LSysInfo::ProductType(); // 打印产品类型
   return 0;
 }
 ```

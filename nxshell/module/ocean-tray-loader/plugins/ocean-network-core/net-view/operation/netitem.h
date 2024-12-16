@@ -26,7 +26,7 @@ enum NetItemType {
     WirelessMineItem,                                 // 我的网络,2级,虚拟项
     WirelessOtherItem,                                // 其他网络,2级,虚拟项
     WirelessItem,                                     // 无线项,3级
-    WirelessHioceannItem,                               // 无线隐藏项,3级,虚拟项
+    WirelessHiddenItem,                               // 无线隐藏项,3级,虚拟项
     WirelessDisabledItem,                             // 无线禁用项,1级,虚拟项
     AirplaneModeTipsItem,                             // 飞行模式提示项,1级
     WiredControlItem = NET_WIRED | NET_CONTROL,       // 有线开关,1级,虚拟项
@@ -419,7 +419,7 @@ private:
     friend class NetManagerThreadPrivate;
 };
 
-class NetWirelessHioceannItem : public NetItem
+class NetWirelessHiddenItem : public NetItem
 {
     Q_OBJECT
 
@@ -429,8 +429,8 @@ public:
     void retranslateUi() override;
 
 protected:
-    explicit NetWirelessHioceannItem(const QString &id);
-    ~NetWirelessHioceannItem() Q_DECL_OVERRIDE;
+    explicit NetWirelessHiddenItem(const QString &id);
+    ~NetWirelessHiddenItem() Q_DECL_OVERRIDE;
 
     friend class NetManagerPrivate;
     friend class NetManagerThreadPrivate;

@@ -15,7 +15,7 @@
 #include <QDBusObjectPath>
 #include <QSharedPointer>
 
-#include <cstoceanf>
+#include <cstddef>
 
 DPOWER_BEGIN_NAMESPACE
 UPowerManagerInterface::UPowerManagerInterface(QObject *parent)

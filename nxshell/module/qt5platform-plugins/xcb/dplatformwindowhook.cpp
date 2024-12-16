@@ -144,7 +144,7 @@ void DPlatformWindowHook::setWindowState(Qt::WindowState state)
     if (state == Qt::WindowMinimized
             && (window->m_windowState == Qt::WindowMaximized
                 || window->m_windowState == Qt::WindowFullScreen)) {
-        window->changeNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIOCEANN"));
+        window->changeNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIDDEN"));
         XIconifyWindow(QX11Info::display(), window->m_window, QX11Info::appScreen());
         window->connection()->sync();
 

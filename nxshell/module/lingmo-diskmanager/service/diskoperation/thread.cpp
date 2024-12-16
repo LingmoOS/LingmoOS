@@ -252,7 +252,7 @@ void ProbeThread::probeDeviceInfo()
     }
 //    qDebug() << __FUNCTION__ << "**9";
     //这里的代码有可能会恢复，与文管对移动设备的处理相关
-//    getPartitionHioceannFlag();
+//    getPartitionHiddenFlag();
     for (auto it = m_deviceMap.begin(); it != m_deviceMap.end(); it++) {
         DeviceInfo devinfo = it.value().getDeviceInfo();
         for (int i = 0; i < it.value().m_partitions.size(); i++) {

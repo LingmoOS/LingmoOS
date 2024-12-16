@@ -277,7 +277,7 @@
         <translation>देखाउनुहोस्</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>लुकाउनुहोस्</translation>
     </message>
     <message>

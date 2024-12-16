@@ -37,7 +37,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void requestFixItem(SysCheckItemID index);
     void requestSetIgnore(SysCheckItemID index, bool isNeedIgnore);
-    void widgetHioceann(); // 隐藏时需要刷新其它项的背景
+    void widgetHidden(); // 隐藏时需要刷新其它项的背景
 
 private:
     void initUI();

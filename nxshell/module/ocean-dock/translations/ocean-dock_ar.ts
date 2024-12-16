@@ -277,7 +277,7 @@
         <translation>اﻹبقاء ظاهراً</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>الإبقاء مخفياً</translation>
     </message>
     <message>

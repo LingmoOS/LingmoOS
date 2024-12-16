@@ -105,7 +105,7 @@ MainWindow::MainWindow(QSettings& settings, AppConfig& appConfig) :
     m_pTempConfigFile(NULL),
     m_pTrayIcon(NULL),
     m_pTrayIconMenu(NULL),
-    m_AlreadyHioceann(false),
+    m_AlreadyHidden(false),
     m_pMenuBar(NULL),
     m_pMenuBarrier(NULL),
     m_pMenuHelp(NULL),
@@ -766,7 +766,7 @@ void MainWindow::stopBarrier()
     m_pTempConfigFile = NULL;
 
     // reset so that new connects cause auto-hide.
-    m_AlreadyHioceann = false;
+    m_AlreadyHidden = false;
 }
 
 void MainWindow::stopService()

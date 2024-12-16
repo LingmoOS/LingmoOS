@@ -22,7 +22,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN ShmPool::Private
+class Q_DECL_HIDDEN ShmPool::Private
 {
 public:
     Private(ShmPool *q);

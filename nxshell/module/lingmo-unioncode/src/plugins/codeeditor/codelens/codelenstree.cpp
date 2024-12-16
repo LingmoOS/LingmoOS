@@ -20,7 +20,7 @@ CodeLensTree::CodeLensTree(QWidget *parent)
     setEnabled(true);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setItemDelegate(new CodeLensDelegate(this));
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     setLineWidth(0);
 
     QObject::connect(this, &QTreeView::doubleClicked, [=](const QModelIndex &index) {

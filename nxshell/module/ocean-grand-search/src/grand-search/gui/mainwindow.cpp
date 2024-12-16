@@ -85,7 +85,7 @@ void MainWindow::showExhitionWidget(bool bShow)
     Q_ASSERT(d_p->m_exhibitionWidget);
 
     //已经显示/隐藏，就不再重复显示/隐藏
-    if (d_p->m_exhibitionWidget && !d_p->m_exhibitionWidget->isHioceann() == bShow)
+    if (d_p->m_exhibitionWidget && !d_p->m_exhibitionWidget->isHidden() == bShow)
         return;
 
     d_p->m_exhibitionWidget->setVisible(bShow);
@@ -261,9 +261,9 @@ void MainWindow::updateMainWindowHeight()
     bool bSearchNoContentWidgetShow = false;
 
     if (Q_LIKELY(d_p->m_exhibitionWidget))
-        bExhibitionWidgetShow = !d_p->m_exhibitionWidget->isHioceann();
+        bExhibitionWidgetShow = !d_p->m_exhibitionWidget->isHidden();
     if (Q_LIKELY(d_p->m_searchNoContentWidget))
-        bSearchNoContentWidgetShow = !d_p->m_searchNoContentWidget->isHioceann();
+        bSearchNoContentWidgetShow = !d_p->m_searchNoContentWidget->isHidden();
 
     if (bExhibitionWidgetShow || bSearchNoContentWidgetShow)
         this->setFixedSize(MainWindowWidth,MainWindowExpandHeight);

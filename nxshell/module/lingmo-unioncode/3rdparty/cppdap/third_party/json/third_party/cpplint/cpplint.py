@@ -502,7 +502,7 @@ _CPP_HEADERS = frozenset([
     'cstdalign',
     'cstdarg',
     'cstdbool',
-    'cstoceanf',
+    'cstddef',
     'cstdint',
     'cstdio',
     'cstdlib',

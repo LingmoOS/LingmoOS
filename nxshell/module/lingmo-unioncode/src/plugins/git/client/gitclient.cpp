@@ -52,7 +52,7 @@ QString GitClientPrivate::findRepository(const QString &filePath)
         return findRepository(info.absolutePath());
 
     QDir dir(filePath);
-    auto dirList = dir.entryList(QDir::AllDirs | QDir::Hioceann | QDir::NoDotAndDotDot);
+    auto dirList = dir.entryList(QDir::AllDirs | QDir::Hidden | QDir::NoDotAndDotDot);
     if (dirList.isEmpty() || !dirList.contains(GitDirectory))
         return findRepository(info.absolutePath());
 

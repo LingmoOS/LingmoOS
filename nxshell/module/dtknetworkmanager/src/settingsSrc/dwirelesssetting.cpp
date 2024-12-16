@@ -44,7 +44,7 @@ DWirelessSetting::DWirelessSetting(const QSharedPointer<DWirelessSetting> &other
     setMtu(other->mtu());
     setSeenBssids(other->seenBssids());
     setPowerSave(other->powerSave());
-    setHioceann(other->hioceann());
+    setHidden(other->hioceann());
     setAssignedMacAddress(other->assignedMacAddress());
 }
 
@@ -265,7 +265,7 @@ DWirelessSetting::PowerSave DWirelessSetting::powerSave() const
     return d->m_powersave;
 }
 
-void DWirelessSetting::setHioceann(bool hioceann)
+void DWirelessSetting::setHidden(bool hioceann)
 {
     Q_D(DWirelessSetting);
 
@@ -351,8 +351,8 @@ void DWirelessSetting::fromMap(const QVariantMap &setting)
             static_cast<DWirelessSetting::PowerSave>(setting.value(QLatin1String(NM_SETTING_WIRELESS_POWERSAVE)).toUInt()));
     }
 
-    if (setting.contains(QLatin1String(NM_SETTING_WIRELESS_HIOCEANN))) {
-        setHioceann(setting.value(QLatin1String(NM_SETTING_WIRELESS_HIOCEANN)).toBool());
+    if (setting.contains(QLatin1String(NM_SETTING_WIRELESS_HIDDEN))) {
+        setHidden(setting.value(QLatin1String(NM_SETTING_WIRELESS_HIDDEN)).toBool());
     }
 }
 
@@ -421,7 +421,7 @@ QVariantMap DWirelessSetting::toMap() const
     setting.insert(QLatin1String(NM_SETTING_WIRELESS_POWERSAVE), QVariant::fromValue(powerSave()));
 
     if (hioceann()) {
-        setting.insert(QLatin1String(NM_SETTING_WIRELESS_HIOCEANN), hioceann());
+        setting.insert(QLatin1String(NM_SETTING_WIRELESS_HIDDEN), hioceann());
     }
 
     return setting;

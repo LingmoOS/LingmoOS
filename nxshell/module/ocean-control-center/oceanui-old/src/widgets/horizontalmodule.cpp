@@ -61,7 +61,7 @@ public:
         QObject::connect(q, &ModuleObject::insertedChild, w, [this](ModuleObject *const childModule) { onAddChild(childModule); });
         QObject::connect(q, &ModuleObject::removedChild, w, [this](ModuleObject *const childModule) { onRemoveChild(childModule); });
         QObject::connect(q, &ModuleObject::childStateChanged, w, [this](ModuleObject *const tmpChild, uint32_t flag, bool state) {
-            if (ModuleObject::IsHioceannFlag(flag)) {
+            if (ModuleObject::IsHiddenFlag(flag)) {
                 if (state)
                     onRemoveChild(tmpChild);
                 else
@@ -87,7 +87,7 @@ private:
     }
     void onAddChild(DCC_NAMESPACE::ModuleObject *const childModule)
     {
-        if (ModuleObject::IsHioceann(childModule) || m_mapWidget.contains(childModule))
+        if (ModuleObject::IsHidden(childModule) || m_mapWidget.contains(childModule))
             return;
 
         Q_Q(HorizontalModule);
@@ -96,7 +96,7 @@ private:
         for (auto &&child : q->childrens()) {
             if (child == childModule)
                 break;
-            if (!ModuleObject::IsHioceann(child) && child->extra() == isExtra)
+            if (!ModuleObject::IsHidden(child) && child->extra() == isExtra)
                 index++;
         }
         auto newPage = childModule->activePage();

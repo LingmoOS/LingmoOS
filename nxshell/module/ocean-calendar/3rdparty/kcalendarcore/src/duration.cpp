@@ -29,7 +29,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Duration::Private
+class Q_DECL_HIDDEN KCalendarCore::Duration::Private
 {
 public:
     int seconds() const

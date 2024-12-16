@@ -296,7 +296,7 @@ bool TrashFileInfo::canAttributes(const CanableInfoType type) const
         return d->dFileInfo->attribute(DFileInfo::AttributeID::kAccessCanRename, nullptr).toBool();
     case FileCanType::kCanDrop:
         return FileUtils::isTrashRootFile(urlOf(UrlInfoType::kUrl));
-    case FileCanType::kCanHioceann:
+    case FileCanType::kCanHidden:
         return false;
     case FileCanType::kCanRedirectionFileUrl:
         return true;
@@ -399,7 +399,7 @@ bool TrashFileInfo::isAttributes(const OptInfoType type) const
             return ProxyFileInfo::isAttributes(type);
 
         return d->dFileInfo->attribute(DFileInfo::AttributeID::kAccessCanWrite, nullptr).toBool();
-    case FileIsType::kIsHioceann:
+    case FileIsType::kIsHidden:
         return false;
     case FileIsType::kIsSymLink:
         if (!d->dFileInfo)

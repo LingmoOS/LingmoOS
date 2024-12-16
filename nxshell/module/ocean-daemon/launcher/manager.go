@@ -50,7 +50,7 @@ const (
 	gsKeyFullscreen         = "fullscreen"
 	gsKeyAppsUseProxy       = "apps-use-proxy"
 	gsKeyAppsDisableScaling = "apps-disable-scaling"
-	gsKeyAppsHioceann         = "apps-hioceann"
+	gsKeyAppsHidden         = "apps-hioceann"
 	gsKeyPackageNameSearch  = "search-package-name"
 )
 
@@ -84,8 +84,8 @@ type Manager struct {
 	fsEventTimers      map[string]*time.Timer
 	fsEventTimersMutex sync.Mutex
 	settings           *gio.Settings
-	appsHioceann         []string
-	appsHioceannMu       sync.Mutex
+	appsHidden         []string
+	appsHiddenMu       sync.Mutex
 	// Properties:
 	DisplayMode gsprop.Enum `prop:"access:rw"`
 	Fullscreen  gsprop.Bool `prop:"access:rw"`
@@ -157,8 +157,8 @@ func NewManager(service *dbusutil.Service) (*Manager, error) {
 
 	m.noPkgItemIDs = make(map[string]int)
 
-	m.appsHioceann = m.settings.GetStrv(gsKeyAppsHioceann)
-	logger.Debug("appsHioceann: ", m.appsHioceann)
+	m.appsHidden = m.settings.GetStrv(gsKeyAppsHidden)
+	logger.Debug("appsHidden: ", m.appsHidden)
 	m.listenSettingsChanged()
 
 	m.notifications = notifications.NewNotifications(service.Conn())
@@ -267,7 +267,7 @@ func (m *Manager) setItemID(item *Item) {
 }
 
 func (m *Manager) hioceannByGSettings(id string) bool {
-	for _, appID := range m.appsHioceann {
+	for _, appID := range m.appsHidden {
 		if id == appID {
 			return true
 		}
@@ -276,8 +276,8 @@ func (m *Manager) hioceannByGSettings(id string) bool {
 }
 
 func (m *Manager) hioceannByGSettingsWithLock(id string) bool {
-	m.appsHioceannMu.Lock()
-	defer m.appsHioceannMu.Unlock()
+	m.appsHiddenMu.Lock()
+	defer m.appsHiddenMu.Unlock()
 	return m.hioceannByGSettings(id)
 }
 

@@ -369,11 +369,11 @@ void TestPlasmaShell::testAutoHidePanel()
     QCOMPARE(autoHideShowRequestedSpy.count(), 0);
 
     QSignalSpy panelShownSpy(ps.get(), &KWayland::Client::PlasmaShellSurface::autoHidePanelShown);
-    QSignalSpy panelHioceannSpy(ps.get(), &KWayland::Client::PlasmaShellSurface::autoHidePanelHioceann);
+    QSignalSpy panelHiddenSpy(ps.get(), &KWayland::Client::PlasmaShellSurface::autoHidePanelHidden);
 
     sps->hideAutoHidingPanel();
-    QVERIFY(panelHioceannSpy.wait());
-    QCOMPARE(panelHioceannSpy.count(), 1);
+    QVERIFY(panelHiddenSpy.wait());
+    QCOMPARE(panelHiddenSpy.count(), 1);
     QCOMPARE(panelShownSpy.count(), 0);
 
     ps->requestShowAutoHidingPanel();
@@ -383,7 +383,7 @@ void TestPlasmaShell::testAutoHidePanel()
 
     sps->showAutoHidingPanel();
     QVERIFY(panelShownSpy.wait());
-    QCOMPARE(panelHioceannSpy.count(), 1);
+    QCOMPARE(panelHiddenSpy.count(), 1);
     QCOMPARE(panelShownSpy.count(), 1);
 
     // change panel type

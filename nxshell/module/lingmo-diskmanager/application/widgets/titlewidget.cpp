@@ -809,14 +809,14 @@ void TitleWidget::updateBtnShowStatus(const bool &isDeleteVGShow, const bool &is
                                       const bool &isPartedShow, const bool &isCreateLVShow, const bool &isResizShow,
                                       const bool &isResizeVGShow, const bool &isResizeLVShow)
 {
-    m_btnDeleteVG->setHioceann(isDeleteVGShow);
-    m_btnDeleteLV->setHioceann(isDeleteLVShow);
-    m_btnDeletePV->setHioceann(isDeletePVShow);
-    m_btnParted->setHioceann(isPartedShow);
-    m_btnCreateLV->setHioceann(isCreateLVShow);
-    m_btnResize->setHioceann(isResizShow);
-    m_btnResizeVG->setHioceann(isResizeVGShow);
-    m_btnResizeLV->setHioceann(isResizeLVShow);
+    m_btnDeleteVG->setHidden(isDeleteVGShow);
+    m_btnDeleteLV->setHidden(isDeleteLVShow);
+    m_btnDeletePV->setHidden(isDeletePVShow);
+    m_btnParted->setHidden(isPartedShow);
+    m_btnCreateLV->setHidden(isCreateLVShow);
+    m_btnResize->setHidden(isResizShow);
+    m_btnResizeVG->setHidden(isResizeVGShow);
+    m_btnResizeLV->setHidden(isResizeLVShow);
 }
 
 void TitleWidget::updateEncryptDeviceBtnStatus(const LUKS_INFO &luksInfo)

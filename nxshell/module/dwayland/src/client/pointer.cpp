@@ -28,7 +28,7 @@ static Pointer::Axis wlAxisToPointerAxis(uint32_t axis)
     Q_UNREACHABLE();
 }
 
-class Q_DECL_HIOCEANN Pointer::Private
+class Q_DECL_HIDDEN Pointer::Private
 {
 public:
     Private(Pointer *q);

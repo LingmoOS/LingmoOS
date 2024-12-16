@@ -277,7 +277,7 @@
         <translation>দেখিয়ে রাখুন</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>লুকিয়ে রাখুন</translation>
     </message>
     <message>

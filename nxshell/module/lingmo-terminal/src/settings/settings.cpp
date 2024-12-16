@@ -16,7 +16,7 @@
 #include <DSlider>
 #include <DApplicationHelper>
 #include <DKeySequenceEdit>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QApplication>
 #include <QStandardPaths>
@@ -81,7 +81,7 @@ void Settings::init()
     QJsonDocument doc = QJsonDocument::fromJson(json);
     QVariant jsonVar = doc.toVariant();
     //龙芯 且 服务器企业版
-    if (Utils::isLoongarch() && DSysInfo::uosEditionType() == DSysInfo::UosEnterprise) {
+    if (Utils::isLoongarch() && LSysInfo::uosEditionType() == LSysInfo::UosEnterprise) {
         //隐藏透明度界面
         Utils::insertToDefaultConfigJson(jsonVar, "basic", "interface", "opacity", "hide", true);
         //隐藏背景模糊界面

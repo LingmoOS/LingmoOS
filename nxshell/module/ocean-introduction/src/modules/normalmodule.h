@@ -32,7 +32,7 @@
 #include <DLabel>
 #include <DPalette>
 #include <DSuggestButton>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DWidget>
 
 #include <com_lingmo_wmswitcher.h>

@@ -17,7 +17,7 @@
 #include <QTimer>
 #include <QDBusConnection>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 using namespace DDLog;
 
@@ -44,8 +44,8 @@ MainJob::MainJob(const char *name, QObject *parent)
     // 在驱动管理延迟加载1000ms
     QTimer::singleShot(1000, this, [ = ]() {
 #ifndef DISABLE_DRIVER
-        DTK_CORE_NAMESPACE::DSysInfo::UosEdition type = DTK_CORE_NAMESPACE::DSysInfo::uosEditionType();
-        if (DTK_CORE_NAMESPACE::DSysInfo::UosCommunity != type ) {
+        DTK_CORE_NAMESPACE::LSysInfo::UosEdition type = DTK_CORE_NAMESPACE::LSysInfo::uosEditionType();
+        if (DTK_CORE_NAMESPACE::LSysInfo::UosCommunity != type ) {
             initDriverRepoSource();
         }
 #endif

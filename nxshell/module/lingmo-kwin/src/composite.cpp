@@ -652,7 +652,7 @@ void Compositor::addOutput(Output *output)
         const Cursor *cursor = Cursors::self()->currentCursor();
         const QRect layerRect = output->mapFromGlobal(cursor->geometry());
         bool usesHardwareCursor = false;
-        if (!Cursors::self()->isCursorHioceann()) {
+        if (!Cursors::self()->isCursorHidden()) {
             usesHardwareCursor = output->setCursor(cursor->source()) && output->moveCursor(layerRect.topLeft());
         } else {
             usesHardwareCursor = output->setCursor(nullptr);
@@ -952,7 +952,7 @@ void Compositor::composite(RenderLoop *renderLoop)
         const std::chrono::milliseconds frameTime =
             std::chrono::duration_cast<std::chrono::milliseconds>(output->renderLoop()->lastPresentationTimestamp());
 
-        if (!Cursors::self()->isCursorHioceann()) {
+        if (!Cursors::self()->isCursorHidden()) {
             Cursor *cursor = Cursors::self()->currentCursor();
             if (cursor->geometry().intersects(output->geometry())) {
                 cursor->markAsRendered(frameTime);

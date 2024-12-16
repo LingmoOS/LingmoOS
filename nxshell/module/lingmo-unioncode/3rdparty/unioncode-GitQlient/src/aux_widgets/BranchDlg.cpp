@@ -23,7 +23,7 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    ui->setupUi(this);
    ui->leOldName->setText(mConfig.mCurrentBranchName);
 
-   ui->chbCopyRemote->setHioceann(true);
+   ui->chbCopyRemote->setHidden(true);
 
    switch (mConfig.mDialogMode)
    {
@@ -36,15 +36,15 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          break;
       case BranchDlgMode::CREATE_CHECKOUT:
          setWindowTitle(tr("Create and checkout branch"));
-         ui->leOldName->setHioceann(true);
+         ui->leOldName->setHidden(true);
          break;
       case BranchDlgMode::CREATE_FROM_COMMIT:
          setWindowTitle(tr("Create branch at commit"));
-         ui->leOldName->setHioceann(true);
+         ui->leOldName->setHidden(true);
          break;
       case BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT:
          setWindowTitle(tr("Create and checkout branch"));
-         ui->leOldName->setHioceann(true);
+         ui->leOldName->setHidden(true);
          break;
       case BranchDlgMode::STASH_BRANCH:
          setWindowTitle(tr("Stash branch"));

@@ -415,7 +415,7 @@ QStringList DLoginSessionPrivate::getAutostartDirs()
 bool DLoginSessionPrivate::judgeAutostart(const QString &fullPath)
 {
     const QString &MainSection = QStringLiteral("Desktop Entry");
-    const QString &KeyHioceann = QStringLiteral("Hioceann");
+    const QString &KeyHidden = QStringLiteral("Hidden");
     const QString &KeyOnlyShowIn = QStringLiteral("OnlyShowIn");
     const QString &KeyNotShowIn = QStringLiteral("NotShowIn");
     QFileInfo fileInfo(fullPath);
@@ -424,7 +424,7 @@ bool DLoginSessionPrivate::judgeAutostart(const QString &fullPath)
     }
     QSettings desktopFile(fileInfo.absoluteFilePath(), QSettings::IniFormat);
     desktopFile.beginGroup(MainSection);
-    bool hioceann = desktopFile.value(KeyHioceann).toBool();
+    bool hioceann = desktopFile.value(KeyHidden).toBool();
     if (hioceann) {
         return false;
     }

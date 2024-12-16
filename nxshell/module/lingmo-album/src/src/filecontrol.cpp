@@ -10,7 +10,7 @@
 #include "ocr/ocrinterface.h"
 #include "imagedata/imageinfo.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QFileInfo>
 #include <QDir>
@@ -140,7 +140,7 @@ QStringList FileControl::getDirImagePath(const QString &path)
     QString DirPath = QFileInfo(LibUnionImage_NameSpace::localPath(path)).dir().path();
 
     QDir _dirinit(DirPath);
-    QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hioceann | QDir::NoDotAndDotDot);
+    QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
 
     // 修复Ｑt带后缀排序错误的问题
     std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
@@ -800,7 +800,7 @@ void FileControl::resetImageFiles(const QStringList &filePaths)
  */
 QUrl FileControl::getCompanyLogo()
 {
-    QString logoPath = DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Light, ":/assets/images/lingmo-logo.svg");
+    QString logoPath = LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Light, ":/assets/images/lingmo-logo.svg");
     return QUrl::fromLocalFile(logoPath);
 }
 

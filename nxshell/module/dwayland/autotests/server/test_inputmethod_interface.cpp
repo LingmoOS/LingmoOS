@@ -500,7 +500,7 @@ void TestInputMethodInterface::testContentHints_data()
     QTest::addRow("Lowercase") << TextInputContentHints(TextInputContentHint::LowerCase) << quint32(QtWaylandServer::zwp_text_input_v1::content_hint_lowercase);
     QTest::addRow("Uppercase") << TextInputContentHints(TextInputContentHint::UpperCase) << quint32(QtWaylandServer::zwp_text_input_v1::content_hint_uppercase);
     QTest::addRow("Titlecase") << TextInputContentHints(TextInputContentHint::TitleCase) << quint32(QtWaylandServer::zwp_text_input_v1::content_hint_titlecase);
-    QTest::addRow("HioceannText") << TextInputContentHints(TextInputContentHint::HioceannText)
+    QTest::addRow("HiddenText") << TextInputContentHints(TextInputContentHint::HiddenText)
                                 << quint32(QtWaylandServer::zwp_text_input_v1::content_hint_hioceann_text);
     QTest::addRow("SensitiveData") << TextInputContentHints(TextInputContentHint::SensitiveData)
                                    << quint32(QtWaylandServer::zwp_text_input_v1::content_hint_sensitive_data);

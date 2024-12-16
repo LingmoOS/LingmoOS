@@ -918,7 +918,7 @@ bool PartedCore::deletePartition()
 bool PartedCore::showPartition()
 {
     // qDebug() << __FUNCTION__ << "Show Partition start";
-    getPartitionHioceannFlag();
+    getPartitionHiddenFlag();
     if (m_hioceannPartition.indexOf(m_curpartition.m_uuid) == -1) {
         emit refreshDeviceInfo();
         emit showPartitionInfo("0");
@@ -970,7 +970,7 @@ bool PartedCore::hidePartition()
 {
     // qDebug() << __FUNCTION__ << "Hide Partition start";
 //ENV{ID_FS_UUID}==\"1ee3b4c6-1c69-46b9-9656-8c534ffd4f43\", ENV{UDISKS_IGNORE}=\"1\"\n
-    getPartitionHioceannFlag();
+    getPartitionHiddenFlag();
     if (m_hioceannPartition.indexOf(m_curpartition.m_uuid) != -1) {
         emit refreshDeviceInfo();
         emit hidePartitionInfo("0");
@@ -1821,9 +1821,9 @@ void PartedCore::setDeviceSerialNumber(Device &device)
     // Otherwise serial number left blank when not found in the hdparm output.
 }
 
-int PartedCore::getPartitionHioceannFlag()
+int PartedCore::getPartitionHiddenFlag()
 {
-    qDebug() << __FUNCTION__ << "Get Partition Hioceann Flag start";
+    qDebug() << __FUNCTION__ << "Get Partition Hidden Flag start";
 
     m_hioceannPartition.clear();
     QFile file("/etc/udev/rules.d/80-udisks2.rules");
@@ -1838,7 +1838,7 @@ int PartedCore::getPartitionHioceannFlag()
 //        qDebug() << m_hioceannPartition;
     }
     file.close();
-    qDebug() << __FUNCTION__ << "Get Partition Hioceann Flag end";
+    qDebug() << __FUNCTION__ << "Get Partition Hidden Flag end";
     return 0;
 }
 
@@ -1987,7 +1987,7 @@ void PartedCore::probeDeviceInfo(const QString &)
         m_deviceMap.insert(devicePaths.at(t), tempDevice);
     }
     //qDebug() << __FUNCTION__ << "**9";
-//    getPartitionHioceannFlag();
+//    getPartitionHiddenFlag();
     for (auto it = m_deviceMap.begin(); it != m_deviceMap.end(); it++) {
         DeviceInfo devinfo = it.value().getDeviceInfo();
         for (int i = 0; i < it.value().m_partitions.size(); i++) {

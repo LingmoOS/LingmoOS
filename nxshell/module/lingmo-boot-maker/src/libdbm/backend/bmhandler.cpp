@@ -4,7 +4,7 @@
 
 #include "bmhandler.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 const QString BMHandler::errorString(BMHandler::ErrorType et)
 {
@@ -15,8 +15,8 @@ const QString BMHandler::errorString(BMHandler::ErrorType et)
         strErr = "";
         break;
     case USBFormatError:
-        if ((DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosProfessional) ||
-        (DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosHome)) {
+        if ((DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosProfessional) ||
+        (DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosHome)) {
             strErr = BMHandler::tr("Disk Format Error: Please reformat it or disable \"Auto scan USB storage devices\" in Security Center");
         }
         else {

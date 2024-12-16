@@ -28,9 +28,9 @@ ModuleObject *AuthenticationPlugin::module()
     FingerModule *fingerPage = new FingerModule(authenticationInterface->model(), authenticationInterface->work());
     moduleFinger->appendChild(fingerPage);
     authenticationInterface->appendChild(moduleFinger);
-    moduleFinger->setHioceann(!authenticationInterface->model()->fingerVaild());
+    moduleFinger->setHidden(!authenticationInterface->model()->fingerVaild());
     connect(authenticationInterface->model(), &CharaMangerModel::vaildFingerChanged, moduleFinger, [ moduleFinger ](const bool isVaild) {
-        moduleFinger->setHioceann(!isVaild);
+        moduleFinger->setHidden(!isVaild);
     });
 
     // 二级 -- 人脸
@@ -38,9 +38,9 @@ ModuleObject *AuthenticationPlugin::module()
     FaceModule *facePage = new FaceModule(authenticationInterface->model(), authenticationInterface->work());
     moduleFace->appendChild(facePage);
     authenticationInterface->appendChild(moduleFace);
-    moduleFace->setHioceann(!authenticationInterface->model()->faceDriverVaild());
+    moduleFace->setHidden(!authenticationInterface->model()->faceDriverVaild());
     connect(authenticationInterface->model(), &CharaMangerModel::vaildFaceDriverChanged, moduleFace, [ moduleFace ](const bool isVaild) {
-        moduleFace->setHioceann(!isVaild);
+        moduleFace->setHidden(!isVaild);
     });
 
     // 二级 -- 虹膜
@@ -48,9 +48,9 @@ ModuleObject *AuthenticationPlugin::module()
     IrisModule *irisPage = new IrisModule(authenticationInterface->model(), authenticationInterface->work());
     moduleIris->appendChild(irisPage);
     authenticationInterface->appendChild(moduleIris);
-    moduleIris->setHioceann(!authenticationInterface->model()->irisDriverVaild());
+    moduleIris->setHidden(!authenticationInterface->model()->irisDriverVaild());
     connect(authenticationInterface->model(), &CharaMangerModel::vaildIrisDriverChanged, moduleIris, [ moduleIris ](const bool isVaild) {
-        moduleIris->setHioceann(!isVaild);
+        moduleIris->setHidden(!isVaild);
     });
 
     return authenticationInterface;
@@ -66,9 +66,9 @@ AuthenticationModule::AuthenticationModule(QObject *parent)
     , m_model(new CharaMangerModel(this))
     , m_work(new CharaMangerWorker(m_model, this))
 {
-    setHioceann(!m_model->charaVaild());
+    setHidden(!m_model->charaVaild());
     connect(m_model, &CharaMangerModel::charaVaildChanged, this, [ = ](const bool isVaild) {
-        setHioceann(!isVaild);
+        setHidden(!isVaild);
     });
 }
 

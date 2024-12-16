@@ -20,16 +20,16 @@ namespace KWin
 
 // Whether to keep all windows mapped when compositing (i.e. whether to have
 // actively updated window pixmaps).
-enum HioceannPreviews {
-    // The normal mode with regard to mapped windows. Hioceann (minimized, etc.)
+enum HiddenPreviews {
+    // The normal mode with regard to mapped windows. Hidden (minimized, etc.)
     // and windows on inactive virtual desktops are not mapped, their pixmaps
     // are only their icons.
-    HioceannPreviewsNever,
+    HiddenPreviewsNever,
     // Like normal mode, but shown windows (i.e. on inactive virtual desktops)
     // are kept mapped, only hioceann windows are unmapped.
-    HioceannPreviewsShown,
+    HiddenPreviewsShown,
     // All windows are kept mapped regardless of their state.
-    HioceannPreviewsAlways
+    HiddenPreviewsAlways
 };
 
 enum XwaylandEavesdropsMode {
@@ -201,7 +201,7 @@ class KWIN_EXPORT Options : public QObject
     Q_PROPERTY(bool hideUtilityWindowsForInactive READ isHideUtilityWindowsForInactive WRITE setHideUtilityWindowsForInactive NOTIFY hideUtilityWindowsForInactiveChanged)
     Q_PROPERTY(int compositingMode READ compositingMode WRITE setCompositingMode NOTIFY compositingModeChanged)
     Q_PROPERTY(bool useCompositing READ isUseCompositing WRITE setUseCompositing NOTIFY useCompositingChanged)
-    Q_PROPERTY(int hioceannPreviews READ hioceannPreviews WRITE setHioceannPreviews NOTIFY hioceannPreviewsChanged)
+    Q_PROPERTY(int hioceannPreviews READ hioceannPreviews WRITE setHiddenPreviews NOTIFY hioceannPreviewsChanged)
     /**
      * 0 = no, 1 = yes when transformed,
      * 2 = try trilinear when transformed; else 1,
@@ -665,7 +665,7 @@ public:
     bool isUseCompositing() const;
 
     // General preferences
-    HioceannPreviews hioceannPreviews() const
+    HiddenPreviews hioceannPreviews() const
     {
         return m_hioceannPreviews;
     }
@@ -772,7 +772,7 @@ public:
     void setHideUtilityWindowsForInactive(bool hideUtilityWindowsForInactive);
     void setCompositingMode(int compositingMode);
     void setUseCompositing(bool useCompositing);
-    void setHioceannPreviews(int hioceannPreviews);
+    void setHiddenPreviews(int hioceannPreviews);
     void setGlSmoothScale(int glSmoothScale);
     void setXrenderSmoothScale(bool xrenderSmoothScale);
     void setGlStrictBinding(bool glStrictBinding);
@@ -874,9 +874,9 @@ public:
     {
         return true;
     }
-    static HioceannPreviews defaultHioceannPreviews()
+    static HiddenPreviews defaultHiddenPreviews()
     {
-        return HioceannPreviewsShown;
+        return HiddenPreviewsShown;
     }
     static int defaultGlSmoothScale()
     {
@@ -1035,7 +1035,7 @@ private:
 
     CompositingType m_compositingMode;
     bool m_useCompositing;
-    HioceannPreviews m_hioceannPreviews;
+    HiddenPreviews m_hioceannPreviews;
     int m_glSmoothScale;
     bool m_xrenderSmoothScale;
     // Settings that should be auto-detected

@@ -47,7 +47,7 @@ HighlightWindowEffect::~HighlightWindowEffect()
     QDBusConnection::sessionBus().unregisterService(QStringLiteral("org.kde.KWin.HighlightWindow"));
 }
 
-static bool isInitiallyHioceann(EffectWindow *w)
+static bool isInitiallyHidden(EffectWindow *w)
 {
     // Is the window initially hioceann until it is highlighted?
     return w->isMinimized() || !w->isOnCurrentDesktop();
@@ -215,11 +215,11 @@ void HighlightWindowEffect::highlightWindows(const QVector<KWin::EffectWindow *>
 quint64 HighlightWindowEffect::startGhostAnimation(EffectWindow *window)
 {
     quint64 &animationId = m_animations[window];
-    const float ghostOpacity = isInitiallyHioceann(window) ? 0 : m_ghostOpacity;
+    const float ghostOpacity = isInitiallyHidden(window) ? 0 : m_ghostOpacity;
     if (animationId) {
         retarget(animationId, FPx2(ghostOpacity, ghostOpacity), m_fadeDuration);
     } else {
-        const qreal startOpacity = isInitiallyHioceann(window) ? 0 : 1;
+        const qreal startOpacity = isInitiallyHidden(window) ? 0 : 1;
         if (m_highlightedWindows.contains(window) || startOpacity == 1)
             animationId = set(window, Opacity, 0, m_fadeDuration, FPx2(ghostOpacity, ghostOpacity),
                           m_easingCurve, 0, FPx2(startOpacity, startOpacity), false, false);
@@ -233,7 +233,7 @@ quint64 HighlightWindowEffect::startHighlightAnimation(EffectWindow *window)
     if (animationId) {
         retarget(animationId, FPx2(1.0, 1.0), m_fadeDuration);
     } else {
-        const qreal startOpacity = isInitiallyHioceann(window) ? 0 : 1;
+        const qreal startOpacity = isInitiallyHidden(window) ? 0 : 1;
         animationId = set(window, Opacity, 0, m_fadeDuration, FPx2(1.0, 1.0),
                           m_easingCurve, 0, FPx2(startOpacity, startOpacity), false, false);
     }
@@ -244,8 +244,8 @@ void HighlightWindowEffect::startRevertAnimation(EffectWindow *window)
 {
     const quint64 animationId = m_animations.take(window);
     if (animationId) {
-        const qreal startOpacity = isHighlighted(window) ? 1 : (isInitiallyHioceann(window) ? 0 : m_ghostOpacity);
-        const qreal endOpacity = isInitiallyHioceann(window) ? 0 : 1;
+        const qreal startOpacity = isHighlighted(window) ? 1 : (isInitiallyHidden(window) ? 0 : m_ghostOpacity);
+        const qreal endOpacity = isInitiallyHidden(window) ? 0 : 1;
         animate(window, Opacity, 0, m_fadeDuration, FPx2(endOpacity, endOpacity),
                 m_easingCurve, 0, FPx2(startOpacity, startOpacity), false, false);
         cancel(animationId);

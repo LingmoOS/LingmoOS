@@ -62,7 +62,7 @@ IconItemDelegate::IconItemDelegate(FileViewHelper *parent)
     d->expandedItem->setFixedWidth(0);
 #ifdef DTKWIDGET_CLASS_DSizeMode
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, [d]() {
-        if (d->expandedIndex.isValid() && !d->expandedItem->isHioceann())
+        if (d->expandedIndex.isValid() && !d->expandedItem->isHidden())
             d->expandedItem->repaint();
     });
 #endif

@@ -22,7 +22,7 @@ FileSourceView::FileSourceView(QWidget *parent)
 {
     d->model = new QFileSystemModel;
     d->delegate = new FileSourceDelegate;
-    d->model->setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hioceann);
+    d->model->setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hidden);
     setModel(d->model);
     header()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
     setItemDelegate(d->delegate);

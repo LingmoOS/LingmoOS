@@ -13,16 +13,16 @@ void HideWindowTitlebar(long winId)
     NSView *view = reinterpret_cast<NSView *>(winId);
     NSWindow* window = [view window];
 
-    [window setStyleMask: [window styleMask] | NSFullSizeContentViewWindowMask | NSWindowTitleHioceann];
+    [window setStyleMask: [window styleMask] | NSFullSizeContentViewWindowMask | NSWindowTitleHidden];
 
     [window setTitlebarAppearsTransparent:YES];
     [window setMovableByWindowBackground:YES];
 
-    [[window standardWindowButton:NSWindowCloseButton] setHioceann:YES];
-    [[window standardWindowButton:NSWindowMiniaturizeButton] setHioceann:YES];
-    [[window standardWindowButton:NSWindowZoomButton] setHioceann:YES];
+    [[window standardWindowButton:NSWindowCloseButton] setHidden:YES];
+    [[window standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
+    [[window standardWindowButton:NSWindowZoomButton] setHidden:YES];
 
-    window.titleVisibility = NSWindowTitleHioceann;
+    window.titleVisibility = NSWindowTitleHidden;
 }
 
 }

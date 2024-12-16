@@ -138,16 +138,16 @@ void FolderListWidget::setFolderList(const QList<CrumbData> &datas, bool stacked
     d->folderModel->clear();
     int dataNum = 0;
     d->crumbDatas = datas;
-    bool isShowedHioceannFiles = true;
+    bool isShowedHiddenFiles = true;
     if (!stacked)
-        isShowedHioceannFiles = Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool();
+        isShowedHiddenFiles = Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool();
 
     // Calculate max text width
     int maxTextWidth = 0;
     QFontMetrics fm(font());
     for (int i = 0; i < datas.size(); ++i) {
         auto info = InfoFactory::create<FileInfo>(datas[i].url);
-        if (!info.isNull() && (isShowedHioceannFiles || !info->isAttributes(FileInfo::FileIsType::kIsHioceann))) {
+        if (!info.isNull() && (isShowedHiddenFiles || !info->isAttributes(FileInfo::FileIsType::kIsHidden))) {
             QStandardItem *item = new QStandardItem(info->fileIcon(), datas[i].displayText);
             item->setData(i, Qt::UserRole);
             d->folderModel->insertRow(dataNum, item);

@@ -286,7 +286,7 @@ TEST_F(TextFormatTest, PrintUnknownFields) {
     message.DebugString());
 }
 
-TEST_F(TextFormatTest, PrintUnknownFieldsHioceann) {
+TEST_F(TextFormatTest, PrintUnknownFieldsHidden) {
   // Test printing of unknown fields in a message when suppressed.
 
   unittest::OneString message;

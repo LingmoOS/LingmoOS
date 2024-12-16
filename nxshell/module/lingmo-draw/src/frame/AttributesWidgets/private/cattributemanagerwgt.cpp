@@ -190,7 +190,7 @@ void CAttributeManagerWgt::setAttributions(const SAttrisList &attribution)
         _sAttributions = attribution;
         _dirty = 1;
         //ensureAttributions();
-        if (this->isHioceann())
+        if (this->isHidden())
             this->show();
         else
             update();

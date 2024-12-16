@@ -22,7 +22,7 @@ void DmTreeview::initUI()
     setVerticalScrollMode(ScrollPerItem);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     setIndentation(0); //去除树型节点之间的缩进
     setWindowFlags(Qt::FramelessWindowHint); //无边框
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

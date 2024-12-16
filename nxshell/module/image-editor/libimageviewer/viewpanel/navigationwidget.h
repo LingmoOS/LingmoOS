@@ -16,8 +16,8 @@ public:
     explicit NavigationWidget(QWidget *parent = nullptr);
     void setImage(const QImage &img);
     void setRectInImage(const QRect &r);
-    void setAlwaysHioceann(bool value);
-    bool isAlwaysHioceann() const;
+    void setAlwaysHidden(bool value);
+    bool isAlwaysHidden() const;
     bool checkbgisdark(QImage &img) const;
     QPoint transImagePos(QPoint pos);
 

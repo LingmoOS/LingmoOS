@@ -39,7 +39,7 @@ private slots:
         QCOMPARE(session.tryExec(), QString());
         QCOMPARE(session.desktopSession(), QStringLiteral("plasmawayland-dev"));
         QCOMPARE(session.desktopNames(), QStringLiteral("KDE"));
-        QCOMPARE(session.isHioceann(), false);
+        QCOMPARE(session.isHidden(), false);
         QCOMPARE(session.isNoDisplay(), false);
     }
     void testKOLocale()
@@ -56,7 +56,7 @@ private slots:
         QCOMPARE(session.tryExec(), QString());
         QCOMPARE(session.desktopSession(), QStringLiteral("plasmawayland-dev"));
         QCOMPARE(session.desktopNames(), QStringLiteral("KDE"));
-        QCOMPARE(session.isHioceann(), false);
+        QCOMPARE(session.isHidden(), false);
         QCOMPARE(session.isNoDisplay(), false);
     }
 };

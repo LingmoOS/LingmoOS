@@ -104,7 +104,7 @@ void MultiScreenWorker::onRegionMonitorChanged(int x, int y, const QString &key)
     if (m_registerKey != key || testState(MousePress))
         return;
 
-    if (m_hideMode == HideMode::KeepHioceann) {
+    if (m_hideMode == HideMode::KeepHidden) {
         TaskManager::instance()->setPropHideState(HideState::Show);
     }
 
@@ -128,14 +128,14 @@ void MultiScreenWorker::onExtralRegionMonitorChanged(int x, int y, const QString
     // 鼠标移动到任务栏界面之外，停止计时器（延时2秒改变任务栏所在屏幕）
     m_delayWakeTimer->stop();
 
-    if (m_hideMode == HideMode::KeepHioceann && !TaskManager::instance()->preventDockAutoHide()) {
+    if (m_hideMode == HideMode::KeepHidden && !TaskManager::instance()->preventDockAutoHide()) {
         TaskManager::instance()->setPropHideState(HideState::Hide);
     }
 
     if (m_hideMode == HideMode::KeepShowing
-            || ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
+            || ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
         Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Show);
-    } else if ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
+    } else if ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
         Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Hide);
     }
 }
@@ -194,7 +194,7 @@ void MultiScreenWorker::onPositionChanged(int position)
     m_position = static_cast<Position>(position);
     DockItem::setDockPosition(m_position);
 
-    if (m_hideMode == HideMode::KeepHioceann || (m_hideMode == HideMode::SmartHide && m_hideState == HideState::Hide)) {
+    if (m_hideMode == HideMode::KeepHidden || (m_hideMode == HideMode::SmartHide && m_hideState == HideState::Hide)) {
         // 这种情况切换位置,任务栏不需要显示
         // 参数说明 1 当前屏幕名称 2 改变位置之前的位置，因为需要从之前的位置完成隐藏的动画
         // 3 隐藏动画 4 无需考虑当前鼠标是否在任务栏上，这个参数是通过其他方式隐藏唤醒任务栏的时候考虑鼠标是否在任务栏的位置来决定是否做隐藏动画
@@ -236,9 +236,9 @@ void MultiScreenWorker::onHideModeChanged(int hideMode)
     m_hideMode = static_cast<HideMode>(hideMode);
 
     if (m_hideMode == HideMode::KeepShowing
-            || ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
+            || ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
         Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Show);
-    } else if ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
+    } else if ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
         Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Hide);
     }
 
@@ -266,9 +266,9 @@ void MultiScreenWorker::onHideStateChanged(int state)
     qInfo() << "hidestate change:" << m_hideMode << m_hideState;
 
     if (m_hideMode == HideMode::KeepShowing
-            || ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
+            || ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Show)) {
         Q_EMIT requestPlayAnimation(currentScreen, m_position, Dock::AniAction::Show);
-    } else if ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
+    } else if ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) && m_hideState == HideState::Hide) {
         // 最后一个参数，当任务栏的隐藏状态发生变化的时候（从一直显示变成一直隐藏或者智能隐藏），需要考虑鼠标是否在任务栏上，如果在任务栏上，此时无需执行隐藏动画
         Q_EMIT requestPlayAnimation(currentScreen, m_position, Dock::AniAction::Hide);
     }
@@ -540,7 +540,7 @@ void MultiScreenWorker::onRequestDelayShowDock()
     // 检查边缘是否允许停靠
     QScreen *curScreen = DIS_INS->screen(m_delayScreen);
     if (curScreen && DIS_INS->canDock(curScreen, m_position)) {
-        if (m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide) {
+        if (m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide) {
             Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Hide);
         } else if (m_hideMode == HideMode::KeepShowing) {
             changeDockPosition(DOCK_SCREEN->last(), DOCK_SCREEN->current(), m_position, m_position);
@@ -879,7 +879,7 @@ void MultiScreenWorker::onTouchRelease(int type, int x, int y, const QString &ke
 void MultiScreenWorker::onDelayAutoHideChanged()
 {
     switch (m_hideMode) {
-    case HideMode::KeepHioceann: {
+    case HideMode::KeepHidden: {
         Q_EMIT requestPlayAnimation(DOCK_SCREEN->current(), m_position, Dock::AniAction::Hide, true);
         break;
     }
@@ -953,7 +953,7 @@ void MultiScreenWorker::tryToShowDock(int eventX, int eventY)
             return;
         }
 
-        if ((m_hideMode == HideMode::KeepHioceann || m_hideMode == HideMode::SmartHide)) {
+        if ((m_hideMode == HideMode::KeepHidden || m_hideMode == HideMode::SmartHide)) {
             Q_EMIT requestPlayAnimation(currentScreen, m_position, Dock::AniAction::Show);
         }
     }

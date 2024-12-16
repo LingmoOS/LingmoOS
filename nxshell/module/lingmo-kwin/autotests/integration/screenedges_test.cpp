@@ -268,17 +268,17 @@ void ScreenEdgesTest::testClientEdge()
 
     // Hide the window.
     window->hideClient();
-    QVERIFY(window->isHioceannInternal());
+    QVERIFY(window->isHiddenInternal());
 
     // Trigger the screen edge.
     QFETCH(QPointF, triggerPoint);
     quint32 timestamp = 0;
     Test::pointerMotion(triggerPoint, timestamp);
-    QVERIFY(window->isHioceannInternal());
+    QVERIFY(window->isHiddenInternal());
 
     timestamp += 150 + 1;
     Test::pointerMotion(triggerPoint, timestamp);
-    QTRY_VERIFY(!window->isHioceannInternal());
+    QTRY_VERIFY(!window->isHiddenInternal());
 }
 
 void ScreenEdgesTest::testObjectEdge_data()

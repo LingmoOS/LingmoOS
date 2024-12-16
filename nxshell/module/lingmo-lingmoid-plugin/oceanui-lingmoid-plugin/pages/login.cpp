@@ -11,7 +11,7 @@
 #include <DPushButton>
 #include <DFontSizeManager>
 #include <DTipLabel>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DCommandLinkButton>
 
 #include <QProcess>

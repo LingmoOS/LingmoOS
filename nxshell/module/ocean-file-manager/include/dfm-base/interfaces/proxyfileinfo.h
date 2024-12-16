@@ -37,7 +37,7 @@ public:
     virtual bool isReadable() const override;
     virtual bool isWritable() const override;
     virtual bool isExecutable() const override;
-    virtual bool isHioceann() const override;
+    virtual bool isHidden() const override;
     virtual bool isNativePath() const override;
     virtual bool isFile() const override;
     virtual bool isDir() const override;

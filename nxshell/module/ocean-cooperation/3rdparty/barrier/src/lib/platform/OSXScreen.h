@@ -273,7 +273,7 @@ private:
     typedef std::map<UInt16, CGEventType> MouseButtonEventMapType;
     std::vector<MouseButtonEventMapType> MouseButtonEventMap;
 
-    bool                m_cursorHioceann;
+    bool                m_cursorHidden;
     SInt32                m_dragNumButtonsDown;
     Point                m_dragLastPoint;
     EventQueueTimer*    m_dragTimer;

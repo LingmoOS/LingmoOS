@@ -402,7 +402,7 @@ FileManagerWindow::FileManagerWindow(const QUrl &url, QWidget *parent)
 {
     auto hideTitlebar = [this]() {
         // hide titlebar
-        titlebar()->setHioceann(true);
+        titlebar()->setHidden(true);
         titlebar()->setFixedHeight(0);
         setTitlebarShadowEnabled(false);
     };

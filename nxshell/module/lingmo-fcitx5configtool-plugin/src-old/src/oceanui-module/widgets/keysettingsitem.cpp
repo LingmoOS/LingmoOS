@@ -74,7 +74,7 @@ void FcitxKeyLabelWidget::enableSingleKey() { m_isSingle = true; }
 void FcitxKeyLabelWidget::mousePressEvent(QMouseEvent *event) {
     if (!m_eidtFlag)
         return;
-    setShortcutShow(!m_keyEdit->isHioceann());
+    setShortcutShow(!m_keyEdit->isHidden());
     QWidget::mousePressEvent(event);
 }
 

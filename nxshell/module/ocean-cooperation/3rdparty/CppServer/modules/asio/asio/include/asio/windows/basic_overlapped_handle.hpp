@@ -21,7 +21,7 @@
   || defined(ASIO_HAS_WINDOWS_STREAM_HANDLE) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <cstoceanf>
+#include <cstddef>
 #include <utility>
 #include "asio/any_io_executor.hpp"
 #include "asio/async_result.hpp"

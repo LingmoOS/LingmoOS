@@ -26,7 +26,7 @@ public:
 
     inline QString contributor() const
     {
-        return DSysInfo::isCommunityEdition() ? QLatin1String("lingmo")
+        return LSysInfo::isCommunityEdition() ? QLatin1String("lingmo")
                                               : QLatin1String("UOS");
     }
 };

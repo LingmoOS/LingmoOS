@@ -30,7 +30,7 @@
 #include <QTextLayout>
 #include <QThread>
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DDciIcon>
 
 #include <QApt/Package>
@@ -417,26 +417,26 @@ bool Utils::isDevelopMode()
     std::call_once(kDevelopOnceFlag, [&]() {
     // Add for judge OS Version
 #if (DTK_VERSION >= DTK_VERSION_CHECK(5, 2, 2, 2))
-        qInfo() << "system code(UOS): " << Dtk::Core::DSysInfo::uosEditionType();
-        switch (Dtk::Core::DSysInfo::uosEditionType()) {
+        qInfo() << "system code(UOS): " << Dtk::Core::LSysInfo::uosEditionType();
+        switch (Dtk::Core::LSysInfo::uosEditionType()) {
 #if (DTK_VERSION > DTK_VERSION_CHECK(5, 4, 10, 0))
-            case Dtk::Core::DSysInfo::UosEducation:
-            case Dtk::Core::DSysInfo::UosDeviceEdition:
+            case Dtk::Core::LSysInfo::UosEducation:
+            case Dtk::Core::LSysInfo::UosDeviceEdition:
 #endif
-            case Dtk::Core::DSysInfo::UosProfessional:
-            case Dtk::Core::DSysInfo::UosHome: {
+            case Dtk::Core::LSysInfo::UosProfessional:
+            case Dtk::Core::LSysInfo::UosHome: {
                 // Check if current is develop mode
                 QDBusInterface *dbusInterFace = new QDBusInterface(
                     "com.lingmo.sync.Helper", "/com/lingmo/sync/Helper", "com.lingmo.sync.Helper", QDBusConnection::systemBus());
                 bool deviceMode = dbusInterFace->property("DeveloperMode").toBool();
                 qInfo() << "DebListModel:"
-                        << "system editon:" << Dtk::Core::DSysInfo::uosEditionName() << "develop mode:" << deviceMode;
+                        << "system editon:" << Dtk::Core::LSysInfo::uosEditionName() << "develop mode:" << deviceMode;
                 kIsDevelopMode = deviceMode;
                 delete dbusInterFace;
                 break;
             }
-            case Dtk::Core::DSysInfo::UosCommunity:   // The community edition does not need signature verification
-            case Dtk::Core::DSysInfo::UosEnterprise:  // Server Version
+            case Dtk::Core::LSysInfo::UosCommunity:   // The community edition does not need signature verification
+            case Dtk::Core::LSysInfo::UosEnterprise:  // Server Version
                 kIsDevelopMode = true;
                 break;
             default:
@@ -444,22 +444,22 @@ bool Utils::isDevelopMode()
                 break;
         }
 #else
-        qInfo() << "system code(Lingmo): " << Dtk::Core::DSysInfo::lingmoType();
-        switch (Dtk::Core::DSysInfo::lingmoType()) {
-        case Dtk::Core::DSysInfo::LingmoDesktop:
+        qInfo() << "system code(Lingmo): " << Dtk::Core::LSysInfo::lingmoType();
+        switch (Dtk::Core::LSysInfo::lingmoType()) {
+        case Dtk::Core::LSysInfo::LingmoDesktop:
             kIsDevelopMode = true;
             break;
-        case Dtk::Core::DSysInfo::LingmoPersonal:
-        case Dtk::Core::DSysInfo::LingmoProfessional:
+        case Dtk::Core::LSysInfo::LingmoPersonal:
+        case Dtk::Core::LSysInfo::LingmoProfessional:
             // Check if develop mode
             QDBusInterface *dbusInterFace = new QDBusInterface("com.lingmo.lingmoid", "/com/lingmo/lingmoid", "com.lingmo.lingmoid");
             bool deviceMode = dbusInterFace->property("DeviceUnlocked").toBool();
-            qInfo() << "DebListModel:" << "system editon:" << Dtk::Core::DSysInfo::uosEditionName() << "develop mode:" << deviceMode;
+            qInfo() << "DebListModel:" << "system editon:" << Dtk::Core::LSysInfo::uosEditionName() << "develop mode:" << deviceMode;
             kIsDevelopMode = deviceMode;
             delete dbusInterFace;
             break;
-        case Dtk::Core::DSysInfo::isCommunityEdition():
-        case Dtk::Core::DSysInfo::LingmoServer:
+        case Dtk::Core::LSysInfo::isCommunityEdition():
+        case Dtk::Core::LSysInfo::LingmoServer:
             kIsDevelopMode = true;
             break;
         default:

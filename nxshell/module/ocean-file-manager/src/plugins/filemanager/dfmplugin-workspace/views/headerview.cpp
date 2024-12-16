@@ -57,7 +57,7 @@ void HeaderView::updateColumnWidth()
 
         for (; i < columnCount; ++i) {
             int logicalIndex = this->logicalIndex(i);
-            if (isSectionHioceann(logicalIndex))
+            if (isSectionHidden(logicalIndex))
                 continue;
 
             resizeSection(logicalIndex, model->getColumnWidth(i) + kLeftPadding + kListModeLeftMargin + 2 * kColumnPadding);
@@ -66,7 +66,7 @@ void HeaderView::updateColumnWidth()
 
         for (; j > 0; --j) {
             int logicalIndex = this->logicalIndex(j);
-            if (isSectionHioceann(logicalIndex))
+            if (isSectionHidden(logicalIndex))
                 continue;
 
             resizeSection(logicalIndex, model->getColumnWidth(j) + kRightPadding + kListModeRightMargin + 2 * kColumnPadding);
@@ -96,7 +96,7 @@ void HeaderView::doFileNameColumnResize(const int totalWidth)
     int columnWidthSumOmitFileName = 0;
 
     for (int i = 0; i < columnCount; ++i) {
-        if (i == fileNameColumn || isSectionHioceann(i))
+        if (i == fileNameColumn || isSectionHidden(i))
             continue;
         columnWidthSumOmitFileName += view->getColumnWidth(i);
     }
@@ -111,7 +111,7 @@ void HeaderView::doFileNameColumnResize(const int totalWidth)
 void HeaderView::onActionClicked(const int column, QAction *action)
 {
     action->setChecked(!action->isChecked());
-    setSectionHioceann(column, action->isChecked());
+    setSectionHidden(column, action->isChecked());
 
     emit hioceannSectionChanged(action->text(), action->isChecked());
 }
@@ -150,7 +150,7 @@ void HeaderView::mouseMoveEvent(QMouseEvent *e)
         //grip at the beginning of the section
         while (visual > -1) {
             int logical = logicalIndex(--visual);
-            if (!isSectionHioceann(logical)) {
+            if (!isSectionHidden(logical)) {
                 result = logical;
                 break;
             }
@@ -207,7 +207,7 @@ void HeaderView::contextMenuEvent(QContextMenuEvent *event)
 
         action->setText(model->roleDisplayString(role));
         action->setCheckable(true);
-        action->setChecked(!isSectionHioceann(i));
+        action->setChecked(!isSectionHidden(i));
 
         connect(action, &QAction::triggered, this, [=] {
             onActionClicked(i, action);

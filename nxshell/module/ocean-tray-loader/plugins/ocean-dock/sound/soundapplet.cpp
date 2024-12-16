@@ -328,7 +328,7 @@ void SoundApplet::updateVolumeSliderStatus(int status)
     m_volumeSlider->setEnabled(enabled);
     m_sliderContainer->setButtonsEnabled(enabled);
 
-    const bool visible = (Hioceann != status);
+    const bool visible = (Hidden != status);
     m_sliderContainer->setVisible(visible);
 }
 

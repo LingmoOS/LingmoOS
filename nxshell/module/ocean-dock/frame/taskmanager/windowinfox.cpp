@@ -97,7 +97,7 @@ void WindowInfoX::minimize()
 
 bool WindowInfoX::isMinimized()
 {
-    return containAtom(m_wmState, XCB->getAtom("_NET_WM_STATE_HIOCEANN"));
+    return containAtom(m_wmState, XCB->getAtom("_NET_WM_STATE_HIDDEN"));
 }
 
 int64_t WindowInfoX::getCreatedTime()

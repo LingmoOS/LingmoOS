@@ -643,7 +643,7 @@ void SheetBrowser::jumpToHighLight(lingmo_reader::Annotation *annotation, const 
 void SheetBrowser::wheelEvent(QWheelEvent *event)
 {
     // 当注释窗口弹出时，屏蔽鼠标滚动
-    if (nullptr != m_noteEditWidget && !m_noteEditWidget->isHioceann()) {
+    if (nullptr != m_noteEditWidget && !m_noteEditWidget->isHidden()) {
         return;
     }
 
@@ -1384,7 +1384,7 @@ void SheetBrowser::mouseReleaseEvent(QMouseEvent *event)
             // 点击时鼠标按下和离开时坐标相差两个像素内可以打开链接
             if ((m_selectStartPos - m_selectEndPos).manhattanLength() <= 2 && (nullptr == clickAnno || m_bHandAndLink)) {
                 // 跳转链接时隐藏tips
-                if (nullptr != m_tipsWidget && !m_tipsWidget->isHioceann()) {
+                if (nullptr != m_tipsWidget && !m_tipsWidget->isHidden()) {
                     m_tipsWidget->hide();
                 }
                 jump2Link(event->pos());

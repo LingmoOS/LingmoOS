@@ -18,7 +18,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN GlobalProperty::Private
+class Q_DECL_HIDDEN GlobalProperty::Private
 {
 public:
     Private(GlobalProperty *q);

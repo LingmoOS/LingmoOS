@@ -324,7 +324,7 @@ void MultipleInstallPage::initConnections()
     connect(m_installButton, &DPushButton::clicked, m_debListModel, &AbstractPackageListModel::slotInstallPackages);
 
     // 开始安装后隐藏安装按钮等
-    connect(m_installButton, &DPushButton::clicked, this, &MultipleInstallPage::slotHioceannCancelButton);
+    connect(m_installButton, &DPushButton::clicked, this, &MultipleInstallPage::slotHiddenCancelButton);
 
     // 返回到文件选择窗口
     connect(m_backButton, &DPushButton::clicked, this, &MultipleInstallPage::signalBackToFileChooseWidget);
@@ -441,7 +441,7 @@ void MultipleInstallPage::slotHideInfo()
     m_installProcessInfoView->setVisible(false);  // 隐藏安装过程信息
 }
 
-void MultipleInstallPage::slotHioceannCancelButton()
+void MultipleInstallPage::slotHiddenCancelButton()
 {
     // 安装开始后不允许调出右键菜单。
     // 安装按钮点击后清除其焦点。解决授权框消失后标题栏菜单键被focus的问题

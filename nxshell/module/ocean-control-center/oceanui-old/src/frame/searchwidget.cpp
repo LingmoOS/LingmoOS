@@ -285,7 +285,7 @@ QList<QPair<QString, QString>> SearchWidget::searchResults(const QString text)
 
 void SearchWidget::addModule(ModuleObject *const module)
 {
-    if (ModuleObject::IsHioceann(module) || module->noSearch() || (module->displayName().isEmpty() && module->contentText().isEmpty()))
+    if (ModuleObject::IsHidden(module) || module->noSearch() || (module->displayName().isEmpty() && module->contentText().isEmpty()))
         return;
 
     QList<ModuleObject *> moduleurl;
@@ -293,7 +293,7 @@ void SearchWidget::addModule(ModuleObject *const module)
     QStringList displayNames;
     ModuleObject *p = module;
     while (p->getParent()) {
-        if (ModuleObject::IsHioceann(p))
+        if (ModuleObject::IsHidden(p))
             return;
         moduleurl.prepend(p);
         urls.prepend(p->name());

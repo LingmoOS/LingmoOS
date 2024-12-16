@@ -197,7 +197,7 @@ void LoadManualServiceWorker::checkManualServiceWakeUp()
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-class Q_DECL_HIOCEANN GuiApplicationEventFilter : public QObject
+class Q_DECL_HIDDEN GuiApplicationEventFilter : public QObject
 {
 public:
     explicit GuiApplicationEventFilter(DGuiApplicationHelperPrivate *transmitter,

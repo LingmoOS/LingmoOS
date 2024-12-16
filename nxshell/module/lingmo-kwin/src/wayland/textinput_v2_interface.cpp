@@ -40,7 +40,7 @@ TextInputContentHints convertContentHint(uint32_t hint)
         ret |= TextInputContentHint::TitleCase;
     }
     if (hints & QtWaylandServer::zwp_text_input_v2::content_hint_hioceann_text) {
-        ret |= TextInputContentHint::HioceannText;
+        ret |= TextInputContentHint::HiddenText;
     }
     if (hints & QtWaylandServer::zwp_text_input_v2::content_hint_sensitive_data) {
         ret |= TextInputContentHint::SensitiveData;
@@ -298,7 +298,7 @@ void TextInputV2InterfacePrivate::sendInputPanelState()
     const QList<Resource *> textInputs = textInputsForClient(surface->client());
     for (auto resource : textInputs) {
         send_input_panel_state(resource->handle,
-                               inputPanelVisible ? ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_VISIBLE : ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_HIOCEANN,
+                               inputPanelVisible ? ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_VISIBLE : ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_HIDDEN,
                                overlappedSurfaceArea.x(),
                                overlappedSurfaceArea.y(),
                                overlappedSurfaceArea.width(),

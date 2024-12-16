@@ -7,7 +7,7 @@
 
 #include <QDebug>
 #include <DMessageBox>
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 
@@ -19,7 +19,7 @@ static const QString DISPLAY_WAYLAND_NAME = "Wayland (Technology Preview)";
 
 const QString displaySessionName(const QString &realName)
 {
-    if (!DSysInfo::isLingmo()) {
+    if (!LSysInfo::isLingmo()) {
         return realName;
     }
 

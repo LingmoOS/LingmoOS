@@ -27,7 +27,7 @@ public slots:
     bool handleItemRemove(const QUrl &url);
     bool handleItemUpdate(const QUrl &url, const QVariantMap &properties);
     bool handleItemInsert(int index, const QUrl &url, const QVariantMap &properties);
-    void handleItemHioceann(const QUrl &url, bool visible);   // TODO(zhangs): remove
+    void handleItemHidden(const QUrl &url, bool visible);   // TODO(zhangs): remove
     void handleItemTriggerEdit(quint64 winId, const QUrl &url);
     void handleSidebarUpdateSelection(quint64 winId);
 

@@ -87,7 +87,7 @@ Qt::ItemFlags ModuleDataModel::flags(const QModelIndex &index) const
 void ModuleDataModel::onDataChanged(QObject *obj)
 {
     ModuleObject *const module = static_cast<ModuleObject *>(obj);
-    if (module->extra() || ModuleObject::IsHioceann(module))
+    if (module->extra() || ModuleObject::IsHidden(module))
         onRemovedChild(module);
     else {
         int row = m_data.indexOf(module);
@@ -102,14 +102,14 @@ void ModuleDataModel::onDataChanged(QObject *obj)
 
 void ModuleDataModel::onInsertChild(ModuleObject *const module)
 {
-    if (module->extra() || ModuleObject::IsHioceann(module) || m_data.contains(module))
+    if (module->extra() || ModuleObject::IsHidden(module) || m_data.contains(module))
         return;
 
     int row = 0;
     for (auto &&tmpModule : m_parentObject->childrens()) {
         if (tmpModule == module)
             break;
-        if (!tmpModule->extra() && !tmpModule->isHioceann())
+        if (!tmpModule->extra() && !tmpModule->isHidden())
             row++;
     }
     Q_ASSERT(row <= rowCount(QModelIndex()));
@@ -142,7 +142,7 @@ void ModuleDataModel::setModuleObject(ModuleObject *const module)
     beginResetModel();
     m_data.clear();
     for (ModuleObject *tmpModule : datas) {
-        if (!tmpModule->extra() && !ModuleObject::IsHioceann(tmpModule))
+        if (!tmpModule->extra() && !ModuleObject::IsHidden(tmpModule))
             m_data.append(tmpModule);
     }
     endResetModel();

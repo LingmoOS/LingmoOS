@@ -55,7 +55,7 @@ QRect ScreenQt::availableGeometry() const
 
     int dockHideMode = DockInfoIns->hideMode();
     if (1 == dockHideMode) {   //隐藏
-        fmInfo() << "dock is Hioceann";
+        fmInfo() << "dock is Hidden";
         return ret;
     }
 

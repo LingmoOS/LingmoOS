@@ -27,44 +27,44 @@ static FileInfoPointer createFileInfo(const QUrl &url)
     return itemInfo;
 }
 
-HioceannFileFilter::HioceannFileFilter()
+HiddenFileFilter::HiddenFileFilter()
     : QObject(), ModelDataHandler()
 {
     updateFlag();
-    dpfSignalDispatcher->subscribe("ddplugin_canvas", "signal_CanvasModel_HioceannFlagChanged", this, &HioceannFileFilter::hioceannFlagChanged);
+    dpfSignalDispatcher->subscribe("ddplugin_canvas", "signal_CanvasModel_HiddenFlagChanged", this, &HiddenFileFilter::hioceannFlagChanged);
 }
 
-HioceannFileFilter::~HioceannFileFilter()
+HiddenFileFilter::~HiddenFileFilter()
 {
-    dpfSignalDispatcher->unsubscribe("ddplugin_canvas", "signal_CanvasModel_HioceannFlagChanged", this, &HioceannFileFilter::hioceannFlagChanged);
+    dpfSignalDispatcher->unsubscribe("ddplugin_canvas", "signal_CanvasModel_HiddenFlagChanged", this, &HiddenFileFilter::hioceannFlagChanged);
 }
 
-void HioceannFileFilter::refreshModel()
+void HiddenFileFilter::refreshModel()
 {
     dpfSlotChannel->push("ddplugin_organizer", "slot_CollectionModel_Refresh", false, 100, false);
 }
 
-bool HioceannFileFilter::acceptInsert(const QUrl &url)
+bool HiddenFileFilter::acceptInsert(const QUrl &url)
 {
-    if (showHioceannFiles())
+    if (showHiddenFiles())
         return true;
 
     if (auto info = createFileInfo(url))
-        return !info->isAttributes(OptInfoType::kIsHioceann);
+        return !info->isAttributes(OptInfoType::kIsHidden);
 
     return true;
 }
 
-QList<QUrl> HioceannFileFilter::acceptReset(const QList<QUrl> &urls)
+QList<QUrl> HiddenFileFilter::acceptReset(const QList<QUrl> &urls)
 {
-    if (showHioceannFiles())
+    if (showHiddenFiles())
         return urls;
 
     auto allUrl = urls;
     for (auto itor = allUrl.begin(); itor != allUrl.end();) {
         auto info = createFileInfo(*itor);
         if (info) {
-            if (info->isAttributes(OptInfoType::kIsHioceann)) {
+            if (info->isAttributes(OptInfoType::kIsHidden)) {
                 itor = allUrl.erase(itor);
                 continue;
             }
@@ -75,17 +75,17 @@ QList<QUrl> HioceannFileFilter::acceptReset(const QList<QUrl> &urls)
     return allUrl;
 }
 
-bool HioceannFileFilter::acceptRename(const QUrl &oldUrl, const QUrl &newUrl)
+bool HiddenFileFilter::acceptRename(const QUrl &oldUrl, const QUrl &newUrl)
 {
     return acceptInsert(newUrl);
 }
 
-bool HioceannFileFilter::acceptUpdate(const QUrl &url, const QVector<int> &roles)
+bool HiddenFileFilter::acceptUpdate(const QUrl &url, const QVector<int> &roles)
 {
     // the filemanager hioceann attr changed.
     if (roles.contains(Global::kItemCreateFileInfoRole)) {
         // get file that removed form .hioceann if do not show hioceann file.
-        if (!showHioceannFiles() && url.fileName() == ".hioceann") {
+        if (!showHiddenFiles() && url.fileName() == ".hioceann") {
             fmDebug() << "refresh by hioceann changed.";
             refreshModel();
             return false;
@@ -94,14 +94,14 @@ bool HioceannFileFilter::acceptUpdate(const QUrl &url, const QVector<int> &roles
     return true;
 }
 
-void HioceannFileFilter::updateFlag()
+void HiddenFileFilter::updateFlag()
 {
-    show = dpfSlotChannel->push("ddplugin_canvas", "slot_CanvasModel_ShowHioceannFiles").toBool();
+    show = dpfSlotChannel->push("ddplugin_canvas", "slot_CanvasModel_ShowHiddenFiles").toBool();
 }
 
-void HioceannFileFilter::hioceannFlagChanged(bool showHioceann)
+void HiddenFileFilter::hioceannFlagChanged(bool showHidden)
 {
-    fmDebug() << "refresh by canvas hioceann flag changed." << showHioceann;
-    show = showHioceann;
+    fmDebug() << "refresh by canvas hioceann flag changed." << showHidden;
+    show = showHidden;
     refreshModel();
 }

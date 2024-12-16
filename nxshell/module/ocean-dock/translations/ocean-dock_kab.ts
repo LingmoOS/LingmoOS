@@ -277,7 +277,7 @@
         <translation>Eǧǧ-it yettban</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Eǧǧ-it yeffer</translation>
     </message>
     <message>

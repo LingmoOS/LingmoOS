@@ -515,7 +515,7 @@ void ListView::setHoverIndexAt(const QPoint &p)
     d->m_hover = index;
 }
 
-bool ListView::isIndexHioceann(const QModelIndex & /*index*/) const
+bool ListView::isIndexHidden(const QModelIndex & /*index*/) const
 {
     return false;
 }

@@ -78,7 +78,7 @@ public:
              {{"o", "output"}, i18n("Output path <output> "), i18n("output")}});
         QCommandLineOption option{"fd", i18n("File descriptor <fd> "),
                                   i18n("fd")};
-        option.setFlags(QCommandLineOption::HioceannFromHelp);
+        option.setFlags(QCommandLineOption::HiddenFromHelp);
         parser.addOption(option);
         parser.process(*this);
 

@@ -8,7 +8,7 @@
 
 #include <DApplication>
 #include <DLog>
-#include <DSysInfo>
+#include <LSysInfo>
 #if (defined QT_DEBUG) && (defined CHECK_ACCESSIBLENAME)
 #include <DAccessibilityChecker>
 #endif
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     if (parser.isSet(config)) {
-        const DSysInfo::LingmoType LingmoType = DSysInfo::lingmoType();
-        bool IsServerSystem = DSysInfo::LingmoServer == LingmoType;
+        const LSysInfo::LingmoType LingmoType = LSysInfo::lingmoType();
+        bool IsServerSystem = LSysInfo::LingmoServer == LingmoType;
         if (IsServerSystem) {
             selectNormalModel(parser.value(config));
             return 0;

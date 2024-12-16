@@ -14,7 +14,7 @@
 #include "widgets/switchwidget.h"
 
 #include <DSwitchButton>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DIconTheme>
 #include <DTipLabel>
 
@@ -32,7 +32,7 @@ PersonalizationDesktopModule::PersonalizationDesktopModule(PersonalizationModel 
     , m_model(model)
     , m_work(work)
 {
-    if (DSysInfo::UosServer != DSysInfo::uosType()) { // 以下服务器版没有
+    if (LSysInfo::UosServer != LSysInfo::uosType()) { // 以下服务器版没有
         appendChild(new ItemModule("window", tr("Window")));
         SettingsGroupModule *group = new SettingsGroupModule("windowGroup", tr("Window"));
         appendChild(group);

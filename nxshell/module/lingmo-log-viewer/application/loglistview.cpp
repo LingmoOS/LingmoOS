@@ -17,7 +17,7 @@
 #include <DApplication>
 #include <DStyle>
 #include <DApplication>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QItemSelectionModel>
 #include <QMargins>
@@ -155,9 +155,9 @@ void LogListView::initUI()
     this->setItemDelegate(new LogListDelegate(this));
     this->setItemSpacing(0);
     this->setViewportMargins(10, 10, 10, 0);
-    Dtk::Core::DSysInfo::UosEdition edition = Dtk::Core::DSysInfo::uosEditionType();
+    Dtk::Core::LSysInfo::UosEdition edition = Dtk::Core::LSysInfo::uosEditionType();
     //等于服务器行业版或欧拉版(centos)
-    bool isCentos = Dtk::Core::DSysInfo::UosEuler == edition || Dtk::Core::DSysInfo::UosEnterpriseC == edition || Dtk::Core::DSysInfo::UosMilitaryS == edition;
+    bool isCentos = Dtk::Core::LSysInfo::UosEuler == edition || Dtk::Core::LSysInfo::UosEnterpriseC == edition || Dtk::Core::LSysInfo::UosMilitaryS == edition;
     m_pModel = new QStandardItemModel(this);
     QStandardItem *item = nullptr;
     if (isFileExist("/var/log/journal") || isCentos) {

@@ -173,7 +173,7 @@ public:
         kIsReadable = 0,   // 文件是否可读
         kIsWritable = 1,   // 文件是否可写
         kIsExecutable = 2,   // 文件是否可执行
-        kIsHioceann = 3,   // 文件是否可隐藏
+        kIsHidden = 3,   // 文件是否可隐藏
         kIsFile = 4,   // 是否是文件
         kIsDir = 5,   // 是否是目录
         kIsSymLink = 6,   // 是否是链接文件
@@ -198,7 +198,7 @@ public:
         kCanDrag = 6,   // 可以drag
         kCanDragCompress = 7,   // 可以压缩
         kCanFetch = 8,   // 可以遍历
-        kCanHioceann = 9,   // 可以隐藏
+        kCanHidden = 9,   // 可以隐藏
         kCustomerFileCan = 50,   // 其他用户使用
         kUnknowFileCanInfo = 255,
     };
@@ -227,7 +227,7 @@ public:
     enum class FileInfoAttributeID : uint16_t {
 
         kStandardType = 0,   // uint32
-        kStandardIsHioceann = 1,   // boolean
+        kStandardIsHidden = 1,   // boolean
         kStandardIsBackup = 2,   // boolean
         kStandardIsSymlink = 3,   // boolean
         kStandardIsVirtual = 4,   // boolean

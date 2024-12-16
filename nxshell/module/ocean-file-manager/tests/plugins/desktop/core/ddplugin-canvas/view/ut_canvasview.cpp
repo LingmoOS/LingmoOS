@@ -677,12 +677,12 @@ TEST_F(TestCanvasView, indexAt)
     }
 }
 
-TEST_F(TestCanvasView, isIndexHioceann)
+TEST_F(TestCanvasView, isIndexHidden)
 {
-    EXPECT_FALSE(view->isIndexHioceann(model->index(0)));
-    EXPECT_FALSE(view->isIndexHioceann(model->index(1)));
-    EXPECT_FALSE(view->isIndexHioceann(model->index(2)));
-    EXPECT_FALSE(view->isIndexHioceann(QModelIndex()));
+    EXPECT_FALSE(view->isIndexHidden(model->index(0)));
+    EXPECT_FALSE(view->isIndexHidden(model->index(1)));
+    EXPECT_FALSE(view->isIndexHidden(model->index(2)));
+    EXPECT_FALSE(view->isIndexHidden(QModelIndex()));
 }
 
 TEST_F(TestCanvasView, paintEvent)

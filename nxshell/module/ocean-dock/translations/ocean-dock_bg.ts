@@ -277,7 +277,7 @@
         <translation>Показвай</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Скрий</translation>
     </message>
     <message>

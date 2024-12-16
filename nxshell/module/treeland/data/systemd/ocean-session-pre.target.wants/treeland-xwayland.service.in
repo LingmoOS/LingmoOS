@@ -1,0 +1,23 @@
+[Unit]
+Description=TreeLand socket helper service
+CollectMode=inactive-or-failed
+
+Requires=treeland-xwayland.socket
+PartOf=treeland-xwayland.socket
+After=treeland-xwayland.socket
+
+Before=ocean-display.service
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+[Service]
+ExecCondition=/bin/sh -c 'test "$OCEAN_CURRENT_COMPOSITOR" = "TreeLand" || exit 2'
+Type=notify
+Sockets=treeland-xwayland.socket
+UnsetEnvironment=DISPLAY
+ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/treeland-sd --type xwayland
+ExecStop=-/usr/bin/systemctl --user unset-environment DISPLAY
+Slice=session.slice
+RestartSec=3s

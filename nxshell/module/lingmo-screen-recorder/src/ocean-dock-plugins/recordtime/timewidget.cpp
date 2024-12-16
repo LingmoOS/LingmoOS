@@ -9,7 +9,7 @@
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
 #include <DStyle>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QApplication>
 #include <QPainter>

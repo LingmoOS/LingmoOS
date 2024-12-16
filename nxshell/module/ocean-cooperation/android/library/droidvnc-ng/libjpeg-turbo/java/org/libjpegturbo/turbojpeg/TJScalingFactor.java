@@ -40,7 +40,7 @@ public class TJScalingFactor {
    * @param num numerator
    * @param denom denominator
    */
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   public TJScalingFactor(int num, int denom) {
     if (num < 1 || denom < 1)
       throw new IllegalArgumentException("Numerator and denominator must be >= 1");

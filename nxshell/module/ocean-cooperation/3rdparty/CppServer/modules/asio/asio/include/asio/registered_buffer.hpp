@@ -66,7 +66,7 @@ public:
 private:
   friend class detail::buffer_registration_base;
 
-  // Hioceann constructor used by buffer registration.
+  // Hidden constructor used by buffer registration.
   registered_buffer_id(const void* scope, int index) noexcept
     : scope_(scope),
       index_(index)
@@ -131,7 +131,7 @@ public:
 private:
   friend class detail::buffer_registration_base;
 
-  // Hioceann constructor used by buffer registration and operators.
+  // Hidden constructor used by buffer registration and operators.
   mutable_registered_buffer(const mutable_buffer& b,
       const registered_buffer_id& i) noexcept
     : buffer_(b),
@@ -208,7 +208,7 @@ public:
   }
 
 private:
-  // Hioceann constructor used by operators.
+  // Hidden constructor used by operators.
   const_registered_buffer(const const_buffer& b,
       const registered_buffer_id& i) noexcept
     : buffer_(b),

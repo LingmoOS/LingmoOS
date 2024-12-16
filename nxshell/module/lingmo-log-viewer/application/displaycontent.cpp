@@ -1816,7 +1816,7 @@ void DisplayContent::slot_parseFinished(LOG_FLAG type, int status)
     int nSegementIndex = -1;
     // 取消鉴权时，若导出进度条存在，则隐藏
     if (status == ParseThreadBase::CancelAuth) {
-        if (m_exportDlg && !m_exportDlg->isHioceann()) {
+        if (m_exportDlg && !m_exportDlg->isHidden()) {
             m_exportDlg->hide();
             DApplication::setActiveWindow(this);
         }
@@ -3090,28 +3090,28 @@ void DisplayContent::parseListToModel(QList<LOG_MSG_COREDUMP> iList, QStandardIt
  */
 void DisplayContent::setLoadState(DisplayContent::LOAD_STATE iState, bool bSearching/* = false*/)
 {
-    if (!m_spinnerWgt->isHioceann()) {
+    if (!m_spinnerWgt->isHidden()) {
         m_spinnerWgt->spinnerStop();
         m_spinnerWgt->hide();
     }
-    if (!m_spinnerWgt_K->isHioceann()) {
+    if (!m_spinnerWgt_K->isHidden()) {
         m_spinnerWgt_K->spinnerStop();
         m_spinnerWgt_K->hide();
     }
-    if (!noResultLabel->isHioceann()) {
+    if (!noResultLabel->isHidden()) {
         noResultLabel->hide();
     }
-    if (!notAuditLabel->isHioceann()) {
+    if (!notAuditLabel->isHidden()) {
         notAuditLabel->hide();
     }
-    if (!noCoredumpctlLabel->isHioceann()) {
+    if (!noCoredumpctlLabel->isHidden()) {
         noCoredumpctlLabel->hide();
     }
-    if (!noPermissionLabel->isHioceann()) {
+    if (!noPermissionLabel->isHidden()) {
         noPermissionLabel->hide();
     }
 
-//    if (!m_treeView->isHioceann()) {
+//    if (!m_treeView->isHidden()) {
 //        m_treeView->hide();
 //    }
     switch (iState) {
@@ -3199,7 +3199,7 @@ void DisplayContent::setLoadState(DisplayContent::LOAD_STATE iState, bool bSearc
 void DisplayContent::onExportResult(bool isSuccess)
 {
     QString titleIcon = ICONPREFIX;
-    if (m_exportDlg && !m_exportDlg->isHioceann()) {
+    if (m_exportDlg && !m_exportDlg->isHidden()) {
         m_exportDlg->updateProgressBarValue(0);
         m_exportDlg->hide();
     }
@@ -3220,7 +3220,7 @@ void DisplayContent::onExportResult(bool isSuccess)
  */
 void DisplayContent::onExportFakeCloseDlg()
 {
-    if (m_exportDlg && !m_exportDlg->isHioceann()) {
+    if (m_exportDlg && !m_exportDlg->isHidden()) {
         m_exportDlg->hide();
     }
 }
@@ -3248,7 +3248,7 @@ void DisplayContent::onExportProgress(int nCur, int nTotal)
     }
 
     //弹窗
-    if (m_exportDlg->isHioceann()) {
+    if (m_exportDlg->isHidden()) {
         m_exportDlg->show();
     }
 

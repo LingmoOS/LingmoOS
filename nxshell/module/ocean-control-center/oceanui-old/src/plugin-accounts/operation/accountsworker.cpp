@@ -59,7 +59,7 @@ AccountsWorker::AccountsWorker(UserModel *userList, QObject *parent)
     getAllGroups();
     getPresetGroups();
 
-    if(DSysInfo::UosServer != DSysInfo::uosType()) {
+    if(LSysInfo::UosServer != LSysInfo::uosType()) {
         m_userModel->setAutoLoginVisable(true);
         m_userModel->setNoPassWordLoginVisable(true);
     } else {
@@ -88,7 +88,7 @@ void AccountsWorker::getAllGroupsResult(QDBusPendingCallWatcher *watch)
 
 void AccountsWorker::getPresetGroups()
 {
-    int userType = DSysInfo::UosServer == DSysInfo::uosType() ? 0 : 1;
+    int userType = LSysInfo::UosServer == LSysInfo::uosType() ? 0 : 1;
     QDBusPendingReply<QStringList> reply = m_accountsInter->GetPresetGroups(userType);
     QDBusPendingCallWatcher *presetGroupsResult = new QDBusPendingCallWatcher(reply, this);
     connect(presetGroupsResult, &QDBusPendingCallWatcher::finished, this, &AccountsWorker::getPresetGroupsResult);
@@ -767,7 +767,7 @@ CreationResult *AccountsWorker::createAccountInternal(const User *user)
     bool spResult = !userDBus->SetPassword(cryptUserPassword(user->password())).isError();
     bool groupResult = true;
     bool passwordHintResult = true;
-    if (DSysInfo::UosServer == DSysInfo::uosType() && !user->groups().isEmpty()) {
+    if (LSysInfo::UosServer == LSysInfo::uosType() && !user->groups().isEmpty()) {
         groupResult = !userDBus->SetGroups(user->groups()).isError();
     }
     passwordHintResult = !userDBus->SetPasswordHint(user->passwordHint()).isError();

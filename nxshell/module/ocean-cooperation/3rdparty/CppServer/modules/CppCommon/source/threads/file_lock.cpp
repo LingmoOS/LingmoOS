@@ -72,7 +72,7 @@ public:
         const int sleep = 100;
         for (int attempt = 0; attempt < attempts; ++attempt)
         {
-            _file = CreateFileW(wpath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_HIOCEANN | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
+            _file = CreateFileW(wpath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
             if (_file == INVALID_HANDLE_VALUE)
             {
                 Sleep(sleep);

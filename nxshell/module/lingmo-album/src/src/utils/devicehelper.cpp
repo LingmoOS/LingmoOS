@@ -5,7 +5,7 @@
 #include "devicehelper.h"
 #include "unionimage/baseutils.h"
 #include <dfm-mount/base/dmount_global.h>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDBusReply>
 #include <QDebug>
@@ -26,7 +26,7 @@ DeviceHelper::DeviceHelper(QObject *parent)
     : QObject(parent)
 {
     // DFM 设备管理接口，访问文件挂载信息
-    if (DSysInfo::majorVersion() == "25") {
+    if (LSysInfo::majorVersion() == "25") {
         m_dfmDeviceManager.reset(new QDBusInterface(QStringLiteral(V25_FILEMANAGER_DAEMON_SERVICE),
                                                     QStringLiteral(V25_FILEMANAGER_DAEMON_PATH),
                                                     QStringLiteral(V25_FILEMANAGER_DAEMON_INTERFACE)));
@@ -36,7 +36,7 @@ DeviceHelper::DeviceHelper(QObject *parent)
                                                     QStringLiteral(V23_FILEMANAGER_DAEMON_INTERFACE)));
     }
 
-    qInfo() << "m_dfmDeviceManager: majorVersion:" << DSysInfo::majorVersion()
+    qInfo() << "m_dfmDeviceManager: majorVersion:" << LSysInfo::majorVersion()
              << "dbus service:" << m_dfmDeviceManager.data()->service()
              << "interface:" << m_dfmDeviceManager.data()->interface()
              << "object:" << m_dfmDeviceManager.data()->objectName()

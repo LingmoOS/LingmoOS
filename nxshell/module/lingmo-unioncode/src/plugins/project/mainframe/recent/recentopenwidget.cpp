@@ -31,7 +31,7 @@ void RecentOpenWidget::initUI()
     listView = new RecentOpenView(this);
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listView->setLineWidth(0);
-    listView->setHeaderHioceann(true);
+    listView->setHeaderHidden(true);
     listView->setContentsMargins(0, 0, 0, 0);
     listView->setRootIsDecorated(false);
     listView->setIconSize(QSize(16, 16));

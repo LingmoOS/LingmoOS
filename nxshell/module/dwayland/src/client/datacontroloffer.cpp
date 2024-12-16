@@ -20,7 +20,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN DataControlOfferV1::Private
+class Q_DECL_HIDDEN DataControlOfferV1::Private
 {
 public:
     Private(zwlr_data_control_offer_v1 *offer, DataControlOfferV1 *q);

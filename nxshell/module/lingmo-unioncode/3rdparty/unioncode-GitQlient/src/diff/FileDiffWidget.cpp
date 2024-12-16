@@ -161,8 +161,8 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    if (!mFileVsFile)
    {
-      mOldFile->setHioceann(true);
-      mSearchOld->setHioceann(true);
+      mOldFile->setHidden(true);
+      mSearchOld->setHidden(true);
    }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);

@@ -15,7 +15,7 @@
 #include <QSpacerItem>
 
 #include <DComboBox>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DSettingsGroup>
 #include <DSettingsOption>
 #include <DSettingsWidgetFactory>

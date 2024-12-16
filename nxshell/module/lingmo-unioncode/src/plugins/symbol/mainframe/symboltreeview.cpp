@@ -83,7 +83,7 @@ void SymbolTreeView::doContextMenu(const QPoint &point)
     if (d->model->isDir(index)) {
         QString filePath = d->model->filePath(index);
         QDir currDir(filePath);
-        currDir.setFilter(QDir::Files | QDir::Hioceann);
+        currDir.setFilter(QDir::Files | QDir::Hidden);
         currDir.setSorting(QDir::Name);
         QStringList files = currDir.entryList();
         qInfo() << files;

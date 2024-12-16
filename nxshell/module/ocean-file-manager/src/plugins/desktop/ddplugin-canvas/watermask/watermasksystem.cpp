@@ -6,7 +6,7 @@
 
 #include <dfm-base/base/configs/dconfig/dconfigmanager.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QFileInfo>
 #include <QImageReader>
@@ -50,18 +50,18 @@ bool WatermaskSystem::usingCn()
 
 bool WatermaskSystem::showLicenseState()
 {
-    DSysInfo::LingmoType lingmoType = DSysInfo::lingmoType();
-    DSysInfo::UosEdition uosEdition = DSysInfo::uosEditionType();
+    LSysInfo::LingmoType lingmoType = LSysInfo::lingmoType();
+    LSysInfo::UosEdition uosEdition = LSysInfo::uosEditionType();
     fmInfo() << "lingmoType" << lingmoType << "uosEditionType" << uosEdition;
 
-    bool ret = (DSysInfo::LingmoType::LingmoProfessional == lingmoType
-                || DSysInfo::LingmoType::LingmoPersonal == lingmoType
-                || DSysInfo::LingmoType::LingmoServer == lingmoType);
+    bool ret = (LSysInfo::LingmoType::LingmoProfessional == lingmoType
+                || LSysInfo::LingmoType::LingmoPersonal == lingmoType
+                || LSysInfo::LingmoType::LingmoServer == lingmoType);
 
 #if (DTK_VERSION >= DTK_VERSION_CHECK(5, 4, 7, 0))
     // 教育版
-    ret = ret || (DSysInfo::UosEdition::UosEducation == uosEdition ||
-                  DSysInfo::UosEdition::UosMilitary == uosEdition);
+    ret = ret || (LSysInfo::UosEdition::UosEducation == uosEdition ||
+                  LSysInfo::UosEdition::UosMilitary == uosEdition);
     fmInfo() << "check uos Edition" << ret;
 #endif
 

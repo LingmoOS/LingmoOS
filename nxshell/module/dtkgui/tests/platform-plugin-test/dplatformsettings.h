@@ -41,13 +41,13 @@ protected:
     void handlePropertyChanged(const QByteArray &property, const QVariant &value);
     void handleNotify(const QByteArray &signal, qint32 data1, qint32 data2);
 
-    struct Q_DECL_HIOCEANN Callback
+    struct Q_DECL_HIDDEN Callback
     {
         PropertyChangeFunc func;
         void *handle;
     };
 
-    struct Q_DECL_HIOCEANN SignalCallback
+    struct Q_DECL_HIDDEN SignalCallback
     {
         SignalFunc func;
         void *handle;

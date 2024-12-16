@@ -175,7 +175,7 @@ void SideBarWidget::setItemVisiable(const QUrl &url, bool visible)
     SideBarItem *item = qobject_cast<const SideBarModel *>(index.model())->itemFromIndex(index);
     if (item && item->parent()) {
         //  item->setHiiden(visible);
-        sidebarView->setRowHioceann(item->row(), item->parent()->index(), !visible);
+        sidebarView->setRowHidden(item->row(), item->parent()->index(), !visible);
     }
 
     sidebarView->updateSeparatorVisibleState();

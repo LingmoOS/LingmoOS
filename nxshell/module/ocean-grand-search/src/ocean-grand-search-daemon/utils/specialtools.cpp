@@ -99,7 +99,7 @@ QJsonArray SpecialTools::getJsonArray(QJsonObject *json, const QString &key)
     return ret;
 }
 
-bool SpecialTools::isHioceannFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &pathPrefix)
+bool SpecialTools::isHiddenFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &pathPrefix)
 {
     if (!fileName.startsWith(pathPrefix) || fileName == pathPrefix)
         return false;
@@ -110,7 +110,7 @@ bool SpecialTools::isHioceannFile(const QString &fileName, QHash<QString, QSet<Q
 
     // 判断.hioceann文件是否存在，不存在说明该路径下没有隐藏文件
     if (!QFile::exists(hioceannFileConfig))
-        return isHioceannFile(fileParentPath, filters, pathPrefix);
+        return isHiddenFile(fileParentPath, filters, pathPrefix);
 
     if (filters[fileParentPath].isEmpty()) {
         QFile file(hioceannFileConfig);
@@ -125,11 +125,11 @@ bool SpecialTools::isHioceannFile(const QString &fileName, QHash<QString, QSet<Q
             const auto &hioceannFiles = QSet<QString>::fromList(QString(data).split('\n', QString::SkipEmptyParts));
             filters[fileParentPath] = hioceannFiles;
         } else {
-            return isHioceannFile(fileParentPath, filters, pathPrefix);
+            return isHiddenFile(fileParentPath, filters, pathPrefix);
         }
     }
 
     return filters[fileParentPath].contains(fileInfo.fileName())
             ? true
-            : isHioceannFile(fileParentPath, filters, pathPrefix);
+            : isHiddenFile(fileParentPath, filters, pathPrefix);
 }

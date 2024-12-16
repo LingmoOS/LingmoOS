@@ -39,8 +39,8 @@ public:
     ~Monitor();
 
     void setEdgeEnabled(int edge, bool enabled);
-    void setEdgeHioceann(int edge, bool set);
-    bool edgeHioceann(int edge) const;
+    void setEdgeHidden(int edge, bool set);
+    bool edgeHidden(int edge) const;
     void clear();
     void addEdgeItem(int edge, const QString &item);
     void setEdgeItemEnabled(int edge, int index, bool enabled);

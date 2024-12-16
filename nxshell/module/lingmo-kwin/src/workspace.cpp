@@ -1217,7 +1217,7 @@ void Workspace::addWaylandWindow(Window *window)
 
 void Workspace::removeWaylandWindow(Window *window)
 {
-    windowHioceann(window);
+    windowHidden(window);
     removeWindow(window);
 }
 

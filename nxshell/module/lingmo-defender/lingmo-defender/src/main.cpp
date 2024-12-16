@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     a.setProductIcon(QIcon::fromTheme("lingmo-defender"));
     a.setApplicationDescription(QApplication::translate("main", "Security Center is a utility for system health check, virus scan, disk cleanup, security protection, etc."));
     // 设置关于文字，区分服务器版本
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         a.setApplicationDescription(QApplication::tr("Security Center is a utility for system virus scan and disk cleanup."));
     }
     a.setQuitOnLastWindowClosed(false);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     DefenderDBusService dbus(&w);
 
     // 若是服务器版本，添加授权弹窗
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         // 打开之前，进行授权确认
         Authority::Result result;
         result = Authority::instance()->checkAuthorizationSync("com.lingmo.lingmo-defender.runByAuthentication",

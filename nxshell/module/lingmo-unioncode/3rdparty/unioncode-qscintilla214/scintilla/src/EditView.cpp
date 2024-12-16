@@ -5,7 +5,7 @@
 // Copyright 1998-2014 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstoceanf>
+#include <cstddef>
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
@@ -991,7 +991,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		rcSegment.left = rcLine.left;
 	rcSegment.right = rcLine.right;
 
-	const bool fillRemainder = !lastSubLine || model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIOCEANN || !model.pcs->GetFoldDisplayTextShown(line);
+	const bool fillRemainder = !lastSubLine || model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN || !model.pcs->GetFoldDisplayTextShown(line);
 	if (fillRemainder) {
 		// Fill the remainder of the line
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcSegment, subLine);
@@ -1111,7 +1111,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	if (!lastSubLine)
 		return;
 
-	if ((model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIOCEANN) || !model.pcs->GetFoldDisplayTextShown(line))
+	if ((model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN) || !model.pcs->GetFoldDisplayTextShown(line))
 		return;
 
 	PRectangle rcSegment = rcLine;
@@ -1207,7 +1207,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
     if (!lastSubLine)
         return;
 
-    if (vsDraw.eolAnnotationVisible == EOLANNOTATION_HIOCEANN) {
+    if (vsDraw.eolAnnotationVisible == EOLANNOTATION_HIDDEN) {
         return;
     }
     const StyledText stEOLAnnotation = model.pdoc->EOLAnnotationStyledText(line);
@@ -1266,7 +1266,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
                      ll->positions[ll->numCharsInLine] - subLineStart
                      /*+ virtualSpace*//* + vsDraw.aveCharWidth*/;
 
-    if ((model.foldDisplayTextStyle != SC_FOLDDISPLAYTEXT_HIOCEANN) && model.pcs->GetFoldDisplayTextShown(line)) {
+    if ((model.foldDisplayTextStyle != SC_FOLDDISPLAYTEXT_HIDDEN) && model.pcs->GetFoldDisplayTextShown(line)) {
         const char *textFoldDisplay = model.pcs->GetFoldDisplayText(line);
         if (textFoldDisplay) {
             const int lengthFoldDisplayText = static_cast<int>(strlen(textFoldDisplay));

@@ -1287,7 +1287,7 @@ void DPrintPreviewDialogPrivate::setfrmaeback(DFrame *frame)
 
 void DPrintPreviewDialogPrivate::showadvancesetting()
 {
-    if (advancesettingwdg->isHioceann()) {
+    if (advancesettingwdg->isHidden()) {
         advancesettingwdg->show();
         advanceBtn->setText(qApp->translate("DPrintPreviewDialogPrivate", "Collapse"));
         advanceBtn->setIcon(DIconTheme::findQIcon("printer_dropup"));
@@ -2236,7 +2236,7 @@ void DPrintPreviewDialogPrivate::_q_colorButtonCliked(bool cliked)
 {
     Q_Q(DPrintPreviewDialog);
     Q_UNUSED(cliked)
-    if (colorWidget->isHioceann()) {
+    if (colorWidget->isHidden()) {
         isChecked = false;
     } else {
         isChecked = true;
@@ -3121,7 +3121,7 @@ void PreviewSettingsPluginHelper::doUpdateStatus(QWidget *source, DPrintPreviewS
 
         DPrintPreviewSettingInterface::SettingStatus status = m_currentInterface->settingStatus(d->settingHelper->m_printSettingData, subControlType);
         switch (status) {
-        case DPrintPreviewSettingInterface::Hioceann: {
+        case DPrintPreviewSettingInterface::Hidden: {
             source->setEnabled(enabled);
             source->setVisible(false);
         }

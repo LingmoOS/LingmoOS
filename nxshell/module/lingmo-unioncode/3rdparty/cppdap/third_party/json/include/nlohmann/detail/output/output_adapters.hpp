@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm> // copy
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <ios> // streamsize
 #include <iterator> // back_inserter
 #include <memory> // shared_ptr, make_shared

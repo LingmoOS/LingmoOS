@@ -39,7 +39,7 @@ public:
 
     void onInsertChild(ModuleObject *const module)
     {
-        if (ModuleObject::IsHioceann(module) || m_data.contains(module))
+        if (ModuleObject::IsHidden(module) || m_data.contains(module))
             return;
         QObject::connect(module, &ModuleObject::moduleDataChanged, q_ptr, [this]() {
             ModuleObject *module = qobject_cast<ModuleObject *>(q_ptr->sender());
@@ -72,7 +72,7 @@ public:
     void onDataChanged(ModuleObject *const module, uint32_t flag, bool state)
     {
         Q_Q(ModuleListModel);
-        if (ModuleObject::IsHioceannFlag(flag)) {
+        if (ModuleObject::IsHiddenFlag(flag)) {
             if (state)
                 onRemovedChild(module);
             else

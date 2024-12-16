@@ -42,7 +42,7 @@ private:
 private:
     static QPointer<QCheckBox> kAutoMountCheckBox;
     static QPointer<QCheckBox> kAutoMountOpenCheckBox;
-    static QSet<QString> kHioceannSettingItems;
+    static QSet<QString> kHiddenSettingItems;
     QPointer<DSettings> dtkSettings;
     static quint64 parentWid;
 };

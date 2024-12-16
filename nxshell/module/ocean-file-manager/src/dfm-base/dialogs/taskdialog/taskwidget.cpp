@@ -168,12 +168,12 @@ void TaskWidget::onShowErrors(const JobInfoPointer jobInfo)
     }
     QString errorMsg = jobInfo->value(AbstractJobHandler::NotifyInfoKey::kErrorMsgKey).toString();
     lbErrorMsg->setText(errorMsg);
-    lbErrorMsg->setHioceann(errorMsg.isEmpty());
+    lbErrorMsg->setHidden(errorMsg.isEmpty());
     if (!widButton) {
         widButton = createBtnWidget();
         mainLayout->addWidget(widButton);
     }
-    widButton->setHioceann(false);
+    widButton->setHidden(false);
 
     if (!widConfict) {
         widConfict = createConflictWidget();
@@ -237,7 +237,7 @@ void TaskWidget::onShowConflictInfo(const QUrl source, const QUrl target, const 
 
     widConfict->show();
     widButton->show();
-    btnCoexist->setHioceann(false);
+    btnCoexist->setHidden(false);
     showConflictButtons();
 
     if (btnPause)
@@ -253,7 +253,7 @@ void TaskWidget::onHandlerTaskStateChange(const JobInfoPointer JobInfo)
     bool hide = JobInfo->value(AbstractJobHandler::NotifyInfoKey::kJobStateHideKey).value<bool>();
 
     if (hide)
-        isBtnHioceann = true;
+        isBtnHidden = true;
 
     if (JobInfo->count(AbstractJobHandler::NotifyInfoKey::kJobStateKey) == 0)
         return;
@@ -656,8 +656,8 @@ QWidget *TaskWidget::createBtnWidget()
  */
 void TaskWidget::showBtnByAction(const AbstractJobHandler::SupportActions &actions)
 {
-    btnSkip->setHioceann(!actions.testFlag(AbstractJobHandler::SupportAction::kSkipAction));
-    btnCoexist->setHioceann(!actions.testFlag(AbstractJobHandler::SupportAction::kCoexistAction));
+    btnSkip->setHidden(!actions.testFlag(AbstractJobHandler::SupportAction::kSkipAction));
+    btnCoexist->setHidden(!actions.testFlag(AbstractJobHandler::SupportAction::kCoexistAction));
     QString btnTxt;
     QVariant variantReplace;
     if (actions.testFlag(AbstractJobHandler::SupportAction::kRetryAction)) {
@@ -670,11 +670,11 @@ void TaskWidget::showBtnByAction(const AbstractJobHandler::SupportActions &actio
         btnReplace->setText(tr("Merge", "button"));
         variantReplace.setValue<AbstractJobHandler::SupportAction>(AbstractJobHandler::SupportAction::kMergeAction);
     } else {
-        btnReplace->setHioceann(true);
+        btnReplace->setHidden(true);
         return;
     }
 
-    btnReplace->setHioceann(false);
+    btnReplace->setHidden(false);
     btnReplace->setProperty(kBtnPropertyActionName, variantReplace);
 }
 /*!
@@ -700,7 +700,7 @@ void TaskWidget::showConflictButtons(bool showBtns, bool showConflict)
 
 void TaskWidget::onMouseHover(const bool hover)
 {
-    if (isBtnHioceann) {
+    if (isBtnHidden) {
         btnPause->setVisible(false);
         btnStop->setVisible(false);
     } else {
@@ -708,8 +708,8 @@ void TaskWidget::onMouseHover(const bool hover)
         btnStop->setVisible(hover);
     }
 
-    lbSpeed->setHioceann(hover);
-    lbRmTime->setHioceann(hover);
+    lbSpeed->setHidden(hover);
+    lbRmTime->setHidden(hover);
     lbSrcPath->setFixedWidth(hover ? kMsgLabelHoverWidth : kMsgLabelWidth);
     lbDstPath->setFixedWidth(hover ? kMsgLabelHoverWidth : kMsgLabelWidth);
     adjustSize();

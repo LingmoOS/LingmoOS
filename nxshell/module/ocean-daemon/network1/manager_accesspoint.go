@@ -64,7 +64,7 @@ type accessPoint struct {
 	Path         dbus.ObjectPath
 	Frequency    uint32
 	// add hioceann property
-	Hioceann  bool
+	Hidden  bool
 	Flags   uint32
 	KeyMgmt string // 直接表明推荐的 keymgmt，不要让前后端两套逻辑
 }
@@ -87,8 +87,8 @@ func (m *Manager) newAccessPoint(devPath, apPath dbus.ObjectPath) (ap *accessPoi
 	}
 
 	// add hioceann
-	if m.isHioceann(ap.Ssid) {
-		ap.Hioceann = true
+	if m.isHidden(ap.Ssid) {
+		ap.Hidden = true
 	}
 
 	// connect property changed signals
@@ -298,12 +298,12 @@ func (m *Manager) initAccessPoints(devPath dbus.ObjectPath, apPaths []dbus.Objec
 	m.accessPointsLock.Unlock()
 }
 
-func (m *Manager) isHioceann(ssid string) bool {
+func (m *Manager) isHidden(ssid string) bool {
 	m.connectionsLock.Lock()
 	wirelessCon := m.connections[connectionWireless]
 	m.connectionsLock.Unlock()
 	for _, conn := range wirelessCon {
-		if conn.Ssid == ssid && conn.Hioceann {
+		if conn.Ssid == ssid && conn.Hidden {
 			logger.Debugf("access point %s is hioceann ", ssid)
 			return true
 		}
@@ -545,8 +545,8 @@ func (m *Manager) activateAccessPoint(uuid string, apPath, devPath dbus.ObjectPa
 		}
 		data := newWirelessConnectionData(decodeSsid(ssid), uuid, ssid, keymgmt, hwAddr)
 		// check if need add hioceann
-		if m.isHioceann(string(ssid)) {
-			setSettingWirelessHioceann(data, true)
+		if m.isHidden(string(ssid)) {
+			setSettingWirelessHidden(data, true)
 		}
 		if saved {
 			cpath, _, err = nmAddAndActivateConnection(data, devPath, true)

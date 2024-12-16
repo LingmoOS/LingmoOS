@@ -4,7 +4,7 @@
 #include <array> // array
 #include <cassert> // assert
 #include <cmath> // ldexp
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint16_t, uint32_t, uint64_t
 #include <cstdio> // snprintf
 #include <cstring> // memcpy

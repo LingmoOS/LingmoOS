@@ -16,7 +16,7 @@ class ParametersContainer : public QObject
 public:
     typedef QSharedPointer<ParametersContainer> Ptr;
     typedef enum {
-        Uuid = 0, DevicePath, AccessPath, isHioceann
+        Uuid = 0, DevicePath, AccessPath, isHidden
     } ParamType;
 
     explicit ParametersContainer(QObject *parent = nullptr);

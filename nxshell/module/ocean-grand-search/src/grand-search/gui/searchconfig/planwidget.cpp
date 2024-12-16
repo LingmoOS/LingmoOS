@@ -12,7 +12,7 @@
 
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -64,7 +64,7 @@ PlanWidget::PlanWidget(QWidget *parent)
     const QString endText = tr(").");
 
     QString showHyperlink;
-    if (DSysInfo::uosEditionType() == DSysInfo::UosCommunity)
+    if (LSysInfo::uosEditionType() == LSysInfo::UosCommunity)
         showHyperlink = communityHyperlink;
     else
         showHyperlink = uosHyperlink;

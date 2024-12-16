@@ -36,7 +36,7 @@
 #include <DSettingsOption>
 #include <DSettingsWidgetFactory>
 #include <DStandardItem>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTitlebar>
 #include <DWarningButton>
 
@@ -228,8 +228,8 @@ void MainWindow::initData()
     connect(action, &QAction::triggered, this, &MainWindow::showDefaultSettingDialog);
 
     // 只有桌面专业版才需要用户反馈
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosProfessional
-        && DSysInfo::UosType::UosDesktop == SystemType) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosProfessional
+        && LSysInfo::UosType::UosDesktop == SystemType) {
         // 用户反馈
         auto userReplyAction = new QAction(tr("Report issues"), this);
         menu->addAction(userReplyAction);
@@ -305,7 +305,7 @@ void MainWindow::setModuleVisible(ModuleInterface *const inter, const bool visib
                                 });
 
     if (find_it != m_modules.cend()) {
-        m_navView->setRowHioceann(find_it - m_modules.cbegin(), !visible);
+        m_navView->setRowHidden(find_it - m_modules.cbegin(), !visible);
         Q_EMIT moduleVisibleChanged(find_it->first->name(), visible);
     }
 }

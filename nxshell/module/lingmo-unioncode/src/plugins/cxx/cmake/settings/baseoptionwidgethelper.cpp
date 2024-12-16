@@ -62,7 +62,7 @@ void BaseOptionWidgetHelperPrivate::initUI()
     optionView->setAlternatingRowColors(true);
     optionView->setEditTriggers(QTreeView::NoEditTriggers);
     optionView->setFrameShape(QFrame::NoFrame);
-    optionView->setHeaderHioceann(true);
+    optionView->setHeaderHidden(true);
     optionView->setModel(&optionModel);
     optionView->setItemDelegate(new BaseItemDelegate(optionView));
 

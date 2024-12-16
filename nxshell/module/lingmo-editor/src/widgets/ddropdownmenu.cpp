@@ -313,7 +313,7 @@ DDropdownMenu *DDropdownMenu::createHighLightMenu()
             intel = false;
             continue;
         }
-        if (def.isHioceann()) {
+        if (def.isHidden()) {
             continue;
         }
 

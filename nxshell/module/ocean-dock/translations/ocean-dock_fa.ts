@@ -277,7 +277,7 @@
         <translation>نمایش داده شود</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>مخفی نگاه داشتن</translation>
     </message>
     <message>

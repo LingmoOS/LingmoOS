@@ -12,7 +12,7 @@ GeneralModelFilter::GeneralModelFilter()
     : ModelDataHandler()
 {
     // the default filters
-    defaultFilters << new HioceannFileFilter();
+    defaultFilters << new HiddenFileFilter();
     defaultFilters << new InnerDesktopAppFilter();
     modelFilters << defaultFilters;
 }

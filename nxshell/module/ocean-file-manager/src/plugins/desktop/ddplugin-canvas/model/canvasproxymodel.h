@@ -30,7 +30,7 @@ public:
     FileInfoPointer fileInfo(const QModelIndex &index) const;
     QUrl fileUrl(const QModelIndex &index) const;
     QList<QUrl> files() const;
-    bool showHioceannFiles() const;
+    bool showHiddenFiles() const;
     Qt::SortOrder sortOrder() const;
     void setSortOrder(const Qt::SortOrder &order);
 
@@ -58,7 +58,7 @@ signals:
 public slots:
     bool sort();
     void refresh(const QModelIndex &parent, bool global = false, int ms = 50, bool updateFile = true);
-    void setShowHioceannFiles(bool show);
+    void setShowHiddenFiles(bool show);
     bool fetch(const QUrl &url);   //show \a url if exsited
     bool take(const QUrl &url);   // hide \a url
 private:

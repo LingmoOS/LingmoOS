@@ -117,8 +117,8 @@ public slots:
     void handleFilterData(const QVariant &data);
     void handleFilterCallFunc(FileViewFilterCallback callback);
 
-    void onToggleHioceannFiles();
-    void onShowHioceannFileChanged(bool isShow);
+    void onToggleHiddenFiles();
+    void onShowHiddenFileChanged(bool isShow);
 
     void handleWatcherAddChildren(const QList<SortInfoPointer> &children);
     void handleWatcherRemoveChildren(const QList<SortInfoPointer> &children);
@@ -198,7 +198,7 @@ private:
     QVariant data(const FileInfoPointer &info, Global::ItemRoles role);
 
     bool checkFilters(const SortInfoPointer &sortInfo, const bool byInfo = false);
-    bool isDefaultHioceannFile(const QUrl &fileUrl);
+    bool isDefaultHiddenFile(const QUrl &fileUrl);
     QUrl parantUrl(const QUrl &url);
     int8_t getDepth(const QUrl &url);
     int findRealShowIndex(const QUrl &preItemUrl);

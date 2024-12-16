@@ -45,7 +45,7 @@ enum ColorTheme {
 
 enum HideMode {
     KeepShowing     = 0,
-    KeepHioceann      = 1,
+    KeepHidden      = 1,
     SmartHide       = 2
 };
 
@@ -141,7 +141,7 @@ const QString MSG_DOCK_PANEL_SIZE_CHANGED = QStringLiteral("dockPanelSizeChanged
  */
 const QString MSG_SET_APPLET_MIN_HEIGHT = QStringLiteral("setAppletMinHeight");
 
-const QString KeyHioceannSurfaceIds = "hioceannSurfaceIds";
+const QString KeyHiddenSurfaceIds = "hioceannSurfaceIds";
 
 const QString DCCIconPath = CMAKE_INSTALL_PREFIX + QString("/share/ocean-dock/icons/oceanui-setting/");
 

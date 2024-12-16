@@ -17,14 +17,14 @@
 
 using namespace NetworkManager;
 
-ConnectionWirelessEditPage::ConnectionWirelessEditPage(const QString &devPath, const QString &connUuid, const QString &apPath, bool isHioceann, QWidget *parent)
+ConnectionWirelessEditPage::ConnectionWirelessEditPage(const QString &devPath, const QString &connUuid, const QString &apPath, bool isHidden, QWidget *parent)
     : ConnectionEditPage(ConnectionEditPage::ConnectionType::WirelessConnection, devPath, connUuid, parent)
 {
     m_tempParameter.reset(new ParametersContainer);
     m_tempParameter->saveParameters(ParametersContainer::ParamType::AccessPath, apPath);
-    m_tempParameter->saveParameters(ParametersContainer::ParamType::isHioceann, isHioceann);
-    if (isHioceann)
-        m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<NetworkManager::WirelessSetting>()->setHioceann(isHioceann);
+    m_tempParameter->saveParameters(ParametersContainer::ParamType::isHidden, isHidden);
+    if (isHidden)
+        m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<NetworkManager::WirelessSetting>()->setHidden(isHidden);
 }
 
 ConnectionWirelessEditPage::~ConnectionWirelessEditPage()

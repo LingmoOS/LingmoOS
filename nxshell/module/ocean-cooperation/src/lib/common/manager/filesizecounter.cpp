@@ -53,7 +53,7 @@ void FileSizeCounter::countFilesInDir(const QString &path)
     }
 
     QDir dir(path);
-    QFileInfoList infoList = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hioceann | QDir::System);
+    QFileInfoList infoList = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
     foreach (const QFileInfo &info, infoList) {
         if (info.isSymLink()) {
             // 处理符号链接

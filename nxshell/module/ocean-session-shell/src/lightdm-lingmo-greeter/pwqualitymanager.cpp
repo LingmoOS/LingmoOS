@@ -4,11 +4,11 @@
 
 #include "pwqualitymanager.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 
-const bool IsServerSystem = (DSysInfo::UosServer ==  DSysInfo::uosType());
+const bool IsServerSystem = (LSysInfo::UosServer ==  LSysInfo::uosType());
 
 PwqualityManager::PwqualityManager(QObject *parent)
     : QObject(parent)

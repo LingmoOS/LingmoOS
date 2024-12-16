@@ -92,7 +92,7 @@ TEST_F(UT_GomokuMainWindow, UT_MainWindow_playFailMusic_true)
 TEST_F(UT_GomokuMainWindow, UT_MainWindow_viewtransparentFrame)
 {
     m_mainwindow->viewtransparentFrame();
-    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHioceann(), false)
+    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHidden(), false)
             << "check the transparentFrame'size has mainwindow'size";
 }
 
@@ -117,7 +117,7 @@ TEST_F(UT_GomokuMainWindow, UT_MainWindow_slotReplayPopup)
     Stub stub;
     stub.set(ADDR(QEventLoop, exec), UTPopupExec);
     m_mainwindow->slotReplayPopup();
-    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHioceann(), true)
+    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHidden(), true)
             << "check replay popup";
 }
 
@@ -126,7 +126,7 @@ TEST_F(UT_GomokuMainWindow, UT_MainWindow_slotReplayFunction)
     Stub stub;
     stub.set(ADDR(QEventLoop, exec), UTPopupExec);
     m_mainwindow->slotReplayFunction();
-    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHioceann(), true)
+    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHidden(), true)
             << "check replay function";
 }
 
@@ -199,6 +199,6 @@ TEST_F(UT_GomokuMainWindow, UT_MainWindow_closeEvent)
     stub.set(ADDR(QEventLoop, exec), UTPopupExec);
     QCloseEvent event;
     m_mainwindow->closeEvent(&event);
-    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHioceann(), true)
+    EXPECT_EQ(m_mainwindow->m_transparentFrame->isHidden(), true)
             << "check mainwindow closeEvent";
 }

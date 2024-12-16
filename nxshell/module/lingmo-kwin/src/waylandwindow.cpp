@@ -269,39 +269,39 @@ void WaylandWindow::cleanGrouping()
 
 bool WaylandWindow::isShown() const
 {
-    return !isZombie() && !isHioceann() && !isMinimized();
+    return !isZombie() && !isHidden() && !isMinimized();
 }
 
-bool WaylandWindow::isHioceannInternal() const
+bool WaylandWindow::isHiddenInternal() const
 {
-    return isHioceann();
+    return isHidden();
 }
 
-bool WaylandWindow::isHioceann() const
+bool WaylandWindow::isHidden() const
 {
-    return m_isHioceann;
+    return m_isHidden;
 }
 
 void WaylandWindow::showClient()
 {
-    if (!isHioceann()) {
+    if (!isHidden()) {
         return;
     }
-    m_isHioceann = false;
+    m_isHidden = false;
     Q_EMIT windowShown(this);
 }
 
 void WaylandWindow::hideClient()
 {
-    if (isHioceann()) {
+    if (isHidden()) {
         return;
     }
     if (isInteractiveMoveResize()) {
         leaveInteractiveMoveResize();
     }
-    m_isHioceann = true;
-    workspace()->windowHioceann(this);
-    Q_EMIT windowHioceann(this);
+    m_isHidden = true;
+    workspace()->windowHidden(this);
+    Q_EMIT windowHidden(this);
 }
 
 QRectF WaylandWindow::frameRectToBufferRect(const QRectF &rect) const

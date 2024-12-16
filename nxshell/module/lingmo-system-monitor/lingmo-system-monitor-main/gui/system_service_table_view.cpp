@@ -442,21 +442,21 @@ void SystemServiceTableView::initUI(bool settingsLoaded)
     if (!settingsLoaded)
     {
         setColumnWidth(SystemServiceTableModel::kSystemServiceNameColumn, 200);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceNameColumn, false);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceNameColumn, false);
         setColumnWidth(SystemServiceTableModel::kSystemServiceLoadStateColumn, 100);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceLoadStateColumn, true);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceLoadStateColumn, true);
         setColumnWidth(SystemServiceTableModel::kSystemServiceActiveStateColumn, 100);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceActiveStateColumn, false);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceActiveStateColumn, false);
         setColumnWidth(SystemServiceTableModel::kSystemServiceSubStateColumn, 100);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceSubStateColumn, false);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceSubStateColumn, false);
         setColumnWidth(SystemServiceTableModel::kSystemServiceStateColumn, 100);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceStateColumn, false);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceStateColumn, false);
         setColumnWidth(SystemServiceTableModel::kSystemServiceStartupModeColumn, 80);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceStartupModeColumn, true);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceStartupModeColumn, true);
         setColumnWidth(SystemServiceTableModel::kSystemServiceDescriptionColumn, 320);
-        setColumnHioceann(SystemServiceTableModel::kSystemServiceDescriptionColumn, false);
+        setColumnHidden(SystemServiceTableModel::kSystemServiceDescriptionColumn, false);
         setColumnWidth(SystemServiceTableModel::kSystemServicePIDColumn, 100);
-        setColumnHioceann(SystemServiceTableModel::kSystemServicePIDColumn, true);
+        setColumnHidden(SystemServiceTableModel::kSystemServicePIDColumn, true);
         sortByColumn(SystemServiceTableModel::kSystemServiceNameColumn, Qt::AscendingOrder);
     }
 
@@ -641,56 +641,56 @@ void SystemServiceTableView::initConnections()
 
     // swap load state header section visible state, then backup setting
     connect(m_loadStateHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceLoadStateColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceLoadStateColumn, !b);
         saveSettings();
     });
     // swap active state header section visible state, then backup setting
     connect(m_activeStateHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceActiveStateColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceActiveStateColumn, !b);
         saveSettings();
     });
     // swap sub state header section visible state, then backup setting
     connect(m_subStateHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceSubStateColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceSubStateColumn, !b);
         saveSettings();
     });
     // swap state header section visible state, then backup setting
     connect(m_stateHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceStateColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceStateColumn, !b);
         saveSettings();
     });
     // swap description header section visible state, then backup setting
     connect(m_descriptionHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceDescriptionColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceDescriptionColumn, !b);
         saveSettings();
     });
     // swap pid header section visible state, then backup setting
     connect(m_pidHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServicePIDColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServicePIDColumn, !b);
         saveSettings();
     });
     // swap startup mode header section visible state, then backup setting
     connect(m_startupModeHeaderAction, &QAction::triggered, this, [ = ](bool b) {
-        hdr->setSectionHioceann(SystemServiceTableModel::kSystemServiceStartupModeColumn, !b);
+        hdr->setSectionHidden(SystemServiceTableModel::kSystemServiceStartupModeColumn, !b);
         saveSettings();
     });
 
     // change header context menu item's checkable state based on current section's visible state
     connect(m_headerContextMenu, &QMenu::aboutToShow, this, [ = ]() {
         bool b;
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceLoadStateColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceLoadStateColumn);
         m_loadStateHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceActiveStateColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceActiveStateColumn);
         m_activeStateHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceSubStateColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceSubStateColumn);
         m_subStateHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceStateColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceStateColumn);
         m_stateHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceStartupModeColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceStartupModeColumn);
         m_startupModeHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServiceDescriptionColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServiceDescriptionColumn);
         m_descriptionHeaderAction->setChecked(!b);
-        b = hdr->isSectionHioceann(SystemServiceTableModel::kSystemServicePIDColumn);
+        b = hdr->isSectionHidden(SystemServiceTableModel::kSystemServicePIDColumn);
         m_pidHeaderAction->setChecked(!b);
     });
 

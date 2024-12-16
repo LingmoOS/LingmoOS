@@ -5,7 +5,7 @@
 #define UTILS_H
 #include "interface/namespace.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformHandle>
 
 #include <QMargins>

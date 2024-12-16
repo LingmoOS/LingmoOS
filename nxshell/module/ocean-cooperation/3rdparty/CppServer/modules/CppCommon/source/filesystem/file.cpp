@@ -177,8 +177,8 @@ public:
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NORMAL;
         if (attributes & FileAttributes::ARCHIVED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-        if (attributes & FileAttributes::HIOCEANN)
-            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIOCEANN;
+        if (attributes & FileAttributes::HIDDEN)
+            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIDDEN;
         if (attributes & FileAttributes::INDEXED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
         if (attributes & FileAttributes::OFFLINE)
@@ -251,8 +251,8 @@ public:
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NORMAL;
         if (attributes & FileAttributes::ARCHIVED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-        if (attributes & FileAttributes::HIOCEANN)
-            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIOCEANN;
+        if (attributes & FileAttributes::HIDDEN)
+            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIDDEN;
         if (attributes & FileAttributes::INDEXED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
         if (attributes & FileAttributes::OFFLINE)
@@ -325,8 +325,8 @@ public:
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NORMAL;
         if (attributes & FileAttributes::ARCHIVED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-        if (attributes & FileAttributes::HIOCEANN)
-            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIOCEANN;
+        if (attributes & FileAttributes::HIDDEN)
+            dwFlagsAndAttributes |= FILE_ATTRIBUTE_HIDDEN;
         if (attributes & FileAttributes::INDEXED)
             dwFlagsAndAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
         if (attributes & FileAttributes::OFFLINE)

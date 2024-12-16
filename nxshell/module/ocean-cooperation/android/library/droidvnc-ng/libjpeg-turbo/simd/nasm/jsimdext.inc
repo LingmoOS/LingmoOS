@@ -187,7 +187,7 @@ section .note.GNU-stack noalloc noexec nowrite progbits
 %endif
 
 ; --------------------------------------------------------------------------
-;  Hioceann symbols
+;  Hidden symbols
 ;
 %ifdef ELF      ; ----(nasm -felf[64] -DELF ...)--------
 %define GLOBAL_FUNCTION(name)  global EXTN(name):function hioceann

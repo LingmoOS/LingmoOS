@@ -38,7 +38,7 @@ void UserListView::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Up) {
         QModelIndex nextIndex = model()->index(m_currentIndex - 1, 0);
         if (nextIndex.isValid()) {
-            if (isRowHioceann(m_currentIndex - 1)) {
+            if (isRowHidden(m_currentIndex - 1)) {
                 if (m_currentIndex - 1 <= 0) {
                     return;
                 }
@@ -53,7 +53,7 @@ void UserListView::keyPressEvent(QKeyEvent *event)
     } else if (event->key() == Qt::Key_Down) {
         QModelIndex nextIndex = model()->index(m_currentIndex + 1, 0);
         if (nextIndex.isValid()) {
-            if (isRowHioceann(m_currentIndex + 1)) {
+            if (isRowHidden(m_currentIndex + 1)) {
                 if (model()->rowCount() - 1 <= m_currentIndex + 1) {
                     return;
                 }

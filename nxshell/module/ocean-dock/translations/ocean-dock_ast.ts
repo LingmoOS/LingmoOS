@@ -277,7 +277,7 @@
         <translation>Caltener amosáu</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Caltener anubríu</translation>
     </message>
     <message>

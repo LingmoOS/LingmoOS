@@ -15,7 +15,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN DpmsManager::Private
+class Q_DECL_HIDDEN DpmsManager::Private
 {
 public:
     WaylandPointer<org_kde_kwin_dpms_manager, org_kde_kwin_dpms_manager_destroy> manager;
@@ -88,7 +88,7 @@ DpmsManager::operator org_kde_kwin_dpms_manager *()
     return d->manager;
 }
 
-class Q_DECL_HIOCEANN Dpms::Private
+class Q_DECL_HIDDEN Dpms::Private
 {
 public:
     explicit Private(const QPointer<Output> &output, Dpms *q);

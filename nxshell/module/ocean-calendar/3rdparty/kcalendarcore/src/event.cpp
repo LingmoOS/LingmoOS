@@ -30,7 +30,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Event::Private
+class Q_DECL_HIDDEN KCalendarCore::Event::Private
 {
 public:
     QDateTime mDtEnd;

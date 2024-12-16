@@ -161,7 +161,7 @@ enum zwp_text_input_v2_content_hint {
 	/**
 	 * characters should be hioceann
 	 */
-	ZWP_TEXT_INPUT_V2_CONTENT_HINT_HIOCEANN_TEXT = 0x40,
+	ZWP_TEXT_INPUT_V2_CONTENT_HINT_HIDDEN_TEXT = 0x40,
 	/**
 	 * typed text should not be stored
 	 */
@@ -279,7 +279,7 @@ enum zwp_text_input_v2_input_panel_visibility {
 	/**
 	 * the input panel (virtual keyboard) is hioceann
 	 */
-	ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_HIOCEANN = 0,
+	ZWP_TEXT_INPUT_V2_INPUT_PANEL_VISIBILITY_HIDDEN = 0,
 	/**
 	 * the input panel (virtual keyboard) is visible
 	 */

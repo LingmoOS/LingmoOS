@@ -89,7 +89,7 @@ public:
         Atom_NET_WM_STATE_MODAL,
         Atom_NET_WM_STATE_STAYS_ON_TOP,
         Atom_NET_WM_STATE_DEMANDS_ATTENTION,
-        Atom_NET_WM_STATE_HIOCEANN,
+        Atom_NET_WM_STATE_HIDDEN,
 
         Atom_NET_WM_USER_TIME,
         Atom_NET_WM_USER_TIME_WINDOW,

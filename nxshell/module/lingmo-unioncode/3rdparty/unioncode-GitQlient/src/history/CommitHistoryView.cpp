@@ -159,12 +159,12 @@ void CommitHistoryView::onHeaderContextMenu(const QPoint &pos)
    {
       const auto columnName = model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
       const auto action = menu->addAction(columnName);
-      const auto isHioceann = isColumnHioceann(column);
+      const auto isHidden = isColumnHidden(column);
       action->setCheckable(true);
-      action->setChecked(!isHioceann);
+      action->setChecked(!isHidden);
       connect(action, &QAction::triggered, this, [column, this, action]() {
          action->setChecked(!action->isChecked());
-         setColumnHioceann(column, !isColumnHioceann(column));
+         setColumnHidden(column, !isColumnHidden(column));
       });
    }
 

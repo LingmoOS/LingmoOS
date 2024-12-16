@@ -3,7 +3,7 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 #ifndef UTILS_H
 #define UTILS_H
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformHandle>
 
 #include <QMargins>
@@ -31,15 +31,15 @@ inline constexpr qint32 ActionIconSize=30;//大图标角标大小
 inline constexpr qint32 ActionListSize=26;//list图标角标大小
 
 
-const DSysInfo::UosType UosType = DSysInfo::uosType();
-const DSysInfo::UosEdition UosEdition = DSysInfo::uosEditionType();
-const bool IsServerSystem = (DSysInfo::UosServer == UosType);//是否是服务器版
-const bool IsCommunitySystem = (DSysInfo::UosCommunity == UosEdition);//是否是社区版
-const bool IsProfessionalSystem = (DSysInfo::UosProfessional == UosEdition);//是否是专业版
-const bool IsHomeSystem = (DSysInfo::UosHome == UosEdition);//是否是个人版
-const bool IsEducationSystem = (DSysInfo::UosEducation == UosEdition); // 是否是教育版
-const bool IsLingmoDesktop = (DSysInfo::LingmoDesktop == DSysInfo::lingmoType());//是否是Lingmo桌面
-const bool IsNotLingmoUos = !DSysInfo::isLingmo(); // 是否是 Lingmo/Uos 以外的发行版
+const LSysInfo::UosType UosType = LSysInfo::uosType();
+const LSysInfo::UosEdition UosEdition = LSysInfo::uosEditionType();
+const bool IsServerSystem = (LSysInfo::UosServer == UosType);//是否是服务器版
+const bool IsCommunitySystem = (LSysInfo::UosCommunity == UosEdition);//是否是社区版
+const bool IsProfessionalSystem = (LSysInfo::UosProfessional == UosEdition);//是否是专业版
+const bool IsHomeSystem = (LSysInfo::UosHome == UosEdition);//是否是个人版
+const bool IsEducationSystem = (LSysInfo::UosEducation == UosEdition); // 是否是教育版
+const bool IsLingmoDesktop = (LSysInfo::LingmoDesktop == LSysInfo::lingmoType());//是否是Lingmo桌面
+const bool IsNotLingmoUos = !LSysInfo::isLingmo(); // 是否是 Lingmo/Uos 以外的发行版
 
 
 template <typename T>

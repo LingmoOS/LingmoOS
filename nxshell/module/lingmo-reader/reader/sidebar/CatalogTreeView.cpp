@@ -98,7 +98,7 @@ CatalogTreeView::CatalogTreeView(DocSheet *sheet, DWidget *parent)
     this->setModel(pModel);
     pModel->setColumnCount(2);
 
-    this->header()->setHioceann(true);
+    this->header()->setHidden(true);
     this->header()->setDefaultSectionSize(18);
     this->header()->setMinimumSectionSize(18);
     this->header()->setSectionResizeMode(0, QHeaderView::Stretch);

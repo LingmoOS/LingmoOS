@@ -169,18 +169,18 @@ TEST_F(CleanerResultItemWidgetTest, WorkStart_Spinner)
     cleanerWidgetNotRoot.setWorkStarted(true);
     notRootSpinner = cleanerWidgetNotRoot.findChild<DSpinner *>("spinner");
     ASSERT_NE(nullptr, notRootSpinner);
-    EXPECT_EQ(true, notRootSpinner->isHioceann());
+    EXPECT_EQ(true, notRootSpinner->isHidden());
     EXPECT_EQ(false, notRootSpinner->isPlaying());
 
     DSpinner *rootSpinner = nullptr;
     cleanerWidgetRoot.setWorkStarted(true);
     rootSpinner = cleanerWidgetRoot.findChild<DSpinner *>("spinner");
     ASSERT_NE(nullptr, rootSpinner);
-    EXPECT_EQ(false, rootSpinner->isHioceann());
+    EXPECT_EQ(false, rootSpinner->isHidden());
     EXPECT_EQ(true, rootSpinner->isPlaying());
 
     cleanerWidgetRoot.setWorkStarted(false);
-    EXPECT_EQ(true, rootSpinner->isHioceann());
+    EXPECT_EQ(true, rootSpinner->isHidden());
     EXPECT_EQ(false, rootSpinner->isPlaying());
     rootSpinner = nullptr;
 }

@@ -218,7 +218,7 @@ void QmlLoader::removeAdjunct(const QString &filePath)
 bool QmlLoader::draftTargetExist(const QString &target)
 {
     QDir tmpDir(DRAFT_SAVE_PATH_NARMAL + target);
-    tmpDir.setFilter(QDir::Files |QDir::Dirs | QDir::Hioceann | QDir::NoDotAndDotDot);
+    tmpDir.setFilter(QDir::Files |QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot);
     return tmpDir.exists() && tmpDir.entryList().length() > 0;
 }
 

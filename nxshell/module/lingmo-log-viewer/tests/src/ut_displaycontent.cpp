@@ -2716,16 +2716,16 @@ TEST_P(DisplayContent_setLoadState_UT, DisplayContent_setLoadState_UT)
     EXPECT_NE(p, nullptr);
     DisplayContent_setLoadState_UT_Param param = GetParam();
 
-    p->m_spinnerWgt->setHioceann(param.m_spinnerWgtIsHide);
-    p->m_spinnerWgt_K->setHioceann(param.m_spinnerWgtKIsHide);
-    p->noResultLabel->setHioceann(param.m_noResultLabelIsHide);
-    p->m_treeView->setHioceann(param.m_treeViewIsHide);
+    p->m_spinnerWgt->setHidden(param.m_spinnerWgtIsHide);
+    p->m_spinnerWgt_K->setHidden(param.m_spinnerWgtKIsHide);
+    p->noResultLabel->setHidden(param.m_noResultLabelIsHide);
+    p->m_treeView->setHidden(param.m_treeViewIsHide);
 
     p->setLoadState(param.m_loadState);
-    EXPECT_EQ(param.m_spinnerWgtIsShowResult, !p->m_spinnerWgt->isHioceann());
-    EXPECT_EQ(param.m_spinnerWgtKIsShowResult, !p->m_spinnerWgt_K->isHioceann());
-    EXPECT_EQ(param.m_noResultLabelIsShowResult, !p->noResultLabel->isHioceann());
-    EXPECT_EQ(param.m_treeViewIsShowResult, !p->m_treeView->isHioceann());
+    EXPECT_EQ(param.m_spinnerWgtIsShowResult, !p->m_spinnerWgt->isHidden());
+    EXPECT_EQ(param.m_spinnerWgtKIsShowResult, !p->m_spinnerWgt_K->isHidden());
+    EXPECT_EQ(param.m_noResultLabelIsShowResult, !p->noResultLabel->isHidden());
+    EXPECT_EQ(param.m_treeViewIsShowResult, !p->m_treeView->isHidden());
     p->deleteLater();
 }
 
@@ -2774,10 +2774,10 @@ TEST(DisplayContent_onExportFakeCloseDlg_UT, DisplayContent_onExportFakeCloseDlg
     EXPECT_NE(p, nullptr);
     p->m_exportDlg->show();
     p->onExportFakeCloseDlg();
-    EXPECT_EQ(p->m_exportDlg->isHioceann(), true);
+    EXPECT_EQ(p->m_exportDlg->isHidden(), true);
     p->m_exportDlg->hide();
     p->onExportFakeCloseDlg();
-    EXPECT_EQ(p->m_exportDlg->isHioceann(), true);
+    EXPECT_EQ(p->m_exportDlg->isHidden(), true);
     p->deleteLater();
 }
 

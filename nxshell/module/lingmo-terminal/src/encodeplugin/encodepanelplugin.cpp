@@ -92,7 +92,7 @@ void EncodePanelPlugin::initEncodePanel()
         TermWidget *pterm = m_mainWindow->currentActivatedTerminal();
         // 列表显示时，切换了当前终端
         // 判断是否是当前页的term
-        if (!m_encodePanel->isHioceann() && pterm == term) {
+        if (!m_encodePanel->isHidden() && pterm == term) {
             TermWidget *curterm = qobject_cast<TermWidget *>(term);
             setCurrentTermEncode(curterm);
         }

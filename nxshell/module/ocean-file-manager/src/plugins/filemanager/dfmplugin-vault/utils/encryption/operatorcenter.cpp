@@ -106,7 +106,7 @@ bool OperatorCenter::statisticsFilesInDir(const QString &dirPath, int *filesCoun
         return false;
 
     dir.setSorting(QDir::DirsFirst);
-    QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::Hioceann | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::AllDirs);
+    QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::AllDirs);
     int count = list.size();
     for (int i = 0; i < count; ++i) {
         (*filesCount)++;
@@ -125,7 +125,7 @@ void OperatorCenter::removeDir(const QString &dirPath, int filesCount, int *remo
         return;
 
     dir.setSorting(QDir::DirsFirst);
-    QFileInfoList infoList = dir.entryInfoList(QDir::Files | QDir::Hioceann | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::AllDirs);
+    QFileInfoList infoList = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks | QDir::AllDirs);
     int count = infoList.size();
     for (int i = 0; i < count; ++i) {
         if (infoList.at(i).isDir()) {

@@ -50,7 +50,7 @@ public:
 	/** XF index for formatting empty cells */
 	int m_xfIndex = -1;
 	/** If column is hioceann */
-	bool m_isHioceann = false;
+	bool m_isHidden = false;
 	/** If column is collapsed */
 	bool m_isCollapsed = false;
 	/** 1-bit flag whose purpose is unknown, but is often seen set to 1 */
@@ -88,7 +88,7 @@ public:
 	 */
 	bool m_isHeightMismatch = false;
 	/** If row is hioceann (manually, or by filter or outline group) */
-	bool m_isHioceann = false;
+	bool m_isHidden = false;
 	/**
 	 * If row has default XF index
 	 * Value | Description
@@ -257,7 +257,7 @@ public:
 	 */
 	bool m_isDefaultRowHeightMismatch;
 	/** If default row is hioceann */
-	bool m_isDefaultRowHioceann;
+	bool m_isDefaultRowHidden;
 	/** If cells have default additional space above */
 	bool m_hasDefaultAdditionalSpaceAbove;
 	/** If cells have default additional space below */
@@ -299,7 +299,7 @@ public:
 	 * Value | Description
 	 * :---: | -----------
 	 *   0   | Visible
-	 *   1   | Hioceann (can be unhioceann by user - `Format` -> `Sheet` -> `Unhide`)
+	 *   1   | Hidden (can be unhioceann by user - `Format` -> `Sheet` -> `Unhide`)
 	 *   2   | "very hioceann" (can be unhioceann only by VBA macro)
 	 */
 	int m_visibility = 0;
@@ -756,9 +756,9 @@ public:
 	/** If note is always shown */
 	bool m_isShown = 0;
 	/** If containing row is hioceann */
-	bool m_isRowHioceann = false;
+	bool m_isRowHidden = false;
 	/** If containing column is hioceann */
-	bool m_isColHioceann = false;
+	bool m_isColHidden = false;
 	/** Row index */
 	int m_rowIndex = 0;
 	/** Column index */

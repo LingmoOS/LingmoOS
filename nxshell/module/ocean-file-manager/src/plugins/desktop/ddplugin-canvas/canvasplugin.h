@@ -88,15 +88,15 @@ private:
     DPF_EVENT_REG_SLOT(slot_CanvasGrid_TryAppendAfter)
 
     // CanvasModel begin
-    DPF_EVENT_REG_SIGNAL(signal_CanvasModel_HioceannFlagChanged)
+    DPF_EVENT_REG_SIGNAL(signal_CanvasModel_HiddenFlagChanged)
 
     DPF_EVENT_REG_SLOT(slot_CanvasModel_RootUrl)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_UrlIndex)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_Index)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_FileUrl)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_Files)
-    DPF_EVENT_REG_SLOT(slot_CanvasModel_ShowHioceannFiles)
-    DPF_EVENT_REG_SLOT(slot_CanvasModel_SetShowHioceannFiles)
+    DPF_EVENT_REG_SLOT(slot_CanvasModel_ShowHiddenFiles)
+    DPF_EVENT_REG_SLOT(slot_CanvasModel_SetShowHiddenFiles)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_SortOrder)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_SetSortOrder)
     DPF_EVENT_REG_SLOT(slot_CanvasModel_SortRole)

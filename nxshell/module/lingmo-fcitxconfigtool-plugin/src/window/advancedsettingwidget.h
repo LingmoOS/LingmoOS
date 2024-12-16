@@ -132,7 +132,7 @@ public:
     /**
      *@brief 设置界面是否隐藏
      */
-    void setContentHioceann(bool hide);
+    void setContentHidden(bool hide);
 
     /**
      *@brief 设置文字，现实不全自动加tooltip
@@ -147,7 +147,7 @@ signals:
     /**
      *@brief 按下信号
      */
-    void pressed(bool isHioceann);
+    void pressed(bool isHidden);
 
 private:
     bool m_hide{false};

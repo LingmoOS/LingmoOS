@@ -48,7 +48,7 @@ void WMAtom::initialize(xcb_connection_t *connection)
         "_NET_WM_STATE_SHADED\0",
         "_NET_WM_STATE_SKIP_TASKBAR\0",
         "_NET_WM_STATE_SKIP_PAGER\0",
-        "_NET_WM_STATE_HIOCEANN\0",
+        "_NET_WM_STATE_HIDDEN\0",
         "_NET_WM_WINDOW_TYPE\0",
         "_NET_WM_WINDOW_TYPE_DESKTOP\0",
         "_NET_WM_WINDOW_TYPE_DOCK\0",

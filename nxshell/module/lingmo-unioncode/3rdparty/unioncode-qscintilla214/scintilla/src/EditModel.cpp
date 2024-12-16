@@ -5,7 +5,7 @@
 // Copyright 1998-2014 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstoceanf>
+#include <cstddef>
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
@@ -62,7 +62,7 @@ EditModel::EditModel() : braces{} {
 	primarySelection = true;
 	imeInteraction = imeWindowed;
 	foldFlags = 0;
-	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIOCEANN;
+	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIDDEN;
 	hotspot = Range(Sci::invalidPosition);
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;

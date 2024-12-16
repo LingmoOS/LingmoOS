@@ -66,7 +66,7 @@ enum NetItemType {
     DeviceControllViewItem = 0, // 总控开关
     WirelessControllViewItem,   // 无线网卡开关
     WirelessViewItem,           // 无线列表
-    WirelessHioceannViewItem,     // 无线隐藏列表
+    WirelessHiddenViewItem,     // 无线隐藏列表
     WiredControllViewItem,      // 有线网卡开关
     WiredViewItem               // 有线列表
 };
@@ -221,7 +221,7 @@ private Q_SLOTS:
     void onConnection();
     void onConnectNetwork();
     void onInputPassword(const QString oldPassword);
-    void onConnectHioceann();
+    void onConnectHidden();
     void checkInputValid();
     void onApConnectionStatusChanged(ConnectionStatus);
 

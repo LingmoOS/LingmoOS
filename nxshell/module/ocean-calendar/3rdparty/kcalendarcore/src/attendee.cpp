@@ -31,7 +31,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Attendee::Private : public QSharedData
+class Q_DECL_HIDDEN KCalendarCore::Attendee::Private : public QSharedData
 {
 public:
     void setCuType(CuType cuType);

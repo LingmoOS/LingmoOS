@@ -38,7 +38,7 @@ enum class FileAttributes
     NONE      = 0x00,   //!< None
     NORMAL    = 0x01,   //!< Normal
     ARCHIVED  = 0x02,   //!< Archived
-    HIOCEANN    = 0x04,   //!< Hioceann
+    HIDDEN    = 0x04,   //!< Hidden
     INDEXED   = 0x08,   //!< Indexed
     OFFLINE   = 0x10,   //!< Offline
     READONLY  = 0x20,   //!< Readonly

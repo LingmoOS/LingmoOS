@@ -8,7 +8,7 @@
 PhotoSlide::PhotoSlide(QWidget *parent)
     : ModuleInterface(parent)
 {
-    DSysInfo::UosEdition imageType = DSysInfo::uosEditionType();
+    LSysInfo::UosEdition imageType = LSysInfo::uosEditionType();
     initSetImage(imageType);
 
     m_selectBtn->hide();
@@ -43,9 +43,9 @@ PhotoSlide::PhotoSlide(QWidget *parent)
     updateBigIcon();
 }
 
-void PhotoSlide::initSetImage(DSysInfo::UosEdition imageType) {
-    if (imageType == DSysInfo::UosEdition::UosProfessional ||
-            imageType == DSysInfo::UosEdition::UosCommunity) {
+void PhotoSlide::initSetImage(LSysInfo::UosEdition imageType) {
+    if (imageType == LSysInfo::UosEdition::UosProfessional ||
+            imageType == LSysInfo::UosEdition::UosCommunity) {
         m_strPhotoPath = QString(UOSPROFESSIONAL_PHOTO_PATH);
         m_iHpotoTotal  = UOSPROFESSIONAL_PHOTO_TOTAL;
         #if 0
@@ -58,8 +58,8 @@ void PhotoSlide::initSetImage(DSysInfo::UosEdition imageType) {
             m_iHpotoTotal  = UOSPROFESSIONAL_PHOTO_TOTAL;
         #endif
         #endif
-    } else if (imageType == DSysInfo::UosEdition::UosEnterprise ||
-               imageType == DSysInfo::UosEdition::UosEnterpriseC ) {
+    } else if (imageType == LSysInfo::UosEdition::UosEnterprise ||
+               imageType == LSysInfo::UosEdition::UosEnterpriseC ) {
         #if defined (ISLOONGARCH64)
             //龙芯5000服务器企业版 misp架构对应6张轮播图
             m_strPhotoPath = QString(UOSENTERPRISE_LOONGARCH5000_PHOTO_PATH);
@@ -69,7 +69,7 @@ void PhotoSlide::initSetImage(DSysInfo::UosEdition imageType) {
         m_strPhotoPath = QString(UOSENTERPRISE_PHOTO_PATH);
         m_iHpotoTotal  = UOSENTERPRISE_PHOTO_TOTAL;
         #endif
-    } else if (imageType == DSysInfo::UosEdition::UosEuler) {
+    } else if (imageType == LSysInfo::UosEdition::UosEuler) {
         //欧拉版,轮播图8张
         m_strPhotoPath = QString(UOSEULER_PHOTO_PATH);
         m_iHpotoTotal  = UOSEULER_PHOTO_TOTAL;

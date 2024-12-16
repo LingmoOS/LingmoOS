@@ -277,7 +277,7 @@
         <translation>Үргэлж харах</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Үргэлж нуух</translation>
     </message>
     <message>

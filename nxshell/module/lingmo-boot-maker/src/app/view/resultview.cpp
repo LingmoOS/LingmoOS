@@ -23,7 +23,7 @@
 #include <QProcess>
 #include <QDesktopServices>
 #include <QFontDatabase>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QDBusInterface>
 #include <QDBusAbstractInterface>
 #include <QDBusError>
@@ -148,7 +148,7 @@ void ResultView::updateResult(quint32 error, const QString &/*title*/, const QSt
         return;
     case BMHandler::SyscExecFailed:
     case BMHandler::ErrorType::InstallBootloaderFailed:
-        if (DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() != DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosProfessional) {
+        if (DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() != DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosProfessional) {
             m_logHits->setText(tr("The error log will be uploaded automatically with the feedback. We cannot improve without your feedback"));
             m_rebootLater->setText(tr("Submit Feedback"));
             m_logHits->adjustSize();
@@ -156,14 +156,14 @@ void ResultView::updateResult(quint32 error, const QString &/*title*/, const QSt
             connect(m_rebootLater, &DPushButton::clicked,
             this, [ = ]() {
                 // FIXME: call feedback 非专业版保持链接进社区
-                if (DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosCommunity) {
+                if (DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosCommunity) {
                     QDesktopServices::openUrl(QString("https://bbs.lingmo.org/post/209286"));
                 }
-                else if(DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosHome) {
+                else if(DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosHome) {
                     QDesktopServices::openUrl(QString("https://bbs.chinauos.com/post/4838?id=4838&type_id=5&forum_name=%E6%A1%8C%E9%9D%A2%E4%B8%AA%E4%BA%BA%E7%89%88"));
                 }
-                else if((DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosEnterprise) ||
-                (DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::DSysInfo::UosEnterprise))
+                else if((DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosEnterprise) ||
+                (DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::uosEditionType() == DTK_NAMESPACE::DCORE_NAMESPACE::LSysInfo::UosEnterprise))
                 {
                     QDesktopServices::openUrl(QString("https://bbs.chinauos.com/zh/post/5609"));
                 }

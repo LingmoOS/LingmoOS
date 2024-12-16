@@ -132,7 +132,7 @@
                 },
                 {
                     "key": "hioceann_files",
-                    "name": "Hioceann files",
+                    "name": "Hidden files",
                     "options": [
                         {
                             "key": "show_hioceann",

@@ -940,7 +940,7 @@ void LingmoWMFaker::CancelPreviewWindow()
         if (m_previewWinMiniPair.second) {
 //            m_windowSystem->minimizeWindow(m_previewWinMiniPair.first);
             // using this way to minimize a window without animation
-            m_windowSystem->setState(m_previewWinMiniPair.first, NET::Hioceann);
+            m_windowSystem->setState(m_previewWinMiniPair.first, NET::Hidden);
             return;
         }
         m_windowSystem->lowerWindow(m_previewWinMiniPair.first);

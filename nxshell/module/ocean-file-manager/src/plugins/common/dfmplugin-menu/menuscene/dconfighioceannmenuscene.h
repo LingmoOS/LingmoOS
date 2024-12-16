@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef DCONFIGHIOCEANNMENUSCENE_H
-#define DCONFIGHIOCEANNMENUSCENE_H
+#ifndef DCONFIGHIDDENMENUSCENE_H
+#define DCONFIGHIDDENMENUSCENE_H
 
 #include "dfmplugin_menu_global.h"
 
@@ -12,7 +12,7 @@
 
 DPMENU_BEGIN_NAMESPACE
 
-class DConfigHioceannMenuCreator : public DFMBASE_NAMESPACE::AbstractSceneCreator
+class DConfigHiddenMenuCreator : public DFMBASE_NAMESPACE::AbstractSceneCreator
 {
 public:
     static QString name()
@@ -22,11 +22,11 @@ public:
     DFMBASE_NAMESPACE::AbstractMenuScene *create() override;
 };
 
-class DConfigHioceannMenuScene : public DFMBASE_NAMESPACE::AbstractMenuScene
+class DConfigHiddenMenuScene : public DFMBASE_NAMESPACE::AbstractMenuScene
 {
     Q_OBJECT
 public:
-    explicit DConfigHioceannMenuScene(QObject *parent = nullptr);
+    explicit DConfigHiddenMenuScene(QObject *parent = nullptr);
 
     virtual QString name() const override;
     bool initialize(const QVariantHash &params) override;
@@ -34,9 +34,9 @@ public:
 
 private:
     void disableScene();
-    void updateActionHioceann(QMenu *parent);
+    void updateActionHidden(QMenu *parent);
 };
 
 DPMENU_END_NAMESPACE
 
-#endif   // DCONFIGHIOCEANNMENUSCENE_H
+#endif   // DCONFIGHIDDENMENUSCENE_H

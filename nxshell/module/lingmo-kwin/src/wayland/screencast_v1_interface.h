@@ -49,7 +49,7 @@ public:
     virtual ~ScreencastV1Interface();
 
     enum CursorMode {
-        Hioceann = 1,
+        Hidden = 1,
         Embeoceand = 2,
         Metadata = 4,
     };

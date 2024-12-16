@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="treeland_ocean_shell_v1">
+    <copyright><![CDATA[
+    SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+    SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+    ]]></copyright>
+    <interface name="treeland_ocean_shell_manager_v1" version="1">
+        <description summary="ocean shell manager">
+            This interface allows OCEAN change some treeland function.
+
+            Warning! The protocol described in this file is currently in the testing
+            phase. Backward compatible changes may be aoceand together with the
+            corresponding interface version bump. Backward incompatible changes can
+            only be done by creating a new major version of the extension.
+        </description>
+        <request name="get_window_overlap_checker">
+            <arg name="id" type="new_id" interface="treeland_window_overlap_checker" />
+        </request>
+
+        <request name="get_shell_surface" since="1">
+            <description summary="create a shell surface from a surface">
+                Create a shell surface for an existing wl_surface.
+
+                Only one shell surface can be associated with a given surface.
+
+                Recommended for use with xdg_surface.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_ocean_shell_surface_v1"/>
+            <arg name="surface" type="object" interface="wl_surface"/>
+        </request>
+
+        <request name="get_treeland_ocean_active" since="1">
+            <description summary="create a new ocean active">
+                Create a new ocean active for a given seat.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_ocean_active_v1"/>
+            <arg name="seat" type="object" interface="wl_seat" summary="seat associated with the ocean_active"/>
+        </request>
+
+        <request name="get_treeland_multitaskview" since="1">
+            <description summary="create a new multitaskview context">
+                Create a new multitaskview context for toggle.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_multitaskview_v1"/>
+        </request>
+
+        <request name="get_treeland_window_picker" since="1">
+            <description summary="create a new window picker">
+                Create a new window picker to pick window.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_window_picker_v1"/>
+        </request>
+
+        <request name="get_treeland_lockscreen" since="1">
+            <description summary="create a new lockscreen context">
+                Create a new lockscreen context for toggle.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_lockscreen_v1"/>
+        </request>
+
+    </interface>
+
+    <interface name="treeland_window_overlap_checker" version="1">
+        <description summary="An opened toplevel">
+            A treeland_ocean_shell_handle_v1 object represents an opened toplevel window. Each
+            app may have multiple opened toplevels.
+
+            Warning! The protocol described in this file is currently in the testing
+            phase. Backward compatible changes may be aoceand together with the
+            corresponding interface version bump. Backward incompatible changes can
+            only be done by creating a new major version of the extension.
+        </description>
+
+        <event name="enter">
+            <description summary="Window has overlapped">
+                This event is sent when windows overlapped.
+                This event is sent only once.
+            </description>
+        </event>
+
+        <event name="leave">
+            <description summary="Window not has overlapped">
+                This event is sent when windows not overlapped.
+                This event is sent only once.
+            </description>
+        </event>
+
+        <enum name="anchor" bitfield="true">
+            <description summary="same layershell">
+                same layershell
+            </description>
+            <entry name="top" value="1" summary="the top edge of the anchor rectangle" />
+            <entry name="bottom" value="2" summary="the bottom edge of the anchor rectangle" />
+            <entry name="left" value="4" summary="the left edge of the anchor rectangle" />
+            <entry name="right" value="8" summary="the right edge of the anchor rectangle" />
+        </enum>
+
+        <request name="update">
+            <description summary="Register the detected surface">
+                This interface is used to receive the detected surface.
+                When the xdgshell window in the workspace overlaps with the detected window,
+                an event will be sent to notify the client to process it.
+                The window position will only be recorded when this interface is called.
+                If the window moves, this interface needs to be called again.
+            </description>
+            <arg name="width" type="int" />
+            <arg name="height" type="int" />
+            <arg name="anchor" type="uint" enum="anchor" />
+            <arg name="output" type="object" interface="wl_output" allow-null="false" />
+        </request>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the treeland_window_overlap_checker object">
+                Destroys the treeland_window_overlap_checker object.
+
+                This request should be called either when the client does not want to
+                use the toplevel anymore or after the closed event to finalize the
+                destruction of the object.
+            </description>
+        </request>
+    </interface>
+
+    <interface name="treeland_ocean_shell_surface_v1" version="1">
+        <description summary="metadata interface">
+            An interface that may be implemented by a wl_surface, for
+            implementations that provide the shell user interface.
+
+            It provides requests to set surface role, set skip, set the position
+            set auto placement in output coordinates.
+
+            On the server side the object is automatically destroyed when
+            the related wl_surface is destroyed.  On client side,
+            treeland_ocean_shell_surface_v1.destroy() must be called before
+            destroying the wl_surface object.
+        </description>
+
+        <request name="destroy" type="destructor" since="1">
+            <description summary="destroy the treeland_ocean_shell_surface_v1 object">
+                The treeland_ocean_shell_surface_v1 interface is removed from the
+                wl_surface object that was turned into a shell surface with the
+                treeland_shell_v1.get_treeland_ocean_shell_surface request.
+
+                The shell surface role is lost and wl_surface is unmapped.
+            </description>
+        </request>
+
+        <request name="set_surface_position" since="1">
+            <description summary="change the shell surface position">
+                Move the surface to new coordinates.
+
+                Coordinates are global, for example 50,50 for a 1920,0+1920x1080 output
+                is 1970,50 in global coordinates space.
+            </description>
+            <arg name="x" type="int" summary="x coordinate in global space"/>
+            <arg name="y" type="int" summary="y coordinate in global space"/>
+        </request>
+
+        <enum name="role">
+            <description summary="available roles for surfaces">
+                These values indicate which roles a surface can be rendered in, They
+                are ordered by z depth.
+
+                Displayed below wlr-layer-shell, at the overlay level of the workspace.
+
+                Multiple surfaces can share a single role, and ordering within a single
+                role is undefined.
+            </description>
+            <entry name="overlay" value="1" since="1"/>
+        </enum>
+
+        <request name="set_role" since="1">
+            <description summary="assign a role to this surface">
+                Assign a role to a shell surface.
+            </description>
+            <arg name="role" type="uint" enum="treeland_ocean_shell_surface_v1.role"/>
+        </request>
+
+        <request name="set_auto_placement" since="1">
+            <description summary="Place the surface at the bottom of the cursor area">
+                Set the vertical alignment of the surface within the cursor width.
+
+                Do not use it together with set_surface_position to avoid exceptions.
+
+                The position of the surface will be controlled by the compositor after the
+                request, including preventing it from being displayed beyond the edge of
+                the output.
+            </description>
+            <arg name="y_offset" type="uint" summary="y position is relative to the cursor bottom"/>
+        </request>
+
+        <request name="set_skip_switcher" since="1">
+            <description summary="make the window not appear in a switcher">
+                Setting this bit will indicate that the window prefers not to be listed in a switcher.
+            </description>
+            <arg name="skip" type="uint" summary="Boolean value that sets whether to skip the window switcher."/>
+        </request>
+
+        <request name="set_skip_dock_preview" since="1">
+            <description summary="make the window not appear in a dock preview">
+                Setting this bit will indicate that the window prefers not to be listed in a dock preview.
+            </description>
+            <arg name="skip" type="uint" summary="Boolean value that sets whether to skip the dock preview."/>
+        </request>
+
+        <request name="set_skip_muti_task_view" since="1">
+            <description summary="make the window not appear in a mutitask view">
+                Setting this bit will indicate that the window prefers not to be listed in a mutitask view.
+            </description>
+            <arg name="skip" type="uint" summary="Boolean value that sets whether to skip the mutitask view."/>
+        </request>
+
+        <request name="set_accept_keyboard_focus" since="1">
+            <description summary="control whether the surface accepts keyboard focus">
+                Setting this will determine whether the surface can receive keyboard focus.
+                When set to 0, the surface will not receive keyboard focus even when clicked or activated.
+                When set to 1 (default), the surface will receive keyboard focus normally.
+            </description>
+            <arg name="accept" type="uint" summary="Boolean value that sets whether to accept keyboard focus"/>
+        </request>
+    </interface>
+
+    <interface name="treeland_ocean_active_v1" version="1">
+        <description summary="metadata interface">
+            An interface used to monitor special events.
+        </description>
+
+        <request name="destroy" type="destructor" since="1">
+            <description summary="destroy the treeland_ocean_active_v1 object">
+            </description>
+        </request>
+
+        <enum name="reason">
+            <description summary="event reason"/>
+            <entry name="mouse" value="0" since="1"/>
+            <entry name="wheel" value="1" since="1"/>
+        </enum>
+
+        <event name="active_in" since="1">
+            <description summary="activeIn event"/>
+        <arg name="reason" type="uint" enum="treeland_ocean_active_v1.reason"/>
+        </event>
+
+        <event name="active_out" since="1">
+            <description summary="activeOut event"/>
+        <arg name="reason" type="uint" enum="treeland_ocean_active_v1.reason"/>
+        </event>
+
+        <event name="start_drag" since="1">
+            <description summary="sent when the compositor starts a drag operation"/>
+        </event>
+
+        <event name="drop" since="1">
+            <description summary="sent when the compositor drop operation"/>
+        </event>
+    </interface>
+
+    <interface name="treeland_multitaskview_v1" version="1">
+        <description summary="multitaskview context interface">
+            An interface used to control multitaskview.
+        </description>
+
+        <request name="destroy" type="destructor" since="1">
+            <description summary="destroy the treeland_multitaskview_v1 object">
+            </description>
+        </request>
+
+        <request name="toggle" since="1">
+            <description summary="toggle multitaskview">
+                Show or hide the multitaskview.
+            </description>
+        </request>
+    </interface>
+
+    <interface name="treeland_window_picker_v1" version="1">
+        <description summary="window picker interface">
+            An interface used to pick window and return credentials.
+        </description>
+
+        <request name="destroy" type="destructor" since="1">
+            <description summary="destroy the treeland_window_picker_v1 object">
+            </description>
+        </request>
+
+        <request name="pick" since="1">
+            <description summary="pick a window">
+                Pick a window to get information.
+            </description>
+            <arg name="hint" type="string" summary="Hint of pick process"/>
+        </request>
+
+        <event name="window" since="1">
+            <description summary="window picked">
+                Picked window information.
+            </description>
+            <arg name="pid" type="int" summary="Pid of picked window"/>
+        </event>
+    </interface>
+
+    <interface name="treeland_lockscreen_v1" version="1">
+        <description summary="lockscreen interface">
+            An interface used to operate lockscreen.
+        </description>
+
+        <request name="destroy" type="destructor" since="1">
+            <description summary="destroy the treeland_lockscreen_v1 object">
+            </description>
+        </request>
+
+        <request name="lock" since="1">
+            <description summary="lock screen">
+                Lock the screen.
+            </description>
+        </request>
+
+        <request name="shutdown" since="1">
+            <description summary="show shutdown">
+                Show shutdown.
+            </description>
+        </request>
+
+        <request name="switch_user" since="1">
+            <description summary="switch user">
+                Switch user.
+            </description>
+        </request>
+    </interface>
+</protocol>

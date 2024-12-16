@@ -197,13 +197,13 @@ TEST_F(UT_Debinstaller, UT_Debinstaller_slotSetEnableButton)
     deb->m_dragflag = 2;
     deb->slotSetEnableButton(true);
     deb->slotSetEnableButton(false);
-    deb->slotShowHioceannButton();
+    deb->slotShowHiddenButton();
     EXPECT_FALSE(deb->m_packageAppending);
     EXPECT_EQ(2, deb->m_dragflag);
     deb->m_dragflag = 1;
     deb->slotSetEnableButton(true);
     deb->slotSetEnableButton(false);
-    deb->slotShowHioceannButton();
+    deb->slotShowHiddenButton();
     EXPECT_FALSE(deb->m_packageAppending);
     EXPECT_EQ(1, deb->m_dragflag);
     EXPECT_TRUE(debListModel->m_packageOperateStatus.isEmpty());

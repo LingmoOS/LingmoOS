@@ -15,7 +15,7 @@ class ConfigWatcher : public QObject
 
 public:
     enum class ModuleState {
-        Hioceann = 0,
+        Hidden = 0,
         Enabled,
         Disabled
     };

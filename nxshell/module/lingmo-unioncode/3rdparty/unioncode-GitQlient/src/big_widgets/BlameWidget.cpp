@@ -33,9 +33,9 @@ BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
    mTabWidget->setObjectName("HistoryTab");
    mRepoView->setObjectName("blameGraphView");
    mRepoView->setModel(mRepoModel);
-   mRepoView->header()->setSectionHioceann(static_cast<int>(CommitHistoryColumns::Graph), true);
-   mRepoView->header()->setSectionHioceann(static_cast<int>(CommitHistoryColumns::Date), true);
-   mRepoView->header()->setSectionHioceann(static_cast<int>(CommitHistoryColumns::Author), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Graph), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Date), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Author), true);
    mRepoView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, mGit, nullptr, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
@@ -53,9 +53,9 @@ BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
 
    fileSystemView->setModel(fileSystemModel);
    fileSystemView->setMaximumWidth(450);
-   fileSystemView->header()->setSectionHioceann(1, true);
-   fileSystemView->header()->setSectionHioceann(2, true);
-   fileSystemView->header()->setSectionHioceann(3, true);
+   fileSystemView->header()->setSectionHidden(1, true);
+   fileSystemView->header()->setSectionHidden(2, true);
+   fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(fileSystemView, &QTreeView::clicked, this, &BlameWidget::showFileHistoryByIndex);
 

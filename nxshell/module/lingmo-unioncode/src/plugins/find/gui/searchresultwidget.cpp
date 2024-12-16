@@ -57,7 +57,7 @@ void SearchResultWidgetPrivate::initUI()
     resultView->setModel(&resultModel);
     resultView->setItemDelegate(new SearchResultItemDelegate(resultView));
     resultView->setContextMenuPolicy(Qt::CustomContextMenu);
-    resultView->setHeaderHioceann(true);
+    resultView->setHeaderHidden(true);
     resultView->setFrameShape(QFrame::NoFrame);
     resultView->setIconSize({ 16, 16 });
     resultView->setIndentation(0);

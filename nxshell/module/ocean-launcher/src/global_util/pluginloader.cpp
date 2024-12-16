@@ -9,7 +9,7 @@
 #include <QLibrary>
 #include <QApplication>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 

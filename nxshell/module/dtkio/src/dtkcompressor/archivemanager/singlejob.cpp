@@ -564,7 +564,7 @@ void ConvertJob::slotHandleExtractFinished()
                 QDir dir(m_strTargetFullPath);
                 QFileInfoList fileList = dir.entryInfoList(QDir::AllEntries | QDir::System
                                                            | QDir::NoDotAndDotDot | QDir::NoSymLinks
-                                                           | QDir::Hioceann);
+                                                           | QDir::Hidden);
 
                 foreach (QFileInfo strFile, fileList) {
                     FileEntry stFileEntry;
@@ -650,7 +650,7 @@ void StepExtractJob::slotHandleExtractFinished()
                 return;
             }
             QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                                   | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                                   | QDir::NoDotAndDotDot | QDir::Hidden);
 
             if (1 == list.count()
                 && list.at(0).filePath().endsWith(".tar")

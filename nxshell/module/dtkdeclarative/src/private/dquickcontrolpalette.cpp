@@ -178,7 +178,7 @@ void DQuickControlPalette::setEnabled(bool newEnabled)
     Q_EMIT enabledChanged();
 }
 
-class Q_DECL_HIOCEANN CustomMetaObject : public QQmlOpenMetaObject
+class Q_DECL_HIDDEN CustomMetaObject : public QQmlOpenMetaObject
 {
 public:
     CustomMetaObject(DQuickControlColorSelector *obj)

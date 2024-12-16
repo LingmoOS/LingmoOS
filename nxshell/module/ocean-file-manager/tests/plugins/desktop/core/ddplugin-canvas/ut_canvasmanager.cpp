@@ -654,19 +654,19 @@ TEST(CanvasManagerPrivate, onFileSorted)
     EXPECT_EQ(GridIns->mode(), CanvasGrid::Mode::Custom);
 }
 
-TEST(CanvasManagerPrivate, onHioceannFlagsChanged)
+TEST(CanvasManagerPrivate, onHiddenFlagsChanged)
 {
     CanvasManager obj;
     stub_ext::StubExt stub;
     obj.d->canvasModel = new CanvasProxyModel(&obj);
 
     bool flag = false;
-    stub.set_lamda(&CanvasProxyModel::showHioceannFiles, [&flag](){
+    stub.set_lamda(&CanvasProxyModel::showHiddenFiles, [&flag](){
         return flag;
     });
 
     bool sflag = false;
-    stub.set_lamda(&CanvasProxyModel::setShowHioceannFiles, [&sflag](CanvasProxyModel *, bool f){
+    stub.set_lamda(&CanvasProxyModel::setShowHiddenFiles, [&sflag](CanvasProxyModel *, bool f){
         sflag = f;
     });
 
@@ -677,14 +677,14 @@ TEST(CanvasManagerPrivate, onHioceannFlagsChanged)
         EXPECT_GT(ms, 0);
     });
 
-    obj.d->onHioceannFlagsChanged(false);
+    obj.d->onHiddenFlagsChanged(false);
     EXPECT_FALSE(ridx.isValid());
 
     {
         flag = false;
         ridx = QModelIndex();
         sflag = false;
-        obj.d->onHioceannFlagsChanged(true);
+        obj.d->onHiddenFlagsChanged(true);
         EXPECT_TRUE(sflag);
         EXPECT_EQ(ridx, obj.d->canvasModel->rootIndex());
     }
@@ -693,7 +693,7 @@ TEST(CanvasManagerPrivate, onHioceannFlagsChanged)
         flag = true;
         ridx = QModelIndex();
         sflag = true;
-        obj.d->onHioceannFlagsChanged(false);
+        obj.d->onHiddenFlagsChanged(false);
         EXPECT_FALSE(sflag);
         EXPECT_EQ(ridx, obj.d->canvasModel->rootIndex());
     }

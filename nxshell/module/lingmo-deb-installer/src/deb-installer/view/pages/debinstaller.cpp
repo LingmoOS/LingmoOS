@@ -163,7 +163,7 @@ void DebInstaller::initConnections()
 
     // Determine the status of the current application based on the status of the authorization box.
     connect(m_fileListModel, &DebListModel::signalLockForAuth, this, &DebInstaller::slotSetAuthingStatus);
-    connect(m_fileListModel, &DebListModel::signalAuthCancel, this, &DebInstaller::slotShowHioceannButton);
+    connect(m_fileListModel, &DebListModel::signalAuthCancel, this, &DebInstaller::slotShowHiddenButton);
     connect(m_fileListModel, &DebListModel::signalEnableReCancelBtn, this, &DebInstaller::slotSetEnableButton);
     connect(m_fileListModel, &DebListModel::signalDependResult, this, &DebInstaller::slotDealDependResult);
     connect(m_fileListModel, &DebListModel::signalEnableCloseButton, this, &DebInstaller::slotEnableCloseButton);
@@ -1007,7 +1007,7 @@ void DebInstaller::slotSetEnableButton(bool bButtonEnabled)
     }
 }
 
-void DebInstaller::slotShowHioceannButton()
+void DebInstaller::slotShowHiddenButton()
 {
     enableCloseAndExit();
     m_fileListModel->resetInstallStatus();  // 授权取消，重置所有的状态，包括安装状态，依赖状态等

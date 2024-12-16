@@ -29,7 +29,7 @@
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::FreeBusy::Private
+class Q_DECL_HIDDEN KCalendarCore::FreeBusy::Private
 {
 private:
     FreeBusy *q;

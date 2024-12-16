@@ -370,7 +370,7 @@ void SpeedWidget::SetSpeedAttributes()
     m_speedtableview->setFrameShape(QTableView::NoFrame);
     //自动调整最后一列的宽度使它和表格的右边界对齐
     m_speedtableview->horizontalHeader()->setStretchLastSection(true);
-    m_speedtableview->verticalHeader()->setHioceann(true);
+    m_speedtableview->verticalHeader()->setHidden(true);
     m_speedtableview->setShowGrid(false);
     m_speedtableview->setSortingEnabled(true);
     m_speedtableview->verticalHeader()->setDefaultSectionSize(48);
@@ -404,16 +404,16 @@ void SpeedWidget::SetSpeedAttributes()
     m_speeditemmodel->setHorizontalHeaderItem(UploadSpeedCol, new QStandardItem(QString("UploadSpeed")));
     m_speeditemmodel->setHorizontalHeaderItem(NetStatus, new QStandardItem(QString("NetStatus")));
 
-    m_speedtableview->setColumnHioceann(ProcIsRunningCol, true);
-    m_speedtableview->setColumnHioceann(PidCol, true);
-    m_speedtableview->setColumnHioceann(IsbSysAppCol, true);
-    m_speedtableview->setColumnHioceann(ProcNameCol, true);
-    m_speedtableview->setColumnHioceann(DesktopCol, true);
-    m_speedtableview->setColumnHioceann(AppNameCol, true);
-    m_speedtableview->setColumnHioceann(IconCol, true);
-    m_speedtableview->setColumnHioceann(DownloadSpeedCol, true);
-    m_speedtableview->setColumnHioceann(UploadSpeedCol, true);
-    m_speedtableview->setColumnHioceann(NetStatus, true);
+    m_speedtableview->setColumnHidden(ProcIsRunningCol, true);
+    m_speedtableview->setColumnHidden(PidCol, true);
+    m_speedtableview->setColumnHidden(IsbSysAppCol, true);
+    m_speedtableview->setColumnHidden(ProcNameCol, true);
+    m_speedtableview->setColumnHidden(DesktopCol, true);
+    m_speedtableview->setColumnHidden(AppNameCol, true);
+    m_speedtableview->setColumnHidden(IconCol, true);
+    m_speedtableview->setColumnHidden(DownloadSpeedCol, true);
+    m_speedtableview->setColumnHidden(UploadSpeedCol, true);
+    m_speedtableview->setColumnHidden(NetStatus, true);
 
     m_speedtableview->setColumnWidth(AppNameDispCol, COL_APP_NAME);
     m_speedtableview->setColumnWidth(DownloadSpeedDispCol, COL_DOWNLOAD_SPEED);

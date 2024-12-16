@@ -130,7 +130,7 @@ void NetworkPanel::initUi()
                 else
                     device->connectNetwork(connection);
             }
-        } else if (type == NetItemType::WirelessViewItem || type == NetItemType::WirelessHioceannViewItem) {
+        } else if (type == NetItemType::WirelessViewItem || type == NetItemType::WirelessHiddenViewItem) {
             WirelessDevice *device = index.data(NetItemRole::DeviceDataRole).value<WirelessDevice *>();
             AccessPoints *accessPoint = static_cast<AccessPoints *>(index.data(NetItemRole::DataRole).value<void *>());
             if (device && accessPoint) {
@@ -635,7 +635,7 @@ void NetworkPanel::onClickListView(const QModelIndex &index)
 {
     // 如果当前点击的是连接隐藏网络或者无线网络，且开启了飞行模式，则不让点击
     NetItemType type = index.data(NetItemRole::TypeRole).value<NetItemType>();
-    if ((type == WirelessHioceannViewItem || type == WirelessViewItem) && m_airplaneMode->enabled())
+    if ((type == WirelessHiddenViewItem || type == WirelessViewItem) && m_airplaneMode->enabled())
         return;
 
     NetItem *oldSelectItem = selectItem();
@@ -645,7 +645,7 @@ void NetworkPanel::onClickListView(const QModelIndex &index)
         item->expandWidget(WirelessItem::Hide, false); // 选择切换时隐藏输入框
     }
     switch (type) {
-    case WirelessHioceannViewItem:
+    case WirelessHiddenViewItem:
     case WirelessViewItem: {
         WirelessItem *item = static_cast<WirelessItem *>(newSelectItem);
         item->connectNetwork();
@@ -760,7 +760,7 @@ void NetworkPanel::expandPasswordInput()
 NetItem *NetworkPanel::selectItem()
 {
     for (NetItem *item : m_items) {
-        if (NetItemType::WirelessViewItem == item->itemType() || NetItemType::WirelessHioceannViewItem == item->itemType()) {
+        if (NetItemType::WirelessViewItem == item->itemType() || NetItemType::WirelessHiddenViewItem == item->itemType()) {
             WirelessItem *wirelessItem = static_cast<WirelessItem *>(item);
             if (wirelessItem->expandVisible()) {
                 return wirelessItem;
@@ -927,7 +927,7 @@ bool NetworkDelegate::cantHover(const QModelIndex &index) const
 {
     NetItemType itemType = index.data(TypeRole).value<NetItemType>();
     // 如果是无线网络或者连接隐藏网络项，且当前开启了飞行模式，则当前行不让点击
-    if (itemType == NetItemType::WirelessViewItem || itemType == NetItemType::WirelessHioceannViewItem)
+    if (itemType == NetItemType::WirelessViewItem || itemType == NetItemType::WirelessHiddenViewItem)
         return (m_airplaneMode && m_airplaneMode->enabled());
 
     return (itemType == NetItemType::DeviceControllViewItem

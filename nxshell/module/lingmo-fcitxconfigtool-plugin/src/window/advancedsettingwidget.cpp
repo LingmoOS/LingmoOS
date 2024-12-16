@@ -304,8 +304,8 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
                     grouplabel->setEnabled(false);
                     button->setEnabled(false);
                 }
-                grouplabel->setVisible("Hioceann" != value);
-                button->setVisible("Hioceann" != value);
+                grouplabel->setVisible("Hidden" != value);
+                button->setVisible("Hidden" != value);
 
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_SHORTCUT, grouplabel);
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_SHORTCUT, button);
@@ -318,8 +318,8 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
                     grouplabel->setEnabled(false);
                     button->setEnabled(false);
                 }
-                grouplabel->setVisible("Hioceann" != value);
-                button->setVisible("Hioceann" != value);
+                grouplabel->setVisible("Hidden" != value);
+                button->setVisible("Hidden" != value);
 
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_PROGRAM, grouplabel);
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_PROGRAM, button);
@@ -332,8 +332,8 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
                     grouplabel->setEnabled(false);
                     button->setEnabled(false);
                 }
-                grouplabel->setVisible("Hioceann" != value);
-                button->setVisible("Hioceann" != value);
+                grouplabel->setVisible("Hidden" != value);
+                button->setVisible("Hidden" != value);
 
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_OUTPUT, grouplabel);
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_OUTPUT, button);
@@ -346,8 +346,8 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
                     grouplabel->setEnabled(false);
                     button->setEnabled(false);
                 }
-                grouplabel->setVisible("Hioceann" != value);
-                button->setVisible("Hioceann" != value);
+                grouplabel->setVisible("Hidden" != value);
+                button->setVisible("Hidden" != value);
 
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_APPEARANCE, grouplabel);
                 GSettingWatcher::instance()->bind(GSETTINGS_GLOBALCONFIG_APPEARANCE, button);
@@ -360,8 +360,8 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
                 grouplabel->setEnabled(false);
                 button->setEnabled(false);
             }
-            grouplabel->setVisible("Hioceann" != value);
-            button->setVisible("Hioceann" != value);
+            grouplabel->setVisible("Hidden" != value);
+            button->setVisible("Hidden" != value);
             GSettingWatcher::instance()->bind(GSETTINGS_ADVANCESETTING_GLOBALCONFIG, grouplabel);
             GSettingWatcher::instance()->bind(GSETTINGS_ADVANCESETTING_GLOBALCONFIG, button);
 
@@ -377,23 +377,23 @@ QWidget *AdvancedSettingWidget::createglobalSettingsUi()
             QVBoxLayout *vlayout = new QVBoxLayout;
             vlayout->setContentsMargins(0, 0, 0, 0);
             content->setLayout(vlayout);
-            content->setHioceann(true);
-            connect(grouplabel, &ArrowButton::pressed, this, [ = ](bool isHioceann) {
-                content->setHioceann(isHioceann);
-                button->setContentHioceann(!isHioceann);
+            content->setHidden(true);
+            connect(grouplabel, &ArrowButton::pressed, this, [ = ](bool isHidden) {
+                content->setHidden(isHidden);
+                button->setContentHidden(!isHidden);
                 QMatrix matrix;
-                if (!isHioceann) {
+                if (!isHidden) {
                     matrix.rotate(180);
                 } else {
                     matrix.rotate(0);
                 }
                 button->setPixmap(pmap.transformed(matrix, Qt::SmoothTransformation));
             });
-            connect(button, &ArrowButton::pressed, this, [ = ](bool isHioceann) {
-                content->setHioceann(isHioceann);
-                grouplabel->setContentHioceann(!isHioceann);
+            connect(button, &ArrowButton::pressed, this, [ = ](bool isHidden) {
+                content->setHidden(isHidden);
+                grouplabel->setContentHidden(!isHidden);
                 QMatrix matrix;
-                if (!isHioceann) {
+                if (!isHidden) {
                     matrix.rotate(180);
                 } else {
                     matrix.rotate(0);
@@ -688,7 +688,7 @@ void ArrowButton::resizeEvent(QResizeEvent *event)
     QLabel::resizeEvent(event);
 }
 
-void ArrowButton::setContentHioceann(bool hide)
+void ArrowButton::setContentHidden(bool hide)
 {
     m_hide = hide;
 }

@@ -726,11 +726,11 @@ void MoveResizeWindowTest::testAdjustClientGeometryOfAutohidingX11Panel()
     QTEST(Workspace::self()->adjustWindowPosition(testWindow, targetPoint, false).toPoint(), "expectedAdjustedPoint");
 
     // now let's hide the panel
-    QSignalSpy panelHioceannSpy(panel, &Window::windowHioceann);
+    QSignalSpy panelHiddenSpy(panel, &Window::windowHidden);
     QFETCH(quint32, hideLocation);
     xcb_change_property(c.get(), XCB_PROP_MODE_REPLACE, windowId, atoms->kde_screen_edge_show, XCB_ATOM_CARDINAL, 32, 1, &hideLocation);
     xcb_flush(c.get());
-    QVERIFY(panelHioceannSpy.wait());
+    QVERIFY(panelHiddenSpy.wait());
 
     // now try to snap again
     QCOMPARE(Workspace::self()->adjustWindowPosition(testWindow, targetPoint, false), targetPoint);
@@ -803,9 +803,9 @@ void MoveResizeWindowTest::testAdjustClientGeometryOfAutohidingWaylandPanel()
     QTEST(Workspace::self()->adjustWindowPosition(testWindow, targetPoint, false).toPoint(), "expectedAdjustedPoint");
 
     // now let's hide the panel
-    QSignalSpy panelHioceannSpy(panel, &Window::windowHioceann);
+    QSignalSpy panelHiddenSpy(panel, &Window::windowHidden);
     plasmaSurface->requestHideAutoHidingPanel();
-    QVERIFY(panelHioceannSpy.wait());
+    QVERIFY(panelHiddenSpy.wait());
 
     // now try to snap again
     QCOMPARE(Workspace::self()->adjustWindowPosition(testWindow, targetPoint, false), targetPoint);

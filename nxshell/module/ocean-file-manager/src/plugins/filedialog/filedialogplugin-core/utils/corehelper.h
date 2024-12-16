@@ -20,7 +20,7 @@ class CoreHelper
 {
 public:
     static void delayInvokeProxy(std::function<void()> func, quint64 winID, QObject *parent);
-    static bool askHioceannFile(QWidget *parent);
+    static bool askHiddenFile(QWidget *parent);
     static bool askReplaceFile(QString fileName, QWidget *parent);
     static QStringList stripFilters(const QStringList &filters);
     static QString findExtensioName(const QString &fileName, const QStringList &newNameFilters, QMimeDatabase *db);

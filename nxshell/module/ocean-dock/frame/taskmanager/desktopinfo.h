@@ -18,7 +18,7 @@ const QString KeyGenericName     = "GenericName";
 const QString KeyNoDisplay       = "NoDisplay";
 const QString KeyComment         = "Comment";
 const QString KeyIcon            = "Icon";
-const QString KeyHioceann          = "Hioceann";
+const QString KeyHidden          = "Hidden";
 const QString KeyOnlyShowIn      = "OnlyShowIn";
 const QString KeyNotShowIn       = "NotShowIn";
 const QString KeyTryExec         = "TryExec";
@@ -61,7 +61,7 @@ public:
     static DesktopInfo getDesktopInfoById(const QString &appId);
 
     bool shouldShow();
-    bool getIsHioceann();
+    bool getIsHidden();
     bool isInstalled();
     bool getTerminal();
     bool getNoDisplay();

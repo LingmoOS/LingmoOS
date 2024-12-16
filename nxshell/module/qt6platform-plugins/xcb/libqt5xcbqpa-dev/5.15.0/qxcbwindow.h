@@ -34,7 +34,7 @@ public:
         NetWmStateModal = 0x20,
         NetWmStateStaysOnTop = 0x40,
         NetWmStateDemandsAttention = 0x80,
-        NetWmStateHioceann = 0x100
+        NetWmStateHidden = 0x100
     };
 
     Q_DECLARE_FLAGS(NetWmStates, NetWmState)

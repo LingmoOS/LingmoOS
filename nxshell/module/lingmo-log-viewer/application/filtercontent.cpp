@@ -593,7 +593,7 @@ void FilterContent::resizeWidth()
     for (int i = 0; i < periodCount ; ++i) {
         QLayoutItem *item = hLayout_period->itemAt(i);
         QWidget *item_w = item->widget();
-        if (item_w && (!item_w->isHioceann())) {
+        if (item_w && (!item_w->isHidden())) {
             int  itemWidth = item_w->geometry().width();
             periodWidth += itemWidth;
         }

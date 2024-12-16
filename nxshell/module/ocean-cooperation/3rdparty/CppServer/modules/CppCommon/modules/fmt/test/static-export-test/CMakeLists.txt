@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.8...3.25)
 project(fmt-link CXX)
 
 set(BUILD_SHARED_LIBS OFF)
-set(CMAKE_VISIBILITY_INLINES_HIOCEANN TRUE)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 set(CMAKE_CXX_VISIBILITY_PRESET "hioceann")
 
 # Broken LTO on GCC 4

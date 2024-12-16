@@ -143,7 +143,7 @@ TEST_F(UT_ComputerItemWatcher, OnDevicePropertyChangedQDBusVar)
 TEST_F(UT_ComputerItemWatcher, OnGenAttributeChanged)
 {
     EXPECT_NO_FATAL_FAILURE(ins->onGenAttributeChanged(Application::GenericAttribute::kShowFileSystemTagOnDiskIcon, true));
-    EXPECT_NO_FATAL_FAILURE(ins->onGenAttributeChanged(Application::GenericAttribute::kHioceannSystemPartition, true));
+    EXPECT_NO_FATAL_FAILURE(ins->onGenAttributeChanged(Application::GenericAttribute::kHiddenSystemPartition, true));
 
     stub.set_lamda(&ComputerItemWatcher::removeDevice, [] { __DBG_STUB_INVOKE__ });
     stub.set_lamda(&ComputerItemWatcher::removeSidebarItem, [] { __DBG_STUB_INVOKE__ });

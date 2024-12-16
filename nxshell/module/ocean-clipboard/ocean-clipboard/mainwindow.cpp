@@ -199,7 +199,7 @@ void MainWindow::registerMonitor()
     connect(m_regionMonitor, &DRegionMonitor::buttonRelease, this, [ = ](const QPoint &p, const int flag) {
         Q_UNUSED(flag);
         if (!geometry().contains(p))
-            if (!isHioceann()) {
+            if (!isHidden()) {
                 hideAni();
             }
     });

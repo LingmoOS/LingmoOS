@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef DCONFIGHIOCEANNMENUSCENE_P_H
-#define DCONFIGHIOCEANNMENUSCENE_P_H
+#ifndef DCONFIGHIDDENMENUSCENE_P_H
+#define DCONFIGHIDDENMENUSCENE_P_H
 
 #include "menuscene/dconfighioceannmenuscene.h"
 
@@ -12,15 +12,15 @@
 DFMBASE_USE_NAMESPACE
 DPMENU_BEGIN_NAMESPACE
 
-class DConfigHioceannMenuScenePrivate : public AbstractMenuScenePrivate
+class DConfigHiddenMenuScenePrivate : public AbstractMenuScenePrivate
 {
     Q_OBJECT
-    friend class DConfigHioceannMenuScene;
+    friend class DConfigHiddenMenuScene;
 
 public:
-    explicit DConfigHioceannMenuScenePrivate(DConfigHioceannMenuScene *qq);
+    explicit DConfigHiddenMenuScenePrivate(DConfigHiddenMenuScene *qq);
 };
 
 DPMENU_END_NAMESPACE
 
-#endif   // DCONFIGHIOCEANNMENUSCENE_P_H
+#endif   // DCONFIGHIDDENMENUSCENE_P_H

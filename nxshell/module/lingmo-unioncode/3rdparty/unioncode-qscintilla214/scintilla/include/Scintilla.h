@@ -273,7 +273,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define INDIC_TT 2
 #define INDIC_DIAGONAL 3
 #define INDIC_STRIKE 4
-#define INDIC_HIOCEANN 5
+#define INDIC_HIDDEN 5
 #define INDIC_BOX 6
 #define INDIC_ROUNDBOX 7
 #define INDIC_STRAIGHTBOX 8
@@ -486,7 +486,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETFOLDEXPANDED 2230
 #define SCI_TOGGLEFOLD 2231
 #define SCI_TOGGLEFOLDSHOWTEXT 2700
-#define SC_FOLDDISPLAYTEXT_HIOCEANN 0
+#define SC_FOLDDISPLAYTEXT_HIDDEN 0
 #define SC_FOLDDISPLAYTEXT_STANDARD 1
 #define SC_FOLDDISPLAYTEXT_BOXED 2
 #define SCI_FOLDDISPLAYTEXTSETSTYLE 2701
@@ -877,7 +877,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_ANNOTATIONGETSTYLES 2545
 #define SCI_ANNOTATIONGETLINES 2546
 #define SCI_ANNOTATIONCLEARALL 2547
-#define ANNOTATION_HIOCEANN 0
+#define ANNOTATION_HIDDEN 0
 #define ANNOTATION_STANDARD 1
 #define ANNOTATION_BOXED 2
 #define ANNOTATION_INDENTED 3
@@ -891,7 +891,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_EOLANNOTATIONSETSTYLE 2742
 #define SCI_EOLANNOTATIONGETSTYLE 2743
 #define SCI_EOLANNOTATIONCLEARALL 2744
-#define EOLANNOTATION_HIOCEANN 0x0
+#define EOLANNOTATION_HIDDEN 0x0
 #define EOLANNOTATION_STANDARD 0x1
 #define EOLANNOTATION_BOXED 0x2
 #define EOLANNOTATION_STADIUM 0x100

@@ -771,9 +771,9 @@ bool TaskManager::isWindowDockOverlapX(XWindow xid)
 
     // TODO 检查窗口透明度
     // 检查窗口是否显示
-    auto wmHioceannType = XCB->getAtom("_NET_WM_STATE_HIOCEANN");
+    auto wmHiddenType = XCB->getAtom("_NET_WM_STATE_HIDDEN");
     for (auto ty : XCB->getWMState(xid)) {
-        if (ty == wmHioceannType) {
+        if (ty == wmHiddenType) {
             // 不处理隐藏的窗口属性
             return false;
         }
@@ -987,7 +987,7 @@ void TaskManager::updateHideState(bool delay)
     case HideMode::KeepShowing:
         setPropHideState(HideState::Show);
         break;
-    case HideMode::KeepHioceann:
+    case HideMode::KeepHidden:
         setPropHideState(HideState::Hide);
         break;
     case HideMode::SmartHide:

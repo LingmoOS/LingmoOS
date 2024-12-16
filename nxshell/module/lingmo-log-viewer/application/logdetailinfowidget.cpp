@@ -75,11 +75,11 @@ void logDetailInfoWidget::cleanText()
 
 /**
  * @brief logDetailInfoWidget::hideLine 设置是否隐藏分割线
- * @param isHioceann 是否隐藏分割线
+ * @param isHidden 是否隐藏分割线
  */
-void logDetailInfoWidget::hideLine(bool isHioceann)
+void logDetailInfoWidget::hideLine(bool isHidden)
 {
-    m_hline->setHioceann(isHioceann);
+    m_hline->setHidden(isHidden);
 }
 
 /**

@@ -52,11 +52,11 @@ public:
         kAlwaysShowOfflineRemoteConnections,   // always show offline remote mounts (currently only smb mounts are resident)
         kMergeTheEntriesOfSambaSharedFolders,   // merge the entries of Samba shared folders
         kOverrideFileChooserDialog,   // dialog box when using OCEAN File Manager as an application to select files
-        kShowedHioceannOnSearch,   // show hioceann files when searching
-        kShowedHioceannFiles,   // show hioceann files
+        kShowedHiddenOnSearch,   // show hioceann files when searching
+        kShowedHiddenFiles,   // show hioceann files
         kShowedFileSuffix,   // show suffix
         kDisableNonRemovableDeviceUnmount,   // disable local disk uninstallation
-        kHioceannSystemPartition,   // hide system partition
+        kHiddenSystemPartition,   // hide system partition
         kShowCsdCrumbBarClickableArea,   // eave an area in the breadcrumb bar that can be clicked on to go to the edit state of the address bar
         kShowFileSystemTagOnDiskIcon,   // display file system information on the disk icon
         kShowDeleteConfirmDialog,   // display the delete confirmation dialog
@@ -109,7 +109,7 @@ Q_SIGNALS:
     void previewCompressFileChanged(bool enable);
     void showedFileSuffixChanged(bool enable);
     void previewAttributeChanged(GenericAttribute ga, bool enable);
-    void showedHioceannFilesChanged(bool enable);
+    void showedHiddenFilesChanged(bool enable);
     void csdClickableAreaAttributeChanged(bool enabled);
     void indexFullTextSearchChanged(bool enabled);
 

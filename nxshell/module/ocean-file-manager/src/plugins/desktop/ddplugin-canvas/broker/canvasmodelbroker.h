@@ -28,8 +28,8 @@ public slots:
     QModelIndex index(int row);
     QUrl fileUrl(const QModelIndex &index);
     QList<QUrl> files();
-    bool showHioceannFiles();
-    void setShowHioceannFiles(bool show);
+    bool showHiddenFiles();
+    void setShowHiddenFiles(bool show);
     int sortOrder();
     void setSortOrder(int order);
     int sortRole();

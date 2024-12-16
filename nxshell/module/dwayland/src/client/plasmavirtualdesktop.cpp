@@ -16,7 +16,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN PlasmaVirtualDesktopManagement::Private
+class Q_DECL_HIDDEN PlasmaVirtualDesktopManagement::Private
 {
 public:
     Private(PlasmaVirtualDesktopManagement *q);
@@ -44,7 +44,7 @@ private:
     static const org_kde_plasma_virtual_desktop_management_listener s_listener;
 };
 
-class Q_DECL_HIOCEANN PlasmaVirtualDesktop::Private
+class Q_DECL_HIDDEN PlasmaVirtualDesktop::Private
 {
 public:
     Private(PlasmaVirtualDesktop *q);

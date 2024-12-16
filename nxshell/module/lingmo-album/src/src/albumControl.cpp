@@ -11,7 +11,7 @@
 #include <DDialog>
 #include <DMessageBox>
 #include <DGuiApplicationHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -2105,7 +2105,7 @@ void AlbumControl::openLingmoMovie(const QString &path)
 
         // check if current is v23, v25 or later
         static const int kMinimalOsVersion = 23;
-        const int osMajor = DSysInfo::majorVersion().toInt();
+        const int osMajor = LSysInfo::majorVersion().toInt();
         if (osMajor >= kMinimalOsVersion) {
             qInfo() << "trying start detached ll-cli run lingmo-movie";
             arguments << "run" << "org.lingmo.movie" << "--" << "lingmo-movie" << path;

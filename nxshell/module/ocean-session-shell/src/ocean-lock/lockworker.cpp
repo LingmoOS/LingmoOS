@@ -8,7 +8,7 @@
 #include "sessionbasemodel.h"
 #include "userinfo.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QApplication>
 #include <QDebug>
@@ -215,9 +215,9 @@ void LockWorker::initData()
     m_model->setAllowShowCustomUser(allowShowCustomUser);
 
     /* init server user or custom user */
-    if (DSysInfo::lingmoType() == DSysInfo::LingmoServer || m_model->allowShowCustomUser()) {
+    if (LSysInfo::lingmoType() == LSysInfo::LingmoServer || m_model->allowShowCustomUser()) {
         std::shared_ptr<User> user(new User());
-        m_model->setIsServerModel(DSysInfo::lingmoType() == DSysInfo::LingmoServer);
+        m_model->setIsServerModel(LSysInfo::lingmoType() == LSysInfo::LingmoServer);
         m_model->addUser(user);
     }
 

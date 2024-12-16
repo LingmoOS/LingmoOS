@@ -28,7 +28,7 @@ CanvasProxyModelPrivate::CanvasProxyModelPrivate(CanvasProxyModel *qq)
     // the hook filter must be first filter.
     modelFilters << QSharedPointer<CanvasModelFilter>(new HookFilter(qq));
 
-    modelFilters << QSharedPointer<CanvasModelFilter>(new HioceannFileFilter(qq));
+    modelFilters << QSharedPointer<CanvasModelFilter>(new HiddenFileFilter(qq));
     modelFilters << QSharedPointer<CanvasModelFilter>(new InnerDesktopAppFilter(qq));
     isNotMixDirAndFile = !Application::instance()->appAttribute(Application::kFileAndDirMixedSort).toBool();
 }
@@ -505,9 +505,9 @@ QList<QUrl> CanvasProxyModel::files() const
     return d->fileList;
 }
 
-bool CanvasProxyModel::showHioceannFiles() const
+bool CanvasProxyModel::showHiddenFiles() const
 {
-    return d->filters & QDir::Hioceann;
+    return d->filters & QDir::Hidden;
 }
 
 Qt::SortOrder CanvasProxyModel::sortOrder() const
@@ -848,12 +848,12 @@ void CanvasProxyModel::refresh(const QModelIndex &parent, bool global, int ms, b
     }
 }
 
-void CanvasProxyModel::setShowHioceannFiles(bool show)
+void CanvasProxyModel::setShowHiddenFiles(bool show)
 {
     if (show)
-        d->filters |= QDir::Hioceann;
+        d->filters |= QDir::Hidden;
     else
-        d->filters &= ~QDir::Hioceann;
+        d->filters &= ~QDir::Hidden;
 
     if (d->hookIfs)
         d->hookIfs->hioceannFlagChanged(show);

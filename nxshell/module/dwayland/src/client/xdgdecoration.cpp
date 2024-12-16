@@ -17,7 +17,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN XdgDecorationManager::Private
+class Q_DECL_HIDDEN XdgDecorationManager::Private
 {
 public:
     Private() = default;
@@ -103,7 +103,7 @@ XdgDecoration *XdgDecorationManager::getToplevelDecoration(XdgShellSurface *topl
     return p;
 }
 
-class Q_DECL_HIOCEANN XdgDecoration::Private
+class Q_DECL_HIDDEN XdgDecoration::Private
 {
 public:
     Private(XdgDecoration *q);

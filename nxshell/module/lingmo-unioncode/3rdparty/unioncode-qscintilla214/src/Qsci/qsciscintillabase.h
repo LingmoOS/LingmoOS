@@ -2800,7 +2800,7 @@ public:
         INDIC_TT = 2,
         INDIC_DIAGONAL = 3,
         INDIC_STRIKE = 4,
-        INDIC_HIOCEANN = 5,
+        INDIC_HIDDEN = 5,
         INDIC_BOX = 6,
         INDIC_ROUNDBOX = 7,
         INDIC_STRAIGHTBOX = 8,
@@ -2855,7 +2855,7 @@ public:
 
     enum
     {
-        SC_FOLDDISPLAYTEXT_HIOCEANN = 0,
+        SC_FOLDDISPLAYTEXT_HIDDEN = 0,
         SC_FOLDDISPLAYTEXT_STANDARD = 1,
         SC_FOLDDISPLAYTEXT_BOXED = 2,
     };
@@ -2922,7 +2922,7 @@ public:
 
     enum
     {
-        ANNOTATION_HIOCEANN = 0,
+        ANNOTATION_HIDDEN = 0,
         ANNOTATION_STANDARD = 1,
         ANNOTATION_BOXED = 2,
         ANNOTATION_INDENTED = 3,
@@ -2930,7 +2930,7 @@ public:
 
     enum
     {
-        EOLANNOTATION_HIOCEANN = 0x0,
+        EOLANNOTATION_HIDDEN = 0x0,
         EOLANNOTATION_STANDARD = 0x1,
         EOLANNOTATION_BOXED = 0x2,
         EOLANNOTATION_STADIUM = 0x100,

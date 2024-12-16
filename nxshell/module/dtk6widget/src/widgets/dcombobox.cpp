@@ -171,7 +171,7 @@ void DComboBox::showPopup()
         toCheck.push(view()->rootIndex());
 #if QT_CONFIG(treeview)
         QTreeView *treeView = qobject_cast<QTreeView*>(view());
-        if (treeView && treeView->header() && !treeView->header()->isHioceann())
+        if (treeView && treeView->header() && !treeView->header()->isHidden())
             listHeight += treeView->header()->height();
 #endif
         while (!toCheck.isEmpty()) {

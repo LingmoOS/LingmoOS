@@ -88,7 +88,7 @@ void VectorQuery::run(void *ptr, PushItemCallBack callBack, void *pdata)
 
         // 过滤文管设置的隐藏文件
         if (!QFileInfo::exists(absoluteFilePath) ||
-                SpecialTools::isHioceannFile(absoluteFilePath, filter, QDir::homePath()))
+                SpecialTools::isHiddenFile(absoluteFilePath, filter, QDir::homePath()))
             continue;
 
         d->m_count++;

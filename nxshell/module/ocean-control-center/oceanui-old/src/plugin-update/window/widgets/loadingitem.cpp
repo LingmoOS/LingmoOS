@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QIcon>
 #include <QPainter>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DIconTheme>
 
 DGUI_USE_NAMESPACE
@@ -72,9 +72,9 @@ void LoadingItem::setVersionVisible(bool state)
 void LoadingItem::setSystemVersion(const QString &version)
 {
     Q_UNUSED(version);
-    QString uVersion = DSysInfo::uosProductTypeName() + " " + DSysInfo::majorVersion();
-    if (DSysInfo::uosType() != DSysInfo::UosServer)
-        uVersion.append(" " + DSysInfo::uosEditionName());
+    QString uVersion = LSysInfo::uosProductTypeName() + " " + LSysInfo::majorVersion();
+    if (LSysInfo::uosType() != LSysInfo::UosServer)
+        uVersion.append(" " + LSysInfo::uosEditionName());
     m_labelText->setText(uVersion);
 }
 

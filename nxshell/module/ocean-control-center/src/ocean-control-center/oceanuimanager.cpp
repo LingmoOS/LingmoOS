@@ -133,7 +133,7 @@ int OceanUIManager::height() const
 
 OceanUIApp::UosEdition OceanUIManager::uosEdition() const
 {
-    DSysInfo::UosEdition edition = DSysInfo::uosEditionType();
+    LSysInfo::UosEdition edition = LSysInfo::uosEditionType();
     return OceanUIApp::UosEdition(edition);
 }
 
@@ -166,7 +166,7 @@ void OceanUIManager::addObject(OceanUIObject *obj)
             OceanUIObject::Private::FromObject(m_noParentObjects)->addChild(o, false);
         } else {
             if (contains(m_hideModule, o)) {
-                OceanUIObject::Private::FromObject(o)->setFlagState(DCC_CONFIG_HIOCEANN, true);
+                OceanUIObject::Private::FromObject(o)->setFlagState(DCC_CONFIG_HIDDEN, true);
             }
             if (contains(m_disableModule, o)) {
                 OceanUIObject::Private::FromObject(o)->setFlagState(DCC_CONFIG_DISABLED, true);
@@ -550,9 +550,9 @@ void OceanUIManager::updateModuleConfig(const QString &key)
 {
     QSet<QString> oldModuleConfig;
     QSet<QString> *newModuleConfig = nullptr;
-    uint32_t type = DCC_CONFIG_HIOCEANN;
+    uint32_t type = DCC_CONFIG_HIDDEN;
     if (key == HideConfig) {
-        type = DCC_CONFIG_HIOCEANN;
+        type = DCC_CONFIG_HIDDEN;
         oldModuleConfig = m_hideModule;
         newModuleConfig = &m_hideModule;
     } else if (key == DisableConfig) {

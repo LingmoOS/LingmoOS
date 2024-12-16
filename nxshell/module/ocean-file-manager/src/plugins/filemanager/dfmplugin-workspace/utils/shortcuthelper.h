@@ -35,7 +35,7 @@ protected slots:
     void deleteFiles();
     void moveToTrash();
     void touchFolder();
-    void toggleHioceannFiles();
+    void toggleHiddenFiles();
     void showFilesProperty();
     void previewFiles();
     void openAction(const QList<QUrl> &urls, const DirOpenMode openMode = DirOpenMode::kOpenInCurrentWindow);

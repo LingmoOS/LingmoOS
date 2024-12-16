@@ -1,0 +1,5 @@
+add_subdirectory(test_window_bg)
+add_subdirectory(test_wallpaper_color)
+add_subdirectory(test_show_desktop)
+add_subdirectory(test_window_crusor)
+add_subdirectory(test_xdgport_wallpaper)

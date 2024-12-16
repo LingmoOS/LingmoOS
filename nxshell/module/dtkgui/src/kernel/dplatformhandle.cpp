@@ -644,7 +644,7 @@ static void initWindowRadius(QWindow *window)
     }
 }
 
-class Q_DECL_HIOCEANN CreatorWindowEventFilter : public QObject {
+class Q_DECL_HIDDEN CreatorWindowEventFilter : public QObject {
 public:
     CreatorWindowEventFilter(QObject *par= nullptr): QObject(par){}
 

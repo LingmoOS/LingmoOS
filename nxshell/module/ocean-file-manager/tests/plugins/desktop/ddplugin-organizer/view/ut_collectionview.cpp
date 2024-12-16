@@ -255,7 +255,7 @@ TEST(CollectionView, keyboardSearch)
     EXPECT_TRUE(view.d->searchKeys.isEmpty());
 }
 
-TEST(CollectionView, isIndexHioceann)
+TEST(CollectionView, isIndexHidden)
 {
     stub_ext::StubExt stub;
     TestProvider test;
@@ -277,8 +277,8 @@ TEST(CollectionView, isIndexHioceann)
     QModelIndex idx1(0, 0, (void *)nullptr, &model);
     QModelIndex idx2(1, 0, (void *)nullptr, &model);
 
-    EXPECT_TRUE(view.isIndexHioceann(idx1));
-    EXPECT_FALSE(view.isIndexHioceann(idx2));
+    EXPECT_TRUE(view.isIndexHidden(idx1));
+    EXPECT_FALSE(view.isIndexHidden(idx2));
 }
 
 TEST(CollectionView, selectedIndexes)

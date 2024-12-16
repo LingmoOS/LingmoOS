@@ -22,9 +22,9 @@ MainWindow::MainWindow(DWidget *parent)
     //这个判断版本　QSysInfo
     bool isx86 = QSysInfo::currentCpuArchitecture().startsWith("x86");
     if (isx86) {
-        if (DSysInfo::uosType() == DSysInfo::UosType::UosServer ||
-            DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterpriseC ||
-            DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEuler) {
+        if (LSysInfo::uosType() == LSysInfo::UosType::UosServer ||
+            LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterpriseC ||
+            LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEuler) {
             m_useVideo = false; //x86架构，服务行业版和服务器欧拉版都是轮播图
         } else {
             m_useVideo = true;
@@ -48,17 +48,17 @@ MainWindow::MainWindow(DWidget *parent)
 
     //UosEnterprise:服务器企业版　　UosEnterpriseC:行业版   UosEuler:服务器欧拉版
     bool bIsServerSystemType;
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterprise  ||
-        DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterpriseC ||
-        DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEuler) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterprise  ||
+        LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterpriseC ||
+        LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEuler) {
         bIsServerSystemType = true;
     } else {
         bIsServerSystemType = false;
     }
 
     //获取lingmo版本
-    const DSysInfo::LingmoType LingmoType = DSysInfo::lingmoType();
-    bool bIsLingmoServerType = (DSysInfo::LingmoServer == LingmoType);
+    const LSysInfo::LingmoType LingmoType = LSysInfo::lingmoType();
+    bool bIsLingmoServerType = (LSysInfo::LingmoServer == LingmoType);
 
     //使用DBUS获取窗口特效是否支持切换
     bool isSuportEffect = QDBusInterface("com.lingmo.wm", "/com/lingmo/wm", "com.lingmo.wm")

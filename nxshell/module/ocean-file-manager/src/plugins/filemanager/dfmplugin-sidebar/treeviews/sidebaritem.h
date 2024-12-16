@@ -21,7 +21,7 @@ public:
         kItemUrlRole = Dtk::UserRole + 1,
         kItemGroupRole,
         kItemTypeRole,
-        kItemHioceannRole,
+        kItemHiddenRole,
         kItemUserCustomRole = Dtk::UserRole + 0x0100
     };
 
@@ -46,7 +46,7 @@ public:
     void setGroup(const QString &group = "");
     QString subGourp() const;
 
-    bool isHioceann() const;
+    bool isHidden() const;
     void setHiiden(bool hioceann);
 
     ItemInfo itemInfo() const;

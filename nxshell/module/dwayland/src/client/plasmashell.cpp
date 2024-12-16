@@ -15,14 +15,14 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN PlasmaShell::Private
+class Q_DECL_HIDDEN PlasmaShell::Private
 {
 public:
     WaylandPointer<org_kde_plasma_shell, org_kde_plasma_shell_destroy> shell;
     EventQueue *queue = nullptr;
 };
 
-class Q_DECL_HIOCEANN PlasmaShellSurface::Private
+class Q_DECL_HIDDEN PlasmaShellSurface::Private
 {
 public:
     Private(PlasmaShellSurface *q);
@@ -37,7 +37,7 @@ public:
     static PlasmaShellSurface *get(Surface *surface);
 
 private:
-    static void autoHidingPanelHioceannCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface);
+    static void autoHidingPanelHiddenCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface);
     static void autoHidingPanelShownCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface);
 
     PlasmaShellSurface *q;
@@ -167,13 +167,13 @@ void PlasmaShellSurface::Private::setup(org_kde_plasma_surface *s)
     org_kde_plasma_surface_add_listener(surface, &s_listener, this);
 }
 
-const org_kde_plasma_surface_listener PlasmaShellSurface::Private::s_listener = {autoHidingPanelHioceannCallback, autoHidingPanelShownCallback};
+const org_kde_plasma_surface_listener PlasmaShellSurface::Private::s_listener = {autoHidingPanelHiddenCallback, autoHidingPanelShownCallback};
 
-void PlasmaShellSurface::Private::autoHidingPanelHioceannCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface)
+void PlasmaShellSurface::Private::autoHidingPanelHiddenCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface)
 {
     auto p = reinterpret_cast<PlasmaShellSurface::Private *>(data);
     Q_ASSERT(p->surface == org_kde_plasma_surface);
-    Q_EMIT p->q->autoHidePanelHioceann();
+    Q_EMIT p->q->autoHidePanelHidden();
 }
 
 void PlasmaShellSurface::Private::autoHidingPanelShownCallback(void *data, org_kde_plasma_surface *org_kde_plasma_surface)

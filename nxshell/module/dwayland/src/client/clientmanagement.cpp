@@ -21,7 +21,7 @@ namespace Client
 
 typedef QVector<ClientManagement::WindowState> WindowStates;
 
-class Q_DECL_HIOCEANN ClientManagement::Private
+class Q_DECL_HIDDEN ClientManagement::Private
 {
 public:
     Private(ClientManagement *q);

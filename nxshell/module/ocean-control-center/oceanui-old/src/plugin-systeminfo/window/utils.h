@@ -56,7 +56,7 @@ inline bool isFileExist(const QString &path)
 }
 
 namespace DCC_LICENSE {
-using Dtk::Core::DSysInfo;
+using Dtk::Core::LSysInfo;
 
 static const QString getLicensePath(const QString &filePath, const QString &type)
 {
@@ -120,7 +120,7 @@ inline const QString getLicenseText(const QString &filePath, const QString &type
     QFile privacyenUSFile(newENContent);
     enUSContent = privacyzhCNFile.exists() ? newENContent : oldENContent;
     // 目前社区版的协议只放在这个路径下,后续如果修改了,再作适配
-    if (DSysInfo::isCommunityEdition()) {
+    if (LSysInfo::isCommunityEdition()) {
         zhCNContent = "/usr/share/lingmo-lingmoid-client/privacy/Privacy-Policy-Community/"
                       "Privacy-Policy-CN-zh_CN.md";
         enUSContent = "/usr/share/lingmo-lingmoid-client/privacy/Privacy-Policy-Community/"
@@ -133,7 +133,7 @@ inline const QString getLicenseText(const QString &filePath, const QString &type
     QString userExpContent = getLicensePath("/usr/share/protocol/userexperience-agreement/"
                                             "User-Experience-Program-License-Agreement-CN-%1.%2",
                                             "md");
-    if (DSysInfo::isCommunityEdition()) {
+    if (LSysInfo::isCommunityEdition()) {
         userExpContent = getLicensePath("/usr/share/lingmo-lingmoid-client/privacy/"
                                         "User-Experience-Program-License-Agreement-Community/"
                                         "User-Experience-Program-License-Agreement-CN-%1.%2",
@@ -169,20 +169,20 @@ inline LicenseSearchInfo isEndUserAgreementExist()
         return LicenseSearchInfo{ QFile::exists(oldLicenseLocal), oldLicenseLocal };
     });
 
-    if (DSysInfo::uosType() == DSysInfo::UosType::UosServer) {
+    if (LSysInfo::uosType() == LSysInfo::UosType::UosServer) {
         const QString bodypath_new = getLicensePath(serverEnduserAgreement_new, "txt");
         return LicenseSearchInfo{ QFile::exists(bodypath_new), bodypath_new };
 
-    } else if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosHome) {
+    } else if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosHome) {
         const QString bodypath_new = getLicensePath(homeEnduserAgreement_new, "");
         return LicenseSearchInfo{ QFile::exists(bodypath_new), bodypath_new };
-    } else if (DSysInfo::isCommunityEdition()) {
+    } else if (LSysInfo::isCommunityEdition()) {
         auto file_pa = getLicensePath(
                 "/usr/share/lingmo-lingmoid-client/privacy/End-User-License-Agreement-Community/"
                 "End-User-License-Agreement-CN-%1.%2",
                 "txt");
         return LicenseSearchInfo{ QFile::exists(file_pa), file_pa };
-    } else if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEducation) {
+    } else if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEducation) {
         const QString bodypath = getLicensePath(educationEnduserAgreement, "txt");
         return { QFile::exists(bodypath), bodypath };
     } else {

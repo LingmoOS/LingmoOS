@@ -110,23 +110,23 @@ void MenuWorker::createMenu(QMenu *settingsMenu)
         statusSubMenu->setAccessibleName("statussubmenu");
 
         QAction *keepShownAct = new QAction(tr("Keep Shown"), this);
-        QAction *keepHioceannAct = new QAction(tr("Keep Hioceann"), this);
+        QAction *keepHiddenAct = new QAction(tr("Keep Hidden"), this);
         QAction *smartHideAct = new QAction(tr("Smart Hide"), this);
 
         keepShownAct->setCheckable(true);
-        keepHioceannAct->setCheckable(true);
+        keepHiddenAct->setCheckable(true);
         smartHideAct->setCheckable(true);
 
         keepShownAct->setChecked(m_hideMode == KeepShowing);
-        keepHioceannAct->setChecked(m_hideMode == KeepHioceann);
+        keepHiddenAct->setChecked(m_hideMode == KeepHidden);
         smartHideAct->setChecked(m_hideMode == SmartHide);
 
         connect(keepShownAct,  &QAction::triggered, this, [ = ]{ DockSettings::instance()->setHideMode(HideMode::KeepShowing); });
-        connect(keepHioceannAct, &QAction::triggered, this, [ = ]{ DockSettings::instance()->setHideMode(HideMode::KeepHioceann);  });
+        connect(keepHiddenAct, &QAction::triggered, this, [ = ]{ DockSettings::instance()->setHideMode(HideMode::KeepHidden);  });
         connect(smartHideAct,  &QAction::triggered, this, [ = ]{ DockSettings::instance()->setHideMode(HideMode::SmartHide);   });
 
         statusSubMenu->addAction(keepShownAct);
-        statusSubMenu->addAction(keepHioceannAct);
+        statusSubMenu->addAction(keepHiddenAct);
         statusSubMenu->addAction(smartHideAct);
 
         QAction *act = new QAction(tr("Status"), this);

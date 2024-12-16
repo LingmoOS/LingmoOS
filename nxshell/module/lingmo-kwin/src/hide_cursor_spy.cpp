@@ -44,19 +44,19 @@ void HideCursorSpy::tabletToolEvent(TabletEvent *event)
 
 void HideCursorSpy::showCursor()
 {
-    if (!m_cursorHioceann) {
+    if (!m_cursorHidden) {
         return;
     }
-    m_cursorHioceann = false;
+    m_cursorHidden = false;
     Cursors::self()->showCursor();
 }
 
 void HideCursorSpy::hideCursor()
 {
-    if (m_cursorHioceann) {
+    if (m_cursorHidden) {
         return;
     }
-    m_cursorHioceann = true;
+    m_cursorHidden = true;
     Cursors::self()->hideCursor();
 }
 

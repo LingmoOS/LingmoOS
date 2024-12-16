@@ -27,10 +27,10 @@ TraySettings::TraySettings(QObject* parent)
 void TraySettings::init()
 {
     if (m_trayConfig && m_trayConfig->isValid()) {
-        m_hioceannSurfaceIds = m_trayConfig->value(KeyHioceannSurfaceIds).toStringList();
+        m_hioceannSurfaceIds = m_trayConfig->value(KeyHiddenSurfaceIds).toStringList();
         connect(m_trayConfig.data(), &DConfig::valueChanged, this, [this](const QString& key){
-            if (KeyHioceannSurfaceIds == key) {
-                auto hioceannSurfaceIds = m_trayConfig->value(KeyHioceannSurfaceIds).toStringList();
+            if (KeyHiddenSurfaceIds == key) {
+                auto hioceannSurfaceIds = m_trayConfig->value(KeyHiddenSurfaceIds).toStringList();
                 if (hioceannSurfaceIds == m_hioceannSurfaceIds) return;
                 m_hioceannSurfaceIds = hioceannSurfaceIds;
                 Q_EMIT hioceannSurfaceIdsChanged(m_hioceannSurfaceIds);
@@ -53,7 +53,7 @@ void TraySettings::addTrayItemOnDock(const QString &surfaceIds)
         return;
     if (m_hioceannSurfaceIds.contains(surfaceIds)) {
         m_hioceannSurfaceIds.removeOne(surfaceIds);
-        m_trayConfig->setValue(KeyHioceannSurfaceIds, m_hioceannSurfaceIds);
+        m_trayConfig->setValue(KeyHiddenSurfaceIds, m_hioceannSurfaceIds);
     }
 }
 
@@ -63,7 +63,7 @@ void TraySettings::removeTrayItemOnDock(const QString &surfaceIds)
         return;
     if (!m_hioceannSurfaceIds.contains(surfaceIds)) {
         m_hioceannSurfaceIds << surfaceIds;
-        m_trayConfig->setValue(KeyHioceannSurfaceIds, m_hioceannSurfaceIds);
+        m_trayConfig->setValue(KeyHiddenSurfaceIds, m_hioceannSurfaceIds);
     }
 }
 

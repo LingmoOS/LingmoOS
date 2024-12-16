@@ -74,7 +74,7 @@ private Q_SLOTS:
     void testMaximizedToFullscreen();
     void testSendMaximizedWindowToAnotherOutput();
     void testFullscreenMultipleOutputs();
-    void testHioceann();
+    void testHidden();
     void testDesktopFileName();
     void testCaptionSimplified();
     void testCaptionMultipleWindows();
@@ -636,7 +636,7 @@ void TestXdgShellWindow::testFullscreenMultipleOutputs()
     }
 }
 
-void TestXdgShellWindow::testHioceann()
+void TestXdgShellWindow::testHidden()
 {
     // this test verifies that when hiding window it doesn't get shown
     std::unique_ptr<KWayland::Client::Surface> surface(Test::createSurface());

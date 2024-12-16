@@ -89,7 +89,7 @@ NetManagerThreadPrivate::NetManagerThreadPrivate()
     , m_monitorNetworkNotify(false)
     , m_useSecretAgent(true)
     , m_network8021XMode(NetManager::ToControlCenter)
-    , m_autoUpdateHioceannConfig(true)
+    , m_autoUpdateHiddenConfig(true)
     , m_isInitialized(false)
     , m_enabled(true)
     , m_autoScanInterval(0)
@@ -220,9 +220,9 @@ void NetManagerThreadPrivate::setNetwork8021XMode(NetManager::Network8021XMode m
     m_network8021XMode = networkMode;
 }
 
-void NetManagerThreadPrivate::setAutoUpdateHioceannConfig(bool autoUpdate)
+void NetManagerThreadPrivate::setAutoUpdateHiddenConfig(bool autoUpdate)
 {
-    m_autoUpdateHioceannConfig = autoUpdate;
+    m_autoUpdateHiddenConfig = autoUpdate;
 }
 
 void NetManagerThreadPrivate::setAutoScanInterval(int ms)
@@ -278,10 +278,10 @@ void NetManagerThreadPrivate::disconnectConnection(const QString &path)
     QMetaObject::invokeMethod(this, "doDisconnectConnection", Qt::QueuedConnection, Q_ARG(QString, path));
 }
 
-void NetManagerThreadPrivate::connectHioceann(const QString &id, const QString &ssid)
+void NetManagerThreadPrivate::connectHidden(const QString &id, const QString &ssid)
 {
     if (m_isInitialized)
-        QMetaObject::invokeMethod(this, "doConnectHioceann", Qt::QueuedConnection, Q_ARG(QString, id), Q_ARG(QString, ssid));
+        QMetaObject::invokeMethod(this, "doConnectHidden", Qt::QueuedConnection, Q_ARG(QString, id), Q_ARG(QString, ssid));
 }
 
 void NetManagerThreadPrivate::connectWired(const QString &id, const QVariantMap &param)
@@ -642,7 +642,7 @@ void NetManagerThreadPrivate::doDisconnectConnection(const QString &path)
     }
 }
 
-void NetManagerThreadPrivate::doConnectHioceann(const QString &id, const QString &ssid)
+void NetManagerThreadPrivate::doConnectHidden(const QString &id, const QString &ssid)
 {
     QList<NetworkDeviceBase *> devices = NetworkController::instance()->devices();
     auto it = std::find_if(devices.begin(), devices.end(), [id](NetworkDeviceBase *dev) {
@@ -1159,7 +1159,7 @@ void NetManagerThreadPrivate::doGetConnectInfo(const QString &id, NetType::NetIt
             Q_EMIT request(NetManager::ConnectInfo, id, retParam);
         }
     } break;
-    case NetType::WirelessHioceannItem: { // 新建无线网络/隐藏网络
+    case NetType::WirelessHiddenItem: { // 新建无线网络/隐藏网络
         QStringList ids = id.split(":");
         if (ids.size() != 2) {
             return;
@@ -1172,7 +1172,7 @@ void NetManagerThreadPrivate::doGetConnectInfo(const QString &id, NetType::NetIt
         }
 
         NetworkManager::ConnectionSettings::Ptr settings = NetworkManager::ConnectionSettings::Ptr(new ConnectionSettings(ConnectionSettings::Wireless));
-        settings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->setHioceann(true);
+        settings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->setHidden(true);
         settings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->setInitialized(true);
         QVariantMap retParam;
         const NMVariantMapMap &settingsMap = settings->toMap();
@@ -1330,7 +1330,7 @@ void NetManagerThreadPrivate::doSetConnectInfo(const QString &id, NetType::NetIt
         devPath = id;
         break;
     case NetType::WiredItem:
-    case NetType::WirelessHioceannItem:
+    case NetType::WirelessHiddenItem:
         devPath = id.split(":").first();
         break;
     case NetType::WirelessItem: {
@@ -1967,7 +1967,7 @@ void NetManagerThreadPrivate::onActiveConnectionChanged()
         }
     } break;
     case DeviceType::Wireless:
-        updateHioceannNetworkConfig(qobject_cast<WirelessDevice *>(dev));
+        updateHiddenNetworkConfig(qobject_cast<WirelessDevice *>(dev));
         break;
     default:
         break;
@@ -2483,9 +2483,9 @@ void NetManagerThreadPrivate::sendNetworkNotify(NetworkNotifyType type, const QS
     }
 }
 
-void NetManagerThreadPrivate::updateHioceannNetworkConfig(WirelessDevice *wireless)
+void NetManagerThreadPrivate::updateHiddenNetworkConfig(WirelessDevice *wireless)
 {
-    if (!m_autoUpdateHioceannConfig || !m_enabled)
+    if (!m_autoUpdateHiddenConfig || !m_enabled)
         return;
 
     DeviceStatus const status = wireless->deviceStatus();
@@ -2622,7 +2622,7 @@ bool NetManagerThreadPrivate::needSetPassword(AccessPoints *accessPoint) const
 
 void NetManagerThreadPrivate::handleAccessPointSecure(AccessPoints *accessPoint)
 {
-    if (!m_autoUpdateHioceannConfig || !m_enabled)
+    if (!m_autoUpdateHiddenConfig || !m_enabled)
         return;
 
     if (needSetPassword(accessPoint)) {

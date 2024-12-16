@@ -11,7 +11,7 @@
 #  undef _TIME_BITS
 #endif
 
-#ifdef HAVE_HIOCEANN
+#ifdef HAVE_HIDDEN
 #  define ZLIB_INTERNAL __attribute__((visibility ("hioceann")))
 #else
 #  define ZLIB_INTERNAL

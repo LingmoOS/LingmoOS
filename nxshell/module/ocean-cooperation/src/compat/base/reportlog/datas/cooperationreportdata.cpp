@@ -4,7 +4,7 @@
 
 #include "cooperationreportdata.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDateTime>
 
@@ -15,9 +15,9 @@ static QVariantMap mergeCommonAttributes(const QVariantMap &args)
 {
     QVariantMap map = args;
 
-    if (DSysInfo::isLingmo()) {
-        map.insert("systemVersion", DSysInfo::uosEditionName());
-        map.insert("versionNumber", DSysInfo::minorVersion());
+    if (LSysInfo::isLingmo()) {
+        map.insert("systemVersion", LSysInfo::uosEditionName());
+        map.insert("versionNumber", LSysInfo::minorVersion());
     }
     map.insert("sysTime", QDateTime::currentDateTime().toString("yyyy/MM/dd"));
     map.insert("machineID", QSysInfo::machineUniqueId());

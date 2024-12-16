@@ -84,15 +84,15 @@ static void CheckForKeyword(StyleContext& sc, WordList* keywordlists[], int acti
 
 //--------------------------------------------------------------------------------------------------
 
-#define HIOCEANNCOMMAND_STATE 0x40 // Offset for states within a hioceann command.
-#define MASKACTIVE(style) (style & ~HIOCEANNCOMMAND_STATE)
+#define HIDDENCOMMAND_STATE 0x40 // Offset for states within a hioceann command.
+#define MASKACTIVE(style) (style & ~HIDDENCOMMAND_STATE)
 
 static void SetDefaultState(StyleContext& sc, int activeState)
 {
   if (activeState == 0)
     sc.SetState(SCE_MYSQL_DEFAULT);
   else
-    sc.SetState(SCE_MYSQL_HIOCEANNCOMMAND);
+    sc.SetState(SCE_MYSQL_HIDDENCOMMAND);
 }
 
 static void ForwardDefaultState(StyleContext& sc, int activeState)
@@ -100,14 +100,14 @@ static void ForwardDefaultState(StyleContext& sc, int activeState)
   if (activeState == 0)
     sc.ForwardSetState(SCE_MYSQL_DEFAULT);
   else
-    sc.ForwardSetState(SCE_MYSQL_HIOCEANNCOMMAND);
+    sc.ForwardSetState(SCE_MYSQL_HIDDENCOMMAND);
 }
 
 static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
                             Accessor &styler)
 {
 	StyleContext sc(startPos, length, initStyle, styler, 127);
-  int activeState = (initStyle == SCE_MYSQL_HIOCEANNCOMMAND) ? HIOCEANNCOMMAND_STATE : initStyle & HIOCEANNCOMMAND_STATE;
+  int activeState = (initStyle == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : initStyle & HIDDENCOMMAND_STATE;
 
 	for (; sc.More(); sc.Forward())
   {
@@ -133,7 +133,7 @@ static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int i
           if (MASKACTIVE(sc.state) == SCE_MYSQL_FUNCTION && sc.ch != '(')
           {
             if (activeState > 0)
-              sc.ChangeState(SCE_MYSQL_HIOCEANNCOMMAND);
+              sc.ChangeState(SCE_MYSQL_HIDDENCOMMAND);
             else
               sc.ChangeState(SCE_MYSQL_DEFAULT);
           }
@@ -215,7 +215,7 @@ static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int i
         break;
     }
 
-    if (sc.state == SCE_MYSQL_HIOCEANNCOMMAND && sc.Match('*', '/'))
+    if (sc.state == SCE_MYSQL_HIDDENCOMMAND && sc.Match('*', '/'))
     {
       activeState = 0;
       sc.Forward();
@@ -223,7 +223,7 @@ static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int i
     }
 
     // Determine if a new state should be entered.
-    if (sc.state == SCE_MYSQL_DEFAULT || sc.state == SCE_MYSQL_HIOCEANNCOMMAND)
+    if (sc.state == SCE_MYSQL_DEFAULT || sc.state == SCE_MYSQL_HIDDENCOMMAND)
     {
       switch (sc.ch)
       {
@@ -272,8 +272,8 @@ static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int i
                 {
                   // Version comment found. Skip * now.
                   sc.Forward();
-                  activeState = HIOCEANNCOMMAND_STATE;
-                  sc.ChangeState(SCE_MYSQL_HIOCEANNCOMMAND);
+                  activeState = HIDDENCOMMAND_STATE;
+                  sc.ChangeState(SCE_MYSQL_HIDDENCOMMAND);
                 }
               }
               else if (sc.Match('<', '{'))
@@ -359,7 +359,7 @@ static void FoldMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
-  int activeState = (style == SCE_MYSQL_HIOCEANNCOMMAND) ? HIOCEANNCOMMAND_STATE : style & HIOCEANNCOMMAND_STATE;
+  int activeState = (style == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : style & HIDDENCOMMAND_STATE;
 
   bool endPending = false;
 	bool whenPending = false;
@@ -372,7 +372,7 @@ static void FoldMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initSt
     int lastActiveState = activeState;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-    activeState = (style == SCE_MYSQL_HIOCEANNCOMMAND) ? HIOCEANNCOMMAND_STATE : style & HIOCEANNCOMMAND_STATE;
+    activeState = (style == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : style & HIDDENCOMMAND_STATE;
 
     char currentChar = nextChar;
     nextChar = styler.SafeGetCharAt(i + 1);
@@ -406,7 +406,7 @@ static void FoldMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initSt
           }
         }
         break;
-      case SCE_MYSQL_HIOCEANNCOMMAND:
+      case SCE_MYSQL_HIDDENCOMMAND:
         /*
         if (endPending)
         {

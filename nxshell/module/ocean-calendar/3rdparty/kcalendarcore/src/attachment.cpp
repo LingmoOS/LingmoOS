@@ -26,7 +26,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Attachment::Private : public QSharedData
+class Q_DECL_HIDDEN KCalendarCore::Attachment::Private : public QSharedData
 {
 public:
     Private() = default;

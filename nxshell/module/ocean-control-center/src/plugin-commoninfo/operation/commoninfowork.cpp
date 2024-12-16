@@ -24,7 +24,7 @@
 
 Q_LOGGING_CATEGORY(OceanUICommonInfoWork, "oceanui-commoninfo-work");
 
-#define IS_COMMUNITY_SYSTEM (DSysInfo::UosCommunity == DSysInfo::uosEditionType())       // 是否是社区版
+#define IS_COMMUNITY_SYSTEM (LSysInfo::UosCommunity == LSysInfo::uosEditionType())       // 是否是社区版
 
 std::mutex SCALE_SETTING_GUARD;
 
@@ -63,7 +63,7 @@ static const QString getLicensePath(const QString &filePath, const QString &type
 static QString getUserExpContent()
 {
     QString userExpContent = getLicensePath("/usr/share/protocol/userexperience-agreement/User-Experience-Program-License-Agreement-CN-%1.md", "");
-    if (DSysInfo::isCommunityEdition()) {
+    if (LSysInfo::isCommunityEdition()) {
         userExpContent = getLicensePath("/usr/share/lingmo-lingmoid-client/privacy/User-Experience-Program-License-Agreement-Community/User-Experience-Program-License-Agreement-CN-%1.md", "");
         return userExpContent;
     }

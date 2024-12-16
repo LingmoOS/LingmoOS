@@ -17,7 +17,7 @@
 #include <DDesktopServices>
 #include <DDialog>
 #include <DFontSizeManager>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTitlebar>
 
 #include <QApplication>
@@ -59,7 +59,7 @@ CreateAccountPage::CreateAccountPage(AccountsWorker *accountsWorker, QWidget *pa
     m_repeatpasswdEdit->setCutEnabled(false);
 
     m_groupListView = new DCCListView(this);
-    m_isServerSystem = DSysInfo::UosServer == DSysInfo::uosType();
+    m_isServerSystem = LSysInfo::UosServer == LSysInfo::uosType();
     QVBoxLayout *mainContentLayout = new QVBoxLayout;
     mainContentLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
     DTitlebar *titleIcon = new DTitlebar();
@@ -634,8 +634,8 @@ bool CreateAccountPage::checkPassword(DPasswordEdit *edit, bool &needShowSafetyP
         m_passwdEdit->showAlertMessage(msg, 2000);
 
         // 企业版控制中心用户创建屏蔽安全中心登录安全的接口需求
-        if ((DSysInfo::uosEditionType() == DSysInfo::UosEnterprise)
-            || (DSysInfo::uosEditionType() == DSysInfo::UosEnterpriseC))
+        if ((LSysInfo::uosEditionType() == LSysInfo::UosEnterprise)
+            || (LSysInfo::uosEditionType() == LSysInfo::UosEnterpriseC))
             return false;
 
         needShowSafetyPage = true;

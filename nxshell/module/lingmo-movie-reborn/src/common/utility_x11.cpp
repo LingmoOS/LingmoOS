@@ -25,7 +25,7 @@
 #define _NET_WM_STATE_ADD           1    /* add/set property */
 #define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
 
-const char kAtomNameHioceann[] = "_NET_WM_STATE_HIOCEANN";
+const char kAtomNameHidden[] = "_NET_WM_STATE_HIDDEN";
 const char kAtomNameFullscreen[] = "_NET_WM_STATE_FULLSCREEN";
 const char kAtomNameMaximizedHorz[] = "_NET_WM_STATE_MAXIMIZED_HORZ";
 const char kAtomNameMaximizedVert[] = "_NET_WM_STATE_MAXIMIZED_VERT";

@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN DataSource::Private
+class Q_DECL_HIDDEN DataSource::Private
 {
 public:
     explicit Private(DataSource *q);

@@ -139,7 +139,7 @@ bool RmDir(const QString &dirpath)
     QDir dir(dirpath);
 
     if (dir.exists(dirpath)) {
-        Q_FOREACH (QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+        Q_FOREACH (QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
             if (info.isDir()) {
                 result = RmDir(info.absoluteFilePath());
             } else {

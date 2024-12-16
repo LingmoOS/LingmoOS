@@ -43,15 +43,15 @@ func (m *Manager) handlePackageNameSearchChanged() {
 
 }
 
-func (m *Manager) handleAppHioceannChanged() {
-	m.appsHioceannMu.Lock()
-	defer m.appsHioceannMu.Unlock()
+func (m *Manager) handleAppHiddenChanged() {
+	m.appsHiddenMu.Lock()
+	defer m.appsHiddenMu.Unlock()
 
-	newVal := m.settings.GetStrv(gsKeyAppsHioceann)
-	logger.Debug(gsKeyAppsHioceann+" changed", newVal)
+	newVal := m.settings.GetStrv(gsKeyAppsHidden)
+	logger.Debug(gsKeyAppsHidden+" changed", newVal)
 
-	aoceand, removed := diffAppsHioceann(m.appsHioceann, newVal)
-	logger.Debugf(gsKeyAppsHioceann+" aoceand: %v, removed: %v", aoceand, removed)
+	aoceand, removed := diffAppsHidden(m.appsHidden, newVal)
+	logger.Debugf(gsKeyAppsHidden+" aoceand: %v, removed: %v", aoceand, removed)
 	for _, appID := range aoceand {
 		// apps need to be hioceann
 		item := m.getItemById(appID)
@@ -87,21 +87,21 @@ func (m *Manager) handleAppHioceannChanged() {
 		m.addItemWithLock(item)
 		m.emitItemChanged(item, AppStatusCreated)
 	}
-	m.appsHioceann = newVal
+	m.appsHidden = newVal
 }
 
 func (m *Manager) listenSettingsChanged() {
 	gsettings.ConnectChanged(gsSchemaLauncher, "*", func(key string) {
 		switch key {
-		case gsKeyAppsHioceann:
-			m.handleAppHioceannChanged()
+		case gsKeyAppsHidden:
+			m.handleAppHiddenChanged()
 		case gsKeyPackageNameSearch:
 			m.handlePackageNameSearchChanged()
 		}
 	})
 }
 
-func diffAppsHioceann(old, new []string) (aoceand, removed []string) {
+func diffAppsHidden(old, new []string) (aoceand, removed []string) {
 	if len(old) == 0 {
 		return new, nil
 	}

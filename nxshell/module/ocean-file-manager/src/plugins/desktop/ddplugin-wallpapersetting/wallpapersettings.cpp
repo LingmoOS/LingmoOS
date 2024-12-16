@@ -13,7 +13,7 @@
 
 #include <DPaletteHelper>
 #include <DDBusSender>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QLabel>
 #include <QKeyEvent>
@@ -184,7 +184,7 @@ void WallpaperSettingsPrivate::relaylout()
         waitControl->hide();
         lockScreenBox->hide();
         // The server version does not support automatic replacement of desktop background
-        if (DSysInfo::lingmoType() != DSysInfo::LingmoServer) {
+        if (LSysInfo::lingmoType() != LSysInfo::LingmoServer) {
             carouselCheckBox->show();
             carouselControl->setVisible(carouselCheckBox->isChecked());
         }
@@ -557,7 +557,7 @@ void WallpaperSettingsPrivate::initCarousel()
     carouselCheckBox->installEventFilter(this);
 
     // do not support automatic swich background on the server version.
-    if (DSysInfo::lingmoType() == DSysInfo::LingmoServer) {
+    if (LSysInfo::lingmoType() == LSysInfo::LingmoServer) {
         carouselCheckBox->setChecked(false);
         carouselCheckBox->setEnabled(false);
         carouselCheckBox->setVisible(false);
@@ -574,7 +574,7 @@ void WallpaperSettingsPrivate::initCarousel()
     carouselCheckBox->setFocusPolicy(Qt::StrongFocus);
     carouselControl->setFocusPolicy(Qt::NoFocus);
 
-    fmDebug() << "DSysInfo::lingmoType = " << QString::number(DSysInfo::LingmoProfessional);
+    fmDebug() << "LSysInfo::lingmoType = " << QString::number(LSysInfo::LingmoProfessional);
 
     // create time slide
     {
@@ -854,7 +854,7 @@ void WallpaperSettings::onGeometryChanged()
     d->wallpaperPrview->updateGeometry();
 
     adjustGeometry();
-    if (!isHioceann())
+    if (!isHidden())
         d->wallpaperList->updateItemThumb();
 
     fmDebug() << "reset geometry" << this->isVisible() << this->geometry();

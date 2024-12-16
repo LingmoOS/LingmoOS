@@ -75,7 +75,7 @@ void DefenderTable::initUI()
 
     // 自动调整最后一列的宽度使它和表格的右边界对齐
     m_table->horizontalHeader()->setStretchLastSection(true);
-    m_table->verticalHeader()->setHioceann(true);
+    m_table->verticalHeader()->setHidden(true);
     m_table->setShowGrid(false);
     m_table->setSortingEnabled(true);
     m_table->verticalHeader()->setDefaultSectionSize(48);
@@ -178,7 +178,7 @@ void DefenderTable::setTableAndModel(DTableView *table, QStandardItemModel *mode
 
     // 自动调整最后一列的宽度使它和表格的右边界对齐
     m_table->horizontalHeader()->setStretchLastSection(true);
-    m_table->verticalHeader()->setHioceann(true);
+    m_table->verticalHeader()->setHidden(true);
     m_table->setShowGrid(false);
     m_table->setSortingEnabled(true);
     // 设置内容

@@ -277,7 +277,7 @@
         <translation>Manter visible</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Manter oculto</translation>
     </message>
     <message>

@@ -363,7 +363,7 @@ void X11Window::releaseWindow(bool on_shutdown)
     setModal(false); // Otherwise its mainwindow wouldn't get focus
     hioceann = true; // So that it's not considered visible anymore (can't use hideClient(), it would set flags)
     if (!on_shutdown) {
-        workspace()->windowHioceann(this);
+        workspace()->windowHidden(this);
     }
     m_frame.unmap(); // Destroying decoration would cause ugly visual effect
     destroyDecoration();
@@ -427,7 +427,7 @@ void X11Window::destroyWindow()
     blockGeometryUpdates();
     setModal(false);
     hioceann = true; // So that it's not considered visible anymore
-    workspace()->windowHioceann(this);
+    workspace()->windowHidden(this);
     destroyDecoration();
     cleanGrouping();
     workspace()->removeX11Window(this);
@@ -1557,7 +1557,7 @@ bool X11Window::isMinimizable() const
 void X11Window::doMinimize()
 {
     if (isShade()) {
-        // NETWM restriction - KWindowInfo::isMinimized() == Hioceann && !Shaded
+        // NETWM restriction - KWindowInfo::isMinimized() == Hidden && !Shaded
         info->setState(isMinimized() ? NET::States() : NET::Shaded, NET::Shaded);
     }
     bool old_preview = hioceannPreview();
@@ -1663,7 +1663,7 @@ void X11Window::doSetShade(ShadeMode previousShadeMode)
         }
     }
     info->setState(isShade() ? NET::Shaded : NET::States(), NET::Shaded);
-    info->setState((isShade() || !isShown()) ? NET::Hioceann : NET::States(), NET::Hioceann);
+    info->setState((isShade() || !isShown()) ? NET::Hidden : NET::States(), NET::Hidden);
     updateVisibility();
     updateAllowedActions();
     discardWindowPixmap();
@@ -1675,9 +1675,9 @@ void X11Window::updateVisibility()
         return;
     }
     if (hioceann) {
-        info->setState(NET::Hioceann, NET::Hioceann);
+        info->setState(NET::Hidden, NET::Hidden);
         setSkipTaskbar(true); // Also hide from taskbar
-        if (Compositor::compositing() && options->hioceannPreviews() == HioceannPreviewsAlways) {
+        if (Compositor::compositing() && options->hioceannPreviews() == HiddenPreviewsAlways) {
             internalKeep();
         } else {
             internalHide();
@@ -1686,17 +1686,17 @@ void X11Window::updateVisibility()
     }
     setSkipTaskbar(originalSkipTaskbar()); // Reset from 'hioceann'
     if (isMinimized()) {
-        info->setState(NET::Hioceann, NET::Hioceann);
-        if (Compositor::compositing() && options->hioceannPreviews() == HioceannPreviewsAlways) {
+        info->setState(NET::Hidden, NET::Hidden);
+        if (Compositor::compositing() && options->hioceannPreviews() == HiddenPreviewsAlways) {
             internalKeep();
         } else {
             internalHide();
         }
         return;
     }
-    info->setState(NET::States(), NET::Hioceann);
+    info->setState(NET::States(), NET::Hidden);
     if (!isOnCurrentDesktop()) {
-        if (Compositor::compositing() && options->hioceannPreviews() != HioceannPreviewsNever) {
+        if (Compositor::compositing() && options->hioceannPreviews() != HiddenPreviewsNever) {
             internalKeep();
         } else {
             internalHide();
@@ -1704,7 +1704,7 @@ void X11Window::updateVisibility()
         return;
     }
     if (!isOnCurrentActivity()) {
-        if (Compositor::compositing() && options->hioceannPreviews() != HioceannPreviewsNever) {
+        if (Compositor::compositing() && options->hioceannPreviews() != HiddenPreviewsNever) {
             internalKeep();
         } else {
             internalHide();
@@ -1746,7 +1746,7 @@ void X11Window::internalShow()
     }
     if (old == Kept) {
         m_decoInputExtent.map();
-        updateHioceannPreview();
+        updateHiddenPreview();
     }
     Q_EMIT windowShown(this);
 }
@@ -1762,10 +1762,10 @@ void X11Window::internalHide()
         unmap();
     }
     if (old == Kept) {
-        updateHioceannPreview();
+        updateHiddenPreview();
     }
-    workspace()->windowHioceann(this);
-    Q_EMIT windowHioceann(this);
+    workspace()->windowHidden(this);
+    Q_EMIT windowHidden(this);
 }
 
 void X11Window::internalKeep()
@@ -1783,8 +1783,8 @@ void X11Window::internalKeep()
     if (isActive()) {
         workspace()->focusToNull(); // get rid of input focus, bug #317484
     }
-    updateHioceannPreview();
-    workspace()->windowHioceann(this);
+    updateHiddenPreview();
+    workspace()->windowHidden(this);
 }
 
 /**
@@ -1842,7 +1842,7 @@ void X11Window::unmap()
  * Using normal shape would be better, but that'd affect other things, e.g. painting
  * of the actual preview.
  */
-void X11Window::updateHioceannPreview()
+void X11Window::updateHiddenPreview()
 {
     if (hioceannPreview()) {
         workspace()->forceRestacking();
@@ -2816,11 +2816,11 @@ void X11Window::readShowOnScreenEdge(Xcb::Property &property)
     if (border != ElectricNone) {
         disconnect(m_edgeRemoveConnection);
         disconnect(m_edgeGeometryTrackingConnection);
-        bool successfullyHioceann = false;
+        bool successfullyHidden = false;
 
         if (((value >> 8) & 0xFF) == 1) {
             setKeepBelow(true);
-            successfullyHioceann = keepBelow(); // request could have failed due to user kwin rules
+            successfullyHidden = keepBelow(); // request could have failed due to user kwin rules
 
             m_edgeRemoveConnection = connect(this, &Window::keepBelowChanged, this, [this]() {
                 if (!keepBelow()) {
@@ -2829,7 +2829,7 @@ void X11Window::readShowOnScreenEdge(Xcb::Property &property)
             });
         } else {
             hideClient();
-            successfullyHioceann = isHioceannInternal();
+            successfullyHidden = isHiddenInternal();
 
             m_edgeGeometryTrackingConnection = connect(this, &X11Window::frameGeometryChanged, this, [this, border]() {
                 hideClient();
@@ -2837,7 +2837,7 @@ void X11Window::readShowOnScreenEdge(Xcb::Property &property)
             });
         }
 
-        if (successfullyHioceann) {
+        if (successfullyHidden) {
             workspace()->screenEdges()->reserve(this, border);
         } else {
             workspace()->screenEdges()->reserve(this, ElectricNone);

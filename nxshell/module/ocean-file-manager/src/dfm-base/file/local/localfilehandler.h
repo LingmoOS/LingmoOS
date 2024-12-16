@@ -48,7 +48,7 @@ public:
     bool deleteFileRecursive(const QUrl &url);
     bool setFileTime(const QUrl &url, const QDateTime &accessDateTime, const QDateTime &lastModifiedTime);
     bool renameFilesBatch(const QMap<QUrl, QUrl> &urls, QMap<QUrl, QUrl> &successUrls);
-    bool doHioceannFileRemind(const QString &name, bool *checkRule = nullptr);
+    bool doHiddenFileRemind(const QString &name, bool *checkRule = nullptr);
 
     QString defaultTerminalPath();
     GlobalEventType lastEventType();

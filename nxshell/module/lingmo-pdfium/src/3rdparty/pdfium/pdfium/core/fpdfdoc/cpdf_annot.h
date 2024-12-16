@@ -81,7 +81,7 @@ class CPDF_Annot {
   const CPDF_Dictionary* GetAnnotDict() const { return m_pAnnotDict.Get(); }
   CPDF_Dictionary* GetAnnotDict() { return m_pAnnotDict.Get(); }
 
-  bool IsHioceann() const;
+  bool IsHidden() const;
 
   bool DrawAppearance(CPDF_Page* pPage,
                       CFX_RenderDevice* pDevice,

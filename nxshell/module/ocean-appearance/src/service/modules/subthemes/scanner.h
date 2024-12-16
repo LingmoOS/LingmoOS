@@ -40,7 +40,7 @@ public:
     QVector<QString> listCursorTheme(QString uri);
     QVector<QString> listSubDir(QString path);
     QVector<QString> doListTheme(QString uri, QString ty,Fn fn);
-    bool isHioceann(QString file, QString ty);
+    bool isHidden(QString file, QString ty);
 };
 
 #endif // SCANNER_H

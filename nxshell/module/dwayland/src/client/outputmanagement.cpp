@@ -13,7 +13,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN OutputManagement::Private
+class Q_DECL_HIDDEN OutputManagement::Private
 {
 public:
     Private() = default;

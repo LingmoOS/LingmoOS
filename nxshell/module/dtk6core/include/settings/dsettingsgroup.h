@@ -26,7 +26,7 @@ public:
 
     QString key() const;
     QString name() const;
-    bool isHioceann() const;
+    bool isHidden() const;
 
     QPointer<DSettingsGroup> childGroup(const QString &groupKey) const;
     QPointer<DSettingsOption> option(const QString &key) const;

@@ -15,7 +15,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Region::Private
+class Q_DECL_HIDDEN Region::Private
 {
 public:
     Private(const QRegion &region);

@@ -472,55 +472,55 @@ void ProcessTableView::initUI(bool settingsLoaded)
     if (!settingsLoaded) {
         // proc name
         setColumnWidth(ProcessTableModel::kProcessNameColumn, 300);
-        setColumnHioceann(ProcessTableModel::kProcessNameColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessNameColumn, false);
 
         // cpu
         setColumnWidth(ProcessTableModel::kProcessCPUColumn, 100);
-        setColumnHioceann(ProcessTableModel::kProcessCPUColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessCPUColumn, false);
 
         // account
         setColumnWidth(ProcessTableModel::kProcessUserColumn, 80);
-        setColumnHioceann(ProcessTableModel::kProcessUserColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessUserColumn, true);
 
         // memory
         setColumnWidth(ProcessTableModel::kProcessMemoryColumn, 70);
-        setColumnHioceann(ProcessTableModel::kProcessMemoryColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessMemoryColumn, false);
 
         // share memory
         setColumnWidth(ProcessTableModel::kProcessShareMemoryColumn, 80);
-        setColumnHioceann(ProcessTableModel::kProcessShareMemoryColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessShareMemoryColumn, true);
 
         // vtr memory
         setColumnWidth(ProcessTableModel::kProcessVTRMemoryColumn, 80);
-        setColumnHioceann(ProcessTableModel::kProcessVTRMemoryColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessVTRMemoryColumn, true);
 
         // download
         setColumnWidth(ProcessTableModel::kProcessDownloadColumn, 70);
-        setColumnHioceann(ProcessTableModel::kProcessDownloadColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessDownloadColumn, false);
 
         // upload
         setColumnWidth(ProcessTableModel::kProcessUploadColumn, 70);
-        setColumnHioceann(ProcessTableModel::kProcessUploadColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessUploadColumn, false);
 
         // disk read
         setColumnWidth(ProcessTableModel::kProcessDiskReadColumn, 80);
-        setColumnHioceann(ProcessTableModel::kProcessDiskReadColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessDiskReadColumn, true);
 
         // disk write
         setColumnWidth(ProcessTableModel::kProcessDiskWriteColumn, 80);
-        setColumnHioceann(ProcessTableModel::kProcessDiskWriteColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessDiskWriteColumn, true);
 
         // pid
         setColumnWidth(ProcessTableModel::kProcessPIDColumn, 70);
-        setColumnHioceann(ProcessTableModel::kProcessPIDColumn, false);
+        setColumnHidden(ProcessTableModel::kProcessPIDColumn, false);
 
         // nice
         setColumnWidth(ProcessTableModel::kProcessNiceColumn, 100);
-        setColumnHioceann(ProcessTableModel::kProcessNiceColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessNiceColumn, true);
 
         // priority
         setColumnWidth(ProcessTableModel::kProcessPriorityColumn, 100);
-        setColumnHioceann(ProcessTableModel::kProcessPriorityColumn, true);
+        setColumnHidden(ProcessTableModel::kProcessPriorityColumn, true);
 
         //sort
         sortByColumn(ProcessTableModel::kProcessCPUColumn, Qt::DescendingOrder);
@@ -689,7 +689,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessCPU));
     cpuHeaderAction->setCheckable(true);
     connect(cpuHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessCPUColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessCPUColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -698,7 +698,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessUser));
     userHeaderAction->setCheckable(true);
     connect(userHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessUserColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessUserColumn, !b);
         saveSettings();
     });
     // memory action
@@ -706,7 +706,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessMemory));
     memHeaderAction->setCheckable(true);
     connect(memHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessMemoryColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessMemoryColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -715,7 +715,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessShareMemory));
     sharememHeaderAction->setCheckable(true);
     connect(sharememHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessShareMemoryColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessShareMemoryColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -724,7 +724,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessVtrMemory));
     vtrmemHeaderAction->setCheckable(true);
     connect(vtrmemHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessVTRMemoryColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessVTRMemoryColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -733,7 +733,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessUpload));
     uploadHeaderAction->setCheckable(true);
     connect(uploadHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessUploadColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessUploadColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -742,7 +742,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessDownload));
     downloadHeaderAction->setCheckable(true);
     connect(downloadHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessDownloadColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessDownloadColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -751,7 +751,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessDiskRead));
     dreadHeaderAction->setCheckable(true);
     connect(dreadHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessDiskReadColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessDiskReadColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -760,7 +760,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessDiskWrite));
     dwriteHeaderAction->setCheckable(true);
     connect(dwriteHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessDiskWriteColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessDiskWriteColumn, !b);
         saveSettings();
         Q_EMIT signalHeadchanged();
     });
@@ -769,7 +769,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessPID));
     pidHeaderAction->setCheckable(true);
     connect(pidHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessPIDColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessPIDColumn, !b);
         saveSettings();
     });
     // nice value action
@@ -777,7 +777,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessNice));
     niceHeaderAction->setCheckable(true);
     connect(niceHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessNiceColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessNiceColumn, !b);
         saveSettings();
     });
     // priority value action
@@ -785,7 +785,7 @@ void ProcessTableView::initConnections(bool settingsLoaded)
             DApplication::translate("Process.Table.Header", kProcessPriority));
     priorityHeaderAction->setCheckable(true);
     connect(priorityHeaderAction, &QAction::triggered, this, [this](bool b) {
-        header()->setSectionHioceann(ProcessTableModel::kProcessPriorityColumn, !b);
+        header()->setSectionHidden(ProcessTableModel::kProcessPriorityColumn, !b);
         saveSettings();
     });
 
@@ -806,29 +806,29 @@ void ProcessTableView::initConnections(bool settingsLoaded)
     // set header context menu checkable state based on current header section's visible state before popup
     connect(m_headerContextMenu, &QMenu::aboutToShow, this, [=]() {
         bool b;
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessCPUColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessCPUColumn);
         cpuHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessMemoryColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessMemoryColumn);
         memHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessShareMemoryColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessShareMemoryColumn);
         sharememHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessVTRMemoryColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessVTRMemoryColumn);
         vtrmemHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessUploadColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessUploadColumn);
         uploadHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessDownloadColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessDownloadColumn);
         downloadHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessDiskReadColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessDiskReadColumn);
         dreadHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessDiskWriteColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessDiskWriteColumn);
         dwriteHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessPIDColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessPIDColumn);
         pidHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessNiceColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessNiceColumn);
         niceHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessPriorityColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessPriorityColumn);
         priorityHeaderAction->setChecked(!b);
-        b = header()->isSectionHioceann(ProcessTableModel::kProcessUserColumn);
+        b = header()->isSectionHidden(ProcessTableModel::kProcessUserColumn);
         userHeaderAction->setChecked(!b);
     });
 

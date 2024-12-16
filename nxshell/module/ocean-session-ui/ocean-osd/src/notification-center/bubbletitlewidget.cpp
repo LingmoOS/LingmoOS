@@ -11,7 +11,7 @@
 #include <QScroller>
 
 #include <DFontSizeManager>
-#include <DSysInfo>
+#include <LSysInfo>
 
 BubbleTitleWidget::BubbleTitleWidget(NotifyModel *model, EntityPtr entity, QWidget *parent)
     : DWidget(parent),
@@ -58,7 +58,7 @@ void BubbleTitleWidget::enterEvent(QEvent *event)
 {
     // QScroller::hasScroller用于判断listview是否处于滑动状态，滑动状态不触发paint相关操作，否则滑动动画异常
     // 欧拉此函数返回异常，且无触屏场景,不需要此判断
-    if (Dtk::Core::DSysInfo::uosEditionType() == Dtk::Core::DSysInfo::UosEuler)
+    if (Dtk::Core::LSysInfo::uosEditionType() == Dtk::Core::LSysInfo::UosEuler)
         m_closeButton->setVisible(true);
     if (!QScroller::hasScroller(m_view)) {
         m_closeButton->setVisible(true);
@@ -68,7 +68,7 @@ void BubbleTitleWidget::enterEvent(QEvent *event)
 
 void BubbleTitleWidget::leaveEvent(QEvent *event)
 {
-    if (Dtk::Core::DSysInfo::uosEditionType() == Dtk::Core::DSysInfo::UosEuler)
+    if (Dtk::Core::LSysInfo::uosEditionType() == Dtk::Core::LSysInfo::UosEuler)
         m_closeButton->setVisible(false);
     bool hasScroller = QScroller::hasScroller(m_view);
     if (!hasScroller) {

@@ -68,8 +68,8 @@ ConnectionStatus AccessPointsProxyInter::status() const
 
 bool AccessPointsProxyInter::hioceann() const
 {
-    if (m_json.contains("Hioceann"))
-        return m_json.value("Hioceann").toBool();
+    if (m_json.contains("Hidden"))
+        return m_json.value("Hidden").toBool();
 
     return false;
 }

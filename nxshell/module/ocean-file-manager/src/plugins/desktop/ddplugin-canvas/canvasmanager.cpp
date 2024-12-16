@@ -382,7 +382,7 @@ void CanvasManagerPrivate::initModel()
 {
     sourceModel = new FileInfoModel(q);
     canvasModel = new CanvasProxyModel(q);
-    canvasModel->setShowHioceannFiles(Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool());
+    canvasModel->setShowHiddenFiles(Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool());
     canvasModel->setSourceModel(sourceModel);
 
     // use default root url
@@ -439,7 +439,7 @@ void CanvasManagerPrivate::initModel()
 void CanvasManagerPrivate::initSetting()
 {
     // setting changed.
-    connect(Application::instance(), &Application::showedHioceannFilesChanged, this, &CanvasManagerPrivate::onHioceannFlagsChanged);
+    connect(Application::instance(), &Application::showedHiddenFilesChanged, this, &CanvasManagerPrivate::onHiddenFlagsChanged);
     connect(Application::instance(), &Application::previewAttributeChanged, sourceModel, &FileInfoModel::refreshAllFile);
     connect(Application::instance(), &Application::showedFileSuffixChanged, sourceModel, &FileInfoModel::refreshAllFile);
 }
@@ -483,11 +483,11 @@ void CanvasManagerPrivate::updateView(const CanvasViewPointer &view, QWidget *ro
     view->setGeometry(avRect);
 }
 
-void CanvasManagerPrivate::onHioceannFlagsChanged(bool show)
+void CanvasManagerPrivate::onHiddenFlagsChanged(bool show)
 {
     fmInfo() << "hioceann flags changed to" << show;
-    if (show != canvasModel->showHioceannFiles()) {
-        canvasModel->setShowHioceannFiles(show);
+    if (show != canvasModel->showHiddenFiles()) {
+        canvasModel->setShowHiddenFiles(show);
         canvasModel->refresh(canvasModel->rootIndex());
     }
 }

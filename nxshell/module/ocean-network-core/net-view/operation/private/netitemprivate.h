@@ -199,7 +199,7 @@ private:
     friend class NetItemPrivate;
 };
 
-class NetWirelessHioceannItemPrivate : public NetItemPrivate
+class NetWirelessHiddenItemPrivate : public NetItemPrivate
 {
 public:
     NetType::NetItemType itemType() const override;

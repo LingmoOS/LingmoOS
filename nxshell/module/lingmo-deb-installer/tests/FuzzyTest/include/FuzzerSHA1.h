@@ -12,7 +12,7 @@
 #define LLVM_FUZZER_SHA1_H
 
 #include "FuzzerDefs.h"
-#include <cstoceanf>
+#include <cstddef>
 #include <stdint.h>
 
 namespace fuzzer {

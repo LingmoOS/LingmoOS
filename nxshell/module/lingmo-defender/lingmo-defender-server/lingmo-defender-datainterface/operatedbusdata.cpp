@@ -21,7 +21,7 @@
 #include "window/modules/startup/dbustartmanager.h"
 
 #include <DPinyin>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTrashManager>
 
 #include <QSysInfo>
@@ -816,7 +816,7 @@ void OperateDBusData::scanFile(const QString &path)
             m_fileList.append(info.absoluteFilePath());
         } else if (info.isDir()) {
             QDir dir(path);
-            for (const QFileInfo &i : dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs | QDir::Hioceann | QDir::NoSymLinks)) {
+            for (const QFileInfo &i : dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs | QDir::Hidden | QDir::NoSymLinks)) {
                 // 递归扫描目录内容
                 scanFile(i.absoluteFilePath());
             }

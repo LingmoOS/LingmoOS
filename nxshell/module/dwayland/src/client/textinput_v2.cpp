@@ -353,8 +353,8 @@ void TextInputUnstableV2::Private::setContentType(ContentHints hints, ContentPur
     if (hints.testFlag(ContentHint::TitleCase)) {
         wlHints |= ZWP_TEXT_INPUT_V2_CONTENT_HINT_TITLECASE;
     }
-    if (hints.testFlag(ContentHint::HioceannText)) {
-        wlHints |= ZWP_TEXT_INPUT_V2_CONTENT_HINT_HIOCEANN_TEXT;
+    if (hints.testFlag(ContentHint::HiddenText)) {
+        wlHints |= ZWP_TEXT_INPUT_V2_CONTENT_HINT_HIDDEN_TEXT;
     }
     if (hints.testFlag(ContentHint::SensitiveData)) {
         wlHints |= ZWP_TEXT_INPUT_V2_CONTENT_HINT_SENSITIVE_DATA;

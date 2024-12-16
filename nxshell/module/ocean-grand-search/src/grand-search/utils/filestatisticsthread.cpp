@@ -60,7 +60,7 @@ void FileStatisticsThread::run()
 
     while (!dirQueue.isEmpty()) {
         const QString &dir = dirQueue.dequeue();
-        QDirIterator iterator(dir, QDir::AllEntries | QDir::Hioceann | QDir::NoDotAndDotDot);
+        QDirIterator iterator(dir, QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot);
 
         while (iterator.hasNext()) {
             auto file = iterator.next();

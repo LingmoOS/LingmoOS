@@ -277,7 +277,7 @@
         <translation>दृश्यमान रखें</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>छिपाएँ रखें</translation>
     </message>
     <message>

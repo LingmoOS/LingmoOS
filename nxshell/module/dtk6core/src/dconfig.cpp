@@ -101,7 +101,7 @@ DConfigBackend::~DConfigBackend()
 }
 
 static QString _globalAppId;
-class Q_DECL_HIOCEANN DConfigPrivate : public DObjectPrivate
+class Q_DECL_HIDDEN DConfigPrivate : public DObjectPrivate
 {
 public:
     explicit DConfigPrivate(DConfig *qq,
@@ -141,7 +141,7 @@ public:
 namespace {
 
 #ifndef D_DISABLE_DCONFIG
-class Q_DECL_HIOCEANN FileBackend : public DConfigBackend
+class Q_DECL_HIDDEN FileBackend : public DConfigBackend
 {
 public:
     explicit FileBackend(DConfigPrivate *o)
@@ -278,7 +278,7 @@ FileBackend::~FileBackend()
 #define DSG_CONFIG "org.desktopspec.ConfigManager"
 #define DSG_CONFIG_MANAGER "org.desktopspec.ConfigManager"
 
-class Q_DECL_HIOCEANN DBusBackend : public DConfigBackend
+class Q_DECL_HIDDEN DBusBackend : public DConfigBackend
 {
 public:
     explicit DBusBackend(DConfigPrivate* o):
@@ -442,7 +442,7 @@ DBusBackend::~DBusBackend()
 #endif //D_DISABLE_DBUS_CONFIG
 #else
 
-class Q_DECL_HIOCEANN QSettingBackend : public DConfigBackend
+class Q_DECL_HIDDEN QSettingBackend : public DConfigBackend
 {
 public:
     explicit QSettingBackend(DConfigPrivate* o):

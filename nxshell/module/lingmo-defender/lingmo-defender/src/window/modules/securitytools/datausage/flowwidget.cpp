@@ -156,7 +156,7 @@ void FlowWidget::SetFlowAttributes()
     m_flowtableview->setFrameShape(QTableView::NoFrame);
     //自动调整最后一列的宽度使它和表格的右边界对齐
     m_flowtableview->horizontalHeader()->setStretchLastSection(true);
-    m_flowtableview->verticalHeader()->setHioceann(true);
+    m_flowtableview->verticalHeader()->setHidden(true);
     m_flowtableview->setShowGrid(false);
     m_flowtableview->setSortingEnabled(true);
     m_flowtableview->verticalHeader()->setDefaultSectionSize(48);
@@ -197,16 +197,16 @@ void FlowWidget::SetFlowAttributes()
     m_flowitemmodel->setHorizontalHeaderItem(IUploadsCol, new QStandardItem(QString("Uploads")));
     m_flowitemmodel->setHorizontalHeaderItem(ITotalsCol, new QStandardItem(QString("Totals")));
 
-    m_flowtableview->setColumnHioceann(IIsbOnShowingCol, true);
-    m_flowtableview->setColumnHioceann(IPidCol, true);
-    m_flowtableview->setColumnHioceann(IIsbSysAppCol, true);
-    m_flowtableview->setColumnHioceann(IExecPathCol, true);
-    m_flowtableview->setColumnHioceann(IPkgNameCol, true);
-    m_flowtableview->setColumnHioceann(IAppNameCol, true);
-    m_flowtableview->setColumnHioceann(IIconCol, true);
-    m_flowtableview->setColumnHioceann(IDownloadsCol, true);
-    m_flowtableview->setColumnHioceann(IUploadsCol, true);
-    m_flowtableview->setColumnHioceann(ITotalsCol, true);
+    m_flowtableview->setColumnHidden(IIsbOnShowingCol, true);
+    m_flowtableview->setColumnHidden(IPidCol, true);
+    m_flowtableview->setColumnHidden(IIsbSysAppCol, true);
+    m_flowtableview->setColumnHidden(IExecPathCol, true);
+    m_flowtableview->setColumnHidden(IPkgNameCol, true);
+    m_flowtableview->setColumnHidden(IAppNameCol, true);
+    m_flowtableview->setColumnHidden(IIconCol, true);
+    m_flowtableview->setColumnHidden(IDownloadsCol, true);
+    m_flowtableview->setColumnHidden(IUploadsCol, true);
+    m_flowtableview->setColumnHidden(ITotalsCol, true);
 
     m_flowtableview->setColumnWidth(0, 65);
     m_flowtableview->setColumnWidth(1, 200);

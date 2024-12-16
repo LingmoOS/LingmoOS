@@ -48,7 +48,7 @@ VideoWidget::VideoWidget(bool autoPlay, QWidget *parent)
     m_hideAni->setEndValue(0.0f);
 
     //Community : 社区版
-    m_isCommunity = DSysInfo::isCommunityEdition();
+    m_isCommunity = LSysInfo::isCommunityEdition();
     //社区版/专业版/个人版视频封面不同
 
     m_isCommunity ? m_strVideoCoverIcon = QString(":/resources/community_Moment.png") :
@@ -197,11 +197,11 @@ void VideoWidget::onControlButtonClicked()
         //修改回原有的固定使用视频名称,打各个版本包时将视频内容更换,名字不变
         QString file =  videoPath.path() + QString("/demo.mp4");
 
-//        if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterprise ||
-//            DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterpriseC ||
-//            DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEuler) {
+//        if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterprise ||
+//            LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterpriseC ||
+//            LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEuler) {
 //            file += QString("/server.mp4");
-//        } else if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosCommunity) {
+//        } else if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosCommunity) {
 //            file += QString("/community.mp4");
 //        } else {
 //            file += QString("/professional.mp4");

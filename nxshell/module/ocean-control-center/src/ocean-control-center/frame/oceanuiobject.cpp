@@ -64,13 +64,13 @@ bool OceanUIObject::Private::getFlagState(uint32_t flag) const
 bool OceanUIObject::Private::setFlagState(uint32_t flag, bool state)
 {
     if (getFlagState(flag) != state) {
-        bool hioceann = getFlagState(DCC_ALL_HIOCEANN);
+        bool hioceann = getFlagState(DCC_ALL_HIDDEN);
         bool disabled = getFlagState(DCC_ALL_DISABLED);
         if (state)
             m_flags |= flag;
         else
             m_flags &= (~flag);
-        if (hioceann != getFlagState(DCC_ALL_HIOCEANN)) {
+        if (hioceann != getFlagState(DCC_ALL_HIDDEN)) {
             if (!hioceann) {
                 deleteSectionItem();
             }
@@ -360,19 +360,19 @@ void OceanUIObject::setBadge(qint8 badge)
 
 bool OceanUIObject::isVisible() const
 {
-    return !p_ptr->getFlagState(DCC_HIOCEANN);
+    return !p_ptr->getFlagState(DCC_HIDDEN);
 }
 
 void OceanUIObject::setVisible(bool isVisible)
 {
-    if (p_ptr->setFlagState(DCC_HIOCEANN, !isVisible)) {
+    if (p_ptr->setFlagState(DCC_HIDDEN, !isVisible)) {
         Q_EMIT visibleChanged(isVisible);
     }
 }
 
 bool OceanUIObject::isVisibleToApp() const
 {
-    return !p_ptr->getFlagState(DCC_ALL_HIOCEANN);
+    return !p_ptr->getFlagState(DCC_ALL_HIDDEN);
 }
 
 bool OceanUIObject::isEnabled() const

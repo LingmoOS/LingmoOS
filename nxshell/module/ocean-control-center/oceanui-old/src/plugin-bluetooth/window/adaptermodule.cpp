@@ -280,12 +280,12 @@ void AdapterModule::updateVisible(bool bPower, bool bDiscovering)
 {
     // NOTE: maybe it should be used?
     Q_UNUSED(bDiscovering)
-    m_bluetoothTitle->setHioceann(bPower);
-    m_otherDevices->setHioceann(!bPower);
-    m_anonymousCheckBox->setHioceann(!bPower);
-    m_otherdevicelist->setHioceann(!bPower);
-    m_devicesTitle->setHioceann(!bPower || !m_hasPaired);
-    m_mydevicelist->setHioceann(!bPower || !m_hasPaired);
+    m_bluetoothTitle->setHidden(bPower);
+    m_otherDevices->setHidden(!bPower);
+    m_anonymousCheckBox->setHidden(!bPower);
+    m_otherdevicelist->setHidden(!bPower);
+    m_devicesTitle->setHidden(!bPower || !m_hasPaired);
+    m_mydevicelist->setHidden(!bPower || !m_hasPaired);
 }
 
 void AdapterModule::contextMenu(const BluetoothAdapter *adapter, const BluetoothDevice *device, DCCListView *view)

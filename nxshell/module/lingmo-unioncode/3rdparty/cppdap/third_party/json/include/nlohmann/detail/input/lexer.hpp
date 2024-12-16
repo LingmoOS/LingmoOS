@@ -2,7 +2,7 @@
 
 #include <array> // array
 #include <clocale> // localeconv
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdio> // snprintf
 #include <cstdlib> // strtof, strtod, strtold, strtoll, strtoull
 #include <initializer_list> // initializer_list

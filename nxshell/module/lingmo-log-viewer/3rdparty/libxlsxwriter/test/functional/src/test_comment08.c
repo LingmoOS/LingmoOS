@@ -14,7 +14,7 @@ int main() {
     lxw_workbook  *workbook  = workbook_new("test_comment08.xlsx");
     lxw_worksheet *worksheet = workbook_add_worksheet(workbook, NULL);
 
-    lxw_comment_options options1 = {.visible = LXW_COMMENT_DISPLAY_HIOCEANN};
+    lxw_comment_options options1 = {.visible = LXW_COMMENT_DISPLAY_HIDDEN};
     lxw_comment_options options2 = {.visible = LXW_COMMENT_DISPLAY_VISIBLE};
 
     worksheet_write_comment(worksheet, CELL("A1"), "Some text");

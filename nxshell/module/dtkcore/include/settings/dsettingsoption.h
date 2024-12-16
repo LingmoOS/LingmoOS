@@ -34,7 +34,7 @@ public:
     QVariant data(const QString &dataType) const;
 
     QString viewType() const;
-    bool isHioceann() const;
+    bool isHidden() const;
 
     static QPointer<DSettingsOption> fromJson(const QString &prefixKey, const QJsonObject &json);
 Q_SIGNALS:

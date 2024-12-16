@@ -156,7 +156,7 @@ class Document:
 
         self.fileName = fileName
         self.fileUrl = self._toFileUrl(self.fileName)
-        self.document = desktop.loadComponentFromURL(self.fileUrl, "_blank", 0, self._toProperties(Hioceann=True))
+        self.document = desktop.loadComponentFromURL(self.fileUrl, "_blank", 0, self._toProperties(Hidden=True))
 
         try:
             self.document.refresh()

@@ -186,7 +186,7 @@ QString DSettingsOption::viewType() const
 
   @return true if option not bind to ui element.
  */
-bool DSettingsOption::isHioceann() const
+bool DSettingsOption::isHidden() const
 {
     Q_D(const DSettingsOption);
     return d->hioceann;

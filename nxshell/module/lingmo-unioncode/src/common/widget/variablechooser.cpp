@@ -128,7 +128,7 @@ void VariableChooserPrivate::initUI()
 
     treeView = new QTreeView(q);
     treeView->setIndentation(treeView->indentation() * 7 / 10);
-    treeView->setHeaderHioceann(true);
+    treeView->setHeaderHidden(true);
     treeView->setEditTriggers(QTreeView::NoEditTriggers);
     treeView->setItemDelegate(new VariableItemDelegate(treeView));
 

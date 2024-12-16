@@ -14,7 +14,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN XdgExporter::Private
+class Q_DECL_HIDDEN XdgExporter::Private
 {
 public:
     Private();
@@ -32,7 +32,7 @@ public:
     EventQueue *queue = nullptr;
 };
 
-class Q_DECL_HIOCEANN XdgImporter::Private
+class Q_DECL_HIDDEN XdgImporter::Private
 {
 public:
     Private();
@@ -50,7 +50,7 @@ public:
     EventQueue *queue = nullptr;
 };
 
-class Q_DECL_HIOCEANN XdgExported::Private
+class Q_DECL_HIDDEN XdgExported::Private
 {
 public:
     Private(XdgExported *q);
@@ -69,7 +69,7 @@ protected:
     XdgExported *q;
 };
 
-class Q_DECL_HIOCEANN XdgImported::Private
+class Q_DECL_HIDDEN XdgImported::Private
 {
 public:
     Private(XdgImported *q);

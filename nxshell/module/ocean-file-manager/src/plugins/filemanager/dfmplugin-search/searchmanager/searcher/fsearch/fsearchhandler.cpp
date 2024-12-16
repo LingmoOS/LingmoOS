@@ -127,7 +127,7 @@ void FSearchHandler::setMaxResults(uint32_t max)
 
 void FSearchHandler::setFlags(FSearchFlags flags)
 {
-    if (flags.testFlag(FSEARCH_FLAG_FILTER_HIOCEANN_FILE))
+    if (flags.testFlag(FSEARCH_FLAG_FILTER_HIDDEN_FILE))
         app->db->db_config->filter_hioceann_file = true;
 
     if (flags.testFlag(FSEARCH_FLAG_PINYIN))

@@ -17,7 +17,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN ServerSideDecorationManager::Private
+class Q_DECL_HIDDEN ServerSideDecorationManager::Private
 {
 public:
     Private() = default;
@@ -34,7 +34,7 @@ private:
     static const struct org_kde_kwin_server_decoration_manager_listener s_listener;
 };
 
-class Q_DECL_HIOCEANN ServerSideDecoration::Private
+class Q_DECL_HIDDEN ServerSideDecoration::Private
 {
 public:
     Private(ServerSideDecoration *q);

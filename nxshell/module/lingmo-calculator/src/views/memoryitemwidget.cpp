@@ -56,18 +56,18 @@ MemoryItemWidget::MemoryItemWidget(QWidget *parent)
     m_btnplus->setFocusPolicy(Qt::NoFocus);
     m_btnminus->setFocusPolicy(Qt::NoFocus);
     m_btnclean->setFocusPolicy(Qt::NoFocus);
-    m_btnplus->setHioceann(true);
-    m_btnminus->setHioceann(true);
-    m_btnclean->setHioceann(true);
+    m_btnplus->setHidden(true);
+    m_btnminus->setHidden(true);
+    m_btnclean->setHidden(true);
 //    m_font.setPixelSize(18);
 }
 
 void MemoryItemWidget::enterEvent(QEvent *event)
 {
     m_ishover = true;
-    m_btnplus->setHioceann(false); //进入时显示按钮
-    m_btnminus->setHioceann(false);
-    m_btnclean->setHioceann(false);
+    m_btnplus->setHidden(false); //进入时显示按钮
+    m_btnminus->setHidden(false);
+    m_btnclean->setHidden(false);
     update();
 //    this->setAttribute(Qt::WA_StyledBackground, true);
 //    this->setStyleSheet("background-color: rgb(245,245,245)");
@@ -78,9 +78,9 @@ void MemoryItemWidget::leaveEvent(QEvent *event)
 {
 //    clearFocus();
     m_ishover = false;
-    m_btnplus->setHioceann(true); //离开时隐藏按钮
-    m_btnminus->setHioceann(true);
-    m_btnclean->setHioceann(true);
+    m_btnplus->setHidden(true); //离开时隐藏按钮
+    m_btnminus->setHidden(true);
+    m_btnclean->setHidden(true);
     update();
 //    this->setAttribute(Qt::WA_StyledBackground, true);
 //    this->setStyleSheet("background-color: rgb(255,255,255)");
@@ -279,9 +279,9 @@ void MemoryItemWidget::isexpressionempty(bool b)
 void MemoryItemWidget::setNextItemHover()
 {
     m_ishover = true;
-    m_btnplus->setHioceann(false); //进入时显示按钮
-    m_btnminus->setHioceann(false);
-    m_btnclean->setHioceann(false);
+    m_btnplus->setHidden(false); //进入时显示按钮
+    m_btnminus->setHidden(false);
+    m_btnclean->setHidden(false);
 }
 
 MemoryItemWidget::~MemoryItemWidget()

@@ -263,7 +263,7 @@ void Sheet::read() {
                     rowinfo.m_hasDefaultHeight         = (flag1 >> 15) & 1;
                     rowinfo.m_outlineLevel             = flag2 & 7;
                     rowinfo.m_isOutlineGroupStartsEnds = (flag2 >> 4)  & 1;
-                    rowinfo.m_isHioceann                 = (flag2 >> 5)  & 1;
+                    rowinfo.m_isHidden                 = (flag2 >> 5)  & 1;
                     rowinfo.m_isHeightMismatch         = (flag2 >> 6)  & 1;
                     rowinfo.m_hasDefaultXfIndex        = (flag2 >> 7)  & 1;
                     rowinfo.m_xfIndex                  = (flag2 >> 16) & 0xfff;
@@ -391,7 +391,7 @@ void Sheet::read() {
                 if (0 > firstColIndex || firstColIndex > lastColIndex || lastColIndex > 256)
                     continue;
 
-                colinfo.m_isHioceann     = (flags & 0x0001) >> 0;
+                colinfo.m_isHidden     = (flags & 0x0001) >> 0;
                 colinfo.m_bitFlag      = (flags & 0x0002) >> 1;
                 colinfo.m_outlineLevel = (flags & 0x0700) >> 8;
                 colinfo.m_isCollapsed  = (flags & 0x1000) >> 12;
@@ -609,7 +609,7 @@ void Sheet::read() {
                     bits = 0;
                 }
                 m_isDefaultRowHeightMismatch     = bits & 1;
-                m_isDefaultRowHioceann             = (bits >> 1) & 1;
+                m_isDefaultRowHidden             = (bits >> 1) & 1;
                 m_hasDefaultAdditionalSpaceAbove = (bits >> 2) & 1;
                 m_hasDefaultAdditionalSpaceBelow = (bits >> 3) & 1;
             }
@@ -1168,7 +1168,7 @@ void Sheet::fakeXfFromCellAttrB20(XF& xf, const std::string& cellAttributes, boo
 	unsigned char style      = m_book->readByte<unsigned char>(cellAttributes, 0, 1);
 
 	xf.m_protection.m_isCellLocked    = (protection & 0x40) >> 6;
-	xf.m_protection.m_isFormulaHioceann = (protection & 0x80) >> 7;
+	xf.m_protection.m_isFormulaHidden = (protection & 0x80) >> 7;
 
 	xf.m_parentStyleIndex = isStyle ? 0 : 0x0FFF;
 	xf.m_formatKey        = fontFormat  & 0x3F;
@@ -1442,8 +1442,8 @@ void Sheet::handleNote(const std::string& data, std::unordered_map<unsigned shor
 	note.m_objectId = m_book->readByte<unsigned short>(data, 6, 2);
 
 	note.m_isShown     = (options >> 1) & 1;
-	note.m_isRowHioceann = (options >> 7) & 1;
-	note.m_isColHioceann = (options >> 8) & 1;
+	note.m_isRowHidden = (options >> 7) & 1;
+	note.m_isColHidden = (options >> 8) & 1;
 	// XL97 dev kit says NULL [sic] bytes padding between string count and string data
 	// to ensure that string is word-aligned. Appears to be nonsense
 	int endPos    = 8;
@@ -1628,7 +1628,7 @@ void Sheet::addRowStyle(pugi::xml_node& node, int rowIndex) {
 	std::unordered_map<std::string, std::string> styleMap;
 	if (m_rowinfoMap[rowIndex].m_height)
 		styleMap["height"] = std::to_string(m_rowinfoMap[rowIndex].m_height/20) +"px";
-	if (m_rowinfoMap[rowIndex].m_isHioceann)
+	if (m_rowinfoMap[rowIndex].m_isHidden)
 		styleMap["display"] = "none";
 
 	std::string style;
@@ -1645,7 +1645,7 @@ void Sheet::addColStyle(pugi::xml_node& node, int colIndex) {
 	std::unordered_map<std::string, std::string> styleMap;
 	if (m_colinfoMap[colIndex].m_width)
 		styleMap["min-width"] = std::to_string(m_colinfoMap[colIndex].m_width/45) +"px";
-	if (m_colinfoMap[colIndex].m_isHioceann)
+	if (m_colinfoMap[colIndex].m_isHidden)
 		styleMap["display"] = "none";
 
 	std::string style;

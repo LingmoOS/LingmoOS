@@ -612,7 +612,7 @@ void Book::handleName(const std::string& data) {
 	Name& nobj                = m_nameObjList.back();
 	nobj.m_nameIndex          = m_nameObjList.size() - 1;
 	nobj.m_optionFlags        = optionFlags;
-	nobj.m_isHioceann           = (optionFlags & 1) >> 0;
+	nobj.m_isHidden           = (optionFlags & 1) >> 0;
 	nobj.m_function           = (optionFlags & 2) >> 1;
 	nobj.m_vbasic             = (optionFlags & 4) >> 2;
 	nobj.m_macro              = (optionFlags & 8) >> 3;

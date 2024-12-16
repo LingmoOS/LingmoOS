@@ -212,7 +212,7 @@ bool TableDataControl::aria2MethodAdd(QJsonObject &json, QString &searchContent)
             m_DownloadTableView->getTableHeader()->onHeaderChecked(false);
             if ((!searchContent.isEmpty()) && !data->fileName.contains(searchContent)) {
                 TableModel *dtModel = m_DownloadTableView->getTableModel();
-                m_DownloadTableView->setRowHioceann(dtModel->rowCount(), true);
+                m_DownloadTableView->setRowHidden(dtModel->rowCount(), true);
             }
             qDebug() << "aria2MethodAdd: " << /*taskInfo.url << */"    " << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
         }

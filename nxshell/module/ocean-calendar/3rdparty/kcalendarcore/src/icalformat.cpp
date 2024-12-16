@@ -37,7 +37,7 @@ extern "C" {
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::ICalFormat::Private
+class Q_DECL_HIDDEN KCalendarCore::ICalFormat::Private
 {
 public:
     Private(ICalFormat *parent)

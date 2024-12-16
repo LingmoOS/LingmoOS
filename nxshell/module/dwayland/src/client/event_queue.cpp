@@ -13,7 +13,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN EventQueue::Private
+class Q_DECL_HIDDEN EventQueue::Private
 {
 public:
     wl_display *display = nullptr;

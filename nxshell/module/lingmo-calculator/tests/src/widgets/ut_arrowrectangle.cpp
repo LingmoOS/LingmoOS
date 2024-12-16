@@ -18,9 +18,9 @@ TEST_F(Ut_ArrowRectangle, eventFilter)
     QFocusEvent *f = new QFocusEvent(QFocusEvent::Type::FocusOut);
     QKeyEvent *k = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::KeyboardModifier::NoModifier);
     arrowrectangle->eventFilter(arrowrectangle, static_cast <QEvent *>(k));
-    EXPECT_TRUE(arrowrectangle->isHioceann());
+    EXPECT_TRUE(arrowrectangle->isHidden());
     arrowrectangle->eventFilter(arrowrectangle, static_cast <QEvent *>(f));
-    EXPECT_TRUE(arrowrectangle->isHioceann());
+    EXPECT_TRUE(arrowrectangle->isHidden());
     delete k;
     delete f;
     delete arrowrectangle;

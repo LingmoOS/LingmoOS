@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QDebug>
 
 namespace common{
@@ -151,7 +151,7 @@ static inline const SystemState &systemInfo()
 {
     static SystemState *state = nullptr;
     if (!state) {
-        const auto version = DTK_CORE_NAMESPACE::DSysInfo::majorVersion();
+        const auto version = DTK_CORE_NAMESPACE::LSysInfo::majorVersion();
         qInfo() << "Running desktop environment version is:" << version << ", versionNumber:" << version.toLong();
         if (!version.isEmpty() && version.toLong() <= 20) {
             state = new V20SystemState();

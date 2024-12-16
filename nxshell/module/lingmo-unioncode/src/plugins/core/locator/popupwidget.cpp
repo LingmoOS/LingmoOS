@@ -84,7 +84,7 @@ PopupWidget::PopupWidget(QWidget *parent)
     layout->addWidget(tree);
 
     tree->setMinimumWidth(500);
-    tree->setHeaderHioceann(true);
+    tree->setHeaderHidden(true);
     tree->setRootIsDecorated(false);
     tree->setUniformRowHeights(true);
     tree->header()->setSectionResizeMode(QHeaderView::Stretch);

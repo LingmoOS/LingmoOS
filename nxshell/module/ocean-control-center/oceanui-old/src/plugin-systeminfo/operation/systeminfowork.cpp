@@ -6,7 +6,7 @@
 #include "systeminfodbusproxy.h"
 #include "window/utils.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 namespace DCC_NAMESPACE{
@@ -28,20 +28,20 @@ void SystemInfoWork::activate()
     //获取主机名
     m_model->setHostName(m_systemInfDBusProxy->staticHostname());
 
-    if (DSysInfo::isLingmo()) {
+    if (LSysInfo::isLingmo()) {
         m_model->setLicenseState(static_cast<ActiveState>(m_systemInfDBusProxy->authorizationState()));
-        QString productName = QString("%1").arg(DSysInfo::uosSystemName());
+        QString productName = QString("%1").arg(LSysInfo::uosSystemName());
         m_model->setProductName(productName);
-        QString versionNumber = QString("%1").arg(DSysInfo::majorVersion());
+        QString versionNumber = QString("%1").arg(LSysInfo::majorVersion());
         m_model->setVersionNumber(versionNumber);
     }
     QString version;
-    if (DSysInfo::uosType() == DSysInfo::UosServer || DSysInfo::uosEditionType() == DSysInfo::UosEuler) {
-        version = QString("%1%2").arg(DSysInfo::minorVersion(), DSysInfo::uosEditionName());
-    } else if (DSysInfo::isLingmo()) {
-        version = QString("%1 (%2)").arg(DSysInfo::uosEditionName(), DSysInfo::minorVersion());
+    if (LSysInfo::uosType() == LSysInfo::UosServer || LSysInfo::uosEditionType() == LSysInfo::UosEuler) {
+        version = QString("%1%2").arg(LSysInfo::minorVersion(), LSysInfo::uosEditionName());
+    } else if (LSysInfo::isLingmo()) {
+        version = QString("%1 (%2)").arg(LSysInfo::uosEditionName(), LSysInfo::minorVersion());
     } else {
-        version = QString("%1 %2").arg(DSysInfo::productVersion(), DSysInfo::productTypeString());
+        version = QString("%1 %2").arg(LSysInfo::productVersion(), LSysInfo::productTypeString());
     }
 
     m_model->setVersion(version);
@@ -49,8 +49,8 @@ void SystemInfoWork::activate()
     m_model->setType(QSysInfo::WordSize);
 
     m_model->setKernel(QSysInfo::kernelVersion());
-    m_model->setProcessor(DSysInfo::cpuModelName());
-    m_model->setMemory(static_cast<qulonglong>(DSysInfo::memoryTotalSize()), static_cast<qulonglong>(DSysInfo::memoryInstalledSize()));
+    m_model->setProcessor(LSysInfo::cpuModelName());
+    m_model->setMemory(static_cast<qulonglong>(LSysInfo::memoryTotalSize()), static_cast<qulonglong>(LSysInfo::memoryInstalledSize()));
 }
 
 void SystemInfoWork::deactivate()
@@ -69,7 +69,7 @@ QPair<QString, QString> SystemInfoWork::getGNULicenseText()
 QString SystemInfoWork::getEndUserAgreementText()
 {
     if (!m_model->endUserAgreement().has_value()) {
-        if (DSysInfo::uosEditionType() == DSysInfo::UosEuler) {
+        if (LSysInfo::uosEditionType() == LSysInfo::UosEuler) {
             m_model->setEndUserAgreement(DCC_LICENSE::getEulerEndUserAgreement());
         } else {
             if (m_model->endUserAgreementPath().has_value()) {

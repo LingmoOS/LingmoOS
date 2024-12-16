@@ -530,7 +530,7 @@ void CylinderInfoWidget::onScrollBarValueChanged(int value)
 
 void CylinderInfoWidget::wheelEvent(QWheelEvent *event)
 {
-    if (!m_scrollBar->isHioceann()) {
+    if (!m_scrollBar->isHidden()) {
         if(event->delta() > 0){
             int value = m_scrollBar->value() - 15;
             m_scrollBar->setValue(value);

@@ -473,8 +473,8 @@ void TextInputTest::testContentHints_data()
                                   << KWaylandServer::TextInputContentHints(KWaylandServer::TextInputContentHint::UpperCase);
     QTest::newRow("Titlecase/v2") << TextInput::ContentHints(TextInput::ContentHint::TitleCase)
                                   << KWaylandServer::TextInputContentHints(KWaylandServer::TextInputContentHint::TitleCase);
-    QTest::newRow("HioceannText/v2") << TextInput::ContentHints(TextInput::ContentHint::HioceannText)
-                                   << KWaylandServer::TextInputContentHints(KWaylandServer::TextInputContentHint::HioceannText);
+    QTest::newRow("HiddenText/v2") << TextInput::ContentHints(TextInput::ContentHint::HiddenText)
+                                   << KWaylandServer::TextInputContentHints(KWaylandServer::TextInputContentHint::HiddenText);
     QTest::newRow("SensitiveData/v2") << TextInput::ContentHints(TextInput::ContentHint::SensitiveData)
                                       << KWaylandServer::TextInputContentHints(KWaylandServer::TextInputContentHint::SensitiveData);
     QTest::newRow("Latin/v2") << TextInput::ContentHints(TextInput::ContentHint::Latin)
@@ -489,12 +489,12 @@ void TextInputTest::testContentHints_data()
     // all has combinations which don't make sense - what's both lowercase and uppercase?
     QTest::newRow("all/v2") << (TextInput::ContentHint::AutoCompletion | TextInput::ContentHint::AutoCorrection | TextInput::ContentHint::AutoCapitalization
                                 | TextInput::ContentHint::LowerCase | TextInput::ContentHint::UpperCase | TextInput::ContentHint::TitleCase
-                                | TextInput::ContentHint::HioceannText | TextInput::ContentHint::SensitiveData | TextInput::ContentHint::Latin
+                                | TextInput::ContentHint::HiddenText | TextInput::ContentHint::SensitiveData | TextInput::ContentHint::Latin
                                 | TextInput::ContentHint::MultiLine)
                             << (KWaylandServer::TextInputContentHint::AutoCompletion | KWaylandServer::TextInputContentHint::AutoCorrection
                                 | KWaylandServer::TextInputContentHint::AutoCapitalization | KWaylandServer::TextInputContentHint::LowerCase
                                 | KWaylandServer::TextInputContentHint::UpperCase | KWaylandServer::TextInputContentHint::TitleCase
-                                | KWaylandServer::TextInputContentHint::HioceannText | KWaylandServer::TextInputContentHint::SensitiveData
+                                | KWaylandServer::TextInputContentHint::HiddenText | KWaylandServer::TextInputContentHint::SensitiveData
                                 | KWaylandServer::TextInputContentHint::Latin | KWaylandServer::TextInputContentHint::MultiLine);
 }
 

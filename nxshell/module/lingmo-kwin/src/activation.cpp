@@ -428,7 +428,7 @@ bool Workspace::takeActivity(Window *window, ActivityFlags flags)
  *
  * @note @p c may already be destroyed.
  */
-void Workspace::windowHioceann(Window *window)
+void Workspace::windowHidden(Window *window)
 {
     Q_ASSERT(!window->isShown() || !window->isOnCurrentDesktop() || !window->isOnCurrentActivity());
     activateNextWindow(window);

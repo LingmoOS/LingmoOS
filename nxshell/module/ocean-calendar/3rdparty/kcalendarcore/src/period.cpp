@@ -26,7 +26,7 @@
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Period::Private
+class Q_DECL_HIDDEN KCalendarCore::Period::Private
 {
 public:
     Private()

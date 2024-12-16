@@ -225,7 +225,7 @@ void MainWindow::initDockHeader(DDockWidget *dock, dpfservice::Position pos)
         if (dock->isVisible()) {
             dock->hide();
         }
-        emit dockHioceann(dockName);
+        emit dockHidden(dockName);
     });
 }
 

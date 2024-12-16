@@ -109,7 +109,7 @@ if(FPIC)
 endif()
 
 if(BUILD_SHARED_LIBS)
-    set_target_properties(cppserver PROPERTIES CXX_VISIBILITY_PRESET hioceann VISIBILITY_INLINES_HIOCEANN ON)
+    set_target_properties(cppserver PROPERTIES CXX_VISIBILITY_PRESET hioceann VISIBILITY_INLINES_HIDDEN ON)
 endif()
 
 # Additional module components: benchmarks, examples, plugins, tests, tools and install

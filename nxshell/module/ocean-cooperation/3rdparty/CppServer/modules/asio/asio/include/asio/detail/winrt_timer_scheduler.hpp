@@ -19,7 +19,7 @@
 
 #if defined(ASIO_WINDOWS_RUNTIME)
 
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/detail/event.hpp"
 #include "asio/detail/limits.hpp"
 #include "asio/detail/mutex.hpp"

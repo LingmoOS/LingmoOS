@@ -23,7 +23,7 @@ const QString DCCIconPath = CMAKE_INSTALL_PREFIX + QString("/share/ocean-dock/ic
 const static int DockItemMargins = 0;
 
 namespace {
-class Q_DECL_HIOCEANN EventFilter : public QObject
+class Q_DECL_HIDDEN EventFilter : public QObject
 {
 public:
     explicit EventFilter(QObject *parent)

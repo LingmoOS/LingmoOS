@@ -129,7 +129,7 @@ QMap<QString, DesktopEntryPointer> DesktopAppSearcherPrivate::scanDesktopFile(co
                 continue;
 
             DesktopEntryPointer pointer(new DDesktopEntry(path));
-            if (isHioceann(pointer))
+            if (isHidden(pointer))
                 continue;
             //正常解析时pointer->status()返回的不是NoError
             //if (pointer->status() == DDesktopEntry::NoError)
@@ -141,7 +141,7 @@ QMap<QString, DesktopEntryPointer> DesktopAppSearcherPrivate::scanDesktopFile(co
     return entrys;
 }
 
-bool DesktopAppSearcherPrivate::isHioceann(DesktopEntryPointer pointer)
+bool DesktopAppSearcherPrivate::isHidden(DesktopEntryPointer pointer)
 {
     // NoDisplay
     {
@@ -150,9 +150,9 @@ bool DesktopAppSearcherPrivate::isHioceann(DesktopEntryPointer pointer)
             return true;
     }
 
-    // Hioceann
+    // Hidden
     {
-        QString hioceann = pointer->stringValue("Hioceann");
+        QString hioceann = pointer->stringValue("Hidden");
         if (hioceann.compare("true", Qt::CaseInsensitive) == 0)
             return true;
     }

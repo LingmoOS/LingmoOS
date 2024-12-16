@@ -15,7 +15,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN DSGBlendNode : public QSGRenderNode
+class Q_DECL_HIDDEN DSGBlendNode : public QSGRenderNode
 {
 public:
     explicit DSGBlendNode(bool restore = false);

@@ -19,7 +19,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Surface::Private
+class Q_DECL_HIDDEN Surface::Private
 {
 public:
     Private(Surface *q);

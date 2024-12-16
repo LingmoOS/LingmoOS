@@ -117,7 +117,7 @@ public:
 
         //protection
         P_Protection_Locked,
-        P_Protection_Hioceann,
+        P_Protection_Hidden,
 
         P_ENDID
     };

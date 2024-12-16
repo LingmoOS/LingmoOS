@@ -754,7 +754,7 @@ private:
     class Private;
     Private *const d;
 
-    Q_DECL_HIOCEANN QVariantList attendeesVariant() const;
+    Q_DECL_HIDDEN QVariantList attendeesVariant() const;
     //@endcond
 
     friend Q_CORE_EXPORT QDataStream &operator<<(QDataStream &stream, const KCalendarCore::IncidenceBase::Ptr &);

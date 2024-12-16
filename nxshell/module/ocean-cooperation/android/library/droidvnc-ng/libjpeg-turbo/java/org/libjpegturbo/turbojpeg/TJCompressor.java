@@ -599,53 +599,53 @@ public class TJCompressor implements Closeable {
   private native void destroy() throws TJException;
 
   // JPEG size in bytes is returned
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   @Deprecated
   private native int compress(byte[] srcBuf, int width, int pitch,
     int height, int pixelFormat, byte[] jpegBuf, int jpegSubsamp, int jpegQual,
     int flags) throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   private native int compress(byte[] srcBuf, int x, int y, int width,
     int pitch, int height, int pixelFormat, byte[] jpegBuf, int jpegSubsamp,
     int jpegQual, int flags) throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   @Deprecated
   private native int compress(int[] srcBuf, int width, int stride,
     int height, int pixelFormat, byte[] jpegBuf, int jpegSubsamp, int jpegQual,
     int flags) throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   private native int compress(int[] srcBuf, int x, int y, int width,
     int stride, int height, int pixelFormat, byte[] jpegBuf, int jpegSubsamp,
     int jpegQual, int flags) throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   private native int compressFromYUV(byte[][] srcPlanes, int[] srcOffsets,
     int width, int[] srcStrides, int height, int subsamp, byte[] jpegBuf,
     int jpegQual, int flags)
     throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   @Deprecated
   private native void encodeYUV(byte[] srcBuf, int width, int pitch,
     int height, int pixelFormat, byte[] dstBuf, int subsamp, int flags)
     throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   private native void encodeYUV(byte[] srcBuf, int x, int y, int width,
     int pitch, int height, int pixelFormat, byte[][] dstPlanes,
     int[] dstOffsets, int[] dstStrides, int subsamp, int flags)
     throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   @Deprecated
   private native void encodeYUV(int[] srcBuf, int width, int stride,
     int height, int pixelFormat, byte[] dstBuf, int subsamp, int flags)
     throws TJException;
 
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   private native void encodeYUV(int[] srcBuf, int x, int y, int width,
     int srcStride, int height, int pixelFormat, byte[][] dstPlanes,
     int[] dstOffsets, int[] dstStrides, int subsamp, int flags)

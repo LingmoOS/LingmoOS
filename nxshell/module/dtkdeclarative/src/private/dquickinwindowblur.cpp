@@ -19,7 +19,7 @@
 DGUI_USE_NAMESPACE
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN InWindowBlurTextureProvider : public QSGTextureProvider {
+class Q_DECL_HIDDEN InWindowBlurTextureProvider : public QSGTextureProvider {
 public:
     InWindowBlurTextureProvider()
         : QSGTextureProvider()

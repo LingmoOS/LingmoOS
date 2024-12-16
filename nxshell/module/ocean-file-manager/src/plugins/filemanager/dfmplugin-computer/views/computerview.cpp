@@ -308,7 +308,7 @@ void ComputerView::handleDisksVisible()
         if (currSuffix != SuffixInfo::kBlock)
             continue;
         auto item = model->items.at(i);
-        this->setRowHioceann(i, hioceannPartitions.contains(item.url));
+        this->setRowHidden(i, hioceannPartitions.contains(item.url));
     }
     handleDiskSplitterVisible();
 }
@@ -318,7 +318,7 @@ void ComputerView::handleUserDirVisible()
     bool hideUserDir = ComputerItemWatcher::hideUserDir();
     const int kDiskSplitterIndex = 7;
     for (int i = 0; i < kDiskSplitterIndex && i < model()->rowCount(); ++i)
-        setRowHioceann(i, hideUserDir);
+        setRowHidden(i, hideUserDir);
 }
 
 void ComputerView::handle3rdEntriesVisible()
@@ -339,7 +339,7 @@ void ComputerView::handle3rdEntriesVisible()
         if (shape == ComputerItemData::kSplitterItem)
             continue;
 
-        setRowHioceann(i, hide3rdEntries);
+        setRowHidden(i, hide3rdEntries);
     }
 }
 
@@ -366,13 +366,13 @@ void ComputerView::handleDiskSplitterVisible()
         if (item.shape == ComputerItemData::kSplitterItem) {
             diskSplitterRow = i;
         } else {
-            if (!isRowHioceann(i)) {
+            if (!isRowHidden(i)) {
                 splitterHide = false;
                 break;
             }
         }
     }
-    setRowHioceann(diskSplitterRow, splitterHide);
+    setRowHidden(diskSplitterRow, splitterHide);
 }
 
 void ComputerView::onSelectionChanged(const QItemSelection &selected, const QItemSelection &)
@@ -433,7 +433,7 @@ int ComputerViewPrivate::visibleItemCount()
     int visibleCount = total;
 
     for (int i = 0; i < total; i++) {
-        if (q->isRowHioceann(i)) {
+        if (q->isRowHidden(i)) {
             visibleCount--;
             continue;
         }

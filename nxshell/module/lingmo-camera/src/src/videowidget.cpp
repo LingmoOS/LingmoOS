@@ -1120,9 +1120,9 @@ int videowidget::switchCamera(const char *device, const char *devName)
 QString videowidget::getSaveFilePrefix()
 {
     QString filePrefix = "Camera_";
-    if (DSysInfo::lingmoType() == DSysInfo::LingmoProfessional) {
+    if (LSysInfo::lingmoType() == LSysInfo::LingmoProfessional) {
         filePrefix = "UOS_";
-    } else if (DSysInfo::lingmoType() == DSysInfo::LingmoDesktop) {
+    } else if (LSysInfo::lingmoType() == LSysInfo::LingmoDesktop) {
         filePrefix = "LINGMO_";
     }
     return filePrefix;

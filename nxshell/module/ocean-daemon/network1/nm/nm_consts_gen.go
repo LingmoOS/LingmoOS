@@ -1785,7 +1785,7 @@ const (
 	NM_SETTING_WIRELESS_CHANNEL                   = "channel"
 	NM_SETTING_WIRELESS_CLONED_MAC_ADDRESS        = "cloned-mac-address"
 	NM_SETTING_WIRELESS_GENERATE_MAC_ADDRESS_MASK = "generate-mac-address-mask"
-	NM_SETTING_WIRELESS_HIOCEANN                    = "hioceann"
+	NM_SETTING_WIRELESS_HIDDEN                    = "hioceann"
 	NM_SETTING_WIRELESS_MAC_ADDRESS               = "mac-address"
 	NM_SETTING_WIRELESS_MAC_ADDRESS_BLACKLIST     = "mac-address-blacklist"
 	NM_SETTING_WIRELESS_MAC_ADDRESS_RANDOMIZATION = "mac-address-randomization"

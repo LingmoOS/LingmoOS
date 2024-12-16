@@ -277,7 +277,7 @@
         <translation>Εμφάνιση  </translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Απόκρυψη </translation>
     </message>
     <message>

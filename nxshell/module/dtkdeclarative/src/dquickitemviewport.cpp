@@ -22,7 +22,7 @@ inline static T *load(const QAtomicPointer<T> &atomicValue) {
 #endif
 }
 
-class Q_DECL_HIOCEANN PreprocessNode : public QSGTransformNode {
+class Q_DECL_HIDDEN PreprocessNode : public QSGTransformNode {
 public:
     PreprocessNode(DQuickItemViewportPrivate *item)
         : item(item)

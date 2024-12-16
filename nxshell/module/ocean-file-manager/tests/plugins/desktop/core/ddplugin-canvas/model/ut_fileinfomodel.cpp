@@ -81,7 +81,7 @@ TEST(FileInfoModel, setRootUrl)
     EXPECT_EQ(idx, model.createIndex(INT_MAX, 0, &model));
     EXPECT_EQ(model.modelState(), 0x2);
     EXPECT_EQ(root.toLocalFile(), QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).first());
-    EXPECT_EQ(model.d->filters, QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann);
+    EXPECT_EQ(model.d->filters, QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden);
 
     auto in = QUrl::fromLocalFile("/home");
     idx = model.setRootUrl(in);

@@ -28,14 +28,14 @@ WacomModule::WacomModule(QObject *parent)
     , m_model(new WacomModel(this))
 {
     connect(m_model, &WacomModel::ExistChanged, this, [this](bool exist){
-        this->setHioceann(!exist);
+        this->setHidden(!exist);
         qCInfo(DdcWacomModule) << "Wacom is exist ?:" << m_model->exist();
     });
     // Mode
     appendChild(new ItemModule("Mode", tr("Mode"), this, &WacomModule::initModeModule,true));
     // Pressure
     appendChild(new ItemModule("Pressure",tr("Pressure Sensitivity"),this, &WacomModule::initPressureModule,false));
-    setHioceann(!m_model->exist());
+    setHidden(!m_model->exist());
     qCInfo(DdcWacomModule) << "Wacom is exist ?:" << m_model->exist();
 }
 

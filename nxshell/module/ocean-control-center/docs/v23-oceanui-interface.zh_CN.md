@@ -69,8 +69,8 @@ ocean-control-center --spec ./build
 |currentModule()|当前激活的子项|
 |setCurrentModule(child)|设置当前激活项，由框架调用。子项变化时会触发currentModuleChanged信号|
 |defultModule()|默认激活的子项（如第二级激活时，会根据该值展开到第三级、第四级），如果返回为nullptr则不向下展开|
-|isHioceann()|是否为隐藏，默认不隐藏|
-|setHioceann(hioceann)|设置为隐藏，对应ModuleObject隐藏应通过该函数设置，不要自行设置QWidget的隐藏|
+|isHidden()|是否为隐藏，默认不隐藏|
+|setHidden(hioceann)|设置为隐藏，对应ModuleObject隐藏应通过该函数设置，不要自行设置QWidget的隐藏|
 |isDisabled()|是否为禁用，默认为启用|
 |setDisabled(disabled)|设置为禁用，对应ModuleObject禁用应通过该函数设置，不要自行设置QWidget的禁用|
 |findChild(child)|查找子项，广度搜索优先，返回子项相对于当前模块所在的层级，-1为未找到，0为自己，>0为子项层级|
@@ -102,8 +102,8 @@ ocean-control-center --spec ./build
 
 |名称|说明|
 |:----|:----|
-|IsHioceann|返回module是否显示，判断了配置项和程序设置项|
-|IsHioceannFlag|判断标志是否为隐藏标志|
+|IsHidden|返回module是否显示，判断了配置项和程序设置项|
+|IsHiddenFlag|判断标志是否为隐藏标志|
 |IsDisabled|返回module是否可用，判断了配置项和程序设置项|
 |IsDisabledFlag|判断标志是否为禁用标志|
 
@@ -224,7 +224,7 @@ Test1ModuleObject::Test1ModuleObject()
             buttonModule->setText(QString("我是页面%1的第%2个按钮").arg(i).arg(j));
             module->appendChild(buttonModule);
         }
-        module->children(1)->setHioceann(true);
+        module->children(1)->setHidden(true);
         module->children(2)->setDisabled(true);
 
         appendChild(module);
@@ -389,7 +389,7 @@ QWidget *FormModule::page()
     connect(this, &ModuleObject::appendedChild, areaWidget, addModuleSlot);
     connect(this, &ModuleObject::removedChild, areaWidget, [this](ModuleObject *const childModule) { onRemoveChild(childModule); });
     connect(this, &ModuleObject::childStateChanged, areaWidget, [this](ModuleObject *const tmpChild, uint32_t flag, bool state) {
-    if (ModuleObject::IsHioceannFlag(flag)) { // 显示隐藏同增加删除处理
+    if (ModuleObject::IsHiddenFlag(flag)) { // 显示隐藏同增加删除处理
         if (state)
           onRemoveChild(tmpChild);
         else
@@ -419,14 +419,14 @@ void FormModule::onCurrentModuleChanged(oceanuiV23::ModuleObject *child)
 // 动态的添加子项
 void FormModule::onAddChild(oceanuiV23::ModuleObject *const childModule)
 {
-    if (ModuleObject::IsHioceann(childModule) || m_mapWidget.contains(childModule))
+    if (ModuleObject::IsHidden(childModule) || m_mapWidget.contains(childModule))
         return;
 
     int index = 0;
     for (auto &&child : childrens()) {
         if (child == childModule)
           break;
-        if (!ModuleObject::IsHioceann(child))
+        if (!ModuleObject::IsHidden(child))
           index++;
     }
     auto newPage = childModule->activePage();
@@ -498,7 +498,7 @@ void Test1ModuleObject::addTestModule(ModuleObject *parent)
             },
             false);
     connect(hlabel, &ModuleObject::displayNameChanged, hlabel, [hlabel]() {
-        hlabel->setHioceann(false);
+        hlabel->setHidden(false);
     });
 
     ItemModule *hedit = new ItemModule(
@@ -512,28 +512,28 @@ void Test1ModuleObject::addTestModule(ModuleObject *parent)
                         hlabel->setDisplayName(text);
                         module->setDisplayName(text);
                     }
-                    module->setHioceann(true);
+                    module->setHidden(true);
                 });
                 return edit;
             },
             false);
-    hedit->setHioceann(true);
+    hedit->setHidden(true);
     ItemModule *hbutton = new ItemModule(
             "hbutton", tr("Horizontal QPushButton"), [hlabel, hedit](ModuleObject *module) {
                 QPushButton *but = new QPushButton();
                 but->setIcon(Dtk::Widget::DStyle::standardIcon(qApp->style(), Dtk::Widget::DStyle::SP_EditElement));
                 but->setFixedSize(32, 32);
                 connect(but, &QPushButton::clicked, module, [hlabel, hedit, module]() {
-                    hlabel->setHioceann(true);
-                    hedit->setHioceann(false);
-                    module->setHioceann(true);
+                    hlabel->setHidden(true);
+                    hedit->setHidden(false);
+                    module->setHidden(true);
                 });
                 return but;
             },
             false);
     connect(hedit, &ModuleObject::stateChanged, hedit, [hlabel, hbutton, hedit]() {
-        hlabel->setHioceann(!hedit->isHioceann());
-        hbutton->setHioceann(!hedit->isHioceann());
+        hlabel->setHidden(!hedit->isHidden());
+        hbutton->setHidden(!hedit->isHidden());
     });
     hor->appendChild(hlabel);
     hor->appendChild(hedit);
@@ -564,7 +564,7 @@ void Test1ModuleObject::addTestModule(ModuleObject *parent)
     listmodule->appendChild(item2);
     connect(item2, &ModuleObjectItem::clicked, this, [item1]() {
         qInfo() << __FILE__ << __LINE__ << "clicked ModuleObjectItem:" << tr("listitem 2");
-        item1->setHioceann(!item1->isHioceann());
+        item1->setHidden(!item1->isHidden());
         static int pix = Dtk::Widget::DStyle::SP_ForkElement;
         item1->setRightIcon((Dtk::Widget::DStyle::StandardPixmap)(pix));
         pix++;

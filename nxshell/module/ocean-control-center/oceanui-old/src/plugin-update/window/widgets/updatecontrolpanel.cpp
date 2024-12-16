@@ -10,7 +10,7 @@
 #include <DIconButton>
 #include <DTipLabel>
 #include <DProgressBar>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DFontSizeManager>
 #include <DIconTheme>
 

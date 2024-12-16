@@ -32,7 +32,7 @@ class NetTipsItem;
 class NetAirplaneModeTipsItem;
 class NetVPNTipsItem;
 class NetWiredItem;
-class NetWirelessHioceannItem;
+class NetWirelessHiddenItem;
 class NetWirelessItem;
 enum class NetConnectionStatus;
 
@@ -167,12 +167,12 @@ private:
     Dtk::Widget::DSpinner *m_loading;
 };
 
-class NetWirelessHioceannWidget : public NetWidget
+class NetWirelessHiddenWidget : public NetWidget
 {
     Q_OBJECT
 public:
-    NetWirelessHioceannWidget(NetWirelessHioceannItem *item, QWidget *parent = nullptr);
-    ~NetWirelessHioceannWidget() Q_DECL_OVERRIDE;
+    NetWirelessHiddenWidget(NetWirelessHiddenItem *item, QWidget *parent = nullptr);
+    ~NetWirelessHiddenWidget() Q_DECL_OVERRIDE;
 };
 
 class NetTipsWidget : public NetWidget

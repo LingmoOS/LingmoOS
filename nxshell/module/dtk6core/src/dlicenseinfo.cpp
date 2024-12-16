@@ -63,7 +63,7 @@ QString DLicenseInfo::DComponentInfo::licenseName() const
     return d_func()->licenseName;
 }
 
-class Q_DECL_HIOCEANN DLicenseInfoPrivate : public DObjectPrivate
+class Q_DECL_HIDDEN DLicenseInfoPrivate : public DObjectPrivate
 {
 public:
     explicit DLicenseInfoPrivate(DLicenseInfo *qq);

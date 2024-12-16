@@ -44,10 +44,10 @@ Q_LOGGING_CATEGORY(logSysInfo, "dtk.lsysinfo")
 Q_LOGGING_CATEGORY(logSysInfo, "dtk.lsysinfo", QtInfoMsg)
 #endif
 
-class Q_DECL_HIOCEANN DSysInfoPrivate
+class Q_DECL_HIDDEN LSysInfoPrivate
 {
 public:
-    DSysInfoPrivate();
+    LSysInfoPrivate();
 
 #ifdef Q_OS_LINUX
     void ensureLingmoInfo();
@@ -60,7 +60,7 @@ public:
     QMap<QString, QString> parseInfoFile(QFile &file);
     QMap<QString, QString> parseInfoContent(const QString &content);
 #ifdef Q_OS_LINUX
-    DSysInfo::LingmoType lingmoType = DSysInfo::LingmoType(-1);
+    LSysInfo::LingmoType lingmoType = LSysInfo::LingmoType(-1);
     QMap<QString, QString> lingmoTypeMap; //Type Name with Language
     QString lingmoVersion;
     QString lingmoEdition;
@@ -102,7 +102,7 @@ public:
 
     QScopedPointer<DDesktopEntry> distributionInfo;
 
-    DSysInfo::ProductType productType = DSysInfo::ProductType(-1);
+    LSysInfo::ProductType productType = LSysInfo::ProductType(-1);
     QString prettyName;
     QString productTypeString;
     QString productVersion;
@@ -114,23 +114,23 @@ public:
     qint64 diskSize = 0;
 };
 
-DSysInfoPrivate::DSysInfoPrivate()
+LSysInfoPrivate::LSysInfoPrivate()
 {
 
 }
 
 #ifdef Q_OS_LINUX
-void DSysInfoPrivate::ensureDistributionInfo()
+void LSysInfoPrivate::ensureDistributionInfo()
 {
     if (distributionInfo)
         return;
 
-    const QString distributionInfoFile(DSysInfo::distributionInfoPath());
+    const QString distributionInfoFile(LSysInfo::distributionInfoPath());
     // Generic OCEAN distribution info
     distributionInfo.reset(new DDesktopEntry(distributionInfoFile));
 }
 
-bool DSysInfoPrivate::splitA_BC_DMode()
+bool LSysInfoPrivate::splitA_BC_DMode()
 {
     // A-BC-D
     bool ok = false;
@@ -155,7 +155,7 @@ bool DSysInfoPrivate::splitA_BC_DMode()
     return ok;
 }
 
-void DSysInfoPrivate::ensureLingmoInfo()
+void LSysInfoPrivate::ensureLingmoInfo()
 {
     if (static_cast<int>(lingmoType) > 0 && !inTest())
         return;
@@ -166,7 +166,7 @@ void DSysInfoPrivate::ensureLingmoInfo()
     QFile file(LINGMO_VERSION_FILE);
 
     if (!file.open(QFile::ReadOnly)) {
-        lingmoType = DSysInfo::UnknownLingmo;
+        lingmoType = LSysInfo::UnknownLingmo;
 
         return;
     }
@@ -218,23 +218,23 @@ void DSysInfoPrivate::ensureLingmoInfo()
     const QString &lingmo_type = lingmoTypeMap[QString()];
 
     if (lingmo_type.isEmpty()) {
-        lingmoType = DSysInfo::UnknownLingmo;
+        lingmoType = LSysInfo::UnknownLingmo;
     } else if (lingmo_type == "Desktop") {
-        lingmoType = DSysInfo::LingmoDesktop;
+        lingmoType = LSysInfo::LingmoDesktop;
     } else if (lingmo_type == "Professional") {
-        lingmoType = DSysInfo::LingmoProfessional;
+        lingmoType = LSysInfo::LingmoProfessional;
     } else if (lingmo_type == "Server") {
-        lingmoType = DSysInfo::LingmoServer;
+        lingmoType = LSysInfo::LingmoServer;
     } else if (lingmo_type == "Personal") {
-        lingmoType = DSysInfo::LingmoPersonal;
+        lingmoType = LSysInfo::LingmoPersonal;
     } else if (lingmo_type == "Military") {
-        lingmoType = DSysInfo::LingmoMilitary;
+        lingmoType = LSysInfo::LingmoMilitary;
     } else {
-        lingmoType = DSysInfo::UnknownLingmo;
+        lingmoType = LSysInfo::UnknownLingmo;
     }
 }
 
-bool DSysInfoPrivate::ensureOsVersion()
+bool LSysInfoPrivate::ensureOsVersion()
 {
     if (osBuild.A > 0 && !inTest())
         return true;
@@ -361,7 +361,7 @@ static QString unquote(const QByteArray &value)
     return QString::fromLatin1(value);
 }
 
-static bool readEtcFile(DSysInfoPrivate *info, const char *filename,
+static bool readEtcFile(LSysInfoPrivate *info, const char *filename,
                         const QByteArray &idKey, const QByteArray &versionKey, const QByteArray &prettyNameKey)
 {
 
@@ -378,7 +378,7 @@ static bool readEtcFile(DSysInfoPrivate *info, const char *filename,
     if (inTest()) {
         // for test clear cache
         info->productTypeString.clear();
-        info->productType = DSysInfo::UnknownType;
+        info->productType = LSysInfo::UnknownType;
     }
 
     while (valid_data_count < 3) {
@@ -416,7 +416,7 @@ static bool readEtcFile(DSysInfoPrivate *info, const char *filename,
     return valid_data_count != 0;
 }
 
-static bool readOsRelease(DSysInfoPrivate *info)
+static bool readOsRelease(LSysInfoPrivate *info)
 {
     if (!readEtcFile(info, OS_RELEASE_FILE, "ID=", "VERSION_ID=", "PRETTY_NAME="))
         return readEtcFile(info, LSYSINFO_PREFIX"/usr/lib/os-release", "ID=", "VERSION_ID=", "PRETTY_NAME=");
@@ -424,13 +424,13 @@ static bool readOsRelease(DSysInfoPrivate *info)
     return true;
 }
 
-static bool readLsbRelease(DSysInfoPrivate *info)
+static bool readLsbRelease(LSysInfoPrivate *info)
 {
     return readEtcFile(info, LSB_RELEASE_FILE, "DISTRIB_ID=", "DISTRIB_RELEASE=", "DISTRIB_DESCRIPTION=");
 }
 #endif
 
-void DSysInfoPrivate::ensureReleaseInfo()
+void LSysInfoPrivate::ensureReleaseInfo()
 {
     if (productType > 0 && !inTest()) {
         return;
@@ -441,86 +441,86 @@ void DSysInfoPrivate::ensureReleaseInfo()
     readLsbRelease(this);
 
     if (productTypeString.isEmpty()) {
-        productType = DSysInfo::UnknownType;
+        productType = LSysInfo::UnknownType;
     } else {
         switch (productTypeString.at(0).unicode()) {
         case 'd':
         case 'D':
             if (productTypeString.compare("lingmo", Qt::CaseInsensitive) == 0) {
-                productType = DSysInfo::Lingmo;
+                productType = LSysInfo::Lingmo;
             } else if (productTypeString.compare("debian", Qt::CaseInsensitive) == 0) {
-                productType = DSysInfo::Debian;
+                productType = LSysInfo::Debian;
             }
             break;
         case 'a':
         case 'A':
             if (productTypeString.compare("arch", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::ArchLinux;
+                productType = LSysInfo::ArchLinux;
             break;
         case 'c':
         case 'C':
             if (productTypeString.compare("centos", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::CentOS;
+                productType = LSysInfo::CentOS;
             break;
         case 'f':
         case 'F':
             if (productTypeString.compare("fedora", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::Fedora;
+                productType = LSysInfo::Fedora;
             break;
         case 'g':
         case 'G':
             if (productTypeString.compare("gentoo", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::Gentoo;
+                productType = LSysInfo::Gentoo;
             break;
         case 'l':
         case 'L':
             if (productTypeString.compare("linuxmint", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::LinuxMint;
+                productType = LSysInfo::LinuxMint;
             break;
         case 'm':
         case 'M':
             if (productTypeString.compare("manjaro", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::Manjaro;
+                productType = LSysInfo::Manjaro;
             break;
         case 'n':
         case 'N':
             if (productTypeString.compare("nixos", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::NixOS;
+                productType = LSysInfo::NixOS;
             break;
         case 'o':
         case 'O':
             if (productTypeString.compare("opensuse", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::openSUSE;
+                productType = LSysInfo::openSUSE;
             break;
         case 's':
         case 'S':
             if (productTypeString.compare("sailfishos", Qt::CaseInsensitive) == 0)
-                productType = DSysInfo::SailfishOS;
+                productType = LSysInfo::SailfishOS;
             break;
         case 'u':
         case 'U':
             if (productTypeString.compare("ubuntu", Qt::CaseInsensitive) == 0) {
-                productType = DSysInfo::Ubuntu;
+                productType = LSysInfo::Ubuntu;
             } else if (productTypeString.compare("uos", Qt::CaseInsensitive) == 0 || productTypeString.compare("UnionTech OS", Qt::CaseInsensitive) == 0) {
-                productType = DSysInfo::Uos;
+                productType = LSysInfo::Uos;
             }
             break;
         default:
-            productType = DSysInfo::UnknownType;
+            productType = LSysInfo::UnknownType;
             break;
         }
     }
 #endif
 }
 
-void DSysInfoPrivate::ensureComputerInfo()
+void LSysInfoPrivate::ensureComputerInfo()
 {
 #ifdef Q_OS_LINUX
 
 #endif
 }
 
-QMap<QString, QString> DSysInfoPrivate::parseInfoFile(QFile &file)
+QMap<QString, QString> LSysInfoPrivate::parseInfoFile(QFile &file)
 {
     char buf[1024];
     qint64 lineLength = 0;
@@ -538,7 +538,7 @@ QMap<QString, QString> DSysInfoPrivate::parseInfoFile(QFile &file)
     return map;
 }
 
-QMap<QString, QString> DSysInfoPrivate::parseInfoContent(const QString &content)
+QMap<QString, QString> LSysInfoPrivate::parseInfoContent(const QString &content)
 {
     QMap<QString, QString> map;
     QStringList lineContents = content.split("\n");
@@ -553,9 +553,9 @@ QMap<QString, QString> DSysInfoPrivate::parseInfoContent(const QString &content)
     return map;
 }
 
-Q_GLOBAL_STATIC(DSysInfoPrivate, siGlobal)
+Q_GLOBAL_STATIC(LSysInfoPrivate, siGlobal)
 
-QString DSysInfo::operatingSystemName()
+QString LSysInfo::operatingSystemName()
 {
     siGlobal->ensureReleaseInfo();
 
@@ -567,16 +567,16 @@ QString DSysInfo::operatingSystemName()
   \brief Check current distro is Lingmo or not.
   \note Uos will also return true.
  */
-bool DSysInfo::isLingmo()
+bool LSysInfo::isLingmo()
 {
     siGlobal->ensureReleaseInfo();
 
     return productType() == Lingmo || productType() == Uos;
 }
 
-bool DSysInfo::isOCEAN()
+bool LSysInfo::isOCEAN()
 {
-    if (!DSysInfo::isLingmo()) {
+    if (!LSysInfo::isLingmo()) {
         const QByteArray &xsd = qgetenv("XDG_SESSION_DESKTOP");
         return !xsd.compare("lingmo", Qt::CaseInsensitive) ||
                 !xsd.compare("OCEAN", Qt::CaseInsensitive);
@@ -587,35 +587,35 @@ bool DSysInfo::isOCEAN()
     return siGlobal->lingmoType != UnknownLingmo;
 }
 
-DSysInfo::LingmoType DSysInfo::lingmoType()
+LSysInfo::LingmoType LSysInfo::lingmoType()
 {
     siGlobal->ensureLingmoInfo();
 
     return siGlobal->lingmoType;
 }
 
-QString DSysInfo::lingmoTypeDisplayName(const QLocale &locale)
+QString LSysInfo::lingmoTypeDisplayName(const QLocale &locale)
 {
     siGlobal->ensureLingmoInfo();
 
     return siGlobal->lingmoTypeMap.value(locale.name(), siGlobal->lingmoTypeMap.value(QString()));
 }
 
-QString DSysInfo::lingmoVersion()
+QString LSysInfo::lingmoVersion()
 {
     siGlobal->ensureLingmoInfo();
 
     return siGlobal->lingmoVersion;
 }
 
-QString DSysInfo::lingmoEdition()
+QString LSysInfo::lingmoEdition()
 {
     siGlobal->ensureLingmoInfo();
 
     return siGlobal->lingmoEdition;
 }
 
-QString DSysInfo::lingmoCopyright()
+QString LSysInfo::lingmoCopyright()
 {
     siGlobal->ensureLingmoInfo();
 
@@ -628,9 +628,9 @@ QString DSysInfo::lingmoCopyright()
   Display system type [1: desktop] [2: server] [3: special devices]
   \note 根据 osBuild.B 判断
  */
-DSysInfo::UosType DSysInfo::uosType()
+LSysInfo::UosType LSysInfo::uosType()
 {
-    if (!DSysInfo::isLingmo() && !inTest())
+    if (!LSysInfo::isLingmo() && !inTest())
         return UosTypeUnknown;
 
     siGlobal->ensureOsVersion();
@@ -649,7 +649,7 @@ DSysInfo::UosType DSysInfo::uosType()
   Editions: professional version/personal version/community version ...
   \note According to osbuild.b && osbuild.d
  */
-DSysInfo::UosEdition DSysInfo::uosEditionType()
+LSysInfo::UosEdition LSysInfo::uosEditionType()
 {
     siGlobal->ensureOsVersion();
     UosEdition ospt = UosEditionUnknown;
@@ -700,7 +700,7 @@ DSysInfo::UosEdition DSysInfo::uosEditionType()
    \brief Architecture information (using bit flags of a byte)
   【0x8 sw64】【0x4 mips64】【0x2 arm64】【0x1 amd64】
  */
-DSysInfo::UosArch DSysInfo::uosArch()
+LSysInfo::UosArch LSysInfo::uosArch()
 {
     siGlobal->ensureOsVersion();
 
@@ -722,47 +722,47 @@ static QString getUosVersionValue(const QString &key, const QLocale &locale)
   ProductType[xx] The corresponding value of the item, if you can't find the value of the corresponding language, use the value of the productType (desktop/server/device)
   \a locale Current system language
  */
-QString DSysInfo::uosProductTypeName(const QLocale &locale)
+QString LSysInfo::uosProductTypeName(const QLocale &locale)
 {
     return getUosVersionValue("ProductType", locale);
 }
 
 /*!
 @~english
-  \brief DSysInfo::osSystemName Version name
+  \brief LSysInfo::osSystemName Version name
 
   The corresponding value corresponding to SystemName [xx] item, if you can't find the default language of the corresponding language, use the value of SystemName uniontech os
   \a locale Current system language
  */
-QString DSysInfo::uosSystemName(const QLocale &locale)
+QString LSysInfo::uosSystemName(const QLocale &locale)
 {
     return getUosVersionValue("SystemName", locale);
 }
 
 /*!
 @~english
-  \brief DSysInfo::osEditionName Version name
+  \brief LSysInfo::osEditionName Version name
    EditionName[xx] The corresponding value of the item, if you can't find the value of the corresponding language, use the value of EditionName (Professional/Home/Community ...)
   \a locale Current system language
  */
-QString DSysInfo::uosEditionName(const QLocale &locale)
+QString LSysInfo::uosEditionName(const QLocale &locale)
 {
     return getUosVersionValue("EditionName", locale);
 }
 
 /*!
 @~english
-  \brief DSysInfo::spVersion Period version name
+  \brief LSysInfo::spVersion Period version name
   BC, A.B.C in the small version number a-bc-d
   Return to SP1-SPXX, if the official version returns empty
   In the x.y.z mode, it will not support returning this version number for the time being
   \ note minversion.bc == 00: The official version minversion.bc | minversion.b == 01-99: SP1 ... .sp99
  */
-QString DSysInfo::spVersion()
+QString LSysInfo::spVersion()
 {
     siGlobal->ensureOsVersion();
     switch (siGlobal->minVersion.type) {
-    case DSysInfoPrivate::MinVersion::A_BC_D: {
+    case LSysInfoPrivate::MinVersion::A_BC_D: {
         if (siGlobal->minVersion.BC > 0) {
             return QString("SP%1").arg(siGlobal->minVersion.BC);
         } else {
@@ -770,7 +770,7 @@ QString DSysInfo::spVersion()
         }
     }
 
-    case DSysInfoPrivate::MinVersion::A_B_C: {
+    case LSysInfoPrivate::MinVersion::A_B_C: {
         if (siGlobal->minVersion.B > 0) {
             return QStringLiteral("SP%1").arg(siGlobal->minVersion.B);
         } else {
@@ -778,7 +778,7 @@ QString DSysInfo::spVersion()
         }
     }
 
-    case DSysInfoPrivate::MinVersion::X_Y_Z:
+    case LSysInfoPrivate::MinVersion::X_Y_Z:
         qWarning() << "Getting the SP version in this mode is not supported.";
         return {};
     }
@@ -787,17 +787,17 @@ QString DSysInfo::spVersion()
 
 /*!
 @~english
-  \brief DSysInfo::udpateVersion Update version name
+  \brief LSysInfo::udpateVersion Update version name
   minor version number D in A-BC-D mode、C in A.B.C mode
   Return to Update1 ... Update9, if the official version returns to empty
  In the x.y.z mode, it will not support returning this version number for the time being
   \note minVersion.D == 0：official version    minVersion.D | minVersion.C == 1-9：update1… update9,updateA...updateZ
  */
-QString DSysInfo::udpateVersion()
+QString LSysInfo::udpateVersion()
 {
     siGlobal->ensureOsVersion();
     switch (siGlobal->minVersion.type) {
-    case DSysInfoPrivate::MinVersion::A_BC_D: {
+    case LSysInfoPrivate::MinVersion::A_BC_D: {
         if (siGlobal->minVersion.D > 0) {
             uint uv = siGlobal->minVersion.D;
             if (uv < 10) {
@@ -813,7 +813,7 @@ QString DSysInfo::udpateVersion()
         }
     }
 
-    case DSysInfoPrivate::MinVersion::A_B_C: {
+    case LSysInfoPrivate::MinVersion::A_B_C: {
         if (siGlobal->minVersion.C > 0) {
             return QStringLiteral("update%1").arg(siGlobal->minVersion.C);
         } else {
@@ -821,7 +821,7 @@ QString DSysInfo::udpateVersion()
         }
     }
 
-    case DSysInfoPrivate::MinVersion::X_Y_Z:
+    case LSysInfoPrivate::MinVersion::X_Y_Z:
         qWarning() << "Getting the update version in this mode is not supported.";
         break;
     }
@@ -835,7 +835,7 @@ QString DSysInfo::udpateVersion()
   Main edition number 【20】【23】【25】【26】【29】【30】
   \note Return to Majorversion value
  */
-QString DSysInfo::majorVersion()
+QString LSysInfo::majorVersion()
 {
     siGlobal->ensureOsVersion();
     return siGlobal->majorVersion;
@@ -843,12 +843,12 @@ QString DSysInfo::majorVersion()
 
 /*!
 @~english
-  \brief DSysInfo::minorVersion minor version
+  \brief LSysInfo::minorVersion minor version
  *【ABCD】 ·[0-9]{4}
  *【A.B.C】 or【X.Y.Z】
   @return the value of minorversion
  */
-QString DSysInfo::minorVersion()
+QString LSysInfo::minorVersion()
 {
     siGlobal->ensureOsVersion();
     return siGlobal->minorVersion;
@@ -856,11 +856,11 @@ QString DSysInfo::minorVersion()
 
 /*!
 @~english
-  \brief DSysInfo::buildVersion Small version number
+  \brief LSysInfo::buildVersion Small version number
   System mirror batch number, in order of time (non-retreat) increase from 100-999
   \note Return  osbuild.xyz value
  */
-QString DSysInfo::buildVersion()
+QString LSysInfo::buildVersion()
 {
     DDesktopEntry entry(OS_VERSION_FILE);
     QString osb = entry.stringValue("OsBuild", "Version");
@@ -869,13 +869,13 @@ QString DSysInfo::buildVersion()
 #endif
 
 #if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
-QString DSysInfo::lingmoDistributionInfoPath()
+QString LSysInfo::lingmoDistributionInfoPath()
 {
     return distributionInfoPath();
 }
 #endif
 
-QString DSysInfo::distributionInfoPath()
+QString LSysInfo::distributionInfoPath()
 {
 #ifdef Q_OS_LINUX
     // return "/usr/share/lingmo/distribution.info";
@@ -885,7 +885,7 @@ QString DSysInfo::distributionInfoPath()
 #endif // Q_OS_LINUX
 }
 
-QString DSysInfo::distributionInfoSectionName(DSysInfo::OrgType type)
+QString LSysInfo::distributionInfoSectionName(LSysInfo::OrgType type)
 {
     switch (type) {
     case Distribution:
@@ -907,7 +907,7 @@ QString DSysInfo::distributionInfoSectionName(DSysInfo::OrgType type)
 
   \sa lingmoDistributionInfoPath()
  */
-QString DSysInfo::distributionOrgName(DSysInfo::OrgType type, const QLocale &locale)
+QString LSysInfo::distributionOrgName(LSysInfo::OrgType type, const QLocale &locale)
 {
 #ifdef Q_OS_LINUX
     siGlobal->ensureDistributionInfo();
@@ -919,7 +919,7 @@ QString DSysInfo::distributionOrgName(DSysInfo::OrgType type, const QLocale &loc
 }
 
 #if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
-QString DSysInfo::lingmoDistributorName()
+QString LSysInfo::lingmoDistributorName()
 {
     return distributionOrgName(Distributor);
 }
@@ -932,7 +932,7 @@ QString DSysInfo::lingmoDistributorName()
 
   \sa lingmoDistributionInfoPath()
  */
-QPair<QString, QString> DSysInfo::distributionOrgWebsite(DSysInfo::OrgType type)
+QPair<QString, QString> LSysInfo::distributionOrgWebsite(LSysInfo::OrgType type)
 {
 #ifdef Q_OS_LINUX
     siGlobal->ensureDistributionInfo();
@@ -948,7 +948,7 @@ QPair<QString, QString> DSysInfo::distributionOrgWebsite(DSysInfo::OrgType type)
 }
 
 #if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
-QPair<QString, QString> DSysInfo::lingmoDistributorWebsite()
+QPair<QString, QString> LSysInfo::lingmoDistributorWebsite()
 {
     return distributionOrgWebsite(Distributor);
 }
@@ -962,7 +962,7 @@ QPair<QString, QString> DSysInfo::lingmoDistributorWebsite()
 
   \sa lingmoDistributionInfoPath()
  */
-QString DSysInfo::distributionOrgLogo(DSysInfo::OrgType orgType, DSysInfo::LogoType type, const QString &fallback)
+QString LSysInfo::distributionOrgLogo(LSysInfo::OrgType orgType, LSysInfo::LogoType type, const QString &fallback)
 {
     DDesktopEntry distributionInfo(distributionInfoPath());
     QString orgSectionName = distributionInfoSectionName(orgType);
@@ -982,27 +982,27 @@ QString DSysInfo::distributionOrgLogo(DSysInfo::OrgType orgType, DSysInfo::LogoT
 }
 
 #if DTK_VERSION < DTK_VERSION_CHECK(6, 0, 0, 0)
-QString DSysInfo::lingmoDistributorLogo(DSysInfo::LogoType type, const QString &fallback)
+QString LSysInfo::lingmoDistributorLogo(LSysInfo::LogoType type, const QString &fallback)
 {
     return distributionOrgLogo(Distributor, type, fallback);
 }
 #endif
 
-DSysInfo::ProductType DSysInfo::productType()
+LSysInfo::ProductType LSysInfo::productType()
 {
     siGlobal->ensureReleaseInfo();
 
     return siGlobal->productType;
 }
 
-QString DSysInfo::productTypeString()
+QString LSysInfo::productTypeString()
 {
     siGlobal->ensureReleaseInfo();
 
     return siGlobal->productTypeString;
 }
 
-QString DSysInfo::productVersion()
+QString LSysInfo::productVersion()
 {
     siGlobal->ensureReleaseInfo();
 
@@ -1022,7 +1022,7 @@ QString DSysInfo::productVersion()
 
   \return true if it's on a community edition distro/installation
  */
-bool DSysInfo::isCommunityEdition()
+bool LSysInfo::isCommunityEdition()
 {
 #ifdef Q_OS_LINUX
     LingmoType type = lingmoType();
@@ -1042,7 +1042,7 @@ bool DSysInfo::isCommunityEdition()
     return true;
 }
 
-QString DSysInfo::computerName()
+QString LSysInfo::computerName()
 {
 #ifdef Q_OS_LINUX
     struct utsname u;
@@ -1054,7 +1054,7 @@ QString DSysInfo::computerName()
     return QString();
 }
 
-QString DSysInfo::cpuModelName()
+QString LSysInfo::cpuModelName()
 {
     if (!siGlobal->cpuModelName.isEmpty())
         return siGlobal->cpuModelName;
@@ -1113,7 +1113,7 @@ QString DSysInfo::cpuModelName()
 @~english
   \return the installed memory size
  */
-qint64 DSysInfo::memoryInstalledSize()
+qint64 LSysInfo::memoryInstalledSize()
 {
 #ifdef Q_OS_LINUX
     // Getting Memory Installed Size
@@ -1166,7 +1166,7 @@ qint64 DSysInfo::memoryInstalledSize()
 @~english
   \return the total available to use memory size
  */
-qint64 DSysInfo::memoryTotalSize()
+qint64 LSysInfo::memoryTotalSize()
 {
 #ifdef Q_OS_LINUX
     siGlobal->memoryAvailableSize = get_phys_pages() * sysconf(_SC_PAGESIZE);
@@ -1175,7 +1175,7 @@ qint64 DSysInfo::memoryTotalSize()
     return -1;
 }
 
-qint64 DSysInfo::systemDiskSize()
+qint64 LSysInfo::systemDiskSize()
 {
 #ifdef Q_OS_LINUX
     // Getting Disk Size
@@ -1229,20 +1229,20 @@ qint64 DSysInfo::systemDiskSize()
     return -1;
 }
 
-/*! @~english DSysInfo::bootTime
- * @~english \sa DSysInfo::uptime
+/*! @~english LSysInfo::bootTime
+ * @~english \sa LSysInfo::uptime
  * @~english \return the boot time(currentDateTime - uptime)
 */
-QDateTime DSysInfo::bootTime()
+QDateTime LSysInfo::bootTime()
 {
     qint64 ut = uptime();
     return ut > 0 ? QDateTime::currentDateTime().addSecs(-ut) : QDateTime();
 }
 
-/*! @~english DSysInfo::shutdownTime
+/*! @~english LSysInfo::shutdownTime
  * @~english \return the last shutdown time
 */
-QDateTime DSysInfo::shutdownTime()
+QDateTime LSysInfo::shutdownTime()
 {
     QDateTime dt;
 #if defined Q_OS_LINUX
@@ -1272,10 +1272,10 @@ QDateTime DSysInfo::shutdownTime()
     return dt;
 }
 
-/*! @~english DSysInfo::uptime
+/*! @~english LSysInfo::uptime
  * @~english \return the up time (/proc/uptime)
 */
-qint64 DSysInfo::uptime()
+qint64 LSysInfo::uptime()
 {
 #if defined Q_OS_LINUX
     QFile file("/proc/uptime");
@@ -1298,10 +1298,10 @@ qint64 DSysInfo::uptime()
 #endif
 }
 
-/*! @~english DSysInfo::arch
+/*! @~english LSysInfo::arch
  * @~english \return the architecture of processor
 */
-DSysInfo::Arch DSysInfo::arch()
+LSysInfo::Arch LSysInfo::arch()
 {
 #if defined(__x86_64__)
     return X86_64;

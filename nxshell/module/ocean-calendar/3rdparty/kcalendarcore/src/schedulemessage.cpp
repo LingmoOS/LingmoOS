@@ -14,7 +14,7 @@
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::ScheduleMessage::Private
+class Q_DECL_HIDDEN KCalendarCore::ScheduleMessage::Private
 {
 public:
     Private()

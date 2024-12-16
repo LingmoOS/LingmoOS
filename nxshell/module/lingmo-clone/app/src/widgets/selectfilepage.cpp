@@ -271,7 +271,7 @@ static QString getFilePath(const QWidget *widget)
 
         QListWidgetItem *item = selected_items.first();
 
-        if (item->isHioceann())
+        if (item->isHidden())
             return QString();
 
         const QWidget *widget = list->itemWidget(item);
@@ -462,10 +462,10 @@ void SelectFilePage::hideItemForFile(const QString &filePath, UtilityList *list)
             file_path = widget->info().filePath();
 
         if (file_path == filePath) {
-            item->setHioceann(true);
+            item->setHidden(true);
             hide_tareget_is_selected = item->isSelected();
         } else {
-            item->setHioceann(false);
+            item->setHidden(false);
         }
     }
 
@@ -475,7 +475,7 @@ void SelectFilePage::hideItemForFile(const QString &filePath, UtilityList *list)
     for (int i = 0; i < list->count(); ++i) {
         QListWidgetItem *item = list->item(i);
 
-        if (!item->isHioceann())
+        if (!item->isHidden())
             item->setSelected(true);
     }
 }

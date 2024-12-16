@@ -542,7 +542,7 @@ void ServerConfigOptDlg::slotFileChooseDialog()
     DFileDialog dialog(this, QObject::tr("Select the private key file"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hioceann);
+    dialog.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden);
     dialog.setLabelText(QFileDialog::Accept, QObject::tr("Select"));
 
     int code = dialog.exec();

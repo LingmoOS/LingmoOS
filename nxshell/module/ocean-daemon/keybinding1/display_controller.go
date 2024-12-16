@@ -26,7 +26,7 @@ type OsdBrightnessState int32
 const (
 	BrightnessAdjustEnable OsdBrightnessState = iota
 	BrightnessAdjustForbioceann
-	BrightnessAdjustHioceann
+	BrightnessAdjustHidden
 )
 
 type DisplayController struct {

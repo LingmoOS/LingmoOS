@@ -139,7 +139,7 @@ public:
         auto currentTool = q->pageScene() == nullptr ? selection : q->pageScene()->page()->currentTool();
         if (currentTool == selection || currentTool == EDrawToolMode::text) {
 
-            if (m_pTextEdit->isHioceann())
+            if (m_pTextEdit->isHidden())
                 m_pTextEdit->show();
 
             m_pProxy->setFlag(ItemHasNoContents, false);

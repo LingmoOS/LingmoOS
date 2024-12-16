@@ -234,7 +234,7 @@ void CPDF_AnnotList::DisplayPass(CPDF_Page* pPage,
       continue;
 
     uint32_t annot_flags = pAnnot->GetFlags();
-    if (annot_flags & pdfium::annotation_flags::kHioceann)
+    if (annot_flags & pdfium::annotation_flags::kHidden)
       continue;
 
     if (bPrinting && (annot_flags & pdfium::annotation_flags::kPrint) == 0)
@@ -282,7 +282,7 @@ void CPDF_AnnotList::DisplayAnnots(CPDF_Page* pPage,
     DisplayPass(pPage, pDevice, pContext, bPrinting, pUser2Device, false,
                 pOptions, pClipRect);
   }
-  if (dwAnnotFlags & pdfium::annotation_flags::kHioceann) {
+  if (dwAnnotFlags & pdfium::annotation_flags::kHidden) {
     DisplayPass(pPage, pDevice, pContext, bPrinting, pUser2Device, true,
                 pOptions, pClipRect);
   }
@@ -295,7 +295,7 @@ void CPDF_AnnotList::DisplayAnnots(CPDF_Page* pPage,
                                    bool bShowWidget,
                                    CPDF_RenderOptions* pOptions) {
   uint32_t dwAnnotFlags = bShowWidget ? pdfium::annotation_flags::kInvisible |
-                                            pdfium::annotation_flags::kHioceann
+                                            pdfium::annotation_flags::kHidden
                                       : pdfium::annotation_flags::kInvisible;
   DisplayAnnots(pPage, nullptr, pContext, bPrinting, pMatrix, dwAnnotFlags,
                 pOptions, nullptr);

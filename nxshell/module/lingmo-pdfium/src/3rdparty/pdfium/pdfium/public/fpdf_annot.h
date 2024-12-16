@@ -51,7 +51,7 @@ extern "C" {
 // Refer to PDF Reference (6th edition) table 8.16 for all annotation flags.
 #define FPDF_ANNOT_FLAG_NONE 0
 #define FPDF_ANNOT_FLAG_INVISIBLE (1 << 0)
-#define FPDF_ANNOT_FLAG_HIOCEANN (1 << 1)
+#define FPDF_ANNOT_FLAG_HIDDEN (1 << 1)
 #define FPDF_ANNOT_FLAG_PRINT (1 << 2)
 #define FPDF_ANNOT_FLAG_NOZOOM (1 << 3)
 #define FPDF_ANNOT_FLAG_NOROTATE (1 << 4)

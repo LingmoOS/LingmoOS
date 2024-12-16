@@ -8,7 +8,7 @@
 #include "appslistmodel.h"
 #include "constants.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QObject>
 #include <QGSettings>
@@ -50,8 +50,8 @@ public:
     QSize getSearchWidgetSizeHint() const { return  m_searchWidgetHintSize; }
     void setSearchWidgetSizeHint(const QSize &size) { m_searchWidgetHintSize = size; }
 
-    const DSysInfo::LingmoType LingmoType = DSysInfo::lingmoType();
-    const bool IsServerSystem = (DSysInfo::LingmoServer == LingmoType);
+    const LSysInfo::LingmoType LingmoType = LSysInfo::lingmoType();
+    const bool IsServerSystem = (LSysInfo::LingmoServer == LingmoType);
 
     inline int navigationHeight() { return 90; }
     QSize getAppBoxSize() ;

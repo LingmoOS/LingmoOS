@@ -9,7 +9,7 @@
 #include "userinfo.h"
 #include "mfainfolist.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QObject>
 

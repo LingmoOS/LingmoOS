@@ -162,7 +162,7 @@ void MatchWidget::onShowMore()
 
 void MatchWidget::selectNextItem()
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return;
 
     for (int i = 0; i < m_vGroupWidgets.count(); ++i) {
@@ -213,7 +213,7 @@ void MatchWidget::selectNextItem()
 
 void MatchWidget::selectPreviousItem()
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return;
 
     for (int i = 0; i < m_vGroupWidgets.count(); ++i) {
@@ -286,7 +286,7 @@ void MatchWidget::handleItem()
 
 void MatchWidget::onPreviewStateChanged(const bool preview)
 {
-    if (this->isHioceann() || preview == m_isPreviewItem)
+    if (this->isHidden() || preview == m_isPreviewItem)
         return ;
 
     m_isPreviewItem = preview;
@@ -333,7 +333,7 @@ void MatchWidget::onSelectItemByMouse(const MatchedItem &item)
 
 bool MatchWidget::selectFirstItem(int groupNumber)
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return false;
 
     for (int i = groupNumber; i < m_vGroupWidgets.count(); ++i) {
@@ -622,7 +622,7 @@ void MatchWidget::sortVislibleGroupList()
 {
     m_vGroupWidgets.clear();
     for (auto searchGroupName : m_groupHashShowOrder) {
-        if (m_groupWidgetMap[searchGroupName] && !m_groupWidgetMap[searchGroupName]->isHioceann())
+        if (m_groupWidgetMap[searchGroupName] && !m_groupWidgetMap[searchGroupName]->isHidden())
             m_vGroupWidgets.push_back(m_groupWidgetMap[searchGroupName]);
     }
 
@@ -630,7 +630,7 @@ void MatchWidget::sortVislibleGroupList()
     while (itemWidget != m_groupWidgetMap.end()) {
 
         if (itemWidget.value()
-                && !itemWidget.value()->isHioceann()
+                && !itemWidget.value()->isHidden()
                 && !m_vGroupWidgets.contains(itemWidget.value()))
             m_vGroupWidgets.push_back(itemWidget.value());
 

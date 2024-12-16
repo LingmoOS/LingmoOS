@@ -42,12 +42,12 @@ void PanguGenerator::generatorComputerDevice()
 
     // setOsDescription
     QString os = "UOS";
-    DSysInfo::LingmoType type = DSysInfo::lingmoType();
-    if (DSysInfo::LingmoProfessional == type)
+    LSysInfo::LingmoType type = LSysInfo::lingmoType();
+    if (LSysInfo::LingmoProfessional == type)
         os =  "UOS 20";
-    else if (DSysInfo::LingmoPersonal == type)
+    else if (LSysInfo::LingmoPersonal == type)
         os =  "UOS 20 Home";
-    else if (DSysInfo::LingmoDesktop == type)
+    else if (LSysInfo::LingmoDesktop == type)
         os =  "Lingmo 20 Beta";
 
     device->setOsDescription(os);

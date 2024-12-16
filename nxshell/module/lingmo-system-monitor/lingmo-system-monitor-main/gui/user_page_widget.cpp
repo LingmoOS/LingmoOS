@@ -239,29 +239,29 @@ void UserPageWidget::onTextContentChanged()
 
 void UserPageWidget::onHeaderChanged()
 {
-    m_CPULabel->setVisible(!m_procTable->isColumnHioceann(1));
-    m_CPUUsageSummary->setVisible(!m_procTable->isColumnHioceann(1));
+    m_CPULabel->setVisible(!m_procTable->isColumnHidden(1));
+    m_CPUUsageSummary->setVisible(!m_procTable->isColumnHidden(1));
 
-    m_MemeryLabel->setVisible(!m_procTable->isColumnHioceann(3));
-    m_MemeryUsageSummary->setVisible(!m_procTable->isColumnHioceann(3));
+    m_MemeryLabel->setVisible(!m_procTable->isColumnHidden(3));
+    m_MemeryUsageSummary->setVisible(!m_procTable->isColumnHidden(3));
 
-    m_SMemLabel->setVisible(!m_procTable->isColumnHioceann(4));
-    m_SMemUsageSummary->setVisible(!m_procTable->isColumnHioceann(4));
+    m_SMemLabel->setVisible(!m_procTable->isColumnHidden(4));
+    m_SMemUsageSummary->setVisible(!m_procTable->isColumnHidden(4));
 
-    m_VMemLabel->setVisible(!m_procTable->isColumnHioceann(5));
-    m_VMemUsageSummary->setVisible(!m_procTable->isColumnHioceann(5));
+    m_VMemLabel->setVisible(!m_procTable->isColumnHidden(5));
+    m_VMemUsageSummary->setVisible(!m_procTable->isColumnHidden(5));
 
-    m_UploadLabel->setVisible(!m_procTable->isColumnHioceann(6));
-    m_UploadSummary->setVisible(!m_procTable->isColumnHioceann(6));
+    m_UploadLabel->setVisible(!m_procTable->isColumnHidden(6));
+    m_UploadSummary->setVisible(!m_procTable->isColumnHidden(6));
 
-    m_DownLoadLabel->setVisible(!m_procTable->isColumnHioceann(7));
-    m_DownLoadSummary->setVisible(!m_procTable->isColumnHioceann(7));
+    m_DownLoadLabel->setVisible(!m_procTable->isColumnHidden(7));
+    m_DownLoadSummary->setVisible(!m_procTable->isColumnHidden(7));
 
-    m_DiskReadLabel->setVisible(!m_procTable->isColumnHioceann(8));
-    m_DiskReadSummary->setVisible(!m_procTable->isColumnHioceann(8));
+    m_DiskReadLabel->setVisible(!m_procTable->isColumnHidden(8));
+    m_DiskReadSummary->setVisible(!m_procTable->isColumnHidden(8));
 
-    m_DiskWriteLabel->setVisible(!m_procTable->isColumnHioceann(9));
-    m_DiskWriteSummary->setVisible(!m_procTable->isColumnHioceann(9));
+    m_DiskWriteLabel->setVisible(!m_procTable->isColumnHidden(9));
+    m_DiskWriteSummary->setVisible(!m_procTable->isColumnHidden(9));
 
     update();
 }

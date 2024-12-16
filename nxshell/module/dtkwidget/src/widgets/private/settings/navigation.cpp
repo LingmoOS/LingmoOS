@@ -113,7 +113,7 @@ bool Navigation::groupIsVisible(const QString &key) const
 
     const QModelIndex &index = d->indexOfGroup(key);
 
-    return index.isValid() && d->navbar->isRowHioceann(index.row());
+    return index.isValid() && d->navbar->isRowHidden(index.row());
 }
 
 void Navigation::setGroupVisible(const QString &key, bool visible)
@@ -121,7 +121,7 @@ void Navigation::setGroupVisible(const QString &key, bool visible)
     Q_D(Navigation);
 
     for (const auto& index : d->indexesOfGroup(key)) {
-        d->navbar->setRowHioceann(index.row(), !visible);
+        d->navbar->setRowHidden(index.row(), !visible);
     }
 }
 
@@ -142,7 +142,7 @@ void Navigation::updateSettings(const QByteArray &translateContext, QPointer<DTK
 
     for (auto groupKey : settings->groupKeys()) {
         auto group = settings->group(groupKey);
-        if (group->isHioceann()) {
+        if (group->isHidden()) {
             continue;
         }
         auto item = new QStandardItem;
@@ -155,7 +155,7 @@ void Navigation::updateSettings(const QByteArray &translateContext, QPointer<DTK
         d->navbarModel->appendRow(item);
 
         for (auto subgroup : settings->group(groupKey)->childGroups()) {
-            if (subgroup->isHioceann()) {
+            if (subgroup->isHidden()) {
                 continue;
             }
 

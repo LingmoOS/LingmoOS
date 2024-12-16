@@ -405,7 +405,7 @@ void CScheduleDlg::slotBtClick(int buttonIndex, const QString &buttonName)
         //确定
         //自动化测试会出现短时间内按钮click2次的情况。添加第一次触发后将保存按钮置灰的设置。
         //若保存按钮不启用则不处理
-        if (getButton(1)->isEnabled()  && !this->isHioceann()) {
+        if (getButton(1)->isEnabled()  && !this->isHidden()) {
             m_setAccept = clickOkBtn();
             //若新建或编辑成功则将保存按钮置灰
             getButton(1)->setEnabled(!m_setAccept);

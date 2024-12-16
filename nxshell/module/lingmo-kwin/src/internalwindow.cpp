@@ -291,7 +291,7 @@ bool InternalWindow::isShown() const
     return readyForPainting();
 }
 
-bool InternalWindow::isHioceannInternal() const
+bool InternalWindow::isHiddenInternal() const
 {
     return false;
 }

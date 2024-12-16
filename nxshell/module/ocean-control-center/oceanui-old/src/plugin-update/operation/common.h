@@ -6,7 +6,7 @@
 
 #include <QRegularExpression>
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DGuiApplicationHelper>
 
 #include <QString>
@@ -21,15 +21,15 @@ inline const QString AppStoreUpdateType = QStringLiteral("appstore_upgrade");
 inline const QString SecurityUpdateType = QStringLiteral("security_upgrade");
 inline const QString UnknownUpdateType = QStringLiteral("unknown_upgrade");
 
-inline const DSysInfo::UosType UosType = DSysInfo::uosType();
-inline const DSysInfo::UosEdition UosEdition = DSysInfo::uosEditionType();
-inline const bool IsServerSystem = (DSysInfo::UosServer == UosType); // 是否是服务器版
-inline const bool IsCommunitySystem = (DSysInfo::UosCommunity == UosEdition); // 是否是社区版
-inline const bool IsProfessionalSystem = (DSysInfo::UosProfessional == UosEdition); // 是否是专业版
-inline const bool IsHomeSystem = (DSysInfo::UosHome == UosEdition);           // 是否是个人版
-inline const bool IsEducationSystem = (DSysInfo::UosEducation == UosEdition); // 是否是教育版
+inline const LSysInfo::UosType UosType = LSysInfo::uosType();
+inline const LSysInfo::UosEdition UosEdition = LSysInfo::uosEditionType();
+inline const bool IsServerSystem = (LSysInfo::UosServer == UosType); // 是否是服务器版
+inline const bool IsCommunitySystem = (LSysInfo::UosCommunity == UosEdition); // 是否是社区版
+inline const bool IsProfessionalSystem = (LSysInfo::UosProfessional == UosEdition); // 是否是专业版
+inline const bool IsHomeSystem = (LSysInfo::UosHome == UosEdition);           // 是否是个人版
+inline const bool IsEducationSystem = (LSysInfo::UosEducation == UosEdition); // 是否是教育版
 inline const bool IsLingmoDesktop =
-        (DSysInfo::LingmoDesktop == DSysInfo::lingmoType()); // 是否是Lingmo桌面
+        (LSysInfo::LingmoDesktop == LSysInfo::lingmoType()); // 是否是Lingmo桌面
 
 inline const QString TestingChannelPackage = QStringLiteral("lingmo-unstable-source");
 inline const QString ServiceLink = QStringLiteral("https://insider.lingmo.org");

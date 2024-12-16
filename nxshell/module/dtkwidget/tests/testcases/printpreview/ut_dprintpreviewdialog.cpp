@@ -282,7 +282,7 @@ TEST_F(ut_DPrintPreviewDialog, testSetfrmaeback)
 TEST_F(ut_DPrintPreviewDialog, testAdvanceBtn)
 {
     ASSERT_TRUE(test_dialog_d->advanceBtn->isEnabled());
-    ASSERT_TRUE(test_dialog_d->advancesettingwdg->isHioceann());
+    ASSERT_TRUE(test_dialog_d->advancesettingwdg->isHidden());
 
     // 显示 advanced 菜单
     test_dialog_d->showadvancesetting();
@@ -346,7 +346,7 @@ TEST_F(ut_DPrintPreviewDialog, testCancelBtn)
     // 点击 cancel 按钮
     test_dialog_d->cancelBtn->click();
 
-    ASSERT_TRUE(testPrintDialog->isHioceann());
+    ASSERT_TRUE(testPrintDialog->isHidden());
 }
 
 TEST_F(ut_DPrintPreviewDialog, testPageRangeCombo)
@@ -484,7 +484,7 @@ TEST_F(ut_DPrintPreviewDialog, testWaterColorBtn)
     ASSERT_TRUE(test_dialog_d->watermarksettingwdg->isVisible());
 
     ASSERT_TRUE(test_dialog_d->waterColorBtn->isEnabled());
-    ASSERT_TRUE(test_dialog_d->colorWidget->isHioceann());
+    ASSERT_TRUE(test_dialog_d->colorWidget->isHidden());
 
     // 显示 PrintPickColorWidget
     test_dialog_d->_q_colorButtonCliked(true);
@@ -757,12 +757,12 @@ TEST_F(ut_DPrintPreviewDialog, testSizeBox)
     test_dialog_d->showadvancesetting();
     ASSERT_TRUE(QTest::qWaitForWindowExposed(test_dialog_d->advancesettingwdg));
 
-    ASSERT_FALSE(test_dialog_d->sizeBox->isHioceann());
+    ASSERT_FALSE(test_dialog_d->sizeBox->isHidden());
 
     ASSERT_TRUE(test_dialog_d->advancesettingwdg->isVisible());
 
     ASSERT_TRUE(test_dialog_d->sizeBox->isEnabled());
-    ASSERT_FALSE(test_dialog_d->sizeBox->isHioceann());
+    ASSERT_FALSE(test_dialog_d->sizeBox->isHidden());
 //    ASSERT_TRUE(test_dialog_d->sizeBox->isVisible());
 
     ASSERT_EQ(test_dialog_d->sizeBox->value(), 100);
@@ -845,7 +845,7 @@ TEST_F(ut_DPrintPreviewDialog, testPickColorWidget)
 
     ASSERT_TRUE(test_dialog_d->watermarksettingwdg->isVisible());
 
-    ASSERT_TRUE(test_dialog_d->colorWidget->isHioceann());
+    ASSERT_TRUE(test_dialog_d->colorWidget->isHidden());
     ASSERT_TRUE(test_dialog_d->colorWidget->isEnabled());
 
     // 显示 colorWidget 菜单
@@ -1052,7 +1052,7 @@ TEST_F(ut_DPrintPreviewDialog, testWaterMarkBtn)
     // 隐藏 waterMark 菜单
     test_dialog_d->waterMarkBtnClicked(false);
 
-    ASSERT_TRUE(test_dialog_d->watermarksettingwdg->isHioceann());
+    ASSERT_TRUE(test_dialog_d->watermarksettingwdg->isHidden());
 }
 
 TEST_F(ut_DPrintPreviewDialog, testWaterTypeGroup)

@@ -19,7 +19,7 @@
 
 #if defined(ASIO_HAS_DEV_POLL)
 
-#include <cstoceanf>
+#include <cstddef>
 #include <vector>
 #include <sys/devpoll.h>
 #include "asio/detail/hash_map.hpp"

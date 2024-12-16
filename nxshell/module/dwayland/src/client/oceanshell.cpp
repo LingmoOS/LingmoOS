@@ -21,7 +21,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN OCEANShell::Private
+class Q_DECL_HIDDEN OCEANShell::Private
 {
 public:
     Private(OCEANShell *q);
@@ -34,7 +34,7 @@ private:
     OCEANShell *q;
 };
 
-class Q_DECL_HIOCEANN OCEANShellSurface::Private
+class Q_DECL_HIDDEN OCEANShellSurface::Private
 {
 public:
     Private(OCEANShellSurface *q);

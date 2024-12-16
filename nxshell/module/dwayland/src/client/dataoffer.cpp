@@ -16,7 +16,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN DataOffer::Private
+class Q_DECL_HIDDEN DataOffer::Private
 {
 public:
     Private(wl_data_offer *offer, DataOffer *q);

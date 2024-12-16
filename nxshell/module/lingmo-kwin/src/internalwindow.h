@@ -51,7 +51,7 @@ public:
     bool isSplitMenu() const override;
     bool isSwitcherWin() const override;
     bool isShown() const override;
-    bool isHioceannInternal() const override;
+    bool isHiddenInternal() const override;
     void hideClient() override;
     void showClient() override;
     QRectF resizeWithChecks(const QRectF &geometry, const QSizeF &size) override;

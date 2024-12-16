@@ -137,10 +137,10 @@ private slots:
     void slotSetEnableButton(bool bEnable);
 
     /**
-     * @brief slotShowHioceannButton
+     * @brief slotShowHiddenButton
      * 授权取消后显示被隐藏的按钮
      */
-    void slotShowHioceannButton();
+    void slotShowHiddenButton();
 
     /**
      * @brief slotSetAuthingStatus

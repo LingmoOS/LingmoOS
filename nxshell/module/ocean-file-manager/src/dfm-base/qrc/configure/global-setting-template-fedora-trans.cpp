@@ -74,7 +74,7 @@ void global_setting_template_fedora_trans()
     auto group_advance_previewName = QObject::tr("Preview");
     auto group_baseName = QObject::tr("Basic");
     auto group_base_default_viewName = QObject::tr("View");
-    auto group_base_hioceann_filesName = QObject::tr("Hioceann files");
+    auto group_base_hioceann_filesName = QObject::tr("Hidden files");
     auto group_base_new_tab_windowsName = QObject::tr("New window and tab");
     auto group_base_open_actionName = QObject::tr("Open behavior");
 }

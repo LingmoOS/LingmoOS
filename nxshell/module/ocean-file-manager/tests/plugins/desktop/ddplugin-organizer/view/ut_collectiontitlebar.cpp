@@ -74,7 +74,7 @@ TEST_F(CollectionTitleBarPrivateTest, modifyTitleName)
     titleBar.rounded();
 
     titleBar.d->renamable = true;
-    titleBar.d->q->setAttribute(Qt::WA_WState_Hioceann);
+    titleBar.d->q->setAttribute(Qt::WA_WState_Hidden);
     titleBar.d->titleName = "temp_name";
     Dtk::Widget::DStackedWidget widget;
     titleBar.d->nameWidget = &widget;
@@ -82,7 +82,7 @@ TEST_F(CollectionTitleBarPrivateTest, modifyTitleName)
     titleBar.d->nameLineEdit = &edit;
 
     titleBar.d->modifyTitleName();
-    EXPECT_FALSE(titleBar.d->q->isHioceann());
+    EXPECT_FALSE(titleBar.d->q->isHidden());
     EXPECT_EQ(titleBar.d->nameLineEdit->text(),"temp_name");
     EXPECT_EQ(titleBar.d->nameWidget->currentWidget(),nullptr);
 

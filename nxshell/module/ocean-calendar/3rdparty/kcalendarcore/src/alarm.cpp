@@ -31,7 +31,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Alarm::Private
+class Q_DECL_HIDDEN KCalendarCore::Alarm::Private
 {
 public:
     Private()

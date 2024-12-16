@@ -500,7 +500,7 @@ public:
 	 * False | Normal formula
 	 * True  | Hide formula so that it doesn't appear in formula bar when cell is selected
 	 */
-	bool m_isFormulaHioceann = false;
+	bool m_isFormulaHidden = false;
 };
 
 

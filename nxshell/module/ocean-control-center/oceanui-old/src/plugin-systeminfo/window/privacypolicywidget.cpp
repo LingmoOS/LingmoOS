@@ -6,7 +6,7 @@
 
 #include <DFontSizeManager>
 #include <DTipLabel>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QVBoxLayout>
 #include <QDesktopServices>
@@ -18,7 +18,7 @@ DCORE_USE_NAMESPACE
 using namespace DCC_NAMESPACE;
 
 static bool useLingmoLicense () {
-    static bool useLingmoLicense = DSysInfo::productType() != DSysInfo::ProductType::Uos;
+    static bool useLingmoLicense = LSysInfo::productType() != LSysInfo::ProductType::Uos;
     return useLingmoLicense;
 }
 

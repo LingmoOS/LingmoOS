@@ -238,7 +238,7 @@ bool NetWirelessConnect::initConnection()
         m_connectionSettings->setUuid(uuid);
         m_connectionSettings->setId(m_ssid);
         if (!m_accessPoint) {
-            m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->setHioceann(true);
+            m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->setHidden(true);
         }
         qCInfo(DNC) << "Wireless connect init, create connect: ssid: " << m_ssid << ", uuid: " << uuid << ", access point: " << m_accessPoint;
         if (m_accessPoint) {
@@ -273,8 +273,8 @@ bool NetWirelessConnect::initConnection()
 void NetWirelessConnect::setPassword(const QString &password)
 {
     WirelessSecuritySetting::Ptr const wsSetting = m_connectionSettings->setting(Setting::SettingType::WirelessSecurity).staticCast<WirelessSecuritySetting>();
-    bool const isHioceann = m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->hioceann();
-    WirelessSecuritySetting::KeyMgmt const keyMgmt = isHioceann ? getKeyMgmtByAp(m_accessPoint) : wsSetting->keyMgmt();
+    bool const isHidden = m_connectionSettings->setting(Setting::SettingType::Wireless).staticCast<WirelessSetting>()->hioceann();
+    WirelessSecuritySetting::KeyMgmt const keyMgmt = isHidden ? getKeyMgmtByAp(m_accessPoint) : wsSetting->keyMgmt();
     wsSetting->setKeyMgmt(keyMgmt);
     if (keyMgmt == WirelessSecuritySetting::KeyMgmt::Wep) {
         wsSetting->setWepKey0(password);
@@ -286,7 +286,7 @@ void NetWirelessConnect::setPassword(const QString &password)
 // #endif
         wsSetting->setPsk(password);
 
-        if (isHioceann && keyMgmt == WirelessSecuritySetting::KeyMgmt::WpaPsk) {
+        if (isHidden && keyMgmt == WirelessSecuritySetting::KeyMgmt::WpaPsk) {
             wsSetting->setAuthAlg(WirelessSecuritySetting::AuthAlg::Open);
         }
     }

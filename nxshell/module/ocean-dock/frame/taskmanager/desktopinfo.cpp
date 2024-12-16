@@ -89,7 +89,7 @@ bool DesktopInfo::isInstalled()
  */
 bool DesktopInfo::shouldShow()
 {
-    if (getNoDisplay() || getIsHioceann()) {
+    if (getNoDisplay() || getIsHidden()) {
         qDebug() << "hioceann desktop file path: " << m_desktopFilePath;
         return false;
     }
@@ -103,9 +103,9 @@ bool DesktopInfo::getNoDisplay()
     return m_desktopFile->value(MainSection + '/' +  KeyNoDisplay).toBool();
 }
 
-bool DesktopInfo::getIsHioceann()
+bool DesktopInfo::getIsHidden()
 {
-    return m_desktopFile->value(MainSection + '/' + KeyHioceann).toBool();
+    return m_desktopFile->value(MainSection + '/' + KeyHidden).toBool();
 }
 
 bool DesktopInfo::getShowIn(QStringList desktopEnvs)

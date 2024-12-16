@@ -68,14 +68,14 @@ void SideBarItem::setGroup(const QString &group)
     setData(group, Roles::kItemGroupRole);
 }
 
-bool SideBarItem::isHioceann() const
+bool SideBarItem::isHidden() const
 {
     return data(Roles::kItemGroupRole).toBool();
 }
 
 void SideBarItem::setHiiden(bool hioceann)
 {
-    setData(hioceann, Roles::kItemHioceannRole);
+    setData(hioceann, Roles::kItemHiddenRole);
 }
 
 QString SideBarItem::subGourp() const

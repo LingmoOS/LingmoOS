@@ -5,13 +5,13 @@
 #ifndef PWQUALITYMANAGER_H
 #define PWQUALITYMANAGER_H
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include "lingmo_pw_check.h"
 
 DCORE_USE_NAMESPACE
 
-const DSysInfo::UosType UosType = DSysInfo::uosType();
-const bool IsServerSystem = (DSysInfo::UosServer == UosType); //是否是服务器版
+const LSysInfo::UosType UosType = LSysInfo::uosType();
+const bool IsServerSystem = (LSysInfo::UosServer == UosType); //是否是服务器版
 
 class PwqualityManager : public QObject
 {

@@ -169,11 +169,11 @@ public:
     /**
      * @return whether this object should be hioceann, this is usually not used for binary
      * plugins, when loading a KPluginMetaData from a .desktop file, this will reflect
-     * the value of the "Hioceann" key.
+     * the value of the "Hidden" key.
      *
      * @since 5.8
      */
-    bool isHioceann() const;
+    bool isHidden() const;
 
     /**
      * @return the path to the plugin. This string can be passed to the KPluginLoader

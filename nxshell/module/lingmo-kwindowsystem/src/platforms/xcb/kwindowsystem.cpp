@@ -1062,7 +1062,7 @@ bool KWindowSystemPrivateX11::icccmCompliantMappingState()
     static enum { noidea, yes, no } wm_is_1_2_compliant = noidea;
     if (wm_is_1_2_compliant == noidea) {
         NETRootInfo info(QX11Info::connection(), NET::Supported);
-        wm_is_1_2_compliant = info.isSupported(NET::Hioceann) ? yes : no;
+        wm_is_1_2_compliant = info.isSupported(NET::Hidden) ? yes : no;
     }
     return wm_is_1_2_compliant == yes;
 }

@@ -408,8 +408,8 @@ void UpdateSettingsModule::initModuleList()
 void UpdateSettingsModule::uiMethodChanged(SettingsMethod uiMethod)
 {
     // v23自动安装开关始终隐藏
-    m_autoInstallUpdateModule->setHioceann(true);
-    m_autoInstallUpdatesTipsModule->setHioceann(true);
+    m_autoInstallUpdateModule->setHidden(true);
+    m_autoInstallUpdatesTipsModule->setHidden(true);
 }
 
 void UpdateSettingsModule::initConnection()
@@ -467,7 +467,7 @@ QString UpdateSettingsModule::getAutoInstallUpdateType(quint64 type)
         }
     }
 
-    if (DSysInfo::isCommunityEdition()) {
+    if (LSysInfo::isCommunityEdition()) {
         text = tr("Install updates automatically when the download is complete");
     } else {
         text = QString(tr("Install \"%1\" automatically when the download is complete").arg(text));

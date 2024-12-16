@@ -84,7 +84,7 @@ DArchiveManager::MgrFileEntry CompressorTest::fileInfo2Entry(const QFileInfo &fi
 
     if (entry.isDirectory) {
         // 文件夹显示子文件数目
-        entry.qSize = QDir(fileInfo.filePath()).entryList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hioceann).count();   //目录下文件数
+        entry.qSize = QDir(fileInfo.filePath()).entryList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hidden).count();   //目录下文件数
     } else {
         // 文件直接显示大小
         entry.qSize = fileInfo.size();

@@ -7,7 +7,7 @@
 #include "private/daboutdialog_p.h"
 
 #include <dwidgetutil.h>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DGuiApplicationHelper>
 #include <DApplication>
 #include <DFontSizeManager>
@@ -229,8 +229,8 @@ void DAboutDialogPrivate::init()
 
 void DAboutDialogPrivate::loadDistributionInfo()
 {
-    logoPath = DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Light, ":/assets/images/lingmo-logo.svg");
-    auto websiteInfo = DSysInfo::distributionOrgWebsite(DSysInfo::Distribution); // will always return a valid result.
+    logoPath = LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Light, ":/assets/images/lingmo-logo.svg");
+    auto websiteInfo = LSysInfo::distributionOrgWebsite(LSysInfo::Distribution); // will always return a valid result.
     websiteName = websiteInfo.first;
     websiteLink = websiteInfo.second;
 }

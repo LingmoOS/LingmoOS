@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <QCoreApplication>
 
-class Q_DECL_HIOCEANN KWindowInfo::Private
+class Q_DECL_HIDDEN KWindowInfo::Private
 {
 public:
     Private()
@@ -108,7 +108,7 @@ unsigned long KWindowInfo::state() const
     }
 #endif
     if (!IsWindowVisible(d->win_)) {
-        state |= NET::Hioceann;
+        state |= NET::Hidden;
     }
 
 #ifndef _WIN32_WCE

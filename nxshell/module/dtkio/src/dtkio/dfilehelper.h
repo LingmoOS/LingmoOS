@@ -33,7 +33,7 @@ QVariant attributeFromInfo(AttributeID id, GFileInfo *fileinfo, const QUrl &url 
 QVariant customAttributeFromInfo(AttributeID id, GFileInfo *fileinfo, const QUrl &url = QUrl());
 GFile *fileNewForUrl(const QUrl &url);
 QSet<QString> hideListFromUrl(const QUrl &url);
-bool fileIsHioceann(const DFileInfo *dfileinfo, const QSet<QString> &hideList);
+bool fileIsHidden(const DFileInfo *dfileinfo, const QSet<QString> &hideList);
 
 bool setAttribute(GFile *gfile, const char *key, AttributeType type, const QVariant &value, GFileQueryInfoFlags flags, GCancellable *cancellable, GError **error);
 

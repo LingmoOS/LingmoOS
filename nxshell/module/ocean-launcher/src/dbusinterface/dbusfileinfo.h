@@ -243,9 +243,9 @@ public:
     inline QString fileAttributeStandardIsBackup() const
     { return qvariant_cast< QString >(property("FileAttributeStandardIsBackup")); }
 
-    Q_PROPERTY(QString FileAttributeStandardIsHioceann READ fileAttributeStandardIsHioceann NOTIFY FileAttributeStandardIsHioceannChanged)
-    inline QString fileAttributeStandardIsHioceann() const
-    { return qvariant_cast< QString >(property("FileAttributeStandardIsHioceann")); }
+    Q_PROPERTY(QString FileAttributeStandardIsHidden READ fileAttributeStandardIsHidden NOTIFY FileAttributeStandardIsHiddenChanged)
+    inline QString fileAttributeStandardIsHidden() const
+    { return qvariant_cast< QString >(property("FileAttributeStandardIsHidden")); }
 
     Q_PROPERTY(QString FileAttributeStandardIsSymlink READ fileAttributeStandardIsSymlink NOTIFY FileAttributeStandardIsSymlinkChanged)
     inline QString fileAttributeStandardIsSymlink() const
@@ -501,7 +501,7 @@ void FileAttributeStandardDisplayNameChanged();
 void FileAttributeStandardEditNameChanged();
 void FileAttributeStandardFastContentTypeChanged();
 void FileAttributeStandardIsBackupChanged();
-void FileAttributeStandardIsHioceannChanged();
+void FileAttributeStandardIsHiddenChanged();
 void FileAttributeStandardIsSymlinkChanged();
 void FileAttributeStandardIsVirtualChanged();
 void FileAttributeStandardNameChanged();

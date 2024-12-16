@@ -5,7 +5,7 @@
 #include "syncworker.h"
 #include "cryptor.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DDBusSender>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -730,7 +730,7 @@ void SyncWorker::getUserLingmoidInfo()
 
 void SyncWorker::getLicenseState()
 {
-    if (DSysInfo::uosEditionType() == DSysInfo::UosCommunity) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosCommunity) {
         m_model->setActivation(true);
         return;
     }

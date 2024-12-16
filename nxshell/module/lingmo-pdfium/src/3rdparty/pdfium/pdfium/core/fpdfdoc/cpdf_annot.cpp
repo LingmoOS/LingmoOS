@@ -138,11 +138,11 @@ bool CPDF_Annot::ShouldGenerateAP() const {
   if (pAP && pAP->GetDictFor("N"))
     return false;
 
-  return !IsHioceann();
+  return !IsHidden();
 }
 
 bool CPDF_Annot::ShouldDrawAnnotation() const {
-  if (IsHioceann())
+  if (IsHidden())
     return false;
   return m_bOpenState || m_nSubtype != CPDF_Annot::Subtype::POPUP;
 }
@@ -173,8 +173,8 @@ uint32_t CPDF_Annot::GetFlags() const {
   return m_pAnnotDict->GetIntegerFor(pdfium::annotation::kF);
 }
 
-bool CPDF_Annot::IsHioceann() const {
-  return !!(GetFlags() & pdfium::annotation_flags::kHioceann);
+bool CPDF_Annot::IsHidden() const {
+  return !!(GetFlags() & pdfium::annotation_flags::kHidden);
 }
 
 CPDF_Stream* GetAnnotAP(CPDF_Dictionary* pAnnotDict,
@@ -438,7 +438,7 @@ void CPDF_Annot::DrawBorder(CFX_RenderDevice* pDevice,
     return;
 
   uint32_t annot_flags = GetFlags();
-  if (annot_flags & pdfium::annotation_flags::kHioceann)
+  if (annot_flags & pdfium::annotation_flags::kHidden)
     return;
 
   bool bPrinting = pDevice->GetDeviceType() == DeviceType::kPrinter;

@@ -188,7 +188,7 @@ void DArrowButton::initButtonState()
 //    QPropertyAnimation *ha = new QPropertyAnimation(this, "pos");
 //    ha->setDuration(200);
 //    ha->setEasingCurve(QEasingCurve::InSine);
-//    connect(ha,&QPropertyAnimation::finished,this,&Panel::hasHioceann);
+//    connect(ha,&QPropertyAnimation::finished,this,&Panel::hasHidden);
 
 //    QSignalTransition *ts1 = hoverState->addTransition(this,SIGNAL(startHide()), hideState);
 //    ts1->addAnimation(ha);

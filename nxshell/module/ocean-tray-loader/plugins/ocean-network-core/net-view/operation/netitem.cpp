@@ -436,27 +436,27 @@ NetWiredItem::NetWiredItem(const QString &id)
 NetWiredItem::~NetWiredItem() { }
 
 // 隐藏网络
-NetItemType NetWirelessHioceannItem::itemType() const
+NetItemType NetWirelessHiddenItem::itemType() const
 {
-    return NetItemType::WirelessHioceannItem;
+    return NetItemType::WirelessHiddenItem;
 }
 
-QVariant NetWirelessHioceannItem::sortValue() const
+QVariant NetWirelessHiddenItem::sortValue() const
 {
     return "ff";
 }
 
-void NetWirelessHioceannItem::retranslateUi()
+void NetWirelessHiddenItem::retranslateUi()
 {
     updateName(tr("Connect to hioceann network"));
 }
 
-NetWirelessHioceannItem::NetWirelessHioceannItem(const QString &id)
+NetWirelessHiddenItem::NetWirelessHiddenItem(const QString &id)
     : NetItem(id)
 {
 }
 
-NetWirelessHioceannItem::~NetWirelessHioceannItem() { }
+NetWirelessHiddenItem::~NetWirelessHiddenItem() { }
 
 // 无线网络
 NetItemType NetWirelessItem::itemType() const

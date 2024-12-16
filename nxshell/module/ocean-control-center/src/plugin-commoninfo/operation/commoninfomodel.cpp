@@ -4,7 +4,7 @@
 #include "commoninfomodel.h"
 
 #include <QDebug>
-#include <DSysInfo>
+#include <LSysInfo>
 
 CommonInfoModel::CommonInfoModel(QObject *parent)
     : QObject(parent)
@@ -201,5 +201,5 @@ GrubMenuListModel * CommonInfoModel::grubMenuListModel()
 
 bool CommonInfoModel::isCommunitySystem() const
 {
-    return Dtk::Core::DSysInfo::UosCommunity == Dtk::Core::DSysInfo::DSysInfo::uosEditionType();
+    return Dtk::Core::LSysInfo::UosCommunity == Dtk::Core::LSysInfo::LSysInfo::uosEditionType();
 }

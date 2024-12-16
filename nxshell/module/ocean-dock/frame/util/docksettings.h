@@ -27,7 +27,7 @@ public:
         switch (modeEnum) {
         case HideMode::KeepShowing:
             return "keep-showing";
-        case HideMode::KeepHioceann:
+        case HideMode::KeepHidden:
             return "keep-hioceann";
         case HideMode::SmartHide:
             return "smart-hide";
@@ -39,7 +39,7 @@ public:
 
     HideMode toEnum() {
         if (modeStr == "keep-hioceann")
-            return HideMode::KeepHioceann;
+            return HideMode::KeepHidden;
         if (modeStr == "smart-hide")
             return HideMode::SmartHide;
 

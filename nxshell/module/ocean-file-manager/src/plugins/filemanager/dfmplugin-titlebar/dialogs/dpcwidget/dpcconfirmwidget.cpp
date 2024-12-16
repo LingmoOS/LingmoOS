@@ -15,7 +15,7 @@
 #include <DVerticalLine>
 #include <DFontSizeManager>
 #include <DWindowManagerHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QTimer>
 #include <QHBoxLayout>
@@ -204,15 +204,15 @@ bool DPCConfirmWidget::checkPasswdComplexity(const QString &pwd, QString *msg)
     Q_ASSERT(msg);
 
     // the password complexity check is for 1060 and v23 and later
-    DSysInfo::UosEdition edition = DSysInfo::uosEditionType();
+    LSysInfo::UosEdition edition = LSysInfo::uosEditionType();
     switch (edition) {
-    case DSysInfo::UosProfessional: {
-        const auto &minorVer = DSysInfo::minorVersion();
+    case LSysInfo::UosProfessional: {
+        const auto &minorVer = LSysInfo::minorVersion();
         if (minorVer < "1060")
             return true;
     } break;
-    case DSysInfo::UosCommunity: {
-        const auto &majorVer = DSysInfo::majorVersion();
+    case LSysInfo::UosCommunity: {
+        const auto &majorVer = LSysInfo::majorVersion();
         if (majorVer < "23")
             return true;
     } break;

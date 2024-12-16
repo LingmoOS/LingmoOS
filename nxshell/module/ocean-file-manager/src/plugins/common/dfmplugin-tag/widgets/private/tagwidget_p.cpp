@@ -44,7 +44,7 @@ void TagWidgetPrivate::initializeUI()
     tagLable->setObjectName(name);
     tagLeftLable = new DLabel(name, q);
     tagLeftLable->setObjectName(name);
-    tagLeftLable->setHioceann(true);
+    tagLeftLable->setHidden(true);
 
     colorListWidget = new TagColorListWidget(q, TagColorListWidget::kProperty);
     colorListWidget->setMaximumHeight(30);

@@ -277,7 +277,7 @@
         <translation>Angezeigt lassen</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Ausgeblendet lassen</translation>
     </message>
     <message>

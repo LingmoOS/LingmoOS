@@ -67,13 +67,13 @@ TEST_F(Test_MultiScreenWorker, onDisplayModeChanged)
     worker->onHideModeChanged(static_cast<HideMode>(0));
     worker->m_hideMode = HideMode::KeepShowing;
     worker->onHideModeChanged(static_cast<HideMode>(1));
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onHideModeChanged(static_cast<HideMode>(3));
 
     worker->onHideStateChanged(static_cast<HideState>(0));
     worker->m_hideMode = HideMode::KeepShowing;
     worker->onHideStateChanged(static_cast<HideState>(1));
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onHideStateChanged(static_cast<HideState>(2));
 
     delete worker;
@@ -169,7 +169,7 @@ TEST_F(Test_MultiScreenWorker, onDelayAutoHideChanged)
     worker->m_hideMode = HideMode::KeepShowing;
     worker->onDelayAutoHideChanged();
 
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onDelayAutoHideChanged();
 
     delete worker;
@@ -181,7 +181,7 @@ TEST_F(Test_MultiScreenWorker, onPositionChanged)
     MainWindow window;
     MultiScreenWorker *worker = new MultiScreenWorker(&window, DWindowManagerHelper::instance());
 
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onPositionChanged(static_cast<Position>(0));
     QTest::qWait(400);
 
@@ -189,7 +189,7 @@ TEST_F(Test_MultiScreenWorker, onPositionChanged)
     worker->onPositionChanged(static_cast<Position>(1));
     QTest::qWait(400);
 
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onPositionChanged(static_cast<Position>(2));
     QTest::qWait(400);
 
@@ -273,7 +273,7 @@ TEST_F(Test_MultiScreenWorker, onExtralRegionMonitorChanged)
     worker->m_hideMode = HideMode::SmartHide;
     worker->onExtralRegionMonitorChanged(0, 0, worker->m_registerKey);
 
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->m_hideState = HideState::Hide;
     worker->onExtralRegionMonitorChanged(0, 0, worker->m_registerKey);
 

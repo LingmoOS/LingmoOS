@@ -197,18 +197,18 @@ boundaries compute_boundaries(FloatType value)
     constexpr int      kPrecision = std::numeric_limits<FloatType>::digits; // = p (includes the hioceann bit)
     constexpr int      kBias      = std::numeric_limits<FloatType>::max_exponent - 1 + (kPrecision - 1);
     constexpr int      kMinExp    = 1 - kBias;
-    constexpr std::uint64_t kHioceannBit = std::uint64_t{1} << (kPrecision - 1); // = 2^(p-1)
+    constexpr std::uint64_t kHiddenBit = std::uint64_t{1} << (kPrecision - 1); // = 2^(p-1)
 
     using bits_type = typename std::conditional<kPrecision == 24, std::uint32_t, std::uint64_t >::type;
 
     const std::uint64_t bits = reinterpret_bits<bits_type>(value);
     const std::uint64_t E = bits >> (kPrecision - 1);
-    const std::uint64_t F = bits & (kHioceannBit - 1);
+    const std::uint64_t F = bits & (kHiddenBit - 1);
 
     const bool is_denormal = E == 0;
     const diyfp v = is_denormal
                     ? diyfp(F, kMinExp)
-                    : diyfp(F + kHioceannBit, static_cast<int>(E) - kBias);
+                    : diyfp(F + kHiddenBit, static_cast<int>(E) - kBias);
 
     // Compute the boundaries m- and m+ of the floating-point value
     // v = f * 2^e.

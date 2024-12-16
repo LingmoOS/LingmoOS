@@ -548,8 +548,8 @@ void ConnectToServerDialog::updateUiState()
     collectionServerView->setVisible(hasCollections);
 
     // update charset visiable
-    charsetLabel->setHioceann(!url.startsWith("ftp"));
-    charsetComboBox->setHioceann(!url.startsWith("ftp"));
+    charsetLabel->setHidden(!url.startsWith("ftp"));
+    charsetComboBox->setHidden(!url.startsWith("ftp"));
 
     // highlight current selection
     const QString &currUrlStr = getCurrentUrlString();

@@ -58,7 +58,7 @@ private:
     QScopedPointer<Private> d;
 };
 
-class Q_DECL_HIOCEANN TextInputManager::Private
+class Q_DECL_HIDDEN TextInputManager::Private
 {
 public:
     Private() = default;
@@ -96,7 +96,7 @@ public:
     EventQueue *queue = nullptr;
 };
 
-class Q_DECL_HIOCEANN TextInput::Private
+class Q_DECL_HIDDEN TextInput::Private
 {
 public:
     Private(Seat *seat);

@@ -14,7 +14,7 @@
 #include <QApt/DebFile>
 #include <QApt/Transaction>
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPushButton>
 #include <DDialog>
 

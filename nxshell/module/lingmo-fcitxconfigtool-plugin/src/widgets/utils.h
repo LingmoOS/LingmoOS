@@ -11,7 +11,7 @@
 #include <QVariant>
 #include <QSettings>
 #include <QMetaMethod>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformHandle>
 
 DCORE_USE_NAMESPACE
@@ -42,15 +42,15 @@ const qint32 ActionListSize = 26; //list图标角标大小
 const int List_Interval = 10;
 const QMargins ArrowEnterClickMargin(8, 8, 8, 8);
 
-const QString SystemTypeName = DSysInfo::uosEditionName(QLocale::c());
+const QString SystemTypeName = LSysInfo::uosEditionName(QLocale::c());
 
-const DSysInfo::UosType UosType = DSysInfo::uosType();
-const DSysInfo::UosEdition UosEdition = DSysInfo::uosEditionType();
-const bool IsServerSystem = (DSysInfo::UosServer == UosType); //是否是服务器版
-const bool IsCommunitySystem = (DSysInfo::UosCommunity == UosEdition); //是否是社区版
-const bool IsProfessionalSystem = (DSysInfo::UosProfessional == UosEdition); //是否是专业版
-const bool IsHomeSystem = (DSysInfo::UosHome == UosEdition); //是否是个人版
-const bool IsLingmoDesktop = (DSysInfo::LingmoDesktop == DSysInfo::lingmoType()); //是否是Lingmo桌面
+const LSysInfo::UosType UosType = LSysInfo::uosType();
+const LSysInfo::UosEdition UosEdition = LSysInfo::uosEditionType();
+const bool IsServerSystem = (LSysInfo::UosServer == UosType); //是否是服务器版
+const bool IsCommunitySystem = (LSysInfo::UosCommunity == UosEdition); //是否是社区版
+const bool IsProfessionalSystem = (LSysInfo::UosProfessional == UosEdition); //是否是专业版
+const bool IsHomeSystem = (LSysInfo::UosHome == UosEdition); //是否是个人版
+const bool IsLingmoDesktop = (LSysInfo::LingmoDesktop == LSysInfo::lingmoType()); //是否是Lingmo桌面
 struct ListSubItem {
     QString itemIcon;
     QString itemText;

@@ -16,7 +16,7 @@ SERVICETEXTINDEX_BEGIN_NAMESPACE
 
 namespace IndexTraverseUtils {
 
-bool isHioceannFile(const char *name)
+bool isHiddenFile(const char *name)
 {
     return name[0] == '.';
 }

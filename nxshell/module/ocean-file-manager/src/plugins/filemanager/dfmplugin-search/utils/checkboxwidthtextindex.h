@@ -21,7 +21,7 @@ public:
         Indexing,   // 正在更新
         Completed,   // 更新完成
         Failed,   // 更新失败
-        Hioceann   // 隐藏状态
+        Hidden   // 隐藏状态
     };
 
     explicit TextIndexStatusBar(QWidget *parent = nullptr);
@@ -31,7 +31,7 @@ public:
     Status status() const;
 
 private:
-    Status currentStatus { Status::Hioceann };
+    Status currentStatus { Status::Hidden };
     DTK_NAMESPACE::Widget::DSpinner *spinner { nullptr };
     DTK_NAMESPACE::Widget::DTipLabel *iconLabel { nullptr };
     DTK_NAMESPACE::Widget::DTipLabel *msgLabel { nullptr };

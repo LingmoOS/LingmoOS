@@ -421,7 +421,7 @@ TEST(UT_Editwrapper_hideWarningNotices, UT_Editwrapper_hideWarningNotices)
         pWindow->currentWrapper()->m_pWaringNotices->show();
     }
     pWindow->currentWrapper()->hideWarningNotices();
-    ASSERT_TRUE(pWindow->currentWrapper()->m_pWaringNotices->isHioceann());
+    ASSERT_TRUE(pWindow->currentWrapper()->m_pWaringNotices->isHidden());
 
     delete pWindow;
     pWindow = nullptr;
@@ -505,7 +505,7 @@ TEST(UT_Editwrapper_setLineNumberShow, UT_Editwrapper_setLineNumberShow_002)
     Window *pWindow = new Window();
     pWindow->addBlankTab(QString());
     pWindow->currentWrapper()->setLineNumberShow(false);
-    ASSERT_TRUE(pWindow->currentWrapper()->textEditor()->getLeftAreaWidget()->m_pLineNumberArea->isHioceann());
+    ASSERT_TRUE(pWindow->currentWrapper()->textEditor()->getLeftAreaWidget()->m_pLineNumberArea->isHidden());
 
     pWindow->deleteLater();
 }

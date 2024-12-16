@@ -46,9 +46,9 @@ DGUI_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
 using namespace DCC_NAMESPACE;
 
-#define DCC_CONFIG_HIOCEANN 0x20000000
+#define DCC_CONFIG_HIDDEN 0x20000000
 #define DCC_CONFIG_DISABLED 0x10000000
-#define setConfigHioceann(hide) setFlagState(DCC_CONFIG_HIOCEANN, hide)
+#define setConfigHidden(hide) setFlagState(DCC_CONFIG_HIDDEN, hide)
 #define setConfigDisabled(disabled) setFlagState(DCC_CONFIG_DISABLED, disabled)
 
 constexpr QSize MainWindowMininumSize(QSize(800, 600));
@@ -254,7 +254,7 @@ void MainWindow::initConfig()
 
 void MainWindow::configModule(QString url, ModuleObject *module)
 {
-    module->setFlagState(DCC_CONFIG_HIOCEANN, m_hideModule.contains(url));
+    module->setFlagState(DCC_CONFIG_HIDDEN, m_hideModule.contains(url));
     module->setFlagState(DCC_CONFIG_DISABLED, m_disableModule.contains(url));
 }
 
@@ -273,9 +273,9 @@ void MainWindow::updateModuleConfig(const QString &key)
 {
     QSet<QString> oldModuleConfig;
     QSet<QString> *newModuleConfig = nullptr;
-    uint32_t type = DCC_CONFIG_HIOCEANN;
+    uint32_t type = DCC_CONFIG_HIDDEN;
     if (key == HideConfig) {
-        type = DCC_CONFIG_HIOCEANN;
+        type = DCC_CONFIG_HIDDEN;
         oldModuleConfig = m_hideModule;
         newModuleConfig = &m_hideModule;
     } else if (key == DisableConfig) {
@@ -521,7 +521,7 @@ void MainWindow::onTriggered()
 
 void MainWindow::onChildStateChanged(ModuleObject *const child, uint32_t flag, bool state)
 {
-    if (ModuleObject::IsHioceannFlag(flag)) {
+    if (ModuleObject::IsHiddenFlag(flag)) {
         if (state)
             onRemoveModule(child);
         else

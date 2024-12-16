@@ -199,9 +199,9 @@ void UpdateWorker::init()
     qRegisterMetaType<TestingChannelStatus>("TestingChannelStatus");
 
     QString sVersion =
-            QString("%1 %2").arg(DSysInfo::uosProductTypeName()).arg(DSysInfo::majorVersion());
+            QString("%1 %2").arg(LSysInfo::uosProductTypeName()).arg(LSysInfo::majorVersion());
     if (!IsServerSystem)
-        sVersion.append(" " + DSysInfo::uosEditionName());
+        sVersion.append(" " + LSysInfo::uosEditionName());
     m_model->setSystemVersionInfo(sVersion);
 
     // clang-format off
@@ -274,7 +274,7 @@ void UpdateWorker::testingChannelChangeSlot()
 
 void UpdateWorker::getLicenseState()
 {
-    if (DSysInfo::LingmoDesktop == DSysInfo::lingmoType()) {
+    if (LSysInfo::LingmoDesktop == LSysInfo::lingmoType()) {
         m_model->setSystemActivation(UiActiveState::Authorized);
         return;
     }
@@ -390,7 +390,7 @@ void UpdateWorker::requestUpdateLog()
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("platformType", QByteArray::number(getPlatform()));
     urlQuery.addQueryItem("isUnstable", QByteArray::number(isUnstableResource()));
-    urlQuery.addQueryItem("mainVersion", QString("V%1").arg(DSysInfo::majorVersion()));
+    urlQuery.addQueryItem("mainVersion", QString("V%1").arg(LSysInfo::majorVersion()));
 
     url.setQuery(urlQuery);
     request.setUrl(url);
@@ -1572,8 +1572,8 @@ void UpdateWorker::updateItemInfo(const UpdateLogItem &logItem, UpdateItemInfo *
     // 安全更新只会更新与当前系统版本匹配的内容，例如，105X的系统版本只会更新105X的安全更新，而不会更新106X的
     // 更新日志也需要与之匹配，只显示与当前系统版本相同的安全更新日志
     if (logItem.logType == LogTypeSecurity) {
-        const QString &currentSystemVer = IsCommunitySystem ? Dtk::Core::DSysInfo::lingmoVersion()
-                                                            : Dtk::Core::DSysInfo::minorVersion();
+        const QString &currentSystemVer = IsCommunitySystem ? Dtk::Core::LSysInfo::lingmoVersion()
+                                                            : Dtk::Core::LSysInfo::minorVersion();
         QString tmpSystemVersion = logItem.systemVersion;
         tmpSystemVersion.replace(tmpSystemVersion.length() - 1, 1, '0');
         if (currentSystemVer.compare(tmpSystemVersion) != 0) {
@@ -1806,7 +1806,7 @@ std::optional<QUrl> UpdateWorker::updateTestingChannelUrl()
     auto query = QUrlQuery(testingUrl.query());
     query.addQueryItem("h", hostname);
     query.addQueryItem("m", machineid.value());
-    query.addQueryItem("v", DSysInfo::minorVersion());
+    query.addQueryItem("v", LSysInfo::minorVersion());
     testingUrl.setQuery(query);
     return testingUrl;
 }

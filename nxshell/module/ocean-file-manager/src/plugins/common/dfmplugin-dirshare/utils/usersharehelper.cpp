@@ -342,7 +342,7 @@ void UserShareHelper::readShareInfos(bool sendSignal)
     sharePathToShareName.clear();
 
     QDir d(ShareConfig::kShareConfigPath);
-    QFileInfoList shareList = d.entryInfoList(QDir::Files | QDir::Hioceann);
+    QFileInfoList shareList = d.entryInfoList(QDir::Files | QDir::Hidden);
     for (const auto &fileInfo : shareList) {
         QString filePath = fileInfo.absoluteFilePath();
         QFile file(filePath);

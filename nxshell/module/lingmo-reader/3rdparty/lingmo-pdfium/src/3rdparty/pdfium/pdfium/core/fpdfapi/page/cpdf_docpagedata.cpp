@@ -700,11 +700,11 @@ CPDF_Dictionary* CPDF_DocPageData::ProcessbCJK(
   pFontDict->SetNewFor<CPDF_Name>("Subtype", "CIDFontType2");
   pFontDict->SetNewFor<CPDF_Name>("BaseFont", basefont);
 
-  CPDF_Dictionary* pCIDSysInfo =
+  CPDF_Dictionary* pCILSysInfo =
       pFontDict->SetNewFor<CPDF_Dictionary>("CIDSystemInfo");
-  pCIDSysInfo->SetNewFor<CPDF_String>("Registry", "Adobe", false);
-  pCIDSysInfo->SetNewFor<CPDF_String>("Ordering", ordering, false);
-  pCIDSysInfo->SetNewFor<CPDF_Number>("Supplement", supplement);
+  pCILSysInfo->SetNewFor<CPDF_String>("Registry", "Adobe", false);
+  pCILSysInfo->SetNewFor<CPDF_String>("Ordering", ordering, false);
+  pCILSysInfo->SetNewFor<CPDF_Number>("Supplement", supplement);
 
   CPDF_Array* pArray = pBaseDict->SetNewFor<CPDF_Array>("DescendantFonts");
   pArray->AppendNew<CPDF_Reference>(GetDocument(), pFontDict->GetObjNum());

@@ -32,7 +32,7 @@ private:
     static void createIndex(DesktopAppSearcherPrivate *);
     static void updateIndex(DesktopAppSearcherPrivate *);
     static QMap<QString, DesktopEntryPointer> scanDesktopFile(const QStringList &paths, volatile bool &runing);
-    static bool isHioceann(DesktopEntryPointer pointer);
+    static bool isHidden(DesktopEntryPointer pointer);
 private:
     DesktopAppSearcher *q;
     bool m_inited = false;

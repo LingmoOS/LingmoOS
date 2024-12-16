@@ -2155,7 +2155,7 @@ func isSettingWirelessClonedMacAddressExists(data connectionData) bool {
 func isSettingWirelessGenerateMacAddressMaskExists(data connectionData) bool {
 	return isSettingKeyExists(data, "802-11-wireless", "generate-mac-address-mask")
 }
-func isSettingWirelessHioceannExists(data connectionData) bool {
+func isSettingWirelessHiddenExists(data connectionData) bool {
 	return isSettingKeyExists(data, "802-11-wireless", "hioceann")
 }
 func isSettingWirelessMacAddressExists(data connectionData) bool {
@@ -4194,7 +4194,7 @@ func getSettingWirelessGenerateMacAddressMask(data connectionData) (value string
 	value = interfaceToString(ivalue)
 	return
 }
-func getSettingWirelessHioceann(data connectionData) (value bool) {
+func getSettingWirelessHidden(data connectionData) (value bool) {
 	ivalue := getSettingKey(data, "802-11-wireless", "hioceann")
 	value = interfaceToBoolean(ivalue)
 	return
@@ -5927,7 +5927,7 @@ func setSettingWirelessClonedMacAddress(data connectionData, value []byte) {
 func setSettingWirelessGenerateMacAddressMask(data connectionData, value string) {
 	setSettingKey(data, "802-11-wireless", "generate-mac-address-mask", value)
 }
-func setSettingWirelessHioceann(data connectionData, value bool) {
+func setSettingWirelessHidden(data connectionData, value bool) {
 	setSettingKey(data, "802-11-wireless", "hioceann", value)
 }
 func setSettingWirelessMacAddress(data connectionData, value []byte) {
@@ -7342,7 +7342,7 @@ func removeSettingWirelessClonedMacAddress(data connectionData) {
 func removeSettingWirelessGenerateMacAddressMask(data connectionData) {
 	removeSettingKey(data, "802-11-wireless", "generate-mac-address-mask")
 }
-func removeSettingWirelessHioceann(data connectionData) {
+func removeSettingWirelessHidden(data connectionData) {
 	removeSettingKey(data, "802-11-wireless", "hioceann")
 }
 func removeSettingWirelessMacAddress(data connectionData) {

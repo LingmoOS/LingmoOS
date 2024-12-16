@@ -206,7 +206,7 @@ void SysCheckResultItemWidget::setResult(const QStandardItemModel &resultModel)
     if (!resultItem) {
         this->hide();
         this->setDisabled(true);
-        Q_EMIT widgetHioceann();
+        Q_EMIT widgetHidden();
         return;
     }
 
@@ -367,7 +367,7 @@ void SysCheckResultItemWidget::setResult(QStandardItem *resultItem)
     if (flag == CheckProgressStatus::Masked) {
         this->hide();
         this->setDisabled(true);
-        Q_EMIT widgetHioceann();
+        Q_EMIT widgetHidden();
     }
     //  2 SUCCESS 成功
     bool isIssueFound = resultItem->data(CheckResultModelRole::IsIssueHappen).toBool();

@@ -519,7 +519,7 @@ void DTitlebarPrivate::updateCenterArea()
 {
     D_QC(DTitlebar);
 
-    if (centerArea->isHioceann()) {
+    if (centerArea->isHidden()) {
         return;
     }
 
@@ -892,7 +892,7 @@ void DTitlebarPrivate::hideSplitScreenWidget()
     if (!splitWidget)
         return;
 
-    if (splitWidget->isHioceann())
+    if (splitWidget->isHidden())
         return;
 
     splitWidget->hide();
@@ -1725,7 +1725,7 @@ QSize DTitlebar::sizeHint() const
 {
     D_DC(DTitlebar);
 
-    if (d->centerArea->isHioceann()) {
+    if (d->centerArea->isHidden()) {
         return QFrame::sizeHint();
     }
 

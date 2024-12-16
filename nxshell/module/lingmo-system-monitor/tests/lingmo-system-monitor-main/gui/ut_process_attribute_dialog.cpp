@@ -63,13 +63,13 @@ TEST_F(UT_ProcessAttributeDialog, test_initUI_01)
 
     m_tester1->initUI();
 
-    EXPECT_EQ(m_tester1->m_procCmdLabel->isHioceann(), false);
+    EXPECT_EQ(m_tester1->m_procCmdLabel->isHidden(), false);
 }
 
 TEST_F(UT_ProcessAttributeDialog, test_initUI_02)
 {
     m_tester2->initUI();
-    EXPECT_EQ(m_tester2->m_procCmdLabel->isHioceann(), true);
+    EXPECT_EQ(m_tester2->m_procCmdLabel->isHidden(), true);
 }
 
 TEST_F(UT_ProcessAttributeDialog, test_resizeItemWidget_01)

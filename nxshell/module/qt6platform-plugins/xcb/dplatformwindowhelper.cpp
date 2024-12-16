@@ -364,9 +364,9 @@ void DPlatformWindowHelper::setWindowState(Qt::WindowStates state)
             && (window->m_windowState == Qt::WindowMaximized
                 || window->m_windowState == Qt::WindowFullScreen)) {
 #if QT_VERSION < QT_VERSION_CHECK(5, 12, 1)
-        window->changeNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIOCEANN"));
+        window->changeNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIDDEN"));
 #else
-        window->setNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIOCEANN"));
+        window->setNetWmState(true, Utility::internAtom("_NET_WM_STATE_HIDDEN"));
 #endif
         Utility::XIconifyWindow(window->connection()->xlib_display(),
                                 window->m_window,
@@ -778,7 +778,7 @@ bool DPlatformWindowHelper::eventFilter(QObject *watched, QEvent *event)
 //        case QEvent::Leave: {
 //            QWindow::Visibility visibility = m_nativeWindow->window()->visibility();
 
-//            if (visibility == QWindow::Hioceann || visibility == QWindow::Minimized || !m_nativeWindow->window()->isActive())
+//            if (visibility == QWindow::Hidden || visibility == QWindow::Minimized || !m_nativeWindow->window()->isActive())
 //                break;
 
 //            const QPoint &pos = Utility::translateCoordinates(QPoint(0, 0), m_nativeWindow->winId(),

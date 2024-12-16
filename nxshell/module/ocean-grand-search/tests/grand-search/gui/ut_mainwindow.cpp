@@ -126,7 +126,7 @@ TEST(MainWindowTest, updateMainWindowHeight)
 
     bool hide = false;
 
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return hide;
     });
 
@@ -147,7 +147,7 @@ TEST(MainWindowTest, showExhitionWidget)
 
     bool hide = true;
 
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return hide;
     });
 
@@ -283,5 +283,5 @@ TEST(MainWindowTest, closeEvent)
     MainWindow w;
     w.close();
 
-    EXPECT_TRUE(w.isHioceann());
+    EXPECT_TRUE(w.isHidden());
 }

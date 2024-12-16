@@ -139,7 +139,7 @@ TEST(MatchWidgetTest, selectNextItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -215,7 +215,7 @@ TEST(MatchWidgetTest, selectPreviousItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -294,7 +294,7 @@ TEST(MatchWidgetTest, handleItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -345,7 +345,7 @@ TEST(MatchWidgetTest, onSelectItemByMouse)
 
     // 窗口显示的情况下，添加数据才会触发刷新，否则会忽略
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -380,7 +380,7 @@ TEST(MatchWidgetTest, selectFirstItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -416,7 +416,7 @@ TEST(MatchWidgetTest, selectLastItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -452,7 +452,7 @@ TEST(MatchWidgetTest, hasSelectItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -479,7 +479,7 @@ TEST(MatchWidgetTest, hasSelectItem_group)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -523,7 +523,7 @@ TEST(MatchWidgetTest, clearSelectItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -550,7 +550,7 @@ TEST(MatchWidgetTest, adjustScrollBar)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -605,7 +605,7 @@ TEST(MatchWidgetTest, currentIndexChanged)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -635,7 +635,7 @@ TEST(MatchWidgetTest, reLayout)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -676,7 +676,7 @@ TEST(MatchWidgetTest, sortVislibleGroupList)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -723,7 +723,7 @@ TEST(MatchWidgetTest, resizeEvent)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 

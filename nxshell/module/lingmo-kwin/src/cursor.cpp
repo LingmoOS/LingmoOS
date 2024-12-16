@@ -82,7 +82,7 @@ void Cursors::showCursor()
     }
 }
 
-bool Cursors::isCursorHioceann() const
+bool Cursors::isCursorHidden() const
 {
     return m_cursorHideCounter > 0;
 }
@@ -172,7 +172,7 @@ void Cursor::slotKGlobalSettingsNotifyChange(int type, int arg)
 
 bool Cursor::isOnOutput(Output *output) const
 {
-    if (Cursors::self()->isCursorHioceann()) {
+    if (Cursors::self()->isCursorHidden()) {
         return false;
     }
     return geometry().intersects(output->geometry());

@@ -17,40 +17,40 @@
 DPMENU_USE_NAMESPACE
 using namespace GlobalDConfDefines::ConfigPath;
 
-DConfigHioceannMenuScenePrivate::DConfigHioceannMenuScenePrivate(DConfigHioceannMenuScene *qq)
+DConfigHiddenMenuScenePrivate::DConfigHiddenMenuScenePrivate(DConfigHiddenMenuScene *qq)
     : AbstractMenuScenePrivate(qq)
 {
 }
 
-DConfigHioceannMenuScene::DConfigHioceannMenuScene(QObject *parent)
+DConfigHiddenMenuScene::DConfigHiddenMenuScene(QObject *parent)
     : AbstractMenuScene(parent)
 {
 }
 
-QString dfmplugin_menu::DConfigHioceannMenuScene::name() const
+QString dfmplugin_menu::DConfigHiddenMenuScene::name() const
 {
-    return DConfigHioceannMenuCreator::name();
+    return DConfigHiddenMenuCreator::name();
 }
 
-bool DConfigHioceannMenuScene::initialize(const QVariantHash &params)
+bool DConfigHiddenMenuScene::initialize(const QVariantHash &params)
 {
     auto currentDir = params.value(MenuParamKey::kCurrentDir).toUrl();
     if (currentDir.isValid()) {
         // extend menu scene
-        if (Helper::isHioceannExtMenu(currentDir))
+        if (Helper::isHiddenExtMenu(currentDir))
             disableScene();
     }
 
     return true;
 }
 
-void dfmplugin_menu::DConfigHioceannMenuScene::updateState(QMenu *parent)
+void dfmplugin_menu::DConfigHiddenMenuScene::updateState(QMenu *parent)
 {
-    updateActionHioceann(parent);
+    updateActionHidden(parent);
     AbstractMenuScene::updateState(parent);
 }
 
-void DConfigHioceannMenuScene::disableScene()
+void DConfigHiddenMenuScene::disableScene()
 {
     fmDebug() << "disable extend menu scene..";
     static const QSet<QString> extendScenes { "OemMenu", "ExtendMenu" };
@@ -66,7 +66,7 @@ void DConfigHioceannMenuScene::disableScene()
     }
 }
 
-void DConfigHioceannMenuScene::updateActionHioceann(QMenu *parent)
+void DConfigHiddenMenuScene::updateActionHidden(QMenu *parent)
 {
     static const QMap<QString, QString> appKeyMap {
         { "ocean-file-manager", "dfm.menu.action.hioceann" },
@@ -98,7 +98,7 @@ void DConfigHioceannMenuScene::updateActionHioceann(QMenu *parent)
     } while (menus.count() > 0);
 }
 
-AbstractMenuScene *DConfigHioceannMenuCreator::create()
+AbstractMenuScene *DConfigHiddenMenuCreator::create()
 {
-    return new DConfigHioceannMenuScene();
+    return new DConfigHiddenMenuScene();
 }

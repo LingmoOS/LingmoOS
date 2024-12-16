@@ -92,7 +92,7 @@ void SysCheckResultWidget::resetItemsBackGround()
     bool isNeedColored = false;
     for (int index = 0; index < m_itemWidgets.size(); index++) {
         auto wid = m_itemWidgets[index];
-        if (!wid->isHioceann()) {
+        if (!wid->isHidden()) {
             DPalette::ColorType role = isNeedColored ? DPalette::ItemBackground : DPalette::NoType;
             wid->setBackgroundRole(role);
             isNeedColored = !isNeedColored;
@@ -218,7 +218,7 @@ void SysCheckResultWidget::createItemWidgets()
                 this,
                 &SysCheckResultWidget::requestSetIgnore);
         connect(item,
-                &SysCheckResultItemWidget::widgetHioceann,
+                &SysCheckResultItemWidget::widgetHidden,
                 this,
                 &SysCheckResultWidget::resetItemsBackGround);
 

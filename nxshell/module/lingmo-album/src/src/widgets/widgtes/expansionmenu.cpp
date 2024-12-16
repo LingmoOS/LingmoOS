@@ -159,8 +159,8 @@ void ExpansionMenu::onCurrentItemChanged(ExpansionPanel::FilteData &data)
 
 void ExpansionMenu::onMainButtonClicked()
 {
-    qDebug() << __FUNCTION__ << "---" << panel->isHioceann();
-    panel->isHioceann() ? panel->show() : panel->hide();
+    qDebug() << __FUNCTION__ << "---" << panel->isHidden();
+    panel->isHidden() ? panel->show() : panel->hide();
     //不允许弹窗被右侧屏幕遮挡部分
     QList<QScreen *> screens = QGuiApplication::screens();
     int width = 0;//所有屏幕整体宽度

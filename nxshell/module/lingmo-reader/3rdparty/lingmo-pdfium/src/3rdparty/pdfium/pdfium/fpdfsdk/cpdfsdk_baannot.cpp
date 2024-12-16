@@ -193,7 +193,7 @@ BorderStyle CPDFSDK_BAAnnot::GetBorderStyle() const {
 bool CPDFSDK_BAAnnot::IsVisible() const {
   uint32_t nFlags = GetFlags();
   return !((nFlags & pdfium::annotation_flags::kInvisible) ||
-           (nFlags & pdfium::annotation_flags::kHioceann) ||
+           (nFlags & pdfium::annotation_flags::kHidden) ||
            (nFlags & pdfium::annotation_flags::kNoView));
 }
 

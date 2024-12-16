@@ -60,7 +60,7 @@ namespace DDM {
         QString desktopSession() const;
         QString desktopNames() const;
 
-        bool isHioceann() const;
+        bool isHidden() const;
         bool isNoDisplay() const;
 
         bool isSingleMode() const;
@@ -86,7 +86,7 @@ namespace DDM {
         QString m_xdgSessionType;
         QString m_desktopNames;
         QProcessEnvironment m_additionalEnv;
-        bool m_isHioceann;
+        bool m_isHidden;
         bool m_isNoDisplay;
 
         friend class SessionModel;

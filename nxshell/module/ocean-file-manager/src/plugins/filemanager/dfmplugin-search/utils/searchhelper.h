@@ -59,7 +59,7 @@ public:
                 + expression
                 + QLatin1String(")\\z");
     }
-    bool isHioceannFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &searchPath);
+    bool isHiddenFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &searchPath);
     bool allowRepeatUrl(const QUrl &cur, const QUrl &pre);
 
     bool crumbRedirectUrl(QUrl *redirectUrl);

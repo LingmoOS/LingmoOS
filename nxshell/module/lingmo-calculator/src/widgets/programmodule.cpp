@@ -172,9 +172,9 @@ void ProgramModule::mouseMoveEvent(QMouseEvent *event)
 
 void ProgramModule::mousePressEvent(QMouseEvent *event)
 {
-    m_byteArrowRectangle->setHioceann(true);
+    m_byteArrowRectangle->setHidden(true);
     static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setBtnPressing(false);
-    m_shiftArrowRectangle->setHioceann(true);
+    m_shiftArrowRectangle->setHidden(true);
     static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_Option))->setBtnPressing(false);
     closeListWidget();
     setwidgetAttribute(false);
@@ -217,7 +217,7 @@ void ProgramModule::handleKeypadButtonPress(int key)
         break;
     case ProCheckBtnKeypad::Key_System:
         static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setBtnPressing(true);
-        m_byteArrowRectangle->setHioceann(false);
+        m_byteArrowRectangle->setHidden(false);
         setwidgetAttribute(true);
         m_byteArrowRectangle->setFocus(Qt::MouseFocusReason);
         pagefocus = true;
@@ -225,7 +225,7 @@ void ProgramModule::handleKeypadButtonPress(int key)
     case ProCheckBtnKeypad::Key_Option:
         static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_Option))->setBtnPressing(true);
         resetArrowWidth();
-        m_shiftArrowRectangle->setHioceann(false);
+        m_shiftArrowRectangle->setHidden(false);
         setwidgetAttribute(true);
         m_shiftArrowRectangle->setFocus(Qt::MouseFocusReason);
         pagefocus = true;
@@ -440,14 +440,14 @@ void ProgramModule::handleKeypadButtonPressByspace(int key)
         break;
     case ProCheckBtnKeypad::Key_System:
         static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setBtnPressing(true);
-        m_byteArrowRectangle->setHioceann(false);
+        m_byteArrowRectangle->setHidden(false);
         setwidgetAttribute(true);
         m_byteArrowRectangle->setFocus(Qt::TabFocusReason);
         break;
     case ProCheckBtnKeypad::Key_Option:
         static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_Option))->setBtnPressing(true);
         resetArrowWidth();
-        m_shiftArrowRectangle->setHioceann(false);
+        m_shiftArrowRectangle->setHidden(false);
         setwidgetAttribute(true);
         m_shiftArrowRectangle->setFocus(Qt::TabFocusReason);
         break;
@@ -640,7 +640,7 @@ void ProgramModule::shiftArrowListWidgetItemClicked(int row, bool isselect)
         m_shiftArrowListWidget->setCurrentRow(row);
         static_cast<ProgrammerItemWidget *>(m_shiftArrowListWidget->itemWidget(m_shiftArrowListWidget->item(m_shiftArrowCurrentRow)))->isMarkHide(true);
         static_cast<ProgrammerItemWidget *>(m_shiftArrowListWidget->itemWidget(m_shiftArrowListWidget->currentItem()))->isMarkHide(false);
-        m_shiftArrowRectangle->setHioceann(true);
+        m_shiftArrowRectangle->setHidden(true);
         static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_Option))->setBtnPressing(false);
         setwidgetAttribute(false);
         emit activateWindow();
@@ -702,7 +702,7 @@ void ProgramModule::byteArrowListWidgetItemClicked(int row, bool isselect)
         static_cast<ProgrammerItemWidget *>(m_byteArrowListWidget->itemWidget(m_byteArrowListWidget->currentItem()))->isMarkHide(false);
         QString str = static_cast<ProgrammerItemWidget *>(m_byteArrowListWidget->itemWidget(m_byteArrowListWidget->currentItem()))->findChild<QLabel *>()->text();
         static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setText(str);
-        m_byteArrowRectangle->setHioceann(true);
+        m_byteArrowRectangle->setHidden(true);
         static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setBtnPressing(false);
         setwidgetAttribute(false);
         emit activateWindow();
@@ -941,7 +941,7 @@ void ProgramModule::initArrowRectangle()
     m_shiftArrowRectangle->setShadowBlurRadius(15);
 
     m_shiftArrowRectangle->setHeight(191);
-    m_shiftArrowRectangle->setHioceann(true);
+    m_shiftArrowRectangle->setHidden(true);
 
     m_byteArrowListWidget->setItemDelegate(m_byteProgrammerArrowDelegate);
     m_byteArrowListWidget->setFrameShape(QFrame::NoFrame); //设置边框类型，无边框
@@ -991,7 +991,7 @@ void ProgramModule::initArrowRectangle()
     m_byteArrowRectangle->setShadowYOffset(0);
     m_byteArrowRectangle->setShadowBlurRadius(15);
     m_byteArrowRectangle->setHeight(191);
-    m_byteArrowRectangle->setHioceann(true);
+    m_byteArrowRectangle->setHidden(true);
 
     //信号槽
     //点击press & 选中select事件
@@ -1004,7 +1004,7 @@ void ProgramModule::initArrowRectangle()
 
     //隐藏rectangle
     connect(m_byteArrowRectangle, &ArrowRectangle::hidearrowrectangle, this, [ = ](bool isesc) {
-        m_byteArrowRectangle->setHioceann(true);
+        m_byteArrowRectangle->setHidden(true);
         static_cast<TextButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setBtnPressing(false);
         setwidgetAttribute(false);
         //esc按钮退出时需要focus到按钮上
@@ -1012,7 +1012,7 @@ void ProgramModule::initArrowRectangle()
             static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_System))->setFocus(Qt::TabFocusReason);
     });
     connect(m_shiftArrowRectangle, &ArrowRectangle::hidearrowrectangle, this, [ = ](bool isesc) {
-        m_shiftArrowRectangle->setHioceann(true);
+        m_shiftArrowRectangle->setHidden(true);
         static_cast<IconButton *>(m_checkBtnKeypad->button(ProCheckBtnKeypad::Key_Option))->setBtnPressing(false);
         setwidgetAttribute(false);
         //esc按钮退出时需要focus到按钮上

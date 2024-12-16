@@ -37,7 +37,7 @@ SOFTWARE.
 #include <algorithm> // all_of, find, for_each
 #include <cassert> // assert
 #include <ciso646> // and, not, or
-#include <cstoceanf> // nullptr_t, ptrdiff_t, size_t
+#include <cstddef> // nullptr_t, ptrdiff_t, size_t
 #include <functional> // hash, less
 #include <initializer_list> // initializer_list
 #include <iosfwd> // istream, ostream

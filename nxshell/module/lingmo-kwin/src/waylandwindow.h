@@ -30,13 +30,13 @@ public:
     void killWindow() override;
     QString windowRole() const override;
     bool isShown() const override;
-    bool isHioceannInternal() const override;
+    bool isHiddenInternal() const override;
     void hideClient() override;
     void showClient() override;
     void doSetDesktop() override;
 
     virtual QRectF frameRectToBufferRect(const QRectF &rect) const;
-    bool isHioceann() const;
+    bool isHidden() const;
 
     void updateDepth();
     void setCaption(const QString &caption);
@@ -61,7 +61,7 @@ private:
 
     QString m_captionNormal;
     QString m_captionSuffix;
-    bool m_isHioceann = false;
+    bool m_isHidden = false;
     quint32 m_windowId;
 };
 

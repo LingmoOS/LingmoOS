@@ -447,8 +447,8 @@ void CmdTool::loadHciconfigInfo(const QString &debugfile)
     QString deviceInfo;
 
     // 判断是否是系统是否是个人版
-    DSysInfo::UosEdition type = DSysInfo::uosEditionType();
-    if (DSysInfo::UosHome == type) {
+    LSysInfo::UosEdition type = LSysInfo::uosEditionType();
+    if (LSysInfo::UosHome == type) {
         // 如果是个人版则直接执行命令获取设备信息
         // bug 目前服务端与直接执行命令获取结果不一致
         QProcess process;

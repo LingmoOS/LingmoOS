@@ -232,29 +232,29 @@ bool stub_exists_false()
     return false;
 }
 
-static Dtk::Core::DSysInfo::UosEdition model_uosEditionType_UosEnterprise()
+static Dtk::Core::LSysInfo::UosEdition model_uosEditionType_UosEnterprise()
 {
-    return Dtk::Core::DSysInfo::UosEnterprise;
+    return Dtk::Core::LSysInfo::UosEnterprise;
 }
 
-static Dtk::Core::DSysInfo::UosEdition model_uosEditionType_UosProfessional()
+static Dtk::Core::LSysInfo::UosEdition model_uosEditionType_UosProfessional()
 {
-    return Dtk::Core::DSysInfo::UosProfessional;
+    return Dtk::Core::LSysInfo::UosProfessional;
 }
 
-static Dtk::Core::DSysInfo::UosEdition model_uosEditionType_UosHome()
+static Dtk::Core::LSysInfo::UosEdition model_uosEditionType_UosHome()
 {
-    return Dtk::Core::DSysInfo::UosHome;
+    return Dtk::Core::LSysInfo::UosHome;
 }
 
-static Dtk::Core::DSysInfo::UosEdition model_uosEditionType_UosCommunity()
+static Dtk::Core::LSysInfo::UosEdition model_uosEditionType_UosCommunity()
 {
-    return Dtk::Core::DSysInfo::UosCommunity;
+    return Dtk::Core::LSysInfo::UosCommunity;
 }
 
-static Dtk::Core::DSysInfo::UosEdition model_uosEditionType_default()
+static Dtk::Core::LSysInfo::UosEdition model_uosEditionType_default()
 {
-    return Dtk::Core::DSysInfo::UosEditionUnknown;
+    return Dtk::Core::LSysInfo::UosEditionUnknown;
 }
 
 bool stud_toBool()
@@ -684,31 +684,31 @@ TEST_F(ut_DebListModel_test, deblistmodel_UT_initRowStatus)
 
 TEST_F(ut_DebListModel_test, deblistmodel_UT_checkSystemVersion_UosEnterprise)
 {
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), model_uosEditionType_UosEnterprise);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), model_uosEditionType_UosEnterprise);
     EXPECT_TRUE(Utils::isDevelopMode());
 }
 
 TEST_F(ut_DebListModel_test, deblistmodel_UT_checkSystemVersion_UosProfessional)
 {
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), model_uosEditionType_UosProfessional);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), model_uosEditionType_UosProfessional);
     Utils::isDevelopMode();
 }
 
 TEST_F(ut_DebListModel_test, deblistmodel_UT_checkSystemVersion_UosHome)
 {
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), model_uosEditionType_UosHome);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), model_uosEditionType_UosHome);
     Utils::isDevelopMode();
 }
 
 TEST_F(ut_DebListModel_test, deblistmodel_UT_checkSystemVersion_UosCommunity)
 {
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), model_uosEditionType_UosCommunity);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), model_uosEditionType_UosCommunity);
     EXPECT_TRUE(Utils::isDevelopMode());
 }
 
 TEST_F(ut_DebListModel_test, deblistmodel_UT_checkSystemVersion_default)
 {
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), model_uosEditionType_default);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), model_uosEditionType_default);
     EXPECT_TRUE(Utils::isDevelopMode());
 }
 

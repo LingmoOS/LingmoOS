@@ -1582,7 +1582,7 @@ int CollectionView::verticalOffset() const
     return verticalScrollBar()->value();
 }
 
-bool CollectionView::isIndexHioceann(const QModelIndex &index) const
+bool CollectionView::isIndexHidden(const QModelIndex &index) const
 {
     auto url = model()->fileUrl(index);
     return !d->provider->contains(d->id, url);

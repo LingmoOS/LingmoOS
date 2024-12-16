@@ -87,7 +87,7 @@ static QByteArray get_cstr(const QString &item_P);
 static QStringList get_fields(const QString &txt_P);
 static QString escape_str(const QString &str_P);
 
-class Q_DECL_HIOCEANN KStartupInfo::Data
+class Q_DECL_HIDDEN KStartupInfo::Data
     : public KStartupInfoData
 {
 public:
@@ -97,7 +97,7 @@ public:
     unsigned int age;
 };
 
-struct Q_DECL_HIOCEANN KStartupInfoId::Private
+struct Q_DECL_HIDDEN KStartupInfoId::Private
 {
     Private() : id("") {}
 
@@ -106,7 +106,7 @@ struct Q_DECL_HIOCEANN KStartupInfoId::Private
     QByteArray id; // id
 };
 
-struct Q_DECL_HIOCEANN KStartupInfoData::Private
+struct Q_DECL_HIDDEN KStartupInfoData::Private
 {
     Private() : desktop(0), wmclass(""), hostname(""),
         silent(KStartupInfoData::Unknown), screen(-1), xinerama(-1), launched_by(0) {}
@@ -129,7 +129,7 @@ struct Q_DECL_HIOCEANN KStartupInfoData::Private
     QString application_id;
 };
 
-class Q_DECL_HIOCEANN KStartupInfo::Private
+class Q_DECL_HIDDEN KStartupInfo::Private
 {
 public:
     // private slots

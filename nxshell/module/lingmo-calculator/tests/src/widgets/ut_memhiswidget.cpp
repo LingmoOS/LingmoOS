@@ -21,7 +21,7 @@ TEST_F(Ut_MemHisWidget, space)
     m_memhiswidget->m_memoryBtn->keyPressEvent(k);
     EXPECT_EQ(m_memhiswidget->m_stackWidget->currentIndex(), 0);
     m_memhiswidget->m_clearButton->keyPressEvent(k);
-    EXPECT_TRUE(m_memhiswidget->m_clearButton->isHioceann());
+    EXPECT_TRUE(m_memhiswidget->m_clearButton->isHidden());
     m_memhiswidget->m_stackWidget->setCurrentWidget(m_memhiswidget->m_listView);
     m_memhiswidget->m_clearButton->keyPressEvent(k);
     EXPECT_FALSE(m_memhiswidget->m_isshowH);
@@ -64,7 +64,7 @@ TEST_F(Ut_MemHisWidget, clicked)
     m_memhiswidget->m_memoryBtn->clicked();
     EXPECT_EQ(m_memhiswidget->m_stackWidget->currentIndex(), 0);
     m_memhiswidget->m_clearButton->clicked();
-    EXPECT_TRUE(m_memhiswidget->m_clearButton->isHioceann());
+    EXPECT_TRUE(m_memhiswidget->m_clearButton->isHidden());
     m_memhiswidget->m_stackWidget->setCurrentWidget(m_memhiswidget->m_listView);
     m_memhiswidget->m_clearButton->clicked();
     EXPECT_FALSE(m_memhiswidget->m_isshowH);
@@ -117,7 +117,7 @@ TEST_F(Ut_MemHisWidget, eventFilter)
     m_memhiswidget->eventFilter(m_memhiswidget->m_memoryBtn, static_cast <QEvent *>(k));
     m_memhiswidget->eventFilter(m_memhiswidget->m_clearButton, static_cast <QEvent *>(k));
     m_memhiswidget->eventFilter(m_memhiswidget->m_memoryWidget, static_cast <QEvent *>(k));
-    m_memhiswidget->m_clearButton->setHioceann(false);
+    m_memhiswidget->m_clearButton->setHidden(false);
     m_memhiswidget->eventFilter(m_memhiswidget, static_cast <QEvent *>(k));
     m_memhiswidget->eventFilter(m_memhiswidget, static_cast <QEvent *>(f1));
     m_memhiswidget->eventFilter(m_memhiswidget->m_clearButton, static_cast <QEvent *>(f1));

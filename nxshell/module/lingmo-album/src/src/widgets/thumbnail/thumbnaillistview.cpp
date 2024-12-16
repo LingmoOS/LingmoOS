@@ -1006,7 +1006,7 @@ QStringList ThumbnailListView::selectedPaths()
 {
     QStringList paths;
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        if (isRowHioceann(index.row())) {
+        if (isRowHidden(index.row())) {
             continue;
         }
         DBImgInfo info = index.data(Qt::DisplayRole).value<DBImgInfo>();
@@ -1024,7 +1024,7 @@ QVariantList ThumbnailListView::selectedUrls()
 {
     QVariantList urls;
     for (QModelIndex index : selectionModel()->selectedIndexes()) {
-        if (isRowHioceann(index.row())) {
+        if (isRowHidden(index.row())) {
             continue;
         }
         DBImgInfo info = index.data(Qt::DisplayRole).value<DBImgInfo>();
@@ -1043,7 +1043,7 @@ QVariantList ThumbnailListView::allUrls()
     QVariantList urls;
     for (int i = 0; i < m_model->rowCount(); i++) {
         QModelIndex index = m_model->index(i, 0);
-        if (isRowHioceann(index.row())) {
+        if (isRowHidden(index.row())) {
             continue;
         }
         DBImgInfo info = index.data(Qt::DisplayRole).value<DBImgInfo>();
@@ -1301,9 +1301,9 @@ void ThumbnailListView::hideAllAppointType(ItemType type)
         QModelIndex index = m_model->index(i, 0);
         DBImgInfo info = index.data(Qt::DisplayRole).value<DBImgInfo>();
         if (info.itemType == type) {
-            setRowHioceann(i, true);
+            setRowHidden(i, true);
         } else {
-            setRowHioceann(i, false);
+            setRowHidden(i, false);
         }
     }
     //有可能出现图片或者视频删除好，时间线页面两个标题在一起的情况
@@ -1316,12 +1316,12 @@ void ThumbnailListView::hideAllAppointType(ItemType type)
             for (int j = i + 1; j < m_model->rowCount(); j++) {
                 QModelIndex nextIndex = m_model->index(j, 0);
                 DBImgInfo nextInfo = nextIndex.data(Qt::DisplayRole).value<DBImgInfo>();
-                if (!isRowHioceann(j) && (nextInfo.itemType == ItemTypePic || nextInfo.itemType == ItemTypeVideo)) {
+                if (!isRowHidden(j) && (nextInfo.itemType == ItemTypePic || nextInfo.itemType == ItemTypeVideo)) {
                     break;
                 }
-                if (!isRowHioceann(j)) {
+                if (!isRowHidden(j)) {
                     if (nextInfo.itemType == ItemTypeTimeLineTitle || nextInfo.itemType == ItemTypeImportTimeLineTitle) {
-                        setRowHioceann(j, true);
+                        setRowHidden(j, true);
                         bool isSelect = getCurrentIndexSelectStatus(nextIndex, false);
                         emit sigTimeLineDataAndNum(nextInfo.date, nextInfo.num, isSelect ? QObject::tr("Unselect") : QObject::tr("Select"));
                         nextVisibleIsTitle = true;
@@ -1339,18 +1339,18 @@ void ThumbnailListView::hideAllAppointType(ItemType type)
             for (int j = i + 1; j < m_model->rowCount(); j++) {
                 QModelIndex nextIndex = m_model->index(j, 0);
                 DBImgInfo nextInfo = nextIndex.data(Qt::DisplayRole).value<DBImgInfo>();
-                if (!isRowHioceann(j) && (nextInfo.itemType == ItemTypePic || nextInfo.itemType == ItemTypeVideo)) {
+                if (!isRowHidden(j) && (nextInfo.itemType == ItemTypePic || nextInfo.itemType == ItemTypeVideo)) {
                     break;
                 }
-                if (!isRowHioceann(j)) {
+                if (!isRowHidden(j)) {
                     if (nextInfo.itemType == ItemTypeTimeLineTitle || nextInfo.itemType == ItemTypeImportTimeLineTitle || nextInfo.itemType == ItemTypeBlank) {
-                        setRowHioceann(i, true);
+                        setRowHidden(i, true);
                         break;
                     }
                 }
                 //当前是最后一个标题
-                if (isRowHioceann(j) && (j == (m_model->rowCount() - 1))) {
-                    setRowHioceann(i, true);
+                if (isRowHidden(j) && (j == (m_model->rowCount() - 1))) {
+                    setRowHidden(i, true);
                 }
             }
         }
@@ -1883,7 +1883,7 @@ int ThumbnailListView::getAppointTypeItemCount(ItemType type)
 {
     int count = 0;
     for (int i = 0;  i < m_model->rowCount(); i++) {
-        if (isRowHioceann(i)) {
+        if (isRowHidden(i)) {
             continue;
         }
         QModelIndex index = m_model->index(i, 0);
@@ -1907,7 +1907,7 @@ int ThumbnailListView::getAppointTypeSelectItemCount(ItemType type)
     int size = list.size();
     for (int i = 0;  i < size; i++) {
         QModelIndex index = list.at(i);
-        if (isRowHioceann(index.row())) {
+        if (isRowHidden(index.row())) {
             continue;
         }
         DBImgInfo pdata = index.data(Qt::DisplayRole).value<DBImgInfo>();

@@ -108,7 +108,7 @@ FileManagerWindow *CoreHelper::defaultWindow()
     const auto &idList { FMWindowsIns.windowIdList() };
     if (idList.size() == 1) {
         auto window { FMWindowsIns.findWindowById(idList.first()) };
-        if (window && window->isHioceann())
+        if (window && window->isHidden())
             return window;
     }
 

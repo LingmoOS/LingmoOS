@@ -5,10 +5,10 @@
 #define UTILS_H
 
 #include <DNotifySender>
-#include <DSysInfo>
+#include <LSysInfo>
 
-inline const static Dtk::Core::DSysInfo::UosType UosType = Dtk::Core::DSysInfo::uosType();
+inline const static Dtk::Core::LSysInfo::UosType UosType = Dtk::Core::LSysInfo::uosType();
 inline const static bool IsServerSystem =
-        (Dtk::Core::DSysInfo::UosServer == UosType); // 是否是服务器版
+        (Dtk::Core::LSysInfo::UosServer == UosType); // 是否是服务器版
 
 #endif // UTILS_H

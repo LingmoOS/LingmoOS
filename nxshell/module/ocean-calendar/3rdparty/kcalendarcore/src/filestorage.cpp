@@ -29,7 +29,7 @@ using namespace KCalendarCore;
   Private class that helps to provide binary compatibility between releases.
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::FileStorage::Private
+class Q_DECL_HIDDEN KCalendarCore::FileStorage::Private
 {
 public:
     Private(const QString &fileName, CalFormat *format)

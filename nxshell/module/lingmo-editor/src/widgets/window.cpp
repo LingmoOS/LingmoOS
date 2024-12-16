@@ -2803,7 +2803,7 @@ void Window::slotFindbarClose()
 {
     EditWrapper *wrapper = currentWrapper();
 
-    if (wrapper->bottomBar()->isHioceann()) {
+    if (wrapper->bottomBar()->isHidden()) {
         wrapper->bottomBar()->show();
     }
 
@@ -2816,7 +2816,7 @@ void Window::slotReplacebarClose()
 {
     EditWrapper *wrapper = currentWrapper();
 
-    if (wrapper->bottomBar()->isHioceann()) {
+    if (wrapper->bottomBar()->isHidden()) {
         wrapper->bottomBar()->show();
     }
 

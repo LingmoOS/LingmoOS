@@ -68,20 +68,20 @@ const FileInfoPointer VaultFileIterator::fileInfo() const
     QSharedPointer<DFileInfo> fileinfo = dfmioDirIterator->fileInfo();
 
     const QString &fileName = fileinfo->attribute(DFileInfo::AttributeID::kStandardName, nullptr).toString();
-    bool isHioceann = false;
+    bool isHidden = false;
     if (fileName.startsWith(".")) {
-        isHioceann = true;
+        isHidden = true;
     } else {
-        isHioceann = hideFileList.contains(fileName);
+        isHidden = hideFileList.contains(fileName);
     }
 
     QSharedPointer<FileInfo> info = QSharedPointer<AsyncFileInfo>(new AsyncFileInfo(url, fileinfo));
-    info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+    info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
     info.dynamicCast<AsyncFileInfo>()->cacheAsyncAttributes();
 
     QSharedPointer<FileInfo> infoTrans = InfoFactory::transfromInfo<FileInfo>(url.scheme(), info);
     if (infoTrans) {
-        infoTrans->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+        infoTrans->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
         infoTrans->setExtendedAttributes(ExtInfoType::kFileLocalDevice, false);
         infoTrans->setExtendedAttributes(ExtInfoType::kFileCdRomDevice, false);
         InfoFactory::cacheFileInfo(infoTrans);

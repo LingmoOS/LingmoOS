@@ -19,7 +19,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Compositor::Private
+class Q_DECL_HIDDEN Compositor::Private
 {
 public:
     Private() = default;

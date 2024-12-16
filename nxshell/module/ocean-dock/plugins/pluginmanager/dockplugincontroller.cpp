@@ -11,7 +11,7 @@
 #include "utils.h"
 
 #include <DNotifySender>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDebug>
 #include <QDir>
@@ -496,7 +496,7 @@ void DockPluginController::loadPlugin(const QString &pluginFile)
         return;
     }
 
-    if (interface->pluginName() == "multitasking" && (Utils::IS_WAYLAND_DISPLAY || Dtk::Core::DSysInfo::lingmoType() == Dtk::Core::DSysInfo::LingmoServer)) {
+    if (interface->pluginName() == "multitasking" && (Utils::IS_WAYLAND_DISPLAY || Dtk::Core::LSysInfo::lingmoType() == Dtk::Core::LSysInfo::LingmoServer)) {
         for (auto &pair : m_pluginLoadMap.keys()) {
             if (pair.first == pluginFile) {
                 m_pluginLoadMap.remove(pair);

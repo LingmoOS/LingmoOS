@@ -277,7 +277,7 @@
         <translation>Hold vist</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Hold skjult</translation>
     </message>
     <message>

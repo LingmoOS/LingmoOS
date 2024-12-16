@@ -172,7 +172,7 @@ void DockHelper::checkNeedHideOrNot()
         needHide = isWindowOverlap();
         break;
     }
-    case KeepHioceann: {
+    case KeepHidden: {
         // only any enter
         needHide = true;
         break;
@@ -202,8 +202,8 @@ void DockHelper::checkNeedShowOrNot()
         needShow = !isWindowOverlap();
         break;
     }
-    case KeepHioceann: {
-        // KeepHioceann only any enter.
+    case KeepHidden: {
+        // KeepHidden only any enter.
         needShow = false;
         break;
     }

@@ -50,7 +50,7 @@ FileViewModel::FileViewModel(QAbstractItemView *parent)
     itemRootData = new FileItemData(dirRootUrl);
     connect(ThumbnailFactory::instance(), &ThumbnailFactory::produceFinished, this, &FileViewModel::onFileThumbUpdated);
     connect(Application::instance(), &Application::genericAttributeChanged, this, &FileViewModel::onGenericAttributeChanged);
-    connect(Application::instance(), &Application::showedHioceannFilesChanged, this, &FileViewModel::onHioceannSettingChanged);
+    connect(Application::instance(), &Application::showedHiddenFilesChanged, this, &FileViewModel::onHiddenSettingChanged);
     connect(DConfigManager::instance(), &DConfigManager::valueChanged, this, &FileViewModel::onDConfigChanged);
     connect(&waitTimer, &QTimer::timeout, this, &FileViewModel::onSetCursorWait);
     waitTimer.setInterval(50);
@@ -708,9 +708,9 @@ void FileViewModel::setFilterCallback(const FileViewFilterCallback callback)
     Q_EMIT requestSetFilterCallback(callback);
 }
 
-void FileViewModel::toggleHioceannFiles()
+void FileViewModel::toggleHiddenFiles()
 {
-    Q_EMIT requestChangeHioceannFilter();
+    Q_EMIT requestChangeHiddenFilter();
 }
 
 void FileViewModel::setReadOnly(bool value)
@@ -827,14 +827,14 @@ void FileViewModel::onSetCursorWait()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 }
 
-void FileViewModel::onHioceannSettingChanged(bool value)
+void FileViewModel::onHiddenSettingChanged(bool value)
 {
     if (value) {
-        currentFilters |= QDir::Hioceann;
+        currentFilters |= QDir::Hidden;
     } else {
-        currentFilters &= ~QDir::Hioceann;
+        currentFilters &= ~QDir::Hidden;
     }
-    Q_EMIT requestShowHioceannChanged(value);
+    Q_EMIT requestShowHiddenChanged(value);
 }
 
 void FileViewModel::onWorkFinish(int visiableCount, int totalCount)
@@ -892,11 +892,11 @@ void FileViewModel::initFilterSortWork()
     // make filters
     if (currentFilters == QDir::NoFilter) {
         currentFilters = QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System;
-        bool isShowedHioceannFiles = Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool();
-        if (isShowedHioceannFiles) {
-            currentFilters |= QDir::Hioceann;
+        bool isShowedHiddenFiles = Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool();
+        if (isShowedHiddenFiles) {
+            currentFilters |= QDir::Hidden;
         } else {
-            currentFilters &= ~QDir::Hioceann;
+            currentFilters &= ~QDir::Hidden;
         }
     }
 
@@ -946,7 +946,7 @@ void FileViewModel::initFilterSortWork()
                 closeCursorTimer();
             },
             Qt::QueuedConnection);
-    connect(this, &FileViewModel::requestChangeHioceannFilter, filterSortWorker.data(), &FileSortWorker::onToggleHioceannFiles, Qt::QueuedConnection);
+    connect(this, &FileViewModel::requestChangeHiddenFilter, filterSortWorker.data(), &FileSortWorker::onToggleHiddenFiles, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestChangeFilters, filterSortWorker.data(), &FileSortWorker::handleFilters, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestChangeNameFilters, filterSortWorker.data(), &FileSortWorker::HandleNameFilters, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestUpdateFile, filterSortWorker.data(), &FileSortWorker::handleUpdateFile, Qt::QueuedConnection);
@@ -956,7 +956,7 @@ void FileViewModel::initFilterSortWork()
     connect(this, &FileViewModel::requestGetSourceData, filterSortWorker.data(), &FileSortWorker::handleModelGetSourceData, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestRefreshAllChildren, filterSortWorker.data(), &FileSortWorker::handleRefresh, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestClearThumbnail, filterSortWorker.data(), &FileSortWorker::handleClearThumbnail, Qt::QueuedConnection);
-    connect(this, &FileViewModel::requestShowHioceannChanged, filterSortWorker.data(), &FileSortWorker::onShowHioceannFileChanged, Qt::QueuedConnection);
+    connect(this, &FileViewModel::requestShowHiddenChanged, filterSortWorker.data(), &FileSortWorker::onShowHiddenFileChanged, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestCollapseItem, filterSortWorker.data(), &FileSortWorker::handleCloseExpand, Qt::QueuedConnection);
     connect(this, &FileViewModel::requestTreeView, filterSortWorker.data(), &FileSortWorker::handleSwitchTreeView, Qt::QueuedConnection);
     connect(filterSortWorker.data(), &FileSortWorker::requestUpdateView, this, &FileViewModel::onUpdateView, Qt::QueuedConnection);

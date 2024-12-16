@@ -36,7 +36,7 @@ public:
     using FileInfo::FileInfo;
     void refresh() override {re = true;}
     bool isAttributes(const FileIsType type) const {
-        if (type == OptInfoType::kIsHioceann)
+        if (type == OptInfoType::kIsHidden)
             return hioceann;
         return FileInfo::isAttributes(type);
     }
@@ -46,10 +46,10 @@ public:
 };
 }
 
-TEST(HioceannFileFilter, insertFilter)
+TEST(HiddenFileFilter, insertFilter)
 {
     CanvasProxyModel model;
-    HioceannFileFilter filter(&model);
+    HiddenFileFilter filter(&model);
     FileInfoPointer file(new TestFileInfo(QUrl("file:///var/log")));
     TestFileInfo *ptr = dynamic_cast<TestFileInfo *>(file.data());
 
@@ -61,7 +61,7 @@ TEST(HioceannFileFilter, insertFilter)
     });
 
     ptr->hioceann = false;
-    model.d->filters |= QDir::Hioceann;
+    model.d->filters |= QDir::Hidden;
 
     EXPECT_FALSE(filter.insertFilter({}));
     EXPECT_FALSE(cf);
@@ -69,7 +69,7 @@ TEST(HioceannFileFilter, insertFilter)
 
     ptr->re = false;
     ptr->hioceann = true;
-    model.d->filters &= ~QDir::Hioceann;
+    model.d->filters &= ~QDir::Hidden;
 
     EXPECT_TRUE(filter.insertFilter({}));
     EXPECT_TRUE(cf);
@@ -77,16 +77,16 @@ TEST(HioceannFileFilter, insertFilter)
 
     ptr->re = false;
     ptr->hioceann = false;
-    model.d->filters &= ~QDir::Hioceann;
+    model.d->filters &= ~QDir::Hidden;
     EXPECT_FALSE(filter.insertFilter({}));
     EXPECT_TRUE(cf);
     EXPECT_FALSE(ptr->re);
 }
 
-TEST(HioceannFileFilter, resetFilter)
+TEST(HiddenFileFilter, resetFilter)
 {
     CanvasProxyModel model;
-    HioceannFileFilter filter(&model);
+    HiddenFileFilter filter(&model);
     FileInfoPointer file(new TestFileInfo(QUrl("file:///var/log")));
     TestFileInfo *ptr = dynamic_cast<TestFileInfo *>(file.data());
 
@@ -98,7 +98,7 @@ TEST(HioceannFileFilter, resetFilter)
     });
 
     ptr->hioceann = false;
-    model.d->filters |= QDir::Hioceann;
+    model.d->filters |= QDir::Hidden;
     QList<QUrl> urls = {QUrl::fromLocalFile("/var/log")};
 
     {
@@ -112,7 +112,7 @@ TEST(HioceannFileFilter, resetFilter)
         auto in = urls;
         ptr->re = false;
         ptr->hioceann = true;
-        model.d->filters &= ~QDir::Hioceann;
+        model.d->filters &= ~QDir::Hidden;
 
         EXPECT_FALSE(filter.resetFilter(in));
         EXPECT_TRUE(cf);
@@ -123,18 +123,18 @@ TEST(HioceannFileFilter, resetFilter)
         auto in = urls;
         ptr->re = false;
         ptr->hioceann = false;
-        model.d->filters &= ~QDir::Hioceann;
+        model.d->filters &= ~QDir::Hidden;
         EXPECT_FALSE(filter.resetFilter(in));
         EXPECT_TRUE(cf);
         EXPECT_EQ(in.size(), 1);
     }
 }
 
-TEST(HioceannFileFilter, updateFilter)
+TEST(HiddenFileFilter, updateFilter)
 {
     CanvasProxyModel model;
-    HioceannFileFilter filter(&model);
-    model.d->filters &= ~QDir::Hioceann;
+    HiddenFileFilter filter(&model);
+    model.d->filters &= ~QDir::Hidden;
 
     stub_ext::StubExt stub;
     bool re = false;
@@ -155,7 +155,7 @@ TEST(HioceannFileFilter, updateFilter)
 
     {
         re = false;
-        model.d->filters |= QDir::Hioceann;
+        model.d->filters |= QDir::Hidden;
         EXPECT_FALSE(filter.updateFilter(QUrl::fromLocalFile("/var/.hioceann")));
         EXPECT_FALSE(re);
     }

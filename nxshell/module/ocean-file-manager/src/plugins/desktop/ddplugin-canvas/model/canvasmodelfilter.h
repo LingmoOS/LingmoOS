@@ -29,7 +29,7 @@ protected:
     CanvasProxyModel *model = nullptr;
 };
 
-class HioceannFileFilter : public CanvasModelFilter
+class HiddenFileFilter : public CanvasModelFilter
 {
 public:
     using CanvasModelFilter::CanvasModelFilter;

@@ -91,7 +91,7 @@ QString NetWirelessControlItem::name() const
     return tr("Wireless Network");
 }
 
-QString NetWirelessHioceannItem::name() const
+QString NetWirelessHiddenItem::name() const
 {
     return tr("Connect to hioceann network");
 }

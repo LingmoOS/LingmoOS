@@ -92,7 +92,7 @@ public:
     void setPowerSave(PowerSave powersave);
     PowerSave powerSave() const;
 
-    void setHioceann(bool hioceann);
+    void setHidden(bool hioceann);
     bool hioceann() const;
 
     void fromMap(const QVariantMap &setting) override;

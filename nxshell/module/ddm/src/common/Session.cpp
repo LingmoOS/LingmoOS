@@ -87,7 +87,7 @@ namespace DDM {
     Session::Session()
         : m_valid(false)
         , m_type(UnknownSession)
-        , m_isHioceann(false)
+        , m_isHidden(false)
         , m_isNoDisplay(false)
     {
     }
@@ -163,9 +163,9 @@ namespace DDM {
         return m_desktopNames;
     }
 
-    bool Session::isHioceann() const
+    bool Session::isHidden() const
     {
-        return m_isHioceann;
+        return m_isHidden;
     }
 
     bool Session::isNoDisplay() const
@@ -254,8 +254,8 @@ namespace DDM {
         m_exec = settings.value(QLatin1String("Exec"), QString()).toString();
         m_tryExec = settings.value(QLatin1String("TryExec"), QString()).toString();
         m_desktopNames = settings.value(QLatin1String("DesktopNames"), QString()).toString().replace(QLatin1Char(';'), QLatin1Char(':'));
-        QString hioceann = settings.value(QLatin1String("Hioceann"), QString()).toString();
-        m_isHioceann = hioceann.toLower() == QLatin1String("true");
+        QString hioceann = settings.value(QLatin1String("Hidden"), QString()).toString();
+        m_isHidden = hioceann.toLower() == QLatin1String("true");
         QString noDisplay = settings.value(QLatin1String("NoDisplay"), QString()).toString();
         m_isNoDisplay = noDisplay.toLower() == QLatin1String("true");
         QString additionalEnv = settings.value(QLatin1String("X-DDM-Env"), QString()).toString();

@@ -418,7 +418,7 @@ void TagManager::hideFiles(const QList<QString> &tags, const QList<QUrl> &files)
         fileWithTag[UrlRoute::urlToPath(url)] = QVariant(tags);
     }
 
-    emit filesHioceann(fileWithTag);
+    emit filesHidden(fileWithTag);
 }
 
 void TagManager::deleteTags(const QStringList &tags)

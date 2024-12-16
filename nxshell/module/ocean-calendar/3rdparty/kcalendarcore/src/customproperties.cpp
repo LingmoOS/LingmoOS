@@ -26,7 +26,7 @@ using namespace KCalendarCore;
 //@cond PRIVATE
 static bool checkName(const QByteArray &name);
 
-class Q_DECL_HIOCEANN CustomProperties::Private
+class Q_DECL_HIDDEN CustomProperties::Private
 {
 public:
     bool operator==(const Private &other) const;

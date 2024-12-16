@@ -22,7 +22,7 @@
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::FreeBusyPeriod::Private
+class Q_DECL_HIDDEN KCalendarCore::FreeBusyPeriod::Private
 {
 public:
     Private()

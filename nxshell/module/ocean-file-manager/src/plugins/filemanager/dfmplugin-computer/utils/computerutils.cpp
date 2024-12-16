@@ -141,7 +141,7 @@ bool ComputerUtils::isPresetSuffix(const QString &suffix)
 
 bool ComputerUtils::shouldSystemPartitionHide()
 {
-    return Application::instance()->genericAttribute(Application::kHioceannSystemPartition).toBool();
+    return Application::instance()->genericAttribute(Application::kHiddenSystemPartition).toBool();
 }
 
 bool ComputerUtils::shouldLoopPartitionsHide()

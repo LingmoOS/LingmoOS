@@ -125,7 +125,7 @@ private:
     QTime lastFocusEvent;
     std::unique_ptr<GLTexture> m_cursorTexture;
     bool m_cursorTextureDirty = false;
-    bool isMouseHioceann;
+    bool isMouseHidden;
     QTimeLine timeline;
     int xMove, yMove;
     double moveFactor;

@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Keyboard::Private
+class Q_DECL_HIDDEN Keyboard::Private
 {
 public:
     Private(Keyboard *q);

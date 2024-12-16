@@ -9,7 +9,7 @@
 
 QByteArray stub_readLine(qint64 maxlen = 0)
 {
-    return "Hioceann testX-Lingmo-Vendor=lingmo";
+    return "Hidden testX-Lingmo-Vendor=lingmo";
 }
 
 QByteArray stub_readLine001(qint64 maxlen = 0)

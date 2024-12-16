@@ -1752,27 +1752,27 @@ void PointerInputTest::testMoveCursor()
 
 void PointerInputTest::testHideShowCursor()
 {
-    QCOMPARE(Cursors::self()->isCursorHioceann(), false);
+    QCOMPARE(Cursors::self()->isCursorHidden(), false);
     Cursors::self()->hideCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
     Cursors::self()->showCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), false);
+    QCOMPARE(Cursors::self()->isCursorHidden(), false);
 
     Cursors::self()->hideCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
     Cursors::self()->hideCursor();
     Cursors::self()->hideCursor();
     Cursors::self()->hideCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
 
     Cursors::self()->showCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
     Cursors::self()->showCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
     Cursors::self()->showCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), true);
+    QCOMPARE(Cursors::self()->isCursorHidden(), true);
     Cursors::self()->showCursor();
-    QCOMPARE(Cursors::self()->isCursorHioceann(), false);
+    QCOMPARE(Cursors::self()->isCursorHidden(), false);
 }
 
 void PointerInputTest::testDefaultInputRegion()

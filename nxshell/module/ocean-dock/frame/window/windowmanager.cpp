@@ -73,9 +73,9 @@ void WindowManager::launch()
     const QString &currentScreen = DOCKSCREEN_INS->current();
     if (m_multiScreenWorker->hideMode() == HideMode::KeepShowing) {
         onPlayAnimation(currentScreen, m_multiScreenWorker->position(), Dock::AniAction::Show);
-    } else if (m_multiScreenWorker->hideMode() == HideMode::KeepHioceann) {
+    } else if (m_multiScreenWorker->hideMode() == HideMode::KeepHidden) {
         qApp->setProperty(PROP_HIDE_STATE, HideState::Hide);
-        onUpdateDockGeometry(HideMode::KeepHioceann);
+        onUpdateDockGeometry(HideMode::KeepHidden);
     } else if (m_multiScreenWorker->hideMode() == HideMode::SmartHide) {
         switch(m_multiScreenWorker->hideState()) {
         case HideState::Show:
@@ -277,7 +277,7 @@ void WindowManager::onPositionChanged(const Dock::Position &position)
         mainWindow->setPosition(position);
 
     // 在改变位置后，需要根据当前任务栏是隐藏还是显示，来调整左右两侧区域的大小
-    onUpdateDockGeometry(HideMode::KeepHioceann);
+    onUpdateDockGeometry(HideMode::KeepHidden);
 }
 
 void WindowManager::onDisplayModeChanged(const Dock::DisplayMode &displayMode)

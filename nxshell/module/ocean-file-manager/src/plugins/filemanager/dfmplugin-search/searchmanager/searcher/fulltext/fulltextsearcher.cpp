@@ -125,7 +125,7 @@ bool FullTextSearcherPrivate::doSearch(const QString &path, const QString &keywo
                 if (modifyEpoch.toStdWString() != storeTime) {
                     continue;
                 } else {
-                    if (!SearchHelper::instance()->isHioceannFile(StringUtils::toUTF8(resultPath).c_str(), hioceannFileHash, searchPath)) {
+                    if (!SearchHelper::instance()->isHiddenFile(StringUtils::toUTF8(resultPath).c_str(), hioceannFileHash, searchPath)) {
                         if (hasTransform)
                             resultPath.replace(0, static_cast<unsigned long>(searchPath.length()), path.toStdWString());
                         QMutexLocker lk(&mutex);

@@ -83,7 +83,7 @@ void FileDialogPrivate::handleSaveAcceptBtnClicked()
     }
 
     if (!fileName.isEmpty()) {
-        if (fileName.startsWith(".") && CoreHelper::askHioceannFile(q))
+        if (fileName.startsWith(".") && CoreHelper::askHiddenFile(q))
             return;
         if (!options.testFlag(QFileDialog::DontConfirmOverwrite)) {
             QFileInfo info(q->directory().absoluteFilePath(fileName));

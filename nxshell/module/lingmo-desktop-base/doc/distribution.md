@@ -10,7 +10,7 @@
 
 ### 文件解析建议
 
-可以考虑使用任何能够解析 `.desktop` 文件的库。如果可以使用 DTK，则 dtkcore 提供了 `DSysInfo` 以获取部分常用的定制配置信息，对于不常见的定制信息，可以使用 `DDesktopEntry` 帮助解析。
+可以考虑使用任何能够解析 `.desktop` 文件的库。如果可以使用 DTK，则 dtkcore 提供了 `LSysInfo` 以获取部分常用的定制配置信息，对于不常见的定制信息，可以使用 `DDesktopEntry` 帮助解析。
 
 ### 作弊表：
 

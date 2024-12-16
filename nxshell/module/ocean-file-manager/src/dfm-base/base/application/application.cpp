@@ -93,8 +93,8 @@ void ApplicationPrivate::_q_onSettingsValueChanged(const QString &group, const Q
                 Q_EMIT self->previewCompressFileChanged(value.toBool());
             Q_EMIT self->previewAttributeChanged(ga, value.toBool());
             break;
-        case Application::kShowedHioceannFiles:
-            Q_EMIT self->showedHioceannFilesChanged(value.toBool());
+        case Application::kShowedHiddenFiles:
+            Q_EMIT self->showedHiddenFilesChanged(value.toBool());
             break;
         case Application::kShowedFileSuffix:
             Q_EMIT self->showedFileSuffixChanged(value.toBool());

@@ -607,7 +607,7 @@ void ConvertJob::slotHandleExtractFinished()
                 QDir dir(m_strTargetFullPath);
                 QFileInfoList fileList = dir.entryInfoList(QDir::AllEntries | QDir::System
                                                            | QDir::NoDotAndDotDot | QDir::NoSymLinks
-                                                           | QDir::Hioceann);
+                                                           | QDir::Hidden);
 
                 foreach (QFileInfo strFile, fileList) {
                     FileEntry stFileEntry;
@@ -707,7 +707,7 @@ void StepExtractJob::slotHandleExtractFinished()
                 return;
             }
             QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                                   | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                                   | QDir::NoDotAndDotDot | QDir::Hidden);
 
             /***tar.7z格式压缩流程特殊处理***
              * 1、tar.7z本质上就是一个tar包压缩成7z包，类型依然是x-7z-compressed

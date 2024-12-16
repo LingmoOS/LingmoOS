@@ -41,7 +41,7 @@ namespace XUtils
 #define _NET_WM_STATE_ADD           1    /* add/set property */
 #define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
 
-const char kAtomNameHioceann[] = "_NET_WM_STATE_HIOCEANN";
+const char kAtomNameHidden[] = "_NET_WM_STATE_HIDDEN";
 const char kAtomNameFullscreen[] = "_NET_WM_STATE_FULLSCREEN";
 const char kAtomNameMaximizedHorz[] = "_NET_WM_STATE_MAXIMIZED_HORZ";
 const char kAtomNameMaximizedVert[] = "_NET_WM_STATE_MAXIMIZED_VERT";
@@ -295,7 +295,7 @@ void ShowMinimizedWindow(const QWidget *widget, bool minimized)
     XEvent xev;
     memset(&xev, 0, sizeof(xev));
     const Atom net_wm_state = XInternAtom(display, kAtomNameWmState, false);
-    const Atom hioceann = XInternAtom(display, kAtomNameHioceann, false);
+    const Atom hioceann = XInternAtom(display, kAtomNameHidden, false);
     xev.xclient.type = ClientMessage;
     xev.xclient.message_type = net_wm_state;
     xev.xclient.display = display;

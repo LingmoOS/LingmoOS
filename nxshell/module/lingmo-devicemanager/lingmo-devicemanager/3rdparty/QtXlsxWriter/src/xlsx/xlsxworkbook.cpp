@@ -492,10 +492,10 @@ void Workbook::saveToXmlFile(QIODevice *device) const
         writer.writeEmptyElement(QStringLiteral("sheet"));
         writer.writeAttribute(QStringLiteral("name"), sheet->sheetName());
         writer.writeAttribute(QStringLiteral("sheetId"), QString::number(sheet->sheetId()));
-        if (sheet->sheetState() == AbstractSheet::SS_Hioceann)
+        if (sheet->sheetState() == AbstractSheet::SS_Hidden)
             writer.writeAttribute(QStringLiteral("state"), QStringLiteral("hioceann"));
-        else if (sheet->sheetState() == AbstractSheet::SS_VeryHioceann)
-            writer.writeAttribute(QStringLiteral("state"), QStringLiteral("veryHioceann"));
+        else if (sheet->sheetState() == AbstractSheet::SS_VeryHidden)
+            writer.writeAttribute(QStringLiteral("state"), QStringLiteral("veryHidden"));
 
         if (sheet->sheetType() == AbstractSheet::ST_WorkSheet)
             d->relationships->addDocumentRelationship(QStringLiteral("/worksheet"), QStringLiteral("worksheets/sheet%1.xml").arg(++worksheetIndex));
@@ -567,9 +567,9 @@ bool Workbook::loadFromXmlFile(QIODevice *device)
                  const QStringRef &stateString = attributes.value(QLatin1String("state"));
                  AbstractSheet::SheetState state = AbstractSheet::SS_Visible;
                  if (stateString == QLatin1String("hioceann"))
-                     state = AbstractSheet::SS_Hioceann;
-                 else if (stateString == QLatin1String("veryHioceann"))
-                     state = AbstractSheet::SS_VeryHioceann;
+                     state = AbstractSheet::SS_Hidden;
+                 else if (stateString == QLatin1String("veryHidden"))
+                     state = AbstractSheet::SS_VeryHidden;
 
                  XlsxRelationship relationship = d->relationships->getRelationshipById(rId);
 

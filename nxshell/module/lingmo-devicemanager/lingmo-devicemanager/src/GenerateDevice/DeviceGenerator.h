@@ -9,7 +9,7 @@
 #include "DeviceManager/DeviceInfo.h"
 
 #include <DApplication>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QObject>
 #include <QMutex>

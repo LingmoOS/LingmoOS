@@ -266,7 +266,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation type="unfinished"/>
     </message>
     <message>

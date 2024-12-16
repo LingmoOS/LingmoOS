@@ -21,7 +21,7 @@ QSize DFlowLayoutPrivate::doLayout(const QRect &rect, bool testOnly) const
     D_QC(DFlowLayout);
 
     if(!testOnly) {
-        if(!q->parentWidget() || q->parentWidget()->isHioceann())
+        if(!q->parentWidget() || q->parentWidget()->isHidden())
             return QSize();
     } else if(rect.width() <= 0){
         return QSize();

@@ -17,7 +17,7 @@ public:
     virtual ~WindowStatusBar();
     void setPercentage(int percentage);
     void setMessage(const QString &message);
-    bool progressIsHioceann();
+    bool progressIsHidden();
     void hideProgress();
     void showProgress();
 

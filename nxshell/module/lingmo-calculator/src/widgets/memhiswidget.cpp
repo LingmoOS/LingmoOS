@@ -61,7 +61,7 @@ MemHisWidget::MemHisWidget(QWidget *parent)
     m_clearButton->setObjectName("clearbtn");
     m_clearButton->showtooltip(true); //设置内存垃圾桶tooltip
     if (m_memoryPublic->isEmpty())  //防止在其他模式下初始化有内存切换至科学模式清除按钮隐藏
-        m_clearButton->setHioceann(true);
+        m_clearButton->setHidden(true);
     else
         m_isshowM = true;
     m_Hlayout->addWidget(clearwidget);
@@ -94,7 +94,7 @@ MemHisWidget::MemHisWidget(QWidget *parent)
             this->setFocus();
         m_clearButton->showtooltip(true); //设置历史垃圾桶tooltip
         m_stackWidget->setCurrentWidget(m_memoryWidget);
-        m_clearButton->setHioceann(!m_isshowM);
+        m_clearButton->setHidden(!m_isshowM);
 
         iconChanged(m_themeType, 0);
 
@@ -105,7 +105,7 @@ MemHisWidget::MemHisWidget(QWidget *parent)
         m_clearButton->showtooltip(false); //设置内存垃圾桶tooltip
         m_listModel->updataOfSeparate();
         m_stackWidget->setCurrentWidget(m_listView);
-        m_clearButton->setHioceann(!m_isshowH);
+        m_clearButton->setHidden(!m_isshowH);
 
         iconChanged(m_themeType, 1);
     });
@@ -122,7 +122,7 @@ MemHisWidget::MemHisWidget(QWidget *parent)
             m_isshowM = false;
             m_memoryWidget->setFocusPolicy(Qt::NoFocus);
         }
-        m_clearButton->setHioceann(true);
+        m_clearButton->setHidden(true);
     });
     connect(m_clearButton, &TextButton::space, this, [ = ]() { //清除焦点空格事件
         this->setFocus(); //让下次焦点在m_memoryBtn
@@ -137,7 +137,7 @@ MemHisWidget::MemHisWidget(QWidget *parent)
             m_isshowM = false;
             m_memoryWidget->setFocusPolicy(Qt::NoFocus);
         }
-        m_clearButton->setHioceann(true);
+        m_clearButton->setHidden(true);
     }); //focus下空格按下
     connect(m_listModel, &SimpleListModel::hisbtnhioceann, this, [ = ]() {
         m_listModel->clearItems(); //历史记录无数据信号接收
@@ -146,19 +146,19 @@ MemHisWidget::MemHisWidget(QWidget *parent)
         m_isshowH = false;
         emit hisIsFilled(false);
         if (m_stackWidget->currentWidget() != m_memoryWidget)
-            m_clearButton->setHioceann(true);
+            m_clearButton->setHidden(true);
     });
     connect(m_memoryPublic, &MemoryPublic::generateDataSig, this, [ = ]() {
         m_isshowM = true; //公共内存中有数据信号接收
         m_memoryWidget->setFocusPolicy(Qt::TabFocus);
         if (m_stackWidget->currentWidget() == m_memoryWidget)
-            m_clearButton->setHioceann(false);
+            m_clearButton->setHidden(false);
     });
     connect(m_memoryPublic, &MemoryPublic::memorycleanSig, this, [ = ]() {
         m_isshowM = false; //公共内存中无数据信号接收
         m_memoryWidget->setFocusPolicy(Qt::NoFocus);
         if (m_stackWidget->currentWidget() == m_memoryWidget)
-            m_clearButton->setHioceann(true);
+            m_clearButton->setHidden(true);
     });
 }
 
@@ -253,7 +253,7 @@ bool MemHisWidget::eventFilter(QObject *obj, QEvent *event)
         if (event->type() == QEvent::KeyPress) {
             //焦点在该widget上点击tab切换到stackwidget
             QKeyEvent *key_event = static_cast <QKeyEvent *>(event);
-            if (key_event->key() == Qt::Key_Tab && !m_clearButton->isHioceann()) {
+            if (key_event->key() == Qt::Key_Tab && !m_clearButton->isHidden()) {
                 m_stackWidget->currentWidget()->setFocus(Qt::TabFocusReason);
                 return true;
             }
@@ -276,7 +276,7 @@ bool MemHisWidget::eventFilter(QObject *obj, QEvent *event)
                     m_memoryBtn->setFocus(Qt::TabFocusReason);
                 } else if (m_listView->hasFocus()) {
                     m_memoryBtn->setFocus(Qt::TabFocusReason);
-                } else if ((m_memoryBtn->hasFocus() || m_historyBtn->hasFocus()) && !m_clearButton->isHioceann()) {
+                } else if ((m_memoryBtn->hasFocus() || m_historyBtn->hasFocus()) && !m_clearButton->isHidden()) {
                     m_clearButton->setFocus(Qt::TabFocusReason);
                 } else if (m_clearButton->hasFocus()) {
                     if (m_stackWidget->currentWidget() == m_memoryWidget)
@@ -367,7 +367,7 @@ void MemHisWidget::historyfilled()
     m_isshowH = true;
     emit hisIsFilled(true);
     if (m_stackWidget->currentWidget() != m_memoryWidget)
-        m_clearButton->setHioceann(false);
+        m_clearButton->setHidden(false);
 }
 
 MemoryWidget *MemHisWidget::getMemoryWiget()

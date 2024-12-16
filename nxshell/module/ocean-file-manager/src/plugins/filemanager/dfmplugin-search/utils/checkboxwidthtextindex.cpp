@@ -82,7 +82,7 @@ void TextIndexStatusBar::setStatus(Status status, const QVariant &data)
         msgLabel->setText(tr("Index update failed, please turn on the \"Full-Text search\" switch again"));
         iconLabel->setPixmap(QIcon::fromTheme("dialog-error").pixmap(16, 16));
         break;
-    case Status::Hioceann:
+    case Status::Hidden:
         iconLabel->hide();
         msgLabel->hide();
         hide();
@@ -120,7 +120,7 @@ CheckBoxWidthTextIndex::CheckBoxWidthTextIndex(QWidget *parent)
             statusBar->show();
             statusBar->setStatus(TextIndexStatusBar::Status::Indexing);
         } else {
-            statusBar->setStatus(TextIndexStatusBar::Status::Hioceann);
+            statusBar->setStatus(TextIndexStatusBar::Status::Hidden);
         }
         emit stateChanged(state);
     });
@@ -185,7 +185,7 @@ void CheckBoxWidthTextIndex::initStatusBar()
             }
         }
     } else {
-        statusBar->setStatus(TextIndexStatusBar::Status::Hioceann);
+        statusBar->setStatus(TextIndexStatusBar::Status::Hidden);
     }
 }
 

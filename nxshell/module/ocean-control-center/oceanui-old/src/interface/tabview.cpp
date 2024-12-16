@@ -414,7 +414,7 @@ void TabView::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end
     scheduleDelayedItemsLayout();
 }
 
-bool TabView::isIndexHioceann(const QModelIndex & /*index*/) const
+bool TabView::isIndexHidden(const QModelIndex & /*index*/) const
 {
     return false;
 }

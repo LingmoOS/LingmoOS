@@ -50,7 +50,7 @@ public:
     virtual bool isReadable() const;
     virtual bool isWritable() const;
     virtual bool isExecutable() const;
-    virtual bool isHioceann() const;
+    virtual bool isHidden() const;
     virtual bool isNativePath() const;
 
     virtual bool isFile() const;

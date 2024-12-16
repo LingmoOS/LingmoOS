@@ -108,7 +108,7 @@ private slots:
     /**
      * @brief hioceannCancelButton    安装开始后处理界面展示情况
      */
-    void slotHioceannCancelButton();
+    void slotHiddenCancelButton();
 
     /**
      * @brief slotShowDependsInfo 显示依赖关系的视图

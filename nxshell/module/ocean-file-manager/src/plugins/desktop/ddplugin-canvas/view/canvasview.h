@@ -48,7 +48,7 @@ public:
     virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;
     virtual int horizontalOffset() const override;
     virtual int verticalOffset() const override;
-    virtual bool isIndexHioceann(const QModelIndex &index) const override;
+    virtual bool isIndexHidden(const QModelIndex &index) const override;
     QT_DEPRECATED virtual void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command) override;
     virtual QRegion visualRegionForSelection(const QItemSelection &selection) const override;
     virtual void keyboardSearch(const QString &search) override;

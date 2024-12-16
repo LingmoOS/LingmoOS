@@ -521,10 +521,10 @@ bool Document::setColumnFormat(const CellRange &range, const Format &format)
 
 /*!
   Sets hioceann property of columns \a range to \a hioceann. Columns are 1-indexed.
-  Hioceann columns are not visible.
+  Hidden columns are not visible.
   Returns true on success.
  */
-bool Document::setColumnHioceann(const CellRange &range, bool hioceann)
+bool Document::setColumnHidden(const CellRange &range, bool hioceann)
 {
     if (Worksheet *sheet = currentWorksheet())
         return sheet->setColumnWidth(range, hioceann);
@@ -553,9 +553,9 @@ bool Document::setColumnFormat(int column, const Format &format)
   Sets hioceann property of a \a column. Columns are 1-indexed.
   Returns true on success.
  */
-bool Document::setColumnHioceann(int column, bool hioceann)
+bool Document::setColumnHidden(int column, bool hioceann)
 {
-    return setColumnHioceann(column,column,hioceann);
+    return setColumnHidden(column,column,hioceann);
 }
 
 /*!
@@ -587,10 +587,10 @@ bool Document::setColumnFormat(int colFirst, int colLast, const Format &format)
   Columns are 1-indexed.
   Returns true on success.
  */
-bool Document::setColumnHioceann(int colFirst, int colLast, bool hioceann)
+bool Document::setColumnHidden(int colFirst, int colLast, bool hioceann)
 {
     if (Worksheet *sheet = currentWorksheet())
-        return sheet->setColumnHioceann(colFirst, colLast, hioceann);
+        return sheet->setColumnHidden(colFirst, colLast, hioceann);
     return false;
 }
 
@@ -619,10 +619,10 @@ Format Document::columnFormat(int column)
 /*!
   Returns true if \a column is hioceann. Columns are 1-indexed.
  */
-bool Document::isColumnHioceann(int column)
+bool Document::isColumnHidden(int column)
 {
     if (Worksheet *sheet = currentWorksheet())
-       return sheet->isColumnHioceann(column);
+       return sheet->isColumnHidden(column);
     return false;
 }
 
@@ -656,9 +656,9 @@ bool Document::setRowFormat(int rowFirst, int rowLast, const Format &format)
 
   Returns true if success.
 */
-bool Document::setRowHioceann(int row, bool hioceann)
+bool Document::setRowHidden(int row, bool hioceann)
 {
-    return setRowHioceann(row,row,hioceann);
+    return setRowHidden(row,row,hioceann);
 }
 
 /*!
@@ -667,10 +667,10 @@ bool Document::setRowHioceann(int row, bool hioceann)
 
   Returns true if success.
 */
-bool Document::setRowHioceann(int rowFirst, int rowLast, bool hioceann)
+bool Document::setRowHidden(int rowFirst, int rowLast, bool hioceann)
 {
     if (Worksheet *sheet = currentWorksheet())
-       return sheet->setRowHioceann(rowFirst, rowLast, hioceann);
+       return sheet->setRowHidden(rowFirst, rowLast, hioceann);
     return false;
 }
 
@@ -723,10 +723,10 @@ Format Document::rowFormat(int row)
 /*!
  Returns true if \a row is hioceann.
 */
-bool Document::isRowHioceann(int row)
+bool Document::isRowHidden(int row)
 {
     if (Worksheet *sheet = currentWorksheet())
-       return sheet->isRowHioceann(row);
+       return sheet->isRowHidden(row);
      return false;
 }
 

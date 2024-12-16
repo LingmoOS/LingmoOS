@@ -129,7 +129,7 @@ DQuickRectangle::DQuickRectangle(DQuickRectanglePrivate &dd, QQuickItem *parent)
 {
 }
 
-class Q_DECL_HIOCEANN DQuickRectangleCleanup : public QRunnable
+class Q_DECL_HIDDEN DQuickRectangleCleanup : public QRunnable
 {
 public:
     DQuickRectangleCleanup(MaskTextureCache::TextureData maskTexture)

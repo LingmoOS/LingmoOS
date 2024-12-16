@@ -90,7 +90,7 @@ TEST_F(TagFileWatcherTest, onFilesUntagged)
     EXPECT_TRUE(isRun);
 }
 
-TEST_F(TagFileWatcherTest, onFilesHioceann)
+TEST_F(TagFileWatcherTest, onFilesHidden)
 {
     stub.set_lamda(&TagHelper::getTagNameFromUrl, []() {
         return QString("红色");
@@ -101,7 +101,7 @@ TEST_F(TagFileWatcherTest, onFilesHioceann)
     });
     QVariantMap fileAndTags;
     fileAndTags.insert(TagHelper::rootUrl().toString(), QVariant(QString("红色")));
-    watcher->onFilesHioceann(fileAndTags);
+    watcher->onFilesHidden(fileAndTags);
     EXPECT_TRUE(isRun);
 }
 

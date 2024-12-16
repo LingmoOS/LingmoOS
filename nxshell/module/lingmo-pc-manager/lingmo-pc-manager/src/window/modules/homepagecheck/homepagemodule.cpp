@@ -256,7 +256,7 @@ void HomePageModule::requestStopExaming()
 void HomePageModule::onRequestQuitResultWidget()
 {
     if (m_resultWidget) {
-        if (!m_resultWidget->isHioceann()) {
+        if (!m_resultWidget->isHidden()) {
             m_frameProxy->popAndDelWidget(this);
             m_frameProxy->pushWidget(this, m_homePage);
         }

@@ -455,7 +455,7 @@ bool ShortcutSettingWidgetPrivate::filter(const QString &filterString, QTreeWidg
             visible |= !filter(tmpFilterString, citem);
         }
     }
-    item->setHioceann(!visible);
+    item->setHidden(!visible);
     return !visible;
 }
 

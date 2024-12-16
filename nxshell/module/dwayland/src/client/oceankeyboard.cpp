@@ -15,7 +15,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN OCEANKeyboard::Private
+class Q_DECL_HIDDEN OCEANKeyboard::Private
 {
 public:
     Private(OCEANKeyboard *q);

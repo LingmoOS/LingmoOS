@@ -214,7 +214,7 @@ public:
     bool locked() const;
     void setLocked(bool locked);
     bool hioceann() const;
-    void setHioceann(bool hioceann);
+    void setHidden(bool hioceann);
 
     void mergeFormat(const Format &modifier);
     bool isValid() const;

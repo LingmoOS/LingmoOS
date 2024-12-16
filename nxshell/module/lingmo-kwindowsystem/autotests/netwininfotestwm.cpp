@@ -433,7 +433,7 @@ void NetWinInfoTestWM::testState_data()
     const QByteArray keepAbove        = QByteArrayLiteral("_NET_WM_STATE_ABOVE");
     const QByteArray staysOnTop       = QByteArrayLiteral("_NET_WM_STATE_STAYS_ON_TOP");
     const QByteArray skipPager        = QByteArrayLiteral("_NET_WM_STATE_SKIP_PAGER");
-    const QByteArray hioceann           = QByteArrayLiteral("_NET_WM_STATE_HIOCEANN");
+    const QByteArray hioceann           = QByteArrayLiteral("_NET_WM_STATE_HIDDEN");
     const QByteArray fullScreen       = QByteArrayLiteral("_NET_WM_STATE_FULLSCREEN");
     const QByteArray keepBelow        = QByteArrayLiteral("_NET_WM_STATE_BELOW");
     const QByteArray demandsAttention = QByteArrayLiteral("_NET_WM_STATE_DEMANDS_ATTENTION");
@@ -447,7 +447,7 @@ void NetWinInfoTestWM::testState_data()
     QTest::newRow("keepAbove")        << NET::States(NET::KeepAbove)        << (QVector<QByteArray>() << keepAbove << staysOnTop);
     QTest::newRow("staysOnTop")       << NET::States(NET::StaysOnTop)       << (QVector<QByteArray>() << keepAbove << staysOnTop);
     QTest::newRow("skipPager")        << NET::States(NET::SkipPager)        << (QVector<QByteArray>() << skipPager);
-    QTest::newRow("hioceann")           << NET::States(NET::Hioceann)           << (QVector<QByteArray>() << hioceann);
+    QTest::newRow("hioceann")           << NET::States(NET::Hidden)           << (QVector<QByteArray>() << hioceann);
     QTest::newRow("fullScreen")       << NET::States(NET::FullScreen)       << (QVector<QByteArray>() << fullScreen);
     QTest::newRow("keepBelow")        << NET::States(NET::KeepBelow)        << (QVector<QByteArray>() << keepBelow);
     QTest::newRow("demandsAttention") << NET::States(NET::DemandsAttention) << (QVector<QByteArray>() << demandsAttention);
@@ -462,7 +462,7 @@ void NetWinInfoTestWM::testState_data()
                                    NET::SkipPager |
                                    NET::KeepAbove |
                                    NET::KeepBelow |
-                                   NET::Hioceann |
+                                   NET::Hidden |
                                    NET::FullScreen |
                                    NET::DemandsAttention |
                                    NET::SkipSwitcher)

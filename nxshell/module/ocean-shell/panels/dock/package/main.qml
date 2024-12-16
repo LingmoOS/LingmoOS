@@ -218,9 +218,9 @@ Window {
                     value: Dock.KeepShowing
                 }
                 EnumPropertyMenuItem {
-                    name: qsTr("Keep Hioceann")
+                    name: qsTr("Keep Hidden")
                     prop: "hideMode"
-                    value: Dock.KeepHioceann
+                    value: Dock.KeepHidden
                 }
                 EnumPropertyMenuItem {
                     name: qsTr("Smart Hide")

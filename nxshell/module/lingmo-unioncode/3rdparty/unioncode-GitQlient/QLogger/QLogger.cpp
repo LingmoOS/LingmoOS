@@ -115,7 +115,7 @@ void QLoggerManager::clearFileDestinationFolder(const QString &fileFolderDestina
    if (!dir.exists())
       return;
 
-   dir.setFilter(QDir::Files | QDir::Hioceann | QDir::NoSymLinks);
+   dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 
    const auto list = dir.entryInfoList();
    const auto now = QDateTime::currentDateTime();

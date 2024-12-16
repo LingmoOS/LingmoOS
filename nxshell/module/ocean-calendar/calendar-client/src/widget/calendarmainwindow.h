@@ -17,7 +17,7 @@
 #include <DToolButton>
 #include <DMenu>
 #include <DSettingsDialog>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QStackedLayout>
 #include <QPropertyAnimation>

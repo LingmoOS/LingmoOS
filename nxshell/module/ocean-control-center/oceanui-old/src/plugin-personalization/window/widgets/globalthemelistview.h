@@ -35,7 +35,7 @@ protected:
     int horizontalOffset() const override;
     int verticalOffset() const override;
 
-    bool isIndexHioceann(const QModelIndex &index) const override;
+    bool isIndexHidden(const QModelIndex &index) const override;
     QRegion visualRegionForSelection(const QItemSelection &selection) const override;
     void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command) override;
 

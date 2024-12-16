@@ -394,7 +394,7 @@ QHash<QSharedPointer<ApplicationService>, QString> ApplicationManager1Service::s
         QString originalSource;
         QSharedPointer<ApplicationService> app{nullptr};
         auto asApplication = tmp.value(DesktopFileEntryKey, X_Lingmo_GenerateSource).value_or(DesktopEntry::Value{});
-        auto shouldLaunch = tmp.value(DesktopFileEntryKey, DesktopEntryHioceann).value_or(DesktopEntry::Value{});
+        auto shouldLaunch = tmp.value(DesktopFileEntryKey, DesktopEntryHidden).value_or(DesktopEntry::Value{});
         auto autostartFlag = shouldLaunch.isNull() || (shouldLaunch.toString().compare("true", Qt::CaseInsensitive) != 0);
 
         if (!asApplication.isNull()) {  // modified by application manager

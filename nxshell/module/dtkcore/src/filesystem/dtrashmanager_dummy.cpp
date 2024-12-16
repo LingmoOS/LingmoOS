@@ -66,7 +66,7 @@ static bool renameFile(const QFileInfo &fileInfo, const QString &target, QString
     else
     {
         QDirIterator iterator(fileInfo.filePath(),
-                              QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hioceann | QDir::System);
+                              QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
 
         while (iterator.hasNext())
         {

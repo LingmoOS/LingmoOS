@@ -5,7 +5,7 @@
 #include "watermaskframe.h"
 #include "displayconfig.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -194,18 +194,18 @@ QMap<QString, WaterMaskFrame::ConfigInfo> WaterMaskFrame::parseJson(QJsonObject 
 
 bool WaterMaskFrame::showLicenseState()
 {
-    DSysInfo::LingmoType lingmoType = DSysInfo::lingmoType();
-    DSysInfo::UosEdition uosEdition = DSysInfo::uosEditionType();
+    LSysInfo::LingmoType lingmoType = LSysInfo::lingmoType();
+    LSysInfo::UosEdition uosEdition = LSysInfo::uosEditionType();
     fmInfo() << "lingmoType" << lingmoType << "uosEditionType" << uosEdition;
 
-    bool ret = (DSysInfo::LingmoType::LingmoProfessional == lingmoType
-                || DSysInfo::LingmoType::LingmoPersonal == lingmoType
-                || DSysInfo::LingmoType::LingmoServer == lingmoType);
+    bool ret = (LSysInfo::LingmoType::LingmoProfessional == lingmoType
+                || LSysInfo::LingmoType::LingmoPersonal == lingmoType
+                || LSysInfo::LingmoType::LingmoServer == lingmoType);
 
 #if (DTK_VERSION >= DTK_VERSION_CHECK(5, 4, 7, 0))
     // 教育版
-    ret = ret || (DSysInfo::UosEdition::UosEducation == uosEdition ||
-                  DSysInfo::UosEdition::UosMilitary == uosEdition);
+    ret = ret || (LSysInfo::UosEdition::UosEducation == uosEdition ||
+                  LSysInfo::UosEdition::UosMilitary == uosEdition);
     fmInfo() << "check uos Edition" << ret;
 #endif
 
@@ -322,7 +322,7 @@ WaterMaskFrame::ConfigInfo WaterMaskFrame::defaultCfg(QJsonObject *configs)
             if (configs->contains("maskLogoUri"))
                 maskLogoUri = configs->value("maskLogoUri").toString();
         } else {
-            maskLogoUri = DSysInfo::distributionOrgLogo(DSysInfo::OrgType::Distribution, DSysInfo::LogoType::Transparent);
+            maskLogoUri = LSysInfo::distributionOrgLogo(LSysInfo::OrgType::Distribution, LSysInfo::LogoType::Transparent);
         }
 
         if (maskLogoUri.startsWith("~/"))

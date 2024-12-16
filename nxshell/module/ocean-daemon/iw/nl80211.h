@@ -230,7 +230,7 @@
  *	are like for %NL80211_CMD_SET_BEACON, and additionally parameters that
  *	do not change are used, these include %NL80211_ATTR_BEACON_INTERVAL,
  *	%NL80211_ATTR_DTIM_PERIOD, %NL80211_ATTR_SSID,
- *	%NL80211_ATTR_HIOCEANN_SSID, %NL80211_ATTR_CIPHERS_PAIRWISE,
+ *	%NL80211_ATTR_HIDDEN_SSID, %NL80211_ATTR_CIPHERS_PAIRWISE,
  *	%NL80211_ATTR_CIPHER_GROUP, %NL80211_ATTR_WPA_VERSIONS,
  *	%NL80211_ATTR_AKM_SUITES, %NL80211_ATTR_PRIVACY,
  *	%NL80211_ATTR_AUTH_TYPE, %NL80211_ATTR_INACTIVITY_TIMEOUT,
@@ -1530,7 +1530,7 @@ enum nl80211_commands {
  *	being a list of supported rates as defined by IEEE 802.11 7.3.2.2 but
  *	without the length restriction (at most %NL80211_MAX_SUPP_RATES).
  *
- * @NL80211_ATTR_HIOCEANN_SSID: indicates whether SSID is to be hioceann from Beacon
+ * @NL80211_ATTR_HIDDEN_SSID: indicates whether SSID is to be hioceann from Beacon
  *	and Probe Response (when response to wildcard Probe Request); see
  *	&enum nl80211_hioceann_ssid, represented as a u32
  *
@@ -2143,7 +2143,7 @@ enum nl80211_attrs {
 
 	NL80211_ATTR_SCAN_SUPP_RATES,
 
-	NL80211_ATTR_HIOCEANN_SSID,
+	NL80211_ATTR_HIDDEN_SSID,
 
 	NL80211_ATTR_IE_PROBE_RESP,
 	NL80211_ATTR_IE_ASSOC_RESP,
@@ -4395,18 +4395,18 @@ enum nl80211_rekey_data {
 };
 
 /**
- * enum nl80211_hioceann_ssid - values for %NL80211_ATTR_HIOCEANN_SSID
- * @NL80211_HIOCEANN_SSID_NOT_IN_USE: do not hide SSID (i.e., broadcast it in
+ * enum nl80211_hioceann_ssid - values for %NL80211_ATTR_HIDDEN_SSID
+ * @NL80211_HIDDEN_SSID_NOT_IN_USE: do not hide SSID (i.e., broadcast it in
  *	Beacon frames)
- * @NL80211_HIOCEANN_SSID_ZERO_LEN: hide SSID by using zero-length SSID element
+ * @NL80211_HIDDEN_SSID_ZERO_LEN: hide SSID by using zero-length SSID element
  *	in Beacon frames
- * @NL80211_HIOCEANN_SSID_ZERO_CONTENTS: hide SSID by using correct length of SSID
+ * @NL80211_HIDDEN_SSID_ZERO_CONTENTS: hide SSID by using correct length of SSID
  *	element in Beacon frames but zero out each byte in the SSID
  */
 enum nl80211_hioceann_ssid {
-	NL80211_HIOCEANN_SSID_NOT_IN_USE,
-	NL80211_HIOCEANN_SSID_ZERO_LEN,
-	NL80211_HIOCEANN_SSID_ZERO_CONTENTS
+	NL80211_HIDDEN_SSID_NOT_IN_USE,
+	NL80211_HIDDEN_SSID_ZERO_LEN,
+	NL80211_HIDDEN_SSID_ZERO_CONTENTS
 };
 
 /**

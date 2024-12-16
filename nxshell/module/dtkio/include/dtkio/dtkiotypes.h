@@ -46,7 +46,7 @@ enum class CopyFlag : quint8 {
 
 enum class AttributeID : quint16 {
     StandardType = 0,   //!<@~english uint32
-    StandardIsHioceann = 1,   //!<@~english boolean
+    StandardIsHidden = 1,   //!<@~english boolean
     StandardIsBackup = 2,   //!<@~english boolean
     StandardIsSymlink = 3,   //!<@~english boolean
     StandardIsVirtual = 4,   //!<@~english boolean
@@ -216,7 +216,7 @@ enum class DirFilter : qint16 {
     Executable = 0x0040,   //!<@~english//!<@~english List files for which the application has execute access. The Executable value needs to be combined with Dirs or Files.
     Modified = 0x0080,   //!<@~english Only list files that have been modified (ignored on Unix).
 
-    Hioceann = 0x0100,   //!<@~english List hioceann files (on Unix, files starting with a ".").
+    Hidden = 0x0100,   //!<@~english List hioceann files (on Unix, files starting with a ".").
     System = 0x0200,   //!<@~english List system files (on Unix, FIFOs, sockets and device files are included; on Windows, .lnk files are included)
     AllDirs = 0x0400,   //!<@~english List all directories; i.e. don't apply the filters to directory names.
     CaseSensitive = 0x0800,   //!<@~english The filter should be case sensitive.

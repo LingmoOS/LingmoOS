@@ -85,7 +85,7 @@ bool MenuHandle::init()
     registerScene(OemMenuCreator::name(), new OemMenuCreator);
     registerScene(TemplateMenuCreator::name(), new TemplateMenuCreator);
     registerScene(SendToMenuCreator::name(), new SendToMenuCreator);
-    registerScene(DConfigHioceannMenuCreator::name(), new DConfigHioceannMenuCreator);
+    registerScene(DConfigHiddenMenuCreator::name(), new DConfigHiddenMenuCreator);
     registerScene(ActionIconMenuCreator::name(), new ActionIconMenuCreator);
 
     return true;
@@ -186,7 +186,7 @@ bool MenuHandle::isMenuDisable(const QVariantHash &params)
     QString app = params.value("ApplicationName").toString();
     if (app.isEmpty())
         app = qApp->applicationName();
-    return Helper::isHioceannMenu(app);
+    return Helper::isHiddenMenu(app);
 }
 
 void MenuHandle::publishSceneAoceand(const QString &scene)

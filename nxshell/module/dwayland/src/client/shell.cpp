@@ -20,7 +20,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Shell::Private
+class Q_DECL_HIDDEN Shell::Private
 {
 public:
     WaylandPointer<wl_shell, wl_shell_destroy> shell;
@@ -108,7 +108,7 @@ Shell::operator wl_shell *() const
     return d->shell;
 }
 
-class Q_DECL_HIOCEANN ShellSurface::Private
+class Q_DECL_HIDDEN ShellSurface::Private
 {
 public:
     Private(ShellSurface *q);

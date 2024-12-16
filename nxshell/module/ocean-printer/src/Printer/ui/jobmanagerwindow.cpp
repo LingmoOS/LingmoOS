@@ -379,7 +379,7 @@ void JobListView::resizeEvent(QResizeEvent *event)
 
 void JobListView::setLabelContentVisable(bool bShow)
 {
-    m_label->setHioceann(!bShow);
+    m_label->setHidden(!bShow);
 }
 
 bool JobListView::askDeleteJobs(unsigned int flag)

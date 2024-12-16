@@ -34,12 +34,12 @@ void SideBarEventReceiver::bindEvents()
     dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_Remove", this, &SideBarEventReceiver::handleItemRemove);
     dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_Update", this, &SideBarEventReceiver::handleItemUpdate);
     dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_Insert", this, &SideBarEventReceiver::handleItemInsert);
-    dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_Hioceann", this, &SideBarEventReceiver::handleItemHioceann);
+    dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_Hidden", this, &SideBarEventReceiver::handleItemHidden);
     dpfSlotChannel->connect(kCurrentEventSpace, "slot_Item_TriggerEdit", this, &SideBarEventReceiver::handleItemTriggerEdit);
     dpfSlotChannel->connect(kCurrentEventSpace, "slot_Sidebar_UpdateSelection", this, &SideBarEventReceiver::handleSidebarUpdateSelection);
 }
 
-void SideBarEventReceiver::handleItemHioceann(const QUrl &url, bool visible)
+void SideBarEventReceiver::handleItemHidden(const QUrl &url, bool visible)
 {
     QList<SideBarWidget *> allSideBar = SideBarHelper::allSideBar();
     for (SideBarWidget *sidebar : allSideBar)

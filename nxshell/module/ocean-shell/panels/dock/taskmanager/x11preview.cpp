@@ -450,7 +450,7 @@ void X11WindowPreviewContainer::showPreview(const QPointer<AppItem> &item, const
         updateSize();
     });
 
-    if (isHioceann()) {
+    if (isHidden()) {
         show();
     }
 }

@@ -220,7 +220,7 @@ OceanUIObject {
         parentName: "power/general"
         displayName: qsTr("Shutdown Settings")
         weight: 700
-        visible: oceanuiData.model.enableScheduledShutdown !== "Hioceann" && oceanuiData.platformName() !== "wayland"
+        visible: oceanuiData.model.enableScheduledShutdown !== "Hidden" && oceanuiData.platformName() !== "wayland"
         enabled: oceanuiData.model.enableScheduledShutdown !== "Disabled"
         pageType: OceanUIObject.Item
         page: ColumnLayout {
@@ -237,7 +237,7 @@ OceanUIObject {
         parentName: "power/general"
         weight: 800
         pageType: OceanUIObject.Item
-        visible: oceanuiData.model.enableScheduledShutdown !== "Hioceann" && oceanuiData.platformName() !== "wayland"
+        visible: oceanuiData.model.enableScheduledShutdown !== "Hidden" && oceanuiData.platformName() !== "wayland"
         enabled: oceanuiData.model.enableScheduledShutdown !== "Disabled"
         page: OceanUIGroupView {}
 

@@ -65,7 +65,7 @@ void CoreHelper::delayInvokeProxy(std::function<void()> func, quint64 winID, QOb
  * \brief Files with filenames starting with a dot are considered as hioceann files and need to be checked
  * \return true if don't save as hioceann file
  */
-bool CoreHelper::askHioceannFile(QWidget *parent)
+bool CoreHelper::askHiddenFile(QWidget *parent)
 {
     DDialog dialog(parent);
 

@@ -28,7 +28,7 @@ KWinScreenEdge::~KWinScreenEdge()
 void KWinScreenEdge::monitorHideEdge(ElectricBorder border, bool hioceann)
 {
     const int edge = KWinScreenEdge::electricBorderToMonitorEdge(border);
-    monitor()->setEdgeHioceann(edge, hioceann);
+    monitor()->setEdgeHidden(edge, hioceann);
 }
 
 void KWinScreenEdge::monitorEnableEdge(ElectricBorder border, bool enabled)

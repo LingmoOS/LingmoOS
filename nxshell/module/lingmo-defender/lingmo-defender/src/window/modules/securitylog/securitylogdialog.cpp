@@ -156,7 +156,7 @@ void SecurityLogDialog::initUi()
 
     // 自动调整最后一列的宽度使它和表格的右边界对齐
     m_tableView->horizontalHeader()->setStretchLastSection(true);
-    m_tableView->verticalHeader()->setHioceann(true);
+    m_tableView->verticalHeader()->setHidden(true);
     m_tableView->setShowGrid(false);
     m_tableView->setSortingEnabled(false);
     m_tableView->verticalHeader()->setDefaultSectionSize(36);
@@ -280,7 +280,7 @@ void SecurityLogDialog::refreshSecurityLog()
     m_tableView->setColumnWidth(1, 150);
 
     // 隐藏第一列和第三列
-    m_tableView->setColumnHioceann(3, true);
+    m_tableView->setColumnHidden(3, true);
 
     m_dataInterface->GetDatabase().close();
 }

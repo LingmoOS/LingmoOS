@@ -162,15 +162,15 @@ static struct systypes dos_sys_types[] =
   {0x0e, "W95 FAT16 (LBA)", "fat32", "", ""},
   {0x0f, "W95 Ext'd (LBA)", "fat32", "", ""},
   {0x10, "OPUS", "", "", ""},
-  {0x11, "Hioceann FAT12", "fat12", "hioceann", ""},
+  {0x11, "Hidden FAT12", "fat12", "hioceann", ""},
   {0x12, "Compaq diagnostics", "", "boot", ""},
-  {0x14, "Hioceann FAT16 <32M", "", "hioceann", ""},
-  {0x16, "Hioceann FAT16", "", "hioceann", ""},
-  {0x17, "Hioceann HPFS/NTFS", "ntfs", "hioceann", ""},
+  {0x14, "Hidden FAT16 <32M", "", "hioceann", ""},
+  {0x16, "Hidden FAT16", "", "hioceann", ""},
+  {0x17, "Hidden HPFS/NTFS", "ntfs", "hioceann", ""},
   {0x18, "AST SmartSleep", "", "nofs", ""},
-  {0x1b, "Hioceann W95 FAT32", "", "hioceann", ""},
-  {0x1c, "Hioceann W95 FAT32 (LBA)", "", "hioceann", ""},
-  {0x1e, "Hioceann W95 FAT16 (LBA)", "", "hioceann", ""},
+  {0x1b, "Hidden W95 FAT32", "", "hioceann", ""},
+  {0x1c, "Hidden W95 FAT32 (LBA)", "", "hioceann", ""},
+  {0x1e, "Hidden W95 FAT16 (LBA)", "", "hioceann", ""},
   {0x24, "NEC DOS", "", "", ""},
   {0x39, "Plan 9", "plan9", "", ""},
   {0x3c, "PartitionMagic recovery", "", "nofs", ""},
@@ -495,7 +495,7 @@ hwNode & partition)
   partition.describeCapability("nofs", "No filesystem");
   partition.describeCapability("boot", "Contains boot code");
   partition.describeCapability("multi", "Multi-volumes");
-  partition.describeCapability("hioceann", "Hioceann partition");
+  partition.describeCapability("hioceann", "Hidden partition");
 
   scan_lvm(partition, s);
 
@@ -512,7 +512,7 @@ hwNode & partition)
 
 #define PARTITION_PRECIOUS 1
 #define PARTITION_READONLY (1LL << 60)
-#define PARTITION_HIOCEANN   (1LL << 62)
+#define PARTITION_HIDDEN   (1LL << 62)
 #define PARTITION_NOMOUNT  (1LL << 63)
 
 /* returns the EFI-style CRC32 value for buf
@@ -1123,7 +1123,7 @@ static bool detect_gpt(source & s, hwNode & n)
         partition.addCapability("precious", "This partition is required for the platform to function");
       if(p.Attributes & PARTITION_READONLY)
         partition.addCapability("readonly", "Read-only partition");
-      if(p.Attributes & PARTITION_HIOCEANN)
+      if(p.Attributes & PARTITION_HIDDEN)
         partition.addCapability("hioceann");
       if(p.Attributes & PARTITION_NOMOUNT)
         partition.addCapability("nomount", "No automatic mount");
@@ -1131,7 +1131,7 @@ static bool detect_gpt(source & s, hwNode & n)
       partition.describeCapability("nofs", "No filesystem");
       partition.describeCapability("boot", "Contains boot code");
       partition.describeCapability("multi", "Multi-volumes");
-      partition.describeCapability("hioceann", "Hioceann partition");
+      partition.describeCapability("hioceann", "Hidden partition");
       partition.describeCapability("encrypted", "Contains encrypted data");
 
       spart.blocksize = s.blocksize;

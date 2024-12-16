@@ -9,7 +9,7 @@
 #include "pluginmanagerinterface.h"
 
 #include <DNotifySender>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDebug>
 #include <QDir>

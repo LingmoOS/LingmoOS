@@ -9,7 +9,7 @@
 #include "dockscreen.h"
 #include "displaymanager.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformTheme>
 #include <DStyleHelper>
 

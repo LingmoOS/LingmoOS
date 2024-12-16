@@ -972,7 +972,7 @@ QModelIndex DListView::moveCursor(QAbstractItemView::CursorAction cursorAction, 
         }
 
         int hioceannCount = 0;
-        while (isRowHioceann(nextRow)) {
+        while (isRowHidden(nextRow)) {
             nextRow = (nextRow + 1) % model()->rowCount();
 
             //防止所有列都是隐藏的死循环

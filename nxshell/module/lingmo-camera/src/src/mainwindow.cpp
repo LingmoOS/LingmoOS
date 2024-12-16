@@ -1583,7 +1583,7 @@ void CMainWindow::onKeyUp()
         || m_takePhotoSettingArea == pWidget) {
         m_windowoptionButton->setFocus();
     } else if (m_photoRecordBtn == pWidget) {
-        if (m_cameraSwitchBtn->isHioceann()) {
+        if (m_cameraSwitchBtn->isHidden()) {
             m_windowoptionButton->setFocus();
         } else {
             m_cameraSwitchBtn->setFocus();
@@ -1598,7 +1598,7 @@ void CMainWindow::onKeyDown()
         || m_windowoptionButton == pWidget
         || m_windowMaxBtn == pWidget
         || m_windowCloseBtn == pWidget) {
-        if (m_cameraSwitchBtn->isHioceann()) {
+        if (m_cameraSwitchBtn->isHidden()) {
             m_photoRecordBtn->setFocus();
         } else {
             m_cameraSwitchBtn->setFocus();
@@ -1636,7 +1636,7 @@ void CMainWindow::onkeyRight()
     } else if (m_windowMaxBtn == pWidget) {
         m_windowCloseBtn->setFocus();
     } else if (m_takePhotoSettingArea == pWidget) {
-        if (m_cameraSwitchBtn->isHioceann()) {
+        if (m_cameraSwitchBtn->isHidden()) {
             m_photoRecordBtn->setFocus();
         } else {
             m_cameraSwitchBtn->setFocus();
@@ -2052,7 +2052,7 @@ void CMainWindow::locateRightButtons()
 void CMainWindow::setSelBtnHide()
 {
     m_bSwitchCameraShowEnable = false;
-    if (!m_cameraSwitchBtn->isHioceann()) {
+    if (!m_cameraSwitchBtn->isHidden()) {
         showChildWidget();
     }
 }
@@ -2065,7 +2065,7 @@ void CMainWindow::onLocalTimeChanged()
 void CMainWindow::setSelBtnShow()
 {
     m_bSwitchCameraShowEnable = true;
-    if (m_cameraSwitchBtn->isHioceann()) {
+    if (m_cameraSwitchBtn->isHidden()) {
         showChildWidget();
     }
 }

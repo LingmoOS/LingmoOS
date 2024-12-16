@@ -277,7 +277,7 @@
         <translation>Altijd tonen</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Altijd verbergen</translation>
     </message>
     <message>

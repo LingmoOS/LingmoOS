@@ -30,9 +30,9 @@ TEST_F(Ut_MemoryItemWidget, enterEvent)
     QEvent *e = new QEvent(QEvent::Type::MouseMove);
     m_memoryItemWidget->enterEvent(e);
     EXPECT_TRUE(m_memoryItemWidget->m_ishover);
-    EXPECT_FALSE(m_memoryItemWidget->m_btnplus->isHioceann());
-    EXPECT_FALSE(m_memoryItemWidget->m_btnminus->isHioceann());
-    EXPECT_FALSE(m_memoryItemWidget->m_btnclean->isHioceann());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnplus->isHidden());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnminus->isHidden());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnclean->isHidden());
     delete e;
     delete m_memoryItemWidget;
 }
@@ -43,9 +43,9 @@ TEST_F(Ut_MemoryItemWidget, leaveEvent)
     QEvent *e = new QEvent(QEvent::Type::MouseMove);
     m_memoryItemWidget->leaveEvent(e);
     EXPECT_FALSE(m_memoryItemWidget->m_ishover);
-    EXPECT_TRUE(m_memoryItemWidget->m_btnplus->isHioceann());
-    EXPECT_TRUE(m_memoryItemWidget->m_btnminus->isHioceann());
-    EXPECT_TRUE(m_memoryItemWidget->m_btnclean->isHioceann());
+    EXPECT_TRUE(m_memoryItemWidget->m_btnplus->isHidden());
+    EXPECT_TRUE(m_memoryItemWidget->m_btnminus->isHidden());
+    EXPECT_TRUE(m_memoryItemWidget->m_btnclean->isHidden());
     delete e;
     delete m_memoryItemWidget;
 }
@@ -153,8 +153,8 @@ TEST_F(Ut_MemoryItemWidget, setNextItemHover)
     MemoryItemWidget *m_memoryItemWidget = new MemoryItemWidget;
     m_memoryItemWidget->setNextItemHover();
     EXPECT_TRUE(m_memoryItemWidget->m_ishover);
-    EXPECT_FALSE(m_memoryItemWidget->m_btnplus->isHioceann());
-    EXPECT_FALSE(m_memoryItemWidget->m_btnminus->isHioceann());
-    EXPECT_FALSE(m_memoryItemWidget->m_btnclean->isHioceann());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnplus->isHidden());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnminus->isHidden());
+    EXPECT_FALSE(m_memoryItemWidget->m_btnclean->isHidden());
     delete m_memoryItemWidget;
 }

@@ -14,7 +14,7 @@
 #include <private/qquickitem_p.h>
 #include <private/qquickitemchangelistener_p.h>
 
-class Q_DECL_HIOCEANN MaskTextureCache {
+class Q_DECL_HIDDEN MaskTextureCache {
 public:
     class Texture : public QSharedData {
     public:
@@ -116,7 +116,7 @@ public:
     QSGLayer *sourceTexture;
 };
 
-class Q_DECL_HIOCEANN DQuickViewportCleanup : public QRunnable
+class Q_DECL_HIDDEN DQuickViewportCleanup : public QRunnable
 {
 public:
     DQuickViewportCleanup(QSGLayer *texture, MaskTextureCache::TextureData maskTexture,
@@ -136,7 +136,7 @@ public:
 };
 
 class PreprocessNode;
-class Q_DECL_HIOCEANN DQuickItemViewportPrivate : public DCORE_NAMESPACE::DObjectPrivate, public QQuickItemChangeListener
+class Q_DECL_HIDDEN DQuickItemViewportPrivate : public DCORE_NAMESPACE::DObjectPrivate, public QQuickItemChangeListener
 {
 public:
     enum DirtyStateBit {

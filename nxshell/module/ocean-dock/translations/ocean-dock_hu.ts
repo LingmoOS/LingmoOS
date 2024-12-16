@@ -277,7 +277,7 @@
         <translation>Folyamatosan látható</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Rejtett</translation>
     </message>
     <message>

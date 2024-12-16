@@ -162,7 +162,7 @@ bool ShortcutHelper::processKeyPressEvent(QKeyEvent *event)
     case Qt::ControlModifier:
         switch (event->key()) {
         case Qt::Key_H: {
-            toggleHioceannFiles();
+            toggleHiddenFiles();
             return true;
         }
         case Qt::Key_I: {
@@ -328,10 +328,10 @@ void ShortcutHelper::touchFolder()
     FileOperatorHelperIns->touchFolder(view);
 }
 
-void ShortcutHelper::toggleHioceannFiles()
+void ShortcutHelper::toggleHiddenFiles()
 {
-    bool isShowedHioceannFiles = Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool();
-    Application::instance()->setGenericAttribute(Application::kShowedHioceannFiles, !isShowedHioceannFiles);
+    bool isShowedHiddenFiles = Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool();
+    Application::instance()->setGenericAttribute(Application::kShowedHiddenFiles, !isShowedHiddenFiles);
 }
 
 void ShortcutHelper::showFilesProperty()

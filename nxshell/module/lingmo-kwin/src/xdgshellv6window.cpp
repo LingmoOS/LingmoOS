@@ -390,7 +390,7 @@ void XdgSurfaceV6Window::updateShowOnScreenEdge()
         return;
     }
     const PlasmaShellSurfaceInterface::PanelBehavior panelBehavior = m_plasmaShellSurface->panelBehavior();
-    if ((panelBehavior == PlasmaShellSurfaceInterface::PanelBehavior::AutoHide && isHioceann()) || panelBehavior == PlasmaShellSurfaceInterface::PanelBehavior::WindowsCanCover) {
+    if ((panelBehavior == PlasmaShellSurfaceInterface::PanelBehavior::AutoHide && isHidden()) || panelBehavior == PlasmaShellSurfaceInterface::PanelBehavior::WindowsCanCover) {
         // Screen edge API requires an edge, thus we need to figure out which edge the window borders.
         const QRect clientGeometry = frameGeometry().toRect(); // converted here to match output checks
         Qt::Edges edges;
@@ -1208,7 +1208,7 @@ void XdgToplevelV6Window::handleRoleCommit()
 void XdgToplevelV6Window::doMinimize()
 {
     if (isMinimized()) {
-        workspace()->windowHioceann(this);
+        workspace()->windowHidden(this);
     } else {
         Q_EMIT windowShown(this);
     }

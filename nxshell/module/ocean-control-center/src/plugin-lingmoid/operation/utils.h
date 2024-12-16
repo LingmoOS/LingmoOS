@@ -5,7 +5,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 
@@ -25,13 +25,13 @@ DCORE_USE_NAMESPACE
 #define LICENSE_INTERFACE QStringLiteral("com.lingmo.license.Info")
 
 
-const DSysInfo::UosType UosType = DSysInfo::uosType();
-const DSysInfo::UosEdition UosEdition = DSysInfo::uosEditionType();
-const bool IsServerSystem = (DSysInfo::UosServer == UosType);          // 是否是服务器版
-const bool IsCommunitySystem = (DSysInfo::UosCommunity == UosEdition); // 是否是社区版
-const bool IsProfessionalSystem = (DSysInfo::UosProfessional == UosEdition); // 是否是专业版
-const bool IsHomeSystem = (DSysInfo::UosHome == UosEdition);                 // 是否是个人版
-const bool IsLingmoDesktop = (DSysInfo::LingmoDesktop == DSysInfo::lingmoType()); // 是否是Lingmo桌面
+const LSysInfo::UosType UosType = LSysInfo::uosType();
+const LSysInfo::UosEdition UosEdition = LSysInfo::uosEditionType();
+const bool IsServerSystem = (LSysInfo::UosServer == UosType);          // 是否是服务器版
+const bool IsCommunitySystem = (LSysInfo::UosCommunity == UosEdition); // 是否是社区版
+const bool IsProfessionalSystem = (LSysInfo::UosProfessional == UosEdition); // 是否是专业版
+const bool IsHomeSystem = (LSysInfo::UosHome == UosEdition);                 // 是否是个人版
+const bool IsLingmoDesktop = (LSysInfo::LingmoDesktop == LSysInfo::lingmoType()); // 是否是Lingmo桌面
 
 
 #endif // UTILS_H

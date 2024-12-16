@@ -204,7 +204,7 @@ SideBarView::SideBarView(QWidget *parent)
 #endif
     setVerticalScrollMode(ScrollPerPixel);
     setIconSize(QSize(16, 16));
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     setMouseTracking(true);   // sp3 feature 35，解除注释以便鼠标在移动时就能触发 mousemoveevent
 
     setDragDropMode(QAbstractItemView::InternalMove);
@@ -765,16 +765,16 @@ void SideBarView::updateSeparatorVisibleState()
                 for (int j = 0; j < childCount; j++) {
                     if (!groupItem->index().isValid())
                         continue;
-                    bool hiden = this->isRowHioceann(j, groupItem->index());
+                    bool hiden = this->isRowHidden(j, groupItem->index());
                     if (!hiden) {
                         allChildIsHiden = false;
                         break;
                     }
                 }
                 if (allChildIsHiden || childCount <= 0)   // The top item dont have child item or they are hiden
-                    this->setRowHioceann(i, QModelIndex(), true);
+                    this->setRowHidden(i, QModelIndex(), true);
                 else   // sub item
-                    this->setRowHioceann(i, QModelIndex(), false);   // The other top be shown include its children
+                    this->setRowHidden(i, QModelIndex(), false);   // The other top be shown include its children
 
                 lastGroupName = item->group();
             }

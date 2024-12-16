@@ -34,8 +34,8 @@ static const char *const kMenuTypeKey = "X-OCEAN-FileManager-MenuTypes";
 static const char *const kMenuTypeAliasKey = "X-DFM-MenuTypes";
 static const char *const kMimeTypeExcludeKey = "X-OCEAN-FileManager-ExcludeMimeTypes";
 static const char *const kMimeTypeExcludeAliasKey = "X-DFM-ExcludeMimeTypes";
-static const char *const kMenuHioceannKey = "X-OCEAN-FileManager-NotShowIn";   // "Desktop", "Filemanager"
-static const char *const kMenuHioceannAliasKey = "X-DFM-NotShowIn";
+static const char *const kMenuHiddenKey = "X-OCEAN-FileManager-NotShowIn";   // "Desktop", "Filemanager"
+static const char *const kMenuHiddenAliasKey = "X-DFM-NotShowIn";
 static const char *const kSupportSchemesKey = "X-OCEAN-FileManager-SupportSchemes";
 static const char *const kSupportSchemesAliasKey = "X-DFM-SupportSchemes";
 static const char *const kSupportSuffixKey = "X-OCEAN-FileManager-SupportSuffix";   // for lingmo-compress *.7z.001,*.7z.002,*.7z.003...
@@ -69,8 +69,8 @@ OemMenuPrivate::OemMenuPrivate(OemMenu *qq)
               << kMultiFileDirs;
 
     actionProperties << kMimeType
-                     << kMenuHioceannKey
-                     << kMenuHioceannAliasKey
+                     << kMenuHiddenKey
+                     << kMenuHiddenAliasKey
                      << kMimeTypeExcludeKey
                      << kMimeTypeExcludeAliasKey
                      << kSupportSchemesKey
@@ -148,11 +148,11 @@ bool OemMenuPrivate::isActionShouldShow(const QAction *action, bool onDesktop) c
         return false;
 
     // X-DFM-NotShowIn not exist
-    if (!action->property(kMenuHioceannKey).isValid() && !action->property(kMenuHioceannAliasKey).isValid())
+    if (!action->property(kMenuHiddenKey).isValid() && !action->property(kMenuHiddenAliasKey).isValid())
         return true;
 
-    QStringList notShowInList = action->property(kMenuHioceannKey).toStringList();
-    notShowInList << action->property(kMenuHioceannAliasKey).toStringList();
+    QStringList notShowInList = action->property(kMenuHiddenKey).toStringList();
+    notShowInList << action->property(kMenuHiddenAliasKey).toStringList();
 
     return (onDesktop && !notShowInList.contains(kDesktop, Qt::CaseInsensitive))
             || (!onDesktop && !notShowInList.contains(kFilemanager, Qt::CaseInsensitive));

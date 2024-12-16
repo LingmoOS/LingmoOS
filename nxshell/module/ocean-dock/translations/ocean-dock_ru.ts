@@ -277,7 +277,7 @@
         <translation>Отображать Всегда</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Держать Скрытым</translation>
     </message>
     <message>

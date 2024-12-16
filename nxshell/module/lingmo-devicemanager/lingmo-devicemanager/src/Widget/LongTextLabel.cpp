@@ -8,7 +8,7 @@
 // Dtk头文件
 #include <DFontSizeManager>
 #include <DApplication>
-#include <DSysInfo>
+#include <LSysInfo>
 
 // Qt库文件
 #include <QLoggingCategory>

@@ -172,7 +172,7 @@ bool VaultFileInfo::isAttributes(const OptInfoType type) const
         [[fallthrough]];
     case FileIsType::kIsSymLink:
         [[fallthrough]];
-    case FileIsType::kIsHioceann:
+    case FileIsType::kIsHidden:
         return !proxy || proxy->isAttributes(type);
     default:
         return ProxyFileInfo::isAttributes(type);
@@ -246,7 +246,7 @@ int VaultFileInfo::countChildFile() const
     if (isAttributes(OptInfoType::kIsDir)) {
         QDir dir(pathOf(PathInfoType::kAbsoluteFilePath));
         QStringList entryList = dir.entryList(QDir::AllEntries | QDir::System
-                                              | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                              | QDir::NoDotAndDotDot | QDir::Hidden);
         return entryList.size();
     }
 

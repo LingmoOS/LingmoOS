@@ -1,0 +1,33 @@
+[Unit]
+Description=TreeLand session service
+StartLimitBurst=60
+CollectMode=inactive-or-failed
+
+Wants=treeland-sd.socket
+After=treeland-sd.socket
+
+Wants=treeland-sd.service
+Before=treeland-sd.service
+
+Wants=treeland-xwayland.service
+Before=treeland-xwayland.service
+
+Wants=treeland-shortcut.service
+Before=treeland-shortcut.service
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+[Service]
+ExecCondition=/bin/sh -c 'test "$XDG_SESSION_DESKTOP" = "treeland-user" || exit 2'
+Type=dbus
+BusName=org.lingmo.Compositor1
+UnsetEnvironment=DISPLAY
+UnsetEnvironment=WAYLAND_DISPLAY
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/treeland
+ExecStartPost=-/usr/bin/systemctl --user set-environment OCEAN_CURRENT_COMPOSITOR=TreeLand
+ExecStop=-/usr/bin/systemctl --user unset-environment OCEAN_CURRENT_COMPOSITOR
+Slice=session.slice
+Restart=on-failure
+RestartSec=1s

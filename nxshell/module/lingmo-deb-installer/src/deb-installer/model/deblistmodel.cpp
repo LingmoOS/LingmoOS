@@ -18,7 +18,7 @@
 #include "immutable/immutable_process_controller.h"
 
 #include <DDialog>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QApplication>
 #include <QDebug>

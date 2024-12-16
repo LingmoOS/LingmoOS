@@ -8,7 +8,7 @@
 
 #include <DGuiApplicationHelper>
 #include <DStyle>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QApplication>
 #include <QPainter>
@@ -31,12 +31,12 @@ IconWidget::IconWidget(QWidget *parent):
     m_blgPixmap(nullptr),
     centralLayout(nullptr)
 {
-    m_systemVersion = DSysInfo::minorVersion().toInt() ;
+    m_systemVersion = LSysInfo::minorVersion().toInt() ;
     setMouseTracking(true);
     setMinimumSize(PLUGIN_BACKGROUND_MIN_SIZE, PLUGIN_BACKGROUND_MIN_SIZE);
 
     QString iconName("screen-capture");
-    if(m_systemVersion >= 1070 || DSysInfo::lingmoType() == DSysInfo::LingmoDesktop){
+    if(m_systemVersion >= 1070 || LSysInfo::lingmoType() == LSysInfo::LingmoDesktop){
         iconName = "screenshot";
     }
     m_icon = QIcon::fromTheme(iconName, QIcon(QString(":/res/%1.svg").arg(iconName)));
@@ -143,7 +143,7 @@ void IconWidget::paintEvent(QPaintEvent *e)
 
     QPixmap pixmap;
     QString iconName = "screen-capture";
-    if(m_systemVersion >= 1070 || DSysInfo::lingmoType() == DSysInfo::LingmoDesktop){
+    if(m_systemVersion >= 1070 || LSysInfo::lingmoType() == LSysInfo::LingmoDesktop){
         iconName = "screenshot";
     }
     int iconSize = PLUGIN_ICON_MAX_SIZE;

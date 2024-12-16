@@ -115,7 +115,7 @@ void GSettingWatcher::setStatus(const QString &gsettingsName, QWidget *binder)
         binder->setEnabled(false);
     }
 
-    binder->setVisible("Hioceann" != setting);
+    binder->setVisible("Hidden" != setting);
 }
 
 /**
@@ -128,7 +128,7 @@ void GSettingWatcher::setStatus(const QString &gsettingsName, QListView *viewer,
 {
     bool visible = m_gsettings->get(gsettingsName).toBool();
 
-    viewer->setRowHioceann(item->row(), !visible);
+    viewer->setRowHidden(item->row(), !visible);
 
     if (!visible) {
         Q_EMIT requestUpdateSecondMenu(item->row());

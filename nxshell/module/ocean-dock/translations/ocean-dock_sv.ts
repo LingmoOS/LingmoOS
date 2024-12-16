@@ -277,7 +277,7 @@
         <translation>Behåll visad</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Behåll gömd</translation>
     </message>
     <message>

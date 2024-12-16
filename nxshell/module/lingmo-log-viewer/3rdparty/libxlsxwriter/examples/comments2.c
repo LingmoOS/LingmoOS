@@ -102,7 +102,7 @@ int main() {
                            "However, we can still override it locally.",
                            text_wrap);
 
-    lxw_comment_options options3b = {.visible = LXW_COMMENT_DISPLAY_HIOCEANN};
+    lxw_comment_options options3b = {.visible = LXW_COMMENT_DISPLAY_HIDDEN};
     worksheet_write_comment_opt(worksheet3, CELL("C9"), "Hello", &options3b);
 
 

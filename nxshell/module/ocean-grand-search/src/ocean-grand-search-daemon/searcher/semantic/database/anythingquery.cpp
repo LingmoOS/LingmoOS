@@ -109,7 +109,7 @@ bool AnythingQueryPrivate::searchUserPath(PushItemCallBack callBack, void *pdata
             auto absoluteFilePath = info.absoluteFilePath();
 
             // 过滤文管设置的隐藏文件
-            if (SpecialTools::isHioceannFile(absoluteFilePath, filter, QDir::homePath()))
+            if (SpecialTools::isHiddenFile(absoluteFilePath, filter, QDir::homePath()))
                 continue;
 
             // 去除掉添加的data前缀
@@ -237,7 +237,7 @@ bool AnythingQueryPrivate::searchByAnything(PushItemCallBack callBack, void *pda
 
                 // 过滤文管设置的隐藏文件
                 QHash<QString, QSet<QString>> hioceannFilters;
-                if (SpecialTools::isHioceannFile(path, hioceannFilters, QDir::homePath()))
+                if (SpecialTools::isHiddenFile(path, hioceannFilters, QDir::homePath()))
                     continue;
                 m_count++;
                 if (m_handler) {

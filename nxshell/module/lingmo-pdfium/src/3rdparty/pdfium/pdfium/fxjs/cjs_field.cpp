@@ -183,26 +183,26 @@ bool SetWidgetDisplayStatus(CPDFSDK_Widget* pWidget, int value) {
   switch (value) {
     case 0:
       dwFlag &= ~pdfium::annotation_flags::kInvisible;
-      dwFlag &= ~pdfium::annotation_flags::kHioceann;
+      dwFlag &= ~pdfium::annotation_flags::kHidden;
       dwFlag &= ~pdfium::annotation_flags::kNoView;
       dwFlag |= pdfium::annotation_flags::kPrint;
       break;
     case 1:
       dwFlag &= ~pdfium::annotation_flags::kInvisible;
       dwFlag &= ~pdfium::annotation_flags::kNoView;
-      dwFlag |= (pdfium::annotation_flags::kHioceann |
+      dwFlag |= (pdfium::annotation_flags::kHidden |
                  pdfium::annotation_flags::kPrint);
       break;
     case 2:
       dwFlag &= ~pdfium::annotation_flags::kInvisible;
       dwFlag &= ~pdfium::annotation_flags::kPrint;
-      dwFlag &= ~pdfium::annotation_flags::kHioceann;
+      dwFlag &= ~pdfium::annotation_flags::kHidden;
       dwFlag &= ~pdfium::annotation_flags::kNoView;
       break;
     case 3:
       dwFlag |= pdfium::annotation_flags::kNoView;
       dwFlag |= pdfium::annotation_flags::kPrint;
-      dwFlag &= ~pdfium::annotation_flags::kHioceann;
+      dwFlag &= ~pdfium::annotation_flags::kHidden;
       break;
   }
 
@@ -331,11 +331,11 @@ void SetDisplay(CPDFSDK_FormFillEnvironment* pFormFillEnv,
   }
 }
 
-void SetHioceann(CPDFSDK_FormFillEnvironment* pFormFillEnv,
+void SetHidden(CPDFSDK_FormFillEnvironment* pFormFillEnv,
                const WideString& swFieldName,
                int nControlIndex,
                bool b) {
-  int display = b ? 1 /*Hioceann*/ : 0 /*Visible*/;
+  int display = b ? 1 /*Hidden*/ : 0 /*Visible*/;
   SetDisplay(pFormFillEnv, swFieldName, nControlIndex, display);
 }
 
@@ -1155,7 +1155,7 @@ CJS_Result CJS_Field::get_display(CJS_Runtime* pRuntime) {
 
   uint32_t dwFlag = pWidget->GetFlags();
   if (pdfium::annotation_flags::kInvisible & dwFlag ||
-      pdfium::annotation_flags::kHioceann & dwFlag) {
+      pdfium::annotation_flags::kHidden & dwFlag) {
     return CJS_Result::Success(pRuntime->NewNumber(1));
   }
 
@@ -1350,7 +1350,7 @@ CJS_Result CJS_Field::get_hioceann(CJS_Runtime* pRuntime) {
   uint32_t dwFlags = pWidget->GetFlags();
   return CJS_Result::Success(
       pRuntime->NewBoolean(pdfium::annotation_flags::kInvisible & dwFlags ||
-                           pdfium::annotation_flags::kHioceann & dwFlags));
+                           pdfium::annotation_flags::kHidden & dwFlags));
 }
 
 CJS_Result CJS_Field::set_hioceann(CJS_Runtime* pRuntime,
@@ -1359,9 +1359,9 @@ CJS_Result CJS_Field::set_hioceann(CJS_Runtime* pRuntime,
     return CJS_Result::Failure(JSMessage::kReadOnlyError);
 
   if (m_bDelay) {
-    AddDelay_Bool(FP_HIOCEANN, pRuntime->ToBoolean(vp));
+    AddDelay_Bool(FP_HIDDEN, pRuntime->ToBoolean(vp));
   } else {
-    SetHioceann(m_pFormFillEnv.Get(), m_FieldName, m_nFormControlIndex,
+    SetHidden(m_pFormFillEnv.Get(), m_FieldName, m_nFormControlIndex,
               pRuntime->ToBoolean(vp));
   }
   return CJS_Result::Success();
@@ -2636,8 +2636,8 @@ void CJS_Field::DoDelay(CPDFSDK_FormFillEnvironment* pFormFillEnv,
       SetDisplay(pFormFillEnv, pData->sFieldName, pData->nControlIndex,
                  pData->num);
       break;
-    case FP_HIOCEANN:
-      SetHioceann(pFormFillEnv, pData->sFieldName, pData->nControlIndex,
+    case FP_HIDDEN:
+      SetHidden(pFormFillEnv, pData->sFieldName, pData->nControlIndex,
                 pData->b);
       break;
     case FP_LINEWIDTH:

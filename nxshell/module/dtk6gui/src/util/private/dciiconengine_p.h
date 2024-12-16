@@ -13,7 +13,7 @@
 
 DGUI_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN DDciIconEngine : public QIconEngine
+class Q_DECL_HIDDEN DDciIconEngine : public QIconEngine
 {
 public:
     explicit DDciIconEngine(const QString &iconName);

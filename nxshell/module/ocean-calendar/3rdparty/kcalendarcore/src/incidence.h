@@ -901,8 +901,8 @@ private:
      */
     Incidence &operator=(const Incidence &other);
 
-    Q_DECL_HIOCEANN QVariantList attachmentsVariant() const;
-    Q_DECL_HIOCEANN QVariantList conferencesVariant() const;
+    Q_DECL_HIDDEN QVariantList attachmentsVariant() const;
+    Q_DECL_HIDDEN QVariantList conferencesVariant() const;
 
     //@cond PRIVATE
     class Private;

@@ -284,10 +284,10 @@ void WorkspaceHelper::setViewFilter(const quint64 windowID, const QDir::Filters 
     FileView *view = findFileViewByWindowID(windowID);
     if (view) {
         QDir::Filters filters = filter;
-        if (Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool()) {
-            filters = filters | QDir::Hioceann;
+        if (Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool()) {
+            filters = filters | QDir::Hidden;
         } else {
-            filters = filters & QDir::Filter(~QDir::Hioceann);
+            filters = filters & QDir::Filter(~QDir::Hidden);
         }
         view->model()->setFilters(filters);
     }

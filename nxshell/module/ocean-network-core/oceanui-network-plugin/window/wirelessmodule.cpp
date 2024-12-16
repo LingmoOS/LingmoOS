@@ -146,11 +146,11 @@ void WirelessModule::onApWidgetEditRequested(AccessPoints *ap, QWidget *parent)
     QString uuid;
     QString apPath;
     QString ssid;
-    bool isHioceann = true;
+    bool isHidden = true;
     if (ap) {
         ssid = ap->ssid();
         apPath = ap->path();
-        isHioceann = ap->hioceann();
+        isHidden = ap->hioceann();
 
         for (auto conn : NetworkManager::activeConnections()) {
             if (conn->type() != NetworkManager::ConnectionSettings::ConnectionType::Wireless || conn->id() != ssid)
@@ -182,7 +182,7 @@ void WirelessModule::onApWidgetEditRequested(AccessPoints *ap, QWidget *parent)
             }
         }
     }
-    ConnectionWirelessEditPage *apEditPage = new ConnectionWirelessEditPage(m_device->path(), uuid, apPath, isHioceann, parent);
+    ConnectionWirelessEditPage *apEditPage = new ConnectionWirelessEditPage(m_device->path(), uuid, apPath, isHidden, parent);
     apEditPage->setAttribute(Qt::WA_DeleteOnClose);
     connect(apEditPage, &ConnectionWirelessEditPage::disconnect, this, [this] {
         m_device->disconnectNetwork();

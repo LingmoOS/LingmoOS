@@ -15,7 +15,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN BlitTextureProvider : public QSGTextureProvider {
+class Q_DECL_HIDDEN BlitTextureProvider : public QSGTextureProvider {
 public:
     BlitTextureProvider()
         : QSGTextureProvider()
@@ -35,7 +35,7 @@ private:
 };
 
 class Content;
-class Q_DECL_HIOCEANN DQuickBackdropBlitterPrivate : public DCORE_NAMESPACE::DObjectPrivate
+class Q_DECL_HIDDEN DQuickBackdropBlitterPrivate : public DCORE_NAMESPACE::DObjectPrivate
 {
 public:
     DQuickBackdropBlitterPrivate(DQuickBackdropBlitter *qq)
@@ -71,7 +71,7 @@ public:
     mutable BlitTextureProvider *tp = nullptr;
 };
 
-class Q_DECL_HIOCEANN Content : public QQuickItem
+class Q_DECL_HIDDEN Content : public QQuickItem
 {
 public:
     explicit Content(DQuickBackdropBlitter *parent)

@@ -45,7 +45,7 @@ enum wm_state_t {
     kShadedState,
     kSkipTaskbarState,
     kSkipPagerState,
-    kHioceannState,
+    kHiddenState,
     kFullScreenState,
     kAboveState,
     kBelowState,
@@ -239,7 +239,7 @@ TEST_F(UT_WMInfo, test_selectWindow_004)
     wmExtchild->parent = 1000;
     wmExtchild->map_state = kViewableState;
     wmExtchild->wclass = kInputOutputClass;
-    wmExtchild->states << kHioceannState;
+    wmExtchild->states << kHiddenState;
     m_childRootWinExtInfo.reset(wmExtchild);
 
     m_tester->m_tree->cache[2000] = std::move(m_childRootWinExtInfo);
@@ -378,7 +378,7 @@ TEST_F(UT_WMInfo, test_getHoveredByWindowList_006)
     wmExtchild->parent = 1000;
     wmExtchild->map_state = kViewableState;
     wmExtchild->wclass = kInputOutputClass;
-    wmExtchild->states << kHioceannState;
+    wmExtchild->states << kHiddenState;
     m_childRootWinExtInfo.reset(wmExtchild);
 
     m_tester->m_tree->cache[2000] = std::move(m_childRootWinExtInfo);
@@ -486,7 +486,7 @@ TEST_F(UT_WMInfo, test_findDockWindows_005)
     wmExtchild->parent = 1000;
     wmExtchild->map_state = kViewableState;
     wmExtchild->wclass = kInputOutputClass;
-    wmExtchild->states << kHioceannState;
+    wmExtchild->states << kHiddenState;
     m_childRootWinExtInfo.reset(wmExtchild);
 
     m_tester->m_tree->cache[2000] = std::move(m_childRootWinExtInfo);

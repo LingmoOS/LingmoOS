@@ -118,7 +118,7 @@ struct TypeOf<optional<T>> {
 };
 
 // DAP_OFFSETOF() macro is a generalization of the offsetof() macro defined in
-// <cstoceanf>. It evaluates to the offset of the given field, with fewer
+// <cstddef>. It evaluates to the offset of the given field, with fewer
 // restrictions than offsetof(). We cast the address '32' and subtract it again,
 // because null-dereference is undefined behavior.
 #define DAP_OFFSETOF(s, m) \

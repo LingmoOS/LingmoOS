@@ -268,7 +268,7 @@ void DmTreeviewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         //        // 获取分区是否隐藏
         //        int hide = 0;
         //        if (data.mountpoints.isEmpty() || data.mountpoints == "/recovery") {
-        //            int result = DMDbusHandler::instance()->getPartitionHioceannFlag(data.diskpath, data.partitonpath);
+        //            int result = DMDbusHandler::instance()->getPartitionHiddenFlag(data.diskpath, data.partitonpath);
         //            if (1 == result) {
         //                hide = 1;
         //            }

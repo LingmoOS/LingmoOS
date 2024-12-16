@@ -17,7 +17,7 @@
 #include <DPasswordEdit>
 #include <DCommandLinkButton>
 #include <DPaletteHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QVBoxLayout>
 #include <QScrollBar>

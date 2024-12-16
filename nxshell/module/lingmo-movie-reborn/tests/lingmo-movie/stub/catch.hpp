@@ -324,12 +324,12 @@ namespace Catch {
   #  endif // __has_include(<optional>) && defined(CATCH_CPP17_OR_GREATER)
 
   // Check if byte is available and usable
-  #  if __has_include(<cstoceanf>) && defined(CATCH_CPP17_OR_GREATER)
-  #    include <cstoceanf>
+  #  if __has_include(<cstddef>) && defined(CATCH_CPP17_OR_GREATER)
+  #    include <cstddef>
   #    if __cpp_lib_byte > 0
   #      define CATCH_INTERNAL_CONFIG_CPP17_BYTE
   #    endif
-  #  endif // __has_include(<cstoceanf>) && defined(CATCH_CPP17_OR_GREATER)
+  #  endif // __has_include(<cstddef>) && defined(CATCH_CPP17_OR_GREATER)
 
   // Check if variant is available and usable
   #  if __has_include(<variant>) && defined(CATCH_CPP17_OR_GREATER)
@@ -595,7 +595,7 @@ namespace Catch {
 // end catch_interfaces_testcase.h
 // start catch_stringref.h
 
-#include <cstoceanf>
+#include <cstddef>
 #include <string>
 #include <iosfwd>
 #include <cassert>
@@ -1415,13 +1415,13 @@ namespace Catch {
 // start catch_tostring.h
 
 #include <vector>
-#include <cstoceanf>
+#include <cstddef>
 #include <type_traits>
 #include <string>
 // start catch_stream.h
 
 #include <iosfwd>
-#include <cstoceanf>
+#include <cstddef>
 #include <ostream>
 
 namespace Catch {
@@ -2824,7 +2824,7 @@ namespace Catch {
 
 // start catch_totals.h
 
-#include <cstoceanf>
+#include <cstddef>
 
 namespace Catch {
 
@@ -4769,7 +4769,7 @@ namespace Catch {
     struct TestCaseInfo {
         enum SpecialProperties{
             None = 0,
-            IsHioceann = 1 << 1,
+            IsHidden = 1 << 1,
             ShouldFail = 1 << 2,
             MayFail = 1 << 3,
             Throws = 1 << 4,
@@ -4785,7 +4785,7 @@ namespace Catch {
 
         friend void setTags( TestCaseInfo& testCaseInfo, std::vector<std::string> tags );
 
-        bool isHioceann() const;
+        bool isHidden() const;
         bool throws() const;
         bool okToFail() const;
         bool expectedToFail() const;
@@ -6946,7 +6946,7 @@ namespace Catch {
 #include <tuple>
 #include <cmath>
 #include <utility>
-#include <cstoceanf>
+#include <cstddef>
 #include <random>
 
 namespace Catch {
@@ -10385,7 +10385,7 @@ namespace Catch {
 #  include <cassert>
 #  include <sys/types.h>
 #  include <unistd.h>
-#  include <cstoceanf>
+#  include <cstddef>
 #  include <ostream>
 
 #ifdef __apple_build_version__
@@ -11199,7 +11199,7 @@ namespace Catch {
 
         auto matchedTestCases = filterTests( getAllTestCasesSorted( config ), testSpec, config );
         for( auto const& testCaseInfo : matchedTestCases ) {
-            Colour::Code colour = testCaseInfo.isHioceann()
+            Colour::Code colour = testCaseInfo.isHidden()
                 ? Colour::SecondaryText
                 : Colour::None;
             Colour colourGuard( colour );
@@ -13233,7 +13233,7 @@ namespace Catch {
 
                 if (m_matches.empty() && invalidArgs.empty()) {
                     for (auto const& test : allTestCases)
-                        if (!test.isHioceann())
+                        if (!test.isHidden())
                             m_tests.emplace(&test);
                 } else {
                     for (auto const& match : m_matches)
@@ -13920,7 +13920,7 @@ namespace Catch {
         TestCaseInfo::SpecialProperties parseSpecialTag( std::string const& tag ) {
             if( startsWith( tag, '.' ) ||
                 tag == "!hide" )
-                return TestCaseInfo::IsHioceann;
+                return TestCaseInfo::IsHidden;
             else if( tag == "!throws" )
                 return TestCaseInfo::Throws;
             else if( tag == "!shouldfail" )
@@ -13930,7 +13930,7 @@ namespace Catch {
             else if( tag == "!nonportable" )
                 return TestCaseInfo::NonPortable;
             else if( tag == "!benchmark" )
-                return static_cast<TestCaseInfo::SpecialProperties>( TestCaseInfo::Benchmark | TestCaseInfo::IsHioceann );
+                return static_cast<TestCaseInfo::SpecialProperties>( TestCaseInfo::Benchmark | TestCaseInfo::IsHidden );
             else
                 return TestCaseInfo::None;
         }
@@ -13950,7 +13950,7 @@ namespace Catch {
                             NameAndTags const& nameAndTags,
                             SourceLineInfo const& _lineInfo )
     {
-        bool isHioceann = false;
+        bool isHidden = false;
 
         // Parse out tags
         std::vector<std::string> tags;
@@ -13966,8 +13966,8 @@ namespace Catch {
             else {
                 if( c == ']' ) {
                     TestCaseInfo::SpecialProperties prop = parseSpecialTag( tag );
-                    if( ( prop & TestCaseInfo::IsHioceann ) != 0 )
-                        isHioceann = true;
+                    if( ( prop & TestCaseInfo::IsHidden ) != 0 )
+                        isHidden = true;
                     else if( prop == TestCaseInfo::None )
                         enforceNotReservedTag( tag, _lineInfo );
 
@@ -13985,7 +13985,7 @@ namespace Catch {
                     tag += c;
             }
         }
-        if( isHioceann ) {
+        if( isHidden ) {
             // Add all "hioceann" tags to make them behave identically
             tags.insert( tags.end(), { ".", "!hide" } );
         }
@@ -14021,8 +14021,8 @@ namespace Catch {
         setTags( *this, _tags );
     }
 
-    bool TestCaseInfo::isHioceann() const {
-        return ( properties & IsHioceann ) != 0;
+    bool TestCaseInfo::isHidden() const {
+        return ( properties & IsHidden ) != 0;
     }
     bool TestCaseInfo::throws() const {
         return ( properties & Throws ) != 0;
@@ -14178,7 +14178,7 @@ namespace Catch {
         std::vector<TestCase> filtered;
         filtered.reserve( testCases.size() );
         for (auto const& testCase : testCases) {
-            if ((!testSpec.hasFilters() && !testCase.isHioceann()) ||
+            if ((!testSpec.hasFilters() && !testCase.isHidden()) ||
                 (testSpec.hasFilters() && matchTest(testCase, testSpec, config))) {
                 filtered.push_back(testCase);
             }
@@ -15039,7 +15039,7 @@ std::string StringMaker<wchar_t *>::convert(wchar_t * str) {
 #endif
 
 #if defined(CATCH_CONFIG_CPP17_BYTE)
-#include <cstoceanf>
+#include <cstddef>
 std::string StringMaker<std::byte>::convert(std::byte value) {
     return ::Catch::Detail::stringify(std::to_integer<unsigned long long>(value));
 }

@@ -29,7 +29,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::OccurrenceIterator::Private
+class Q_DECL_HIDDEN KCalendarCore::OccurrenceIterator::Private
 {
 public:
     Private(OccurrenceIterator *qq)
@@ -67,7 +67,7 @@ public:
      * When filtering completed to-dos, the CalFilter doesn't hide
      * them if it's a recurring to-do.
      */
-    bool occurrenceIsHioceann(const Calendar &calendar, const Incidence::Ptr &inc, const QDateTime &occurrenceDate)
+    bool occurrenceIsHidden(const Calendar &calendar, const Incidence::Ptr &inc, const QDateTime &occurrenceDate)
     {
         if ((inc->type() == Incidence::TypeTodo) && calendar.filter() && (calendar.filter()->criteria() & KCalendarCore::CalFilter::HideCompletedTodos)) {
             if (inc->recurs()) {
@@ -128,7 +128,7 @@ public:
                         occurrenceStartDate = occurrenceStartDate.addSecs(offset);
                     }
 
-                    if (!occurrenceIsHioceann(calendar, incidence, occurrenceStartDate)) {
+                    if (!occurrenceIsHidden(calendar, incidence, occurrenceStartDate)) {
                         occurrenceList << Private::Occurrence(incidence, recurrenceId, occurrenceStartDate);
                     }
 

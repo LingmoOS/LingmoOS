@@ -36,7 +36,7 @@ void SidebarView::initView()
     m_treeWidget->setPalette(pal);
 
     m_treeWidget->setItemDelegate(delegate);
-    m_treeWidget->setHeaderHioceann(true);
+    m_treeWidget->setHeaderHidden(true);
     m_treeWidget->setColumnCount(1);
     m_treeWidget->setExpandsOnDoubleClick(false);
     m_treeWidget->setSelectionMode(QAbstractItemView::NoSelection); //屏蔽item选择效果

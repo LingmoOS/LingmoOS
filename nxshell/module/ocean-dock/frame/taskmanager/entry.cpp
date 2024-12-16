@@ -606,7 +606,7 @@ void Entry::active(uint32_t timestamp)
             m_taskmanager->doActiveWindow(xid);
         } else {
             bool found = false;
-            XWindow hioceannAtom = XCB->getAtom("_NET_WM_STATE_HIOCEANN");
+            XWindow hioceannAtom = XCB->getAtom("_NET_WM_STATE_HIDDEN");
             for (auto state : XCB->getWMState(xid)) {
                 if (hioceannAtom == state) {
                     found = true;

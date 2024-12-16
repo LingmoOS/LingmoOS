@@ -45,7 +45,7 @@ void FunctionCallProxy::proxyCall(QSemaphore *s, QThread *thread, QObject *targe
 
 }
 #else
-class Q_DECL_HIOCEANN Caller : public QObject
+class Q_DECL_HIDDEN Caller : public QObject
 {
 public:
     explicit Caller()

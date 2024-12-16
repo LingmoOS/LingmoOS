@@ -277,7 +277,7 @@
         <translation>常に表示</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>常に非表示</translation>
     </message>
     <message>

@@ -522,7 +522,7 @@ void SearchEditWidget::updateCompletionState(const QString &text)
 
 void SearchEditWidget::doComplete()
 {
-    if (completerView->isHioceann()) {
+    if (completerView->isHidden()) {
         urlCompleter->complete(searchEdit->lineEdit()->rect().adjusted(0, 5, 0, 5));
     } else {
         urlCompleter->metaObject()->invokeMethod(urlCompleter, "_q_autoResizePopup");

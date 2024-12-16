@@ -9,7 +9,7 @@
 #include "utils/waylandmousesimulator.h"
 #endif
 #include <DDialog>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DWindowManagerHelper>
 #include <DForeignWindow>
 
@@ -201,22 +201,22 @@ void Utils::cancelInputEvent1(const int wid, const short x, const short y, const
 // 判断系统是否是大于1040, 大于1040才显示录制时长功能。
 bool Utils::isSysHighVersion1040()
 {
-    if (DSysInfo::isLingmo()) {
+    if (LSysInfo::isLingmo()) {
         bool correct = false;
-        QString sysVersion = DSysInfo::minorVersion();
+        QString sysVersion = LSysInfo::minorVersion();
         float version = sysVersion.toFloat(&correct);
-        qDebug() << DSysInfo::uosEditionName() << DSysInfo::uosEditionType() << " System Version:" << sysVersion << correct << sysVersion.split('.');
-        if (DSysInfo::UosProfessional == DSysInfo::uosEditionType() || DSysInfo::UosEducation == DSysInfo::uosEditionType()) {
+        qDebug() << LSysInfo::uosEditionName() << LSysInfo::uosEditionType() << " System Version:" << sysVersion << correct << sysVersion.split('.');
+        if (LSysInfo::UosProfessional == LSysInfo::uosEditionType() || LSysInfo::UosEducation == LSysInfo::uosEditionType()) {
             const float versionProfessional = 1040;
             if (correct && (version >= versionProfessional)) {
                 return true;
             }
-        } else if (DSysInfo::UosHome == DSysInfo::uosEditionType()) {
+        } else if (LSysInfo::UosHome == LSysInfo::uosEditionType()) {
             const float versionHome = 21.3f;
             if (correct && (version >= versionHome)) {
                 return true;
             }
-        } else if (DSysInfo::UosCommunity == DSysInfo::uosEditionType()) {
+        } else if (LSysInfo::UosCommunity == LSysInfo::uosEditionType()) {
             const float versionCommunity = 20.6f;
             QStringList v = sysVersion.split('.');
             if (!correct && v.size() > 2) {
@@ -234,16 +234,16 @@ bool Utils::isSysHighVersion1040()
 
 void Utils::showCurrentSys()
 {
-    qInfo() << "isLingmo: " << DSysInfo::isLingmo();
-    qInfo() << "isOCEAN: " << DSysInfo::isOCEAN();
-    qInfo() << "SystemName: " << DSysInfo::uosSystemName();
-    qInfo() << "EditionName: " << DSysInfo::uosEditionName();
-    qInfo() << "ProductTypeName: " << DSysInfo::uosProductTypeName();
-    qInfo() << "SystemVersion: " << DSysInfo::minorVersion();
-    //qDebug() << "spVersion: " << DSysInfo::spVersion();
-    //qDebug() << "udpateVersion: " << DSysInfo::udpateVersion();
-    //qDebug() << "majorVersion: " << DSysInfo::majorVersion();
-    //qDebug() << "majorVersion: " << DSysInfo::majorVersion();
+    qInfo() << "isLingmo: " << LSysInfo::isLingmo();
+    qInfo() << "isOCEAN: " << LSysInfo::isOCEAN();
+    qInfo() << "SystemName: " << LSysInfo::uosSystemName();
+    qInfo() << "EditionName: " << LSysInfo::uosEditionName();
+    qInfo() << "ProductTypeName: " << LSysInfo::uosProductTypeName();
+    qInfo() << "SystemVersion: " << LSysInfo::minorVersion();
+    //qDebug() << "spVersion: " << LSysInfo::spVersion();
+    //qDebug() << "udpateVersion: " << LSysInfo::udpateVersion();
+    //qDebug() << "majorVersion: " << LSysInfo::majorVersion();
+    //qDebug() << "majorVersion: " << LSysInfo::majorVersion();
 }
 
 void Utils::enableXGrabButton()
@@ -433,10 +433,10 @@ bool Utils::checkCpuIsZhaoxin()
 //获取处理器名称
 QString Utils::getCpuModelName()
 {
-    if (DSysInfo::cpuModelName().isNull()) {
+    if (LSysInfo::cpuModelName().isNull()) {
         return "";
     }
-    return DSysInfo::cpuModelName();
+    return LSysInfo::cpuModelName();
 }
 
 void Utils::notSupportWarn()

@@ -597,7 +597,7 @@ void DetailTreeView::showTips(QTableWidgetItem *item)
     if (item && item == mp_OldItem) {
         // 通过计时器控制toolTips的刷新
         qint64 curMS = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (curMS - m_TimeStep > 1000 && mp_ToolTips->isHioceann()) {
+        if (curMS - m_TimeStep > 1000 && mp_ToolTips->isHidden()) {
             // tooltips内容
             QString text = item->text();
 

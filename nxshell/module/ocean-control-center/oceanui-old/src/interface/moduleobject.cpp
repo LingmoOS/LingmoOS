@@ -5,12 +5,12 @@
 
 #include <QWidget>
 
-#define DCC_HIOCEANN 0x80000000
+#define DCC_HIDDEN 0x80000000
 #define DCC_DISABLED 0x40000000
 
 // 0xA0000000 = 0x80000000|0x20000000 0x80000000为用户设置位 0x20000000为配置设置位
 // 0x50000000 = 0x40000000|0x10000000 0x4000000为用户设置位 0x10000000为配置设置位
-#define DCC_ALL_HIOCEANN 0xA0000000
+#define DCC_ALL_HIDDEN 0xA0000000
 #define DCC_ALL_DISABLED 0x50000000
 
 #define DCC_EXTRA 0x00800000 // 扩展按钮(子项)
@@ -42,7 +42,7 @@ public:
         const QString SPLIT_CHAR = QObject::tr(", ");
         QString description;
         for (const auto child : q->childrens()) {
-            if (child->isHioceann())
+            if (child->isHidden())
                 continue;
             const auto &name = child->displayName();
             if (!name.isEmpty())
@@ -151,9 +151,9 @@ QWidget *ModuleObject::activePage(bool autoActive)
 {
     if (autoActive)
         active();
-    QWidget *w = ModuleObject::IsHioceann(this) ? nullptr : page();
+    QWidget *w = ModuleObject::IsHidden(this) ? nullptr : page();
     // 处理page中修改隐藏状态
-    if (w && ModuleObject::IsHioceann(this)) {
+    if (w && ModuleObject::IsHidden(this)) {
         delete w;
         w = nullptr;
     }
@@ -220,14 +220,14 @@ int ModuleObject::badge() const
     return d->m_badge;
 }
 
-bool ModuleObject::isHioceann() const
+bool ModuleObject::isHidden() const
 {
-    return getFlagState(DCC_HIOCEANN);
+    return getFlagState(DCC_HIDDEN);
 }
 
 bool ModuleObject::isVisible() const
 {
-    return !isHioceann();
+    return !isHidden();
 }
 
 bool ModuleObject::isDisabled() const
@@ -245,15 +245,15 @@ unsigned ModuleObject::GetCurrentVersion()
     return c_currentVersion;
 }
 
-void ModuleObject::setHioceann(bool hioceann)
+void ModuleObject::setHidden(bool hioceann)
 {
-    setFlagState(DCC_HIOCEANN, hioceann);
+    setFlagState(DCC_HIDDEN, hioceann);
     Q_EMIT visibleChanged();
 }
 
 void ModuleObject::setVisible(bool visible)
 {
-    setHioceann(!visible);
+    setHidden(!visible);
 }
 
 void ModuleObject::setDisabled(bool disabled)
@@ -446,7 +446,7 @@ ModuleObject *ModuleObject::defultModule()
     Q_D(const ModuleObject);
     // 第一个可见项
     for (auto &&module : d->m_childrens) {
-        if (!ModuleObject::IsHioceann(module) && !module->extra())
+        if (!ModuleObject::IsHidden(module) && !module->extra())
             return module;
     }
     return nullptr;
@@ -535,17 +535,17 @@ int ModuleObject::findChild(ModuleObject *const module, ModuleObject *const chil
 
 bool ModuleObject::IsVisible(ModuleObject *const module)
 {
-    return !ModuleObject::IsHioceann(module);
+    return !ModuleObject::IsHidden(module);
 }
 
-bool ModuleObject::IsHioceann(ModuleObject *const module)
+bool ModuleObject::IsHidden(ModuleObject *const module)
 {
-    return module ? module->getFlagState(DCC_ALL_HIOCEANN) : true;
+    return module ? module->getFlagState(DCC_ALL_HIDDEN) : true;
 }
 
-bool ModuleObject::IsHioceannFlag(uint32_t flag)
+bool ModuleObject::IsHiddenFlag(uint32_t flag)
 {
-    return DCC_ALL_HIOCEANN & flag;
+    return DCC_ALL_HIDDEN & flag;
 }
 
 bool ModuleObject::IsEnabled(ModuleObject *const module)

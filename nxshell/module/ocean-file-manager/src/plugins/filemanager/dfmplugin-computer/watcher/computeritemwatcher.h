@@ -60,8 +60,8 @@ public:
 
     static bool hideUserDir();
     static bool hide3rdEntries();
-    static QList<QUrl> disksHioceannByDConf();
-    static QList<QUrl> disksHioceannBySettingPanel();
+    static QList<QUrl> disksHiddenByDConf();
+    static QList<QUrl> disksHiddenBySettingPanel();
     static QList<QUrl> hioceannPartitions();
 
     QHash<QUrl, QVariantMap> getComputerInfos() const;

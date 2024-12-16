@@ -277,7 +277,7 @@
         <translation>Görünsün</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Gizlədilsin</translation>
     </message>
     <message>

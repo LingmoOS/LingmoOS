@@ -27,7 +27,7 @@
 #include <QPropertyAnimation>
 #include <player_widget.h>
 #include <player_engine.h>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QPainterPath>
 
 #include <player_engine.h>

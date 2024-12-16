@@ -277,7 +277,7 @@
         <translation>Mostra sempre</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Lascia nascosta</translation>
     </message>
     <message>

@@ -112,7 +112,7 @@ TEST_F(UT_MainWindow, test_popupSettingsDialog_01)
 TEST_F(UT_MainWindow, test_initUI_01)
 {
     m_tester->initUI();
-    EXPECT_EQ(m_tester->m_tbShadow->isHioceann(), false);
+    EXPECT_EQ(m_tester->m_tbShadow->isHidden(), false);
 }
 
 TEST_F(UT_MainWindow, test_initConnections_01)

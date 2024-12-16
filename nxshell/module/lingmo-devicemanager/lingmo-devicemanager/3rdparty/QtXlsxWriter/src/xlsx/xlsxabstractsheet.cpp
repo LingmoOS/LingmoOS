@@ -60,8 +60,8 @@ AbstractSheetPrivate::~AbstractSheetPrivate()
   \enum AbstractSheet::SheetState
 
   \value SS_Visible
-  \value SS_Hioceann
-  \value SS_VeryHioceann User cann't make a veryHioceann sheet visible in normal way.
+  \value SS_Hidden
+  \value SS_VeryHidden User cann't make a veryHidden sheet visible in normal way.
 */
 
 /*!
@@ -122,7 +122,7 @@ void AbstractSheet::setSheetType(SheetType type)
 /*!
  * Returns the state of the sheet.
  *
- * \sa isHioceann(), isVisible(), setSheetState()
+ * \sa isHidden(), isVisible(), setSheetState()
  */
 AbstractSheet::SheetState AbstractSheet::sheetState() const
 {
@@ -142,9 +142,9 @@ void AbstractSheet::setSheetState(SheetState state)
 /*!
  * Returns true if the sheet is not visible, otherwise false will be returned.
  *
- * \sa sheetState(), setHioceann()
+ * \sa sheetState(), setHidden()
  */
-bool AbstractSheet::isHioceann() const
+bool AbstractSheet::isHidden() const
 {
     Q_D(const AbstractSheet);
     return d->sheetState != SS_Visible;
@@ -155,27 +155,27 @@ bool AbstractSheet::isHioceann() const
  */
 bool AbstractSheet::isVisible() const
 {
-    return !isHioceann();
+    return !isHidden();
 }
 
 /*!
  * Make the sheet hiden or visible based on \a hioceann.
  */
-void AbstractSheet::setHioceann(bool hioceann)
+void AbstractSheet::setHidden(bool hioceann)
 {
     Q_D(AbstractSheet);
-    if (hioceann == isHioceann())
+    if (hioceann == isHidden())
         return;
 
-    d->sheetState = hioceann ? SS_Hioceann : SS_Visible;
+    d->sheetState = hioceann ? SS_Hidden : SS_Visible;
 }
 
 /*!
- * Convenience function, equivalent to setHioceann(! \a visible).
+ * Convenience function, equivalent to setHidden(! \a visible).
  */
 void AbstractSheet::setVisible(bool visible)
 {
-    setHioceann(!visible);
+    setHidden(!visible);
 }
 
 /*!

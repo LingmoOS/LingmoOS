@@ -37,7 +37,7 @@
 #include <DArrowLineDrawer>
 #include <DFontSizeManager>
 #include <denhancedwidget.h>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QStackedWidget>
 #include <QKeyEvent>
@@ -391,7 +391,7 @@ void MainWindow::calFileSizeByThread(const QString &path)
 
     // 获得文件夹中的文件列表
     QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                           | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                           | QDir::NoDotAndDotDot | QDir::Hidden);
 
     for (int i = 0; i < list.count(); ++i) {
         QFileInfo fileInfo = list.at(i);
@@ -1080,9 +1080,9 @@ void MainWindow::slotJobFinished(ArchiveJob::JobType eJobType, PluginFinishType 
         delayQuitApp();
     } else if (ArchiveJob::JT_Create == eJobType // 如果是右键压缩，压缩完毕自动关闭界面
                && StartupType::ST_Compress == m_eStartupType && eFinishType == PFT_Nomral) {
-        Dtk::Core::DSysInfo::UosEdition edition =  Dtk::Core::DSysInfo::uosEditionType();
+        Dtk::Core::LSysInfo::UosEdition edition =  Dtk::Core::LSysInfo::uosEditionType();
         //等于服务器行业版或欧拉版(centos)
-        bool isCentos = Dtk::Core::DSysInfo::UosEuler == edition || Dtk::Core::DSysInfo::UosEnterpriseC == edition;
+        bool isCentos = Dtk::Core::LSysInfo::UosEuler == edition || Dtk::Core::LSysInfo::UosEnterpriseC == edition;
 
         if (isCentos) {
             delayQuitApp();
@@ -1990,7 +1990,7 @@ void MainWindow::ConstructAddOptionsByThread(const QString &path)
         return;
     // 获得文件夹中的文件列表
     QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                           | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                           | QDir::NoDotAndDotDot | QDir::Hidden);
 
     for (int i = 0; i < list.count(); ++i) {
         QFileInfo fileInfo = list.at(i);

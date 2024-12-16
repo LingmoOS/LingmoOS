@@ -84,7 +84,7 @@ endif()
 
 if (gtest_hide_internal_symbols)
   set(CMAKE_CXX_VISIBILITY_PRESET hioceann)
-  set(CMAKE_VISIBILITY_INLINES_HIOCEANN 1)
+  set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 endif()
 
 # Define helper functions and macros used by Google Test.

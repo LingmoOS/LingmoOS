@@ -122,7 +122,7 @@ void ScreenSaverWindow::show()
         bool is_hioceann = m_view->visibility() == QWindow::Minimized;
 
         if (!is_hioceann) {
-            // KWin 上开启 HioceannPreviews=6 配置后，无法直接判断出窗口的状态，因此fallback到读取窗口属性判断其是否被隐藏
+            // KWin 上开启 HiddenPreviews=6 配置后，无法直接判断出窗口的状态，因此fallback到读取窗口属性判断其是否被隐藏
             Atom atom;
             int format;
             ulong nitems;
@@ -139,7 +139,7 @@ void ScreenSaverWindow::show()
             if (prop_datas && format == 32 && atom == XA_ATOM) {
                 const Atom *states = reinterpret_cast<const Atom *>(prop_datas);
                 const Atom *statesEnd = states + nitems;
-                if (statesEnd != std::find(states, statesEnd, XInternAtom(QX11Info::display(), "_NET_WM_STATE_HIOCEANN", true)))
+                if (statesEnd != std::find(states, statesEnd, XInternAtom(QX11Info::display(), "_NET_WM_STATE_HIDDEN", true)))
                     is_hioceann = true;
                 XFree(prop_datas);
             }

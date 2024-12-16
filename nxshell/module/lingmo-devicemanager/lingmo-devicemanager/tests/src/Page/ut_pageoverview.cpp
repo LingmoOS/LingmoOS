@@ -12,7 +12,7 @@
 #include "ut_Head.h"
 #include "stub.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DApplication>
 
 #include <QCoreApplication>

@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 
 #include <DGuiApplicationHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QDBusInterface>
 
 #include <QDateTime>
@@ -84,39 +84,39 @@ void SystemInfoWork::activate()
     //获取主机名
     m_model->setHostName(m_systemInfDBusProxy->staticHostname());
 
-    m_model->setLogoPath(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Normal));
-    if (DSysInfo::isLingmo()) {
+    m_model->setLogoPath(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Normal));
+    if (LSysInfo::isLingmo()) {
         m_model->setLicenseState(static_cast<ActiveState>(m_systemInfDBusProxy->authorizationState()));
-        QString productName = QString("%1").arg(DSysInfo::uosSystemName());
+        QString productName = QString("%1").arg(LSysInfo::uosSystemName());
         m_model->setProductName(productName);
-        QString versionNumber = QString("%1").arg(DSysInfo::majorVersion());
+        QString versionNumber = QString("%1").arg(LSysInfo::majorVersion());
         m_model->setVersionNumber(versionNumber);
     }
     QString version;
-    if (DSysInfo::uosType() == DSysInfo::UosServer || DSysInfo::uosEditionType() == DSysInfo::UosEuler) {
-        version = QString("%1%2").arg(DSysInfo::minorVersion(), DSysInfo::uosEditionName());
-    } else if (DSysInfo::isLingmo()) {
-        version = QString("%1 (%2)").arg(DSysInfo::uosEditionName(), DSysInfo::minorVersion());
+    if (LSysInfo::uosType() == LSysInfo::UosServer || LSysInfo::uosEditionType() == LSysInfo::UosEuler) {
+        version = QString("%1%2").arg(LSysInfo::minorVersion(), LSysInfo::uosEditionName());
+    } else if (LSysInfo::isLingmo()) {
+        version = QString("%1 (%2)").arg(LSysInfo::uosEditionName(), LSysInfo::minorVersion());
     } else {
-        version = QString("%1 %2").arg(DSysInfo::productVersion(), DSysInfo::productTypeString());
+        version = QString("%1 %2").arg(LSysInfo::productVersion(), LSysInfo::productTypeString());
     }
 
 
     m_model->setVersion(version);
     m_model->setType(QSysInfo::WordSize);
     m_model->setKernel(QSysInfo::kernelVersion());
-    m_model->setProcessor(DSysInfo::cpuModelName());
+    m_model->setProcessor(LSysInfo::cpuModelName());
 
     if (m_systemInfDBusProxy->memorySize() > 0) {
-        m_model->setMemory(static_cast<qulonglong>(DSysInfo::memoryTotalSize()), m_systemInfDBusProxy->memorySize());
+        m_model->setMemory(static_cast<qulonglong>(LSysInfo::memoryTotalSize()), m_systemInfDBusProxy->memorySize());
     } else {
-        m_model->setMemory(static_cast<qulonglong>(DSysInfo::memoryTotalSize()), static_cast<qulonglong>(DSysInfo::memoryInstalledSize()));
+        m_model->setMemory(static_cast<qulonglong>(LSysInfo::memoryTotalSize()), static_cast<qulonglong>(LSysInfo::memoryInstalledSize()));
     }
 
     m_model->setSystemInstallationDate(getSystemInstallDate(m_systemInfDBusProxy->shortDateFormat(), m_systemInfDBusProxy->timezone()));
 
     // 隐私政策文本内容
-    QString http = DSysInfo::productType() != DSysInfo::ProductType::Uos ? tr("https://www.lingmo.org/en/agreement/privacy/") : tr("https://www.uniontech.com/agreement/privacy-en");
+    QString http = LSysInfo::productType() != LSysInfo::ProductType::Uos ? tr("https://www.lingmo.org/en/agreement/privacy/") : tr("https://www.uniontech.com/agreement/privacy-en");
     QString text = tr("<p>We are deeply aware of the importance of your personal information to you. So we have the Privacy Policy that covers how we collect, use, share, transfer, publicly disclose, and store your information.</p>"
               "<p>You can <a href=\"%1\">click here</a> to view our latest privacy policy and/or view it online by visiting <a href=\"%1\"> %1</a>. Please read carefully and fully understand our practices on customer privacy. If you have any questions, please contact us at: support@uniontech.com.</p>")
                .arg(http);
@@ -161,7 +161,7 @@ void SystemInfoWork::deactivate() { }
 
 QString SystemInfoWork::getEndUserAgreementText()
 {
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEuler) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEuler) {
         return DCC_LICENSE::getEulerEndUserAgreement();
     } else {
         if (m_model->endUserAgreementPath().has_value()) {
@@ -211,7 +211,7 @@ void SystemInfoWork::initSystemCopyright()
     const QSettings settings("/etc/lingmo-installer.conf", QSettings::IniFormat);
     QString oem_copyright = settings.value("system_info_vendor_name").toString().toLatin1();
     if (oem_copyright.isEmpty()) {
-        if (DSysInfo::productType() != DSysInfo::ProductType::Uos)
+        if (LSysInfo::productType() != LSysInfo::ProductType::Uos)
             oem_copyright = QCoreApplication::translate("LogoModule", "Copyright© 2011-%1 Lingmo Community")
                     .arg(QString(__DATE__).right(4));
         else
@@ -250,8 +250,8 @@ void SystemInfoWork::updateFrequency(bool state)
     if (outArgs.count()) {
         cpuMaxMhz = outArgs.at(0).value<QDBusVariant>().variant().toDouble();
     }
-    if (DSysInfo::cpuModelName().contains("Hz")) {
-        m_model->setProcessor(DSysInfo::cpuModelName());
+    if (LSysInfo::cpuModelName().contains("Hz")) {
+        m_model->setProcessor(LSysInfo::cpuModelName());
     } else {
         QString processor;
         QDBusMessage replyCpuInfo = interface.call("Get", "com.lingmo.daemon.SystemInfo", "Processor");
@@ -262,11 +262,11 @@ void SystemInfoWork::updateFrequency(bool state)
         if (processor.contains("Hz")) {
             m_model->setProcessor(processor);
         } else {
-            if (DSysInfo::cpuModelName().isEmpty())
+            if (LSysInfo::cpuModelName().isEmpty())
                 m_model->setProcessor(QString("%1 @ %2GHz").arg(processor)
                                               .arg(cpuMaxMhz / 1000));
             else
-                m_model->setProcessor(QString("%1 @ %2GHz").arg(DSysInfo::cpuModelName())
+                m_model->setProcessor(QString("%1 @ %2GHz").arg(LSysInfo::cpuModelName())
                                               .arg(cpuMaxMhz / 1000));
         }
     }
@@ -320,7 +320,7 @@ static const QString getLicensePath(const QString &filePath, const QString &type
 static QString getUserExpContent()
 {
     QString userExpContent = getLicensePath("/usr/share/protocol/userexperience-agreement/User-Experience-Program-License-Agreement-CN-%1.md", "");
-    if (DSysInfo::isCommunityEdition()) {
+    if (LSysInfo::isCommunityEdition()) {
         userExpContent = getLicensePath("/usr/share/lingmo-lingmoid-client/privacy/User-Experience-Program-License-Agreement-Community/User-Experience-Program-License-Agreement-CN-%1.md", "");
         return userExpContent;
     }

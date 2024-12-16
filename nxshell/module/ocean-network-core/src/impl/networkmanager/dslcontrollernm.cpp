@@ -167,7 +167,7 @@ DSLItem *DSLController_NM::addPppoeConnection(NetworkManager::WiredDevice::Ptr d
 
         json.insert("ClonedAddress", QString(wiredSetting->clonedMacAddress()));
         json.insert("Ssid", QString());
-        json.insert("Hioceann", false);
+        json.insert("Hidden", false);
         return json;
     };
 

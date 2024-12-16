@@ -332,7 +332,7 @@ void Formatting::handleXf(const std::string& data) {
 		unsigned short borderBackgr3 = m_book->readByte<unsigned short>(data, 18, 2);
 
 		xf.m_protection.m_isCellLocked    = (parTypeFlags & 0x01) >> 0;
-		xf.m_protection.m_isFormulaHioceann = (parTypeFlags & 0x02) >> 1;
+		xf.m_protection.m_isFormulaHidden = (parTypeFlags & 0x02) >> 1;
 		// Following is not in OOo docs, but is mentioned in Gnumeric source
 		xf.m_isStyle          = (parTypeFlags & 0x0004) >> 2;
 		xf.m_lotusPrefix      = (parTypeFlags & 0x0008) >> 3;  // Meaning is not known
@@ -380,7 +380,7 @@ void Formatting::handleXf(const std::string& data) {
 		int borderBackgr2           = m_book->readByte<int>(data, 12, 4);
 
 		xf.m_protection.m_isCellLocked    = (parTypeFlags & 0x01) >> 0;
-		xf.m_protection.m_isFormulaHioceann = (parTypeFlags & 0x02) >> 1;
+		xf.m_protection.m_isFormulaHidden = (parTypeFlags & 0x02) >> 1;
 
 		xf.m_isStyle          = (parTypeFlags & 0x0004) >> 2;
 		xf.m_lotusPrefix      = (parTypeFlags & 0x0008) >> 3;  // Meaning is not known
@@ -424,7 +424,7 @@ void Formatting::handleXf(const std::string& data) {
 		unsigned int border34       = m_book->readByte<unsigned int>(data, 8, 4);
 
 		xf.m_protection.m_isCellLocked    = (parTypeFlags & 0x01) >> 0;
-		xf.m_protection.m_isFormulaHioceann = (parTypeFlags & 0x02) >> 1;
+		xf.m_protection.m_isFormulaHidden = (parTypeFlags & 0x02) >> 1;
 
 		xf.m_isStyle          = (parTypeFlags & 0x0004) >> 2;
 		xf.m_lotusPrefix      = (parTypeFlags & 0x0008) >> 3;  // Meaning is not known
@@ -468,7 +468,7 @@ void Formatting::handleXf(const std::string& data) {
 		unsigned int border34       = m_book->readByte<unsigned int>(data, 8, 4);
 
 		xf.m_protection.m_isCellLocked    = (protectType & 0x01) >> 0;
-		xf.m_protection.m_isFormulaHioceann = (protectType & 0x02) >> 1;
+		xf.m_protection.m_isFormulaHidden = (protectType & 0x02) >> 1;
 
 		xf.m_isStyle          = (protectType & 0x0004) >> 2;  // protectType
 		xf.m_lotusPrefix      = (protectType & 0x0008) >> 3;  // Meaning is not known
@@ -510,7 +510,7 @@ void Formatting::handleXf(const std::string& data) {
 		xf.m_formatKey = format_etc & 0x3F;
 
 		xf.m_protection.m_isCellLocked    = (format_etc & 0x40) >> 6;
-		xf.m_protection.m_isFormulaHioceann = (format_etc & 0x80) >> 7;
+		xf.m_protection.m_isFormulaHidden = (format_etc & 0x80) >> 7;
 
 		xf.m_parentStyleIndex = 0;  // ???????????
 

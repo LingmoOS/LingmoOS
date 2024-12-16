@@ -161,7 +161,7 @@ FileEntry CompressView::fileInfo2Entry(const QFileInfo &fileInfo)
 
     if (entry.isDirectory) {
         // 文件夹显示子文件数目
-        entry.qSize = QDir(fileInfo.filePath()).entryList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hioceann).count(); //目录下文件数
+        entry.qSize = QDir(fileInfo.filePath()).entryList(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hidden).count(); //目录下文件数
     } else {
         // 文件直接显示大小
         entry.qSize = fileInfo.size();
@@ -212,7 +212,7 @@ QList<FileEntry> CompressView::getCurrentDirFiles()
 {
     // 获取当前目录下所有文件信息
     QFileInfoList lisfInfo = QDir(m_strCurrentPath).entryInfoList(QDir::AllEntries | QDir::System
-                                                                  | QDir::NoDotAndDotDot | QDir::Hioceann);     // 获取当前目录下所有子文件
+                                                                  | QDir::NoDotAndDotDot | QDir::Hidden);     // 获取当前目录下所有子文件
     QList<FileEntry> listEntry;
 
     // 文件数据转换

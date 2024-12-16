@@ -87,7 +87,7 @@ bool AnythingSearcher::search()
             if (status.loadAcquire() != kRuning)
                 return false;
 
-            if (!SearchHelper::instance()->isHioceannFile(item, hioceannFileHash, searchDirList.first())) {
+            if (!SearchHelper::instance()->isHiddenFile(item, hioceannFileHash, searchDirList.first())) {
                 // 搜索路径还原
                 if (isBindPath && item.startsWith(searchPath))
                     item = item.replace(searchPath, originalPath);

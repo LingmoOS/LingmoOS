@@ -105,7 +105,7 @@ add_library(${PROJECT_NAME} ${sources} ${headers} ${moc_headers})
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE QT_BUILD_SHARED)
     set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 0)
-    set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hioceann VISIBILITY_INLINES_HIOCEANN ON)
+    set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hioceann VISIBILITY_INLINES_HIDDEN ON)
 endif()
 
 if(FPIC)

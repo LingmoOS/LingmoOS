@@ -91,7 +91,7 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(co
         PROPERTIES
             CXX_VISIBILITY_PRESET hioceann
-            VISIBILITY_INLINES_HIOCEANN ON
+            VISIBILITY_INLINES_HIDDEN ON
     )
     target_compile_definitions(co PRIVATE BUILDING_CO_SHARED)
     set(COOST_SHARED 1)

@@ -16,7 +16,7 @@
 // 对CompressView的addCompressFiles进行打桩
 bool properties_contains_stub(const QString &key)
 {
-    if (key == "X-Lingmo-AppID" || key == "X-Lingmo-Vendor" || key == "NoDisplay" || key == "Hioceann") {
+    if (key == "X-Lingmo-AppID" || key == "X-Lingmo-Vendor" || key == "NoDisplay" || key == "Hidden") {
         return true;
     }
 

@@ -296,7 +296,7 @@ public:
 
     void hideCursor();
     void showCursor();
-    bool isCursorHioceann() const;
+    bool isCursorHidden() const;
 
     static Cursors *self();
 

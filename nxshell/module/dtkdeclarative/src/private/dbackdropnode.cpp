@@ -36,7 +36,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN DataManagerBase : public QObject
+class Q_DECL_HIDDEN DataManagerBase : public QObject
 {
 public:
     mutable QAtomicInt ref;
@@ -49,7 +49,7 @@ public:
 };
 
 template <class T>
-class Q_DECL_HIOCEANN DataManagerPointer
+class Q_DECL_HIDDEN DataManagerPointer
 {
     static_assert(std::is_base_of<DataManagerBase, T>::value);
 public:
@@ -132,7 +132,7 @@ private:
 };
 
 template <class Derive, class DataType, typename... DataKeys>
-class Q_DECL_HIOCEANN DataManager : public DataManagerBase
+class Q_DECL_HIDDEN DataManager : public DataManagerBase
 {
 public:
     struct Data {
@@ -269,7 +269,7 @@ protected:
     QRunnable *cleanJob = nullptr;
 };
 
-class Q_DECL_HIOCEANN RhiTextureManager : public DataManager<RhiTextureManager, QRhiTexture, QRhiTexture::Format, const QSize&>
+class Q_DECL_HIDDEN RhiTextureManager : public DataManager<RhiTextureManager, QRhiTexture, QRhiTexture::Format, const QSize&>
 {
     Q_OBJECT
 
@@ -299,7 +299,7 @@ class Q_DECL_HIOCEANN RhiTextureManager : public DataManager<RhiTextureManager, 
     }
 };
 
-class Q_DECL_HIOCEANN RhiManager : public DataManager<RhiManager, void>
+class Q_DECL_HIDDEN RhiManager : public DataManager<RhiManager, void>
 {
     Q_OBJECT
 public:
@@ -481,7 +481,7 @@ private:
 };
 
 #ifndef QT_NO_OPENGL
-class Q_DECL_HIOCEANN GLFramebufferManager : public DataManager<GLFramebufferManager, void>
+class Q_DECL_HIDDEN GLFramebufferManager : public DataManager<GLFramebufferManager, void>
 {
     Q_OBJECT
 
@@ -648,7 +648,7 @@ inline static void overrideChildNodesTo(QSGNode *node, QSGNode *newParent) {
     } while (node);
 }
 
-class Q_DECL_HIOCEANN RhiNode : public DBackdropNode {
+class Q_DECL_HIDDEN RhiNode : public DBackdropNode {
 public:
     RhiNode(QQuickItem *item)
         : DBackdropNode(item, new Texture)
@@ -1060,7 +1060,7 @@ DBackdropNode *DBackdropNode::createRhiNode(QQuickItem *item)
     return node;
 }
 
-class Q_DECL_HIOCEANN QImageManager : public DataManager<QImageManager, QImage, QImage::Format, const QSize&>
+class Q_DECL_HIDDEN QImageManager : public DataManager<QImageManager, QImage, QImage::Format, const QSize&>
 {
     Q_OBJECT
 
@@ -1084,7 +1084,7 @@ class Q_DECL_HIOCEANN QImageManager : public DataManager<QImageManager, QImage, 
     }
 };
 
-class Q_DECL_HIOCEANN SoftwareNode : public DBackdropNode {
+class Q_DECL_HIDDEN SoftwareNode : public DBackdropNode {
 public:
     SoftwareNode(QQuickItem *item)
         : DBackdropNode(item, new QSGPlainTexture)

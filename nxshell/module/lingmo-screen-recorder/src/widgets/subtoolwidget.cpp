@@ -1378,19 +1378,19 @@ void SubToolWidget::shapeClickedFromWidget(QString shape)
             m_textButton->click();
         } else if (shape == "option") {
             if (m_currentType == "shot" || currentWidget() == m_shotSubTool) {
-                if (m_optionMenu->isHioceann()) {
+                if (m_optionMenu->isHidden()) {
                     m_shotOptionButton->showMenu();
                 } else {
                     m_optionMenu->hide();
                 }
             } else if (m_currentType == "record" || currentWidget() == m_recordSubTool) {
-                if (m_recordOptionMenu->isHioceann()) {
+                if (m_recordOptionMenu->isHidden()) {
                     m_optionButton->showMenu();
                 } else {
                     m_recordOptionMenu->hide();
                 }
             } else if (m_currentType == "scroll" || currentWidget() == m_scrollSubTool) {
-                if (m_scrollOptionMenu->isHioceann()) {
+                if (m_scrollOptionMenu->isHidden()) {
                     m_scrollOptionButton->showMenu();
                 } else {
                     m_scrollOptionMenu->hide();

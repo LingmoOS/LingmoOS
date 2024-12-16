@@ -7,7 +7,7 @@
 #include "oceanuiobject.h"
 
 #include <DConfig>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDBusContext>
 #include <QDBusMessage>

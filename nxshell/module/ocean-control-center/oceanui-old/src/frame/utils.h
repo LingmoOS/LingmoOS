@@ -7,12 +7,12 @@
 #include <QObject>
 #include <QDir>
 
-#define IS_SERVER_SYSTEM (DSysInfo::UosServer == DSysInfo::uosType())                    // 是否是服务器版
-#define IS_COMMUNITY_SYSTEM (DSysInfo::UosCommunity == DSysInfo::uosEditionType())       // 是否是社区版
-#define IS_PROFESSIONAL_SYSTEM (DSysInfo::UosProfessional == DSysInfo::uosEditionType()) // 是否是专业版
-#define IS_HOME_SYSTEM (DSysInfo::UosHome == DSysInfo::uosEditionType())                 // 是否是个人版
-#define IS_EDUCATION_SYSTEM (DSysInfo::UosEducation == DSysInfo::uosEditionType())       // 是否是教育版
-#define IS_LINGMO_DESKTOP (DSysInfo::LingmoDesktop == DSysInfo::lingmoType())            // 是否是Lingmo桌面
+#define IS_SERVER_SYSTEM (LSysInfo::UosServer == LSysInfo::uosType())                    // 是否是服务器版
+#define IS_COMMUNITY_SYSTEM (LSysInfo::UosCommunity == LSysInfo::uosEditionType())       // 是否是社区版
+#define IS_PROFESSIONAL_SYSTEM (LSysInfo::UosProfessional == LSysInfo::uosEditionType()) // 是否是专业版
+#define IS_HOME_SYSTEM (LSysInfo::UosHome == LSysInfo::uosEditionType())                 // 是否是个人版
+#define IS_EDUCATION_SYSTEM (LSysInfo::UosEducation == LSysInfo::uosEditionType())       // 是否是教育版
+#define IS_LINGMO_DESKTOP (LSysInfo::LingmoDesktop == LSysInfo::lingmoType())            // 是否是Lingmo桌面
 
 namespace DCC_NAMESPACE {
 class ModuleObject;

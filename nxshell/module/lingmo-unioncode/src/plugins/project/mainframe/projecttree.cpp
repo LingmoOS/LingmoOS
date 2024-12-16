@@ -67,7 +67,7 @@ ProjectTree::ProjectTree(QWidget *parent)
     setEditTriggers(DTreeView::NoEditTriggers);   //节点不能编辑
     setSelectionBehavior(DTreeView::SelectRows);   //一次选中整行
     setSelectionMode(DTreeView::SingleSelection);   //单选，配合上面的整行就是一次选单行
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     header()->setStretchLastSection(false);
 

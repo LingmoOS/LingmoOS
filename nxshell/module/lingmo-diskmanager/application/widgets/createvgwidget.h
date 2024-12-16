@@ -220,10 +220,10 @@ private:
     /**
      * @brief 设置滚动区域属性
      * @param scrollArea 滚动区域指针
-     * @param hScrollBarHioceann 是否隐藏横向滚动条
-     * @param vScrollBarHioceann 是否隐藏竖向滚动条
+     * @param hScrollBarHidden 是否隐藏横向滚动条
+     * @param vScrollBarHidden 是否隐藏竖向滚动条
      */
-    void setScrollAreaAttribute(DScrollArea *scrollArea, bool hScrollBarHioceann, bool vScrollBarHioceann);
+    void setScrollAreaAttribute(DScrollArea *scrollArea, bool hScrollBarHidden, bool vScrollBarHidden);
 
     /**
      * @brief 判断数据是否相同

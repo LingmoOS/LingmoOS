@@ -47,25 +47,25 @@ bool CanvasModelFilter::renameFilter(const QUrl &oldUrl, const QUrl &newUrl)
     return false;
 }
 
-bool HioceannFileFilter::insertFilter(const QUrl &url)
+bool HiddenFileFilter::insertFilter(const QUrl &url)
 {
-    if (model->showHioceannFiles())
+    if (model->showHiddenFiles())
         return false;
 
     if (auto info = FileCreator->createFileInfo(url))
-        return info->isAttributes(OptInfoType::kIsHioceann);
+        return info->isAttributes(OptInfoType::kIsHidden);
 
     return false;
 }
 
-bool HioceannFileFilter::resetFilter(QList<QUrl> &urls)
+bool HiddenFileFilter::resetFilter(QList<QUrl> &urls)
 {
-    if (model->showHioceannFiles())
+    if (model->showHiddenFiles())
         return false;
 
     for (auto itor = urls.begin(); itor != urls.end();) {
         auto info = FileCreator->createFileInfo(*itor);
-        if (info && info->isAttributes(OptInfoType::kIsHioceann)) {
+        if (info && info->isAttributes(OptInfoType::kIsHidden)) {
             itor = urls.erase(itor);
             continue;
         }
@@ -75,13 +75,13 @@ bool HioceannFileFilter::resetFilter(QList<QUrl> &urls)
     return false;
 }
 
-bool HioceannFileFilter::updateFilter(const QUrl &url, const QVector<int> &roles)
+bool HiddenFileFilter::updateFilter(const QUrl &url, const QVector<int> &roles)
 {
     // the filemanager hioceann attr changed.
     // just refresh model if file content changed.
     if (roles.contains(Global::kItemCreateFileInfoRole)) {
         // get file that removed form .hioceann if do not show hioceann file.
-        if (!model->showHioceannFiles() && url.fileName() == ".hioceann") {
+        if (!model->showHiddenFiles() && url.fileName() == ".hioceann") {
             fmDebug() << "refresh by hioceann changed.";
             // do not refresh file info and wait 100ms to let the file atrr changed signal to refresh file
             model->refresh(model->rootIndex(), false, 100, false);
@@ -91,7 +91,7 @@ bool HioceannFileFilter::updateFilter(const QUrl &url, const QVector<int> &roles
     return false;
 }
 
-bool HioceannFileFilter::renameFilter(const QUrl &oldUrl, const QUrl &newUrl)
+bool HiddenFileFilter::renameFilter(const QUrl &oldUrl, const QUrl &newUrl)
 {
     Q_UNUSED(oldUrl)
     return insertFilter(newUrl);

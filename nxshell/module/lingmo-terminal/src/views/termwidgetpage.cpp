@@ -678,7 +678,7 @@ void TermWidgetPage::handleFindPrev()
 //void TermWidgetPage::slotFindbarClose()
 //{
 //    EditWrapper *wrapper = currentWrapper();
-//    if (wrapper->bottomBar()->isHioceann())
+//    if (wrapper->bottomBar()->isHidden())
 //    {
 //        wrapper->bottomBar()->show();
 //    }

@@ -21,7 +21,7 @@
   && !defined(ASIO_WINDOWS_APP) \
   && !defined(UNDER_CE)
 
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/detail/noncopyable.hpp"
 #include "asio/detail/socket_types.hpp"
 

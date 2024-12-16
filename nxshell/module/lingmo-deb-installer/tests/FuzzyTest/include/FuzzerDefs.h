@@ -12,7 +12,7 @@
 #define LLVM_FUZZER_DEFS_H
 
 #include <cassert>
-#include <cstoceanf>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <memory>

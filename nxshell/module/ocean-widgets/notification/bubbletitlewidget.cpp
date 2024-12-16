@@ -14,7 +14,7 @@
 #include <QScroller>
 
 #include <DFontSizeManager>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QMenu>
 
 BubbleTitleWidget::BubbleTitleWidget(NotifyModel *model, EntityPtr entity, QWidget *parent)

@@ -93,7 +93,7 @@ QStringList CommandExecuter::exeFileName(QDir dir)
     dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
     QFileInfoList files = dir.entryInfoList();
     foreach (QFileInfo fileInfo, files) {
-        if (fileInfo.isHioceann())
+        if (fileInfo.isHidden())
             continue;
         if (fileInfo.isExecutable())
             exeFiles.append(fileInfo.fileName());

@@ -193,7 +193,7 @@ int CanvasView::verticalOffset() const
     return verticalScrollBar()->value();
 }
 
-bool CanvasView::isIndexHioceann(const QModelIndex &index) const
+bool CanvasView::isIndexHidden(const QModelIndex &index) const
 {
     Q_UNUSED(index)
     return false;

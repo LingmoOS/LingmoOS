@@ -478,7 +478,7 @@ public:
            indicates that a window should not be visible on the screen (e.g. when minimised).
            Only the window manager is allowed to change it.
         **/
-        Hioceann       = 1u << 8,
+        Hidden       = 1u << 8,
         /**
            indicates that a window should fill the entire screen and have no window
            decorations.
@@ -555,7 +555,7 @@ public:
         /**
            indicates that the client window is not visible, but its icon is.
            This can be when the window is minimized or when it's on a
-           different virtual desktop. See also NET::Hioceann.
+           different virtual desktop. See also NET::Hidden.
         **/
         Iconic = 3 // IconicState
     };

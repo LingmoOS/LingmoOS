@@ -13,7 +13,7 @@
 #ifndef ZUTIL_H
 #define ZUTIL_H
 
-#ifdef HAVE_HIOCEANN
+#ifdef HAVE_HIDDEN
 #  define ZLIB_INTERNAL __attribute__((visibility ("hioceann")))
 #else
 #  define ZLIB_INTERNAL

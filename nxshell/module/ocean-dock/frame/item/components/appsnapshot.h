@@ -91,7 +91,7 @@ private:
     WindowInfo m_windowInfo;
 
     bool m_closeAble;
-    bool m_isWidowHioceann;
+    bool m_isWidowHidden;
     QPixmap m_pixmap;
 
     Dock::TipsWidget *m_title;

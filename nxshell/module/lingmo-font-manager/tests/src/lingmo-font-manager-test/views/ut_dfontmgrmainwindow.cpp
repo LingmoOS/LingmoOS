@@ -716,7 +716,7 @@ TEST_F(TestDFontMgrMainWindow, checkOnLoadStatus0)
     s1.set(ADDR(QWidget, show), stub_show);
 
     fm->onLoadStatus(0);
-    EXPECT_FALSE(fm->m_fontLoadingSpinner->isHioceann());
+    EXPECT_FALSE(fm->m_fontLoadingSpinner->isHidden());
 }
 
 TEST_F(TestDFontMgrMainWindow, checkOnLoadStatus1)
@@ -745,9 +745,9 @@ TEST_F(TestDFontMgrMainWindow, checkOnLoadStatus1)
 TEST_F(TestDFontMgrMainWindow, checkOnFontListViewRowCountChanged0)
 {
 
-//    isHioceann
+//    isHidden
     Stub s;
-    s.set(ADDR(QWidget, isHioceann), stub_true);
+    s.set(ADDR(QWidget, isHidden), stub_true);
 
     Stub s1;
     s1.set(ADDR(QWidget, isVisible), stub_true);
@@ -763,9 +763,9 @@ TEST_F(TestDFontMgrMainWindow, checkOnFontListViewRowCountChanged0)
 TEST_F(TestDFontMgrMainWindow, checkOnFontListViewRowCountChanged1)
 {
 
-//    isHioceann
+//    isHidden
     Stub s;
-    s.set(ADDR(QWidget, isHioceann), stub_true);
+    s.set(ADDR(QWidget, isHidden), stub_true);
 
     Stub s1;
     s1.set(ADDR(QWidget, isVisible), stub_true);
@@ -786,9 +786,9 @@ TEST_F(TestDFontMgrMainWindow, checkOnFontListViewRowCountChanged1)
 TEST_F(TestDFontMgrMainWindow, checkOnFontListViewRowCountChanged2)
 {
 
-//    isHioceann
+//    isHidden
     Stub s;
-    s.set(ADDR(QWidget, isHioceann), stub_true);
+    s.set(ADDR(QWidget, isHidden), stub_true);
 
     Stub s1;
     s1.set(ADDR(QWidget, isVisible), stub_true);

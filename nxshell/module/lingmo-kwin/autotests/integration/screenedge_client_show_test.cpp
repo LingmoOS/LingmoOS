@@ -129,7 +129,7 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowHideX11()
     QVERIFY(!window->isDecorated());
     QCOMPARE(window->frameGeometry(), windowGeometry);
     QVERIFY(!window->hasStrut());
-    QVERIFY(!window->isHioceannInternal());
+    QVERIFY(!window->isHiddenInternal());
 
     QSignalSpy effectsWindowAoceand(effects, &EffectsHandler::windowAoceand);
     QVERIFY(effectsWindowAoceand.wait());
@@ -139,17 +139,17 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowHideX11()
     xcb_change_property(c.get(), XCB_PROP_MODE_REPLACE, windowId, atom, XCB_ATOM_CARDINAL, 32, 1, &location);
     xcb_flush(c.get());
 
-    QSignalSpy effectsWindowHioceannSpy(effects, &EffectsHandler::windowHioceann);
-    QSignalSpy clientHioceannSpy(window, &X11Window::windowHioceann);
-    QVERIFY(clientHioceannSpy.wait());
-    QVERIFY(window->isHioceannInternal());
-    QCOMPARE(effectsWindowHioceannSpy.count(), 1);
+    QSignalSpy effectsWindowHiddenSpy(effects, &EffectsHandler::windowHidden);
+    QSignalSpy clientHiddenSpy(window, &X11Window::windowHidden);
+    QVERIFY(clientHiddenSpy.wait());
+    QVERIFY(window->isHiddenInternal());
+    QCOMPARE(effectsWindowHiddenSpy.count(), 1);
 
     // now trigger the edge
     QSignalSpy effectsWindowShownSpy(effects, &EffectsHandler::windowShown);
     QFETCH(QPoint, triggerPos);
     Cursors::self()->mouse()->setPos(triggerPos);
-    QVERIFY(!window->isHioceannInternal());
+    QVERIFY(!window->isHiddenInternal());
     QCOMPARE(effectsWindowShownSpy.count(), 1);
 
     // go into event loop to trigger xcb_flush
@@ -159,14 +159,14 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowHideX11()
     Cursors::self()->mouse()->setPos(QPoint(640, 512));
     xcb_change_property(c.get(), XCB_PROP_MODE_REPLACE, windowId, atom, XCB_ATOM_CARDINAL, 32, 1, &location);
     xcb_flush(c.get());
-    QVERIFY(clientHioceannSpy.wait());
-    QVERIFY(window->isHioceannInternal());
+    QVERIFY(clientHiddenSpy.wait());
+    QVERIFY(window->isHiddenInternal());
     QFETCH(QRect, resizedWindowGeometry);
     // resizewhile hioceann
     window->moveResize(resizedWindowGeometry);
     // triggerPos shouldn't be valid anymore
     Cursors::self()->mouse()->setPos(triggerPos);
-    QVERIFY(window->isHioceannInternal());
+    QVERIFY(window->isHiddenInternal());
 
     // destroy window again
     QSignalSpy windowClosedSpy(window, &X11Window::windowClosed);
@@ -227,7 +227,7 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowX11Touch()
     QVERIFY(!window->isDecorated());
     QCOMPARE(window->frameGeometry(), windowGeometry);
     QVERIFY(!window->hasStrut());
-    QVERIFY(!window->isHioceannInternal());
+    QVERIFY(!window->isHiddenInternal());
 
     QSignalSpy effectsWindowAoceand(effects, &EffectsHandler::windowAoceand);
     QVERIFY(effectsWindowAoceand.wait());
@@ -237,11 +237,11 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowX11Touch()
     xcb_change_property(c.get(), XCB_PROP_MODE_REPLACE, windowId, atom, XCB_ATOM_CARDINAL, 32, 1, &location);
     xcb_flush(c.get());
 
-    QSignalSpy effectsWindowHioceannSpy(effects, &EffectsHandler::windowHioceann);
-    QSignalSpy clientHioceannSpy(window, &X11Window::windowHioceann);
-    QVERIFY(clientHioceannSpy.wait());
-    QVERIFY(window->isHioceannInternal());
-    QCOMPARE(effectsWindowHioceannSpy.count(), 1);
+    QSignalSpy effectsWindowHiddenSpy(effects, &EffectsHandler::windowHidden);
+    QSignalSpy clientHiddenSpy(window, &X11Window::windowHidden);
+    QVERIFY(clientHiddenSpy.wait());
+    QVERIFY(window->isHiddenInternal());
+    QCOMPARE(effectsWindowHiddenSpy.count(), 1);
 
     // now trigger the edge
     QSignalSpy effectsWindowShownSpy(effects, &EffectsHandler::windowShown);
@@ -252,7 +252,7 @@ void ScreenEdgeClientShowTest::testScreenEdgeShowX11Touch()
     Test::touchMotion(0, targetPos, timestamp++);
     Test::touchUp(0, timestamp++);
     QVERIFY(effectsWindowShownSpy.wait());
-    QVERIFY(!window->isHioceannInternal());
+    QVERIFY(!window->isHiddenInternal());
     QCOMPARE(effectsWindowShownSpy.count(), 1);
 
     // destroy window again

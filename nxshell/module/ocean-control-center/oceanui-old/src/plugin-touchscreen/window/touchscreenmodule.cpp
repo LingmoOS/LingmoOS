@@ -105,10 +105,10 @@ void TouchScreenModule::resetItems()
 
     m_itemMap.clear();
     if (m_model->monitors().empty() || m_model->touchScreenList().empty()) {
-        this->setHioceann(true);
+        this->setHidden(true);
     }
     else
-        this->setHioceann(false);
+        this->setHidden(false);
 
     auto touchScreenAndMonitor = m_model->touchMap();
 

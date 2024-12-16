@@ -326,7 +326,7 @@ DTreeViewExample::DTreeViewExample(QWidget *parent)
 
     treeView->setItemDelegate(delegate);
     treeView->setModel(model);
-    treeView->setHeaderHioceann(true);
+    treeView->setHeaderHidden(true);
     treeView->setFrameShape(QFrame::NoFrame);
     treeView->expandAll();
     treeViewWidget->setFixedHeight(324);

@@ -10,7 +10,7 @@
 #include "searchinput.h"
 
 #include <DAnchors>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QLineEdit>
 #include <QTimer>
@@ -46,7 +46,7 @@ ShortCutSettingWidget::ShortCutSettingWidget(ShortcutModel *model, QWidget *pare
     m_windowGroup->getLayout()->setMargin(0);
     m_windowGroup->appendItem(windowHead, SettingsGroup::NoneBackground);
 
-    if (DSysInfo::UosServer != DSysInfo::uosType()) {
+    if (LSysInfo::UosServer != LSysInfo::uosType()) {
         m_workspaceHead = new SettingsHead();
         m_workspaceHead->setEditEnable(false);
         m_workspaceHead->setTitle(tr("Workspace"));
@@ -55,7 +55,7 @@ ShortCutSettingWidget::ShortCutSettingWidget(ShortcutModel *model, QWidget *pare
         m_workspaceGroup->appendItem(m_workspaceHead, SettingsGroup::NoneBackground);
     }
 
-    if (DSysInfo::UosServer != DSysInfo::uosType() && DSysInfo::UosCommunity != DSysInfo::uosEditionType()) {
+    if (LSysInfo::UosServer != LSysInfo::uosType() && LSysInfo::UosCommunity != LSysInfo::uosEditionType()) {
         SettingsHead *speechHead = new SettingsHead();
         speechHead->setTitle(tr("Assistive Tools"));
         speechHead->setEditEnable(false);

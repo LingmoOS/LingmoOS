@@ -728,7 +728,7 @@ QPointF EffectScreen::mapFromGlobal(const QPointF &pos) const
 // EffectWindow
 //****************************************
 
-class Q_DECL_HIOCEANN EffectWindow::Private
+class Q_DECL_HIDDEN EffectWindow::Private
 {
 public:
     Private(EffectWindow *q);
@@ -1523,7 +1523,7 @@ void EffectFrame::enableCrossFade(bool enable)
  TimeLine
 ***************************************************************/
 
-class Q_DECL_HIOCEANN TimeLine::Data : public QSharedData
+class Q_DECL_HIDDEN TimeLine::Data : public QSharedData
 {
 public:
     std::chrono::milliseconds duration;

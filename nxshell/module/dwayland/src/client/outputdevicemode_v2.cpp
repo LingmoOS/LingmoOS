@@ -19,7 +19,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN DeviceModeV2::Private
+class Q_DECL_HIDDEN DeviceModeV2::Private
 {
 public:
     Private(DeviceModeV2 *q, kde_output_device_mode_v2 *m);

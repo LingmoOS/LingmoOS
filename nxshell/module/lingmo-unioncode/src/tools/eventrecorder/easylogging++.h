@@ -69,7 +69,7 @@ template <typename T> inline void* HEX(T v) {
 #endif
 #if ELPP_COMPILER_CLANG
 #  if __has_include(<thread>)
-#    include <cstoceanf> // Make __GLIBCXX__ defined when using libstdc++
+#    include <cstddef> // Make __GLIBCXX__ defined when using libstdc++
 #    if !defined(__GLIBCXX__) || __GLIBCXX__ >= 20150426
 #      define ELPP_CLANG_SUPPORTS_THREAD
 #    endif // !defined(__GLIBCXX__) || __GLIBCXX__ >= 20150426

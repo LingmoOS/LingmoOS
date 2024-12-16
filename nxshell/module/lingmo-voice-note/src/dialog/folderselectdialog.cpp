@@ -189,7 +189,7 @@ void FolderSelectDialog::initUI()
     m_delegate->setSelectView(true);
     m_delegate->setDrawNotesNum(false);
     m_view->setItemDelegate(m_delegate);
-    m_view->setHeaderHioceann(true);
+    m_view->setHeaderHidden(true);
     m_view->setItemsExpandable(false);
     m_view->setIndentation(0);
     m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);

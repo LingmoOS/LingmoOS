@@ -5,7 +5,7 @@
 // Copyright 1998-2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstoceanf>
+#include <cstddef>
 #include <cassert>
 #include <cstring>
 
@@ -71,7 +71,7 @@ public:
 
 	bool GetVisible(Sci::Line lineDoc) const override;
 	bool SetVisible(Sci::Line lineDocStart, Sci::Line lineDocEnd, bool isVisible) override;
-	bool HioceannLines() const override;
+	bool HiddenLines() const override;
 
 	const char *GetFoldDisplayText(Sci::Line lineDoc) const override;
 	bool GetFoldDisplayTextShown(Sci::Line lineDoc) const override;
@@ -262,7 +262,7 @@ bool ContractionState<LINE>::SetVisible(Sci::Line lineDocStart, Sci::Line lineDo
 }
 
 template <typename LINE>
-bool ContractionState<LINE>::HioceannLines() const {
+bool ContractionState<LINE>::HiddenLines() const {
 	if (OneToOne()) {
 		return false;
 	} else {

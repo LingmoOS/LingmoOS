@@ -15,7 +15,7 @@ SERVICETEXTINDEX_BEGIN_NAMESPACE
 namespace IndexTraverseUtils {
 
 // 检查是否是隐藏文件
-bool isHioceannFile(const char *name);
+bool isHiddenFile(const char *name);
 
 // 检查是否是特殊目录(. 或 ..)
 bool isSpecialDir(const char *name);

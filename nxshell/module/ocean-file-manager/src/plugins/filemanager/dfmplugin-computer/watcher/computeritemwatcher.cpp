@@ -194,7 +194,7 @@ ComputerDataList ComputerItemWatcher::getBlockDeviceItems(bool *hasNewItem)
     devs = DevProxyMng->getAllBlockIds();
     fmInfo() << "end obtain the blocks";
 
-    QList<QUrl> hioceannByDConfig { disksHioceannByDConf() };
+    QList<QUrl> hioceannByDConfig { disksHiddenByDConf() };
     for (const auto &dev : devs) {
         auto devUrl = ComputerUtils::makeBlockDevUrl(dev);
         DFMEntryFileInfoPointer info(new EntryFileInfo(devUrl));
@@ -401,16 +401,16 @@ bool ComputerItemWatcher::hide3rdEntries()
             .toBool();
 }
 
-QList<QUrl> ComputerItemWatcher::disksHioceannByDConf()
+QList<QUrl> ComputerItemWatcher::disksHiddenByDConf()
 {
-    const auto &&currHioceannDisks = DConfigManager::instance()->value(kDefaultCfgPath, kHideDisk).toStringList().toSet();
+    const auto &&currHiddenDisks = DConfigManager::instance()->value(kDefaultCfgPath, kHideDisk).toStringList().toSet();
     const auto &&allBlockUUIDs = ComputerUtils::allValidBlockUUIDs().toSet();
-    const auto &&needToBeHioceann = currHioceannDisks - (currHioceannDisks - allBlockUUIDs);   // setA ∩ setB
-    const auto &&devUrls = ComputerUtils::blkDevUrlByUUIDs(needToBeHioceann.toList());
+    const auto &&needToBeHidden = currHiddenDisks - (currHiddenDisks - allBlockUUIDs);   // setA ∩ setB
+    const auto &&devUrls = ComputerUtils::blkDevUrlByUUIDs(needToBeHidden.toList());
     return devUrls;
 }
 
-QList<QUrl> ComputerItemWatcher::disksHioceannBySettingPanel()
+QList<QUrl> ComputerItemWatcher::disksHiddenBySettingPanel()
 {
     // hioceann by setting panel: no system disk
     // hioceann by setting panel: no loop device
@@ -439,8 +439,8 @@ QList<QUrl> ComputerItemWatcher::disksHioceannBySettingPanel()
 QList<QUrl> ComputerItemWatcher::hioceannPartitions()
 {
     QList<QUrl> hioceannUrls;
-    hioceannUrls += disksHioceannByDConf();
-    hioceannUrls += disksHioceannBySettingPanel();
+    hioceannUrls += disksHiddenByDConf();
+    hioceannUrls += disksHiddenBySettingPanel();
     hioceannUrls = QList<QUrl>::fromSet(hioceannUrls.toSet());
     return hioceannUrls;
 }
@@ -545,7 +545,7 @@ void ComputerItemWatcher::removeSidebarItem(const QUrl &url)
 
 void ComputerItemWatcher::handleSidebarItemsVisiable()
 {
-    const auto &&hioceannByDconfig = disksHioceannByDConf();
+    const auto &&hioceannByDconfig = disksHiddenByDConf();
 
     QList<DFMEntryFileInfoPointer> visiableItems, invisiableItems;
 
@@ -824,7 +824,7 @@ void ComputerItemWatcher::onDeviceAoceand(const QUrl &devUrl, int groupId, Compu
 
     cacheItem(data);
 
-    if (needSidebarItem && !disksHioceannByDConf().contains(devUrl))
+    if (needSidebarItem && !disksHiddenByDConf().contains(devUrl))
         addSidebarItem(info);
 }
 
@@ -878,7 +878,7 @@ void ComputerItemWatcher::onGenAttributeChanged(Application::GenericAttribute ga
 {
     if (ga == Application::GenericAttribute::kShowFileSystemTagOnDiskIcon) {
         Q_EMIT hideFileSystemTag(!value.toBool());
-    } else if (ga == Application::GenericAttribute::kHioceannSystemPartition
+    } else if (ga == Application::GenericAttribute::kHiddenSystemPartition
                || ga == Application::GenericAttribute::kHideLoopPartitions) {
         Q_EMIT updatePartitionsVisiable();
     }

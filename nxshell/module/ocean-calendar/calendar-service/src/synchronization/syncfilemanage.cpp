@@ -5,7 +5,7 @@
 #include "syncfilemanage.h"
 #include "commondef.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 SyncFileManage::SyncFileManage(QObject *parent)
     : QObject(parent)

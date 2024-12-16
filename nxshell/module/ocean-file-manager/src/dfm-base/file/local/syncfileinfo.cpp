@@ -208,8 +208,8 @@ bool SyncFileInfo::isAttributes(const OptInfoType type) const
         return d->attribute(DFileInfo::AttributeID::kAccessCanRead).toBool();
     case FileIsType::kIsWritable:
         return d->attribute(DFileInfo::AttributeID::kAccessCanWrite).toBool();
-    case FileIsType::kIsHioceann:
-        return d->attribute(DFileInfo::AttributeID::kStandardIsHioceann).toBool();
+    case FileIsType::kIsHidden:
+        return d->attribute(DFileInfo::AttributeID::kStandardIsHidden).toBool();
     case FileIsType::kIsSymLink:
         return d->attribute(DFileInfo::AttributeID::kStandardIsSymlink).toBool();
     case FileIsType::kIsExecutable:
@@ -236,7 +236,7 @@ bool SyncFileInfo::canAttributes(const CanableInfoType type) const
         return d->canTrash();
     case FileCanType::kCanRename:
         return d->canRename();
-    case FileCanType::kCanHioceann:
+    case FileCanType::kCanHidden:
         if (ProtocolUtils::isGphotoFile(url))
             return false;
         return true;
@@ -261,7 +261,7 @@ QVariant SyncFileInfo::extendAttributes(const ExtInfoType type) const
     case FileExtendedInfoType::kGroup:
         return d->attribute(DFileInfo::AttributeID::kOwnerGroup);
     case FileExtendedInfoType::kFileIsHid:
-        return d->attribute(DFileInfo::AttributeID::kStandardIsHioceann);
+        return d->attribute(DFileInfo::AttributeID::kStandardIsHidden);
     case FileExtendedInfoType::kOwnerId:
         return d->attribute(DFileInfo::AttributeID::kUnixUID);
     case FileExtendedInfoType::kGroupId:
@@ -516,7 +516,7 @@ void SyncFileInfo::setExtendedAttributes(const FileExtendedInfoType &key, const 
         break;
     case FileExtendedInfoType::kFileIsHid: {
         locker.unlock();
-        cacheAttribute(DFileInfo::AttributeID::kStandardIsHioceann, value);
+        cacheAttribute(DFileInfo::AttributeID::kStandardIsHidden, value);
         break;
     }
     default:

@@ -5,7 +5,7 @@
 #include "computerpropertydialog.h"
 #include <dfm-base/utils/universalutils.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DFontSizeManager>
 #include <DFrame>
 #include <DGuiApplicationHelper>
@@ -57,7 +57,7 @@ void ComputerPropertyDialog::iniUI()
     titleLabel->setForegroundRole(DPalette::TextTitle);
 
     computerIcon = new DLabel(this);
-    QString distributerLogoPath = DSysInfo::distributionOrgLogo();
+    QString distributerLogoPath = LSysInfo::distributionOrgLogo();
     QIcon logoIcon;
     if (!distributerLogoPath.isEmpty() && QFile::exists(distributerLogoPath)) {
         logoIcon = QIcon(distributerLogoPath);
@@ -269,23 +269,23 @@ void ComputerInfoThread::computerProcess()
 
 QString ComputerInfoThread::computerName() const
 {
-    return DSysInfo::computerName();
+    return LSysInfo::computerName();
 }
 
 QString ComputerInfoThread::versionNum() const
 {
-    return DSysInfo::majorVersion();
+    return LSysInfo::majorVersion();
 }
 
 QString ComputerInfoThread::edition() const
 {
-    if (DSysInfo::isLingmo()) {
-        if (DSysInfo::uosType() == DSysInfo::UosServer) {
-            return QString("%1%2").arg(DSysInfo::minorVersion()).arg(DSysInfo::uosEditionName());
+    if (LSysInfo::isLingmo()) {
+        if (LSysInfo::uosType() == LSysInfo::UosServer) {
+            return QString("%1%2").arg(LSysInfo::minorVersion()).arg(LSysInfo::uosEditionName());
         } else {
-            QString defaultEdition = QString("%1(%2)").arg(DSysInfo::uosEditionName()).arg(DSysInfo::minorVersion());
-            if (DSysInfo::UosEdition::UosProfessional == DSysInfo::uosEditionType()
-                || DSysInfo::UosEdition::UosMilitary == DSysInfo::uosEditionType()) {
+            QString defaultEdition = QString("%1(%2)").arg(LSysInfo::uosEditionName()).arg(LSysInfo::minorVersion());
+            if (LSysInfo::UosEdition::UosProfessional == LSysInfo::uosEditionType()
+                || LSysInfo::UosEdition::UosMilitary == LSysInfo::uosEditionType()) {
                 QDBusInterface lingmoLicenseInfo("com.lingmo.license",
                                                  "/com/lingmo/license/Info",
                                                  "com.lingmo.license.Info",
@@ -303,22 +303,22 @@ QString ComputerInfoThread::edition() const
                     QVariant info = lingmoLicenseInfo.property("ServiceProperty");
                     fmInfo() << "End call Dbus com.lingmo.license serviceProperty";
                     if (info.isValid() && info.toUInt() == kSecretsSecurity) {
-                        return QString("%1(%2)(%3)").arg(DSysInfo::uosEditionName()).arg(tr("For Secrets Security")).arg(DSysInfo::minorVersion());
+                        return QString("%1(%2)(%3)").arg(LSysInfo::uosEditionName()).arg(tr("For Secrets Security")).arg(LSysInfo::minorVersion());
                     }
 
                     fmInfo() << "Start call Dbus com.lingmo.license AuthorizationProperty";
                     uint authorizedInfo = lingmoLicenseInfo.property("AuthorizationProperty").toUInt();
                     fmInfo() << "End call Dbus com.lingmo.license AuthorizationProperty";
                     if (kGovernment == authorizedInfo) {
-                        return QString("%1(%2)(%3)").arg(DSysInfo::uosEditionName()).arg(tr("For Government")).arg(DSysInfo::minorVersion());
+                        return QString("%1(%2)(%3)").arg(LSysInfo::uosEditionName()).arg(tr("For Government")).arg(LSysInfo::minorVersion());
                     } else if (kEnterprise == authorizedInfo) {
-                        return QString("%1(%2)(%3)").arg(DSysInfo::uosEditionName()).arg(tr("For Enterprise")).arg(DSysInfo::minorVersion());
+                        return QString("%1(%2)(%3)").arg(LSysInfo::uosEditionName()).arg(tr("For Enterprise")).arg(LSysInfo::minorVersion());
                     } else if (kUnauthorized == authorizedInfo) {
                         return defaultEdition;
                     } else {
                         const QString info = lingmoLicenseInfo.property("AuthorizationPropertyString").toString();
                         if (!info.isEmpty())
-                            return QString("%1(%2)(%3)").arg(DSysInfo::uosEditionName()).arg(info).arg(DSysInfo::minorVersion());
+                            return QString("%1(%2)(%3)").arg(LSysInfo::uosEditionName()).arg(info).arg(LSysInfo::minorVersion());
                         return defaultEdition;
                     }
                 } else {
@@ -329,13 +329,13 @@ QString ComputerInfoThread::edition() const
             }
         }
     } else {
-        return QString("%1 %2").arg(DSysInfo::productVersion()).arg(DSysInfo::productTypeString());
+        return QString("%1 %2").arg(LSysInfo::productVersion()).arg(LSysInfo::productTypeString());
     }
 }
 
 QString ComputerInfoThread::osBuild() const
 {
-    return DSysInfo::buildVersion();
+    return LSysInfo::buildVersion();
 }
 
 QString ComputerInfoThread::systemType() const
@@ -346,7 +346,7 @@ QString ComputerInfoThread::systemType() const
 QString ComputerInfoThread::cpuInfo() const
 {
     // 1. 如果CPU型号名称中已包含频率信息，直接返回
-    QString modelName = DSysInfo::cpuModelName();
+    QString modelName = LSysInfo::cpuModelName();
     if (modelName.contains("Hz"))
         return modelName;
 
@@ -385,7 +385,7 @@ QString ComputerInfoThread::cpuInfo() const
     }
 
     // 5. 构建最终的CPU信息字符串
-    QString actualProcessor = DSysInfo::cpuModelName().isEmpty() ? processor : DSysInfo::cpuModelName();
+    QString actualProcessor = LSysInfo::cpuModelName().isEmpty() ? processor : LSysInfo::cpuModelName();
     if (cpuGHz <= 0.0)
         return actualProcessor;
 
@@ -395,7 +395,7 @@ QString ComputerInfoThread::cpuInfo() const
 QString ComputerInfoThread::memoryInfo() const
 {
     return QString("%1 (%2 %3)")
-            .arg(formatCap(DSysInfo::memoryInstalledSize(), 1024, 0))
-            .arg(formatCap(DSysInfo::memoryTotalSize()))
+            .arg(formatCap(LSysInfo::memoryInstalledSize(), 1024, 0))
+            .arg(formatCap(LSysInfo::memoryTotalSize()))
             .arg(tr("Available"));
 }

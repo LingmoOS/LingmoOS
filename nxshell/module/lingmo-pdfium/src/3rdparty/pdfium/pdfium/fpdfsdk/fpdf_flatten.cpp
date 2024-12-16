@@ -106,7 +106,7 @@ int ParserAnnots(CPDF_Document* pSourceDoc,
       continue;
 
     int nAnnotFlag = pAnnotDict->GetIntegerFor("F");
-    if (nAnnotFlag & pdfium::annotation_flags::kHioceann)
+    if (nAnnotFlag & pdfium::annotation_flags::kHidden)
       continue;
 
     bool bParseStream;

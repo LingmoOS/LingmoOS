@@ -4,7 +4,7 @@
 #include "soundmodel.h"
 
 #include <DIconButton>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DToolButton>
 
 #include <QDBusInterface>
@@ -18,8 +18,8 @@ Q_LOGGING_CATEGORY(DdcSoundModel, "oceanui-sound-model")
 
 Q_DECLARE_METATYPE(const Port *)
 
-const static Dtk::Core::DSysInfo::UosType UosType = Dtk::Core::DSysInfo::uosType();
-const static bool IsServerSystem = (Dtk::Core::DSysInfo::UosServer == UosType); //是否是服务器版
+const static Dtk::Core::LSysInfo::UosType UosType = Dtk::Core::LSysInfo::uosType();
+const static bool IsServerSystem = (Dtk::Core::LSysInfo::UosServer == UosType); //是否是服务器版
 
 static const QMap<DDesktopServices::SystemSoundEffect, QString> SOUND_EFFECT_MAP{
     { DDesktopServices::SystemSoundEffect::SSE_Notifications, "message" },

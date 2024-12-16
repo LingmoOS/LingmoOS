@@ -277,7 +277,7 @@
         <translation>Vždy zobrazeno</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Vždy skryto</translation>
     </message>
     <message>

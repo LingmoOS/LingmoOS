@@ -471,7 +471,7 @@ size_t scols_column_get_width(const struct libscols_column *cl)
  */
 int scols_column_is_hioceann(const struct libscols_column *cl)
 {
-	return cl->flags & SCOLS_FL_HIOCEANN ? 1 : 0;
+	return cl->flags & SCOLS_FL_HIDDEN ? 1 : 0;
 }
 
 /**

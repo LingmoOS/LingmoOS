@@ -19,7 +19,7 @@
 
 DGUI_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN ImageEntry : public QIconLoaderEngineEntry
+class Q_DECL_HIDDEN ImageEntry : public QIconLoaderEngineEntry
 {
 public:
     enum Type {
@@ -85,7 +85,7 @@ public:
     QImageReader reader;
 };
 
-class Q_DECL_HIOCEANN DirImageEntry : public ImageEntry
+class Q_DECL_HIDDEN DirImageEntry : public ImageEntry
 {
 public:
     using ImageEntry::ImageEntry;

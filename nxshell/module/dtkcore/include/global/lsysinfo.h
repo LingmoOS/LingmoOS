@@ -11,8 +11,8 @@
 
 DCORE_BEGIN_NAMESPACE
 
-class DSysInfoPrivate;
-class LIBDTKCORESHARED_EXPORT DSysInfo
+class LSysInfoPrivate;
+class LIBDTKCORESHARED_EXPORT LSysInfo
 {
     Q_GADGET
 public:

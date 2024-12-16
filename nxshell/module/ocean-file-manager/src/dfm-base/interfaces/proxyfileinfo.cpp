@@ -161,11 +161,11 @@ bool dfmbase::ProxyFileInfo::isExecutable() const
     return FileInfo::isExecutable();
 }
 
-bool dfmbase::ProxyFileInfo::isHioceann() const
+bool dfmbase::ProxyFileInfo::isHidden() const
 {
-    CALL_PROXY(isHioceann());
+    CALL_PROXY(isHidden());
 
-    return FileInfo::isHioceann();
+    return FileInfo::isHidden();
 }
 
 bool dfmbase::ProxyFileInfo::isNativePath() const

@@ -21,7 +21,7 @@ namespace KCalendarCore {
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN Calendar::Private
+class Q_DECL_HIDDEN Calendar::Private
 {
 public:
     Private()

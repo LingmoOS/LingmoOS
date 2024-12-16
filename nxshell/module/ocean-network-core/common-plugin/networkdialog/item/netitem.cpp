@@ -397,7 +397,7 @@ void WirelessItem::initUi(QWidget *parent)
     if (m_accessPoint) {
         standardItem()->setData(NetItemType::WirelessViewItem, NetItemRole::TypeRole);
     } else {
-        standardItem()->setData(NetItemType::WirelessHioceannViewItem, NetItemRole::TypeRole);
+        standardItem()->setData(NetItemType::WirelessHiddenViewItem, NetItemRole::TypeRole);
     }
     standardItem()->setData(QVariant::fromValue(m_device), NetItemRole::DeviceDataRole);
     standardItem()->setData(QVariant::fromValue(DeviceType::Wireless), NetItemRole::DeviceTypeRole);
@@ -598,8 +598,8 @@ void WirelessItem::createSsidEdit()
     m_stackWidget->addWidget(ssidWidget);
 
     connect(cancelButtion, &DPushButton::clicked, this, &WirelessItem::onCancel);
-    connect(connectButton, &DPushButton::clicked, this, &WirelessItem::onConnectHioceann);
-    connect(m_ssidEdit->lineEdit(), &QLineEdit::returnPressed, this, &WirelessItem::onConnectHioceann);
+    connect(connectButton, &DPushButton::clicked, this, &WirelessItem::onConnectHidden);
+    connect(m_ssidEdit->lineEdit(), &QLineEdit::returnPressed, this, &WirelessItem::onConnectHidden);
     ThemeManager::ref().updateInputStyle(m_ssidEdit);
 }
 
@@ -657,7 +657,7 @@ void WirelessItem::onAirplaneModeChanged(bool airplaneModeEnabled)
     m_stackWidget->setDisabled(airplaneModeEnabled);
 }
 
-void WirelessItem::onConnectHioceann()
+void WirelessItem::onConnectHidden()
 {
     QString ssid = m_ssidEdit->text();
     if (!ssid.isEmpty()) {

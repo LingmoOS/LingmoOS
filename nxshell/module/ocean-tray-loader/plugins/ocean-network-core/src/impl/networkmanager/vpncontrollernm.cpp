@@ -70,7 +70,7 @@ VPNItem *VPNController_NM::addVpnConnection(const NetworkManager::Connection::Pt
         json.insert("HwAddress", QString());
         json.insert("ClonedAddress", QString());
         json.insert("Ssid", QString());
-        json.insert("Hioceann", false);
+        json.insert("Hidden", false);
         return json;
     };
     // 从列表中查找是否存在path相同的连接

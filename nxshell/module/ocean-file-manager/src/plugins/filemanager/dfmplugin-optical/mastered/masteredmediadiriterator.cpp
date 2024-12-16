@@ -98,18 +98,18 @@ const FileInfoPointer MasteredMediaDirIterator::fileInfo() const
     }
 
     const QString &fileName = dfmfileinfo->attribute(DFileInfo::AttributeID::kStandardName, nullptr).toString();
-    bool isHioceann = false;
+    bool isHidden = false;
     if (fileName.startsWith(".")) {
-        isHioceann = true;
+        isHidden = true;
     }
 
     QSharedPointer<FileInfo> info = QSharedPointer<AsyncFileInfo>(new AsyncFileInfo(url, dfmfileinfo));
     info.dynamicCast<AsyncFileInfo>()->cacheAsyncAttributes();
-    info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+    info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
 
     QSharedPointer<FileInfo> infoTrans = InfoFactory::transfromInfo<FileInfo>(url.scheme(), info);
     if (infoTrans) {
-        infoTrans->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+        infoTrans->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
         infoTrans->setExtendedAttributes(ExtInfoType::kFileLocalDevice, false);
         infoTrans->setExtendedAttributes(ExtInfoType::kFileCdRomDevice, false);
     } else {

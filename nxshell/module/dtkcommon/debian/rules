@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/default.mk
+export QT_SELECT = qt5
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+VERSION = $(DEB_VERSION_UPSTREAM)
+_PACK_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$1}')
+_BUILD_VER = $(shell echo $(VERSION) | awk -F'[+_~-]' '{print $$2}' | sed 's/[^0-9]//g')
+ifeq ($(_BUILD_VER),)
+	CONFIG_VERSION = $(_PACK_VER)
+else
+	CONFIG_VERSION = $(_PACK_VER).$(_BUILD_VER)
+endif
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DDTK_VERSION=$(CONFIG_VERSION)
+
+#override_dh_auto_test:
+#	echo "skip auto test"
+
+override_dh_makeshlibs:
+	dh_makeshlibs -V "libdtkcommon (>= $(shell echo $(VERSION) | cut -d '.' -f 1,2))"

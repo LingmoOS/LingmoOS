@@ -553,7 +553,7 @@ bool CompressSettingPage::checkFile(const QString &path)
         QDir dir(path);
         // 遍历文件夹下的子文件夹
         QFileInfoList listInfo = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                                   | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                                   | QDir::NoDotAndDotDot | QDir::Hidden);
 
         foreach (QFileInfo subInfo, listInfo) {
             bool bResult = checkFile(subInfo.absoluteFilePath());

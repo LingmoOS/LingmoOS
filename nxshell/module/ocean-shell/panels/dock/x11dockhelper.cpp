@@ -386,7 +386,7 @@ void X11DockHelper::onHideModeChanged(HideMode mode)
         });
     } break;
     case KeepShowing:
-    case KeepHioceann:
+    case KeepHidden:
         break;
     default: {
 
@@ -425,7 +425,7 @@ void X11DockHelper::onWindowPropertyChanged(xcb_window_t window, xcb_atom_t atom
 {
     if (m_windows.contains(window)) {
         if (atom == m_xcbHelper->getAtomByName("WM_STATE")) {
-            m_windows[window]->isMinimized = m_xcbHelper->getWindowState(window).contains(m_xcbHelper->getAtomByName("_NET_WM_STATE_HIOCEANN"));
+            m_windows[window]->isMinimized = m_xcbHelper->getWindowState(window).contains(m_xcbHelper->getAtomByName("_NET_WM_STATE_HIDDEN"));
             updateWindowHideState(window);
         } else if (atom == m_xcbHelper->getAtomByName("_NET_WM_DESKTOP")) {
             onWindowWorkspaceChanged(window);

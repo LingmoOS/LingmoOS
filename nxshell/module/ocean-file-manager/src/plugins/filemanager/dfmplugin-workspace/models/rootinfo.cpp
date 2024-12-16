@@ -75,7 +75,7 @@ bool RootInfo::initThreadOfFileData(const QString &key, DFMGLOBAL_NAMESPACE::Ite
     traversalThread.reset(new DirIteratorThread);
     traversalThread->traversalThread.reset(
             new TraversalDirThreadManager(url, QStringList(),
-                                          QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann,
+                                          QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden,
                                           QDirIterator::FollowSymlinks));
     traversalThread->traversalThread->setSortAgruments(order, role, isMixFileAndFolder);
     traversalThread->traversalThread->setTraversalToken(key);
@@ -496,7 +496,7 @@ SortInfoPointer RootInfo::sortFileInfo(const FileInfoPointer &info)
     sortInfo->setSize(info->size());
     sortInfo->setFile(!info->isAttributes(OptInfoType::kIsDir));
     sortInfo->setDir(info->isAttributes(OptInfoType::kIsDir));
-    sortInfo->setHide(info->isAttributes(OptInfoType::kIsHioceann));
+    sortInfo->setHide(info->isAttributes(OptInfoType::kIsHidden));
     sortInfo->setSymlink(info->isAttributes(OptInfoType::kIsSymLink));
     sortInfo->setReadable(info->isAttributes(OptInfoType::kIsReadable));
     sortInfo->setWriteable(info->isAttributes(OptInfoType::kIsWritable));

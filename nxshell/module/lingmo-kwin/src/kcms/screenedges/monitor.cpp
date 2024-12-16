@@ -66,7 +66,7 @@ void Monitor::clear()
     for (size_t i = 0; i < m_popups.size(); i++) {
         m_popups[i]->clear();
         m_items[i]->setActive(false);
-        setEdgeHioceann(i, false);
+        setEdgeHidden(i, false);
         m_actionGroups[i] = std::make_unique<QActionGroup>(this);
     }
 }
@@ -116,7 +116,7 @@ void Monitor::setEdgeEnabled(int edge, bool enabled)
     }
 }
 
-void Monitor::setEdgeHioceann(int edge, bool set)
+void Monitor::setEdgeHidden(int edge, bool set)
 {
     m_hioceann[edge] = set;
     if (set) {
@@ -126,7 +126,7 @@ void Monitor::setEdgeHioceann(int edge, bool set)
     }
 }
 
-bool Monitor::edgeHioceann(int edge) const
+bool Monitor::edgeHidden(int edge) const
 {
     return m_hioceann[edge];
 }

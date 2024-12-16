@@ -10,7 +10,7 @@
 #include <dfm-framework/dpf.h>
 
 #include <DApplication>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDebug>
 #include <QDir>

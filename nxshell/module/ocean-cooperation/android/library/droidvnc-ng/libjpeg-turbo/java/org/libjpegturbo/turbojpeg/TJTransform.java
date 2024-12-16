@@ -173,7 +173,7 @@ public class TJTransform extends Rectangle {
    * @param cf an instance of an object that implements the {@link
    * TJCustomFilter} interface, or null if no custom filter is needed
    */
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   public TJTransform(int x, int y, int w, int h, int op, int options,
                      TJCustomFilter cf) {
     super(x, y, w, h);
@@ -198,7 +198,7 @@ public class TJTransform extends Rectangle {
    * @param cf an instance of an object that implements the {@link
    * TJCustomFilter} interface, or null if no custom filter is needed
    */
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   public TJTransform(Rectangle r, int op, int options,
                      TJCustomFilter cf) {
     super(r);

@@ -41,7 +41,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::IncidenceBase::Private
+class Q_DECL_HIDDEN KCalendarCore::IncidenceBase::Private
 {
 public:
     Private()

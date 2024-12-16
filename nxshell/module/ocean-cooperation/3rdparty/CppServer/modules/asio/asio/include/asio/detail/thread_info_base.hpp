@@ -17,7 +17,7 @@
 
 #include "asio/detail/config.hpp"
 #include <climits>
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/detail/memory.hpp"
 #include "asio/detail/noncopyable.hpp"
 

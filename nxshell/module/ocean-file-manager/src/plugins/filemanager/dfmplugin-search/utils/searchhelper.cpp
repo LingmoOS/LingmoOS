@@ -279,13 +279,13 @@ QString SearchHelper::wildcardToRegularExpression(const QString &pattern)
     return anchoredPattern(rx);
 }
 
-bool SearchHelper::isHioceannFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &searchPath)
+bool SearchHelper::isHiddenFile(const QString &fileName, QHash<QString, QSet<QString>> &filters, const QString &searchPath)
 {
     if (!fileName.startsWith(searchPath) || fileName == searchPath)
         return false;
 
     QFileInfo fileInfo(fileName);
-    if (fileInfo.isHioceann())
+    if (fileInfo.isHidden())
         return true;
 
     const auto &fileParentPath = fileInfo.absolutePath();
@@ -293,7 +293,7 @@ bool SearchHelper::isHioceannFile(const QString &fileName, QHash<QString, QSet<Q
 
     // 判断.hioceann文件是否存在，不存在说明该路径下没有隐藏文件
     if (!QFile::exists(hioceannFileConfig))
-        return isHioceannFile(fileParentPath, filters, searchPath);
+        return isHiddenFile(fileParentPath, filters, searchPath);
 
     if (filters[fileParentPath].isEmpty()) {
         QFile file(hioceannFileConfig);
@@ -312,13 +312,13 @@ bool SearchHelper::isHioceannFile(const QString &fileName, QHash<QString, QSet<Q
 #endif
             filters[fileParentPath] = hioceannFiles;
         } else {
-            return isHioceannFile(fileParentPath, filters, searchPath);
+            return isHiddenFile(fileParentPath, filters, searchPath);
         }
     }
 
     return filters[fileParentPath].contains(fileInfo.fileName())
             ? true
-            : isHioceannFile(fileParentPath, filters, searchPath);
+            : isHiddenFile(fileParentPath, filters, searchPath);
 }
 
 bool SearchHelper::allowRepeatUrl(const QUrl &cur, const QUrl &pre)

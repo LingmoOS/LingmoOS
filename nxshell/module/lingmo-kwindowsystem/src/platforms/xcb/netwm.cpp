@@ -1006,8 +1006,8 @@ void NETRootInfo::setSupported()
         if (p->states & SkipSwitcher) {
             atoms[pnum++] = p->atom(_KDE_NET_WM_STATE_SKIP_SWITCHER);
         }
-        if (p->states & Hioceann) {
-            atoms[pnum++] = p->atom(_NET_WM_STATE_HIOCEANN);
+        if (p->states & Hidden) {
+            atoms[pnum++] = p->atom(_NET_WM_STATE_HIDDEN);
         }
         if (p->states & FullScreen) {
             atoms[pnum++] = p->atom(_NET_WM_STATE_FULLSCREEN);
@@ -1321,8 +1321,8 @@ void NETRootInfo::updateSupportedProperties(xcb_atom_t atom)
         p->states |= SkipPager;
     } else if (atom == p->atom(_KDE_NET_WM_STATE_SKIP_SWITCHER)) {
         p->states |= SkipSwitcher;
-    } else if (atom == p->atom(_NET_WM_STATE_HIOCEANN)) {
-        p->states |= Hioceann;
+    } else if (atom == p->atom(_NET_WM_STATE_HIDDEN)) {
+        p->states |= Hidden;
     } else if (atom == p->atom(_NET_WM_STATE_FULLSCREEN)) {
         p->states |= FullScreen;
     } else if (atom == p->atom(_NET_WM_STATE_ABOVE)) {
@@ -2986,9 +2986,9 @@ void NETWinInfo::setState(NET::States state, NET::States mask)
             xcb_send_event(p->conn, false, p->root, netwm_sendevent_mask, (const char *) &event);
         }
 
-        if ((mask & Hioceann) && ((p->state & Hioceann) != (state & Hioceann))) {
-            event.data.data32[0] = (state & Hioceann) ? 1 : 0;
-            event.data.data32[1] = p->atom(_NET_WM_STATE_HIOCEANN);
+        if ((mask & Hidden) && ((p->state & Hidden) != (state & Hidden))) {
+            event.data.data32[0] = (state & Hidden) ? 1 : 0;
+            event.data.data32[1] = p->atom(_NET_WM_STATE_HIDDEN);
             event.data.data32[2] = 0l;
 
             xcb_send_event(p->conn, false, p->root, netwm_sendevent_mask, (const char *) &event);
@@ -3054,8 +3054,8 @@ void NETWinInfo::setState(NET::States state, NET::States mask)
         if (p->state & Shaded) {
             data[count++] = p->atom(_NET_WM_STATE_SHADED);
         }
-        if (p->state & Hioceann) {
-            data[count++] = p->atom(_NET_WM_STATE_HIOCEANN);
+        if (p->state & Hidden) {
+            data[count++] = p->atom(_NET_WM_STATE_HIDDEN);
         }
         if (p->state & FullScreen) {
             data[count++] = p->atom(_NET_WM_STATE_FULLSCREEN);
@@ -3651,8 +3651,8 @@ void NETWinInfo::event(xcb_generic_event_t *event, NET::Properties *properties, 
                     mask |= SkipPager;
                 } else if ((xcb_atom_t) message->data.data32[i] == p->atom(_KDE_NET_WM_STATE_SKIP_SWITCHER)) {
                     mask |= SkipSwitcher;
-                } else if ((xcb_atom_t) message->data.data32[i] == p->atom(_NET_WM_STATE_HIOCEANN)) {
-                    mask |= Hioceann;
+                } else if ((xcb_atom_t) message->data.data32[i] == p->atom(_NET_WM_STATE_HIDDEN)) {
+                    mask |= Hidden;
                 } else if ((xcb_atom_t) message->data.data32[i] == p->atom(_NET_WM_STATE_FULLSCREEN)) {
                     mask |= FullScreen;
                 } else if ((xcb_atom_t) message->data.data32[i] == p->atom(_NET_WM_STATE_ABOVE)) {
@@ -4064,8 +4064,8 @@ void NETWinInfo::update(NET::Properties dirtyProperties, NET::Properties2 dirtyP
                 p->state |= SkipSwitcher;
             }
 
-            else if (state == p->atom(_NET_WM_STATE_HIOCEANN)) {
-                p->state |= Hioceann;
+            else if (state == p->atom(_NET_WM_STATE_HIDDEN)) {
+                p->state |= Hidden;
             }
 
             else if (state == p->atom(_NET_WM_STATE_FULLSCREEN)) {

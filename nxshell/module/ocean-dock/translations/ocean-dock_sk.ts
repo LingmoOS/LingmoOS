@@ -277,7 +277,7 @@
         <translation>Ponechať zobrazené</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Ponechať skryté</translation>
     </message>
     <message>

@@ -76,7 +76,7 @@ TEST_F(RecentFileInfoTest, isAttributes)
 {
     EXPECT_FALSE(info->isAttributes(dfmbase::OptInfoType::kIsReadable));
     EXPECT_FALSE(info->isAttributes(dfmbase::OptInfoType::kIsWritable));
-    EXPECT_FALSE(info->isAttributes(dfmbase::OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info->isAttributes(dfmbase::OptInfoType::kIsHidden));
 }
 
 TEST_F(RecentFileInfoTest, canAttributes)

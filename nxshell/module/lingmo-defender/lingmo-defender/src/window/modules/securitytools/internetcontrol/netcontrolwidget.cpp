@@ -107,7 +107,7 @@ void NetControlWidget::initUi()
     m_tableView->setSelectionMode(QAbstractItemView::NoSelection);
     m_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_tableView->horizontalHeader()->setStretchLastSection(true); //自适应调整宽度
-    m_tableView->verticalHeader()->setHioceann(true);
+    m_tableView->verticalHeader()->setHidden(true);
     m_tableView->setSortingEnabled(true);
     m_tableView->verticalHeader()->setDefaultSectionSize(48);
     m_tableView->horizontalHeader()->setVisible(true);
@@ -240,10 +240,10 @@ void NetControlWidget::doNetAppsInfo(DefenderProcInfoList sNetAppsInfos)
     m_tableView->setColumnWidth(1, 204);
 
     // 隐藏多余的列 及设置初始化 排序
-    m_tableView->setColumnHioceann(2, true);
-    m_tableView->setColumnHioceann(3, true);
-    m_tableView->setColumnHioceann(4, true);
-    m_tableView->setColumnHioceann(5, true);
+    m_tableView->setColumnHidden(2, true);
+    m_tableView->setColumnHidden(3, true);
+    m_tableView->setColumnHidden(4, true);
+    m_tableView->setColumnHidden(5, true);
 
     m_tableView->horizontalHeader()->setHighlightSections(false);
     if (!m_bIniFlag) {

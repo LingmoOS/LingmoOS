@@ -222,10 +222,10 @@ void BasicWidget::basicFill(const QUrl &url)
     FileInfoPointer info = InfoFactory::create<FileInfo>(url);
     if (info.isNull())
         return;
-    if (!info->canAttributes(CanableInfoType::kCanHioceann))
+    if (!info->canAttributes(CanableInfoType::kCanHidden))
         hideFile->setEnabled(false);
 
-    if (info->isAttributes(OptInfoType::kIsHioceann))
+    if (info->isAttributes(OptInfoType::kIsHidden))
         hideFile->setChecked(true);
 
     connect(hideFile, &DCheckBox::stateChanged, this, &BasicWidget::slotFileHide);

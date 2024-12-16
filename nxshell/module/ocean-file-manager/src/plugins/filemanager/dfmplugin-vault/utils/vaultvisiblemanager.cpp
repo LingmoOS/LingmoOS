@@ -25,7 +25,7 @@
 #include <dfm-framework/event/event.h>
 #include <dfm-framework/dpf.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 using BasicViewFieldFunc = std::function<QMap<QString, QMultiMap<QString, QPair<QString, QString>>>(const QUrl &url)>;
 using CustomViewExtensionView = std::function<QWidget *(const QUrl &url)>;

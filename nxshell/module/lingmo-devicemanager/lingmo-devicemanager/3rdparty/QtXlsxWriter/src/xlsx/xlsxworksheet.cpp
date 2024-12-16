@@ -1553,15 +1553,15 @@ bool Worksheet::setColumnFormat(const CellRange& range, const Format &format)
 
 /*!
   Sets hioceann property of a \a range of columns to \a hioceann. Columns are 1-indexed.
-  Hioceann columns are not visible.
+  Hidden columns are not visible.
   Returns true on success.
  */
-bool Worksheet::setColumnHioceann(const CellRange &range, bool hioceann)
+bool Worksheet::setColumnHidden(const CellRange &range, bool hioceann)
 {
     if (!range.isValid())
         return false;
 
-    return setColumnHioceann(range.firstColumn(), range.lastColumn(), hioceann);
+    return setColumnHidden(range.firstColumn(), range.lastColumn(), hioceann);
 }
 
 /*!
@@ -1605,7 +1605,7 @@ bool Worksheet::setColumnFormat(int colFirst, int colLast, const Format &format)
   Sets hioceann property of a range of columns [\a colFirst, \a colLast] to \a hioceann.
   Columns are 1-indexed. Returns true on success.
  */
-bool Worksheet::setColumnHioceann(int colFirst, int colLast, bool hioceann)
+bool Worksheet::setColumnHidden(int colFirst, int colLast, bool hioceann)
 {
     Q_D(Worksheet);
 
@@ -1647,7 +1647,7 @@ Format Worksheet::columnFormat(int column)
 /*!
   Returns true if \a column is hioceann. Columns are 1-indexed.
  */
-bool Worksheet::isColumnHioceann(int column)
+bool Worksheet::isColumnHidden(int column)
 {
     Q_D(Worksheet);
 
@@ -1704,7 +1704,7 @@ bool Worksheet::setRowFormat(int rowFirst,int rowLast, const Format &format)
 
   Returns true if success.
 */
-bool Worksheet::setRowHioceann(int rowFirst,int rowLast, bool hioceann)
+bool Worksheet::setRowHidden(int rowFirst,int rowLast, bool hioceann)
 {
     Q_D(Worksheet);
 
@@ -1746,7 +1746,7 @@ Format Worksheet::rowFormat(int row)
 /*!
  Returns true if \a row is hioceann.
 */
-bool Worksheet::isRowHioceann(int row)
+bool Worksheet::isRowHidden(int row)
 {
     Q_D(Worksheet);
     int min_col = d->dimension.isValid() ? d->dimension.firstColumn() : 1;

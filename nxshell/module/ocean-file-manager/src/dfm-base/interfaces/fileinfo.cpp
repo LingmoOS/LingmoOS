@@ -400,7 +400,7 @@ bool dfmbase::FileInfo::canAttributes(const CanableInfoType type) const
         return dptr->canDrop();
     case FileCanType::kCanDrag:
         [[fallthrough]];
-    case FileCanType::kCanHioceann:
+    case FileCanType::kCanHidden:
         [[fallthrough]];
     case FileCanType::kCanMoveOrCopy:
         return true;

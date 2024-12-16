@@ -68,8 +68,8 @@ TEST_F(UT_AsyncFileInfo, testAsyncFileInfo)
     info.reset(new AsyncFileInfo(url, dfileinfo));
     queryAsync(info);
     EXPECT_TRUE(info->exists());
-    info->cacheAttribute(dfmio::DFileInfo::AttributeID::kStandardIsHioceann, true);
-    EXPECT_TRUE(info->isAttributes(OptInfoType::kIsHioceann));
+    info->cacheAttribute(dfmio::DFileInfo::AttributeID::kStandardIsHidden, true);
+    EXPECT_TRUE(info->isAttributes(OptInfoType::kIsHidden));
 }
 
 TEST_F(UT_AsyncFileInfo, testAsyncFileInfoNameOf)
@@ -156,7 +156,7 @@ TEST_F(UT_AsyncFileInfo, testAsyncFileInfoIsAttributes)
     EXPECT_TRUE(info->isAttributes(OptInfoType::kIsWritable));
     EXPECT_TRUE(info->isAttributes(OptInfoType::kIsExecutable));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsRoot));
-    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHidden));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsBundle));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsPrivate));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kCustomerFileIs));
@@ -171,7 +171,7 @@ TEST_F(UT_AsyncFileInfo, testAsyncFileInfoCanAttributes)
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanDelete));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanTrash));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanRename));
-    EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanHioceann));
+    EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanHidden));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanFetch));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanDrop));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanMoveOrCopy));

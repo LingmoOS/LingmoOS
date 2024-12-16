@@ -326,7 +326,7 @@ void Calendarmainwindow::slotOpenSchedule(QString job)
         m_dlg->setSchedules(out);
         m_dlg->updateFormat();
     }
-    if (m_dlg->isHioceann())
+    if (m_dlg->isHidden())
         m_dlg->exec();
     slotWUpdateSchedule();
 }
@@ -545,7 +545,7 @@ void Calendarmainwindow::resizeView()
     }
 
     int sidWidth = 0;
-    if (!m_sidebarView->isHioceann()) {
+    if (!m_sidebarView->isHidden()) {
         sidWidth = m_sidebarView->width();
     }
     if (width() < CalendarViewSwitchWidth + sidWidth) {
@@ -900,7 +900,7 @@ void Calendarmainwindow::slotShowPrivacy()
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
-    bool isCommunityEdition = DSysInfo::isCommunityEdition();
+    bool isCommunityEdition = LSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
         if (isCommunityEdition) {
             url = "https://www.lingmo.org/zh/agreement/privacy/";

@@ -14,7 +14,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN PrimaryOutputV1::Private : public QObject
+class Q_DECL_HIDDEN PrimaryOutputV1::Private : public QObject
 {
     Q_OBJECT
 public:

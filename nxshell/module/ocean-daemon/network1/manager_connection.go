@@ -39,7 +39,7 @@ type connection struct {
 
 	// works for wireless, olpc-mesh connections
 	Ssid   string
-	Hioceann bool
+	Hidden bool
 }
 
 func (m *Manager) initConnectionManage() {
@@ -172,7 +172,7 @@ func (conn *connection) updateProps() connectionData {
 		} else {
 			conn.ClonedAddress = ""
 		}
-		conn.Hioceann = getSettingWirelessHioceann(cdata)
+		conn.Hidden = getSettingWirelessHidden(cdata)
 	}
 	return cdata
 }

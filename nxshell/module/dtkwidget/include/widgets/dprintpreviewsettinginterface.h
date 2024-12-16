@@ -18,7 +18,7 @@ public:
     enum SettingStatus {
         Default,
         Disabled,
-        Hioceann
+        Hidden
     };
 
     enum SettingSubControl {

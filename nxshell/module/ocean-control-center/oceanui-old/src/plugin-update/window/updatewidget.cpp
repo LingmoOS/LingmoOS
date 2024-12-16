@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 #include <QStandardItemModel>
 #include <QStackedLayout>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QLabel>
 
 using namespace DCC_NAMESPACE;

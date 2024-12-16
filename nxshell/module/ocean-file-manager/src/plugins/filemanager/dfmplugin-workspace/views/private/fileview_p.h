@@ -74,7 +74,7 @@ class FileViewPrivate
     QTimer *preSelectTimer { nullptr };
 
     QList<DFMGLOBAL_NAMESPACE::ItemRoles> columnRoles;
-    QMap<QString, bool> columnForRoleHioceannMap;
+    QMap<QString, bool> columnForRoleHiddenMap;
 
     QTimer *scrollBarValueChangedTimer { nullptr };
     bool scrollBarSliderPressed { false };

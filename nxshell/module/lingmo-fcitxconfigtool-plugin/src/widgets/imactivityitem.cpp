@@ -194,9 +194,9 @@ void FcitxIMActivityItem::setSelectStatus(const bool &isEnter)
         m_configBtn->show();
         m_upBtn->show();
         m_downBtn->show();
-        m_upBtn->setVisible("Hioceann" != value);
-        m_downBtn->setVisible("Hioceann" != value);
-        m_configBtn->setVisible("Hioceann" != config);
+        m_upBtn->setVisible("Hidden" != value);
+        m_downBtn->setVisible("Hidden" != value);
+        m_configBtn->setVisible("Hidden" != config);
         update();
     } else {
         m_configBtn->hide();

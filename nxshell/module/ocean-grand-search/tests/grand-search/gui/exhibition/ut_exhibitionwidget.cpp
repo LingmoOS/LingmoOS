@@ -55,7 +55,7 @@ TEST(ExhibitionWidgetTest, onSelectNextItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -80,7 +80,7 @@ TEST(ExhibitionWidgetTest, onSelectPreviousItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 
@@ -105,7 +105,7 @@ TEST(ExhibitionWidgetTest, onHandleItem)
     stub_ext::StubExt stu;
 
     bool ut_hide = true;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 

@@ -38,11 +38,11 @@ func main() {
 			break
 		}
 		//fmt.Println(string(a))
-		if strings.Contains(string(a), "Hioceann") {
+		if strings.Contains(string(a), "Hidden") {
                   if enable == "-off"{
-				result += "Hioceann=true\n"
+				result += "Hidden=true\n"
 			} else {
-				result += "Hioceann=false\n"
+				result += "Hidden=false\n"
 			}
 		} else {
 			result += string(a) + "\n"

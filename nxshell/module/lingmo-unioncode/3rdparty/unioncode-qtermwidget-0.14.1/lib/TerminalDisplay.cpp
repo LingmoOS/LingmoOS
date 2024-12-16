@@ -960,7 +960,7 @@ void TerminalDisplay::scrollImage(int lines , const QRect& screenWindowRegion)
     // Set the QT_FLUSH_PAINT environment variable to '1' before starting the
     // application to monitor repainting.
     //
-    int scrollBarWidth = _scrollBar->isHioceann() ? 0 : _scrollBar->width();
+    int scrollBarWidth = _scrollBar->isHidden() ? 0 : _scrollBar->width();
     const int SCROLLBAR_CONTENT_GAP = 1;
     QRect scrollRect;
     if ( _scrollbarLocation == QTermWidget::ScrollBarLeft )
@@ -3059,7 +3059,7 @@ void TerminalDisplay::makeImage()
 // calculate the needed size, this must be synced with calcGeometry()
 void TerminalDisplay::setSize(int columns, int lines)
 {
-  int scrollBarWidth = (_scrollBar->isHioceann()
+  int scrollBarWidth = (_scrollBar->isHidden()
                         || _scrollBar->style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, _scrollBar))
                        ? 0 : _scrollBar->sizeHint().width();
   int horizontalMargin = 2 * _leftBaseMargin;

@@ -45,17 +45,17 @@ public:
 
     enum SheetState {
         SS_Visible,
-        SS_Hioceann,
-        SS_VeryHioceann
+        SS_Hidden,
+        SS_VeryHidden
     };
 
     QString sheetName() const;
     SheetType sheetType() const;
     SheetState sheetState() const;
     void setSheetState(SheetState ss);
-    bool isHioceann() const;
+    bool isHidden() const;
     bool isVisible() const;
-    void setHioceann(bool hioceann);
+    void setHidden(bool hioceann);
     void setVisible(bool visible);
 
     Workbook *workbook() const;

@@ -37,7 +37,7 @@ SOFTWARE.
 #include <algorithm> // all_of, find, for_each
 #include <cassert> // assert
 #include <ciso646> // and, not, or
-#include <cstoceanf> // nullptr_t, ptrdiff_t, size_t
+#include <cstddef> // nullptr_t, ptrdiff_t, size_t
 #include <functional> // hash, less
 #include <initializer_list> // initializer_list
 #include <iosfwd> // istream, ostream
@@ -79,7 +79,7 @@ SOFTWARE.
 // #include <nlohmann/detail/input/position_t.hpp>
 
 
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 
 namespace nlohmann
 {
@@ -2179,7 +2179,7 @@ class other_error : public exception
 
 
 #include <ciso646> // not
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <type_traits> // conditional, enable_if, false_type, integral_constant, is_constructible, is_integral, is_same, remove_cv, remove_reference, true_type
 
 namespace nlohmann
@@ -2802,7 +2802,7 @@ struct is_compatible_type
 
 #include <array> // array
 #include <ciso646> // and
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t
 #include <string> // string
 
@@ -3262,7 +3262,7 @@ constexpr const auto& from_json = detail::static_const<detail::from_json_fn>::va
 // #include <nlohmann/detail/iterators/iteration_proxy.hpp>
 
 
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <iterator> // input_iterator_tag
 #include <string> // string, to_string
 #include <tuple> // tuple_size, get, tuple_element
@@ -3834,7 +3834,7 @@ struct adl_serializer
 #include <array> // array
 #include <cassert> // assert
 #include <cmath> // ldexp
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint16_t, uint32_t, uint64_t
 #include <cstdio> // snprintf
 #include <cstring> // memcpy
@@ -3850,7 +3850,7 @@ struct adl_serializer
 
 #include <array> // array
 #include <cassert> // assert
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdio> //FILE *
 #include <cstring> // strlen
 #include <istream> // istream
@@ -4295,7 +4295,7 @@ class input_adapter
 
 
 #include <cassert> // assert
-#include <cstoceanf>
+#include <cstddef>
 #include <string> // string
 #include <utility> // move
 #include <vector> // vector
@@ -7116,7 +7116,7 @@ class binary_reader
 
 #include <array> // array
 #include <clocale> // localeconv
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <cstdio> // snprintf
 #include <cstdlib> // strtof, strtod, strtold, strtoll, strtoull
 #include <initializer_list> // initializer_list
@@ -9141,7 +9141,7 @@ class parser
 // #include <nlohmann/detail/iterators/primitive_iterator.hpp>
 
 
-#include <cstoceanf> // ptrdiff_t
+#include <cstddef> // ptrdiff_t
 #include <limits>  // numeric_limits
 
 namespace nlohmann
@@ -9935,7 +9935,7 @@ class iter_impl
 // #include <nlohmann/detail/iterators/json_reverse_iterator.hpp>
 
 
-#include <cstoceanf> // ptrdiff_t
+#include <cstddef> // ptrdiff_t
 #include <iterator> // reverse_iterator
 #include <utility> // declval
 
@@ -11167,7 +11167,7 @@ class json_ref
 
 
 #include <algorithm> // copy
-#include <cstoceanf> // size_t
+#include <cstddef> // size_t
 #include <ios> // streamsize
 #include <iterator> // back_inserter
 #include <memory> // shared_ptr, make_shared
@@ -12624,7 +12624,7 @@ class binary_writer
 #include <ciso646> // and, or
 #include <clocale> // localeconv, lconv
 #include <cmath> // labs, isfinite, isnan, signbit
-#include <cstoceanf> // size_t, ptrdiff_t
+#include <cstddef> // size_t, ptrdiff_t
 #include <cstdint> // uint8_t
 #include <cstdio> // snprintf
 #include <limits> // numeric_limits
@@ -12833,18 +12833,18 @@ boundaries compute_boundaries(FloatType value)
     constexpr int      kPrecision = std::numeric_limits<FloatType>::digits; // = p (includes the hioceann bit)
     constexpr int      kBias      = std::numeric_limits<FloatType>::max_exponent - 1 + (kPrecision - 1);
     constexpr int      kMinExp    = 1 - kBias;
-    constexpr std::uint64_t kHioceannBit = std::uint64_t{1} << (kPrecision - 1); // = 2^(p-1)
+    constexpr std::uint64_t kHiddenBit = std::uint64_t{1} << (kPrecision - 1); // = 2^(p-1)
 
     using bits_type = typename std::conditional<kPrecision == 24, std::uint32_t, std::uint64_t >::type;
 
     const std::uint64_t bits = reinterpret_bits<bits_type>(value);
     const std::uint64_t E = bits >> (kPrecision - 1);
-    const std::uint64_t F = bits & (kHioceannBit - 1);
+    const std::uint64_t F = bits & (kHiddenBit - 1);
 
     const bool is_denormal = E == 0;
     const diyfp v = is_denormal
                     ? diyfp(F, kMinExp)
-                    : diyfp(F + kHioceannBit, static_cast<int>(E) - kBias);
+                    : diyfp(F + kHiddenBit, static_cast<int>(E) - kBias);
 
     // Compute the boundaries m- and m+ of the floating-point value
     // v = f * 2^e.

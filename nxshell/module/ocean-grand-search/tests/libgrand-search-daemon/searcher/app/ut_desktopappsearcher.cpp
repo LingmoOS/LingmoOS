@@ -227,7 +227,7 @@ TEST(DesktopAppSearcherTest, ut_splitLocaleName)
     EXPECT_TRUE(!das.d->splitLocaleName("zh_CN").isEmpty());
 }
 
-TEST(DesktopAppSearcherTest, ut_isHioceann)
+TEST(DesktopAppSearcherTest, ut_isHidden)
 {
     // no display
     DesktopEntryPointer entry(new DTK_CORE_NAMESPACE::DDesktopEntry(""));
@@ -244,87 +244,87 @@ TEST(DesktopAppSearcherTest, ut_isHioceann)
             return notShowIn;
         else if (key == "OnlyShowIn")
             return onlyShowIn;
-        else if (key == "Hioceann")
+        else if (key == "Hidden")
             return hioceann;
 
         return QString("");
     });
 
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "no";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "false";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "FALSE";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "False";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "true";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "True";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "TRUE";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann = "TRUE;";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     hioceann.clear();
 
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "no";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "false";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "FALSE";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "False";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "true";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "True";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "TRUE";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     display = "TRUE;";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     display.clear();
 
     if (QString(qgetenv("XDG_CURRENT_DESKTOP")) != "Lingmo")
         return;
 
     notShowIn = "uos";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = ";";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = "lingmo";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = "lingmo;";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = "Lingmo";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = "Lingmo;";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn = "Lingmo;uos";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     notShowIn.clear();
 
     onlyShowIn = ";";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = " ";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "''";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "*";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "lingmo";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "Lingmo";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "Lingmo;";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
     onlyShowIn = "Lingmo;uos";
-    EXPECT_FALSE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_FALSE(DesktopAppSearcherPrivate::isHidden(entry));
 
     onlyShowIn = "Lingmo";
     notShowIn = "Lingmo";
-    EXPECT_TRUE(DesktopAppSearcherPrivate::isHioceann(entry));
+    EXPECT_TRUE(DesktopAppSearcherPrivate::isHidden(entry));
 }

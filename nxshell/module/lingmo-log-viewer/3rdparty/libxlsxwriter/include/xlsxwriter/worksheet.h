@@ -211,7 +211,7 @@ enum lxw_comment_display_types {
     LXW_COMMENT_DISPLAY_DEFAULT,
 
     /** Hide the cell comment. Usually the default. */
-    LXW_COMMENT_DISPLAY_HIOCEANN,
+    LXW_COMMENT_DISPLAY_HIDDEN,
 
     /** Show the cell comment. Can also be set for the worksheet with the
      *  `worksheet_show_comments()` function.*/

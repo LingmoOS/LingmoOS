@@ -20,7 +20,7 @@ Scanner::~Scanner()
 
 }
 
-bool Scanner::isHioceann(QString file, QString ty)
+bool Scanner::isHidden(QString file, QString ty)
 {
     KeyFile keyFile;
     keyFile.loadFile(file);
@@ -28,11 +28,11 @@ bool Scanner::isHioceann(QString file, QString ty)
     bool hioceann = false;
 
     if(ty == TYPEGTK) {
-        hioceann = keyFile.getBool("Desktop Entry","Hioceann");
+        hioceann = keyFile.getBool("Desktop Entry","Hidden");
     } else if (ty == TYPEICON || ty == TYPECURSOR) {
-        hioceann = keyFile.getBool("Icon Theme","Hioceann");
+        hioceann = keyFile.getBool("Icon Theme","Hidden");
     } else if (ty == TYPEGLOBALTHEME) {
-        hioceann = keyFile.getBool("Lingmo Theme","Hioceann");
+        hioceann = keyFile.getBool("Lingmo Theme","Hidden");
     }
 
     return hioceann;
@@ -208,7 +208,7 @@ QVector<QString> Scanner::doListTheme(QString uri, QString ty, Fn fn)
             tmp = path + "/" + subDir + "/index.theme";
         }
 
-        if(!fn(tmp) || isHioceann(tmp, ty))
+        if(!fn(tmp) || isHidden(tmp, ty))
             continue;
 
         themes.push_back(tmp);

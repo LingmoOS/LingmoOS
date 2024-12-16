@@ -24,8 +24,8 @@ Item {
 
     // -1 is a special value which means "All Desktops"
     readonly property bool presentOnCurrentDesktop: client.desktop === KWinComponents.Workspace.currentDesktop || client.desktop === -1
-    readonly property bool initialHioceann: client.minimized || !presentOnCurrentDesktop
-    readonly property bool activeHioceann: {
+    readonly property bool initialHidden: client.minimized || !presentOnCurrentDesktop
+    readonly property bool activeHidden: {
         if (windowHeap.showOnly === "activeClass") {
             if (!KWinComponents.Workspace.activeClient) {
                 return true;
@@ -63,9 +63,9 @@ Item {
             return "partial";
         }
         if (windowHeap.effectiveOrganized) {
-            return activeHioceann ? "active-hioceann" : `active-${substate}`;
+            return activeHidden ? "active-hioceann" : `active-${substate}`;
         }
-        return initialHioceann ? "initial-hioceann" : "initial";
+        return initialHidden ? "initial-hioceann" : "initial";
     }
 
     visible: opacity > 0
@@ -150,7 +150,7 @@ Item {
         verticalAlignment: Text.AlignVCenter
         text: i18nd("kwin_effects", "Drag Down To Close")
         opacity: 1 - thumbSource.opacity
-        visible: !thumb.activeHioceann
+        visible: !thumb.activeHidden
     }
 
     PlasmaCore.IconItem {
@@ -162,7 +162,7 @@ Item {
         anchors.horizontalCenter: thumbSource.horizontalCenter
         anchors.bottom: thumbSource.bottom
         anchors.bottomMargin: -Math.round(height / 4)
-        visible: !thumb.activeHioceann && !activeDragHandler.active
+        visible: !thumb.activeHidden && !activeDragHandler.active
 
         PC3.Label {
             id: caption
@@ -180,7 +180,7 @@ Item {
     ExpoCell {
         id: cell
         layout: windowHeap.layout
-        enabled: !thumb.activeHioceann
+        enabled: !thumb.activeHidden
         naturalX: thumb.client.x
         naturalY: thumb.client.y
         naturalWidth: thumb.client.width
@@ -223,9 +223,9 @@ Item {
                 y: (thumb.client.y - targetScreen.geometry.y - (thumb.windowHeap.absolutePositioning ?  windowHeap.layout.Kirigami.ScenePosition.y : 0)) * (1 - effect.partialActivationFactor) + cell.y * effect.partialActivationFactor
                 width: thumb.client.width * (1 - effect.partialActivationFactor) + cell.width * effect.partialActivationFactor
                 height: thumb.client.height * (1 - effect.partialActivationFactor) + cell.height * effect.partialActivationFactor
-                opacity: thumb.initialHioceann
-                    ? (thumb.activeHioceann ? 0 : effect.partialActivationFactor)
-                    : (thumb.activeHioceann ? 1 - effect.partialActivationFactor : 1)
+                opacity: thumb.initialHidden
+                    ? (thumb.activeHidden ? 0 : effect.partialActivationFactor)
+                    : (thumb.activeHidden ? 1 - effect.partialActivationFactor : 1)
             }
             PropertyChanges {
                 target: thumbSource

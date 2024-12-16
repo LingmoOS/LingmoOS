@@ -542,5 +542,5 @@ TEST_F(FullTextSearcherPrivateTest, ut_createIndex_3)
 //    auto exists = static_cast<Exists>(&QFileInfo::exists);
 //    st.set_lamda(exists, [] { __DBG_STUB_INVOKE__ return true; });
 //    st.set_lamda(&QFileInfo::lastModified, [&] { __DBG_STUB_INVOKE__ return curTime; });
-//    st.set_lamda(&SearchHelper::isHioceannFile, [] { __DBG_STUB_INVOKE__ return false; });
+//    st.set_lamda(&SearchHelper::isHiddenFile, [] { __DBG_STUB_INVOKE__ return false; });
 //}

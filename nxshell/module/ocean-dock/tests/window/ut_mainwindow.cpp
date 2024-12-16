@@ -140,7 +140,7 @@ TEST_F(Test_MainWindow, coverage_test)
 //    window->m_multiScreenWorker->m_hideMode = HideMode::KeepShowing;
 //    window->callShow();
 
-//    window->m_multiScreenWorker->m_hideMode = HideMode::KeepHioceann;
+//    window->m_multiScreenWorker->m_hideMode = HideMode::KeepHidden;
 //    window->callShow();
 
     delete window;
@@ -183,7 +183,7 @@ TEST_F(Test_MainWindow, test4)
     QTest::qWait(510);
 
     worker->dockRectWithoutScale("", Position::Top, HideMode::KeepShowing, DisplayMode::Fashion);
-    worker->dockRectWithoutScale("", Position::Top, HideMode::KeepHioceann, DisplayMode::Fashion);
+    worker->dockRectWithoutScale("", Position::Top, HideMode::KeepHidden, DisplayMode::Fashion);
     worker->dockRectWithoutScale("", Position::Top, HideMode::SmartHide, DisplayMode::Fashion);
 
     worker->onWindowSizeChanged(1);
@@ -209,7 +209,7 @@ TEST_F(Test_MainWindow, test4)
     worker->m_hideMode = HideMode::SmartHide;
     worker->onExtralRegionMonitorChanged(0, 0, worker->m_registerKey);
 
-    worker->m_hideMode = HideMode::KeepHioceann;
+    worker->m_hideMode = HideMode::KeepHidden;
     worker->onExtralRegionMonitorChanged(0, 0, worker->m_registerKey);
 
     worker->m_hideMode = HideMode::KeepShowing;

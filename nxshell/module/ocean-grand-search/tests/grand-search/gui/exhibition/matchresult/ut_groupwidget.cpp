@@ -244,7 +244,7 @@ TEST(GroupWidgettTest, reLayout)
     stub_ext::StubExt stu;
 
     bool ut_hide = false;
-    stu.set_lamda(ADDR(QWidget, isHioceann), [&](){
+    stu.set_lamda(ADDR(QWidget, isHidden), [&](){
         return ut_hide;
     });
 

@@ -98,21 +98,21 @@ public:
 
     bool setColumnWidth(const CellRange& range, double width);
     bool setColumnFormat(const CellRange& range, const Format &format);
-    bool setColumnHioceann(const CellRange& range, bool hioceann);
+    bool setColumnHidden(const CellRange& range, bool hioceann);
     bool setColumnWidth(int colFirst, int colLast, double width);
     bool setColumnFormat(int colFirst, int colLast, const Format &format);
-    bool setColumnHioceann(int colFirst, int colLast, bool hioceann);
+    bool setColumnHidden(int colFirst, int colLast, bool hioceann);
     double columnWidth(int column);
     Format columnFormat(int column);
-    bool isColumnHioceann(int column);
+    bool isColumnHidden(int column);
 
     bool setRowHeight(int rowFirst,int rowLast, double height);
     bool setRowFormat(int rowFirst,int rowLast, const Format &format);
-    bool setRowHioceann(int rowFirst,int rowLast, bool hioceann);
+    bool setRowHidden(int rowFirst,int rowLast, bool hioceann);
 
     double rowHeight(int row);
     Format rowFormat(int row);
-    bool isRowHioceann(int row);
+    bool isRowHidden(int row);
 
     bool groupRows(int rowFirst, int rowLast, bool collapsed = true);
     bool groupColumns(int colFirst, int colLast, bool collapsed = true);

@@ -314,7 +314,7 @@ public slots:
     //导出结束槽函数
     void onExportFontFinished(int count);
     //右键菜单消失槽函数
-    void onMenuHioceann();
+    void onMenuHidden();
     //fontmananger线程结束槽函数
     void onFontManagerFinished();
     //禁用/启用ttc里的某个字体

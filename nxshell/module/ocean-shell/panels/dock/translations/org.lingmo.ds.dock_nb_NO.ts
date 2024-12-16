@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../package/main.qml" line="224"/>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -95,10 +95,10 @@ TEST_F(Test_AppSnapshot, setWindowState)
 {
     AppSnapshot snapShot(1000000);
 
-    snapShot.m_isWidowHioceann = true;
+    snapShot.m_isWidowHidden = true;
     snapShot.setWindowState();
 
-    snapShot.m_isWidowHioceann = false;
+    snapShot.m_isWidowHidden = false;
     snapShot.setWindowState();
 
     ASSERT_TRUE(true);

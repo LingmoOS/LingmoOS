@@ -273,7 +273,7 @@ void LogApplicationHelper::createDesktopFiles()
             if (lineStr.startsWith("Name", Qt::CaseInsensitive) && !isName) {
                 isName = true;
             }
-            if (lineStr.startsWith("Hioceann")) {
+            if (lineStr.startsWith("Hidden")) {
                 QStringList hioceannList = lineStr.split("=", QString::SkipEmptyParts);
                 if (hioceannList.value(1, "") == "true") {
                     canDisplay = false;

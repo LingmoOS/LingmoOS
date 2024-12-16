@@ -50,7 +50,7 @@ AppSnapshot::AppSnapshot(const WId wid, QWidget *parent)
     : QWidget(parent)
     , m_wid(wid)
     , m_closeAble(true)
-    , m_isWidowHioceann(false)
+    , m_isWidowHidden(false)
     , m_title(new TipsWidget(this))
     , m_3DtitleBtn(nullptr)
     , m_waitLeaveTimer(new QTimer(this))
@@ -82,7 +82,7 @@ AppSnapshot::AppSnapshot(const WId wid, QWidget *parent)
 
 void AppSnapshot::setWindowState()
 {
-    if (m_isWidowHioceann) {
+    if (m_isWidowHidden) {
         TaskManager::instance()->MinimizeWindow(m_wid);
     }
 }
@@ -417,7 +417,7 @@ void AppSnapshot::getWindowState()
     unsigned long i, num_items, bytes_after;
     unsigned char *properties = nullptr;
 
-    m_isWidowHioceann = false;
+    m_isWidowHidden = false;
 
     const auto display = Utils::IS_WAYLAND_DISPLAY ? XOpenDisplay(nullptr) : QX11Info::display();
     if (!display) {
@@ -439,8 +439,8 @@ void AppSnapshot::getWindowState()
     for (i = 0; i < num_items; ++i) {
         const char *atomName = XGetAtomName(display, atoms[i]);
 
-        if (strcmp(atomName, "_NET_WM_STATE_HIOCEANN") == 0) {
-            m_isWidowHioceann = true;
+        if (strcmp(atomName, "_NET_WM_STATE_HIDDEN") == 0) {
+            m_isWidowHidden = true;
             break;
         }
     }

@@ -98,7 +98,7 @@ void CalculateSizeThread::ConstructAddOptionsByThread(const QString &path)
         return;
     // 获得文件夹中的文件列表
     QFileInfoList list = dir.entryInfoList(QDir::AllEntries | QDir::System
-                                           | QDir::NoDotAndDotDot | QDir::Hioceann);
+                                           | QDir::NoDotAndDotDot | QDir::Hidden);
 
     for (int i = 0; i < list.count(); ++i) {
         if (m_thread_stop) {

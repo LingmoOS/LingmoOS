@@ -5,7 +5,7 @@
 #include "sysinfoutils.h"
 #include <dfm-base/dfm_global_defines.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDBusInterface>
 #include <QDBusReply>
@@ -61,7 +61,7 @@ bool SysInfoUtils::isRootUser()
 
 bool SysInfoUtils::isServerSys()
 {
-    return DSysInfo::lingmoType() == DSysInfo::LingmoServer;
+    return LSysInfo::lingmoType() == LSysInfo::LingmoServer;
 }
 
 bool SysInfoUtils::isDesktopSys()
@@ -98,12 +98,12 @@ bool SysInfoUtils::isDeveloperModeEnabled()
 
 bool SysInfoUtils::isProfessional()
 {
-    return DSysInfo::lingmoType() == DSysInfo::LingmoProfessional;
+    return LSysInfo::lingmoType() == LSysInfo::LingmoProfessional;
 }
 
 bool SysInfoUtils::isLingmo23()
 {
-    return DSysInfo::isCommunityEdition() && DSysInfo::productVersion() == "23";
+    return LSysInfo::isCommunityEdition() && LSysInfo::productVersion() == "23";
 }
 
 bool SysInfoUtils::isSameUser(const QMimeData *data)

@@ -11,7 +11,7 @@
 #include <QMenu>
 
 namespace {
-class Q_DECL_HIOCEANN EventFilter : public QObject
+class Q_DECL_HIDDEN EventFilter : public QObject
 {
 public:
     explicit EventFilter(PluginItem *target)
@@ -66,7 +66,7 @@ private:
     QEvent::Type m_accepedEvent = {QEvent::None};
 };
 
-class Q_DECL_HIOCEANN ItemWidgetEventFilter : public QObject
+class Q_DECL_HIDDEN ItemWidgetEventFilter : public QObject
 {
 public:
     explicit ItemWidgetEventFilter(QuickPluginItem *target)

@@ -15,14 +15,14 @@
 DCORE_USE_NAMESPACE
 
 bool distributionInfoValid() {
-    return QFile::exists(DSysInfo::distributionInfoPath());
+    return QFile::exists(LSysInfo::distributionInfoPath());
 }
 
-void printDistributionOrgInfo(DSysInfo::OrgType type) {
-    QString sectionName = DSysInfo::distributionInfoSectionName(type);
-    printf("%s Name: %s\n", qPrintable(sectionName), qPrintable(DSysInfo::distributionOrgName(type)));
-    printf("%s Logo (Normal size): %s\n", qPrintable(sectionName), qPrintable(DSysInfo::distributionOrgLogo(type)));
-    printf("%s Website: %s\n", qPrintable(sectionName), qPrintable(DSysInfo::distributionOrgWebsite(type).second));
+void printDistributionOrgInfo(LSysInfo::OrgType type) {
+    QString sectionName = LSysInfo::distributionInfoSectionName(type);
+    printf("%s Name: %s\n", qPrintable(sectionName), qPrintable(LSysInfo::distributionOrgName(type)));
+    printf("%s Logo (Normal size): %s\n", qPrintable(sectionName), qPrintable(LSysInfo::distributionOrgLogo(type)));
+    printf("%s Website: %s\n", qPrintable(sectionName), qPrintable(LSysInfo::distributionOrgWebsite(type).second));
 }
 
 int main(int argc, char *argv[])
@@ -58,68 +58,68 @@ int main(int argc, char *argv[])
         parser.showHelp();
 
     if (parser.isSet(option_all)) {
-        printf("Computer Name: %s\n", qPrintable(DSysInfo::computerName()));
-        printf("CPU Model: %s x %d\n", qPrintable(DSysInfo::cpuModelName()), QThread::idealThreadCount());
-        printf("Installed Memory Size: %f GiB\n", DSysInfo::memoryInstalledSize() / 1024.0 / 1024 / 1024);
-        printf("Memory Size: %f GiB\n", DSysInfo::memoryTotalSize() / 1024.0 / 1024 / 1024);
-        printf("Disk Size: %f GiB\n", DSysInfo::systemDiskSize() / 1024.0 / 1024 / 1024);
+        printf("Computer Name: %s\n", qPrintable(LSysInfo::computerName()));
+        printf("CPU Model: %s x %d\n", qPrintable(LSysInfo::cpuModelName()), QThread::idealThreadCount());
+        printf("Installed Memory Size: %f GiB\n", LSysInfo::memoryInstalledSize() / 1024.0 / 1024 / 1024);
+        printf("Memory Size: %f GiB\n", LSysInfo::memoryTotalSize() / 1024.0 / 1024 / 1024);
+        printf("Disk Size: %f GiB\n", LSysInfo::systemDiskSize() / 1024.0 / 1024 / 1024);
 
-        if (DSysInfo::isLingmo() && DSysInfo::isOCEAN()) {
-            printf("Lingmo Type: %s\n", qPrintable(DSysInfo::lingmoTypeDisplayName()));
-            printf("Lingmo Version: %s\n", qPrintable(DSysInfo::lingmoVersion()));
+        if (LSysInfo::isLingmo() && LSysInfo::isOCEAN()) {
+            printf("Lingmo Type: %s\n", qPrintable(LSysInfo::lingmoTypeDisplayName()));
+            printf("Lingmo Version: %s\n", qPrintable(LSysInfo::lingmoVersion()));
 
-            if (!DSysInfo::lingmoEdition().isEmpty())
-                printf("Lingmo Edition: %s\n", qPrintable(DSysInfo::lingmoEdition()));
+            if (!LSysInfo::lingmoEdition().isEmpty())
+                printf("Lingmo Edition: %s\n", qPrintable(LSysInfo::lingmoEdition()));
 
-            if (!DSysInfo::lingmoCopyright().isEmpty())
-                printf("Lingmo Copyright: %s\n", qPrintable(DSysInfo::lingmoCopyright()));
+            if (!LSysInfo::lingmoCopyright().isEmpty())
+                printf("Lingmo Copyright: %s\n", qPrintable(LSysInfo::lingmoCopyright()));
         }
 
-        printf("Operating System Name: %s\n", qPrintable(DSysInfo::operatingSystemName()));
-        printf("Product Type: %s\n", qPrintable(DSysInfo::productTypeString()));
-        printf("Product Version: %s\n", qPrintable(DSysInfo::productVersion()));
+        printf("Operating System Name: %s\n", qPrintable(LSysInfo::operatingSystemName()));
+        printf("Product Type: %s\n", qPrintable(LSysInfo::productTypeString()));
+        printf("Product Version: %s\n", qPrintable(LSysInfo::productVersion()));
 
-        if (DSysInfo::isLingmo()) {
-            printf("Uos Product Name: %s\n", qPrintable(DSysInfo::uosProductTypeName()));
-            printf("Uos SystemName Name: %s\n", qPrintable(DSysInfo::uosSystemName()));
-            printf("Uos Edition Name: %s\n", qPrintable(DSysInfo::uosEditionName()));
-            printf("Uos SP Version: %s\n", qPrintable(DSysInfo::spVersion()));
-            printf("Uos update Version: %s\n", qPrintable(DSysInfo::udpateVersion()));
-            printf("Uos major Version: %s\n", qPrintable(DSysInfo::majorVersion()));
-            printf("Uos minor Version: %s\n", qPrintable(DSysInfo::minorVersion()));
-            printf("Uos build Version: %s\n", qPrintable(DSysInfo::buildVersion()));
+        if (LSysInfo::isLingmo()) {
+            printf("Uos Product Name: %s\n", qPrintable(LSysInfo::uosProductTypeName()));
+            printf("Uos SystemName Name: %s\n", qPrintable(LSysInfo::uosSystemName()));
+            printf("Uos Edition Name: %s\n", qPrintable(LSysInfo::uosEditionName()));
+            printf("Uos SP Version: %s\n", qPrintable(LSysInfo::spVersion()));
+            printf("Uos update Version: %s\n", qPrintable(LSysInfo::udpateVersion()));
+            printf("Uos major Version: %s\n", qPrintable(LSysInfo::majorVersion()));
+            printf("Uos minor Version: %s\n", qPrintable(LSysInfo::minorVersion()));
+            printf("Uos build Version: %s\n", qPrintable(LSysInfo::buildVersion()));
         }
         if (distributionInfoValid()) {
-            printDistributionOrgInfo(DSysInfo::Distribution);
-            printDistributionOrgInfo(DSysInfo::Distributor);
+            printDistributionOrgInfo(LSysInfo::Distribution);
+            printDistributionOrgInfo(LSysInfo::Distributor);
         }
     } else {
         if (parser.isSet(option_lingmo_type))
-            printf("%s", qPrintable(DSysInfo::uosEditionName(QLocale::c())));
+            printf("%s", qPrintable(LSysInfo::uosEditionName(QLocale::c())));
         else if (parser.isSet(option_lingmo_version))
-            printf("%s", qPrintable(DSysInfo::majorVersion()));
+            printf("%s", qPrintable(LSysInfo::majorVersion()));
         else if (parser.isSet(option_lingmo_edition))
-            printf("%s", qPrintable(DSysInfo::lingmoEdition()));
+            printf("%s", qPrintable(LSysInfo::lingmoEdition()));
         else if (parser.isSet(option_lingmo_copyright))
-            printf("%s", qPrintable(DSysInfo::lingmoCopyright()));
+            printf("%s", qPrintable(LSysInfo::lingmoCopyright()));
         else if (parser.isSet(option_product_type))
-            printf("%s", qPrintable(DSysInfo::productTypeString()));
+            printf("%s", qPrintable(LSysInfo::productTypeString()));
         else if (parser.isSet(option_product_version))
-            printf("%s", qPrintable(DSysInfo::productVersion()));
+            printf("%s", qPrintable(LSysInfo::productVersion()));
         else if (parser.isSet(option_cpu_model))
-            printf("%s x %d", qPrintable(DSysInfo::cpuModelName()), QThread::idealThreadCount());
+            printf("%s x %d", qPrintable(LSysInfo::cpuModelName()), QThread::idealThreadCount());
         else if (parser.isSet(option_computer_name))
-            printf("%s", qPrintable(DSysInfo::computerName()));
+            printf("%s", qPrintable(LSysInfo::computerName()));
         else if (parser.isSet(option_installed_memory_size))
-            printf("%f", DSysInfo::memoryInstalledSize() / 1024.0 / 1024 / 1024);
+            printf("%f", LSysInfo::memoryInstalledSize() / 1024.0 / 1024 / 1024);
         else if (parser.isSet(option_memory_size))
-            printf("%f", DSysInfo::memoryTotalSize() / 1024.0 / 1024 / 1024);
+            printf("%f", LSysInfo::memoryTotalSize() / 1024.0 / 1024 / 1024);
         else if (parser.isSet(option_disk_size))
-            printf("%f", DSysInfo::systemDiskSize() / 1024.0 / 1024 / 1024);
+            printf("%f", LSysInfo::systemDiskSize() / 1024.0 / 1024 / 1024);
         else if (parser.isSet(option_distribution_info)) {
-            printDistributionOrgInfo(DSysInfo::Distribution);
+            printDistributionOrgInfo(LSysInfo::Distribution);
         } else if (parser.isSet(option_distributer_info)) {
-            printDistributionOrgInfo(DSysInfo::Distributor);
+            printDistributionOrgInfo(LSysInfo::Distributor);
         }
     }
 

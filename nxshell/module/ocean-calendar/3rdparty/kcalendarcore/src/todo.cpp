@@ -33,7 +33,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Todo::Private
+class Q_DECL_HIDDEN KCalendarCore::Todo::Private
 {
 public:
     Private()

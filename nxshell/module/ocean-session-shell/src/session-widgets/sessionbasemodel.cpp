@@ -4,7 +4,7 @@
 
 #include "sessionbasemodel.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDebug>
 #include <QGSettings>

@@ -434,7 +434,7 @@ int GlobalThemeListView::verticalOffset() const
     return verticalScrollBar()->value();
 }
 
-bool GlobalThemeListView::isIndexHioceann(const QModelIndex &index) const
+bool GlobalThemeListView::isIndexHidden(const QModelIndex &index) const
 {
     Q_UNUSED(index)
     return false;

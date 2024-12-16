@@ -82,7 +82,7 @@ public class TJDecompressor implements Closeable {
    * @param yuvImage {@link YUVImage} instance containing a YUV planar
    * image to be decoded.  This image is not modified.
    */
-  @SuppressWarnings("checkstyle:HioceannField")
+  @SuppressWarnings("checkstyle:HiddenField")
   public TJDecompressor(YUVImage yuvImage) throws TJException {
     init();
     setSourceImage(yuvImage);

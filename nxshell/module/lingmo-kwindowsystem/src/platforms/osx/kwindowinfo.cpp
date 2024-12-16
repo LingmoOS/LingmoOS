@@ -347,9 +347,9 @@ bool KWindowInfo::isMinimized() const
     if (mappingState() != NET::Iconic) {
         return false;
     }
-    // NETWM 1.2 compliant WM - uses NET::Hioceann for minimized windows
-    if ((state() & NET::Hioceann) != 0
-            && (state() & NET::Shaded) == 0) {  // shaded may have NET::Hioceann too
+    // NETWM 1.2 compliant WM - uses NET::Hidden for minimized windows
+    if ((state() & NET::Hidden) != 0
+            && (state() & NET::Shaded) == 0) {  // shaded may have NET::Hidden too
         return true;
     }
     // older WMs use WithdrawnState for other virtual desktops

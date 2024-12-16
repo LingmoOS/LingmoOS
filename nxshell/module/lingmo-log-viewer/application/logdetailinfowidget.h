@@ -30,7 +30,7 @@ public:
 
     void cleanText();
 
-    void hideLine(bool isHioceann);
+    void hideLine(bool isHidden);
 
 private:
     void initUI();

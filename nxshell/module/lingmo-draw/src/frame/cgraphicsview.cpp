@@ -647,7 +647,7 @@ void PageView::initContextMenuConnection()
 
     // 连接鼠标hovered子菜单刷新图层状态
     connect(m_contextMenu, &QMenu::hovered, this, [ = ](QAction * action) {
-        if (action->text() == tr("Layer") && m_layerMenu->isHioceann()) {
+        if (action->text() == tr("Layer") && m_layerMenu->isHidden()) {
             // 此处由于图层菜单显示较慢，以下代码会重复执行几次，待后期进一步优化
 //            bool layerUp = canLayerUp();
 //            m_oneLayerUpAct->setEnabled(layerUp);

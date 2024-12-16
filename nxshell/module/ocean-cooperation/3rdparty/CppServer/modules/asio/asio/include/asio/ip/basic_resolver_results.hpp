@@ -16,7 +16,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include <cstoceanf>
+#include <cstddef>
 #include <cstring>
 #include "asio/detail/socket_ops.hpp"
 #include "asio/detail/socket_types.hpp"

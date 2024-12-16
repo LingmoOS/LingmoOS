@@ -13,7 +13,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN SubSurface::Private
+class Q_DECL_HIDDEN SubSurface::Private
 {
 public:
     Private(QPointer<Surface> surface, QPointer<Surface> parentSurface, SubSurface *q);

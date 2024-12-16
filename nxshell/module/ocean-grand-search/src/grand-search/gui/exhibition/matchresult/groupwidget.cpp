@@ -159,7 +159,7 @@ void GroupWidget::reLayout()
     if (m_resultLabel->isVisible())
         nHeight += m_resultLabel->height();
 
-    if (!m_line->isHioceann()) {
+    if (!m_line->isHidden()) {
         nHeight += m_line->height();
         if (m_resultLabel->isVisible()) {
             m_vContentLayout->setSpacing(5);

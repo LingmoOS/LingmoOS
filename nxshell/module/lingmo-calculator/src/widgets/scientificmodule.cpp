@@ -1002,7 +1002,7 @@ void scientificModule::showMemHisWidget()
     m_memhiswidget->getMemoryWiget()->resetLabelBySeparator();
     if (static_cast<MemoryButton *>(m_memhiskeypad->button(MemHisKeypad::Key_MHlist))->hasFocus()) {
         //当前界面无历史focus到membuttonboxbutton
-        if (!m_memhiswidget->findChild<IconButton *>()->isHioceann())
+        if (!m_memhiswidget->findChild<IconButton *>()->isHidden())
             m_memhiswidget->findChild<QStackedWidget *>()->currentWidget()->setFocus();
         else {
             m_memhiswidget->findChild<DButtonBoxButton *>("mButtonBoxButton")->setFocus();

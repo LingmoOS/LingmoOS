@@ -17,7 +17,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Touch::Private
+class Q_DECL_HIDDEN Touch::Private
 {
 public:
     Private(Touch *q);

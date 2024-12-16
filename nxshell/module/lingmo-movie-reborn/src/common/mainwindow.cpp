@@ -70,7 +70,7 @@
 #define _NET_WM_STATE_ADD           1    /* add/set property */
 #define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
 
-const char kAtomNameHioceann[] = "_NET_WM_STATE_HIOCEANN";
+const char kAtomNameHidden[] = "_NET_WM_STATE_HIDDEN";
 const char kAtomNameFullscreen[] = "_NET_WM_STATE_FULLSCREEN";
 const char kAtomNameMaximizedHorz[] = "_NET_WM_STATE_MAXIMIZED_HORZ";
 const char kAtomNameMaximizedVert[] = "_NET_WM_STATE_MAXIMIZED_VERT";
@@ -2658,7 +2658,7 @@ void MainWindow::play(const QList<QString> &listFiles)
 void MainWindow::slotFinishedAddFiles(QList<QUrl> lstValid)
 {
     if(lstValid.count() > 0 && !m_bHaveFile) {
-        if (!isHioceann()) {
+        if (!isHidden()) {
             activateWindow();
         }
         m_pEngine->playByName(lstValid[0]);
@@ -3718,7 +3718,7 @@ void MainWindow::subtitleMatchVideo(const QString &sFileName)
     // Search for video files with the same name as the subtitles and play the video file.
     QFileInfo subfileInfo(sFileName);
     QDir dir(subfileInfo.canonicalPath());
-    dir.setFilter(QDir::Files | QDir::Hioceann | QDir::NoSymLinks);
+    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
     dir.setSorting(QDir::Size | QDir::Reversed);
 
     QFileInfoList list = dir.entryInfoList();

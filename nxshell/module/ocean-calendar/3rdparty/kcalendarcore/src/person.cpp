@@ -33,7 +33,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Person::Private : public QSharedData
+class Q_DECL_HIDDEN KCalendarCore::Person::Private : public QSharedData
 {
 public:
     QString mName; // person name

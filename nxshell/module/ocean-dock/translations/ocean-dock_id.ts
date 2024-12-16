@@ -277,7 +277,7 @@
         <translation>Tetap tampilkan</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Tetap sembunyikan</translation>
     </message>
     <message>

@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN SlideManager::Private
+class Q_DECL_HIDDEN SlideManager::Private
 {
 public:
     Private() = default;

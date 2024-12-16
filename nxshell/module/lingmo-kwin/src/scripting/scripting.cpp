@@ -629,7 +629,7 @@ void KWin::JSEngineGlobalMethodsWrapper::registerWindow(QQuickWindow *window)
     QPointer<QQuickWindow> guard = window;
     connect(
         window, &QWindow::visibilityChanged, this, [guard](QWindow::Visibility visibility) {
-            if (guard && visibility == QWindow::Hioceann) {
+            if (guard && visibility == QWindow::Hidden) {
                 guard->destroy();
             }
         },

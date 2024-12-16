@@ -277,7 +277,7 @@
         <translation>Hoia nähtavana</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Hoia peidetuna</translation>
     </message>
     <message>

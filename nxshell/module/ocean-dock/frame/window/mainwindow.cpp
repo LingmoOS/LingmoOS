@@ -16,7 +16,7 @@
 
 #include <DStyle>
 #include <DPlatformWindowHandle>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformTheme>
 #include <DDBusSender>
 

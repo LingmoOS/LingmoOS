@@ -21,7 +21,7 @@
 #include <QAction>
 #include <QStyle>
 #include <DStyle>
-#include <DSysInfo>
+#include <LSysInfo>
 
 static bool stub_isSEOpen()
 {
@@ -39,14 +39,14 @@ bool stub_hasFocus()
     return true;
 }
 
-Dtk::Core::DSysInfo::UosEdition stub_uosProfessEditionType()
+Dtk::Core::LSysInfo::UosEdition stub_uosProfessEditionType()
 {
-    return Dtk::Core::DSysInfo::UosProfessional;
+    return Dtk::Core::LSysInfo::UosProfessional;
 }
 
-Dtk::Core::DSysInfo::UosEdition stub_uosEulerEditionType()
+Dtk::Core::LSysInfo::UosEdition stub_uosEulerEditionType()
 {
-    return Dtk::Core::DSysInfo::UosEuler;
+    return Dtk::Core::LSysInfo::UosEuler;
 }
 
 QString stub_ListViewreadLog(const QString &filePath)
@@ -135,7 +135,7 @@ TEST(LogListView_initUI_UT, LogListView_initUI_UT_001)
     Stub stub;
     stub.set(ADDR(DLDBusHandler, readLog), stub_ListViewreadLog);
     stub.set(ADDR(DebugTimeManager, beginPointLinux), stubbeginPointLinux);
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), stub_uosProfessEditionType);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), stub_uosProfessEditionType);
     stub.set(ADDR(LogApplicationHelper, getCustomLogList), LogApplicationHelper_getCustomLogList);
     LogListView *p = new LogListView(nullptr);
     EXPECT_NE(p, nullptr);
@@ -149,7 +149,7 @@ TEST(LogListView_initUI_UT, LogListView_initUI_UT_002)
     stub.set(ADDR(DLDBusHandler, readLog), stub_ListViewreadLog);
     stub.set(ADDR(DebugTimeManager, beginPointLinux), stubbeginPointLinux);
     stub.set(ADDR(DBusManager, isSEOpen), stub_isSEOpen);
-    stub.set(ADDR(Dtk::Core::DSysInfo, uosEditionType), stub_uosEulerEditionType);
+    stub.set(ADDR(Dtk::Core::LSysInfo, uosEditionType), stub_uosEulerEditionType);
     stub.set(ADDR(LogApplicationHelper, getCustomLogList), LogApplicationHelper_getCustomLogList);
     LogListView *p = new LogListView(nullptr);
     EXPECT_NE(p, nullptr);

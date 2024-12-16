@@ -35,7 +35,7 @@ class KWIN_EXPORT WindowItem : public Item
 
 public:
     enum {
-        PAINT_DISABLED_BY_HIOCEANN = 1 << 0,
+        PAINT_DISABLED_BY_HIDDEN = 1 << 0,
         PAINT_DISABLED_BY_DELETE = 1 << 1,
         PAINT_DISABLED_BY_DESKTOP = 1 << 2,
         PAINT_DISABLED_BY_MINIMIZE = 1 << 3,
@@ -74,7 +74,7 @@ private:
     std::unique_ptr<SurfaceItem> m_surfaceItem;
     std::unique_ptr<DecorationItem> m_decorationItem;
     std::unique_ptr<ShadowItem> m_shadowItem;
-    int m_forceVisibleByHioceannCount = 0;
+    int m_forceVisibleByHiddenCount = 0;
     int m_forceVisibleByDeleteCount = 0;
     int m_forceVisibleByDesktopCount = 0;
     int m_forceVisibleByMinimizeCount = 0;

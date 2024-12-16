@@ -179,7 +179,7 @@ public slots:
         QTemporaryFile* m_pTempConfigFile;
         QSystemTrayIcon* m_pTrayIcon;
         QMenu* m_pTrayIconMenu;
-        bool m_AlreadyHioceann;
+        bool m_AlreadyHidden;
         VersionChecker m_VersionChecker;
         IpcClient m_IpcClient;
         QMenuBar* m_pMenuBar;

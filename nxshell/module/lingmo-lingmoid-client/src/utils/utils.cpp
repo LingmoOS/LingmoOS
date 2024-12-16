@@ -244,8 +244,8 @@ QString getDeviceKernel()
 
 QString getOsVersion()
 {
-    QString version = QString("%1 (%2)").arg(DSysInfo::uosEditionName())
-                                      .arg(DSysInfo::minorVersion());
+    QString version = QString("%1 (%2)").arg(LSysInfo::uosEditionName())
+                                      .arg(LSysInfo::minorVersion());
     return version;
 }
 

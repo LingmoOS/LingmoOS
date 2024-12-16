@@ -228,7 +228,7 @@ void UsbConnectionWidget::onReceiveUsbInfo(UsbConnectionInfo info)
     updateNameinWhiteLst(info.sName, info.sSerial, info.sVendorID, info.sProductID);
 
     //不显示 数据 栏
-    m_connectionRecordTable->setColumnHioceann(USB_LOG_ITEM_DATA_COL, true);
+    m_connectionRecordTable->setColumnHidden(USB_LOG_ITEM_DATA_COL, true);
 }
 
 void UsbConnectionWidget::refreshUsbConnectionTable()
@@ -314,7 +314,7 @@ QWidget *UsbConnectionWidget::initConnectionRecordTableWgt()
     m_connectionRecordTable->setIconSize(QSize(25, 25));
     //自动调整最后一列的宽度使它和表格的右边界对齐
     m_connectionRecordTable->horizontalHeader()->setStretchLastSection(true);
-    m_connectionRecordTable->verticalHeader()->setHioceann(true);
+    m_connectionRecordTable->verticalHeader()->setHidden(true);
     m_connectionRecordTable->setShowGrid(false);
     m_connectionRecordTable->setSortingEnabled(true);
     m_connectionRecordTable->verticalHeader()->setDefaultSectionSize(30);
@@ -375,7 +375,7 @@ QWidget *UsbConnectionWidget::initConnectionRecordTableWgt()
     }
 
     //不显示 数据 栏
-    m_connectionRecordTable->setColumnHioceann(USB_LOG_ITEM_DATA_COL, true);
+    m_connectionRecordTable->setColumnHidden(USB_LOG_ITEM_DATA_COL, true);
 
     //设置各栏宽度
     m_connectionRecordTable->setColumnWidth(USB_LOG_ITEM_NAME_COL, 240);
@@ -406,7 +406,7 @@ QWidget *UsbConnectionWidget::initWhiteLstTableWgt()
     m_whiteLstTable->setFrameShape(QTableView::NoFrame);
     //自动调整最后一列的宽度使它和表格的右边界对齐
     m_whiteLstTable->horizontalHeader()->setStretchLastSection(true);
-    m_whiteLstTable->verticalHeader()->setHioceann(true);
+    m_whiteLstTable->verticalHeader()->setHidden(true);
     m_whiteLstTable->setShowGrid(false);
     m_whiteLstTable->setSortingEnabled(true);
     m_whiteLstTable->verticalHeader()->setDefaultSectionSize(35);
@@ -442,7 +442,7 @@ QWidget *UsbConnectionWidget::initWhiteLstTableWgt()
     }
 
     //不显示 数据 栏
-    m_whiteLstTable->setColumnHioceann(USB_WHITELIST_ITEM_DATA_COL, true);
+    m_whiteLstTable->setColumnHidden(USB_WHITELIST_ITEM_DATA_COL, true);
 
     //设置各栏宽度
     m_whiteLstTable->setColumnWidth(USB_WHITELIST_ITEM_NAME_COL, 300);
@@ -1036,7 +1036,7 @@ void UsbConnectionWidget::changeUsbConnectionWhiteLst(int operationStatus, UsbCo
         appendUsbConnectionWhiteList(info);
         m_usbConnectionWork->appendToUsbConnectionWhiteLst(info);
         // 不显示 数据 栏
-        m_whiteLstTable->setColumnHioceann(USB_WHITELIST_ITEM_DATA_COL, true);
+        m_whiteLstTable->setColumnHidden(USB_WHITELIST_ITEM_DATA_COL, true);
     } else { // 移除
         m_usbConnectionWork->removeFromUsbConnectionWhiteLst(info);
         //从白名单表格显示窗口中删除该行

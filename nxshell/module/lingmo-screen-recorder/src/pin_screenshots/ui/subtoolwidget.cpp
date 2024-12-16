@@ -239,7 +239,7 @@ QPair<int, int> SubToolWidget::getSaveInfo()
 // 选项按钮被点击
 void SubToolWidget::onOptionButtonClicked()
 {
-    if (m_optionMenu->isHioceann())
+    if (m_optionMenu->isHidden())
         m_pinOptionButton->showMenu();
     else
         m_optionMenu->hide();

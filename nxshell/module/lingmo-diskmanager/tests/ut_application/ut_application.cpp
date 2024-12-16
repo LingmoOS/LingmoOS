@@ -73,7 +73,7 @@ TEST_F(ut_application, init)
     stub4.set(foo, currentThemeType);
 
 
-    qDebug() << MainWindow::instance()->isHioceann();
+    qDebug() << MainWindow::instance()->isHidden();
     qDebug() << MainWindow::instance()->children();
 //    qDebug() << DMDbusHandler::instance()->getDeviceNameList();
 //    qDebug() << DMDbusHandler::instance()->getCurDeviceInfo().m_path

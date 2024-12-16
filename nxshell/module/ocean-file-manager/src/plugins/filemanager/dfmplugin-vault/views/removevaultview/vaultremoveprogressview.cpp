@@ -50,7 +50,7 @@ VaultRemoveProgressView::VaultRemoveProgressView(QWidget *parent)
     deletedLay->addWidget(deleteFinishedImageLabel, 0, Qt::AlignHCenter);
     deletedLay->addWidget(finishedLabel, 0, Qt::AlignHCenter);
     deletedWidget->setLayout(deletedLay);
-    deletedWidget->setHioceann(true);
+    deletedWidget->setHidden(true);
 
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(deletingWidget, 0, Qt::AlignCenter);
@@ -106,9 +106,9 @@ void VaultRemoveProgressView::handleVaultRemovedProgress(int value)
         if (!isExecuted) {
             vaultRmProgressBar->setValue(value);
             layout->removeWidget(deletingWidget);
-            deletingWidget->setHioceann(true);
+            deletingWidget->setHidden(true);
             layout->addWidget(deletedWidget, 0, Qt::AlignCenter);
-            deletedWidget->setHioceann(false);
+            deletedWidget->setHidden(false);
 
             Settings setting(kVaultTimeConfigFile);
             setting.removeGroup(QString("VaultTime"));

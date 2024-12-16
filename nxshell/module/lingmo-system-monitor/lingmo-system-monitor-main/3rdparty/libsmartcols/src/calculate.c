@@ -415,7 +415,7 @@ int __scols_calculate(struct libscols_table *tb, struct ul_buffer *buf)
 
 			/* hide zero width columns */
 			if (cl->width == 0)
-				cl->flags |= SCOLS_FL_HIOCEANN;
+				cl->flags |= SCOLS_FL_HIDDEN;
 		}
 
 		/* the current stage is without effect, go to the next */
@@ -440,7 +440,7 @@ int __scols_calculate(struct libscols_table *tb, struct ul_buffer *buf)
 				cl->width -= r;
 				width -= r;
 			} else {
-				cl->flags |= SCOLS_FL_HIOCEANN;
+				cl->flags |= SCOLS_FL_HIDDEN;
 				width -= cl->width + colsepsz;
 			}
 		}

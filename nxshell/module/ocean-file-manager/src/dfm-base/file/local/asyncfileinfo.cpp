@@ -196,8 +196,8 @@ bool AsyncFileInfo::isAttributes(const OptInfoType type) const
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kAccessCanRead).toBool();
     case FileIsType::kIsWritable:
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kAccessCanWrite).toBool();
-    case FileIsType::kIsHioceann:
-        return d->asyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHioceann).toBool();
+    case FileIsType::kIsHidden:
+        return d->asyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHidden).toBool();
     case FileIsType::kIsSymLink:
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsSymlink).toBool();
     case FileIsType::kIsExecutable:
@@ -218,7 +218,7 @@ bool AsyncFileInfo::canAttributes(const CanableInfoType type) const
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kAccessCanTrash).toBool();
     case FileCanType::kCanRename:
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kAccessCanRename).toBool();
-    case FileCanType::kCanHioceann:
+    case FileCanType::kCanHidden:
         if (ProtocolUtils::isGphotoFile(url))
             return false;
         return true;
@@ -243,7 +243,7 @@ QVariant AsyncFileInfo::extendAttributes(const ExtInfoType type) const
     case FileExtendedInfoType::kGroup:
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kOwnerGroup);
     case FileExtendedInfoType::kFileIsHid:
-        return d->asyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHioceann);
+        return d->asyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHidden);
     case FileExtendedInfoType::kOwnerId:
         return d->asyncAttribute(FileInfo::FileInfoAttributeID::kUnixUID);
     case FileExtendedInfoType::kGroupId:
@@ -499,7 +499,7 @@ void AsyncFileInfo::setExtendedAttributes(const FileExtendedInfoType &key, const
         cacheAttribute(static_cast<DFileInfo::AttributeID>(FileInfo::FileInfoAttributeID::kStandardIsCdRomDevice), value);
         break;
     case FileExtendedInfoType::kFileIsHid: {
-        cacheAttribute(DFileInfo::AttributeID::kStandardIsHioceann, value);
+        cacheAttribute(DFileInfo::AttributeID::kStandardIsHidden, value);
         break;
     }
     default:
@@ -1125,7 +1125,7 @@ int AsyncFileInfoPrivate::cacheAllAttributes(const QString &attributes)
     inserAsyncAttribute(FileInfo::FileInfoAttributeID::kTimeAccess, attribute(DFileInfo::AttributeID::kTimeAccess));
     inserAsyncAttribute(FileInfo::FileInfoAttributeID::kTimeAccessUsec, attribute(DFileInfo::AttributeID::kTimeAccessUsec));
     if (!notInit)
-        inserAsyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHioceann, attribute(DFileInfo::AttributeID::kStandardIsHioceann));
+        inserAsyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsHidden, attribute(DFileInfo::AttributeID::kStandardIsHidden));
     inserAsyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsFile, attribute(DFileInfo::AttributeID::kStandardIsFile));
     inserAsyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsDir, attribute(DFileInfo::AttributeID::kStandardIsDir));
     inserAsyncAttribute(FileInfo::FileInfoAttributeID::kStandardIsSymlink, attribute(DFileInfo::AttributeID::kStandardIsSymlink));

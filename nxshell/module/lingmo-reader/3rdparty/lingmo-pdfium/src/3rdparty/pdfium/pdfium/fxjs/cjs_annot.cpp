@@ -48,26 +48,26 @@ CJS_Result CJS_Annot::get_hioceann(CJS_Runtime* pRuntime) {
     return CJS_Result::Failure(JSMessage::kBadObjectError);
 
   CPDF_Annot* pPDFAnnot = m_pAnnot->AsBAAnnot()->GetPDFAnnot();
-  return CJS_Result::Success(pRuntime->NewBoolean(pPDFAnnot->IsHioceann()));
+  return CJS_Result::Success(pRuntime->NewBoolean(pPDFAnnot->IsHidden()));
 }
 
 CJS_Result CJS_Annot::set_hioceann(CJS_Runtime* pRuntime,
                                  v8::Local<v8::Value> vp) {
   // May invalidate m_pAnnot.
-  bool bHioceann = pRuntime->ToBoolean(vp);
+  bool bHidden = pRuntime->ToBoolean(vp);
 
   CPDFSDK_BAAnnot* pBAAnnot = ToBAAnnot(m_pAnnot.Get());
   if (!pBAAnnot)
     return CJS_Result::Failure(JSMessage::kBadObjectError);
 
   uint32_t flags = pBAAnnot->GetFlags();
-  if (bHioceann) {
-    flags |= pdfium::annotation_flags::kHioceann;
+  if (bHidden) {
+    flags |= pdfium::annotation_flags::kHidden;
     flags |= pdfium::annotation_flags::kInvisible;
     flags |= pdfium::annotation_flags::kNoView;
     flags &= ~pdfium::annotation_flags::kPrint;
   } else {
-    flags &= ~pdfium::annotation_flags::kHioceann;
+    flags &= ~pdfium::annotation_flags::kHidden;
     flags &= ~pdfium::annotation_flags::kInvisible;
     flags &= ~pdfium::annotation_flags::kNoView;
     flags |= pdfium::annotation_flags::kPrint;

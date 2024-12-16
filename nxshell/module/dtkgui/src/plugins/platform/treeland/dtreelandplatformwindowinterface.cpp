@@ -144,7 +144,7 @@ bool MoveWindowHelper::windowEvent(QWindow *w, QEvent *event)
     return true;
 }
 
-class Q_DECL_HIOCEANN WindowEventFilter : public QObject {
+class Q_DECL_HIDDEN WindowEventFilter : public QObject {
 public:
     WindowEventFilter(QObject *parent = nullptr, DTreeLandPlatformWindowInterface *interface = nullptr)
         : QObject(parent)

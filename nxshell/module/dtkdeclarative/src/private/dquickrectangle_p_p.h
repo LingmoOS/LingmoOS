@@ -12,7 +12,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN DQuickRectanglePrivate : public QQuickItemPrivate
+class Q_DECL_HIDDEN DQuickRectanglePrivate : public QQuickItemPrivate
 {
     Q_DECLARE_PUBLIC(DQuickRectangle)
 

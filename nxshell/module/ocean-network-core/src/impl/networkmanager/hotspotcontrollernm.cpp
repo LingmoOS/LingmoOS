@@ -67,7 +67,7 @@ HotspotItem *HotspotController_NM::addConnection(WirelessDevice *device, Network
         json.insert("HwAddress", QString(wsSetting->macAddress()));
         json.insert("ClonedAddress", QString(wsSetting->clonedMacAddress()));
         json.insert("Ssid", QString(wsSetting->ssid()));
-        json.insert("Hioceann", false);
+        json.insert("Hidden", false);
 
         return json;
     };

@@ -143,7 +143,7 @@ void CGraphicsTextItem::changToEditState(bool selectAll)
     auto currentTool = drawScene() == nullptr ? selection : drawScene()->page()->currentTool();
     if (currentTool == selection || currentTool == text) {
 
-        if (m_pTextEdit->isHioceann())
+        if (m_pTextEdit->isHidden())
             m_pTextEdit->show();
 
         m_pProxy->setFlag(ItemHasNoContents, false);

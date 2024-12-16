@@ -55,11 +55,11 @@ FileInfoPointer LocalDirIteratorPrivate::fileInfo(const QSharedPointer<DFileInfo
     auto url = dfmInfo->uri();
     QSharedPointer<FileInfo> info { nullptr };
     const QString &fileName = dfmInfo->attribute(DFileInfo::AttributeID::kStandardName, nullptr).toString();
-    bool isHioceann = false;
+    bool isHidden = false;
     if (fileName.startsWith(".")) {
-        isHioceann = true;
+        isHidden = true;
     } else {
-        isHioceann = hideFileList.contains(fileName);
+        isHidden = hideFileList.contains(fileName);
     }
 
     auto targetPath = dfmInfo->attribute(dfmio::DFileInfo::AttributeID::kStandardSymlinkTarget).toString();
@@ -67,7 +67,7 @@ FileInfoPointer LocalDirIteratorPrivate::fileInfo(const QSharedPointer<DFileInfo
         info = QSharedPointer<SyncFileInfo>(new SyncFileInfo(url));
     } else {
         info = QSharedPointer<AsyncFileInfo>(new AsyncFileInfo(url, dfmInfo));
-        info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+        info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
         info.dynamicCast<AsyncFileInfo>()->cacheAsyncAttributes(q->property("QueryAttributes").toString());
     }
 
@@ -77,7 +77,7 @@ FileInfoPointer LocalDirIteratorPrivate::fileInfo(const QSharedPointer<DFileInfo
             info->setExtendedAttributes(ExtInfoType::kFileNeedUpdate, true);
             info->setExtendedAttributes(ExtInfoType::kFileNeedTransInfo, true);
         }
-        info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHioceann);
+        info->setExtendedAttributes(ExtInfoType::kFileIsHid, isHidden);
         info->setExtendedAttributes(ExtInfoType::kFileCdRomDevice, isCdRomDevice);
     } else {
         qCWarning(logDFMBase) << "info is nullptr url = " << url;

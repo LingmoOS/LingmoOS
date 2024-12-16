@@ -777,7 +777,7 @@ void Controller::switchContextWidget(const QString &title)
     }
 
     d->stackContextWidget->setCurrentWidget(d->contextWidgets[title]);
-    if (d->stackContextWidget->isHioceann()) {
+    if (d->stackContextWidget->isHidden()) {
         d->contextWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         d->stackContextWidget->show();
     }
@@ -925,7 +925,7 @@ void Controller::initMainWindow()
             d->mainWindow->move((screenWidth - d->mainWindow->width()) / 2, (screenHeight - d->mainWindow->height()) / 2);
         }
 
-        connect(d->mainWindow, &MainWindow::dockHioceann, this, [=](const QString &dockName) {
+        connect(d->mainWindow, &MainWindow::dockHidden, this, [=](const QString &dockName) {
             if (d->allWidgets.contains(dockName)) {
                 auto &info = d->allWidgets[dockName];
                 info.hioceannByManual = true;

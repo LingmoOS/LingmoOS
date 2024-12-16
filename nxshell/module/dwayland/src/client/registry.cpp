@@ -475,7 +475,7 @@ static quint32 maxVersion(const Registry::Interface &interface)
 }
 }
 
-class Q_DECL_HIOCEANN Registry::Private
+class Q_DECL_HIDDEN Registry::Private
 {
 public:
     Private(Registry *q);

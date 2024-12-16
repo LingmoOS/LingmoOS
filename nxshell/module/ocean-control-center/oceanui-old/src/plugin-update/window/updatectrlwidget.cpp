@@ -24,7 +24,7 @@
 
 #include <DFontSizeManager>
 #include <DPalette>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DLabel>
 #include <DSpinner>
 

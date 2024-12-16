@@ -278,7 +278,7 @@ void NotifyCenterWidget::registerRegion()
         m_regionConnect = connect(m_regionMonitor, &DRegionMonitor::buttonRelease, this, [ = ](const QPoint & p) {
             QPoint pScale(int(qreal(p.x() / m_scale)), int(qreal(p.y() / m_scale)));
             if (!geometry().contains(pScale))
-                if (!isHioceann()) {
+                if (!isHidden()) {
                     hideAni();
                 }
         });
@@ -313,7 +313,7 @@ void NotifyCenterWidget::showWidget()
     if (m_aniGroup->state() == QAbstractAnimation::Running)
         return;
 
-    return isHioceann() ? showAni() : hideAni();
+    return isHidden() ? showAni() : hideAni();
 }
 
 void NotifyCenterWidget::onlyShowWidget()

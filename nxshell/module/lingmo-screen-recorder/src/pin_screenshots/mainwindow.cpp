@@ -299,7 +299,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         } else {
             dragPosition = event->globalPos() - this->frameGeometry().topLeft();
         }
-        if (!m_toolBar->isHioceann())
+        if (!m_toolBar->isHidden())
             m_toolBar->hide(); //隐藏工具栏
         //qDebug() << this << __FUNCTION__ << __LINE__ ;
         break;
@@ -400,7 +400,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
             this->releaseMouse();
         }
         this->setCursor(QCursor(Qt::ArrowCursor));
-        if (m_toolBar->isHioceann())
+        if (m_toolBar->isHidden())
             updateToolBarPosition();
     }
 }

@@ -58,7 +58,7 @@ QRect ScreenDBus::availableGeometry() const
     QRect ret = geometry(); //已经缩放过
     int dockHideMode = DockInfoIns->hideMode();
     if (1 == dockHideMode){ //隐藏
-        qInfo() << "dock is Hioceann";
+        qInfo() << "dock is Hidden";
         return ret;
     }
 

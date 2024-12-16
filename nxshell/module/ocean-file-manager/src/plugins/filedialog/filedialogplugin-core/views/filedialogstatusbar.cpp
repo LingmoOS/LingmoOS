@@ -70,8 +70,8 @@ void FileDialogStatusBar::setComBoxItems(const QStringList &list)
     filtersComboBox->addItems(list);
 
     if (curMode == kOpen) {
-        filtersComboBox->setHioceann(list.isEmpty());
-        filtersLabel->setHioceann(list.isEmpty());
+        filtersComboBox->setHidden(list.isEmpty());
+        filtersLabel->setHidden(list.isEmpty());
     } else {
         if (visible == list.isEmpty()) {
             updateLayout();

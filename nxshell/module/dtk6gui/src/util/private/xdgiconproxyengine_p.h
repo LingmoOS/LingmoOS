@@ -28,7 +28,7 @@ class XdgIconLoaderEngine;
 DGUI_BEGIN_NAMESPACE
 
 #if (XDG_ICON_VERSION_MAR >= 3)
-class Q_DECL_HIOCEANN XdgIconProxyEngine : public QIconEngine
+class Q_DECL_HIDDEN XdgIconProxyEngine : public QIconEngine
 {
 public:
     XdgIconProxyEngine(XdgIconLoaderEngine *proxy);

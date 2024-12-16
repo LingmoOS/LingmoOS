@@ -140,7 +140,7 @@ void Compat::setCreatedToDtStamp(const Incidence::Ptr &incidence, const QDateTim
     Q_UNUSED(dtstamp);
 }
 
-class Q_DECL_HIOCEANN CompatDecorator::Private
+class Q_DECL_HIDDEN CompatDecorator::Private
 {
 public:
     Compat *compat;

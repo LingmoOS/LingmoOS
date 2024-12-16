@@ -16,7 +16,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/buffer.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/limits.hpp"

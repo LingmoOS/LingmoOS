@@ -5,7 +5,7 @@
 
 #include "vnotea2tmanager.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDBusError>
 

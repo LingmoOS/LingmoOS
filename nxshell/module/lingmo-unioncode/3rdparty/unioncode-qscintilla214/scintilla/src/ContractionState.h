@@ -29,7 +29,7 @@ public:
 
 	virtual bool GetVisible(Sci::Line lineDoc) const=0;
 	virtual bool SetVisible(Sci::Line lineDocStart, Sci::Line lineDocEnd, bool isVisible)=0;
-	virtual bool HioceannLines() const=0;
+	virtual bool HiddenLines() const=0;
 
 	virtual const char *GetFoldDisplayText(Sci::Line lineDoc) const=0;
 	virtual bool GetFoldDisplayTextShown(Sci::Line lineDoc) const=0;

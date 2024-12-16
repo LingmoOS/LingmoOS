@@ -9,10 +9,10 @@ export GO111MODULE = off
 all:kelvinu-dm
 
 
-kelvinu-dm: ocean-setHioceann
+kelvinu-dm: ocean-setHidden
 
-ocean-setHioceann:
-	env GOPATH="${CURDIR}/${GOPATH_DIR}:${GOPATH}"  ${GOBUILD} -o Xlingmo ${GOBUILD_OPTIONS} setHioceann.go
+ocean-setHidden:
+	env GOPATH="${CURDIR}/${GOPATH_DIR}:${GOPATH}"  ${GOBUILD} -o Xlingmo ${GOBUILD_OPTIONS} setHidden.go
 
 install::
 	mkdir -p ${DESTDIR}/usr/share/wayland-sessions/

@@ -13,7 +13,7 @@
 
 DGUI_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN DIconProxyEngine : public QIconEngine
+class Q_DECL_HIDDEN DIconProxyEngine : public QIconEngine
 {
 public:
     explicit DIconProxyEngine(const QString &iconName, DIconTheme::Options m_option);

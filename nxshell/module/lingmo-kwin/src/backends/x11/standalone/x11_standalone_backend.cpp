@@ -218,7 +218,7 @@ PlatformCursorImage X11StandaloneBackend::cursorImage() const
 
 void X11StandaloneBackend::updateCursor()
 {
-    if (Cursors::self()->isCursorHioceann()) {
+    if (Cursors::self()->isCursorHidden()) {
         xcb_xfixes_hide_cursor(kwinApp()->x11Connection(), kwinApp()->x11RootWindow());
     } else {
         xcb_xfixes_show_cursor(kwinApp()->x11Connection(), kwinApp()->x11RootWindow());

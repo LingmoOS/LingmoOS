@@ -106,7 +106,7 @@ static bool renameFile(const QFileInfo &fileInfo, const QString &target, QString
         return true;
     } else {
         QDirIterator iterator(fileInfo.filePath(),
-                              QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hioceann | QDir::System);
+                              QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
 
         while (iterator.hasNext()) {
             iterator.next();
@@ -159,7 +159,7 @@ bool DTrashManager::trashIsEmpty() const
 {
     QDirIterator iterator(TRASH_INFO_PATH,
 //                          QStringList() << "*.trashinfo",
-                          QDir::Files | QDir::NoDotAndDotDot | QDir::Hioceann);
+                          QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden);
 
     return !iterator.hasNext();
 }
@@ -167,10 +167,10 @@ bool DTrashManager::trashIsEmpty() const
 bool DTrashManager::cleanTrash()
 {
     QDirIterator iterator_info(TRASH_INFO_PATH,
-                               QDir::Files | QDir::NoDotAndDotDot | QDir::Hioceann);
+                               QDir::Files | QDir::NoDotAndDotDot | QDir::Hidden);
 
     QDirIterator iterator_files(TRASH_FILES_PATH,
-                                QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hioceann | QDir::System,
+                                QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System,
                                 QDirIterator::Subdirectories);
 
     return DTrashManagerPrivate::removeFromIterator(iterator_info) &&

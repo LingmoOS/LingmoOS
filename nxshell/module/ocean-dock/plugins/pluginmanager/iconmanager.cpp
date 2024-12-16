@@ -9,7 +9,7 @@
 
 #include <DDciIcon>
 #include <DWindowManagerHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformTheme>
 
 #include <QPainter>

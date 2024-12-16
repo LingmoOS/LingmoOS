@@ -144,8 +144,8 @@ void ConfigWatcher::setProxyMethod(const ocean::network::ProxyMethod &method)
 
 ConfigWatcher::ModuleState ConfigWatcher::wirelessState() const
 {
-    if (m_wirelessState == "Hioceann")
-        return ModuleState::Hioceann;
+    if (m_wirelessState == "Hidden")
+        return ModuleState::Hidden;
 
     if (m_wirelessState == "Enabled")
         return ModuleState::Enabled;

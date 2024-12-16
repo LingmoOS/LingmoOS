@@ -21,7 +21,7 @@ AdapterV20toV23Root::AdapterV20toV23Root(QObject *parent)
     , m_status(WaitParent)
     , m_tryCount(50)
 {
-    setHioceann(true);
+    setHidden(true);
 }
 
 AdapterV20toV23Root::~AdapterV20toV23Root()

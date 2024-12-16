@@ -259,7 +259,7 @@
         <translation>എപ്പോഴും ദൃശ്യമാക്കുക</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>എപ്പോഴും അദൃശ്യമാക്കുക</translation>
     </message>
     <message>

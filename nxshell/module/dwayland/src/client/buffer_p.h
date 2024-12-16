@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Buffer::Private
+class Q_DECL_HIDDEN Buffer::Private
 {
 public:
     Private(Buffer *q, ShmPool *parent, wl_buffer *nativeBuffer, const QSize &size, int32_t stride, size_t offset, Format format);

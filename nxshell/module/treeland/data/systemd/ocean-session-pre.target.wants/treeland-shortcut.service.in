@@ -1,0 +1,19 @@
+[Unit]
+Description=TreeLand shortcut service
+CollectMode=inactive-or-failed
+
+Requires=treeland-sd.service
+PartOf=treeland-sd.service
+After=treeland-sd.service
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+[Service]
+ExecCondition=/bin/sh -c 'test "$OCEAN_CURRENT_COMPOSITOR" = "TreeLand" || exit 2'
+Type=notify
+ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/treeland-shortcut
+Slice=session.slice
+RestartSec=3s
+

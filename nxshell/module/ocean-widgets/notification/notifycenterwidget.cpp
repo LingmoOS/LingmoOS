@@ -162,13 +162,13 @@ void NotifyCenterWidget::CompositeChanged()
 void NotifyCenterWidget::updateDisplayOfRemainingNotification()
 {
     if (!hasAppNotification()) {
-        if (m_bottomTipLayout->parentWidget()->isHioceann())
+        if (m_bottomTipLayout->parentWidget()->isHidden())
             m_bottomTipLayout->parentWidget()->show();
         m_bottomTipLayout->setCurrentWidget(m_noNotifyLabel);
     } else {
         const int rowCount = m_notifyWidget->model()->remainNotificationCount();
         if (rowCount > 0) {
-            if (m_bottomTipLayout->parentWidget()->isHioceann()) {
+            if (m_bottomTipLayout->parentWidget()->isHidden()) {
                 m_bottomTipLayout->parentWidget()->show();
                 m_expandRemaining->show();
             }
@@ -191,7 +191,7 @@ void NotifyCenterWidget::updateTabFocus()
     if (auto w = m_notifyWidget->view()->lastItemView()) {
         QWidget::setTabOrder(w, m_expandRemaining);
     } else {
-        if (!m_bottomTipLayout->parentWidget()->isHioceann())
+        if (!m_bottomTipLayout->parentWidget()->isHidden())
             QWidget::setTabOrder(m_notifyWidget->view(), m_expandRemaining);
     }
 }

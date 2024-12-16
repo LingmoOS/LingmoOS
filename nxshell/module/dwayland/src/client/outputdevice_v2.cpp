@@ -18,7 +18,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN OutputDeviceV2::Private : public QObject
+class Q_DECL_HIDDEN OutputDeviceV2::Private : public QObject
 {
     Q_OBJECT
 public:

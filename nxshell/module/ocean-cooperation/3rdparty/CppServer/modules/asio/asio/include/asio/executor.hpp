@@ -21,7 +21,7 @@
 
 #include <new>
 #include <typeinfo>
-#include "asio/detail/cstoceanf.hpp"
+#include "asio/detail/cstddef.hpp"
 #include "asio/detail/executor_function.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/throw_exception.hpp"

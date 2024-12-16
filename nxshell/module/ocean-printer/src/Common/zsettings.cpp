@@ -5,7 +5,7 @@
 #include "zsettings.h"
 #include "config.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QSettings>
 #include <QFile>
@@ -93,7 +93,7 @@ const QString zSettings::getLogRules()
 
 const QString zSettings::getOSVersion()
 {
-    QString defaultVersion = LingmoTypeStrMap.value(DTK_CORE_NAMESPACE::DSysInfo::lingmoType(), OS_VERSION);
+    QString defaultVersion = LingmoTypeStrMap.value(DTK_CORE_NAMESPACE::LSysInfo::lingmoType(), OS_VERSION);
     QString archName = sysArch();
 
     qInfo() << QLocale::languageToString(QLocale::system().language());
@@ -108,20 +108,20 @@ const QString zSettings::getOSVersion()
 
 QString zSettings::getSysInfo()
 {
-    int iType = DTK_CORE_NAMESPACE::DSysInfo::uosType();
-    int iEditionType = DTK_CORE_NAMESPACE::DSysInfo::uosEditionType();
+    int iType = DTK_CORE_NAMESPACE::LSysInfo::uosType();
+    int iEditionType = DTK_CORE_NAMESPACE::LSysInfo::uosEditionType();
 
     return QString::number(iType) + '-' + QString::number(iEditionType);
 }
 
 QString zSettings::majorVersion()
 {
-    return DTK_CORE_NAMESPACE::DSysInfo::majorVersion();
+    return DTK_CORE_NAMESPACE::LSysInfo::majorVersion();
 }
 
 QString zSettings::minorVersion()
 {
-    return DTK_CORE_NAMESPACE::DSysInfo::minorVersion();
+    return DTK_CORE_NAMESPACE::LSysInfo::minorVersion();
 }
 
 int zSettings::getSubscriptionId()

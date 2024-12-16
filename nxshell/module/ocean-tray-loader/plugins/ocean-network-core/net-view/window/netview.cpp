@@ -69,7 +69,7 @@ NetView::NetView(NetManager *manager)
     setSelectionMode(QAbstractItemView::NoSelection);
     setRootIsDecorated(false);
     setItemsExpandable(false);
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     setAnimated(false);
     setIndentation(0);
     setContentsMargins(0, 0, 0, 0);

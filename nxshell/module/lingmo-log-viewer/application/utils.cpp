@@ -232,7 +232,7 @@ bool Utils::deleteDir(const QString &iFilePath)
     if (!srcPath.endsWith(QDir::separator()))
         srcPath += QDir::separator();
 
-    QStringList fileNames = directory.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hioceann);
+    QStringList fileNames = directory.entryList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden);
     bool error = false;
     for (QStringList::size_type i = 0; i != fileNames.size(); ++i) {
         QString filePath = srcPath + fileNames.at(i);

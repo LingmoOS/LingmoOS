@@ -7,7 +7,7 @@
 #include "units.h"
 #include "calendarprogramexitcontrol.h"
 #include <qstandardpaths.h>
-#include <DSysInfo>
+#include <LSysInfo>
 
 const QString firstDayOfWeek_key = "firstDayOfWeek";
 const QString shortTimeFormat_key = "shortTimeFormat";

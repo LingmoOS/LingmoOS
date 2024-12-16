@@ -134,7 +134,7 @@ TEST(UT_VaultFileInfo, isAttributes_one)
     info.isAttributes(FileInfo::FileIsType::kIsWritable);
     info.isAttributes(FileInfo::FileIsType::kIsExecutable);
     info.isAttributes(FileInfo::FileIsType::kIsSymLink);
-    isOk = info.isAttributes(FileInfo::FileIsType::kIsHioceann);
+    isOk = info.isAttributes(FileInfo::FileIsType::kIsHidden);
 
     EXPECT_TRUE(isOk);
 }
@@ -197,7 +197,7 @@ TEST(UT_VaultFileInfo, canAttributes_four)
     });
 
     VaultFileInfo info(QUrl("dfmvault:///UT_TEST"));
-    bool isOk = info.canAttributes(FileInfo::FileCanType::kCanHioceann);
+    bool isOk = info.canAttributes(FileInfo::FileCanType::kCanHidden);
 
     EXPECT_TRUE(isOk);
 }

@@ -40,7 +40,7 @@ enum wm_state_t {
     kShadedState,
     kSkipTaskbarState,
     kSkipPagerState,
-    kHioceannState,
+    kHiddenState,
     kFullScreenState,
     kAboveState,
     kBelowState,
@@ -176,7 +176,7 @@ std::list<WMWindowArea> WMInfo::selectWindow(const QPoint &pos) const
                 continue;
 
             // window state
-            if (child->states.contains(kHioceannState))
+            if (child->states.contains(kHiddenState))
                 continue;
 
             WMWindowArea warea(new struct wm_window_area_t());
@@ -264,7 +264,7 @@ std::list<WMWindowArea> WMInfo::getHoveredByWindowList(WMWId wid, QRect &area) c
                 continue;
 
             // window state
-            if (child->states.contains(kHioceannState))
+            if (child->states.contains(kHiddenState))
                 continue;
 
             // adjust child rect with frame extents
@@ -371,7 +371,7 @@ void WMInfo::findDockWindows()
                 continue;
 
             // window state
-            if (child->states.contains(kHioceannState))
+            if (child->states.contains(kHiddenState))
                 continue;
 
             // window type (dock type should exclude from this)
@@ -721,8 +721,8 @@ WMWindowExt WMInfo::requestWindowExtInfo(xcb_connection_t *conn, xcb_window_t wi
                 winfo->states << kSkipTaskbarState;
             } else if (atomName == "_NET_WM_STATE_SKIP_PAGER") {
                 winfo->states << kSkipPagerState;
-            } else if (atomName == "_NET_WM_STATE_HIOCEANN") {
-                winfo->states << kHioceannState;
+            } else if (atomName == "_NET_WM_STATE_HIDDEN") {
+                winfo->states << kHiddenState;
             } else if (atomName == "_NET_WM_STATE_FULLSCREEN") {
                 winfo->states << kFullScreenState;
             } else if (atomName == "_NET_WM_STATE_ABOVE") {

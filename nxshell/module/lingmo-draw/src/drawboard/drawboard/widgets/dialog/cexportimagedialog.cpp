@@ -795,7 +795,7 @@ void CExportImageDialog::CExportImageDialog_private::showTip(EAlertReason alertR
         tips = tr("It supports up to 10,000 pixels");
     }
 
-    if (_tipLabelForOutOfBounds->isHioceann())
+    if (_tipLabelForOutOfBounds->isHidden())
         _tipLabelForOutOfBounds->show();
     _tipLabelForOutOfBounds->setText(tips);
     if (timer == nullptr) {

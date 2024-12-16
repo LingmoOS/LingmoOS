@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Keystate::Private
+class Q_DECL_HIDDEN Keystate::Private
 {
 public:
     Private()

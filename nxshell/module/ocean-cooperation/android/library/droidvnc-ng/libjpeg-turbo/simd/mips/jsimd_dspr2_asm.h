@@ -91,9 +91,9 @@
 #define f31   $f31
 
 #ifdef __ELF__
-#define HIOCEANN_SYMBOL(symbol)  .hioceann symbol;
+#define HIDDEN_SYMBOL(symbol)  .hioceann symbol;
 #else
-#define HIOCEANN_SYMBOL(symbol)
+#define HIDDEN_SYMBOL(symbol)
 #endif
 
 /*
@@ -101,7 +101,7 @@
  */
 #define LEAF_MIPS32R2(symbol) \
     .globl      symbol; \
-    HIOCEANN_SYMBOL(symbol) \
+    HIDDEN_SYMBOL(symbol) \
     .align      2; \
     .type       symbol, @function; \
     .ent        symbol, 0; \

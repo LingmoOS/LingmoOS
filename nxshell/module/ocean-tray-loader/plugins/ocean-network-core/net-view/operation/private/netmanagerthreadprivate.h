@@ -50,7 +50,7 @@ public:
 
     void setEnabled(bool enabled);
     void setNetwork8021XMode(NetManager::Network8021XMode mode);
-    void setAutoUpdateHioceannConfig(bool autoUpdate);
+    void setAutoUpdateHiddenConfig(bool autoUpdate);
     void setAutoScanInterval(int ms);
     void setAutoScanEnabled(bool enabled);
     void setServerKey(const QString &serverKey);
@@ -92,7 +92,7 @@ public Q_SLOTS:
     void setDeviceEnabled(const QString &id, bool enabled);
     void requestScan(const QString &id);
     void disconnectDevice(const QString &id);
-    void connectHioceann(const QString &id, const QString &ssid);
+    void connectHidden(const QString &id, const QString &ssid);
     void connectWired(const QString &id, const QVariantMap &param);
     void connectWireless(const QString &id, const QVariantMap &param);
     void gotoControlCenter(const QString &page);
@@ -117,7 +117,7 @@ protected Q_SLOTS:
     void doSetDeviceEnabled(const QString &id, bool enabled);
     void doRequestScan(const QString &id);
     void doDisconnectDevice(const QString &id);
-    void doConnectHioceann(const QString &id, const QString &ssid);
+    void doConnectHidden(const QString &id, const QString &ssid);
     void doConnectWired(const QString &id, const QVariantMap &param);
     void doConnectWireless(const QString &id, const QVariantMap &param);
     void doGotoControlCenter(const QString &page);
@@ -165,7 +165,7 @@ protected Q_SLOTS:
     void onNotifyDeviceStatusChanged(NetworkManager::Device::State newState, NetworkManager::Device::State oldState, NetworkManager::Device::StateChangeReason reason);
     void sendNetworkNotify(NetworkNotifyType type, const QString &name);
     // 处理隐藏网络
-    void updateHioceannNetworkConfig(WirelessDevice *wireless);
+    void updateHiddenNetworkConfig(WirelessDevice *wireless);
     bool needSetPassword(AccessPoints *accessPoint) const;
     void handleAccessPointSecure(AccessPoints *accessPoint);
     void handle8021xAccessPoint(AccessPoints *ap);
@@ -192,7 +192,7 @@ private:
     bool m_monitorNetworkNotify;
     bool m_useSecretAgent;
     NetManager::Network8021XMode m_network8021XMode;
-    bool m_autoUpdateHioceannConfig; // 自动更新隐藏网络配置
+    bool m_autoUpdateHiddenConfig; // 自动更新隐藏网络配置
     bool m_isInitialized;
     bool m_enabled;
     int m_autoScanInterval;

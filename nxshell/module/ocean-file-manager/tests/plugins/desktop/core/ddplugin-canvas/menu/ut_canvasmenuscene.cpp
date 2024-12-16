@@ -26,7 +26,7 @@ DPF_USE_NAMESPACE
 DFMBASE_USE_NAMESPACE
 QT_BEGIN_NAMESPACE
 static const char *const kActionIconMenuSceneName = "ActionIconManager";
-static const char *const kDConfigHioceannMenuSceneName = "DConfigMenuFilter";
+static const char *const kDConfigHiddenMenuSceneName = "DConfigMenuFilter";
 static const char *const kCanvasBaseSortMenuSceneName = "CanvasBaseSortMenu";
 static const char *const kNewCreateMenuSceneName = "NewCreateMenu";
 static const char *const kTemplateMenuSceneName = "TemplateMenu";
@@ -216,7 +216,7 @@ class testItemView : public QAbstractItemView
     virtual int horizontalOffset() const { return 1; }
     virtual int verticalOffset() const { return 1; }
 
-    virtual bool isIndexHioceann(const QModelIndex &index) const { return true; }
+    virtual bool isIndexHidden(const QModelIndex &index) const { return true; }
 
     virtual void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command) {}
     virtual QRegion visualRegionForSelection(const QItemSelection &selection) const { return QRegion(1, 1, 2, 2); }

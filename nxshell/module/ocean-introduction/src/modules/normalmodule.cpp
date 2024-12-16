@@ -105,17 +105,17 @@ NormalModule::NormalModule(DWidget *parent)
 
     //UosEnterprise:服务器企业版　　UosEnterpriseC:行业版   UosEuler:服务器欧拉版
     bool bIsServerSystemType;
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterprise  ||
-        DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEnterpriseC ||
-        DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEuler) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterprise  ||
+        LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEnterpriseC ||
+        LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEuler) {
         bIsServerSystemType = true;
     } else {
         bIsServerSystemType = false;
     }
 
     //lingmo类型，桌面，个人等
-    const DSysInfo::LingmoType LingmoType = DSysInfo::lingmoType();
-    bool bIsLingmoServerType = (LingmoType == DSysInfo::LingmoServer);
+    const LSysInfo::LingmoType LingmoType = LSysInfo::lingmoType();
+    bool bIsLingmoServerType = (LingmoType == LSysInfo::LingmoServer);
 
     //使用DBUS获取窗口特效是否支持切换 这个和上面的m_wmSwitcher->AllowSwitch();
     bool isSuportEffect = QDBusInterface("com.lingmo.wm", "/com/lingmo/wm", "com.lingmo.wm")

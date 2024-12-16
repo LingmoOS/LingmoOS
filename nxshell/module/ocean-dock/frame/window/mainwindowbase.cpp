@@ -15,7 +15,7 @@
 
 #include <DStyle>
 #include <DWindowManagerHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformTheme>
 
 #include <QScreen>

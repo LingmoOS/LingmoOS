@@ -240,10 +240,10 @@ void InputMethod::setPanel(InputPanelV1Window *panel)
         }
     });
     connect(m_panel, &Window::frameGeometryChanged, this, &InputMethod::updateInputPanelState);
-    connect(m_panel, &Window::windowHioceann, this, &InputMethod::updateInputPanelState);
+    connect(m_panel, &Window::windowHidden, this, &InputMethod::updateInputPanelState);
     connect(m_panel, &Window::windowClosed, this, &InputMethod::updateInputPanelState);
     connect(m_panel, &Window::windowShown, this, &InputMethod::visibleChanged);
-    connect(m_panel, &Window::windowHioceann, this, &InputMethod::visibleChanged);
+    connect(m_panel, &Window::windowHidden, this, &InputMethod::visibleChanged);
     connect(m_panel, &Window::windowClosed, this, &InputMethod::visibleChanged);
     Q_EMIT visibleChanged();
     updateInputPanelState();

@@ -25,23 +25,23 @@ TEST(logDetailInfoWidget_cleanText_UT, logDetailInfoWidget_cleanText_UT)
     logDetailInfoWidget *p = new logDetailInfoWidget(nullptr);
     EXPECT_NE(p, nullptr);
     p->cleanText();
-    EXPECT_EQ(p->m_dateTime->isHioceann(), true);
-    EXPECT_EQ(p->m_userName->isHioceann(), true);
-    EXPECT_EQ(p->m_userLabel->isHioceann(), true);
-    EXPECT_EQ(p->m_pid->isHioceann(), true);
-    EXPECT_EQ(p->m_pidLabel->isHioceann(), true);
-    EXPECT_EQ(p->m_action->isHioceann(), true);
-    EXPECT_EQ(p->m_actionLabel->isHioceann(), true);
-    EXPECT_EQ(p->m_status->isHioceann(), true);
-    EXPECT_EQ(p->m_statusLabel->isHioceann(), true);
+    EXPECT_EQ(p->m_dateTime->isHidden(), true);
+    EXPECT_EQ(p->m_userName->isHidden(), true);
+    EXPECT_EQ(p->m_userLabel->isHidden(), true);
+    EXPECT_EQ(p->m_pid->isHidden(), true);
+    EXPECT_EQ(p->m_pidLabel->isHidden(), true);
+    EXPECT_EQ(p->m_action->isHidden(), true);
+    EXPECT_EQ(p->m_actionLabel->isHidden(), true);
+    EXPECT_EQ(p->m_status->isHidden(), true);
+    EXPECT_EQ(p->m_statusLabel->isHidden(), true);
 
-    EXPECT_EQ(p->m_level->isHioceann(), true);
-    EXPECT_EQ(p->m_daemonName->isHioceann(), true);
+    EXPECT_EQ(p->m_level->isHidden(), true);
+    EXPECT_EQ(p->m_daemonName->isHidden(), true);
     EXPECT_EQ(p->m_textBrowser->toPlainText().isEmpty(), true);
-    EXPECT_EQ(p->m_name->isHioceann(), true);
-    EXPECT_EQ(p->m_nameLabel->isHioceann(), true);
-    EXPECT_EQ(p->m_event->isHioceann(), true);
-    EXPECT_EQ(p->m_eventLabel->isHioceann(), true);
+    EXPECT_EQ(p->m_name->isHidden(), true);
+    EXPECT_EQ(p->m_nameLabel->isHidden(), true);
+    EXPECT_EQ(p->m_event->isHidden(), true);
+    EXPECT_EQ(p->m_eventLabel->isHidden(), true);
     p->deleteLater();
 }
 
@@ -50,7 +50,7 @@ TEST(logDetailInfoWidget_hideLine_UT, logDetailInfoWidget_hideLine_UT)
     logDetailInfoWidget *p = new logDetailInfoWidget(nullptr);
     EXPECT_NE(p, nullptr);
     p->hideLine(true);
-    EXPECT_EQ(p->m_hline->isHioceann(), true);
+    EXPECT_EQ(p->m_hline->isHidden(), true);
     p->deleteLater();
 }
 

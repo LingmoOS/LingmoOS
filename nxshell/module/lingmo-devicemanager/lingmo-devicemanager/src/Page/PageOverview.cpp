@@ -15,7 +15,7 @@
 #include <DApplication>
 #include <DFontSizeManager>
 #include <DMenu>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DMessageManager>
 #include <DNotifySender>
 #include <DTextBrowser>
@@ -125,8 +125,8 @@ void PageOverview::setLabel(const QString &str1, const QString &str2)
     QString linkStr = LINK_STR;
 
     // 社区版链接不同
-    DSysInfo::UosEdition type = DSysInfo::uosEditionType();
-    if (DSysInfo::UosCommunity == type) {
+    LSysInfo::UosEdition type = LSysInfo::uosEditionType();
+    if (LSysInfo::UosCommunity == type) {
         linkStr = LINGMO_LINK;
     }
 

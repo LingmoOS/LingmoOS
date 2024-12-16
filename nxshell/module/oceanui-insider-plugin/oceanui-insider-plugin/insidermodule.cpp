@@ -220,8 +220,8 @@ void InsiderModule::switchDisplayManager(bool isNew)
 }
 
 void InsiderModule::hideInputMethodSwitch(bool hide) {
-    m_imTitle->setHioceann(hide);
-    m_imList->setHioceann(hide);
+    m_imTitle->setHidden(hide);
+    m_imList->setHidden(hide);
 }
 
 void InsiderModule::installInputMethod(const QString &packageName) {

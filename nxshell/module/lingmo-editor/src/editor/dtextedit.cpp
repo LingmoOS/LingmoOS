@@ -42,7 +42,7 @@
 #include <QTimer>
 #include <QGesture>
 #include <QStyleHints>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <private/qguiapplication_p.h>
 #include <qpa/qplatformtheme.h>
@@ -518,9 +518,9 @@ void TextEdit::popRightMenu(QPoint pos)
 
     /* 专业版/家庭版/教育版鼠标右键菜单支持语音读写 */
     /* 更换成只要发现有com.iflytek.aiassistant服务已经注册开启，则开启支持语音读写功能 */
-    /*if ((DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosProfessional) ||
-        (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosHome) ||
-        (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosEducation)) {*/
+    /*if ((LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosProfessional) ||
+        (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosHome) ||
+        (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosEducation)) {*/
 
     if (IflytekAiAssistant::instance()->valid()) {
         bool stopReadingState = false;
@@ -4658,10 +4658,10 @@ void TextEdit::setEditPalette(const QString &activeColor, const QString &inactiv
     setPalette(pa);
 }
 
-void TextEdit::setCodeFoldWidgetHide(bool isHioceann)
+void TextEdit::setCodeFoldWidgetHide(bool isHidden)
 {
     if (m_foldCodeShow) {
-        m_foldCodeShow->setHioceann(isHioceann);
+        m_foldCodeShow->setHidden(isHidden);
     }
 }
 

@@ -186,7 +186,7 @@ bool dfmbase::AbstractFileInfo::isExecutable() const
     return false;
 }
 
-bool dfmbase::AbstractFileInfo::isHioceann() const
+bool dfmbase::AbstractFileInfo::isHidden() const
 {
     return false;
 }

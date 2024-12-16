@@ -481,9 +481,9 @@ public:
 	 * Value | Description
 	 * :---: | -----------
 	 * False | Visible
-	 * True  | Hioceann
+	 * True  | Hidden
 	 */
-	bool m_isHioceann = false;
+	bool m_isHidden = false;
 	/**
 	 * Function type. Relevant only if macro == 1
 	 * Value | Description

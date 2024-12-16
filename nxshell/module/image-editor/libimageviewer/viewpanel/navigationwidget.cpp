@@ -20,7 +20,7 @@
 namespace {
 
 const QString SETTINGS_GROUP = "VIEWPANEL";
-const QString SETTINGS_ALWAYSHIOCEANN_KEY = "NavigationAlwaysHioceann";
+const QString SETTINGS_ALWAYSHIDDEN_KEY = "NavigationAlwaysHidden";
 const int IMAGE_MARGIN = 5;
 const int IMAGE_MARGIN_BOTTOM = 5;
 //因为qrc改变,需要改变资源文件的获取路径,bug63261
@@ -52,7 +52,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     closeBtn_light->setPalette(palette1);
     closeBtn_light->hide();
     connect(closeBtn_light, &ImageButton::clicked, [this]() {
-        setAlwaysHioceann(true);
+        setAlwaysHidden(true);
     });
 
     ImageButton *closeBtn_dark = new ImageButton(ICON_CLOSE_NORMAL_DARK, ICON_CLOSE_HOVER_DARK, ICON_CLOSE_PRESS_DARK, " ", this);
@@ -65,7 +65,7 @@ NavigationWidget::NavigationWidget(QWidget *parent)
     closeBtn_dark->setPalette(palette2);
     closeBtn_dark->hide();
     connect(closeBtn_dark, &ImageButton::clicked, [this]() {
-        setAlwaysHioceann(true);
+        setAlwaysHidden(true);
     });
 
     //修复style问题
@@ -118,19 +118,19 @@ NavigationWidget::NavigationWidget(QWidget *parent)
 //            &NavigationWidget::onThemeChanged);
 }
 
-void NavigationWidget::setAlwaysHioceann(bool value)
+void NavigationWidget::setAlwaysHidden(bool value)
 {
-    LibConfigSetter::instance()->setValue(SETTINGS_GROUP, SETTINGS_ALWAYSHIOCEANN_KEY,
+    LibConfigSetter::instance()->setValue(SETTINGS_GROUP, SETTINGS_ALWAYSHIDDEN_KEY,
                                           QVariant(value));
-    if (isAlwaysHioceann())
+    if (isAlwaysHidden())
         hide();
     else
         show();
 }
 
-bool NavigationWidget::isAlwaysHioceann() const
+bool NavigationWidget::isAlwaysHidden() const
 {
-    return LibConfigSetter::instance()->value(SETTINGS_GROUP, SETTINGS_ALWAYSHIOCEANN_KEY,
+    return LibConfigSetter::instance()->value(SETTINGS_GROUP, SETTINGS_ALWAYSHIDDEN_KEY,
                                               QVariant(false)).toBool();
 }
 

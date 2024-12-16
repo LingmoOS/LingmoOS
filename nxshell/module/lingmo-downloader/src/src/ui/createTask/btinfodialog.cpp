@@ -331,9 +331,9 @@ void BtInfoDialog::initUI()
         m_listBtInfo.append(file);
     }
 
-    m_tableView->setColumnHioceann(1, true);
-    m_tableView->setColumnHioceann(4, true);
-    m_tableView->setColumnHioceann(5, true);
+    m_tableView->setColumnHidden(1, true);
+    m_tableView->setColumnHidden(4, true);
+    m_tableView->setColumnHidden(5, true);
 
     m_tableView->setColumnWidth(0, 290);
     m_tableView->setColumnWidth(2, 60);

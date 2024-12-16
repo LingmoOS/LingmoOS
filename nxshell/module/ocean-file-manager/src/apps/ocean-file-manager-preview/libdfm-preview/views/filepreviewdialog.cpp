@@ -391,7 +391,7 @@ void FilePreviewDialog::updateTitle()
         elidedText = fm.elidedText(preview->title(), Qt::ElideMiddle, width() / 2 - statusBar->preButton()->width() - statusBar->nextButton()->width() - statusBar->contentsMargins().left() - statusBar->layout()->spacing() * 3 - 30);
     }
     statusBar->title()->setText(elidedText);
-    statusBar->title()->setHioceann(statusBar->title()->text().isEmpty());
+    statusBar->title()->setHidden(statusBar->title()->text().isEmpty());
 }
 
 QString FilePreviewDialog::generalKey(const QString &key)

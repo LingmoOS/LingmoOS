@@ -426,7 +426,7 @@ TEST_F(TagManagerTest, renameHandle)
 TEST_F(TagManagerTest, hideFiles)
 {
     bool isCall = false;
-    QObject::connect(ins, &TagManager::filesHioceann, [&isCall]() {
+    QObject::connect(ins, &TagManager::filesHidden, [&isCall]() {
         isCall = true;
     });
     ins->hideFiles(QList<QString>() << "red", QList<QUrl>() << QUrl("/test"));

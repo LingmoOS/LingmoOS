@@ -277,7 +277,7 @@
         <translation>Tiếp tục Hiển thị</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Tiếp tục Ẩn</translation>
     </message>
     <message>

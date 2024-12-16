@@ -12,7 +12,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Strut::Private
+class Q_DECL_HIDDEN Strut::Private
 {
 public:
     Private() = default;

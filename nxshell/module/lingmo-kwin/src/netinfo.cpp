@@ -80,7 +80,7 @@ RootInfo *RootInfo::create()
         | NET::KeepAbove
         // | NET::StaysOnTop // The same like KeepAbove
         | NET::SkipPager
-        | NET::Hioceann
+        | NET::Hidden
         | NET::FullScreen
         | NET::KeepBelow
         | NET::DemandsAttention
@@ -281,7 +281,7 @@ void WinInfo::changeFullscreenMonitors(NETFullscreenMonitors topology)
 void WinInfo::changeState(NET::States state, NET::States mask)
 {
     mask &= ~NET::Sticky; // KWin doesn't support large desktops, ignore
-    mask &= ~NET::Hioceann; // clients are not allowed to change this directly
+    mask &= ~NET::Hidden; // clients are not allowed to change this directly
     state &= mask; // for safety, clear all other bits
 
     if ((mask & NET::FullScreen) != 0 && (state & NET::FullScreen) == 0) {

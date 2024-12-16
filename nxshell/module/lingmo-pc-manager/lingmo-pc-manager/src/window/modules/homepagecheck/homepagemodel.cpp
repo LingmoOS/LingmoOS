@@ -238,7 +238,7 @@ bool HomePageModel::IsDeveloperMode()
 bool HomePageModel::ignoreDevModeChecking() const
 {
     // 服务器版差异修改
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         return true;
     }
 

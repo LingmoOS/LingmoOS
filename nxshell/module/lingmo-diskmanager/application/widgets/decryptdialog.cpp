@@ -243,7 +243,7 @@ void DecryptDialog::onPasswordEditTextChanged(const QString &)
 
 void DecryptDialog::onPasswordHintButtonClicked()
 {
-    if (!m_frame->isHioceann()) {
+    if (!m_frame->isHidden()) {
         m_height = 200;
         setFixedSize(406, m_height);
         m_frame->hide();

@@ -19,7 +19,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN DataControlDeviceV1::Private
+class Q_DECL_HIDDEN DataControlDeviceV1::Private
 {
 public:
     explicit Private(DataControlDeviceV1 *q);

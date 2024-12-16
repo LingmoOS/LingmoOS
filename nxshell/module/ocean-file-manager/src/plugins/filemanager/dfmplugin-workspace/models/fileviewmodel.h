@@ -90,7 +90,7 @@ public:
     void setFilterData(const QVariant &data);
     void setFilterCallback(const FileViewFilterCallback callback);
 
-    void toggleHioceannFiles();
+    void toggleHiddenFiles();
     void setReadOnly(bool value);
     void updateThumbnailIcon(const QModelIndex &index, const QString &thumb);
     void setTreeView(const bool isTree);
@@ -105,7 +105,7 @@ Q_SIGNALS:
     void filtersChanged(QStringList nameFilters, QDir::Filters filters);
     void requestGetSourceData();
 
-    void requestChangeHioceannFilter();
+    void requestChangeHiddenFilter();
     void requestChangeFilters(QDir::Filters filters);
     void requestChangeNameFilters(const QStringList &nameFilters);
     void requestUpdateFile(const QUrl &url);
@@ -115,7 +115,7 @@ Q_SIGNALS:
     void requestSortChildren(Qt::SortOrder order, DFMGLOBAL_NAMESPACE::ItemRoles role, const bool isMixAndFile);
     void requestSetFilterData(const QVariant &data);
     void requestSetFilterCallback(FileViewFilterCallback callback);
-    void requestShowHioceannChanged(bool value);
+    void requestShowHiddenChanged(bool value);
 
     void requestCollapseItem(const QString &key, const QUrl &parent);
     void requestTreeView(const bool isTree);
@@ -131,7 +131,7 @@ public Q_SLOTS:
     void onGenericAttributeChanged(DFMBASE_NAMESPACE::Application::GenericAttribute ga, const QVariant &value);
     void onDConfigChanged(const QString &config, const QString &key);
     void onSetCursorWait();
-    void onHioceannSettingChanged(bool value);
+    void onHiddenSettingChanged(bool value);
     void onWorkFinish(int visiableCount, int totalCount);
     void onDataChanged(int first, int last);
 

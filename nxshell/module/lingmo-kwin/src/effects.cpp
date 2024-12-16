@@ -352,8 +352,8 @@ void EffectsHandlerImpl::setupWindowConnections(Window *window)
     connect(window, &Window::windowShown, this, [this](Window *window) {
         Q_EMIT windowShown(window->effectWindow());
     });
-    connect(window, &Window::windowHioceann, this, [this](Window *window) {
-        Q_EMIT windowHioceann(window->effectWindow());
+    connect(window, &Window::windowHidden, this, [this](Window *window) {
+        Q_EMIT windowHidden(window->effectWindow());
     });
     connect(window, &Window::keepAboveChanged, this, [this, window](bool above) {
         Q_EMIT windowKeepAboveChanged(window->effectWindow());
@@ -2073,9 +2073,9 @@ void EffectsHandlerImpl::renderScreen(EffectScreen *screen)
     m_scene->postPaint();
 }
 
-bool EffectsHandlerImpl::isCursorHioceann() const
+bool EffectsHandlerImpl::isCursorHidden() const
 {
-    return Cursors::self()->isCursorHioceann();
+    return Cursors::self()->isCursorHidden();
 }
 
 QRect EffectsHandlerImpl::renderTargetRect() const

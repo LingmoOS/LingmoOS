@@ -322,7 +322,7 @@ Qt::KeyboardModifiers keyboardModifiers_stub()
     return Qt::ControlModifier;
 }
 
-bool isHioceann_stub()
+bool isHidden_stub()
 {
     g_funcName = __FUNCTION__;
     return false;
@@ -1531,9 +1531,9 @@ TEST_F(TestSheetBrowser, testwheelEvent001)
     m_tester->wheelEvent(event);
     EXPECT_TRUE(g_funcName == "keyboardModifiers_stub");
 
-    s.set(ADDR(QWidget, isHioceann), isHioceann_stub);
+    s.set(ADDR(QWidget, isHidden), isHidden_stub);
     m_tester->wheelEvent(event);
-    EXPECT_FALSE(g_funcName == "isHioceann_stub");
+    EXPECT_FALSE(g_funcName == "isHidden_stub");
 
     delete sheet;
     delete event;
@@ -1939,7 +1939,7 @@ TEST_F(TestSheetBrowser, testmouseReleaseEvent001)
     s.set(ADDR(SheetBrowser, showNoteEditWidget), showNoteEditWidget_stub);
     s.set(ADDR(QPointF, manhattanLength), manhattanLength_stub);
     s.set(ADDR(SheetBrowser, jump2Link), jump2Link_stub);
-    s.set(ADDR(QWidget, isHioceann), isHioceann_stub);
+    s.set(ADDR(QWidget, isHidden), isHidden_stub);
     s.set(ADDR(SheetBrowser, getLinkAtPoint), getLinkAtPoint_stub);
 
     typedef void (*fptr)(QGraphicsView *, QMouseEvent *);
@@ -1978,7 +1978,7 @@ TEST_F(TestSheetBrowser, testmouseReleaseEvent002)
     s.set(ADDR(SheetBrowser, getClickAnnot), getClickAnnot_stub);
     s.set(ADDR(QPointF, manhattanLength), manhattanLength_stub);
     s.set(ADDR(SheetBrowser, jump2Link), jump2Link_stub);
-    s.set(ADDR(QWidget, isHioceann), isHioceann_stub);
+    s.set(ADDR(QWidget, isHidden), isHidden_stub);
 
     typedef void (*fptr)(QGraphicsView *, QMouseEvent *);
     fptr A_foo = (fptr)(&QGraphicsView::mouseReleaseEvent);   //获取虚函数地址

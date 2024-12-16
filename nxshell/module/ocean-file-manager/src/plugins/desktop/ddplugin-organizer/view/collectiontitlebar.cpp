@@ -73,8 +73,8 @@ CollectionTitleBarPrivate::CollectionTitleBarPrivate(const QString &uuid, Collec
 
     menu = new DMenu(q);
     connect(menu, &DMenu::aboutToHide, this, [=]() {
-        if (needHioceann) {
-            needHioceann = false;
+        if (needHidden) {
+            needHidden = false;
             q->setVisible(false);
         }
     });
@@ -89,8 +89,8 @@ void CollectionTitleBarPrivate::modifyTitleName()
     if (!renamable)
         return;
 
-    if (q->isHioceann())
-        q->setHioceann(false);
+    if (q->isHidden())
+        q->setHidden(false);
 
     nameWidget->setCurrentWidget(nameLineEdit);
     nameLineEdit->setText(titleName);
@@ -205,11 +205,11 @@ bool CollectionTitleBar::setTitleBarVisible(const bool &visible)
     // todo 显隐逻辑待根据场景细化(需求：当鼠标移出集合时，隐藏该集合的标题栏)
     // 标题栏操作过程中（正在重命名、弹出菜单选项），移出鼠标是否隐藏标题栏？
     if (!visible && d->menu->isVisible()) {
-        d->needHioceann = true;
+        d->needHidden = true;
         return false;
     }
 
-    d->needHioceann = false;
+    d->needHidden = false;
     this->setVisible(visible);
     return true;
 }

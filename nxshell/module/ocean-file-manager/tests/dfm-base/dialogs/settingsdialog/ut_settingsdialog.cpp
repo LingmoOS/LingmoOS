@@ -26,9 +26,9 @@ TEST_F(UT_SettingsDialog, SetItemVisiable)
 {
     auto &&set = "a.b.c";
     EXPECT_NO_FATAL_FAILURE(SettingDialog::setItemVisiable(set, false));
-    EXPECT_TRUE(SettingDialog::kHioceannSettingItems.contains(set));
+    EXPECT_TRUE(SettingDialog::kHiddenSettingItems.contains(set));
     EXPECT_NO_FATAL_FAILURE(SettingDialog::setItemVisiable(set, true));
-    EXPECT_FALSE(SettingDialog::kHioceannSettingItems.contains(set));
+    EXPECT_FALSE(SettingDialog::kHiddenSettingItems.contains(set));
 }
 // TEST_F(UT_SettingsDialog, CreateAutoMountCheckBox){}
 // TEST_F(UT_SettingsDialog, CreateAutoMountOpenCheckBox){}
@@ -127,9 +127,9 @@ TEST_F(UT_SettingsDialog, LoadSettings)
 
 TEST_F(UT_SettingsDialog, NeedHide)
 {
-    SettingDialog::kHioceannSettingItems.clear();
+    SettingDialog::kHiddenSettingItems.clear();
     auto &&set = "a.b.c";
     EXPECT_NO_FATAL_FAILURE(SettingDialog::setItemVisiable(set, false));
-    EXPECT_TRUE(SettingDialog::kHioceannSettingItems.contains(set));
+    EXPECT_TRUE(SettingDialog::kHiddenSettingItems.contains(set));
     EXPECT_TRUE(SettingDialog::needHide(set));
 }

@@ -197,7 +197,7 @@ TEST(CollectionViewMenu, showNormalMenu)
     stub.set_lamda(&QItemSelectionModel::selectedIndexes, [&model](){
         return QModelIndexList {model.index(0, 0), model.index(1, 0)};
     });
-    stub.set_lamda(VADDR(CollectionView, isIndexHioceann), [](){
+    stub.set_lamda(VADDR(CollectionView, isIndexHidden), [](){
         return false;
     });
 

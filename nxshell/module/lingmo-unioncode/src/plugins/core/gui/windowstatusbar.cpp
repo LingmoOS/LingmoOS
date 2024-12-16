@@ -79,8 +79,8 @@ void WindowStatusBar::requestNotify()
     NotificationManager::instance()->toggle();
 }
 
-bool WindowStatusBar::progressIsHioceann()
+bool WindowStatusBar::progressIsHidden()
 {
-    return d->progressBar->isHioceann()
-            && d->messageLabel->isHioceann();
+    return d->progressBar->isHidden()
+            && d->messageLabel->isHidden();
 }

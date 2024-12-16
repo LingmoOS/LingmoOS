@@ -354,13 +354,13 @@ TEST_F(UT_FileViewModel, SetFilterData) {
     EXPECT_EQ(recData, filterData);
 }
 
-TEST_F(UT_FileViewModel, ToggleHioceannFiles) {
+TEST_F(UT_FileViewModel, ToggleHiddenFiles) {
     bool emitSignal = false;
-    QObject::connect(model, &FileViewModel::requestChangeHioceannFilter, model, [&emitSignal]{
+    QObject::connect(model, &FileViewModel::requestChangeHiddenFilter, model, [&emitSignal]{
         emitSignal = true;
     });
 
-    model->toggleHioceannFiles();
+    model->toggleHiddenFiles();
     EXPECT_TRUE(emitSignal);
 }
 

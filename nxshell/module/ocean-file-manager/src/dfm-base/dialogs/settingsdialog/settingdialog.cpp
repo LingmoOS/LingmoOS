@@ -134,7 +134,7 @@ void SettingDialog::loadSettings(const QString & /*templateFile*/)
 
 QPointer<QCheckBox> SettingDialog::kAutoMountCheckBox = nullptr;
 QPointer<QCheckBox> SettingDialog::kAutoMountOpenCheckBox = nullptr;
-QSet<QString> SettingDialog::kHioceannSettingItems {};
+QSet<QString> SettingDialog::kHiddenSettingItems {};
 quint64 SettingDialog::parentWid { 0 };
 
 SettingDialog::SettingDialog(QWidget *parent)
@@ -195,14 +195,14 @@ void SettingDialog::initialze()
 void SettingDialog::setItemVisiable(const QString &key, bool visiable)
 {
     if (visiable)
-        kHioceannSettingItems.remove(key);
+        kHiddenSettingItems.remove(key);
     else
-        kHioceannSettingItems.insert(key);
+        kHiddenSettingItems.insert(key);
 }
 
 bool SettingDialog::needHide(const QString &key)
 {
-    return kHioceannSettingItems.contains(key);
+    return kHiddenSettingItems.contains(key);
 }
 
 QPair<QWidget *, QWidget *> SettingDialog::createAutoMountCheckBox(QObject *opt)

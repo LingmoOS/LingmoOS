@@ -8,7 +8,7 @@
 #include "private/dsearchedit_p.h"
 #include "diconbutton.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DGuiApplicationHelper>
 #include <DIconTheme>
 #undef ENABLE_AI

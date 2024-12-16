@@ -12,7 +12,7 @@
 #include <DSettingsGroup>
 #include <DSettingsOption>
 #include <DSettingsWidgetFactory>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DWindowManagerHelper>
 #include <DTitlebar>
 

@@ -24,7 +24,7 @@ void DriverListView::initUI()
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setFrameStyle(QFrame::NoFrame);
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
     DriverListViewDelegate *delegate = new DriverListViewDelegate(this);
     setItemDelegate(delegate);
 

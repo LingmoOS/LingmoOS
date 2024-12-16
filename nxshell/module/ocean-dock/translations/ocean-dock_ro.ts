@@ -277,7 +277,7 @@
         <translation>Păstrați docul afișat</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Păstrați docul ascuns</translation>
     </message>
     <message>

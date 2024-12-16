@@ -68,9 +68,9 @@ TEST(SpecialToolsTest, ut_getJsonArray)
     EXPECT_TRUE(!SpecialTools::getJsonArray(&object, "key1").isEmpty());
 }
 
-TEST(SpecialToolsTest, ut_isHioceannFile)
+TEST(SpecialToolsTest, ut_isHiddenFile)
 {
     QString path = QDir::homePath();
      QHash<QString, QSet<QString>> filters;
-    EXPECT_NO_FATAL_FAILURE(SpecialTools::isHioceannFile(path, filters));
+    EXPECT_NO_FATAL_FAILURE(SpecialTools::isHiddenFile(path, filters));
 }

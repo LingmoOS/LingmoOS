@@ -57,7 +57,7 @@ NetItemPrivate *NetItemPrivate::New(NetType::NetItemType type, const QString &id
         CaseNewItem(WirelessControlItem);
         CaseNewItem(WirelessDeviceItem);
         CaseNewItem(WirelessItem);
-        CaseNewItem(WirelessHioceannItem);
+        CaseNewItem(WirelessHiddenItem);
         CaseNewItem(WiredControlItem);
         CaseNewItem(WiredDeviceItem);
         CaseNewItem(WiredItem);
@@ -245,7 +245,7 @@ NetWirelessOtherItemPrivate::NetWirelessOtherItemPrivate()
 {
 }
 // 隐藏网络
-GETFUN(NetType::NetItemType, NetWirelessHioceannItem, itemType, NetType::NetItemType::WirelessHioceannItem)
+GETFUN(NetType::NetItemType, NetWirelessHiddenItem, itemType, NetType::NetItemType::WirelessHiddenItem)
 
 // 无线网络
 GETFUN(NetType::NetItemType, NetWirelessItem, itemType, NetType::NetItemType::WirelessItem)

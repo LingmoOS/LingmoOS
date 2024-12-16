@@ -277,7 +277,7 @@
         <translation>Mantén visible</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Mantén ocult</translation>
     </message>
     <message>

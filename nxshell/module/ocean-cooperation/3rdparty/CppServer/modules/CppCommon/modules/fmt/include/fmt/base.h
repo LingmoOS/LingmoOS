@@ -12,8 +12,8 @@
 #include <stdio.h>   // FILE
 #include <string.h>  // strlen
 
-// <cstoceanf> is also included transitively from <type_traits>.
-#include <cstoceanf>      // std::byte
+// <cstddef> is also included transitively from <type_traits>.
+#include <cstddef>      // std::byte
 #include <type_traits>  // std::enable_if
 
 // The fmt library version in the form major * 10000 + minor * 100 + patch.

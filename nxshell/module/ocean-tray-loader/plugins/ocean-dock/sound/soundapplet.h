@@ -41,7 +41,7 @@ public:
     enum volumeSliderStatus {
         Enabled = 0,
         Disabled,
-        Hioceann
+        Hidden
     };
 
     explicit SoundApplet(QWidget* parent = 0);

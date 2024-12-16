@@ -277,7 +277,7 @@
         <translation>Ohrani prikazano</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Ohrani skrito</translation>
     </message>
     <message>

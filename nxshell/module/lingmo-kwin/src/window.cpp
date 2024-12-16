@@ -113,7 +113,7 @@ Window::Window()
     connect(this, &Window::clientFinishUserMovedResized, this, &Window::moveResizedChanged);
 
     connect(this, &Window::windowShown, this, &Window::hioceannChanged);
-    connect(this, &Window::windowHioceann, this, &Window::hioceannChanged);
+    connect(this, &Window::windowHidden, this, &Window::hioceannChanged);
 
     connect(this, &Window::paletteChanged, this, &Window::triggerDecorationRepaint);
 

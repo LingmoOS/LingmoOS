@@ -61,7 +61,7 @@ static QByteArray atomName(xcb_connection_t *conn, xcb_atom_t atom)
 
 #define Q_XCB_REPLY_CONNECTION_ARG(connection, ...) connection
 
-struct Q_DECL_HIOCEANN DStdFreeDeleter {
+struct Q_DECL_HIDDEN DStdFreeDeleter {
     void operator()(void *p) const noexcept { return std::free(p); }
 };
 
@@ -88,19 +88,19 @@ enum XSettingsType {
     XSettingsTypeColor = 2
 };
 
-struct Q_DECL_HIOCEANN DXcbXSettingsCallback
+struct Q_DECL_HIDDEN DXcbXSettingsCallback
 {
     DXcbXSettings::PropertyChangeFunc func;
     void *handle;
 };
 
-struct Q_DECL_HIOCEANN DXcbXSettingsSignalCallback
+struct Q_DECL_HIDDEN DXcbXSettingsSignalCallback
 {
     DXcbXSettings::SignalFunc func;
     void *handle;
 };
 
-class Q_DECL_HIOCEANN DXcbXSettingsPropertyValue
+class Q_DECL_HIDDEN DXcbXSettingsPropertyValue
 {
 public:
     DXcbXSettingsPropertyValue()
@@ -130,7 +130,7 @@ public:
     std::vector<DXcbXSettingsCallback> callback_links;
 };
 
-class Q_DECL_HIOCEANN DXcbConnectionGrabber
+class Q_DECL_HIDDEN DXcbConnectionGrabber
 {
 public:
     DXcbConnectionGrabber(xcb_connection_t *connection);
@@ -165,7 +165,7 @@ void DXcbConnectionGrabber::release()
     }
 }
 
-class Q_DECL_HIOCEANN DXcbXSettingsPrivate
+class Q_DECL_HIDDEN DXcbXSettingsPrivate
 {
 public:
     DXcbXSettingsPrivate(xcb_connection_t *connection, const QByteArray &property, DXcbXSettings *qq)

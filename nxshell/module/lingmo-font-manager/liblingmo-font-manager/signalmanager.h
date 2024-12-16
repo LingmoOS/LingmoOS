@@ -56,7 +56,7 @@ signals:
     //请求设置addbutton焦点
     void requestSetTabFocusToAddBtn();
     //右键菜单关闭请求触发操作
-    void menuHioceann();
+    void menuHidden();
 private:
     explicit SignalManager(QObject *parent = nullptr);
 public:

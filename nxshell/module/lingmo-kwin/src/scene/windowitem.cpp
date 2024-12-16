@@ -78,8 +78,8 @@ Window *WindowItem::window() const
 
 void WindowItem::refVisible(int reason)
 {
-    if (reason & PAINT_DISABLED_BY_HIOCEANN) {
-        m_forceVisibleByHioceannCount++;
+    if (reason & PAINT_DISABLED_BY_HIDDEN) {
+        m_forceVisibleByHiddenCount++;
     }
     if (reason & PAINT_DISABLED_BY_DELETE) {
         m_forceVisibleByDeleteCount++;
@@ -98,9 +98,9 @@ void WindowItem::refVisible(int reason)
 
 void WindowItem::unrefVisible(int reason)
 {
-    if (reason & PAINT_DISABLED_BY_HIOCEANN) {
-        Q_ASSERT(m_forceVisibleByHioceannCount > 0);
-        m_forceVisibleByHioceannCount--;
+    if (reason & PAINT_DISABLED_BY_HIDDEN) {
+        Q_ASSERT(m_forceVisibleByHiddenCount > 0);
+        m_forceVisibleByHiddenCount--;
     }
     if (reason & PAINT_DISABLED_BY_DELETE) {
         Q_ASSERT(m_forceVisibleByDeleteCount > 0);
@@ -154,8 +154,8 @@ bool WindowItem::computeVisibility() const
             return false;
         }
     }
-    if (m_window->isHioceannInternal()) {
-        if (m_forceVisibleByHioceannCount == 0) {
+    if (m_window->isHiddenInternal()) {
+        if (m_forceVisibleByHiddenCount == 0) {
             return false;
         }
     }

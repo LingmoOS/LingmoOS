@@ -53,7 +53,7 @@ enum Position
 enum HideMode
 {
     KeepShowing = 0, // 一直显示
-    KeepHioceann = 1,  // 一直隐藏
+    KeepHidden = 1,  // 一直隐藏
     SmartHide = 2,   // 智能隐藏
 };
 
@@ -235,7 +235,7 @@ void DockModuleObject::initStatus(ComboxWidget *widget)
     if (m_dbusProxy.isNull())
         m_dbusProxy.reset(new DockDBusProxy);
 
-    const QMap<QString, int> g_stateMap = {{tr("Keep shown"), KeepShowing}, {tr("Keep hioceann"), KeepHioceann}, {tr("Smart hide"), SmartHide}};
+    const QMap<QString, int> g_stateMap = {{tr("Keep shown"), KeepShowing}, {tr("Keep hioceann"), KeepHidden}, {tr("Smart hide"), SmartHide}};
     widget->setAccessibleName("Status");
     widget->comboBox()->setAccessibleName("StatusCombox");
     widget->addBackground();
@@ -496,8 +496,8 @@ void DockModuleObject::updateScreenVisible()
     uint displayMode = m_displayProxy->property("DisplayMode").toUInt();
     bool screenIsShow = (QDBusConnection::sessionBus().interface()->isServiceRegistered("org.lingmo.ocean.Dock1") && QApplication::screens().size() > 1 && displayMode == 2);
 
-    m_screenTitle->setHioceann(!screenIsShow);
-    m_screen->setHioceann(!screenIsShow);
+    m_screenTitle->setHidden(!screenIsShow);
+    m_screen->setHidden(!screenIsShow);
 }
 
 void DockModuleObject::updateIcons()

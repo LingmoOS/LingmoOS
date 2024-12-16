@@ -19,7 +19,7 @@
 
 #include <dfm-burn/dburn_global.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QDir>
 
 using namespace dfmplugin_optical;
@@ -160,7 +160,7 @@ void OpticalMediaWidget::updateUi()
     lbAvailable->setText(QObject::tr("Free Space %1").arg(FileUtils::formatSize(curAvial)));
 
     if (curFS.toLower() == "udf" && !isSupportedUDF()) {
-        if (DSysInfo::lingmoType() == DSysInfo::LingmoProfessional) {   // for other version, show normal unsupported writtings
+        if (LSysInfo::lingmoType() == LSysInfo::LingmoProfessional) {   // for other version, show normal unsupported writtings
             lbUDFSupport->setText(tr("%1 burning is not supported").arg("UDF"));
             iconCaution->setVisible(true);
             iconCaution->load(QString(":/dark/icons/caution.svg"));
@@ -214,7 +214,7 @@ void OpticalMediaWidget::handleErrorMount()
 
 bool OpticalMediaWidget::isSupportedUDF()
 {
-    if (!(DSysInfo::lingmoType() == DSysInfo::LingmoProfessional))
+    if (!(LSysInfo::lingmoType() == LSysInfo::LingmoProfessional))
         return false;
     if (!OpticalHelper::isSupportedUDFMedium(curMediaType))
         return false;
@@ -248,7 +248,7 @@ void OpticalMediaWidget::onBurnButtonClicked()
 
     // empty stage files folder
     QString errTitle(tr("No files to burn"));
-    QDir::Filters filter { QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann | QDir::NoSymLinks };
+    QDir::Filters filter { QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::NoSymLinks };
     QFileInfoList listFilesInStage = dirStage.entryInfoList(filter);
     if (listFilesInStage.count() == 0) {
         DialogManagerInstance->showMessageDialog(DialogManager::kMsgWarn, errTitle);

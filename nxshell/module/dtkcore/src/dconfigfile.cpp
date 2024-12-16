@@ -297,7 +297,7 @@ struct DConfigKey {
     QString subpath;
 };
 
-class Q_DECL_HIOCEANN DConfigInfo {
+class Q_DECL_HIDDEN DConfigInfo {
 public:
     DConfigInfo()
     {
@@ -619,7 +619,7 @@ private:
     @return
 */
 
-class Q_DECL_HIOCEANN DConfigMetaImpl : public DConfigMeta {
+class Q_DECL_HIDDEN DConfigMetaImpl : public DConfigMeta {
     // DConfigMeta interface
 public:
     explicit DConfigMetaImpl(const DConfigKey &configKey);
@@ -1015,7 +1015,7 @@ and it needs to distinguish the paths of different caches by caller.
     @param prefix cache's prefix path.
 */
 
-class Q_DECL_HIOCEANN DConfigCacheImpl : public DConfigCache {
+class Q_DECL_HIDDEN DConfigCacheImpl : public DConfigCache {
 public:
     DConfigCacheImpl(const DConfigKey &configKey, const uint uid, bool global);
     virtual ~DConfigCacheImpl() override;
@@ -1245,7 +1245,7 @@ bool DConfigCacheImpl::save(const QString &localPrefix, QJsonDocument::JsonForma
     return status;
 }
 
-class Q_DECL_HIOCEANN DConfigFilePrivate : public DObjectPrivate {
+class Q_DECL_HIDDEN DConfigFilePrivate : public DObjectPrivate {
 public:
     DConfigFilePrivate(DConfigFile *qq, const QString &appId,
                        const QString &name, const QString &subpath)

@@ -51,7 +51,7 @@ bool SearchFileInfo::isAttributes(const OptInfoType type) const
             return true;
 
         return FileInfo::isAttributes(type);
-    case FileIsType::kIsHioceann:
+    case FileIsType::kIsHidden:
         if (SearchHelper::isRootUrl(url))
             return false;
 

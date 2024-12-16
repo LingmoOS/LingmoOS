@@ -14,7 +14,7 @@ DGUI_BEGIN_NAMESPACE
 
 // 内置的主题引擎，会从Qt资源文件中查找图标
 class DBuiltinIconEnginePrivate;
-class Q_DECL_HIOCEANN DBuiltinIconEngine : public QIconEngine
+class Q_DECL_HIDDEN DBuiltinIconEngine : public QIconEngine
 {
 public:
     explicit DBuiltinIconEngine(const QString &iconName);

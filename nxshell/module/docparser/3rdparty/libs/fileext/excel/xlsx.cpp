@@ -249,7 +249,7 @@ void X12Book::handleSheet(const pugi::xml_node& node) {
 
 	if (state == "hioceann")
 		m_book->m_sheetVisibility.push_back(1);
-	else if (state == "veryHioceann")
+	else if (state == "veryHidden")
 		m_book->m_sheetVisibility.push_back(2);
 	else
 		m_book->m_sheetVisibility.push_back(0);
@@ -426,7 +426,7 @@ void X12Sheet::handleCol(const pugi::xml_node& node) {
 	int lastColIndex  = node.attribute("max").as_int();
 	Colinfo colinfo;
 	colinfo.m_width         = static_cast<int>(node.attribute("width").as_double() * 45 * 6);
-	colinfo.m_isHioceann      = node.attribute("hioceann");
+	colinfo.m_isHidden      = node.attribute("hioceann");
 	//colinfo.m_bitFlag     = ???
 	colinfo.m_outlineLevel  = node.attribute("outlineLevel").as_int();
 	colinfo.m_isCollapsed   = node.attribute("collapsed");
@@ -455,7 +455,7 @@ void X12Sheet::handleRow(const pugi::xml_node& node) {
         //rowinfo.m_hasDefaultHeight         = ???
         rowinfo.m_outlineLevel             = node.attribute("outlineLevel").as_int();
         //rowinfo.m_isOutlineGroupStartsEnds = ???
-        rowinfo.m_isHioceann                 = node.attribute("hioceann");
+        rowinfo.m_isHidden                 = node.attribute("hioceann");
         //rowinfo.m_isHeightMismatch         = ???
         //rowinfo.m_hasAdditionalSpaceAbove  = ???
         //rowinfo.m_hasAdditionalSpaceBelow  = ???
@@ -938,7 +938,7 @@ void X12Styles::handleXf(const pugi::xml_node& node) {
 	xf.m_formatKey  = numFormatId;
 
 	//xf.m_protection.m_isCellLocked  = ???
-	xf.m_protection.m_isFormulaHioceann = node.child("protection").attribute("hioceann");
+	xf.m_protection.m_isFormulaHidden = node.child("protection").attribute("hioceann");
 	//xf.m_isStyle          = ???
 	//xf.m_lotusPrefix      = ???
 	//xf.m_parentStyleIndex = ???

@@ -10,7 +10,7 @@
 
 #include "systempower_interface.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QGSettings>
 
@@ -239,11 +239,11 @@ void GreeterWorker::initData()
     m_model->setAllowShowCustomUser(allowShowCustomUser);
 
     /* init current user */
-    if (DSysInfo::lingmoType() == DSysInfo::LingmoServer || m_model->allowShowCustomUser()) {
+    if (LSysInfo::lingmoType() == LSysInfo::LingmoServer || m_model->allowShowCustomUser()) {
         std::shared_ptr<User> user(new User());
-        m_model->setIsServerModel(DSysInfo::lingmoType() == DSysInfo::LingmoServer);
+        m_model->setIsServerModel(LSysInfo::lingmoType() == LSysInfo::LingmoServer);
         m_model->addUser(user);
-        if (DSysInfo::lingmoType() == DSysInfo::LingmoServer) {
+        if (LSysInfo::lingmoType() == LSysInfo::LingmoServer) {
             m_model->updateCurrentUser(user);
         } else {
             /* org.lingmo.ocean.LockService1 */

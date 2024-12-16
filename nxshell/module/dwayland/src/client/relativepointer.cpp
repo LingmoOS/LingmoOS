@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN RelativePointerManager::Private
+class Q_DECL_HIDDEN RelativePointerManager::Private
 {
 public:
     Private() = default;
@@ -88,7 +88,7 @@ RelativePointer *RelativePointerManager::createRelativePointer(Pointer *pointer,
     return p;
 }
 
-class Q_DECL_HIOCEANN RelativePointer::Private
+class Q_DECL_HIDDEN RelativePointer::Private
 {
 public:
     Private(RelativePointer *q);

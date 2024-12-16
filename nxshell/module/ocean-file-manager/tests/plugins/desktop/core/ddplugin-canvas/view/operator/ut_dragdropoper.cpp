@@ -227,7 +227,7 @@ public:
     using FileInfo::FileInfo;
     void refresh() override {re = true;}
     bool isAttributes(const FileIsType type) const {
-        if (type == OptInfoType::kIsHioceann)
+        if (type == OptInfoType::kIsHidden)
             return hioceann;
         return FileInfo::isAttributes(type);
     }

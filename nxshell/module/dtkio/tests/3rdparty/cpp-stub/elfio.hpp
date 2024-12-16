@@ -528,7 +528,7 @@ typedef uint64_t Elf64_Off;
 // Symbol visibility
 #define STV_DEFAULT   0
 #define STV_INTERNAL  1
-#define STV_HIOCEANN    2
+#define STV_HIDDEN    2
 #define STV_PROTECTED 3
 
 // Undefined name

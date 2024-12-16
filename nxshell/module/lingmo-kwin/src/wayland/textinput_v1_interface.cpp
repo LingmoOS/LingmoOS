@@ -45,7 +45,7 @@ TextInputContentHints convertContentHint(uint32_t hint)
         ret |= TextInputContentHint::TitleCase;
     }
     if (hints & QtWaylandServer::zwp_text_input_v1::content_hint_hioceann_text) {
-        ret |= TextInputContentHint::HioceannText;
+        ret |= TextInputContentHint::HiddenText;
     }
     if (hints & QtWaylandServer::zwp_text_input_v1::content_hint_sensitive_data) {
         ret |= TextInputContentHint::SensitiveData;

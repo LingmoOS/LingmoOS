@@ -225,7 +225,7 @@ void traverseDirectoryCommon(const QString &rootPath, TaskState &state,
             if (!state.isRunning())
                 break;
 
-            if (IndexTraverseUtils::isHioceannFile(entry->d_name) || IndexTraverseUtils::isSpecialDir(entry->d_name))
+            if (IndexTraverseUtils::isHiddenFile(entry->d_name) || IndexTraverseUtils::isSpecialDir(entry->d_name))
                 continue;
 
             QString fullPath = QDir::cleanPath(currentPath + QDir::separator() + QString::fromUtf8(entry->d_name));

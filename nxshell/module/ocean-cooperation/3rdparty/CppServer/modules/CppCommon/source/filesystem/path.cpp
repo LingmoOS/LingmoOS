@@ -480,8 +480,8 @@ Flags<FileAttributes> Path::attributes() const
         result |= FileAttributes::NORMAL;
     if (attributes & FILE_ATTRIBUTE_ARCHIVE)
         result |= FileAttributes::ARCHIVED;
-    if (attributes & FILE_ATTRIBUTE_HIOCEANN)
-        result |= FileAttributes::HIOCEANN;
+    if (attributes & FILE_ATTRIBUTE_HIDDEN)
+        result |= FileAttributes::HIDDEN;
     if (attributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
         result |= FileAttributes::INDEXED;
     if (attributes & FILE_ATTRIBUTE_OFFLINE)
@@ -1322,10 +1322,10 @@ void Path::SetAttributes(const Path& path, const Flags<FileAttributes>& attribut
         result |= FILE_ATTRIBUTE_ARCHIVE;
     else
         result &= ~FILE_ATTRIBUTE_ARCHIVE;
-    if (attributes & FileAttributes::HIOCEANN)
-        result |= FILE_ATTRIBUTE_HIOCEANN;
+    if (attributes & FileAttributes::HIDDEN)
+        result |= FILE_ATTRIBUTE_HIDDEN;
     else
-        result &= ~FILE_ATTRIBUTE_HIOCEANN;
+        result &= ~FILE_ATTRIBUTE_HIDDEN;
     if (attributes & FileAttributes::INDEXED)
         result |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
     else

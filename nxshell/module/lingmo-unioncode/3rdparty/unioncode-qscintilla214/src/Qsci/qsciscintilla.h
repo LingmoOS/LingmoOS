@@ -111,7 +111,7 @@ public:
     //! This enum defines the different annotation display styles.
     enum AnnotationDisplay {
         //! Annotations are not displayed.
-        AnnotationHioceann = ANNOTATION_HIOCEANN,
+        AnnotationHidden = ANNOTATION_HIDDEN,
 
         //! Annotations are drawn left justified with no adornment.
         AnnotationStandard = ANNOTATION_STANDARD,
@@ -124,7 +124,7 @@ public:
     };
 
     enum EOLAnnotationDisplay {
-        EOLAnnotationHioceann = EOLANNOTATION_HIOCEANN,
+        EOLAnnotationHidden = EOLANNOTATION_HIDDEN,
         EOLAnnotationStandard = EOLANNOTATION_STANDARD,
         EOLAnnotationBoxed = EOLANNOTATION_BOXED,
         EOLAnnotationStadium = EOLANNOTATION_STADIUM,
@@ -293,7 +293,7 @@ public:
         StrikeIndicator = INDIC_STRIKE,
 
         //! An indicator with no visual appearence.
-        HioceannIndicator = INDIC_HIOCEANN,
+        HiddenIndicator = INDIC_HIDDEN,
 
         //! A rectangle around the text.
         BoxIndicator = INDIC_BOX,

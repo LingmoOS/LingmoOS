@@ -19,7 +19,7 @@
 #include <DObject>
 #include <DGuiApplicationHelper>
 #include <DFontManager>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DNotifySender>
 #include <QQuickItem>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -178,7 +178,7 @@ void DQMLGlobalObjectPrivate::ensureWebsiteInfo()
 {
     DCORE_USE_NAMESPACE;
     if (lingmoWebsiteName.isEmpty() || lingmoWebsiteLink.isEmpty()) {
-        const auto &lingmoWebsiteInfo = DSysInfo::distributionOrgWebsite(DSysInfo::Distribution);
+        const auto &lingmoWebsiteInfo = LSysInfo::distributionOrgWebsite(LSysInfo::Distribution);
         lingmoWebsiteName = lingmoWebsiteInfo.first;
         lingmoWebsiteLink = lingmoWebsiteInfo.second;
     }
@@ -354,7 +354,7 @@ QString DQMLGlobalObject::lingmoDistributionOrgLogo() const
 
     D_DC(DQMLGlobalObject);
     if (d->lingmoDistributionOrgLogo.isEmpty()) {
-        const auto &logo = DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Light, ":/assets/images/lingmo-logo.svg");
+        const auto &logo = LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Light, ":/assets/images/lingmo-logo.svg");
         const_cast<DQMLGlobalObjectPrivate*>(d)->lingmoDistributionOrgLogo = logo;
 
     }

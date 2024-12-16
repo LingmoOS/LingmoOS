@@ -45,7 +45,7 @@ private:
     void initConnection();
     void updateInfo();
     void updateConnection();
-    void updateHioceannInfo();
+    void updateHiddenInfo();
 
 private slots:
     void onUpdateNetwork();
@@ -54,7 +54,7 @@ private:
     NetworkManager::WirelessDevice::Ptr m_device;
     NetworkManager::WirelessNetwork::Ptr m_network;
     ConnectionStatus m_status;
-    bool m_isHioceann;
+    bool m_isHidden;
     int m_strength;
     bool m_secured;
     QList<QMetaObject::Connection> m_connectionList;

@@ -162,7 +162,7 @@ static uint32_t translateHints(GtkInputHints inputHints, GtkInputPurpose purpose
         hints |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_AUTO_CAPITALIZATION;
 
     if (purpose == GTK_INPUT_PURPOSE_PIN || purpose == GTK_INPUT_PURPOSE_PASSWORD) {
-        hints |= (ZWP_TEXT_INPUT_V3_CONTENT_HINT_HIOCEANN_TEXT
+        hints |= (ZWP_TEXT_INPUT_V3_CONTENT_HINT_HIDDEN_TEXT
                   | ZWP_TEXT_INPUT_V3_CONTENT_HINT_SENSITIVE_DATA);
     }
 

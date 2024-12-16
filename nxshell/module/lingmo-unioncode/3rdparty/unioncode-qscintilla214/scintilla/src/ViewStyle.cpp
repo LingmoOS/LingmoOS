@@ -5,7 +5,7 @@
 // Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstoceanf>
+#include <cstddef>
 #include <cassert>
 #include <cstring>
 
@@ -288,8 +288,8 @@ void ViewStyle::Init(size_t stylesSize_) {
 	extraAscent = 0;
 	extraDescent = 0;
 	marginStyleOffset = 0;
-	annotationVisible = ANNOTATION_HIOCEANN;
-    eolAnnotationVisible = EOLANNOTATION_HIOCEANN;
+	annotationVisible = ANNOTATION_HIDDEN;
+    eolAnnotationVisible = EOLANNOTATION_HIDDEN;
 	annotationStyleOffset = 0;
     eolAnnotationStyleOffset = 0;
 	braceHighlightIndicatorSet = false;

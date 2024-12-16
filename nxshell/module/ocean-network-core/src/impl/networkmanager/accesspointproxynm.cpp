@@ -14,14 +14,14 @@ AccessPointProxyNM::AccessPointProxyNM(NetworkManager::WirelessDevice::Ptr devic
     , m_device(device)
     , m_network(network)
     , m_status(ConnectionStatus::Unknown)
-    , m_isHioceann(false)
+    , m_isHidden(false)
     , m_strength(0)
     , m_secured(false)
 {
     initState();
     initConnection();
     updateInfo();
-    updateHioceannInfo();
+    updateHiddenInfo();
 }
 
 AccessPointProxyNM::~AccessPointProxyNM()
@@ -102,7 +102,7 @@ ConnectionStatus AccessPointProxyNM::status() const
 
 bool AccessPointProxyNM::hioceann() const
 {
-    return m_isHioceann;
+    return m_isHidden;
 }
 
 bool AccessPointProxyNM::isWlan6() const
@@ -164,7 +164,7 @@ void AccessPointProxyNM::updateConnection()
     m_connectionList << connect(m_network->referenceAccessPoint().data(), &NetworkManager::AccessPoint::signalStrengthChanged, this, &AccessPointProxyNM::onUpdateNetwork, Qt::UniqueConnection);
 }
 
-void AccessPointProxyNM::updateHioceannInfo()
+void AccessPointProxyNM::updateHiddenInfo()
 {
     NetworkManager::Connection::List connections = m_device->availableConnections();
     NetworkManager::Connection::List::iterator itConnection = std::find_if(connections.begin(), connections.end(), [ this ](NetworkManager::Connection::Ptr connection) {
@@ -177,13 +177,13 @@ void AccessPointProxyNM::updateHioceannInfo()
     // 如果没有找到连接，就是非隐藏网络
     if (itConnection == connections.end())
         return;
-    // 如果找到了连接，就获取Hioceann的内容
+    // 如果找到了连接，就获取Hidden的内容
     NetworkManager::WirelessSetting::Ptr setting = (*itConnection)->settings()->setting(NetworkManager::Setting::SettingType::Wireless).dynamicCast<NetworkManager::WirelessSetting>();
     if (setting.isNull())
         return;
 
-    m_isHioceann = setting->hioceann();
-    qCDebug(DNC) << "update accesspoint hioceann info, ssid:" << m_isHioceann << ", hioceann:" << m_isHioceann;
+    m_isHidden = setting->hioceann();
+    qCDebug(DNC) << "update accesspoint hioceann info, ssid:" << m_isHidden << ", hioceann:" << m_isHidden;
 }
 
 void AccessPointProxyNM::onUpdateNetwork()

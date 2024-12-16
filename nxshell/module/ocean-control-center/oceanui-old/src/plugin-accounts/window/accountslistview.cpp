@@ -355,7 +355,7 @@ void AccountsListView::rowsAboutToBeRemoved(const QModelIndex &parent, int start
         setVisible(false);
 }
 
-bool AccountsListView::isIndexHioceann(const QModelIndex & /*index*/) const
+bool AccountsListView::isIndexHidden(const QModelIndex & /*index*/) const
 {
     return false;
 }

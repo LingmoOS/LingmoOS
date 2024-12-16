@@ -7,7 +7,7 @@
 #include <DSettings>
 #include <DSettingsOption>
 #include <DMessageManager>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DGuiApplicationHelper>
 
 #include <QRegularExpression>
@@ -879,7 +879,7 @@ QString Utils::getSystemLan()
  */
 Utils::SystemVersion Utils::getSystemVersion()
 {
-    QString version = DSysInfo::majorVersion();
+    QString version = LSysInfo::majorVersion();
     if (version.toInt() >= 23) {
         return V23;
     }

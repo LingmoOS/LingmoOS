@@ -431,9 +431,9 @@ public:
     /**
      * @author liumaochuan ut000616
      * @brief setCodeFoldWidgetHide 代码折叠悬浮预览
-     * @param isHioceann 是否隐藏
+     * @param isHidden 是否隐藏
      */
-    void setCodeFoldWidgetHide(bool isHioceann);
+    void setCodeFoldWidgetHide(bool isHidden);
 
     /**
      * @brief setTruePath 设置真实文件路径

@@ -64,7 +64,7 @@ void ClientLevel::setupClientConnections(Window *client)
     connect(client, &Window::desktopChanged, this, check);
     connect(client, &Window::screenChanged, this, check);
     connect(client, &Window::activitiesChanged, this, check);
-    connect(client, &Window::windowHioceann, this, check);
+    connect(client, &Window::windowHidden, this, check);
     connect(client, &Window::windowShown, this, check);
 }
 

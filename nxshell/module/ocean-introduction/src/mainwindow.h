@@ -35,7 +35,7 @@
 #include <DGuiApplicationHelper>
 #include <DPalette>
 #include <DPlatformWindowHandle>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTitlebar>
 
 #include <com_lingmo_wmswitcher.h>

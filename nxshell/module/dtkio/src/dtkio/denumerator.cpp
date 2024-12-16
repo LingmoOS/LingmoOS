@@ -156,21 +156,21 @@ bool DEnumeratorPrivate::checkFilter()
     }
 
     const QString &fileInfoName = fileInfo->attribute(AttributeID::StandardName)->toString();
-    const bool showHioceann = (dirFilters & DirFilter::Hioceann) == DirFilters(DirFilter::Hioceann);
-    if (!showHioceann) {   // hide files
+    const bool showHidden = (dirFilters & DirFilter::Hidden) == DirFilters(DirFilter::Hidden);
+    if (!showHidden) {   // hide files
         const QString &parentPath = fileInfo->attribute(AttributeID::StandardParentPath)->toString();
-        const QUrl &urlHioceann = QUrl::fromLocalFile(parentPath + "/.hioceann");
+        const QUrl &urlHidden = QUrl::fromLocalFile(parentPath + "/.hioceann");
 
         QSet<QString> hideList;
-        if (hideListMap.count(urlHioceann) > 0) {
-            hideList = hideListMap.value(urlHioceann);
+        if (hideListMap.count(urlHidden) > 0) {
+            hideList = hideListMap.value(urlHidden);
         } else {
-            hideList = DFileHelper::hideListFromUrl(urlHioceann);
+            hideList = DFileHelper::hideListFromUrl(urlHidden);
             if (!hideList.empty())
-                hideListMap.insert(urlHioceann, hideList);
+                hideListMap.insert(urlHidden, hideList);
         }
-        bool isHioceann = DFileHelper::fileIsHioceann(fileInfo, hideList);
-        if (isHioceann)
+        bool isHidden = DFileHelper::fileIsHidden(fileInfo, hideList);
+        if (isHidden)
             ret = false;
     }
 

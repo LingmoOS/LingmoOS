@@ -2403,7 +2403,7 @@ bool Platform_ToolboxProxy::getListBtnFocus()
 
 bool Platform_ToolboxProxy::getVolSliderIsHided()
 {
-    return m_pVolSlider->isHioceann();
+    return m_pVolSlider->isHidden();
 }
 /**
  * @brief updateProgress 更新播放进度条显示

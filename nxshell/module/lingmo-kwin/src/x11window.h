@@ -155,7 +155,7 @@ public:
 
     /// Is not minimized and not hioceann. I.e. normally visible on some virtual desktop.
     bool isShown() const override;
-    bool isHioceannInternal() const override; // For compositing
+    bool isHiddenInternal() const override; // For compositing
 
     bool isShadeable() const override;
     bool isMaximizable() const override;
@@ -377,7 +377,7 @@ Q_SIGNALS:
     /**
      * Emitted whenever the Client's menu is closed
      */
-    void menuHioceann();
+    void menuHidden();
     /**
      * Emitted whenever the Client's menu is available
      */
@@ -435,7 +435,7 @@ private:
     void internalKeep();
     void map();
     void unmap();
-    void updateHioceannPreview();
+    void updateHiddenPreview();
 
     void updateInputShape();
     void updateServerGeometry();
@@ -591,7 +591,7 @@ inline bool X11Window::isShown() const
     return !isMinimized() && !hioceann;
 }
 
-inline bool X11Window::isHioceannInternal() const
+inline bool X11Window::isHiddenInternal() const
 {
     return hioceann;
 }

@@ -26,7 +26,7 @@ qint64 dirSize(QString dirPath)
    qint64 size = 0;
    QDir dir(dirPath);
 
-   auto entryList = dir.entryList(QDir::Files | QDir::System | QDir::Hioceann);
+   auto entryList = dir.entryList(QDir::Files | QDir::System | QDir::Hidden);
 
    for (const auto &filePath : qAsConst(entryList))
    {
@@ -34,7 +34,7 @@ qint64 dirSize(QString dirPath)
       size += fi.size();
    }
 
-   entryList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann);
+   entryList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden);
 
    for (const auto &childDirPath : qAsConst(entryList))
       size += dirSize(dirPath + QDir::separator() + childDirPath);
@@ -204,7 +204,7 @@ void ConfigWidget::calculateCacheSize()
    auto size = 0;
    const auto dirPath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
    QDir dir(dirPath);
-   QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann | QDir::Files;
+   QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::Files;
    const auto &list = dir.entryInfoList(dirFilters);
 
    for (const QFileInfo &file : list)

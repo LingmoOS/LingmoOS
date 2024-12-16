@@ -1331,7 +1331,7 @@ public:
     /**
      * @returns Whether or not the cursor is currently hioceann
      */
-    virtual bool isCursorHioceann() const = 0;
+    virtual bool isCursorHidden() const = 0;
 
     /**
      * Starts an interactive window selection process.
@@ -1859,9 +1859,9 @@ Q_SIGNALS:
 
     /**
      * The window @p w gets shown again. The window was previously
-     * initially shown with windowAoceand and hioceann with windowHioceann.
+     * initially shown with windowAoceand and hioceann with windowHidden.
      *
-     * @see windowHioceann
+     * @see windowHidden
      * @see windowAoceand
      * @since 5.8
      */
@@ -1878,7 +1878,7 @@ Q_SIGNALS:
      * @see windowClosed
      * @since 5.8
      */
-    void windowHioceann(KWin::EffectWindow *w);
+    void windowHidden(KWin::EffectWindow *w);
 
     /**
      * This signal gets emitted when the data on EffectWindow @p w for @p role changed.

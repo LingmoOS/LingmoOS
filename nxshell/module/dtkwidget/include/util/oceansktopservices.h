@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#ifndef OCEANSKTOPSERVICES_H
-#define OCEANSKTOPSERVICES_H
+#ifndef DDESKTOPSERVICES_H
+#define DDESKTOPSERVICES_H
 
 #include <dtkwidget_global.h>
 
@@ -74,4 +74,4 @@ DWIDGET_END_NAMESPACE
 Q_DECLARE_METATYPE(DTK_WIDGET_NAMESPACE::DDesktopServices::SystemSoundEffect)
 #endif
 
-#endif // OCEANSKTOPSERVICES_H
+#endif // DDESKTOPSERVICES_H

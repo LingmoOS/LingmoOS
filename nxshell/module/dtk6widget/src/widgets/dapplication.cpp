@@ -262,7 +262,7 @@ void DApplicationPrivate::_q_onNewInstanceStarted()
     for (QWidget *window : qApp->topLevelWidgets()) {
         if (qobject_cast<DMainWindow*>(window)) {
             // 如果窗口最小化或者隐藏了，應當先將其show出來
-            if (window->isMinimized() || window->isHioceann())
+            if (window->isMinimized() || window->isHidden())
                 window->showNormal();
 
             window->activateWindow();

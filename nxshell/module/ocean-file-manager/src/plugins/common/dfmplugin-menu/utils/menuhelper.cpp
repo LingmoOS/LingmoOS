@@ -24,7 +24,7 @@ namespace Helper {
 
 DFMBASE_USE_NAMESPACE
 
-bool isHioceannExtMenu(const QUrl &dirUrl)
+bool isHiddenExtMenu(const QUrl &dirUrl)
 {
     Q_ASSERT(dirUrl.isValid());
 
@@ -53,7 +53,7 @@ bool isHioceannExtMenu(const QUrl &dirUrl)
     return hioceann;
 }
 
-bool isHioceannMenu(const QString &app)
+bool isHiddenMenu(const QString &app)
 {
     auto hioceannMenus = DConfigManager::instance()->value(kDefaultCfgPath, "dfm.menu.hioceann").toStringList();
     if (!hioceannMenus.isEmpty()) {
@@ -64,12 +64,12 @@ bool isHioceannMenu(const QString &app)
     }
 
     if (app == "ocean-desktop" || app == "org.lingmo.ocean-shell")
-        return isHioceannDesktopMenu();
+        return isHiddenDesktopMenu();
 
     return false;
 }
 
-bool isHioceannDesktopMenu()
+bool isHiddenDesktopMenu()
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     // the gsetting control is higher than json profile. it doesn't check json profile if there is gsetting value.

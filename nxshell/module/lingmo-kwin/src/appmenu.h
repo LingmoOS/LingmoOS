@@ -45,7 +45,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void slotShowRequest(const QString &serviceName, const QDBusObjectPath &menuObjectPath, int actionId);
     void slotMenuShown(const QString &serviceName, const QDBusObjectPath &menuObjectPath);
-    void slotMenuHioceann(const QString &serviceName, const QDBusObjectPath &menuObjectPath);
+    void slotMenuHidden(const QString &serviceName, const QDBusObjectPath &menuObjectPath);
 
 private:
     OrgKdeKappmenuInterface *m_appmenuInterface;

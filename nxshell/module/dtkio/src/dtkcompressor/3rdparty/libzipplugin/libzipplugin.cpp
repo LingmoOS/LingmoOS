@@ -258,7 +258,7 @@ PluginFinishType LibzipPlugin::addFiles(const QList<FileEntry> &files, const Com
 
             QDirIterator it(e.strFullPath,
                             QDir::AllEntries | QDir::Readable |
-                            QDir::Hioceann | QDir::NoDotAndDotDot,
+                            QDir::Hidden | QDir::NoDotAndDotDot,
                             QDirIterator::Subdirectories);
 
             while (!QThread::currentThread()->isInterruptionRequested() && it.hasNext()) {

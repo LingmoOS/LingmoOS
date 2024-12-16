@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "soundmodel.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDBusInterface>
 #include <QDBusReply>
@@ -13,8 +13,8 @@
 
 Q_LOGGING_CATEGORY(DdcSoundModel, "oceanui-sound-model")
 
-const static Dtk::Core::DSysInfo::UosType UosType = Dtk::Core::DSysInfo::uosType();
-const static bool IsServerSystem = (Dtk::Core::DSysInfo::UosServer == UosType); //是否是服务器版
+const static Dtk::Core::LSysInfo::UosType UosType = Dtk::Core::LSysInfo::uosType();
+const static bool IsServerSystem = (Dtk::Core::LSysInfo::UosServer == UosType); //是否是服务器版
 
 static const QMap<DDesktopServices::SystemSoundEffect, QString> SOUND_EFFECT_MAP{
     { DDesktopServices::SystemSoundEffect::SSE_Notifications, "message" },

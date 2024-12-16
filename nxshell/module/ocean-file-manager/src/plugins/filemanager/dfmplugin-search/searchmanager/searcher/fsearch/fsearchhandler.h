@@ -26,10 +26,10 @@ public:
     using FSearchCallbackFunc = std::function<void(const QString &, bool)>;
     enum FSearchFlag {
         FSEARCH_FLAG_NONE = 0,
-        FSEARCH_FLAG_FILTER_HIOCEANN_FILE = 1,
+        FSEARCH_FLAG_FILTER_HIDDEN_FILE = 1,
         FSEARCH_FLAG_PINYIN = 1 << 1,
         FSEARCH_FLAG_REGEX = 1 << 2,
-        FSEARCH_FLAG_ALL = FSEARCH_FLAG_FILTER_HIOCEANN_FILE | FSEARCH_FLAG_REGEX | FSEARCH_FLAG_PINYIN
+        FSEARCH_FLAG_ALL = FSEARCH_FLAG_FILTER_HIDDEN_FILE | FSEARCH_FLAG_REGEX | FSEARCH_FLAG_PINYIN
     };
     Q_DECLARE_FLAGS(FSearchFlags, FSearchFlag)
 

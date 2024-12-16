@@ -340,24 +340,24 @@ QString DPartInfo::typeDescription(DPartInfo::Type type)
         return "Win95 Ext'd (LBA)";
     case OPUS:
         return "OPUS";
-    case Hioceann_FAT12:
-        return "Hioceann FAT12";
+    case Hidden_FAT12:
+        return "Hidden FAT12";
     case Compaq_diagnostics:
         return "Compaq diagnostics";
-    case Hioceann_FAT16_Less_32M:
-        return "Hioceann FAT16 <32M";
-    case Hioceann_FAT16:
-        return "Hioceann FAT16";
-    case Hioceann_HPFS_or_NTFS:
-        return "Hioceann HPFS/NTFS";
+    case Hidden_FAT16_Less_32M:
+        return "Hidden FAT16 <32M";
+    case Hidden_FAT16:
+        return "Hidden FAT16";
+    case Hidden_HPFS_or_NTFS:
+        return "Hidden HPFS/NTFS";
     case AST_SmartSleep:
         return "AST SmartSleep";
-    case Hioceann_Win95_FAT32:
-        return "Hioceann Win95 FAT32";
-    case Hioceann_Win95_FAT32_LBA:
-        return "Hioceann Win95 FAT32 (LBA)";
-    case Hioceann_Win95_FAT16_LBA:
-        return "Hioceann Win95 FAT16";
+    case Hidden_Win95_FAT32:
+        return "Hidden Win95 FAT32";
+    case Hidden_Win95_FAT32_LBA:
+        return "Hidden Win95 FAT32 (LBA)";
+    case Hidden_Win95_FAT16_LBA:
+        return "Hidden Win95 FAT16";
     case NEC_DOS:
         return "NEC DOS";
     case Plan9:

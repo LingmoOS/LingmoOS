@@ -14,7 +14,7 @@
 #include <DDBusSender>
 #include <DDesktopServices>
 #include <DMessageManager>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTitlebar>
 
 #include <QVBoxLayout>
@@ -76,7 +76,7 @@ void ModifyPasswdPage::initWidget()
         QLabel *oldPasswdLabel = new QLabel(tr("Current Password") + ":");
         m_forgetPasswordBtn = new DCommandLinkButton(tr("Forgot password?"));
         DFontSizeManager::instance()->bind(m_forgetPasswordBtn, DFontSizeManager::T8);
-        m_forgetPasswordBtn->setVisible(!(DSysInfo::UosCommunity == DSysInfo::uosEditionType()) && getuid() < 9999); // 如果当前账户是域账号,则屏蔽重置密码入口
+        m_forgetPasswordBtn->setVisible(!(LSysInfo::UosCommunity == LSysInfo::uosEditionType()) && getuid() < 9999); // 如果当前账户是域账号,则屏蔽重置密码入口
         connect(m_forgetPasswordBtn, &QPushButton::clicked, this, &ModifyPasswdPage::onForgetPasswordBtnClicked);
         QHBoxLayout *hLayout = new QHBoxLayout;
         hLayout->addWidget(oldPasswdLabel);
@@ -247,7 +247,7 @@ void ModifyPasswdPage::onPasswordChangeFinished(const int exitCode, const QStrin
         m_newPasswordEdit->setAlert(true);
         m_newPasswordEdit->showAlertMessage(PwqualityManager::instance()->getErrorTips(error));
         // 企业版控制中心修改密码屏蔽安全中心登录安全的接口需求
-        if ((DSysInfo::uosEditionType() == DSysInfo::UosEnterprise) || (DSysInfo::uosEditionType() == DSysInfo::UosEnterpriseC))
+        if ((LSysInfo::uosEditionType() == LSysInfo::UosEnterprise) || (LSysInfo::uosEditionType() == LSysInfo::UosEnterpriseC))
             return;
 
         Q_EMIT requestCheckPwdLimitLevel();
@@ -297,8 +297,8 @@ void ModifyPasswdPage::resetPassword(const QString &password, const QString &rep
 
     if (check) {
         // 企业版控制中心修改密码屏蔽安全中心登录安全的接口需求
-        if ((DSysInfo::uosEditionType() == DSysInfo::UosEnterprise)
-            || (DSysInfo::uosEditionType() == DSysInfo::UosEnterpriseC)) {
+        if ((LSysInfo::uosEditionType() == LSysInfo::UosEnterprise)
+            || (LSysInfo::uosEditionType() == LSysInfo::UosEnterpriseC)) {
             return;
         }
 

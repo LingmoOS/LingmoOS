@@ -109,7 +109,7 @@ bool X11Window::shouldSkip()
 bool X11Window::isMinimized()
 {
     checkWindowState();
-    return m_windowStates.contains(X11->getAtomByName("_NET_WM_STATE_HIOCEANN"));
+    return m_windowStates.contains(X11->getAtomByName("_NET_WM_STATE_HIDDEN"));
 }
 
 bool X11Window::allowClose()

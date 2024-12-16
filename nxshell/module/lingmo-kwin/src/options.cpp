@@ -62,7 +62,7 @@ Options::Options(QObject *parent)
     , m_renderTimeEstimator(Options::defaultRenderTimeEstimator())
     , m_compositingMode(Options::defaultCompositingMode())
     , m_useCompositing(Options::defaultUseCompositing())
-    , m_hioceannPreviews(Options::defaultHioceannPreviews())
+    , m_hioceannPreviews(Options::defaultHiddenPreviews())
     , m_glSmoothScale(Options::defaultGlSmoothScale())
     , m_xrenderSmoothScale(Options::defaultXrenderSmoothScale())
     , m_glStrictBinding(Options::defaultGlStrictBinding())
@@ -568,12 +568,12 @@ void Options::setUseCompositing(bool useCompositing)
     Q_EMIT useCompositingChanged();
 }
 
-void Options::setHioceannPreviews(int hioceannPreviews)
+void Options::setHiddenPreviews(int hioceannPreviews)
 {
-    if (m_hioceannPreviews == static_cast<HioceannPreviews>(hioceannPreviews)) {
+    if (m_hioceannPreviews == static_cast<HiddenPreviews>(hioceannPreviews)) {
         return;
     }
-    m_hioceannPreviews = static_cast<HioceannPreviews>(hioceannPreviews);
+    m_hioceannPreviews = static_cast<HiddenPreviews>(hioceannPreviews);
     Q_EMIT hioceannPreviewsChanged();
 }
 
@@ -928,17 +928,17 @@ void Options::reloadCompositingSettings(bool force)
 
     m_xrenderSmoothScale = config.readEntry("XRenderSmoothScale", false);
 
-    HioceannPreviews previews = Options::defaultHioceannPreviews();
+    HiddenPreviews previews = Options::defaultHiddenPreviews();
     // 4 - off, 5 - shown, 6 - always, other are old values
-    int hps = config.readEntry("HioceannPreviews", 5);
+    int hps = config.readEntry("HiddenPreviews", 5);
     if (hps == 4) {
-        previews = HioceannPreviewsNever;
+        previews = HiddenPreviewsNever;
     } else if (hps == 5) {
-        previews = HioceannPreviewsShown;
+        previews = HiddenPreviewsShown;
     } else if (hps == 6) {
-        previews = HioceannPreviewsAlways;
+        previews = HiddenPreviewsAlways;
     }
-    setHioceannPreviews(previews);
+    setHiddenPreviews(previews);
 
     auto interfaceToKey = [](OpenGLPlatformInterface interface) {
         switch (interface) {

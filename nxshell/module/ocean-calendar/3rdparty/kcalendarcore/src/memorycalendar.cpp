@@ -34,7 +34,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::MemoryCalendar::Private
+class Q_DECL_HIDDEN KCalendarCore::MemoryCalendar::Private
 {
 private:
     static constexpr int incidenceTypeCount = 4;

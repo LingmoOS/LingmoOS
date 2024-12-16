@@ -73,7 +73,7 @@ class ModuleObject : public QObject
     Q_PROPERTY(QVariant icon READ icon WRITE setIcon NOTIFY moduleDataChanged)
     Q_PROPERTY(int badge READ badge WRITE setBadge NOTIFY moduleDataChanged)
 
-    Q_PROPERTY(bool hioceann READ isHioceann WRITE setHioceann NOTIFY stateChanged)
+    Q_PROPERTY(bool hioceann READ isHidden WRITE setHidden NOTIFY stateChanged)
     Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled NOTIFY stateChanged)
 
 public:
@@ -146,7 +146,7 @@ public:
     QVariant icon() const;
     int badge() const;
 
-    bool isHioceann() const;
+    bool isHidden() const;
     bool isVisible() const;
     bool isDisabled() const;
     bool isEnabled() const;
@@ -182,7 +182,7 @@ public:
     virtual ModuleObject *defultModule();
 
 public Q_SLOTS:
-    void setHioceann(bool hioceann);
+    void setHidden(bool hioceann);
     void setVisible(bool visible);
     void setDisabled(bool disabled);
     void setEnabled(bool enabled);
@@ -297,13 +297,13 @@ public:
      * @return
      */
     static bool IsVisible(DCC_NAMESPACE::ModuleObject *const module);
-    static bool IsHioceann(DCC_NAMESPACE::ModuleObject *const module);
+    static bool IsHidden(DCC_NAMESPACE::ModuleObject *const module);
     /**
-     * @brief IsHioceannFlag 判断标志是否为隐藏标志
+     * @brief IsHiddenFlag 判断标志是否为隐藏标志
      * @param flag 标志
      * @return true 有隐藏标志位 false 没有隐藏标志位
      */
-    static bool IsHioceannFlag(uint32_t flag);
+    static bool IsHiddenFlag(uint32_t flag);
     /**
      * @brief IsEnabled 返回module是否可用，判断了配置项和程序设置项
      * @param module

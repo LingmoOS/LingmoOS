@@ -3593,7 +3593,7 @@ TEST(UT_test_textedit_hideRightMenu, UT_test_textedit_hideRightMenu_001)
     pWindow->currentWrapper()->textEditor()->insertTextEx(textCursor, strMsg);
 
     pWindow->currentWrapper()->textEditor()->hideRightMenu();
-    bool bRet = pWindow->currentWrapper()->textEditor()->m_rightMenu->isHioceann();
+    bool bRet = pWindow->currentWrapper()->textEditor()->m_rightMenu->isHidden();
 
     ASSERT_TRUE(bRet == true);
     pWindow->deleteLater();
@@ -4751,7 +4751,7 @@ TEST_F(test_textedit, setEditPalette)
     p->deleteLater();
 }
 
-// void setCodeFoldWidgetHide(bool isHioceann);
+// void setCodeFoldWidgetHide(bool isHidden);
 TEST_F(test_textedit, setCodeFoldWidgetHide)
 {
     QList<QTextEdit::ExtraSelection> listSelection;

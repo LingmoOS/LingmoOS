@@ -228,7 +228,7 @@ void InputMethodContextV1Interface::sendContentType(TextInputContentHints hint, 
     if (hint.testFlag(TextInputContentHint::TitleCase)) {
         contentHint |= QtWaylandServer::zwp_text_input_v1::content_hint_titlecase;
     }
-    if (hint.testFlag(TextInputContentHint::HioceannText)) {
+    if (hint.testFlag(TextInputContentHint::HiddenText)) {
         contentHint |= QtWaylandServer::zwp_text_input_v1::content_hint_hioceann_text;
     }
     if (hint.testFlag(TextInputContentHint::SensitiveData)) {

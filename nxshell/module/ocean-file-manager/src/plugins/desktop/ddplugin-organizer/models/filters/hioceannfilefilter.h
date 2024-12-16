@@ -2,20 +2,20 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef HIOCEANNFILEFILTER_H
-#define HIOCEANNFILEFILTER_H
+#ifndef HIDDENFILEFILTER_H
+#define HIDDENFILEFILTER_H
 
 #include "models/modeldatahandler.h"
 
 namespace ddplugin_organizer {
 
-class HioceannFileFilter : public QObject, public ModelDataHandler
+class HiddenFileFilter : public QObject, public ModelDataHandler
 {
     Q_OBJECT
 public:
-    explicit HioceannFileFilter();
-    ~HioceannFileFilter();
-    inline bool showHioceannFiles() const {return show;}
+    explicit HiddenFileFilter();
+    ~HiddenFileFilter();
+    inline bool showHiddenFiles() const {return show;}
     void refreshModel();
     bool acceptInsert(const QUrl &url) override;
     QList<QUrl> acceptReset(const QList<QUrl> &urls) override;
@@ -23,10 +23,10 @@ public:
     bool acceptUpdate(const QUrl &url, const QVector<int> &roles = {}) override;
 protected slots:
     void updateFlag();
-    void hioceannFlagChanged(bool showHioceann);
+    void hioceannFlagChanged(bool showHidden);
 protected:
     bool show = false;
 };
 
 }
-#endif // HIOCEANNFILEFILTER_H
+#endif // HIDDENFILEFILTER_H

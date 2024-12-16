@@ -63,7 +63,7 @@ void TagFileWatcher::onFilesUntagged(const QVariantMap &fileAndTags)
     }
 }
 
-void TagFileWatcher::onFilesHioceann(const QVariantMap &fileAndTags)
+void TagFileWatcher::onFilesHidden(const QVariantMap &fileAndTags)
 {
     QString tagName = TagHelper::instance()->getTagNameFromUrl(dptr->url);
 

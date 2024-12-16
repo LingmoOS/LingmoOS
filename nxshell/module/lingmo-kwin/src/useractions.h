@@ -32,7 +32,7 @@ struct MenuItem {
     bool checked;
 };
 
-class Q_DECL_HIOCEANN MenuSlot : public QObject
+class Q_DECL_HIDDEN MenuSlot : public QObject
 {
     Q_OBJECT
 public:

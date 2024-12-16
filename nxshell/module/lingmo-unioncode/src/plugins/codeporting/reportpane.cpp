@@ -84,12 +84,12 @@ void ReportPane::onChangeReportList(const QString &listName)
 void ReportPane::initUI()
 {
     srcView = new DTreeView(this);
-    srcView->setHeaderHioceann(false);
+    srcView->setHeaderHidden(false);
     srcView->setEditTriggers(QListView::NoEditTriggers);
     srcView->setTextElideMode(Qt::ElideRight);
 
     libView = new DTreeView(this);
-    libView->setHeaderHioceann(false);
+    libView->setHeaderHidden(false);
     libView->setEditTriggers(QListView::NoEditTriggers);
     libView->setTextElideMode(Qt::ElideRight);
     libView->hide();

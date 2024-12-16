@@ -4,7 +4,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DPlatformHandle>
 
 #include <QVariant>
@@ -34,9 +34,9 @@ T valueByQSettings(const QStringList& configFiles,
     return failback.value<T>();
 }
 
-inline const static Dtk::Core::DSysInfo::UosType UosType = Dtk::Core::DSysInfo::uosType();
+inline const static Dtk::Core::LSysInfo::UosType UosType = Dtk::Core::LSysInfo::uosType();
 inline const static bool IsServerSystem =
-        (Dtk::Core::DSysInfo::UosServer == UosType); // 是否是服务器版
+        (Dtk::Core::LSysInfo::UosServer == UosType); // 是否是服务器版
 
 
 #endif // UTILS_H

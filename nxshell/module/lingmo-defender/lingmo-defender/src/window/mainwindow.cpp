@@ -34,7 +34,7 @@
 #include <DDialog>
 #include <DRadioButton>
 #include <DCheckBox>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DWarningButton>
 
 #include <QDateTime>
@@ -169,8 +169,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(action, &QAction::triggered, this, &MainWindow::showDefaultSettingDialog);
 
     // 只有桌面专业版才需要用户反馈
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosProfessional
-        && DSysInfo::UosType::UosDesktop == SystemType) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosProfessional
+        && LSysInfo::UosType::UosDesktop == SystemType) {
         // 用户反馈
         auto userReplyAction = new QAction(tr("Report issues"), this);
         menu->addAction(userReplyAction);
@@ -183,7 +183,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(securityLogAction, &QAction::triggered, this, &MainWindow::showSecurityLogDialog);
 
     // 服务器版本上不需要安全日志
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         securityLogAction->setVisible(false);
     }
 
@@ -257,7 +257,7 @@ void MainWindow::setModuleVisible(ModuleInterface *const inter, const bool visib
     });
 
     if (find_it != m_modules.cend()) {
-        m_navView->setRowHioceann(find_it - m_modules.cbegin(), !visible);
+        m_navView->setRowHidden(find_it - m_modules.cbegin(), !visible);
         Q_EMIT moduleVisibleChanged(find_it->first->name(), visible);
     }
 }
@@ -334,7 +334,7 @@ void MainWindow::showSettingDialog(const QString &groupKey)
     Dtk::Core::DSettings *settings;
     bool bStatus = m_dataInterFaceServer->GetUosResourceStatus();
     // 区分服务器版
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         settings = Dtk::Core::DSettings::fromJsonFile(SETTING_JSON_FOR_SRV_EDITION);
     } else {
         if (bStatus) {
@@ -354,7 +354,7 @@ void MainWindow::showSettingDialog(const QString &groupKey)
 
     /* 安全防护设置 */
     // 区分服务器版
-    if (DSysInfo::UosType::UosServer != SystemType) {
+    if (LSysInfo::UosType::UosServer != SystemType) {
         settings->setOption(SETTING_SAFETY_USB_STORAGE_DEVICES, getUsbStorageType());
         if (bStatus) {
             settings->setOption(SETTING_SAFETY_REM_CONTROL, getRemType());
@@ -453,7 +453,7 @@ void MainWindow::initAllModule()
 {
     // 首页体检模块
     // 区分服务器版
-    if (DSysInfo::UosType::UosServer == SystemType) {
+    if (LSysInfo::UosType::UosServer == SystemType) {
         m_modules = {
             {new CleanerModule(this), tr("Cleanup")},
         };

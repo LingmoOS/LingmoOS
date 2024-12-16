@@ -398,9 +398,9 @@ bool CPDFSDK_InteractiveForm::DoAction_Hide(const CPDF_Action& action) {
         nFlags &= ~pdfium::annotation_flags::kInvisible;
         nFlags &= ~pdfium::annotation_flags::kNoView;
         if (bHide)
-          nFlags |= pdfium::annotation_flags::kHioceann;
+          nFlags |= pdfium::annotation_flags::kHidden;
         else
-          nFlags &= ~pdfium::annotation_flags::kHioceann;
+          nFlags &= ~pdfium::annotation_flags::kHidden;
         pWidget->SetFlags(nFlags);
         pWidget->GetPageView()->UpdateView(pWidget);
         bChanged = true;

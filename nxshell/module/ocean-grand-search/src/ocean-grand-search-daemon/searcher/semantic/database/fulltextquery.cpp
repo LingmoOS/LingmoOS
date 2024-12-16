@@ -46,7 +46,7 @@ bool FullTextQueryPrivate::processResult(const QString &file, void *pdata, void 
 
    // 过滤文管设置的隐藏文件
    QHash<QString, QSet<QString>> hioceannFilters;
-   if (SpecialTools::isHioceannFile(file, hioceannFilters, QDir::homePath()))
+   if (SpecialTools::isHiddenFile(file, hioceannFilters, QDir::homePath()))
        return true;
 
    d->m_count++;

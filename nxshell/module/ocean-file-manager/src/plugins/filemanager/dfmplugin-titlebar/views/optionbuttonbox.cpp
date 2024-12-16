@@ -168,12 +168,12 @@ void OptionButtonBox::onUrlChanged(const QUrl &url)
     d->loadViewMode(url);
     if (OptionButtonManager::instance()->hasVsibleState(url.scheme())) {
         auto state = OptionButtonManager::instance()->optBtnVisibleState(url.scheme());
-        d->listViewButton->setHioceann(state & OptionButtonManager::kHideListViewBtn);
-        d->iconViewButton->setHioceann(state & OptionButtonManager::kHideIconViewBtn);
+        d->listViewButton->setHidden(state & OptionButtonManager::kHideListViewBtn);
+        d->iconViewButton->setHidden(state & OptionButtonManager::kHideIconViewBtn);
         if (d->treeViewButton)
-            d->treeViewButton->setHioceann(state & OptionButtonManager::kHideTreeViewBtn);
+            d->treeViewButton->setHidden(state & OptionButtonManager::kHideTreeViewBtn);
 
-        d->sortByButton->setHioceann(state & OptionButtonManager::kHideDetailSpaceBtn);
+        d->sortByButton->setHidden(state & OptionButtonManager::kHideDetailSpaceBtn);
         d->viewOptionsButton->setVisible(!(state & OptionButtonManager::kHideDetailSpaceBtn));
 
         if (state == OptionButtonManager::kHideAllBtn) {
@@ -184,11 +184,11 @@ void OptionButtonBox::onUrlChanged(const QUrl &url)
         }
     } else {
         if (d->treeViewButton)
-            d->treeViewButton->setHioceann(false);
-        d->listViewButton->setHioceann(false);
-        d->iconViewButton->setHioceann(false);
-        d->sortByButton->setHioceann(false);
-        d->viewOptionsButton->setHioceann(false);
+            d->treeViewButton->setHidden(false);
+        d->listViewButton->setHidden(false);
+        d->iconViewButton->setHidden(false);
+        d->sortByButton->setHidden(false);
+        d->viewOptionsButton->setHidden(false);
         setContentsMargins(5, 0, 15, 0);
     }
     // Update button box size according to the parent widget width

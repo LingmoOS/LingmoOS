@@ -47,7 +47,7 @@ enum DisplayMode {
 ///
 enum HideMode {
     KeepShowing = 0,
-    KeepHioceann = 1,
+    KeepHidden = 1,
     SmartHide = 3,
 };
 

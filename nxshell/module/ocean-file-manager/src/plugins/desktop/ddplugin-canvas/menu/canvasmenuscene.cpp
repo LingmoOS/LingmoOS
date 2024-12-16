@@ -28,7 +28,7 @@
 
 #include <dfm-framework/dpf.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QMenu>
 #include <QVariant>
@@ -41,7 +41,7 @@ DFMBASE_USE_NAMESPACE
 DPMENU_USE_NAMESPACE
 
 static const char *const kActionIconMenuSceneName = "ActionIconManager";
-static const char *const kDConfigHioceannMenuSceneName = "DConfigMenuFilter";
+static const char *const kDConfigHiddenMenuSceneName = "DConfigMenuFilter";
 static const char *const kCanvasBaseSortMenuSceneName = "CanvasBaseSortMenu";
 static const char *const kNewCreateMenuSceneName = "NewCreateMenu";
 static const char *const kTemplateMenuSceneName = "TemplateMenu";
@@ -230,7 +230,7 @@ bool CanvasMenuScene::initialize(const QVariantHash &params)
             currentScene.append(extendScene);
     }
 
-    if (auto dconfigFilterScene = dfmplugin_menu_util::menuSceneCreateScene(kDConfigHioceannMenuSceneName))
+    if (auto dconfigFilterScene = dfmplugin_menu_util::menuSceneCreateScene(kDConfigHiddenMenuSceneName))
         currentScene.append(dconfigFilterScene);
 
     if (auto actionIconManagerScene = dfmplugin_menu_util::menuSceneCreateScene(kActionIconMenuSceneName))

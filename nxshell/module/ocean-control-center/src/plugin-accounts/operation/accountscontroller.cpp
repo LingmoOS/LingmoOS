@@ -13,7 +13,7 @@
 #include <QVariantMap>
 #include <QRegularExpression>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <grp.h>
 
@@ -178,8 +178,8 @@ int AccountsController::adminCount() const
 void AccountsController::checkPwdLimitLevel(int lvl)
 {
     // 企业版控制中心用户创建屏蔽安全中心登录安全的接口需求
-    if ((DSysInfo::uosEditionType() == DSysInfo::UosEnterprise) ||
-        (DSysInfo::uosEditionType() == DSysInfo::UosEnterpriseC))
+    if ((LSysInfo::uosEditionType() == LSysInfo::UosEnterprise) ||
+        (LSysInfo::uosEditionType() == LSysInfo::UosEnterpriseC))
         return ;
 
     // needShowSafetyPage
@@ -256,7 +256,7 @@ bool AccountsController::needShowGroups()
     return true;
 #endif
 
-    return !DSysInfo::isCommunityEdition();
+    return !LSysInfo::isCommunityEdition();
 }
 
 QStringList AccountsController::allGroups() const
@@ -738,7 +738,7 @@ QString AccountsController::currentUserId() const
 QStringList AccountsController::userTypes(bool createUser /* = false*/) const
 {
     QStringList types{ tr("Standard User"), tr("Administrator") };
-    if (createUser && DSysInfo::UosServer == DSysInfo::uosType()) {
+    if (createUser && LSysInfo::UosServer == LSysInfo::uosType()) {
         types << tr("Customized");
     }
     return types;

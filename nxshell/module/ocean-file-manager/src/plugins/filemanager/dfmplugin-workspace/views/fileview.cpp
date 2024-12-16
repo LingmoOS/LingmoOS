@@ -409,7 +409,7 @@ void FileView::onSectionHandleDoubleClicked(int logicalIndex)
     }
 
     for (int i = d->headerView->count() - 1; i >= 0; --i) {
-        if (d->headerView->isSectionHioceann(i))
+        if (d->headerView->isSectionHidden(i))
             continue;
 
         // 最后一列要多加上视图的右margin
@@ -444,9 +444,9 @@ void FileView::onHeaderSectionMoved(int logicalIndex, int oldVisualIndex, int ne
     dpfSignalDispatcher->publish("dfmplugin_workspace", "signal_View_HeaderViewSectionChanged", rootUrl);
 }
 
-void FileView::onHeaderHioceannChanged(const QString &roleName, const bool isHioceann)
+void FileView::onHeaderHiddenChanged(const QString &roleName, const bool isHidden)
 {
-    d->columnForRoleHioceannMap[roleName] = isHioceann;
+    d->columnForRoleHiddenMap[roleName] = isHidden;
 
     if (d->allowedAdjustColumnSize) {
         updateListHeaderView();
@@ -2273,10 +2273,10 @@ void FileView::updateListHeaderView()
 
         const QString &columnName = model()->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
 
-        if (!d->columnForRoleHioceannMap.contains(columnName)) {
-            d->headerView->setSectionHioceann(logicalIndex, false);
+        if (!d->columnForRoleHiddenMap.contains(columnName)) {
+            d->headerView->setSectionHidden(logicalIndex, false);
         } else {
-            d->headerView->setSectionHioceann(logicalIndex, d->columnForRoleHioceannMap.value(columnName));
+            d->headerView->setSectionHidden(logicalIndex, d->columnForRoleHiddenMap.value(columnName));
         }
     }
 

@@ -11,7 +11,7 @@
 #include <DFontSizeManager>
 #include <DLabel>
 #include <DSuggestButton>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QButtonGroup>
 #include <QLabel>
@@ -197,7 +197,7 @@ void HomePage::changePicWithTheme(DGuiApplicationHelper::ColorType themeType)
 
     //    QIcon icon;
     //    // 只有是社区版才是社区  其他的都是专业
-    //    if (DSysInfo::uosEditionType() == DSysInfo::UosEdition::UosCommunity) {
+    //    if (LSysInfo::uosEditionType() == LSysInfo::UosEdition::UosCommunity) {
     //        // 社区版本
     //        if (themeType == DGuiApplicationHelper::ColorType::LightType) {
     //            icon = QIcon::fromTheme(HOMEPAGE_LINGMO_LIGHT);

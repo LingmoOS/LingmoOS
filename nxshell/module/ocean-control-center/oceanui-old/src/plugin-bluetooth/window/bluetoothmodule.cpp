@@ -142,5 +142,5 @@ void BluetoothModule::updateVisible()
 
 void BluetoothModule::updateWidget()
 {
-    setHioceann(m_valueMap.isEmpty());
+    setHidden(m_valueMap.isEmpty());
 }

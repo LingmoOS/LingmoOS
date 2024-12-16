@@ -12,7 +12,7 @@
 #include "common/thread_manager.h"
 #include "system/system_monitor_thread.h"
 #include "packet.h"
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QString>
 #include <QtDBus>
@@ -320,9 +320,9 @@ QString SysInfo::read_version()
 {
     auto ver = QString("%1 %2")
                //etc/os-version 下 MajorVersion
-               .arg(DSysInfo::majorVersion())
+               .arg(LSysInfo::majorVersion())
                //etc/os-version 下 EditionName
-               .arg(DSysInfo::uosEditionName());
+               .arg(LSysInfo::uosEditionName());
     return ver;
 }
 

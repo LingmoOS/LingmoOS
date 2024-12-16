@@ -37,7 +37,7 @@
 #include <DLabel>
 #include <DToolButton>
 #include <DWarningButton>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DDesktopServices>
 #include <DFloatingButton>
 #include <DBlurEffectWidget>
@@ -129,7 +129,7 @@ AccountsModule::AccountsModule(QObject *parent)
     horModule->appendChild(m_fullNameModule);
     m_fullNameEditModule = new ItemModule("fullNameEdit", QString(), this, &AccountsModule::initFullNameEdit, false);
     horModule->appendChild(m_fullNameEditModule);
-    m_fullNameEditModule->setHioceann(true);
+    m_fullNameEditModule->setHidden(true);
     m_fullNameIconModule = new ItemModule("fullNameIcon", QString(), this, &AccountsModule::initFullNameIcon, false);
     connect(m_fullNameIconModule, &ModuleObject::stateChanged, this, &AccountsModule::updateFullnameVisible);
     horModule->appendChild(m_fullNameIconModule);
@@ -161,7 +161,7 @@ AccountsModule::AccountsModule(QObject *parent)
     m_validityDaysModule = validityDaysModule;
     appendChild(m_validityDaysModule);
 
-    if (DSysInfo::UosServer == DSysInfo::uosType()) {
+    if (LSysInfo::UosServer == LSysInfo::uosType()) {
         appendChild(new ItemModule("group", tr("Group")));
         appendChild(new ItemModule(
                 "groupListView", tr("Group"), [this](ModuleObject *module) {
@@ -387,7 +387,7 @@ QWidget *AccountsModule::initFullNameIcon(ModuleObject *module)
     fullNameBtn->setIconSize(QSize(12, 12));
     //点击用户全名编辑按钮
     connect(fullNameBtn, &DIconButton::clicked, module, [this]() {
-        m_fullNameIconModule->setHioceann(true);
+        m_fullNameIconModule->setHidden(true);
     });
     return fullNameBtn;
 }
@@ -627,7 +627,7 @@ void AccountsModule::setCurrentUser(User *user)
         connect(m_curUser, &User::autoLoginChanged, this, &AccountsModule::updateLoginModule);
         connect(m_curUser, &User::nopasswdLoginChanged, this, &AccountsModule::updateLoginModule);
         updateLoginModule();
-        m_fullNameIconModule->setHioceann(false);
+        m_fullNameIconModule->setHidden(false);
         m_fullNameModule->setDisplayName(m_curUser->fullname());
         connect(m_curUser, &User::fullnameChanged, this, [this](const QString &fullname) {
             m_fullNameModule->setDisplayName(fullname);
@@ -786,9 +786,9 @@ void AccountsModule::setFullname(const QString &fullName, DLabel *fullNameLabel)
 void AccountsModule::updateFullnameVisible(uint32_t flag, bool state)
 {
     Q_UNUSED(state)
-    if (ModuleObject::IsHioceannFlag(flag)) {
-        m_fullNameModule->setHioceann(m_fullNameIconModule->isHioceann());
-        m_fullNameEditModule->setHioceann(!m_fullNameIconModule->isHioceann());
+    if (ModuleObject::IsHiddenFlag(flag)) {
+        m_fullNameModule->setHidden(m_fullNameIconModule->isHidden());
+        m_fullNameEditModule->setHidden(!m_fullNameIconModule->isHidden());
     }
 }
 

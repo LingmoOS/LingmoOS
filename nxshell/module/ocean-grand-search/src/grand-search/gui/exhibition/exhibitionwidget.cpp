@@ -49,7 +49,7 @@ void ExhibitionWidget::clearData()
 
 void ExhibitionWidget::onSelectNextItem()
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return;
 
     Q_ASSERT(m_matchWidget);
@@ -59,7 +59,7 @@ void ExhibitionWidget::onSelectNextItem()
 
 void ExhibitionWidget::onSelectPreviousItem()
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return;
 
     Q_ASSERT(m_matchWidget);
@@ -69,7 +69,7 @@ void ExhibitionWidget::onSelectPreviousItem()
 
 void ExhibitionWidget::onHandleItem()
 {
-    if (this->isHioceann())
+    if (this->isHidden())
         return;
 
     Q_ASSERT(m_matchWidget);

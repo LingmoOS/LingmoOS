@@ -16,7 +16,7 @@
 
 #include <DLabel>
 #include <DHiDPIHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #define UOSPROFESSIONAL_PHOTO_PATH  ":/resources/photo/UosProfessional"
 #define UOSPROFESSIONAL_PHOTO_TOTAL 8
@@ -55,7 +55,7 @@ private slots:
 
 private:
     //初始化设置轮播图
-    void initSetImage(DSysInfo::UosEdition imageType);
+    void initSetImage(LSysInfo::UosEdition imageType);
 
 private:
     int                      slide_index_ {0};

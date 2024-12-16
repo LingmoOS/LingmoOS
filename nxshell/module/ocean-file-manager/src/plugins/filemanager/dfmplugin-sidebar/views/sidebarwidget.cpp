@@ -81,7 +81,7 @@ int SideBarWidget::addItem(SideBarItem *item)
     // TODO(zhangs): custom group
 
     int r { kSidebarModelIns->appendRow(item) };
-    bool hideAoceandItem = r >= 0 && SideBarInfoCacheMananger::instance()->containsHioceannUrl(item->url());
+    bool hideAoceandItem = r >= 0 && SideBarInfoCacheMananger::instance()->containsHiddenUrl(item->url());
     if (!SideBarHelper::hioceannRules().value(item->itemInfo().visiableControlKey, true).toBool())
         hideAoceandItem = true;
 
@@ -95,7 +95,7 @@ bool SideBarWidget::insertItem(const int index, SideBarItem *item)
     Q_ASSERT(qApp->thread() == QThread::currentThread());
 
     bool r { kSidebarModelIns->insertRow(index, item) };
-    bool hideInsertedItem = r && SideBarInfoCacheMananger::instance()->containsHioceannUrl(item->url());
+    bool hideInsertedItem = r && SideBarInfoCacheMananger::instance()->containsHiddenUrl(item->url());
     if (!SideBarHelper::hioceannRules().value(item->itemInfo().visiableControlKey, true).toBool())
         hideInsertedItem = true;
 
@@ -157,7 +157,7 @@ void SideBarWidget::setItemVisiable(const QUrl &url, bool visible)
     Q_ASSERT(qApp->thread() == QThread::currentThread());
     int r = kSidebarModelIns->findRowByUrl(url);
     if (r > 0)
-        sidebarView->setRowHioceann(r, !visible);
+        sidebarView->setRowHidden(r, !visible);
     updateSeparatorVisibleState();
 }
 
@@ -325,7 +325,7 @@ void SideBarWidget::updateSeparatorVisibleState()
         SideBarItem *item = kSidebarModelIns->itemFromIndex(i);
         bool isSplitter = dynamic_cast<SideBarItemSeparator *>(item);
         if (!isSplitter) {
-            if (sidebarView->isRowHioceann(i))
+            if (sidebarView->isRowHidden(i))
                 continue;
             else
                 allItemsInvisiable = false;
@@ -334,10 +334,10 @@ void SideBarWidget::updateSeparatorVisibleState()
         if (item->group() != lastGroupName) {
             if (isSplitter) {   // Separator
                 if (lastGroupItemCount == 0) {
-                    sidebarView->setRowHioceann(i, true);
+                    sidebarView->setRowHidden(i, true);
                 } else {
                     lastShowSeparatorIndex = i;
-                    sidebarView->setRowHioceann(i, false);
+                    sidebarView->setRowHidden(i, false);
                 }
                 lastGroupItemCount = 0;
                 lastGroupName = item->group();
@@ -352,7 +352,7 @@ void SideBarWidget::updateSeparatorVisibleState()
     if (lastShowSeparatorIndex > 0) {
         SideBarItem *item = kSidebarModelIns->itemFromIndex(lastShowSeparatorIndex);
         if (dynamic_cast<SideBarItemSeparator *>(item))
-            sidebarView->setRowHioceann(lastShowSeparatorIndex, true);
+            sidebarView->setRowHidden(lastShowSeparatorIndex, true);
     }
 
     // when no item is visiable in sidebar, do something, such as hide sidebar?

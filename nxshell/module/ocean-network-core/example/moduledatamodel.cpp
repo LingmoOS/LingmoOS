@@ -78,7 +78,7 @@ Qt::ItemFlags ModuleDataModel::flags(const QModelIndex &index) const
 
 void ModuleDataModel::onDataChanged(ModuleObject *const module)
 {
-    if (module->extra() || ModuleObject::IsHioceann(module)) {
+    if (module->extra() || ModuleObject::IsHidden(module)) {
         onRemovedChild(module);
     } else {
         int row = m_data.indexOf(module);
@@ -93,7 +93,7 @@ void ModuleDataModel::onDataChanged(ModuleObject *const module)
 
 void ModuleDataModel::onInsertChild(ModuleObject *const module)
 {
-    if (module->extra() || ModuleObject::IsHioceann(module) || m_data.contains(module))
+    if (module->extra() || ModuleObject::IsHidden(module) || m_data.contains(module))
         return;
 
     int row = 0;
@@ -126,7 +126,7 @@ void ModuleDataModel::setModuleObject(ModuleObject *const module)
     beginResetModel();
     m_data.clear();
     for (ModuleObject *tmpModule : datas) {
-        if (!tmpModule->extra() && !ModuleObject::IsHioceann(tmpModule))
+        if (!tmpModule->extra() && !ModuleObject::IsHidden(tmpModule))
             m_data.append(tmpModule);
     }
     endResetModel();

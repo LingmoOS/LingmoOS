@@ -107,7 +107,7 @@ TEST(FSearcherTest, ut_receiveResultCallback_1)
 TEST(FSearcherTest, ut_receiveResultCallback_2)
 {
     stub_ext::StubExt st;
-    st.set_lamda(&SearchHelper::isHioceannFile, [] { __DBG_STUB_INVOKE__ return false; });
+    st.set_lamda(&SearchHelper::isHiddenFile, [] { __DBG_STUB_INVOKE__ return false; });
 
     FSearcher searcher(QUrl::fromLocalFile("/"), "test");
     searcher.status.storeRelease(AbstractSearcher::kRuning);

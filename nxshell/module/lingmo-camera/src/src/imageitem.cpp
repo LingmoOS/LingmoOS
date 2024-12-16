@@ -11,7 +11,7 @@
 #include <DGuiApplicationHelper>
 #include <DDesktopServices>
 #include <DApplicationHelper>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QFileInfo>
 #include <QPainterPath>
@@ -331,7 +331,7 @@ void ImageItem::openFile()
 
     // check if os edition on v23 or later
     static const int kMinOsEdition = 23;
-    const int osMajor = DSysInfo::majorVersion().toInt();
+    const int osMajor = LSysInfo::majorVersion().toInt();
 
     if (osMajor >= kMinOsEdition) {
         //玲珑环境下无法通过QProcess方式打开应用，通过DBus打开

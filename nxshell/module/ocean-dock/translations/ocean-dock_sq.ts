@@ -277,7 +277,7 @@
         <translation>Mbaje të Shfaqur</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Mbaje të Fshehur</translation>
     </message>
     <message>

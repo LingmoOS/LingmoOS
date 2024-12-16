@@ -164,9 +164,9 @@ TEST(SearchHelperTest, ut_checkWildcardAndToRegularExpression)
     EXPECT_TRUE(!ret.isEmpty());
 }
 
-TEST(SearchHelperTest, ut_isHioceannFile)
+TEST(SearchHelperTest, ut_isHiddenFile)
 {
     QString path = QDir::homePath();
     QHash<QString, QSet<QString>> filters;
-    EXPECT_NO_FATAL_FAILURE(SearchHelper::instance()->isHioceannFile(path, filters, "/"));
+    EXPECT_NO_FATAL_FAILURE(SearchHelper::instance()->isHiddenFile(path, filters, "/"));
 }

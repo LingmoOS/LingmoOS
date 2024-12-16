@@ -566,7 +566,7 @@ QVariant AppsListModel::data(const QModelIndex &index, int role) const
         return (m_actionSettings && !m_actionSettings->get("uninstall").toBool()) || m_hideUninstallPackages.contains(itemInfo.m_key);
     case AppHideUseProxyRole: {
         bool hideUse = ((m_actionSettings && !m_actionSettings->get("use-proxy").toBool()) || hideUseProxyPackages.contains(itemInfo.m_key));
-        return DSysInfo::isCommunityEdition() ? hideUse : (!QFile::exists(ChainsProxy_path) || hideUse);
+        return LSysInfo::isCommunityEdition() ? hideUse : (!QFile::exists(ChainsProxy_path) || hideUse);
     }
     case AppCanOpenRole:
         return !m_cantOpenPackages.contains(itemInfo.m_key);

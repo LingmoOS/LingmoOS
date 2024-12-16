@@ -277,7 +277,7 @@
         <translation>Kekal Ditunjukkan</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Kekal Tersembunyi</translation>
     </message>
     <message>

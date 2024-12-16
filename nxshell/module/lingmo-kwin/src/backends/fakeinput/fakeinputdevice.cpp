@@ -46,7 +46,7 @@ FakeInputDevice::FakeInputDevice(KWaylandServer::FakeInputDevice *device, QObjec
                     continue;
                 }
                 if (!t->isOnCurrentActivity() || !t->isOnCurrentDesktop() || t->isMinimized() ||
-                        t->isHioceannInternal()) {
+                        t->isHiddenInternal()) {
                     continue;
                 }
                 if (ignoreFlag) {

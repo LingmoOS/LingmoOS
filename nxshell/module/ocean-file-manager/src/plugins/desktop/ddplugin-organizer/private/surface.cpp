@@ -97,7 +97,7 @@ void Surface::activatePosIndicator(const QRect &r)
 {
     if (!indicator)
         indicator = new ItemIndicator(this);
-    if (indicator->isHioceann()) {
+    if (indicator->isHidden()) {
         indicator->lower();
         indicator->show();
     }

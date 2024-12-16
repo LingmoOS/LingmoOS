@@ -16,7 +16,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include <climits>
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/detail/call_stack.hpp"
 
 #include "asio/detail/push_options.hpp"

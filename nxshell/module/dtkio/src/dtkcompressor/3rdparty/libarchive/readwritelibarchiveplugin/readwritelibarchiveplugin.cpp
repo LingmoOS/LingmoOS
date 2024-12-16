@@ -101,7 +101,7 @@ PluginFinishType ReadWriteLibarchivePlugin::addFiles(const QList<FileEntry> &fil
         if (QFileInfo(fullPath).isDir()) {
             QDirIterator it(fullPath,
                             QDir::AllEntries | QDir::Readable |
-                            QDir::Hioceann | QDir::NoDotAndDotDot,
+                            QDir::Hidden | QDir::NoDotAndDotDot,
                             QDirIterator::Subdirectories);
             QString firstDirFullPath = fullPath;
             QString externalPath = QFileInfo(fullPath).path() + QDir::separator();

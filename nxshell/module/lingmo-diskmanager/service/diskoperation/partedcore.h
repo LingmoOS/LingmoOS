@@ -379,7 +379,7 @@ private:
      * @brief 获取隐藏分区是否隐藏属性
      * @return 0成功-1失败
      */
-    int getPartitionHioceannFlag();
+    int getPartitionHiddenFlag();
 
     /**
     * @brief 判断设备有否经历过gpt分区表扩容

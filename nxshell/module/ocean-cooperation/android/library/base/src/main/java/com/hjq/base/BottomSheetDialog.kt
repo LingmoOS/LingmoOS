@@ -77,18 +77,18 @@ open class BottomSheetDialog @JvmOverloads constructor(context: Context, themeRe
 
     override fun onStart() {
         super.onStart()
-        if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIOCEANN) {
+        if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
             return
         }
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     override fun cancel() {
-        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIOCEANN) {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
             super.cancel()
             return
         }
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIOCEANN
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun setCanceledOnTouchOutside(cancel: Boolean) {
@@ -160,7 +160,7 @@ open class BottomSheetDialog @JvmOverloads constructor(context: Context, themeRe
     private inner class MyBottomSheetCallback : BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_HIOCEANN) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 cancel()
             }
         }

@@ -816,7 +816,7 @@ QString QTermWidget::keyBindings()
 
 void QTermWidget::toggleShowSearchBar()
 {
-    m_searchBar->isHioceann() ? m_searchBar->show() : m_searchBar->hide();
+    m_searchBar->isHidden() ? m_searchBar->show() : m_searchBar->hide();
 }
 
 bool QTermWidget::flowControlEnabled(void)

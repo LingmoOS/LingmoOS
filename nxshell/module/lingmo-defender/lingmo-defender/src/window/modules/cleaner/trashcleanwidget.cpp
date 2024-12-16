@@ -349,7 +349,7 @@ void TrashCleanWidget::initResultFrame()
     m_treeWidget->setIndentation(16);
     m_treeWidget->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
     m_treeWidget->setBackgroundRole(QPalette::Background);
-    m_treeWidget->setHeaderHioceann(true);
+    m_treeWidget->setHeaderHidden(true);
     m_treeWidget->setColumnCount(1);
     m_treeWidget->setFocusPolicy(Qt::NoFocus);
     m_delegate = new MyItemDelegateTree(this);
@@ -424,7 +424,7 @@ void TrashCleanWidget::addRootCheckItems()
         m_rootItems.push_back(trash);
         QTreeWidgetItem *treeItem = new QTreeWidgetItem(m_treeWidget);
         treeItem->setData(0, Qt::DisplayRole, "treeWidget_rootItem");
-        treeItem->setHioceann(true);
+        treeItem->setHidden(true);
         m_treeWidget->setItemWidget(treeItem, 0, trash->itemWidget());
         i++;
     }
@@ -855,7 +855,7 @@ void TrashCleanWidget::setWidgetScanStart()
     foreach (auto item, m_configItem) {
         if (item->getCheckBoxStatus()) {
             // 开始显示选中的根项和子项窗口
-            m_treeWidget->topLevelItem(i)->setHioceann(false);
+            m_treeWidget->topLevelItem(i)->setHidden(false);
             // 默认将项目设为选中状态
             m_rootItems[i]->setConfigToScan();
             Q_EMIT m_rootItems[i]->scanStarted(true);
@@ -865,7 +865,7 @@ void TrashCleanWidget::setWidgetScanStart()
         } else {
             // 隐藏未选中的检查项
             hioceanns++;
-            m_treeWidget->topLevelItem(i)->setHioceann(true);
+            m_treeWidget->topLevelItem(i)->setHidden(true);
             m_rootItems[i]->setSelected(false);
         }
         i++;

@@ -28,8 +28,8 @@ CanvasModelBroker::~CanvasModelBroker()
     CanvasModelDisconnect(slot_CanvasModel_Index);
     CanvasModelDisconnect(slot_CanvasModel_FileUrl);
     CanvasModelDisconnect(slot_CanvasModel_Files);
-    CanvasModelDisconnect(slot_CanvasModel_ShowHioceannFiles);
-    CanvasModelDisconnect(slot_CanvasModel_SetShowHioceannFiles);
+    CanvasModelDisconnect(slot_CanvasModel_ShowHiddenFiles);
+    CanvasModelDisconnect(slot_CanvasModel_SetShowHiddenFiles);
     CanvasModelDisconnect(slot_CanvasModel_SortOrder);
     CanvasModelDisconnect(slot_CanvasModel_SetSortOrder);
     CanvasModelDisconnect(slot_CanvasModel_SortRole);
@@ -49,8 +49,8 @@ bool CanvasModelBroker::init()
     CanvasModelSlot(slot_CanvasModel_Index, &CanvasModelBroker::index);
     CanvasModelSlot(slot_CanvasModel_FileUrl, &CanvasModelBroker::fileUrl);
     CanvasModelSlot(slot_CanvasModel_Files, &CanvasModelBroker::files);
-    CanvasModelSlot(slot_CanvasModel_ShowHioceannFiles, &CanvasModelBroker::showHioceannFiles);
-    CanvasModelSlot(slot_CanvasModel_SetShowHioceannFiles, &CanvasModelBroker::setShowHioceannFiles);
+    CanvasModelSlot(slot_CanvasModel_ShowHiddenFiles, &CanvasModelBroker::showHiddenFiles);
+    CanvasModelSlot(slot_CanvasModel_SetShowHiddenFiles, &CanvasModelBroker::setShowHiddenFiles);
     CanvasModelSlot(slot_CanvasModel_SortOrder, &CanvasModelBroker::sortOrder);
     CanvasModelSlot(slot_CanvasModel_SetSortOrder, &CanvasModelBroker::setSortOrder);
     CanvasModelSlot(slot_CanvasModel_SortRole, &CanvasModelBroker::sortRole);
@@ -84,14 +84,14 @@ QList<QUrl> CanvasModelBroker::files()
     return model->files();
 }
 
-bool CanvasModelBroker::showHioceannFiles()
+bool CanvasModelBroker::showHiddenFiles()
 {
-    return model->showHioceannFiles();
+    return model->showHiddenFiles();
 }
 
-void CanvasModelBroker::setShowHioceannFiles(bool show)
+void CanvasModelBroker::setShowHiddenFiles(bool show)
 {
-    model->setShowHioceannFiles(show);
+    model->setShowHiddenFiles(show);
 }
 
 int CanvasModelBroker::sortOrder()

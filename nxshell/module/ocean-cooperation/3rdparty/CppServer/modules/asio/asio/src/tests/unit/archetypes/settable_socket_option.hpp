@@ -11,7 +11,7 @@
 #ifndef ARCHETYPES_SETTABLE_SOCKET_OPTION_HPP
 #define ARCHETYPES_SETTABLE_SOCKET_OPTION_HPP
 
-#include <cstoceanf>
+#include <cstddef>
 
 namespace archetypes {
 

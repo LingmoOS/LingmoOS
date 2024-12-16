@@ -277,7 +277,7 @@
         <translation>표시된 상태로 유지</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>숨겨진 상태로 유지</translation>
     </message>
     <message>

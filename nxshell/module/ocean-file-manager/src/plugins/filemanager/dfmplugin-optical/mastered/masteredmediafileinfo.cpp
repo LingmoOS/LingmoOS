@@ -162,7 +162,7 @@ bool MasteredMediaFileInfo::canAttributes(const CanableInfoType type) const
         return d->canDrop();
     case FileCanType::kCanDragCompress:
         [[fallthrough]];
-    case FileCanType::kCanHioceann:
+    case FileCanType::kCanHidden:
         return false;
     default:
         return ProxyFileInfo::canAttributes(type);

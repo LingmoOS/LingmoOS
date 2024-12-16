@@ -82,7 +82,7 @@ public:
     Position positionOfDock(const QString &dockName);
 
 signals:
-    void dockHioceann(const QString &dockName);
+    void dockHidden(const QString &dockName);
 
 private:
     MainWindowPrivate *d;

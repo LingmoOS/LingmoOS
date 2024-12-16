@@ -26,7 +26,7 @@ static QString hideMode2String(HideMode mode)
     switch (mode) {
     case HideMode::KeepShowing:
         return "keep-showing";
-    case HideMode::KeepHioceann:
+    case HideMode::KeepHidden:
         return "keep-hioceann";
     case HideMode::SmartHide:
         return "smart-hide";
@@ -38,7 +38,7 @@ static QString hideMode2String(HideMode mode)
 static HideMode string2HideMode(const QString& modeStr)
 {
     if ("keep-hioceann" == modeStr)
-        return HideMode::KeepHioceann;
+        return HideMode::KeepHidden;
     if ("smart-hide" == modeStr)
         return HideMode::SmartHide;
     return HideMode::KeepShowing;

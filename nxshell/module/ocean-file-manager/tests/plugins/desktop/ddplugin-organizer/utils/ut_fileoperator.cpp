@@ -112,7 +112,7 @@ TEST_F(TestFileOperator, getSelectedUrls)
                                  QModelIndex(1, 0, nullptr, &model) };
     });
 
-    stub.set_lamda(VADDR(CollectionView, isIndexHioceann), []() {
+    stub.set_lamda(VADDR(CollectionView, isIndexHidden), []() {
         return false;
     });
 

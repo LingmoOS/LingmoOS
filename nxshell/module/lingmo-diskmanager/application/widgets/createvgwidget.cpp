@@ -503,16 +503,16 @@ void CreateVGWidget::initConnection()
     connect(DMDbusHandler::instance(), &DMDbusHandler::updateDeviceInfo, this, &CreateVGWidget::onUpdateUsb);
 }
 
-void CreateVGWidget::setScrollAreaAttribute(DScrollArea *scrollArea, bool hScrollBarHioceann, bool vScrollBarHioceann)
+void CreateVGWidget::setScrollAreaAttribute(DScrollArea *scrollArea, bool hScrollBarHidden, bool vScrollBarHidden)
 {
     scrollArea->setFrameShadow(QFrame::Plain);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
-    if (hScrollBarHioceann) {
+    if (hScrollBarHidden) {
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏横向滚动条
     }
 
-    if (vScrollBarHioceann) {
+    if (vScrollBarHidden) {
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏竖向滚动条
     }
 }

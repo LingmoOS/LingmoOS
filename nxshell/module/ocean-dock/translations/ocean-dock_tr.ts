@@ -277,7 +277,7 @@
         <translation>Sürekli Göster</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Sürekli Gizle</translation>
     </message>
     <message>

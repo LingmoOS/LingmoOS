@@ -287,9 +287,9 @@ void UseBatteryModule::initUI()
                            });
                            return cmbLowBatteryHint;
                        });
-    itemLowBatteryHint->setHioceann(!(m_model->haveBettary() && m_model->lowPowerNotifyEnable()));
+    itemLowBatteryHint->setHidden(!(m_model->haveBettary() && m_model->lowPowerNotifyEnable()));
     connect(m_model, &PowerModel::lowPowerNotifyEnableChanged, itemLowBatteryHint, [itemLowBatteryHint, this] (/*const bool state*/) {
-        itemLowBatteryHint->setHioceann(!(m_model->haveBettary() && m_model->lowPowerNotifyEnable()));
+        itemLowBatteryHint->setHidden(!(m_model->haveBettary() && m_model->lowPowerNotifyEnable()));
     });
     group->appendChild(itemLowBatteryHint);
 

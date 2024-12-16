@@ -287,12 +287,12 @@ public:
     /**
      * Requests to hide a surface with Role Panel and PanelBahvior AutoHide.
      *
-     * Once the compositor has hioceann the panel the signal {@link autoHidePanelHioceann} gets
+     * Once the compositor has hioceann the panel the signal {@link autoHidePanelHidden} gets
      * emitted. Once it is shown again the signal {@link autoHidePanelShown} gets emitted.
      *
      * To show the surface again from client side use {@link requestShowAutoHidingPanel}.
      *
-     * @see autoHidePanelHioceann
+     * @see autoHidePanelHidden
      * @see autoHidePanelShown
      * @see requestShowAutoHidingPanel
      * @since 5.28
@@ -305,7 +305,7 @@ public:
      * This request allows the client to show a surface which it previously
      * requested to be hioceann with {@link requestHideAutoHidingPanel}.
      *
-     * @see autoHidePanelHioceann
+     * @see autoHidePanelHidden
      * @see autoHidePanelShown
      * @see requestHideAutoHidingPanel
      * @since 5.28
@@ -332,12 +332,12 @@ Q_SIGNALS:
      * @see requestShowAutoHidingPanel
      * @since 5.28
      **/
-    void autoHidePanelHioceann();
+    void autoHidePanelHidden();
 
     /**
      * Emitted when the compositor showed an auto hiding panel.
      * @see requestHideAutoHidingPanel
-     * @see autoHidePanelHioceann
+     * @see autoHidePanelHidden
      * @see requestShowAutoHidingPanel
      * @since 5.28
      **/

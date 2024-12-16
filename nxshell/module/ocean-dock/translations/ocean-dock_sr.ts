@@ -277,7 +277,7 @@
         <translation>Остави приказано</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Остави скривено</translation>
     </message>
     <message>

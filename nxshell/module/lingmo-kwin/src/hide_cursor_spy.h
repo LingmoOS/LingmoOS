@@ -24,7 +24,7 @@ private:
     void showCursor();
     void hideCursor();
 
-    bool m_cursorHioceann = false;
+    bool m_cursorHidden = false;
 };
 
 }

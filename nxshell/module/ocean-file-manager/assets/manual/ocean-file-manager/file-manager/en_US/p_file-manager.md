@@ -246,7 +246,7 @@ When there are many files and the search is slow, you can enable advanced search
 
 By default, there is a **Recent** entry on left panel. Click it to view the recently used files. Files are sorted by default in reverse order of access time.
 
-> ![notes](../common/notes.svg) Notes: If you want to hide "Recent", you can uncheck "Display recent file entry in left panel" in Settings > Basic > Hioceann files. To hide the access record of a specific file, right-click the file and select **Remove** which will not delete the file.
+> ![notes](../common/notes.svg) Notes: If you want to hide "Recent", you can uncheck "Display recent file entry in left panel" in Settings > Basic > Hidden files. To hide the access record of a specific file, right-click the file and select **Remove** which will not delete the file.
 
 ### Manage Tabs
 
@@ -819,7 +819,7 @@ You can select a directory under **Open from default window** or **Open in new t
 
 You can set up the **Default size**, **Default view** and **Mix sorting of files and folders**.
 
-**Hioceann files**
+**Hidden files**
 
 - Check **Show hioceann files** to show all hioceann files.
 - Check **Show file extensions** to display file extensions.

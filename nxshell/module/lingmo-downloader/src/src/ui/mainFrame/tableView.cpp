@@ -231,8 +231,8 @@ bool TableView::refreshTableView(const int &index)
         //if(1 == getTableModel()->getTablemodelMode()){
         getTableModel()->switchDownloadingMode();
         //}
-        setColumnHioceann(3, false);
-        setColumnHioceann(4, true);
+        setColumnHidden(3, false);
+        setColumnHidden(4, true);
         break;
     }
 
@@ -240,8 +240,8 @@ bool TableView::refreshTableView(const int &index)
         //if(0 == getTableModel()->getTablemodelMode()){
         getTableModel()->switchFinishedMode();
         //}
-        setColumnHioceann(3, true);
-        setColumnHioceann(4, false);
+        setColumnHidden(3, true);
+        setColumnHidden(4, false);
         //getTableHeader()->setSortIndicator(4, Qt::AscendingOrder);
         break;
     }
@@ -255,18 +255,18 @@ void TableView::onModellayoutChanged()
         const QList<DownloadDataItem *> &selectList = getTableModel()->renderList();
         for (int i = 0; i < selectList.size(); i++) {
             if (selectList.at(i)->isHide) {
-                setRowHioceann(i, true);
+                setRowHidden(i, true);
             } else {
-                setRowHioceann(i, false);
+                setRowHidden(i, false);
             }
         }
     } else {
         const QList<DeleteDataItem *> &selectList = getTableModel()->recyleList();
         for (int i = 0; i < selectList.size(); i++) {
             if (selectList.at(i)->isHide) {
-                setRowHioceann(i, true);
+                setRowHidden(i, true);
             } else {
-                setRowHioceann(i, false);
+                setRowHidden(i, false);
             }
         }
     }

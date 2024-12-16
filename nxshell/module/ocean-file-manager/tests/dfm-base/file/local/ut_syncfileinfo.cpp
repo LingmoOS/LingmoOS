@@ -51,10 +51,10 @@ TEST_F(UT_SyncFileInfo, testSyncFileInfo)
     EXPECT_TRUE(info1 != info3);
     EXPECT_TRUE(info3.initQuerier());
     EXPECT_TRUE(info->exists());
-    info->cacheAttribute(dfmio::DFileInfo::AttributeID::kStandardIsHioceann, true);
-    EXPECT_TRUE(info->isAttributes(OptInfoType::kIsHioceann));
+    info->cacheAttribute(dfmio::DFileInfo::AttributeID::kStandardIsHidden, true);
+    EXPECT_TRUE(info->isAttributes(OptInfoType::kIsHidden));
     info->refresh();
-    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHidden));
 }
 
 TEST_F(UT_SyncFileInfo, testSyncFileInfoNameOf)
@@ -133,7 +133,7 @@ TEST_F(UT_SyncFileInfo, testSyncFileInfoIsAttributes)
     EXPECT_TRUE(info->isAttributes(OptInfoType::kIsWritable));
     EXPECT_TRUE(info->isAttributes(OptInfoType::kIsExecutable));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsRoot));
-    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info->isAttributes(OptInfoType::kIsHidden));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsBundle));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kIsPrivate));
     EXPECT_FALSE(info->isAttributes(OptInfoType::kCustomerFileIs));
@@ -147,7 +147,7 @@ TEST_F(UT_SyncFileInfo, testSyncFileInfoCanAttributes)
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanDelete));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanTrash));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanRename));
-    EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanHioceann));
+    EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanHidden));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanFetch));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanDrop));
     EXPECT_TRUE(info->canAttributes(CanableInfoType::kCanMoveOrCopy));

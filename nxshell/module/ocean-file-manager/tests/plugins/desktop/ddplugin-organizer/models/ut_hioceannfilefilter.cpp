@@ -13,13 +13,13 @@
 DPF_USE_NAMESPACE
 using namespace ddplugin_organizer;
 
-class HioceannFileFilterTest : public testing::Test
+class HiddenFileFilterTest : public testing::Test
 {
 public:
     virtual void SetUp() override {
         stub.set_lamda((QVariant (EventChannelManager::*)(const QString &, const QString &))&EventChannelManager::push,
                        [this](EventChannelManager *self, const QString &space, const QString &topic) {
-            if (topic == "slot_CanvasModel_ShowHioceannFiles" && space == "ddplugin_canvas") {
+            if (topic == "slot_CanvasModel_ShowHiddenFiles" && space == "ddplugin_canvas") {
                 getFlag = true;
                 return QVariant::fromValue(show);
             }
@@ -35,9 +35,9 @@ public:
 
 };
 
-TEST_F(HioceannFileFilterTest, construct)
+TEST_F(HiddenFileFilterTest, construct)
 {
-    HioceannFileFilter filter;
+    HiddenFileFilter filter;
     EXPECT_TRUE(filter.show);
     EXPECT_TRUE(getFlag);
 }

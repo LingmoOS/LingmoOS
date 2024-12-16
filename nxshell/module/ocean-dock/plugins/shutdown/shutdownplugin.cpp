@@ -9,7 +9,7 @@
 #include "../widgets/tipswidget.h"
 #include "./dbus/dbuspowermanager.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DDBusSender>
 #include <DGuiApplicationHelper>
 
@@ -182,7 +182,7 @@ const QString ShutdownPlugin::itemContextMenu(const QString &itemKey)
         // 和登录锁屏界面的逻辑保持一致
         if (AlwaysShow == switchUserConfig ||
                  (OnDemand == switchUserConfig &&
-                 (DBusAccount().userList().count() > 1 || DSysInfo::uosType() == DSysInfo::UosType::UosServer))) {
+                 (DBusAccount().userList().count() > 1 || LSysInfo::uosType() == LSysInfo::UosType::UosServer))) {
             QMap<QString, QVariant> switchUser;
             switchUser["itemId"] = "SwitchUser";
             switchUser["itemText"] = tr("Switch account");

@@ -18,7 +18,7 @@
 #include <qstandarditemmodel.h>
 
 #include <DIconTheme>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTipLabel>
 
 #include <QApplication>
@@ -73,9 +73,9 @@ ModuleObject *CommonInfoPlugin::module()
             new PlyMouthModule(moduleInterface->model(), moduleInterface->worker()));
 
     // 服务器版/社区版
-    if (!IS_SERVER_SYSTEM && !IS_COMMUNITY_SYSTEM && DSysInfo::isLingmo()) {
-        if (DSysInfo::uosEditionType() != DSysInfo::UosEuler
-            || DSysInfo::uosEditionType() != DSysInfo::UosEnterpriseC) {
+    if (!IS_SERVER_SYSTEM && !IS_COMMUNITY_SYSTEM && LSysInfo::isLingmo()) {
+        if (LSysInfo::uosEditionType() != LSysInfo::UosEuler
+            || LSysInfo::uosEditionType() != LSysInfo::UosEnterpriseC) {
             // 二级菜单--开发者模式
             ModuleObject *moduleDeveloperMode =
                     new PageModule("developerMode", tr("Developer Mode"));

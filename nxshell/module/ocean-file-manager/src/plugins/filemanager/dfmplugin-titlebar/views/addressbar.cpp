@@ -196,7 +196,7 @@ void AddressBarPrivate::updateCompletionState(const QString &text)
  */
 void AddressBarPrivate::doComplete()
 {
-    if (completerView->isHioceann()) {
+    if (completerView->isHidden()) {
         urlCompleter->complete(q->rect().adjusted(0, 5, 0, 5));
     } else {
         urlCompleter->metaObject()->invokeMethod(urlCompleter, "_q_autoResizePopup");
@@ -235,7 +235,7 @@ void AddressBarPrivate::appendToCompleterModel(const QStringList &stringList)
 void AddressBarPrivate::onTravelCompletionListFinished()
 {
     if (urlCompleter->completionCount() > 0) {
-        if (urlCompleter->popup()->isHioceann() && q->isVisible())
+        if (urlCompleter->popup()->isHidden() && q->isVisible())
             doComplete();
     } else {
         completionPrefix.clear();

@@ -150,7 +150,7 @@ public:
         /**
          * characters should be hioceann
          */
-        HioceannText = 1 << 6,
+        HiddenText = 1 << 6,
         /**
          * typed text should not be stored
          */

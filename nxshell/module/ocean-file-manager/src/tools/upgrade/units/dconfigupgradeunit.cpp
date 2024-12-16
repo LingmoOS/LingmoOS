@@ -17,13 +17,13 @@ using namespace dfm_upgrade;
 using namespace GlobalDConfDefines::ConfigPath;
 
 namespace DConfigKeys {
-static constexpr char kDFMMenuHioceann[] { "dfm.menu.hioceann" };
-static constexpr char kFileManagerActionHioceann[] { "dfm.menu.action.hioceann" };
-static constexpr char kFileDialogActionHioceann[] { "dfd.menu.action.hioceann" };
-static constexpr char kDesktopActionHioceann[] { "dd.menu.action.hioceann" };
+static constexpr char kDFMMenuHidden[] { "dfm.menu.hioceann" };
+static constexpr char kFileManagerActionHidden[] { "dfm.menu.action.hioceann" };
+static constexpr char kFileDialogActionHidden[] { "dfd.menu.action.hioceann" };
+static constexpr char kDesktopActionHidden[] { "dd.menu.action.hioceann" };
 
 static constexpr char kSambaPermanent[] { "dfm.samba.permanent" };
-static constexpr char kDiskHioceann[] { "dfm.disk.hioceann" };
+static constexpr char kDiskHidden[] { "dfm.disk.hioceann" };
 }   // namespace DConfigKeys
 
 DConfigUpgradeUnit::DConfigUpgradeUnit()
@@ -49,7 +49,7 @@ bool DConfigUpgradeUnit::upgrade()
     ret &= upgradeSmbConfigs();
     ret &= upgradeRecentConfigs();
     ret &= upgradeSearchConfigs();
-    clearDiskHioceann();
+    clearDiskHidden();
     addOldGenericSettings();
 
     return ret;
@@ -138,25 +138,25 @@ bool DConfigUpgradeUnit::upgradeMenuConfigs()
     };
 
     using namespace DConfigKeys;
-    auto fileManagerActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kFileManagerActionHioceann).toStringList();
-    auto desktopActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kDesktopActionHioceann).toStringList();
-    auto fileDialogActionHioceann = DConfigManager::instance()->value(kDefaultCfgPath, kFileDialogActionHioceann).toStringList();
+    auto fileManagerActionHidden = DConfigManager::instance()->value(kDefaultCfgPath, kFileManagerActionHidden).toStringList();
+    auto desktopActionHidden = DConfigManager::instance()->value(kDefaultCfgPath, kDesktopActionHidden).toStringList();
+    auto fileDialogActionHidden = DConfigManager::instance()->value(kDefaultCfgPath, kFileDialogActionHidden).toStringList();
 
-    qCInfo(logToolUpgrade) << "upgrade: [old] fileManagerHioceannActions: " << fileManagerActionHioceann;
-    upgradeActions(fileManagerActionHioceann);
-    qCInfo(logToolUpgrade) << "upgrade: [new] fileManagerHioceannActions: " << fileManagerActionHioceann;
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileManagerHiddenActions: " << fileManagerActionHidden;
+    upgradeActions(fileManagerActionHidden);
+    qCInfo(logToolUpgrade) << "upgrade: [new] fileManagerHiddenActions: " << fileManagerActionHidden;
 
-    qCInfo(logToolUpgrade) << "upgrade: [old] desktopActionHioceann: " << desktopActionHioceann;
-    upgradeActions(desktopActionHioceann);
-    qCInfo(logToolUpgrade) << "upgrade: [new] desktopActionHioceann: " << desktopActionHioceann;
+    qCInfo(logToolUpgrade) << "upgrade: [old] desktopActionHidden: " << desktopActionHidden;
+    upgradeActions(desktopActionHidden);
+    qCInfo(logToolUpgrade) << "upgrade: [new] desktopActionHidden: " << desktopActionHidden;
 
-    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHioceann: " << fileDialogActionHioceann;
-    upgradeActions(fileDialogActionHioceann);
-    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHioceann: " << fileDialogActionHioceann;
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHidden: " << fileDialogActionHidden;
+    upgradeActions(fileDialogActionHidden);
+    qCInfo(logToolUpgrade) << "upgrade: [old] fileDialogActionHidden: " << fileDialogActionHidden;
 
-    DConfigManager::instance()->setValue(kDefaultCfgPath, kDesktopActionHioceann, desktopActionHioceann);
-    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileManagerActionHioceann, fileManagerActionHioceann);
-    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileDialogActionHioceann, fileDialogActionHioceann);
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kDesktopActionHidden, desktopActionHidden);
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileManagerActionHidden, fileManagerActionHidden);
+    DConfigManager::instance()->setValue(kDefaultCfgPath, kFileDialogActionHidden, fileDialogActionHidden);
 
     return true;
 }
@@ -251,9 +251,9 @@ bool DConfigUpgradeUnit::upgradeSearchConfigs()
     return true;
 }
 
-void DConfigUpgradeUnit::clearDiskHioceann()
+void DConfigUpgradeUnit::clearDiskHidden()
 {
-    DConfigManager::instance()->setValue(kDefaultCfgPath, DConfigKeys::kDiskHioceann, QStringList());
+    DConfigManager::instance()->setValue(kDefaultCfgPath, DConfigKeys::kDiskHidden, QStringList());
 }
 
 void DConfigUpgradeUnit::addOldGenericSettings()

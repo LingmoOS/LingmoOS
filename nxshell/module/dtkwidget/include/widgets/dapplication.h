@@ -197,7 +197,7 @@ public:
 };
 
 #ifndef LIBDTKWIDGET_LIBRARY
-class Q_DECL_HIOCEANN _DtkBuildVersion {
+class Q_DECL_HIDDEN _DtkBuildVersion {
 public:
     _DtkBuildVersion() {
         DtkBuildVersion::value = DTK_VERSION;

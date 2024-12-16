@@ -134,8 +134,8 @@ QWaylandInputMethodContentType QWaylandInputMethodContentType::convertV4(Qt::Inp
     uint32_t hint = ZWP_TEXT_INPUT_V3_CONTENT_HINT_NONE;
     uint32_t purpose = ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL;
 
-    if (hints & Qt::ImhHioceannText)
-        hint |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_HIOCEANN_TEXT;
+    if (hints & Qt::ImhHiddenText)
+        hint |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_HIDDEN_TEXT;
     if (hints & Qt::ImhSensitiveData)
         hint |= ZWP_TEXT_INPUT_V3_CONTENT_HINT_SENSITIVE_DATA;
     if ((hints & Qt::ImhNoAutoUppercase) == 0)

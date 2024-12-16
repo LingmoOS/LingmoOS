@@ -77,8 +77,8 @@ void SystemInfoModule::initChildModule()
     moduleAboutPc->appendChild(sysInfoGroup);
 
     // systemInfoGroup
-    if (DSysInfo::uosType() == DSysInfo::UosType::UosServer
-        || DSysInfo::uosType() == DSysInfo::UosType::UosDesktop) {
+    if (LSysInfo::uosType() == LSysInfo::UosType::UosServer
+        || LSysInfo::uosType() == LSysInfo::UosType::UosDesktop) {
             sysInfoGroup->appendChild(
                     new WidgetModule<TitleValueItem>("osName", tr("OS Name"), this, &SystemInfoModule::initOSNameModule));
             sysInfoGroup->appendChild(
@@ -89,8 +89,8 @@ void SystemInfoModule::initChildModule()
             new WidgetModule<TitleValueItem>("edition", tr("Edition"), this, &SystemInfoModule::initEditionModule));
     sysInfoGroup->appendChild(
             new WidgetModule<TitleValueItem>("type", tr("Type"), this, &SystemInfoModule::initTypeModule));
-    if (!(IS_COMMUNITY_SYSTEM || DSysInfo::UosEditionUnknown == DSysInfo::uosEditionType())
-        && DSysInfo::uosEditionType() != DSysInfo::UosEnterpriseC) {
+    if (!(IS_COMMUNITY_SYSTEM || LSysInfo::UosEditionUnknown == LSysInfo::uosEditionType())
+        && LSysInfo::uosEditionType() != LSysInfo::UosEnterpriseC) {
         sysInfoGroup->appendChild(
                 new WidgetModule<TitleAuthorizedItem>("authorization", tr("Authorization"), this, &SystemInfoModule::initAuthorizationModule));
     }
@@ -126,7 +126,7 @@ void SystemInfoModule::initChildModule()
 }
 
 static bool useLingmoCopyright () {
-    static bool useLingmoCopyright = DSysInfo::productType() != DSysInfo::ProductType::Uos;
+    static bool useLingmoCopyright = LSysInfo::productType() != LSysInfo::ProductType::Uos;
     return useLingmoCopyright;
 }
 
@@ -154,7 +154,7 @@ void SystemInfoModule::initLogoModule(LogoItem *item)
 {
     item->setDescription(true);              // 显示文字描述
     item->setDescription(systemCopyright()); // LogoItem构造函数: set the discription visible=false
-    item->setLogo(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Normal));
+    item->setLogo(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Normal));
 }
 
 void SystemInfoModule::initHostnameModule(HostNameItem *item)

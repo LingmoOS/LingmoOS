@@ -13,7 +13,7 @@
 
 DCORE_USE_NAMESPACE
 
-class ut_DSysInfo : public testing::Test
+class ut_LSysInfo : public testing::Test
 {
 protected:
     void SetUp() override {
@@ -26,7 +26,7 @@ protected:
     }
 };
 
-TEST_F(ut_DSysInfo, testOsVersion)
+TEST_F(ut_LSysInfo, testOsVersion)
 {
     FileGuard guard("/tmp/etc/os-version");
     DDesktopEntry entry(guard.fileName());
@@ -41,65 +41,65 @@ TEST_F(ut_DSysInfo, testOsVersion)
     entry.setStringValue("11Z18.107.109", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
 
-    ASSERT_TRUE(DSysInfo::uosSystemName(QLocale("C")) == "UnionTech OS Desktop");
-    ASSERT_TRUE(DSysInfo::uosSystemName(QLocale("zh_CN")) == "统信桌面操作系统");
-    ASSERT_TRUE(DSysInfo::uosProductTypeName(QLocale("zh_CN")) == "桌面");
-    ASSERT_TRUE(DSysInfo::uosProductTypeName(QLocale("C")) == "Desktop");
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("zh_CN")) == "专业版");
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("C")) == "Professional");
-    ASSERT_TRUE(DSysInfo::majorVersion() == "20");
-    ASSERT_TRUE(DSysInfo::minorVersion() == "100A");
-    ASSERT_TRUE(DSysInfo::buildVersion() == "107.109");
+    ASSERT_TRUE(LSysInfo::uosSystemName(QLocale("C")) == "UnionTech OS Desktop");
+    ASSERT_TRUE(LSysInfo::uosSystemName(QLocale("zh_CN")) == "统信桌面操作系统");
+    ASSERT_TRUE(LSysInfo::uosProductTypeName(QLocale("zh_CN")) == "桌面");
+    ASSERT_TRUE(LSysInfo::uosProductTypeName(QLocale("C")) == "Desktop");
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("zh_CN")) == "专业版");
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("C")) == "Professional");
+    ASSERT_TRUE(LSysInfo::majorVersion() == "20");
+    ASSERT_TRUE(LSysInfo::minorVersion() == "100A");
+    ASSERT_TRUE(LSysInfo::buildVersion() == "107.109");
 
     // test minVersion.BC SP1….SP99
     for (int i = 0; i < 3; ++i) {
         int sp = QRandomGenerator::global()->generate() % 100;
         entry.setStringValue(QString("%1").arg(1001 + sp * 10), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::spVersion() == (sp ? QString("SP%1").arg(sp) : QString()));
+        ASSERT_TRUE(LSysInfo::spVersion() == (sp ? QString("SP%1").arg(sp) : QString()));
     }
 
     // test minVersion.D udpate1~udpate9 updateA~udpateZ
     for (int i = 0; i < 10; ++i) {
         entry.setStringValue(QString("%1").arg(1000 + i), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::udpateVersion() == (i ? QString("update%1").arg(i) : QString()));
+        ASSERT_TRUE(LSysInfo::udpateVersion() == (i ? QString("update%1").arg(i) : QString()));
     }
 
     for (char c = 'A'; c <= 'Z'; ++c) {
         entry.setStringValue(QString("100").append(c), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::udpateVersion() == QString("update%1").arg(c));
+        ASSERT_TRUE(LSysInfo::udpateVersion() == QString("update%1").arg(c));
     }
 
     // test incalide MinorVersion
     entry.setStringValue(QString("100?"), "MinorVersion", "Version");
     ASSERT_TRUE(entry.save());
-    ASSERT_TRUE(DSysInfo::udpateVersion() == QString());
+    ASSERT_TRUE(LSysInfo::udpateVersion() == QString());
     // restore MinorVersion
     entry.setStringValue(QString("1000"), "MinorVersion", "Version");
     ASSERT_TRUE(entry.save());
 
     // test OsBuild.B == 1 && OsBuild.D = [1, 6]
-    ASSERT_TRUE(DSysInfo::uosType() == DSysInfo::UosDesktop);
+    ASSERT_TRUE(LSysInfo::uosType() == LSysInfo::UosDesktop);
     for (int i = 1; i <= 6; ++i) {
         entry.setStringValue(QString("%1").arg(11008.107 + i * 10), "OsBuild", "Version");
         ASSERT_TRUE(entry.save());
         switch (i) {
         case 1:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosProfessional);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosProfessional);
             break;
         case 2:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosHome);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosHome);
             break;
         case 4:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosMilitary);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosMilitary);
             break;
         case 5:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosDeviceEdition);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosDeviceEdition);
             break;
         case 6:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosEducation);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosEducation);
             break;
         default:
             break;
@@ -109,25 +109,25 @@ TEST_F(ut_DSysInfo, testOsVersion)
     // test OsBuild.B == 2 && OsBuild.D = [1, 5]
     entry.setStringValue("12018.107", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
-    ASSERT_TRUE(DSysInfo::uosType() == DSysInfo::UosServer);
+    ASSERT_TRUE(LSysInfo::uosType() == LSysInfo::UosServer);
     for (int i = 1; i <= 5; ++i) {
         entry.setStringValue(QString("%1").arg(12008.107 + i * 10), "OsBuild", "Version");
         ASSERT_TRUE(entry.save());
         switch (i) {
         case 1:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosEnterprise);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosEnterprise);
             break;
         case 2:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosEnterpriseC);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosEnterpriseC);
             break;
         case 3:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosEuler);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosEuler);
             break;
         case 4:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosMilitaryS);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosMilitaryS);
             break;
         case 5:
-            ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosDeviceEdition);
+            ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosDeviceEdition);
             break;
         default:
             break;
@@ -137,13 +137,13 @@ TEST_F(ut_DSysInfo, testOsVersion)
     // test OsBuild.B == 3
     entry.setStringValue("13018.107", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
-    ASSERT_TRUE(DSysInfo::uosType() == DSysInfo::UosDevice);
-    ASSERT_TRUE(DSysInfo::uosEditionType() == DSysInfo::UosEnterprise);
+    ASSERT_TRUE(LSysInfo::uosType() == LSysInfo::UosDevice);
+    ASSERT_TRUE(LSysInfo::uosEditionType() == LSysInfo::UosEnterprise);
 
     // test invalid OsBuild.B
     entry.setStringValue("10018.107", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
-    ASSERT_TRUE(DSysInfo::uosType() == DSysInfo::UosTypeUnknown);
+    ASSERT_TRUE(LSysInfo::uosType() == LSysInfo::UosTypeUnknown);
 
     // 社区版测试
     entry.setStringValue("Community", "EditionName", "Version");
@@ -152,24 +152,24 @@ TEST_F(ut_DSysInfo, testOsVersion)
     entry.setStringValue("11038.107", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
 
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("zh_CN")) == "社区版");
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("C")) == "Community");
-    ASSERT_TRUE(DSysInfo::minorVersion() == "21.1.2");
-    ASSERT_TRUE(DSysInfo::buildVersion() == "107");
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("zh_CN")) == "社区版");
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("C")) == "Community");
+    ASSERT_TRUE(LSysInfo::minorVersion() == "21.1.2");
+    ASSERT_TRUE(LSysInfo::buildVersion() == "107");
 
     //社区版A_BC_D模式 test minVersion.BC SP1….SP99
     for (int i = 0; i < 3; ++i) {
         int sp = QRandomGenerator::global()->generate() % 100;
         entry.setStringValue(QString("%1").arg(1001 + sp * 10), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::spVersion() == (sp ? QString("SP%1").arg(sp) : QString()));
+        ASSERT_TRUE(LSysInfo::spVersion() == (sp ? QString("SP%1").arg(sp) : QString()));
     }
 
     //社区版A_BC_D模式 test minVersion.D udpate1~udpate9 updateA~udpateZ
     for (int i = 0; i < 10; ++i) {
         entry.setStringValue(QString("%1").arg(1000 + i), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::udpateVersion() == (i ? QString("update%1").arg(i) : QString()));
+        ASSERT_TRUE(LSysInfo::udpateVersion() == (i ? QString("update%1").arg(i) : QString()));
     }
 
     auto dmax = [](int x, int y){
@@ -181,7 +181,7 @@ TEST_F(ut_DSysInfo, testOsVersion)
         int sp = dmax(QRandomGenerator::global()->generate() % 100, 1);
         entry.setStringValue(defalutSP.arg(sp), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::spVersion() == QString("SP%1").arg(sp));
+        ASSERT_TRUE(LSysInfo::spVersion() == QString("SP%1").arg(sp));
     }
 
     //社区版A_B_C模式 test minVersion.D udpate1~udpate9 updateA~udpateZ
@@ -190,7 +190,7 @@ TEST_F(ut_DSysInfo, testOsVersion)
         int sp = dmax(QRandomGenerator::global()->generate() % 100, 1);
         entry.setStringValue(defalutUpdate.arg(sp), "MinorVersion", "Version");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::udpateVersion() == QString("update%1").arg(sp));
+        ASSERT_TRUE(LSysInfo::udpateVersion() == QString("update%1").arg(sp));
     }
 
     // 家庭版测试
@@ -200,15 +200,15 @@ TEST_F(ut_DSysInfo, testOsVersion)
     entry.setStringValue("11078.107", "OsBuild", "Version");
     ASSERT_TRUE(entry.save());
 
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("zh_CN")) == "家庭版");
-    ASSERT_TRUE(DSysInfo::uosEditionName(QLocale("C")) == "Home");
-    ASSERT_TRUE(DSysInfo::minorVersion() == "21.0");
-    ASSERT_TRUE(DSysInfo::buildVersion() == "107");
-    ASSERT_TRUE(DSysInfo::spVersion() == QStringLiteral(""));
-    ASSERT_TRUE(DSysInfo::udpateVersion() == QStringLiteral(""));
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("zh_CN")) == "家庭版");
+    ASSERT_TRUE(LSysInfo::uosEditionName(QLocale("C")) == "Home");
+    ASSERT_TRUE(LSysInfo::minorVersion() == "21.0");
+    ASSERT_TRUE(LSysInfo::buildVersion() == "107");
+    ASSERT_TRUE(LSysInfo::spVersion() == QStringLiteral(""));
+    ASSERT_TRUE(LSysInfo::udpateVersion() == QStringLiteral(""));
 }
 
-TEST_F(ut_DSysInfo, testdistributionInfo)
+TEST_F(ut_LSysInfo, testdistributionInfo)
 {
     FileGuard fg("/tmp/share/lingmo/distribution.info");
     DDesktopEntry entry(fg.fileName());
@@ -225,23 +225,23 @@ TEST_F(ut_DSysInfo, testdistributionInfo)
 
     EnvGuard guard;
     guard.set("XDG_DATA_HOME", "/tmp/share");
-    ASSERT_EQ(DSysInfo::distributionInfoPath(), fg.fileName());
-    auto website = DSysInfo::distributionOrgWebsite();
+    ASSERT_EQ(LSysInfo::distributionInfoPath(), fg.fileName());
+    auto website = LSysInfo::distributionOrgWebsite();
     ASSERT_EQ(website.first, "www.lingmo.org");
     ASSERT_EQ(website.second, "https://www.lingmo.org");
-    ASSERT_EQ(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Normal), "Logo.svg");
-    ASSERT_EQ(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Light), "LogoLight.svg");
-    ASSERT_EQ(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Symbolic), ""); // not set
-    ASSERT_EQ(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Transparent), "LogoTransparent.svg");
+    ASSERT_EQ(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Normal), "Logo.svg");
+    ASSERT_EQ(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Light), "LogoLight.svg");
+    ASSERT_EQ(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Symbolic), ""); // not set
+    ASSERT_EQ(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Transparent), "LogoTransparent.svg");
 
-    ASSERT_EQ(DSysInfo::distributionOrgName(DSysInfo::Distribution), "Lingmo");
-    ASSERT_EQ(DSysInfo::distributionOrgName(DSysInfo::Distributor), "Lingmo-Distributor");
-    ASSERT_EQ(DSysInfo::distributionOrgName(DSysInfo::Manufacturer), "Lingmo-Manufacturer");
+    ASSERT_EQ(LSysInfo::distributionOrgName(LSysInfo::Distribution), "Lingmo");
+    ASSERT_EQ(LSysInfo::distributionOrgName(LSysInfo::Distributor), "Lingmo-Distributor");
+    ASSERT_EQ(LSysInfo::distributionOrgName(LSysInfo::Manufacturer), "Lingmo-Manufacturer");
 
     guard.restore();
 }
 
-TEST_F(ut_DSysInfo, osRelease)
+TEST_F(ut_LSysInfo, osRelease)
 {
     FileGuard fg("/tmp/etc/os-release");
     DDesktopEntry entry(fg.fileName());
@@ -250,32 +250,32 @@ TEST_F(ut_DSysInfo, osRelease)
     entry.setStringValue("Lingmo 20.9", "PRETTY_NAME", "Release");
     ASSERT_TRUE(entry.save());
 
-    ASSERT_EQ(DSysInfo::operatingSystemName(), "Lingmo 20.9");
-    ASSERT_EQ(DSysInfo::productType(), DSysInfo::Lingmo);
-    ASSERT_EQ(DSysInfo::productTypeString(), "Lingmo");
-    ASSERT_EQ(DSysInfo::productVersion(), "20.9");
+    ASSERT_EQ(LSysInfo::operatingSystemName(), "Lingmo 20.9");
+    ASSERT_EQ(LSysInfo::productType(), LSysInfo::Lingmo);
+    ASSERT_EQ(LSysInfo::productTypeString(), "Lingmo");
+    ASSERT_EQ(LSysInfo::productVersion(), "20.9");
 
     // isLingmo
-    ASSERT_TRUE(DSysInfo::isLingmo());
+    ASSERT_TRUE(LSysInfo::isLingmo());
     entry.setStringValue("Uos", "ID", "Release");
     ASSERT_TRUE(entry.save());
-    ASSERT_TRUE(DSysInfo::isLingmo());
+    ASSERT_TRUE(LSysInfo::isLingmo());
 
     entry.setStringValue("arch", "ID", "Release");
     ASSERT_TRUE(entry.save());
-    ASSERT_FALSE(DSysInfo::isLingmo());
+    ASSERT_FALSE(LSysInfo::isLingmo());
 
     QString types[] = {"UnknownType", "Lingmo", "Arch", "CentOS", "Debian",
                        "Fedora", "LinuxMint", "Manjaro", "openSUSE","SailfishOS",
                        "Ubuntu", "Uos", "Gentoo", "NixOS"};
-    for (int i = DSysInfo::UnknownType; i <= DSysInfo::NixOS; ++i) {
+    for (int i = LSysInfo::UnknownType; i <= LSysInfo::NixOS; ++i) {
         entry.setStringValue(types[i], "ID", "Release");
         ASSERT_TRUE(entry.save());
-        ASSERT_EQ(DSysInfo::productType(), DSysInfo::ProductType(i));
+        ASSERT_EQ(LSysInfo::productType(), LSysInfo::ProductType(i));
     }
 }
 
-TEST_F(ut_DSysInfo, isOCEAN)
+TEST_F(ut_LSysInfo, isOCEAN)
 {
     FileGuard fg("/tmp/etc/os-release");
     DDesktopEntry entry(fg.fileName());
@@ -291,38 +291,38 @@ TEST_F(ut_DSysInfo, isOCEAN)
     ASSERT_TRUE(entry2.save());
 
     // isLingmo && lingmoType valid
-    ASSERT_TRUE(DSysInfo::isLingmo());
-    ASSERT_TRUE(DSysInfo::isOCEAN());
+    ASSERT_TRUE(LSysInfo::isLingmo());
+    ASSERT_TRUE(LSysInfo::isOCEAN());
 
     // isLingmo but lingmoType unknow
     entry2.setStringValue("Unknown", "Type", "Release");
     ASSERT_TRUE(entry2.save());
-    ASSERT_TRUE(DSysInfo::isLingmo());
-    ASSERT_FALSE(DSysInfo::isOCEAN());
+    ASSERT_TRUE(LSysInfo::isLingmo());
+    ASSERT_FALSE(LSysInfo::isOCEAN());
 
     // !isLingmo && XDG_SESSION_DESKTOP == ocean or lingmo
     {
         entry.setStringValue("Unknown", "ID", "Release");
         ASSERT_TRUE(entry.save());
-        ASSERT_FALSE(DSysInfo::isLingmo());
+        ASSERT_FALSE(LSysInfo::isLingmo());
         EnvGuard guard;
 
         guard.set("XDG_SESSION_DESKTOP", "ocean");
-        ASSERT_TRUE(DSysInfo::isOCEAN());
+        ASSERT_TRUE(LSysInfo::isOCEAN());
         guard.restore();
 
         guard.set("XDG_SESSION_DESKTOP", "lingmo");
-        ASSERT_TRUE(DSysInfo::isOCEAN());
+        ASSERT_TRUE(LSysInfo::isOCEAN());
         guard.restore();
 
         guard.set("XDG_SESSION_DESKTOP", "Unknown");
-        ASSERT_FALSE(DSysInfo::isOCEAN());
+        ASSERT_FALSE(LSysInfo::isOCEAN());
         guard.restore();
     }
 
 }
 
-TEST_F(ut_DSysInfo, lingmoVersion)
+TEST_F(ut_LSysInfo, lingmoVersion)
 {
     FileGuard fg("/tmp/etc/lingmo-version");
     DDesktopEntry entry(fg.fileName());
@@ -335,47 +335,47 @@ TEST_F(ut_DSysInfo, lingmoVersion)
     //entry.setStringValue("", "Milestone", "Addition");
     ASSERT_TRUE(entry.save());
 
-    ASSERT_EQ(DSysInfo::lingmoTypeDisplayName(QLocale("C")), "Desktop");
-    ASSERT_EQ(DSysInfo::lingmoTypeDisplayName(QLocale("zh_CN")), "社区版");
-    ASSERT_EQ(DSysInfo::lingmoVersion(), "20.9");
-    ASSERT_EQ(DSysInfo::lingmoEdition(), "Y2020E0001");
-    ASSERT_EQ(DSysInfo::lingmoCopyright(), "Y2020CR001");
+    ASSERT_EQ(LSysInfo::lingmoTypeDisplayName(QLocale("C")), "Desktop");
+    ASSERT_EQ(LSysInfo::lingmoTypeDisplayName(QLocale("zh_CN")), "社区版");
+    ASSERT_EQ(LSysInfo::lingmoVersion(), "20.9");
+    ASSERT_EQ(LSysInfo::lingmoEdition(), "Y2020E0001");
+    ASSERT_EQ(LSysInfo::lingmoCopyright(), "Y2020CR001");
 
-    qInfo() << "DSysInfo::lingmoType()" << DSysInfo::lingmoType();
-    ASSERT_EQ(DSysInfo::lingmoType(), DSysInfo::LingmoDesktop);
+    qInfo() << "LSysInfo::lingmoType()" << LSysInfo::lingmoType();
+    ASSERT_EQ(LSysInfo::lingmoType(), LSysInfo::LingmoDesktop);
     {
         // isCommunityEdition Not Uos
         FileGuard fg("/tmp/etc/os-release");
         DDesktopEntry entry(fg.fileName());
         entry.setStringValue("Lingmo", "ID", "Release");
         ASSERT_TRUE(entry.save());
-        ASSERT_TRUE(DSysInfo::isCommunityEdition());
+        ASSERT_TRUE(LSysInfo::isCommunityEdition());
 
         entry.setStringValue("Uos", "ID", "Release");
         ASSERT_TRUE(entry.save());
-        ASSERT_FALSE(DSysInfo::isCommunityEdition());
+        ASSERT_FALSE(LSysInfo::isCommunityEdition());
     }
 
     entry.setStringValue("Professional", "Type", "Release");
     ASSERT_TRUE(entry.save());
-    ASSERT_EQ(DSysInfo::lingmoType(), DSysInfo::LingmoProfessional);
-    ASSERT_FALSE(DSysInfo::isCommunityEdition());
+    ASSERT_EQ(LSysInfo::lingmoType(), LSysInfo::LingmoProfessional);
+    ASSERT_FALSE(LSysInfo::isCommunityEdition());
 
     entry.setStringValue("Server", "Type", "Release");
     ASSERT_TRUE(entry.save());
-    ASSERT_EQ(DSysInfo::lingmoType(), DSysInfo::LingmoServer);
-    ASSERT_FALSE(DSysInfo::isCommunityEdition());
+    ASSERT_EQ(LSysInfo::lingmoType(), LSysInfo::LingmoServer);
+    ASSERT_FALSE(LSysInfo::isCommunityEdition());
 
     entry.setStringValue("Personal", "Type", "Release");
     ASSERT_TRUE(entry.save());
-    ASSERT_EQ(DSysInfo::lingmoType(), DSysInfo::LingmoPersonal);
-    ASSERT_FALSE(DSysInfo::isCommunityEdition());
+    ASSERT_EQ(LSysInfo::lingmoType(), LSysInfo::LingmoPersonal);
+    ASSERT_FALSE(LSysInfo::isCommunityEdition());
 }
 
-TEST_F(ut_DSysInfo, other)
+TEST_F(ut_LSysInfo, other)
 {
-    qDebug() << DSysInfo::computerName();
-    qDebug() << DSysInfo::memoryInstalledSize();
-    qDebug() << DSysInfo::memoryTotalSize();
-    qDebug() << DSysInfo::systemDiskSize();
+    qDebug() << LSysInfo::computerName();
+    qDebug() << LSysInfo::memoryInstalledSize();
+    qDebug() << LSysInfo::memoryTotalSize();
+    qDebug() << LSysInfo::systemDiskSize();
 }

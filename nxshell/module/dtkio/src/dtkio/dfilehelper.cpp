@@ -133,7 +133,7 @@ std::map<AttributeID, AttributeDetails> attributeDetailsMap()
 {
     static std::map<AttributeID, AttributeDetails> map = {
         { AttributeID::StandardType, { .id = AttributeID::StandardType, .key = "standard::type", .defaultValue = 0, .type = AttributeType::TypeUInt32 } },
-        { AttributeID::StandardIsHioceann, { .id = AttributeID::StandardIsHioceann, .key = "standard::is-hioceann", .defaultValue = false, .type = AttributeType::TypeBool } },
+        { AttributeID::StandardIsHidden, { .id = AttributeID::StandardIsHidden, .key = "standard::is-hioceann", .defaultValue = false, .type = AttributeType::TypeBool } },
         { AttributeID::StandardIsBackup, { .id = AttributeID::StandardIsBackup, .key = "standard::is-backup", .defaultValue = false, .type = AttributeType::TypeBool } },
         { AttributeID::StandardIsSymlink, { .id = AttributeID::StandardIsSymlink, .key = "standard::is-symlink", .defaultValue = false, .type = AttributeType::TypeBool } },
         { AttributeID::StandardIsVirtual, { .id = AttributeID::StandardIsVirtual, .key = "standard::is-virtual", .defaultValue = false, .type = AttributeType::TypeBool } },
@@ -426,7 +426,7 @@ QSet<QString> hideListFromUrl(const QUrl &url)
     return {};
 }
 
-bool fileIsHioceann(const DFileInfo *dfileinfo, const QSet<QString> &hideList)
+bool fileIsHidden(const DFileInfo *dfileinfo, const QSet<QString> &hideList)
 {
     if (!dfileinfo)
         return false;

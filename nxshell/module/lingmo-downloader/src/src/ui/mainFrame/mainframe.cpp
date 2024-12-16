@@ -143,11 +143,11 @@ void MainFrame::init()
 
     m_DownLoadingTableView = new TableView(tableviewFlag::downloading);
     m_DownLoadingTableView->setObjectName("downloadTableView");
-    m_DownLoadingTableView->setColumnHioceann(4, true);
+    m_DownLoadingTableView->setColumnHidden(4, true);
 
     m_RecycleTableView = new TableView(tableviewFlag::recycle);
     m_RecycleTableView->setObjectName("recycleTableView");
-    m_RecycleTableView->setColumnHioceann(3, true);
+    m_RecycleTableView->setColumnHidden(3, true);
     m_DownLoadingTableView->getTableControl()->setRecycleTable(m_RecycleTableView);
     m_LeftWidget = new QWidget;
     m_LeftWidget->setAutoFillBackground(true);
@@ -562,7 +562,7 @@ void MainFrame::createNewTask(QString url)
         activateWindow();
         setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 
-        if (isHioceann()) {
+        if (isHidden()) {
             Dtk::Widget::moveToCenter(this);
             show();
         }
@@ -572,7 +572,7 @@ void MainFrame::createNewTask(QString url)
         m_TaskWidget->showNetErrorMsg();
         return;
     }
-    if (m_TaskWidget->isHioceann()) {
+    if (m_TaskWidget->isHidden()) {
         m_TaskWidget->move(pos().x() + this->width() / 2 - m_TaskWidget->width() / 2,
                            pos().y() + this->height() / 2 - 575 / 2);
     }
@@ -2930,7 +2930,7 @@ bool MainFrame::isAutoStart()
     QString str;
     while (!data.atEnd()) {
         str = data.readLine();
-        if (str.contains("Hioceann=")) {
+        if (str.contains("Hidden=")) {
             QStringList list = str.split('=');
             readFile.close();
             if (list[1] == "false") {
@@ -2958,11 +2958,11 @@ void MainFrame::setAutoStart(bool ret)
     readFile.close();
 
     for (int i = 0; i < list.size(); i++) {
-        if (list[i].contains("Hioceann=")) {
+        if (list[i].contains("Hidden=")) {
             if (ret) {
-                list[i] = "Hioceann=false";
+                list[i] = "Hidden=false";
             } else {
-                list[i] = "Hioceann=true";
+                list[i] = "Hidden=true";
             }
         }
     }

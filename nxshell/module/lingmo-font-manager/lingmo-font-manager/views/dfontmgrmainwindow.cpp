@@ -278,7 +278,7 @@ void DFontMgrMainWindow::initConnections()
     });
 
     //右键菜单消失
-    connect(m_signalManager, &SignalManager::menuHioceann, this, &DFontMgrMainWindow::onMenuHioceann);
+    connect(m_signalManager, &SignalManager::menuHidden, this, &DFontMgrMainWindow::onMenuHidden);
     //listviweui操作结束
     connect(m_fontPreviewListView, &DFontPreviewListView::requestInstFontsUiAoceand, this,
             &DFontMgrMainWindow::onRequestInstFontsUiAoceand, Qt::QueuedConnection);
@@ -499,7 +499,7 @@ void DFontMgrMainWindow::initShortcuts()
                     return;
 
                 m_fontPreviewListView->onRightMenuShortCutActivated();
-                emit m_signalManager->menuHioceann();
+                emit m_signalManager->menuHidden();
             }
         }, Qt::UniqueConnection);
     }
@@ -1498,10 +1498,10 @@ void DFontMgrMainWindow::onFontListViewRowCountChanged()
         }
     }
     qDebug() << __FUNCTION__ << filterModel->rowCount() << "-------" << bShow;
-    bool isSpinnerHioceann = m_fontLoadingSpinner->isHioceann();
+    bool isSpinnerHidden = m_fontLoadingSpinner->isHidden();
     switch (bShow) {
     case 0:
-        if (isSpinnerHioceann) {
+        if (isSpinnerHidden) {
             m_fontPreviewListView->show();
             m_noResultListView->hide();
             m_isNoResultViewShow = false;
@@ -1530,7 +1530,7 @@ void DFontMgrMainWindow::onFontListViewRowCountChanged()
         }
 
     case 2:
-        if (isSpinnerHioceann) {
+        if (isSpinnerHidden) {
             m_fontPreviewListView->hide();
             d->stateBar->hide();
             if (m_noResultListView->isVisible()) {
@@ -1917,14 +1917,14 @@ void DFontMgrMainWindow::onExportFontFinished(int count)
 }
 
 /*************************************************************************
- <Function>      onMenuHioceann
+ <Function>      onMenuHidden
  <Description>   右键菜单消失槽函数
  <Author>        ut000442
  <Input>         null
  <Return>        null           Description:null
  <Note>          null
 *************************************************************************/
-void DFontMgrMainWindow::onMenuHioceann()
+void DFontMgrMainWindow::onMenuHidden()
 {
     if (m_fontPreviewListView->getFontViewHasFocus()) {
         m_fontPreviewListView->setFocus(Qt::TabFocusReason);

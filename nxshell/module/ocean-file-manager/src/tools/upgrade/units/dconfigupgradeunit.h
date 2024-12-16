@@ -25,7 +25,7 @@ private:
     bool upgradeSmbConfigs();
     bool upgradeRecentConfigs();
     bool upgradeSearchConfigs();
-    void clearDiskHioceann();
+    void clearDiskHidden();
     void addOldGenericSettings();
     bool checkOldGeneric(const QString &key);
 

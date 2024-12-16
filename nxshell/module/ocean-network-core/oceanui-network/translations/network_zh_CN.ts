@@ -1681,7 +1681,7 @@
     </message>
 </context>
 <context>
-    <name>ocean::network::NetWirelessHioceannItem</name>
+    <name>ocean::network::NetWirelessHiddenItem</name>
     <message>
         <source>Connect to hioceann network</source>
         <translation>连接到隐藏网络</translation>

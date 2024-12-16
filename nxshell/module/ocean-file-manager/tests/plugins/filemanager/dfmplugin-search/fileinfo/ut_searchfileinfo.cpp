@@ -15,10 +15,10 @@ TEST(SearchFileInfoTest, ut_exists)
     EXPECT_TRUE(info.exists());
 }
 
-TEST(SearchFileInfoTest, ut_isHioceann)
+TEST(SearchFileInfoTest, ut_isHidden)
 {
     SearchFileInfo info(SearchHelper::rootUrl());
-    EXPECT_FALSE(info.isAttributes(OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info.isAttributes(OptInfoType::kIsHidden));
 }
 
 TEST(SearchFileInfoTest, ut_isReadable)

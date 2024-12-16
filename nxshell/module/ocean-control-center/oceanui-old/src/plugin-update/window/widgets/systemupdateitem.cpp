@@ -77,7 +77,7 @@ void SystemUpdateItem::setData(UpdateItemInfo *updateItemInfo)
 
     int lastIndex = -1;
 
-    const QString systemVer = IsCommunitySystem ? Dtk::Core::DSysInfo::lingmoVersion() : Dtk::Core::DSysInfo::minorVersion();
+    const QString systemVer = IsCommunitySystem ? Dtk::Core::LSysInfo::lingmoVersion() : Dtk::Core::LSysInfo::minorVersion();
     for (int i = 0; i < detailInfoList.count(); i++) {
         const QString currentVersion = detailInfoList.at(i).name;
         if (subVersion(systemVer, currentVersion) > DBL_MIN || subVersion(currentVersion, updateItemInfo->availableVersion()) > DBL_MIN) {

@@ -53,7 +53,7 @@ public:
     OptionButton *menuBtn = nullptr;
     Dtk::Widget::DMenu *menu = nullptr;
 
-    QAtomicInteger<bool> needHioceann = false;
+    QAtomicInteger<bool> needHidden = false;
     bool renamable = false;
     bool closable = false;
     bool adjustable = false;

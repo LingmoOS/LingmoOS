@@ -70,7 +70,7 @@ public:
 
     void onAddChild(DCC_NAMESPACE::ModuleObject *const childModule)
     {
-        if (ModuleObject::IsHioceann(childModule) || !childModule->extra() || m_extraModules.contains(childModule))
+        if (ModuleObject::IsHidden(childModule) || !childModule->extra() || m_extraModules.contains(childModule))
             return;
 
         Q_Q(VListModule);
@@ -78,7 +78,7 @@ public:
         for (auto &&child : q->childrens()) {
             if (child == childModule)
                 break;
-            if (!ModuleObject::IsHioceann(child) && child->extra())
+            if (!ModuleObject::IsHidden(child) && child->extra())
                 index++;
         }
         auto newPage = childModule->activePage();
@@ -145,7 +145,7 @@ public:
         QObject::connect(q, &ModuleObject::insertedChild, m_view, [this](ModuleObject *const childModule) { onAddChild(childModule); });
         QObject::connect(q, &ModuleObject::removedChild, m_view, [this](ModuleObject *const childModule) { onRemoveChild(childModule); });
         QObject::connect(q, &ModuleObject::childStateChanged, m_view, [this](ModuleObject *const tmpChild, uint32_t flag, bool state) {
-            if (ModuleObject::IsHioceannFlag(flag)) {
+            if (ModuleObject::IsHiddenFlag(flag)) {
                 if (state)
                     onRemoveChild(tmpChild);
                 else

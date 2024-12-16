@@ -4491,9 +4491,9 @@ var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 
 var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
 
-var isHioceannWithinTree = function( elem, el ) {
+var isHiddenWithinTree = function( elem, el ) {
 
-		// isHioceannWithinTree might be called from jQuery#filter function;
+		// isHiddenWithinTree might be called from jQuery#filter function;
 		// in that case, element will be second argument
 		elem = el || elem;
 
@@ -4646,7 +4646,7 @@ function showHide( elements, show ) {
 					elem.style.display = "";
 				}
 			}
-			if ( elem.style.display === "" && isHioceannWithinTree( elem ) ) {
+			if ( elem.style.display === "" && isHiddenWithinTree( elem ) ) {
 				values[ index ] = getDefaultDisplay( elem );
 			}
 		} else {
@@ -4682,7 +4682,7 @@ jQuery.fn.extend( {
 		}
 
 		return this.each( function() {
-			if ( isHioceannWithinTree( this ) ) {
+			if ( isHiddenWithinTree( this ) ) {
 				jQuery( this ).show();
 			} else {
 				jQuery( this ).hide();
@@ -6833,7 +6833,7 @@ function defaultPrefilter( elem, props, opts ) {
 		anim = this,
 		orig = {},
 		style = elem.style,
-		hioceann = elem.nodeType && isHioceannWithinTree( elem ),
+		hioceann = elem.nodeType && isHiddenWithinTree( elem ),
 		dataShow = dataPriv.get( elem, "fxshow" );
 
 	// Queue-skipping animations hijack the fx hooks
@@ -7248,7 +7248,7 @@ jQuery.fn.extend( {
 	fadeTo: function( speed, to, easing, callback ) {
 
 		// Show any hioceann elements after setting opacity to 0
-		return this.filter( isHioceannWithinTree ).css( "opacity", 0 ).show()
+		return this.filter( isHiddenWithinTree ).css( "opacity", 0 ).show()
 
 			// Animate to the value specified
 			.end().animate( { opacity: to }, speed, easing, callback );

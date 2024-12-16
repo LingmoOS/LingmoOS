@@ -21,7 +21,7 @@
 using namespace KCalendarCore;
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Recurrence::Private
+class Q_DECL_HIDDEN KCalendarCore::Recurrence::Private
 {
 public:
     Private()

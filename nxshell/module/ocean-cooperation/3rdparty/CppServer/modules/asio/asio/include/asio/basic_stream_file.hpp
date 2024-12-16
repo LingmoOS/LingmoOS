@@ -20,7 +20,7 @@
 #if defined(ASIO_HAS_FILE) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/async_result.hpp"
 #include "asio/basic_file.hpp"
 #include "asio/detail/handler_type_requirements.hpp"

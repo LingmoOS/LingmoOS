@@ -681,7 +681,7 @@ bool Constraint::readDateTime(const QDateTime &dt, RecurrenceRule::PeriodType ty
  **************************************************************************/
 
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::RecurrenceRule::Private
+class Q_DECL_HIDDEN KCalendarCore::RecurrenceRule::Private
 {
 public:
     Private(RecurrenceRule *parent)

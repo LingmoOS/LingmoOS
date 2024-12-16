@@ -104,7 +104,7 @@ void DefSecurityToolsFrontUnit::setToolsInfo(const DEFSECURITYTOOLINFO &info)
     }
 
     if (info.bSystemTool) {
-        m_pUnInstallBtn->setHioceann(true);
+        m_pUnInstallBtn->setHidden(true);
     }
 }
 
@@ -114,27 +114,27 @@ void DefSecurityToolsFrontUnit::setAppStatus(DEFSECURITYTOOLSTATUS status)
 
     switch (m_status) {
     case UNINSTALLED:
-        m_pOpenBtn->setHioceann(true);
-        m_pUpdateBtn->setHioceann(true);
-        m_pUnInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(true);
+        m_pOpenBtn->setHidden(true);
+        m_pUpdateBtn->setHidden(true);
+        m_pUnInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(true);
         m_pSpinner->stop();
-        m_pInstallBtn->setHioceann(false);
+        m_pInstallBtn->setHidden(false);
         break;
     case INSTALLING:
-        m_pOpenBtn->setHioceann(true);
-        m_pUpdateBtn->setHioceann(true);
-        m_pUnInstallBtn->setHioceann(true);
-        m_pInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(false);
+        m_pOpenBtn->setHidden(true);
+        m_pUpdateBtn->setHidden(true);
+        m_pUnInstallBtn->setHidden(true);
+        m_pInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(false);
         m_pSpinner->start();
         break;
     case INSTALLED:
-        m_pOpenBtn->setHioceann(false);
-        m_pUpdateBtn->setHioceann(true);
-        m_pUnInstallBtn->setHioceann(false);
-        m_pInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(true);
+        m_pOpenBtn->setHidden(false);
+        m_pUpdateBtn->setHidden(true);
+        m_pUnInstallBtn->setHidden(false);
+        m_pInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(true);
         m_pSpinner->stop();
         break;
     case INSTALLFAILED:
@@ -145,18 +145,18 @@ void DefSecurityToolsFrontUnit::setAppStatus(DEFSECURITYTOOLSTATUS status)
         setAppStatus(DEFSECURITYTOOLSTATUS::INSTALLED);
         break;
     case WAITFORUPDATE:
-        m_pOpenBtn->setHioceann(true);
-        m_pUpdateBtn->setHioceann(false);
-        m_pUnInstallBtn->setHioceann(false);
-        m_pInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(true);
+        m_pOpenBtn->setHidden(true);
+        m_pUpdateBtn->setHidden(false);
+        m_pUnInstallBtn->setHidden(false);
+        m_pInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(true);
         break;
     case UPDATING:
-        m_pOpenBtn->setHioceann(true);
-        m_pUpdateBtn->setHioceann(true);
-        m_pUnInstallBtn->setHioceann(true);
-        m_pInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(false);
+        m_pOpenBtn->setHidden(true);
+        m_pUpdateBtn->setHidden(true);
+        m_pUnInstallBtn->setHidden(true);
+        m_pInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(false);
         break;
     case UPDATEFAIL:
         reportStatus(m_strUpdateFailed);
@@ -166,11 +166,11 @@ void DefSecurityToolsFrontUnit::setAppStatus(DEFSECURITYTOOLSTATUS status)
         setAppStatus(DEFSECURITYTOOLSTATUS::INSTALLED);
         break;
     case UNINSTALLING:
-        m_pOpenBtn->setHioceann(true);
-        m_pUpdateBtn->setHioceann(true);
-        m_pUnInstallBtn->setHioceann(true);
-        m_pInstallBtn->setHioceann(true);
-        m_pSpinner->setHioceann(false);
+        m_pOpenBtn->setHidden(true);
+        m_pUpdateBtn->setHidden(true);
+        m_pUnInstallBtn->setHidden(true);
+        m_pInstallBtn->setHidden(true);
+        m_pSpinner->setHidden(false);
         m_pSpinner->start();
         break;
     case UNINSTALLFAILED:

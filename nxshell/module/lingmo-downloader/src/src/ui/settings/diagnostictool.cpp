@@ -155,7 +155,7 @@ void DiagnosticTool::initUI()
     m_Tableview->setColumnWidth(2, 72);
     m_Tableview->setAlternatingRowColors(true);
     m_Tableview->setEnabled(false);
-    m_Tableview->verticalScrollBar()->setHioceann(true);
+    m_Tableview->verticalScrollBar()->setHidden(true);
 
 }
 

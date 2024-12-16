@@ -411,7 +411,7 @@ void LibViewPanel::initNavigation()
         //如果stackindex不为2，全屏会出现导航窗口
         //如果是正在移动的情况，将不会出现导航栏窗口
         if (m_stack->currentWidget() == m_view) {
-            m_nav->setVisible((! m_nav->isAlwaysHioceann() && ! m_view->isWholeImageVisible()));
+            m_nav->setVisible((! m_nav->isAlwaysHidden() && ! m_view->isWholeImageVisible()));
             m_nav->setRectInImage(m_view->visibleImageRect());
         } else {
             m_nav->setVisible(false);
@@ -681,10 +681,10 @@ void LibViewPanel::updateMenuContent(const QString &path)
         }
 
         //判断导航栏隐藏,需要添加一个当前是否有图片,todo
-        if (isReadable && isPic && !m_view->isWholeImageVisible() && m_nav->isAlwaysHioceann()) {
+        if (isReadable && isPic && !m_view->isWholeImageVisible() && m_nav->isAlwaysHidden()) {
             appendAction(IdShowNavigationWindow, QObject::tr("Show navigation window"),
                          ss("Show navigation window", ""));
-        } else if (isReadable && isPic && !m_view->isWholeImageVisible() && !m_nav->isAlwaysHioceann()) {
+        } else if (isReadable && isPic && !m_view->isWholeImageVisible() && !m_nav->isAlwaysHidden()) {
             appendAction(IdHideNavigationWindow, QObject::tr("Hide navigation window"),
                          ss("Hide navigation window", ""));
         }
@@ -959,7 +959,7 @@ bool LibViewPanel::startdragImage(const QStringList &paths, const QString &first
         } else {
             QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
             QDir _dirinit(DirPath);
-            QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hioceann | QDir::NoDotAndDotDot);
+            QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
             //修复Ｑt带后缀排序错误的问题
             std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
 
@@ -1324,7 +1324,7 @@ bool LibViewPanel::startChooseFileDialog()
         } else {
             QString DirPath = image_list.first().left(image_list.first().lastIndexOf("/"));
             QDir _dirinit(DirPath);
-            QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hioceann | QDir::NoDotAndDotDot);
+            QFileInfoList m_AllPath = _dirinit.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
             //修复Ｑt带后缀排序错误的问题
             std::sort(m_AllPath.begin(), m_AllPath.end(), compareByFileInfo);
 
@@ -1545,7 +1545,7 @@ void LibViewPanel::backImageView(const QString &path)
     }
     //退出幻灯片的时候导航栏应该出现(未打开不出现)
     if (m_nav && m_view) {
-        m_nav->setVisible((!m_nav->isAlwaysHioceann() && !m_view->isWholeImageVisible()) && !m_view->image().isNull());
+        m_nav->setVisible((!m_nav->isAlwaysHidden() && !m_view->isWholeImageVisible()) && !m_view->image().isNull());
     }
     //退出幻灯片，应该切换回应该的窗口
     //判断文件是否存在
@@ -1844,11 +1844,11 @@ void LibViewPanel::onMenuItemClicked(QAction *action)
             break;
         }
         case IdShowNavigationWindow: {
-            m_nav->setAlwaysHioceann(false);
+            m_nav->setAlwaysHidden(false);
             break;
         }
         case IdHideNavigationWindow: {
-            m_nav->setAlwaysHioceann(true);
+            m_nav->setAlwaysHidden(true);
             break;
         }
         case IdRotateClockwise: {

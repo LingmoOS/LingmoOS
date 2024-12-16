@@ -71,7 +71,7 @@ void TroubleShootItem::paintEvent(QPaintEvent *event)
 
 void TroubleShootItem::slotStateChanged(int state, const QString &message)
 {
-    setHioceann(false);
+    setHidden(false);
 
     if (TStat_Suc == state)
         m_iconLabel->setPixmap(QIcon(":/images/success.svg").pixmap(17, 17));

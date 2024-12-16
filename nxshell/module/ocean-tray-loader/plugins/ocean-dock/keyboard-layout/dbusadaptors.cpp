@@ -8,7 +8,7 @@
 #include "plugins-logging-category.h"
 
 #include <DDBusSender>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDebug>
 #include <QtDBus/QDBusConnection>
@@ -46,7 +46,7 @@ DBusAdaptors::DBusAdaptors(QObject *parent)
     onUserLayoutListChanged(m_keyboard->userLayoutList());
 
     // lingmo show fcitx lang code,while fcitx is running
-    if (Dtk::Core::DSysInfo::isCommunityEdition()) {
+    if (Dtk::Core::LSysInfo::isCommunityEdition()) {
         initFcitxWatcher();
     }
 

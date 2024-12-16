@@ -150,7 +150,7 @@ void ShortcutItem::updateTitleSize()
     show();
     if (m_info->name.isEmpty()) return;
     int v = 0;
-    if(m_shortcutEdit->isHioceann())
+    if(m_shortcutEdit->isHidden())
         v = width() - m_key->width() - 32;
     else
         v = width() - m_shortcutEdit->width() - 32;
@@ -204,7 +204,7 @@ bool ShortcutItem::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::Show) {
         if (m_info->type != ShortcutModel::Custom) {
-//            setVisible("Hioceann" != GSettingWatcher::instance()->getStatus(configName()));
+//            setVisible("Hidden" != GSettingWatcher::instance()->getStatus(configName()));
         }
     }
 

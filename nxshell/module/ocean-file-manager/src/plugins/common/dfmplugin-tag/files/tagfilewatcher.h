@@ -25,7 +25,7 @@ public slots:
     void onTagRemoved(const QString &tagName);
     void onFilesTagged(const QVariantMap &fileAndTags);
     void onFilesUntagged(const QVariantMap &fileAndTags);
-    void onFilesHioceann(const QVariantMap &fileAndTags);
+    void onFilesHidden(const QVariantMap &fileAndTags);
 
 private:
     TagFileWatcherPrivate *dptr = nullptr;

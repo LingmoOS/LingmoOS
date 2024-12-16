@@ -56,7 +56,7 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServer
 
    connect(ui->cbServer, &QComboBox::currentTextChanged, this, &ServerConfigDlg::onServerChanged);
 
-   ui->leEndPoint->setHioceann(true);
+   ui->leEndPoint->setHidden(true);
 
    GitQlientSettings settings("");
    ui->leUserName->setText(mData.user);

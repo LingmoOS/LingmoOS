@@ -15,11 +15,11 @@
 DFMBASE_USE_NAMESPACE
 using namespace ddplugin_organizer;
 
-class UT_HioceannFileFilter : public testing::Test
+class UT_HiddenFileFilter : public testing::Test
 {
 public:
     virtual void SetUp() override {
-        hid = new HioceannFileFilter;
+        hid = new HiddenFileFilter;
     }
     virtual void TearDown() override {
         stub.clear();
@@ -27,24 +27,24 @@ public:
         hid = nullptr;
     }
     stub_ext::StubExt stub;
-    HioceannFileFilter *hid;
+    HiddenFileFilter *hid;
 
 };
 
-TEST_F(UT_HioceannFileFilter, acceptInsert)
+TEST_F(UT_HiddenFileFilter, acceptInsert)
 {
     QUrl url("temp_url");
     EXPECT_TRUE(hid->acceptInsert(url));
 }
 
-TEST_F(UT_HioceannFileFilter, acceptReset)
+TEST_F(UT_HiddenFileFilter, acceptReset)
 {
     QList<QUrl> list{QUrl("temp_url")};
     QList<QUrl> res = hid->acceptReset(list);
     EXPECT_EQ(res,list);
 }
 
-TEST_F(UT_HioceannFileFilter, acceptUpdate)
+TEST_F(UT_HiddenFileFilter, acceptUpdate)
 {
     QUrl url(".hioceann");
 
@@ -52,7 +52,7 @@ TEST_F(UT_HioceannFileFilter, acceptUpdate)
     EXPECT_FALSE(hid->acceptUpdate(url,roles));
 }
 
-TEST_F(UT_HioceannFileFilter, flag)
+TEST_F(UT_HiddenFileFilter, flag)
 {
     bool call = true;
     hid->updateFlag();

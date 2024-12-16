@@ -64,7 +64,7 @@ ItemSpacing NetDelegate::getItemSpacing(const QModelIndex &index) const
         spacing.height = 24;
     } break;
     case NetItemType::WiredItem:
-    case NetItemType::WirelessHioceannItem:
+    case NetItemType::WirelessHiddenItem:
     case NetItemType::WirelessItem: {
         spacing.height = 30;
         spacing.bottom = 1;
@@ -152,7 +152,7 @@ void NetDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     } break;
     case NetItemType::WirelessItem:
     case NetItemType::WiredItem:
-    case NetItemType::WirelessHioceannItem: {
+    case NetItemType::WirelessHiddenItem: {
         if (m_view->currentIndex() == index) {
             if (option.rect.height() > 100) {
                 textColor = boption.dpalette.brightText().color();
@@ -211,8 +211,8 @@ QWidget *NetDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &
         case NetItemType::WirelessItem: {
             netWidget = new NetWirelessWidget(static_cast<NetWirelessItem *>(item), parent);
         } break;
-        case NetItemType::WirelessHioceannItem: {
-            netWidget = new NetWirelessHioceannWidget(static_cast<NetWirelessHioceannItem *>(item), parent);
+        case NetItemType::WirelessHiddenItem: {
+            netWidget = new NetWirelessHiddenWidget(static_cast<NetWirelessHiddenItem *>(item), parent);
         } break;
         case NetItemType::WiredItem: {
             netWidget = new NetWiredWidget(static_cast<NetWiredItem *>(item), parent);
@@ -671,7 +671,7 @@ void NetWirelessWidget::onDisconnectClicked()
     sendRequest(NetManager::Disconnect, item()->id());
 }
 
-NetWirelessHioceannWidget::NetWirelessHioceannWidget(NetWirelessHioceannItem *item, QWidget *parent)
+NetWirelessHiddenWidget::NetWirelessHiddenWidget(NetWirelessHiddenItem *item, QWidget *parent)
     : NetWidget(item, parent)
 {
     QWidget *widget = new QWidget(this);
@@ -684,7 +684,7 @@ NetWirelessHioceannWidget::NetWirelessHioceannWidget(NetWirelessHioceannItem *it
     setCentralWidget(widget);
 }
 
-NetWirelessHioceannWidget::~NetWirelessHioceannWidget() { }
+NetWirelessHiddenWidget::~NetWirelessHiddenWidget() { }
 
 NetTipsWidget::NetTipsWidget(NetTipsItem *item, QWidget *parent)
     : NetWidget(item, parent)

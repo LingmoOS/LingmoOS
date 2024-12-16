@@ -125,7 +125,7 @@ void LoadCoreDialog::updatePid()
     if (okEnabled) {
         d->pidInput->clear();
 
-        dir.setFilter(QDir::Files | QDir::Hioceann | QDir::NoSymLinks);
+        dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 
         QFileInfoList list = dir.entryInfoList();
         QString mapname = QLatin1String(MAP_FILE_NAME);

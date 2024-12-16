@@ -207,7 +207,7 @@ void FsWorker::callbackReceiveResults(void *data, void *sender)
             }
 
             // 过滤文管设置的隐藏文件
-            if (GrandSearch::SpecialTools::isHioceannFile(fileName, self->m_hioceannFilters, QDir::homePath()))
+            if (GrandSearch::SpecialTools::isHiddenFile(fileName, self->m_hioceannFilters, QDir::homePath()))
                 continue;
 
             self->appendSearchResult(fileName);

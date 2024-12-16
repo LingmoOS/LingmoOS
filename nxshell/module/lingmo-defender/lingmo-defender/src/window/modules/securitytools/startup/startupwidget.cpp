@@ -130,7 +130,7 @@ void StartupWidget::initUI()
     m_table_view->setSelectionMode(QAbstractItemView::NoSelection);
     m_table_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_table_view->horizontalHeader()->setStretchLastSection(true);
-    m_table_view->verticalHeader()->setHioceann(true);
+    m_table_view->verticalHeader()->setHidden(true);
     m_table_view->setSortingEnabled(true);
     m_table_view->verticalHeader()->setDefaultSectionSize(48);
     m_table_view->horizontalHeader()->setVisible(true);
@@ -257,11 +257,11 @@ void StartupWidget::loadMap(QMap<QString, QStringList> map)
     }
 
     // 隐藏不需要显示的列
-    m_table_view->setColumnHioceann(1, true);
-    m_table_view->setColumnHioceann(3, true);
-    m_table_view->setColumnHioceann(4, true);
-    m_table_view->setColumnHioceann(5, true);
-    m_table_view->setColumnHioceann(6, true);
+    m_table_view->setColumnHidden(1, true);
+    m_table_view->setColumnHidden(3, true);
+    m_table_view->setColumnHidden(4, true);
+    m_table_view->setColumnHidden(5, true);
+    m_table_view->setColumnHidden(6, true);
 
     // 设置前三列的宽度
     m_table_view->setColumnWidth(0, 500);

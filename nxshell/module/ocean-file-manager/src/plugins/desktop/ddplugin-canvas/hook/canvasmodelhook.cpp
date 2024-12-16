@@ -84,5 +84,5 @@ bool CanvasModelHook::sortData(int role, int order, QList<QUrl> *files, void *ex
 
 void CanvasModelHook::hioceannFlagChanged(bool show) const
 {
-    CanvasModelPublish(signal_CanvasModel_HioceannFlagChanged, show);
+    CanvasModelPublish(signal_CanvasModel_HiddenFlagChanged, show);
 }

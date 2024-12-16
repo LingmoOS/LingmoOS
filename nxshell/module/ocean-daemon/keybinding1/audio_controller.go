@@ -30,7 +30,7 @@ type OsdVolumeState int32
 const (
 	VolumeAdjustEnable OsdVolumeState = iota
 	VolumeAdjustForbioceann
-	VolumeAdjustHioceann
+	VolumeAdjustHidden
 )
 
 type AudioController struct {

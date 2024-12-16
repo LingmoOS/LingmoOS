@@ -79,7 +79,7 @@ NetManagerThreadPrivate::NetManagerThreadPrivate()
     , m_monitorNetworkNotify(false)
     , m_useSecretAgent(true)
     , m_network8021XMode(NetManager::ToControlCenter)
-    , m_autoUpdateHioceannConfig(true)
+    , m_autoUpdateHiddenConfig(true)
     , m_isInitialized(false)
     , m_enabled(true)
     , m_autoScanInterval(0)
@@ -191,9 +191,9 @@ void NetManagerThreadPrivate::setNetwork8021XMode(NetManager::Network8021XMode m
     m_network8021XMode = networkMode;
 }
 
-void NetManagerThreadPrivate::setAutoUpdateHioceannConfig(bool autoUpdate)
+void NetManagerThreadPrivate::setAutoUpdateHiddenConfig(bool autoUpdate)
 {
-    m_autoUpdateHioceannConfig = autoUpdate;
+    m_autoUpdateHiddenConfig = autoUpdate;
 }
 
 void NetManagerThreadPrivate::setAutoScanInterval(int ms)
@@ -243,10 +243,10 @@ void NetManagerThreadPrivate::disconnectDevice(const QString &id)
         QMetaObject::invokeMethod(this, "doDisconnectDevice", Qt::QueuedConnection, Q_ARG(QString, id));
 }
 
-void NetManagerThreadPrivate::connectHioceann(const QString &id, const QString &ssid)
+void NetManagerThreadPrivate::connectHidden(const QString &id, const QString &ssid)
 {
     if (m_isInitialized)
-        QMetaObject::invokeMethod(this, "doConnectHioceann", Qt::QueuedConnection, Q_ARG(QString, id), Q_ARG(QString, ssid));
+        QMetaObject::invokeMethod(this, "doConnectHidden", Qt::QueuedConnection, Q_ARG(QString, id), Q_ARG(QString, ssid));
 }
 
 void NetManagerThreadPrivate::connectWired(const QString &id, const QVariantMap &param)
@@ -494,7 +494,7 @@ void NetManagerThreadPrivate::doDisconnectDevice(const QString &id)
     }
 }
 
-void NetManagerThreadPrivate::doConnectHioceann(const QString &id, const QString &ssid)
+void NetManagerThreadPrivate::doConnectHidden(const QString &id, const QString &ssid)
 {
     QList<NetworkDeviceBase *> devices = NetworkController::instance()->devices();
     auto it = std::find_if(devices.begin(), devices.end(), [id](NetworkDeviceBase *dev) {
@@ -853,7 +853,7 @@ void NetManagerThreadPrivate::onActiveConnectionChanged()
         }
     } break;
     case DeviceType::Wireless:
-        updateHioceannNetworkConfig(qobject_cast<WirelessDevice *>(dev));
+        updateHiddenNetworkConfig(qobject_cast<WirelessDevice *>(dev));
         break;
     default:
         break;
@@ -1160,9 +1160,9 @@ void NetManagerThreadPrivate::sendNetworkNotify(NetworkNotifyType type, const QS
     }
 }
 
-void NetManagerThreadPrivate::updateHioceannNetworkConfig(WirelessDevice *wireless)
+void NetManagerThreadPrivate::updateHiddenNetworkConfig(WirelessDevice *wireless)
 {
-    if (!m_autoUpdateHioceannConfig || !m_enabled)
+    if (!m_autoUpdateHiddenConfig || !m_enabled)
         return;
 
     DeviceStatus const status = wireless->deviceStatus();
@@ -1299,7 +1299,7 @@ bool NetManagerThreadPrivate::needSetPassword(AccessPoints *accessPoint) const
 
 void NetManagerThreadPrivate::handleAccessPointSecure(AccessPoints *accessPoint)
 {
-    if (!m_autoUpdateHioceannConfig || !m_enabled)
+    if (!m_autoUpdateHiddenConfig || !m_enabled)
         return;
 
     if (needSetPassword(accessPoint)) {

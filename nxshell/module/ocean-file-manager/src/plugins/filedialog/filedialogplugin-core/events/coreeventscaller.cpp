@@ -30,7 +30,7 @@ void CoreEventsCaller::sendSelectFiles(quint64 windowId, const QList<QUrl> &file
 
 void CoreEventsCaller::setSidebarItemVisible(const QUrl &url, bool visible)
 {
-    dpfSlotChannel->push("dfmplugin_sidebar", "slot_Item_Hioceann",
+    dpfSlotChannel->push("dfmplugin_sidebar", "slot_Item_Hidden",
                          url, visible);
 }
 

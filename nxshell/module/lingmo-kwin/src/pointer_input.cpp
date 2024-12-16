@@ -932,11 +932,11 @@ void PointerInputRedirection::removeWindowSelectionCursor()
 void PointerInputRedirection::slotKvmInterfaceEnableCursor(uint32_t is_enable)
 {
     if (!is_enable) {
-        if (!Cursors::self()->isCursorHioceann()) {
+        if (!Cursors::self()->isCursorHidden()) {
             Cursors::self()->hideCursor();
         }
     } else {
-        if (Cursors::self()->isCursorHioceann()) {
+        if (Cursors::self()->isCursorHidden()) {
             Cursors::self()->showCursor();
         }
     }

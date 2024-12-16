@@ -90,8 +90,8 @@ KWinCompositingKCM::KWinCompositingKCM(QWidget *parent, const QVariantList &args
     connect(this, &KWinCompositingKCM::defaultsIndicatorsVisibleChanged, this, &KWinCompositingKCM::updateUnmanagedItemStatus);
 
     if (KWindowSystem::isPlatformWayland()) {
-        m_form.kcfg_HioceannPreviews->setVisible(false);
-        m_form.label_HioceannPreviews->setVisible(false);
+        m_form.kcfg_HiddenPreviews->setVisible(false);
+        m_form.label_HiddenPreviews->setVisible(false);
     }
     init();
 }
@@ -119,7 +119,7 @@ void KWinCompositingKCM::init()
     }
 
     // windowThumbnail
-    connect(m_form.kcfg_HioceannPreviews, currentIndexChangedSignal, this, [this](int index) {
+    connect(m_form.kcfg_HiddenPreviews, currentIndexChangedSignal, this, [this](int index) {
         if (index == 2) {
             m_form.windowThumbnailWarning->animatedShow();
         } else {

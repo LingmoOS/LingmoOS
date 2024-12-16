@@ -23,7 +23,7 @@
 #include "window/modules/hoverballs/hoverballsdlg.h"
 
 #include <DPinyin>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DTrashManager>
 
 #include <QDBusContext>
@@ -628,7 +628,7 @@ void OperateDBusData::scanFile(const QString &path)
         } else if (info.isDir()) {
             QDir dir(path);
             for (const QFileInfo &i :
-                 dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs | QDir::Hioceann
+                 dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs | QDir::Hidden
                                    | QDir::NoSymLinks)) {
                 // 递归扫描目录内容
                 scanFile(i.absoluteFilePath());

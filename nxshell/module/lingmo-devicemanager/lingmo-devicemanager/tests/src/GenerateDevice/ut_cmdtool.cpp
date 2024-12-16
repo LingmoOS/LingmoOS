@@ -273,9 +273,9 @@ bool UT_CmdTool_loadHciconfigInfo(void *obj, QString &deviceInfo, const QString 
                  "	Manufacturer: HiSilicon Technologies Co., Ltd. (271)\n";
     return true;
 }
-DSysInfo::UosEdition ui_uosEditionType()
+LSysInfo::UosEdition ui_uosEditionType()
 {
-    return DSysInfo::UosHome;
+    return LSysInfo::UosHome;
 }
 TEST_F(UT_CmdTool, UT_CmdTool_loadHciconfigInfo_001)
 {
@@ -288,7 +288,7 @@ TEST_F(UT_CmdTool, UT_CmdTool_loadHciconfigInfo_002)
 {
     Stub stub;
     stub.set(ADDR(CmdTool, getDeviceInfo), UT_CmdTool_loadHciconfigInfo);
-    stub.set(ADDR(DSysInfo, uosEditionType), ui_uosEditionType);
+    stub.set(ADDR(LSysInfo, uosEditionType), ui_uosEditionType);
     m_cmdTool->loadHciconfigInfo("hciconfig.txt");
     EXPECT_TRUE(m_cmdTool->m_cmdInfo.find("hciconfig") == m_cmdTool->m_cmdInfo.end());
 }

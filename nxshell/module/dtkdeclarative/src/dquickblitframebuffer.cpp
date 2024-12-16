@@ -15,7 +15,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN BlitFrameTextureProvider : public QSGTextureProvider {
+class Q_DECL_HIDDEN BlitFrameTextureProvider : public QSGTextureProvider {
 public:
     BlitFrameTextureProvider()
         : QSGTextureProvider()
@@ -34,7 +34,7 @@ private:
     QSGTexture *m_texture = nullptr;
 };
 
-class Q_DECL_HIOCEANN DQuickBlitFramebufferPrivate : public DCORE_NAMESPACE::DObjectPrivate
+class Q_DECL_HIDDEN DQuickBlitFramebufferPrivate : public DCORE_NAMESPACE::DObjectPrivate
 {
 public:
     DQuickBlitFramebufferPrivate(DQuickBlitFramebuffer *qq)

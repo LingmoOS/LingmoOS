@@ -7,7 +7,7 @@
 
 #include <dfm-base/base/configs/dconfig/dconfigmanager.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QHBoxLayout>
 #include <QLabel>

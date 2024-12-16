@@ -66,7 +66,7 @@ ProcessTableView::ProcessTableView(DWidget *parent)
 
     this->setAttribute(Qt::WA_TranslucentBackground, true);
 
-    setHeaderHioceann(true);
+    setHeaderHidden(true);
 }
 
 // destructor
@@ -157,15 +157,15 @@ void ProcessTableView::initUI()
 
     // proc name
     setColumnWidth(ProcessTableModel::kProcessNameColumn, 200);
-    setColumnHioceann(ProcessTableModel::kProcessNameColumn, false);
+    setColumnHidden(ProcessTableModel::kProcessNameColumn, false);
 
     // cpu
     setColumnWidth(ProcessTableModel::kProcessCPUColumn, 80);
-    setColumnHioceann(ProcessTableModel::kProcessCPUColumn, false);
+    setColumnHidden(ProcessTableModel::kProcessCPUColumn, false);
 
     // cpu
     setColumnWidth(ProcessTableModel::kProcessPIDColumn, 0);
-    setColumnHioceann(ProcessTableModel::kProcessPIDColumn, true);
+    setColumnHidden(ProcessTableModel::kProcessPIDColumn, true);
 
     //sort
     sortByColumn(ProcessTableModel::kProcessCPUColumn, Qt::DescendingOrder);

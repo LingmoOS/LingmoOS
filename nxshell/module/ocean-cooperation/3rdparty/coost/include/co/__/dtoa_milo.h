@@ -60,7 +60,7 @@ struct DiyFp {
         int biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
         uint64_t significand = (u.u64 & kDpSignificandMask);
         if (biased_e != 0) {
-            f = significand + kDpHioceannBit;
+            f = significand + kDpHiddenBit;
             e = biased_e - kDpExponentBias;
         }
         else {
@@ -113,7 +113,7 @@ struct DiyFp {
         return DiyFp(f << s, e - s);
       #else
         DiyFp res = *this;
-        while (!(res.f & kDpHioceannBit)) {
+        while (!(res.f & kDpHiddenBit)) {
             res.f <<= 1;
             res.e--;
         }
@@ -130,7 +130,7 @@ struct DiyFp {
         return DiyFp (f << (63 - index), e - (63 - index));
       #else
         DiyFp res = *this;
-        while (!(res.f & (kDpHioceannBit << 1))) {
+        while (!(res.f & (kDpHiddenBit << 1))) {
             res.f <<= 1;
             res.e--;
         }
@@ -142,7 +142,7 @@ struct DiyFp {
 
     void NormalizedBoundaries(DiyFp* minus, DiyFp* plus) const {
         DiyFp pl = DiyFp((f << 1) + 1, e - 1).NormalizeBoundary();
-        DiyFp mi = (f == kDpHioceannBit) ? DiyFp((f << 2) - 1, e - 2) : DiyFp((f << 1) - 1, e - 1);
+        DiyFp mi = (f == kDpHiddenBit) ? DiyFp((f << 2) - 1, e - 2) : DiyFp((f << 1) - 1, e - 1);
         mi.f <<= mi.e - pl.e;
         mi.e = pl.e;
         *plus = pl;
@@ -155,7 +155,7 @@ struct DiyFp {
     static const int kDpMinExponent = -kDpExponentBias;
     static const uint64_t kDpExponentMask = UINT64_C2(0x7FF00000, 0x00000000);
     static const uint64_t kDpSignificandMask = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
-    static const uint64_t kDpHioceannBit = UINT64_C2(0x00100000, 0x00000000);
+    static const uint64_t kDpHiddenBit = UINT64_C2(0x00100000, 0x00000000);
 
     uint64_t f;
     int e;

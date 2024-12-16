@@ -16,7 +16,7 @@ TEST(GeneralModelFilter, construct)
 {
     GeneralModelFilter obj;
     ASSERT_EQ(obj.modelFilters.size(), 2);
-    EXPECT_NE(dynamic_cast<HioceannFileFilter *>(obj.modelFilters.at(0)), nullptr);
+    EXPECT_NE(dynamic_cast<HiddenFileFilter *>(obj.modelFilters.at(0)), nullptr);
     EXPECT_NE(dynamic_cast<InnerDesktopAppFilter *>(obj.modelFilters.at(1)), nullptr);
 }
 

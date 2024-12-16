@@ -8,7 +8,7 @@
 #include <QPalette>
 #include <QDebug>
 #include <QSettings>
-#include <DSysInfo>
+#include <LSysInfo>
 #include "public_func.h"
 #include "util_updateui.h"
 
@@ -21,7 +21,7 @@ DCORE_USE_NAMESPACE
 
 const QPixmap systemLogo(const QSize &size)
 {
-    return loadPixmap(DSysInfo::distributionOrgLogo(DSysInfo::Distribution, DSysInfo::Transparent, ":img/logo.svg"), size);
+    return loadPixmap(LSysInfo::distributionOrgLogo(LSysInfo::Distribution, LSysInfo::Transparent, ":img/logo.svg"), size);
 }
 
 LogoWidget::LogoWidget(QWidget *parent)
@@ -73,7 +73,7 @@ void LogoWidget::initUI()
     font.setPixelSize(m_logoLabel->height() / 2);
     m_logoVersionLabel->setFont(font);
 
-    if(DSysInfo::UosEdition::UosEducation == DSysInfo::uosEditionType()) {  //教育版登录界面不要显示系统版本号（和Logo冲突）
+    if(LSysInfo::UosEdition::UosEducation == LSysInfo::uosEditionType()) {  //教育版登录界面不要显示系统版本号（和Logo冲突）
       //systemVersion = "";
       return;
     }
@@ -94,12 +94,12 @@ QPixmap LogoWidget::loadSystemLogo()
 QString LogoWidget::getVersion()
 {
     QString version;
-    if (DSysInfo::uosType() == DSysInfo::UosServer) {
-        version = QString("%1").arg(DSysInfo::majorVersion());
-    } else if (DSysInfo::isLingmo()) {
-        version = QString("%1 %2").arg(DSysInfo::majorVersion()).arg(DSysInfo::uosEditionName(m_locale));
+    if (LSysInfo::uosType() == LSysInfo::UosServer) {
+        version = QString("%1").arg(LSysInfo::majorVersion());
+    } else if (LSysInfo::isLingmo()) {
+        version = QString("%1 %2").arg(LSysInfo::majorVersion()).arg(LSysInfo::uosEditionName(m_locale));
     } else {
-        version = QString("%1 %2").arg(DSysInfo::productVersion()).arg(DSysInfo::productTypeString());
+        version = QString("%1 %2").arg(LSysInfo::productVersion()).arg(LSysInfo::productTypeString());
     }
     return version;
 }

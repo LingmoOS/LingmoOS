@@ -56,7 +56,7 @@
 #include <DStatusBar>
 #include <DTitlebar>
 #include <DSettingsDialog>
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DFileDialog>
 
 #include <QScrollBar>
@@ -439,7 +439,7 @@ void VNoteMainWindow::initLeftView()
 
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_leftView->setContentsMargins(0, 0, 0, 0);
-    m_leftView->setHeaderHioceann(true);
+    m_leftView->setHeaderHidden(true);
     m_leftView->setFrameShape(QFrame::NoFrame);
     m_leftView->setItemsExpandable(false);
     m_leftView->setIndentation(0);
@@ -1873,7 +1873,7 @@ void VNoteMainWindow::onShowPrivacy()
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
-    bool isCommunityEdition = DSysInfo::isCommunityEdition();
+    bool isCommunityEdition = LSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
         if (isCommunityEdition) {
             url = "https://www.lingmo.org/zh/agreement/privacy/";

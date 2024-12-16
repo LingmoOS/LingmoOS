@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "syncwidget.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QIcon>
 
@@ -17,7 +17,7 @@ SyncModule::SyncModule(QObject *parent)
 {
     qInfo() << "create syncmodule";
     setName("cloudsync");
-    setDisplayName(DSysInfo::isCommunityEdition() ? tr("lingmo ID") : tr("UOS ID"));
+    setDisplayName(LSysInfo::isCommunityEdition() ? tr("lingmo ID") : tr("UOS ID"));
     setDescription(tr("Cloud sync, app store and etc"));
     setIcon(QIcon::fromTheme("lingmo-id"));
     m_model = new SyncModel(this);
@@ -78,7 +78,7 @@ QWidget *SyncModule::page()
 void SyncModule::InitModuleData()
 {
     qInfo() << "InitModuleData begin";
-    if (!DSysInfo::isLingmo()) {
+    if (!LSysInfo::isLingmo()) {
         qInfo() << "module: " << displayName() << " is disable now!";
         return;
     }

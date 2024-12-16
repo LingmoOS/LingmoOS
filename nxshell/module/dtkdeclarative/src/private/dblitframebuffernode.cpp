@@ -23,7 +23,7 @@
 
 DQUICK_BEGIN_NAMESPACE
 
-class Q_DECL_HIOCEANN ProxyAtlasTexture : public QSGPlainTexture {
+class Q_DECL_HIDDEN ProxyAtlasTexture : public QSGPlainTexture {
 public:
     bool isAtlasTexture() const override {
         return !subRect.isEmpty();
@@ -38,7 +38,7 @@ public:
 };
 
 #ifndef QT_NO_OPENGL
-class Q_DECL_HIOCEANN CachedFBO : public QSharedData, public QOpenGLFramebufferObject {
+class Q_DECL_HIDDEN CachedFBO : public QSharedData, public QOpenGLFramebufferObject {
 public:
     typedef QPair<QSize, CachedFBO*> CacheData;
     CachedFBO(const QSize &size)
@@ -78,7 +78,7 @@ private:
 thread_local QList<CachedFBO::CacheData> CachedFBO::globalFBOList;
 typedef QExplicitlySharedDataPointer<CachedFBO> SharedCachedFBO;
 
-class Q_DECL_HIOCEANN GLRenderNode : public DBlitFramebufferNode {
+class Q_DECL_HIDDEN GLRenderNode : public DBlitFramebufferNode {
 public:
     GLRenderNode(QQuickItem *item)
         : DBlitFramebufferNode(item)
@@ -161,7 +161,7 @@ DBlitFramebufferNode *DBlitFramebufferNode::createOpenGLNode(QQuickItem *item,
 }
 #endif
 
-class Q_DECL_HIOCEANN CachedQImage : public QSharedData, public QImage {
+class Q_DECL_HIDDEN CachedQImage : public QSharedData, public QImage {
 public:
     typedef QPair<QSize, CachedQImage*> CacheData;
     CachedQImage(const QSize &size)
@@ -201,7 +201,7 @@ private:
 thread_local QList<CachedQImage::CacheData> CachedQImage::globalImageList;
 typedef QExplicitlySharedDataPointer<CachedQImage> SharedCachedQImage;
 
-class Q_DECL_HIOCEANN SoftwareRenderNode : public DBlitFramebufferNode {
+class Q_DECL_HIDDEN SoftwareRenderNode : public DBlitFramebufferNode {
 public:
     SoftwareRenderNode(QQuickItem *item)
         : DBlitFramebufferNode(item)

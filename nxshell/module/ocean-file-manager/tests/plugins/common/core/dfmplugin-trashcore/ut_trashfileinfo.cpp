@@ -223,7 +223,7 @@ TEST_F(UT_TrashFileInfo, testTrashFileInfoCanAttributes)
     EXPECT_FALSE(info.canAttributes(CanableInfoType::kCanTrash));
     EXPECT_FALSE(info.canAttributes(CanableInfoType::kCanRename));
     EXPECT_FALSE(info.canAttributes(CanableInfoType::kCanDrop));
-    EXPECT_FALSE(info.canAttributes(CanableInfoType::kCanHioceann));
+    EXPECT_FALSE(info.canAttributes(CanableInfoType::kCanHidden));
     EXPECT_TRUE(info.canAttributes(CanableInfoType::kCanRedirectionFileUrl));
     EXPECT_FALSE(info.permissions().testFlag(QFileDevice::WriteOwner));
 
@@ -297,7 +297,7 @@ TEST_F(UT_TrashFileInfo, testTrashFileInfoIsAttributes)
     EXPECT_TRUE(info.isAttributes(OptInfoType::kIsReadable));
     EXPECT_TRUE(info.isAttributes(OptInfoType::kIsWritable));
 
-    EXPECT_FALSE(info.isAttributes(OptInfoType::kIsHioceann));
+    EXPECT_FALSE(info.isAttributes(OptInfoType::kIsHidden));
     EXPECT_FALSE(info.isAttributes(OptInfoType::kIsSymLink));
     EXPECT_TRUE(info.isAttributes(OptInfoType::kIsRoot));
 

@@ -118,7 +118,7 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 	} else if (sacDraw.style == INDIC_STRIKE) {
 		surface->MoveTo(irc.left, irc.top - 4);
 		surface->LineTo(irc.right, irc.top - 4);
-	} else if ((sacDraw.style == INDIC_HIOCEANN) || (sacDraw.style == INDIC_TEXTFORE)) {
+	} else if ((sacDraw.style == INDIC_HIDDEN) || (sacDraw.style == INDIC_TEXTFORE)) {
 		// Draw nothing
 	} else if (sacDraw.style == INDIC_BOX) {
 		surface->MoveTo(irc.left, ymid + 1);

@@ -482,7 +482,7 @@ void OceanUIPluginTestWidget::onTriggered()
 
 void OceanUIPluginTestWidget::onChildStateChanged(ModuleObject *child, uint32_t flag, bool state)
 {
-    if (ModuleObject::IsHioceannFlag(flag)) {
+    if (ModuleObject::IsHiddenFlag(flag)) {
         if (state)
             onRemoveModule(child);
         else

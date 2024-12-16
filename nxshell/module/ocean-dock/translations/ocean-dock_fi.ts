@@ -277,7 +277,7 @@
         <translation>Näytä aina</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Piilotta paneeli</translation>
     </message>
     <message>

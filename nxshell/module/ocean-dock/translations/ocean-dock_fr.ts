@@ -277,7 +277,7 @@
         <translation>Maintenir affiché</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Maintenir caché</translation>
     </message>
     <message>

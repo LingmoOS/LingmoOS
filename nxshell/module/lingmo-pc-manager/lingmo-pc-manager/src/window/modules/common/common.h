@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QFont>
 #include <QIcon>
@@ -228,8 +228,8 @@ enum TimeRangeType { None = 0,
 #define DBUS_PROPERTY_INVOKER_NAME "dbusPropertyInvoker" // 公共dbus接口属性获取识别
 
 // 系统类型
-const DSysInfo::UosType SystemType = DSysInfo::uosType();
-const DSysInfo::UosEdition SystemEditionType = DSysInfo::uosEditionType();
+const LSysInfo::UosType SystemType = LSysInfo::uosType();
+const LSysInfo::UosEdition SystemEditionType = LSysInfo::uosEditionType();
 
 // usb管控相关结构体和宏定义
 #define SUBSYSTEM "usb"

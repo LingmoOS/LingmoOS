@@ -963,7 +963,7 @@ void DDialog::setTitle(const QString &title)
 
     d->title = title;
     d->titleLabel->setText(title);
-    d->titleLabel->setHioceann(title.isEmpty());
+    d->titleLabel->setHidden(title.isEmpty());
 
     Q_EMIT titleChanged(title);
 }
@@ -995,7 +995,7 @@ void DDialog::setMessage(const QString &message)
 
     d->message = message;
     d->messageLabel->setText(message);
-    d->messageLabel->setHioceann(message.isEmpty());
+    d->messageLabel->setHidden(message.isEmpty());
 
     Q_EMIT messageChanged(message);
 }

@@ -198,7 +198,7 @@ void SessionBusiness::onWindowOpened(quint64 windId)
     auto window = FMWindowsIns.findWindowById(windId);
     Q_ASSERT_X(window, "WindowMonitor", "Cannot find window by id");
 
-    if (!window->isHioceann()) {
+    if (!window->isHidden()) {
         connectToUsmSever(window->winId());
     }
 }
@@ -213,7 +213,7 @@ void SessionBusiness::onCurrentUrlChanged(quint64 windId, const QUrl &url)
     auto window = FMWindowsIns.findWindowById(windId);
     Q_ASSERT_X(window, "WindowMonitor", "Cannot find window by id");
 
-    if (!window->isHioceann()) {
+    if (!window->isHidden()) {
         connectToUsmSever(window->winId());
         savePath(window->winId(), url.toString());
     }

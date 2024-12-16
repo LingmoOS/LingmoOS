@@ -49,7 +49,7 @@ QPair<int, int> ToolBarWidget::getSaveInfo()
 void ToolBarWidget::showAt(QPoint pos, bool isfirstTime)
 {
     this->move(pos);
-    if (this->isHioceann())
+    if (this->isHidden())
         this->show();
     if (isfirstTime) {
         this->hide();

@@ -75,7 +75,7 @@ OSXScreen::OSXScreen(IEventQueue* events, bool isPrimary, bool autoShowHideCurso
 	m_isOnScreen(m_isPrimary),
 	m_cursorPosValid(false),
 	MouseButtonEventMap(NumButtonIDs),
-	m_cursorHioceann(false),
+	m_cursorHidden(false),
 	m_dragNumButtonsDown(0),
 	m_dragTimer(NULL),
 	m_keyState(NULL),
@@ -709,7 +709,7 @@ OSXScreen::showCursor()
 
 	logCursorVisibility();
 
-	m_cursorHioceann = false;
+	m_cursorHidden = false;
 }
 
 void
@@ -736,7 +736,7 @@ OSXScreen::hideCursor()
 
 	logCursorVisibility();
 
-	m_cursorHioceann = true;
+	m_cursorHidden = true;
 }
 
 void
@@ -1895,7 +1895,7 @@ OSXScreen::handleCGInputEventSecondary(
 	return event;
 
 	OSXScreen* screen = (OSXScreen*)refcon;
-	if (screen->m_cursorHioceann && type == kCGEventMouseMoved) {
+	if (screen->m_cursorHidden && type == kCGEventMouseMoved) {
 
 		CGPoint pos = CGEventGetLocation(event);
 		if (pos.x != screen->m_xCenter || pos.y != screen->m_yCenter) {

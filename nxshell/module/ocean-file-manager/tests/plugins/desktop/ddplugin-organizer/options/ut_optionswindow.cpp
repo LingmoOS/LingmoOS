@@ -39,7 +39,7 @@ TEST(OptionsWindow, initialize_on)
     ASSERT_NE(win.d->autoArrange, nullptr);
     EXPECT_FALSE(win.d->autoArrange->checked());
     EXPECT_TRUE(win.d->autoArrange->testAttribute(Qt::WA_WState_ExplicitShowHide));
-    EXPECT_TRUE(win.d->autoArrange->testAttribute(Qt::WA_WState_Hioceann));
+    EXPECT_TRUE(win.d->autoArrange->testAttribute(Qt::WA_WState_Hidden));
 }
 
 TEST(OptionsWindow, initialize_off)
@@ -71,5 +71,5 @@ TEST(OptionsWindow, initialize_off)
     ASSERT_NE(win.d->autoArrange, nullptr);
     EXPECT_TRUE(win.d->autoArrange->checked());
     EXPECT_TRUE(win.d->autoArrange->testAttribute(Qt::WA_WState_ExplicitShowHide));
-    EXPECT_FALSE(win.d->autoArrange->testAttribute(Qt::WA_WState_Hioceann));
+    EXPECT_FALSE(win.d->autoArrange->testAttribute(Qt::WA_WState_Hidden));
 }

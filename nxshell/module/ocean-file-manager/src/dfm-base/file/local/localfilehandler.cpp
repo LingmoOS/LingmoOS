@@ -173,7 +173,7 @@ bool LocalFileHandler::renameFile(const QUrl &url, const QUrl &newUrl, const boo
     {   // check hioceann name
         if (needCheck) {
             const QString &newName = newUrl.fileName();
-            if (!doHioceannFileRemind(newName))
+            if (!doHiddenFileRemind(newName))
                 return true;
         }
     }
@@ -1173,7 +1173,7 @@ bool LocalFileHandler::renameFilesBatch(const QMap<QUrl, QUrl> &urls, QMap<QUrl,
         auto fileinfo = InfoFactory::create<FileInfo>(expectedName);
 
         if (!check) {
-            bool checkPass = doHioceannFileRemind(fileinfo->nameOf(NameInfoType::kFileName), &check);
+            bool checkPass = doHiddenFileRemind(fileinfo->nameOf(NameInfoType::kFileName), &check);
             if (!checkPass)
                 return true;
         }
@@ -1193,11 +1193,11 @@ bool LocalFileHandler::renameFilesBatch(const QMap<QUrl, QUrl> &urls, QMap<QUrl,
     return successUrls.size() == urls.size();
 }
 
-bool LocalFileHandler::doHioceannFileRemind(const QString &name, bool *checkRule)
+bool LocalFileHandler::doHiddenFileRemind(const QString &name, bool *checkRule)
 {
     if (!name.startsWith("."))
         return true;
-    if (Application::instance()->genericAttribute(Application::kShowedHioceannFiles).toBool())
+    if (Application::instance()->genericAttribute(Application::kShowedHiddenFiles).toBool())
         return true;
 
     if (checkRule)

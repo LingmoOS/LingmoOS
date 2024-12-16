@@ -209,7 +209,7 @@ void Content::updateSettings(const QByteArray &translateContext, QPointer<DTK_CO
         current_groupKey = groupKey;
 
         auto group = settings->group(groupKey);
-        if (group->isHioceann()) {
+        if (group->isHidden()) {
             continue;
         }
         auto trName = translateContext.isEmpty() ? QObject::tr(group->name().toStdString().c_str())
@@ -232,7 +232,7 @@ void Content::updateSettings(const QByteArray &translateContext, QPointer<DTK_CO
         d->contentLayout->setSpacing(10);
 
         for (auto subgroup : settings->group(groupKey)->childGroups()) {
-            if (subgroup->isHioceann()) {
+            if (subgroup->isHidden()) {
                 continue;
             }
 
@@ -271,7 +271,7 @@ void Content::updateSettings(const QByteArray &translateContext, QPointer<DTK_CO
             d->contentLayout->addWidget(bgGroup);
 
             for (auto option : subgroup->childOptions()) {
-                if (option->isHioceann()) {
+                if (option->isHidden()) {
                     continue;
                 }
 

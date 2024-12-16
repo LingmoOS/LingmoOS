@@ -1,0 +1,13 @@
+[Unit]
+Description=User Compositor Socket
+PartOf=treeland-sd.service
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+[Socket]
+ListenStream=%t/treeland.socket
+RemoveOnStop=true
+FileDescriptorName=TreeLand
+ExecStop=-/usr/bin/systemctl --user unset-environment WAYLAND_DISPLAY

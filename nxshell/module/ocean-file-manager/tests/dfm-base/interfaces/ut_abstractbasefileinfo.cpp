@@ -58,7 +58,7 @@ TEST_F(UT_AbstractFileInfo, testFileBaseInfo)
     EXPECT_EQ(false, info->isReadable());
     EXPECT_EQ(false, info->isWritable());
     EXPECT_EQ(false, info->isExecutable());
-    EXPECT_EQ(false, info->isHioceann());
+    EXPECT_EQ(false, info->isHidden());
     EXPECT_EQ(false, info->isNativePath());
     EXPECT_EQ(false, info->isFile());
     EXPECT_EQ(false, info->isDir());

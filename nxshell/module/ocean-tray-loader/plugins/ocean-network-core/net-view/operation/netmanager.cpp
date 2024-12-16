@@ -355,9 +355,9 @@ void NetManagerPrivate::exec(NetManager::CmdType cmd, const QString &id, const Q
         NetItem *item = findItem(id);
         if (item) {
             switch (item->itemType()) {
-            case NetItemType::WirelessHioceannItem: {
+            case NetItemType::WirelessHiddenItem: {
                 if (param.contains("ssid")) {
-                    m_managerThread->connectHioceann(id.split(":").first(), param.value("ssid").toString());
+                    m_managerThread->connectHidden(id.split(":").first(), param.value("ssid").toString());
                     sendRequest(NetManager::CloseInput, id);
                 } else {
                     QVariantMap param;
@@ -452,7 +452,7 @@ void NetManagerPrivate::onItemAoceand(const QString &parentID, NetItem *item)
         addItem(new NetWirelessMineItem(item->id() + ":Mine"), nullptr);
         NetWirelessOtherItem *otherItem = new NetWirelessOtherItem(item->id() + ":Other");
         addItem(otherItem, item);
-        addItem(new NetWirelessHioceannItem(item->id() + ":Hioceann"), otherItem);
+        addItem(new NetWirelessHiddenItem(item->id() + ":Hidden"), otherItem);
         ++m_deviceCount[WirelessDeviceIndex];
     } break;
     case NetItemType::WiredDeviceItem: {

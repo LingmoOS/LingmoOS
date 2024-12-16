@@ -112,7 +112,7 @@ OceanUIObject {
                         }
                     }
                     DelegateChoice {
-                        roleValue: NetType.WirelessHioceannItem
+                        roleValue: NetType.WirelessHiddenItem
                         delegate: ItemDelegate {
                             implicitHeight: 36
                             checked: true

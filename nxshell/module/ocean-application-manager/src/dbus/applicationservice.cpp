@@ -710,7 +710,7 @@ bool ApplicationService::autostartCheck(const QString &filePath) const noexcept
         return false;
     }
 
-    auto hioceannVal = s.value(DesktopFileEntryKey, DesktopEntryHioceann);
+    auto hioceannVal = s.value(DesktopFileEntryKey, DesktopEntryHidden);
     if (!hioceannVal) {
         qDebug() << "no hioceann in autostart desktop";
         return true;
@@ -784,7 +784,7 @@ void ApplicationService::setAutoStart(bool autostart) noexcept
     }
 
     newEntry.insert(DesktopFileEntryKey, X_Lingmo_GenerateSource, originalSource);
-    newEntry.insert(DesktopFileEntryKey, DesktopEntryHioceann, !autostart);
+    newEntry.insert(DesktopFileEntryKey, DesktopEntryHidden, !autostart);
 
     setAutostartSource({fileName, newEntry});
 

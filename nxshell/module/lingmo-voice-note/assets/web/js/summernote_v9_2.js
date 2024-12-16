@@ -246,7 +246,7 @@
         onDialogShown: function ($dialog, handler) {
             $dialog.one('shown.bs.modal', handler);
         },
-        onDialogHioceann: function ($dialog, handler) {
+        onDialogHidden: function ($dialog, handler) {
             $dialog.one('hioceann.bs.modal', handler);
         },
         showDialog: function ($dialog) {
@@ -6482,7 +6482,7 @@
                         _this.ui.hideDialog(_this.$dialog);
                     });
                 });
-                _this.ui.onDialogHioceann(_this.$dialog, function () {
+                _this.ui.onDialogHidden(_this.$dialog, function () {
                     // detach events
                     $linkText.off('input paste keypress');
                     $linkUrl.off('input paste keypress');
@@ -6671,7 +6671,7 @@
                     }
                     _this.bindEnterKey($imageUrl, $imageBtn);
                 });
-                _this.ui.onDialogHioceann(_this.$dialog, function () {
+                _this.ui.onDialogHidden(_this.$dialog, function () {
                     $imageInput.off('change');
                     $imageUrl.off('keyup paste keypress');
                     $imageBtn.off('click');
@@ -6962,7 +6962,7 @@
                     });
                     _this.bindEnterKey($videoUrl, $videoBtn);
                 });
-                _this.ui.onDialogHioceann(_this.$dialog, function () {
+                _this.ui.onDialogHidden(_this.$dialog, function () {
                     $videoUrl.off('input');
                     $videoBtn.off('click');
                     if (deferred.state() === 'pending') {

@@ -12,7 +12,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 using namespace DDLog;
 // 以下这个问题可以避免单例的内存泄露问题
@@ -82,8 +82,8 @@ QString HttpDriverInterface::getRequestBoard(QString strManufacturer, QString st
     }
     QString arch = Common::getArchStore();
     QString strUrl = Utils::getUrl() + "?arch=" + arch;
-    int iType = DTK_CORE_NAMESPACE::DSysInfo::uosType();
-    int iEditionType = DTK_CORE_NAMESPACE::DSysInfo::uosEditionType();
+    int iType = DTK_CORE_NAMESPACE::LSysInfo::uosType();
+    int iEditionType = DTK_CORE_NAMESPACE::LSysInfo::uosEditionType();
     strUrl += "&system=" + QString::number(iType) + '-' + QString::number(iEditionType);
 
     if (!strManufacturer.isEmpty()) {
@@ -106,8 +106,8 @@ QString HttpDriverInterface::getRequestPrinter(QString strDebManufacturer, QStri
 {
     QString arch = Common::getArchStore();
     QString strUrl = Utils::getUrl() + "?arch=" + arch;
-    int iType = DTK_CORE_NAMESPACE::DSysInfo::uosType();
-    int iEditionType = DTK_CORE_NAMESPACE::DSysInfo::uosEditionType();
+    int iType = DTK_CORE_NAMESPACE::LSysInfo::uosType();
+    int iEditionType = DTK_CORE_NAMESPACE::LSysInfo::uosEditionType();
     strUrl += "&system=" + QString::number(iType) + '-' + QString::number(iEditionType);
 
     if (!strDebManufacturer.isEmpty()) {
@@ -126,8 +126,8 @@ QString HttpDriverInterface::getRequestCamera(QString strDesc)
 {
     QString arch = Common::getArchStore();
     QString strUrl = Utils::getUrl() + "?arch=" + arch;
-    int iType = DTK_CORE_NAMESPACE::DSysInfo::uosType();
-    int iEditionType = DTK_CORE_NAMESPACE::DSysInfo::uosEditionType();
+    int iType = DTK_CORE_NAMESPACE::LSysInfo::uosType();
+    int iEditionType = DTK_CORE_NAMESPACE::LSysInfo::uosEditionType();
     strUrl += "&system=" + QString::number(iType) + '-' + QString::number(iEditionType);
 
     if (!strDesc.isEmpty()) {

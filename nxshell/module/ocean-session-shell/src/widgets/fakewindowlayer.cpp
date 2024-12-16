@@ -15,7 +15,7 @@ FakeWindowLayer::FakeWindowLayer(QWidget *parent)
     , m_savedFocus(nullptr)
 {
     setAutoFillBackground(false);
-    setAttribute(Qt::WA_WState_Hioceann); // ensure invisible to parent
+    setAttribute(Qt::WA_WState_Hidden); // ensure invisible to parent
 }
 
 void FakeWindowLayer::setContent(QWidget *toSet)

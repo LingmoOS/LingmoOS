@@ -277,7 +277,7 @@
         <translation>كۆرسىتىش</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>يوشۇرۇش</translation>
     </message>
     <message>

@@ -16,7 +16,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN DataDeviceManager::Private
+class Q_DECL_HIDDEN DataDeviceManager::Private
 {
 public:
     WaylandPointer<wl_data_device_manager, wl_data_device_manager_destroy> manager;

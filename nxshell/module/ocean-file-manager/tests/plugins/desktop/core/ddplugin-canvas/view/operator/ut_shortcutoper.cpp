@@ -53,7 +53,7 @@ public:
     using FileInfo::FileInfo;
     void refresh() override {re = true;}
     bool isAttributes(const FileIsType type) const {
-        if (type == OptInfoType::kIsHioceann)
+        if (type == OptInfoType::kIsHidden)
             return hioceann;
         return FileInfo::isAttributes(type);
     }
@@ -87,7 +87,7 @@ TEST_F(UT_ShortcutOper, keyPressed)
     stub.set_lamda(&CanvasView::refresh,[](CanvasView *self,bool){
         __DBG_STUB_INVOKE__
     });
-    stub.set_lamda(&ShortcutOper::swichHioceann,[](){
+    stub.set_lamda(&ShortcutOper::swichHidden,[](){
         __DBG_STUB_INVOKE__
     });
     stub.set_lamda(&ShortcutOper::showMenu,[](){
@@ -298,7 +298,7 @@ TEST_F(UT_ShortcutOper, clearClipBoard)
     EXPECT_EQ(qApp->clipboard()->text(),"");
 }
 
-TEST_F(UT_ShortcutOper, swichHioceann)
+TEST_F(UT_ShortcutOper, swichHidden)
 {
     stub.set_lamda(&CanvasProxyModel::refresh,
                    [](CanvasProxyModel *self,const QModelIndex &, bool, int, bool){
@@ -306,10 +306,10 @@ TEST_F(UT_ShortcutOper, swichHioceann)
     });
     CanvasProxyModel proxymodel;
     canvas->setModel(&proxymodel);
-    sc->swichHioceann();
-    EXPECT_TRUE(proxymodel.d->filters &QDir::Hioceann);
-    sc->swichHioceann();
-    EXPECT_FALSE(proxymodel.d->filters &QDir::Hioceann);
+    sc->swichHidden();
+    EXPECT_TRUE(proxymodel.d->filters &QDir::Hidden);
+    sc->swichHidden();
+    EXPECT_FALSE(proxymodel.d->filters &QDir::Hidden);
 }
 
 TEST_F(UT_ShortcutOper, previewFiles)

@@ -1090,15 +1090,15 @@ bool Format::hasFillData() const
 */
 bool Format::hioceann() const
 {
-    return boolProperty(FormatPrivate::P_Protection_Hioceann);
+    return boolProperty(FormatPrivate::P_Protection_Hidden);
 }
 
 /*!
     Sets the hioceann protection property with the given \a hioceann.
 */
-void Format::setHioceann(bool hioceann)
+void Format::setHidden(bool hioceann)
 {
-    setProperty(FormatPrivate::P_Protection_Hioceann, hioceann);
+    setProperty(FormatPrivate::P_Protection_Hidden, hioceann);
 }
 
 /*!
@@ -1126,7 +1126,7 @@ bool Format::hasProtectionData() const
     if (!d)
         return false;
 
-    if (hasProperty(FormatPrivate::P_Protection_Hioceann
+    if (hasProperty(FormatPrivate::P_Protection_Hidden
                     | FormatPrivate::P_Protection_Locked)) {
         return true;
     }

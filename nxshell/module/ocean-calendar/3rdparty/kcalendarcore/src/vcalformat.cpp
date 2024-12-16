@@ -60,7 +60,7 @@ void removeAllVCal(QVector<QSharedPointer<K>> &c, const QSharedPointer<K> &x)
     c.remove(c.indexOf(x));
 }
 
-class Q_DECL_HIOCEANN KCalendarCore::VCalFormat::Private
+class Q_DECL_HIDDEN KCalendarCore::VCalFormat::Private
 {
 public:
     Calendar::Ptr mCalendar;

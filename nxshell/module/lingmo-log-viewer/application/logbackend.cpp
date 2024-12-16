@@ -19,7 +19,7 @@
 #include <sys/utsname.h>
 #include <malloc.h>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDateTime>
 #include <QStandardPaths>
@@ -547,9 +547,9 @@ bool LogBackend::exportAppLogsByCondition(const QString &outDir, const QString &
 
 QStringList LogBackend::getLogTypes()
 {
-    Dtk::Core::DSysInfo::UosEdition edition = Dtk::Core::DSysInfo::uosEditionType();
+    Dtk::Core::LSysInfo::UosEdition edition = Dtk::Core::LSysInfo::uosEditionType();
     //等于服务器行业版或欧拉版(centos)
-    bool isCentos = Dtk::Core::DSysInfo::UosEuler == edition || Dtk::Core::DSysInfo::UosEnterpriseC == edition || Dtk::Core::DSysInfo::UosMilitaryS == edition;
+    bool isCentos = Dtk::Core::LSysInfo::UosEuler == edition || Dtk::Core::LSysInfo::UosEnterpriseC == edition || Dtk::Core::LSysInfo::UosMilitaryS == edition;
     if (QFile::exists("/var/log/journal") || isCentos) {
         m_logTypes.push_back(JOUR_TREE_DATA);
     }
@@ -1762,8 +1762,8 @@ bool LogBackend::getOutDirPath(const QString &path)
 
 LOG_FLAG LogBackend::type2Flag(const QString &type, QString& error)
 {
-    Dtk::Core::DSysInfo::UosEdition edition = Dtk::Core::DSysInfo::uosEditionType();
-    bool isCentos = Dtk::Core::DSysInfo::UosEuler == edition || Dtk::Core::DSysInfo::UosEnterpriseC == edition || Dtk::Core::DSysInfo::UosMilitaryS == edition;
+    Dtk::Core::LSysInfo::UosEdition edition = Dtk::Core::LSysInfo::uosEditionType();
+    bool isCentos = Dtk::Core::LSysInfo::UosEuler == edition || Dtk::Core::LSysInfo::UosEnterpriseC == edition || Dtk::Core::LSysInfo::UosMilitaryS == edition;
 
     LOG_FLAG flag = NONE;
     if (type == TYPE_SYSTEM)

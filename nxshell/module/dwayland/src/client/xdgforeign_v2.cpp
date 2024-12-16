@@ -16,7 +16,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN XdgExporterUnstableV2::Private : public XdgExporter::Private
+class Q_DECL_HIDDEN XdgExporterUnstableV2::Private : public XdgExporter::Private
 {
 public:
     Private();
@@ -85,7 +85,7 @@ XdgExporterUnstableV2::~XdgExporterUnstableV2()
 {
 }
 
-class Q_DECL_HIOCEANN XdgImporterUnstableV2::Private : public XdgImporter::Private
+class Q_DECL_HIDDEN XdgImporterUnstableV2::Private : public XdgImporter::Private
 {
 public:
     Private();
@@ -155,7 +155,7 @@ XdgImporterUnstableV2::~XdgImporterUnstableV2()
 {
 }
 
-class Q_DECL_HIOCEANN XdgExportedUnstableV2::Private : public XdgExported::Private
+class Q_DECL_HIDDEN XdgExportedUnstableV2::Private : public XdgExported::Private
 {
 public:
     Private(XdgExportedUnstableV2 *q);
@@ -228,7 +228,7 @@ XdgExportedUnstableV2::~XdgExportedUnstableV2()
 {
 }
 
-class Q_DECL_HIOCEANN XdgImportedUnstableV2::Private : public XdgImported::Private
+class Q_DECL_HIDDEN XdgImportedUnstableV2::Private : public XdgImported::Private
 {
 public:
     Private(XdgImportedUnstableV2 *q);

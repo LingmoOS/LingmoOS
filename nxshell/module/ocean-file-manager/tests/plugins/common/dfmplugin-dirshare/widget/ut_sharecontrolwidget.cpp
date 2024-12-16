@@ -161,11 +161,11 @@ TEST_F(UT_ShareControlWidget, OnSambapasswordSet)
 TEST_F(UT_ShareControlWidget, ShowMoreInfo)
 {
     EXPECT_NO_FATAL_FAILURE(widget->showMoreInfo(true));
-    EXPECT_FALSE(widget->m_shareNotes->isHioceann());
+    EXPECT_FALSE(widget->m_shareNotes->isHidden());
     EXPECT_TRUE(widget->refreshIp);
     EXPECT_TRUE(widget->refreshIp->isActive());
     EXPECT_NO_FATAL_FAILURE(widget->showMoreInfo(false));
-    EXPECT_TRUE(widget->m_shareNotes->isHioceann());
+    EXPECT_TRUE(widget->m_shareNotes->isHidden());
     EXPECT_FALSE(widget->refreshIp->isActive());
 }
 

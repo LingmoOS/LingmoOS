@@ -396,7 +396,7 @@ static QJsonObject createJson(NetworkManager::Device::Ptr device, NetworkManager
             json.insert("Ssid", QString(wsSetting->ssid()));
     }
 
-    json.insert("Hioceann", false);
+    json.insert("Hidden", false);
     return json;
 }
 

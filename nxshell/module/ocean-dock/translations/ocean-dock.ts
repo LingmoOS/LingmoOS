@@ -279,8 +279,8 @@
         <translation>Keep Shown</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
-        <translation>Keep Hioceann</translation>
+        <source>Keep Hidden</source>
+        <translation>Keep Hidden</translation>
     </message>
     <message>
         <source>Smart Hide</source>

@@ -217,7 +217,7 @@ protected:
     using NetItem::NetItem;
 };
 
-class NetWirelessHioceannItem : public NetItem
+class NetWirelessHiddenItem : public NetItem
 {
     Q_OBJECT
 public:

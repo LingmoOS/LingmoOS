@@ -277,7 +277,7 @@
         <translation>እንደ ታየ ማቆያ</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>እንደ ተደበቅ ማቆያ</translation>
     </message>
     <message>

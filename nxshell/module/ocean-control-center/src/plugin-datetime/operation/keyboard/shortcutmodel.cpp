@@ -4,7 +4,7 @@
 
 #include "shortcutmodel.h"
 
-#include <DSysInfo>
+#include <LSysInfo>
 #include <QDBusInterface>
 #include <QDebug>
 #include <QJsonArray>
@@ -129,7 +129,7 @@ void ShortcutModel::delInfo(ShortcutInfo *info)
 void ShortcutModel::onParseInfo(const QString &info)
 {
     QStringList systemShortKeys;
-    if (DSysInfo::UosServer == DSysInfo::uosType()) {
+    if (LSysInfo::UosServer == LSysInfo::uosType()) {
         QStringList systemFilterServer = systemFilter;
         systemFilterServer.removeOne("wm-switcher");
         systemFilterServer.removeOne("preview-workspace");

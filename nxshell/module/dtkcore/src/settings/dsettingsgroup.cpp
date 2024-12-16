@@ -102,7 +102,7 @@ QString DSettingsGroup::name() const
   @brief Check this group will show on DSettings dialog.
   @return true indicates that this option group will be displayed。
  */
-bool DSettingsGroup::isHioceann() const
+bool DSettingsGroup::isHidden() const
 {
     Q_D(const DSettingsGroup);
     return d->hide;

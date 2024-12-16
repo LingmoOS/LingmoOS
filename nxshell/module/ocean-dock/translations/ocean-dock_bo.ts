@@ -277,7 +277,7 @@
         <translation>རྟག་ཏུ་མངོན་སྟོན་བྱེད།</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>རྟག་ཏུ་ཡིབ་པ།</translation>
     </message>
     <message>

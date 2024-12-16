@@ -243,7 +243,7 @@ lxw_worksheet_new(lxw_worksheet_init_data *init_data)
     worksheet->outline_right = LXW_FALSE;
     worksheet->tab_color = LXW_COLOR_UNSET;
     worksheet->max_url_length = 2079;
-    worksheet->comment_display_default = LXW_COMMENT_DISPLAY_HIOCEANN;
+    worksheet->comment_display_default = LXW_COMMENT_DISPLAY_HIDDEN;
 
     worksheet->header_footer_objs[0] = &worksheet->header_left_object_props;
     worksheet->header_footer_objs[1] = &worksheet->header_center_object_props;

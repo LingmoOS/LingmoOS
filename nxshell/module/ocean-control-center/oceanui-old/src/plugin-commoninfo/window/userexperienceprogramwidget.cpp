@@ -7,7 +7,7 @@
 #include "widgets/switchwidget.h"
 
 #include <DTipLabel>
-#include <DSysInfo>
+#include <LSysInfo>
 
 #include <QDesktopServices>
 #include <QUrl>

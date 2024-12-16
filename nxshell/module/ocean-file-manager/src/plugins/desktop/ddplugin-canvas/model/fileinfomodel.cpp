@@ -283,7 +283,7 @@ QModelIndex FileInfoModel::setRootUrl(QUrl url)
     d->fileProvider->setRoot(url);
 
     //! FileInfoModel should get all files
-    d->filters = QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hioceann;
+    d->filters = QDir::AllEntries | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden;
 
     // root url changed,refresh data as soon
     d->doRefresh();

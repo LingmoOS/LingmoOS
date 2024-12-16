@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef OCEANSKTOPSERVICESTHREAD_H
-#define OCEANSKTOPSERVICESTHREAD_H
+#ifndef DDESKTOPSERVICESTHREAD_H
+#define DDESKTOPSERVICESTHREAD_H
 
 #include <dtkwidget_global.h>
 #include <dtkgui_global.h>
@@ -49,4 +49,4 @@ private:
     QStringList m_listFiles;    // 需要打开的文件路径
 };
 
-#endif // OCEANSKTOPSERVICESTHREAD_H
+#endif // DDESKTOPSERVICESTHREAD_H

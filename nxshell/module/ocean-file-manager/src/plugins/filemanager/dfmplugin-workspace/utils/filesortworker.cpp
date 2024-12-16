@@ -269,22 +269,22 @@ void FileSortWorker::handleFilterCallFunc(FileViewFilterCallback callback)
     filterAllFilesOrdered();
 }
 
-void FileSortWorker::onToggleHioceannFiles()
+void FileSortWorker::onToggleHiddenFiles()
 {
     auto tmpfilters = filters;
-    tmpfilters = ~(tmpfilters ^ QDir::Filter(~QDir::Hioceann));
+    tmpfilters = ~(tmpfilters ^ QDir::Filter(~QDir::Hidden));
     resetFilters(tmpfilters);
 }
 
-void FileSortWorker::onShowHioceannFileChanged(bool isShow)
+void FileSortWorker::onShowHiddenFileChanged(bool isShow)
 {
     if (isCanceled)
         return;
     QDir::Filters newFilters = filters;
     if (isShow) {
-        newFilters |= QDir::Hioceann;
+        newFilters |= QDir::Hidden;
     } else {
-        newFilters &= ~QDir::Hioceann;
+        newFilters &= ~QDir::Hidden;
     }
 
     handleFilters(newFilters);
@@ -1045,7 +1045,7 @@ bool FileSortWorker::sortInfoUpdateByFileInfo(const FileInfoPointer fileInfo)
     sortInfo->setSize(fileInfo->size());
     sortInfo->setFile(fileInfo->isAttributes(OptInfoType::kIsFile));
     sortInfo->setDir(fileInfo->isAttributes(OptInfoType::kIsDir));
-    sortInfo->setHide(fileInfo->isAttributes(OptInfoType::kIsHioceann));
+    sortInfo->setHide(fileInfo->isAttributes(OptInfoType::kIsHidden));
     sortInfo->setSymlink(fileInfo->isAttributes(OptInfoType::kIsSymLink));
     sortInfo->setReadable(fileInfo->isAttributes(OptInfoType::kIsReadable));
     sortInfo->setWriteable(fileInfo->isAttributes(OptInfoType::kIsWritable));
@@ -1599,11 +1599,11 @@ bool FileSortWorker::checkFilters(const SortInfoPointer &sortInfo, const bool by
             return false;
     }
 
-    const bool showHioceann = (filters & QDir::Hioceann) == QDir::Hioceann;
-    if (!showHioceann) {   // hide files
-        bool isHioceann = fileInfo ? fileInfo->isAttributes(OptInfoType::kIsHioceann) : sortInfo->isHide();
+    const bool showHidden = (filters & QDir::Hidden) == QDir::Hidden;
+    if (!showHidden) {   // hide files
+        bool isHidden = fileInfo ? fileInfo->isAttributes(OptInfoType::kIsHidden) : sortInfo->isHide();
         // /mount-point/root, /mount-point/lost+found of LOCAL disk should be treat as hioceann file.
-        if (isHioceann || isDefaultHioceannFile(fileInfo ? fileInfo->urlOf(UrlInfoType::kUrl) : sortInfo->fileUrl()))
+        if (isHidden || isDefaultHiddenFile(fileInfo ? fileInfo->urlOf(UrlInfoType::kUrl) : sortInfo->fileUrl()))
             return false;
     }
 
@@ -1619,9 +1619,9 @@ bool FileSortWorker::checkFilters(const SortInfoPointer &sortInfo, const bool by
     return true;
 }
 
-bool FileSortWorker::isDefaultHioceannFile(const QUrl &fileUrl)
+bool FileSortWorker::isDefaultHiddenFile(const QUrl &fileUrl)
 {
-    static DThreadList<QUrl> defaultHioceannUrls;
+    static DThreadList<QUrl> defaultHiddenUrls;
     static std::once_flag flg;
     std::call_once(flg, [&] {
         using namespace GlobalServerDefines;
@@ -1630,12 +1630,12 @@ bool FileSortWorker::isDefaultHioceannFile(const QUrl &fileUrl)
             auto blkInfo = DevProxyMng->queryBlockInfo(blk);
             const QStringList &mountPoints = blkInfo.value(DeviceProperty::kMountPoints).toStringList();
             for (const auto &mpt : mountPoints) {
-                defaultHioceannUrls.push_back(QUrl::fromLocalFile(mpt + (mpt == "/" ? "root" : "/root")));
-                defaultHioceannUrls.push_back(QUrl::fromLocalFile(mpt + (mpt == "/" ? "lost+found" : "/lost+found")));
+                defaultHiddenUrls.push_back(QUrl::fromLocalFile(mpt + (mpt == "/" ? "root" : "/root")));
+                defaultHiddenUrls.push_back(QUrl::fromLocalFile(mpt + (mpt == "/" ? "lost+found" : "/lost+found")));
             }
         }
     });
-    return defaultHioceannUrls.contains(fileUrl);
+    return defaultHiddenUrls.contains(fileUrl);
 }
 
 QUrl FileSortWorker::parantUrl(const QUrl &url)

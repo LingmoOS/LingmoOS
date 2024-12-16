@@ -160,7 +160,7 @@ void XWaylandInputTest::testPointerEnterLeaveSsd()
     QVERIFY(window);
     QVERIFY(window->isDecorated());
     QVERIFY(!window->hasStrut());
-    QVERIFY(!window->isHioceannInternal());
+    QVERIFY(!window->isHiddenInternal());
     QVERIFY(!window->readyForPainting());
 
     QMetaObject::invokeMethod(window, "setReadyForPainting");

@@ -10,7 +10,7 @@
 #include <QLibrary>
 #include <QGSettings>
 
-#include <DSysInfo>
+#include <LSysInfo>
 
 DCORE_USE_NAMESPACE
 
@@ -43,7 +43,7 @@ void PluginLoader::run()
             continue;
 
         // 社区版需要加载键盘布局，其他不需要
-        if (file.contains("libkeyboard-layout") && !DSysInfo::isCommunityEdition())
+        if (file.contains("libkeyboard-layout") && !LSysInfo::isCommunityEdition())
             continue;
 
         // TODO: old dock plugins is uncompatible

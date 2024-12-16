@@ -168,7 +168,7 @@ void ConnectionEditPage::initHeaderButtons()
     m_removeBtn->setVisible(true);
 
     //当只有m_removeBtn显示时,由于布局中添加了space,导致删除按钮未对齐,需要删除空格
-    if (!m_disconnectBtn->isHioceann())
+    if (!m_disconnectBtn->isHidden())
         return;
     m_buttonTuple_conn->removeSpacing();
 }
@@ -475,7 +475,7 @@ bool ConnectionEditPage::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Show && obj == m_removeBtn) {
         QWidget *widget = static_cast<QWidget *>(obj);
-        bool visible = true; // "Hioceann" != GSettingWatcher::instance()->getStatus("removeConnection");
+        bool visible = true; // "Hidden" != GSettingWatcher::instance()->getStatus("removeConnection");
         if (m_isNewConnection)
             widget->setVisible(false);
         else if (visible != widget->isVisible())

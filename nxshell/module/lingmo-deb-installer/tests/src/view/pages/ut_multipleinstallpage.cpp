@@ -167,9 +167,9 @@ TEST_F(UT_MultipleInstallPage, UT_MultipleInstallPage_slotShowInfo)
     EXPECT_FALSE(multiplepage->m_appsListViewBgFrame->isVisible());
 }
 
-TEST_F(UT_MultipleInstallPage, UT_MultipleInstallPage_slotHioceannCancelButton)
+TEST_F(UT_MultipleInstallPage, UT_MultipleInstallPage_slotHiddenCancelButton)
 {
-    multiplepage->slotHioceannCancelButton();
+    multiplepage->slotHiddenCancelButton();
     EXPECT_FALSE(multiplepage->m_installButton->hasFocus());
     EXPECT_FALSE(multiplepage->m_appsListView->m_bIsRightMenuShow);
     EXPECT_FALSE(multiplepage->m_showDependsButton->isVisible());

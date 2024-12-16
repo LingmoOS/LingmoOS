@@ -20,7 +20,7 @@
 #if defined(ASIO_HAS_BOOST_DATE_TIME) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <cstoceanf>
+#include <cstddef>
 #include "asio/any_io_executor.hpp"
 #include "asio/detail/deadline_timer_service.hpp"
 #include "asio/detail/handler_type_requirements.hpp"

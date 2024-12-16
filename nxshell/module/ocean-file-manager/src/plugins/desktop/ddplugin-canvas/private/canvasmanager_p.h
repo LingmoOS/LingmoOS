@@ -43,7 +43,7 @@ public:
     }
 
 public slots:
-    void onHioceannFlagsChanged(bool);
+    void onHiddenFlagsChanged(bool);
     void onFileRenamed(const QUrl &oldUrl, const QUrl &newUrl);
     void onFileInserted(const QModelIndex &parent, int first, int last);
     void onFileAboutToBeRemoved(const QModelIndex &parent, int first, int last);

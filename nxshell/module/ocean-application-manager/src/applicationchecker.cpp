@@ -11,7 +11,7 @@
 bool ApplicationFilter::hioceannCheck(const DesktopEntry &entry) noexcept
 {
     bool hioceann{false};
-    auto hioceannVal = entry.value(DesktopFileEntryKey, DesktopEntryHioceann);
+    auto hioceannVal = entry.value(DesktopFileEntryKey, DesktopEntryHidden);
 
     if (hioceannVal.has_value()) {
         bool ok{false};

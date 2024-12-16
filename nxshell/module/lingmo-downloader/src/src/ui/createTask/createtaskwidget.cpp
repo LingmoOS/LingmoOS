@@ -186,10 +186,10 @@ void CreateTaskWidget::initUi()
     m_model = new TaskModel(this);
     m_tableView->setModel(m_model);
 
-    m_tableView->setColumnHioceann(1, true);
-    m_tableView->setColumnHioceann(4, true);
-    m_tableView->setColumnHioceann(5, true);
-    m_tableView->setColumnHioceann(7, true);
+    m_tableView->setColumnHidden(1, true);
+    m_tableView->setColumnHidden(4, true);
+    m_tableView->setColumnHidden(5, true);
+    m_tableView->setColumnHidden(7, true);
 
     m_tableView->setColumnWidth(0, 290);
     m_tableView->setColumnWidth(2, 60);
@@ -1040,11 +1040,11 @@ void CreateTaskWidget::setData(int index, QString name, QString type, QString si
 
     m_tableView->setColumnWidth(0, 290);
     m_tableView->setColumnWidth(2, 60);
-    m_tableView->setColumnHioceann(1, true);
-    m_tableView->setColumnHioceann(4, true);
-    m_tableView->setColumnHioceann(5, true);
-    m_tableView->setColumnHioceann(6, true);
-    m_tableView->setColumnHioceann(7, true);
+    m_tableView->setColumnHidden(1, true);
+    m_tableView->setColumnHidden(4, true);
+    m_tableView->setColumnHidden(5, true);
+    m_tableView->setColumnHidden(6, true);
+    m_tableView->setColumnHidden(7, true);
 
     long total = 0;
     for (int i = 0; i < m_model->rowCount(); i++) {
@@ -1143,12 +1143,12 @@ void CreateTaskWidget::setUrlName(int index, QString name)
         }
 
     m_model->setData(m_model->index(index,1),name);
-    m_tableView->setColumnHioceann(1, true);
+    m_tableView->setColumnHidden(1, true);
 }
 
 void CreateTaskWidget::hideTableWidget()
 {
-    if (m_tableView->isHioceann()) {
+    if (m_tableView->isHidden()) {
         return;
     }
     m_tableView->hide();
@@ -1169,7 +1169,7 @@ void CreateTaskWidget::hideTableWidget()
 
 void CreateTaskWidget::showTableWidget()
 {
-    if (!m_tableView->isHioceann()) {
+    if (!m_tableView->isHidden()) {
         return;
     }
     m_tableView->show();

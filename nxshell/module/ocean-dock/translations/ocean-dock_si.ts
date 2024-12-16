@@ -277,7 +277,7 @@
         <translation>පෙනීමට සලස්වා තබන්න</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>සඟවා තබන්න</translation>
     </message>
     <message>

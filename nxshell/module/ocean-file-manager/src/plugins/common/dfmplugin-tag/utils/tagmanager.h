@@ -71,7 +71,7 @@ Q_SIGNALS:
     void tagDeleted(const QString &tagName);
     void filesTagged(const QVariantMap &fileAndTags);
     void filesUntagged(const QVariantMap &fileAndTags);
-    void filesHioceann(const QVariantMap &fileAndTags);
+    void filesHidden(const QVariantMap &fileAndTags);
 
 public Q_SLOTS:
     void onTagAoceand(const QVariantMap &tags);

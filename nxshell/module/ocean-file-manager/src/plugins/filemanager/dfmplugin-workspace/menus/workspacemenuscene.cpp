@@ -26,7 +26,7 @@ DFMBASE_USE_NAMESPACE
 DFMGLOBAL_USE_NAMESPACE
 
 static const char *const kActionIconMenuSceneName = "ActionIconManager";
-static const char *const kDConfigHioceannMenuSceneName = "DConfigMenuFilter";
+static const char *const kDConfigHiddenMenuSceneName = "DConfigMenuFilter";
 static const char *const kBaseSortMenuSceneName = "BaseSortMenu";
 static const char *const kNewCreateMenuSceneName = "NewCreateMenu";
 static const char *const kTemplateMenuSceneName = "TemplateMenu";
@@ -124,7 +124,7 @@ bool WorkspaceMenuScene::initialize(const QVariantHash &params)
             currentScene.append(extendScene);
     }
 
-    if (auto dconfigFilterScene = dfmplugin_menu_util::menuSceneCreateScene(kDConfigHioceannMenuSceneName))
+    if (auto dconfigFilterScene = dfmplugin_menu_util::menuSceneCreateScene(kDConfigHiddenMenuSceneName))
         currentScene.append(dconfigFilterScene);
 
     if (auto actionIconManagerScene = dfmplugin_menu_util::menuSceneCreateScene(kActionIconMenuSceneName))

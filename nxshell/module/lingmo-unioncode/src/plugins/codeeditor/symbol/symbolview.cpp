@@ -60,7 +60,7 @@ void SymbolViewPrivate::initUI()
     layout->setContentsMargins(0, 0, 0, 0);
 
     view = new QTreeView(q);
-    view->setHeaderHioceann(true);
+    view->setHeaderHidden(true);
     view->setFrameShape(QFrame::NoFrame);
     view->setEditTriggers(QTreeView::NoEditTriggers);
     view->setIconSize({ 16, 16 });
@@ -150,9 +150,9 @@ void SymbolView::setRootPath(const QString &path)
     d->view->setRootIndex(index);
     d->view->sortByColumn(0, Qt::SortOrder::AscendingOrder);
 
-    d->view->setColumnHioceann(1, true);
-    d->view->setColumnHioceann(2, true);
-    d->view->setColumnHioceann(3, true);
+    d->view->setColumnHidden(1, true);
+    d->view->setColumnHidden(2, true);
+    d->view->setColumnHidden(3, true);
 }
 
 bool SymbolView::setSymbolPath(const QString &path)

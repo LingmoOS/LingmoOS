@@ -3,7 +3,7 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 #include "pwqualitymanager.h"
 #include <QMap>
-#include <DSysInfo>
+#include <LSysInfo>
 
 using namespace DCC_NAMESPACE;
 DCORE_USE_NAMESPACE
@@ -71,7 +71,7 @@ QString PwqualityManager::getErrorTips(PwqualityManager::ERROR_TYPE type, CheckT
     };
 
     //服务器版校验规则
-    if (DSysInfo::UosServer == DSysInfo::uosType()) {
+    if (LSysInfo::UosServer == LSysInfo::uosType()) {
         PasswordFlagsStrMap[PW_ERR_CHARACTER_INVALID] = tr("Password must contain uppercase letters, lowercase letters, numbers and symbols (~`!@#$%^&*()-_+=|\\{}[]:\"'<>,.?/)");
         PasswordFlagsStrMap[PW_ERR_PALINDROME] = tr("Password must not contain more than 4 palindrome characters");
         PasswordFlagsStrMap[PW_ERR_WORD] = tr("Do not use common words and combinations as password");

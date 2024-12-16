@@ -159,7 +159,7 @@ bool FileNameWorkerPrivate::searchUserPath()
             auto absoluteFilePath = info.absoluteFilePath();
 
             // 过滤文管设置的隐藏文件
-            if (SpecialTools::isHioceannFile(absoluteFilePath, m_hioceannFilters, QDir::homePath()))
+            if (SpecialTools::isHiddenFile(absoluteFilePath, m_hioceannFilters, QDir::homePath()))
                 continue;
 
             // 去除掉添加的data前缀
@@ -245,7 +245,7 @@ bool FileNameWorkerPrivate::searchByAnything()
                 path.replace(m_searchPath, m_originalSearchPath);
 
             // 过滤文管设置的隐藏文件
-            if (SpecialTools::isHioceannFile(path, m_hioceannFilters, QDir::homePath()))
+            if (SpecialTools::isHiddenFile(path, m_hioceannFilters, QDir::homePath()))
                 continue;
 
             appendSearchResult(path);

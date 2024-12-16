@@ -21,7 +21,7 @@ namespace
 typedef QList<Output::Mode> Modes;
 }
 
-class Q_DECL_HIOCEANN Output::Private
+class Q_DECL_HIDDEN Output::Private
 {
 public:
     Private(Output *q);

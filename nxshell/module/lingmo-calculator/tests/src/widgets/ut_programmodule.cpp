@@ -83,9 +83,9 @@ TEST_F(Ut_ProgramModule, Signals2)
     EXPECT_EQ(m_programmodule->m_shiftArrowListWidget->currentRow(), 0);
 
     m_programmodule->m_byteArrowRectangle->hidearrowrectangle();
-    EXPECT_TRUE(m_programmodule->m_byteArrowRectangle->isHioceann());
+    EXPECT_TRUE(m_programmodule->m_byteArrowRectangle->isHidden());
     m_programmodule->m_shiftArrowRectangle->hidearrowrectangle();
-    EXPECT_TRUE(m_programmodule->m_shiftArrowRectangle->isHioceann());
+    EXPECT_TRUE(m_programmodule->m_shiftArrowRectangle->isHidden());
 
     Settings::instance()->programmerBase = 0;
     Settings::instance()->proBitLength = 64;

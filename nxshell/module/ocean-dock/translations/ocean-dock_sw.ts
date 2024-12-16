@@ -277,7 +277,7 @@
         <translation>Tunza ionekane</translation>
     </message>
     <message>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>Tunza ifiche</translation>
     </message>
     <message>

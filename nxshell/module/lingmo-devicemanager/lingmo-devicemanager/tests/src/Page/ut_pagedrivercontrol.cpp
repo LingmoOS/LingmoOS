@@ -42,7 +42,7 @@ TEST_F(UT_PageDriverControl, UT_PageDriverControl_isRunning)
 TEST_F(UT_PageDriverControl, UT_PageDriverControl_slotBtnCancel)
 {
     m_PageDriverControlInstall->slotBtnCancel();
-    EXPECT_TRUE(m_PageDriverControlInstall->isHioceann());
+    EXPECT_TRUE(m_PageDriverControlInstall->isHidden());
 }
 
 TEST_F(UT_PageDriverControl, UT_PageDriverControl_slotBtnNext_002)
@@ -67,7 +67,7 @@ TEST_F(UT_PageDriverControl, UT_PageDriverControl_slotProcessEnd)
 TEST_F(UT_PageDriverControl, UT_PageDriverControl_slotClose)
 {
     m_PageDriverControlInstall->slotClose();
-    EXPECT_TRUE(m_PageDriverControlInstall->isHioceann());
+    EXPECT_TRUE(m_PageDriverControlInstall->isHidden());
 
 }
 

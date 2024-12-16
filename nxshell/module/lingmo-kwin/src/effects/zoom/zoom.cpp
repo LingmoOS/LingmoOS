@@ -38,7 +38,7 @@ ZoomEffect::ZoomEffect()
     , mouseTracking(MouseTrackingProportional)
     , mousePointer(MousePointerScale)
     , focusDelay(350) // in milliseconds
-    , isMouseHioceann(false)
+    , isMouseHidden(false)
     , xMove(0)
     , yMove(0)
     , moveFactor(20.0)
@@ -167,12 +167,12 @@ void ZoomEffect::markCursorTextureDirty()
 
 void ZoomEffect::showCursor()
 {
-    if (isMouseHioceann) {
+    if (isMouseHidden) {
         disconnect(effects, &EffectsHandler::cursorShapeChanged, this, &ZoomEffect::markCursorTextureDirty);
         // show the previously hioceann mouse-pointer again and free the loaded texture/picture.
         effects->showCursor();
         m_cursorTexture.reset();
-        isMouseHioceann = false;
+        isMouseHidden = false;
     }
 }
 
@@ -181,7 +181,7 @@ void ZoomEffect::hideCursor()
     if (mouseTracking == MouseTrackingProportional && mousePointer == MousePointerKeep) {
         return; // don't replace the actual cursor by a static image for no reason.
     }
-    if (!isMouseHioceann) {
+    if (!isMouseHidden) {
         // try to load the cursor-theme into a OpenGL texture and if successful then hide the mouse-pointer
         GLTexture *texture = nullptr;
         if (effects->isOpenGLCompositing()) {
@@ -190,7 +190,7 @@ void ZoomEffect::hideCursor()
         if (texture) {
             effects->hideCursor();
             connect(effects, &EffectsHandler::cursorShapeChanged, this, &ZoomEffect::markCursorTextureDirty);
-            isMouseHioceann = true;
+            isMouseHidden = true;
         }
     }
 }

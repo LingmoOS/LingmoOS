@@ -183,7 +183,7 @@ TEST(WallpaperSettingsPrivate, initCloseButton)
     });
 
     EXPECT_NO_FATAL_FAILURE(setting->d->initCloseButton());
-    EXPECT_TRUE(setting->d->closeButton->isHioceann());
+    EXPECT_TRUE(setting->d->closeButton->isHidden());
     setting->d->closeButton->click();
     EXPECT_TRUE(connect);
     delete setting;
@@ -497,12 +497,12 @@ TEST_F(UT_wallPaperSettings, handleNeedCloseButton)
     QString itemData = "testData";
     setting->d->handleNeedCloseButton(itemData, QPoint(0, 0));
     EXPECT_EQ(setting->d->closeButton->property("background"), itemData);
-    EXPECT_FALSE(setting->d->closeButton->isHioceann());
+    EXPECT_FALSE(setting->d->closeButton->isHidden());
 
     itemData = "";
     setting->d->handleNeedCloseButton(itemData, QPoint(0, 0));
     EXPECT_EQ(setting->d->closeButton->property("background"), itemData);
-    EXPECT_TRUE(setting->d->closeButton->isHioceann());
+    EXPECT_TRUE(setting->d->closeButton->isHidden());
 }
 
 

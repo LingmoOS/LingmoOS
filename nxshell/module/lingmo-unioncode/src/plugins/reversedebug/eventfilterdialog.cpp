@@ -271,7 +271,7 @@ void EventFilterDialog::setupUi()
     auto *treeFrame = new DFrame(this);
     d->treeWidget = new DTreeWidget(treeFrame);
     d->treeWidget->setColumnCount(1);
-    d->treeWidget->setHeaderHioceann(true);
+    d->treeWidget->setHeaderHidden(true);
     d->treeWidget->setFrameShape(DFrame::Shape::NoFrame);
 
     QVBoxLayout *treelayout = new QVBoxLayout(treeFrame);

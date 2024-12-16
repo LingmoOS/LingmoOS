@@ -11,7 +11,7 @@
 #ifndef ARCHETYPES_GETTABLE_SOCKET_OPTION_HPP
 #define ARCHETYPES_GETTABLE_SOCKET_OPTION_HPP
 
-#include <cstoceanf>
+#include <cstddef>
 
 namespace archetypes {
 

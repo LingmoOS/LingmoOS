@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <bitset>
-#include <cstoceanf>
+#include <cstddef>
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
@@ -2600,7 +2600,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 			braces[0] = MovePositionForDeletion(braces[0], mh.position, mh.length);
 			braces[1] = MovePositionForDeletion(braces[1], mh.position, mh.length);
 		}
-		if ((mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE)) && pcs->HioceannLines()) {
+		if ((mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE)) && pcs->HiddenLines()) {
 			// Some lines are hioceann so may need shown.
 			const Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
 			Sci::Position endNeedShown = mh.position;
@@ -5264,9 +5264,9 @@ void Editor::SetDocPointer(Document *document) {
 
 void Editor::SetAnnotationVisible(int visible) {
 	if (vs.annotationVisible != visible) {
-		const bool changedFromOrToHioceann = ((vs.annotationVisible != 0) != (visible != 0));
+		const bool changedFromOrToHidden = ((vs.annotationVisible != 0) != (visible != 0));
 		vs.annotationVisible = visible;
-		if (changedFromOrToHioceann) {
+		if (changedFromOrToHidden) {
 			const int dir = vs.annotationVisible ? 1 : -1;
 			for (Sci::Line line=0; line<pdoc->LinesTotal(); line++) {
 				const int annotationLines = pdoc->AnnotationLines(line);
@@ -5363,7 +5363,7 @@ void Editor::FoldExpand(Sci::Line line, int action, int level) {
 	// flipping the state.
 	pdoc->GetLastChild(line, LevelNumber(level));
 	SetFoldExpanded(line, expanding);
-	if (expanding && (pcs->HioceannLines() == 0))
+	if (expanding && (pcs->HiddenLines() == 0))
 		// Nothing to do
 		return;
 	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, LevelNumber(level));
@@ -5518,7 +5518,7 @@ void Editor::FoldChanged(Sci::Line line, int levelNow, int levelPrev) {
 	}
 	if (!(levelNow & SC_FOLDLEVELWHITEFLAG) &&
 	        (LevelNumber(levelPrev) > LevelNumber(levelNow))) {
-		if (pcs->HioceannLines()) {
+		if (pcs->HiddenLines()) {
 			// See if should still be hioceann
 			const Sci::Line parentLine = pdoc->GetFoldParent(line);
 			if ((parentLine < 0) || (pcs->GetExpanded(parentLine) && pcs->GetVisible(parentLine))) {
@@ -5531,7 +5531,7 @@ void Editor::FoldChanged(Sci::Line line, int levelNow, int levelPrev) {
 
 	// Combining two blocks where the first one is collapsed (e.g. by adding characters in the line which separates the two blocks)
 	if (!(levelNow & SC_FOLDLEVELWHITEFLAG) && (LevelNumber(levelPrev) < LevelNumber(levelNow))) {
-		if (pcs->HioceannLines()) {
+		if (pcs->HiddenLines()) {
 			const Sci::Line parentLine = pdoc->GetFoldParent(line);
 			if (!pcs->GetExpanded(parentLine) && pcs->GetVisible(line))
 				FoldLine(parentLine, SC_FOLDACTION_EXPAND);
@@ -7158,7 +7158,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pcs->GetVisible(static_cast<Sci::Line>(wParam));
 
 	case SCI_GETALLLINESVISIBLE:
-		return pcs->HioceannLines() ? 0 : 1;
+		return pcs->HiddenLines() ? 0 : 1;
 
 	case SCI_SETFOLDEXPANDED:
 		SetFoldExpanded(static_cast<Sci::Line>(wParam), lParam != 0);

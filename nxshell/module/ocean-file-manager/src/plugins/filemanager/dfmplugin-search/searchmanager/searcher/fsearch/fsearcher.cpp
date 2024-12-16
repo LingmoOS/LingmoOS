@@ -20,7 +20,7 @@ FSearcher::FSearcher(const QUrl &url, const QString &key, QObject *parent)
       searchHandler(new FSearchHandler)
 {
     searchHandler->init();
-    searchHandler->setFlags(FSearchHandler::FSEARCH_FLAG_REGEX | FSearchHandler::FSEARCH_FLAG_FILTER_HIOCEANN_FILE);
+    searchHandler->setFlags(FSearchHandler::FSEARCH_FLAG_REGEX | FSearchHandler::FSEARCH_FLAG_FILTER_HIDDEN_FILE);
 }
 
 FSearcher::~FSearcher()
@@ -106,7 +106,7 @@ void FSearcher::receiveResultCallback(const QString &result, bool isFinished, FS
         return;
     }
 
-    if (!SearchHelper::instance()->isHioceannFile(result, self->hioceannFileHash, UrlRoute::urlToPath(self->searchUrl))) {
+    if (!SearchHelper::instance()->isHiddenFile(result, self->hioceannFileHash, UrlRoute::urlToPath(self->searchUrl))) {
         QMutexLocker lk(&self->mutex);
         self->allResults << QUrl::fromLocalFile(result);
     }

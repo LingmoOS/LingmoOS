@@ -87,7 +87,7 @@ void MainDialog::setupUI(TemplateVector &templateVec)
     DFrame *leftFrame = new DFrame(this);
     DTreeView *treeView = new DTreeView(leftFrame);
     QHBoxLayout *leftFrameLayout = new QHBoxLayout();
-    treeView->setHeaderHioceann(true);
+    treeView->setHeaderHidden(true);
 
     treeView->setEditTriggers(DTreeView::NoEditTriggers);
     treeView->setSelectionMode(DTreeView::SingleSelection);

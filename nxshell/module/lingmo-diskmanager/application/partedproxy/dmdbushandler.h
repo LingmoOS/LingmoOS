@@ -538,7 +538,7 @@ private:
     HardDiskInfo m_hardDiskInfo;
     QString m_deviceHardStatus;
     HardDiskStatusInfoList m_hardDiskStatusInfoList;
-    int m_partitionHioceannFlag;
+    int m_partitionHiddenFlag;
     bool m_partitionTableError;
     QMap<QString, QString> m_isExistUnallocated;
     QStringList m_deviceNameList;

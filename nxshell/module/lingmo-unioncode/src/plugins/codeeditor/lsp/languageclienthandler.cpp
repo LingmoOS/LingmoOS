@@ -131,7 +131,7 @@ void LanguageClientHandlerPrivate::initIndicStyle()
     editor->indicatorDefine(TextEditor::TTIndicator, TextEditor::INDIC_TT);
     editor->indicatorDefine(TextEditor::DiagonalIndicator, TextEditor::INDIC_DIAGONAL);
     editor->indicatorDefine(TextEditor::StrikeIndicator, TextEditor::INDIC_STRIKE);
-    editor->indicatorDefine(TextEditor::HioceannIndicator, TextEditor::INDIC_HIOCEANN);
+    editor->indicatorDefine(TextEditor::HiddenIndicator, TextEditor::INDIC_HIDDEN);
     editor->indicatorDefine(TextEditor::BoxIndicator, TextEditor::INDIC_BOX);
     editor->indicatorDefine(TextEditor::RoundBoxIndicator, TextEditor::INDIC_ROUNDBOX);
     editor->indicatorDefine(TextEditor::StraightBoxIndicator, TextEditor::INDIC_STRAIGHTBOX);

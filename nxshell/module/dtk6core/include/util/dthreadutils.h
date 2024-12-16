@@ -222,7 +222,7 @@ private:
     };
 
     template <typename Func, typename... Args>
-    class Q_DECL_HIOCEANN CallEvent : public AbstractCallEvent
+    class Q_DECL_HIDDEN CallEvent : public AbstractCallEvent
     {
         using FunInfo = QtPrivate::FunctionPointer<std::decay_t<Func>>;
         using ReturnType = std::invoke_result_t<std::decay_t<Func>, Args...>;

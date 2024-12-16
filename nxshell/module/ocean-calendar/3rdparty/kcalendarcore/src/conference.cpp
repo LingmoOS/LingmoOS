@@ -17,7 +17,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::Conference::Private : public QSharedData
+class Q_DECL_HIDDEN KCalendarCore::Conference::Private : public QSharedData
 {
 public:
     QString label;

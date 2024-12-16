@@ -23,7 +23,7 @@ namespace KWayland
 namespace Client
 {
 
-class Q_DECL_HIOCEANN OCEANSeat::Private
+class Q_DECL_HIDDEN OCEANSeat::Private
 {
 public:
     Private(OCEANSeat *q);
@@ -151,7 +151,7 @@ OCEANSeat::operator ocean_seat*() const {
 }
 
 
-class Q_DECL_HIOCEANN OCEANPointer::Private
+class Q_DECL_HIDDEN OCEANPointer::Private
 {
 public:
     Private(OCEANPointer *q);
@@ -276,7 +276,7 @@ QPointF OCEANPointer::getGlobalPointerPos()
 }
 
 //OCEANTouch
-class Q_DECL_HIOCEANN OCEANTouch::Private
+class Q_DECL_HIDDEN OCEANTouch::Private
 {
 public:
     Private(OCEANTouch *q);

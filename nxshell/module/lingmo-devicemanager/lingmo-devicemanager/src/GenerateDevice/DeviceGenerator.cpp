@@ -27,7 +27,7 @@
 #include "MacroDefinition.h"
 
 // Dtk头文件
-#include <DSysInfo>
+#include <LSysInfo>
 
 // Qt库文件
 #include <QLoggingCategory>
@@ -1137,19 +1137,19 @@ const QStringList &DeviceGenerator::getBusIDFromHwinfo()
 const QString DeviceGenerator::getProductName()
 {
     // 由DTK接口获取系统名称
-    QString name = DSysInfo::uosSystemName(QLocale(QLocale::English));
-    QString productType = DSysInfo::uosProductTypeName(QLocale(QLocale::English));
+    QString name = LSysInfo::uosSystemName(QLocale(QLocale::English));
+    QString productType = LSysInfo::uosProductTypeName(QLocale(QLocale::English));
 
     if (!productType.contains("Server", Qt::CaseInsensitive)) {
         // 非服务器版 “产品名称”+“大版本号”+“版本名称”
-        name += " " + DSysInfo::majorVersion();
-        name += " " + DSysInfo::uosEditionName(QLocale(QLocale::English));
+        name += " " + LSysInfo::majorVersion();
+        name += " " + LSysInfo::uosEditionName(QLocale(QLocale::English));
     } else {
         // 服务器版 产品名称”+“大版本号”+“（完整版本号识别码版本识别码）”
-        name += " " + DSysInfo::majorVersion();
+        name += " " + LSysInfo::majorVersion();
         name += " (";
-        name += DSysInfo::minorVersion();
-        name += DSysInfo::uosEditionName(QLocale(QLocale::English));
+        name += LSysInfo::minorVersion();
+        name += LSysInfo::uosEditionName(QLocale(QLocale::English));
         name += ")";
     }
 

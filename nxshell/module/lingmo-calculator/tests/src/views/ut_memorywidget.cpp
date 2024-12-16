@@ -129,8 +129,8 @@ TEST_F(Ut_MemoryWidget, memoryclean)
     MemoryWidget *m_memoryWidget = m_memoryPublic->getwidget(MemoryPublic::memorymode::scientificright);
     m_memoryPublic->generateData(Quantity(1));
     m_memoryWidget->memoryclean();
-    EXPECT_FALSE(m_memoryWidget->m_label->isHioceann());
-    EXPECT_TRUE(m_memoryWidget->m_clearbutton->isHioceann());
+    EXPECT_FALSE(m_memoryWidget->m_label->isHidden());
+    EXPECT_TRUE(m_memoryWidget->m_clearbutton->isHidden());
     EXPECT_EQ(m_memoryWidget->m_listwidget->count(), 1);
 }
 
@@ -260,7 +260,7 @@ TEST_F(Ut_MemoryWidget, keyPressEvent)
     QKeyEvent *k = new QKeyEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
     m_memoryWidget->keyPressEvent(k);
     delete k;
-    EXPECT_FALSE(m_memoryWidget->isHioceann());
+    EXPECT_FALSE(m_memoryWidget->isHidden());
 }
 
 TEST_F(Ut_MemoryWidget, resetItemHeight)

@@ -613,9 +613,9 @@ QString UpdateModel::commitSubmissionTime()
 QString UpdateModel::systemVersion()
 {
     QString systemVer = QString("uos-%1-%2-%3")
-                                .arg(DSysInfo::majorVersion())
-                                .arg(DSysInfo::minorVersion())
-                                .arg(DSysInfo::buildVersion());
+                                .arg(LSysInfo::majorVersion())
+                                .arg(LSysInfo::minorVersion())
+                                .arg(LSysInfo::buildVersion());
     return systemVer;
 }
 

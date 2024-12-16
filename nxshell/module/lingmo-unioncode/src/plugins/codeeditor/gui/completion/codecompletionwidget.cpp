@@ -243,7 +243,7 @@ void CodeCompletionWidget::modelContentChanged()
     if (!editor()->hasFocus())
         return;
 
-    if ((completionView->isHioceann() || needShow) && proxyModel->rowCount() != 0) {
+    if ((completionView->isHidden() || needShow) && proxyModel->rowCount() != 0) {
         needShow = false;
         completionView->setVisible(true);
         updateAndShow();
@@ -268,7 +268,7 @@ void CodeCompletionWidget::onCompletionChanged()
 
     if (!completionExtWidget->isValid()) {
         completionExtWidget->setVisible(false);
-        if (completionView->isHioceann())
+        if (completionView->isHidden())
             hide();
     } else {
         if (proxyModel->rowCount() == 0)

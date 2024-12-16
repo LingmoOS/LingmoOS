@@ -27,22 +27,22 @@ TEST_F(ut_photoslide_test, PhotoSlide)
 TEST_F(ut_photoslide_test, initSetImage)
 {
     PhotoSlide* test_module = new PhotoSlide();
-    test_module->initSetImage(DSysInfo::UosEdition::UosProfessional);
+    test_module->initSetImage(LSysInfo::UosEdition::UosProfessional);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSPROFESSIONAL_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSPROFESSIONAL_PHOTO_TOTAL);
-    test_module->initSetImage(DSysInfo::UosEdition::UosCommunity);
+    test_module->initSetImage(LSysInfo::UosEdition::UosCommunity);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSPROFESSIONAL_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSPROFESSIONAL_PHOTO_TOTAL);
-    test_module->initSetImage(DSysInfo::UosEdition::UosEnterprise);
+    test_module->initSetImage(LSysInfo::UosEdition::UosEnterprise);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSENTERPRISE_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSENTERPRISE_PHOTO_TOTAL);
-    test_module->initSetImage(DSysInfo::UosEdition::UosEnterpriseC);
+    test_module->initSetImage(LSysInfo::UosEdition::UosEnterpriseC);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSENTERPRISE_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSENTERPRISE_PHOTO_TOTAL);
-    test_module->initSetImage(DSysInfo::UosEdition::UosEuler);
+    test_module->initSetImage(LSysInfo::UosEdition::UosEuler);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSEULER_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSEULER_PHOTO_TOTAL);
-    test_module->initSetImage(DSysInfo::UosEdition::UosEditionUnknown);
+    test_module->initSetImage(LSysInfo::UosEdition::UosEditionUnknown);
     EXPECT_EQ(test_module->m_strPhotoPath,UOSPROFESSIONAL_PHOTO_PATH);
     EXPECT_EQ(test_module->m_iHpotoTotal,UOSPROFESSIONAL_PHOTO_TOTAL);
 

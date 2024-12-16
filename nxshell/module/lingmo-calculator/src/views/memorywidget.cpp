@@ -610,7 +610,7 @@ QString MemoryWidget::setitemwordwrap(const QString &text, int row)
             result.insert(20, "\n");
             m_line = 2;
         }
-        if (m_clearbutton->isHioceann() == true) {
+        if (m_clearbutton->isHidden() == true) {
             m_clearbutton->show();
             m_clearbutton->updateWhenBtnDisable();
             m_clearbutton->showtooltip(true);
@@ -631,7 +631,7 @@ QString MemoryWidget::setitemwordwrap(const QString &text, int row)
     } else {
         result = programmerWrap(result);
 
-        if (m_clearbutton->isHioceann() == true) {
+        if (m_clearbutton->isHidden() == true) {
             m_clearbutton->show();
             m_clearbutton->updateWhenBtnDisable();
             m_clearbutton->showtooltip(true);

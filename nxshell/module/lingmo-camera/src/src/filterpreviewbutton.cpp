@@ -48,7 +48,7 @@ void filterPreviewButton::setImage(QImage *img)
 {
     Q_ASSERT(img);
 
-    if (isHioceann() && !img->isNull())
+    if (isHidden() && !img->isNull())
         return;
 
     uint8_t* frame = img->bits();

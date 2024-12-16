@@ -24,7 +24,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN PlasmaWindowManagement::Private
+class Q_DECL_HIDDEN PlasmaWindowManagement::Private
 {
 public:
     Private(PlasmaWindowManagement *q);
@@ -53,7 +53,7 @@ private:
     PlasmaWindowManagement *q;
 };
 
-class Q_DECL_HIOCEANN PlasmaWindow::Private
+class Q_DECL_HIDDEN PlasmaWindow::Private
 {
 public:
     Private(org_kde_plasma_window *window, quint32 internalId, const char *uuid, PlasmaWindow *q);
@@ -1190,7 +1190,7 @@ void PlasmaWindow::sendToOutput(KWayland::Client::Output *output) const
     }
 }
 
-class Q_DECL_HIOCEANN PlasmaActivationFeedback::Private
+class Q_DECL_HIDDEN PlasmaActivationFeedback::Private
 {
 public:
     Private(PlasmaActivationFeedback *q);
@@ -1290,7 +1290,7 @@ PlasmaActivationFeedback::operator org_kde_plasma_activation_feedback *() const
     return d->feedback;
 }
 
-class Q_DECL_HIOCEANN PlasmaActivation::Private
+class Q_DECL_HIDDEN PlasmaActivation::Private
 {
 public:
     Private(org_kde_plasma_activation *activation, PlasmaActivation *q)

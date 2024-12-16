@@ -73,7 +73,7 @@
     </message>
     <message>
         <location filename="../package/main.qml" line="224"/>
-        <source>Keep Hioceann</source>
+        <source>Keep Hidden</source>
         <translation>壹直隱藏</translation>
     </message>
     <message>

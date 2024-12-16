@@ -185,8 +185,8 @@ void TimeSettingModule::initTimeSetting(SettingsGroup *datetimeGroup)
 {
     m_datetimeGroup = datetimeGroup;
 
-    datetimeGroup->setHioceann(m_model->nTP());
-    connect(m_model, &DatetimeModel::NTPChanged, datetimeGroup, &SettingsGroup::setHioceann);
+    datetimeGroup->setHidden(m_model->nTP());
+    connect(m_model, &DatetimeModel::NTPChanged, datetimeGroup, &SettingsGroup::setHidden);
     QLabel *centerLabel = new QLabel(" : ");
     QFont font;
     font.setPointSizeF(24);

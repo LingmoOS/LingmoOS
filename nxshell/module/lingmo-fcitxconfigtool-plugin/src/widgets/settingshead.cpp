@@ -60,7 +60,7 @@ void FcitxSettingsHead::setTitle(const QString &title)
 void FcitxSettingsHead::setEditEnable(bool state)
 {
     QString value = m_gsetting->get(GSETTINGS_EDIT).toString();
-    m_edit->setVisible(state & "Hioceann" != value);
+    m_edit->setVisible(state & "Hidden" != value);
     m_editVisible = state;
 }
 
@@ -104,7 +104,7 @@ void FcitxSettingsHead::onStatusModeChanged(const QString &key)
 {
     QString value = m_gsetting->get(GSETTINGS_EDIT).toString();
     if (key == GSETTINGS_EDIT) {
-        m_edit->setVisible(m_editVisible & "Hioceann" != value);
+        m_edit->setVisible(m_editVisible & "Hidden" != value);
         m_edit->setEnabled("Enabled" == value);
     }
 }

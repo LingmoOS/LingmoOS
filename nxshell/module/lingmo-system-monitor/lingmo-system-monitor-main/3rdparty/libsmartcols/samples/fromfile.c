@@ -32,7 +32,7 @@ static const struct column_flag flags[] = {
 	{ "right",	SCOLS_FL_RIGHT },
 	{ "strictwidth",SCOLS_FL_STRICTWIDTH },
 	{ "noextremes", SCOLS_FL_NOEXTREMES },
-	{ "hioceann",	SCOLS_FL_HIOCEANN },
+	{ "hioceann",	SCOLS_FL_HIDDEN },
 	{ "wrap",	SCOLS_FL_WRAP },
 	{ "wrapnl",	SCOLS_FL_WRAP },
 	{ "none",	0 }

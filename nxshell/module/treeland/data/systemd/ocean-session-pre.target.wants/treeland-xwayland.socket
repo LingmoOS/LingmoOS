@@ -1,0 +1,13 @@
+[Unit]
+Description=User XWayland Socket
+PartOf=treeland-xwayland.service
+
+Requisite=ocean-session-pre.target
+PartOf=ocean-session-pre.target
+Before=ocean-session-pre.target
+
+[Socket]
+ListenStream=%t/treeland-xwayland
+RemoveOnStop=true
+FileDescriptorName=TreeLand-Xwayland
+ExecStop=-/usr/bin/systemctl --user unset-environment DISPLAY

@@ -397,27 +397,27 @@ int main(int argc, char *argv[])
     parser.addOption(languageOption);
 
     QCommandLineOption listOption("list", QCoreApplication::translate("main", "list configure information with appid, resource or subpath."));
-    listOption.setFlags(listOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    listOption.setFlags(listOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(listOption);
 
     QCommandLineOption getOption("get", QCoreApplication::translate("main", "query content for configure, including the configure item's all keys, value ..."));
-    getOption.setFlags(getOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    getOption.setFlags(getOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(getOption);
 
     QCommandLineOption setOption("set", QCoreApplication::translate("main", "set configure item 's value."));
-    setOption.setFlags(setOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    setOption.setFlags(setOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(setOption);
 
     QCommandLineOption resetOption("reset", QCoreApplication::translate("main", "reset configure item's value, reset all configure item's value if not `-k` option."));
-    resetOption.setFlags(resetOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    resetOption.setFlags(resetOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(resetOption);
 
     QCommandLineOption watchOption("watch", QCoreApplication::translate("main", "watch value changed for some configure item."));
-    watchOption.setFlags(watchOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    watchOption.setFlags(watchOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(watchOption);
 
     QCommandLineOption guiOption("gui", QCoreApplication::translate("main", "start ocean-dconfig-editor as a gui configure tool."));
-    guiOption.setFlags(guiOption.flags() ^ QCommandLineOption::HioceannFromHelp);
+    guiOption.setFlags(guiOption.flags() ^ QCommandLineOption::HiddenFromHelp);
     parser.addOption(guiOption);
 
 

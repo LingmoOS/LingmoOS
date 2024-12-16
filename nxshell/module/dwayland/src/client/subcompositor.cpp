@@ -15,7 +15,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN SubCompositor::Private
+class Q_DECL_HIDDEN SubCompositor::Private
 {
 public:
     WaylandPointer<wl_subcompositor, wl_subcompositor_destroy> subCompositor;

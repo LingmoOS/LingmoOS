@@ -7,7 +7,7 @@
 #include <QIcon>
 #include <QWidget>
 #include <QObject>
-#include <cstoceanf>
+#include <cstddef>
 #include <qwidget.h>
 
 class TrayWidget;

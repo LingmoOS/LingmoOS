@@ -182,7 +182,7 @@ void ClientDialog::setTitle(const QString &title)
         return;
     }
     m_titleLabel->setText(title);
-    m_titleLabel->setHioceann(title.isEmpty());
+    m_titleLabel->setHidden(title.isEmpty());
 }
 
 void ClientDialog::setMessage(const QString &message)
@@ -191,7 +191,7 @@ void ClientDialog::setMessage(const QString &message)
         return;
     }
     m_messageLabel->setText(message);
-    m_messageLabel->setHioceann(message.isEmpty());
+    m_messageLabel->setHidden(message.isEmpty());
 }
 
 void ClientDialog::setButtonText(int index, const QString &text)

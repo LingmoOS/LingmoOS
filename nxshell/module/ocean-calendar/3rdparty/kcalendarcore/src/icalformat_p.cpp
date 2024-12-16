@@ -125,7 +125,7 @@ ToComponentVisitor::~ToComponentVisitor()
 {
 }
 
-class Q_DECL_HIOCEANN ICalFormatImpl::Private
+class Q_DECL_HIDDEN ICalFormatImpl::Private
 {
 public:
     Private(ICalFormatImpl *impl, ICalFormat *parent)

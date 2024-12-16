@@ -65,7 +65,7 @@ private:
     QPointer<QWindow> m_renderWindow;
 };
 
-class Q_DECL_HIOCEANN OffscreenQuickView::Private
+class Q_DECL_HIDDEN OffscreenQuickView::Private
 {
 public:
     std::unique_ptr<QQuickWindow> m_view;
@@ -100,7 +100,7 @@ public:
     void updateTouchState(Qt::TouchPointState state, qint32 id, const QPointF &pos);
 };
 
-class Q_DECL_HIOCEANN OffscreenQuickScene::Private
+class Q_DECL_HIDDEN OffscreenQuickScene::Private
 {
 public:
     Private()

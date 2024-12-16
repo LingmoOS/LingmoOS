@@ -42,7 +42,7 @@ TEST_F(UT_SideBarHelper, DefaultCdAction) {}
 TEST_F(UT_SideBarHelper, DefaultContextMenu) {}
 TEST_F(UT_SideBarHelper, SortFunc) {}
 
-TEST_F(UT_SideBarHelper, HioceannRules)
+TEST_F(UT_SideBarHelper, HiddenRules)
 {
     using namespace dfmbase;
     stub.set_lamda(&DConfigManager::value, [] { __DBG_STUB_INVOKE__ return QVariantMap(); });

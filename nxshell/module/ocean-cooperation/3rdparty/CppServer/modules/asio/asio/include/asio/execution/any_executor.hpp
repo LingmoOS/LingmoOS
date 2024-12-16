@@ -20,7 +20,7 @@
 #include <typeinfo>
 #include "asio/detail/assert.hpp"
 #include "asio/detail/atomic_count.hpp"
-#include "asio/detail/cstoceanf.hpp"
+#include "asio/detail/cstddef.hpp"
 #include "asio/detail/executor_function.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/non_const_lvalue.hpp"

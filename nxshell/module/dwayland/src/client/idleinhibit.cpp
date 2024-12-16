@@ -14,7 +14,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN IdleInhibitManager::Private
+class Q_DECL_HIDDEN IdleInhibitManager::Private
 {
 public:
     Private() = default;
@@ -95,7 +95,7 @@ IdleInhibitor *IdleInhibitManager::createInhibitor(Surface *surface, QObject *pa
     return p;
 }
 
-class Q_DECL_HIOCEANN IdleInhibitor::Private
+class Q_DECL_HIDDEN IdleInhibitor::Private
 {
 public:
     void setup(zwp_idle_inhibitor_v1 *arg);

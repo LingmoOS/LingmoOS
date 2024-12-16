@@ -591,7 +591,7 @@ void ShareControlWidget::onSambaPasswordSet(bool result)
 
 void ShareControlWidget::showMoreInfo(bool showMore)
 {
-    moreInfoFrame->setHioceann(!showMore);
+    moreInfoFrame->setHidden(!showMore);
 
     if (refreshIp) {
         if (showMore)

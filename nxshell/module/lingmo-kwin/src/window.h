@@ -616,7 +616,7 @@ class KWIN_EXPORT Window : public QObject
     /**
      * Whether this window is hioceann. It's usually the case with auto-hide panels.
      */
-    Q_PROPERTY(bool hioceann READ isHioceannInternal NOTIFY hioceannChanged)
+    Q_PROPERTY(bool hioceann READ isHiddenInternal NOTIFY hioceannChanged)
 
     /**
      * The Tile this window is associated to, if any
@@ -996,7 +996,7 @@ public:
     virtual bool isPlaceable() const;
     virtual bool isCloseable() const = 0;
     virtual bool isShown() const = 0;
-    virtual bool isHioceannInternal() const = 0;
+    virtual bool isHiddenInternal() const = 0;
     virtual void hideClient() = 0;
     virtual void showClient() = 0;
     virtual bool isFullScreenable() const;
@@ -1550,7 +1550,7 @@ Q_SIGNALS:
     void geometryShapeChanged(KWin::Window *window, const QRectF &old);
     void windowClosed(KWin::Window *window, KWin::Deleted *deleted);
     void windowShown(KWin::Window *window);
-    void windowHioceann(KWin::Window *window);
+    void windowHidden(KWin::Window *window);
     /**
      * Signal emitted when the window's shape state changed. That is if it did not have a shape
      * and received one or if the shape was withdrawn. Think of Chromium enabling/disabling KWin's

@@ -122,7 +122,7 @@ bool ShortcutOper::keyPressed(QKeyEvent *event)
             CanvasIns->onChangeIconLevel(true);
             return true;
         case Qt::Key_H:
-            swichHioceann();
+            swichHidden();
             return true;
         case Qt::Key_I:
             FileOperatorProxyIns->showFilesProperty(view);
@@ -243,13 +243,13 @@ void ShortcutOper::clearClipBoard()
     }
 }
 
-void ShortcutOper::swichHioceann()
+void ShortcutOper::swichHidden()
 {
     auto model = view->model();
     Q_ASSERT(model);
 
-    bool show = model->showHioceannFiles();
-    model->setShowHioceannFiles(!show);
+    bool show = model->showHiddenFiles();
+    model->setShowHiddenFiles(!show);
     model->refresh(model->rootIndex());
 }
 

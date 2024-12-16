@@ -31,7 +31,7 @@ QString UpdatePlugin::name() const
 
 ModuleObject *UpdatePlugin::module()
 {
-    if (DSysInfo::uosEditionType() == DSysInfo::UosEuler) {
+    if (LSysInfo::uosEditionType() == LSysInfo::UosEuler) {
         return nullptr;
     }
     // 一级页面

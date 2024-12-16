@@ -171,7 +171,7 @@ void StartupFeedbackEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono
     }
     m_lastPresentTime = presentTime;
 
-    if (m_active && effects->isCursorHioceann()) {
+    if (m_active && effects->isCursorHidden()) {
         stop();
     }
     if (m_active) {
@@ -295,7 +295,7 @@ void StartupFeedbackEffect::gotStartupChange(const QString &id, const QIcon &ico
 
 void StartupFeedbackEffect::start(const Startup &startup)
 {
-    if (m_type == NoFeedback || m_splashVisible || effects->isCursorHioceann()) {
+    if (m_type == NoFeedback || m_splashVisible || effects->isCursorHidden()) {
         return;
     }
     if (!m_active) {

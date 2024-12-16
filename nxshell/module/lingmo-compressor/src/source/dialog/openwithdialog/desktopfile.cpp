@@ -37,8 +37,8 @@ DesktopFile::DesktopFile(const QString &fileName)
     if (desktop.contains("NoDisplay")) {
         m_noDisplay = desktop.value("NoDisplay", settings.value("NoDisplay").toBool()).toBool();
     }
-    if (desktop.contains("Hioceann")) {
-        m_hioceann = desktop.value("Hioceann", settings.value("Hioceann").toBool()).toBool();
+    if (desktop.contains("Hidden")) {
+        m_hioceann = desktop.value("Hidden", settings.value("Hidden").toBool()).toBool();
     }
 
     //由于获取的系统语言简写与.desktop的语言简写存在不对应关系，经决定先采用获取的系统值匹配

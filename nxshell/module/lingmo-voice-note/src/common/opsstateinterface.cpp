@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "opsstateinterface.h"
-#include <DSysInfo>
+#include <LSysInfo>
 #include <DLog>
 
 DCORE_USE_NAMESPACE

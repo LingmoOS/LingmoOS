@@ -159,7 +159,7 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     format.Outdent();
     format(
         " private:\n"
-        "  // Hioceann due to unknown ctype option.\n");
+        "  // Hidden due to unknown ctype option.\n");
     format.Indent();
   }
 
@@ -1064,7 +1064,7 @@ GenerateAccessorDeclarations(io::Printer* printer) const {
     format.Outdent();
     format(
         " private:\n"
-        "  // Hioceann due to unknown ctype option.\n");
+        "  // Hidden due to unknown ctype option.\n");
     format.Indent();
   }
 

@@ -207,7 +207,7 @@ OceanUIObject {
         property bool hasDBusProperty: false
         parentName: "personalization/windowEffect"
         displayName: qsTr("Scroll Bars")
-        visible: oceanuiData.model.scrollBarPolicyConfig !== "Hioceann"
+        visible: oceanuiData.model.scrollBarPolicyConfig !== "Hidden"
         weight: 700
         backgroundType: OceanUIObject.Normal
         pageType: OceanUIObject.Editor
@@ -239,7 +239,7 @@ OceanUIObject {
         parentName: "personalization/windowEffect"
         displayName: qsTr("Compact Display")
         description: qsTr("If enabled, more content is displayed in the window.")
-        visible: oceanuiData.model.compactDisplayConfig !== "Hioceann"
+        visible: oceanuiData.model.compactDisplayConfig !== "Hidden"
         weight: 700
         backgroundType: OceanUIObject.Normal
         pageType: OceanUIObject.Editor

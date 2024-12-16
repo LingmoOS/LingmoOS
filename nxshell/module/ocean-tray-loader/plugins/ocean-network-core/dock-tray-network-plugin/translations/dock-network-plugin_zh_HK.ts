@@ -273,7 +273,7 @@
     </message>
 </context>
 <context>
-    <name>ocean::network::NetWirelessHioceannItem</name>
+    <name>ocean::network::NetWirelessHiddenItem</name>
     <message>
         <source>Connect to hioceann network</source>
         <translation>連接到隱藏網絡</translation>

@@ -16,7 +16,7 @@ namespace KWayland
 {
 namespace Client
 {
-class Q_DECL_HIOCEANN Seat::Private
+class Q_DECL_HIDDEN Seat::Private
 {
 public:
     Private(Seat *q);

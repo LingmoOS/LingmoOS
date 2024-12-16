@@ -28,7 +28,7 @@ using namespace KCalendarCore;
   @internal
 */
 //@cond PRIVATE
-class Q_DECL_HIOCEANN KCalendarCore::CalFormat::Private
+class Q_DECL_HIDDEN KCalendarCore::CalFormat::Private
 {
 public:
     Private()
