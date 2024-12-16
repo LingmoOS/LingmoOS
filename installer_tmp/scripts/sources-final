@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Writes the final sources.list file
+#
+
+CHROOT=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g")
+RELEASE="helium"
+RELEASE_DEBIAN="bookworm"
+
+rm $CHROOT/etc/apt/sources.list
+rm $CHROOT/etc/apt/sources.list.d/*
+cat << EOF > $CHROOT/etc/apt/sources.list
+# Lingmo OS apt Sources list
+deb http://packages.lingmo.org/lingmo $RELEASE main
+# deb-src http://packages.lingmo.org/lingmo $RELEASE main
+
+# Lingmo OS Team
+EOF
+
+cat << EOF > $CHROOT/etc/apt/sources.list.d/debian.sources
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian
+Suites: $RELEASE_DEBIAN $RELEASE_DEBIAN-updates $RELEASE_DEBIAN-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# URIs: http://debian-archive.trafficmanager.net/debian
+# Suites: $RELEASE_DEBIAN $RELEASE_DEBIAN-updates $RELEASE_DEBIAN-backports
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: http://debian-archive.trafficmanager.net/debian-security
+Suites: $RELEASE_DEBIAN-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Types: deb-src
+# # URIs: http://debian-archive.trafficmanager.net/debian-security
+# Suites: $RELEASE_DEBIAN-security
+# Components: main contrib non-free non-free-firmware
+# Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+#
+# Reconfigure GRUB for theming
+#
+EOF
+
+chroot ${CHROOT} /bin/bash -c "dpkg-reconfigure lingmo-grub-config"
+
+exit 0
