@@ -30,35 +30,20 @@ jobs:
       - name: Install base packages
         run: sudo apt install -y sudo tree arch-install-scripts dctrl-tools devscripts wget isolinux syslinux debian-cd simple-cdd mtools binutils build-essential diffutils gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc findutils make sed python3 cvs git mercurial subversion libncurses5 asciidoc w3m dblatex python3-aiohttp python3-matplotlib graphviz dpkg-dev debootstrap live-build
 
-      - name: Config Dir
-        run: rm -rf boot/ installer/ && mv distribution/current/* ./
-
-      - name: Install Lingmo System Build
-        run: |
-            cd utils/live-build
-            apt build-dep . -y
-            dpkg-buildpackage -us -nc 
-            sudo apt install ../*.deb
-            sudo make install
-            cd ../../
       # - name: Build GRUB EFI
       #  run: |
       #      cd boot/grub/ && sudo apt build-dep ./ && debuild -us -uc -b && cd ../ && mv ./*.deb ../config/packages.chroot/ && cd ..
 
       - name: Build System
         run: |
-            cd distribution/current/.getopt.sh .
-            mkdir buildsys/
-            cp -r distribution/system/ buildsys/
-            cd buildsys
+            cd system_12
             bash ./build.sh
 
       - name: Read Upload
         run: |
             mkdir artifact/
             # find ./ -type f -name "*.iso" -exec mv {} artifact/ \;
-            sudo mv -v ./buildsys/system/images/iso/* artifact/
-            sudo mv -v ./buildsys/system/build.log artifact/
+            sudo mv -v ./system_12/images/iso/* artifact/
 
       - name: Artifact
         uses: actions/upload-artifact@v4
