@@ -29,6 +29,7 @@
 #include <QFileSystemWatcher>
 #include <QStandardPaths>
 #include <QScopedPointer>
+#include <QSettings>
 #include <QDirIterator>
 #include <QDebug>
 #include <QIcon>
@@ -224,14 +225,27 @@ void LauncherModel::refresh(LauncherModel *manager)
         addedEntries.append(item.id);
 
     QStringList allEntries;
-    QDirIterator it("/usr/share/applications", { "*.desktop" }, QDir::NoFilter, QDirIterator::Subdirectories);
 
-    while (it.hasNext()) {
-        const auto fileName = it.next();
-        if (!QFile::exists(fileName))
-            continue;
+    QSettings settings(QSettings::UserScope, "lingmoos", "launcher");
+    QStringList directories = settings.value("appDirectories").toStringList();
 
-        allEntries.append(fileName);
+    if (directories.isEmpty()) {
+        directories = QStringList{
+            "/usr/share/applications",
+            "/var/lib/flatpak/exports/share/applications"
+        };
+        settings.setValue("appDirectories", directories);
+    }
+
+    for (const QString &dir : directories) {
+        QDirIterator it(dir, { "*.desktop" }, QDir::NoFilter, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            const auto fileName = it.next();
+            if (!QFile::exists(fileName))
+                continue;
+
+            allEntries.append(fileName);
+        }
     }
 
     for (const QString &fileName : allEntries) {
