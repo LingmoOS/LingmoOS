@@ -1,0 +1,69 @@
+name: Daily Build
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ "master", "debian-12" ]
+  pull_request:
+    branches: [ "master", "debian-12"  ]
+  schedule:
+    - cron: "59 18 * * *"
+  workflow_dispatch:
+jobs:
+  debian:
+    strategy:
+        matrix:
+          arch: ['amd64']
+    name: Build ${{ matrix.arch }} iso
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          swap-size-mb: 512
+          remove-dotnet: 'true'
+          remove-android: 'true'
+
+      - uses: actions/checkout@v4
+
+      - name: Set up amd64 Debian container
+        uses: addnab/docker-run-action@v3
+        if: ${{ matrix.arch == 'amd64' }}
+        with:
+          image: docker.io/library/debian:trixie-slim
+          options: --privileged -v ${{ github.workspace }}:/work
+          run: |
+            cd /work
+            apt update; apt install sudo git fakeroot live-build debootstrap debian-cd simple-cdd xorriso squashfs-tools debootstrap mtools -y
+            git config --global --add safe.directory /work
+            export LINGMO_ARCH=${{ matrix.arch }}
+            export DEBIAN_FRONTEND=noninteractive
+            bash -i ./build.sh
+            
+      - name: Set up arm64 Debian container
+        uses: uraimo/run-on-arch-action@v2
+        if: ${{ matrix.arch == 'arm64' }}
+        with:
+          arch: "aarch64"
+          distro: "bookworm"
+          # Mount the artifacts directory as /artifacts in the container
+          dockerRunArgs: |
+            --privileged -v ${{ github.workspace }}:/work
+          run: |
+            cd /work
+            apt update; apt install sudo git fakeroot live-build debootstrap debian-cd simple-cdd xorriso squashfs-tools debootstrap mtools -y
+            git config --global --add safe.directory /work
+            export LINGMO_ARCH=${{ matrix.arch }}
+            export DEBIAN_FRONTEND=noninteractive
+            bash -i ./build.sh
+            
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}
+          path: ${{ github.workspace }}/images/*.iso
+          compression-level: 0
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
