@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <!-- interface-requires gtk+ 3.10 -->
+  <template class="GsScreenshotImage" parent="GtkWidget">
+    <accessibility>
+      <property name="label" translatable="yes">Screenshot</property>
+    </accessibility>
+    <style>
+      <class name="screenshot-image"/>
+    </style>
+    <child>
+      <object class="GtkOverlay" id="overlay">
+        <property name="halign">fill</property>
+        <property name="valign">fill</property>
+        <child type="overlay">
+          <object class="GtkSpinner" id="spinner">
+            <property name="width_request">32</property>
+            <property name="height_request">32</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <style>
+              <class name="fade-in"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="transition-type">crossfade</property>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">image1</property>
+                <property name="child">
+                  <object class="GtkPicture" id="image1">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <style>
+                      <class name="image1"/>
+                    </style>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">image2</property>
+                <property name="child">
+                  <object class="GtkPicture" id="image2">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <style>
+                      <class name="image2"/>
+                    </style>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">video</property>
+                <property name="child">
+                  <object class="GtkVideo" id="video">
+                    <style>
+                      <class name="video"/>
+                    </style>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">error</property>
+                <property name="child">
+                  <object class="GtkBox" id="box_error">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">4</property>
+                    <child>
+                      <object class="GtkImage" id="image_error">
+                        <property name="icon-name">dialog-error-symbolic</property>
+                        <property name="pixel-size">48</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label_error"/>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

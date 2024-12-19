@@ -1,0 +1,80 @@
+# lingmo-appstore(1) completion                             -*- shell-script -*-
+
+_filter_completed_options()
+{
+	local filtered=()
+	local completed_option
+	local completed_words=($(compgen -W '${COMP_WORDS[@]}' -- "--"))
+
+	for option in ${COMPREPLY[@]}
+	do
+	    completed_option=0
+
+	    for completed in ${completed_words[@]}
+	    do
+		# acccount for --option if applicable
+		if [ "${option}" == "${completed}" ]; then
+		    completed_option=1
+		    break
+		fi
+
+		# acccount for --option= if applicable
+		if [[ "${words[@]}" =~ "${option}" && "${option}" == "${completed}=" ]]; then
+		    completed_option=1
+		    break
+		fi
+	    done
+
+	    if [ $completed_option -eq 0 ]; then
+		filtered+=($option)
+	    fi
+	done
+
+	COMPREPLY=("${filtered[@]}")
+}
+
+_lingmo_software()
+{
+	local cur prev words cword split
+	_init_completion -s || return
+
+	case $prev in
+		'--mode')
+			COMPREPLY=( $(compgen -W "updates updated installed overview" -- "$cur") )
+			return
+			;;
+		'--search' | '--details' | '--details-pkg' | '--install' | '--uninstall')
+			# argument required but no completions available
+			return
+			;;
+		'--local-filename')
+			_filedir
+			return
+			;;
+		'--interaction')
+			COMPREPLY=( $(compgen -W "none notify full" -- "$cur") )
+			return
+			;;
+		'--show-metainfo')
+			_filedir @(xml*(.in))
+			return
+			;;
+		'?'|'-h'|'--help'|'--help-all'|'--help-gapplication'|'--version')
+			return
+			;;
+	esac
+
+	$split && return
+
+	if [[ $cur == -* ]]; then
+	    COMPREPLY=($(compgen -W '$(_parse_help "$1")' -- "$cur"))
+	    [[ ${COMPREPLY-} == *= ]] && compopt -o nospace
+	fi
+
+	# Don't show already completed options
+	_filter_completed_options
+
+} &&
+    complete -F _lingmo_software lingmo-appstore
+
+# ex: filetype=sh

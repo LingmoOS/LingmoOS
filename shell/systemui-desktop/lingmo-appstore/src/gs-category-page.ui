@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+
+  <template class="GsCategoryPage" parent="GsPage">
+    <child>
+      <object class="GtkScrolledWindow" id="scrolledwindow_category">
+        <property name="hscrollbar_policy">never</property>
+        <property name="vscrollbar_policy">automatic</property>
+        <child>
+          <object class="GtkViewport" id="viewport3">
+            <property name="scroll-to-focus">True</property>
+            <child>
+              <object class="AdwClamp">
+                <!-- We use the same sizes as the overview page. -->
+                <property name="maximum-size">1000</property>
+                <property name="tightening-threshold">600</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">9</property>
+                    <property name="valign">start</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-top">24</property>
+                    <property name="margin-bottom">0</property><!-- bottom margin provided by the sections -->
+
+                    <child>
+                      <object class="GsFeaturedCarousel" id="top_carousel">
+                        <property name="height-request">318</property>
+                        <property name="margin-bottom">24</property>
+                        <signal name="app-clicked" handler="top_carousel_app_clicked_cb"/>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel" id="featured_heading">
+                        <property name="visible" bind-source="featured_flow_box" bind-property="visible" bind-flags="sync-create|bidirectional" />
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes" comments="Heading for featured apps on a category page">Editor’s Choice</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkFlowBox" id="featured_flow_box">
+                        <property name="visible">False</property>
+                        <property name="column_spacing">14</property>
+                        <property name="halign">fill</property>
+                        <property name="row_spacing">14</property>
+                        <property name="homogeneous">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="valign">start</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <signal name="child-activated" handler="app_activated_cb" swapped="yes"/>
+                        <accessibility>
+                          <relation name="labelled-by">featured_heading</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel" id="recently_updated_heading">
+                        <property name="visible" bind-source="recently_updated_flow_box" bind-property="visible" bind-flags="sync-create|bidirectional" />
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes" comments="Heading for recently updated apps on a category page">New &amp; Updated</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkFlowBox" id="recently_updated_flow_box">
+                        <property name="visible">False</property>
+                        <property name="column_spacing">14</property>
+                        <property name="halign">fill</property>
+                        <property name="row_spacing">14</property>
+                        <property name="homogeneous">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="valign">start</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <signal name="child-activated" handler="app_activated_cb" swapped="yes"/>
+                        <accessibility>
+                          <relation name="labelled-by">recently_updated_heading</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel" id="web_apps_heading">
+                        <property name="visible" bind-source="web_apps_flow_box" bind-property="visible" bind-flags="sync-create|bidirectional" />
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes" comments="Heading for web apps on a category page">Picks from the Web</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkFlowBox" id="web_apps_flow_box">
+                        <property name="visible">False</property>
+                        <property name="column_spacing">14</property>
+                        <property name="halign">fill</property>
+                        <property name="row_spacing">14</property>
+                        <property name="homogeneous">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="valign">start</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <signal name="child-activated" handler="app_activated_cb" swapped="yes"/>
+                        <accessibility>
+                          <relation name="labelled-by">web_apps_heading</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel" id="other_heading">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes" comments="Heading for the rest of the apps on a category page">Other Appstore</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkFlowBox" id="category_detail_box">
+                        <property name="halign">fill</property>
+                        <property name="row_spacing">14</property>
+                        <property name="column_spacing">14</property>
+                        <property name="homogeneous">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="valign">start</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <signal name="child-activated" handler="app_activated_cb" swapped="yes"/>
+                        <accessibility>
+                          <relation name="labelled-by">other_heading</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

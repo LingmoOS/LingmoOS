@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <template class="GsStorageContextDialog" parent="GsInfoWindow">
+    <property name="title" translatable="yes" comments="Translators: This is the title of the dialog which contains information about the storage or download size needed for an app">Storage</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <child>
+          <object class="AdwPreferencesGroup">
+
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">8</property>
+
+                <child>
+                  <object class="GtkBox">
+                    <property name="margin-bottom">16</property>
+                    <property name="margin-start">20</property>
+                    <property name="margin-end">20</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">12</property>
+
+                    <child>
+                      <object class="GsLozenge" id="lozenge">
+                        <property name="circular">False</property>
+                        <style>
+                          <class name="large"/>
+                          <class name="grey"/>
+                        </style>
+                        <accessibility>
+                          <relation name="labelled-by">title</relation>
+                        </accessibility>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel" id="title">
+                        <property name="justify">center</property>
+                        <!-- this is a placeholder: the text is actually set in code -->
+                        <property name="label">Shortwave works on this device</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0.5</property>
+                        <style>
+                          <class name="title-2"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
+                <child>
+                  <object class="GtkListBox" id="sizes_list">
+                    <property name="selection_mode">none</property>
+                    <property name="halign">fill</property>
+                    <property name="valign">start</property>
+                    <style>
+                      <class name="boxed-list"/>
+                    </style>
+                    <!-- Rows are added in code -->
+                    <placeholder/>
+                  </object>
+                </child>
+
+                <child>
+                  <object class="GtkLabel" id="manage_storage_label">
+                    <!-- The ‘dummy’ URI is ignored in the activate-link handler, but needs to be specified as otherwise GTK complains that no href is set -->
+                    <property name="label" translatable="yes" comments="Translators: Please do not translate the markup or link href">Cached data can be cleared from the &lt;a href="dummy"&gt;_app settings&lt;/a&gt;.</property>
+                    <property name="margin-top">16</property>
+                    <property name="use-markup">True</property>
+                    <property name="use-underline">True</property>
+                    <signal name="activate-link" handler="manage_storage_activate_link_cb"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+
+  <object class="GtkSizeGroup" id="lozenge_size_group">
+    <property name="mode">horizontal</property>
+  </object>
+</interface>

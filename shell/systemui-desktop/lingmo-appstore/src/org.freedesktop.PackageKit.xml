@@ -1,0 +1,506 @@
+<!DOCTYPE node PUBLIC
+"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd" [
+  <!ENTITY ERROR_GENERAL "org.freedesktop.PackageKit.Denied">
+]>
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+
+  <interface name="org.freedesktop.PackageKit.Query">
+    <doc:doc>
+      <doc:description>
+        <doc:para>
+          The interface used for querying the package database.
+        </doc:para>
+      </doc:description>
+    </doc:doc>
+
+    <!--*****************************************************************************************-->
+    <method name="IsInstalled">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Finds out if the package is installed.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="s" name="package_name" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              A package name, e.g. <doc:tt>hal-info</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>timeout=10</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="b" name="installed" direction="out">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              If the package is installed.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="SearchFile">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Finds the package name for an installed or available file
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="s" name="file_name" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              A package name, e.g. <doc:tt>/usr/share/help/gimp/index.html</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>timeout=10</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="b" name="installed" direction="out">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              If the package is installed.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="package_name" direction="out">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The package name of the file, e.g. <doc:tt>hal-info</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+  </interface>
+
+  <!-- ######################################################################################### -->
+  <interface name="org.freedesktop.PackageKit.Modify">
+    <doc:doc>
+      <doc:description>
+        <doc:para>
+          The interface used for modifying the package database.
+        </doc:para>
+      </doc:description>
+    </doc:doc>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallPackageFiles">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs local package files or service packs.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="files" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of file names.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An interaction mode that specifies which UI elements should be shown
+              or hidden different from the user default, e.g.
+              <doc:tt>hide-confirm-search,hide-confirm-deps,hide-confirm-install,show-progress</doc:tt>.
+              The show options are:
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>.
+              The hide options are:
+              <doc:tt>hide-confirm-search,hide-confirm-deps,hide-confirm-install,hide-progress,hide-finished,hide-warning</doc:tt>.
+              Convenience options such as:
+              <doc:tt>never</doc:tt>, <doc:tt>defaults</doc:tt> or <doc:tt>always</doc:tt>.
+              are also available.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallProvideFiles">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs packages to provide files.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="files" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of file names.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallPackageNames">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs packages from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="packages" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of package names.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallMimeTypes">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs mimetype handlers from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="mime_types" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of mime types, e.g. <doc:tt>text/plain</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallFontconfigResources">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs fontconfig resources (usually fonts) from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="resources" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of font descriptors from fontconfig, e.g. <doc:tt>:lang=mn</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallGStreamerResources">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs GStreamer fontconfig resources (usually codecs) from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="resources" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of codecs descriptors from <doc:tt>pk-gstreamer-install</doc:tt>, e.g.
+              <doc:tt>Advanced Streaming Format (ASF) demuxer|decoder-video/x-ms-asf</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="InstallResources">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs resources of a given type from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="type" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The type of resource to request, e.g. <doc:tt>plasma-service</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="resources" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of resource descriptors
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <!--*****************************************************************************************-->
+    <method name="RemovePackageByFiles">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Removes packages that provide the given local files.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="files" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of file names.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An interaction mode that specifies which UI elements should be shown
+              or hidden different from the user default, e.g.
+              <doc:tt>hide-confirm-search,hide-confirm-deps,hide-confirm-install,show-progress</doc:tt>.
+              The show options are:
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>.
+              The hide options are:
+              <doc:tt>hide-confirm-search,hide-confirm-deps,hide-confirm-install,hide-progress,hide-finished,hide-warning</doc:tt>.
+              Convenience options such as:
+              <doc:tt>never</doc:tt>, <doc:tt>defaults</doc:tt> or <doc:tt>always</doc:tt>.
+              are also available.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+
+    <method name="InstallPrinterDrivers">
+      <annotation name="org.freedesktop.DBus.GLib.Async" value=""/>
+      <doc:doc>
+        <doc:description>
+          <doc:para>
+            Installs printer drivers from a configured software source.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+      <arg type="u" name="xid" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              The X window handle ID, used for focus stealing prevention and setting modality.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="as" name="resources" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An array of printer model descriptors in IEEE 1284
+              Device ID format,
+              e.g. <doc:tt>MFG:Hewlett-Packard;MDL:HP LaserJet
+              6MP;</doc:tt>.
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+      <arg type="s" name="interaction" direction="in">
+        <doc:doc>
+          <doc:summary>
+            <doc:para>
+              An optional interaction mode, e.g.
+              <doc:tt>show-confirm-search,show-confirm-deps,show-confirm-install,show-progress,show-finished,show-warning</doc:tt>
+            </doc:para>
+          </doc:summary>
+        </doc:doc>
+      </arg>
+    </method>
+  </interface>
+</node>
+

@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <requires lib="handy" version="1.0"/>
+  <menu id="primary_menu">
+    <item>
+      <attribute name="label" translatable="yes">_Appstore Repositories</attribute>
+      <attribute name="action">app.sources</attribute>
+      <attribute name="hidden-when">action-disabled</attribute>
+    </item>
+    <item>
+      <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
+      <attribute name="action">win.show-help-overlay</attribute>
+    </item>
+    <item>
+      <attribute name="label" translatable="yes">_Preferences</attribute>
+      <attribute name="action">app.prefs</attribute>
+    </item>
+  </menu>
+
+  <template class="GsShell" parent="AdwApplicationWindow">
+    <property name="visible">False</property>
+    <property name="width-request">360</property>
+    <property name="height-request">400</property>
+    <property name="default-width">1200</property>
+    <property name="default-height">800</property>
+    <property name="title" translatable="yes">Appstore</property>
+    <property name="icon_name">org.lingmo.Appstore</property>
+    <signal name="map" handler="gs_shell_main_window_mapped_cb"/>
+    <signal name="realize" handler="gs_shell_main_window_realized_cb"/>
+    <signal name="close-request" handler="main_window_closed_cb"/>
+    <child>
+      <object class="GtkEventControllerKey">
+        <property name="propagation-phase">capture</property>
+        <signal name="key-pressed" handler="window_keypress_handler"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkEventControllerKey">
+        <signal name="key-pressed" handler="window_key_pressed_cb"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkShortcutController">
+        <property name="scope">managed</property>
+        <child>
+          <object class="GtkShortcut">
+            <property name="trigger">&lt;Control&gt;comma</property>
+            <property name="action">action(app.prefs)</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcut">
+            <property name="trigger">&lt;Control&gt;period</property>
+            <property name="action">action(app.sources)</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcut">
+            <property name="trigger">&lt;Alt&gt;1</property>
+            <property name="action">action(app.set-mode)</property>
+            <property name="arguments">'overview'</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcut">
+            <property name="trigger">&lt;Alt&gt;2</property>
+            <property name="action">action(app.set-mode)</property>
+            <property name="arguments">'installed'</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcut">
+            <property name="trigger">&lt;Alt&gt;3</property>
+            <property name="action">action(app.set-mode)</property>
+            <property name="arguments">'updates'</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGestureClick">
+        <!-- Mouse hardware back button -->
+        <property name="button">8</property>
+        <signal name="pressed" handler="window_button_pressed_cb"/>
+      </object>
+    </child>
+    <child>
+      <object class="AdwBreakpoint">
+        <condition>max-width: 550sp</condition>
+        <setter object="main_header" property="title-widget"/>
+        <setter object="sidebar_switcher" property="reveal">True</setter>
+      </object>
+    </child>
+    <child>
+      <object class="AdwViewStack" id="stack_loading">
+        <property name="width-request">318</property>
+        <signal name="notify::visible-child" handler="stack_notify_visible_child_cb"/>
+        <child>
+          <object class="AdwViewStackPage">
+            <property name="name">main</property>
+            <property name="child">
+              <object class="AdwToastOverlay" id="toast_overlay">
+                <property name="child">
+                  <object class="AdwLeaflet" id="details_leaflet">
+                    <property name="can-navigate-back">True</property>
+                    <property name="can-unfold">False</property>
+                    <signal name="notify::visible-child" handler="stack_notify_visible_child_cb"/>
+
+
+                    <child>
+                      <object class="AdwLeafletPage">
+                        <property name="name">main</property>
+                        <property name="child">
+                          <object class="AdwLeaflet" id="main_leaflet">
+                            <property name="can-navigate-back">True</property>
+                            <property name="can-unfold">False</property>
+                            <signal name="notify::visible-child" handler="stack_notify_visible_child_cb"/>
+
+                            <child>
+                              <object class="AdwLeafletPage">
+                                <property name="name">main</property>
+                                <property name="child">
+                                  <object class="AdwToolbarView">
+                                    <child type="top">
+                                      <object class="AdwHeaderBar" id="main_header">
+                                        <property name="hexpand">True</property>
+                                        <property name="show-end-title-buttons">True</property>
+                                        <child type="start">
+                                          <object class="GtkToggleButton" id="search_button">
+                                            <property name="can_focus">True</property>
+                                            <property name="icon_name">edit-find-symbolic</property>
+                                            <property name="active" bind-source="search_bar" bind-property="search-mode-enabled" bind-flags="sync-create|bidirectional"/>
+                                            <property name="tooltip-text" translatable="yes">Search</property>
+                                            <accessibility>
+                                              <property name="label" translatable="yes">Search</property>
+                                            </accessibility>
+                                            <style>
+                                              <class name="image-button"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <child type="end">
+                                          <object class="GtkMenuButton" id="menu_button">
+                                            <property name="can_focus">True</property>
+                                            <property name="sensitive">True</property>
+                                            <property name="primary">True</property>
+                                            <property name="icon_name">open-menu-symbolic</property>
+                                            <property name="menu_model">primary_menu</property>
+                                            <property name="tooltip-text" translatable="yes">Main Menu</property>
+                                            <accessibility>
+                                              <property name="label" translatable="yes">Main Menu</property>
+                                            </accessibility>
+                                            <style>
+                                              <class name="image-button"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <property name="title-widget">
+                                          <object class="AdwViewSwitcher">
+                                            <property name="stack">stack_main</property>
+                                            <property name="policy">wide</property>
+                                          </object>
+                                        </property>
+                                      </object>
+                                    </child>
+
+                                    <child type="top">
+                                      <object class="GtkSearchBar" id="search_bar">
+                                        <property name="key-capture-widget">GsShell</property>
+                                        <signal name="notify::search-mode-enabled" handler="search_bar_search_mode_enabled_changed_cb"/>
+                                        <child>
+                                          <object class="AdwClamp">
+                                            <property name="hexpand">True</property>
+                                            <property name="maximum_size">500</property>
+                                            <property name="tightening_threshold">500</property>
+                                            <child>
+                                              <object class="GtkSearchEntry" id="entry_search">
+                                                <property name="placeholder_text" translatable="yes">Search apps</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="activates_default">True</property>
+                                                <signal name="search-changed" handler="search_changed_handler"/>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <child type="top">
+                                      <object class="GsUpdatesPausedBanner" id="updates_paused_banner"/>
+                                    </child>
+                                    <property name="content">
+                                      <object class="AdwViewStack" id="stack_main">
+                                        <property name="hexpand">True</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="hhomogeneous">False</property>
+                                        <property name="vhomogeneous">False</property>
+                                        <signal name="notify::visible-child" handler="stack_notify_visible_child_cb"/>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">overview</property>
+                                            <property name="title" translatable="yes" comments="Translators: A label for a button to show all available software.">_Explore</property>
+                                            <property name="use-underline">True</property>
+                                            <property name="icon-name">explore-symbolic</property>
+                                            <property name="child">
+                                              <object class="GsOverviewPage" id="overview_page">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">installed</property>
+                                            <!-- FIXME: Add mnemonics support when it’s supported in GTK (same for the other pages).
+                                                 See https://github.com/LingmoOS/gtk/-/issues/3134 -->
+                                            <property name="title" translatable="yes" comments="Translators: A label for a button to show only software which is already installed." context="List of installed apps">_Installed</property>
+                                            <property name="use-underline">True</property>
+                                            <property name="icon-name">app-installed-symbolic</property>
+                                            <property name="child">
+                                              <object class="GsInstalledPage" id="installed_page">
+                                                <property name="is-narrow" bind-source="GsShell" bind-property="is-narrow" bind-flags="sync-create"/>
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">search</property>
+                                            <property name="child">
+                                              <object class="GsSearchPage" id="search_page">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">updates</property>
+                                            <property name="title" translatable="yes" comments="Translators: A label for a button to show only updates which are available to install." context="Header bar button for list of apps to be updated">_Updates</property>
+                                            <property name="use-underline">True</property>
+                                            <property name="icon-name">emblem-synchronizing-symbolic</property>
+                                            <property name="badge-number" bind-source="updates_page" bind-property="counter" bind-flags="sync-create"/>
+                                            <property name="visible" bind-source="updates_page" bind-property="visible" bind-flags="sync-create"/>
+                                            <property name="child">
+                                              <object class="GsUpdatesPage" id="updates_page">
+                                                <property name="is-narrow" bind-source="GsShell" bind-property="is-narrow" bind-flags="sync-create"/>
+                                                <signal name="notify::counter" handler="updates_page_notify_counter_cb"/>
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <child type="bottom">
+                                      <object class="AdwViewSwitcherBar" id="sidebar_switcher">
+                                        <property name="stack">stack_main</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="AdwLeafletPage">
+                                <property name="name">sub</property>
+                                <property name="child">
+                                  <object class="AdwToolbarView">
+                                    <child type="top">
+                                      <object class="AdwHeaderBar" id="sub_header">
+                                        <property name="show-end-title-buttons">True</property>
+                                        <property name="hexpand">True</property>
+                                        <child>
+                                          <object class="GtkButton" id="button_back">
+                                            <property name="tooltip-text" translatable="yes">Go back</property>
+                                            <property name="icon_name">go-previous-symbolic</property>
+                                            <property name="can_focus">True</property>
+                                            <signal name="clicked" handler="gs_shell_back_button_cb"/>
+                                          </object>
+                                        </child>
+                                        <child type="title">
+                                          <object class="GtkLabel" id="sub_page_header_title">
+                                            <property name="selectable">False</property>
+                                            <property name="ellipsize">end</property>
+                                            <style>
+                                              <class name="title"/>
+                                            </style>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <property name="content">
+                                      <object class="AdwViewStack" id="stack_sub">
+                                        <property name="hexpand">True</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="hhomogeneous">False</property>
+                                        <property name="vhomogeneous">False</property>
+                                        <signal name="notify::visible-child" handler="stack_notify_visible_child_cb"/>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">moderate</property>
+                                            <property name="child">
+                                              <object class="GsModeratePage" id="moderate_page">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">category</property>
+                                            <property name="child">
+                                              <object class="GsCategoryPage" id="category_page">
+                                                <signal name="app-clicked" handler="category_page_app_clicked_cb"/>
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">extras</property>
+                                            <property name="child">
+                                              <object class="GsExtrasPage" id="extras_page">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="AdwLeafletPage">
+                        <property name="name">details</property>
+                        <property name="child">
+                          <object class="AdwToolbarView">
+                            <child type="top">
+                              <object class="AdwHeaderBar" id="details_header">
+                                <property name="hexpand">True</property>
+                                <property name="show-end-title-buttons">True</property>
+                                <property name="title-widget">
+                                  <object class="AdwWindowTitle">
+                                    <property name="title" bind-source="details_page" bind-property="title" bind-flags="sync-create"/>
+                                  </object>
+                                </property>
+                                <child>
+                                  <object class="GtkButton" id="button_back2">
+                                    <property name="tooltip-text" translatable="yes">Go back</property>
+                                    <property name="icon_name">go-previous-symbolic</property>
+                                    <property name="can_focus">True</property>
+                                    <signal name="clicked" handler="gs_shell_details_back_button_cb"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <property name="content">
+                              <object class="GsDetailsPage" id="details_page">
+                                <property name="is-narrow" bind-source="GsShell" bind-property="is-narrow" bind-flags="sync-create"/>
+                                <signal name="metainfo-loaded" handler="gs_shell_details_page_metainfo_loaded_cb"/>
+                                <signal name="app-clicked" handler="details_page_app_clicked_cb"/>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwViewStackPage">
+            <property name="name">loading</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
+                </child>
+                <property name="content">
+                  <object class="GtkWindowHandle">
+                    <child>
+                      <object class="GsLoadingPage" id="loading_page">
+                        <signal name="refreshed" handler="initial_refresh_done"/>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

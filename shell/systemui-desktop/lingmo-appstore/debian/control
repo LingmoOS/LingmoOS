@@ -1,0 +1,197 @@
+Source: lingmo-appstore
+Section: lingmo
+Priority: optional
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Build-Depends: appstream,
+               debhelper-compat (= 13),
+               dh-sequence-gnome,
+               docbook-xsl,
+               gsettings-desktop-schemas-dev (>= 3.18),
+               gtk-doc-tools,
+               itstool,
+               libadwaita-1-dev (>= 1.6~beta),
+               libappstream-dev (>= 1.0.0),
+               libflatpak-dev (>= 1.14.0) [amd64 arm64 armel armhf i386 mipsel mips64el ppc64el s390x hppa powerpc ppc64 riscv64 x32],
+               libfwupd-dev (>= 1.5.6) [linux-any],
+               libglib-testing-0-dev,
+               libglib2.0-dev (>= 2.76.0),
+               libgtk-4-dev (>= 4.13.4),
+               libgudev-1.0-dev [linux-any],
+               libjson-glib-dev (>= 1.6.0),
+               libmalcontent-0-dev [amd64 arm64 armel armhf i386 mipsel mips64el ppc64el s390x hppa powerpc ppc64 riscv64 x32],
+               libostree-dev (>= 2022.5-2~) [linux-any],
+               libpackagekit-glib2-dev (>= 1.2.5),
+               libpolkit-gobject-1-dev,
+               libsnapd-glib-dev (>= 1.63) [amd64 arm64 armel armhf i386 ppc64el s390x],
+               libsoup-3.0-dev,
+               libsysprof-capture-4-dev (>= 3.38.0) [amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x powerpc ppc64],
+               libxml2-utils,
+               libxmlb-dev (>= 0.3.4),
+               meson (>= 0.55.0),
+               pkgconf,
+               polkitd,
+               xsltproc
+Build-Depends-Indep: libgdk-pixbuf2.0-doc <!nodoc>,
+                     libglib2.0-doc <!nodoc>,
+                     libgtk-3-doc <!nodoc>,
+                     libjson-glib-doc <!nodoc>,
+                     libsoup-3.0-doc <!nodoc>,
+Rules-Requires-Root: no
+Standards-Version: 4.7.0
+Vcs-Browser: https://github.com/LingmoOS/lingmo-appstore
+Vcs-Git: https://github.com/LingmoOS/lingmo-appstore.git
+Homepage: https://github.com/LingmoOS/lingmo-appstore
+X-Ubuntu-Use-Langpack: yes
+
+Package: lingmo-appstore
+Architecture: any
+Depends: lingmo-appstore-plugin-deb (= ${binary:Version}) | lingmo-appstore-plugin (= ${binary:Version}),
+         lingmo-appstore-common (= ${source:Version}),
+         gsettings-desktop-schemas (>= 3.18),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Conflicts: sessioninstaller
+Recommends: ${plugin:Recommends}
+Suggests: lingmo-appstore-plugin-deb,
+          lingmo-appstore-plugin-flatpak [amd64 arm64 armel armhf i386 mipsel mips64el ppc64el s390x hppa powerpc ppc64 riscv64 x32],
+          lingmo-appstore-plugin-snap [amd64 arm64 armel armhf i386 ppc64el s390x]
+Description: Appstore Center for Lingmo OS
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+
+Package: lingmo-appstore-common
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Description: Appstore Center for Lingmo OS (common files)
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+ .
+ This package contains the architecture-independent files.
+
+Package: lingmo-appstore-plugin-deb
+Architecture: any
+Depends: appstream,
+         apt-config-icons,
+         lingmo-appstore (= ${binary:Version}),
+         libgtk3-perl,
+         packagekit (>= 1.2.5),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Suggests: apt-config-icons-hidpi
+Provides: lingmo-appstore-plugin (= ${binary:Version})
+Breaks: lingmo-appstore (<< 0.1~)
+Replaces: lingmo-appstore (<< 0.1~)
+Description: .deb support for Lingmo OS Appstore
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+ .
+ This package contains the AppStream and PackageKit plugins necessary for
+ managing .deb packages with apt.
+
+Package: lingmo-appstore-plugin-flatpak
+Architecture: amd64 arm64 armel armhf hppa i386 mips64el mipsel powerpc ppc64 ppc64el riscv64 s390x x32
+Depends: flatpak (>= 1.14.0),
+         lingmo-appstore (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: lingmo-appstore-plugin (= ${binary:Version})
+Breaks: lingmo-appstore (<< 0.1~)
+Replaces: lingmo-appstore (<< 0.1~)
+Description: Flatpak support for Lingmo OS Appstore
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+ .
+ This package contains the Flatpak plugin.
+
+Package: lingmo-appstore-plugin-fwupd
+Architecture: linux-any
+Depends: fwupd,
+         lingmo-appstore (= ${binary:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Breaks: lingmo-appstore (<< 0.1~)
+Replaces: lingmo-appstore (<< 0.1~)
+Description: Firmware updater support for Lingmo OS Appstore
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+ .
+ This package contains the fwupd plugin to update firmware.
+
+Package: lingmo-appstore-plugin-snap
+Architecture: amd64 arm64 armel armhf i386 ppc64el s390x
+Depends: lingmo-appstore (= ${binary:Version}),
+         snapd [amd64 arm64 armel armhf i386 ppc64el],
+         ${misc:Depends},
+         ${shlibs:Depends}
+Provides: lingmo-appstore-plugin (= ${binary:Version})
+Recommends: snapd [s390x]
+Breaks: lingmo-appstore (<< 0.1~)
+Replaces: lingmo-appstore (<< 0.1~)
+Description: Snap support for Lingmo OS Appstore
+ Appstore lets you install and update applications and system extensions.
+ .
+ Appstore uses a plugin architecture to separate the frontend from the
+ technologies that are used underneath. Currently, a PackageKit plugin provides
+ data from a number of traditional packaging systems, such as rpm or apt. An
+ appdata plugin provides additional metadata from locally installed data in the
+ appdata format.
+ .
+ This package contains the Snap plugin.
+
+Package: lingmo-appstore-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libappstream-dev (>= 0.14.0),
+         libglib2.0-dev (>= 2.76.0),
+         libgtk-4-dev (>= 4.13.4),
+         libjson-glib-dev (>= 1.6.0),
+         libpolkit-gobject-1-dev,
+         libsoup-3.0-dev,
+         libsysprof-capture-4-dev (>= 3.38.0) [amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x powerpc ppc64],
+         libxmlb-dev (>= 0.3.4),
+         ${misc:Depends}
+Suggests: lingmo-appstore-doc
+Description: Appstore Center for Lingmo OS - development files
+ Appstore lets you install and update applications and system extensions.
+ .
+ This package contains headers and other files required when compiling external
+ plugins for use with Appstore.
+
+Package: lingmo-appstore-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Build-Profiles: <!nodoc>
+Description: Appstore Center for Lingmo OS - documentation
+ Appstore lets you install and update applications and system extensions.
+ .
+ This package contains documentation for use when developing plugins for
+ Appstore.

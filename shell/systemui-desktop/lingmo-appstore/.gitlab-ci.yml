@@ -1,0 +1,107 @@
+include: 'https://github.com/LingmoOS/citemplates/raw/HEAD/flatpak/flatpak_ci_initiative.yml'
+
+stages:
+  - build
+  - deploy
+
+cache:
+  paths:
+    - _ccache/
+
+variables:
+  MESON_TEST_TIMEOUT_MULTIPLIER: 4
+  G_MESSAGES_DEBUG: all
+  MESON_COMMON_OPTIONS: "--werror --buildtype debug --wrap-mode=nodownload --prefix /usr -Dsoup2=true -Dwebapps=true -Dhardcoded_foss_webapps=false -Dhardcoded_proprietary_webapps=false"
+  BUNDLE: "lingmo-appstore-dev.flatpak"
+
+.build:
+  before_script:
+    - cp -r $HOME/subprojects/* subprojects/
+
+fedora-x86_64:
+  extends: .build
+  image: registry.github.com/LingmoOS/lingmo/lingmo-appstore/fedora:v15
+  stage: build
+  except:
+    - tags
+  script:
+    - meson ${MESON_COMMON_OPTIONS}
+            -Drpm_ostree=true
+            -Dmalcontent=true
+            -Dsysprof=enabled
+            _build
+    - ninja -C _build
+    - .gitlab-ci/run-tests.sh
+            --no-suite packagekit
+            --no-suite fwupd
+            --no-suite gtk
+            --no-suite libglib-testing
+            --no-suite malcontent
+  artifacts:
+    reports:
+      junit: "_build/${CI_JOB_NAME}-report.xml"
+    name: "lingmo-appstore-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/config.h"
+      - "_build/meson-logs"
+      - "_build/${CI_JOB_NAME}-report.xml"
+
+debian-x86_64:
+  extends: .build
+  image: registry.github.com/LingmoOS/lingmo/lingmo-appstore/debian:v14
+  stage: build
+  except:
+    - tags
+  script:
+    - meson ${MESON_COMMON_OPTIONS}
+            -Drpm_ostree=false
+            -Dmalcontent=false
+            -Dsysprof=disabled
+            _build
+    - ninja -C _build
+    - .gitlab-ci/run-tests.sh
+            --no-suite packagekit
+            --no-suite fwupd
+            --no-suite gtk
+            --no-suite fedora-langpacks
+            --no-suite libxmlb
+  artifacts:
+    reports:
+      junit: "_build/${CI_JOB_NAME}-report.xml"
+    name: "lingmo-appstore-${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}"
+    when: always
+    paths:
+      - "_build/config.h"
+      - "_build/meson-logs"
+      - "_build/${CI_JOB_NAME}-report.xml"
+
+# Allow building a flatpak on demand to test out the lingmo-appstore UI
+flatpak bundle:
+  extends: '.flatpak'
+  stage: 'build'
+  dependencies: []
+  variables:
+    MANIFEST_PATH: "contrib/org.lingmo.AppstoreDevel.json"
+    FLATPAK_MODULE: "lingmo-appstore"
+    RUNTIME_REPO: "https://nightly.lingmo.org/lingmo-nightly.flatpakrepo"
+    APP_ID: "org.lingmo.AppstoreDevel"
+  when: manual
+  allow_failure: true
+  script:
+    # Modified from https://github.com/LingmoOS/citemplates/-/blob/HEAD/flatpak/flatpak_ci_initiative.yml
+    # to drop the unit tests, since we don’t need them
+    - rewrite-flatpak-manifest ${MANIFEST_PATH} ${FLATPAK_MODULE} ${CONFIG_OPTS}
+    - flatpak-builder --user --disable-rofiles-fuse flatpak_app --repo=repo ${BRANCH:+--default-branch=$BRANCH} ${MANIFEST_PATH}
+    # Generate a Flatpak bundle
+    - flatpak build-bundle repo ${BUNDLE} --runtime-repo=${RUNTIME_REPO} ${APP_ID} ${BRANCH}
+    - tar cf repo.tar repo/
+
+# Due to the `only` clause in .publish_nightly, this will only publish on-demand
+# builds to nightly.lingmo.org if they are built from a commit on `main`
+nightly:
+  extends: '.publish_nightly'
+  dependencies:
+    - 'flatpak bundle'
+  needs: ['flatpak bundle']
+  when: manual

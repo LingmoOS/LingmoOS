@@ -1,0 +1,771 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+[
+  <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
+]>
+<book id="index">
+  <bookinfo>
+    <title>LINGMO Appstore Reference Manual</title>
+  </bookinfo>
+
+  <reference id="tutorial">
+    <title>LINGMO Appstore Plugin Tutorial</title>
+    <partintro>
+      <para>
+        LINGMO Appstore is a software installer designed to be easy to use.
+      </para>
+
+      <section>
+        <title>Introduction</title>
+        <para>
+          At the heart of lingmo appstore the application is just a plugin loader
+          that has some GTK UI that gets created for various result types.
+          The idea is we have lots of small plugins that each do one thing and
+          then pass the result onto the other plugins.
+          These are ordered by dependencies against each other at runtime and
+          each one can do things like editing an existing application or adding a
+          new application to the result set.
+          This is how we can add support for things like firmware updating,
+          LINGMO Shell web-apps and flatpak bundles without making big
+          changes all over the source tree.
+        </para>
+        <para>
+          There are broadly 3 types of plugin methods:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="strong">Actions</emphasis>: Do something on a specific GsApp</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="strong">Refine</emphasis>: Get details about a specific GsApp</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="strong">Adopt</emphasis>: Can this plugin handle this GsApp</para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          In general, building things out-of-tree isn't something that I think is
+          a very good idea; the API and ABI inside lingmo-appstore is still
+          changing and there's a huge benefit to getting plugins upstream where
+          they can undergo review and be ported as the API adapts.
+          I'm also super keen to provide configurability in GSettings for doing
+          obviously-useful things, the sort of thing Fleet Commander can set for
+          groups of users.
+        </para>
+        <para>
+          However, now we're shipping lingmo-appstore in enterprise-class distros
+          we might want to allow customers to ship their own plugins to make
+          various business-specific changes that don't make sense upstream.
+          This might involve querying a custom LDAP server and changing the
+          suggested apps to reflect what groups the user is in, or might involve
+          showing a whole new class of applications that does not conform to the
+          Linux-specific <emphasis>application is a desktop-file</emphasis> paradigm.
+          This is where a plugin makes sense.
+        </para>
+
+        <para>
+          The plugin needs to create a class derived from <type>GsPlugin</type>,
+          and define the vfuncs that it needs. The
+          plugin name is taken automatically from the suffix of the
+          <filename>.so</filename> file. The type of the plugin is exposed to
+          lingmo-appstore using <function>gs_plugin_query_type()</function>, which
+          must be exported from the module.
+        </para>
+        <example>
+          <title>A sample plugin</title>
+          <programlisting>
+/*
+ * Copyright (C) 2016 Richard Hughes
+ */
+
+#include &lt;glib.h&gt;
+#include &lt;lingmo-appstore.h&gt;
+
+struct _GsPluginSample {
+  GsPlugin parent;
+
+  /* private data here */
+};
+
+G_DEFINE_TYPE (GsPluginSample, gs_plugin_sample, GS_TYPE_PLUGIN)
+
+static void
+gs_plugin_sample_init (GsPluginSample *self)
+{
+  GsPlugin *plugin = GS_PLUGIN (self);
+
+  gs_plugin_add_rule (plugin, GS_PLUGIN_RULE_RUN_BEFORE, "appstream");
+}
+
+static void
+gs_plugin_sample_list_apps_async (GsPlugin              *plugin,
+                                  GsAppQuery            *query,
+                                  GsPluginListAppsFlags  flags,
+                                  GCancellable          *cancellable,
+                                  GAsyncReadyCallback    callback,
+                                  gpointer               user_data)
+{
+  GsPluginSample *self = GS_PLUGIN_SAMPLE (plugin);
+  g_autoptr(GTask) task = NULL;
+  const gchar * const *keywords;
+  g_autoptr(GsAppList) list = gs_app_list_new ();
+
+  task = gs_plugin_list_apps_data_new_task (plugin, query, flags,
+                                            cancellable, callback, user_data);
+  g_task_set_source_tag (task, gs_plugin_sample_list_apps_async);
+
+  if (query == NULL ||
+      gs_app_query_get_keywords (query) == NULL ||
+      gs_app_query_get_n_properties_set (query) != 1) {
+    g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                             "Unsupported query");
+    return;
+  }
+
+  keywords = gs_app_query_get_keywords (query);
+
+  for (gsize i = 0; keywords[i] != NULL; i++) {
+    if (g_str_equal (keywords[i], "fotoshop")) {
+      g_autoptr(GsApp) app = gs_app_new ("gimp.desktop");
+      gs_app_add_quirk (app, GS_APP_QUIRK_IS_WILDCARD);
+      gs_app_list_add (list, app);
+    }
+  }
+
+  g_task_return_pointer (task, g_steal_pointer (&amp;list), g_object_unref);
+}
+
+static GsAppList *
+gs_plugin_sample_list_apps_finish (GsPlugin      *plugin,
+                                   GAsyncResult  *result,
+                                   GError       **error)
+{
+  return g_task_propagate_pointer (G_TASK (result), error);
+}
+
+static void
+gs_plugin_sample_class_init (GsPluginSampleClass *klass)
+{
+  GsPluginClass *plugin_class = GS_PLUGIN_CLASS (klass);
+
+  plugin_class->list_apps_async = gs_plugin_sample_list_apps_async;
+  plugin_class->list_apps_finish = gs_plugin_sample_list_apps_finish;
+}
+
+GType
+gs_plugin_query_type (void)
+{
+  return GS_TYPE_PLUGIN_SAMPLE;
+}
+          </programlisting>
+        </example>
+
+        <para>
+          We have to define when our plugin is run in reference to other plugins,
+          in this case, making sure we run before <code>appstream</code>.
+          As we're such a simple plugin we're relying on another plugin to run
+          after us to actually make the GsApp <emphasis>complete</emphasis>,
+          i.e. loading icons and setting a localised long description.
+        </para>
+        <para>
+          In this example we want to show GIMP as a result (from any provider,
+          e.g. flatpak or a distro package) when the user searches exactly for
+          <code>fotoshop</code>.
+        </para>
+        <para>
+          We can then build and install the plugin using:
+        </para>
+        <informalexample>
+          <programlisting>
+gcc -shared -o libgs_plugin_example.so gs-plugin-example.c -fPIC \
+    $(pkg-config --libs --cflags lingmo-appstore) \
+    -DI_KNOW_THE_LINGMO_SOFTWARE_API_IS_SUBJECT_TO_CHANGE &amp;&amp; \
+cp libgs_plugin_example.so $(pkg-config lingmo-appstore --variable=plugindir)
+          </programlisting>
+        </informalexample>
+
+        <mediaobject id="gs-example-search">
+          <imageobject>
+            <imagedata format="PNG" fileref="gs-example-search.png" align="center"/>
+          </imageobject>
+        </mediaobject>
+
+      </section>
+
+      <section>
+        <title>Distribution Specific Functionality</title>
+        <para>
+          Some plugins should only run on specific distributions, for instance
+          the <code>fedora-pkgdb-collections</code> plugin should only be used on
+          Fedora systems.
+          This can be achieved with a simple runtime check using the helper
+          <code>gs_plugin_check_distro_id()</code> method or the <code>GsOsRelease</code>
+          object where more complicated rules are required.
+        </para>
+        <example>
+          <title>Self disabling on other distributions</title>
+          <programlisting>
+static void
+gs_plugin_sample_init (GsPluginSample *self)
+{
+  GsPlugin *plugin = GS_PLUGIN (self);
+
+  if (!gs_plugin_check_distro_id (plugin, "ubuntu")) {
+    gs_plugin_set_enabled (plugin, FALSE);
+    return;
+  }
+  /* set up private data etc. */
+}
+          </programlisting>
+        </example>
+
+      </section>
+
+      <section>
+        <title>Custom Applications in the Installed List</title>
+        <para>
+          Next is returning custom applications in the installed list.
+          The use case here is a proprietary software distribution method that
+          installs custom files into your home directory, but you can use your
+          imagination for how this could be useful.
+          The example here is all hardcoded, and a true plugin would have to
+          derive the details about the GsApp, for example reading in an XML
+          file or YAML config file somewhere.
+        </para>
+        <example>
+          <title>Example showing a custom installed application</title>
+          <programlisting>
+static void
+gs_plugin_sample_init (GsPluginSample *self)
+{
+  GsPlugin *plugin = GS_PLUGIN (self);
+
+  gs_plugin_add_rule (plugin, GS_PLUGIN_RULE_RUN_BEFORE, "icons");
+}
+
+static void
+gs_plugin_custom_list_apps_async (GsPlugin              *plugin,
+                                  GsAppQuery            *query,
+                                  GsPluginListAppsFlags  flags,
+                                  GCancellable          *cancellable,
+                                  GAsyncReadyCallback    callback,
+                                  gpointer               user_data)
+{
+  g_autofree gchar *fn = NULL;
+  g_autoptr(GsApp) app = NULL;
+  g_autoptr(GIcon) icon = NULL;
+  g_autoptr(GsAppList) list = gs_app_list_new ();
+  g_autoptr(GTask) task = NULL;
+
+  task = g_task_new (plugin, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gs_plugin_custom_list_apps_async);
+
+  /* We’re only listing installed apps in this example. */
+  if (query == NULL ||
+      gs_app_query_get_is_installed (query) != GS_APP_QUERY_TRISTATE_TRUE ||
+      gs_app_query_get_n_properties_set (query) != 1) {
+    g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                             "Unsupported query");
+    return;
+  }
+
+  /* check if the app exists */
+  fn = g_build_filename (g_get_home_dir (), "chiron", NULL);
+  if (!g_file_test (fn, G_FILE_TEST_EXISTS)) {
+    g_task_return_pointer (task, g_steal_pointer (&amp;list), g_object_unref);
+    return;
+  }
+
+  /* the trigger exists, so create a fake app */
+  app = gs_app_new ("chiron.desktop");
+  gs_app_set_management_plugin (app, plugin);
+  gs_app_set_kind (app, AS_COMPONENT_KIND_DESKTOP_APP);
+  gs_app_set_state (app, GS_APP_STATE_INSTALLED);
+  gs_app_set_name (app, GS_APP_QUALITY_NORMAL, "Chiron");
+  gs_app_set_summary (app, GS_APP_QUALITY_NORMAL, "A teaching application");
+  gs_app_set_description (app, GS_APP_QUALITY_NORMAL,
+        "Chiron is the name of an application.\n\n"
+        "It can be used to demo some of our features");
+
+  /* these are all optional, but make details page looks better */
+  gs_app_set_version (app, "1.2.3");
+  gs_app_set_size_installed (app, GS_SIZE_TYPE_VALID, 2 * 1024 * 1024);
+  gs_app_set_size_download (app, GS_SIZE_TYPE_VALID, 3 * 1024 * 1024);
+  gs_app_set_origin_hostname (app, "http://www.teaching-example.org/");
+  gs_app_add_category (app, "Game");
+  gs_app_add_category (app, "ActionGame");
+  gs_app_set_license (app, GS_APP_QUALITY_NORMAL, "GPL-2.0-or-later and LGPL-2.1-or-later");
+
+  /* use a stock icon */
+  icon = g_themed_icon_new ("input-gaming");
+  gs_app_add_icon (app, icon);
+
+  /* return new app */
+  gs_app_list_add (list, app);
+
+  g_task_return_pointer (task, g_steal_pointer (&amp;list), g_object_unref);
+}
+
+static GsAppList *
+gs_plugin_custom_list_apps_finish (GsPlugin      *plugin,
+                                   GAsyncResult  *result,
+                                   GError       **error)
+{
+  return g_task_propagate_pointer (G_TASK (result), error);
+}
+          </programlisting>
+        </example>
+        <para>
+          This shows a lot of the plugin architecture in action. Some notable points:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Setting the management plugin means we can check for this string
+              when working out if we can handle the install or remove action.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Most applications want a kind of <code>AS_COMPONENT_KIND_DESKTOP_APP</code>
+              to be visible as an application.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The origin is where the application originated from — usually
+              this will be something like <emphasis>Fedora Updates</emphasis>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              Setting the license means we don't get the non-free warning —
+              removing the 3rd party warning can be done using
+              <code>GS_APP_QUIRK_PROVENANCE</code>
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+              The icon will be loaded into a pixbuf of the correct size when
+              needed by the UI. You must ensure that icons are available at
+              common sizes. For icons of type <code>GsRemoteIcon</code>, the
+              <code>icons</code> plugin will download and cache the icon
+              locally.
+            </para>
+          </listitem>
+        </itemizedlist>
+        <para>
+          To show this fake application just compile and install the plugin,
+          <code>touch ~/chiron</code> and then restart lingmo-appstore.
+          To avoid restarting <filename>lingmo-appstore</filename> each time a
+          proper plugin would create a <code>GFileMonitor</code> object to
+          monitor files.
+        </para>
+
+        <mediaobject id="gs-example-installed">
+          <imageobject>
+            <imagedata format="PNG" fileref="gs-example-installed.png" align="center"/>
+          </imageobject>
+        </mediaobject>
+
+        <para>
+          By filling in the optional details (which can also be filled in using
+          <code>refine_async()</code> you can also make the details
+          page a much more exciting place.
+          Adding a set of screenshots is left as an exercise to the reader.
+        </para>
+
+        <mediaobject id="gs-example-details">
+          <imageobject>
+            <imagedata format="PNG" fileref="gs-example-details.png" align="center"/>
+          </imageobject>
+        </mediaobject>
+
+      </section>
+
+      <section>
+        <title>Downloading Metadata and Updates</title>
+
+        <para>
+          The plugin loader supports a <code>refresh_metadata_async()</code> vfunc that
+          is called in various situations.
+          To ensure plugins have the minimum required metadata on disk it is
+          called at startup, but with a cache age of <emphasis>infinite</emphasis>.
+          This basically means the plugin must just ensure that
+          <emphasis role="strong">any</emphasis> data exists no matter what the age.
+        </para>
+        <para>
+          Usually once per hour, we'll call <code>refresh_metadata_async()</code> but
+          with the correct cache age set (typically a little over 24 hours) which
+          allows the plugin to download new metadata or payload files from remote
+          servers.
+          The <code>gs_utils_get_file_age()</code> utility helper can help you
+          work out the cache age of a file, or the plugin can handle it some other
+          way.
+        </para>
+        <para>
+          For the Flatpak plugin we just make sure the AppStream metadata exists
+          at startup, which allows us to show search results in the UI.
+          If the metadata did not exist (e.g. if the user had added a remote
+          using the command-line without lingmo-appstore running) then we would
+          show a loading screen with a progress bar before showing the main UI.
+          On fast connections we should only show that for a couple of seconds,
+          but it's a good idea to try any avoid that if at all possible in the
+          plugin.
+          Once per day the <code>gs_plugin_get_updates()</code> method is called,
+          and then a <code>GsPluginJobUpdateApps</code> job may be run with the
+          <code>GS_PLUGIN_JOB_UPDATE_APPS_FLAGS_NO_APPLY</code> flag if the
+          user has configured automatic updates.
+          This is where the Flatpak plugin would download any ostree trees (but
+          not doing the deploy step) so that the applications can be updated live
+          in the details panel without having to wait for the download to complete.
+          In a similar way, the fwupd plugin downloads the tiny LVFS metadata with
+          <code>refresh_metadata_async()</code> and then downloads the large firmware
+          files themselves when <code>update_apps_async()</code> is called.
+        </para>
+        <para>
+          Note, if the downloading fails it's okay to return <code>FALSE</code>;
+          the plugin loader continues to run all plugins and just logs an error
+          to the console. We'll be calling into <code>refresh_metadata_async()</code>
+          again in only another hour, so there's no need to bother the user.
+          For actions like <code>gs_plugin_app_install</code> we also do the same
+          thing, but we also save the error on the GsApp itself so that the UI is
+          free to handle that how it wants, for instance showing a GtkDialog
+          window for example.
+        </para>
+        <example>
+          <title>Refresh example</title>
+          <programlisting>
+static void progress_cb (gsize bytes_downloaded,
+                         gsize total_download_size,
+                         gpointer user_data);
+static void download_file_cb (GObject *source_object,
+                              GAsyncResult *result,
+                              gpointer user_data);
+
+static void
+gs_plugin_example_refresh_metadata_async (GsPlugin *plugin,
+                                          guint64 cache_age_secs,
+                                          GsPluginRefreshMetadataFlags flags,
+                                          GCancellable *cancellable,
+                                          GError **error)
+{
+  const gchar *metadata_filename = "/var/cache/example/metadata.xml";
+  const gchar *metadata_url = "https://www.example.com/new.xml";
+  g_autoptr(GFile) file = g_file_new_for_path (metadata_filename);
+  g_autoptr(GTask) task = NULL;
+  g_autoptr(SoupSession) soup_session = NULL;
+
+  task = g_task_new (plugin, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gs_plugin_example_refresh_metadata_async);
+
+  soup_session = gs_build_soup_session ();
+
+  /* is the metadata missing or too old? */
+  if (gs_utils_get_file_age (file) &gt; cache_age_secs) {
+    gs_download_file_async (soup_session,
+                            metadata_url,
+                            file,
+                            G_PRIORITY_LOW,
+                            progress_cb,
+                            plugin,
+                            cancellable,
+                            download_file_cb,
+                            g_steal_pointer (&amp;task));
+    return;
+  }
+
+  g_task_return_boolean (task, TRUE);
+}
+
+static void
+progress_cb (gsize bytes_downloaded,
+             gsize total_download_size,
+             gpointer user_data)
+{
+  g_debug ("Downloaded %zu of %zu bytes", bytes_downloaded, total_download_size);
+}
+
+static void
+download_file_cb (GObject *source_object,
+                  GAsyncResult *result,
+                  gpointer user_data)
+{
+  GsPlugin *plugin = GS_PLUGIN (source_object);
+  g_autoptr(GTask) task = g_steal_pointer (&amp;user_data);
+
+  if (!gs_download_file_finish (result, &amp;local_error)) {
+    g_task_return_error (task, g_steal_pointer (&amp;local_error));
+  } else {
+    g_debug ("successfully downloaded new metadata");
+    g_task_return_boolean (task, TRUE);
+  }
+}
+
+static gboolean
+gs_plugin_example_refresh_metadata_finish (GsPlugin *plugin,
+                                           GAsyncResult *result,
+                                           GError **error)
+{
+  return g_task_propagate_boolean (G_TASK (result), error);
+}
+          </programlisting>
+        </example>
+      </section>
+
+      <section>
+        <title>Adding Application Information Using Refine</title>
+
+        <para>
+          As previous examples have shown it's very easy to add a new
+          application to the search results, updates list or installed list.
+          Some plugins don't want to add more applications, but want to modify
+          existing applications to add more information depending on what is
+          required by the UI code.
+          The reason we don't just add everything at once is that for
+          search-as-you-type to work effectively we need to return results in
+          less than about 50ms and querying some data can take a long time.
+          For example, it might take a few hundred ms to work out the download
+          size for an application when a plugin has to also look at what
+          dependencies are already installed.
+          We only need this information once the user has clicked the search
+          results and when the user is in the details panel, so we can save a
+          ton of time not working out properties that are not useful.
+        </para>
+        <example>
+          <title>Refine example</title>
+          <programlisting>
+static void
+gs_plugin_example_refine_async (GsPlugin *plugin,
+                                GsAppList *list,
+                                GsPluginRefineFlags flags,
+                                GCancellable *cancellable,
+                                GAsyncReadyCallback callback,
+                                gpointer user_data)
+{
+  g_autoptr(GTask) task = NULL;
+
+  task = g_task_new (plugin, cancellable, callback, user_data);
+  g_task_set_source_tag (task, gs_plugin_example_refine_async);
+
+  /* not required */
+  if ((flags &amp; GS_PLUGIN_REFINE_FLAGS_REQUIRE_LICENSE) == 0) {
+    g_task_return_boolean (task, TRUE);
+    return;
+  }
+
+  for (guint i = 0; i &lt; gs_app_list_length (list); i++) {
+    GsApp *app = gs_app_list_index (list, i);
+
+    /* already set */
+    if (gs_app_get_license (app) != NULL) {
+      g_task_return_boolean (task, TRUE);
+      return;
+    }
+
+    /* FIXME, not just hardcoded! */
+    if (g_strcmp0 (gs_app_get_id (app, "chiron.desktop") == 0))
+      gs_app_set_license (app, "GPL-2.0 and LGPL-2.1-or-later");
+  }
+
+  g_task_return_boolean (task, TRUE);
+}
+
+static gboolean
+gs_plugin_example_refine_finish (GsPlugin *plugin,
+                                 GAsyncResult *result,
+                                 GError **error)
+{
+  return g_task_propagate_boolean (G_TASK (result), error);
+}
+          </programlisting>
+        </example>
+        <para>
+          This is a simple example, but shows what a plugin needs to do.
+          It first checks if the action is required, in this case
+          <code>GS_PLUGIN_REFINE_FLAGS_REQUIRE_LICENSE</code>.
+          This request is more common than you might expect as even the search
+          results shows a non-free label if the license is unspecified or
+          non-free.
+          It then checks if the license is already set, returning with success
+          if so.
+          If not, it checks the application ID and hardcodes a license; in the
+          real world this would be querying a database or parsing an additional
+          config file.
+          As mentioned before, if the license value is freely available without
+          any extra work then it's best just to set this at the same time as
+          when adding the app with <code>gs_app_list_add()</code>.
+          Think of refine as <emphasis>adding things that cost time to
+          calculate only when really required</emphasis>.
+        </para>
+        <para>
+          The UI in lingmo-appstore is quite forgiving for missing data, hiding
+          sections or labels as required.
+          Some things are required however, and forgetting to assign an icon or
+          short description will get the application vetoed so that it's not
+          displayed at all.
+          Helpfully, running <code>lingmo-appstore --verbose</code> on the
+          command line will tell you why an application isn't shown along with
+          any extra data.
+        </para>
+
+      </section>
+
+      <section>
+        <title>Adopting AppStream Applications</title>
+
+        <para>
+          There's a lot of flexibility in the lingmo-appstore plugin structure;
+          a plugin can add custom applications and handle things like search and
+          icon loading in a totally custom way.
+          Most of the time you don't care about how search is implemented or how
+          icons are going to be loaded, and you can re-use a lot of the existing
+          code in the <code>appstream</code> plugin.
+          To do this you just save an AppStream-format XML file in either
+          <filename>/usr/share/swcatalog/xml/</filename>,
+          <filename>/var/cache/swcatalog/xml/</filename> or
+          <filename>~/.local/share/swcatalog/xml/</filename>.
+          LINGMO Appstore will immediately notice any new files, or changes to
+          existing files as it has set up the various inotify watches.
+        </para>
+        <para>
+          This allows plugins to care a lot less about how applications are
+          going to be shown.
+          For example, the <code>flatpak</code> plugin downloads AppStream data
+          for configured remotes during <code>refresh_metadata_async()</code>.
+        </para>
+        <para>
+          The only extra step a plugin providing its own apps needs to do
+          is to implement the <code>gs_plugin_adopt_app()</code> function.
+          This is called when an application does not have a management plugin
+          set, and allows the plugin to <emphasis>claim</emphasis> the
+          application for itself so it can handle installation, removal and
+          updating.
+        </para>
+        <para>
+          Another good example is the <code>fwupd</code> that wants to handle
+          any firmware we've discovered in the AppStream XML.
+          This might be shipped by the vendor in a package using Satellite,
+          or downloaded from the LVFS. It wouldn't be kind to set a management
+          plugin explicitly in case XFCE or KDE want to handle this in a
+          different way. This adoption function in this case is trivial:
+        </para>
+
+        <informalexample>
+          <programlisting>
+void
+gs_plugin_adopt_app (GsPlugin *plugin, GsApp *app)
+{
+  if (gs_app_get_kind (app) == AS_COMPONENT_KIND_FIRMWARE)
+    gs_app_set_management_plugin (app, plugin);
+}
+          </programlisting>
+        </informalexample>
+      </section>
+
+      <section>
+        <title>Using The Plugin Cache</title>
+
+        <para>
+          LINGMO Appstore used to provide a per-process plugin cache,
+          automatically de-duplicating applications and trying to be smarter
+          than the plugins themselves.
+          This involved merging applications created by different plugins and
+          really didn't work very well.
+          For versions 3.20 and later we moved to a per-plugin cache which
+          allows the plugin to control getting and adding applications to the
+          cache and invalidating it when it made sense.
+          This seems to work a lot better and is an order of magnitude less
+          complicated.
+          Plugins can trivially be ported to using the cache using something
+          like this:
+        </para>
+        <informalexample>
+          <programlisting>
+   /* create new object */
+   id = gs_plugin_flatpak_build_id (inst, xref);
+-  app = gs_app_new (id);
++  app = gs_plugin_cache_lookup (plugin, id);
++  if (app == NULL) {
++     app = gs_app_new (id);
++     gs_plugin_cache_add (plugin, id, app);
++  }
+          </programlisting>
+        </informalexample>
+        <para>
+          Using the cache has two main benefits for plugins.
+          The first is that we avoid creating duplicate GsApp objects for the
+          same logical thing.
+          This means we can query the installed list, start installing an
+          application, then query it again before the install has finished.
+          The GsApp returned from the second <code>list_apps()</code>
+          request will be the same GObject, and thus all the signals connecting
+          up to the UI will still be correct.
+          This means we don't have to care about <emphasis>migrating</emphasis>
+          the UI widgets as the object changes and things like progress bars just
+          magically work.
+        </para>
+        <para>
+          The other benefit is more obvious.
+          If we know the application state from a previous request we don't have
+          to query a daemon or do another blocking library call to get it.
+          This does of course imply that the plugin is properly invalidating
+          the cache using <code>gs_plugin_cache_invalidate()</code> which it
+          should do whenever a change is detected.
+          Whether a plugin uses the cache for this reason is up to the plugin,
+          but if it does it is up to the plugin to make sure the cache doesn't
+          get out of sync.
+        </para>
+      </section>
+
+    </partintro>
+  </reference>
+
+  <reference id="api">
+    <partintro>
+      <para>
+          This documentation is auto-generated.
+          If you see any issues, please file bugs.
+      </para>
+    </partintro>
+    <title>LINGMO Appstore Plugin API</title>
+    <xi:include href="xml/gs-app.xml"/>
+    <xi:include href="xml/gs-app-collation.xml"/>
+    <xi:include href="xml/gs-app-list.xml"/>
+    <xi:include href="xml/gs-app-query.xml"/>
+    <xi:include href="xml/gs-appstream.xml"/>
+    <xi:include href="xml/gs-category.xml"/>
+    <xi:include href="xml/gs-category-manager.xml"/>
+    <xi:include href="xml/gs-debug.xml"/>
+    <xi:include href="xml/gs-desktop-data.xml"/>
+    <xi:include href="xml/gs-download-utils.xml"/>
+    <xi:include href="xml/gs-external-appstream-utils.xml"/>
+    <xi:include href="xml/gs-fedora-third-party.xml"/>
+    <xi:include href="xml/gs-icon.xml"/>
+    <xi:include href="xml/gs-ioprio.xml"/>
+    <xi:include href="xml/gs-key-colors.xml"/>
+    <xi:include href="xml/gs-metered.xml"/>
+    <xi:include href="xml/gs-odrs-provider.xml"/>
+    <xi:include href="xml/gs-os-release.xml"/>
+    <xi:include href="xml/gs-plugin.xml"/>
+    <xi:include href="xml/gs-plugin-event.xml"/>
+    <xi:include href="xml/gs-plugin-helpers.xml"/>
+    <xi:include href="xml/gs-plugin-job-list-apps.xml"/>
+    <xi:include href="xml/gs-plugin-job-list-categories.xml"/>
+    <xi:include href="xml/gs-plugin-job-list-distro-upgrades.xml"/>
+    <xi:include href="xml/gs-plugin-job-refine.xml"/>
+    <xi:include href="xml/gs-plugin-job-refresh-metadata.xml"/>
+    <xi:include href="xml/gs-plugin-job-update-apps.xml"/>
+    <xi:include href="xml/gs-plugin-job.xml"/>
+    <xi:include href="xml/gs-plugin-loader-sync.xml"/>
+    <xi:include href="xml/gs-plugin-loader.xml"/>
+    <xi:include href="xml/gs-plugin-types.xml"/>
+    <xi:include href="xml/gs-plugin-vfuncs.xml"/>
+    <xi:include href="xml/gs-remote-icon.xml"/>
+    <xi:include href="xml/gs-test.xml"/>
+    <xi:include href="xml/gs-worker-thread.xml"/>
+    <xi:include href="xml/gs-utils.xml"/>
+  </reference>
+
+</book>

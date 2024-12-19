@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <template class="GsUpdatesPage" parent="GsPage">
+    <accessibility>
+      <property name="label" translatable="yes">Updates page</property>
+    </accessibility>
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="AdwBanner" id="banner_end_of_life"/>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack_updates">
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">spinner</property>
+                <property name="child">
+                  <object class="AdwClamp">
+                    <property name="valign">center</property>
+                    <!-- We explicitly want to use the default AdwClamp sizes here,
+                         as does AdwStatusPage. -->
+                    <style>
+                      <class name="status-page"/>
+                    </style>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="valign">center</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="valign">center</property>
+                            <property name="halign">center</property>
+                            <style>
+                              <class name="iconbox"/>
+                            </style>
+                            <child>
+                              <object class="GtkSpinner" id="spinner_updates">
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <style>
+                                  <class name="icon"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label_updates_spinner">
+                            <property name="wrap">True</property>
+                            <property name="wrap-mode">word-char</property>
+                            <property name="justify">center</property>
+                            <property name="label" translatable="yes" comments="TRANSLATORS: the updates panel is starting up.">Loading Updates</property>
+                            <style>
+                              <class name="title"/>
+                              <class name="title-1"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="wrap">True</property>
+                            <property name="wrap-mode">word-char</property>
+                            <property name="justify">center</property>
+                            <property name="use-markup">True</property>
+                            <property name="label" translatable="yes" comments="TRANSLATORS: the updates panel is starting up.">This could take a while</property>
+                            <style>
+                              <class name="body"/>
+                              <class name="description"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">view</property>
+                <property name="child">
+                  <object class="GtkScrolledWindow" id="scrolledwindow_updates">
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">never</property>
+                    <property name="vscrollbar_policy">automatic</property>
+                    <style>
+                      <class name="list-page"/>
+                    </style>
+                    <child>
+                      <object class="AdwClamp">
+                        <property name="maximum-size">600</property>
+                        <property name="tightening-threshold">400</property>
+                        <child>
+                          <object class="GtkBox" id="list_box_updates_box">
+                            <property name="orientation">vertical</property>
+                            <child>
+                              <object class="GsUpgradeBanner" id="upgrade_banner">
+                                <property name="visible">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">False</property>
+                                <property name="margin-top">12</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="updates_box">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">24</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">uptodate</property>
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">48</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <child>
+                      <object class="GsUpgradeBanner" id="upgrade_banner_uptodate">
+                        <property name="visible">False</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                      </object>
+                    </child>
+                    <child>
+
+                      <!-- FIXME: This should be a AdwStatusPage but it doesn’t
+                           currently support non-icon images
+                           See https://github.com/LingmoOS/libhandy/-/issues/448 -->
+                      <object class="GtkScrolledWindow">
+                        <property name="hscrollbar-policy">never</property>
+                        <property name="propagate-natural-height">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="valign">center</property>
+                        <style>
+                          <class name="fake-adw-status-page"/>
+                        </style>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="valign">center</property>
+                            <child>
+                              <object class="AdwClamp">
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="orientation">vertical</property>
+                                    <property name="valign">center</property>
+                                    <child>
+                                      <object class="GtkImage" id="up_to_date_image">
+                                        <property name="pixel-size">300</property>
+                                        <property name="resource">/org/lingmo/Appstore/up-to-date.svg</property>
+                                        <style>
+                                          <class name="icon"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <property name="justify">center</property>
+                                        <property name="label" translatable="yes" comments="TRANSLATORS: This means all software (plural) installed on this system is up to date.">Up to Date</property>
+                                        <style>
+                                          <class name="title"/>
+                                          <class name="title-1"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="uptodate_description">
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <property name="justify">center</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="label">Last checked: HH:MM</property>
+                                        <style>
+                                          <class name="body"/>
+                                          <class name="description"/>
+                                        </style>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">mobile</property>
+                <property name="child">
+                  <object class="AdwStatusPage">
+                    <property name="icon_name">dialog-warning-symbolic</property>
+                    <property name="title" translatable="yes">Use Mobile Data?</property>
+                    <property name="description" translatable="yes">Checking for updates when using mobile broadband could cause you to incur charges</property>
+                    <child>
+                      <object class="GtkButton" id="button_updates_mobile">
+                        <property name="label" translatable="yes">_Check Anyway</property>
+                        <property name="use_underline">True</property>
+                        <property name="halign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">offline</property>
+                <property name="child">
+                  <object class="AdwStatusPage">
+                    <property name="icon_name">network-offline-symbolic</property>
+                    <property name="title" translatable="yes">No Connection</property>
+                    <property name="description" translatable="yes">Go online to check for updates</property>
+                    <child>
+                      <object class="GtkButton" id="button_updates_offline">
+                        <property name="label" translatable="yes">_Network Settings</property>
+                        <property name="use_underline">True</property>
+                        <property name="halign">center</property>
+                        <style>
+                          <class name="pill"></class>
+                          <class name="suggested-action"></class>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">failed</property>
+                <property name="child">
+                  <object class="AdwStatusPage" id="updates_failed_page">
+                    <property name="icon_name">action-unavailable-symbolic</property>
+                    <property name="title" translatable="yes">Error</property>
+                    <!-- placeholder, the description is changed in the code -->
+                    <property name="description" translatable="No">Failed to get updates</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">managed</property>
+                <property name="child">
+                  <object class="AdwStatusPage">
+                    <property name="icon_name">action-unavailable-symbolic</property>
+                    <property name="title" translatable="yes">Error</property>
+                    <property name="description" translatable="yes">Updates are automatically managed</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

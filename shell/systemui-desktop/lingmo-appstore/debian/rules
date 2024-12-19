@@ -1,0 +1,108 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,-O1 -Wl,-z,defs
+
+# Fix the Flatpak plugin: https://launchpad.net/bugs/1650783
+export DEB_LDFLAGS_MAINT_STRIP := -Wl,-Bsymbolic-functions
+
+GS_CONFIGURE_FLAGS = \
+	-Dauto_features=enabled \
+	-Dgsettings_desktop_schemas=enabled \
+	-Dpackagekit=true \
+	-Dpackagekit_autoremove=true \
+	-Drpm_ostree=false \
+	-Dapt=true
+
+# these are conditionally re-enabled later
+GS_CONFIGURE_FLAGS += \
+	-Dfwupd=false \
+	-Dflatpak=false \
+	-Dgudev=false \
+	-Dmalcontent=false
+
+ifeq ($(filter amd64 arm64 armel armhf i386 mips64el ppc64el riscv64 s390x powerpc ppc64,$(DEB_HOST_ARCH)),)
+GS_CONFIGURE_FLAGS += -Dsysprof=disabled
+endif
+
+ifeq ($(DEB_HOST_ARCH_OS), linux)
+	# Enable Flatpak support on supported architectures
+	ifneq (,$(filter $(DEB_HOST_ARCH), amd64 arm64 armel armhf i386 mipsel mips64el ppc64el s390x hppa powerpc ppc64 riscv64 x32))
+		GS_CONFIGURE_FLAGS += -Dflatpak=true -Dmalcontent=true
+	endif
+
+	# Enable GUdev support on Linux
+	GS_CONFIGURE_FLAGS += -Dgudev=true
+	
+	# Enable fwupd support on Linux
+	GS_CONFIGURE_FLAGS += -Dfwupd=true
+
+	# Enable snap support on supported architectures
+	ifneq (,$(filter $(DEB_HOST_ARCH), amd64 arm64 armel armhf i386 ppc64el s390x))
+		GS_CONFIGURE_FLAGS += -Dsnap=true
+	endif
+endif
+
+DISTRO_ID = debian
+FREE_REPOS = \'@DISTRO@-*-main\'
+FREE_URL = https:\/\/www.debian.org\/social_contract\#guidelines
+ifeq (yes,$(shell dpkg-vendor --derives-from Ubuntu && echo yes))
+	DISTRO_ID = ubuntu
+	FREE_REPOS = \'@DISTRO@-*-main\', \'@DISTRO@-*-universe\'
+	FREE_URL = https:\/\/www.ubuntu.com\/about\/about-ubuntu\/licensing
+else ifeq (yes,$(shell dpkg-vendor --derives-from Tanglu && echo yes))
+	DISTRO_ID = tanglu
+else ifeq (yes,$(shell dpkg-vendor --derives-from PureOS && echo yes))
+	DISTRO_ID = pureos
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(GS_CONFIGURE_FLAGS)
+
+override_dh_installgsettings:
+	sed "s#@FREE_REPOS@#$(FREE_REPOS)#g" debian/lingmo-appstore.gsettings-override.in > debian/lingmo-appstore.gsettings-override
+	sed -i "s/@DISTRO@/$(DISTRO_ID)/g" debian/lingmo-appstore.gsettings-override
+	sed -i "s/@URL@/$(FREE_URL)/g" debian/lingmo-appstore.gsettings-override
+	dh_installgsettings
+
+execute_after_dh_missing:
+	# Not useful for Debian
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_fedora*
+	# These files are split out to separate packages
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_appstream*
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_flatpak*
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_fwupd*
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_packagekit*
+	rm -f debian/lingmo-appstore/usr/lib/*/lingmo-appstore/plugins-*/libgs_plugin_snap*
+	rm -f debian/lingmo-appstore/usr/share/metainfo/org.lingmo.Appstore.Plugin.Flatpak.metainfo.xml
+	rm -f debian/lingmo-appstore/usr/share/metainfo/org.lingmo.Appstore.Plugin.Snap.metainfo.xml
+	rm -f debian/lingmo-appstore/usr/share/applications/lingmo-appstore-local-file-fwupd.desktop
+# Ubuntu doesn't need the autostart file
+ifeq ($(shell dpkg-vendor --query vendor),Ubuntu)
+	rm -rf debian/lingmo-appstore/etc/xdg/autostart
+endif
+
+override_dh_makeshlibs:
+	dh_makeshlibs -Xlibgs_plugin
+
+override_dh_shlibdeps:
+	dh_shlibdeps -l/usr/lib/$(DEB_HOST_MULTIARCH)/lingmo-appstore/
+
+# DISABLED
+override_dh_auto_test:
+
+# Ubuntu doesn't need the fwupd plugin
+override_dh_gencontrol:
+ifeq ($(shell dpkg-vendor --query vendor),Ubuntu)
+	dh_gencontrol -- -Vplugin:Recommends='lingmo-appstore-plugin-deb'
+else
+	dh_gencontrol -- -Vplugin:Recommends='lingmo-appstore-plugin-fwupd [linux-any], lingmo-appstore-plugin-deb'
+endif
+
+execute_before_dh_clean:
+	rm -f debian/lingmo-appstore.gsettings-override
+
+override_dh_lingmo_clean:

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GsBasicAuthDialog" parent="AdwWindow">
+    <property name="modal">True</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="title" translatable="yes">Login Required</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="show_title_buttons">False</property>
+            <child>
+              <object class="GtkButton" id="cancel_button">
+                <property name="label" translatable="yes">_Cancel</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="cancel_button_clicked_cb" object="GsBasicAuthDialog" swapped="yes"/>
+                <style>
+                  <class name="text-button"/>
+                </style>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkButton" id="login_button">
+                <property name="label" translatable="yes">_Login</property>
+                <property name="receives_default">True</property>
+                <property name="use_underline">True</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="login_button_clicked_cb" object="GsBasicAuthDialog" swapped="yes"/>
+                <style>
+                  <class name="text-button"/>
+                  <class name="suggested-action"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+        <property name="content">
+          <object class="GtkBox">
+            <property name="margin_bottom">12</property>
+            <property name="margin_end">12</property>
+            <property name="margin_start">12</property>
+            <property name="margin_top">12</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">12</property>
+            <child>
+              <object class="GtkLabel" id="description_label">
+                <property name="wrap">True</property>
+                <property name="wrap_mode">word-char</property>
+                <property name="max_width_chars">55</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry" id="user_entry">
+                <property name="hexpand">True</property>
+                <property name="invisible_char">●</property>
+                <property name="activates_default">True</property>
+                <property name="invisible_char_set">True</property>
+                <property name="input_purpose">password</property>
+                <property name="placeholder_text" translatable="yes" comments="Translators: Placeholder text for a login entry.">User</property>
+                <signal name="changed" handler="dialog_validate" object="GsBasicAuthDialog" swapped="yes"/>
+                <signal name="activate" handler="dialog_validate" object="GsBasicAuthDialog" swapped="yes"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry" id="password_entry">
+                <property name="hexpand">True</property>
+                <property name="visibility">False</property>
+                <property name="invisible_char">●</property>
+                <property name="activates_default">True</property>
+                <property name="invisible_char_set">True</property>
+                <property name="input_purpose">password</property>
+                <property name="placeholder_text" translatable="yes" comments="Translators: Placeholder text for a login entry.">Password</property>
+                <signal name="changed" handler="dialog_validate" object="GsBasicAuthDialog" swapped="yes"/>
+                <signal name="activate" handler="dialog_validate" object="GsBasicAuthDialog" swapped="yes"/>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+  <object class="GtkSizeGroup">
+    <property name="mode">horizontal</property>
+    <widgets>
+      <widget name="login_button"/>
+      <widget name="cancel_button"/>
+    </widgets>
+  </object>
+</interface>

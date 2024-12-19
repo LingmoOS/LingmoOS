@@ -1,0 +1,202 @@
+{
+    "app-id": "org.lingmo.AppstoreDevel",
+    "runtime": "org.lingmo.Platform",
+    "runtime-version": "master",
+    "sdk": "org.lingmo.Sdk",
+    "command": "lingmo-appstore",
+    "tags": [
+        "devel",
+        "development",
+        "nightly"
+    ],
+    "finish-args": [
+        "--device=dri",
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--socket=session-bus",
+        "--socket=system-bus",
+        "--filesystem=host",
+        "--share=network",
+        "--filesystem=xdg-run/dconf",
+        "--filesystem=~/.config/dconf:ro",
+        "--talk-name=ca.desrt.dconf",
+        "--env=DCONF_USER_CONFIG_DIR=.config/dconf",
+        "--filesystem=/var/lib/flatpak",
+        "--env=FLATPAK_SYSTEM_DIR=/var/lib/flatpak",
+        "--filesystem=xdg-data/flatpak",
+        "--filesystem=/usr/share/metainfo:ro",
+        "--filesystem=/usr/share/swcatalog:ro",
+        "--filesystem=/usr/share/appdata:ro",
+        "--filesystem=/usr/share/app-info:ro",
+        "--filesystem=/var/lib/swcatalog:ro",
+        "--filesystem=/var/lib/app-info:ro",
+        "--filesystem=/var/cache/swcatalog:ro",
+        "--filesystem=/var/cache/app-info:ro"
+    ],
+    "modules": [
+        {
+            "name": "libyaml",
+            "buildsystem": "autotools",
+            "builddir": true,
+            "config-opts": [
+                "--libdir=/app/lib"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/yaml/libyaml"
+                }
+            ]
+        },
+        {
+            "name": "lmdb",
+            "buildsystem": "simple",
+            "subdir": "libraries/liblmdb",
+            "build-commands": [
+                "make install prefix=/ DESTDIR=/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://git.openldap.org/openldap/openldap.git"
+                }
+            ]
+        },
+        {
+            "name": "libxmlb",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dgtkdoc=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/hughsie/libxmlb.git",
+                    "branch": "main"
+                }
+            ]
+        },
+        {
+            "name": "appstream",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dstemming=false",
+                "-Dapidocs=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/ximion/appstream.git",
+                    "tag": "v0.15.2",
+                    "commit": "d2bfe7c2a4ca692daf33a5cb4d429011269d1cba"
+                }
+            ]
+        },
+        {
+            "name": "intltool",
+            "buildsystem": "autotools",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.lingmo.org/sources/intltool/0.40/intltool-0.40.6.tar.bz2",
+                    "sha256": "4d1e5f8561f09c958e303d4faa885079a5e173a61d28437d0013ff5efc9e3b64"
+                }
+            ]
+        },
+        {
+            "name": "libfuse",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dutils=false",
+                "-Dexamples=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/libfuse/libfuse.git"
+                }
+            ]
+        },
+        {
+            "name": "ostree",
+            "buildsystem": "autotools",
+            "config-opts": [
+                "--disable-rofiles-fuse"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/ostreedev/ostree.git",
+                    "branch": "main"
+                }
+            ]
+        },
+        {
+            "name": "pyparsing",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip3 install --prefix=/app --no-deps ./pyparsing-*.whl"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/8a/bb/488841f56197b13700afd5658fc279a2025a39e22449b7cf29864669b15d/pyparsing-2.4.7-py2.py3-none-any.whl",
+                    "sha256": "ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"
+                }
+            ]
+        },
+        {
+            "name": "flatpak",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dsystem_helper=disabled",
+                "-Dgtkdoc=disabled",
+                "-Dinstalled_tests=false",
+                "-Dtests=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/flatpak/flatpak.git",
+                    "branch": "main"
+                }
+            ]
+        },
+        {
+            "name": "libglib-testing",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/pwithnall/libglib-testing.git",
+                    "tag": "0.1.1"
+                }
+            ]
+        },
+        {
+            "buildsystem": "meson",
+            "builddir": true,
+            "name": "lingmo-appstore",
+            "config-opts": [
+                "--libdir=/app/lib",
+                "-Dpackagekit=false",
+                "-Dpackagekit_autoremove=false",
+                "-Dpolkit=false",
+                "-Dfwupd=false",
+                "-Dflatpak=true",
+                "-Dmalcontent=false",
+                "-Dgudev=false",
+                "-Dgtk_doc=false",
+                "-Dprofile=Devel"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/LingmoOS/lingmo-appstore.git",
+                    "branch": "main"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,66 @@
+# Maintainer: Lingmo OS Team <team@lingmo.org>
+
+pkgname=lingmo-appstore
+pkgver=0.5
+pkgrel=1
+pkgdesc="Lingmo OS Appstore"
+url="https://github.com/LingmoOS/lingmo-appstore"
+arch=(x86_64)
+license=(GPL-2.0-or-later)
+depends=(
+  appstream
+  dconf
+  gcc-libs
+  gdk-pixbuf2
+  glib2
+  glibc
+  gsettings-desktop-schemas
+  gtk4
+  hicolor-icon-theme
+  json-glib
+  libadwaita
+  libgudev
+  libsoup3
+  libsysprof-capture
+  libxmlb
+  pango
+  polkit
+)
+makedepends=(
+  docbook-xsl
+  flatpak
+  fwupd
+  git
+  glib2-devel
+  gobject-introspection
+  gtk-doc
+  libglib-testing
+  malcontent
+  meson
+)
+optdepends=(
+  'flatpak: Flatpak support plugin'
+  'fwupd: fwupd support plugin'
+  'malcontent: Parental control plugin'
+)
+groups=(lingmo)
+source=(git+$url)
+b2sums=('SKIP')
+validpgpkeys=('41EF7182553A87AC18196A77F27F2FDA54F067D8') # Lingmo OS Team <team@lingmo.org>
+
+build() {
+  local meson_options=(
+    -D packagekit=false
+  )
+
+  arch-meson $pkgname build "${meson_options[@]}"
+  meson compile -C build
+}
+
+# Not running tests - need root and a D-Bus system bus
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+}
+
+

@@ -1,0 +1,189 @@
+%global glib2_version 2.61.1
+%global gtk3_version 3.22.4
+%global json_glib_version 1.6.0
+%global packagekit_version 1.1.1
+%global appstream_version 0.14.0
+%global libsoup_version 2.52.0
+%global gsettings_desktop_schemas_version 3.12.0
+%global fwupd_version 1.2.10
+%global flatpak_version 1.1.3
+%global libxmlb_version 0.1.7
+
+%define alphatag                        #ALPHATAG#
+
+Name:      lingmo-appstore
+Version:   #VERSION#
+Release:   0.#BUILD#%{?alphatag}%{?dist}
+Summary:   A software center for LINGMO
+
+License:   GPLv2+
+URL:       https://apps.lingmo.org/Appstore
+Source0:   https://download.lingmo.org/sources/lingmo-appstore/3.34/%{name}-%{version}.tar.xz
+
+BuildRequires: gcc
+BuildRequires: gettext
+BuildRequires: libxslt
+BuildRequires: docbook-style-xsl
+BuildRequires: desktop-file-utils
+BuildRequires: fwupd-devel >= %{fwupd_version}
+BuildRequires: glib2-devel >= %{glib2_version}
+BuildRequires: gsettings-desktop-schemas-devel >= %{gsettings_desktop_schemas_version}
+BuildRequires: gtk3-devel >= %{gtk3_version}
+BuildRequires: gtk-doc
+BuildRequires: json-glib-devel >= %{json_glib_version}
+BuildRequires: libappstream-devel >= %{appstream_version}
+BuildRequires: libsoup-devel
+BuildRequires: libxmlb-devel >= %{libxmlb_version}
+BuildRequires: meson
+BuildRequires: PackageKit-glib-devel >= %{packagekit_version}
+BuildRequires: polkit-devel
+BuildRequires: flatpak-devel >= %{flatpak_version}
+BuildRequires: ostree-devel
+BuildRequires: rpm-devel
+BuildRequires: rpm-ostree-devel
+BuildRequires: libgudev1-devel
+
+Requires: appstream-data
+Requires: flatpak%{?_isa} >= %{flatpak_version}
+Requires: flatpak-libs%{?_isa} >= %{flatpak_version}
+Requires: fwupd%{?_isa} >= %{fwupd_version}
+Requires: glib2%{?_isa} >= %{glib2_version}
+# lingmo-menus is needed for app folder .directory entries
+Requires: lingmo-menus%{?_isa}
+Requires: gsettings-desktop-schemas%{?_isa} >= %{gsettings_desktop_schemas_version}
+Requires: gtk3%{?_isa} >= %{gtk3_version}
+Requires: json-glib%{?_isa} >= %{json_glib_version}
+Requires: iso-codes
+Requires: libappstream%{?_isa} >= %{appstream_version}
+# librsvg2 is needed for gdk-pixbuf svg loader
+Requires: librsvg2%{?_isa}
+Requires: libsoup%{?_isa} >= %{libsoup_version}
+Requires: libxmlb%{?_isa} >= %{libxmlb_version}
+
+Recommends: PackageKit%{?_isa} >= %{packagekit_version}
+
+Obsoletes: lingmo-appstore-snap < 3.33.1
+Obsoletes: lingmo-appstore-editor < 3.35.1
+
+# this is not a library version
+%define gs_plugin_version               16
+%define gs_plugin_dir %{_libdir}/lingmo-appstore/plugins-%{gs_plugin_version}
+
+%description
+lingmo-appstore is an app that makes it easy to add, remove
+and update software in the LINGMO desktop.
+
+%package devel
+Summary: Headers for building external lingmo-appstore plugins
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+These development files are for building lingmo-appstore plugins outside
+the source tree. Most users do not need this subpackage installed.
+
+%package rpm-ostree
+Summary: rpm-ostree backend for lingmo-appstore
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: rpm-ostree%{?_isa}
+Supplements: (lingmo-appstore%{?_isa} and rpm-ostree%{?_isa})
+
+%description rpm-ostree
+lingmo-appstore is an app that makes it easy to add, remove
+and update software in the LINGMO desktop.
+
+This package includes the rpm-ostree backend.
+
+%prep
+%autosetup -p1
+
+%build
+%meson \
+    -Dsnap=false \
+    -Dgudev=true \
+    -Dpackagekit=true \
+    -Dexternal_appstream=false \
+    -Drpm_ostree=true \
+    -Dtests=false
+%meson_build
+
+%install
+%meson_install
+
+# remove unneeded dpkg plugin
+rm %{buildroot}%{gs_plugin_dir}/libgs_plugin_dpkg.so
+
+# make the software center load faster
+desktop-file-edit %{buildroot}%{_datadir}/applications/org.lingmo.Appstore.desktop \
+    --set-key=X-AppInstall-Package --set-value=%{name}
+
+# set up for Fedora
+cat >> %{buildroot}%{_datadir}/glib-2.0/schemas/org.lingmo.appstore-fedora.gschema.override << FOE
+[org.lingmo.appstore]
+official-repos = [ 'anaconda', 'fedora', 'fedora-debuginfo', 'fedora-source', 'koji-override-0', 'koji-override-1', 'rawhide', 'rawhide-debuginfo', 'rawhide-source', 'updates', 'updates-debuginfo', 'updates-source', 'updates-testing', 'updates-testing-debuginfo', 'updates-testing-source', 'fedora-modular', 'fedora-modular-debuginfo', 'fedora-modular-source', 'rawhide-modular', 'rawhide-modular-debuginfo', 'rawhide-modular-source' ]
+FOE
+
+%find_lang %name --with-lingmo
+
+%check
+desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
+
+%files -f %{name}.lang
+%doc AUTHORS README.md
+%license COPYING
+%{_bindir}/lingmo-appstore
+%{_datadir}/applications/lingmo-appstore-local-file-flatpak.desktop
+%{_datadir}/applications/lingmo-appstore-local-file-fwupd.desktop
+%{_datadir}/applications/lingmo-appstore-local-file-packagekit.desktop
+%{_datadir}/applications/org.lingmo.Appstore.desktop
+%dir %{_datadir}/lingmo-appstore
+%{_datadir}/lingmo-appstore/*.png
+%{_mandir}/man1/lingmo-appstore.1.gz
+%{_datadir}/icons/hicolor/*/apps/org.lingmo.Appstore.svg
+%{_datadir}/icons/hicolor/symbolic/apps/org.lingmo.Appstore-symbolic.svg
+%{_datadir}/lingmo-appstore/featured-*.svg
+%{_datadir}/lingmo-appstore/featured-*.jpg
+%{_datadir}/metainfo/org.lingmo.Appstore.metainfo.xml
+%{_datadir}/metainfo/org.lingmo.Appstore.Plugin.Epiphany.metainfo.xml
+%{_datadir}/metainfo/org.lingmo.Appstore.Plugin.Flatpak.metainfo.xml
+%{_datadir}/metainfo/org.lingmo.Appstore.Plugin.Fwupd.metainfo.xml
+%dir %{gs_plugin_dir}
+%{gs_plugin_dir}/libgs_plugin_appstream.so
+%{gs_plugin_dir}/libgs_plugin_dummy.so
+%{gs_plugin_dir}/libgs_plugin_epiphany.so
+%{gs_plugin_dir}/libgs_plugin_fedora-langpacks.so
+%{gs_plugin_dir}/libgs_plugin_fedora-pkgdb-collections.so
+%{gs_plugin_dir}/libgs_plugin_flatpak.so
+%{gs_plugin_dir}/libgs_plugin_fwupd.so
+%{gs_plugin_dir}/libgs_plugin_generic-updates.so
+%{gs_plugin_dir}/libgs_plugin_hardcoded-blocklist.so
+%{gs_plugin_dir}/libgs_plugin_icons.so
+%{gs_plugin_dir}/libgs_plugin_modalias.so
+%{gs_plugin_dir}/libgs_plugin_os-release.so
+%{gs_plugin_dir}/libgs_plugin_packagekit.so
+%{gs_plugin_dir}/libgs_plugin_provenance-license.so
+%{gs_plugin_dir}/libgs_plugin_provenance.so
+%{gs_plugin_dir}/libgs_plugin_repos.so
+%{gs_plugin_dir}/libgs_plugin_rewrite-resource.so
+%{_sysconfdir}/xdg/autostart/org.lingmo.Appstore.desktop
+%{_datadir}/app-info/xmls/org.lingmo.Appstore.Featured.xml
+%{_datadir}/dbus-1/services/org.freedesktop.PackageKit.service
+%{_datadir}/dbus-1/services/org.lingmo.Appstore.service
+%{_datadir}/lingmo-shell/search-providers/org.lingmo.Appstore-search-provider.ini
+%{_datadir}/glib-2.0/schemas/org.lingmo.appstore.gschema.xml
+%{_datadir}/glib-2.0/schemas/org.lingmo.appstore-fedora.gschema.override
+%{_libexecdir}/lingmo-appstore-cmd
+%{_libexecdir}/lingmo-appstore-restarter
+
+%files rpm-ostree
+%{gs_plugin_dir}/libgs_plugin_rpm-ostree.so
+
+%files devel
+%{_libdir}/pkgconfig/lingmo-appstore.pc
+%dir %{_includedir}/lingmo-appstore
+%{_includedir}/lingmo-appstore/*.h
+%{_datadir}/gtk-doc/html/lingmo-appstore
+
+%changelog
+* #LONGDATE# Richard Hughes <richard@hughsie.com> #VERSION#-0.#BUILD##ALPHATAG#
+- Update from GIT
+

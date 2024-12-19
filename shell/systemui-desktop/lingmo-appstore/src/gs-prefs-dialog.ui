@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.10"/>
+  <template class="GsPrefsDialog" parent="AdwPreferencesWindow">
+    <property name="title" translatable="yes">Preferences</property>
+    <property name="default_width">610</property>
+    <property name="default_height">-1</property>
+    <property name="search_enabled">False</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="margin-bottom">12</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Appstore Updates</property>
+            <property name="header-suffix">
+              <object class="GtkMenuButton" id="updates_info_button">
+                <property name="icon-name">info-symbolic</property>
+                <property name="popover">updates_info_popover</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </property>
+            <child>
+              <object class="AdwActionRow" id="automatic_updates_row">
+                <property name="title" translatable="yes">_Automatic</property>
+                <property name="subtitle" translatable="yes">Automatically check for and download updates</property>
+                <property name="subtitle_lines">0</property>
+                <property name="activatable_widget">automatic_updates_radio</property>
+                <property name="use_underline">True</property>
+                <child type="prefix">
+                  <object class="GtkCheckButton" id="automatic_updates_radio">
+                    <property name="valign">center</property>
+                    <property name="active">True</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwActionRow" id="manual_updates_row">
+                <property name="title" translatable="yes">_Manual</property>
+                <property name="subtitle" translatable="yes">Checking for and downloading updates must be done manually</property>
+                <property name="subtitle_lines">0</property>
+                <property name="activatable_widget">manual_updates_radio</property>
+                <property name="use_underline">True</property>
+                <child type="prefix">
+                  <object class="GtkCheckButton" id="manual_updates_radio">
+                    <property name="valign">center</property>
+                    <property name="group">automatic_updates_radio</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <child>
+              <object class="AdwActionRow" id="automatic_update_notifications_row">
+                <property name="title" translatable="yes">Automatic Update _Notifications</property>
+                <property name="subtitle" translatable="yes">Notify when updates have been automatically installed</property>
+                <property name="subtitle_lines">0</property>
+                <property name="activatable_widget">switch_updates_notify</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <object class="GtkSwitch" id="switch_updates_notify">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Content Filters</property>
+            <child>
+              <object class="AdwActionRow" id="show_only_free_apps_row">
+                <property name="title" translatable="yes">Only Show _Free Appstore</property>
+                <property name="subtitle" translatable="yes">Hide proprietary software when browsing and searching</property>
+                <property name="subtitle_lines">0</property>
+                <property name="activatable_widget">switch_free_apps</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <object class="GtkSwitch" id="switch_free_apps">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwActionRow" id="show_only_verified_apps_row">
+                <property name="title" translatable="yes">Only Show _Verified Developers</property>
+                <property name="subtitle" translatable="yes">Show only apps from developers whose identity has been verified</property>
+                <property name="subtitle_lines">0</property>
+                <property name="activatable_widget">switch_verified_apps</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <object class="GtkSwitch" id="switch_verified_apps">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+  <object class="GtkPopover" id="updates_info_popover">
+    <property name="position">bottom</property>
+    <property name="visible">False</property>
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="halign">center</property>
+        <property name="margin-start">6</property>
+        <property name="margin-end">6</property>
+        <property name="margin-top">6</property>
+        <property name="margin-bottom">6</property>
+        <property name="label" translatable="yes">Checking for and downloading updates uses data and power. Automatic update features are therefore paused when on metered network connections and when power saver is on.</property>
+        <property name="wrap">True</property>
+        <property name="max-width-chars">50</property>
+        <property name="valign">center</property>
+        <!--This is a hack so the popover contents can be read by the screen reader. See https://github.com/LingmoOS/lingmo-control-center/-/merge_requests/1891-->
+        <property name="selectable" bind-source="updates_info_popover" bind-property="visible" bind-flags="invert-boolean">True</property>
+      </object>
+    </property>
+  </object>
+</interface>
