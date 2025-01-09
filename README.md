@@ -12,22 +12,25 @@ This is the main repository for Lingmo OS and is used to guide how to build Ling
 
 ## Tool preparation
 
- - Clone This Code Warehouse.
-   `git clone https://github.com/LingmoOS/LingmoOS.git`
-   `mkdir -p ~/bin`
-   `cp -v LingmoOS/repo ~/bin/`
-   `chmod a+x ~/bin/repo`
-   `echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc`
-   `source ~/.bashrc`
+### Clone This Code Warehouse.
+   ```
+   git clone https://github.com/LingmoOS/LingmoOS.git
+   mkdir -p ~/bin
+   cp -v LingmoOS/repo ~/bin/
+   chmod a+x ~/bin/repo
+   echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
+   source ~/.bashrc
+```
 
 # Initialize repo warehouse
 
- - Create a directory for building:
-  - `mkdir -p workdir`
-  - `cd workdir`
-
- - Init Repo
-  - `repo init -u https://github.com/LingmoOS/manifest.git`
+## Create a directory for building:
+```
+mkdir -p workdir
+cd workdir
+```
+## Init Repo
+`repo init -u https://github.com/LingmoOS/manifest.git`
 
 # Check-out code from a repository
- - `repo sync`
+`repo sync`
