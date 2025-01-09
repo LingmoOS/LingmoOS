@@ -30,7 +30,12 @@ mkdir -p workdir
 cd workdir
 ```
 ## Init Repo
-`repo init -u https://github.com/LingmoOS/manifest.git`
 
-# Check-out code from a repository
-`repo sync`
+```
+repo init -u https://github.com/LingmoOS/manifest.git
+```
+
+# Synchronization code
+```
+repo sync
+```
