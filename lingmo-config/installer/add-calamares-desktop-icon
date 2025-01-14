@@ -1,0 +1,27 @@
+#!/bin/sh
+# Creates an "Install Debian" icon on the live session tested with:
+# Xfce, LXDE, LXqt, Gnome, KDE, Mate, Cinnamon
+
+# We query xdg-user-dir because the Desktop directory has different
+# names for different languages
+DESKTOP=$(xdg-user-dir DESKTOP)
+
+# Create ~/Desktop just in case this runs before the xdg folder
+# creation script.
+mkdir -p $DESKTOP
+
+# Among the Debian desktop environments, LXDE is the only one
+# that behaves completely different.
+if [ -f /usr/bin/lxsession ]; then
+    echo "[Desktop Entry]" > $DESKTOP/install-debian.desktop
+    echo "Type=Link" >> $DESKTOP/install-debian.desktop
+    echo "Name=Install Debian" >> $DESKTOP/install-debian.desktop
+    echo "Icon=install-debian" >> $DESKTOP/install-debian.desktop
+    echo "URL=/usr/share/applications/install-debian.desktop" \
+          >> $DESKTOP/install-debian.desktop
+else
+    cp /usr/share/applications/install-debian.desktop $DESKTOP
+    # Xfce needs this executable otherwise it complains, everything
+    # else doesn't seem to care either way.
+    chmod +x $DESKTOP/install-debian.desktop
+fi

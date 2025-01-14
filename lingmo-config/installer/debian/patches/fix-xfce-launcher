@@ -1,0 +1,22 @@
+Description: Fix Xfce launcher 
+ Add gio bits to script so that Xfce doesn't complain about launcher icon
+ (Closes: #1037299)
+Author: Jonathan Carter <jcc@debian.org>
+Last-Update: 2024-08-22
+
+--- lingmo-installer-config-12.0.9.orig/add-calamares-desktop-icon
++++ lingmo-installer-config-12.0.9/add-calamares-desktop-icon
+@@ -25,3 +25,13 @@ else
+     # else doesn't seem to care either way.
+     chmod +x $DESKTOP/install-debian.desktop
+ fi
++
++if [ "$XDG_CURRENT_DESKTOP" = "XFCE" ]; then 
++    #Set desktop launcher as trusted under gnome/xfce (See: #1037299)
++    gio set --type=string ~/Desktop/install-debian.desktop \
++        metadata::trusted true
++    gio set --type=string ~/Desktop/install-debian.desktop \
++        metadata::xfce-exe-checksum \
++        "$(sha256sum ~/Desktop/install-debian.desktop | cut -f1 -d' ')"
++    touch ~/Desktop/install-debian.desktop
++fi

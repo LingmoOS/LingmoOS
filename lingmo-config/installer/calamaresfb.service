@@ -1,0 +1,20 @@
+[Unit]
+Description=Calamares Framebuffer Session
+DefaultDependencies=no
+ConditionKernelCommandLine=calamares
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStartPre=-/bin/plymouth quit
+# let the console output settle down
+ExecStart=-/usr/sbin/calamares -platform linuxfb
+StandardInput=tty-force
+StandardOutput=inherit
+StandardError=inherit
+KillMode=process
+IgnoreSIGPIPE=no
+SendSIGHUP=yes
+
+[Install]
+WantedBy=sysinit.target
