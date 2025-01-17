@@ -32,7 +32,7 @@ cd workdir
 ## Init Repo
 
 ```
-repo init -u https://github.com/LingmoOS/manifest.git -m manifest.xml
+repo init -u https://github.com/LingmoOS/manifest.git
 ```
 
 # Synchronization code
