@@ -461,6 +461,6 @@ run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $LINGMO_ARCH)
 run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $LINGMO_ARCH)
 
 debug "Stage 3/3 - Generating Verification File"
-run_and_log cd $TARGET_DIR && bash ../make-sums
+run_and_log cd images/ && ../make-sums
 
 run_and_log echo -e "\n***\nGENERATED LINGMO IMAGE: $TARGET_DIR/$(target_image_name $LINGMO_ARCH)\n***"
