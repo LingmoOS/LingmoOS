@@ -39,3 +39,24 @@ repo init -u https://github.com/LingmoOS/manifest.git
 ```
 repo sync
 ```
+
+# Build Desktop Packages
+```
+make config #Config
+make pkg-base
+make pkg-libs
+make pkg-core
+make pkg-fm
+make pkg-shell
+make base
+```
+
+# Build iso disk image file
+```
+make image
+```
+After completion, the generated iso file will be in the build/image directory
+
+## License
+
+This project has been licensed by GPLv3.
