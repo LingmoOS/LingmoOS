@@ -1,0 +1,53 @@
+name: Auto CI Push
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian:
+    name: Debian 13 Trixie
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:trixie
+    steps:
+    - name: Install Dependencies
+      run: |
+        apt-get update
+        apt-get install -y sudo git
+
+    - name: Checkout Source
+      uses: actions/checkout@v3
+
+    - name: Init Git Repo
+      run: |
+        git config --global --add safe.directory $(realpath .)
+
+
+    - name: Build Debian Src Package
+      uses: LingmoOS/action-package-deb@0.0.5
+      with:
+        add-suffix: true
+        build-binary: false
+        build-source: true
+        output-dir: ./debian-deb-output
+        source-dir: ./
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Source DEB Artifacts
+        path: debian-deb-output
+        compression-level: 9 # maximum compression
+
+    - name: Upload to OBS
+      if: ${{ !(github.event_name == 'pull_request') }}
+      uses: LingmoOS/action-upload-to-obs@0.0.4
+      with:
+        remove-old-sources: true
+        obs-package-name: 'lingmo-wallpapers'
+        obs-project-name: 'home:elysia:LingmoOS:CI'
+        obs-user-name: ${{ secrets.OBS_CI_USERNAME }}
+        obs-password: ${{ secrets.OBS_CI_TOKEN }}
+        obs-instance-url: 'https://api.opensuse.org'
+        local-package-dir: './debian-deb-output'

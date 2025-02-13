@@ -1,0 +1,55 @@
+# build pkg
+
+name: Build
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian:
+    name: Debian
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:testing
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v2
+    - name: Update repository
+      run: |
+        apt-get update -y
+    - name: Install the basic dev packages
+      run: apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
+    - name: Install build dependencies
+      run: |
+        mk-build-deps -i -t "apt-get --yes" -r
+    - name: Fix KF5
+      run: mkdir -p /usr/include/KF5
+    - name: Build Package
+      run: |
+        dpkg-buildpackage -b -uc -us -j$(nproc)
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: 3.0.0-rc3
+        release_name: Release 3.0.0-rc3 Packages
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: /__w/lingmo-updator/lingmo-updator_3.0.0-rc3_amd64.deb
+        asset_name: lingmo-updator_3.0.0-rc3_amd64.deb
+        asset_content_type: application/deb

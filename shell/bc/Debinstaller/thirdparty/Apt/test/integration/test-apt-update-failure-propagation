@@ -1,0 +1,99 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+
+buildsimplenativepackage 'foo' 'all' '1' 'stable'
+buildsimplenativepackage 'foo' 'all' '2' 'sid'
+setupaptarchive --no-update
+
+NEWMETHODS="$(readlink -f rootdir)/usr/lib/apt/methods"
+OLDMETHODS="$(readlink -f rootdir/usr/lib/apt/methods)"
+rm "$NEWMETHODS"
+mkdir "$NEWMETHODS"
+backupIFS="$IFS"
+IFS="$(printf "\n\b")"
+for METH in $(find "$OLDMETHODS" -maxdepth 1 ! -type d); do
+	ln -s "$OLDMETHODS/$(basename "$METH")" "$NEWMETHODS"
+done
+IFS="$backupIFS"
+
+changetohttpswebserver
+for FILE in rootdir/etc/apt/sources.list.d/*-sid-* ; do
+	sed -i -e 's#https:#http:#' -e "s#:${APTHTTPSPORT}/#:${APTHTTPPORT}/#" "$FILE"
+done
+
+# these tests are designed to fail, retries are just a waste of time here
+echo 'Acquire::Retries 0;' > rootdir/etc/apt/apt.conf.d/disable-retries.conf
+
+pretest() {
+	msgmsg "$@"
+	rm -rf rootdir/var/lib/apt/lists
+	testsuccessequal 'N: Unable to locate package foo' aptcache policy foo
+}
+pretest 'initialize test' 'update'
+testsuccess aptget update
+testsuccessequal "foo:
+  Installed: (none)
+  Candidate: 2
+  Version table:
+     2 500
+        500 http://localhost:${APTHTTPPORT} sid/main all Packages
+     1 500
+        500 https://localhost:${APTHTTPSPORT} stable/main all Packages" aptcache policy foo
+
+pretest 'not found' 'release files'
+mv aptarchive/dists/stable aptarchive/dists/stable.good
+testfailuremsg "E: The repository 'https://localhost:${APTHTTPSPORT} stable Release' does not have a Release file.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update
+testfailuremsg "E: The repository 'https://localhost:${APTHTTPSPORT} stable Release' does not have a Release file.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details."  aptget update
+
+mv aptarchive/dists/stable.good aptarchive/dists/stable
+posttest() {
+	testsuccessequal "foo:
+  Installed: (none)
+  Candidate: 2
+  Version table:
+     2 500
+        500 http://localhost:${APTHTTPPORT} sid/main all Packages" aptcache policy foo
+}
+posttest
+
+pretest 'method disabled' 'https'
+echo 'Dir::Bin::Methods::https "false";' > rootdir/etc/apt/apt.conf.d/99disable-https
+testfailuremsg "E: The method 'https' is explicitly disabled via configuration.
+N: If you meant to use Tor remember to use tor+https instead of https.
+E: Failed to fetch https://localhost:${APTHTTPSPORT}/dists/stable/InRelease  
+E: Some index files failed to download. They have been ignored, or old ones used instead." aptget update
+rm -f rootdir/etc/apt/apt.conf.d/99disable-https
+posttest
+
+pretest 'method not installed' 'https'
+rm "${NEWMETHODS}/https"
+testfailuremsg "E: The method driver ${TMPWORKINGDIRECTORY}/rootdir/usr/lib/apt/methods/https could not be found.
+N: Is the package apt-transport-https installed?
+E: Failed to fetch https://localhost:${APTHTTPSPORT}/dists/stable/InRelease  
+E: Some index files failed to download. They have been ignored, or old ones used instead." aptget update
+posttest
+
+pretest 'https connection refused' 'doom port'
+for FILE in rootdir/etc/apt/sources.list.d/*-stable-* ; do
+	# lets see how many testservers run also Doom
+	sed -i -e "s#:${APTHTTPSPORT}/#:666/#" "$FILE"
+done
+testwarning aptget update -o Dir::Bin::Methods::https="${OLDMETHODS}/https"
+testsuccess grep '^W: Failed to fetch https://localhost:666/dists/stable/InRelease ' rootdir/tmp/testwarning.output
+testequal 'W: Some index files failed to download. They have been ignored, or old ones used instead.' tail -n 1 rootdir/tmp/testwarning.output
+posttest
+
+pretest 'error-mode=any' 'doom port'
+testfailure aptget update -o Dir::Bin::Methods::https="${OLDMETHODS}/https" -eany
+testsuccess grep '^E: Failed to fetch https://localhost:666/dists/stable/InRelease ' rootdir/tmp/testfailure.output
+testequal 'E: Some index files failed to download. They have been ignored, or old ones used instead.' tail -n 1 rootdir/tmp/testfailure.output
+posttest

@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+if [ -z "$AUTOPKGTEST_TMP" ]; then
+   WORKDIR=''
+   cleanup() {
+      if [ -n "$WORKDIR" ]; then cd /; rm -rf -- "$WORKDIR"; fi
+      WORKDIR=''
+   }
+   trap 'cleanup' 0 HUP INT QUIT ILL ABRT FPE SEGV PIPE TERM
+   WORKDIR="$(mktemp -d)"
+   cd "$WORKDIR"
+else
+   cd "$AUTOPKGTEST_TMP"
+fi
+
+cat >pkgconfigtest.cc <<EOF
+#include <apt-pkg/init.h>
+#include <cstdio>
+
+int main()
+{
+    printf("APT Version: %s\n", pkgVersion);
+    return 0;
+}
+EOF
+
+g++ -Wall -Wextra -o pkgconfigtest pkgconfigtest.cc `pkg-config --cflags --libs apt-pkg`
+echo 'build: OK'
+test -x pkgconfigtest
+./pkgconfigtest
+echo 'run: OK'

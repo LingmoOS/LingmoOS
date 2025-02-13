@@ -1,0 +1,71 @@
+name: Build Check
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian-13:
+    name: Debian 13
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:trixie-slim
+    steps:
+    - name: Update repository
+      run: apt-get update -y
+
+    - name: Install the basic dev packages
+      run: apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
+
+    - name: Checkout Source
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+    
+    - name: Install build dependencies
+      run: mk-build-deps -i -t "apt --yes --no-install-recommends" -r
+    
+    
+    - name: Build Package
+      run: |
+        dpkg-buildpackage -b -uc -us -j$(nproc)
+        mkdir artifacts
+        mv ../*.deb ./artifacts/
+    
+    - uses: actions/upload-artifact@v4
+      with:
+        name: lingmo-kwin-plugins
+        path: |
+          artifacts/*
+        compression-level: 9 # maximum compression
+
+  arch-linux:
+    name: Arch Linux
+    runs-on: ubuntu-latest
+    container: docker.io/library/archlinux:multilib-devel
+    steps:
+    - name: Set up build environment
+      run: |
+        pacman-key --init
+        pacman-key --populate archlinux
+        pacman -Syu --noconfirm base-devel git
+        useradd -m builder
+        echo 'builder ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
+
+    - name: Checkout Source
+      uses: actions/checkout@v4
+      with:
+        submodules: 'true'
+
+    - name: Install the basic dev packages
+      run: sudo -u builder sh -c 'sudo pacman -Syu --noconfirm extra-cmake-modules qt5-base qt5-declarative kconfig5 kdecoration5 kguiaddons5 kcoreaddons5 kconfigwidgets5 kwindowsystem5 kwayland kwin'
+      
+    - name: Build Package
+      run: |
+        mkdir build-arch && cd build-arch && cmake -DCMAKE_PREFIX_PATH=/usr/lib/cmake/plasma5/KDecoration2 .. && make -j$(nproc)
+  

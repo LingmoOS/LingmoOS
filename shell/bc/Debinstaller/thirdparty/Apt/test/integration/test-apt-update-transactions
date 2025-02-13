@@ -1,0 +1,85 @@
+#!/bin/sh
+set -e
+
+# ensure that an update will only succeed entirely or not at all
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+configcompression '.' 'gz'
+
+insertpackage 'unstable' 'foo' 'i386' '1.0'
+insertsource 'unstable' 'foo' 'i386' '1.0'
+
+setupaptarchive --no-update
+
+breakfile() {
+	breakfiles "$1" "${1}.gz"
+}
+restorefile() {
+	unbreakfiles "$1" "${1}.gz"
+}
+
+testrun() {
+	rm -rf aptarchive/dists.good
+	cp -a aptarchive/dists aptarchive/dists.good
+	insertpackage 'unstable' 'bar' 'i386' '1.0'
+	insertsource 'unstable' 'bar' 'i386' '1.0'
+	buildaptarchivefromfiles '+1 hour'
+
+	# produce an unsigned repository
+	find aptarchive \( -name 'Release.gpg' -o -name 'InRelease' \) -delete
+	testfailure aptget update --no-allow-insecure-repositories
+	testfileequal "$1" "$(listcurrentlistsdirectory)"
+
+	# signed but broken
+	signreleasefiles
+
+	onehashbroken() {
+		rm -rf rootdir/var/lib/apt/lists/partial
+		testfailure aptget update -o Debug::pkgAcquire::Worker=1 -o Debug::Acquire::http=1
+		# each file generates two messages with this string
+		testequal '2' grep --count 'Hash Sum mismatch' rootdir/tmp/testfailure.output
+		testfileequal "$1" "$(listcurrentlistsdirectory)"
+	}
+
+	breakfile aptarchive/dists/unstable/main/binary-i386/Packages
+	onehashbroken "$1"
+	restorefile aptarchive/dists/unstable/main/binary-i386/Packages
+
+	breakfile aptarchive/dists/unstable/main/source/Sources
+	onehashbroken "$1"
+	restorefile aptarchive/dists/unstable/main/source/Sources
+
+	rm -rf aptarchive/dists
+	cp -a aptarchive/dists.good aptarchive/dists
+}
+
+testsetup() {
+	msgmsg 'Test with no initial data over' "$1"
+	rm -rf rootdir/var/lib/apt/lists
+	mkdir -p rootdir/var/lib/apt/lists/partial
+	listcurrentlistsdirectory > listsdir.lst
+	testrun 'listsdir.lst'
+
+	msgmsg 'Test with initial data over' "$1"
+	rm -rf rootdir/var/lib/apt/lists
+	testsuccess aptget update -o Debug::pkgAcquire::Worker=1
+	listcurrentlistsdirectory > listsdir.lst
+	testrun 'listsdir.lst'
+}
+
+testsetup 'file'
+
+changetowebserver
+webserverconfig 'aptwebserver::support::modified-since' 'false' "$1"
+webserverconfig 'aptwebserver::support::last-modified' 'false' "$1"  # curl is clever and sees hits here also
+webserverconfig 'aptwebserver::response-header::Accept-Ranges' 'none' "$1"
+
+testsetup 'http'
+
+changetohttpswebserver
+
+testsetup 'https'

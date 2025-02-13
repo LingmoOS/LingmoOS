@@ -1,0 +1,217 @@
+#!/bin/sh
+#
+# test that apt-get update is transactional
+# 
+set -e
+
+avoid_ims_hit() {
+    touch -d '+1hour' aptarchive/dists/unstable/main/binary-i386/Packages*
+    touch -d '+1hour' aptarchive/dists/unstable/main/source/Sources*
+    touch -d '+1hour' aptarchive/dists/unstable/*Release*
+
+    touch -d '-1hour' rootdir/var/lib/apt/lists/*
+}
+
+create_fresh_archive()
+{
+    rm -rf aptarchive/*
+    rm -f rootdir/var/lib/apt/lists/_* rootdir/var/lib/apt/lists/partial/*
+
+    insertpackage 'unstable' 'old' 'all' '1.0'
+
+    setupaptarchive --no-update
+}
+
+add_new_package() {
+    insertpackage 'unstable' 'new' 'all' '1.0'
+    insertsource 'unstable' 'new' 'all' '1.0'
+
+    setupaptarchive --no-update "$@"
+}
+
+break_repository_sources_index() {
+    mv "$APTARCHIVE/dists/unstable/main/source/Sources.gz" "$APTARCHIVE/dists/unstable/main/source/Sources.gz.orig"
+    printf 'xxx' > "$APTARCHIVE/dists/unstable/main/source/Sources"
+    compressfile "$APTARCHIVE/dists/unstable/main/source/Sources" "$@"
+}
+
+start_with_good_inrelease() {
+    create_fresh_archive
+    testsuccess aptget update
+    listcurrentlistsdirectory > lists.before
+    testsuccessequal 'old/unstable 1.0 all' apt list -qq
+}
+
+test_inrelease_to_new_inrelease() {
+    msgmsg 'Test InRelease to new InRelease works fine'
+    start_with_good_inrelease
+
+    add_new_package '+1hour'
+    testsuccess aptget update -o Debug::Acquire::Transaction=1
+    testsuccessequal 'new/unstable 1.0 all
+old/unstable 1.0 all' apt list -qq
+}
+
+test_inrelease_to_broken_hash_reverts_all() {
+    msgmsg 'Test InRelease to broken InRelease reverts everything'
+    start_with_good_inrelease
+
+    add_new_package '+1hour'
+    # break the Sources file
+    break_repository_sources_index '+1hour'
+
+    # test the error condition
+    testfailureequal "E: Failed to fetch file:${APTARCHIVE}/dists/unstable/main/source/Sources.gz  Hash Sum mismatch
+   Hashes of expected file:
+    - Filesize:$(stat -c '%s' 'aptarchive/dists/unstable/main/source/Sources.gz.orig') [weak]
+    - SHA256:$(sha256sum 'aptarchive/dists/unstable/main/source/Sources.gz.orig' | cut -d' ' -f 1)
+   Hashes of received file:
+    - SHA256:$(sha256sum 'aptarchive/dists/unstable/main/source/Sources.gz' | cut -d' ' -f 1)
+    - Filesize:$(stat -c '%s' 'aptarchive/dists/unstable/main/source/Sources.gz') [weak]
+   Last modification reported: $(lastmodification 'aptarchive/dists/unstable/main/source/Sources.gz')
+   Release file created at: $(releasefiledate 'aptarchive/dists/unstable/InRelease')
+E: Some index files failed to download. They have been ignored, or old ones used instead." aptget update -qq
+    # ensure that the Packages file is also rolled back
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+    testfailureequal "E: Unable to locate package new" aptget install new -s -qq
+}
+
+test_inrelease_to_valid_release() {
+    msgmsg 'Test InRelease to valid Release'
+    start_with_good_inrelease
+
+    add_new_package '+1hour'
+    # switch to a unsigned repo now
+    rm -f "$APTARCHIVE/dists/unstable/InRelease" "$APTARCHIVE/dists/unstable/Release.gpg"
+
+    # update fails
+    testfailureequal "E: The repository 'file:${APTARCHIVE} unstable Release' is no longer signed." aptget update -qq
+
+    # test that security downgrade was not successful
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+    testsuccess aptget install old -s
+    testfailure aptget install new -s
+    testnotempty find "${ROOTDIR}/var/lib/apt/lists" -name '*_InRelease'
+    testempty find "${ROOTDIR}/var/lib/apt/lists" -name '*_Release'
+}
+
+test_inrelease_to_release_reverts_all() {
+    msgmsg 'Test InRelease to broken Release reverts everything'
+    start_with_good_inrelease
+
+    # switch to a unsigned repo now
+    add_new_package '+1hour'
+    rm -f "$APTARCHIVE/dists/unstable/InRelease" "$APTARCHIVE/dists/unstable/Release.gpg"
+
+    # break it
+    break_repository_sources_index '+1hour'
+
+    # ensure error
+    testfailureequal "E: The repository 'file:${APTARCHIVE} unstable Release' is no longer signed." aptget update -qq # -o Debug::acquire::transaction=1
+
+    # ensure that the Packages file is also rolled back
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+    testsuccess aptget install old -s
+    testfailure aptget install new -s
+    testnotempty find "${ROOTDIR}/var/lib/apt/lists" -name '*_InRelease'
+    testempty find "${ROOTDIR}/var/lib/apt/lists" -name '*_Release'
+}
+
+test_unauthenticated_to_invalid_inrelease() {
+    msgmsg 'Test UnAuthenticated to invalid InRelease reverts everything'
+    create_fresh_archive
+    rm -f "$APTARCHIVE/dists/unstable/InRelease" "$APTARCHIVE/dists/unstable/Release.gpg"
+
+    testwarning aptget update --allow-insecure-repositories
+    listcurrentlistsdirectory > lists.before
+    testfailureequal "WARNING: The following packages cannot be authenticated!
+  old
+E: There were unauthenticated packages and -y was used without --allow-unauthenticated" aptget install -qq -y old
+
+    # go to authenticated but not correct
+    add_new_package '+1hour'
+    break_repository_sources_index '+1hour'
+
+    testfailureequal "E: Failed to fetch file:$APTARCHIVE/dists/unstable/main/source/Sources.gz  Hash Sum mismatch
+   Hashes of expected file:
+    - Filesize:$(stat -c '%s' 'aptarchive/dists/unstable/main/source/Sources.gz.orig') [weak]
+    - SHA256:$(sha256sum 'aptarchive/dists/unstable/main/source/Sources.gz.orig' | cut -d' ' -f 1)
+   Hashes of received file:
+    - SHA256:$(sha256sum 'aptarchive/dists/unstable/main/source/Sources.gz' | cut -d' ' -f 1)
+    - Filesize:$(stat -c '%s' 'aptarchive/dists/unstable/main/source/Sources.gz') [weak]
+   Last modification reported: $(lastmodification 'aptarchive/dists/unstable/main/source/Sources.gz')
+   Release file created at: $(releasefiledate 'aptarchive/dists/unstable/InRelease')
+E: Some index files failed to download. They have been ignored, or old ones used instead." aptget update -qq
+
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+    testempty find "${ROOTDIR}/var/lib/apt/lists" -maxdepth 1 -name '*_InRelease'
+    testfailureequal "WARNING: The following packages cannot be authenticated!
+  old
+E: There were unauthenticated packages and -y was used without --allow-unauthenticated" aptget install -qq -y old
+}
+
+test_inrelease_to_unauth_inrelease() {
+    msgmsg 'Test InRelease to InRelease without good sig'
+    start_with_good_inrelease
+
+    signreleasefiles 'Marvin Paranoid'
+
+    testwarningequal "W: An error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: file:${APTARCHIVE} unstable InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY E8525D47528144E2
+W: Failed to fetch file:$APTARCHIVE/dists/unstable/InRelease  The following signatures couldn't be verified because the public key is not available: NO_PUBKEY E8525D47528144E2
+W: Some index files failed to download. They have been ignored, or old ones used instead." aptget update -qq
+
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+    testnotempty find "${ROOTDIR}/var/lib/apt/lists" -name '*_InRelease'
+}
+
+test_inrelease_to_broken_gzip() {
+    msgmsg "Test InRelease to broken gzip"
+    start_with_good_inrelease
+
+    break_repository_sources_index '+1hour'
+    generatereleasefiles '+2hours'
+    signreleasefiles
+
+    # append junk at the end of the compressed file
+    echo "lala" >> "$APTARCHIVE/dists/unstable/main/source/Sources.gz"
+    touch -d '+2min' "$APTARCHIVE/dists/unstable/main/source/Sources.gz"
+    # remove uncompressed file to avoid fallback
+    rm "$APTARCHIVE/dists/unstable/main/source/Sources"
+
+    testfailure aptget update
+    testsuccess grep 'Hash Sum mismatch' rootdir/tmp/testfailure.output
+    testfileequal lists.before "$(listcurrentlistsdirectory)"
+}
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture "i386"
+export APT_DONT_SIGN='Release.gpg'
+
+APTARCHIVE="$(readlink -f ./aptarchive)"
+ROOTDIR="${TMPWORKINGDIRECTORY}/rootdir"
+APTARCHIVE_LISTS="$(echo "$APTARCHIVE" | tr "/" "_" )"
+
+# test the following cases:
+# - InRelease -> broken InRelease revert to previous state
+# - empty lists dir and broken remote leaves nothing on the system
+# - InRelease -> hashsum mismatch for one file reverts all files to previous state
+# - Release/Release.gpg -> hashsum mismatch
+# - InRelease -> Release with hashsum mismatch revert entire state and kills Release
+# - Release -> InRelease with broken Sig/Hash removes InRelease
+# going from Release/Release.gpg -> InRelease and vice versa
+# - unauthenticated -> invalid InRelease
+
+# stuff to do:
+# - ims-hit
+# - gzip-index tests
+
+test_inrelease_to_new_inrelease
+test_inrelease_to_broken_hash_reverts_all
+test_inrelease_to_valid_release
+test_inrelease_to_release_reverts_all
+test_unauthenticated_to_invalid_inrelease
+test_inrelease_to_unauth_inrelease
+test_inrelease_to_broken_gzip

@@ -1,0 +1,113 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+
+insertinstalledpackage 'pkgb' 'none' '1'
+insertinstalledpackage 'pkgd' 'none' '1'
+insertpackage 'unstable' 'pkga' 'amd64' '2' 'Depends: pkgb'
+insertpackage 'unstable' 'pkgb' 'amd64' '2'
+insertpackage 'unstable' 'pkgc' 'amd64' '1' 'Conflicts: pkgb'
+
+setupaptarchive
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkgb:none
+The following NEW packages will be installed:
+  pkgc
+0 upgraded, 1 newly installed, 1 to remove and 0 not upgraded.
+Remv pkgb:none [1]
+Inst pkgc (1 unstable [amd64])
+Conf pkgc (1 unstable [amd64])' aptget install pkgc -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  pkgb
+The following packages will be REMOVED:
+  pkgb:none
+The following NEW packages will be installed:
+  pkga pkgb
+0 upgraded, 2 newly installed, 1 to remove and 0 not upgraded.
+Remv pkgb:none [1]
+Inst pkgb (2 unstable [amd64])
+Inst pkga (2 unstable [amd64])
+Conf pkgb (2 unstable [amd64])
+Conf pkga (2 unstable [amd64])' aptget install pkga -s
+
+# do not automatically change from none-arch to whatever-arch as
+# this breaks other none packages and dpkg has this ruleset as
+# this difference seems so important that it has to be maintained …
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Calculating upgrade...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget dist-upgrade -s
+
+# pkgd has no update with an architecture
+testdpkginstalled pkgd
+msgtest 'Test apt-get purge' 'pkgd'
+testsuccess --nomsg aptget purge pkgd -y
+testdpkgnotinstalled pkgd
+
+# there is a pkgb with an architecture
+testdpkginstalled pkgb
+msgtest 'Test apt-get purge' 'pkgb:none'
+testsuccess --nomsg aptget purge pkgb:none -y
+testdpkgnotinstalled pkgb
+
+# check that dependencies are created after the none package exists in the cache
+rm rootdir/var/cache/apt/*.bin
+insertinstalledpackage 'pkgb' 'none' '1'
+insertinstalledpackage 'pkgf' 'none' '1' 'Conflicts: pkgb'
+insertinstalledpackage 'pkgg' 'amd64' '1' 'Conflicts: pkgb'
+insertinstalledpackage 'pkgb' 'amd64' '2'
+testequalor2 "Reading package lists...
+Building dependency tree...
+Reading state information...
+You might want to run 'apt --fix-broken install' to correct these.
+The following packages have unmet dependencies:
+ pkgb : Conflicts: pkgb:none but 1 is installed
+ pkgb:none : Conflicts: pkgb but 2 is installed
+ pkgf:none : Conflicts: pkgb:none but 1 is installed
+             Conflicts: pkgb but 2 is installed
+ pkgg : Conflicts: pkgb but 2 is installed
+        Conflicts: pkgb:none but 1 is installed
+E: Unmet dependencies. Try using --fix-broken." "Reading package lists...
+Building dependency tree...
+Reading state information...
+You might want to run 'apt --fix-broken install' to correct these.
+The following packages have unmet dependencies:
+ pkgb : Conflicts: pkgb:none but 1 is installed
+ pkgb:none : Conflicts: pkgb but 2 is installed
+ pkgf:none : Conflicts: pkgb but 2 is installed
+             Conflicts: pkgb:none but 1 is installed
+ pkgg : Conflicts: pkgb but 2 is installed
+        Conflicts: pkgb:none but 1 is installed
+E: Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution)." aptget check
+
+# check that dependencies are generated for none-packages
+rm rootdir/var/lib/dpkg/status
+insertinstalledpackage 'pkgx' 'none' '1'
+insertinstalledpackage 'pkgy' 'none' '1' 'Depends: pkgz, pkgx (>= 1)'
+insertinstalledpackage 'pkgz' 'none' '1'
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  pkgx:none* pkgy:none*
+0 upgraded, 0 newly installed, 2 to remove and 0 not upgraded.
+Purg pkgy:none [1]
+Purg pkgx:none [1]' aptget purge pkgx -s
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  pkgy:none* pkgz:none*
+0 upgraded, 0 newly installed, 2 to remove and 0 not upgraded.
+Purg pkgy:none [1]
+Purg pkgz:none [1]' aptget purge pkgz -s

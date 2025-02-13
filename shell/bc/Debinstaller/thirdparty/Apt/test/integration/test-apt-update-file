@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Ensure that we do not modify file:/// uris (regression test for
+# CVE-2014-0487
+#
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture "amd64"
+configcompression 'bz2' 'gz'
+confighashes 'SHA512'
+
+insertpackage 'unstable' 'foo' 'all' '1'
+insertpackage 'unstable' 'bar' 'amd64' '1'
+insertsource 'unstable' 'foo' 'all' '1'
+
+setupaptarchive --no-update
+logcurrentarchivedirectory
+
+# ensure the archive is not writable
+addtrap 'prefix' 'chmod 755 aptarchive/dists/unstable/main/binary-all;'
+if [ "$(id -u)" = '0' ]; then
+	# too deep to notice it, but it also unlikely that files in the same repo have different permissions
+	chmod 500 aptarchive/dists/unstable/main/binary-all
+	testfailure aptget update
+	rm -rf rootdir/var/lib/apt/lists
+	chmod 755 aptarchive/dists/unstable/main/binary-all
+	testsuccess aptget update
+	rm -rf rootdir/var/lib/apt/lists
+	chmod 511 aptarchive/dists/
+	testsuccess aptget update
+	rm -rf rootdir/var/lib/apt/lists
+	chmod 510 aptarchive/dists/
+	testsuccesswithnotice aptget update
+	rm -rf rootdir/var/lib/apt/lists
+	chmod 500 aptarchive/dists/
+	testsuccesswithnotice aptget update
+	chmod 755 aptarchive/dists/
+else
+	testsuccess aptget update
+fi
+mv rootdir/var/lib/apt/lists/_* rootdir/var/lib/apt/lists/partial
+chmod 555 aptarchive/dists/unstable/main/binary-all
+testsuccess aptget update -o Debug::pkgAcquire::Worker=1
+cp -a rootdir/tmp/testsuccess.output rootdir/tmp/update.output
+testsuccess grep '%0aAlt-Filename:%20' rootdir/tmp/update.output
+
+# the release files aren't an IMS-hit, but the indexes are
+redatereleasefiles '+1 hour'
+
+# we don't download the index if it isn't updated
+testsuccess aptget update -o Debug::pkgAcquire::Auth=1
+# file:/ isn't shown in the log, so see if it was downloaded anyhow
+cp -a rootdir/tmp/testsuccess.output rootdir/tmp/update.output
+canary="SHA512:$(bzcat aptarchive/dists/unstable/main/binary-all/Packages.bz2 | sha512sum |cut -f1 -d' ')"
+testfailure grep -- "$canary" rootdir/tmp/update.output
+
+testfoo() {
+	# foo is still available
+	testsuccess aptget install -s foo
+	testsuccess aptcache showsrc foo
+	testsuccess aptget source foo --print-uris
+}
+testfoo
+
+# the release file is new again, the index still isn't, but it is somehow gone now from disk
+redatereleasefiles '+2 hour'
+find rootdir/var/lib/apt/lists -name '*_Packages*' -delete
+
+testsuccess aptget update -o Debug::pkgAcquire::Auth=1
+# file:/ isn't shown in the log, so see if it was downloaded anyhow
+cp -a rootdir/tmp/testsuccess.output rootdir/tmp/update.output
+canary="SHA512:$(bzcat aptarchive/dists/unstable/main/binary-all/Packages.bz2 | sha512sum |cut -f1 -d' ')"
+testsuccess grep -- "$canary" rootdir/tmp/update.output
+
+testfoo

@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+import os
+import time
+import dbus
+import pyinotify
+import pathlib
+
+
+def sendDbusMessage(text):
+    bus = dbus.SessionBus()
+    lyrics = bus.get_object('com.lingmo.Statusbar', '/Statusbar/PermissionSurveillance')
+    iface = dbus.Interface(lyrics, dbus_interface='com.lingmo.Statusbar')
+    m = iface.get_dbus_method("sendCameraUser", dbus_interface=None)
+    m(text)
+
+
+def get_app_and_camera():
+    app_lst = []
+    shell_return = "".join(os.popen("bash -c 'lsof /dev/video*'").readlines())
+    if shell_return == "":
+        return None
+    return_lst = shell_return.split("\n")
+    del return_lst[0]
+    tmp_old = None
+    for _i in return_lst:
+        __tmp_split = _i.split(" ")
+        if __tmp_split[0] == tmp_old:
+            ...
+        elif __tmp_split[0] != "":
+            app_lst.append(__tmp_split[0])
+            tmp_old = __tmp_split[0]
+    return app_lst
+ 
+class MyEventHandler(pyinotify.ProcessEvent):
+    is_send = None
+    def process_IN_OPEN(self,event):
+        __tmp_get = get_app_and_camera()
+        if self.is_send == __tmp_get:
+            ...
+        elif __tmp_get is None:
+            reta = "{U-APPLE_QAQ-U}"
+            self.is_send = __tmp_get
+            sendDbusMessage(reta)
+            # print(reta)
+        else:
+            self.is_send = __tmp_get
+            reta = "、".join(__tmp_get)
+            sendDbusMessage(reta)
+            # print(reta)
+    def process_IN_CLOSE_WRITE(self,event):
+        __tmp_get = get_app_and_camera()
+        if self.is_send == __tmp_get:
+            ...
+        elif __tmp_get is None:
+            reta = "{U-APPLE_QAQ-U}"
+            self.is_send = __tmp_get
+            sendDbusMessage(reta)
+            # print(reta)
+        else:
+            self.is_send = __tmp_get
+            reta = "、".join(__tmp_get)
+            sendDbusMessage(reta)
+            # print(reta)
+
+wm = pyinotify.WatchManager()
+notifier = pyinotify.Notifier(wm)
+p = pathlib.Path("/dev/")
+ret = p.glob("video*")
+for item in ret:
+    print(item)
+    wm.watch_transient_file(item,pyinotify.IN_OPEN|pyinotify.IN_CLOSE_WRITE, MyEventHandler)
+notifier.loop()

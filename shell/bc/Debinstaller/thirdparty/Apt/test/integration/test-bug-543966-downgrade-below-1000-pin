@@ -1,0 +1,90 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable' 'base-files' 'all' '5.0.0'
+insertinstalledpackage 'base-files' 'all' '5.0.0-1'
+
+setupaptarchive
+
+STATUS=$(readlink -f rootdir/var/lib/dpkg/status)
+APTARCHIVE="$(readlink -f aptarchive)"
+
+testsuccessequal "base-files:
+  Installed: 5.0.0-1
+  Candidate: 5.0.0-1
+  Version table:
+ *** 5.0.0-1 100
+        100 $STATUS
+     5.0.0 500
+        500 file:${APTARCHIVE} unstable/main all Packages" aptcache policy base-files -o apt::pin=0
+
+writepin() {
+	echo "Package: $1
+Pin: release a=unstable
+Pin-Priority: $2" > rootdir/etc/apt/preferences
+}
+
+
+
+testpinning() {
+	local PKGPINPRIO=''
+	local REPPINPRIO=''
+	if [ "$1" != '*' ]; then
+		PKGPINPRIO=''
+		REPPINPRIO=' 500'
+	fi
+	writepin "$1" '99'
+	testsuccessequal "base-files:
+  Installed: 5.0.0-1
+  Candidate: 5.0.0-1
+  Version table:
+ *** 5.0.0-1 100
+        100 $STATUS
+     5.0.0 ${PKGPINPRIO:-99}
+       ${REPPINPRIO:-  99} file:${APTARCHIVE} unstable/main all Packages" aptcache policy base-files -o apt::pin=99
+
+	writepin "$1" '100'
+	testsuccessequal "base-files:
+  Installed: 5.0.0-1
+  Candidate: 5.0.0-1
+  Version table:
+ *** 5.0.0-1 100
+        100 $STATUS
+     5.0.0 ${PKGPINPRIO:-100}
+       ${REPPINPRIO:- 100} file:${APTARCHIVE} unstable/main all Packages" aptcache policy base-files -o apt::pin=100
+
+	writepin "$1" '999'
+	testsuccessequal "base-files:
+  Installed: 5.0.0-1
+  Candidate: 5.0.0-1
+  Version table:
+ *** 5.0.0-1 100
+        100 $STATUS
+     5.0.0 ${PKGPINPRIO:-999}
+       ${REPPINPRIO:- 999} file:${APTARCHIVE} unstable/main all Packages" aptcache policy base-files -o apt::pin=999
+
+	writepin "$1" '1000'
+	testsuccessequal "base-files:
+  Installed: 5.0.0-1
+  Candidate: 5.0.0
+  Version table:
+ *** 5.0.0-1 100
+        100 $STATUS
+     5.0.0 ${PKGPINPRIO:-1000}
+       ${REPPINPRIO:-1000} file:${APTARCHIVE} unstable/main all Packages" aptcache policy base-files -o apt::pin=1000
+}
+
+msgmsg 'Tests with generic-form pin'
+testpinning '*'
+msgmsg 'Tests with specific-form pin'
+testpinning 'base-files'
+msgmsg 'Tests with specific-form pin with glob'
+testpinning 'base-fil*'
+msgmsg 'Tests with specific-form pin with regex'
+testpinning '/^base-f[iI]les$/'

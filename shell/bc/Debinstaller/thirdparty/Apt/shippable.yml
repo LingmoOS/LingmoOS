@@ -1,0 +1,18 @@
+language: none
+env:
+  - DEBIAN_FRONTEND=noninteractive
+
+build:
+  pre_ci_boot:
+    image_name: debian
+    image_tag: unstable
+    pull: true
+  ci:
+    - apt-get install -qq build-essential expect
+    - ./prepare-release travis-ci
+    - mkdir build
+    - ( cd build && cmake -DWITH_CURL=OFF .. )
+    - make -C build -j 4
+    - rm -f /etc/dpkg/dpkg.cfg.d/excludes
+    - CTEST_OUTPUT_ON_FAILURE=1 make -C build test
+    - unbuffer ./test/integration/run-tests -q -j 4

@@ -1,0 +1,40 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable' 'apt' 'i386' '0.8.11'
+
+export APT_DONT_SIGN='Release.gpg'
+setupaptarchive --no-update
+
+find aptarchive/ -name 'InRelease' -exec cp {} {}.old \;
+
+for RELEASE in $(find aptarchive/ -name 'InRelease'); do
+	(echo 'Origin: Marvin
+Label: Marvin
+Suite: experimental
+Codename: experimental
+MD5Sum:
+ 65fd410587b6978de2277f2912523f09     9360 Packages
+ d27b294ed172a1fa9dd5a53949914c5d     4076 Packages.bz2
+ 2182897e0a2a0c09e760beaae117a015     2023 Packages.diff/Index
+ 1b895931853981ad8204d2439821b999     4144 Packages.gz'; echo; cat ${RELEASE}.old;) > ${RELEASE}
+done
+
+testfailure aptget update
+testsuccess grep '^E:.*Clearsigned file .*NOSPLIT.*' rootdir/tmp/testfailure.output
+
+testsuccessequal "Package files:
+Pinned packages:" aptcache policy
+
+insertinstalledpackage 'foo' 'all' '1'
+
+ROOTDIR="$(readlink -f .)"
+testsuccessequal "Package files:
+ 100 ${ROOTDIR}/rootdir/var/lib/dpkg/status
+     release a=now
+Pinned packages:" aptcache policy

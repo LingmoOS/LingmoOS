@@ -1,0 +1,96 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture "i386"
+
+buildsimplenativepackage "peace-dpkg" "all" "1.0" "stable"
+
+buildsimplenativepackage "a" "all" "1.0" "stable" "Depends: b"
+buildsimplenativepackage "b" "all" "1.0" "stable"
+buildsimplenativepackage "c" "all" "1.0" "stable" "Depends: b"
+
+setupaptarchive
+
+# dpkg freaks out if the last package is removed so keep one around
+testsuccess aptget install peace-dpkg -y
+testdpkginstalled peace-dpkg
+testmarkedauto
+
+testsuccess aptget install a -y
+testdpkginstalled a b
+testdpkgnotinstalled c
+testmarkedauto 'b'
+
+testsuccess aptget remove a -y
+testdpkgnotinstalled a c
+testdpkginstalled b
+testmarkedauto 'b'
+
+testsuccess aptget install c -y
+testdpkgnotinstalled a
+testdpkginstalled b c
+testmarkedauto 'b'
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+b is already the newest version (1.0).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget install b --only-upgrade
+testmarkedauto 'b'
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+b is already the newest version (1.0).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget install b -d
+testmarkedauto 'b'
+
+rm rootdir/var/log/apt/history.log
+
+testsuccess aptget install b --reinstall -y
+testdpkgnotinstalled a
+testdpkginstalled b c
+testmarkedauto 'b'
+
+sed -i rootdir/var/log/apt/history.log -e '/^Commandline: / d' -e '/^Start-Date: / d' -e '/^End-Date: / d'
+if [ -n "$SUDO_USER" ] && [ "$(id -u "$SUDO_USER")" -gt 0 ]; then
+	testfileequal 'rootdir/var/log/apt/history.log' "
+Requested-By: $SUDO_USER ($(id -u "$SUDO_USER"))
+Reinstall: b:i386 (1.0)"
+else
+	testfileequal 'rootdir/var/log/apt/history.log' '
+Reinstall: b:i386 (1.0)'
+fi
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+b is already the newest version (1.0).
+b set to manually installed.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget install b
+testmarkedauto
+
+testsuccess aptget remove b -y
+testdpkgnotinstalled a b c
+testmarkedauto
+
+testsuccess aptget install a b -y
+testdpkginstalled a b
+testdpkgnotinstalled c
+testmarkedauto
+
+testsuccess aptget purge a b -y
+testdpkgnotinstalled a b c
+testmarkedauto
+
+testsuccess aptget install b c -y
+testdpkgnotinstalled a
+testdpkginstalled b c
+testmarkedauto
+
+testsuccess aptget install a -y
+testdpkginstalled a b c
+testmarkedauto

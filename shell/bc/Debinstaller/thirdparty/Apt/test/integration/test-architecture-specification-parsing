@@ -1,0 +1,120 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+
+# we need this construct here as it isn't really possible to fake native arch for dpkg-* tools
+NATIVE="$(command dpkg --print-architecture)"
+configarchitecture "${NATIVE}" 'armel'
+
+buildsimplenativepackage 'pkg-arch-foo' "$NATIVE" '1.0' 'stable' "Build-Depends: foo [${NATIVE} !${NATIVE}]
+Depends: foo [${NATIVE} !${NATIVE}]"
+buildsimplenativepackage 'pkg-arch-no-foo' "$NATIVE" '1.0' 'stable' "Build-Depends: foo [!${NATIVE} ${NATIVE}]
+Depends: foo [!${NATIVE} ${NATIVE}]"
+buildsimplenativepackage 'pkg-arch-foo-unrelated-no' "$NATIVE" '1.0' 'stable' "Build-Depends: foo [!someos-any ${NATIVE}]
+Depends: foo [!someos-any ${NATIVE}]"
+buildsimplenativepackage 'pkg-arch-foo-unrelated-no2' "$NATIVE" '1.0' 'stable' "Build-Depends: foo [${NATIVE} !someos-any]
+Depends: foo [${NATIVE} !someos-any]"
+buildsimplenativepackage 'no-depends' 'armel' '1.0' 'stable' 'Build-Depends: foo [armeb], bar [arm]
+Depends: foo [armeb], bar [arm]'
+
+buildsimplenativepackage 'foo' "$NATIVE" '1.0' 'stable'
+
+insertinstalledpackage 'build-essential' 'all' '11.5' 'Multi-Arch: foreign'
+
+setupaptarchive
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  foo
+The following NEW packages will be installed:
+  foo pkg-arch-foo
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Inst pkg-arch-foo (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])
+Conf pkg-arch-foo (1.0 stable [${NATIVE}])" aptget install pkg-arch-foo -s
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  pkg-arch-no-foo
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst pkg-arch-no-foo (1.0 stable [${NATIVE}])
+Conf pkg-arch-no-foo (1.0 stable [${NATIVE}])" aptget install pkg-arch-no-foo -s
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  foo
+The following NEW packages will be installed:
+  foo pkg-arch-foo-unrelated-no
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Inst pkg-arch-foo-unrelated-no (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])
+Conf pkg-arch-foo-unrelated-no (1.0 stable [${NATIVE}])" aptget install pkg-arch-foo-unrelated-no -s
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  foo
+The following NEW packages will be installed:
+  foo pkg-arch-foo-unrelated-no2
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Inst pkg-arch-foo-unrelated-no2 (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])
+Conf pkg-arch-foo-unrelated-no2 (1.0 stable [${NATIVE}])" aptget install pkg-arch-foo-unrelated-no2 -s
+
+testsuccessequal "Reading package lists...
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  foo
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])" aptget build-dep pkg-arch-foo -s
+
+testsuccessequal 'Reading package lists...
+pkg-arch-no-foo has no build depends.
+Reading package lists...
+Building dependency tree...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget build-dep pkg-arch-no-foo -s
+
+testsuccessequal "Reading package lists...
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  foo
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])" aptget build-dep pkg-arch-foo-unrelated-no -s
+
+testsuccessequal "Reading package lists...
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  foo
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst foo (1.0 stable [${NATIVE}])
+Conf foo (1.0 stable [${NATIVE}])" aptget build-dep pkg-arch-foo-unrelated-no2 -s
+
+testsuccessequal 'Reading package lists...
+no-depends has no build depends.
+Reading package lists...
+Building dependency tree...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget build-dep no-depends -s
+
+# this is not really testing APT - more that dpkg is in line with us
+configarchitecture 'amd64' 'armel'
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  no-depends:armel
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst no-depends:armel (1.0 stable [armel])
+Conf no-depends:armel (1.0 stable [armel])' aptget install no-depends -s

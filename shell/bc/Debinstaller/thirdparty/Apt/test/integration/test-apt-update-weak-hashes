@@ -1,0 +1,202 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+confighashes 'MD5'
+export APT_DONT_SIGN=''
+
+insertpackage 'unstable' 'foo' 'i386' '1.0'
+insertsource 'unstable' 'foo' 'any' '1.0'
+
+setupaptarchive --no-update
+APTARCHIVE="$(readlink -f ./aptarchive)"
+
+testnopkg() {
+	testnopackage "$@"
+	testnosrcpackage "$@"
+}
+testbadpkg() {
+	testempty find rootdir/var/lib/apt/lists -maxdepth 1 -name '*InRelease' -o -name '*Release.gpg'
+	testnotempty find rootdir/var/lib/apt/lists -maxdepth 1 -name '*Release'
+	testnotempty apt show "$@"
+	testnotempty apt showsrc "$@"
+	testfailureequal "WARNING: The following packages cannot be authenticated!
+  $*
+E: There were unauthenticated packages and -y was used without --allow-unauthenticated" aptget install -qq -y "$@"
+	testfailureequal "WARNING: The following packages cannot be authenticated!
+  $*
+E: Some packages could not be authenticated" aptget source -qq "$@"
+}
+
+testrun() {
+	local TYPE="$1"
+	local FILENAME="$2"
+	shift 2
+	local MANGLED="$(readlink -f ./rootdir)/var/lib/apt/lists/partial/$(echo "$FILENAME" | sed 's#/#_#g')"
+	msgmsg "$TYPE contains only weak hashes"
+	confighashes 'MD5'
+	generatereleasefiles
+	signreleasefiles
+	preparetest
+	if [ -z "$1" ]; then
+		listcurrentlistsdirectory > lists.before
+		testfailuremsg "W: No Hash entry in Release file ${MANGLED} which is considered strong enough for security purposes
+E: The repository 'file:${APTARCHIVE} unstable $(basename "$FILENAME")' provides only weak security information.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update
+		testfileequal lists.before "$(listcurrentlistsdirectory)"
+		testnopkg 'foo'
+	else
+		testwarningmsg "W: No Hash entry in Release file ${MANGLED} which is considered strong enough for security purposes
+W: The repository 'file:${APTARCHIVE} unstable $(basename "$FILENAME")' provides only weak security information.
+N: Data from such a repository can't be authenticated and is therefore potentially dangerous to use.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update "$@"
+		testbadpkg 'foo'
+	fi
+
+	msgmsg "$TYPE contains only weak hashes, but source allows weak"
+	sed -i 's#^deb\(-src\)\? #deb\1 [allow-weak=yes] #' rootdir/etc/apt/sources.list.d/*
+	genericprepare
+	testwarningmsg "W: No Hash entry in Release file ${MANGLED} which is considered strong enough for security purposes
+W: The repository 'file:${APTARCHIVE} unstable $(basename "$FILENAME")' provides only weak security information.
+N: Data from such a repository can't be authenticated and is therefore potentially dangerous to use.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update "$@"
+	testbadpkg 'foo'
+	sed -i 's#^deb\(-src\)\? \[allow-weak=yes\] #deb\1 #' rootdir/etc/apt/sources.list.d/*
+
+	msgmsg "$TYPE contains no hashes"
+	generatereleasefiles
+	sed -i -e '/^ / d' -e '/^MD5Sum:/ d' "$APTARCHIVE/dists/unstable/Release"
+	signreleasefiles
+	preparetest
+	if [ -z "$1" ]; then
+		listcurrentlistsdirectory > lists.before
+		testfailuremsg "W: No Hash entry in Release file ${MANGLED}
+E: The repository 'file:${APTARCHIVE} unstable $(basename "$FILENAME")' provides only weak security information.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update
+		testfileequal lists.before "$(listcurrentlistsdirectory)"
+		testnopkg 'foo'
+	else
+		testwarningmsg "W: No Hash entry in Release file ${MANGLED}
+W: The repository 'file:${APTARCHIVE} unstable $(basename "$FILENAME")' provides only weak security information.
+N: Data from such a repository can't be authenticated and is therefore potentially dangerous to use.
+N: See apt-secure(8) manpage for repository creation and user configuration details." apt update "$@"
+		testbadpkg 'foo'
+	fi
+
+	msgmsg "$TYPE contains only weak hashes for some files"
+	confighashes 'MD5' 'SHA256'
+	generatereleasefiles
+	sed -i '/^ [0-9a-fA-Z]\{64\} .*Sources$/d' "$APTARCHIVE/dists/unstable/Release"
+	signreleasefiles
+	preparetest
+	if [ -z "$1" ]; then
+		testwarningmsg "W: Skipping acquire of configured file 'main/source/Sources' as repository 'file:${APTARCHIVE} unstable InRelease' provides only weak security information for it" apt update
+		testnosrcpackage foo
+	else
+		rm -f rootdir/var/lib/apt/lists/partial/*
+		testsuccess apt update "$@"
+		testnotempty apt showsrc foo
+	fi
+	testsuccess apt show foo
+}
+
+genericprepare() {
+	rm -rf rootdir/var/lib/apt/lists
+	mkdir -p rootdir/var/lib/apt/lists/partial
+	touch rootdir/var/lib/apt/lists/lock
+	local RELEASEGPG="$(readlink -f ./rootdir)/var/lib/apt/lists/partial/$(echo "${APTARCHIVE}/dists/unstable/Release.gpg" | sed 's#/#_#g')"
+	touch "$RELEASEGPG"
+	chmod 644 "$RELEASEGPG"
+	local INRELEASE="$(readlink -f ./rootdir)/var/lib/apt/lists/partial/$(echo "${APTARCHIVE}/dists/unstable/InRelease" | sed 's#/#_#g')"
+	touch "$INRELEASE"
+	chmod 644 "$INRELEASE"
+}
+preparetest() {
+	rm -f "${APTARCHIVE}/dists/unstable/Release" "${APTARCHIVE}/dists/unstable/Release.gpg"
+	genericprepare
+}
+testrun 'InRelease' "${APTARCHIVE}/dists/unstable/InRelease"
+testrun 'InRelease' "${APTARCHIVE}/dists/unstable/InRelease" --allow-weak-repositories -o APT::Get::List-Cleanup=0
+
+preparetest() {
+	rm -f "${APTARCHIVE}/dists/unstable/InRelease"
+	genericprepare
+}
+testrun 'Release+Release.gpg' "${APTARCHIVE}/dists/unstable/Release"
+testrun 'Release+Release.gpg' "${APTARCHIVE}/dists/unstable/Release" --allow-weak-repositories -o APT::Get::List-Cleanup=0
+
+preparetest() {
+	rm -f "${APTARCHIVE}/dists/unstable/InRelease" "${APTARCHIVE}/dists/unstable/Release.gpg"
+	genericprepare
+}
+
+msgmsg 'Moving between Release files with good and bad hashes'
+rm -rf rootdir/var/lib/apt/lists
+confighashes 'MD5'
+generatereleasefiles 'now - 7 days'
+signreleasefiles
+testfailure apt update
+testnopkg 'foo'
+testwarning apt update --allow-weak-repositories
+testbadpkg 'foo'
+
+confighashes 'MD5' 'SHA256'
+rm -rf aptarchive/dists
+insertpackage 'unstable' 'foo2' 'i386' '1.0'
+insertsource 'unstable' 'foo2' 'any' '1.0'
+setupaptarchive --no-update 'now - 5 days'
+testsuccess apt update
+testnopkg foo
+testnotempty find rootdir/var/lib/apt/lists -maxdepth 1 -name '*InRelease' -o -name '*Release.gpg'
+testnotempty apt show foo2
+testnotempty apt showsrc foo2
+
+confighashes 'MD5'
+rm -rf aptarchive/dists
+insertpackage 'unstable' 'foo3' 'i386' '1.0'
+insertsource 'unstable' 'foo3' 'any' '1.0'
+setupaptarchive --no-update 'now - 3 days'
+testfailure apt update
+testnopkg foo
+testnopkg foo3
+testnotempty find rootdir/var/lib/apt/lists -maxdepth 1 -name '*InRelease' -o -name '*Release.gpg'
+testnotempty apt show foo2
+testnotempty apt showsrc foo2
+testwarning apt update --allow-weak-repositories
+testnopkg foo2
+testbadpkg foo3
+
+msgmsg 'Working with packages guarded only by weak hashes'
+confighashes 'MD5'
+rm -rf aptarchive/dists
+buildsimplenativepackage 'foo4' 'i386' '1' 'unstable'
+setupaptarchive --no-update
+testfailure apt update
+confighashes 'SHA256'
+generatereleasefiles 'now - 1 day'
+signreleasefiles
+testsuccess apt update
+cd downloaded
+testfailure apt download foo4
+cp ../rootdir/tmp/testfailure.output download.output
+testfailure grep 'Hash Sum mismatch' download.output
+testsuccess grep 'Insufficient information' download.output
+
+testsuccess apt install foo4 -s
+testfailure apt install foo4 -dy
+cp ../rootdir/tmp/testfailure.output install.output
+testfailure grep 'Hash Sum mismatch' install.output
+testsuccess grep 'Insufficient information' download.output
+
+testsuccess apt source foo4
+cp ../rootdir/tmp/testsuccess.output source.output
+testsuccess grep 'Skipping download of file' source.output
+testfailure test -e foo4_1.dsc
+testfailure test -e foo4_1.tar.*
+cd ..

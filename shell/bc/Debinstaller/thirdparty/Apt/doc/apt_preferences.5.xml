@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   <!-- The last update date -->
+   <date>2022-01-03T00:00:00Z</date>
+ </refentryinfo>
+
+ <refmeta>
+   <refentrytitle>apt_preferences</refentrytitle>
+   <manvolnum>5</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+
+ <!-- Man page title -->
+ <refnamediv>
+    <refname>apt_preferences</refname>
+    <refpurpose>Preference control file for APT</refpurpose>
+ </refnamediv>
+
+<refsect1>
+<title>Description</title>
+<para>The APT preferences file <filename>/etc/apt/preferences</filename>
+and the fragment files in the <filename>/etc/apt/preferences.d/</filename>
+folder can be used to control which versions of packages will be selected
+for installation.</para>
+
+<para>Several versions of a package may be available for installation when
+the &sources-list; file contains references to more than one distribution
+(for example, <literal>stable</literal> and <literal>testing</literal>).
+APT assigns a priority to each version that is available.
+Subject to dependency constraints, <command>apt-get</command> selects the
+version with the highest priority for installation.
+The APT preferences override the priorities that APT assigns to
+package versions by default, thus giving the user control over which
+one is selected for installation.</para>
+
+<para>Several instances of the same version of a package may be available when
+the &sources-list; file contains references to more than one source.
+In this case <command>apt-get</command> downloads the instance listed
+earliest in the &sources-list; file.
+The APT preferences do not affect the choice of instance, only
+the choice of version.</para>
+
+<para>Preferences are a strong power in the hands of a system administrator
+but they can become also their biggest nightmare if used without care!
+APT will not question the preferences, so wrong settings can
+lead to uninstallable packages or wrong decisions while upgrading packages.
+Even more problems will arise if multiple distribution releases are mixed
+without a good understanding of the following paragraphs.
+Packages included in a specific release aren't tested in (and
+therefore don't always work as expected in) older or newer releases, or
+together with other packages from different releases.
+You have been warned.</para>
+
+<para>Note that the files in the <filename>/etc/apt/preferences.d</filename>
+directory are parsed in alphanumeric ascending order and need to obey the
+following naming convention: The files have either no or "<literal>pref</literal>"
+as filename extension and only contain alphanumeric, hyphen (-),
+underscore (_) and period (.) characters.
+Otherwise APT will print a notice that it has ignored a file, unless that
+file matches a pattern in the <literal>Dir::Ignore-Files-Silently</literal>
+configuration list - in which case it will be silently ignored.</para>
+
+<refsect2><title>APT's Default Priority Assignments</title>
+
+<para>If there is no preferences file or if there is no entry in the file
+that applies to a particular version then the priority assigned to that
+version is the priority of the distribution to which that version
+belongs.  It is possible to single out a distribution, "the target release",
+which receives a higher priority than other distributions do by default.
+The target release can be set on the <command>apt-get</command> command
+line or in the APT configuration file <filename>/etc/apt/apt.conf</filename>.
+Note that this has precedence over any general priority you set in the
+<filename>/etc/apt/preferences</filename> file described later, but not
+over specifically pinned packages.
+For example,
+
+<programlisting>
+<command>apt-get install -t testing <replaceable>some-package</replaceable></command>
+</programlisting>
+<programlisting>
+APT::Default-Release "stable";
+</programlisting>
+</para>
+
+<para>If the target release has been specified then APT uses the following
+algorithm to set the priorities of the versions of a package.  Assign:
+
+<variablelist>
+<varlistentry>
+<term>priority 1</term>
+<listitem><simpara>to the versions coming from archives which in their <filename>Release</filename>
+files are marked as "NotAutomatic: yes" but <emphasis>not</emphasis> as "ButAutomaticUpgrades: yes"
+like the Debian <literal>experimental</literal> archive,
+as well as versions that are not phased on this systems.
+</simpara>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>priority 100</term>
+<listitem><simpara>to the version that is already installed (if any) and to the versions coming
+from archives which in their <filename>Release</filename> files are marked as "NotAutomatic: yes" and
+"ButAutomaticUpgrades: yes" like the Debian backports archive since <literal>squeeze-backports</literal>.
+</simpara></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>priority 500</term>
+<listitem><simpara>to the versions that do not belong to the target release.</simpara></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>priority 990</term>
+<listitem><simpara>to the versions that belong to the target release.</simpara></listitem>
+</varlistentry>
+</variablelist>
+
+The highest of those priorities whose description matches the version is assigned to the
+version.
+</para>
+
+<para>If the target release has not been specified then APT simply assigns
+priority 100 to all installed package versions and priority 500 to all
+uninstalled package versions, except versions coming from archives which
+in their <filename>Release</filename> files are marked as "NotAutomatic: yes" -
+these versions get the priority 1 or priority 100 if it is additionally marked
+as "ButAutomaticUpgrades: yes".</para>
+
+<para>APT then applies the following rules, listed in order of precedence,
+to determine which version of a package to install.
+<itemizedlist>
+<listitem><simpara>Never downgrade unless the priority of an available
+version exceeds 1000.  ("Downgrading" is installing a less recent version
+of a package in place of a more recent version.  Note that none of APT's
+default priorities exceeds 1000; such high priorities can only be set in
+the preferences file.  Note also that downgrading a package
+can be risky.)</simpara></listitem>
+<listitem><simpara>Install the highest priority version.</simpara></listitem>
+<listitem><simpara>If two or more versions have the same priority,
+install the most recent one (that is, the one with the higher version
+number).</simpara></listitem>
+<listitem><simpara>If two or more versions have the same priority and
+version number but either the packages differ in some of their metadata or the
+<literal>--reinstall</literal> option is given, install the uninstalled one.</simpara></listitem>
+</itemizedlist>
+</para>
+
+<para>In a typical situation, the installed version of a package (priority 100)
+is not as recent as one of the versions available from the sources listed in
+the &sources-list; file (priority 500 or 990).  Then the package will be upgraded
+when <command>apt-get install <replaceable>some-package</replaceable></command>
+or <command>apt-get upgrade</command> is executed.
+</para>
+
+<para>More rarely, the installed version of a package is <emphasis>more</emphasis> recent
+than any of the other available versions.  The package will not be downgraded
+when <command>apt-get install <replaceable>some-package</replaceable></command>
+or <command>apt-get upgrade</command> is executed.</para>
+
+<para>Sometimes the installed version of a package is more recent than the
+version belonging to the target release, but not as recent as a version
+belonging to some other distribution.  Such a package will indeed be upgraded
+when <command>apt-get install <replaceable>some-package</replaceable></command>
+or <command>apt-get upgrade</command> is executed,
+because at least <emphasis>one</emphasis> of the available versions has a higher
+priority than the installed version.</para>
+</refsect2>
+
+<refsect2><title>Phased Updates</title>
+<para>APT understands a field called <literal>Phased-Update-Percentage</literal>
+which can be used to control the rollout of a new version. It is an integer between
+0 and 100.</para>
+
+<para>A system's eligibility to a phased update is determined by seeding
+random number generator with the package source name, the version number,
+and /etc/machine-id, and then calculating an integer in the range [0, 100].
+If this integer is larger than the <literal>Phased-Update-Percentage</literal>,
+the version is pinned to 1, and thus held back. Otherwise, normal policy rules apply.
+</para>
+
+<para>In case you have multiple systems that you want to receive the same set of updates, you can set
+<code>APT::Machine-ID</code> to a UUID such that they all phase the same, or set <code>APT::Get::Never-Include-Phased-Updates</code>
+or <code>APT::Get::Always-Include-Phased-Updates</code> to true such that APT will never/always consider phased updates.</para>
+</refsect2>
+<refsect2><title>The Effect of APT Preferences</title>
+
+<para>The APT preferences file allows the system administrator to control the
+assignment of priorities.  The file consists of one or more multi-line records
+separated by blank lines.  Records can have one of two forms, a specific form
+and a general form.
+<itemizedlist>
+<listitem>
+<simpara>The specific form assigns a priority (a "Pin-Priority") to one or more
+specified packages with a specified version or version range.  For example,
+the following record assigns a high priority to all versions of
+the <filename>perl</filename> package whose version number begins with "<literal>&good-perl;</literal>".
+Multiple packages can be separated by spaces.</simpara>
+
+<programlisting>
+Package: perl
+Pin: version &good-perl;*
+Pin-Priority: 1001
+</programlisting>
+</listitem>
+
+<listitem><simpara>The general form assigns a priority to all of the package versions in a
+given distribution (that is, to all the versions of packages that are
+listed in a certain <filename>Release</filename> file) or to all of the package
+versions coming from a particular Internet site, as identified by the
+site's fully qualified domain name.</simpara>
+
+<simpara>This general-form entry in the APT preferences file applies only
+to groups of packages.  For example, the following record assigns a high
+priority to all package versions available from the local site.</simpara>
+
+<programlisting>
+Package: *
+Pin: origin ""
+Pin-Priority: 999
+</programlisting>
+
+<simpara>A note of caution: the keyword used here is "<literal>origin</literal>"
+which can be used to match a hostname. The following record will assign a high priority
+to all versions available from the server identified by the hostname "ftp.de.debian.org"</simpara>
+<programlisting>
+Package: *
+Pin: origin "ftp.de.debian.org"
+Pin-Priority: 999
+</programlisting>
+<simpara>This should <emphasis>not</emphasis> be confused with the Origin of a distribution as
+specified in a <filename>Release</filename> file.  What follows the "Origin:" tag
+in a <filename>Release</filename> file is not an Internet address
+but an author or vendor name, such as "Debian" or "Ximian".</simpara>
+
+<simpara>The following record assigns a low priority to all package versions
+belonging to any distribution whose Archive name is "<literal>unstable</literal>".</simpara>
+
+<programlisting>
+Package: *
+Pin: release a=unstable
+Pin-Priority: 50
+</programlisting>
+
+<simpara>The following record assigns a high priority to all package versions
+belonging to any distribution whose Codename is "<literal>&debian-testing-codename;</literal>".</simpara>
+
+<programlisting>
+Package: *
+Pin: release n=&debian-testing-codename;
+Pin-Priority: 900
+</programlisting>
+
+<simpara>The following record assigns a high priority to all package versions
+belonging to any release whose Archive name is "<literal>stable</literal>"
+and whose release Version number is "<literal>&debian-stable-version;</literal>".</simpara>
+
+<programlisting>
+Package: *
+Pin: release a=stable, v=&debian-stable-version;
+Pin-Priority: 500
+</programlisting>
+</listitem>
+</itemizedlist>
+
+The effect of the comma operator is similar to an "and" in logic: All
+conditions must be satisfied for the pin to match. There is one exception:
+For any type of condition (such as two "a" conditions), only the last such
+condition is checked.
+</para>
+
+</refsect2>
+
+<refsect2><title>Matching packages in the Package field</title>
+
+<para>The <literal>Package</literal> field specifies the package that a pinning
+priority is applied to. The field can either contain a binary package name, a
+source package name (prefixed with "src:"), a &glob; expression or a regular
+expression (surrounded by slashes). Multiple package names, &glob; expressions
+and regular expressions can be listed separated by whitespace in which case
+the record will match any of the matched packages.</para>
+
+<para>By default, only packages of the native architecture are matched. To
+match binary packages of any architecture, add the <literal>:any</literal>
+suffix to the package name. You can also limit matching to a specific
+architecture by appending the architecture name to the package name,
+separated by a colon character.</para>
+
+<para>
+For example, the following example uses a glob expression and a regular
+expression to assign the priority 500 to all packages from
+experimental where the name starts with gnome (as a &glob;-like
+expression) or contains the word kde (as a POSIX extended regular
+expression surrounded by slashes).
+</para>
+
+<programlisting>
+Package: gnome* /kde/
+Pin: release a=experimental
+Pin-Priority: 500
+</programlisting>
+
+<para>
+The rule for those expressions is that they can occur anywhere
+where a string can occur. Thus, the following pin assigns the
+priority 990 to all packages from a release starting with &ubuntu-codename;.
+</para>
+
+<programlisting>
+Package: *
+Pin: release n=&ubuntu-codename;*
+Pin-Priority: 990
+</programlisting>
+
+<para>
+If a regular expression occurs in a <literal>Package</literal> field,
+the behavior is the same as if this regular expression were replaced
+with a list of all package names it matches. It is undecided whether
+this will change in the future; thus you should always list wild-card
+pins first, so later specific pins override it.
+
+The pattern "<literal>*</literal>" in a Package field is not considered
+a &glob; expression in itself.
+</para>
+
+<para>To pin all binaries produced by the apt source package
+of this APT's version to 990, you can do:</para>
+
+<programlisting>
+Package: src:apt
+Pin: version &apt-product-version;
+Pin-Priority: 990
+</programlisting>
+
+<para>Source package pinning can be combined with regular expressions and
+glob patterns, and can also take a binary architecture.</para>
+<para>For example, let's pin all binaries for all architectures produced by
+any source package containing apt in its name to 990:</para>
+<programlisting>
+Package: src:*apt*:any
+Pin: version *
+Pin-Priority: 990
+</programlisting>
+
+<para>The <literal>:any</literal> suffix makes sure to select binary packages
+from any architecture. Without that suffix, apt implicitly assumes the
+<literal>:native</literal> suffix which would only select packages from
+the native architecture.</para>
+
+</refsect2>
+
+
+
+<refsect2>
+<title>How APT Interprets Priorities</title>
+
+<para>
+Priorities (P) assigned in the APT preferences file must be positive
+or negative integers.  They are interpreted as follows (roughly speaking):
+
+<variablelist>
+<varlistentry>
+<term>P &gt;= 1000</term>
+<listitem><simpara>causes a version to be installed even if this
+constitutes a downgrade of the package</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>990 &lt;= P &lt; 1000</term>
+<listitem><simpara>causes a version to be installed
+even if it does not come from the target release,
+unless the installed version is more recent</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>500 &lt;= P &lt; 990</term>
+<listitem><simpara>causes a version to be installed
+unless there is a version available belonging to the target release
+or the installed version is more recent</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>100 &lt;= P &lt; 500</term>
+<listitem><simpara>causes a version to be installed
+unless there is a version available belonging to some other
+distribution or the installed version is more recent</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>0 &lt; P &lt; 100</term>
+<listitem><simpara>causes a version to be installed
+only if there is no installed version of the package</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>P &lt; 0</term>
+<listitem><simpara>prevents the version from being installed</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>P = 0</term>
+<listitem><simpara>has undefined behaviour, do not use it.</simpara></listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>
+The first specific-form record matching an available package version determines
+the priority of the package version.
+Failing that, the priority of the package is defined as the maximum of all
+priorities defined by generic-form records matching the version.
+Records defined using patterns in the Pin field other than "*" are treated like
+specific-form records.
+</para>
+
+<para>For example, suppose the APT preferences file contains the three
+records presented earlier:</para>
+
+<programlisting>
+Package: perl
+Pin: version &good-perl;*
+Pin-Priority: 1001
+
+Package: *
+Pin: origin ""
+Pin-Priority: 999
+
+Package: *
+Pin: release unstable
+Pin-Priority: 50
+</programlisting>
+
+<para>Then:
+<itemizedlist>
+<listitem><simpara>The most recent available version of the <literal>perl</literal>
+package will be installed, so long as that version's version number begins
+with "<literal>&good-perl;</literal>".  If <emphasis>any</emphasis> &good-perl;* version of <literal>perl</literal> is
+available and the installed version is &bad-perl;*, then <literal>perl</literal> will be
+downgraded.</simpara></listitem>
+<listitem><simpara>A version of any package other than <literal>perl</literal>
+that is available from the local system has priority over other versions,
+even versions belonging to the target release.
+</simpara></listitem>
+<listitem><simpara>A version of a package whose origin is not the local
+system but some other site listed in &sources-list; and which belongs to
+an <literal>unstable</literal> distribution is only installed if it is selected
+for installation and no version of the package is already installed.
+</simpara></listitem>
+</itemizedlist>
+</para>
+</refsect2>
+
+<refsect2>
+<title>Determination of Package Version and Distribution Properties</title>
+
+<para>The locations listed in the &sources-list; file should provide
+<filename>Packages</filename> and <filename>Release</filename> files
+to describe the packages available at that location. </para>
+
+<para>The <filename>Packages</filename> file is normally found in the directory
+<filename>.../dists/<replaceable>dist-name</replaceable>/<replaceable>component</replaceable>/<replaceable>arch</replaceable></filename>:
+for example, <filename>.../dists/stable/main/binary-i386/Packages</filename>.
+It consists of a series of multi-line records, one for each package available
+in that directory.  Only two lines in each record are relevant for setting
+APT priorities:
+<variablelist>
+<varlistentry>
+<term>the <literal>Package:</literal> line</term>
+<listitem><simpara>gives the package name</simpara></listitem>
+</varlistentry>
+<varlistentry>
+<term>the <literal>Version:</literal> line</term>
+<listitem><simpara>gives the version number for the named package</simpara></listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>The <filename>Release</filename> file is normally found in the directory
+<filename>.../dists/<replaceable>dist-name</replaceable></filename>:
+for example, <filename>.../dists/stable/Release</filename>,
+or <filename>.../dists/&debian-stable-codename;/Release</filename>.
+It consists of a single multi-line record which applies to <emphasis>all</emphasis> of
+the packages in the directory tree below its parent.  Unlike the
+<filename>Packages</filename> file, nearly all of the lines in a <filename>Release</filename>
+file are relevant for setting APT priorities:
+
+<variablelist>
+<varlistentry>
+<term>the <literal>Archive:</literal> or <literal>Suite:</literal> line</term>
+<listitem><simpara>names the archive to which all the packages
+in the directory tree belong.  For example, the line
+"Archive: stable" or
+"Suite: stable"
+specifies that all of the packages in the directory
+tree below the parent of the <filename>Release</filename> file are in a
+<literal>stable</literal> archive.  Specifying this value in the APT preferences file
+would require the line:
+</simpara>
+<programlisting>
+Pin: release a=stable
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>the <literal>Codename:</literal> line</term>
+<listitem><simpara>names the codename to which all the packages
+in the directory tree belong.  For example, the line
+"Codename: &debian-testing-codename;"
+specifies that all of the packages in the directory
+tree below the parent of the <filename>Release</filename> file belong to a version named
+<literal>&debian-testing-codename;</literal>.  Specifying this value in the APT preferences file
+would require the line:
+</simpara>
+<programlisting>
+Pin: release n=&debian-testing-codename;
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>the <literal>Version:</literal> line</term>
+<listitem><simpara>names the release version.  For example, the
+packages in the tree might belong to Debian release
+version &debian-stable-version;.  Note that there is normally no version number for the
+<literal>testing</literal> and <literal>unstable</literal> distributions because they
+have not been released yet.  Specifying this in the APT preferences
+file would require one of the following lines.
+</simpara>
+
+<programlisting>
+Pin: release v=&debian-stable-version;
+Pin: release a=stable, v=&debian-stable-version;
+Pin: release &debian-stable-version;
+</programlisting>
+
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>the <literal>Component:</literal> line</term>
+<listitem><simpara>names the licensing component associated with the
+packages in the directory tree of the <filename>Release</filename> file.
+For example, the line "Component: main" specifies that
+all the packages in the directory tree are from the <literal>main</literal>
+component, which entails that they are licensed under terms listed
+in the Debian Free Software Guidelines.  Specifying this component
+in the APT preferences file would require the line:
+</simpara>
+<programlisting>
+Pin: release c=main
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>the <literal>Origin:</literal> line</term>
+<listitem><simpara>names the originator of the packages in the
+directory tree of the <filename>Release</filename> file.  Most commonly, this is
+<literal>Debian</literal>.  Specifying this origin in the APT preferences file
+would require the line:
+</simpara>
+<programlisting>
+Pin: release o=Debian
+</programlisting>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>the <literal>Label:</literal> line</term>
+<listitem><simpara>names the label of the packages in the directory tree
+of the <filename>Release</filename> file.  Most commonly, this is
+<literal>Debian</literal>.  Specifying this label in the APT preferences file
+would require the line:
+</simpara>
+<programlisting>
+Pin: release l=Debian
+</programlisting>
+</listitem>
+</varlistentry>
+</variablelist>
+</para>
+
+<para>All of the <filename>Packages</filename> and <filename>Release</filename>
+files retrieved from locations listed in the &sources-list; file are stored
+in the directory <filename>/var/lib/apt/lists</filename>, or in the file named
+by the variable <literal>Dir::State::Lists</literal> in the <filename>apt.conf</filename> file.
+For example, the file
+<filename>debian.lcs.mit.edu_debian_dists_unstable_contrib_binary-i386_Release</filename>
+contains the <filename>Release</filename> file retrieved from the site
+<literal>debian.lcs.mit.edu</literal> for <literal>binary-i386</literal> architecture
+files from the <literal>contrib</literal> component of the <literal>unstable</literal>
+distribution.</para>
+</refsect2>
+
+<refsect2>
+<title>Optional Lines in an APT Preferences Record</title>
+
+<para>Each record in the APT preferences file can optionally begin with
+one or more lines beginning with the word <literal>Explanation:</literal>.
+This provides a place for comments.</para>
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Examples</title>
+<refsect2>
+<title>Tracking Stable</title>
+
+<para>The following APT preferences file will cause APT to assign a
+priority higher than the default (500) to all package versions belonging
+to a <literal>stable</literal> distribution and a prohibitively low priority to
+package versions belonging to other <literal>Debian</literal> distributions.
+
+<programlisting>
+Explanation: Uninstall or do not install any Debian-originated
+Explanation: package versions other than those in the stable distro
+Package: *
+Pin: release a=stable
+Pin-Priority: 900
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>With a suitable &sources-list; file and the above preferences file,
+any of the following commands will cause APT to upgrade to the
+latest <literal>stable</literal> version(s).
+
+<programlisting>
+apt-get install <replaceable>package-name</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>The following command will cause APT to upgrade the specified
+package to the latest version from the <literal>testing</literal> distribution;
+the package will not be upgraded again unless this command is given
+again.
+
+<programlisting>
+apt-get install <replaceable>package</replaceable>/testing
+</programlisting>
+</para>
+</refsect2>
+
+ <refsect2>
+ <title>Tracking Testing or Unstable</title>
+
+<para>The following APT preferences file will cause APT to assign
+a high priority to package versions from the <literal>testing</literal>
+distribution, a lower priority to package versions from the
+<literal>unstable</literal> distribution, and a prohibitively low priority
+to package versions from other <literal>Debian</literal> distributions.
+
+<programlisting>
+Package: *
+Pin: release a=testing
+Pin-Priority: 900
+
+Package: *
+Pin: release a=unstable
+Pin-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>With a suitable &sources-list; file and the above preferences file,
+any of the following commands will cause APT to upgrade to the latest
+<literal>testing</literal> version(s).
+
+<programlisting>
+apt-get install <replaceable>package-name</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>The following command will cause APT to upgrade the specified
+package to the latest version from the <literal>unstable</literal> distribution.
+Thereafter, <command>apt-get upgrade</command> will upgrade
+the package to the most recent <literal>testing</literal> version if that is
+more recent than the installed version, otherwise, to the most recent
+<literal>unstable</literal> version if that is more recent than the installed
+version.
+
+<programlisting>
+apt-get install <replaceable>package</replaceable>/unstable
+</programlisting>
+</para>
+</refsect2>
+
+
+<refsect2>
+<title>Tracking the evolution of a codename release</title>
+
+<para>The following APT preferences file will cause APT to assign a
+priority higher than the default (500) to all package versions belonging
+to a specified codename of a distribution and a prohibitively low priority to
+package versions belonging to other <literal>Debian</literal> distributions,
+codenames and archives.
+Note that with this APT preference APT will follow the migration of a release
+from the archive <literal>testing</literal> to <literal>stable</literal> and
+later <literal>oldstable</literal>. If you want to follow for example the progress
+in <literal>testing</literal> notwithstanding the codename changes you should use
+the example configurations above.
+
+<programlisting>
+Explanation: Uninstall or do not install any Debian-originated package versions
+Explanation: other than those in the distribution codenamed with &debian-testing-codename; or sid
+Package: *
+Pin: release n=&debian-testing-codename;
+Pin-Priority: 900
+
+Explanation: Debian unstable is always codenamed with sid
+Package: *
+Pin: release n=sid
+Pin-Priority: 800
+
+Package: *
+Pin: release o=Debian
+Pin-Priority: -10
+</programlisting>
+</para>
+
+<para>With a suitable &sources-list; file and the above preferences file,
+any of the following commands will cause APT to upgrade to the
+latest version(s) in the release codenamed with <literal>&debian-testing-codename;</literal>.
+
+<programlisting>
+apt-get install <replaceable>package-name</replaceable>
+apt-get upgrade
+apt-get dist-upgrade
+</programlisting>
+</para>
+
+<para>The following command will cause APT to upgrade the specified
+package to the latest version from the <literal>sid</literal> distribution.
+Thereafter, <command>apt-get upgrade</command> will upgrade
+the package to the most recent <literal>&debian-testing-codename;</literal> version if that is
+more recent than the installed version, otherwise, to the most recent
+<literal>sid</literal> version if that is more recent than the installed
+version.
+
+<programlisting>
+apt-get install <replaceable>package</replaceable>/sid
+</programlisting>
+</para>
+</refsect2>
+</refsect1>
+
+<refsect1>
+<title>Files</title>
+  <variablelist>
+    &file-preferences;
+  </variablelist>
+</refsect1>
+
+<refsect1>
+<title>See Also</title>
+<para>&apt-get; &apt-cache; &apt-conf; &sources-list;
+</para>
+</refsect1>
+
+ &manbugs;
+
+</refentry>

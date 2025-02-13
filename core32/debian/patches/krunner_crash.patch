@@ -1,0 +1,107 @@
+From 9d18e0821455366c00a763252515d48741316f6c Mon Sep 17 00:00:00 2001
+From: Max Ramanouski <max8rr8@gmail.com>
+Date: Thu, 1 Jun 2023 19:05:00 +0300
+Subject: [PATCH] runners/calculator: implement thread-safety in
+ QalculateEngine::evaluate
+
+Libqalculate does not seem to support ability to run multiple computations
+that are controlled or have timeout set beeing run in the same time.
+After the timeout was introduced in QalculateEngine this led to BUG 470219,
+which happens when computations are started from multiple threads in the same time
+that "confuses" libqalculate computation thread which leads to crash in libqalculate code.
+
+To fix that we need to ensure that only one evaluation is running at single moment of time.
+This is done via QalculateLock class that is like QMutexLocker but for libqalculate.
+QalculateLock is implemented with two static mutexes. Mutex s_evalLock is used
+to ensure that only one evaluation is running at single moment.
+Mutex s_ctrlLock is used to ensure that thread that aborted evaluation will
+get to start next evaluation.
+
+BUG: 470219
+---
+ runners/calculator/qalculate_engine.cpp | 43 ++++++++++++++++++++-----
+ 1 file changed, 35 insertions(+), 8 deletions(-)
+
+diff --git a/runners/calculator/qalculate_engine.cpp b/runners/calculator/qalculate_engine.cpp
+index a9d0a78243..09ff75fed5 100644
+--- a/runners/calculator/qalculate_engine.cpp
++++ b/runners/calculator/qalculate_engine.cpp
+@@ -17,11 +17,42 @@
+ #include <QClipboard>
+ #include <QDebug>
+ #include <QFile>
++#include <QMutex>
+ 
+ #include <KIO/Job>
+ #include <KLocalizedString>
+ #include <KProtocolManager>
+ 
++constexpr int evaluationTimeout = 10000;
++
++// Synchronization lock that ensures that
++// a) only one evaluation is running at a time
++// b) abortion and preemption of evaluation is synchronized
++class QalculateLock
++{
++public:
++    QalculateLock()
++    {
++        QMutexLocker ctrlLocker(&s_ctrlLock);
++        CALCULATOR->abort();
++        s_evalLock.lock();
++        CALCULATOR->startControl(evaluationTimeout);
++    }
++
++    ~QalculateLock()
++    {
++        CALCULATOR->stopControl();
++        s_evalLock.unlock();
++    }
++
++private:
++    static QMutex s_ctrlLock;
++    static QMutex s_evalLock;
++};
++
++QMutex QalculateLock::s_ctrlLock;
++QMutex QalculateLock::s_evalLock;
++
+ QAtomicInt QalculateEngine::s_counter;
+ 
+ QalculateEngine::QalculateEngine(QObject *parent)
+@@ -114,7 +145,8 @@ QString QalculateEngine::evaluate(const QString &expression, bool *isApproximate
+     QByteArray ba = input.replace(QChar(0xA3), "GBP").replace(QChar(0xA5), "JPY").replace('$', "USD").replace(QChar(0x20AC), "EUR").toLocal8Bit();
+     const char *ctext = ba.data();
+ 
+-    CALCULATOR->terminateThreads();
++    QalculateLock qalculateLock;
++
+     EvaluationOptions eo;
+ 
+     eo.auto_post_conversion = POST_CONVERSION_BEST;
+@@ -150,12 +182,7 @@ QString QalculateEngine::evaluate(const QString &expression, bool *isApproximate
+     }
+ #endif
+ 
+-    constexpr int timeout = 10000;
+-    MathStructure result;
+-    if (!CALCULATOR->calculate(&result, ctext, timeout, eo)) {
+-        // BUG 468084: stop libqalculate thread if timeout is reached
+-        return {};
+-    }
++    MathStructure result = CALCULATOR->calculate(ctext, eo);
+ 
+     PrintOptions po;
+     po.base = base;
+@@ -173,7 +200,7 @@ QString QalculateEngine::evaluate(const QString &expression, bool *isApproximate
+ 
+     result.format(po);
+ 
+-    m_lastResult = QString::fromStdString(CALCULATOR->print(result, timeout, po));
++    m_lastResult = QString::fromStdString(result.print(po));
+ 
+     if (isApproximate) {
+         *isApproximate = result.isApproximate();
+-- 
+GitLab
+

@@ -1,0 +1,238 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+buildsimplenativepackage 'unrelated' 'all' '1' 'unstable'
+buildsimplenativepackage 'po-debconf' 'all' '1.0.16' 'unstable'
+buildsimplenativepackage 'debhelper' 'all' '8.0.0' 'unstable' 'Depends: po-debconf'
+buildsimplenativepackage 'base-files' 'all' '10' 'unstable' 'Essential: yes'
+buildsimplenativepackage 'fdisk' 'all' '2.30.2' 'unstable' 'XB-Important: yes'
+buildsimplenativepackage 'linux-image' 'all' '4.9.80' 'unstable'
+buildsimplenativepackage 'hold-me' 'all' '1.0' 'unstable'
+buildsimplenativepackage 'remove-me' 'all' '1.0' 'unstable'
+buildsimplenativepackage 'system-base' 'all' '1.0' 'unstable' 'Depends: unrelated, base-files, fdisk, linux-image, hold-me, remove-me'
+setupaptarchive
+
+testsuccess aptget install unrelated debhelper -y
+testdpkginstalled 'unrelated' 'debhelper' 'po-debconf'
+
+testmarkedauto 'po-debconf'
+testsuccess aptget remove debhelper -y
+testdpkgnotinstalled 'debhelper'
+testdpkginstalled 'po-debconf' 'unrelated'
+echo 'unrelated purge' | dpkg --set-selections
+testdpkgstatus 'pi' '1' 'unrelated'
+
+AUTOREMOVE='apt autoremove'
+if [ -n "$SUDO_USER" ]; then
+	AUTOREMOVE="sudo $AUTOREMOVE"
+fi
+echo 'APT::NeverAutoRemove { "^debc.*nf$"; };' > rootdir/etc/apt/apt.conf.d/00autoremove
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  po-debconf
+0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded.
+Remv po-debconf [1.0.16]' aptget autoremove -s
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+The following package was automatically installed and is no longer required:
+  po-debconf
+Use '$AUTOREMOVE' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget install -s
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+1 package was automatically installed and is no longer required.
+Use '$AUTOREMOVE' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget install -s -o APT::Get::HideAutoRemove=small
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+Calculating upgrade...
+The following package was automatically installed and is no longer required:
+  po-debconf
+Use '$AUTOREMOVE' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget upgrade -s
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  po-debconf
+0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded.
+Remv po-debconf [1.0.16]' aptget install -s --autoremove
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+Calculating upgrade...
+The following packages will be REMOVED:
+  po-debconf
+0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded.
+Remv po-debconf [1.0.16]' aptget upgrade -s --autoremove
+echo 'APT::Get::AutomaticRemove "true";' > rootdir/etc/apt/apt.conf.d/autoremoval
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  po-debconf
+0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded.
+Remv po-debconf [1.0.16]' aptget install -s
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+Calculating upgrade...
+The following package was automatically installed and is no longer required:
+  po-debconf
+Use '$AUTOREMOVE' to remove it.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget upgrade -s
+rm -f rootdir/etc/apt/apt.conf.d/autoremoval
+
+testdpkginstalled 'po-debconf'
+
+echo 'APT::NeverAutoRemove { "^po-debconf$"; };' > rootdir/etc/apt/apt.conf.d/00autoremove
+testsuccess aptget autoremove -y
+testdpkginstalled 'po-debconf'
+testdpkgstatus 'pi' '1' 'unrelated'
+
+echo 'APT::NeverAutoRemove { "^po-.*$"; };' > rootdir/etc/apt/apt.conf.d/00autoremove
+testsuccess aptget autoremove -y
+testdpkginstalled "po-debconf"
+testdpkgstatus 'pi' '1' 'unrelated'
+
+rm rootdir/etc/apt/apt.conf.d/00autoremove
+testsuccess aptget autoremove -y
+testdpkgnotinstalled 'po-debconf'
+testdpkgstatus 'pi' '1' 'unrelated'
+testmarkedauto
+
+sed rootdir/var/log/apt/history.log -e '/^Commandline: / d' \
+	-e '/^Start-Date: / d' -e '/^End-Date: / d' \
+	-e '/^Requested-By: / d' \
+	-e 's#), #)\nInstall: #g' | sort -u > apt-history.log
+testfileequal 'apt-history.log' '
+Install: debhelper:i386 (8.0.0)
+Install: po-debconf:i386 (1.0.16, automatic)
+Install: unrelated:i386 (1)
+Remove: debhelper:i386 (8.0.0)
+Remove: po-debconf:i386 (1.0.16)'
+
+testsuccess aptget install debhelper -y
+testdpkgstatus 'pi' '1' 'unrelated'
+testdpkginstalled 'debhelper' 'po-debconf'
+testsuccess aptmark auto debhelper
+
+testmarkedauto 'debhelper' 'po-debconf'
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  debhelper po-debconf
+0 upgraded, 0 newly installed, 2 to remove and 0 not upgraded.
+Remv debhelper [8.0.0]
+Remv po-debconf [1.0.16]' aptget autoremove -s
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages were automatically installed and are no longer required:
+  debhelper po-debconf
+Use '$AUTOREMOVE' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget install -s
+testequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+2 packages were automatically installed and are no longer required.
+Use '$AUTOREMOVE' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded." aptget install -s -o APT::Get::HideAutoRemove=small
+
+testsuccess aptmark hold debhelper
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.' aptget autoremove -s
+
+testsuccess aptget autoremove debhelper -y --allow-change-held-packages
+testdpkgnotinstalled 'po-debconf' 'debhelper'
+testdpkgstatus 'pi' '1' 'unrelated'
+testmarkedauto
+testsuccess aptget install debhelper --solver apt -y -o Debug::pkgDepCache::Marker=1
+testmarkedauto 'po-debconf'
+testdpkgstatus 'pi' '1' 'unrelated'
+
+testsuccess aptget install system-base debhelper -y
+testdpkginstalled 'debhelper' 'po-debconf' 'system-base' 'base-files' 'fdisk' 'linux-image' 'hold-me' 'remove-me'
+testsuccess aptmark hold 'hold-me'
+echo 'APT::NeverAutoRemove { "^linux-image$"; };' > rootdir/etc/apt/apt.conf.d/00autoremove
+testsuccess aptget remove system-base -y
+testsuccess aptget autoremove -y -o Debug::pkgAutoRemove=yes
+DEBUGLOG=${TMPWORKINGDIRECTORY}/rootdir/tmp/autoremove.debuglog
+cp "${TMPWORKINGDIRECTORY}/rootdir/tmp/testsuccess.output" "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: fdisk:i386 2.30.2 (Important)' "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: base-files:i386 10 (Essential)' "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: unrelated:i386 1 (Manual-Installed)' "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: hold-me:i386 1.0 (Hold)' "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: po-debconf:i386 1.0.16 (Dependency)' "$DEBUGLOG"
+testsuccess grep -Fx 'Marking: linux-image:i386 4.9.80 (Blacklisted [APT::NeverAutoRemove])' "$DEBUGLOG"
+testdpkginstalled 'debhelper' 'po-debconf' 'base-files' 'fdisk' 'linux-image'
+testdpkgstatus 'hi' '1' 'hold-me'
+testdpkgnotinstalled 'remove-me'
+testdpkgstatus 'pi' '1' 'unrelated'
+
+insertinstalledpackage 'bar' 'all' '1' 'Depends: foo-provider'
+insertinstalledpackage 'foo-multi1-1' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (1)'
+insertinstalledpackage 'foo-multi1-2' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (2)'
+insertinstalledpackage 'foo-multi1-3' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (3)'
+insertinstalledpackage 'foo-multi2-1' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (1)'
+insertinstalledpackage 'foo-multi2-2' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (2)'
+insertinstalledpackage 'foo-multi2-3' 'all' '1' 'Provides: foo-provider
+Source: foo-multi (3)'
+insertinstalledpackage 'foo-plus-1' 'all' '1' 'Provides: foo-provider
+Source: foo-plus (1)'
+insertinstalledpackage 'foo-plus-2' 'all' '1' 'Provides: foo-provider
+Source: foo-plus (2)'
+insertinstalledpackage 'foo-plus-3' 'all' '1' 'Provides: foo-provider
+Source: foo-plus (3)'
+insertinstalledpackage 'foo-single-1' 'all' '1' 'Provides: foo-provider'
+insertinstalledpackage 'foo-single-2' 'all' '1' 'Provides: foo-provider'
+
+testsuccess aptmark auto 'foo-*'
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  foo-multi1-1 foo-multi1-2 foo-multi2-1 foo-multi2-2 foo-plus-1 foo-plus-2
+0 upgraded, 0 newly installed, 6 to remove and 0 not upgraded.
+Remv foo-multi1-1 [1]
+Remv foo-multi1-2 [1]
+Remv foo-multi2-1 [1]
+Remv foo-multi2-2 [1]
+Remv foo-plus-1 [1]
+Remv foo-plus-2 [1]' apt autoremove -s
+
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  foo-multi1-1* foo-multi1-2* foo-multi2-1* foo-multi2-2* foo-plus-1*
+  foo-plus-2*
+0 upgraded, 0 newly installed, 6 to remove and 0 not upgraded.
+Purg foo-multi1-1 [1]
+Purg foo-multi1-2 [1]
+Purg foo-multi2-1 [1]
+Purg foo-multi2-2 [1]
+Purg foo-plus-1 [1]
+Purg foo-plus-2 [1]' apt autopurge -s
+
+testdpkgstatus 'pi' '1' 'unrelated'
+testsuccess apt purge unrelated -y

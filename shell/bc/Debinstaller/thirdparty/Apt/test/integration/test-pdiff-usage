@@ -1,0 +1,415 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+LOWCOSTEXT='lz4'
+
+buildaptarchive
+setupflataptarchive
+changetowebserver
+
+cat >rootdir/etc/apt/apt.conf.d/contents.conf <<EOF
+Acquire::IndexTargets::deb::Contents {
+	MetaKey "\$(COMPONENT)/Contents-\$(ARCHITECTURE)";
+	ShortDescription "Contents";
+	Description "\$(RELEASE)/\$(COMPONENT) \$(ARCHITECTURE) Contents";
+	MetaKey "\$(COMPONENT)/Contents-\$(ARCHITECTURE)";
+	flatMetaKey "Contents-\$(ARCHITECTURE)";
+	flatDescription "\$(RELEASE) \$(ARCHITECTURE) Contents";
+};
+EOF
+
+PKGFILE="${TESTDIR}/$(echo "$(basename $0)" | sed 's#^test-#Packages-#')"
+echo 'contents for stuff' > aptarchive/Contents-i386
+compressfile aptarchive/Contents-i386
+echo 'hacked' > aptarchive/hacked-i386
+compressfile aptarchive/hacked-i386
+
+wasmergeused() {
+	if echo "$*" | grep -q -- '-o test::cannot-use-pdiff=1'; then
+		find rootdir/var/lib/apt/lists/partial -name '*-patched*' -delete
+	fi
+
+	testsuccess apt update "$@"
+	#apt update "$@" 2>&1 | tee rootdir/tmp/testsuccess.output
+
+	msgtest 'No intermediate patch files' 'still exist'
+	local EDS="$(find rootdir/var/lib/apt/lists -name '*.ed' -o -name '*.ed.*')"
+	if [ -z "$EDS" ]; then
+		msgpass
+	else
+		echo
+		echo "$EDS"
+		msgfail
+	fi
+
+	if echo "$*" | grep -q -- '-o test::cannot-use-pdiff=1'; then
+		msgtest 'Check if pdiff was' 'not used'
+		cp -a rootdir/tmp/testsuccess.output rootdir/tmp/aptupdate.output
+		testsuccess --nomsg grep "^Ign:.*  Packages\.diff/Index" rootdir/tmp/aptupdate.output
+		return;
+	fi
+
+	msgtest 'Check if the right pdiff merger was used'
+	if grep -q '^pkgAcqIndexMergeDiffs::Done(): rred' rootdir/tmp/testsuccess.output; then
+		if echo "$*" | grep -q -- '-o Acquire::PDiffs::Merge=1'; then
+			msgpass
+		else
+			msgfail "Merge shouldn't have been used, but was"
+		fi
+	elif echo "$*" | grep -q -- '-o Acquire::PDiffs::Merge=1'; then
+		msgfail "Merge should have been used, but wasn't"
+	else
+		msgpass
+	fi
+
+	testequal '1' grep -c rred:601 rootdir/tmp/testsuccess.output
+}
+
+testrun() {
+	configcompression '.' 'xz'
+	msgmsg "Testcase: setup the base with: $*"
+	find aptarchive -name 'Packages*' -type f -delete
+	cp "${PKGFILE}" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	generatereleasefiles
+	signreleasefiles
+	rm -rf aptarchive/Packages.diff rootdir/var/lib/apt/lists rootdir/var/lib/apt/lists-bak
+	testsuccess aptget update "$@"
+	cp -a rootdir/var/lib/apt/lists rootdir/var/lib/apt/lists-bak
+	testnopackage newstuff
+	testsuccessequal "$(cat "${PKGFILE}")
+" aptcache show apt oldstuff
+	configcompression '.' 'gz'
+
+	# see if the code deals properly with leftover partial files
+	partialleftovers
+
+	msgmsg "Testcase: apply with one patch: $*"
+	find aptarchive -name 'Packages*' -type f -delete
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA256-Current: $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA256-History:
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") 2000-08-18-2013.28
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA256-Patches:
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") 2000-08-18-2013.28
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+SHA256-Download:
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") 2000-08-18-2013.28.gz
+ d2a1b33187ed2d248eeae3b1223ea71791ea35f2138a713ed371332a6421f467 197 2010-08-18-2013.28.gz
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") $(basename "${PATCHFILE}.gz")" > "$PATCHINDEX"
+
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	find aptarchive -name 'Packages*' -type f -delete
+	wasmergeused "$@"
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: apply with compressed Index and one patch: $*"
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	cat "$PATCHINDEX" | gzip > "${PATCHINDEX}.gz"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	find aptarchive -name 'Packages*' -type f -delete
+	rm "$PATCHINDEX"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	wasmergeused "$@"
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: apply with by-hash compressed Index and one patch: $*"
+	local NORMAL="$(readlink -f "./aptarchive/Packages.diff")"
+	local BYHASH="${NORMAL}/by-hash/SHA256"
+	mkdir -p "${BYHASH}"
+	find "${NORMAL}/" -maxdepth 1 -name "Index*" -exec mv '{}' "$BYHASH" \;
+	ln -s "${BYHASH}/Index.gz" "${BYHASH}/$(sha256sum "${BYHASH}/Index.gz" | cut -f1 -d' ')"
+	echo 'foobar' > "${BYHASH}/$(sha256sum "$PATCHFILE" | cut -f1 -d' ')"
+	echo 'foobar' > "${BYHASH}/$(sha256sum "${PATCHFILE}.gz" | cut -f1 -d' ')"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	wasmergeused "$@" -o Acquire::By-Hash=force
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: SHA1-only patches are not used: $*"
+	find aptarchive -name 'Packages*' -type f -delete
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA1-Current: $(sha1sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA1-History:
+ 9f4148e06d7faa37062994ff10d0c842d7017513 33053002 2010-08-18-2013.28
+ $(sha1sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA1-Patches:
+ 7651fc0ac57cd83d41c63195a9342e2db5650257 19722 2010-08-18-2013.28
+ $(sha1sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+SHA1-Download:
+ 2365ac0ac57cde3d43c63145e8251a3bd5410213 197 2010-08-18-2013.28.gz
+ $(sha1sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") $(basename "${PATCHFILE}.gz")" > "$PATCHINDEX"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	wasmergeused "$@" -o test::cannot-use-pdiff=1
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: no download-hashes patches are not used: $*"
+	find aptarchive -name 'Packages*' -type f -delete
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA256-Current: $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA256-History:
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA256-Patches:
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")" > "$PATCHINDEX"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	wasmergeused "$@" -o test::cannot-use-pdiff=1
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: apply with two patches: $*"
+	cp "${PKGFILE}-new" aptarchive/Packages
+	echo '
+Package: futurestuff
+Version: 1.0
+Architecture: i386
+Maintainer: Joe Sixpack <joe@example.org>
+Installed-Size: 202
+Filename: pool/futurestuff_1.0_i386.deb
+Size: 202200
+SHA256: b46fd154615edaae5ba33c56a5cc0e7deaef23e2da3e4f129727fd660f28f050
+Description: some cool and shiny future stuff
+ This package will appear in the next^2 mirror update
+Description-md5: d5f89fbbc2ce34c455dfee9b67d82b6b' >> aptarchive/Packages
+
+	compressfile 'aptarchive/Packages'
+	PATCHFILE2="aptarchive/Packages.diff/$(date -d 'now + 1hour' '+%Y-%m-%d-%H%M.%S')"
+	diff -e "${PKGFILE}-new" aptarchive/Packages > "${PATCHFILE2}" || true
+	cat "$PATCHFILE2" | gzip > "${PATCHFILE2}.gz"
+	echo "SHA256-Current: $(sha256sum aptarchive/Packages | cut -d' ' -f 1) $(stat -c%s aptarchive/Packages)
+SHA256-History:
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+ $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new") $(basename "${PATCHFILE2}")
+SHA256-Patches:
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+ $(sha256sum "${PATCHFILE2}" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE2}") $(basename "${PATCHFILE2}")
+SHA256-Download:
+ d2a1b33187ed2d248eeae3b1223ea71791ea35f2138a713ed371332a6421f467 197 2010-08-18-2013.28.gz
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") $(basename "${PATCHFILE}.gz")
+ $(sha256sum "${PATCHFILE2}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE2}.gz") $(basename "${PATCHFILE2}.gz")" > "$PATCHINDEX"
+
+	generatereleasefiles '+2hour'
+	signreleasefiles
+	cp -a aptarchive/Packages Packages-future
+	find aptarchive -name 'Packages*' -type f -delete
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	wasmergeused "$@"
+	testnopackage oldstuff
+	testsuccessequal "$(cat Packages-future)
+" aptcache show apt newstuff futurestuff
+
+	# we reuse the archive state of the previous test here
+	msgmsg "Testcase: pdiff handling is stopped if transaction fails $*"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	cp Packages-future aptarchive/Packages
+	rm -f rootdir/var/lib/apt/lists/*_Contents-*
+	webserverconfig 'aptwebserver::overwrite::.*Contents-.*::filename' '/hacked-i386.gz'
+	testfailure apt update "$@"
+	cp rootdir/tmp/testfailure.output patchdownload.output
+	webserverconfig 'aptwebserver::overwrite::.*Contents-.*::filename' '/Contents-i386.gz'
+	testfailure grep -q -z 'AbortTransaction.* [a-zA-Z0-9+-]\+:600%20' patchdownload.output
+	testnopackage newstuff futurestuff
+	testsuccessequal "$(cat "${PKGFILE}")
+" aptcache show apt oldstuff
+
+	# we reuse the entire state of the previous test here
+	msgmsg "Testcase: good files from previous fails are picked up from partial: $*"
+	wasmergeused "$@"
+	testfailure grep '^GET /Packages.diff/Index HTTP/1.1' rootdir/tmp/testsuccess.output
+	testnopackage oldstuff
+	testsuccessequal "$(cat Packages-future)
+" aptcache show apt newstuff futurestuff
+
+	# we reuse the archive state of the previous test here
+	msgmsg "Testcase: downloading a patch fails, but successful fallback: $*"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	cp Packages-future aptarchive/Packages
+	rm "${PATCHFILE}.gz"
+	testsuccess apt update "$@"
+	cp rootdir/tmp/testsuccess.output patchdownload.output
+	# it should be anchored on line start, but multiple processes on the same output stream…
+	testsuccess grep 'Falling back to normal index file acquire' patchdownload.output
+	testnopackage oldstuff
+	testsuccessequal "$(cat Packages-future)
+" aptcache show apt newstuff futurestuff
+
+	msgmsg "Testcase: patch applying fails, but successful fallback: $*"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA256-Current: $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA256-History:
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA256-Patches:
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+SHA256-Download:
+ d2a1b33187ed2d248eeae3b1223ea71791ea35f2138a713ed371332a6421f467 197 2010-08-18-2013.28.gz
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") $(basename "${PATCHFILE}.gz")" > "$PATCHINDEX"
+	breakfiles "$PATCHFILE" "${PATCHFILE}.gz"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	testsuccess apt update "$@"
+	cp -f rootdir/tmp/testsuccess.output rootdir/tmp/aptupdate.output
+	testsuccess grep 'Hash Sum mismatch' rootdir/tmp/aptupdate.output
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: pdiff patch bigger than index itself: $*"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	# the general testcode checks for leftovers in partial, but as this file
+	# is never touched in this test as it exits earlier its not a leftover…
+	rm -f rootdir/var/lib/apt/lists/partial/localhost:${APTHTTPPORT}_Packages
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA256-Current: $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA256-History:
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA256-Patches:
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+SHA256-Download:
+ d2a1b33187ed2d248eeae3b1223ea71791ea35f2138a713ed371332a6421f467 197 2010-08-18-2013.28.gz
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz")000 $(basename "${PATCHFILE}.gz")" > "$PATCHINDEX"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	wasmergeused "$@" -o test::cannot-use-pdiff=1
+	testsuccess grep 'bytes, but limit is' rootdir/tmp/aptupdate.output
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+
+	msgmsg "Testcase: pdiff index failed to download: $*"
+	rm -rf rootdir/var/lib/apt/lists
+	cp -a rootdir/var/lib/apt/lists-bak rootdir/var/lib/apt/lists
+	cp "${PKGFILE}-new" aptarchive/Packages
+	compressfile 'aptarchive/Packages'
+	mkdir -p aptarchive/Packages.diff
+	PATCHFILE="aptarchive/Packages.diff/$(date +%Y-%m-%d-%H%M.%S)"
+	diff -e "${PKGFILE}" "${PKGFILE}-new" > "${PATCHFILE}" || true
+	cat "$PATCHFILE" | gzip > "${PATCHFILE}.gz"
+	PATCHINDEX='aptarchive/Packages.diff/Index'
+	echo "SHA256-Current: $(sha256sum "${PKGFILE}-new" | cut -d' ' -f 1) $(stat -c%s "${PKGFILE}-new")
+SHA256-History:
+ 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b 33053002 2010-08-18-2013.28
+ $(sha256sum "$PKGFILE" | cut -d' ' -f 1) $(stat -c%s "$PKGFILE") $(basename "$PATCHFILE")
+SHA256-Patches:
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 19722 2010-08-18-2013.28
+ $(sha256sum "$PATCHFILE" | cut -d' ' -f 1) $(stat -c%s "$PATCHFILE") $(basename "$PATCHFILE")
+SHA256-Download:
+ d2a1b33187ed2d248eeae3b1223ea71791ea35f2138a713ed371332a6421f467 197 2010-08-18-2013.28.gz
+ $(sha256sum "${PATCHFILE}.gz" | cut -d' ' -f 1) $(stat -c%s "${PATCHFILE}.gz") $(basename "${PATCHFILE}.gz")" > "$PATCHINDEX"
+	generatereleasefiles '+1hour'
+	signreleasefiles
+	# we let it fail by removing the files so the webserver reports 404
+	rm -f "$PATCHINDEX" "$PATCHFILE" "${PATCHFILE}.gz"
+	wasmergeused "$@" -o test::cannot-use-pdiff=1
+	testsuccess grep '400%20URI%20Failure.*FailReason.*HttpError404.*Packages\.diff/Index' rootdir/tmp/aptupdate.output
+	testnopackage oldstuff
+	testsuccessequal "$(cat "${PKGFILE}-new")
+" aptcache show apt newstuff
+}
+echo 'Debug::pkgAcquire::Diffs "true";
+Debug::Acquire::Transaction "true";
+Debug::pkgAcquire::Worker "true";
+Debug::Acquire::http "true";
+Debug::pkgAcquire "true";
+Debug::Acquire::rred "true";' > rootdir/etc/apt/apt.conf.d/rreddebug.conf
+
+testcase() {
+	testrun -o Acquire::PDiffs::Merge=0 -o APT::Get::List-Cleanup=1 "$@"
+	testrun -o Acquire::PDiffs::Merge=1 -o APT::Get::List-Cleanup=1 "$@"
+	testrun -o Acquire::PDiffs::Merge=0 -o APT::Get::List-Cleanup=0 "$@"
+	testrun -o Acquire::PDiffs::Merge=1 -o APT::Get::List-Cleanup=0 "$@"
+}
+generatepartialleftovers() {
+	for f in "$@"; do
+		cat "${PKGFILE}" "${PKGFILE}" > "rootdir/var/lib/apt/lists-bak/partial/localhost:${APTHTTPPORT}_${f}"
+		printf '\n\nInvalid\nStanza: yes\n\n' >> "rootdir/var/lib/apt/lists-bak/partial/localhost:${APTHTTPPORT}_${f}"
+	done
+}
+
+partialleftovers() { generatepartialleftovers 'Packages' 'Packages-patched'; }
+aptautotest_apt_update() { aptautotest_aptget_update "$@"; testsuccess test -e "rootdir/var/lib/apt/lists/localhost:${APTHTTPPORT}_Packages"; }
+testcase -o Acquire::IndexTargets::deb::Packages::KeepCompressed=false
+partialleftovers() { generatepartialleftovers "Packages.${LOWCOSTEXT}" "Packages-patched.${LOWCOSTEXT}"; }
+aptautotest_apt_update() { aptautotest_aptget_update "$@"; testsuccess test -e "rootdir/var/lib/apt/lists/localhost:${APTHTTPPORT}_Packages.$LOWCOSTEXT"; }
+testcase -o Acquire::IndexTargets::deb::Packages::KeepCompressed=true
+
+
+partialleftovers() { generatepartialleftovers "redirectme_Packages.${LOWCOSTEXT}" "redirectme_Packages-patched.${LOWCOSTEXT}"; }
+# redirect the InRelease file only – the other files are auto-redirected by apt
+webserverconfig 'aptwebserver::redirect::replace::/redirectme/I' "http://0.0.0.0:${APTHTTPPORT}/I"
+rewritesourceslist "http://localhost:${APTHTTPPORT}/redirectme"
+aptautotest_apt_update() {
+	aptautotest_aptget_update "$@"
+	testsuccess test -e "rootdir/var/lib/apt/lists/localhost:${APTHTTPPORT}_redirectme_Packages.$LOWCOSTEXT"
+	testempty find rootdir/var/lib/apt/lists -type f \! \( -name lock -o -name '*_redirectme_*' \)
+}
+testcase -o Acquire::IndexTargets::deb::Packages::KeepCompressed=true

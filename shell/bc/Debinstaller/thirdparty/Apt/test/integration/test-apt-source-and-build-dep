@@ -1,0 +1,250 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+
+# we need to insert a package into "unstable" so that a Release file is
+# create for the test
+insertpackage 'wheezy' 'build-essential' 'all' '1.0'
+
+# a "normal" package with source and binary
+insertpackage 'unstable' 'foo' 'all' '2.0'
+insertsource 'unstable' 'foo' 'all' '2.0'
+insertpackage 'unstable' 'foo-common' 'all' '2.0' 'Source: foo (2.0)'
+insertpackage 'experimental' 'foo' 'all' '5' 'Depends: foo-common (= 5)'
+insertpackage 'experimental' 'foo-common' 'all' '5' 'Source: foo (5)'
+insertsource 'experimental' 'foo-source' 'all' '42' 'Build-Depends: foo (= 5), baz'
+
+# binary packages with Source-field
+insertpackage 'unstable,testing' 'bin' 'i386' '3-2+b1' 'Source: bin (3-2)'
+insertsource 'unstable,testing' 'bin' 'any' '3-2'
+insertpackage 'stable' 'bin' 'i386' '2-2+b1' 'Source: bin-backport (2-2)'
+insertsource 'stable' 'bin-backport' 'any' '2-2'
+
+# its possible to have multiple src versions in the sources file, ensure
+# to pick the correct one in this case (bts #731853)
+insertsource 'stable' 'foo' 'all' '1.5'
+insertsource 'stable' 'foo' 'all' '0.5'
+insertpackage 'stable' 'foo' 'all' '1.0'
+insertsource 'stable' 'foo' 'all' '1.0'
+
+# these packages exists only as sources, add two versions to ensure that
+# apt will pick the higher version number (bts #731853)
+insertsource 'wheezy' 'foo' 'all' '0.0.1'
+insertsource 'wheezy' 'foo' 'all' '0.1'
+
+# the order of these versions is chosen to ensure that
+# * apt will pick the one in the correct release, despite a higher version coming later and
+# * apt will pick the highest version in a release, despite a lower version coming later.
+# (bts #746412)
+insertsource 'stable' 'baz' 'all' '1.0'
+insertsource 'unstable' 'baz' 'all' '2.0'
+insertsource 'unstable' 'baz' 'all' '1.5'
+insertpackage 'unstable' 'baz' 'all' '2.0'
+insertpackage 'experimental' 'baz' 'all' '5.0'
+
+# ensure we really have the situation we wanted (first 2.0 is foo above)
+testequal 'Version: 2.0
+Version: 3-2
+Version: 2.0
+Version: 1.5' grep '^Version:' aptarchive/dists/unstable/main/source/Sources
+
+insertsource 'stable' 'bar' 'any' '1.1' 'Vcs-Browser: https://anonscm.debian.org/cgit/bar/bar.git
+Vcs-Git: git://anonscm.debian.org/bar/bar.git -b debian/experimental'
+
+setupaptarchive
+
+APTARCHIVE=$(readlink -f ./aptarchive)
+
+# normal operation gets highest version number
+HEADER='Reading package lists...'
+DOWNLOAD1="Need to get 0 B/25 B of source archives.
+'file:${APTARCHIVE}/foo_1.0.dsc' foo_1.0.dsc 11 SHA256:ed7c25c832596339bee13e4e7c45cf49f869b60d2bf57252f18191d75866c2a7
+'file:${APTARCHIVE}/foo_1.0.tar.gz' foo_1.0.tar.gz 14 SHA256:f3da8c6ebc62c8ef2dae439a498dddcdacc1a07f45ff67ad12f44b6e2353c239"
+DOWNLOAD2="Need to get 0 B/25 B of source archives.
+'file:${APTARCHIVE}/foo_2.0.dsc' foo_2.0.dsc 11 SHA256:0fcb803ffbeef26db884625aaf06e75f3eda5c994634980e7c20fd37ed1fc104
+'file:${APTARCHIVE}/foo_2.0.tar.gz' foo_2.0.tar.gz 14 SHA256:ca9b0b828ca22372502af2b80f61f0bd9063910ece9fc34eeaf9d9e31aa8195a"
+DOWNLOAD3="Need to get 0 B/25 B of source archives.
+'file:${APTARCHIVE}/baz_1.0.dsc' baz_1.0.dsc 11 SHA256:322245f56092b466801dda62d79c8687bba9724af6d16d450d655d29e41d3d7b
+'file:${APTARCHIVE}/baz_1.0.tar.gz' baz_1.0.tar.gz 14 SHA256:0870bc73164ff5ba1f52153fdcb48e140137f9c7c122d57592cea136a57f73c0"
+DOWNLOAD4="Need to get 0 B/25 B of source archives.
+'file:${APTARCHIVE}/baz_2.0.dsc' baz_2.0.dsc 11 SHA256:47d062d29070b3f592d1c8aed8c1e7913804bbb67ca1d64877c8219dac5e0420
+'file:${APTARCHIVE}/baz_2.0.tar.gz' baz_2.0.tar.gz 14 SHA256:11c1b202c94a64ab6433d9f0ed5515fce1dc7b20e6bcf51cec9ef8b9455f5a41"
+testsuccessequal "$HEADER
+$DOWNLOAD2" apt source -q --print-uris foo
+testsuccessequal "$HEADER
+$DOWNLOAD2" apt source -q --print-uris foo foo
+getbuilddep() {
+	echo 'Reading package lists...'
+	if [ -n "$2" ]; then
+		echo "$2"
+	fi
+	echo "${1} has no build depends.
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  build-essential
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Inst build-essential (1.0 wheezy [all])
+Conf build-essential (1.0 wheezy [all])"
+}
+testsuccessequal "$(getbuilddep 'foo')" apt build-dep foo -s
+
+# select by release: suite
+testsuccessequal "$HEADER
+Selected version '1.0' (stable) for foo
+$DOWNLOAD1" apt source -q --print-uris foo/stable
+testsuccessequal "$(getbuilddep 'foo' "Selected version '1.0' (stable) for foo")" apt build-dep foo/stable -s
+testsuccessequal "$HEADER
+Selected version '2.0' (unstable) for foo
+$DOWNLOAD2" apt source -q --print-uris foo/unstable
+testsuccessequal "$(getbuilddep 'foo' "Selected version '2.0' (unstable) for foo")" apt build-dep foo/unstable -s
+testsuccessequal "$HEADER
+Selected version '1.0' (stable) for foo
+$DOWNLOAD1" apt source -q --print-uris foo -t stable
+testsuccessequal "$(getbuilddep 'foo' "Selected version '1.0' (stable) for foo")" apt build-dep foo -t stable -s
+testsuccessequal "$HEADER
+Selected version '2.0' (unstable) for foo
+$DOWNLOAD2" apt source -q --print-uris foo -t unstable
+testsuccessequal "$(getbuilddep 'foo' "Selected version '2.0' (unstable) for foo")" apt build-dep foo -t unstable -s
+testsuccessequal "$HEADER
+Selected version '1.0' (stable) for baz
+$DOWNLOAD3" apt source -q --print-uris baz -t stable
+testsuccessequal "$(getbuilddep 'baz' "Selected version '1.0' (stable) for baz")" apt build-dep baz -t stable -s
+
+# select by release: codename
+testsuccessequal "$HEADER
+Selected version '2.0' (sid) for foo
+$DOWNLOAD2" apt source -q --print-uris foo/sid
+testsuccessequal "$(getbuilddep 'foo' "Selected version '2.0' (sid) for foo")" apt build-dep foo/sid -s
+testsuccessequal "$HEADER
+Selected version '2.0' (sid) for foo
+$DOWNLOAD2" apt source -q --print-uris foo -t sid
+testsuccessequal "$(getbuilddep 'foo' "Selected version '2.0' (sid) for foo")" apt build-dep foo -t sid -s
+testsuccessequal "$HEADER
+Selected version '2.0' (sid) for baz
+$DOWNLOAD4" apt source -q --print-uris baz -t sid
+testsuccessequal "$(getbuilddep 'baz' "Selected version '2.0' (sid) for baz")" apt build-dep baz -t sid -s
+
+# select by version
+testsuccessequal "$HEADER
+$DOWNLOAD1" apt source -q --print-uris foo=1.0
+testsuccessequal "$(getbuilddep 'foo')" apt build-dep foo=1.0 -s
+
+# select by release with no binary package (Bug#731102) but ensure to get
+# highest version
+DOWNLOAD01="Need to get 0 B/25 B of source archives.
+'file:${APTARCHIVE}/foo_0.1.dsc' foo_0.1.dsc 11 SHA256:72af24b0290fe1d13a3e25fddd2633e43c87ff79d249bc850009e47bcce73565
+'file:${APTARCHIVE}/foo_0.1.tar.gz' foo_0.1.tar.gz 14 SHA256:ec748ad88a71f98bfdc012e1a7632377d05fe3ebbf9c0922e0691fe4d79c0585"
+testsuccessequal "$HEADER
+Selected version '0.1' (wheezy) for foo
+$DOWNLOAD01" apt source -q --print-uris foo/wheezy
+testsuccessequal "$(getbuilddep 'foo' "Selected version '0.1' (wheezy) for foo")" apt build-dep foo/wheezy -s
+
+# unavailable one
+testfailureequal "$HEADER
+E: Can not find version '9.9-not-there' of package 'foo'
+E: Unable to find a source package for foo" apt source -q --print-uris foo=9.9-not-there
+testfailureequal "Reading package lists...
+E: Can not find version '9.9-not-there' of package 'foo'
+E: Unable to find a source package for foo=9.9-not-there" apt build-dep -s foo=9.9-not-there
+
+# version and release
+DOWNLOAD001="Need to get 0 B/29 B of source archives.
+'file:${APTARCHIVE}/foo_0.0.1.dsc' foo_0.0.1.dsc 13 SHA256:649dfe03bbb70cebdfe7c6bf9036f9f2472510b8f52e823bdf5ade362ebaa76f
+'file:${APTARCHIVE}/foo_0.0.1.tar.gz' foo_0.0.1.tar.gz 16 SHA256:ab7ba789d178362ecc808e49705e2338988a7f5b9410ec11a6c9555c017de907"
+testsuccessequal "$HEADER
+$DOWNLOAD001" apt source -q --print-uris -t unstable foo=0.0.1
+testsuccessequal "$(getbuilddep 'foo')" apt build-dep foo=0.0.1 -s
+
+testsuccessequal "$HEADER
+Need to get 0 B/25 B of source archives.
+Fetch source foo" apt source -q -s foo
+testsuccessequal "$(getbuilddep 'foo')" apt build-dep foo -s
+
+testfailureequal 'E: Must specify at least one package to fetch source for' apt source
+testfailureequal 'E: Must specify at least one package to check builddeps for' apt build-dep
+
+testsuccessequal "Reading package lists...
+NOTICE: 'bar' packaging is maintained in the 'Git' version control system at:
+git://anonscm.debian.org/bar/bar.git -b debian/experimental
+Please use:
+git clone git://anonscm.debian.org/bar/bar.git -b debian/experimental
+to retrieve the latest (possibly unreleased) updates to the package.
+Need to get 0 B/25 B of source archives.
+Fetch source bar" apt source bar -s
+testsuccessequal "$(getbuilddep 'bar')" apt build-dep bar -s
+
+testsuccessequal "$HEADER
+Need to get 0 B/25 B of source archives.
+Fetch source bin" apt source bin -s -q
+testsuccessequal "$(getbuilddep 'bin')" apt build-dep bin -s
+testsuccessequal "$HEADER
+Selected version '3-2' (unstable) for bin
+Need to get 0 B/25 B of source archives.
+Fetch source bin" apt source bin/unstable -s -q
+testsuccessequal "$(getbuilddep 'bin' "Selected version '3-2' (unstable) for bin")" apt build-dep bin/unstable -s
+testsuccessequal "$HEADER
+Picking 'bin-backport' as source package instead of 'bin'
+Selected version '2-2' (stable) for bin-backport
+Need to get 0 B/43 B of source archives.
+Fetch source bin-backport" apt source bin/stable -s -q
+testsuccessequal "$(getbuilddep 'bin-backport' "Picking 'bin-backport' as source package instead of 'bin'
+Selected version '2-2' (stable) for bin-backport")" apt build-dep bin/stable -s
+
+testsuccess apt install foo/experimental -s
+testfailure apt build-dep foo-source -s
+testsuccessequal "Reading package lists...
+Selected version '42' (experimental) for foo-source
+Reading package lists...
+Building dependency tree...
+Selected version '5' (experimental [all]) for 'foo' because of 'src:foo-source'
+Selected version '5' (experimental [all]) for 'foo-common' because of 'foo'
+The following NEW packages will be installed:
+  baz build-essential foo foo-common
+0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+Inst baz (2.0 unstable [all])
+Inst build-essential (1.0 wheezy [all])
+Inst foo-common (5 experimental [all])
+Inst foo (5 experimental [all])
+Conf baz (2.0 unstable [all])
+Conf build-essential (1.0 wheezy [all])
+Conf foo-common (5 experimental [all])
+Conf foo (5 experimental [all])" apt build-dep foo-source/experimental -s
+testsuccessequal "Reading package lists...
+Selected version '42' (experimental) for foo-source
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  baz build-essential foo foo-common
+0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+Inst baz (5.0 experimental [all])
+Inst build-essential (1.0 wheezy [all])
+Inst foo-common (5 experimental [all])
+Inst foo (5 experimental [all])
+Conf baz (5.0 experimental [all])
+Conf build-essential (1.0 wheezy [all])
+Conf foo-common (5 experimental [all])
+Conf foo (5 experimental [all])" apt build-dep foo-source -t experimental -s
+# this checks that mentioning the source pkg baz has no influence on the binary package baz
+testsuccessequal "Reading package lists...
+Selected version '42' (experimental) for foo-source
+Selected version '2.0' (unstable) for baz
+baz has no build depends.
+Reading package lists...
+Building dependency tree...
+The following NEW packages will be installed:
+  baz build-essential foo foo-common
+0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+Inst baz (5.0 experimental [all])
+Inst build-essential (1.0 wheezy [all])
+Inst foo-common (5 experimental [all])
+Inst foo (5 experimental [all])
+Conf baz (5.0 experimental [all])
+Conf build-essential (1.0 wheezy [all])
+Conf foo-common (5 experimental [all])
+Conf foo (5 experimental [all])" apt build-dep foo-source baz/unstable -t experimental -s
