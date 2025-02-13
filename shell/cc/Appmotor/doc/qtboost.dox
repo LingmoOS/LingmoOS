@@ -1,0 +1,90 @@
+/*! \page qtboost Using the Qt booster
+
+This section describes how to use the Qt booster. The booster provides
+the application with the key libraries already present in the process,
+but no other initialisations are done in the booster.
+
+\section intro Prerequisites
+
+The launcher can start an application if the following prerequisites are met:
+
+\li The application is compiled and linked to a position independent binary
+(executable or library) 
+
+\li The application is started with the \c invoker command instead of executing the executable file.
+
+\section qtboostcompiling 1. Compiling and linking for launcher
+
+If you intend to run a binary with \c applauncherd, compile it
+with \c -fPIC option to produce position-independent code. It is 
+recommended that you link them either as shared libraries, or, preferably,
+as position-independent executables, which can be executed both 
+traditionally and with the launcher. The \c -pie and \c -rdynamic linker flags
+accomplish this.
+
+To improve linking and loading times of shared object libraries, it is
+recommended that you hide any unnecessary symbols from the resulting binary
+by using \c -fvisibility=hidden and \c -fvisibility-inlines-hidden
+flags as well.  However, \c applauncherd needs to find the entry point
+for your application, so the symbol \c main needs to be explicitly made
+visible. This can be done as follows:
+
+\code
+  #include <QtCore/QtGlobal>
+  
+  Q_DECL_EXPORT int main(int argc, char **argv)
+  {
+  ...
+  }
+\endcode
+
+
+If your application loads a plug-in that needs to access some symbols
+in the main application, the symbols also need to be exported. In
+addition, you must use the \c --global-syms invoker parameter, as
+described in \ref invokerparameters "Advanced invoker command line parameters".
+
+Normally you do not need to worry about the compiler and linker
+flags, as the \c applauncherd-dev package provides configuration
+options for \c qmake, \c CMake, and \c pkg-config. If you are building
+a Debian package, make your package build-depend on \c
+applauncherd-dev and your application binary package depend on \c 
+applauncherd.
+
+For details on how to get the compiler and linker flags, see 
+\ref usingqmake "Using qmake", \ref usingcmake "Using CMake", or
+\ref usingpkgconfig "Using pkg-config".
+
+\section qtboostexit 2. Adapting application source code
+
+No modifications are typically needed when the Qt booster is
+used. However, if the application has explicit calls to \c exit(),
+change them to use \c _exit() instead. This 
+prevents cleanup actions related to shared
+libraries to be performed multiple times. For more details, see
+\ref limitations "Limitations and known issues".
+
+
+\section qtboostinvoker 3. Launching the application
+
+Check that applauncherd package is installed and applancherd daemon is
+running. You can now run your application as usual as
+/usr/bin/myApp, or use the qtboosted launching by running:
+
+\code
+invoker --type=q /usr/bin/myApp
+\endcode
+
+\section qtboostfinishingtouch 4. Finishing touches
+
+The invoker can also provide single instance behaviour for your application
+as follows. For more details, see 
+\ref singleinstance "Enabling single instance support for an application".
+
+\code
+/usr/bin/invoker --single-instance --type=q /usr/bin/myApp
+\endcode
+
+*/
+
+

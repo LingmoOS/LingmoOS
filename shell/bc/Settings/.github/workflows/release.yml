@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Tarball
+        run: |
+          mkdir -p lingmo-settings
+          cp -R $(ls | grep -xv lingmo-settings) lingmo-settings/
+          tar -cJf lingmo-settings.tar.xz lingmo-settings
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+            files: lingmo-settings.tar.xz
+            name: Release ${{ github.ref }}
+
+      - name: Cleanup
+        run: rm lingmo-settings.tar.xz

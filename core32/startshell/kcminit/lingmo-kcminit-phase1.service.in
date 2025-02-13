@@ -1,0 +1,10 @@
+[Unit]
+Description=KDE Configuration Module Initialization (Phase 1)
+Requires=lingmo-kcminit.service
+After=lingmo-kcminit.service lingmo-kded.service
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=@QtBinariesDir@/qdbus org.kde.kcminit /kcminit org.kde.KCMInit.runPhase1
+Slice=session.slice

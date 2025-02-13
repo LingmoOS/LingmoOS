@@ -1,0 +1,164 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+
+insertpackage 'unstable' 'okay' 'all' '1'
+insertpackage 'unstable' 'upgrade' 'all' '2'
+insertpackage 'unstable' 'unneeded' 'all' '1'
+insertpackage 'unstable' 'unneeded2' 'all' '1' 'Depends: bad-level1'
+insertpackage 'unstable' 'later' 'all' '1'
+
+insertpackage 'unstable' 'bad-level0' 'all' '1' 'Depends: unneeded, unknown'
+insertpackage 'unstable' 'bad-level1' 'all' '1' 'Depends: bad-level0'
+insertpackage 'unstable' 'bad-upgrade-level0' 'all' '2' 'Depends: unneeded, unknown'
+insertpackage 'unstable' 'bad-upgrade-level1' 'all' '2' 'Depends: bad-upgrade-level0 (>= 2), unneeded2'
+insertpackage 'unstable' 'bad-conflict-level0' 'all' '1' 'Depends: unneeded
+Conflicts: bad-conflict-level2'
+insertpackage 'unstable' 'bad-conflict-level1' 'all' '1' 'Depends: bad-conflict-level0'
+insertpackage 'unstable' 'bad-conflict-level2' 'all' '1' 'Depends: bad-conflict-level1, unneeded2'
+
+insertinstalledpackage 'upgrade' 'all' '1'
+insertinstalledpackage 'bad-upgrade' 'all' '1'
+insertinstalledpackage 'bad-upgrade-level0' 'all' '1'
+insertinstalledpackage 'bad-upgrade-level1' 'all' '1'
+
+insertfoos() {
+	insertpackage 'unstable' "foo-${1}-level0" 'all' '1' "${2}: unknown | unknown | okay | later"
+	insertpackage 'unstable' "foo-${1}-level1" 'all' '1' "${2}: bad-level0 | bad-level0 | okay | later"
+	insertpackage 'unstable' "foo-${1}-level2" 'all' '1' "${2}: bad-level1 | bad-level1 | okay | later"
+
+	insertpackage 'unstable' "foo-${1}-upgrade-level0" 'all' '1' "${2}: bad-upgrade (>= 2) | okay | upgrade (>= 2) | later"
+	insertpackage 'unstable' "foo-${1}-upgrade-level1" 'all' '1' "${2}: bad-upgrade-level0 (>= 2) | bad-upgrade-level0 (>= 2) | bad-level0 | okay | upgrade (>= 2) | later"
+	insertpackage 'unstable' "foo-${1}-upgrade-level2" 'all' '1' "${2}: bad-upgrade-level1 (>= 2) | bad-upgrade-level1 (>= 2) | bad-level1 | okay | upgrade (>= 2) | later"
+
+	insertpackage 'unstable' "foo-${1}-conflict" 'all' '1' "${2}: unknown | bad-conflict-level2 | okay | later"
+}
+insertfoos 'd' 'Depends'
+insertfoos 'r' 'Recommends'
+
+setupaptarchive
+
+_testsuccessheadtailequal() {
+	local TYPE="$1"
+	shift
+	msggroup "testsuccess${TYPE}equal"
+	local HEADLINES="$1"
+	local CMP="$2"
+	shift 2
+	testsuccesswithglobalerror 'testsuccess' 'EW' "$@"
+	cp "${TMPWORKINGDIRECTORY}/rootdir/tmp/testsuccess.output" "${TMPWORKINGDIRECTORY}/rootdir/tmp/testsuccess${TYPE}equal.output"
+	testsuccessequal "$CMP" "${TYPE}" -n "$HEADLINES" "${TMPWORKINGDIRECTORY}/rootdir/tmp/testsuccess${TYPE}equal.output"
+	msggroup
+}
+testsuccessheadequal() {
+	_testsuccessheadtailequal 'head' "$@"
+}
+testsuccesstailequal() {
+	_testsuccessheadtailequal 'tail' "$@"
+}
+checkfoos() {
+	msgmsg 'Install checks with foos dependency type' "$2"
+	for level in 0 1 2; do
+		testsuccessheadequal 7 "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  okay
+The following NEW packages will be installed:
+  foo-${1}-level${level} okay
+0 upgraded, 2 newly installed, 0 to remove and 3 not upgraded." apt install foo-${1}-level${level} -s
+		testsuccessheadequal 9 "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  upgrade
+The following NEW packages will be installed:
+  foo-${1}-upgrade-level${level}
+The following packages will be upgraded:
+  upgrade
+1 upgraded, 1 newly installed, 0 to remove and 2 not upgraded." apt install foo-${1}-upgrade-level${level} -s
+	done
+
+	testsuccessheadequal 7 "Reading package lists...
+Building dependency tree...
+The following additional packages will be installed:
+  okay
+The following NEW packages will be installed:
+  foo-${1}-conflict okay
+0 upgraded, 2 newly installed, 0 to remove and 3 not upgraded." apt install foo-${1}-conflict -s
+}
+checkfoos 'd' 'Depends'
+checkfoos 'r' 'Recommends'
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Calculating upgrade...
+The following NEW packages will be installed:
+   foo-d-upgrade-level2 (1)
+The following packages have been kept back:
+   bad-upgrade-level0 (1 => 2)
+   bad-upgrade-level1 (1 => 2)
+The following packages will be upgraded:
+   upgrade (1 => 2)
+1 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+Inst upgrade [1] (2 unstable [all])
+Inst foo-d-upgrade-level2 (1 unstable [all])
+Conf upgrade (2 unstable [all])
+Conf foo-d-upgrade-level2 (1 unstable [all])' apt full-upgrade foo-d-upgrade-level2 -sV
+
+TEST_WITH_APTITUDE=false
+msgtest 'Check if aptitude is available for additional tests'
+if dpkg-checkbuilddeps -d 'aptitude' /dev/null >/dev/null 2>&1; then
+	TEST_WITH_APTITUDE=true
+	# we don't document aptitude config options
+	sed -i -e '/^#x-apt-configure-index/ d' "$(getaptconfig)"
+	msgpass
+else
+	msgskip 'not installed'
+fi
+
+if $TEST_WITH_APTITUDE; then
+	OKAYAPTITUDE='0 packages upgraded, 2 newly installed, 0 to remove and 3 not upgraded.
+Need to get 0 B/84 B of archives. After unpacking 86.0 kB will be used.
+Would download/install/remove packages.'
+	testsuccesstailequal 3 "$OKAYAPTITUDE" aptitude install foo-d-level2 -sy
+	testsuccesstailequal 3 "$OKAYAPTITUDE" aptitude install foo-r-level2 -sy
+	testsuccesstailequal 3 "$OKAYAPTITUDE" aptitude install foo-d-conflict -sy
+	testsuccesstailequal 3 "$OKAYAPTITUDE" aptitude install foo-r-conflict -sy
+fi
+
+BADSOLVETEXT='Reading package lists...
+Building dependency tree...
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+'
+
+testfailureequal "$BADSOLVETEXT
+The following packages have unmet dependencies:
+ bad-level0 : Depends: unknown but it is not installable
+ bad-upgrade-level0 : Depends: unknown but it is not installable
+E: Unable to correct problems, you have held broken packages." apt install bad-upgrade-level1 -s
+testfailureequal "$BADSOLVETEXT
+The following packages have unmet dependencies:
+ bad-conflict-level0 : Conflicts: bad-conflict-level2 but 1 is to be installed
+ bad-level0 : Depends: unknown but it is not installable
+E: Unable to correct problems, you have held broken packages." apt install bad-conflict-level2 -s
+
+if $TEST_WITH_APTITUDE; then
+	testsuccesstailequal 6 'The following packages have been kept back:
+  bad-upgrade-level1 
+No packages will be installed, upgraded, or removed.
+0 packages upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+Need to get 0 B of archives. After unpacking 0 B will be used.
+Would download/install/remove packages.' aptitude install bad-upgrade-level1 -sy
+	# aptitude does not show the kept back message in this case…
+	testsuccesstailequal 4 'No packages will be installed, upgraded, or removed.
+0 packages upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+Need to get 0 B of archives. After unpacking 0 B will be used.
+Would download/install/remove packages.' aptitude install bad-conflict-level2 -sy
+fi

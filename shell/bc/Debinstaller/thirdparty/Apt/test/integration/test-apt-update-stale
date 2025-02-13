@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Ensure that a MITM can not stale the Packages/Sources without
+# raising a error message. Note that the Release file is protected
+# via the "Valid-Until" header
+#
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture "i386"
+
+insertpackage 'unstable' 'foo' 'i386' '1.0'
+
+setupaptarchive --no-update
+changetowebserver
+
+echo "Acquire::Languages \"none\";" > rootdir/etc/apt/apt.conf.d/00nolanguages
+testsuccess aptget update -o Debug::pkgAcquire::Worker=1 -o Debug::Acquire::http=1
+listcurrentlistsdirectory > lists.before
+
+# insert new version
+mkdir aptarchive/dists/unstable/main/binary-i386/saved
+cp -p aptarchive/dists/unstable/main/binary-i386/Packages* \
+     aptarchive/dists/unstable/main/binary-i386/saved
+insertpackage 'unstable' 'foo' 'i386' '2.0'
+touch -d '+1 hour' aptarchive/dists/unstable/main/binary-i386/Packages
+compressfile aptarchive/dists/unstable/main/binary-i386/Packages
+# ensure that we do not get a I-M-S hit for the Release file
+
+generatereleasefiles '+1hour'
+signreleasefiles
+
+# but now only deliver the previous Packages file instead of the new one
+# (simulating a stale attack)
+cp -p aptarchive/dists/unstable/main/binary-i386/saved/Packages* \
+     aptarchive/dists/unstable/main/binary-i386/
+
+# ensure this raises an error
+testfailure aptget update -o Debug::pkgAcquire::Worker=1 -o Debug::Acquire::http=1
+testsuccess grep 'File has unexpected size' rootdir/tmp/testfailure.output
+testfileequal lists.before "$(listcurrentlistsdirectory)"

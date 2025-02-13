@@ -1,0 +1,59 @@
+/*! \page debug Debugging boosted applications
+
+\section debugging Debugging
+
+To debug a launched application, the debugger must be attached to an
+already running booster process.
+
+1. Run the following command:
+
+\code
+gdb /usr/bin/applauncherd.bin $(pgrep booster-d)
+\endcode
+
+2. Set a breakpoint to the application code and let the process
+continue to that point:
+
+\code
+(gdb) break main.cpp:42
+No source file named main.cpp.
+Make breakpoint pending on future shared library load? (y or [n]) y
+
+Breakpoint 1 (main.cpp:42) pending.
+(gdb) c
+Continuing.
+\endcode
+
+3. Invoke the application with the booster to which the debugger
+is attached:
+
+\code
+invoker --type=d /usr/bin/myApp
+\endcode
+
+\subsection pie-binaries PIE binaries and debugging
+
+If you use the \c pkg-config when building your binaries, they are
+linked with the \c -pie flag. The \c -pie flag  makes your binaries
+\e position-independent \e executables. This means that the executables
+can be either used as a normal shared library or run, for example, from
+the command line.
+
+This creates problems when debugging your application with gdb older than
+version 7.1 which introduced the support for PIE binaries.
+
+To use gdb 7.0 or earlier, link your binaries as
+libraries by using \c -shared instead of \c -pie. After this, you cannot
+execute your binaries directly, you have to use \c invoker.
+
+Setting correct linker flags with qmake:
+
+\code
+QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
+QMAKE_LFLAGS += -shared -rdynamic
+\endcode
+
+Remember to remove the CONFIG += qdeclarative-boostable, if used
+(the same applies for meegotouch-boostable or qt-boostable).
+
+*/

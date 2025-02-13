@@ -1,0 +1,66 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'unstable' 'cool' 'all' '1.0-1'
+
+getcodenamefromsuite() {
+	if [ "$SUITE" = 'unstable' ]; then
+		echo -n 'sid'
+	else
+		echo -n "$SUITE"
+	fi
+}
+getreleaseversionfromsuite() {
+	if [ "$SUITE" = 'unstable' ]; then
+		echo -n '42.0'
+	else
+		echo -n '0.8.15'
+	fi
+}
+
+getlabelfromsuite() {
+	if [ "$SUITE" = 'unstable' ]; then
+		echo -n 'UnstableTestcases'
+	else
+		echo -n 'Testcases'
+	fi
+}
+
+setupaptarchive
+
+passdist() {
+	msgtest 'Test that target-release is accepted' $1
+	testsuccess --nomsg aptget dist-upgrade -t $1
+	msgtest 'Test that target-release pins with' $1
+	aptcache policy -t $1 | grep -q ' 990' && msgpass || msgfail
+}
+
+faildist() {
+	msgtest 'Test that target-release is refused' $1
+	testfailure --nomsg aptget dist-upgrade -t $1
+}
+
+msgtest 'Test that no default-release is active in this test' 'setup'
+aptcache policy | grep -q ' 990' && msgfall || msgpass
+
+passdist unstable
+passdist sid
+faildist sidd
+faildist stable
+passdist 42.0
+passdist 42.*
+passdist 42*
+passdist 4*.0
+faildist 21.0
+faildist 21*
+# we accept, but don't validate the following
+passdist a=unstable
+passdist n=sid
+passdist v=42.0
+passdist c=main
+passdist l=UnstableTestcases

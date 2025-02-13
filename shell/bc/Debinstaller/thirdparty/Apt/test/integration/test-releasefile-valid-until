@@ -1,0 +1,57 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'i386'
+
+insertpackage 'wheezy' 'apt' 'all' '0.8.15'
+
+getlabelfromsuite() {
+	echo -n 'Testcases'
+}
+
+setupaptarchive --no-update
+
+runtest() {
+	local MSG="$1"
+	msgtest "Release file is $MSG as it has" "$2"
+	rm -rf rootdir/var/lib/apt/lists
+	generatereleasefiles "$3" "$4"
+	signreleasefiles
+	shift 4
+	if [ "$MSG" = 'accepted' ]; then
+		testsuccess --nomsg aptget update "$@"
+		testfailure grep -q 'is expired' rootdir/tmp/testsuccess.output
+	else
+		testfailure --nomsg aptget update "$@"
+		testsuccess grep -q 'is expired' rootdir/tmp/testfailure.output
+	fi
+}
+
+runtest 'accepted' 'no Until' '' ''
+runtest 'accepted' 'no Until and good Max-Valid' '' '' -o Acquire::Max-ValidTime=3600
+runtest 'rejected' 'no Until, but bad Max-Valid' 'now - 2 days' '' -o Acquire::Max-ValidTime=3600
+runtest 'accepted' 'good Until' 'now - 3 days' 'now + 1 day'
+runtest 'rejected' 'bad Until' 'now - 7 days' 'now - 4 days'
+runtest 'rejected' 'bad Until (ignore good Max-Valid)' 'now - 7 days' 'now - 4 days' -o Acquire::Max-ValidTime=1209600
+runtest 'rejected' 'bad Max-Valid (bad Until)' 'now - 7 days' 'now - 4 days' -o Acquire::Max-ValidTime=86400
+runtest 'rejected' 'bad Max-Valid (good Until)' 'now - 7 days' 'now + 4 days' -o Acquire::Max-ValidTime=86400
+runtest 'accepted' 'good labeled Max-Valid' 'now - 7 days' 'now + 4 days' -o Acquire::Max-ValidTime=86400 -o Acquire::Max-ValidTime::Testcases=1209600
+runtest 'rejected' 'bad labeled Max-Valid' 'now - 7 days' 'now + 4 days' -o Acquire::Max-ValidTime=1209600 -o Acquire::Max-ValidTime::Testcases=86400
+runtest 'accepted' 'good Until (good Min-Valid, no Max-Valid)' 'now - 7 days' 'now + 1 days' -o Acquire::Min-ValidTime=1209600
+runtest 'accepted' 'good Min-Valid (bad Until, no Max-Valid)' 'now - 7 days' 'now - 4 days' -o Acquire::Min-ValidTime=1209600
+runtest 'accepted' 'good Min-Valid (bad Until, good Max-Valid) <' 'now - 7 days' 'now - 2 days' -o Acquire::Min-ValidTime=1209600 -o Acquire::Max-ValidTime=2419200
+runtest 'rejected' 'bad Max-Valid (bad Until, good Min-Valid) >' 'now - 7 days' 'now - 2 days' -o Acquire::Max-ValidTime=12096 -o Acquire::Min-ValidTime=2419200
+runtest 'rejected' 'bad Max-Valid (bad Until, bad Min-Valid) <' 'now - 7 days' 'now - 2 days' -o Acquire::Min-ValidTime=12096 -o Acquire::Max-ValidTime=241920
+runtest 'rejected' 'bad Max-Valid (bad Until, bad Min-Valid) >' 'now - 7 days' 'now - 2 days' -o Acquire::Max-ValidTime=12096 -o Acquire::Min-ValidTime=241920
+
+sed -i -e 's#\(deb\(-src\)\?\) #\1 [check-valid-until=no] #' rootdir/etc/apt/sources.list.d/*
+runtest 'accepted' 'bad Until but overridden by sources option' 'now - 7 days' 'now - 4 days'
+
+sed -i -e 's#\(deb\(-src\)\?\) \[check-valid-until=no\] #\1 [valid-until-max=86400] #' rootdir/etc/apt/sources.list.d/*
+runtest 'rejected' 'bad Max-Valid (good Until) via sources option' 'now - 7 days' 'now + 4 days'
+
+sed -i -e 's#\(deb\(-src\)\?\) \[valid-until-max=86400\] #\1 [valid-until-min=1209600] #' rootdir/etc/apt/sources.list.d/*
+runtest 'accepted' 'good Min-Valid (bad Until) via sources option' 'now - 7 days' 'now - 4 days'

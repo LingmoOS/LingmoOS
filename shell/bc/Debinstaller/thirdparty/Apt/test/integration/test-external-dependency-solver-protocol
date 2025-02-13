@@ -1,0 +1,319 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64' 'i386'
+
+insertinstalledpackage 'cool' 'all' '1'
+insertinstalledpackage 'stuff' 'all' '1'
+insertinstalledpackage 'somestuff' 'all' '1' 'Depends: cool, stuff'
+
+insertpackage 'unstable' 'cool' 'all' '2' 'Multi-Arch: foreign'
+insertpackage 'unstable' 'stuff' 'all' '2' 'Multi-Arch: foreign'
+insertpackage 'unstable' 'coolstuff' 'i386,amd64' '2' 'Depends: cool, stuff'
+insertpackage 'unstable' 'awesome' 'all' '2' 'Multi-Arch: foreign
+Conflicts: badstuff'
+insertpackage 'unstable' 'badstuff' 'all' '2' 'Multi-Arch: foreign
+Conflicts: awesome'
+insertpackage 'unstable' 'awesomecoolstuff' 'i386' '2' 'Depends: coolstuff, awesome'
+
+insertpackage 'experimental' 'cool' 'all' '3' 'Multi-Arch: foreign'
+insertpackage 'experimental' 'stuff' 'all' '3' 'Multi-Arch: foreign'
+insertpackage 'experimental' 'coolstuff' 'i386,amd64' '3' 'Depends: cool, stuff'
+
+setupaptarchive
+
+testsuccess aptget install --solver apt coolstuff -s
+testempty find . -name 'edsp.last.*'
+echo 'Dir::Log::Solver "edsp.last.xz";' > rootdir/etc/apt/apt.conf.d/log-edsp.conf
+
+testfailure aptget install --solver dump coolstuff -s
+testsuccess grep 'ERR_NO_FILENAME' rootdir/tmp/testfailure.output
+testfailure test -s rootdir/var/log/apt/edsp.last.xz
+export APT_EDSP_DUMP_FILENAME="/nonexistent/apt/edsp.dump"
+testfailure aptget install --solver dump coolstuff -s
+testsuccess grep 'ERR_CREATE_FILE' rootdir/tmp/testfailure.output
+testfailure test -s rootdir/var/log/apt/edsp.last.xz
+export APT_EDSP_DUMP_FILENAME="${TMPWORKINGDIRECTORY}/downloaded/dump.edsp"
+
+testfailureequal 'Reading package lists...
+Building dependency tree...
+Execute external solver...
+The solver encountered an error of type: ERR_JUST_DUMPING
+The following information might help you to understand what is wrong:
+I am too dumb, i can just dump!
+Please use one of my friends instead!
+
+E: External solver failed with: I am too dumb, i can just dump!' aptget install --solver dump coolstuff -s
+testfailure test -s rootdir/var/log/apt/edsp.last.xz
+testsuccess test -s "$APT_EDSP_DUMP_FILENAME"
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Execute external solver...
+The following NEW packages will be installed:
+  coolstuff
+0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+Inst coolstuff (2 unstable [amd64])
+Conf coolstuff (2 unstable [amd64])' aptget install --solver apt coolstuff -s
+testsuccess test -s rootdir/var/log/apt/edsp.last.xz
+sed -i -e 's#^Solver: dump$#Solver: apt#' "$APT_EDSP_DUMP_FILENAME"
+testequal "$(cat "$APT_EDSP_DUMP_FILENAME")
+" apthelper cat-file rootdir/var/log/apt/edsp.last.xz
+cp rootdir/var/log/apt/edsp.last.xz rootdir/var/log/apt/edsp.last.xz.1
+rm -f "$APT_EDSP_DUMP_FILENAME"
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Execute external solver...
+The following NEW packages will be installed:
+  coolstuff
+0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+Inst coolstuff (3 experimental [amd64])
+Conf coolstuff (3 experimental [amd64])' aptget install --solver apt coolstuff -s -t experimental
+testfailure cmp rootdir/var/log/apt/edsp.last.xz rootdir/var/log/apt/edsp.last.xz.1
+
+testsuccessequal "Reading package lists...
+Building dependency tree...
+Selected version '3' (experimental [amd64]) for 'coolstuff'
+Execute external solver...
+The following NEW packages will be installed:
+  coolstuff
+0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+Inst coolstuff (3 experimental [amd64])
+Conf coolstuff (3 experimental [amd64])" aptget install --solver apt coolstuff/experimental -sq=0
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Execute external solver...
+The following NEW packages will be installed:
+  coolstuff
+0 upgraded, 1 newly installed, 0 to remove and 2 not upgraded.
+Inst coolstuff (3 experimental [amd64])
+Conf coolstuff (3 experimental [amd64])' aptget install --solver apt coolstuff=3 -sq=0
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Execute external solver...
+The following packages will be REMOVED:
+  somestuff
+0 upgraded, 0 newly installed, 1 to remove and 2 not upgraded.
+Remv somestuff [1]' aptget autoremove --solver apt somestuff -s
+testsuccess aptmark auto cool stuff
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+Execute external solver...
+The following packages will be REMOVED:
+  cool somestuff stuff
+0 upgraded, 0 newly installed, 3 to remove and 0 not upgraded.
+Remv somestuff [1]
+Remv cool [1]
+Remv stuff [1]' aptget autoremove --solver apt somestuff -s
+
+AUTOREMOVE='apt autoremove'
+if [ -n "$SUDO_USER" ]; then
+	AUTOREMOVE="sudo $AUTOREMOVE"
+fi
+testsuccessequal "Reading package lists...
+Building dependency tree...
+Reading state information...
+Execute external solver...
+The following package was automatically installed and is no longer required:
+  stuff
+Use '$AUTOREMOVE' to remove it.
+The following packages will be REMOVED:
+  cool* somestuff*
+0 upgraded, 0 newly installed, 2 to remove and 1 not upgraded.
+Purg somestuff [1]
+Purg cool [1]" aptget purge --solver apt cool -s
+
+testsuccess aptget install awesomecoolstuff:i386 -s
+testsuccess aptget install --solver apt awesomecoolstuff:i386 -s
+
+rm -f "$APT_EDSP_DUMP_FILENAME"
+testfailure aptget install --solver dump awesomecoolstuff:i386 -s
+testsuccess test -s "$APT_EDSP_DUMP_FILENAME"
+testequal 'Install: awesomecoolstuff:i386' grep :i386 "$APT_EDSP_DUMP_FILENAME"
+testfailure grep -e ':amd64' -e 'Architecture: any' "$APT_EDSP_DUMP_FILENAME"
+
+testsuccess aptget dist-upgrade -s
+testsuccess aptget dist-upgrade -s --solver apt
+
+testsuccess aptget upgrade -s
+testsuccess aptget upgrade -s --solver apt
+
+testfailure aptget install awesome badstuff -s
+testfailure aptget install awesome badstuff -s --solver apt
+testsuccess grep 'ERR_UNSOLVABLE' rootdir/tmp/testfailure.output
+msgtest 'A resolving error is format as' 'valid parseable EDSP error'
+if dpkg-checkbuilddeps -d 'dctrl-tools' /dev/null >/dev/null 2>&1; then
+	if apthelper cat-file rootdir/var/log/apt/edsp.last.xz | aptinternalsolver > solver.result 2>&1; then
+		testsuccess --nomsg grep-dctrl -FError ERR -- solver.result
+	else
+		msgfail
+	fi
+else
+	msgskip 'dctrl-tools not installed'
+fi
+configarchitecture 'armel'
+testfailure aptget install --solver apt awesomecoolstuff:i386 -s
+msgtest 'An invalid EDSP file generates a' 'hard error'
+if printf "%b\n" "Request: This is a test\nFoo: bar\n\n" | aptinternalsolver > solver.result 2>&1; then
+	cat solver.result
+	msgfail
+else
+	msgpass
+fi
+msgtest 'Test direct calling is okay for' 'apt-internal-solver'
+cat "$APT_EDSP_DUMP_FILENAME" | aptinternalsolver > solver.result 2>&1 || true
+if [ "$(tail -n2 solver.result | head -n1 )" = "Message: Done" ]; then
+	msgpass
+else
+	cat solver.result
+	msgfail
+fi
+testsuccess grep '^APT-ID: 1$' "$APT_EDSP_DUMP_FILENAME"
+sed -i -e 's#^APT-ID: 1$#APT-ID: 10000#' "$APT_EDSP_DUMP_FILENAME"
+cat "$APT_EDSP_DUMP_FILENAME" | aptinternalsolver > solver.result 2>&1 || true
+testsuccessequal 'Message: Done
+' tail -n2 solver.result
+rm -f "$APT_EDSP_DUMP_FILENAME"
+
+testsuccess aptinternalsolver scenario
+testsuccessequal 'Package: stuff
+Architecture: all
+Version: 3
+APT-ID: 1
+Multi-Arch: foreign
+Source: stuff
+Source-Version: 3
+Priority: optional
+Section: other
+APT-Release:
+ a=experimental,n=experimental,c=main,b=all
+APT-Pin: 1
+
+Package: stuff
+Architecture: all
+Version: 2
+APT-ID: 3
+Multi-Arch: foreign
+Source: stuff
+Source-Version: 2
+Priority: optional
+Section: other
+APT-Release:
+ a=unstable,n=sid,c=main,b=all
+APT-Pin: 500
+APT-Candidate: yes
+
+Package: stuff
+Architecture: all
+Version: 1
+APT-ID: 7
+Source: stuff
+Source-Version: 1
+Priority: optional
+Section: other
+Installed: yes
+APT-Pin: 100
+' aptinternalsolver scenario stuff
+
+cat > rootdir/usr/lib/apt/solvers/explicitremove << EOF
+#!/bin/sh
+set -e
+while read line; do
+	if [ "APT-ID" = "\${line%:*}" ]; then
+		cat << APT
+Install: \${line#*:}
+
+Remove: \${line#*:}
+
+APT
+	fi
+done
+EOF
+chmod +x rootdir/usr/lib/apt/solvers/explicitremove
+testfailure apt full-upgrade -s --solver explicitremove
+testsuccess grep 'had a previous stanza' rootdir/tmp/testfailure.output
+
+cat > rootdir/usr/lib/apt/solvers/removeall << EOF
+#!/bin/sh
+set -e
+while read line; do
+	if [ "APT-ID" = "\${line%:*}" ]; then
+		cat << APT
+Remove: \${line#*:}
+
+APT
+	fi
+done
+EOF
+chmod +x rootdir/usr/lib/apt/solvers/removeall
+testwarning apt full-upgrade -s --solver removeall
+testsuccess grep "which isn't installed!" rootdir/tmp/testwarning.output
+
+cat > rootdir/usr/lib/apt/solvers/installall << EOF
+#!/bin/sh
+set -e
+while read line; do
+	if [ "APT-ID" = "\${line%:*}" ]; then
+		cat << APT
+Install: \${line#*:}
+
+APT
+	fi
+done
+EOF
+chmod +x rootdir/usr/lib/apt/solvers/installall
+testfailure apt full-upgrade -s --solver installall
+testsuccess grep "is already installed!" rootdir/tmp/testfailure.output
+
+testsolverfailuremsg() {
+	local SOLVER="rootdir/usr/lib/apt/solvers/$1"
+	echo "$2" > "$SOLVER"
+	chmod +x "$SOLVER"
+	testfailuremsg "$3" apt full-upgrade -s --solver $1
+}
+
+testsolverfailuremsg 'exit0withmsg' "#!/bin/sh
+echo 'Error: instant-exit
+Message: This solver exits instantly'
+exit 0" 'E: External solver failed with: This solver exits instantly'
+
+testsolverfailuremsg 'exit1withoutmsg' "#!/bin/sh
+exit 1" 'E: Sub-process exit1withoutmsg returned an error code (1)'
+
+testsolverfailuremsg 'exit1withmsg' "#!/bin/sh
+echo 'Error: instant-exit
+Message: This solver exits instantly'
+exit 1" 'E: External solver failed with: This solver exits instantly
+E: Sub-process exit1withmsg returned an error code (1)'
+
+configarchitecture 'amd64' 'i386'
+for arch in 'amd64' 'i386' 'armel' 'armhf'; do
+	insertinstalledpackage "dummy-httpd-$arch" "$arch" '1' 'Provides: httpd'
+done
+buildsimplenativepackage 'dummy-webserver' 'all' '1' 'unstable' 'Provides: httpd
+Multi-Arch: foreign'
+testfailure apt install -s dummy-webserver
+testsuccess apt install -s ./incoming/dummy-webserver_1_all.deb
+testsuccess apt install -s ./incoming/dummy-webserver_1_all.deb --solver apt
+testfailure apt install -s ./incoming/dummy-webserver_1_all.deb --solver dump
+
+testsuccess aptcache showpkg dummy-webserver --with-source ./incoming/dummy-webserver_1_all.deb
+cp -a rootdir/tmp/testsuccess.output showpkg.output
+testequal 'Reverse Depends: 
+Dependencies: 
+1 - 
+Provides: 
+1 - ./incoming/dummy-webserver_1_all.deb (= 1) httpd:armhf (= ) httpd:armel (= ) httpd:i386 (= ) httpd (= ) 
+Reverse Provides: ' tail -n 6 showpkg.output
+testsuccessequal 'Provides: httpd
+Provides: httpd
+Provides: httpd
+Provides: httpd
+Provides: httpd' grep 'Provides:' "$APT_EDSP_DUMP_FILENAME"

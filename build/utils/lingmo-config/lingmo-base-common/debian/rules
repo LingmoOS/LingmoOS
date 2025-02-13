@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+
+OSNAME = "GNU/`uname | sed -e 's/GNU\///'`"
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+  OSNAME=GNU/Linux
+endif
+ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
+  OSNAME=GNU/Hurd
+endif
+
+BUILDDATE = "`date +%Y%m%d%H%M`"
+
+VENDORFILE = debian
+DESTDIR = debian/lingmo-base-files
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	sh debian/check-md5sum-etc profile
+	sed -e "s/#VENDORFILE#/$(VENDORFILE)/g" debian/postinst.in > debian/postinst
+
+override_dh_auto_install:
+	install -p -m 644 etc/*      $(DESTDIR)/etc
+	install -p -m 755 motd/*     $(DESTDIR)/etc/update-motd.d
+	install -p -m 644 licenses/* $(DESTDIR)/usr/share/common-licenses
+	install -p -m 644 origins/*  $(DESTDIR)/etc/dpkg/origins
+	install -p -m 644 share/*    $(DESTDIR)/usr/share/base-files
+ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
+	rmdir $(DESTDIR)/sys
+endif
+	sed -e "s&#BUILDDATE#&$(BUILDDATE)&g" etc/os-release > $(DESTDIR)/etc/os-release
+	mkdir -p $(DESTDIR)/usr/lib
+	mv $(DESTDIR)/etc/os-release $(DESTDIR)/usr/lib/os-release
+	ln -s ../usr/lib/os-release $(DESTDIR)/etc/os-release
+
+override_dh_installchangelogs:
+	dh_installchangelogs --no-trim
+
+override_dh_link:
+	dh_link -X os-release
+
+override_dh_compress:
+	dh_compress -X README
+
+override_dh_fixperms:
+	dh_fixperms
+	cd debian/lingmo-base-files && chown root:staff   var/local
+	cd debian/lingmo-base-files && chmod 755  `find . -type d`
+	cd debian/lingmo-base-files && chmod 1777 `cat ../1777-dirs`
+	cd debian/lingmo-base-files && chmod 2775 `cat ../2775-dirs`
+	cd debian/lingmo-base-files && chmod 700 root

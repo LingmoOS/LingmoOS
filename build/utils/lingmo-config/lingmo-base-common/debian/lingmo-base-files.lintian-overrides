@@ -1,0 +1,35 @@
+#
+# Permissions 0700 on /root are intentional as people expect
+# the /root directory to be more private than /home/* directories.
+#
+base-files: non-standard-dir-perm 0700 != 0755 [root/]
+#
+# The /etc/os-release symlink is relative on purpose to avoid breaking dracut.
+# See Bug #755394 for details.
+#
+base-files: relative-symlink ../usr/lib/os-release [etc/os-release]
+#
+# The purpose of having licenses here is precisely to allow
+# other packages to reference them.
+#
+base-files: extra-license-file [usr/share/common-licenses/Artistic]
+base-files: extra-license-file [usr/share/common-licenses/BSD]
+base-files: extra-license-file [usr/share/common-licenses/GPL-1]
+base-files: extra-license-file [usr/share/common-licenses/GPL-2]
+base-files: extra-license-file [usr/share/common-licenses/GPL-3]
+base-files: extra-license-file [usr/share/common-licenses/LGPL-2]
+base-files: extra-license-file [usr/share/common-licenses/LGPL-2.1]
+base-files: extra-license-file [usr/share/common-licenses/LGPL-3]
+#
+# These links really should be relative.
+#
+base-files: relative-symlink usr/bin [bin]
+base-files: relative-symlink usr/lib [lib]
+base-files: relative-symlink usr/lib64 [lib64]
+base-files: relative-symlink usr/libx32 [libx32]
+base-files: relative-symlink usr/sbin [sbin]
+#
+# We need these for the relevant architectures.
+#
+base-files: non-multi-arch-lib-dir [usr/lib64/]
+base-files: non-multi-arch-lib-dir [usr/libx32/]

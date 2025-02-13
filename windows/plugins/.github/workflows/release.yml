@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Build Tarball
+        run: |
+          ls -la
+          mkdir -p lingmo-kwin-plugins
+          cp -R $(ls | grep -xv lingmo-kwin-plugins) lingmo-kwin-plugins/
+          tar -cJf lingmo-kwin-plugins.tar.xz lingmo-kwin-plugins
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+            files: lingmo-kwin-plugins.tar.xz
+            name: Release ${{ github.ref }}
+
+      - name: Cleanup
+        run: rm lingmo-kwin-plugins.tar.xz

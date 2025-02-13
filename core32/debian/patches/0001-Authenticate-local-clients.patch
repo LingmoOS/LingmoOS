@@ -1,0 +1,128 @@
+From 061651824683fc728b804a5cbf8a51e4d62194e0 Mon Sep 17 00:00:00 2001
+From: David Edmundson <kde@davidedmundson.co.uk>
+Date: Sat, 13 Apr 2024 23:07:19 +0100
+Subject: Authenticate local clients
+
+ksmserver currently authenticates remote clients, but allows local
+connections through.
+
+This is a security risk that can allow another user on the same system
+to access the user's session management session without authentication.
+
+Co-authored-by: Fabian Vogt <fabian@ritter-vogt.de>
+---
+ ksmserver/server.cpp | 58 +++-----------------------------------------
+ 1 file changed, 4 insertions(+), 54 deletions(-)
+
+diff --git a/ksmserver/server.cpp b/ksmserver/server.cpp
+index 8a408cf73b..94b6952d4b 100644
+--- a/ksmserver/server.cpp
++++ b/ksmserver/server.cpp
+@@ -158,15 +158,6 @@ static QTemporaryFile *remTempFile = nullptr;
+ 
+ static IceListenObj *listenObjs = nullptr;
+ int numTransports = 0;
+-static bool only_local = 0;
+-
+-static Bool HostBasedAuthProc(char * /*hostname*/)
+-{
+-    if (only_local)
+-        return true;
+-    else
+-        return false;
+-}
+ 
+ Status KSMRegisterClientProc(SmsConn /* smsConn */, SmPointer managerData, char *previousId)
+ {
+@@ -311,34 +302,6 @@ static void write_iceauth(FILE *addfp, FILE *removefp, IceAuthDataEntry *entry)
+ 
+ #define MAGIC_COOKIE_LEN 16
+ 
+-Status SetAuthentication_local(int count, IceListenObj *listenObjs)
+-{
+-    int i;
+-    for (i = 0; i < count; i++) {
+-        char *prot = IceGetListenConnectionString(listenObjs[i]);
+-        if (!prot)
+-            continue;
+-        char *host = strchr(prot, '/');
+-        char *sock = nullptr;
+-        if (host) {
+-            *host = 0;
+-            host++;
+-            sock = strchr(host, ':');
+-            if (sock) {
+-                *sock = 0;
+-                sock++;
+-            }
+-        }
+-        qCDebug(KSMSERVER) << "KSMServer: SetAProc_loc: conn " << (unsigned)i << ", prot=" << prot << ", file=" << sock;
+-        if (sock && !strcmp(prot, "local")) {
+-            chmod(sock, 0700);
+-        }
+-        IceSetHostBasedAuthProc(listenObjs[i], HostBasedAuthProc);
+-        free(prot);
+-    }
+-    return 1;
+-}
+-
+ Status SetAuthentication(int count, IceListenObj *listenObjs, IceAuthDataEntry **authDataEntries)
+ {
+     QTemporaryFile addTempFile;
+@@ -372,8 +335,6 @@ Status SetAuthentication(int count, IceListenObj *listenObjs, IceAuthDataEntry *
+         write_iceauth(addAuthFile, remAuthFile, &(*authDataEntries)[i + 1]);
+ 
+         IceSetPaAuthData(2, &(*authDataEntries)[i]);
+-
+-        IceSetHostBasedAuthProc(listenObjs[i / 2], HostBasedAuthProc);
+     }
+     fclose(addAuthFile);
+     fclose(remAuthFile);
+@@ -397,9 +358,6 @@ Status SetAuthentication(int count, IceListenObj *listenObjs, IceAuthDataEntry *
+ void FreeAuthenticationData(int count, IceAuthDataEntry *authDataEntries)
+ {
+     /* Each transport has entries for ICE and XSMP */
+-    if (only_local)
+-        return;
+-
+     for (int i = 0; i < count * 2; i++) {
+         free(authDataEntries[i].network_id);
+         free(authDataEntries[i].auth_data);
+@@ -542,16 +500,13 @@ KSMServer::KSMServer(InitFlags flags)
+     clientInteracting = nullptr;
+     xonCommand = config.readEntry("xonCommand", "xon");
+ 
+-    only_local = flags.testFlag(InitFlag::OnlyLocal);
+ #ifdef HAVE__ICETRANSNOLISTEN
+-    if (only_local)
++    if (flags.testFlag(InitFlag::OnlyLocal))
+         _IceTransNoListen("tcp");
+-#else
+-    only_local = false;
+ #endif
+ 
+     char errormsg[256];
+-    if (!SmsInitialize((char *)KSMVendorString, (char *)KSMReleaseString, KSMNewClientProc, (SmPointer)this, HostBasedAuthProc, 256, errormsg)) {
++    if (!SmsInitialize((char *)KSMVendorString, (char *)KSMReleaseString, KSMNewClientProc, (SmPointer)this, nullptr, 256, errormsg)) {
+         qCWarning(KSMSERVER, "KSMServer: could not register XSM protocol");
+     }
+ 
+@@ -594,13 +549,8 @@ KSMServer::KSMServer(InitFlags flags)
+         free(session_manager);
+     }
+ 
+-    if (only_local) {
+-        if (!SetAuthentication_local(numTransports, listenObjs))
+-            qFatal("KSMSERVER: authentication setup failed.");
+-    } else {
+-        if (!SetAuthentication(numTransports, listenObjs, &authDataEntries))
+-            qFatal("KSMSERVER: authentication setup failed.");
+-    }
++    if (!SetAuthentication(numTransports, listenObjs, &authDataEntries))
++        qFatal("KSMSERVER: authentication setup failed.");
+ 
+     IceAddConnectionWatch(KSMWatchProc, (IcePointer)this);
+ 
+-- 
+2.30.2
+

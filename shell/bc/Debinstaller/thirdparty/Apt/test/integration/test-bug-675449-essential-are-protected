@@ -1,0 +1,115 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64' 'i386'
+
+insertinstalledpackage 'pkg-native' 'amd64' '1' 'Multi-Arch: foreign
+Essential: yes'
+insertinstalledpackage 'pkg-foreign' 'i386' '1' 'Multi-Arch: foreign
+Essential: yes'
+insertinstalledpackage 'pkg-none-native' 'amd64' '1' 'Essential: yes'
+insertinstalledpackage 'pkg-none-foreign' 'i386' '1' 'Essential: yes'
+
+insertpackage 'unstable' 'pkg-native' 'amd64,i386' '2' 'Multi-Arch: foreign
+Essential: yes'
+insertpackage 'unstable' 'pkg-foreign' 'amd64,i386' '2' 'Multi-Arch: foreign
+Depends: pkg-depends-new
+Essential: yes'
+insertpackage 'unstable' 'pkg-none-native' 'amd64,i386' '2' 'Essential: yes'
+insertpackage 'unstable' 'pkg-none-foreign' 'amd64,i386' '2' 'Essential: yes
+Depends: pkg-depends-new'
+
+insertpackage 'unstable' 'pkg-none-new' 'amd64,i386' '2' 'Essential: yes'
+insertpackage 'unstable' 'pkg-depends-new' 'amd64,i386' '2' 'Essential: yes'
+
+setupaptarchive
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkg-native*
+WARNING: The following essential packages will be removed.
+This should NOT be done unless you know exactly what you are doing!
+  pkg-native
+0 upgraded, 0 newly installed, 1 to remove and 3 not upgraded.
+Purg pkg-native [1]' aptget purge pkg-native -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkg-foreign:i386*
+WARNING: The following essential packages will be removed.
+This should NOT be done unless you know exactly what you are doing!
+  pkg-foreign:i386
+0 upgraded, 0 newly installed, 1 to remove and 3 not upgraded.
+Purg pkg-foreign:i386 [1]' aptget purge pkg-foreign:i386 -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkg-none-native*
+WARNING: The following essential packages will be removed.
+This should NOT be done unless you know exactly what you are doing!
+  pkg-none-native
+0 upgraded, 0 newly installed, 1 to remove and 3 not upgraded.
+Purg pkg-none-native [1]' aptget purge pkg-none-native -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  pkg-none-foreign:i386*
+WARNING: The following essential packages will be removed.
+This should NOT be done unless you know exactly what you are doing!
+  pkg-none-foreign:i386
+0 upgraded, 0 newly installed, 1 to remove and 3 not upgraded.
+Purg pkg-none-foreign:i386 [1]' aptget purge pkg-none-foreign:i386 -s
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Calculating upgrade...
+The following NEW packages will be installed:
+  pkg-depends-new:i386 pkg-none-new
+The following packages will be upgraded:
+  pkg-foreign:i386 pkg-native pkg-none-foreign:i386 pkg-none-native
+4 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst pkg-depends-new:i386 (2 unstable [i386])
+Conf pkg-depends-new:i386 (2 unstable [i386])
+Inst pkg-foreign:i386 [1] (2 unstable [i386])
+Conf pkg-foreign:i386 (2 unstable [i386])
+Inst pkg-native [1] (2 unstable [amd64])
+Conf pkg-native (2 unstable [amd64])
+Inst pkg-none-foreign:i386 [1] (2 unstable [i386])
+Conf pkg-none-foreign:i386 (2 unstable [i386])
+Inst pkg-none-native [1] (2 unstable [amd64])
+Conf pkg-none-native (2 unstable [amd64])
+Inst pkg-none-new (2 unstable [amd64])
+Conf pkg-none-new (2 unstable [amd64])' aptget dist-upgrade -s
+
+insertinstalledpackage 'foo' 'amd64' '1' 'Depends: libfoo
+Essential: yes'
+insertinstalledpackage 'libfoo' 'amd64' '1'
+testequal 'Reading package lists...
+Building dependency tree...
+The following packages will be REMOVED:
+  foo* libfoo*
+WARNING: The following essential packages will be removed.
+This should NOT be done unless you know exactly what you are doing!
+  foo libfoo (due to foo)
+0 upgraded, 0 newly installed, 2 to remove and 4 not upgraded.
+Purg foo [1]
+Purg libfoo [1]' aptget purge foo libfoo -s
+
+testequal 'Reading package lists...
+Building dependency tree...
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ foo : Depends: libfoo but it is not going to be installed
+E: Error, pkgProblemResolver::Resolve generated breaks, this may be caused by held packages.' aptget purge libfoo -s

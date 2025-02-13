@@ -1,0 +1,158 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64' 'i386'
+
+insertpackage 'unstable' 'bar' 'amd64,i386' '1'
+insertpackage 'unstable' 'uninstalled' 'all' '1'
+insertpackage 'unstable' 'uninstalled-native' 'amd64' '1'
+
+insertinstalledpackage 'foo' 'all' '1'
+insertinstalledpackage 'bar' 'amd64' '1'
+
+setupaptarchive
+
+testnoautopkg() {
+	testempty aptmark showauto
+	testempty aptcache -q=1 showauto
+	testsuccessequal 'bar
+foo' aptmark showmanual
+	testsuccessequal 'bar
+foo' aptmark showmanual bar foo uninstalled
+}
+testfooisauto() {
+	testsuccessequal 'foo' aptmark showauto
+	testsuccessequal 'foo' aptcache -q=1 showauto
+	testsuccessequal 'foo' aptmark showauto foo
+	testsuccessequal 'foo' aptcache -q=1 showauto foo
+	testsuccessequal 'bar' aptmark showmanual
+	testsuccessequal 'bar' aptmark showmanual bar
+}
+testmarkonpkgasauto() {
+	testsuccess $1 -q=1 $2 foo
+	testfooisauto
+	testsuccess $1 -q=1 $2 foo
+	testfooisauto
+
+	testsuccess $1 -q=1 $3 foo
+	testnoautopkg
+	testsuccess $1 -q=1 $3 foo
+	testnoautopkg
+}
+
+testfailureequal 'E: No packages found' aptmark auto
+testfailureequal 'E: No packages found' aptmark manual
+
+testnoautopkg
+testmarkonpkgasauto 'aptmark' 'auto' 'manual'
+testmarkonpkgasauto 'aptmark' 'markauto' 'unmarkauto'
+testmarkonpkgasauto 'aptget' 'markauto' 'unmarkauto'
+
+testnoholdpkg() {
+	testempty aptmark showhold
+	testempty aptmark showholds  # typical "typo"
+}
+testpkgonhold() {
+	testsuccessequal "$1" aptmark showhold
+	testsuccessequal "$1" aptmark showholds
+	testsuccessequal "$1" aptmark showhold $1
+	testsuccessequal "$1" aptmark showholds $1
+}
+testmarkonepkgashold() {
+	testsuccess aptmark hold $1
+	testpkgonhold $1
+	testsuccess aptmark hold $1
+	testpkgonhold $1
+	testsuccess aptmark unhold $1
+	testnoholdpkg
+	testsuccess aptmark unhold $1
+	testnoholdpkg
+}
+
+testfailureequal 'E: No packages found' aptmark hold
+testfailureequal 'E: No packages found' aptmark unhold
+
+testnoholdpkg
+testmarkonepkgashold 'foo'
+testmarkonepkgashold 'bar'
+
+msgtest 'dpkg supports --merge-avail via' 'stdin'
+if dpkg --merge-avail - < /dev/null >/dev/null 2>&1; then
+	msgpass
+else
+	msgskip 'dpkg version too old'
+	exit 0
+fi
+
+testmarkonepkgashold 'uninstalled'
+testmarkonepkgashold 'uninstalled-native'
+
+testsuccessequal 'uninstalled set on hold.' aptmark hold uninstalled
+testsuccessequal 'uninstalled-native set on hold.' aptmark hold uninstalled-native
+# FIXME: Remove old alternative answer for dpkg < 1.20.7 post bullseye release
+testequalor2 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  uninstalled uninstalled-native
+The following held packages will be changed:
+  uninstalled uninstalled-native
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst uninstalled (1 unstable [all])
+Inst uninstalled-native (1 unstable [amd64])
+Conf uninstalled (1 unstable [all])
+Conf uninstalled-native (1 unstable [amd64])' 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  uninstalled uninstalled-native
+The following held packages will be changed:
+  uninstalled-native
+0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.
+Inst uninstalled (1 unstable [all])
+Inst uninstalled-native (1 unstable [amd64])
+Conf uninstalled (1 unstable [all])
+Conf uninstalled-native (1 unstable [amd64])' aptget install uninstalled uninstalled-native -s
+testsuccess aptmark unhold uninstalled uninstalled-native
+
+testselections() {
+	testsuccess aptmark hold "$1"
+	testsuccessequal "$1" aptmark showholds "$1"
+	testsuccess aptmark unhold "$1"
+	testsuccessequal "$1" aptmark showinstalls "$1"
+	testsuccess aptmark hold "$1"
+	testsuccessequal "$1" aptmark showholds "$1"
+	testsuccess aptmark install "$1"
+	testsuccessequal "$1" aptmark showinstalls "$1"
+	testsuccess aptmark remove "$1"
+	testsuccessequal "$1" aptmark showremoves "$1"
+	testsuccess aptmark purge "$1"
+	testsuccessequal "$1" aptmark showpurges "$1"
+}
+testselections 'foo'
+testselections 'bar'
+
+testsuccessequal 'Reading package lists...
+Building dependency tree...
+Reading state information...
+The following packages will be REMOVED:
+  bar* foo*
+0 upgraded, 0 newly installed, 2 to remove and 0 not upgraded.
+Purg bar [1]
+Purg foo [1]' aptget dselect-upgrade -s
+
+testuninstalledselections() {
+	testsuccess aptmark hold "$1"
+	testsuccessequal "$1" aptmark showholds "$1"
+	testsuccess aptmark unhold "$1"
+	testsuccessequal "$1" aptmark showremoves "$1"
+	testsuccess aptmark hold "$1"
+	testsuccessequal "$1" aptmark showholds "$1"
+	testsuccess aptmark install "$1"
+	testsuccessequal "$1" aptmark showinstalls "$1"
+}
+testuninstalledselections 'uninstalled'
+testuninstalledselections 'uninstalled-native'

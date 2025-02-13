@@ -1,0 +1,37 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+
+insertpackage 'unstable' 'foo' 'all' '1'
+insertpackage 'unstable' 'bar' 'amd64' '1'
+insertpackage 'unstable' 'bar' 'i386' '1'
+insertsource 'unstable' 'foo' 'all' '1'
+
+sed -e 's#^Description-en:#Description-de:#' \
+	aptarchive/dists/unstable/main/i18n/Translation-en > aptarchive/dists/unstable/main/i18n/Translation-de
+
+setupaptarchive --no-update
+changetowebserver
+
+# the framework modifies some configs to ensure testability,
+# at the expense of creating an environment which doesn't always
+# reflect apts "normal" behavior on a "normal" system
+echo 'Acquire::IndexTargets::Randomized "true";
+Acquire::Languages { "environment"; "en"; "de"; };
+' > rootdir/etc/apt/apt.conf.d/restore-simplicity
+
+testempty aptget indextargets
+testsuccess aptget update
+testequal 'main/source/Sources
+main/binary-amd64/Packages
+main/binary-all/Packages
+main/i18n/Translation-en
+main/i18n/Translation-de' aptget indextargets --format '$(METAKEY)'
+
+# Check that -o Acquire::Queue-Mode=access does not crash
+find rootdir/var/lib/apt/lists/ -type f -delete
+testsuccess valgrind aptget update -o Acquire::Queue-Mode=access

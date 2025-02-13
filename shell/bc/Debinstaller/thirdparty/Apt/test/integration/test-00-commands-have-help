@@ -1,0 +1,105 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'amd64'
+
+# this test does double duty: The obvious is checking for --help and co,
+# but it also checks if the binary can find all methods in the library.
+# The later is quite handy for manual testing of non-abibreaking changes
+export LD_BIND_NOW=1
+# german variant of klingon used for testing usage of non-existent l10n
+export LC_ALL=tlh_DE.UTF-8
+
+checkversionmessage() {
+	testsuccess grep '^apt .* (' ${1}-help.output
+}
+
+checkhelpmessage() {
+	checkversionmessage "$1"
+	testsuccess grep '^Usage:' ${1}-help.output
+}
+
+checkoptions() {
+	testsuccess $1 --help
+	cp -f rootdir/tmp/testsuccess.output ${1}-help.output
+	checkhelpmessage "$1"
+
+	testsuccess $1 --version
+	cp -f rootdir/tmp/testsuccess.output ${1}-help.output
+	checkversionmessage "$1"
+}
+
+for CMD in 'apt-cache' 'apt-cdrom' 'apt-config' \
+	'apt-extracttemplates' 'apt-get' 'apt-helper' \
+	'apt-mark' 'apt-sortpkgs' 'apt' 'apt-ftparchive'; do
+	cmd="$(echo "$CMD" | tr -d '-')"
+	msgtest 'Test for failure with no parameters calling' "$CMD"
+	if $cmd > ${cmd}-help.output 2>&1; then
+		echo
+		cat ${cmd}-help.output
+		msgfail 'zero exit'
+	else
+		msgpass
+	fi
+	checkhelpmessage "$cmd"
+	checkoptions "$cmd"
+done
+
+
+rred() {
+	runapt "${METHODSDIR}/rred" "$@"
+}
+for CMD in 'apt-dump-solver'  'apt-internal-solver' 'apt-internal-planner' 'rred'; do
+	checkoptions "$(echo "$CMD" | tr -d '-')"
+done
+
+# in times of need, we all look for super cow to save the day
+testsuccess aptget moo
+testsuccess aptget moo -q=2
+testsuccess aptget moo moo
+testsuccess aptget moo moo -q=2
+testsuccess aptget moo moo --color
+testsuccess aptget moo moo moo
+testsuccess aptget moo moo moo -q=2
+testsuccess aptget moo moo moo moo
+testsuccess aptget moo moo moo moo -q=2
+
+export SOURCE_DATE_EPOCH=moo
+testwarningmsg 'W: Environment variable SOURCE_DATE_EPOCH was ignored as it has an invalid value: "moo"' apt moo
+testmoo() {
+	export SOURCE_DATE_EPOCH="$(date -d "$1" +'%s')"
+	testsuccess aptget moo
+	cp rootdir/tmp/testsuccess.output moo.output
+	testsuccess grep "$2" moo.output
+	testsuccessequal "$2" apt moo -qqq
+	unset SOURCE_DATE_EPOCH
+}
+testmoo '@0' 'Have you mooed today?'
+# the year 0 is too early for 32bit architectures
+testmoo '2000-12-25' 'Happy package management day!'
+testmoo '1930-02-18' "It's a Bird ... It's a Plane ... It's Super Cow!"
+testmoo '1966-11-07' 'Whoever needs milk, bows to the animal.'
+testmoo '1988-03-29' 'Have you mooed today?'
+testmoo '1993-08-16' 'Three moos for Debian!'
+testmoo '1998-04-01' 'Have you smashed some milk today?'
+testmoo '@1484822790' 'Have you mooed today?'
+testmoo '@1484822791' 'Have you mooed today?'
+testmoo '@1484822792' 'Have you mooed today?'
+testmoo '@1484822793' 'Have you mooed today?'
+
+# that also helps with reproducibility of output…
+export COLUMNS=80
+testsuccess aptget moo
+export COLUMNS=0
+testwarning aptget moo
+export COLUMNS=80a
+testwarning aptget moo
+export COLUMNS=a80
+testwarning aptget moo
+export COLUMNS=
+testwarning aptget moo
+unset COLUMNS

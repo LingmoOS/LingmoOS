@@ -1,0 +1,361 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+
+setupenvironment
+configarchitecture 'i386'
+
+LISTS='rootdir/etc/apt/sources.list.d/test.list'
+ABSLISTS="$(readlink -f $LISTS)"
+SOURCES='rootdir/etc/apt/sources.list.d/test.sources'
+BASE='# some comment
+# that contains a : as well
+#Types: meep
+
+# a free-standing comment appears
+
+Types: deb
+#Types: deb-src
+URIs: http://ftp.debian.org/debian
+Suites: stable
+Components: main
+Description: summary
+# comments are ignored
+ and the long part'
+
+msgcleantest() {
+	 rm -f $LISTS $SOURCES
+	 msgtest "$@"
+}
+
+msgcleantest 'Test sources.list' 'old style'
+echo "deb http://ftp.debian.org/debian stable main" > $LISTS
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with tabs'
+echo "deb	http://ftp.debian.org/debian	stable main" > $LISTS
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with forgotten end for options'
+echo "deb [trusted=yes arch+=armel,powerpc http://ftp.debian.org/debian stable main" > $LISTS
+testfailureequal --nomsg "E: Malformed entry 1 in list file $ABSLISTS ([option] not assignment)
+E: The list of sources could not be read." aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with stray ] instead of options'
+echo "deb ] http://ftp.debian.org/debian stable main" > $LISTS
+testfailureequal --nomsg "E: Malformed entry 1 in list file $ABSLISTS (URI parse)
+E: The list of sources could not be read." aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style options no key'
+echo "deb [=test] http://ftp.debian.org/debian stable main" > $LISTS
+testfailureequal --nomsg "E: Malformed entry 1 in list file $ABSLISTS ([option] no key)
+E: The list of sources could not be read." aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style options no value'
+echo "deb [test=] http://ftp.debian.org/debian stable main" > $LISTS
+testfailureequal --nomsg "E: Malformed entry 1 in list file $ABSLISTS ([option] no value)
+E: The list of sources could not be read." aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with options'
+echo "deb [trusted=yes arch+=armel,powerpc] http://ftp.debian.org/debian stable main" > $LISTS
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-armel/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-armel_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with comments'
+echo "deb http://ftp.debian.org/debian stable main # non-free" > $LISTS
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'old style with option comments'
+echo "deb [trusted=yes#yeahreally] http://ftp.debian.org/debian stable main # non-free" > $LISTS
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test sources.list' 'simple deb822'
+echo "$BASE"  > $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test deb822 with' 'two entries'
+# Two entries
+echo "$BASE" > $SOURCES
+echo "" >> $SOURCES
+echo "$BASE" | sed  s/stable/unstable/  >> $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/unstable/InRelease' ftp.debian.org_debian_dists_unstable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/unstable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_unstable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/unstable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_unstable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/unstable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_unstable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+# two suite entries
+msgcleantest 'Test deb822 with' 'two Suite entries'
+echo "$BASE"  | sed -e "s/stable/stable unstable/" > $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/unstable/InRelease' ftp.debian.org_debian_dists_unstable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/unstable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_unstable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/unstable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_unstable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/unstable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_unstable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test deb822' 'architecture option'
+echo "$BASE" > $SOURCES
+echo "Architectures: amd64 armel" >> $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-armel/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-armel_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+msgcleantest 'Test old-style' 'suite arch variable'
+echo 'deb http://ftp.tlh.debian.org/universe unstable/binary-$(ARCH)/' > $LISTS
+testsuccessequal --nomsg "'http://ftp.tlh.debian.org/universe/unstable/binary-i386/InRelease' ftp.tlh.debian.org_universe_unstable_binary-i386_InRelease 0 
+'http://ftp.tlh.debian.org/universe/unstable/binary-i386/Packages.xz' ftp.tlh.debian.org_universe_unstable_binary-i386_Packages 0 
+'http://ftp.tlh.debian.org/universe/unstable/binary-i386/en.xz' ftp.tlh.debian.org_universe_unstable_binary-i386_en 0 " aptget update --print-uris
+
+msgcleantest 'Test deb822' 'suite arch variable'
+echo 'Types: deb
+URIs: http://ftp.tlh.debian.org/universe
+Suites: stable/binary-$(ARCH)/' > $SOURCES
+testsuccessequal --nomsg "'http://ftp.tlh.debian.org/universe/stable/binary-i386/InRelease' ftp.tlh.debian.org_universe_stable_binary-i386_InRelease 0 
+'http://ftp.tlh.debian.org/universe/stable/binary-i386/Packages.xz' ftp.tlh.debian.org_universe_stable_binary-i386_Packages 0 
+'http://ftp.tlh.debian.org/universe/stable/binary-i386/en.xz' ftp.tlh.debian.org_universe_stable_binary-i386_en 0 " aptget update --print-uris
+
+msgcleantest 'Test old-style sources.list file which has' 'malformed dist'
+echo "deb http://ftp.debian.org" > $LISTS
+testfailureequal --nomsg "E: Malformed entry 1 in list file $TMPWORKINGDIRECTORY/$LISTS (Suite)
+E: The list of sources could not be read."  aptget update --print-uris
+
+msgcleantest 'Test deb822 sources.list file which has' 'malformed URI'
+echo "Types: deb
+Suites: stable
+" > $SOURCES
+testfailureequal --nomsg  "E: Malformed entry 1 in sources file $TMPWORKINGDIRECTORY/$SOURCES (URI)
+E: The list of sources could not be read."  aptget update --print-uris
+
+# with Enabled: false
+echo "$BASE"  > $SOURCES
+echo "Enabled: no" >> $SOURCES
+testempty aptget update --print-uris
+
+# multiple URIs
+msgcleantest 'Test deb822 sources.list file which has' 'Multiple URIs work'
+echo "$BASE"  | sed -e 's#http://ftp.debian.org/debian#http://ftp.debian.org/debian http://ftp.de.debian.org/debian#' > $SOURCES
+testsuccessequal --nomsg  "'http://ftp.de.debian.org/debian/dists/stable/InRelease' ftp.de.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.de.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.de.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.de.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.de.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.de.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.de.debian.org_debian_dists_stable_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+# multiple Type in one field
+msgcleantest 'Test deb822 sources.list file which has' 'Multiple Types work'
+echo "$BASE"  | sed -e 's#Types: deb#Types: deb deb-src#' > $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/source/Sources.xz' ftp.debian.org_debian_dists_stable_main_source_Sources 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 " aptget update --print-uris
+
+# a Suite
+msgcleantest 'Test deb822 sources.list file which has' 'an exact path and no sections'
+cat > $SOURCES <<EOF
+Types: deb
+URIs: http://emacs.naquadah.org
+Suites: stable/
+EOF
+testsuccessequal --nomsg "'http://emacs.naquadah.org/stable/InRelease' emacs.naquadah.org_stable_InRelease 0 
+'http://emacs.naquadah.org/stable/Packages.xz' emacs.naquadah.org_stable_Packages 0 
+'http://emacs.naquadah.org/stable/en.xz' emacs.naquadah.org_stable_en 0 " aptget update --print-uris
+
+# multivalue -Add/-Remove
+msgcleantest 'Test deb822 sources.list file which has' '-Add/-Remove multivalues'
+echo "$BASE" > $SOURCES
+echo "Languages-Remove: en" >> $SOURCES
+echo "Architectures-Add: armel" >> $SOURCES
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-i386/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-i386_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-armel/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-armel_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 " aptget update --print-uris
+
+msgcleantest 'Test deb822 sources with' 'multiline multivalues'
+cat > "$SOURCES" <<EOF
+Types: deb
+ deb-src
+URIs:
+ http://ftp.debian.org/debian
+ http://ftp.debian.org/debian2
+Suites: stable
+ 	  sid
+Components:
+ 	main
+ contrib	non-free
+Architectures: amd64
+ armhf	   powerpc
+EOF
+testsuccessequal --nomsg "'http://ftp.debian.org/debian/dists/stable/InRelease' ftp.debian.org_debian_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian/dists/sid/InRelease' ftp.debian.org_debian_dists_sid_InRelease 0 
+'http://ftp.debian.org/debian2/dists/stable/InRelease' ftp.debian.org_debian2_dists_stable_InRelease 0 
+'http://ftp.debian.org/debian2/dists/sid/InRelease' ftp.debian.org_debian2_dists_sid_InRelease 0 
+'http://ftp.debian.org/debian/dists/stable/main/source/Sources.xz' ftp.debian.org_debian_dists_stable_main_source_Sources 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/source/Sources.xz' ftp.debian.org_debian_dists_stable_contrib_source_Sources 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/source/Sources.xz' ftp.debian.org_debian_dists_stable_non-free_source_Sources 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_stable_contrib_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_stable_contrib_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_stable_contrib_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_contrib_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/contrib/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_contrib_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_stable_non-free_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_stable_non-free_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_stable_non-free_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/binary-all/Packages.xz' ftp.debian.org_debian_dists_stable_non-free_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/stable/non-free/i18n/Translation-en.xz' ftp.debian.org_debian_dists_stable_non-free_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/sid/main/source/Sources.xz' ftp.debian.org_debian_dists_sid_main_source_Sources 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/source/Sources.xz' ftp.debian.org_debian_dists_sid_contrib_source_Sources 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/source/Sources.xz' ftp.debian.org_debian_dists_sid_non-free_source_Sources 0 
+'http://ftp.debian.org/debian/dists/sid/main/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_sid_main_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/main/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_sid_main_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/main/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_sid_main_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/main/binary-all/Packages.xz' ftp.debian.org_debian_dists_sid_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/main/i18n/Translation-en.xz' ftp.debian.org_debian_dists_sid_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_sid_contrib_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_sid_contrib_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_sid_contrib_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/binary-all/Packages.xz' ftp.debian.org_debian_dists_sid_contrib_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/contrib/i18n/Translation-en.xz' ftp.debian.org_debian_dists_sid_contrib_i18n_Translation-en 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/binary-amd64/Packages.xz' ftp.debian.org_debian_dists_sid_non-free_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/binary-armhf/Packages.xz' ftp.debian.org_debian_dists_sid_non-free_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/binary-powerpc/Packages.xz' ftp.debian.org_debian_dists_sid_non-free_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/binary-all/Packages.xz' ftp.debian.org_debian_dists_sid_non-free_binary-all_Packages 0 
+'http://ftp.debian.org/debian/dists/sid/non-free/i18n/Translation-en.xz' ftp.debian.org_debian_dists_sid_non-free_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/stable/main/source/Sources.xz' ftp.debian.org_debian2_dists_stable_main_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/source/Sources.xz' ftp.debian.org_debian2_dists_stable_contrib_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/source/Sources.xz' ftp.debian.org_debian2_dists_stable_non-free_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/stable/main/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_stable_main_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/main/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_stable_main_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/main/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_stable_main_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/main/binary-all/Packages.xz' ftp.debian.org_debian2_dists_stable_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/main/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_stable_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_stable_contrib_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_stable_contrib_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_stable_contrib_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/binary-all/Packages.xz' ftp.debian.org_debian2_dists_stable_contrib_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/contrib/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_stable_contrib_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_stable_non-free_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_stable_non-free_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_stable_non-free_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/binary-all/Packages.xz' ftp.debian.org_debian2_dists_stable_non-free_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/stable/non-free/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_stable_non-free_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/sid/main/source/Sources.xz' ftp.debian.org_debian2_dists_sid_main_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/source/Sources.xz' ftp.debian.org_debian2_dists_sid_contrib_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/source/Sources.xz' ftp.debian.org_debian2_dists_sid_non-free_source_Sources 0 
+'http://ftp.debian.org/debian2/dists/sid/main/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_sid_main_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/main/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_sid_main_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/main/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_sid_main_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/main/binary-all/Packages.xz' ftp.debian.org_debian2_dists_sid_main_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/main/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_sid_main_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_sid_contrib_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_sid_contrib_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_sid_contrib_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/binary-all/Packages.xz' ftp.debian.org_debian2_dists_sid_contrib_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/contrib/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_sid_contrib_i18n_Translation-en 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/binary-amd64/Packages.xz' ftp.debian.org_debian2_dists_sid_non-free_binary-amd64_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/binary-armhf/Packages.xz' ftp.debian.org_debian2_dists_sid_non-free_binary-armhf_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/binary-powerpc/Packages.xz' ftp.debian.org_debian2_dists_sid_non-free_binary-powerpc_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/binary-all/Packages.xz' ftp.debian.org_debian2_dists_sid_non-free_binary-all_Packages 0 
+'http://ftp.debian.org/debian2/dists/sid/non-free/i18n/Translation-en.xz' ftp.debian.org_debian2_dists_sid_non-free_i18n_Translation-en 0 " aptget update --print-uris
+
+EXPECTEDUK="'http://ftp.uk.debian.org/debian/dists/stretch/InRelease' ftp.uk.debian.org_debian_dists_stretch_InRelease 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/main/source/Sources.xz' ftp.uk.debian.org_debian_dists_stretch_main_source_Sources 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/contrib/source/Sources.xz' ftp.uk.debian.org_debian_dists_stretch_contrib_source_Sources 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/non-free/source/Sources.xz' ftp.uk.debian.org_debian_dists_stretch_non-free_source_Sources 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/main/binary-i386/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_main_binary-i386_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/main/binary-all/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_main_binary-all_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/main/i18n/Translation-en.xz' ftp.uk.debian.org_debian_dists_stretch_main_i18n_Translation-en 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/contrib/binary-i386/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_contrib_binary-i386_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/contrib/binary-all/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_contrib_binary-all_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/contrib/i18n/Translation-en.xz' ftp.uk.debian.org_debian_dists_stretch_contrib_i18n_Translation-en 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/non-free/binary-i386/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_non-free_binary-i386_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/non-free/binary-all/Packages.xz' ftp.uk.debian.org_debian_dists_stretch_non-free_binary-all_Packages 0 
+'http://ftp.uk.debian.org/debian/dists/stretch/non-free/i18n/Translation-en.xz' ftp.uk.debian.org_debian_dists_stretch_non-free_i18n_Translation-en 0 "
+
+msgcleantest 'Test deb822 sources.list file comments' 'top'
+cat > $SOURCES <<EOF
+#NOTE: Most preferred source listed first!
+
+
+#=== NEW MULTI-LINE FORMAT ===============
+Types:          deb deb-src
+URIs:http://ftp.uk.debian.org/debian/
+Suites:         stretch
+Components:     main contrib non-free
+EOF
+testsuccessequal --nomsg "$EXPECTEDUK" aptget update --print-uris
+
+msgcleantest 'Test deb822 sources.list file comments' 'bottom'
+cat > $SOURCES <<EOF
+Types:          deb deb-src
+URIs:http://ftp.uk.debian.org/debian/
+Suites:         stretch
+Components:     main contrib non-free
+#=== NEW MULTI-LINE FORMAT ===============
+
+
+#NOTE: Most preferred source listed first!
+EOF
+testsuccessequal --nomsg "$EXPECTEDUK" aptget update --print-uris
+
+msgcleantest 'Test deb822 sources.list file comments' 'both'
+cat > $SOURCES <<EOF
+#=== NEW MULTI-LINE FORMAT ===============
+
+
+#NOTE: Most preferred source listed first!
+Types:          deb deb-src
+URIs:http://ftp.uk.debian.org/debian/
+Suites:         stretch
+Components:     main contrib non-free
+#=== NEW MULTI-LINE FORMAT ===============
+
+
+#NOTE: Most preferred source listed first!
+EOF
+testsuccessequal --nomsg "$EXPECTEDUK" aptget update --print-uris
+
+
+msgcleantest 'Test deb822 sources.list file comments' 'empty'
+cat > $SOURCES <<EOF
+#=== NEW MULTI-LINE FORMAT ===============
+
+
+EOF
+testempty aptget update --print-uris

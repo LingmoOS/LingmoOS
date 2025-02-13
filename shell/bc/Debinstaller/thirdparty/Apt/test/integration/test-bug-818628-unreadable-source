@@ -1,0 +1,94 @@
+#!/bin/sh
+set -e
+
+TESTDIR="$(readlink -f "$(dirname "$0")")"
+. "$TESTDIR/framework"
+setupenvironment
+configarchitecture 'amd64'
+cat rootdir/etc/apt/apt.conf.d/01multiarch.conf >> $(getaptconfig)
+
+if [ "$(id -u)" = '0' ]; then
+    msgskip 'Tests for unreadable files do not work as root'
+    exit 0
+fi
+
+insertinstalledpackage 'foo' 'amd64' '1'
+insertpackage 'unstable' 'foo' 'amd64' '2'
+
+setupaptarchive --no-update
+
+touch rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.list
+touch rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.sources
+touch rootdir/etc/apt/apt.conf.d/unreadable.conf
+touch rootdir/etc/apt/preferences.d/unreadable.pref
+
+addtrap 'prefix' "chmod -R +r '$(escape_shell "$TMPWORKINGDIRECTORY")/rootdir/etc/apt';"
+chmod -r rootdir/etc/apt/trusted.gpg.d
+testfailure apt update
+chmod +r rootdir/etc/apt/trusted.gpg.d
+testsuccess apt update
+testsuccess apt policy foo
+testsuccess apt search foo
+testsuccessequal "Listing...
+foo/unstable 2 amd64 [upgradable from: 1]
+N: There is 1 additional version. Please use the '-a' switch to see it" apt list --upgradable
+
+runthemall() {
+	local ERR="$1"
+	local ERRNOTICEVER="$1${2-
+N: There is 1 additional version. Please use the '-a' switch to see it}"
+	local ERRNOTICEREC="$1${2-
+N: There is 1 additional record. Please use the '-a' switch to see it}"
+	testwarningmsg "$ERR" aptcache policy
+	testwarningmsg "$ERR" aptcache policy foo
+	testwarningmsg "$ERR" aptcache depends foo
+	testwarningmsg "$ERR" aptcache rdepends foo
+	testwarningmsg "$ERR" aptcache search foo
+	testwarningmsg "$ERR" apt policy
+	testwarningmsg "$ERR" apt policy foo
+	testwarningmsg "$ERR" apt depends foo
+	testwarningmsg "$ERR" apt rdepends foo
+	testwarningmsg "$ERR" apt search foo
+	testwarningmsg "$ERRNOTICEVER" apt list --upgradable
+	testwarningmsg "$ERRNOTICEREC" apt show foo
+	testwarningmsg "$ERRNOTICEREC" aptcache show foo --no-all-versions
+	testwarningmsg "$ERR" aptmark auto foo
+	testwarningmsg "$ERR" aptmark manual foo
+	testwarningmsg "$ERR" aptmark auto foo
+}
+echo 'Apt::Cmd::Disable-Script-Warning "true";' >> aptconfig.conf
+
+msgmsg 'Unreadable one-line-style sources file'
+chmod -r rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.list
+runthemall "W: Unable to read $TMPWORKINGDIRECTORY/rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.list - open (13: Permission denied)"
+chmod +r rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.list
+
+msgmsg 'Unreadable deb822-style sources file'
+chmod -r rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.sources
+runthemall "W: Unable to read $TMPWORKINGDIRECTORY/rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.sources - open (13: Permission denied)"
+chmod +r rootdir/etc/apt/sources.list.d/apt-test-unstable-deb-src.sources
+
+msgmsg 'Unreadable config file'
+chmod -r rootdir/etc/apt/apt.conf.d/unreadable.conf
+runthemall "W: Unable to read ${TMPWORKINGDIRECTORY}/rootdir/etc/apt/apt.conf.d/unreadable.conf - open (13: Permission denied)"
+chmod +r rootdir/etc/apt/apt.conf.d/unreadable.conf
+
+msgmsg 'Unreadable preferences file'
+chmod -r rootdir/etc/apt/preferences.d/unreadable.pref
+runthemall "W: Unable to read ${TMPWORKINGDIRECTORY}/rootdir/etc/apt/preferences.d/unreadable.pref - open (13: Permission denied)"
+chmod +r rootdir/etc/apt/preferences.d/unreadable.pref
+
+msgmsg 'Unreadable sources directory'
+chmod -r rootdir/etc/apt/sources.list.d
+runthemall "W: Unable to read $TMPWORKINGDIRECTORY/rootdir/etc/apt/sources.list.d/ - opendir (13: Permission denied)" ""
+chmod +r rootdir/etc/apt/sources.list.d
+
+msgmsg 'Unreadable config directory'
+chmod -r rootdir/etc/apt/apt.conf.d
+runthemall "W: Unable to read ${TMPWORKINGDIRECTORY}/rootdir/etc/apt/apt.conf.d/ - opendir (13: Permission denied)"
+chmod +r rootdir/etc/apt/apt.conf.d
+
+msgmsg 'Unreadable preferences directory'
+chmod -r rootdir/etc/apt/preferences.d
+runthemall "W: Unable to read ${TMPWORKINGDIRECTORY}/rootdir/etc/apt/preferences.d/ - opendir (13: Permission denied)"
+chmod +r rootdir/etc/apt/preferences.d

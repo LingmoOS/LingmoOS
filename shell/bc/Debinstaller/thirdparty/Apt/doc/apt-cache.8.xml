@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % aptent SYSTEM "apt.ent"> %aptent;
+<!ENTITY % aptverbatiment SYSTEM "apt-verbatim.ent"> %aptverbatiment;
+<!ENTITY % aptvendor SYSTEM "apt-vendor.ent"> %aptvendor;
+]>
+
+<refentry>
+
+ <refentryinfo>
+   &apt-author.jgunthorpe;
+   &apt-author.team;
+   &apt-email;
+   &apt-product;
+   <!-- The last update date -->
+   <date>2019-04-04T00:00:00Z</date>
+ </refentryinfo>
+ 
+ <refmeta>
+   <refentrytitle>apt-cache</refentrytitle>
+   <manvolnum>8</manvolnum>
+   <refmiscinfo class="manual">APT</refmiscinfo>
+ </refmeta>
+ 
+ <!-- Man page title -->
+ <refnamediv>
+    <refname>apt-cache</refname>
+    <refpurpose>query the APT cache</refpurpose>
+ </refnamediv>
+
+ &synopsis-command-apt-cache;
+
+ <refsect1><title>Description</title>
+    <para>
+       <command>apt-cache</command> performs a variety of operations on APT's
+       package cache. <command>apt-cache</command> does not manipulate the
+       state of the system but does provide operations to search and generate
+       interesting output from the package metadata. The metadata is acquired
+       and updated via the 'update' command of e.g. <command>apt-get</command>,
+       so that it can be outdated if the last update is too long ago, but in
+       exchange <command>apt-cache</command> works independently of the
+       availability of the configured sources (e.g. offline).
+    </para>
+
+   <para>Unless the <option>-h</option>, or <option>--help</option> option is given, one of the
+   commands below must be present.</para>
+
+   <variablelist>
+     <varlistentry><term><option>gencaches</option></term>
+     <listitem><para><literal>gencaches</literal> creates APT's package cache. This is done
+     implicitly by all commands needing this cache if it is missing or outdated.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>showpkg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showpkg</literal> displays information about the packages listed on the 
+     command line. Remaining arguments are package names. The available
+     versions and reverse dependencies of each package listed are listed, as 
+     well as forward dependencies for each version. Forward (normal) 
+     dependencies are those packages upon which the package in question 
+     depends; reverse dependencies are those packages that depend upon the 
+     package in question. Thus, forward dependencies must be satisfied for a 
+     package, but reverse dependencies need not be.
+     For instance, <command>apt-cache showpkg libreadline2</command> would produce 
+     output similar to the following:</para>
+     
+<informalexample><programlisting>
+Package: libreadline2
+Versions: 2.1-12(/var/state/apt/lists/foo_Packages),
+Reverse Depends: 
+  libreadlineg2,libreadline2
+  libreadline2-altdev,libreadline2
+Dependencies:
+2.1-12 - libc5 (2 5.4.0-0) ncurses3.0 (0 (null))
+Provides:
+2.1-12 - 
+Reverse Provides: 
+</programlisting></informalexample>
+			    
+     <para>Thus it may be seen that libreadline2, version 2.1-12, depends on
+     libc5 and ncurses3.0 which must be installed for libreadline2 to work. 
+     In turn, libreadlineg2 and libreadline2-altdev depend on libreadline2. If
+     libreadline2 is installed, libc5 and ncurses3.0 (and ldso) must also be
+     installed; libreadlineg2 and libreadline2-altdev do not have to be
+     installed. For the specific meaning of the remainder of the output it
+     is best to consult the apt source code.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>stats</option></term><listitem><para><literal>stats</literal> displays some statistics about the cache.
+     No further arguments are expected. Statistics reported are:
+     <itemizedlist>
+       <listitem><para><literal>Total package names</literal> is the number of package names found 
+       in the cache.</para>
+       </listitem>
+       
+       <listitem><para><literal>Normal packages</literal> is the number of regular, ordinary package 
+       names; these are packages that bear a one-to-one correspondence between 
+       their names and the names used by other packages for them in 
+       dependencies. The majority of packages fall into this category.</para>
+       </listitem>
+
+       <listitem><para><literal>Pure virtual packages</literal> is the number of packages that exist 
+       only as a virtual package name; that is, packages only "provide" the 
+       virtual package name, and no package actually uses the name. For 
+       instance, "mail-transport-agent" in the Debian system is a 
+       pure virtual package; several packages provide "mail-transport-agent", 
+       but there is no package named "mail-transport-agent".</para>
+       </listitem>
+   
+       <listitem><para><literal>Single virtual packages</literal> is the number of packages with only 
+       one package providing a particular virtual package. For example, in the
+       Debian system, "X11-text-viewer" is a virtual package, but 
+       only one package, xless, provides "X11-text-viewer".</para>
+       </listitem>
+
+       <listitem><para><literal>Mixed virtual packages</literal> is the number of packages that either 
+       provide a particular virtual package or have the virtual package name 
+       as the package name. For instance, in the Debian system, 
+       "debconf" is both an actual package, and provided by the debconf-tiny
+       package.</para>
+       </listitem>
+   
+       <listitem><para><literal>Missing</literal> is the number of package names that were referenced in
+       a dependency but were not provided by any package. Missing packages may 
+       be an evidence if a full distribution is not accessed, or if a package
+       (real or virtual) has been dropped from the distribution. Usually they
+       are referenced from Conflicts or Breaks statements.</para>
+       </listitem>
+
+       <listitem><para><literal>Total distinct</literal> versions is the number of package versions 
+       found in the cache. If more than one distribution is being accessed
+       (for instance, "stable" and "unstable"), this value
+       can be considerably larger than the number of total package names.</para>
+       </listitem>
+
+       <listitem><para><literal>Total dependencies</literal> is the number of dependency relationships 
+       claimed by all of the packages in the cache.</para>
+       </listitem>
+     </itemizedlist>
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>showsrc</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>showsrc</literal> displays all the
+     source package records that match the given package names. All
+     versions are shown, as well as all records that declare the name
+     to be a binary package. Use <option>--only-source</option> to
+     display only source package names.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dump</option></term>
+     <listitem><para><literal>dump</literal> shows a short listing of every package in the cache. It is 
+     primarily for debugging.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>dumpavail</option></term>
+     <listitem><para><literal>dumpavail</literal> prints out an available list to stdout. This is 
+     suitable for use with &dpkg; and is used by the &dselect; method.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>unmet</option></term>
+     <listitem><para><literal>unmet</literal> displays a summary of all unmet dependencies in the 
+     package cache.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>show</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>show</literal> performs a function similar to 
+     <command>dpkg --print-avail</command>; it displays the package records for the 
+     named packages.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>search</option> <option><replaceable>&synopsis-regex;</replaceable>…</option></term>
+     <listitem><para><literal>search</literal> performs a full text search on all available package
+     lists for the POSIX regex pattern given, see &regex;.
+     It searches the package names and the
+     descriptions for an occurrence of the regular expression and prints out
+     the package name and the short description, including virtual package
+     names.
+     If <option>--full</option> is given
+     then output identical to <literal>show</literal> is produced for each matched
+     package, and if <option>--names-only</option> is given then the long description
+     is not searched, only the package name and provided packages are.</para>
+     <para>
+     Separate arguments can be used to specify multiple search patterns that 
+     are and'ed together.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>depends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>depends</literal> shows a listing of each dependency a package has 
+     and all the possible other packages that can fulfill that dependency.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>rdepends</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>rdepends</literal> shows a listing of each reverse dependency a
+      package has.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>pkgnames</option> <optional><replaceable>&synopsis-prefix;</replaceable></optional></term>
+     <listitem><para>This command prints the name of each package APT knows. The optional
+     argument is a prefix match to filter the name list. The output is suitable
+     for use in a shell tab complete function and the output is generated 
+     extremely quickly. This command is best used with the 
+     <option>--generate</option> option.</para>
+     <para>Note that a package which APT knows of is not necessarily available to download,
+     installable or installed, e.g. virtual packages are also listed in the generated list.
+     </para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>dotty</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>dotty</literal> takes a list of packages on the command line and
+     generates output suitable for use by dotty from the 
+     <ulink url="http://www.research.att.com/sw/tools/graphviz/">GraphViz</ulink>
+     package. The result will be a set of nodes and edges representing the 
+     relationships between the packages. By default the given packages will 
+     trace out all dependent packages; this can produce a very large graph. 
+     To limit the output to only the packages listed on the command line,
+     set the <literal>APT::Cache::GivenOnly</literal> option.</para>
+
+     <para>The resulting nodes will have several shapes; normal packages are boxes,
+     pure virtual packages are triangles, mixed virtual packages are diamonds,
+     missing packages are hexagons. Orange boxes mean recursion was stopped 
+     (leaf packages), blue lines are pre-depends, green lines are conflicts.</para>
+
+     <para>Caution, dotty cannot graph larger sets of packages.</para></listitem>
+     </varlistentry>
+     
+     <varlistentry><term><option>xvcg</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+	 <listitem><para>The same as <literal>dotty</literal>, only for xvcg from the
+	 <ulink url="http://rw4.cs.uni-sb.de/users/sander/html/gsvcg1.html">VCG tool</ulink>.
+	 </para></listitem></varlistentry>
+
+	 <varlistentry><term><option>policy</option> <optional><replaceable>&synopsis-pkg;</replaceable>…</optional></term>
+     <listitem><para><literal>policy</literal> is meant to help debug issues relating to the 
+     preferences file. With no arguments it will print out the 
+     priorities of each source. Otherwise it prints out detailed information
+     about the priority selection of the named package.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>madison</option> <option><replaceable>&synopsis-pkg;</replaceable>…</option></term>
+     <listitem><para><literal>apt-cache</literal>'s <literal>madison</literal> command attempts to mimic
+     the output format and a subset of the functionality of the Debian
+     archive management tool, <literal>madison</literal>.  It displays
+     available versions of a package in a tabular format.  Unlike the
+     original <literal>madison</literal>, it can only display information for
+     the architecture for which APT has retrieved package lists
+     (<literal>APT::Architecture</literal>).</para></listitem>
+     </varlistentry>
+   </variablelist>
+ </refsect1>
+ 
+ <refsect1><title>options</title>
+   &apt-cmdblurb;
+   
+   <variablelist>
+     <varlistentry><term><option>-p</option></term><term><option>--pkg-cache</option></term>
+     <listitem><para>Select the file to store the package cache. The package cache is the 
+     primary cache used by all operations.
+     Configuration Item: <literal>Dir::Cache::pkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-s</option></term><term><option>--src-cache</option></term>
+     <listitem><para>Select the file to store the source cache. The source is used only by
+     <literal>gencaches</literal> and it stores a parsed version of the package 
+     information from remote sources. When building the package cache the 
+     source cache is used to avoid reparsing all of the package files.
+     Configuration Item: <literal>Dir::Cache::srcpkgcache</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-q</option></term><term><option>--quiet</option></term>
+     <listitem><para>Quiet; produces output suitable for logging, omitting progress indicators.
+     More q's will produce more quietness up to a maximum of 2. You can also use
+     <option>-q=#</option> to set the quietness level, overriding the configuration file.
+     Configuration Item: <literal>quiet</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-i</option></term><term><option>--important</option></term>
+     <listitem><para>Print only important dependencies; for use with <literal>unmet</literal>
+     and <literal>depends</literal>. Causes only Depends and
+     Pre-Depends relations to be printed.
+     Configuration Item: <literal>APT::Cache::Important</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--no-pre-depends</option></term>
+		   <term><option>--no-depends</option></term>
+		   <term><option>--no-recommends</option></term>
+		   <term><option>--no-suggests</option></term>
+		   <term><option>--no-conflicts</option></term>
+		   <term><option>--no-breaks</option></term>
+		   <term><option>--no-replaces</option></term>
+		   <term><option>--no-enhances</option></term>
+		   <listitem><para>Per default the <command>depends</command> and
+     <command>rdepends</command> print all dependencies. This can be tweaked with
+     these flags which will omit the specified dependency type.
+     Configuration Item: <literal>APT::Cache::Show<replaceable>DependencyType</replaceable></literal>
+     e.g. <literal>APT::Cache::ShowRecommends</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--implicit</option></term>
+	<listitem><para>Per default <command>depends</command> and <command>rdepends</command>
+	      print only dependencies explicitly expressed in the metadata. With this flag
+	      it will also show dependencies implicitly added based on the encountered data.
+	      A <literal>Conflicts: foo</literal> e.g. expresses implicitly that this package
+	      also conflicts with the package foo from any other architecture.
+	      Configuration Item: <literal>APT::Cache::ShowImplicit</literal>.
+	</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-f</option></term><term><option>--full</option></term>
+     <listitem><para>Print full package records when searching. 
+     Configuration Item: <literal>APT::Cache::ShowFull</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-a</option></term><term><option>--all-versions</option></term>
+     <listitem><para>Print full records for all available versions. This is the
+     default; to turn it off, use <option>--no-all-versions</option>.
+     If <option>--no-all-versions</option> is specified, only the candidate version
+     will be displayed (the one which would be selected for installation).
+     This option is only applicable to  the <literal>show</literal> command.
+     Configuration Item: <literal>APT::Cache::AllVersions</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>-g</option></term><term><option>--generate</option></term>
+     <listitem><para>Perform automatic package cache regeneration, rather than use the cache 
+     as it is. This is the default; to turn it off, use <option>--no-generate</option>.
+     Configuration Item: <literal>APT::Cache::Generate</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--names-only</option></term><term><option>-n</option></term>
+     <listitem><para>Only search on the package and provided package names, not the long descriptions.
+     Configuration Item: <literal>APT::Cache::NamesOnly</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--all-names</option></term>
+     <listitem><para>Make <literal>pkgnames</literal> print all names, including virtual packages 
+     and missing dependencies. 
+     Configuration Item: <literal>APT::Cache::AllNames</literal>.</para></listitem>
+     </varlistentry>
+
+     <varlistentry><term><option>--recurse</option></term>
+     <listitem><para>Make <literal>depends</literal> and <literal>rdepends</literal> recursive so
+     that all packages mentioned are printed once.
+     Configuration Item: <literal>APT::Cache::RecurseDepends</literal>.</para></listitem>
+     </varlistentry>
+
+      <varlistentry><term><option>--installed</option></term>
+      <listitem><para>
+      Limit the output of <literal>depends</literal> and <literal>rdepends</literal> to
+      packages which are currently installed.
+      Configuration Item: <literal>APT::Cache::Installed</literal>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry><term><option>--with-source</option> <option>&synopsis-param-filename;</option></term>
+      <listitem><para>
+      Adds the given file as a source for metadata. Can be repeated to add multiple files.
+      Supported are currently <literal>*.deb</literal>, <literal>*.dsc</literal>,
+      <literal>*.changes</literal>, <literal>Sources</literal> and
+      <literal>Packages</literal> files as well as source package directories.
+      Files are matched based on their name only, not their content!</para>
+      <para><literal>Sources</literal> and <literal>Packages</literal> can be compressed in any
+      format apt supports as long as they have the correct extension. If you need to store
+      multiple of these files in one directory you can prefix a name of your choice with the
+      last character being an underscore ("<literal>_</literal>"). Example: my.example_Packages.xz</para>
+      <para>Note that these sources are treated as trusted (see &apt-secure;).
+      Configuration Item: <literal>APT::Sources::With</literal>.</para></listitem>
+      </varlistentry>
+
+     &apt-commonoptions;
+     
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>Files</title>
+   <variablelist>
+     &file-sourceslist;
+     &file-statelists;
+   </variablelist>
+ </refsect1>
+
+ <refsect1><title>See Also</title>
+   <para>&apt-conf;, &sources-list;, &apt-get;
+   </para>
+ </refsect1>
+
+ <refsect1><title>Diagnostics</title>
+   <para><command>apt-cache</command> returns zero on normal operation, decimal 100 on error.
+   </para>
+ </refsect1>
+
+ &manbugs;
+ 
+</refentry>

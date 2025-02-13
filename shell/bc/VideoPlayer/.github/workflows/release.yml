@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Tarball
+        run: |
+          mkdir -p lingmo-videoplayer
+          cp -R $(ls | grep -xv lingmo-videoplayer) lingmo-videoplayer/
+          tar -cJf lingmo-videoplayer.tar.xz lingmo-videoplayer
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+            files: lingmo-videoplayer.tar.xz
+            name: Release ${{ github.ref }}
+
+      - name: Cleanup
+        run: rm lingmo-videoplayer.tar.xz

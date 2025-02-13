@@ -1,0 +1,37 @@
+/*! \page singleinstance Enabling single instance support for an application
+
+Usually a user wants an application to be run as a single instance. This means
+that if the launched application is already running, the existing application
+window is activated and no new application processes are started.
+
+Note: This functionality is currently included in the Qt Quick application template
+provided by the Qt SDK. To enable  single instance support for your application,
+select Make application boostable checkbox when creating a new project with the
+template.
+
+When not using the template provided by the Qt SDK, this can be achieved by adding 
+--single-instance to the invoker command in the .desktop file:
+
+\verbatim
+[Desktop Entry]
+Type=Application
+Name=My Application
+Exec=/usr/bin/invoker --single-instance --type=e /usr/bin/myApp
+\endverbatim
+
+As a result, a lock file 
+\c $XDG_RUNTIME_DIR/single-instance-locks/usr/bin/myApp/instance.lock is created. 
+If applauncherd cannot acquire the lock, it tries to find the corresponding
+window and activates it. 
+
+Using single instance support requires that the shown window belongs
+to the invoked application binary. For example, if the invoked
+application starts a new application as a plug-in and the plug-in
+shows the window, you must manually set the plug-in window XProperty
+WM_COMMAND. To use single instance support, set the property to
+correspond with the application name used in the single instance lock file.
+
+Consider using --single-instance instead of the single instance functionality
+provided by D-Bus, because --single-instance is much faster in most cases.
+
+*/

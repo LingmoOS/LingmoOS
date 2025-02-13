@@ -1,0 +1,162 @@
+/*! \page limitations Limitations and known issues
+
+\section issue-exit Using _exit() instead of exit()
+
+Use \c _exit() instead of \c exit() with QML, Qt, and MeeGo Touch
+boosters. However, do not use it with exec booster.
+
+The basic difference between \c exit() and \c _exit() is that the former
+performs cleanup related to user-mode constructs in the library and
+calls user-supplied cleanup-functions, whereas the latter performs
+only the kernel cleanup for the process.
+
+The function \c _exit() terminates the calling process immediately. Any
+open file descriptors belonging to the process are closed; any
+children of the process are inherited by process.
+
+The \c exit() function causes normal process termination and the value of
+status is returned to the parent. A child process must strictly use
+\c _exit() instead of a simple \c exit().
+
+The user-level initialisations of the libraries are done once when the
+launcher daemon loads the libraries. The launched applications are
+child processes of the launcher, and every time \c exit() is called, the
+corresponding cleanup actions are executed. The root problem is that
+the cleanup actions are carried out multiple times, and libraries may
+not be designed to tolerate this. By calling \c _exit() in the
+applications, the problem is avoided.
+
+\section issue-cmdline Command line arguments
+
+Current launcher implementation does not support the following Qt and
+MeeGo Touch command line options. For more information on QApplication
+command line options, see MeeGo 1.2 Harmattan API reference
+library. For more information on MApplication command line options,
+see Platform API reference library.
+
+\li  \c -style
+\li  \c -stylesheet
+\li  \c -session
+\li  \c -widgetcount
+\li  \c -reverse
+\li  \c -graphicssystem
+\li  \c -display
+\li  \c -geometry
+\li  \c -fn
+\li  \c -font
+\li  \c -bg
+\li  \c -background
+\li  \c -fg
+\li  \c -foreground
+\li  \c -btn
+\li  \c -button
+\li  \c -name
+\li  \c -title
+\li  \c -visual
+\li  \c -ncols
+\li  \c -cmap
+\li  \c -im
+\li  \c -inputstyle
+\li  \c -genimglist
+\li  \c -remote-theme
+\li  \c -fullscreen
+\li  \c -disable-m-input-context
+
+QCoreApplication::arguments() returns a QStringList that containing at
+most 32 arguments and drops the rest. The full list of arguments is
+accessible through \c argc and \c argv. They can be converted into
+QStringList similar to returned by QCoreApplication::arguments() as
+follows:
+
+\code
+M_EXPORT int main(int argc, char **argv) {
+    QStringList arguments;
+    for (int a = 0; a < argc; ++a) {
+        arguments << QString::fromLocal8Bit(argv[a]);
+    }
+    ...
+\endcode
+
+\section issue-watchdog Scripts, D-Bus, and process monitoring
+
+By default, invoker processes terminate before or right after booster
+processes have called main(). This can confuse shell scripts and
+process monitoring in D-Bus daemon and Upstart, for instance. To solve
+these issues, you can use the following parameters supported by the
+invoker:
+
+    \li <tt> --delay 10 </tt> The invoker waits for 10 seconds before terminating
+    \li <tt>--wait-term </tt> The invoker does not terminate until the launched
+    application terminates. The invoker returns the same return
+    value as the application did, or it is terminated by the same
+    signal as the launched application. Signals received by the
+    invoker process are forwarded to the launched application.
+
+\section forking Forking
+
+It is not possible to use MComponentCache or MDeclarativeCache in the child
+process if you fork() in your application. This is due to the fact that
+X11 connections are disrupted after fork().
+
+\section crashes Crashes after application's main()
+
+If an application is launched with invoker, there may be some
+destructors of MeeGo Touch classes executed after application's
+main(). This can cause crashes if the application has installed a
+custom debug message handler and does not uninstall it before exit.
+
+\section wm_class_value WM_CLASS value
+
+If an application is started with m-booster but it creates its own
+MApplicationWindow based object, such as an MApplicationWindow derived
+class object, or if an application has multiple windows, the launcher
+does not currently set the correct value for WM_CLASS property of X
+window. The WM_CLASS property is used, for example, by Compositor as
+the application name to notify the user if the application is stuck.
+
+Set the WM_CLASS property for the application as follows:
+
+\code
+M_EXPORT int main(int argc, char **argv)
+{
+    MApplication *app = MComponentCache::mApplication(argc, argv);
+    
+    //don't use window from cache, create our own
+    MApplicationWindow *window = new myDerivedMApplicationWindow();
+
+#ifdef Q_WS_X11
+            // reinit WM_COMMAND X11 property
+            if (window) {
+                Display *display = QX11Info::display();
+                if (display) {
+                    XSetCommand(display, window->effectiveWinId(), argv, argc);
+
+                    // set correct WM_CLASS properties
+                    QString appName = QFileInfo(argv[0]).fileName();
+                    QString appClass = appName.left(1).toUpper();
+                    if (appName.length() > 1)
+                        appClass += appName.right(appName.length() - 1);
+           
+                    // reserve memory for C strings
+                    QByteArray arrName(appName.toLatin1());
+                    QByteArray arrClass(appClass.toLatin1());
+
+                    XClassHint class_hint;
+                    class_hint.res_name  = arrName.data();
+                    class_hint.res_class = arrClass.data();
+
+                    XSetClassHint(display, window->effectiveWinId(), &class_hint);
+                }
+            }
+#endif
+
+    // do application specific stuff
+    ...    
+
+    window->show();
+    return app->exec();
+}
+\endcode
+
+*/
+

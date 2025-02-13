@@ -1,0 +1,61 @@
+#!/usr/bin/make -f
+# Copyright (C) 2009, 2016 Julian Andres Klode <jak@debian.org>
+#
+# Free Software, licensed under the GPL-2 or (at your option) any later version.
+export DEB_LDFLAGS_MAINT_APPEND := -Wl,--as-needed
+export DEB_BUILD_MAINT_OPTIONS := hardening=+all
+
+# do not fail as we are just experimenting with symbol files for now
+export DPKG_GENSYMBOLS_CHECK_LEVEL=0
+
+export CTEST_OUTPUT_ON_FAILURE=1
+
+
+ifneq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
+	configure_test_flags = -DWITH_TESTS=OFF
+else
+	configure_test_flags =
+endif
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_clean:
+	cp COPYING debian/copyright
+	dh_clean
+
+override_dh_install-arch:
+	dh_install -papt-utils -X/dump
+	dh_install -papt -Xmethods/curl -Xmethods/curl+https -Xmethods/curl+http
+	dh_install --remaining
+	install -m 644 debian/apt.conf.autoremove debian/apt/etc/apt/apt.conf.d/01autoremove
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vapt:keyring="$(shell ./vendor/getinfo keyring-package)"
+
+override_dh_installcron:
+	dh_installcron --name=apt-compat
+
+override_dh_installsystemd:
+	# Do not restart "apt-daily.service" because this script runs
+	# unattended-upgrades. So if apt itself is upgraded as part of
+	# an unattended-upgrades run it would kill itself
+	dh_installsystemd -papt apt-daily.timer apt-daily-upgrade.timer
+	dh_installsystemd -papt --no-restart-on-upgrade --no-restart-after-upgrade --no-start apt-daily.service apt-daily-upgrade.service
+	dh_installsystemd --remaining-packages
+
+ifneq ($(filter pkg.apt.nodoxygen,$(DEB_BUILD_PROFILES)),)
+override_dh_auto_configure-arch: configure_doc_flags=-DWITH_DOC=OFF -DWITH_DOC_MANPAGES=ON -DWITH_DOC_EXAMPLES=ON
+override_dh_auto_configure-indep: configure_doc_flags=-DWITH_DOC=OFF -DWITH_DOC_GUIDES=ON -DWITH_DOC_EXAMPLES=ON
+else
+ifneq ($(filter nodoc,$(DEB_BUILD_PROFILES)),)
+override_dh_auto_configure-arch: configure_doc_flags=-DWITH_DOC=OFF
+override_dh_auto_configure-indep: configure_doc_flags=-DWITH_DOC=OFF
+else
+override_dh_auto_configure-arch: configure_doc_flags=-DWITH_DOC=OFF -DWITH_DOC_MANPAGES=ON -DWITH_DOC_EXAMPLES=ON
+override_dh_auto_configure-indep: configure_doc_flags=-DWITH_DOC=ON
+endif
+endif
+
+override_dh_auto_configure-arch override_dh_auto_configure-indep:
+	dh_auto_configure -- -DCMAKE_BUILD_RPATH_USE_ORIGIN=ON $(configure_doc_flags) $(configure_test_flags)

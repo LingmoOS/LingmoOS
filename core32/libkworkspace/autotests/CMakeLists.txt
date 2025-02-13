@@ -1,0 +1,5 @@
+include(ECMMarkAsTest)
+add_executable(testPlatformDetection testPlatformDetection.cpp)
+target_link_libraries(testPlatformDetection Qt::Test PW::KWorkspace)
+add_test(NAME kworkspace-testPlatformDetection COMMAND testPlatformDetection)
+ecm_mark_as_test(testPlatformDetection)
