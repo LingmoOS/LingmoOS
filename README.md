@@ -3,7 +3,8 @@
 This is the source tree of the LingmoOS desktop environment.
 
 ### Introduction
-![LingmoOS](desktop/screenshots/screenshot.png)
+![Lingmo OS](res/screenshots/screenshot2.png)
+![Lingmo OS Desktop](res/screenshots/screenshot1.png)
 Lingmo OS is a Linux operating system based on the desktop environment. It is developed based on the open source Linux kernel and is compatible with the amd64 architecture. It has a beautiful desktop environment, software adapted to the desktop environment, and a unified UI style.
 
 ### UI, new desktop environment
