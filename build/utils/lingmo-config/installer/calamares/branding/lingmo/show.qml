@@ -33,7 +33,6 @@ Presentation
         Image {
             id: background1
             source: "welcome.png"
-            width: 467; height: 280
             fillMode: Image.PreserveAspectFit
             anchors.centerIn: parent
         }

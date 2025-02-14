@@ -27,7 +27,7 @@ config:
 	@$(foreach dir,$(SHELL_DIRS) $(LIB_DIRS) $(EXTRA_PKG) $(CORE_DIRS) $(FM_DIRS),mkdir -p $(OUTPUT)/$(dir);)
 	@$(foreach dir,$(SHELL_DIRS),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
 	@$(foreach dir,$(LIB_DIRS),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
-	@$(foreach dir,$(EXTRA_PKG),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
+#	@$(foreach dir,$(EXTRA_PKG),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
 	@$(foreach dir,$(CORE_DIRS),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
 	@$(foreach dir,$(FM_DIRS),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
 	@$(foreach dir,$(BOOT_DIRS),cp -r $(dir)/* $(OUTPUT)/$(dir)/;)
@@ -50,7 +50,7 @@ pkg-shell: $(SHELL_DIRS) ${WINDOWS_DIRS}
 pkg-libs: $(LIB_DIRS) $(LIBCOREUI_DIRS)
 pkg-fm: $(FM_DIRS)
 pkg-core: $(CORE_DIRS) $(CORE32_DIRS)
-pkg-extra: $(EXTRA_PKG) $(BOOT_DIRS)
+pkg-extra: $(BOOT_DIRS)
 pkg-base:
 	@echo "Processing directory: init"
 	@cd $(OUTPUT)/$(EXTRA_PKG)/init/ && sudo apt build-dep . -y && dpkg-buildpackage -b -uc -us -j8
