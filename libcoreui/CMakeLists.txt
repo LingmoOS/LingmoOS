@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(lingmo-qt-plugins)
+project(ocean)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 

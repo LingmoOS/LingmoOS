@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/lingmo/Ocean/kstyle/config/ui/oceanstyleconfig.ui'
+# Form implementation generated from reading ui file '/home/lingmo/Lightly/oceanui/config/ui/oceanstyleconfig.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -200,7 +200,7 @@ class Ui_OceanStyleConfig(object):
         self._menuOpacity.setMaximum(100)
         self._menuOpacity.setSingleStep(1)
         self._menuOpacity.setPageStep(10)
-        self._menuOpacity.setProperty("value", 100)
+        self._menuOpacity.setProperty("value", 60)
         self._menuOpacity.setOrientation(QtCore.Qt.Horizontal)
         self._menuOpacity.setInvertedAppearance(False)
         self._menuOpacity.setInvertedControls(False)

@@ -1,26 +1,5 @@
 #ifndef ocean_helper_h
 #define ocean_helper_h
-
-/*************************************************************************
- * Copyright (C) 2014 by Hugo Pereira Da Costa <hugo.pereira@free.fr>    *
- *                                                                       *
- * This program is free software; you can redistribute it and/or modify  *
- * it under the terms of the GNU General Public License as published by  *
- * the Free Software Foundation; either version 2 of the License, or     *
- * (at your option) any later version.                                   *
- *                                                                       *
- * This program is distributed in the hope that it will be useful,       *
- * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- * GNU General Public License for more details.                          *
- *                                                                       *
- * You should have received a copy of the GNU General Public License     *
- * along with this program; if not, write to the                         *
- * Free Software Foundation, Inc.,                                       *
- * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
- *************************************************************************/
-
-
 #include "ocean.h"
 #include "oceanstyleconfigdata.h"
 #include "oceananimationdata.h"
@@ -37,6 +16,8 @@
 
 namespace Ocean
 {
+    // 在命名空间开始处声明
+    extern QColor baseColor;
 
     //* ocean style helper class.
     /** contains utility functions used at multiple places in both ocean style and ocean window decoration */
@@ -71,7 +52,10 @@ namespace Ocean
 
         //* focus color
         QColor focusColor( const QPalette& palette ) const
-        { return _viewFocusBrush.brush( palette ).color(); }
+        {
+            Q_UNUSED(palette);
+            return baseColor;
+        }
 
         //* negative text color (used for close button)
         QColor negativeText( const QPalette& palette ) const
@@ -288,7 +272,10 @@ namespace Ocean
         
         //* returns true if a given palette has dark colors 
         bool isDarkTheme( const QPalette& palette) const
-        { return true; }
+        { 
+            Q_UNUSED(palette);
+            return true;
+        }
         
 
         //@}
@@ -312,6 +299,9 @@ namespace Ocean
         
         QPixmap coloredIcon(const QIcon &icon, const QPalette& palette, const QSize &size,
                             QIcon::Mode mode = QIcon::Normal, QIcon::State state = QIcon::Off);
+
+        // 获取当前强调色
+        QColor accentColor() const { return baseColor; }
 
         protected:
 
