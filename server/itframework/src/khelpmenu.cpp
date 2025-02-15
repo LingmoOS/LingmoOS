@@ -126,7 +126,7 @@ void KHelpMenuPrivate::createActions(KHelpMenu *q)
         mAboutAppAction = KStandardAction::aboutApp(q, &KHelpMenu::aboutApplication, q);
     }
 
-    if (KAuthorized::authorizeAction(QStringLiteral("help_about_kde"))) {
+    if (KAuthorized::authorizeAction(QStringLiteral("help_about_lingmo"))) {
         mAboutLingmoAction = KStandardAction::aboutLingmo(q, &KHelpMenu::aboutLingmo, q);
     }
 }
@@ -295,11 +295,6 @@ void KHelpMenu::switchApplicationLanguage()
         connect(d->mSwitchApplicationLanguage, &QDialog::finished, this, &KHelpMenu::dialogFinished);
     }
     d->mSwitchApplicationLanguage->show();
-}
-
-void KHelpMenu::donate()
-{
-    QDesktopServices::openUrl(QUrl(QLatin1String("https://www.kde.org/donate?app=") + d->mAboutData.componentName()));
 }
 
 void KHelpMenu::dialogFinished()

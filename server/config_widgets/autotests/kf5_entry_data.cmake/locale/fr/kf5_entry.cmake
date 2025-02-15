@@ -1,0 +1,2 @@
+[KCM Locale]
+Name=French

@@ -373,9 +373,9 @@ void KXmlGuiWindow::createGUI(const QString &xmlfile)
         if (aboutLingmoAction) {
             actions->addAction(aboutLingmoAction->objectName(), aboutLingmoAction);
         }
-        if (donateAction) {
-            actions->addAction(donateAction->objectName(), donateAction);
-        }
+        // if (donateAction) {
+        //     actions->addAction(donateAction->objectName(), donateAction);
+        // }
     }
 
     const QString windowXmlFile = xmlfile.isNull() ? componentName() + QLatin1String("ui.rc") : xmlfile;

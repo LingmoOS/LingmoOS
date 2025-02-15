@@ -99,7 +99,7 @@ class KHelpMenuPrivate;
    actions/help_report_bug=false
    actions/switch_application_language=false
    actions/help_about_app=false
-   actions/help_about_kde=false
+   actions/help_about_lingmo=false
    @endverbatim
  *
  * @author Espen Sand (espen@kde.org)
@@ -200,7 +200,7 @@ public Q_SLOTS:
     void aboutApplication();
 
     /**
-     * Opens the standard "About KDE" dialog box.
+     * Opens the standard "About Lingmo OS" dialog box.
      */
     void aboutLingmo();
 
@@ -213,12 +213,6 @@ public Q_SLOTS:
      * Opens the changing default application language dialog box.
      */
     void switchApplicationLanguage();
-
-    /**
-     * Opens the donate url.
-     * @since 5.24
-     */
-    void donate();
 
 private Q_SLOTS:
     /**

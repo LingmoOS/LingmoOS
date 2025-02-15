@@ -370,7 +370,7 @@ static KStandardShortcutInfo g_infoStandardShortcut[] = {
      false,
      Category::Settings},
     {AboutApp, "AboutApp", QT_TRANSLATE_NOOP3("KStandardShortcut", "About Application", "@action"), 0, 0, QList<QKeySequence>(), false, Category::Help},
-    {AboutLingmo, "AboutLingmo", QT_TRANSLATE_NOOP3("KStandardShortcut", "About KDE", "@action"), 0, 0, QList<QKeySequence>(), false, Category::Help},
+    {AboutLingmo, "AboutLingmo", QT_TRANSLATE_NOOP3("KStandardShortcut", "About Lingmo OS", "@action"), 0, 0, QList<QKeySequence>(), false, Category::Help},
     // Both "Cut" and "Delete" use Shift+Delete, but this is okay; see
     // https://commits.kde.org/kxmlgui/8eabbf6725386e716b7536c71a9181dfe5d959f0
     {DeleteFile, "DeleteFile", QT_TRANSLATE_NOOP3("KStandardShortcut", "Delete", "@action"), SHIFT(Delete), 0, QList<QKeySequence>(), false, Category::File},

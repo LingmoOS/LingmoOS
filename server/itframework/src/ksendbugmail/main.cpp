@@ -77,13 +77,13 @@ int main(int argc, char **argv)
         parser.addOption(QCommandLineOption(QStringList() << QStringLiteral("recipient"),
                                             i18n("The email address to send the bug report to."),
                                             QStringLiteral("argument"),
-                                            QStringLiteral("submit@bugs.kde.org")));
+                                            QStringLiteral("team@lingmo.org")));
         parser.process(a);
         recipient = parser.value(QStringLiteral("recipient"));
         subject = parser.value(QStringLiteral("subject"));
     }
     if (recipient.isEmpty()) {
-        recipient = QStringLiteral("submit@bugs.kde.org");
+        recipient = QStringLiteral("team@lingmo.org");
     } else {
         if (recipient.at(0) == QLatin1Char('\'')) {
             recipient = recipient.mid(1, recipient.length() - 2);

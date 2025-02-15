@@ -1,0 +1,31 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+if (@HAVE_KAUTH@)
+  find_dependency(KF5Auth "@KF_DEP_VERSION@")
+endif()
+find_dependency(KF5Codecs "@KF_DEP_VERSION@")
+find_dependency(KF5Config "@KF_DEP_VERSION@")
+find_dependency(KF5WidgetsAddons "@KF_DEP_VERSION@")
+
+# Not using 'TARGET Qt6::Core5Compat' as it may be undefined at the
+# time this file is used
+if(@_qt6_core5_compat@)
+    find_dependency(Qt6Core5Compat @REQUIRED_QT_VERSION@)
+endif()
+
+if (NOT @BUILD_SHARED_LIBS@)
+    find_dependency(Qt@QT_MAJOR_VERSION@Widgets @REQUIRED_QT_VERSION@)
+
+    if (NOT ANDROID)
+        find_dependency(Qt@QT_MAJOR_VERSION@DBus @REQUIRED_QT_VERSION@)
+    endif()
+
+    find_dependency(KF5CoreAddons "@KF_DEP_VERSION@")
+    find_dependency(KF5GuiAddons "@KF_DEP_VERSION@")
+    find_dependency(KF5I18n "@KF_DEP_VERSION@")
+endif()
+
+
+include("${CMAKE_CURRENT_LIST_DIR}/KF5ConfigWidgetsTargets.cmake")
+@PACKAGE_INCLUDE_QCHTARGETS@
