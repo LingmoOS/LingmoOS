@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+include /usr/share/dpkg/vendor.mk
+
+%:
+	dh $@ --with pkgkde_symbolshelper
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_QCH=ON -DXMLGUI_DISTRIBUTION_TEXT="$(DEB_VENDOR) packages" -DBUILD_TESTING=OFF
+
+override_dh_auto_test:
+	# Disable dh_auto_test at build time
+	:

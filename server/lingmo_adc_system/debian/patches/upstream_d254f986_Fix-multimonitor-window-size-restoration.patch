@@ -1,0 +1,60 @@
+From d254f9861c4df375525323815081c3f1b64d42b2 Mon Sep 17 00:00:00 2001
+From: Nate Graham <nate@kde.org>
+Date: Mon, 13 Feb 2023 15:47:05 -0700
+Subject: [PATCH] Fix multimonitor window size restoration
+
+The size saving and restoring code saves width and height values under a
+config key that changes based on the active screens, the name of the
+current screen, and the resolution of the current screen. This suffers
+from a few issues:
+- Due to https://bugreports.qt.io/browse/QTBUG-50788, what counts as the
+  current screen is volatile at runtime, and hence data gets saved to
+  and read from different config file keys.
+- Including the screen resolution of the current screen only makes sense
+  for single-screen setups anyway as it's just random data causing
+  entropy for multi-screen setups.
+
+Both of these issues contribute to the problem of window size being
+restored incorrectly for multi-screen setups.
+
+This commit fixes the issue by no longer including current-screen-based
+data in the config file keys for multi-screen setups; just including the
+current set of screens is good enough and it's non-volatile within the
+scope of what we care about.
+
+BUG: 460260
+FIXED-IN: 5.104
+(cherry picked from commit fc46a2215809abebfdab8ca471c1b27b65b7ad56)
+---
+ src/gui/kwindowconfig.cpp | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/src/gui/kwindowconfig.cpp b/src/gui/kwindowconfig.cpp
+index 5e1de4ca..1270579b 100644
+--- a/src/gui/kwindowconfig.cpp
++++ b/src/gui/kwindowconfig.cpp
+@@ -61,10 +61,17 @@ static QScreen *findScreenByName(const QWindow *window, const QString screenName
+ // save window size, position, or maximization information.
+ static QString configFileString(const QScreen *screen, const QString &key)
+ {
+-    // We include resolution data to also save data on a per-resolution basis
+-    const QString returnString =
+-        QStringLiteral("%1 %2 %3x%4 %5")
+-            .arg(allConnectedScreens(), key, QString::number(screen->geometry().width()), QString::number(screen->geometry().height()), screen->SCREENNAME());
++    // For single-screen setups, we include resolution data to also save data on
++    // a per-resolution basis. We don't do this for multi-screen setups because
++    // screen order (and hence resolutions) are volatile due to
++    // https://bugreports.qt.io/browse/QTBUG-50788
++    QString returnString;
++    if (QGuiApplication::screens().length() == 1) {
++        returnString = QStringLiteral("%1 %2x%3 %4")
++                           .arg(allConnectedScreens(), QString::number(screen->geometry().width()), QString::number(screen->geometry().height()), key);
++    } else {
++        returnString = QStringLiteral("%1 %2").arg(allConnectedScreens(), key);
++    }
+     return returnString;
+ }
+ 
+-- 
+GitLab
+
