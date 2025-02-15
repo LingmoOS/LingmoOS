@@ -66,9 +66,6 @@ ecm_set_disabled_deprecation_versions(
 )
 
 add_subdirectory(src)
-if (BUILD_TESTING)
-    add_subdirectory(autotests)
-endif()
 
 include (ECMPoQmTools)
 ecm_install_po_files_as_qm(poqm)
