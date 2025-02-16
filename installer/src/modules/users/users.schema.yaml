@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: 2020 Adriaan de Groot <groot@kde.org>
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+$schema: https://json-schema.org/schema#
+$id: https://calamares.io/schemas/users
+additionalProperties: false
+type: object
+properties:
+    # User shell, should be path to /bin/sh or so
+    userShell: { type: string }
+    user:
+        additionalProperties: false
+        type: object
+        properties:
+            shell: { type: string }  # Overrides userShell
+            forbidden_names: { type: array, items: { type: string } }
+    # Group settings
+    defaultGroups:
+        type: array
+        items:
+            oneOf:
+                - type: string
+                - type: object
+                  properties:
+                      name: { type: string }
+                      must_exist: { type: boolean, default: false }
+                      system: { type: boolean, default: false }
+                  additionalProperties: false
+                  required: [ name ]
+    autologinGroup: { type: string }
+    sudoersGroup: { type: string }
+    sudoersConfigureWithGroup: { type: boolean, default: false }
+    # Skip login (depends on displaymanager support)
+    doAutologin: { type: boolean, default: true }
+    # Root password separate from user password?
+    setRootPassword: { type: boolean, default: true }
+    doReusePassword: { type: boolean, default: true }
+    # Passwords that don't pass a quality test
+    allowWeakPasswords: { type: boolean, default: false }
+    allowWeakPasswordsDefault: { type: boolean, default: false }
+    passwordRequirements:
+        additionalProperties: false
+        type: object
+        properties:
+            nonempty: { type: boolean, default: true }
+            minLength: { type: number }
+            maxLength: { type: number }
+            libpwquality: { type: array, items: { type: string } }  # Don't know what libpwquality supports
+    hostname:
+        additionalProperties: false
+        type: object
+        properties:
+            location: { type: string, enum: [ None, EtcFile, Hostnamed, Transient ] }
+            writeHostsFile: { type: boolean, default: true }
+            template: { type: string, default: "${first}-${product}" }
+            forbidden_names: { type: array, items: { type: string } }
+    # Legacy Hostname setting
+    setHostname: { type: string, enum: [ None, EtcFile, Hostnamed ] }
+    writeHostsFile: { type: boolean, default: true }
+
+    # Presets
+    #
+    # TODO: lift up somewhere, since this will return in many modules;
+    #       the type for each field (fullName, loginName) is a
+    #       preset-description (value, editable).
+    presets:
+        type: object
+        additionalProperties: false
+        properties:
+            fullName: { type: object }
+            loginName: { type: object }
+
+required:
+    - defaultGroups
+    - autologinGroup
+    - sudoersGroup
