@@ -213,13 +213,6 @@ QAction *_k_createInternal(StandardAction id, QObject *parent)
             }
         }
 
-        if (id == Donate) {
-            const QString currencyCode = QLocale().currencySymbol(QLocale::CurrencyIsoCode).toLower();
-            if (!currencyCode.isEmpty()) {
-                iconName = QStringLiteral("help-donate-%1").arg(currencyCode);
-            }
-        }
-
         QIcon icon = iconName.isEmpty() ? QIcon() : QIcon::fromTheme(iconName);
 
         switch (id) {
@@ -744,7 +737,7 @@ QAction *aboutApp(const QObject *recvr, const char *slot, QObject *parent)
     return KStandardAction::create(AboutApp, recvr, slot, parent);
 }
 
-QAction *aboutLingmo(const QObject *recvr, const char *slot, QObject *parent)
+QAction *aboutKDE(const QObject *recvr, const char *slot, QObject *parent)
 {
     return KStandardAction::create(AboutKDE, recvr, slot, parent);
 }
@@ -762,11 +755,6 @@ QAction *renameFile(const QObject *recvr, const char *slot, QObject *parent)
 QAction *moveToTrash(const QObject *recvr, const char *slot, QObject *parent)
 {
     return KStandardAction::create(MoveToTrash, recvr, slot, parent);
-}
-
-QAction *donate(const QObject *recvr, const char *slot, QObject *parent)
-{
-    return KStandardAction::create(Donate, recvr, slot, parent);
 }
 
 KHamburgerMenu *hamburgerMenu(const QObject *recvr, const char *slot, QObject *parent)

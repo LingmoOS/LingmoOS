@@ -23,7 +23,7 @@
 #include <QWidget>
 
 #include "kaboutapplicationdialog.h"
-#include "lingmoaboutdialog.h"
+#include "kaboutkdedialog_p.h"
 #include "kbugreport.h"
 #include "kswitchlanguagedialog_p.h"
 
@@ -45,7 +45,7 @@ public:
     {
         delete mMenu;
         delete mAboutApp;
-        delete mAboutLingmo;
+        delete mAboutKDE;
         delete mBugReport;
         delete mSwitchApplicationLanguage;
     }
@@ -54,7 +54,7 @@ public:
 
     QMenu *mMenu = nullptr;
     QDialog *mAboutApp = nullptr;
-    LingmoAboutDialog *mAboutLingmo = nullptr;
+    KAboutKdeDialog *mAboutKDE = nullptr;
     KBugReport *mBugReport = nullptr;
     KSwitchLanguageDialog *mSwitchApplicationLanguage = nullptr;
 
@@ -70,7 +70,7 @@ public:
     QAction *mReportBugAction = nullptr;
     QAction *mSwitchApplicationLanguageAction = nullptr;
     QAction *mAboutAppAction = nullptr;
-    QAction *mAboutLingmoAction = nullptr;
+    QAction *mAboutKDEAction = nullptr;
 
     KAboutData mAboutData;
 };
@@ -126,8 +126,8 @@ void KHelpMenuPrivate::createActions(KHelpMenu *q)
         mAboutAppAction = KStandardAction::aboutApp(q, &KHelpMenu::aboutApplication, q);
     }
 
-    if (KAuthorized::authorizeAction(QStringLiteral("help_about_lingmo"))) {
-        mAboutLingmoAction = KStandardAction::aboutLingmo(q, &KHelpMenu::aboutLingmo, q);
+    if (KAuthorized::authorizeAction(QStringLiteral("help_about_kde"))) {
+        mAboutKDEAction = KStandardAction::aboutKDE(q, &KHelpMenu::aboutKDE, q);
     }
 }
 
@@ -177,8 +177,8 @@ QMenu *KHelpMenu::menu()
             d->mMenu->addAction(d->mAboutAppAction);
         }
 
-        if (d->mAboutLingmoAction) {
-            d->mMenu->addAction(d->mAboutLingmoAction);
+        if (d->mAboutKDEAction) {
+            d->mMenu->addAction(d->mAboutKDEAction);
         }
     }
 
@@ -203,8 +203,8 @@ QAction *KHelpMenu::action(MenuId id) const
     case menuAboutApp:
         return d->mAboutAppAction;
 
-    case menuAboutLingmo:
-        return d->mAboutLingmoAction;
+    case menuAboutKDE:
+        return d->mAboutKDEAction;
     }
 
     return nullptr;
@@ -270,13 +270,13 @@ void KHelpMenu::aboutApplication()
 #endif
 }
 
-void KHelpMenu::aboutLingmo()
+void KHelpMenu::aboutKDE()
 {
-    if (!d->mAboutLingmo) {
-        d->mAboutLingmo = new LingmoAboutDialog(d->mParent);
-        connect(d->mAboutLingmo, &QDialog::finished, this, &KHelpMenu::dialogFinished);
+    if (!d->mAboutKDE) {
+        d->mAboutKDE = new KAboutKdeDialog(d->mParent);
+        connect(d->mAboutKDE, &QDialog::finished, this, &KHelpMenu::dialogFinished);
     }
-    d->mAboutLingmo->show();
+    d->mAboutKDE->show();
 }
 
 void KHelpMenu::reportBug()
@@ -304,9 +304,9 @@ void KHelpMenu::dialogFinished()
 
 void KHelpMenu::timerExpired()
 {
-    if (d->mAboutLingmo && !d->mAboutLingmo->isVisible()) {
-        delete d->mAboutLingmo;
-        d->mAboutLingmo = nullptr;
+    if (d->mAboutKDE && !d->mAboutKDE->isVisible()) {
+        delete d->mAboutKDE;
+        d->mAboutKDE = nullptr;
     }
 
     if (d->mBugReport && !d->mBugReport->isVisible()) {

@@ -193,7 +193,7 @@ enum StandardAction {
     WhatsThis, ///< Trigger the What's This cursor.
     ReportBug, ///< Open up the Report Bug dialog.
     AboutApp, ///< Display the application's About box.
-    AboutKDE, ///< Display the About KDE dialog.
+    AboutKDE, ///< Display the About Lingmo OS dialog.
     TipofDay, ///< Display the "Tip of the Day".
     // Other standard actions
     ConfigureNotifications, ///< Display the notifications configuration dialog.
@@ -209,7 +209,6 @@ enum StandardAction {
     DeleteFile, ///< Permanently deletes files or folders. @since 5.25
     RenameFile, ///< Renames files or folders. @since 5.25
     MoveToTrash, ///< Moves files or folders to the trash. @since 5.25
-    Donate, ///< Open donation page on kde.org. @since 5.26
     HamburgerMenu ///< Opens a menu that substitutes the menubar. @since 5.81
 };
 
@@ -1177,15 +1176,15 @@ KCONFIGWIDGETS_EXPORT QAction *aboutApp(const QObject *recvr, const char *slot, 
 KSTANDARDACTION_WITH_NEW_STYLE_CONNECT(aboutApp, AboutApp)
 
 /**
- * Display the About KDE dialog.
+ * Display the About Lingmo OS dialog.
  */
-KCONFIGWIDGETS_EXPORT QAction *aboutLingmo(const QObject *recvr, const char *slot, QObject *parent);
+KCONFIGWIDGETS_EXPORT QAction *aboutKDE(const QObject *recvr, const char *slot, QObject *parent);
 
 /**
- * Display the About KDE dialog.
+ * Display the About Lingmo OS dialog.
  * @since 5.23
  */
-KSTANDARDACTION_WITH_NEW_STYLE_CONNECT(aboutLingmo, AboutKDE)
+KSTANDARDACTION_WITH_NEW_STYLE_CONNECT(aboutKDE, AboutKDE)
 
 /**
  * Permanently deletes files or folders.
@@ -1222,18 +1221,6 @@ KCONFIGWIDGETS_EXPORT QAction *moveToTrash(const QObject *recvr, const char *slo
  * @since 5.25
  */
 KSTANDARDACTION_WITH_NEW_STYLE_CONNECT(moveToTrash, MoveToTrash)
-
-/**
- * Open donation page on kde.org.
- * @since 5.26
- */
-KCONFIGWIDGETS_EXPORT QAction *donate(const QObject *recvr, const char *slot, QObject *parent);
-
-/**
- * Open donation page on kde.org.
- * @since 5.26
- */
-KSTANDARDACTION_WITH_NEW_STYLE_CONNECT(donate, Donate)
 
 /**
  * Opens a menu that substitutes the menubar.

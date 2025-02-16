@@ -112,10 +112,10 @@ KBugReport::KBugReport(const KAboutData &aboutData, QWidget *_parent)
 
     const QString bugAddress = d->m_aboutData.bugAddress();
     if (bugAddress == QLatin1String("team@lingmo.org")) {
-        // 这是一个 LingmoOS 核心应用 -> 重定向到 GitHub Issues
+        // This is a core KDE application -> redirect to the web form
         d->bugDestination = KBugReportPrivate::BugsKdeOrg;
     } else if (!QUrl(bugAddress).scheme().isEmpty()) {
-        // bug 报告地址是一个 URL -> 重定向到该地址
+        // The bug reporting address is a URL -> redirect to that
         d->bugDestination = KBugReportPrivate::CustomUrl;
     }
 
@@ -298,7 +298,7 @@ KBugReport::KBugReport(const KAboutData &aboutData, QWidget *_parent)
         if (d->bugDestination == KBugReportPrivate::BugsKdeOrg) {
             text = i18n(
                 "<qt>To submit a bug report, click on the button below. This will open a web browser "
-                "window on <a href=\"https://github.com/LingmoOS/LingmoOS/issues\">https://github.com/LingmoOS/LingmoOS/issues</a> where you will find "
+                "window on <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> where you will find "
                 "a form to fill in. The information displayed above will be transferred to that server.</qt>");
             d->updateUrl();
         } else {
@@ -351,7 +351,19 @@ void KBugReport::setMessageBody(const QString &messageBody)
 
 void KBugReportPrivate::updateUrl()
 {
-    url = QUrl(QStringLiteral("https://github.com/LingmoOS/LingmoOS/issues"));
+    url = QUrl(QStringLiteral("https://bugs.kde.org/enter_bug.cgi"));
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("format"), QStringLiteral("guided")); // use the guided form
+
+    // the string format is product/component, where component is optional
+    QStringList list = appname.split(QLatin1Char('/'));
+    query.addQueryItem(QStringLiteral("product"), list[0]);
+    if (list.size() == 2) {
+        query.addQueryItem(QStringLiteral("component"), list[1]);
+    }
+
+    query.addQueryItem(QStringLiteral("version"), m_strVersion);
+    url.setQuery(query);
 
     // TODO: guess and fill OS(sys_os) and Platform(rep_platform) fields
 }
@@ -464,7 +476,7 @@ void KBugReport::accept()
         QString msg = i18n(
             "Unable to send the bug report.\n"
             "Please submit a bug report manually....\n"
-            "See https://github.com/LingmoOS/LingmoOS/issues for instructions.");
+            "See https://bugs.kde.org/ for instructions.");
         KMessageBox::error(this, msg + QLatin1String("\n\n") + d->lastError);
         return;
     }

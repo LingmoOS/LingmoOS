@@ -174,7 +174,7 @@ QWidget *KAbstractAboutDialogPrivate::createAuthorsWidget(const QList<KAboutPers
             if (bugAddress.isEmpty() || bugAddress == QLatin1String("team@lingmo.org")) {
                 bugsLabel->setText(i18nc("Reference to website",
                                          "Please use %1 to report bugs.\n",
-                                         QLatin1String("<a href=\"https://github.com/LingmoOS/LingmoOS/issues\">https://github.com/LingmoOS/LingmoOS/issues</a>")));
+                                         QLatin1String("<a href=\"https://bugs.kde.org\">https://bugs.kde.org</a>")));
             } else {
                 QUrl bugUrl(bugAddress);
                 if (bugUrl.scheme().isEmpty()) {

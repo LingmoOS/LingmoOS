@@ -8,3 +8,6 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all reproducible=-fixfilepath
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DBUILD_QCH=ON
+
+override_dh_auto_test:
+	xvfb-run -a --server-args="-screen 0 1024x768x24" dbus-run-session dh_auto_test --buildsystem=kf5 -O--buildsystem=kf5

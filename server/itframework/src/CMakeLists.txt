@@ -19,7 +19,7 @@ target_sources(KF5XmlGui PRIVATE
   kaboutapplicationlistview_p.cpp
   kaboutapplicationpersonlistdelegate_p.cpp
   kaboutapplicationpersonmodel_p.cpp
-  lingmoaboutdialog.cpp
+  kaboutkdedialog_p.cpp
   kaboutplugindialog.cpp
   kabstractaboutdialog_p.cpp
   kactioncategory.cpp

@@ -160,7 +160,7 @@ public:
      * It contains entries for the
      * help system (activated by F1), an optional "What's This?" entry
      * (activated by Shift F1), an application specific dialog box,
-     * and an "About KDE" dialog box.
+     * and an "About Lingmo OS" dialog box.
      *
      * Example (adding a standard help menu to your application):
      * \code
@@ -190,7 +190,7 @@ public:
      * It contains entries for the
      * help system (activated by F1), an optional "What's This?" entry
      * (activated by Shift F1), an application specific dialog box,
-     * and an "About KDE" dialog box. You must create the application
+     * and an "About Lingmo OS" dialog box. You must create the application
      * specific dialog box yourself. When the "About application"
      * menu entry is activated, a signal will trigger the
      * showAboutApplication slot. See showAboutApplication for more

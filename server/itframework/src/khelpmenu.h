@@ -44,7 +44,7 @@ class KHelpMenuPrivate;
  *
  * \code
  * mHelpMenu = new KHelpMenu( this, <someText> );
- * connect(this, &ClassFoo::someSignal, mHelpMenu, &KHelpMenu::aboutLingmo);
+ * connect(this, &ClassFoo::someSignal, mHelpMenu, &KHelpMenu::aboutKDE);
  * \endcode
  *
  * IMPORTANT:
@@ -99,7 +99,7 @@ class KHelpMenuPrivate;
    actions/help_report_bug=false
    actions/switch_application_language=false
    actions/help_about_app=false
-   actions/help_about_lingmo=false
+   actions/help_about_kde=false
    @endverbatim
  *
  * @author Espen Sand (espen@kde.org)
@@ -127,7 +127,7 @@ public:
      * Constructor.
      *
      * This alternative constructor is mainly useful if you want to
-     * override the standard actions (aboutApplication(), aboutLingmo(),
+     * override the standard actions (aboutApplication(), aboutKDE(),
      * helpContents(), reportBug, and optionally whatsThis).
      *
      * @param parent The parent of the dialog boxes. The boxes are modeless
@@ -162,7 +162,7 @@ public:
         menuHelpContents = 0,
         menuWhatsThis = 1,
         menuAboutApp = 2,
-        menuAboutLingmo = 3,
+        menuAboutKDE = 3,
         menuReportBug = 4,
         menuSwitchLanguage = 5,
     };
@@ -202,7 +202,7 @@ public Q_SLOTS:
     /**
      * Opens the standard "About Lingmo OS" dialog box.
      */
-    void aboutLingmo();
+    void aboutKDE();
 
     /**
      * Opens the standard "Report Bugs" dialog box.

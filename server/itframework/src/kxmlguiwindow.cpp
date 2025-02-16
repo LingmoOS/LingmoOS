@@ -353,7 +353,7 @@ void KXmlGuiWindow::createGUI(const QString &xmlfile)
         QAction *reportBugAction = d->helpMenu->action(KHelpMenu::menuReportBug);
         QAction *switchLanguageAction = d->helpMenu->action(KHelpMenu::menuSwitchLanguage);
         QAction *aboutAppAction = d->helpMenu->action(KHelpMenu::menuAboutApp);
-        QAction *aboutLingmoAction = d->helpMenu->action(KHelpMenu::menuAboutLingmo);
+        QAction *aboutKdeAction = d->helpMenu->action(KHelpMenu::menuAboutKDE);
 
         if (helpContentsAction) {
             actions->addAction(helpContentsAction->objectName(), helpContentsAction);
@@ -370,12 +370,9 @@ void KXmlGuiWindow::createGUI(const QString &xmlfile)
         if (aboutAppAction) {
             actions->addAction(aboutAppAction->objectName(), aboutAppAction);
         }
-        if (aboutLingmoAction) {
-            actions->addAction(aboutLingmoAction->objectName(), aboutLingmoAction);
+        if (aboutKdeAction) {
+            actions->addAction(aboutKdeAction->objectName(), aboutKdeAction);
         }
-        // if (donateAction) {
-        //     actions->addAction(donateAction->objectName(), donateAction);
-        // }
     }
 
     const QString windowXmlFile = xmlfile.isNull() ? componentName() + QLatin1String("ui.rc") : xmlfile;

@@ -765,7 +765,7 @@ void KXmlGui_UnitTest::testCustomPlaceToolBar()
         "  <text>Custom Toolbar</text>\n"
         "  <Action name=\"go_up\"/>\n"
         "  <Action name=\"file_open\"/>\n"
-        "  <Action name=\"help_about_lingmo\"/>\n"
+        "  <Action name=\"help_about_kde\"/>\n"
         "</ToolBar>\n"
         "</gui>\n";
     KConfigGroup cg(KSharedConfig::openConfig(), "testHiddenToolBar");

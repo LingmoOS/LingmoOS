@@ -1,4 +1,14 @@
-#include "lingmoaboutdialog.h"
+/*
+    This file is part of the KDE libraries
+    SPDX-FileCopyrightText: 2007 Urs Wolfer <uwolfer at kde.org>
+
+    Parts of this class have been take from the KAboutKDE class, which was
+    SPDX-FileCopyrightText: 2000 Espen Sand <espen@kde.org>
+
+    SPDX-License-Identifier: LGPL-2.0-only
+*/
+
+#include "kaboutkdedialog_p.h"
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
@@ -14,14 +24,14 @@
 
 namespace KDEPrivate
 {
-LingmoAboutDialog::LingmoAboutDialog(QWidget *parent)
+KAboutKdeDialog::KAboutKdeDialog(QWidget *parent)
     : QDialog(parent)
     , d(nullptr)
 {
     setWindowTitle(i18nc("@title:window", "About Lingmo OS"));
 
     KTitleWidget *titleWidget = new KTitleWidget(this);
-    titleWidget->setText(i18n("<html><font size=\"5\">Lingmo OS</font></html>"));
+    titleWidget->setText(i18n("<html><font size=\"6\">Lingmo OS</font></html>"));
     titleWidget->setIconSize(QSize(48, 48));
     titleWidget->setIcon(QIcon::fromTheme(QStringLiteral("systemlogo")), KTitleWidget::ImageLeft);
 

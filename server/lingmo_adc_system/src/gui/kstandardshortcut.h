@@ -136,11 +136,10 @@ enum StandardShortcut {
     ReportBug, ///< Display the Report Bug dialog.
     SwitchApplicationLanguage, ///< Display the Switch Application Language dialog.
     AboutApp, ///< Display the application's About dialog.
-    AboutLingmo, ///< Display the About KDE dialog.
+    AboutKDE, ///< Display the About Lingmo OS dialog.
     DeleteFile, ///< Permanently delete files or folders. @since 5.25
     RenameFile, ///< Rename files or folders. @since 5.25
     MoveToTrash, ///< Move files or folders to the trash. @since 5.25
-    Donate, ///< Open donation page on kde.org. @since 5.26
     ShowHideHiddenFiles, ///< Toggle showing or hiding hidden files @since 5.70
     CreateFolder, ///< Create a folder. @since 5.74
     // Insert new items here!
