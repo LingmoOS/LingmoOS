@@ -65,12 +65,11 @@ ecm_set_disabled_deprecation_versions(
     QT 5.15.2
 )
 
+add_subdirectory(src)
+
 include (ECMPoQmTools)
 ecm_install_po_files_as_qm(poqm)
 
-# allow kconfig_compiler install dir to be set as a configure argument
-set(KCONFIG_COMPILER_INSTALL_DIR "${KDE_INSTALL_LIBEXECDIR_KF}" CACHE STRING
-   "Set directory for kconfig compiler tool")
 
 # create a Config.cmake and a ConfigVersion.cmake file and install them
 set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5Config")
