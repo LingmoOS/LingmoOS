@@ -1,23 +1,3 @@
-/*
- * Copyright (C) 2024 LingmoOS.
- *
- * Author:     Reion Wong <reionwong@gmail.com>
- * Maintainer: Lingmo OS Team <team@lingmo.org>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12 as QQC2
@@ -35,6 +15,8 @@ Item {
     id: root
 
     property string notificationMessage
+    property bool loginVisible: false  // 登录界面显示状态
+    property color timeColor: "white"  // 时间颜色，根据背景亮度调整
 
     LayoutMirroring.enabled: Qt.locale().textDirection == Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
@@ -44,8 +26,7 @@ Item {
     Image {
         id: wallpaperImage
         anchors.fill: parent
-        // TODO: dynamically change to wallpaper for user
-        source: "file://" + "/usr/share/backgrounds/lingmoos/default.jpg"
+        source: "/etc/system/wallpaper/img.jpg"
         sourceSize: Qt.size(width * Screen.devicePixelRatio,
                             height * Screen.devicePixelRatio)
         fillMode: Image.PreserveAspectCrop
@@ -53,6 +34,13 @@ Item {
         clip: true
         cache: false
         smooth: true
+        onStatusChanged: checkTimeColor()  // 当背景图像加载完成后检测颜色
+    }
+
+    function checkTimeColor() {
+        // 简单的颜色检测示例，实际实现可能需要更多优化
+        var imageBrightness = wallpaperImage.colorAt(0, 0).lightness
+        timeColor = imageBrightness > 0.5 ? "black" : "white"
     }
 
     FastBlur {
@@ -61,7 +49,7 @@ Item {
         radius: 64
         source: wallpaperImage
         cached: true
-        visible: true
+        visible: loginVisible  // 登录界面显示时模糊
     }
 
     Timer {
@@ -80,6 +68,28 @@ Item {
         dateLabel.updateInfo()
     }
 
+    Keys.onPressed: {
+        if (!loginVisible) {
+            loginVisible = true
+        }
+    }
+
+    // MouseArea {
+    //     id: rootMouseArea
+    //     anchors.fill: parent
+    //     onClicked: {
+    //         if (!loginVisible) {
+    //             loginVisible = true
+    //         }
+    //     }
+    //     onPressAndHold: {
+    //         if (!loginVisible) {
+    //             loginVisible = true
+    //         }
+    //     }
+    //     acceptedButtons: Qt.LeftButton | Qt.RightButton
+    // }
+
     Item {
         id: _topItem
         anchors.left: parent.left
@@ -93,11 +103,23 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             Layout.alignment: Qt.AlignHCenter
-            font.pointSize: 35
-            color: "white"
+            font.pointSize: 60
+            font.bold: true  // 加粗时间文本
+            color: root.timeColor  // 自动反色
+            opacity: loginVisible ? 0 : 1  // 动态控制透明度
 
             function updateInfo() {
-                timeLabel.text = new Date().toLocaleString(Qt.locale(), "hh:mm")
+                timeLabel.text = new Date().toLocaleTimeString(Qt.locale(), Locale.ShortFormat)
+            }
+
+            Behavior on opacity {
+                OpacityAnimator { duration: 500 }
+            }
+
+            NumberAnimation on y {
+                from: 0
+                to: loginVisible ? -root.height * 0.2 : 0
+                duration: 500
             }
         }
 
@@ -106,11 +128,59 @@ Item {
             anchors.top: timeLabel.bottom
             anchors.topMargin: LingmoUI.Units.largeSpacing
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pointSize: 19
-            color: "white"
+            font.pointSize: 24
+            color: root.timeColor  // 自动反色
+            opacity: loginVisible ? 0 : 1  // 动态控制透明度
 
             function updateInfo() {
                 dateLabel.text = new Date().toLocaleDateString(Qt.locale(), Locale.LongFormat)
+            }
+
+            Behavior on opacity {
+                OpacityAnimator { duration: 500 }
+            }
+
+            NumberAnimation on y {
+                from: 0
+                to: loginVisible ? -root.height * 0.2 : 0
+                duration: 500
+            }
+        }
+
+        QQC2.Button {
+            id: stBtn
+            visible: !loginVisible  // 登录界面显示时隐藏
+            hoverEnabled: true
+            focusPolicy: Qt.StrongFocus
+            focus: true  // 确保按钮默认获取焦点
+            anchors.top: dateLabel.bottom
+            anchors.topMargin: 100
+            anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.centerIn: parent
+            Layout.preferredHeight: 40
+            Layout.preferredWidth: 300
+            text: qsTr("↑")
+            onClicked: loginVisible = true
+
+            scale: stBtn.pressed ? 0.95 : 1.0
+
+            Behavior on scale {
+                NumberAnimation {
+                    duration: 100
+                }
+            }
+
+            background: Rectangle {
+                color: LingmoUI.Theme.darkMode ? "#B6B6B6" : "white"
+                opacity: stBtn.pressed ? 0.3 : stBtn.hovered ? 0.2 : 0.3
+                radius: 100
+            }
+
+            contentItem: Text {
+                text: stBtn.text
+                color: "white"  // 设置文本颜色为白色
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
 
@@ -124,7 +194,7 @@ Item {
             samples: radius * 4
             spread: 0.35
             color: Qt.rgba(0, 0, 0, 0.8)
-            opacity: 0.1
+            opacity: 0
             visible: true
         }
 
@@ -138,7 +208,7 @@ Item {
             samples: radius * 4
             spread: 0.35
             color: Qt.rgba(0, 0, 0, 0.8)
-            opacity: 0.1
+            opacity: 0
             visible: true
         }
     }
@@ -149,7 +219,12 @@ Item {
         width: 260 + LingmoUI.Units.largeSpacing * 3
         height: _mainLayout.implicitHeight + LingmoUI.Units.largeSpacing * 4
 
-        Layout.alignment: Qt.AlignHCenter
+        visible: loginVisible  // 动态控制可见性
+        opacity: loginVisible ? 1 : 0
+
+        Behavior on opacity {
+            OpacityAnimator { duration: 500 }
+        }
 
         Rectangle {
             anchors.fill: parent
@@ -227,6 +302,8 @@ Item {
         width: sessionMenu.implicitWidth + LingmoUI.Units.largeSpacing
         height: sessionMenu.implicitHeight
 
+        visible: loginVisible  // 动态控制可见性
+
         SessionMenu {
             id: sessionMenu
             anchors.fill: parent
@@ -236,7 +313,7 @@ Item {
         }
     }
 
-    Item {
+        Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.rightMargin: LingmoUI.Units.largeSpacing
@@ -245,6 +322,7 @@ Item {
         width: 50
         height: 50 + LingmoUI.Units.largeSpacing
 
+        visible: true  // 无论登录状态显示电源选项
 
         LingmoUI.RoundImageButton {
             anchors.fill: parent
@@ -255,9 +333,6 @@ Item {
             source: "system-shutdown-symbolic.svg"
             iconMargins: LingmoUI.Units.largeSpacing
 
-            // anchors.top: message.bottom
-            // anchors.topMargin: LingmoUI.Units.largeSpacing
-            // anchors.horizontalCenter: parent.horizontalCenter
             onClicked: actionMenu.popup()
         }
     }
@@ -284,19 +359,6 @@ Item {
         }
     }
 
-    // LingmoUI.RoundImageButton {
-    //     width: 50
-    //     height: 50
-
-    //     size: 50
-    //     source: "system-shutdown-symbolic.svg"
-    //     iconMargins: 10
-
-    //     anchors.top: message.bottom
-    //     anchors.topMargin: LingmoUI.Units.largeSpacing
-    //     anchors.horizontalCenter: parent.horizontalCenter
-    // }
-
     QQC2.Label {
         id: message
         anchors.top: _mainItem.bottom
@@ -305,6 +367,8 @@ Item {
         font.bold: true
         text: root.notificationMessage
         color: "white"
+
+        visible: loginVisible  // 仅在登录界面显示
 
         Behavior on opacity {
             NumberAnimation {
@@ -333,6 +397,7 @@ Item {
         var username = _userView.currentItem.userName
         var password = passwordField.text
         root.notificationMessage = ""
+        console.log("Starting login for user:", username)  // 调试信息
         sddm.login(username, password, sessionMenu.currentIndex)
     }
 
@@ -347,7 +412,14 @@ Item {
 
         function onLoginFailed() {
             notificationMessage = textConstants.loginFailed
-            notificationResetTimer.start();
+            console.log("Login failed")  // 调试信息
+            notificationResetTimer.start()
+        }
+
+        function onLoginSuccess() {
+            notificationMessage = textConstants.loginSuccess
+            console.log("Login successful")  // 调试信息
+            loginVisible = false  // 登录成功后隐藏登录界面
         }
     }
 }

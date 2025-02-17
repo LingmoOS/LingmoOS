@@ -14,7 +14,7 @@ jobs:
   debian:
     name: Debian
     runs-on: ubuntu-latest
-    container: docker.io/library/debian:bookworm
+    container: docker.io/library/debian:trixie
     steps:
     - name: Checkout Source
       uses: actions/checkout@v2
@@ -23,9 +23,9 @@ jobs:
     - name: Install the basic dev packages
       run: apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
     - name: Install build dependencies
-      run: apt build-dep ./ -y
+      run: mk-build-deps -i -t "apt-get --yes" -r
     - name: Build Package
-      run: pwd && cd ../ && tar -Jcvf ocean_3.0.0.orig.tar.xz ocean/ && cd ocean && dpkg-buildpackage -uc -us -j$(nproc)
+      run: dpkg-buildpackage -b -uc -us -j$(nproc)
     # - name: Create Release
     #   id: create_release
     #   uses: actions/create-release@v1

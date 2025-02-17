@@ -17,5 +17,6 @@ install(FILES system-shutdown-symbolic.svg DESTINATION /usr/share/sddm/themes/li
 install(FILES theme.conf DESTINATION /usr/share/sddm/themes/lingmo)
 install(FILES hidpi.conf DESTINATION /etc/sddm.conf.d/)
 install(FILES sddm.conf DESTINATION /etc/)
+install(FILES img.jpg DESTINATION /etc/system/wallpaper/)
 
 install(DIRECTORY faces DESTINATION /usr/share/sddm/themes/lingmo)

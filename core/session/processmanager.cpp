@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Lingmo OS Team.
+ * Copyright (C) 2023-2025 Lingmo OS Team.
  */
 
 #include "processmanager.h"
@@ -17,6 +17,8 @@
 
 #include <QDBusInterface>
 #include <QDBusPendingCall>
+#include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 
 #include <QX11Info>
 #include <KWindowSystem>
@@ -50,6 +52,7 @@ void ProcessManager::start()
 {
     startWindowManager();
     startDaemonProcess();
+    checkAndDeactivateScreenSaver();
 }
 
 void ProcessManager::logout()
@@ -97,9 +100,9 @@ void ProcessManager::startDesktopProcess()
 
     QList<QPair<QString, QStringList>> list;
     // Desktop components
-    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
     list << qMakePair(QString("kwin_x11"), QStringList("--replace"));
     list << qMakePair(QString("lingmo-notificationd"), QStringList());
+    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
     list << qMakePair(QString("lingmo-statusbar"), QStringList());
     list << qMakePair(QString("lingmo-dock"), QStringList());
     list << qMakePair(QString("lingmo-launcher"), QStringList());
@@ -202,4 +205,23 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     }
 
     return false;
+}
+
+void ProcessManager::checkAndDeactivateScreenSaver()
+{
+    QDBusInterface interface("org.freedesktop.ScreenSaver", "/ScreenSaver", "org.freedesktop.ScreenSaver", QDBusConnection::sessionBus());
+    if (interface.isValid()) {
+        QDBusPendingCall call = interface.asyncCall("GetActive");
+        QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
+        connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher]() {
+            QDBusPendingReply<bool> reply = *watcher;
+            if (reply.isValid() && reply.value()) {
+                QDBusInterface setActiveInterface("org.freedesktop.ScreenSaver", "/ScreenSaver", "org.freedesktop.ScreenSaver", QDBusConnection::sessionBus());
+                setActiveInterface.call("SetActive", false);
+            }
+            watcher->deleteLater();
+        });
+    } else {
+        qWarning() << "Cannot find org.freedesktop.ScreenSaver interface.";
+    }
 }

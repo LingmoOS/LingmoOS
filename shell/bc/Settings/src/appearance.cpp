@@ -318,9 +318,11 @@ void Appearance::openAdvancedSettings()
 void Appearance::lightThemeChanged()
 {
     QProcess::startDetached("lookandfeeltool", QStringList() << "-a" << "org.lingmo.ocean.desktop");
+    QProcess::startDetached("gsettings", QStringList() << "set" << "org.gnome.desktop.interface" << "color-scheme" << "prefer-light");
 }
 
 void Appearance::darkThemeChanged()
 {
     QProcess::startDetached("lookandfeeltool", QStringList() << "-a" << "org.lingmo.oceandark.desktop");
+    QProcess::startDetached("gsettings", QStringList() << "set" << "org.gnome.desktop.interface" << "color-scheme" << "prefer-dark");
 }

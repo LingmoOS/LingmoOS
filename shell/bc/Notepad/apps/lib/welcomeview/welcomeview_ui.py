@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/lingmo/project/kate/apps/lib/welcomeview/welcomeview.ui'
+# Form implementation generated from reading ui file '/home/lingmo/project/LingmoOS/shell/bc/Notepad/apps/lib/welcomeview/welcomeview.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
