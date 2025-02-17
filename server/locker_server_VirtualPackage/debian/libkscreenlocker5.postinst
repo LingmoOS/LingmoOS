@@ -1,0 +1,26 @@
+#!/bin/sh -e
+
+#DEBHELPER#
+
+set -e
+
+case "$1" in
+    configure)
+
+	# Force unlock of the graphical sessions in case kscreenlocker starts
+	# during upgrade.
+	# A kscreenlocker_greet started in Plasma 5.9 won't be able to unlock
+	# with a kcheckpass from Plasma 5.10
+        command -v loginctl > /dev/null && loginctl unlock-sessions || true
+        ;;
+
+    abort-upgrade|abort-deconfigure|abort-remove)
+        ;;
+
+    *)
+        echo "$0 called with unknown argument \`$1'" 1>&2
+        exit 1
+        ;;
+esac
+
+exit 0
