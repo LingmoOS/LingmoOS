@@ -603,6 +603,7 @@ void KWidgetJobTrackerPrivate::ProgressWidget::init()
     setMaximumHeight(sizeHint().height());
 
     setWindowTitle(QCoreApplication::translate("KWidgetJobTracker", "Progress Dialog")); // show something better than kuiserver
+    setWindowFlag(Qt::WindowStaysOnTopHint, true);
 }
 
 void KWidgetJobTrackerPrivate::ProgressWidget::showTotals()
