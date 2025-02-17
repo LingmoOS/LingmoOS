@@ -17,7 +17,7 @@ VERBOSE="false"
 DEBUG=""
 LINGMO_VERTYPE="beta"
 LINGMO_SYS_VERSION="3.0-rc"
-LINGMO_BUILD_VER="20250214-a"
+LINGMO_BUILD_VER="20250218-a"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 
