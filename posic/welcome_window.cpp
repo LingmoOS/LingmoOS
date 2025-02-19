@@ -7,15 +7,14 @@
 #include <QHBoxLayout>
 #include <QGraphicsDropShadowEffect>
 #include "ripple_button.h"
+#include <QSizePolicy>
 
 WelcomeWindow::WelcomeWindow(QWidget *parent)
     : QWidget(parent)
 {
-    // 设置无边框全屏窗口
-    // setWindowFlags(Qt::Window | Qt::FramelessWindowHint);  // 删除这行
-    
-    // 设置窗口背景色
+    // 设置窗口背景色和大小策略
     setStyleSheet("QWidget { background-color: #f8f9fa; }");
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     
     setupUI();
 }
@@ -26,13 +25,14 @@ void WelcomeWindow::setupUI()
     mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(50, 50, 50, 50);
     
-    // 设置窗口背景图片（只应用于主窗口）
+    // 设置窗口背景图片
     setStyleSheet(QString(
-        "WelcomeWindow {"  // 改为具体的类名，而不是 QWidget
+        "WelcomeWindow {"
         "    background-image: url(:/images/default.jpg);"
         "    background-position: center;"
         "    background-repeat: no-repeat;"
         "    background-attachment: fixed;"
+        "    background-size: cover;"
         "}"
     ));
     

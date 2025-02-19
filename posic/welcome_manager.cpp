@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QResizeEvent>
 #include <QSizePolicy>
+#include <QApplication>
+#include <QScreen>
 
 WelcomeManager::WelcomeManager(QWidget *parent)
     : QStackedWidget(parent)
@@ -17,6 +19,9 @@ WelcomeManager::WelcomeManager(QWidget *parent)
 {
     // 设置窗口属性
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    
+    // 设置全屏并调整大小
+    showFullScreen();
     
     // 检查是否是 Beta 版本
     QFile osRelease("/etc/os-release");

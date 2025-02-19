@@ -6,7 +6,12 @@ export QT_SELECT=5
 	dh $@
 
 override_dh_auto_configure:
-	qmake
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_BUILD_TYPE=Release
 
 override_dh_auto_build:
-	make 
+	cmake --build build
+
+override_dh_auto_install:
+	DESTDIR=$(CURDIR)/debian/lingmo-welcome cmake --install build 

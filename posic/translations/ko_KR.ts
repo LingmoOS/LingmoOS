@@ -73,4 +73,4 @@
         <translation>다음</translation>
     </message>
 </context>
-</TS> 
+</TS>

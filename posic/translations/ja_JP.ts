@@ -73,4 +73,4 @@
         <translation>次へ</translation>
     </message>
 </context>
-</TS> 
+</TS>

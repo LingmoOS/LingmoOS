@@ -73,4 +73,4 @@
         <translation>Далее</translation>
     </message>
 </context>
-</TS> 
+</TS>
