@@ -1,0 +1,53 @@
+Lingmo OS Package Build Tools
+
+This package provides two tools:
+
+lingmo-pkgbuild:
+A tool for building Debian packages. It supports both native packages and quilt-format packages.
+
+Usage:
+  lingmo-pkgbuild [options] <directory>
+
+Options:
+  -h, --help      Show help message
+  -o, --output    Specify output directory (default: pkg_out)
+  -b, --build-dir Specify build directory (default: .build_deb_lingmo)
+  -j, --jobs      Specify number of parallel builds (default: 1)
+  --no-sign       Do not sign the package
+  -k, --key       Specify signing key
+  --no-deps       Skip build dependency check
+  -c, --clean     Clean build directory before and after build
+
+lingmo-repotool:
+A tool for managing Debian package repositories using reprepro.
+
+Usage:
+  lingmo-repotool --init <codename> <repository directory>
+  lingmo-repotool -c <codename> <changes file/directory>
+  lingmo-repotool -deb <codename> <deb file/directory>
+
+Options:
+  --init          Initialize a new repository
+  -c, --changes   Import changes file(s) to repository
+  -deb            Import deb package(s) to repository
+
+Examples:
+1. Build packages:
+   lingmo-pkgbuild -j$(nproc) source/dir/
+
+2. Initialize repository:
+   lingmo-repotool --init helium /path/to/repo
+
+3. Import changes files:
+   cd /path/to/repo
+   lingmo-repotool -c helium path/to/changes
+
+4. Import deb packages:
+   cd /path/to/repo
+   lingmo-repotool -deb helium path/to/debs/
+
+Dependencies:
+- build-essential
+- dpkg-dev
+- gettext
+- reprepro (for lingmo-repotool) 

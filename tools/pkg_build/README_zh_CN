@@ -1,0 +1,53 @@
+Lingmo OS 包构建工具
+
+本软件包提供两个工具：
+
+lingmo-pkgbuild:
+一个用于构建 Debian 包的工具。支持原生包和 quilt 格式的包。
+
+用法：
+  lingmo-pkgbuild [选项] <目录>
+
+选项：
+  -h, --help      显示帮助信息
+  -o, --output    指定输出目录（默认：pkg_out）
+  -b, --build-dir 指定构建目录（默认：.build_deb_lingmo）
+  -j, --jobs      指定并行构建数量（默认：1）
+  --no-sign       不对包进行签名
+  -k, --key       指定签名密钥
+  --no-deps       跳过构建依赖检查
+  -c, --clean     在构建前后清理构建目录
+
+lingmo-repotool:
+一个使用 reprepro 管理 Debian 软件包仓库的工具。
+
+用法：
+  lingmo-repotool --init <代号> <仓库目录>
+  lingmo-repotool -c <代号> <changes 文件/目录>
+  lingmo-repotool -deb <代号> <deb 文件/目录>
+
+选项：
+  --init          初始化新仓库
+  -c, --changes   导入 changes 文件到仓库
+  -deb            导入 deb 包到仓库
+
+示例：
+1. 构建包：
+   lingmo-pkgbuild -j$(nproc) source/dir/
+
+2. 初始化仓库：
+   lingmo-repotool --init helium /path/to/repo
+
+3. 导入 changes 文件：
+   cd /path/to/repo
+   lingmo-repotool -c helium path/to/changes
+
+4. 导入 deb 包：
+   cd /path/to/repo
+   lingmo-repotool -deb helium path/to/debs/
+
+依赖：
+- build-essential
+- dpkg-dev
+- gettext
+- reprepro（用于 lingmo-repotool） 
