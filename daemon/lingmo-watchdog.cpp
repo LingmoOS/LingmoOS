@@ -46,7 +46,7 @@ int main() {
             startFileManager();
         }
         
-        // 每5秒检查一次
+        // 每3秒检查一次
         sleep(3);
     }
     
