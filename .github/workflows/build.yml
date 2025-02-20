@@ -1,0 +1,40 @@
+name: Lingmo OS Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: debian:12
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Lingmo build tool
+      run: |
+        sudo wget https://packages.lingmo.org/lingmo/pool/main/l/lingmo-pkgbuild/lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
+        sudo apt install ./ lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
+        sudo apt-get install -f
+
+    - name: Create .deb packages
+      run: |
+        mkdir buildpkg/
+        cp core*/ buildpkg/
+        sudo lingmo-pkgbuild -j$(nproc) --no-deps -c buildpkg/
+
+    - name: Move files and compress directory
+      run: |
+        mv pkg_out release
+        tar -Jcf release.tar.xz release/
+
+    - name: Create GitHub Release
+      run: |
+        CURRENTDATE=$(date +%Y%m%d)
+        TAG=3.0.0-rc9.build$CURRENTDATE
+        gh release create $TAG --title "Release $TAG" --notes "Automated release for $TAG"
+        gh release upload $TAG pkg_out/*
+        gh release upload $TAG release.tar.xz
