@@ -31,14 +31,14 @@ jobs:
     - name: Install Lingmo build tool
       run: |
         wget https://packages.lingmo.org/lingmo/pool/main/l/lingmo-pkgbuild/lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
-        apt install -y ./lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
+        apt install ./lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
         apt-get install -f
 
     - name: Create .deb packages
       run: |
-        mkdir buildpkg/
-        cp -r core buildpkg/
-        lingmo-pkgbuild -j$(nproc) -c buildpkg/
+        mkdir -p buildpkg/
+        cp -r core/ buildpkg/
+        lingmo-pkgbuild -j$(nproc) --no-deps -c buildpkg/
 
     - name: Move files and compress directory
       run: |
@@ -46,6 +46,8 @@ jobs:
         tar -Jcf release.tar.xz release/
 
     - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         CURRENTDATE=$(date +%Y%m%d)
         TAG=3.0.0-rc9.build$CURRENTDATE
