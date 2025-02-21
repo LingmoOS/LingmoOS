@@ -3,24 +3,45 @@
 SRC_DIRS=(
     "boot/splash/BootScreen"
     "core"
-    "core32"
     "daemon"
     "fm"
-    "lib/*"
     "libcoreui"
     "posic"
     "server/asyncjobprog"
     "server/itframework"
-    "shell/bc/*"
-    "shell/cc/*"
-    "windows/*"
 )
 
 DEST_DIR="buildpkg"
+SPCASE_BUILD_DIR="buildpkg_spcase"
 
 for dir in "${SRC_DIRS[@]}"; do
-
    rsync -av --relative "$dir" "$DEST_DIR"
-                                                            done
+done
+
+SRC_OTHER_DIRS=(
+    "core32/"
+    "shell/bc/*"
+    "shell/cc/*"
+    "windows/*"
+    "lib/*"
+)
+
+DEST_O_DIR="$DEST_O_DIR"
+SPCASE_BUILD_DIR="$SPCASE_BUILD_DIR"
+
+rsync -av --relative "${SRC_OTHER_DIRS[0]}" "$SPCASE_BUILD_DIR"
+
+for dir in "${SRC_OTHER_DIRS[@]:1}"; do
+    cp -r "$dir" "$DEST_O_DIR"
+done
 
 ls buildpkg/
+ls buildpkg_spcase/
+
+# Build core32
+cd buildpkg_spcase/core32 && apt build-dep ./ -y && dpkg-buildpackage -j10 && cp ../..
+cp buildpkg_spcase/*.deb pkg_out
+cp buildpkg_spcase/*.changes pkg_out
+cp buildpkg_spcase/*.buildingo pkg_out
+cp buildpkg_spcase/*.dsc pkg_out
+cp buildpkg_spcase/*.xz pkg_out
