@@ -41,7 +41,9 @@ jobs:
     - name: Create .deb packages
       run: |
         mkdir -p buildpkg/
-        cp -r daemon/ buildpkg/
+        cp tools/config.sh .
+        chmod +x config.sh
+        ./config.sh
         lingmo-pkgbuild -j$(nproc) -c buildpkg/
 
     - name: Move files and compress directory
