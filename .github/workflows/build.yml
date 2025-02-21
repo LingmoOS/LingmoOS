@@ -52,14 +52,18 @@ jobs:
       run: |
         tar -cJf release.tar.xz -C release .
 
+    - name: Set Release Tag
+      id: set_tag
+      run: echo "TAG_NAME=3.0.0-rc9-build-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: 3.0.0-rc9-build-$(date +'%Y%m%d%H%M%S')
-        release_name: Release 3.0.0-rc9
+        tag_name: ${{ env.TAG_NAME }}
+        release_name: Release ${{ env.TAG_NAME }}
         draft: false
         prerelease: false
 
