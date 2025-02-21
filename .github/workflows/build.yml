@@ -43,14 +43,30 @@ jobs:
     - name: Move files and compress directory
       run: |
         mv pkg_out release
-        tar -Jcf release.tar.xz release/
 
-    - name: Create GitHub Release
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload pkg_out directory
+      uses: actions/upload-artifact@v4
+      with:
+        name: release
+        path: release/*
+
+    - name: Create release tarball
       run: |
-        CURRENTDATE=$(date +%Y%m%d)
-        TAG=3.0.0-rc9.build$CURRENTDATE
-        gh release create $TAG --title "Release $TAG" --notes "Automated release for $TAG"
-        gh release upload $TAG pkg_out/*
-        gh release upload $TAG release.tar.xz
+        tar -cJf release.tar.xz -C release .
+
+    - name: Upload release tarball
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release.tar.xz
+        asset_name: release.tar.xz
+        asset_content_type: application/x-xz
+
+    - name: Create Tag
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git tag -a "3.0.0-rc9-build$(date +'%Y%m%d%H%M%S')" -m "Release 3.0.0-rc9"
+        git push origin "3.0.0-rc9-build$(date +'%Y%m%d%H%M%S')"
