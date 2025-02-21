@@ -41,7 +41,7 @@ jobs:
     - name: Create .deb packages
       run: |
         mkdir -p buildpkg/
-        cp -r libcoreui/ buildpkg/
+        cp -r daemon/ buildpkg/
         lingmo-pkgbuild -j$(nproc) -c buildpkg/
 
     - name: Move files and compress directory
@@ -71,7 +71,10 @@ jobs:
       run: |
         for file in release/*; do
           if [ -f "$file" ]; then
-            gh release upload ${{ env.TAG_NAME }} "$file" --clobber
+            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                 -H "Content-Type: application/octet-stream" \
+                 --data-binary @"$file" \
+                 "$UPLOAD_URL?name=$(basename "$file")&label=$(basename "$file")"
           fi
         done
 
