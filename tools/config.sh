@@ -38,10 +38,11 @@ done
 ls buildpkg/
 ls buildpkg_spcase/
 
+mkdir pkg_out/
+
 # Build core32
-cd buildpkg_spcase/ && mv core32 lingmo-workspace/ && tar -Jcvf lingmo-workspace_3.0.5.orig.tar.xz --exclude='debian/' lingmo-workspace/ && cd lingmo-workspace/ && apt build-dep ./ -y && dpkg-buildpackage -j10 && cd ../..
-cp buildpkg_spcase/*.deb pkg_out
-cp buildpkg_spcase/*.changes pkg_out
-cp buildpkg_spcase/*.buildingo pkg_out
-cp buildpkg_spcase/*.dsc pkg_out
-cp buildpkg_spcase/*.xz pkg_out
+cd buildpkg_spcase/ &&
+mv core32 lingmo-workspace/ &&
+tar -Jcvf lingmo-workspace_3.0.5.orig.tar.xz --exclude='debian/' lingmo-workspace/ &&
+(cd lingmo-workspace/ && apt build-dep ./ -y && dpkg-buildpackage -j10) &&
+cp *.deb *.changes *.buildinfo *.dsc *.xz ../pkg_out
