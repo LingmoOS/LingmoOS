@@ -71,10 +71,11 @@ jobs:
       run: |
         for file in release/*; do
           if [ -f "$file" ]; then
-            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            echo "Uploading $file"
+            curl -XPOST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
                  -H "Content-Type: application/octet-stream" \
                  --data-binary @"$file" \
-                 "$UPLOAD_URL?name=$(basename "$file")&label=$(basename "$file")"
+                 "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
           fi
         done
 
