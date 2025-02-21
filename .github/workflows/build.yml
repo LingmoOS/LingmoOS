@@ -73,7 +73,7 @@ jobs:
           if [ -f "$file" ]; then
             echo "Uploading $file"
             curl -XPOST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                 -H "Content-Type: application/octet-stream" \
+                 -H "Content-Type: $(file --mime-type -b $file)" \
                  --data-binary @"$file" \
                  "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
           fi
