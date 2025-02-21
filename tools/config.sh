@@ -39,7 +39,7 @@ ls buildpkg/
 ls buildpkg_spcase/
 
 # Build core32
-cd buildpkg_spcase/core32 && apt build-dep ./ -y && dpkg-buildpackage -j10 && cp ../..
+cd buildpkg_spcase/ && mv core32 lingmo-workspace/ && tar -Jcvf lingmo-workspace_3.0.5.orig.tar.xz --exclude='debian/' lingmo-workspace/ && cd lingmo-workspace/ && apt build-dep ./ -y && dpkg-buildpackage -j10 && cp ../..
 cp buildpkg_spcase/*.deb pkg_out
 cp buildpkg_spcase/*.changes pkg_out
 cp buildpkg_spcase/*.buildingo pkg_out
