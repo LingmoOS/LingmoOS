@@ -68,14 +68,12 @@ jobs:
         prerelease: false
 
     - name: Upload release directory files
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/*
-        asset_name: release_files
-        asset_content_type: application/octet-stream
+      run: |
+        for file in release/*; do
+          if [ -f "$file" ]; then
+            gh release upload ${{ env.TAG_NAME }} "$file" --clobber
+          fi
+        done
 
     - name: Upload release tarball
       uses: actions/upload-release-asset@v1
