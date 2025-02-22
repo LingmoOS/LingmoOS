@@ -8,7 +8,6 @@ CPU_CORES = $(shell nproc)
 SOURCE_DIRS = \
     boot/splash/BootScreen \
     core \
-    core32 \
     daemon \
     fm \
     $(wildcard lib/*) \
@@ -16,6 +15,7 @@ SOURCE_DIRS = \
     posic \
     server/asyncjobprog \
     server/itframework \
+    server/locker_server_VirtualPackage \
     $(wildcard shell/bc/*) \
     $(wildcard shell/cc/*) \
     $(wildcard windows/*)
