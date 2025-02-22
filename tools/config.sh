@@ -15,7 +15,7 @@ DEST_DIR="buildpkg"
 SPCASE_BUILD_DIR="buildpkg_spcase"
 
 for dir in "${SRC_DIRS[@]}"; do
-   rsync -av --relative "$dir" "$DEST_DIR"
+   cp -rL "$dir" "$DEST_DIR"
 done
 
 SRC_OTHER_DIRS=(
