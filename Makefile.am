@@ -18,5 +18,5 @@ third-party:
 		echo "No third-party directories found."; \
 	fi
 
-clean-local:
-	rm -rf $(BUILD_DIR) $(BUILD_TP_DIR)
+# clean-local:
+#	rm -rf $(BUILD_DIR) $(BUILD_TP_DIR)
