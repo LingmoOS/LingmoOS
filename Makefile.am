@@ -30,18 +30,36 @@ all-local:
 
 # 准备构建目录
 prepare:
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR) $(BUILD_SC_DIR)
 	@$(foreach dir,$(SOURCE_DIRS),cp -r $(dir) $(BUILD_DIR)/;)
- @mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
- @mv -v $(BUILD_DIR)/itframework $(BUILD_SC_DIR)/
- @mv -v $(BUILD_DIR)/locker_server_VirtualPackage $(BUILD_SC_DIR)/
- @cp -rL core32 $(BUILD_SC_DIR)/
+	@mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
+	@mv -v $(BUILD_DIR)/itframework $(BUILD_SC_DIR)/
+	@mv -v $(BUILD_DIR)/locker_server_VirtualPackage $(BUILD_SC_DIR)/
+	@cp -rL core32 $(BUILD_SC_DIR)/
 
 # 构建所有软件包
 pkg_all: prepare
 	@echo "Building packages with lingmo-pkgbuild..."
 	lingmo-pkgbuild -j$(CPU_CORES) -c $(BUILD_DIR)
- @echo "Building packages with dpkg..."
+	@echo "Building packages with dpkg..."
+	@$(foreach dir,$(wildcard $(BUILD_SC_DIR)/*), \
+		$(MAKE) build-pkg DIR=$(dir); \
+	)
+
+# 构建单个软件包
+build-pkg:
+	@if [ -d "$(DIR)" ]; then \
+		echo "Processing $(DIR)..."; \
+		cd $(DIR) && \
+		PKG_NAME=$$(head -1 debian/changelog | awk '{print $$1}') && \
+		PKG_VERSION=$$(head -1 debian/changelog | awk -F'[()]' '{print $$2}' | awk -F: '{print $$2}' | awk -F- '{print $$1}') && \
+		echo "Package: $$PKG_NAME, Version: $$PKG_VERSION"; \
+		tar --exclude='debian' -cf - . | xz -z - > ../$$PKG_NAME_$$PKG_VERSION.orig.tar.xz && \
+		apt build-dep -y ./ && \
+		dpkg-buildpackage -j$(CPU_CORES); \
+	else \
+		echo "Directory $(DIR) does not exist."; \
+	fi
 
 # 处理第三方软件包
 third-party:
@@ -56,4 +74,4 @@ third-party:
 
 # 清理构建目录
 clean-local:
-	rm -rf $(BUILD_DIR) $(BUILD_TP_DIR)
+	rm -rf $(BUILD_DIR) $(BUILD_TP_DIR) $(BUILD_SC_DIR)
