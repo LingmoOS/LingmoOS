@@ -35,7 +35,7 @@ prepare:
 	@mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
 	@mv -v $(BUILD_DIR)/itframework $(BUILD_SC_DIR)/
 	@mv -v $(BUILD_DIR)/locker_server_VirtualPackage $(BUILD_SC_DIR)/
-	@cp -rL core32 $(BUILD_SC_DIR)/
+	@mv core32 $(BUILD_SC_DIR)/
 
 # 构建所有软件包
 pkg_all: prepare
