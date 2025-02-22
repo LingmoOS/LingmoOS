@@ -1,5 +1,5 @@
 # 定义目标目录
-SUBDIRS = boot core daemon fm lib libcoreui posic server shell windows
+SUBDIRS = boot/splash/BootScreen core daemon fm lib/* libcoreui posic server/asyncjobprog server/itframework server/locker_server_VirtualPackage shell/bc/* shell/cc/* windows/*
 
 # 定义构建目录
 BUILD_DIR = buildpkg
