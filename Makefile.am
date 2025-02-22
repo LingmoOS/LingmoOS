@@ -1,6 +1,7 @@
 # 定义构建目录
 BUILD_DIR = buildpkg
 BUILD_TP_DIR = buildpkg_tp
+BUILD_SC_DIR = buildpkg_sc
 THIRD_PARTY_DIR = third-party
 CPU_CORES = $(shell nproc)
 
@@ -31,11 +32,16 @@ all-local:
 prepare:
 	@mkdir -p $(BUILD_DIR)
 	@$(foreach dir,$(SOURCE_DIRS),cp -r $(dir) $(BUILD_DIR)/;)
+ @mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
+ @mv -v $(BUILD_DIR)/itframework $(BUILD_SC_DIR)/
+ @mv -v $(BUILD_DIR)/locker_server_VirtualPackage $(BUILD_SC_DIR)/
+ @cp -rL core32 $(BUILD_SC_DIR)/
 
 # 构建所有软件包
 pkg_all: prepare
 	@echo "Building packages with lingmo-pkgbuild..."
 	lingmo-pkgbuild -j$(CPU_CORES) -c $(BUILD_DIR)
+ @echo "Building packages with dpkg..."
 
 # 处理第三方软件包
 third-party:
