@@ -38,13 +38,11 @@ jobs:
         apt install -y ./lingmo-pkgbuild_0.1.0-1~lingmo1_amd64.deb
         apt-get install -f
 
-    - name: Create .deb packages
+    - name: Create packages
       run: |
-        mkdir -p buildpkg/
-        cp tools/config.sh .
-        chmod +x config.sh
-        ./config.sh
-        lingmo-pkgbuild -j$(nproc) -c buildpkg/
+        autoreconf -fiv
+        ./configure
+        make pkg_all
 
     - name: Move files and compress directory
       run: |
