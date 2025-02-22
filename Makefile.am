@@ -1,11 +1,24 @@
-# 定义目标目录
-SUBDIRS = boot/splash/BootScreen core daemon fm lib/* libcoreui posic server/asyncjobprog server/itframework server/locker_server_VirtualPackage shell/bc/* shell/cc/* windows/*
-
 # 定义构建目录
 BUILD_DIR = buildpkg
 BUILD_TP_DIR = buildpkg_tp
 THIRD_PARTY_DIR = third-party
 CPU_CORES = $(shell nproc)
+
+# 动态生成需要复制的目录列表
+SOURCE_DIRS = \
+    boot/splash/BootScreen \
+    core \
+    core32 \
+    daemon \
+    fm \
+    $(wildcard lib/*) \
+    libcoreui \
+    posic \
+    server/asyncjobprog \
+    server/itframework \
+    $(wildcard shell/bc/*) \
+    $(wildcard shell/cc/*) \
+    $(wildcard windows/*)
 
 # 默认目标
 all-local:
@@ -15,7 +28,7 @@ all-local:
 # 准备构建目录
 prepare:
 	@mkdir -p $(BUILD_DIR)
-	@$(foreach dir,$(SUBDIRS),cp -r $(dir) $(BUILD_DIR)/;)
+	@$(foreach dir,$(SOURCE_DIRS),cp -r $(dir) $(BUILD_DIR)/;)
 
 # 构建所有软件包
 pkg_all: prepare
