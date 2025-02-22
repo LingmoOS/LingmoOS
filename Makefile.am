@@ -10,7 +10,9 @@ SOURCE_DIRS = \
     core \
     daemon \
     fm \
-    $(wildcard lib/*) \
+    lib/libsys \
+    lib/libsysqt \
+    lib/libsysui \
     libcoreui \
     posic \
     server/asyncjobprog \
