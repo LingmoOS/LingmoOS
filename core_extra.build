@@ -1,0 +1,144 @@
+#!/bin/bash
+
+# 版本号（可通过命令行参数覆盖）
+VERSION_CORE32="${1:-3.0.5}"
+VERSION_ASYNC="${2:-5.103.0}"
+VERSION_ITFRAME="${3:-5.103.3}"
+VERSION_LOCK_SERVER="${4:-5.27.5}"
+
+# 全局变量
+GLOB_TAR="tar -Jcvf"
+OPI_AC=" --exclude=debian "
+BUILD_THREADS="${5:-8}"  # 默认使用 8 个线程
+TEMP_DIR=$(mktemp -d)  # 创建临时目录
+PKG_OUT_DIR="../pkg_out"  # 输出目录
+
+# 日志函数
+log() {
+    local level=$1
+    local message=$2
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$level] $message"
+}
+
+# 错误处理函数
+handle_error() {
+    log "ERROR" "Error occurred at line $1, command: $2"
+    cleanup
+    exit 1
+}
+
+# 清理函数
+cleanup() {
+    log "INFO" "Cleaning up temporary files..."
+    rm -rf "$TEMP_DIR"
+    log "INFO" "Cleanup completed."
+}
+
+# 构建函数
+build_package() {
+    local package_dir=$1
+    local package_name=$2
+    local version=$3
+
+    log "INFO" "Building $package_name (version: $version) in $package_dir..."
+
+    # 切换到包目录
+    cd "$package_dir" || { log "ERROR" "Directory $package_dir not found"; return 1; }
+
+    # 安装构建依赖
+    log "INFO" "Installing build dependencies for $package_name..."
+    if ! apt build-dep . -y 2>&1; then
+        log "ERROR" "Failed to install build dependencies for $package_name"
+        return 1
+    fi
+
+    # 构建包
+    log "INFO" "Building $package_name with $BUILD_THREADS threads..."
+    dpkg-buildpackage -j$BUILD_THREADS
+    #if ! dpkg-buildpackage -j$BUILD_THREADS >> "$LOG_FILE" 2>&1; then
+    #   log "ERROR" "Failed to build $package_name"
+    #	cd ../
+    #        return 1
+    #    fi
+
+    log "INFO" "Successfully built $package_name"
+    cd ..
+}
+
+# 打包函数
+create_tar() {
+    local package_dir=$1
+    local package_name=$2
+    local version=$3
+
+    log "INFO" "Creating tar.xz for $package_name (version: $version)..."
+
+    if ! ${GLOB_TAR} "${package_name}_${version}.orig.tar.xz" ${OPI_AC} "$package_dir" 2>&1; then
+        log "ERROR" "Failed to create tar.xz for $package_name"
+        return 1
+    fi
+
+    log "INFO" "Successfully created tar.xz for $package_name"
+}
+
+create_tar_core32() {
+    local package_dir=$1
+    local package_name=$2
+    local version=$3
+
+    if ! ${GLOB_TAR} "${package_name}_${version}.orig.tar.xz" $package_dir 2>&1; then
+        log "ERROR" "Failed to create tar.xz for $package_name"
+        return 1
+    fi
+}
+
+# 复制生成文件到输出目录
+copy_output_files() {
+    log "INFO" "Copying generated files to $PKG_OUT_DIR..."
+
+    # 创建输出目录（如果不存在）
+    mkdir -p "$PKG_OUT_DIR"
+
+    # 复制所有非目录文件到输出目录
+    find . -maxdepth 1 -type f -exec cp {} "$PKG_OUT_DIR" \;
+
+    log "INFO" "Successfully copied files to $PKG_OUT_DIR"
+}
+
+# 主函数
+main() {
+    log "INFO" "Starting build process..."
+
+    # 检查权限
+    if [[ $EUID -ne 0 ]]; then
+        log "ERROR" "This script must be run as root"
+        exit 1
+    fi
+
+    # 切换到构建目录
+    cd buildpkg_sc || { log "ERROR" "Directory buildpkg_sc not found"; exit 1; }
+
+    # 打包源代码
+    mv core32/debian ./.tmp_debian/
+    create_tar_core32 "core32" "lingmo-workspace" "$VERSION_CORE32"
+    mv ./.tmp_debian/ core32/debian/
+    create_tar "asyncjobprog" "lingmo-asyncjob" "$VERSION_ASYNC"
+    create_tar "itframework" "lingmo-itframework" "$VERSION_ITFRAME"
+    create_tar "locker_server_VirtualPackage" "lingmo-lockerserver" "$VERSION_LOCK_SERVER"
+
+    # 构建包
+    build_package "asyncjobprog" "lingmo-asyncjob" "$VERSION_ASYNC"
+    build_package "itframework" "lingmo-itframework" "$VERSION_ITFRAME"
+    build_package "locker_server_VirtualPackage" "lingmo-lockerserver" "$VERSION_LOCK_SERVER"
+    build_package "core32" "lingmo-workspace" "$VERSION_CORE32"
+
+    # 复制生成文件到输出目录
+    copy_output_files
+
+    log "INFO" "All builds completed successfully!"
+    cleanup
+}
+
+# 捕获错误并调用主函数
+trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
+main

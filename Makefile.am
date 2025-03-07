@@ -3,7 +3,21 @@ BUILD_DIR = buildpkg
 BUILD_TP_DIR = buildpkg_tp
 BUILD_SC_DIR = buildpkg_sc
 THIRD_PARTY_DIR = third-party
+CORE_EXTRA_FILE = core_extra.build
+TAR = tar
+TAR_OPTIONS = -Jcvf
+EXCLUDE_DIR = --exclude=debian
 CPU_CORES = $(shell nproc)
+
+PKG_TARGETS = $(shell awk '{print $$1 "_" $$2 ".orig.tar.xz"}' $(CORE_EXTRA_FILE))
+
+# 定义打包规则
+%.orig.tar.xz:
+	@echo "Pack: $@"
+	$(eval PKG_NAME = $(shell echo $@ | awk -F_ '{print $$1}'))
+	$(eval VERSION = $(shell echo $@ | awk -F_ '{print $$2}' | awk -F. '{print $$1 "." $$2 "." $$3}'))
+	$(eval SRC_DIR = $(shell awk -v pkg=$(PKG_NAME) -v ver=$(VERSION) '$$1 == pkg && $$2 == ver {print $$3}' $(CORE_EXTRA_FILE)))
+	$(TAR) $(TAR_OPTIONS) $@ $(EXCLUDE_DIR) $(SRC_DIR)
 
 # 动态生成需要复制的目录列表
 SOURCE_DIRS = \
@@ -45,23 +59,12 @@ pkg_all: prepare
 	lingmo-pkgbuild -j$(CPU_CORES) -c $(BUILD_DIR)
 	@echo "Building packages with dpkg..."
 	@$(foreach dir,$(wildcard $(BUILD_SC_DIR)/*), \
-		$(MAKE) build-pkg DIR=$(dir); \
+		$(MAKE) build-pkg; \
 	)
 
 # 构建单个软件包
 build-pkg:
-	@if [ -d "$(DIR)" ]; then \
-		echo "Processing $(DIR)..."; \
-		cd $(DIR) && \
-		PKG_NAME=$$(head -1 debian/changelog | awk '{print $$1}') && \
-		PKG_VERSION=$$(head -1 debian/changelog | awk -F'[()]' '{print $$2}' | awk -F: '{print $$2}' | awk -F- '{print $$1}') && \
-		echo "Package: $$PKG_NAME, Version: $$PKG_VERSION"; \
-		tar --exclude='debian' -cf - . | xz -z - > ../$$PKG_NAME_$$PKG_VERSION.orig.tar.xz && \
-		apt build-dep -y ./ && \
-		dpkg-buildpackage -j$(CPU_CORES); \
-	else \
-		echo "Directory $(DIR) does not exist."; \
-	fi
+	@bash core_extra.build
 
 # 处理第三方软件包
 third-party:
