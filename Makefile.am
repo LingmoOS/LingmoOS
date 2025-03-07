@@ -12,7 +12,6 @@ SOURCE_DIRS = \
     daemon \
     fm \
     lib/libsys \
-    lib/libsysqt \
     lib/libsysui \
     libcoreui \
     posic \
@@ -37,6 +36,7 @@ prepare:
 	@mv -v $(BUILD_DIR)/locker_server_VirtualPackage $(BUILD_SC_DIR)/
 	@mv -v $(BUILD_DIR)/Notepad $(BUILD_SC_DIR)/
 	@mv -v $(BUILD_DIR)/Debinstaller $(BUILD_SC_DIR)/
+	@mv -v $(BUILD_DIR)/Icons $(BUILD_SC_DIR)/
 	@mv -v core32 $(BUILD_SC_DIR)/
 
 # 构建所有软件包
@@ -73,6 +73,10 @@ third-party:
 	else \
 		echo "No third-party directories found."; \
 	fi
+
+# Buuld Iso Images
+image-iso:
+	@echo "Nothing..."
 
 # 清理构建目录
 clean-local:
