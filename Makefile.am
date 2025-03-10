@@ -97,8 +97,8 @@ third-party:
 image-iso:
 #	@echo "Nothing..."
 	@bash tools/update_status.sh -p iso_status 1
-	@mkdir -p .iso_build/ && cp -r utils/* ./.iso_build/
-	@cd utils/ && ./build.sh && cd ../
+	@mkdir -p .iso_build/ && cp -r utils/* ./.iso_build/ && cp build/.getopt.sh .iso_build/
+	@cd .iso_build/ && ./build.sh && cd ../
 	@mkdir img_out/ && cp .iso_build/images/*.iso img_out/
 	@cd img_out/ && bash ../utils/make-sums && cd ../
 	@bash tools/update_status.sh -p iso_status 0
