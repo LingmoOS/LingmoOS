@@ -46,7 +46,8 @@ all-local:
 
 # 准备构建目录
 prepare:
-	@bash tools/update_status.sh -p software_status 3 -p iso_status 3
+	@bash tools/update_status.sh -p software_status 3 
+	@bash tools/update status.sh -p iso_status 3
 	@mkdir -p $(BUILD_DIR) $(BUILD_SC_DIR)
 	@$(foreach dir,$(SOURCE_DIRS),cp -r $(dir) $(BUILD_DIR)/;)
 	@mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
@@ -59,14 +60,23 @@ prepare:
 
 # 构建所有软件包
 pkg_all: prepare
-	@bash tools/update_status.sh -p software_status 1 -p iso_status 3 -s "`date +%Y%m%d%H%M%S`" -e "N/A" -d "N/A" -n "N/A" -t $(TARGET_TP) -v $(BUILD_VERSION)
+	@bash tools/update_status.sh -p software_status 1 
+	@bash tools/update status.sh -p iso_status 3 
+	@bash tools/update status.sh -s "`date +%Y%m%d%H%M%S`" 
+	@bash tools/update status.sh -e "N/A" 
+	@bash tools/update status.sh -d "N/A" 
+	@bash tools/update status.sh -n "N/A" 
+	@bash tools/update status.sh -t $(TARGET_TP) 
+	@bash tools/update status.sh -v $(BUILD_VERSION)
 	@echo "Building packages with lingmo-pkgbuild..."
 	lingmo-pkgbuild -j$(CPU_CORES) -c $(BUILD_DIR)
 #	@echo "Building packages with dpkg..."
 #	@$(foreach dir,$(wildcard $(BUILD_SC_DIR)/*), \
 #		$(MAKE) build-pkg; \
 #	)
-	@bash tools/update_status.sh -p software_status 0 -p iso_status 3 -e "`date +%Y%m%d%H%M%S`" 
+	@bash tools/update_status.sh -p software_status 0 
+	@bash tools/update status.sh -p iso_status 3 
+	@bash tools/update status.sh -e "`date +%Y%m%d%H%M%S`" 
 
 # 构建单个软件包
 build-pkg:
