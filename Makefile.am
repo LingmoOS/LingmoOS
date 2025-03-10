@@ -1,3 +1,5 @@
+BUILD_VERSION = 3.0.0_rc9_build$(shell date +%Y%m%d%H%M%S)
+TARGET_TP = Beta_$(BUILD_VERSION)
 # 定义构建目录
 BUILD_DIR = buildpkg
 BUILD_TP_DIR = buildpkg_tp
@@ -8,6 +10,7 @@ TAR = tar
 TAR_OPTIONS = -Jcvf
 EXCLUDE_DIR = --exclude=debian
 CPU_CORES = $(shell nproc)
+RUN_DATE := $(shell date +%Y%m%d%H%M%S)
 
 PKG_TARGETS = $(shell awk '{print $$1 "_" $$2 ".orig.tar.xz"}' $(CORE_EXTRA_FILE))
 
@@ -43,6 +46,7 @@ all-local:
 
 # 准备构建目录
 prepare:
+	@bash tools/update_status.sh -p software_status 3 -p iso_status 3
 	@mkdir -p $(BUILD_DIR) $(BUILD_SC_DIR)
 	@$(foreach dir,$(SOURCE_DIRS),cp -r $(dir) $(BUILD_DIR)/;)
 	@mv -v $(BUILD_DIR)/asyncjobprog $(BUILD_SC_DIR)/
@@ -55,12 +59,14 @@ prepare:
 
 # 构建所有软件包
 pkg_all: prepare
+	@bash tools/update_status.sh -p software_status 1 -p iso_status 3 -s "`date +%Y%m%d%H%M%S`" -e "N/A" -d "N/A" -n "N/A" -t $(TARGET_TP) -v $(BUILD_VERSION)
 	@echo "Building packages with lingmo-pkgbuild..."
 	lingmo-pkgbuild -j$(CPU_CORES) -c $(BUILD_DIR)
-	@echo "Building packages with dpkg..."
-	@$(foreach dir,$(wildcard $(BUILD_SC_DIR)/*), \
-		$(MAKE) build-pkg; \
-	)
+#	@echo "Building packages with dpkg..."
+#	@$(foreach dir,$(wildcard $(BUILD_SC_DIR)/*), \
+#		$(MAKE) build-pkg; \
+#	)
+	@bash tools/update_status.sh -p software_status 0 -p iso_status 3 -e "`date +%Y%m%d%H%M%S`" 
 
 # 构建单个软件包
 build-pkg:
@@ -79,7 +85,13 @@ third-party:
 
 # Buuld Iso Images
 image-iso:
-	@echo "Nothing..."
+#	@echo "Nothing..."
+	@bash tools/update_status.sh -p iso_status 1
+	@mkdir -p .iso_build/ && cp -r utils/* ./.iso_build/
+	@cd utils/ && ./build.sh && cd ../
+	@mkdir img_out/ && cp .iso_build/images/*.iso img_out/
+	@cd img_out/ && bash ../utils/make-sums && cd ../
+	@bash tools/update_status.sh -p iso_status 0
 
 # 清理构建目录
 clean-local:
