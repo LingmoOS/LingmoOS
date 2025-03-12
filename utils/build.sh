@@ -16,8 +16,8 @@ SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
 LINGMO_VERTYPE="beta"
-LINGMO_SYS_VERSION="3.0-rc"
-LINGMO_BUILD_VER="20250218-a"
+LINGMO_SYS_VERSION="3.0-rc9"
+LINGMO_BUILD_VER="20250313a"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 
@@ -460,7 +460,7 @@ set -e
 run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $LINGMO_ARCH)
 run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $LINGMO_ARCH)
 
-debug "Stage 3/3 - Generating Verification File"
-run_and_log cd $TARGET_DIR && bash ../make-sums
+# debug "Stage 3/3 - Generating Verification File"
+# run_and_log cd $TARGET_DIR && bash ../make-sums
 
 run_and_log echo -e "\n***\nGENERATED LINGMO IMAGE: $TARGET_DIR/$(target_image_name $LINGMO_ARCH)\n***"
