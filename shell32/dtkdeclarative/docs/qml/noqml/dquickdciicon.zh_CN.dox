@@ -1,0 +1,271 @@
+
+/**
+@~chinese
+@class DciIcon
+@ingroup Item
+
+    \keyword DQuickDciIcon
+@brief 提供一个兼容多种场景的DTK图标控件.
+
+    DCI 图标控件是一个提供多模式、多主题、多大小的整合型控件，该控件可能包含多个图标文件，在上述
+    场景下进行动态切换。例如，当某个图标文件在鼠标的不同状态下需要发生前景色甚至整个图标的变化时，
+    常规图标需要在不同状态时切换不同图标，代码繁琐且难维护DCI 图标为了解决这种多场景的问题，帮助
+    在 QML 中能够快速实现图标跟随不同场景的变化。
+
+    \section1 多模式
+    DCI 图标可以包含多种不同的模式下的图标，DCI 图标分为五种状态，
+    其分别为：NormalState、HoveredState、PressedState、
+    DisabledState 和 InactiveState 。这五种状态和 \l{DTK}{DQMLGlobalObject}
+    中的 DTK.ControlState 枚举一致，能够直接兼容该枚举进行使用。
+
+    这个状态用于表示控件的不同状态，并不是每个控件都有每种不同的状态，如 Rectangle 控件
+    ，就只有NormalState、DisabledState 和 InactiveState。而 Button 控件，就有上述
+    的所有状态。当控件使用的 DCI 图标文件中有某个状态下的单独图标时，会优先显示该状态下的
+    图标文件，否则显示 NormalState 状态下的图标文件。如果一个图标文件中不存在 NormalState
+    状态下的图标，则讲该图标视为一个无效图标。
+
+    \section1 多主题
+    DCI 图标适配了多主题下的图标不一致问题。设计中可能会存在 DCI 图标在不同的主题下图标不一致
+    的情况，目前的实现只能保证图标的前景配色跟随主题发生改变。DCI整合多主题的问题，使同一个图标
+    在不同主题下的不一致，仍能用一个图标进行表示，并能根据不同主题的情况，发生图标的适应性变化。
+    目前多主题分为：深色主题和浅色主题两种。
+
+    \section1 多缩放比、多大小
+    DCI 图标能够适配不同的缩放比和大小。例如控件的大小和设备的缩放比，当控件需要通过 DCI 图标进
+    行高级合成时（如 Switch 控件的 Handle），控件可能在不同的场景下大小不同，这时图标就需要根
+    据这种不同的大小场景动态选择出合适大小的图标进行展示。设备缩放比同样如此，目前 DCI 图标的策略
+    是，优先将图标中较大的大小和缩放比进行缩放显示。
+
+    \section1 使用图层进行布局
+    DCI 图标使用图层布局每种状态下的图标，QML 下的图标文件大多数都存在阴影特效，这类特效并不是
+    应用程序在渲染绘制时添加的，而是 DCI 图标本身存在的阴影大小，而在某些情况下，可能存在阴影不
+    占用控件大小或者阴影不跟随图标前景色发生变化的情况。因此，为了区别同一个图标的不同变化问题，
+    DCI 图标的内部渲染使用图层概念，每个图标的内部都由不同的图层组成，每个图层都代表不同的部件，
+    如 Switch控件的 Handle 控件中，中心滑块是一个图层，外阴影是一个图层，内阴影也是一个图层。
+    这些不同图层通过不同顺序的堆叠形成最终效果。
+
+@image html dciicon-layers.png
+
+    \section1 图标调色板
+    每个图标都有一个调色板，其包含四种类型的颜色：前景色、背景色、高亮前景色、高亮色，这四种调色板
+    分别对应不同的情形，每个图层文件都包含一个调色板数据，而每个图标文件可能存在多个图层文件，因此，
+    每个图标可能有多个调色板，如一个图标的背景色如果存在变化的情况，则其背景图层会标记为背景色调色板；
+    而对于需要高亮显示的部分，其图层指定的调色板数据则为高亮色。当用户在使用 DCI 图标时，如果该图标
+    需要调色板数据，则需要显示指定该调色板颜色值，如下述代码所示：
+
+@
+    import org.deepin.dtk 1.0
+
+    DciIcon {
+        name: "test-icon"
+        sourceSize {
+            width: 50
+            height: 50
+        }
+
+        // 设置调色板数据
+        palette.foreground: "red"
+        palette.background: "black"
+        palette.highlight: "blue"
+        palette.hightlightForeground: "white"
+    }
+```
+
+    对于能够继承 QPalette 的控件，在控件的颜色对应正常的情况下，可以直接使用控件的调色板指定，如下代码：
+
+@
+    import org.deepin.dtk 1.0
+
+    Control {
+        id: control
+        width: 100
+        height: 100
+
+        background: Rectangle {
+            color: control.palette.background
+        }
+
+        contentItem: DciIcon {
+            name: "test-icon"
+            sourceSize {
+                width: 50
+                height: 50
+            }
+
+            palette: DTK.makeIconPalette(control.palette)
+        }
+    }
+```
+
+    \section1 附加属性
+    DciIcon 控件存在附加属性，附加属性为了保持和 QtIcon 的兼容，为了更方便的操作使用 QtIcon 的控件，如 Button ComboBox
+    等等。 DciIcon 的附加属性和其内部属性一致，目的时为了设置 QtIcon 中不存在的图标属性，如 mode theme palette 等等。
+    其用法可用下述代码表示：
+
+@
+    import org.deepin.dtk 1.0
+
+    Button {
+        icon {
+            name: "test"
+            width: 50
+            height: 50
+        }
+
+        DciIcon.mode: DTK.HoveredState
+        DciIcon.theme: ApplicationHelper.LightType
+        DciIcon.palette {
+            foreground: "red"
+        }
+        DciIcon.fallbackToQIcon: true
+    }
+```
+
+    其附加属性如下列表：
+
+    \table
+    \row
+        \li mode
+        \li 与 \l {mode}{DciIcon::mode} 功能保持一致
+
+    \row
+        \li theme
+        \li 与 \l {theme}{DciIcon::theme} 功能保持一致
+
+    \row
+        \li palette
+        \li 与 \l {palette}{DciIcon::palette} 功能保持一致
+
+    \row
+        \li fallbackToQIcon
+        \li 与 \l {fallbackToQIcon}{DciIcon::fallbackToQIcon} 功能保持一致
+    \endtable
+
+
+
+@property string DciIcon::name
+
+    name 属性用于设置 DciIcon 的名称，一般情况下，该名称需要对应图标主题下的图标名称，而不需要将资源路径或绝
+    对路径下的全名称设置进去。例如 “/usr/share/dsg/icons/bloom”目录下存在一个名称为 “test.dci” 的文
+    件。在使用时可直接用下述情况进行展示：
+
+@
+    import org.deepin.dtk 1.0
+
+    DciIcon {
+        name: "test"
+    }
+```
+
+    图标主题的存在是为了更方便的将一类图标进行统一管理与更换，同时也能更好的配置一些图标替换操作，例如使用图标主题能够帮助
+    DTK 内部管理和控制图标的替换。例如上述的“test”图标，其所属的图标主题名为“bloom”。更多的图标主题规范内容，请见
+    DCI 图标主题规范。
+
+
+
+@property enumeration DciIcon::mode
+
+    mode 属性用于设置 DciIcon 的图标模式，不同的 mode 其对应的图标文件可能会不一样，其枚举值如下述表示：
+
+    \value DTK.NormalState      控件的normal状态
+    \value DTK.HoveredState     控件鼠标悬浮时的状态
+    \value DTK.PressedState     控件的pressed状态
+    \value DTK.DisabledState    控件的禁用状态
+    \value DTK.InactiveState    控件的未激活状态
+
+
+
+@property enumeration DciIcon::theme
+
+    theme 属性用于设置 DciIcon 的图标主题，目前分为深色主题和浅色主题两种。不同主题下的图标可能会不一样。
+
+    \value ApplicationHelper.UnknownType 未知主题
+    \value ApplicationHelper.LightType   亮色主题
+    \value ApplicationHelper.DarkType    暗色主题
+
+
+
+@propertygroup DciIcon::palette
+@property color :DciIcon::palette.foreground
+@property color :DciIcon::palette.background
+@property color :DciIcon::palette.highlight
+@property color :DciIcon::palette.highlightForeground
+
+    该属性用于设置 DciIcon 的图标调色板。
+
+    \include ddciiconpalette.qdocinc grouped-properties
+
+
+
+@property size DciIcon::sourceSize
+
+    sourceSize 属性用于指定 DciIcon 控件的大小，一般情况下，在未指定其图标大小时，
+    会读取出图标的默认大小，但由于控件本身未设置大小，因此该该控件本身并不占用任何大小。
+    除非手动指定了 width height 属性。
+
+    当 sourceSize 被指定时，DciIcon 控件被设置了与 sourceSize 大小一致的隐式宽高，
+    当图标存在外阴影时，其阴影部分不占用 sourceSize 的大小。
+
+
+
+@property bool DciIcon::mirror
+
+    mirror 属性决定 DciIcon 控件是否需要水平翻转显示。
+
+    该属性默认是 false.
+    \sa {Image::mirror}
+
+
+
+@property bool DciIcon::fallbackToQIcon
+
+    fallbackToQIcon 属性决定当 DciIcon 无法在当前主题下找到对应 name 的
+    图标文件时，其是否需要从 QtIcon 中继续寻找。当控件使用 Qt 的图标加载方
+    式时，将该属性打开能够兼容 Qt 的图标控件进行显示。
+
+    该属性默认时 false.
+
+@property bool DciIcon::asynchronous
+
+    指定图标是否异步加载，默认异步加载，该属性和Image的asynchronous属性效果一致。
+
+@property bool DciIcon::cache
+
+    指定图标是否缓存，该属性的默认值和行为与Image的cache属性一致。
+
+@attachedproperty enumeration DciIcon::mode
+
+    该属性用于附加一个图标 mode 状态值。其使用方式如下
+@
+    Button {
+        DciIcon.mode: DTK.HoveredState
+    }
+```
+
+
+
+@attachedproperty enumeration DciIcon::theme
+
+    该属性用于附加一个图标亮暗色主题枚举。其使用方式如下
+@
+    Button {
+        DciIcon.theme: ApplicationHelper.DarkTheme
+    }
+```
+
+
+
+@attachedproperty group DciIcon::palette
+
+    该属性用于附加一个图标调色板。其使用方式如下
+@
+    Button {
+        DciIcon.palette.foreground: "red"
+    }
+```
+
+
+
+@attachedproperty bool DciIcon::fallbackToQIcon
+
+    指定附加一个当无法找到 Dci Icon 时是否回滚到 QIcon 中。

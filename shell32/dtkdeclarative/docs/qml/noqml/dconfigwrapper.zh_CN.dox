@@ -1,0 +1,48 @@
+
+/**
+@~chinese
+@class Config
+@ingroup QtObject
+@brief 一个 DTK 配置项中的配置信息类.
+@details
+    Config 用于提供专门为 DSG配置管理的统一的读写函数，其主要用于更方便的在 SettingsDialog 中进行配置项的实时更新，当然
+    SettingDialog 是作为用于前端配置信息展示的窗口，为了提供自定义配置，该类允许放置在自定义的控件上。
+    该类会读取 name 中指定的文件名的文件中存在的属性，当其控件内部存在该配置文件中同名的属性时，对该属性上的所有修改，都将
+    在文件内对应的同名配置项中生效。
+    例如以下代码：
+```qml
+    import org.deepin.dtk 1.0
+
+    Config {
+        name: "example"
+        property string key : "key default"
+    }
+```
+    同样地，当配置文件中名为 "key" 的配置项发生了数据改变，该 Config 的 key 属性也会触发 changed 信号。
+    需要注意的是，当 Config 中添加了配置文件中不存在的配置项属性，该配置文件不会检测并添加一个新的配置项，其属性的改变也不会对
+    配置文件造成任何修改。同样地，当配置文件中存在配置项，而 Config 中并未添加同名属性时，该配置项的改变不会触发 Config 中任
+    何属性的变化。
+
+@property string Config::name
+@brief 指定配置文件名称。
+
+@fn Config::value(string key, variant fallback)
+@brief 获取配置文件中对应 \a key 下的值，当 \a key 获取不到时返回 \a fallback 的值。
+@details 该函数除了可以访问在 Config 中添加了同名属性的配置项外，也能获取为设置属性的额外配置项。
+
+@fn Config::setValue(string key, variant value)
+@brief 设置`key`下的`value`值
+@details 该函数只能设置配置文件中 `key`对应的值，对于`key`是一个不存在或非法值，该函数无法正确设置。
+
+@fn Config::keyList()
+@brief 获取该 Config 项下的所有键值列表。
+
+@fn Config::isValid()
+@brief 判断当前 Config 是否有效。如果有效返回 \c true 否则返回 \c false。
+
+@signal Config::valueChanged(string key)
+@brief 该信号在`key`对应的配置项内容发生改变时发出
+@details 通常情况下，如果 Config 中存在一个同名的配置项属性时，无需在使用该信号检测配置项的改变。
+    而直接使用属性槽函数绑定的形式进行。但对于没创建对应属性的配置项，可以通过该信号检测到`key`对应的配置项值的变化。
+
+*/

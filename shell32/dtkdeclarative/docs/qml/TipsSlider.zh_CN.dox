@@ -1,0 +1,81 @@
+/**
+@~chinese
+@class TipsSlider
+@ingroup Control
+
+@ingroup QML_TYPES
+@brief 提供一种带标签文本的滑动条控件.
+@details
+    TipsSlider 是一种带标签文本的滑动条。根据使用场景不同，可以控制
+    标签的种类。
+    TipsSlider 添加默认空标签
+```qml
+    TipsSlider {
+        width: 200
+        tickDirection: TipsSlider.TickDirection.Back
+        slider.highlightedPassedGroove: true
+        slider.handleType: Slider.HandleType.ArrowBottom
+
+        ticks: [SliderTipItem {
+            },
+            SliderTipItem {
+            },
+            SliderTipItem {
+            },
+            SliderTipItem {
+            }]
+    }
+```
+    效果如下图所示：
+@image html  TipsSliderDefault.png
+TipsSlider 添加字符标签
+```qml
+    TipsSlider {
+        id: slider
+        readonly property var tips: [qsTr("1m"), qsTr("30m"), qsTr("Never")]
+        width: 180
+        tickDirection: TipsSlider.TickDirection.Back
+        slider.handleType: Slider.HandleType.ArrowBottom
+        slider.stepSize: 10
+        slider.from: 0
+        slider.to: 20
+        slider.value: 10
+
+        ticks: [
+            SliderTipItem {
+                text: slider.tips[0]
+                textHorizontalAlignment: Text.AlignLeft
+            },
+            SliderTipItem {
+                highlight: true
+                text: slider.tips[1]
+            },
+            SliderTipItem {
+                text: slider.tips[2]
+                textHorizontalAlignment: Text.AlignRight
+            }
+        ]
+    }
+```
+    效果如下图所示：
+@image html  TicksSllider_Highlight.png
+
+    TipsSlider 同样适配不同方向，不同位置的标签，通过 tickDirection 和 slider.orientation
+    属性控制。
+
+@property Item TipsSlider::slider
+@brief slider 属性获取 TipsSlider 的内部 Slider 控件。
+
+@property list<SliderTipItem> TipsSlider::ticks
+@brief ticks 属性设置 TipsSlider 中的所有标签。
+
+@property enumeration TipsSlider::tickDirection
+@brief tickDirection 是 TipsSlider 提供标签方向属性的枚举。
+@details
+    目前提供了 TipsSlider.Front 和 TipsSlider.Back 两个枚举。
+    Front 枚举代表标签在 TipsSlider 的前部，TipsSlider 水平方向时为上部，竖直方向时
+    为前部。
+    Back 枚举代表标签在 TipsSlider 的后部，TipsSlider 水平方向时为下部，竖直方向时
+    为后部。
+
+*/

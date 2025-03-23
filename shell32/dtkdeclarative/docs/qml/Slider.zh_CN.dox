@@ -1,0 +1,86 @@
+/**
+@~chinese
+@class Slider(FlowStyle)
+@ingroup Slider
+
+@ingroup QML_TYPES
+@brief 提供一种行云设计风格的滑动条控件.
+@details
+    Slider 控件被用于通过控制滑块选择指定值或者代表某一进度。<br>
+    Slider 在行云设计中增加了许多用于额外控制的方式和布局，例如增加了用于指示进度的提示文本;<br>
+    提供了上下左右四个方向的滑块;<br>
+    Slider 的用法如下代码所示：<br>
+```qml
+    Slider {
+        width: parent.width
+        handleType: Slider.HandleType.ArrowBottom
+    }
+```
+    Slider 的效果如下图所示：<br>
+| **方向** | **滑块方向** | **效果**                          |
+|--------|----------|---------------------------------|
+| 横向     | 无滑块方向    | @image html SliderNormalHor.png |
+| 纵向     | 滑块朝下     | @image html SliderNormalVer.png |
+
+
+@property Palette Slider(FlowStyle)::grooveColor
+@brief grooveColor 属性控制滑槽的颜色， \c grooveColor 并非控制滑槽划过区域的颜色，
+    而是整个滑槽的默认颜色。
+
+
+
+@property enumeration Slider(FlowStyle)::handleType
+@brief handleType 属性表示滑块的方向，默认情况下，滑块无任何方向。
+@details
+handleType 可供使用的枚举为：<br>
+| **枚举**                   | **含义**               |
+|:------------------------:|:------------------------:|
+| Slider.NoArrowHorizontal | 水平无方向                |
+| Slider.NoArrowVertical   | 竖直无方向                |
+| Slider.ArrowUp           | 滑块箭头朝上，一般用于滑动条为水平方向时 |
+| Slider.ArrowLeft         | 滑块箭头朝左，一般用于滑动条为竖直方向时 |
+| Slider.ArrowBottom       | 滑块箭头朝下，一般用于滑动条为水平方向时 |
+| Slider.ArrowRight        | 滑块箭头朝右，一般用于滑动条为竖直方向时 |
+
+@note 注意，水平无方向和竖直无方向，在滑动条的水平和数值方向时，滑块的图标也不一样，
+    水平无方向时，滑块宽度高于高度，显得更加扁平，竖直无方向时，滑块高度高于宽度，显得更加修长。
+
+
+@property real Slider(FlowStyle)::dashOffset
+@brief dashOffset 属性是绘制滑块时，画笔的起始位置偏移量。
+@image html SliderDashOffset.png
+
+    如上图所示，当 \c dashOffset 不为0时，绘制滑槽的位置将根据绘制位置发生
+    偏移，例如下述示例，\c dashOffset 为 0 和 dashOffset 为 20 的比较。
+@image html SliderDashOffsetCompare.png
+
+    上图中，上层 Slider 调整了 dashOffset 而 Slider 未调整，但从上图可以看出
+    并不是 Slider 设置 dashOffset 值，绘制就会在偏移 dashOffset 大小后开始，它
+    还受绘制的间距影响，例如下图所示：
+@image html SliderDashOffsetCompareWithPattern.png
+
+
+
+@property var Slider(FlowStyle)::dashPattern
+@brief dashPattern 表示绘制点和间距的距离，默认值为[0.5, 0.25]
+@details 即可以理解为，每绘制0.5 像素的滑条样式，就绘制 0.25 像素的间距。将其中值变大，会起到其代表的那一部分的区域变大的效果。
+    例如以下代码：
+```qml
+    Slider {
+        dashPattern: [0.5, 5] // 每绘制0.5像素的滑块，就绘制5像素的间距
+        width: 200
+    }
+```
+    效果如下图所示：
+@image html SliderDashPattern.png
+
+@property bool Slider(FlowStyle)::highlightedPassedGroove
+@brief highlightedPassedGroove 属性控制是否高亮滑块移动过的区域，
+@details 默认情况下 highlightedPassedGroove为 false。<br>
+效果如下所示：
+| **highlightedPassedGroove** | **效果**                            |
+|:---------------------------:|:---------------------------------:|
+| false                       | @image html SliderNormalHor.png   |
+| true                        | @image html SliderHighlighted.png |
+
+*/

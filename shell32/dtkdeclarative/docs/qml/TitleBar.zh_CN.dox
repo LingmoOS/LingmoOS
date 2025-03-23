@@ -1,0 +1,200 @@
+
+/**
+@~chinese
+@class TitleBar
+@ingroup Control
+
+@ingroup QML_TYPES
+@brief 提供一种统一样式风格的标题栏控件.
+@details
+    TitleBar 控件用于标准样式风格的 TitleBar 控件，与 DialogTitleBar不同， TitleBar 只被用于 ApplicationWindow 中的标题栏。<br>
+    通常情况下，标题栏适配 ApplicationWindow 的布局，需要放置在 header 属性中，例如以下代码：<br>
+```qml
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+
+        flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
+        header: TitleBar {}
+    }
+```
+    TitleBar 主要用于 DTK 中适配的无标题窗口，在去除系统标题栏后， DTK 应用需要
+    添加一个应用内的 TitleBar 控件，当作应用统一的标题栏。这在 UOS/Deepin 操作
+    系统中非常友好，例如以下代码：
+```qml
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+
+        header: TitleBar {}
+        DWindow.enabled: true
+        DWindow.windowRadius: 16
+    }
+```
+    TitleBar 默认是最顶层控件，其他所有控件无法越过 TitleBar ，并且 TitleBar 中提供了
+    通用标题栏的默认布局，如应用图标，应用标题，菜单按钮，最大化最小化关闭按钮等等。TitleBar
+    还支持添加额外的自定义内容，这取决于应用想要实现的样式，例如以下代码：
+    添加中心区域的代码如下：
+```qml
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+
+        header: TitleBar {
+            content: Item {
+                SearchEdit {
+                    anchors.centerIn: parent
+                    width: 300
+                    placeholder: "搜索"
+                }
+            }
+        }
+        DWindow.enabled: true
+        DWindow.windowRadius: 16
+    }
+```
+    添加左侧区域的代码如下：
+```
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+
+        header: TitleBar {
+            leftContent: ActionButton {
+                icon.name: "window_sidebar"
+            }
+        }
+        DWindow.enabled: true
+        DWindow.windowRadius: 16
+    }
+```
+    Titlebar 适配的 ApplicationWindow 中的 flags 属性。 WindowMinMaxButtonsHint 属性
+    控制标题栏的最大化最小化按钮 WindowCloseButtonHint 属性控制关闭按钮;WindowTitleHint 属性
+    控制在标题文本属性;在xcb环境下，还能够通过修改 MotifDecoration 来控制窗口的标题，其中 DECOR_MINIMIZE
+    表示最小化按钮， DECOR_MAXIMIZE 表示最大化按钮 DECOR_TITLE 表示窗口标题。
+
+@property string TitleBar::title
+@brief title 属性用于控制标题栏的标题文本
+
+@property DciIcon TitleBar::icon
+@brief icon 属性用于控制标题栏的图标， \c icon 的类型是 DciIcon，能同时
+    兼容 QtIcon 和 DciIcon。
+
+@property Component TitleBar::leftContent
+@brief leftContent 属性用于添加标题左侧区域的组件，例如添加侧边栏按钮等等。
+
+@property Component TitleBar::content
+@brief content 属性用于添加标题中心区域的组件，当存在多个组件时，可以使用
+    布局进行排列。
+
+@property Component TitleBar::menu
+@brief menu 属性用于控制 Option 按钮的弹出菜单。默认情况下 TitleBar 会提供
+    一个默认的菜单，当需要自定义菜单时，菜单项需要进行手动调整。
+    例如以下代码：
+```qml
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+
+        ButtonGroup {
+            id: activeColorSelector
+            onCheckedButtonChanged: {
+                root.palette.highlight = checkedButton.color
+            }
+        }
+
+        header: TitleBar {
+        menu: Menu {
+            Action {
+                text: "Light Theme"
+            }
+            Action {
+                text: "Dark Theme"
+            }
+            MenuItem {
+                contentItem: Item {
+                    Row {
+                        anchors.centerIn: parent
+                        Repeater {
+                            model: ["#d8316c", "#ff5d00", "#f8cb00", "#23c400", "#00a48a", "#0081ff", "#3c02d7", "#8c00d4"]
+                            delegate: ColorButton {
+                                color: modelData
+                                Component.onCompleted: {
+                                    activeColorSelector.addButton(this)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        DWindow.enabled: true
+        DWindow.windowRadius: 16
+    }
+```
+
+@property bool TitleBar::menuDisabled
+@brief menuDisabled 属性可以将 menu 属性设置禁用或者启用，默认情况下为 false。
+
+
+
+@property Component TitleBar::aboutDialog
+@brief aboutDialog 属性控制应用的关于对话框。其使用方式如下所示：
+```qml
+    import org.deepin.dtk 1.0
+
+    ApplicationWindow {
+        id: root
+        DWindow.enabled: true
+        DWindow.windowRadius: 16
+
+        header: TitleBar {
+            aboutDialog: AboutDialog {
+                modality: Qt.NonModal
+                version: qsTr(String("Version: %1").arg(Qt.application.version))
+                productName: qsTr(appProductName)
+                companyLogo: "file://" + DTK.deepinDistributionOrgLogo
+                websiteName: DTK.deepinWebsiteName
+                websiteLink: DTK.deepinWebsiteLink
+                license: appLicense === "" ? "" : qsTr(String("%1 is released under %2").arg(appProductName).arg(appLicense))
+            }
+        }
+    }
+```
+@sa AboutDialog
+
+@property bool TitleBar::fullScreenButtonVisible
+@brief fullScreenButtonVisible 属性控制 TitleBar 在全屏时按钮是否可见。
+@details 默认情况下，该值是 true。
+
+@signal TitleBar::toggleWindowState()
+@brief toggleWindowState 信号当窗口状态发生变化时触发。例如双击最大化等操作时。
+
+@property bool TitleBar::windowButtonGroup
+@brief windowButtonGroup 是默认的窗口按钮组
+@details 包含最小化、最大化、关闭按钮。默认情况下，该属性已经由 TitleBar 提供。
+
+@property bool TitleBar::autoHideOnFullscreen
+@brief autoHideOnFullscreen 属性表示是否在全屏时自动关闭标题栏
+@details 默认情况下，该值为 false。
+
+@property bool TitleBar::embedMode
+@brief embedMode 属性表示是否属于嵌入模式
+@details 当`DWindow.enabled`属性为false 时， embedMode 为 true， 否则为 false。
+@details 嵌入模式下的标题栏上的`WindowButtonGroup`上的按钮均有系统标题栏提供。
+
+@property bool TitleBar::separatorVisible
+@brief separatorVisible 属性控制分隔符是否可见。默认情况下，该值为 true。
+
+@property bool TitleBar::enableInWindowBlendBlur
+@brief enableInWindowBlendBlur 属性表示是否开启窗口内模糊，默认情况下为 false。
+@sa InWindowBlur
+
+@property Palette TitleBar::textColor
+@brief textColor 属性控制文本和图标等颜色，即前景色相关颜色。
+

@@ -1,0 +1,40 @@
+# Maintainer: zccrs <zhangjide@deepin.org>
+pkgname=dtkdeclarative-git
+pkgver=1.0.0
+pkgrel=1
+sourcename=dtkdeclarative
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Deepin Toolkit, declarative module for DDE look and feel'
+arch=('x86_64' 'aarch64')
+url="https://github.com/linuxdeepin/dtkdeclarative"
+license=('LGPL3')
+depends=('qt5-declarative' 'qt5-quickcontrols2' 'dtkcommon-git' 'dtkcore-git' 'dtkgui-git')
+makedepends=('git' 'qt5-tools' 'gtest' 'cmake'  'ninja' 'doxygen')
+conflicts=('dtkdeclarative')
+provides=('dtkdeclarative')
+groups=('deepin-git')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  cmake -GNinja \
+      -DMKSPECS_INSTALL_DIR=lib/qt/mkspecs/modules/\
+      -DQML_INSTALL_DIR=lib/qt/qml \
+      -DBUILD_DOCS=OFF \
+      -DBUILD_EXAMPLES=OFF \
+      -DQCH_INSTALL_DESTINATION=share/doc/qt \
+      -DCMAKE_INSTALL_LIBDIR=lib \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      -DCMAKE_BUILD_TYPE=Release
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

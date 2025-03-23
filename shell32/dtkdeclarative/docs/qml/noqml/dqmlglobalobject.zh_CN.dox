@@ -1,0 +1,630 @@
+
+/**
+@~chinese
+@class Color
+
+@brief`DTK 项目中统一的颜色类型.
+@details
+    Color 是`DTK 中为了适配 QPalette 部分颜色角色枚举，适配 Qt 的基础的颜色以及所有
+    的 RGB 的颜色值。除此之外，该类能很好的兼容`ColorSelector 的取色系统和`Palette
+    取色器调色板。
+    构造`Color 对象有两种方式，一种是通过 QColor 对象，QColor 能够兼容使用字符串、Qt枚举
+    等等方式，因此使用 QColor 构造`DTK 的`Color 同样能兼容上述方式。另外一种是通过 QPalette
+    的部分枚举值，目前仅支持使用`Highlight 和`HighlightText 这两种枚举值。该枚举在`Color
+    对象的`Type 枚举中有定义。
+
+    \section2 Color.Type
+    Type 枚举定义了颜色是什么类别，其与 QPalette::ColorRole 枚举描述一致，当需要使用一个抽象的颜色角色时，
+    可以通过指定该类别，其颜色最终根据其控件的对应调色板颜色。
+
+    \table
+    \row
+    \li Color.Invalid
+    \li 无效 Type。此类枚举表示该类型是一个无效类型或者为具体颜色类型，非调色板数据类型。
+
+    \row
+    \li Color.Highlight
+    \li 高亮色，对应于 QPalette::Highlight ，并且其颜色也从其所处控件的 Highlight 调色板中获取
+
+    \row
+    \li Color.HighlightedText
+    \li 高亮文本色，对应于 QPalette::HighlightedText，其使用场景在高亮的背景下文本或者前景需要展示
+    的颜色。
+
+    \endtable
+
+@fn bool Color::isValid()
+@return 判断当前颜色值是否有效，有效则返回 true, 否则返回 false。
+
+@fn bool Color::isTypedColor()
+@brief 判断当前颜色是否是一种已标记颜色（或称调色板颜色）。
+@return 是调色板颜色则返回 true，否则返回 false。
+@details
+    通过`Color.Type`构造的颜色都是类型颜色，而通过 QColor 构造的颜色不是类型颜色。
+    类型颜色不是一个具体的颜色值，它需要一个具体的 QPalette 对象才能获取具体颜色。
+
+@fn color Color::toColor(var palette)
+@brief 转换`Color` 类型的颜色为`QColor 类型的颜色
+@details 该函数能够将`Color 类型转化成一个具体的 QColor 颜色类型。
+    通过判断`Color.Type 类型的颜色值，从`palette`
+    参数中获取`Color 使用的调色板对应的具体颜色值。
+@return 返回对应调色板数据的 QColor 颜色值。
+
+@fn color Color::color()
+    将`Color 类型转换成 QColor 类型，当`Color 指定了`lightness 或`opacity 属性时，该颜色
+    会将这两种属性设置到输出的颜色中。
+@return 将转换后的 QColor 类型。
+@note 该函数不适用 Typed 颜色类型
+
+@fn Color Color::lightness(int floatValue)
+    将自身的`Color 提高/降低 \a floatValue 大小的亮度，并返回。
+
+@return 返回调整亮度后的 Color 类型颜色。
+
+@fn Color Color::opacity(int floatValue)
+    将自身的`Color 提高/降低 \a floatValue 大小的不透明度，并返回。
+
+@return 返回调整不透明度后的 Color 类型颜色。
+
+/**
+@~chinese
+@class DTK
+@brief 提供一个全局的`DTK 对象，保证QML中能够获取`DTK 的相关枚举和函数.
+@details
+    DTK 对象可以更方便地在QML中使用，它提供了一些统一的函数、属性以及枚举值，它能够更快捷的
+    访问一些系统信息和图形化配置，下述代码简单展示了其使用方式：
+```qml
+    import org.deepin.dtk 1.0
+
+    Text {
+        color: DTK.selectorColor(palette.window, "black", "white")
+        text: "WindowManager: " + DTK.windowManagerNameString()
+    }
+```
+    \section1 枚举 DTK 将一些通用的枚举类型封装起来，当做控件的枚举统一进行使用。在使用DTK封装的控件中，
+    能够很容易看到他们的使用场景。例如，你可以设置控件Z轴坐标，来控制控件的层级关系，使用 DTK.BottomOrder 来设置最底层控件，使用`DTK.TopOrder 设置最顶层控件坐标。
+
+    \section2 DTK.ControlState@brief Control 控件的状态，\c Control 控件或继承于`Control 控件都有多种状态，如：hover、
+    press、disabled等等，该枚举能够在 DTK 的其他控件中使用进行统一，例如在`ColorSelector
+    中可以通过该枚举控制控件的状态，`DciIcon 中可以通过设置值指定图标的状态等等。
+
+    \table
+    \row
+    \li`DTK.NormalState
+    \li
+    Control 控件的 normal 状态，是控件最原始的状态，控件在未处理任何事件且可用时的
+    一种状态。
+
+    \row
+    \li`DTK.HoveredState
+    \li
+    Control 控件当鼠标放置到控件时的状态。
+
+    \row
+    \li`DTK.PressedState
+    \li
+    Control 控件当鼠标按压时的控件状态。
+
+    \row
+    \li`DTK.DisabledState
+    \li
+    Control 控件在禁用时的状态，当控件的 enable 属性设置为 false 状态时，就是该种状态。
+    这种状态下，无法接受任何鼠标事件。
+
+    \row
+    \li`DTK.InactiveState
+    \li
+    Control 控件在未激活下的状态，当窗口处于非焦点状态下，该窗口下的所有控件都是未激活状态。
+
+    \endtable
+
+    \section2 DTK.ZOrder
+    Control 的 z 属性表示的控件的层级堆叠关系，当某个控件的 z 值比其他所有控件的 z 值都低时，
+    表示该控件在最低层显示，可以被其他控件覆盖。`DTK 提供了一种便捷方式设置该属性，就是这个
+    枚举值。
+
+    \table
+    \row
+    \li`DTK.BottomOrder
+    \li
+    最底层控件，其层级关系是所有控件中最低的。
+
+    \row
+    \li`DTK.BelowOrder
+    \li
+    下层控件，这个层级关系比`DTK.BottomOrder 高，它能够覆盖`DTK.BottomOrder 层
+    的控件。
+
+    \row
+    \li`DTK.NormalOrder
+    \li
+    常规控件，当控件不设置 z 属性时默认就是该值，这是大多数控件的层级大小，它比`DTK.BelowOrder
+    和`DTK.BottomOrder 都高。
+
+    \row
+    \li`DTK.AboveOrder
+    \li
+    普通上层控件，该层级大小大于`DTK.NormalOrder 的层级大小。
+
+    \row
+    \li`DTK.TopOrder
+    \li
+    顶层控件，顶层控件显示在所有控件之上，能够遮盖住其他枚举状态的所有控件。目前如`TitleBar 等
+    控件正在使用这种层级堆叠枚举。
+
+    \endtable
+
+    \section2 DTK.PopupMode
+    Popup 控件窗口弹出模式（Menu 等继承于 Popup 的控件也适用）， 默认情况下所有的 Popup 控件类型
+    为 DTK.AutoMode 模式。
+
+    \table
+    \row
+    \li`DTK.AutoMode
+    \li
+    自动模式，能够根据 “D_POPUP_MODE” 环境变量的值指定，如果该变量被设置为 “embed”，则为嵌入式弹出
+    窗口类型，否则为独立式窗口类型。
+
+    \row
+    \li`DTK.WindowMode
+    \li
+    独立式窗口模式，该模式下窗口能够独立于其他窗口显示，作为一个单独的窗口，类似于 dtkwidget 的 Menu 窗口
+    类似。
+
+    \row
+    \li`DTK.EmbedMode
+    \li
+    嵌入式窗口模式，默认的 qtdeclarative 项目风格的 Menu 和 Popup 控件为该类型，此模式将 Popup 窗口嵌入
+    其父窗口内部，其显示无法超出父窗口的大小，并且会根据父窗口的位置和大小而发生适应性变化。
+
+    \endtable
+
+    \section2 DTK.ArrowDirection
+    箭头方向枚举，如`Slider 控件中箭头滑块， 当`Slider 控件需要有上下左右的标签时，需要指定`Slider
+    滑块的方向。
+
+    \table
+    \row
+    \li`DTK.UpArrow
+    \li
+    上箭头
+
+    \row
+    \li`DTK.DownArrow
+    \li
+    下箭头
+
+    \row
+    \li`DTK.LeftArrow
+    \li
+    左箭头
+
+    \row
+    \li`DTK.RightArrow
+    \li
+    右箭头
+
+    \endtable
+
+    \section1 函数
+    使用DTK中提供的函数能够更好的兼容DTK控件的使用方式，能快捷的适配DTK控件的特殊使用场景。
+    例如，一些标准的窗口信息函数，可以获取到窗管的无标题和混成模式等等信息；DTK 通用颜色可以
+    通过函数进行颜色混合、颜色调整以及特殊颜色的创建。以下将从几个方面展开描述 DTK 提供的一些
+    基本通用函数：
+
+    \section2 窗管信息
+    QML中能够快速通过这些函数快速获取到当前窗管的一些属性，其中包含获取窗管是否支持模糊，是否支持混成，
+    是否处于无标题以及是否是软件渲染的状态。
+
+    \list
+        \li \l{DTK::hasBlurWindow}{bool DTK.hasBlurWindow()}
+        \li \l{DTK::hasComposite}{bool DTK.hasComposite()}
+        \li \l{DTK::hasNoTitlebar}{bool DTK.hasNoTitlebar()}
+        \li \l{DTK::isSoftwareRender}{bool DTK.isSoftwareRender()}
+        \li \l{DTK::windowManagerName}{int DTK.windowManagerName()}
+        \li \l{DTK::windowManagerNameString}{string DTK.windowManagerNameString()}
+    \endlist
+
+    \section2 主题相关
+    DTK程序默认都适配明/暗主题，DTK程序在某些情况下需要获取明暗主题相关的接口，或者获取平台主题和应用主题
+    的相关配置时，可以调用这些接口信息。
+
+    \list
+        \li \l{DTK::themeType}{int DTK.themeType()}
+        \li \l{DTK::platformTheme}{Object DTK.platformTheme()}
+        \li \l{DTK::toColorType()}{int DTK.toColorType()}
+        \li \l{DTK::selectColor()}{color DTK.selectColor()}
+    \endlist
+
+    \section2 消息通知
+    DTK能够使用全局对象的方式发送消息，以下函数提供了一种便捷的发送窗口内通知的快捷方式。
+    \list
+        \li \l{DSendMessageFromContent}{DTK.sendMessage()}
+        \li \l{DSendMessageFromComponent}{DTK.sendMessage(Object)}
+        \li \l{DCloseMessageFromMessageObject}{DTK.closeMessage(Container)}
+        \li \l{DCloseMessageFromMessageId}{DTK.closeMessage(Object)}
+    \endlist
+
+    \section2 颜色相关
+    DTK提供了相关函数能够更方便的调整颜色，获取调色板信息。
+    \list
+        \li \l{DTK::palette}{DTK.palette()}
+        \li \l{DTK::inactivePalette}{DTK.inactivePalette()}
+        \li \l{DTK::blendColor()}{color DTK.blendColor()}
+        \li \l{DTK::makeColor(Color::Type type)}{DTK.makeColor(type)}
+        \li \l{DTK::makeColor(color)}{DTK.makeColor(color)}
+    \endlist
+
+    \section2 图标相关
+    DCI图标相关的统一接口，例如兼容QIcon和DciIcon的附加属性、将QPalette属性设置到IconPalette中等等。
+    \list
+        \li \l{DTK::makeIcon()}{DTK.makeIcon()}
+        \li \l{DTK::makeIconPalette()}{DTK.makeIconPalette()}
+    \endlist
+
+    \section2 其他函数
+    其它未汇总的函数，例如一些系统信息，字体管理，以及弹出菜单的嵌入模式等等
+    \list
+        \li \l{DTK::fontManager}{DTK.fontManager()}
+        \li \l{DTK::makeShadowImageUrl()}{DTK.makeShadowImageUrl()}
+        \li \l{DTK::deepinWebsiteName}{DTK.deepinWebsiteName()}
+        \li \l{DTK::deepinWebsiteLink}{DTK.deepinWebsiteLink()}
+        \li \l{DTK::deepinDistributionOrgLogo}{DTK.deepinDistributionOrgLogo()}
+        \li \l{DTK::cursorPosition}{DTK.cursorPosition()}
+        \li \l{DTK::setPopupMode()}{DTK.setPopupMode()}
+    \endlist\m
+
+@enum Dtk::Declarative::DTK::CompositionMode
+@brief 合成模式，与 @sa QPainter::CompositionMode 等价。
+@var DTK::CompositionMode::Source
+@brief 与 @sa QPainter::CompositionMode_Source 等价
+@var DTK::CompositionMode::SourceOver
+@brief 与 @sa QPainter::CompositionMode_SourceOver 等价
+@var DTK::CompositionMode::Destination
+@brief 与 @sa QPainter::CompositionMode_Destination 等价
+@var DTK::CompositionMode::DestinationOver
+@brief 与 @sa QPainter::CompositionMode_DestinationOver 等价
+@var DTK::CompositionMode::Clear
+@brief 与 @sa QPainter::CompositionMode_Clear 等价
+
+@property bool DTK::hasBlurWindow
+@note 此属性为只读属性
+
+    如果当前窗口管理器支持窗口背景模糊特效则返回 true，否则返回 false
+
+@property bool DTK::hasComposite
+@note 此属性为只读属性
+
+    如果当前窗口管理器支持混成则返回 true，否则返回 false
+
+@property bool DTK::hasNoTitlebar
+@note 此属性为只读属性
+
+    如果窗口管理器当前支持设置隐藏窗口标题栏则返回 true，否则返回 false
+
+@property bool DTK::isSoftwareRender
+@note 此属性为只读属性
+
+    如果当前窗口渲染模式为软件，则返回 true，否则返回 false
+
+@property string DTK::windowManagerNameString
+@note 此属性为只读属性
+
+    当前使用的窗口管理器名称
+
+@property int DTK::themeType
+@note 此属性为只读属性
+@brief 程序的主题类型.
+@details
+    当themeType为UnknownType时, 将自动根据
+    GuiApplication::palette的QPalette::background颜色计算主题
+    类型, 否则与 paletteType 的值一致. 程序中应当使用此值作为
+    暗色/亮色主题类型的判断. 设置该属性会重新设置palette, 并且会
+    覆盖qml中的属性赋值, 与qml中的属性绑定冲突.
+
+@property int DTK::windowManagerName
+@note 此属性为只读属性
+@brief 窗口管理器名称枚举.
+
+    目前包含 deepinWM, KWinWM 和其他窗口管理器。
+
+@property Object DTK::platformTheme
+@note 此属性为只读属性
+@brief
+    返回应用程序的平台主题实例.
+
+    平台主题能够获取到一些系统级的主题配置，如图标主题，铃声主题，窗口圆角，
+    调色板颜色信息等等相关配置。
+
+@property FontManager DTK::fontManager
+@note 此属性为只读属性
+@brief
+    应用程序的字体管理器实例实例.
+
+    字体管理器通过使用 t1 - t10 的字体字号进行
+    统一管理，同时也能设置一些自定义的特殊字号。
+
+@property qpalette DTK::palette
+@note 此属性为只读属性
+@brief
+    返回应用程序默认的调色板主题
+
+@property qpalette DTK::inactivePalette
+@note 此属性为只读属性
+@brief
+    应用程序默认的未激活状态的调色板主题
+
+@fn color DTK::blendColor(color substrate, color superstratum)
+@brief 将 \a substrate 和 \a superstratum 颜色进行混合，形成一种新的颜色。
+    该颜色通过 alpha 通道的权重值进行混合运算，新的颜色值中 RGB 等于 \a substrate 的 RGB
+    值 * (1 - \a superstratum 的 alpha 值) 加上 \a superstratum 的 RGB 值 * superstratum
+    的 alpha 值， 新颜色的 alpha 值和底色的 alpha值一致。
+@return 返回调整后的颜色值
+
+@fn Color DTK::makeColor(Color::Type type)
+@brief 根据 \a type 类型创建出 Color 实例，目前 type 包含
+    Highlight 和 HighlightedText 两种。
+@return 返回转换后的 Color 类型的颜色值。
+
+@fn Color DTK::makeColor(color c)
+@brief 将 \a c 转换成 Color 并返回。 Color 能够兼容 QColor 和 type
+    两种模式。
+@return 返回转换后的 Color 类型的颜色值。
+
+@fn url DTK::makeShadowImageUrl()
+@brief 内部DTK接口，用于创建 shadow image 的url链接，其实现方式是将其内部属性
+    全部都添加到一个URL中，用于最后渲染Image时获取对应属性。
+@return 返回阴影的 Url 用于解析获取。
+
+@fn int DTK::toColorType(color c)
+    用于根据一个指定的颜色 \a c ，返回在该颜色下对应的系统主题。
+    最常用的方式是通过传入`Control 中调色板属性中的 window
+    颜色来判断主题类型。
+
+@return 亮色主题颜色返回 ApplicationHelper.LightType, 暗色主题
+    返回 ApplicationHelper.DarkType
+
+@fn color DTK::selectColor(color windowColor, color light, color dark)
+    用于根据一个指定的颜色 \a windowColor ，判断当前程序正在使用的
+    系统主题，并根据不同主题返回对应的 \a light 和 \a dark 颜色。
+
+@return 当 LightType 时返回 \a light , 当 DarkType 时返回 \a dark 。
+
+@property string DTK::deepinWebsiteName
+@note 此属性为只读属性
+@brief deepin 网站名称。
+
+@property string DTK::deepinWebsiteLink
+@note 此属性为只读属性
+@brief deepin 网站链接。
+
+@property string DTK::deepinDistributionOrgLogo
+@note 此属性为只读属性
+@brief deepin 组织 Logo 路径。
+
+@property point DTK::cursorPosition
+@note 此属性为只读属性
+@brief 鼠标当前位置的属性。
+    Qt 中返回鼠标位置只能通过 MouseArea 控件，但当多个该控件一起
+    就存在覆盖而无法正确接受事件的可能，因此 DTK 提供一个可以直接
+    访问鼠标位置的接口，方便QML程序获取并使用。
+
+@fn DciIcon DTK::makeIcon(QtIcon, DciIconAttached)
+@brief
+    兼容 \a QtIcon 的属性，将 DciIcon 附加属性值和 \a QtIcon 的属性值添加到
+    DciIcon 实例中。这种方式大多在控件图标为 \a QtIcon 时使用，在添加 \a QtIcon
+    的属性后，可以通过添加 DciIcon 附加属性，将其进行整合，例如 Button 控件。
+```qml
+    import org.deepin.dtk 1.0
+
+    Button {
+        width: 50
+        height: 50
+
+        icon.name: "apple"
+        icon.width: 24
+        icon.height: 24
+        DciIcon.palette.foreground: "red"
+        DciIcon.mode: DTK.HoveredState
+        DciIcon.theme: ApplicationHelper.DarkType
+    }
+```
+    上述方式这样实现是由于，Button 的属性 icon 为 QtIcon, 而其内部的图标控件是 DciIcon，
+    因此为了保持兼容，在使用方式上不存在差别，才衍生出该函数进行整合。Button 中使用该函数进行
+    QtIcon 和 DciIcon 附加属性进行绑定的场景如下：
+```qml
+    import org.deepin.dtk 1.0
+
+    Button {
+        id: control
+        contentItem: IconLabel {
+            icon: DTK.makeIcon(control.icon, control.DciIcon)
+        }
+    }
+```
+@return 返回兼容后的 DciIcon 图标实例。
+
+@fn DciIcon::Palette DTK::makeIconPalette(qpalette)
+@brief
+    根据 \a qpalette 创建图标的调色板属性。 图标调色板和控件调色板是分开的
+    图标调色板分为 Foreground Background HighlightForeground 和 Hightlight 四种
+    某些图标的图层会使用该类调色板进行着色，当控件使用`QPalette 时，可以将`QPalette
+    和 DDciIconPalette 兼容。
+    例如以下使用场景：
+```qml
+    import org.deepin.dtk 1.0
+
+    Control {
+        property alias icon: _icon
+        DciIcon {
+            id: _icon
+            anchors.centerIn: parent
+            sourceSize {
+                width: 50
+                height: 50
+            }
+
+            palette: DTK.makeIconPalette(parent.palette)
+        }
+
+    }
+```
+@return 返回转化后的 DciIcon 中的 palette 属性，返回后的实例可直接应用在 DciIcon
+    的属性中进行属性绑定。
+
+@fn bool DTK::sendMessage(object target, string content, string iconName, int duration, string msgId)
+    \keyword DSendMessageFromContent
+@brief
+    DTK 提供一种能在全局发送应用内通知的方式，目前有两种方式：一种是提供所有的通知信息，DTK 进行托管显示，并设置关闭或手动关闭。
+    一种是提供消息的 Component 组件，DTK 负责布局和管理，组件自身提供样式和关闭策略。
+
+    以下函数代表的第一种情况， \a target 可以使用目标对象或者目标对象所处的`window 。 \a content 为需要显示的文本信息
+    \a iconName 为可选参数，当需要显示图标时，可传入图标名称。 \a duration 为可选参数，代表消息显示的时长，默认时间为 4 秒，
+    当 \a duration 参数为 -1 时，表示该显示为常驻消息，关闭需要手动点击关闭按钮才行。 \a msgId 为可选参数，当 \a msgId 未
+    指定时，显示的消息将都为不同类消息，当多个消息的 \a msgId 一致时，后面的消息会替换同类型的前面的消息。
+
+    其使用方法如下展示：
+```qml
+    import org.deepin.dtk 1.0
+
+    Button {
+        text: "FloatingMessage"
+        property int count: 0
+        onClicked: {
+            DTK.sendMessage(control, "message" + count)
+            DTK.sendMessage(Window.window, "message" + count, "music", 4000, "type1")
+            DTK.sendMessage(Window.window, "message" + count, "video", -1)
+            count++
+        }
+    }
+```
+
+@fn bool DTK::sendMessage(object target, component delegate, var message, int duration, string msgId)
+    \keyword DSendMessageFromComponent
+
+    这种方式跟 \l {DSendMessageFromContent}{DTK.sendMessage()} 类似，不同的是，
+    它可以使用自定义创建的`FloatingMessage 和`FloatingMessageContainer 组件进行指定。
+    \a target 可以使用目标对象或者目标对象所处的`window 。 \a delegate 为消息显示的代理组件，可以使用`DTK 封装好的@brief FloatingMessage 添加自定义文本或者策略进行显示，也可以自己封装`FloatingMessageContainer 实现自定义的消息组件，当然
+    后面这种方式的成本更高。 \a message 参数指定 \a delegate 组件封装时需要用的额外参数，例如“content”，“iconName”等内容，由于@brief Component 存在作用域的问题，问了更方便的获取到这些数据对象，防止出现属性绑定失败的情况，DTK 消息推荐将数据对象传入到 \a message
+    参数中， \a message 接收一个 JSON 的键值对类型，数据通过键值对进行访问，例如下述示例：
+```qml
+    import org.deepin.dtk 1.0
+
+    Button {
+        text: "FloatingMessage"
+        onClicked: {
+            DTK.sendMessage(control, floatingMsgCom, {content: "message....", iconName: "music"}, -1)
+        }
+
+        Component {
+            id: floatingMsgCom
+            FloatingMessage {
+            }
+        }
+    }
+```
+
+    上述代码中 \a message 变量传入了“{content: "message....", iconName: "music"}”参数，值得注意的是， FloatingMessage 中自带了两个
+    默认的 “key”，如上面参数展示，其分别是 “content” 和 “iconName”，分别对应的是文本内容和图标名称。对于一些自定义的键值对，可以使用如下方式
+    添加：
+
+@
+    import org.deepin.dtk 1.0
+
+    Button {
+        text: "FloatingMessage"
+        onClicked: {
+            DTK.sendMessage(control, floatingMsgCom, {text: "message....", iconName: "music"}, -1)
+        }
+
+        Component {
+            id: floatingMsgCom
+            FloatingMessage {
+                id: floatMsg
+                contentItem: RowLayout {
+                    anchors.fill: parent
+                    spacing: 0
+
+                    Label {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        text: floatMsg.message.text
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignLeft
+                        Layout.alignment: Qt.AlignVCenter
+                        font: DTK.fontManager.t6
+                        wrapMode: Text.Wrap
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                    }
+
+                    Button {
+                        text: "reload"
+                        font: DTK.fontManager.t5
+                        Layout.alignment: Qt.AlignVCenter
+                    }
+                }
+            }
+        }
+    }
+```
+
+    \a duration 为可选参数，代表消息显示的时长，默认时间为 4 秒，当`duration 参数为 -1 时，表示该显示为常驻消息，关闭需要手动点击关闭按钮才行。
+    \a msgId 为可选参数，当 \a msgId 未指定时，显示的消息将都为不同类消息，当多个消息的 \a msgId 一致时，后面的消息会替换同类型的前面的消息。
+
+@fn void DTK::closeMessage(object message)
+    \keyword DCloseMessageFromMessageObject
+
+    关闭浮动消息的统一接口，当使用 \l {DSendMessageFromComponent}{DTK.sendMessage(Object)} 接口时，
+    当自己重新定义`Component \a message 后，如果重载了其内部属性，就需要手动处理关闭该消息的动作。否则需要等待 duration 结束才能关闭，该种使用场
+    景可以通过下述方式描述：
+
+```qml
+    import org.deepin.dtk 1.0
+
+    Button {
+        text: "FloatingMessage"
+        onClicked: {
+            DTK.sendMessage(control, floatingMsgCom, {content: "message...."}, -1)
+        }
+        Component {
+            id: floatingMsgCom
+            FloatingMessage {
+                id: floatMsg
+                button: Button {
+                    text: "close"
+                    onClicked: {
+                        console.log("close clicked")
+                        DTK.closeMessage(floatMsg)
+                    }
+                }
+            }
+        }
+    }
+```
+
+@fn void DTK::closeMessage(object target, string msgId)
+    \keyword DCloseMessageFromMessageId
+
+    通过 \a msgId 关闭浮动消息，其中 \a target 表示浮动消息所在的 Item 或 Window 控件。
+    当控件中存在 \a msgId 指定的消息时，通过该接口可直接将该消息关闭。\a msgId 与 sendMessage()
+    接口中的 \a msgId 相对应。
+
+@fn void DTK::setPopupMode(int mode)
+
+    设置 Popup 类型窗口的弹出方式，目前 \a mode 可以设置为 嵌入式弹出窗口（ EmbedMode ）或者 独立式弹出窗口（ WindowMode ）两种模式
+    ，其默认值为 AutoMode, 该模式会根据窗口情况进行自动选择。除此之外，还能通过修改环境变量的方式：
+
+    可以在 main 函数开头添加如下代码：
+```qml
+    int main(int argc, char **argv)
+    {
+        qputenv("D_POPUP_MODE", "embed");
+        ...
+        return a.exec();
+    }
+```
+    当 “D_POPUP_MODE” 的值为非 “embed” 表示为独立式窗口。
+TODO:这个文档需要仔细确定
+
+*/

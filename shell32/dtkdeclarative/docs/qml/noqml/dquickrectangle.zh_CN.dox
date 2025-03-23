@@ -1,0 +1,89 @@
+
+/**
+@~chinese
+@class RoundRectangle
+@ingroup Item
+
+    \keyword DQuickRectangle
+@brief DTK 提供的一种支持不同圆角功能的矩形控件
+
+    能够支持某一边或者多边圆角，而其他边保持无圆角状态的控件。该控件
+    是对 Qt 提供的 Rectangle 控件进行的升级。其包含了原本 Color 的
+    大部分属性外，同时能够支持对固定角进行圆角操作。但其不包含对边框和
+    边框颜色的控制。
+
+    例如一下示例代码，可以构造一个左上角和右下角的特殊矩形：
+
+@
+    import org.deein.dtk 1.0
+
+    RoundRectangle {
+        width: 100
+        height: 100
+        color: "blue"
+        radius: 20
+        antialiasing: true
+        corners: (RoundRectangle.TopLeftCorner | RoundRectangle.BottomRightCorner)
+    }
+```
+
+    其示例效果如下：
+@image html RoundRectangleExample.png
+
+
+
+@property color RoundRectangle::color
+
+    该属性用于指定圆角矩形填充的颜色值。和 Rectangle 控件类似，其会
+    根据圆角矩形的形状自由填充。
+
+
+
+@property real RoundRectangle::radius
+
+    该属性用于指定圆角矩形的圆角大小。和 Rectangle 中该属性保持一致，其
+    只会作用在设置了 corners 的部分。
+
+
+
+@property enumeration RoundRectangle::corners
+
+    该属性用于控制圆角矩形的圆角位置，支持圆角位置的叠加，例如上述示例代码。
+    该属性枚举包含以下值：
+
+    \table
+        \header
+            \li 枚举值
+            \li 描述
+        \row
+            \li RoundRectangle.NoneCorner
+            \li 无圆角，即直角矩形。
+        \row
+            \li RoundRectangle.TopLeftCorner
+            \li 指定左上角为圆角。
+        \row
+            \li RoundRectangle.TopRightCorner
+            \li 指定右上角为圆角。
+        \row
+            \li RoundRectangle.BottomLeftCorner
+            \li 指定左下角为圆角。
+        \row
+            \li RoundRectangle.BottomRightCorner
+            \li 指定右下角为圆角。
+        \row
+            \li RoundRectangle.TopCorner
+            \li 指定矩形上部分为圆角，即左上角和右上角。
+        \row
+            \li RoundRectangle.BottomCorner
+            \li 指定矩形下部分为圆角，即左下角和右下角。
+        \row
+            \li RoundRectangle.LeftCorner
+            \li 指定矩形左边部分为圆角，即左上角和左下角。
+        \row
+            \li RoundRectangle.RightCorner
+            \li 指定矩形右边部分为圆角，即右上角和右下角。
+        \row
+            \li RoundRectangle.AllCorner
+            \li 指定矩形为全圆角矩形。
+    \endtable
+

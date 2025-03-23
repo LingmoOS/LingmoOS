@@ -1,0 +1,43 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=lingmo-desktop-base-git
+pkgver=2025.3.24
+pkgrel=1
+sourcename=lingmo-desktop-base
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='Base component for Lingmo OS'
+arch=('any')
+url="https://github.com/LingmoOS/lingmo-desktop-base"
+license=('GPL3')
+groups=('lingmo')
+conflicts=('lingmo-desktop-base')
+provides=('lingmo-desktop-base')
+groups=('lingmo')
+makedepends=('git')
+source=("${sourcetars[@]}"
+        distribution.info)
+sha512sums=('SKIP'
+            'SKIP')
+
+prepare() {
+    cd $sourcedir
+}
+
+build() {
+  cd $sourcedir
+  make
+}
+
+package() {
+  cd $sourcedir
+  make DESTDIR="$pkgdir" install
+  install -Dm644 "$srcdir"/distribution.info -t "$pkgdir"/usr/share/lingmo/
+  # Remove Deepin distro's lsb-release
+  rm "$pkgdir"/etc/lsb-release
+  # Don't override systemd timeouts
+  rm -r "$pkgdir"/etc/systemd
+  # Make a symlink for deepin-version
+  ln -s ../usr/lib/lingmo/desktop-version "$pkgdir"/etc/lingmo-version
+  # Remove apt-specific templates
+  rm -r "$pkgdir"/usr/share/python-apt
+}

@@ -1,0 +1,110 @@
+
+/**
+@~chinese
+@class BoxShadow
+@ingroup Item
+@ingroup QML_TYPES
+@brief 提供一种盒子阴影控件.
+@details
+    BoxShadow 是 DTK 提供的一种兼容软件渲染和硬件渲染的盒子阴影控件。无论应用处在哪种环境（软件和硬件）
+    应用所表现出来的效果一致。
+
+    BoxShadow 控件通常使用 anchors 对目标控件进行填充。根据内部的模糊系数、阴影颜色等等，作用在
+    目标控件中。当然由于 QML 绘制项的层级关系，应当将 BoxShadow 放在目标控件之前创建，或手动修改
+    BoxShadow 的 z 属性，以便保证 BoxShadow 控件在目标控件的底部，防止目标控件被阴影控件覆盖。
+
+    BoxShadow 的简单用法如下所示：
+```qml
+    BoxShadow {
+        anchors.fill: boxShadowSource
+        shadowBlur : 20
+        shadowColor : Qt.rgba(0, 0, 0, 0.5)
+        shadowOffsetX : 0
+        shadowOffsetY : 0
+        cornerRadius: boxShadowSource.radius
+    }
+
+    Rectangle {
+        id: boxShadowSource
+        width: 200
+        height: 200
+        color: "#D2691E"
+        radius: 20
+    }
+```
+
+    效果如下图所示：
+@image html BoxShadowExample1.png
+
+    当目标控件是一个带有不透明颜色的控件时，通常我们需要打开 hollow 属性，是为了带有透明
+    部分的目标控件所在区域和底部的 BoxShadow 区域颜色混合的情况，例如以下代码：
+```qml
+    BoxShadow {
+        anchors.fill: boxShadowSource
+        shadowBlur : 20
+        shadowColor : Qt.rgba(0, 0, 0, 0.5)
+        shadowOffsetX : 0
+        shadowOffsetY : 0
+        cornerRadius: boxShadowSource.radius
+        hollow: true
+    }
+
+    Rectangle {
+        id: boxShadowSource
+        width: 200
+        height: 200
+        color: Qt.rgba(0.82, 0.71, 0, 0.6)
+        radius: 20
+    }
+```
+
+    控件使用 hollow 属性和未使用 hollow 属性的效果对比如下：
+| **hollow** | **效果**                                       |
+|------------|----------------------------------------------|
+| false      | @image html BoxShadowExampleNoHollow.png   |
+| true       | @image html BoxShadowExampleWithHollow.png |
+
+@property real BoxShadow::cornerRadius
+@brief cornerRadius 属性表示 BoxShadow 的圆角大小
+@details 通常情况下，该大小需要与目标控件的圆角大小保持一致。
+
+@property real BoxShadow::shadowBlur
+@brief shadowBlur 属性表示 BoxShadow 的阴影模糊系数，模糊系数越大，阴影的模糊程度越高。
+@details
+    默认情况下，该属性的值为 10。
+
+    例如下述效果展示，其他属性保持一致的情况下，只修改 shadowBlur 值的大小，会发现 BoxShaow
+    的阴影大小会随之增加。
+| **shadowBlur系数** | **效果**                                   |
+|------------------|------------------------------------------|
+| 2                | @image html BoxShadowExampleBlur2.png  |
+| 10               | @image html BoxShadowExampleBlur10.png |
+| 20               | @image html BoxShadowExample1.png      |
+| 40               | @image html BoxShadowExampleBlur40.png |
+
+
+@property real BoxShadow::shadowOffsetX
+@brief shadowOffsetX 属性表示 BoxShadow 的 x 坐标偏移大小。 默认情况下，该值为 0
+
+@property real BoxShadow::shadowOffsetY
+@brief shadowOffsetY 属性表示 BoxShadow 的 y 坐标偏移大小。 默认情况下，该值为 0
+
+@property color BoxShadow::shadowColor
+@brief shadowColor 属性表示 BoxShadow 的阴影颜色。默认情况下，该颜色为 "black"
+
+@property real BoxShadow::spread
+@brief spread 属性表示 BoxShadow 的阴影扩散系数，扩散系数越大，表示阴影越
+    能向外扩散，通常情况下，spread 的值为 0。
+    扩散距离的效果展示如下表所示：
+| **spread系数** | **效果**                                   |
+|--------------|------------------------------------------|
+| 0            | @image html BoxShadowExample1.png        |
+| 2            | @image html BoxShadowExampleSpread2.png  |
+| 5            | @image html BoxShadowExampleSpread5.png  |
+| 10           | @image html BoxShadowExampleSpread10.png |
+
+@property bool BoxShadow::hollow
+@brief hollow 属性表示 BoxShadow 是否指定为空洞属性
+@details 当 hollow 属性为 true 时BoxShadow 会去掉和目标控件重合的部分。默认情况下，该值为 false.
+
+*/

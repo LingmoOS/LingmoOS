@@ -1,0 +1,162 @@
+
+/**
+@~chinese
+@class IconLabel
+@ingroup Item
+
+    \keyword DQuickIconLabel
+@brief 提供一种带图标和文字的组合控件类型
+
+    Qt Quick Control 2 中提供了类似控件，但 IconLabel 与它不同的是，
+    IconLabel 兼容了 DciIcon 的支持，提供了图标和文字的组合方式等等，使
+    该控件的使用更加灵活。
+
+    该控件的场景效果如下图所示：
+@image html IconLabel.png
+
+    使用代码示例如下所示：
+@
+    IconLabel {
+        icon.name: "action_setting"
+        spacing: 10
+        icon.width: 48
+        icon.height: 48
+        display: D.IconLabel.TextBesideIcon
+        text: "Text Beside Icon"
+    }
+```
+
+    \warning 请注意这是一个内部控件，并不作为 DTK 的外部控件提供。
+    \warning IconLabel 控件使用的图标类型为 DciIcon ，而非 QtIcon 和 Icon.
+
+
+
+@propertygroup IconLabel::icon
+@property string :IconLabel::icon.name
+@property real :IconLabel::icon.width
+@property real :IconLabel::icon.height
+@property enumeration :IconLabel::icon.mode
+@property enumeration :IconLabel::icon.theme
+@property string :IconLabel::icon.source
+
+    icon 属性表示 IconLabel 中使用的图标， 其与 DciIcon 中控件的属性一致，但又有不同
+    之处，其子属性如下表列举所示：
+
+    \table
+    \row
+        \li icon.name
+        \li dci 图标名称,从图标主题中获取，其用法于 DciIcon::name 一致。
+    \row
+        \li icon.width
+        \li 图标宽度，请确保在使用图标的时候给定一个具体宽度。
+    \row
+        \li icon.height
+        \li 图标高度，请确保在使用图标的时候给定一个具体高度。
+    \row
+        \li icon.mode
+        \li 图标的状态，与 DciIcon 中图标状态枚举一致。
+    \row
+        \li icon.theme
+        \li 图标主题，与 DciIcon 中图标主题枚举一致。
+    \row
+        \li icon.source
+        \li Dci 图标 fallback 到 Qt 图标时的路径，该路径应该是
+        Qt 图标的 source 属性。一般情况下，应用无需关心该属性值，
+        \l{DTK::makeIcon()}{DTK.makeIcon()} 函数中已经将该属性于 Qt 图标进行绑定。
+    \endtable
+
+
+
+@property string :IconLabel::text
+
+    text 属性描述 IconLabel 控件中的文本文字内容，暂只支持静态文本。
+
+
+
+@property font :IconLabel::font
+
+    font 属性描述 text 所使用的字体。
+
+    对于更多可以使用的 Qml 字体属性列表，请参阅 \l {Qml 字体属性类型} {https://doc.qt.io/qt-5/qml-font.html}
+
+
+
+@property color :IconLabel::color
+
+    color 属性表示 text 的文字颜色。
+
+
+
+@property enumeration :IconLabel::display
+
+    display 属性表示文字和图标的排列方式，IconLabel 控件提供了5种不同的图标展示方式，
+    具体请看下表：
+
+    \table
+    \row
+        \li IconLabel.IconOnly
+        \li 仅展示图标
+    \row
+        \li IconLabel.TextOnly
+        \li 仅展示文字
+    \row
+        \li IconLabel.TextBesideIcon
+        \li 文字置于图标之后
+    \row
+        \li IconLabel.TextUnderIcon
+        \li 文字置于图标之下
+    \row
+        \li IconLabel.IconBesideText
+        \li 图标置于文字之后
+    \endtable
+
+
+
+@property real IconLabel::spacing
+
+    spacing 属性描述文字和图标之间的间距值。当仅有图标或者仅有文字时
+    该属性将不会生效。
+
+
+
+@property bool IconLabel::mirrored
+
+    镜像属性，一般情况下无需操作该属性。不同国家和地区可能阅读方式不一样，
+    默认情况下的控件为从左到右排列，当需要控件进行从右向左展示时，该接口
+    可以很好的解决次问题。
+
+    \warning 请注意，该属性的读取接口为 isMirrored .
+
+
+
+@property enumeration IconLabel::alignment
+
+    该属性用于控制文字和图标的对其方式，默认的对其方式为左对齐，其枚举值如下：
+    \table
+    \row
+        \li Qt.AlignLeft
+        \li 左对齐
+    \row
+        \li Qt.AlignRight
+        \li 右对齐
+    \row
+        \li Qt.AlignHCenter
+        \li 水平居中对齐
+    \row
+        \li Qt.AlignVCenter
+        \li 竖直居中对齐
+    \row
+        \li Qt.AlignCenter
+        \li 居中对齐
+    \endtable
+
+
+
+@property real IconLabel::topPadding
+@property real IconLabel::leftPadding
+@property real IconLabel::rightPadding
+@property real IconLabel::bottomPadding
+
+    该属性用于描述 IconLabel 的各个 padding 大小。是控件大小距离 contentWidth
+    和 contentHeight 的预留区域大小，
+

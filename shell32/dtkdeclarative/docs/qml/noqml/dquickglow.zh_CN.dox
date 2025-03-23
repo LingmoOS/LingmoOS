@@ -1,0 +1,76 @@
+
+/**
+@~chinese
+@class GlowEffect
+@ingroup Item
+
+@brief DTK 中一种光晕特效控件.
+
+    GlowEffect 是一种在 DTK 中用于作用在控件上的光晕特效。该特效使用
+    OpenGL 中特殊的阴影材质着色器实现，目前仅支持硬件软件模式，不支持软
+    件渲染。如需使用支持全模式的阴影效果，请使用控件 BoxShadow.
+    光晕特效通常呗作用在矩形中，用于矩形的阴影效果。例如 DTK 根据 GlowEffect
+    开发出的 RectangularShadow 控件。 GlowEffect 的使用场景更加抽象，其属性
+    更难控制，对于简单场景，请使用 RectangularShadow 控件。
+
+    如下示例代码：
+@
+    import org.deepin.dtk 1.0
+    GlowEffect {
+        anchors.centerIn: parent
+        width: 100
+        height: 100
+        glowRadius: 50
+        color: "black"
+        spread: 0.01
+        relativeSizeX: 0.5
+        relativeSizeY: 0.5
+    }
+```
+
+    其效果为：
+@image html dtk-gloweffect.png
+
+    \sa RectangularShadow
+
+
+
+@property qreal GlowEffect::glowRadius
+
+    该属性用于表示光晕半径，当 fill 属性为 true 时，该属性将不会生效。发光半径
+    表示从 (0,0) 点到矩形的中心点的距离，当发光半径等于矩形宽高的一半时，表示对
+    矩形的全部填充。
+
+
+
+@property color GlowEffect::color
+
+    该属性用于表示光晕特效的填充颜色。
+
+
+
+@property qreal GlowEffect::spread
+
+    该属性用于表示发光的扩散系数。该系数越小，表示扩散程度越大。
+
+
+
+@property qreal GlowEffect::relativeSizeX
+
+    该属性用于表示光晕相对大小的 X 坐标。其取值范围为[0,1]。0表示无相对大小。
+    1表示完全相对。
+
+
+
+@property qreal GlowEffect::relativeSizeY
+
+    该属性用于表示光晕相对大小的 Y 坐标。其取值范围为[0,1]。0表示无相对大小。
+    1表示完全相对。
+
+
+
+@property bool GlowEffect::fill
+
+    该属性表示是否填充整个光晕区域。当设置为填充时，光晕颜色将完全覆盖矩形大小。
+    当扩散系数未覆盖区域时，显示出颜色的纯色。
+

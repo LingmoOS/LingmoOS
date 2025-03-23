@@ -1,0 +1,54 @@
+
+/**
+@~chinese
+@class DialogWindow
+@ingroup Window
+
+@ingroup QML_TYPES
+@brief DTK 提供的一种基本对话框窗口.
+@details
+    DialogWindow 是基础的自定义对话框窗口，除窗口内容外,其余部分 DTK 完成实现并提供。
+    应用可直接在 DialogWindow 中添加需要展示的内容，通过布局的方式对内容进行属性控制。
+    DialogWindow 继承自 Window 控件，相比于 PopupWindow 窗口，DialogWindow 是
+    一个独立的窗口。
+    DialogWindow 实现了 DTK 样式中的无标题，背景模糊的等样式。直接使用 Window 时，这些样式都需要
+    自定义实现。
+
+@property int DialogWindow::maxContentHeight
+@note 该属性为只读属性
+@brief maxContentHeight 属性是一个只读属性，它表示内容区域的最大高度。
+
+@property Compnent DialogWindow::header
+@brief header 属性用于存储 DialogTitleBar 控件,当需要自定义 DialogTitleBar 时，
+    可通过 header: DialogTitleBar {} 来实现。
+
+@property string DialogWindow::icon
+@brief icon 属性用于存储 DialogWindow 中的图标名称。
+
+@property list<QtObject> DialogWindow::content
+@brief 属性表示 DialogWindow 中内容控件
+@details
+    它是 DialogWindow 中的默认控件，使用时无需强制指定 content 属性。
+    其使用方式如下代码：
+```qml
+    DialogWindow {
+        width: 200
+        icon: "music"
+        ColumnLayout {
+            width: parent.width
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                font: DTK.fontManager.t5
+                text: "名称“XXX”已被占用，请使用其他名称"
+            }
+            Button {
+                Layout.alignment: Qt.AlignBottom | Qt.AlignHCenter
+                Layout.bottomMargin: 10
+                Layout.fillWidth: true
+                text: "确定"
+            }
+        }
+    }
+```
+
+*/

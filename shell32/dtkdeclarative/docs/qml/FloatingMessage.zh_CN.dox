@@ -1,0 +1,98 @@
+
+/**
+@~chinese
+@class FloatingMessage
+@ingroup Item
+@ingroup QML_TYPES
+@brief 提供一种窗口内浮动效果的消息控件.
+@details
+    FloatingMessage 控件用于显示在窗口内的提示消息，是消息的基础类型。其使用 FloatingPanel 作为背景，用于增加它的浮动效果，是使用外部定义
+    的文本和图标作为消息内容。<br>
+    FloatingMessage 能进行常驻显示也能进行短暂显示，当消息短暂显示时会在持续时间结束后自动消失，而常驻消息会一致保留在程序中，除非用户
+    手动进行关闭。<br>
+    FloatingMessage 支持高度定制化，当消息效果不满足实际应用需求时，通过重写控件属性，能够修改控件的样式。
+    下图展示了 FloatingMessage 的效果：
+@image html FloatingMessage.png
+    MessageManager 控制 FloatingMessage 的消息容量、样式风格、布局方式等等，也可用过 MessageManager 直接发送
+    消息通知。 MessageManager 作为全局的方式控制 FloatingMessage 的风格和功能，它和 FloatingMessage 的关系为: MessageManager
+    是控制者，FloatingMessage 是控制元素。
+
+@property Component FloatingMessage::contentItem
+@brief contentItem 属性是 FloatingMessage 的内容部分，例如其内部可以放置文本。contentItem 的内容不包含图标部分。当需要自定义
+    中心部分时，可以重新实现该属性。默认情况下 contentItem 属性只存在消息的文本。
+
+@property Component FloatingMessage::button
+@brief button 属性存放 FloatingMessage 中的关闭按钮。默认情况下， \c button 属性是一个提供关闭按钮的 ActionButton。
+
+@property Component FloatingMessage::duration
+@brief duration 属性用于表示 FloatingMessage 持续的时间。默认情况下， \c duration 的值为 4 秒，超过该时间，消息自动关闭。当将该
+    属性的值修改为 -1 时，表示 FloatingMessage 是一个常驻消息，除非用户手动关闭，否则将无法消失。
+
+@property Component FloatingMessage::panel
+@brief panel 属性用于表示 FloatingMessage 控件的背景面板，FloatingMessage 的浮动效果最终由 \c panel 属性提供。一般情况无需手动实现
+    该控件的内容。当需要手动实现时，请实现 重新对图标、文本(contentItem)、关闭按钮(button) 进行重新布局。
+
+@propertygroup FloatingMessage::message
+
+@property string :FloatingMessage::message.iconName
+@brief iconName 属性用于表示 FloatingMessage 中的图标名称。默认情况下， \c iconName 属性的值为 \c "dialog-information"。
+
+@property color :FloatingMessage::palette.content
+@brief message 属性是一个复合属性，默认情况下 message 提供了 iconName 和 content 两个属性名。 \c iconName 表示图标名称 \c content 表示文字内容。
+    \l {DSendMessageFromContent}{DTK.sendMessage()} 接口中可以添加自定义的子属性名，但需要自定义 content 组件进行自适配。
+
+    \l {DSendMessageFromContent}{DTK.sendMessage()}
+
+
+
+/**
+@~chinese
+@class MessageManager
+@ingroup QtObject
+
+@ingroup QML_TYPES
+@brief 一种控制 FloatingMessage 的附加对象.
+
+    MessageManager 是一个附加对象，它无法独立的创建。它有多种用于控制 FloatingMessage 的全局效果的属性。
+    通常情况下，再构造 Window 时就可指定全局的 FloatingMessage 属性。例如以下代码：
+
+```qml
+    MessageManager.layout: Column {
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+        }
+    }
+    MessageManager.capacity: 6
+    MessageManager.delegate: FloatingMessage {
+        id: floatingMsg
+        contentItem: Label {
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+            text: floatingMsg.message.content
+            elide: Text.ElideRight
+            maximumLineCount: 1
+            wrapMode: Text.Wrap
+        }
+
+        duration: 3000
+    }
+```
+
+@attachedproperty Component MessageManager::delegate
+@brief delegate 属性控制全局情况下的 FloatingMessage 样式风格。
+@details 默认情况下无需重新实现该风格，当需要添加自定义内容时，可修改其内容达到目标效果。
+
+@attachedproperty Item MessageManager::layout
+@brief layout 属性控制不同消息之间的排列方式。
+@details 默认情况下，多个消息使用纵向布局的方式进行排列。例如，还能自定义为横向布局、流布局等等。
+
+@attachedproperty int MessageManager::capacity
+@brief capacity 属性用于控制消息最大存储的容量。
+@details 默认情况下，`capacity`的值为 3，即最大能同时容纳 3 条消息进行显示。
+
+@attachedproperty int MessageManager::count
+@note 该属性只读
+@brief count 属性表示当前消息的个数。
+
+*/

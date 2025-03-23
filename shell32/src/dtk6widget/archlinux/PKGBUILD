@@ -1,0 +1,40 @@
+# Maintainer: justforlxz <justforlxz@gmail.com>
+pkgname=dtk6widget
+pkgver=6.0.26
+pkgrel=1
+sourcename=dtk6widget
+sourcetars=("$sourcename"_"$pkgver".tar.xz)
+sourcedir="$sourcename"
+pkgdesc='DTK6 widgets library for graphical user interface development'
+arch=('x86_64' 'aarch64')
+url="https://github.com/LingmoOS/dtk6widget"
+license=('LGPL3')
+depends=('dtk6core' 'dtk6gui' 'gcc-libs' 'qt6-base' 'qt6-svg' 'dtkcommon-git' 'startup-notification')
+makedepends=('git' 'qt6-tools' 'gtest' 'ninja' 'cmake' 'doxygen' 'pkg-config' 'gcc')
+provides=('dtk6widget')
+conflicts=('dtk6widget')
+groups=('lingmo')
+source=("${sourcetars[@]}")
+sha512sums=('SKIP')
+
+
+build() {
+  cd $sourcedir
+  version=$(echo $pkgver | awk -F'[+_~-]' '{print $1}')
+  cmake \
+    -GNinja \
+    -DDTK_VERSION=$version \
+    -DMKSPECS_INSTALL_DIR=lib/qt6/mkspecs/modules/ \
+    -DBUILD_PLUGINS=OFF \
+    -DBUILD_DOCS=ON \
+    -DQCH_INSTALL_DESTINATION=share/doc/qt6 \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release
+  ninja
+}
+
+package() {
+  cd $sourcedir
+  DESTDIR="$pkgdir" ninja install
+}

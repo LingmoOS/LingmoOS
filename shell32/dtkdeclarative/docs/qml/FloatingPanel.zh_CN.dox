@@ -1,0 +1,74 @@
+
+/**
+@~chinese
+@class FloatingPanel
+@ingroup Control
+
+@ingroup QML_TYPES
+@brief 提供一种浮动效果的背景面板.
+@details
+    FloatingPanel 是浮动消息（FloatingMessage）、浮动工具栏、内嵌菜单（Menu）等等控件的通用背景。
+    FloatingPanel 自带浮动的效果，能够使其内部控件呈现出浮动在应用内部的效果。
+    FloatingPanel 支持颜色和效果的控制，即它能够在外部控制背景颜色、边框颜色、圆角大小和模糊系数等等。
+    其使用方式如下代码：
+```qml
+    FloatingPanel {
+        contentItem: RowLayout {
+            spacing: 20
+
+            DciIcon { name: "entry_voice"; sourceSize: Qt.size(16, 16)}
+            DciIcon { name: "entry_voice"; sourceSize: Qt.size(16, 16)}
+            DciIcon { name: "entry_voice"; sourceSize: Qt.size(16, 16)}
+
+            RowLayout {
+                spacing: 12
+                Slider {
+                    id: toolBarSlider
+                    property int totalValue: 7*60 + 56
+                    property int currentValue: 3 * 60 + 25
+
+                    Layout.preferredWidth: 230
+                    highlightedPassedGroove: true
+                    handleType: Slider.HandleType.NoArrowHorizontal
+                    from: 0
+                    to: msToValue(totalValue)
+                    value: msToValue(currentValue)
+                    stepSize: 1
+                    function msToValue(ms) { return ms}
+                    function msToText(ms) {
+                        return String("%1:%2").arg(Math.floor(ms / 60)).arg(ms % 60)
+                    }
+                }
+                Text {
+                    Layout.preferredWidth: 50
+                    text: String("%1/%2").arg(toolBarSlider.msToText(toolBarSlider.value)).arg(toolBarSlider.msToText(toolBarSlider.to))
+                }
+            }
+
+            DciIcon { name: "entry_voice"; sourceSize: Qt.size(16, 16)}
+            DciIcon { name: "entry_voice"; sourceSize: Qt.size(16, 16)}
+        }
+    }
+```
+    效果如下图所示：
+@image html FloatingPanelExample.png
+
+@property Palette FloatingPanel::backgroundColor
+@brief backgroundColor 属性用于控制背景颜色。
+@sa Palette
+
+@property Palette FloatingPanel::dropShadowColor
+@brief dropShadowColor 属性用于控制阴影部分的颜色。
+@sa Palette
+
+@property Palette FloatingPanel::borderColor
+@brief borderColor 属性用于控制边框的颜色。
+@sa Palette
+
+@property Palette FloatingPanel::radius
+@brief radius 属性控制 FloatingPanel 背景的圆角大小，默认情况下为该值为 14。
+
+@property Palette FloatingPanel::blurRadius
+@brief blurRadius 属性控制 FloatingPanel 的模糊系数，默认情况下为该值为 14。
+
+*/

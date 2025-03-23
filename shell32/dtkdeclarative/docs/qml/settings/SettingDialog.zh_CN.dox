@@ -1,0 +1,171 @@
+
+/**
+@~chinese
+@class SettingsDialog
+@ingroup WindowDialog
+.settings
+@brief DTK 应用统一的应用设置对话框.
+
+    SettingsDialog 是 DTK 应用用于存储和设置应用信息的对话框。 SettingsDialog
+    中当设置项发生改变时，应用程序会收到此变化，并发生响应。通常情况下， SettingsDialog
+    用于存储应用的界面信息、配置信息和用户自定义信息等等。 虽然 SettingsDialog 的整体
+    样式保持和 DTK 风格一致，但仍提供了高度自由的接口，用于设置自定义风格的设置属性对话框。
+
+@image html SettingsDialog.png
+
+    \section1 DConfig 兼容
+    您需要了解 Config 的使用和配置，SettingsDialog 中存储的配置信息，将全部使用 Config
+    保存，根据 Config 中的已有属性，自动更新设置。同时，当用户修改 SettingsDialog 中的属性
+    后， Config 能够受到变化并修改内部的配置文件。这也是应用响应 SettingsDialog 中的属性
+    信息发生变化的方式。例如下述代码：
+
+```qml
+    import org.deepin.dtk
+
+    Config {
+        name: "example" // 存储配置文件的名称
+
+        property string setting1: "Setting1"  // 配置文件中设置项的具体内容。
+        property int setting2: 0
+    }
+```
+
+    SettingsDialog 中必须指定 Config 才能对配置项进行生效和存储，当 Config 无效时，SettingsDialog
+    同样也不会生效任何设置。DConfig 中的具体细节，可查阅 dtkcore 项目中的文档。
+
+    \section1 SettingsGroup, SettingsOption
+    SettingsDialog 中设置项有内部的多个 SettingsGroup 构成，而 SettingsGroup 可以嵌套其子 SettingsGroup
+    和 SettingsOption，形成一个配置树，同一层级的配置，表现为同一字体和缩进大小。不同的层级，具备父子关系的
+    不同层级，所属关系跟随父子关系。例如一下代码示例：
+```qml
+    import QtQuick 2.0
+    import org.deepin.dtk 1.0
+    import org.deepin.dtk.settings 1.0 as Settings
+
+    Settings.SettingsDialog {
+        id: SettingsDialog
+
+        width: 800
+        height: 600
+
+        config: Config {
+            name: "example" // 请确保配置文件存在
+            property string setting1: "Setting1"  // 请确保配置文件存在该属性
+        }
+
+        groups: [  // 配置根 SettingsGroup 组，其包含多个并列的 SettingsGroup 对应关系为，根节点下的多个设置项
+            Settings.SettingsGroup {
+                key: "rootKey1"
+                name: "Basic Settings"
+
+                children: [  // 配置该组下的子 SettingGroup
+                    Settings.SettingsGroup {
+                        key: "group1"
+                        name: "Custom Widget"
+
+                        Settings.SettingOption {
+                            key: "setting1"  // 对应 Config 中的属性名
+                            Settings.ComboBox {  // Settings封装的基础控件类型
+                                model: ["first", "second", "three"]
+                            }
+                        }
+                    }
+                ]
+            }
+
+        ]
+    }
+```
+
+    \section1 自定义属性
+    SettingsDialog 中提供了多个可自定义的组件，在实现风格统一的同时，也能够帮助用户高度定制内部组件。
+    可定制的区域，包括 SettingsContainer(主界面容器); 导航界面视图; 内容界面视图。
+    SettingsContainer 中也存在可自定义的子属性： NavigationTitle(导航栏标题); ContentTitle(内容区域标题);
+    ContentBackground(内容区域背景）。
+
+    自定义方式如下代码所示：
+```qml
+    import QtQuick 2.0
+    import org.deepin.dtk 1.0
+    import org.deepin.dtk.settings 1.0 as Settings
+
+    Settings.SettingsDialog {
+        id: SettingsDialog
+
+        width: 800
+        height: 600
+
+        config: Config {
+            name: "example" // 请确保配置文件存在
+            property string setting1: "Setting1"  // 请确保配置文件存在该属性
+        }
+
+        groups: [  // 配置根 SettingsGroup 组，其包含多个并列的 SettingsGroup 对应关系为，根节点下的多个设置项
+            Settings.SettingsGroup {
+                key: "rootKey1"
+                name: "Basic Settings"
+
+                container.contentBackground: Settings.ContentBackground {
+                    border.color: "red"  // 将对话框的内容区域部分添加边框
+                }
+
+                children: [  // 配置该组下的子 SettingGroup
+                    Settings.SettingsGroup {
+                        key: "group1"
+                        name: "Custom Widget"
+                        background: Settings.ContentBackground {
+                            boder.color: "blue"  // 特殊组的边框可自定义
+                            radius: 18
+                        }
+
+                        Settings.SettingOption {
+                            key: "setting1"  // 对应 Config 中的属性名
+                            Settings.ComboBox {  // Settings封装的基础控件类型
+                                model: ["first", "second", "three"]
+                            }
+                        }
+                    }
+                ]
+            }
+
+        ]
+    }
+```
+
+
+
+@property list<SettingsGroup> org.deepin.dtk.settings::SettingsDialog::groups
+
+    SettingsDialog 中的根设置组。根设置组使用 FontManager 中 t1 号字体区分。并且其缩进保持最小。
+    其可保存多个 SettingsGroup 或 SettingsOption。
+
+
+
+@property Config org.deepin.dtk.settings::SettingsDialog::config
+
+    config 属性存储 SettingsDialog 用于读写的配置文件，每个配置文件中的配置属性，都需要
+    和 SettingsDialog 中的设置项对应，才能保证当用户修改了 SettingsDialog 的属性后
+    配置文件能够跟随发生变化，也确保了外部通过修改配置文件中配置属性的值时，界面中的配置项
+    能够跟随配置文件的改变发生变化。
+
+
+
+@property SettingsContainer org.deepin.dtk.settings::SettingsDialog::container
+
+    container 属性存储 SettingDialog 中的主界面容器。默认情况下，SettingsDialog 会提供一个默认的
+    基于 DTK 风格的主界面容器，当应用程序需要自定义界面时，可通过设置该属性进行改变。
+
+
+
+@property Item org.deepin.dtk.settings::SettingsDialog::navigationView
+
+    navigationView 属性存储导航视图界面的控件。默认情况下，DTK 会提供一个自适应设置项层级的导航视图。
+    当自定义该属性时，需要考虑滚动区域和点击单项标题时内容区域的跳转问题。
+
+
+
+@property Item org.deepin.dtk.settings::SettingsDialog::contentView
+
+    contentView 内容视图存储用于放置设置项内容区域的视图控件。默认情况下，SettingsDialog 提供了一个
+    根据 SettingsOption 的层级关系，自动列举的视图控件。
+

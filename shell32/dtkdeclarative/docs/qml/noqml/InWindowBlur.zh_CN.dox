@@ -1,0 +1,94 @@
+/**
+@~chinese
+@class InWindowBlur
+@ingroup Item
+
+    \keyword DQuickInWindowBlur
+@brief 提供一个使目标控件在窗口内模糊的特效控件.
+
+    该控件用于在窗口内对某些控件背景进行模糊操作，例如一个 ListView 的背景如果是一个图片，如果其 Item 需要
+    进行模糊处理，对 ListView 的背景进行模糊处理，就能够用 InWindowBlur 控件对 delegate 进行模糊处理。
+    例如以下代码
+
+```qml
+    import org.deepin.dtk
+
+    Item {
+        Image {
+            anchors.fill: parent
+            source: "file:///usr/share/wallpapers/deepin/desktop.jpg"
+        }
+
+        ListView {
+            id: testView
+
+            model: 10
+            spacing: 30
+            clip: true
+            anchors {
+                fill: parent
+                margins: 10
+            }
+
+            delegate: Item {
+                height: 50
+                width: 300
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                InWindowBlur {
+                    id: blur
+                    anchors.fill: parent
+                    radius: 20
+                    offscreen: true
+                }
+
+                ItemViewport {
+                    id: roundBlur
+                    anchors.fill: blur
+                    fixed: true
+                    sourceItem: blur
+                    radius: blur.radius
+                    hideSource: false
+                }
+
+                Rectangle {
+                    radius: roundBlur.radius
+                    anchors.fill: roundBlur
+                    color: Qt.rgba(1, 0, 0, 0.2)
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "InWindowBlur" + index
+                    color: "white"
+                    font.pixelSize: 22
+                }
+            }
+        }
+    }
+```
+
+    其效果展示如下：
+@image html inwindowblur.png
+
+    如上述示例代码， InWindowBlur 控件需要配合 ItemViewport 控件才能完成与 BehindWindowBlur 控件
+    类似的混色效果。 其中 ItemViewport 主要完成圆角效果和混色填充的功能。 由于 InWindowBlur 控件本身
+    不支持圆角功能，因此在使用 ItemViewport 是需要隐藏其非圆角的效果， offscreen 属性就需要设置为 true 状
+    态，让 ItemViewport 能够展示 InWindowBlur 控件的内容但不现实 InWindowBlur 本身，该功能与 ItemViewport
+    中的 hideSource 类似，但该属性与 InWindowBlur 控件的绘制发生冲突，无法正确渲染其模糊图像，因此建议使用
+    InWindowBlur 控件的 offscreen 属性而非 ItemViewport 控件的 hideSource 属性。
+
+
+
+@property real InWindowBlur::radius
+
+    该属性用于指定窗口内模糊程度系数大小，其并非控件的圆角大小。当模糊程度超过了背景的渲染程度时，其模糊效果会
+    呈现出一个黑色。
+
+
+
+@property bool InWindowBlur::offscreen
+
+    该属性用于指定其模糊特效是否需要渲染在屏幕之外，即离屏渲染，该属性默认为 false，当 InWindowBlur 控件与
+    ItemViewport 控件配合使用时，多数情况下会将其设置为 true。
+*/
