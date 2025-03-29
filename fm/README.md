@@ -1,4 +1,4 @@
-# Lingmo File Manager
+# File Manager
 
 Lingmo File Manager, simple to use, beautiful, and retain the classic PC interactive design. 
 

@@ -19,10 +19,10 @@
 
 #include "application.h"
 #include "dbusinterface.h"
-#include "window.h"
-#include "desktop/desktop.h"
+#include "window.h" 
 #include "thumbnailer/thumbnailprovider.h"
 #include "filemanageradaptor.h"
+#include "runtime/runtime.h"
 
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
@@ -143,11 +143,11 @@ bool Application::parseCommandLineArgs()
 
     parser.addPositionalArgument("files", "Files", "[FILE1, FILE2,...]");
 
-    QCommandLineOption desktopOption(QStringList() << "d" << "desktop" << "Desktop Mode");
-    parser.addOption(desktopOption);
-
     QCommandLineOption emptyTrashOption(QStringList() << "e" << "empty-trash" << "Empty Trash");
     parser.addOption(emptyTrashOption);
+
+    QCommandLineOption runtimeOption(QStringList() << "r" << "runtime" << "Run");
+    parser.addOption(runtimeOption);
 
     QCommandLineOption moveToTrashOption(QStringList() << "mtr" << "move-to-trash" << "Move To Trash");
     parser.addOption(moveToTrashOption);
@@ -155,10 +155,9 @@ bool Application::parseCommandLineArgs()
     parser.process(arguments());
 
     if (m_instance) {
-        QPixmapCache::setCacheLimit(2048);
-
-        if (parser.isSet(desktopOption)) {
-            Desktop desktop;
+	QPixmapCache::setCacheLimit(2048);
+	if (parser.isSet(runtimeOption)) {
+            RunTime runtime;
         } else {
             openFiles(formatUriList(parser.positionalArguments()));
         }
