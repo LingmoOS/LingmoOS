@@ -13,7 +13,7 @@ bool isProcessRunning(const std::string& processName) {
 }
 
 void startFileManager() {
-    system("lingmo-filemanager --desktop &");
+    system("lingmo-filemanager --runtime &");
 }
 
 int main() {
