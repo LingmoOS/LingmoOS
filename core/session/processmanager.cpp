@@ -102,7 +102,8 @@ void ProcessManager::startDesktopProcess()
     // Desktop components
     list << qMakePair(QString("kwin_x11"), QStringList("--replace"));
     list << qMakePair(QString("lingmo-notificationd"), QStringList());
-    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
+    list << qMakePair(QString("lingmo-desktop"), QStringList());
+    list << qMakePair(QString("lingmo-filemanager"), QStringList("--runtime"));
     list << qMakePair(QString("lingmo-statusbar"), QStringList());
     list << qMakePair(QString("lingmo-dock"), QStringList());
     list << qMakePair(QString("lingmo-launcher"), QStringList());
