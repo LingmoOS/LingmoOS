@@ -1,0 +1,133 @@
+Source: dkms
+Section: kernel
+Priority: optional
+Maintainer: Dynamic Kernel Module System Team <dkms@packages.debian.org>
+Uploaders: David Paleino <dapal@debian.org>,
+ Petter Reinholdtsen <pere@debian.org>,
+ Aron Xu <aron@debian.org>,
+ Andreas Beckmann <anbe@debian.org>,
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.2
+Homepage: https://github.com/dell/dkms
+Vcs-Git: https://salsa.debian.org/debian/dkms.git
+Vcs-Browser: https://salsa.debian.org/debian/dkms
+Rules-Requires-Root: no
+Testsuite: autopkgtest-pkg-dkms
+
+Package: dkms
+Architecture: all
+Multi-Arch: foreign
+Pre-Depends: lsb-release
+Depends: ${misc:Depends},
+ kmod,
+ dpkg-dev,
+ make | build-essential,
+ patch,
+Recommends:
+ gcc | c-compiler,
+ fakeroot,
+ sudo,
+Suggests: menu, e2fsprogs
+Breaks:
+# fewer supported architectures in trixie than before
+ broadcom-sta-dkms (<< 6.30.223.271-25.1~),
+ tp-smapi-dkms (<< 0.44-1.2~),
+# in bookworm, not in trixie
+ adv-17v35x-dkms (<< 5.0.7.0-1.0),
+ falcosecurity-scap-dkms (< 0.20),
+ nat-rtsp-dkms (<< 0.7+5.3-0.3~),
+# fewer supported architectures in bookworm than before
+ bbswitch-dkms (<< 0.8-12~),
+# in bullseye, not in bookworm
+ spl-dkms (<< 2.1),
+ wireguard-dkms (<< 1.0.20210606-1.0),
+# in buster, not in bullseye
+ aufs-dkms (<< 5.2+20190909-1.1.0),
+ dpdk-igb-uio-dkms (<< 20.08-1.0),
+ dpdk-rte-kni-dkms (<< 18.11.11-1.0),
+ kpatch-dkms (<< 0.6.0-0.2.0),
+ mali-midgard-dkms (<< 16.0+pristine-4.0),
+ ndiswrapper-dkms (<< 1.60-8.0),
+ sl-modem-dkms (<< 2.9.11~20110321-16.0),
+# in stretch, not in buster
+ asic0x-dkms (<< 1.0.1-1.0),
+ backfire-dkms (<< 1.0-1.0),
+ blktap-dkms (<< 2.0.93-0.10.0),
+ flashcache-dkms (<< 3.1.3+git20150701-5.0),
+ open-vm-tools-dkms (<< 2:10.1.15-1.0),
+ sysdig-dkms (<< 0.27.1-0.3.0),
+# in jessie, not in stretch
+ fglrx-modules-dkms (<< 1:15.12-2.0),
+ iscsitarget-dkms (<< 1.4.20.3+svn502-2.0),
+ oss4-dkms (<< 4.2-build2020-1~),
+ virtualbox-dkms (<< 5),
+ virtualbox-guest-dkms (<< 7),
+# in wheezy, not in jessie
+ blcr-dkms (<< 0.8.6~b3-1.0),
+ fuse4bsd-dkms (<< 0.3.9~pre1.20080208-8.0),
+ openswan-modules-dkms (<< 1:2.6.38-1.0),
+ openvswitch-datapath-dkms (<< 2.1.0+git20140411-3.0),
+ virtualbox-ose-dkms (<< 5),
+ virtualbox-ose-guest-dkms (<< 5),
+# in squeeze, not in wheezy
+ batman-adv-dkms (<< 2011.1.0-1.0),
+ batmand-gateway-dkms (<< 0.3.2-9.0),
+Provides:
+ dkms-autopkgtest (= ${binary:Version}),
+Description: Dynamic Kernel Module System (DKMS)
+ DKMS is a framework designed to allow individual kernel modules to be upgraded
+ without changing the whole kernel. It is also very easy to rebuild modules as
+ you upgrade kernels.
+
+Package: dh-dkms
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ ${perl:Depends},
+ ${misc:Depends},
+Breaks:
+ dkms (<< 3.0.3-3~),
+Replaces:
+ dkms (<< 3.0.3-3~),
+Provides:
+ dh-sequence-dkms,
+Description: debhelper addon for the Dynamic Kernel Module System (DKMS)
+ DKMS is a framework designed to allow individual kernel modules to be upgraded
+ without changing the whole kernel. It is also very easy to rebuild modules as
+ you upgrade kernels.
+ .
+ This package provides a debhelper add-on 'dkms' that simplifies packaging of
+ dkms kernel module source packages.
+
+Package: dkms-test-dkms
+Architecture: all
+Depends:
+ ${misc:Depends},
+Description: trivial dkms test kernel module
+ This package provides the dkms source code for the dkms_test kernel module.
+ .
+ This package is only intended for CI tests and not expected to be installed
+ on regular systems.
+
+Package: dkms-noautoinstall-test-dkms
+Architecture: all
+Depends:
+ ${misc:Depends},
+Description: trivial dkms noautoinstall test kernel module
+ This package provides the dkms source code for the dkms_noautoinstall_test
+ kernel module.
+ .
+ This package is only intended for CI tests and not expected to be installed
+ on regular systems.
+
+Package: dkms-replace-test-dkms
+Architecture: all
+Depends:
+ dkms-test-dkms,
+ ${misc:Depends},
+Description: trivial dkms replace test kernel module
+ This package provides the dkms source code for the dkms_replace_test
+ kernel module.
+ .
+ This package is only intended for CI tests and not expected to be installed
+ on regular systems.

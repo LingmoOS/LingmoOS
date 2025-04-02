@@ -1,0 +1,12 @@
+[Unit]
+Description=Builds and install new kernel modules through DKMS
+Documentation=man:dkms(8)
+Before=network-pre.target graphical.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=@SBINDIR@/dkms autoinstall --verbose --kernelver %v
+
+[Install]
+WantedBy=multi-user.target

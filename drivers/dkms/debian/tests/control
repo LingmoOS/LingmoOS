@@ -1,0 +1,99 @@
+Test-Command: sh debian/tests/run_test_wrapper.sh
+Features: test-name=run_test.sh
+Architecture: !i386
+Depends:
+ dkms,
+ openssl,
+ linux-headers-generic
+ | linux-headers-rpi [armel]
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install some-dkms after linux-headers
+Test-Command: apt-get install -yf dkms-test-dkms && dkms status
+Features: test-name=install_some-dkms_after_linux-headers
+Architecture: amd64
+Depends:
+ dkms,
+ linux-headers-generic,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install linux-headers after some-dkms
+Test-Command: apt-get install -yf linux-headers-generic && dkms status
+Features: test-name=install_linux-headers_after_some-dkms
+Architecture: amd64
+Depends:
+ dkms-test-dkms,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install some-dkms after linux-image w/o linux-headers
+Test-Command: apt-get install -yf dkms-test-dkms && dkms status
+Features: test-name=install_some-dkms_after_linux-image_without_linux-headers
+Architecture: amd64
+Depends:
+ dkms,
+ linux-image-generic,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install linux-image after some-dkms w/o linux-headers
+Test-Command: apt-get install -yf linux-image-generic && dkms status
+Features: test-name=install_linux-image_after_some-dkms_without_linux-headers
+Architecture: amd64
+Depends:
+ dkms-test-dkms,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install some-noautoinstall-dkms after linux-headers
+Test-Command: apt-get install -yf dkms-noautoinstall-test-dkms && dkms status
+Features: test-name=install_some-noautoinstall-dkms_after_linux-headers
+Architecture: amd64
+Depends:
+ dkms,
+ linux-headers-generic,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# install linux-headers after some-noautoinstall-dkms
+Test-Command: apt-get install -yf linux-headers-generic && dkms status
+Features: test-name=install_linux-headers_after_some-noautoinstall-dkms
+Architecture: amd64
+Depends:
+ dkms-noautoinstall-test-dkms,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+
+# 32-bit userspace with 64-bit kernel
+# cf. https://bugs.debian.org/1042993
+# workaround: apt-get install -yf linux-compiler-gcc-13-x86:amd64
+Test-Command:
+ dpkg --add-architecture amd64 &&
+ apt-get update &&
+ apt-get install -yf linux-headers-amd64 &&
+ /usr/lib/dkms/dkms-autopkgtest dkms-test-dkms
+Features: test-name=32-bit_userspace_with_64-bit_kernel
+Architecture: i386
+Depends:
+ dkms,
+Restrictions:
+ allow-stderr,
+ needs-root,
+ breaks-testbed,
+ flaky,

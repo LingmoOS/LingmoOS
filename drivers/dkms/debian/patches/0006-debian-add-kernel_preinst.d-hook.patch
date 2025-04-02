@@ -1,0 +1,69 @@
+From 5d05111a6ce4038226b6c34907964c2c38e6dc1f Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Thu, 23 Jan 2025 02:58:43 +0100
+Subject: [PATCH] debian: add kernel_preinst.d hook
+
+On kernel upgrades (w/o version change, but no guarantee that there was
+no ABI change), uninstall && unbuild all AUTOINSTALL=yes modules
+currently built for the kernel to ensure they get rebuilt by the
+kernel_postinst.d hook.
+No-op on initial installation of a kernel version.
+---
+ .gitignore                 |  1 +
+ Makefile                   |  2 ++
+ debian_kernel_preinst.d.in | 11 +++++++++++
+ 3 files changed, 14 insertions(+)
+ create mode 100644 debian_kernel_preinst.d.in
+
+diff --git a/.gitignore b/.gitignore
+index 0bd49a6..29155b7 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -9,6 +9,7 @@ dkms.service
+ dkms_common.postinst
+ debian_kernel_install.d
+ debian_kernel_postinst.d
++debian_kernel_preinst.d
+ debian_kernel_prerm.d
+ redhat_kernel_install.d
+ 
+diff --git a/Makefile b/Makefile
+index d46b864..c4b3da3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -40,6 +40,7 @@ GENERATED= \
+ 	dkms.service \
+ 	debian_kernel_install.d \
+ 	debian_kernel_postinst.d \
++	debian_kernel_preinst.d \
+ 	debian_kernel_prerm.d \
+ 	redhat_kernel_install.d
+ 
+@@ -82,6 +83,7 @@ install-debian: install
+ 	install -D -m 0755 debian_kernel_install.d $(DESTDIR)$(KINSTALL)/40-dkms.install
+ 	install -D -m 0755 debian_kernel_postinst.d $(DESTDIR)$(KCONF)/postinst.d/dkms
+ 	install -D -m 0755 debian_kernel_postinst.d $(DESTDIR)$(KCONF)/header_postinst.d/dkms
++	install -D -m 0755 debian_kernel_preinst.d $(DESTDIR)$(KCONF)/preinst.d/dkms
+ 	install -D -m 0755 debian_kernel_prerm.d $(DESTDIR)$(KCONF)/prerm.d/dkms
+ 
+ install-doc:
+diff --git a/debian_kernel_preinst.d.in b/debian_kernel_preinst.d.in
+new file mode 100644
+index 0000000..bfc175d
+--- /dev/null
++++ b/debian_kernel_preinst.d.in
+@@ -0,0 +1,11 @@
++#!/bin/sh
++
++# This script is triggered when the kernel (linux-image) package is being
++# installed/upgraded.  We're passed the version of the kernel being installed.
++inst_kern=$1
++
++if command -v dkms > /dev/null; then
++    dkms kernel_preinst -k "$inst_kern"
++fi
++
++exit 0
+-- 
+2.39.5
+

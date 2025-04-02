@@ -1,0 +1,20 @@
+Important note
+==============
+
+Driver from Broadcom conflicts with the following modules:
+ * b44, Broadcom 44xx/47xx 10/100 PCI ethernet driver (depends on ssb)
+ * b43legacy, Broadcom B43legacy wireless driver (depends on ssb)
+ * b43, Broadcom B43 wireless driver (free driver)
+ * brcm80211/brcmsmac, free driver from Broadcom for 802.11n wireless LAN driver
+ * ssb, Sonics Silicon Backplane driver
+
+These modules are blacklisted in /etc/modprobe.d/broadcom-sta-dkms.conf file, 
+initrd file is automatically rebuilt by dkms but you need to restart your
+computer at the first installation.
+
+Please note that any network card that requires b44 module will not work until
+broadcom-sta-dkms is installed.
+
+If it works, consider using one of the free drivers is better than using this one.
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Fri, 27 Jan 2012 17:00:33 +0400

@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+# module-assistant stuff
+PACKAGE = broadcom-sta-modules
+MA_DIR ?= /usr/share/modass
+-include $(MA_DIR)/include/generic.make
+-include $(MA_DIR)/include/common-rules.make
+
+kdist_clean: prep-deb-files
+	dh_clean
+	$(MAKE) clean "KBUILD_DIR=$(KSRC)" "KVER=$(KVERS)"
+
+kdist_config: prep-deb-files
+
+binary-modules: kdist_config
+	dh_testdir
+	dh_testroot
+	dh_prep
+	# Build and install the module
+	$(MAKE) "KBUILD_DIR=$(KSRC)" "KVER=$(KVERS)"
+	install -D -m 0644 wl.ko debian/$(PACKAGE)-$(KVERS)/lib/modules/$(KVERS)/kernel/drivers/net/wireless/wl.ko
+	dh_installdocs
+	dh_installchangelogs
+	dh_installmodules
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -v$(VERSION)
+	dh_md5sums
+	dh_builddeb --destdir=$(DEB_DESTDIR)

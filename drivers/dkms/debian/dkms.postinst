@@ -1,0 +1,57 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+if dpkg --compare-versions "$2" lt-nl "3.0.3-3~" ; then
+	for d in /etc/dkms/template-dkms-mkdeb/debian /etc/dkms/template-dkms-mkdeb /etc/dkms/template-dkms-mkbmdeb/debian /etc/dkms/template-dkms-mkbmdeb
+	do
+		test ! -d $d || rmdir --ignore-fail-on-non-empty $d
+	done
+fi
+
+if dpkg --compare-versions "$2" lt-nl "3.0.10-8~" ; then
+	for f in /boot/*.old-dkms
+	do
+		test ! -f "$f" || rm -fv "$f"
+	done
+fi
+
+if dpkg --compare-versions "$2" lt-nl "3.0.12" ; then
+	for d in /lib/modules/*
+	do
+		# clean up leftover depmod files if modules.dep is empty
+		# i.e. dkms called depmod after removing the last kernel module
+		if [ -f "$d/modules.dep" ] && [ ! -s "$d/modules.dep" ]; then
+			rm -fv \
+				"$d/modules.alias" \
+				"$d/modules.dep" \
+				"$d/modules.devname" \
+				"$d/modules.softdep" \
+				"$d/modules.symbols" \
+				"$d"/modules.*.bin
+			rmdir --ignore-fail-on-non-empty "$d"
+			test -d "$d" || echo "removed directory $d"
+		fi
+	done
+fi
+
+if dpkg --compare-versions "$2" lt-nl "3.0.12-2~" ; then
+	# missing $arch in the path, #1036033
+	rm -rfv /var/lib/dkms/*/*/[1-6].*/module/
+	rm -rfv /var/lib/dkms/*/*/[1-6].*/log/
+
+	# /usr/src/$module-$version was already removed,
+	# but /var/lib/dkms/$module/$version/source still points there
+	for source in /var/lib/dkms/*/*/source
+	do
+		test -h "$source" || continue
+		test -f "$source/dkms.conf" || rm -fv "$source"
+	done
+
+	for mdir in /var/lib/dkms/*/
+	do
+		test -d "$mdir" || continue
+		find "$mdir" -depth -type d -exec sh -c 'd="{}"; rmdir --ignore-fail-on-non-empty "$d" ; test -d "$d" || echo "removed directory $d"' \;
+	done
+fi

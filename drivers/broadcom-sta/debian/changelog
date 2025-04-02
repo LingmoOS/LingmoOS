@@ -1,0 +1,660 @@
+broadcom-sta (6.30.223.271-26) unstable; urgency=medium
+
+  [ Diego Escalante Urrelo ]
+
+  * 31-build-Provide-local-lib80211.h-header.patch: support for kernel
+    6.13.x (closes: #1093091)
+  * Various fixes on Linux build warnings (closes: #1084853)
+
+  [ Petter Reinholdtsen ]
+
+  * Disable the AppStream metadata until it's clear how to work around
+    confusion with the devices supported by the free driver (closes: #1093193)
+
+  [ Eduard Bloch ]
+
+  * 32-Prepare-for-6.14.0-rc6.patch: Experimental support for Linux 6.16
+    (trivial API change)
+
+  [ Andreas Beckmann ]
+  * 35-wl-Use-kernel-keyword-for-fallthrough.patch update (checks existence of
+    fallthrough macro)
+
+ -- Eduard Bloch <blade@debian.org>  Thu, 20 Mar 2025 12:48:52 +0100
+
+broadcom-sta (6.30.223.271-25.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * broadcom-sta-source: Add autopkgtest.  (Closes: #1095295)
+  * Promote module-assistant to Depends.
+  * Switch Architecture from all to amd64 i386.
+  * Update Lintian overrides.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 06 Mar 2025 09:07:30 +0100
+
+broadcom-sta (6.30.223.271-25) unstable; urgency=low
+
+  [ Eduard Bloch ]
+
+  * Adding initramfs update trigger as suggested by Andreas Beckmann
+    (closes: #1016882) to deliver modprobe blocklist into initrd and prevent
+    the influence of a wrong driver
+  * 31-6.12-unaligned-header-location.patch: adjust to new location of
+    unaligned.h (closes: #1088844, #1090964)
+
+  [ Petter Reinholdtsen ]
+
+  * Explicit device IDs in AppStream metadata (closes: #838735)
+
+ -- Eduard Bloch <blade@debian.org>  Sun, 29 Dec 2024 13:03:04 +0100
+
+broadcom-sta (6.30.223.271-24) unstable; urgency=low
+
+  [ Andreas Beckmann <anbe@debian.org> ]
+
+  * Switch to dh-sequence-dkms.  (Closes: #1027868)
+  * Declare Testsuite: autopkgtest-pkg-dkms, restrict it to amd64 and i386.
+  * Added/Updated patches to support a variety of Linux versions (including
+    6.x-rcY) and GCC versions (for bookworm, trixie, sid):
+    - 08-linux47.patch
+    - 24-wl-Use-the-right-enums-for-cfg80211_get_bss.patch
+    - 30-fix-version-parsing.patch
+    (Closes: #1057447)
+
+  [ Eduard Bloch <blade@debian.org> ]
+
+  * Adding dh-dkms to Build-Depends to make dh_clean happy
+
+ -- Eduard Bloch <blade@debian.org>  Sun, 03 Mar 2024 11:02:34 +0100
+
+broadcom-sta (6.30.223.271-23) unstable; urgency=medium
+
+  * Pulled the truckload of latest patches from Diego Escalante Urrelo (Fixing
+    `Incorrect netdev->dev_addr` errors in linux-5.17+ patch, closes: #1016505)
+  * debian/patches/29-linux601.patch: Linux 6.1 fixes from
+    https://github.com/archlinux/svntogit-community/blob/master/broadcom-wl-dkms/repos/community-x86_64/016-linux601.patch
+    (closes: #1023843, actually probably before by 6.30.223.271-21)
+  * debian/control.modules.in: updated with author information from
+    debian/control, and removed the dependencency on linux-image-* (not much of
+    help anyway and causes the problem with *-unsigned kernel packages)
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 27 Dec 2022 00:06:53 +0100
+
+broadcom-sta (6.30.223.271-22) unstable; urgency=medium
+
+  * Re-upload with binary since this is non-free and won't get auto-built.
+
+ -- Eduard Bloch <blade@debian.org>  Fri, 28 Oct 2022 14:17:06 +0200
+
+broadcom-sta (6.30.223.271-21) unstable; urgency=medium
+
+  * debian/patches/27-linux600.patch: build fix for Linux 6.00 based on
+    https://github.com/archlinux/svntogit-community/blob/master/broadcom-wl-dkms/repos/community-x86_64/015-linux600.patch
+    (closes: #1021912)
+
+ -- Eduard Bloch <blade@debian.org>  Fri, 21 Oct 2022 12:31:12 +0200
+
+broadcom-sta (6.30.223.271-20) unstable; urgency=low
+
+  * debian/patches/26-linux518.patch: build fix for Linux 5.18.
+    Based on ArchLinux patch, closes: #1012481
+
+ -- Eduard Bloch <blade@debian.org>  Wed, 08 Jun 2022 20:16:18 +0200
+
+broadcom-sta (6.30.223.271-19) unstable; urgency=medium
+
+  * Re-upload with binary since this is non-free and won't get built
+    on buildd.
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 10 May 2022 21:50:15 +0200
+
+broadcom-sta (6.30.223.271-18) unstable; urgency=medium
+
+  * debian/patches/25-linux517.patch:
+    Fixing build for Linux 5.17 (based on ArchLinux patch)
+
+ -- Eduard Bloch <blade@debian.org>  Sun, 08 May 2022 23:05:27 +0200
+
+broadcom-sta (6.30.223.271-17) unstable; urgency=medium
+
+  * Re-upload with binary since this is non-free and won't get built
+    on buildd.
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 17 May 2021 19:39:19 +0900
+
+broadcom-sta (6.30.223.271-16.1) unstable; urgency=medium
+
+  * Non-maintainer upload
+  * debian/control.modules.in:
+    - Declare debhelper compat level through a build-dependency
+      (Closes: #988562)
+  * debian/rules:
+    - Fix copying of Debian files in install-source rule
+
+ -- Ben Hutchings <benh@debian.org>  Mon, 17 May 2021 01:06:42 +0200
+
+broadcom-sta (6.30.223.271-16) unstable; urgency=medium
+
+  * Upload to unstable.
+  * debian/patches:
+    - Fix typo of patch 21.
+    - Previous patch 19 20 fixes old ticket (Closes: #987159).
+  * debian/README.source:
+    - Note some git repo for future reference.
+
+ -- Roger Shimizu <rosh@debian.org>  Tue, 04 May 2021 18:11:49 +0900
+
+broadcom-sta (6.30.223.271-16~exp1) experimental; urgency=medium
+
+  * debian/patches:
+    - Add 5 patches from Diego Escalante Urrelo to improve:
+      + power mgmt setting
+      + tx_power
+      + mac address setting
+      + other minor fixes
+
+ -- Roger Shimizu <rosh@debian.org>  Sat, 03 Oct 2020 02:25:04 +0900
+
+broadcom-sta (6.30.223.271-15) unstable; urgency=medium
+
+  * debian/patches:
+    - Remove patch 02, since it's not needed.
+    - Refresh patches.
+    - Add patch 17 to fix FTBFS since linux 5.9
+      Thanks to Joan Bruguera for the patch.
+  * Add source-is-missing to debian/source/lintian-overrides.
+
+ -- Roger Shimizu <rosh@debian.org>  Sun, 27 Sep 2020 20:26:10 +0900
+
+broadcom-sta (6.30.223.271-14) unstable; urgency=medium
+
+  * Rebuild as unstable.
+
+ -- Roger Shimizu <rosh@debian.org>  Sat, 18 Apr 2020 19:07:30 +0900
+
+broadcom-sta (6.30.223.271-13) experimental; urgency=medium
+
+  * debian/patches:
+    - Add patch to fix dkms build error (Closes: #886512).
+
+ -- Roger Shimizu <rosh@debian.org>  Sat, 18 Apr 2020 18:32:36 +0900
+
+broadcom-sta (6.30.223.271-13~exp1) experimental; urgency=medium
+
+  * debian/control:
+    - Get the package added to the "autobuild" whitelist, hoping can
+      resolve the source upload.
+    - Bump debhelper version to 12.
+    - Bump policy version to 4.5.0
+  * debian/broadcom-sta-dkms.metainfo.xml:
+    - Fix license for the metadata.
+  * Add debian/upstream/metadata.
+  * Remove debian/compat.
+
+ -- Roger Shimizu <rosh@debian.org>  Fri, 17 Apr 2020 19:21:05 +0900
+
+broadcom-sta (6.30.223.271-12) unstable; urgency=medium
+
+  * debian/patches:
+    - Add patch to adapt linux 5.6
+      Thanks to Herman van Hazendonk (Closes: #955415).
+  * debian/control:
+    - Add Rules-Requires-Root: no
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 13 Apr 2020 23:59:43 +0900
+
+broadcom-sta (6.30.223.271-11) unstable; urgency=medium
+
+  * debian/patches:
+    - Add compat fix for deprecated get_ds function
+      (Thanks patch from ubuntu, LP: #1830042, closes: #928754, #934677)
+
+ -- Roger Shimizu <rosh@debian.org>  Thu, 15 Aug 2019 21:42:52 +0900
+
+broadcom-sta (6.30.223.271-10) unstable; urgency=medium
+
+  * debian/patches:
+    - Apply DEP-3.
+    - Refresh patches.
+  * debian/source/lintian-overrides:
+    - Remove source-only-upload-to-non-free-without-autobuild.
+
+ -- Roger Shimizu <rosh@debian.org>  Fri, 11 Jan 2019 00:12:46 +0200
+
+broadcom-sta (6.30.223.271-9.1) unstable; urgency=medium
+
+  * Re-upload with source and all.
+  * debian/source/lintian-overrides:
+    - Add source-only-upload-to-non-free-without-autobuild.
+
+ -- Roger Shimizu <rosh@debian.org>  Sun, 04 Nov 2018 23:01:49 +0900
+
+broadcom-sta (6.30.223.271-9) unstable; urgency=medium
+
+  * debian/copyright:
+    - Apply DEP-5.
+    - Add Comment sectioin to explain why this is non-free.
+  * debian/rules:
+    - Get version info from packaging script.
+  * debian/*lintian-overrides:
+    - spelling-error-in-binary on prebuilt libraries.
+    - source-contains-prebuilt-binary on prebuilt libraries.
+    - binary-package-depends-on-toolchain-package on debhelper,
+      since it is unused.
+  * debian/patches:
+    - Amend debian/patches/20-linux414.patch to support i386.
+      Thanks to ubuntu for the patch.
+  * debian/control:
+    - Add Vcs-Browser.
+
+ -- Roger Shimizu <rosh@debian.org>  Sun, 23 Sep 2018 00:56:35 +0900
+
+broadcom-sta (6.30.223.271-8) unstable; urgency=low
+
+  [ Roger Shimizu ]
+  * debian/patches:
+    - Added 20-linux414.patch, and 21-linux415.patch to support
+      Linux kernel 4.15
+      (Thanks to Gerardo Esteban Malazdrewicz, closes: #885885)
+    - Fix typo in 14-rdtscl.patch
+
+  [ Eduard Bloch ]
+  * Dropped extra CHANGELOG file (ancient documentation)
+  * Standard version update to 4.1.3 (added lintian override to
+    broadcom-sta-source since debhelper is used on purpose therein)
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 13 Feb 2018 21:45:18 +0100
+
+broadcom-sta (6.30.223.271-7) unstable; urgency=medium
+
+  * Added 19-linux412.patch to support Linux kernel 4.12
+    (Thanks to koos vriezen, closes: #867258)
+
+ -- Eduard Bloch <blade@debian.org>  Sat, 08 Jul 2017 15:03:23 +0200
+
+broadcom-sta (6.30.223.271-6) unstable; urgency=low
+
+  * Added 18-linux411.patch to support Linux kernel 4.11, by koos vriezen
+    (closes: #861807)
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 09 May 2017 20:15:42 +0200
+
+broadcom-sta (6.30.223.271-5) unstable; urgency=medium
+
+  * Disable the AppStream metadata again until it's clear how to work around
+    confusion with the devices better covered by the free driver
+  * Added 17-fix-kernel-warnings.patch from Luis Ortega (avoid useless kernel
+    warnings and possibly add better tracibility of bogus auth failures)
+    (closes: #843387, #843389)
+  * Updated upstream download URL
+  * Switch to debhelper 9 (no functional changes)
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 20 Dec 2016 21:53:02 +0100
+
+broadcom-sta (6.30.223.271-4) unstable; urgency=medium
+
+  * Added patch from Koos Vriezen to work around kernel crash with version
+    4.8+ (THANKS!) (closes: #839629)
+  * Experimental inclusion of AppStream metadata (closes: #838735)
+  * Standards update (no changes required)
+
+ -- Eduard Bloch <blade@debian.org>  Tue, 04 Oct 2016 23:25:35 +0200
+
+broadcom-sta (6.30.223.271-3) unstable; urgency=low
+
+  * Added patch to support kernel 4.7 changes, based on
+    https://github.com/archlinuxcn/repo/blob/f4d6cff1cacf8dad13006fade5f96bc2cf020a9b/broadcom-wl-dkms/003-linux47.patch
+    with minor modifications (closes: #829363)
+
+ -- Eduard Bloch <blade@debian.org>  Sun, 03 Jul 2016 00:42:10 +0200
+
+broadcom-sta (6.30.223.271-2) unstable; urgency=low
+
+  * Added 14-rdtscl.patch (closes: #808954), originally 002-rdtscl.patch from
+    https://aur.archlinux.org/cgit/aur.git/snapshot/broadcom-wl-dkms.tar.gz
+  * Added device id for Lenovo Yoga 3 (closes: 791672)
+  * More explanation about mutually exclusive build systems in the package
+    description (closes: #787091)
+  * changed the relation between -dkms and others to simple conflict with the
+    local binary packages
+
+ -- Eduard Bloch <blade@debian.org>  Fri, 25 Dec 2015 19:15:22 +0100
+
+broadcom-sta (6.30.223.271-1) unstable; urgency=low
+
+  * New upstream release (Closes: #800880).
+  * Dropped applied upstream patches (also thanks to Rafael Cunha de Almeida):
+    - 09-fix_system_hang_when_deleting_monitor.patch
+    - 06-kernel-3.17.0.patch
+    - 08-enable_error_traces.patch (stop deviating from upstream)
+    - 10-0015-add-support-for-Linux-3.18.patch
+    - 11-0016-repair-make-warnings.patch
+    - 12-0017-add-support-for-Linux-4.0.patch
+    - 14-0018-cfg80211_disconnected.patch
+  * Adopted (Raphael):
+    - 05-kernel-3.15.0.patch
+    - 07-fix_procfs_handling.patch
+  * Refreshed: all other except for 00-changelog.patch
+
+ -- Eduard Bloch <blade@debian.org>  Mon, 05 Oct 2015 20:20:36 +0200
+
+broadcom-sta (6.30.223.248-4) unstable; urgency=medium
+
+  * Adopting package after confirmation from maintainer, keeping Cyril
+    Lacoux as co-maintainer
+  * Added support for kernel 4.2 (0018-cfg80211_disconnected.patch, by Tim
+    Garnder / Canonical, closes: #796372)
+
+ -- Eduard Bloch <blade@debian.org>  Sat, 26 Sep 2015 12:26:59 +0200
+
+broadcom-sta (6.30.223.248-3.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Rebuild to include arch-indep packages
+
+ -- Eduard Bloch <blade@debian.org>  Sun, 10 May 2015 22:56:43 +0200
+
+broadcom-sta (6.30.223.248-3.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Added broadcom-sta-6.30.223.248-linux-3.18-null-pointer-crash.patch to
+    prevent potential problems with recent kernels (closes: #773713)
+
+ -- Eduard Bloch <blade@debian.org>  Wed, 06 May 2015 21:22:40 +0200
+
+broadcom-sta (6.30.223.248-3.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Added Canonical patches to support Linux kernel versions up to 4.0.0
+    (closes: #773713)
+  * Set some variables right for kernel-package/module-assistant usage,
+    to build correctly against headers without having to boot that kernel
+
+ -- Eduard Bloch <blade@debian.org>  Wed, 29 Apr 2015 11:50:17 +0200
+
+broadcom-sta (6.30.223.248-3) unstable; urgency=medium
+
+  * Synced supported chipsets list with README.txt file (Closes: #762954).
+  * Bumped standards version to 3.9.6 (No changes).
+  * Added series of patches from Mickael MASSON <mmasson.dev@gmail.com> to
+    fix system hang when activating monitor mode (Closes: #770327).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Sun, 07 Dec 2014 17:49:06 +0400
+
+broadcom-sta (6.30.223.248-2) unstable; urgency=medium
+
+  * Switched compression method from bz2 to xz.
+  * Added 06-3.17.0.patch for kernel 3.17 compatibility (Closes: #762711).
+  * Fixed broken variable for kernel version when compiling with
+    module-assistant (Closes: #763550).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Mon, 20 Oct 2014 19:53:44 +0400
+
+broadcom-sta (6.30.223.248-1) unstable; urgency=medium
+
+  * New upstream release (Closes: #756443).
+  * Refreshed the following patch files:
+    - 00-changelog.patch
+    - 01-shipped-module.patch
+    - 02-license.patch
+    - 03-rename-to-wlan0.patch
+    - 04-user_ioctl.patch
+  * Dropped applied upstream patch for kernel 3.10 compatibility.
+  * Added 05-3.15.0.patch for kernel 3.15 compatibility
+    (Closes: #752864, #754434, #757984).
+  * Added PCI-ID list file for live-config in broadcom-sta-dkms package
+    (Closes: #748679).
+  * Added BCM4314- as supported chipset in package's description
+    (Closes: #756430).
+  * Bumped standards version to 3.9.5 (No changes).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Mon, 11 Aug 2014 08:17:25 +0400
+
+broadcom-sta (6.30.223.141-1) unstable; urgency=low
+
+  * New upstream release (Yeah!) (Closes: #688823).
+  * Refreshed the following patch files:
+    - 00-changelog.patch
+    - 01-shipped-module.patch
+    - 02-license.patch
+    - 03-rename-to-wlan0.patch
+    - 05-user_ioctl.patch (-> 04-user_ioctl.patch)
+  * Dropped applied upstream patch files:
+    - 04-linux-semaphore-include.patch
+    - 06-2.6.39.patch
+    - 07-3.0.0.patch
+    - 08-3.2.0.patch
+    - 09-3.4.0.patch
+    - 10-3.6.0.patch
+    - 11-3.8.0.patch
+    - 12-3.9.0.patch
+  * Added 05-3.10.0.patch for kernel 3.10 compatibility (Closes: #716999).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Mon, 16 Sep 2013 10:19:56 +0400
+
+broadcom-sta (5.100.82.112-11) unstable; urgency=low
+
+  * Added 12-3.9.0.patch for kernel 3.9 compatibility (Closes: #711227).
+  * Bumped standards version to 3.9.4 (No changes).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Thu, 06 Jun 2013 17:32:29 +0400
+
+broadcom-sta (5.100.82.112-10) unstable; urgency=low
+
+  * Changed section from non-free/admin to non-free/kernel (See: #698894).
+  * Added 11-3.8.0.patch for kernel 3.8 compatibility (Closes: #702788).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Tue, 12 Mar 2013 10:22:56 +0400
+
+broadcom-sta (5.100.82.112-9) unstable; urgency=low
+
+  * Added bcma (which brcmsmac depends on) to blacklist (Closes: #697496).
+  * Added 10-3.6.0.patch to fix kernel oops with 3.6 serie (Closes: #698216).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Thu, 24 Jan 2013 09:36:20 +0400
+
+broadcom-sta (5.100.82.112-8) unstable; urgency=low
+
+  * Added 05-user_ioctl.patch to allow normal user to send ioctls.
+  * Added 07-3.0.0.patch to use cfg80211 with 3.0 kernels, thanks to Jacopo
+    Corbetta <jacopo.corbetta@gmail.com> (Closes: #672677)
+  * Added 09-3.4.0.patch to compile with 3.4 kernels, thanks to Eugene San
+    <eugenesan@gmail.com>
+  * Reorded patches.
+  * Export KVER variable to `make` (Closes: #651787)
+  * Improved target kernel arch detection. (Closes: #651787)
+    It was a pleasure, really.
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Mon, 18 Nov 2012 10:56:27 +0400
+
+broadcom-sta (5.100.82.112-7) unstable; urgency=low
+
+  * Revert architecture to all (Closes: #659732, #659509, #664476)
+  * Bumped standards version to 3.9.3 (No changes)
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Tue, 17 Apr 2012 14:08:12 +0400
+
+broadcom-sta (5.100.82.112-6) unstable; urgency=low
+
+  * Added dkms support (Closes: #568034)
+  * Remove modass override symlink
+  * debian/control:
+    - Set architecture to amd64 i386
+    - Removed wireless-tools from Suggests since module recommends it
+    - Bumped debhelper version to 8
+  * debian/control.modules.in:
+    - Bumped standards version to 3.9.2 (No changes)
+    - Set architecture to amd64 i386
+    - Removed quilt from Depends and Build-Depends
+    - Bumped debhelper version to 8
+  * debian/rules:
+    - Moved module specific stuff to debian/rules.modules
+    - Removed quilt stuff since it's natively supported by format 3.0
+    - Rewrote most of file
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Sat, 28 Jan 2012 09:47:33 +0400
+
+broadcom-sta (5.100.82.112-5) unstable; urgency=low
+
+  * Re-add support for installation from sources (Closes: #655279).
+  * Added 06-3.2.0.patch to compile with 3.2 kernels (Closes: #656600, #657049).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Fri, 20 Jan 2012 08:59:07 +0400
+
+broadcom-sta (5.100.82.112-4) unstable; urgency=low
+
+  * Enabled compilation for 64bits kernel on i386 architecture
+    (Closes: #651787):
+    - Provide one merged src tree with both amd64 and i386 shipped proprietary
+      modules.
+    - Patch Makefile to select correct shipped module depending on kernel
+      configuration.
+    - Removed all extra patches (from i386 tree).
+    - Removed SOURCEDIR = f(dpkg-architecture) from rules file.
+    - Updated series file as well.
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Wed, 14 Dec 2011 08:03:53 +0400
+
+broadcom-sta (5.100.82.112-3) unstable; urgency=low
+
+  * Added a note to NEWS.Debian to inform the user that the interface has been
+    renamed in 5.100.82.112-2 (Closes: #648396).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Fri, 11 Nov 2011 15:09:34 +0400
+
+broadcom-sta (5.100.82.112-2) unstable; urgency=low
+
+  * Added 02-rename-to-wlan0.patch to rename device from eth%d to wlan%d.
+  * Added 04-2.6.39.patch to compile with 2.6.39.X kernels.
+  * Thanks to Carlos Alberto Lopez Perez <clopez@igalia.com> (Closes: #648169).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Thu, 10 Nov 2011 08:50:03 +0400
+
+broadcom-sta (5.100.82.112-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Wed, 26 Oct 2011 08:51:03 +0400
+
+broadcom-sta (5.100.82.111-1) unstable; urgency=low
+
+  * New upstream release.
+  * Refreshed changelog and license patches.
+  * Removed obsolete patch 03-linux-2.6.37.patch.
+  * Bumped standards version to 3.9.2 (No changes).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Tue, 25 Oct 2011 08:21:13 +0400
+
+broadcom-sta (5.100.82.38-2) unstable; urgency=low
+
+  * Updated supported chipset details, thanks to Geoff Simmons
+    <gsimmons@gsimmons.org> (Closes: #620149).
+  * Added brcmsmac to blacklist, thanks to Geoff Simmons for the tip
+    (Closes: #626283).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Wed, 11 May 2011 07:24:54 +0400
+
+broadcom-sta (5.100.82.38-1) unstable; urgency=low
+
+  * New upstream release (Closes: #605715).
+  * Switch to dpkg-source 3.0 (quilt) format.
+  * Updated my e-mail.
+  * Rebuild initrd when broadcom-sta-common is configured (Closes: #591869).
+  * Added brcm80211 driver to blacklist as requested by Ben Hutchings
+    (Closes: #597786, #601009, #611539).
+  * Added upstream changelog and README.txt files.
+  * Removed applyed upstream patch for 2.6.33 compatibility.
+  * Removed applyed upstream patch for 2.6.35 compatibility.
+  * Added patch to compile with 2.6.37.
+  * Added patch from Anisse Astier <anisse@astier.eu> to compile with minimal
+    kernel configuration (Closes: #612445).
+
+ -- Cyril Lacoux <clacoux@easter-eggs.com>  Thu, 10 Feb 2011 09:21:50 +0400
+
+broadcom-sta (5.60.48.36-3) unstable; urgency=low
+
+  * Added upstream patch to compile with 2.6.35 (Closes: #591549).
+  * Bumped standards version to 3.9.1 (No changes).
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Thu, 05 Aug 2010 11:44:37 +0400
+
+broadcom-sta (5.60.48.36-2) unstable; urgency=low
+
+  * Added patch to compile with 2.6.33 (Closes: #572314, #572429).
+  * Added patch from Michael Tuschik for cross-compilation. (Closes: #579839)
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Mon, 24 May 2010 10:22:44 +0400
+
+broadcom-sta (5.60.48.36-1) unstable; urgency=low
+
+  * New upstream release (Closes: #571233).
+  * Removed applyed upstream patch for 2.6.32 compatibility.
+  * Refreshed 01-license.patch file.
+  * Bumped standards version to 3.8.4 (No changes).
+  * Added BCM4313 to the list of supported cards.
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Wed, 24 Feb 2010 21:12:29 +0400
+
+broadcom-sta (5.10.91.9.3-3) unstable; urgency=low
+
+  * Blacklisting b43legacy, b43, b44 and ssb modules (Closes: #545388).
+  * Added a note to README.Debian (broadcom-sta-common) to explain why b44
+    module is blacklisted.
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Thu, 14 Jan 2010 22:33:24 +0400
+
+broadcom-sta (5.10.91.9.3-2) unstable; urgency=low
+
+  * Added patch from Emilio Coppa <ercoppa@gmail.com> to compile with 2.6.32.
+  * Added a note to README.Debian to inform the user that he should now use
+    the free b43 driver (Closes: #542775).
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Sat, 19 Dec 2009 11:48:47 +0400
+
+broadcom-sta (5.10.91.9.3-1) unstable; urgency=low
+
+  * New maintainer (Closes: #543888).
+  * New upstream release (Closes: #547373, #551364).
+  * Compile with 2.6.31.
+  * Removed applyed upstream patches.
+  * Refreshed 01-license.patch file.
+  * Fixed dh_installdeb called twice.
+  * Added README.source file referring to /usr/share/doc/quilt/README.source
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Wed, 11 Nov 2009 14:12:55 +0400
+
+broadcom-sta (5.10.91.9-3) unstable; urgency=low
+
+  * Actually updating the maintainers field.
+
+ -- Daniel Baumann <daniel@debian.org>  Thu, 27 Aug 2009 10:53:07 +0200
+
+broadcom-sta (5.10.91.9-2) unstable; urgency=low
+
+  * Updating package to standards version 3.8.3.
+  * Removing vcs fields.
+  * Orphaning package.
+
+ -- Daniel Baumann <daniel@debian.org>  Thu, 27 Aug 2009 10:38:01 +0200
+
+broadcom-sta (5.10.91.9-1) unstable; urgency=low
+
+  * Merging upstream version 5.10.91.9.
+  * Using correct rfc-2822 date formats in changelog.
+  * Correcting broadcom-sta-common package description.
+  * Adding patch from Chris Nolan <chris@cenolan.com> to allow the
+    driver to associate with hidden SSID networks using Network Manager.
+  * Adding patch to export module license symbol.
+  * Adding updated 2.6.29 patch from Alexander Feldman <alex@llama.gs>.
+  * Adding patch from Victor Ashirov <victor.ashirov@gmail.com> to
+    compile with 2.6.30.
+  * Removing wl-iw.patch, not required anymore.
+  * Removing disabled patches.
+
+ -- Daniel Baumann <daniel@debian.org>  Tue, 19 May 2009 13:13:00 +0200
+
+broadcom-sta (5.10.79.10-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Daniel Baumann <daniel@debian.org>  Mon, 06 Apr 2009 00:08:00 +0200

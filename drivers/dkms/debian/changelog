@@ -1,0 +1,1360 @@
+dkms (3.1.5-2) unstable; urgency=medium
+
+  * dkms-autopkgtest: Support manual execution with a .deb file argument.
+  * Add Breaks against more obsolete *-dkms packages.
+  * run_test.sh: Extract only the major part of the kmod version.
+    (Closes: #1099711)
+  * Bump Standards-Version to 4.7.2, no changes needed.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 18 Mar 2025 09:08:57 +0100
+
+dkms (3.1.5-1) unstable; urgency=medium
+
+  * New upstream release.  (Closes: #1009645, #706868)
+  * Refresh patches.
+  * framework.conf.d: Enable autoinstall_all_kernels="yes" by default.
+    (Closes: #1087433)
+  * dkms-autopkgtest: Skip test (exit 0) on i386 (no more kernels or headers).
+  * dkms-autopkgtest: Skip test (exit 77) if no linux-headers-* seem to exist.
+  * Skip upstream testsuite on i386.
+  * Add Breaks against obsolete *-dkms packages that are incompatible with the
+    Linux 6.12 kernel in trixie.
+  * Remove outdated HOWTO.Debian.
+  * Upload to unstable.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 05 Feb 2025 04:13:14 +0100
+
+dkms (3.1.4-1) experimental; urgency=medium
+
+  * New upstream release.  (Closes: #1088640)
+  * Refresh patches.
+  * Add dkms-replace-test-dkms package with a trivial kernel module for dkms
+    tests.
+  * Fix dkms_autoinstaller error propagation.  (Closes: #1093556)
+  * Ensure modules get rebuilt once on kernel upgrades w/o version change.
+    (Closes: #1076351)
+  * dkms-autopkgtest: Update module-is-installed regex again.
+  * Remove Mario Limonciello from Uploaders at his request.
+  * Upload to experimental.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 23 Jan 2025 05:31:56 +0100
+
+dkms (3.1.0-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * No change source-only upload for testing migration.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 19 Jan 2025 15:57:54 -0500
+
+dkms (3.1.0-2) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Andreas Beckmann ]
+  * Clean up /etc/kernel/install.d/40-dkms.install, moved to /usr.
+    (Closes: #1086441)
+
+  [ Jeremy Sowden ]
+  * d/s/dkms-autopkgtest: fix testing of packages that override original modules
+    (Closes: #1088558).
+
+ -- Petter Reinholdtsen <pere@debian.org>  Mon, 06 Jan 2025 23:40:28 +0100
+
+dkms (3.1.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+  * Bump Standards-Version to 4.7.0, no changes needed.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 18 Oct 2024 03:45:43 +0200
+
+dkms (3.0.13-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+  * Downgrade compiler dependency to Recommends to ease cross installation.
+    The linux-headers-* packages have a proper compiler dependency.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 07 Mar 2024 11:33:57 +0100
+
+dkms (3.0.12-5) unstable; urgency=medium
+
+  * dkms: Use saner compression defaults.  (Closes: #1061427)
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 07 Feb 2024 20:54:03 +0100
+
+dkms (3.0.12-4) unstable; urgency=medium
+
+  * common.postinst: Use bash for extracting AUTOINSTALL from dkms.conf.
+    (Closes: #1059885)
+  * Stop recommending linux-headers-*.
+    (Closes: #1059895, #918918, #968763, #637877, #755942, #762061, #951404)
+  * postinst: Be less greedy and don't remove module source while cleaning up
+    module builds with empty $arch from the dkms tree.  (Closes: #1059900)
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 03 Jan 2024 20:16:57 +0100
+
+dkms (3.0.12-3) unstable; urgency=medium
+
+  * Autodetect module compression during tests.  (Closes: #1059894)
+  * Upload to unstable.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 02 Jan 2024 14:10:36 +0100
+
+dkms (3.0.12-2) experimental; urgency=medium
+
+  * Cherry-pick upstream patches:
+    - Use 'unbuild' instead of 'remove' in kernel prerm script to keep the
+      modules in 'added' state.  (Closes: #621846, #894250)
+    - Document MOK key *and* cert recreation behavior if MOK key *or* cert is
+      missing.  (Closes: #1052243)
+  * kernel/header_postinst.d hook: On header upgrades w/o package name change,
+    'unbuild' all 'autoinstall'ed modules built against the old version first
+    to ensure they get rebuilt against the upgraded headers on the next
+    'autoinstall'.  (Closes: #1040401, #1034013)
+  * common.postinst: Only build AUTOINSTALL="yes" modules on installation.
+  * Clean up obsolete /etc/kernel/install.d/dkms, renamed to 40-dkms.install.
+    (Closes: #1056949)
+  * postinst: Clean up modules with empty $arch from dkms tree. (Cf. #1036033)
+  * postinst: Clean up dangling source links from dkms tree.  (LP: #830915)
+  * dh_dkms: Strip epoch from upstream version.  (Closes: #660043)
+  * dh_dkms: Error out on invalid package versions.
+  * dh_dkms: Always substitute #MODULE_VERSION#.  (Closes: #736803)
+  * Add dkms-noautoinstall-test-dkms package with a trivial kernel module for
+    dkms tests.
+  * Add autopkgtests using dkms-noautoinstall-test-dkms.
+  * Upload to experimental.
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 06 Dec 2023 00:48:28 +0100
+
+dkms (3.0.12-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+  * New autopkgtest: Test 32-bit i386 userspace with 64-bit kernel.
+  * Only enumerate kernels that potentially have headers installed.
+    (Closes: #1011317)
+  * Clean up after depmod if modules.dep is empty.
+  * postinst: Clean up leftover depmod files from removed kernels/headers.
+
+ -- Andreas Beckmann <anbe@debian.org>  Sat, 25 Nov 2023 02:36:21 +0100
+
+dkms (3.0.11-3) unstable; urgency=medium
+
+  * autopkgtest fixes.
+  * Drop Ubuntu-specific patch.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 16 Jun 2023 17:15:58 +0200
+
+dkms (3.0.11-2) unstable; urgency=medium
+
+  * dh_dkms: Bump generated dkms dependency for new BUILD_EXCLUSIVE
+    directives.
+  * Fix and unify CC detection.
+  * Fail early if $arch detection fails.  (Closes: #1036033, #842596, #999467)
+  * Add Breaks against obsolete *-dkms packages that are incompatible with the
+    Linux 6.1 kernel in bookworm.  (Closes: #1037425)
+  * Upload to unstable.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 13 Jun 2023 19:02:14 +0200
+
+dkms (3.0.11-1) experimental; urgency=medium
+
+  * New upstream release.
+    - Adds BUILD_EXCLUSIVE_{CONFIG,_KERNEL_{MIN,MAX}}.  (Closes: #911665)
+    - Fixes BUILD_EXCLUSIVE matches propagating as error.  (Closes: #1031561)
+  * Drop patches that were applied upstream.
+  * Avoid unnecessary rpm comands on Debian based systems.  (Closes: #741399)
+    (LP: #1069350)
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 27 Apr 2023 18:12:51 +0200
+
+dkms (3.0.10-9) experimental; urgency=medium
+
+  * Add dkms-test-dkms package with a trivial kernel module for dkms tests.
+    (Closes: #642174)
+  * New autopkgtest: Install some-dkms after linux-headers.
+  * New autopkgtest: Install linux-headers after some-dkms.
+  * New autopkgtest: Install some-dkms after linux-image w/o linux-headers.
+  * New autopkgtest: Install linux-image after some-dkms w/o linux-headers.
+  * Upload to experimental.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 31 Mar 2023 14:19:59 +0200
+
+dkms (3.0.10-8+deb12u1) bookworm; urgency=medium
+
+  * Add Breaks against obsolete *-dkms packages that are incompatible with the
+    Linux 6.1 kernel in bookworm.  (Closes: #1037425)
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 12 Jul 2023 13:43:22 +0200
+
+dkms (3.0.10-8) unstable; urgency=medium
+
+  * Disable tests broken by fix-builtin-archive-dkms-coinstallation.patch.
+    (Closes: #1033396)
+  * Run autopkgtest for all architectures using the headers from the
+    linux-headers-generic (virtual) meta-package.
+  * Generate dh_dkms.1 at build time.
+  * Clean up /boot/*.old-dkms on upgrades from bullseye.  (Closes: #717584)
+  * Clean up obsolete /etc/dkms/sign_helper.sh on upgrades. (Closes: #1019563)
+  * dkms-autopkgtest: Try to 'dkms install' its BUILD_DEPENDS before testing a
+    module. (Single level only, without recursion.)  (Closes: #1034303)
+  * Fix fallback value for BUILD_MODULE_NAME[0].  (Closes: #651973)
+  * dkms.8: Clarify 'dkms add' arguments.  (Closes: #704917)
+  * Print a warning if /proc is not mounted.  (Closes: #810665, #968074)
+  * dkms_autoinstaller: Skip autoinstall if headers are missing (like
+    dkms_common.postinst).  (Closes: #1030595)
+  * Use return code 77 if skipping due to BUILD_EXCLUSIVE_*.
+  * Sort kernels by version.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 31 Mar 2023 14:01:26 +0200
+
+dkms (3.0.10-7) unstable; urgency=medium
+
+  [ Dimitri John Ledkov ]
+  * Fix release regression preventing co-installing in-archive dkms
+    packages with kernels that built-in identical or newer versions of the
+    same dkms package. LP: #2008269
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 22 Mar 2023 00:02:08 +0100
+
+dkms (3.0.10-6) unstable; urgency=medium
+
+  * Fix test failure on s390x due to typo in "linux" package installation
+    name.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 14 Feb 2023 09:37:48 +0100
+
+dkms (3.0.10-5) unstable; urgency=medium
+
+  * dkms-autopkgtest: fix typo in variable name
+
+ -- Aron Xu <aron@debian.org>  Wed, 08 Feb 2023 11:14:35 +0800
+
+dkms (3.0.10-4) unstable; urgency=medium
+
+  * dkms-autopkgtest: fix build vs install checks
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Tue, 07 Feb 2023 19:02:02 +0000
+
+dkms (3.0.10-3) unstable; urgency=medium
+
+  [ Andreas Beckmann ]
+  * dkms: Drop Depends: dh-dkms, the B-D: dkms have migrated to
+    B-D: dh-sequence-dkms or B-D: dh-dkms.
+  * Provide virtual package dkms-autopkgtest.
+  * dkms-autopkgtest: Accept a list of packages to be tested as parameters.
+  * dkms-autopkgtest: Ensure dctrl-tools and openssl are installed.
+  * Bump Standards-Version to 4.6.2, no changes needed.
+  * dh_dkms: Error out if dkms.conf cannot be read.  (Closes: #1028331)
+  * dh_dkms: Fall back to debian/tmp when looking up the dkms.conf template.
+
+  [ Aron Xu ]
+  * add autopkgtest for dkms itself
+
+ -- Aron Xu <aron@debian.org>  Tue, 07 Feb 2023 14:55:19 +0800
+
+dkms (3.0.10-2) unstable; urgency=medium
+
+  * dkms-autopkgtest:
+    - Use dkms --force to force installation and build
+      if the module is already found (e.g. provided by kernel)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 31 Jan 2023 10:16:53 +0100
+
+dkms (3.0.10-1) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Drop gencontrol hack, now that the Breaks has been removed
+
+  [ Aron Xu ]
+  * New upstream version 3.0.10 (Closes: #1025783, #1026822)
+  * Drop patch merged upstream
+
+ -- Aron Xu <aron@debian.org>  Tue, 10 Jan 2023 22:08:49 +0800
+
+dkms (3.0.9-1) unstable; urgency=medium
+
+  * New upstream version 3.0.9 (Closes: #1019425)
+  * Remove patches merged upstream and refresh remainders
+  * Remove unused override: source/maintainer-manual-page
+  * Remove unused "Breaks: ${dkms:Breaks}" from d/control
+  * Fix bash term in dkms_common.postinst
+
+ -- Aron Xu <aron@debian.org>  Tue, 13 Dec 2022 18:01:38 +0800
+
+dkms (3.0.8-3) unstable; urgency=high
+
+  * Revert back to 3.0.8-1 behavior to prevent breakages for sid users
+    (Closes: #1025214, #1025171)
+
+ -- Aron Xu <aron@debian.org>  Fri, 02 Dec 2022 19:49:16 +0800
+
+dkms (3.0.8-2) unstable; urgency=medium
+
+  * export-CC, exact-cc: Merge and improve the two patches. Ensure that
+    compiler is set and exported as early in the prepartion stage as
+    possible, is not subsequently unset (already unset at the start of the
+    dkms script), and also export MAKEFLAGS to ensure that environment CC
+    variable is used by kernel's Makefile. Fixes LP: #1997841
+  * Drop dangling unapplied patch from git.
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Thu, 24 Nov 2022 14:59:45 +0000
+
+dkms (3.0.8-1) unstable; urgency=medium
+
+  [ Andreas Beckmann ]
+  * Update watch file.
+  * Make messages more consistent.
+
+  [ Gianfranco Costamagna ]
+  * New upstream version 3.0.7 (Closes: #1019330, #1021966)
+  * New upstream version 3.0.8
+  * Drop upstream patches:
+    - 2b76d4aa29e65ae4ed8e89685c4e729f1276c5fc
+    - 3ca52f8769bdf7ebdc83735355fff7c5c0664152
+    - 7f3c4b03c506e40f0a5ce9315a8ade88b108ce0f
+    - 8d60956f6dcda0679066954215eb8be4045413b4
+    - 985bfd584f0e87bc726865bfdc17887d4713c854
+  * Refresh patches
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 18 Nov 2022 22:34:50 +0100
+
+dkms (3.0.6-4) unstable; urgency=medium
+
+  [ Dimitri John Ledkov ]
+  * Fix dkms signing regressions with cherry-picks from 3.0.7 upstream
+    git. LP: #1991725
+    - Reinstate enroll call, as it causes dpkg-trigger action during dpkg
+    transaction to enroll newly created key, if it wasn't enrolled yet.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Thu, 20 Oct 2022 21:04:14 +0200
+
+dkms (3.0.6-3) unstable; urgency=medium
+
+  * Export exact CC compiler earlier, before pre_build script is run. Some
+    dkms modules already perform compilation in pre_build script, and thus
+    need correct CC variable earlier. LP: #1991664
+
+ -- Dimitri John Ledkov <dimitri.ledkov@canonical.com>  Tue, 04 Oct 2022 15:22:46 +0100
+
+dkms (3.0.6-2) unstable; urgency=medium
+
+  * debian/patches/7f3c4b03c506e40f0a5ce9315a8ade88b108ce0f.patch
+    - Apply upstream patch suggested by Marinelli Giorgio, to fix an issue due
+      to an extra $ character.
+  * debian/patches/49d647b6476d605feb10548e33fc3807415ec724.patch
+    - Apply another upstream hotfix.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 07 Sep 2022 12:27:13 +0200
+
+dkms (3.0.6-1) unstable; urgency=medium
+
+  [ Andreas Beckmann ]
+  * dkms-autopkgtest: Print a summary for all tested kernels.
+  * Update Lintian overrides.
+
+  [ Dimitri John Ledkov ]
+  * Use exact compiler for dkms as used to build the kernel, when possible.
+  * Fix dkms-autopkgtest when a given dkms package is built into the kernel
+    already of the same version. (i.e. zfs-linux on Ubuntu).
+
+  [ Gianfranco Costamagna ]
+  * New upstream version 3.0.4 (Closes: #665774)
+  * New upstream version 3.0.6
+  * Refresh patches for new release
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 07 Sep 2022 10:11:13 +0200
+
+dkms (3.0.3-4) unstable; urgency=medium
+
+  * Make deprecation warnings less noisy and more informative.
+    (Closes: #1012043)
+  * Add new feature BUILD_EXCLUSIVE_CONFIG="CONFIG_FOO !CONFIG_BAR".
+  * dh_dkms: Bump generated dependency if BUILD_EXCLUSIVE_CONFIG is used.
+  * Upload to unstable.
+
+ -- Andreas Beckmann <anbe@debian.org>  Tue, 14 Jun 2022 09:28:22 +0200
+
+dkms (3.0.3-3) experimental; urgency=medium
+
+  * dkms-autopkgtest: Try not to fail if linux-doc is not installed.
+  * Set 'our $VERSION' in dh_dkms to show it along autoscripts.
+  * Move dh-dkms into a separate package.  (Closes: #966601)
+  * Regenerate dh_dkms(1).
+  * Clean up obsolete conffiles from /etc/dkms/template*/*.
+    (Closes: #1012285, #1009148)
+  * Upload to experimental.
+
+ -- Andreas Beckmann <anbe@debian.org>  Thu, 02 Jun 2022 23:49:20 +0200
+
+dkms (3.0.3-2) unstable; urgency=medium
+
+  [ Andreas Beckmann ]
+  * dkms-autopkgtest: Only install linux-headers-* packages matching the
+    source version of linux-doc (a dependency generated by autodep8 for
+    autopkgtest-pkg-dkms). Mixing different versions may fail if multiple
+    distros (e.g. testing and unstable) are enabled and pinning is used.
+    (Closes: #1010883)
+  * Provide versioned virtual package dh-dkms.
+  * Drop maintainer script code handling upgrades from versions predating
+    squeeze/trusty.
+  * Properly clean up ancient /etc/bash_completion.d/dkms.
+  * Clean up ancient /etc/dkms/kernel_install.d_dkms.  (Closes: #996812)
+  * Add debian/upstream/metadata.
+  * Bump Standards-Version to 4.6.1, no changes needed.
+  * Add myself to Uploaders.
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster.
+    - dkms: Drop versioned constraint on coreutils in Depends.
+
+ -- Andreas Beckmann <anbe@debian.org>  Fri, 27 May 2022 16:12:46 +0200
+
+dkms (3.0.3-1) unstable; urgency=low
+
+  * New upstream version 2.8.8 (Closes: #650331, #763534)
+  * New upstream version 3.0.3 (Closes: #996104, #1005812, #996648)
+  * Drop examples removed upstream
+  * Drop patches now part of upstream codebase:
+    - 149.patch
+    - do-not-load-modules.patch
+  * Refresh export-CC patch
+
+  [ Andreas Beckmann ]
+  * dkms-autopkgtest: If no linux-headers-* packages are installed, install
+    all available ones before building modules. (Closes: #945594)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Thu, 07 Apr 2022 12:08:47 +0200
+
+dkms (2.8.7-2) unstable; urgency=medium
+
+  * Drop old conffile moved upstream (Closes: #990138)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 11 Oct 2021 09:16:04 +0200
+
+dkms (2.8.7-1) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * New upstream version 2.8.7
+  * Refresh patches
+  * Bump std-version to 4.6.0
+  * Remove AUTHORS file, dropped upstream
+  * override_dh_auto_install to fix double installation and failure in second gzip of manpage
+
+  [ Dimitri John Ledkov ]
+  * dkms-autopkgtest: only test dkms builds against kernel abi in the ADT
+    trigger such that results are reported only for the requested kernel
+    flavour. This is to catch cases when dkms module builds for a
+    derivative kernel, but not for generic (or any other flavour) that may
+    be installed on the test system in addition to the requested kernel
+    flavour.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 08 Oct 2021 10:23:02 +0200
+
+dkms (2.8.4-4) unstable; urgency=medium
+
+  * debian/patches/149.patch:
+    - upstream proposed patch to fix wrong bash interpreter (Closes: #986674)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 09 Apr 2021 14:28:48 +0200
+
+dkms (2.8.4-3) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Team upload.
+
+  [ Andreas Beckmann ]
+  * Export the CC variable from .kernelvariables in the kernel source to allow
+    module build systems use the kernel's compiler also outside of Kbuild.
+    (Closes: #984929)
+
+ -- Andreas Beckmann <anbe@debian.org>  Wed, 10 Mar 2021 12:11:42 +0100
+
+dkms (2.8.4-2) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Team upload
+
+  [ Andreas Beckmann ]
+  * Add Provides: dh-sequence-dkms to help reverse-dependencies use it. (Closes: #981395)
+
+  [ Marcelo Henrique Cerri ]
+  * dkms-autopkgtest: Also select binary packages that depends on dkms for testing (LP: #1915051)
+    Closes: #982315
+
+ -- Marcelo Henrique Cerri <marcelo.cerri@canonical.com>  Thu, 11 Feb 2021 11:56:32 -0300
+
+dkms (2.8.4-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Fix day-of-week for changelog entry 2.0.17.5-0ubuntu1.
+
+  [ Aron Xu ]
+  * New upstream version 2.8.4
+  * Refresh patch do-not-load-module.patch
+
+ -- Aron Xu <aron@debian.org>  Tue, 22 Dec 2020 14:32:22 +0800
+
+dkms (2.8.3-4) unstable; urgency=medium
+
+  * Silently source dkms.conf files, to help iptables-netflow work
+    in autopkgtests (Addresses: #966483)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 11 Aug 2020 12:03:25 +0200
+
+dkms (2.8.3-3) unstable; urgency=medium
+
+  * dynamically generate breaks for shim-signed in Ubuntu and Derivates
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 29 Jul 2020 10:30:50 +0200
+
+dkms (2.8.3-2) unstable; urgency=medium
+
+  * tweak dkms-autopkgtest script to avoid cases where some files called "dkms.conf"
+    are stored somewhere else (e.g. /etc).
+    This fixes e.g.
+    dpkg -L broadcom-sta-dkms |grep "dkms.conf"
+    /etc/modprobe.d/broadcom-sta-dkms.conf
+    /usr/src/broadcom-sta-6.30.223.271/dkms.conf
+    and others (8168-dkms) (Closes: #959910)
+  * Make copyright file machine readable and add myself to it
+  * Add R^3: no
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 29 Jul 2020 09:28:05 +0200
+
+dkms (2.8.3-1) unstable; urgency=medium
+
+  * New upstream version 2.8.3
+  * Drop patches:
+    - 130,
+    - no-autoinstall-flag-file,
+    - 885f8275aa65fb11be1e17bc28a0b0ea734dc585: upstream
+  * Refresh patch do-not-load-modules
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 28 Jul 2020 18:44:36 +0200
+
+dkms (2.8.2-2) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Tweak previous patch to do bash string comparison (Closes: #956245)
+    thanks Thorsten Glaser for the reminder!
+
+  [ Andreas Beckmann ]
+  * use /etc/dkms/no-autoinstall as flag file to disable autoinstall
+  * improve dkms-autopkgtest (Closes: #959910)
+
+  [ Seth Forshee ]
+  * Cherry-pick upstream fix for dkms failure with signed kernel modules
+    - debian/patches/885f8275aa65fb11be1e17bc28a0b0ea734dc585.patch:
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 17 Jun 2020 10:00:12 +0200
+
+dkms (2.8.2-1) unstable; urgency=medium
+
+  * New upstream version 2.8.2 (Closes: #585771)
+  * Drop verboselog patch: upstreamed
+  * Refresh do-not-load-modules patch
+  * Bump std-version to 4.5.0
+  * Bump debhelper compat level to 13
+  * Bump watch file version to 4
+  * Add upstream proposed patch to close Debian bug 956245. (Closes: #956245)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 15 Jun 2020 11:21:01 +0200
+
+dkms (2.8.1-5) unstable; urgency=medium
+
+  * Team upload.
+  * Patch dkms to not load random modules during dkms install
+    Closes: #931017
+  * Replace maintainer email address with dkms@packages.debian.org
+  * Drop Depends on lsb-release, we have Pre-Depends already.
+
+ -- Raphaël Hertzog <raphael@offensive-security.com>  Wed, 22 Jan 2020 12:42:37 +0100
+
+dkms (2.8.1-4) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Team upload
+  * Import Ubuntu patch
+
+  [ Dimitri John Ledkov ]
+  * Some dkms modules are included by the Ubuntu kernel and not overriden
+    by default. That's ok, as long as they are installed. Do not fail
+    autopkgtest in this case. See virtualbox dkms test.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Sun, 22 Dec 2019 10:00:44 +0100
+
+dkms (2.8.1-3) unstable; urgency=medium
+
+  * Suggest e2fsprogs (Closes: #887263)
+  * Add some verbosity on log messages (Closes: #840620)
+  * Depend on lsb-release (Closes: #896814)
+  * Do not depend anymore on python3-apport, removed even from experimental
+    (Closes: #881709)
+  * Add back the pre-depends on lsb-release (Closes: #826928)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 08 Nov 2019 12:39:25 +0100
+
+dkms (2.8.1-2) unstable; urgency=medium
+
+  * QA upload
+  * Fix build by dropping patch revert
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Thu, 07 Nov 2019 23:27:29 +0100
+
+dkms (2.8.1-1) unstable; urgency=medium
+
+  * New upstream version 2.8.1
+  * Drop all the patches, all of them are now upstream
+    - 0001-688904.patch
+    - 0002-757758.patch
+    - 0003-Do-not-ignore-kernelsourcedir.patch
+    - 0004-mkbmdeb-support-for-lean-binary-package-with-only-th.patch
+    - 0008-Don-t-assume-boot-config-exists-test-first.patch
+    - 0009-Add-support-for-UEFI-Secure-Boot-validation-toggling.patch
+    - 0015-change-arch-in-mkdeb-template.patch
+    - 0017-fix-OBSOLETE_BY-in-DKMS.CONF-Closes-81.patch
+    - lp-1827697.patch
+    - 0008-man-fix-manpage-has-errors-from-man-lintina-warning.patch
+    - 0019-add-force-version-override-and-dkms-_version-overrid.patch
+    - 0020-versioned-provides.patch
+  * Bump std-version to 4.4.1, no changes required
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Thu, 07 Nov 2019 17:49:54 +0100
+
+dkms (2.7.1-5) unstable; urgency=medium
+
+  [ Aron Xu ]
+  * Allow any c-compiler to satisfy the required Depends (Closes: #620754)
+  * Only test "-dkms" packages in dkms-autopkgtest (Closes: #903588)
+
+  [ Alex Tu ]
+  * revert 0019-fix-OBSOLETE_BY-be-blocked-by-force-Closes-89.patch
+  * cherry-pick from upstream 9bbef17 for issue #89 #42
+    - 0019-add-force-version-override-and-dkms-_version-overrid.patch
+    (LP: #1838921)
+
+  [ Martijn Grendelman ]
+  * Add versioned provides to mkbmdeb (Closes: #943484)
+
+  [ Gianfranco Costamagna ]
+  * QA upload.
+  * Add Ubuntu patch, now upstream
+  * Drop old patch
+  * Add patch from Martijn Grendelman to add versioned provides to dkms
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Sat, 26 Oct 2019 12:47:11 +0200
+
+dkms (2.7.1-4) unstable; urgency=medium
+
+  * QA upload.
+  * Cherry-pick two other Ubuntu/Upstream patches:
+    - 0017-fix-OBSOLETE_BY-in-DKMS.CONF-Closes-81.patch
+    - lp-1827697.patch
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 06 Sep 2019 10:17:59 +0200
+
+dkms (2.7.1-3) unstable; urgency=medium
+
+  * QA upload
+
+  [ You-Sheng Yang ]
+  * Fix lintian warnings related to manpages typos
+  * Add debian/ci yaml file
+  * Fix lintian warning about python shebang
+
+  [ Dimitri John Ledkov]
+  * Try to improve dkms-autopkgtest when testing incompatible dkms
+    modules. Ensure package is purged first, as make.log is not
+    regenerated upon second installation. Also, before checking the
+    make.log check if the package in question is a dkms.conf one, as
+    otherwise empty tarball is created. This should now unbreak
+    testability of multi-binary packages, which have build-excluded dkms
+    modules.
+
+  [ Timo Aaltonen ]
+  * dkms: cherry-pick from upstream a35d981 for issue #89
+    0019-fix-OBSOLETE_BY-be-blocked-by-force-Closes-89.patch (LP: #1838921)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 06 Sep 2019 10:08:19 +0200
+
+dkms (2.7.1-2) unstable; urgency=medium
+
+  * QA upload
+  [ Seth Forshee ]
+  * debian/dkms-autopkgtest: skip testing when package is disabled from
+    building by a BUILD_EXCLUSIVE directive.
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 29 Jul 2019 15:36:18 +0200
+
+dkms (2.7.1-1) unstable; urgency=medium
+
+  * QA upload
+  * Upload to unstable
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 02 Jul 2019 09:41:26 +0200
+
+dkms (2.7.1-1~exp2) experimental; urgency=medium
+
+  * QA upload
+  * Drop trailing newlines
+  * Use DEB_VERSION_UPSTREAM to guess upstream revision
+  * Drop old get-orig-source target
+  * Bump compat level to 12
+  * Bump std-version to 4.3.0, no changes required
+  * Apply UEFI patch from Ubuntu,
+    it is not applied in Debian (removed in debian/rules conditional statement)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 25 Jun 2019 11:09:04 +0200
+
+dkms (2.7.1-1~exp1) experimental; urgency=medium
+
+  * New upstream release
+  * QA upload
+  * Drop upstream patches:
+    - {63,6ef1a48eda99ec0d728302830483fd0137174d17,bash-completions}.patch
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 25 Jun 2019 10:45:13 +0200
+
+dkms (2.6.1-4) unstable; urgency=medium
+
+  * Remove shim-signed break
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 15 Jan 2019 13:27:05 +0100
+
+dkms (2.6.1-3) unstable; urgency=medium
+
+  * debian/patches/63.patch:
+    - cherry-pick upstream fix when default shell is zsh (Closes: #910526)
+  * Install bash completion script in usr/share new location (Closes: #912849)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 02 Jan 2019 18:06:43 +0100
+
+dkms (2.6.1-2) unstable; urgency=medium
+
+  * Team upload (salsa shared repo)
+  * Add dpkg-dev dependency, needed for dpkg-architecture calls (Closes: #884658)
+  * cherry-pick shim-signed break relationship from Ubuntu
+    - (will be needed if Debian shim-signed is updated)
+  * debian/patches/6ef1a48eda99ec0d728302830483fd0137174d17.patch:
+    cherry-pick upstream fix for kernel version parsing
+  * debian/patches/0015-change-arch-in-mkdeb-template.patch: cherry-pick
+    Ubuntu applied fix for mkbmdeb (Closes: #832558)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Wed, 02 Jan 2019 16:15:32 +0100
+
+dkms (2.6.1-1) unstable; urgency=medium
+
+  [ Petter Reinholdtsen ]
+  * Remove Giuseppe Iuculano as uploader on request from the MIA team.
+    (Closes: #866839)
+
+  [ Aron Xu ]
+  * New upstream version 2.4.0 (Closes: #848608, #904869)
+  * New upstream version 2.6.1
+  * Drop patches not used
+  * Use @tracker.d.o address
+  * Use salsa.d.o Git URLs
+  * Set std-ver to 4.1.4
+
+ -- Aron Xu <aron@debian.org>  Sun, 05 Aug 2018 01:52:35 +0800
+
+dkms (2.3-3) unstable; urgency=medium
+
+  * Upstream post-2.3 cherry-picks for apport (LP: #1661843)
+
+ -- Aron Xu <aron@debian.org>  Tue, 07 Feb 2017 23:27:25 +0800
+
+dkms (2.3-2) unstable; urgency=medium
+
+  [ Adam Cornad ]
+  * Don't assume /boot/config-* exists, test first.
+
+  [ Aron Xu ]
+  * d/control: update VCS-*, std-ver: 3.9.8
+  * d/rules: add shim support for Ubuntu derivatives
+
+ -- Aron Xu <aron@debian.org>  Wed, 28 Dec 2016 19:57:32 +0800
+
+dkms (2.3-1) unstable; urgency=medium
+
+  [ Adel Belhouane ]
+  * Update mkbmdeb behavior (Closes: #830670)
+
+  [ Aron Xu ]
+  * Downgrade menu from Recommends to Suggests (Closes: #744054)
+  * Imported Upstream version 2.3
+  * Upstream post-release cherry-picks
+  * d/compat: 7 -> 9
+
+  [ D. Jared Dominguez ]
+  * update URLs
+
+ -- Aron Xu <aron@debian.org>  Wed, 26 Oct 2016 14:26:44 +0800
+
+dkms (2.2.1.0+git20160527-1) unstable; urgency=medium
+
+  * Rebase to upstream commit eb402f72b9a71ccdd0d3610db8570195eb048f1f
+  * Update patches
+
+ -- Aron Xu <aron@debian.org>  Tue, 23 Aug 2016 14:24:38 +0800
+
+dkms (2.2.0.3-5) unstable; urgency=medium
+
+  [ Aron Xu ]
+  * Remove obsolete virtual package 'linux-image' from Recommends (Closes: #724566)
+  * Do not ignore --kernelsourcedir (Closes: #653176)
+  * Update upstream link to github
+  * Use gbp-pq to manage patches
+
+  [ Daniel Kahn Gillmor ]
+  * Make dh_dkms name and version parsing more proper (Closes: #829123)
+
+  [ Dirk Griesbach ]
+  * Port apport hook to python3 and add python3-apport to Suggests (Closes: #707008)
+
+  [ Thijs Kinkhorst ]
+  * mkbmdeb: support for lean binary package with only the built modules (Closes: #554843)
+
+ -- Aron Xu <aron@debian.org>  Wed, 06 Jul 2016 05:51:37 +0800
+
+dkms (2.2.0.3-4) unstable; urgency=medium
+
+  * Acknowledge 2.2.0.3-2.1 NMU. (Closes: #822351)
+  * Make sure apport code write files in binary mode. (Closes: #684377)
+  * Build modules using all CPU cores. (Closes: #663114)
+  * Improve message printed when kernel headers are missing. (Closes: #690866)
+  * Add gbp.conf to ensure pristine-tar feature is used.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sun, 01 May 2016 15:27:22 +0200
+
+dkms (2.2.0.3-3) unstable; urgency=medium
+
+  [ Petter Reinholdtsen ]
+  * Correct indentation of mkdeb in dkms(8) manual page. (Closes: #690865)
+  * Drop the unneeded quilt build dependency. (Closes: #728550)
+  * Added myself and Aron Xu as uploaders.
+
+  [ Aron Xu ]
+  * Added patches from Darik Horn and Ubuntu:
+    - Add support for BUILD_DEPENDS (Closes: #729015)
+    - Correct handling of POST_BUILD (Closes: #704989)
+
+ -- Petter Reinholdtsen <pere@debian.org>  Wed, 27 Apr 2016 10:20:15 +0200
+
+dkms (2.2.0.3-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add dkms-autopkgtest script from Ubuntu (Closes: #769095).
+  * Updated Standards-Version from 3.9.2 to 3.9.7.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 23 Apr 2016 19:55:25 +0200
+
+dkms (2.2.0.3-2) unstable; urgency=low
+
+  * [49fccbc] Depends on kmod | kldutils (Closes: #761728)
+  * [9064776] Fixed "sed without options" issue.
+    Thanks to Cristian Ionescu-Idbohrn (Closes: #757758, #762324, #763929)
+  * [1fa1a31] fixes have_one_kernel for non-zero return code.
+    Thanks to Mario Limonciello (Closes: #659672, #735181)
+  * [ba6140d] Added Multi-Arch: foreign.
+    Thanks to Ben Hutchings (Closes: #693634)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sat, 04 Oct 2014 19:51:23 +0200
+
+dkms (2.2.0.3-1.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Replace dependency on transitional module-init-tools package with kmod.
+    (Closes: #733695)
+
+ -- Michael Biebl <biebl@debian.org>  Thu, 21 Aug 2014 05:43:30 +0200
+
+dkms (2.2.0.3-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Don't fail if kernel major version number is not single-digit (like on
+    kfreebsd-10) (Closes: #688904)
+
+ -- Christoph Egger <christoph@debian.org>  Fri, 05 Oct 2012 20:52:34 -0700
+
+dkms (2.2.0.3-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Do not fail if /lib/modules does not exist.  (Closes: #666023)
+  * Remove the directory where the module was installed.  (Closes: #657145)
+
+ -- Andreas Beckmann <debian@abeckmann.de>  Thu, 19 Jul 2012 22:20:45 +0200
+
+dkms (2.2.0.3-1) unstable; urgency=low
+
+  * [e24a52f] Imported Upstream version 2.2.0.3
+  * [09da5c7] bump standards version
+  * [713ebfd] add missing debhelper token to preinst
+  * [8970435] add versioned build depends for debhelper
+  * [db4238c] switch to dh7
+  * [13a34c7] update lintian override for DKMS apport rule
+
+ -- Mario Limonciello <mario_limonciello@dell.com>  Wed, 07 Dec 2011 13:21:33 -0600
+
+dkms (2.2.0.2-1) unstable; urgency=low
+
+  [ Mario Limonciello ]
+  * [c5846b6] Imported Upstream version 2.2.0.2
+    - Doesn't leave files in /tmp (Closes: #633802)
+    - Autoinstall works on multiple kernels (Closes: #634979) (LP: #812979)
+    - PRE_BUILD command working directory fix. (LP: #812088)
+  * [83b5f6e] Drop kfreebsd.patch.  Merged upstream
+
+  [ Giuseppe Iuculano ]
+  * [a80ecc5] Updated VCS control field
+
+ -- Mario Limonciello <Mario_Limonciello@Dell.com>  Fri, 22 Jul 2011 13:36:32 -0500
+
+dkms (2.2.0.1-3) unstable; urgency=low
+
+  * [c9f7ed0] Fixed kFreeBSD subdirs check
+  * [57c5c9d] Removed improved-error-messages.patch
+  * [370ff7b] Remove debian-lsb.patch. Now Ubuntu can sync from Debian
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Fri, 15 Jul 2011 16:44:11 +0200
+
+dkms (2.2.0.1-2) unstable; urgency=low
+
+  * [6b2d392] Run depmod command only in Linux.
+    Thanks to Robert Millan (Closes: #631657)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Fri, 15 Jul 2011 16:00:05 +0200
+
+dkms (2.2.0.1-1) unstable; urgency=low
+
+  * [18353fe] Imported Upstream version 2.2.0.1
+  * [2a56b4e] Refreshed and removed patches merged upstream.
+  * [c552af9] Use linux-headers-686-pae and linux-headers-amd64 in Recommends
+    (Closes: #628873)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Fri, 15 Jul 2011 12:56:08 +0200
+
+dkms (2.1.1.2-6) unstable; urgency=low
+
+  [ Michael Gilbert ]
+  * [430b97f] Fix logging for compound make statements (closes: #577972)
+    - Thanks to Anders Kaseorg!
+  * [935ae61] Check for debhelper when using 'dkms mkdeb' (closes: #592863)
+  * [e739e8c] fixup logging patch
+
+  [ Giuseppe Iuculano ]
+  * [46cc01a] Merge from Ubuntu: Before using the current kernel we need to make
+    sure that this kernel doesn't belong to the host of a chroot and we should
+    also be more careful when adding kernels to the candidates list
+    (LP: #602408). - Thanks to Alberto Milone
+  * [313d661] Merge from Ubuntu: depend on patch instead of recommending it, if
+    its missing the "patches" feature of dkms will no longer work and that will
+    cause build failures (LP: #653899)  Thanks to Michael Vogt
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sat, 12 Mar 2011 11:07:47 +0100
+
+dkms (2.1.1.2-5) unstable; urgency=low
+
+  * [bd3b35d] Set DISTRIB_ID=Debian in case lsb_release is missing
+  * [2465627] Removed lsb-release from Pre-Depends
+  * [1732998] Do not use lsb_release to determine the distribution, add
+    a static assignment (Closes: #547353)
+  * [d00ff09] Do not return error if /etc/dkms/framework.conf is missing
+    (LP: #613407) - thanks to pasadrul
+  * [618efc8] Copy from the right directory with mkdsc and copy
+    source.changes when building with mkdsc (LP: #611652) - thanks to
+    David Henningsson
+  * [f23d6b0] Bump to standards-version 3.9.1, no changes needed
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Wed, 04 Aug 2010 16:03:16 +0200
+
+dkms (2.1.1.2-4) unstable; urgency=low
+
+  * [f649aa1] Added coreutils >= 7.4 in Depends (Closes: #586356)
+  * [01c7c14] Remove old modules when removing a kernel (Closes: #586724)
+    - thanks to Jan Muszynski
+  * [b6182ba] Bump to Standards-Version 3.9.0, no changes needed
+  * [eaeddb3] dkms_common.postinst: handle dkms build error gracefully
+    by skipping build for the non matching kernels. (Closes: #588585) -
+    thanks to Jan-Marek Glogowski
+  * [73533c2] Promote lsb-release to Pre-Depends (Closes: #589308)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sat, 17 Jul 2010 13:23:43 +0200
+
+dkms (2.1.1.2-3) unstable; urgency=low
+
+  [ Michael Gilbert ]
+  * Update to source format 3 (quilt) for better patch management/handling.
+  * Improve the status info displayed during the kernel postinst, and
+    provide informative/useful messages when things go awry.
+  * Fix bashism in dkms_common.postinst (closes: #581079).
+  * Document odd behavior of MAKE[#] (closes: #553625).
+  * Document package naming convention (closes: #571753).
+  * Use system TMPDIR setting in all scripts (closes: #581568).
+
+  [ Giuseppe Iuculano ]
+  * [208b229] Added a lintian override for python-script-but-no-python-
+    dep, dkms.py is an apport hook
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Fri, 04 Jun 2010 13:53:23 +0200
+
+dkms (2.1.1.2-2) unstable; urgency=low
+
+  * [67fb76a] Do not remove /etc/header_postinst.d/dkms in preinst. Hopefully
+    now Ubuntu can sync dkms from Debian
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Tue, 23 Feb 2010 10:02:40 +0100
+
+dkms (2.1.1.2-1) unstable; urgency=low
+
+  [ David Paleino ]
+  * [ff95487] dh_dkms: continue the loop if there's nothing to do on the
+    current package. (Closes: #568580)
+  * [73dd83f] dh_dkms: specify that version mangling only happens if
+    PACKAGE_VERSION=#MODULE_VERSION# in dkms.conf
+  * [cdda61c] debian/scripts/postinst-dkms: really make sure the error
+    is thrown when nothing is found. (Closes: #568591)
+
+  [ Frédéric Brière ]
+  * [2930aa9] Insert the package version directly into postinst at
+    creation time
+  * [9ccbdc7] Skip prerm removal if there are no modules for that
+    version
+
+  [ Giuseppe Iuculano ]
+  * [898ab8c] Imported Upstream version 2.1.1.2
+  * [4fff928] Removed 01_shell_error.patch, merged in upstream
+  * [c5566c7] Removed 02_header_postinst.patch to avoid delta with
+    Ubuntu. Hopefully /etc/kernel/header_postinst.d directory will be
+    supported in Debian soon
+  * [e8aeb49] Add a comment in debian/patches/series and fix quilt-
+    build-dep-but-no-series-file lintian warning
+  * [bc89600] Fixed a minor spelling error in dh_dkms man page
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Mon, 22 Feb 2010 15:34:12 +0100
+
+dkms (2.1.1.1-2) unstable; urgency=low
+
+  [ David Paleino ]
+  * [d56bce9] Add -V flag to dh_dkms, thanks to Frédéric Brière
+    <fbriere@fbriere.net> for the patch. (Closes: #568589)
+  * [dc7e358] dh_dkms: don't return an error if there's nothing to do
+    (Closes: #568580)
+  * [ecfc1c7] debian/scripts/postinst-dkms: don't exit on success, only
+    do it on errors (Closes: #568591)
+
+  [ Giuseppe Iuculano ]
+  * [adb3042] Really remove obsolete conffiles
+  * [3fe380c] Do not install /etc/header_postinst.d/dkms, at this moment
+    Debian kernel doesn't support it
+  * [ad6a1f2] Bump Standards-Version (no changes).
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sun, 14 Feb 2010 12:02:42 +0100
+
+dkms (2.1.1.1-1) unstable; urgency=low
+
+  [ David Paleino ]
+  * [19ac85e] Added DKMS debhelper script (Closes: #553665)
+
+  [ Giuseppe Iuculano ]
+  * [9d66264] Imported Upstream version 2.1.1.1
+  * [0735c11] Removed 01_upstart.patch
+  * [ec26539] Merge from Ubuntu: Remove the init script and Upstart job.
+    There is no reason that DKMS needs to run on boot; you can build
+    modules for non-running kernels just fine at installation time.
+  * [48ff9a4] Correct a minor shell error in dkms_autoinstaller
+  * [5c76a45] Fixed a minor spelling error in dh_dkms man page
+  * [c611461] debian/preinst: Use set -e
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Wed, 27 Jan 2010 10:02:27 +0100
+
+dkms (2.1.1.0-2) unstable; urgency=low
+
+  * [8510207] Do not install upstart job file
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Tue, 15 Dec 2009 08:57:24 +0100
+
+dkms (2.1.1.0-1) unstable; urgency=low
+
+  * [3122b6c] Imported Upstream version 2.1.1.0
+  * [ac6fb91] Removed patches applied in upstream
+  * [d40faf7] debian/rules: Use new make install-debian target
+  * [5d2e1e4] debian/rules: Do not stop /etc/init.d/dkms_autoinstaller
+    on upgrade
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Mon, 14 Dec 2009 22:38:54 +0100
+
+dkms (2.1.0.1-4) unstable; urgency=low
+
+  * [fdaa289] Use new upstream patch for optimized init. (Closes: #560267)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Fri, 11 Dec 2009 09:11:01 +0100
+
+dkms (2.1.0.1-3) unstable; urgency=low
+
+  [ David Paleino ]
+  * [d3f1e76] debian/control: updated my email address
+
+  [ Giuseppe Iuculano ]
+  * [ad96cbc] Updated vcs control fields
+  * [40941ad] /etc/init.d/dkms_autoinstaller:
+    - optimize with a single find call instead of multiple loops with ls.
+    - port to POSIX sh and drop the /bin/bash from the shebang.
+    - drop localization of the usage message - this is inconsistent with all
+      other init scripts on the system.
+    - use case instead of grep for string matching
+    - Patch based on work done by Steve Langasek, thanks (LP: #484386)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sun, 06 Dec 2009 18:36:43 +0100
+
+dkms (2.1.0.1-2) unstable; urgency=low
+
+  [ David Paleino ]
+  * [47e453e] debian/patches/02-improve_error_message.patch: improve
+    error message, and add Debian/Ubuntu specific suggestion.
+    (Closes: #553600)
+
+  [ Giuseppe Iuculano ]
+  * [27f707a] Do not build as a nobody user and don't chown the build
+    directory, no files should be owned by nobody. (Closes: #554168)
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Tue, 03 Nov 2009 22:52:30 +0100
+
+dkms (2.1.0.1-1) unstable; urgency=low
+
+  * [34e006a] debian/patches/02_dkms.8.patch: Fix typos in the man page,
+    thanks A. Costa (Closes: #534662)
+  * [7735c89] Imported Upstream version 2.1.0.1
+  * [3bdb6c1] Removed all patches, they are now merged in upstream.
+    Thanks to Mario Limonciello.
+  * [dbb778c] debian/rules: template-dkms-mkdeb/debian/postrm was
+    removed in upstream, do not chmod it
+  * [09cd9d3] Updated to standards version 3.8.3 (No changes needed)
+  * [96663f0] Updated my email address and removed DM-Upload-Allowed
+    control field. Thanks to Ben Hutchings for his previous sponsorship
+  * [4848db2] debian/patches/01_init.patch: Added dkms_autoinstaller in
+    Provides and fixed init.d-script-does-not-provide-itself lintian
+    warning
+
+ -- Giuseppe Iuculano <iuculano@debian.org>  Sat, 03 Oct 2009 11:12:04 +0200
+
+dkms (2.0.22.0-1) unstable; urgency=low
+
+  * [023618e] Imported Upstream version 2.0.22.0
+  * [d6e0b15] Deleted patches merged in upstream: 01-fix_manpage.patch
+    02-fix_distribution.patch 04-use_su-to-root.patch 05-
+    do_not_check_admin_group.patch 06-fakeroot.patch 07-exit-if-build-
+    fails.patch 09-lilo_detection.patch 10-lsb.patch 11-bash-
+    completion.patch 12-use_invoke-rc.d.patch 13-template.patch
+    14_new_module-init-tools.patch 08-support_kernel-img.conf.patch
+  * [c5b7822] debian/patches/15_modprobe.patch: do not create an empty
+    /etc/modprobe.d/package_name.conf. It is opened and parsed every
+    time modprobe is run (and it is run very often at boot time). Create
+    it only if necessary.
+  * [3731c00] debian/patches/08-support_kernel-img.conf.patch: Use
+    update-initramfs, it is the default in Debian/Ubuntu and it also computes
+    and stores some checksums. (Closes: #529038)
+  * [f4a197f] debian/patches/16_old_module.patch: Do not move away the old
+    module, by default dkms install the new one in
+    /lib/modules/<kernelversion>/updates/dkms (Closes: #529059)
+  * [db7ffe7] debian/patches/01_kernel_postinst.patch: shut up "which" in the
+    the kernel kernel_postinst.d script, only the exit code is needed.
+
+ -- Giuseppe Iuculano <giuseppe@iuculano.it>  Fri, 05 Jun 2009 22:00:35 +0200
+
+dkms (2.0.21.1-1) unstable; urgency=low
+
+  * [bcda131] Imported Upstream version 2.0.21.1
+  * [487ad26] debian/patches/13-template.patch:
+    Updated template-dkms-mkdeb Changes:
+    - Bump to debhelper 7 compatibility levels
+    - Updated to standards version 3.8.1
+    - Use Dynamic Kernel Modules Support Team as maintainer field
+    - Remove bash and add ${misc:Depends} in Depends
+    - Use dh_prep instead of dh_clean -k
+  * [c75e860] Updated to standards version 3.8.1 (No changes needed)
+  * [0d14f3e] Update dkms to check for /etc/modprobe.d/dkms.conf,
+    dh_installmodules now gives files in /etc/modprobe.d a .conf syntax,
+    as required by new module-init-tools.
+  * [ceff6d3] Move to kernel section as by ftpmasters override
+  * [aa84c76] debian/control: Fix VCS-Browser field
+  * [6cd45ec] debian/patches/15_modprobe.patch: Do not install
+    /etc/modprobe.d/dkms, it only contains comments and is opened and
+    parsed every time modprobe is run (and it is run very often at boot
+    time). Use instead (and create if necessary)
+    /etc/modprobe.d/package_name.conf. (Closes: #525379)
+  * [171907c] debian/postinst: if /etc/modprobe.d/dkms is modified, put
+    its content in /etc/modprobe.d/dkms.conf and remove it.
+  * [426868b] update debian/copyright to add Giuseppe Iuculano to
+    copyright on debian/*
+  * [1ffb2cd] Removed 03-use-new-header_postinst.d_directory.patch,
+    /etc/kernel/header_postinst.d is used only by kernel-package. dkms
+    must use /etc/kernel/postinst.d/ directory.
+  * [eff2f3e] debian/control: demoted linux-headers and linux-image in
+    Recommends, removed kernel-package and build-essential from Depends,
+    and added only gcc and make.
+  * [508c115] debian/postinst: Remove also
+    /etc/kernel/header_postinst.d/dkms and do an init script remove to
+    un-do the "bad" links created by previous version
+
+  [ Mario Limonciello ]
+  * [848d7f9] update debian/copyright to add Mario Limonciello to
+    copyright on debian/*
+  * [791fc37] Update debian/rules to only run DKMS on the startup
+    targets. This change was proposed from Ubuntu some time back as DKMS
+    doesn't do anything on shutdown.
+
+
+ -- Giuseppe Iuculano <giuseppe@iuculano.it>  Mon, 04 May 2009 09:55:18 +0200
+
+dkms (2.0.21.0-1) unstable; urgency=low
+
+  * [0c2c36b] New Upstream version 2.0.21.0
+  * First Debian release (Closes: #481590)
+  * [6723982] debian/patches/: Refreshed patches, and deleted
+    03-remove_dkms_lib_directory_if_empty.patch (now it is in upstream)
+  * [592acec] debian/patches/04-use_su-to-root.patch: Do not test for $DISPLAY
+    as su-to-root does not require an X display
+  * [22d2ce2] debian/patches/09-lilo_detection.patch: grep for
+    do_bootloader instead of postinst_hook
+  * [b910eb3] debian/patches/03-use-new-
+    header_postinst.d_directory.patch: Use new
+    /etc/kernel/header_postinst.d directory introduced in kernel-package
+    11.017
+  * [f59cc66] debian/control: Add kernel-package (>= 11.017) in Depends
+  * [6ebb0c4] Removed debian/postinst and debian/prerm
+
+ -- Giuseppe Iuculano <giuseppe@iuculano.it>  Mon, 16 Feb 2009 11:06:58 +0100
+
+dkms (2.0.20.4-1) unstable; urgency=low
+
+  [ David Paleino ]
+  * debian/control:
+    - using new Homepage field in source stanza
+    - setting team as Maintainer
+    - adding myself and Mario Limonciello as Uploaders
+    - removed awk and bash dependencies: they are "essential" (de facto)
+      packages (LP: #314774)
+    - DM-Upload-Allowed set
+    - added menu|sudo to Recommends
+  * debian/copyright:
+    - updated to machine-readable format
+    - clarified license for debian/HOWTO.Debian
+  * debian/compat bumped to 7
+  * debian/docs:
+    - sample.{conf,spec} moved to debian/examples
+  * debian/rules updated
+  * debian/patches/01-fix_manpage.patch added, to fix hyphen-used-as-minus-sign
+    lintian warning
+  * debian/postinst added
+  * debian/HOWTO.Debian from Ubuntu package added
+  * debian/modprobe added
+  * debian/prerm:
+    - use sed instead of tricky grep hack
+    - always do the default thing
+  * added get-svn-source to debian/rules
+  * debian/patches/08-use_update-initramfs.patch: updated to parse
+    /etc/kernel-img.conf
+  * debian/patches/11-bash-completion.patch:
+    - better usage of bash builtins
+    - _filename_parts(): fix wrong behaviour when /usr/src/ is a symlink
+    - added patch description
+
+  [ Giuseppe Iuculano ]
+  * Added myself as Uploader
+  * Standards-Version bumped to 3.8.0
+    - Add debian/README.source to document quilt usage
+  * debian/prerm: quiet grep, do not write anything to standard output.
+  * debian/rules:
+    - remove some pointless blank lines
+    - fix dh-clean-k-is-deprecated lintian warning, use dh_prep instead of
+      dh_clean -k
+  * debian/patches/03-remove_dkms_lib_directory_if_empty.patch: Merge from
+    Ubuntu, ensure that the /lib/modules/<version>/updates/dkms directory is
+    removed if it is empty after a removal.  This allows the modules directory
+    to be removed as it becomes empty.
+  * debian/patches/04-use_su-to-root.patch:  Use su-to-root if available
+  * debian/patches/05-do_not_check_admin_group.patch:
+    - Do not check for admin group, this isn't a Debian standard group.
+    - added a g modifier to replace all underscores in function make_debian()
+  * debian/patches/06-fakeroot.patch: Do not use fakeroot for source-
+    only build, and use -rfakeroot for binary build
+  * debian/patches/07-exit-if-build-fails.patch: Fix exit when build
+    fails
+  * debian/patches/08-support_kernel-img.conf.patch: Use update-initramfs
+    if ramdisk value in /etc/kernel-img.conf is missing
+  * debian/patches/09-lilo_detection.patch: check /etc/kernel-img.conf
+    to find if user is using grub
+  * debian/patches/10-lsb.patch:
+    - /etc/lsb-release is not present in Debian, so run run lsb_release
+    - Added Debian as known distro in override_dest_module_location()
+  * debian/control:
+    - Added lsb-release in Recommends
+    - Updated VCS control field
+    - Added build-essential in Depends (LP: #304014),
+      Removed ${shlibs:Depends} from Depends and removed make, dpkg-dev and
+      gcc from Recommends
+  * debian/patches/11-bash-completion.patch: Improve bash-completion
+    support (Origin Mandriva)
+  * debian/patches/01-fix_manpage.patch: fix wrong path into man page
+    (LP: #292289)
+  * debian/patches/12-use_invoke-rc.d.patch: Use invoke-rc.d in
+    kernel_postinst.d_dkms and fix script-calls-init-script-directly lintian
+    warning
+
+ -- Giuseppe Iuculano <giuseppe@iuculano.it>  Thu, 08 Jan 2009 15:01:39 +0100
+
+dkms (2.0.19-0ubuntu2) hardy; urgency=low
+
+  * Depend on awk instead of gawk.  All variants of awk provide the
+    currently required functionality.
+
+ -- Mario Limonciello <mario_limonciello@dell.com>  Wed, 26 Mar 2008 16:51:33 -0500
+
+dkms (2.0.19-0ubuntu1) hardy; urgency=low
+
+  * New upstream version.
+    - Fixes appending date to debian/changelog in mkdeb.
+
+ -- Mario Limonciello <mario_limonciello@dell.com>  Wed, 26 Mar 2008 10:46:52 -0500
+
+dkms (2.0.17.6-0ubuntu1) hardy; urgency=low
+
+  [ Matt Domsch ]
+  * Correct kernel uninstall trigger (LP: #192240)
+  * Call udevadm trigger if present, fall back to udevtrigger (LP: #192241)
+  * Fix uninstallation with weak modules (Red Hat BZ#429410)
+  * debian/control:
+    - Update standards version to 3.7.3
+    - Add Vcs-git repository.
+
+ -- Mario Limonciello <mario_limonciello@dell.com>  Mon, 18 Feb 2008 09:40:18 -0600
+
+dkms (2.0.17.4-0ubuntu4) hardy; urgency=low
+
+  * Fix -x call.
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 14 Dec 2007 16:52:51 +0000
+
+dkms (2.0.17.4-0ubuntu3) hardy; urgency=low
+
+  * dkms: call udevadm instead of udevtrigger
+
+ -- Scott James Remnant <scott@ubuntu.com>  Fri, 14 Dec 2007 16:15:13 +0000
+
+dkms (2.0.17.5-0ubuntu1) hardy; urgency=low
+
+  * Correct DKMS file install/uninstall problems  (LP: #151644)
+    - call udevtrigger if we install a module for the currently running kernel
+    - uninstall from /extra before DEST_MODULE_LOCATION
+    - Run depmod after uninstall
+
+ -- Matt Domsch <Matt_Domsch@dell.com>  Wed, 10 Oct 2007 16:50:00 -0500
+
+dkms (2.0.17.4-0ubuntu1) gutsy; urgency=low
+
+  * initial debian packaging for Ubuntu (LP: #121676)
+
+ -- Matt Domsch <Matt_Domsch@dell.com>  Mon, 17 Sep 2007 09:58:46 -0500

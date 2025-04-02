@@ -1,0 +1,61 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+include /usr/share/dpkg/pkg-info.mk
+version         := $(DEB_VERSION_EPOCH_UPSTREAM)
+
+source_name     := broadcom-sta
+source_package  := $(source_name)-source
+source_target   := usr/src/modules/$(source_name)
+source_debdir   := debian/$(source_package)/$(source_target)/debian
+
+dkms_package    := $(source_name)-dkms
+dkms_target     := usr/src/$(source_name)-$(version)
+
+# Live config
+ids_dir         := usr/share/broadcom-sta
+
+# AppStream data
+metadata_dir    := usr/share/metainfo
+
+%:
+	dh $@
+
+install-tmp:
+	mkdir -p debian/tmp
+	cp -a amd64/* debian/tmp/
+
+	# Shipped proprietary precompiled driver
+	rm -f debian/tmp/lib/wlc_hybrid.o_shipped
+	rm -f debian/tmp/lib/LICENSE.txt # License is in copyright file
+	cp -p $(DEB_HOST_ARCH)/lib/wlc_hybrid.o_shipped debian/tmp/lib/wlc_hybrid.o_$(DEB_HOST_ARCH)
+
+install-dkms: install-tmp
+	dh_installdirs --package=$(dkms_package) $(dkms_target)
+	dh_install --package=$(dkms_package) debian/tmp/* $(dkms_target)/
+	dh_install --package=$(dkms_package) debian/broadcom-sta.ids $(ids_dir)/
+# disable the AppStream metadata until it's clear how to work around confusion with the devices supported by the free driver
+#	dh_install -p $(dkms_package) debian/broadcom-sta-dkms.metainfo.xml $(metadata_dir)/
+	dh_install -p $(dkms_package) debian/com.broadcom.linux.broadcom_sta.dkms.metainfo.xml $(metadata_dir)/
+
+install-source: install-tmp
+	dh_installdirs --package=$(source_package) $(source_target)
+	dh_install --package=$(source_package) debian/tmp/* README.txt $(source_target)/
+
+	# Copy Debian files
+	install -D -m 0755 debian/rules.modules $(source_debdir)/rules
+	for file in changelog control control.modules.in copyright; do \
+		install -m 644 debian/$$file $(source_debdir) || exit; \
+	done
+
+	# Make suitable tarball for module-assisant and kernel-package
+	cd debian/$(source_package)/usr/src && tar cfJ $(source_name).tar.xz modules && rm -rf modules
+
+override_dh_install: install-dkms install-source
+
+override_dh_dkms:
+	dh_dkms -V $(version)
+
+# do nothing
+override_dh_auto_configure override_dh_auto_build override_dh_auto_test override_dh_auto_install override_dh_auto_clean:

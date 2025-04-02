@@ -1,0 +1,19 @@
+Important note
+==============
+
+Driver from Broadcom conflicts with ssb module, so we have to blacklist
+the following modules:
+ * b44, Broadcom 44xx/47xx 10/100 PCI ethernet driver (depends on ssb)
+ * b43legacy, Broadcom B43legacy wireless driver (depends on ssb)
+ * b43, Broadcom B43 wireless driver (free driver)
+ * ssb, Sonics Silicon Backplane driver
+
+This is done in /etc/modprobe.d/broadcom-sta-common.conf file, you also should
+rebuild initrd file with the following command:
+
+        # update-initramfs -u -k `uname -r`
+
+Please note that any network card that requires b44 module will stop working
+from now.
+
+ -- Cyril Lacoux (Yack) <clacoux@easter-eggs.com>  Thu, 14 Jan 2010 22:33:24 +0400

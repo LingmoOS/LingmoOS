@@ -1,0 +1,46 @@
+From d22fcae3f690589a3dc5551bb6440ac3842505f4 Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Wed, 5 Feb 2025 01:30:51 +0100
+Subject: [PATCH] dkms: drop superfluous blank line before removing original
+ modules
+
+---
+ dkms.in     | 1 -
+ run_test.sh | 2 --
+ 2 files changed, 3 deletions(-)
+
+diff --git a/dkms.in b/dkms.in
+index 8d9d966..3aa7995 100644
+--- a/dkms.in
++++ b/dkms.in
+@@ -1783,7 +1783,6 @@ do_uninstall()
+ 
+     # Delete the original_module if nothing for this kernel is installed anymore
+     if [[ $was_active && -d $dkms_tree/$module/original_module/$1/$2 ]]; then
+-        echo ""
+         echo "Removing original module(s) from DKMS tree for kernel $1 ($2)"
+         rm -rf "$dkms_tree/$module/original_module/$1/$2" 2>/dev/null
+         [[ $(find $dkms_tree/$module/original_module/$1/* -maxdepth 0 -type d 2>/dev/null) ]] || rm -rf "$dkms_tree/$module/original_module/$1"
+diff --git a/run_test.sh b/run_test.sh
+index 255c0a8..6760031 100755
+--- a/run_test.sh
++++ b/run_test.sh
+@@ -1877,7 +1877,6 @@ Before uninstall, this module version was ACTIVE on this kernel.
+ Deleting /lib/modules/${KERNEL_VER}/${expected_dest_loc}/dkms_test.ko${mod_compression_ext}
+ Restoring archived original module
+ Running depmod... done.
+-
+ Removing original module(s) from DKMS tree for kernel ${KERNEL_VER} (${KERNEL_ARCH})
+ EOF
+ if [ "${expected_dest_loc}" != "kernel/extra" ]; then
+@@ -1934,7 +1933,6 @@ Before uninstall, this module version was ACTIVE on this kernel.
+ Deleting /lib/modules/${KERNEL_VER}/${expected_dest_loc}/dkms_test.ko${mod_compression_ext}
+ Restoring archived original module
+ Running depmod... done.
+-
+ Removing original module(s) from DKMS tree for kernel ${KERNEL_VER} (${KERNEL_ARCH})
+ 
+ Deleting module dkms_replace_test/2.0 completely from the DKMS tree.
+-- 
+2.39.5
+

@@ -1,0 +1,25 @@
+From c0a1f6b8863b6c9a7a8a6bce2341828b0abee586 Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Fri, 7 Mar 2025 07:15:17 +0100
+Subject: [PATCH] run_test.sh: extract only the major part of the kmod version
+
+---
+ run_test.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/run_test.sh b/run_test.sh
+index 3f05ace..52717db 100755
+--- a/run_test.sh
++++ b/run_test.sh
+@@ -312,7 +312,7 @@ remove_module_source_tree() {
+ 
+ # sig_hashalgo itself may show bogus value if kmod version < 26
+ kmod_broken_hashalgo() {
+-    local -ri kmod_ver=$(kmod --version | grep version | cut -f 3 -d ' ')
++    local -ri kmod_ver=$(kmod --version | sed -n 's/kmod version \([0-9]\+\).*/\1/p')
+ 
+     (( kmod_ver < 26 ))
+ }
+-- 
+2.39.5
+
