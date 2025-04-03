@@ -1,0 +1,170 @@
+#!/usr/bin/perl -w
+# Create and populate the package build directories.
+
+sub doit {
+	print "\t".join(" ", @_)."\n";
+	my $ret=(system(@_) >> 8);
+	if ($ret != 0) {
+		die "command exited with status $ret\n";
+	}
+}
+
+my $hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
+chomp $hostarch;
+my $hostos=`dpkg-architecture -qDEB_HOST_ARCH_OS`;
+chomp $hostos;
+
+my $configdir = ($ENV{KW_CONFIG_DIR} || '.');
+my $fixsourcedir = $ENV{SOURCEDIR};
+
+my $fixkernelversion = $ARGV[0];
+
+open(KVERS, "$configdir/kernel-versions") || die "kernel-versions: $!";
+my $version = 0;
+while (<KVERS>) {
+	chomp;
+	next if /^#/ || ! length;
+
+	my ($arch, $kernelversion, $flavour, $installedname, $suffix, $builddep)=split(' ', $_, 6);
+	if (! length $arch || ! length $kernelversion ||
+	    ! length $installedname || ! length $flavour || 
+	    ! length $builddep ) {
+		die "parse error: $_";
+	}
+	next unless $arch eq $hostarch;
+
+	if (defined($fixkernelversion)) {
+		$kernelversion = $fixkernelversion;
+	}
+	elsif ($kernelversion eq "-") {
+		die "kernel version not set in file or on command line";
+	}
+
+	if ($installedname eq "-") {
+		$installedname = "$kernelversion-$flavour";
+	}
+
+	my $sourcedir;
+	my $bootwrapper_sourcedir;
+	if (defined $fixsourcedir) {
+		$sourcedir = $fixsourcedir;
+	}
+	else {
+		# Building with installed kernel package, or as part
+		# of a package?
+		if ($builddep ne "-") {
+			$sourcedir = "";
+		}
+		elsif ($arch =~ /^kfreebsd-/) {
+			$sourcedir = "debian/kfreebsd-image-$installedname";
+		}
+		else {
+			($sourcedir) = grep {-d}
+				("debian/linux-image-$installedname",
+				 "debian/linux-image-$installedname-unsigned");
+			($bootwrapper_sourcedir) = grep {-d}
+				"debian/linux-bootwrapper-$kernelversion";
+		}
+		# Set SOURCEDIR for copy-modules
+		$ENV{SOURCEDIR} = $sourcedir;
+	}
+
+	my $extraname="";
+	if ($suffix =~ /^[yY]/) {
+		$extraname="-$kernelversion-$flavour";
+	}
+	elsif ($suffix =~ /^-.+/) {
+		$extraname="$suffix";
+	}
+	
+	my $modlistdir;
+	if (-d "$configdir/modules/$arch-$flavour") {
+		$modlistdir = "$configdir/modules/$arch-$flavour";
+	}
+	elsif (-d "$configdir/modules/$flavour") {
+		$modlistdir = "$configdir/modules/$flavour";
+	}
+	else {
+		$modlistdir = "$configdir/modules/$arch";
+	}
+
+	if (! -e "$modlistdir/kernel-image") {
+		# copy no kernel
+	}
+	elsif ($hostos eq 'linux') {
+		if (-e "$sourcedir/boot/vmlinux-$installedname") {
+			doit("install", "-D", "-m", 644,
+			     "$sourcedir/boot/vmlinux-$installedname",
+			     "debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
+		}
+		elsif (-e "$sourcedir/boot/vmlinuz-$installedname") {
+			doit("install", "-D", "-m", 644,
+			     "$sourcedir/boot/vmlinuz-$installedname",
+			     "debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
+		}
+		else {
+			die "could not find kernel image";
+		}
+		if (-e "$sourcedir/lib/modules/$installedname") {
+			doit("install", "-d",
+			     "debian/kernel-image-$kernelversion-$flavour-di/lib/modules/$installedname");
+			doit("install", "-m", 644,
+			     "$sourcedir/lib/modules/$installedname/modules.builtin",
+			     "$sourcedir/lib/modules/$installedname/modules.order",
+			     "debian/kernel-image-$kernelversion-$flavour-di/lib/modules/$installedname/");
+		}
+	}
+	elsif (-e "$sourcedir/boot/kfreebsd-$installedname.gz") {
+		doit("install", "-D", "-m", 644,
+			"$sourcedir/boot/kfreebsd-$installedname.gz",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/kfreebsd$extraname.gz");
+	}
+	else {
+		die "could not find kernel image";
+	}
+	doit("install", "-D", "-m", 644,
+		"$sourcedir/boot/System.map-$installedname",
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
+	      if -e "$sourcedir/boot/System.map-$installedname" &&
+	         -e "$modlistdir/kernel-image";
+
+	# Include extra files to help the d-i build process build kernels
+	# for certain subarchitectures. This is powerpc-specific at the
+	# moment.
+	if (-d "$sourcedir/usr/lib/linux-image-$kernelversion-$flavour") {
+		my $installdir =
+			"debian/kernel-image-$kernelversion-$flavour-di" .
+			"/usr/lib/linux-image-$installedname";
+
+		doit("install", "-d",
+			"debian/kernel-image-$kernelversion-$flavour-di/usr/lib");
+		doit("cp", "-a",
+			"$sourcedir/usr/lib/linux-image-$kernelversion-$flavour",
+			$installdir);
+
+		# Replace symlinks into linux-bootwrapper with the target
+		# files, rather than building yet another udeb.
+		if (defined($bootwrapper_sourcedir)) {
+			opendir(my $dh, $installdir)
+				or die "opendir: $installdir: $!";
+			for my $name (readdir($dh)) {
+				my $fullname = "$installdir/$name";
+				my $target = readlink($fullname);
+				next unless defined($target) &&
+					$target eq "../linux-bootwrapper-$kernelversion/$name";
+				unlink($fullname)
+					or die "unlink: $fullname: $!";
+				doit("cp", "-a",
+					$bootwrapper_sourcedir .
+					"/usr/lib/linux-bootwrapper-$kernelversion/$name",
+					$fullname);
+			}
+			closedir($dh);
+		}
+	}
+
+	doit("kernel-wedge", "copy-modules", $kernelversion, $flavour, $installedname);
+	doit("kernel-wedge", "find-dups", "$kernelversion-$flavour");
+	doit("kernel-wedge", "find-unpackaged", "$kernelversion-$flavour", $installedname);
+}
+close KVERS;

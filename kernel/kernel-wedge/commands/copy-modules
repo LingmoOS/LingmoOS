@@ -1,0 +1,168 @@
+#!/bin/bash
+#
+# Copy modules into the right directories in preparation for building udebs.
+# This script is named after the its counterpart in the original
+# kernel-image-di package by Joey Hess <joeyh@debian.org>.
+#
+# Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
+#
+# Usage: copy-modules version flavour installedname
+
+set -e
+
+deplist() {
+	local deps=$1
+	local list=$2
+	
+	cp $list $tmpdir/work
+
+	# recursively append external dependencies to $list
+	while :; do
+
+		# list external dependencies of $work
+		join -o 2.2 $tmpdir/work $deps | sort -u | comm -23 - $list \
+			> $tmpdir/work.new
+		mv $tmpdir/work.new $tmpdir/work
+
+		# exit if work is empty
+		[ -s $tmpdir/work ] || break
+      
+		# append work to $list
+		sort -um -o $list $list $tmpdir/work
+	done
+}
+
+version=$1-$2
+flavour=$2
+installedname=$3
+configdir=$(readlink -f ${KW_CONFIG_DIR:-.})
+arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+os=$(dpkg-architecture -qDEB_HOST_ARCH_OS)
+home=$PWD
+
+trap 'rm -rf $tmpdir' EXIT
+tmpdir=$(mktemp -d)
+
+# SOURCEDIR may be set externally to control where to copy from.
+if [ -n "$SOURCEDIR" ]; then
+	moddir=$SOURCEDIR/lib/modules/$installedname
+else
+	moddir=/lib/modules/$installedname
+fi
+
+if [ ! -d $moddir ]; then
+	exit 0
+fi
+	
+# The directory of modules lists to use.
+if [ -d $configdir/modules/$arch-$flavour ]; then
+	modlistdir=$configdir/modules/$arch-$flavour
+elif [ -d $configdir/modules/$flavour ]; then
+	modlistdir=$configdir/modules/$flavour
+else
+	modlistdir=$configdir/modules/$arch
+fi
+
+if [ "$os" = "linux" ] ; then
+	if [ "$SOURCEDIR" ]; then
+		modulesdep=$tmpdir/modules.dep
+		PATH="/usr/sbin:/sbin:$PATH" depmod \
+			-b $SOURCEDIR $installedname -n \
+			| sed '/^#/d; /^alias /,$d' >$modulesdep
+	elif [ -e "$moddir/modules.dep" ]; then
+		modulesdep=$moddir/modules.dep
+	else
+		echo "Installed kernel package is missing $moddir/modules.dep" >&2
+		exit 1
+	fi
+
+	# get module dependencies from modules.dep
+	# sort it by field 2
+	perl -lne '
+		@words=split(" ");
+		s!'/lib/modules/$installedname'/!! foreach (@words);
+		if ($words[0] =~ /:$/) {
+			$words[0]=~s/:$//;
+			$module=shift @words;
+		}
+		foreach (@words) {
+			print "$module\t$_" unless $_ eq "\\";
+		}
+	' $modulesdep | sort -k 2,2 > $tmpdir/deps
+	
+	if [ ! -s $tmpdir/deps ] && [ ! -e $configdir/no-modules ]; then
+		echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
+		echo "If this is intentional, touch $configdir/no-modules" >&2
+		exit 1
+	fi
+else
+	touch $tmpdir/deps
+fi
+
+mkdir $tmpdir/module-deps $tmpdir/module-list
+
+# generate module interrelationships from package-list file
+kernel-wedge gen-deps $flavour > $tmpdir/module-deps.packages
+
+code=0
+# loop over all udebs, sort that all dependent modules are processed first
+for i in $(
+	{
+		find $modlistdir/ -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
+		cat $tmpdir/module-deps.packages
+	} | tsort | tac
+); do
+	# write dependent (direct and indirect) udebs to exclude
+	# write dependencies to module-deps/$i
+	echo $i | join -o 2.2 - $tmpdir/module-deps.packages | { # dependent modules
+		cd $tmpdir/module-deps
+		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh # direct and indirect deps
+	} | sort -u | tee $tmpdir/module-deps/$i | {	# write deps
+		cd $tmpdir/module-list
+		xargs -r cat
+	} | sort -u > $tmpdir/exclude			# modules to exclude
+	
+	# preprocess file, handle includes and excludes and sort so that
+	# the joins work, no matter what the order of the input.
+	kernel-wedge preprocess $modlistdir/$i $moddir |
+		sort > $tmpdir/module-list/$i
+	test ${PIPESTATUS[0]} = 0
+
+	# exclude modules in exclude from dependency list
+	join -o 2.1,2.2 -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
+		sort -k 1,1 > $tmpdir/tmpdeps
+
+	# include dependent modules which are not in a
+	# dependent udeb into module-list/$i
+	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
+
+	if [ -s $tmpdir/module-list/$i ] && dh_listpackages | grep -qx "$i-$version-di"; then
+		# copy kernel modules to package build dir
+		cd $moddir
+		ret=$( ( (
+			set +e
+			tar cfT - $tmpdir/module-list/$i
+			printf $? >&3
+		) | (
+			set +e
+			dir=$home/debian/$i-$version-di/lib/modules/$installedname
+			mkdir -p $dir
+			cd $dir
+			tar xf -
+			printf $? >&3
+		) ) 3>&1)
+		if [ "$ret" != "00" ]; then
+			echo "tar failed" >&2
+			exit $ret
+		fi
+		cd $home
+
+		if [ "$os" = linux ]; then
+			cat >"debian/$i-$version-di.postinst" <<EOF
+#!/bin/sh -e
+depmod $installedname
+EOF
+		fi
+	fi
+done
+exit $code

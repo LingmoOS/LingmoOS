@@ -1,0 +1,57 @@
+#!/bin/sh -eu
+
+datadir="debian/tests/preprocess-data"
+moddir="$AUTOPKGTEST_TMP/modules"
+
+# Create dummy module files and modules.builtin
+while read -r filename; do
+    mkdir -p "$moddir/$(dirname "$filename")"
+    touch "$moddir/$filename"
+done < "$datadir/filelist"
+cp "$datadir/modules.builtin" "$moddir/"
+
+# Access $moddir via a symlink, to test for Debian Bug #955210
+ln -nsf "$moddir" "${moddir}.symlink"
+moddir="${moddir}.symlink"
+
+my_rc=0
+
+export KW_DEFCONFIG_DIR="$PWD/$datadir"
+for input in "$datadir"/*.in; do
+    name="$(basename "${input%.in}")"
+    echo "I: Testing preprocess case $name"
+
+    output="$AUTOPKGTEST_TMP/$name.out"
+    error="$AUTOPKGTEST_TMP/$name.err"
+    rc=0; commands/preprocess "$input" "$moddir" >"$output" 2>"$error" || rc=$?
+
+    # Replace source locations in error messages, so expected error
+    # messages don't need to be updated for every change of line no.
+    sed -i 's/at [^ ]* line [0-9]*/at SOMEWHERE/' "$error"
+
+    # Find expected output, error messages and exit code
+    exp_output="$datadir/$name.out"
+    if [ -f "$datadir/$name.err" ]; then
+	exp_error="$datadir/$name.err"
+    else
+	exp_error=/dev/null
+    fi
+    if [ -f "$datadir/$name.rc" ]; then
+	exp_rc="$(cat "$datadir/$name.rc")"
+    else
+	exp_rc=0
+    fi
+
+    # Compare actual with expected
+    if diff -q "$exp_output" "$output" && diff -q "$exp_error" "$error" \
+       && [ "$rc" = "$exp_rc" ]; then
+	echo "I: pass"
+    else
+	diff -u "$exp_output" "$output" || true
+	diff -u "$exp_error" "$error" || true
+	echo "E: rc=$rc"
+	my_rc=1
+    fi
+done
+
+exit "$my_rc"

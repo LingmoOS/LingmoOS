@@ -1,0 +1,24 @@
+#!/bin/bash -e
+# Find duplicate modules. Pass the kernel name.
+kernel=$1
+(
+	shopt -s nullglob
+	for dir in debian/*-modules-$kernel-di; do
+		cd $dir
+		find lib -type f -printf "$dir %p\n"
+		cd ../..
+	done
+) | sort -k2 | perl -ne '
+	my $configdir = ($ENV{KW_CONFIG_DIR} || ".");
+	while (<>) {
+		($d, $f)=split;
+		if ($f eq $lf) { print "$d $f\n$ld $lf\n"; $dups++ }
+		$lf=$f;
+		$ld=$d
+	}
+	if ($dups) {
+		print STDERR "some modules are in more than one package\n";
+		exit 1 unless (-e "$configdir/ignore-dups" ||
+			       length($ENV{KW_CHECK_NONFATAL}));
+	}
+'

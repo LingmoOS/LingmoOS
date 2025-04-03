@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+# Generates from debian/control a dependency file, suitable to be fed to
+# tsort. The file has the base package name on the left, and the package it
+# depends on is on the right. It is sorted.
+use strict;
+use warnings;
+
+use KernelWedge qw(read_kernel_versions read_package_lists for_each_package);
+
+my $arch=`dpkg-architecture -qDEB_HOST_ARCH`;
+chomp $arch;
+
+my $flavour=$ARGV[0];
+
+my @out;
+
+my $versions = [[$arch, '-', $flavour]];
+my $packages = read_package_lists();
+
+for_each_package($packages, $versions, sub {
+	my ($arch, $kernelversion, $flavour, $modlistdir, $package) = @_;
+	my $pkg_name = $package->("Package");
+	my @depends = split(", ", $package->("Depends") || "");
+
+	@out = grep(!/^$pkg_name\t/, @out);
+
+	foreach my $dep (@depends) {
+		# Skip depends that are not built for this
+		# architecture.
+		next unless -e "$modlistdir/$dep";
+		push @out, "$pkg_name\t$dep\n";
+	}
+});
+
+print sort @out;

@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use File::Find ();
+use File::Spec ();
+
+# Dummy filename for when we find that a module is actually built-in
+use constant BUILTIN => "<builtin>";
+
+my $defconfigdir = $ENV{KW_DEFCONFIG_DIR};
+if (!defined($defconfigdir)) {
+	print STDERR "$0: Required environment variable \$KW_DEFCONFIG_DIR is not defined\n";
+	exit 2;
+}
+my $sysdir="$defconfigdir/modules/";
+my $os = `dpkg-architecture -qDEB_HOST_ARCH_OS`;
+chomp $os;
+
+my @module_files;
+my @modules_builtin;
+my %modules;
+my %missing;
+my %loaded;
+
+sub find_all_modules {
+	my ($moddir) = @_;
+
+	File::Find::find({
+		follow => 1, # If $moddir is a symlink, follow it.
+		wanted => sub {
+			if (/\.ko(?:\.(?:xz|zstd))?$/) {
+				push @module_files,
+				    File::Spec->abs2rel($File::Find::name,
+							$moddir);
+			}
+		}
+	}, $moddir);
+
+	if ($os eq 'linux') {
+		if (open(my $builtin, "$moddir/modules.builtin")) {
+			while (<$builtin>) {
+				chomp;
+				push @modules_builtin, $_;
+			}
+			close($builtin);
+		}
+	}
+}
+
+sub wildcard_to_regexp {
+	my ($pattern) = @_;
+
+	# Convert to regexp syntax.  We handle '**' as a recursive
+	# match-all.  We don't bother to handle '\' or '[...]'.
+	my %glob_re = ('?'  => '[^/]',
+		       '*'  => '[^/]*',
+		       '**' => '.*',
+		       ''   => '');
+	my $extra_wild;
+	if ($os eq 'linux') {
+		# Linux treats '-' and '_' as equivalent, and neither
+		# is used consistently.  So let each match the other.
+		$glob_re{'-'} = $glob_re{'_'} = '[-_]';
+		$extra_wild = '|[-_]';
+	} else {
+		$extra_wild = '';
+	}
+	$pattern =~ s/(.*?)(\*\*|[?*]$extra_wild|)/
+                      quotemeta($1) . $glob_re{$2}/eg;
+
+	return $pattern;
+}
+
+sub is_really_wild {
+	my ($pattern) = @_;
+
+	return scalar($pattern =~ /[?*]/);
+}
+
+sub find_modules {
+	my ($moddir, $pattern, $optional) = @_;
+	my $wild = is_really_wild($pattern);
+
+	my @regexps;
+	if ($wild) {
+		my $re;
+		if ($pattern =~ m|^([^?*]*)/(.*)|) {
+			my $subdir = $1;
+			if (! -d "$moddir/$subdir") {
+				if (-d "$moddir/kernel/$subdir") {
+					$subdir = "kernel/$subdir";
+				} elsif (!$optional) {
+					print STDERR "pattern $pattern refers to nonexistent subdirectory\n";
+					unless ($ENV{KW_CHECK_NONFATAL}) {
+						$! = 1;
+						die;
+					}
+				} else {
+					return ();
+				}
+			}
+			$re = quotemeta($subdir) . '/' . wildcard_to_regexp($2);
+		} else {
+			$re = wildcard_to_regexp($pattern);
+		}
+
+		# Add module suffix; anchor at start and end of string
+		@regexps = ('^' . $re . '\.ko(?:\.(?:xz|zstd))?$');
+	} else {
+		# If pattern doesn't include a wildcard, find the
+		# module in any subdir, but prefer a module in the
+		# kernel subdir.  We still do wildcard processing
+		# to handle equivalence of '-' and '_' for Linux.
+		my $re = wildcard_to_regexp($pattern);
+		@regexps = ('^kernel/(?:.*/)?' . $re . '\.ko(?:\.(?:xz|zstd))?$',
+			    '(?:^|/)' . $re . '\.ko(?:\.(?:xz|zstd))?$');
+	}
+
+	my @modules;
+      regexp_loop:
+	for my $re (@regexps) {
+		for (@module_files) {
+			if (/$re/) {
+				push @modules, $_;
+				last regexp_loop unless $wild;
+			}
+		}
+		if (!$wild && grep(/$re/, @modules_builtin)) {
+			push @modules, BUILTIN;
+			last;
+		}
+	}
+
+	return @modules;
+}
+
+sub loadlist {
+	my ($list, $moddir) = @_;
+	
+	if ($loaded{$list}) {
+		$! = 1;
+		die "include loop detected loading $list\n";
+	}
+	$loaded{$list}=1;
+	
+	my $fh;
+	unless (open($fh, $list)) {
+		$! = 1;
+		die "cannot read $list\n";
+	}
+	while (<$fh>) {
+		s/^\s*//;
+		s/\s*$//;
+		if (/^#include\s+<(.*)>$/) {
+			my $basename=$1;
+			loadlist($sysdir.$basename, $moddir);
+		}
+		elsif (/^#include\s+"(.*)"$/) {
+			my $include=$1;
+			my ($dirname)=$list=~m!(.*/).*!;
+			loadlist($dirname.$include, $moddir);
+		}
+		elsif (/^$/) {
+			next;
+		}
+		elsif (/^#/) {
+			next;
+		}
+		elsif (/^(.*) -$/) {
+			# If this was explicitly included and is missing,
+			# we no longer care
+			delete $missing{$1};
+
+			for (find_modules($moddir, $1, 1)) {
+				delete $modules{$_};
+			}
+		}
+		else {
+			my ($pattern, $optional, @found);
+
+			if (/^(.*) \?$/) {
+				($pattern, $optional) = ($1, 1);
+			}
+			# Support dash prefixing for backwards compatibility.
+			elsif (/^-(.*)/) {
+				($pattern, $optional) = ($1, 1);
+			} else {
+				($pattern, $optional) = ($_, 0);
+			}
+
+			@found = find_modules($moddir, $pattern, $optional);
+			for (@found) {
+				$modules{$_} = 1 unless $_ eq BUILTIN;
+			}
+
+			# Check for missing required module.  This is not
+			# yet an error as it might be excluded later.
+			if (!is_really_wild($pattern) && !$optional
+			    && !@found) {
+				$missing{$pattern} = 1;
+			}
+		}
+	}
+	close $fh;
+}
+
+if (@ARGV < 2) {
+	print STDERR "$0: Required parameters missing\n";
+	exit 2;
+}
+my ($file, $moddir) = @ARGV;
+find_all_modules($moddir);
+loadlist($file, $moddir);
+
+if (keys %missing) {
+	for (keys %missing) {
+		print STDERR "missing module $_\n";
+	}
+	exit 1 unless $ENV{'KW_CHECK_NONFATAL'};
+}
+
+foreach my $m (sort keys %modules) {
+	print "$m\n";
+}

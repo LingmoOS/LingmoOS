@@ -1,0 +1,67 @@
+#!/bin/sh
+# This is a wrapper script to build a specific architecture.
+#
+# It takes the architecture to be built as parameter and that architecture
+# needs to be listed in kernel-versions.
+# It expects to have the unpacked kernel packages for the architecture in
+# e.g. ../alpha. modules.dep files have to be put in there too if they are
+# not shipped in the .deb (varies)
+#
+# dpkg-cross must be installed, but you do not need a cross compiler.
+
+set -e
+
+buildpackage () {
+	dpkg-buildpackage -d -us -uc -rfakeroot -tc -I $@
+}
+
+# Build source package. Binaries are built below.
+buildpackage -S
+
+# Directory for stubs, added to PATH.
+arch="$1"
+trap 'rm -rf $tmpdir' EXIT 
+tmpdir=$(mktemp -d)
+PATH=$PATH:$tmpdir
+export PATH
+
+if [ -z "$arch" ]; then
+	echo "** Error: architecture not specified"
+	exit 1
+fi
+if ! cut -d ' ' -f 1 kernel-versions | grep -v "^$arch$"; then
+	echo "** Error: arch $arch not listed in kernel-versions"
+	exit 1
+fi
+
+if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
+	# Generate cross-compiler stub, this is needed to get the
+	# debian build system to cross-build the given arch w/o a
+	# real cross compiler.
+	CC=$tmpdir/$arch-linux-gcc
+	echo "#!/bin/sh" > $CC
+	echo "echo $arch-linux" >> $CC
+	chmod +x $CC
+	# Not only must it be in the path, but CC needs to be
+	# exported as well.
+	export CC
+else
+	# native build
+	unset CC
+fi
+	
+if [ -d ../$arch ]; then
+	export SOURCEDIR=`pwd`/../$arch
+else
+	unset SOURCEDIR
+fi
+
+if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
+	if [ -z "$SOURCEDIR" ]; then
+		echo "** Warning: no SOURCEDIR for arch $arch" >&2
+	fi
+	buildpackage -b -a$arch
+else
+	# native build
+	buildpackage
+fi	

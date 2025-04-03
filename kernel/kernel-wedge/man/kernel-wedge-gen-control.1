@@ -1,0 +1,64 @@
+.TH KERNEL\-WEDGE\-GEN\-CONTROL 1 "June 2019" "Kernel-wedge"
+.SH NAME
+kernel\-wedge\-gen\-control \- generate debian/control file
+.SH SYNOPSIS
+.B kernel\-wedge gen\-control
+.SH DESCRIPTION
+Generate a debian/control from the control stub, the kernel\-versions
+files, and the package\-list files.
+
+For each kernel version and flavour, and for each module list defined
+for that flavour, \fBgen\-control\fR will create a binary package control
+paragraph.  This is normally based on a template in the package\-list
+in the default-configuration directory.
+
+Templates are processed as follows:
+
+.IP 1. 4
+For each standard control field \fIname\fR, copy the template control
+field \fIname\fR_\fIflavour\fR, \fIname\fR_\fIarch\fR_\fIflavour\fR,
+\fIname\fR_\fIarch\fR, or \fIname\fR (in descending order of priority).
+.IP 2. 4
+Append the kernel version and flavour to package names in the
+Package and Depends fields.
+.IP 3. 4
+Stop processing the package if it has been excluded.
+.IP 4. 4
+Set the Architecture, Package\-Type, Kernel\-Version, and Section
+fields automatically.
+.IP 5. 4
+Remove any package that is not going to be built from the Depends
+field.  This can be overridden by adding a "!" to the dependency
+name.
+.IP 6. 4
+Add the original (unsuffixed) package name to the Provides field.
+.IP 7. 4
+Emit the processed control paragraph.
+.RE
+
+The package\-list in the configuration directory may add new package
+templates or override template field values.  For example:
+
+.RS 4
+.EX
+# This file is used to build up the control file. The kernel version and
+# "\-di" are appended to the package names. Section can be left out. So can
+# architecture, which is derived from the files in the modules directory.
+# It overwrites specifications from /usr/share/kernel\-wedge/package\-list.
+Package: fat\-modules
+Priority: standard
+
+Package: nic\-modules
+Depends: kernel\-image, nic\-shared\-modules, core\-modules, firewire\-core\-modules
+
+Package: other\-modules
+Depends: kernel\-image
+Description: some other modules I like to have in the installer
+.EE
+.RE
+
+The configuration directory may have an exclude\-packages file that
+lists any udebs (by full package name) that would normally be built,
+but should be excluded from the control file.
+.SH AUTHOR
+Joey Hess, Ben Hutchings <ben@decadent.org.uk>

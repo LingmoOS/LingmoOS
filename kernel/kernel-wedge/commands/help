@@ -1,0 +1,12 @@
+#!/bin/sh
+LIBDIR=/usr/share/kernel-wedge/commands
+set -e
+command=$1
+if [ -z "$command" ]; then
+	kernel-wedge
+fi
+if [ ! -x "$LIBDIR/$command" ]; then
+	echo "No such command."
+	exit 1
+fi
+exec man 1 "kernel-wedge-$command"

@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+# Generic rules file for kernel-wedge using packages.
+# Just include it into your own rules file.
+
+export DH_COMPAT=7
+
+debian/control:
+	kernel-wedge gen-control > debian/control
+
+build: debian/control
+	dh_testdir
+
+clean: debian/control
+	dh_testdir
+	dh_clean `find modules -type l`
+
+binary-indep:
+
+binary-arch: debian/control
+	dh_testdir
+	dh_prep
+	
+	kernel-wedge install-files
+	kernel-wedge check
+
+	dh_fixperms -s
+	dh_gencontrol -s
+	dh_builddeb -s
+
+binary: build binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary debian/control

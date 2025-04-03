@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+# Generate a debian/control from the control stub, the kernel-versions
+# files, and the package-list.
+use strict;
+use warnings;
+
+use KernelWedge qw(CONFIG_DIR CONTROL_FIELDS read_kernel_versions
+		   read_package_lists for_each_package);
+
+my @builddeps;
+my %excluded;
+
+my $fixkernelversion = $ARGV[0];
+
+if (open(EXCLUDED, CONFIG_DIR . "/exclude-packages")) {
+	while (<EXCLUDED>) {
+		chomp;
+		$excluded{$_}=1;
+	}
+	close EXCLUDED;
+}
+
+my $versions = read_kernel_versions($fixkernelversion);
+
+for my $ver (@$versions) {
+	(my $arch, my $kernelversion, undef, undef, undef, my $builddep) =
+		@$ver;
+	if (defined($fixkernelversion)) {
+		$ver->[1] = $fixkernelversion;
+	}
+	elsif ($kernelversion eq "-") {
+		die "kernel version not set in file or on command line";
+	}
+	if ($builddep ne "-") {
+		foreach my $pkg (split(", ", $builddep)) {
+			push @builddeps, "$pkg [$arch]";
+		}
+	}
+}
+
+# Building with installed kernel package, or as part of a package?
+if (@builddeps) {
+	open(STUB, "debian/control.stub") || die "debian/control.stub: $!";
+	while (<STUB>) {
+		chomp;
+		if (/^Build-Depends:/) {
+			$_=join(", ", $_, @builddeps);
+		}
+		print $_."\n";
+	}
+	close STUB;
+}
+
+my $packages = read_package_lists();
+
+for_each_package($packages, $versions, sub {
+	my ($arch, $kernelversion, $flavour, $modlistdir, $template) = @_;
+
+	my %override;
+	$override{Architecture}=$arch;
+	$override{Package}=$template->("Package")."-".$kernelversion."-".$flavour."-di";
+	$override{'Package-Type'}="udeb";
+	$override{'Kernel-Version'}=$kernelversion."-".$flavour;
+
+	return if $excluded{$override{Package}};
+		
+	print "\n";
+		
+	if (! defined $template->("Section") || $template->("Section") !~ /debian-installer$/) {
+		$override{Section}="debian-installer";
+	}
+
+	if (defined $template->("Depends")) {
+		$override{Depends}=join(", ",
+				   map { $_."-".$kernelversion."-".$flavour."-di" }
+				   # Remove force marker.
+				   map { s/!$//; $_ }
+				   # If the dep is not built for this arch,
+				   # skip it, unless it's forced.
+				   grep { -e "$modlistdir/$_" || /!$/ }
+				   split(", ", $template->("Depends")));
+	}
+		
+	foreach my $field (CONTROL_FIELDS) {
+		my $value = $override{$field} || $template->($field);
+		if ($field eq 'Provides') {
+			if (defined $value) {
+				print $field.": ".$template->("Package").", ".$value."\n";
+			}
+			else {
+				print $field.": ".$template->("Package")."\n";
+			}
+		}
+		else {
+			print $field.": ".$value."\n" if defined $value;
+		}
+	}
+});

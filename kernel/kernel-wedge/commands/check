@@ -1,0 +1,16 @@
+#!/bin/sh -e
+empty=
+if [ $# -ge 1 ]; then
+    packages="$*"
+else
+    packages="$(dh_listpackages -s)"
+fi
+for pkg in $packages; do
+	if [ -z  "$(find debian/$pkg -type f)" ]; then
+		echo "$pkg will be empty" >&2
+		empty=1
+	fi
+done
+if [ "$empty" -a -z "$KW_CHECK_NONFATAL" ]; then
+	exit 1
+fi

@@ -1,0 +1,28 @@
+.TH KERNEL\-WEDGE\-PREPROCESS 1 "June 2019" "Kernel-wedge"
+.SH NAME
+kernel\-wedge\-preprocess \- process a module list file
+.SH SYNOPSIS
+.B kernel\-wedge preprocess
+.I module-list module-dir
+.SH DESCRIPTION
+Preprocesses the \fImodule-list\fR, performing list includes and module
+excludes, removing blank lines and comments, and expanding wildcards.
+Emits a list of filenames to stdout.
+
+Return 1 if a required module or directory is missing, unless
+$KW_CHECK_NONFATAL is non-empty.
+
+The supported wildcards are:
+
+.TS
+nokeep;
+lB	l.
+?	Match a single character within a path component
+*	Match any number of characters within a path component
+**	Match any number of characters including multiple path components
+.TE
+
+On Linux, '\-' and '_' also match each other since the kernel and kmod
+treat them as equivalent in module names.
+.SH AUTHOR
+Joey Hess, Ben Hutchings <ben@decadent.org.uk>
