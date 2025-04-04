@@ -1,0 +1,101 @@
+#include <kernel-image>
+
+# Multifunction devices
+drivers/mfd/**
+
+# Regulators
+drivers/regulator/**
+
+# Some regulators on RK3588 require GPIO
+gpio-rockchip
+
+# NIC,sata, and USB on Armada 8K
+phy-mvebu-cp110-comphy ?
+
+# SoC modules
+drivers/soc/**
+
+# Watchdogs: boot loader may start a watchdog that we need to pet,
+# and/or it may be the only way to trigger reboot
+drivers/watchdog/**
+
+# SPI devices
+drivers/spi/**
+
+# Force mtd as spi/spi-mtk-snfi depends on ecc-mtk,nandcore -> mtd
+mtd
+
+# For cros_ec mfd device
+cros_ec_spi ?
+
+# PCIe PHYs
+phy-rockchip-pcie ?
+
+# PCIe x4 on RK3588 (usually NVME)
+phy-rockchip-snps-pcie3
+
+# USB/SATA/PCIe on Rockchip RK3588
+phy-rockchip-naneng-combphy
+
+# For spi-rockchip
+pl330 ?
+
+# Regulator-SoC synchronization
+rockchip-io-domain ?
+
+# Pin controllers
+drivers/pinctrl/**
+
+# EFUSE/OTP drivers
+nvmem-imx-ocotp ?
+
+# DRM modules as soc/qcom/phy-qcom-qmp-combo -> aux-hpd-bridge -> drm
+drm
+drm_kms_helper
+
+# Qualcomm devices
+qcom-apcs-ipc-mailbox
+qcom-ipcc
+nvmem_qcom-spmi-sdam
+nvmem_qfprom
+bam_dma
+clk-smd-rpm
+phy_qcom_edp
+phy-qcom-qmp-combo
+phy-qcom-qmp-pcie
+qcom_glink
+qcom_glink_smem
+qcom_glink_rpm
+qcom_smd
+qcom_hwspinlock
+icc-osm-l3
+rpmpd
+qrtr ?
+qrtr-smd ?
+
+gcc-sc8280xp
+qnoc-sc8280xp
+gcc-sc8180x
+qnoc-sc8180x
+gcc-x1e80100 ?
+tcsrcc-x1e80100
+qnoc-x1e80100 ?
+
+# TypeC connector stuff used by phy-qcom-qmp-combo and pmic_glink_altmode modules
+typec ?
+
+# I²C drivers
+i2c-tegra
+i2c-rk3x
+i2c-mv64xxx
+i2c-imx
+i2c-qcom-geni
+i2c-qup
+i2c-omap
+
+# TI AM64 / AM65 ICSSG PRU subsystem
+drivers/irqchip/irq-pruss-intc
+drivers/remoteproc/pru_rproc
+
+# RTC
+drivers/rtc/**

@@ -1,0 +1,371 @@
+# This file is used to build up the control file. The kernel version and
+# "-di" are appended to the package names. Section can be left out. So can
+# architecture, which is derived from the files in the modules directory.
+#
+Package: kernel-image
+Provides_amd64: efi-modules
+Provides_arm64: drm-core-modules, mmc-core-modules, mtd-core-modules, efi-modules
+Provides_armmp: mmc-core-modules, mtd-core-modules, efi-modules
+Provides_loong64: efi-modules
+Provides_mips: mtd-core-modules, mtd-modules
+Provides_mips64: mtd-core-modules, mtd-modules
+Provides_mips64el: mtd-core-modules, mtd-modules
+Provides_mips64r6: mtd-core-modules, mtd-modules
+Provides_mips64r6el: mtd-core-modules, mtd-modules
+Provides_mipsel: mtd-core-modules, mtd-modules
+Provides_mipsr6: mtd-core-modules, mtd-modules
+Provides_mipsr6el: mtd-core-modules, mtd-modules
+Provides_parisc64: drm-core-modules
+Provides_powerpc64:
+Provides_riscv64: mtd-core-modules, efi-modules
+Provides_sh4: fb-modules, input-modules, nic-shared-modules, uinput-modules, usb-modules
+Priority: standard
+Description: Linux kernel image and core modules for the Debian installer
+ This package contains the kernel image and core modules for the Debian
+ installer boot images. It does _not_ provide a usable kernel for your full
+ Debian system.
+
+Package: nic-modules
+Depends: kernel-image, nic-shared-modules, mtd-core-modules
+Provides: nic-extra-modules
+Priority: standard
+Description: NIC drivers
+ This package contains Ethernet and some paravirtualised network drivers
+ for the kernel.
+
+Package: nic-wireless-modules
+Depends: kernel-image, nic-shared-modules, usb-modules, mmc-core-modules, pcmcia-modules, rfkill-modules, crypto-modules
+Priority: standard
+Description: Wireless NIC drivers
+ This package contains wireless NIC drivers for the kernel.
+ Includes crypto modules only needed for wireless (WEP, WPA).
+
+Package: nic-shared-modules
+Depends: kernel-image
+Priority: standard
+Description: Shared NIC drivers
+ This package contains NIC drivers needed by combinations of nic-modules,
+ nic-pcmcia-modules, nic-usb-modules and nic-wireless-modules.
+
+Package: serial-modules
+Depends: kernel-image, pcmcia-modules
+Priority: optional
+Description: Serial drivers
+ This package contains serial drivers for the kernel.
+
+Package: usb-serial-modules
+Depends: kernel-image, usb-modules
+Priority: optional
+Description: USB serial drivers
+ This package contains USB serial drivers for the kernel.
+
+Package: ppp-modules
+Depends: kernel-image, serial-modules
+Priority: optional
+Description: PPP drivers
+ This package contains PPP drivers for the kernel.
+
+Package: pata-modules
+Depends: kernel-image, ata-modules
+Priority: standard
+Priority_armhf: optional
+Description: PATA drivers
+ This package contains PATA drivers for the kernel.
+
+Package: cdrom-core-modules
+Depends: kernel-image, scsi-core-modules
+Priority: standard
+Description: CDROM support
+ This package contains core CDROM support for the kernel.
+
+Package: firewire-core-modules
+Depends: kernel-image, scsi-core-modules
+Priority: standard
+Description: Core FireWire drivers
+ This package contains core FireWire drivers for the kernel.
+
+Package: scsi-core-modules
+Depends: kernel-image
+Priority: standard
+Description: Core SCSI subsystem
+ This package contains the core SCSI subsystem for the kernel.
+
+Package: scsi-modules
+Depends: kernel-image, scsi-core-modules, cdrom-core-modules, ata-modules
+Priority: standard
+Description: SCSI drivers
+ This package contains SCSI drivers for the kernel.
+
+Package: scsi-nic-modules
+Depends: scsi-modules, nic-modules
+Priority: optional
+Description: SCSI drivers for converged NICs
+ This package contains SCSI drivers that depend on net drivers.
+
+Package: loop-modules
+Depends: kernel-image
+Priority: standard
+Description: Loopback filesystem support
+ This package contains loopback filesystem support for the kernel.
+
+Package: btrfs-modules
+Depends: kernel-image, md-modules
+Priority: optional
+Description: BTRFS filesystem support
+ This package contains the BTRFS filesystem module for the kernel.
+
+Package: ext4-modules
+Depends: kernel-image
+Provides: ext2-modules, ext3-modules
+Priority: standard
+Description: ext2/ext3/ext4 filesystem support
+ This package contains the ext4 filesystem module for the kernel, which
+ also supports ext2 and ext3.
+
+Package: isofs-modules
+Depends: kernel-image, cdrom-core-modules
+Priority: standard
+Description: ISOFS filesystem support
+ This package contains the ISOFS filesystem module for the kernel.
+
+Package: jffs2-modules
+Depends: kernel-image, mtd-modules
+Priority: optional
+Description: JFFS2 filesystem support
+ This package contains the JFFS2 filesystem module for the kernel.
+
+Package: jfs-modules
+Depends: kernel-image
+Priority: standard
+Description: JFS filesystem support
+ This package contains the JFS filesystem module for the kernel.
+
+Package: ufs-modules
+Depends: kernel-image
+Priority: optional
+Description: UFS filesystem support
+ This package contains the UFS filesystem module for the kernel.
+
+Package: xfs-modules
+Depends: kernel-image
+Priority: standard
+Description: XFS filesystem support
+ This package contains the XFS filesystem module for the kernel.
+
+Package: fat-modules
+Depends: kernel-image
+Priority: optional
+Priority_amd64: standard
+Description: FAT filesystem support
+ This package contains the FAT and VFAT filesystem modules for the kernel.
+
+Package: hfs-modules
+Depends: kernel-image, cdrom-core-modules
+Priority: optional
+Description: HFS filesystem support
+ This package contains the HFS and HFS+ filesystem modules for the kernel.
+
+Package: affs-modules
+Depends: kernel-image
+Priority: optional
+Description: Amiga filesystem support
+ This package contains the Amiga filesystem module for the kernel.
+
+Package: minix-modules
+Depends: kernel-image
+Priority: optional
+Description: Minix filesystem support
+ This package contains the Minix filesystem module for the kernel.
+
+Package: nfs-modules
+Depends: kernel-image
+Priority: optional
+Description: NFS filesystem support
+ This package contains the NFS filesystem module for the kernel.
+
+Package: squashfs-modules
+Depends: kernel-image
+Priority: optional
+Description: squashfs modules
+ This package contains squashfs modules.
+
+Package: udf-modules
+Depends: kernel-image, cdrom-core-modules
+Priority: optional
+Description: UDF modules
+ This package contains the UDF filesystem module.
+
+Package: f2fs-modules
+Depends: kernel-image
+Priority: optional
+Description: f2fs filesystem support
+ This package contains the f2fs (Flash-Friendly Filesystem) module.
+
+Package: md-modules
+Depends: kernel-image
+Priority: optional
+Description: RAID and LVM support
+ This package contains RAID and LVM modules for the kernel.
+
+Package: multipath-modules
+Depends: kernel-image, md-modules, scsi-core-modules
+Priority: optional
+Description: Multipath support
+ This package contains DM-Multipath modules for the kernel.
+
+Package: usb-modules
+Depends: kernel-image
+Priority: optional
+Description: USB support
+ This package contains core USB drivers for the kernel.
+
+Package: usb-storage-modules
+Depends: kernel-image, scsi-core-modules, usb-modules
+Priority: standard
+Description: USB storage support
+ This package contains the USB storage driver for the kernel.
+
+Package: pcmcia-storage-modules
+Depends: kernel-image, cdrom-core-modules, pcmcia-modules, ata-modules
+Priority: standard
+Description: PCMCIA storage drivers
+ This package contains PCMCIA storage drivers for the kernel.
+
+Package: drm-core-modules
+Depends: kernel-image
+Priority: optional
+Description: Frame buffer support
+ This package contains core DRM modules for the kernel.
+
+Package: fb-modules
+Depends: kernel-image, drm-core-modules, input-modules
+Priority: optional
+Priority_hppa: standard
+Description: Frame buffer support
+ This package contains Frame buffer drivers for the kernel.
+
+Package: input-modules
+Depends: kernel-image, usb-modules, rfkill-modules
+Priority: optional
+Description: Input devices support
+ This package contains input device drivers for the kernel.
+
+Package: nic-pcmcia-modules
+Depends: kernel-image, nic-shared-modules, nic-wireless-modules, pcmcia-modules, mmc-core-modules
+Priority: standard
+Description: Common PCMCIA NIC drivers
+ This package contains common PCMCIA NIC drivers for the kernel.
+
+Package: pcmcia-modules
+Depends: kernel-image
+Priority: standard
+Description: Common PCMCIA drivers
+ This package contains common PCMCIA drivers for the kernel.
+
+Package: nic-usb-modules
+Depends: kernel-image, nic-shared-modules, nic-wireless-modules, usb-modules
+Priority: standard
+Description: USB NIC drivers
+ This package contains USB network adapter drivers for the kernel.
+
+Package: sata-modules
+Depends: kernel-image, scsi-core-modules, ata-modules
+Priority: standard
+Description: SATA drivers
+ This package contains SATA drivers for the kernel.
+
+Package: crypto-modules
+Depends: kernel-image
+Priority: optional
+Description: crypto modules
+ This package contains crypto modules.
+
+Package: crypto-dm-modules
+Depends: kernel-image, md-modules
+Priority: optional
+Description: devicemapper crypto module
+ This package contains the devicemapper crypto (dm-crypt) module.
+
+Package: ata-modules
+Depends: kernel-image, scsi-core-modules
+Priority: optional
+Description: ATA disk modules
+ This package contains core ATA disk modules used by both PATA and SATA
+ disk drivers.
+
+Package: mmc-core-modules
+Depends: kernel-image
+Priority: optional
+Description: MMC/SD/SDIO core modules
+ This package contains core modules for MMC/SD/SDIO support.
+
+Package: mmc-modules
+Depends: kernel-image, mmc-core-modules, usb-modules
+Priority: optional
+Description: MMC/SD card modules
+ This package contains modules needed to support MMC (multimedia) and
+ SD cards.
+
+Package: nbd-modules
+Depends: kernel-image
+Priority: optional
+Description: Network Block Device modules
+ This package contains the modules required for support of the Network Block
+ Device
+
+Package: speakup-modules
+Depends: kernel-image
+Priority: optional
+Description: speakup modules
+ This package contains speakup modules.
+
+Package: uinput-modules
+Depends: kernel-image
+Priority: optional
+Description: uinput support
+ This package contains the uinput module.
+
+Package: sound-modules
+Depends: kernel-image, usb-modules, pcmcia-modules, firewire-core-modules
+Priority: optional
+Description: sound support
+ This package contains sound modules.
+
+Package: mtd-modules
+Depends: kernel-image, mtd-core-modules
+Priority: optional
+Description: MTD driver modules
+ This package contains MTD driver modules.
+
+Package: mtd-core-modules
+Depends: kernel-image
+Priority: optional
+Description: MTD core
+ This package contains the MTD core.
+
+Package: rfkill-modules
+Depends: kernel-image
+Priority: optional
+Description: rfkill modules
+ This package contains the rfkill module.
+
+Package: hypervisor-modules
+Depends: kernel-image
+Priority: standard
+Description: IBM 64bit hypervisor console modules
+ Contains drivers for the hypervisor console, used as console for linux
+ running in logical partitions of IBM hardware supporting it.
+
+Package: dasd-modules
+Depends: kernel-image
+Priority: standard
+Description: dasd modules
+ This package contains dasd modules.
+
+Package: dasd-extra-modules
+Depends: kernel-image, dasd-modules
+Priority: optional
+Description: optional dasd DIAG support
+ This package contains the module for dasd DIAG support. The udeb is
+ not loaded by default as the installer does not actually support this.
+ It can however be useful to have available in rescue situations.
