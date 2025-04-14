@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Handle systems where /lib is not merged in /usr/lib
+if [ ! -h /lib ]; then
+    mv /usr/lib/live/config/* /lib/live/config/
+fi
+
+# Enable cryptsetup in the initramfs for later use if the user
+# adds an encrypted persistence partition.
+# This is until https://bugs.debian.org/908220 has a proper fix.
+if [ -e /etc/cryptsetup-initramfs/conf-hook ]; then
+    if grep -q '^#CRYPTSETUP=' /etc/cryptsetup-initramfs/conf-hook; then
+	sed -i -e 's/^#CRYPTSETUP=.*/CRYPTSETUP=y/' /etc/cryptsetup-initramfs/conf-hook
+    else
+	echo "CRYPTSETUP=y" >>/etc/cryptsetup-initramfs/conf-hook
+    fi
+fi
+
+# Rebuild the initramfs to include the last change
+update-initramfs -u
+
+# Run updatedb to initialize the database for the locate command
+if [ -x "$(which updatedb 2>/dev/null)" ]; then
+    updatedb
+fi
+
+# Mark kernel related packages on hold so that they are not upgraded in
+# the live system
+for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'linux-image-*' 'linux-headers-*' 'linux-kbuild-*' | sed -ne 's/^installed //p')
+do
+    apt-mark hold $pkg | true
+done
+
+# Mark lingmo DE as manually installed
+for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'lingmo*'| sed -ne 's/^installed //p')
+do
+    apt-mark manual $pkg | true
+done
+
+apt install system-core -y | true
+
+# Remove unwanted packages 
+apt remove systemsettings -y | true
+apt remove plasma-desktop -y | true
+# apt remove network-manager-gnome konsole kde-baseapps -y | true
+apt remove zutty -y | true
+apt remove breeze eog -y | true
+apt remove xterm -y | true
+apt autoremove -y | true
+# apt update | true
+
+# Install OnlyOffice
+get_arch=$(arch)
+if [[ $get_arch =~ "x86_64" ]];then
+    apt update
+    curl -o onlyoffice.deb https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
+    apt install -y --no-install-recommends ./onlyoffice.deb
+    rm -rfv ./onlyoffice.deb
+fi
+
+chmod +x /bin/config-installer
+
+rm /usr/lib/os-release
+
+cat << EOF > /usr/lib/os-release
+PRETTY_NAME="Lingmo OS 3.0.0-rc.10 (Helium)"
+NAME="Lingmo OS"
+RELEASE="Beta"
+VERSION_ID="3.0.0"
+VERSION="3.0.0 (Helium)"
+VERSION_CODENAME=helium
+VERSION_BUILD=300250402a
+VERSION_TYPE="unstable"
+ID=lingmo
+ID_LIKE=debian
+HOME_URL="https://lingmo.org"
+SUPPORT_URL="https://bbs.lingmo.org/"
+COMMUNITY_URL="https://bbs.lingmo.org/"
+APT_SOURCES="https://packages.lingmo.org/lingmo"
+EOF
+
+# Fixing os-release
+rm /etc/os-release
+ln -s /usr/lib/os-release /etc/os-release
