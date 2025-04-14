@@ -73,6 +73,10 @@ autoreconf -fiv  # Generate the configure script
 ```
 
 ### 2. Build the Project
+Build iso image:
+```bash
+make image-iso
+```
 Use the following commands to build the project:
 ```bash
 make             # Build all targets
