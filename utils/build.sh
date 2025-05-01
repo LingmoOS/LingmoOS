@@ -5,6 +5,8 @@ set -e
 # Use return code for any command errors in part of a pipe
 set -o pipefail # Bashism
 
+source ../tools/build_version.sh
+
 # Lingmo's default values
 LINGMO_DIST="bookworm"
 LINGMO_VERSION=""
@@ -16,8 +18,8 @@ SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
 LINGMO_VERTYPE="beta"
-LINGMO_SYS_VERSION="3.0-rc10"
-LINGMO_BUILD_VER="20250405"
+LINGMO_SYS_VERSION="3.0.0"
+LINGMO_BUILD_VER=$(generate_build_ver)
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 
@@ -61,9 +63,9 @@ target_image_name() {
 	fi
 	if [ "$IMAGE_TYPE" = "live" ]; then
 		if [ "$LINGMO_VARIANT" = "default" ]; then
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$RELEASE-$LINGMO_VERTYPE-$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$LINGMO_VERTYPE$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
 		else
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$RELEASE-$LINGMO_VERTYPE-$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$LINGMO_VERTYPE$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
 		fi
 	else
 		if [ "$LINGMO_VARIANT" = "default" ]; then

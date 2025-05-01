@@ -1,4 +1,4 @@
-BUILD_VERSION = 3.0.0_rc9_build$(shell date +%Y%m%d%H%M%S)
+BUILD_VERSION = 3.0.0_rc10_build$(shell date +%Y%m%d%H%M%S)
 TARGET_TP = Beta_$(BUILD_VERSION)
 # 定义构建目录
 BUILD_DIR = buildpkg
