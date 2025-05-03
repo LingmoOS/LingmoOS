@@ -171,22 +171,22 @@
 <context>
     <name>FolderModel</name>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="296"/>
         <source>%1 item</source>
         <translation>%1 объект</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="296"/>
         <source>%1 items</source>
         <translation>%1 объектов</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="389"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="401"/>
         <source>The file or folder %1 does not exist.</source>
         <translation>Файл или папка %1 не существует.</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1298"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1310"/>
         <source>Select All</source>
         <translation>Выделить всё</translation>
     </message>
@@ -195,211 +195,211 @@
         <translation type="vanished">Файловый менеджер</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1957"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1969"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1961"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1973"/>
         <source>Open with</source>
         <translation>Открыть как</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1965"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1977"/>
         <source>Cut</source>
         <translation>Вырезать</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1969"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1981"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1973"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1985"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="888"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1977"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="900"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1989"/>
         <source>New Folder</source>
         <translation>Новая папка</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="910"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1984"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="922"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1996"/>
         <source>New Text</source>
         <translation>Новый текст</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1305"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1981"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1317"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1993"/>
         <source>New Documents</source>
         <translation>Новые документы</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1449"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1461"/>
         <source>Compress</source>
         <translation>Сжать</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1420"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1432"/>
         <source>Extract</source>
         <translation>Распаковать</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1424"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1436"/>
         <source>Extract Here</source>
         <translation>Распаковать здесь</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1435"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1447"/>
         <source>Extract To...</source>
         <translation>Распаковать в...</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1439"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1451"/>
         <source>Select Destination</source>
         <translation>Выберите место назначения</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1459"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1471"/>
         <source>ZIP Archive</source>
         <translation>ZIP архив</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1486"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1498"/>
         <source>TAR Archive</source>
         <translation>TAR архив</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1472"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1484"/>
         <source>7-Zip Archive</source>
         <translation>7-Zip архив</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1313"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2116"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1325"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2128"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1497"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1509"/>
         <source>TAR Archive (gzip)</source>
         <translation>TAR архив (gzip)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1498"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1510"/>
         <source>TAR Archive (bzip2)</source>
         <translation>TAR архив (bzip2)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1499"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1511"/>
         <source>TAR Archive (xz)</source>
         <translation>TAR архив (xz)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1500"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1512"/>
         <source>TAR Archive (zstd)</source>
         <translation>TAR архив (zstd)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1501"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1513"/>
         <source>TAR Archive (uncompressed)</source>
         <translation>TAR архив (без сжатия)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1990"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2002"/>
         <source>Move To Trash</source>
         <translation>Переместить в корзину</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1994"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2006"/>
         <source>Empty Trash</source>
         <translation>Очистить корзину</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1998"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2010"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2002"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2014"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2006"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2018"/>
         <source>Open in Terminal</source>
         <translation>Открыть в терминале</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2010"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2022"/>
         <source>Set as ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2014"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2026"/>
         <source>Set as Wallpaper</source>
         <translation>Установить как обои</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2020"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2032"/>
         <source>Set as Login Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2026"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2038"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2030"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2042"/>
         <source>Change background</source>
         <translation>Изменить фон</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2034"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2046"/>
         <source>Restore</source>
         <translation>Восстановить</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2038"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2050"/>
         <source>Show hidden files</source>
         <translation>Показать скрытые файлы</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2044"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2056"/>
         <source>Open in new window</source>
         <translation>Открыть в новом окне</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2048"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2060"/>
         <source>Icon Size</source>
         <translation>Размер значков</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2052"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2064"/>
         <source>Huge</source>
         <translation>Огромный</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2056"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2068"/>
         <source>Large</source>
         <translation>Большой</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2060"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2072"/>
         <source>Normal</source>
         <translation>Обычный</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2064"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2076"/>
         <source>Small</source>
         <translation>Маленький</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2086"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2098"/>
         <source>View</source>
         <translation>Вид</translation>
     </message>

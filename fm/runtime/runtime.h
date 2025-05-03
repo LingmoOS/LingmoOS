@@ -9,6 +9,9 @@ class RunTime : public QObject
 public:
     explicit RunTime(QObject *parent = nullptr);
     ~RunTime();
+private:
+    void ignoreSigInt();
 };
+
 
 #endif // RUNTIME_H

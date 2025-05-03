@@ -171,7 +171,7 @@
 <context>
     <name>FolderModel</name>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="+284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="+296"/>
         <source>%1 item</source>
         <translation>%1 वस्तु</translation>
     </message>
