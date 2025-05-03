@@ -36,21 +36,26 @@
         <source>Launcher</source>
         <translation>应用启动器</translation>
     </message>
+    <message>
+        <location filename="../src/applicationmodel.cpp" line="369"/>
+        <source>Workspace</source>
+        <translation>工作区</translation>
+    </message>
 </context>
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="125"/>
+        <location filename="../qml/main.qml" line="119"/>
         <source>Trash</source>
         <translation>回收站</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="160"/>
+        <location filename="../qml/main.qml" line="154"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="165"/>
+        <location filename="../qml/main.qml" line="159"/>
         <source>Empty Trash</source>
         <translation>清空回收站</translation>
     </message>

@@ -27,7 +27,7 @@
 <context>
     <name>DateHelper</name>
     <message>
-        <location filename="../helper/datehelper.cpp" line="+15"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="+15"/>
         <source>Now</source>
         <translation>अभी</translation>
     </message>
@@ -71,18 +71,18 @@
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../dialogs/deletedialog.cpp" line="+34"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="+34"/>
         <source>Cancel</source>
         <translation>निरस्त करें</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location filename="../dialogs/deletedialog.cpp" line="+1"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="+1"/>
         <source>Delete</source>
         <translation>मिटाये</translation>
     </message>
     <message>
-        <location filename="../dialogs/deletedialog.cpp" line="-22"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="-22"/>
         <source>Delete Files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -128,9 +128,8 @@
 <context>
     <name>DesktopView</name>
     <message>
-        <location filename="../desktop/desktopview.cpp" line="+48"/>
         <source>Desktop</source>
-        <translation>डेस्कटॉप</translation>
+        <translation type="vanished">डेस्कटॉप</translation>
     </message>
 </context>
 <context>
@@ -159,7 +158,7 @@
 <context>
     <name>FilePropertiesDialog</name>
     <message>
-        <location filename="../dialogs/filepropertiesdialog.cpp" line="+193"/>
+        <location filename="../filemanager/dialogs/filepropertiesdialog.cpp" line="+193"/>
         <source>Properties</source>
         <translation>गुण</translation>
     </message>
@@ -172,7 +171,7 @@
 <context>
     <name>FolderModel</name>
     <message>
-        <location filename="../model/foldermodel.cpp" line="+284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="+284"/>
         <source>%1 item</source>
         <translation>%1 वस्तु</translation>
     </message>
@@ -542,7 +541,7 @@
         <translation>खोले</translation>
     </message>
     <message>
-        <location filename="../dialogs/openwithdialog.cpp" line="+32"/>
+        <location filename="../filemanager/dialogs/openwithdialog.cpp" line="+32"/>
         <source>Open With</source>
         <translation>अन्य अनुप्रयोग (एप्लीकेशन) में खोले</translation>
     </message>
@@ -583,7 +582,7 @@
 <context>
     <name>PlacesModel</name>
     <message>
-        <location filename="../model/placesmodel.cpp" line="+39"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="+39"/>
         <source>Home</source>
         <translation>होम</translation>
     </message>

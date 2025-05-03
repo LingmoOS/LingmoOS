@@ -33,7 +33,7 @@ DockItem {
 
     onPositionChanged: updateGeometry()
     onPressed: updateGeometry()
-    onRightClicked: if (model.appId !== "lingmo-launcher") contextMenu.show()
+    onRightClicked: if (model.appId !== "lingmo-launcher"&&model.appId !== "lingmo-multitasking") contextMenu.show()
 
     onClicked: {
         if (mouse.button === Qt.LeftButton)

@@ -36,21 +36,26 @@
         <source>Launcher</source>
         <translation>Käynnistäjä</translation>
     </message>
+    <message>
+        <location filename="../src/applicationmodel.cpp" line="369"/>
+        <source>Workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="125"/>
+        <location filename="../qml/main.qml" line="119"/>
         <source>Trash</source>
         <translation>Roskakori</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="160"/>
+        <location filename="../qml/main.qml" line="154"/>
         <source>Open</source>
         <translation>Avaa</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="165"/>
+        <location filename="../qml/main.qml" line="159"/>
         <source>Empty Trash</source>
         <translation>Tyhjennä roskakori</translation>
     </message>

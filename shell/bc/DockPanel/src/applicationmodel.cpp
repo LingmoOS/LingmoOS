@@ -361,6 +361,15 @@ void ApplicationModel::initPinnedApplications()
     item->fixed = true;
     m_appItems.append(item);
 
+    // Workspace
+    ApplicationItem *Workspaceitem = new ApplicationItem;
+    Workspaceitem->id = "lingmo-multitasking";
+    Workspaceitem->exec = "qdbus org.kde.kglobalaccel /component/kwin invokeShortcut ShowDesktopGrid";
+    Workspaceitem->iconName = "qrc:/images/multitasking.svg";
+    Workspaceitem->visibleName = tr("Workspace");
+    Workspaceitem->fixed = true;
+    m_appItems.append(Workspaceitem);
+
     // Pinned Apps
     for (int i = 0; i < groups.size(); ++i) {
         for (const QString &id : groups) {

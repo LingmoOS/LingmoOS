@@ -320,6 +320,29 @@ Item {
             }
         }
 
+        ExtraItem {
+            id: screenCaptureItem
+            visible: permissionSurveillance.screenCaptureVisible
+            backcolor: "#ee7959"
+            backColorEnabled: true
+            checked: true
+            popupText: permissionSurveillance.screenCaptureUser + " " + qsTr("is capturing screen")
+            animationEnabled: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: volumeIcon.implicitWidth + LingmoUI.Units.largeSpacing + 8
+            Image {
+                id: screenCaptureIcon
+                anchors.centerIn: parent
+                width: rootItem.iconSize
+                height: width
+                sourceSize: Qt.size(width, height)
+                source: "qrc:/images/" + (rootItem.darkMode ? "dark/" : "light/") + "screen-capture.svg"
+                asynchronous: true
+                antialiasing: true
+                smooth: false
+            }
+        }
+
         StandardItem {
             id: controler
 

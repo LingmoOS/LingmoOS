@@ -27,37 +27,37 @@
 <context>
     <name>DateHelper</name>
     <message>
-        <location filename="../helper/datehelper.cpp" line="15"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="15"/>
         <source>Now</source>
         <translation>Nyní</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="17"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="17"/>
         <source>1 minute ago</source>
         <translation>Před jednou minutou</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="19"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="19"/>
         <source>%1 minutes ago</source>
         <translation>Před %1 minutami</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="23"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="23"/>
         <source>1 hour ago</source>
         <translation>Před jednou hodinou</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="25"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="25"/>
         <source>%1 hours ago</source>
         <translation>Před %1 hodinami</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="29"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="29"/>
         <source>1 day ago</source>
         <translation>Před jedním dnem</translation>
     </message>
     <message>
-        <location filename="../helper/datehelper.cpp" line="31"/>
+        <location filename="../filemanager/helper/datehelper.cpp" line="31"/>
         <source>%1 days ago</source>
         <translation>Před %1 dny</translation>
     </message>
@@ -71,28 +71,28 @@
     </message>
     <message>
         <location filename="../qml/Dialogs/DeleteDialog.qml" line="65"/>
-        <location filename="../dialogs/deletedialog.cpp" line="34"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="34"/>
         <source>Cancel</source>
         <translation>Storno</translation>
     </message>
     <message>
         <location filename="../qml/Dialogs/DeleteDialog.qml" line="71"/>
-        <location filename="../dialogs/deletedialog.cpp" line="35"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="35"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../dialogs/deletedialog.cpp" line="13"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="13"/>
         <source>Delete Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs/deletedialog.cpp" line="20"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="20"/>
         <source>Are you sure you want to permanently delete &quot;%1&quot;?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../dialogs/deletedialog.cpp" line="23"/>
+        <location filename="../filemanager/dialogs/deletedialog.cpp" line="23"/>
         <source>Are you sure you want to permanently delete %1 files?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -128,9 +128,8 @@
 <context>
     <name>DesktopView</name>
     <message>
-        <location filename="../desktop/desktopview.cpp" line="48"/>
         <source>Desktop</source>
-        <translation>Plocha</translation>
+        <translation type="vanished">Plocha</translation>
     </message>
 </context>
 <context>
@@ -159,12 +158,12 @@
 <context>
     <name>FilePropertiesDialog</name>
     <message>
-        <location filename="../dialogs/filepropertiesdialog.cpp" line="193"/>
+        <location filename="../filemanager/dialogs/filepropertiesdialog.cpp" line="193"/>
         <source>Properties</source>
         <translation>Vlastnosti</translation>
     </message>
     <message>
-        <location filename="../dialogs/filepropertiesdialog.cpp" line="246"/>
+        <location filename="../filemanager/dialogs/filepropertiesdialog.cpp" line="246"/>
         <source>%1 files</source>
         <translation>%1 souborů</translation>
     </message>
@@ -172,22 +171,22 @@
 <context>
     <name>FolderModel</name>
     <message>
-        <location filename="../model/foldermodel.cpp" line="284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="284"/>
         <source>%1 item</source>
         <translation>%1 položka</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="284"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="284"/>
         <source>%1 items</source>
         <translation>%1 položek</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="389"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="389"/>
         <source>The file or folder %1 does not exist.</source>
         <translation>Soubor nebo složka %1 neexistuje.</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1298"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1298"/>
         <source>Select All</source>
         <translation>Vybrat vše</translation>
     </message>
@@ -196,211 +195,211 @@
         <translation type="vanished">Správce souborů</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1957"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1957"/>
         <source>Open</source>
         <translation>Otevřít</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1961"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1961"/>
         <source>Open with</source>
         <translation>Otevřít s</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1965"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1965"/>
         <source>Cut</source>
         <translation>Vyjmout</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1969"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1969"/>
         <source>Copy</source>
         <translation>Zkopírovat</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1973"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1973"/>
         <source>Paste</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="888"/>
-        <location filename="../model/foldermodel.cpp" line="1977"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="888"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1977"/>
         <source>New Folder</source>
         <translation>Nová složka</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="910"/>
-        <location filename="../model/foldermodel.cpp" line="1984"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="910"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1984"/>
         <source>New Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1305"/>
-        <location filename="../model/foldermodel.cpp" line="1981"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1305"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1981"/>
         <source>New Documents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1449"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1449"/>
         <source>Compress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1420"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1420"/>
         <source>Extract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1424"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1424"/>
         <source>Extract Here</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1435"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1435"/>
         <source>Extract To...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1439"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1439"/>
         <source>Select Destination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1459"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1459"/>
         <source>ZIP Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1486"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1486"/>
         <source>TAR Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1472"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1472"/>
         <source>7-Zip Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1313"/>
-        <location filename="../model/foldermodel.cpp" line="2116"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1313"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2116"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1497"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1497"/>
         <source>TAR Archive (gzip)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1498"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1498"/>
         <source>TAR Archive (bzip2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1499"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1499"/>
         <source>TAR Archive (xz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1500"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1500"/>
         <source>TAR Archive (zstd)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1501"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1501"/>
         <source>TAR Archive (uncompressed)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1990"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1990"/>
         <source>Move To Trash</source>
         <translation>Přesunout do Koše</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1994"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1994"/>
         <source>Empty Trash</source>
         <translation>Vysypat Koš</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="1998"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1998"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2002"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2002"/>
         <source>Rename</source>
         <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2006"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2006"/>
         <source>Open in Terminal</source>
         <translation>Otevřít v Terminálu</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2010"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2010"/>
         <source>Set as ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2014"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2014"/>
         <source>Set as Wallpaper</source>
         <translation>Nastavit jako pozadí plochy</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2020"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2020"/>
         <source>Set as Login Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2026"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2026"/>
         <source>Properties</source>
         <translation>Vlastnosti</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2030"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2030"/>
         <source>Change background</source>
         <translation>Změnit pozadí</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2034"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2034"/>
         <source>Restore</source>
         <translation>Obnovit</translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2038"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2038"/>
         <source>Show hidden files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2044"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2044"/>
         <source>Open in new window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2048"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2048"/>
         <source>Icon Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2052"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2052"/>
         <source>Huge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2056"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2056"/>
         <source>Large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2060"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2060"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2064"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2064"/>
         <source>Small</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../model/foldermodel.cpp" line="2086"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2086"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -542,7 +541,7 @@
         <translation>Otevřít</translation>
     </message>
     <message>
-        <location filename="../dialogs/openwithdialog.cpp" line="32"/>
+        <location filename="../filemanager/dialogs/openwithdialog.cpp" line="32"/>
         <source>Open With</source>
         <translation>Otevřít s</translation>
     </message>
@@ -583,53 +582,53 @@
 <context>
     <name>PlacesModel</name>
     <message>
-        <location filename="../model/placesmodel.cpp" line="39"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="39"/>
         <source>Home</source>
         <translation>Domovská složka</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="47"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="47"/>
         <source>Desktop</source>
         <translation>Plocha</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="55"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="55"/>
         <source>Documents</source>
         <translation>Dokumenty</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="63"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="63"/>
         <source>Downloads</source>
         <translation>Stažené</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="71"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="71"/>
         <source>Music</source>
         <translation>Hudba</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="79"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="79"/>
         <source>Pictures</source>
         <translation>Obrázky</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="87"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="87"/>
         <source>Videos</source>
         <translation>Videa</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="93"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="93"/>
         <source>Trash</source>
         <translation>Koš</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="117"/>
-        <location filename="../model/placesmodel.cpp" line="288"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="117"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="288"/>
         <source>Drives</source>
         <translation>Ovladače</translation>
     </message>
     <message>
-        <location filename="../model/placesmodel.cpp" line="169"/>
+        <location filename="../filemanager/model/placesmodel.cpp" line="169"/>
         <source>Computer</source>
         <translation type="unfinished"></translation>
     </message>

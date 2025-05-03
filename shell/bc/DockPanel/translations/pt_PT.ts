@@ -36,21 +36,26 @@
         <source>Launcher</source>
         <translation>Lançador</translation>
     </message>
+    <message>
+        <location filename="../src/applicationmodel.cpp" line="369"/>
+        <source>Workspace</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="125"/>
+        <location filename="../qml/main.qml" line="119"/>
         <source>Trash</source>
         <translation>Lixo</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="160"/>
+        <location filename="../qml/main.qml" line="154"/>
         <source>Open</source>
         <translation>Abrir</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="165"/>
+        <location filename="../qml/main.qml" line="159"/>
         <source>Empty Trash</source>
         <translation>Esvaziar Lixo</translation>
     </message>
