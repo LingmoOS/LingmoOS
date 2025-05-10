@@ -17,9 +17,10 @@ TARGET_SUBDIR=""
 SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
-LINGMO_VERTYPE="beta"
+LINGMO_VERTYPE="rc10"
 LINGMO_SYS_VERSION="3.0.0"
-LINGMO_BUILD_VER=$(generate_build_ver)
+# LINGMO_BUILD_VER=$(generate_build_ver)
+LINGMO_BUILD_VER="build2555130.2501"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 
@@ -63,7 +64,7 @@ target_image_name() {
 	fi
 	if [ "$IMAGE_TYPE" = "live" ]; then
 		if [ "$LINGMO_VARIANT" = "default" ]; then
-			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$LINGMO_VERTYPE$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
+			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$LINGMO_VERTYPE-$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
 		else
 			echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}lingmo-os-$LINGMO_SYS_VERSION-$LINGMO_VERTYPE$LINGMO_BUILD_VER-desktop-$LINGMO_ARCH.$IMAGE_EXT"
 		fi
