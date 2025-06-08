@@ -212,6 +212,7 @@ public:
 
     Q_INVOKABLE void setWallpaperSelected();
     Q_INVOKABLE void setLoginWallpaperSelected();
+    Q_INVOKABLE void setWallpaperMenuSelected();
 
     Q_INVOKABLE void openContextMenu(QQuickItem *visualParent = nullptr, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
     Q_INVOKABLE void openPropertiesDialog();
@@ -264,6 +265,7 @@ signals:
 
     void currentIndexChanged();
     void changeIconSize(int size);
+    void changeSortMode(int sortmode);
 
 private slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

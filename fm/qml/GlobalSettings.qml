@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 LingmoOS Team.
+ * Copyright (C) 2025 Lingmo OS Team.
  *
- * Author:     revenmartin <revenmartin@gmail.com>
+ * Author:     Lingmo OS Team <team@lingmo.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,12 @@ Settings {
 
     // Name, Date, Size
     property int orderBy: 0
-    property int sortMode: 0
+    property int sortMode: 1
+    readonly property int sortModeNone: -1
+    readonly property int sortModeName: 0
+    readonly property int sortModeType: 1
+    readonly property int sortModeModified: 2
+    readonly property int sortModeSize: 3
 
     // UI
     property int width: 900

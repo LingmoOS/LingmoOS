@@ -37,7 +37,7 @@
         <translation>应用启动器</translation>
     </message>
     <message>
-        <location filename="../src/applicationmodel.cpp" line="369"/>
+        <location filename="../src/applicationmodel.cpp" line="370"/>
         <source>Workspace</source>
         <translation>工作区</translation>
     </message>

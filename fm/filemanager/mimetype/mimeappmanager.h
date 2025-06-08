@@ -49,8 +49,11 @@ public:
 
     QStringList getRecommendedAppsByFilePath(const QString &filePath);
     QStringList getRecommendedAppsByMimeType(const QMimeType &mimeType);
+    QStringList getAllAppsByFilePath(const QString &filePath);
+    QStringList getAllAppsByMimeType(const QMimeType &mimeType);
 
     Q_INVOKABLE QVariantList recommendedApps(const QUrl &url);
+    Q_INVOKABLE QVariantList allApps(const QUrl &url);
 
     Q_INVOKABLE void launchTerminal(const QString &path);
 
@@ -59,6 +62,7 @@ private slots:
 
 private:
     QStringList m_desktopFiles;
+    QStringList m_allApps;
     QMap<QString, QStringList> m_mimeApps;
 
     QMap<QString, XdgDesktopFile> m_videoMimeApps;

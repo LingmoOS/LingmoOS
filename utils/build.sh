@@ -17,10 +17,10 @@ TARGET_SUBDIR=""
 SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
-LINGMO_VERTYPE="rc10"
+LINGMO_VERTYPE="stable"
 LINGMO_SYS_VERSION="3.0.0"
 # LINGMO_BUILD_VER=$(generate_build_ver)
-LINGMO_BUILD_VER="build2555130.2501"
+LINGMO_BUILD_VER="build2568220.2502"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 

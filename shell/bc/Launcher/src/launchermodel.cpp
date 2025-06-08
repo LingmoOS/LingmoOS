@@ -62,7 +62,16 @@ LauncherModel::LauncherModel(QObject *parent)
 
     QtConcurrent::run(LauncherModel::refresh, this);
 
-    m_fileWatcher->addPath("/usr/share/applications");
+    // 添加监控的路径
+    QStringList directoriesToWatch = {
+        "/usr/share/applications",
+        "/var/lib/flatpak/exports/share/applications"
+    };
+
+    for (const QString& dir : directoriesToWatch) {
+        m_fileWatcher->addPath(dir);
+    }
+
     connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this, &LauncherModel::onFileChanged);
     connect(m_fileWatcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &) {
         QtConcurrent::run(LauncherModel::refresh, this);

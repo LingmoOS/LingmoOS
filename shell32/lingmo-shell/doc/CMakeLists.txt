@@ -1,0 +1,4 @@
+ecm_optional_add_subdirectory(kcontrol)
+ecm_optional_add_subdirectory(kfontview)
+ecm_optional_add_subdirectory(plasma-desktop)
+ecm_optional_add_subdirectory(knetattach)

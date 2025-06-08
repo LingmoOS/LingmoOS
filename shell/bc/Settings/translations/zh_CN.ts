@@ -1103,6 +1103,66 @@
         <source>Update</source>
         <translation>更新</translation>
     </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="11"/>
+        <source>Work Space</source>
+        <translation>工作区</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="30"/>
+        <source>Workspace Behavior</source>
+        <translation>工作区行为</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="46"/>
+        <source>Screen edge</source>
+        <translation>屏幕边缘</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="102"/>
+        <source>Task Switcher</source>
+        <translation>任务切换器</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="130"/>
+        <source>Font Manager</source>
+        <translation>字体管理</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="158"/>
+        <source>File Associations</source>
+        <translation>文件关联</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="178"/>
+        <source>Global Search</source>
+        <translation>全局搜索</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="194"/>
+        <source>File Search</source>
+        <translation>文件搜索</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="222"/>
+        <source>Web search keywords</source>
+        <translation>网页搜索关键词</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="242"/>
+        <source>Hardware</source>
+        <translation>硬件</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="258"/>
+        <source>Keyboard</source>
+        <translation>键盘</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="74"/>
+        <source>Display Effects Compositor</source>
+        <translation>显示效果合成器</translation>
+    </message>
 </context>
 <context>
     <name>NewNetworkDialog</name>
@@ -1241,6 +1301,11 @@
         <translation>外观</translation>
     </message>
     <message>
+        <location filename="../src/qml/SideBar.qml" line="262"/>
+        <source>Work Space</source>
+        <translation type="unfinished">工作区</translation>
+    </message>
+    <message>
         <location filename="../src/qml/SideBar.qml" line="165"/>
         <source>Mouse</source>
         <translation>鼠标</translation>
@@ -1289,6 +1354,11 @@
         <location filename="../src/qml/SideBar.qml" line="240"/>
         <source>System</source>
         <translation>系统</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/SideBar.qml" line="268"/>
+        <source>Advanced Settings</source>
+        <translation>高级设置</translation>
     </message>
     <message>
         <location filename="../src/qml/SideBar.qml" line="145"/>

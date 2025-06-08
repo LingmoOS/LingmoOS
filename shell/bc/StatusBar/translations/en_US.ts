@@ -47,32 +47,32 @@
 <context>
     <name>ControlCenter</name>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="244"/>
+        <location filename="../qml/ControlCenter.qml" line="245"/>
         <source>Wi-Fi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="173"/>
+        <location filename="../qml/ControlCenter.qml" line="174"/>
         <source>Control Center</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="259"/>
+        <location filename="../qml/ControlCenter.qml" line="260"/>
         <source>Bluetooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="275"/>
+        <location filename="../qml/ControlCenter.qml" line="276"/>
         <source>Dark Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="285"/>
+        <location filename="../qml/ControlCenter.qml" line="293"/>
         <source>Do Not Disturb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="295"/>
+        <location filename="../qml/ControlCenter.qml" line="303"/>
         <source>Screenshot</source>
         <translation type="unfinished"></translation>
     </message>
@@ -115,6 +115,11 @@
     <message>
         <location filename="../qml/main.qml" line="306"/>
         <source>is using the camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="329"/>
+        <source>is capturing screen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

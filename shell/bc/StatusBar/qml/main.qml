@@ -344,6 +344,56 @@ Item {
         }
 
         StandardItem {
+            id: showDesktopItem
+            // checked: controlCenter.item.visible
+            animationEnabled: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: sIcon.implicitWidth + LingmoUI.Units.largeSpacing
+
+            onClicked: {
+                process.startDetached("qdbus", ["org.kde.kglobalaccel", "/component/kwin", "invokeShortcut", "Show Desktop"])
+            }
+
+            Image {
+                id: sIcon
+                anchors.centerIn: parent
+                width: rootItem.iconSize
+                height: width
+                sourceSize: Qt.size(width, height)
+                source: "qrc:/images/" + (rootItem.darkMode ? "dark/" : "light/") + "computer.svg"
+                asynchronous: true
+                Layout.alignment: Qt.AlignCenter
+                antialiasing: true
+                smooth: false
+            }
+        }
+
+        StandardItem {
+            id: searchItem
+            // checked: controlCenter.item.visible
+            animationEnabled: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: searchforIcon.implicitWidth + LingmoUI.Units.largeSpacing
+
+            onClicked: {
+                process.startDetached("qdbus", ["org.kde.krunner", "/App", "org.kde.krunner.App.display"])
+            }
+
+            Image {
+                id: searchforIcon
+                anchors.centerIn: parent
+                width: rootItem.iconSize
+                height: width
+                sourceSize: Qt.size(width, height)
+                source: "qrc:/images/" + (rootItem.darkMode ? "dark/" : "light/") + "search.svg"
+                asynchronous: true
+                Layout.alignment: Qt.AlignCenter
+                antialiasing: true
+                smooth: false
+            }
+        }
+
+        StandardItem {
             id: controler
 
             checked: controlCenter.item.visible
@@ -455,20 +505,20 @@ Item {
         //     }
         // }
 
-        // Pop-up notification center and calendar
         StandardItem {
-            id: datetimeItem
+            id: notificationItem
 
             animationEnabled: true
             Layout.fillHeight: true
-            Layout.preferredWidth: _dateTimeLayout.implicitWidth + LingmoUI.Units.smallSpacing
+            Layout.preferredWidth: _notificationLayout.implicitWidth + LingmoUI.Units.smallSpacing
+            // checked: dateTime.item.visible
 
             onClicked: {
                 process.startDetached("lingmo-notificationd", ["-s"])
             }
 
             RowLayout {
-                id: _dateTimeLayout
+                id: _notificationLayout
                 anchors.fill: parent
 
                Image {
@@ -481,6 +531,50 @@ Item {
                    antialiasing: true
                    smooth: false
                }
+            }
+        }
+
+        // Pop-up notification center and calendar
+        StandardItem {
+            id: datetimeItem
+
+            animationEnabled: true
+            Layout.fillHeight: true
+            Layout.preferredWidth: _dateTimeLayout.implicitWidth + LingmoUI.Units.smallSpacing
+            checked: dateTime.item.visible
+
+            // onClicked: {
+            //     process.startDetached("lingmo-notificationd", ["-s"])
+            // }
+            onClicked: {
+                toggleDateDialog()
+            }
+
+            function toggleDateDialog() {
+                if (dateTime.item.visible)
+                    dateTime.item.close()
+                else {
+                    // 先初始化，用户可能会通过Alt鼠标左键移动位置
+                    dateTime.item.position = Qt.point(0, 0)
+                    dateTime.item.position = mapToGlobal(0, 0)
+                    dateTime.item.open()
+                }
+            }
+
+            RowLayout {
+                id: _dateTimeLayout
+                anchors.fill: parent
+
+            //    Image {
+            //        width: rootItem.iconSize
+            //        height: width
+            //        sourceSize: Qt.size(width, height)
+            //        source: "qrc:/images/" + (rootItem.darkMode ? "dark/" : "light/") + "notification-symbolic.svg"
+            //        asynchronous: true
+            //        Layout.alignment: Qt.AlignCenter
+            //        antialiasing: true
+            //        smooth: false
+            //    }
 
                 Label {
                     id: timeLabel
@@ -554,6 +648,12 @@ Item {
     Loader {
         id: controlCenter
         sourceComponent: ControlCenter {}
+        asynchronous: true
+    }
+
+    Loader {
+        id: dateTime
+        sourceComponent: DateTime {}
         asynchronous: true
     }
 

@@ -52,7 +52,7 @@ LingmoUI.Window {
         close.accepted = true
     }
 
-    // background.opacity: LingmoUI.Theme.darkMode ? 0.9 : 0.8
+    background.opacity: LingmoUI.Theme.darkMode ? 0.9 : 0.8
 
     LingmoUI.WindowBlur {
         view: rootWindow

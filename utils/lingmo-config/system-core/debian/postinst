@@ -6,15 +6,15 @@ echo "*[update] system"
 rm -f /usr/lib/os-release
 
 cat << EOF > /usr/lib/os-release
-PRETTY_NAME="Lingmo OS 3.0.0-rc.10 (Helium)"
+PRETTY_NAME="Lingmo OS 3.0.0 (Helium)"
 NAME="Lingmo OS"
-RELEASE="Beta"
-BUILD_ID="2555130.2501"
+RELEASE="release"
+BUILD_ID="2568220.2502"
 VERSION_ID="3.0.0"
 VERSION="3.0.0 (Helium)"
 VERSION_CODENAME=helium
-VERSION_BUILD="2555130.2501+build"
-VERSION_TYPE="unstable"
+VERSION_BUILD="2568220.2502+build"
+VERSION_TYPE="stable"
 ID=lingmo
 ID_LIKE=debian
 HOME_URL="https://lingmo.org"
@@ -28,3 +28,19 @@ ln -s /usr/lib/os-release /etc/os-release
 
 echo "*[clean]"
 rm -f /usr/system/*.xz
+
+SOURCE_DIR="/System/updates"
+
+# 遍历 /home 下的所有用户目录
+for user_home in /home/*; do
+    if [ -d "$user_home" ]; then
+        # 获取用户家目录
+        TARGET_HOME="$user_home"
+
+        echo $TARGET_HOME
+
+        # 复制文件
+        cp -r "$SOURCE_DIR"/config/* "$TARGET_HOME/.config/"
+        cp -r "$SOURCE_DIR"/system_target.img "$TARGET_HOME/.config/"
+    fi
+done

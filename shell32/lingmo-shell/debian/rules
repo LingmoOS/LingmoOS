@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+l10npkgs_firstversion_ok := 4:17.08.3-3~
+include /usr/share/pkg-kde-tools/qt-kde-team/2/l10n-packages.mk
+
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ifneq (,$(filter $(DEB_HOST_ARCH), armel armhf mips mipsel))
+    export DEB_CFLAGS_MAINT_STRIP = -g
+    export DEB_CXXFLAGS_MAINT_STRIP = -g
+    export DEB_CFLAGS_MAINT_APPEND = -gstabs
+    export DEB_CXXFLAGS_MAINT_APPEND = -gstabs
+endif
+
+%:
+	dh $@ --with kf5,pkgkde_symbolshelper,sodeps --buildsystem kf5 --without build_stamp
+
+override_dh_auto_configure:
+	dh_auto_configure -Skf5 -- -DBUILD_TESTING=OFF
+
+override_dh_auto_test:
+	# Disable dh_auto_test, fourth test never ends
+	# xvfb-run -a dh_auto_test
+	:
+
+override_dh_gencontrol-indep: l10npkgs_firstversion_ok
+	dh_gencontrol -i

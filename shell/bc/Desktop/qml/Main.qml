@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
@@ -25,11 +25,11 @@ import QtGraphicalEffects 1.0
 
 import Lingmo.FileManager 1.0 as FM
 import LingmoUI 1.0 as LingmoUI
-import "./"
+import "../"
 
 Item {
     id: rootItem
-    opacity: 0.99
+
     LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
@@ -45,17 +45,22 @@ Item {
         id: dirModel
         url: desktopPath()
         isDesktop: true
-        sortMode: -1
+        sortMode: globalSettings.sortMode
         viewAdapter: viewAdapter
 
         onCurrentIndexChanged: {
             _folderView.currentIndex = dirModel.currentIndex
         }
 
-        // onChangeIconSize: {
-        //     _folderView.iconSize = size
-        //     globalSettings.desktopIconSize = size
-        // }
+        onChangeIconSize: {
+            _folderView.iconSize = size
+            globalSettings.desktopIconSize = size
+        }
+
+        onChangeSortMode: {
+            dirModel.sortMode = sortmode
+            globalSettings.sortMode = sortmode
+        }
     }
 
     FM.ItemViewAdapter {
@@ -100,10 +105,6 @@ Item {
 
         delegate: FolderGridItem {}
 
-        // onIconSizeChanged: {
-        //     globalSettings.desktopIconSize = _folderView.iconSize
-        // }
-
         onActiveFocusChanged: {
             if (!activeFocus) {
                 _folderView.cancelRename()
@@ -122,6 +123,31 @@ Item {
                 iconSize = newSize
                 cellWidth = newSize + 32
                 cellHeight = newSize + 48
+            }
+            function onChangeSortMode(sortmode) {
+                switch (sortmode) {
+                    case sortModeName:
+                        // 按文件名排序
+                        console.log("Sorting by name")
+                        break;
+                    case sortModeType:
+                        // 按文件类型排序
+                        console.log("Sorting by type")
+                        break;
+                    case sortModeModified:
+                        // 按修改时间排序
+                        console.log("Sorting by modified time")
+                        break;
+                    case sortModeSize:
+                        // 按文件大小排序
+                        console.log("Sorting by size")
+                        break;
+                    default:
+                        // 默认排序
+                        console.log("Using default sorting")
+                        break;
+                }
+                sortMode = sortmode
             }
         }
     }
@@ -156,6 +182,9 @@ Item {
         }
         onDeleteFile: {
             dirModel.keyDeletePress()
+        }
+        onDeleteFileForever: {
+            dirModel.keyDeleteForever()
         }
         onKeyPressed: {
             dirModel.keyboardSearch(text)

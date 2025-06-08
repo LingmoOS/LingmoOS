@@ -1,22 +1,3 @@
-/*
- * Copyright (C) 2021 LingmoOS Team.
- *
- * Author:     Reion Wong <reionwong@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import QtQuick 2.12
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
@@ -43,6 +24,12 @@ Item {
             listView.model.append(items[i])
         }
 
+        // 获取所有程序并添加到 allAppsModel
+        var allApps = mimeAppManager.allApps(control.url)
+        for (var j in allApps) {
+            allAppsModel.append(allApps[j])
+        }
+
         defaultCheckBox.checked = false
         doneButton.focus = true
     }
@@ -52,6 +39,14 @@ Item {
             mimeAppManager.setDefaultAppForFile(control.url, listView.model.get(listView.currentIndex).desktopFile)
 
         launcher.launchApp(listView.model.get(listView.currentIndex).desktopFile, control.url)
+        main.close()
+    }
+
+    function openOtherApp() {
+        if (defaultCheckBox.checked)
+            mimeAppManager.setDefaultAppForFile(control.url, allAppsGridView.model.get(allAppsGridView.currentIndex).desktopFile)
+
+        launcher.launchApp(allAppsGridView.model.get(allAppsGridView.currentIndex).desktopFile, control.url)
         main.close()
     }
 
@@ -148,6 +143,90 @@ Item {
                     }
                 }
             }
+            visible: !showOtherApps
+        }
+
+        // 添加显示所有程序的 GridView
+        GridView {
+            id: allAppsGridView
+            Layout.fillWidth: true
+            Layout.preferredHeight: 250
+            model: allAppsModel
+            clip: true
+            ScrollBar.vertical: ScrollBar {}
+
+            leftMargin: LingmoUI.Units.smallSpacing
+            rightMargin: LingmoUI.Units.smallSpacing
+
+            cellHeight: {
+                var extraHeight = calcExtraSpacing(80, allAppsGridView.Layout.preferredHeight - topMargin - bottomMargin)
+                return 80 + extraHeight
+            }
+
+            cellWidth: {
+                var extraWidth = calcExtraSpacing(120, allAppsGridView.width - leftMargin - rightMargin)
+                return 120 + extraWidth
+            }
+
+            delegate: Item {
+                id: allAppsItem
+                width: GridView.view.cellWidth
+                height: GridView.view.cellHeight
+                scale: mouseArea.pressed ? 0.95 : 1.0
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
+
+                property bool isSelected: allAppsGridView.currentIndex === index
+
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    acceptedButtons: Qt.LeftButton
+                    onDoubleClicked: control.openOtherApp()
+                    onClicked: allAppsGridView.currentIndex = index
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: LingmoUI.Units.smallSpacing
+                    radius: LingmoUI.Theme.mediumRadius
+                    color: isSelected ? LingmoUI.Theme.highlightColor
+                                      : mouseArea.containsMouse ? Qt.rgba(LingmoUI.Theme.textColor.r,
+                                                                          LingmoUI.Theme.textColor.g,
+                                                                          LingmoUI.Theme.textColor.b,
+                                                                          0.1) : "transparent"
+                    smooth: true
+                }
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: LingmoUI.Units.smallSpacing
+                    spacing: LingmoUI.Units.smallSpacing
+
+                    LingmoUI.IconItem {
+                        id: icon
+                        Layout.preferredHeight: 36
+                        Layout.preferredWidth: height
+                        source: model.icon
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+
+                    Label {
+                        text: model.name
+                        Layout.fillWidth: true
+                        elide: Text.ElideMiddle
+                        Layout.alignment: Qt.AlignHCenter
+                        horizontalAlignment: Qt.AlignHCenter
+                        color: isSelected ? LingmoUI.Theme.highlightedTextColor : LingmoUI.Theme.textColor
+                    }
+                }
+            }
+            visible: showOtherApps
         }
 
         CheckBox {
@@ -181,8 +260,29 @@ Item {
                 enabled: listView.count > 0
                 Layout.fillWidth: true
                 onClicked: control.openApp()
+                visible: !showOtherApps
             }
 
+            Button {
+                id: doneOtherButton
+                focus: true
+                flat: true
+                text: qsTr("Open")
+                enabled: listView.count > 0
+                Layout.fillWidth: true
+                onClicked: control.openOtherApp()
+                visible: showOtherApps
+            }
+
+            Switch {
+                id: showOtherAppsSwitch
+                text: qsTr("Show All Apps")
+                checked: showOtherApps
+                Layout.fillHeight: true
+                onCheckedChanged: {
+                    showOtherApps = checked
+                }
+            }
         }
     }
 
@@ -196,4 +296,17 @@ Item {
         }
         return Math.floor(extraSpacing)
     }
+
+    // 定义一个模型用于存储所有程序
+    ListModel {
+        id: allAppsModel
+    }
+
+    // 控制其他应用程序的显示与隐藏
+    property bool showOtherApps: false
+
+    // onShowOtherAppsChanged: {
+    //     otherAppsLabel.visible = showOtherApps
+    //     allAppsGridView.visible = showOtherApps
+    // }
 }

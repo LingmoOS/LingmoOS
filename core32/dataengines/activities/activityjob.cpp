@@ -75,7 +75,7 @@ void ActivityJob::start()
         return;
     }
     if (operation == QLatin1String("toggleActivityManager")) {
-        QDBusMessage message = QDBusMessage::createMethodCall(QStringLiteral("org.lingmo.lingmoshell"),
+        QDBusMessage message = QDBusMessage::createMethodCall(QStringLiteral("org.kde.plasmashell"),
                                                               QStringLiteral("/PlasmaShell"),
                                                               QStringLiteral("org.kde.PlasmaShell"),
                                                               QStringLiteral("toggleActivityManager"));

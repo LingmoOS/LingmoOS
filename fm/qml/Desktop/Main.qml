@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2021 LingmoOS Team.
+ * Copyright (C) 2025 Lingmo OS Team.
  *
- * Author:     revenmartin <revenmartin@gmail.com>
+ * Author:     Lingmo OS Team <team@lingmo.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ Item {
         id: dirModel
         url: desktopPath()
         isDesktop: true
-        sortMode: -1
+        sortMode: globalSettings.sortMode
         viewAdapter: viewAdapter
 
         onCurrentIndexChanged: {
@@ -55,6 +55,11 @@ Item {
         onChangeIconSize: {
             _folderView.iconSize = size
             globalSettings.desktopIconSize = size
+        }
+
+        onChangeSortMode: {
+            dirModel.sortMode = sortmode
+            globalSettings.sortMode = sortmode
         }
     }
 
@@ -118,6 +123,31 @@ Item {
                 iconSize = newSize
                 cellWidth = newSize + 32
                 cellHeight = newSize + 48
+            }
+            function onChangeSortMode(sortmode) {
+                switch (sortmode) {
+                    case sortModeName:
+                        // 按文件名排序
+                        console.log("Sorting by name")
+                        break;
+                    case sortModeType:
+                        // 按文件类型排序
+                        console.log("Sorting by type")
+                        break;
+                    case sortModeModified:
+                        // 按修改时间排序
+                        console.log("Sorting by modified time")
+                        break;
+                    case sortModeSize:
+                        // 按文件大小排序
+                        console.log("Sorting by size")
+                        break;
+                    default:
+                        // 默认排序
+                        console.log("Using default sorting")
+                        break;
+                }
+                sortMode = sortmode
             }
         }
     }

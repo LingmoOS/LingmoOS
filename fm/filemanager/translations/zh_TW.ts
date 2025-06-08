@@ -562,6 +562,7 @@
     </message>
     <message>
         <location filename="../qml/OptionsMenu.qml" line="165"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2110"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>

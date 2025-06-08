@@ -1889,35 +1889,6 @@ Plasma::Containment *ShellCorona::setContainmentTypeForScreen(int screen, const 
 
 void ShellCorona::checkAddPanelAction()
 {
-    delete m_addPanelAction;
-    m_addPanelAction = nullptr;
-
-    m_addPanelsMenu.reset(nullptr);
-
-    const QList<KPluginMetaData> panelContainmentPlugins = Plasma::PluginLoader::listContainmentsMetaDataOfType(QStringLiteral("Panel"));
-
-    auto filter = [](const KPluginMetaData &md) -> bool {
-        return !md.rawData().value(QStringLiteral("NoDisplay")).toBool()
-            && md.value(QStringLiteral("X-Plasma-ContainmentCategories"), QStringList()).contains(QLatin1String("panel"));
-    };
-    QList<KPluginMetaData> templates = KPackage::PackageLoader::self()->findPackages(QStringLiteral("Plasma/LayoutTemplate"), QString(), filter);
-
-    if (panelContainmentPlugins.count() + templates.count() == 1) {
-        m_addPanelAction = new QAction(this);
-        connect(m_addPanelAction, &QAction::triggered, this, qOverload<>(&ShellCorona::addPanel));
-    } else if (!panelContainmentPlugins.isEmpty()) {
-        m_addPanelAction = new QAction(this);
-        m_addPanelsMenu.reset(new QMenu);
-        m_addPanelAction->setMenu(m_addPanelsMenu.get());
-        connect(m_addPanelsMenu.get(), &QMenu::aboutToShow, this, &ShellCorona::populateAddPanelsMenu);
-        connect(m_addPanelsMenu.get(), &QMenu::triggered, this, qOverload<QAction *>(&ShellCorona::addPanel));
-    }
-
-    if (m_addPanelAction) {
-        m_addPanelAction->setText(i18n("Add Panel"));
-        m_addPanelAction->setIcon(QIcon::fromTheme(QStringLiteral("list-add")));
-        actions()->addAction(QStringLiteral("add panel"), m_addPanelAction);
-    }
 }
 
 void ShellCorona::populateAddPanelsMenu()

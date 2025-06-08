@@ -28,7 +28,12 @@ Settings {
 
     // Name, Date, Size
     property int orderBy: 0
-    property int sortMode: 0
+    property int sortMode: 1
+    readonly property int sortModeNone: -1
+    readonly property int sortModeName: 0
+    readonly property int sortModeType: 1
+    readonly property int sortModeModified: 2
+    readonly property int sortModeSize: 3
 
     // UI
     property int width: 900

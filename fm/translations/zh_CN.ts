@@ -195,176 +195,201 @@
         <translation type="vanished">文件管理器</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1969"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1972"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1973"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1976"/>
         <source>Open with</source>
         <translation>打开方式</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1977"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1980"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1981"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1984"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1985"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1988"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="900"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1989"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1992"/>
         <source>New Folder</source>
         <translation>新建文件夹</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="922"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1996"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1999"/>
         <source>New Text</source>
         <translation>新建文本</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="1317"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1993"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1996"/>
         <source>New Documents</source>
         <translation>新建文档</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1436"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1439"/>
         <source>Extract Here</source>
         <translation>解压到此处</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1447"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1450"/>
         <source>Extract To...</source>
         <translation>解压到...</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1451"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1454"/>
         <source>Select Destination</source>
         <translation>选择目标位置</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1471"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1474"/>
         <source>ZIP Archive</source>
         <translation>ZIP 压缩包</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1498"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1501"/>
         <source>TAR Archive</source>
         <translation>TAR 压缩包</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1484"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1487"/>
         <source>7-Zip Archive</source>
         <translation>7-Zip 压缩包</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="1325"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2128"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2168"/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1509"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1512"/>
         <source>TAR Archive (gzip)</source>
         <translation>TAR 压缩包 (gzip)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1510"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1513"/>
         <source>TAR Archive (bzip2)</source>
         <translation>TAR 压缩包 (bzip2)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1511"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1514"/>
         <source>TAR Archive (xz)</source>
         <translation>TAR 压缩包 (xz)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1512"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1515"/>
         <source>TAR Archive (zstd)</source>
         <translation>TAR 压缩包 (zstd)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1513"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1516"/>
         <source>TAR Archive (uncompressed)</source>
         <translation>TAR 压缩包 (未压缩)</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2002"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2005"/>
         <source>Move To Trash</source>
         <translation>移动到回收站</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2006"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2009"/>
         <source>Empty Trash</source>
         <translation>清空回收站</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2010"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2013"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2014"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2017"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2018"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2021"/>
         <source>Open in Terminal</source>
         <translation>在终端中打开</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2022"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2025"/>
         <source>Set as ...</source>
         <translation>设为...</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2026"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2029"/>
         <source>Set as Wallpaper</source>
         <translation>设置为壁纸</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2032"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2035"/>
         <source>Set as Login Screen</source>
         <translation>设置为登陆屏幕壁纸</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2038"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2041"/>
         <source>Properties</source>
         <translation>属性</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2042"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2045"/>
         <source>Change background</source>
         <translation>更改桌面背景</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2046"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2049"/>
         <source>Restore</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2050"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2053"/>
         <source>Show hidden files</source>
         <translation>显示隐藏文件</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2056"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2059"/>
         <source>Open in new window</source>
         <translation>在新窗口中打开</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2098"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2101"/>
+        <source>Sort by</source>
+        <translation>排序方式</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2105"/>
+        <source>Name</source>
+        <translation type="unfinished">名称</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2108"/>
+        <source>Type</source>
+        <translation type="unfinished">类型</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2111"/>
+        <source>Date</source>
+        <translation type="unfinished">日期</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2114"/>
+        <source>Size</source>
+        <translation type="unfinished">大小</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2138"/>
         <source>View</source>
         <translation>查看</translation>
     </message>
@@ -373,27 +398,27 @@
         <translation type="obsolete">取消</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2060"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2063"/>
         <source>Icon Size</source>
         <translation>图标大小</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2064"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2067"/>
         <source>Huge</source>
         <translation>超大</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2068"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2071"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2072"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2075"/>
         <source>Normal</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2076"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2079"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
@@ -402,12 +427,12 @@
         <translation type="vanished">自动排列</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1461"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1464"/>
         <source>Compress</source>
         <translation>压缩</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1432"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1435"/>
         <source>Extract</source>
         <translation>解压缩</translation>
     </message>
@@ -525,22 +550,28 @@
 <context>
     <name>OpenWithDialog</name>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="89"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="84"/>
         <source>No applications</source>
         <translation>没有应用程序</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="156"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="235"/>
         <source>Set as default</source>
         <translation>设置为默认</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="171"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="250"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="180"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="279"/>
+        <source>Show All Apps</source>
+        <translation>显示所有程序</translation>
+    </message>
+    <message>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="259"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="270"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>

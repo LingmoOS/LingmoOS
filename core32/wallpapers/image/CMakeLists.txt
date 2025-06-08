@@ -20,6 +20,8 @@ plasma_install_package(imagepackage org.kde.image wallpapers wallpaper)
 plasma_install_package(slideshowpackage org.kde.slideshow wallpapers wallpaper)
 
 configure_file(setaswallpaper.desktop.in setaswallpaper.desktop)
+configure_file(setassplash.desktop.in setassplash.desktop)
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setaswallpaper.desktop DESTINATION ${KDE_INSTALL_DATADIR}/kio/servicemenus)
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setassplash.desktop DESTINATION ${KDE_INSTALL_DATADIR}/kio/servicemenus)
 
 install(DIRECTORY imagepackage/contents/ui DESTINATION ${PLASMA_DATA_INSTALL_DIR}/wallpapers/org.kde.slideshow/contents PATTERN .svn EXCLUDE PATTERN CMakeLists.txt EXCLUDE PATTERN Messages.sh EXCLUDE)

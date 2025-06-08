@@ -173,7 +173,7 @@ Item {
             background: Rectangle {
                 color: LingmoUI.Theme.darkMode ? "#B6B6B6" : "white"
                 opacity: stBtn.pressed ? 0.3 : stBtn.hovered ? 0.2 : 0.3
-                radius: 100
+                radius: 20
             }
 
             contentItem: Text {

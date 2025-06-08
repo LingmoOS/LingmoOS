@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+config-opt := -DUSE_FLATPAK_ICON=OFF -DENABLE_XDGAUTOSTART=OFF
+
+ifneq (linux,$(DEB_HOST_ARCH_OS))
+config-opt += -DUSE_SYSTEMD=OFF -DENABLE_WAYLAND=OFF
+endif
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(config-opt)
+
+override_dh_auto_test:
+	# DBus-related tests can't run in parallel
+	dh_auto_test --no-parallel

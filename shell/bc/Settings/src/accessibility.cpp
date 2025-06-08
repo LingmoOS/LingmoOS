@@ -120,5 +120,5 @@ void Accessibility::setDiminactive(bool enabled)
 
 void Accessibility::openHotkeysSettings()
 {
-    QProcess::startDetached("lingmo-control-panel", QStringList() << "kcm_hotkeys");
+    QProcess::startDetached("kcmshell5", QStringList() << "kcm_keys");
 }

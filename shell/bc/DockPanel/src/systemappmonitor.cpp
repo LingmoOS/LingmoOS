@@ -24,8 +24,10 @@
 #include <QDirIterator>
 #include <QSettings>
 #include <QLocale>
+#include <QSettings>
 
 #define SystemApplicationsFolder "/usr/share/applications"
+#define FlatpakApplicationsFolder "/var/lib/flatpak/exports/share/applications"
 
 static SystemAppMonitor *SELF = nullptr;
 
@@ -51,9 +53,13 @@ SystemAppMonitor::SystemAppMonitor(QObject *parent)
     : QObject(parent)
 {
     QFileSystemWatcher *watcher = new QFileSystemWatcher(this);
-    watcher->addPath(SystemApplicationsFolder);
+    watcher->addPath(SystemApplicationsFolder);  // 添加 /usr/share/applications
+    watcher->addPath(FlatpakApplicationsFolder); // 添加 /var/lib/flatpak/exports/share/applications
+
     connect(watcher, &QFileSystemWatcher::directoryChanged, this, &SystemAppMonitor::refresh);
-    refresh();
+    connect(watcher, &QFileSystemWatcher::fileChanged, this, &SystemAppMonitor::refresh);
+
+    refresh(); // 初始刷新
 }
 
 SystemAppMonitor::~SystemAppMonitor()
@@ -78,15 +84,27 @@ void SystemAppMonitor::refresh()
         addedEntries.append(item->path);
 
     QStringList allEntries;
-    QDirIterator it(SystemApplicationsFolder, { "*.desktop" }, QDir::NoFilter, QDirIterator::Subdirectories);
 
-    while (it.hasNext()) {
-        const QString &filePath = it.next();
+    QSettings settings(QSettings::UserScope, "lingmoos", "dock");
+    QStringList directories = settings.value("appDirectories").toStringList();
 
-        if (!QFile::exists(filePath))
-            continue;
+    if (directories.isEmpty()) {
+        directories = QStringList{
+            "/usr/share/applications",
+            "/var/lib/flatpak/exports/share/applications"
+        };
+        settings.setValue("appDirectories", directories);
+    }
 
-        allEntries.append(filePath);
+    for (const QString &dir : directories) {
+        QDirIterator it(dir, { "*.desktop" }, QDir::NoFilter, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            const QString &filePath = it.next();
+            if (!QFile::exists(filePath))
+                continue;
+
+            allEntries.append(filePath);
+        }
     }
 
     for (const QString &filePath : allEntries) {

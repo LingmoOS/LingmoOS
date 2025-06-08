@@ -34,6 +34,9 @@ public Q_SLOTS:
     void startLogout();
     void configureDisplays();
 
+private slots:
+    void toggleHiddenFiles();
+
 private:
     QAction *m_openTerminalAction = nullptr;
     QAction *m_runCommandAction = nullptr;
@@ -43,6 +46,7 @@ private:
     QAction *m_separator1 = nullptr;
     QAction *m_separator2 = nullptr;
     QAction *m_separator3 = nullptr;
+    QAction *m_toggleHiddenFilesAction;
 
     // action name and whether it is enabled or not
     QHash<QString, bool> m_actions;

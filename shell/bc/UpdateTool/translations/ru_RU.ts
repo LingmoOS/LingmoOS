@@ -5,8 +5,8 @@
     <name>FinishedPage</name>
     <message>
         <location filename="../FinishedPage.qml" line="46"/>
-        <source>The update is complete and we recommend that you restart your computer.</source>
-        <translation type="unfinished">Обновление завершено, рекомендуется перезапустить ПК</translation>
+        <source>The update download has completed and you will need to restart your computer to install the updates.</source>
+        <translation>Загрузка обновления завершена, и для установки обновлений вам потребуется перезагрузить компьютер.</translation>
     </message>
     <message>
         <location filename="../FinishedPage.qml" line="53"/>
@@ -20,8 +20,8 @@
     </message>
     <message>
         <location filename="../FinishedPage.qml" line="72"/>
-        <source>Reboot</source>
-        <translation type="unfinished">Перезапуск</translation>
+        <source>Reboot and install updates</source>
+        <translation type="unfinished">Перезагрузите и установите обновления.</translation>
     </message>
 </context>
 <context>
@@ -69,8 +69,8 @@
     <name>UpdatingPage</name>
     <message>
         <location filename="../UpdatingPage.qml" line="43"/>
-        <source>Updating, This may take a long time, please be patient</source>
-        <translation type="unfinished">Это может занять много времени, пожалуйста, проявите терпение.</translation>
+        <source>The update is downloading. It may take a long time. Please be patient.</source>
+        <translation>Обновление загружается. Это может занять много времени. Пожалуйста, будьте терпеливы.</translation>
     </message>
 </context>
 <context>

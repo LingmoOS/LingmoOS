@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/> .
  */
 
 #include "mimeappmanager.h"
@@ -24,7 +24,6 @@
 #include <QDirIterator>
 #include <QUrl>
 #include <QDir>
-
 #include <QMimeDatabase>
 #include <QMimeType>
 #include <QSettings>
@@ -85,6 +84,7 @@ void MimeAppManager::initApplications()
 {
     m_desktopFiles.clear();
     m_desktopObjects.clear();
+    m_allApps.clear(); // 清空所有应用程序列表
 
     QMap<QString, QSet<QString>> mimeAppsSet;
 
@@ -103,6 +103,8 @@ void MimeAppManager::initApplications()
 
             m_desktopFiles.append(filePath);
             m_desktopObjects.insert(filePath, desktopFile);
+
+            
 
             // Load terminal
             QStringList categories = desktopFile.value("Categories").toString().split(";");
@@ -288,7 +290,7 @@ bool MimeAppManager::setDefaultAppForType(const QString &mimeType, const QString
 {
     Q_UNUSED(mimeType);
 
-    // ref: https://specifications.freedesktop.org/mime-apps-spec/1.0.1/ar01s03.html
+// ref: https://specifications.freedesktop.org/mime-apps-spec/1.0.1/ar01s03.html
 
     QString mimeappsFile = mimeAppsListFilePath();
     QString desktop = app;
@@ -351,6 +353,38 @@ bool MimeAppManager::setDefaultAppForFile(const QString &filePath, const QString
     profile->sync();
 
     return true;
+}
+
+QStringList MimeAppManager::getAllAppsByFilePath(const QString &filePath)
+{
+    return getAllAppsByMimeType(QMimeDatabase().mimeTypeForFile(filePath));
+}
+
+QStringList MimeAppManager::getAllAppsByMimeType(const QMimeType &mimeType)
+{
+    QStringList allApps;
+    QList<QMimeType> mimeTypeList;
+    QMimeDatabase mimeDatabase;
+
+    mimeTypeList.append(mimeType);
+
+    while (!mimeTypeList.isEmpty()) {
+        QList<QMimeType> newMimeTypeList;
+
+        for (const auto &entry : m_mimeApps) {
+            for (const QString &app : entry) {
+                if (!QFileInfo::exists(app)) {
+                    qWarning() << app << "not exist anymore";
+                    continue;
+                }
+                allApps.append(app); // 将应用程序添加到结果列表中
+            }
+        }
+
+        mimeTypeList = newMimeTypeList;
+    }
+
+    return allApps;
 }
 
 QStringList MimeAppManager::getRecommendedAppsByFilePath(const QString &filePath)
@@ -441,6 +475,31 @@ QVariantList MimeAppManager::recommendedApps(const QUrl &url)
     }
 
     return list;
+}
+
+QVariantList MimeAppManager::allApps(const QUrl &url)
+{
+    QVariantList applist;
+
+    if (url.isValid()) {
+        const QString &filePath = url.toString();
+
+        for (const QString &path : getAllAppsByFilePath(filePath)) {
+            XdgDesktopFile desktop(path);
+
+            if (!desktop.valid())
+                continue;
+
+            QVariantMap item;
+            item["icon"] = desktop.value("Icon").toString();
+            item["name"] = desktop.localeName();
+            item["desktopFile"] = path;
+
+            applist << item;
+        }
+    }
+
+    return applist;
 }
 
 void MimeAppManager::launchTerminal(const QString &path)

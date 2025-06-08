@@ -258,6 +258,15 @@ Item {
             category: qsTr("System & Update")
         }
 
+        ListElement {
+            title: qsTr("Work Space")
+            name: "workspace"
+            page: "qrc:/qml/WorkSpace/Main.qml"
+            // source: "notifications.svg"
+            iconSource: "defaultapps.svg"
+            iconColor: "#2277FF"
+            category: qsTr("Advanced Settings")
+        }
     }
 
     ColumnLayout {

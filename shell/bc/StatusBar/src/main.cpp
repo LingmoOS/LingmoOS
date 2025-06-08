@@ -23,6 +23,7 @@
 
 #include "statusbar.h"
 #include "controlcenterdialog.h"
+#include "datetimedialog.h"
 #include "systemtray/systemtraymodel.h"
 #include "appmenu/appmenumodel.h"
 #include "appmenu/appmenuapplet.h"
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
     const char *uri = "Lingmo.StatusBar";
     qmlRegisterType<SystemTrayModel>(uri, 1, 0, "SystemTrayModel");
     qmlRegisterType<ControlCenterDialog>(uri, 1, 0, "ControlCenterDialog");
+    qmlRegisterType<DateTimeDialog>(uri, 1, 0, "DateTimeDialog");
     qmlRegisterType<Appearance>(uri, 1, 0, "Appearance");
     qmlRegisterType<Brightness>(uri, 1, 0, "Brightness");
     qmlRegisterType<Battery>(uri, 1, 0, "Battery");

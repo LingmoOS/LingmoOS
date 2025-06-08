@@ -17,7 +17,7 @@ Presentation
         Image {
             id: background1
             source: "welcome.png"
-            fillMode: Image.PreserveAspectFit
+            fillMode: Image.PreserveAspectCover
             anchors.centerIn: parent
         }
 

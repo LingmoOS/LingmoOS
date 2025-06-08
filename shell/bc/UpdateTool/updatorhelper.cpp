@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 LingmoOS Team.
+ * Copyright (C) 2025 LingmoOS Team.
  *
  * Author:     Lingmo OS Team <team@lingmo.org>
  *
@@ -32,6 +32,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QLocale>
+#include <QProcess>
 
 const static QString s_dbusName = "com.lingmo.Session";
 const static QString s_pathName = "/Session";
@@ -254,11 +255,12 @@ void UpdatorHelper::upgrade()
 
 void UpdatorHelper::reboot()
 {
-    QDBusInterface iface(s_dbusName, s_pathName, s_interfaceName, QDBusConnection::sessionBus());
+    // QDBusInterface iface(s_dbusName, s_pathName, s_interfaceName, QDBusConnection::sessionBus());
 
-    if (iface.isValid()) {
-        iface.call("reboot");
-    }
+    // if (iface.isValid()) {
+    //     iface.call("reboot");
+    // }
+    QProcess::startDetached("pkexec", QStringList() << "/System/updates/update.sh");
 }
 
 QString UpdatorHelper::version()

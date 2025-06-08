@@ -37,7 +37,7 @@
         <translation>المُشَغِّل</translation>
     </message>
     <message>
-        <location filename="../src/applicationmodel.cpp" line="369"/>
+        <location filename="../src/applicationmodel.cpp" line="370"/>
         <source>Workspace</source>
         <translation type="unfinished"></translation>
     </message>

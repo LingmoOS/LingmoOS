@@ -21,6 +21,7 @@ set(SRCS
     src/main.cpp
     src/statusbar.cpp
     src/controlcenterdialog.cpp
+    src/datetimedialog.cpp
     src/brightness.cpp
     src/battery.cpp
     src/appearance.cpp

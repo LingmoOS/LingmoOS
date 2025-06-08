@@ -1,0 +1,33 @@
+From 0ad9576f29a3fcc41cec283ad13d3e654508ce1f Mon Sep 17 00:00:00 2001
+From: Fushan Wen <qydwhotmail@gmail.com>
+Date: Tue, 7 Mar 2023 22:34:03 +0800
+Subject: [PATCH] WindowThumbnail: postpone texture deletion to avoid crash
+
+The culprit was the texture that was delete as soon as the item was
+delete while they may be used a bit longer by the render thread.
+
+See also: https://github.com/sailfishos/sailfish-office/pull/85
+
+BUG: 464186
+BUG: 446874
+FIXED-IN: 5.104
+---
+ src/declarativeimports/core/windowthumbnail.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/declarativeimports/core/windowthumbnail.cpp b/src/declarativeimports/core/windowthumbnail.cpp
+index 6a08f3bc29..7b1e26dc80 100644
+--- a/src/declarativeimports/core/windowthumbnail.cpp
++++ b/src/declarativeimports/core/windowthumbnail.cpp
+@@ -233,7 +233,7 @@ void WindowThumbnail::releaseResources()
+ {
+     QQuickWindow::RenderStage m_renderStage = QQuickWindow::NoStage;
+     if (m_textureProvider) {
+-        window()->scheduleRenderJob(new DiscardTextureProviderRunnable(m_textureProvider), m_renderStage);
++        window()->scheduleRenderJob(new DiscardTextureProviderRunnable(m_textureProvider), QQuickWindow::AfterSynchronizingStage);
+         m_textureProvider = nullptr;
+     }
+ 
+-- 
+GitLab
+

@@ -41,14 +41,15 @@ Item {
             width: 64
             height: 64
             sourceSize: Qt.size(width, height)
-            source: "image://icontheme/" + (control.success ? "process-completed-symbolic" : "process-error-symbolic")
+            // source: "image://icontheme/" + (control.success ? "process-completed-symbolic" : "process-error-symbolic")
+            source: "image://icontheme/" + (control.success ? "computer" : "process-error-symbolic")
             Layout.alignment: Qt.AlignHCenter
         }
 
         Label {
             visible: success
             topPadding: LingmoUI.Units.largeSpacing
-            text: qsTr("The update is complete and we recommend that you restart your computer.")
+            text: qsTr("The update download has completed and you will need to restart your computer to install the updates.")
             Layout.alignment: Qt.AlignHCenter
         }
 
@@ -74,7 +75,7 @@ Item {
 
             Button {
                 visible: success
-                text: qsTr("Reboot")
+                text: qsTr("Reboot and install updates")
                 Layout.fillWidth: true
                 flat: true
                 onClicked: updator.reboot()

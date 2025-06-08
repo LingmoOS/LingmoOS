@@ -33,6 +33,8 @@ ContextMenu::ContextMenu(QObject *parent, const QVariantList &args)
     : Plasma::ContainmentActions(parent, args)
     , m_session(new SessionManagement(this))
 {
+    m_toggleHiddenFilesAction = new QAction(i18n("Toggle Hidden Files"), this);
+    connect(m_toggleHiddenFilesAction, &QAction::triggered, this, &ContextMenu::toggleHiddenFiles);
 }
 
 ContextMenu::~ContextMenu()
@@ -65,16 +67,17 @@ void ContextMenu::restore(const KConfigGroup &config)
                       << QStringLiteral("_context")
                       << QStringLiteral("_open_terminal")
                       << QStringLiteral("_run_command")
-                      << QStringLiteral("add widgets")
-                      << QStringLiteral("_add panel")
+                    //   << QStringLiteral("add widgets")
+                    //   << QStringLiteral("_add panel")
                       << QStringLiteral("manage activities")
                       << QStringLiteral("remove")
-                      << QStringLiteral("edit mode")
+                    //   << QStringLiteral("edit mode")
                       << QStringLiteral("_sep2")
                       << QStringLiteral("_lock_screen")
                       << QStringLiteral("_logout")
                       << QStringLiteral("_sep3")
                       << QStringLiteral("_wallpaper");
+        m_actionOrder << QStringLiteral("toggle_hidden_files");
         disabled.insert(QStringLiteral("configure shortcuts"));
         disabled.insert(QStringLiteral("_open_terminal"));
         disabled.insert(QStringLiteral("_run_command"));
@@ -83,6 +86,8 @@ void ContextMenu::restore(const KConfigGroup &config)
         disabled.insert(QStringLiteral("_logout"));
     }
     // clang-format on
+
+    actions.insert(QStringLiteral("toggle_hidden_files"), true);
 
     for (const QString &name : qAsConst(m_actionOrder)) {
         actions.insert(name, !disabled.contains(name));
@@ -179,10 +184,10 @@ QAction *ContextMenu::action(const QString &name)
         return m_separator2;
     } else if (name == QLatin1String("_sep3")) {
         return m_separator3;
-    } else if (name == QLatin1String("_add panel")) {
-        if (c->corona() && c->corona()->immutability() == Plasma::Types::Mutable) {
-            return c->corona()->actions()->action(QStringLiteral("add panel"));
-        }
+    // } else if (name == QLatin1String("_add panel")) {
+    //     if (c->corona() && c->corona()->immutability() == Plasma::Types::Mutable) {
+    //         return c->corona()->actions()->action(QStringLiteral("add panel"));
+    //     }
     } else if (name == QLatin1String("_run_command")) {
         if (KAuthorized::authorizeAction(QStringLiteral("run_command")) && KAuthorized::authorize(QStringLiteral("run_command"))) {
             return m_runCommandAction;
@@ -191,6 +196,8 @@ QAction *ContextMenu::action(const QString &name)
         if (KAuthorized::authorizeAction(QStringLiteral("shell_access"))) {
             return m_openTerminalAction;
         }
+    } else if (name == QLatin1String("toggle_hidden_files")) {
+        return m_toggleHiddenFilesAction;
     } else if (name == QLatin1String("_lock_screen")) {
         if (KAuthorized::authorizeAction(QStringLiteral("lock_screen"))) {
             return m_lockScreenAction;
@@ -203,10 +210,10 @@ QAction *ContextMenu::action(const QString &name)
         if (KAuthorized::authorizeControlModule(QStringLiteral("kcm_kscreen.desktop")) && KService::serviceByStorageId(QStringLiteral("kcm_kscreen"))) {
             return m_configureDisplaysAction;
         }
-    } else if (name == QLatin1String("edit mode")) {
-        if (c->corona()) {
-            return c->corona()->actions()->action(QStringLiteral("edit mode"));
-        }
+    // } else if (name == QLatin1String("edit mode")) {
+    //     if (c->corona()) {
+    //         return c->corona()->actions()->action(QStringLiteral("edit mode"));
+    //     }
     } else if (name == QLatin1String("manage activities")) {
         if (c->corona()) {
             // Don't show the action if there's only one activity since in this
@@ -229,9 +236,27 @@ void ContextMenu::openTerminal()
     if (!KAuthorized::authorizeAction(QStringLiteral("shell_access"))) {
         return;
     }
-    auto job = new KTerminalLauncherJob(QString());
-    job->setWorkingDirectory(QDir::homePath());
-    job->start();
+
+    QProcess::startDetached(QStringLiteral("lingmo-terminal"), QStringList(), QDir::homePath());
+    // auto job = new KTerminalLauncherJob(QString());
+    // job->setWorkingDirectory(QDir::homePath());
+    // job->start();
+}
+
+void ContextMenu::toggleHiddenFiles()
+{
+    // 获取当前桌面的文件管理器视图
+    Plasma::Containment *cont = containment();
+    if (!cont) {
+        return;
+    }
+
+    // 假设文件管理器视图有一个方法来切换显示隐藏文件
+    // 这里只是一个示例，具体实现可能需要根据实际的文件管理器进行调整
+    QObject *fileManagerView = cont->property("fileManagerView").value<QObject *>();
+    if (fileManagerView) {
+        QMetaObject::invokeMethod(fileManagerView, "toggleShowHiddenFiles");
+    }
 }
 
 void ContextMenu::runCommand()
@@ -299,6 +324,9 @@ QWidget *ContextMenu::createConfigurationInterface(QWidget *parent)
             item = new QCheckBox(widget);
             // FIXME better text
             item->setText(i18nc("plasma_containmentactions_contextmenu", "[Other Actions]"));
+        } else if (name == QLatin1String("toggle_hidden_files")) {
+            item = new QCheckBox(widget);
+            item->setText(i18n("Toggle Hidden Files"));
         } else if (name == QLatin1String("_wallpaper")) {
             item = new QCheckBox(widget);
             item->setText(i18nc("plasma_containmentactions_contextmenu", "Wallpaper Actions"));

@@ -1075,6 +1075,66 @@
         <source>Time Zone</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="11"/>
+        <source>Work Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="30"/>
+        <source>Workspace Behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="46"/>
+        <source>Screen edge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="102"/>
+        <source>Task Switcher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="130"/>
+        <source>Font Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="158"/>
+        <source>File Associations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="178"/>
+        <source>Global Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="194"/>
+        <source>File Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="222"/>
+        <source>Web search keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="242"/>
+        <source>Hardware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="258"/>
+        <source>Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qml/WorkSpace/Main.qml" line="74"/>
+        <source>Display Effects Compositor</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NewNetworkDialog</name>
@@ -1241,6 +1301,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/qml/SideBar.qml" line="268"/>
+        <source>Advanced Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Fonts</source>
         <translation type="vanished">Шрифтове</translation>
     </message>
@@ -1268,6 +1333,11 @@
         <location filename="../src/qml/SideBar.qml" line="240"/>
         <source>System</source>
         <translation>Система</translation>
+    </message>
+    <message>
+        <location filename="../src/qml/SideBar.qml" line="262"/>
+        <source>Work Space</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qml/SideBar.qml" line="175"/>

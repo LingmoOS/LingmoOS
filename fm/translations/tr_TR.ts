@@ -195,211 +195,236 @@
         <translation type="vanished">Dosya Yöneticisi</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1969"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1972"/>
         <source>Open</source>
         <translation>Aç</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1973"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1976"/>
         <source>Open with</source>
         <translation>Birlikte aç</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1977"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1980"/>
         <source>Cut</source>
         <translation>Kes</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1981"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1984"/>
         <source>Copy</source>
         <translation>Kopyala</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1985"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1988"/>
         <source>Paste</source>
         <translation>Yapıştır</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="900"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1989"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1992"/>
         <source>New Folder</source>
         <translation>Yeni Klasör</translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="922"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1996"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1999"/>
         <source>New Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="1317"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1993"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1996"/>
         <source>New Documents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1461"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1464"/>
         <source>Compress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1432"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1435"/>
         <source>Extract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1436"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1439"/>
         <source>Extract Here</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1447"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1450"/>
         <source>Extract To...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1451"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1454"/>
         <source>Select Destination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1471"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1474"/>
         <source>ZIP Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1498"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1501"/>
         <source>TAR Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1484"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1487"/>
         <source>7-Zip Archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filemanager/model/foldermodel.cpp" line="1325"/>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2128"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2168"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1509"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1512"/>
         <source>TAR Archive (gzip)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1510"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1513"/>
         <source>TAR Archive (bzip2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1511"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1514"/>
         <source>TAR Archive (xz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1512"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1515"/>
         <source>TAR Archive (zstd)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="1513"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="1516"/>
         <source>TAR Archive (uncompressed)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2002"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2005"/>
         <source>Move To Trash</source>
         <translation>Çöpe Taşı</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2006"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2009"/>
         <source>Empty Trash</source>
         <translation>Çöpü Boşalt</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2010"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2013"/>
         <source>Delete</source>
         <translation>Sil</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2014"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2017"/>
         <source>Rename</source>
         <translation>Yeniden adlandır</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2018"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2021"/>
         <source>Open in Terminal</source>
         <translation>Uçbirimde aç</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2022"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2025"/>
         <source>Set as ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2026"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2029"/>
         <source>Set as Wallpaper</source>
         <translation>Arkaplan olarak ayarla</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2032"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2035"/>
         <source>Set as Login Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2038"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2041"/>
         <source>Properties</source>
         <translation>Özellikler</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2042"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2045"/>
         <source>Change background</source>
         <translation>Arkaplanı değiştir</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2046"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2049"/>
         <source>Restore</source>
         <translation>Onar</translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2050"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2053"/>
         <source>Show hidden files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2056"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2059"/>
         <source>Open in new window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2060"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2063"/>
         <source>Icon Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2064"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2067"/>
         <source>Huge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2068"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2071"/>
         <source>Large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2072"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2075"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2076"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2079"/>
         <source>Small</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filemanager/model/foldermodel.cpp" line="2098"/>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2101"/>
+        <source>Sort by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2105"/>
+        <source>Name</source>
+        <translation type="unfinished">İsim</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2108"/>
+        <source>Type</source>
+        <translation type="unfinished">Tür</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2111"/>
+        <source>Date</source>
+        <translation type="unfinished">Tarih</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2114"/>
+        <source>Size</source>
+        <translation type="unfinished">Boyut</translation>
+    </message>
+    <message>
+        <location filename="../filemanager/model/foldermodel.cpp" line="2138"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -521,22 +546,28 @@
 <context>
     <name>OpenWithDialog</name>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="89"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="84"/>
         <source>No applications</source>
         <translation>Uygulama yok</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="156"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="235"/>
         <source>Set as default</source>
         <translation>Varsayılan olarak ayarla</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="171"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="250"/>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
     <message>
-        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="180"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="279"/>
+        <source>Show All Apps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="259"/>
+        <location filename="../qml/Dialogs/OpenWithDialog.qml" line="270"/>
         <source>Open</source>
         <translation>Aç</translation>
     </message>

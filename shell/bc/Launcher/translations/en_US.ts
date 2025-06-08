@@ -32,7 +32,7 @@
 <context>
     <name>Launcher</name>
     <message>
-        <location filename="../src/launcher.cpp" line="57"/>
+        <location filename="../src/launcher.cpp" line="56"/>
         <source>Launcher</source>
         <translation>Launcher</translation>
     </message>

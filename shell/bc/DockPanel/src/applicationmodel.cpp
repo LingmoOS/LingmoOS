@@ -364,7 +364,8 @@ void ApplicationModel::initPinnedApplications()
     // Workspace
     ApplicationItem *Workspaceitem = new ApplicationItem;
     Workspaceitem->id = "lingmo-multitasking";
-    Workspaceitem->exec = "qdbus org.kde.kglobalaccel /component/kwin invokeShortcut ShowDesktopGrid";
+    // Workspaceitem->exec = "qdbus org.kde.kglobalaccel /component/kwin invokeShortcut ShowDesktopGrid";
+    Workspaceitem->exec = "qdbus org.kde.kglobalaccel /component/kwin invokeShortcut Overview";
     Workspaceitem->iconName = "qrc:/images/multitasking.svg";
     Workspaceitem->visibleName = tr("Workspace");
     Workspaceitem->fixed = true;

@@ -1329,7 +1329,9 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
         });
 
         menu->addSeparator();
-        menu->addAction(refresh);  // 添加到空白区域的右键菜单
+        if (m_isDesktop) {
+            menu->addAction(refresh);  // 添加到空白区域的右键菜单
+        }
         menu->addAction(m_actionCollection.action("paste"));
         menu->addAction(selectAll);
         if (m_actionCollection.action("terminal")->isVisible()) {
@@ -1340,6 +1342,7 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
         if (m_isDesktop) {
             menu->addAction(m_actionCollection.action("changeBackground"));
             menu->addAction(m_actionCollection.action("iconSizeMenu"));
+            menu->addAction(m_actionCollection.action("sortBy"));
         }
 
         menu->addSeparator();
@@ -2058,7 +2061,7 @@ void FolderModel::createActions()
     QObject::connect(openInNewWindow, &QAction::triggered, this, [=] { this->openInNewWindow(); });
 
     QMenu *iconSizeMenu = new QMenu(tr("Icon Size"));
-    iconSizeMenu->setIcon(QIcon::fromTheme("preferences-desktop-icons"));
+    iconSizeMenu->setIcon(QIcon::fromTheme(QStringLiteral("transform-scale")));
     iconSizeMenu->menuAction()->setIconVisibleInMenu(true);
     
     QAction *hugeIcon = new QAction(tr("Huge"), this);
@@ -2095,13 +2098,50 @@ void FolderModel::createActions()
     iconSizeMenu->addAction(normalIcon);
     iconSizeMenu->addAction(smallIcon);
 
+    QMenu *sortBy = new QMenu(tr("Sort by"));
+    sortBy->setIcon(QIcon::fromTheme(QStringLiteral("view-sort")));
+    sortBy->menuAction()->setIconVisibleInMenu(true);
+
+    QAction *sortByName = new QAction(tr("Name"), this);
+    sortByName->setIconVisibleInMenu(true);
+
+    QAction *sortByType = new QAction(tr("Type"), this);
+    sortByType->setIconVisibleInMenu(true);
+
+    QAction *sortByModified = new QAction(tr("Date"), this);
+    sortByModified->setIconVisibleInMenu(true);
+
+    QAction *sortBySize = new QAction(tr("Size"), this);
+    sortBySize->setIconVisibleInMenu(true);
+
+    connect(sortByName, &QAction::triggered, this, [=] {
+        emit changeSortMode(0); // 按文件名排序
+    });
+
+    connect(sortByType, &QAction::triggered, this, [=] {
+        emit changeSortMode(1); // 按文件类型排序
+    });
+
+    connect(sortByModified, &QAction::triggered, this, [=] {
+        emit changeSortMode(2); // 按修改时间排序
+    });
+
+    connect(sortBySize, &QAction::triggered, this, [=] {
+        emit changeSortMode(3); // 按文件大小排序
+    });
+
+    sortBy->addAction(sortByName);
+    sortBy->addAction(sortByType);
+    sortBy->addAction(sortByModified);
+    sortBy->addAction(sortBySize);
+
     QMenu *viewMenu = new QMenu(tr("View"));
     viewMenu->addMenu(iconSizeMenu);
     viewMenu->addSeparator();
     viewMenu->addAction(showHidden);
 
     m_actionCollection.addAction(QStringLiteral("iconSizeMenu"), iconSizeMenu->menuAction());
-
+    m_actionCollection.addAction(QStringLiteral("sortBy"), sortBy->menuAction());
     m_actionCollection.addAction(QStringLiteral("open"), open);
     m_actionCollection.addAction(QStringLiteral("openWith"), openWith);
     m_actionCollection.addAction(QStringLiteral("cut"), cut);
@@ -2237,14 +2277,20 @@ void FolderModel::updateActions()
         terminal->setVisible(items.size() == 1 && items.first().isDir() && !isTrash);
     }
 
-    if (QAction *terminal = m_actionCollection.action("setWallpaper")) {
-        terminal->setVisible(items.size() == 1 &&
+    if (QAction *setWallpaperMenuSelected = m_actionCollection.action("setWallpaperMenu")) {
+        setWallpaperMenuSelected->setVisible(items.size() == 1 &&
                              !isTrash &&
                              supportSetAsWallpaper(items.first().mimetype()));
     }
 
-    if (QAction *terminal = m_actionCollection.action("wallpaperLogin")) {
-        terminal->setVisible(items.size() == 1 &&
+    if (QAction *setWallpaperSelected = m_actionCollection.action("setWallpaper")) {
+        setWallpaperSelected->setVisible(items.size() == 1 &&
+                             !isTrash &&
+                             supportSetAsWallpaper(items.first().mimetype()));
+    }
+
+    if (QAction *setLoginWallpaperSelected = m_actionCollection.action("wallpaperLogin")) {
+        setLoginWallpaperSelected->setVisible(items.size() == 1 &&
                              !isTrash &&
                              supportSetAsWallpaper(items.first().mimetype()));
     }
@@ -2265,6 +2311,10 @@ void FolderModel::updateActions()
 
     if (QAction *iconSizeMenu = m_actionCollection.action("iconSizeMenu")) {
         iconSizeMenu->setVisible(m_isDesktop);
+    }
+
+    if (QAction *sortBy = m_actionCollection.action("sortBy")) {
+        sortBy->setVisible(m_isDesktop);
     }
 
     if (QAction *viewMenu = m_actionCollection.action("viewMenu")) {

@@ -32,6 +32,7 @@
 #include "language.h"
 #include "networkproxy.h"
 #include "notifications.h"
+#include "workspace.h"
 #include "password.h"
 #include "powermanager.h"
 #include "settingsuiadaptor.h"
@@ -78,6 +79,7 @@ Application::Application(std::shared_ptr<QQmlApplicationEngine> engine)
     qmlRegisterType<Touchpad>(uri, 1, 0, "Touchpad");
     qmlRegisterType<NetworkProxy>(uri, 1, 0, "NetworkProxy");
     qmlRegisterType<Notifications>(uri, 1, 0, "Notifications");
+    qmlRegisterType<Workspace>(uri, 1, 0, "Workspace");
     qmlRegisterType<DefaultApplications>(uri, 1, 0, "DefaultApplications");
     qmlRegisterType<Accessibility>(uri, 1, 0, "Accessibility");
     qmlRegisterSingletonType<Password>(uri, 1, 0, "Password", passwordSingleton);

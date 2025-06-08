@@ -33,7 +33,7 @@ GlobalShortcuts::~GlobalShortcuts() = default;
 void GlobalShortcuts::showDoNotDisturbOsd(bool doNotDisturb) const
 {
     QDBusMessage msg = QDBusMessage::createMethodCall( //
-        QStringLiteral("org.lingmo.lingmoshell"),
+        QStringLiteral("org.kde.plasmashell"),
         QStringLiteral("/org/kde/osdService"),
         QStringLiteral("org.kde.osdService"),
         QStringLiteral("showText"));

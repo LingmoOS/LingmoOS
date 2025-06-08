@@ -51,34 +51,61 @@
 <context>
     <name>ControlCenter</name>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="244"/>
+        <location filename="../qml/ControlCenter.qml" line="245"/>
         <source>Wi-Fi</source>
         <translation>无线网络</translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="173"/>
+        <location filename="../qml/ControlCenter.qml" line="174"/>
         <source>Control Center</source>
         <translation>控制中心</translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="259"/>
+        <location filename="../qml/ControlCenter.qml" line="260"/>
         <source>Bluetooth</source>
         <translation>蓝牙</translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="275"/>
+        <location filename="../qml/ControlCenter.qml" line="276"/>
         <source>Dark Mode</source>
         <translation>深色模式</translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="285"/>
+        <location filename="../qml/ControlCenter.qml" line="293"/>
         <source>Do Not Disturb</source>
         <translation>勿扰模式</translation>
     </message>
     <message>
-        <location filename="../qml/ControlCenter.qml" line="295"/>
+        <location filename="../qml/ControlCenter.qml" line="303"/>
         <source>Screenshot</source>
         <translation>截图</translation>
+    </message>
+</context>
+<context>
+    <name>DateTime</name>
+    <message>
+        <source>Control Center</source>
+        <translation type="obsolete">控制中心</translation>
+    </message>
+    <message>
+        <source>Wi-Fi</source>
+        <translation type="obsolete">无线网络</translation>
+    </message>
+    <message>
+        <source>Bluetooth</source>
+        <translation type="obsolete">蓝牙</translation>
+    </message>
+    <message>
+        <source>Dark Mode</source>
+        <translation type="obsolete">深色模式</translation>
+    </message>
+    <message>
+        <source>Do Not Disturb</source>
+        <translation type="obsolete">勿扰模式</translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="obsolete">截图</translation>
     </message>
 </context>
 <context>
@@ -120,6 +147,11 @@
         <location filename="../qml/main.qml" line="306"/>
         <source>is using the camera</source>
         <translation>正在使用相机</translation>
+    </message>
+    <message>
+        <location filename="../qml/main.qml" line="329"/>
+        <source>is capturing screen</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

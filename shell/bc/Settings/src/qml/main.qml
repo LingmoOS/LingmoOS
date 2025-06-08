@@ -51,7 +51,7 @@ LingmoUI.Window {
         geometry: Qt.rect(rootWindow.x, rootWindow.y, rootWindow.width, rootWindow.height)
         windowRadius: rootWindow.windowRadius
         enabled: true
-    }   
+    }
 
     RowLayout {
         anchors.fill: parent
