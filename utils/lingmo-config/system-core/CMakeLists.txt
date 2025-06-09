@@ -20,3 +20,8 @@ install(DIRECTORY sources/System
         DESTINATION /
         FILES_MATCHING
         PATTERN "*")
+
+install(DIRECTORY sources/desktop/*
+        DESTINATION /usr/share/plasma/desktoptheme
+        FILES_MATCHING
+        PATTERN "*")
