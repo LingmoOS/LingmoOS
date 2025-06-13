@@ -21,7 +21,18 @@ install(DIRECTORY sources/System
         FILES_MATCHING
         PATTERN "*")
 
-install(DIRECTORY sources/desktop/*
-        DESTINATION /usr/share/plasma/desktoptheme
+install(DIRECTORY sources/desktop/default
+        DESTINATION /usr/share/plasma/desktoptheme/
         FILES_MATCHING
         PATTERN "*")
+
+install(DIRECTORY sources/desktop/ocean
+        DESTINATION /usr/share/plasma/desktoptheme/
+        FILES_MATCHING
+        PATTERN "*")
+
+install(DIRECTORY sources/desktop/ocean-dark
+        DESTINATION /usr/share/plasma/desktoptheme/
+        FILES_MATCHING
+        PATTERN "*")
+
