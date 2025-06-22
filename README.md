@@ -24,11 +24,6 @@ Lingmo OS adopts a new design that is different from the traditional KDE, making
 ### Clone This Code Warehouse.
    ```
    git clone https://github.com/LingmoOS/LingmoOS.git
-   mkdir -p ~/bin
-   cp -v LingmoOS/repo ~/bin/
-   chmod a+x ~/bin/repo
-   echo 'export PATH="$PATH:$HOME/bin"' >> ~/.bashrc
-   source ~/.bashrc
 ```
 
 # Initialize repo warehouse
@@ -37,21 +32,8 @@ Lingmo OS adopts a new design that is different from the traditional KDE, making
 ```
 cd LingmoOS
 ```
-## Init Repo
-
-```
-repo init -u https://github.com/LingmoOS/manifest.git
-```
-
-# Synchronization code
-```
-repo sync
-```
-
 ## Dependencies
 Before building the project, ensure the following tools are installed:
-- `autoconf`: Used to generate the `configure` script.
-- `automake`: Used to generate `Makefile.in`.
 - `lingmo-pkgbuild`: Used to build packages.
 - `make`: Used to execute the build process.
 - `gcc` or another C compiler.
@@ -66,21 +48,14 @@ sudo apt-get install autoconf automake build-essential
 ## Build Process
 
 ### 1. Initialize the Project
-Run the following commands to generate the `configure` script and `Makefile`:
 ```bash
-autoreconf -fiv  # Generate the configure script
-./configure      # Generate the Makefile
+make config-pkgs
 ```
 
 ### 2. Build the Project
-Build iso image:
-```bash
-make image-iso
-```
 Use the following commands to build the project:
 ```bash
-make             # Build all targets
-make pkg_all     # Build all packages
+make build-pkgs     # Build all packages
 make third-party # Process third-party packages
 ```
 
@@ -94,7 +69,7 @@ make clean       # Clean the build directories
 
 ## Target Descriptions
 - **`make`**: Default target, builds all components.
-- **`make pkg_all`**: Builds all packages using `lingmo-pkgbuild`.
+- **`make build-pkgs`**: Builds all packages using `lingmo-pkgbuild`.
 - **`make third-party`**: Processes third-party packages in the `third-party` directory.
 - **`make clean`**: Cleans the build directories.
 
