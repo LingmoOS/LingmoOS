@@ -12,11 +12,6 @@ install(FILES ${BASESYSTEM} DESTINATION /System/updates/config/)
 install(FILES sources/org.build_lingmo DESTINATION /)
 
 # 安装整个目录及其内容到 ~/.config/
-install(DIRECTORY sources/fcitx5
-        DESTINATION /System/updates/config/
-        FILES_MATCHING
-        PATTERN "*")
-
 install(DIRECTORY sources/System
         DESTINATION /
         FILES_MATCHING

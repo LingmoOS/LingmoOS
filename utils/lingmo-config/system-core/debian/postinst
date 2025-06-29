@@ -5,15 +5,15 @@ echo "*[update] system"
 
 rm -f /usr/lib/os-release
 
-cat << EOF > /usr/lib/os-release
-PRETTY_NAME="Lingmo OS 3.0.0 (Helium)"
+cat <<EOF >/usr/lib/os-release
+PRETTY_NAME="Lingmo OS 3.0.1 (Helium)"
 NAME="Lingmo OS"
 RELEASE="release"
-BUILD_ID="2568220.2502"
-VERSION_ID="3.0.0"
-VERSION="3.0.0 (Helium)"
+BUILD_ID="25629150.2503"
+VERSION_ID="3.0.1"
+VERSION="3.0.1 (Helium)"
 VERSION_CODENAME=helium
-VERSION_BUILD="2568220.2502+build"
+VERSION_BUILD="25629150.2503+build"
 VERSION_TYPE="stable"
 ID=lingmo
 ID_LIKE=debian
@@ -33,16 +33,16 @@ SOURCE_DIR="/System/updates"
 
 # 遍历 /home 下的所有用户目录
 for user_home in /home/*; do
-    if [ -d "$user_home" ]; then
-        # 获取用户家目录
-        TARGET_HOME="$user_home"
+  if [ -d "$user_home" ]; then
+    # 获取用户家目录
+    TARGET_HOME="$user_home"
 
-        echo $TARGET_HOME
+    echo $TARGET_HOME
 
-        # 复制文件
-        cp -r "$SOURCE_DIR"/config/* "$TARGET_HOME/.config/"
-        cp -r "$SOURCE_DIR"/system_target.img "$TARGET_HOME/.config/"
-    fi
+    # 复制文件
+    cp -r "$SOURCE_DIR"/config/* "$TARGET_HOME/.config/"
+    cp -r "$SOURCE_DIR"/system_target.img "$TARGET_HOME/.config/"
+  fi
 done
 
 chmod +x "$SOURCE_DIR"/update.sh
