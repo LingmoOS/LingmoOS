@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+case $1 in
+	remove|disappear)
+		for file in libauparse.so.0 libauparse.so.0.0.0; do
+			dpkg-divert --package libauparse0t64 --no-rename \
+				--remove --divert \
+				"/lib/#DEB_HOST_MULTIARCH#/$file.usr-is-merged" \
+				"/lib/#DEB_HOST_MULTIARCH#/$file"
+		done
+	;;
+esac
+
+#DEBHELPER#
+

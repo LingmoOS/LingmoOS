@@ -1,0 +1,20 @@
+Description: Remove the RefuseManualStop=yes option
+ This option is preventing the daemon to be restarted on upgrade.
+ .
+ When using systemctl to stop audit, the audit framework is recording the pid
+ of systemd instead of the one from the user process that actually stopped the
+ process. This is breaking the conformity with some gouvernemental
+ certifications.
+Author: Laurent Bigonville <bigon@debian.org>
+Forwarded: not-needed
+
+--- a/init.d/auditd.service.in
++++ b/init.d/auditd.service.in
+@@ -21,7 +21,6 @@ After=local-fs.target systemd-tmpfiles-s
+ Before=sysinit.target shutdown.target
+ #Before=shutdown.target
+ Conflicts=shutdown.target
+-RefuseManualStop=yes
+ 
+ Documentation=man:auditd(8) https://github.com/linux-audit/audit-documentation
+ 

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -ex
+
+cd "${AUTOPKGTEST_TMP}"
+
+if [ -n "${DEB_HOST_GNU_TYPE:-}" ]; then
+    CROSS_COMPILE="$DEB_HOST_GNU_TYPE-"
+else
+    CROSS_COMPILE=
+fi
+
+cat > libaudit-static.c <<EOF
+#include <stddef.h>
+#include <libaudit.h>
+
+int main (void)
+{
+    int fd;
+    fd=audit_open();
+
+    audit_log_user_message(fd, AUDIT_USER_LOGIN, "test", NULL, NULL, NULL, 0);
+
+    audit_close(fd);
+    return 0;
+}
+EOF
+
+"${CROSS_COMPILE}gcc" -static -o libaudit-static libaudit-static.c $("${CROSS_COMPILE}pkg-config" --static --cflags --libs audit)
+echo "build: OK"
+./libaudit-static
+echo "run: OK"

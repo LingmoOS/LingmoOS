@@ -1,0 +1,19 @@
+The place where syscall information is gathered is:
+
+arch/arm/tools/syscall.tbl
+arch/arm/include/uapi/asm/unistd.h (unused?)
+include/uapi/asm-generic/unistd.h  (aarch64)
+arch/powerpc/kernel/syscalls/syscall.tbl
+arch/s390/kernel/syscalls/syscall.tbl
+arch/x86/entry/syscalls/syscall_32.tbl
+arch/x86/entry/syscalls/syscall_64.tbl
+
+For src/ausearch-lookup.c:
+Inspect include/linux/net.h for socketcall updates
+Inspect include/linux/ipc.h for ipccall updates
+
+For adding new arches, the following might be useful to get a first pass file:
+
+cat unistd.h | grep '^#define __NR_' | tr -d ')' | tr 'NR+' ' ' | awk '{ printf "_S(%s, \"%s\")\n", $6, $3 }; '
+
+it will still need hand editing

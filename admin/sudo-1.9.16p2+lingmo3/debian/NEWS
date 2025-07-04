@@ -1,0 +1,97 @@
+sudo (1.9.16p2-2) unstable; urgency=medium
+
+  === sudo-ldap is going away ===
+
+  sudo-ldap has become a burden to maintain. This is mainly due to the fact
+  that the sudo team has neither the manpower nor the know-how to maintain
+  sudo-ldap adequately.
+
+  In practice, there are few installations that use sudo-ldap. Most
+  installations that use LDAP as a directory service and sudo have now opted
+  for sssd, sssd-ldap and libsss-sudo.
+
+  The Debian sudo team recommends the use of libsss-sudo for new
+  installations and the migration of existing installations from sudo-ldap
+   to libsss-sudo and sssd.
+
+  The combination of sudo and sssd is automatically tested in autopkgtest
+  of sudo.
+
+  sudo-ldap removal is also being discussed in #1033728 in the Debian BTS.
+
+  Debian 13, "trixie", will be the last version of Debian that supports
+  sudo-ldap. Please use the bookworm and trixie release cycles to migrate
+  your installation away from sudo-ldap.
+
+  Please make sure that you do not upgrade from Debian 13 to Debian 14
+  while you're still using sudo-ldap. This is not going to work and
+  will probably leave you without intended privilege escalation.
+
+  === sudo_logsrvd is going away if no one is willing to help ===
+
+  Similar reasoning applies to input/output logging and sudo_logsrvd,
+  a feature that is also seldomly used in the Debian context. The sudo
+  maintainer team plans to remove this to avoid additional dependencies
+  in the basic sudo package.
+
+  Should you be willing to maintain sudo_logsrvd as part of the sudo team,
+  please get in touch with us. Please note that this is a long-term
+  commitment.
+
+  The removal of the input/output plugins and sudo_logsrvd are discussed
+  in #1101451 in the Debian BTS.
+
+  Upgrading from Debian 13 to Debian 14 will most likely leave you without
+  sudo logging.
+
+ -- Marc Haber <mh+debian-packages@zugschlus.de>  Sun, 04 May 2025 17:48:00 +0200
+
+sudo (1.9.5p2-3) unstable; urgency=medium
+
+  We have added "Defaults use_pty" to the default configuration. This fixes
+  CVE-2005-4890 which has been lingering around for more then a decade.
+  If you would like the old behavior back, please remove the respective line
+  from /etc/sudoers.
+
+ -- Marc Haber <mh+debian-packages@zugschlus.de>  Wed, 24 Feb 2021 17:59:22 +0100
+
+sudo (1.8.2-1) unstable; urgency=low
+
+  The sudo package is no longer configured using --with-secure-path.
+  Instead, the provided sudoers file now contains a line declaring
+  'Defaults secure_path=' with the same path content that was previously
+  hard-coded in the binary.  A consequence of this change is that if you
+  do not have such a definition in sudoers, the PATH searched for commands
+  by sudo may be empty.
+
+  Using explicit paths for each command you want to run with sudo will work
+  well enough to allow the sudoers file to be updated with a suitable entry
+  if one is not already present and you choose to not accept the updated
+  version provided by the package.
+  
+ -- Bdale Garbee <bdale@gag.com>  Wed, 24 Aug 2011 13:33:11 -0600
+
+sudo (1.7.4p4-2) unstable; urgency=low
+
+  The HOME and MAIL environment variables are now reset based on the
+  target user's password database entry when the env_reset sudoers option
+  is enabled (which is the case in the default configuration).  Users
+  wishing to preserve the original values should use a sudoers entry like:
+     Defaults env_keep += HOME
+  to preserve the old value of HOME and
+     Defaults env_keep += MAIL
+  to preserve the old value of MAIL.
+
+  The change in handling of HOME is known to affect programs like pbuilder.
+
+ -- Bdale Garbee <bdale@gag.com>  Wed, 08 Sep 2010 14:29:16 -0600
+
+sudo (1.6.8p12-5) unstable; urgency=low
+
+  The sudo package is no longer configured --with-exempt=sudo.  If you 
+  depend on members of group sudo being able to run sudo without needing
+  a password, you will need to put "%sudo ALL=NOPASSWD: ALL" in 
+  /etc/sudoers to preserve equivalent functionality.
+
+ -- Bdale Garbee <bdale@gag.com>  Tue,  3 Apr 2007 21:13:39 -0600
+

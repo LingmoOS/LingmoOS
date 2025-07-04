@@ -1,0 +1,93 @@
+#!/usr/bin/make -f
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# the following line can go away after the bookworm release
+# iff no backports to bullseye and/or buster are planned.
+# See #1025683 for a comprehension question. If this is cleared,
+# the export can be commented out (but stay around as reminder for backports)
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+DPKG_EXPORT_BUILDFLAGS = 1
+
+include /usr/share/dpkg/default.mk
+
+define CONFIGURE_ARGS
+	--with-all-insults
+	--with-pam --with-pam-login
+	--with-fqdn
+	--with-logging=syslog
+	--with-logfac=authpriv
+	--with-devel
+	--with-env-editor
+	--with-editor=/usr/bin/editor
+	--with-timeout=15
+	--with-password-timeout=0
+	--with-passprompt="[sudo] password for %p: "
+	--with-tty-tickets
+	--without-lecture
+	--disable-root-mailer
+	--with-sendmail=/usr/sbin/sendmail
+	--with-rundir=/run/sudo
+	--with-sssd --with-sssd-lib=/usr/lib/$(DEB_HOST_MULTIARCH)
+	--enable-zlib=system
+	--enable-admin-flag
+endef
+
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+CONFIGURE_ARGS += --with-apparmor --with-selinux --with-linux-audit --enable-tmpfiles.d=/usr/lib/tmpfiles.d
+endif
+
+# Consistently use /bin/mv to ensure reproducible builds regardless of
+# building on a usrmerge or non-usrmerge system.
+CONFIGURE_ARGS += MVPROG=/bin/mv
+
+deb_systemdsystemunitdir = $(shell pkg-config --variable=systemdsystemunitdir systemd)
+
+%:
+		dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure --builddirectory build-simple -- $(strip $(CONFIGURE_ARGS)) \
+		--with-exampledir=/usr/share/doc/sudo/examples
+	dh_auto_configure --builddirectory build-ldap   -- $(strip $(CONFIGURE_ARGS)) \
+		--with-exampledir=/usr/share/doc/sudo-ldap/examples \
+		--docdir=/usr/share/doc/sudo-ldap \
+		--with-ldap --with-ldap-conf-file=/etc/sudo-ldap.conf
+
+override_dh_auto_clean override_dh_auto_build:
+	$(patsubst override_%,%,$@) --builddirectory build-simple
+	$(patsubst override_%,%,$@) --builddirectory build-ldap
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	dh_auto_test --builddirectory build-simple
+	dh_auto_test --builddirectory build-ldap
+endif
+
+override_dh_auto_install:
+	dh_auto_install --builddirectory build-simple --destdir debian/sudo -- INSTALL_OWNER=
+	dh_auto_install --builddirectory build-ldap --destdir debian/sudo-ldap -- INSTALL_OWNER=
+
+	rm -f debian/sudo*/etc/sudoers \
+	      debian/sudo*/usr/share/doc/sudo*/LICENSE.md \
+	rm -rf debian/sudo*/run
+	find debian/sudo*/ -type f -name '*.la' | xargs rm -f
+
+	for pkg in sudo sudo-ldap; do \
+		mv debian/$$pkg/etc/sudoers.dist \
+		   debian/$$pkg/usr/share/doc/$$pkg/examples/sudoers.dist; \
+		mkdir -p debian/$$pkg$(deb_systemdsystemunitdir)/; \
+		ln -s /dev/null debian/$$pkg$(deb_systemdsystemunitdir)/sudo.service; \
+	done
+
+execute_after_dh_fixperms:
+	# fix executable libraries
+	chmod 0644 debian/sudo*/usr/libexec/sudo/*.so
+
+override_dh_fixperms:
+	dh_fixperms --exclude=usr/bin/sudo
+
+override_dh_installchangelogs:
+	dh_installchangelogs --exclude=HISTORY

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Helper script to provide legacy auditd service options not 
+# directly supported by systemd
+
+# Check that we are root ... so non-root users stop here
+test "$(id -u)" = "0"  ||  exit 4
+
+printf "Resuming logging: "
+/sbin/auditctl --signal resume
+RETVAL=$?
+echo
+exit $RETVAL

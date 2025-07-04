@@ -1,0 +1,58 @@
+Source: sudo
+Section: admin
+Priority: optional
+Maintainer: Debian Sudo Maintainers <sudo@packages.debian.org>
+Uploaders: Marc Haber <mh+debian-packages@zugschlus.de>,
+  Hanno Wagner <wagner@debian.org>,
+  Hilko Bengen <bengen@debian.org>,
+  Bastian Blank <waldi@debian.org>
+Build-Depends: debhelper-compat (= 13), dh-sequence-installnss, libpam0g-dev, libldap2-dev, libsasl2-dev, libapparmor-dev [linux-any], libselinux1-dev [linux-any], autoconf, bison, flex, libaudit-dev [linux-any], zlib1g-dev, po-debconf, pkgconf, systemd-dev, tzdata
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+Vcs-Git: https://salsa.debian.org/sudo-team/sudo.git
+Vcs-Browser: https://salsa.debian.org/sudo-team/sudo
+Homepage: https://www.sudo.ws/
+
+Package: sudo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libpam-modules
+Pre-Depends: ${misc:Pre-Depends}
+Conflicts: sudo-ldap
+Replaces: sudo-ldap
+Multi-Arch: foreign
+Description: Provide limited super user privileges to specific users
+ Sudo is a program designed to allow a sysadmin to give limited root
+ privileges to users and log root activity.  The basic philosophy is to give
+ as few privileges as possible but still allow people to get their work done.
+ .
+ This version is built with minimal shared library dependencies, use the
+ sudo-ldap package instead if you need LDAP support for sudoers.
+
+Package: sudo-ldap
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnss-sudo, libpam-modules, debconf (>= 1.4.69) | cdebconf (>= 0.39)
+Pre-Depends: ${misc:Pre-Depends}
+Conflicts: sudo
+Replaces: sudo
+Provides: sudo
+Multi-Arch: foreign
+Description: Provide limited super user privileges (with LDAP support, deprecated)
+ Sudo is a program designed to allow a sysadmin to give limited root
+ privileges to users and log root activity.  The basic philosophy is to give
+ as few privileges as possible but still allow people to get their work done.
+ .
+ sudo-ldap will be supported up to Debian 13 "trixie" and will be removed in
+ Debian 14. Please do not use sudo-ldap for new installations and consider
+ migrating your existing installations to libsss-sudo and sssd.
+ .
+ This version is built with LDAP support, which allows an equivalent of the
+ sudoers database to be distributed via LDAP.  Authentication is still
+ performed via pam.
+
+Package: libnss-sudo
+Architecture: all
+Depends: ${misc:Depends}
+Multi-Arch: foreign
+Description: NSS configuration for sudoers service
+ This empty package provides the basic configuration needed to enable the
+ `sudoers` NSS service.

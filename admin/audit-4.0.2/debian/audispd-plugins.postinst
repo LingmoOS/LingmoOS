@@ -1,0 +1,15 @@
+#!/bin/sh
+# postinst script for audispd-plugins
+#
+# see: dh_installdeb(1)
+
+set -e
+
+#DEBHELPER#
+
+if [ "$1" = configure ] && dpkg --compare-versions "$2" le-nl "1:3.0~alpha9-1~"; then
+	rmdir --ignore-fail-on-non-empty /etc/audisp/plugins.d 2> /dev/null || true
+	rmdir --ignore-fail-on-non-empty /etc/audisp 2> /dev/null || true
+fi
+
+exit 0

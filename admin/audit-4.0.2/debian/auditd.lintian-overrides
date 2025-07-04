@@ -1,0 +1,20 @@
+## Only to be forked by auditd, which explicitly checks for 750
+#auditd: executable-is-not-world-readable usr/sbin/audispd 0750 != 0755
+## Only root can run
+#auditd: non-standard-executable-perm usr/sbin/auditctl 0754 != 0755
+#auditd: non-standard-executable-perm usr/sbin/auditd 0754 != 0755
+#auditd: non-standard-executable-perm usr/sbin/autrace 0754 != 0755
+#auditd: non-standard-executable-perm usr/bin/aulastlog 0754 != 0755
+## Normal users should not see what is being audited
+auditd: non-standard-dir-perm 0750 != 0755 [etc/audit/]
+auditd: non-standard-dir-perm 0750 != 0755 [etc/audit/plugins.d/]
+auditd: non-standard-dir-perm 0750 != 0755 [etc/audit/rules.d/]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/audisp-filter.conf]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/auditd.conf]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/audit-stop.rules]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/plugins.d/af_unix.conf]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/plugins.d/filter.conf]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/plugins.d/syslog.conf]
+auditd: non-standard-file-perm 0640 != 0644 [etc/audit/rules.d/audit.rules]
+# Contains sensitive information
+auditd: non-standard-dir-perm 0750 != 0755 [var/log/audit/]

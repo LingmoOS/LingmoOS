@@ -1,0 +1,26 @@
+Test-Command: set -e ; for py in $(py3versions -s 2>/dev/null) ; do cd "$AUTOPKGTEST_TMP" ; echo "Testing with $py:" ; $py -c "import audit; print(audit)" ; done
+Depends: python3-all, python3-audit
+Restrictions: allow-stderr, superficial
+Features: test-name=python3-audit
+
+Test-Command: set -e ; for py in $(py3versions -s 2>/dev/null) ; do cd "$AUTOPKGTEST_TMP" ; echo "Testing with $py:" ; $py -c "import auparse; print(auparse)" ; done
+Depends: python3-all, python3-audit
+Restrictions: allow-stderr, superficial
+Features: test-name=python3-auparse
+
+# Regression test for bug #954257
+Tests: 954257-regression
+Depends: python3-all, python3-audit
+Restrictions: allow-stderr, superficial
+
+Tests: libaudit-build
+Depends: build-essential, libaudit-dev, pkg-config
+Restrictions: allow-stderr, superficial
+
+Tests: libauparse-build
+Depends: build-essential, libauparse-dev, pkg-config
+Restrictions: allow-stderr, superficial
+
+Tests: libaudit-static-build
+Depends: build-essential, libaudit-dev, pkg-config
+Restrictions: allow-stderr, superficial

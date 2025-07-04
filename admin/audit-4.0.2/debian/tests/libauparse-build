@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -ex
+
+cd "${AUTOPKGTEST_TMP}"
+
+if [ -n "${DEB_HOST_GNU_TYPE:-}" ]; then
+    CROSS_COMPILE="$DEB_HOST_GNU_TYPE-"
+else
+    CROSS_COMPILE=
+fi
+
+cat > libauparse.c <<EOF
+#include <auparse.h>
+
+int main (void)
+{
+    auparse_state_t *au;
+
+    au = auparse_init(AUSOURCE_FEED, 0);
+    if (au == NULL) {
+            return 1;
+    }
+    auparse_destroy(au); 
+    return 0;
+}
+EOF
+
+"${CROSS_COMPILE}gcc" -o libauparse libauparse.c $("${CROSS_COMPILE}pkg-config" --cflags --libs auparse)
+echo "build: OK"
+./libauparse
+echo "run: OK"

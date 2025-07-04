@@ -1,0 +1,100 @@
+#!/bin/sh
+
+set -e
+
+# set a root password so that we can later replace sudo with sudo-ldap
+# see #1001858
+passwd=$(getent shadow root|cut -f2 -d:)
+passwd1=$(echo "$passwd" |cut -c1)
+# Note: we do need the 'xfoo' syntax here, since POSIX special-cases
+# the $passwd value '!' as negation.
+if [ "x$passwd" = "x*" ] || [ "x$passwd1" = "x!" ]; then
+  echo "root:rootpassword"  | chpasswd
+fi
+
+TESTNR="01"
+BASEDIR="$(pwd)/debian/tests"
+COMMONDIR="${BASEDIR}/common"
+DIR="${BASEDIR}/${TESTNR}"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+ACCTA="test${TESTNR}a"
+ACCTB="test${TESTNR}b"
+PASSWD="test${TESTNR}23456"
+HOMEDIRA="/home/${ACCTA}"
+HOMEDIRB="/home/${ACCTB}"
+LDIFDIR="${DIR}/ldif"
+
+trap '
+  deluser --remove-home "${ACCTA}" 2>/dev/null || true
+  deluser --remove-home "${ACCTB}" 2>/dev/null || true
+' 0 INT QUIT ABRT PIPE TERM
+
+printf > /etc/hosts "127.0.1.1 %s\n" "$(hostname)"
+cat /etc/hosts
+
+printf "========= test %s\.1: account group member, correct password\n" "${TESTNR}"
+deluser ${ACCTA} 2>/dev/null || true
+adduser --disabled-password --home "${HOMEDIRA}" --gecos "" "${ACCTA}"
+printf "%s:%s\n" "${ACCTA}" "${PASSWD}" | chpasswd
+adduser "${ACCTA}" sudo
+RET=0
+printf "trying %s with correct password\n" "${ACCTA}"
+su - "${ACCTA}" -c "${COMMONDIR}/asuser ${PASSWD}" || RET=$?
+printf "%s with correct password, return value %s\n" "${ACCTA}" "${RET}"
+if [ "$(cat ${HOMEDIRA}/stdout)" != "0" ]; then
+  echo >&2 id -u did not give 0
+    printf >&2 "stdout:\n"
+  cat >&2 ${HOMEDIRA}/stdout
+  printf >&2 "stderr:\n"
+  cat >&2 ${HOMEDIRA}/stderr
+  printf >&2 "exit code %s\n" "${RET}"
+  printf >&2 "exit 1\n" "${RET}"
+  exit 1
+fi
+
+printf "========= test %s\.2: account group member, wrong password\n" "${TESTNR}"
+rm -f "${HOMEDIRA}/std*"
+RET=0
+printf "trying %s with wrong password\n" "${ACCTA}"
+su - "${ACCTA}" -c "${COMMONDIR}/asuser wrongpasswd" || RET=$?
+printf "%s with wrong password, return value %s\n" "${ACCTA}" "${RET}"
+head -n-0 ${HOMEDIRA}/stdout ${HOMEDIRA}/stderr
+printf -- "\n-------\n"
+for string in "[sudo] password for ${ACCTA}" "Sorry, try again" "sudo: no password was provided" "sudo: 1 incorrect password attempt"; do
+  if ! grep -F "${string}" ${HOMEDIRA}/stderr; then
+    printf "%s missing in stderr output\n" "${string}"
+    printf >&2 "stdout:\n"
+    cat >&2 ${HOMEDIRA}/stdout
+    printf >&2 "stderr:\n"
+    cat >&2 ${HOMEDIRA}/stderr
+    printf >&2 "\nexit code %s\n" "${RET}"
+    printf >&2 -- "------\n exit 1\n"
+    exit 1
+  fi
+done
+
+printf "========= test %s\.3: account not group member, correct password\n" "${TESTNR}"
+deluser ${ACCTB} 2>/dev/null || true
+adduser --disabled-password --home "${HOMEDIRB}" --gecos "" "${ACCTB}"
+printf "%s:%s\n" "${ACCTB}" "${PASSWD}" | chpasswd
+RET=0
+printf "trying %s (no sudo membership) with correct password\n" "${ACCTB}"
+su - "${ACCTB}" -c "${COMMONDIR}/asuser ${PASSWD}" || RET=$?
+printf "%s with correct password, return value %s\n" "${ACCTB}" "${RET}"
+head -n-0 ${HOMEDIRB}/stdout ${HOMEDIRA}/stderr
+printf -- "\n-------\n"
+for string in "[sudo] password for ${ACCTB}" "${ACCTB} is not in the sudoers file"; do
+  if ! grep -F "${string}" ${HOMEDIRB}/stderr; then
+    printf "%s missing in stderr output\n" "${string}"
+    printf >&2 "stdout:\n"
+    cat >&2 ${HOMEDIRB}/stdout
+    printf >&2 "stderr:\n"
+    cat >&2 ${HOMEDIRB}/stderr
+    printf >&2 "\nexit code %s\n" "${RET}"
+    printf >&2 -- "------\n exit 1\n"
+    exit 1
+  fi
+done
+
+printf "test series sucessful, exit 0\n"
+exit 0

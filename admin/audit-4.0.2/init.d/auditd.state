@@ -1,0 +1,22 @@
+#!/bin/sh
+# Helper script to provide legacy auditd service options not 
+# directly supported by systemd
+
+# Check that we are root ... so non-root users stop here
+test "$(id -u)" = "0"  ||  exit 4
+
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
+state_file="/var/run/auditd.state"
+
+printf "Getting auditd internal state: "
+/sbin/auditctl --signal state
+RETVAL=$?
+sleep 1
+if [ $RETVAL -eq 0 ] ; then
+	if [ -e $state_file ] ; then
+		printf "\n\n"
+		cat $state_file
+	fi
+fi
+echo
+exit $RETVAL

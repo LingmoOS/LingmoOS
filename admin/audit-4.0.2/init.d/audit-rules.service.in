@@ -1,0 +1,27 @@
+[Unit]
+Description=Load Audit Rules
+ConditionKernelCommandLine=!audit=0
+ConditionKernelCommandLine=!audit=off
+DefaultDependencies=no
+# We need the local file system for the rules. Augenrules uses /tmp while
+# constructing rules, so we have to wait for that to be available, too.
+After=local-fs.target systemd-tmpfiles-setup.service
+
+Documentation=man:auditctl(8) https://github.com/linux-audit/audit-documentation
+
+[Service]
+Type=oneshot
+ExecStart=@sbindir@/augenrules --load
+
+# By default we don't clear the rules on exit. To enable this, uncomment the
+# next line after copying the file to /etc/systemd/system/audit-rules.service
+#ExecStopPost=@sbindir@/auditctl -R @sysconfdir@/audit/audit-stop.rules
+
+### Security Settings ###
+# This won't use any security settings. They tend to interfere with
+# loading rules anyways. Since its a one-shot service with root owned
+# input, let's just load and get done.
+
+[Install]
+WantedBy=multi-user.target
+

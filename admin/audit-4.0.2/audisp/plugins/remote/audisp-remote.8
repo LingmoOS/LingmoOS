@@ -1,0 +1,37 @@
+.TH AUDISP-REMOTE "8" "August 2018" "Red Hat" "System Administration Utilities"
+.SH NAME
+audisp-remote \- plugin for remote logging 
+.SH SYNOPSIS
+.B audisp-remote
+.SH DESCRIPTION
+\fBaudisp-remote\fP is a plugin for the audit event dispatcher that performs remote logging to an aggregate logging server.
+
+.SH TIPS
+If you are aggregating multiple machines, you should edit auditd.conf to set the name_format to something meaningful and the log_format to enriched. This way you can tell where the event came from and have the user name and groups resolved locally before it is sent off of the machine.
+
+.SH SIGNALS
+.TP
+SIGUSR1
+Causes the audisp-remote program to write the value of some of its internal flags to syslog. The
+.IR suspend
+flag tells whether or not logging has been suspended. The
+.IR remote_ended
+flag tells if the connection was broken by the server saying it can't log events. The
+.IR transport_ok
+flag tells whether or not the connection to the remote server is healthy. The
+.IR queue_size
+tells how many records are enqueued to be sent to the remote server.
+.TP
+SIGUSR2
+Causes the audisp-remote program to resume logging if it were suspended due to an error.
+
+.SH FILES
+/etc/audit/audisp-remote.conf
+/etc/audit/plugins.d/au-remote.conf
+/etc/audit/auditd.conf
+.SH "SEE ALSO"
+.BR auditd.conf (8),
+.BR auditd-plugins (5),
+.BR audisp-remote.conf (5).
+.SH AUTHOR
+Steve Grubb

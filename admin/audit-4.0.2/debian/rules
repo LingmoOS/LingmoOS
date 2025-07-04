@@ -1,0 +1,126 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+include /usr/share/dpkg/architecture.mk
+
+LDFLAGS += -Wl,--as-needed
+DH_ADDONS =
+CONFIGURE_FLAGS =
+
+ifeq ($(filter nopython,$(DEB_BUILD_PROFILES)),)
+# For building bindings/swig/ and bindings/python/ for all Python version, these directories are cloned and build in addition to the main library
+PY3DEFAULTVER := $(shell py3versions --default --version)
+PY3VERS := $(shell py3versions --requested --version debian/control)
+PY3VERS := $(filter-out $(PY3DEFAULTVER), $(PY3VERS))
+CONFIGURE_FLAGS += --without-python --with-python3
+DH_ADDONS += --with python3
+else
+CONFIGURE_FLAGS += --without-python --without-python3
+endif
+
+ifneq ($(filter pkg.audit.noldap,$(DEB_BUILD_PROFILES)),)
+  CONFIGURE_FLAGS += --disable-zos-remote
+endif
+
+# Merge the last remaining Ubuntu specific change in Debian:
+# Disable auditd network listener to reduce the risk of a remote attack on
+# auditd, which runs as root
+ifeq ($(shell dpkg-vendor --derives-from Ubuntu && echo yes), yes)
+  CONFIGURE_FLAGS += --disable-listener
+endif
+
+UID42 = $(shell LC_ALL=C id -un 42 2>/dev/null || echo 'unknown\(42\)')
+
+%:
+	dh $@ --builddirectory=debian/build --buildsystem=autoconf $(DH_ADDONS)
+
+override_dh_auto_configure: debian/config-python-stamp $(PY3VERS:%=debian/config-python3-%-stamp)
+debian/config-python-stamp:
+	dh_testdir
+	# Detect at runtime the user with UID 42
+	cp -f auparse/test/auparse_test.ref auparse/test/auparse_test.ref.orig
+	sed -e "s/gdm/${UID42}/" auparse/test/auparse_test.ref.orig > auparse/test/auparse_test.ref
+	cp -f auparse/test/auparse_test.ref.py auparse/test/auparse_test.ref.py.orig
+	sed -e "s/gdm/${UID42}/" auparse/test/auparse_test.ref.py.orig > auparse/test/auparse_test.ref.py
+
+# We should also have "--with-golang" but it's not available in all arch and
+# the golang binding package is arch:all anyway.
+	dh_auto_configure -- \
+		--libdir=/usr/lib/${DEB_HOST_MULTIARCH} \
+		--enable-shared=audit \
+		--enable-gssapi-krb5 \
+		--with-apparmor \
+		--with-libwrap \
+		--with-libcap-ng \
+		--with-io_uring \
+		$(CONFIGURE_FLAGS) \
+		--with-arm --with-aarch64 ${EXTRA_ARCH_TABLE}
+	touch $@
+debian/config-python3-%-stamp: debian/config-python-stamp
+	cp -lpr debian/build/bindings/swig   debian/build/bindings/swig3.$*
+	cp -lpr debian/build/bindings/python debian/build/bindings/python3.$*
+	touch $@
+
+override_dh_auto_clean:
+	mv -f auparse/test/auparse_test.ref.orig auparse/test/auparse_test.py || true
+	mv -f auparse/test/auparse_test.ref.py.orig auparse/test/auparse_test.ref.py || true
+	$(RM) debian/*-stamp
+	dh_auto_clean
+
+override_dh_auto_build: debian/build-python-stamp $(PY3VERS:%=debian/build-python3-%-stamp)
+debian/build-python-stamp: debian/config-python-stamp
+	dh_testdir
+	dh_auto_build
+	touch $@
+debian/build-python3-%-stamp: debian/config-python3-%-stamp debian/build-python-stamp
+	PYTHON=/usr/bin/python$* $(MAKE) -C debian/build/bindings/swig3.$*/python3   pyexecdir=/usr/lib/python$*/dist-packages \
+	    PYTHON3_CFLAGS="$(shell python$*-config --cflags 2> /dev/null)" PYTHON3_LIBS="$(shell python$*-config --libs 2> /dev/null)" PYTHON3_INCLUDES="$(shell python$*-config --includes 2> /dev/null)"
+	PYTHON=/usr/bin/python$* $(MAKE) -C debian/build/bindings/python3.$*/python3 pyexecdir=/usr/lib/python$*/dist-packages \
+	    PYTHON3_CFLAGS="$(shell python$*-config --cflags 2> /dev/null)" PYTHON3_LIBS="$(shell python$*-config --libs 2> /dev/null)" PYTHON3_INCLUDES="$(shell python$*-config --includes 2> /dev/null)"
+	touch $@
+
+debian/install-python-stamp: debian/build-python-stamp
+	dh_testdir
+	dh_auto_install --sourcedir=debian/build --destdir=debian/tmp
+	touch $@
+debian/install-python3-%-stamp: debian/build-python3-%-stamp debian/install-python-stamp
+	PYTHON=/usr/bin/python$* $(MAKE) -C debian/build/bindings/swig3.$*/python3   pyexecdir=/usr/lib/python$*/dist-packages DESTDIR=$(CURDIR)/debian/tmp install \
+	    PYTHON3_CFLAGS="$(shell python$*-config --cflags 2> /dev/null)" PYTHON3_LIBS="$(shell python$*-config --libs 2> /dev/null)" PYTHON3_INCLUDES="$(shell python$*-config --includes 2> /dev/null)"
+	PYTHON=/usr/bin/python$* $(MAKE) -C debian/build/bindings/python3.$*/python3 pyexecdir=/usr/lib/python$*/dist-packages DESTDIR=$(CURDIR)/debian/tmp install \
+	    PYTHON3_CFLAGS="$(shell python$*-config --cflags 2> /dev/null)" PYTHON3_LIBS="$(shell python$*-config --libs 2> /dev/null)" PYTHON3_INCLUDES="$(shell python$*-config --includes 2> /dev/null)"
+	touch $@
+override_dh_auto_install: debian/install-python-stamp $(PY3VERS:%=debian/install-python3-%-stamp)
+	# Remove some RedHat specific files
+	$(RM) debian/tmp/etc/rc.d/init.d/auditd
+	$(RM) debian/tmp/etc/sysconfig/auditd
+
+	# Install the default configuration
+	install -o root -g root -m 0750 -d debian/tmp/etc/audit/rules.d/
+	install -o root -g root -m 0640 rules/10-base-config.rules debian/tmp/etc/audit/rules.d/audit.rules
+
+override_dh_installexamples:
+	dh_installexamples -XMakefile
+
+override_dh_installlogrotate:
+	# auditd has a equivalent built-in feature
+
+override_dh_installinit:
+	dh_installinit --restart-after-upgrade
+
+override_dh_fixperms-arch:
+	dh_fixperms -a
+	#chmod o-wx debian/auditd/usr/bin/aulastlog
+	#chmod o-wx debian/auditd/usr/sbin/auditctl
+	#chmod o-wx debian/auditd/usr/sbin/auditd
+	#chmod o-wx debian/auditd/usr/sbin/autrace
+	#chmod 750 debian/auditd/usr/sbin/audispd
+	chmod -R o-rwx debian/auditd/var/log/audit
+	chgrp adm debian/auditd/var/log/audit
+	chmod -R o-rwx debian/auditd/etc/audit debian/audispd-plugins/etc/audit
+
+get-orig-source:
+	-uscan --upstream-version 0
+
+my-check:
+	find debian/*aud*/ -mindepth 0 -name DEBIAN -prune -o -not -type d -print|sed -e 's,debian/[^/]*/,,' -e 's/\.gz$$//'

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+# remove old link
+# this was already present in 2017
+
+if [ -L /etc/alternatives/sudo ]; then
+	rm /etc/alternatives/sudo
+fi
+
+# remove legacy conffile no longer delivered
+# this was added in 1.8.21p2-1 in 2017.
+
+if [ -f /etc/sudoers.dist ]; then
+        rm /etc/sudoers.dist 
+fi
+
+# complain if no sudoers file is present
+if [ ! -f /etc/sudoers ];then
+	echo "WARNING:  /etc/sudoers not present!";
+fi
+
+# make sure sudoers has the correct permissions and owner/group
+if [ -f /etc/sudoers ];then
+    chown root:root /etc/sudoers
+    chmod 440 /etc/sudoers
+fi
+
+# if we've gotten this far .. remove the saved, unchanged old sudoers file
+rm -f /etc/sudoers.pre-conffile
+
+#DEBHELPER#

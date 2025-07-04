@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -e
+
+TESTNR="02"
+BASEDIR="$(pwd)/debian/tests"
+COMMONDIR="${BASEDIR}/common"
+DIR="${BASEDIR}/${TESTNR}"
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+ACCTA="test${TESTNR}a"
+ACCTB="test${TESTNR}b"
+PASSWD="test${TESTNR}23456"
+HOMEDIRA="/root"
+LDIFDIR="${DIR}/ldif"
+
+trap '
+  printf "\ntrap handler\n"
+  mv /etc/resolv.conf.disabled /etc/resolv.conf || true
+  mv /etc/hosts.disabled /etc/hosts || true
+' 0 INT QUIT ABRT PIPE TERM
+
+printf "========= test %s\.1: sudo to nobody\n" "${TESTNR}"
+mv /etc/resolv.conf /etc/resolv.conf.disabled
+mv /etc/hosts /etc/hosts.disabled
+RET=0
+printf "trying sudo to nobody\n"
+cd "${HOMEDIRA}"
+${COMMONDIR}/asuser "" nobody || RET=$?
+printf "sudo to nobody, return value %s\n" "${RET}"
+STDERRLENGTH="$(cat ${HOMEDIRA}/stderr | grep -vE 'sudo: unable to resolve host [^:]+: Temporary failure in name resolution' | wc -l)"
+if [ "${STDERRLENGTH}" != "0" ]; then
+  echo >&2 non-empty stderr
+  printf >&2 "stdout:\n"
+  cat >&2 ${HOMEDIRA}/stdout
+  printf >&2 "stderr:\n"
+  cat >&2 ${HOMEDIRA}/stderr
+  printf >&2 "exit code %s\n" "${RET}"
+  printf >&2 "exit 1\n" "${RET}"
+  exit 1
+fi
+
+printf "test series sucessful, exit 0\n"
+exit 0

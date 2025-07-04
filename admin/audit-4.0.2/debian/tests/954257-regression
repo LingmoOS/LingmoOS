@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -ex
+
+for py in $(py3versions -s 2>/dev/null); do
+  cd "$AUTOPKGTEST_TMP"
+
+  echo "Testing with $py:"
+  $py -c 'import audit; fd = audit.audit_open(); audit.audit_syscall_to_name(0, 1); audit.audit_close(fd)'
+done

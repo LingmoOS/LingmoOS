@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+  purge)
+	rm -rf /var/lib/sudo
+	rm -rf /run/sudo
+  ;;
+
+  remove|upgrade|deconfigure)
+  ;;
+
+  abort-upgrade|failed-upgrade)
+    if [ -e "/etc/sudoers.pre-conffile" ]; then
+	mv /etc/sudoers.pre-conffile /etc/sudoers
+    fi
+  ;;
+
+  *)
+        echo "unknown argument --> $1" >&2
+        exit 0
+  ;;
+esac
+
+#DEBHELPER#

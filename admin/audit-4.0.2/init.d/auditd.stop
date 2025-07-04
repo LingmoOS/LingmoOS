@@ -1,0 +1,10 @@
+#!/bin/sh
+# Helper script to provide legacy auditd service options not 
+# directly supported by systemd
+
+# Check that we are root ... so non-root users stop here
+test "$(id -u)" = "0"  ||  exit 4
+
+echo "Stopping logging: "
+/sbin/auditctl --signal stop
+exit $?

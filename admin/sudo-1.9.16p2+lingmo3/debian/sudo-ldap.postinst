@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+# remove old link
+# this was already present in 2017
+
+if [ -L /etc/alternatives/sudo ]; then
+	rm /etc/alternatives/sudo
+fi
+
+# remove legacy conffile no longer delivered
+# this was added in 1.8.21p2-1 in 2017.
+
+if [ -f /etc/sudoers.dist ]; then
+        rm /etc/sudoers.dist 
+fi
+
+# complain if no sudoers file is present
+if [ ! -f /etc/sudoers ];then
+	echo "WARNING:  /etc/sudoers not present!";
+fi
+
+# make sure sudoers has the correct permissions and owner/group
+if [ -f /etc/sudoers ];then
+    chown root:root /etc/sudoers
+    chmod 440 /etc/sudoers
+fi
+
+# create symlink to ease transition to new path for ldap config
+# if old config file exists and new one doesn't
+if [ -e /etc/ldap/ldap.conf -a ! -e /etc/sudo-ldap.conf ];then
+	ln -s ldap/ldap.conf /etc/sudo-ldap.conf
+fi
+
+# if we've gotten this far .. remove the saved, unchanged old sudoers file
+rm -f /etc/sudoers.pre-conffile
+
+# before 1.8.7-1 sudo-ldap used /etc/init.d/sudo instead of /etc/init.d/sudo-ldap,
+# let's make sure that's taken care of
+if [ "$1" = "configure" ] && dpkg --compare-versions "$2" lt-nl "1.8.21p2-2~" ; then
+	update-rc.d sudo remove
+fi
+
+# Between 1.8.3p2-1 and 1.19.11p3-1, sudo-ldap's postrm unconditionally
+# removed the sudoers database from /etc/nsswitch.conf.
+# This breaks the "upgrade" path of the code installed by dh_installnss,
+# but it is handled properly its "install" path.
+# If we detect that situation, we install a file to inform the dh_installnss
+# code that it should run as if sudo-ldap were being installed from scratch,
+# even though this is an upgrade.
+if [ "$1" = "configure" ] &&
+	dpkg --compare-versions "$2" gt "1.8.3p2-1" &&
+	dpkg --compare-versions "$2" lt-nl "1.9.12p1-1~"
+then
+	touch /etc/nsswitch.conf.nss.sudo-ldap-will-install
+fi
+
+#DEBHELPER#

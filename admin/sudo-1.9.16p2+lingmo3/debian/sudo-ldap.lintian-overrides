@@ -1,0 +1,21 @@
+# sudo is set-uid root by design.
+sudo-ldap: elevated-privileges 4755 root/root [usr/bin/sudo]
+
+# two variants for different lintian versions
+# the init script job is done by systemd-tmpfiles on systemd systems
+sudo-ldap: omitted-systemd-service-for-init.d-script sudo-ldap [etc/init.d/sudo-ldap]
+
+# a false alarm, see #204975
+sudo-ldap: package-has-unnecessary-activation-of-ldconfig-trigger
+
+# a false alarm
+sudo-ldap: hardening-no-fortify-functions [usr/libexec/sudo/group_file.so]
+
+# this is a false alarm, our shared objects are all private
+sudo-ldap: custom-library-search-path RUNPATH /usr/libexec/sudo [*]
+
+# Debian does not ship Apport.
+sudo-ldap: python3-script-but-no-python3-dep /usr/bin/python3 (does not satisfy python3:any | python3-minimal:any) [*]
+
+# This is a film quote
+sudo-ldap: spelling-error-in-binary "allow to" "allow one to" [usr/libexec/sudo/sudoers.so]

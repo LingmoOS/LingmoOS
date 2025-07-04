@@ -1,0 +1,40 @@
+Description: fix paths in sudoers example to match Debian's
+Last-Update: 2021-12-13
+Author: Bdale Garbee <bdale@gag.com>
+Forwarded: not-needed
+--- a/examples/sudoers.in
++++ b/examples/sudoers.in
+@@ -44,7 +44,7 @@ Host_Alias	CDROM = orion, perseus, hercu
+ # Cmnd alias specification
+ ##
+ Cmnd_Alias	DUMPS = /usr/sbin/dump, /usr/sbin/rdump, /usr/sbin/restore, \
+-			/usr/sbin/rrestore, /usr/bin/mt, \
++			/usr/sbin/rrestore, /bin/mt, \
+ 			sha224:0GomF8mNN3wlDt1HD9XldjJ3SNgpFdbjO1+NsQ== \
+ 			/home/operator/bin/start_backups
+ Cmnd_Alias	KILL = /usr/bin/kill, /usr/bin/top
+@@ -85,7 +85,7 @@ operator	ALL = DUMPS, KILL, SHUTDOWN, HA
+ 		sudoedit /etc/printcap, /usr/oper/bin/
+ 
+ # joe may su only to operator
+-joe		ALL = /usr/bin/su operator
++joe		ALL = /bin/su operator
+ 
+ # pete may change passwords for anyone but root on the hp snakes
+ pete		HPPA = /usr/bin/passwd ^[a-zA-Z0-9_]+$, !/usr/bin/passwd root
+@@ -99,13 +99,13 @@ jim		+biglab = ALL
+ 
+ # users in the secretaries netgroup need to help manage the printers
+ # as well as add and remove users
+-+secretaries	ALL = PRINTING, /usr/bin/adduser, /usr/bin/rmuser
+++secretaries	ALL = PRINTING, /usr/sbin/adduser
+ 
+ # fred can run commands as oracle or sybase without a password
+ fred		ALL = (DB) NOPASSWD: ALL
+ 
+ # on the alphas, john may su to anyone except root, no flags are allowed.
+-john		ALPHA = /usr/bin/su ^[a-zA-Z0-9_]+$, !/usr/bin/su root
++john		ALPHA = /bin/su ^[a-zA-Z0-9_]+$, !/bin/su root
+ 
+ # jen can run anything on all machines except the ones
+ # in the "SERVERS" Host_Alias

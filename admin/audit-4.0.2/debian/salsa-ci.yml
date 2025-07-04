@@ -1,0 +1,13 @@
+---
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/salsa-ci.yml
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/pipeline-jobs.yml
+
+variables:
+# These files are not linked with any binaries that are shipped in the package
+# but at executed at compilation time only
+  SALSA_CI_BLHC_ARGS: '--ignore-line=.*gen_tables\.(c|o).*'
+
+reprotest:
+# Fails when doing chgrp, not too sure why
+  allow_failure: true
