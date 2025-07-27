@@ -1,0 +1,547 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title>The &kgpg; Handbook</title>
+
+<authorgroup>
+<author>
+<firstname>Jean-Baptiste</firstname>
+<surname>Mardelle</surname>
+<affiliation>
+<address><email>bj@altern.org</email></address>
+</affiliation>
+</author>
+<author>
+<firstname>Rolf Eike</firstname>
+<surname>Beer</surname>
+<affiliation>
+<address><email>kde@opensource.sf-tec.de</email></address>
+</affiliation>
+</author>
+
+<!-- TRANS:ROLES_OF_TRANSLATORS -->
+
+</authorgroup>
+
+<copyright>
+<year>2002</year>
+<year>2007</year>
+<year>2008</year>
+<year>2009</year>
+<year>2010</year>
+<holder>Jean-Baptiste Mardelle</holder>
+<holder>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>2016-10-10</date>
+<releaseinfo>Applications 16.12</releaseinfo>
+
+<abstract>
+<para>
+&kgpg; is a simple graphical interface for GnuPG (<ulink
+url="https://gnupg.org">https://gnupg.org</ulink>).
+</para>
+</abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>KGpg</keyword>
+<keyword>encryption</keyword>
+<keyword>gpg</keyword>
+<keyword>pgp</keyword>
+<keyword>security</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Introduction</title>
+
+
+<para>&kgpg; is a simple interface for GnuPG, a powerful encryption utility. GnuPG (also known as gpg) is included in most distributions and should be installed on your system. You can get the latest version on <ulink
+url="https://gnupg.org">https://gnupg.org</ulink>.</para>
+
+<para>With &kgpg; you will be able to encrypt and decrypt your files and emails, allowing much more secure communications. A mini howto on encryption with gpg is available on <ulink url="https://www.gnupg.org/documentation/howtos.en.html">GnuPG's web site</ulink>.
+</para>
+
+<para>With &kgpg;, you don't need to remember gpg's command lines and options. Almost everything can be done with a few mouse clicks.
+</para>
+</chapter>
+
+<chapter id="getting-started">
+<title>Getting Started</title>
+
+<para>Here is a list of &kgpg;'s main components:</para>
+
+<variablelist>
+
+<varlistentry>
+<term>System Tray Icon </term>
+<listitem>
+
+<screenshot>
+<screeninfo>&kgpg; system tray applet</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>
+When you start &kgpg;, a system tray icon will appear. A &LMB;
+click will open the Key Manager window, while a &RMB; click will open a menu allowing quick access to some important features. If you prefer other options you can change the &LMB; action to show the editor or completely disable the system tray icon using the <link linkend="conf-misc">settings dialog</link>.
+</para>
+<para>Please note that the system tray icon of &kgpg; is marked as &quot;inactive&quot; basically all the time. Since the system tray applet will usually hide inactive icons the one of &kgpg; will not be shown until you explicitly request it. For details please have a look at the &plasma; documentation.
+</para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term>Key Manager Window</term>
+<listitem>
+
+<screenshot>
+<screeninfo>Key manager window</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>That's the central place to manage your keys. To open the <link linkend="keymanager">Key Manager window</link>, click with the &LMB; on &kgpg;'s applet.
+You can import, export, sign and edit your keys. Most actions can be performed with a &RMB; click on a key.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>Editor Window</term>
+<listitem>
+
+<screenshot>
+<screeninfo>Editor window</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>It's a simple text editor, where you can type or paste text to encrypt/decrypt it. To open the <link linkend="editor">editor</link>, click with the &RMB; on &kgpg;'s applet.
+</para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term>File manager integration</term>
+<listitem>
+
+<para>&kgpg; is integrated in &konqueror; and &dolphin;. It means that when you right click on a file, you can choose
+ <menuchoice><guimenu>Actions</guimenu><guimenuitem>Encrypt
+File</guimenuitem></menuchoice> to encrypt a file. You can decrypt a file with a &LMB; click.
+ </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title>Using &kgpg;</title>
+
+<para>
+There are two ways to encrypt your data:
+<itemizedlist>
+<listitem><para>Symmetrical encryption: your data is just encrypted with a password. Anybody who has a computer with gpg can decrypt your message if you give him/her the password. To perform a symmetrical encryption, choose "symmetrical encryption" in the options box when asked to choose an encryption key.</para></listitem>
+<listitem><para>Key encryption: you must first create your key pair (secret key and public key) and give a passphrase. Keep your secret key in a safe place, and exchange your public key with your friends. Then, if you want to send an encrypted message to Alex, you must encrypt the message with Alex's public key. To decrypt the message, the recipient will need Alex's secret key and passphrase.</para></listitem>
+</itemizedlist>
+</para>
+<para>Key encryption is a bit more complicated (you must exchange keys with your friends) but safer. Remember that if you encrypt a message with someone else's key, you will not be able to decrypt it. You can only decrypt messages that have been encrypted with your public key.</para>
+
+<sect1 id="key-generation">
+<title>Generating a key</title>
+
+<para>If you don't have a key, &kgpg; will automatically pop up
+the key generation dialog at the first startup. You can also access it
+in the Key Manager from
+<menuchoice><guimenu>Keys</guimenu><guimenuitem>Generate Key
+Pair</guimenuitem></menuchoice>.</para>
+
+<screenshot>
+<screeninfo>Key generation dialog</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>Simply enter your name, Email address and click
+<guibutton>Ok</guibutton>. This will generate a standard gpg key. If
+you want more options, you can click on the <guibutton>Expert Mode</guibutton> button, which
+will bring up a &konsole; window with all of gpg's options.</para>
+<para>Many people play around with their first
+key, generate bad user ids, add comments they later regret or simply forget their
+passphrase. To avoid such keys to stay valid forever it's usually a good idea
+to limit the lifetime to some 12 month. You can modify the lifetime of your
+secret keys later using the <link linkend="keyproperties">key properties window</link>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title>Revoking a key</title>
+
+<para>A key pair that has expired can be brought back into an operational state
+as long as you have access to the private key and the passphrase. To
+reliably render a key unusable you need to revoke it. Revoking is done by
+adding a special revocation signature to the key.</para>
+
+<para>This revocation signature can be created together with the key. In this
+case it is stored in a separate file. This file can later be imported into
+the keyring and is then attached to the key rendering it unusable. Please
+note that to import this signature to the key no password is required.
+Therefore you should store this revocation signature in a safe place,
+usually one that is different from you key pair. It is a good advise to
+use a place that is detached from your computer, either copy it to an
+external storage device like an USB stick or print it out.</para>
+
+<para>If you have not created such a detached revocation on key creation you can
+create such a revocation signature at any time choosing <menuchoice><guimenu>Keys</guimenu>
+<guimenuitem>Revoke key</guimenuitem></menuchoice>,
+optionally importing it to your keyring immediately.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title>Encrypting Your Data</title>
+
+<sect2 id="konqui">
+
+<title>Encrypting a file from &konqueror; or Dolphin</title>
+
+<para>Click on the file you want to encrypt with the &RMB;. Choose <menuchoice><guimenu>Actions</guimenu><guimenuitem>Encrypt File</guimenuitem></menuchoice> in the pop up menu. You will then be prompted with the Public key selection dialog. Choose the key of the recipient and click <guibutton>Encrypt</guibutton>. The encrypted file will be saved with a <literal
+role="extension">.asc</literal> or <literal role="extension">.gpg</literal> extension depending on whether you chose <guilabel>ASCII armored encryption</guilabel> or not. ASCII encrypted files only use readable characters to represent the data resulting in files that are more robust when copied around or sent by mail but are one third larger.</para>
+
+<screenshot>
+<screeninfo>Here is a screen shot of the key selection window</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title>Encrypting a text with &kgpg;'s applet</title>
+
+<para>You can encrypt the contents of the clipboard by selecting the
+<guimenuitem>Encrypt clipboard</guimenuitem> item in applet menu. When you
+choose <guimenuitem>Sign clipboard</guimenuitem> then the text will be signed
+instead. Both actions will import the current clipboard contents into an
+<link linkend="editor">editor window</link>, perform the requested action and
+paste the contents back into the editor.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title>Encrypting text from &kgpg;'s editor</title>
+
+<para>This is as simple as clicking on the
+<guibutton>Encrypt</guibutton> button. You will then be prompted with
+the Public key selection dialog. Choose your key and click
+<guibutton>Ok</guibutton>. The encrypted message will
+appear in the editor window.</para>
+
+<para>Usually you can only encrypt files with keys that are trusted by
+you. Since you sometimes want to just send a confident note to some random
+people you are aware of having a GPG key you can set the option
+<guilabel>Allow encryption with untrusted keys</guilabel>.</para>
+
+<para>To make sure that you can decrypt every file you have encrypted even if
+they are encrypted with someone else's key you can use the options
+<guilabel>Always encrypt with</guilabel> and <guilabel>Encrypt files with</guilabel>
+which are available in the <link linkend="conf-encryption">KGpg configuration</link>.</para>
+
+<para>For more information on the encryption options <guilabel>ASCII
+armor</guilabel>, <guilabel>Allow encryption with untrusted keys</guilabel> and
+<guilabel>Symmetrical encryption</guilabel>, please refer to gpg's
+documentation or <ulink url="man:gpg">man pages</ulink>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title>Decrypting Your Data</title>
+
+
+<sect2 id="konq-dec">
+<title>Decrypting a file from &konqueror; or &dolphin;</title>
+<para><mousebutton>Left</mousebutton> click on the file you want to
+decrypt. Enter your passphrase and it will be decrypted. You can also
+drag an encrypted text file and drop it into &kgpg;'s editor window. It
+will then ask the passphrase and open the decrypted text in &kgpg;'s
+editor.  You can even drop remote files ! You can also use the
+<menuchoice><guimenu>File</guimenu><guimenuitem>Decrypt
+File</guimenuitem></menuchoice> and choose a file to decrypt.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title>Decrypting text with &kgpg;'s applet</title>
+
+<para>You can also decrypt the contents of the clipboard with the
+<guimenuitem>Decrypt Clipboard</guimenuitem> menu
+entry of the &kgpg; applet. An <link linkend="editor">editor window</link>
+will show up with the decrypted text.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title>Decrypting a text from the editor</title>
+
+<para>Copy or Drag and Drop the text you want to decrypt, and click on
+the <guibutton>Decrypt</guibutton> button. You will be prompted for the
+passphrase.
+</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title>Key Management</title>
+
+<para>All basic key management options can be performed through
+&kgpg;. To open the key management window click the &LMB; on &kgpg;'s applet.
+Most options are available with a <mousebutton>right</mousebutton> click on a key.
+To import/export public keys, you can use drag
+and drop or the Copy/Paste keyboard shortcuts.</para>
+
+<para>You can export a public key via email, to the clipboard, to a keyserver or to a local file.
+Use the options in the export dialog to export everything, export without attributes (photo ids)
+or export a clean key &ie; the key itself including its subkeys, but excluding all signatures.
+</para>
+
+<sect2 id="keymanager">
+<title>Key Manager</title>
+
+<screenshot>
+<screeninfo>Here's a screen shot of key management</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>In this example you see a key group containing two keys, two key pairs and three public keys. The third column shows the trust you have in the keys. The first key pair is ultimately trusted and is also set as the default key (bold font) while the second one has expired. Two of the public keys are fully trusted while the trust of the last key is marginal. The last key is expanded, showing it's ElGamal subkey, an additional user id, both also with marginal trust, and some of it's signatures.</para>
+<para>Signatures allow navigating through your keyring. Double clicking on a signature or a key shown as member of a group will jump directly to the corresponding primary key.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title>Key properties</title>
+
+<screenshot>
+<screeninfo>The key properties window</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>While the key manager allows you to do general actions with one or multiple keys, key groups or signatures, the key properties window gives you access to a single key. You can reach it by pressing enter in the key manager or double clicking the key.</para>
+<para>In this window you can change the key passphrase and expiration of your secret keys. For all keys you can also set the owner trust value.</para>
+<para>This value indicates how much you trust the owner of this key to correctly verify the identity of the keys he signs. Taking the owner trust into account gpg creates your own web of trust. You trust the keys you signed. If you assign owner trust to these persons you will also trust the keys they have signed without the need that you first have to sign their keys too.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title>Signing keys</title>
+
+<para>When you sign a key of someone else (let's call her Alice) you announce that you are sure that this key really belongs to that person and the key can be trusted. Of course you really should have checked that. This usually means that you have to meet Alice, check at least one identity card and get the full key fingerprint or a copy of her key. Then you go home and sign that key. Usually you will later upload the newly signed key to a <link linkend="keyserver">key server</link> so everyone knows you have checked that key and the owner may be trusted. Alice will likely do the same so you both will have your keys signed by the other one. If one of you has no identity card at hand it's no problem if the signing happens in only direction.</para>
+
+<para>But think about what happens if Alice lives on the other end of the world. You communicate with her regularly but there is no chance you will see her anytime soon. How do you trust her key?</para>
+
+<para>When you select her key and then choose <guimenuitem>Sign Key...</guimenuitem> you will get the dialog that allows you to choose the options how you would like to sign that key.</para>
+
+<screenshot>
+<screeninfo>Selecting a Secret Key for Signing</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>First you can choose the key you will use to sign the key. Then you can enter how carefully you checked that she really is the person she pretends to be. This information will be stored together with the signature so it is a guidance for everyone else who might need that signature (more on this below). And then comes the option that would help you if you can't meet Alice in person: <guilabel>Local signature (cannot be exported)</guilabel>. When you activate that option a special version of a signature will be created that can never even by accident leave you keyring.</para>
+
+<para>But why is it important how carefully you checked Alice's identity? Who should care? There is a different way to solve your problem with the identity of Alice. If you can't visit Alice anytime soon just think of Trent. You know Trent has a keypair, too. And Trent is a globetrotter, being on a different continent at least twice a month. If you are lucky he will fly close to Alice soon. So you will go and meet with Trent to sign keys. Then you will drop Alice a note that Trent will be at her place soon and ask her if she can meet with him too to sign keys. After all this has happened you know that Trent's key can be trusted and Trent knows that Alice's key can be trusted. If you trust Trent that he has carefully checked Alice's identity then you can also trust her key.</para>
+
+<para>These relationships between keys and their owners form a so called web of trust. Within that web there are some important values that define how trustworthy a particular key is. The first thing is how carefully the identity of the key owner was checked. That is the value you have seen above in the secret key selection window. For example you will likely know how to verify your local countries identity card but one from a completely different country may be hard to verify. So you could say that you have very carefully checked Trent's identity because you have seen his identity card and it looks very much the same as yours. But Trent, although he has seen both Alice's identity card and driver license might say he has only done casual checking of her identity as he is not absolutely sure about the documents from that part of the world.</para>
+
+<para>The next important value is how much you trust the other person to verify documents. You know Trent is good at that. But George for example is no one you would call smart. He barely looked at your id card when you met him for key signing. You are sure that George is the person he pretends to be as you checked his documents carefully. But he doesn't seem to really care if he checks other people so you will have a high trust in the key of George but a very low trust in the signatures of George. If you open the <link linkend="keyproperties">properties</link> of a key you will find the field <guilabel>Owner Trust</guilabel>. This is how much you trust the key owner when he signs keys. This value will not be exported, it is completely up to your personal preference.</para>
+
+<screenshot>
+<screeninfo>The key properties window</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>Now you should have an idea how the web of trust is built, what the owner and key trust values are for, and why you always should be very careful when checking identities: other people might rely on you. But one element in the process is still unverified: the email addresses in the keys you signed. Creating a new user identity in your key with the email address of Alice or Trent will only take a few mouse clicks. You have verified that Trent really owns his key. But noone has checked until now that Trent really controls the email addresses of his user identities.</para>
+
+<para>If you choose <guimenuitem>Sign and Mail User ID...</guimenuitem> from the menu instead you can close that gap. The idea is that you will sign the key as usual and afterwards it will be split into pieces. Every piece will only contain one user identity of Trent's key and your signature to it. This will be encrypted with Trent's key and sent only to the email address given in that identity. Only if Trent can receive this mail and decrypt the message he will be able to import that signature into his key ring. You will not upload your signatures, this is entirely up to him. If your signature will show up on a key server you can be sure that Trent really controls both his key as well as the email address you signed. The signatures you make in this process will also be not part of your keyring. So right after you signed Trent's key it will still be shown as untrusted in your keyring. Once Trent has received your mail and imported your signature into his keyring he can upload them to a keyserver. When you refresh his key from a keyserver you will get the new signatures. While that may sound inconvenient first it makes sure that you will not by accident see one of his identities as trusted that he does not control. Only the signatures that show up on a keyserver are those where everyone, including you, can be sure that he really controls the corresponding email addresses.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title>Working with key servers</title>
+
+<sect2>
+<title>Communication with key servers</title>
+
+<para>The public part of a key pair is usually stored on a key server. These servers allow anyone to search for a key belonging to a specific person or mail address. The signatures are also stored on these servers.</para>
+
+<screenshot>
+<screeninfo>Here's a screen shot of keyserver window.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>This dialog gives you access to the keyservers. You can search and import keys from a keyserver as well as export keys to a server. An example of searching and importing is when you want to write a mail to someone new. If you would like to encrypt your mail to your contact you can search if he or she has a public key on the key servers. If you have created a new key pair or have signed someone else's key you might want to export the public key (possibly with new signatures) to a keyserver.</para>
+<para>Most keyservers synchronize their data between each others so you will get similar search results regardless which server you use. Since there are exceptions of this rule you can choose the keyserver to use in this dialog. It's usually a good idea to choose a default keyserver that is located close to you (i.e. in your country or on your continent) as they usually respond faster to your queries.</para>
+<para>Please note that everything you upload to a keyserver usually stays there forever. This is one reason you should usually limit the lifetime of your keys. Also note that the keyservers are sometimes scanned by spammers for email addresses.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title>Key server search results</title>
+<screenshot>
+<screeninfo>This is an example of the results of a keyserver search.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para>All results of a search are displayed in this window. This picture shows a search for &quot;@kde.org&quot; addresses which showed up 244 results. Using the search field the displayed list was reduced to a single key. This key has two matches: the primary user id itself matches the search string as well as one of the other user ids.</para>
+
+<para>You can select one or more keys to import. The ids of those keys are shown in the <guilabel>Keys to import</guilabel> field at the bottom of the window. When you click on <guibutton>Import</guibutton> the key server is contacted again and the keys are fetched into your keyring.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title>Configuring &kgpg;</title>
+
+<para>Configuration is accessible through the &kgpg; applet menu (&RMB;
+click on the applet) or through the main menu (
+<menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure KGpg</guimenuitem></menuchoice>).
+You can set default parameters for encryption, decryption, user interface and applet.
+Most encryption options are directly related to gpg and are documented in it's <ulink url="man:gpg">man page</ulink>.</para>
+
+<sect2 id="conf-encryption">
+<title>Encryption</title>
+<screenshot>
+<screeninfo>A screen shot of the option dialog with encryption tab opened</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para>Here you can configure special options to be passed to GnuPG to change the encryption behavior. For detailed description please have a look at the GnuPG manual.</para>
+<itemizedlist>
+<listitem><para><guilabel>ASCII armored encryption</guilabel>: this causes encrypted files to be stored in a format that uses only printable ASCII characters and has short lines. Files stored this way are bigger than the files in binary format but are easier to send &eg; by email.</para></listitem>
+<listitem><para><guilabel>Allow encryption with untrusted keys</guilabel>: this allows you to encrypt files with keys that are not trusted by you.</para></listitem>
+<listitem><para><guilabel>PGP 6 compatibility</guilabel>: encrypted files are compatible with the older PGP6 standard. This disables certain features so you should only use this if really needed.</para></listitem>
+<listitem><para><guilabel>Hide user id</guilabel>: this removes all evidence of the receiver from the encrypted file. In case the transmission is intercepted noone could gain information about the recipient from the file. If the receiver has multiple keys he needs to try which one was used.</para></listitem>
+<listitem><para><guilabel>Always encrypt with</guilabel>: all encryptions are additionally encrypted with this key. If you set this to one of your private keys this makes sure you can read all data you encrypted by the price of bigger messages.</para></listitem>
+<listitem><para><guilabel>Encrypt files with</guilabel>: behaves like <guilabel>Always encrypt with</guilabel> for file encryption.</para></listitem>
+<listitem><para><guilabel>Custom encryption command</guilabel>: if you need to pass some unusual options to GnuPG you can specify the command line here. Most users will not need this.</para></listitem>
+<listitem><para><guilabel>Use *.pgp extension for encrypted files</guilabel>: if you check this option encrypted files will be named as the input file with the extension <literal role="extension">.pgp</literal> added, otherwise the extension <literal role="extension">.gpg</literal> is used.</para></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title>Decryption</title>
+
+<para>Here you can specify a custom decryption command. This option is seldomly needed and only useful for advanced users that know of GnuPGs command line options.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title>Appearance</title>
+<para>Here you can configure the way &kgpg; looks to you. Possible settings are the colors that reflect the different levels of key trust in the <link linkend="keymanager">key manager</link> and the font settings for the <link linkend="editor">editor</link>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title>GnuPG Settings</title>
+<para>Here you can configure which gpg binary and which <guilabel>configuration file</guilabel> and home folder are used. These values are autodetected on first start and should already work.</para>
+<para>Using the <ulink url="man:gpg-agent">GnuPG agent</ulink> makes work with GnuPG more comfortable as you do not need to type in your password for every action. It is cached in memory for a while so any operation that would require a password can immediately be done. Note that this may allow other people to use your private keys if you leave your session accessible to them.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title>Key Servers</title>
+<para>Here you can create a list of keyservers that are shown to you when you open the <link linkend="keyserver">key server dialog</link>. If you run GnuPG from the command line only the key server you set as default here will be used.</para>
+<para>The protocol used for communication with the key servers is based on &HTTP;, so it makes sense in some environments to <guilabel>honor the &HTTP; proxy when available</guilabel>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title>Misc</title>
+<para>This section allows the setting of some different features that do not fit into the other sections. You can configure for example to <guilabel>start KGpg automatically at login</guilabel>. The option <guilabel>use mouse selection instead of clipboard</guilabel> changes if selection happens by mouse and pasting by middle mouse button or if all operations are done by keyboard shortcuts.</para>
+<para>You can also change if the systray icon of &kgpg; is shown or not and what action happens if the icon is clicked with the &LMB;. If the systray icon is shown closing the &kgpg; window will minimize the application to tray. If the systray icon is not shown &kgpg; will exit when all windows are closed.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title>Credits and License</title>
+
+<para>
+&kgpg;
+</para>
+
+<para>Program copyright &copy; 2002-2003 Jean-Baptiste Mardelle
+<email>bj@altern.org</email>.</para>
+
+<para>&copy; 2006-2007 Jimmy Gilles
+<email>jimmygilles@gmail.com</email></para>
+
+<para>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer
+<email>kde@opensource.sf-tec.de</email>
+</para>
+
+<!-- TRANS:CREDIT_FOR_TRANSLATORS -->
+
+&underFDL;               <!-- FDL: do not remove -->
+&underGPL;
+
+</chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

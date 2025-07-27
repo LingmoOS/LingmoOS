@@ -1,0 +1,794 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Spanish "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title
+>El manual de &kgpg;</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>Eloy</firstname
+><surname
+>Cuadra</surname
+><affiliation
+><address
+><email
+>ecuadra@eloihr.net</email
+></address
+></affiliation
+><contrib
+>Traductor</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2016-10-10</date>
+<releaseinfo
+>Aplicaciones 16.12</releaseinfo>
+
+<abstract>
+<para
+>&kgpg; es una interfaz gráfica sencilla para GnuPG (<ulink url="https://gnupg.org"
+> (https://gnupg.org)</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>cifrado</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>seguridad</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introducción</title>
+
+
+<para
+>&kgpg; es una interfaz sencilla para GnuPG, una potente herramienta de cifrado. GnuPG (conocido también como gpg) está incluido en la mayor parte de las distribuciones y debe estar instalado en su sistema. Puede obtener la última versión en <ulink url="https://gnupg.org"
+>https://gnupg.org</ulink
+>.</para>
+
+<para
+>Con &kgpg; podrá cifrar y descifrar sus archivos y mensajes de correo electrónico, permitiendo unas comunicaciones mucho más seguras. Un mini cómo sobre cifrado con gpg está disponible en <ulink url="https://www.gnupg.org/documentation/howtos.en.html"
+>la página web de GnuPG</ulink
+>. </para>
+
+<para
+>Con &kgpg; no necesita recordar las opciones de la línea de órdenes de gpg. Casi todo se puede hacer con unos cuantos clics de ratón. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Comenzando</title>
+
+<para
+>Esta es una lista de los principales componentes de &kgpg;:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Icono de la bandeja del sistema </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Icono de &kgpg; en la bandeja del sistema</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Cuando inicia &kgpg;, aparecerá un icono en la bandeja del sistema. Un clic con el &LMB; abrirá la ventana del administrador de claves, mientras que un clic con el &RMB; abrirá un menú que le permite un rápido acceso a algunas características importantes. Si prefiere otras opciones, puede cambiar la acción del &LMB; para que muestre el editor o para desactivar completamente el icono de la bandeja del sistema usando el <link linkend="conf-misc"
+>diálogo de preferencias</link
+>. </para>
+<para
+>Tenga en cuenta que el icono de &kgpg; de la bandeja del sistema está marcado como «inactivo» casi todo el tiempo. Como la bandeja del sistema suele ocultar los iconos inactivos, el de &kgpg; no se mostrará hasta que usted lo solicite explícitamente. Para más detalles, consulte la documentación de &plasma;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Ventana del administrador de claves</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Ventana del administrador de claves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Este es el lugar central para administrar sus claves. Para abrir la ventana del <link linkend="keymanager"
+>administrador de claves</link
+>, haga clic con el &LMB; en el icono de &kgpg; de la bandeja del sistema. Puede importar, exportar, firmar y editar sus claves. La mayor parte de las acciones se pueden llevar a cabo con un clic del &LMB; sobre una clave. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Ventana del editor</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Ventana del editor</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Es un editor de texto sencillo, donde puede escribir o pegar un texto para cifrarlo o descifrarlo. Para abrir el <link linkend="editor"
+>editor</link
+>, haga clic con el &RMB; en el icono de &kgpg; de la bandeja del sistema. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integración en el gestor de archivos</term>
+<listitem>
+
+<para
+>&kgpg; está integrado en &konqueror; y &dolphin;. Esto significa que cuando haga clic con el botón derecho sobre un archivo, podrá seleccionar <menuchoice
+><guimenu
+>Acciones</guimenu
+><guimenuitem
+>Cifrar archivo</guimenuitem
+></menuchoice
+> para cifrar un archivo. Puede descifrar un archivo con un clic del &LMB;. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>Uso de &kgpg;</title>
+
+<para
+>Existen dos formas de cifrar sus datos: <itemizedlist>
+<listitem
+><para
+>Cifrado simétrico: sus datos se cifran con una contraseña. Cualquiera que tenga un ordenador con gpg puede descifrar su mensaje si usted le proporciona la contraseña. Para realizar un cifrado simétrico, seleccione la opción «Cifrado simétrico» cuando se le pregunte por una clave de cifrado.</para
+></listitem>
+<listitem
+><para
+>Cifrado por clave: primero debe crear su pareja de claves (clave secreta y clave pública) y proporcionar una contraseña. Guarde su clave secreta en un lugar seguro, e intercambie su clave pública con sus amigos. Luego, si desea enviar un mensaje cifrado a Álex, deberá cifrar el mensaje con la clave pública de Álex. Para descifrar el mensaje, el receptor necesitará la clave secreta de Álex y su contraseña.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>El cifrado por clave es algo más complicado (usted debe intercambiar claves con sus amigos), pero más seguro. Recuerde que si cifra un mensaje con la clave de otra persona, no será capaz de descifrarlo. Usted solo puede descifrar mensajes que hayan sido cifrados con su propia clave pública.</para>
+
+<sect1 id="key-generation">
+<title
+>Generar una clave</title>
+
+<para
+>Si no tiene una clave, &kgpg; le mostrará automáticamente el diálogo de generación de claves la primera vez que lo inicie. También puede acceder a él desde el administrador de claves con la opción de menú <menuchoice
+><guimenu
+>Clave</guimenu
+> <guimenuitem
+>Generar par de claves</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>El diálogo de generación de clave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Solo tiene que introducir su nombre y su dirección de correo electrónico, y luego pulsar el botón <guibutton
+>Aceptar</guibutton
+>. De este modo generará una clave gpg estándar. Si necesita más opciones puede pulsar el botón de <guibutton
+>Modo experto</guibutton
+>, que le mostrará una ventana de &konsole; donde puede emplear todas las opciones de gpg.</para>
+<para
+>Muchas personas juguetean con su primera clave, generan identificaciones de usuario incorrectas, añaden comentarios de los que luego se arrepienten o simplemente olvidan su contraseña. Para evitar que estas claves tengan validez ilimitada suele ser una buena idea limitar su vida a unos 12 meses. Puede modificar la vida de su clave secreta más tarde usando la <link linkend="keyproperties"
+>ventana de propiedades de la clave</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Revocar una clave</title>
+
+<para
+>Un par de claves que ha expirado se puede devolver a un estado operativo siempre que tenga acceso a la clave privada y a la contraseña. Para convertir con seguridad una clave en no utilizable necesita revocarla. La revocación se lleva a cabo añadiendo a la clave una firma especial de revocación.</para>
+
+<para
+>Esta firma de revocación se puede crear de forma simultánea a la clave. En este caso se almacena en un archivo separado. Este archivo se puede importar más adelante en el anillo de claves para adjuntarlo a la clave y convertirla así en no utilizable. Tenga en cuenta que importar esta firma en la clave no necesita contraseña. Por ello, debería guardar esta firma de revocación en un lugar seguro, normalmente uno distinto al de su par de claves. Un buen consejo sería guardarla en un lugar independiente de su equipo, ya sea copiándola en un dispositivo de almacenamiento externo como un pendrive USB o imprimiéndola.</para>
+
+<para
+>Si no ha creado esta firma de revocación independiente al crear la clave, puede crearla en cualquier momento escogiendo <menuchoice
+><guimenu
+>Claves</guimenu
+> <guimenuitem
+>Revocar clave</guimenuitem
+></menuchoice
+>. De forma opcional, puede importarla inmediatamente a su anillo de claves.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Cifrando sus datos</title>
+
+<sect2 id="konqui">
+
+<title
+>Cifrar un archivo desde &konqueror; o Dolphin</title>
+
+<para
+>Haga clic con el &RMB; sobre el archivo que quiere cifrar. Elija <menuchoice
+><guimenu
+>Acciones</guimenu
+> <guimenuitem
+> Cifrar archivo</guimenuitem
+></menuchoice
+> en el menú emergente. Se le mostrará el diálogo para seleccionar una clave pública. Seleccione la clave del receptor y pulse <guibutton
+>Cifrar</guibutton
+>. El archivo cifrado se guardará con la extensión <literal role="extension"
+>.asc</literal
+> o <literal role="extension"
+>.gpg</literal
+>, dependiendo de si había elegido el <guilabel
+>cifrado con blindaje ASCII</guilabel
+> o no. Los archivos cifrados en ASCII solamente utilizan caracteres legibles para representar los datos resultantes en archivos que son más robustos al ser copiados o enviados por correo, pero son un tercio más largos.</para>
+
+<screenshot>
+<screeninfo
+>Captura de pantalla de la ventana de selección de clave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Cifrar un texto con la miniaplicación de &kgpg;</title>
+
+<para
+>Puede cifrar el contenido del portapapeles seleccionando la opción <guimenuitem
+>Cifrar el portapapeles</guimenuitem
+> en el menú del icono de la bandeja del sistema. En cambio, si selecciona <guimenuitem
+>Firmar el portapapeles</guimenuitem
+>, se firmará el texto contenido en el mismo. Ambas acciones importarán el contenido actual del portapapeles en una <link linkend="editor"
+>ventana del editor</link
+>, realizarán la acción solicitada y pegarán el contenido de nuevo en el editor.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Cifrar un texto en el editor de &kgpg;</title>
+
+<para
+>Esto es tan sencillo como pulsar el botón <guibutton
+>Cifrar</guibutton
+>. Se le mostrará el diálogo de selección de clave pública. Seleccione su clave y pulse <guibutton
+>Aceptar</guibutton
+>. El texto cifrado aparecerá en la ventana del editor.</para>
+
+<para
+>Normalmente, solo podrá cifrar archivos con las claves en las que confía. Debido a que a veces solo querrá enviar una nota confidencial a ciertas personas, debe ser consciente de tener una clave GPG para la que pueda fijar la opción <guilabel
+>Permitir cifrar con claves que no sean de confianza</guilabel
+>.</para>
+
+<para
+>Para asegurarse de que puede descifrar cualquier archivo que haya cifrado, incluso si lo ha hecho con la clave de otro, puede usar las opciones <guilabel
+>Cifrar siempre con</guilabel
+> y <guilabel
+>Cifrar archivos con</guilabel
+>, que están disponibles en la <link linkend="conf-encryption"
+>configuración de KGpg</link
+>.</para>
+
+<para
+>Para más información sobre las opciones de cifrado en <guilabel
+>ASCII blindado</guilabel
+>, <guilabel
+>Permitir cifrar con claves que no sean de confianza</guilabel
+> y <guilabel
+>Cifrado simétrico</guilabel
+>, consulte la documentación de gpg o sus <ulink url="man:gpg"
+>páginas man</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Descifrando sus datos</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Descifrar un archivo en &konqueror; o &dolphin;</title>
+<para
+>Haga clic con el botón <mousebutton
+>izquierdo</mousebutton
+> del ratón sobre el archivo que quiere descifrar, y luego introduzca su contraseña. También puede arrastrar un archivo de texto cifrado y soltarlo en la ventana del editor de &kgpg;. Se le preguntará la contraseña y se mostrará el texto descifrado en la ventana del editor de &kgpg;. Puede arrastrar y soltar incluso archivos remotos. De forma alternativa, también puede usar la opción del menú <menuchoice
+><guimenu
+>Archivo</guimenu
+> <guimenuitem
+>Descifrar archivo</guimenuitem
+></menuchoice
+> y seleccionar un archivo para descifrar.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Descifrar un texto con la miniaplicación de &kgpg;</title>
+
+<para
+>También puede descifrar el contenido del portapapeles con la entrada del menú <guimenuitem
+>Descifrar el portapapeles</guimenuitem
+> del icono de &kgpg; en la bandeja del sistema. Se mostrará una <link linkend="editor"
+>ventana del editor</link
+> con el texto descifrado.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Descifrar un texto desde el editor</title>
+
+<para
+>Copie o arrastre y suelte el texto que desea descifrar, y luego pulse el botón <guibutton
+>Descifrar</guibutton
+>. Se le preguntará por la contraseña. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Administración de claves</title>
+
+<para
+>&kgpg; puede realizar todas las opciones básicas de administración de claves. Para abrir la ventana de administración de claves haga clic con el &LMB; en applet de &kgpg;. La mayor parte de las opciones están disponibles al hacer clic con el botón <mousebutton
+>derecho</mousebutton
+> del ratón sobre una clave. Para importar o exportar claves públicas puede usar el procedimiento de arrastrar y soltar o los accesos rápidos de teclado para copiar y pegar.</para>
+
+<para
+>Puede exportar una clave pública por correo electrónico, al portapapeles, a un servidor de claves o a un archivo local. Use las opciones del diálogo de exportación para exportar todo, para exportar sin atributos (identidades de fotos) o para exportar una clave «limpia» (&ie;, la clave sola, incluyendo sus subclaves, pero excluyendo todas las firmas). </para>
+
+<sect2 id="keymanager">
+<title
+>El administrador de claves</title>
+
+<screenshot>
+<screeninfo
+>Captura de la pantalla de administración de claves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>En este ejemplo puede ver un grupo de claves que contiene dos claves, dos pares de claves y tres claves públicas. La tercera columna muestra la confianza que tiene en las claves. El primer par de claves es de confianza total y también es la clave predeterminada (caracteres en negrita), mientras que el segundo ha expirado. Dos de las claves públicas son de completa confianza, mientras que la última clave posee una ligera confianza. La última clave está expandida, y muestra su subclave ElGamal, una identidad de usuario adicional, ambas de ligera confianza, y algunas de sus firmas.</para>
+<para
+>Las firmas permiten le navegar por su anillo de claves. Si hace doble clic sobre una firma o una clave mostrada como miembro de un grupo, irá directamente a su correspondiente clave primaria.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Propiedades de la clave</title>
+
+<screenshot>
+<screeninfo
+>La ventana de propiedades de la clave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Mientras que el administrador de claves le permite acciones generales con una o más claves, grupos de claves o firmas, la ventana de propiedades de la clave le proporciona acceso a una única clave. Puede llegar a ella pulsando la tecla «Intro» en el administrador de claves o haciendo doble clic sobre la clave.</para>
+<para
+>En esta ventana puede cambiar la contraseña de la clave y la caducidad de sus claves secretas. También puede establecer el valor de confianza en el propietario de todas las claves.</para>
+<para
+>Este valor indica cuánto confía en el propietario de esta clave para verificar correctamente la identidad de las claves que firma. Teniendo en cuenta la confianza en el propietario, gpg crea su propia red de confianza. Usted confía en las claves que ha firmado. Si asigna confianza en estas personas, también confiará en las claves que ellos hayan firmado sin la necesidad de que usted tenga que firmar sus claves también.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Firma de claves</title>
+
+<para
+>Cuando firma una clave de otra persona (a la que llamaremos Alicia) está anunciando que está seguro de que esta clave pertenece realmente a esta persona y que dicha clave es de confianza. Por supuesto, usted tendría que haberlo comprobado. Esto suele significar que usted se ha encontrado con Alicia, ha comprobado por lo menos su carnet de identidad y ha obtenido de ella la huella digital completa de su clave o una copia de su clave. A continuación ha vuelto a casa y ha firmado la clave de Alicia. Normalmente, subirá más tarde la clave recién firmada a un <link linkend="keyserver"
+>servidor de claves</link
+> para que todo el mundo sepa que usted ha comprobado que la clave y su propietario son de confianza. Alicia hará probablemente lo mismo, de modo que ambos tendrán sus claves firmadas por la otra persona. Si uno de ustedes no tiene el carnet de identidad a mano, tampoco habrá ningún problema si la firma se hace en una dirección.</para>
+
+<para
+>Pero piense en lo que ocurriría si Alicia vive en la otra punta del mundo. Usted se comunica con ella a menudo pero no existe la posibilidad de la vea en persona en un futuro próximo. ¿Cómo puede confiar en su clave?</para>
+
+<para
+>Cuando usted selecciona su clave y elige <guimenuitem
+>Firmar clave...</guimenuitem
+> obtendrá el diálogo que le permitirá escoger las opciones sobre cómo desea firmar dicha clave.</para>
+
+<screenshot>
+<screeninfo
+>Selección de una clave privada para firmar</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>En primer lugar, puede escoger la clave que usará para firmar la clave de la otra persona. Luego puede introducir el grado de seguridad con el que ha comprobado que ella es realmente la persona que dice ser. Esta información se almacenará junto con la firma para que sirva de guía a cualquiera que pueda necesitar esta clave (volveremos a esto más adelante). Y también dispone de la opción que le ayudará en caso de que no pueda encontrarse con Alicia en persona: <guilabel
+>Firma local (no se puede exportar)</guilabel
+>. Si marca esta opción se creará una versión especial de la firma que nunca saldrá de su anillo de claves, ni siquiera por accidente.</para>
+
+<para
+>Pero, ¿por qué es importante el grado de seguridad con el que ha comprobado la identidad de Alicia? ¿A quién debería importarle? Existe un modo distinto de solucionar su problema con la identidad de Alicia. Si usted no puede visitarla en un futuro próximo, acuérdese de su amigo Juan. Usted sabe que Juan también tiene una pareja de claves, y que Juan es un trotamundos que viaja a un continente distinto al menos dos veces al mes. Si tiene suerte, tal vez un día vaya a estar próximo a Alicia. De este modo, usted puede encontrarse con Juan para firmar sus respectivas claves, y luego le enviará una nota a Alicia para comunicarle que Juan viajará a su ciudad pronto, pidiéndole que se encuentre con él para firmar sus claves. Cuando esto haya ocurrido, usted sabrá que la clave de Juan es de confianza, y también que Juan sabe que la clave de Alicia es de confianza. Si usted confía en que Juan ha verificado ciudadosamente la identidad de Alicia, también podrá confiar en la clave de ella.</para>
+
+<para
+>Estas relaciones entre claves y sus propietarios forman lo que se llama una red de confianza. Dentro de esta red existen varios valores importantes que definen lo fiable que es una determinada clave. Lo primero es el grado de meticulosidad con el que se ha comprobado la identidad del propietario de una clave. Este es el valor que ha visto en la parte superior de la ventana de selección de claves secretas. Por ejemplo, probablemente sabrá cómo verificar el carnet de identidad de su propio país, aunque tal vez tenga problemas en comprobar la tarjeta de identificación de un país distinto. De este modo usted podrá decir que ha comprobado con mucho cuidado la identidad de Juan porque ha visto su carnet de identidad y se parece bastante al de usted. Pero Juan, aunque ha visto la tarjeta de identidad y el permiso de conducir de Alicia, puede decir que él solo ha realizado una ligera comprobación de la identidad de ella, ya que él no está completamente seguro de la veracidad de estos documentos de otra parte del mundo.</para>
+
+<para
+>El siguiente valor importante es cuánto confía usted en la otra persona para que verifique estos documentos. Usted sabe que Juan es fiable en este sentido. Pero Jorge, por ejemplo, no es alguien a quien usted calificaría de inteligente, ya que apenas comprobó su carnet de identidad cuando se encontró con él para firmar sus respectivas claves. Usted está seguro de que Jorge es la persona que dice ser porque comprobó sus documentos cuidadosamente, pero no parece que él sea igual de cuidadoso cuando comprueba la identidad de otras personas. Así, usted tendrá una alta confianza en la clave de Jorge, pero confiará bastante menos en las claves que él firme. Si abre las <link linkend="keyproperties"
+>propiedades</link
+> de una clave encontrará el campo <guilabel
+>Confianza en el propietario</guilabel
+>. Esta es la confianza que tiene usted en el propietario de la clave cuando él firma otras claves. Este valor no se exportará, ya que se trata de una preferencia personal suya.</para>
+
+<screenshot>
+<screeninfo
+>La ventana de propiedades de la clave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Ahora debería tener una idea sobre cómo se construye una red de confianza, para qué sirven los valores de confianza en propietarios y claves, y por qué debe ser tan cuidadoso como le sea posible cuando compruebe identidades: otras personas pueden confiar en usted. Pero todavía queda por comprobar un elemento de este proceso: las direcciones de correo electrónico de las claves que firme. Solo necesitará varios clics de ratón para crear una nueva identidad de usuario en su clave con las direcciones de correo electrónico de Alicia o de Juan. Usted ha verificado que Juan es realmente el propietario de su clave. Pero nadie ha comprobado hasta ahora que Juan controla realmente las direcciones de correo electrónico de sus identidades de usuario.</para>
+
+<para
+>Si usted elige <guimenuitem
+>Firmar y enviar por correo ID de usuario...</guimenuitem
+> en el menú, habrá cerrado este agujero. La idea es que usted firmará la clave como siempre y que después sea dividida en varias partes. Cada parte contendrá únicamente una identidad de usuario de la clave de Juan y la firma de usted, y será cifrada con la clave de Juan y enviada solo a la dirección de correo electrónico que contiene dicha identidad. Juan solo podrá importar esta firma en su anillo de claves si es capaz de recibir este mensaje y descifrarlo. Usted no enviará sus firmas, ya que esto le corresponde a él. Si la firma de usted se muestra en un servidor de claves, podrá estar seguro de que Juan controla tanto su clave como la dirección de correo electrónico que usted firmó. Las firmas que haga en este proceso tampoco serán parte de su anillo de claves. De modo que, tras firmar la clave de Juan, todavía seguirá apareciendo sin confianza en su anillo de claves. Una vez que Juan haya recibido su mensaje y haya importado su firma en su propio anillo de claves, podrá enviarla a un servidor de claves. Cuando usted actualice la clave de Juan de un servidor de claves obtendrá las nuevas firmas. Aunque esto pueda parecer inconveniente a primera vista, asegura que usted no vea como fiables por accidente alguna de las identidades que él no controle. Solo las firmas que se muestran en un servidor de claves son las que todo el mundo, incluido usted, puede estar seguro de que son las que Juan controla las correspondientes direcciones de correo electrónico.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Trabajo con los servidores de claves</title>
+
+<sect2>
+<title
+>Comunicación con los servidores de claves</title>
+
+<para
+>La parte pública de un par de claves se almacena normalmente en un servidor de claves. Estos servidores permiten que cualquiera pueda buscar una clave perteneciente a una determinada persona o dirección de correo. Las firmas también se guardan en estos servidores.</para>
+
+<screenshot>
+<screeninfo
+>Captura de pantalla de la ventana del servidor de claves.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Este diálogo le proporciona acceso a los servidores de claves. Puede buscar e importar claves de un servidor de claves, además de exportar claves al servidor. Un ejemplo de búsqueda e importación es cuando quiere escribir un mensaje a alguien nuevo. Si quisiera cifrar un mensaje para su contacto, podría buscar si este posee una clave pública en los servidores. Si usted ha creado un nuevo par de claves o ha firmado la clave de alguien, podría desear exportar la clave pública (posiblemente con nuevas firmas) a un servidor de claves.</para>
+<para
+>La mayor parte de los servidores de claves sincroniza sus datos con otros servidores, de modo que obtendrá resultados de búsqueda similares sin importar qué servidor esté usando.Como existen excepciones a esta regla, siempre puede seleccionar el servidor de claves a usar en este diálogo. Normalmente suele ser una buena idea seleccionar un servidor de claves predeterminado que esté cerca de usted (es decir, en su país o en su continente), ya que suelen responder más rápidamente a sus consultas.</para>
+<para
+>Por favor, tenga en cuenta que todo lo que envíe a un servidor de claves suele permanecer allí indefinidamente. Esta es una buena razón para limitar la vida de sus claves. Recuerde también que los servidores de claves pueden ser rastreados por «spammers» que busquen direcciones de correo electrónico.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Resultado de la búsqueda en el servidor de claves</title>
+<screenshot>
+<screeninfo
+>Esto es un ejemplo del resultado de una búsqueda en el servidor de claves.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Todos los resultados de una búsqueda se muestran en esta ventana. La imagen muestra una búsqueda de direcciones «@kde.org», que ha encontrado 244 coincidencias. Al usar el campo de búsqueda, la lista se ha reducido a una única clave. Esta clave tiene dos coincidencias: la identidad del primer usuario concuerda con la cadena buscada, al igual que la identidad de otro usuario.</para>
+
+<para
+>Puede seleccionar una o más claves para importar. Las identidades de estas claves se muestran en el campo <guilabel
+>Claves a importar</guilabel
+> existente en la parte inferior de la ventana. Cuando pulse en el botón <guibutton
+>Importar</guibutton
+>, se vuelve a contactar de nuevo con el servidor de claves para obtener las que haya seleccionado, que serán incorporadas a su anillo de claves.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>Configuración de &kgpg;</title>
+
+<para
+>Se puede acceder a la configuración de &kgpg; desde el menú de la miniaplicación (haga clic con el &RMB; sobre el icono del applet) o desde el menú principal (<menuchoice
+><guimenu
+>Preferencias</guimenu
+><guimenuitem
+>Configurar KGpg</guimenuitem
+></menuchoice
+>). Puede establecer los parámetros por omisión para cifrar, descifrar, la interfaz del usuario y la miniaplicación. Muchas de las opciones de cifrado están directamente relacionadas con gpg y están documentadas en su <ulink url="man:gpg"
+>página man</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Cifrado</title>
+<screenshot>
+<screeninfo
+>Captura de la pantalla del diálogo de opciones con la pestaña de cifrado abierta</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Aquí puede configurar opciones especiales para pasar a GnuPG para cambiar el comportamiento del cifrado. Para una descripción detallada, consulte el manual de GnuPG.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>Cifrado ASCII armado</guilabel
+>: esto hace que los archivos cifrados se almacenen en un formato que solo use caracteres ASCII imprimibles y que tenga líneas cortas. Los archivos almacenados de este modo son mayores que los que están en formato binario, pero son más fáciles de enviar (&eg;, por correo electrónico).</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Permitir cifrado con claves no confiables</guilabel
+>: esto le permite cifrar archivos con claves que no sean de confianza para usted.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Compatibilidad con PGP 6</guilabel
+>: los archivos cifrados son compatibles con el anterior estándar PGP6. Esto desactiva ciertas características, así que solo debería usar esto si es absolutamente necesario.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Ocultar ID de usuario</guilabel
+>: esto elimina todo indicio del receptor en el archivo cifrado. En caso de que la transmisión sea interceptada, nadie puede obtener información sobre el destinatario a partir del archivo. Si el receptor posee múltiples claves, necesitará probar con la que fue usada.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Cifrar siempre con</guilabel
+>: todos los cifrados serán cifrados adicionalmente con esta clave. Si establece esto a una de sus claves privadas, se asegurará de que podrá leer todos los datos que cifre con el precio de obtener mensajes más largos.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Cifrar archivos con</guilabel
+>: se comporta como <guilabel
+>Cifrar siempre con</guilabel
+> para el cifrado de archivos.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Orden de cifrado personalizada</guilabel
+>: si necesita pasar alguna opción poco usual a GnuPG, puede especificar la línea de órdenes aquí. La mayor parte de usuarios no necesitará esto.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Usar la extensión *.pgp en los archivos cifrados</guilabel
+>: si marca esta opción, los archivos cifrados se nombrarán como el archivo de entrada con la extensión <literal role="extension"
+>.pgp</literal
+> añadida; en caso contrario se usará la extensión <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Descifrado</title>
+
+<para
+>Aquí puede especificar una orden de descifrado personalizada. Esta opción es raramente necesaria y solo resulta útil para usuarios avanzados que conozcan las opciones de la línea de órdenes de GnuPG.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Apariencia</title>
+<para
+>Aquí puede configurar el modo en que &kgpg; se muestra ante usted. Las preferencias posibles son los colores que reflejan los diferentes niveles de confianza de las claves en el <link linkend="keymanager"
+>gestor de claves</link
+> y las preferencias del tipo de letra para el <link linkend="editor"
+>editor</link
+>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>Preferencias GnuPG</title>
+<para
+>Aquí puede configurar qué binario gpg y qué <guilabel
+>archivo de configuración</guilabel
+> y carpeta de inicio se usarán. Estos valores son autodetectados durante el primer inicio y ya deberían funcionar.</para>
+<para
+>El uso del <ulink url="man:gpg-agent"
+>agente GnuPG</ulink
+> hace que el trabajo con GnuPG sea más confortable, no teniendo que teclear su contraseña para cada acción. Esta será cacheada en memoria durante un rato, de modo que cualquier operación que requiera la contraseña será realizada de inmediato. Tenga en cuenta que esto puede permitir que otras personas usen su clave privada si deja la sesión accesible a ellas.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Servidores de claves</title>
+<para
+>Aquí puede crear una lista de servidores de claves que se le mostrarán cuando abra el <link linkend="keyserver"
+>diálogo de los servidores de claves</link
+>. Si ejecuta GnuPG desde la línea de órdenes, solo será usado el servidor de claves que haya establecido aquí como predeterminado.</para>
+<para
+>El protocolo usado para la comunicación con el servidor de claves está basado en &HTTP;, de modo que tiene sentido en algunos entornos <guilabel
+>usar el proxy &HTTP; cuando esté disponible</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Varios</title>
+<para
+>Esta sección permite el establecimiento de algunas características diferentes que no encajan en otras secciones. Puede configurar, por ejemplo, <guilabel
+>iniciar KGpg automáticamente al comenzar KDE</guilabel
+>. La opción <guilabel
+>usar la selección del ratón en lugar del portapapeles</guilabel
+> modifica si se puede seleccionar con el ratón y el pegado con el botón central del ratón, o si todas las operaciones se realizan mediante accesos rápidos de teclado.</para>
+<para
+>También puede cambiar si el icono de &kgpg; en la bandeja del sistema se muestra o no, y qué acción ocurre si se pulsa el icono con el &LMB;. Si se muestra el icono de la bandeja del sistema, el cierre de la ventana de &kgpg; minimizará la aplicación en la bandeja del sistema. Si este icono no se muestra, se saldrá de &kgpg; cuando se cierren todas sus ventanas.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Créditos y licencia</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Copyright del programa &copy; 2002-2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Traducido por Eloy Cuadra <email
+>ecuadra@eloihr.net</email
+></para
+> &underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

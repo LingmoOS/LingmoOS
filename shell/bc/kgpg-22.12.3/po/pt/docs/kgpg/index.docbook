@@ -1,0 +1,795 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Portuguese "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title
+>O Manual do &kgpg;</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>José</firstname
+><surname
+>Pires</surname
+><affiliation
+><address
+><email
+>zepires@gmail.com</email
+></address
+></affiliation
+><contrib
+>Tradução</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2016-10-10</date>
+<releaseinfo
+>Aplicações 16.12</releaseinfo>
+
+<abstract>
+<para
+>O &kgpg; é uma interface gráfica simples para o GnuPG (<ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>encriptação</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>segurança</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introdução</title>
+
+
+<para
+>O &kgpg; é uma interface simples para o GnuPG, um utilitário poderoso de encriptação. O GnuPG (também conhecido por 'gpg') vem incluído na maioria das distribuições e deverá estar instalado no seu sistema. Poderá obter a última versão em <ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>.</para>
+
+<para
+>Com o &kgpg; será capaz de cifrar e decifrar os seus ficheiros e e-mails, o que lhe permitirá comunicações muito mais seguras. Está disponível um mini-tutorial sobre encriptação com o gpg na <ulink url="http://www.gnupg.org/documentation/howtos.html"
+>página Web do GnuPG</ulink
+>. </para>
+
+<para
+>Com o &kgpg;, não terá de se lembrar das linhas de comando e opções do 'gpg'. Quase tudo poderá ser feito com alguns 'clicks' do rato. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Começar</title>
+
+<para
+>Aqui está uma lista das principais componentes do &kgpg;:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Ícone da Bandeja do Sistema </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>'Applet' na bandeja do sistema do &kgpg;</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Quando iniciar o &kgpg;, irá aparecer um ícone na bandeja do sistema. Se carregar nele com o &LMB; irá abrir a janela de Gestão das Chaves, por outro lado se carregar com o &RMB; irá abrir um menu que permite rápido acesso a algumas funcionalidades importantes. Se preferir outras opções, poderá modificar a acção do &LMB; para mostrar o editor ou desactivar por completo o ícone da bandeja, usando a <link linkend="conf-misc"
+>janela de configuração</link
+>. </para>
+<para
+>Lembre-se que o ícone da bandeja do &kgpg; fica marcado como &quot;inactivo&quot; na maior parte do tempo. Dado que a 'applet' da bandeja irá normalmente esconder os ícones inactivos, o do &kgpg; poderá não ficar visível até que lhe peça explicitamente para tal. Para mais detalhes, veja a documentação do &plasma;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Janela de Gestão de Chaves</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Janela de gestão de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Esse é o local central para gerir as suas chaves. Para abrir a <link linkend="keymanager"
+>janela de Gestão das Chaves</link
+>, carregue com o &LMB; na 'applet' do &kgpg;. Poderá importar, exportar, assinar e editar as suas chaves. A maioria das acções poderá ser feita com um 'click' do &RMB; numa chave. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Janela do Editor</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Janela do editor</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>É um editor de texto simples, onde poderá escrever ou colar texto para o cifrar ou decifrar. Para abrir o <link linkend="editor"
+>editor</link
+>, carregue com o &RMB; na 'applet' do &kgpg;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integração com o gestor de ficheiros</term>
+<listitem>
+
+<para
+>O &kgpg; está integrado no &konqueror; e do &dolphin;. Isto significa que, quando carrega num ficheiro, pode optar por <menuchoice
+><guimenu
+>Acções</guimenu
+><guimenuitem
+>Encriptar o Ficheiro</guimenuitem
+></menuchoice
+> para o cifrar. Pode decifrá-lo se carregar com o &LMB;. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>Usar o &kgpg;</title>
+
+<para
+>Existem duas formas de cifrar os seus dados: <itemizedlist>
+<listitem
+><para
+>Cifra simétrica: os seus dados são apenas cifrados com uma senha. Qualquer pessoa que tiver um computador com o 'gpg' poderá decifrar a sua mensagem se lhe der a senha. Para efectuar uma cifra simétrica, escolha a "cifra simétrica" na janela de opções quando for pedido para escolher uma senha de cifra.</para
+></listitem>
+<listitem
+><para
+>Cifra por chave: primeiro terá de criar o seu par de chaves (pública e privada) e indicar uma frase-senha. Mantenha a sua chave privada num local seguro e troque a sua chave pública com os seus amigos. Aí, se quiser enviar uma mensagem cifrada para o Alex, terá de cifrar a mensagem com a chave pública do Alex. Para decifrar a mensagem, o destinatário irá necessitar da chave privada e da frase-senha do Alex.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>A cifra por chave é um pouco mais complicada (precisa de trocar chaves com os seus amigos) mas é mais segura. Lembre-se que, se cifrar uma chave com a chave de outra pessoa, não será capaz de a decifrar. Só consegue decifrar as mensagens que tenham sido cifradas com a sua chave pública.</para>
+
+<sect1 id="key-generation">
+<title
+>Gerar uma chave</title>
+
+<para
+>Se não tiver uma chave, o &kgpg; irá automaticamente mostrar a janela de geração de chaves no primeiro arranque. Pode também aceder à mesma no Gestor de Chaves a partir da opção <menuchoice
+><guimenu
+>Chaves</guimenu
+><guimenuitem
+>Gerar um Par de Chaves</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Janela de geração de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Basta indicar o seu nome, o endereço de e-mail e carregar em <guibutton
+>Ok</guibutton
+>. Será gerada uma chave-padrão de GPG. Se quiser mais opções poderá carregar no botão do <guibutton
+>Modo Experiente</guibutton
+>, o que irá mostrar uma janela do &konsole; com todas as opções do 'gpg'.</para>
+<para
+>Muitas pessoas gostam de brincar com a sua primeira chave, geram ID's de utilizadores inválidos, adicionam comentários que se arrependem mais tarde ou simplesmente esquecem a sua senha. Para evitar que essas chaves se mantenham válidas para sempre, é normalmente boa ideia limitar o tempo de vida para cerca de 12 meses. Você poderá modificar o tempo de vida das suas chaves privadas mais tarde com a <link linkend="keyproperties"
+>janela de propriedades da chave</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Revogar uma chave</title>
+
+<para
+>Um par de chaves que tenha expirado poderá voltar a um estado operacional, desde que tenha acesso à chave privada e à frase-senha. Para inutilizar de forma fiável uma chave, terá de a revogar. A revogação é feita com a adição de uma assinatura de revogação especial à chave.</para>
+
+<para
+>Esta assinatura de revogação poderá ser criada em conjunto com a chave. Nesse caso, é guardada num ficheiro separado. Esse ficheiro poderá então ser importado para o porta-chaves e depois anexado à chave, inutilizando-a. Lembre-se por favor que, para importar esta assinatura para a chave, não é necessária qualquer senha. Como tal, deverá guardar esta assinatura de revogação num local seguro, normalmente num que seja distinto do seu par de chaves. Um bom conselho é usar um local separado do seu computador, seja copiando-o para um dispositivo externo de armazenamento (p.ex., um disco USB) ou imprimindo-o.</para>
+
+<para
+>Se não tiver criado uma dessas revogações destacadas na criação da chave, poderá criar uma assinatura de revogação em qualquer altura, escolhendo a opção <menuchoice
+><guimenu
+>Chaves</guimenu
+> <guimenuitem
+>Revogar a chave</guimenuitem
+></menuchoice
+>, importando-a opcionalmente para o seu porta-chaves de imediato.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Cifrar os Seus Dados</title>
+
+<sect2 id="konqui">
+
+<title
+>Cifrar um Ficheiro a Partir do &konqueror; ou do Dolphin</title>
+
+<para
+>Carregue no ficheiro que deseja cifrar com o &RMB;. Escolha a opção <menuchoice
+><guimenu
+>Acções</guimenu
+><guimenuitem
+>Cifrar o Ficheiro</guimenuitem
+></menuchoice
+> no menu de contexto. Ser-lhe-á apresentada a janela de selecção da Chave Pública. Escolha a chave do destinatário e carregue em <guibutton
+>Cifrar</guibutton
+>. O ficheiro cifrado será gravado com uma extensão <literal role="extension"
+>.asc</literal
+> ou <literal role="extension"
+>.gpg</literal
+>, dependendo se escolheu a <guilabel
+>cifra armada ASCII</guilabel
+> ou não. Os ficheiros encriptados em ASCII só usam os caracteres visíveis, para representar os dados resultantes, nos ficheiros para serem mais robustos ao copiar ou enviar por e-mail; contudo, são maiores em um terço.</para>
+
+<screenshot>
+<screeninfo
+>Aqui está uma imagem da janela de selecção das chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Cifrar um texto com a 'applet' do &kgpg;</title>
+
+<para
+>Poderá encriptar o conteúdo da área de transferência, seleccionando para tal a opção <guimenuitem
+>Encriptar a área de transferência</guimenuitem
+> no menu da 'applet'. Quando escolher a opção <guimenuitem
+>Assinar a área de transferência</guimenuitem
+>, então o texto será assinado em alternativa. Ambas as acções irão importar o conteúdo actual da área de transferência para a <link linkend="editor"
+>janela do editor</link
+>, efectuam a acção pedida e colam o conteúdo de volta no editor.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Cifrar o texto do editor do &kgpg;</title>
+
+<para
+>É tão simples como carregar no botão <guibutton
+>Encriptar</guibutton
+>. Ser-lhe-á então apresentada a janela de selecção da chave pública; escolha a sua chave e carregue em <guibutton
+>Ok</guibutton
+>. A mensagem cifrada irá então aparecer na janela do editor.</para>
+
+<para
+>Normalmente, só poderá encriptar os ficheiros que sejam da sua confiança. Dado que, algumas vezes, só deseja enviar uma nota privada a algumas pessoas que sabe que têm uma chave de GPG, poderá activar a opção <guilabel
+>Activar a encriptação com chaves não-fiáveis</guilabel
+>.</para>
+
+<para
+>Para se certificar que consegue descodificar os ficheiros que encriptou, mesmo que o tenha feito com a chave de outra pessoa, poderá usar as opções <guilabel
+>Encriptar sempre com</guilabel
+> e <guilabel
+>Encriptar os ficheiros com</guilabel
+>, que estão disponíveis na <link linkend="conf-encryption"
+>configuração do KGpg</link
+>.</para>
+
+<para
+>Para mais informações sobre as opções de encriptação <quote
+>Cifra de ASCII armada</quote
+>, <quote
+>Permitir a cifra com chaves não fiáveis</quote
+> e <quote
+>Cifra simétrica</quote
+>, por favor veja a documentação ou as <ulink url="man:gpg"
+>páginas do 'man'</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Decifrar os Seus Dados</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Decifrar um Ficheiro a Partir do &konqueror; ou do &dolphin;</title>
+<para
+>Carregue com o botão <mousebutton
+>esquerdo</mousebutton
+> no ficheiro que quer decifrar. Indique a sua frase-senha e este será decifrado. Também poderá arrastar um ficheiro de texto cifrado e largá-lo na janela do editor do &kgpg;. Ser-lhe-á então pedida a frase-senha, ao que depois poderá abrir o texto decifrado no editor do &kgpg;. Poderá inclusive largar aqui ficheiros remotos! Também poderá usar a opção <menuchoice
+><guimenu
+>Ficheiro</guimenu
+><guimenuitem
+>Decifrar o Ficheiro</guimenuitem
+></menuchoice
+> e escolher o ficheiro a decifrar.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Decifrar um texto com a 'applet' do &kgpg;</title>
+
+<para
+>Poderá também descodificar o conteúdo da área de transferência, usando a opção do menu <guimenuitem
+>Descodificar a Área de Transferência</guimenuitem
+> da 'applet' do &kgpg;. Irá aparecer uma <link linkend="editor"
+>janela do editor</link
+> com o texto descodificado.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Decifrar um texto do editor</title>
+
+<para
+>Copie ou arraste e largue o texto que deseja decifrar, e carregue no botão <guibutton
+>Decifrar</guibutton
+>. Ser-lhe-á pedida a frase-senha. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Gestão de Chaves</title>
+
+<para
+>Todas as opções básicas de gestão de chaves poderão ser efectuadas através do &kgpg;. Para abrir a janela de gestão de chaves, carregue com o &LMB; na 'applet' do &kgpg;. A maioria das opções estão disponíveis se carregar com o botão <mousebutton
+>direito</mousebutton
+> numa chave. Para importar/exportar as chaves públicas, poderá arrastar e largar os itens ou usar os atalhos de teclado Copiar/Colar.</para>
+
+<para
+>Poderá exportar uma chave pública por e-mail, para a área de transferência, para um servidor de chaves ou para um ficheiro local. Use as opções na janela de exportação para exportar tudo, exportar sem atributos (identificações fotográficas) ou exportar uma chave limpa &ie;, a chave em si, incluindo as suas sub-chaves, mas excluindo todas as assinaturas. </para>
+
+<sect2 id="keymanager">
+<title
+>Gestor de Chaves</title>
+
+<screenshot>
+<screeninfo
+>Aqui está uma imagem da gestão de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Neste exemplo, pode ver um grupo de chaves que contém duas chaves, dois pares de chaves e três chaves públicas. A terceira coluna mostra a confiança que deposita nas chaves. O primeiro par de chaves tem a confiança máxima e também está definido como chave predefinida (a negrito), enquanto o segundo expirou. Duas das chaves públicas são de completa confiança e a confiança da última chave é marginal. A última chave é expandida, mostrando a sua sub-chave ElGamal, um ID de utilizador adicional, ambos com confiança marginal, e algumas das suas assinaturas.</para>
+<para
+>As assinaturas permitem navegar pelo seu porta-chaves. Se fizer duplo-click sobre uma assinatura ou uma chave que apareça como membro de um grupo, irá saltar directamente para a chave primária correspondente.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Propriedades da chave</title>
+
+<screenshot>
+<screeninfo
+>A janela de propriedades da chave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Enquanto o gestor de chaves lhe permite fazer acções genéricas com uma ou várias chaves, grupos de chaves ou assinaturas, a janela de propriedades da chave dá-lhe acesso a uma única chave. Poderá aceder a ela se carregar em Enter no gestor de chaves ou se fizer duplo-click na chave.</para>
+<para
+>Nesta janela, poderá modificar a frase-senha e o prazo de validade das suas chaves privadas. Também pode definir para todas as chaves o valor de confiança do dono.</para>
+<para
+>Este valor indica quanto é que confia no dono desta chave, para verificar correctamente a identidade das chaves que ele assina. Ao ter a confiança do dono em conta, o 'gpg' cria a sua própria cadeia de confiança. Você confia nas chaves que assinou. Se atribuir a confiança do dono a essas pessoas, irá confiar também nas chaves que eles assinaram, sem ter a necessidade de assinar também as chaves deles.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Assinar as chaves</title>
+
+<para
+>Quando assinar a chave de outra pessoa qualquer (vamos assumir que é Alice), você está a anunciar que tem a certeza que esta chave pertence a essa pessoa e que a chave dela é de confiança. Obviamente, já poderá ter verificado isso anteriormente. Isto normalmente significa que terá de se encontrar com a Alice, verificar pelo menos um documento de identificação dela e obter a 'impressão digital' completa da chave dela ou até uma cópia da mesma. Depois, poderá ir para casa e assinar essa chave. Geralmente, irá depois enviar essa chave acabada de assinar para um <link linkend="keyserver"
+>servidor de chaves</link
+>, para que toda a gente saiba que verificou essa chave e que o dono dela é de confiança. A Alice provavelmente irá fazer o mesmo, pelo que irão ficar ambos com as vossas chaves assinadas pela outra pessoa. Se um de vocês não tiver um documento de identificação, não será problema caso só exista a assinatura num sentido.</para>
+
+<para
+>Mas pense no que aconteceria se a Alice vivesse do outro lado do mundo. Você comunica com ela regularmente, mas não existe a hipótese de a ver em breve. Como é que poderá confiar na sua chave?</para>
+
+<para
+>Quando seleccionar a chave dela e depois escolher a opção <guimenuitem
+>Assinar a Chave...</guimenuitem
+>, irá obter uma janela que lhe permite definir como é que gostaria de assinar essa chave.</para>
+
+<screenshot>
+<screeninfo
+>Seleccionar uma Chave Privada para a Assinatura</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Primeiro poderá escolher a chave que irá usar para assinar a outra chave. Depois, poderá indicar com que cuidado é que verificou que a outra pessoa é de facto quem diz. Essa informação ficará guardada em conjunto com a assinatura, pelo que é uma indicação para todos os outros que possam necessitar dessa assinatura (veremos mais sobre isso em baixo). Depois vem a opção que o irá ajudar, caso não consiga encontrar-se com a Alice em pessoa <guilabel
+>Assinatura local (não pode ser exportada)</guilabel
+>. Quando activar esta opção, será criada uma versão especial da assinatura que nunca irá sair, mesmo por acidente, do seu porta-chaves local.</para>
+
+<para
+>Mas porque é que é importante que tenha verificado a identidade da Alice? Quem é que se deverá importar? Existe uma outra forma de resolver o seu problema com a identidade da Alice. Se não for visitar a Alice tão cedo, poderá pensar no Pedro. Assumimos que sabe que o Pedro tem também um porta-chaves. Se souber que o Pedro é um viajante, estando em diferentes continentes duas vezes por mês, se souber que ele irá para algum sítio próximo da Alice em breve. Por isso, poderá ir ter com o Pedro para assinar as chaves. Depois, poderá deixar uma nota à Alice a avisar que o Pedro irá estar com ela em breve e perguntar-lhe se ela poderá ir ter com ele para assinar as chaves. Depois de tudo isso ter acontecido, saberá que a chave do Pedro será de confiança e o Pedro também saberá que a chave da Alice será também fidedigna. Se confiar no Pedro em que ele verificou cuidadosamente a identidade da Alice, poderá então também confiar na chave dela.</para>
+
+<para
+>Estas relações entre as chaves e os seus donos são o que se chama normalmente de 'cadeia de confiança'. Dentro dessa cadeia, existem alguns valores importantes que definem quão fidedigna uma dada chave é. A primeira coisa é saber com que cuidado foi verificada a identidade do dono da chave. Esse é o valor que viu acima na janela de selecção da chave privada. Por exemplo, poderá saber como verificar o bilhete de identidade do seu país local mas, num país completamente diferente, isso poderá ser mais difícil. Por isso, poderá ter dito que verificou com cuidado a identidade do Pedro, porque viu o bilhete de identidade dele e se parecia muito com o seu. Mas o Pedro, ainda que ele tenha visto o bilhete de identidade e a carta de condução da Alice, poderá dizer que apenas fez uma verificação casual da identidade dela, dado não confiar em absoluto na documentação dessa parte do mundo.</para>
+
+<para
+>O valor importante a seguir é quanto é que confia na outra pessoa para verificar os documentos. Você sabe que o Pedro é bom nisso. Mas o Jorge, por exemplo, não é uma pessoa que consideraria inteligente. Ele mal olhou para o seu bilhete de identidade quando o encontrou pessoalmente para assinar as chaves. Poderá ter a certeza que o Jorge é a pessoa que diz ser quando você verificou os documentos dele com cuidado. O problema é que ele não parece realmente querer saber se verifica com cuidado as outras pessoas, pelo que poderá ter uma confiança elevada na chave do Jorge, mas uma confiança muito baixa nas assinaturas feitas por ele. Se abrir as <link linkend="keyproperties"
+>propriedades</link
+> da chave do Jorge, irá encontrar o campo de <guilabel
+>Confiança do Dono</guilabel
+>. Aqui é onde poderá definir o grau de confiança que tem no dono da chave, quando ele assina chaves de outros. Este valor não será exportado, pelo que será apenas da sua preferência pessoal.</para>
+
+<screenshot>
+<screeninfo
+>A janela de propriedades da chave</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Agora deverá ter uma ideia de como é formada a cadeia de confiança, para que servem os valores de confiança do dono e da chave, e porque é terá de ser bastante cuidadoso ao verificar as identidades: outras pessoas poderão confiar em si. Contudo, existe ainda um elemento por verificar no processo: os endereços de e-mail nas chaves que assinou. A ideia de criar um novo utilizador na sua chave, com o endereço de e-mail da Alice e do Pedro só irá levar mais alguns botões de rato. O Pedro já verificou isso com a sua própria chave. Mas ninguém verificou até agora que você realmente controla os endereços de e-mail das suas identidades de utilizador.</para>
+
+<para
+>Se escolher a opção <guimenuitem
+>Assinar e Enviar o ID de Utilizador por E-Mail...</guimenuitem
+> no menu, poderá eliminar essa lacuna. A ideia é que irá assinar a sua chave, como de costume e depois a mesma será em dividida em pedaços. Cada pedaço só irá conter uma identidade de utilizador da chave do Pedro e a sua assinatura para a mesma. Esta será encriptada com a chave do Pedro e enviada apenas para o endereço de e-mail indicado nessa identidade. Só se o Pedro conseguir receber este correio e descodificar a mensagem é que conseguir importar essa assinatura para o seu porta-chaves. Você não irá enviar as suas assinaturas; isso será apenas a respeito dele. Se a sua assinatura for aparecer num servidor de chaves, poderá ter a certeza que o Pedro tanto controla a chave dele como o endereço de e-mail que você assinou.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Lidar com os servidores de chaves</title>
+
+<sect2>
+<title
+>Comunicação com os servidores de chaves</title>
+
+<para
+>A parte pública de um par de chaves normalmente é guardada num servidor de chaves. Estes servidores permitem a toda a gente procurar por uma chave que pertença a uma dada pessoa ou endereço de e-mail. As assinaturas também são guardadas nestes servidores.</para>
+
+<screenshot>
+<screeninfo
+>Aqui está uma imagem da janela dos servidores de chaves.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Esta janela dá-lhe acesso aos servidores de chaves. Poderá procurar e importar chaves a partir de um servidor de chaves, assim como exportar as suas chaves para um servidor. Um exemplo de pesquisa e importação acontece quando tenta escrever um e-mail para alguém novo. Se quiser encriptar a sua mensagem para o seu contacto, poderá procurar se ele ou ela tem uma chave nos servidores de chaves. Se tiver criado um novo par de chaves ou tiver assinado a chave de outra pessoa, poderá querer exportar a chave pública (possivelmente com assinaturas novas) para um servidor de chaves.</para>
+<para
+>A maioria dos servidores de chaves sincroniza os seus dados entre si, pelo que poderá obter resultados semelhantes, independentemente do servidor que usar. Dado que existem excepções a esta regra, poderá escolher o servidor de chaves a usar nesta janela. Normalmente é uma boa ideia escolher um servidor predefinido que esteja localizado perto de si (p.ex. no seu país ou no seu continente), dado que estes respondem normalmente mais depressa às suas pesquisas.</para>
+<para
+>Lembre-se que tudo o que enviar para um servidor de chaves normalmente ficará por lá. Esta é uma razão pela qual deverá normalmente limitar o tempo de validade das suas chaves. Lembre-se também que os servidores de chaves são algumas vezes analisados pelos geradores de lixo electrónico para obter endereços de e-mail.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Resultados da pesquisa no servidor de chaves</title>
+<screenshot>
+<screeninfo
+>Este é um exemplo dos resultados de uma pesquisa no servidor de chaves.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Todos os resultados de uma pesquisa são apresentados nesta janela. Esta imagem mostra uma pesquisa por endereços &quot;@kde.org&quot; que originaram 244 resultados. Se usar o campo de pesquisa, a lista apresentada foi reduzida a uma única chave. Esta chave tem duas correspondências: o ID do utilizador primário corresponde ao texto da pesquisa, assim como um dos outros ID's do utilizador.</para>
+
+<para
+>Poderá seleccionar uma ou mais chaves a importar. Os ID's dessas chaves aparecem no campo de <guilabel
+>Chaves a importar</guilabel
+>, no fundo da janela. Quando carregar em <guibutton
+>Importar</guibutton
+>, o servidor de chaves será contactado de novo e as chaves serão obtidas para o seu porta-chaves.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>Configurar o &kgpg;</title>
+
+<para
+>A configuração está acessível através do menu da 'applet' do &kgpg; (se carregar com o &RMB; na 'applet') ou através do menu principal ( <menuchoice
+><guimenu
+>Configuração</guimenu
+><guimenuitem
+>Configurar o KGpg</guimenuitem
+></menuchoice
+>). Poderá definir os parâmetros por omissão para a encriptação, a descodificação, a interface do utilizador e a 'applet'. A maioria das opções de encriptação estão relacionadas directamente com o gpg e estão documentadas na sua <ulink url="man:gpg"
+>página do 'man'</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Encriptação</title>
+<screenshot>
+<screeninfo
+>Uma imagem da janela de opções com a página de encriptação aberta</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Aqui poderá configurar opções especiais a passar ao GnuPG, para mudar o comportamento da encriptação. Para uma descrição mais detalhada, dê uma vista de olhos no manual do GnuPG.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>Encriptação ASCII armada</guilabel
+>: isto faz com que os ficheiros encriptados fiquem guardados num formato que só use caracteres visíveis do ASCII e tenha linhas curtas. Os ficheiros guardados desta forma são maiores que os ficheiros em binário, mas são mais simples de enviar &eg; por e-mail.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Permitir cifra com chaves não-fidedignas</guilabel
+>: esta opção permite-lhe encriptar os ficheiros com chaves nas quais não confia.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Compatibilidade com o PGP 6</guilabel
+>: os ficheiros encriptados são compatíveis com a norma antiga do PGP6. Esta desactiva certas funcionalidades; como tal, só a deverá usar se for realmente necessário.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Esconder o ID do utilizador</guilabel
+>: esta opção remove todos os vestígios do destinatário no ficheiro encriptado. No caso de a transmissão ser interceptada, ninguém poderá obter informações sobre o destinatário a partir do ficheiro. Se este destinatário tiver várias chaves, terá de experimentar para saber qual foi usada.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Encriptar sempre com</guilabel
+>: todas as encriptações são encriptadas adicionalmente com esta chave. Se configurar esta opção com uma das suas chaves privadas, isto garante que você poderá ler sempre todos os dados encriptados por si, com o custo de mensagens maiores.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Encriptar os ficheiros com</guilabel
+>: comporta-se como o <guilabel
+>Encriptar sempre como</guilabel
+> para a encriptação de ficheiros.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Comando de encriptação personalizado</guilabel
+>: se necessitar de passar algumas opções pouco usuais ao GnuPG, poderá indicar a linha de comandos aqui. A maioria dos utilizadores não irá necessitar disto.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Usar a extensão  *.pgp para os ficheiros encriptados</guilabel
+>: se assinalar esta opção, os ficheiros encriptados terão adicionada ao seu nome a extensão <literal role="extension"
+>.pgp</literal
+>; caso contrário, é utilizada a extensão <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Descodificação</title>
+
+<para
+>Aqui poderá indicar um comando de descodificação personalizado. Esta opção raramente é usada, e só é útil para os utilizadores avançados que conheçam as opções da linha de comandos.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Aparência</title>
+<para
+>Aqui poderá configurar a forma como lhe aparece o &kgpg;. As opções possíveis são as cores que reflectem os diferentes níveis de confiança nas chaves do <link linkend="keymanager"
+>gestor de chaves</link
+> e a configuração dos tipos de letra do <link linkend="editor"
+>editor</link
+>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>Configuração do GnuPG</title>
+<para
+>Aqui poderá configurar o executável do 'gpg' e o <guilabel
+>ficheiro de configuração</guilabel
+> e pasta pessoal a utilizar. Estes valores são detectados automaticamente no primeiro arranque e deverão funcionar logo à partida.</para>
+<para
+>A utilização do <ulink url="man:gpg-agent"
+>agente do GnuPG</ulink
+> torna mais confortável o trabalho com o GnuPG, dado que não necessita de escrever a sua senha para todas as acções. Fica guardada numa 'cache' em memória durante algum tempo, de modo que todas as operações que pudessem necessitar de uma senha possam ser feitas imediatamente. Lembre-se que isto poderá permitir às outras pessoas usarem as suas chaves privadas, caso deixe a sua sessão acessível para elas.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Servidores de Chaves</title>
+<para
+>Aqui poderá criar uma lista dos servidores de chaves conhecidos por si quando abrir a <link linkend="keyserver"
+>janela do servidor de chaves</link
+>. Se executar o GnuPG a partir da linha de comandos, somente será usado o servidor de chaves que definir por omissão aqui.</para>
+<para
+>O protocolo usado para a comunicação com os servidores de chaves baseia-se em &HTTP;, por isso fará sentido, em alguns ambientes que se possa <guilabel
+>honrar o 'proxy' de &HTTP; quando disponível</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Diversos</title>
+<para
+>Esta secção permite a configuração de algumas funcionalidades que não se encaixam noutras secções. Poderá configurar, por exemplo, para <guilabel
+>iniciar o KGpg automaticamente no arranque</guilabel
+>. A opção <guilabel
+>usar a selecção do rato em vez da área de transferência</guilabel
+> altera se as selecções são feitas através do botão do meio do rato ou se são feitas por combinações de teclas.</para>
+<para
+>Poderá também alterar se o ícone da bandeja do &kgpg; aparece ou não e o que acontece se o ícone for seleccionado através do &LMB;. Se a 'applet' aparecer, ao fechar, a janela do &kgpg; irá minimizar a aplicação para a bandeja. Se o ícone não aparecer, o &kgpg; irá sair quando fechar todas as janelas.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Créditos e Licença</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Programa copyright &copy; 2002-2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Tradução de José Nuno Pires <email
+>zepires@gmail.com</email
+></para
+> 
+&underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

@@ -1,0 +1,794 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Catalan  "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title
+>El manual del &kgpg;</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>Albert</firstname
+><surname
+>Astals Cid</surname
+><affiliation
+><address
+><email
+>aacid@kde.org</email
+></address
+></affiliation
+><contrib
+>Traductor</contrib
+></othercredit
+>&traductor.Antoni.Bella; 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>10 d'octubre de 2016</date>
+<releaseinfo
+>Aplicacions 16.12</releaseinfo>
+
+<abstract>
+<para
+>El &kgpg; és una interfície gràfica simple per GnuPG (<ulink url="https://gnupg.org"
+>https://gnupg.org</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>encriptatge</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>seguretat</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introducció</title>
+
+
+<para
+>&kgpg; és una interfície simple de GnuPG, una potent utilitat d'encriptatge. GnuPG (també conegut com a «gpg») està inclòs a la majoria de distribucions i hauria d'estar instal·lat al vostre sistema. Podeu obtenir l'última versió a <ulink url="https://gnupg.org"
+>https://gnupg.org</ulink
+>.</para>
+
+<para
+>Amb &kgpg; podreu encriptar i desencriptar els vostres fitxers i correus electrònics, permetent una comunicació molt més segura. Un mini «com es fa» sobre encriptació amb gpg està disponible al <ulink url="https://www.gnupg.org/documentation/howtos.en.html"
+>lloc web de GnuPG</ulink
+>. </para>
+
+<para
+>Amb &kgpg;, no necessiteu recordar les opcions i ordres de gpg. Es pot fer gairebé tot amb uns quants clics de ratolí. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Com començar</title>
+
+<para
+>Aquesta és una llista dels components principals de &kgpg;:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Icona de la safata del sistema </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Miniaplicació de &kgpg; de la safata del sistema</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Quan inicieu &kgpg;, apareixerà una icona a la safata del sistema. Un clic amb el &BER; obrirà la finestra del gestor de claus, mentre que un clic amb el &BDR; obrirà un menú que us permetrà un ràpid accés a algunes característiques importants. Si preferiu altres opcions podeu canviar l'acció del &BER; a mostrar l'editor o inhabilitar completament la icona de la safata del sistema usant el <link linkend="conf-misc"
+>diàleg de configuració</link
+>. </para>
+<para
+>Si us plau, tingueu en compte que la icona de &kgpg; a la safata del sistema està marcada com «inactiva» gairebé tot el temps. Com la miniaplicació de safata del sistema sol ocultar les icones inactives, la de &kgpg; no es mostrarà fins que ho requeriu explícitament. Per a més detalls, consulteu la documentació de &plasma;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Finestra de gestió de claus</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Finestra de gestió de claus</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Aquest és el lloc central per a gestionar les vostres claus. Per obrir la <link linkend="keymanager"
+>finestra del gestor de claus</link
+>, feu clic amb el &BER; sobre la miniaplicació de &kgpg;. Podeu importar, exportar, signar i editar les vostres claus. Gran part de les accions es poden realitzar amb un clic del &BER; sobre una clau. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Finestra de l'editor</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Finestra de l'editor</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>És un editor de text simple, on podeu escriure o enganxar text per encriptar/desencriptar. Per obrir l'<link linkend="editor"
+>editor</link
+>, feu clic del &BDR; sobre la miniaplicació de &kgpg;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integració amb el gestor de fitxers</term>
+<listitem>
+
+<para
+>El &kgpg; està integrat en el &konqueror; i el &dolphin;. Això vol dir que quan feu clic dret a sobre d'un fitxer, podreu escollir <menuchoice
+><guimenu
+>Accions</guimenu
+><guimenuitem
+>Encripta un fitxer</guimenuitem
+></menuchoice
+> per a encriptar-lo. El podreu desencriptar amb un clic del &BER;. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>Com usar &kgpg;</title>
+
+<para
+>Hi ha dues formes d'encriptar les vostres dades: <itemizedlist>
+<listitem
+><para
+>Encriptatge simètric: Les vostres dades s'encripten amb una contrasenya. Qualsevol que disposi d'un ordinador amb gpg podrà desencriptar el vostre missatge si li doneu la contrasenya. Per a realitzar un encriptatge simètric, escolliu l'opció «Encriptatge simètric» al quadre d'opcions quan se us demani per una clau d'encriptatge.</para
+></listitem>
+<listitem
+><para
+>Encriptar amb clau: Primer haureu de crear el vostre parell de claus (la clau secreta i la clau pública) i proporcionar una frase de pas. Deseu la vostra clau secreta en un lloc segur, i intercanvieu la vostra clau pública amb els vostres amics. Després, si desitgeu enviar un missatge encriptat a l'Àlex, haureu d'encriptar el missatge amb la clau pública de l'Àlex. Per a desencriptar el missatge, el destinatari necessitarà la clau secreta de l'Àlex i la seva frase de pas.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>L'encriptació amb clau és una mica més complicat (haureu d'intercanviar claus amb els vostres amics), però més segur. Recordeu que si encripteu un missatge amb la clau d'una altra persona, no el podreu desencriptar. Tan sols podreu desencriptar els missatges que hagin estat encriptats amb la vostra clau pública.</para>
+
+<sect1 id="key-generation">
+<title
+>Com generar una clau</title>
+
+<para
+>Si no teniu cap clau, la primera vegada que l'inicieu, &kgpg; mostrarà automàticament una finestra emergent amb el diàleg per a la generació de claus. També podeu accedir-hi mitjançant el Gestor de claus de <menuchoice
+><guimenu
+>Claus</guimenu
+><guimenuitem
+>Genera parell de claus</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Diàleg de generació de la clau</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Simplement introduïu el vostre nom, adreça de correu electrònic i feu clic a <guibutton
+>D'acord</guibutton
+>. Això generarà una clau gpg estàndard. Si desitgeu més opcions, podeu fer clic en el botó de <guibutton
+>Mode expert</guibutton
+>, el qual us oferirà una &konsole; amb totes les opcions de gpg.</para>
+<para
+>Moltes persones juguen amb la seva primera clau, generen identificadors d'usuari incorrectes, afegeixen comentaris dels quals després se'n penedeixen o simplement obliden la seva frase de pas. Per evitar que aquestes claus tinguin validesa il·limitada sol ser una bona idea limitar la seva vida a uns 12 mesos. Podeu modificar la vida de la vostra clau secreta més endavant utilitzant la <link linkend="keyproperties"
+>finestra de propietats de la clau</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Com revocar una clau</title>
+
+<para
+>Un parell de claus que ha expirat es pot tornar a un estat funcional, sempre que tingueu accés a la clau privada i a la frase de pas. Per tornar llegible una clau inusable necessitareu revocar-la. La revocació es porta a terme mitjançant l'afegit d'una signatura de revocació especial a la clau.</para>
+
+<para
+>Aquesta signatura de revocació es pot crear juntament amb la clau. En aquest cas, s'emmagatzema en un fitxer a part. Aquest fitxer podrà ser importar més endavant al clauer i després afegit a la clau inusable. Si us plau, tingueu en compte que per a la importació d'aquesta signatura a la clau no és necessària la contrasenya. Per tant, hauríem d'emmagatzemar aquesta signatura de revocació en un lloc segur, en general diferent del parell de claus. És un bon consell utilitzar un lloc separat del vostre ordinador, o bé copiar-la a un dispositiu d'emmagatzematge extern com una memòria USB o imprimir-la.</para>
+
+<para
+>Si no heu creat una revocació separada en la creació de la clau podeu crear una signatura de revocació en qualsevol moment escollint <menuchoice
+><guimenu
+>Claus</guimenu
+> <guimenuitem
+>Revoca la clau</guimenuitem
+></menuchoice
+>, opcionalment important-la al vostre clauer immediatament.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Com encriptar les vostres dades</title>
+
+<sect2 id="konqui">
+
+<title
+>Com encriptar un fitxer des del &konqueror; o Dolphin</title>
+
+<para
+>Feu clic amb el &BDR; sobre el fitxer que voleu encriptar. Escolliu <menuchoice
+><guimenu
+>Accions</guimenu
+><guimenuitem
+>Encripta el fitxer</guimenuitem
+></menuchoice
+> en el menú emergent. Se us mostrarà el diàleg de selecció de la clau pública. Escolliu la clau del destinatari i feu clic a <guibutton
+>Encripta</guibutton
+>. El fitxer encriptat es desarà amb una extensió <literal role="extension"
+>.asc</literal
+> o <literal role="extension"
+>.gpg</literal
+>, depenent de si havíeu escollit <guilabel
+>Encriptatge en armadura ASCII</guilabel
+> o no. Els fitxers encriptats en ASCII només utilitzen caràcters llegibles per a representar les dades resultants en fitxers que són més robustos quan es copia tot o s'envien per correu, però són un terç més grans.</para>
+
+<screenshot>
+<screeninfo
+>Aquesta és una captura de pantalla de la finestra de selecció de claus</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Com encriptar un text amb la miniaplicació de &kgpg;</title>
+
+<para
+>Podeu encriptar el contingut del porta-retalls seleccionant l'element <guimenuitem
+>Encripta el porta-retalls</guimenuitem
+> en el menú de la miniaplicació. En canvi, si escolliu <guimenuitem
+>Signa el porta-retalls</guimenuitem
+> llavors se signarà el text contingut en el mateix. Ambdues accions importaran el contingut actual del porta-retalls a una <link linkend="editor"
+>finestra de l'editor</link
+>, realitzant l'acció requerida i enganxant el contingut altra vegada a l'editor.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Com encriptar text des de l'editor de &kgpg;</title>
+
+<para
+>És tan simple com fer clic a sobre del botó <guibutton
+>Encripta</guibutton
+>. Llavors se us mostrarà el diàleg per a la selecció de la clau pública. Escolliu la vostra clau i feu clic a <guibutton
+>D'acord</guibutton
+>. El missatge encriptat apareixerà a la finestra de l'editor.</para>
+
+<para
+>Normalment, només podreu encriptar fitxers amb les claus en què confieu. Atès que a vegades sols voldreu enviar una nota confidencial a certes persones, haureu de ser conscient de tenir una clau GPG per a la que pugueu establir l'opció <guilabel
+>Permet l'encriptatge amb claus que no siguin de confiança</guilabel
+>.</para>
+
+<para
+>Per assegurar-vos que podeu desencriptar qualsevol fitxer que heu encriptat, fins i tot si ho heu fet amb la clau d'un altre, podeu utilitzar les opcions <guilabel
+>Encripta sempre amb</guilabel
+> i <guilabel
+>Encripta fitxers amb</guilabel
+>, que estan disponibles en la <link linkend="conf-encryption"
+>configuració de KGpg</link
+>.</para>
+
+<para
+>Per a més informació quant a les opcions d'encriptatge <guilabel
+>Armadura ASCII</guilabel
+>, <guilabel
+>Permet l'encriptatge amb claus que no siguin de confiança</guilabel
+> i <guilabel
+>Encriptatge simètric</guilabel
+>, si us plau, consulteu la documentació o <ulink url="man:gpg"
+>pàgines del manual</ulink
+> de gpg.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Com desencriptar les vostres dades</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Com desencriptar un fitxer des del &konqueror; o el &dolphin;</title>
+<para
+>Feu clic <mousebutton
+>esquerre</mousebutton
+> en el fitxer que voleu desencriptar. Introduïu la vostra frase de pas i es desencriptarà. També podeu arrossegar un fitxer de text encriptat a la finestra de l'editor de &kgpg;. Aquest us demanarà la frase de pas i obrirà el fitxer desencriptat amb l'editor de &kgpg;. Fins i tot podeu arrossegar-hi fitxers remots! També podeu usar <menuchoice
+><guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Desencripta el fitxer</guimenuitem
+></menuchoice
+> i escollir un fitxer a desencriptar.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Com desencriptar text amb la miniaplicació de &kgpg;</title>
+
+<para
+>També podeu desencriptar el contingut del porta-retalls amb l'entrada <guimenuitem
+>Desencripta el porta-retalls</guimenuitem
+> del menú de la miniaplicació del &kgpg;. Es mostrarà una <link linkend="editor"
+>finestra de l'editor</link
+> amb el text desencriptat.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Com desencriptar un text des de l'editor</title>
+
+<para
+>Copieu o arrossegueu i deixeu-hi anar el text que voleu desencriptar, i feu clic a sobre del botó <guibutton
+>Desencripta</guibutton
+>. Se us demanarà la frase de pas. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Gestió de claus</title>
+
+<para
+>Totes les opcions bàsiques per a la gestió de claus poden realitzar-se a través de &kgpg;. Per obrir la finestra de gestió de claus feu clic amb el &BER; a la miniaplicació de &kgpg;. La majoria d'opcions estan disponibles amb un clic <mousebutton
+>dret</mousebutton
+> sobre una clau. Per importar/exportar claus públiques, podeu utilitzar arrossegar i deixar anar o les dreceres del teclat de copiar/enganxar.</para>
+
+<para
+>Podeu exportar una clau pública a través del correu electrònic, al porta-retalls, a un servidor de claus o a un fitxer local. Utilitzeu les opcions en el diàleg d'exportació per exportar-ho tot, exportar sense atributs (identificacions amb foto) o exportar una clau neta, &ead;, la clau incloent les seves subclaus, però excloent totes les signatures. </para>
+
+<sect2 id="keymanager">
+<title
+>Gestor de claus</title>
+
+<screenshot>
+<screeninfo
+>Aquesta és una captura de pantalla de la gestió de claus</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>En aquest exemple podeu veure un grup de claus que conté dues claus, dos parells de claus i tres claus públiques. La tercera columna mostra la confiança que teniu en les claus. El primer parell de claus és de confiança total i també és la clau per omissió (els caràcters en negreta), mentre que el segon ja ha expirat. Dues de les claus públiques són de confiança completa, mentre que l'última posseeix una confiança marginal. L'última clau està expandida, i mostra la seva subclau ElGamal, una identitat d'usuari addicional, ambdues de confiança marginal, i algunes de les seves signatures.</para>
+<para
+>Les signatures permeten navegar pel vostre anell de claus. Si feu doble clic sobre una signatura o una clau mostrada com membre d'un grup, anireu directament a la seva clau primària corresponent.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Propietats de la clau</title>
+
+<screenshot>
+<screeninfo
+>La finestra de propietats de la clau</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Mentre que el gestor de claus us permet accions generals amb una o més claus, grups de claus o signatures, la finestra de propietats de la clau us proporciona accés a una única clau. La podeu obtenir prement la tecla &Intro; en el gestor de claus o fent doble clic sobre la clau.</para>
+<para
+>En aquesta finestra podeu canviar la frase de pas de la clau i la caducitat de les vostres claus secretes. També podeu establir el valor de confiança en el propietari, per a cadascuna de les claus.</para>
+<para
+>Aquest valor indica quanta confiança dipositeu en el propietari d'aquesta clau per a verificar correctament la identitat de les claus que signa. Tenint en compte la confiança en el propietari, gpg crea la vostra pròpia xarxa de confiança. Confieu en les claus que heu signat. Si assigneu confiança en aquestes persones, també confiareu en les claus que hagin signat sense la necessitat que també les signeu.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Firmar les claus</title>
+
+<para
+>Quan signeu una clau d'una altra persona (a la que anomenarem Alícia) esteu anunciant que esteu segur que aquesta clau realment pertany a aquesta persona i que la clau és de confiança. Per descomptat, hauríeu de comprovar-ho. Això sol significar que us heu trobat amb Alícia, que almenys heu comprovat el seu carnet d'identitat i heu obtingut d'ella l'empremta digital completa de la seva clau o una còpia d'aquesta. A continuació heu tornat a casa i heu signat la clau de l'Alícia. Normalment, pujareu més tard la clau recentment signada a un <link linkend="keyserver"
+>servidor de claus</link
+> perquè tothom sàpiga que heu comprovat que la clau i el seu propietari són de confiança. Alícia probablement farà el mateix, de manera que ambos tindreu les vostres claus signades per l'altra persona. Si un de vosaltres no té el carnet d'identitat a mà, tampoc hi haurà cap problema si la signatura es fa en una única direcció.</para>
+
+<para
+>Però penseu en el que succeeix si Alícia viu a l'altre extrem del món. Us hi comuniqueu amb regularitat, però no hi ha cap possibilitat que us veieu en un futur immediat. Com confiar en la seva clau?</para>
+
+<para
+>Quan selecciona la seva clau i després seleccioneu <guimenuitem
+>Signa la clau...</guimenuitem
+> obtindreu el diàleg que us permetrà triar les opcions amb què us agradaria signar aquesta clau.</para>
+
+<screenshot>
+<screeninfo
+>Selecció d'una clau privada per signar</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>En primer lloc podeu triar la clau que utilitzareu per signar la clau. Llavors podeu introduir el grau de confiança amb el que heu comprovat que realment és la persona que diu ser. Aquesta informació serà emmagatzemada juntament amb la signatura per la qual cosa és una guia per a tots els altres que puguin necessitar la signatura (tornarem a això més endavant). I després ve l'opció que us ajuda si no us podeu trobar amb Alícia en persona: <guilabel
+>Signatura local (no es pot exportar)</guilabel
+>. Quan activeu aquesta opció es crearà una versió especial de la signatura que mai sortirà del vostre anell de claus, ni tan sols per accident.</para>
+
+<para
+>Però. Per què és important la cura amb què s'ha comprovat la identitat d'Alícia? Qui ha de tenir cura? Hi ha una manera diferent de resoldre el vostre problema amb la identitat d'Alícia. Si no podeu visitar-la a curt termini penseu en Trent. Sabeu que Trent també té un parell de claus. I és un rodamon, en un continent diferent almenys dues vegades al mes. Si teniu sort potser cau a prop d'Alícia aviat. D'aquesta manera us podeu reunir amb en Trent per signar les vostres respectives claus. A continuació, enviareu una nota a Alice dient que Trent viatjarà aviat a la seva ciutat i li demanareu si es pot reunir amb ell per a signar les claus. Quan tot això hagi passat, ja sabíeu que la clau d'en Trent és de confiança i Trent sap que la clau d'Alícia és de confiança. Si confieu en Trent que ha verificat acuradament la identitat d'Alícia, aleshores també podeu confiar en la seva clau.</para>
+
+<para
+>Aquestes relacions entre les claus i els seus propietaris formen el que s'anomena una xarxa de confiança. Dins d'aquesta xarxa hi ha alguns valors importants que defineixen el fiable que és una clau en particular. El primer és la cura amb què s'ha comprovat la identitat del propietari de la clau. Aquest és el valor que hem vist a la finestra de selecció de la clau secreta. Per exemple, probablement sabeu com verificar el vostre carnet d'identitat local, però en un país completament diferent pot ser difícil de comprovar. Per tant es podria dir que heu revisat acuradament la identitat de Trent, perquè heu vist el seu carnet d'identitat i s'assembla molt al vostre. No obstant això, Trent, tot i que ha vist tant el document d'identitat i la llicència de conduir de l'Alícia podria dir que només ha fet una lleugera identificació, ja que no està absolutament segur quant als documents en aquesta part del món.</para>
+
+<para
+>El valor d'importància és la quantitat de confiança en l'altra persona per a verificar documents. Sabeu que en Trent és bo en això. Però George, per exemple, no és algú al que qualificaríeu d'intel·ligent. Ja que gairebé no va mirar el vostre carnet d'identitat quan us vàreu reunir amb ell per signar una clau. Esteu segur que en George és la persona que pretén ser perquè vàreu comprovar acuradament els seus documents. Però, segons sembla, ell no és igual de minuciós en el control d'altres persones pel que tindreu un alt nivell de confiança en la clau d'en George, però una confiança molt baixa en la seva signatura. Si obriu les <link linkend="keyproperties"
+>propietats</link
+> d'una clau trobareu el camp <guilabel
+>Confiança en el propietari</guilabel
+>. Aquesta serà la confiança que teniu en el propietari de la clau quan ell signa claus. Aquest valor no s'exportarà, és totalment una preferència personal vostra.</para>
+
+<screenshot>
+<screeninfo
+>La finestra de propietats de la clau</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Ara hauríeu de tenir una idea de com es construeix la xarxa de confiança, per a què serveixen els valors de confiança en el propietari i la clau, i per què cal tenir sempre molta cura en verificar les identitats: Altres persones podran donar-vos la seva confiança. Però encara hi ha un element en el procés que està sense verificar: Les adreces de correu electrònic de les claus que signeu. Creant una nova identitat d'usuari en la vostra clau amb l'adreça de correu electrònic d'Alícia o Trent només us caldran alguns clics del ratolí. Heu comprovat que Trent és el veritable propietari de la seva clau. Però ningú ha comprovat fins ara que Trent realment controla les adreces de correu electrònic de les seves identitats d'usuari.</para>
+
+<para
+>Si escolliu <guimenuitem
+>Signa i envia l'ID de l'usuari...</guimenuitem
+> des del menú haureu tancat aquest forat. La idea és que signeu la clau com de costum i després es dividirà en trossos. Cada peça només contindrà una identitat d'usuari de la clau d'en Trent i la vostra signatura. Aquesta serà encriptada amb la clau d'en Trent i enviada només a l'adreça de correu electrònic proporcionada en aquesta identitat. En Trent només podrà importar la signatura al seu anell de claus si rep aquest correu i el desencripta. No pugeu les vostres signatures, ja que li pertoca a ell. Si la vostra signatura es mostra en un servidor de claus, podeu estar segur que en Trent realment controla tant la seva clau com l'adreça de correu electrònic que vàreu signar. Les signatures que realitzeu en aquest procés no formaran part del vostre anell de claus. De manera que després de signar les claus d'en Trent encara es mostraran com a no de confiança en el vostre anell de claus. Una vegada en Trent rebi el correu i hagi importat la vostra signatura al seu anell de claus podreu pujar-les a un servidor de claus. En actualitzar la seva clau des del servidor obtindreu les noves signatures. Encara que aquest principi pot semblar un inconvenient, no garanteix que li donareu confiança a la seva identitat, la que ell controla. Només les signatures que apareixen en un servidor de claus són les que tothom, inclòs vostè, podeu estar segur que realment controla l'adreça de correu electrònic corresponent.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Treballar amb els servidors de claus</title>
+
+<sect2>
+<title
+>Comunicació amb els servidors de claus</title>
+
+<para
+>La part pública d'un parell de claus normalment s'emmagatzema en un servidor de claus. Aquests servidors permeten que qualsevol persona cerqui una clau pertanyent a una determinada persona o adreça de correu electrònic. Les signatures també estan emmagatzemades en aquests servidors.</para>
+
+<screenshot>
+<screeninfo
+>Aquesta és una captura de pantalla de la finestra del servidor de claus.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Aquest diàleg us proporciona accés als servidors de claus. Podeu cercar i importar claus des d'un servidor de claus, així com exportar a un servidor. Un exemple de cerca i importació és quan es vol escriure un correu a algú. Si el voleu encriptar, podeu cercar si aquest posseeix alguna clau pública en els servidors de claus. Si heu creat un parell nou de claus o heu signat la clau d'algú, és possible que vulgueu exportar la clau pública (possiblement amb noves signatures) a un servidor de claus.</para>
+<para
+>La majoria dels servidors de claus sincronitzen les seves dades entre els altres de manera que s'obtinguin resultats similars sense importar quin servidor utilitzeu. Com que hi ha excepcions a aquesta regla podeu triar el servidor de claus a utilitzar en aquest diàleg. En general és una bona idea triar un servidor de claus per omissió que es trobi a prop vostre (és a dir, al país o al continent), ja que generalment responen més ràpidament a les vostres consultes.</para>
+<para
+>Si us plau, tingueu en compte que tot el que pugeu a un servidor de claus en general es queda allà per sempre. Aquesta és una bona raó per a limitar la vida de les vostres claus. Tingueu també en compte que els servidors a vegades són rastrejats pels generadors de correu brossa a la cerca d'adreces de correu electrònic.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Resultat de la cerca en el servidor de claus</title>
+<screenshot>
+<screeninfo
+>Aquest és un exemple dels resultats d'una cerca en un servidor de claus.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Tots els resultats d'una cerca es mostren en aquesta finestra. Aquesta imatge mostra una cerca per a les adreces «@ kde.org» i ens mostra 244 resultats. Utilitzant el camp de cerca, la llista s'ha reduït a una sola clau. Aquesta clau té dues coincidències: L'ID d'usuari primari coincideix amb la cadena de cerca, així com un dels altres identificadors d'usuari.</para>
+
+<para
+>Podeu seleccionar una o més claus a importar. Els identificadors de les claus es mostren en el camp <guilabel
+>Clau a importar</guilabel
+> a la part inferior de la finestra. En fer clic a <guibutton
+>Importa</guibutton
+> es torna a contactar amb el servidor per obtenir les seleccionades i incorporar-les al vostre anell de claus.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>Com configurar &kgpg;</title>
+
+<para
+>La configuració és accessible a través del menú de la miniaplicació de &kgpg; (feu clic amb el &BDR; a sobre de la miniaplicació) o a través del menú principal (<menuchoice
+><guimenu
+>Arranjament</guimenu
+><guimenuitem
+>Configura KGpg</guimenuitem
+></menuchoice
+>). Podreu establir-hi els paràmetres per omissió per a l'encriptatge, desencriptatge, la interfície d'usuari i per a la miniaplicació. La majoria de les opcions d'encriptatge estan directament relacionades amb gpg i estan documentades a les seves <ulink url="man:gpg"
+>pàgines del manual</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Encriptatge</title>
+<screenshot>
+<screeninfo
+>Aquesta és una captura de pantalla del diàleg d'opcions amb la pestanya encriptatge oberta</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Aquí podeu configurar opcions especials per passar-les a GnuPG per canviar el comportament de l'encriptatge. Per a una descripció detallada, si us plau doneu un cop d'ull al manual de GnuPG.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>Encriptatge en armadura ASCII</guilabel
+>: Això causa que els fitxers encriptats s'emmagatzemin en un format que fa servir caràcters ASCII imprimibles i amb línies curtes. Els fitxers emmagatzemats d'aquesta manera són més grans que els fitxers en format binari, però són més fàcils d'enviar, &pex;, per correu electrònic.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Permet l'encriptatge amb claus que no siguin de confiança</guilabel
+>: Això us permet encriptar fitxers amb claus que no són de confiança.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Compatibilitat amb PGP 6</guilabel
+>: Els fitxers encriptats són compatibles amb l'estàndard PGP6 antic. Això inhabilita certes característiques, de manera que només l'hauríeu d'utilitzar si és absolutament necessari.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Oculta l'identificador d'usuari</guilabel
+>: Això elimina tot indici del receptor en el fitxer encriptat. En cas que la transmissió sigui interceptada, ningú podrà obtenir informació sobre el destinatari a partir del fitxer. Si el receptor posseeix múltiples claus, necessitareu provar amb la que s'ha emprat.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Encripta sempre amb</guilabel
+>: Totes les encriptacions seran encriptades addicionalment amb aquesta clau. Si ho establiu a una de les vostres claus privades, us assegurareu que podreu llegir totes les dades que encripteu pel preu d'obtenir missatges més llargs.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Encripta fitxers amb</guilabel
+>: Es comporta com <guilabel
+>Encripta sempre amb </guilabel
+> per a l'encriptatge del fitxer.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Ordre a mida per a l'encriptatge</guilabel
+>: Si necessiteu passar alguna opció poc usual a GnuPG, podeu especificar aquí la línia d'ordres. La majoria d'usuaris no ho necessitarà.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Usa l'extensió *.pgp per als fitxers encriptats</guilabel
+>: Si marqueu aquesta opció, els fitxers encriptats s'anomenaran com el fitxer d'entrada amb l'extensió <literal role="extension"
+>.pgp</literal
+> afegida, en cas contrari s'utilitzarà l'extensió <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Desencriptatge</title>
+
+<para
+>Aquí podeu especificar una ordre de desencriptatge personalitzada. Aquesta opció rares vegades és necessària i només és d'utilitat per a usuaris avançats que coneixen les opcions de la línia d'ordres de GnuPG.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Aparença</title>
+<para
+>Aquí podeu configurar la manera en què es mostra &kgpg;. Les opcions possibles són els colors que reflecteixen els diferents nivells de confiança de les claus en el <link linkend="keymanager"
+>gestor de claus</link
+> i les opcions del tipus de lletra per a l'<link linkend="editor"
+>editor</link
+>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>Opcions de GnuPG</title>
+<para
+>Aquí podeu configurar quin binari gpg i quin <guilabel
+>fitxer de configuració</guilabel
+> i carpeta d'inici s'utilitzaran. Aquests valors són autodetectats durant el primer inici i ja haurien de funcionar.</para>
+<para
+>La utilització de l'<ulink url="man:gpg-agent"
+>Agent GnuPG</ulink
+> fa que el treball amb GnuPG sigui més còmode, ja que no cal introduir la contrasenya per a cada acció. Aquesta serà emmagatzemada en la memòria cau per un temps, de manera que es pugui realitzar qualsevol operació que la requereixi. Tingueu en compte que això pot permetre que altres persones facin servir les vostres claus privades si els doneu accés a la sessió.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Servidors de claus</title>
+<para
+>Aquí podeu crear una llista de servidors de claus que se us mostraran quan obriu el <link linkend="keyserver"
+>diàleg dels servidors de claus</link
+>. Si executeu GnuPG des de la línia d'ordres, només s'usarà el servidor de claus que heu establert aquí com per omissió.</para>
+<para
+>El protocol utilitzat per a la comunicació amb el servidor de claus està basat en &HTTP;, de manera que pren sentit en alguns entorns <guilabel
+>Satisfer a l'intermediari &HTTP; quan estigui disponible</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Miscel·lània</title>
+<para
+>Aquesta secció permet l'establiment d'algunes característiques diferents que no encaixen en les altres seccions. Podeu configurar per exemple <guilabel
+>Inicia KGpg automàticament en accedir al sistema</guilabel
+>. L'opció <guilabel
+>Usa la selecció del ratolí en comptes del porta-retalls</guilabel
+> modifica si es pot seleccionar amb el ratolí i enganxar amb el botó del mig del ratolí o si totes les operacions es realitzaran mitjançant dreceres de teclat.</para>
+<para
+>També podeu canviar si es mostrarà la icona de la safata del sistema de &kgpg;, i quina acció succeeix si feu clic sobre la icona amb el &BER;. Si es mostra la icona de la safata del sistema es tancarà la finestra de &kgpg; minimitzant l'aplicació a la safata. Si no es mostra la icona de la safata del sistema &kgpg; sortirà de totes les finestres en tancar-se.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Crèdits i llicència</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Copyright del programa &copy; 2002-2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Traductors de la documentació: Albert Astals Cid <email
+>aacid@kde.org</email
+> i &credits.Antoni.Bella;</para
+> &underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

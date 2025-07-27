@@ -1,0 +1,793 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY package "kdeutils">
+  <!ENTITY kappname "&kgpg;">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Lithuanian "INCLUDE">
+]>
+
+<book lang="&language;">
+
+<bookinfo>
+<title
+>&kgpg; vadovas</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>Tomas</firstname
+><surname
+>Straupis</surname
+><affiliation
+><address
+><email
+>tomasstraupis@gmail.com</email
+></address
+></affiliation
+><contrib
+>Vertė</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-05-14</date>
+<releaseinfo
+>0.06.00</releaseinfo>
+
+<abstract>
+<para
+>&kgpg;  – paprasta naudotojo sąsaja paketui GnuPG (<ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>užšifravimas</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>saugumas</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Įvadas</title>
+
+
+<para
+>&kgpg; yra paprasta naudotojo sąsaja su GnuPG – galinga šifravimo priemone. GnuPG (dar žinoma kaip gpg) įtraukta į daugelį distribucijų ir jau turėtų būti įdiegta jūsų sistemoje. Naujausią GnuPG versiją galite atsisiųsti iš <ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>.</para>
+
+<para
+>Naudodami &kgpg; galėsite užšifruoti ir iššifruoti savo failus, laiškus, taip padarydami savo bendravimą daug saugesniu. Nedidelis aprašymas, kaip naudoti šifravimą pateikiamas <ulink url="http://www.gnupg.org/documentation/howtos.en.html"
+>GnuPG svetainėje</ulink
+>. </para>
+
+<para
+>Naudojant &kgpg; jums nebereikės atsminti gpg komandinės eilutės funkcijų ir parinkčių. Praktiškai viską galėsite padaryti keliais pelės mygtukų paspaudimais. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Pirmieji žingsniai</title>
+
+<para
+>Štai pagrindinių &kgpg; komponentų sąrašas:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Sistemos dėklo ženkliukas </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>&kgpg; sistemos dėklo įskiepis</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Paleidus &kgpg; pasirodys sistemos dėklo ženkliukas. Paspaudus kairiu pelės mygtuku bus atidarytas raktų tvarkymo langas. Paspaudus dešiniu pelės mygtuku bus parodytas meniu su svarbiausių funkcijų sąrašu. Jei jums labiau patinka kitos parinktys – galite nurodyti, kad kairiojo mygtuko paspaudimas turi atidaryti redaktorių. Taipogi galite apskritai išjungti sistemos dėklo ženkliuką. Visą tai galite nurodyti <link linkend="conf-misc"
+>nustatymų dialoge</link
+>. </para>
+<para
+>Atkreipkite dėmesį, kad &kgpg; sistemos dėklo ženkliukas praktiškai visada pažymėtas kaip &quot;neaktyvus&quot;. Kadangi sistemos dėklo įskiepis paprastai paslėpia neaktyvius ženkliukus, &kgpg; ženkliukas nebus rodomas tol, kol jūs konkrečiai jo neiškviesite. Daugiau informacijos apie tai rasite &plasma; dokumentacijoje. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Raktų tvarkyklės langas</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Raktų tvarkyklės langas</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Tai pagrindinė raktų valdymo vieta. Norėdami atidaryti <link linkend="keymanager"
+>Raktų tvarkyklės langą</link
+> spauskite kairįjį pelės mygtuką ant &kgpg; ženkliuko. Dauguma operacijų galite atlikti ant rakto paspaudę dešiniu pelės mygtuku. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Redaktoriaus langas</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Redaktoriaus langas</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Tai paprastas teksto redaktorius, į kurį galite įrašyti arba įkelti tekstą, kurį norite užšifruoti ar iššifruoti. Norėdami atidaryti <link linkend="editor"
+>redaktorių</link
+> spauskite dešinį pelės mygtuką ant &kgpg; įskiepio. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integracija su failų tvarkykle</term>
+<listitem>
+
+<para
+>&kgpg; yra integruotas su &konqueror; ir Dolphin. Tai reiškia, kad, paspaudę ant failo dešinį pelės mygtuką, galite pasirinkti <menuchoice
+><guimenu
+>Veiksmai</guimenu
+><guimenuitem
+>Šifruoti failą</guimenuitem
+></menuchoice
+>, jei norite užšifruoti failą. Iššifruoti failą galėsite paspaudę ant jo dešinį pelės mygtuką. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>&kgpg; naudojimas</title>
+
+<para
+>Duomenis užšifruoti galite dviem būdais: <itemizedlist>
+<listitem
+><para
+>Simetrinis šifravimas: jūsų duomenys užšifruojami su slaptažodžiu. Bet kas, turintis kompiuterį su gpg gali iššifruoti jūsų pranešimą, jei jam ar jai pasakysite slaptažodį. Norėdami atlikti simetrinį šifravimą, šifravimo dialogo parinktyse pasirinkite „simetrinis šifravimas“.</para
+></listitem>
+<listitem
+><para
+>Užšifravimas naudojant raktą: jūs iš pradžių turite susikurti savo raktų porą (slaptą raktą ir viešą raktą) ir suteikti jai slaptafrazę. Slaptą raktą saugokite saugioje vietoje, o viešais raktais apsikeiskite su draugais. Tada, jei norėsite siųsti užšifruotą laišką Mindaugui, turėsite užšifruoti jį naudodami Mindaugo viešąjį raktą. Tokio laiško iššifravimui bus reikalingas Mindaugo slaptasis raktas ir slaptafrazė.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Šifravimas naudojant raktus yra kiek sudėtingesnis (nes jums reikia su draugais apsikeisti raktais), bet jis yra saugesnis. Nepamirškite, kad užšifravę pranešimą su kieno nors kito raktu, jūs negalėsite jo iššifruoti. Jūs galite iššifruoti tik tuos pranešimus, kurie buvo užšifruoti naudojant jūsų viešąjį raktą.</para>
+
+<sect1 id="key-generation">
+<title
+>Rakto generavimas</title>
+
+<para
+>Jei dar neturite rakto, &kgpg; automatiškai parodys rakto generavimo dialogą pirmo paleidimo metu. Jūs taipogi galite jį paleisti iš raktų tvarkyklės meniu <menuchoice
+><guimenu
+>Raktai</guimenu
+><guimenuitem
+>Generuoti raktų porą</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Raktų generavimo dialogas</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Tiesiog įveskite savo vardą, elektroninio pašto adresą ir spauskite <guibutton
+>Gerai</guibutton
+>. Bus sugeneruotas standartinis gpg raktas. Jei norite matyti daugiau rakto generavimo parinkčių, spauskite mygtuką <guibutton
+>Eksperto režimas</guibutton
+>, tada bus atidarytas konsolės langas, kuriame matysite visas gpg parinktis.</para>
+<para
+>Dauguma žmonių žaidžia su savo pirmąja raktų pora: kuria blogus naudotojų identifikatorius, prideda komentarus, dėl kurių vėliau gailisi arba tiesiog pamiršta slaptafrazę. Kad tokie raktai negaliotų amžinai, protinga būtų apriboti raktų galiojimo periodą 12 mėnesių. Rakto galiojimo periodą galima keisti ir vėliau, naudojant <link linkend="keyproperties"
+>rakto savybių langą</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Rakto atšaukimas</title>
+
+<para
+>Raktų pora, kurios galiojimas baigėsi, gali būti vėl sugrąžinta į veikiančią būseną, jei tebeturite priėjimą prie privataus rakto ir slaptafrazės. Kad užtikrintai padarytumėte raktą nebenaudotinu, turite jį atšaukti. Atšaukimas vykdomas prie rakto pridedant specialų atšaukimo parašą.</para>
+
+<para
+>Šis atšaukimo parašas gali būti sukurtas kartu su raktu. Tokiu atveju jis saugomas atskirame faile. Šis failas vėliau gali būti importuotas į raktinę ir prijungtas prie rakto, taip padarydamas jį nebenaudojamu. Atkreipkite dėmesį, kad norint importuoti šį parašą prie rakto, slaptažodis nereikalingas. Taigi jūs turėtumėte saugoti šį atšaukimo parašą saugioje vietoje, paprastai kitoje, nei jūsų raktų pora. Geras patarimas yra naudoti vietą, kuri nėra prijungta prie jūsų kompiuterio, kopija išorinėje laikmenoje, tokioje kaip USB raktas arba tiesiog atsispausdinti ant popieriaus.</para>
+
+<para
+>Jei nesukūrėte tokio greta esančio atšaukimo kai kūrėte raktą, jūs galite jį sukurti bet kuriuo metu pasirinkę <menuchoice
+><guimenu
+>Raktai</guimenu
+> <guimenuitem
+>Atšaukti raktą</guimenuitem
+></menuchoice
+>. Jei norite, galite nedelsiant importuoti jį į savo raktinę.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Duomenų užšifravimas</title>
+
+<sect2 id="konqui">
+
+<title
+>Duomenų užšifravimas naudojant &konqueror; arba Dolphin</title>
+
+<para
+>Spauskite dešinį pelės mygtuką ant failo, kurį norite užšifruoti. Kontekstiniame meniu pasirinkite <menuchoice
+><guimenu
+>Veiksmai</guimenu
+><guimenuitem
+>Šifruoti failą</guimenuitem
+></menuchoice
+>. Jums bus parodytas viešo rakto parinkimo dialogas. Parinkite gavėjo raktą ir spauskite <guibutton
+>Gerai</guibutton
+>. Užšifruotas failas bus išsaugotas su praplėtimu <literal role="extension"
+>.asc</literal
+> arba <literal role="extension"
+>.gpg</literal
+> (priklausomai nuo to, ar pasirinksite ASCII šifravimą. Šifruojant ASCII būdu, galutiniame faile bus tik perskaitomi simboliai, kuriuos galima persiųsti tiesiog tekstiniu pavidalu (pavzydžiui laišku), bet jie užima trečdaliu daugiau vietos.</para>
+
+<screenshot>
+<screeninfo
+>Raktų parinkimo lango nuotrauka</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Teksto šifravimas naudojant &kgpg; įskiepį</title>
+
+<para
+>Norėdami užšifruoti iškarpinės turinį, iškylančiame meniu parinkite <guimenuitem
+>Šifruoti iškarpinę</guimenuitem
+>. Parinkus <guimenuitem
+>Pasirašyti iškarpinę</guimenuitem
+> tekstas tiesiog bus pasirašytas. Atliekant bet kurį iš šių veiksmų iškarpinės turinys bus įkeltas į <link linkend="editor"
+>redaktoriaus langą</link
+>, tada bus atliktas parinktas veiksmas ir tada turinys bus vėl įkeltas į redaktorių.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Teksto &kgpg; redaktoriuje šifravimas</title>
+
+<para
+>Tiesiog reikia paspausti mygtuką <guibutton
+>Šifruoti</guibutton
+>. Jūsų tada paprašys parinkti viešą raktą. Parinkite jūsų raktą ir spauskite mygtuką <guibutton
+>Gerai</guibutton
+>. Redaktoriuje pasirodys užšifruotas pranešimas.</para>
+
+<para
+>Paprastai failus užšifruoti galite tik tais raktais, kuriais pasitikite. Kadangi kartais gali prireikti tiesiog išsiųsti pranešimą atisiktiniams žmonėms, kurie turi jums žinomus GPG raktus, galite įjungti parinktį <guilabel
+>Leisti šifravimą nepatikimu raktu</guilabel
+>.</para>
+
+<para
+>Kad visada galėtumėte iššifruoti visus jūsų užšifruotus failus, net jei jie užšifruoti su kitų žmonių viešais raktais, galite įjungti parinktis <guilabel
+>Visada šifruoti su</guilabel
+> bei <guilabel
+>Šifruoti failus su</guilabel
+>, kurias rasite <link linkend="conf-encryption"
+>KGpg konfigūracijoje</link
+>.</para>
+
+<para
+>Norėdami gauti daugiau informacijos apie šifravimo parinktis <guilabel
+>ASCII šarvuotas</guilabel
+>, <guilabel
+>Leisti šifravimą nepatikimu raktu</guilabel
+> ir <guilabel
+>Simetrinis šifravimas</guilabel
+> skaitykite gpg dokumentaciją arba <ulink url="man:gpg"
+>man puslapius</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Duomenų iššifravimas</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Failo iššifravimas naudojant &konqueror; arba Dolphin</title>
+<para
+>Spauskite <mousebutton
+>kairįjį</mousebutton
+> pelės mygtuką ant failo, kurį norite iššifruoti. Įveskite savo slaptafrazę ir failas bus iššifruotas. Taipogi galite pertempti užšifruotą failą į &kgpg; redaktoriaus langą. Tada jūsų paklaus slaptafrazės ir &kgpg; redaktoriuje atidarys iššifruotą tekstą. Galite pertempti net ir ne jūsų kompiuteryje esančius failus! Dar galite naudoti meniu <menuchoice
+><guimenu
+>Failas</guimenu
+><guimenuitem
+>Iššifruoti failą</guimenuitem
+></menuchoice
+></para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Teksto iššifravimas naudojant &kgpg; įskiepį</title>
+
+<para
+>Norėdami iššifruoti iškarpinės turinį naudokite &kgpg; įskiepio meniu punktą <guimenuitem
+>Iššifruoti škarpinę</guimenuitem
+>. Pasirodys <link linkend="editor"
+>redaktoriaus langas</link
+> su iššifruotu tekstu.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Teksto redaktoriuje iššifravimas</title>
+
+<para
+>Nukopijuokite arba pertempkite tekstą, kurį norite iššifruoti, ir spauskite mygtuką <guibutton
+>Iššifruoti</guibutton
+>. Jūsų paprašys įvesti slaptafrazę. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Raktų valdymas</title>
+
+<para
+>Naudojant &kgpg; gali būti vykdomos visos pagrindinės raktų valdymo funkcijos. Spauskite kairįjį pelės mygtuką, jei norite atverti raktų valdymo langą. Dauguma parinkčių pamatysite paspaudę ant rakto <mousebutton
+>dešinį</mousebutton
+> pelės mygtuką. Norėdami importuoti ar eksportuoti viešus raktus, galite naudoti pertempimą arba kopijavimo/įkėlimo funkcionalumą.</para>
+
+<sect2 id="keymanager">
+<title
+>Raktų tvarkyklė</title>
+
+<screenshot>
+<screeninfo
+>Raktų tvarkyklės nuotrauka</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Šiame pavyzdyje matote raktų grupę, kurioje yra du raktai, dvi raktų poros ir trys vieši raktai. Trečiame stulpelyje rodomas jūsų pasitikėjimas šiais raktais. Pirma raktų pora jūs pasitikite visiškai, ji taipogi parinkta kaip numatytoji raktų pora (išskirta riebiu šriftu). Antro rakto galiojimas baigėsi. Dvejais iš viešųjų raktų pasitikima pilnai, o štai paskutiniu raktu pasitikima tik dalinai. Paskutinis raktas išskleistas, todėl matosi  ElGamal subraktas, papildomas naudotojo identifikatorius, abiem vėlgi pasitikima tik dalinai, bei keletas parašų.</para>
+<para
+>Parašų pagalba galite naviguoti savo raktinėje. Du kartus paspaudus ant parašo arba rakto, rodomo kaip grupės nario, jus nuves tiesiai į atitinkamą pirminį raktą.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Raktų savybės</title>
+
+<screenshot>
+<screeninfo
+>Rakto savybių langas</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Nors rektų tvarkyklėje galite atlikti bendrus veiksmus su vienu ar daugiau raktų, raktų grupių arba parašų, raktų savybių lange matote vieno konkretaus rakto informaciją. Šį langą galite iškviesti ant rakto spausdami enter arba du kartus spragtelėje pele.</para>
+<para
+>Šiame lange galite pakeisti rakto slaptafrazę bei galiojimo terminą. Taipogi visiems raktams galite nurodyti pasitikėjimo lygį.</para>
+<para
+>Ši reikšmė nurodo, kiek jūs pasitikite, kad šis raktas tiksliai identifikuoja nurodytą rakto savininką ir jo raktus bei parašus. Atsižvelgiant į pasitikėjimą savininku, gpg sukuria jūsų asmeninį pasitikėjimo tinklą. Jūs pasitikite raktais, kurios pats pasirašėte. Jei pasitikite savininkais, tai reiškia pasitikite ir jų pasirašytais raktais ir jums nebereikia pasirašinėti jų raktų.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Raktų pasirašymas</title>
+
+<para
+>Kai pasirašote kieno nors raktą (sakykime Urtės), jūs paskelbiate, kad jūs įsitikinęs, kad šis raktas tikrai priklauso tam žmogui ir kad raktu galima pasitikėti. Aišku, jūs turėtumėte įsitikinti, kad viskas tikrai taip ir yra. Dažniausiai tai reiškia, kad jums reikia sutikti Urtę, patikrinti bent vieną asmens identifikavimo dokumentą ir tada pasirašyti raktą. Paprastai po to jūs nusiųsite naujai pasirašytą raktą į <link linkend="keyserver"
+>raktų serverį</link
+>, kad visi žinotų, jog jūs patikrinote ir pasitikite savininku. Urtė tikriausiai padarys tą patį, taigi jūsų abiejų raktai bus vienas kito pasirašyti. Jei vienas iš jūsų neturi su savimi identifikacinio dokumento – ne bėda, pasirašymas gali būti vykdomas ir tik viena kryptimi.</para>
+
+<para
+>Pagalvokite, kas atsitinka, jei Urtė gyvena kitoje pasaulio pusėje. Jūs bendraujate su ja reguliariai, bet susitikti akis į akį jums praktiškai nėra galimybių. Kaip tada galima pasitikėti raktu?</para>
+
+<para
+>Kei pažymite jos raktą ir pasirenkate <guimenuitem
+>Pasirašyti raktą...</guimenuitem
+>, jums parodomas dialogas, kuriame turite nurodyti kaip norite šį raktą pasirašyti.</para>
+
+<screenshot>
+<screeninfo
+>Slapto rakto žymėjimas pasirašymui</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Pirma jūs galite pasirinkti raktą, kurį naudosite kito rakto pasirašymui. Tada galite nurodyti, kaip kruopščiai jūs patikrinote, kad ji tikrai yra tas žmogus, kuriuo dedasi. Ši informacija bus saugoma kartu su parašu, taigi tai indikacija kitiems žmonėms, kuriems irgi gali prireikti šio parašo (daugiau informacijos apie tai rasite žemiau). Tada turite dar vieną variantą, kuris gali padėti, jei jūs negalite sutikti Urtės: <guilabel
+>Vietinis parašas (negali būti eksportuotas)</guilabel
+>. Įjungus šią parinktį, sukuriama specifinė parašo versija, kuri niekaip (net per klaidą) negali patekti už jūsų raktinės ribų.</para>
+
+<para
+>Bet kodėl taip svarbu žinoti, kaip kruopščiai jūs patikrinote Urtės tapatybę? Kam gi tai rūpi? Yra keli būdai išspręsti Urtės tapatybės problemą. Jei neturite galimybių aplankyti Urtę, pagalvokite apie Vytautą. Jūs žinote, kad Vytautas irgi turi raktų porą. Be to Vytautas labai daug keliauja, bent du kartus per mėnesį būna kituose žemynuose. Jei jums pasiseks, jis anksčiau ar vėliau nuskris kur nors netoli Urtės. Taigi jūs einate ir susitinkate su Vytautu bei pasirašote jo raktus. Tada pranešate Urtei, kad Vytautas greitai ją aplankys, ir paklausiate, ar ji galėtų su juo susitikti ir pasirašyti su juo vienas kito raktus. Kai visa tai įvyksta, jūs žinote, kad Vytauto raktu galima pasitikėti, o Vytautas žino, kad Urtės raktu irgi galima pasitikėti. Jei jūs pasitikte Vytautu ir tuo, kad jis kruopščiai patikrino Urtės tapatybę, jūs galite taipogi pasitikėti Urtės raktais.</para>
+
+<para
+>Šie ryšiai tarp raktų ir jų savininkų sukuria taip vadinamą pasitikėjimų tinklą. Tame tinkle yra keletas labai svarbių nuostatų, kurios nustato, kiek galima pasitikėti kokiu nors konkrečiu raktu. Pirma, kaip kruopščiai buvo patikrinta rakto savininko tapatybė. Tai reikšmė, kurią jūs matėte aukščiau pateiktoje slapto rakto parinkimo lango nuotraukoje. Pavyzdžiui jūs tikriausiai žinosite, kaip patikrinti savo šalies tapatybės kortelę, bet tą patį padaryti su kitos šalies kortelėmis gali būti sunku. Taigi jūs galite sakyti, kad labai kruopščiai patikrinote Vytauto tapatybės kortelę ir ji atrodo labai panašiai į jūsų. Bet Vytautas, nors ir matė tiek tapatybės kortelę, tiek vairuotojo pažymėjimą, gali sakyti, kad jis tik daugmaž patikrino Urtės tapatybę, nes jis negali būti tikras dėl kitame pasaulio gale naudojamų dokumentų.</para>
+
+<para
+>Kita svarbi reikšmė yra pasitikėjimo kito žmogaus sugebėjimu tikrinti dokumentus lygis. Žinote, kad Vytautas tai gerai daro. Bet va Kęstučio jūs tikrai negalite pavadinti protingu. Jis tik akį užmetė į jūsų tapatybės kortelę, kai susitikote raktų pasirašymui. Jūs esate įsitikinęs, kad Kęstutis yra tas žmogus, kuriuo dedasi, nes jūs kruopščiai patikrinote jo dokumentus. Visgi panašu, kad jam nelabai rūpi patikrinti dokukumentus žmonių, kurių raktus jis pasirašo. Taigi jūs pilnai pasitikėsite Kęstučio raktu, bet nelabai pasitikėsite Kęstučio parašais. Atvėrę Kęstučio rakto <link linkend="keyproperties"
+>savybes</link
+>, rasite lauką <guilabel
+>Pasitikėjimas savininku</guilabel
+>. Čia nurodote, kiek jūs pasitikite rakto savininku, kai jis pasirašinėja kitus raktus. Ši reikšmė nebus eksportuojama, tai grynai jūsų asmeninė nuomonė.</para>
+
+<screenshot>
+<screeninfo
+>Rakto savybių langas</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Taigi dabar turėtumėte turėti bendrą supratimą apie tai, kas yra pasitikėjimo tinklas, kam skirtos pasitikėjimo raktu ir savininku reikšmės, bei kodėl visada reikia labai kruopščiai tikrinti tapatybes: kiti žmonės gali pasitikėti jumis. Kaip ten bebūtų, vienas šio proceso žingsnis lieka nepatikrintas: jūsų pasirašytuose raktuose nurodytas elektroninio pašto adresas. Keliais pelės mygtukų paspaudimais jūsų rakte galima sukurti naują naudotoją su Urtės ar Vytauto pašto adresais. Vytautas įsitikino, kad jūs valdote savo raktą. Bet niekas iki šiol nepatikrino, kad jūs tikrai valdote ir jūsų naudotojo pašto adresus.</para>
+
+<para
+>Iš meniu parinkę <guimenuitem
+>Pasirašyti ir išsiųsti naudotojo tapatybę...</guimenuitem
+> jūs galite užverti šitą skylę. Mintis yra kaip įprasta pasirašyti raktą ir tada jį padalinti į dalis. Kiekvienoje dalyje bus tik viena Vytauto tapatybės rakto dalis ir jūsų parašas. Tai bus užšifruota Vytauto raktu ir išsiųsta tik tuo adresu, kuris nurodytas prie tapatybės. Į savo raktinę importuoti parašą Vytautas galės tik tada, jei jis gali gauti šitą laišką ir iššifruoti pranešimą. Jūs neišsiųsite savo parašų, tą jis turi padaryti pats. Jei jūsų parašas pasirodys raktų serveryje, galėsite būti įsitikinęs, kad Vytautas tikrai kontroliuoja ir savo raktą, ir nurodytą elektroninio pašto adresą. Taip sukurti parašai taipogi netaps jūsų raktinės dalimi. Taigi iš karto po Vytauto rakto pasirašymo, jūsų raktinėje raktas bus rodomas kaip nepatikimas. Po to, kai Vytautas gavo jūsų laišką ir ikėlė jūsų parašą į savo raktinę, jis gali įkelti juos į raktų serverį. Kai atnaujinsite jo raktą iš raktų serverio, gausite naujus parašus. Nors iš pradžių tai atrodo gan nepatogu, tai užtikrina, kad per klaidą nematysite vienos iš jo asmenybių kaip patikimos, nors Vytautas jos ir nekontroliuoja. Tik tie parašai, kurie patenka į raktų serverį, yra tokie patikimi, kad tiek jūs, tiek visi kiti galite būti užtikrinti, kad jis tikrai kontroliuoja atitinkamus pašto adresus.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Darbas su raktų serveriais</title>
+
+<sect2>
+<title
+>Ryšys su raktų serveriais</title>
+
+<para
+>Viešoji rakto dalis paprastai saugoma raktų serveryje. Šie serveriai leidžia visiems ieškoti rakto, priklausančio konkrečiam asmeniui ar pašto adresui. Tokiuose serveriuose saugomi ir parašai.</para>
+
+<screenshot>
+<screeninfo
+>Raktų serverio lango nuotrauka</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Šio dialogo pagalba gaunate priėjimą prie raktų serverio. Galite ieškoti ir importuoti raktus iš raktų serverio bei eksportuoti raktus į serverį. Pavyzdžiui jei norite kam nors naujai pažįstamam parašyti užšifruotą laišką, galite paieškoti jo ar jos viešojo rakto raktų serveriuose. Jei sukūrėte naują raktų porą arba pasirašėte kažkieno raktą, jūs galite eksportuoti viešą raktą (tikriausiai kartu su naujais parašais) į raktų serverį.</para>
+<para
+>Dauguma raktų serverių sinchronizuoja turimus duomenis tarpusavyje, taigi turėtumėte gauti tokius pačius paieškos rezultatus nepriklausomai nuo to, kokį raktų serverį naudojate. Kadangi ši taisyklė turi išimčiu, šiame dialoge jūs galite pasirinkti konkretų raktų serverį. Paprastai protingiausia yra pasirinkti numatytąjį serverį, esantį arčiausiai jūsų (t.y. jūsų šalyje ar žemyne), nes jie dažniausiai atsako greičiausiai.</para>
+<para
+>Pastebėtina, kad bet kas, ką jūs nusiunčiate į raktų serverį lieką ten amžinai. Tai viena iš priežasčių, kodėl turėtumėte riboti savo raktų galiojimo laikotarpį. Taipogi turėkite omenyje, kad kartais, ieškodami pašto adresų, raktų serverius kartais skenuoja šlamšto siuntinėtojai.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Raktų serverio paieškos rezultatai</title>
+<screenshot>
+<screeninfo
+>Raktų serverio rezultatų pavyzdžio nuotrauka</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Šiame lange rodomi visi paieškos rezultatai. Šiame pavyzdyje matote, kad ieškant „@kde.org“ adresų buvo rasti 244 įrašai. Naudojant paieškos lauką rezultatų sąrašas buvo sumažintas iki vieno rakto. Šis raktas rastas dėl dviejų priežasčių: paieškos eilutę atitinka tiek pirminis naudotojo identifikatorius, tiek ir vienas iš kitų naudotojo identifikatorių.</para>
+
+<para
+>Galite pasirinkti vieną ar daugiau įrašų importavimui. Raktų identifikatoriai rodomi lauke <guilabel
+>Importuoti raktą</guilabel
+> lango apačioje. Paspaudus mygtuką <guibutton
+>Importuoti</guibutton
+>, dar kartą susisiekiama su raktų serveriu ir tada į jūsų raktinę parsiunčiama raktų informacija.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>&kgpg; konfigūravimas</title>
+
+<para
+>Konfigūraciją galite pasiekti per &kgpg; įskiepio meniu (ant įskiepio ženkliuko spausdami dešinį pelės mygtuką) arba per pagrindinį meniu (<menuchoice
+><guimenu
+>Nustatymai</guimenu
+><guimenuitem
+>Konfigūruoti KGpg</guimenuitem
+></menuchoice
+>). Galite nurodyti numatytasias reikšmes šifravimui, dešifravimui, naudotojo sąsajai ir įskiepiui. Dauguma šifravimo parinkčių yra tiesiogiai susijusios su gpg, todėl jos aprašytos <ulink url="man:gpg"
+>gpg aprašymo puslapyje</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Šifravimas</title>
+<screenshot>
+<screeninfo
+>Parinkčių dialogo šifravimo skilties nuotrauka</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Čia galite nurodyti parinktis, įtakojančias šifravimą, kurios bus perduodamos GnuPG. Detalų parinkčių aprašymą galite rasti GnuPG dokumentacijoje.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>ASCII šarvuotas šifravimas</guilabel
+>: užšifruotuose failuose naudojami tik ASCII simboliai bei tik trumpos eilutės. Taip įrašomi failai didesni nei failai, įrašomi dvejetainiu formatu, bet tokius juos paprasčiau siųsti pavyzdžiui elektroniniu paštu.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Leisti šifravimą nepatikimais raktais</guilabel
+>: leidžia jums šifruoti failus naudojant raktus, kuriais jūs nepasitikite.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>PGP 6 suderinamumas</guilabel
+>: užšifruoti failai suderinami su senesniu PGP6 standartu. Tai atjungia dalį funkcionalumo, taigi jūs turėtumėte įjungti šią parinktį tik tada, kai jos tikrai reikia.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Slėpti naudotojo id</guilabel
+>: iš užšifruoto failo pašalina visus gavėjo pėdsakus. Perėmus komunikacijos turinį, niekas negalės sužinoti, kas buvo šio failo gavėjas. Jei gavėjas turi daugiau nei vieną raktą, jis turės išbandyti juos visus, kad sužinotų, kuris raktas buvo panaudotas užšifruojant.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Visada šifruoti su</guilabel
+>: visi šifravimai yra papildomai užšifruojami ir nurodytu raktu. Jei čia nurodysite savo privatų raktą, tai galėsite būti tikras, kad galėsite perskaityti bet kokį užšifruotą pranešimą.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Šifruoti failus su</guilabel
+>: veikia taip pat, kaip <guilabel
+>Visada šifruoti su</guilabel
+>, tik taikoma failų šifravimui.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Sava šifravimo komanda</guilabel
+>: jei norite perduoti kokias nors neįprastas parinktis GnuPG programai, šiame lauke galite nurodyti pilną komandinę eilutę. Daugumai naudotojų šito neprireiks.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Užšifruotiems failams naudoti *.pgp praplėtimą</guilabel
+>: įjungus šią parinktį, užšifruoti raktai bus pavadinti taip pat, kaip pradiniai failai tik su praplėtimu <literal role="extension"
+>.pgp</literal
+>. Priešingu atveju bus naudojamas praplėtimas <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Iššifravimas</title>
+
+<para
+>Čia galite nurodyti savą iššifravimo komandą. Ši parinktis naudinga tik pažengusiems naudotojams, žinantiems GnuPG komandinės eilutės parinktis.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Išvaizda</title>
+<para
+>Čia galite nurodyti, kaip turi atrodyti &kgpg;. Galite nurodyti, kokiomis spalvomis <link linkend="keymanager"
+>raktų tvarkyklėje</link
+> išskirti skirtingus pasitikėjimo lygius bei <link linkend="editor"
+>redaktoriuje</link
+> naudojamą šriftą.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>GnuPG nustatymai</title>
+<para
+>Čia galite nurodyti, kurią gpg programą, <guilabel
+>konfigūracinį failą</guilabel
+> bei namų aplanką naudoti. Šios reikšmės automatiškai nustatomos pirmo paleidimo metu ir turėtų būti tinkamos.</para>
+<para
+>Naudojant <ulink url="man:gpg-agent"
+>GnuPG agentą</ulink
+> darbas su GnuPG bus patogesnis, nes nereikės kiekvieną kartą atliekant kokį nors veiksmą suvedinėti savo slaptažodžio. Slaptažodis bus kažkurį laiką įsimintas atmintyje, todėl bet kuri operacija, kuriai reikia slaptažodžio galės būti įvykdyta iš karto. Atkreipkite dėmesį, kad pasirinkus šį variantą ir palikus savo darbo sesiją prieinamą kitiems naudotojams jūs galite leisti jiems pasinaudoti savo slaptais raktais.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Raktų serveriai</title>
+<para
+>Čia galite sukurti sąrašą raktų serverių, kurie bus jums rodomi, kai atidarysite <link linkend="keyserver"
+>raktų serverių dialogą</link
+>. Jei paleisite GnuPG iš komandinės eilutės – bus naudojamas tik numatytasis raktų serveris.</para>
+<para
+>Kadangi ryšiui su raktų serveriais naudojamas protokolas pagrįstas &HTTP; protokolu, tai yra prasmė kai kuriose aplinkose <guilabel
+>naudoti &HTTP; įgaliotąjį serverį, jei galima</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Įvairūs</title>
+<para
+>Šioje skiltyje rasite parinktis, kurios netiko nei vienai kitai skilčiai. Čia pavyzdžiui galite nurodyti, kad reikia <guilabel
+>KGpg paleisti automatiškai po prisijungimo</guilabel
+>. Parinktis <guilabel
+>Naudoti pelės pažymėjimą, o ne iškarpinę</guilabel
+> nurodo, ar pažymėjimas daromas pele įkeliant su viduriniu mygtuku ar visos operacijos daromos sparčiaisiais klavišais.</para>
+<para
+>Galite nurodyti, ar reikia rodyti &kgpg; sistemos dėklo ženkliuką bei kas atsitinka, kai ženkliukas paspaudžiamas kairiu pelės mygtuku. Jei rodomas sistemos dėklo ženkliukas, tai uždarant &kgpg; langą jis bus minimizuojamas į sistemos dėklą. Jei sistemos dėklo ženkliukas nerodomas, tai uždarant &kgpg; langą bus baigtas &kgpg; darbas.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Padėkos ir licencija</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Programos autorinės teisės &copy; 2002-2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Tomas Straupis<email
+>tomasstraupis@gmail.com</email
+></para
+> 
+&underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

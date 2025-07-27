@@ -1,0 +1,772 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY package "kdeutils">
+  <!ENTITY kappname "&kgpg;">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Galician  "INCLUDE">
+]>
+
+<book lang="&language;">
+
+<bookinfo>
+<title
+>Manual do &kgpg;</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>Xosé</firstname
+><surname
+>Calvo </surname
+><affiliation
+><address
+><email
+>xosecalvo@edu.xunta.es</email
+></address
+></affiliation
+><contrib
+>Tradutor do proxecto Trasno</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2010-05-14</date>
+<releaseinfo
+>0.06.00</releaseinfo>
+
+<abstract>
+<para
+>O &kgpg; é unha interface gráfica simple para o GnuPG (<ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>cifrado</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>seguranza</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Introdución</title>
+
+
+<para
+>O &kgpg; é unha interface simple para o GnuPG, unha poderosa utilidade de  cifrado. O GnuPG (tamén coñecido como "gpg") ven incluído na maioría das distribuicións e debería estar instalado no sistema. Pódese obter a versión máis recente en <ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>.</para>
+
+<para
+>With &kgpg; you will be able to encrypt and decrypt your files and emails, allowing much more secure communications. A mini howto on encryption with gpg is available on <ulink url="http://www.gnupg.org/documentation/howtos.en.html"
+>GnuPG's web site</ulink
+>. </para>
+
+<para
+>Co &kgpg;, non hai que lembrar as liñas de comando e as opcións do gpg. Pódese facer case todo cuns "clics" do rato. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Comezar</title>
+
+<para
+>Velaquí unha lista dos componentes principais do &kgpg;:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Icona da bandexa do sistema </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Aplicacionciña da bandexa do sistema do &kgpg;</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>When you start &kgpg;, a system tray icon will appear. A &LMB; click will open the Key Manager window, while a &RMB; click will open a menu allowing quick access to some important features. If you prefer other options you can change the &LMB; action to show the editor or completely disable the system tray icon using the <link linkend="conf-misc"
+>settings dialog</link
+>. </para>
+<para
+>Please note that the system tray icon of &kgpg; is marked as &quot;inactive&quot; basically all the time. Since the system tray applet will usually hide inactive icons the one of &kgpg; will not be shown until you explicitly request it. For details please have a look at the &plasma; documentation. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Xanela do xestor de chaves</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Xanela do xestor de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Este é o lugar central para xestionar as chaves. Para abrir a <link linkend="keymanager"
+>xanela do xestor de chaves</link
+>, prema a  aplicacionciña do &kgpg; co &LMB;. Pódense importar, exportar, asinar e editar as chaves. A maioría das accións pódense facer cun "clic" do &RMB; sobre unha chave. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Xanela do editor</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Xanela do editor</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>It's a simple text editor, where you can type or paste text to encrypt/decrypt it. To open the <link linkend="editor"
+>editor</link
+>, click with the &RMB; on &kgpg;'s applet. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integración co xestor de ficheiros</term>
+<listitem>
+
+<para
+>O &kgpg; está integrado no &konqueror; e no Dolphin. Isto significa que, cando se calca nun ficheiro, pódese escoller <menuchoice
+><guimenu
+>Accións</guimenu
+><guimenuitem
+>Cifrar o ficheiro</guimenuitem
+></menuchoice
+> para o cifrar. Pódese descrifrar un ficheiro premendo nel co &LMB;. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>Usar o &kgpg;</title>
+
+<para
+>Existen dúas formas de cifrar os datos: <itemizedlist>
+<listitem
+><para
+>Cifrado simétrico: os dados só se cifran cun contrasinal. Calquer persoa que tiver un computador co gpg pode descifrar a mensaxe se se lle dá o contrasinal. Para efectuar unha cifra simétrica, escolla a "cifra  simétrica" na xanela de opcións cando se lle pida que escolla un contrasinal de cifrado.</para
+></listitem>
+<listitem
+><para
+>Cifrado con chave: primeiro hai que criar un par de chaves (pública e privada) e indicar un contrasinal. Manteña a súa chave privada nun lugar seguro e troque a chave pública cos seus amigos. A partir de entón, se lle quere enviar unha mensaxe cifrada a Alexandre, ten que cifrar a mensagen coa chave pública de Alexandre. Para descifrar a mensaxe, o destinatario necesita a chave privada e o contrasinal de Alex.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Key encryption is a bit more complicated (you must exchange keys with your friends) but safer. Remember that if you encrypt a key with someone else's key, you will not be able to decrypt it. You can only decrypt messages that have been encrypted with your public key.</para>
+
+<sect1 id="key-generation">
+<title
+>Xerar unha chave</title>
+
+<para
+>Se non ten unha chave, o &kgpg; mostra automaticamente o diálogo de  xeración de chaves no primeiro arranque. Tamén se pode acceder a este no Xestor de Chaves a partir da opción <menuchoice
+><guimenu
+>Chaves</guimenu
+><guimenuitem
+>Xerar un Par de Chaves</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Diálogo de xeración de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Simply enter your name, Email address and click <guibutton
+>Ok</guibutton
+>. This will generate a standard gpg key. If you want more options, you can click on the <guibutton
+>Expert Mode</guibutton
+> button, which will bring up a &konsole; window with all of gpg's options.</para>
+<para
+>Many people play around with their first key, generate bad user ids, add comments they later regret or simply forget their passphrase. To avoid such keys to stay valid forever it's usually a good idea to limit the lifetime to some 12 month. You can modify the lifetime of your secret keys later using the <link linkend="keyproperties"
+>key properties window</link
+>.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Cifrar datos</title>
+
+<sect2 id="konqui">
+
+<title
+>Cifrar un ficheiro desde o &konqueror; ou o Dolphin</title>
+
+<para
+>Click on the file you want to encrypt with the &RMB;. Choose <menuchoice
+><guimenu
+>Actions</guimenu
+><guimenuitem
+>Encrypt File</guimenuitem
+></menuchoice
+> in the pop up menu. You will then be prompted with the Public key selection dialog. Choose the key of the recipient and click <guibutton
+>Encrypt</guibutton
+>. The encrypted file will be saved with a <literal role="extension"
+>.asc</literal
+> or <literal role="extension"
+>.gpg</literal
+> extension depending on whether you chose <guilabel
+>ASCII armored encryption</guilabel
+> or not. ASCII encrypted files only use readable characters to represent the data resulting in files that are more robust when copied around or sent by mail but are one third larger.</para>
+
+<screenshot>
+<screeninfo
+>Velaquí unha captura da xanela de selección das chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Cifrar un texto coa aplicacionciña do &kgpg;</title>
+
+<para
+>You can encrypt the contents of the clipboard by selecting the <guimenuitem
+>Encrypt clipboard</guimenuitem
+> item in applet menu. When you choose <guimenuitem
+>Sign clipboard</guimenuitem
+> then the text will be signed instead. Both actions will import the current clipboard contents into an <link linkend="editor"
+>editor window</link
+>, perform the requested action and paste the contents back into the editor.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Cifrar o texto do editor do &kgpg;</title>
+
+<para
+>É tan simple como premer o botón <guibutton
+>Cifrar</guibutton
+>. Aparece o diálogo de selección da chave pública; escolla a súa  chave e prema <guibutton
+>Aceptar</guibutton
+>. A mensaxe cifrada aparece na xanela do editor.</para>
+
+<para
+>Usually you can only encrypt files with keys that are trusted by you. Since you sometimes want to just send a confident note to some random people you are aware of having a GPG key you can set the option <guilabel
+>Allow encryption with untrusted keys</guilabel
+>.</para>
+
+<para
+>To make sure that you can decrypt every file you have encrypted even if they are encrypted with someone else's key you can use the options <guilabel
+>Always encrypt with</guilabel
+> and <guilabel
+>Encrypt files with</guilabel
+> which are available in the <link linkend="conf-encryption"
+>KGpg configuration</link
+>.</para>
+
+<para
+>For more information on the encryption options <guilabel
+>ASCII armor</guilabel
+>, <guilabel
+>Allow encryption with untrusted keys</guilabel
+> and <guilabel
+>Symmetrical encryption</guilabel
+>, please refer to gpg's documentation or <ulink url="man:gpg"
+>man pages</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Descifrar os datos</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Decifrar un ficheiro desde o &konqueror; ou o Dolphin</title>
+<para
+>Prema co botón <mousebutton
+>esquerdo</mousebutton
+> do rato o ficheiro que queira descifrar. Indique o contrasinal e descifrarase. Tamén se pode arrastrar un ficheiro de texto cifrado e soltalo na xanela do editor do &kgpg;. Pídese o contrasinal e ábrese o texto decifrado no editor do &kgpg;. Mesmo se poden soltar aquí ficheiros remotos! Tamén se pode empregar a opción <menuchoice
+><guimenu
+>Ficheiro</guimenu
+><guimenuitem
+> Descifrar Ficheiro</guimenuitem
+></menuchoice
+> e escoller o ficheiro que se quere descifrar.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Descifrar un texto coa aplicacionciña do &kgpg;</title>
+
+<para
+>You can also decrypt the contents of the clipboard with the <guimenuitem
+>decrypt clipboard</guimenuitem
+> menu entry of the &kgpg; applet. An <link linkend="editor"
+>editor window</link
+> will show up with the decrypted text.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Descifrar un texto no editor</title>
+
+<para
+>Copie ou arrastre e solte o texto que desexe descifrar e prema o botón <guibutton
+>Descifrar</guibutton
+>. Pediráselle o contrasinal. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Xestión de chaves</title>
+
+<para
+>Pódense efectuar todas as opcións básicas de xestión de chaves a través do &kgpg;. Para abrir a xanela de xestión de chaves, prema a  aplicacionciña do &kgpg; co &LMB;. A maioría das opcións están disponíbeis ao premer co  botón <mousebutton
+>dereito</mousebutton
+> nunha chave. Para importar/exportar as chaves públicas, pódense arrastrar e soltar os elementos ou usar os atallos de teclado Copiar/Apegar.</para>
+
+<sect2 id="keymanager">
+<title
+>Xestor de chaves</title>
+
+<screenshot>
+<screeninfo
+>Velaquí unha captura da xestión de chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Neste exemplo pódese ver un grupo de chaves que contén dúas chaves, dous pares de chaves e tres chaves públicas. A terceira columna mostra a confianza que se deposita nas chaves. O primeiro par de chaves ten a confianza máxima e tamén está definido como chave predefinida (en negra), mentres que o segundo caducou. Dúas das chaves públicas son de confianza completa e a confianza da última chave é marxinal. A última chave está expandida e mostra a súa sub-chave ElGamal, un ID de utilizador adicional, ambos con confianza marxinal, e algunhas das súas sinaturas.</para>
+<para
+>As sinaturas permiten navegar polo chaveiro. Ao premer dúas veces sobre unha sinatura ou unha chave que apareza como membro dun grupo pásase directamente para a chave primaria correspondente.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Propiedades das chaves</title>
+
+<screenshot>
+<screeninfo
+>A xanela de propiedades das chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Mentres que o xestor de chaves permite realizar accións xenéricas con unha ou varias chaves, grupos de chaves ou sinaturas, a xanela de propiedades das chaves dá acceso a unha única chave. Pódese acceder a ela premendoEnter no xestor de chaves ou dúas veces na chave.</para>
+<para
+>Nesta xanela pódense modificar o contrasinal e o prazo de validez das  chaves privadas. Tamén se pode definir para todas as chaves o valor de confianza no dono.</para>
+<para
+>Este valor indica canto se confía no dono desta chave para que verifiquecorrectamente a identidade das chaves que el/a asina. Ao ter a confianza do dono en conta, o gpg crea a sua propia rede de confianza. O usuario confía nas chaves que asinou. Se lle atribúe a confianza no dono a esas pessoas, confiará tamén nas chaves que asinen, sen ter necesidade de asinar tamén as chaves deles.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Signing keys</title>
+
+<para
+>When you sign a key of someone else (let's call her Alice) you announce that you are sure that this key really belongs to that person and the key can be trusted. Of course you really should have checked that. This usually means that you have to meet Alice, check at least one identity card and get the full key fingerprint or a copy of her key. Then you go home and sign that key. Usually you will later upload the newly signed key to a <link linkend="keyserver"
+>key server</link
+> so everyone knows you have checked that key and the owner may be trusted. Alice will likely do the same so you both will have your keys signed by the other one. If one of you has no identity card at hand it's no problem if the signing happens in only direction.</para>
+
+<para
+>But think about what happens if Alice lives on the other end of the world. You communicate with her regularly but there is no chance you will see her anytime soon. How do you trust her key?</para>
+
+<para
+>When you select her key and then choose <guimenuitem
+>Sign Key...</guimenuitem
+> you will get the dialog that allows you to choose the options how you would like to sign that key.</para>
+
+<screenshot>
+<screeninfo
+>Selecting a Secret Key for Signing</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>First you can choose the key you will use to sign the key. Then you can enter how carefully you checked that she really is the person she pretends to be. This information will be stored together with the signature so it is a guidance for everyone else who might need that signature (more on this below). And then comes the option that would help you if you can't meet Alice in person: <guilabel
+>Local signature (cannot be exported)</guilabel
+>. When you activate that option a special version of a signature will be created that can never even by accident leave you keyring.</para>
+
+<para
+>But why is it important how carefully you checked Alice's identity? Who should care? There is a different way to solve your problem with the identity of Alice. If you can't visit Alice anytime soon just think of Trent. You know Trent has a keypair, too. And Trent is a globetrotter, being on a different continent at least twice a month. If you are lucky he will fly close to Alice soon. So you will go and meet with Trent to sign keys. Then you will drop Alice a note that Trent will be at her place soon and ask her if she can meet with him too to sign keys. After all this has happened you know that Trent's key can be trusted and Trent knows that Alice's key can be trusted. If you trust Trent that he has carefully checked Alice's identity then you can also trust her key.</para>
+
+<para
+>These relationships between keys and their owners form a so called web of trust. Within that web there are some important values that define how trustworthy a particular key is. The first thing is how carefully the identity of the key owner was checked. That is the value you have seen above in the secret key selection window. For example you will likely know how to verify your local countries identity card but one from a completely different country may be hard to verify. So you could say that you have very carefully checked Trent's identity because you have seen his identity card and it looks very much the same as yours. But Trent, although he has seen both Alice's identity card and driver license might say he has only done casual checking of her identity as he is not absolutely sure about the documents from that part of the world.</para>
+
+<para
+>The next important value is how much you trust the other person to verify documents. You know Trent is good at that. But George for example is no one you would call smart. He barely looked at your id card when you met him for key signing. You are sure that George is the person he pretends to be as you checked his documents carefully. But he doesn't seem to really care if he checks other people so you will have a high trust in the key of George but a very low trust in the signatures of George. If you open the <link linkend="keyproperties"
+>properties</link
+> of a key you will find the field <guilabel
+>Owner Trust</guilabel
+>. This is how much you trust the key owner when he signs keys. This value will not be exported, it is completely up to your personal preference.</para>
+
+<screenshot>
+<screeninfo
+>A xanela de propiedades das chaves</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Now you should have an idea how the web of trust is built, what the owner and key trust values are for, and why you always should be very careful when checking identities: other people might rely on you. But one element in the process is still unverified: the email addresses in the keys you signed. Creating a new user identity in your key with the email address of Alice or Trent will only take a few mouse clicks. You have verified that Trent really owns his key. But noone has checked until now that Trent really controls the email addresses of his user identities.</para>
+
+<para
+>If you choose <guimenuitem
+>Sign and Mail User ID...</guimenuitem
+> from the menu instead you can close that gap. The idea is that you will sign the key as usual and afterwards it will be split into pieces. Every piece will only contain one user identity of Trent's key and your signature to it. This will be encrypted with Trent's key and sent only to the email address given in that identity. Only if Trent can receive this mail and decrypt the message he will be able to import that signature into his key ring. You will not upload your signatures, this is entirely up to him. If your signature will show up on a key server you can be sure that Trent really controls both his key as well as the email address you signed. The signatures you make in this process will also be not part of your keyring. So right after you signed Trent's key it will still be shown as untrusted in your keyring. Once Trent has received your mail and imported your signature into his keyring he can upload them to a keyserver. When you refresh his key from a keyserver you will get the new signatures. While that may sound inconvenient first it makes sure that you will not by accident see one of his identities as trusted that he does not control. Only the signatures that show up on a keyserver are those where everyone, including you, can be sure that he really controls the corresponding email addresses.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Working with key servers</title>
+
+<sect2>
+<title
+>Comunicación cos servidores de chaves</title>
+
+<para
+>A parte pública dun par de chaves gárdase normalmente nun servidor de chaves. Estes servidores permiten que todo o mundo poida procurar por unha chave que pertenza a unha persoa ou enderezo de e-mail determinados. As sinaturas tamén se gardan nestes servidores.</para>
+
+<screenshot>
+<screeninfo
+>Velaquí unha captura da xanela dos servidores de chaves.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Esta xanela dá acceso aos servidores de chaves. Pódense procurar e importar chaves a partir dun servidor de chaves, así como exportar as chaves a un servidor. Un exemplo de pesquisa e importación acontece cando se tenta escribir unha mensaxe de correo a alguén novo. Se quere cifrar amensaxe para o seu contacto, pode procurar se el ou ela teñen unha chave nos servidores de chaves. Se ten creado un par de chaves novo ou ten asinado a chave doutra pesoa, é unha boa idea exportar a chave pública (posibelmente con sinaturas novas) a un servidor de chaves.</para>
+<para
+>A maioría dos servidores de chaves sincroniza os seus dados entre si, polo que se obteñen resultados semellantes independentemente do servidor que se empregue. Dado que existen excepcións a esta regra, pódese escoller nesta xanela o servidor de  chaves que se queira empregar. Normalmente é unha boa idea escoller un servidor predefinido que estea localizado perto (p.ex. no seu país ou no seu continente), dado que estes responden normalmente máis depresa ás  pesquisas.</para>
+<para
+>Lembre que todo o que envíe a un servidor de chaves normalmente ficará nel por sempre. Esta é unha razón pola que normalmente debería limitar o tempo de validez das súas chaves. Lembre tamén que, ás veces, os servidores de chaves son analisados polos xeradores de lixo electrónico para obteren enderezos de e-mail.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Key server search results</title>
+<screenshot>
+<screeninfo
+>This is an example of the results of a keyserver search.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>All results of a search are displayed in this window. This picture shows a search for &quot;@kde.org&quot; addresses which showed up 244 results. Using the search field the displayed list was reduced to a single key. This key has two matches: the primary user id itself matches the search string as well as one of the other user ids.</para>
+
+<para
+>You can select one or more keys to import. The ids of those keys are shown in the <guilabel
+>Keys to import</guilabel
+> field at the bottom of the window. When you click on <guibutton
+>Import</guibutton
+> the key server is contacted again and the keys are fetched into your keyring.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>Configurar o &kgpg;</title>
+
+<para
+>A configuración está accesíbel desde o menú da aplicacionciña do &kgpg; (premendo a aplicacionciña co &RMB;) ou através do menú principal ( <menuchoice
+><guimenu
+>Configuración</guimenu
+><guimenuitem
+>Configurar KGpg</guimenuitem
+></menuchoice
+>). Pódense definir os parámetros por omisión para o  cifrado, o descifrado, a interface do usuario e a aplicacionciña. A maioría das opcións de cifrado están relacionadas directamente co gpg e están documentadas na súa <ulink url="man:gpg"
+>páxina do man</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Cifrado</title>
+<screenshot>
+<screeninfo
+>Captura da xanela de opcións coa pestana de cifrado aberta</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Here you can configure special options to be passed to GnuPG to change the encryption behavior. For detailed description please have a look at the GnuPG manual.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>Encriptación ASCII armada</guilabel
+>: isto fai que os ficheiros cifrados se garden nun formato que só usa caracteres ASCII imprimíbeis e que ten liñas curtas. Os ficheiros gardados desta forma son maiores que os ficheiros en binario, mais son máis doados de enviar &eg; por correo electrónico.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Allow encryption with untrusted keys</guilabel
+>: this allows you to encrypt files with keys that are not trusted by you.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Compatibilidade co PGP 6</guilabel
+>: os ficheiros cifrados son compatíbeis coa norma antiga do PGP6. Esta desactiva certas funcionalidades, polo que só se debería empregar se for realmente necesario.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Agochar o ID do usuario</guilabel
+>: esta opción elimina todos os vestixios do destinatario no ficheiro cifrado. No caso de que se intercepte a transmisión, ninguén poderá obter informacións sobre o destinatario a partir do ficheiro. Se este destinatario tiver varias chaves, terá de experimentar para saber a que utilizou.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Cifrar sempre con</guilabel
+>: todos os cifrados cífranse adicionalmente con esta chave. Se o usuario configura esta opción cunha chave privada, isto garante que poida ler sempre todos os dados cifrados por el mesmo, ao custo de mensaxes maiores.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Cifrar os ficheiros con</guilabel
+>: compórtase como  <guilabel
+>Cifrar sempre como</guilabel
+> para a cifrado de ficheiros.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Comando de cifrado personalizado</guilabel
+>: se lle hai que pasar algunhas opcións pouco habituais ao GnuPG, pódese indicar aquí a liña de comandos. A maioría dos usuarios non necesita isto.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Use *.pgp extension for encrypted files</guilabel
+>: if you check this option encrypted keys will be named as the input file with the extension <literal role="extension"
+>.pgp</literal
+> added, otherwise the extension <literal role="extension"
+>.gpg</literal
+> is used.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Descifrado</title>
+
+<para
+>Aquí pódese indicar un comando de descodificación personalizado. Esta opción raramente se usa, e só é útil para os usuarios avanzados que coñezan as opcións da liña de comandos.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Aparencia</title>
+<para
+>Aqui pódese configurar a forma como aparece o &kgpg;. As opcións  posíbeis son as cores que reflicten os diferentes níveis de confianza nas chaves do <link linkend="keymanager"
+>xestor de chaves</link
+> e a configuración dos tipos de letra do <link linkend="editor"
+>editor</link
+>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>Configuración do GnuPG</title>
+<para
+>Here you can configure which gpg binary and which <guilabel
+>configuration file</guilabel
+> and home folder are used. These values are autodetected on first start and should already work.</para>
+<para
+>A utilización do <ulink url="man:gpg-agent"
+>axente do GnuPG</ulink
+> fai  mais cómodo o traballo co GnuPG, dado que non hai que escribir o contrasinal para todas as accións. Gárdase na memoria durante algún tempo, de modo que todas as operacións que poidesen necesitar dun contrasinal se poidan facer inmediatamente. Lembre que isto podería permitir que outras persoas usen as súas chaves privadas, caso deixe a súa sesión accesíbel.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Servidores de chaves</title>
+<para
+>Aquí pódese crear unha lista dos servidores de chaves coñecidos  ao abrir a <link linkend="keyserver"
+>xanela do servidor de chaves</link
+>. Se se executa o GnuPG a partir da liña de comandos, somente se empregará  o servidor de chaves definido por omisión aquí.</para>
+<para
+>O protocolo usado para a comunicación cos servidores de chaves baséase en &HTTP;, polo que nalgúns ambientes ten sentido <guilabel
+>respectar o proxy de &HTTP; cando estea disponíbel</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Diversos</title>
+<para
+>Esta sección permite a configuración dalgunhas funcionalidades que non encaixan noutras seccións. Pódese configurar, por exemplo,  <guilabel
+>iniciar o KGpg automaticamente no arranque</guilabel
+>. A opción <guilabel
+>usar a selección do rato no canto do porta-retallos</guilabel
+> altera se as seleccións se fan a través do botón do medio do rato ou se se fan por combinacións de teclas.</para>
+<para
+>You can also change if the systray icon of &kgpg; is shown or not and what action happens if the icon is clicked with the &LMB;. If the systray icon is shown closing the &kgpg; window will minimize the application to tray. If the systray icon is not shown &kgpg; will exit when all windows are closed.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Créditos e licenza</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Copyright do programa &copy; 2002-2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006,2007,2008,2009,2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Tradución da documentación: Xosé Calvo - http://trasno.net/</para
+> 
+&underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

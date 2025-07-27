@@ -1,0 +1,795 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN"
+"dtd/kdedbx45.dtd" [
+  <!ENTITY package "kdeutils">
+  <!ENTITY kappname "&kgpg;">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Estonian  "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title
+>&kgpg; käsiraamat</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+><firstname
+>Marek</firstname
+><surname
+>Laane</surname
+><affiliation
+><address
+><email
+>bald@smail.ee</email
+></address
+></affiliation
+><contrib
+>Tõlge eesti keelde</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2013-05-25</date>
+<releaseinfo
+>2.9.50 (&kde; 4.11)</releaseinfo>
+
+<abstract>
+<para
+>&kgpg; on GnuPG (<ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>) lihtne graafiline kasutajaliides. </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>KGpg</keyword>
+<keyword
+>krüptimine</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>turvalisus</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Sissejuhatus</title>
+
+
+<para
+>&kgpg; on võimsa krüptimisvahendi GnuPG lihtne kasutajaliides. GnuPG (kannab ka nimetust gpg) on kaasas enamiku distributsioonidega ning peaaegu kindlalt paigaldatud ka sinu süsteemi. Uusima versiooni leiab aadressilt <ulink url="http://gnupg.org"
+>http://gnupg.org</ulink
+>.</para>
+
+<para
+>&kgpg; abil saab oma faile ja kirju krüptida ning lahti krüptida, mis võimaldab märksa turvalisemat sihtlemist. Lühike õpetus (HOWTO) gpg vahendusel krüptimise kohta asub <ulink url="http://www.gnupg.org/documentation/howtos.en.html"
+>GnuPG veebileheküljel</ulink
+>. </para>
+
+<para
+>&kgpg; kasutamisel ei ole sugugi vaja meeles pidada gpg arvukaid käsureavõtmeid ja muud sellist, peaaegu kõik on võimalik ära teha mõne hiireklõpsuga. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Alustamine</title>
+
+<para
+>&kgpg; põhikomponendid on sellised:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Süsteemse doki ikoon </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>&kgpg; süsteemse doki aplett</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>&kgpg; käivitamisel ilmub kõigepealt ikoon süsteemisalve. Klõps sellel &HVNga; avab võtmehalduri, klõps &HPNga; menüü, mis võimaldab kasutada mõningaid olulisemaid rakenduse võimalusi. Kui soovid kasutada teisi võimalusi, võid &HVNga; klõpsates avada redaktori või üldse süsteemisalve ikooni välja lülitada <link linkend="conf-misc"
+>seadistustedialoogis</link
+>. </para>
+<para
+>Pane tähele, et &kgpg; süsteemisalve ikoon on põhimõtteliselt kogu aeg &quot;mitteaktiivne&quot;. Et süsteemisalve aplett peidab tavaliselt mitteaktiivsed ikoonid, siis ei näe &kgpg; ikooni enamasti, kuni sa seda spetsiaalselt ei kasuta. Täpsemalt kõneleb sellest &plasma; käsiraamat. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Võtmehalduri aken</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Võtmehalduri aken</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>See on keskne koht, kus oma võtmeid hallata. <link linkend="keymanager"
+>Võtmehalduri</link
+> avamiseks klõpsa &kgpg; apletil &HVNga;. Siin saab võtmeid importida, eksportida, signeerida ja redigeerida. Enamik tegevusi on võimalik sooritada võtmel &HVNga; klõpsates. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Redaktoriaken</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Redaktoriaken</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>See on üsna lihtne tekstiredaktor, kuhu saab teksti kirjutada või asetada ning seejärel krüptida või lahti krüptida. <link linkend="editor"
+>Redaktori</link
+> avamiseks tee &kgpg; apletil klõps &HPNga;. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Lõimimine failihalduriga</term>
+<listitem>
+
+<para
+>&kgpg; on põimitud &konqueror;i ja Dolphini. See tähendab, et kui klõpsad failil hiire parema nupuga, saad näiteks faili krüptida hüpikmenüü käsuga <menuchoice
+><guimenu
+>Toimingud</guimenu
+><guimenuitem
+>Krüpti fail</guimenuitem
+></menuchoice
+>. Sama hõlpsalt saab &HVNga; klõpsates faili lahti krüptida. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>&kgpg; kasutamine</title>
+
+<para
+>Andmete krüptimiseks on olemas kaks viisi: <itemizedlist>
+<listitem
+><para
+>Sümmeetriline krüptimine: andmed krüptitakse ainult parooliga. Kõik, kes kasutavad gpg-ga arvutit, võivad sinu kirja lahti krüptida, kui vaid annad neile teada parooli. Sümmeetrilise krüptimise kasutamiseks vali siis, kui sul palutakse valida krüptovõti, võimalus "sümmeetriline krüptimine".</para
+></listitem>
+<listitem
+><para
+>Võtmega krüptimine: esmalt tuleb luua võtmepaar (salajane ja avalik võti) ning määrata paroolifraas. Hoia salajane võti turvalises kohas ning levita oma avalikku võtit tuttavate ja sõprade seas. Kui soovid nüüd saata näiteks krüptitud kirja Aleksile, pead kirja krüptima Aleksi avaliku võtmega. Kirja lahtikrüptimiseks vajab saaja Aleksi salajast võtit ja paroolifraasi.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Võtmega krüptimine on mõnevõrra keerukam (sõpradega tuleb võtmeid vahetada), kuid see-eest turvalisem. Pea meeles, et kui krüptid kirja kellegi teise võtmega, ei suuda sa seda enam lahti krüptida. Lahti krüptida saad ainult neid kirju, mis on krüptitud sinu avaliku võtmega.</para>
+
+<sect1 id="key-generation">
+<title
+>Võtme genereerimine</title>
+
+<para
+>Kui sul võtit ei ole, avab &kgpg; kohe esimesel käivitamisel automaatselt võtme genereerimise dialoogi. Selle saab avada ka võtmehalduris menüükäsuga <menuchoice
+><guimenu
+>Võtmed</guimenu
+><guimenuitem
+>Genereeri võtmepaar</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Võtme genereerimise dialoog</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Anna siin lihtsalt oma nimi, e-posti aadress ja klõpsa nupule <guibutton
+>OK</guibutton
+>. Nüüd genereeritakse tavaline gpg võti. Kui soovid tingimusi ja omadusi täpsemalt määrata, vali <guibutton
+>ekspertrežiim</guibutton
+>, mis avab &konsole;i akna koos kõigi gpg valikutega.</para>
+<para
+>Paljud proovivad oma esimese võtmega mitmeid asju, loovad kehvi kasutaja ID-id, lisavad kommentaare, mida nad hiljem kahetsevad, või lihtsalt unustavad oma paroolifraasi. Esimest korda avalikku võtit luues oleks mõttekas piirata selle eluiga näiteks 12 kuuga. Oma salajaste võtmete eluiga saab hiljem muuta <link linkend="keyproperties"
+>võtme omaduste dialoogis</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Võtme tühistamine</title>
+
+<para
+>Aegunud võtmepaari saab taas kasutusele võtta, kui on ligipääs privaatvõtmele ja paroolifraasile. Et muuta võti kindlalt kasutuskõlbmatuks, tuleb see tühistada. Selleks lisatakse võtmele spetsiaalne tühistamisallkiri.</para>
+
+<para
+>Tühistamisallkirja võib luua koos võtmega. Sel juhul salvestatakse see eraldi faili, mille võib hiljem importida võtmerõngasse, millega see lisatakse võtmele ja muudetakse viimane kasutuskõlbmatuks. Palun pane tähele, et allkirja importimisel võtmesse ei ole parool nõutav. Seepärast tuleks tühistamisallkiri salvestada turvalisse, reeglina võtmepaarist erinevasse kohta. Soovitatav on salvestada see arvutist eraldi, näiteks kopeerida välisele salvestile (USB-pulk või midagi muud) või lausa trükkida.</para>
+
+<para
+>Kui sa ei loonud eraldiseisvat tühistust võtme loomisel, saab tühistamisallkirja alati luua menüükäsuga <menuchoice
+><guimenu
+>Võtmed</guimenu
+> <guimenuitem
+>Tühista võti</guimenuitem
+></menuchoice
+>, kusjuures võib selle ka kohe importida võtmerõngasse.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Andmete krüptimine</title>
+
+<sect2 id="konqui">
+
+<title
+>Faili krüptimine &konqueror;is või Dolphinis</title>
+
+<para
+>Klõpsa failil, mida soovid krüptida, &HPN;ga. Vali hüpikmenüüst <menuchoice
+><guimenu
+>Tegevused</guimenu
+><guimenuitem
+>Krüpti fail</guimenuitem
+></menuchoice
+>. Seejärel ilmub avaliku võtme valimise dialoog. Vali seal saaja võti ning klõpsa nupule <guibutton
+>Krüpti</guibutton
+>. Krüptitud fail salvestada sõltuvalt sellest, kas valid <guilabel
+>ASCII krüptimise</guilabel
+> või mitte, laiendiga <literal role="extension"
+>.asc</literal
+> või <literal role="extension"
+>.gpg</literal
+>. ASCII krüptingus failid kasutavad andmete esitamiseks ainult loetavaid märke, mis annab tulemuseks töökindlamad failid, kui neid kopeerida või e-kirjaga saata, kuid on samas kolmandiku võrra suuremad.</para>
+
+<screenshot>
+<screeninfo
+>Võtme valimise aken</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Faili või teksti krüptimine &kgpg; apleti abil</title>
+
+<para
+>Lõikepuhvri sisu saab krüptida, kui valida apleti menüüs käsk <guimenuitem
+>Krüpti lõikepuhver</guimenuitem
+>. Kui aga valida <guimenuitem
+>Allkirjasta lõikepuhver</guimenuitem
+>, tekst hoopis allkirjastatakse. Mõlemal juhul imporditakse lõikepuhvri aktiivne sisu <link linkend="editor"
+>redaktori aknasse</link
+>, sooritatakse vajalik toiming ning asetatakse sisu tagasi redaktorisse.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Teksti krüptimine &kgpg; redaktoris</title>
+
+<para
+>Siin piirdub kõik vaid klõpsuga nupule <guibutton
+>Krüpti</guibutton
+>. Seejärel ilmub avaliku võtme valimise dialoog. Vali võti ja klõpsa taas nupule <guibutton
+>OK</guibutton
+>. Krüptitud kiri ilmub redaktori aknasse.</para>
+
+<para
+>Tavaliselt saab faile krüptida ainult võtmega, mida sa usaldad. Et aga mõnikord võib olla vaja saata konfidentsiaalne tekst mõningatele juhuslikumatele inimestele, kelle kohta sa siiski tead, et neil on GPG võti olemas, saab siin valida ka võimaluse <guilabel
+>Krüptimise lubamine mitteusaldusväärsete võtmetega</guilabel
+>.</para>
+
+<para
+>Tagamaks, et sa saad lahti krüptida iga faili, mille oled krüptinud, isegi kui need on krüptitud kellegi teise võtmega, saab dialoogis <link linkend="conf-encryption"
+>KGpg seadistamine</link
+> valida võimalusi <guilabel
+>Alati krüptitakse võtmega</guilabel
+> ja <guilabel
+>Failid krüptitakse võtmega</guilabel
+>.</para>
+
+<para
+>Rohkem infot krüptimise selliste valikute kohta, nagu <guilabel
+>ASCII pakend</guilabel
+>, <guilabel
+>krüptimise lubamine mitteusaldusväärsete võtmetega</guilabel
+> ja <guilabel
+>sümmeetriline krüptimine</guilabel
+> leiab gpg dokumentatsioonist või <ulink url="man:gpg"
+>man-lehekülgedelt</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Andmete lahtikrüptimine</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Faili lahtikrüptimine &konqueror;is või Dolphinis</title>
+<para
+>Klõpsa hiire <mousebutton
+>vasaku</mousebutton
+> nupuga failil, mida soovid lahti krüptida. Anna paroolifraas ja see krüptitaksegi lahti. Krüptitud tekstifaili võib lohistada ka &kgpg; redaktori aknasse. Seejärel küsitakse paroolifraasi ja kui see on õige, avatakse lahtikrüptitud tekst &kgpg; redaktoris. Sinna võib kukutada isegi võrgufaile! Samuti võib kasutada menüükäsku <menuchoice
+><guimenu
+>Fail</guimenu
+><guimenuitem
+>Krüpti fail lahti</guimenuitem
+></menuchoice
+> ja valida, millist faili soovid lahti krüptida.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Teksti lahtikrüptimine &kgpg; apleti abil</title>
+
+<para
+>Lõikepuhvri sisu saab lahti krüptida, kui valida &kgpg; apleti menüüs <guimenuitem
+>Krüpti lõikepuhver lahti</guimenuitem
+>. Selle peale ilmub <link linkend="editor"
+>redaktori aken</link
+> lahtikrüptitud tekstiga.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Teksti lahtikrüptimine redaktoris</title>
+
+<para
+>Kopeeri või lohista tekst, mida soovid lahti krüptida, ning klõpsa nupule <guibutton
+>Krüpti lahti</guibutton
+>. Seejärel küsitakse paroolifraasi. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Võtmehaldur</title>
+
+<para
+>&kgpg; võimaldab sooritada kõik peamised võtmete haldamisega seotud operatsioonid. Võtmehalduri avamiseks tee &HVNga; klõps &kgpg; apletil. Enamik valikud on saadaval hiire <mousebutton
+>parema</mousebutton
+> nupu klõpsuga võtmel. Avaliku võtme importimiseks või eksportimiseks võib selle kas lohistada või kiirklahvidega kopeerida/asetada.</para>
+
+<sect2 id="keymanager">
+<title
+>Võtmehaldur</title>
+
+<screenshot>
+<screeninfo
+>Võtmehaldur</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Antud näites on näha võtmegrupp, mis koosneb kahest võtmest, kahest võtmepaarist ja kolmest avalikust võtmest. Kolmas veerg näitab võtmete usaldusväärsust. Esimene võtmepaar on äärmiselt usaldusväärne ning ühtlasi vaikimisi võti (rasvane kiri), teine aga juba aegunud. Kaks avalikku võtit on täielikult usaldusväärsed, viimane aga põgusalt usaldusväärne. Viimane võti on avatud:näha on selle ElGamali alamvõti, kasutaja ID, mis mõlemad on samuti põgusalt usaldusväärsed, ning mõned allkirjad.</para>
+<para
+>Allkirjad võimaldavad liikuda võtmerõngas. Topeltklõpsuga allkirjal või võtmel, mis kuulub gruppi, saab otse hüpata vastavale primaarvõtmele.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Võtme omadused</title>
+
+<screenshot>
+<screeninfo
+>Võtme omaduste dialoog</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Kui võtmehalduris saab võtta midagi ette ühe või mitme võtme, võtmegrupi või allkirjaga, siis võtme omaduste aknas saab tegelda konkreetse võtmega. Selle akna saab avada võtmehalduris klahvi Enter vajutades või topeltklõpsu tehes.</para>
+<para
+>Selles aknas saab muuta paroolifraasi ja oma salajaste võtmete aegumist. Kõigi võtmete puhul saab määrata ka omaniku usaldusväärsuse.</para>
+<para
+>See näitab, mil määral usaldad selle võtme omanikku tema allkirjastamisel kasutatud võtmete identiteedi kontrollimisel. Omaniku usaldusväärsuse arvestamisega loob gpg sinu isikliku usaldusvõrgu. Sa usaldad võtmeid, mille oled allkirjastanud. Kui omistad neile isikutele samuti usaldusväärsuse, usaldad ka võtmeid, millega nad allkirjastavad, ilma et sa oleksid eelnevalt ka nende võtmeid allkirjastanud.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Võtmete allkirjastamine</title>
+
+<para
+>Kui allkirjastad kellegi teise (ütleme näiteks Alice'i) võtme, annad teada, et oled kindel, et see võti kuulub tõepoolest sellele isikule ja et seda võtit võib usaldada. Loomulikult tuleks seda kindlasti kontrollida. See tähendab enamasti, et sa oled Alice'iga kohtunud, kontrollinud vähemalt tema isikutunnistust ning saanud tema võtme koopia või täieliku võtme sõrmejälje. läinud seejärel koju ja allkirjastanud selle võtme. Tavaliselt järgneb sellele allkirjastatud võtme laadimine <link linkend="keyserver"
+>võtmeserverisse</link
+>, mille järel kõik teavad, et sa oled seda võtit kontrollinud ja pead omanikku usaldusväärseks. Alice teeb tõenäoliselt sama, nii et sel juhul olete mõlemad vastastikku teineteise võtmed allkirjastanud. Kui ühel ei juhtu olema näiteks isikutunnistust kaasas, pole ka viga, kui see toimub ühepoolselt.</para>
+
+<para
+>Aga mis siis, kui Alice elab teises maailma otsas? Sa suhtled temaga pidevalt, aga sul pole vähimatki võimalust teada niipea näha. Kuidas siis tema võtit usaldada+</para>
+
+<para
+>Kui valid tema võtme ja seejärel käsu <guimenuitem
+>Allkirjasta võti...</guimenuitem
+>, ilmub dialoog, kus saab valida tingimused, kuidas võti allkirjastada.</para>
+
+<screenshot>
+<screeninfo
+>Salajase võtme valimine allkirjastamiseks</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Kõigepealt saad valida võtme, mida kasutada võtme allkirjastamiseks. Siis saab valida, kui hoolikalt oled kontrollinud, et tegemist on ikka isikuga, keda ta väidab ennast olevat. See salvestatakse koos allkirjaga, andes niisiis märku kõigile, kellel võib seda allkirja vaja minna (sellest lähemalt allpool). Siis tulebki valik, mis on abiks, kui sa ei saa Alice'iga isiklikult kohtuda: <guilabel
+>Kohalik allkiri (ei saa eksportida)</guilabel
+>. Selle valimisel luuakse eriline allkiri, mis ei saa mitte kunagi isegi juhuslikult pääseda kaugemale kui sinu võtmerõngas.</para>
+
+<para
+>Aga miks on üldse oluline, kui hoolikalt sa oled kontrollinud Alice'i identiteeti? Kes sellest ikka hoolib? Igal juhul saab Alice'i identiteedi probleemi lahendada ka teisiti. Kui sa ei saa ise Alice'it niipea külastada, siis tuleb appi Trent. Sa tead, et Trentil on samuti võtmepaar. Ja Trent on tõeline maailmarändur, kes satub vähemalt paar korda kuus mõnele teisele mandrile. Hea õnne korral satub ta peagi ka Alice'i lähedale. Niisiis, lähed Trentiga kohtuma, et võtmed allkirjastada. Seejärel saadad Alice'ile teate, et Trent satub peagi tema lähedusse ja palud, kas ta ei saaks Trentiga kohtuda, et võtmed allkirjastada. Pärast seda tead, et Trenti võtit saab usaldada, ning Trent teab, et Alice'i võtit saab usaldada. Kui sa usud, et Trent on hoolikalt kontrollinud Alice'i identiteeti, võid niisiis usaldada ka Alice'i võtit.</para>
+
+<para
+>Niisuguseid suhteid võtmete ja nende omanike vahel nimetatakse usaldusvõrguks. Selles võrgus valitsevad teatavad olulised väärtused, mis määravad, kui usaldusväärne on konkreetne võti. Kõigepealt see, kui hoolikalt on kontrollitud võtmeomaniku identiteeti. See on väärtus, mida võis näha eespool salajase võtme valimise aknas. Näiteks on usutav, et sa tead, kui usaldusväärsed on sinu enda maa isikutunnistused, aga teiste riikide puhul on seda juba raskem kontrollida. Seega võid öelda, et oled kontrollinud hoolikalt Trenti isikutunnistust ja see paistis täiesti sinu enda isikutunnistuse moodi. Aaa kuigi Trent nägi Alice'i isikutunnistust ja autojuhiluba, võib öelda, et ta kontrollis Alice'i identiteeti vaid pealiskaudselt, sest ta ei saa olla absoluutselt kindel, millised peavad just välja nägema selle maailma nurga dokumendid.</para>
+
+<para
+>Järgmine oluline väärtus on see, mil määral sa usaldad teist isikut dokumentide kontrollimisel. Sa tead, et Trent on selles päris hea. Aga näiteks George'i ei söanda keegi targaks nimetada. Ta heitis vaevu pilgu sinu isikutunnistusele, kui te võtmete allkirjastamiseks kohtusite. Sa oled kindel, et George on tõepoolest George, sest kontrollisid hoolikalt tema dokumente. Kuid tema ei paistnud kontrollimisest eriti välja tegevat. Niisiis võid väga usaldada George'i võtit, aga väga vähe tema allkirju. Kui avad võtme <link linkend="keyproperties"
+>omadused</link
+>, leiab seal välja <guilabel
+>Omaniku usaldusväärsus</guilabel
+>. See näitabki seda, mil määral sa usaldad võtme omanikku, kui ta võtmeid allkirjastab. Seda väärtust ei ekspordita, see on puhtalt sinu enda jaoks.</para>
+
+<screenshot>
+<screeninfo
+>Võtme omaduste dialoog</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Nüüd peaks sul olema ettekujutus, kuidas näeb välja usaldusvärk, mida tähendavad omaniku ja võtme usaldusväärtused ja miks tuleb alati olla identiteedi kontrollimisel väga hoolas: teised inimesed võivad tugineda sinu hinnangutele. Üks element on siiski veel lahtine: allkirjastatud võtmete e-posti aadressid. Uue kasutajaidentiteedi loomine sinu võtmes Alice'i või Trenti e-posti aadressiga nõuab vaid paari hiireklõpsu. Sa oled kontrollinud, et Trenti võti kuulub tõepoolest talle. Aga seni ei ole keegi kontrollinud, et Trent kontrollib tegelikult ka tema kasutajaidentiteedi e-posti aadresse.</para>
+
+<para
+>Sellest saab üle, kui valida menüüst käsk <guimenuitem
+>Allkirjasta ja saada kasutaja ID...</guimenuitem
+> Selle mõte seisab sellest, et sa allkirjastad võtme nagu tavaliselt, aga siis jagatakse see osadeks. Iga osa sisaldab ainult ühte Trenti võtme kasutajaidentiteeti ja sinu allkirja sellele. See krüptitakse Trenti võtmega ja saadetakse ainult identiteedis leiduvale e-posti aadressile. Ainult siis, kui Trent saab selle kirja kätte ja suudab selle lahti krüptida, saab ta selle allkirja importida oma võtmerõngasse. Mitte sina ei laadi oma allkirju üles, see on vaid tema teha. Kui sinu allkiri ilmub võtmeserverisse, võid olla kindel, et Trent kontrollib tõepoolest nii võtit kui e-posti aadressi, mille sa allkirjastasid. Allkirjad, mida sa selle käigus andsid, ei muutu sinu võtmerõnga osaks. Seega ka pärast seda, kui sa oled allkirjastanud Trenti võtme, näidatakse seda sinu võtmerõngas ebausaldusväärsena. Kui Trent saab sinu kirja ja impordib sini allkirja oma võtmerõngasse, võib ta need laadida võtmeserverisse. Kui värskendad oma võtit võtmeserverist, saad sealt uued allkirjad. See võib esialgu tunduda üsna ebamugav, aga asja mõte on see, et sa ei näeks kogemata usaldusväärsena mõnda tema identiteeti, mida ta tegelikult ei kontrolli. Ainult allkirjad, mis ilmuvad võtmeserveris, on allkirjad, mille puhul kõik, sealhulgas sa ise, võivad olla kindlad, et just tema kontrollib vastavat e-posti aadressi.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Võtmeserverite kasutamine</title>
+
+<sect2>
+<title
+>Suhtlemine võtmeserveritega</title>
+
+<para
+>Võtmepaari avalik osa on tavaliselt salvestatud võtmeserverisse. Need serverid võimaldavad kõigl otsida konkreetse isiku või e-posti aadressiga seotud võtit. Serveritesse on salvestatud ka allkirjad.</para>
+
+<screenshot>
+<screeninfo
+>Võtmeserveri aken</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>See dialoog võimaldab kasutada võtmeservereid. Siin saab otsida võtmeserveris võtmeid ja neid importida, samuti eksportida võtmeid serverisse. Otsimisel ja importimisel on mõtet näiteks siis, kui soovid kirjutada kirja kellelegi, kellega pole varem suhelnud. Kui soovid oma kirja uuele kontaktile krüptida, võid otsida, kas tal on võtmeserverites avalik võti. Kui oled loonud uue võtmepaari või allkirjastanud kellegi teise võtme, võib aga olla mõttekas eksportuda avalik võti (soovi korral koos uute allkirjadega) võtmeserverisse.</para>
+<para
+>Enamik võtmeservereid sünkroniseerib oma andmed, nii et otsimine annab sõltumata serverist sama tulemuse. Et igal reeglil on alati erandeid, saab dialoogis siiski ka määrata, millist võtmeserverit kasutada. Tavaliselt on mõttekas valida vaikimisi võtmeserveriks mõni füüsiliselt lähemal asuv (oma riigis või vähemalt samal mandril), sest need vastavad enamasti päringutele kiiremini.</para>
+<para
+>Palun arvesta, et üldiselt jääb kõik, mis on laaditud võtmeserverisse, sinna igaveseks. Seepärast ongi mõttekas piirata oma võtmete eluiga. Samuti tasub arvestada, et mõnikord kammivad võtmeservereid aadresside leidmiseks läbi rämpsposti levitajad.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Võtmeserveri otsingu tulemused</title>
+<screenshot>
+<screeninfo
+>See on võtmeserveri otsingu näidis.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Selles aknas näeb kõiki otsingutulemusi. Pildilt näeb, et otsing &quot;@kde.org&quot; on andnud 224 tulemust. Otsinguvälja kasutades on nimekirja piiratud, nii et näha on vaid üks võti. Sel on kaks sobivust: otsingule vastab nii primaarne kasutaja ID ise kui ka üks teiste kasutajate ID-dest.</para>
+
+<para
+>Importimiseks võib valida kas ainult ühe või ka rohkem võtmeid. Nende võtmete ID-sid näeb akna allosas väljal <guilabel
+>Imporditavad võtmed</guilabel
+>. Klõpsuga nupule <guibutton
+>Impordi</guibutton
+> võetakse taas ühendust võtmeserveriga ja võtmed tõmmatakse sinu võtmerõngasse.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>&kgpg; seadistamine</title>
+
+<para
+>Seadistamise manu pääseb &kgpg; apletilt (klõps &HPNga; apletil) või põhimenüüst ( <menuchoice
+><guimenu
+>Seadistused</guimenu
+><guimenuitem
+>KGpg seadistmaine</guimenuitem
+></menuchoice
+>). Seal saab määrata vaikeväärtused krüptimisele, lahtikrüptimisele, kasutajaliidesele ja apletile. Enamik krüptimisvalikuid on otseselt seotud gpg-ga ning nende parima seletuse leiab gpg <ulink url="man:gpg"
+>man-leheküljelt</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Krüptimine</title>
+<screenshot>
+<screeninfo
+>Seadistustedialoogi krüptimise kaart</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Siin saab seadistada spetsiaalseid GnuPG-le edastatavaid valikuid, mis muudavad krüptimise käiku. Täpsemalt kõneleb neist GnuPG manuaal.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>ASCII pakendis krüptimine</guilabel
+>: krüptitud failid salvestatakse vormingus, is kasutab ainult ASCII sümboleid ning lühikesi ridu. Sel moel salvestatud failid on suuremad kui binaarfailid, aga neil näiteks e-postiga lihtsam saata.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Krüptimise lubamine mitteusaldusväärsete võtmetega</guilabel
+>: see lubab krüptida faile võtmetega, mida sa pole märkinud usaldusväärseks.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>PGP 6 ühilduvus</guilabel
+>: krüptitud failid ühilduvad vanema PGP6 standardiga. See tühistab teatud omadused, mistõttu seda tasuks kasutada ainult siis, kui seda on tõepoolest vaja.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Kasutaja ID peitmine</guilabel
+>: kõrvaldab krüptitud failist kõik viited saajale. Kui keegi peaks ülekande hõivama, ei saa ta vähemalt teada, kes on faili saaja. Kui saaja kasutab mitut võtit, peab ta proovima, millist sellise ülekande puhul kasutati.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Alati krüptitakse kasutades</guilabel
+>: kõik krüptimised krüptitakse lisaks määratud võtmega. Kui määrad siin mõne oma privaatvõtmetest, tuleks kontrollida, et saad lugeda kõiki andmeid, mida oled krüptinud.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Failid krüptitakse kasutades</guilabel
+>: käitub samamoodi nagu <guilabel
+>Alati krüptitakse kasutades</guilabel
+> failide krüptimise puhul.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Kohandatud krüptimise käsk</guilabel
+>: kui sul on tarvis määrata GnuPG-le mingeid tavapärasest erinevaid võtmeid, siis saab vastava käsu anda siin. Enamasti ei ole seda vaja.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Krüptitud failidel kasutatakse laiendit .pgp</guilabel
+>: selle märkimisel nimetatakse krüptitud failid sisendfailiks laiendiga <literal role="extension"
+>.pgp</literal
+>, vastasel juhul kasutatakse laiendit <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Lahtikrüptimine</title>
+
+<para
+>Siin saab määrata kohandatud lahtikrüptimise käsu. Seda läheb harva tarvis ning see on mõeldud eelkõige kogenud kasutajatele, kes tunnevad hästi GnuPG käsurea võtmeid.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Välimus</title>
+<para
+>Siin saab seadistada &kgpg; välimust. Määrata saab värve, mis tähistavad võtme erinevat usaldusväärsust <link linkend="keymanager"
+>võtmehalduris</link
+>, ning <link linkend="editor"
+>redaktoris</link
+> kasutatavaid fonte.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>GnuPG seadistused</title>
+<para
+>Siin saab määrata, millist gpg binaarfaili ning <guilabel
+>seadistusfaili</guilabel
+> ja kodukataloogi kasutatakse. Need väärtused tuvastatakse automaatselt esmakäivitamise ajal ning peaksid üldjuhul sobima.</para>
+<para
+><ulink url="man:gpg-agent"
+>GnuPG agendi</ulink
+> kasutamine muudab GnuPG-ga töötamise hõlpsamaks, sest siis pole vaja iga toimingu jaoks anda uuesti parooli. See salvestatakse mõneks ajaks mällu ning kõik parooli nõudvad toimingud sooritatakse aega viitmata. Pane siiski tähele, et see võib võimaldada teistel kasutada sinu privaatvõtmeid, kui neil avaneb ligipääs sinu seansile.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Võtmeserverid</title>
+<para
+>Siin saab paika panna võtmeserverite nikekirja, mida näidatakse, kui avad <link linkend="keyserver"
+>võtmeserveri dialoogi</link
+>. Kui käivitad GnuPG käsurealt, kasutatakse ainult siin vaikimisi serveriks määratud võtmeserverit.</para>
+<para
+>Võtmeserveritega suhtlemiseks kasutatakse &HTTP; põhist protokolli, mistõttu mõnes keskkonnas tasuks märkida valik <guilabel
+>HTTP puhverserveri kasutamine, kui võimalik</guilabel
+>.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Muu</title>
+<para
+>Siin saab määrata mõningaid asju, mis ei sobi mujale. Näiteks saab sisse lülitada valiku <guilabel
+>KGpg käivitatakse automaatselt sisselogimisel</guilabel
+>. Valik <guilabel
+>Lõikepuhver kasutab hiirega valimist</guilabel
+> muudab seda, kas valik toimub hiirega ja asetamine hiire keskmise nupuga või sooritatakse kõik toimingud kiirklahvide abil.</para>
+<para
+>Samuti saab muuta seda, kas &kgpg; ikooni näidatakse süsteemses salves või mitte ning mis juhtub siis, kui ikoonil klõpsata &HVNga;. Kui süsteemses salves näidatakse ikooni, võrdub &kgpg; akna sulgemine selle minimeerimisega süsteemsesse salve. Kui ikooni ei näidata, lõpetatakse &kgpg; töö kõigi akende sulgemisel.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Autorid ja litsents</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Rakenduse autoriõigus &copy; 2002-2003: Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007: Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006, 2007, 2008, 2009, 2010: Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Tõlge eesti keelde: Marek Laane <email
+>bald@starman.ee</email
+></para
+> 
+&underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->

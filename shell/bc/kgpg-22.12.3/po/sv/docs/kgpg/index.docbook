@@ -1,0 +1,794 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % Swedish "INCLUDE">
+]>
+
+<book id="kgpg" lang="&language;">
+
+<bookinfo>
+<title
+>Handbok &kgpg;</title>
+
+<authorgroup>
+<author
+><firstname
+>Jean-Baptiste</firstname
+> <surname
+>Mardelle</surname
+> <affiliation
+> <address
+><email
+>bj@altern.org</email
+></address>
+</affiliation>
+</author>
+<author
+><firstname
+>Rolf Eike</firstname
+> <surname
+>Beer</surname
+> <affiliation
+> <address
+><email
+>kde@opensource.sf-tec.de</email
+></address>
+</affiliation>
+</author>
+
+<othercredit role="translator"
+> <firstname
+>Stefan</firstname
+> <surname
+>Asserhäll</surname
+> <affiliation
+><address
+><email
+>stefan.asserhall@telia.com</email
+></address
+></affiliation
+> <contrib
+>Översättare</contrib
+></othercredit
+> 
+
+</authorgroup>
+
+<copyright>
+<year
+>2002</year>
+<year
+>2007</year>
+<year
+>2008</year>
+<year
+>2009</year>
+<year
+>2010</year>
+<holder
+>Jean-Baptiste Mardelle</holder>
+<holder
+>Rolf Eike Beer</holder>
+</copyright>
+
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2016-10-10</date>
+<releaseinfo
+>Program 16.12</releaseinfo>
+
+<abstract>
+<para
+>&kgpg; är ett enkelt grafiskt gränssnitt till GnuPG (<ulink url="https://gnupg.org"
+>https://gnupg.org</ulink
+>). </para>
+</abstract>
+
+<keywordset>
+<keyword
+>KDE</keyword>
+<keyword
+>Kgpg</keyword>
+<keyword
+>kryptering</keyword>
+<keyword
+>gpg</keyword>
+<keyword
+>pgp</keyword>
+<keyword
+>säkerhet</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title
+>Inledning</title>
+
+
+<para
+>&kgpg; är ett enkelt gränssnitt till GnuPG, ett kraftfullt krypteringsverktyg. GnuPG (också känt som gpg) ingår i de flesta distributioner och bör vara installerat på ditt system. Du kan hämta senaste versionen på <ulink url="https://gnupg.org"
+>https://gnupg.org</ulink
+>.</para>
+
+<para
+>Med &kgpg; kan du kryptera och avkoda filer och e-post, vilket tillåter mycket säkrare kommunikation. En minihandledning om hur man krypterar med gpg är tillgänglig på <ulink url="https://www.gnupg.org/documentation/howtos.en.html"
+>GnuPG's web site</ulink
+>. </para>
+
+<para
+>Med &kgpg; behöver du inte komma ihåg gpg:s kommandorader och väljare. Nästan allt kan göras med musklick. </para>
+</chapter>
+
+<chapter id="getting-started">
+<title
+>Komma igång</title>
+
+<para
+>Här är en lista över &kgpg;:s huvudkomponenter:</para>
+
+<variablelist>
+
+<varlistentry>
+<term
+>Ikon i systembrickan </term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>&kgpg;:s miniprogram i systembrickan</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="systray.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>När du startar &kgpg;, visas en ikon i systembrickan. Ett vänsterklick öppnar nyckelhanteringsfönstret, medan ett högerklick visar en meny som ger snabb tillgång till några viktiga funktioner. Om du föredrar andra alternativ kan du ändra vänsterklickets funktion så att det visar editorn, eller helt inaktivera ikonen i systembrickan med <link linkend="conf-misc"
+>inställningsdialogrutan</link
+>. </para>
+<para
+>Observera att &kgpg;s ikon i systembrickan är markerad som &quot;inaktiv&quot; nästan alltid. Eftersom systembrickans miniprogram oftast döljer inaktiva ikoner, visas inte &kgpg;s ikon förrän du explicit begär det. För detaljinformation ta gärna en titt på &plasma;s dokumentation. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Nyckelhanteringsfönster</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Nyckelhanteringsfönster</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Det här är den centrala platsen där du hanterar dina nycklar. För att öppna <link linkend="keymanager"
+>nyckelhanteringsfönstret</link
+>, vänsterklicka på &kgpg;:s miniprogram. Du kan importera, exportera, signera och redigera dina nycklar. De flesta åtgärder kan utföras med ett högerklick på en nyckel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+>Redigeringsfönster</term>
+<listitem>
+
+<screenshot>
+<screeninfo
+>Redigeringsfönster</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="editor.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Det här är en enkel texteditor, där du kan skriva in eller klistra in text för att kryptera eller avkoda den. För att öppna <link linkend="editor"
+>editorn</link
+>, högerklicka på &kgpg;:s miniprogram. </para>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term
+>Integrering med filhanterare</term>
+<listitem>
+
+<para
+>&kgpg; är integrerat med &konqueror; och &dolphin;. Det betyder att när du högerklickar på en fil, kan du välja <menuchoice
+><guimenu
+>Åtgärder</guimenu
+> <guimenuitem
+>Kryptera fil</guimenuitem
+></menuchoice
+> för att kryptera en fil. Du kan avkoda en fil med ett vänsterklick. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+
+</chapter>
+
+<chapter id="using-kgpg">
+<title
+>Använda &kgpg;</title>
+
+<para
+>Det finns två sätt att kryptera data: <itemizedlist>
+<listitem
+><para
+>Symmetrisk kryptering: Din data krypteras bara med ett lösenord. Alla som har en dator med gpg kan avkoda ditt meddelande om du ger dem lösenordet. För att utföra symmetrisk kryptering, välj "symmetrisk kryptering" i alternativrutan när du blir tillfrågad om att välja en krypteringsnyckel.</para
+></listitem>
+<listitem
+><para
+>Nyckelkryptering: Du måste först skapa ett nyckelpar (hemlig nyckel och öppen nyckel) och ange en lösenordsfras. Bevara din hemliga nyckel på ett säkert ställe, och utbyt din öppna nyckel med dina vänner. Om du därefter vill skicka ett krypterat meddelande till Anna, måste du kryptera det med Annas öppna nyckel. För att avkoda meddelandet, måste mottagaren ha Annas hemliga nyckel och lösenordsfras.</para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Nyckelkryptering är något mer komplicerat (du måste utbyta nycklar med dina vänner) men säkrare. Kom ihåg att om du krypterar ett meddelande med någon annans nyckel, kommer du inte kunna avkoda det. Du kan bara avkoda meddelanden som har krypterats med din öppna nyckel.</para>
+
+<sect1 id="key-generation">
+<title
+>Skapa en nyckel</title>
+
+<para
+>Om du inte redan har en, startar &kgpg; automatiskt dialogrutan för att skapa en nyckel vid första starten. Du kan också komma åt den i nyckelhanteringen från <menuchoice
+><guimenu
+>Nycklar</guimenu
+> <guimenuitem
+>Skapa nyckelpar</guimenuitem
+></menuchoice
+>.</para>
+
+<screenshot>
+<screeninfo
+>Dialogruta för att skapa en nyckel</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keygen.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Skriv helt enkelt in ditt namn, e-postadress och klicka på <guibutton
+>Ok</guibutton
+>. Då skapas en gpg-standardnyckel. Om du vill ha fler alternativ, kan du klicka på knappen <guibutton
+>Expertläge</guibutton
+>, som visar ett terminalfönster med alla alternativ i gpg.</para>
+<para
+>Många leker med sina första nycklar, skapar dåliga användar-identiteter, lägger till kommentarer som de senare ångrar eller glömmer helt enkelt bort lösenordsfrasen. För att undvika att sådana nycklar förblir giltiga för alltid, är det oftast en bra idé att begränsa livslängden till omkring 12 månader. Du kan ändra livslängden hos dina hemliga nycklar senare genom att använda <link linkend="keyproperties"
+>nyckelegenskapsfönstret</link
+>.</para>
+
+</sect1>
+
+<sect1 id="key-revoke">
+<title
+>Återkalla en nyckel</title>
+
+<para
+>Ett nyckelpar som har utgått kan återställas till användbart skick under förutsättning att du har tillgång till den privata nyckeln och lösenordsfrasen. För att göra en nyckel oanvändbar på ett tillförlitligt sätt måste den återkallas. Att återkalla görs genom att lägga till en särskild återkallelsesignatur i nyckeln.</para>
+
+<para
+>Denna återkallelsesignatur kan skapas tillsammans med nyckeln. I detta fall lagras den i en separat fil. Filen kan senare importeras till nyckelringen och ansluts då till nyckeln och gör den oanvändbar. Observera att inget lösenord krävs för att importera signaturen till nyckeln. Därför bör återkallelsesignaturen lagras på ett säkert ställe, oftast ett som skiljer sig från platsen där nyckelparet lagras. Ett gott råd är att använda en plats som kan kopplas från datorn, genom att antingen kopiera den till en extern lagringsenhet som en USB-sticka eller skriva ut den.</para>
+
+<para
+>Om du inte har skapad en sådan frikopplad återkallelse när nycklarna skapades, kan en sådan återkallelsesignatur skapas när som helst genom att välja <menuchoice
+><guimenu
+>Nycklar</guimenu
+> <guimenuitem
+>Återkalla nyckel</guimenuitem
+></menuchoice
+>, och välja att omedelbart importera den till din nyckelring.</para>
+
+</sect1>
+
+<sect1 id="encryption">
+<title
+>Kryptera data</title>
+
+<sect2 id="konqui">
+
+<title
+>Kryptera en fil från &konqueror; eller Dolphin</title>
+
+<para
+>Högerklicka på filen som du vill kryptera. Välj <menuchoice
+><guimenu
+>Åtgärder</guimenu
+> <guimenuitem
+>Kryptera fil</guimenuitem
+></menuchoice
+> i menyn som dyker upp. Då visas dialogrutan för att välja öppen nyckel. Välj nyckel och klicka på <guibutton
+>Kryptera</guibutton
+>. Den krypterade filen sparas med filändelsen <literal role="extension"
+>.asc</literal
+> eller <literal role="extension"
+>.gpg</literal
+>, beroende på om du valde <guilabel
+>ASCII-kryptering</guilabel
+> eller inte. ASCII-krypterade filer använder bara läsbara tecken för att representera data, vilket ger filer som är mer robusta när de kopieras till olika ställen eller skickas via e-post, men är en tredjedel större.</para>
+
+<screenshot>
+<screeninfo
+>Här är en skärmbild av nyckelvalsfönstret</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keys.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+</sect2>
+
+<sect2 id="drop">
+<title
+>Kryptera en fil eller text från &kgpg;:s miniprogram</title>
+
+<para
+>Du kan kryptera klippbordets innehåll genom att välja alternativet <guimenuitem
+>Kryptera klippbordet</guimenuitem
+> i miniprogrammets meny. Om du väljer <guimenuitem
+>Signera klippbordet</guimenuitem
+> signeras texten istället. Båda åtgärderna importerar klippbordets nuvarande innehåll till ett <link linkend="editor"
+>editorfönster</link
+>, utför begärd åtgärd och klistrar tillbaka innehållet i editorn.</para>
+
+</sect2>
+
+<sect2 id="editor">
+<title
+>Kryptera text från &kgpg;:s editor</title>
+
+<para
+>Det här görs helt enkelt genom att klicka på knappen <guibutton
+>Kryptera</guibutton
+>. Då visas dialogrutan för att välja öppen nyckel. Välj nyckel och klicka på <guibutton
+>Ok</guibutton
+>. Det krypterade meddelandet visas i editorfönstret.</para>
+
+<para
+>Oftast kan du bara kryptera filer med nycklar som du anser vara pålitliga. Eftersom du ibland bara vill skicka ett konfidentiellt meddelande till godtyckliga personer som du vet har en GPG-nyckel, kan du ställa in alternativet <guilabel
+>Tillåt kryptering med opålitliga nycklar</guilabel
+>.</para>
+
+<para
+>För att vara säker på att du kan avkoda alla filer som du har krypterat, även om de är krypterade med någon annans nyckel, kan du använda alternativet <guilabel
+>Kryptera alltid med</guilabel
+> och <guilabel
+>Kryptera filer med</guilabel
+>, vilka är tillgängliga i <link linkend="conf-encryption"
+>Kgpgs inställningar</link
+>.</para>
+
+<para
+>För mer information om krypteringsalternativen <guilabel
+>ASCII-bepansring</guilabel
+>, <guilabel
+>Tillåt kryptering med opålitliga nycklar</guilabel
+> och <guilabel
+>Symmetrisk kryptering</guilabel
+>, se gpgs dokumentation eller <ulink url="man:gpg"
+>manualsidor</ulink
+>.</para>
+</sect2>
+
+</sect1>
+
+<sect1 id="decryption">
+<title
+>Avkoda data</title>
+
+
+<sect2 id="konq-dec">
+<title
+>Avkoda en fil från &konqueror; eller &dolphin;</title>
+<para
+><mousebutton
+>Vänster</mousebutton
+>klicka på filen du vill avkoda. Skriv in lösenordsfrasen så är det klart. Du kan också dra en krypterad textfil, och släppa den i &kgpg;:s fönster. Då frågas efter lösenordsfrasen, och den avkodade texten visas i &kgpg;:s editor. Du kan till och med släppa fjärrfiler! Du kan också använda <menuchoice
+><guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Avkoda fil</guimenuitem
+></menuchoice
+>, och välja en fil att avkoda.</para>
+
+</sect2>
+
+<sect2 id="applet-dec">
+<title
+>Avkoda text med &kgpg;:s miniprogram</title>
+
+<para
+>Du kan också avkoda klippbordets innehåll med menyalternativet <guimenuitem
+>Avkoda klippbord</guimenuitem
+> i &kgpg;:s miniprogram. Ett <link linkend="editor"
+>editorfönster</link
+> visas med den krypterade texten.</para>
+
+</sect2>
+
+<sect2 id="editor-dec">
+<title
+>Avkoda en text från editorn</title>
+
+<para
+>Kopiera eller dra och släpp texten du vill avkoda, och klicka på knappen <guibutton
+>Avkoda</guibutton
+>. Du blir tillfrågad om lösenordsfrasen. </para>
+</sect2>
+
+</sect1>
+
+<sect1 id="manage">
+<title
+>Nyckelhantering</title>
+
+<para
+>Alla grundläggande nyckelhanteringsfunktioner kan skötas via &kgpg;. Öppna nyckelhanteringsfönstret med ett vänsterklick på &kgpg;:s miniprogram. De flesta alternativ är tillgängliga med ett <mousebutton
+>höger</mousebutton
+>klick på en nyckel. För att importera eller exportera öppna nycklar, kan du använda drag och släpp eller snabbtangenterna för att kopiera eller klistra in.</para>
+
+<para
+>Det går att exportera en öppen nyckel via e-post, till klippbordet, till en nyckelserver eller till en lokal fil. Använd alternativen i exportdialogrutan för att exportera allting, exportera utan attribut (foto-id) eller exportera en ren nyckel, dvs. själva nyckeln inklusive dess delnycklar, men utan alla signaturer. </para>
+
+<sect2 id="keymanager">
+<title
+>Nyckelhantering</title>
+
+<screenshot>
+<screeninfo
+>Här är en skärmbild av nyckelhantering</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keymanage.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>I det här exemplet ser du en nyckelgrupp som innehåller två nycklar, två nyckelpar och tre öppna nycklar. Den tredje kolumnen visar hur mycket du litar på nycklarna. Det första nyckelparet är slutgiltigt pålitligt, och är också inställt som standardnyckel (fetstil), medan det andra har gått ut. Två av de öppna nycklarna är fullständigt pålitliga, medan den sista nyckeln har begränsad pålitlighet. Den sista nyckeln är expanderad, så att dess ElGamal-delnyckel och ytterligare en användar-identitet visas, båda också med begränsad pålitlighet, samt vissa av dess signaturer.</para>
+<para
+>Signaturer gör det möjligt att navigera i nyckelringen. Att dubbelklicka på en signatur eller en nyckel som visas som medlem i en grupp går direkt till motsvarande primära nyckel.</para>
+</sect2>
+
+<sect2 id="keyproperties">
+<title
+>Nyckelegenskaper</title>
+
+<screenshot>
+<screeninfo
+>Nyckelegenskapsfönstret</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Medan nyckelhanteringen låter dig utföra allmänna åtgärder med en eller flera nycklar, nyckelgrupper eller signaturer, ger nyckelegenskapsfönstret dig tillgång till en enstaka nyckel. Du kan nå det genom att trycka på returtangenten i nyckelhanteringen eller dubbelklicka på nyckeln.</para>
+<para
+>Du kan ändra nyckelns lösenordsfras och utgångsdatum för hemliga nycklar i det här fönstret. Du kan också ställa in ägarens pålitlighet för alla nycklar.</para>
+<para
+>Värdet anger hur mycket du litar på att ägaren till nyckeln kontrollerar identiteten hos nycklar han signerar. Genom att ta hänsyn till ägarens pålitlighet skapar gpg ditt eget nätverk av pålitlighet. Du litar på nycklarna du signerar. Om du anger att ägarna är pålitliga, litar du dessutom på nycklarna de signerat utan att du också måste signera deras nycklar.</para>
+</sect2>
+
+<sect2 id="keysigning">
+<title
+>Signera nycklar</title>
+
+<para
+>När du signerar någon annans nyckel (låt oss kalla henne Alice), säger du att du är säker på att nyckeln verkligen hör till den personen, och att nyckeln är pålitlig. Naturligtvis bör du verkligen ha kontrollerat det. Det betyder oftast att du måste träffa Alice, kontrollera minst ett identitetskort och få nyckelns fullständiga fingeravtryck eller en kopia av hennes nyckel. Därefter kan du gå hem och signera nyckeln. Oftast laddar du upp den nysignerade nyckeln till en <link linkend="keyserver"
+>nyckelserver</link
+> så att alla vet att du har kontrollerat nyckeln, och att ägaren är pålitlig. Alice gör troligen samman sak, så att ni båda har signerat varandras nycklar. Om en av er inte har något identitetskort tillhanda, är det inget problem om signeringen bara sker åt ena hållet.</para>
+
+<para
+>Men tänk på vad som händer om Alice bor på andra sidan världen. Du kommunicerar regelbundet med henne, men det finns inte någon chans att ni snart träffas. Hur kan du då lita på hennes nyckel?</para>
+
+<para
+>När du markerar hennes nyckel och väljer <guimenuitem
+>Signera nyckel</guimenuitem
+> visas dialogrutan som låter dig välja alternativ för hur du vill signera nyckeln.</para>
+
+<screenshot>
+<screeninfo
+>Välja en hemlig nyckel för signering</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="select-secret-key.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Först kan du välja nyckeln du ska använda att signera med. Därefter kan du ange hur noggrannt du kontrollerade att hon verkligen är personen hon framställer sig som. Denna information lagras tillsammans med signaturen, för att vara till hjälp för alla andra som kan behöva signaturen (mer om det nedan). Därefter kommer alternativet som kan hjälpa dig om du inte kan träffa Alice personligen: <guilabel
+>Lokal signatur (kan inte exporteras)</guilabel
+>. När alternativet aktiveras, skapas en specialversion av en signatur som aldrig kan lämna din nyckelring, inte ens av misstag.</para>
+
+<para
+>Men varför är det viktigt hur noggrannt du kontrollerar Alice identitet? Vem bryr sig? Det finns ett annat sätt att lösa problemet med Alice identitet. Om du inte kan besöka Alice i närtid, tänk då på Trent. Du vet att Trent också har ett nyckelpar, och Trent är en långresenär, som besöker andra kontinenter åtminstone två gånger i månaden Om du har tur, flyger han snart till en plats nära Alice. Då kan du skicka ett meddelande till Alice, att Trent kommer att vara i närheten snart, och fråga henne om hon kan träffa Trent för att signera nycklar. När allt detta har skett, vet du att Trents nycklar är pålitliga och Trent vet att Alice nyckel är pålitlig. Om du litar på att Trent har kontrollerat Alice identitet noggrannt, kan du också lita på hennes nyckel.</para>
+
+<para
+>Dessa förhållanden mellan nycklar och deras ägare skapar ett så kallat pålitlighetsnätverk. Inom nätverket finns det några viktiga värden som definierar hur pålitlig en viss nyckel är. Det första är hur noggrannt nyckelägarens identitet kontrollerades. Det är värdet du såg ovan i fönstret för att välja hemlig nyckel. Du vet till exempel troligen hur man kontrollerar identitetskort från ditt eget land, men ett från ett annat land kan vara svårt att verifiera. Du skulle alltså kunna säga att du har kontrollerat Trents identitet mycket noggrannt, eftersom du har sett hans identitetskort, och det förefaller mycket likt ditt eget. Men Trent kan säga att han bara har gjort en ytlig kontroll av Alice identitet, även om han har sett både Alice identitetskort och körkort, eftersom han inte är absolut säker på dokument från den delen av världen.</para>
+
+<para
+>Nästa viktiga värde är hur mycket du litar på att den andra personen kontrollerar dokument. Du vet att Trent är bra på det, men George är till exempel inte någon du skulle kalla smart. Han tittade knappt på ditt id-kort när ni träffades för att signera nycklar. Du är säker på att George är den han utger sig för att vara, eftersom du kontrollerade hans dokument noggrannt, men han verkar inte bry sig om att kontrollera andra. Alltså litar du helt på Georges nyckel, men litar väldigt lite på Georges signaturer. Om du öppnar <link linkend="keyproperties"
+>egenskaper</link
+> för Georges nyckel, hittar du fältet <guilabel
+>Ägarens pålitlighet</guilabel
+>. Det är hur mycket du litar på nyckelägaren när han signerar nycklar. Värdet exporteras inte, utan det är fullständigt enligt din egen personliga uppfattning.</para>
+
+<screenshot>
+<screeninfo
+>Nyckelegenskapsfönstret</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyprop.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Nu bör du har en idé om hur pålitlighetsnätverk byggs upp, vad pålitlighetsvärden för ägaren och nyckeln är till för, och varför du alltid måste vara mycket noggrann när du kontrollerar identiteter: andra personer kan förlita sig på dig. Men en del av processen är fortfarande inte verifierad: e-postadressen i nycklarna du signerade. Att skapa en ny användaridentitet i din nyckel med Alice eller Trents e-postadress tar bara några få musklick. Du har kontrollerat att Trent verkligen äger sin nyckel, men ingen har tidigare kontrollerat att Trent verkligen äger sina egna användaridentiteters e-postadresser.</para>
+
+<para
+>Om du istället väljer <guimenuitem
+>Signera och skicka användaridentitet med e-post...</guimenuitem
+> i menyn, kan du stänga gapet. Idén är att du signerar nyckeln som vanligt, och därefter delas den upp i delar. Varje del innehåller bara en användaridentiet från Trents nyckel och din signatur av den. Det krypteras med Trents nyckel och skickas bara till e-postadressen angiven i identiteten. Bara om Trent kan ta emot brevet och avkoda det, kommer han att kunna importera signaturen till sin nyckelring. Du laddar inte upp dina signaturer, det är helt och hållet hans sak. Om din signatur dyker upp på en nyckelserver, kan du vara säker på att Trent verkligen har hand om både sin egen nyckel samt e-postadressen du signerade. Direkt efter du har signerat Trents nyckel, kommer den alltså fortfarande visas som opålitlig i din nyckelring. När Trent väl har tagit emot ditt brev och importerat signaturen till sin nyckelring, kan han ladda upp dem till en nyckelserver. När du uppdaterar hans nyckel från en nyckelserver, får du de nya signaturerna. Även om det först kan låta obekvämt, försäkrar det att du inte av misstag anser som pålitlig en av hans identiteter han inte äger. Bara signaturerna som dyker upp på en nyckelserver är de där alla, inklusive dig själv, kan vara säkra på att han äger motsvarande e-postadresser.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="keyserver">
+<title
+>Arbeta med nyckelservrar</title>
+
+<sect2>
+<title
+>Kommunikation med nyckelservrar</title>
+
+<para
+>Den öppna delen av ett nyckelpar lagras oftast på en nyckelserver. Dessa servrar låter vem som helst leta efter en nyckel som hör till en viss person eller e-postadress. Signaturerna lagras också på dessa servrar.</para>
+
+<screenshot>
+<screeninfo
+>Här är en skärmbild av nyckelserverfönstret</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Dialogrutan ger dig möjlighet att komma åt nyckelservrar. Du kan söka efter och importera nycklar från en nyckelserver, samt exportera nycklar till en server. Ett exempel då du behöver söka och importera, är när du vill skriva ett brev till en ny mottagare. Om du vill kryptera brevet till mottagaren kan du söka för att se om han eller hon har en öppen nyckel på en nyckelserver. Om du har skapat ett nytt nyckelpar eller har signerat någon annans nyckel, kanske du vill exportera den öppna nyckeln (möjligen med nya signaturer) till en nyckelserver.</para>
+<para
+>De flesta nyckelservrar synkroniserar data mellan varandra, alltså får du liknande sökresultat oberoende av vilken server du använder. Eftersom det finns undantag till den här regeln, kan du välja nyckelserver att använda i dialogrutan. Det är oftast en bra idé att välja en standardnyckelserver som finns nära dig (dvs i ditt land eller på din kontinent) eftersom de oftast svarar snabbare på förfrågningar.</para>
+<para
+>Observera att allting du laddar upp till en nyckelserver oftast förblir där för evigt. Det är en orsak till att du oftast bör begränsa dina nycklars livstid. Observera också att nyckelservrar ibland söks igenom av skräppostare efter e-postadresser.</para>
+</sect2>
+
+<sect2 id="keyserver-results">
+<title
+>Sökresultat för nyckelserver</title>
+<screenshot>
+<screeninfo
+>Det här är ett exempel på resultatet av en sökning efter en nyckelserver.</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="keyserver-search.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+
+<para
+>Alla resultat av en sökning visas i det här fönstret. Bilden visar en sökning efter adresser i &quot;@kde.org&quot;, vilket gav 244 resultat. Genom att använda sökfältet reducerades den visade listan till en enda nyckel. Nyckeln har två träffar: själva den primära användaridentiteten matchar söksträngen, liksom en av de andra användaridentiteterna.</para>
+
+<para
+>Du kan välja en eller flera nycklar att importera. Identiteterna för dessa nycklar visas i fältet <guilabel
+>Nycklar att importera</guilabel
+> längst ner i fönstret. När du klickar på <guibutton
+>Importera</guibutton
+> kontaktas nyckelservern igen, och nycklarna hämtas till din nyckelring.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="options">
+<title
+>Anpassa &kgpg;</title>
+
+<para
+>Inställningar kan kommas åt via &kgpg;:s miniprogrammeny (högerklicka på miniprogrammet) eller via huvudmenyn (<menuchoice
+><guimenu
+>Inställningar</guimenu
+><guimenuitem
+>Anpassa Kgpg</guimenuitem
+></menuchoice
+>). Du kan ställa in standardvärden för kryptering, avkodning, användargränssnitt och miniprogram. De flesta alternativ är direkt relaterade till gpg, och dokumenteras på dess <ulink url="man:gpg"
+>manualsida</ulink
+>.</para>
+
+<sect2 id="conf-encryption">
+<title
+>Kryptering</title>
+<screenshot>
+<screeninfo
+>En skärmbild av inställningsdialogrutan med krypteringsfliken vald</screeninfo>
+<mediaobject>
+<imageobject>
+<imagedata fileref="options.png" format="PNG"/></imageobject>
+</mediaobject>
+</screenshot>
+<para
+>Här kan du ställa in särskilda alternativ som ska skickas till GnuPG för att ändra krypteringsbeteendet. Ta en titt i GnuPG-manualen för en detaljerad beskrivning.</para>
+<itemizedlist>
+<listitem
+><para
+><guilabel
+>ASCII-bepansrad kryptering</guilabel
+>: Det här leder till att krypterade filer lagras med ett format som bara använder utskrivningsbara ASCII-tecken och har korta rader. Filer som lagras på detta sätt är större än filer med binärformat, men är lättare att skicka, t.ex. via e-post.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Tillåt kryptering med opålitliga nycklar</guilabel
+>: Det låter dig kryptera filer med nycklar som du inte litar på.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Fungera med PGP 6</guilabel
+>: Krypterade filer fungerar med den äldre PGP 6-standarden. Det här inaktiverar vissa funktioner, så du bör bara använda det om det verkligen behövs.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Dölj användar-id</guilabel
+>: Det här tar bort alla spår av mottagaren från den krypterade filen. Om överföringen fångas upp kan ingen erhålla information om mottagaren från filen. Om mottagaren har flera nycklar, måste han prova vilken som användes.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Kryptera alltid med</guilabel
+>: För allt som krypteras används dessutom den här nyckeln för att kryptera det. Om du ställer in den till en av dina privata nycklar, försäkrar det att du kan läsa all data du krypterade till priset av större meddelanden.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Kryptera filer med</guilabel
+>: Beter sig som <guilabel
+>Kryptera alltid med</guilabel
+> vid filkryptering.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Eget krypteringskommando</guilabel
+>: Om du behöver skicka några ovanliga väljare till GnuPG kan du ange kommandoraden här. De flesta användare behöver inte det här.</para
+></listitem>
+<listitem
+><para
+><guilabel
+>Använd filändelsen *.pgp för krypterade filer</guilabel
+>: Om du markerar alternativet namnges krypterade filer som indatafilen med filändelsen <literal role="extension"
+>.pgp</literal
+> tillagd, annars används filändelsen <literal role="extension"
+>.gpg</literal
+>.</para
+></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="conf-decryption">
+<title
+>Avkodning</title>
+
+<para
+>Här kan du ange ett eget avkodningskommando. Alternativet behövs sällan, och är bara användbart för avancerade användare som känner till kommandoradsväljare i GnuPG.</para>
+</sect2>
+
+<sect2 id="conf-appearance">
+<title
+>Utseende</title>
+<para
+>Här kan du ställa in hur &kgpg; ser ut. Möjliga inställningar är färger som motsvarar de olika nivåerna av pålitlighet hos nycklar i <link linkend="keymanager"
+>nyckelhanteringen</link
+>, och inställningar av teckensnitt för <link linkend="editor"
+>editorn</link
+>.</para>
+</sect2>
+
+<sect2 id="conf-gnupg">
+<title
+>Inställningar av GnuPG</title>
+<para
+>Här kan du ställa in vilket gpg-binärprogram och vilken <guilabel
+>inställningsfil</guilabel
+> och hemkatalog som används. Dessa värden detekteras automatiskt vid första start, och bör redan fungera.</para>
+<para
+>Att använda <ulink url="man:gpg-agent"
+>GnuPG-agent</ulink
+> gör det mycket bekvämare att arbeta med GnuPG, eftersom du inte behöver skriva in ditt lösenord för varje åtgärd. Det lagras i minnet en stund, så alla åtgärder som skulle kräva ett lösenord omedelbart kan utföras. Observera att det kan tillåta att andra personer använder dina privata nycklar om du lämnar din session tillgänglig för dem.</para>
+</sect2>
+
+<sect2 id="conf-keyservers">
+<title
+>Nyckelservrar</title>
+<para
+>Här kan du skapa en lista med nyckelservrar som visas när du öppnar <link linkend="keyserver"
+>dialogrutan för nyckelserver</link
+>. Om du kör GnuPG från kommandoraden används bara nyckelservern som du ställer in som förval här.</para>
+<para
+>Protokollet som används för kommunikation med nyckelservrarna är baserat på &HTTP;, så det är vettigt att <guilabel
+>följa &HTTP;-proxy om tillgänglig</guilabel
+> i vissa miljöer.</para>
+</sect2>
+
+<sect2 id="conf-misc">
+<title
+>Diverse</title>
+<para
+>Den här delen låter dig ställa in några olika funktioner som inte passar i övriga delar. Du kan till exempel ställa in att <guilabel
+>starta Kgpg automatiskt vid inloggning</guilabel
+>. Alternativet att <guilabel
+>använda musmarkering istället för klippbordet</guilabel
+> ändrar om markering sker med musen och inklistring med musens mittenknapp, eller om alla åtgärder utförs med snabbtangenter.</para>
+<para
+>Du kan också ändra om &kgpg;s ikon i systembrickan visas eller inte, och vilken åtgärd som utförs om ikonen klickas med vänster musknapp. Om miniprogrammet visas, minimeras programmet till systembrickan om &kgpg;s fönster stängs. Om ikonen i systembrickan inte visas, avslutas &kgpg; när alla fönster stängs.</para>
+</sect2>
+
+</sect1>
+
+</chapter>
+
+
+<chapter id="credits">
+
+<title
+>Tack till och licens</title>
+
+<para
+>&kgpg; </para>
+
+<para
+>Program copyright &copy; 2002, 2003 Jean-Baptiste Mardelle <email
+>bj@altern.org</email
+>.</para>
+
+<para
+>&copy; 2006-2007 Jimmy Gilles <email
+>jimmygilles@gmail.com</email
+></para>
+
+<para
+>&copy; 2006, 2007, 2008, 2009, 2010 Rolf Eike Beer <email
+>kde@opensource.sf-tec.de</email
+> </para>
+
+<para
+>Översättning Stefan Asserhäll<email
+>stefan.asserhall@bredband.net</email
+></para
+> &underFDL; &underGPL; </chapter>
+
+&documentation.index;
+
+</book>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+sgml-intent-step:0
+sgml-indent-data:nil
+End:
+-->
