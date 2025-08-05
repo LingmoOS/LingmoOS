@@ -1,0 +1,41 @@
+http://sourceware.org/ml/libc-alpha/2013-08/msg00207.html
+
+From: Justus Winter <4winter@informatik.uni-hamburg.de>
+To: libc-alpha@sourceware.org
+Subject: [PATCH 2/2] Define _PATH_MOUNTED as "/etc/mtab"
+Date: Thu, 15 Aug 2013 10:43:35 +0200
+
+Change the definition of _PATH_MOUNTED to "/etc/mtab". This is the
+value used on Linux.
+
+The change is motivated by the fact that on Debian /etc/mtab is a
+symbolic link to /proc/mounts. This patch adjusts the macro for
+non-linux systems such as Hurd. Changing this using
+sysdeps/mach/hurd/paths.h causes build problems because
+/usr/include/hurd/paths.h is shadowed by this file. This change is
+proposed in the hope that aligning the non-linux targets with the
+glibc for Linux is perceived as a good thing while fixing this problem
+on Debian/Hurd along the way.
+
+* sysdeps/generic/paths.h (_PATH_MOUNTED): Change value to "/etc/mtab".
+---
+ sysdeps/generic/paths.h |    2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
+index 893b4c2..6b8f440 100644
+--- a/sysdeps/generic/paths.h
++++ b/sysdeps/generic/paths.h
+@@ -51,7 +51,7 @@
+ #define	_PATH_MAN	"/usr/share/man"
+ #define	_PATH_MEM	"/dev/mem"
+ #define	_PATH_MNTTAB	"/etc/fstab"
+-#define	_PATH_MOUNTED	"/var/run/mtab"
++#define	_PATH_MOUNTED	"/etc/mtab"
+ #define	_PATH_NOLOGIN	"/etc/nologin"
+ #define	_PATH_PRESERVE	"/var/lib"
+ #define	_PATH_RWHODIR	"/var/spool/rwho"
+-- 
+1.7.10.4
+
+

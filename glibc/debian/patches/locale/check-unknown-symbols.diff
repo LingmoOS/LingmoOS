@@ -1,0 +1,37 @@
+Check for unknown symbols in collation rules.  This is useful to detect
+broken locales since unknown symbols are always wrong.
+
+This request has not been submitted upstream yet.
+
+# DP: Dpatch author: Denis Barbier
+# DP: Patch author: Denis Barbier
+# DP: Upstream status: not submitted
+# DP: Date: 2006-01-08
+
+---
+ locale/programs/ld-collate.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+--- a/locale/programs/ld-collate.c
++++ b/locale/programs/ld-collate.c
+@@ -3498,8 +3498,20 @@
+ 	    }
+ 	  else if (arg != NULL)
+ 	    {
++	      void *ptr = NULL;
+ 	      symstr = arg->val.str.startmb;
+ 	      symlen = arg->val.str.lenmb;
++	      if (state != 5
++		  && find_entry (&charmap->char_table, symstr, symlen, &ptr) != 0
++		  && (repertoire == NULL ||
++		      find_entry (&repertoire->char_table, symstr, symlen, &ptr) != 0)
++		  && find_entry (&collate->elem_table, symstr, symlen, &ptr) != 0
++	          && find_entry (&collate->sym_table, symstr, symlen, &ptr) != 0)
++		{
++		  if (verbose)
++		    lr_error (ldfile, _("%s: symbol `%.*s' not known"),
++			      "LC_COLLATE", (int) symlen, symstr);
++		}
+ 	    }
+ 	  else
+ 	    {

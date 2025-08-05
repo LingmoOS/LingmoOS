@@ -1,0 +1,49 @@
+#! /bin/sh
+set -e
+
+# This script adds "udeb lines" to shlibs files which allows other udebs
+# to get correct dependencies when built against glibc libraries.
+# The script was written by Frans Pop <fjp@debian.org>.
+
+package="$1"
+shlibs_file="debian/$package/DEBIAN/shlibs"
+
+# Skip packages that don't have an shlibs file.
+# The "cross-subarch" library packages have an shlibs file, but should
+# not have udeb lines, so skip those as well.
+if [ ! -r "$shlibs_file" ] || \
+   echo "$package" | grep -Eq "^libc[0-9.]+-"; then
+	exit 0
+fi
+
+# $1: regexp to select libraries for which lines should be duplicated
+# $2: name of the udeb the new line should point to
+add_udeb_line() {
+	local regexp udeb line lib soname package rest
+	regexp="$1"
+	udeb="$2"
+
+	if line="$(grep "^$regexp[[:space:]]" $shlibs_file)"; then
+		echo "$line" | while read lib soname package rest; do
+			echo "udeb: $lib $soname $udeb $rest" >>$shlibs_file
+		done
+	fi
+}
+
+
+W="[^[:space:]]*"
+
+# The following lists should match the ones in the *-udeb.install files
+# in debian/debhelper.in; $W replaces any "*" wildcards there.
+expr_libc1="ld$W libm-$W libm libdl$W libresolv$W libc-$W libc"
+expr_libc2="libutil$W librt$W libpthread$W libmvec$W"
+expr_libc3="libnss_dns$W libnss_files$W"
+expr_hurd="libmachuser$W libhurduser$W"
+
+# Remove udeb entries wrongly added by dh_makeshlibs (see bugs #934889
+# and #934891)
+sed -i -e '/^udeb:/d' $shlibs_file
+
+for expr in $expr_libc1 $expr_libc2 $expr_libc3 $expr_hurd; do
+	add_udeb_line "$expr" $package-udeb
+done

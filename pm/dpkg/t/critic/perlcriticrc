@@ -1,0 +1,136 @@
+## Perl Critic configuration file
+severity = 1
+verbose = %f %l:%c (Severity: %s)\n  %P (%s)\n  near '%r'\n%d\n
+program-extensions = .pl .t
+
+##
+## Tune tests
+##
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | DESCRIPTION | CHANGES
+script_sections = NAME | SYNOPSIS | DESCRIPTION
+
+[InputOutput::ProhibitBacktickOperators]
+# TODO: Add new Dpkg::Program module and switch those to it ?
+only_in_void_context = 1
+
+[NamingConventions::ProhibitAmbiguousNames]
+# Allow set(), which is the common name for a setter.
+forbid = abstract bases close contract last left no record right second
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 60
+
+[Subroutines::RequireArgUnpacking]
+allow_delegation_to = new clone
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+# TODO: Switch these to q{} ?
+allow_if_string_contains_single_quote = 1
+
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_types = Octal
+allowed_values = all_integers
+
+##
+## Disable tests
+##
+
+# Here complex is meant as long, but long is not necessarily complex.
+[-BuiltinFunctions::ProhibitComplexMappings]
+
+# Needed when generating code.
+[-BuiltinFunctions::ProhibitStringyEval]
+
+# BUG: Bogus check.
+[-Documentation::PodSpelling]
+
+# While this might be good for performance, it is bad for keeping docs updated.
+[-Documentation::RequirePodAtEnd]
+
+# Too many false positives.
+[-CodeLayout::RequireTidyCode]
+
+# Forcing this just turns into noise (depending on the context, it makes sense).
+[-CodeLayout::RequireTrailingCommas]
+
+# These are fine, and given/when are marked as experimental.
+[-ControlStructures::ProhibitCascadingIfElse]
+
+# These are fine, and too many in the code base anyway.
+[-ControlStructures::ProhibitPostfixControls]
+
+# These are fine, usually as long as they are not double negations.
+[-ControlStructures::ProhibitUnlessBlocks]
+
+# BUG: Too many false positives.
+[-ControlStructures::ProhibitUnreachableCode]
+
+# Not relevant anymore, the mentioned problems were fixed in Perl 5.14.
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# Needed, using <>/<@ARGV> is not correct, Prompt is not a core module.
+[-InputOutput::ProhibitExplicitStdin]
+
+# TODO: Maybe, some of these are part of the public/current API.
+[-Modules::ProhibitAutomaticExportation]
+
+# Here complex is meant as long, but long is not necessarily complex.
+[-Modules::ProhibitExcessMainComplexity]
+
+# BUG: Too many false positives; non-modules all trigger.
+[-Modules::RequireVersionVar]
+
+# We work primarily with ASCII, so we need to specify the exact characters
+# to match.
+[-RegularExpressions::ProhibitEnumeratedClasses]
+
+# When . is used in the code it means what it does.
+[-RegularExpressions::RequireDotMatchAnything]
+
+# When ^ or $ are used in the code they mean what they do.
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# TODO: While valid, these are part of the public/current API.
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+# TODO: Needed but we should switch away, and with perl 5.36 use signatures.
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# Adding these seems like more noise.
+[-Subroutines::RequireFinalReturn]
+
+# Readers need to know perl, English module is worse.
+[-Variables::ProhibitPunctuationVars]
+[-Modules::RequireNoMatchVarsWithUseEnglish]
+
+# Readers need to know perl.
+[-Variables::RequireInitializationForLocalVars]
+
+# BUG: Too many false positives; on ::main and for $ENV, $SIG, $?, $a, $b.
+[-Variables::RequireLocalizedPunctuationVars]
+
+# Readonly is not a core module.
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+# TODO: Check it out, using other quotes might be less readable and uniform.
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+# Using charnames is less clear.
+[-ValuesAndExpressions::ProhibitEscapedCharacters]
+
+# Used for help output.
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+
+# TODO: Octals are fine, but revisit with perl 5.34 octal syntax 0o<nnnn>.
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+
+# BUG: False positives on long hex numbers, even when separated.
+[-ValuesAndExpressions::RequireNumberSeparators]

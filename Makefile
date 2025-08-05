@@ -30,7 +30,7 @@ help:
 # 配置构建目录
 config-pkgs:
 	@mkdir -p $(AUTO_DIR) $(DEFAULT_DIR)
-	@cp -r core daemon fm im/fcitx5-5.1.12 libcoreui lib/libsys lib/libsysui windows/global windows/plugins $(AUTO_DIR)/
+	@cp -r core daemon fm im/fcitx5-5.1.12 lib/libshell lib/libsys lib/libsysui windows/global windows/plugins $(AUTO_DIR)/
 	@cp -r shell/bc/* $(AUTO_DIR)/
 	@rm -r $(AUTO_DIR)/{Debinstaller,Icons}
 	@cp -r shell/cc/* $(AUTO_DIR)/

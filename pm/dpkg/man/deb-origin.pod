@@ -1,0 +1,94 @@
+# dpkg manual page - deb-origin(5)
+#
+# Copyright © 2011 Matt Kraai <kraai@ftbfs.org>
+# Copyright © 2011 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-origin - Vendor-specific information files
+
+=head1 SYNOPSIS
+
+B<%PKGCONFDIR%/origins/>I<filename>
+
+=head1 DESCRIPTION
+
+The files in B<%PKGCONFDIR%/origins> can provide information about various
+vendors that are providing Debian packages.
+These files are usually used both to determine the behavior of tools and
+resulting contents during package builds targeting a specific vendor,
+and to describe the provenance of packages.
+
+Packages can explicitly declare their vendor by including an B<Origin> field,
+otherwise the vendor for a package without such field is assumed to be the
+one pointed to by the F<default> origin symbolic link.
+
+They contain a number of fields, or comments when the line starts with
+‘B<#>’.
+Each field begins with a tag, such as B<Vendor> or B<Parent>,
+followed by a colon and the body of the field.
+Fields are delimited only by field tags.
+In other words, field text may be multiple lines
+in length, but the tools will join lines when processing the body of
+the field.
+
+The file should be named according to the vendor name.
+The usual convention is to name the vendor file using the vendor name
+in all lowercase, but some variation is permitted.
+
+Namely (since dpkg 1.21.10), first, non-alphanumeric characters
+(‘B<[^A-Za-z0-9]>’) are mapped to dashes (‘B<->’), then the resulting
+name will be tried in sequence by lower-casing it, keeping it as is,
+lower-casing then capitalizing it (that is upper-casing the first character),
+and only capitalizing it.
+
+=head1 FIELDS
+
+=over
+
+=item B<Vendor:> I<vendor-name> (required)
+
+The value of this field determines the vendor name.
+
+=item B<Vendor-URL:> I<vendor-url>
+
+The value of this field determines the vendor URL.
+
+=item B<Bugs:> I<bug-url>
+
+The value of this field determines the type and address of the bug
+tracking system used by this vendor.
+It can be a mailto URL or a
+debbugs URL (e.g., debbugs://bugs.debian.org/).
+
+=item B<Parent:> I<vendor-name>
+
+The value of this field determines the vendor name of the vendor that
+this vendor derives from.
+
+=back
+
+=head1 EXAMPLE
+
+ Vendor: Debian
+ Vendor-URL: https://www.debian.org/
+ Bugs: debbugs://bugs.debian.org
+
+=head1 SEE ALSO
+
+L<dpkg-vendor(1)>.

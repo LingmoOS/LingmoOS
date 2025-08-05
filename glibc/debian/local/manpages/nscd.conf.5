@@ -1,0 +1,243 @@
+.\" Placed in the Public Domain by Sebastian Rittau <srittau@jroger.in-berlin.de>
+.TH NSCD.CONF 5 "07 January 2001"
+.UC 5
+.SH NAME
+nscd.conf \- configuration file for Name Service Caching Daemon
+.hy 0
+.SH DESCRIPTION
+.I /etc/nscd.conf
+configures the caches used by
+.BR nscd (8)
+as well as some generic options.
+.BR nscd (8)
+is able to use a configuration file at a different location,
+when supplied with the
+.IR -f 
+or
+.IR --config-file
+command line option.
+
+.PP
+The configuration file consists of a set of lines.
+Empty lines, and text after a '#' is ignored.
+All remaining lines denote the setting of an option.
+White space before and after options, and between
+options and option arguments is ignored.
+
+There are two kinds of options: General options influence
+.BR nscd (8)'s
+general behaviour, while cache related options only affect the
+specified cache. Options are set like this:
+.nf
+
+  general_option option
+  cache_option cache_name option
+.fi
+.SH GENERAL OPTIONS
+.TP
+.BI logfile \ file
+Specifies the name of the debug log-file that
+.BR nscd (8)
+should use if
+.B debug-level
+is higher than
+.BR 0 .
+If this option is not set,
+.BR nscd (8)
+will write its debug output to stderr.
+.TP
+.BI debug-level \ level
+If
+.I level
+is higher than
+.BR 0 ,
+.BR nscd (8)
+will create some debug output. The higher the level, the more verbose
+the output.
+.TP
+.BI threads \ #threads
+This option sets the number of threads that
+.BR nscd (8)
+should use by default. It can be overridden by calling
+.BR nscd (8)
+with the
+.I -t
+or
+.I --nthreads
+argument. If neither this configuration option nor the command line
+argument is given,
+.BR nscd (8)
+uses 5 threads by default. The minimum is 3. More threads means more
+simultaneous connections that
+.BR nscd (8)
+can handle.
+.TP
+.BI max-threads \ #threads
+Specifies the maximum number of threads to be started.
+.TP
+.BI server-user \ user
+By default,
+.BR nscd (8)
+is run as user root. This option can be set to force
+.BR nscd (8)
+to drop root privileges after startup. It cannot be used when
+.BR nscd (8)
+is called with the
+.I -S
+or
+.I --secure
+argument. Also note that some services require that nscd run as root, so
+using this may break those lookup services.
+.TP
+.BI stat-user \ user
+Specifies the user who is allowed to request statistics.
+.TP
+.BI paranoia \ bool
+.I bool
+must be one of
+.B yes
+or
+.BR no .
+Enabling paranoia mode causes 
+.BR nscd (8)
+to restart itself periodically.
+.TP
+.BI restart-interval \ time
+Sets the restart interval to time seconds if periodic restart is enabled by enabling
+paranoia mode. The default value is 3600.
+.SH CACHE OPTIONS
+All cache options take two arguments. The first one denotes
+the service or cache the option should affect. Currently
+.I service
+can be one of
+.BR passwd ,
+.BR group ,
+or
+.BR hosts .
+.TP
+.BI enable-cache \ service\ bool
+.I bool
+must be one of
+.B yes
+or
+.BR no .
+Each cache is disabled by default and must be enabled explicitly
+by setting this options to
+.BR yes .
+.TP
+.BI positive-time-to-live \ service\ secs
+This is the number of seconds after which a cached entry is
+removed from the cache. This defaults to 3600 seconds (i. e.
+one hour).
+.TP
+.BI negative-time-to-live \ service\ secs
+If an entry is not found by the Name Service, it is added to
+the cache and marked as "not existent". This option sets the number
+of seconds after which such a not existent entry is removed from
+the cache. This defaults to 20 seconds for the
+.B password
+and
+.B host
+caches and to 60 seconds for the
+.B group
+cache.
+.TP
+.BI suggested-size \ service\ prime-number
+This option sets the size of the hash that is used to store the
+cache entries. As this is a hash, it should be reasonably larger
+than the maximum number of entries that is expected to be cached
+simultaneously and should be a prime number. It defaults to a
+size of 211 entries.
+.TP
+.BI check-files \ service\ bool
+.I bool
+must be one of
+.B yes
+(default) or
+.BR no .
+If file checking is enabled,
+.BR nscd (8)
+periodically checks the modification time of
+.IR /etc/passwd ,
+.IR /etc/group ,
+or
+.I /etc/hosts
+(for the
+.BR passwd ,
+.BR group ,
+and
+.B host
+cache respectively)
+and invalidates the cache if the file has changed since the
+last check.
+.TP
+.BI persistent \ service\ bool
+.I bool
+must be one of
+.B yes
+(default) or
+.BR no .
+Keep the content of the cache for service over 
+.BR nscd (8)
+restarts. Useful when paranoia mode is set.
+.TP
+.BI shared \ service\ bool
+.I bool
+must be one of
+.B yes
+(default) or
+.BR no .
+The memory mapping of the
+.BR nscd (8)
+databases for service is shared with the clients so that they can directly search
+in them instead of having to ask the daemon over the socket each time a lookup is
+performed.
+.TP
+.BI reload-count \ #number
+Sets the number of times a cached record is reloaded before it is pruned from 
+the cache. Each cache record has a timeout, when that timeout expires, 
+.BR nscd (8)
+will either reload it (query the NSS service again if the data hasn't changed), or
+drop it.
+.TP
+.BI max-db-size \ service\ number-of-bytes  
+Sets the maximum allowable size for the service. 
+.TP
+.BI auto-propagate \ service\ bool
+When set to no for passwd or group service, then the 
+.I .byname
+requests are not added to
+.I passwd.byuid
+or
+.I group.bygid
+cache. This may help for tables containing multiple records for the same id.
+.SH EXAMPLE
+.nf
+
+# This is a comment.
+
+    logfile                 /var/log/nscd.log
+    threads                 6
+    server-user             nobody
+    debug-level             0
+
+    enable-cache            passwd          yes
+    positive-time-to-live   passwd          600
+    negative-time-to-live   passwd          20
+    suggested-size          passwd          211
+    check-files             passwd          yes
+
+    enable-cache            group           yes
+    positive-time-to-live   group           3600
+    negative-time-to-live   group           60
+    suggested-size          group           211
+    check-files             group           yes
+
+    enable-cache            hosts           yes
+    positive-time-to-live   hosts           3600
+    negative-time-to-live   hosts           20
+    suggested-size          hosts           211
+    check-files             hosts           yes
+.fi
+.SH SEE ALSO
+nscd(8), nsswitch.conf(5)

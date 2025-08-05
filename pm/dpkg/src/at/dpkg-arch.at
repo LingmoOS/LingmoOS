@@ -1,0 +1,30 @@
+m4_define([DPKG_ARCH], [dnl
+  dpkg DPKG_OPTIONS_COMMON --instdir=DPKG_DIR_INST dnl
+])
+
+AT_SETUP([dpkg native architecture support])
+AT_KEYWORDS([dpkg native arch])
+
+DPKG_GEN_DB_FILE([arch], [arm64
+])
+DPKG_GEN_DB_FILE([arch-native], [arm64
+])
+AT_CHECK([DPKG_ARCH --print-architecture], [], [arm64
+])
+AT_CHECK([DPKG_ARCH --print-foreign-architectures], [], [])
+
+AT_CLEANUP
+
+AT_SETUP([dpkg foreign architecture support])
+AT_KEYWORDS([dpkg foreign arch])
+
+DPKG_GEN_DB_FILE([arch], [arm64
+])
+DPKG_GEN_DB_FILE([arch-native], [riscv64
+])
+AT_CHECK([DPKG_ARCH --print-architecture], [], [riscv64
+])
+AT_CHECK([DPKG_ARCH --print-foreign-architectures], [], [arm64
+])
+
+AT_CLEANUP

@@ -1,0 +1,40 @@
+commit 5293b5ec02706bad449ea5eccd0058257a369638
+Author: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date:   Sun Mar 9 22:25:14 2025 +0100
+
+    aio_suspend64: Fix clock discrepancy [BZ #32795]
+    
+    cc5d5852c65e ("y2038: Convert aio_suspend to support 64 bit time")
+    switched from __clock_gettime (CLOCK_REALTIME, &now); to __clock_gettime64
+    (CLOCK_MONOTONIC, &ts);, but pthread_cond_timedwait is based on the
+    absolute realtime clock, so migrate to using pthread_cond_clockwait to
+    select CLOCK_MONOTONIC. Also fix AIO_MISC_WAIT into passing
+    CLOCK_MONOTONIC to __futex_abstimed_wait64.
+
+diff --git a/rt/aio_suspend.c b/rt/aio_suspend.c
+index 2257cd80d4..75d9d515d0 100644
+--- a/rt/aio_suspend.c
++++ b/rt/aio_suspend.c
+@@ -195,7 +195,8 @@ ___aio_suspend_time64 (const struct aiocb *const list[], int nent,
+       result = do_aio_misc_wait (&cntr, timeout == NULL ? NULL : &ts);
+ #else
+       struct timespec ts32 = valid_timespec64_to_timespec (ts);
+-      result = pthread_cond_timedwait (&cond, &__aio_requests_mutex,
++      result = __pthread_cond_clockwait (&cond, &__aio_requests_mutex,
++					 CLOCK_MONOTONIC,
+ 				       timeout == NULL ? NULL : &ts32);
+ #endif
+ 
+diff --git a/sysdeps/nptl/aio_misc.h b/sysdeps/nptl/aio_misc.h
+index ddc5acc379..87fd759f13 100644
+--- a/sysdeps/nptl/aio_misc.h
++++ b/sysdeps/nptl/aio_misc.h
+@@ -50,7 +50,7 @@
+ 		FUTEX_PRIVATE);						      \
+ 	    else							      \
+ 	      status = __futex_abstimed_wait64 ((unsigned int *) futexaddr,   \
+-		oldval, CLOCK_REALTIME, timeout, FUTEX_PRIVATE); 	      \
++		oldval, CLOCK_MONOTONIC, timeout, FUTEX_PRIVATE); 	      \
+ 	    if (status != EAGAIN)					      \
+ 	      break;							      \
+ 									      \

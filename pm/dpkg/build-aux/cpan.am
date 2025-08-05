@@ -1,0 +1,46 @@
+CPAN_DIST_NAME = $(PACKAGE_CPAN_NAME)
+CPAN_DIST_VERSION = $(PACKAGE_VERSION)
+if !PACKAGE_DIST_IS_RELEASE
+CPAN_DIST_SUFFIX = -TRIAL
+endif
+CPAN_DIST = $(CPAN_DIST_NAME)-$(CPAN_DIST_VERSION)$(CPAN_DIST_SUFFIX)
+CPAN_DIST_ARCHIVE = $(CPAN_DIST).tar.gz
+
+dist-cpan:
+	: # Create the CPAN source tree.
+	mkdir -p $(CPAN_DIST)
+	mkdir -p $(CPAN_DIST)/lib
+	mkdir -p $(CPAN_DIST)/t
+	cp -fpR $(top_srcdir)/COPYING $(CPAN_DIST)/LICENSE
+	cp -fpR $(top_srcdir)/debian/changelog $(CPAN_DIST)/Changes
+	cp -fpR $(top_srcdir)/data $(CPAN_DIST)
+	cp -fpR $(top_srcdir)/t/* \
+	         $(top_srcdir)/scripts/t/Dpkg* \
+	         $(top_srcdir)/scripts/t/origins \
+	         $(CPAN_DIST)/t
+	cp -fpR $(top_srcdir)/scripts/Dpkg.pm $(CPAN_DIST)/lib/
+	cp -fpR $(top_srcdir)/scripts/Dpkg $(CPAN_DIST)/lib/
+	cp -fpR $(top_srcdir)/scripts/Test $(CPAN_DIST)/lib/
+	cp -fpR $(top_builddir)/scripts/README.cpan $(CPAN_DIST)/README
+	cp -fpR $(top_builddir)/scripts/Build.PL $(CPAN_DIST)
+
+	: # Fix permissions of the distributed files.
+	find $(CPAN_DIST) \
+	       -type d ! -perm 755 -exec chmod u+rwx,go+rx {} ';' -o \
+	     ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
+	     ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
+	     ! -type d ! -perm -444 -exec $(install_sh) -c -m a+r {} {} \; || \
+	  chmod -R a+r $(CPAN_DIST)
+
+	: # Prepare the CPAN distribution.
+	cd $(CPAN_DIST) && $(PERL) Build.PL
+	cd $(CPAN_DIST) && ./Build manifest
+	cd $(CPAN_DIST) && ./Build distdir
+
+	: # Pack the CPAN distribution.
+	$(TAR) -caf $(CPAN_DIST_ARCHIVE) -C $(CPAN_DIST) -Hustar \
+	  --sort=name --owner=root:0 --group=root:0 $(CPAN_DIST)
+
+	: # Cleanup the CPAN source tree.
+	find $(CPAN_DIST) -type d ! -perm -200 -exec chmod u+w {} ';'
+	rm -rf $(CPAN_DIST)

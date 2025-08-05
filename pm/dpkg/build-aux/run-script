@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+top_srcdir="$(dirname "$0")/.."
+
+# To avoid using «readlink -f» or «realpath» we just change into the
+# desired directory and work from there.
+cd "$top_srcdir"
+cwd="$(pwd)"
+cd "$OLDPWD"
+
+# Set up the environment, to use local perl modules and data files.
+export PERL="${PERL:-perl}"
+export PERL5LIB="$cwd/scripts:$cwd/dselect/methods"
+export DPKG_DATADIR="$cwd/data"
+
+script="$1"
+shift 1
+
+exec "$PERL" "$cwd/$script" "$@"

@@ -1,0 +1,23 @@
+Description: Lie about futex_atomic_cmpxchg_inatomic kernel support.
+ In past versions of glibc, we incorrectly assumed all ARM kernels
+ in all configurations supported futex_atomic_cmpxchg_inatomic. This
+ was clearly a lie, however it was a lie that we relied on, because
+ the fallback implementation appears to not play nicely with certain
+ applications like pulseaudio.  Restore the lie for kernels > 2.6.32
+ and plug our ears and scream "LA LA LA" about how wrong this is.
+Author: Adam Conrad <adconrad@ubuntu.com>
+Bug-Ubuntu: https://launchpad.net/bugs/1436162
+Bug-Debian: https://bugs.debian.org/788799
+Last-Update: 2015-03-25
+
+--- glibc-2.21.orig/sysdeps/unix/sysv/linux/arm/kernel-features.h
++++ glibc-2.21/sysdeps/unix/sysv/linux/arm/kernel-features.h
+@@ -37,7 +37,7 @@
+ /* The ARM kernel before 3.14.3 may or may not support
+    futex_atomic_cmpxchg_inatomic, depending on kernel
+    configuration.  */
+-#if __LINUX_KERNEL_VERSION < 0x030E03
++#if __LINUX_KERNEL_VERSION < 0x020620
+ # undef __ASSUME_SET_ROBUST_LIST
+ #endif
+ 

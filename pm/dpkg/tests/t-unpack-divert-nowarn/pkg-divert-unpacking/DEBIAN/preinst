@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+  dpkg-divert --quiet --package pkg-divert-unpacking --rename \
+              --divert /test-file.diverted --add /test-file 2>&1 | \
+    grep "warning: " && echo "Fail: warning in output" && exit 1 ||
+    echo Pass
+fi

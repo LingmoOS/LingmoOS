@@ -1,0 +1,55 @@
+.\" SPDX-License-Identifier: 0BSD
+.\"
+.Dd May 5, 2022
+.Dt LOCALE-GEN 8
+.Os
+.
+.Sh NAME
+.Nm locale-gen
+.Nd generate localisation files from templates
+.Sh SYNOPSIS
+.Nm
+.Op Fl -keep-existing
+.
+.Sh DESCRIPTION
+As compiled locales are large, only templates are distributed in the default
+.Sy locales
+package, and only the desired locales are compiled on the target system.
+.Pp
+After selecting the locales into
+.Pa /etc/locale.gen
+.Pq via Nm dpkg No package configuration, for example ,
+.Nm
+is run to compile them via
+.Xr localedef 1 .
+.
+.Sh OPTIONS
+.Bl -tag -compact -width ".Fl -keep-existing"
+.It Fl -keep-existing
+Do not remove
+.Pa /usr/lib/locale/locale-archive ,
+only compiling new locales.
+.El
+.
+.Sh FILES
+.Bl -tag -compact -width ".Pa /etc/locale.gen"
+.It Pa /etc/locale.gen
+Whitespace-separated newline-delimited
+.Ar locale charset
+list of locales to build with
+.Li #
+start-of-line comments.
+.El
+.
+.Sh SEE ALSO
+.Xr locale 1 ,
+.Xr localedef 1 ,
+.Xr locale.gen 5
+.Pp
+.Pa /usr/share/i18n/SUPPORTED
+.Pq Pa /usr/local/share/i18n/SUPPORTED
+\(em list of all supported locales on the current system.
+.Pp
+The
+.Sy locales-all
+package, which contains all supported locales in compiled form.

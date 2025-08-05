@@ -1,0 +1,587 @@
+# dpkg manual page - dpkg-architecture(1)
+#
+# Copyright © 2005 Marcus Brinkmann <brinkmd@debian.org>
+# Copyright © 2005 Scott James Remnant <scott@netsplit.com>
+# Copyright © 2006-2015 Guillem Jover <guillem@debian.org>
+# Copyright © 2009-2012 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-architecture - set and determine the architecture for package building
+
+=head1 SYNOPSIS
+
+B<dpkg-architecture>
+[I<option>...] [I<command>]
+
+=head1 DESCRIPTION
+
+B<dpkg-architecture>
+provides a facility to determine and set the build and
+host architecture for package building.
+
+The build architecture is always determined by either the B<DEB_BUILD_ARCH>
+variable if set (and B<--force> not being specified) or by an external call to
+L<dpkg(1)>, and cannot be set at the command line.
+
+You can specify the host architecture by providing one or both of the options
+B<--host-arch> and B<--host-type>, otherwise the B<DEB_HOST_ARCH> variable
+is used if set (and B<--force> not being specified).
+The default is
+determined by an external call to L<gcc(1)>,
+or the same as the build architecture if B<CC> or gcc are both not
+available.
+One out of B<--host-arch> and B<--host-type> is
+sufficient, the value of the
+other will be set to a usable default.
+Indeed, it is often better to only
+specify one, because B<dpkg-architecture> will warn you if your choice
+does not match the default.
+
+=head1 COMMANDS
+
+=over
+
+=item B<-l>, B<--list>
+
+Print the environment variables, one each line, in the format
+I<VARIABLE=value>.
+This is the default action.
+
+=item B<-e>, B<--equal> I<architecture>
+
+Check for equality of architecture (since dpkg 1.13.13).
+It compares the current or specified Debian host architecture against
+I<architecture>, to check if they are equal.
+This action will not expand the architecture wildcards.
+Command finishes with an exit status of 0 if matched, 1 if not matched.
+
+=item B<-i>, B<--is> I<architecture-wildcard>
+
+Check for identity of architecture (since dpkg 1.13.13).
+It compares the current or specified Debian host architecture against
+I<architecture-wildcard> after having expanded it as an architecture
+wildcard, to check if they match.
+Command finishes with an exit status of 0 if matched, 1 if not matched.
+
+=item B<-q>, B<--query> I<variable-name>
+
+Print the value of a single variable.
+
+=item B<-s>, B<--print-set>
+
+Print an export command.
+This can be used to set the environment variables
+using the POSIX shell or make B<eval>, depending on the output format.
+
+=item B<-u>, B<--print-unset>
+
+Print a similar command to B<--print-set> but to unset all variables.
+
+=item B<-c>, B<--command> I<command-string>
+
+Execute a I<command-string> in an environment which has all variables
+set to the determined value.
+
+If the I<command-string> contains shell metacharacters, then it will be
+invoked through the system bourne shell.
+
+=item B<-L>, B<--list-known>
+
+Print a list of valid architecture names.
+Possibly restricted by one or more of the matching options
+B<--match-wildcard>, B<--match-bits> or B<--match-endian>
+(since dpkg 1.17.14).
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-a>, B<--host-arch> I<architecture>
+
+Set the host Debian architecture.
+
+=item B<-t>, B<--host-type> I<gnu-system-type>
+
+Set the host GNU system type.
+
+=item B<-A>, B<--target-arch> I<architecture>
+
+Set the target Debian architecture (since dpkg 1.17.14).
+
+=item B<-T>, B<--target-type> I<gnu-system-type>
+
+Set the target GNU system type (since dpkg 1.17.14).
+
+=item B<-W>, B<--match-wildcard> I<architecture-wildcard>
+
+Restrict the architectures listed by B<--list-known> to ones matching
+the specified architecture wildcard (since dpkg 1.17.14).
+
+=item B<-B>, B<--match-bits> I<architecture-bits>
+
+Restrict the architectures listed by B<--list-known> to ones with the
+specified CPU bits (since dpkg 1.17.14).
+Either B<32> or B<64>.
+
+=item B<-E>, B<--match-endian> I<architecture-endianness>
+
+Restrict the architectures listed by B<--list-known> to ones with the
+specified endianness (since dpkg 1.17.14).
+Either B<little> or B<big>.
+
+=item B<--print-format> I<format>
+
+Sets the output format for B<--print-set> and B<--print-unset>
+(since dpkg 1.20.6), to either B<shell> (default) or B<make>.
+
+=item B<-f>, B<--force>
+
+Values set by existing environment variables with the same name as used by
+the scripts are honored (i.e. used by B<dpkg-architecture>), except if
+this force flag is present.
+This allows the user
+to override a value even when the call to B<dpkg-architecture> is buried
+in some other script (for example L<dpkg-buildpackage(1)>).
+
+=back
+
+=head1 TERMS
+
+=over
+
+=item build machine
+
+The machine the package is built on.
+
+=item host machine
+
+The machine the package is built for.
+
+=item target machine
+
+The machine the compiler is building for, or the emulator will run code for.
+This is only needed when building a cross-toolchain (or emulator), one that
+will be built on the build architecture, to be run on the host architecture,
+and that itself will build (or run emulated) code for the target architecture.
+
+=item Debian architecture
+
+The Debian architecture string,
+used in binary packages,
+which specifies the binary tree in a package repository.
+
+Examples: i386, sparc, hurd-i386.
+
+=item Debian architecture tuple
+
+A Debian architecture tuple is the fully qualified architecture with all its
+components spelled out.
+This differs with Debian architectures in that at least the I<cpu>
+component does not embed the I<abi>.
+The current tuple has the form I<abi>-I<libc>-I<os>-I<cpu>.
+
+Examples: base-gnu-linux-amd64, eabihf-musl-linux-arm.
+
+=item Debian architecture wildcard
+
+A Debian architecture wildcard is a special architecture string that will
+match any real architecture being part of it.
+The general form is a Debian architecture tuple with four or less elements,
+and with at least one of them being B<any>.
+Missing elements of the tuple are prefixed implicitly as B<any>, and thus
+the following pairs are equivalent:
+
+=over
+
+=item B<any>-B<any>-B<any>-B<any> = B<any>
+
+=item B<any>-B<any>-I<os>-B<any> = I<os>-B<any>
+
+=item B<any>-I<libc>-B<any>-B<any> = I<libc>-B<any>-B<any>
+
+=back
+
+Examples: linux-any, any-i386, hurd-any, eabi-any-any-arm,
+musl-any-any.
+
+=item GNU system type
+
+An architecture specification string consisting of two parts separated by
+a hyphen: CPU and system.
+
+The CPU part never contains a hyphen,
+while the system part might itself contain a hyphen to separate a kernel
+from its general ABI,
+where the general ABI might contain both runtime (such as libc) and
+executable ABI specifiers joined without a hyphen.
+
+Examples: i586-linux-gnu, sparc-linux-gnu, i686-gnu, x86_64-netbsd.
+
+=item multiarch triplet
+
+The clarified GNU system type, used for filesystem paths.
+This triplet does not change even when the baseline ISA gets bumped,
+so that the resulting paths are stable over time.
+The only current difference with the GNU system type is that the CPU part
+for i386 based systems is always i386.
+
+Examples: i386-linux-gnu, x86_64-linux-gnu.
+Example paths: /lib/powerpc64le-linux-gnu/, /usr/lib/i386-kfreebsd-gnu/.
+
+=back
+
+=head1 VARIABLES
+
+The following variables are read from the environment (unless B<--force>
+has been specified) and set by B<dpkg-architecture> (see the B<TERMS>
+section for a description of the naming scheme):
+
+=over
+
+=item B<DEB_BUILD_ARCH>
+
+The Debian architecture of the build machine.
+
+B<Note>: If you are not building tools that need to run during the build,
+these are probably not the variables you are looking for.
+Please see L</TERMS> section for the meanings of these terms.
+
+=item B<DEB_BUILD_ARCH_ABI>
+
+The Debian ABI name of the build machine (since dpkg 1.18.11).
+
+=item B<DEB_BUILD_ARCH_LIBC>
+
+The Debian libc name of the build machine (since dpkg 1.18.11).
+
+=item B<DEB_BUILD_ARCH_OS>
+
+The Debian system name of the build machine (since dpkg 1.13.2).
+
+=item B<DEB_BUILD_ARCH_CPU>
+
+The Debian CPU name of the build machine (since dpkg 1.13.2).
+
+=item B<DEB_BUILD_ARCH_BITS>
+
+The pointer size of the build machine (in bits; since dpkg 1.15.4).
+
+=item B<DEB_BUILD_ARCH_ENDIAN>
+
+The endianness of the build machine (little / big; since dpkg 1.15.4).
+
+=item B<DEB_BUILD_GNU_CPU>
+
+The GNU CPU part of B<DEB_BUILD_GNU_TYPE>.
+
+=item B<DEB_BUILD_GNU_SYSTEM>
+
+The GNU system part of B<DEB_BUILD_GNU_TYPE>.
+
+=item B<DEB_BUILD_GNU_TYPE>
+
+The GNU system type of the build machine.
+
+=item B<DEB_BUILD_MULTIARCH>
+
+The clarified GNU system type of the build machine, used for filesystem
+paths (since dpkg 1.16.0).
+
+=item B<DEB_HOST_ARCH>
+
+The Debian architecture of the host machine.
+
+=item B<DEB_HOST_ARCH_ABI>
+
+The Debian ABI name of the host machine (since dpkg 1.18.11).
+
+=item B<DEB_HOST_ARCH_LIBC>
+
+The Debian libc name of the host machine (since dpkg 1.18.11).
+
+=item B<DEB_HOST_ARCH_OS>
+
+The Debian system name of the host machine (since dpkg 1.13.2).
+
+=item B<DEB_HOST_ARCH_CPU>
+
+The Debian CPU name of the host machine (since dpkg 1.13.2).
+
+=item B<DEB_HOST_ARCH_BITS>
+
+The pointer size of the host machine (in bits; since dpkg 1.15.4).
+
+=item B<DEB_HOST_ARCH_ENDIAN>
+
+The endianness of the host machine (little / big; since dpkg 1.15.4).
+
+=item B<DEB_HOST_GNU_CPU>
+
+The GNU CPU part of B<DEB_HOST_GNU_TYPE>.
+
+=item B<DEB_HOST_GNU_SYSTEM>
+
+The GNU system part of B<DEB_HOST_GNU_TYPE>.
+
+=item B<DEB_HOST_GNU_TYPE>
+
+The GNU system type of the host machine.
+
+=item B<DEB_HOST_MULTIARCH>
+
+The clarified GNU system type of the host machine, used for filesystem
+paths (since dpkg 1.16.0).
+
+=item B<DEB_TARGET_ARCH>
+
+The Debian architecture of the target machine (since dpkg 1.17.14).
+
+B<Note>: If you are not building cross-toolchains (or emulators),
+these are probably not the variables you are looking for.
+Please see L</TERMS> section for the meanings of these terms.
+
+=item B<DEB_TARGET_ARCH_ABI>
+
+The Debian ABI name of the target machine (since dpkg 1.18.11).
+
+=item B<DEB_TARGET_ARCH_LIBC>
+
+The Debian libc name of the target machine (since dpkg 1.18.11).
+
+=item B<DEB_TARGET_ARCH_OS>
+
+The Debian system name of the target machine (since dpkg 1.17.14).
+
+=item B<DEB_TARGET_ARCH_CPU>
+
+The Debian CPU name of the target machine (since dpkg 1.17.14).
+
+=item B<DEB_TARGET_ARCH_BITS>
+
+The pointer size of the target machine (in bits; since dpkg 1.17.14).
+
+=item B<DEB_TARGET_ARCH_ENDIAN>
+
+The endianness of the target machine (little / big; since dpkg 1.17.14).
+
+=item B<DEB_TARGET_GNU_CPU>
+
+The GNU CPU part of B<DEB_TARGET_GNU_TYPE> (since dpkg 1.17.14).
+
+=item B<DEB_TARGET_GNU_SYSTEM>
+
+The GNU system part of B<DEB_TARGET_GNU_TYPE> (since dpkg 1.17.14).
+
+=item B<DEB_TARGET_GNU_TYPE>
+
+The GNU system type of the target machine (since dpkg 1.17.14).
+
+=item B<DEB_TARGET_MULTIARCH>
+
+The clarified GNU system type of the target machine, used for filesystem
+paths (since dpkg 1.17.14).
+
+=back
+
+=head1 FILES
+
+=head2 Architecture tables
+
+All these files have to be present for B<dpkg-architecture> to
+work.
+Their location can be overridden at runtime with the environment
+variable B<DPKG_DATADIR>.
+These tables contain a format B<Version> pseudo-field on their first
+line to mark their format, so that parsers can check if they understand
+it, such as "# Version=1.0".
+
+=over
+
+=item I<%PKGDATADIR%/cputable>
+
+Table of known CPU names and mapping to their GNU name.
+Format version 1.0 (since dpkg 1.13.2).
+
+=item I<%PKGDATADIR%/ostable>
+
+Table of known operating system names and mapping to their GNU name.
+Format version 2.0 (since dpkg 1.18.11).
+
+=item I<%PKGDATADIR%/tupletable>
+
+Mapping between Debian architecture tuples and Debian architecture
+names.
+Format version 1.0 (since dpkg 1.18.11).
+
+=item I<%PKGDATADIR%/abitable>
+
+Table of Debian architecture ABI attribute overrides.
+Format version 2.0 (since dpkg 1.18.11).
+
+=back
+
+=head2 Packaging support
+
+=over
+
+=item I<%PKGDATADIR%/architecture.mk>
+
+Makefile snippet that properly sets and exports all the variables that
+B<dpkg-architecture> outputs (since dpkg 1.16.1).
+
+=back
+
+=head1 EXAMPLES
+
+B<dpkg-buildpackage> accepts the B<-a> option and passes it to
+B<dpkg-architecture>.
+Other examples:
+
+=over
+
+ CC=i386-gnu-gcc dpkg-architecture -c debian/rules build
+
+ eval $(dpkg-architecture -u)
+
+=back
+
+Check if the current or specified host architecture is equal to an
+architecture:
+
+=over
+
+ dpkg-architecture -elinux-arm64
+
+ dpkg-architecture -ariscv64 -elinux-riscv64
+
+=back
+
+Check if the current or specified host architecture is a Linux system:
+
+=over
+
+ dpkg-architecture -ilinux-any
+
+ dpkg-architecture -aamd64 -ilinux-any
+
+=back
+
+=head2 Usage in debian/rules
+
+The environment variables set by B<dpkg-architecture> are passed to
+I<debian/rules> as make variables (see make documentation).
+However,
+you should not rely on them, as this breaks manual invocation of the
+script.
+Instead, you should always initialize them using
+B<dpkg-architecture> with the B<-q> option.
+Here are some examples,
+which also show how you can improve the cross compilation support in your
+package:
+
+Retrieving the GNU system type and forwarding it to ./configure:
+
+=over
+
+ DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ [...]
+ ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+   confflags += --build=$(DEB_HOST_GNU_TYPE)
+ else
+   confflags += --build=$(DEB_BUILD_GNU_TYPE) \
+                --host=$(DEB_HOST_GNU_TYPE)
+ endif
+ [...]
+ ./configure $(confflags)
+
+=back
+
+Doing something only for a specific architecture:
+
+=over
+
+ DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+ ifeq ($(DEB_HOST_ARCH),arm64)
+   [...]
+ endif
+
+=back
+
+or if you only need to check the CPU or OS type, use the
+B<DEB_HOST_ARCH_CPU> or B<DEB_HOST_ARCH_OS> variables.
+
+Note that you can also rely on an external Makefile snippet to properly
+set all the variables that B<dpkg-architecture> can provide:
+
+=over
+
+ include %PKGDATADIR%/architecture.mk
+
+ ifeq ($(DEB_HOST_ARCH),arm64)
+   [...]
+ endif
+
+=back
+
+In any case, you should never use B<dpkg --print-architecture> to get
+architecture information during a package build.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_DATADIR>
+
+If set, it will be used as the B<dpkg> data directory, where the
+architecture tables are located (since dpkg 1.14.17).
+Defaults to «%PKGDATADIR%».
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 NOTES
+
+All long command and option names available only since dpkg 1.17.17.
+
+=head1 SEE ALSO
+
+L<dpkg-buildpackage(1)>.

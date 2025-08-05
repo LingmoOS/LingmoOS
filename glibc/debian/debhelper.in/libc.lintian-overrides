@@ -1,0 +1,22 @@
+# ld.so must be executable, otherwise the system will not work
+shared-library-is-executable 0755 [*/ld*.so.*]
+
+# It is normal that the ELF dynamic linker does not need any other 
+# library
+shared-library-lacks-prerequisites */ld*.so.*
+
+# A linker script is used instead of a symlink (see debian-policy bug#1095039)
+lacks-unversioned-link-to-shared-library * [*/libc.so.*]
+
+# These are empty libraries shipped for backward compatibilities
+lacks-unversioned-link-to-shared-library * [*/libdl.so.*]
+lacks-unversioned-link-to-shared-library * [*/libpthread.so.*]
+lacks-unversioned-link-to-shared-library * [*/librt.so.*]
+lacks-unversioned-link-to-shared-library * [*/libutil.so.*]
+
+# These are plugins and not general purpose libraries
+lacks-unversioned-link-to-shared-library * [*/libnss_dns.so.*]
+lacks-unversioned-link-to-shared-library * [*/libnss_files.so.*]
+
+# dependency on debconf is not needed, as glibc has a fallback to tty 
+missing-debconf-dependency-for-preinst

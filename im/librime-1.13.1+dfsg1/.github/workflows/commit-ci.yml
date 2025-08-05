@@ -1,0 +1,36 @@
+name: Commit CI
+
+on:
+  push:
+    branches:
+      - '!master'
+    tags:
+      - '![0-9]+.*'
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: macos-14
+    steps:
+      - name: Checkout last commit
+        uses: actions/checkout@v4
+      - name: Install latest lang-format
+        run: brew update && brew install clang-format
+      - name: Code style lint
+        run: make clang-format-lint
+
+  linux:
+    needs: lint
+    uses: ./.github/workflows/linux-build.yml
+
+  macos:
+    needs: lint
+    uses: ./.github/workflows/macos-build.yml
+
+  windows:
+    needs: lint
+    uses: ./.github/workflows/windows-build.yml
+
+  docker:
+    needs: lint
+    uses: ./.github/workflows/docker-build.yml

@@ -1,0 +1,236 @@
+#! /usr/bin/make -f
+# -*- makefile -*-
+# debian/rules file for GNU libc.
+# Copyright 1998, 1999 by Joel Klecker <espy@debian.org>
+# Copyright 2000-2004 Ben Collins <bcollins@debian.org>
+# Copyright 2002-2004 Jeff Bailey <jbailey@debian.org>
+# Copyright 2002-2005 Philip Blundell <pb@debian.org>
+# Copyright 2002-2006 Daniel Jacobowitz <dan@debian.org>
+# Copyright 2002-2006 GOTO Masanori <gotom@debian.org>
+# Copyright 2006 Denis Barbier <barbier@debian.org>
+# Copyright 2006-2025 Aurelien Jarno <aurel32@debian.org>
+# Copyright 2007-2008 Pierre Habouzit <madcoder@debian.org>
+# Copyright 2010-2013 Clint Adams <clint@debian.org>
+# Copyright 2012-2019 Adam Conrad <adconrad@0c3.net>
+# Copyright 2016-2025 Samuel Thibault <sthibault@debian.org>
+# This Makefile is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# What are the phases to building glibc?
+
+# Unpack main tarball
+# Do any necessary overlays
+# Apply patches
+# Determine how many builds there are to do.  For Each build:
+
+#  Create build directory
+#  Configure
+#  Build
+#  Test as desired
+#  Install to package directories
+
+# Run debian magic to build packages.
+
+# Things you may need to customise:
+
+# These are done as absolute paths so that in the case of filesystem size
+# limitations, they can be overridden and spread all over.
+build-tree := build-tree
+debian-tmp = debian/tmp$(filter-out -libc,-$(curpass))
+stamp := $(CURDIR)/stamp-dir/
+DUMMY := $(shell mkdir -p $(stamp))
+
+# Beyond here you shouldn't need to customise anything:
+DEB_HOST_ARCH         ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_ARCH_CPU     ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+DEB_HOST_ARCH_ENDIAN  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_ENDIAN)
+DEB_HOST_ARCH_OS      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_GNU_TYPE     ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_HOST_MULTIARCH    ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+DEB_BUILD_ARCH        ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+DEB_BUILD_ARCH_BITS   ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_BITS)
+DEB_BUILD_GNU_TYPE    ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+include /usr/share/dpkg/pkg-info.mk
+
+# The minimum package version with which these packages are compatible.
+shlib_dep_ver = $(DEB_VERSION_UPSTREAM)
+shlib_dep = $(libc) (>= $(shlib_dep_ver))
+
+DEB_BUILDDIR ?= $(build-tree)/$(DEB_HOST_ARCH)-$(curpass)
+DEB_BUILDDIRLIBC ?= $(build-tree)/$(DEB_HOST_ARCH)-libc
+
+GLIBC_SOURCES = $(filter-out debian $(shell basename $(stamp)) $(build-tree), $(wildcard *))
+
+# Support multiple makes at once based on number of processors
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+NJOBS := -j $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+
+# use the package settings, not the settings from the environment
+define unsetenv
+  unexport $(1)
+  $(1) =
+endef
+$(foreach v, CPPFLAGS CFLAGS CXXFLAGS LDFLAGS, $(if $(filter environment,$(origin $(v))),$(eval $(call unsetenv, $(v)))))
+
+# export debhelper substitution variables
+export $(build-tree)
+
+# Default setup
+GLIBC_PASSES ?= libc
+
+prefix=/usr
+bindir=$(prefix)/bin
+datadir=$(prefix)/share
+complocaledir=$(prefix)/lib/locale
+sysconfdir=/etc
+libexecdir=$(prefix)/lib
+rootsbindir=/sbin
+includedir=$(prefix)/include
+docdir=$(prefix)/share/doc
+mandir=$(prefix)/share/man
+sbindir=$(prefix)/sbin
+vardbdir=/var/lib/misc
+rtlddir=/lib
+slibdir=/lib/$(DEB_HOST_MULTIARCH)
+libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
+mvec = no
+
+rtld_so=$(shell awk 'BEGIN {FS="="} /^ld\.so-version/ {print $$2}' $(DEB_BUILDDIR)/soversions.mk)
+rtld_target=$(shell readlink $(debian-tmp)$(rtlddir)/$(rtld_so))
+libc_so=$(shell awk 'BEGIN {FS="="} /^libc\.so-version/ {print "libc.so"$$2}' $(DEB_BUILDDIR)/soversions.mk)
+
+BASE_CC = gcc
+BASE_CXX = g++
+BASE_MIG = mig
+# If you override DEB_GCC_VERSION, consider adding DEB_CFLAGS_APPEND=-Wno-error.
+DEB_GCC_VERSION ?= -14
+
+RUN_TESTSUITE = yes
+TIMEOUTFACTOR = 25
+
+# Set cross and native compiler names, including version.
+CC     = $(DEB_HOST_GNU_TYPE)-$(BASE_CC)$(DEB_GCC_VERSION)
+CXX    = $(DEB_HOST_GNU_TYPE)-$(BASE_CXX)$(DEB_GCC_VERSION)
+MIG    = $(DEB_HOST_GNU_TYPE)-$(BASE_MIG)
+BUILD_CC = $(DEB_BUILD_GNU_TYPE)-$(BASE_CC)
+BUILD_CXX = $(DEB_BUILD_GNU_TYPE)-$(BASE_CXX)
+
+BUILD_CFLAGS = -O2 -g -fdebug-prefix-map=$(CURDIR)=.
+HOST_CFLAGS = -pipe -O2 -g -fdebug-prefix-map=$(CURDIR)=. $(call xx,extra_cflags)
+
+# 32-bit MIPS builders have a 2GB memory space. This is not enough to
+# build test-tgmath3.o with GCC, unless tweaking the garbage collector.
+ifeq ($(findstring mips,$(DEB_BUILD_ARCH))-$(DEB_BUILD_ARCH_BITS), mips-32)
+  CC += --param ggc-min-expand=10
+endif
+
+configure_target := $(DEB_HOST_GNU_TYPE)
+
+# Normally we'll just use this for --build.  If the architecture requires
+# that build daemons be able to run a particular optimized library, then
+# they can set the --build to match --host for that optimized build.
+# Among other things this lets tests run.
+configure_build := $(DEB_BUILD_GNU_TYPE)
+
+# Which build pass are we on?
+curpass = $(filter-out %_,$(subst _,_ ,$@))
+
+ifneq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
+  DEB_ARCH_REGULAR_PACKAGES = $(libc)-dev
+  DEB_INDEP_REGULAR_PACKAGES =
+  DEB_UDEB_PACKAGES =
+  ifeq ($(filter nocheck,$(DEB_BUILD_OPTIONS)),)
+    DEB_BUILD_OPTIONS+=nocheck
+  endif
+else
+  DEB_ARCH_REGULAR_PACKAGES = $(libc) $(libc)-dev $(libc)-dbg libc-bin libc-dev-bin
+  ifeq ($(filter stage2,$(DEB_BUILD_PROFILES)),)
+    DEB_ARCH_REGULAR_PACKAGES += libc-devtools
+  endif
+  DEB_INDEP_REGULAR_PACKAGES = glibc-doc glibc-source libc-l10n locales
+  ifneq ($(filter noudeb,$(DEB_BUILD_PROFILES)),)
+    DEB_UDEB_PACKAGES =
+  else
+    DEB_UDEB_PACKAGES = $(libc)-udeb
+  endif
+  ## Locales can only be pre-generated during native compiles
+  ifeq ($(DEB_HOST_ARCH),$(DEB_BUILD_ARCH))
+    DEB_ARCH_REGULAR_PACKAGES += locales-all
+  endif
+endif
+
+# Generic kernel version check
+define kernel_check
+(if [ $(CURRENT_KERNEL_VERSION) -lt $(1) ]; then \
+  false; \
+fi)
+endef
+
+# Include libidn for both NPTL and FBTL targets.
+standard-add-ons = libidn,
+
+# Pull in all the per-arch magic!
+
+-include debian/sysdeps/$(DEB_HOST_ARCH_OS).mk
+-include debian/sysdeps/$(DEB_HOST_ARCH).mk
+
+ifneq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
+DEB_ARCH_REGULAR_PACKAGES += $(foreach p,$(DEB_ARCH_MULTILIB_PACKAGES), $(if $(findstring -dev,$(p)), $(p)))
+else
+DEB_ARCH_REGULAR_PACKAGES += $(DEB_ARCH_MULTILIB_PACKAGES)
+endif
+
+# Don't run dh_strip on this package
+NOSTRIP_$(libc)-dbg = 1
+
+# Put the debug files from these packages in $(libc)-dbg
+DEBUG_$(libc) = 1
+
+ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
+  ifeq ($(threads),yes)
+  DEB_ARCH_REGULAR_PACKAGES += nscd
+  endif
+endif
+
+# And now the rules...
+include debian/rules.d/*.mk
+
+clean:: unpatch
+	rm -rf $(patsubst %,debian/tmp-%,$(GLIBC_PASSES))
+	rm -rf $(build-tree)
+	rm -rf $(stamp)
+	rm -rf debian/include
+	rm -f debian/control.in/libc0.3	debian/control.in/libc6 debian/control.in/libc6.1 \
+		debian/*.preinst.* debian/*.links.*
+
+# Required Debian targets
+build-arch: $(stamp)info \
+	$(patsubst %,$(stamp)build_%,$(GLIBC_PASSES)) \
+	$(patsubst %,$(stamp)check_%,$(GLIBC_PASSES)) \
+	build-arch-post-check
+
+ifeq ($(filter stage1,$(DEB_BUILD_PROFILES)),)
+build-arch: $(stamp)build_C.utf8 \
+	$(stamp)build_locales-all
+endif
+
+build-indep: $(stamp)source $(stamp)build_libc
+
+build: build-arch build-indep
+
+
+binary-indep: build-indep testroot debian/control $(build-tree) \
+	$(patsubst %,$(stamp)binaryinst_%,$(DEB_INDEP_REGULAR_PACKAGES))
+
+binary-arch: build-arch testroot debian/control $(build-tree) \
+	$(patsubst %,$(stamp)binaryinst_%,$(DEB_ARCH_REGULAR_PACKAGES)) \
+	$(patsubst %,$(stamp)binaryinst_%,$(DEB_UDEB_PACKAGES))
+
+binary: binary-indep binary-arch
+
+testroot:
+	dh_testroot

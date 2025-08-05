@@ -1,0 +1,22 @@
+m4_define([DPKG_DB_TRIGGERS_DEFERRED], [DPKG_DIR_ADMIN/triggers/Unincorp])
+m4_define([DPKG_TRIGGER], [dnl
+  dpkg-trigger DPKG_OPTIONS_COMMON dnl
+])
+
+AT_SETUP([dpkg trigger no-act])
+AT_KEYWORDS([dpkg trigger])
+
+AT_DATA([ref-deferred], [synthetic-trigger synthetic-package
+])
+
+DPKG_GEN_DB_TRIGGERS_FILE([Lock], [])
+DPKG_GEN_DB_TRIGGERS_FILE([Unincorp], [])
+
+AT_CHECK([DPKG_TRIGGER --by-package synthetic-package synthetic-trigger], [], [])
+DPKG_CHECK_DIFF([DPKG_DB_TRIGGERS_DEFERRED], [ref-deferred])
+
+# Check whether we are really doing nothing.
+AT_CHECK([DPKG_TRIGGER --by-package synthetic-package --no-act synthetic-trigger], [], [])
+DPKG_CHECK_DIFF([DPKG_DB_TRIGGERS_DEFERRED], [ref-deferred])
+
+AT_CLEANUP

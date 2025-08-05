@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+if [ "$(id -u)" != '0' ]; then
+  # Fail, we declared needing root as a restriction.
+  exit 1
+fi
+
+srcdir="$(pwd)"
+
+cd $AUTOPKGTEST_TMP
+"$srcdir/configure" \
+  --disable-nls \
+  --disable-dselect \
+  --prefix=/usr \
+  --libexecdir='${exec_prefix}/lib' \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  # EOL
+make installcheck TEST_VERBOSE=1

@@ -1,0 +1,39 @@
+From: Boyuan Yang <byang@debian.org>
+Date: Thu, 21 Sep 2023 20:27:45 -0400
+Subject: Use googletest lib built from source
+
+Forwarded: not-needed
+---
+ CMakeLists.txt | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3ec4398..2f55f95 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -98,10 +98,24 @@ if(NOT ENABLE_THREADING)
+ endif()
+ 
+ if(BUILD_TEST)
+-  find_package(GTest REQUIRED)
++  find_package(GTest)
+   if(GTEST_FOUND)
+     enable_testing()
+     include_directories(${GTEST_INCLUDE_DIRS})
++  else()
++    # Debian-specific: build gtest as library from source code
++    set(GTEST_SRC_DIR /usr/src/googletest/googletest CACHE STRING "Location of gest sources")
++    if(EXISTS ${GTEST_SRC_DIR}/src/gtest-all.cc)
++      message(STATUS "building gtest from sources in ${GTEST_SRC_DIR}")
++      set(gtest_sources ${GTEST_SRC_DIR}/src/gtest-all.cc)
++      add_library(gtest STATIC ${gtest_sources})
++      include_directories(${GTEST_SRC_DIR})
++      include_directories(${GTEST_SRC_DIR}/include)
++      set(GTEST_LIBRARIES gtest)
++      enable_testing()
++    else()
++      message(FATAL_ERROR "BUILD_TEST is set but unable to find gtest library")
++    endif()
+   endif()
+ endif()
+ 

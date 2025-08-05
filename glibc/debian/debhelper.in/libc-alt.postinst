@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+# begin-remove-after: released:forky
+if [ "$1" = configure ]; then
+    # These symbolic links are either included in base-files or created by
+    # base-files via triggers, but we also create them to avoid a versioned
+    # dependency on base-files. Cleanup will be handled by base-files.
+    if ! [ -h "$DPKG_ROOTRTLDDIR" ]; then
+        ln -s "usrRTLDDIR" "$DPKG_ROOTRTLDDIR"
+    fi
+    if ! [ -h "$DPKG_ROOTSLIBDIR" ]; then
+        ln -s usrSLIBDIR "$DPKG_ROOTSLIBDIR"
+    fi
+fi
+# end-remove-after
+
+if [ "$1" = configure -o "$1" = triggered ] && ! [ -h "$DPKG_ROOT/usrRTLDDIR/RTLD_SO" ]; then
+    # In principle, this package should contain this link, but it also is
+    # contained in the multiarch libc package. To avoid a conflict and the need
+    # for declaring Replaces (which work badly with the /usr-move due to
+    # aliasing), we manually create this link whenever we are installed or
+    # upgraded or the multiarch libc is installed, upgraded or importantly
+    # removed. The link target is given as absolute without /usr. The runtime
+    # linker directory is always one level deep, so we can simply prepend "..".
+    ln -s ..RTLD_TARGET "$DPKG_ROOT/usrRTLDDIR/RTLD_SO"
+fi
+
+#DEBHELPER#
+
+exit 0

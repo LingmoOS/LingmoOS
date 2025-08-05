@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  configure)
+    dpkg-trigger /test/trigger-a/test-file
+  ;;
+  triggered)
+    pkg_status=`dpkg-query -f '${Status}' -W pkg-depends`
+    if [ "$pkg_status" = "install ok installed" ]; then
+      echo "Pass: pkg-depends is installed"
+    else
+      echo "Fail: pkg-depends is not installed ($pkg_status)"
+      exit 1
+    fi
+    dpkg-trigger /test/trigger-a/test-file
+  ;;
+esac
+
+exit 0

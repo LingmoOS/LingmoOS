@@ -1,0 +1,57 @@
+diff --git a/elf/ldconfig.c b/elf/ldconfig.c
+index 4211f4c..6425f8e 100644
+--- a/elf/ldconfig.c
++++ b/elf/ldconfig.c
+@@ -450,6 +450,25 @@ chroot_stat (const char *real_path, const char *path, struct stat64 *st)
+   return ret;
+ }
+ 
++static const char * const ld_sonames[] =
++{
++  "ld-kfreebsd-x86-64.so.1",
++  "ld-linux-aarch64.so.1",
++  "ld-linux-aarch64_be.so.1",
++  "ld-linux-armhf.so.3",
++  "ld-linux-ia64.so.2",
++  "ld-linux-mipsn8.so.1",
++  "ld-linux-riscv64-lp64.so.1"
++  "ld-linux-riscv64-lp64d.so.1"
++  "ld-linux-x32.so.2",
++  "ld-linux-x86-64.so.2",
++  "ld-linux.so.2",
++  "ld-linux.so.3",
++  "ld.so.1",
++  "ld64.so.1",
++  "ld64.so.2",
++};
++
+ /* Create a symbolic link from soname to libname in directory path.  */
+ static void
+ create_links (const char *real_path, const char *path, const char *libname,
+@@ -460,6 +477,7 @@ create_links (const char *real_path, const char *path, const char *libname,
+   struct stat stat_lib, stat_so, lstat_so;
+   int do_link = 1;
+   int do_remove = 1;
++  int i;
+   /* XXX: The logics in this function should be simplified.  */
+ 
+   /* Get complete path.  */
+@@ -488,6 +506,18 @@ create_links (const char *real_path, const char *path, const char *libname,
+ 	  error (0, 0, _("Can't stat %s\n"), full_libname);
+ 	  return;
+ 	}
++
++      /* Do not change the symlink pointer to the dynamic linker except for
++	 non-existing symlinks, as it might break multiarch systems.  */
++      for (i = 0; i < sizeof (ld_sonames) / sizeof (ld_sonames[0]); i++)
++	if (__glibc_unlikely(!strcmp(soname, ld_sonames[i])))
++	  {
++	    if (opt_verbose)
++	      error (0, 0, _("%s is the dynamic linker, ignoring\n"),
++			     full_libname);
++	    do_link = 0;
++	  }
++
+       if (stat_lib.st_dev == stat_so.st_dev
+ 	  && stat_lib.st_ino == stat_so.st_ino)
+ 	/* Link is already correct.  */

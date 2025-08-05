@@ -1,0 +1,69 @@
+# dpkg manual page - deb-src-files(5)
+#
+# Copyright © 2016 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-src-files - Debian distribute files format
+
+=head1 SYNOPSIS
+
+B<debian/files>
+
+=head1 DESCRIPTION
+
+This file contains the list of artifacts that are to be distributed via
+the B<.changes> control file.
+
+The I<debian/files> file has a simple whitespace-delimited format.
+
+=over
+
+I<filename>
+I<section>
+I<priority>
+[
+I<keyword=value...>
+]
+
+=back
+
+I<filename>
+is the name of the artifact to distribute.
+
+I<section>
+and
+I<priority>
+correspond to the respective control fields available in the .deb.
+The allowed values are specific to each distribution archive.
+
+I<keyword=value...>
+corresponds to an optional whitespace-delimited list of attributes for this
+entry.
+The only currently supported keyword is B<automatic> with value
+B<yes>, to mark automatically generated files.
+
+=head1 NOTES
+
+This file is not intended to be modified directly, please use one of
+B<dpkg-gencontrol> or B<dpkg-distaddfile> to add entries to it.
+
+=head1 SEE ALSO
+
+L<dpkg-genchanges(1)>,
+L<dpkg-distaddfile(1)>.

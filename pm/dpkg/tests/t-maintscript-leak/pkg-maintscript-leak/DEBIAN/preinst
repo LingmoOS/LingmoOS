@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# On kFreeBSD: /dev/fd/
+# On Linux and kFreeBSD w/ linprocfs: /proc/self/fd/
+for d in /dev/fd/ /proc/self/fd/; do
+  if [ -d $d ]; then
+    fddir=$d
+    break
+  fi
+done
+
+if [ -n $fddir ]; then
+  ls -l $fddir
+  # We should have the 3 standard descriptors, plus 1 for the open directory.
+  [ `ls $fddir | wc -l` -eq 4 ] || echo WARN: maintscript leaks fd
+fi

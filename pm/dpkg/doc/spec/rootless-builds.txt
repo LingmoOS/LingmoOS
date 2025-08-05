@@ -1,0 +1,179 @@
+Supporting rootless builds
+==========================
+
+Status: recommendation, stable
+Version: 1.0
+
+Background
+----------
+
+Traditionally, Debian packages have required (fake)root privileges for some
+of the "debian/rules" targets. This has required also a split between build
+and binary targets; making the builds slower, due to the increased amount
+of invocations of "debian/rules" and the overhead of using fakeroot(1) or
+equivalent fake environments, or less secure due to the increased dangers
+of running under real root via sudo or equivalent.
+
+On this document when talking about "(fake)root" privileges, it will refer
+to any mechanism, supported by the dpkg-buildpackage "-r/--root-command"
+option, that can provide either a real or faked root user environment.
+
+Specification
+-------------
+
+We add a new field to the "Source" stanza of debian/control:
+
+  Rules-Requires-Root: no | binary-targets | <implementations-keywords>
+
+The case sensitive values are defined as:
+
+ * If "no", then "debian/rules binary" will not require root at all (not even
+   fakeroot). This is the default in dpkg-build-api level >= 1, or since
+   dpkg 1.22.13.
+   - If the "no" keyword is used, it MUST be the only keyword in that field
+     and MUST appear exactly once.
+
+ * If "binary-targets", then "debian/rules binary" (etc.) must always be run
+   under (fake)root. This was the status quo, default in dpkg-build-api level 0
+   until dpkg 1.22.13.
+
+ * <implementations-keywords> will be a space separated list of keywords which
+   define when root is required.
+
+   - Keywords consists of <namespace>/<cases>. The "namespace" part cannot
+     contain "/" or whitespace. The "cases" part cannot contain whitespace.
+     Furthermore, both parts MUST consist entirely of printable ASCII
+     characters.
+
+   - Each tool/package will define a namespace named after itself and provide
+     a number of cases where (fake)root is required.
+     (See also "Implementation provided keywords".)
+
+   - When "Rules-Requires-Root" is set to <implementations-keywords>, the
+     builder (i.e. whatever is executing debian/rules) will expose an
+     interface that is used to run a command under (fake)root via the
+     "Gain Root API". If the builder cannot provide such a command, it
+     MUST behave like "Rules-Requires-Root" was set to "binary-targets",
+     i.e. run "debian/rules binary" under (fake)root.
+
+When the builder supports this specification, it MUST notify this fact to
+the rules file via the "DEB_RULES_REQUIRES_ROOT" environment variable, with
+the value it has obtained from the Rules-Requires-Root field or some builder
+specific override mechanism, which will denote the level of support the
+builder has chosen to commit to take effect during the build. When set,
+it MUST be a valid value for the Rules-Requires-Root field. If unset,
+the build system SHOULD assume that the builder does not recognize the
+Rules-Requires-Root field at all.
+
+It is always permissible for a builder to ignore this field and fall back to
+running the binary targets under (fake)root. This is to ensure backwards
+compatibility when builds are performed by legacy builders or older versions
+of the tooling.
+
+Tools called from the rules file MUST cope gracefully with being called under
+(fake)root even when Rules-Requires-Root is set to a value that implies they
+should not be (e.g. "no"). However, they MUST NOT attempt to run processes
+under (fake)root when run as a regular user when Rules-Requires-Root does
+not list any keywords they respond to.
+
+Tools MUST gracefully ignore valid unknown keywords outside their namespace.
+They MAY warn about unknown keywords inside their namespace.
+
+The value of this field MUST NOT change the content of the package in any
+way. Notably, packages that are bit-for-bit reproducible MUST still provide
+bit-for-bit identical results even when the field is ignored.
+
+Implementation provided keywords
+--------------------------------
+
+Keywords provided by various implementations:
+
+ * dpkg/target-subcommand: When the package needs to run a given command
+   under (fake)root within the "debian/rules" files directly, this MUST be
+   declared via this keyword.
+
+ * dpkg/target/<target-name>: When a specific "debian/rules" unofficial
+   target (none of the root-requiring "binary-indep", "binary-arch", "binary",
+   "clean", nor the non-root-requiring "build-indep", "build-arch", "build")
+   needs to be run under (fake)root, this MUST be declared via this dynamic
+   keyword, where <target-name> is the name of the "debian/rules" target.
+
+ * debhelper/upstream-make-install: The dh_auto_install command will run
+   the "install" target from the upstream's Makefile under (fake)root (for
+   the "makefile" build system or one derived from it).
+
+Gain Root API
+-------------
+
+The builder will provide a command to promote a given command to (fake)root
+by exposing it in the environment variable "DEB_GAIN_ROOT_CMD". Tools that
+need this promotion will then use it like the following:
+
+    $DEB_GAIN_ROOT_CMD cmd-that-needs-root ...
+
+This command is subject to the same requirements as the "gain-root-command"
+that dpkg-buildpackage accepts via its "-r/--root-command" option, which
+means that it can contain space-separated parameters. If dpkg-buildpackage is
+called with "-r/--root-command", then dpkg-buildpackage shall use that value
+as the value for "DEB_GAIN_ROOT_CMD". The command SHOULD preserve all the
+environment variables, unmodified.
+
+The variable SHOULD only be provided when there is a need for it. Notably
+when "Rules-Requires-Root" is either "no" or "binary-targets" the variable
+SHOULD NOT be defined.
+
+(The "DEB_GAIN_ROOT_CMD" variable used to be named "DPKG_GAIN_ROOT_CMD"
+starting with dpkg 1.19.0 and before dpkg 1.19.1 when this specification
+got released as stable. The old name MUST not be used.)
+
+Common cases
+------------
+
+ * Upstream installation insists on "sudo make install"-like behavior.
+   => Use dpkg/target-subcommand or debhelper/upstream-make-install.
+
+ * Files shipped in the package must be owned by another user than root.
+   => Not covered; use "binary-targets" for now until dpkg+debhelper
+      provides the required interface.
+
+Prototyping/preparation
+=======================
+
+dpkg side
+---------
+
+dpkg-deb --build provides the --root-owner-group option so that dh_builddeb
+or direct calls can control the owner/group file values w/o requiring
+(fake)root.
+
+dpkg-buildpackage must export DEB_GAIN_ROOT_CMD when necessary (for
+prototyping, doing this unconditionally would be fine).
+
+
+debhelper side
+--------------
+
+When the field is present:
+
+ * dh_testroot will behave as usual when Rules-Requires-Root is not present
+   or set to "binary-targets".
+
+ * dh_testroot will be a no-op when Rules-Requires-Root is set to "no".
+
+ * Otherwise, dh_testroot will either verify that it is run under (fake)root
+   (as usual) OR assert that DEB_GAIN_ROOT_CMD is defined.
+
+ * debhelper build systems will be patched to check for the
+   "debhelper/upstream-make-install" keyword and use the "Gain Root API"
+   accordingly.
+
+ * All other (src:)debhelper commands will skip their calls to chown
+   (currently they just reset them to "0:0" anyway).
+
+With the above, a default "dh $@" will no longer require (fake)root when
+built (and Rules-Requires-Root is "no").
+
+Prototyping:
+
+ * During prototyping, dh_builddeb can wrap the dpkg-deb --build call with
+   fakeroot (when not already root).

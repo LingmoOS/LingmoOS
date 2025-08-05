@@ -1,0 +1,67 @@
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Subject: [PATCH] XXX: make libc_rwlock recursive
+
+Without making the rwlocks recursive, running fakeroot-tcp gets this:
+
+#0  0x0106e91c in mach_msg_trap () at /usr/src/glibc-2.24/build-tree/hurd-i386-libc/mach/mach_msg_trap.S:2
+#1  0x0106f090 in __mach_msg (msg=0x20034a0, option=3, send_size=64, rcv_size=32, rcv_name=421, timeout=0, notify=0) at msg.c:110
+#2  0x0125a241 in __gsync_wait (task=1, addr=19101080, val1=2, val2=0, msec=0, flags=0)
+    at /usr/src/glibc-2.24/build-tree/hurd-i386-libc/mach/RPC_gsync_wait.c:175
+#3  0x010b0743 in __dcigettext (domainname=0x8050740 <_libc_intl_domainname@@GLIBC_2.2.6> "libc", 
+    msgid1=0x8051d88 "undefined symbol: acl_get_fd", msgid2=0x0, plural=0, n=0, category=5) at dcigettext.c:527
+#4  0x010af776 in __dcgettext (domainname=0x8050740 <_libc_intl_domainname@@GLIBC_2.2.6> "libc", 
+    msgid=0x8051d88 "undefined symbol: acl_get_fd", category=5) at dcgettext.c:47
+#5  0x0124e427 in __dlerror () at dlerror.c:94
+#6  0x01035ae3 in load_library_symbols () from /usr/lib/i386-gnu/libfakeroot/libfakeroot-tcp.so
+#7  0x01035cc3 in tmp___fxstat64 () from /usr/lib/i386-gnu/libfakeroot/libfakeroot-tcp.so
+#8  0x01036cd6 in __fxstat64 () from /usr/lib/i386-gnu/libfakeroot/libfakeroot-tcp.so
+#9  0x010ad831 in _nl_load_locale_from_archive (category=category@entry=0, namep=namep@entry=0x200399c) at loadarchive.c:211
+#10 0x010ac45b in _nl_find_locale (locale_path=0x0, locale_path_len=0, category=category@entry=0, name=0x200399c) at findlocale.c:154
+#11 0x010abde7 in setlocale (category=0, locale=0x804c2e4 "") at setlocale.c:417
+#12 0x0804947f in main (argc=2, argv=0x2003ad4) at programs/locale.c:191
+
+That's very unfortunate: libfakeroot gets initialized from a section
+where __libc_setlocale_lock is already locked, and thus the dlerror()
+call hangs inside __dcigettext. It happens that Linux doesn't have
+the problem probably because pthread_rwlock_wrlock returns a EDEADLK
+error instead of hanging, and then the first unlock unlocks, and the
+second unlock probably returns an EINVAL. This is all very unsafe, but
+that's fakeroot-tcp's matter (see http://bugs.debian.org/845930 for the
+follow-up)...
+
+We only use it when constructing the debian installer for -s -r options
+anyway.
+
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+---
+ sysdeps/mach/libc-lock.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+--- a/sysdeps/mach/libc-lock.h
++++ b/sysdeps/mach/libc-lock.h
+@@ -151,15 +151,15 @@ typedef cthread_key_t __libc_key_t;
+   __libc_lock_unlock_recursive (NAME)
+ 
+ /* XXX for now */
+-#define __libc_rwlock_define		__libc_lock_define
+-#define __libc_rwlock_define_initialized __libc_lock_define_initialized
+-#define __libc_rwlock_init		__libc_lock_init
+-#define __libc_rwlock_fini		__libc_lock_fini
+-#define __libc_rwlock_rdlock		__libc_lock_lock
+-#define __libc_rwlock_wrlock		__libc_lock_lock
+-#define __libc_rwlock_tryrdlock		__libc_lock_trylock
+-#define __libc_rwlock_trywrlock		__libc_lock_trylock
+-#define __libc_rwlock_unlock		__libc_lock_unlock
++#define __libc_rwlock_define		__libc_lock_define_recursive
++#define __libc_rwlock_define_initialized __libc_lock_define_initialized_recursive
++#define __libc_rwlock_init		__libc_lock_init_recursive
++#define __libc_rwlock_fini		__libc_lock_fini_recursive
++#define __libc_rwlock_rdlock		__libc_lock_lock_recursive
++#define __libc_rwlock_wrlock		__libc_lock_lock_recursive
++#define __libc_rwlock_tryrdlock		__libc_lock_trylock_recursive
++#define __libc_rwlock_trywrlock		__libc_lock_trylock_recursive
++#define __libc_rwlock_unlock		__libc_lock_unlock_recursive
+ 
+ struct __libc_cleanup_frame
+ {

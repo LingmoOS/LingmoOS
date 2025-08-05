@@ -1,0 +1,40 @@
+EXTRA_DIST += $(srcdir)/at/package.m4
+
+DISTCLEANFILES += at/atconfig
+
+AUTOTEST_DEPS = at/atconfig at/atlocal $(TESTSUITE)
+
+TEST_VERBOSE ?= 0
+TEST_PARALLEL ?= 1
+
+TEST_VERBOSE_OPT = $(TEST_VERBOSE:0=)
+
+TESTSUITEFLAGS =
+TESTSUITEFLAGS += -j$(TEST_PARALLEL)
+TESTSUITEFLAGS += $(TEST_VERBOSE_OPT:1=--verbose)
+
+# The ":;" works around a Bash 3.2 bug when the output is not writable.
+$(srcdir)/at/package.m4: $(top_srcdir)/configure.ac
+	:;{ \
+	  echo '# Signature of the current package.' && \
+	  echo 'm4_define([AT_PACKAGE_NAME], [$(PACKAGE_NAME)])' && \
+	  echo 'm4_define([AT_PACKAGE_TARNAME], [$(PACKAGE_TARNAME)])' && \
+	  echo 'm4_define([AT_PACKAGE_VERSION], [$(PACKAGE_VERSION)])' && \
+	  echo 'm4_define([AT_PACKAGE_STRING], [$(PACKAGE_STRING)])' && \
+	  echo 'm4_define([AT_PACKAGE_URL], [$(PACKAGE_URL)])' && \
+	  echo 'm4_define([AT_PACKAGE_BUGREPORT], [$(PACKAGE_BUGREPORT)])'; \
+	} >'$(srcdir)/at/package.m4'
+
+autotest-check: $(AUTOTEST_DEPS)
+	$(SHELL) '$(TESTSUITE)' -C at $(TESTSUITEFLAGS)
+
+autotest-installcheck: $(AUTOTEST_DEPS)
+	$(SHELL) '$(TESTSUITE)' -C at AUTOTEST_PATH='$(bindir)' $(TESTSUITEFLAGS)
+
+autotest-clean:
+	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' -C at --clean
+
+AUTOTEST = $(AUTOM4TE) --language=autotest
+$(TESTSUITE): $(srcdir)/at/package.m4 $(TESTSUITE_AT)
+	$(AUTOTEST) -I '$(srcdir)/at' -o $@.tmp $@.at
+	mv $@.tmp $@

@@ -1,0 +1,1135 @@
+# dpkg manual page - dpkg-source(1)
+#
+# Copyright © 1995-1996 Ian Jackson <ijackson@chiark.greenend.org.uk>
+# Copyright © 2000 Wichert Akkerman <wakkerma@debian.org>
+# Copyright © 2006-2007 Frank Lichtenheld <djpig@debian.org>
+# Copyright © 2006-2015 Guillem Jover <guillem@debian.org>
+# Copyright © 2008-2011 Raphaël Hertzog <hertzog@debian.org>
+# Copyright © 2010 Joey Hess <joeyh@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-source - Debian source package (.dsc) manipulation tool
+
+=head1 SYNOPSIS
+
+B<dpkg-source>
+[I<option>...] I<command>
+
+=head1 DESCRIPTION
+
+B<dpkg-source>
+packs and unpacks Debian source archives.
+
+None of these commands allow multiple options to be combined into one,
+and they do not allow the value for an option to be specified in a
+separate argument.
+
+=head1 COMMANDS
+
+=over
+
+=item B<-x>, B<--extract> I<filename>.dsc [I<output-directory>]
+
+Extract a source package (B<--extract> since dpkg 1.17.14).
+One non-option argument must be supplied,
+the name of the Debian source control file
+(B<.dsc>).
+An optional second non-option argument may be supplied to specify the
+directory to extract the source package to, this must not exist.
+If
+no output directory is specified, the source package is extracted into
+a directory named I<source>-I<version> under the current working
+directory.
+
+B<dpkg-source>
+will read the names of the other file(s) making up the source package
+from the control file; they are assumed to be in the same directory as
+the
+B<.dsc>.
+
+The files in the extracted package will have their permissions and
+ownerships set to those which would have been expected if the files
+and directories had simply been created - directories and executable
+files will be 0777 and plain files will be 0666, both modified by the
+extractors' umask; if the parent directory is setgid then the
+extracted directories will be too, and all the files and directories
+will inherit its group ownership.
+
+If the source package uses a non-standard format (currently this means all
+formats except “1.0”), its name will be stored in
+B<debian/source/format> so that the following builds of the source
+package use the same format by default.
+
+=item B<-b>, B<--build> I<directory> [I<format-specific-parameters>]
+
+Build a source package (B<--build> since dpkg 1.17.14).
+The first non-option argument is taken as the
+name of the directory containing the debianized source tree (i.e. with a
+debian sub-directory and maybe changes to the original files).
+Depending on the source package format used to build the package,
+additional parameters might be accepted.
+
+B<dpkg-source> will build the source package with the first format
+found in this ordered list:
+the format indicated with the I<--format> command line option,
+the format indicated in B<debian/source/format>,
+“1.0”.
+The fallback to “1.0” is deprecated and will be removed at some
+point in the future, you should always document the desired source format
+in B<debian/source/format>.
+See section L</SOURCE PACKAGE FORMATS>
+for an extensive description of the various source package formats.
+
+=item B<--print-format> I<directory>
+
+Print the source format that would be used to build the source package if
+B<dpkg-source --build> I<directory> was called (in the same conditions
+and with the same parameters; since dpkg 1.15.5).
+
+=item B<--before-build> I<directory>
+
+Run the corresponding hook of the source package format (since dpkg 1.15.8).
+This hook is
+called before any build of the package (B<dpkg-buildpackage> calls it
+very early even before B<debian/rules clean>).
+This command is idempotent and can be called multiple times.
+Not all source formats
+implement something in this hook, and those that do usually prepare the
+source tree for the build for example by ensuring that the Debian patches
+are applied.
+
+=item B<--after-build> I<directory>
+
+Run the corresponding hook of the source package format (since dpkg 1.15.8).
+This hook is
+called after any build of the package (B<dpkg-buildpackage> calls it
+last).
+This command is idempotent and can be called multiple times.
+Not
+all source formats implement something in this hook, and those that do
+usually use it to undo what B<--before-build> has done.
+
+=item B<--commit> [I<directory>] ...
+
+Record changes in the source tree unpacked in I<directory>
+(since dpkg 1.16.1).
+This command can take supplementary parameters depending on the source format.
+It will error out for formats where this operation doesn't mean anything.
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+The format specific build and extract options can be shown by using the
+B<--format> option.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 OPTIONS
+
+=head2 Generic build options
+
+=over
+
+=item B<-c>I<control-file>
+
+Specifies the main source control file to read information from.
+The
+default is
+B<debian/control>.
+If given with relative pathname this is interpreted starting at
+the source tree's top level directory.
+
+=item B<-l>I<changelog-file>
+
+Specifies the changelog file to read information from.
+The
+default is
+B<debian/changelog>.
+If given with relative pathname this is interpreted starting at
+the source tree's top level directory.
+
+=item B<-F>I<changelog-format>
+
+Specifies the format of the changelog.
+See L<dpkg-parsechangelog(1)>
+for information about alternative formats.
+
+=item B<--format=>I<value>
+
+Use the given format for building the source package (since dpkg 1.14.17).
+It does override any format given in B<debian/source/format>.
+
+=item B<-V>I<name>B<=>I<value>
+
+Set an output substitution variable.
+See L<deb-substvars(5)> for a discussion of output substitution.
+
+=item B<-T>I<substvars-file>
+
+Read substitution variables in
+I<substvars-file>;
+the default is to not read any file.
+This option can be used multiple
+times to read substitution variables from multiple files (since dpkg 1.15.6).
+
+=item B<-D>I<field>B<=>I<value>
+
+Override or add an output control file field.
+
+=item B<-U>I<field>
+
+Remove an output control file field.
+
+=item B<-Z>I<compression>, B<--compression>=I<compression>
+
+Specify the compression to use for created tarballs and diff files
+(B<--compression> since dpkg 1.15.5).
+Note that this option will not cause existing tarballs to be recompressed,
+it only affects new files.
+Supported values are:
+I<gzip>, I<bzip2>, I<lzma> and I<xz>.
+The default is I<xz> for formats 2.0 and newer, and I<gzip> for
+format 1.0.
+I<xz> is only supported since dpkg 1.15.5.
+
+=item B<-z>I<level>, B<--compression-level>=I<level>
+
+Compression level to use (B<--compression-level> since dpkg 1.15.5).
+As with B<-Z> it only affects newly created
+files.
+Supported values are:
+I<1> to I<9>, I<best>, and I<fast>.
+The default is I<9> for gzip and bzip2, I<6> for xz and lzma.
+
+=item B<-i>[I<regex>], B<--diff-ignore>[=I<regex>]
+
+You may specify a perl regular expression to match files you want
+filtered out of the list of files for the diff (B<--diff-ignore>
+since dpkg 1.15.6).
+(This list is
+generated by a find command.) (If the source package is being built as a
+version 3 source package using a VCS, this can be used to ignore
+uncommitted changes on specific files.
+Using -i.* will ignore all of them.)
+
+The B<-i> option by itself enables this setting with a default regex
+(preserving any modification to the default regex done by a previous use
+of B<--extend-diff-ignore>) that will filter out control files and
+directories of the most common revision control systems, backup and swap
+files and Libtool build output directories.
+There can only be one active
+regex, of multiple B<-i> options only the last one will take effect.
+
+This is very helpful in cutting out extraneous files that get included
+in the diff, for example if you maintain your source in a revision control
+system and want to use a checkout to build a source package without
+including the additional files and directories that it will usually
+contain (e.g. CVS/, .cvsignore, .svn/).
+The default regex is already
+very exhaustive, but if you need to replace it, please note that by
+default it can match any part of a path, so if you want to match the
+begin of a filename or only full filenames, you will need to provide
+the necessary anchors (e.g. ‘(^|/)’, ‘($|/)’) yourself.
+
+=item B<--extend-diff-ignore>=I<regex>
+
+The perl regular expression specified will extend the default value used by
+B<--diff-ignore> and its current value, if set (since dpkg 1.15.6).
+It does this by concatenating “B<|>I<regex>” to the existing value.
+This option is convenient to use in B<debian/source/options> to exclude
+some auto-generated files from the automatic patch generation.
+
+=item B<-I>[I<file-pattern>], B<--tar-ignore>[=I<file-pattern>]
+
+If this option is specified, the pattern will be passed to
+L<tar(1)>'s
+B<--exclude>
+option when it is called to generate a .orig.tar or .tar file
+(B<--tar-ignore> since dpkg 1.15.6).
+For
+example, B<-I>CVS will make tar skip over CVS directories when generating
+a .tar.gz file.
+The option may be repeated multiple times to list multiple
+patterns to exclude.
+
+B<-I> by itself adds default B<--exclude> options that will
+filter out control files and directories of the most common revision
+control systems, backup and swap files and Libtool build output
+directories.
+
+=back
+
+B<Note>:
+While they have similar purposes, B<-i> and B<-I> have very
+different syntax and semantics.
+B<-i> can only be specified once and
+takes a perl compatible regular expression which is matched against
+the full relative path of each file.
+B<-I> can specified
+multiple times and takes a filename pattern with shell wildcards.
+The pattern is applied to the full relative path but also
+to each part of the path individually.
+The exact semantic of tar's
+B<--exclude> option is somewhat complicated, see
+L<https://www.gnu.org/software/tar/manual/tar.html#wildcards> for a full
+documentation.
+
+The default regex and patterns for both options can be seen
+in the output of the B<--help> command.
+
+=head2 Generic extract options
+
+=over
+
+=item B<--no-copy>
+
+Do not copy original tarballs near the extracted source package
+(since dpkg 1.14.17).
+
+=item B<--no-check>
+
+Do not check signatures and checksums before unpacking (since dpkg 1.14.17).
+
+=item B<--no-overwrite-dir>
+
+Do not overwrite the extraction directory if it already exists
+(since dpkg 1.18.8).
+
+=item B<--require-valid-signature>
+
+Refuse to unpack the source package if it doesn't contain an OpenPGP
+signature that can be verified (since dpkg 1.15.0) either with the user's
+I<trustedkeys.gpg> keyring, one of the vendor-specific keyrings, or one
+of the official Debian keyrings
+(I</usr/share/keyrings/debian-keyring.gpg>,
+I</usr/share/keyrings/debian-nonupload.gpg> and
+I</usr/share/keyrings/debian-maintainers.gpg>).
+
+=item B<--require-strong-checksums>
+
+Refuse to unpack the source package if it does not contain any strong
+checksums (since dpkg 1.18.7).
+Currently the only known checksum considered strong is B<SHA-256>.
+
+=item B<--ignore-bad-version>
+
+Turns the bad source package version check into a non-fatal warning
+(since dpkg 1.17.7).
+This option should only be necessary when extracting ancient source
+packages with broken versions, just for backwards compatibility.
+
+=back
+
+=head2 Generic general options
+
+=over
+
+=item B<--threads-max=>I<threads>
+
+Sets the maximum number of threads allowed for compressors that support
+multi-threaded operations (since dpkg 1.21.14).
+
+=item B<-q>
+
+Sets quiet mode to suppress warnings.
+
+=back
+
+=head1 SOURCE PACKAGE FORMATS
+
+If you don't know what source format to use, you should probably pick
+either “3.0 (quilt)” or “3.0 (native)”.
+See L<https://wiki.debian.org/Projects/DebSrc3.0> for information on the
+deployment of those formats within Debian.
+
+=head2 Format: 1.0
+
+A source package in this format consists either of a B<.orig.tar.gz>
+associated to a B<.diff.gz> or a single B<.tar.gz> (in that case
+the package is said to be I<native>).
+Optionally the original tarball might be accompanied by a detached
+upstream signature B<.orig.tar.gz.asc>, extraction
+supported since dpkg 1.18.5.
+
+B<Extracting>
+
+Extracting a native package is a simple extraction of the single
+tarball in the target directory.
+Extracting a non-native package
+is done by first unpacking the B<.orig.tar.gz> and then applying
+the patch contained in the B<.diff.gz> file.
+The timestamp of
+all patched files is reset to the extraction time of the source
+package (this avoids timestamp skews leading to problems when
+autogenerated files are patched).
+The diff can create new files (the whole
+debian directory is created that way) but cannot remove files (empty files
+will be left over) and cannot create or change symlinks.
+
+B<Building>
+
+Building a native package is just creating a single tarball with
+the source directory.
+Building a non-native package involves
+extracting the original tarball in a separate “.orig” directory and
+regenerating the B<.diff.gz> by comparing the source package
+I<directory> with the .orig directory.
+
+B<Build options (with --build):>
+
+If a second non-option argument is supplied it should be the name of the
+original source directory or tarfile or the empty string if the package is
+a Debian-specific one and so has no debianization diffs.
+If no second
+argument is supplied then
+B<dpkg-source>
+will look for the original source tarfile
+I<package>B<_>I<upstream-version>B<.orig.tar.gz>
+or the original source directory
+I<directory>B<.orig>
+depending on the B<-sX> arguments.
+
+B<-sa>, B<-sp>, B<-sk>, B<-su> and B<-sr>
+will not overwrite existing tarfiles or directories.
+If this is
+desired then
+B<-sA>, B<-sP>, B<-sK>, B<-sU> and B<-sR>
+should be used instead.
+
+=over
+
+=item B<-sk>
+
+Specifies to expect the original source as a tarfile, by default
+I<package>B<_>I<upstream-version>B<.orig.tar.>I<extension>.
+It will leave this original source in place as a tarfile, or copy it
+to the current directory if it isn't already there.
+The
+tarball will be unpacked into
+I<directory>B<.orig>
+for the generation of the diff.
+
+=item B<-sp>
+
+Like
+B<-sk>
+but will remove the directory again afterwards.
+
+=item B<-su>
+
+Specifies that the original source is expected as a directory, by
+default
+I<package>B<->I<upstream-version>B<.orig>
+and
+B<dpkg-source>
+will create a new original source archive from it.
+
+=item B<-sr>
+
+Like
+B<-su>
+but will remove that directory after it has been used.
+
+=item B<-ss>
+
+Specifies that the original source is available both as a directory
+and as a tarfile.
+B<dpkg-source> will use the directory to create
+the diff, but the tarfile to create the
+B<.dsc>.
+This option must be used with care - if the directory and tarfile do
+not match a bad source archive will be generated.
+
+=item B<-sn>
+
+Specifies to not look for any original source, and to not generate a diff.
+The second argument, if supplied, must be the empty string.
+This is
+used for Debian-specific packages which do not have a separate
+upstream source and therefore have no debianization diffs.
+
+=item B<-sa> or B<-sA>
+
+Specifies to look for the original source archive as a tarfile or as a
+directory - the second argument, if any, may be either, or the empty
+string (this is equivalent to using
+B<-sn>).
+If a tarfile is found it will unpack it to create the diff and remove
+it afterwards (this is equivalent to
+B<-sp>);
+if a directory is found it will pack it to create the original source
+and remove it afterwards (this is equivalent to
+B<-sr>);
+if neither is found it will assume that the package has no
+debianization diffs, only a straightforward source archive (this is
+equivalent to
+B<-sn>).
+If both are found then B<dpkg-source> will ignore the directory,
+overwriting it, if
+B<-sA>
+was specified (this is equivalent to
+B<-sP>)
+or raise an error if
+B<-sa>
+was specified.
+B<-sa>
+is the default.
+
+=item B<--abort-on-upstream-changes>
+
+The process fails if the generated diff contains changes to files
+outside of the debian sub-directory (since dpkg 1.15.8).
+This option is not allowed in
+B<debian/source/options> but can be used in
+B<debian/source/local-options>.
+
+=back
+
+B<Extract options (with --extract):>
+
+In all cases any existing original source tree will be removed.
+
+=over
+
+=item B<-sp>
+
+Used when extracting then the original source (if any) will be left
+as a tarfile.
+If it is not already located in the current directory
+or if an existing but different file is there it will be copied there.
+(B<This is the default>).
+
+=item B<-su>
+
+Unpacks the original source tree.
+
+=item B<-sn>
+
+Ensures that the original source is neither copied to the current
+directory nor unpacked.
+Any original source tree that was in the
+current directory is still removed.
+
+=back
+
+All the
+B<-s>I<X>
+options are mutually exclusive.
+If you specify more than one only the
+last one will be used.
+
+=over
+
+=item B<--skip-debianization>
+
+Skips application of the debian diff on top of the upstream sources
+(since dpkg 1.15.1).
+
+=back
+
+=head2 Format: 2.0
+
+Extraction supported since dpkg 1.13.9, building supported since dpkg 1.14.8.
+Also known as wig&pen.
+This format is not recommended for wide-spread
+usage, the format “3.0 (quilt)” replaces it.
+Wig&pen was the first specification of a new-generation source package format.
+
+The behavior of this format is the same as the “3.0 (quilt)” format
+except that it doesn't use an explicit list of patches.
+All files in
+B<debian/patches/> matching the perl regular expression B<[\w-]+>
+must be valid patches: they are applied at extraction time.
+
+When building a new source package, any change to the upstream source
+is stored in a patch named B<zz_debian-diff-auto>.
+
+=head2 Format: 3.0 (native)
+
+Supported since dpkg 1.14.17.
+This format is an extension of the native package format as defined
+in the 1.0 format.
+It supports all compression methods and
+will ignore by default any VCS specific files and directories
+as well as many temporary files (see default value associated to
+B<-I> option in the B<--help> output).
+
+=head2 Format: 3.0 (quilt)
+
+Supported since dpkg 1.14.17.
+A source package in this format contains at least
+an original tarball (B<.orig.tar.>I<ext> where I<ext> can be
+B<gz>, B<bz2>, B<lzma> and B<xz>) and a debian tarball
+(B<.debian.tar.>I<ext>).
+It can also contain additional original
+tarballs (B<.orig->I<component>B<.tar.>I<ext>).
+I<component> can only contain alphanumeric (‘a-zA-Z0-9’) characters
+and hyphens (‘-’).
+Optionally each original tarball can be accompanied by a detached
+upstream signature (B<.orig.tar.>I<ext>B<.asc> and
+B<.orig->I<component>B<.tar.>I<ext>B<.asc>), extraction
+supported since dpkg 1.17.20, building supported since dpkg 1.18.5.
+
+B<Extracting>
+
+The main original tarball is extracted first, then all additional original
+tarballs are extracted in subdirectories named after the I<component>
+part of their filename (any pre-existing directory is replaced).
+The
+debian tarball is extracted on top of the source directory after prior
+removal of any pre-existing B<debian> directory.
+Note that the
+debian tarball must contain a B<debian> sub-directory but it
+can also contain binary files outside of that directory (see
+B<--include-binaries> option).
+
+All patches listed in B<debian/patches/>I<vendor>B<.series> or
+B<debian/patches/series> are then applied, where I<vendor> will be
+the lowercase name of the current vendor, or B<debian> if there is
+no vendor defined.
+If the former file is used and the latter one doesn't exist (or is a
+symlink), then the latter is replaced with a symlink to the former.
+This is meant to simplify usage of B<quilt> to manage the set of patches.
+Vendor-specific series files are intended to make it possible to serialize
+multiple development branches based on the vendor, in a declarative way,
+in preference to open-coding this handling in B<debian/rules>.
+This is particularly useful when the source would need to be patched
+conditionally because the affected files do not have built-in conditional
+occlusion support.
+Note however that while B<dpkg-source> parses correctly series files
+with explicit options used for patch application (stored on each line
+after the patch filename and one or more spaces), it does ignore those
+options and always expects patches that can be applied with the B<-p1>
+option of B<patch>.
+It will thus emit a warning when it encounters
+such options, and the build is likely to fail.
+
+Note that L<lintian(1)> will emit unconditional warnings when using
+vendor series due to a controversial Debian specific ruling, which should
+not affect any external usage; to silence these, the dpkg lintian profile
+can be used by passing «B<--profile dpkg>» to L<lintian(1)>.
+
+The timestamp of all patched files is reset to the extraction time of
+the source package (this avoids timestamp skews leading to problems
+when autogenerated files are patched).
+
+Contrary to B<quilt>'s default behavior, patches are expected to apply
+without any fuzz.
+When that is not the case, you should refresh such
+patches with B<quilt>, or B<dpkg-source> will error out while
+trying to apply them.
+
+Similarly to B<quilt>'s default behavior, the patches can remove
+files too.
+
+The file B<.pc/applied-patches> is created if some
+patches have been applied during the extraction.
+
+B<Building>
+
+All original tarballs found in the current directory are extracted in a
+temporary directory by following the same logic as for the unpack, the
+debian directory is copied over in the temporary directory, and all
+patches except the automatic patch (B<debian-changes->I<version>
+or B<debian-changes>, depending on B<--single-debian-patch>) are
+applied.
+The temporary directory is compared to the source package directory.
+When the diff is non-empty, the build fails unless
+B<--single-debian-patch> or B<--auto-commit>
+has been used, in which case the diff is stored in the automatic patch.
+If the automatic patch is created/deleted, it's added/removed from the
+series file and from the B<quilt> metadata.
+
+Any change
+on a binary file is not representable in a diff and will thus lead to a
+failure unless the maintainer deliberately decided to include that
+modified binary file in the debian tarball (by listing it in
+B<debian/source/include-binaries>).
+The build will also fail if it
+finds binary files in the debian sub-directory unless they have been
+allowed through B<debian/source/include-binaries>.
+
+The updated debian directory and the list of modified binaries is then
+used to generate the debian tarball.
+
+The automatically generated diff doesn't include changes on VCS specific
+files as well as many temporary files (see default value associated to
+B<-i> option in the B<--help> output).
+In particular, the
+B<.pc> directory used by B<quilt> is ignored during generation of the
+automatic patch.
+
+B<Note>: B<dpkg-source> B<--before-build> (and B<--build>) will
+ensure that all patches listed in the series file are applied so that a
+package build always has all patches applied.
+It does this by finding
+unapplied patches (they are listed in the B<series> file but not in
+B<.pc/applied-patches>), and if the first patch in that set can be
+applied without errors, it will apply them all.
+The option
+B<--no-preparation> can be used to disable this
+behavior.
+
+B<Recording changes>
+
+=over
+
+=item B<--commit> [I<directory>] [I<patch-name>] [I<patch-file>]
+
+Generates a patch corresponding to the local changes that are not managed
+by the B<quilt> patch system and integrates it in the patch system under
+the name I<patch-name>.
+If the name is missing, it will be asked interactively.
+If I<patch-file> is given,
+it is used as the patch corresponding to the local changes to integrate.
+Once integrated, an
+editor (the first one found from B<sensible-editor>, C<$VISUAL>, C<$EDITOR>,
+B<vi>) is launched so that you can edit the meta-information in the patch
+header.
+
+Passing I<patch-file> is mainly useful after a build failure that
+pre-generated this file, and on this ground the given file is removed
+after integration.
+Note also that the changes contained in the patch file
+must already be applied on the tree and that the files modified by the
+patch must not have supplementary unrecorded changes.
+
+If the patch generation detects modified binary files, they will be
+automatically added to B<debian/source/include-binaries> so that
+they end up in the debian tarball (exactly like B<dpkg-source
+--include-binaries --build> would do).
+
+=back
+
+B<Build options>
+
+=over
+
+=item B<--allow-version-of-quilt-db=>I<version>
+
+Allow B<dpkg-source> to build the source package if the version of
+the B<quilt> metadata is the one specified, even if B<dpkg-source>
+doesn't know about it (since dpkg 1.15.5.4).
+Effectively this says that the given version of the
+B<quilt> metadata is compatible with the version 2 that B<dpkg-source>
+currently supports.
+The version of the B<quilt> metadata is stored in
+B<.pc/.version>.
+
+=item B<--include-removal>
+
+Do not ignore removed files and include them in the automatically
+generated patch.
+
+=item B<--include-timestamp>
+
+Include timestamp in the automatically generated patch.
+
+=item B<--include-binaries>
+
+Add all modified binaries in the debian tarball.
+Also add them to
+B<debian/source/include-binaries>: they will be added by default
+in subsequent builds and this option is thus no more needed.
+
+=item B<--no-preparation>
+
+Do not try to prepare the build tree by applying patches which are
+apparently unapplied (since dpkg 1.14.18).
+
+=item B<--single-debian-patch>
+
+Use B<debian/patches/debian-changes> instead of
+B<debian/patches/debian-changes->I<version> for the name of the
+automatic patch generated during build (since dpkg 1.15.5.4).
+This option is particularly
+useful when the package is maintained in a VCS and a patch set can't reliably
+be generated.
+Instead the current diff with upstream should be stored in a single patch.
+The option would be put in B<debian/source/local-options>
+and would be accompanied by a B<debian/source/local-patch-header> file
+explaining how the Debian changes can be best reviewed, for example in the
+VCS that is used.
+
+=item B<--create-empty-orig>
+
+Automatically create the main original tarball as empty if it's missing
+and if there are supplementary original tarballs (since dpkg 1.15.6).
+This option is meant to
+be used when the source package is just a bundle of multiple upstream
+software and where there's no “main” software.
+
+=item B<--no-unapply-patches, --unapply-patches>
+
+By default, B<dpkg-source> will automatically unapply the patches in the
+B<--after-build> hook if it did apply them during
+B<--before-build> (B<--unapply-patches> since dpkg 1.15.8,
+B<--no-unapply-patches> since dpkg 1.16.5).
+Those options allow you to forcefully disable
+or enable the patch unapplication process.
+Those options are only allowed
+in B<debian/source/local-options> so that all generated source
+packages have the same behavior by default.
+
+=item B<--abort-on-upstream-changes>
+
+The process fails if an automatic patch has been generated
+(since dpkg 1.15.8).
+This option
+can be used to ensure that all changes were properly recorded in separate
+B<quilt> patches prior to the source package build.
+This option is not
+allowed in B<debian/source/options> but can be used in
+B<debian/source/local-options>.
+
+=item B<--auto-commit>
+
+The process doesn't fail if an automatic patch has been generated, instead
+it's immediately recorded in the B<quilt> series.
+
+=back
+
+B<Extract options>
+
+=over
+
+=item B<--skip-debianization>
+
+Skips extraction of the debian tarball on top of the upstream sources
+(since dpkg 1.15.1).
+
+=item B<--skip-patches>
+
+Do not apply patches at the end of the extraction (since dpkg 1.14.18).
+
+=back
+
+=head2 Format: 3.0 (custom)
+
+Supported since dpkg 1.14.17.
+This format is special.
+It doesn't represent a real source package
+format but can be used to create source packages with arbitrary files.
+
+B<Build options>
+
+All non-option arguments are taken as files to integrate in the
+generated source package.
+They must exist and are preferably in the current directory.
+At least one file must be given.
+
+=over
+
+=item B<--target-format=>I<value>
+
+B<Required>.
+Defines the real format of the generated source package.
+The generated .dsc file will contain this value in its B<Format> field
+and not “3.0 (custom)”.
+
+=back
+
+=head2 Format: 3.0 (git)
+
+Supported since dpkg 1.14.17.
+This format is experimental.
+
+A source package in this format consists of a
+single bundle of a git repository B<.git> to hold the source of a package.
+There may also be a B<.gitshallow> file listing revisions for a shallow
+git clone.
+
+B<Extracting>
+
+The bundle is cloned as a git repository to the target directory.
+If there is a gitshallow file, it is installed as I<.git/shallow> inside
+the cloned git repository.
+
+Note that by default the new repository will have the same branch checked
+out that was checked out in the original source.
+(Typically “main”, but it could be anything.)
+Any other branches will be available under I<remotes/origin/>.
+
+B<Building>
+
+Before going any further, some checks are done to ensure that we
+don't have any non-ignored uncommitted changes.
+
+L<git-bundle(1)> is used to generate a bundle of the git repository.
+By default, all branches and tags in the repository are included in the
+bundle.
+
+B<Build options>
+
+=over
+
+=item B<--git-ref=>I<ref>
+
+Allows specifying a git ref to include in the git bundle.
+Use disables the default behavior of including all branches and tags.
+May be specified multiple times.
+The I<ref> can be the name of a branch or tag to include.
+It may also be any parameter that can be passed to L<git-rev-list(1)>.
+For example, to include only the main branch, use B<--git-ref=>main.
+To include all tags and
+branches, except for the private branch, use B<--git-ref=>--all
+B<--git-ref=>^private
+
+=item B<--git-depth=>I<number>
+
+Creates a shallow clone with a history truncated to the specified number of
+revisions.
+
+=back
+
+=head2 Format: 3.0 (bzr)
+
+Supported since dpkg 1.14.17.
+This format is experimental.
+It generates a single tarball containing the bzr repository.
+
+B<Extracting>
+
+The tarball is unpacked and then bzr is used to checkout the current
+branch.
+
+B<Building>
+
+Before going any further, some checks are done to ensure that we
+don't have any non-ignored uncommitted changes.
+
+Then the VCS specific part of the source directory is copied over to a
+temporary directory.
+Before this temporary directory is packed in a tarball,
+various cleanup are done to save space.
+
+=head1 DIAGNOSTICS
+
+=head2 no source format specified in debian/source/format
+
+The file B<debian/source/format> should always exist and indicate the
+desired source format.
+For backwards compatibility, format “1.0” is
+assumed when the file doesn't exist but you should not rely on this:
+at some point in the future B<dpkg-source> will be modified to fail
+when that file doesn't exist.
+
+The rationale is that format “1.0” is no longer the recommended format,
+you should usually pick one of the newer formats (“3.0 (quilt)”, “3.0
+(native)”) but B<dpkg-source> will not do this automatically for you.
+If you want to continue using the old format, you should be explicit about
+it and put “1.0” in B<debian/source/format>.
+
+=head2 the diff modifies the following upstream files
+
+When using source format “1.0” it is usually a bad idea to modify
+upstream files directly as the changes end up hidden and mostly
+undocumented in the .diff.gz file.
+Instead you should store your changes as patches in the debian directory
+and apply them at build-time.
+To avoid
+this complexity you can also use the format “3.0 (quilt)” that offers
+this natively.
+
+=head2 cannot represent change to I<file>
+
+Changes to upstream sources are usually stored with patch files, but not
+all changes can be represented with patches: they can only alter the
+content of plain text files.
+If you try replacing a file with something of
+a different type (for example replacing a plain file with a symlink or a
+directory), you will get this error message.
+
+=head2 newly created empty file I<file> will not be represented in diff
+
+Empty files can't be created with patch files.
+Thus this change is not
+recorded in the source package and you are warned about it.
+
+=head2 executable mode I<perms> of I<file> will not be represented in diff
+
+Patch files do not record permissions of files and thus executable
+permissions are not stored in the source package.
+This warning reminds you
+of that fact.
+
+=head2 special mode I<perms> of I<file> will not be represented in diff
+
+Patch files do not record permissions of files and thus modified
+permissions are not stored in the source package.
+This warning reminds you
+of that fact.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=item B<SOURCE_DATE_EPOCH>
+
+If set, it will be used as the timestamp (as seconds since the epoch) to
+clamp the mtime in the L<tar(5)> file entries.
+
+Since dpkg 1.18.11.
+
+=item B<VISUAL>
+
+=item B<EDITOR>
+
+Used by the “2.0” and “3.0 (quilt)” source format modules.
+
+=item B<GIT_DIR>
+
+=item B<GIT_INDEX_FILE>
+
+=item B<GIT_OBJECT_DIRECTORY>
+
+=item B<GIT_ALTERNATE_OBJECT_DIRECTORIES>
+
+=item B<GIT_WORK_TREE>
+
+Used by the “3.0 (git)” source format modules.
+
+=back
+
+=head1 FILES
+
+=head2 debian/source/format
+
+This file contains on a single line the format that should be used to
+build the source package (possible formats are described above).
+No leading
+or trailing spaces are allowed.
+
+=head2 debian/source/include-binaries
+
+This file contains a list of pathnames of binary files (one per line) relative
+to the source root directory that should be included in the debian tarball.
+Leading and trailing spaces are stripped.
+Lines starting with ‘B<#>’ are comments and are skipped.
+Empty lines are ignored.
+
+=head2 debian/source/options
+
+This file contains a list of long options that should be automatically
+prepended to the set of command line options of a B<dpkg-source --build>
+or B<dpkg-source --print-format> call.
+Options like
+B<--compression> and B<--compression-level> are well suited for
+this file.
+
+Each option should be put on a separate line.
+Empty lines and lines
+starting with ‘B<#>’ are ignored.
+The leading ‘B<-->’ should be stripped and short options are
+not allowed.
+Optional spaces are allowed around the ‘B<=>’ symbol and optional
+quotes are allowed around the value.
+Here's an example of such a file:
+
+ # let dpkg-source create a debian.tar.bz2 with maximal compression
+ compression = "bzip2"
+ compression-level = 9
+ # use debian/patches/debian-changes as automatic patch
+ single-debian-patch
+ # ignore changes on config.{sub,guess}
+ extend-diff-ignore = "(^|/)(config.sub|config.guess)$"
+
+B<Note>: B<format> options are not accepted in this file, you should
+use B<debian/source/format> instead.
+
+=head2 debian/source/local-options
+
+Exactly like B<debian/source/options> except that the file is not
+included in the generated source package.
+It can be useful to store
+a preference tied to the maintainer or to the VCS repository where
+the source package is maintained.
+
+=head2 debian/source/local-patch-header
+
+=head2 debian/source/patch-header
+
+Free form text that is put on top of the automatic patch generated
+in formats “2.0” or “3.0 (quilt)”.
+B<local-patch-header> is not
+included in the generated source package while B<patch-header> is.
+
+=head2 debian/patches/I<vendor>.series
+
+=head2 debian/patches/series
+
+This file lists all patches that have to be applied (in the given order)
+on top of the upstream source package.
+Leading and trailing spaces are
+stripped.
+The I<vendor> will be the lowercase name of the current vendor, or
+B<debian> if there is no vendor defined.
+If the vendor-specific series file does not exist, the vendor-less series
+file will be used.
+Lines starting with ‘B<#>’ are comments and are skipped.
+Empty lines are ignored.
+Remaining lines start with a patch filename (relative
+to the B<debian/patches/> directory) up to the first space character or
+the end of line.
+Optional B<quilt> options can follow up to the end of line
+or the first ‘B<#>’ preceded by one or more spaces (which marks the
+start of a comment up to the end of line).
+
+=head1 SECURITY
+
+Examining untrusted source packages or extracting them into staging
+directories should be considered a security boundary, and any breakage
+of that boundary stemming from these operations should be considered a
+security vulnerability.
+But handling untrusted source packages should not be done lightly,
+as the surface area includes any compression command supported,
+commands to handle specific data formats (such as L<tar(1)> or L<patch(1)>)
+in addition to the source package formats and control files themselves.
+Performing these operations over untrusted data as root is strongly
+discouraged.
+
+Building source packages should only be performed over trusted data.
+
+=head1 BUGS
+
+The point at which field overriding occurs compared to certain
+standard output field settings is rather confused.
+
+=head1 SEE ALSO
+
+L<deb-src-control(5)>,
+L<deb-changelog(5)>,
+L<deb-substvars(5)>,
+L<dsc(5)>.

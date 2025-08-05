@@ -1,0 +1,48 @@
+#
+# Build time variable substitution for generated files.
+#
+
+# Shell support.
+
+subst_shell_rules = "\
+	s{^ADMINDIR=.*$$}{ADMINDIR='$(admindir)'}; \
+	s{^BACKUPSDIR=.*$$}{BACKUPSDIR='$(backupsdir)'}; \
+	s{^PKGDATADIR_DEFAULT=.*$$}{PKGDATADIR_DEFAULT='$(pkgdatadir)'}; \
+	s{^version=['\"][^'\"]*[\"']}{version=\"$(PACKAGE_VERSION)\"}; \
+	s{^TAR=.*$$}{TAR='$(TAR)'}; \
+	"
+
+subst_shell_filter = $(PERL) -p -e $(subst_shell_rules)
+subst_shell_file = $(PERL) -i -p -e $(shell_subst_rules)
+
+SUFFIXES += .sh
+
+.sh: Makefile
+	@test -d `dirname $@` || $(MKDIR_P) `dirname $@`
+	$(AM_V_GEN) $(subst_shell_filter) <$< >$@
+	$(AM_V_at) chmod +x $@
+
+# Perl support.
+
+# Note: We need to hex-escape '#' (0x23) to avoid portability issues with make.
+subst_perl_rules = "\
+	s{^\x23!\s*/usr/bin/perl}{\x23!$(PERL)}; \
+	s{our \\\$$CONFDIR = .*;}{our \\\$$CONFDIR = '$(pkgconfdir)';}; \
+	s{our \\\$$ADMINDIR = .*;}{our \\\$$ADMINDIR = '$(admindir)';}; \
+	s{our \\\$$LIBDIR = .*;}{our \\\$$LIBDIR = '$(pkglibexecdir)';}; \
+	s{our \\\$$DATADIR = .*;}{our \\\$$DATADIR = '$(pkgdatadir)';}; \
+	s{our \\\$$PROGMAKE = .*;}{our \\\$$PROGMAKE = '$(MAKE)';}; \
+	s{our \\\$$PROGTAR = .*;}{our \\\$$PROGTAR = '$(TAR)';}; \
+	s{our \\\$$PROGPATCH = .*;}{our \\\$$PROGPATCH = '$(PATCH)';}; \
+	s{our \\\$$PROGVERSION = .*;}{our \\\$$PROGVERSION = '$(PACKAGE_VERSION)';}; \
+	"
+
+subst_perl_filter = $(PERL) -p -e $(subst_perl_rules)
+subst_perl_file = $(PERL) -i -p -e $(subst_perl_rules)
+
+SUFFIXES += .pl
+
+.pl: Makefile
+	@test -d `dirname $@` || $(MKDIR_P) `dirname $@`
+	$(AM_V_GEN) $(subst_perl_filter) <$< >$@
+	$(AM_V_at) chmod +x $@

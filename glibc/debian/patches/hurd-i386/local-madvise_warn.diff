@@ -1,0 +1,19 @@
+Do not warn about madvise not being implemented. It does not have any real
+semantic anyway, and that brings some -Werror FTBFS.
+
+--- a/misc/madvise.c
++++ b/misc/madvise.c
+@@ -32,4 +32,4 @@ __madvise (void *addr, size_t len, int a
+ libc_hidden_def (__madvise)
+ weak_alias (__madvise, madvise)
+ 
+-stub_warning (madvise)
++/* stub_warning (madvise) */
+--- a/posix/posix_madvise.c
++++ b/posix/posix_madvise.c
+@@ -27,4 +27,4 @@ posix_madvise (__ptr_t addr, size_t len,
+ {
+   return ENOSYS;
+ }
+-stub_warning (posix_madvise)
++/* stub_warning (posix_madvise) */

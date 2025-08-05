@@ -1,0 +1,70 @@
+# dpkg manual page - deb-postinst(5)
+#
+# Copyright © 2016 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-postinst - package post-installation maintainer script
+
+=head1 SYNOPSIS
+
+B<DEBIAN/postinst>
+
+=head1 DESCRIPTION
+
+A package can perform several post-installation actions via maintainer
+scripts, by including an executable I<postinst> file in its control
+archive (i.e. I<DEBIAN/postinst> during package creation).
+
+The script can be called in the following ways:
+
+=over
+
+=item I<postinst> B<configure> I<old-version>
+
+After the package was installed.
+
+=item I<postinst> B<triggered> "I<trigger-name...>"
+
+After the package was triggered.
+The list of space-separated I<trigger-name>s is passed as the second
+argument.
+
+=item I<old-postinst> B<abort-upgrade> I<new-version>
+
+If I<prerm> fails during B<upgrade> or fails on B<failed-upgrade>.
+
+=item I<old-postinst> B<abort-remove>
+
+If I<prerm> fails during B<remove>.
+
+=item I<postinst> B<abort-deconfigure> B<in-favour> I<new-package> I<new-version>
+
+=item S<       >[ B<removing> I<old-package> I<old-version> ]
+
+If I<prerm> fails during B<deconfigure in-favour> of a package.
+
+=item I<postinst> B<abort-remove> B<in-favour> I<new-package> I<new-version>
+
+If I<prerm> fails during B<remove in-favour> for replacement due to conflict.
+
+=back
+
+=head1 SEE ALSO
+
+L<dpkg(1)>.

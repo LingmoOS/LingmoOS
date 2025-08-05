@@ -1,0 +1,103 @@
+# dpkg manual page - dpkg-build-api(7)
+#
+# Copyright © 2021-2023 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-build-api - source package dpkg build API level
+
+=head1 SYNOPSIS
+
+ Build-Depends:
+  dpkg-build-api (= 1),
+
+=head1 DESCRIPTION
+
+The source package dpkg build API level, defines a versioned interface for
+source packages, where each API level provides specific behaviors and
+guarantees.
+
+These interfaces can then be adopted by packages in a gradual way,
+and phased out more easily than with global behavior changes.
+
+The declaration of this API level is done through build-dependencies, in
+one of B<Build-Depends>, B<Build-Depends-Indep> or B<Build-Depends-Arch>,
+or via the environment variable B<DPKG_BUILD_API>, which will override these
+if both are present, and might emit a warning in case they are different.
+
+=head1 API LEVELS
+
+=over
+
+=item v2
+
+This level is still under development, and cannot be declared via
+build-dependencies.
+
+=item v1
+
+This is the recommended level.
+Since dpkg 1.22.0.
+
+Changes from v0 are:
+
+=over
+
+=item *
+
+B<dpkg-shlibdeps> no longer uses the B<LD_LIBRARY_PATH> environment variable.
+The B<-l> option should be used instead.
+
+=item *
+
+B<dpkg-buildpackage> defaults to B<Rules-Requires-Root> value B<no>.
+To restore the B<v0> behavior (from before dpkg 1.22.13)
+B<Rules-Requires-Root> should be set to B<binary-targets>.
+
+=item *
+
+B<dpkg-buildpackage> expects all required F<debian/rules> targets to be
+supported and no longer has backwards compatibility fallback code.
+The required targets are B<clean>, B<build>, B<build-indep>, B<build-arch>,
+B<binary-indep> and B<binary-arch>.
+
+=item *
+
+B<vendor.mk> defaults to using B<dpkg_vendor_derives_from_v1> for the
+B<dpkg_vendor_derives_from> macro.
+To restore the B<v0> behavior set B<dpkg_vendor_derives_from> to
+B<dpkg_vendor_derives_from_v0>.
+
+=item *
+
+B<default.mk> defaults to including B<buildtools.mk>.
+
+=back
+
+=item v0
+
+This is the current global level, equivalent to not specifying one.
+The interfaces and behaviors provided are subject to the normal global
+interface updates, which tend to require longer deprecation cycles and/or
+coordinated transitions.
+
+=back
+
+=head1 SEE ALSO
+
+L<deb-src-control(5)>.

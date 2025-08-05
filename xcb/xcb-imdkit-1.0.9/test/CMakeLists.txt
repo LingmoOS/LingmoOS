@@ -1,0 +1,10 @@
+add_executable(test_server test_server.c)
+target_link_libraries(test_server XCB::XCB XCB::UTIL XCB::KEYSYMS xcb-imdkit)
+add_executable(test_client test_client.c)
+target_link_libraries(test_client XCB::XCB XCB::UTIL XCB::KEYSYMS xcb-imdkit)
+add_executable(client_demo client_demo.c)
+target_link_libraries(client_demo XCB::XCB XCB::UTIL XCB::KEYSYMS xcb-imdkit)
+
+add_executable(test_encoding test_encoding.c)
+target_link_libraries(test_encoding xcb-imdkit)
+add_test(NAME test_encoding COMMAND test_encoding)

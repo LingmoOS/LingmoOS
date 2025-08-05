@@ -1,0 +1,50 @@
+2014-08-27  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	Fix bind when umask is e.g. 0777.
+
+        * sysdeps/mach/hurd/bind.c (__bind): Pass mode 0666 to __dir_mkfile
+        instead of final mode, so that call __ifsock_getsockaddr can always
+        succeed, before calling __file_chmod to fix the mode according to umask,
+        before calling __dir_link to show the file.
+
+Part of the original fix was committed, the other hasn't been yet, see Roland's
+"Harumph" reply to
+https://sourceware.org/ml/libc-alpha/2014-08/msg00408.html
+
+---
+ sysdeps/mach/hurd/bind.c |   17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+--- a/sysdeps/mach/hurd/bind.c
++++ b/sysdeps/mach/hurd/bind.c
+@@ -52,7 +52,7 @@
+ 	err = ENOTDIR;
+       else
+ 	/* Create a new, unlinked node in the target directory.  */
+-	err = __dir_mkfile (dir, O_CREAT, 0666 & ~_hurd_umask, &node);
++	err = __dir_mkfile (dir, O_CREAT, 0666, &node);
+ 
+       if (! err)
+ 	{
+@@ -80,11 +80,16 @@
+ 		err = EGRATUITOUS;
+ 	      if (! err)
+ 		{
+-		  /* Link the node, now a socket with proper mode, into the
+-		     target directory.  */
+-		  err = __dir_link (dir, node, n, 1);
+-		  if (err == EEXIST)
+-		    err = EADDRINUSE;
++		  /* Fix the access mode before showing the file.  */
++		  err = __file_chmod (node, 0666 & ~_hurd_umask);
++		  if (! err)
++		    {
++		      /* Link the node, now a socket with proper mode, into the
++		         target directory.  */
++		      err = __dir_link (dir, node, n, 1);
++		      if (err == EEXIST)
++			err = EADDRINUSE;
++		    }
+ 		  if (err)
+ 		    __mach_port_deallocate (__mach_task_self (), aport);
+ 		}

@@ -1,0 +1,101 @@
+# dpkg manual page - deb-src-rules(5)
+#
+# Copyright © 2016-2017 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-src-rules - Debian source package rules file
+
+=head1 SYNOPSIS
+
+B<debian/rules>
+
+=head1 DESCRIPTION
+
+This file contains the instructions necessary to build the binary packages
+from the source package.
+
+The I<debian/rules> file is an executable Makefile, with a shebang that
+is usually set to "#!/usr/bin/make -f".
+
+It must support the following make targets:
+
+=over
+
+=item B<clean>
+
+Clean up the source tree, by undoing any change done by any of the build
+and binary targets.
+This target will be called with root privileges.
+
+=item B<build-indep>
+
+Build architecture independent files required to build any architecture
+independent binary package.
+If there are no architecture independent binary packages to generate,
+the target must still exist but do nothing.
+This target must not require root privileges.
+
+=item B<build-arch>
+
+Build architecture dependent files required to build any architecture
+dependent binary package.
+If there are no architecture dependent binary packages to generate,
+the target must still exist but do nothing.
+This target must not require root privileges.
+
+=item B<build>
+
+Build architecture independent and dependent files, either by depending
+(at least transitively) on B<build-indep> and/or B<build-arch> or
+by inlining what those targets would do.
+This target must not require root privileges.
+
+=item B<binary-indep>
+
+Build architecture independent binary packages.
+This target must depend (at least transitively) on either B<build-indep>
+or B<build>.
+This target will be called with root privileges.
+
+=item B<binary-arch>
+
+Build architecture dependent binary packages.
+This target must depend (at least transitively) on either B<build-arch>
+or B<build>.
+This target will be called with root privileges.
+
+=item B<binary>
+
+Build architecture independent and dependent binary packages, either by
+depending (at least transitively) on B<binary-indep> and/or
+B<binary-arch> or by inlining what those targets would do.
+This target will be called with root privileges.
+
+=back
+
+=head1 SEE ALSO
+
+L<dpkg-architecture(1)>,
+L<dpkg-vendor(1)>,
+L<dpkg-buildflags(1)>,
+L<dpkg-parsechangelog(1)>,
+L<dpkg-shlibdeps(1)>,
+L<dpkg-gencontrol(1)>,
+L<dpkg-deb(1)>,
+L<dpkg-distaddfile(1)>.

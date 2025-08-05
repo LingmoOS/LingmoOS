@@ -1,0 +1,303 @@
+#!/usr/bin/perl
+#
+# gen-changelog
+#
+# Copyright © 2020-2022 Guillem Jover <guillem@debian.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+use strict;
+use warnings;
+
+use lib qw(scripts);
+
+use List::Util qw(uniq);
+use Text::Wrap;
+use Dpkg::IPC;
+use Dpkg::Index;
+
+my @sections = qw(
+    main
+    arch
+    port
+    perl-mod
+    make-mod
+    shell-mod
+    doc
+    code-int
+    build-sys
+    pkg
+    test
+    l10n
+);
+
+my %sections = (
+    arch => {
+        title => 'Architecture support',
+        match => qr/^arch: /,
+    },
+    port => {
+        title => 'Portability',
+        type => 'porting',
+    },
+    'perl-mod' => {
+        title => 'Perl modules',
+        match => qr/^(?:Test|Dpkg|Dselect).*[,:] /,
+        keep => 1,
+    },
+    'make-mod' => {
+        title => 'Make fragments',
+        match => qr{^scripts/mk: },
+    },
+    'shell-mod' => {
+        title => 'Shell library',
+        match => qr{^src/sh: },
+    },
+    doc => {
+        title => 'Documentation',
+        match => qr/^(?:doc|man)[,:] /,
+        keep => 1,
+    },
+    'code-int' => {
+        title => 'Code internals',
+        type => 'internal',
+        match => qr/^(?:lib(?:compat|dpkg)?|src|scripts|perl|utils): /,
+        keep => 1,
+    },
+    'build-sys' => {
+        title => 'Build system',
+        match => qr/^build: /,
+    },
+    pkg => {
+        title => 'Packaging',
+        match => qr/^debian: /,
+    },
+    test => {
+        title => 'Test suite',
+        match => qr/^(?:test|t): /,
+    },
+    l10n => {
+        title => 'Localization',
+        match => qr/^po: /,
+        sort => 1,
+    },
+);
+
+my @metafields = qw(
+    Thanks-to
+    Co-Author
+    Based-on-patch-by
+    Improved-by
+    Prompted-by
+    Reported-by
+    Required-by
+    Analysis-by
+    Requested-by
+    Suggested-by
+    Spotted-by
+    Naming-by
+    Ref
+);
+
+my %metafield = (
+    'Co-Author' => 'Co-authored by',
+    'Based-on-patch-by' => 'Based on a patch by',
+    'Improved-by' => 'Improved by',
+    'Prompted-by' => 'Prompted by',
+    'Reported-by' => 'Reported by',
+    'Required-by' => 'Required by',
+    'Analysis-by' => 'Analysis by',
+    'Requested-by' => 'Requested by',
+    'Suggested-by' => 'Suggested by',
+    'Spotted-by' => 'Spotted by',
+    'Naming-by' => 'Naming by',
+    'Thanks-to' => 'Thanks to',
+    'Ref' => 'See',
+);
+
+my %mappings = (
+    'u-a' => 'update-alternatives',
+    's-s-d' => 'start-stop-daemon',
+    'dpkg-m-h' => 'dpkg-maintscript-helper',
+);
+
+my $log_format =
+    'Commit: %H%n' .
+    'Author: %aN%n' .
+    'AuthorEmail: %aE%n' .
+    'Committer: %cN%n' .
+    'CommitterEmail: %cE%n' .
+    'Title: %s%n' .
+    '%(trailers:only,unfold)%N';
+
+my $tag_prev = $ARGV[0];
+my $tag_next = $ARGV[1] // "";
+
+$tag_prev //= qx(git describe --abbrev=0);
+chomp $tag_prev;
+
+my $fh_gitlog;
+
+spawn(
+    exec => [
+        qw(git log --first-parent), "--format=tformat:$log_format",
+        "$tag_prev..$tag_next"
+    ],
+    to_pipe => \$fh_gitlog,
+);
+
+my $log = Dpkg::Index->new(
+    get_key_func => sub { return $_[0]->{Commit} },
+    item_opts => {
+        keep_duplicate => 1,
+        allow_duplicate => 1,
+    },
+);
+$log->parse($fh_gitlog, 'git log');
+
+my %entries;
+my %groups;
+my @groups;
+
+# Analyze the commits and select which group and section to place them in.
+foreach my $id (reverse $log->get_keys()) {
+    my $commit = $log->get_by_key($id);
+    my $title = $commit->{Title};
+    my $group = $commit->{Committer};
+    my $changelog = $commit->{'Changelog'};
+    my $sectmatch = 'main';
+
+    # Skip irrelevant commits.
+    if ($title =~ m/^(?:Bump version to|Release) /) {
+        next;
+    }
+    if ($title =~ m/^po: Regenerate/) {
+        next;
+    }
+
+    if (defined $changelog) {
+        # Skip silent commits.
+        next if $changelog =~ m/(?:silent|skip|ignore)/;
+
+        # Include the entire commit body for verbose commits.
+        if ($changelog =~ m/(?:verbose|full)/) {
+            my $body = qx(git show -s --pretty=tformat:%b $id);
+            $commit->{Title} .= "\n$body";
+        }
+
+        if ($changelog =~ m{s/([^/]+)/([^/]+)/}) {
+            $commit->{Fixup} = {
+                old => $1,
+                new => $2,
+            };
+        }
+    }
+
+    # Decide into what section the commit should go.
+    foreach my $sectname (keys %sections) {
+        my $section = $sections{$sectname};
+
+        if ((exists $section->{match} and $title =~ m/$section->{match}/) or
+            (exists $section->{type} and defined $changelog and
+             $changelog =~ m/$section->{type}/)) {
+            $sectmatch = $sectname;
+            last;
+        }
+    }
+
+    # Add the group entries in order, with l10n ones at the end.
+    if (not exists $entries{$group}) {
+        push @groups, $group;
+    }
+
+    push @{$entries{$group}{$sectmatch}}, $commit;
+}
+
+# Go over the groups and their sections and format them.
+foreach my $groupname (@groups) {
+    print "\n";
+    print "  [ $groupname ]\n";
+
+    foreach my $sectname (@sections) {
+        my $section = $sections{$sectname};
+
+        next unless exists $entries{$groupname}{$sectname};
+        next if @{$entries{$groupname}{$sectname}} == 0;
+
+        if (exists $sections{$sectname}->{title}) {
+            print "  * $sections{$sectname}->{title}:\n";
+        }
+        my @entries;
+        foreach my $commit (@{$entries{$groupname}{$sectname}}) {
+            my $title = $commit->{Title} =~ s/\.$//r . '.';
+
+            # Remove the title prefix if needed.
+            if (exists $section->{match} and not exists $section->{keep}) {
+                $title =~ s/$section->{match}//;
+            }
+
+            # Metafields.
+            if ($commit->{Author} ne $commit->{Committer}) {
+                $commit->{'Thanks-to'} = "$commit->{Author} <$commit->{AuthorEmail}>";
+            }
+            foreach my $metafield (@metafields) {
+                next unless exists $commit->{$metafield};
+
+                my $values = $commit->{$metafield};
+                $values = [ $values ] if ref $values ne 'ARRAY';
+
+                foreach my $value (@{$values}) {
+                    $title .= "\n$metafield{$metafield} $value.";
+                }
+            }
+            # Handle the Closes metafield last.
+            if (exists $commit->{Closes}) {
+                $title .= " Closes: $commit->{Closes}";
+            }
+
+            # Handle fixups from git notes.
+            if (exists $commit->{Fixup}) {
+                $title =~ s/\Q$commit->{Fixup}{old}\E/$commit->{Fixup}{new}/m;
+            }
+
+            # Handle mappings.
+            foreach my $mapping (keys %mappings) {
+                $title =~ s/$mapping/$mappings{$mapping}/g;
+            }
+
+            # Select prefix formatting.
+            my ($entry_tab, $body_tab);
+            if (not exists $sections{$sectname}->{title}) {
+                $entry_tab = '  * ';
+                $body_tab  = '    ';
+            } else {
+                $entry_tab = '    - ';
+                $body_tab  = '      ';
+            }
+
+            local $Text::Wrap::columns = 80;
+            local $Text::Wrap::unexpand = 0;
+            local $Text::Wrap::huge = 'overflow';
+            local $Text::Wrap::break = qr/(?<!Closes:)\s/;
+            push @entries, wrap($entry_tab, $body_tab, $title) . "\n";
+        }
+
+        if ($sections{$sectname}->{sort}) {
+            @entries = uniq(sort @entries);
+        }
+
+        print @entries;
+    }
+}

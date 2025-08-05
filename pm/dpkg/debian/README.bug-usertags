@@ -1,0 +1,200 @@
+To make management of bugs against the dpkg suite easier we add as many of
+the following usertags as apply to the bug.
+
+When filing bugs, please do the same to aid triage, by including in the
+bug report pseudo-header:
+
+	User: dpkg@packages.debian.org
+	Usertags: <usertag...>
+
+These are the currently used usertags:
+
+Generic tags
+============
+
+usertag			description
+-------			-----------
+
+segfault		Errors that cause segmentation faults.
+conffile		Issues with configuration file handling.
+symlink			Issues related to symlink handling.
+diversion		Issues related to diversions.
+depends			Issues with dependency relationship handling.
+maint-script		Errors related to maintainer scripts.
+db			Issues handling the database.
+file-metadata		File metadata tracking (perm, acl, cap, hash).
+trivial			Bug should be trivial to fix.
+perf			Performance problems.
+new-buildflags		Request for new build flags.
+new-field		Request for new control file fields.
+new-option		Request for new command line option.
+deb-format		Changes to the binary (.deb) format.
+dsc-format		Changes to the source (.dsc) format.
+arch			Updates to ‘cputable’, ‘ostable’ and porting patches.
+vendor			Vendor support and needed modifications.
+frontend		Issues or request affecting or required by frontends.
+build			Project build system issues.
+i18n			Internationalization problems.
+l10n			New or updated translations and bugs affecting
+			  translation. Include the language code in the tag,
+			  e.g. [INTL:cy_GB].
+doc			Documentation bugs, including --help, program output
+			  and manual pages.
+
+Program tags
+============
+
+usertag			description
+-------			-----------
+
+dpkg
+dpkg-architecture
+dpkg-buildapi
+dpkg-buildflags
+dpkg-buildpackage
+dpkg-buildtree
+dpkg-checkbuilddeps
+dpkg-db-backup
+dpkg-deb
+dpkg-distaddfile
+dpkg-divert
+dpkg-genbuildinfo
+dpkg-genchanges
+dpkg-gencontrol
+dpkg-gensymbols
+dpkg-maintscript-helper
+dpkg-mergechangelogs
+dpkg-name
+dpkg-parsechangelog
+dpkg-realpath
+dpkg-query
+dpkg-scanpackages
+dpkg-scansources
+dpkg-shlibdeps
+dpkg-source
+dpkg-split
+dpkg-statoverride
+dpkg-trigger
+dpkg-vendor
+make-fragment		*.mk
+s-s-d			start-stop-daemon
+u-a			update-alternatives
+
+Current categories
+==================
+
+,--- Definition ---
+user dpkg@packages.debian.org
+
+usercategory dpkg-status [hidden]
+ * Status [pending=]
+   + Outstanding with Patch Available [0:pending+tag=patch]
+   + Outstanding and Confirmed [1:pending+tag=confirmed]
+   + Outstanding and More Info Needed [pending+tag=moreinfo]
+   + Outstanding but Will Not Fix [pending+tag=wontfix]
+   + Outstanding and Unclassified [2:pending]
+   + From other Branch [absent]
+   + Pending Upload [pending-fixed]
+   + Fixed in NMU [fixed]
+   + Resolved [done]
+   + Unknown Pending Status []
+
+usercategory dpkg-program [hidden]
+ * Dpkg by Program
+  + dpkg program [tag=dpkg]
+  + dpkg-deb [tag=dpkg-deb]
+  + dpkg-divert [tag=dpkg-divert]
+  + dpkg-query [tag=dpkg-query]
+  + dpkg-split [tag=dpkg-split]
+  + dpkg-statoverride [tag=dpkg-statoverride]
+  + dpkg-trigger [tag=dpkg-trigger]
+  + dpkg-realpath [tag=dpkg-realpath]
+  + dpkg-maintscript-helper [tag=dpkg-maintscript-helper]
+  + dpkg-db-backup [tag=dpkg-db-backup]
+  + update-alternatives [tag=u-a]
+  + start-stop-daemon [tag=s-s-d]
+  + libdpkg [package=libdpkg-dev]
+  + dpkg-architecture [tag=dpkg-architecture]
+  + dpkg-buildapi [tag=dpkg-buildapi]
+  + dpkg-buildflags [tag=dpkg-buildflags]
+  + dpkg-buildpackage [tag=dpkg-buildpackage]
+  + dpkg-buildtree [tag=dpkg-buildtree]
+  + dpkg-checkbuilddeps [tag=dpkg-checkbuilddeps]
+  + dpkg-distaddfile [tag=dpkg-distaddfile]
+  + dpkg-genbuildinfo [tag=dpkg-genbuildinfo]
+  + dpkg-genchanges [tag=dpkg-genchanges]
+  + dpkg-gencontrol [tag=dpkg-gencontrol]
+  + dpkg-gensymbols [tag=dpkg-gensymbols]
+  + dpkg-mergechangelogs [tag=dpkg-mergechangelogs]
+  + dpkg-name [tag=dpkg-name]
+  + dpkg-parsechangelog [tag=dpkg-parsechangelog]
+  + dpkg-scanpackages [tag=dpkg-scanpackages]
+  + dpkg-scansources [tag=dpkg-scansources]
+  + dpkg-shlibdeps [tag=dpkg-shlibdeps]
+  + dpkg-source [tag=dpkg-source]
+  + dpkg-vendor [tag=dpkg-vendor]
+  + Dpkg perl modules [package=libdpkg-perl]
+  + Dpkg make fragment [tag=make-fragment]
+  + dselect [package=dselect]
+  + Other [0:]
+
+usercategory dpkg-class [hidden]
+ * Dpkg by Classification [tag=]
+  + Segfault [segfault]
+  + Dependency relationship handling [depends]
+  + Conffile handling [conffile]
+  + Symlink handling [symlink]
+  + Diversion handling [diversion]
+  + Database handling [db]
+  + File metadata tracking [file-metadata]
+  + Maintainer script handling [maint-script]
+  + Performance issue [perf]
+  + Trivial fix [trivial]
+  + New build flags [new-buildflags]
+  + New control field [new-field]
+  + New command line option [new-option]
+  + Binary package format [deb-format]
+  + Source package format [dsc-format]
+  + Architecture specific issue [arch]
+  + Vendor specific issue [vendor]
+  + Frontend features [frontend]
+  + Own build system [build]
+  + Internationalization [i18n]
+  + Localization [l10n]
+  + Documentation [doc]
+  + Other [0:]
+
+usercategory view-simple
+ * status
+ * dpkg-program
+
+usercategory view-program
+ * status
+ * dpkg-program
+ * severity
+ * classification
+
+usercategory view-class
+ * status
+ * dpkg-class
+ * severity
+ * classification
+
+usercategory view-detail
+ * dpkg-status
+ * severity
+ * dpkg-program
+ * dpkg-class
+
+# Change default view
+usercategory normal
+ * status
+ * dpkg-program
+ * severity
+ * classification
+
+usercategory traditional
+ * status
+ * severity
+ * classification
+`---

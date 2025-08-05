@@ -1,0 +1,111 @@
+# dpkg manual page - deb-shlibs(5)
+#
+# Copyright © 1996 Michael Shields <shields@crosslink.net>
+# Copyright © 2008 Zack Weinberg <zackw@panix.com>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-shlibs - Debian shared library information file
+
+=head1 SYNOPSIS
+
+B<debian/shlibs>, B<debian/>I<binary-name>B<.shlibs>, B<DEBIAN/shlibs>
+
+=head1 DESCRIPTION
+
+B<shlibs>
+files map shared library names and versions
+(I<SONAMEs>)
+to dependencies suitable for a package control file.
+There is one entry per line.
+Blank lines are B<not> allowed.
+Lines beginning
+with a B<#> character are considered commentary, and are ignored.
+All other lines must have the format:
+
+=over
+
+[I<type>B<:>]
+I<library>
+I<version>
+I<dependencies>
+
+=back
+
+The I<library> and I<version> fields are whitespace-delimited,
+but the I<dependencies> field extends to the end of the line.
+The
+I<type> field is optional and normally not needed.
+
+The I<dependencies> field has the same syntax as the B<Depends>
+field in a binary control file, see L<deb-control(5)>.
+
+=head1 SONAME FORMATS
+
+The SONAME formats supported are:
+
+=over
+
+I<name>.so.I<version>
+
+=back
+
+and
+
+=over
+
+I<name>-I<version>.so
+
+=back
+
+where I<name> is usually prefixed by B<lib>.
+
+The former tends to be used by shared libraries with stable interfaces.
+The latter by shared libraries with unstable interfaces, where the whole
+version becomes part of the SONAME and needs to be specified in full
+when linking against those libraries.
+
+=head1 EXAMPLES
+
+The
+B<shlibs>
+file for a typical library package, named
+I<libcrunch1>,
+that provides one library whose SONAME is
+I<libcrunch.so.1>,
+might read
+
+=over
+
+ libcrunch 1 libcrunch1 (>= 1.2-1)
+
+=back
+
+The I<dependencies>
+must mention the most recent version of the package that added new
+symbols to the library: in the above example, new symbols were added to
+version 1.2 of
+I<libcrunch>.
+This is not the only reason the dependencies might need to be
+tightened.
+
+=head1 SEE ALSO
+
+L<deb-control(5)>,
+L<deb-symbols(5)>,
+L<dpkg-shlibdeps(1)>.

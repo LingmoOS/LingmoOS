@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+# begin-remove-after: released:forky
+# We create the top-level lib symlink on merged-usr systems, so that we can
+# cover cases where for example libc-i386 on amd64 is installed and then removed
+# (which deletes the symlink too). Note that we only suppor the simplest case,
+# no conversion (moving files) is done here, as that's the job of the usrmerge
+# package. See: https://bugs.debian.org/926699
+# Once all packages install only under /usr, this can be removed, as removing
+# this package will no longer result in the symlink being deleted.
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+    if [ -L /lib ]; then
+        # Has the link already been created?
+        # If it has not, is a directory already there? Half-merged systems are
+        # the problem of usrmerge, simply ignore them here.
+        if [ ! -L SLIBDIR ] && [ ! -d SLIBDIR ]; then
+            ln -s usrSLIBDIR SLIBDIR
+        fi
+    fi
+fi
+# end-remove-after
+
+#DEBHELPER#
+

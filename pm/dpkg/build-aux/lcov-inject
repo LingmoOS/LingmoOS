@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+#
+# lcov-inject
+#
+# Copyright © 2014-2024 Guillem Jover <guillem@debian.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+use strict;
+use warnings;
+
+use Cwd;
+use Devel::Cover::DB;
+
+my $dir = 'scripts';
+my $cwd = getcwd();
+
+chdir $dir or die "cannot switch to $dir\n";
+
+my $db = Devel::Cover::DB->new(db => 'cover_db');
+$db = $db->merge_runs();
+$db->calculate_summary(map { $_ => 1 } $db->collected());
+
+chdir $cwd or die "cannot switch to $cwd\n";
+
+my $s = $db->{summary}{Total};
+
+my $tmpl = sprintf '
+      <td class="coverDirectory"><a href="%s">%s</a></td>
+      <td class="coverBar" align="center">
+        <table border=0 cellspacing=0 cellpadding=1>
+          <tr><td class="coverBarOutline">%s</td></tr>
+        </table>
+      </td>
+      %s
+      %s
+      %s
+    </tr>
+    <tr>
+', "$dir/coverage.html", $dir, bar_html($s->{total}{percentage}),
+   box_html($s->{total}), box_html($s->{branch}), box_html($s->{subroutine});
+
+while (<>) {
+    s/^(.*<td .*href="utils\/index\.html".*<\/td>.*)$/$tmpl$1/;
+    print;
+}
+
+sub bar_image {
+    my ($num) = @_;
+
+    return 'emerald.png' if $num >= 90;
+    return 'ruby.png' if $num < 75;
+    return 'amber.png';
+}
+
+sub bar_html {
+    my ($num) = @_;
+
+    my $html = sprintf '<img src="%s" width=%.0f height=10 alt="%.1f">',
+                       bar_image($num), $num, $num;
+
+    if ($num < 100) {
+        $html .= sprintf '<img src="snow.png" width=%.0f height=10 alt="%.1f">',
+                         100 - $num, $num;
+    }
+
+    return $html;
+}
+
+sub box_rating {
+    my ($num) = @_;
+
+    return 'Hi' if $num >= 90;
+    return 'Lo' if $num < 75;
+    return 'Med';
+}
+
+sub box_html {
+    my ($stats) = @_;
+
+    return sprintf '<td class="coverPer%s">%.1f&nbsp;%%</td>' . "\n" .
+                   '<td class="coverNum%s">%d</td>' . "\n" .
+                   '<td class="coverNum%s">%d</td>',
+        box_rating($stats->{percentage}), $stats->{percentage},
+        'Dflt', $stats->{total}, 'Dflt', $stats->{covered};
+}

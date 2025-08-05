@@ -1,0 +1,166 @@
+#!/bin/sh
+#
+# gen-release
+#
+# Copyright © 2017-2024 Guillem Jover <guillem@debian.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+set -x
+set -e
+set -u
+
+# Pre-checks.
+
+# Currently requires packages: dpkg-dev, git, schroot and devscripts
+# (the latter should eventually be replaced by dpkg tools).
+for req in dpkg-parsechangelog git schroot dch debsign dscverify; do
+  if ! command -v $req >/dev/null 2>&1; then
+    echo "error: missing required command $req" >&2
+    exit 1
+  fi
+done
+
+if [ "$(dpkg-parsechangelog -SSource)" != 'dpkg' ] || ! [ -e .git ]; then
+  echo "error: not inside the dpkg git tree" >&2
+  exit 1
+fi
+
+# Setup.
+dist="${1:-unstable}"
+relver="${2:-$(dpkg-parsechangelog -SVersion)}"
+
+numjobs="$(nproc)"
+checkflags="-j$numjobs AUTHOR_TESTING=1 TEST_PARALLEL=$numjobs"
+
+dircode="$(pwd)"
+dirtests="$dircode/tests"
+dirbuild="$(mktemp --tmpdir --directory release-dpkg.XXXXXXXX)"
+
+# Update the source chroot.
+schroot -c "source:$dist" -- sudo eatmydata apt-get --yes update
+schroot -c "source:$dist" -- sudo eatmydata apt-get --yes upgrade
+
+# Setup a clean chroot session.
+chroot="$(schroot -c "$dist" -b)"
+
+echo "Release start: $(date -Iseconds)"
+
+cd "$dircode"
+
+schroot -c "$chroot" -r -- sudo eatmydata apt-get --yes build-dep \
+  -P pkg.dpkg.author-testing,pkg.dpkg.author-release .
+
+if ! git log --format=tformat:%s -s HEAD~2.. | grep 'po: Regenerate'; then
+  # Clean slate.
+  git clean -Xdf
+
+  # Update the .pot and .po files.
+  echo "$relver" >.dist-version
+  schroot -c "$chroot" -r -- ./autogen
+  schroot -c "$chroot" -r -- ./configure
+  schroot -c "$chroot" -r -- make update-po
+  rm -f .dist-version
+  git commit -a -m 'po: Regenerate .pot files and merge .po files with them'
+fi
+
+if [ -z "$(git tag --list "$relver")" ]; then
+  # Finalize the actual release.
+  genchangelog='build-aux/gen-changelog'
+  sed -i -e "2e$genchangelog" -e '2,3d' debian/changelog
+  dch -r -D"$dist"
+  git commit -a -m "Release $relver"
+  git tag -s "$relver" -m "Release $relver"
+elif [ "$(git describe)" != "$relver" ]; then
+  echo "error: mismatched tag for $relver not on git HEAD" >&2
+  exit 1
+fi
+
+# Clean slate.
+git clean -Xdf
+
+# Prepare the tarball for distribution.
+schroot -c "$chroot" -r -- ./autogen
+schroot -c "$chroot" -r -- ./configure
+if [ "$dist" = unstable ]; then
+  # Generate the CPAN distribution only from main.
+  make dist-cpan
+fi
+# shellcheck disable=SC2086
+schroot -c "$chroot" -r -- make $checkflags distcheck
+
+# Prepare for packaged release.
+mkdir -p "$dirbuild"
+cp "dpkg-$relver.tar.xz" "$dirbuild/"
+
+# Teardown pre-release chroot.
+schroot -c "$chroot" -e
+
+cd "$dirbuild"
+
+# Setup a clean chroot session for the dist tarballs.
+chroot="$(schroot -c "$dist" -b)"
+
+# Build twice, to make sure we can build ourselves with the new dpkg,
+# and to verify that we are building reproducibly.
+
+# Build A and B in a chroot.
+for iter in a b; do (
+  mkdir -p "build-$iter"
+  cd "build-$iter"
+  tar xaf "../dpkg-$relver.tar.xz"
+  cd "dpkg-$relver"
+
+  schroot -c "$chroot" -r -- sudo eatmydata apt-get --yes build-dep .
+  schroot -c "$chroot" -r -- dpkg-buildpackage -us -uc --changes-option=-S
+
+  # Install resulting .debs.
+  schroot -c "$chroot" -r -- sudo eatmydata dpkg -iO ../*.deb
+) done
+
+# Run functional test-suite.
+(
+  set -x
+  set -e
+  set -u
+
+  cd "$dirtests"
+  schroot -c "$chroot" -r -- sudo eatmydata apt-get --yes purge pkg-config
+  schroot -c "$chroot" -r -- eatmydata make test-clean clean
+  schroot -c "$chroot" -r -- eatmydata make test 2>&1 | tee test.log
+)
+
+schroot -c "$chroot" -r -- sudo eatmydata apt-get --yes install lintian
+
+# Verify the result.
+diff -u build-a/dpkg_*.changes build-b/dpkg_*.changes || true
+# Prompt to continue? (.buildinfo will differ)
+diff -u build-a/dpkg_*.buildinfo build-b/dpkg_*.buildinfo || true
+# Prompt to continue? (Build-Date, Environment will differ).
+schroot -c "$chroot" -r -- lintian build-b/*.changes build-b/*.deb
+
+# Teardown chroot.
+schroot -c "$chroot" -e
+
+# Sign and verify.
+cd "$dirbuild/build-b"
+debsign dpkg_"${relver}"_*.changes
+dscverify dpkg_"${relver}"_*.changes
+
+ls -l "$(pwd)"
+
+echo "Release process finished (dpkg ${relver}): $(date -Iseconds)"
+echo "  Hint: upload to CPAN"
+echo "  Hint: update https://www.wikidata.org/wiki/Q305892"

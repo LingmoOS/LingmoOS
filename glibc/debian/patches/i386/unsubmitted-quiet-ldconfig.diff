@@ -1,0 +1,16 @@
+--- a/sysdeps/x86/readelflib.c
++++ b/sysdeps/x86/readelflib.c
+@@ -46,8 +46,11 @@
+ 	break;
+       /* Fall through.  */
+     default:
+-      error (0, 0, _("%s is for unknown machine %d.\n"),
+-	     file_name, elf_header->e_machine);
++      if (opt_verbose)
++	{
++	  error (0, 0, _("%s is for unknown machine %d.\n"),
++		file_name, elf_header->e_machine);
++	}
+       return 1;
+     }
+ 

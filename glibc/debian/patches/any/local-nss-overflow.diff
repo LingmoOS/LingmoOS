@@ -1,0 +1,51 @@
+2009-01-12  Arthur Loiret  <aloiret@debian.org>
+
+	nss/nss_files/files-parse.c: Include <limits.h>.
+	(INT_FIELD): Convert field to uintmax_t and check for 32-bit overflow.
+	(INT_FIELD_MAYBE_NULL): Likewise.
+
+---
+ nss/nss_files/files-parse.c |   15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+--- a/nss/nss_files/files-parse.c
++++ b/nss/nss_files/files-parse.c
+@@ -21,6 +21,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stdint.h>
++#include <limits.h>
+ #include <nss_files.h>
+ 
+ /* These symbols are defined by the including source file:
+@@ -162,7 +163,12 @@
+ # define INT_FIELD(variable, terminator_p, swallow, base, convert)	      \
+   {									      \
+     char *endp;								      \
+-    variable = convert (strtou32 (line, &endp, base));			      \
++    unsigned long long tmp;						      \
++    /* Prevent from 32-bit overflow.  */				      \
++    tmp = __strtoull_internal (line, &endp, base, 0);			      \
++    if (tmp > UINT_MAX)						      \
++      return 0;								      \
++    variable = convert ((unsigned long int)tmp);			      \
+     if (endp == line)							      \
+       return 0;								      \
+     else if (terminator_p (*endp))					      \
+@@ -177,10 +183,15 @@
+ # define INT_FIELD_MAYBE_NULL(variable, terminator_p, swallow, base, convert, default)	      \
+   {									      \
+     char *endp;								      \
++    unsigned long long tmp;						      \
+     if (*line == '\0')							      \
+       /* We expect some more input, so don't allow the string to end here. */ \
+       return 0;								      \
+-    variable = convert (strtou32 (line, &endp, base));			      \
++    /* Prevent from 32-bit overflow.  */				      \
++    tmp = __strtoull_internal (line, &endp, base, 0);		      \
++    if (tmp > UINT_MAX)						      \
++      return 0;								      \
++    variable = convert ((unsigned long int)tmp);			      \
+     if (endp == line)							      \
+       variable = default;						      \
+     if (terminator_p (*endp))						      \

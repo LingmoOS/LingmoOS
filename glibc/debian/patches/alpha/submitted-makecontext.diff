@@ -1,0 +1,30 @@
+2018-03-01  Aurelien Jarno  <aurelien@aurel32.net>
+
+	[BZ #22910]
+	* sysdeps/unix/sysv/linux/alpha/setcontext.S (__startcontext): Set
+	up CFI directive to forbid further backtracing.
+
+
+--- a/sysdeps/unix/sysv/linux/alpha/makecontext.S
++++ b/sysdeps/unix/sysv/linux/alpha/makecontext.S
+@@ -138,10 +138,14 @@ weak_alias (__makecontext, makecontext)
+ 
+ 	.align	4
+ 	.ent	__startcontext
++	cfi_startproc
+ __startcontext:
+ 	.frame $31, 0, $31, 0
+ 	.prologue 0
+ 
++	/* Mark ra as undefined in order to stop unwinding here.  */
++	cfi_undefined(ra)
++
+ 	jsr	$26, ($27), 0
+ 	ldgp	$29, 0($26)
+ 	mov	$9, $16
+@@ -160,4 +164,5 @@ __startcontext:
+ 
+ 	halt
+ 
++	cfi_endproc
+ 	.end __startcontext

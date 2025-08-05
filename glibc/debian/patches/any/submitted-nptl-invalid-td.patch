@@ -1,0 +1,22 @@
+2010-02-27  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* pthreadP.h(INVALID_TD_P, INVALID_NOT_TERMINATED_TD_P): detect
+	NULL pointers.
+
+---
+ sysdeps/nptl/pthreadP.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/sysdeps/nptl/pthreadP.h
++++ b/sysdeps/nptl/pthreadP.h
+@@ -242,8 +242,8 @@
+ /* This will not catch all invalid descriptors but is better than
+    nothing.  And if the test triggers the thread descriptor is
+    guaranteed to be invalid.  */
+-#define INVALID_TD_P(pd) __builtin_expect ((pd)->tid <= 0, 0)
+-#define INVALID_NOT_TERMINATED_TD_P(pd) __builtin_expect ((pd)->tid < 0, 0)
++#define INVALID_TD_P(pd) __builtin_expect (!pd || ((pd)->tid <= 0), 0)
++#define INVALID_NOT_TERMINATED_TD_P(pd) __builtin_expect (!pd || ((pd)->tid < 0), 0)
+ 
+ extern void __pthread_unwind (__pthread_unwind_buf_t *__buf)
+      __cleanup_fct_attribute __attribute ((__noreturn__))

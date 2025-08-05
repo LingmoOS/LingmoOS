@@ -1,0 +1,142 @@
+# dpkg manual page - dpkg-scansources(1)
+#
+# Copyright © 2005 Roderick Schertler <roderick@argon.org>
+# Copyright © 2006 Frank Lichtenheld <djpig@debian.org>
+# Copyright © 2009 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-scansources - create Sources index files
+
+=head1 SYNOPSIS
+
+B<dpkg-scansources>
+[I<option>...] I<binary-dir>
+[I<override-file>
+[I<path-prefix>]]
+B<E<gt>>
+I<Sources>
+
+=head1 DESCRIPTION
+
+B<dpkg-scansources> scans the given I<binary-dir> for I<.dsc> files.
+These are used to create a Debian source index, which is output to
+stdout.
+
+The I<override-file>, if given, is used to set priorities in the resulting
+index stanzas and to override the maintainer field given in the I<.dsc>
+files.
+The file can be compressed (since dpkg 1.15.5).
+See
+L<deb-override(5)>
+for the format of this file.
+
+B<Note>: Since
+the override file is indexed by binary, not source packages, there's a bit
+of a problem here.
+The current implementation uses the highest priority of
+all the binary packages produced by a I<.dsc> file for the priority of the
+source package, and the override entry for the first binary package listed
+in the I<.dsc> file to modify maintainer information.
+This might change.
+
+The I<path-prefix>, if given, is prepended to the directory field in the
+generated source index.
+You generally use this to make the directory
+fields contain the path from the top of the Debian archive hierarchy.
+
+B<Note>:
+If you want to access the generated Sources file with
+L<apt(8)>
+you will probably need to compress the file with
+L<gzip(1)>
+(generating a Sources.gz file).
+L<apt(8)>
+ignores uncompressed Sources files except on local access (i.e.
+B<file://>
+sources).
+
+=head1 OPTIONS
+
+=over
+
+=item B<-n>, B<--no-sort>
+
+Do not sort the index stanzas.
+Normally they are sorted by source package name.
+
+=item B<-e>, B<--extra-override> I<file>
+
+Scan I<file> to find supplementary overrides (since dpkg 1.15.4;
+the file can be compressed since dpkg 1.15.5).
+See
+L<deb-extra-override(5)>
+for more information on its format.
+
+=item B<-s>, B<--source-override> I<file>
+
+Use I<file> as the source override file (the file can be compressed
+since dpkg 1.15.5).
+The default is the name of the override file you specified with I<.src>
+appended.
+
+The source override file is in a different format from the binary override
+file.
+It contains only two whitespace separated fields,
+the first is the source package name and the second is the section.
+Blank lines and comment lines are ignored in the normal manner.
+If a package appears in both files
+the source override takes precedence for setting the section.
+
+=item B<--debug>
+
+Turn debugging on.
+
+=item B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 SEE ALSO
+
+L<deb-override(5)>,
+L<deb-extra-override(5)>,
+L<dpkg-scanpackages(1)>.

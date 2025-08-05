@@ -1,0 +1,57 @@
+# dpkg manual page - deb-md5sums(5)
+#
+# Copyright © 2021 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-md5sums - package MD5 file digests
+
+=head1 SYNOPSIS
+
+B<DEBIAN/md5sums>
+
+=head1 DESCRIPTION
+
+A package declares the MD5 digests for the package file contents by
+including an I<md5sums> file in its control archive (i.e. I<DEBIAN/md5sums>
+during package creation).
+This file is used for integrity verification
+and deduplication purposes, and not for any kind of security purpose.
+
+This file contains a list of MD5 digests (as 32 case-insensitive hexadecimal
+characters) followed by two spaces (U+0020 B<SPACE>) and the absolute
+pathname of a plain file, one per line.
+
+Trailing slashes (U+002F B</>) in the pathname will be trimmed.
+Neither trailing whitespace nor empty or whitespace-only lines are accepted.
+
+If the control file does not exist in the binary package, L<dpkg(1)> will
+generate the matching information at unpack time (since B<dpkg> 1.16.3).
+
+=head1 EXAMPLE
+
+ 53c0d4afe4bc4eccb5cb234d2e06ef4d  usr/bin/dpkg
+ f8da2bc74cdcad8b81c48a4f0d7bb0a8  usr/bin/dpkg-deb
+ 70b913132de56e95e75de504979309b4  usr/bin/dpkg-divert
+ […]
+
+=head1 SEE ALSO
+
+L<md5sum(1)>,
+L<dpkg-deb(1)>,
+L<dpkg(1)>.

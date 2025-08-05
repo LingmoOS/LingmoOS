@@ -1,0 +1,22 @@
+When profiling ext2fs, the shutdown stops all RPC, which thus interrupts this
+open, and we have to retry here.
+
+TODO: is open really supposed to expose such EINTR?  Should the generic gmon
+loop around EINTR (since there might be signals happening indeed)
+
+Index: glibc-2.22/gmon/gmon.c
+===================================================================
+--- glibc-2.22.orig/gmon/gmon.c
++++ glibc-2.22/gmon/gmon.c
+@@ -357,8 +357,11 @@ write_gmon (void)
+ 
+     if (fd == -1)
+       {
++       do
+ 	fd = __open_nocancel ("gmon.out", O_CREAT | O_TRUNC | O_WRONLY
+ 			      | O_NOFOLLOW | O_CLOEXEC, 0666);
++       while (fd < 0 && errno == EINTR);
++
+ 	if (fd < 0)
+ 	  {
+ 	    char buf[300];

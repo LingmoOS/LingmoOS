@@ -1,0 +1,34 @@
+Partially revert:
+
+From: Roland Mc Grath <roland@hack.frob.com>
+Date: Tue, 8 May 2012 17:44:57 +0000 (+0200)
+Subject: Warn if user requests __FORTIFY_SOURCE but it is disabled
+X-Git-Tag: glibc-2.16-tps~448
+X-Git-Url: http://sourceware.org/git/?p=glibc.git;a=commitdiff_plain;h=05c2c9618f583ea4acd69b3fe5ae2a2922dd2ddc
+
+Warn if user requests __FORTIFY_SOURCE but it is disabled
+
+[BZ #13979]
+        * include/features.h: Warn if user requests __FORTIFY_SOURCE
+        checking but the checks are disabled for any reason.
+
+---
+ include/features.h |    7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+--- a/include/features.h
++++ b/include/features.h
+@@ -407,10 +407,9 @@
+ # define __USE_GNU	1
+ #endif
+ 
+-#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0
+-# if !defined __OPTIMIZE__ || __OPTIMIZE__ <= 0
+-#  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+-# elif !__GNUC_PREREQ (4, 1)
++#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 \
++    && defined __OPTIMIZE__ && __OPTIMIZE__ > 0
++# if !__GNUC_PREREQ (4, 1)
+ #  warning _FORTIFY_SOURCE requires GCC 4.1 or later
+ # elif _FORTIFY_SOURCE > 2 && (__glibc_clang_prereq (9, 0)		      \
+ 			       || __GNUC_PREREQ (12, 0))

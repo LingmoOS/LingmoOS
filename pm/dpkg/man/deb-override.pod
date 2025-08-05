@@ -1,0 +1,79 @@
+# dpkg manual page - deb-override(5)
+#
+# Copyright © 1996 Michael Shields <shields@crosslink.net>
+# Copyright © 2010 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-override - Debian archive override file
+
+=head1 SYNOPSIS
+
+B<override>
+
+=head1 DESCRIPTION
+
+While most information about a package can be found in the control file,
+some is managed centrally by the distribution czars rather than by the
+maintainer in order to offer some global consistency.
+This information is found in the override file.
+
+The override file has a simple whitespace-delimited format.
+Comments are
+allowed (denoted with a
+B<#>).
+
+=over
+
+I<package>
+I<priority>
+I<section>
+[I<maintainer-info>]
+
+=back
+
+I<package>
+is the name of the package.
+Entries in the override file for packages
+not found in the tree of binary packages are ignored.
+
+I<priority>
+and
+I<section>
+correspond to the respective control fields available in the .deb.
+The
+allowed values are specific to each distribution archive.
+
+I<maintainer-info>,
+if present, can be either the name of a maintainer for an unconditional
+override, or else
+I<old-maintainer>
+B<=E<gt>>
+I<new-maintainer>
+to perform a substitution.
+
+The override files used to make the official Packages lists may be found
+in the
+I<indices>
+directory on any Debian mirror.
+
+=head1 SEE ALSO
+
+L<dpkg-scanpackages(1)>,
+L<dpkg-scansources(1)>,
+L<apt-ftparchive(1)>.

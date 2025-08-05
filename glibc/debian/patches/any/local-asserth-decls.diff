@@ -1,0 +1,36 @@
+# DP: Description: /usr/include/assert.h
+# DP:	One must be allowed to include <assert.h> multiple times with different
+# DP:	values for NDEBUG, so the file is not protected against multiple
+# DP:	inclusions.  Unfortunately this means that the declarations for
+# DP:	__assert_fail() and the like may occur multiple times in a compilation
+# DP:	unit, causing gcc to issue a batch of warnings.
+# DP:	I believe this can be fixed by protecting the declarations (but only
+# DP:	those declarations) against repetition.
+# DP: Author: Jeroen T. Vermeulen <jtv@xs4all.nl>
+# DP: Upstream status: Not submitted
+# DP: Status Details: Plan to submit
+# DP: Date: 2003-01-01
+
+---
+ assert/assert.h |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/assert/assert.h
++++ b/assert/assert.h
+@@ -61,6 +61,8 @@
+ 
+ #else /* Not NDEBUG.  */
+ 
++#ifndef _ASSERT_H_DECLS
++#define _ASSERT_H_DECLS
+ __BEGIN_DECLS
+ 
+ /* This prints an "Assertion failed" message and aborts.  */
+@@ -81,6 +83,7 @@
+ 
+ 
+ __END_DECLS
++#endif /* Not _ASSERT_H_DECLS */
+ 
+ /* When possible, define assert so that it does not add extra
+    parentheses around EXPR.  Otherwise, those added parentheses would

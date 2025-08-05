@@ -1,0 +1,55 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  clang-format:
+    name: Check clang-format
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm git clang diffutils
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+      - uses: actions/checkout@v4
+      - uses: fcitx/github-actions@clang-format
+  check:
+    name: Build and test
+    needs: clang-format
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            cxx_compiler: g++
+          - compiler: clang
+            cxx_compiler: clang++
+    env:
+      CC: ${{ matrix.compiler }}
+      CXX: ${{ matrix.cxx_compiler }}
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm base-devel clang cmake ninja extra-cmake-modules xcb-util xcb-util-keysyms
+      - name: Init CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: c
+      - uses: actions/checkout@v4
+      - name: Build and Install
+        uses: fcitx/github-actions@cmake
+        with:
+          path: .
+      - name: Test
+        run: |
+          ctest --test-dir build
+      - name: CodeQL Analysis
+        uses: github/codeql-action/analyze@v2

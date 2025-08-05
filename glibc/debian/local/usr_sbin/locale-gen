@@ -1,0 +1,58 @@
+#!/bin/sh
+
+set -e
+
+LOCALEGEN=/etc/locale.gen
+LOCALES=/usr/share/i18n/locales
+USER_LOCALES=/usr/local/share/i18n/locales
+
+
+[ -s "$LOCALEGEN" ] || exit 0
+
+[ "$1" = '--keep-existing' ] && KEEP=1 || KEEP=0
+
+# Remove old locale-archive before generating new locale data
+[ "$KEEP" -eq 0 ] && rm -rf /usr/lib/locale/locale-archive || :
+
+umask 022
+
+is_entry_ok() {
+	if [ -z "$locale" ] || [ -z "$charset" ]; then
+		echo "error: Bad entry '$locale $charset'"
+		return 1
+	fi
+}
+
+if [ -z "${I18NPATH:-}" ]; then
+  if [ -d "${USER_LOCALES}" ]; then
+    I18NPATH="${USER_LOCALES%%/locales*}/"
+  fi
+fi
+
+echo "Generating locales (this might take a while)..."
+while read -r locale charset; do
+	if [ -z "$locale" ] || [ "${locale#\#}" != "$locale" ]; then continue; fi
+	is_entry_ok || continue
+
+	if [ "$KEEP" -eq 1 ] && PERL_BADLANG=0 perl -MPOSIX -e 'exit 1 unless setlocale(LC_ALL, $ARGV[0])' "$locale"; then continue; fi
+
+	locale_base="${locale%%.*}"
+	locale_base="${locale_base%%@*}"
+	locale_at="${locale#*@}"
+	[ "$locale_at" = "$locale" ] && locale_at= || locale_at="@$locale_at"
+	printf "  %s.%s%s..." "$locale_base" "$charset" "$locale_at"
+
+	if [ -e "$USER_LOCALES/$locale" ]; then
+		input="$USER_LOCALES/$locale"
+	elif [ -e "$LOCALES/$locale" ]; then
+		input="$locale"
+	else
+		input="$locale_base$locale_at"
+		if [ -e "$USER_LOCALES/$input" ]; then
+			input="$USER_LOCALES/$input"
+		fi
+	fi
+	I18NPATH="${I18NPATH}" localedef -i "$input" -c -f "$charset" -A /usr/share/locale/locale.alias "$locale" || :
+	echo " done"
+done < "$LOCALEGEN"
+echo "Generation complete."

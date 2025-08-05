@@ -1,0 +1,37 @@
+2013-05-11  Aurelien Jarno  <aurelien@aurel32.net>
+  
+	* elf/ldd.bash.in: Verify the dynamic linker is working before
+	using it.
+
+---
+ elf/ldd.bash.in |   20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
+
+--- a/elf/ldd.bash.in
++++ b/elf/ldd.bash.in
+@@ -151,17 +152,18 @@
+     echo "ldd: ${file}:" $"not regular file" >&2
+     result=1
+   elif test -r "$file"; then
+-    test -x "$file" || echo 'ldd:' $"\
+-warning: you do not have execution permission for" "\`$file'" >&2
+     RTLD=
+     ret=1
+     for rtld in ${RTLDLIST}; do
+       if test -x $rtld; then
+-	verify_out=`${rtld} --verify "$file"`
+-	ret=$?
+-	case $ret in
+-	[02]) RTLD=${rtld}; break;;
+-	esac
++	dummy=`$rtld --version 2>&1`
++	if test $? = 0; then
++	  verify_out=`${rtld} --verify "$file"`
++	  ret=$?
++	  case $ret in
++	  [02]) RTLD=${rtld}; break;;
++	  esac
++	fi
+       fi
+     done
+     case $ret in

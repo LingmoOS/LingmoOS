@@ -1,0 +1,25 @@
+#!/bin/sh
+self="$(basename "$0")"
+from="$(dirname "$0")"
+case "$DPKG_BUILDPACKAGE_HOOK_NAME" in
+source)
+  echo "$self: source-opts=$DPKG_BUILDPACKAGE_HOOK_SOURCE_OPTIONS"
+  ;;
+build)
+  echo "$self: build-target=$DPKG_BUILDPACKAGE_HOOK_BUILD_TARGET"
+  ;;
+binary)
+  echo "$self: binary-target=$DPKG_BUILDPACKAGE_HOOK_BINARY_TARGET"
+  ;;
+buildinfo)
+  echo "$self: buildinfo-opts=$DPKG_BUILDPACKAGE_HOOK_BUILDINFO_OPTIONS" \
+    | perl -p -E "s{\Q$from\E}{<ROOT>}g"
+  ;;
+changes)
+  echo "$self: changes-opts=$DPKG_BUILDPACKAGE_HOOK_CHANGES_OPTIONS"
+  ;;
+check)
+  echo "$self: check-opts=$DPKG_BUILDPACKAGE_HOOK_CHECK_OPTIONS"
+  ;;
+esac
+echo "$self: n=$DPKG_BUILDPACKAGE_HOOK_NAME $*"

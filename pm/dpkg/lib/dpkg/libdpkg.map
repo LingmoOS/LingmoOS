@@ -1,0 +1,532 @@
+LIBDPKG_0 {
+global:
+	# Error reporting
+	dpkg_has_error;
+	dpkg_put_warn;
+	dpkg_put_error;
+	dpkg_put_errno;
+	dpkg_error_print;
+	dpkg_error_move;
+	dpkg_error_destroy;
+
+	# Charset and string functions
+	dpkg_locales_init;
+	dpkg_locales_done;
+
+	# Program name
+	dpkg_set_progname;
+	dpkg_get_progname;
+
+	# Program setup/teardown
+	dpkg_program_init;
+	dpkg_program_done;
+
+	# Ar support
+	dpkg_ar_fdopen;
+	dpkg_ar_create;
+	dpkg_ar_open;
+	dpkg_ar_set_mtime;
+	dpkg_ar_close;
+	dpkg_ar_normalize_name;
+	dpkg_ar_member_is_illegal;
+
+	# Process information
+	dpkg_get_pid_execname;
+
+local:
+	*;
+};
+
+LIBDPKG_PRIVATE {
+	# Color handling
+	color_set_mode;
+	color_get;
+	color_reset;
+
+	# Error handling
+	push_error_context_jump;
+	push_error_context_func;
+	push_error_context;
+	pop_error_context;
+	print_fatal_error;
+	catch_fatal_error;
+	push_checkpoint;
+	push_cleanup;
+	push_cleanup_fallback;
+	pop_cleanup;
+	onerr_abort;		# XXX variable, do not export
+	ohshitv;
+	ohshite;
+	ohshit;
+	do_internerr;
+	dpkg_set_report_piped_mode;
+	dpkg_set_report_buffer;
+	dpkg_warning_printer;
+	dpkg_set_warning_printer;
+	warning_get_count;
+	warningv;
+	warning;
+	notice;
+	info;
+	dpkg_set_hints_enable;
+	hint;
+
+	debug_set_output;
+	debug_set_mask;
+	debug_parse_mask;
+	debug_has_flag;
+	debug;
+	dpkg_debug_init;
+
+	# Generic cleanup
+	cu_closepipe;
+	cu_closestream;
+	cu_closedir;
+	cu_closefd;
+	cu_filename;
+
+	# ‘Must do’ functions
+	m_malloc;
+	m_calloc;
+	m_realloc;
+	m_strdup;
+	m_vasprintf;
+	m_asprintf;
+	m_dup;
+	m_dup2;
+	m_pipe;
+	m_output;
+	fgets_must;
+	fgets_checked;
+
+	# Charset and string functions
+	c_isbits;
+
+	str_match_end;
+	str_fnv_hash;
+	str_concat;
+	str_fmt;
+	str_escape_fmt;
+	str_strip_quotes;
+	str_rtrim_spaces;
+	str_quote_meta;
+	str_width;
+	str_gen_crop;
+
+	strvec_new;
+	strvec_grow;
+	strvec_push;
+	strvec_pop;
+	strvec_drop;
+	strvec_peek;
+	strvec_split;
+	strvec_join;
+	strvec_free;
+
+	# Variable buffer support
+	varbuf_new;
+	varbuf_init;
+	varbuf_swap;
+	varbuf_reset;
+	varbuf_grow;
+	varbuf_trunc;
+	varbuf_str;
+	varbuf_array;
+	varbuf_set_varbuf;
+	varbuf_set_buf;
+	varbuf_set_vfmt;
+	varbuf_set_fmt;
+	varbuf_add_varbuf;
+	varbuf_add_vfmt;
+	varbuf_add_fmt;
+	varbuf_add_char;
+	varbuf_dup_char;
+	varbuf_map_char;
+	varbuf_add_buf;
+	varbuf_add_dir;
+	varbuf_has_prefix;
+	varbuf_has_suffix;
+	varbuf_trim_varbuf_prefix;
+	varbuf_trim_char_prefix;
+	varbuf_detach;
+	varbuf_snapshot;
+	varbuf_rollback;
+	varbuf_rollback_len;
+	varbuf_rollback_end;
+	varbuf_destroy;
+	varbuf_free;
+
+	# Path, directory and file functions
+	secure_unlink_statted;
+	secure_unlink;
+	secure_remove;
+	path_remove_tree;
+	path_canonicalize;
+	path_skip_slash_dotslash;
+	path_trim_slash_slashdot;
+	path_basename;
+	path_make_temp_template;
+	path_quote_filename;
+
+	dir_make_path;
+	dir_make_path_parent;
+	dir_sync_path;
+	dir_sync_path_parent;
+	dir_sync_contents;
+
+	treenode_get_name;
+	treenode_get_mode;
+	treenode_get_virtname;
+	treenode_get_pathname;
+	treewalk_open;
+	treewalk_node;
+	treewalk_next;
+	treewalk_close;
+	treewalk;
+
+	file_getcwd;
+	file_realpath;
+	file_readlink;
+	file_canonicalize;
+	file_is_exec;
+	file_copy_perms;
+	file_show;
+	file_slurp;
+
+	atomic_file_new;
+	atomic_file_open;
+	atomic_file_sync;
+	atomic_file_close;
+	atomic_file_commit;
+	atomic_file_remove;
+	atomic_file_free;
+
+	glob_list_prepend;
+	glob_list_free;
+
+	# Data structure functions
+	namevalue_find_by_name;
+
+	# Buffer I/O functions
+	fd_read;
+	fd_write;
+	fd_allocate_size;
+	buffer_digest;
+	buffer_skip_*;
+	buffer_copy_*;
+
+	# Subprocess and command handling
+	subproc_signals_ignore;
+	subproc_signals_cleanup;
+	subproc_signals_restore;
+	subproc_fork;
+	subproc_reap;
+
+	command_init;
+	command_add_arg;
+	command_add_argl;
+	command_add_argv;
+	command_add_args;
+	command_exec;
+	command_shell;
+	command_in_path;
+	command_destroy;
+
+	pager_get_exec;
+	pager_spawn;
+	pager_reap;
+	pager_enable;
+
+	setcloexec;
+
+	# Memory information
+	meminfo_get_available_from_file;
+	meminfo_get_available;
+
+	# Compression support
+	compressor_find_by_name;
+	compressor_find_by_extension;
+	compressor_get_name;
+	compressor_get_extension;
+	compressor_get_strategy;
+	compressor_check_params;
+	compress_filter;
+	decompress_filter;
+
+	# Ar support
+	dpkg_ar_put_magic;
+	dpkg_ar_member_put_header;
+	dpkg_ar_member_put_file;
+	dpkg_ar_member_put_mem;
+	dpkg_ar_member_get_size;
+
+	# deb version support
+	deb_version_parse;
+
+	# Configuration and command line handling
+	dpkg_options_load;
+	dpkg_options_parse;
+	dpkg_options_parse_arg_int;
+	dpkg_options_parse_pkgname;
+	badusage;
+	cipaction;		# XXX variable, do not export
+	setaction;
+	setobsolete;
+	set_instdir;
+	set_admindir;
+	set_root;
+
+	# General logging
+	log_file;		# XXX variable, do not export
+	log_message;
+
+	# Action logging
+	statusfd_add;
+	statusfd_send;
+
+	# Progress report support
+	progress_init;
+	progress_step;
+	progress_done;
+
+	# Tar support
+	tar_atoul;
+	tar_atosl;
+	tar_extractor;
+	tar_entry_update_from_system;
+
+	# Non-freeing malloc (pool/arena)
+	nfmalloc;
+	nfstrnsave;
+	nfstrsave;
+	nffreeall;
+
+	# Version struct handling
+	dpkg_version_blank;
+	dpkg_version_is_informative;
+	dpkg_version_compare;
+	dpkg_version_relate;
+	versiondescribe;
+	versiondescribe_c;
+	parseversion;
+
+	# Architecture database
+	dpkg_arch_name_is_illegal;
+	dpkg_arch_describe;
+	dpkg_arch_find;
+	dpkg_arch_get;
+	dpkg_arch_get_list;
+	dpkg_arch_reset_list;
+	dpkg_arch_add;
+	dpkg_arch_unmark;
+	dpkg_arch_load_native;
+	dpkg_arch_load_list;
+	dpkg_arch_save_list;
+
+	# Package struct handling
+	pkgset_blank;
+	pkgset_link_pkg;
+	pkgset_installed_instances;
+	pkg_blank;
+	pkgbin_blank;
+	pkg_name_is_illegal;
+	pkg_set_status;
+	pkg_set_eflags;
+	pkg_clear_eflags;
+	pkg_reset_eflags;
+	pkg_copy_eflags;
+	pkg_set_want;
+	pkg_is_informative;
+	copy_dependency_links;
+	pkg_sorter_by_nonambig_name_arch;
+	varbuf_add_pkgbin_name;
+	varbuf_add_archqual;
+	varbuf_add_source_version;
+	pkgbin_name;
+	pkg_name;
+	pkgbin_name_const;
+	pkg_name_const;
+	pkg_source_version;
+	pkgbin_synopsis;
+	pkg_synopsis;
+	pkg_abbrev_want;
+	pkg_abbrev_status;
+	pkg_abbrev_eflag;
+	pkg_want_name;
+	pkg_eflag_name;
+	pkg_status_name;
+	pkg_priority_name;
+
+	# Package list handling
+	pkg_list_new;
+	pkg_list_free;
+	pkg_list_prepend;
+
+	# Package array handling
+	pkg_array_init_from_hash;
+	pkg_array_init_from_names;
+	pkg_array_foreach;
+	pkg_array_sort;
+	pkg_array_destroy;
+
+	# Package queue handling
+	pkg_queue_init;
+	pkg_queue_destroy;
+	pkg_queue_is_empty;
+	pkg_queue_push;
+	pkg_queue_pop;
+
+	# Package in-core database functions
+	pkg_hash_find_set;
+	pkg_hash_find_singleton;
+	pkg_hash_find_pkg;
+	pkg_hash_get_singleton;
+	pkg_hash_count_set;
+	pkg_hash_count_pkg;
+	pkg_hash_reset;
+	pkg_hash_iter_new;
+	pkg_hash_iter_next_set;
+	pkg_hash_iter_next_pkg;
+	pkg_hash_iter_free;
+	pkg_hash_report;
+
+	# Package field handling
+	booleaninfos;		# XXX variable, do not export
+	fieldinfos;		# XXX variable, do not export
+	find_field_info;
+	find_arbfield_info;
+
+	# Package field format handling
+	pkg_format_parse;
+	pkg_format_print;
+	pkg_format_show;
+	pkg_format_needs_db_fsys;
+	pkg_format_free;
+
+	# Package specifiers
+	pkg_spec_is_illegal;
+	pkg_spec_init;
+	pkg_spec_destroy;
+	pkg_spec_set;
+	pkg_spec_parse;
+	pkg_spec_match_pkg;
+	pkg_spec_parse_pkg;
+	pkg_spec_find_pkg;
+	pkg_spec_iter_init;
+	pkg_spec_iter_next_pkg;
+	pkg_spec_iter_destroy;
+
+	# Dependency and Conflict functions
+	pkg_virtual_deppossi_satisfied;
+	deparchsatisfied;
+	archsatisfied;
+	versionsatisfied;
+
+	# Package on-disk database functions
+	wantinfos;		# XXX variable, do not export
+	varbuf_add_arbfield;
+	varbufdependency;
+	varbuf_stanza;
+	write_stanza;
+	parsedb_new;
+	parsedb_open;
+	parsedb_load;
+	parsedb_parse;
+	parsedb_close;
+	parsedb;
+	writedb_stanzas;
+	writedb;
+
+	dpkg_db_set_dir;
+	dpkg_db_get_dir;
+	dpkg_db_get_path;
+
+	# Log based package on-disk database support
+	modstatdb_init;
+	modstatdb_is_locked;
+	modstatdb_can_lock;
+	modstatdb_lock;
+	modstatdb_unlock;
+	modstatdb_open;
+	modstatdb_get_status;
+	modstatdb_note;
+	modstatdb_note_ifwrite;
+	modstatdb_checkpoint;
+	modstatdb_shutdown;
+	modstatdb_done;
+
+	# Package on-disk control database support
+	pkg_infodb_foreach;
+	pkg_infodb_get_dir;
+	pkg_infodb_get_file;
+	pkg_infodb_has_file;
+	pkg_infodb_upgrade;
+
+	# Package on-disk diversion database support
+	ensure_diversions;
+
+	# Filesystem node hash support
+	fsys_hash_init;
+	fsys_hash_reset;
+	fsys_hash_entries;
+	fsys_hash_find_node;
+	fsys_hash_report;
+
+	fsys_hash_iter_new;
+	fsys_hash_iter_next;
+	fsys_hash_iter_free;
+
+	fsys_hash_rev_iter_init;
+	fsys_hash_rev_iter_next;
+	fsys_hash_rev_iter_abort;
+
+	fsys_node_pkgs_iter_new;
+	fsys_node_pkgs_iter_next;
+	fsys_node_pkgs_iter_free;
+
+	dpkg_fsys_set_dir;
+	dpkg_fsys_get_dir;
+	dpkg_fsys_get_path;
+
+	# Package on-disk filesystem sysuser/sysgroup support
+	dpkg_sysuser_from_name;
+	dpkg_sysuser_from_uid;
+	dpkg_sysgroup_from_name;
+	dpkg_sysgroup_from_gid;
+
+	# Package on-disk filesystem database support
+	parse_filehash;
+	write_filelist_except;
+	write_filehash_except;
+	ensure_packagefiles_available;
+	ensure_allinstfiles_available;
+	ensure_allinstfiles_available_quiet;
+
+	# Package on-disk stat override database support
+	statdb_parse_uid;
+	statdb_parse_gid;
+	statdb_parse_mode;
+	ensure_statoverrides;
+
+	# Triggers support
+	trig_name_is_illegal;
+	trigdef_set_methods;
+	trigdef_update_start;
+	trigdef_update_printf;
+	trigdef_parse;
+	trigdef_process_done;
+	trig_override_hooks;
+	trig_file_activate_byname;
+	trig_file_activate;
+	trig_path_activate;
+	trig_note_pend;
+	trig_note_aw;
+	trig_clear_awaiters;
+	trig_file_interests_ensure;
+	trig_file_interests_save;
+	trig_cicb_interest_delete;
+	trig_cicb_interest_add;
+	trig_parse_ci;
+	trig_cicb_statuschange_activate;
+	trig_incorporate;
+} LIBDPKG_0;

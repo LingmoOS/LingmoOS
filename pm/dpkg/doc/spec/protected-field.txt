@@ -1,0 +1,74 @@
+Support for a Protected field
+=============================
+
+Status: draft, experimental
+URL: https://wiki.debian.org/Teams/Dpkg/Spec/ProtectedField
+
+Summary
+-------
+
+The goal of the following proposal is to standardize a field to split
+part of the «Essential» packages, and add support for it in the package
+management stack. There is currently an Important field, that has the
+correct semantics but has a very confusing name and is only supported
+by apt anyway, so this new field would phase out that one.
+
+Background
+----------
+
+Our current use of «Essential: yes» is confused, and it includes several
+conflated things, some of which would be worth splitting up.
+
+We use «Essential» to:
+
+  * Denote that a package must be always installed and cannot be
+    removed (easily), because it is essential to the system in some way.
+  * Denote that a package must be functional even when just unpacked
+    (after having been configured once / fully bootstrapped).
+  * Mark auto-vivification, by making front-ends either complain very
+    loudly or reinstalling these packages when missing.
+  * Minimize dependency loops, by making these dependencies implicit.
+
+One problem is that the first point above includes being essential for
+the packaging system during upgrades/installation, for the operation
+of the system in general, and for the operation of the system during
+boot.
+
+The latter is not always necessary though, for example within a chroot,
+or some types of containers. There has been work on trying to trim down
+the pseudo-essential set as can be seen from:
+
+  <https://wiki.debian.org/Proposals/EssentialOnDiet>
+  <https://wiki.debian.org/BusterPriorityRequalification>
+
+And several of these switches made use of a pre-existing field called
+«Important», defined and currently only supported by apt, which had the
+following properties:
+
+  * These packages are not required to be installed.
+  * They do not have to be usable while unconfigured.
+  * Dependencies need to be spelled out.
+
+Proposal
+--------
+
+The proposal would be to add support for a new Protected field, with the
+following properties:
+
+  * Protected packages should not be trivial to remove (require a force
+    option for example, like «Essential»).
+  * Protected packages should not be required to be installed (i.e. once
+    removed they should not be automatically brought back by a front-end,
+    unlike «Essential»).
+  * Protected packages must be depended on explicitly (unlike «Essential»).
+  * Protected packages must be functional even when unpacked (think of
+    a boot loader or an init system; like «Essential»). [XXX: This one is
+    not entirely clear and might not match reality anyway, for example kernels,
+    which might require building an initramfs, etc.]
+
+This would make it possible to phase out the current «Important» field
+usage (because it has a name too confusing relative to the «Priority»
+value; and has small tooling coverage) and the usage of «Essential» for
+at least packages involved in the boot process, and perhaps also for
+packages essential for operation of the system in general (in contrast
+to packages required for the packaging system).

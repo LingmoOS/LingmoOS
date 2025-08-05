@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+pathfind() {
+    OLDIFS="$IFS"
+    IFS=:
+    for p in $PATH; do
+        if [ -x "$p/$*" ]; then
+            IFS="$OLDIFS"
+            return 0
+        fi
+    done
+    IFS="$OLDIFS"
+    return 1
+}
+
+case "$1" in
+    remove|purge)
+	# Is locales installed?
+	if pathfind locale-gen ; then
+		# If yes, generate locales selected in the debconf question
+		locale-gen
+	fi
+	;;
+    *)
+    	;;
+esac
+
+#DEBHELPER#
+
+exit 0

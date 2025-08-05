@@ -1,0 +1,304 @@
+# dpkg manual page - dpkg-parsechangelog(1)
+#
+# Copyright © 1995-1996 Ian Jackson <ijackson@chiark.greenend.org.uk>
+# Copyright © 2000 Wichert Akkerman <wakkerma@debian.org>
+# Copyright © 2006, 2011-2015 Guillem Jover <guillem@debian.org>
+# Copyright © 2007-2008 Frank Lichtenheld <djpig@debian.org>
+# Copyright © 2009 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-parsechangelog - parse Debian changelog files
+
+=head1 SYNOPSIS
+
+B<dpkg-parsechangelog>
+[I<option>...]
+
+=head1 DESCRIPTION
+
+B<dpkg-parsechangelog>
+reads and parses the changelog of an unpacked Debian source tree and
+outputs the information in it to standard output in a machine-readable
+form.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-l>, B<--file> I<changelog-file>
+
+Specifies the changelog file to read information from.
+A ‘-’ can be used to specify reading from standard input.
+The default is
+B<debian/changelog>.
+
+=item B<-F> I<changelog-format>
+
+Specifies the format of the changelog.
+By default the format is read
+from a special line near the bottom of the changelog or failing that
+defaults to the B<debian> standard format.
+See also L</CHANGELOG FORMATS>.
+
+=item B<-L> I<libdir>
+
+Obsolete option without effect (since dpkg 1.18.8).
+Setting the perl environment variables B<PERL5LIB> or B<PERLLIB>
+has a similar effect when looking for the parser perl modules.
+
+=item B<-S>, B<--show-field> I<field>
+
+Specifies the name of the field to show (since dpkg 1.17.0).
+The field name is not printed, only its value.
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head2 Parser Options
+
+The following options can be used to influence the output of
+the changelog parser, for example the range of entries or the format
+of the output.
+
+=over
+
+=item B<--format> I<output-format>
+
+Set the output format.
+Currently supported values are
+B<dpkg> and B<rfc822>.
+B<dpkg> is the classic output format (from before this
+option existed) and the default.
+It consists of one stanza in Debian control format (see L<deb-control(5)>).
+If more
+than one entry is requested, then most fields are taken from the
+first entry (usually the most recent entry), except otherwise stated:
+
+=over
+
+=item B<Source:> I<pkg-name>
+
+The source package name.
+
+=item B<Version:> I<version>
+
+The source version number.
+B<Note>: For binary-only releases there might be no corresponding source
+release.
+
+=item B<Distribution:> I<target-distribution>
+
+A space-separated list of one or more distribution names where this version
+should be installed when it is uploaded.
+
+=item B<Urgency:> I<urgency>
+
+The highest urgency of all included entries is used, followed by the
+concatenated (space-separated) comments from all the versions requested.
+
+=item B<Maintainer:> I<author>
+
+The name and email address of the person who prepared these changes,
+they are B<not> necessarily those of the uploader or the usual package
+maintainer.
+
+=item B<Date:> I<date>
+
+The date of the entry as a string, as it appears in the changelog.
+With a L<strptime(3)> format "B<%a, %d %b %Y %T %z>", but where the
+day of the week might not actually correspond to the real day obtained
+from the rest of the date string.
+If you need a more accurate representation of the date, use the
+B<Timestamp> field, but take into account it might not be possible to
+map it back to the exact value in this field.
+
+=item B<Timestamp:> I<timestamp>
+
+The date of the entry as a timestamp in seconds since the epoch
+(since dpkg 1.18.8).
+
+=item B<Closes:> I<bug-number>
+
+The Closes fields of all included entries are merged.
+
+=item B<Changes:> I<changelog-entries>
+
+The text of all changelog entries is concatenated.
+To make
+this field a valid Debian control format multiline field
+empty lines are replaced with a single full stop and all lines
+is intended by one space character.
+The exact content depends
+on the changelog format.
+
+=back
+
+The B<Version>, B<Distribution>, B<Urgency>, B<Maintainer> and
+B<Changes> fields are mandatory.
+
+There might be additional user-defined fields present.
+
+The B<rfc822> format uses the same fields but outputs
+a separate stanza for each changelog entry so that all
+metadata for each entry is preserved.
+
+=item B<--reverse>
+
+Include all changes in reverse order (since dpkg 1.19.1).
+
+B<Note>: For the B<dpkg> format the first entry will be the most ancient
+entry.
+
+=item B<--all>
+
+Include all changes.
+B<Note>: Other options have no effect when this is in use.
+
+=item B<-s>, B<--since> I<version>
+
+=item B<-v> I<version>
+
+Include all changes later than I<version>.
+
+=item B<-u>, B<--until> I<version>
+
+Include all changes earlier than I<version>.
+
+=item B<-f>, B<--from> I<version>
+
+Include all changes equal or later than I<version>.
+
+=item B<-t>, B<--to> I<version>
+
+Include all changes up to or equal than I<version>.
+
+=item B<-c>, B<--count> I<number>
+
+=item B<-n> I<number>
+
+Include I<number> entries from the top (or the tail
+if I<number> is lower than 0).
+
+=item B<-o>, B<--offset> I<number>
+
+Change the starting point for B<--count>, counted from the top
+(or the tail if I<number> is lower than 0).
+
+=back
+
+=head1 CHANGELOG FORMATS
+
+It is possible to use a different format to the standard one, by providing
+a parser for that alternative format.
+
+In order to have B<dpkg-parsechangelog> run the new parser, a line must
+be included within the last 40 lines of the changelog file, matching the Perl
+regular expression: “B<\schangelog-format:\s+([0-9a-z]+)\W>”.
+The part in parentheses should be the name of the format.
+For example:
+
+=over
+
+@@@ changelog-format: I<otherformat> @@@
+
+=back
+
+Changelog format names are non-empty strings of lowercase alphanumerics
+(“a-z0-9”).
+
+If such a line exists then B<dpkg-parsechangelog> will look for
+the parser as a B<Dpkg::Changelog::>I<Otherformat> perl module;
+it is an error for it not being present.
+The parser name in the perl module will be automatically capitalized.
+The default changelog format is B<debian>, and a parser for it is
+provided by default.
+
+The parser should be derived from the L<Dpkg::Changelog> class and implement
+the required documented interface.
+
+If the changelog format which is being parsed always or almost always
+leaves a blank line between individual change notes, these blank lines
+should be stripped out, so as to make the resulting output compact.
+
+If the changelog format does not contain date or package name information
+this information should be omitted from the output.
+The parser should not
+attempt to synthesize it or find it from other sources.
+
+If the changelog does not have the expected format the parser should
+error out, rather than trying to muddle through and possibly generating
+incorrect output.
+
+A changelog parser may not interact with the user at all.
+
+=head1 NOTES
+
+All B<Parser Options> except for B<-v> are only supported
+since dpkg 1.14.16.
+
+Short option parsing with non-bundled values available only since dpkg 1.18.0.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 FILES
+
+=over
+
+=item B<debian/changelog>
+
+The changelog file, used to obtain version-dependent information about
+the source package, such as the urgency and distribution of an upload,
+the changes made since a particular release, and the source version
+number itself.
+
+=back
+
+=head1 BUGS
+
+The B<Maintainer> field has a confusing name matching the field in
+the F<debian/control> file but not its exact semantics,
+where its meaning would be better represented by the B<Changed-By> field
+name used in the F<.changes> file.
+
+=head1 SEE ALSO
+
+L<deb-changelog(5)>.

@@ -1,0 +1,88 @@
+#!/usr/bin/make -f
+# debian/rules for the dpkg suite.
+# Copyright © 2004 Scott James Remnant <scott@netsplit.com>
+# Copyright © 2006-2012 Guillem Jover <guillem@debian.org>
+
+WFLAGS := \
+	-Wall -Wextra \
+	-Wno-missing-field-initializers \
+	-Wno-nonnull-compare \
+	-Wno-unused-parameter \
+	# EOL
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND = $(WFLAGS)
+export DEB_CXXFLAGS_MAINT_APPEND = $(WFLAGS)
+
+# Use the in-tree dpkg-buildflags
+dpkg_buildflags = \
+	DEB_BUILD_MAINT_OPTIONS="$(DEB_BUILD_MAINT_OPTIONS)" \
+	DEB_CFLAGS_MAINT_APPEND="$(WFLAGS)" \
+	DEB_CXXFLAGS_MAINT_APPEND="$(WFLAGS)" \
+	$(CURDIR)/build-aux/run-script scripts/dpkg-buildflags.pl
+
+# Do not enable everything on all platforms.
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	confflags += --with-libselinux
+endif
+ifeq (,$(filter terse,$(DEB_BUILD_OPTIONS)))
+  testflags += TEST_VERBOSE=1
+endif
+
+# Enable parallel test suite
+NUMJOBS = 1
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+  testflags += TEST_PARALLEL=$(NUMJOBS)
+endif
+
+dpkg_vendor = \
+	$(CURDIR)/build-aux/run-script scripts/dpkg-vendor.pl
+
+DEB_VENDOR = $(shell $(call dpkg_vendor) --query Vendor)
+
+D := $(CURDIR)/debian/tmp
+
+%:
+	dh $@ --builddirectory=build-tree
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		$(confflags) \
+		$(shell $(dpkg_buildflags) --export=configure) \
+		--libexecdir=\$${exec_prefix}/lib \
+		--with-devlibdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+		--with-libz \
+		--with-liblzma \
+		--with-libzstd \
+		--with-libbz2 \
+		# EOL
+
+execute_after_dh_auto_install:
+	# Special-case the lintian profile, as dh cannot rename on install.
+	mkdir -p $(D)/usr/share/lintian/profiles/dpkg
+	cp debian/dpkg.lintian-profile \
+	   $(D)/usr/share/lintian/profiles/dpkg/main.profile
+
+override_dh_auto_test:
+	dh_auto_test -- $(testflags)
+
+override_dh_installsystemd:
+	dh_installsystemd -a --name=dpkg-db-backup \
+	  --no-start --no-stop-on-upgrade
+
+execute_after_dh_installlogrotate:
+	dh_installlogrotate --name=alternatives
+
+override_dh_installdocs:
+	dh_installdocs -Ndpkg-dev
+	dh_installdocs -pdpkg-dev --doc-main-package=dpkg
+
+override_dh_installchangelogs:
+	dh_installchangelogs --no-trim
+
+override_dh_bugfiles:
+	dh_bugfiles -A
+
+override_dh_compress:
+	dh_compress -Xspec/

@@ -1,0 +1,55 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH validlocale 8 0.1 "Petter Reinholdtsen" ""
+.SH NAZWA
+.LP
+validlocale \- Sprawdza, czy dostępne jest dane locale
+.SH SKŁADNIA
+.LP
+validlocale <\fIlocale\fP>
+.SH OPIS
+.LP
+Sprawdza, czy locale podane jako argument jest poprawne. Jeśli nie jest,
+wypisuje na stdout napis, jaki należy dodać do /etc/locale.gen, aby
+polecenie locale\-gen wygenerowało dane locale (o ile w ogóle ono istnieje).
+.SH PLIKI
+.LP
+\fI/usr/sbin/validlocale\fP
+.br
+\fI/usr/share/i18n/SUPPORTED\fP
+.SH "ZMIENNE ŚRODOWISKOWE"
+.LP
+.TP  
+\fBDEFAULTCHARSET\fP
+Jakiego zestawu znaków użyć, jeśli podanego locale nie ma w liście
+obsługiwanych.
+.SH PRZYKŁADY
+.LP
+Jeśli jako parametr podano nazwę poprawnego locale, wypisuje na stderr
+odpowiedni napis:
+.LP
+.IP
+% validlocale C
+.br
+locale 'C' valid and available
+.LP
+Jeśli podano nazwę nieprawidłowego locale (niewygenerowanego lub po prostu
+nieistniejącego), wypisuje na stderr napis mówiący o tym, że nie jest to
+prawidłowe locale, oraz \- na stdout \- napis, który należy dodać do
+/etc/locale.gen, aby móc wygenerować dane locale:
+.LP
+.IP
+% validlocale de_AU@euro
+.br
+locale 'de_AU@euro' not available
+.br
+de_AU@euro ISO\-8859\-15
+.SH AUTOR
+.LP
+Petter Reinholdtsen <pere@hungry.com>
+.SH "PATRZ TAKŻE"
+.LP
+locale\-gen(8), localedef(1), locale(1)

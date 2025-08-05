@@ -1,0 +1,87 @@
+.\" Placed in the Public Domain by Sebastian Rittau <srittau@jroger.in-berlin.de>.
+.Dd January 07, 2001
+.Dt NSCD 8
+.Os "GNU C Library 2.2"
+.Sh NAME
+.Nm nscd
+.Nd name service caching daemon
+.Sh SYNOPSIS
+.Nm nscd
+.Op OPTION...
+.Sh DESCRIPTION
+.Nm Nscd
+caches libc-issued requests to the Name Service. If retrieving
+NSS data is fairly expensive,
+.Nm nscd
+is able to speed up consecutive access to the same data
+dramatically and increase overall system performance.
+.Nm Nscd
+should be run at boot time by
+.Pa /etc/init.d/nscd .
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl d , Fl -debug
+Do not fork and display messages on the current tty.
+.El
+.Bl -tag -width Ds
+.It Fl f , Fl -config-file Ar NAME
+Read configuration data from
+.Pa NAME .
+For a description of the config file format, see nscd.conf(5).
+.El
+.Bl -tag -width Ds
+.It Fl g , Fl -statistic
+Print current configuration statistics.
+.El
+.Bl -tag -width Ds
+.It Fl i , Fl -invalidate Ar TABLE
+Invalidate the specified
+.Pa TABLE ,
+i. e. forget all data cached therein. This should be used if the
+database storing this information has been changed.
+.El
+.Bl -tag -width Ds
+.It Fl K , Fl -shutdown
+Quit a running
+.Nm nscd
+process.
+.El
+.Bl -tag -width Ds
+.It Fl S , Fl -secure Ar TABLE
+Use a separate cache for each user.
+.El
+.Bl -tag -width Ds
+.It Fl t , Fl -nthreads Ar NUMBER
+Start
+.Pa NUMBER
+threads. This denotes the maximum number
+of requests that can be handled simultaneously. The default is set
+in the configuration file. (See nscd.conf(5).)
+.El
+.Bl -tag -width Ds
+.It Fl ? , Fl -help
+Print the list of available options.
+.El
+.Bl -tag -width Ds
+.It Fl -usage
+Print a short usage message.
+.El
+.Bl -tag -width Ds
+.It Fl V , Fl -version
+Print program version.
+.El
+.Sh FILES
+.Bl -tag -width Ds
+.It Ar /etc/nscd.conf
+.Nm Nscd
+configuration file. See nscd.conf(5) for more information.
+.El
+.Bl -tag -width Ds
+.It Ar /etc/nsswitch.conf
+Name Service Switch configuration. See nsswitch.conf(5)
+for more information.
+.El
+.Sh SEE ALSO
+GNU C Library info file,
+.Xr nscd.conf 5 ,
+.Xr nsswitch.conf 5

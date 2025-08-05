@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+
+# See dpkg-buildflags(1)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_CFLAGS_MAINT_APPEND  =
+
+include /usr/share/dpkg/default.mk
+
+# For individual package versions
+REV_CHARCODE = 20240319
+REV_LUA = 20241221
+REV_OCTAGRAM = 20241118
+
+_DEB_VERSION_REVISION = $(shell echo $(DEB_VERSION) | sed -e 's/^.*-//g')
+
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	LIBRIME_BUILD_TEST_FLAG := ON
+else
+	LIBRIME_BUILD_TEST_FLAG := OFF
+endif
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	cp -r ./librime-lua ./plugins/lua
+	cp -r ./librime-octagram ./plugins/octagram
+	cp -r ./librime-charcode ./plugins/charcode
+	dh_auto_configure -Scmake -- \
+	    -DCMAKE_BUILD_TYPE=Release \
+	    -DINSTALL_PRIVATE_HEADERS=ON \
+	    -DENABLE_EXTERNAL_PLUGINS=ON \
+	    -DBUILD_TEST=$(LIBRIME_BUILD_TEST_FLAG) \
+	    -DBUILD_MERGED_PLUGINS=Off \
+	    -DENABLE_EXTERNAL_PLUGINS=On \
+	    -DENABLE_TIMESTAMP=ON \
+	    $(NULL)
+
+override_dh_installchangelogs:
+	dh_installchangelogs -k CHANGELOG.md
+
+execute_after_dh_fixperms:
+	# https://github.com/rime/librime/issues/520
+	chmod 755 $(CURDIR)/debian/*/usr/lib/*/rime-plugins/*.so
+
+# Individual version number for librime-plugin-*
+override_dh_gencontrol:
+	dh_gencontrol -plibrime-plugin-charcode -- \
+	        -v$(DEB_VERSION_EPOCH_UPSTREAM)~git$(REV_CHARCODE)-$(_DEB_VERSION_REVISION)
+	dh_gencontrol -plibrime-plugin-lua -- \
+	        -v$(DEB_VERSION_EPOCH_UPSTREAM)~git$(REV_LUA)-$(_DEB_VERSION_REVISION)
+	dh_gencontrol -plibrime-plugin-octagram -- \
+	        -v$(DEB_VERSION_EPOCH_UPSTREAM)~git$(REV_OCTAGRAM)-$(_DEB_VERSION_REVISION)
+	dh_gencontrol --remaining-packages

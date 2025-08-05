@@ -1,0 +1,49 @@
+.TH "validlocale" "8" "0.1" "Petter Reinholdtsen" ""
+.SH "NAME"
+.LP 
+validlocale \- Test if a given locale is available
+.SH "SYNTAX"
+.LP 
+validlocale <\fIlocale\fP>
+.SH "DESCRIPTION"
+.LP 
+Test if the locale given as argument is a valid locale.  If it
+isn't, print on stdout the string to add to /etc/locale.gen to make
+locale\-gen generate the locale (if it exists at all).
+.SH "FILES"
+.LP 
+\fI/usr/sbin/validlocale\fP
+.br 
+\fI/usr/share/i18n/SUPPORTED\fP
+.SH "ENVIRONMENT VARIABLES"
+.LP 
+.TP 
+\fBDEFAULTCHARSET\fP
+Which charset to assume if the given locale is missing from the
+list of supported locales.
+.SH "EXAMPLES"
+.LP 
+If you give a valid locale as parameter, it outputs a string
+specifying this on stderr:
+.LP 
+.IP 
+% validlocale C
+.br 
+locale 'C' valid and available
+.LP 
+When given a invalid (not generated or just nonexistent), it
+outputs a string on stderr telling that this is an invalid locale, and a string to stdout with the string to add to /etc/locale.gen
+to have this locale generated:
+.LP 
+.IP 
+% validlocale de_AU@euro
+.br 
+locale 'de_AU@euro' not available
+.br 
+de_AU@euro ISO\-8859\-15
+.SH "AUTHORS"
+.LP 
+Petter Reinholdtsen <pere@hungry.com>
+.SH "SEE ALSO"
+.LP 
+locale\-gen(8), localedef(1), locale(1)

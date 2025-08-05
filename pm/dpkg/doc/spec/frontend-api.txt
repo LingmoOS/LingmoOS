@@ -1,0 +1,30 @@
+Frontend Interfaces
+===================
+
+Status: recommendation, stable
+
+
+Overview
+--------
+
+This file will try to document some of the interfaces that dpkg makes
+available to frontends or that expects them to use, which are currently
+not covered by any other type of documentation.
+
+
+Database Locking
+----------------
+
+Any frontend needing to make sure no write operation is currently happening,
+and no other frontend is running should first acquire the frontend lock at
+«<admindir>/lock-frontend», and then acquire the dpkg database lock at
+«<admindir>/lock». When the frontend invokes dpkg, it should set the
+environment variable DPKG_FRONTEND_LOCKED (to prevent dpkg from acquiring
+the frontend lock), and then release the dpkg database lock, which will be
+acquired by dpkg itself. This way no other frontend following this protocol
+can race to perform operations while another one has one in progress.
+
+These locks must be file record locks (i.e. fcntl(2) advisory locking), and
+the whole file should be locked, as that's the most portable way to perform
+this operation; this can be achieved by using start=0, len=0 and
+whence=SEEK_SET.

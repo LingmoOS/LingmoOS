@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  triggered)
+    pkg_status=`dpkg-query -f '${Status}' -W pkg-depends-a`
+    if [ "$pkg_status" = "install ok installed" ]; then
+      echo "Pass: pkg-depends is installed"
+    else
+      echo "Fail: pkg-depends is not installed ($pkg_status)"
+      exit 1
+    fi
+  ;;
+esac
+
+exit 0

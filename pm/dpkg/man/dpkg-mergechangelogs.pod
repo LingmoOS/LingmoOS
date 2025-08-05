@@ -1,0 +1,128 @@
+# dpkg manual page - dpkg-mergechangelogs(1)
+#
+# Copyright © 2009-2010 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-mergechangelogs - 3-way merge of debian/changelog files
+
+=head1 SYNOPSIS
+
+B<dpkg-mergechangelogs>
+[I<option>...] I<old> I<new-a> I<new-b> [I<out>]
+
+=head1 DESCRIPTION
+
+This program will use the 3 provided versions of the Debian changelog to
+generate a merged changelog file.
+The resulting changelog is stored
+in the file I<out> or output to the standard output if that parameter is
+not given.
+
+Each entry is identified by its version number and they are assumed to
+be not conflicting, they are simply merged in the right order (by
+decreasing version number).
+When B<--merge-prereleases> is used, the
+part of the version number after the last tilde is dropped so that
+1.0-1~exp1 and 1.0-1~exp5 are considered to be the same entry.
+When the
+same version is available in both I<new-a> and I<new-b>, a standard
+line-based 3-way merge is attempted (provided that the module
+Algorithm::Merge is available — it's part of the package
+libalgorithm-merge-perl — otherwise you get a global conflict on the
+content of the entry).
+
+This program was introduced in dpkg 1.15.7.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--merge-unreleased>
+
+Ignore the version number when the entries are marked as B<UNRELEASED>
+(since dpkg 1.21.0).
+
+This is useful when you have diverging development for versions that have
+not yet been released.
+For instance 2.1-1 is released, then development
+happens for the new 2.2-1 and then for 2.3-1, where it makes sense to just
+end with a coalesced entry for 2.3-1 including all the development done in
+2.2-1.
+
+=item B<-m>, B<--merge-prereleases>
+
+Drop the part after the last tilde in the version number when doing
+version comparison to identify if two entries are supposed to be
+the same or not.
+
+This is useful when you keep using the same changelog entry but you
+increase its version number regularly.
+For instance, you might have
+2.3-1~exp1, 2.3-1~exp2, ... until the official release 2.3-1 and they
+are all the same changelog entry that has evolved over time.
+
+=item B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 LIMITATIONS
+
+Anything that is not parsed by L<Dpkg::Changelog> is lost during the merge.
+This might include stuff like comments which were not supposed to be
+there, etc.
+
+=head1 INTEGRATION WITH GIT
+
+If you want to use this program to merge Debian changelog files in a git
+repository, you have first to register a new merge driver in
+B<.git/config> or B<~/.gitconfig>:
+
+ [merge "dpkg-mergechangelogs"]
+    name = debian/changelog merge driver
+    driver = dpkg-mergechangelogs -m %O %A %B %A
+
+Then you have to setup the merge attribute for the debian/changelog file
+either in B<.gitattributes> in the repository itself, or in
+B<.git/info/attributes>:
+
+ debian/changelog merge=dpkg-mergechangelogs

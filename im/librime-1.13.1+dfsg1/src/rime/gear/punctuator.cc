@@ -1,0 +1,430 @@
+﻿// encoding: utf-8
+//
+// Copyright RIME Developers
+// Distributed under the BSD License
+//
+// 2011-11-21 GONG Chen <chen.sst@gmail.com>
+//
+#include <utf8.h>
+#include <rime/commit_history.h>
+#include <rime/common.h>
+#include <rime/composition.h>
+#include <rime/context.h>
+#include <rime/engine.h>
+#include <rime/key_event.h>
+#include <rime/key_table.h>
+#include <rime/menu.h>
+#include <rime/schema.h>
+#include <rime/translation.h>
+#include <rime/gear/punctuator.h>
+
+namespace rime {
+
+void PunctConfig::LoadConfig(Engine* engine, bool load_symbols) {
+  bool full_shape = engine->context()->get_option("full_shape");
+  string shape(full_shape ? "full_shape" : "half_shape");
+  if (shape_ == shape)
+    return;
+  shape_ = shape;
+  Config* config = engine->schema()->config();
+  mapping_ = config->GetMap("punctuator/" + shape);
+  if (!mapping_) {
+    LOG(WARNING) << "missing punctuation mapping.";
+  }
+  if (load_symbols) {
+    symbols_ = config->GetMap("punctuator/symbols");
+  }
+  {
+    string configured;
+    if (config->GetString("punctuator/digit_separators", &configured)) {
+      digit_separators_ = configured;
+    }
+  }
+  {
+    string configured;
+    if (config->GetString("punctuator/digit_separator_action", &configured)) {
+      digit_separator_commit_ = (configured == "commit");
+    }
+  }
+}
+
+an<ConfigItem> PunctConfig::GetPunctDefinition(const string key) {
+  an<ConfigItem> result = mapping_ ? mapping_->Get(key) : nullptr;
+  return result ? result : symbols_ ? symbols_->Get(key) : nullptr;
+}
+
+Punctuator::Punctuator(const Ticket& ticket) : Processor(ticket) {
+  Config* config = engine_->schema()->config();
+  if (config) {
+    config->GetBool("punctuator/use_space", &use_space_);
+  }
+  config_.LoadConfig(engine_);
+}
+
+static bool punctuation_is_translated(Context* ctx, const string& tag) {
+  Composition& comp = ctx->composition();
+  if (comp.empty() || !comp.back().HasTag(tag)) {
+    return false;
+  }
+  auto cand = comp.back().GetSelectedCandidate();
+  return cand && cand->type() == "punct";
+}
+
+inline static bool ends_with_digit(const string& text) {
+  auto len = text.length();
+  return len > 0 && isdigit(text[len - 1]);
+}
+
+// recognizes patterns like 3.14 12:30 1,000 1'000
+static bool is_after_number(Context* ctx) {
+  const CommitHistory& history = ctx->commit_history();
+  if (history.empty()) {
+    return false;
+  }
+  const CommitRecord& cr = history.back();
+  return ends_with_digit(cr.text) & (cr.type == "thru" || cr.type == "raw");
+}
+
+static bool is_after_digit_separator(Context* ctx) {
+  const auto& comp = ctx->composition();
+  return !comp.empty() && comp[0].HasTag("punct_number") &&
+         comp[0].length == ctx->input().length();
+}
+
+ProcessResult Punctuator::ProcessKeyEvent(const KeyEvent& key_event) {
+  if (key_event.release() || key_event.ctrl() || key_event.alt() ||
+      key_event.super())
+    return kNoop;
+  int ch = key_event.keycode();
+  if (ch < 0x20 || ch >= 0x7f)
+    return kNoop;
+  Context* ctx = engine_->context();
+  if (ctx->get_option("ascii_punct")) {
+    return kNoop;
+  }
+  if ((isdigit(ch) || ch == XK_space) && is_after_digit_separator(ctx)) {
+    ctx->PushInput(ch) && ctx->Commit();
+    return kAccepted;
+  }
+  if (!use_space_ && ch == XK_space && ctx->IsComposing()) {
+    return kNoop;
+  }
+  if (ConvertDigitSeparator(ch)) {
+    return kAccepted;
+  }
+  // sync with full_shape option
+  config_.LoadConfig(engine_);
+  string key(1, ch);
+  auto punct_definition = config_.GetPunctDefinition(key);
+  if (!punct_definition)
+    return kNoop;
+  DLOG(INFO) << "punct key: '" << key << "'";
+  if (AlternatePunct(key, punct_definition)) {
+    return kAccepted;
+  }
+  if (ReconvertDigitSeparatorAsPunct(key) || ctx->PushInput(ch)) {
+    if (punctuation_is_translated(ctx, "punct")) {
+      ConfirmUniquePunct(punct_definition) ||
+          AutoCommitPunct(punct_definition) || PairPunct(punct_definition);
+    }
+  }
+  return kAccepted;
+}
+
+bool Punctuator::ConvertDigitSeparator(char ch) {
+  if (!config_.is_digit_separator(ch)) {
+    return false;
+  }
+  Context* ctx = engine_->context();
+  if (ctx->composition().empty() && is_after_number(ctx)) {
+    DLOG(INFO) << "convert punct in number: " << ch;
+    ctx->PushInput(ch) && punctuation_is_translated(ctx, "punct_number") &&
+        (config_.digit_separator_commit() ? ctx->Commit()
+                                          : ctx->composition().Forward());
+    return true;
+  }
+  return false;
+}
+
+bool Punctuator::ReconvertDigitSeparatorAsPunct(const string& key) {
+  if (!config_.has_digit_separators()) {
+    return false;
+  }
+  Context* ctx = engine_->context();
+  // repeat the same punctuation key to access the original binding
+  if (ctx->input() != key) {
+    return false;
+  }
+  Composition& comp = ctx->composition();
+  if (!comp.empty()) {
+    Segment& segment = comp[0];
+    if (segment.HasTag("punct_number")) {
+      segment.tags.erase("punct_number");
+      segment.tags.insert("punct");
+      segment.status = Segment::kVoid;
+      DLOG(INFO) << "reconvert punct, key = " << key;
+      ctx->ReopenPreviousSegment();
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Punctuator::AlternatePunct(const string& key,
+                                const an<ConfigItem>& definition) {
+  if (!As<ConfigList>(definition))
+    return false;
+  Context* ctx = engine_->context();
+  Composition& comp = ctx->composition();
+  if (comp.empty())
+    return false;
+  Segment& segment(comp.back());
+  if (segment.status > Segment::kVoid && segment.HasTag("punct") &&
+      key == ctx->input().substr(segment.start, segment.end - segment.start)) {
+    if (!segment.menu ||
+        segment.menu->Prepare(segment.selected_index + 2) == 0) {
+      LOG(ERROR) << "missing candidate for punctuation '" << key << "'.";
+      return false;
+    }
+    DLOG(INFO) << "alternating punctuation '" << key << "'.";
+    (segment.selected_index += 1) %= segment.menu->candidate_count();
+    segment.status = Segment::kGuess;
+    return true;
+  }
+  return false;
+}
+
+bool Punctuator::ConfirmUniquePunct(const an<ConfigItem>& definition) {
+  if (!As<ConfigValue>(definition))
+    return false;
+  engine_->context()->ConfirmCurrentSelection();
+  return true;
+}
+
+bool Punctuator::AutoCommitPunct(const an<ConfigItem>& definition) {
+  auto map = As<ConfigMap>(definition);
+  if (!map || !map->HasKey("commit"))
+    return false;
+  engine_->context()->Commit();
+  return true;
+}
+
+bool Punctuator::PairPunct(const an<ConfigItem>& definition) {
+  auto map = As<ConfigMap>(definition);
+  if (!map || !map->HasKey("pair"))
+    return false;
+  Context* ctx = engine_->context();
+  Composition& comp = ctx->composition();
+  if (comp.empty())
+    return false;
+  Segment& segment(comp.back());
+  if (segment.status > Segment::kVoid && segment.HasTag("punct")) {
+    if (!segment.menu || segment.menu->Prepare(2) < 2) {
+      LOG(ERROR) << "missing candidate for paired punctuation.";
+      return false;
+    }
+    DLOG(INFO) << "alternating paired punctuation.";
+    auto& oddness(oddness_[definition]);
+    (segment.selected_index += oddness) %= 2;
+    oddness = 1 - oddness;
+    ctx->ConfirmCurrentSelection();
+    return true;
+  }
+  return false;
+}
+
+PunctSegmentor::PunctSegmentor(const Ticket& ticket) : Segmentor(ticket) {
+  config_.LoadConfig(engine_);
+}
+
+bool PunctSegmentor::Proceed(Segmentation* segmentation) {
+  const string& input = segmentation->input();
+  int k = segmentation->GetCurrentStartPosition();
+  if (k == input.length())
+    return false;  // no chance for others too
+  char ch = input[k];
+  if (ch < 0x20 || ch >= 0x7f)
+    return true;
+  // sync with full_shape option
+  config_.LoadConfig(engine_);
+  string key(1, ch);
+  auto punct_definition = config_.GetPunctDefinition(key);
+  if (!punct_definition)
+    return true;
+  {
+    Segment segment(k, k + 1);
+    DLOG(INFO) << "add a punctuation segment [" << segment.start << ", "
+               << segment.end << ")";
+    if (k == 0 && config_.is_digit_separator(ch) &&
+        is_after_number(engine_->context())) {
+      segment.tags.insert("punct_number");
+    } else {
+      segment.tags.insert("punct");
+    }
+    segmentation->AddSegment(segment);
+  }
+  return false;  // exclusive
+}
+
+PunctTranslator::PunctTranslator(const Ticket& ticket)
+    : Translator(ticket), formatter_(ticket) {
+  const bool load_symbols = true;
+  config_.LoadConfig(engine_, load_symbols);
+}
+
+an<Candidate> CreatePunctCandidate(const string& punct,
+                                   const Segment& segment) {
+  const char half_shape[] =
+      "\xe3\x80\x94\xe5\x8d\x8a\xe8\xa7\x92\xe3\x80\x95";  // 〔半角〕
+  const char full_shape[] =
+      "\xe3\x80\x94\xe5\x85\xa8\xe8\xa7\x92\xe3\x80\x95";  // 〔全角〕
+  bool is_half_shape = false;
+  bool is_full_shape = false;
+  const char* p = punct.c_str();
+  uint32_t ch = utf8::unchecked::next(p);
+  if (*p == '\0') {  // length == 1 unicode character
+    bool is_ascii = (ch >= 0x20 && ch < 0x7F);
+    bool is_ideographic_space = (ch == 0x3000);
+    bool is_full_shape_ascii = (ch >= 0xFF01 && ch <= 0xFF5E);
+    bool is_kana =
+        ((ch >= 0x30A1 && ch <= 0x30FC) || ch == 0x3001 || ch == 0x3002 ||
+         ch == 0x300C || ch == 0x300D || ch == 0x309B || ch == 0x309C);
+    bool is_half_shape_kana = (ch >= 0xFF61 && ch <= 0xFF9F);
+    bool is_hangul = (ch >= 0x3131 && ch <= 0x3164);
+    bool is_half_shape_hangul = (ch >= 0xFFA0 && ch <= 0xFFDC);
+    bool is_full_shape_narrow_symbol =
+        (ch == 0xFF5F || ch == 0xFF60 || (ch >= 0xFFE0 && ch <= 0xFFE6));
+    bool is_narrow_symbol =
+        (ch == 0x00A2 || ch == 0x00A3 || ch == 0x00A5 || ch == 0x00A6 ||
+         ch == 0x00AC || ch == 0x00AF || ch == 0x2985 || ch == 0x2986);
+    bool is_half_shape_wide_symbol = (ch >= 0xFFE8 && ch <= 0xFFEE);
+    bool is_wide_symbol = ((ch >= 0x2190 && ch <= 0x2193) || ch == 0x2502 ||
+                           ch == 0x25A0 || ch == 0x25CB);
+    is_half_shape = is_ascii || is_half_shape_kana || is_half_shape_hangul ||
+                    is_narrow_symbol || is_half_shape_wide_symbol;
+    is_full_shape = is_ideographic_space || is_full_shape_ascii || is_kana ||
+                    is_hangul || is_full_shape_narrow_symbol || is_wide_symbol;
+  }
+  bool one_key = (segment.end - segment.start == 1);
+  return New<SimpleCandidate>("punct", segment.start, segment.end, punct,
+                              (is_half_shape   ? half_shape
+                               : is_full_shape ? full_shape
+                                               : ""),
+                              one_key ? punct : "");
+}
+
+an<Translation> PunctTranslator::Query(const string& input,
+                                       const Segment& segment) {
+  if (segment.HasTag("punct_number")) {
+    if (!input.empty()) {
+      string punct = input;
+      formatter_.Format(&punct);
+      return New<UniqueTranslation>(CreatePunctCandidate(punct, segment));
+    }
+    return nullptr;
+  }
+  if (!segment.HasTag("punct"))
+    return nullptr;
+  // sync with full_shape option
+  config_.LoadConfig(engine_);
+  auto definition = config_.GetPunctDefinition(input);
+  if (!definition)
+    return nullptr;
+  DLOG(INFO) << "populating punctuation candidates for '" << input << "'.";
+  auto translation =
+      TranslateUniquePunct(input, segment, As<ConfigValue>(definition));
+  if (!translation)
+    translation =
+        TranslateAlternatingPunct(input, segment, As<ConfigList>(definition));
+  if (!translation)
+    translation =
+        TranslateAutoCommitPunct(input, segment, As<ConfigMap>(definition));
+  if (!translation)
+    translation =
+        TranslatePairedPunct(input, segment, As<ConfigMap>(definition));
+  // if (translation) {
+  //   const char tips[] =
+  //       "\xe3\x80\x94\xe7\xac\xa6\xe8\x99\x9f\xe3\x80\x95";  // 〔符號〕
+  //   const_cast<Segment*>(&segment)->prompt = tips;
+  // }
+  return translation;
+}
+
+an<Translation> PunctTranslator::TranslateUniquePunct(
+    const string& key,
+    const Segment& segment,
+    const an<ConfigValue>& definition) {
+  if (!definition)
+    return nullptr;
+  return New<UniqueTranslation>(
+      CreatePunctCandidate(definition->str(), segment));
+}
+
+an<Translation> PunctTranslator::TranslateAlternatingPunct(
+    const string& key,
+    const Segment& segment,
+    const an<ConfigList>& definition) {
+  if (!definition)
+    return nullptr;
+  auto translation = New<FifoTranslation>();
+  for (size_t i = 0; i < definition->size(); ++i) {
+    auto value = definition->GetValueAt(i);
+    if (!value) {
+      LOG(WARNING) << "invalid alternating punct at index " << i << " for '"
+                   << key << "'.";
+      continue;
+    }
+    translation->Append(CreatePunctCandidate(value->str(), segment));
+  }
+  if (!translation->size()) {
+    LOG(WARNING) << "empty candidate list for alternating punct '" << key
+                 << "'.";
+    translation.reset();
+  }
+  return translation;
+}
+
+an<Translation> PunctTranslator::TranslateAutoCommitPunct(
+    const string& key,
+    const Segment& segment,
+    const an<ConfigMap>& definition) {
+  if (!definition || !definition->HasKey("commit"))
+    return nullptr;
+  auto value = definition->GetValue("commit");
+  if (!value) {
+    LOG(WARNING) << "unrecognized punct definition for '" << key << "'.";
+    return nullptr;
+  }
+  return New<UniqueTranslation>(CreatePunctCandidate(value->str(), segment));
+}
+
+an<Translation> PunctTranslator::TranslatePairedPunct(
+    const string& key,
+    const Segment& segment,
+    const an<ConfigMap>& definition) {
+  if (!definition || !definition->HasKey("pair"))
+    return nullptr;
+  auto list = As<ConfigList>(definition->Get("pair"));
+  if (!list || list->size() != 2) {
+    LOG(WARNING) << "unrecognized pair definition for '" << key << "'.";
+    return nullptr;
+  }
+  auto translation = New<FifoTranslation>();
+  for (size_t i = 0; i < list->size(); ++i) {
+    auto value = list->GetValueAt(i);
+    if (!value) {
+      LOG(WARNING) << "invalid paired punct at index " << i << " for '" << key
+                   << "'.";
+      continue;
+    }
+    translation->Append(CreatePunctCandidate(value->str(), segment));
+  }
+  if (translation->size() != 2) {
+    LOG(WARNING) << "invalid num of candidate for paired punct '" << key
+                 << "'.";
+    translation.reset();
+  }
+  return translation;
+}
+
+}  // namespace rime

@@ -1,0 +1,135 @@
+# dpkg manual page - dpkg-vendor(1)
+#
+# Copyright © 2009 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-vendor - queries information about distribution vendors
+
+=head1 SYNOPSIS
+
+B<dpkg-vendor>
+[I<option>...] I<command>
+
+=head1 DESCRIPTION
+
+B<dpkg-vendor> is a tool to query information about vendors listed in
+B<%PKGCONFDIR%/origins>.
+B<%PKGCONFDIR%/origins/default> contains
+information about the current vendor.
+
+The origin files provide metadata about specific vendors,
+such as their URL or where to file bug reports,
+and are usually used both to determine the behavior of tools and
+resulting contents during package builds targeting a specific vendor,
+and to describe the provenance of packages.
+
+Packages can explicitly declare their vendor by including an B<Origin> field,
+otherwise the vendor for a package without such field is assumed to be the
+one pointed to by the F<default> origin symbolic link.
+
+The F<default> symbolic link is also used to denote the origin of
+the current installation managed by B<dpkg>,
+be that a full distribution or an overlay on top of an existing base
+system that contains either no packaging system or a native one.
+
+This program was introduced in dpkg 1.15.1.
+
+=head1 COMMANDS
+
+=over
+
+=item B<--is> I<vendor>
+
+Exits with B<0> if the current vendor is I<vendor>.
+Otherwise exits
+with B<1>.
+
+=item B<--derives-from> I<vendor>
+
+Exits with B<0> if the current vendor distribution is a derivative of
+I<vendor>, otherwise exits with B<1>.
+It uses the B<Parent> field to browse all ancestors of the current vendor.
+
+=item B<--query> I<field>
+
+Print on standard output the value of the vendor-specific I<field> for
+the current vendor.
+
+=item B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<--vendor> I<vendor>
+
+Assumes the current vendor is I<vendor> instead of discovering it
+with the B<DEB_VENDOR> environment variable or
+B<%PKGCONFDIR%/origins/default>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DEB_VENDOR>
+
+This setting defines the current vendor.
+If not set, it will discover the
+current vendor by reading B<%PKGCONFDIR%/origins/default>.
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 FILES
+
+=head2 Packaging support
+
+=over
+
+=item B<%PKGDATADIR%/vendor.mk>
+
+Makefile snippet that sets the current vendor and its parent into variables,
+and provides make macros to check for derivatives (since dpkg 1.16.1).
+
+=back
+
+=head1 SEE ALSO
+
+L<deb-origin(5)>.

@@ -1,0 +1,793 @@
+From: Marcus Brinkmann <marcus@gnu.org>
+Subject: [PATCH] Implement SysV shared memory for GNU/Hurd.
+
+2005-07-11  Marcus Brinkmann  <marcus@gnu.org>
+
+        * hurd/Makefile (routines): Add sysvshm.
+        (distribute): Add sysvshm.h.
+        * hurd/sysvshm.h: New file.
+        * hurd/sysvshm.c: New file.
+        * sysdeps/mach/hurd/bits/stat.h (S_IMMAP0): New macro.
+        (S_ISPARE): Unset the S_IMMAP0 flag.
+        * sysdeps/mach/hurd/ftok.c: New file.
+        * sysdeps/mach/hurd/shmat.c: New file.
+        * sysdeps/mach/hurd/shmctl.c: New file.
+        * sysdeps/mach/hurd/shmdt.c: New file.
+        * sysdeps/mach/hurd/bits/posix_opt.h: Define _XOPEN_SHM to 1.
+
+TODO:
+“
+> +  char filename[sizeof (SHM_DIR) - 1 + SHM_NAMEMAX];
+> +  struct stat statbuf;
+> +
+> +  sprintf (filename, SHM_DIR SHM_NAMEPRI, id);
+> +  /* SysV requires read access for IPC_STAT.  */
+> +  fd = __open (filename, O_NORW);
+> +  if (fd < 0)
+> +    {
+> +      if (errno == ENOENT)
+> +     errno = EINVAL;
+> +      return -1;
+> +    }
+
+Since this is repeated in more than one function, put it into an
+internal subroutine.  Then we have only one place doing the
+name-generation logic.
+”
+
+“
+> +    case IPC_RMID:
+> +      res = __unlink (filename);
+> +      /* FIXME: Check error (mapping ENOENT to EINVAL).  */
+
+Fix it.
+”
+
+---
+ hurd/Makefile                      |    1 
+ hurd/sysvshm.c                     |   97 ++++++++++++++
+ hurd/sysvshm.h                     |   47 +++++++
+ sysdeps/mach/hurd/bits/posix_opt.h |    4 
+ sysdeps/mach/hurd/ftok.c           |   43 ++++++
+ sysdeps/mach/hurd/shmat.c          |   79 ++++++++++++
+ sysdeps/mach/hurd/shmctl.c         |  132 ++++++++++++++++++++
+ sysdeps/mach/hurd/shmdt.c          |   51 +++++++
+ sysdeps/mach/hurd/shmget.c         |  242 +++++++++++++++++++++++++++++++++++++
+ 9 files changed, 694 insertions(+), 2 deletions(-)
+
+--- a/hurd/Makefile
++++ b/hurd/Makefile
+@@ -115,6 +115,7 @@ routines = \
+   set-host \
+   setauth \
+   seteuids \
++  sysvshm \
+   task2pid \
+   vpprintf \
+   xattr \
+--- /dev/null
++++ b/hurd/sysvshm.c
+@@ -0,0 +1,97 @@
++/* Copyright (C) 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <string.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <stddef.h>
++#include <errno.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <dirent.h>
++#include <sys/stat.h>
++#include <sys/shm.h>
++
++
++/* Description of an shm attachment.  */
++struct sysvshm_attach
++{
++  /* Linked list.  */
++  struct sysvshm_attach *next;
++
++  /* Map address.  */
++  void *addr;
++
++  /* Map size.  */
++  size_t size;
++};
++
++/* List of attachments.  */
++static struct sysvshm_attach *attach_list;
++
++/* A lock to protect the linked list of shared memory attachments.  */
++static unsigned int sysvshm_lock = LLL_LOCK_INITIALIZER;
++
++
++/* Adds a segment attachment.  */
++error_t
++__sysvshm_add (void *addr, size_t size)
++{
++  struct sysvshm_attach *shm;
++
++  shm = malloc (sizeof (*shm));
++  if (!shm)
++    return errno;
++
++  __mutex_lock (&sysvshm_lock);
++  shm->addr = addr;
++  shm->size = size;
++  shm->next = attach_list;
++  attach_list = shm;
++  __mutex_unlock (&sysvshm_lock);
++
++  return 0;
++}
++
++/* Removes a segment attachment.  Returns its size if found, or EINVAL
++   otherwise.  */
++error_t
++__sysvshm_remove (void *addr, size_t *size)
++{
++  struct sysvshm_attach *shm;
++  struct sysvshm_attach **pshm = &attach_list;
++
++  __mutex_lock (&sysvshm_lock);
++  shm = attach_list;
++  while (shm)
++    {
++      shm = *pshm;
++      if (shm->addr == addr)
++	{
++	  *pshm = shm->next;
++	  *size = shm->size;
++	  __mutex_unlock (&sysvshm_lock);
++	  free (shm);
++	  return 0;
++	}
++      pshm = &shm->next;
++      shm = shm->next;
++    }
++  __mutex_unlock (&sysvshm_lock);
++  return EINVAL;
++}
+--- /dev/null
++++ b/hurd/sysvshm.h
+@@ -0,0 +1,47 @@
++/* Copyright (C) 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <paths.h>
++#include <hurd.h>
++
++/* The area (from top to bottom) that is used for private keys.  These
++   are all keys that have the second highest bit set.  */
++#define SHM_PRIV_KEY_START INT_MAX
++#define SHM_PRIV_KEY_END ((INT_MAX / 2) + 1)
++
++#define SHM_PREFIX		"sysvshm-"
++#define SHM_DIR _PATH_DEV "shm/"
++
++/* The maximum number of characters in a shared memory segment file name.
++   32 is the max number of characters in a 128 bit number in hex.  */
++#if __WORDSIZE > 128
++#error Need to increase SHM_NAMEMAX.
++#else
++#define SHM_NAMEMAX (sizeof (SHM_PREFIX) - 1 + 32 + 1)
++#endif
++
++/* Use this with printf and its variants.  */
++#define SHM_NAMEPRI SHM_PREFIX "%0x"
++
++
++/* Adds a segment attachment.  */
++error_t __sysvshm_add (void *addr, size_t size);
++
++/* Removes a segment attachment.  Returns its size if found, or EINVAL
++   otherwise.  */
++error_t __sysvshm_remove (void *addr, size_t *size);
+--- /dev/null
++++ b/sysdeps/mach/hurd/ftok.c
+@@ -0,0 +1,41 @@
++/* Copyright (C) 1995, 1996, 2000, 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++   Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, August 1995.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <sys/ipc.h>
++#include <sys/stat.h>
++
++
++/* In the Hurd, we use the second-to-most-significant bit as flag for
++   private keys.  We use a different order of the components so that
++   the biggest one---the inode number---is affected by this.  */
++
++key_t
++ftok (const char *pathname, int proj_id)
++{
++  struct stat64 st;
++  key_t key;
++
++  if (__stat64 (pathname, &st) < 0)
++    return (key_t) -1;
++
++  key = ((st.st_dev & 0xff) | ((proj_id & 0xff) << 8)
++	 | ((st.st_ino & 0x3fff) << 16));
++
++  return key;
++}
+--- /dev/null
++++ b/sysdeps/mach/hurd/shmat.c
+@@ -0,0 +1,82 @@
++/* SysV shmat for Hurd.
++   Copyright (C) 2005-2015 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <http://www.gnu.org/licenses/>.  */
++
++#include <errno.h>
++#include <utime.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <assert.h>
++#include <sys/mman.h>
++#include <sys/ipc.h>
++#include <sys/shm.h>
++#include <sys/time.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++
++#include "sysvshm.h"
++
++/* Attach the shared memory segment associated with SHMID to the data
++   segment of the calling process.  SHMADDR and SHMFLG determine how
++   and where the segment is attached.  */
++void *
++__shmat (int shmid, const void *shmaddr, int shmflg)
++{
++  error_t err;
++  char filename[sizeof (SHM_DIR) - 1 + SHM_NAMEMAX];
++  int fd;
++  void *addr;
++  struct stat statbuf;
++  int res;
++
++  sprintf (filename, SHM_DIR SHM_NAMEPRI, shmid);
++  fd = __open (filename, (shmflg & SHM_RDONLY) ? O_RDONLY : O_RDWR);
++  if (fd < 0)
++    {
++      if (errno == ENOENT)
++	errno = EINVAL;
++      return (void *) -1;
++    }
++
++  res = __fstat (fd, &statbuf);
++  if (res < 0)
++    {
++      err = errno;
++      __close (fd);
++      errno = err;
++      return (void *) -1;
++    }
++
++  addr = __mmap ((void *) shmaddr, statbuf.st_size,
++		 PROT_READ | ((shmflg & SHM_RDONLY) ? 0 : PROT_WRITE),
++		 MAP_SHARED, fd, 0);
++  __close (fd);
++  if (addr == MAP_FAILED)
++    return (void *) -1;
++
++  err = __sysvshm_add (addr, statbuf.st_size);
++  if (err)
++    {
++      __munmap (addr, statbuf.st_size);
++      errno = err;
++      return (void *) -1;
++    }
++
++  return addr;
++}
++
++weak_alias(__shmat, shmat)
+--- /dev/null
++++ b/sysdeps/mach/hurd/shmctl.c
+@@ -0,0 +1,132 @@
++/* Copyright (C) 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <errno.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <sys/mman.h>
++#include <sys/ipc.h>
++#include <sys/shm.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++
++#include "sysvshm.h"
++
++/* Provide operations to control over shared memory segments.  */
++int
++__shmctl (int id, int cmd, struct shmid_ds *buf)
++{
++  error_t err = 0;
++  int fd;
++  int res;
++  char filename[sizeof (SHM_DIR) - 1 + SHM_NAMEMAX];
++  struct stat statbuf;
++
++  sprintf (filename, SHM_DIR SHM_NAMEPRI, id);
++  /* SysV requires read access for IPC_STAT.  */
++  fd = __open (filename, O_NORW);
++  if (fd < 0)
++    {
++      if (errno == ENOENT)
++	errno = EINVAL;
++      return -1;
++    }
++
++  res = __fstat (fd, &statbuf);
++  if (res < 0)
++    {
++      err = errno;
++      __close (fd);
++      errno = err;
++      return -1;
++    }
++
++  switch (cmd)
++    {
++    case IPC_STAT:
++
++      buf->shm_perm.__key = id;
++      buf->shm_perm.uid = statbuf.st_uid;
++      buf->shm_perm.gid = statbuf.st_gid;
++
++      /* We do not support the creator.  */
++      buf->shm_perm.cuid = statbuf.st_uid;
++      buf->shm_perm.cgid = statbuf.st_gid;
++
++      /* We just want the protection bits.  */
++      buf->shm_perm.mode = statbuf.st_mode & 0777;
++      /* Hopeless.  We do not support a sequence number.  */
++      buf->shm_perm.__seq = statbuf.st_ino;
++      buf->shm_segsz = statbuf.st_size;
++
++      /* Hopeless.  We do not support any of these.  */
++      buf->shm_atime = statbuf.st_atime;
++      buf->shm_dtime = statbuf.st_mtime;
++      /* Well, this comes at least close.  */
++      buf->shm_ctime = statbuf.st_ctime;
++
++      /* We do not support the PID.  */
++      buf->shm_cpid = 0;
++      buf->shm_lpid = 0;
++
++      if (statbuf.st_mode & S_IMMAP0)
++        buf->shm_nattch = 0;
++      else
++        /* 42 is the answer.  Of course this is bogus, but for most
++	   applications, this should be fine.  */
++        buf->shm_nattch = 42;
++
++      break;
++
++    case IPC_SET:
++      if (statbuf.st_uid != buf->shm_perm.uid
++	  || statbuf.st_gid != buf->shm_perm.gid)
++	{
++	  res = __fchown (fd,
++			  (statbuf.st_uid != buf->shm_perm.uid)
++			  ? buf->shm_perm.uid : -1,
++			  (statbuf.st_gid != buf->shm_perm.gid)
++			  ? buf->shm_perm.gid : -1);
++	  if (res < 0)
++	    err = errno;
++	}
++
++      if (!err && statbuf.st_mode & 0777 != buf->shm_perm.mode & 0777)
++	{
++	  res = __fchmod (fd, (statbuf.st_mode & ~0777)
++			  | (buf->shm_perm.mode & 0777));
++	  if (res < 0)
++	    err = errno;
++	}
++      break;
++
++    case IPC_RMID:
++      res = __unlink (filename);
++      /* FIXME: Check error (mapping ENOENT to EINVAL).  */
++      break;
++
++    default:
++      err = EINVAL;
++    }
++
++  __close (fd);
++  errno = err;
++  return err ? -1 : 0;
++}
++
++weak_alias(__shmctl, shmctl)
+--- /dev/null
++++ b/sysdeps/mach/hurd/shmdt.c
+@@ -0,0 +1,51 @@
++/* Copyright (C) 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <stdio.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <assert.h>
++#include <sys/mman.h>
++#include <sys/ipc.h>
++#include <sys/shm.h>
++#include <sys/time.h>
++#include <sys/stat.h>
++
++#include "sysvshm.h"
++
++/* Detach shared memory segment starting at address specified by
++   SHMADDR from the caller's data segment.  */
++int
++__shmdt (const void *shmaddr)
++{
++  error_t err;
++  size_t size;
++
++  err = __sysvshm_remove ((void *) shmaddr, &size);
++  if (err)
++    {
++      errno = err;
++      return -1;
++    }
++
++  __munmap ((void *) shmaddr, size);
++  return 0;
++}
++
++weak_alias(__shmdt, shmdt)
+--- /dev/null
++++ b/sysdeps/mach/hurd/shmget.c
+@@ -0,0 +1,242 @@
++/* Copyright (C) 2005 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <stdbool.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <sys/shm.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <limits.h>
++#include <stdio.h>
++#include <fcntl.h>
++#include <unistd.h>
++
++#include <hurd/fd.h>
++
++#include "sysvshm.h"
++
++/* Create a new shared memory segment file without linking it into the
++   filesystem.  Return the directory and file ports in R_DIR and R_FILE.  */
++static error_t
++create_shm_file (size_t size, int flags, file_t *r_dir, file_t *r_file)
++{
++  error_t err;
++  file_t dir;
++  file_t file;
++
++  flags &= 0777;
++
++  /* Get a port to the directory that will contain the file.  */
++  dir = __file_name_lookup (SHM_DIR, 0, 0);
++  if (dir == MACH_PORT_NULL)
++    return errno;
++
++  /* Create an unnamed file in the directory.  */
++  err = __dir_mkfile (dir, O_RDWR, flags, &file);
++  if (err)
++    {
++      __mach_port_deallocate (__mach_task_self (), dir);
++      return err;
++    }
++
++  err = __file_set_size (file, size);
++  if (err)
++    {
++      __mach_port_deallocate (__mach_task_self (), file);
++      __mach_port_deallocate (__mach_task_self (), dir);
++
++      return err;
++    }
++
++  *r_dir = dir;
++  *r_file = file;
++
++  return 0;
++}
++
++
++/* Open the shared memory segment *R_KEY and return a file descriptor
++   to it in R_FD.  If KEY is IPC_PRIVATE, use a private key and return
++   it in R_KEY.  */
++static error_t
++get_exclusive (int shmflags, size_t size, key_t *r_key, int *r_fd)
++{
++  error_t err;
++  file_t dir;
++  file_t file;
++  char filename[SHM_NAMEMAX];
++  key_t key = *r_key;
++  bool is_private;
++
++  /* Create the shared memory segment.  */
++  err = create_shm_file (size, shmflags, &dir, &file);
++  if (err)
++    return err;
++
++  if (key == IPC_PRIVATE)
++    {
++      is_private = true;
++      key = SHM_PRIV_KEY_START;
++
++      /* Try to link the shared memory segment into the filesystem
++	 (exclusively).  Private segments have negative keys.  */
++      do
++	{
++	  sprintf (filename, SHM_NAMEPRI, key);
++	  err = __dir_link (dir, file, filename, 1);
++	  if (!err)
++	    {
++	      /* We are done.  */
++	      *r_key = key;
++	      break;
++	    }
++	  else if (err == EEXIST)
++	    {
++	      /* Check if we ran out of keys.  If not, try again with new
++		 key.  */
++	      if (key == SHM_PRIV_KEY_END)
++		err = ENOSPC;
++	      else
++		err = 0;
++
++	      key--;
++	    }
++	}
++      while (!err);
++    }
++  else
++    {
++      /* Try to link the shared memory segment into the filesystem
++	 (exclusively) under the given key.  */
++      sprintf (filename, SHM_NAMEPRI, key);
++      err = __dir_link (dir, file, filename, 1);
++    }
++
++  __mach_port_deallocate (__mach_task_self (), dir);
++
++  if (!err)
++    {
++      int fd;
++
++      /* Get a file descriptor for that port.  */
++      fd = _hurd_intern_fd (file, O_RDWR, 1); /* dealloc on error */
++      if (fd < 0)
++	err = errno;
++      else
++	*r_fd = fd;
++    }
++
++  return err;
++}
++
++
++/* Open the shared memory segment KEY (creating it if it doesn't yet
++   exist) and return a file descriptor to it in R_FD.  */
++static error_t
++get_shared (int shmflags, size_t size, key_t key, int *r_fd)
++{
++  error_t err = 0;
++  char filename[sizeof (SHM_DIR) - 1 + SHM_NAMEMAX];
++  int fd = -1;
++  sprintf (filename, SHM_DIR SHM_NAMEPRI, key);
++
++  do
++    {
++      fd = __open (filename, O_NORW, shmflags & 0777);
++
++      if (fd < 0 && errno != ENOENT)
++	/* We give up.  */
++	return errno;
++      else if (fd >= 0)
++	{
++	  int res;
++	  struct stat statbuf;
++
++	  /* Check the size (we only need to do this if we did not
++	     create the shared memory segment file ourselves).  */
++	  res = __fstat (fd, &statbuf);
++	  if (res < 0)
++	    {
++	      err = errno;
++	      __close (fd);
++	      return err;
++	    }
++
++	  if (statbuf.st_size < size)
++	    {
++	      __close (fd);
++	      return EINVAL;
++	    }
++	}
++      else
++	{
++	  /* The memory segment doesn't exist.  */
++	  if (shmflags & IPC_CREAT)
++	    {
++	      /* Try to create it exclusively.  */
++	      err = get_exclusive (shmflags, size, &key, &fd);
++	      if (err == EEXIST)
++		/* If somebody created it in the meanwhile, just try again.  */
++		err = 0;
++	    }
++	  else
++	    err = ENOENT;
++	}
++    }
++  while (fd < 0 && !err);
++
++  if (!err)
++    *r_fd = fd;
++  else
++    *r_fd = -1;
++
++  return err;
++}
++
++/* Return an identifier for an shared memory segment of at least size
++   SIZE which is associated with KEY.  */
++int
++__shmget (key_t key, size_t size, int shmflags)
++{
++  error_t err;
++  int fd;
++
++  if (key == IPC_PRIVATE || shmflags & IPC_EXCL)
++    /* An exclusive shared memory segment must be created.  */
++    err = get_exclusive (shmflags, size, &key, &fd);
++  else
++    err = get_shared (shmflags, size, key, &fd);
++
++  if (err)
++    {
++      errno = err;
++      return -1;
++    }
++
++  /* From here, we can't fail.  That's important, as otherwise we
++     would need to unlink the file if we created it (in that case, the
++     code above would have to be changed to pass a "created" flag down
++     to the caller).  */
++
++  __close (fd);
++
++  return key;
++}
++
++weak_alias(__shmget, shmget)
+--- a/sysdeps/mach/hurd/bits/posix_opt.h
++++ b/sysdeps/mach/hurd/bits/posix_opt.h
+@@ -68,8 +68,8 @@
+ /* X/Open thread realtime support is not supported.  */
+ #undef _XOPEN_REALTIME_THREADS
+ 
+-/* XPG4.2 shared memory is not supported.  */
+-#undef	_XOPEN_SHM
++/* XPG4.2 shared memory is supported.  */
++#define _XOPEN_SHM      1
+ 
+ /* Tell we have POSIX threads.  */
+ #define _POSIX_THREADS	200809L

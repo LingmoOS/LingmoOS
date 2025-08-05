@@ -1,0 +1,21 @@
+glibc (2.34-1) unstable; urgency=medium
+
+  Starting with glibc 2.31, Sun RPC is removed from glibc. This includes the
+  rpcgen program, librpcsvc, and the Sun RPC header files. However backward
+  runtime compatibility is provided, that is to say existing binaries will
+  continue to work.
+
+  In order to link new binaries, the rpcsvc-proto package (a dependency of
+  libc6-dev) provides rpcgen and several rpcsvc header files and RPC protocol
+  definitions from Sun RPC sources that were previously shipped by glibc, and
+  an alternative RPC library shall be used. The most used alternative library
+  is TI-RPC, the corresponding development package is libtirpc-dev.
+
+  Here are the necessary steps to switch an existing program to use the TI-RPC
+  library:
+  - Make sure the rpcsvc-proto, libtirpc-dev and pkg-config packages are
+    installed.
+  - Add the output of 'pkg-config --cflags libtirpc' to CFLAGS or equivalent.
+  - Add the output of 'pkg-config --libs libtirpc' to LDFLAGS or equivalent.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 03 Aug 2022 12:07:29 +0200

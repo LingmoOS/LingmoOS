@@ -1,0 +1,52 @@
+Note: Keep the 2.41 symbol until we rebuild packages against the 2.42
+symbol.
+
+Index: glibc-upstream/sysdeps/htl/pt-once.c
+===================================================================
+--- glibc-upstream.orig/sysdeps/htl/pt-once.c
++++ glibc-upstream/sysdeps/htl/pt-once.c
+@@ -58,5 +58,8 @@ libc_hidden_def (__pthread_once)
+ versioned_symbol (libc, __pthread_once, pthread_once, GLIBC_2_42);
+ 
+ #if OTHER_SHLIB_COMPAT (libpthread, GLIBC_2_12, GLIBC_2_42)
++compat_symbol (libpthread, __pthread_once, pthread_once, GLIBC_2_41);
++#endif
++#if OTHER_SHLIB_COMPAT (libpthread, GLIBC_2_12, GLIBC_2_42)
+ compat_symbol (libpthread, __pthread_once, pthread_once, GLIBC_2_12);
+ #endif
+Index: glibc-upstream/sysdeps/mach/hurd/i386/libc.abilist
+===================================================================
+--- glibc-upstream.orig/sysdeps/mach/hurd/i386/libc.abilist
++++ glibc-upstream/sysdeps/mach/hurd/i386/libc.abilist
+@@ -2588,6 +2588,7 @@ GLIBC_2.41 pthread_mutexattr_setpshared
+ GLIBC_2.41 pthread_mutexattr_setrobust F
+ GLIBC_2.41 pthread_mutexattr_setrobust_np F
+ GLIBC_2.41 pthread_mutexattr_settype F
++GLIBC_2.41 pthread_once F
+ GLIBC_2.41 pthread_sigmask F
+ GLIBC_2.42 __inet_ntop_chk F
+ GLIBC_2.42 __inet_pton_chk F
+Index: glibc-upstream/sysdeps/mach/hurd/x86_64/libc.abilist
+===================================================================
+--- glibc-upstream.orig/sysdeps/mach/hurd/x86_64/libc.abilist
++++ glibc-upstream/sysdeps/mach/hurd/x86_64/libc.abilist
+@@ -2271,6 +2271,7 @@ GLIBC_2.41 pthread_mutexattr_setpshared
+ GLIBC_2.41 pthread_mutexattr_setrobust F
+ GLIBC_2.41 pthread_mutexattr_setrobust_np F
+ GLIBC_2.41 pthread_mutexattr_settype F
++GLIBC_2.41 pthread_once F
+ GLIBC_2.41 pthread_sigmask F
+ GLIBC_2.42 __inet_ntop_chk F
+ GLIBC_2.42 __inet_pton_chk F
+Index: glibc-upstream/htl/Versions
+===================================================================
+--- glibc-upstream.orig/htl/Versions
++++ glibc-upstream/htl/Versions
+@@ -148,6 +148,7 @@ libc {
+     pthread_mutexattr_setpshared;
+     pthread_mutexattr_setrobust; pthread_mutexattr_setrobust_np;
+     pthread_mutexattr_settype;
++    pthread_once;
+     pthread_sigmask;
+   }
+ 

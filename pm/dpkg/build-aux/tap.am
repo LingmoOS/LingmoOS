@@ -1,0 +1,38 @@
+# Variables to be defined:
+#
+#  TEST_VERBOSE - set to 0 (default) or 1 to control test suite verbosity
+#  TEST_PARALLEL - set to 1 (default) or N to control the parallel jobs
+#  TEST_ENV_VARS - environment variables to be set for the test suite
+#  TEST_COVERAGE - set to the perl module in charge of getting test coverage
+#  test_tmpdir - test suite temporary directory
+#  test_scripts - list of test case scripts
+#  test_programs - list of test case programs
+#  test_data - list of test data files
+
+TEST_VERBOSE ?= 0
+TEST_PARALLEL ?= 1
+
+tap-clean:
+	[ -z "$(test_tmpdir)" ] || rm -fr $(test_tmpdir)
+
+tap-check: $(test_data) $(test_programs) $(test_scripts)
+	[ -z "$(test_tmpdir)" ] || $(MKDIR_P) $(test_tmpdir)
+	  $(TEST_ENV_VARS) \
+	  TEST_PARALLEL=$(TEST_PARALLEL) \
+	  TEST_VERBOSE=$(TEST_VERBOSE) \
+	  abs_srcdir=$(abs_srcdir) \
+	  abs_builddir=$(abs_builddir) \
+	  abs_top_srcdir=$(abs_top_srcdir) \
+	  abs_top_builddir=$(abs_top_builddir) \
+	  srcdir=$(srcdir) builddir=$(builddir) \
+	  CC=$(CC) \
+	  SHELL=$(SHELL) \
+	  PERL=$(PERL) \
+	  PERL_DL_NONLAZY=1 \
+	  PERL5OPT=$(TEST_COVERAGE) \
+	  $(PERL) $(top_srcdir)/build-aux/test-runner \
+	    $(addprefix $(builddir)/,$(test_programs)) \
+	    $(addprefix $(srcdir)/,$(test_scripts))
+
+authorcheck:
+	AUTHOR_TESTING=1 $(MAKE) check

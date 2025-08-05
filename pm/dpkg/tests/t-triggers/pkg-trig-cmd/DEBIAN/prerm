@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+if [ -e "$DPKG_ROOT/trigger-$DPKG_MAINTSCRIPT_NAME" ]; then
+    if [ -e "$DPKG_ROOT/trigger-noawait" ]; then
+	echo "Executing 'dpkg-trigger --no-await a-trigger' from '$0 $1'"
+	dpkg-trigger --no-await a-trigger
+    elif [ -e "$DPKG_ROOT/trigger-await" ]; then
+	echo "Executing 'dpkg-trigger --await a-trigger' from '$0 $1'"
+	dpkg-trigger --await a-trigger
+    else
+	echo "Executing 'dpkg-trigger a-trigger' from '$0 $1'"
+	dpkg-trigger a-trigger
+    fi
+fi
+

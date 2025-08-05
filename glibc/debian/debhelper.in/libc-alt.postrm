@@ -1,0 +1,20 @@
+#! /bin/sh
+set -e
+
+if [ "$1" = remove ]; then
+    # We manually installed this link in postinst if missing. It is also
+    # installed by the native multiarch package as a proper file. We have
+    # to remove it if we are the last package to provide it. Detect that
+    # situation by checking for a dangling link.
+    if [ -h /usrRTLDDIR/RTLD_SO ] && [ ! -f /usrRTLDDIR/RTLD_SO ]; then
+        rm /usrRTLDDIR/RTLD_SO
+    fi
+fi
+
+if [ "$1" = deconfigure ]; then
+    :; # blah, do something useful with ldso
+fi
+
+#DEBHELPER#
+
+exit 0

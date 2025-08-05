@@ -1,0 +1,334 @@
+Dpkg POD coding style 2021-06-25
+=====================
+
+General
+~~~~~~~
+
+Verbatim code sections that need to be formatted, need to be prefixed with
+a line containing exactly «Z<>», to trick the parser.
+
+New sentences inside a paragraph should start on a new line, so that we
+do not need to reflow the text when adding new content.
+
+Every new feature, option or behavior change needs to be documented with
+the version introducing the change.
+
+
+Dpkg M4sh/Autoconf coding style 2016-09-05
+===============================
+
+General
+~~~~~~~
+
+All dpkg specific macros need to be prefixed with «DPKG_». Complex checks
+should be defined as new macros under m4/dpkg-<name>.m4, and those used
+in configure.ac which should look pretty simple.
+
+Quoting and indentation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Code and arguments that wrap into the next line are indented by two spaces.
+
+In principle all macro argument should always be quoted. Which brings one
+of the biggest readability issues with M4sh/Autoconf code, the amount of
+consecutive quotes and parenthesis pairs, which can make it very hard to
+notice if they are unbalanced. To avoid this we use a style that tries to
+avoid more than two consecutive blocks of «])».
+
+We can either use a style resembling very simple function calls, when the
+arguments are as well very simple, such as:
+
+  AC_DEFINE_UNQUOTED([SOME_VARIABLE],
+    [SOME_CONCOCTED_WAY_TO_GET_A_VALUE],
+    [Some descriptive text here])
+
+  AS_CASE([condition],
+    [case-a], [do-a],
+    [case-b], [do-b])
+
+Or one resembling curly-braced C-style blocks, such as this:
+
+  AS_IF([condition], [
+    DO_SOMETHING([here])
+  ], [
+    DO_OTHERWISE([there])
+  ])
+
+Except for AC_ARG_WITH, AC_ARG_ENABLE and AM_CONDITIONAL which need their
+second argument quoted tightly surrounding the code, like this:
+
+  AC_ARG_ENABLE([feature],
+    [AS_HELP_STRING([--disable-feature], [Disable feature])],
+    [], [enable_feature="yes"])
+
+  AM_CONDITIONAL([HAVE_SOME_FEATURE],
+    [test "$ac_cv_have_some_feature" = "yes" && \
+     test "$ac_cv_have_some_feature" = "yes"])
+
+or the output will get messed up.
+
+
+Dpkg C/C++ coding style 2024-07-24
+=======================
+
+Standards
+~~~~~~~~~
+
+The C code base assumes C99, except for the following features:
+
+ - Variable length arrays.
+ - Mixed declaration and code.
+
+The C++ code base assumes C++14.
+
+The code base assumes a POSIX.1-2008 compatible environment.
+
+The required features are checked at build time, and it will either use
+compatibility code in case the needed extensions are not supported and it
+is possible to support them, otherwise it will abort in case a needed one
+cannot be used.
+
+General
+~~~~~~~
+
+The coding style is a mix of parts from KNF [K] and the Linux CodingStyle [L].
+If in doubt or missing from this file please ask, although files using the
+tab based indentation can be considered canon.
+
+  [K] <https://www.freebsd.org/cgi/man.cgi?query=style>
+  [L] <https://kernel.org/doc/Documentation/process/coding-style.rst>
+
+The code has a mix of an old coding style being phased out and the new
+style. New files should use the new style, changes to files with the old
+style should switch the code being touched except for the indentation level,
+which should be preserved to match (2 spaces).
+
+Code should generally strive for clarity. Monster functions should be split
+into logical and small pieces.
+
+Variable and function names should be generally descriptive, not needed
+for variables commonly used (for example an index inside a loop, etc),
+acronyms should only be used if they are widely known externally or
+inside the project. The names should separate logical concepts within
+with underscores.
+
+On comments use UTF-8 characters for quotes, copyright symbols, etc.
+
+On strings in code use simple or double quotes «''» «""». Not the unpaired
+ones «`'». Strings marked for translation, should only be fixed if there's
+other changes to be done on them, otherwise we get unneeded fuzzies.
+
+  <https://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html>
+
+Code documentation
+~~~~~~~~~~~~~~~~~~
+
+Public declarations should be documented using JavaDoc style comments.
+
+Documentation should always be close to its definition (usually in the .c
+or .cc files) and not its declaration, so that when the code changes it's
+less likely that they will get out of sync. For data types, macros and
+similar where there's only declarations, the documentation will usually
+go instead in the header files.
+
+For enum values and struct members, the documentation should usually be
+one-line comments, preceding the item.
+
+The comment title should be on the second line on its own, and the long
+description on its own paragraph.
+
+Examples:
+
+/**
+ * This is the enum title.
+ */
+enum value_list {
+	/** Value doing foo. */
+	VALUE_A,
+	/** Value doing bar. */
+	VALUE_B,
+};
+
+/**
+ * This is the title.
+ *
+ * This is the long description extending several lines, explaining in
+ * detail what this item does.
+ *
+ * @param a This is the a parameter.
+ * @param b This is the b parameter.
+ *
+ * @return This is the return value.
+ */
+
+Indentation, alignment and spacing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lines should be 80 chars max. Indentation is done with hard tabs (which
+should be considered to take 8 spaces width). Aligning with spaces:
+
+static void
+function(void *ptr, int value)
+{
+	void *ref_ptr = get_ref(ptr);
+	int ref_value = get_value(ref);
+
+	if (value > 10)
+		do_something(GLOBAL_MACRO, ptr, value, "some-string",
+		             ref_ptr, ref_value, "other-string",
+		             "extra-string");
+}
+
+When wrapping, logical operators should be kept on the preceding line:
+
+	if (really_long_variable_to_be_checked_against_a &&
+	    really_long_variable_to_be_checked_against_b)
+		foo();
+
+Spaces around operators:
+
+	if (a && (b || c) && c == d)
+		break;
+
+	a = (b + 4 * (5 - 6)) & 0xff;
+
+Spaces around assignments:
+
+	a += b;
+
+Spaces after comma:
+
+	foo(a, b);
+
+Space after keywords (for, while, do, if, etc, but sizeof should be
+treated like a function):
+
+	for (i = 0; i < 10; i++)
+		foo(i);
+
+	memcpy(dst, src, sizeof(src));
+
+Definition of local variables, related code blocks, functions bodies
+should be split with blank lines:
+
+int
+function(void)
+{
+	int a;
+
+	foo();
+	bar();
+
+	quux();
+
+	return 0;
+}
+
+Braces
+~~~~~~
+
+Braces should be placed on the same line as the keyword, but on a new line
+for the function body. No braces should be used for unambiguous one line
+statements:
+
+	if (a > 0) {
+		foo(a);
+		bar(a);
+	} else {
+		quux(0)
+		bar(0);
+	}
+
+	for (;;) {
+		foo();
+		bar();
+	}
+
+	do {
+		foo();
+		bar();
+	} while (quux());
+
+	switch (foo) {
+	case a:
+		bar();
+		break;
+	case b:
+	default:
+		baz();
+		break;
+	}
+
+Code conventions
+~~~~~~~~~~~~~~~~
+
+Prefer assigning outside of conditionals:
+
+	n = read_items();
+	if (n < 100)
+		foo();
+
+String comparisons should use comparison operators to make it easier to
+see what operation is being done:
+
+	if (strcmp(a, b) == 0)
+		foo();
+
+	if (strcmp(a, b) < 0)
+		foo();
+
+
+Dpkg Perl coding style 2019-03-27
+======================
+
+Perl version
+~~~~~~~~~~~~
+
+We don't want to impose a too-recent Perl version, so only use features
+supported by the Perl version that is currently in Debian oldstable when
+possible. Currently that means Perl 5.32.1.
+
+General
+~~~~~~~
+
+In general you should follow the conventions listed in perlstyle(1).
+All the code should run with the “use strict” and “use warnings” pragmas,
+and pass «make authorcheck».
+
+Code documentation
+~~~~~~~~~~~~~~~~~~
+
+Public modules should be documented with POD (see perlpod(1)). Private
+code doesn't have to use POD, simple comment lines (starting with "#") are
+enough, but if they use POD they need to note the fact that the module is
+private in the CHANGES section and specify a version «0.xx». Public scripts
+are documented in their corresponding manual pages.
+
+Indentation, alignment and spacing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lines should be 80 chars max. The indentation level is 4 characters, and
+indentation is done with soft tabs (no hard tabs) and spaces.
+
+if ($foo) {
+    if ($bar) {
+        print "Hello\n";
+        unless ($baz) {
+            print "Who are you?\n";
+        }
+    }
+}
+
+Object methods
+~~~~~~~~~~~~~~
+
+Use a single line to retrieve all the arguments and use $self as name
+for the current object:
+
+sub do_something {
+    my ($self, $arg1, $arg2, %opts) = @_;
+    ...
+}
+
+Supplementary optional arguments should be named and thus stored in a
+hash.

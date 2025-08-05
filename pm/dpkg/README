@@ -1,0 +1,142 @@
+dpkg - Debian's package maintenance system
+
+This is the dpkg suite of programs that form the foundation of the Debian's
+package management system; on the lower layer there are ‘dpkg-deb’ and
+‘dpkg-split’ programs handling the binary formats, and ‘dpkg-source’ program
+handling the source formats; there is a collection of tools to handle building
+source packages into binary packages; there is the medium-level and less
+user-friendly command-line interface (CLI) in the form of the ‘dpkg’ command;
+and then there is the terminal user interface (TUI) ‘dselect’ program (which
+has gone out of preference in favor of the apt (CLI) and aptitude (TUI)
+programs).
+
+The dpkg suite also includes some other programs currently maintained
+on external repositories, namely ‘dpkg-repack’, ‘dpkg-www’, ‘dupload’
+and ‘debsig-verify’.
+
+
+Releases
+--------
+
+The current legacy, stable and development releases can be found at:
+
+  <https://deb.debian.org/debian/pool/main/d/dpkg/>
+
+For older releases check:
+
+  <https://snapshot.debian.org/package/dpkg/>
+
+
+Mailing List
+------------
+
+The subscription interface and web archives can be found at:
+
+  <https://lists.debian.org/debian-dpkg/>
+
+The mailing list address is (no subscription required to post):
+
+  debian-dpkg@lists.debian.org
+
+
+Source Repository
+-----------------
+
+The primary repository can be browsed and cloned from:
+
+  <https://git.dpkg.org/git/dpkg/dpkg.git>
+
+
+Building from git source
+------------------------
+
+To prepare the dpkg source tree from git before starting the build process
+some required software needs to be installed:
+
+  GNU autoconf >= 2.60
+  GNU automake >= 1.11
+  GNU libtool >= 2.0
+  GNU autopoint >= 0.19.7 (from GNU gettext)
+  GNU gettext >= 0.19.7 (only with --enable-nls)
+
+After installing the needed software, and running the following command on
+the git tree:
+
+  $ ./autogen
+
+the source should be roughly equivalent to the distributed tar source.
+
+To enable translated documentation this software will be needed:
+
+  po4a >= 0.59
+
+
+Building from tar source
+------------------------
+
+The minimum software required to configure and build dpkg from a tarball is:
+
+  C99 compiler (see doc/coding-style.txt)
+  perl (see doc/coding-style.txt)
+  pkgconf
+  GNU make
+
+To enable optional functionality or programs, this software might be needed:
+
+  libmd (used by libdpkg, required if libc is missing digest functions)
+  libz (from zlib, used instead of gzip command-line tool)
+  liblzma (from xz utils, used instead of xz command-line tool)
+  libzstd (from libzstd, used instead of zstd command-line tool)
+  libbz2 (from bzip2, used instead of bzip2 command-line tool)
+  libselinux
+  curses compatible library (needed on --enable-dselect)
+
+To run the test suite («make check» or «make authorcheck» for author tests,
+those that might not be pertinent during release builds) the following
+software might be needed:
+
+  Test::MinimumVersion perl module (optional, author)
+  Test::Pod perl module (optional)
+  Test::Pod::Coverage perl module (optional, author)
+  Test::Spelling perl module (optional, author)
+  Test::Strict perl module (optional)
+  Test::Synopsis perl module (optional, author)
+  Test::Perl::Critic perl module (optional, author)
+  aspell (optional, author)
+  aspell-en (optional, author)
+  codespell (optional, author)
+  cppcheck (optional, author)
+  fakeroot (optional)
+  sop [sqop (from Sequoia-PGP), pgpainless-cli] (optional)
+  sq (from Sequoia-PGP, optional)
+  gpg-sq (from Sequoia-PGP, optional), gpg (optional)
+  i18nspector (optional, author)
+  shellcheck (optional, author)
+
+To enable additional developer's documentation («make doc») this software
+will be needed:
+
+  pod2man
+  doxygen
+  dot
+
+To enable code coverage («./configure --enable-coverage; make coverage»)
+this software is needed:
+
+  lcov (from the Linux Test Project)
+  Devel-Cover perl module
+
+The build process is done by running the usual «./configure; make». To
+see all available configuration options please run «./configure --help».
+The following configure options might be of interest to disable specific
+programs:
+
+  --disable-dselect
+  --disable-start-stop-daemon
+  --disable-update-alternatives
+
+And the following to disable modifications to the build flags:
+
+  --disable-compiler-warnings
+  --disable-compiler-optimizations
+  --disable-linker-optimizations

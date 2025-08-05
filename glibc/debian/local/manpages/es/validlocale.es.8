@@ -1,0 +1,57 @@
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH validlocale 8 0.1 "Petter Reinholdtsen" ""
+.SH NOMBRE
+.LP
+validlocale \- Comprueba si la opción de localización dada está disponible
+.SH SINTAXIS
+.LP
+validlocale <\fIopción_de_localización\fP>
+.SH DESCRIPCIÓN
+.LP
+Comprueba si la opción de localización dada como argumento es válida. Si no
+lo es muestra en la stdout (salida estándar) la cadena de caracteres que se
+necesita añadir a /etc/locale.gen para que locale\-gen genere esa opción de
+localización (si es que existe).
+.SH FICHEROS
+.LP
+\fI/usr/sbin/validlocale\fP
+.br
+\fI/usr/share/i18n/SUPPORTED\fP
+.SH "VARIABLES DE ENTORNO"
+.LP
+.TP  
+\fBDEFAULTCHARSET\fP
+El juego de caracteres que asume en caso de que la opción de localización
+dada no esté entre la lista de opciones de localización soportadas.
+.SH EJEMPLOS
+.LP
+Si usted proporciona una opción de localización válida como parámetro,
+muestra una cadena de caracteres especificándolo en stderr (salida de
+errores estándar):
+.LP
+.IP
+% validlocale C
+.br
+locale 'C' valid and available
+.LP
+Cuando se proporcione una inválida (no ha sido generada o no existe),
+muestra una cadena de caracteres en stderr diciendo que es inválida, y otra
+a stdout con la cadena de caracteres que se necesita añadir a
+/etc/locale.gen para que se genere:
+.LP
+.IP
+% validlocale de_AU@euro
+.br
+locale 'de_AU@euro' not available
+.br
+de_AU@euro ISO\-8859\-15
+.SH AUTORES
+.LP
+Petter Reinholdtsen <pere@hungry.com>
+.SH "VÉASE ADEMÁS"
+.LP
+locale\-gen(8), localedef(1), locale(1)

@@ -1,0 +1,75 @@
+Template: glibc/upgrade
+Type: boolean
+Default: true
+_Description: Do you want to upgrade glibc now?
+ Running services and programs that are using NSS need to be restarted,
+ otherwise they might not be able to do lookup or authentication any more.
+ The installation process is able to restart some services (such as ssh or
+ telnetd), but other programs cannot be restarted automatically. One such
+ program that needs manual stopping and restart after the glibc upgrade by
+ yourself is xdm - because automatic restart might disconnect your active
+ X11 sessions.
+ .
+ This script detected the following installed services which must be
+ stopped before the upgrade: ${services}
+ .
+ If you want to interrupt the upgrade now and continue later, please
+ answer No to the question below.
+
+Template: glibc/restart-services
+Type: string
+_Description: Services to restart for GNU libc library upgrade:
+ Running services and programs that are using NSS need to be restarted,
+ otherwise they might not be able to do lookup or authentication any more
+ (for services such as ssh, this can affect your ability to login).
+ Please review the following space-separated list of init.d scripts for
+ services to be restarted now, and correct it if needed.
+ .
+ Note: restarting sshd/telnetd should not affect any existing connections.
+
+Template: glibc/restart-failed
+Type: error
+#flag:translate!:3
+_Description: Failure restarting some services for GNU libc upgrade
+ The following services could not be restarted for the GNU libc library upgrade:
+ .
+ ${services}
+ .
+ You will need to start these manually by running
+ 'invoke-rc.d <service> start'.
+
+Template: glibc/disable-screensaver
+Type: error
+_Description: xscreensaver and xlockmore must be restarted before upgrading
+ One or more running instances of xscreensaver or xlockmore have been
+ detected on this system. Because of incompatible library changes, the
+ upgrade of the GNU libc library will leave you unable to
+ authenticate to these programs. You should arrange for these programs
+ to be restarted or stopped before continuing this upgrade, to avoid
+ locking your users out of their current sessions.
+
+Template: libraries/restart-without-asking
+Type: boolean
+Default: false
+_Description: Restart services during package upgrades without asking?
+ There are services installed on your system which need to be restarted
+ when certain libraries, such as libpam, libc, and libssl, are upgraded.
+ Since these restarts may cause interruptions of service for the system,
+ you will normally be prompted on each upgrade for the list of services
+ you wish to restart.  You can choose this option to avoid being prompted;
+ instead, all necessary restarts will be done for you automatically so you
+ can avoid being asked questions on each library upgrade.
+
+Template: glibc/kernel-too-old
+Type: error
+_Description: Kernel must be upgraded
+ This version of the GNU libc requires kernel version ${kernel_ver} or
+ later.  Please upgrade your kernel and reboot before installing glibc.
+ You may need to use "apt -f install" after reboot to solve dependencies.
+
+Template: glibc/kernel-not-supported
+Type: note
+_Description: Kernel version not supported
+ This version of the GNU libc requires kernel version ${kernel_ver} or
+ later.  Older versions might work but are not officially supported by
+ Debian.  Please consider upgrading your kernel.

@@ -1,0 +1,40 @@
+Comments tell that LANG has to be the first value, and LC_ALL the last
+one.  Thus LANGUAGE is printed between them.
+
+# DP: Dpatch author: Denis Barbier
+# DP: Patch author: Denis Barbier
+# DP: Upstream status: not submitted
+# DP: Date: 2006-01-08
+
+---
+ locale/programs/locale.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/locale/programs/locale.c
++++ b/locale/programs/locale.c
+@@ -793,11 +793,15 @@
+ show_locale_vars (void)
+ {
+   const char *lcall = getenv ("LC_ALL") ?: "";
++  const char *language = getenv ("LANGUAGE") ?: "";
+   const char *lang = getenv ("LANG") ?: "";
+ 
+   /* LANG has to be the first value.  */
+   print_assignment ("LANG", lang, false);
+ 
++  if (getenv ("POSIXLY_CORRECT") == NULL)
++    printf ("LANGUAGE=%s\n", language);
++
+   /* Now all categories in an unspecified order.  */
+   for (size_t cat_no = 0; cat_no < NCATEGORIES; ++cat_no)
+     if (cat_no != LC_ALL)
+--- a/locale/tst-locale-locpath.sh
++++ b/locale/tst-locale-locpath.sh
+@@ -56,6 +56,7 @@ EOF
+ 
+ cat > "$testroot/stdout-expected" <<EOF
+ LANG=
++LANGUAGE=
+ LC_CTYPE="invalid-locale"
+ LC_NUMERIC="invalid-locale"
+ LC_TIME="invalid-locale"

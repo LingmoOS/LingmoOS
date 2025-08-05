@@ -1,0 +1,50 @@
+2012-05-01  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* elf/Makefile(trusted-dirs.st): Fix DL_DST_LIB computation with
+	two level slibdir directories.
+
+2009-09-08  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* Makeconfig: add support for multiarch compat directories.
+
+---
+ Makeconfig   |    9 +++++++++
+ elf/Makefile |    2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -136,6 +136,11 @@
+ endif
+ inst_libdir = $(install_root)$(libdir)
+ 
++# Compat places to look for libraries
++ifndef extra_libdir
++extra_libdir = /lib:$(exec_prefix)/lib
++endif
++
+ # Where to install the shared library.
+ ifndef slibdir
+ slibdir = $(exec_prefix)/lib
+@@ -589,6 +594,10 @@
+ default-rpath = $(libdir)
+ endif
+ 
++ifdef extra_libdir
++default-rpath += :$(extra_libdir)
++endif
++
+ ifndef link-extra-libs
+ link-extra-libs = $(LDLIBS-$(@F))
+ link-extra-libs-static = $(link-extra-libs)
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -507,7 +507,7 @@
+ 	$(make-target-directory)
+ 	echo "$(subst :, ,$(default-rpath) $(user-defined-trusted-dirs))"    \
+ 	| $(AWK) -f gen-trusted-dirs.awk > ${@:st=T};
+-	echo '#define DL_DST_LIB "$(notdir $(slibdir))"' >> ${@:st=T}
++	echo '#define DL_DST_LIB "$(shell echo $(slibdir) | sed 's,/,,')"' >> ${@:st=T}
+ 	$(move-if-change) ${@:st=T} ${@:st=h}
+ 	touch $@
+ CPPFLAGS-dl-load.c += -I$(objpfx). -I$(csu-objpfx).

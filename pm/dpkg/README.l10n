@@ -1,0 +1,61 @@
+Translators, when adding/updating your translation files, please follow
+the following rules:
+
+* Do not update debian/changelog:
+
+  - The file will get generated out of the commit messages at release time.
+  - Beware that you should NOT update any of the legacy ChangeLog.old
+    files for translation updates.
+
+* Format of commit message
+
+  Following guidelines in <https://wiki.debian.org/Teams/Dpkg/GitUsage>
+  you should start the commit message with a summary line, followed by an
+  empty line and optional pseudo-headers.
+
+  The summary line should use the following format:
+
+  «po: <Action> <Language> [<part> ]translation»
+
+  Where:
+
+  - <Action> is one of “Update” or “Add”,
+  - <Language> should be capitalized (such as “English”),
+  - <part> should be one of «programs» (for lib/, src/ and utils/), «dselect»,
+    «scripts» and «man pages» (man/), or not be set if the commit includes
+    changes to various parts.
+
+  For example:
+
+==========================================================
+po: Update German programs translation
+
+Closes: #123456
+Reviewed-by: Full Name <email@example.org>
+==========================================================
+
+* Use of po/LINGUAS, dselect/po/LINGUAS or scripts/po/LINGUAS:
+
+  When ADDING a new translation, don't forget adding the language to
+  the LINGUAS file, otherwise it will not be used.
+
+* Always CHECK your translations:
+
+  You MUST check your PO files for validity.
+
+  The correct syntax for doing so is:
+
+  $ msgmerge --update <file> dpkg.pot
+  $ msgfmt --check --output-file /dev/null --statistics <file>
+  $ msgcat <file> >/dev/null
+
+  - msgmerge updates your file with the current POT file.
+  - msgfmt checks it for validity.
+  - msgcat may detect encoding problems.
+
+  In addition to the above, the easiest way to check that the po4a
+  translations have valid POD markup, is to try to build them (please
+  see the Building sections in the README file for further details
+  regarding the setup of the source tree):
+
+  $ make -C man

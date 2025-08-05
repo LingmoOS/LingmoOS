@@ -1,0 +1,66 @@
+# dpkg manual page - deb-prerm(5)
+#
+# Copyright © 2016 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-prerm - package pre-removal maintainer script
+
+=head1 SYNOPSIS
+
+B<DEBIAN/prerm>
+
+=head1 DESCRIPTION
+
+A package can perform several pre-removal actions via maintainer
+scripts, by including an executable I<prerm> file in its control
+archive (i.e. I<DEBIAN/prerm> during package creation).
+
+The script can be called in the following ways:
+
+=over
+
+=item I<prerm> B<remove>
+
+Before the package is removed.
+
+=item I<old-prerm> B<upgrade> I<new-version>
+
+Before an upgrade.
+
+=item I<new-prerm> B<failed-upgrade> I<old-version> I<new-version>
+
+If the above B<upgrade> fails.
+
+The I<new-version> is passed only since dpkg 1.18.5.
+
+=item I<prerm> B<deconfigure> B<in-favour> I<new-package> I<new-version>
+
+=item S<    >[ B<removing> I<old-package> I<old-version> ]
+
+Before package is deconfigured while dependency is replaced due to conflict.
+
+=item I<prerm> B<remove> B<in-favour> I<new-package> I<new-version>
+
+Before the package is replaced due to conflict.
+
+=back
+
+=head1 SEE ALSO
+
+L<dpkg(1)>.

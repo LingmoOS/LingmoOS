@@ -1,0 +1,23 @@
+# DP: Description: binutils bug workaround
+# DP: Related bugs: #263601: m68k: workaround for binutils problem
+# DP: Dpatch author: Roman Zippel <zippel@linux-m68k.org>
+# DP: Patch author: Richard Zidlicky <rz@linux-m68k.org>
+# DP: Upstream status: Debian-Specific
+# DP: Status Details: Actual fix is to modify m68k binutils.
+# DP: Date: 2004-08-09
+
+---
+ sysdeps/m68k/dl-machine.h |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/sysdeps/m68k/dl-machine.h
++++ b/sysdeps/m68k/dl-machine.h
+@@ -312,6 +312,8 @@
+   Elf32_Addr *const reloc_addr = (void *) (l_addr + reloc->r_offset);
+   if (ELF32_R_TYPE (reloc->r_info) == R_68K_JMP_SLOT)
+     *reloc_addr += l_addr;
++  else if (ELF32_R_TYPE (reloc->r_info) == R_68K_NONE)
++    return;
+   else
+     _dl_reloc_bad_type (map, ELF32_R_TYPE (reloc->r_info), 1);
+ }

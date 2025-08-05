@@ -1,0 +1,62 @@
+# dpkg manual page - deb-preinst(5)
+#
+# Copyright © 2016 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-preinst - package pre-installation maintainer script
+
+=head1 SYNOPSIS
+
+B<DEBIAN/preinst>
+
+=head1 DESCRIPTION
+
+A package can perform several pre-installation actions via maintainer
+scripts, by including an executable I<preinst> file in its control
+archive (i.e. I<DEBIAN/preinst> during package creation).
+
+The script can be called in the following ways:
+
+=over
+
+=item I<new-preinst> B<install>
+
+Before the package is installed.
+
+=item I<new-preinst> B<install> I<old-version> I<new-version>
+
+Before a removed package is upgraded.
+
+The I<new-version> is passed only since dpkg 1.18.5.
+
+=item I<new-preinst> B<upgrade> I<old-version> I<new-version>
+
+Before the package is upgraded.
+
+The I<new-version> is passed only since dpkg 1.18.5.
+
+=item I<old-preinst> B<abort-upgrade> I<new-version>
+
+If I<postrm> fails during upgrade or fails on failed upgrade.
+
+=back
+
+=head1 SEE ALSO
+
+L<dpkg(1)>.

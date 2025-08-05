@@ -1,0 +1,956 @@
+# dpkg manual page - dpkg-buildpackage(1)
+#
+# Copyright © 1995-1996 Ian Jackson
+# Copyright © 2000 Wichert Akkerman <wakkerma@debian.org>
+# Copyright © 2007-2008 Frank Lichtenheld <djpig@debian.org>
+# Copyright © 2008-2015 Guillem Jover <guillem@debian.org>
+# Copyright © 2008-2012 Raphaël Hertzog <hertzog@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-buildpackage - build binary or source packages from sources
+
+=head1 SYNOPSIS
+
+B<dpkg-buildpackage> [I<option>...] [B<-->] [I<filename>.dsc|I<directory>]
+
+=head1 DESCRIPTION
+
+B<dpkg-buildpackage>
+is a program that automates the process of building a Debian package.
+
+The I<filename>.dsc and I<directory> arguments are supported since dpkg 1.22.7.
+Their semantics are experimental.
+
+It
+consists of the following steps:
+
+=over
+
+=item B<1.>
+
+It runs the B<preinit> hook before reading any source file.
+If a B<.dsc> file has been specified it unpacks it anew and
+changes directory to it,
+if a I<directory> has been specified it changes directory to it,
+otherwise it expects the current directory to contain the source tree.
+It prepares the build environment by setting various environment
+variables (see B<ENVIRONMENT>), runs the B<init> hook, and calls
+B<dpkg-source --before-build> (unless B<-T> or B<--target>
+has been used).
+
+=item B<2.>
+
+It checks that the build-dependencies and build-conflicts
+are satisfied (unless B<-d> or B<--no-check-builddeps> is specified).
+
+=item B<3.>
+
+If one or more specific targets have been selected with the B<-T> or
+B<--target> option, it calls those targets and stops here.
+Otherwise it
+runs the B<preclean> hook and calls B<fakeroot debian/rules clean> to
+clean the build-tree (unless B<-nc> or B<--no-pre-clean>
+is specified).
+
+=item B<4.>
+
+It runs the B<source> hook and calls B<dpkg-source -b> to generate
+the source package (if a B<source> build has been requested with
+B<--build> or equivalent options,
+and if no B<.dsc> has been specified).
+
+=item B<5.>
+
+It runs the B<build> hook and calls B<debian/rules> I<build-target>,
+then runs the B<binary> hook followed by B<fakeroot debian/rules>
+I<binary-target> (unless a source-only build has been requested with
+B<--build=source> or equivalent options).
+Note that I<build-target> and I<binary-target> are either B<build>
+and B<binary> (default case, or if an B<any> and B<all> build
+has been requested with B<--build> or equivalent options), or
+B<build-arch> and B<binary-arch> (if an B<any> and not B<all>
+build has been requested with B<--build> or equivalent options), or
+B<build-indep> and B<binary-indep> (if an B<all> and not B<any>
+build has been requested with B<--build> or equivalent options).
+
+=item B<6.>
+
+It runs the B<buildinfo>
+hook and calls B<dpkg-genbuildinfo> to generate a B<.buildinfo> file.
+Several B<dpkg-buildpackage> options are forwarded to
+B<dpkg-genbuildinfo>.
+If a I<.dsc> has been specified,
+then it will be referenced in the generated B<.buildinfo> file,
+as we can ascertain the provenance of the source tree.
+
+=item B<7.>
+
+It runs the B<changes> hook and calls B<dpkg-genchanges> to
+generate a B<.changes> file.
+The name of the B<.changes> file will depend on the type of build and
+will be as specific as necessary but not more; the name will be:
+
+=over
+
+=item I<source-name>B<_>I<binary-version>B<_>I<arch>B<.changes>
+
+for a build that includes B<any>
+
+=item I<source-name>B<_>I<binary-version>B<_>B<all.changes>
+
+otherwise for a build that includes B<all>
+
+=item I<source-name>B<_>I<source-version>B<_>B<source.changes>.
+
+otherwise for a build that includes B<source>
+
+=back
+
+Many B<dpkg-buildpackage> options are forwarded to
+B<dpkg-genchanges>.
+
+=item B<8.>
+
+It runs the B<postclean> hook and if B<-tc> or B<--post-clean>
+is specified, it will call B<fakeroot debian/rules clean> again.
+
+=item B<9.>
+
+It calls B<dpkg-source --after-build>.
+
+=item B<10.>
+
+It runs the B<check> hook and calls a package checker for the
+B<.changes> file (if a command is specified in B<DEB_CHECK_COMMAND> or
+with B<--check-command>).
+
+=item B<11.>
+
+It runs the B<sign> hook and signs using the OpenPGP backend (as long as it
+is not an UNRELEASED build, or B<--no-sign> is specified) to sign the
+B<.dsc> file (if any, unless
+B<-us> or B<--unsigned-source> is specified), the B<.buildinfo>
+file (unless B<-ui>, B<--unsigned-buildinfo>,
+B<-uc> or B<--unsigned-changes> is specified) and
+the B<.changes> file (unless B<-uc> or B<--unsigned-changes>
+is specified).
+
+=item B<12.>
+
+If a B<.dsc> file has been specified,
+it removes the extracted source directory.
+
+=item B<13.>
+
+It runs the B<done> hook.
+
+=back
+
+=head1 OPTIONS
+
+All long options can be specified both on the command line and in the
+B<dpkg-buildpackage> system and user configuration files.
+Each line in the configuration file is either an option (exactly the same
+as the command line option but without leading hyphens) or a comment (if
+it starts with a ‘B<#>’).
+
+=over
+
+=item B<--build=>I<type>
+
+Specifies the build I<type> from a comma-separated list of components
+(since dpkg 1.18.5).
+All the specified components get combined to select the single build type
+to use, which implies a single build run with a single F<.changes> file
+generated.
+Passed to B<dpkg-genchanges>.
+
+The allowed values are:
+
+=over
+
+=item B<source>
+
+Builds the source package.
+
+B<Note>: When using this value standalone and if what you want is simply to
+(re-)build the source package from a clean source tree, using
+B<dpkg-source> directly is always a better option as it does not
+require any build dependencies to be installed which are otherwise
+needed to be able to call the B<clean> target.
+
+=item B<any>
+
+Builds the architecture specific binary packages.
+
+=item B<all>
+
+Builds the architecture independent binary packages.
+
+=item B<binary>
+
+Builds the architecture specific and independent binary packages.
+This is an alias for B<any,all>.
+
+=item B<full>
+
+Builds everything.
+This is an alias for B<source,any,all>, and the same as the default
+case when no build option is specified.
+
+=back
+
+=item B<-g>
+
+Equivalent to B<--build=source,all> (since dpkg 1.17.11).
+
+=item B<-G>
+
+Equivalent to B<--build=source,any> (since dpkg 1.17.11).
+
+=item B<-b>
+
+Equivalent to B<--build=binary> or B<--build=any,all>.
+
+=item B<-B>
+
+Equivalent to B<--build=any>.
+
+=item B<-A>
+
+Equivalent to B<--build=all>.
+
+=item B<-S>
+
+Equivalent to B<--build=source>.
+
+=item B<-F>
+
+Equivalent to B<--build=full>, B<--build=source,binary> or
+B<--build=source,any,all> (since dpkg 1.15.8).
+
+=item B<--target=>I<target>[,...]
+
+=item B<--target> I<target>[,...]
+
+=item B<-T>, B<--rules-target=>I<target>[,...]
+
+Calls B<debian/rules> I<target> once per target specified, after
+having setup the build environment (except for calling
+B<dpkg-source --before-build>), and stops the package build process
+here (since dpkg 1.15.0, long option since dpkg 1.18.8, multi-target
+support since dpkg 1.18.16).
+If B<--as-root> is also given, then the command is executed
+as root (see B<--root-command>).
+Note that known targets that are required to
+be run as root do not need this option (i.e. the B<clean>, B<binary>,
+B<binary-arch> and B<binary-indep> targets).
+
+=item B<--as-root>
+
+Only meaningful together with B<--target> (since dpkg 1.15.0).
+Requires that the target be run with root rights.
+
+=item B<-si>
+
+=item B<-sa>
+
+=item B<-sd>
+
+=item B<-v>I<version>
+
+=item B<-C>I<changes-description>
+
+=item B<-m>I<maintainer-address>
+
+=item B<-e>I<maintainer-address>
+
+Passed unchanged to B<dpkg-genchanges>.
+See its manual page.
+
+=item B<--build-by=>I<maintainer-address>
+
+=item B<--source-by=>I<maintainer-address> (since dpkg 1.21.10)
+
+Pass as B<-m> to B<dpkg-genchanges>.
+See its manual page.
+
+=item B<--release-by=>I<maintainer-address>
+
+=item B<--changed-by=>I<maintainer-address> (since dpkg 1.21.10)
+
+Pass as B<-e> to B<dpkg-genchanges>.
+See its manual page.
+
+=item B<-a>, B<--host-arch> I<architecture>
+
+Specify the Debian architecture we build for (long option since dpkg 1.17.17).
+The architecture of the
+machine we build on is determined automatically, and is also the default
+for the host machine.
+
+=item B<-t>, B<--host-type> I<gnu-system-type>
+
+Specify the GNU system type we build for (long option since dpkg 1.17.17).
+It can be used in place
+of B<--host-arch> or as a complement to override the default GNU system type
+of the host Debian architecture.
+
+=item B<--target-arch> I<architecture>
+
+Specify the Debian architecture the binaries built will build for
+(since dpkg 1.17.17).
+The default value is the host machine.
+
+=item B<--target-type> I<gnu-system-type>
+
+Specify the GNU system type the binaries built will build for
+(since dpkg 1.17.17).
+It can be
+used in place of B<--target-arch> or as a complement to override the
+default GNU system type of the target Debian architecture.
+
+=item B<-P>, B<--build-profiles=>I<profile>[B<,>...]
+
+Specify the profile(s) we build, as a comma-separated list (since dpkg 1.17.2,
+long option since dpkg 1.18.8).
+The default
+behavior is to build for no specific profile.
+Also sets them (as a space
+separated list) as the B<DEB_BUILD_PROFILES> environment variable which
+allows, for example, B<debian/rules> files to use this information for
+conditional builds.
+
+=item B<-j>, B<--jobs>[=I<jobs>|B<auto>]
+
+Specifies the number of jobs allowed to be run simultaneously
+(since dpkg 1.14.7, long option since dpkg 1.18.8).
+The number of jobs matching the number of online processors if B<auto> is
+specified (since dpkg 1.17.10), or unlimited number if I<jobs> is not
+specified.
+The default behavior is B<auto> (since dpkg 1.18.11) in non-forced mode
+(since dpkg 1.21.10), and as such it is always safer to use with any
+package including those that are not parallel-build safe.
+Setting the number of jobs to B<1> will restore serial execution.
+
+Will add B<parallel=>I<jobs> or B<parallel> to the B<DEB_BUILD_OPTIONS>
+environment variable which allows debian/rules files to opt-in to use this
+information for their own purposes.
+The I<jobs> value will override the B<parallel=>I<jobs> or
+B<parallel> option in the B<DEB_BUILD_OPTIONS> environment variable.
+Note that the B<auto> value will get replaced by the actual number of
+currently active processors, and as such will not get propagated to any
+child process.
+If the number of online processors cannot be inferred then
+the code will fallback to using serial execution (since dpkg 1.18.15),
+although this should only happen on exotic and unsupported systems.
+
+=item B<-J>, B<--jobs-try>[=I<jobs>|B<auto>]
+
+This option (since dpkg 1.18.2, long option since dpkg 1.18.8) is equivalent
+to the B<-j> above.
+
+Since the behavior for B<-j> changed in dpkg 1.21.10 to the opt-in mode,
+you can use this option instead if you need to guarantee semantics across
+dpkg release series.
+
+=item B<--jobs-force>[=I<jobs>|B<auto>]
+
+This option (since dpkg 1.21.10) is equivalent to the B<--jobs> option
+except that it will enable forced parallel mode, by adding the B<make> B<-j>
+option with the computed number of parallel jobs to the B<MAKEFLAGS>
+environment variable.
+
+This should cause all subsequent make invocations to inherit the option,
+thus forcing the parallel setting on the packaging (and possibly the
+upstream build system if that uses L<make(1)>) regardless of their support
+for parallel builds, which might cause build failures.
+
+B<Note>: Any Makefile that is not parallel-safe should be considered to be buggy.
+These should either be made parallel-safe, or marked as not being safe with
+the L<make(1)> B<.NOTPARALLEL> target.
+
+=item B<-D>, B<--check-builddeps>
+
+Check build dependencies and conflicts; abort if unsatisfied (long option
+since dpkg 1.18.8).
+This is the default behavior.
+
+=item B<-d>, B<--no-check-builddeps>
+
+Do not check build dependencies and conflicts (long option since dpkg 1.18.8).
+
+=item B<--ignore-builtin-builddeps>
+
+Do not check built-in build dependencies and conflicts (since dpkg 1.18.2).
+These are the distribution specific implicit build dependencies usually
+required in a build environment, the so called Build-Essential package set.
+
+=item B<--rules-requires-root>
+
+Do not honor the B<Rules-Requires-Root> field,
+falling back to its legacy default value B<binary-targets> (since dpkg 1.19.1).
+
+=item B<-nc>, B<--no-pre-clean>
+
+Do not clean the source tree before building (long option since dpkg 1.18.8).
+Implies B<-b> if nothing else has been selected among B<-F>,
+B<-g>, B<-G>, B<-B>, B<-A> or B<-S>.
+Implies B<-d> with B<-S> (since dpkg 1.18.0).
+
+=item B<--pre-clean>
+
+Clean the source tree before building (since dpkg 1.18.8).
+This is the default behavior.
+
+=item B<-tc>, B<--post-clean>
+
+Clean the source tree (using
+I<gain-root-command>
+B<debian/rules clean>)
+after the package has been built (long option since dpkg 1.18.8).
+
+=item B<--no-post-clean>
+
+Do not clean the source tree after the package has been built
+(since dpkg 1.19.1).
+This is the default behavior.
+
+=item B<--sanitize-env>
+
+Sanitize the build environment (since dpkg 1.20.0).
+This will reset or remove environment variables, umask, and any other process
+attributes that might otherwise adversely affect the build of packages.
+Because the official entry point to build packages is B<debian/rules>,
+packages cannot rely on these settings being in place, and thus should work
+even when they are not.
+What to sanitize is vendor specific.
+
+=item B<-r>, B<--root-command=>I<gain-root-command>
+
+When
+B<dpkg-buildpackage>
+needs to execute part of the build process as root, it prefixes the
+command it executes with
+I<gain-root-command>
+if one has been specified (long option since dpkg 1.18.8).
+Otherwise, if none has been specified,
+B<fakeroot> will be used by default, if the command is present.
+I<gain-root-command>
+should start with the name of a program on the
+B<PATH>
+and will get as arguments the name of the real command to run and the
+arguments it should take.
+I<gain-root-command>
+can include parameters (they must be space-separated) but no shell
+metacharacters.
+I<gain-root-command>
+might typically be
+B<fakeroot>, B<sudo>, B<super> or B<really>.
+B<su>
+is not suitable, since it can only invoke the user's shell with
+B<-c>
+instead of passing arguments individually to the command to be run.
+
+=item B<-R>, B<--rules-file=>I<rules-file>
+
+Building a Debian package usually involves invoking
+B<debian/rules>
+as a command with several standard parameters (since dpkg 1.14.17,
+long option since dpkg 1.18.8).
+With this option it's
+possible to use another program invocation to build the package (it can
+include space separated parameters).
+Alternatively it can be used to execute the standard rules file with
+another make program (for example by using
+B</usr/local/bin/make -f debian/rules>
+as I<rules-file>).
+
+=item B<--check-command=>I<check-command>
+
+Command used to check the B<.changes> file itself and any artifact built
+referenced in the file (since dpkg 1.17.6).
+The command should take the B<.changes> pathname
+as an argument.
+This command will usually be B<lintian>.
+
+=item B<--check-option=>I<opt>
+
+Pass option I<opt> to the I<check-command> specified with
+B<DEB_CHECK_COMMAND> or B<--check-command> (since dpkg 1.17.6).
+Can be used multiple times.
+
+=item B<--hook->I<hook-name>B<=>I<hook-command>
+
+Set the specified shell code I<hook-command> as the hook I<hook-name>,
+which will run at the times specified in the run steps (since dpkg 1.17.6).
+The hooks will
+always be executed even if the following action is not performed (except
+for the B<binary> hook).
+All the hooks will run in the unpacked source directory.
+
+Some hooks can receive addition information through environment variables
+(since dpkg 1.22.0).
+All hooks get the hook name in the B<DPKG_BUILDPACKAGE_HOOK_NAME> environment
+variable (since dpkg 1.22.0).
+
+B<Note>: Hooks can affect the build process, and cause build failures if
+their commands fail, so watch out for unintended consequences.
+
+The current I<hook-name> supported are:
+
+=over
+
+=item B<preinit>
+
+=item B<init>
+
+=item B<preclean>
+
+=item B<source>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_SOURCE_OPTIONS> with the space-separated lists
+of options that will passed to the B<dpkg-source> call.
+
+=item B<build>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_BUILD_TARGET> with the name of the
+B<debian/rules> build target called.
+Before dpkg 1.22.7 the variable was only set if the target was called.
+
+=item B<binary>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_BINARY_TARGET> with the name of the
+B<debian/rules> binary target called, but only if called.
+
+=item B<buildinfo>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_BUILDINFO_OPTIONS> with the space-separated lists
+of options that will passed to the B<dpkg-genbuildinfo> call.
+
+=item B<changes>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_CHANGES_OPTIONS> with the space-separated lists
+of options that will passed to the B<dpkg-genchanges> call.
+
+=item B<postclean>
+
+=item B<check>
+
+Gets B<DPKG_BUILDPACKAGE_HOOK_CHECK_OPTIONS> with the space-separated lists
+of options that will passed to the check command call.
+
+=item B<sign>
+
+=item B<done>
+
+=back
+
+The I<hook-command> supports the following substitution format string,
+which will get applied to it before execution:
+
+=over
+
+=item B<%%>
+
+A single % character.
+
+=item B<%a>
+
+A boolean value (0 or 1), representing whether the following action is
+being performed.
+
+=item B<%p>
+
+The source package name.
+
+=item B<%v>
+
+The source package version.
+
+=item B<%s>
+
+The source package version (without the epoch).
+
+=item B<%u>
+
+The upstream version.
+
+=back
+
+=item B<--buildinfo-file=>I<filename>
+
+Set the I<filename> for the generated B<.buildinfo> file (since dpkg 1.21.0).
+
+=item B<--buildinfo-option=>I<opt>
+
+Pass option I<opt> to B<dpkg-genbuildinfo> (since dpkg 1.18.11).
+Can be used multiple times.
+
+=item B<--sign-backend=>I<sign-backend>
+
+Specify an OpenPGP backend interface to use when invoking the I<sign-command>
+(since dpkg 1.21.10).
+
+The default is B<auto>, where the best current backend available will be used.
+The specific OpenPGP backends supported in order of preference are:
+
+=over 4
+
+=item B<sop>
+
+(any conforming Stateless OpenPGP implementation)
+
+=item B<sq>
+
+(from Sequoia-PGP)
+
+=item B<gpg>
+
+(from GnuPG)
+
+=back
+
+=item B<-p>, B<--sign-command=>I<sign-command>
+
+When B<dpkg-buildpackage> needs to execute an OpenPGP backend command to
+sign a source control (B<.dsc>) file, a B<.buildinfo> file or a B<.changes>
+file it will run
+I<sign-command> (searching the B<PATH> if necessary) instead of the
+default or auto-detected backend command (long option since dpkg 1.18.8).
+I<sign-command> will get all the backend specific arguments according to
+the B<--sign-backend> selected.
+I<sign-command> should not contain spaces or any other shell metacharacters.
+
+=item B<-k>, B<--sign-keyid=>I<key-id>
+
+=item B<--sign-key=>I<key-id>
+
+Specify an OpenPGP key-ID (either a fingerprint or a user-ID) for the
+secret key to use when signing packages (B<--sign-key> since dpkg 1.18.8,
+B<--sign-keyid> since dpkg 1.21.10).
+
+=item B<--sign-keyfile=>I<key-file>
+
+Specify an OpenPGP I<key-file> containing the secret key to use when signing
+packages (since dpkg 1.21.10).
+
+B<Note>: For security reasons the I<key-file> is best kept locked with a
+password.
+
+=item B<-us>, B<--unsigned-source>
+
+Do not sign the source package (long option since dpkg 1.18.8).
+
+=item B<-ui>, B<--unsigned-buildinfo>
+
+Do not sign the B<.buildinfo> file (since dpkg 1.18.19).
+
+=item B<-uc>, B<--unsigned-changes>
+
+Do not sign the B<.buildinfo> and B<.changes> files
+(long option since dpkg 1.18.8).
+
+=item B<--no-sign>
+
+Do not sign any file, this includes the source package, the B<.buildinfo>
+file and the B<.changes> file (since dpkg 1.18.20).
+
+=item B<--force-sign>
+
+Force the signing of the resulting files (since dpkg 1.17.0), regardless of
+B<-us>, B<--unsigned-source>,
+B<-ui>, B<--unsigned-buildinfo>,
+B<-uc>, B<--unsigned-changes>
+or other internal heuristics.
+
+=item B<-sn>
+
+=item B<-ss>
+
+=item B<-sA>
+
+=item B<-sk>
+
+=item B<-su>
+
+=item B<-sr>
+
+=item B<-sK>
+
+=item B<-sU>
+
+=item B<-sR>
+
+=item B<-i>, B<--diff-ignore>[=I<regex>]
+
+=item B<-I>, B<--tar-ignore>[=I<pattern>]
+
+=item B<-z>, B<--compression-level=>I<level>
+
+=item B<-Z>, B<--compression=>I<compressor>
+
+Passed unchanged to B<dpkg-source>.
+See its manual page.
+
+=item B<--source-option=>I<opt>
+
+Pass option I<opt> to B<dpkg-source> (since dpkg 1.15.6).
+Can be used multiple times.
+
+=item B<--changes-file=>I<filename>
+
+Set the I<filename> for the generated B<.changes> file (since dpkg 1.21.0).
+
+=item B<--changes-option=>I<opt>
+
+Pass option I<opt> to B<dpkg-genchanges> (since dpkg 1.15.6).
+Can be used multiple times.
+
+=item B<--admindir=>I<dir>
+
+=item B<--admindir> I<dir>
+
+Change the location of the B<dpkg> database (since dpkg 1.14.0).
+The default location is I<%ADMINDIR%>.
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=head2 External environment
+
+=over
+
+=item B<DEB_CHECK_COMMAND>
+
+If set, it will be used as the command to check the B<.changes> file
+(since dpkg 1.17.6).
+Overridden by the B<--check-command> option.
+
+=item B<DEB_SIGN_KEYID>
+
+If set, it will be used to sign the B<.changes>, B<.buildinfo> and B<.dsc>
+files (since dpkg 1.17.2).
+Overridden by the B<--sign-keyid> option.
+
+=item B<DEB_SIGN_KEYFILE>
+
+If set, it will be used to sign the B<.changes>, B<.buildinfo> and B<.dsc>
+files (since dpkg 1.21.10).
+Overridden by the B<--sign-keyfile> option.
+
+=item B<DEB_BUILD_OPTIONS>
+
+If set, it will contain a space-separated list of options that affect
+the behavior of some dpkg tools involved in package building,
+and might affect the package build process if the code in F<debian/rules>
+honors them.
+These options can have parameters specified immediately after an
+equal sign (‘B<=>‘).
+For options that support multiple parameters,
+these will not be separated by spaces,
+as these are reserved to separate options.
+
+The following are the options known and supported by dpkg tools,
+other options honored by F<debian/rules> might be defined by distribution
+specific policies.
+
+=over
+
+=item B<parallel=>I<N>
+
+The F<debian/rules> in the packaging might use this option to set up
+the build process to use I<N> parallel jobs.
+It is overridden by the B<--jobs> and B<--jobs-force> options.
+
+=item B<nocheck>
+
+B<dpkg-buildpackage> will ignore the B<DEB_CHECK_COMMAND> variable.
+The F<debian/rules> in the packaging is not expected to run test suites
+during the build.
+
+=item B<noopt>
+
+If F<debian/rules> calls B<dpkg-buildflags> to set up the build flags,
+those will be set to not enable any optimizations.
+
+=item B<nostrip>
+
+The F<debian/rules> in the packaging should ensure that objects do not get
+the debugging information stripped.
+If F<debian/rules> includes the B<mk/buildtools.mk> make fragment the
+B<STRIP> make variable will respect this option.
+
+=item B<terse>
+
+B<dpkg-buildpackage> will append the B<--no-print-directory> L<make(1)>
+flag to the B<MAKEFLAGS> environment variable.
+The F<debian/rules> in the packaging should reduce verbosity, while not
+being completely quiet.
+
+=item B<hardening=>I<feature-spec>
+
+=item B<reproducible=>I<feature-spec>
+
+=item B<abi=>I<feature-spec>
+
+=item B<future=>I<feature-spec>
+
+=item B<qa=>I<feature-spec>
+
+=item B<optimize=>I<feature-spec>
+
+=item B<sanitize=>I<feature-spec>
+
+These are feature areas that control build flag features.
+See L<dpkg-buildflags(1)> for further details.
+
+=back
+
+=item B<DEB_BUILD_PROFILES>
+
+If set, it will be used as the active build profile(s) for the package
+being built (since dpkg 1.17.2).
+It is a space separated list of profile names.
+Overridden by the B<-P> option.
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head2 Internal environment
+
+Even if B<dpkg-buildpackage> exports some variables, B<debian/rules>
+should not rely on their presence and should instead use the
+respective interface to retrieve the needed values, because that
+file is the main entry point to build packages and running it
+standalone should be supported.
+
+=over
+
+=item B<DEB_BUILD_*>
+
+=item B<DEB_HOST_*>
+
+=item B<DEB_TARGET_*>
+
+B<dpkg-architecture> is called with the B<-a> and B<-t>
+parameters forwarded.
+Any variable that is output by its B<-s>
+option is integrated in the build environment.
+
+=item B<DEB_RULES_REQUIRES_ROOT>
+
+This variable is set to the value obtained from the B<Rules-Requires-Root>
+field, the dpkg-build-api level or from the command-line.
+When set, it will be a valid value for the B<Rules-Requires-Root> field.
+It is used to notify B<debian/rules> whether the B<rootless-builds.txt>
+specification is supported.
+
+=item B<DEB_GAIN_ROOT_CMD>
+
+This variable is set to I<gain-root-command> when the field
+B<Rules-Requires-Root> is set to a value different to B<no> and
+B<binary-targets>.
+
+=item B<SOURCE_DATE_EPOCH>
+
+This variable is set to the Unix timestamp since the epoch of the
+latest entry in I<debian/changelog>, if it is not already defined.
+
+=back
+
+=head1 FILES
+
+=over
+
+=item I<%PKGCONFDIR%/buildpackage.conf>
+
+System wide configuration file
+
+=item I<$XDG_CONFIG_HOME/dpkg/buildpackage.conf> or
+
+=item I<$HOME/.config/dpkg/buildpackage.conf>
+
+User configuration file.
+
+=back
+
+=head1 NOTES
+
+=head2 Compiler flags are no longer exported
+
+Between dpkg 1.14.17 and 1.16.1, B<dpkg-buildpackage>
+exported compiler flags (B<CFLAGS>, B<CXXFLAGS>, B<FFLAGS>,
+B<CPPFLAGS> and B<LDFLAGS>) with values as returned
+by B<dpkg-buildflags>.
+This is no longer the case.
+
+=head2 Default build targets
+
+B<dpkg-buildpackage> is using the B<build-arch> and
+B<build-indep> targets since dpkg 1.16.2.
+Before dpkg 1.22.7,
+there was code to try to detect the missing targets and fallback on the
+B<build> target.
+Those targets are thus mandatory.
+
+=head1 SECURITY
+
+Building binary or source packages should only be performed over trusted
+source data.
+
+=head1 BUGS
+
+It should be possible to specify spaces and shell metacharacters
+and initial arguments for
+I<gain-root-command> and I<sign-command>.
+
+=head1 SEE ALSO
+
+I<%PKGDOCDIR%/spec/rootless-builds.txt>,
+L<dpkg-source(1)>,
+L<dpkg-architecture(1)>,
+L<dpkg-buildflags(1)>,
+L<dpkg-genbuildinfo(1)>,
+L<dpkg-genchanges(1)>,
+L<fakeroot(1)>,
+L<lintian(1)>,
+L<https://datatracker.ietf.org/doc/draft-dkg-openpgp-stateless-cli/>,
+L<sq(1)>,
+L<gpg(1)>.

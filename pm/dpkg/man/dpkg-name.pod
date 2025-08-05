@@ -1,0 +1,172 @@
+# dpkg manual page - dpkg-name(1)
+#
+# Copyright © 1995-1996 Erick Branderhorst
+# Copyright © 2007-2013, 2015 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-name - rename Debian packages to full package names
+
+=head1 SYNOPSIS
+
+B<dpkg-name>
+[I<option>...]
+[B<-->]
+I<file>...
+
+=head1 DESCRIPTION
+
+This manual page documents the
+B<dpkg-name>
+program which provides an easy way to rename
+B<Debian>
+packages into their full package names.
+A full package name consists of
+I<package>B<_>I<version>B<_>I<architecture>B<.>I<package-type>
+as specified in the control file of the package.
+The I<version> part
+of the filename
+consists of the upstream version information optionally followed by a
+hyphen and the revision information.
+The I<package-type> part comes
+from that field if present or will fall back to B<deb>.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-a>, B<--no-architecture>
+
+The destination filename will not have the architecture information.
+
+=item B<-k>, B<--symlink>
+
+Create a symlink, instead of moving.
+
+=item B<-o>, B<--overwrite>
+
+Existing files will be overwritten if they have the same name as the
+destination filename.
+
+=item B<-s>, B<--subdir> [I<dir>]
+
+Files will be moved into a subdirectory.
+If the directory given as argument exists
+the files will be moved into that directory otherwise the name of
+the target directory is extracted from the section field in the
+control part of the package.
+The target directory will be
+«unstable/binary-I<architecture>/I<section>».
+If the section is not found in the control, then B<no-section> is assumed,
+and in this case, as well as for sections B<non-free> and B<contrib>
+the target directory is «I<section>/binary-I<architecture>».
+The section field is not required so a lot of packages will find their way
+to the B<no-section> area.
+
+B<Warning>: Use this option with care, it is messy.
+
+=item B<-c>, B<--create-dir>
+
+This option can used together with the B<-s> option.
+If a target
+directory isn't found it will be created automatically.
+
+B<Warning>: Use this option with care.
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+
+=item B<-v>, B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DEB_HOST_ARCH>
+
+Sets the host architecture.
+This affects the architecture name used in the package filename.
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 BUGS
+
+Some packages don't follow the name structure
+I<package>B<_>I<version>B<_>I<architecture>B<.deb>.
+Packages renamed by B<dpkg-name>
+will follow this structure.
+Generally this will have no impact on how
+packages are installed by
+L<dselect(1)>/L<dpkg(1)>,
+but other installation tools
+might depend on this naming structure.
+
+=head1 EXAMPLES
+
+=over
+
+=item B<dpkg-name bar-foo.deb>
+
+The file B<bar-foo.deb> will be renamed to bar-foo_1.0-2_i386.deb or
+something similar (depending on whatever information is in the control
+part of B<bar-foo.deb>).
+
+=item B<find /root/debian/ -name '*.deb' | xargs -n 1 dpkg-name -a>
+
+All files with the extension B<deb> in the directory /root/debian and its
+subdirectory's will be renamed by B<dpkg-name> if required into names
+with no architecture information.
+
+=item B<find -name '*.deb' | xargs -n 1 dpkg-name -a -o -s -c>
+
+B<Don't do this.>
+Your archive will be messed up completely because a lot of packages
+don't come with section information.
+B<Don't do this.>
+
+=item B<dpkg-deb --build debian-tmp && dpkg-name -o -s .. debian-tmp.deb>
+
+This can be used when building new packages.
+
+=back
+
+=head1 SEE ALSO
+
+L<deb(5)>,
+L<deb-control(5)>,
+L<dpkg(1)>,
+L<dpkg-deb(1)>,
+L<find(1)>,
+L<xargs(1)>.

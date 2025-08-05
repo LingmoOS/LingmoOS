@@ -1,0 +1,159 @@
+glibc (2.41-7) unstable; urgency=medium
+
+  Starting with glibc 2.41, shared libraries requiring an executable stack
+  cannot be dynamically loaded through the dlopen mechanism from a binary that
+  does not require an executable stack. This change aims to improve security,
+  as the previous behavior was used as a vector for RCE (CVE-2023-38408).
+  Attempting to do so will result in the following error:
+
+    cannot enable executable stack as shared object requires: Invalid argument
+
+  While most libraries generated in the past 20 years do not require an
+  executable stack, some third-party software still need this capability. Many
+  vendors have already updated their binaries to address this.
+
+  If you need to run a program that requires an executable stack through
+  dynamic loaded shared libraries, you can use the glibc.rtld.execstack
+  tunable:
+
+    GLIBC_TUNABLES=glibc.rtld.execstack=2 ./program
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 13 Apr 2025 14:41:11 +0200
+
+glibc (2.32-0experimental1) experimental; urgency=medium
+
+  The libc0.3-xen and libc6-xen packages have been removed in this version,
+  due to the removal of the "nosegneg" support from glibc and due to the
+  removal of 32-bit Xen PV support from Linux kernel 5.9. PVH or PVHVM guests
+  should be used instead.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 24 Aug 2021 20:42:24 +0200
+
+glibc (2.31-5) unstable; urgency=medium
+
+  Starting with glibc 2.31-5, the NIS and NIS+ name service modules
+  libnss_nis.so.2.0.0 and libnss_nisplus.so.2.0.0 are not provided anymore by
+  the libc6 package. People needing those modules have to install the
+  libnss-nis and/or the libnss-nisplus packages, which are recommended by
+  the libc6 package.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 01 Dec 2020 08:42:44 +0100
+
+glibc (2.31-0experimental2) experimental; urgency=medium
+
+  Starting with glibc 2.31, the DNS stub resolver does not blindly trust the
+  AD (authenticated data) flag, indicating a DNSSEC validation:
+
+  - By default the name servers and the network path to them are treated as
+    untrusted. In this mode, the AD flag is not set in queries, and it is
+    automatically cleared in responses, indicating a lack of DNSSEC
+    validation.
+
+  - A new trust-ad option, set via the options directive in /etc/resolv.conf
+    (or if RES_TRUSTAD is set in _res.options), indicates that the name
+    server is trusted. In this mode, the AD bit, as provided by the name
+    server, is made available to the applications.
+
+  Therefore if you trust your name servers, for example because you use a
+  locally running validating resolver (e.g. unbound, systemd-resolved or
+  dnsmasq), you might want to add the following line to /etc/resolv.conf:
+
+    options trust-ad
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 17 May 2020 15:59:38 +0200
+
+glibc (2.26-5) unstable; urgency=medium
+
+  Starting with version 2.26-1, the glibc requires a 3.2 or later Linux
+  kernel.  If you use an older kernel, please upgrade it *before*
+  installing this glibc version. Failing to do so will end-up with the
+  following failure:
+
+    Preparing to unpack .../libc6_2.26-5_amd64.deb ...
+    ERROR: This version of the GNU libc requires kernel version
+    3.2 or later.  Please upgrade your kernel before installing
+    glibc.
+
+  The decision to not support older kernels is a GNU libc upstream
+  decision.
+
+  Note: This obviously does not apply to non-Linux kernels.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 23 Jan 2018 22:03:12 +0100
+
+eglibc (2.13-25) unstable; urgency=medium
+
+  Starting with the eglibc package version 2.13-5, the libraries are
+  shipped in the multiarch directory /lib/<triplet> instead of the more
+  traditional /lib, where <triplet> is the multiarch triplet and can be
+  retrieved with 'dpkg-architecture -qDEB_HOST_MULTIARCH'. Similarly the
+  includes are now shipped in /usr/include/<triplet> instead of the more
+  traditional /usr/include.
+
+  The toolchain in Debian has been updated to cope with that, and most
+  build systems should be unaffected. If you are using a non-Debian
+  toolchain to build your software and it is not able to cope with
+  multiarch, you might try to pass the following options to your
+  compiler:
+
+    -B/usr/lib/<triplet> -I/usr/include/<triplet>
+
+  Alternatively if the build system makes hard to pass the above options,
+  you might try to set the LIBRARY_PATH and CPATH environment variables:
+    LIBRARY_PATH=/usr/lib/<triplet>
+    CPATH=/usr/include/<triplet>
+    export LIBRARY_PATH CPATH
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 09 Jan 2012 12:47:16 +0100
+
+glibc (2.9-8) unstable; urgency=low
+
+  Starting with version 2.9-8, unified IPv4/IPv6 lookup have been enabled
+  in the glibc's resolver. This is faster, fixes numerous of bugs, but is
+  problematic on some broken DNS servers and/or wrongly configured
+  firewalls.
+
+  If such a DNS server is detected, the resolver switches (permanently
+  for that process) to a mode where the second request is sent only when
+  the first answer has been received. This means the first request will
+  be timeout, but subsequent requests should be fast again. This
+  behaviour can be enabled permanently by adding 'options single-request'
+  to /etc/resolv.conf.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 23 Apr 2009 21:14:32 +0200
+
+glibc (2.6.1-2) unstable; urgency=low
+
+  Starting with version 2.6.1, glibc ships a /etc/ld.so.conf.d/libc.conf that
+  enforces /usr/local/lib to take precedence over /usr/lib. This is the
+  intended behaviour (it works like the $PATH where /usr/local/bin takes
+  precedence over /usr/bin).
+
+  To revert that (though doing so is discouraged) you can add /usr/lib to the
+  beginning of /etc/ld.so.conf.d/libc.conf. (see bug#440394).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Sat, 01 Sep 2007 16:58:15 +0200
+
+glibc (2.5-1) unstable; urgency=low
+
+  The script tzconfig has been removed from glibc 2.5-1 and following
+  versions. Please use 'dpkg-reconfigure tzdata' instead to configure
+  the timezone.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 16 Nov 2007 15:38:54 +0100
+
+glibc (2.5-1) unstable; urgency=low
+
+  Starting with version 2.5-1, the glibc requires a 2.6.1 or later
+  kernel.  If you use a 2.4 kernel, please upgrade it *before*
+  installing glibc.
+
+  This also means that it is not possible to use LD_ASSUME_KERNEL with a
+  version lower than 2.6.1. If you have set such a thing in /etc/profile,
+  ~/.bashrc or any other initialization file (something you should have
+  never done!!!), please remove that *before* installing glibc.
+
+  Note: This does not apply to the m68k architecture and to non-Linux
+        kernels.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 24 Apr 2007 00:26:48 +0200

@@ -1,0 +1,34 @@
+#!/bin/sh
+# See deb-postrm(5).
+
+set -e
+
+# Remove dselect methods state.
+purge_state() {
+  admindir=${DPKG_ADMINDIR:-/var/lib/dpkg}
+
+  rm -f $admindir/cmethopt 2>/dev/null
+  for method in file ftp mnt media; do
+    rm -rf $admindir/methods/$method/* 2>/dev/null
+  done
+}
+
+case "$1" in
+remove)
+  ;;
+purge)
+  purge_state
+  ;;
+upgrade)
+  ;;
+failed-upgrade|disappear|abort-install|abort-upgrade)
+  ;;
+*)
+  echo "$0 called with unknown argument '$1'" 1>&2
+  exit 1
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0

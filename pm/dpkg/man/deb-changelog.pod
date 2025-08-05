@@ -1,0 +1,243 @@
+# dpkg manual page - deb-changelog(5)
+#
+# Copyright © 1996-1998 Ian Jackson
+# Copyright © 1996-1998 Christian Schwarz
+# Copyright © 1998, 2001 Manoj Srivastava <srivasta@debian.org>
+# Copyright © 2001 Julian Gilbey <jdg@debian.org>
+# Copyright © 2003 Josip Rodin <joy@debian.org>
+# Copyright © 2008, 2010 Russ Allbery <rra@debian.org>
+# Copyright © 2010 Charles Plessy <plessy@debian.org>
+# Copyright © 2014 Bill Allombert <ballombe@debian.org>
+# Copyright © 2015-2017 Guillem Jover <guillem@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+deb-changelog - dpkg source packages' changelog file format
+
+=head1 SYNOPSIS
+
+B<debian/changelog>
+
+=head1 DESCRIPTION
+
+Changes in the packaged version of a project are explained in the
+changelog file I<debian/changelog>.
+This includes modifications made in the source package compared to the
+upstream one as well as other changes and updates to the package.
+
+The format of the I<debian/changelog> allows the package building
+tools to discover which version of the package is being built and find
+out other release-specific information.
+
+That format is a series of entries like this:
+
+Z<>
+ I<package> (I<version>) I<distributions>; I<metadata>
+          [optional blank line(s), stripped]
+  * I<change-details>
+    I<more-change-details>
+          [blank line(s), included in L<dpkg-parsechangelog(1)> output]
+  * I<even-more-change-details>
+          [optional blank line(s), stripped]
+  -- I<maintainer-name> <I<email-address>>  I<date>
+
+I<package> and I<version> are the source package name and version
+number.
+I<version> is delimited by parenthesis U+00028 ‘B<(>’ and
+U+0029 ‘B<)>’.
+
+I<distributions> lists one or more space-separated distributions where
+this version should be installed when it is uploaded; it is copied to the
+B<Distribution> field in the I<.changes> file.
+I<distributions> must be terminated by a semicolon (U+003B ‘B<;>’).
+
+I<metadata> lists zero or more comma-separated I<keyword>=I<value>
+items.
+Each keyword can contain only minus and case insensitive alphanumeric
+characters, as they need to be mapped to L<deb822(5)> field names.
+The only I<keyword>s currently supported by B<dpkg> are:
+
+=over
+
+=item B<urgency>
+
+Its value is used for the B<Urgency> field in the
+I<.changes> file for the upload.
+
+=item B<binary-only>
+
+With a B<yes> value, it is used to denote that this
+changelog entry is for a binary-only non-maintainer upload (an automatic
+binary rebuild with the only change being the changelog entry).
+
+=back
+
+The change details may in fact be any series of lines starting with
+at least two spaces (U+0020 B<SPACE>), but conventionally each
+change starts with an
+asterisk and a separating space and continuation lines are indented
+so as to bring them in line with the start of the text above.
+Blank lines may be used here to separate groups of changes, if desired.
+
+If this upload resolves bugs recorded in the distribution bug tracking
+system, they may be automatically closed on the inclusion of this
+package into the distribution archive by including the string:
+
+=over
+
+B<Closes: #>I<nnnnn>
+
+=back
+
+in the change details, where B<#>I<nnnnn> is the bug number.
+The exact Perl regular expression is:
+
+=over
+
+B</closes:\s*(?:bug)?\#?\s?\d+(?:,\s*(?:bug)?\#?\s?\d+)*/i>
+
+=back
+
+That is, the string should consist of the word B<closes:> followed by
+a comma-separated list of bug numbers.
+Bug numbers may be preceded by the word B<bug> and/or a B<#> sign,
+as in C<Closes: 42, bug#43, #44, bug 45>.
+The words B<closes:> and B<bug> are not case sensitive.
+The list of bug numbers may span multiple lines.
+
+This information is conveyed via the B<Closes> field in the I<.changes>
+file.
+Where, depending on the archive maintenance software, all the bug numbers
+listed might get automatically closed.
+
+The maintainer name and email address used in the changelog should be the
+details of the person who prepared this release of the package.
+They are B<not> necessarily those of the uploader or usual package
+maintainer.
+The information here will be copied to the B<Changed-By> field in the
+I<.changes> file, and then later might be used to send an acknowledgment
+when the upload has been installed in the distribution archive.
+
+The I<date> has the following format (compatible and with the same
+semantics of RFC2822 and RFC5322, or what «date -R» generates):
+
+=over
+
+I<day-of-week>B<,> I<dd> I<month> I<yyyy> I<hh>B<:>I<mm>B<:>I<ss> B<+>I<zzzz>
+
+=back
+
+where:
+
+=over
+
+=item I<day-of-week>
+
+Is one of:
+B<Mon>, B<Tue>, B<Wed>, B<Thu>, B<Fri>, B<Sat>, B<Sun>.
+
+=item I<dd>
+
+Is a one- or two-digit day of the month (B<01>-B<31>), where the leading
+zero is optional, but conventionally does not get omitted.
+
+=item I<month>
+
+Is one of:
+B<Jan>, B<Feb>, B<Mar>, B<Apr>, B<May>, B<Jun>, B<Jul>, B<Aug>,
+B<Sep>, B<Oct>, B<Nov>, B<Dec>.
+
+=item I<yyyy>
+
+Is the four-digit year (e.g. 2010).
+
+=item I<hh>
+
+Is the two-digit hour (B<00>-B<23>).
+
+=item I<mm>
+
+Is the two-digit minutes (B<00>-B<59>).
+
+=item I<ss>
+
+Is the two-digit seconds (B<00>-B<60>).
+
+=item [B<+->]I<zzzz>
+
+Is the time zone offset from Coordinated Universal Time (UTC).
+‘B<+>’ indicates that the time is ahead of (i.e., east of) UTC and
+‘B<->’ indicates that the time is behind (i.e., west of) UTC.
+The first two digits indicate the hour difference from UTC and the last
+two digits indicate the number of additional minutes difference from UTC.
+The last two digits must be in the range B<00>-B<59>.
+
+=back
+
+The first “title” line with the package name must start at the left
+hand margin.
+The “trailer” line with the maintainer and date details must be
+preceded by exactly one space (U+0020 B<SPACE>).
+The maintainer details and the date must be separated by exactly two
+spaces (U+0020 B<SPACE>).
+Each part of the I<date> can be separated by one or more spaces
+(U+0020 B<SPACE>), except after the comma where it can be separated
+by zero or more spaces (U+0020 B<SPACE>).
+
+Any line that consists entirely (i.e., no leading whitespace) of B<#>
+or B</* */> style comments or RCS keywords.
+
+Vim modelines or Emacs local variables, and ancient changelog entries with
+other formats at the end of the file should be accepted and preserved on
+output, but their contents might be otherwise ignored and parsing stopped
+at that point.
+
+The entire changelog must be encoded in UTF-8.
+
+=head1 FILES
+
+=over
+
+=item I<debian/changelog>
+
+=back
+
+=head1 EXAMPLES
+
+ dpkg (1.17.18) unstable; urgency=low
+
+  [ Guillem Jover ]
+  * Handle empty minimum versions when initializing dependency versions,
+    as the code is mapping the minimum version 0 to '' to avoid outputting
+    useless versions. Regression introduced in dpkg 1.17.17. Closes: #764929
+
+  [ Updated programs translations ]
+  * Catalan (Guillem Jover).
+
+  [ Updated dselect translations ]
+  * Catalan (Guillem Jover).
+  * German (Sven Joachim).
+
+  -- Guillem Jover <guillem@debian.org>  Sun, 12 Oct 2014 15:47:44 +0200
+
+=head1 SEE ALSO
+
+L<deb822(5)>,
+L<deb-changes(5)>,
+L<deb-version(7)>,
+L<dpkg-parsechangelog(1)>.

@@ -1,0 +1,53 @@
+AT_SETUP([dpkg-deb .deb fields])
+AT_KEYWORDS([dpkg-deb deb fields])
+
+DPKG_GEN_CONTROL([pkg-package-type-void])
+AT_CHECK([
+dpkg-deb --root-owner-group -b pkg-package-type-void
+# Test absence of Package-Type field.
+test -z "$(dpkg-deb -f pkg-package-type-void.deb Package-Type)"
+], [0], [ignore])
+
+DPKG_GEN_CONTROL([pkg-package-type-use])
+DPKG_MOD_CONTROL([pkg-package-type-use],
+  [s/^Package: .*$/$&\nPackage-Type: udeb/])
+AT_CHECK([
+dpkg-deb --root-owner-group -b pkg-package-type-use
+# Test presence of Package-Type field.
+test -n "$(dpkg-deb -f pkg-package-type-use.deb Package-Type)"
+], [0], [ignore])
+
+DPKG_GEN_CONTROL([pkg-obsolete-fields])
+DPKG_MOD_CONTROL([pkg-obsolete-fields],
+  [s/^Priority:/Class:/])
+DPKG_MOD_CONTROL([pkg-obsolete-fields],
+  [s/^Version: 0.0-1$/Version: 0.0/])
+DPKG_MOD_CONTROL([pkg-obsolete-fields],
+  [s/^Version:.*$/$&\nRevision: 1/])
+DPKG_MOD_CONTROL([pkg-obsolete-fields],
+  [s/^Package:.*$/$&\nOptional: suggests/])
+DPKG_MOD_CONTROL([pkg-obsolete-fields],
+  [s/^Package:.*$/$&\nRecommended: recommends/])
+AT_CHECK([
+dpkg-deb --root-owner-group -b pkg-obsolete-fields
+], [0], [ignore],
+[dpkg-deb: warning: parsing file 'pkg-obsolete-fields/DEBIAN/control' near line 2 package 'pkg-obsolete-fields':
+ obsolete 'Recommended' field used
+dpkg-deb: warning: parsing file 'pkg-obsolete-fields/DEBIAN/control' near line 3 package 'pkg-obsolete-fields':
+ obsolete 'Optional' field used
+dpkg-deb: warning: parsing file 'pkg-obsolete-fields/DEBIAN/control' near line 5 package 'pkg-obsolete-fields':
+ obsolete 'Revision' field used
+dpkg-deb: warning: parsing file 'pkg-obsolete-fields/DEBIAN/control' near line 7 package 'pkg-obsolete-fields':
+ obsolete 'Class' field used
+dpkg-deb: warning: ignoring 4 warnings about the control file(s)
+])
+AT_CHECK([
+dpkg-deb -f pkg-obsolete-fields.deb \
+  Version Recommends Suggests Priority 2>/dev/null
+], [0], [Version: 0.0-1
+Recommends: recommends
+Suggests: suggests
+Priority: extra
+])
+
+AT_CLEANUP

@@ -1,0 +1,16 @@
+Description: Use install_root for test destination override, not DESTDIR
+Author: Adam Conrad <adconrad@ubuntu.com>
+Forwarded: no
+Last-Update: 2020-02-08
+
+--- glibc-2.30.orig/Makefile
++++ glibc-2.30/Makefile
+@@ -618,7 +618,7 @@ endif
+ 	# Setting INSTALL_UNCOMPRESSED causes localedata/Makefile to
+ 	# install the charmaps uncompressed, as the testroot does not
+ 	# provide a gunzip program.
+-	$(MAKE) install DESTDIR=$(objpfx)testroot.pristine \
++	$(MAKE) install install_root=$(objpfx)testroot.pristine \
+ 	  INSTALL_UNCOMPRESSED=yes subdirs='$(sorted-subdirs)'
+ 	rm -f $(symbolic-link-list)
+ 	touch $(objpfx)testroot.pristine/install.stamp

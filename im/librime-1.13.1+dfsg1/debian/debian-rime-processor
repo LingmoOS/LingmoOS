@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# debian-rime-processor - helper script to build rime schemas in deb packaging
+#
+# SPDX-FileCopyrightText: 2021 Boyuan Yang <byang@debian.org>
+# SPDX-License-Identifier: CC0-1.0
+
+set -e
+
+RIME_DATA_DIR="/usr/share/rime-data"
+
+rime_processor_link_files()
+{
+    for _f in "${RIME_DATA_DIR}"/*.*
+    do
+        if [ -f "${_f}" ]
+        then
+            ln -sf "${_f}" .
+        fi
+    done
+}
+
+rime_processor_do_build()
+{
+    for _s in ./*.schema.yaml
+    do
+        rime_deployer --compile "${_s}"
+    done
+}
+
+rime_processor_do_clean()
+{
+    find . -maxdepth 1 -type l -delete
+}
+
+rime_processor_default()
+{
+    rime_processor_link_files
+    rime_processor_do_build
+    rime_processor_do_clean
+}
+
+if [ $# -eq 0 ]
+then
+    # Do nothing
+    :
+elif [ $# -eq 1 ]
+then
+    if [ "$1" = "default" ]
+    then
+        printf "%s\n" "I: Running default debian rime build..."
+        rime_processor_default
+        printf "%s\n" "I: Finished."
+    fi
+else
+    printf "%s\n" "E: Too many arguments."
+fi

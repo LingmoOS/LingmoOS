@@ -1,0 +1,92 @@
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Subject: [PATCH] The critical section lock _can_ be held in these place.
+
+At least since hurd_thread_cancel can be called by another thread and lock our
+critical lock.
+
+http://bugs.debian.org/46859
+
+“
+Thomas suggested that there is no need to take the critical section
+lock.  I believe that taking the critical section lock is necessary to
+prevent the target thread from entering a signal handler.  Roland will
+look into the problem.
+”
+
+Taking the critical section lock makes these assertions bogus.
+
+It happens that hurd_thread_cancel is only called from libports and inside
+/hurd/term so this is rare in practice.
+
+A reproducer can be found here:
+
+http://lists.gnu.org/archive/html/bug-hurd/2014-05/msg00025.html
+
+2006-08-05  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+       * hurd/thread-cancel.c (hurd_thread_cancel): Do not assert that
+       `&ss->critical_section_lock' is unlocked.
+       * sysdeps/mach/hurd/jmp-unwind.c (_longjmp_unwind): Likewise, and take
+       critical section lock before taking the sigstate lock.
+       * sysdeps/mach/hurd/spawni.c (__spawni): Likewise.
+
+---
+ hurd/hurdexec.c                |    1 -
+ hurd/thread-cancel.c           |    2 --
+ sysdeps/mach/hurd/jmp-unwind.c |    3 +--
+ sysdeps/mach/hurd/spawni.c     |    1 -
+ 4 files changed, 1 insertion(+), 6 deletions(-)
+
+--- a/hurd/hurdexec.c
++++ b/hurd/hurdexec.c
+@@ -123,7 +123,6 @@
+   ss = _hurd_self_sigstate ();
+ 
+ retry:
+-  assert (! __spin_lock_locked (&ss->critical_section_lock));
+   __spin_lock (&ss->critical_section_lock);
+ 
+   _hurd_sigstate_lock (ss);
+--- a/hurd/thread-cancel.c
++++ b/hurd/thread-cancel.c
+@@ -51,7 +51,6 @@
+       return 0;
+     }
+ 
+-  assert (! __spin_lock_locked (&ss->critical_section_lock));
+   __spin_lock (&ss->critical_section_lock);
+   __spin_lock (&ss->lock);
+   err = __thread_suspend (thread);
+@@ -91,7 +90,6 @@
+   int cancel;
+ 
+   __spin_lock (&ss->lock);
+-  assert (! __spin_lock_locked (&ss->critical_section_lock));
+   cancel = ss->cancel;
+   ss->cancel = 0;
+   __spin_unlock (&ss->lock);
+--- a/sysdeps/mach/hurd/jmp-unwind.c
++++ b/sysdeps/mach/hurd/jmp-unwind.c
+@@ -49,9 +49,8 @@
+ 
+   /* All access to SS->active_resources must take place inside a critical
+      section where signal handlers cannot run.  */
+-  __spin_lock (&ss->lock);
+-  assert (! __spin_lock_locked (&ss->critical_section_lock));
+   __spin_lock (&ss->critical_section_lock);
++  __spin_lock (&ss->lock);
+ 
+   /* Remove local signal preemptors being unwound past.  */
+   while (ss->preemptors
+--- a/sysdeps/mach/hurd/spawni.c
++++ b/sysdeps/mach/hurd/spawni.c
+@@ -333,7 +333,6 @@
+   ss = _hurd_self_sigstate ();
+ 
+ retry:
+-  assert (! __spin_lock_locked (&ss->critical_section_lock));
+   __spin_lock (&ss->critical_section_lock);
+ 
+   _hurd_sigstate_lock (ss);
+---
+tg: (9a079e2..) t/thread-cancel (depends on: baseline)

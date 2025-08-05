@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# get-version
+#
+# Copyright © 2009, 2013-2015, 2018, 2020 Guillem Jover <guillem@debian.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+error()
+{
+  echo "get-version: error: $*" 1>&2
+  exit 1
+}
+
+if [ -f .dist-version ]; then
+  # Get the version from the file distributed in the tarball.
+  version=$(cat .dist-version)
+elif [ -d .git ] || [ -f .git ]; then
+  if ! command -v git >/dev/null; then
+    error "cannot get project version, git checkout but git program not found"
+  fi
+
+  # Get the version from the git repository. Since tags cannot contain colons
+  # or tildes, we use percent and underscore instead. Reverse that switch here.
+  version=$(git describe --abbrev=4 HEAD 2>/dev/null | tr %_ :~)
+
+  # Check if we are on a dirty checkout.
+  git update-index --refresh -q >/dev/null
+  dirty=$(git diff-index --name-only HEAD 2>/dev/null)
+  if [ -n "$dirty" ]; then
+    version="$version-dirty"
+  fi
+else
+  error "cannot get project version, not a git checkout nor a distribution tarball."
+fi
+
+# Use printf to avoid the trailing new line that m4_esyscmd would not handle.
+printf "%s" "$version"

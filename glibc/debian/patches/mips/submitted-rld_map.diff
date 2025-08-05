@@ -1,0 +1,21 @@
+2010-05-20  Aurelien Jarno  <aurelien@aurel32.net>
+
+	* sysdeps/mips/dl-debug.h (ELF_MACHINE_DEBUG_SETUP): test for
+	RLD_MAP pointer before using it.
+
+---
+ sysdeps/mips/dl-debug.h |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/sysdeps/mips/dl-debug.h
++++ b/sysdeps/mips/dl-debug.h
+@@ -33,7 +33,8 @@
+       ptr += l->l_info[DT_MIPS (RLD_MAP_REL)]->d_un.d_val;
+       *(ElfW(Addr) *) ptr = (ElfW(Addr)) r;
+     }
+-  else if (l->l_info[DT_MIPS (RLD_MAP)] != NULL)
++  else if (l->l_info[DT_MIPS (RLD_MAP)] != NULL &&
++      (l)->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr)
+     *(ElfW(Addr) *) (l->l_info[DT_MIPS (RLD_MAP)]->d_un.d_ptr)
+       = (ElfW(Addr)) r;
+ }

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+if [ "$(id -u)" != '0' ]; then
+  # Fail, we declared needing root as a restriction.
+  exit 1
+fi
+
+export DPKG_TESTSUITE_OPTIONS="debug as-root"
+export DPKG_ADMINDIR="$AUTOPKGTEST_TMP/db"
+
+eatmydata make -C tests installtest DPKG_ADMINDIR="$DPKG_ADMINDIR"

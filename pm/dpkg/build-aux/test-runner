@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use TAP::Harness;
+
+my $srcroot = $ENV{abs_top_srcdir};
+my $binroot = $ENV{abs_top_builddir};
+
+# Setup the environment
+$ENV{LC_ALL} = 'C';
+$ENV{DPKG_COLORS} = 'never';
+$ENV{PATH} = "$binroot/src:$binroot/scripts:$binroot/utils:$ENV{PATH}";
+
+my %options;
+# XXX: We need force the file formatter to workaround verbose + parallel
+# not working correctly, as the console formatter eats the test output,
+# see <https://github.com/Perl-Toolchain-Gang/Test-Harness/issues/105>.
+if ($ENV{TEST_VERBOSE} && $ENV{TEST_PARALLEL} > 1) {
+    $options{formatter_class} = 'TAP::Formatter::File';
+}
+
+my $harness = TAP::Harness->new({
+    exec => sub {
+        my (undef, $test) = @_;
+        return [ $test ] if $test !~ m/\.t$/ and -x $test;
+        return
+    },
+    lib => [
+        "$srcroot/scripts",
+        "$srcroot/dselect/methods"
+    ],
+    color => 1,
+    verbosity => $ENV{TEST_VERBOSE},
+    jobs => $ENV{TEST_PARALLEL},
+    failures => 1,
+    %options,
+});
+
+my $aggregate = $harness->runtests(@ARGV);
+die "FAIL: test suite has errors\n" if $aggregate->has_errors;

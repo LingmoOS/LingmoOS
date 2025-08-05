@@ -1,0 +1,101 @@
+# dpkg manual page - dpkg-distaddfile(1)
+#
+# Copyright © 1995-1996 Ian Jackson <ijackson@chiark.greenend.org.uk>
+# Copyright © 2000 Wichert Akkerman <wakkerma@debian.org>
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+dpkg-distaddfile - add entries to debian/files
+
+=head1 SYNOPSIS
+
+B<dpkg-distaddfile>
+[I<option>...] I<filename section priority>
+
+=head1 DESCRIPTION
+
+B<dpkg-distaddfile>
+adds an entry for a named file to
+B<debian/files>.
+
+It takes three non-option arguments, the filename and the section and
+priority for the
+B<.changes>
+file.
+
+The filename should be specified relative to the directory where
+B<dpkg-genchanges>
+will expect to find the files, usually
+B<..>,
+rather than being a pathname relative to the current directory when
+B<dpkg-distaddfile>
+is run.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-f>I<files-list-file>
+
+Read or write the list of files to be uploaded here, rather than using
+B<debian/files>.
+
+=item B<-?>, B<--help>
+
+Show the usage message and exit.
+
+=item B<--version>
+
+Show the version and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<DPKG_COLORS>
+
+Sets the color mode (since dpkg 1.18.5).
+The currently accepted values are: B<auto> (default), B<always> and
+B<never>.
+
+=item B<DPKG_NLS>
+
+If set, it will be used to decide whether to activate Native Language Support,
+also known as internationalization (or i18n) support (since dpkg 1.19.0).
+The accepted values are: B<0> and B<1> (default).
+
+=back
+
+=head1 FILES
+
+=over
+
+=item B<debian/files>
+
+The list of generated files which are part of the upload being
+prepared.
+B<dpkg-distaddfile>
+can be used to add additional files.
+
+=back
+
+=head1 SEE ALSO
+
+L<deb-src-files(5)>.

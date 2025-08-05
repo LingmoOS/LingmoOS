@@ -1,0 +1,24 @@
+--- a/sysdeps/unix/sysv/linux/powerpc/dl-auxv.h
++++ b/sysdeps/unix/sysv/linux/powerpc/dl-auxv.h
+@@ -16,5 +16,21 @@
+    License along with the GNU C Library; if not, see
+    <https://www.gnu.org/licenses/>.  */
+ 
++#ifndef __powerpc64__
++/* We have to detect 8xx processors, which have buggy dcbz implementations
++ * that cannot report page faults correctly. That requires reading SPR,
++ * which is a privileged operation.  Fortunately 2.2.18 and later emulates
++ * PowerPC mfspr reads from the PVR register.  */
++#define DL_PLATFORM_AUXV \
++  {									\
++    unsigned pvr = 0;							\
++    asm ("mfspr %0, 287" : "=r" (pvr));					\
++    if ((pvr & 0xffff0000) == 0x00500000)				\
++      GLRO(dl_cache_line_size) = 0;					\
++    else								\
++      GLRO(dl_cache_line_size) = auxv_values[AT_DCACHEBSIZE];		\
++  }
++#else
+ #define DL_PLATFORM_AUXV \
+   GLRO(dl_cache_line_size) = auxv_values[AT_DCACHEBSIZE];
++#endif

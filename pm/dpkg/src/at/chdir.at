@@ -1,0 +1,511 @@
+#
+# Test commands with --root, --instdir and --admindir.
+#
+
+m4_foreach_w([CMD], [dpkg dpkg-divert dpkg-statoverride], [
+  m4_define([CMD_PRINT_DIRS], [DPKG_DEBUG=1 CMD --version])
+
+  AT_SETUP([CMD chdir opts normalize])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=/],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=$DEFAULT_ADMINDIR
+])
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=//./..///../././..///],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir opts])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=/rootdir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [CMD_PRINT_DIRS --instdir=/instdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_env
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/rootdir_env$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_env
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt admindir])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_env
+])
+  AT_CHECK(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt root])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/rootdir_env$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt root+admindir])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_env
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --instdir=/instdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt --instdir=/instdir_opt],
+    [], [ignore],
+    [D000001: root=/instdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --instdir=/instdir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+])
+
+#
+# Test commands with only --root and --admindir.
+#
+
+m4_foreach_w([CMD], [dpkg-split dpkg-query dpkg-trigger], [
+  m4_define([CMD_PRINT_DIRS], [DPKG_DEBUG=1 CMD --version])
+
+  AT_SETUP([CMD chdir opts])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_opt
+])
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+
+  AT_CHECK_UNQUOTED(
+    [CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_env
+])
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/rootdir_env$DEFAULT_ADMINDIR
+])
+
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_env
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt admindir])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=$DEFAULT_ROOTDIR admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt root])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+
+  AT_SETUP([CMD chdir env+opt root+admindir])
+  AT_KEYWORDS([CMD command-line chdir])
+
+  DPKG_ROOT=
+  DPKG_ADMINDIR=
+
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_env admindir=/admindir_opt
+])
+  AT_CHECK(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --root=/rootdir_opt --admindir=/admindir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/admindir_opt
+])
+  AT_CHECK_UNQUOTED(
+    [DPKG_ROOT=/rootdir_env DPKG_ADMINDIR=/admindir_env \
+     CMD_PRINT_DIRS --admindir=/admindir_opt --root=/rootdir_opt],
+    [], [ignore],
+    [D000001: root=/rootdir_opt admindir=/rootdir_opt$DEFAULT_ADMINDIR
+])
+
+  AT_CLEANUP
+])

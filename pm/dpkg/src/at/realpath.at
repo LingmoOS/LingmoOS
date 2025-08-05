@@ -1,0 +1,86 @@
+AT_SETUP([dpkg-realpath options])
+AT_KEYWORDS([dpkg-realpath command-line])
+
+AT_CHECK([dpkg-realpath --version], [], [ignore])
+AT_CHECK([dpkg-realpath --help], [], [ignore])
+
+AT_CLEANUP
+
+AT_SETUP([dpkg-realpath path resolving])
+AT_KEYWORDS([dpkg-realpath canonicalize])
+
+mkdir -p aa/bb/cc
+mkdir -p zz/yy/xx
+mkdir -p usr/bin
+AT_DATA([aa/bb/cc/file], [])
+ln -sf aa/bb/cc/file zz/yy/xx/symlink-rel
+ln -sf /aa/bb/cc/file zz/yy/xx/symlink-abs
+AT_DATA([usr/bin/a-shell], [])
+ln -sf /usr/bin/a-shell usr/bin/sh
+
+tmpdir="$(DPKG_CWD)"
+export DPKG_ROOT=
+
+# Relative paths
+AT_CHECK_UNQUOTED([dpkg-realpath aa/bb/cc], [],
+[$tmpdir/aa/bb/cc
+])
+AT_CHECK_UNQUOTED([dpkg-realpath zz/yy/xx], [], [$tmpdir/zz/yy/xx
+])
+AT_CHECK_UNQUOTED([dpkg-realpath usr/bin], [], [$tmpdir/usr/bin
+])
+AT_CHECK_UNQUOTED([dpkg-realpath aa/bb/cc/file], [], [$tmpdir/aa/bb/cc/file
+])
+AT_CHECK_UNQUOTED([dpkg-realpath zz/yy/xx/symlink-rel], [],
+[$tmpdir/zz/yy/xx/aa/bb/cc/file
+])
+AT_CHECK([dpkg-realpath zz/yy/xx/symlink-abs], [], [/aa/bb/cc/file
+])
+AT_CHECK_UNQUOTED([dpkg-realpath usr/bin/a-shell], [],
+[$tmpdir/usr/bin/a-shell
+])
+AT_CHECK([dpkg-realpath usr/bin/sh], [], [/usr/bin/a-shell
+])
+
+# Absolute paths
+cd /
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/aa/bb/cc"], [], [$tmpdir/aa/bb/cc
+])
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/zz/yy/xx"], [], [$tmpdir/zz/yy/xx
+])
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/usr/bin"], [], [$tmpdir/usr/bin
+])
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/aa/bb/cc/file"], [],
+[$tmpdir/aa/bb/cc/file
+])
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/zz/yy/xx/symlink-rel"], [],
+[$tmpdir/zz/yy/xx/aa/bb/cc/file
+])
+AT_CHECK([dpkg-realpath "$tmpdir/zz/yy/xx/symlink-abs"], [], [/aa/bb/cc/file
+])
+AT_CHECK_UNQUOTED([dpkg-realpath "$tmpdir/usr/bin/a-shell"], [],
+[$tmpdir/usr/bin/a-shell
+])
+AT_CHECK([dpkg-realpath "$tmpdir/usr/bin/sh"], [], [/usr/bin/a-shell
+])
+
+# Chrooted paths
+DPKG_ROOT="$tmpdir"
+AT_CHECK([dpkg-realpath /aa/bb/cc], [], [/aa/bb/cc
+])
+AT_CHECK([dpkg-realpath /zz/yy/xx], [], [/zz/yy/xx
+])
+AT_CHECK([dpkg-realpath /usr/bin], [], [/usr/bin
+])
+AT_CHECK([dpkg-realpath /aa/bb/cc/file], [], [/aa/bb/cc/file
+])
+AT_CHECK([dpkg-realpath /zz/yy/xx/symlink-rel], [], [/zz/yy/xx/aa/bb/cc/file
+])
+AT_CHECK([dpkg-realpath /zz/yy/xx/symlink-abs], [], [/aa/bb/cc/file
+])
+AT_CHECK([dpkg-realpath /usr/bin/a-shell], [], [/usr/bin/a-shell
+])
+AT_CHECK([dpkg-realpath /usr/bin/sh], [], [/usr/bin/a-shell
+])
+
+AT_CLEANUP
