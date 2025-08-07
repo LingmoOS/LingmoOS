@@ -1,0 +1,37 @@
+ecm_install_icons(ICONS
+    16-actions-document-export-key.png
+    16-actions-document-import-key.png
+    16-actions-document-properties-key.png
+    16-status-key-group.png
+    16-status-key-orphan.png
+    16-status-key-pair.png
+    16-status-key-single.png
+    22-actions-key-generate-pair.png
+    22-actions-view-key-secret.png
+    22-actions-document-export-key.png
+    22-actions-document-import-key.png
+    22-actions-document-properties-key.png
+    22-status-key-group.png
+    22-status-key-pair.png
+    22-status-key-single.png
+    32-actions-document-export-key.png
+    32-actions-document-import-key.png
+    32-actions-document-properties-key.png
+    32-status-key-group.png
+    32-status-key-pair.png
+    32-status-key-single.png
+    48-actions-document-export-key.png
+    48-actions-document-import-key.png
+    48-actions-document-properties-key.png
+    48-status-key-group.png
+    48-status-key-pair.png
+    48-status-key-single.png
+    sc-actions-document-export-key.svgz
+    sc-actions-document-import-key.svgz
+    sc-actions-document-properties-key.svgz
+    sc-status-key-group.svgz
+    sc-status-key-pair.svgz
+    sc-status-key-single.svgz
+    DESTINATION ${KDE_INSTALL_ICONDIR}
+    THEME hicolor
+)

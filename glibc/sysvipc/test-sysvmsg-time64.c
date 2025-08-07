@@ -1,1 +1,0 @@
-#include "test-sysvmsg.c"

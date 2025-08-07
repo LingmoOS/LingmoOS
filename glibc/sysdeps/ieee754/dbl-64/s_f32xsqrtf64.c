@@ -1,1 +1,0 @@
-/* Defined as an alias of sqrt.  */

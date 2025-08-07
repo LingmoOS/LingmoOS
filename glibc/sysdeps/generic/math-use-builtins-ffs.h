@@ -1,2 +1,0 @@
-#define USE_FFS_BUILTIN   0
-#define USE_FFSLL_BUILTIN 0

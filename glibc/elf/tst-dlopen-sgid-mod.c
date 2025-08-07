@@ -1,1 +1,0 @@
-/* Opening this object should not succeed.  */
