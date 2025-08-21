@@ -198,22 +198,22 @@
         <translation>Acerca de</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="165"/>
+        <location filename="../src/qml/About/Main.qml" line="229"/>
         <source>OS Version</source>
         <translation>Versión del sistema operativo</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="288"/>
+        <location filename="../src/qml/About/Main.qml" line="352"/>
         <source>CPU</source>
         <translation>CPU</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="277"/>
+        <location filename="../src/qml/About/Main.qml" line="341"/>
         <source>Disk</source>
         <translation>Disco</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="208"/>
+        <location filename="../src/qml/About/Main.qml" line="272"/>
         <source>Debian Version</source>
         <translation>Versión de Debian</translation>
     </message>
@@ -222,22 +222,22 @@
         <translation type="vanished">Debian 13 (trixie)</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="219"/>
+        <location filename="../src/qml/About/Main.qml" line="283"/>
         <source>Linux Kernel Version</source>
         <translation>Versión del kernel de Linux</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="220"/>
+        <location filename="../src/qml/About/Main.qml" line="284"/>
         <source>Linux </source>
         <translation>Linux </translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="229"/>
+        <location filename="../src/qml/About/Main.qml" line="293"/>
         <source>Lingmo UI Version</source>
         <translation>Versión de la interfaz de usuario de Lingmo</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="356"/>
+        <location filename="../src/qml/About/Main.qml" line="420"/>
         <source>Open Source Software Statement</source>
         <translation>Declaración sobre software de código abierto</translation>
     </message>
@@ -250,7 +250,7 @@
         <translation type="vanished">Versión del Sistema</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="158"/>
+        <location filename="../src/qml/About/Main.qml" line="222"/>
         <source>PC Name</source>
         <translation>Nombre del ordenador</translation>
     </message>
@@ -267,7 +267,7 @@
         <translation type="vanished">Versión de interfaz de usuario</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="240"/>
+        <location filename="../src/qml/About/Main.qml" line="304"/>
         <source>System Type</source>
         <translation>Tipo de sistema</translation>
     </message>
@@ -280,7 +280,7 @@
         <translation type="vanished">Procesador</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="267"/>
+        <location filename="../src/qml/About/Main.qml" line="331"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>
@@ -1107,7 +1107,7 @@
         <translation>Aceleración del puntero</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="323"/>
+        <location filename="../src/qml/About/Main.qml" line="387"/>
         <source>System Update</source>
         <translation>Actualización del sistema</translation>
     </message>

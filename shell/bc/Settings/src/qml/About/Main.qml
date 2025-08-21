@@ -30,6 +30,7 @@ ItemPage {
 
             SysItem {
                 id: sysinf
+                visible: false
                 anchors {
                     top: parent.top
                     bottom: lf.top
@@ -134,6 +135,69 @@ ItemPage {
                         }
                     }
                 }
+            }
+
+            Item {
+                id: topArea
+                Layout.fillWidth: true
+                height: 200
+
+                // 开启图层，并整体裁剪圆角
+                layer.enabled: true
+                layer.effect: OpacityMask {
+                    maskSource: Rectangle {
+                        width: topArea.width
+                        height: topArea.height
+                        radius: LingmoUI.Theme.bigRadius
+                        color: "black"   // 必须有颜色，否则 mask 无效
+                    }
+                }
+
+                // 背景图片
+                Image {
+                    id: bgImage
+                    anchors.fill: parent
+                    source: "file://" + wallpaper.path
+                    fillMode: Image.PreserveAspectCrop
+                }
+
+                // FastBlur 模糊
+                FastBlur {
+                    anchors.fill: bgImage
+                    source: bgImage
+                    radius: 55
+                }
+
+                // 半透明遮罩
+                Rectangle {
+                    anchors.fill: parent
+                    color: LingmoUI.Theme.darkMode ? "#66000000" : "#5DFFFFFF"
+                }
+
+                // Logo 居中
+                Image {
+                    id: systemlogo
+                    anchors.centerIn: parent
+                    width: 300
+                    sourceSize: Qt.size(width, height)
+                    source: LingmoUI.Theme.darkMode ?
+                                "qrc:/images/dark/logo.svg" :
+                                "qrc:/images/light/logo.svg"
+
+                    layer.enabled: true
+                    layer.effect: DropShadow {
+                        horizontalOffset: 0
+                        verticalOffset: 4
+                        radius: 16           // 阴影模糊半径
+                        color: "#D3FFFFFF"   // 阴影颜色，可调透明度
+                        samples: 18          // 阴影质量，值越高越平滑
+                    }
+                }
+
+            }
+
+            Item {
+                height: LingmoUI.Units.smallSpacing
             }
 
             // RoundedItem {
