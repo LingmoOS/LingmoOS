@@ -121,13 +121,22 @@ void UpdatorHelper::checkUpdates()
                         continue;
 
                     // 检查是否是lingmo包
-                    if (QString::compare(package->name(), "system-core", Qt::CaseInsensitive) == 0) {
-                        lingmo_found = true;
-                        // 添加lingmo包
-                        UpgradeableModel::self()->addPackage(package->name(),
-                                                             package->availableVersion(),
-                                                             package->downloadSize());
-                        break; // 找到后停止搜索/
+                    bool lingmo_found = false;
+                    for (QApt::Package *package : m_backend->upgradeablePackages()) {
+                        if (!package)
+                            continue;
+
+                        // 检查是否是系统核心包，或者所有包都显示
+                        if (QString::compare(package->name(), "system-core", Qt::CaseInsensitive) == 0) {
+                            lingmo_found = true;
+                        }
+
+                        // 添加包到列表，无论是不是 system-core
+                        UpgradeableModel::self()->addPackage(
+                            package->name(),
+                            package->availableVersion(),
+                            package->downloadSize()
+                        );
                     }
             }
 
