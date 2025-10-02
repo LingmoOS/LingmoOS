@@ -65,12 +65,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../UpdatePage.qml" line="152"/>
+        <location filename="../UpdatePage.qml" line="168"/>
         <source>New Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../UpdatePage.qml" line="239"/>
+        <location filename="../UpdatePage.qml" line="255"/>
         <source>Update now</source>
         <translation type="unfinished"></translation>
     </message>

@@ -4,27 +4,27 @@
 <context>
     <name>GridItemDelegate</name>
     <message>
-        <location filename="../qml/GridItemDelegate.qml" line="116"/>
+        <location filename="../qml/GridItemDelegate.qml" line="129"/>
         <source>Open</source>
         <translation>Otvori</translation>
     </message>
     <message>
-        <location filename="../qml/GridItemDelegate.qml" line="122"/>
+        <location filename="../qml/GridItemDelegate.qml" line="135"/>
         <source>Send to dock</source>
         <translation>Smesti na dok</translation>
     </message>
     <message>
-        <location filename="../qml/GridItemDelegate.qml" line="128"/>
+        <location filename="../qml/GridItemDelegate.qml" line="141"/>
         <source>Send to desktop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/GridItemDelegate.qml" line="134"/>
+        <location filename="../qml/GridItemDelegate.qml" line="147"/>
         <source>Remove from dock</source>
         <translation>Ukloni sa Doka</translation>
     </message>
     <message>
-        <location filename="../qml/GridItemDelegate.qml" line="140"/>
+        <location filename="../qml/GridItemDelegate.qml" line="153"/>
         <source>Uninstall</source>
         <translation type="unfinished"></translation>
     </message>
@@ -40,27 +40,27 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="69"/>
+        <location filename="../qml/main.qml" line="73"/>
         <source>Are you sure you want to uninstall %1 ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="77"/>
+        <location filename="../qml/main.qml" line="81"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="84"/>
+        <location filename="../qml/main.qml" line="88"/>
         <source>Uninstall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="276"/>
+        <location filename="../qml/main.qml" line="280"/>
         <source>Search</source>
         <translation>Pretraži</translation>
     </message>
     <message>
-        <location filename="../qml/main.qml" line="351"/>
+        <location filename="../qml/main.qml" line="355"/>
         <source>Not found</source>
         <translation>Nije Pronađeno</translation>
     </message>

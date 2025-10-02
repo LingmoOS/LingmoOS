@@ -69,9 +69,9 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../UpdatePage.qml" line="152"/>
+        <location filename="../UpdatePage.qml" line="168"/>
         <source>New Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>发现新版本：</translation>
     </message>
     <message>
         <source>Lingmo OS</source>
@@ -82,7 +82,7 @@
         <translation type="vanished"> 更新日志：</translation>
     </message>
     <message>
-        <location filename="../UpdatePage.qml" line="239"/>
+        <location filename="../UpdatePage.qml" line="255"/>
         <source>Update now</source>
         <translation>立即更新</translation>
     </message>

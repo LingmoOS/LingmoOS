@@ -114,37 +114,32 @@ void UpdatorHelper::checkUpdates()
             m_trans = nullptr;
 
             if (success) {
-                // Add packages.
                 bool lingmo_found = false;
+                quint64 totalSize = 0;
+
+                // 遍历所有包，累加下载大小
                 for (QApt::Package *package : m_backend->upgradeablePackages()) {
                     if (!package)
                         continue;
 
-                    // 检查是否是lingmo包
-                    bool lingmo_found = false;
-                    for (QApt::Package *package : m_backend->upgradeablePackages()) {
-                        if (!package)
-                            continue;
+                    totalSize += package->downloadSize();
 
-                        // 检查是否是系统核心包，或者所有包都显示
-                        if (QString::compare(package->name(), "system-core", Qt::CaseInsensitive) == 0) {
-                            lingmo_found = true;
-                        }
-
-                        // 添加包到列表，无论是不是 system-core
-                        UpgradeableModel::self()->addPackage(
-                            package->name(),
-                            package->availableVersion(),
-                            package->downloadSize()
-                        );
+                    // 检查是否存在 system-core
+                    if (QString::compare(package->name(), "system-core", Qt::CaseInsensitive) == 0) {
+                        lingmo_found = true;
                     }
-            }
+                }
 
+                // 如果有 system-core，则只显示它，但大小是总和
                 if (lingmo_found) {
-                    emit checkUpdateFinished(); // 发出更新完成信号
-                } else {
-                    // emit checkError("lingmo package not found"); // 发出未找到包的错误信号
+                    UpgradeableModel::self()->addPackage(
+                        "system-core",
+                        m_backend->package("system-core")->availableVersion(),
+                        totalSize
+                    );
                     emit checkUpdateFinished();
+                } else {
+                    emit checkError("system-core package not found");
                 }
             } else {
                 emit checkError(errorDetails);

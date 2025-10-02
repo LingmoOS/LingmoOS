@@ -148,9 +148,25 @@ Item {
                     spacing: LingmoUI.Units.smallSpacing
 
                     Label {
-                        // text: model.name
-                        text: qsTr("New Version:") + " " + model.version
-                        // Layout.fillWidth: true
+                        textFormat: Text.RichText
+                        text: {
+                            var versionStr = model.version
+                            var colonIndex = versionStr.indexOf(":")
+                            if (colonIndex >= 0) {
+                                versionStr = versionStr.substring(colonIndex + 1)
+                            }
+
+                            var parts = versionStr.split("+")
+                            var formattedVersion
+                            if (parts.length === 2) {
+                                formattedVersion = " Lingmo OS " + parts[0] + " (" + parts[1] + ")"
+                            } else {
+                                formattedVersion = " Lingmo OS " + versionStr
+                            }
+
+                            // 用 <b> 高亮显示
+                            return qsTr("New Version:") + " <b>" + formattedVersion + "</b>"
+                        }
                         font.pointSize: 11
                         Layout.alignment: Qt.AlignLeft
                     }
@@ -218,7 +234,7 @@ Item {
                             background: Rectangle {
                                 color: "transparent" // 设置背景为透明
                                 border.color: "transparent" // 设置边框颜色为透明
-                                border.width: 0 // 设置边框宽度为0
+                                border.width: 100 // 设置边框宽度为0
                             }
                         }
                     }

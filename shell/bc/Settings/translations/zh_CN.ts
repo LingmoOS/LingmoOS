@@ -163,22 +163,22 @@
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="229"/>
+        <location filename="../src/qml/About/Main.qml" line="274"/>
         <source>OS Version</source>
         <translation>操作系统版本</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="352"/>
+        <location filename="../src/qml/About/Main.qml" line="397"/>
         <source>CPU</source>
         <translation>CPU</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="341"/>
+        <location filename="../src/qml/About/Main.qml" line="386"/>
         <source>Disk</source>
         <translation>磁盘</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="272"/>
+        <location filename="../src/qml/About/Main.qml" line="317"/>
         <source>Debian Version</source>
         <translation>Debian 版本</translation>
     </message>
@@ -187,22 +187,22 @@
         <translation type="vanished">13 Trixie</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="283"/>
+        <location filename="../src/qml/About/Main.qml" line="328"/>
         <source>Linux Kernel Version</source>
         <translation>Linux 内核版本</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="284"/>
+        <location filename="../src/qml/About/Main.qml" line="329"/>
         <source>Linux </source>
         <translation>Linux </translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="293"/>
+        <location filename="../src/qml/About/Main.qml" line="338"/>
         <source>Lingmo UI Version</source>
         <translation>Lingmo UI 版本</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="420"/>
+        <location filename="../src/qml/About/Main.qml" line="465"/>
         <source>Open Source Software Statement</source>
         <translation>开放源码软件使用声明</translation>
     </message>
@@ -211,7 +211,7 @@
         <translation type="vanished">系统发行类型</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="222"/>
+        <location filename="../src/qml/About/Main.qml" line="267"/>
         <source>PC Name</source>
         <translation>设备名称</translation>
     </message>
@@ -228,7 +228,7 @@
         <translation type="vanished">UI版本</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="304"/>
+        <location filename="../src/qml/About/Main.qml" line="349"/>
         <source>System Type</source>
         <translation>系统类型</translation>
     </message>
@@ -241,7 +241,7 @@
         <translation type="vanished">处理器</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="331"/>
+        <location filename="../src/qml/About/Main.qml" line="376"/>
         <source>RAM</source>
         <translation>内存大小</translation>
     </message>
@@ -1094,7 +1094,7 @@
         <translation>勿扰模式</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="387"/>
+        <location filename="../src/qml/About/Main.qml" line="432"/>
         <source>System Update</source>
         <translation>系统更新</translation>
     </message>

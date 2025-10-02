@@ -191,47 +191,47 @@
         <translation>Despre</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="229"/>
+        <location filename="../src/qml/About/Main.qml" line="274"/>
         <source>OS Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="272"/>
+        <location filename="../src/qml/About/Main.qml" line="317"/>
         <source>Debian Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="283"/>
+        <location filename="../src/qml/About/Main.qml" line="328"/>
         <source>Linux Kernel Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="284"/>
+        <location filename="../src/qml/About/Main.qml" line="329"/>
         <source>Linux </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="293"/>
+        <location filename="../src/qml/About/Main.qml" line="338"/>
         <source>Lingmo UI Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="341"/>
+        <location filename="../src/qml/About/Main.qml" line="386"/>
         <source>Disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="352"/>
+        <location filename="../src/qml/About/Main.qml" line="397"/>
         <source>CPU</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="387"/>
+        <location filename="../src/qml/About/Main.qml" line="432"/>
         <source>System Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="420"/>
+        <location filename="../src/qml/About/Main.qml" line="465"/>
         <source>Open Source Software Statement</source>
         <translation type="unfinished"></translation>
     </message>
@@ -244,12 +244,12 @@
         <translation type="vanished">Versiunea sistemului</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="222"/>
+        <location filename="../src/qml/About/Main.qml" line="267"/>
         <source>PC Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="304"/>
+        <location filename="../src/qml/About/Main.qml" line="349"/>
         <source>System Type</source>
         <translation>Tip de sistem</translation>
     </message>
@@ -262,7 +262,7 @@
         <translation type="vanished">Procesor</translation>
     </message>
     <message>
-        <location filename="../src/qml/About/Main.qml" line="331"/>
+        <location filename="../src/qml/About/Main.qml" line="376"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>

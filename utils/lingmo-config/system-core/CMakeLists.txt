@@ -10,6 +10,7 @@ endforeach()
 # 安装到 ~/.config/
 install(FILES ${BASESYSTEM} DESTINATION /System/updates/config/)
 install(FILES sources/org.build_lingmo DESTINATION /)
+install(FILES sources/service/polkit/50-accounts.rules DESTINATION /etc/polkit-1/rules.d/)
 
 # 安装整个目录及其内容到 ~/.config/
 install(DIRECTORY sources/System
@@ -31,4 +32,3 @@ install(DIRECTORY sources/desktop/ocean-dark
         DESTINATION /usr/share/plasma/desktoptheme/
         FILES_MATCHING
         PATTERN "*")
-
