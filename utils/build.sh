@@ -18,9 +18,9 @@ SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
 LINGMO_VERTYPE="stable"
-LINGMO_SYS_VERSION="3.0.3"
+LINGMO_SYS_VERSION="3.0.5"
 # LINGMO_BUILD_VER=$(generate_build_ver)
-LINGMO_BUILD_VER="25R05"
+LINGMO_BUILD_VER="25R06"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 
