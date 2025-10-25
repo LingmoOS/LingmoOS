@@ -259,12 +259,12 @@ void UpdatorHelper::upgrade()
 
 void UpdatorHelper::reboot()
 {
-    // QDBusInterface iface(s_dbusName, s_pathName, s_interfaceName, QDBusConnection::sessionBus());
+    QDBusInterface iface(s_dbusName, s_pathName, s_interfaceName, QDBusConnection::sessionBus());
 
-    // if (iface.isValid()) {
-    //     iface.call("reboot");
-    // }
-    QProcess::startDetached("pkexec", QStringList() << "/System/updates/update.sh");
+    if (iface.isValid()) {
+	    iface.call("reboot");
+    }
+//    QProcess::startDetached("pkexec", QStringList() << "/System/updates/update.sh");
 }
 
 QString UpdatorHelper::version()
