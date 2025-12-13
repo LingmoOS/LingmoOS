@@ -44,52 +44,50 @@ jobs:
         echo "deb-src http://deb.debian.org/debian bookworm main contrib non-free" | tee -a /etc/apt/sources.list
         apt update && apt build-dep apt -y
         mkdir -p buildpkg mkdir -p buildpkg_tp
-        autoreconf -fiv
-        ./configure
-        make pkg_all
-        make image-iso
+        make config-pkgs
+        make build-pkgs
 
-    - name: Move files and compress directory
-      run: |
-        mv pkg_out release
+        #    - name: Move files and compress directory
+        #      run: |
+        #        mv pkg_out release
+        #
+        #    - name: Create release tarball
+        #      run: |
+        #        tar -cJf release.tar.xz -C release .
 
-    - name: Create release tarball
-      run: |
-        tar -cJf release.tar.xz -C release .
+        #    - name: Set Release Tag
+        #      id: set_tag
+        #      run: echo "TAG_NAME=3.0.0-rc9-build-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 
-    - name: Set Release Tag
-      id: set_tag
-      run: echo "TAG_NAME=3.0.0-rc9-build-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.TAG_NAME }}
-        release_name: Release ${{ env.TAG_NAME }}
-        draft: false
-        prerelease: false
-
-    - name: Upload release directory files
-      run: |
-        for file in release/*; do
-          if [ -f "$file" ]; then
-            echo "Uploading $file"
-            curl -XPOST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                 -H "Content-Type: $(file --mime-type -b $file)" \
-                 --data-binary @"$file" \
-                 "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
-          fi
-        done
-
-    - name: Upload release tarball
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release.tar.xz
-        asset_name: release.tar.xz
-        asset_content_type: application/x-xz
+        #    - name: Create Release
+        #      id: create_release
+        #      uses: actions/create-release@v1
+        #      env:
+        #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #      with:
+        #        tag_name: ${{ env.TAG_NAME }}
+        #        release_name: Release ${{ env.TAG_NAME }}
+        #        draft: false
+        #        prerelease: false
+        #
+        #    - name: Upload release directory files
+        #      run: |
+        #        for file in release/*; do
+        #          if [ -f "$file" ]; then
+        #            echo "Uploading $file"
+        #            curl -XPOST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        #                 -H "Content-Type: $(file --mime-type -b $file)" \
+        #                 --data-binary @"$file" \
+        #                 "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
+        #          fi
+        #        done
+        #
+        #    - name: Upload release tarball
+        #      uses: actions/upload-release-asset@v1
+        #      env:
+        #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #      with:
+        #        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        #        asset_path: release.tar.xz
+        #        asset_name: release.tar.xz
+        #        #        asset_content_type: application/x-xz
