@@ -78,6 +78,7 @@ private:
     QString m_currentVersion;
     QString m_updateText;
     QString m_statusDetails;
+    QString getSupportedLogLanguage(const QString &localeName);
     int m_checkProgress;
     QApt::Backend *m_backend;
     QApt::Transaction *m_trans;

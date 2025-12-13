@@ -73,6 +73,25 @@ QString formatLocale(const QString &localeName) {
     }
 }
 
+QString UpdatorHelper::getSupportedLogLanguage(const QString &localeName)
+{
+    QString lang = localeName.toLower();
+
+    if (lang.startsWith("en_us") || lang == "en-us") {
+        return "en-us";
+    } else if (lang.startsWith("en")) {
+        return "en";
+    } else if (lang.startsWith("zh_cn") || lang == "zh-cn" || lang == "zh") {
+        return "zh-cn";
+    } else if (lang.startsWith("zh_tw") || lang == "zh-tw") {
+        return "zh-tw";
+    } else if (lang.startsWith("ja")) {
+        return "ja";
+    } else {
+        return "en";  // 默认回落英文
+    }
+}
+
 QString UpdatorHelper::kernelVersion()
 {
     return QSysInfo::kernelVersion();
