@@ -32,7 +32,7 @@ config-pkgs:
 	@mkdir -p $(AUTO_DIR) $(DEFAULT_DIR)
 	@cp -r core daemon fm im/fcitx5-5.1.12 lib/libshell lib/libsys lib/libsysui windows/global windows/plugins $(AUTO_DIR)/
 	@cp -r shell/bc/* $(AUTO_DIR)/
-	@rm -r $(AUTO_DIR)/{Debinstaller,Icons}
+	@rm -r $(AUTO_DIR)/Debinstaller $(AUTO_DIR)/Icons
 	@cp -r shell/cc/* $(AUTO_DIR)/
 	@cp -r shell32/* $(AUTO_DIR)/
 	@cp -r shell/bc/Icons core32/ service/asyncjobprog service/itframework service/locker_service $(DEFAULT_DIR)/
