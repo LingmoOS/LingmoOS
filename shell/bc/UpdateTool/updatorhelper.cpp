@@ -139,7 +139,8 @@ void UpdatorHelper::checkUpdates()
                     );
                     emit checkUpdateFinished();
                 } else {
-                    emit checkError("system-core package not found");
+                    // emit checkError("system-core package not found");
+		    emit checkUpdateFinished();
                 }
             } else {
                 emit checkError(errorDetails);
