@@ -75,6 +75,16 @@ make clean       # Clean the build directories
 
 ---
 
+## ❤️ Support LingmoOS
+
+If you find the project useful, you can support it via a
+**one-time contribution**:
+
+👉 Patreon: https://www.patreon.com/LingmoLinux
+
+Your support helps keep LingmoOS moving forward.
+Thank you for supporting open-source ❤️
+
 ## License
 
 This project has been licensed by GPLv3.
