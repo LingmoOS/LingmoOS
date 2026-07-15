@@ -25,9 +25,6 @@ jobs:
     name: Debian Testing source package
     runs-on: ubuntu-latest
     container: docker.io/library/debian:testing
-    defaults:
-      run:
-        working-directory: 'shell/bc/Desktop'
     steps:
       - name: Install packaging tools
         run: |
@@ -44,9 +41,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Debian source package
+        working-directory: 'shell/bc/Desktop'
         run: dpkg-buildpackage -S -us -uc -d
 
       - name: Collect source package files
+        working-directory: 'shell/bc/Desktop'
         run: |
           mkdir -p source-package
           find .. -maxdepth 1 -type f \
