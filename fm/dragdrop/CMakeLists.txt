@@ -5,15 +5,15 @@ set(SCREEN_SRCS
     plugin.cpp
 )
 
-find_package(Qt5 COMPONENTS Core DBus Quick LinguistTools REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui DBus Quick LinguistTools)
 
 add_library(lingmodragdrop_qmlplugins SHARED ${SCREEN_SRCS})
 
 target_link_libraries (lingmodragdrop_qmlplugins
-    Qt5::Core
-    Qt5::Quick
-    Qt5::Gui
-    Qt5::DBus
+    Qt6::Core
+    Qt6::Quick
+    Qt6::Gui
+    Qt6::DBus
 )
 
 install(TARGETS lingmodragdrop_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/DragDrop)

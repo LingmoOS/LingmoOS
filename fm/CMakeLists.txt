@@ -12,10 +12,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Gui Quick QuickControls2 Widgets DBus Xml Concurrent)
-find_package(Qt5 COMPONENTS Core DBus Quick LinguistTools REQUIRED ${QT})
+find_package(Qt6 REQUIRED COMPONENTS ${QT} LinguistTools)
 
 # Get the installation directory from qmake
-get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
+get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
 if (NOT QT_QMAKE_EXECUTABLE)
     message(FATAL_ERROR "qmake is not found.")
 endif ()
@@ -27,12 +27,12 @@ execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_QML
 
 # find_package(LingmoUI REQUIRED)
 
-find_package(KF5KIO)
-find_package(KF5Solid)
-find_package(KF5WindowSystem)
-find_package(KF5Config)
+find_package(KF6 REQUIRED COMPONENTS KIO)
+find_package(KF6 REQUIRED COMPONENTS Solid)
+find_package(KF6 REQUIRED COMPONENTS WindowSystem)
+find_package(KF6 REQUIRED COMPONENTS Config)
 
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.FileManager.xml
                      application.h Application)
 
@@ -51,16 +51,16 @@ add_executable(lingmo-filemanager
 
 target_link_libraries(lingmo-filemanager
   PRIVATE
-  Qt5::Core
-  Qt5::DBus
-  Qt5::Quick
+  Qt6::Core
+  Qt6::DBus
+  Qt6::Quick
 
-  KF5::KIOCore
-  KF5::KIOFileWidgets
-  KF5::KIOWidgets
-  KF5::Solid
-  KF5::WindowSystem
-  KF5::ConfigCore
+  KF6::KIOCore
+  KF6::KIOFileWidgets
+  KF6::KIOWidgets
+  KF6::Solid
+  KF6::WindowSystem
+  KF6::ConfigCore
 
   # LingmoUI
 )
@@ -73,7 +73,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${ts_files_replaced})
 

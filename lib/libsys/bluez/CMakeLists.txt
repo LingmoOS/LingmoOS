@@ -14,13 +14,13 @@ set(bluezqtextensionplugin_SRCS
 
 add_library(lingmobluez_qmlplugins SHARED ${bluezqtextensionplugin_SRCS})
 
-find_package(KF5BluezQt REQUIRED)
+find_package(KF6BluezQt REQUIRED)
 
 target_link_libraries(lingmobluez_qmlplugins
-    Qt5::Core
-    Qt5::Qml
-    Qt5::DBus
-    KF5::BluezQt
+    Qt6::Core
+    Qt6::Qml
+    Qt6::DBus
+    KF6::BluezQt
 )
 
 install(TARGETS lingmobluez_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/Bluez)

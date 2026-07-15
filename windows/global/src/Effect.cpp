@@ -22,17 +22,10 @@
 
 #include <QtDBus/QDBusConnection>
 #include <QDBusError>
-#include <KX11Extras>
-
-#if QT_VERSION_MAJOR >= 6
-    #include <opengl/glutils.h>
-    #include <effect/effectwindow.h>
-    #include <effect/effecthandler.h>
-    #include <core/renderviewport.h>
-#else
-    #include <kwineffects.h>
-    #include <kwinglutils.h>
-#endif
+#include <opengl/glutils.h>
+#include <effect/effectwindow.h>
+#include <effect/effecthandler.h>
+#include <core/renderviewport.h>
 
 
 ShapeCorners::Effect::Effect()
@@ -104,11 +97,7 @@ ShapeCorners::Effect::windowAdded(KWin::EffectWindow *w)
     }
 #endif
 
-#if QT_VERSION_MAJOR >= 6
     connect(w, &KWin::EffectWindow::windowFrameGeometryChanged, this, &Effect::windowResized);
-#else
-    connect(KWin::effects, &KWin::EffectsHandler::windowFrameGeometryChanged, this, &Effect::windowResized);
-#endif
     redirect(w);
     setShader(w, m_shaderManager.GetShader().get());
     checkTiled();
@@ -148,13 +137,8 @@ void ShapeCorners::Effect::prePaintWindow(KWin::EffectWindow *w, KWin::WindowPre
     window_iterator->second.animateProperties(time);
 
     if(window_iterator->second.hasRoundCorners()) {
-#if QT_VERSION_MAJOR >= 6
         const auto geo = w->frameGeometry() * w->screen()->scale();
         const auto size = window_iterator->second.cornerRadius * w->screen()->scale();
-#else
-        const auto geo = w->frameGeometry() * KWin::effects->renderTargetScale();
-        const auto size = window_iterator->second.cornerRadius * KWin::effects->renderTargetScale();
-#endif
 
         QRegion reg{};
         reg += QRect(geo.x(), geo.y(), size, size);
@@ -174,44 +158,28 @@ bool ShapeCorners::Effect::supported()
     return KWin::effects->isOpenGLCompositing();
 }
 
-#if QT_VERSION_MAJOR >= 6
 void ShapeCorners::Effect::drawWindow(const KWin::RenderTarget &renderTarget, const KWin::RenderViewport &viewport,
-                                    KWin::EffectWindow *w, int mask, const QRegion &region,
-                                    KWin::WindowPaintData &data) {
-#else
-void ShapeCorners::Effect::drawWindow(KWin::EffectWindow *w, int mask, const QRegion &region,
-                                    KWin::WindowPaintData &data) {
-#endif
+                                      KWin::EffectWindow *w, int mask, const QRegion &region,
+                                      KWin::WindowPaintData &data)
+{
     auto window_iterator = m_managed.find(w);
     if (!m_shaderManager.IsValid()
         || window_iterator == m_managed.end()
         || !window_iterator->second.hasEffect())
     {
         unredirect(w);
-#if QT_VERSION_MAJOR >= 6
         OffscreenEffect::drawWindow(renderTarget, viewport, w, mask, region, data);
-#else
-        OffscreenEffect::drawWindow(w, mask, region, data);
-#endif
         return;
     }
 
-#if QT_VERSION_MAJOR >= 6
     const auto scale = viewport.scale();
-#else
-    const auto scale = KWin::effects->renderTargetScale();
-#endif
 
     redirect(w);
     setShader(w, m_shaderManager.GetShader().get());
     m_shaderManager.Bind(window_iterator->second, scale);
     glActiveTexture(GL_TEXTURE0);
 
-#if QT_VERSION_MAJOR >= 6
     OffscreenEffect::drawWindow(renderTarget, viewport, w, mask, region, data);
-#else
-    OffscreenEffect::drawWindow(w, mask, region, data);
-#endif
     m_shaderManager.Unbind();
 }
 

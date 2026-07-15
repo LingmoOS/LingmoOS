@@ -7,10 +7,9 @@ set(SOURCES
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
 target_link_libraries(${TARGET}
-        Qt5::Core
-        Qt5::Quick
-        Qt5::DBus
-        Qt5::X11Extras
+        Qt6::Core
+        Qt6::Quick
+        Qt6::DBus
 )
 
 configure_file(

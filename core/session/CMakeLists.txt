@@ -19,24 +19,23 @@ set(SOURCES
         daemon-helper.h
 )
 
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.Session.xml
                      application.h Application
                      sessionadaptor SessionAdaptor)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
-find_package(KF5WindowSystem)
+find_package(KF6 REQUIRED COMPONENTS WindowSystem)
 find_package(Threads)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
 target_link_libraries(${TARGET}
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Quick
-        Qt5::DBus
-        Qt5::X11Extras
-        KF5::WindowSystem
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Quick
+        Qt6::DBus
+        KF6::WindowSystem
         ${CMAKE_THREAD_LIBS_INIT}
 )
 

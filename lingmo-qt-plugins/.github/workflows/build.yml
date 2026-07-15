@@ -1,0 +1,48 @@
+name: Build
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian:
+    name: Debian
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:trixie
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v2
+    - name: Update repository
+      run: apt-get update -y
+    - name: Install the basic dev packages
+      run: apt-get install -y equivs curl git devscripts lintian build-essential automake autotools-dev cmake g++
+    - name: Install build dependencies
+      run: mk-build-deps -i -t "apt-get --yes" -r
+    - name: Build Package
+      run: dpkg-buildpackage -b -uc -us -j$(nproc)
+    # - name: Create Release
+    #   id: create_release
+    #   uses: actions/create-release@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     tag_name: 2.0
+    #     release_name: Release 2.0.0 Packages
+    #     draft: false
+    #     prerelease: false
+    # - name: Upload Release Asset
+    #   id: upload-release-asset
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: /__w/lingmo-qt-plugins/lingmo-qt-plugins_2.0.0_amd64.deb
+    #     asset_name: lingmo-qt-plugins_2.0.0_amd64.deb
+    #     asset_content_type: application/deb

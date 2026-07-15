@@ -49,13 +49,14 @@ class QQmlSortFilterProxyModel : public QSortFilterProxyModel
     Q_PROPERTY(QQmlScriptString sortExpression READ sortExpression WRITE setSortExpression NOTIFY sortExpressionChanged)
 
 public:
+    // Keep the Qt 5 QRegExp numeric values for source and QML compatibility.
     enum PatternSyntax {
-        RegExp = QRegExp::RegExp,
-        Wildcard = QRegExp::Wildcard,
-        FixedString = QRegExp::FixedString,
-        RegExp2 = QRegExp::RegExp2,
-        WildcardUnix = QRegExp::WildcardUnix,
-        W3CXmlSchema11 = QRegExp::W3CXmlSchema11
+        RegExp = 0,
+        Wildcard = 1,
+        FixedString = 2,
+        RegExp2 = 3,
+        WildcardUnix = 4,
+        W3CXmlSchema11 = 5
     };
     Q_ENUM(PatternSyntax)
 
@@ -107,6 +108,7 @@ protected:
 
 private slots:
     void invalidateFilter();
+    void updateFilterRegularExpression();
     void updateFilterRole();
     void updateSortRole();
     void updateRoles();
@@ -115,6 +117,8 @@ private:
     QVariantMap modelDataMap(const QModelIndex &modelIndex) const;
 
     QString m_filterRoleName;
+    QString m_filterPattern;
+    PatternSyntax m_filterPatternSyntax = RegExp;
     QString m_sortRoleName;
 
     QQmlScriptString m_filterScriptString;

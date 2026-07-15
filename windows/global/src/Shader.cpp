@@ -7,13 +7,8 @@
 #include <QFile>
 #include <QStandardPaths>
 
-#if QT_VERSION_MAJOR >= 6
-    #include <effect/effectwindow.h>
-    #include <opengl/glutils.h>
-#else
-    #include <kwineffects.h>
-    #include <kwinglutils.h>
-#endif
+#include <effect/effectwindow.h>
+#include <opengl/glutils.h>
 
 ShapeCorners::Shader::Shader():
         m_manager(KWin::ShaderManager::instance()) {

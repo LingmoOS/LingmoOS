@@ -68,12 +68,12 @@ pkg_check_modules(LIBPULSE_MAINLOOP libpulse-mainloop-glib REQUIRED IMPORTED_TAR
 add_library(lingmoaudio_qmlplugins SHARED ${audio_SRCS})
 
 target_link_libraries(lingmoaudio_qmlplugins
-    Qt5::Core
-    Qt5::Qml
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::DBus
-    Qt5::Quick
+    Qt6::Core
+    Qt6::Qml
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::DBus
+    Qt6::Quick
     Canberra::Canberra
     PkgConfig::LIBPULSE
     PkgConfig::LIBPULSE_MAINLOOP

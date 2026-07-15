@@ -23,11 +23,7 @@
 #include "Window.h"
 #include "TileChecker.h"
 
-#if QT_VERSION_MAJOR >= 6
-    #include <effect/offscreeneffect.h>
-#else
-    #include <kwinoffscreeneffect.h>
-#endif
+#include <effect/offscreeneffect.h>
 
 namespace ShapeCorners {
     class Effect final : public KWin::OffscreenEffect {
@@ -43,12 +39,8 @@ namespace ShapeCorners {
         void reconfigure(ReconfigureFlags flags) override;
         void prePaintWindow(KWin::EffectWindow *w, KWin::WindowPrePaintData &data, std::chrono::milliseconds time) override;
 
-#if QT_VERSION_MAJOR >= 6
-        void drawWindow(const KWin::RenderTarget &RenderTarget, const KWin::RenderViewport &viewport,
+        void drawWindow(const KWin::RenderTarget &renderTarget, const KWin::RenderViewport &viewport,
                         KWin::EffectWindow *w, int mask, const QRegion &region, KWin::WindowPaintData &data) override;
-#else
-        void drawWindow(KWin::EffectWindow *w, int mask, const QRegion &region, KWin::WindowPaintData &data) override;
-#endif
 
         [[nodiscard]] int requestedEffectChainPosition() const override { return 99; }
         [[nodiscard]] bool blocksDirectScanout() const override { return false; }

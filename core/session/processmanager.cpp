@@ -20,7 +20,7 @@
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 
-#include <QX11Info>
+#include "x11utils.h"
 #include <KWindowSystem>
 #include <KWindowSystem/NETWM>
 
@@ -199,7 +199,7 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     // ref: lxqt session
     if (!m_wmStarted && m_waitLoop) {
         // all window managers must set their name according to the spec
-        if (!QString::fromUtf8(NETRootInfo(QX11Info::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
+        if (!QString::fromUtf8(NETRootInfo(Lingmo::X11::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
             qDebug() << "Window manager started";
             m_wmStarted = true;
             if (m_waitLoop && m_waitLoop->isRunning())

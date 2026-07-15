@@ -1,5 +1,5 @@
-set(SOURCE_SHADER "shapecorners_qt${QT_MAJOR_VERSION}.frag")
-set(SOURCE_SHADER_CORE "shapecorners_qt${QT_MAJOR_VERSION}_core.frag")
+set(SOURCE_SHADER "shapecorners_qt6.frag")
+set(SOURCE_SHADER_CORE "shapecorners_qt6_core.frag")
 
 set(SED_COMMAND sed -e "/#include \"shapecorners.glsl\"/ { r ${CMAKE_SOURCE_DIR}/src/shaders/shapecorners.glsl" -e "d" -e "}")
 

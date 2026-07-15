@@ -26,6 +26,8 @@
  ***************************************************************************/
 
 #include "qqmlsortfilterproxymodel.h"
+
+#include <QRegularExpression>
 #include <QtQml>
 
 QQmlSortFilterProxyModel::QQmlSortFilterProxyModel(QObject *parent)
@@ -71,36 +73,57 @@ void QQmlSortFilterProxyModel::setFilterRoleName(const QString &filterRoleName)
 
 QString QQmlSortFilterProxyModel::filterPattern() const
 {
-    return filterRegExp().pattern();
+    return m_filterPattern;
 }
 
 void QQmlSortFilterProxyModel::setFilterPattern(const QString &filterPattern)
 {
-    QRegExp regExp = filterRegExp();
-    if (regExp.pattern() == filterPattern)
+    if (m_filterPattern == filterPattern)
         return;
 
-    regExp.setPattern(filterPattern);
-    QSortFilterProxyModel::setFilterRegExp(regExp);
+    m_filterPattern = filterPattern;
+    updateFilterRegularExpression();
     emit filterPatternChanged();
 }
 
 QQmlSortFilterProxyModel::PatternSyntax QQmlSortFilterProxyModel::filterPatternSyntax() const
 {
-    return static_cast<PatternSyntax>(filterRegExp().patternSyntax());
+    return m_filterPatternSyntax;
 }
 
 void QQmlSortFilterProxyModel::setFilterPatternSyntax(
     QQmlSortFilterProxyModel::PatternSyntax patternSyntax)
 {
-    QRegExp regExp = filterRegExp();
-    QRegExp::PatternSyntax patternSyntaxTmp = static_cast<QRegExp::PatternSyntax>(patternSyntax);
-    if (regExp.patternSyntax() == patternSyntaxTmp)
+    if (m_filterPatternSyntax == patternSyntax)
         return;
 
-    regExp.setPatternSyntax(patternSyntaxTmp);
-    QSortFilterProxyModel::setFilterRegExp(regExp);
+    m_filterPatternSyntax = patternSyntax;
+    updateFilterRegularExpression();
     emit filterPatternSyntaxChanged();
+}
+
+void QQmlSortFilterProxyModel::updateFilterRegularExpression()
+{
+    QString pattern = m_filterPattern;
+
+    switch (m_filterPatternSyntax) {
+    case FixedString:
+        pattern = QRegularExpression::escape(pattern);
+        break;
+    case Wildcard:
+    case WildcardUnix:
+        pattern = QRegularExpression::wildcardToRegularExpression(pattern);
+        break;
+    case W3CXmlSchema11:
+        // QRegularExpression has no W3C XML Schema grammar; preserve the public
+        // enum and interpret the pattern using the native Qt 6 regular-expression grammar.
+        break;
+    case RegExp:
+    case RegExp2:
+        break;
+    }
+
+    QSortFilterProxyModel::setFilterRegularExpression(QRegularExpression(pattern));
 }
 
 const QVariant &QQmlSortFilterProxyModel::filterValue() const

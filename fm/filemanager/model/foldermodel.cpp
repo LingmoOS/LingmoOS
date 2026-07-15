@@ -41,6 +41,7 @@
 
 // Qt
 #include <QSet>
+#include <QRegularExpression>
 #include <QDir>
 #include <QMenu>
 #include <QAction>
@@ -48,7 +49,6 @@
 #include <QDBusInterface>
 #include <QStandardPaths>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QMimeDatabase>
 #include <QMimeData>
 #include <QClipboard>
@@ -562,10 +562,9 @@ void FolderModel::setFilterPattern(const QString &pattern)
     m_regExps.reserve(patterns.count());
 
     foreach (const QString &pattern, patterns) {
-        QRegExp rx(pattern);
-        rx.setPatternSyntax(QRegExp::Wildcard);
-        rx.setCaseSensitivity(Qt::CaseInsensitive);
-        m_regExps.append(rx);
+        const auto wildcardPattern = QRegularExpression::wildcardToRegularExpression(pattern);
+        m_regExps.append(QRegularExpression(QRegularExpression::anchoredPattern(wildcardPattern),
+                                             QRegularExpression::CaseInsensitiveOption));
     }
 
     invalidateFilterIfComplete();
@@ -1902,9 +1901,8 @@ bool FolderModel::matchPattern(const KFileItem &item) const
     }
 
     const QString name = item.name();
-    QListIterator<QRegExp> i(m_regExps);
-    while (i.hasNext()) {
-        if (i.next().exactMatch(name)) {
+    for (const QRegularExpression &regularExpression : m_regExps) {
+        if (regularExpression.match(name).hasMatch()) {
             return true;
         }
     }

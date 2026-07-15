@@ -1,5 +1,5 @@
 #include <QGuiApplication>
-#include <QX11Info>
+#include "x11utils.h"
 #include <QFile>
 #include <QDebug>
 #include <QSettings>
@@ -10,7 +10,7 @@
 
 inline void applyTheme(const QString &theme, int size)
 {
-    Display *display = QX11Info::display();
+    Display *display = Lingmo::X11::display();
 
     if (!theme.isEmpty())
         XcursorSetTheme(display, QFile::encodeName(theme));
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     if (argc != 3)
         return 1;
 
-    if (!QX11Info::isPlatformX11())
+    if (!Lingmo::X11::isPlatformX11())
         return 2;
 
     QString theme = QFile::decodeName(argv[1]);

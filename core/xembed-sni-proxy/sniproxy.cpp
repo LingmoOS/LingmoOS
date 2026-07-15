@@ -18,7 +18,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>
-#include <QX11Info>
+#include "x11utils.h"
 
 #include <QBitmap>
 
@@ -53,7 +53,7 @@ void xembed_message_send(xcb_window_t towin, long message, long d1, long d2, lon
     ev.data.data32[3] = d2;
     ev.data.data32[4] = d3;
     ev.type = Xcb::atoms->xembedAtom;
-    xcb_send_event(QX11Info::connection(), false, towin, XCB_EVENT_MASK_NO_EVENT, (char *)&ev);
+    xcb_send_event(Lingmo::X11::connection(), false, towin, XCB_EVENT_MASK_NO_EVENT, (char *)&ev);
 }
 
 SNIProxy::SNIProxy(xcb_window_t wid, QObject *parent)
@@ -79,7 +79,7 @@ SNIProxy::SNIProxy(xcb_window_t wid, QObject *parent)
         qCWarning(SNIPROXY) << "could not register SNI:" << reply.error().message();
     }
 
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     // create a container window
     auto screen = xcb_setup_roots_iterator(xcb_get_setup(c)).data;
@@ -178,7 +178,7 @@ SNIProxy::SNIProxy(xcb_window_t wid, QObject *parent)
 
 SNIProxy::~SNIProxy()
 {
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     xcb_destroy_window(c, m_containerWid);
     QDBusConnection::disconnectFromBus(m_dbus.name());
@@ -206,7 +206,7 @@ void SNIProxy::update()
 
 void SNIProxy::resizeWindow(const uint16_t width, const uint16_t height) const
 {
-    auto connection = QX11Info::connection();
+    auto connection = Lingmo::X11::connection();
 
     uint16_t widthNormalized = std::min(width, s_embedSize);
     uint16_t heighNormalized = std::min(height, s_embedSize);
@@ -227,7 +227,7 @@ void SNIProxy::hideContainerWindow(xcb_window_t windowId) const
 
 QSize SNIProxy::calculateClientWindowSize() const
 {
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     auto cookie = xcb_get_geometry(c, m_windowId);
     QScopedPointer<xcb_get_geometry_reply_t, QScopedPointerPodDeleter> clientGeom(xcb_get_geometry_reply(c, cookie, nullptr));
@@ -281,7 +281,7 @@ bool SNIProxy::isTransparentImage(const QImage &image) const
 
 QImage SNIProxy::getImageNonComposite() const
 {
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     QSize clientWindowSize = calculateClientWindowSize();
 
@@ -380,7 +380,7 @@ QPoint SNIProxy::calculateClickPoint() const
 {
     QPoint clickPoint = QPoint(0, 0);
 
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     // request extent to check if shape has been set
     xcb_shape_query_extents_cookie_t extentsCookie = xcb_shape_query_extents(c, m_windowId);
@@ -417,7 +417,7 @@ QPoint SNIProxy::calculateClickPoint() const
 
 void SNIProxy::stackContainerWindow(const uint32_t stackMode) const
 {
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
     const uint32_t stackData[] = {stackMode};
     xcb_configure_window(c, m_containerWid, XCB_CONFIG_WINDOW_STACK_MODE, stackData);
 }
@@ -505,7 +505,7 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
     qCDebug(SNIPROXY) << "Received click" << mouseButton << "with passed x*y" << x << y;
     sendingClickEvent = true;
 
-    auto c = QX11Info::connection();
+    auto c = Lingmo::X11::connection();
 
     auto cookieSize = xcb_get_geometry(c, m_windowId);
     QScopedPointer<xcb_get_geometry_reply_t, QScopedPointerPodDeleter> clientGeom(xcb_get_geometry_reply(c, cookieSize, nullptr));
@@ -548,9 +548,9 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         memset(event, 0x00, sizeof(xcb_button_press_event_t));
         event->response_type = XCB_BUTTON_PRESS;
         event->event = m_windowId;
-        event->time = QX11Info::getTimestamp();
+        event->time = Lingmo::X11::getTimestamp();
         event->same_screen = 1;
-        event->root = QX11Info::appRootWindow();
+        event->root = Lingmo::X11::appRootWindow();
         event->root_x = x;
         event->root_y = y;
         event->event_x = static_cast<int16_t>(clickPoint.x());
@@ -562,7 +562,7 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         xcb_send_event(c, false, m_windowId, XCB_EVENT_MASK_BUTTON_PRESS, (char *)event);
         delete event;
     } else {
-        sendXTestPressed(QX11Info::display(), mouseButton);
+        sendXTestPressed(Lingmo::X11::display(), mouseButton);
     }
 
     // mouse up
@@ -571,9 +571,9 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         memset(event, 0x00, sizeof(xcb_button_release_event_t));
         event->response_type = XCB_BUTTON_RELEASE;
         event->event = m_windowId;
-        event->time = QX11Info::getTimestamp();
+        event->time = Lingmo::X11::getTimestamp();
         event->same_screen = 1;
-        event->root = QX11Info::appRootWindow();
+        event->root = Lingmo::X11::appRootWindow();
         event->root_x = x;
         event->root_y = y;
         event->event_x = static_cast<int16_t>(clickPoint.x());
@@ -585,7 +585,7 @@ void SNIProxy::sendClick(uint8_t mouseButton, int x, int y)
         xcb_send_event(c, false, m_windowId, XCB_EVENT_MASK_BUTTON_RELEASE, (char *)event);
         delete event;
     } else {
-        sendXTestReleased(QX11Info::display(), mouseButton);
+        sendXTestReleased(Lingmo::X11::display(), mouseButton);
     }
 
 #ifndef VISUAL_DEBUG

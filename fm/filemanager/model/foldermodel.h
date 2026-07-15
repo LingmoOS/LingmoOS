@@ -34,6 +34,7 @@
 #include <QQmlParserStatus>
 #include <QQuickItem>
 #include <QPointer>
+#include <QRegularExpression>
 
 #include <KDirLister>
 #include <KDirModel>
@@ -310,7 +311,7 @@ private:
     QString m_filterPattern;
     bool m_filterPatternMatchAll;
     QSet<QString> m_mimeSet;
-    QList<QRegExp> m_regExps;
+    QList<QRegularExpression> m_regExps;
 
     bool m_complete;
     bool m_isDesktop;

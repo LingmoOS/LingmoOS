@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
 set(LINGMOUI_VERSION 1.0)
 project(lingmoui VERSION ${LINGMOUI_VERSION})
@@ -7,7 +7,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #DEFAULT COMPONENTS DEFINITIONS
@@ -19,19 +19,17 @@ option(COMPONENT_STORE "Build store component" OFF)
 option(COMPONENT_TAGGING "Build tagging component" ON)
 option(COMPONENT_SYNCING "Build syncing component" ON)
 
-find_package(ECM 5.45.0 NO_MODULE)
+find_package(ECM 6.0.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-set(QT Core Widgets Quick QuickControls2 DBus)
+set(QT Core Gui Widgets Qml Quick QuickControls2 DBus)
+find_package(Qt6 REQUIRED COMPONENTS ${QT})
 if (UNIX)
     if (NOT APPLE)
-        set(QT ${QT} X11Extras)
-    endif ()
-endif ()
-find_package(Qt5 REQUIRED ${QT})
-if (UNIX)
-    if (NOT APPLE)
-        find_package(KF5WindowSystem REQUIRED)
+        find_package(KF6WindowSystem REQUIRED)
+        find_package(X11 REQUIRED)
+        find_package(X11_XCB REQUIRED)
+        find_package(XCB REQUIRED COMPONENTS XCB ATOM)
     endif ()
 endif ()
 
@@ -41,7 +39,7 @@ include(CMakePackageConfigHelpers)
 include(ECMGenerateHeaders)
 
 # Get the installation directory from qmake
-get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
+get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
 if (NOT QT_QMAKE_EXECUTABLE)
     message(FATAL_ERROR "qmake is not found.")
 endif ()
@@ -92,7 +90,7 @@ configure_package_config_file(
 
 write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/LingmoUIConfigVersion.cmake
-        VERSION ${LIB_VERSION}
+        VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion
 )
 if(NOT APPLE)

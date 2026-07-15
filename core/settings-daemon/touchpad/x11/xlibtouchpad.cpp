@@ -202,10 +202,10 @@ bool XlibTouchpad::setParameter(const Parameter *par, const QVariant &value)
     }
 
     QVariant converted(value);
-    QVariant::Type convType = QVariant::Int;
+    QMetaType convType = QMetaType::fromType<int>();
     if (p->f) {
-        convType = QVariant::Double;
-    } else if (value.type() == QVariant::Double) {
+        convType = QMetaType::fromType<double>();
+    } else if (value.metaType() == QMetaType::fromType<double>()) {
         converted = QVariant(qRound(static_cast<qreal>(value.toDouble())));
     }
 

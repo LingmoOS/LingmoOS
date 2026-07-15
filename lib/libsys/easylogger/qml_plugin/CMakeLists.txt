@@ -7,7 +7,7 @@ foreach(filepath ${SRCS_R})
 endforeach()
 
 add_library(lingmologger_qmlplugins SHARED ${SRCS})
-target_link_libraries(lingmologger_qmlplugins PRIVATE LingmoLogger Qt5::Core Qt5::Quick Qt5::Gui)
+target_link_libraries(lingmologger_qmlplugins PRIVATE LingmoLogger Qt6::Core Qt6::Quick Qt6::Gui)
 target_include_directories(lingmologger_qmlplugins PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 # qmlplugindump

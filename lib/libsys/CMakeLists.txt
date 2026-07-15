@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
 project(liblingmo)
 
@@ -15,11 +15,11 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(QT Core Gui Quick QuickControls2 Widgets DBus Xml Concurrent)
-find_package(Qt5 REQUIRED ${QT})
+set(QT Core Gui Qml Quick QuickControls2 Widgets DBus Xml Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS ${QT})
 
 # Get the installation directory from qmake
-get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
+get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
 if(NOT QT_QMAKE_EXECUTABLE)
     message(FATAL_ERROR "qmake is not found.")
 endif()

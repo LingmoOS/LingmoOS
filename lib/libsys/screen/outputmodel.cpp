@@ -425,19 +425,27 @@ bool OutputModel::setRotation(int outputIndex, KScreen::Output::Rotation rotatio
     if (output.ptr->rotation() == rotation) {
         return false;
     }
-    if(rotation == KScreen::Output::None)
-    {
-        QProcess::startDetached("xrandr --screen "+ QString::number(outputIndex) + " -o normal");
-    }else if(rotation == KScreen::Output::Left)
-    {
-        QProcess::startDetached("xrandr --screen "+ QString::number(outputIndex) + " -o left");
-    }else if(rotation == KScreen::Output::Inverted)
-    {
-        QProcess::startDetached("xrandr --screen "+ QString::number(outputIndex) + " -o inverted");
-    }else if(rotation == KScreen::Output::Right)
-    {
-        QProcess::startDetached("xrandr --screen "+ QString::number(outputIndex) + " -o right");
+    QString orientation;
+    switch (rotation) {
+    case KScreen::Output::None:
+        orientation = QStringLiteral("normal");
+        break;
+    case KScreen::Output::Left:
+        orientation = QStringLiteral("left");
+        break;
+    case KScreen::Output::Inverted:
+        orientation = QStringLiteral("inverted");
+        break;
+    case KScreen::Output::Right:
+        orientation = QStringLiteral("right");
+        break;
+    default:
+        Q_UNREACHABLE();
     }
+
+    QProcess::startDetached(QStringLiteral("xrandr"),
+                            {QStringLiteral("--screen"), QString::number(outputIndex),
+                             QStringLiteral("-o"), orientation});
     //output.ptr->setRotation(rotation);
 
     //QModelIndex index = createIndex(outputIndex, 0);

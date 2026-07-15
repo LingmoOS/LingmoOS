@@ -22,7 +22,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QDBusPendingCall>
-#include <QX11Info>
+#include "x11utils.h"
 #include <QProcess>
 #include <QDebug>
 
@@ -35,11 +35,11 @@ DimDisplayAction::DimDisplayAction(QObject *parent)
               "/Brightness",
               "com.lingmo.Brightness", QDBusConnection::sessionBus())
 {
-    if (QX11Info::isPlatformX11()) {
+    if (Lingmo::X11::isPlatformX11()) {
         // Disable a default timeout, if any
-        xcb_dpms_set_timeouts(QX11Info::connection(), 0, 0, 0);
+        xcb_dpms_set_timeouts(Lingmo::X11::connection(), 0, 0, 0);
 
-        XSetScreenSaver(QX11Info::display(), 0, 0, 0, 0);
+        XSetScreenSaver(Lingmo::X11::display(), 0, 0, 0, 0);
     }
 }
 

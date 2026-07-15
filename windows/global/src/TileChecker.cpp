@@ -5,12 +5,8 @@
 #include "TileChecker.h"
 #include "Window.h"
 
-#if QT_VERSION_MAJOR >= 6
 #include <effect/effecthandler.h>
 #include <utility>
-#else
-#include <kwineffects.h>
-#endif
 
 template<bool vertical>
 bool ShapeCorners::TileChecker::checkTiled_Recursive(double window_start, const uint8_t depth) {

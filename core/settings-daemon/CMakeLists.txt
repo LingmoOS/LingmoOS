@@ -39,25 +39,25 @@ set(HEADERS "")
 set(FORMS "")
 set(RESOURCES "")
 
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      brightness/com.lingmo.Brightness.xml
                      brightness/brightnessmanager.h BrightnessManager)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      theme/com.lingmo.Theme.xml
                      theme/thememanager.h ThemeManager)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      battery/com.lingmo.PrimaryBattery.xml
                      battery/battery.h Battery)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      language/com.lingmo.Language.xml
                      language/language.h Language)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      dock/com.lingmo.Dock.xml
                      dock/dock.h Dock)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      mouse/com.lingmo.Mouse.xml
                      mouse/mousemanager.h Mouse)
-qt5_add_dbus_adaptor(DBUS_SOURCES
+qt_add_dbus_adaptor(DBUS_SOURCES
                      touchpad/com.lingmo.Touchpad.xml
                      touchpad/touchpadmanager.h TouchpadManager)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
@@ -69,15 +69,14 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 target_link_libraries(${TARGET}
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::DBus
-        Qt5::X11Extras
-        Qt5::Xml
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::DBus
+        Qt6::Xml
         ${X11_LIBRARIES}
         X11::X11
         X11::Xi

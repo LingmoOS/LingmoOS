@@ -25,10 +25,10 @@ set(NETWORKMGR_SRCS
 add_library(lingmompris_qmlplugins SHARED ${NETWORKMGR_SRCS})
 
 target_link_libraries (lingmompris_qmlplugins
-    Qt5::Core
-    Qt5::Quick
-    Qt5::Gui
-    Qt5::DBus
+    Qt6::Core
+    Qt6::Quick
+    Qt6::Gui
+    Qt6::DBus
 )
 
 install(TARGETS lingmompris_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/Mpris)

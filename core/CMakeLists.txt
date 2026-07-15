@@ -12,8 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
-set(QT Core Gui Widgets Quick QuickControls2 DBus Xml X11Extras LinguistTools)
-find_package(Qt5 REQUIRED ${QT})
+set(QT Core Gui Widgets Quick QuickControls2 DBus Xml LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS ${QT})
+find_package(KF6 REQUIRED COMPONENTS CoreAddons IdleTime WindowSystem)
+
+# Qt 6 removed QtX11Extras; X11-only code uses the local native-interface adapter.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # find_package(LingmoUI REQUIRED)
 find_package(PkgConfig REQUIRED)
 

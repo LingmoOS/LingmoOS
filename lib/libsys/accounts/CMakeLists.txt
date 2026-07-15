@@ -11,10 +11,10 @@ set(ACCOUNTS_SRCS
     qmlplugins.cpp
 )
 
-qt5_add_dbus_interface(ACCOUNTS_SRCS
+qt6_add_dbus_interface(ACCOUNTS_SRCS
                        org.freedesktop.Accounts.User.xml
                        user_interface)
-qt5_add_dbus_interface(ACCOUNTS_SRCS
+qt6_add_dbus_interface(ACCOUNTS_SRCS
                        org.freedesktop.Accounts.xml
                        accounts_interface)
 
@@ -23,10 +23,10 @@ qt5_add_dbus_interface(ACCOUNTS_SRCS
 add_library(lingmoaccounts_qmlplugins SHARED ${ACCOUNTS_SRCS})
 
 target_link_libraries (lingmoaccounts_qmlplugins
-    Qt5::Core
-    Qt5::DBus
-    Qt5::Quick
-    Qt5::Gui
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Quick
+    Qt6::Gui
 )
 
 install(TARGETS lingmoaccounts_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/Accounts)

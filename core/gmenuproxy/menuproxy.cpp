@@ -22,7 +22,7 @@
 // #include <KSharedConfig>
 #include <KWindowSystem>
 
-#include <QX11Info>
+#include "x11utils.h"
 #include <xcb/xcb.h>
 
 #include "window.h"
@@ -48,7 +48,7 @@ static const QString s_appMenuGtkModule = QStringLiteral("appmenu-gtk-module");
 
 MenuProxy::MenuProxy()
     : QObject()
-    , m_xConnection(QX11Info::connection())
+    , m_xConnection(Lingmo::X11::connection())
     , m_serviceWatcher(new QDBusServiceWatcher(this))
     , m_gtk2RcWatch(new KDirWatch(this))
     , m_writeGtk2SettingsTimer(new QTimer(this))
@@ -192,11 +192,7 @@ void MenuProxy::writeGtk2Settings()
             continue;
         }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-      gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), QString::SkipEmptyParts);
-#else
-      gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), Qt::SkipEmptyParts);
-#endif
+gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), Qt::SkipEmptyParts);
 
         break;
     }

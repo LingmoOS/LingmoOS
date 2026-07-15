@@ -6,12 +6,8 @@
 #include "Config.h"
 
 #include <qconfig.h>
-#if QT_VERSION_MAJOR >= 6
 #include <effect/effecthandler.h>
 #include <utility>
-#else
-#include <kwineffects.h>
-#endif
 
 QWidget ShapeCorners::Window::m_widget {};
 
