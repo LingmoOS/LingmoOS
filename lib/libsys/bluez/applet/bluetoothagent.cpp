@@ -15,35 +15,13 @@
 #include <BluezQt/Device>
 #include <QDebug>
 
-#include <QThread>
-#include <QThreadStorage>
+#include <QRandomGenerator>
 
-#include <unistd.h>
+#include <limits>
 
 static int cRandom()
 {
-    static QThreadStorage<bool> initialized_threads;
-    if (!initialized_threads.localData()) {
-        unsigned int seed;
-        initialized_threads.setLocalData(true);
-        QFile urandom(QStringLiteral("/dev/urandom"));
-        bool opened = urandom.open(QIODevice::ReadOnly | QIODevice::Unbuffered);
-        if (!opened || urandom.read(reinterpret_cast<char *>(&seed), sizeof(seed)) != sizeof(seed)) {
-            // silence warnings about use of deprecated qsrand()/qrand()
-            // Porting to QRandomGenerator::global() instead might result in no new seed set for the generator behind qrand()
-            // which then might affect other places indirectly relying on this.
-            // So just keeping the old calls here, as this method is also deprecated and will disappear together with qsrand/qrand.
-            QT_WARNING_PUSH
-            QT_WARNING_DISABLE_CLANG("-Wdeprecated-declarations")
-            QT_WARNING_DISABLE_GCC("-Wdeprecated-declarations")
-            // No /dev/urandom... try something else.
-            qsrand(getpid());
-            seed = qrand() ^ time(nullptr) ^ reinterpret_cast<quintptr>(QThread::currentThread());
-        }
-        qsrand(seed);
-    }
-    return qrand();
-    QT_WARNING_POP
+    return QRandomGenerator::system()->bounded(std::numeric_limits<int>::max());
 }
 
 BluetoothAgent::BluetoothAgent(QObject *parent)
@@ -122,7 +100,7 @@ QString BluetoothAgent::getPin(BluezQt::DevicePtr device)
         m_fromDatabase = true;
         if (m_pin.startsWith(QLatin1String("max:"))) {
             m_fromDatabase = false;
-            int num = m_pin.rightRef(m_pin.length() - 4).toInt();
+            int num = m_pin.right(m_pin.length() - 4).toInt();
             m_pin = QString::number(cRandom()).left(num);
         }
 
