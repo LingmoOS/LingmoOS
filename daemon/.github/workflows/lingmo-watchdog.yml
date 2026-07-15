@@ -1,0 +1,58 @@
+# Generated Debian source-package upload workflow for lingmo-watchdog.
+# This file belongs in the root of the independent lingmo-watchdog source repository.
+name: Build and upload lingmo-watchdog
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  source-package:
+    name: Debian Testing source package
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:testing
+    steps:
+      - name: Install packaging tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            debhelper \
+            devscripts \
+            dpkg-dev \
+            git
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build Debian source package
+        run: dpkg-buildpackage -S -us -uc -d
+
+      - name: Collect source package files
+        run: |
+          mkdir -p source-package
+          find .. -maxdepth 1 -type f \
+            \( -name '*.dsc' -o -name '*.tar.*' \) \
+            -exec mv -t source-package {} +
+          test -n "$(find source-package -maxdepth 1 -type f -name '*.dsc' -print -quit)"
+
+      - name: Upload source package to OBS
+        if: github.event_name != 'pull_request'
+        uses: LingmoOS/action-upload-to-obs@0.0.4
+        with:
+          remove-old-sources: true
+          obs-package-name: 'lingmo-watchdog'
+          obs-project-name: 'home:LingmoOS:Lithium'
+          obs-user-name: ${{ secrets.OBS_USERNAME }}
+          obs-password: ${{ secrets.OBS_TOKEN }}
+          obs-instance-url: 'https://api.opensuse.org'
+          local-package-dir: './source-package'
