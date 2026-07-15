@@ -9,7 +9,7 @@
 #include "declarativeadapter.h"
 #include "declarativedevice.h"
 
-static int devicesCountDeclarativeAdapterFunction(QQmlListProperty<DeclarativeDevice> *property)
+static qsizetype devicesCountDeclarativeAdapterFunction(QQmlListProperty<DeclarativeDevice> *property)
 {
     Q_ASSERT(qobject_cast<DeclarativeAdapter *>(property->object));
     DeclarativeAdapter *adapter = static_cast<DeclarativeAdapter *>(property->object);
@@ -17,7 +17,7 @@ static int devicesCountDeclarativeAdapterFunction(QQmlListProperty<DeclarativeDe
     return adapter->m_devices.count();
 }
 
-static DeclarativeDevice *devicesAtDeclarativeAdapterFunction(QQmlListProperty<DeclarativeDevice> *property, int index)
+static DeclarativeDevice *devicesAtDeclarativeAdapterFunction(QQmlListProperty<DeclarativeDevice> *property, qsizetype index)
 {
     Q_ASSERT(qobject_cast<DeclarativeAdapter *>(property->object));
     DeclarativeAdapter *adapter = static_cast<DeclarativeAdapter *>(property->object);

@@ -23,6 +23,8 @@
 #include "networkmodel.h"
 #include "uiutils.h"
 
+#include <QRegularExpression>
+
 static NetworkManager::ConnectionSettings::ConnectionType convertType(AppletProxyModel::Type type)
 {
     switch (type) {
@@ -75,7 +77,7 @@ bool AppletProxyModel::filterAcceptsRow(int source_row, const QModelIndex &sourc
 
     // slaves are filtered-out when not searching for a connection (makes the state of search results clear)
     const bool isSlave = sourceModel()->data(index, NetworkModel::SlaveRole).toBool();
-    if (isSlave && filterRegExp().isEmpty()) {
+    if (isSlave && filterRegularExpression().isEmpty()) {
         return false;
     }
 
@@ -95,11 +97,11 @@ bool AppletProxyModel::filterAcceptsRow(int source_row, const QModelIndex &sourc
         return false;
     }
 
-    if (filterRegExp().isEmpty()) {
+    if (filterRegularExpression().isEmpty()) {
         return true;
     }
 
-    return sourceModel()->data(index, NetworkModel::ItemUniqueNameRole).toString().contains(filterRegExp());
+    return sourceModel()->data(index, NetworkModel::ItemUniqueNameRole).toString().contains(filterRegularExpression());
 }
 
 bool AppletProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
