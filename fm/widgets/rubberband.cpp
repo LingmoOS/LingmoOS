@@ -71,7 +71,7 @@ void RubberBand::setColor(QColor color)
     }
 }
 
-void RubberBand::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+void RubberBand::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     Q_UNUSED(oldGeometry);
 
@@ -79,5 +79,5 @@ void RubberBand::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeo
 
     update();
 
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
 }
