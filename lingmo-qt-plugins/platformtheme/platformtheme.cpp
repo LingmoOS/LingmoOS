@@ -12,14 +12,17 @@
 #include <QDebug>
 #include <QLibrary>
 #include <QStyleFactory>
+#include <QWindow>
 #include <QtQuickControls2/QQuickStyle>
 
 // Qt DBus
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
 #include <QDBusInterface>
 
 #include <KWindowSystem>
 
+#ifdef LINGMO_HAVE_DBUS_GLOBAL_MENU
 static const QByteArray s_x11AppMenuServiceNamePropertyName = QByteArrayLiteral("_KDE_NET_WM_APPMENU_SERVICE_NAME");
 static const QByteArray s_x11AppMenuObjectPathPropertyName = QByteArrayLiteral("_KDE_NET_WM_APPMENU_OBJECT_PATH");
 
@@ -35,6 +38,7 @@ static bool isDBusGlobalMenuAvailable()
     static bool dbusGlobalMenuAvailable = checkDBusGlobalMenuAvailable();
     return dbusGlobalMenuAvailable;
 }
+#endif
 
 void onDarkModeChanged()
 {

@@ -33,6 +33,7 @@ find_package(KF6KIO REQUIRED)
 find_package(KF6Solid REQUIRED)
 find_package(KF6WindowSystem REQUIRED)
 find_package(KF6Config REQUIRED)
+find_package(KF6XmlGui REQUIRED)
 
 add_library(lingmofilemanager_qmlplugins SHARED ${SCREEN_SRCS})
 
@@ -47,6 +48,7 @@ target_link_libraries (lingmofilemanager_qmlplugins
     KF6::Solid
     KF6::WindowSystem
     KF6::ConfigCore
+    KF6::XmlGui
 )
 
 install(TARGETS lingmofilemanager_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/FileManager)
