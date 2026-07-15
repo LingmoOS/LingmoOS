@@ -8,10 +8,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(PkgConfig REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets QuickControls2 DBus)
 find_package(KF6WindowSystem REQUIRED)
-find_package(Qt6ThemeSupport REQUIRED)
 
-# qdbusmenubar uses Qt private DBus menu classes.
-remove_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
+# Qt 6.8 on Debian does not ship the private QtThemeSupport library. Keep
+# the copied DBus global-menu backend for distributions that do, but disable
+# it by default so applications retain their normal in-window menu bars.
+option(BUILD_DBUS_GLOBAL_MENU "Build the private QtThemeSupport DBus global-menu backend" OFF)
+if(BUILD_DBUS_GLOBAL_MENU)
+    find_package(Qt6ThemeSupport REQUIRED)
+    # qdbusmenubar uses Qt private DBus menu classes.
+    remove_definitions(-DQT_NO_SIGNALS_SLOTS_KEYWORDS)
+endif()
 
 pkg_check_modules(XCB_EWMH REQUIRED xcb xcb-ewmh x11)
 
@@ -21,11 +27,16 @@ set(SRCS
     platformtheme.cpp
     hintsettings.h
     hintsettings.cpp
-    qdbusmenubar_p.h
-    qdbusmenubar.cpp
     x11integration.h
     x11integration.cpp
 )
+
+if(BUILD_DBUS_GLOBAL_MENU)
+    list(APPEND SRCS
+        qdbusmenubar_p.h
+        qdbusmenubar.cpp
+    )
+endif()
 
 list(APPEND SRCS
     systemtrayicon.h
@@ -72,6 +83,10 @@ target_compile_definitions(lingmoplatformtheme
         LIB_FM_QT_SONAME="${LIB_FM_QT_SONAME}"
 )
 
+if(BUILD_DBUS_GLOBAL_MENU)
+    target_compile_definitions(lingmoplatformtheme PRIVATE LINGMO_HAVE_DBUS_GLOBAL_MENU)
+endif()
+
 
 target_include_directories(lingmoplatformtheme PRIVATE "${QT_GUI_QPA_INCLUDE_DIR}")
 
@@ -83,8 +98,11 @@ target_link_libraries(lingmoplatformtheme PRIVATE
     Qt6::DBus
     KF6::WindowSystem
     ${XCB_LIBRARIES}
-    Qt6ThemeSupport::Qt6ThemeSupport
 )
+
+if(BUILD_DBUS_GLOBAL_MENU)
+    target_link_libraries(lingmoplatformtheme PRIVATE Qt6ThemeSupport::Qt6ThemeSupport)
+endif()
 
 
 # Execute "qmake -query QT_INSTALL_PLUGINS" to use the Qt installation's

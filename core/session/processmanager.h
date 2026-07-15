@@ -53,7 +53,7 @@ public:
      */
     void loadAutoStartProcess();
 
-    bool nativeEventFilter(const QByteArray & eventType, void * message, long * result) override;
+    bool nativeEventFilter(const QByteArray & eventType, void * message, qintptr * result) override;
 
 private:
     Application *m_app;

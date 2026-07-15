@@ -27,10 +27,12 @@ set(SCREEN_SRCS
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui DBus Quick LinguistTools)
-find_package(KF6 REQUIRED COMPONENTS KIO)
-find_package(KF6 REQUIRED COMPONENTS Solid)
-find_package(KF6 REQUIRED COMPONENTS WindowSystem)
-find_package(KF6 REQUIRED COMPONENTS Config)
+# Look up each Framework directly: Debian packages ship component configs,
+# rather than a monolithic KF6Config.cmake package.
+find_package(KF6KIO REQUIRED)
+find_package(KF6Solid REQUIRED)
+find_package(KF6WindowSystem REQUIRED)
+find_package(KF6Config REQUIRED)
 
 add_library(lingmofilemanager_qmlplugins SHARED ${SCREEN_SRCS})
 

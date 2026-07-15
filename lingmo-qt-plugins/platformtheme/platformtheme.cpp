@@ -1,6 +1,8 @@
 #include "platformtheme.h"
 #include "x11integration.h"
+#ifdef LINGMO_HAVE_DBUS_GLOBAL_MENU
 #include "qdbusmenubar_p.h"
+#endif
 
 #include <QApplication>
 #include <QFont>
@@ -126,6 +128,7 @@ const QFont* PlatformTheme::font(Font type) const
 
 QPlatformMenuBar *PlatformTheme::createPlatformMenuBar() const
 {
+#ifdef LINGMO_HAVE_DBUS_GLOBAL_MENU
     if (isDBusGlobalMenuAvailable()) {
         auto *menu = new QDBusMenuBar();
 
@@ -160,8 +163,13 @@ QPlatformMenuBar *PlatformTheme::createPlatformMenuBar() const
     }
 
     return nullptr;
-}
 
+#else
+    // The QtThemeSupport implementation is private and not packaged by
+    // Debian 13. Returning nullptr keeps application menu bars local.
+    return nullptr;
+#endif
+}
 void PlatformTheme::onFontChanged()
 {
     QFont font;

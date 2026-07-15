@@ -4,7 +4,7 @@
 #pragma once
 
 #include <QGuiApplication>
-#include <QNativeInterface>
+#include <QtGui/qnativeinterface.h>
 #include <QString>
 
 #include <X11/Xlib.h>

@@ -191,7 +191,7 @@ void ProcessManager::loadAutoStartProcess()
     m_userAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list, false);
 }
 
-bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result)
 {
     if (eventType != "xcb_generic_event_t") // We only want to handle XCB events
         return false;
