@@ -12,12 +12,6 @@
 #include <QStyleFactory>
 #include <QtQuickControls2/QQuickStyle>
 
-// Qt Private
-#include <private/qicon_p.h>
-#include <private/qiconloader_p.h>
-#include <private/qwindow_p.h>
-#include <private/qguiapplication_p.h>
-
 // Qt DBus
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -39,8 +33,6 @@ static bool isDBusGlobalMenuAvailable()
     static bool dbusGlobalMenuAvailable = checkDBusGlobalMenuAvailable();
     return dbusGlobalMenuAvailable;
 }
-
-extern void updateXdgIconSystemTheme();
 
 void onDarkModeChanged()
 {
@@ -185,8 +177,8 @@ void PlatformTheme::onFontChanged()
 
 void PlatformTheme::onIconThemeChanged()
 {
-    QIconLoader::instance()->updateSystemTheme();
-    updateXdgIconSystemTheme();
+    QIcon::setThemeSearchPaths(m_hints->xdgIconThemePaths());
+    QIcon::setThemeName(m_hints->hint(QPlatformTheme::SystemIconThemeName).toString());
 
     QEvent update(QEvent::UpdateRequest);
     for (QWindow *window : qGuiApp->allWindows()) {

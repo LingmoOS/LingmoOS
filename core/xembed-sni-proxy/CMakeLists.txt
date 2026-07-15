@@ -40,7 +40,7 @@ find_package(XCB
         IMAGE
 )
 
-find_package(KF6 REQUIRED COMPONENTS WindowSystem)
+find_package(KF6WindowSystem REQUIRED)
 
 set(XCB_LIBS
     XCB::XCB

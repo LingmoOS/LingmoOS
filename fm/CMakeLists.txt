@@ -27,10 +27,10 @@ execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_QML
 
 # find_package(LingmoUI REQUIRED)
 
-find_package(KF6 REQUIRED COMPONENTS KIO)
-find_package(KF6 REQUIRED COMPONENTS Solid)
-find_package(KF6 REQUIRED COMPONENTS WindowSystem)
-find_package(KF6 REQUIRED COMPONENTS Config)
+find_package(KF6KIO REQUIRED)
+find_package(KF6Solid REQUIRED)
+find_package(KF6WindowSystem REQUIRED)
+find_package(KF6Config REQUIRED)
 
 qt_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.FileManager.xml

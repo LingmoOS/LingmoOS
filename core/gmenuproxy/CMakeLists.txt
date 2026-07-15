@@ -3,8 +3,8 @@ list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 
 find_package(AppMenuGtkModule)
-find_package(KF6 REQUIRED COMPONENTS WindowSystem)
-find_package(KF6 REQUIRED COMPONENTS CoreAddons)
+find_package(KF6WindowSystem REQUIRED)
+find_package(KF6CoreAddons REQUIRED)
 set_package_properties(AppMenuGtkModule PROPERTIES TYPE RUNTIME)
 
 add_definitions(-DQT_NO_CAST_TO_ASCII

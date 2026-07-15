@@ -20,7 +20,7 @@ set(SRCS main.cpp
 qt_add_dbus_adaptor(DBUS_SOURCES com.lingmo.Notification.xml application.h Application)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
-find_package(KF6 REQUIRED COMPONENTS WindowSystem)
+find_package(KF6WindowSystem REQUIRED)
 
 add_executable(lingmo-notificationd ${SRCS} ${DBUS_SOURCES})
 

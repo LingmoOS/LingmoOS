@@ -6,8 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
-find_package(Qt6 REQUIRED COMPONENTS Core Gui GuiPrivate Widgets QuickControls2 DBus)
-find_package(Qt6XdgIconLoader REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets QuickControls2 DBus)
 find_package(KF6WindowSystem REQUIRED)
 find_package(Qt6ThemeSupport REQUIRED)
 
@@ -46,6 +45,25 @@ qt_add_dbus_adaptor(SRCS
     StatusNotifierItem
 )
 
+get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+if(NOT QT_QMAKE_EXECUTABLE)
+    message(FATAL_ERROR "Qt 6 qmake is not found.")
+endif()
+
+# Debian ships QPA headers in qt6-base-private-dev but does not export a Qt6::GuiPrivate CMake target.
+execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_HEADERS
+    OUTPUT_VARIABLE QT_HEADERS_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_VERSION
+    OUTPUT_VARIABLE QT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+set(QT_GUI_QPA_INCLUDE_DIR "${QT_HEADERS_DIR}/QtGui/${QT_VERSION}/QtGui")
+if(NOT EXISTS "${QT_GUI_QPA_INCLUDE_DIR}/qpa/qplatformtheme.h")
+    message(FATAL_ERROR "Qt 6 QPA headers are missing; install qt6-base-private-dev.")
+endif()
+
 add_library(lingmoplatformtheme MODULE ${SRCS})
 
 target_compile_definitions(lingmoplatformtheme
@@ -55,23 +73,19 @@ target_compile_definitions(lingmoplatformtheme
 )
 
 
+target_include_directories(lingmoplatformtheme PRIVATE "${QT_GUI_QPA_INCLUDE_DIR}")
+
 target_link_libraries(lingmoplatformtheme PRIVATE
-    Qt6::GuiPrivate
+    Qt6::Gui
     Qt6::Widgets
     Qt6::QuickControls2
     Qt6::Core
     Qt6::DBus
-    Qt6XdgIconLoader
     KF6::WindowSystem
     ${XCB_LIBRARIES}
     Qt6ThemeSupport::Qt6ThemeSupport
 )
 
-
-get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
-if(NOT QT_QMAKE_EXECUTABLE)
-    message(FATAL_ERROR "Qt 6 qmake is not found.")
-endif()
 
 # Execute "qmake -query QT_INSTALL_PLUGINS" to use the Qt installation's
 # platform-theme plugin location.

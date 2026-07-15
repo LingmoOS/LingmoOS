@@ -15,8 +15,10 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 
-find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core CorePrivate DBus Widgets)
-find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS Config ConfigWidgets KCMUtils)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core DBus Widgets)
+find_package(KF6Config REQUIRED)
+find_package(KF6ConfigWidgets REQUIRED)
+find_package(KF6KCMUtils REQUIRED)
 find_package(KWin REQUIRED COMPONENTS kwin)
 find_package(KWinDBusInterface CONFIG REQUIRED)
 

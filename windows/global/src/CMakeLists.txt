@@ -15,7 +15,6 @@ kconfig_add_kcfg_files(effect_SRCS Config.kcfgc)
 kcoreaddons_add_plugin(kwin4_effect_shapecorners SOURCES ${effect_SRCS} INSTALL_NAMESPACE "kwin/effects/plugins/")
 
 target_link_libraries(kwin4_effect_shapecorners
-    Qt6::CorePrivate
     Qt6::DBus
     KF6::ConfigGui
     KWin::kwin

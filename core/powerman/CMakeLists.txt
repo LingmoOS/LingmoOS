@@ -4,7 +4,7 @@ set(TARGET lingmo-powerman)
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
-find_package(KF6 REQUIRED COMPONENTS IdleTime)
+find_package(KF6IdleTime REQUIRED)
 find_package(X11)
 find_package(XCB
     REQUIRED COMPONENTS
