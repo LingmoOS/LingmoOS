@@ -14,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
 set(QT Core Gui Widgets Quick QuickControls2 DBus Xml LinguistTools)
 find_package(Qt6 REQUIRED COMPONENTS ${QT})
-# Find individual KF6 package configurations; OBS does not provide ECM's FindKF6.cmake module.
+# Find each framework's package configuration directly instead of using the aggregate KF6 lookup.
 find_package(KF6CoreAddons REQUIRED)
 find_package(KF6IdleTime REQUIRED)
 find_package(KF6WindowSystem REQUIRED)

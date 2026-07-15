@@ -9,7 +9,7 @@ set(SCREEN_SRCS
     screen.cpp
 )
 
-# Find the framework directly instead of requiring ECM's optional FindKF6.cmake module.
+# Find the framework's package configuration directly instead of using the aggregate KF6 lookup.
 find_package(KF6CoreAddons REQUIRED)
 find_package(KF6Screen REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Test Sensors)
