@@ -1331,6 +1331,7 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
         if (m_isDesktop) {
             menu->addAction(refresh);  // 添加到空白区域的右键菜单
         }
+
         menu->addAction(m_actionCollection.action("paste"));
         menu->addAction(selectAll);
         if (m_actionCollection.action("terminal")->isVisible()) {
@@ -1342,6 +1343,7 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
             menu->addAction(m_actionCollection.action("changeBackground"));
             menu->addAction(m_actionCollection.action("iconSizeMenu"));
             menu->addAction(m_actionCollection.action("sortBy"));
+            menu->addAction(m_actionCollection.action("displaySettings"));
         }
 
         menu->addSeparator();
@@ -1591,6 +1593,11 @@ void FolderModel::openInTerminal()
 void FolderModel::openChangeWallpaperDialog()
 {
     QProcess::startDetached("lingmo-settings", QStringList() << "-m" << "background");
+}
+
+void FolderModel::openDisplaySettings()
+{
+    QProcess::startDetached("lingmo-settings", QStringList() << "-m" << "display");
 }
 
 void FolderModel::openDeleteDialog()
@@ -2044,6 +2051,10 @@ void FolderModel::createActions()
     changeBackground->setIcon(QIcon::fromTheme("preferences-desktop-wallpaper"));
     QObject::connect(changeBackground, &QAction::triggered, this, &FolderModel::openChangeWallpaperDialog);
 
+    QAction *displaySettings = new QAction(tr("Display Settings"), this);
+    displaySettings->setIcon(QIcon::fromTheme("display"));
+    QObject::connect(displaySettings, &QAction::triggered, this, &FolderModel::openDisplaySettings);
+
     QAction *restore = new QAction(tr("Restore"), this);
     restore->setIcon(QIcon::fromTheme("edit-undo"));
     QObject::connect(restore, &QAction::triggered, this, &FolderModel::restoreFromTrash);
@@ -2157,6 +2168,7 @@ void FolderModel::createActions()
     m_actionCollection.addAction(QStringLiteral("wallpaperLogin"), wallpaperLogin);
     m_actionCollection.addAction(QStringLiteral("properties"), properties);
     m_actionCollection.addAction(QStringLiteral("changeBackground"), changeBackground);
+    m_actionCollection.addAction(QStringLiteral("displaySettings"), displaySettings);
     m_actionCollection.addAction(QStringLiteral("restore"), restore);
     m_actionCollection.addAction(QStringLiteral("showHidden"), showHidden);
     m_actionCollection.addAction(QStringLiteral("openInNewWindow"), openInNewWindow);

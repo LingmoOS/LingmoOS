@@ -219,6 +219,7 @@ public:
     Q_INVOKABLE void openPropertiesDialog();
     Q_INVOKABLE void openInTerminal();
     Q_INVOKABLE void openChangeWallpaperDialog();
+    Q_INVOKABLE void openDisplaySettings();
     Q_INVOKABLE void openDeleteDialog();
     Q_INVOKABLE void openInNewWindow(const QString &url = QString());
 

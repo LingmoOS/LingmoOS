@@ -9,16 +9,13 @@
 #include <QObject>
 #include <QPointer>
 #include <QQmlParserStatus>
+#include <QQuickItem>
+
+#include "../pulseaudio.h"
+#include "../pulseobject.h"
 
 class QAbstractItemModel;
 class QMenu;
-class QQuickItem;
-
-namespace QPulseAudio
-{
-class CardModel;
-class PulseObject;
-}
 
 class ListItemMenu : public QObject, public QQmlParserStatus
 {
