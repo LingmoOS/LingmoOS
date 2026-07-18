@@ -7,6 +7,19 @@
 #include <QString>
 
 #include <X11/Xlib.h>
+// Undefine X11 macros that conflict with Qt6 enum values
+#undef None
+#undef Bool
+#undef Status
+#undef Success
+#undef Above
+#undef Below
+#undef Bottom
+#undef Top
+#undef Unsorted
+#undef Normal
+#undef Index
+
 #include <xcb/xcb.h>
 
 namespace Lingmo::X11

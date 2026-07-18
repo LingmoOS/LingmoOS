@@ -22,7 +22,7 @@
 
 #include "x11utils.h"
 #include <KWindowSystem>
-#include <KWindowSystem/NETWM>
+#include <netwm.h>
 
 #include "daemon-helper.h"
 

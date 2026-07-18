@@ -26,7 +26,7 @@ class SNIProxy : public QObject
     Q_PROPERTY(QString Category READ Category)
     Q_PROPERTY(QString Id READ Id)
     Q_PROPERTY(QString Title READ Title)
-    Q_PROPERTY(QString Status READ Status)
+    Q_PROPERTY(QString itemStatus READ itemStatus)
     Q_PROPERTY(int WindowId READ WindowId)
     Q_PROPERTY(bool ItemIsMenu READ ItemIsMenu)
     Q_PROPERTY(KDbusImageVector IconPixmap READ IconPixmap)
@@ -57,9 +57,9 @@ public:
 
     /**
      * @return The status of this item
-     * @see Status
+     * @see itemStatus
      */
-    QString Status() const;
+    QString itemStatus() const;
 
     /**
      * @return The id of the main window of the application that controls the item

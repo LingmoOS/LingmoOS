@@ -23,6 +23,7 @@
 #include <QBitmap>
 
 #include <KWindowSystem>
+#include <KWindowInfo>
 #include <netwm.h>
 
 #include "statusnotifieritemadaptor.h"
@@ -450,7 +451,7 @@ bool SNIProxy::ItemIsMenu() const
     return false;
 }
 
-QString SNIProxy::Status() const
+QString SNIProxy::itemStatus() const
 {
     return QStringLiteral("Active");
 }
