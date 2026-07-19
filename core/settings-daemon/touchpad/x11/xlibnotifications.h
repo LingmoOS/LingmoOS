@@ -10,20 +10,6 @@
 #include <QSocketNotifier>
 
 #include <X11/Xlib.h>
-// Undefine X11 macros that conflict with Qt6 enum values
-#undef None
-#undef Bool
-#undef Status
-#undef Success
-#undef Above
-#undef Always
-#undef Below
-#undef Bottom
-#undef Top
-#undef Unsorted
-#undef Normal
-#undef Index
-
 #include "x11utils.h"
 #include <xcb/xcb.h>
 

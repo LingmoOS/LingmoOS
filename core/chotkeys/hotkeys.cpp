@@ -2,19 +2,16 @@
 
 #include <QApplication>
 #include <QKeySequence>
-#include "x11utils.h"
 #include <QTimer>
 #include <QDebug>
 
-// #include <KKeyServer>
-// #include <NETWM>
-
-// XCB & X11
+// XCB & X11 — must come before any Qt headers to avoid macro conflicts
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 #include <xcb/xcb_keysyms.h>
 
-#include <X11/XKBlib.h>
+#include "x11utils.h"
 
 Hotkeys::Hotkeys(QObject *parent)
     : QObject(parent)

@@ -18,8 +18,6 @@ class QTimer;
 
 class KDirWatch;
 
-class Window;
-
 class MenuProxy : public QObject
 {
     Q_OBJECT

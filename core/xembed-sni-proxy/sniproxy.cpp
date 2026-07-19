@@ -15,6 +15,19 @@
 #include "debug.h"
 #include "xcbutils.h"
 
+// Undefine X11 macros that conflict with Qt6 enum values.
+// Must come after all X11 headers (via xcbutils.h) and before Qt headers.
+#undef None
+#undef Always
+#undef Above
+#undef Below
+#undef Bottom
+#undef Top
+#undef Normal
+#undef Unsorted
+#undef Index
+#undef Success
+
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>

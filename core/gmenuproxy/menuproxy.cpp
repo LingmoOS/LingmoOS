@@ -21,6 +21,8 @@
 #include <KDirWatch>
 // #include <KSharedConfig>
 #include <KWindowSystem>
+#include <KWindowInfo>
+#include <netwm.h>
 
 #include "x11utils.h"
 #include <xcb/xcb.h>
