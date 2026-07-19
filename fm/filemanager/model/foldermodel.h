@@ -40,8 +40,6 @@
 #include <KDirModel>
 #include <KDirWatch>
 #include <KActionCollection>
-#include <KService>
-#include <KServiceTypeTrader>
 #include <KRun>
 #include <KFileItemActions>
 

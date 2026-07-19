@@ -152,7 +152,6 @@ void ProcessManager::loadAutoStartProcess()
         const QStringList fileNames = d.entryList(QStringList() << QStringLiteral("*.desktop"));
         for (const QString &file : fileNames) {
             QSettings desktop(d.absoluteFilePath(file), QSettings::IniFormat);
-            desktop.setIniCodec("UTF-8");
             desktop.beginGroup("Desktop Entry");
 
             // Ignore files the require a specific desktop environment

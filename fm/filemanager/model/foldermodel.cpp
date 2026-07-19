@@ -81,8 +81,6 @@
 #include <KFileItemListProperties>
 #include <KDesktopFile>
 
-// KService
-#include <KServiceTypeTrader>
 #include <KRun>
 
 

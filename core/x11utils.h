@@ -13,6 +13,7 @@
 #undef Status
 #undef Success
 #undef Above
+#undef Always
 #undef Below
 #undef Bottom
 #undef Top
