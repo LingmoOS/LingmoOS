@@ -6,19 +6,35 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
+// X11 headers first to avoid macro conflicts with Qt6
+#include "x11utils.h"
+#include <xcb/xcb_atom.h>
+#include <xcb/xcb_event.h>
+#include "xcbutils.h"
+
+// Undefine X11 macros that conflict with Qt6 enum values
+#undef None
+#undef Bool
+#undef Status
+#undef Success
+#undef Always
+#undef Above
+#undef Below
+#undef Bottom
+#undef Top
+#undef Normal
+#undef Unsorted
+#undef Index
+
+// Now include Qt and project headers
 #include "sniproxy.h"
 
 #include <algorithm>
-#include <xcb/xcb_atom.h>
-#include <xcb/xcb_event.h>
-
 #include "debug.h"
-#include "xcbutils.h"
 
 #include <QGuiApplication>
 #include <QScreen>
 #include <QTimer>
-#include "x11utils.h"
 
 #include <QBitmap>
 

@@ -21,7 +21,7 @@
  * Implementation of adaptor class DbusmenuAdaptor
  */
 
-DbusmenuAdaptor::DbusmenuAdaptor(Window *parent)
+DbusmenuAdaptor::DbusmenuAdaptor(AppMenuWindow *parent)
     : QDBusAbstractAdaptor(parent)
 {
     // constructor

@@ -50,7 +50,7 @@ private:
     void writeWindowProperty(WId id, const QByteArray &name, const QByteArray &value);
     xcb_atom_t getAtom(const QByteArray &name);
 
-    QHash<WId, Window *> m_windows;
+    QHash<WId, AppMenuWindow *> m_windows;
 
     QDBusServiceWatcher *m_serviceWatcher;
 

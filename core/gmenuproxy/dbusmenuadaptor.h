@@ -82,11 +82,11 @@ class DbusmenuAdaptor: public QDBusAbstractAdaptor
 "  </interface>\n"
         "")
 public:
-    DbusmenuAdaptor(Window *parent);
+    DbusmenuAdaptor(AppMenuWindow *parent);
     virtual ~DbusmenuAdaptor();
 
-    inline Window *parent() const
-    { return static_cast<Window *>(QObject::parent()); }
+    inline AppMenuWindow *parent() const
+    { return static_cast<AppMenuWindow *>(QObject::parent()); }
 
 public: // PROPERTIES
     Q_PROPERTY(QString Status READ status)

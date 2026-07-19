@@ -290,7 +290,7 @@ void MenuProxy::onWindowAdded(WId id)
         return;
     }
 
-    Window *window = new Window(serviceName);
+    AppMenuWindow *window = new AppMenuWindow(serviceName);
     window->setWinId(id);
     window->setApplicationObjectPath(applicationObjectPath);
     window->setUnityObjectPath(unityObjectPath);
@@ -299,13 +299,13 @@ void MenuProxy::onWindowAdded(WId id)
     window->setMenuBarObjectPath(menuBarObjectPath);
     m_windows.insert(id, window);
 
-    connect(window, &Window::requestWriteWindowProperties, this, [this, window] {
+    connect(window, &AppMenuWindow::requestWriteWindowProperties, this, [this, window] {
         Q_ASSERT(!window->proxyObjectPath().isEmpty());
 
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuServiceName, s_ourServiceName.toUtf8());
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuObjectPath, window->proxyObjectPath().toUtf8());
     });
-    connect(window, &Window::requestRemoveWindowProperties, this, [this, window] {
+    connect(window, &AppMenuWindow::requestRemoveWindowProperties, this, [this, window] {
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuServiceName, QByteArray());
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuObjectPath, QByteArray());
     });

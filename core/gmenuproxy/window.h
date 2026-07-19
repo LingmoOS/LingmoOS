@@ -22,7 +22,7 @@ class QDBusVariant;
 class Actions;
 class Menu;
 
-class Window : public QObject, protected QDBusContext
+class AppMenuWindow : public QObject, protected QDBusContext
 {
     Q_OBJECT
 
@@ -31,8 +31,8 @@ class Window : public QObject, protected QDBusContext
     Q_PROPERTY(uint Version READ version)
 
 public:
-    Window(const QString &serviceName);
-    ~Window() override;
+    explicit AppMenuWindow(const QString &serviceName);
+    ~AppMenuWindow() override;
 
     void init();
 
