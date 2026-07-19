@@ -8,15 +8,30 @@
 
 #pragma once
 
+// X11/xcb headers must come before Qt to avoid macro conflicts
+#include <xcb/xcb.h>
+#include <xcb/xcb_image.h>
+
+// Undefine X11 macros that conflict with Qt6 enum values
+#undef None
+#undef Bool
+#undef Status
+#undef Success
+#undef Always
+#undef Above
+#undef Below
+#undef Bottom
+#undef Top
+#undef Normal
+#undef Unsorted
+#undef Index
+
 #include <QDBusArgument>
 #include <QDBusConnection>
 #include <QDBusObjectPath>
 #include <QObject>
 #include <QPixmap>
 #include <QPoint>
-
-#include <xcb/xcb.h>
-#include <xcb/xcb_image.h>
 
 #include "snidbus.h"
 
