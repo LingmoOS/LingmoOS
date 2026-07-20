@@ -68,7 +68,6 @@
 #include <QQmlContext>
 
 // KIO
-#include <KLocalizedString>
 #include <KIO/CopyJob>
 #include <KIO/Job>
 #include <KIO/MkdirJob>
@@ -1132,8 +1131,8 @@ void FolderModel::moveSelectedToTrash()
     // KF6 removed askDeleteConfirmation from KJobUiDelegate; use QMessageBox directly
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setWindowTitle(i18n("Move to Trash"));
-    msgBox.setText(i18n("Do you want to move the selected files to the trash?"));
+    msgBox.setWindowTitle(tr("Move to Trash"));
+    msgBox.setText(tr("Do you want to move the selected files to the trash?"));
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::No);
 
