@@ -2,16 +2,19 @@
 
 #include <QApplication>
 #include <QKeySequence>
+#include <QtGui/private/qtx11extras_p.h>
 #include <QTimer>
 #include <QDebug>
 
-// XCB & X11 — must come before any Qt headers to avoid macro conflicts
+// #include <KKeyServer>
+// #include <NETWM>
+
+// XCB & X11
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <X11/XKBlib.h>
 #include <xcb/xcb_keysyms.h>
 
-#include "x11utils.h"
+#include <X11/XKBlib.h>
 
 Hotkeys::Hotkeys(QObject *parent)
     : QObject(parent)
@@ -58,7 +61,7 @@ bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, qint
 
 //        // Keyboard needs to be ungrabed after XGrabKey() activates the grab,
 //        // otherwise it becomes frozen.
-//        xcb_connection_t *c = Lingmo::X11::connection();
+//        xcb_connection_t *c = QX11Info::connection();
 //        xcb_void_cookie_t cookie = xcb_ungrab_keyboard_checked(c, XCB_TIME_CURRENT_TIME);
 //        xcb_flush(c);
 
@@ -74,8 +77,8 @@ bool Hotkeys::nativeEventFilter(const QByteArray &eventType, void *message, qint
 //        }
 
 //        // All that work for this hey... argh...
-//        if (NET::timestampCompare(keyEvent->time, Lingmo::X11::appTime()) > 0) {
-//            Lingmo::X11::setAppTime(keyEvent->time);
+//        if (NET::timestampCompare(keyEvent->time, QX11Info::appTime()) > 0) {
+//            QX11Info::setAppTime(keyEvent->time);
 //        }
 
 //        bool found = false;
@@ -145,17 +148,17 @@ void Hotkeys::registerKey(quint32 keycode)
 
 void Hotkeys::registerKey(quint32 key, quint32 mods)
 {
-    xcb_grab_key(Lingmo::X11::connection(),
+    xcb_grab_key(QX11Info::connection(),
                  1,
-                 Lingmo::X11::appRootWindow(),
+                 QX11Info::appRootWindow(),
                  mods,
                  key,
                  XCB_GRAB_MODE_ASYNC,
                  XCB_GRAB_MODE_ASYNC);
 
-    xcb_grab_key(Lingmo::X11::connection(),
+    xcb_grab_key(QX11Info::connection(),
                  1,
-                 Lingmo::X11::appRootWindow(),
+                 QX11Info::appRootWindow(),
                  mods | XCB_MOD_MASK_2,
                  key,
                  XCB_GRAB_MODE_ASYNC,
@@ -164,7 +167,7 @@ void Hotkeys::registerKey(quint32 key, quint32 mods)
 
 void Hotkeys::unregisterKey(quint32 key, quint32 mods)
 {
-    xcb_ungrab_key(Lingmo::X11::connection(), key, Lingmo::X11::appRootWindow(), mods);
+    xcb_ungrab_key(QX11Info::connection(), key, QX11Info::appRootWindow(), mods);
 }
 
 quint32 Hotkeys::nativeKeycode(Qt::Key k)
@@ -241,7 +244,7 @@ quint32 Hotkeys::nativeKeycode(Qt::Key k)
             key = 0;
         }
     }
-    return XKeysymToKeycode(Lingmo::X11::display(), key);
+    return XKeysymToKeycode(QX11Info::display(), key);
 }
 
 quint32 Hotkeys::nativeModifiers(Qt::KeyboardModifiers m)

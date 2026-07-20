@@ -4,7 +4,7 @@ set(TARGET lingmo-powerman)
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
-find_package(KF6IdleTime REQUIRED)
+find_package(KF6IdleTime)
 find_package(X11)
 find_package(XCB
     REQUIRED COMPONENTS
@@ -28,13 +28,13 @@ set(SOURCES
     cpu/cpumanagement.cpp
 )
 
-qt_add_dbus_adaptor(DBUS_SOURCES
+qt6_add_dbus_adaptor(DBUS_SOURCES
                      cpu/com.lingmo.CPUManagement.xml
                      cpu/cpumanagement.h CPUManagement)
-qt_add_dbus_adaptor(DBUS_SOURCES
+qt6_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.PowerManager.xml
                      application.h Application)
-qt_add_dbus_interface(DBUS_SOURCES org.freedesktop.ScreenSaver.xml screenlocker_interface)
+qt6_add_dbus_interface(DBUS_SOURCES org.freedesktop.ScreenSaver.xml screenlocker_interface)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
@@ -44,6 +44,8 @@ target_link_libraries(${TARGET}
         Qt6::Widgets
         Qt6::Quick
         Qt6::DBus
+        Qt6::GuiPrivate 
+
         KF6::IdleTime
         ${XCB_LIBS}
         ${X11_LIBRARIES}

@@ -15,14 +15,13 @@
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
 #include "notificationserver.h"
-QT_BEGIN_NAMESPACE
-class QByteArray;
-template<class T> class QList;
-template<class Key, class Value> class QMap;
-class QString;
-class QStringList;
-class QVariant;
-QT_END_NAMESPACE
+
+#include <QByteArray>
+#include <QList>
+#include <QMap>
+#include <QString>
+#include <QStringList>
+#include <QVariant>
 
 /*
  * Adaptor class for interface org.freedesktop.Notifications

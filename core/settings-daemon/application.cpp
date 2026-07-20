@@ -45,8 +45,6 @@ Application::Application(int &argc, char **argv)
     , m_mouse(new Mouse)
     , m_touchpad(new TouchpadManager)
     , m_defaultApps(new DefaultApplications)
-    //
-   , m_kwinTimer(new QTimer(this))
 {
     initTrash();
 
@@ -54,11 +52,6 @@ Application::Application(int &argc, char **argv)
     // connect to D-Bus and register as an object:
     QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Settings"));
 
-//
-//   m_kwinTimer->setSingleShot(false);
-//   m_kwinTimer->setInterval(50);
-//   connect(m_kwinTimer, &QTimer::timeout, this, &Application::initKWin);
-//   m_kwinTimer->start();
 
     // Translations
     QLocale locale;
@@ -114,28 +107,3 @@ void Application::initTrash()
         ::rmdir(trashDir);
     }
 }
-
-// void Application::initKWin()
-// {
-//    QDBusInterface effect("org.kde.KWin", "/Effects", "org.kde.kwin.Effects",
-//                           QDBusConnection::sessionBus());
-
-//    if (effect.isValid() && !effect.lastError().isValid()) {
-//        // KWin
-//        effect.call("loadEffect", "kwin4_effect_dialogparent");
-
-//        effect.call("unloadEffect", "kwin4_effect_fadingpopups");
-//        effect.call("unloadEffect", "kwin4_effect_fade");
-//        effect.call("unloadEffect", "kwin4_effect_scale");
-//        effect.call("unloadEffect", "kwin4_effect_grayscale");
-//        effect.call("unloadEffect", "kwin4_effect_squash");
-//        effect.call("unloadEffect", "kwin4_effect_translucency");
-//        effect.call("unloadEffect", "magiclamp");
-
-//        effect.call("loadEffect", "lingmo_popups");
-//        effect.call("loadEffect", "lingmo_scale");
-//        effect.call("loadEffect", "lingmo_squash");
-
-//        m_kwinTimer->stop();
-//    }
-// }

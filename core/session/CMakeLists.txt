@@ -19,13 +19,13 @@ set(SOURCES
         daemon-helper.h
 )
 
-qt_add_dbus_adaptor(DBUS_SOURCES
+qt6_add_dbus_adaptor(DBUS_SOURCES
                      com.lingmo.Session.xml
                      application.h Application
                      sessionadaptor SessionAdaptor)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
-find_package(KF6WindowSystem REQUIRED)
+find_package(KF6WindowSystem)
 find_package(Threads)
 
 add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
@@ -35,9 +35,10 @@ target_link_libraries(${TARGET}
         Qt6::Widgets
         Qt6::Quick
         Qt6::DBus
+        Qt6::GuiPrivate
         KF6::WindowSystem
         ${CMAKE_THREAD_LIBS_INIT}
 )
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
-# install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)
+install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)

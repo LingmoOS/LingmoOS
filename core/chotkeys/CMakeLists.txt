@@ -1,7 +1,6 @@
 find_package(ECM REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets DBus)
 find_package(XCB MODULE REQUIRED COMPONENTS XCB KEYSYMS)
 find_package(X11)
 
@@ -22,6 +21,7 @@ target_link_libraries(lingmo-chotkeys
     Qt6::Core
     Qt6::Widgets
     Qt6::DBus
+    Qt6::GuiPrivate
     ${XCB_LIBS}
     ${X11_LIBRARIES}
     XCB::KEYSYMS

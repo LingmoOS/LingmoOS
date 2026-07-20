@@ -4,27 +4,27 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.qml" line="74"/>
+        <location filename="../main.qml" line="240"/>
         <source>Shutdown</source>
         <translation>כיבוי</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="82"/>
+        <location filename="../main.qml" line="248"/>
         <source>Reboot</source>
         <translation>הפעל מחדש</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="90"/>
+        <location filename="../main.qml" line="256"/>
         <source>Logout</source>
         <translation>התנתק</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="98"/>
+        <location filename="../main.qml" line="264"/>
         <source>Lock screen</source>
         <translation>מסך נעילה</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="106"/>
+        <location filename="../main.qml" line="272"/>
         <source>Suspend</source>
         <translation>מצב שינה</translation>
     </message>

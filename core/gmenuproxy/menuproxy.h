@@ -18,6 +18,8 @@ class QTimer;
 
 class KDirWatch;
 
+class Window;
+
 class MenuProxy : public QObject
 {
     Q_OBJECT
@@ -50,7 +52,7 @@ private:
     void writeWindowProperty(WId id, const QByteArray &name, const QByteArray &value);
     xcb_atom_t getAtom(const QByteArray &name);
 
-    QHash<WId, AppMenuWindow *> m_windows;
+    QHash<WId, Window *> m_windows;
 
     QDBusServiceWatcher *m_serviceWatcher;
 

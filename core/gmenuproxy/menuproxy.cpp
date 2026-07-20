@@ -21,10 +21,10 @@
 #include <KDirWatch>
 // #include <KSharedConfig>
 #include <KWindowSystem>
+#include <KX11Extras>
 #include <KWindowInfo>
-#include <netwm.h>
 
-#include "x11utils.h"
+#include <QtGui/private/qtx11extras_p.h>
 #include <xcb/xcb.h>
 
 #include "window.h"
@@ -50,7 +50,7 @@ static const QString s_appMenuGtkModule = QStringLiteral("appmenu-gtk-module");
 
 MenuProxy::MenuProxy()
     : QObject()
-    , m_xConnection(Lingmo::X11::connection())
+    , m_xConnection(QX11Info::connection())
     , m_serviceWatcher(new QDBusServiceWatcher(this))
     , m_gtk2RcWatch(new KDirWatch(this))
     , m_writeGtk2SettingsTimer(new QTimer(this))
@@ -111,10 +111,10 @@ bool MenuProxy::init()
 
     enableGtkSettings(true);
 
-    connect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
-    connect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
+    connect(KX11Extras::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
+    connect(KX11Extras::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
-    const auto windows = KWindowSystem::windows();
+    const auto windows = KX11Extras::windows();
     for (WId id : windows) {
         onWindowAdded(id);
     }
@@ -132,8 +132,8 @@ void MenuProxy::teardown()
 
     QDBusConnection::sessionBus().unregisterService(s_ourServiceName);
 
-    disconnect(KWindowSystem::self(), &KWindowSystem::windowAdded, this, &MenuProxy::onWindowAdded);
-    disconnect(KWindowSystem::self(), &KWindowSystem::windowRemoved, this, &MenuProxy::onWindowRemoved);
+    disconnect(KX11Extras::self(), &KX11Extras::windowAdded, this, &MenuProxy::onWindowAdded);
+    disconnect(KX11Extras::self(), &KX11Extras::windowRemoved, this, &MenuProxy::onWindowRemoved);
 
     qDeleteAll(m_windows);
     m_windows.clear();
@@ -194,7 +194,11 @@ void MenuProxy::writeGtk2Settings()
             continue;
         }
 
-gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), Qt::SkipEmptyParts);
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+      gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), QString::SkipEmptyParts);
+#else
+      gtkModules = line.mid(equalSignIdx + 1).split(QLatin1Char(':'), Qt::SkipEmptyParts);
+#endif
 
         break;
     }
@@ -290,7 +294,7 @@ void MenuProxy::onWindowAdded(WId id)
         return;
     }
 
-    AppMenuWindow *window = new AppMenuWindow(serviceName);
+    Window *window = new Window(serviceName);
     window->setWinId(id);
     window->setApplicationObjectPath(applicationObjectPath);
     window->setUnityObjectPath(unityObjectPath);
@@ -299,13 +303,13 @@ void MenuProxy::onWindowAdded(WId id)
     window->setMenuBarObjectPath(menuBarObjectPath);
     m_windows.insert(id, window);
 
-    connect(window, &AppMenuWindow::requestWriteWindowProperties, this, [this, window] {
+    connect(window, &Window::requestWriteWindowProperties, this, [this, window] {
         Q_ASSERT(!window->proxyObjectPath().isEmpty());
 
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuServiceName, s_ourServiceName.toUtf8());
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuObjectPath, window->proxyObjectPath().toUtf8());
     });
-    connect(window, &AppMenuWindow::requestRemoveWindowProperties, this, [this, window] {
+    connect(window, &Window::requestRemoveWindowProperties, this, [this, window] {
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuServiceName, QByteArray());
         writeWindowProperty(window->winId(), s_kdeNetWmAppMenuObjectPath, QByteArray());
     });

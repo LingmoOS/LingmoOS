@@ -21,11 +21,11 @@ import QtQuick 2.12
 import QtQuick.Window 2.3
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Lingmo.Accounts 1.0 as Accounts
 import Lingmo.System 1.0 as System
-import LingmoUI 1.0 as LingmoUI
+import LingmoUI.Compatible 3.0 as LingmoUI
 
 ApplicationWindow {
     width: Screen.width

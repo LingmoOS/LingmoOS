@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("xcb"));
 
     QQuickWindow::setDefaultAlphaBuffer(true);
-    QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
     Application a(argc, argv);
     a.setQuitOnLastWindowClosed(false);

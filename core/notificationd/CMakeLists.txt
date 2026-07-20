@@ -20,7 +20,7 @@ set(SRCS main.cpp
 qt_add_dbus_adaptor(DBUS_SOURCES com.lingmo.Notification.xml application.h Application)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
-find_package(KF6WindowSystem REQUIRED)
+find_package(KF6WindowSystem)
 
 add_executable(lingmo-notificationd ${SRCS} ${DBUS_SOURCES})
 
@@ -29,7 +29,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 target_link_libraries(lingmo-notificationd
     Qt6::Core

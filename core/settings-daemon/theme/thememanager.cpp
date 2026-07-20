@@ -33,7 +33,7 @@ static const QByteArray s_systemFixedFontName = QByteArrayLiteral("FixedFont");
 static const QByteArray s_systemPointFontSize = QByteArrayLiteral("FontSize");
 static const QByteArray s_devicePixelRatio = QByteArrayLiteral("PixelRatio");
 
-static QString gtkRc2Path()
+[[__maybe_unused__]] static QString gtkRc2Path()
 {
     return QDir::homePath() + QLatin1String("/.gtkrc-2.0");
 }
@@ -312,7 +312,7 @@ void ThemeManager::setWallpaper(const QString &path)
 
         //启动莫奈取色
         QProcess *proc = new QProcess(this);
-        connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), proc, &QProcess::deleteLater);
+        connect(proc, &QProcess::finished, proc, &QProcess::deleteLater);
         proc->startDetached("/usr/bin/lingmo-wallpaper-color-pick");
 
         emit wallpaperChanged(path);
@@ -449,7 +449,6 @@ void ThemeManager::updateGtk3Config()
 {
     QSettings settings(gtk3SettingsIniPath(), QSettings::IniFormat);
     settings.clear();
-    settings.setIniCodec("UTF-8");
     settings.beginGroup("Settings");
 
     // font

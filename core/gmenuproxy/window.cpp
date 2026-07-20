@@ -32,7 +32,7 @@ static const QString s_applicationActionsPrefix = QStringLiteral("app.");
 static const QString s_unityActionsPrefix = QStringLiteral("unity.");
 static const QString s_windowActionsPrefix = QStringLiteral("win.");
 
-AppMenuWindow::Window(const QString &serviceName)
+Window::Window(const QString &serviceName)
     : QObject()
     , m_serviceName(serviceName)
 {
@@ -44,32 +44,32 @@ AppMenuWindow::Window(const QString &serviceName)
     DBusMenuTypes_register();
 }
 
-AppMenuWindow::~Window() = default;
+Window::~Window() = default;
 
-void AppMenuWindow::init()
+void Window::init()
 {
     qDebug() << "Inited window with menu for" << m_winId << "on" << m_serviceName << "at app" << m_applicationObjectPath << "win"
                            << m_windowObjectPath << "unity" << m_unityObjectPath;
 
     if (!m_applicationMenuObjectPath.isEmpty()) {
         m_applicationMenu = new Menu(m_serviceName, m_applicationMenuObjectPath, this);
-        connect(m_applicationMenu, &Menu::menuAppeared, this, &AppMenuWindow::updateWindowProperties);
-        connect(m_applicationMenu, &Menu::menuDisappeared, this, &AppMenuWindow::updateWindowProperties);
-        connect(m_applicationMenu, &Menu::subscribed, this, &AppMenuWindow::onMenuSubscribed);
+        connect(m_applicationMenu, &Menu::menuAppeared, this, &Window::updateWindowProperties);
+        connect(m_applicationMenu, &Menu::menuDisappeared, this, &Window::updateWindowProperties);
+        connect(m_applicationMenu, &Menu::subscribed, this, &Window::onMenuSubscribed);
         // basically so it replies on DBus no matter what
-        connect(m_applicationMenu, &Menu::failedToSubscribe, this, &AppMenuWindow::onMenuSubscribed);
-        connect(m_applicationMenu, &Menu::itemsChanged, this, &AppMenuWindow::menuItemsChanged);
-        connect(m_applicationMenu, &Menu::menusChanged, this, &AppMenuWindow::menuChanged);
+        connect(m_applicationMenu, &Menu::failedToSubscribe, this, &Window::onMenuSubscribed);
+        connect(m_applicationMenu, &Menu::itemsChanged, this, &Window::menuItemsChanged);
+        connect(m_applicationMenu, &Menu::menusChanged, this, &Window::menuChanged);
     }
 
     if (!m_menuBarObjectPath.isEmpty()) {
         m_menuBar = new Menu(m_serviceName, m_menuBarObjectPath, this);
-        connect(m_menuBar, &Menu::menuAppeared, this, &AppMenuWindow::updateWindowProperties);
-        connect(m_menuBar, &Menu::menuDisappeared, this, &AppMenuWindow::updateWindowProperties);
-        connect(m_menuBar, &Menu::subscribed, this, &AppMenuWindow::onMenuSubscribed);
-        connect(m_menuBar, &Menu::failedToSubscribe, this, &AppMenuWindow::onMenuSubscribed);
-        connect(m_menuBar, &Menu::itemsChanged, this, &AppMenuWindow::menuItemsChanged);
-        connect(m_menuBar, &Menu::menusChanged, this, &AppMenuWindow::menuChanged);
+        connect(m_menuBar, &Menu::menuAppeared, this, &Window::updateWindowProperties);
+        connect(m_menuBar, &Menu::menuDisappeared, this, &Window::updateWindowProperties);
+        connect(m_menuBar, &Menu::subscribed, this, &Window::onMenuSubscribed);
+        connect(m_menuBar, &Menu::failedToSubscribe, this, &Window::onMenuSubscribed);
+        connect(m_menuBar, &Menu::itemsChanged, this, &Window::menuItemsChanged);
+        connect(m_menuBar, &Menu::menusChanged, this, &Window::menuChanged);
     }
 
     if (!m_applicationObjectPath.isEmpty()) {
@@ -118,82 +118,82 @@ void AppMenuWindow::init()
     }
 }
 
-WId AppMenuWindow::winId() const
+WId Window::winId() const
 {
     return m_winId;
 }
 
-void AppMenuWindow::setWinId(WId winId)
+void Window::setWinId(WId winId)
 {
     m_winId = winId;
 }
 
-QString AppMenuWindow::serviceName() const
+QString Window::serviceName() const
 {
     return m_serviceName;
 }
 
-QString AppMenuWindow::applicationObjectPath() const
+QString Window::applicationObjectPath() const
 {
     return m_applicationObjectPath;
 }
 
-void AppMenuWindow::setApplicationObjectPath(const QString &applicationObjectPath)
+void Window::setApplicationObjectPath(const QString &applicationObjectPath)
 {
     m_applicationObjectPath = applicationObjectPath;
 }
 
-QString AppMenuWindow::unityObjectPath() const
+QString Window::unityObjectPath() const
 {
     return m_unityObjectPath;
 }
 
-void AppMenuWindow::setUnityObjectPath(const QString &unityObjectPath)
+void Window::setUnityObjectPath(const QString &unityObjectPath)
 {
     m_unityObjectPath = unityObjectPath;
 }
 
-QString AppMenuWindow::applicationMenuObjectPath() const
+QString Window::applicationMenuObjectPath() const
 {
     return m_applicationMenuObjectPath;
 }
 
-void AppMenuWindow::setApplicationMenuObjectPath(const QString &applicationMenuObjectPath)
+void Window::setApplicationMenuObjectPath(const QString &applicationMenuObjectPath)
 {
     m_applicationMenuObjectPath = applicationMenuObjectPath;
 }
 
-QString AppMenuWindow::menuBarObjectPath() const
+QString Window::menuBarObjectPath() const
 {
     return m_menuBarObjectPath;
 }
 
-void AppMenuWindow::setMenuBarObjectPath(const QString &menuBarObjectPath)
+void Window::setMenuBarObjectPath(const QString &menuBarObjectPath)
 {
     m_menuBarObjectPath = menuBarObjectPath;
 }
 
-QString AppMenuWindow::windowObjectPath() const
+QString Window::windowObjectPath() const
 {
     return m_windowObjectPath;
 }
 
-void AppMenuWindow::setWindowObjectPath(const QString &windowObjectPath)
+void Window::setWindowObjectPath(const QString &windowObjectPath)
 {
     m_windowObjectPath = windowObjectPath;
 }
 
-QString AppMenuWindow::currentMenuObjectPath() const
+QString Window::currentMenuObjectPath() const
 {
     return m_currentMenuObjectPath;
 }
 
-QString AppMenuWindow::proxyObjectPath() const
+QString Window::proxyObjectPath() const
 {
     return m_proxyObjectPath;
 }
 
-void AppMenuWindow::initMenu()
+void Window::initMenu()
 {
     if (m_menuInited) {
         return;
@@ -217,7 +217,7 @@ void AppMenuWindow::initMenu()
     m_menuInited = true;
 }
 
-void AppMenuWindow::menuItemsChanged(const QVector<uint> &itemIds)
+void Window::menuItemsChanged(const QVector<uint> &itemIds)
 {
     if (qobject_cast<Menu *>(sender()) != m_currentMenu) {
         return;
@@ -237,7 +237,7 @@ void AppMenuWindow::menuItemsChanged(const QVector<uint> &itemIds)
     emit ItemsPropertiesUpdated(items, {});
 }
 
-void AppMenuWindow::menuChanged(const QVector<uint> &menuIds)
+void Window::menuChanged(const QVector<uint> &menuIds)
 {
     if (qobject_cast<Menu *>(sender()) != m_currentMenu) {
         return;
@@ -248,7 +248,7 @@ void AppMenuWindow::menuChanged(const QVector<uint> &menuIds)
     }
 }
 
-void AppMenuWindow::onMenuSubscribed(uint id)
+void Window::onMenuSubscribed(uint id)
 {
     // When it was a delayed GetLayout request, send the reply now
     const auto pendingReplies = m_pendingGetLayouts.values(id);
@@ -271,7 +271,7 @@ void AppMenuWindow::onMenuSubscribed(uint id)
     }
 }
 
-bool AppMenuWindow::getAction(const QString &name, GMenuAction &action) const
+bool Window::getAction(const QString &name, GMenuAction &action) const
 {
     QString lookupName;
     Actions *actions = getActionsForAction(name, lookupName);
@@ -283,7 +283,7 @@ bool AppMenuWindow::getAction(const QString &name, GMenuAction &action) const
     return actions->get(lookupName, action);
 }
 
-void AppMenuWindow::triggerAction(const QString &name, const QVariant &target, uint timestamp)
+void Window::triggerAction(const QString &name, const QVariant &target, uint timestamp)
 {
     QString lookupName;
     Actions *actions = getActionsForAction(name, lookupName);
@@ -294,7 +294,7 @@ void AppMenuWindow::triggerAction(const QString &name, const QVariant &target, u
     actions->trigger(lookupName, target, timestamp);
 }
 
-Actions *AppMenuWindow::getActionsForAction(const QString &name, QString &lookupName) const
+Actions *Window::getActionsForAction(const QString &name, QString &lookupName) const
 {
     if (name.startsWith(QLatin1String("app."))) {
         lookupName = name.mid(4);
@@ -310,7 +310,7 @@ Actions *AppMenuWindow::getActionsForAction(const QString &name, QString &lookup
     return nullptr;
 }
 
-void AppMenuWindow::onActionsChanged(const QStringList &dirty, const QString &prefix)
+void Window::onActionsChanged(const QStringList &dirty, const QString &prefix)
 {
     if (m_applicationMenu) {
         m_applicationMenu->actionsChanged(dirty, prefix);
@@ -320,7 +320,7 @@ void AppMenuWindow::onActionsChanged(const QStringList &dirty, const QString &pr
     }
 }
 
-bool AppMenuWindow::registerDBusObject()
+bool Window::registerDBusObject()
 {
     Q_ASSERT(m_proxyObjectPath.isEmpty());
 
@@ -342,7 +342,7 @@ bool AppMenuWindow::registerDBusObject()
     return true;
 }
 
-void AppMenuWindow::updateWindowProperties()
+void Window::updateWindowProperties()
 {
     const bool hasMenu = ((m_applicationMenu && m_applicationMenu->hasMenu()) || (m_menuBar && m_menuBar->hasMenu()));
 
@@ -372,7 +372,7 @@ void AppMenuWindow::updateWindowProperties()
 }
 
 // DBus
-bool AppMenuWindow::AboutToShow(int id)
+bool Window::AboutToShow(int id)
 {
     // We always request the first time GetLayout is called and keep up-to-date internally
     // No need to have us prepare anything here
@@ -380,7 +380,7 @@ bool AppMenuWindow::AboutToShow(int id)
     return false;
 }
 
-void AppMenuWindow::Event(int id, const QString &eventId, const QDBusVariant &data, uint timestamp)
+void Window::Event(int id, const QString &eventId, const QDBusVariant &data, uint timestamp)
 {
     Q_UNUSED(data);
 
@@ -400,14 +400,14 @@ void AppMenuWindow::Event(int id, const QString &eventId, const QDBusVariant &da
     }
 }
 
-DBusMenuItemList AppMenuWindow::GetGroupProperties(const QList<int> &ids, const QStringList &propertyNames)
+DBusMenuItemList Window::GetGroupProperties(const QList<int> &ids, const QStringList &propertyNames)
 {
     Q_UNUSED(ids);
     Q_UNUSED(propertyNames);
     return DBusMenuItemList();
 }
 
-uint AppMenuWindow::GetLayout(int parentId, int recursionDepth, const QStringList &propertyNames, DBusMenuLayoutItem &dbusItem)
+uint Window::GetLayout(int parentId, int recursionDepth, const QStringList &propertyNames, DBusMenuLayoutItem &dbusItem)
 {
     Q_UNUSED(recursionDepth); // TODO
     Q_UNUSED(propertyNames);
@@ -424,7 +424,7 @@ uint AppMenuWindow::GetLayout(int parentId, int recursionDepth, const QStringLis
 
     if (!m_currentMenu->hasSubscription(subscription)) {
         // let's serve multiple similar requests in one go once we've processed them
-        m_pendingGetLayouts.insertMulti(subscription, message());
+        m_pendingGetLayouts.insert(subscription, message());
         setDelayedReply(true);
 
         m_currentMenu->start(subscription);
@@ -519,7 +519,7 @@ uint AppMenuWindow::GetLayout(int parentId, int recursionDepth, const QStringLis
     return 1;
 }
 
-QDBusVariant AppMenuWindow::GetProperty(int id, const QString &property)
+QDBusVariant Window::GetProperty(int id, const QString &property)
 {
     Q_UNUSED(id);
     Q_UNUSED(property);
@@ -527,17 +527,17 @@ QDBusVariant AppMenuWindow::GetProperty(int id, const QString &property)
     return value;
 }
 
-QString AppMenuWindow::status() const
+QString Window::status() const
 {
     return QStringLiteral("normal");
 }
 
-uint AppMenuWindow::version() const
+uint Window::version() const
 {
     return 4;
 }
 
-QVariantMap AppMenuWindow::gMenuToDBusMenuProperties(const QVariantMap &source) const
+QVariantMap Window::gMenuToDBusMenuProperties(const QVariantMap &source) const
 {
     QVariantMap result;
 

@@ -10,6 +10,7 @@ target_link_libraries(${TARGET}
         Qt6::Core
         Qt6::Quick
         Qt6::DBus
+        Qt6::GuiPrivate 
 )
 
 configure_file(

@@ -1,8 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
-import LingmoUI 1.0 as LingmoUI
-import "./"
+import LingmoUI.Compatible 3.0 as LingmoUI
 
 Item {
     id: root

@@ -5,7 +5,7 @@
 	#include <QGuiApplication>
 #else
 	#include <QDebug>
-	#include "x11utils.h"
+	#include <QX11Info>
 #endif
 
 #include <QThreadStorage>
@@ -61,7 +61,7 @@ bool QHotkeyPrivate::isPlatformSupported()
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
 	return qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
 #else
-	return Lingmo::X11::isPlatformX11();
+	return QX11Info::isPlatformX11();
 #endif
 }
 
@@ -134,8 +134,8 @@ quint32 QHotkeyPrivateX11::nativeKeycode(Qt::Key keycode, bool &ok)
 	const QNativeInterface::QX11Application *x11Interface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
 	Display *display = x11Interface->display();
 #else
-	const bool x11Interface = Lingmo::X11::isPlatformX11();
-	Display *display = Lingmo::X11::display();
+	const bool x11Interface = QX11Info::isPlatformX11();
+	Display *display = QX11Info::display();
 #endif
 
 	if(x11Interface) {
@@ -168,8 +168,8 @@ bool QHotkeyPrivateX11::registerShortcut(QHotkey::NativeShortcut shortcut)
 	const QNativeInterface::QX11Application *x11Interface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
 	Display *display = x11Interface->display();
 #else
-	const bool x11Interface = Lingmo::X11::isPlatformX11();
-	Display *display = Lingmo::X11::display();
+	const bool x11Interface = QX11Info::isPlatformX11();
+	Display *display = QX11Info::display();
 #endif
 
 	if(!display || !x11Interface)
@@ -200,7 +200,7 @@ bool QHotkeyPrivateX11::unregisterShortcut(QHotkey::NativeShortcut shortcut)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
 	Display *display = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->display();
 #else
-	Display *display = Lingmo::X11::display();
+	Display *display = QX11Info::display();
 #endif
 
 	if(!display)

@@ -45,7 +45,6 @@ public:
     void startWindowManager();
     void startDesktopProcess();
     void startDaemonProcess();
-    void checkAndDeactivateScreenSaver();
 
     /**
      * @brief Start the user defined autostart process.

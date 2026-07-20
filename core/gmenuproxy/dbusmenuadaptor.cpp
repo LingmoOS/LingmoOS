@@ -21,7 +21,7 @@
  * Implementation of adaptor class DbusmenuAdaptor
  */
 
-DbusmenuAdaptor::DbusmenuAdaptor(AppMenuWindow *parent)
+DbusmenuAdaptor::DbusmenuAdaptor(Window *parent)
     : QDBusAbstractAdaptor(parent)
 {
     // constructor
@@ -75,5 +75,3 @@ QDBusVariant DbusmenuAdaptor::GetProperty(int id, const QString &property)
     return parent()->GetProperty(id, property);
 }
 
-
-#include "dbusmenuadaptor.moc"

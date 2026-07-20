@@ -107,7 +107,7 @@ void Menu::stop(const QList<uint> &ids)
             // TODO is there a nicer algorithm for that?
             // TODO remove all m_menus also?
             m_subscriptions.erase(
-                std::remove_if(m_subscriptions.begin(), m_subscriptions.end(), std::bind(&QList<uint>::contains, m_subscriptions, std::placeholders::_1)),
+        std::remove_if(m_subscriptions.begin(), m_subscriptions.end(), std::bind(&QList<uint>::contains<uint>, m_subscriptions, std::placeholders::_1)),
                 m_subscriptions.end());
 
             if (m_subscriptions.isEmpty()) {
@@ -142,7 +142,7 @@ GMenuItem Menu::getSection(int subscription, int section, bool *ok) const
     const auto menu = m_menus.value(subscription);
 
     auto it = std::find_if(menu.begin(), menu.end(), [section](const GMenuItem &item) {
-        return item.section == section;
+        return item.section == static_cast<uint>(section);
     });
 
     if (it == menu.end()) {
@@ -209,7 +209,7 @@ void Menu::onMenuChanged(const GMenuChangeList &changes)
                     dirtyItems.append(Utils::treeStructureToInt(change.subscription, change.menu, change.changePosition + i + 1));
                 }
             } else {
-                for (int i = 0; i < change.itemsToRemoveCount; ++i) {
+                for (uint i = 0; i < change.itemsToRemoveCount; ++i) {
                     section.items.removeAt(change.changePosition); // TODO bounds check
                 }
 

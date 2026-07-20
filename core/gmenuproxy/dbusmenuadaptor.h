@@ -14,14 +14,13 @@
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
+#include <QStringList>
+#include <QVariant>
+#include <QString>
+#include <QByteArray>
+#include <QList>
+#include <QMap>
 #include "window.h"
-QT_BEGIN_NAMESPACE
-class QByteArray;
-template<class T> class QList;
-template<class Key, class Value> class QMap;
-class QString;
-class QVariant;
-QT_END_NAMESPACE
 
 /*
  * Adaptor class for interface com.canonical.dbusmenu
@@ -82,11 +81,11 @@ class DbusmenuAdaptor: public QDBusAbstractAdaptor
 "  </interface>\n"
         "")
 public:
-    DbusmenuAdaptor(AppMenuWindow *parent);
+    DbusmenuAdaptor(Window *parent);
     virtual ~DbusmenuAdaptor();
 
-    inline AppMenuWindow *parent() const
-    { return static_cast<AppMenuWindow *>(QObject::parent()); }
+    inline Window *parent() const
+    { return static_cast<Window *>(QObject::parent()); }
 
 public: // PROPERTIES
     Q_PROPERTY(QString Status READ status)

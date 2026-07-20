@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025 Lingmo OS Team.
+ * Copyright (C) 2023-2024 Lingmo OS Team.
  */
 
 #include "processmanager.h"
@@ -17,12 +17,10 @@
 
 #include <QDBusInterface>
 #include <QDBusPendingCall>
-#include <QDBusPendingCallWatcher>
-#include <QDBusPendingReply>
 
-#include "x11utils.h"
+#include <QtGui/private/qtx11extras_p.h>
 #include <KWindowSystem>
-#include <netwm.h>
+#include <NETWM>
 
 #include "daemon-helper.h"
 
@@ -52,7 +50,6 @@ void ProcessManager::start()
 {
     startWindowManager();
     startDaemonProcess();
-    checkAndDeactivateScreenSaver();
 }
 
 void ProcessManager::logout()
@@ -100,26 +97,14 @@ void ProcessManager::startDesktopProcess()
 
     QList<QPair<QString, QStringList>> list;
     // Desktop components
-    list << qMakePair(QString("lingmo-desktop"), QStringList());
-    list << qMakePair(QString("lingmo-dock"), QStringList());
-    list << qMakePair(
-        QString("kwriteconfig5"),
-        QStringList() << "--file" << "kwinrc" << "--group" << "org.kde.kdecoration2" << "--key" << "BorderSize" << "Huge"
-    );
-    list << qMakePair(QString("kwin_x11"), QStringList("--replace"));
     list << qMakePair(QString("lingmo-notificationd"), QStringList());
-    list << qMakePair(QString("lingmo-filemanager"), QStringList("--runtime"));
     list << qMakePair(QString("lingmo-statusbar"), QStringList());
+    list << qMakePair(QString("lingmo-dock"), QStringList());
+    list << qMakePair(QString("lingmo-filemanager"), QStringList("--desktop"));
     list << qMakePair(QString("lingmo-launcher"), QStringList());
     list << qMakePair(QString("lingmo-powerman"), QStringList());
     list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-wallpaper-color-pick"), QStringList());
-
-    if (QFile(QDir::homePath() + "/.islin_install_lock").exists() &&
-            !QFile("/run/live/medium/live/filesystem.squashfs").exists()) {
-        list << qMakePair(QString("/usr/bin/lingmo-welcome"), QStringList());
-        // list << qMakePair(QString("config-installer"), QStringList());
-    }
 
     m_desktopAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
 
@@ -134,7 +119,7 @@ void ProcessManager::startDaemonProcess()
     list << qMakePair(QString("lingmo-xembedsniproxy"), QStringList());
     list << qMakePair(QString("lingmo-gmenuproxy"), QStringList());
     list << qMakePair(QString("lingmo-permission-surveillance"),QStringList());
-    list << qMakePair(QString("lingmo-clipboard"), QStringList());
+//    list << qMakePair(QString("lingmo-clipboard"), QStringList());
     list << qMakePair(QString("lingmo-chotkeys"), QStringList());
 
     m_daemonAutoStartD = std::make_shared<LINGMO_SESSION::Daemon>(list);
@@ -152,6 +137,7 @@ void ProcessManager::loadAutoStartProcess()
         const QStringList fileNames = d.entryList(QStringList() << QStringLiteral("*.desktop"));
         for (const QString &file : fileNames) {
             QSettings desktop(d.absoluteFilePath(file), QSettings::IniFormat);
+
             desktop.beginGroup("Desktop Entry");
 
             // Ignore files the require a specific desktop environment
@@ -198,7 +184,7 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     // ref: lxqt session
     if (!m_wmStarted && m_waitLoop) {
         // all window managers must set their name according to the spec
-        if (!QString::fromUtf8(NETRootInfo(Lingmo::X11::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
+        if (!QString::fromUtf8(NETRootInfo(QX11Info::connection(), NET::SupportingWMCheck).wmName()).isEmpty()) {
             qDebug() << "Window manager started";
             m_wmStarted = true;
             if (m_waitLoop && m_waitLoop->isRunning())
@@ -209,23 +195,4 @@ bool ProcessManager::nativeEventFilter(const QByteArray &eventType, void *messag
     }
 
     return false;
-}
-
-void ProcessManager::checkAndDeactivateScreenSaver()
-{
-    QDBusInterface interface("org.freedesktop.ScreenSaver", "/ScreenSaver", "org.freedesktop.ScreenSaver", QDBusConnection::sessionBus());
-    if (interface.isValid()) {
-        QDBusPendingCall call = interface.asyncCall("GetActive");
-        QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-        connect(watcher, &QDBusPendingCallWatcher::finished, this, [this, watcher]() {
-            QDBusPendingReply<bool> reply = *watcher;
-            if (reply.isValid() && reply.value()) {
-                QDBusInterface setActiveInterface("org.freedesktop.ScreenSaver", "/ScreenSaver", "org.freedesktop.ScreenSaver", QDBusConnection::sessionBus());
-                setActiveInterface.call("SetActive", false);
-            }
-            watcher->deleteLater();
-        });
-    } else {
-        qWarning() << "Cannot find org.freedesktop.ScreenSaver interface.";
-    }
 }

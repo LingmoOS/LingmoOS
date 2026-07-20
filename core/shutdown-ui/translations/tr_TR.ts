@@ -4,27 +4,29 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.qml" line="67"/>
+        <location filename="../main.qml" line="240"/>
         <source>Shutdown</source>
         <translation>Kapat</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="75"/>
+        <location filename="../main.qml" line="248"/>
         <source>Reboot</source>
         <translation>Yeniden başlat</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="83"/>
+        <location filename="../main.qml" line="256"/>
         <source>Logout</source>
         <translation>Çıkış yap</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="91"/>
+        <location filename="../main.qml" line="264"/>
+        <source>Lock screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main.qml" line="272"/>
         <source>Suspend</source>
         <translation>Uyku</translation>
     </message>
-</context>
-<context>
-    <name></name>
 </context>
 </TS>

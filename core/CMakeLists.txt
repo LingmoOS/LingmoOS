@@ -10,17 +10,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# add_compile_options(-Wall)
+# add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 
 set(QT Core Gui Widgets Quick QuickControls2 DBus Xml LinguistTools)
-find_package(Qt6 REQUIRED COMPONENTS ${QT})
-# Find each framework's package configuration directly instead of using the aggregate KF6 lookup.
-find_package(KF6CoreAddons REQUIRED)
-find_package(KF6IdleTime REQUIRED)
-find_package(KF6WindowSystem REQUIRED)
+find_package(Qt6 REQUIRED ${QT})
 
-# Qt 6 removed QtX11Extras; X11-only code uses the local native-interface adapter.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # find_package(LingmoUI REQUIRED)
 find_package(PkgConfig REQUIRED)
 

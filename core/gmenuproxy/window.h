@@ -11,6 +11,7 @@
 #include <QString>
 #include <QVector>
 #include <QWindow> // for WId
+#include <QMultiHash>
 
 #include <functional>
 
@@ -22,7 +23,7 @@ class QDBusVariant;
 class Actions;
 class Menu;
 
-class AppMenuWindow : public QObject, protected QDBusContext
+class Window : public QObject, protected QDBusContext
 {
     Q_OBJECT
 
@@ -31,8 +32,8 @@ class AppMenuWindow : public QObject, protected QDBusContext
     Q_PROPERTY(uint Version READ version)
 
 public:
-    explicit AppMenuWindow(const QString &serviceName);
-    ~AppMenuWindow() override;
+    Window(const QString &serviceName);
+    ~Window() override;
 
     void init();
 
@@ -111,7 +112,7 @@ private:
 
     QString m_proxyObjectPath; // our object path on this proxy app
 
-    QHash<int, QDBusMessage> m_pendingGetLayouts;
+    QMultiHash<int, QDBusMessage> m_pendingGetLayouts;
 
     Menu *m_applicationMenu = nullptr;
     Menu *m_menuBar = nullptr;
