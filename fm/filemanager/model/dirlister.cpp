@@ -19,21 +19,18 @@
 
 #include "dirlister.h"
 
+#include <KIO/Job>
+
 DirLister::DirLister(QObject *parent)
     : KDirLister(parent)
 {
+    connect(this, &KDirLister::jobError, this, [this](KIO::Job *job) {
+        if (!autoErrorHandlingEnabled()) {
+            emit error(job->errorString());
+        }
+    });
 }
 
 DirLister::~DirLister()
 {
-}
-
-void DirLister::handleError(KIO::Job *job)
-{
-    if (!autoErrorHandlingEnabled()) {
-        emit error(job->errorString());
-        return;
-    }
-
-    KDirLister::handleError(job);
 }
