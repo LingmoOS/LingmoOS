@@ -54,6 +54,7 @@
 #include <QClipboard>
 #include <QPainter>
 #include <QDrag>
+#include <QMessageBox>
 #include <QDir>
 #include <QProcess>
 #include <QSettings>
@@ -67,6 +68,7 @@
 #include <QQmlContext>
 
 // KIO
+#include <KLocalizedString>
 #include <KIO/CopyJob>
 #include <KIO/Job>
 #include <KIO/MkdirJob>
@@ -1127,15 +1129,19 @@ void FolderModel::moveSelectedToTrash()
 
     const QList<QUrl> urls = selectedUrls();
 
-    // In KF6, KIO::JobUiDelegate constructor is protected.
-    // Create a trash job and check confirmation via its UI delegate.
-    KIO::Job *trashJob = KIO::trash(urls);
-    if (trashJob->uiDelegate()->askDeleteConfirmation(urls, KIO::JobUiDelegate::Trash, KIO::JobUiDelegate::DefaultConfirmation)) {
-        trashJob->uiDelegate()->setAutoErrorHandlingEnabled(true);
-        KIO::FileUndoManager::self()->recordJob(KIO::FileUndoManager::Trash, urls, QUrl(QStringLiteral("trash:/")), trashJob);
-        return;
+    // KF6 removed askDeleteConfirmation from KJobUiDelegate; use QMessageBox directly
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setWindowTitle(i18n("Move to Trash"));
+    msgBox.setText(i18n("Do you want to move the selected files to the trash?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+
+    if (msgBox.exec() == QMessageBox::Yes) {
+        KIO::Job *job = KIO::trash(urls);
+        job->uiDelegate()->setAutoErrorHandlingEnabled(true);
+        KIO::FileUndoManager::self()->recordJob(KIO::FileUndoManager::Trash, urls, QUrl(QStringLiteral("trash:/")), job);
     }
-    delete trashJob;
 }
 
 void FolderModel::emptyTrash()
