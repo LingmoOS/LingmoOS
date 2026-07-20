@@ -21,7 +21,7 @@
 #include "x11integration.h"
 
 #include <QCoreApplication>
-#include <QNativeInterface>
+#include <QNativeInterface/QX11Application>
 #include <QPlatformSurfaceEvent>
 #include <QGuiApplication>
 #include <QWindow>
