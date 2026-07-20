@@ -81,7 +81,7 @@
 #include <KFileItemListProperties>
 #include <KDesktopFile>
 
-#include <KRun>
+
 
 
 static bool isDropBetweenSharedViews(const QList<QUrl> &urls, const QUrl &folderUrl)

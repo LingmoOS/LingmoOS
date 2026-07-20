@@ -40,7 +40,7 @@
 #include <KDirModel>
 #include <KDirWatch>
 #include <KActionCollection>
-#include <KRun>
+
 #include <KFileItemActions>
 
 class QDrag;
