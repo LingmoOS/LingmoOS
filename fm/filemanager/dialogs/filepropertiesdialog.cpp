@@ -21,6 +21,7 @@
 #include "../desktopiconprovider.h"
 #include "../helper/fm.h"
 
+#include <QLocale>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QFileInfo>
@@ -223,9 +224,9 @@ void FilePropertiesDialog::init()
         m_size = KIO::convertSize(m_items.first().size());
         m_location = info.dir().path();
 
-        m_creationTime = info.birthTime().toString(Qt::SystemLocaleLongDate);
-        m_modifiedTime = info.lastModified().toString(Qt::SystemLocaleLongDate);
-        m_accessedTime = info.lastRead().toString(Qt::SystemLocaleLongDate);
+        m_creationTime = QLocale().toString(info.birthTime(), QLocale::LongFormat);
+        m_modifiedTime = QLocale().toString(info.lastModified(), QLocale::LongFormat);
+        m_accessedTime = QLocale().toString(info.lastRead(), QLocale::LongFormat);
 
 //        m_creationTime = item.time(KFileItem::CreationTime).toString();
 //        m_modifiedTime = item.time(KFileItem::ModificationTime).toString();
