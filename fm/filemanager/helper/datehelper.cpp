@@ -30,5 +30,5 @@ QString DateHelper::friendlyTime(const QDateTime &time)
     else if (days <= 10)
         return tr("%1 days ago").arg(days);
 
-    return time.toString(Qt::DefaultLocaleShortDate);
+    return time.toString(QLocale::ShortFormat);
 }
