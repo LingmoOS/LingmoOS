@@ -20,9 +20,9 @@
 #include "windowblur.h"
 
 #include <QApplication>
+#include <QGuiApplication>
 #include <QPainterPath>
 #include <QScreen>
-#include <QX11Info>
 
 #include <xcb/xcb.h>
 
@@ -116,7 +116,10 @@ void WindowBlur::updateBlur()
     if (!m_view)
         return;
 
-    xcb_connection_t *c = QX11Info::connection();
+    auto *x11App = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    if (!x11App)
+        return;
+    xcb_connection_t *c = x11App->connection();
     if (!c)
         return;
 
