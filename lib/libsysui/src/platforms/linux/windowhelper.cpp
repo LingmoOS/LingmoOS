@@ -19,11 +19,12 @@
 
 #include "windowhelper.h"
 
+#include <cstring>
 #include <QApplication>
 #include <QGuiApplication>
 #include <QCursor>
 
-#include <KWindowSystem>
+#include <xcb/xcb.h>
 
 static uint qtEdgesToXcbMoveResizeDirection(Qt::Edges edges)
 {
@@ -47,6 +48,34 @@ static uint qtEdgesToXcbMoveResizeDirection(Qt::Edges edges)
     return 0;
 }
 
+static bool isCompositingActive(xcb_connection_t *connection)
+{
+    // Check _NET_WM_CM_Sn atom on root window to detect compositing manager
+    const xcb_screen_t *screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
+    xcb_window_t rootWindow = screen->root;
+
+    // Build atom name: _NET_WM_CM_Sn where n is the screen number
+    QByteArray atomName = QByteArray("_NET_WM_CM_Sn") + QByteArray::number(0);
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, false, atomName.size(), atomName.constData());
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, nullptr);
+    if (!reply)
+        return false;
+
+    xcb_atom_t atom = reply->atom;
+    free(reply);
+
+    // Check if the compositing manager owns this atom
+    xcb_get_selection_owner_cookie_t selCookie = xcb_get_selection_owner(connection, atom);
+    xcb_get_selection_owner_reply_t *selReply = xcb_get_selection_owner_reply(connection, selCookie, nullptr);
+    if (!selReply) {
+        return false;
+    }
+
+    bool active = selReply->owner != XCB_NONE;
+    free(selReply);
+    return active;
+}
+
 WindowHelper::WindowHelper(QObject *parent)
     : QObject(parent)
     , m_moveResizeAtom(0)
@@ -61,8 +90,7 @@ WindowHelper::WindowHelper(QObject *parent)
     QScopedPointer<xcb_intern_atom_reply_t> reply(xcb_intern_atom_reply(connection, cookie, nullptr));
     m_moveResizeAtom = reply ? reply->atom : 0;
 
-    onCompositingChanged(KWindowSystem::isCompositingActive());
-    connect(KWindowSystem::self(), &KWindowSystem::compositingChanged, this, &WindowHelper::onCompositingChanged);
+    onCompositingChanged(isCompositingActive(connection));
 }
 
 bool WindowHelper::compositing() const
@@ -82,7 +110,37 @@ void WindowHelper::startSystemResize(QWindow *w, Qt::Edges edges)
 
 void WindowHelper::minimizeWindow(QWindow *w)
 {
-    KWindowSystem::minimizeWindow(w->winId());
+    auto *x11App = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    xcb_connection_t *connection = x11App->connection();
+    xcb_window_t winId = w->winId();
+
+    // Use _NET_WM_STATE_HIDDEN to minimize via EWMH
+    xcb_client_message_event_t xev;
+    memset(&xev, 0, sizeof(xev));
+    xev.response_type = XCB_CLIENT_MESSAGE;
+    xev.format = 32;
+    xev.window = winId;
+
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, false, sizeof("_NET_WM_STATE_HIDDEN") - 1, "_NET_WM_STATE_HIDDEN");
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, nullptr);
+    if (reply) {
+        xcb_intern_atom_cookie_t stateCookie = xcb_intern_atom(connection, false, sizeof("_NET_WM_STATE") - 1, "_NET_WM_STATE");
+        xcb_intern_atom_reply_t *stateReply = xcb_intern_atom_reply(connection, stateCookie, nullptr);
+        if (stateReply) {
+            xev.type = stateReply->atom;
+            xev.data.data32[0] = 1; // _NET_WM_STATE_ADD
+            xev.data.data32[1] = reply->atom;
+            xev.data.data32[2] = 0;
+            xev.data.data32[3] = 1;
+
+            const xcb_screen_t *screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
+            xcb_send_event(connection, false, screen->root,
+                           XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY,
+                           (const char *)&xev);
+            free(stateReply);
+        }
+        free(reply);
+    }
 }
 
 void WindowHelper::doStartSystemMoveResize(QWindow *w, int edges)
