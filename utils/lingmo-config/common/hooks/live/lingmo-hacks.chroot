@@ -30,20 +30,9 @@ for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'linux-im
   apt-mark hold $pkg | true
 done
 
-# Mark lingmo DE as manually installed
-for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'lingmo*' | sed -ne 's/^installed //p'); do
-  apt-mark manual $pkg | true
-done
-
-apt install system-core -y | true
-
 # Remove unwanted packages
 apt remove systemsettings -y | true
-apt remove plasma-desktop -y | true
 # apt remove network-manager-gnome konsole kde-baseapps -y | true
-apt remove zutty -y | true
-apt remove breeze eog -y | true
-apt remove xterm -y | true
 apt autoremove -y | true
 # apt update | true
 
@@ -56,28 +45,48 @@ if [[ $get_arch =~ "x86_64" ]]; then
   rm -rfv ./onlyoffice.deb
 fi
 
-chmod +x /bin/config-installer
+apt install -y base-files --reinstall | true
 
-rm /usr/lib/os-release
+apt install -y \
+    appmotor \
+    base-files \
+    liblingmo \
+    liblingmo-filemanager \
+    lingmo-appearance-common \
+    lingmo-appearance-decoration \
+    lingmo-appearance-qt6 \
+    lingmo-appearance-settings \
+    lingmo-appearance \
+    lingmo-calculator \
+    lingmo-core \
+    lingmo-cursor-themes \
+    lingmo-daemon \
+    lingmo-desktop \
+    lingmo-dock \
+    lingmo-filemanager \
+    lingmo-grub-config \
+    lingmo-gtk-themes \
+    lingmo-installer \
+    lingmo-installer-config \
+    lingmo-oobe \
+    lingmo-kwin-plugins-roundedwindow \
+    lingmo-launcher \
+    lingmo-qt-plugins \
+    lingmo-screenlocker \
+    lingmo-screenshot \
+    lingmo-sddm-theme \
+    lingmo-settings \
+    lingmo-statusbar \
+    lingmo-system-monitor \
+    lingmo-terminal \
+    lingmo-wallpapers \
+    lingmo-watchdog \
+    lingmoui3 \
+    lingmo-plymouth \
+    sddm \
+    xorg
 
-cat <<EOF >/usr/lib/os-release
-PRETTY_NAME="Lingmo OS 3.0.6 (25R07)"
-NAME="Lingmo OS"
-RELEASE="release"
-BUILD_ID="25R07"
-VERSION_ID="3.0.6"
-VERSION="3.0.6 (Helium)"
-VERSION_CODENAME=helium
-VERSION_BUILD="251214220.2507+build"
-VERSION_TYPE="stable"
-ID=lingmo
-ID_LIKE=debian
-HOME_URL="https://lingmo.org"
-SUPPORT_URL="https://bbs.lingmo.org/"
-COMMUNITY_URL="https://bbs.lingmo.org/"
-APT_SOURCES="https://packages.lingmo.org/lingmo"
-EOF
-
-# Fixing os-release
-rm /etc/os-release
-ln -s /usr/lib/os-release /etc/os-release
+# Mark lingmo DE as manually installed
+for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'lingmo*' | sed -ne 's/^installed //p'); do
+  apt-mark manual $pkg | true
+done
