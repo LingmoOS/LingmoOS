@@ -21,6 +21,13 @@ jobs:
       image: debian:trixie
       options: --privileged
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            git \
+            ca-certificates
+      
       - name: Disable symlink support globally
         run: |
           git config --global core.symlinks false
