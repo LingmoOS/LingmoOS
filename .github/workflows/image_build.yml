@@ -1,0 +1,148 @@
+name: Build ISO of Lingmo OS
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build:
+    name: Build ISO of Lingmo OS
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            apt-utils ca-certificates curl \
+            live-build debootstrap \
+            xorriso squashfs-tools \
+            mtools dosfstools \
+            gpg cpio zstd \
+            gettext \
+            sudo git jq
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 2>/dev/null
+          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt-get update
+          apt-get install -y gh
+
+      - name: Free up disk space
+        run: |
+          echo "=== Disk space before cleanup ==="
+          df -h
+          apt-get clean
+          rm -rf /var/cache/apt/archives/*.deb 2>/dev/null || true
+          rm -rf /tmp/* 2>/dev/null || true
+          echo "=== Disk space after cleanup ==="
+          df -h
+
+      - name: Create debian-cd symlink
+        run: |
+          ln -sf sid /usr/share/live/build/data/debian-cd/trixie 2>/dev/null || true
+      
+      - name: Prepare build environment
+        run: |
+          mkdir -p build
+          cp -r utils/* build/
+          chmod +x build/build.sh
+          chmod +x build/tools/*.sh
+
+      - name: Build ISO
+        working-directory: build
+        run: |
+          sudo ./build.sh \
+            --distribution trixie \
+            --arch amd64 \
+            --variant default \
+            --verbose
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p artifact
+          cp -v build/images/*.iso artifact/ 2>/dev/null || echo "No ISO in build/images/"
+          find build -name "*.iso" -exec cp -v {} artifact/ \; 2>/dev/null || true
+          if ! ls artifact/*.iso 2>/dev/null; then
+            echo "No ISO files found"
+            find build -maxdepth 3 -type f -name "*.iso" -o -name "*.hybrid.iso" 2>/dev/null | head -10
+          fi
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-iso
+          path: artifact/
+          compression-level: 0
+          if-no-files-found: warn
+
+      - name: Generate version tag
+        id: version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          . tools/build_version.sh
+          TAG="lingmo-os-$(generate_build_ver)"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Publish to GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.version.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          ARCHIVE=$(ls -1 artifact/*.iso 2>/dev/null | head -1)
+
+          if [ -z "${ARCHIVE}" ]; then
+            echo "No ISO file found in artifact/"
+            exit 1
+          fi
+
+          echo "Release 文件: ${ARCHIVE}"
+          ls -lh "${ARCHIVE}"
+          SIZE=$(stat -c%s "${ARCHIVE}")
+          echo "文件大小: ${SIZE} bytes"
+
+          # GitHub Release 单个文件限制 2GB，超过则分片上传
+          if [ "${SIZE}" -gt 2147483648 ]; then
+            echo "文件超过 2GB，创建 Release 后分片上传"
+            gh release create "${TAG}" \
+              --repo "${{ github.repository }}" \
+              --title "Build ${TAG}" \
+              --notes "自动构建的 Lingmo OS ISO" \
+              --target "${{ github.ref_name }}" \
+              --latest=false
+
+            split -b 1900M "${ARCHIVE}" "${ARCHIVE}.part-"
+            for part in "${ARCHIVE}".part-*; do
+              echo "上传分片: $(basename "${part}") ($(du -h "${part}" | cut -f1))"
+              gh release upload "${TAG}" "${part}" \
+                --repo "${{ github.repository }}" \
+                --clobber
+            done
+
+            echo "清理分片文件"
+            rm -f "${ARCHIVE}".part-*
+          else
+            echo "创建 Release（含文件）: ${TAG}"
+            gh release create "${TAG}" \
+              "${ARCHIVE}" \
+              --repo "${{ github.repository }}" \
+              --title "Build ${TAG}" \
+              --notes "自动构建的 Lingmo OS ISO" \
+              --target "${{ github.ref_name }}" \
+              --latest=false
+          fi
+
+          echo "Release ${TAG} 创建完成"
