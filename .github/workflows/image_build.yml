@@ -21,7 +21,16 @@ jobs:
       image: debian:trixie
       options: --privileged
     steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            git \
+            ca-certificates
+
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Install system dependencies
         run: |
