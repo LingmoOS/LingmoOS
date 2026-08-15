@@ -68,6 +68,7 @@ jobs:
           mkdir -p build
           cp -r utils/* build/
           chmod +x build/build.sh
+          chmod +x tools/build_version_2.sh
 
       - name: Build ISO
         working-directory: build
@@ -100,7 +101,7 @@ jobs:
         id: version
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          . tools/build_version.sh
+          . tools/build_version_2.sh
           TAG="lingmo-os-$(generate_build_ver)"
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
