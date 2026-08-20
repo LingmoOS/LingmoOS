@@ -14,6 +14,8 @@ find_package(Qt6 CONFIG REQUIRED Widgets DBus Concurrent LinguistTools QuickCont
 find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 
 find_package(KF6WindowSystem REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(XCB_LIBS REQUIRED xcb)
 
 set(SRCS
     src/applicationitem.h
@@ -43,6 +45,7 @@ qt_add_dbus_adaptor(DBUS_SOURCES
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${PROJECT_NAME} ${SRCS} ${DBUS_SOURCES} ${RESOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${XCB_LIBS_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt6::Core
         Qt6::Widgets
@@ -52,6 +55,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt6::DBus
         Qt6::Core5Compat
         KF6::WindowSystem
+        ${XCB_LIBS_LIBRARIES}
 )
 
 file(GLOB TS_FILES translations/*.ts)

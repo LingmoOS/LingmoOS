@@ -129,7 +129,7 @@ CAppItem *CApplications::matchItem(quint32 pid, const QString &windowClass)
 void CApplications::refresh()
 {
     QStringList addedEntries;
-    for (CAppItem *item : qAsConst(m_items)) {
+    for (CAppItem *item : std::as_const(m_items)) {
         addedEntries.append(item->path);
     }
 
@@ -152,7 +152,7 @@ void CApplications::refresh()
     }
 
     QList<CAppItem *> removeItems;
-    for (CAppItem *item : qAsConst(m_items)) {
+    for (CAppItem *item : std::as_const(m_items)) {
         if (!allEntries.contains(item->path)) {
             removeItems.append(item);
         }

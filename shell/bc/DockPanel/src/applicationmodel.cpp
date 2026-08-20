@@ -326,7 +326,7 @@ ApplicationItem *ApplicationModel::findItemByDesktop(const QString &desktop)
 
 bool ApplicationModel::contains(const QString &id)
 {
-    for (ApplicationItem *item : qAsConst(m_appItems)) {
+    for (ApplicationItem *item : std::as_const(m_appItems)) {
         if (item->id == id)
             return true;
     }

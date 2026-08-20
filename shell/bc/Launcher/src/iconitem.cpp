@@ -71,12 +71,14 @@ QSGNode *IconItem::updatePaintNode(QSGNode *oldNode, QQuickItem::UpdatePaintNode
     return textureNode;
 }
 
-void IconItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+void IconItem::itemChange(ItemChange change, const ItemChangeData &data)
 {
-    polish();
-    update();
+    if (change == ItemGeometryChange) {
+        polish();
+        update();
+    }
 
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::itemChange(change, data);
 }
 
 void IconItem::componentComplete()

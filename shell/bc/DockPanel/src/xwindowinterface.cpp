@@ -55,7 +55,7 @@ XWindowInterface::XWindowInterface(QObject *parent)
 
 void XWindowInterface::enableBlurBehind(QWindow *view, bool enable, const QRegion &region)
 {
-    KWindowEffects::enableBlurBehind(view->winId(), enable, region);
+    KWindowEffects::enableBlurBehind(view, enable, region);
 }
 
 WId XWindowInterface::activeWindow()
@@ -184,17 +184,25 @@ void XWindowInterface::setViewStruts(QWindow *view, DockSettings::Direction dire
         break;
     }
 
-    KWindowSystem::setExtendedStrut(view->winId(),
-                                    strut.left_width,   strut.left_start,   strut.left_end,
-                                    strut.right_width,  strut.right_start,  strut.right_end,
-                                    strut.top_width,    strut.top_start,    strut.top_end,
-                                    strut.bottom_width, strut.bottom_start, strut.bottom_end
-                                    );
+    auto *nativeInterface = qApp->platformNativeInterface();
+    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
+        nativeInterface->nativeResourceForScreen("xcbconnection"));
+    xcb_window_t rootWindow = DefaultRootWindow(connection);
+
+    NETWinInfo info(connection, view->winId(), rootWindow, NET::WMExtendedStrut);
+    info.setExtendedStrut(strut);
 }
 
 void XWindowInterface::clearViewStruts(QWindow *view)
 {
-    KWindowSystem::setExtendedStrut(view->winId(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    auto *nativeInterface = qApp->platformNativeInterface();
+    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
+        nativeInterface->nativeResourceForScreen("xcbconnection"));
+    xcb_window_t rootWindow = DefaultRootWindow(connection);
+
+    NETWinInfo info(connection, view->winId(), rootWindow, NET::WMExtendedStrut);
+    NETExtendedStrut emptyStrut;
+    info.setExtendedStrut(emptyStrut);
 }
 
 void XWindowInterface::startInitWindows()

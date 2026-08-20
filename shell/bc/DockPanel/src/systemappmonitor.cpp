@@ -128,7 +128,6 @@ void SystemAppMonitor::addApplication(const QString &filePath)
         return;
 
     QSettings desktop(filePath, QSettings::IniFormat);
-    desktop.setIniCodec("UTF-8");
     desktop.beginGroup("Desktop Entry");
 
     if (desktop.value("Terminal").toBool())

@@ -35,6 +35,8 @@
 #include <NETWM>
 #include <KWindowSystem>
 #include <KWindowEffects>
+#include <xcb/xcb.h>
+#include <qpa/qplatformnativeinterface.h>
 
 StatusBar::StatusBar(QQuickView *parent)
     : QQuickView(parent)
@@ -46,8 +48,15 @@ StatusBar::StatusBar(QQuickView *parent)
     setFlags(Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus);
     setColor(Qt::transparent);
 
-    KWindowSystem::setOnDesktop(winId(), NET::OnAllDesktops);
-    KWindowSystem::setType(winId(), NET::Dock);
+    {
+        auto *nativeInterface = qApp->platformNativeInterface();
+        xcb_connection_t *connection = static_cast<xcb_connection_t*>(
+            nativeInterface->nativeResourceForScreen("xcbconnection"));
+        xcb_window_t rootWindow = DefaultRootWindow(connection);
+        NETWinInfo info(connection, winId(), rootWindow, NET::WMDesktop | NET::WMWindowType);
+        info.setDesktop(NET::OnAllDesktops);
+        info.setWindowType(NET::Dock);
+    }
 
     new StatusbarAdaptor(this);
     new AppMenu(this);
@@ -111,7 +120,7 @@ void StatusBar::updateGeometry()
     setGeometry(windowRect);
     updateViewStruts();
 
-    KWindowEffects::enableBlurBehind(winId(), true);
+    KWindowEffects::enableBlurBehind(window(), true);
 }
 
 void StatusBar::updateViewStruts()
@@ -125,25 +134,26 @@ void StatusBar::updateViewStruts()
     strut.top_start = rect.x();
     strut.top_end = rect.x() + rect.width() - 1;
 
-    KWindowSystem::setExtendedStrut(winId(),
-                                 strut.left_width,
-                                 strut.left_start,
-                                 strut.left_end,
-                                 strut.right_width,
-                                 strut.right_start,
-                                 strut.right_end,
-                                 strut.top_width,
-                                 strut.top_start,
-                                 strut.top_end,
-                                 strut.bottom_width,
-                                 strut.bottom_start,
-                                 strut.bottom_end);
+    auto *nativeInterface = qApp->platformNativeInterface();
+    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
+        nativeInterface->nativeResourceForScreen("xcbconnection"));
+    xcb_window_t rootWindow = DefaultRootWindow(connection);
+
+    NETWinInfo info(connection, winId(), rootWindow, NET::WMExtendedStrut);
+    info.setExtendedStrut(strut);
 }
 
 void StatusBar::initState()
 {
     // Remain below the face launchpad.
-    KWindowSystem::setState(winId(), m_acticity->launchPad() ? NET::KeepBelow : NET::KeepAbove);
+    auto *nativeInterface = qApp->platformNativeInterface();
+    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
+        nativeInterface->nativeResourceForScreen("xcbconnection"));
+    xcb_window_t rootWindow = DefaultRootWindow(connection);
+
+    NETWinInfo info(connection, winId(), rootWindow, NET::WMState);
+    unsigned long state = m_acticity->launchPad() ? NET::KeepBelow : NET::KeepAbove;
+    info.setState(state, state);
 }
 
 void StatusBar::onPrimaryScreenChanged(QScreen *screen)

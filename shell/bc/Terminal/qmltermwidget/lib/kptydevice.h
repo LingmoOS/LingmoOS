@@ -168,7 +168,7 @@ private:
 /////////////////////////////////////////////////////
 
 #include <QByteArray>
-#include <QLinkedList>
+#include <QList>
 
 #define CHUNKSIZE 4096
 
@@ -278,7 +278,7 @@ public:
     {
         int index = 0;
         int start = head;
-        QLinkedList<QByteArray>::ConstIterator it = buffers.constBegin();
+        QList<QByteArray>::ConstIterator it = buffers.constBegin();
         forever {
             if (!maxLength)
                 return index;
@@ -327,7 +327,7 @@ public:
     }
 
 private:
-    QLinkedList<QByteArray> buffers;
+    QList<QByteArray> buffers;
     int head, tail;
     int totalSize;
 };
