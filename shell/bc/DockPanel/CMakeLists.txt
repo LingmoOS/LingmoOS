@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 CONFIG REQUIRED Widgets DBus Concurrent LinguistTools QuickControls2)
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 
 find_package(KF6WindowSystem REQUIRED)
 
@@ -50,7 +50,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt6::QuickControls2
         Qt6::Concurrent
         Qt6::DBus
-        Qt5Compat::Core5Compat
+        Qt6::Core5Compat
         KF6::WindowSystem
 )
 

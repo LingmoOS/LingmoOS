@@ -19,7 +19,7 @@ include(CheckSymbolExists)
 include(FeatureSummary)
 
 find_package(Qt6 COMPONENTS Core DBus Widgets Quick LinguistTools REQUIRED)
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(X11)
 
 # ----------- Check --------------------

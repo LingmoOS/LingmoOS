@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Gui Quick QuickControls2 Widgets DBus LinguistTools)
 find_package(Qt6 REQUIRED ${QT})
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 
 # Get the installation directory from qmake
 get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
@@ -50,7 +50,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::QuickControls2
         Qt6::Widgets
         Qt6::DBus
-        Qt5Compat::Core5Compat
+        Qt6::Core5Compat
 )
 
 file(GLOB TS_FILES translations/*.ts)

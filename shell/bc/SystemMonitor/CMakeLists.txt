@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 COMPONENTS Core Quick Widgets QuickControls2 LinguistTools REQUIRED)
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(KF6WindowSystem REQUIRED)
 
 set(PROJECT_SOURCES
@@ -47,7 +47,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::Quick
     Qt6::QuickControls2
     Qt6::Widgets
-    Qt5Compat::Core5Compat
+    Qt6::Core5Compat
     KF6::WindowSystem
 )
 

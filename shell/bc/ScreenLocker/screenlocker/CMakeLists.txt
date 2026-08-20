@@ -21,7 +21,7 @@ target_link_libraries(lingmo-screenlocker
     Qt6::DBus
     Qt6::Widgets
     Qt6::Quick
-    Qt5Compat::Core5Compat
+    Qt6::Core5Compat
 
     ${X11_LIBRARIES}
 )

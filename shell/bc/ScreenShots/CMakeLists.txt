@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 COMPONENTS Core DBus Gui Widgets Quick LinguistTools REQUIRED)
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -31,7 +31,7 @@ target_link_libraries(lingmo-screenshot
   Qt6::Gui
   Qt6::Widgets
   Qt6::Quick
-  Qt5Compat::Core5Compat
+  Qt6::Core5Compat
 )
 
 file(GLOB TS_FILES translations/*.ts)

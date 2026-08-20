@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Qt6 COMPONENTS Core Quick DBus Widgets LinguistTools REQUIRED)
-find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(Libmpv)
 
 qt_add_dbus_interface(screensaver_inhibit_SRCS ./org.freedesktop.ScreenSaver.xml screensaverdbusinterface)
@@ -44,7 +44,7 @@ target_link_libraries(lingmo-videoplayer
   Qt6::Quick
   Qt6::DBus
   Qt6::Widgets
-  Qt5Compat::Core5Compat
+  Qt6::Core5Compat
   Libmpv::Libmpv
 )
 
