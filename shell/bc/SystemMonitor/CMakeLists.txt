@@ -9,8 +9,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 COMPONENTS Core Quick Widgets QuickControls2 LinguistTools REQUIRED)
-find_package(KF5WindowSystem REQUIRED)
+find_package(Qt6 COMPONENTS Core Quick Widgets QuickControls2 LinguistTools REQUIRED)
+find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
+find_package(KF6WindowSystem REQUIRED)
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -25,7 +26,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 
@@ -42,11 +43,12 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    Qt5::Core
-    Qt5::Quick
-    Qt5::QuickControls2
-    Qt5::Widgets
-    KF5::WindowSystem
+    Qt6::Core
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::Widgets
+    Qt5Compat::Core5Compat
+    KF6::WindowSystem
 )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /usr/bin)

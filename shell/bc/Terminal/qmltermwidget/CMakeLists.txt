@@ -67,11 +67,11 @@ add_library(lingmoqmltermwidget MODULE
 )
 
 target_link_libraries(lingmoqmltermwidget
-    Qt5::Core
-    Qt5::Quick
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::DBus
+    Qt6::Core
+    Qt6::Quick
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::DBus
 )
 
 install(TARGETS lingmoqmltermwidget DESTINATION ${INSTALL_QMLDIR}/Lingmo/TermWidget)

@@ -349,7 +349,7 @@ public:
     void setSize(const QSize & size);
 
     /** Sets the text codec used by this session's terminal emulation. */
-    void setCodec(QTextCodec * codec);
+    void setCodec(QStringConverter::Encoding encoding);
 
     /**
      * Sets whether the session has a dark background or not.  The session

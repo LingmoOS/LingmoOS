@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import Lingmo.System 1.0 as System
 import LingmoUI 1.0 as LingmoUI
 import Lingmo.Settings 1.0
@@ -38,7 +38,7 @@ ItemPage {
                     // horizontalCenter: parent.horizontalCenter
                     leftMargin:80
                     right: parent.right
-                    margins: 5 // 设置边距为20像素
+                    margins: 5 // 设置边距�?0像素
                 }
 
                 Image {
@@ -200,7 +200,7 @@ ItemPage {
             //     Layout.fillWidth: true
             //     height: 200
 
-            //     // 开启图层，并整体裁剪圆角
+            //     // 开启图层，并整体裁剪圆�?
             //     layer.enabled: true
             //     layer.effect: OpacityMask {
             //         maskSource: Rectangle {
@@ -247,7 +247,7 @@ ItemPage {
             //             horizontalOffset: 0
             //             verticalOffset: 4
             //             radius: 16           // 阴影模糊半径
-            //             color: "#D3FFFFFF"   // 阴影颜色，可调透明度
+            //             color: "#D3FFFFFF"   // 阴影颜色，可调透明�?
             //             samples: 18          // 阴影质量，值越高越平滑
             //         }
             //     }

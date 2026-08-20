@@ -502,7 +502,7 @@ ColorScheme* KDE3ColorSchemeReader::read()
 
     ColorScheme* scheme = new ColorScheme();
 
-    QRegExp comment(QLatin1String("#.*$"));
+    QRegularExpression comment(QLatin1String("#.*$"));
     while ( !_device->atEnd() )
     {
         QString line(QString::fromUtf8(_device->readLine()));

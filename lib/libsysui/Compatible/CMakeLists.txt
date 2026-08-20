@@ -117,7 +117,7 @@ endforeach (filepath)
 qt_add_qml_module(${TARGET}CompatibleModule
     PLUGIN_TARGET ${TARGET}CompatibleModule
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/temp/${PROJECT_NAME}/CompatibleModule
-    VERSION ${MODULE_VERSION_MAJOR}.${MODULE_VERSION_MINOR}
+    VERSION 1.0
     URI ${PROJECT_NAME}.CompatibleModule
     TYPEINFO "plugins.qmltypes"
     SOURCES ${TARGET_SOURCES} 

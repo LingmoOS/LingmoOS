@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import LingmoUI 1.0 as LingmoUI
 import "./components" as Components
 
@@ -12,7 +12,7 @@ ItemPage {
     property string sortBy: "cpu"
     property bool sortAscending: false
     property string selectedPid: ""
-    property var activeContextMenu: null  // 添加这个属性来跟踪活动的菜单
+    property var activeContextMenu: null  // 添加这个属性来跟踪活动的菜�?
 
     ColumnLayout {
         anchors.fill: parent
@@ -68,7 +68,7 @@ ItemPage {
                         searchTimer.restart()
                     }
 
-                    // 添加快捷键提示
+                    // 添加快捷键提�?
                     ToolTip.visible: hovered
                     ToolTip.text: qsTr("Press Ctrl+F to search")
 
@@ -182,7 +182,7 @@ ItemPage {
 
                         contentItem: ListView {
                             clip: true
-                            implicitHeight: Math.min(contentHeight, 200)  // 限制最大高度
+                            implicitHeight: Math.min(contentHeight, 200)  // 限制最大高�?
                             model: filterBox.popup.visible ? filterBox.delegateModel : null
                             currentIndex: filterBox.highlightedIndex
                             spacing: LingmoUI.Units.smallSpacing
@@ -285,12 +285,12 @@ ItemPage {
                 // 添加这个属性来禁止自动选择
                 currentIndex: -1
                 
-                // 添加虚拟化
+                // 添加虚拟�?
                 cacheBuffer: 0
                 displayMarginBeginning: 100
                 displayMarginEnd: 100
                 
-                // 添加这个属性来保持选择状态
+                // 添加这个属性来保持选择状�?
                 highlightFollowsCurrentItem: false
                 
                 // 添加动画
@@ -403,7 +403,7 @@ ItemPage {
                     }
                 }
 
-                // 进程项委托
+                // 进程项委�?
                 delegate: ItemDelegate {
                     width: processListView.width
                     height: 36
@@ -497,7 +497,7 @@ ItemPage {
                             id: priorityMenu
                             title: qsTr("Priority")
 
-                            // 添加自定义箭头
+                            // 添加自定义箭�?
                             delegate: MenuItem {
                                 id: menuItem
                                 
@@ -604,7 +604,7 @@ ItemPage {
             sortAscending
         )
 
-        // 如果之前有选中的进程，找到它的新位置
+        // 如果之前有选中的进程，找到它的新位�?
         if (currentPid) {
             for (var i = 0; i < processListView.model.length; i++) {
                 if (processListView.model[i].pid === currentPid) {

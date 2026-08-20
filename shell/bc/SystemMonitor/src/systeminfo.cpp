@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QVariantMap>
+#include <QRegularExpression>
 #include <sys/statvfs.h>
 #include <pwd.h>
 #include <sys/resource.h>
@@ -96,7 +97,7 @@ void SystemInfo::updateCpuUsage()
 
     // 读取总体 CPU 使用率
     QString line = statFile.readLine();
-    QStringList values = line.split(QRegExp("\\s+"));
+    QStringList values = line.split(QRegularExpression("\\s+"));
     if (values.size() >= 5) {
         unsigned long long user = values[1].toLongLong();
         unsigned long long nice = values[2].toLongLong();
@@ -121,7 +122,7 @@ void SystemInfo::updateCpuUsage()
     // 读取每个核心的使用率
     for (int i = 0; i < m_cpuCoreCount; ++i) {
         line = statFile.readLine();
-        values = line.split(QRegExp("\\s+"));
+        values = line.split(QRegularExpression("\\s+"));
         
         if (values.size() >= 5) {
             unsigned long long user = values[1].toLongLong();
@@ -164,13 +165,13 @@ void SystemInfo::updateMemoryInfo()
     QString line;
     while (stream.readLineInto(&line)) {
         if (line.startsWith("MemTotal:"))
-            total = line.split(QRegExp("\\s+"))[1].toLongLong();
+            total = line.split(QRegularExpression("\\s+"))[1].toLongLong();
         else if (line.startsWith("MemFree:"))
-            free = line.split(QRegExp("\\s+"))[1].toLongLong();
+            free = line.split(QRegularExpression("\\s+"))[1].toLongLong();
         else if (line.startsWith("Buffers:"))
-            buffers = line.split(QRegExp("\\s+"))[1].toLongLong();
+            buffers = line.split(QRegularExpression("\\s+"))[1].toLongLong();
         else if (line.startsWith("Cached:"))
-            cached = line.split(QRegExp("\\s+"))[1].toLongLong();
+            cached = line.split(QRegularExpression("\\s+"))[1].toLongLong();
     }
     meminfo.close();
 
@@ -250,7 +251,7 @@ void SystemInfo::updateProcessList()
     QFile statFile("/proc/stat");
     if (statFile.open(QIODevice::ReadOnly)) {
         QString line = statFile.readLine();
-        QStringList values = line.split(QRegExp("\\s+"));
+        QStringList values = line.split(QRegularExpression("\\s+"));
         if (values.size() >= 5) {
             for (int i = 1; i < values.size(); ++i) {
                 totalCPUTime += values[i].toLongLong();
@@ -335,7 +336,7 @@ void SystemInfo::updateProcessList()
     }
 
     // 清理已经不存在的进程的记录
-    QStringList currentPids = pidDirs.filter(QRegExp("^\\d+$"));
+    QStringList currentPids = pidDirs.filter(QRegularExpression("^\\d+$"));
     QStringList prevPids = m_prevProcessTimes.keys();
     for (const QString &pid : prevPids) {
         if (!currentPids.contains(pid)) {
@@ -450,7 +451,7 @@ void SystemInfo::updateNetworkInfo()
         stream.readLine();
         
         while (stream.readLineInto(&line)) {
-            QStringList parts = line.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+            QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
             if (parts.size() >= 10) {
                 QString interface = parts[0].remove(':');
                 if (interface == "lo") continue;  // 跳过回环接口

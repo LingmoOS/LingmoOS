@@ -12,10 +12,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(Qt5 COMPONENTS Core Quick DBus Widgets LinguistTools REQUIRED)
+find_package(Qt6 COMPONENTS Core Quick DBus Widgets LinguistTools REQUIRED)
+find_package(Qt5Compat REQUIRED COMPONENTS Core5Compat)
 find_package(Libmpv)
 
-qt5_add_dbus_interface(screensaver_inhibit_SRCS ./org.freedesktop.ScreenSaver.xml screensaverdbusinterface)
+qt_add_dbus_interface(screensaver_inhibit_SRCS ./org.freedesktop.ScreenSaver.xml screensaverdbusinterface)
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -39,10 +40,11 @@ add_executable(lingmo-videoplayer
 
 target_link_libraries(lingmo-videoplayer
   PRIVATE
-  Qt5::Core
-  Qt5::Quick
-  Qt5::DBus
-  Qt5::Widgets
+  Qt6::Core
+  Qt6::Quick
+  Qt6::DBus
+  Qt6::Widgets
+  Qt5Compat::Core5Compat
   Libmpv::Libmpv
 )
 
@@ -59,7 +61,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 
 install(FILES ${QM_FILES} DESTINATION /usr/share/lingmo-videoplayer/translations)

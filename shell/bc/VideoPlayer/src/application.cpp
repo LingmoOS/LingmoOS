@@ -44,8 +44,6 @@
 
 static QApplication *createApplication(int &argc, char **argv, const QString &applicationName)
 {
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QApplication::setOrganizationName("lingmoos");
     QApplication::setApplicationName(applicationName);
     QApplication::setOrganizationDomain("lingmo.org");

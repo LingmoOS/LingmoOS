@@ -9,8 +9,8 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
-import QtGraphicalEffects 1.12
-import Qt.labs.platform 1.0 as Platform
+import Qt5Compat.GraphicalEffects
+import QtQuick.Dialogs
 
 import LingmoUI 1.0 as CuteUI
 import mpv 1.0
@@ -111,14 +111,14 @@ CuteUI.Window {
         anchors.bottom: parent.bottom
     }
 
-    Platform.FileDialog {
+    FileDialog {
         id: fileDialog
 
         property url location: ""
 
         folder: location
         title: "Select file"
-        fileMode: Platform.FileDialog.OpenFile
+        fileMode: FileDialog.OpenFile
 
         onAccepted: {
             openFile(fileDialog.file.toString(), true)

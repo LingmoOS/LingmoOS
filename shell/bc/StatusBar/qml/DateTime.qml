@@ -22,7 +22,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Window 2.12
 import QtQuick.Layouts 1.12
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Lingmo.StatusBar 1.0
 import Lingmo.Audio 1.0
@@ -128,7 +128,7 @@ DateTimeDialog {
                     Layout.preferredWidth: Math.min(parent.height * 0.7, parent.width * 0.4)
                     Layout.preferredHeight: Layout.preferredWidth
                     Layout.alignment: Qt.AlignVCenter
-                    color: "transparent"  // 移除背景色
+                    color: "transparent"  // 移除背景�?
 
                     Rectangle {
                         anchors.fill: parent
@@ -241,7 +241,7 @@ DateTimeDialog {
                                 ctx.restore();
                             }
 
-                            // 主题改变时重绘
+                            // 主题改变时重�?
                             Connections {
                                 target: LingmoUI.Theme
                                 function onDarkModeChanged() {
@@ -332,7 +332,7 @@ DateTimeDialog {
                             }
                         }
 
-                        // 修改中心点
+                        // 修改中心�?
                         Rectangle {
                             width: clock.width * 0.08
                             height: width
@@ -369,10 +369,10 @@ DateTimeDialog {
                     Layout.preferredWidth: parent.width * 0.5  // 确保右侧有足够的宽度
                     spacing: 20
 
-                    // 顶部弹性空间
+                    // 顶部弹性空�?
                     Item {
                         Layout.fillHeight: true
-                        Layout.preferredHeight: 1  // 权重为1
+                        Layout.preferredHeight: 1  // 权重�?
                     }
 
                     // 时间显示
@@ -409,17 +409,17 @@ DateTimeDialog {
                         wrapMode: Text.Wrap
                     }
 
-                    // 底部弹性空间
+                    // 底部弹性空�?
                     Item {
                         Layout.fillHeight: true
-                        Layout.preferredHeight: 1  // 权重为1
+                        Layout.preferredHeight: 1  // 权重�?
                     }
                 }
             }
 
 
             Timer {
-                interval: 16  // 约60fps的刷新率
+                interval: 16  // �?0fps的刷新率
                 running: true
                 repeat: true
                 onTriggered: {

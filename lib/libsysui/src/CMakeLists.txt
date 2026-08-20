@@ -85,7 +85,7 @@ endforeach (respath)
 qt_add_qml_module(${TARGET}
     PLUGIN_TARGET ${TARGET}
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/temp/${PROJECT_NAME}
-    VERSION ${MODULE_VERSION_MAJOR}.${MODULE_VERSION_MINOR}
+    VERSION 1.0
     URI ${PROJECT_NAME}
     TYPEINFO "plugins.qmltypes"
     SOURCES ${sources_files}

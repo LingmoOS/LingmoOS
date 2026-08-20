@@ -30,8 +30,7 @@
 #include <QDBusServiceWatcher>
 #include <QGuiApplication>
 #include <QMenu>
-
-#include <QX11Info>
+#include <qpa/qplatformnativeinterface.h>
 
 #include <KWindowSystem>
 
@@ -40,9 +39,16 @@
 
 #include <xcb/xcb.h>
 
+static xcb_connection_t *xcbConnection()
+{
+    auto *nativeInterface = qApp->platformNativeInterface();
+    return static_cast<xcb_connection_t*>(
+        nativeInterface->nativeResourceForScreen("xcbconnection"));
+}
+
 static QByteArray getWindowPropertyString(WId id, const QByteArray &name)
 {
-    xcb_connection_t *c = QX11Info::connection();
+    xcb_connection_t *c = xcbConnection();
     QByteArray value;
 
     const xcb_intern_atom_cookie_t atomCookie = xcb_intern_atom(c, false, name.length(), name.constData());

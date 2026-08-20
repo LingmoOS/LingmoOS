@@ -20,7 +20,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import LingmoUI 1.0 as LingmoUI
 
 ToolButton {

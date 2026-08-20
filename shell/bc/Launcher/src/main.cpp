@@ -40,19 +40,13 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QByteArray uri = "Lingmo.Launcher";
     qmlRegisterType<LauncherModel>(uri, 1, 0, "LauncherModel");
     qmlRegisterType<PageModel>(uri, 1, 0, "PageModel");
     qmlRegisterType<IconItem>(uri, 1, 0, "IconItem");
     qmlRegisterType<AppManager>(uri, 1, 0, "AppManager");
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    qmlRegisterType<QAbstractItemModel>();
-#else
     qmlRegisterAnonymousType<QAbstractItemModel>(uri, 0);
-#endif
 
     QApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("lingmo-launcher"));

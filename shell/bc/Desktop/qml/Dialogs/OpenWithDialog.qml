@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import LingmoUI 1.0 as LingmoUI
 
 Item {
@@ -24,7 +24,7 @@ Item {
             listView.model.append(items[i])
         }
 
-        // 获取所有程序并添加到 allAppsModel
+        // 获取所有程序并添加�?allAppsModel
         var allApps = mimeAppManager.allApps(control.url)
         for (var j in allApps) {
             allAppsModel.append(allApps[j])
@@ -297,7 +297,7 @@ Item {
         return Math.floor(extraSpacing)
     }
 
-    // 定义一个模型用于存储所有程序
+    // 定义一个模型用于存储所有程�?
     ListModel {
         id: allAppsModel
     }

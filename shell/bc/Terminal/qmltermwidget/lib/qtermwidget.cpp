@@ -83,7 +83,7 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
     session->setArguments(args);
     session->setAutoClose(true);
 
-    session->setCodec(QTextCodec::codecForName("UTF-8"));
+    session->setCodec(QStringConverter::Utf8);
 
     session->setFlowControlEnabled(true);
     session->setHistoryType(HistoryTypeBuffer(1000));
@@ -159,9 +159,13 @@ void QTermWidget::search(bool forwards, bool next)
     qDebug() << "current selection starts at: " << startColumn << startLine;
     qDebug() << "current cursor position: " << m_impl->m_terminalDisplay->screenWindow()->cursorPosition();
 
-    QRegExp regExp(m_searchBar->searchText());
-    regExp.setPatternSyntax(m_searchBar->useRegularExpression() ? QRegExp::RegExp : QRegExp::FixedString);
-    regExp.setCaseSensitivity(m_searchBar->matchCase() ? Qt::CaseSensitive : Qt::CaseInsensitive);
+    QRegularExpression regExp;
+    if (m_searchBar->useRegularExpression()) {
+        regExp.setPattern(m_searchBar->searchText());
+    } else {
+        regExp.setPattern(QRegularExpression::escape(m_searchBar->searchText()));
+    }
+    regExp.setPatternOptions(m_searchBar->matchCase() ? QRegularExpression::NoPatternOption : QRegularExpression::CaseInsensitiveOption);
 
     HistorySearch *historySearch =
             new HistorySearch(m_impl->m_session->emulation(), regExp, forwards, startColumn, startLine, this);
@@ -424,11 +428,11 @@ void QTermWidget::setArgs(const QStringList &args)
     m_impl->m_session->setArguments(args);
 }
 
-void QTermWidget::setTextCodec(QTextCodec *codec)
+void QTermWidget::setEncoding(QStringConverter::Encoding encoding)
 {
     if (!m_impl->m_session)
         return;
-    m_impl->m_session->setCodec(codec);
+    m_impl->m_session->setCodec(encoding);
 }
 
 void QTermWidget::setColorScheme(const QString& origName)

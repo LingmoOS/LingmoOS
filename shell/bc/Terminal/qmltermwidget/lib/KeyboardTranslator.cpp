@@ -533,10 +533,10 @@ QList<KeyboardTranslatorReader::Token> KeyboardTranslatorReader::tokenize(const 
     text = text.simplified();
 
     // title line: keyboard "title"
-    static QRegExp title(QLatin1String("keyboard\\s+\"(.*)\""));
+    static QRegularExpression title(QLatin1String("keyboard\\s+\"(.*)\""));
     // key line: key KeySequence : "output"
     // key line: key KeySequence : command
-    static QRegExp key(QLatin1String("key\\s+([\\w\\+\\s\\-\\*\\.]+)\\s*:\\s*(\"(.*)\"|\\w+)"));
+    static QRegularExpression key(QLatin1String("key\\s+([\\w\\+\\s\\-\\*\\.]+)\\s*:\\s*(\"(.*)\"|\\w+)"));
 
     QList<Token> list;
     if ( text.isEmpty() )
@@ -544,36 +544,41 @@ QList<KeyboardTranslatorReader::Token> KeyboardTranslatorReader::tokenize(const 
         return list;
     }
 
-    if ( title.exactMatch(text) )
+    QRegularExpressionMatch titleMatch = title.match(text);
+    if ( titleMatch.hasMatch() )
     {
         Token titleToken = { Token::TitleKeyword , QString() };
-        Token textToken = { Token::TitleText , title.capturedTexts().at(1) };
+        Token textToken = { Token::TitleText , titleMatch.captured(1) };
 
         list << titleToken << textToken;
     }
-    else if  ( key.exactMatch(text) )
+    else
     {
-        Token keyToken = { Token::KeyKeyword , QString() };
-        Token sequenceToken = { Token::KeySequence , key.capturedTexts().value(1).remove(QLatin1Char(' ')) };
-
-        list << keyToken << sequenceToken;
-
-        if ( key.capturedTexts().at(3).isEmpty() )
+        QRegularExpressionMatch keyMatch = key.match(text);
+        if  ( keyMatch.hasMatch() )
         {
-            // capturedTexts()[2] is a command
-            Token commandToken = { Token::Command , key.capturedTexts().at(2) };
-            list << commandToken;
+            Token keyToken = { Token::KeyKeyword , QString() };
+            Token sequenceToken = { Token::KeySequence , keyMatch.captured(1).remove(QLatin1Char(' ')) };
+
+            list << keyToken << sequenceToken;
+
+            if ( keyMatch.captured(3).isEmpty() )
+            {
+                // capturedTexts()[2] is a command
+                Token commandToken = { Token::Command , keyMatch.captured(2) };
+                list << commandToken;
+            }
+            else
+            {
+                // capturedTexts()[3] is the output string
+               Token outputToken = { Token::OutputText , keyMatch.captured(3) };
+               list << outputToken;
+            }
         }
         else
         {
-            // capturedTexts()[3] is the output string
-           Token outputToken = { Token::OutputText , key.capturedTexts().at(3) };
-           list << outputToken;
+            qDebug() << "Line in keyboard translator file could not be understood:" << text;
         }
-    }
-    else
-    {
-        qDebug() << "Line in keyboard translator file could not be understood:" << text;
     }
 
     return list;

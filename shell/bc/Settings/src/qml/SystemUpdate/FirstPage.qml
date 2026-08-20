@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Templates 2.12 as T
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import QtWebEngine 1.2
 import LingmoUI 1.0 as LingmoUI
 import Lingmo.Settings 1.0
@@ -379,7 +379,7 @@ Item {
                             text: updator.updateInfo
                             textFormat: TextArea.RichText
                             color: LingmoUI.Theme.disabledTextColor
-                            readOnly: true // 设置为只读模式，因为是用于显示日志
+                            readOnly: true // 设置为只读模式，因为是用于显示日�?
                             wrapMode: Text.WordWrap // 确保文本可以换行
                         }
                     }
@@ -387,12 +387,12 @@ Item {
                     //     id: webview
                     //     Layout.fillWidth: true
                     //     Layout.fillHeight: true
-                    //     url: "about:blank" // 初始为空白页面
+                    //     url: "about:blank" // 初始为空白页�?
                     // }
                     // Text {
                     //     id: updateText
                     //     anchors.fill: parent
-                    //     text: "" // 初始为空字符串
+                    //     text: "" // 初始为空字符�?
                     //     horizontalAlignment: Text.AlignHCenter
                     //     verticalAlignment: Text.AlignVCenter
                     //     elide: Text.ElideRight

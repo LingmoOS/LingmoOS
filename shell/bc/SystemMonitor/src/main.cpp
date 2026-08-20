@@ -8,10 +8,6 @@
 
 int main(int argc, char *argv[])
 {
-    // 设置属性以启用高 DPI 缩放
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon::fromTheme("utilities-system-monitor"));
 

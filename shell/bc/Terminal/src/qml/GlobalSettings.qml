@@ -3,7 +3,7 @@
  * Copyright 2023 LingmoOS Team
  */
 import QtQuick 2.0
-import Qt.labs.settings 1.0
+import QtCore
 
 Settings {
     property int width: 750
