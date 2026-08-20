@@ -46,6 +46,15 @@ KPtyProcess::KPtyProcess(QObject *parent) :
     d->pty->open();
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
+    setChildProcessModifier([d]() {
+        d->pty->setCTty();
+        if (d->ptyChannels & StdinChannel)
+            dup2(d->pty->slaveFd(), 0);
+        if (d->ptyChannels & StdoutChannel)
+            dup2(d->pty->slaveFd(), 1);
+        if (d->ptyChannels & StderrChannel)
+            dup2(d->pty->slaveFd(), 2);
+    });
 }
 
 KPtyProcess::KPtyProcess(int ptyMasterFd, QObject *parent) :
@@ -57,6 +66,15 @@ KPtyProcess::KPtyProcess(int ptyMasterFd, QObject *parent) :
     d->pty->open(ptyMasterFd);
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
+    setChildProcessModifier([d]() {
+        d->pty->setCTty();
+        if (d->ptyChannels & StdinChannel)
+            dup2(d->pty->slaveFd(), 0);
+        if (d->ptyChannels & StdoutChannel)
+            dup2(d->pty->slaveFd(), 1);
+        if (d->ptyChannels & StderrChannel)
+            dup2(d->pty->slaveFd(), 2);
+    });
 }
 
 KPtyProcess::~KPtyProcess()
@@ -117,28 +135,6 @@ KPtyDevice *KPtyProcess::pty() const
     Q_D(const KPtyProcess);
 
     return d->pty;
-}
-
-void KPtyProcess::setupChildProcess()
-{
-    Q_D(KPtyProcess);
-
-    d->pty->setCTty();
-
-#if 0
-    if (d->addUtmp)
-        d->pty->login(KUser(KUser::UseRealUserID).loginName().toLocal8Bit().data(), qgetenv("DISPLAY"));
-#endif
-    if (d->ptyChannels & StdinChannel)
-        dup2(d->pty->slaveFd(), 0);
-
-    if (d->ptyChannels & StdoutChannel)
-        dup2(d->pty->slaveFd(), 1);
-
-    if (d->ptyChannels & StderrChannel)
-        dup2(d->pty->slaveFd(), 2);
-
-    KProcess::setupChildProcess();
 }
 
 //#include "kptyprocess.moc"

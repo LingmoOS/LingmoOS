@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_CURRENT
 # set(QT Core Gui Widgets Network WebEngine Quick QuickControls2 X11Extras DBus Xml Concurrent LinguistTools)
 set(QT Core Gui Widgets Network Quick QuickControls2 DBus Xml Concurrent LinguistTools)
 find_package(Qt6 REQUIRED ${QT})
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat GuiPrivate)
 find_package(X11 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -65,6 +65,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Xml
         Qt6::Concurrent
         Qt6::Core5Compat
+        Qt6::GuiPrivate
 
         Qt6::Network
 

@@ -23,7 +23,7 @@ QMap<int, CScreenOutput *> CScreenManager::outputMap() const
 int CScreenManager::outputId(const QScreen *qscreen)
 {
     QList<int> ids;
-    for (auto output : qAsConst(m_outputMap)) {
+    for (auto output : std::as_const(m_outputMap)) {
         if (qscreen == output->qscreen()) {
             return output->id();
         }

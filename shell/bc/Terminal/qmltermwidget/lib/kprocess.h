@@ -336,8 +336,6 @@ protected:
 
 private:
     // hide those
-    using QProcess::setReadChannelMode;
-    using QProcess::readChannelMode;
     using QProcess::setProcessChannelMode;
     using QProcess::processChannelMode;
 

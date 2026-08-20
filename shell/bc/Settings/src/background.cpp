@@ -9,7 +9,9 @@ static QVariantList getBackgroundPaths()
         QString bg = it.next();
         list.append(QVariant(bg));
     }
-    std::sort(list.begin(), list.end());
+    std::sort(list.begin(), list.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toString() < b.toString();
+    });
     return list;
 }
 

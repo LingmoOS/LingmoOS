@@ -35,7 +35,7 @@ QStringList CIconTheme::list()
     iconsPath += QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("icons"), QStandardPaths::LocateDirectory);
     iconsPath += QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("pixmaps"), QStandardPaths::LocateDirectory);
 
-    for (const QString &path : qAsConst(iconsPath)) {
+    for (const QString &path : std::as_const(iconsPath)) {
         QDir dir(path);
         QStringList dirList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const QString &dir : dirList) {

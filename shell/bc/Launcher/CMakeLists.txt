@@ -12,8 +12,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Widgets DBus Quick QuickControls2 LinguistTools)
 find_package(Qt6 REQUIRED ${QT})
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat GuiPrivate)
 find_package(KF6WindowSystem REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(XCB_LIBS REQUIRED xcb)
 
 set(SRCS
     src/desktopproperties.cpp
@@ -44,6 +46,7 @@ qt_add_dbus_adaptor(DBUS_SRCS
 set_source_files_properties(${DBUS_SRCS} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(${PROJECT_NAME} ${SRCS} ${DBUS_SRCS} ${RESOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${XCB_LIBS_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME}
         Qt6::Core
         Qt6::Widgets
@@ -51,7 +54,9 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Quick
         Qt6::QuickControls2
         Qt6::Core5Compat
+        Qt6::GuiPrivate
         KF6::WindowSystem
+        ${XCB_LIBS_LIBRARIES}
 )
 
 file(GLOB TS_FILES translations/*.ts)
