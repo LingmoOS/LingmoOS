@@ -12,10 +12,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Widgets DBus Quick QuickControls2 LinguistTools)
 find_package(Qt6 REQUIRED ${QT})
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat GuiPrivate)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(KF6WindowSystem REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(XCB_LIBS REQUIRED xcb)
+
+find_path(QT6_GUI_PRIVATE_INCLUDE_DIR qpa/qplatformnativeinterface.h
+    HINTS ${Qt6Gui_INCLUDE_DIRS} PATH_SUFFIXES QtGui)
+if(QT6_GUI_PRIVATE_INCLUDE_DIR)
+    include_directories(${QT6_GUI_PRIVATE_INCLUDE_DIR})
+endif()
 
 set(SRCS
     src/desktopproperties.cpp
@@ -54,7 +60,6 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Quick
         Qt6::QuickControls2
         Qt6::Core5Compat
-        Qt6::GuiPrivate
         KF6::WindowSystem
         ${XCB_LIBS_LIBRARIES}
 )

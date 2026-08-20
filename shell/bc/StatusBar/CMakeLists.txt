@@ -12,9 +12,15 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 CONFIG REQUIRED Widgets DBus Concurrent LinguistTools QuickControls2)
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat GuiPrivate)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(KF6WindowSystem REQUIRED)
 find_package(PkgConfig REQUIRED)
+
+find_path(QT6_GUI_PRIVATE_INCLUDE_DIR qpa/qplatformnativeinterface.h
+    HINTS ${Qt6Gui_INCLUDE_DIRS} PATH_SUFFIXES QtGui)
+if(QT6_GUI_PRIVATE_INCLUDE_DIR)
+    include_directories(${QT6_GUI_PRIVATE_INCLUDE_DIR})
+endif()
 
 pkg_check_modules(XCB_LIBS REQUIRED xcb)
 
@@ -115,7 +121,6 @@ target_link_libraries(lingmo-statusbar
   Qt6::Concurrent
   Qt6::DBus
   Qt6::Core5Compat
-  Qt6::GuiPrivate
   KF6::WindowSystem
   ${XCB_LIBS_LIBRARIES}
 )
