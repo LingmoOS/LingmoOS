@@ -20,7 +20,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import QtQuick.Window 2.3
 
 import LingmoUI 1.0 as LingmoUI
@@ -45,7 +45,7 @@ Item {
         anchors.bottomMargin: LingmoUI.Units.smallSpacing
         spacing: 0
 
-        // 顶部�?
+        // 顶部项
         Item {
             Layout.fillWidth: true
             Layout.preferredHeight: _topItem.implicitHeight + LingmoUI.Units.largeSpacing

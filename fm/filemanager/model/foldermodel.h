@@ -34,13 +34,14 @@
 #include <QQmlParserStatus>
 #include <QQuickItem>
 #include <QPointer>
-#include <QRegularExpression>
 
 #include <KDirLister>
 #include <KDirModel>
 #include <KDirWatch>
 #include <KActionCollection>
-
+#include <KService>
+#include <KServiceTypeTrader>
+#include <KRun>
 #include <KFileItemActions>
 
 class QDrag;
@@ -217,7 +218,6 @@ public:
     Q_INVOKABLE void openPropertiesDialog();
     Q_INVOKABLE void openInTerminal();
     Q_INVOKABLE void openChangeWallpaperDialog();
-    Q_INVOKABLE void openDisplaySettings();
     Q_INVOKABLE void openDeleteDialog();
     Q_INVOKABLE void openInNewWindow(const QString &url = QString());
 
@@ -310,7 +310,7 @@ private:
     QString m_filterPattern;
     bool m_filterPatternMatchAll;
     QSet<QString> m_mimeSet;
-    QList<QRegularExpression> m_regExps;
+    QList<QRegExp> m_regExps;
 
     bool m_complete;
     bool m_isDesktop;

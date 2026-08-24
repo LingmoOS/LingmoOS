@@ -4,27 +4,27 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.qml" line="240"/>
+        <location filename="../main.qml" line="74"/>
         <source>Shutdown</source>
         <translation>Изкючване</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="248"/>
+        <location filename="../main.qml" line="82"/>
         <source>Reboot</source>
         <translation>Рестартиране</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="256"/>
+        <location filename="../main.qml" line="90"/>
         <source>Logout</source>
         <translation>Излизане</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="264"/>
+        <location filename="../main.qml" line="98"/>
         <source>Lock screen</source>
         <translation>Заключен екран</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="272"/>
+        <location filename="../main.qml" line="106"/>
         <source>Suspend</source>
         <translation>Приспиване</translation>
     </message>

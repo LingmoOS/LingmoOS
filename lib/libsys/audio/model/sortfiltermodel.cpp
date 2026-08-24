@@ -1,7 +1,5 @@
 #include "sortfiltermodel.h"
 
-#include <QRegularExpression>
-
 #include <QQmlContext>
 #include <QQmlEngine>
 
@@ -91,14 +89,13 @@ void SortFilterModel::setFilterRegExp(const QString &exp)
     if (exp == filterRegExp()) {
         return;
     }
-    QSortFilterProxyModel::setFilterRegularExpression(
-        QRegularExpression(exp, QRegularExpression::CaseInsensitiveOption));
+    QSortFilterProxyModel::setFilterRegExp(QRegExp(exp, Qt::CaseInsensitive));
     Q_EMIT filterRegExpChanged(exp);
 }
 
 QString SortFilterModel::filterRegExp() const
 {
-    return QSortFilterProxyModel::filterRegularExpression().pattern();
+    return QSortFilterProxyModel::filterRegExp().pattern();
 }
 
 void SortFilterModel::setFilterString(const QString &filterString)

@@ -12,10 +12,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Gui Quick QuickControls2 LinguistTools)
-find_package(Qt6 REQUIRED ${QT})
+find_package(Qt5 REQUIRED ${QT})
 
-find_package(Qt6 COMPONENTS Core Widgets Quick REQUIRED)
-find_package(KF6SyntaxHighlighting)
+find_package(Qt5 COMPONENTS Core Widgets Quick REQUIRED)
+find_package(KF5SyntaxHighlighting)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -31,10 +31,10 @@ add_executable(lingmo-texteditor
 
 target_link_libraries(lingmo-texteditor
   PRIVATE
-  Qt6::Core
-  Qt6::Widgets
-  Qt6::Quick
-  KF6::SyntaxHighlighting
+  Qt5::Core
+  Qt5::Widgets
+  Qt5::Quick
+  KF5::SyntaxHighlighting
   )
 
 file(GLOB TS_FILES translations/*.ts)
@@ -42,7 +42,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
   
 install(TARGETS lingmo-texteditor RUNTIME DESTINATION /usr/bin)

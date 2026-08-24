@@ -41,6 +41,8 @@ public:
     void invokeDesktopProcess();
     void initTrash();
 
+   void initKWin();
+
 private:
     ThemeManager *m_themeManager;
     BrightnessManager *m_brightnessManager;
@@ -49,7 +51,8 @@ private:
     Mouse *m_mouse;
     TouchpadManager *m_touchpad;
     DefaultApplications *m_defaultApps;
-
+//
+   QTimer *m_kwinTimer;
 };
 
 #endif // APPLICATION_H

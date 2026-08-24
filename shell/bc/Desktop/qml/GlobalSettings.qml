@@ -18,7 +18,7 @@
  */
 
 import QtQuick 2.12
-import QtCore
+import Qt.labs.settings 1.0
 
 Settings {
     property int viewMethod: 1          // controls display mode: list or grid

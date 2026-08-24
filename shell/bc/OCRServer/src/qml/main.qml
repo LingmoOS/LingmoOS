@@ -2,7 +2,7 @@ import QtQuick 2.4
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.3
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import QtQuick.Dialogs 1.2
 import LingmoUI 1.0 as LingmoUI
 import Lingmo.Ocr 1.0
@@ -42,7 +42,7 @@ LingmoUI.Window {
                 width: 100
                 height: 30
                 padding: 0
-                model: ["简体中�?,"繁体中文","English"]
+                model: ["简体中文","繁体中文","English"]
                 topInset: 0
                 bottomInset: 0
                 currentIndex: 0
@@ -116,14 +116,14 @@ LingmoUI.Window {
                             x: mapItemArea.width/2-mapImg.width/2
                             y: mapItemArea.height/2-mapImg.height/2
                             source: ocr.imgName
-                            //图像异步加载，只对本地图像有�?
+                            //图像异步加载，只对本地图像有用
                             asynchronous: true
                         }
                         MouseArea {
                             id: mapDragArea
                             anchors.fill: mapImg
                             drag.target: mapImg
-                            //这里使图片不管是比显示框大还是比显示框小都不会被拖拽出显示区�?
+                            //这里使图片不管是比显示框大还是比显示框小都不会被拖拽出显示区域
                             drag.minimumX: (mapImg.width > mapItemArea.width) ? (mapItemArea.width - mapImg.width) : 0
                             drag.minimumY: (mapImg.height > mapItemArea.height) ? (mapItemArea.height - mapImg.height) : 0
                             drag.maximumX: (mapImg.width > mapItemArea.width) ? 0 : (mapItemArea.width - mapImg.width)

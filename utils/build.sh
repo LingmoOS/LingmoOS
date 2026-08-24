@@ -8,7 +8,7 @@ set -o pipefail # Bashism
 source ../tools/build_version.sh
 
 # Lingmo's default values
-LINGMO_DIST="trixie"
+LINGMO_DIST="bookworm"
 LINGMO_VERSION=""
 LINGMO_VARIANT="default"
 IMAGE_TYPE="live"
@@ -17,10 +17,10 @@ TARGET_SUBDIR=""
 SUDO="sudo"
 VERBOSE="false"
 DEBUG=""
-LINGMO_VERTYPE="unstable"
-LINGMO_SYS_VERSION="5.0.0"
+LINGMO_VERTYPE="stable"
+LINGMO_SYS_VERSION="3.0.6"
 # LINGMO_BUILD_VER=$(generate_build_ver)
-LINGMO_BUILD_VER="26R04"
+LINGMO_BUILD_VER="25R07"
 RELEASE="helium"
 HOST_ARCH=$(dpkg --print-architecture)
 

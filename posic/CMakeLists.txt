@@ -8,8 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets Svg REQUIRED)
-find_package(Qt6 REQUIRED LinguistTools)
+find_package(Qt5 COMPONENTS Core Gui Widgets Svg REQUIRED)
+find_package(Qt5LinguistTools REQUIRED)
 
 set(SOURCES
     main.cpp
@@ -39,7 +39,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 
@@ -50,7 +50,7 @@ foreach(_ts_file ${TS_FILES})
 endforeach()
 
 # 生成 qrc 文件
-qt_add_resources(QRC_SOURCES ${RESOURCES})
+qt5_add_resources(QRC_SOURCES ${RESOURCES})
 
 add_executable(lingmo-welcome
     ${SOURCES}
@@ -60,10 +60,10 @@ add_executable(lingmo-welcome
 )
 
 target_link_libraries(lingmo-welcome PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Svg
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+    Qt5::Svg
 )
 
 install(TARGETS lingmo-welcome RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

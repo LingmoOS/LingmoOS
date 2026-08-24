@@ -9,7 +9,6 @@
 
 #include "debug.h"
 #include <QObject>
-#include <QVariant>
 
 #include <pulse/introspect.h>
 

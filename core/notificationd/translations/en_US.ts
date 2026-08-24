@@ -4,37 +4,37 @@
 <context>
     <name>DateHelper</name>
     <message>
-        <location filename="../datehelper.cpp" line="16"/>
+        <location filename="../datehelper.cpp" line="15"/>
         <source>Now</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="18"/>
+        <location filename="../datehelper.cpp" line="17"/>
         <source>1 minute ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="20"/>
+        <location filename="../datehelper.cpp" line="19"/>
         <source>%1 minutes ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="24"/>
+        <location filename="../datehelper.cpp" line="23"/>
         <source>1 hour ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="26"/>
+        <location filename="../datehelper.cpp" line="25"/>
         <source>%1 hours ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="30"/>
+        <location filename="../datehelper.cpp" line="29"/>
         <source>1 day ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../datehelper.cpp" line="32"/>
+        <location filename="../datehelper.cpp" line="31"/>
         <source>%1 days ago</source>
         <translation type="unfinished"></translation>
     </message>

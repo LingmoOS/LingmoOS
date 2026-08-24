@@ -1,108 +1,74 @@
-qt_standard_project_setup()
+set(TARGET LingmoUI)
+set(MODULE_VERSION "1.0")
 
-# Create Qt6 library target
-qt_add_library(${TARGET} SHARED)
+add_library(${TARGET} SHARED "")
+target_sources(${TARGET} PRIVATE
+        lingmoui.cpp
+        iconthemeprovider.cpp
+        thememanager.cpp
 
+        newiconitem.cpp
+        managedtexturenode.cpp
+        wheelhandler.cpp
+        qqmlsortfilterproxymodel.cpp
+
+        desktop/menupopupwindow.cpp
+
+        lingmoui.qrc
+        lingmo-style/style.qrc
+        )
+if (MSVC)
+    target_sources(${TARGET} PRIVATE
+            platforms/windows/windowhelper.cpp platforms/windows/windowhelper.h
+            platforms/windows/blurhelper/windowblur.cpp platforms/windows/blurhelper/windowblur.h
+            platforms/windows/shadowhelper/boxshadowrenderer.cpp platforms/windows/shadowhelper/boxshadowrenderer.h
+            platforms/windows/shadowhelper/tileset.cpp platforms/windows/shadowhelper/tileset.h
+            platforms/windows/shadowhelper/windowshadow.cpp platforms/windows/shadowhelper/windowshadow.h
+            )
+    target_include_directories(${TARGET} PRIVATE platforms/windows)
+elseif (APPLE)
+    target_sources(${TARGET} PRIVATE
+            platforms/mac/windowhelper.cpp platforms/mac/windowhelper.h
+            platforms/mac/blurhelper/windowblur.cpp platforms/mac/blurhelper/windowblur.h
+            platforms/mac/shadowhelper/boxshadowrenderer.cpp platforms/mac/shadowhelper/boxshadowrenderer.h
+            platforms/mac/shadowhelper/tileset.cpp platforms/mac/shadowhelper/tileset.h
+            platforms/mac/shadowhelper/windowshadow.cpp platforms/mac/shadowhelper/windowshadow.h
+            )
+    target_include_directories(${TARGET} PRIVATE platforms/mac)
+else ()
+    target_sources(${TARGET} PRIVATE
+            platforms/linux/windowhelper.cpp platforms/linux/windowhelper.h
+            platforms/linux/blurhelper/windowblur.cpp platforms/linux/blurhelper/windowblur.h
+            platforms/linux/shadowhelper/boxshadowrenderer.cpp platforms/linux/shadowhelper/boxshadowrenderer.h
+            platforms/linux/shadowhelper/tileset.cpp platforms/linux/shadowhelper/tileset.h
+            platforms/linux/shadowhelper/windowshadow.cpp platforms/linux/shadowhelper/windowshadow.h
+            )
+    target_include_directories(${TARGET} PRIVATE platforms/linux)
+endif ()
 target_link_libraries(${TARGET}
         PUBLIC
-        Qt6::Core
-        Qt6::Gui
-        Qt6::DBus
-        Qt6::Widgets
+        Qt5::Core
+        Qt5::Gui
+        Qt5::DBus
+        Qt5::Widgets
         PRIVATE
-        Qt6::Qml
-        Qt6::Quick
-        Qt6::QuickControls2
-        Qt6::GuiPrivate
-        Qt6::Core5Compat
-        QHotkey::QHotkey
+        Qt5::Qml
+        Qt5::Quick
+        Qt5::QuickControls2
+        Qt5::GuiPrivate
         )
-target_include_directories(${TARGET} PRIVATE ${QHOTKEY_INCLUDE_DIR})
-
 if (UNIX)
     if (NOT APPLE)
-        target_link_libraries(${TARGET} PRIVATE Qt6::Gui Qt6::GuiPrivate)
-        if (KF6WindowSystem_FOUND)
-            target_link_libraries(${TARGET} PRIVATE KF6::WindowSystem)
-        endif ()
+        target_link_libraries(${TARGET} PRIVATE Qt5::X11Extras Qt5::Gui KF5::WindowSystem)
     endif ()
 endif ()
 
-# Clear the list of source files
-set(sources_files "")
-set(qml_files "")
-set(resource_files "")
-
-#遍历所有Cpp文件
-file(GLOB CPP_FILES *.cpp)
-foreach (filepath ${CPP_FILES})
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
-    list(APPEND sources_files ${filename})
-endforeach (filepath)
-
-#遍历所有h文件
-file(GLOB H_FILES *.h)
-foreach (filepath ${H_FILES})
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
-    list(APPEND sources_files ${filename})
-endforeach (filepath)
-
-set(SINGLETON_FILES "Controls/LingmoRouter.qml" "Controls/LingmoUnits.qml")
-
-#遍历所有qml文件
-file(GLOB_RECURSE QML_PATHS Controls/*.qml Controls/*.qml qmldir)
-foreach (filepath ${QML_PATHS})
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
-    if (${filename} MATCHES "qmldir")
-        list(APPEND resource_files ${filename})
-    else ()
-        list(APPEND qml_files ${filename})
-        # Check for singleton
-        foreach (singletion_name ${SINGLETON_FILES})
-            if (${filename} MATCHES ${singletion_name})
-                set_source_files_properties(${filename} PROPERTIES QT_QML_SINGLETON_TYPE true)
-            endif ()
-        endforeach (singletion_name)
-    endif ()
-endforeach (filepath)
-
-#遍历所有资源文件
-set(RES_SUFFIX "")
-set(RES_PATHS "")
-list(APPEND RES_SUFFIX *.png *.jpg *.svg *.ico *.ttf *.webp *.js *.qm *.qsb)
-list(APPEND RES_PATHS Controls Font Image)
-foreach (respath ${RES_PATHS})
-    foreach (filesuffix ${RES_SUFFIX})
-        file(GLOB_RECURSE RES_FOUND ${respath}/${filesuffix})
-        foreach (filepath ${RES_FOUND})
-            string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
-            list(APPEND resource_files ${filename})
-        endforeach()
-    endforeach ()
-endforeach (respath)
-
-# Set Qt6 QMl Plugins
-qt_add_qml_module(${TARGET}
-    PLUGIN_TARGET ${TARGET}
-    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/temp/${PROJECT_NAME}
-    VERSION 1.0
-    URI ${PROJECT_NAME}
-    TYPEINFO "plugins.qmltypes"
-    SOURCES ${sources_files}
-    QML_FILES ${qml_files}
-    RESOURCES ${resource_files}
-    RESOURCE_PREFIX "/lingmoui/kit"
-)
-
-set_target_properties(${TARGET}
-    PROPERTIES  VERSION ${MODULE_VERSION} SOVERSION ${MODULE_VERSION_MAJOR})
-
-add_subdirectory(GraphicalEffects)
-
-install(DIRECTORY ${CMAKE_BINARY_DIR}/temp/${PROJECT_NAME} DESTINATION ${INSTALL_QMLDIR})
 generate_export_header(${TARGET} BASE_NAME ${TARGET})
+install(TARGETS ${TARGET} EXPORT ${TARGET}Targets ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS ${TARGET} DESTINATION ${INSTALL_QMLDIR}/${TARGET})
 
-install(TARGETS ${TARGET} EXPORT ${TARGET}Targets DESTINATION ${INSTALL_QMLDIR}/${PROJECT_NAME})
+# Install Controls
+install(DIRECTORY controls/ DESTINATION ${INSTALL_QMLDIR}/${TARGET})
 
-# Install Header
-install(FILES ${H_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TARGET})
+# INSTALL STYLE
+install(DIRECTORY lingmo-style DESTINATION ${INSTALL_QMLDIR}/QtQuick/Controls.2)

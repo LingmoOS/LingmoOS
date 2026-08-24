@@ -14,7 +14,7 @@
 #include <BluezQt/Adapter>
 #include <BluezQt/Device>
 
-static qsizetype adaptersCountFunction(QQmlListProperty<DeclarativeAdapter> *property)
+static int adaptersCountFunction(QQmlListProperty<DeclarativeAdapter> *property)
 {
     Q_ASSERT(qobject_cast<DeclarativeManager *>(property->object));
     DeclarativeManager *manager = static_cast<DeclarativeManager *>(property->object);
@@ -22,7 +22,7 @@ static qsizetype adaptersCountFunction(QQmlListProperty<DeclarativeAdapter> *pro
     return manager->m_adapters.count();
 }
 
-static DeclarativeAdapter *adaptersAtFunction(QQmlListProperty<DeclarativeAdapter> *property, qsizetype index)
+static DeclarativeAdapter *adaptersAtFunction(QQmlListProperty<DeclarativeAdapter> *property, int index)
 {
     Q_ASSERT(qobject_cast<DeclarativeManager *>(property->object));
     DeclarativeManager *manager = static_cast<DeclarativeManager *>(property->object);
@@ -30,7 +30,7 @@ static DeclarativeAdapter *adaptersAtFunction(QQmlListProperty<DeclarativeAdapte
     return manager->m_adapters.values().at(index);
 }
 
-static qsizetype devicesCountFunction(QQmlListProperty<DeclarativeDevice> *property)
+static int devicesCountFunction(QQmlListProperty<DeclarativeDevice> *property)
 {
     Q_ASSERT(qobject_cast<DeclarativeManager *>(property->object));
     DeclarativeManager *manager = static_cast<DeclarativeManager *>(property->object);
@@ -38,7 +38,7 @@ static qsizetype devicesCountFunction(QQmlListProperty<DeclarativeDevice> *prope
     return manager->m_devices.count();
 }
 
-static DeclarativeDevice *devicesAtFunction(QQmlListProperty<DeclarativeDevice> *property, qsizetype index)
+static DeclarativeDevice *devicesAtFunction(QQmlListProperty<DeclarativeDevice> *property, int index)
 {
     Q_ASSERT(qobject_cast<DeclarativeManager *>(property->object));
     DeclarativeManager *manager = static_cast<DeclarativeManager *>(property->object);

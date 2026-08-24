@@ -270,33 +270,6 @@ void Pty::init()
 
   connect(pty(), SIGNAL(readyRead()) , this , SLOT(dataReceived()));
   setPtyChannels(KPtyProcess::AllChannels);
-
-  auto *ptyDev = pty();
-  auto channels = ptyChannels();
-  setChildProcessModifier([ptyDev, channels]() {
-      ptyDev->setCTty();
-      if (channels & KPtyProcess::StdinChannel)
-          dup2(ptyDev->slaveFd(), 0);
-      if (channels & KPtyProcess::StdoutChannel)
-          dup2(ptyDev->slaveFd(), 1);
-      if (channels & KPtyProcess::StderrChannel)
-          dup2(ptyDev->slaveFd(), 2);
-
-      // reset all signal handlers
-      // this ensures that terminal applications respond to
-      // signals generated via key sequences such as Ctrl+C
-      // (which sends SIGINT)
-      struct sigaction action;
-      sigset_t sigset;
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_DFL;
-      action.sa_flags = 0;
-      for (int signal=1;signal < NSIG; signal++) {
-          sigaction(signal,&action,0L);
-      }
-      sigemptyset(&sigset);
-      sigprocmask(SIG_SETMASK, &sigset, 0L);
-  });
 }
 
 Pty::~Pty()
@@ -342,4 +315,24 @@ int Pty::foregroundProcessGroup() const
     }
 
     return 0;
+}
+
+void Pty::setupChildProcess()
+{
+    KPtyProcess::setupChildProcess();
+
+    // reset all signal handlers
+    // this ensures that terminal applications respond to
+    // signals generated via key sequences such as Ctrl+C
+    // (which sends SIGINT)
+    struct sigaction action;
+    sigset_t sigset;
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_DFL;
+    action.sa_flags = 0;
+    for (int signal=1;signal < NSIG; signal++) {
+        sigaction(signal,&action,0L);
+        sigaddset(&sigset, signal);
+    }
+    sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 }

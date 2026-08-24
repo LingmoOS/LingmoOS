@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QScreen>
+#include <QDesktopWidget>
 
 static OcrApplication * ocrApp =nullptr;
 OcrApplication *OcrApplication::instance()

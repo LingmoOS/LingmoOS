@@ -41,7 +41,6 @@
 
 // Qt
 #include <QSet>
-#include <QRegularExpression>
 #include <QDir>
 #include <QMenu>
 #include <QAction>
@@ -49,12 +48,12 @@
 #include <QDBusInterface>
 #include <QStandardPaths>
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QMimeDatabase>
 #include <QMimeData>
 #include <QClipboard>
 #include <QPainter>
 #include <QDrag>
-#include <QMessageBox>
 #include <QDir>
 #include <QProcess>
 #include <QSettings>
@@ -70,7 +69,6 @@
 // KIO
 #include <KIO/CopyJob>
 #include <KIO/Job>
-#include <KIO/MkdirJob>
 #include <KIO/PreviewJob>
 #include <KIO/DeleteJob>
 #include <KIO/DropJob>
@@ -83,7 +81,9 @@
 #include <KFileItemListProperties>
 #include <KDesktopFile>
 
-
+// KService
+#include <KServiceTypeTrader>
+#include <KRun>
 
 
 static bool isDropBetweenSharedViews(const QList<QUrl> &urls, const QUrl &folderUrl)
@@ -138,9 +138,9 @@ FolderModel::FolderModel(QObject *parent)
 
     m_dirLister = new DirLister(this);
     m_dirLister->setDelayedMimeTypes(true);
-    m_dirLister->setAutoErrorHandlingEnabled(false);
+    m_dirLister->setAutoErrorHandlingEnabled(false, nullptr);
     m_dirLister->setAutoUpdate(true);
-    m_dirLister->setShowHiddenFiles(m_showHiddenFiles);
+    m_dirLister->setShowingDotFiles(m_showHiddenFiles);
     // connect(dirLister, &DirLister::error, this, &FolderModel::notification);
 
     connect(m_dirLister, &KCoreDirLister::started, this, std::bind(&FolderModel::setStatus, this, Status::Listing));
@@ -562,9 +562,10 @@ void FolderModel::setFilterPattern(const QString &pattern)
     m_regExps.reserve(patterns.count());
 
     foreach (const QString &pattern, patterns) {
-        const auto wildcardPattern = QRegularExpression::wildcardToRegularExpression(pattern);
-        m_regExps.append(QRegularExpression(QRegularExpression::anchoredPattern(wildcardPattern),
-                                             QRegularExpression::CaseInsensitiveOption));
+        QRegExp rx(pattern);
+        rx.setPatternSyntax(QRegExp::Wildcard);
+        rx.setCaseSensitivity(Qt::CaseInsensitive);
+        m_regExps.append(rx);
     }
 
     invalidateFilterIfComplete();
@@ -755,7 +756,7 @@ void FolderModel::refresh()
 
 void FolderModel::undo()
 {
-    if (KIO::FileUndoManager::self()->isUndoAvailable()) {
+    if (KIO::FileUndoManager::self()->undoAvailable()) {
         KIO::FileUndoManager::self()->undo();
     }
 }
@@ -1127,16 +1128,9 @@ void FolderModel::moveSelectedToTrash()
     }
 
     const QList<QUrl> urls = selectedUrls();
+    KIO::JobUiDelegate uiDelegate;
 
-    // KF6 removed askDeleteConfirmation from KJobUiDelegate; use QMessageBox directly
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setWindowTitle(tr("Move to Trash"));
-    msgBox.setText(tr("Do you want to move the selected files to the trash?"));
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-
-    if (msgBox.exec() == QMessageBox::Yes) {
+    if (uiDelegate.askDeleteConfirmation(urls, KIO::JobUiDelegate::Trash, KIO::JobUiDelegate::DefaultConfirmation)) {
         KIO::Job *job = KIO::trash(urls);
         job->uiDelegate()->setAutoErrorHandlingEnabled(true);
         KIO::FileUndoManager::self()->recordJob(KIO::FileUndoManager::Trash, urls, QUrl(QStringLiteral("trash:/")), job);
@@ -1338,7 +1332,6 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
         if (m_isDesktop) {
             menu->addAction(refresh);  // 添加到空白区域的右键菜单
         }
-
         menu->addAction(m_actionCollection.action("paste"));
         menu->addAction(selectAll);
         if (m_actionCollection.action("terminal")->isVisible()) {
@@ -1350,7 +1343,6 @@ void FolderModel::openContextMenu(QQuickItem *visualParent, Qt::KeyboardModifier
             menu->addAction(m_actionCollection.action("changeBackground"));
             menu->addAction(m_actionCollection.action("iconSizeMenu"));
             menu->addAction(m_actionCollection.action("sortBy"));
-            menu->addAction(m_actionCollection.action("displaySettings"));
         }
 
         menu->addSeparator();
@@ -1600,11 +1592,6 @@ void FolderModel::openInTerminal()
 void FolderModel::openChangeWallpaperDialog()
 {
     QProcess::startDetached("lingmo-settings", QStringList() << "-m" << "background");
-}
-
-void FolderModel::openDisplaySettings()
-{
-    QProcess::startDetached("lingmo-settings", QStringList() << "-m" << "display");
 }
 
 void FolderModel::openDeleteDialog()
@@ -1915,8 +1902,9 @@ bool FolderModel::matchPattern(const KFileItem &item) const
     }
 
     const QString name = item.name();
-    for (const QRegularExpression &regularExpression : m_regExps) {
-        if (regularExpression.match(name).hasMatch()) {
+    QListIterator<QRegExp> i(m_regExps);
+    while (i.hasNext()) {
+        if (i.next().exactMatch(name)) {
             return true;
         }
     }
@@ -1934,7 +1922,7 @@ void FolderModel::setShowHiddenFiles(bool showHiddenFiles)
     if (m_showHiddenFiles != showHiddenFiles) {
         m_showHiddenFiles = showHiddenFiles;
 
-        m_dirLister->setShowHiddenFiles(m_showHiddenFiles);
+        m_dirLister->setShowingDotFiles(m_showHiddenFiles);
         m_dirLister->emitChanges();
 
         QSettings settings("lingmoos", qApp->applicationName());
@@ -2058,10 +2046,6 @@ void FolderModel::createActions()
     changeBackground->setIcon(QIcon::fromTheme("preferences-desktop-wallpaper"));
     QObject::connect(changeBackground, &QAction::triggered, this, &FolderModel::openChangeWallpaperDialog);
 
-    QAction *displaySettings = new QAction(tr("Display Settings"), this);
-    displaySettings->setIcon(QIcon::fromTheme("display"));
-    QObject::connect(displaySettings, &QAction::triggered, this, &FolderModel::openDisplaySettings);
-
     QAction *restore = new QAction(tr("Restore"), this);
     restore->setIcon(QIcon::fromTheme("edit-undo"));
     QObject::connect(restore, &QAction::triggered, this, &FolderModel::restoreFromTrash);
@@ -2175,7 +2159,6 @@ void FolderModel::createActions()
     m_actionCollection.addAction(QStringLiteral("wallpaperLogin"), wallpaperLogin);
     m_actionCollection.addAction(QStringLiteral("properties"), properties);
     m_actionCollection.addAction(QStringLiteral("changeBackground"), changeBackground);
-    m_actionCollection.addAction(QStringLiteral("displaySettings"), displaySettings);
     m_actionCollection.addAction(QStringLiteral("restore"), restore);
     m_actionCollection.addAction(QStringLiteral("showHidden"), showHidden);
     m_actionCollection.addAction(QStringLiteral("openInNewWindow"), openInNewWindow);

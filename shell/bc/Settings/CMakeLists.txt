@@ -18,23 +18,16 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # set(QT Core Gui Widgets Network WebEngine Quick QuickControls2 X11Extras DBus Xml Concurrent LinguistTools)
-set(QT Core Gui Widgets Network Quick QuickControls2 DBus Xml Concurrent LinguistTools)
-find_package(Qt6 REQUIRED ${QT})
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
-
-find_path(QT6_GUI_PRIVATE_INCLUDE_DIR qpa/qplatformnativeinterface.h
-    HINTS ${Qt6Gui_INCLUDE_DIRS} PATH_SUFFIXES QtGui)
-if(QT6_GUI_PRIVATE_INCLUDE_DIR)
-    include_directories(${QT6_GUI_PRIVATE_INCLUDE_DIR})
-endif()
+set(QT Core Gui Widgets Network Quick QuickControls2 X11Extras DBus Xml Concurrent LinguistTools)
+find_package(Qt5 REQUIRED ${QT})
 find_package(X11 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Libcrypt REQUIRED)
 
-find_package(KF6NetworkManagerQt REQUIRED)
-find_package(KF6ModemManagerQt REQUIRED)
-find_package(KF6Config)
+find_package(KF5NetworkManagerQt REQUIRED)
+find_package(KF5ModemManagerQt REQUIRED)
+find_package(KF5Config)
 
 find_package(LingmoLogger REQUIRED)
 
@@ -53,7 +46,7 @@ set(RESOURCES
     src/resources.qrc
 )
 
-qt_add_dbus_adaptor(DBUS_SOURCES
+qt5_add_dbus_adaptor(DBUS_SOURCES
                      src/com.lingmo.SettingsUI.xml
                      src/application.h Application)
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
@@ -63,20 +56,20 @@ set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 add_executable(${PROJECT_NAME} ${DBUS_SOURCES} ${SRCS} ${RESOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC "include" "src")
 target_link_libraries(${PROJECT_NAME}
-        Qt6::Core
-        Qt6::Widgets
-        Qt6::Quick
-        Qt6::QuickControls2
-        Qt6::DBus
-        Qt6::Xml
-        Qt6::Concurrent
-        Qt6::Core5Compat
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Quick
+        Qt5::QuickControls2
+        Qt5::DBus
+        Qt5::Xml
+        Qt5::X11Extras
+        Qt5::Concurrent
 
-        Qt6::Network
+        Qt5::Network
 
-        KF6::NetworkManagerQt
-        KF6::ModemManagerQt
-        KF6::ConfigCore
+        KF5::NetworkManagerQt
+        KF5::ModemManagerQt
+        KF5::ConfigCore
 
         PkgConfig::FontConfig
         ${FREETYPE_LIBRARIES}
@@ -96,7 +89,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 

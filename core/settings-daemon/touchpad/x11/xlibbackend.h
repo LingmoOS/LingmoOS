@@ -13,7 +13,7 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QStringList>
-#include <QtGui/private/qtx11extras_p.h>
+#include <QX11Info>
 
 #include "libinputtouchpad.h"
 #include "synapticstouchpad.h"

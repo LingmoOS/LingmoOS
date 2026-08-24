@@ -17,7 +17,7 @@
 
 #include <QScopedPointer>
 #include <QVector>
-#include <QtGui/private/qtx11extras_p.h>
+#include <QX11Info>
 
 /** XEMBED messages */
 #define XEMBED_EMBEDDED_NOTIFY 0

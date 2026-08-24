@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import Lingmo.Dock 1.0
 import LingmoUI 1.0 as LingmoUI
 
@@ -73,7 +73,7 @@ Item {
             xScale: 1.0
             yScale: 1.0
 
-            // 定义缩放变换的动画行�?
+            // 定义缩放变换的动画行为
             Behavior on xScale {
                 NumberAnimation {
                     duration: 200

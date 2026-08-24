@@ -424,7 +424,7 @@ uint Window::GetLayout(int parentId, int recursionDepth, const QStringList &prop
 
     if (!m_currentMenu->hasSubscription(subscription)) {
         // let's serve multiple similar requests in one go once we've processed them
-        m_pendingGetLayouts.insert(subscription, message());
+        m_pendingGetLayouts.insertMulti(subscription, message());
         setDelayedReply(true);
 
         m_currentMenu->start(subscription);

@@ -1,5 +1,5 @@
 #include <QGuiApplication>
-#include <QtGui/private/qtx11extras_p.h>
+#include <QX11Info>
 #include <QFile>
 #include <QDebug>
 #include <QSettings>

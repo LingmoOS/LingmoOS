@@ -20,6 +20,8 @@ if(X11_FOUND)
   if(NOT X11_SM_FOUND)
     message(FATAL_ERROR "\nThe X11 Session Management (SM) development package could not be found.\nPlease install libSM.\n")
   endif(NOT X11_SM_FOUND)
+
+  find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS X11Extras)
 endif()
 
 if(X11_FOUND AND XCB_XCB_FOUND)
@@ -38,7 +40,7 @@ find_package(XCB
         IMAGE
 )
 
-find_package(KF6WindowSystem)
+find_package(KF5WindowSystem)
 
 set(XCB_LIBS
     XCB::XCB
@@ -60,20 +62,20 @@ set(XEMBED_SNI_PROXY_SOURCES
     xtestsender.cpp
 )
 
-qt6_add_dbus_adaptor(DBUS_SOURCES org.kde.StatusNotifierItem.xml
+qt5_add_dbus_adaptor(DBUS_SOURCES org.kde.StatusNotifierItem.xml
                      sniproxy.h SNIProxy)
 set(statusnotifierwatcher_xml org.kde.StatusNotifierWatcher.xml)
-qt6_add_dbus_interface(DBUS_SOURCES ${statusnotifierwatcher_xml} statusnotifierwatcher_interface)
+qt5_add_dbus_interface(DBUS_SOURCES ${statusnotifierwatcher_xml} statusnotifierwatcher_interface)
 
 set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
 
 add_executable(lingmo-xembedsniproxy ${XEMBED_SNI_PROXY_SOURCES} ${DBUS_SOURCES})
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 target_link_libraries(lingmo-xembedsniproxy
-    Qt6::Core
-    Qt6::DBus
-    Qt6::GuiPrivate
-    KF6::WindowSystem
+    Qt5::Core
+    Qt5::X11Extras
+    Qt5::DBus
+    KF5::WindowSystem
     ${XCB_LIBS}
     ${X11_XTest_LIB}
 )

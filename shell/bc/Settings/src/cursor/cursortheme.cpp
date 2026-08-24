@@ -3,9 +3,8 @@
 #include <QSettings>
 #include <QCursor>
 #include <QDebug>
-#include <QGuiApplication>
+#include <QX11Info>
 #include <QImage>
-#include <qpa/qplatformnativeinterface.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xcursor/Xcursor.h>
@@ -73,7 +72,7 @@ QPixmap CursorTheme::pixmap() const
 
 int CursorTheme::defaultCursorSize() const
 {
-    if (QGuiApplication::platformName() != "xcb") {
+    if (!QX11Info::isPlatformX11()) {
         return 32;
     }
 
@@ -83,9 +82,7 @@ int CursorTheme::defaultCursorSize() const
        this custom value. */
     int size = 0;
     int dpi = 0;
-    auto *nativeInterface = qApp->platformNativeInterface();
-    Display *dpy = static_cast<Display*>(
-        nativeInterface->nativeResourceForScreen("x11display"));
+    Display *dpy = QX11Info::display();
     // The string "v" is owned and will be destroyed by Xlib
     char *v = XGetDefault(dpy, "Xft", "dpi");
     if (v)
@@ -167,7 +164,7 @@ QPixmap CursorTheme::createIcon(int size) const
 
 qulonglong CursorTheme::loadCursor(const QString &name, int size) const
 {
-    if (QGuiApplication::platformName() != "xcb") {
+    if (!QX11Info::isPlatformX11()) {
         return None;
     }
     if (size <= 0)
@@ -183,10 +180,7 @@ qulonglong CursorTheme::loadCursor(const QString &name, int size) const
         return None;
 
     // Create the cursor
-    auto *nativeInterface = qApp->platformNativeInterface();
-    Display *display = static_cast<Display*>(
-        nativeInterface->nativeResourceForScreen("x11display"));
-    Cursor handle = XcursorImagesLoadCursor(display, images);
+    Cursor handle = XcursorImagesLoadCursor(QX11Info::display(), images);
     XcursorImagesDestroy(images);
 
     return handle;
@@ -252,16 +246,13 @@ bool CursorTheme::haveXfixes()
 {
     bool result = false;
 
-    if (QGuiApplication::platformName() != "xcb") {
+    if (!QX11Info::isPlatformX11()) {
         return result;
     }
     int event_base, error_base;
-    auto *nativeInterface = qApp->platformNativeInterface();
-    Display *display = static_cast<Display*>(
-        nativeInterface->nativeResourceForScreen("x11display"));
-    if (XFixesQueryExtension(display, &event_base, &error_base)) {
+    if (XFixesQueryExtension(QX11Info::display(), &event_base, &error_base)) {
         int major, minor;
-        XFixesQueryVersion(display, &major, &minor);
+        XFixesQueryVersion(QX11Info::display(), &major, &minor);
         result = (major >= 2);
     }
 

@@ -12,7 +12,11 @@ namespace ShapeCorners {
     Q_OBJECT
 
     public:
+#if (QT_VERSION_MAJOR >= 6)
         explicit KCM(QObject *parent, const KPluginMetaData &args);
+#else
+        explicit KCM(QWidget* parent = nullptr, const QVariantList& args = QVariantList());
+#endif
 
     public Q_SLOTS:
         void defaults() override;
@@ -28,7 +32,9 @@ namespace ShapeCorners {
 
         void load_ui() const;
 
-        QWidget *widget() final override { return KCModule::widget(); }
-        const QPalette &palette() { return widget()->palette(); }
+#if (QT_VERSION_MAJOR >= 6)
+        QWidget* widget() final override { return KCModule::widget(); }
+        const QPalette& palette() { return widget()->palette(); };
+#endif
     };
 }

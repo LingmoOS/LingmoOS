@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12 as QQC2
 import QtQuick.Layouts 1.12
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 
 import Lingmo.Accounts 1.0 as Accounts
 import Lingmo.System 1.0 as System
@@ -15,8 +15,8 @@ Item {
     id: root
 
     property string notificationMessage
-    property bool loginVisible: false  // 登录界面显示状�?
-    property color timeColor: "white"  // 时间颜色，根据背景亮度调�?
+    property bool loginVisible: false  // 登录界面显示状态
+    property color timeColor: "white"  // 时间颜色，根据背景亮度调整
 
     LayoutMirroring.enabled: Qt.locale().textDirection == Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
@@ -34,11 +34,11 @@ Item {
         clip: true
         cache: false
         smooth: true
-        onStatusChanged: checkTimeColor()  // 当背景图像加载完成后检测颜�?
+        onStatusChanged: checkTimeColor()  // 当背景图像加载完成后检测颜色
     }
 
     function checkTimeColor() {
-        // 简单的颜色检测示例，实际实现可能需要更多优�?
+        // 简单的颜色检测示例，实际实现可能需要更多优化
         var imageBrightness = wallpaperImage.colorAt(0, 0).lightness
         timeColor = imageBrightness > 0.5 ? "black" : "white"
     }
@@ -49,7 +49,7 @@ Item {
         radius: 64
         source: wallpaperImage
         cached: true
-        visible: loginVisible  // 登录界面显示时模�?
+        visible: loginVisible  // 登录界面显示时模糊
     }
 
     Timer {
@@ -106,7 +106,7 @@ Item {
             font.pointSize: 60
             font.bold: true  // 加粗时间文本
             color: root.timeColor  // 自动反色
-            opacity: loginVisible ? 0 : 1  // 动态控制透明�?
+            opacity: loginVisible ? 0 : 1  // 动态控制透明度
 
             function updateInfo() {
                 timeLabel.text = new Date().toLocaleTimeString(Qt.locale(), Locale.ShortFormat)
@@ -130,7 +130,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             font.pointSize: 24
             color: root.timeColor  // 自动反色
-            opacity: loginVisible ? 0 : 1  // 动态控制透明�?
+            opacity: loginVisible ? 0 : 1  // 动态控制透明度
 
             function updateInfo() {
                 dateLabel.text = new Date().toLocaleDateString(Qt.locale(), Locale.LongFormat)
@@ -149,7 +149,7 @@ Item {
 
         QQC2.Button {
             id: stBtn
-            visible: !loginVisible  // 登录界面显示时隐�?
+            visible: !loginVisible  // 登录界面显示时隐藏
             hoverEnabled: true
             focusPolicy: Qt.StrongFocus
             focus: true  // 确保按钮默认获取焦点
@@ -159,7 +159,7 @@ Item {
             //anchors.centerIn: parent
             Layout.preferredHeight: 40
             Layout.preferredWidth: 300
-            text: qsTr("�?)
+            text: qsTr("↑")
             onClicked: loginVisible = true
 
             scale: stBtn.pressed ? 0.95 : 1.0
@@ -178,7 +178,7 @@ Item {
 
             contentItem: Text {
                 text: stBtn.text
-                color: "white"  // 设置文本颜色为白�?
+                color: "white"  // 设置文本颜色为白色
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
@@ -219,7 +219,7 @@ Item {
         width: 260 + LingmoUI.Units.largeSpacing * 3
         height: _mainLayout.implicitHeight + LingmoUI.Units.largeSpacing * 4
 
-        visible: loginVisible  // 动态控制可见�?
+        visible: loginVisible  // 动态控制可见性
         opacity: loginVisible ? 1 : 0
 
         Behavior on opacity {
@@ -302,7 +302,7 @@ Item {
         width: sessionMenu.implicitWidth + LingmoUI.Units.largeSpacing
         height: sessionMenu.implicitHeight
 
-        visible: loginVisible  // 动态控制可见�?
+        visible: loginVisible  // 动态控制可见性
 
         SessionMenu {
             id: sessionMenu
@@ -419,7 +419,7 @@ Item {
         function onLoginSuccess() {
             notificationMessage = textConstants.loginSuccess
             console.log("Login successful")  // 调试信息
-            loginVisible = false  // 登录成功后隐藏登录界�?
+            loginVisible = false  // 登录成功后隐藏登录界面
         }
     }
 }

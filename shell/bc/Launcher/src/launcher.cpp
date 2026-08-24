@@ -30,9 +30,6 @@
 #include <QTimer>
 
 #include <KWindowSystem>
-#include <NETWM>
-#include <xcb/xcb.h>
-#include <qpa/qplatformnativeinterface.h>
 
 Launcher::Launcher(bool firstShow, QQuickView *w)
     : QQuickView(w)
@@ -52,6 +49,7 @@ Launcher::Launcher(bool firstShow, QQuickView *w)
     setColor(Qt::transparent);
     setFlags(Qt::FramelessWindowHint);
     setResizeMode(QQuickView::SizeRootObjectToView);
+    setClearBeforeRendering(true);
     onGeometryChanged();
 
     setSource(QUrl(QStringLiteral("qrc:/qml/main.qml")));
@@ -195,12 +193,7 @@ void Launcher::onGeometryChanged()
 
 void Launcher::showEvent(QShowEvent *e)
 {
-    auto *nativeInterface = qApp->platformNativeInterface();
-    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
-        nativeInterface->nativeResourceForScreen("xcbconnection"));
-    xcb_window_t rootWindow = DefaultRootWindow(connection);
-    NETWinInfo info(connection, winId(), rootWindow, NET::WMState);
-    info.setState(NET::SkipTaskbar | NET::SkipPager, NET::SkipTaskbar | NET::SkipPager);
+    KWindowSystem::setState(winId(), NET::SkipTaskbar | NET::SkipPager);
 
     QQuickView::showEvent(e);
 }

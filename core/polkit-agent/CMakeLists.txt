@@ -2,7 +2,7 @@ find_package(PkgConfig)
 pkg_check_modules(POLKIT_AGENT REQUIRED polkit-agent-1)
 message(STATUS "polkit agent: ${POLKIT_AGENT_INCLUDE_DIRS} ${POLKIT_AGENT_LIBRARIES}")
 
-find_package(PolkitQt6-1 REQUIRED)
+find_package(PolkitQt5-1 REQUIRED)
 
 include_directories(
     ${POLKIT_AGENT_INCLUDE_DIRS}
@@ -21,13 +21,13 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 target_link_libraries(lingmo-polkit-agent
-        Qt6::Core
-        Qt6::Widgets
-        Qt6::Quick
-        Qt6::QuickControls2
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Quick
+        Qt5::QuickControls2
 
         # LingmoUI
 

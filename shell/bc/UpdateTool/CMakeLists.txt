@@ -11,8 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# find_package(Qt6 COMPONENTS Core Quick DBus LinguistTools WebEngine WebEngineWidgets REQUIRED)
-find_package(Qt6 COMPONENTS Core Quick DBus LinguistTools REQUIRED)
+# find_package(Qt5 COMPONENTS Core Quick DBus LinguistTools WebEngine WebEngineWidgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick DBus LinguistTools REQUIRED)
 find_package(QApt REQUIRED)
 
 set(PROJECT_SOURCES
@@ -28,12 +28,12 @@ add_executable(lingmo-updator
 
 target_link_libraries(lingmo-updator
   PRIVATE
-  Qt6::Core
-  Qt6::Quick
-  Qt6::DBus
+  Qt5::Core
+  Qt5::Quick
+  Qt5::DBus
   QApt::Main
-  # Qt6::WebEngine
-  # Qt6::WebEngineWidgets
+  # Qt5::WebEngine
+  # Qt5::WebEngineWidgets
 )
 
 file(GLOB TS_FILES translations/*.ts)
@@ -41,7 +41,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 

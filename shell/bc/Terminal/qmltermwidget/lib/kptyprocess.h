@@ -141,6 +141,10 @@ public:
     KPtyDevice *pty() const;
 
 protected:
+    /**
+     * @reimp
+     */
+    virtual void setupChildProcess();
 
 private:
     Q_PRIVATE_SLOT(d_func(), void _k_onStateChanged(QProcess::ProcessState))

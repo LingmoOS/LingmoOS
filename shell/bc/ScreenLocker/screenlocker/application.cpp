@@ -22,9 +22,8 @@
 // Qt Core
 #include <QAbstractNativeEventFilter>
 #include <QScreen>
+#include <QX11Info>
 #include <QEvent>
-#include <QGuiApplication>
-#include <qpa/qplatformnativeinterface.h>
 
 // Qt Quick
 #include <QQuickItem>
@@ -75,7 +74,7 @@ Application::Application(int &argc, char **argv)
     connect(this, &Application::screenAdded, this, &Application::onScreenAdded);
     connect(this, &Application::screenRemoved, this, &Application::desktopResized);
 
-    if (QGuiApplication::platformName() == "xcb") {
+    if (QX11Info::isPlatformX11()) {
         installNativeEventFilter(new FocusOutEventFilter);
     }
 }
@@ -129,7 +128,7 @@ void Application::desktopResized()
         view->setGeometry(screen->geometry());
 
         if (!m_testing) {
-            if (QGuiApplication::platformName() == "xcb") {
+            if (QX11Info::isPlatformX11()) {
                 view->setFlags(Qt::X11BypassWindowManagerHint);
             } else {
                 view->setFlags(Qt::FramelessWindowHint);
@@ -156,7 +155,7 @@ void Application::desktopResized()
         view->setScreen(screen);
 
         // on Wayland we may not use fullscreen as that puts all windows on one screen
-        if (m_testing || QGuiApplication::platformName() == "xcb") {
+        if (m_testing || QX11Info::isPlatformX11()) {
             view->show();
         } else {
             view->showFullScreen();
@@ -255,19 +254,16 @@ bool Application::eventFilter(QObject *obj, QEvent *event)
                 break;
             }
         }
-        if (view && view->winId() && QGuiApplication::platformName() == "xcb") {
+        if (view && view->winId() && QX11Info::isPlatformX11()) {
             // showing greeter view window, set property
-            auto *nativeInterface = qApp->platformNativeInterface();
-            Display *display = static_cast<Display*>(
-                nativeInterface->nativeResourceForScreen("x11display"));
-            static Atom tag = XInternAtom(display, "_KDE_SCREEN_LOCKER", False);
-            XChangeProperty(display, view->winId(), tag, tag, 32, PropModeReplace, nullptr, 0);
+            static Atom tag = XInternAtom(QX11Info::display(), "_KDE_SCREEN_LOCKER", False);
+            XChangeProperty(QX11Info::display(), view->winId(), tag, tag, 32, PropModeReplace, nullptr, 0);
         }
         // no further processing
         return false;
     }
 
-    if (event->type() == QEvent::MouseButtonPress && QGuiApplication::platformName() == "xcb") {
+    if (event->type() == QEvent::MouseButtonPress && QX11Info::isPlatformX11()) {
         if (getActiveScreen()) {
             getActiveScreen()->requestActivate();
         }

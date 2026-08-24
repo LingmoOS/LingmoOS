@@ -4,27 +4,22 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.qml" line="240"/>
+        <location filename="../main.qml" line="67"/>
         <source>Shutdown</source>
         <translation>Slå av</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="248"/>
+        <location filename="../main.qml" line="75"/>
         <source>Reboot</source>
         <translation>Omstart</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="256"/>
+        <location filename="../main.qml" line="83"/>
         <source>Logout</source>
         <translation>Logg ut</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="264"/>
-        <source>Lock screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../main.qml" line="272"/>
+        <location filename="../main.qml" line="91"/>
         <source>Suspend</source>
         <translation>Hvilemodus</translation>
     </message>

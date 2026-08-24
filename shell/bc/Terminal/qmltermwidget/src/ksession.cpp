@@ -28,7 +28,7 @@
 #include <QDBusInterface>
 #include <QDBusServiceWatcher>
 #include <QDir>
-#include <QStringConverter>
+#include <QTextCodec>
 
 // Konsole
 #include "HistorySearch.h"
@@ -119,7 +119,7 @@ Session* KSession::createSession(QString name)
     session->setArguments(args);
     session->setAutoClose(true);
 
-    session->setCodec(QStringConverter::Utf8);
+    session->setCodec(QTextCodec::codecForName("UTF-8"));
 
     session->setFlowControlEnabled(true);
     session->setHistoryType(HistoryTypeBuffer(1000));
@@ -230,9 +230,9 @@ void KSession::setArgs(const QStringList& args)
     m_session->setArguments(args);
 }
 
-void KSession::setEncoding(QStringConverter::Encoding encoding)
+void KSession::setTextCodec(QTextCodec* codec)
 {
-    m_session->setCodec(encoding);
+    m_session->setCodec(codec);
 }
 
 void KSession::setHistorySize(int lines)
@@ -297,7 +297,7 @@ void KSession::clearScreen()
 
 void KSession::search(const QString& regexp, int startLine, int startColumn, bool forwards)
 {
-    HistorySearch* history = new HistorySearch(QPointer<Emulation>(m_session->emulation()), QRegularExpression(regexp), forwards, startColumn, startLine, this);
+    HistorySearch* history = new HistorySearch(QPointer<Emulation>(m_session->emulation()), QRegExp(regexp), forwards, startColumn, startLine, this);
     connect(history, SIGNAL(matchFound(int, int, int, int)), this, SIGNAL(matchFound(int, int, int, int)));
     connect(history, SIGNAL(noMatchFound()), this, SIGNAL(noMatchFound()));
     history->search();

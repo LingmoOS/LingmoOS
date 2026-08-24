@@ -33,8 +33,6 @@
 #include <NETWM>
 #include <KWindowSystem>
 #include <KWindowEffects>
-#include <xcb/xcb.h>
-#include <qpa/qplatformnativeinterface.h>
 
 MainWindow::MainWindow(QQuickView *parent)
     : QQuickView(parent)
@@ -55,16 +53,8 @@ MainWindow::MainWindow(QQuickView *parent)
     setColor(Qt::transparent);
 
     setFlags(Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus);
-
-    {
-        auto *nativeInterface = qApp->platformNativeInterface();
-        xcb_connection_t *connection = static_cast<xcb_connection_t*>(
-            nativeInterface->nativeResourceForScreen("xcbconnection"));
-        xcb_window_t rootWindow = DefaultRootWindow(connection);
-        NETWinInfo info(connection, winId(), rootWindow, NET::WMDesktop | NET::WMWindowType);
-        info.setDesktop(NET::OnAllDesktops);
-        info.setWindowType(NET::Dock);
-    }
+    KWindowSystem::setOnDesktop(winId(), NET::OnAllDesktops);
+    KWindowSystem::setType(winId(), NET::Dock);
 
     engine()->rootContext()->setContextProperty("appModel", m_appModel);
     engine()->rootContext()->setContextProperty("process", new ProcessProvider);
@@ -296,7 +286,7 @@ void MainWindow::initSlideWindow()
     else if (m_settings->direction() == DockSettings::Bottom)
         location = KWindowEffects::BottomEdge;
 
-    KWindowEffects::slideWindow(window(), location);
+    KWindowEffects::slideWindow(winId(), location);
 }
 
 void MainWindow::updateViewStruts()

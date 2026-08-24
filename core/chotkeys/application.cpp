@@ -47,6 +47,11 @@ void Application::initSetting()
         setting.setValue("Exec","lingmo-debinstaller");
         setting.endGroup();
 
+        setting.beginGroup("Ctrl+Alt+Del");
+        setting.setValue("Comment","ShutdownUI");
+        setting.setValue("Exec","lingmo-shutdown");
+        setting.endGroup();
+
     }
     
     all = setting.childGroups();

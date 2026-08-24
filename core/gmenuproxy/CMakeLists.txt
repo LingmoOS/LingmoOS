@@ -3,8 +3,8 @@ list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 
 find_package(AppMenuGtkModule)
-find_package(KF6WindowSystem)
-find_package(KF6CoreAddons)
+find_package(KF5WindowSystem)
+find_package(KF5CoreAddons)
 set_package_properties(AppMenuGtkModule PROPERTIES TYPE RUNTIME)
 
 add_definitions(-DQT_NO_CAST_TO_ASCII
@@ -38,12 +38,12 @@ add_executable(lingmo-gmenuproxy ${GMENU_DBUSMENU_PROXY_SRCS})
 set_package_properties(XCB PROPERTIES TYPE REQUIRED)
 
 target_link_libraries(lingmo-gmenuproxy
-    Qt6::Core
-    Qt6::GuiPrivate
-    Qt6::DBus
-    Qt6::Widgets
-    KF6::CoreAddons
-    KF6::WindowSystem
+    Qt5::Core
+    Qt5::X11Extras
+    Qt5::DBus
+    Qt5::Widgets
+    KF5::CoreAddons
+    KF5::WindowSystem
     XCB::XCB
     ${AppMenuGtkModule}
 )

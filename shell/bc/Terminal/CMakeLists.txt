@@ -11,11 +11,10 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(QT Core Gui Quick QuickControls2 Widgets DBus LinguistTools)
-find_package(Qt6 REQUIRED ${QT})
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
+find_package(Qt5 REQUIRED ${QT})
 
 # Get the installation directory from qmake
-get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
 if(NOT QT_QMAKE_EXECUTABLE)
     message(FATAL_ERROR "qmake is not found.")
 endif()
@@ -45,12 +44,11 @@ set(RESOURCES
 add_subdirectory(qmltermwidget)
 add_executable(${PROJECT_NAME} ${SRCS} ${RESOURCES})
 target_link_libraries(${PROJECT_NAME}
-        Qt6::Core
-        Qt6::Quick
-        Qt6::QuickControls2
-        Qt6::Widgets
-        Qt6::DBus
-        Qt6::Core5Compat
+        Qt5::Core
+        Qt5::Quick
+        Qt5::QuickControls2
+        Qt5::Widgets
+        Qt5::DBus
 )
 
 file(GLOB TS_FILES translations/*.ts)
@@ -58,7 +56,7 @@ foreach(filepath ${TS_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
     list(APPEND ts_files_replaced ${filename})
 endforeach()
-qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
+qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${ts_files_replaced})
 add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 
 install(FILES ${QM_FILES} DESTINATION /usr/share/lingmo-terminal/translations)

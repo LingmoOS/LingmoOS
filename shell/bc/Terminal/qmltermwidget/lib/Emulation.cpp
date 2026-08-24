@@ -33,7 +33,7 @@
 #include <QClipboard>
 #include <QHash>
 #include <QKeyEvent>
-#include <QRegularExpression>
+#include <QRegExp>
 #include <QTextStream>
 #include <QThread>
 
@@ -52,7 +52,7 @@ using namespace Konsole;
 
 Emulation::Emulation() :
   _currentScreen(0),
-  _encoding(QStringConverter::Utf8),
+  _codec(0),
   _decoder(0),
   _keyTranslator(0),
   _usesMouse(false),
@@ -154,12 +154,15 @@ const HistoryType& Emulation::history() const
   return _screen[0]->getScroll();
 }
 
-void Emulation::setEncoding(QStringConverter::Encoding encoding)
+void Emulation::setCodec(const QTextCodec * qtc)
 {
-  _encoding = encoding;
+  if (qtc)
+      _codec = qtc;
+  else
+     setCodec(LocaleCodec);
 
   delete _decoder;
-  _decoder = new QStringDecoder(_encoding);
+  _decoder = _codec->makeDecoder();
 
   emit useUtf8Request(utf8());
 }
@@ -167,9 +170,9 @@ void Emulation::setEncoding(QStringConverter::Encoding encoding)
 void Emulation::setCodec(EmulationCodec codec)
 {
     if ( codec == Utf8Codec )
-        setEncoding(QStringConverter::Utf8);
+        setCodec( QTextCodec::codecForName("utf8") );
     else if ( codec == LocaleCodec )
-        setEncoding(QStringConverter::System);
+        setCodec( QTextCodec::codecForLocale() );
 }
 
 void Emulation::setKeyBindings(const QString& name)

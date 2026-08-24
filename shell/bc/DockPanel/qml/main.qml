@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import org.kde.kwindowsystem 1.0 as KWindowSystem
 
 import Lingmo.Dock 1.0

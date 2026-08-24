@@ -9,8 +9,7 @@
 Screen::Screen(QObject *parent)
     : QObject(parent)
 {
-    // OutputModel is created and owned by ConfigHandler; it is exposed through
-    // Screen::outputModel rather than being a QML-creatable type.
+    qmlRegisterType<OutputModel>();
     load();
 }
 

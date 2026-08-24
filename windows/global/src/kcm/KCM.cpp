@@ -2,12 +2,21 @@
 #include "ui_KCM.h"
 #include "kwineffects_interface.h"
 
-ShapeCorners::KCM::KCM(QObject *parent, const KPluginMetaData &args)
+#if (QT_VERSION_MAJOR >= 6)
+ShapeCorners::KCM::KCM(QObject* parent, const KPluginMetaData& args)
     : KCModule(parent, args)
     , ui(new Ui::Form)
 {
     ui->setupUi(widget());
     addConfig(&config, widget());
+#else
+ShapeCorners::KCM::KCM(QWidget* parent, const QVariantList& args)
+    : KCModule(parent, args)
+    , ui(new Ui::Form)
+{
+    ui->setupUi(this);
+    addConfig(&config, this);
+#endif
 
     update_colors();
     update_windows();

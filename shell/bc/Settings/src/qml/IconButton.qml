@@ -1,6 +1,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.4
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import LingmoUI 1.0 as LingmoUI
 
 Item {

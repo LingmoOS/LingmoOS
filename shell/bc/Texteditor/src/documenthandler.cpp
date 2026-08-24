@@ -10,6 +10,7 @@
 #include <QQmlFileSelector>
 #include <QQuickTextDocument>
 #include <QTextCharFormat>
+#include <QTextCodec>
 #include <QTextDocument>
 #include <QTextDocumentWriter>
 #include <QUrl>
@@ -102,9 +103,8 @@ void FileLoader::loadFile(const QUrl &url)
 
     if (file.open(QFile::ReadOnly)) {
         const auto array = file.readAll();
-        // Qt6: QTextDocumentWriter::codec() 已移除，使用 QStringConverter
-        QStringConverter converter(QStringConverter::Utf8);
-        emit this->fileReady(converter.decode(array), url);
+        QTextCodec *codec = QTextDocumentWriter(url.toLocalFile()).codec();
+        emit this->fileReady(codec->toUnicode(array), url);
     }
 }
 

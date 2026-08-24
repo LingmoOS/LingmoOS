@@ -75,3 +75,5 @@ QDBusVariant DbusmenuAdaptor::GetProperty(int id, const QString &property)
     return parent()->GetProperty(id, property);
 }
 
+
+#include "dbusmenuadaptor.moc"

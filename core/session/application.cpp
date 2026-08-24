@@ -316,7 +316,7 @@ void Application::initKWinConfig()
     settings.endGroup();
 
     settings.beginGroup("org.kde.kdecoration2");
-    settings.setValue("BorderSize", "Normal");
+    settings.setValue("BorderSize", "Huge");
     settings.setValue("ButtonsOnLeft", "");
     settings.setValue("ButtonsOnRight", "HIAX");
     settings.setValue("library", "org.lingmo.decoration");

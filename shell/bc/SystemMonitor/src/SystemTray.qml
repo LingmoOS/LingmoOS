@@ -1,4 +1,4 @@
-import QtQuick.Controls
+import Qt.labs.platform 1.1
 
 SystemTrayIcon {
     id: systemTray

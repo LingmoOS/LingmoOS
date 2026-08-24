@@ -17,11 +17,11 @@ add_executable(lingmo-screenlocker
 
 target_link_libraries(lingmo-screenlocker
     PRIVATE
-    Qt6::Core
-    Qt6::DBus
-    Qt6::Widgets
-    Qt6::Quick
-    Qt6::Core5Compat
+    Qt5::Core
+    Qt5::DBus
+    Qt5::Widgets
+    Qt5::X11Extras
+    Qt5::Quick
 
     ${X11_LIBRARIES}
 )

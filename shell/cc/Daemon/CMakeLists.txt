@@ -12,10 +12,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 COMPONENTS Core Widgets DBus REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets DBus REQUIRED)
 find_package(QApt REQUIRED)
 
-qt_add_dbus_adaptor(DBUS_SOURCES
+qt5_add_dbus_adaptor(DBUS_SOURCES
                      src/com.lingmo.AppManager.xml
                      src/appmanager.h AppManager)
 
@@ -33,9 +33,9 @@ add_executable(lingmo-daemon
 )
 
 target_link_libraries(lingmo-daemon PRIVATE
-    Qt6::Widgets
-    Qt6::Core
-    Qt6::DBus
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::DBus
     QApt::Main
 )
 

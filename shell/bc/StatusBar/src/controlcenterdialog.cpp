@@ -19,10 +19,6 @@
 
 #include "controlcenterdialog.h"
 #include <KWindowSystem>
-#include <NETWM>
-#include <xcb/xcb.h>
-#include <qpa/qplatformnativeinterface.h>
-#include <QGuiApplication>
 
 ControlCenterDialog::ControlCenterDialog(QQuickWindow *parent)
     : QQuickWindow(parent)
@@ -43,7 +39,7 @@ bool ControlCenterDialog::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
         if (QWindow *w = qobject_cast<QWindow*>(object)) {
-            if (!w->geometry().contains(static_cast<QMouseEvent*>(event)->globalPosition().toPoint())) {
+            if (!w->geometry().contains(static_cast<QMouseEvent*>(event)->globalPos())) {
                 ControlCenterDialog::setVisible(false);
             }
         }
@@ -53,13 +49,7 @@ bool ControlCenterDialog::eventFilter(QObject *object, QEvent *event)
             ControlCenterDialog::setVisible(false);
         }
     } else if (event->type() == QEvent::Show) {
-        auto *nativeInterface = qApp->platformNativeInterface();
-        xcb_connection_t *connection = static_cast<xcb_connection_t*>(
-            nativeInterface->nativeResourceForScreen("xcbconnection"));
-        xcb_window_t rootWindow = DefaultRootWindow(connection);
-        NETWinInfo info(connection, winId(), rootWindow, NET::WMState);
-        info.setState(NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher,
-                      NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
+        KWindowSystem::setState(winId(), NET::SkipTaskbar | NET::SkipPager | NET::SkipSwitcher);
     } else if (event->type() == QEvent::Hide) {
         setMouseGrabEnabled(false);
         setKeyboardGrabEnabled(false);

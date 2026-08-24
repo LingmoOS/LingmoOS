@@ -22,7 +22,7 @@
 #include <QFile>
 #include <QCursor>
 #include <QDebug>
-#include <QGuiApplication>
+#include <QX11Info>
 #include <QDirIterator>
 #include <QSettings>
 #include <QRegularExpression>
@@ -30,7 +30,6 @@
 #include <QProcess>
 #include <QEvent>
 #include <QWidget>
-#include <qpa/qplatformnativeinterface.h>
 
 #include <NETWM>
 #include <KWindowSystem>
@@ -68,10 +67,7 @@ QString Activity::icon() const
 
 void Activity::close()
 {
-    auto *nativeInterface = qApp->platformNativeInterface();
-    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
-        nativeInterface->nativeResourceForScreen("xcbconnection"));
-    NETRootInfo(connection, NET::CloseWindow).closeWindowRequest(KWindowSystem::activeWindow());
+    NETRootInfo(QX11Info::connection(), NET::CloseWindow).closeWindowRequest(KWindowSystem::activeWindow());
 }
 
 void Activity::minimize()
@@ -120,10 +116,7 @@ void Activity::move()
         KWindowSystem::forceActiveWindow(winId);
     }
 
-    auto *nativeInterface = qApp->platformNativeInterface();
-    xcb_connection_t *connection = static_cast<xcb_connection_t*>(
-        nativeInterface->nativeResourceForScreen("xcbconnection"));
-    NETRootInfo ri(connection, NET::WMMoveResize);
+    NETRootInfo ri(QX11Info::connection(), NET::WMMoveResize);
     ri.moveResizeRequest(winId,
                          QCursor::pos().x(),
                          QCursor::pos().y(), NET::Move);
@@ -153,7 +146,7 @@ bool Activity::isAcceptableWindow(quint64 wid)
 
     // WM_TRANSIENT_FOR hint not set - normal window
     WId transFor = info.transientFor();
-    if (transFor == 0 || transFor == wid)
+    if (transFor == 0 || transFor == wid || transFor == (WId) QX11Info::appRootWindow())
         return true;
 
     info = KWindowInfo(transFor, NET::WMWindowType);

@@ -14,13 +14,15 @@
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
-#include <QStringList>
-#include <QVariant>
-#include <QString>
-#include <QByteArray>
-#include <QList>
-#include <QMap>
 #include "window.h"
+QT_BEGIN_NAMESPACE
+class QByteArray;
+template<class T> class QList;
+template<class Key, class Value> class QMap;
+class QString;
+class QStringList;
+class QVariant;
+QT_END_NAMESPACE
 
 /*
  * Adaptor class for interface com.canonical.dbusmenu

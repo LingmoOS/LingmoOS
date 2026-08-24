@@ -21,7 +21,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import LingmoUI 1.0 as LingmoUI
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import Lingmo.Settings 1.0
 import "../"
 
@@ -57,7 +57,7 @@ ItemPage {
                     Layout.preferredWidth: Math.min(parent.height * 0.7, parent.width * 0.4)
                     Layout.preferredHeight: Layout.preferredWidth
                     Layout.alignment: Qt.AlignVCenter
-                    color: "transparent"  // 移除背景�?
+                    color: "transparent"  // 移除背景色
 
                     // 添加玻璃效果背景
                     Rectangle {
@@ -161,7 +161,7 @@ ItemPage {
                                 ctx.restore();
                             }
 
-                            // 主题改变时重�?
+                            // 主题改变时重绘
                             Connections {
                                 target: LingmoUI.Theme
                                 function onDarkModeChanged() {
@@ -252,7 +252,7 @@ ItemPage {
                             }
                         }
 
-                        // 修改中心�?
+                        // 修改中心点
                         Rectangle {
                             width: clock.width * 0.08
                             height: width
@@ -289,10 +289,10 @@ ItemPage {
                     Layout.preferredWidth: parent.width * 0.5  // 确保右侧有足够的宽度
                     spacing: 20
 
-                    // 顶部弹性空�?
+                    // 顶部弹性空间
                     Item {
                         Layout.fillHeight: true
-                        Layout.preferredHeight: 1  // 权重�?
+                        Layout.preferredHeight: 1  // 权重为1
                     }
 
                     // 时间显示
@@ -329,17 +329,17 @@ ItemPage {
                         wrapMode: Text.Wrap
                     }
 
-                    // 底部弹性空�?
+                    // 底部弹性空间
                     Item {
                         Layout.fillHeight: true
-                        Layout.preferredHeight: 1  // 权重�?
+                        Layout.preferredHeight: 1  // 权重为1
                     }
                 }
             }
         
 
             Timer {
-                interval: 16  // �?0fps的刷新率
+                interval: 16  // 约60fps的刷新率
                 running: true
                 repeat: true
                 onTriggered: {

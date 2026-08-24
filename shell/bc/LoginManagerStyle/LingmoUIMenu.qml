@@ -22,7 +22,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Templates 2.12 as T
 import QtQuick.Window 2.12
 import LingmoUI 1.0 as LingmoUI
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 import "./"
 
 T.Menu

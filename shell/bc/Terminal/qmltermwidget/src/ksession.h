@@ -72,7 +72,7 @@ public:
     QString getInitialWorkingDirectory();
 
     //Text codec, default is UTF-8
-    void setEncoding(QStringConverter::Encoding encoding);
+    void setTextCodec(QTextCodec * codec);
 
     // History size for scrolling
     void setHistorySize(int lines); //infinite if lines < 0

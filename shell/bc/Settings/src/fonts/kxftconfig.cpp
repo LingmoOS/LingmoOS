@@ -14,7 +14,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QStandardPaths>
-#include <QGuiApplication>
+#include <QX11Info>
 
 #include <fontconfig/fontconfig.h>
 
@@ -22,20 +22,12 @@ using namespace std;
 
 static int point2Pixel(double point)
 {
-    double dpi = 96.0;
-    if (QScreen *screen = QGuiApplication::primaryScreen()) {
-        dpi = screen->logicalDotsPerInchY();
-    }
-    return (int)(((point * dpi) / 72.0) + 0.5);
+    return (int)(((point * QX11Info::appDpiY()) / 72.0) + 0.5);
 }
 
 static int pixel2Point(double pixel)
 {
-    double dpi = 96.0;
-    if (QScreen *screen = QGuiApplication::primaryScreen()) {
-        dpi = screen->logicalDotsPerInchY();
-    }
-    return (int)(((pixel * 72.0) / dpi) + 0.5);
+    return (int)(((pixel * 72.0) / (double)QX11Info::appDpiY()) + 0.5);
 }
 
 static bool equal(double d1, double d2)

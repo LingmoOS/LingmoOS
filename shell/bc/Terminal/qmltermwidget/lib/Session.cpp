@@ -33,7 +33,7 @@
 #include <QByteRef>
 #include <QDir>
 #include <QFile>
-#include <QRegularExpression>
+#include <QRegExp>
 #include <QStringList>
 #include <QFile>
 #include <QtDebug>
@@ -163,9 +163,9 @@ bool Session::isRunning() const
     return _shellProcess->state() == QProcess::Running;
 }
 
-void Session::setCodec(QStringConverter::Encoding encoding)
+void Session::setCodec(QTextCodec * codec)
 {
-    emulation()->setEncoding(encoding);
+    emulation()->setCodec(codec);
 }
 
 void Session::setProgram(const QString & program)
@@ -403,7 +403,7 @@ void Session::setUserTitle( int what, const QString & caption )
 
     if (what == 31) {
         QString cwd=caption;
-        cwd=cwd.replace( QRegularExpression(QLatin1String("^~")), QDir::homePath() );
+        cwd=cwd.replace( QRegExp(QLatin1String("^~")), QDir::homePath() );
         emit openUrlRequest(cwd);
     }
 

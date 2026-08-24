@@ -21,7 +21,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Window 2.12
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.0
 
 import Lingmo.FileManager 1.0 as FM
 import LingmoUI 1.0 as LingmoUI
@@ -131,15 +131,15 @@ Item {
                         console.log("Sorting by name")
                         break;
                     case sortModeType:
-                        // 按文件类型排�?
+                        // 按文件类型排序
                         console.log("Sorting by type")
                         break;
                     case sortModeModified:
-                        // 按修改时间排�?
+                        // 按修改时间排序
                         console.log("Sorting by modified time")
                         break;
                     case sortModeSize:
-                        // 按文件大小排�?
+                        // 按文件大小排序
                         console.log("Sorting by size")
                         break;
                     default:

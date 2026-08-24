@@ -26,29 +26,25 @@ set(SCREEN_SRCS
     plugin.cpp
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui DBus Quick LinguistTools)
-# Look up each Framework directly: Debian packages ship component configs,
-# rather than a monolithic KF6Config.cmake package.
-find_package(KF6KIO REQUIRED)
-find_package(KF6Solid REQUIRED)
-find_package(KF6WindowSystem REQUIRED)
-find_package(KF6Config REQUIRED)
-find_package(KF6XmlGui REQUIRED)
+find_package(Qt5 COMPONENTS Core DBus Quick LinguistTools REQUIRED)
+find_package(KF5KIO)
+find_package(KF5Solid)
+find_package(KF5WindowSystem)
+find_package(KF5Config)
 
 add_library(lingmofilemanager_qmlplugins SHARED ${SCREEN_SRCS})
 
 target_link_libraries (lingmofilemanager_qmlplugins
-    Qt6::Core
-    Qt6::Quick
-    Qt6::Gui
-    Qt6::DBus
-    KF6::KIOCore
-    KF6::KIOFileWidgets
-    KF6::KIOWidgets
-    KF6::Solid
-    KF6::WindowSystem
-    KF6::ConfigCore
-    KF6::XmlGui
+    Qt5::Core
+    Qt5::Quick
+    Qt5::Gui
+    Qt5::DBus
+    KF5::KIOCore
+    KF5::KIOFileWidgets
+    KF5::KIOWidgets
+    KF5::Solid
+    KF5::WindowSystem
+    KF5::ConfigCore
 )
 
 install(TARGETS lingmofilemanager_qmlplugins DESTINATION ${INSTALL_QMLDIR}/Lingmo/FileManager)

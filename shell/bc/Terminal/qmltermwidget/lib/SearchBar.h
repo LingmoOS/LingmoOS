@@ -19,7 +19,7 @@
 #ifndef _SEARCHBAR_H
 #define	_SEARCHBAR_H
 
-#include <QRegularExpression>
+#include <QRegExp>
 
 #include "ui_SearchBar.h"
 #include "HistorySearch.h"

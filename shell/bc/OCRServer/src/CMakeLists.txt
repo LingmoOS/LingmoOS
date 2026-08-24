@@ -21,7 +21,13 @@ if(DOTEST)
     endif()
 endif()
 
-find_package(Qt6 REQUIRED ${QtModule})
+find_package(Qt5 REQUIRED ${QtModule})
+
+include_directories(
+    ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5DBus_INCLUDE_DIRS}
+)
+add_definitions(${QT_DEFINITIONS})
 
 include(CMakePackageConfigHelpers)
 
@@ -59,7 +65,7 @@ aux_source_directory(./paddleocr-ncnn allSource)
 file(GLOB TargetTsFiles LIST_DIRECTORIES false ../translations/${PROJECT_NAME}*.ts)
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
-    qt6_create_translation(LangSrcs ${allSource} ${TargetTsFiles}
+    qt5_create_translation(LangSrcs ${allSource} ${TargetTsFiles}
         OPTIONS )
 endif()
 #qt5_add_translation(${TargetTsFiles})
@@ -129,10 +135,16 @@ if(DOTEST)
     target_include_directories(${PROJECT_NAME_TEST} PUBLIC ${dtk_lib_INCLUDE_DIRS})
 endif()
 
-target_link_libraries(${PROJECT_NAME} opencv_world ncnn Qt6::Core Qt6::Gui Qt6::Widgets pthread dl -fopenmp)
+qt5_use_modules(${PROJECT_NAME} ${QtModule})
 
 if(DOTEST)
-    target_link_libraries(${PROJECT_NAME_TEST} opencv_world ncnn Qt6::Core Qt6::Gui Qt6::Widgets ${dtk_lib_LIBRARIES} pthread dl -fopenmp)
+    qt5_use_modules(${PROJECT_NAME_TEST} ${QtModule})
+endif()
+
+target_link_libraries(${PROJECT_NAME} opencv_world ncnn Qt5::Core Qt5::Gui Qt5::Widgets pthread dl -fopenmp)
+
+if(DOTEST)
+    target_link_libraries(${PROJECT_NAME_TEST} opencv_world ncnn Qt5::Core Qt5::Gui Qt5::Widgets ${dtk_lib_LIBRARIES} pthread dl -fopenmp)
 endif()
 
 # install

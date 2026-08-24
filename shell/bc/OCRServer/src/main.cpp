@@ -32,6 +32,7 @@
 #include <QCoreApplication>
 #include <QDBusConnection>
 #include <QDBusInterface>
+#include <QDesktopWidget>
 
 //判断是否是wayland
 bool CheckWayland()
