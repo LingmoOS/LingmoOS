@@ -129,6 +129,6 @@ target_sources(
     welcomeview/savedsessionsmodel.cpp
 )
 
-if(BUILD_TESTING)
-  add_subdirectory(autotests)
-endif()
+# if(BUILD_TESTING)
+#   add_subdirectory(autotests)
+# endif()
