@@ -1,4 +1,4 @@
-FROM docker.io/library/debian:testing
+FROM docker.io/library/debian:bookworm
 
 RUN DEBIAN_FRONTEND=noninteractive TZ=America/Denver apt-get update && \
     DEBIAN_FRONTEND=noninteractive TZ=America/Denver apt-get install -y \
